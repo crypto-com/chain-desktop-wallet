@@ -2,12 +2,30 @@
 
 Crypto.com chain desktop wallet
 
-### Development and builds process
+### Installation
 
 ```
 yarn install
 ```
 Installs all the needed dependencies
+
+### Development & Builds Processes
+
+#### Web Target 🌐
+
+```
+yarn start
+```
+The command above runs the app as a normal web app in development, deployed at http://localhost:3000/
+
+```
+yarn build
+```
+Builds a web distributable build of the repository.
+The final output build should be ready to be deployed like any normal react web app
+
+
+#### Electron Target 💻
 
 ```
 yarn electron:dev
@@ -23,4 +41,4 @@ yarn electron:build
 ```
 Builds the Electron app package for production to the dist folder.
 
-The app is ready to be distributed! 
+The app is ready to be distributed!
