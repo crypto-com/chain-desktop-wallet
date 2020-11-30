@@ -23,4 +23,4 @@ yarn electron:build
 ```
 Builds the Electron app package for production to the dist folder.
 
-The app is ready to be distributed!
+The app is ready to be distributed! 
