@@ -23,7 +23,7 @@ yarn build
 ```
 Builds an optimized web distributable output for the repository.
 
-The final output build should be ready to be deployed like any normal react web app. The build folder is ready to be deployed 🚀
+The final output build should be ready to be deployed like any normal react web app. The /build folder is ready to be deployed 🚀
 
 
 #### Electron Target 💻
