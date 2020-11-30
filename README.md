@@ -21,7 +21,7 @@ The command above runs the app as a normal web app in development, deployed at h
 ```
 yarn build
 ```
-Builds a web distributable build of the repository.
+Builds an optimized web distributable output for the repository.
 The final output build should be ready to be deployed like any normal react web app
 
 
