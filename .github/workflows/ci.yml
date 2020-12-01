@@ -1,13 +1,14 @@
-name: Build Executable
+name: Test & Build
 
 on:
+  pull_request:
   push:
     branches:
       - master
 
 jobs:
   build:
-    name: Executable CI Build
+    name: Build CI
     runs-on: macOS-latest
     steps:
       - uses: actions/setup-node@v1
@@ -21,12 +22,16 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node12-${{ hashFiles('**/package-lock.json') }}
-
+      
       - name: Install deps and tools
         run: |
           npm install -g yarn
           yarn install
 
-      - name: Build Executable Target (MacOS)
+      - name: Run All Tests
         run: |
-          yarn electron:build
+          yarn test
+
+      - name: Build For The Web Target
+        run: |
+          yarn build

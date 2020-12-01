@@ -1,5 +1,5 @@
 {
-  "name": "@crypto-com/chain-desktop-wallet",
+  "name": "chain-desktop-wallet",
   "version": "0.0.1",
   "description": "Crypto.com Chain Desktop Wallet",
   "author": "Crypto.com <chain@crypto.com>",
@@ -29,7 +29,7 @@
     "postinstall": "electron-builder install-app-deps",
     "electron:dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:windev": "concurrently \"SET BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
-    "electron:build": "yarn build && tsc -p electron && electron-builder",
+    "electron:build": "yarn build && tsc -p electron && electron-builder --publish=never",
     "eject": "react-scripts eject"
   },
   "build": {
