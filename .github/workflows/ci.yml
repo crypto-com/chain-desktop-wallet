@@ -6,6 +6,7 @@ on:
     branches:
       - master
 
+jobs:
   build:
     name: Build CI
     runs-on: ubuntu-latest
