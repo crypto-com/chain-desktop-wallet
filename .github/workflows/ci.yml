@@ -25,7 +25,6 @@ jobs:
       
       - name: Install deps and tools
         run: |
-          npm install -g yarn
           yarn install
 
       - name: Run All Tests
