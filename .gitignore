@@ -25,3 +25,5 @@ yarn-error.log*
 
 .idea
 .eslintcache
+
+tinker/
