@@ -1,4 +1,4 @@
-name: Build Executable
+name: Build MacOS Executable
 
 on:
   push:
@@ -7,7 +7,6 @@ on:
 
 jobs:
   build:
-    name: Executable CI Build
     runs-on: macOS-latest
     steps:
       - uses: actions/setup-node@v1

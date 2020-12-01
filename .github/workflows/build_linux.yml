@@ -1,14 +1,12 @@
-name: Test & Build
+name: Build Linux Executable
 
 on:
-  pull_request:
   push:
     branches:
       - master
 
 jobs:
   build:
-    name: Build CI
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v1
@@ -22,16 +20,15 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node12-${{ hashFiles('**/package-lock.json') }}
-      
+
       - name: Install deps and tools
         run: |
           npm install -g yarn
           yarn install
+          sudo apt-get install --no-install-recommends -y libopenjp2-tools
+          sudo apt-get install --no-install-recommends -y rpm
+          sudo apt-get install --no-install-recommends -y bsdtar
 
-      - name: Run All Tests
+      - name: Build Executable Target (Linux)
         run: |
-          yarn test
-
-      - name: Build For The Web Target
-        run: |
-          yarn build
+          yarn electron:build
