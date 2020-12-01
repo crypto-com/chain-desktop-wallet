@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build CI
-    runs-on: ubuntu-latest
+    runs-on: macOS-latest
     steps:
       - uses: actions/setup-node@v1
         with:
