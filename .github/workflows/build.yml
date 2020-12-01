@@ -1,7 +1,6 @@
-name: Test & Build
+name: Build Executable
 
 on:
-  pull_request:
   push:
     branches:
       - master
@@ -22,16 +21,12 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node12-${{ hashFiles('**/package-lock.json') }}
-      
+
       - name: Install deps and tools
         run: |
           npm install -g yarn
           yarn install
 
-      - name: Run All Tests
+      - name: Build Executable Target (MacOS)
         run: |
-          yarn test
-
-      - name: Build For The Web Target
-        run: |
-          yarn build
+          yarn electron:build
