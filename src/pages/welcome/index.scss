@@ -1,0 +1,43 @@
+
+.welcome-page{
+    display: grid;
+    grid-template-columns: 40px auto 40px;
+    grid-template-rows: 20vh 60vh 20vh;
+    grid-template-areas: 
+    "header header header"
+    ". container . "
+    ". . .";
+
+    .header{
+        margin: 40px 0;
+        grid-area: header;
+        display:flex;
+        justify-content: center;
+        align-items: center;
+        .logo{
+            width:20vw;
+        }
+    }
+    .container{
+        grid-area: container;
+        display:flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        .title{
+            font-size: 24px;
+        }
+        .slogan{
+            color: #888;
+        }
+        .button-container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            .ant-btn{
+                margin: 10px;
+            }
+        }
+    }
+    
+}
