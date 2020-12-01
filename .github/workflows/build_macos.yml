@@ -1,6 +1,7 @@
 name: Build MacOS Executable
 
 on:
+  pull_request:
   push:
     branches:
       - master
