@@ -1,10 +1,15 @@
 import {Wallet} from "../models/Wallet";
 import {WalletImportOptions} from "./WalletImporter";
 import {WalletNetworkType} from "./WalletNetworkType";
-import {DefaultConfigs} from "../config/StaticConfig";
+import {DefaultConfigs, WalletConfig} from "../config/StaticConfig";
 
 export class WalletCreator {
-    public create(options: WalletCreateOptions): Wallet {
+    public static create(options: WalletCreateOptions): Wallet {
+
+        return {address: "", config: DefaultConfigs.MainNetConfig}
+    }
+
+    public static createWithCustomConfigs(options: WalletImportOptions, customConfigs: WalletConfig): Wallet {
 
         return {address: "", config: DefaultConfigs.MainNetConfig}
     }
