@@ -2951,7 +2951,7 @@
     babel-plugin-transform-react-remove-prop-types "0.4.24"
     babel-plugin-transform-typescript-metadata "0.3.1"
 
-"@umijs/fabric@^2.2.2":
+"@umijs/fabric@^2.3.1":
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/@umijs/fabric/-/fabric-2.3.1.tgz#61ba46c47671e10f677965ba59619af04d2b7c10"
   integrity sha512-e+vQQPTYmH95CXC8TDZsoVAllQ6wAkVCwXZDbEOk0amhKvB8Ef6zJmKufd+AB9AnFEF1FchgU0i+fnDROR4l+Q==
@@ -2983,7 +2983,7 @@
     stylelint-order "^4.0.0"
     typescript "^4.0.0"
 
-"@umijs/test@^3.2.20":
+"@umijs/test@^3.2.28":
   version "3.2.28"
   resolved "https://registry.yarnpkg.com/@umijs/test/-/test-3.2.28.tgz#b2f949c2096a85b604443bb052f07d24112b6b97"
   integrity sha512-2ouwbn2IaEhz2Y5yE5K8+KpVT7CJifNAyTG5dOLC7hoTnKzPsIiDk5LhI+kqakwgjYMFSpPyiwZwFOI8aooNmQ==
@@ -15495,10 +15495,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@4.1.0:
-  version "4.1.0-dev.20201102"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.1.0-dev.20201102.tgz#e1978890ac063bb3f13d067067905b312c1e0897"
-  integrity sha512-kyL2MUGRx69NgowtHpnabYzNA3N8CR+XW51kL9my6MfSXyrojytW5P4YmaayHGQhWLRmzzdDvHfkf2PQBHgbUw==
+typescript@4.0.5:
+  version "4.0.5"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.0.5.tgz#ae9dddfd1069f1cb5beb3ef3b2170dd7c1332389"
+  integrity sha512-ywmr/VrTVCmNTJ6iV2LwIrfG1P+lv6luD8sUJs+2eI9NLGigaN+nUQc13iHqisq7bra9lnmUSYqbJvegraBOPQ==
 
 typescript@^4.0.0:
   version "4.1.2"
