@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build CI
-    runs-on: macOS-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v1
         with:
@@ -25,13 +25,16 @@ jobs:
       
       - name: Install deps and tools
         run: |
-          npm install -g yarn
           yarn install
 
       - name: Run All Tests
         run: |
           yarn test
 
+      - name: Running Lint
+        run: |
+          yarn lint:js
+          
       - name: Build For The Web Target
         run: |
           yarn build
