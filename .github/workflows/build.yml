@@ -1,32 +1,39 @@
-name: Build Executable
+# https://github.com/samuelmeuli/action-electron-builder
+name: Build Executables
 
 on:
+  pull_request:
   push:
     branches:
       - master
 
 jobs:
-  build:
-    name: Executable CI Build
-    runs-on: macOS-latest
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
     steps:
-      - uses: actions/setup-node@v1
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 10
 
-      - uses: actions/checkout@v2
-
-      - uses: actions/cache@v2
-        id: cache-deps
+      - name: Build/release Electron app
+        uses: samuelmeuli/action-electron-builder@v1
         with:
-          path: node_modules
-          key: ${{ runner.os }}-node12-${{ hashFiles('**/package-lock.json') }}
 
-      - name: Install deps and tools
-        run: |
-          npm install -g yarn
-          yarn install
+          build_script_name: electron:pre-build
 
-      - name: Build Executable Target (MacOS)
-        run: |
-          yarn electron:build
+          # GitHub token, automatically provided to the action
+          # (No need to define this secret in the repo settings)
+          github_token: ${{ secrets.github_token }}
+
+          # If the commit is tagged with a version (e.g. "v1.0.0"),
+          # release the app after building
+          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
