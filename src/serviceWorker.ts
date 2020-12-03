@@ -49,10 +49,10 @@ export function register(config?: Config) {
         // Add some additional logging to localhost, pointing developers to the
         // service worker/PWA documentation.
         navigator.serviceWorker.ready.then(() => {
-          console.log(
-            'This web app is being served cache-first by a service ' +
-              'worker. To learn more, visit https://bit.ly/CRA-PWA'
-          );
+          // console.log(
+          //   'This web app is being served cache-first by a service ' +
+          //     'worker. To learn more, visit https://bit.ly/CRA-PWA'
+          // );
         });
       } else {
         // Is not localhost. Just register service worker
@@ -77,32 +77,30 @@ function registerValidSW(swUrl: string, config?: Config) {
               // At this point, the updated precached content has been fetched,
               // but the previous service worker will still serve the older
               // content until all client tabs are closed.
-              console.log(
-                'New content is available and will be used when all ' +
-                  'tabs for this page are closed. See https://bit.ly/CRA-PWA.'
-              );
+              // console.log(
+              //   'New content is available and will be used when all ' +
+              //     'tabs for this page are closed. See https://bit.ly/CRA-PWA.'
+              // );
 
               // Execute callback
               if (config && config.onUpdate) {
                 config.onUpdate(registration);
               }
-            } else {
+            } else if (config && config.onSuccess) {
               // At this point, everything has been precached.
               // It's the perfect time to display a
               // "Content is cached for offline use." message.
-              console.log('Content is cached for offline use.');
+              // console.log('Content is cached for offline use.');
 
               // Execute callback
-              if (config && config.onSuccess) {
-                config.onSuccess(registration);
-              }
+              config.onSuccess(registration);
             }
           }
         };
       };
     })
-    .catch(error => {
-      console.error('Error during service worker registration:', error);
+    .catch(() => {
+      // console.error('Error during service worker registration:', error);
     });
 }
 
@@ -128,9 +126,9 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
       }
     })
     .catch(() => {
-      console.log(
-        'No internet connection found. App is running in offline mode.'
-      );
+      // console.log(
+      //   'No internet connection found. App is running in offline mode.'
+      // );
     });
 }
 
