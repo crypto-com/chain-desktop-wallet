@@ -6,4 +6,6 @@ export class WalletService {
   // /// Save freshly created or imported wallet
   // public persistWallet(wallet: Wallet) {
   // }
+  // public removeWallet(walletID: string) {
+  // }
 }

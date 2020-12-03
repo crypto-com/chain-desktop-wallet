@@ -1,47 +1,62 @@
 import sdk from '@crypto-com/chain-jslib';
 import { Wallet } from '../models/Wallet';
-import { WalletImportOptions } from './WalletImporter';
-import { WalletNetworkType } from './WalletNetworkType';
 import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
 import { HDKey, Secp256k1KeyPair } from './types/ChainJsLib';
 import { encryptPhrase } from '../crypto/Encrypter';
+import { getRandomId } from '../crypto/RandomGen';
 
 export class WalletCreator {
   public static create(options: WalletCreateOptions): Wallet {
+    const { cro, phrase } = this.generatePhrase(options.config);
+
+    const privateKey = HDKey.fromMnemonic(phrase).derivePrivKey(options.config.derivationPath);
+    const keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
+    const address = new cro.Address(keyPair).account();
+
+    const encryptedPhrase = encryptPhrase(phrase);
+    return {
+      id: getRandomId(),
+      name: options.walletName,
+      address,
+      config: options.config,
+      encryptedPhrase,
+    };
+  }
+
+  private static generatePhrase(walletConfig: WalletConfig) {
     const network =
-      options.networkType === WalletNetworkType.MAINNET
+      walletConfig === DefaultWalletConfigs.MainNetConfig
         ? sdk.CroNetwork.Mainnet
         : sdk.CroNetwork.Testnet;
 
     const cro = sdk.CroSDK({ network });
     const phrase = HDKey.generateMnemonic(24);
-
-    const config =
-      options.networkType === WalletNetworkType.MAINNET
-        ? DefaultWalletConfigs.MainNetConfig
-        : DefaultWalletConfigs.TestNetConfig;
-
-    const privateKey = HDKey.fromMnemonic(phrase).derivePrivKey(config.derivationPath);
-    const keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
-    const address = new cro.Address(keyPair).account();
-
-    const encryptedPhrase = encryptPhrase(phrase);
-    return { address, config, encryptedPhrase };
+    return { cro, phrase };
   }
 
   public static createWithCustomConfigs(
-    options: WalletImportOptions,
+    options: WalletCreateOptions,
     customConfigs: WalletConfig,
   ): Wallet {
-    // TODO : Complete implementation for wallet creation with custom configs
-    return { address: '', config: customConfigs, encryptedPhrase: '' };
+    // TODO : Complete implementation for wallet creation with custom configs later
+    // TODO : This will need the Network type to be exported first from the chainjs-lib
+    return {
+      id: getRandomId(),
+      name: options.walletName,
+      address: '',
+      config: customConfigs,
+      encryptedPhrase: '',
+    };
   }
 }
 
 export class WalletCreateOptions {
-  public readonly networkType: WalletNetworkType;
+  public readonly config: WalletConfig;
 
-  constructor(networkType: WalletNetworkType) {
-    this.networkType = networkType;
+  public readonly walletName: string;
+
+  constructor(walletConfig: WalletConfig, walletName: string) {
+    this.config = walletConfig;
+    this.walletName = walletName;
   }
 }

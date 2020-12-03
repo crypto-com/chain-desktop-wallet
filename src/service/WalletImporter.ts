@@ -1,49 +1,60 @@
 import sdk from '@crypto-com/chain-jslib';
 import { Wallet } from '../models/Wallet';
-import { WalletNetworkType } from './WalletNetworkType';
 import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
 import { HDKey, Secp256k1KeyPair } from './types/ChainJsLib';
 import { encryptPhrase } from '../crypto/Encrypter';
+import { getRandomId } from '../crypto/RandomGen';
 
-// TODO : Complete WalletImporter implementation
 export class WalletImporter {
   public static import(options: WalletImportOptions): Wallet {
     const network =
-      options.networkType === WalletNetworkType.MAINNET
+      options.config === DefaultWalletConfigs.MainNetConfig
         ? sdk.CroNetwork.Mainnet
         : sdk.CroNetwork.Testnet;
 
     const cro = sdk.CroSDK({ network });
 
-    const config =
-      options.networkType === WalletNetworkType.MAINNET
-        ? DefaultWalletConfigs.MainNetConfig
-        : DefaultWalletConfigs.TestNetConfig;
-
-    const privateKey = HDKey.fromMnemonic(options.phrase).derivePrivKey(config.derivationPath);
+    const privateKey = HDKey.fromMnemonic(options.phrase).derivePrivKey(
+      options.config.derivationPath,
+    );
     const keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
     const address = new cro.Address(keyPair).account();
 
     const encryptedPhrase = encryptPhrase(options.phrase);
-    return { address, config, encryptedPhrase };
+    return {
+      id: getRandomId(),
+      name: options.walletName,
+      address,
+      config: options.config,
+      encryptedPhrase,
+    };
   }
 
   public static importWithCustomConfigs(
     options: WalletImportOptions,
     customConfigs: WalletConfig,
   ): Wallet {
-    // Generate address
-    return { address: '', config: customConfigs, encryptedPhrase: '' };
+    // TODO : Complete WalletImporter implementation when a custom config is provided
+    return {
+      id: getRandomId(),
+      name: options.walletName,
+      address: '',
+      config: customConfigs,
+      encryptedPhrase: '',
+    };
   }
 }
 
 export class WalletImportOptions {
-  public readonly networkType: WalletNetworkType;
+  public readonly config: WalletConfig;
+
+  public readonly walletName: string;
 
   public readonly phrase: string;
 
-  constructor(networkType: WalletNetworkType, phrase: string) {
-    this.networkType = networkType;
+  constructor(walletName: string, walletConfig: WalletConfig, phrase: string) {
+    this.walletName = walletName;
+    this.config = walletConfig;
     this.phrase = phrase;
   }
 }

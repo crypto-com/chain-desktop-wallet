@@ -14,5 +14,6 @@ module.exports = {
     'no-param-reassign': 'off', // used redux-immer for simplification
     'prefer-object-spread': 'off',
     'max-classes-per-file': ['error', 3],
+    'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/*.spec.ts'] }],
   },
 };
