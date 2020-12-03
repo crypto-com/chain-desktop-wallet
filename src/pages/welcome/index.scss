@@ -1,13 +1,14 @@
+@import "../../index.scss";
 
 .welcome-page{
     display: grid;
-    grid-template-columns: 40px auto 40px;
-    grid-template-rows: 20vh 60vh 20vh;
+    grid-template-columns:  auto ;
+    grid-template-rows: 20vh 80vh;
     grid-template-areas: 
-    "header header header"
-    ". container . "
-    ". . .";
-
+    " header "
+    " container "
+    ".";
+    background: $background-color;
     .header{
         margin: 40px 0;
         grid-area: header;
@@ -15,7 +16,7 @@
         justify-content: center;
         align-items: center;
         .logo{
-            width:20vw;
+            width:240px;
         }
     }
     .container{
@@ -24,18 +25,40 @@
         justify-content: center;
         align-items: center;
         text-align: center;
+        background: url('../../assets/bg-pattern.svg');
+        background-size: cover;
+        padding-bottom: 20vh;
+        font-weight: 500;
         .title{
-            font-size: 24px;
+            font-size: 40px;
         }
         .slogan{
-            color: #888;
+            font-size: 24px;
+            color: #0b1426;
+            opacity: 0.5;
+            margin: auto;
+            width: 50vw;
         }
         .button-container{
             display: flex;
             justify-content: center;
             align-items: center;
+            margin: 32px;
             .ant-btn{
                 margin: 10px;
+                color: $azure;
+                border-radius: 4px;
+                border: solid 2px $azure;
+                font-size: 16px;
+                font-weight: 600;
+                line-height: 1.38;
+                width: 184px;
+                height: 48px;
+                background: transparent;
+                &.ant-btn-primary{
+                    color: $white;
+                    background: $azure;
+                }
             }
         }
     }
