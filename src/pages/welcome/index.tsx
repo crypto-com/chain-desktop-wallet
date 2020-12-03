@@ -1,6 +1,6 @@
 import React from 'react';
 // import ReactDOM from 'react-dom';
-import './index.scss';
+import './index.less';
 import 'antd/dist/antd.css';
 import { Button } from 'antd';
 import logo from '../../assets/logo-products-chain.svg';
