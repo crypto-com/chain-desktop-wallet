@@ -14,8 +14,9 @@ export class WalletCreator {
     const address = new cro.Address(keyPair).account();
 
     const encryptedPhrase = encryptPhrase(phrase);
+    const id = getRandomId();
     return {
-      id: getRandomId(),
+      id,
       name: options.walletName,
       address,
       config: options.config,
