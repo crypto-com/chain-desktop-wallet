@@ -1,18 +1,13 @@
 import sdk from '@crypto-com/chain-jslib';
 import { Wallet } from '../models/Wallet';
-import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
+import { WalletConfig } from '../config/StaticConfig';
 import { HDKey, Secp256k1KeyPair } from './types/ChainJsLib';
 import { encryptPhrase } from '../crypto/Encrypter';
 import { getRandomId } from '../crypto/RandomGen';
 
 export class WalletImporter {
   public static import(options: WalletImportOptions): Wallet {
-    const network =
-      options.config === DefaultWalletConfigs.MainNetConfig
-        ? sdk.CroNetwork.Mainnet
-        : sdk.CroNetwork.Testnet;
-
-    const cro = sdk.CroSDK({ network });
+    const cro = sdk.CroSDK({ network: options.config.network });
 
     const privateKey = HDKey.fromMnemonic(options.phrase).derivePrivKey(
       options.config.derivationPath,

@@ -2,28 +2,23 @@ import { CroNetwork } from '@crypto-com/chain-jslib/lib/dist/core/cro';
 
 export type WalletConfig = {
   name: string;
-  chainId: string;
   nodeUrl: string;
-  addressPrefix: string;
-  coin: {
-    baseDenom: string;
-    croDenom: string;
-  };
   derivationPath: string;
+  network: Network;
 };
 
 const TestNetConfig: WalletConfig = {
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",
   nodeUrl: 'https://testnet-croeseid-1.crypto.com:26657',
-  ...CroNetwork.Testnet,
+  network: CroNetwork.Testnet,
 };
 
 const MainNetConfig: WalletConfig = {
   name: 'MAIN-NET',
   derivationPath: "44'/394'/0'/0/0",
   nodeUrl: 'TO_BE_DECIDED',
-  ...CroNetwork.Mainnet,
+  network: CroNetwork.Mainnet,
 };
 
 // Available wallet configs will be presented to the user on wallet creation
@@ -31,4 +26,15 @@ const MainNetConfig: WalletConfig = {
 export const DefaultWalletConfigs = {
   TestNetConfig,
   MainNetConfig,
+};
+
+// This type is a copy of the Network type defined inside chain-js
+// The redefinition is a work-around on limitation to lib to export it
+export type Network = {
+  chainId: string;
+  addressPrefix: string;
+  bip44Path: { coinType: number; account: number };
+  validatorPubKeyPrefix: string;
+  validatorAddressPrefix: string;
+  coin: { baseDenom: string; croDenom: string };
 };
