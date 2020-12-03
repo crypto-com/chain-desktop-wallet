@@ -24,20 +24,6 @@ export class WalletImporter {
       encryptedPhrase,
     };
   }
-
-  public static importWithCustomConfigs(
-    options: WalletImportOptions,
-    customConfigs: WalletConfig,
-  ): Wallet {
-    // TODO : Complete WalletImporter implementation when a custom config is provided
-    return {
-      id: getRandomId(),
-      name: options.walletName,
-      address: '',
-      config: customConfigs,
-      encryptedPhrase: '',
-    };
-  }
 }
 
 export class WalletImportOptions {

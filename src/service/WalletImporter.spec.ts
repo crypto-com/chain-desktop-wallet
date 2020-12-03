@@ -1,6 +1,6 @@
 import 'mocha';
 import { expect } from 'chai';
-import { DefaultWalletConfigs } from '../config/StaticConfig';
+import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 
 describe('Testing WalletImporter', () => {
@@ -34,5 +34,39 @@ describe('Testing WalletImporter', () => {
     expect(testNetWallet.name).to.eq('My-MainNet-Wallet');
     expect(testNetWallet.address).to.eq('cro1n0ejfh2ur2nslekrynvcwuwc9cccnhxfqn6sfs');
     expect(testNetWallet.config).to.eq(mainNetConfig);
+  });
+
+  it('Test importing wallet with custom configurations', () => {
+    const customConfig: WalletConfig = {
+      derivationPath: "44'/245'/0'/0/0",
+      name: 'Pystaport-Custom-Network',
+      network: {
+        chainId: 'chainmaind',
+        addressPrefix: 'pcro',
+        validatorAddressPrefix: 'pcrocncl',
+        validatorPubKeyPrefix: 'pcrocnclconspub',
+        coin: {
+          baseDenom: 'basepcro',
+          croDenom: 'pcro',
+        },
+        bip44Path: {
+          coinType: 1,
+          account: 0,
+        },
+      },
+      nodeUrl: '123.18.45.12:3400',
+    };
+
+    const importOptions: WalletImportOptions = {
+      phrase:
+        'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone',
+      config: customConfig,
+      walletName: 'My-Custom-Config-Wallet',
+    };
+    const customWallet = WalletImporter.import(importOptions);
+
+    expect(customWallet.address).to.eq('pcro1fdu6qgn3r4ptsx8z6v5hr5dsjvkjw6jkyrphvx');
+    expect(customWallet.config).to.eq(customConfig);
+    expect(customWallet.config.network.chainId).to.eq('chainmaind');
   });
 });

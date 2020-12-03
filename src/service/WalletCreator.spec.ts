@@ -44,7 +44,7 @@ describe('Testing Wallet Creation', () => {
       derivationPath: "44'/245'/0'/0/0",
       name: 'Pystaport-Custom-Network',
       network: {
-        chainId: 'chainmaind',
+        chainId: 'pystaportnet',
         addressPrefix: 'pcro',
         validatorAddressPrefix: 'pcrocncl',
         validatorPubKeyPrefix: 'pcrocnclconspub',
@@ -68,6 +68,6 @@ describe('Testing Wallet Creation', () => {
 
     expect(customWallet.address.startsWith('pcro')).to.eq(true);
     expect(customWallet.config).to.eq(customConfig);
-    expect(customWallet.config.network.chainId).to.eq('Pystaport-Custom-Network');
+    expect(customWallet.config.network.chainId).to.eq('pystaportnet');
   });
 });
