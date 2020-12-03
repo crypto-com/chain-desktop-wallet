@@ -8,6 +8,7 @@
   "main": "build/electron/main.js",
   "private": true,
   "dependencies": {
+    "@crypto-com/chain-jslib": "^0.0.4",
     "@types/electron-devtools-installer": "^2.2.0",
     "@types/node": "14.14.9",
     "@types/react": "17.0.0",

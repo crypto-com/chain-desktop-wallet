@@ -1,35 +1,29 @@
+import { CroNetwork } from '@crypto-com/chain-jslib/lib/dist/core/cro';
+
 export type WalletConfig = {
-    chainId: string;
-    nodeUrl: string;
-    addressPrefix: string;
-    coin: {
-        baseDenom: string;
-        croDenom: string;
-    };
-    bip44Path: {
-        coinType: number;
-        account: number;
-    };
+  chainId: string;
+  nodeUrl: string;
+  addressPrefix: string;
+  coin: {
+    baseDenom: string;
+    croDenom: string;
+  };
+  derivationPath: string;
 };
 
 const TestNetConfig: WalletConfig = {
-    addressPrefix: "tcro",
-    bip44Path: {account: 0, coinType: 0},
-    chainId: "",
-    coin: {baseDenom: "", croDenom: ""},
-    nodeUrl: ""
-}
+  derivationPath: "m/44'/1'/0'/0/0",
+  nodeUrl: 'https://testnet-croeseid-1.crypto.com:26657',
+  ...CroNetwork.Testnet,
+};
 
 const MainNetConfig: WalletConfig = {
-    addressPrefix: "cro",
-    bip44Path: {account: 0, coinType: 0},
-    chainId: "",
-    coin: {baseDenom: "", croDenom: ""},
-    nodeUrl: ""
-}
+  derivationPath: "44'/394'/0'/0/0",
+  nodeUrl: 'TO_BE_DECIDED',
+  ...CroNetwork.Mainnet,
+};
 
-
-export const DefaultConfigs = {
-    TestNetConfig,
-    MainNetConfig
-}
+export const DefaultWalletConfigs = {
+  TestNetConfig,
+  MainNetConfig,
+};
