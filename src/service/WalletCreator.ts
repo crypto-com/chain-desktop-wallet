@@ -7,6 +7,17 @@ import { getRandomId } from '../crypto/RandomGen';
 
 export class WalletCreator {
   public static create(options: WalletCreateOptions): Wallet {
+    const { address, encryptedPhrase } = this.generate(options);
+    return {
+      id: getRandomId(),
+      name: options.walletName,
+      address,
+      config: options.config,
+      encryptedPhrase,
+    };
+  }
+
+  private static generate(options: WalletCreateOptions) {
     const cro = sdk.CroSDK({ network: options.config.network });
     const phrase = HDKey.generateMnemonic(24);
 
@@ -15,29 +26,7 @@ export class WalletCreator {
     const address = new cro.Address(keyPair).account();
 
     const encryptedPhrase = encryptPhrase(phrase);
-    const id = getRandomId();
-    return {
-      id,
-      name: options.walletName,
-      address,
-      config: options.config,
-      encryptedPhrase,
-    };
-  }
-
-  public static createWithCustomConfigs(
-    options: WalletCreateOptions,
-    customConfigs: WalletConfig,
-  ): Wallet {
-    // TODO : Complete implementation for wallet creation with custom configs later
-    // TODO : This will need the Network type to be exported first from the chainjs-lib
-    return {
-      id: getRandomId(),
-      name: options.walletName,
-      address: '',
-      config: customConfigs,
-      encryptedPhrase: '',
-    };
+    return { address, encryptedPhrase };
   }
 }
 
