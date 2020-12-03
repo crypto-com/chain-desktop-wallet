@@ -1,4 +1,4 @@
-@import "../../index.scss";
+@import "../../index.less";
 
 .welcome-page{
     display: grid;
@@ -8,7 +8,7 @@
     " header "
     " container "
     ".";
-    background: $background-color;
+    background: @background-color;
     .header{
         margin: 40px 0;
         grid-area: header;
@@ -46,9 +46,9 @@
             margin: 32px;
             .ant-btn{
                 margin: 10px;
-                color: $azure;
+                color: @azure;
                 border-radius: 4px;
-                border: solid 2px $azure;
+                border: solid 2px @azure;
                 font-size: 16px;
                 font-weight: 600;
                 line-height: 1.38;
@@ -56,8 +56,8 @@
                 height: 48px;
                 background: transparent;
                 &.ant-btn-primary{
-                    color: $white;
-                    background: $azure;
+                    color: @white;
+                    background: @azure;
                 }
             }
         }
