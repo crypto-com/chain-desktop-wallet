@@ -10,7 +10,7 @@ class StorageService {
     this.db = new DatabaseManager(namespace);
   }
 
-  public saveWallet(wallet: Wallet) {
+  public async saveWallet(wallet: Wallet) {
     return this.db.walletStore.insert(wallet);
   }
 
@@ -18,7 +18,7 @@ class StorageService {
     return this.db.walletStore.findOne<Wallet>({ identifier: id });
   }
 
-  public fetchWallets() {
+  public async fetchWallets() {
     return this.db.walletStore.find<Wallet>({}).exec();
   }
 
