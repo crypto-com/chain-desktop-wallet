@@ -17,7 +17,7 @@ export class WalletImporter {
 
     const encryptedPhrase = encryptPhrase(options.phrase);
     return {
-      id: getRandomId(),
+      identifier: getRandomId(),
       name: options.walletName,
       address,
       config: options.config,
