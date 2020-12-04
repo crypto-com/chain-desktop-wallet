@@ -23,8 +23,11 @@ class StorageService {
   }
 
   public async setSession(session: Session) {
-    await this.db.sessionStore.remove({}, {});
-    return this.db.sessionStore.insert({ _id: Session.SESSION_ID, ...session });
+    return this.db.sessionStore.update(
+      { _id: Session.SESSION_ID },
+      { $set: session },
+      { upsert: true },
+    );
   }
 
   public retrieveCurrentSession() {

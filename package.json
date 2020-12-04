@@ -10,9 +10,10 @@
   "dependencies": {
     "@crypto-com/chain-jslib": "^0.0.4",
     "@types/electron-devtools-installer": "^2.2.0",
-    "@types/node": "14.14.9",
-    "@types/react": "17.0.0",
-    "@types/react-dom": "17.0.0",
+    "@types/node": "^14.14.10",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/react-router-dom": "^5.1.6",
     "antd": "^4.9.1",
     "bfj": "^7.0.2",
     "camelcase": "^6.1.0",
@@ -23,6 +24,7 @@
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-refresh": "^0.8.3",
+    "react-router-dom": "^5.2.0",
     "ts-pnp": "1.2.0",
     "typescript": "4.0.5",
     "url-loader": "4.1.1"
@@ -38,7 +40,7 @@
     "electron:build": "yarn build && tsc -p electron && electron-builder --publish=never",
     "lint-staged": "lint-staged",
     "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
-    "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'"
+    "prettier": "prettier --write '/src/**/*.{js,jsx,tsx,ts,less,md,json}'"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
@@ -49,7 +51,7 @@
     }
   },
   "lint-staged": {
-    "**/*.{js,jsx,tsx,ts,less,md,json}": [
+    "src/**/*.{js,jsx,tsx,ts,less,md,json}": [
       "prettier --write"
     ],
     "src/**/*.less": "stylelint --syntax less",
@@ -81,9 +83,11 @@
   },
   "devDependencies": {
     "@babel/core": "7.12.3",
+    "@babel/plugin-syntax-jsx": "^7.12.1",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.2",
     "@svgr/webpack": "5.4.0",
     "@types/chai": "^4.2.14",
+    "@types/jest": "^26.0.16",
     "@types/mocha": "^8.0.4",
     "@typescript-eslint/eslint-plugin": "^4.5.0",
     "@typescript-eslint/parser": "^4.5.0",
@@ -150,7 +154,8 @@
     "webpack-dev-server": "3.11.0",
     "webpack-manifest-plugin": "2.2.0",
     "workbox-webpack-plugin": "5.1.4",
-    "@babel/plugin-syntax-jsx": "^7.12.1"
+    "@babel/plugin-syntax-jsx": "^7.12.1",
+    "workbox-webpack-plugin": "5.1.4"
   },
   "jest": {
     "roots": [

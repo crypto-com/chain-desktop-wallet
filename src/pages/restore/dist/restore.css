@@ -1,0 +1,72 @@
+body {
+  margin: 0;
+  font-family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+.restore-page {
+  display: grid;
+  grid-template-areas: 'header header header' '. container .' '. . .';
+  grid-template-rows: 20vh 80vh;
+  grid-template-columns: 20vw 60vw 20vw;
+  background: #f3fafe;
+}
+.restore-page .header {
+  display: flex;
+  grid-area: header;
+  align-items: center;
+  justify-content: center;
+  margin: 40px 0;
+}
+.restore-page .header .logo {
+  width: 240px;
+}
+.restore-page .container {
+  display: flex;
+  grid-area: container;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  text-align: center;
+}
+.restore-page .container .title {
+  font-size: 24px;
+}
+.restore-page .container .slogan {
+  width: 50vw;
+  margin: auto;
+  color: #0b1426;
+  font-size: 14px;
+  opacity: 0.5;
+}
+.restore-page .container form {
+  width: 100%;
+  max-width: 600px;
+  margin: auto;
+  margin-top: 40px;
+}
+.restore-page .container .button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 32px;
+}
+.restore-page .container .button-container .ant-btn {
+  width: 184px;
+  height: 48px;
+  margin: 10px;
+  color: #1199fa;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.38;
+  background: transparent;
+  border: solid 2px #1199fa;
+  border-radius: 4px;
+}
+.restore-page .container .button-container .ant-btn.ant-btn-primary {
+  color: #fff;
+  background: #1199fa;
+}

@@ -1,8 +1,9 @@
 import React from 'react';
 // import ReactDOM from 'react-dom';
-import './index.less';
+import './welcome.less';
 import 'antd/dist/antd.css';
 import { Button } from 'antd';
+import { Link } from 'react-router-dom';
 import logo from '../../assets/logo-products-chain.svg';
 
 function WelcomePage() {
@@ -17,9 +18,14 @@ function WelcomePage() {
           <div className="slogan">
             Our Sample Chain Wallet supports wallet management and funds transfer.
           </div>
+
           <div className="button-container">
-            <Button>Restore Wallet</Button>
-            <Button type="primary">Create Wallet</Button>
+            <Link to="/restore">
+              <Button>Restore Wallet</Button>
+            </Link>
+            <Link to="/create">
+              <Button type="primary">Create Wallet</Button>
+            </Link>
           </div>
         </div>
       </div>
