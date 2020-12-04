@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from '../../assets/logo.svg';
 
-import './App.scss';
+import './App.less';
 
 const App = () => {
   return (
