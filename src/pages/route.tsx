@@ -2,9 +2,9 @@ import React from 'react';
 // import React, { useState } from 'react';
 import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 
-import WelcomePage from './welcome';
-import RestorePage from './restore';
-import CreatePage from './create';
+import WelcomePage from './welcome/welcome';
+import RestorePage from './restore/restore';
+import CreatePage from './create/create';
 
 function RouteHub() {
   // const [page, setPage] = useState('welcome');

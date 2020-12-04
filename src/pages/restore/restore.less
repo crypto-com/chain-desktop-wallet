@@ -1,0 +1,77 @@
+@import '../../index.less';
+
+.restore-page {
+  display: grid;
+  grid-template-areas:
+    'header header header'
+    '. container .'
+    '. . .';
+  grid-template-rows: 20vh 80vh;
+  grid-template-columns: 20vw 60vw 20vw;
+  background: @background-color;
+
+  .header {
+    display: flex;
+    grid-area: header;
+    align-items: center;
+    justify-content: center;
+    margin: 40px 0;
+
+    .logo {
+      width: 240px;
+    }
+  }
+
+  .container {
+    display: flex;
+    grid-area: container;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    text-align: center;
+
+    .title {
+      font-size: 24px;
+    }
+
+    .slogan {
+      width: 50vw;
+      margin: auto;
+      color: #0b1426;
+      font-size: 14px;
+      opacity: 0.5;
+    }
+
+    form {
+      width: 100%;
+      max-width: 600px;
+      margin: auto;
+      margin-top: 40px;
+    }
+
+    .button-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 32px;
+
+      .ant-btn {
+        width: 184px;
+        height: 48px;
+        margin: 10px;
+        color: @azure;
+        font-weight: 600;
+        font-size: 16px;
+        line-height: 1.38;
+        background: transparent;
+        border: solid 2px @azure;
+        border-radius: 4px;
+
+        &.ant-btn-primary {
+          color: @white;
+          background: @azure;
+        }
+      }
+    }
+  }
+}

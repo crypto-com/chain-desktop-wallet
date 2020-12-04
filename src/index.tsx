@@ -3,7 +3,6 @@ import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 import RouteHub from './pages/route';
 
-
 ReactDOM.render(<RouteHub />, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
