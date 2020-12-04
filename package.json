@@ -39,7 +39,7 @@
     "electron:build": "yarn build && tsc -p electron && electron-builder --publish=never",
     "lint-staged": "lint-staged",
     "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
-    "prettier": "prettier --write '**/*.{js,jsx,tsx,ts,less,md,json}'"
+    "prettier": "prettier --write '/src/**/*.{js,jsx,tsx,ts,less,md,json}'"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
@@ -50,7 +50,7 @@
     }
   },
   "lint-staged": {
-    "**/*.{js,jsx,tsx,ts,less,md,json}": [
+    "src/**/*.{js,jsx,tsx,ts,less,md,json}": [
       "prettier --write"
     ],
     "src/**/*.less": "stylelint --syntax less",
