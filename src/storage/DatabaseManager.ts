@@ -6,7 +6,7 @@ export class DatabaseManager {
   public readonly walletStore: Datastore;
 
   constructor(namespace: string) {
-    this.sessionStore = Datastore.create(`./data/${namespace}app.session.db`);
-    this.walletStore = Datastore.create(`./data/${namespace}app.wallets.db`);
+    this.sessionStore = Datastore.create(`./data/${namespace}.session.db`);
+    this.walletStore = Datastore.create(`./data/${namespace}.wallets.db`);
   }
 }
