@@ -1,7 +1,7 @@
 import { WalletConfig } from '../config/StaticConfig';
 
 export class Wallet {
-  public readonly id: string;
+  public readonly identifier: string;
 
   public readonly name: string;
 
@@ -18,7 +18,7 @@ export class Wallet {
     config: WalletConfig,
     encryptedPhrase: string,
   ) {
-    this.id = id;
+    this.identifier = id;
     this.name = name;
     this.address = address;
     this.config = config;

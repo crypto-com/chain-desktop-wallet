@@ -9,7 +9,7 @@ export class WalletCreator {
   public static create(options: WalletCreateOptions): Wallet {
     const { address, encryptedPhrase } = this.generate(options);
     return {
-      id: getRandomId(),
+      identifier: getRandomId(),
       name: options.walletName,
       address,
       config: options.config,
