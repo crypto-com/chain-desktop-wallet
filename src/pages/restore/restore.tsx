@@ -42,7 +42,7 @@ const FormRestore = () => {
     const { name, mnemonic } = form.getFieldsValue();
     const importOptions: WalletImportOptions = {
       walletName: name,
-      phrase: mnemonic,
+      phrase: mnemonic.toString().trim(),
       config: DefaultWalletConfigs.TestNetConfig,
     };
     try {
