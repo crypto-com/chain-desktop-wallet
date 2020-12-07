@@ -13,8 +13,8 @@ class WalletService {
 
   // eslint-disable-next-line class-methods-use-this
   public supportedConfigs(): WalletConfig[] {
-    // TODO : On first iteration only TestNet configuration is supported
-    return [DefaultWalletConfigs.TestNetConfig];
+    // TODO : Custom configuration wallets will be enabled on future iterations
+    return [DefaultWalletConfigs.TestNetConfig, DefaultWalletConfigs.MainNetConfig];
   }
 
   // Create a new wallet and persist it on the db
