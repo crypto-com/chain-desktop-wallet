@@ -60,13 +60,14 @@ const FormRestore = () => {
   return (
     <Form {...layout} layout="vertical" form={form} name="control-ref">
       <Form.Item name="name" label="Wallet Name" rules={[{ required: true }]}>
-        <Input />
+        <Input placeholder="Wallet name" />
       </Form.Item>
       <Form.Item name="mnemonic" label="Mnemonic Phrase" rules={[{ required: true }]}>
-        <Input.TextArea autoSize={{ minRows: 3, maxRows: 3 }} />
+        <Input.TextArea autoSize={{ minRows: 3, maxRows: 3 }} placeholder="Mnemonic phrase" />
       </Form.Item>
       <Form.Item name="network" label="Network" rules={[{ required: true }]}>
         <Select
+          placeholder="Select wallet network"
           // placeholder="Select a option and change input text above"
           onChange={onNetworkChange}
           // allowClear
