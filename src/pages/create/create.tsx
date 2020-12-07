@@ -5,7 +5,6 @@ import { Button, Form, Input, Select } from 'antd';
 import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions } from '../../service/WalletCreator';
-import { DefaultWalletConfigs } from '../../config/StaticConfig';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -18,27 +17,26 @@ const tailLayout = {
 const FormCreate = () => {
   const [form] = Form.useForm();
 
-  const onNetworkChange = (value: any) => {
-    switch (value) {
-      case 'mainnet':
-        form.setFieldsValue({ note: 'Hi, mainnet!' });
-        return;
-      case 'testnet':
-        form.setFieldsValue({ note: 'Hi, testnet!' });
-        return;
-      case 'custom':
-        form.setFieldsValue({ note: 'Hi custom!' });
-        return;
-      default:
-        form.setFieldsValue({ note: 'Hi mainnet!' });
-    }
+  const onNetworkChange = (network: string) => {
+    form.setFieldsValue({ network });
   };
 
   const onWalletCreateFinish = async () => {
-    const { name } = form.getFieldsValue();
+    const { name, network } = form.getFieldsValue();
+    if (!name || !network) {
+      return;
+    }
+    const selectedNetwork = walletService
+      .supportedConfigs()
+      .find(config => config.name === network);
+
+    if (!selectedNetwork) {
+      return;
+    }
+
     const createOptions: WalletCreateOptions = {
       walletName: name,
-      config: DefaultWalletConfigs.TestNetConfig,
+      config: selectedNetwork,
     };
     try {
       await walletService.createAndSaveWallet(createOptions);
