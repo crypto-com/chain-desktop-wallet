@@ -1,11 +1,9 @@
 import React from 'react';
-// import ReactDOM from 'react-dom';
 import './create.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, Select } from 'antd';
-// import { FormInstance } from 'antd/lib/form';
 import logo from '../../assets/logo-products-chain.svg';
-import { WalletService, walletService } from '../../service/WalletService';
+import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions } from '../../service/WalletCreator';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 
@@ -36,77 +34,43 @@ const FormCreate = () => {
     }
   };
 
-  // const onFinish = values => {
-  //     console.log(values);
-  // };
-
-  const onFinish = async () => {
+  const onWalletCreateFinish = async () => {
     const { name } = form.getFieldsValue();
     const createOptions: WalletCreateOptions = {
       walletName: name,
       config: DefaultWalletConfigs.TestNetConfig,
     };
-    const wallet = await walletService.createAndSaveWallet(createOptions);
-    // eslint-disable-next-line
-    console.log('wallet saved ...', wallet);
+    try {
+      const wallet = await walletService.createAndSaveWallet(createOptions);
+      console.log('wallet saved ...', wallet);
+    } catch (e) {
+      console.error('issue on wallet create', e);
+      // TODO : Show pop up on failure to create wallet
+      return;
+    }
 
     form.resetFields();
-
-    // Show popup success
-    // Jump to home screen
+    // TODO : Show popup success & Jump to home screen
   };
 
-  // const onReset = () => {
-  //     form.resetFields();
-  // };
-
-  // const onFill = () => {
-  //     form.setFieldsValue({
-  //         note: 'Hello world!',
-  //         network: 'mainnet',
-  //     });
-  // };
-
   return (
-    <Form {...layout} layout="vertical" form={form} name="control-ref" onFinish={onFinish}>
+    <Form {...layout} layout="vertical" form={form} name="control-ref">
       <Form.Item name="name" label="Wallet Name" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
       <Form.Item name="network" label="Network" rules={[{ required: true }]}>
         <Select placeholder="Select wallet network" onChange={onNetworkChange}>
-          {WalletService.supportedConfigs().map(config => (
+          {walletService.supportedConfigs().map(config => (
             <Select.Option key={config.name} value={config.name}>
               {config.name}
             </Select.Option>
           ))}
         </Select>
       </Form.Item>
-      <Form.Item
-        noStyle
-        shouldUpdate={(prevValues, currentValues) => prevValues.network !== currentValues.network}
-      >
-        {({ getFieldValue }) => {
-          return getFieldValue('network') === 'custom' ? (
-            <Form.Item
-              name="customizeNetwork"
-              label="Customize Network"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-          ) : null;
-        }}
-      </Form.Item>
       <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit" onClick={onFinish}>
+        <Button type="primary" htmlType="submit" onClick={onWalletCreateFinish}>
           Create Wallet
         </Button>
-        {/* <Button htmlType="button" onClick={onReset}>
-                    Reset
-                </Button>
-                <Button type="link" htmlType="button" onClick={onFill}>
-                    Fill form
-                </Button> */}
       </Form.Item>
     </Form>
   );

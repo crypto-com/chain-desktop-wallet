@@ -2,6 +2,7 @@ import { Wallet } from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import { WalletCreateOptions, WalletCreator } from './WalletCreator';
 import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
+import { WalletImporter, WalletImportOptions } from './WalletImporter';
 
 export class WalletService {
   private readonly storageService: StorageService;
@@ -10,7 +11,8 @@ export class WalletService {
     this.storageService = new StorageService('app-db');
   }
 
-  public static supportedConfigs(): WalletConfig[] {
+  // eslint-disable-next-line class-methods-use-this
+  public supportedConfigs(): WalletConfig[] {
     // TODO : On first iteration only TestNet configuration is supported
     return [DefaultWalletConfigs.TestNetConfig];
   }
@@ -20,6 +22,13 @@ export class WalletService {
     const newWallet = WalletCreator.create(createOptions);
     await this.persistWallet(newWallet);
     return newWallet;
+  }
+
+  // Import or restore wallet and persist it on the db
+  public async restoreAndSaveWallet(importOptions: WalletImportOptions): Promise<Wallet> {
+    const importedWallet = WalletImporter.import(importOptions);
+    await this.persistWallet(importedWallet);
+    return importedWallet;
   }
 
   // Load all persisted wallets
