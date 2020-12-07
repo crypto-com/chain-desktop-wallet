@@ -41,10 +41,11 @@ const FormCreate = () => {
       config: DefaultWalletConfigs.TestNetConfig,
     };
     try {
-      const wallet = await walletService.createAndSaveWallet(createOptions);
-      console.log('wallet saved ...', wallet);
+      await walletService.createAndSaveWallet(createOptions);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error('issue on wallet create', e);
+
       // TODO : Show pop up on failure to create wallet
       return;
     }

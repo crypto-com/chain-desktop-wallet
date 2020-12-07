@@ -46,11 +46,10 @@ const FormRestore = () => {
       config: DefaultWalletConfigs.TestNetConfig,
     };
     try {
-      const wallet = await walletService.restoreAndSaveWallet(importOptions);
-      console.log('wallet imported ...', wallet);
+      await walletService.restoreAndSaveWallet(importOptions);
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.error('issue on wallet import', e);
-      console.log('phrase:\n', mnemonic);
       // TODO : Show pop up displaying the issue on wallet import
       return;
     }
