@@ -39,7 +39,7 @@ class MockNodeRpcService implements INodeRpcService {
 
 describe('Testing NodeRpcService', () => {
   it('Test Node Rpc calls ', async () => {
-    const nodeRpcService = new MockNodeRpcService();
+    const nodeRpcService: INodeRpcService = new MockNodeRpcService();
 
     const broadcastTransactionHash: string = await nodeRpcService.broadcastTransaction('');
     const sequenceNumber: number = await nodeRpcService.loadSequenceNumber(
