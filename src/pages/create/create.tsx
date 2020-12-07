@@ -1,13 +1,11 @@
-import React, { useState } from 'react';
-// import ReactDOM from 'react-dom';
+import React from 'react';
 import './create.less';
 import 'antd/dist/antd.css';
-import { Form, Input, Button, Select } from 'antd';
-// import { FormInstance } from 'antd/lib/form';
-import { Link } from 'react-router-dom';
+import { Button, Form, Input, Select } from 'antd';
 import logo from '../../assets/logo-products-chain.svg';
-
-const { Option } = Select;
+import { walletService } from '../../service/WalletService';
+import { WalletCreateOptions } from '../../service/WalletCreator';
+import { DefaultWalletConfigs } from '../../config/StaticConfig';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -19,7 +17,6 @@ const tailLayout = {
 
 const FormCreate = () => {
   const [form] = Form.useForm();
-  const [finish, setFinish] = useState('');
 
   const onNetworkChange = (value: any) => {
     switch (value) {
@@ -37,69 +34,45 @@ const FormCreate = () => {
     }
   };
 
-  // const onFinish = values => {
-  //     console.log(values);
-  // };
+  const onWalletCreateFinish = async () => {
+    const { name } = form.getFieldsValue();
+    const createOptions: WalletCreateOptions = {
+      walletName: name,
+      config: DefaultWalletConfigs.TestNetConfig,
+    };
+    try {
+      await walletService.createAndSaveWallet(createOptions);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('issue on wallet create', e);
 
-  const onFinish = () => {
-    setFinish('filled');
+      // TODO : Show pop up on failure to create wallet
+      return;
+    }
+
+    form.resetFields();
+    // TODO : Show popup success & Jump to home screen
   };
 
-  // const onReset = () => {
-  //     form.resetFields();
-  // };
-
-  // const onFill = () => {
-  //     form.setFieldsValue({
-  //         note: 'Hello world!',
-  //         network: 'mainnet',
-  //     });
-  // };
-
   return (
-    <Form {...layout} layout="vertical" form={form} name="control-ref" onFinish={onFinish}>
+    <Form {...layout} layout="vertical" form={form} name="control-ref">
       <Form.Item name="name" label="Wallet Name" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
       <Form.Item name="network" label="Network" rules={[{ required: true }]}>
-        <Select
-          // placeholder="Select a option and change input text above"
-          onChange={onNetworkChange}
-          // allowClear
-        >
-          <Option value="mainnet">Mainnet</Option>
-          <Option value="testnet">Testnet</Option>
-          <Option value="custom">Custom</Option>
+        <Select placeholder="Select wallet network" onChange={onNetworkChange}>
+          {walletService.supportedConfigs().map(config => (
+            <Select.Option key={config.name} value={config.name}>
+              {config.name}
+            </Select.Option>
+          ))}
         </Select>
       </Form.Item>
-      <Form.Item
-        noStyle
-        shouldUpdate={(prevValues, currentValues) => prevValues.network !== currentValues.network}
-      >
-        {({ getFieldValue }) => {
-          return getFieldValue('network') === 'custom' ? (
-            <Form.Item
-              name="customizeNetwork"
-              label="Customize Network"
-              rules={[{ required: true }]}
-            >
-              <Input />
-            </Form.Item>
-          ) : null;
-        }}
-      </Form.Item>
       <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit" onClick={onFinish}>
+        <Button type="primary" htmlType="submit" onClick={onWalletCreateFinish}>
           Create Wallet
         </Button>
-        {/* <Button htmlType="button" onClick={onReset}>
-                    Reset
-                </Button>
-                <Button type="link" htmlType="button" onClick={onFill}>
-                    Fill form
-                </Button> */}
       </Form.Item>
-      <Link to="/">{finish}</Link>
     </Form>
   );
 };

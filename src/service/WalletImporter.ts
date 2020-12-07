@@ -9,13 +9,12 @@ export class WalletImporter {
   public static import(options: WalletImportOptions): Wallet {
     const cro = sdk.CroSDK({ network: options.config.network });
 
-    const privateKey = HDKey.fromMnemonic(options.phrase).derivePrivKey(
-      options.config.derivationPath,
-    );
+    const mnemonic = options.phrase;
+    const privateKey = HDKey.fromMnemonic(mnemonic).derivePrivKey(options.config.derivationPath);
     const keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
     const address = new cro.Address(keyPair).account();
 
-    const encryptedPhrase = encryptPhrase(options.phrase);
+    const encryptedPhrase = encryptPhrase(mnemonic);
     return {
       identifier: getRandomId(),
       name: options.walletName,
