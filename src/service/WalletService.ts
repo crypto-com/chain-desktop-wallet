@@ -4,7 +4,7 @@ import { WalletCreateOptions, WalletCreator } from './WalletCreator';
 import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 
-export class WalletService {
+class WalletService {
   private readonly storageService: StorageService;
 
   constructor() {
