@@ -61,7 +61,7 @@ const FormCreate = () => {
   return (
     <Form {...layout} layout="vertical" form={form} name="control-ref" onFinish={onWalletCreateFinish}>
       <Form.Item name="name" label="Wallet Name" rules={[{ required: true }]}>
-        <Input />
+        <Input placeholder="Wallet name" />
       </Form.Item>
       <Form.Item name="network" label="Network" rules={[{ required: true }]}>
         <Select placeholder="Select wallet network" onChange={onNetworkChange}>
