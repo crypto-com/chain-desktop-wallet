@@ -4,6 +4,9 @@ module.exports = {
     page: true,
     REACT_APP_ENV: true,
   },
+  plugins: [
+    'react-hooks'
+  ],
   rules: {
     'jsx-a11y/accessible-emoji': 'off',
     'no-new-wrappers': 'off',
@@ -15,5 +18,11 @@ module.exports = {
     'prefer-object-spread': 'off',
     'max-classes-per-file': ['error', 3],
     'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/*.spec.ts'] }],
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': [
+      'warn', {
+        'additionalHooks': 'useRecoilCallback'
+      }
+    ]
   },
 };
