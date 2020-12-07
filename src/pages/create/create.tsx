@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import './create.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, Select } from 'antd';
@@ -17,6 +18,7 @@ const tailLayout = {
 
 const FormCreate = () => {
   const [form] = Form.useForm();
+  const history = useHistory();
 
   const onNetworkChange = (value: any) => {
     switch (value) {
@@ -52,10 +54,12 @@ const FormCreate = () => {
 
     form.resetFields();
     // TODO : Show popup success & Jump to home screen
+    history.push('home');
+
   };
 
   return (
-    <Form {...layout} layout="vertical" form={form} name="control-ref">
+    <Form {...layout} layout="vertical" form={form} name="control-ref" onFinish={onWalletCreateFinish}>
       <Form.Item name="name" label="Wallet Name" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
@@ -69,7 +73,7 @@ const FormCreate = () => {
         </Select>
       </Form.Item>
       <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit" onClick={onWalletCreateFinish}>
+        <Button type="primary" htmlType="submit">
           Create Wallet
         </Button>
       </Form.Item>

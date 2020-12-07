@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import './restore.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, Select } from 'antd';
@@ -17,6 +18,7 @@ const tailLayout = {
 
 const FormRestore = () => {
   const [form] = Form.useForm();
+  const history = useHistory();
 
   const onNetworkChange = (value: any) => {
     switch (value) {
@@ -55,10 +57,11 @@ const FormRestore = () => {
     }
 
     form.resetFields();
+    history.push('home');
   };
 
   return (
-    <Form {...layout} layout="vertical" form={form} name="control-ref">
+    <Form {...layout} layout="vertical" form={form} name="control-ref" onFinish={onWalletImportFinish}>
       <Form.Item name="name" label="Wallet Name" rules={[{ required: true }]}>
         <Input />
       </Form.Item>
@@ -79,7 +82,7 @@ const FormRestore = () => {
         </Select>
       </Form.Item>
       <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit" onClick={onWalletImportFinish}>
+        <Button type="primary" htmlType="submit">
           Restore Wallet
         </Button>
         {/* <Button htmlType="button" onClick={onReset}>
