@@ -6,6 +6,9 @@ import { Form, Input, Button, Select } from 'antd';
 // import { FormInstance } from 'antd/lib/form';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo-products-chain.svg';
+import { walletService } from '../../service/WalletService';
+import { WalletCreateOptions } from '../../service/WalletCreator';
+import { DefaultWalletConfigs } from '../../config/StaticConfig';
 
 const { Option } = Select;
 
@@ -42,7 +45,12 @@ const FormCreate = () => {
   // };
 
   const onFinish = () => {
-    setFinish('filled');
+    setFinish('');
+    const createOptions: WalletCreateOptions = {
+      walletName: '',
+      config: DefaultWalletConfigs.MainNetConfig,
+    };
+    walletService.createNewWallet(createOptions);
   };
 
   // const onReset = () => {

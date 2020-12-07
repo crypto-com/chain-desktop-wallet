@@ -1,11 +1,18 @@
 import { Wallet } from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
+import { WalletCreateOptions, WalletCreator } from './WalletCreator';
 
 class WalletService {
   private readonly storageService: StorageService;
 
   constructor() {
     this.storageService = new StorageService('app-db');
+  }
+
+  // Create a new wallet and persist it on the db
+  public async createNewWallet(createOptions: WalletCreateOptions) {
+    const newWallet = WalletCreator.create(createOptions);
+    await this.persistWallet(newWallet);
   }
 
   // Load all persisted wallets
