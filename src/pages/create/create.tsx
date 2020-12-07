@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 // import ReactDOM from 'react-dom';
 import './create.less';
 import 'antd/dist/antd.css';
-import { Form, Input, Button, Select } from 'antd';
+import { Button, Form, Input, Select } from 'antd';
 // import { FormInstance } from 'antd/lib/form';
-import { Link } from 'react-router-dom';
 import logo from '../../assets/logo-products-chain.svg';
-import { walletService } from '../../service/WalletService';
+import { WalletService, walletService } from '../../service/WalletService';
 import { WalletCreateOptions } from '../../service/WalletCreator';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
-
-const { Option } = Select;
 
 const layout = {
   // labelCol: { span: 8 },
@@ -22,7 +19,6 @@ const tailLayout = {
 
 const FormCreate = () => {
   const [form] = Form.useForm();
-  const [finish, setFinish] = useState('');
 
   const onNetworkChange = (value: any) => {
     switch (value) {
@@ -44,13 +40,20 @@ const FormCreate = () => {
   //     console.log(values);
   // };
 
-  const onFinish = () => {
-    setFinish('');
+  const onFinish = async () => {
+    const { name } = form.getFieldsValue();
     const createOptions: WalletCreateOptions = {
-      walletName: '',
-      config: DefaultWalletConfigs.MainNetConfig,
+      walletName: name,
+      config: DefaultWalletConfigs.TestNetConfig,
     };
-    walletService.createNewWallet(createOptions);
+    const wallet = await walletService.createAndSaveWallet(createOptions);
+    // eslint-disable-next-line
+    console.log('wallet saved ...', wallet);
+
+    form.resetFields();
+
+    // Show popup success
+    // Jump to home screen
   };
 
   // const onReset = () => {
@@ -70,14 +73,12 @@ const FormCreate = () => {
         <Input />
       </Form.Item>
       <Form.Item name="network" label="Network" rules={[{ required: true }]}>
-        <Select
-          // placeholder="Select a option and change input text above"
-          onChange={onNetworkChange}
-          // allowClear
-        >
-          <Option value="mainnet">Mainnet</Option>
-          <Option value="testnet">Testnet</Option>
-          <Option value="custom">Custom</Option>
+        <Select placeholder="Select wallet network" onChange={onNetworkChange}>
+          {WalletService.supportedConfigs().map(config => (
+            <Select.Option key={config.name} value={config.name}>
+              {config.name}
+            </Select.Option>
+          ))}
         </Select>
       </Form.Item>
       <Form.Item
@@ -107,7 +108,6 @@ const FormCreate = () => {
                     Fill form
                 </Button> */}
       </Form.Item>
-      <Link to="/">{finish}</Link>
     </Form>
   );
 };

@@ -1,18 +1,25 @@
 import { Wallet } from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import { WalletCreateOptions, WalletCreator } from './WalletCreator';
+import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
 
-class WalletService {
+export class WalletService {
   private readonly storageService: StorageService;
 
   constructor() {
     this.storageService = new StorageService('app-db');
   }
 
+  public static supportedConfigs(): WalletConfig[] {
+    // TODO : On first iteration only TestNet configuration is supported
+    return [DefaultWalletConfigs.TestNetConfig];
+  }
+
   // Create a new wallet and persist it on the db
-  public async createNewWallet(createOptions: WalletCreateOptions) {
+  public async createAndSaveWallet(createOptions: WalletCreateOptions): Promise<Wallet> {
     const newWallet = WalletCreator.create(createOptions);
     await this.persistWallet(newWallet);
+    return newWallet;
   }
 
   // Load all persisted wallets
