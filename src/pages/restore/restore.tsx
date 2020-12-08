@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 import './restore.less';
 import { Button, Form, Input, Select } from 'antd';
 import logo from '../../assets/logo-products-chain.svg';
-import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
@@ -34,44 +33,41 @@ const FormRestore = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
-  const onNetworkChange = (value: any) => {
-    switch (value) {
-      case 'mainnet':
-        form.setFieldsValue({ note: 'Hi, mainnet!' });
-        return;
-      case 'testnet':
-        form.setFieldsValue({ note: 'Hi, testnet!' });
-        return;
-      case 'custom':
-        form.setFieldsValue({ note: 'Hi custom!' });
-        return;
-      default:
-        form.setFieldsValue({ note: 'Hi mainnet!' });
-    }
+
+  const onNetworkChange = (network: string) => {
+    form.setFieldsValue({ network });
   };
 
-  // const onWalletImportFinish = values => {
-  //     console.log(values);
-  // };
-
   const onWalletImportFinish = async () => {
-    const { name, mnemonic } = form.getFieldsValue();
+    const { name, mnemonic, network } = form.getFieldsValue();
+    if (!name || !mnemonic || !network) {
+      return;
+    }
+    const selectedNetwork = walletService
+      .supportedConfigs()
+      .find(config => config.name === network);
+
+    if (!selectedNetwork) {
+      return;
+    }
+
     const importOptions: WalletImportOptions = {
       walletName: name,
       phrase: mnemonic.toString().trim(),
-      config: DefaultWalletConfigs.TestNetConfig,
+      config: selectedNetwork,
     };
     try {
       await walletService.restoreAndSaveWallet(importOptions);
       showModal();
+      form.resetFields();
+      // Jump to home screen
+
+      return;
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('issue on wallet import', e);
       // TODO : Show pop up displaying the issue on wallet import
-      return;
     }
-
-    form.resetFields();
   };
 
   return (

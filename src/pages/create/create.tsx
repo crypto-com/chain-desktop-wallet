@@ -41,27 +41,26 @@ const FormCreate = () => {
     setIsModalButtonDisabled(!e.target.checked);
   }
 
-  const onNetworkChange = (value: any) => {
-    switch (value) {
-      case 'mainnet':
-        form.setFieldsValue({ note: 'Hi, mainnet!' });
-        return;
-      case 'testnet':
-        form.setFieldsValue({ note: 'Hi, testnet!' });
-        return;
-      case 'custom':
-        form.setFieldsValue({ note: 'Hi custom!' });
-        return;
-      default:
-        form.setFieldsValue({ note: 'Hi mainnet!' });
-    }
+  const onNetworkChange = (network: string) => {
+    form.setFieldsValue({ network });
   };
 
   const onWalletCreateFinish = async () => {
-    const { name } = form.getFieldsValue();
+    const { name, network } = form.getFieldsValue();
+    if (!name || !network) {
+      return;
+    }
+    const selectedNetwork = walletService
+      .supportedConfigs()
+      .find(config => config.name === network);
+
+    if (!selectedNetwork) {
+      return;
+    }
+
     const createOptions: WalletCreateOptions = {
       walletName: name,
-      config: DefaultWalletConfigs.TestNetConfig,
+      config: selectedNetwork,
     };
     try {
       const createdWallet = await walletService.createAndSaveWallet(createOptions);
