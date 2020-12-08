@@ -19,20 +19,20 @@ const tailLayout = {
 const FormRestore = () => {
   const [form] = Form.useForm();
   const history = useHistory();
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
 
-  const showModal = () => {
-    setIsModalVisible(true);
+  const showSuccessModal = () => {
+    setIsSuccessModalVisible(true);
   };
 
-  const handleOk = () => {
-    setIsModalVisible(false);
+  const handleSuccessOk = () => {
+    setIsSuccessModalVisible(false);
     history.push('home');
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
+  const handleSuccessCancel = () => {
+    setIsSuccessModalVisible(false);
   };
 
   const showErrorModal = () => {
@@ -71,7 +71,7 @@ const FormRestore = () => {
     };
     try {
       await walletService.restoreAndSaveWallet(importOptions);
-      showModal();
+      showSuccessModal();
       form.resetFields();
       // Jump to home screen
 
@@ -114,9 +114,9 @@ const FormRestore = () => {
       </Form.Item>
       <Form.Item {...tailLayout}>
         <SuccessModalPopup
-          isModalVisible={isModalVisible}
-          handleCancel={handleCancel}
-          handleOk={handleOk}
+          isModalVisible={isSuccessModalVisible}
+          handleCancel={handleSuccessCancel}
+          handleOk={handleSuccessOk}
           title="Successful!"
           button={
             <Button type="primary" htmlType="submit">
@@ -124,7 +124,7 @@ const FormRestore = () => {
             </Button>
           }
           footer={[
-            <Button key="submit" type="primary" onClick={handleOk}>
+            <Button key="submit" type="primary" onClick={handleSuccessOk}>
               Next
             </Button>,
           ]}
