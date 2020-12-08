@@ -35,12 +35,11 @@ const FormCreate = () => {
 
   const handleOk = () => {
     setIsModalVisible(false);
-    // history.push('/create/backup');
-    setEncryptedPhrase(wallet?.encryptedPhrase ?? '')
+    setEncryptedPhrase(wallet?.encryptedPhrase ?? '');
     history.push({
       pathname: '/create/backup',
-      state: { encryptedPhrase }
-    })
+      state: { encryptedPhrase },
+    });
   };
 
   const handleCancel = () => {
@@ -122,9 +121,7 @@ const FormCreate = () => {
           ]}
         >
           <>
-            <div>
-              Your wallet has been created!
-            </div>
+            <div>Your wallet has been created!</div>
           </>
         </SuccessModalPopup>
       </Form.Item>

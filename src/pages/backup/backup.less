@@ -23,13 +23,14 @@
   }
 
   .container {
-    display: flex;
+    display: block;
     grid-area: container;
     align-items: center;
     justify-content: center;
+    margin: 40px 0;
+    overflow-y: scroll;
     font-weight: 500;
     text-align: center;
-
     .title {
       font-size: 24px;
     }
@@ -42,30 +43,28 @@
       opacity: 0.5;
     }
 
-    .phrase-container{
-        background: @white;
-        border-radius: 8px;
-        box-shadow: 2px 0 12px 2px rgba(11, 20, 38, 0.05);
-        display: grid;
-        max-width: 400px;
-        grid-template-columns: 1fr 1fr 1fr;
-        padding: 20px;
-        margin: 20px auto;
-        .phrase{
-            margin: 10px;
-            padding: 10px;
-            span{
-                color: @font-color;
-                opacity: 0.5;
-            }
-            border-bottom: 2px solid rgba(128, 128, 128, 0.1);
+    .phrase-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      background: @white;
+      border-radius: 8px;
+      box-shadow: 2px 0 12px 2px rgba(11, 20, 38, 0.05);
+      .phrase {
+        margin: 10px;
+        padding: 10px;
+        border-bottom: 2px solid rgba(128, 128, 128, 0.1);
+        span {
+          color: @font-color;
+          opacity: 0.5;
         }
+      }
     }
 
-    .ant-checkbox-wrapper{
-        margin: 10px 0;
+    .ant-checkbox-wrapper {
+      margin: 10px 0;
     }
   }
 }
-
-
