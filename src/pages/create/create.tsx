@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { atom, useRecoilState } from 'recoil';
 import './create.less';
-import { Button, Form, Input, Select, Checkbox } from 'antd';
+import { Button, Form, Input, Select } from 'antd';
 import logo from '../../assets/logo-products-chain.svg';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions } from '../../service/WalletCreator';
-import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -16,12 +17,17 @@ const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
 
+const encryptedPhraseState = atom({
+  key: 'encryptedPhrase',
+  default: '',
+});
+
 const FormCreate = () => {
   const [form] = Form.useForm();
   const history = useHistory();
   const [wallet, setWallet] = useState<Wallet>();
+  const [encryptedPhrase, setEncryptedPhrase] = useRecoilState(encryptedPhraseState);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isModalButtonDisabled, setIsModalButtonDisabled] = useState(true);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -29,15 +35,16 @@ const FormCreate = () => {
 
   const handleOk = () => {
     setIsModalVisible(false);
-    history.push('home');
+    // history.push('/create/backup');
+    setEncryptedPhrase(wallet?.encryptedPhrase ?? '')
+    history.push({
+      pathname: '/create/backup',
+      state: { encryptedPhrase }
+    })
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
-  };
-
-  const checkboxOnChange = e => {
-    setIsModalButtonDisabled(!e.target.checked);
   };
 
   const onNetworkChange = (network: string) => {
@@ -98,37 +105,28 @@ const FormCreate = () => {
         </Select>
       </Form.Item>
       <Form.Item {...tailLayout}>
-        <ModalPopup
+        <SuccessModalPopup
           isModalVisible={isModalVisible}
           handleCancel={handleCancel}
           handleOk={handleOk}
-          title="Backup Phrase Recovery"
+          title="Success!"
           button={
             <Button type="primary" htmlType="submit">
               Create Wallet
             </Button>
           }
           footer={[
-            <Button key="submit" type="primary" disabled={isModalButtonDisabled} onClick={handleOk}>
-              I have written down my recovery phrase
+            <Button key="submit" type="primary" onClick={handleOk}>
+              Next
             </Button>,
           ]}
         >
           <>
             <div>
-              The recovery phrase will only be shown once, backcup the 24-word phrase now and keep
-              it safe. You would need your recovery phrase to restore and access wallet.
+              Your wallet has been created!
             </div>
-            <div>
-              {wallet?.encryptedPhrase.split(' ').map((item, index) => {
-                return `${index + 1}. ${item} `;
-              })}
-            </div>
-            <Checkbox onChange={checkboxOnChange}>
-              I understand the recovery phrase will be only shown once
-            </Checkbox>
           </>
-        </ModalPopup>
+        </SuccessModalPopup>
       </Form.Item>
     </Form>
   );

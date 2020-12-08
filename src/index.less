@@ -1,6 +1,7 @@
 @import '~antd/lib/style/themes/default.less';
 @import '~antd/dist/antd.less';
 
+// Theme Customization
 @azure: #1199fa;
 @white: #fff;
 @background-color: #f3fafe;
@@ -9,8 +10,27 @@
 @base-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 @featured-font-family: acumin-pro, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
+// Ant Design Override
 @primary-color: @azure;
 @link-color: @azure;
+
+.ant-btn{
+  height: 48px;
+  margin: 10px;
+  color: @azure;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.38;
+  background: transparent;
+  border: solid 2px @azure;
+  border-radius: 4px;
+
+  &.ant-btn-primary:not([disabled]) {
+    color: @white;
+    background: @azure;
+  }
+}
+
 body {
   margin: 0;
   font-family: @base-font-family;

@@ -1,6 +1,6 @@
 @import '../../index.less';
 
-.create-page {
+.backup-page {
   display: grid;
   grid-template-areas:
     'header header header'
@@ -42,15 +42,30 @@
       opacity: 0.5;
     }
 
-    form {
-      width: 100%;
-      max-width: 600px;
-      margin: auto;
-      margin-top: 40px;
+    .phrase-container{
+        background: @white;
+        border-radius: 8px;
+        box-shadow: 2px 0 12px 2px rgba(11, 20, 38, 0.05);
+        display: grid;
+        max-width: 400px;
+        grid-template-columns: 1fr 1fr 1fr;
+        padding: 20px;
+        margin: 20px auto;
+        .phrase{
+            margin: 10px;
+            padding: 10px;
+            span{
+                color: @font-color;
+                opacity: 0.5;
+            }
+            border-bottom: 2px solid rgba(128, 128, 128, 0.1);
+        }
     }
 
-    .ant-btn {
-      width: 184px;
+    .ant-checkbox-wrapper{
+        margin: 10px 0;
     }
   }
 }
+
+
