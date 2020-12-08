@@ -36,7 +36,6 @@ class WalletService {
     };
 
     const transactionSigner = new TransactionSigner(currentWallet.config);
-
     const signedTxHex = transactionSigner.signTransfer(transfer, phrase);
 
     return nodeRpc.broadcastTransaction(signedTxHex);
