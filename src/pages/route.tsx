@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-d
 import WelcomePage from './welcome/welcome';
 import RestorePage from './restore/restore';
 import CreatePage from './create/create';
+import HomePage from './home/home';
 
 function RouteHub() {
   // const [page, setPage] = useState('welcome');
@@ -33,6 +34,12 @@ function RouteHub() {
       key: 'create',
       path: '/create',
       component: <CreatePage />,
+    },
+    {
+      name: 'Home Page',
+      key: 'home',
+      path: '/home',
+      component: <HomePage />,
     },
   ];
 

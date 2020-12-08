@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import './restore.less';
-import 'antd/dist/antd.css';
 import { Button, Form, Input, Select } from 'antd';
 import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -16,6 +18,21 @@ const tailLayout = {
 
 const FormRestore = () => {
   const [form] = Form.useForm();
+  const history = useHistory();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+    history.push('home');
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
 
   const onNetworkChange = (network: string) => {
     form.setFieldsValue({ network });
@@ -41,6 +58,7 @@ const FormRestore = () => {
     };
     try {
       await walletService.restoreAndSaveWallet(importOptions);
+      showModal();
       form.resetFields();
       // Jump to home screen
 
@@ -53,7 +71,7 @@ const FormRestore = () => {
   };
 
   return (
-    <Form {...layout} layout="vertical" form={form} name="control-ref">
+    <Form {...layout} layout="vertical" form={form} name="control-ref" onFinish={onWalletImportFinish}>
       <Form.Item name="name" label="Wallet Name" rules={[{ required: true }]}>
         <Input placeholder="Wallet name" />
       </Form.Item>
@@ -75,15 +93,28 @@ const FormRestore = () => {
         </Select>
       </Form.Item>
       <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit" onClick={onWalletImportFinish}>
-          Restore Wallet
-        </Button>
-        {/* <Button htmlType="button" onClick={onReset}>
-                    Reset
-                </Button>
-                <Button type="link" htmlType="button" onClick={onFill}>
-                    Fill form
-                </Button> */}
+        
+        <ModalPopup 
+          isModalVisible={isModalVisible}
+          handleCancel={handleCancel}
+          handleOk={handleOk}
+          title='Successful!'
+          button={<Button type="primary" htmlType="submit">
+            Restore Wallet
+          </Button>}
+          footer={[
+            <Button key="submit" type="primary" onClick={handleOk}>
+              Next
+            </Button>,
+          ]}
+        >
+          <>
+            <SuccessCheckmark />
+            <div>
+              Your wallet has been restored!
+            </div>
+          </>
+        </ModalPopup>
       </Form.Item>
     </Form>
   );

@@ -1,0 +1,40 @@
+@import '../../index.less';
+
+.home-page {
+  #components-layout-demo-fixed-sider .logo {
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 16px;
+  }
+  .site-layout .site-layout-background {
+    background: @white;
+  }
+  .ant-layout-sider, .ant-menu{
+    background: @background-color;
+  }
+  .ant-layout-header{
+    padding-left: 20px !important;
+    font-size: 24px;
+  }
+  .ant-menu{
+    .ant-menu-item{
+      margin: 10px;
+      border-radius: 8px;
+      width: 180px;
+      color: @font-color;
+      span{
+        color: @font-color;
+      }
+    } 
+    .ant-menu-item-selected{
+      color: @white;
+      background-color: @azure;
+      span{
+        color: @white;
+      }
+    }
+  }
+  .back-to-welcome{
+    margin:10px;
+  }
+}
