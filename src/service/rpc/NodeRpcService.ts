@@ -7,7 +7,7 @@ export interface INodeRpcService {
 
   loadSequenceNumber(address: string): Promise<number>;
 
-  loadAccountNumber(address: string): Promise<number>;
+  fetchAccountNumber(address: string): Promise<number>;
 
   // Broadcast trx return trx hash
   broadcastTransaction(signedTxHex: string): Promise<string>;
@@ -35,7 +35,7 @@ export class NodeRpcService implements INodeRpcService {
     return (await this.client.getAccount(address))?.sequence ?? 0;
   }
 
-  public async loadAccountNumber(address: string): Promise<number> {
+  public async fetchAccountNumber(address: string): Promise<number> {
     return (await this.client.getAccount(address))?.accountNumber ?? 0;
   }
 

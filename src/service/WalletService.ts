@@ -3,12 +3,49 @@ import { StorageService } from '../storage/StorageService';
 import { WalletCreateOptions, WalletCreator } from './WalletCreator';
 import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
+import { NodeRpcService } from './rpc/NodeRpcService';
+import { TransferTransaction } from './signers/TransferTransaction';
+import { TransactionSigner } from './signers/TransactionSigner';
+import { Session } from '../models/Session';
 
 class WalletService {
   private readonly storageService: StorageService;
 
   constructor() {
     this.storageService = new StorageService('app-db');
+  }
+
+  public async sendTransfer(fromAddress: string, toAddress: string, amount: string, memo: string) {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    const currentWallet = currentSession.wallet;
+
+    const nodeRpc = await NodeRpcService.init(currentWallet.config.nodeUrl);
+
+    const accountNumber = await nodeRpc.fetchAccountNumber(currentWallet.address);
+    const accountSequence = await nodeRpc.loadSequenceNumber(currentWallet.address);
+
+    const phrase = await this.decryptPhrase(currentSession);
+
+    const transfer: TransferTransaction = {
+      fromAddress,
+      toAddress,
+      amount,
+      memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    const transactionSigner = new TransactionSigner(currentWallet.config);
+
+    const signedTxHex = transactionSigner.signTransfer(transfer, phrase);
+
+    return nodeRpc.broadcastTransaction(signedTxHex);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async decryptPhrase(session: Session): Promise<string> {
+    // TODO : Implement actual phrase decryption
+    return Promise.resolve(session.wallet.encryptedPhrase);
   }
 
   // eslint-disable-next-line class-methods-use-this

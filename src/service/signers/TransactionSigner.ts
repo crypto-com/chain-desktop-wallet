@@ -1,48 +1,46 @@
 import sdk from '@crypto-com/chain-jslib';
-import { HDKey, Secp256k1KeyPair, Units, Big } from '../types/ChainJsLib';
+import { Big, HDKey, Secp256k1KeyPair, Units } from '../types/ChainJsLib';
+import { TransferTransaction } from './TransferTransaction';
 import { WalletConfig } from '../../config/StaticConfig';
 
 export class TransactionSigner {
-  public static sign(config: WalletConfig) {
-    // Initialize the library configurations with TestNet configs
-    const cro = sdk.CroSDK({ network: config.network });
+  public readonly config: WalletConfig;
 
-    const importedHDKey = HDKey.fromMnemonic(
-      'curtain maid fetch push pilot frozen speak motion island pigeon habit suffer gap purse royal hollow among orange pluck mutual eager cement void panther',
-    );
+  constructor(config: WalletConfig) {
+    this.config = config;
+  }
 
-    // Derive a private key from an HDKey at the specified path
-    const privateKey = importedHDKey.derivePrivKey(config.derivationPath);
+  public signTransfer(transfer: TransferTransaction, phrase: string): string {
+    const cro = sdk.CroSDK({ network: this.config.network });
 
-    // Getting a keyPair from a private key
+    const importedHDKey = HDKey.fromMnemonic(phrase);
+    const privateKey = importedHDKey.derivePrivKey(this.config.derivationPath);
     const keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
 
-    // Init Raw transaction
     const rawTx = new cro.RawTransaction();
 
-    const feeAmount = new cro.Coin('6500', Units.BASE);
-
-    // Custom properties set
-    rawTx.setMemo('Hello Test Memo');
-    rawTx.setGasLimit('280000');
-    rawTx.setFee(feeAmount);
-    rawTx.setTimeOutHeight(341910);
+    rawTx.setMemo(transfer.memo);
 
     const msgSend = new cro.bank.MsgSend({
-      fromAddress: 'tcro165tzcrh2yl83g8qeqxueg2g5gzgu57y3fe3kc3',
-      toAddress: 'tcro165tzcrh2yl83g8qeqxueg2g5gzgu57y3fe3kc3',
-      amount: new cro.Coin('1210', Units.BASE),
+      fromAddress: transfer.fromAddress,
+      toAddress: transfer.toAddress,
+      amount: new cro.Coin(transfer.amount, Units.BASE),
     });
 
     const signableTx = rawTx
       .appendMessage(msgSend)
       .addSigner({
         publicKey: keyPair.getPubKey(),
-        accountNumber: new Big(41),
-        accountSequence: new Big(13),
+        accountNumber: new Big(transfer.accountNumber),
+        accountSequence: new Big(transfer.accountSequence),
       })
       .toSignable();
 
-    return signableTx.setSignature(0, keyPair.sign(signableTx.toSignDoc(0))).toSigned();
+    return signableTx
+      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
+      .toSigned()
+      .getHexEncoded();
   }
+
+  // public signDelegateTx() {}
 }
