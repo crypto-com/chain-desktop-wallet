@@ -76,6 +76,12 @@ class WalletService {
     );
   }
 
+  // This is used to check whether the user should be shown the welcome screen or being redirected straight to their home screen
+  public async hasWalletBeenCreated(): Promise<boolean> {
+    const allWallets = await this.loadAllWallets();
+    return allWallets.length > 0;
+  }
+
   // Save freshly created or imported wallet
   public async persistWallet(wallet: Wallet) {
     await this.storageService.saveWallet(wallet);

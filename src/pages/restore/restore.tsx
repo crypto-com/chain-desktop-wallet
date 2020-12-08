@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import './restore.less';
-import 'antd/dist/antd.css';
 import { Button, Form, Input, Select } from 'antd';
 import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -16,6 +18,34 @@ const tailLayout = {
 
 const FormRestore = () => {
   const [form] = Form.useForm();
+  const history = useHistory();
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+
+  const showSuccessModal = () => {
+    setIsSuccessModalVisible(true);
+  };
+
+  const handleSuccessOk = () => {
+    setIsSuccessModalVisible(false);
+    history.push('home');
+  };
+
+  const handleSuccessCancel = () => {
+    setIsSuccessModalVisible(false);
+  };
+
+  const showErrorModal = () => {
+    setIsErrorModalVisible(true);
+  };
+
+  const handleErrorOk = () => {
+    setIsErrorModalVisible(false);
+  };
+
+  const handleErrorCancel = () => {
+    setIsErrorModalVisible(false);
+  };
 
   const onNetworkChange = (network: string) => {
     form.setFieldsValue({ network });
@@ -41,6 +71,7 @@ const FormRestore = () => {
     };
     try {
       await walletService.restoreAndSaveWallet(importOptions);
+      showSuccessModal();
       form.resetFields();
       // Jump to home screen
 
@@ -49,11 +80,18 @@ const FormRestore = () => {
       // eslint-disable-next-line no-console
       console.error('issue on wallet import', e);
       // TODO : Show pop up displaying the issue on wallet import
+      showErrorModal();
     }
   };
 
   return (
-    <Form {...layout} layout="vertical" form={form} name="control-ref">
+    <Form
+      {...layout}
+      layout="vertical"
+      form={form}
+      name="control-ref"
+      onFinish={onWalletImportFinish}
+    >
       <Form.Item name="name" label="Wallet Name" rules={[{ required: true }]}>
         <Input placeholder="Wallet name" />
       </Form.Item>
@@ -75,15 +113,37 @@ const FormRestore = () => {
         </Select>
       </Form.Item>
       <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit" onClick={onWalletImportFinish}>
-          Restore Wallet
-        </Button>
-        {/* <Button htmlType="button" onClick={onReset}>
-                    Reset
-                </Button>
-                <Button type="link" htmlType="button" onClick={onFill}>
-                    Fill form
-                </Button> */}
+        <SuccessModalPopup
+          isModalVisible={isSuccessModalVisible}
+          handleCancel={handleSuccessCancel}
+          handleOk={handleSuccessOk}
+          title="Successful!"
+          button={
+            <Button type="primary" htmlType="submit">
+              Restore Wallet
+            </Button>
+          }
+          footer={[
+            <Button key="submit" type="primary" onClick={handleSuccessOk}>
+              Next
+            </Button>,
+          ]}
+        >
+          <>
+            <div>Your wallet has been restored!</div>
+          </>
+        </SuccessModalPopup>
+        <ErrorModalPopup
+          isModalVisible={isErrorModalVisible}
+          handleCancel={handleErrorCancel}
+          handleOk={handleErrorOk}
+          title="Error!"
+          footer={[]}
+        >
+          <>
+            <div>Your Mnemonic Phrase is invalid. Please check again.</div>
+          </>
+        </ErrorModalPopup>
       </Form.Item>
     </Form>
   );
