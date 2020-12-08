@@ -1,8 +1,9 @@
 import React from 'react';
-import './ModalPopup.less';
+import './ErrorModalPopup.less';
 import { Modal } from 'antd';
+import ErrorXmark from '../ErrorXmark/ErrorXmark';
 
-interface ModalPopupProps {
+interface ErrorModalPopupProps {
   children: React.ReactNode;
   handleOk(): void;
   handleCancel(): void;
@@ -16,7 +17,7 @@ interface ModalPopupProps {
   footer?: Array<React.ReactNode>;
 }
 
-const ModalPopup: React.FC<ModalPopupProps> = props => {
+const ErrorModalPopup: React.FC<ErrorModalPopupProps> = props => {
   return (
     <>
       {props.button}
@@ -27,10 +28,11 @@ const ModalPopup: React.FC<ModalPopupProps> = props => {
         onCancel={props.handleCancel}
         footer={props.footer}
       >
+        <ErrorXmark />
         {props.children}
       </Modal>
     </>
   );
 };
 
-export default ModalPopup;
+export default ErrorModalPopup;

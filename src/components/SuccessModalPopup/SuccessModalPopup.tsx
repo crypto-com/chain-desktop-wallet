@@ -1,8 +1,9 @@
 import React from 'react';
-import './ModalPopup.less';
+import './SuccessModalPopup.less';
 import { Modal } from 'antd';
+import SuccessCheckmark from '../SuccessCheckmark/SuccessCheckmark';
 
-interface ModalPopupProps {
+interface SuccessModalPopupProps {
   children: React.ReactNode;
   handleOk(): void;
   handleCancel(): void;
@@ -16,7 +17,7 @@ interface ModalPopupProps {
   footer?: Array<React.ReactNode>;
 }
 
-const ModalPopup: React.FC<ModalPopupProps> = props => {
+const SuccessModalPopup: React.FC<SuccessModalPopupProps> = props => {
   return (
     <>
       {props.button}
@@ -27,10 +28,11 @@ const ModalPopup: React.FC<ModalPopupProps> = props => {
         onCancel={props.handleCancel}
         footer={props.footer}
       >
+        <SuccessCheckmark />
         {props.children}
       </Modal>
     </>
   );
 };
 
-export default ModalPopup;
+export default SuccessModalPopup;
