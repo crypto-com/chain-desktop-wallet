@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import './create.less';
-import 'antd/dist/antd.css';
-import { Button, Form, Input, Select } from 'antd';
+import { Button, Form, Input, Select, Checkbox } from 'antd';
 import logo from '../../assets/logo-products-chain.svg';
+import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions } from '../../service/WalletCreator';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -19,6 +20,26 @@ const tailLayout = {
 const FormCreate = () => {
   const [form] = Form.useForm();
   const history = useHistory();
+  const [wallet, setWallet] = useState<Wallet>();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isModalButtonDisabled, setIsModalButtonDisabled] = useState(true);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+    history.push('home');
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const checkboxOnChange = e => {
+    setIsModalButtonDisabled(!e.target.checked);
+  }
 
   const onNetworkChange = (value: any) => {
     switch (value) {
@@ -43,7 +64,10 @@ const FormCreate = () => {
       config: DefaultWalletConfigs.TestNetConfig,
     };
     try {
-      await walletService.createAndSaveWallet(createOptions);
+      const createdWallet = await walletService.createAndSaveWallet(createOptions);
+      setWallet(createdWallet);
+      showModal();
+      
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('issue on wallet create', e);
@@ -54,8 +78,6 @@ const FormCreate = () => {
 
     form.resetFields();
     // TODO : Show popup success & Jump to home screen
-    history.push('home');
-
   };
 
   return (
@@ -73,9 +95,30 @@ const FormCreate = () => {
         </Select>
       </Form.Item>
       <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit">
-          Create Wallet
-        </Button>
+        <ModalPopup 
+          isModalVisible={isModalVisible}
+          handleCancel={handleCancel}
+          handleOk={handleOk}
+          title='Backup Phrase Recovery'
+          button={<Button type="primary" htmlType="submit">
+            Create Wallet
+          </Button>}
+          footer={[
+            <Button key="submit" type="primary" disabled={isModalButtonDisabled} onClick={handleOk}>
+              I have written down my recovery phrase
+            </Button>,
+          ]}
+        >
+          <>
+            <div>The recovery phrase will only be shown once, backcup the 24-word phrase now and keep it safe. You would need your recovery phrase to restore and access wallet.</div>
+            <div>
+              {wallet?.encryptedPhrase.split(' ').map((item, index) =>{
+                return `${index+1}. ${item} `
+              })}
+            </div>
+            <Checkbox onChange={checkboxOnChange}>I understand the recovery phrase will be only shown once</Checkbox>
+          </>
+        </ModalPopup>
       </Form.Item>
     </Form>
   );

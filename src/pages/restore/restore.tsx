@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import './restore.less';
-import 'antd/dist/antd.css';
 import { Button, Form, Input, Select } from 'antd';
 import logo from '../../assets/logo-products-chain.svg';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -19,7 +20,20 @@ const tailLayout = {
 const FormRestore = () => {
   const [form] = Form.useForm();
   const history = useHistory();
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+    history.push('home');
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
   const onNetworkChange = (value: any) => {
     switch (value) {
       case 'mainnet':
@@ -49,6 +63,7 @@ const FormRestore = () => {
     };
     try {
       await walletService.restoreAndSaveWallet(importOptions);
+      showModal();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('issue on wallet import', e);
@@ -57,7 +72,6 @@ const FormRestore = () => {
     }
 
     form.resetFields();
-    history.push('home');
   };
 
   return (
@@ -83,15 +97,28 @@ const FormRestore = () => {
         </Select>
       </Form.Item>
       <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit">
-          Restore Wallet
-        </Button>
-        {/* <Button htmlType="button" onClick={onReset}>
-                    Reset
-                </Button>
-                <Button type="link" htmlType="button" onClick={onFill}>
-                    Fill form
-                </Button> */}
+        
+        <ModalPopup 
+          isModalVisible={isModalVisible}
+          handleCancel={handleCancel}
+          handleOk={handleOk}
+          title='Successful!'
+          button={<Button type="primary" htmlType="submit">
+            Restore Wallet
+          </Button>}
+          footer={[
+            <Button key="submit" type="primary" onClick={handleOk}>
+              Proceed to Home Page
+            </Button>,
+          ]}
+        >
+          <>
+            <SuccessCheckmark />
+            <div>
+              Your wallet has been restored!
+            </div>
+          </>
+        </ModalPopup>
       </Form.Item>
     </Form>
   );

@@ -481,7 +481,8 @@ module.exports = function(webpackEnv) {
                   loader: 'less-loader',
                   options: {
                     lessOptions: {
-                      strictMath: true,
+                      javascriptEnabled: true,
+                      // strictMath: true,
                     },
                   },
                 },
