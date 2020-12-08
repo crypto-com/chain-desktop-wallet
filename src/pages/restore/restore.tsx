@@ -104,7 +104,7 @@ const FormRestore = () => {
           </Button>}
           footer={[
             <Button key="submit" type="primary" onClick={handleOk}>
-              Proceed to Home Page
+              Next
             </Button>,
           ]}
         >
