@@ -5,8 +5,8 @@ import { Button, Form, Input, Select } from 'antd';
 import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
-import ModalPopup from '../../components/ModalPopup/ModalPopup';
-import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -19,19 +19,32 @@ const tailLayout = {
 const FormRestore = () => {
   const [form] = Form.useForm();
   const history = useHistory();
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
 
-  const showModal = () => {
-    setIsModalVisible(true);
+  const showSuccessModal = () => {
+    setIsSuccessModalVisible(true);
   };
 
-  const handleOk = () => {
-    setIsModalVisible(false);
+  const handleSuccessOk = () => {
+    setIsSuccessModalVisible(false);
     history.push('home');
   };
 
-  const handleCancel = () => {
-    setIsModalVisible(false);
+  const handleSuccessCancel = () => {
+    setIsSuccessModalVisible(false);
+  };
+
+  const showErrorModal = () => {
+    setIsErrorModalVisible(true);
+  };
+
+  const handleErrorOk = () => {
+    setIsErrorModalVisible(false);
+  };
+
+  const handleErrorCancel = () => {
+    setIsErrorModalVisible(false);
   };
 
   const onNetworkChange = (network: string) => {
@@ -58,7 +71,7 @@ const FormRestore = () => {
     };
     try {
       await walletService.restoreAndSaveWallet(importOptions);
-      showModal();
+      showSuccessModal();
       form.resetFields();
       // Jump to home screen
 
@@ -67,11 +80,18 @@ const FormRestore = () => {
       // eslint-disable-next-line no-console
       console.error('issue on wallet import', e);
       // TODO : Show pop up displaying the issue on wallet import
+      showErrorModal();
     }
   };
 
   return (
-    <Form {...layout} layout="vertical" form={form} name="control-ref" onFinish={onWalletImportFinish}>
+    <Form
+      {...layout}
+      layout="vertical"
+      form={form}
+      name="control-ref"
+      onFinish={onWalletImportFinish}
+    >
       <Form.Item name="name" label="Wallet Name" rules={[{ required: true }]}>
         <Input placeholder="Wallet name" />
       </Form.Item>
@@ -93,28 +113,37 @@ const FormRestore = () => {
         </Select>
       </Form.Item>
       <Form.Item {...tailLayout}>
-        
-        <ModalPopup 
-          isModalVisible={isModalVisible}
-          handleCancel={handleCancel}
-          handleOk={handleOk}
-          title='Successful!'
-          button={<Button type="primary" htmlType="submit">
-            Restore Wallet
-          </Button>}
+        <SuccessModalPopup
+          isModalVisible={isSuccessModalVisible}
+          handleCancel={handleSuccessCancel}
+          handleOk={handleSuccessOk}
+          title="Successful!"
+          button={
+            <Button type="primary" htmlType="submit">
+              Restore Wallet
+            </Button>
+          }
           footer={[
-            <Button key="submit" type="primary" onClick={handleOk}>
+            <Button key="submit" type="primary" onClick={handleSuccessOk}>
               Next
             </Button>,
           ]}
         >
           <>
-            <SuccessCheckmark />
-            <div>
-              Your wallet has been restored!
-            </div>
+            <div>Your wallet has been restored!</div>
           </>
-        </ModalPopup>
+        </SuccessModalPopup>
+        <ErrorModalPopup
+          isModalVisible={isErrorModalVisible}
+          handleCancel={handleErrorCancel}
+          handleOk={handleErrorOk}
+          title="Error!"
+          footer={[]}
+        >
+          <>
+            <div>Your Mnemonic Phrase is invalid. Please check again.</div>
+          </>
+        </ErrorModalPopup>
       </Form.Item>
     </Form>
   );

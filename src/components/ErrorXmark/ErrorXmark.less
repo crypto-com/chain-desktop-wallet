@@ -15,7 +15,8 @@
   border-radius: 50%;
 
   // Success icon
-  &.f-modal-success {
+  &.f-modal-success,
+  &.f-modal-error {
     border-color: #a5dc86;
 
     &::after,
@@ -90,70 +91,53 @@
       }
     }
   }
-}
 
-.animateSuccessTip {
-  animation: animateSuccessTip 0.75s;
-}
+  // Error icon
+  &.f-modal-error {
+    border-color: #f27474;
 
-.animateSuccessLong {
-  animation: animateSuccessLong 0.75s;
-}
+    .f-modal-x-mark {
+      position: relative;
+      z-index: 2;
+      display: block;
+    }
 
-.f-modal-icon.f-modal-success.animate::after {
-  animation: rotatePlaceholder 4.25s ease-in;
+    .f-modal-placeholder {
+      border: 4px solid rgba(200, 0, 0, 0.2);
+    }
+
+    .f-modal-line {
+      top: 37px;
+      width: 47px;
+      background-color: #f27474;
+
+      &.f-modal-left {
+        left: 17px;
+        transform: rotate(45deg);
+      }
+
+      &.f-modal-right {
+        right: 16px;
+        transform: rotate(-45deg);
+      }
+    }
+  }
 }
 
 .f-modal-icon.f-modal-error.animate::after {
   animation: rotatePlaceholder 4.25s ease-in;
 }
 
-@keyframes animateSuccessTip {
-  0%,
-  54% {
-    top: 19px;
-    left: 1px;
-    width: 0;
-  }
-
-  70% {
-    top: 37px;
-    left: -8px;
-    width: 50px;
-  }
-
-  84% {
-    top: 48px;
-    left: 21px;
-    width: 17px;
-  }
-
-  100% {
-    top: 45px;
-    left: 14px;
-    width: 25px;
-  }
+.animateErrorIcon {
+  animation: animateErrorIcon 0.5s;
 }
 
-@keyframes animateSuccessLong {
-  0%,
-  65% {
-    top: 54px;
-    right: 46px;
-    width: 0;
-  }
+.animateXLeft {
+  animation: animateXLeft 0.75s;
+}
 
-  84% {
-    top: 35px;
-    right: 0;
-    width: 55px;
-  }
-
-  100% {
-    top: 38px;
-    right: 8px;
-    width: 47px;
-  }
+.animateXRight {
+  animation: animateXRight 0.75s;
 }
 
 @keyframes rotatePlaceholder {
@@ -165,5 +149,59 @@
   100%,
   12% {
     transform: rotate(-405deg);
+  }
+}
+
+@keyframes animateErrorIcon {
+  0% {
+    transform: rotateX(100deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes animateXLeft {
+  0%,
+  65% {
+    top: 95px;
+    left: 82px;
+    width: 0;
+  }
+
+  84% {
+    top: 33px;
+    left: 14px;
+    width: 47px;
+  }
+
+  100% {
+    top: 37px;
+    left: 17px;
+    width: 47px;
+  }
+}
+
+@keyframes animateXRight {
+  0%,
+  65% {
+    top: 95px;
+    right: 82px;
+    width: 0;
+  }
+
+  84% {
+    top: 33px;
+    right: 14px;
+    width: 47px;
+  }
+
+  100% {
+    top: 37px;
+    right: 16px;
+    width: 47px;
   }
 }
