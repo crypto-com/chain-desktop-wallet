@@ -137,7 +137,7 @@ const FormRestore = () => {
           isModalVisible={isErrorModalVisible}
           handleCancel={handleErrorCancel}
           handleOk={handleErrorOk}
-          title="Error!"
+          title="An error happened!"
           footer={[]}
         >
           <>
