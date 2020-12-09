@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-d
 import WelcomePage from './welcome/welcome';
 import RestorePage from './restore/restore';
 import CreatePage from './create/create';
+import BackupPage from './backup/backup';
 import HomePage from './home/home';
 
 function RouteHub() {
@@ -36,6 +37,12 @@ function RouteHub() {
       component: <CreatePage />,
     },
     {
+      name: 'Backup Page',
+      key: 'backup',
+      path: '/create/backup',
+      component: <BackupPage />,
+    },
+    {
       name: 'Home Page',
       key: 'home',
       path: '/home',
@@ -52,7 +59,7 @@ function RouteHub() {
           </Route>
           {routeItems.map(item => {
             return (
-              <Route path={item.path} key={item.path}>
+              <Route exact path={item.path} key={item.path}>
                 {item.component}
               </Route>
             );

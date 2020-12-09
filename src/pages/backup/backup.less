@@ -1,15 +1,14 @@
 @import '../../variables.less';
 
-.create-page {
+.backup-page {
   display: grid;
   grid-template-areas:
     'header header header'
     '. container .'
     '. . .';
   grid-template-rows: 20vh 80vh;
-  grid-template-columns: 20vw 60vw 20vw;
+  grid-template-columns: 10vw 80vw 10vw;
   background: @background-color;
-
   .header {
     display: flex;
     grid-area: header;
@@ -23,34 +22,49 @@
   }
 
   .container {
-    display: flex;
+    display: block;
     grid-area: container;
     align-items: center;
     justify-content: center;
+    margin: 20px 0;
+    overflow-y: scroll;
     font-weight: 500;
     text-align: center;
-
     .title {
       font-size: 24px;
     }
 
     .slogan {
-      width: 50vw;
+      width: 60vw;
       margin: auto;
       color: #0b1426;
       font-size: 14px;
       opacity: 0.5;
     }
 
-    form {
-      width: 100%;
+    .phrase-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
       max-width: 600px;
-      margin: auto;
-      margin-top: 40px;
+      margin: 10px auto;
+      padding: 10px;
+      background: @white;
+      border-radius: 8px;
+      box-shadow: 2px 0 12px 2px rgba(11, 20, 38, 0.05);
+      cursor: pointer;
+      .phrase {
+        margin: 7px 14px;
+        padding: 7px;
+        border-bottom: 2px solid rgba(128, 128, 128, 0.1);
+        span {
+          color: @font-color;
+          opacity: 0.5;
+        }
+      }
     }
 
-    .ant-btn {
-      width: 184px;
+    .ant-checkbox-wrapper {
+      margin: 10px 0;
     }
   }
 }
