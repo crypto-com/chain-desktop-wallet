@@ -6,7 +6,11 @@ import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import { TransactionSigner } from './signers/TransactionSigner';
 import { Session } from '../models/Session';
-import { TransferTransaction } from './signers/TransactionSupported';
+import {
+  DelegateTransaction,
+  TransferTransaction,
+  WithdrawStakingReward,
+} from './signers/TransactionSupported';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -16,15 +20,13 @@ class WalletService {
   }
 
   public async sendTransfer(fromAddress: string, toAddress: string, amount: string, memo: string) {
-    const currentSession = await this.storageService.retrieveCurrentSession();
-    const currentWallet = currentSession.wallet;
-
-    const nodeRpc = await NodeRpcService.init(currentWallet.config.nodeUrl);
-
-    const accountNumber = await nodeRpc.fetchAccountNumber(currentWallet.address);
-    const accountSequence = await nodeRpc.loadSequenceNumber(currentWallet.address);
-
-    const phrase = await this.decryptPhrase(currentSession);
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      phrase,
+      transactionSigner,
+    } = await this.prepareTransaction();
 
     const transfer: TransferTransaction = {
       fromAddress,
@@ -35,10 +37,85 @@ class WalletService {
       accountSequence,
     };
 
-    const transactionSigner = new TransactionSigner(currentWallet.config);
     const signedTxHex = transactionSigner.signTransfer(transfer, phrase);
-
     return nodeRpc.broadcastTransaction(signedTxHex);
+  }
+
+  public async sendDelegateTransaction(
+    delegatorAddress: string,
+    validatorAddress: string,
+    amount: string,
+    memo: string,
+  ) {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      phrase,
+      transactionSigner,
+    } = await this.prepareTransaction();
+
+    const delegateTransaction: DelegateTransaction = {
+      delegatorAddress,
+      validatorAddress,
+      amount,
+      memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    const signedTxHex = transactionSigner.signDelegateTx(delegateTransaction, phrase);
+    return nodeRpc.broadcastTransaction(signedTxHex);
+  }
+
+  public async sendStakingRewardWithdrawalTx(
+    delegatorAddress: string,
+    validatorAddress: string,
+    amount: string,
+    memo: string,
+  ) {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      phrase,
+      transactionSigner,
+    } = await this.prepareTransaction();
+
+    const withdrawStakingReward: WithdrawStakingReward = {
+      delegatorAddress,
+      validatorAddress,
+      memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    const signedTxHex = transactionSigner.signWithdrawStakingRewardTx(
+      withdrawStakingReward,
+      phrase,
+    );
+    return nodeRpc.broadcastTransaction(signedTxHex);
+  }
+
+  public async prepareTransaction() {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    const currentWallet = currentSession.wallet;
+
+    const nodeRpc = await NodeRpcService.init(currentWallet.config.nodeUrl);
+
+    const accountNumber = await nodeRpc.fetchAccountNumber(currentWallet.address);
+    const accountSequence = await nodeRpc.loadSequenceNumber(currentWallet.address);
+
+    const phrase = await this.decryptPhrase(currentSession);
+    const transactionSigner = new TransactionSigner(currentWallet.config);
+
+    return {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      phrase,
+      transactionSigner,
+    };
   }
 
   // eslint-disable-next-line class-methods-use-this
