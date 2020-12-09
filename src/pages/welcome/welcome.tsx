@@ -1,12 +1,29 @@
-import React from 'react';
-// import ReactDOM from 'react-dom';
+import React, { useState, useEffect, useRef } from 'react';
 import './welcome.less';
 import 'antd/dist/antd.css';
 import { Button } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
+import { walletService } from '../../service/WalletService';
 import logo from '../../assets/logo-products-chain.svg';
 
 function WelcomePage() {
+  const history = useHistory();
+  const [hasWallet, setHasWallet] = useState(false);
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    const fetchWalletData = async () => {
+      const response = await walletService.hasWalletBeenCreated();
+      setHasWallet(response);
+    };
+    if (!didMountRef.current) {
+      fetchWalletData();
+      didMountRef.current = true;
+    } else if (hasWallet) {
+      history.push('home');
+    }
+  }, [hasWallet, history]);
+
   return (
     <main className="welcome-page">
       <div className="header">
