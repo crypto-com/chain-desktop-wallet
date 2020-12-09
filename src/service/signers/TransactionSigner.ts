@@ -1,7 +1,12 @@
 import sdk from '@crypto-com/chain-jslib';
 import { Big, HDKey, Secp256k1KeyPair, Units } from '../types/ChainJsLib';
-import { TransferTransaction } from './TransferTransaction';
 import { WalletConfig } from '../../config/StaticConfig';
+import {
+  CommonTransaction,
+  DelegateTransaction,
+  TransferTransaction,
+  WithdrawStakingReward,
+} from './TransactionSupported';
 
 export class TransactionSigner {
   public readonly config: WalletConfig;
@@ -10,7 +15,7 @@ export class TransactionSigner {
     this.config = config;
   }
 
-  public signTransfer(transfer: TransferTransaction, phrase: string): string {
+  public getTransactionInfo(phrase: string, transaction: CommonTransaction) {
     const cro = sdk.CroSDK({ network: this.config.network });
 
     const importedHDKey = HDKey.fromMnemonic(phrase);
@@ -18,21 +23,25 @@ export class TransactionSigner {
     const keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
 
     const rawTx = new cro.RawTransaction();
+    rawTx.setMemo(transaction.memo);
+    return { cro, keyPair, rawTx };
+  }
 
-    rawTx.setMemo(transfer.memo);
+  public signTransfer(transaction: TransferTransaction, phrase: string): string {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
 
     const msgSend = new cro.bank.MsgSend({
-      fromAddress: transfer.fromAddress,
-      toAddress: transfer.toAddress,
-      amount: new cro.Coin(transfer.amount, Units.BASE),
+      fromAddress: transaction.fromAddress,
+      toAddress: transaction.toAddress,
+      amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
     const signableTx = rawTx
       .appendMessage(msgSend)
       .addSigner({
         publicKey: keyPair.getPubKey(),
-        accountNumber: new Big(transfer.accountNumber),
-        accountSequence: new Big(transfer.accountSequence),
+        accountNumber: new Big(transaction.accountNumber),
+        accountSequence: new Big(transaction.accountSequence),
       })
       .toSignable();
 
@@ -42,5 +51,51 @@ export class TransactionSigner {
       .getHexEncoded();
   }
 
-  // public signDelegateTx() {}
+  public signDelegateTx(transaction: DelegateTransaction, phrase: string): string {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
+
+    const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
+    const msgDelegate = new cro.staking.MsgDelegate({
+      delegatorAddress: transaction.delegatorAddress,
+      validatorAddress: transaction.validatorAddress,
+      amount: delegateAmount,
+    });
+
+    const signableTx = rawTx
+      .appendMessage(msgDelegate)
+      .addSigner({
+        publicKey: keyPair.getPubKey(),
+        accountNumber: new Big(transaction.accountNumber),
+        accountSequence: new Big(transaction.accountSequence),
+      })
+      .toSignable();
+
+    return signableTx
+      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
+      .toSigned()
+      .getHexEncoded();
+  }
+
+  public signWithdrawStakingRewardTx(transaction: WithdrawStakingReward, phrase: string): string {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
+
+    const msgWithdrawDelegatorReward = new cro.distribution.MsgWithdrawDelegatorReward({
+      delegatorAddress: transaction.delegatorAddress,
+      validatorAddress: transaction.validatorAddress,
+    });
+
+    const signableTx = rawTx
+      .appendMessage(msgWithdrawDelegatorReward)
+      .addSigner({
+        publicKey: keyPair.getPubKey(),
+        accountNumber: new Big(transaction.accountNumber),
+        accountSequence: new Big(transaction.accountSequence),
+      })
+      .toSignable();
+
+    return signableTx
+      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
+      .toSigned()
+      .getHexEncoded();
+  }
 }
