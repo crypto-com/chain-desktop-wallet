@@ -46,8 +46,8 @@ function BackupPage() {
 
   const fetchWallet = async () => {
     const wallet = await walletService.findWalletByIdenifier(walletIdentifier);
-    if (response !== null) {
-      setWallet(response);
+    if (wallet !== null) {
+      setWallet(wallet);
     } else {
       showErrorModal();
     }
