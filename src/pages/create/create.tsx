@@ -9,6 +9,7 @@ import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions } from '../../service/WalletCreator';
 import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
+import { Session } from '../../models/Session';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -63,6 +64,7 @@ const FormCreate = () => {
     };
     try {
       const createdWallet = await walletService.createAndSaveWallet(createOptions);
+      await walletService.setCurrentSession(new Session(createdWallet));
       setWallet(createdWallet);
       showModal();
     } catch (e) {

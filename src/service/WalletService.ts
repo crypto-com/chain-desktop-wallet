@@ -1,7 +1,7 @@
 import { Wallet } from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import { WalletCreateOptions, WalletCreator } from './WalletCreator';
-import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
+import { DefaultAsset, DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import { TransactionSigner } from './signers/TransactionSigner';
@@ -134,13 +134,22 @@ class WalletService {
   public async createAndSaveWallet(createOptions: WalletCreateOptions): Promise<Wallet> {
     const newWallet = WalletCreator.create(createOptions);
     await this.persistWallet(newWallet);
+    await this.persistInitialAsset(newWallet.identifier);
     return newWallet;
+  }
+
+  public async persistInitialAsset(walletId: string) {
+    await this.storageService.saveAsset({
+      walletId,
+      ...DefaultAsset,
+    });
   }
 
   // Import or restore wallet and persist it on the db
   public async restoreAndSaveWallet(importOptions: WalletImportOptions): Promise<Wallet> {
     const importedWallet = WalletImporter.import(importOptions);
     await this.persistWallet(importedWallet);
+    await this.persistInitialAsset(importedWallet.identifier);
     return importedWallet;
   }
 
@@ -164,8 +173,12 @@ class WalletService {
     await this.storageService.saveWallet(wallet);
   }
 
-  public async findWalletByIdenifier(identifier: string): Promise<Wallet> {
+  public async findWalletByIdentifier(identifier: string): Promise<Wallet> {
     return this.storageService.findWalletByIdentifier(identifier);
+  }
+
+  public async setCurrentSession(session: Session) {
+    await this.storageService.setSession(session);
   }
 }
 

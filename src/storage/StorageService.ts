@@ -2,6 +2,7 @@
 import { Wallet } from '../models/Wallet';
 import { DatabaseManager } from './DatabaseManager';
 import { Session } from '../models/Session';
+import { UserAsset } from '../models/UserAsset';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -14,12 +15,20 @@ export class StorageService {
     return this.db.walletStore.insert(wallet);
   }
 
+  public async saveAsset(asset: UserAsset) {
+    return this.db.assetStore.update({ _id: asset.identifier }, { $set: asset }, { upsert: true });
+  }
+
   public async findWalletByIdentifier(identifier: string) {
     return this.db.walletStore.findOne<Wallet>({ identifier });
   }
 
   public async fetchWallets() {
     return this.db.walletStore.find<Wallet>({});
+  }
+
+  public async fetchAssetsByWallet(walletId: string) {
+    return this.db.assetStore.find<UserAsset>({ walletId });
   }
 
   public async setSession(session: Session) {
