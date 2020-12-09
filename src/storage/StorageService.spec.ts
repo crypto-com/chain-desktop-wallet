@@ -82,6 +82,7 @@ describe('Testing Storage Service', () => {
     expect(assets[0].balance).to.eq('0');
     expect(assets[0].identifier).to.eq('cbd4bab2cbfd2b3');
     expect(assets[0].symbol).to.eq('BEST');
+    expect(assets.length).to.eq(1);
 
     /// Testing updating assets
     asset.balance = '250000'; // New balance
@@ -91,5 +92,6 @@ describe('Testing Storage Service', () => {
     expect(updatedAssets[0].balance).to.eq('250000');
     expect(updatedAssets[0].identifier).to.eq('cbd4bab2cbfd2b3');
     expect(updatedAssets[0].symbol).to.eq('BEST');
+    expect(updatedAssets.length).to.eq(1);
   });
 });
