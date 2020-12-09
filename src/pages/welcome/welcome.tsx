@@ -13,8 +13,8 @@ function WelcomePage() {
 
   useEffect(() => {
     const fetchWalletData = async () => {
-      const response = await walletService.hasWalletBeenCreated();
-      setHasWallet(response);
+      const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
+      setHasWallet(hasWalletBeenCreated);
     };
     if (!didMountRef.current) {
       fetchWalletData();
