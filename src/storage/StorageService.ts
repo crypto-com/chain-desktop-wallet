@@ -12,7 +12,11 @@ export class StorageService {
   }
 
   public async saveWallet(wallet: Wallet) {
-    return this.db.walletStore.insert(wallet);
+    return this.db.walletStore.update(
+      { identifier: wallet.identifier },
+      { $set: wallet },
+      { upsert: true },
+    );
   }
 
   public async saveAsset(asset: UserAsset) {
