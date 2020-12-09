@@ -1,22 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import { atom, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import './backup.less';
 import { Button, Checkbox } from 'antd';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import MouseTooltip from 'react-sticky-mouse-tooltip';
+import { walletIdentifierState } from '../../recoil/atom';
+import { Wallet } from '../../models/Wallet';
+import { walletService } from '../../service/WalletService';
 import logo from '../../assets/logo-products-chain.svg';
-
-const encryptedPhraseState = atom({
-  key: 'encryptedPhrase',
-  default: '',
-});
+import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 
 function BackupPage() {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-  const [encryptedPhrase, setEncryptedPhrase] = useState('none');
   const [mouseTooltip, setMouseTooltip] = useState(false);
-  const phrase: string = useRecoilValue(encryptedPhraseState);
+  const [wallet, setWallet] = useState<Wallet>();
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+  const walletIdentifier: string = useRecoilValue(walletIdentifierState);
   const didMountRef = useRef(false);
   const history = useHistory();
 
@@ -24,20 +24,38 @@ function BackupPage() {
     history.push('/home');
   };
 
+  const showErrorModal = () => {
+    setIsErrorModalVisible(true);
+  };
+
+  const handleErrorOk = () => {
+    setIsErrorModalVisible(false);
+  };
+
+  const handleErrorCancel = () => {
+    setIsErrorModalVisible(false);
+    history.push('/create');
+  };
+
   const checkboxOnChange = e => {
     setIsButtonDisabled(!e.target.checked);
   };
 
+  const fetchWallet = async () => {
+    const response = await walletService.findWalletByIdenifier(walletIdentifier);
+    if(response !== null){
+      setWallet(response);
+    }else{
+      showErrorModal();
+    }
+  }
+
   useEffect(() => {
-    if (didMountRef.current) {
-      if (phrase === '') {
-        history.push('/create');
-      }
-    } else {
-      setEncryptedPhrase(phrase);
+    if (!didMountRef.current) {
+      fetchWallet();
       didMountRef.current = true;
     }
-  }, [encryptedPhrase, history, phrase]);
+  });
 
   const onCopyClick = () => {
     setMouseTooltip(true);
@@ -60,10 +78,10 @@ function BackupPage() {
             You would need your recovery phrase to restore and access wallet.
           </div>
           <div>
-            <CopyToClipboard text={phrase}>
+            <CopyToClipboard text={wallet?.encryptedPhrase}>
               <div onClick={onCopyClick}>
                 <div className="phrase-container">
-                  {phrase.split(' ').map((item, index) => {
+                  {wallet?.encryptedPhrase.split(' ').map((item, index) => {
                     return (
                       <div className="phrase" key={index}>
                         <span>{index + 1}. </span>
@@ -93,7 +111,17 @@ function BackupPage() {
               </Button>
             </div>
           </div>
-          {/* <FormCreate /> */}
+          <ErrorModalPopup
+            isModalVisible={isErrorModalVisible}
+            handleCancel={handleErrorCancel}
+            handleOk={handleErrorOk}
+            title="An error happened!"
+            footer={[]}
+          >
+            <>
+              <div>Please try again.</div>
+            </>
+          </ErrorModalPopup>
         </div>
       </div>
     </main>

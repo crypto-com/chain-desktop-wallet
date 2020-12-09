@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import { atom, useRecoilState } from 'recoil';
-import './create.less';
+import { useRecoilState } from 'recoil';
 import { Button, Form, Input, Select } from 'antd';
+import { walletIdentifierState } from '../../recoil/atom';
+import './create.less';
 import logo from '../../assets/logo-products-chain.svg';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
@@ -17,17 +18,13 @@ const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
 
-const encryptedPhraseState = atom({
-  key: 'encryptedPhrase',
-  default: '',
-});
-
 const FormCreate = () => {
   const [form] = Form.useForm();
   const history = useHistory();
   const [wallet, setWallet] = useState<Wallet>();
-  const [encryptedPhrase, setEncryptedPhrase] = useRecoilState(encryptedPhraseState);
+  const [walletIdentifier, setWalletIdentifier] = useRecoilState(walletIdentifierState);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const didMountRef = useRef(false);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -35,15 +32,23 @@ const FormCreate = () => {
 
   const handleOk = () => {
     setIsModalVisible(false);
-    setEncryptedPhrase(wallet?.encryptedPhrase ?? '');
-    history.push({
-      pathname: '/create/backup',
-      state: { encryptedPhrase },
-    });
+    setWalletIdentifier(wallet?.identifier ?? '');
   };
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true
+    } else {
+      history.push({
+        pathname: '/create/backup',
+        state: { walletIdentifier },
+      });
+    }
+  }, [walletIdentifier, history])
 
   const handleCancel = () => {
     setIsModalVisible(false);
+    setWalletIdentifier(wallet?.identifier ?? '');
   };
 
   const onNetworkChange = (network: string) => {
@@ -82,6 +87,7 @@ const FormCreate = () => {
     form.resetFields();
     // TODO : Show popup success & Jump to home screen
   };
+
 
   return (
     <Form
