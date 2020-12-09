@@ -27,7 +27,7 @@ class MockNodeRpcService implements INodeRpcService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
-  loadAccountNumber(address: string): Promise<number> {
+  fetchAccountNumber(address: string): Promise<number> {
     return Promise.resolve(12);
   }
 
@@ -45,7 +45,7 @@ describe('Testing NodeRpcService', () => {
     const sequenceNumber: number = await nodeRpcService.loadSequenceNumber(
       'tcro1l4gxejy8qxl3vxcxv7vpk4cqu8qhrz2nfxxr2p',
     );
-    const accountNumber: number = await nodeRpcService.loadAccountNumber(
+    const accountNumber: number = await nodeRpcService.fetchAccountNumber(
       'tcro1l4gxejy8qxl3vxcxv7vpk4cqu8qhrz2nfxxr2p',
     );
     const balance: string = await nodeRpcService.loadAccountBalance(
