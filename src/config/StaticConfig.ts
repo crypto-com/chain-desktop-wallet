@@ -15,7 +15,7 @@ const TestNetConfig: WalletConfig = {
 };
 
 const MainNetConfig: WalletConfig = {
-  name: 'MAIN-NET',
+  name: 'MAINNET',
   derivationPath: "44'/394'/0'/0/0",
   nodeUrl: 'TO_BE_DECIDED',
   network: CroNetwork.Mainnet,

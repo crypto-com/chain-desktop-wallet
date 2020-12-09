@@ -4,9 +4,9 @@ import { WalletCreateOptions, WalletCreator } from './WalletCreator';
 import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
-import { TransferTransaction } from './signers/TransferTransaction';
 import { TransactionSigner } from './signers/TransactionSigner';
 import { Session } from '../models/Session';
+import { TransferTransaction } from './signers/TransactionSupported';
 
 class WalletService {
   private readonly storageService: StorageService;
