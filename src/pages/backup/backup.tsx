@@ -28,10 +28,6 @@ function BackupPage() {
     setIsErrorModalVisible(true);
   };
 
-  const handleErrorOk = () => {
-    setIsErrorModalVisible(false);
-  };
-
   const handleErrorCancel = () => {
     setIsErrorModalVisible(false);
     history.push('/create');
@@ -41,14 +37,21 @@ function BackupPage() {
     setIsButtonDisabled(!e.target.checked);
   };
 
+  const onCopyClick = () => {
+    setMouseTooltip(true);
+    setTimeout(() => {
+      setMouseTooltip(false);
+    }, 100);
+  };
+
   const fetchWallet = async () => {
     const response = await walletService.findWalletByIdenifier(walletIdentifier);
-    if(response !== null){
+    if (response !== null) {
       setWallet(response);
-    }else{
+    } else {
       showErrorModal();
     }
-  }
+  };
 
   useEffect(() => {
     if (!didMountRef.current) {
@@ -56,13 +59,6 @@ function BackupPage() {
       didMountRef.current = true;
     }
   });
-
-  const onCopyClick = () => {
-    setMouseTooltip(true);
-    setTimeout(() => {
-      setMouseTooltip(false);
-    }, 100);
-  };
 
   return (
     <main className="backup-page">
@@ -114,7 +110,7 @@ function BackupPage() {
           <ErrorModalPopup
             isModalVisible={isErrorModalVisible}
             handleCancel={handleErrorCancel}
-            handleOk={handleErrorOk}
+            handleOk={handleErrorCancel}
             title="An error happened!"
             footer={[]}
           >

@@ -4,10 +4,10 @@ import { useRecoilState } from 'recoil';
 import { Button, Form, Input, Select } from 'antd';
 import { walletIdentifierState } from '../../recoil/atom';
 import './create.less';
-import logo from '../../assets/logo-products-chain.svg';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions } from '../../service/WalletCreator';
+import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 
 const layout = {
@@ -20,11 +20,11 @@ const tailLayout = {
 
 const FormCreate = () => {
   const [form] = Form.useForm();
-  const history = useHistory();
   const [wallet, setWallet] = useState<Wallet>();
   const [walletIdentifier, setWalletIdentifier] = useRecoilState(walletIdentifierState);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const didMountRef = useRef(false);
+  const history = useHistory();
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -34,17 +34,6 @@ const FormCreate = () => {
     setIsModalVisible(false);
     setWalletIdentifier(wallet?.identifier ?? '');
   };
-
-  useEffect(() => {
-    if (!didMountRef.current) {
-      didMountRef.current = true
-    } else {
-      history.push({
-        pathname: '/create/backup',
-        state: { walletIdentifier },
-      });
-    }
-  }, [walletIdentifier, history])
 
   const handleCancel = () => {
     setIsModalVisible(false);
@@ -85,9 +74,19 @@ const FormCreate = () => {
     }
 
     form.resetFields();
-    // TODO : Show popup success & Jump to home screen
   };
 
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+    } else {
+      // Jump to backup screen after walletIdentifier created & setWalletIdentifier finished
+      history.push({
+        pathname: '/create/backup',
+        state: { walletIdentifier },
+      });
+    }
+  }, [walletIdentifier, history]);
 
   return (
     <Form
