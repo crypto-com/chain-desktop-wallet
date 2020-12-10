@@ -1,7 +1,6 @@
 import scrypt from 'scrypt-js';
 import { utils } from '@crypto-com/chain-jslib';
-import { AES, enc } from 'crypto-js';
-import { getRandomId } from './RandomGen';
+import { AES, enc, lib } from 'crypto-js';
 
 export interface HashResult {
   data: string;
@@ -19,6 +18,8 @@ class Cryptographer {
 
   // Generated hash length in bytes
   private readonly dkLen = 64;
+
+  private readonly SALT_BYTE_LENGTH = 64;
 
   public computeHash(data: string, salt: string): HashResult {
     const normalizedData: string = data.normalize();
@@ -53,15 +54,8 @@ class Cryptographer {
     return AES.decrypt(ciphertext, key).toString(enc.Utf8);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   public generateSalt(): string {
-    let salt = getRandomId();
-    const iterations = 12;
-    for (let i = 0; i < iterations; i++) {
-      salt += getRandomId();
-    }
-
-    return salt;
+    return lib.WordArray.random(this.SALT_BYTE_LENGTH).toString();
   }
 }
 
