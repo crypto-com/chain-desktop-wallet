@@ -74,6 +74,7 @@ describe('Testing Storage Service', () => {
       name: 'Best Asset',
       symbol: 'BEST',
       walletId: WALLET_ID,
+      stakedBalance: '0',
     };
 
     await mockWalletStore.saveAsset(asset);
