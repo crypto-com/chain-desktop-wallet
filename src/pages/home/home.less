@@ -8,6 +8,7 @@
     .logo {
       position: relative;
       height: 24px;
+      margin-top: 20px;
       margin-bottom: 20px;
       background: url('../../assets/logo-products-chain.svg');
       background-repeat: no-repeat;
@@ -21,6 +22,7 @@
       position: absolute;
       bottom: 0;
       margin-bottom: 20px;
+      margin-left: 20px;
     }
   }
   .ant-layout-sider,
@@ -28,24 +30,31 @@
     background: @background-color !important;
   }
   .ant-layout-header {
-    margin: 20px 0;
+    height: auto;
+    margin: 36px 0 0 0;
     padding-left: 20px !important;
     font-size: 24px;
+    line-height: inherit;
   }
   .ant-menu {
     .ant-menu-item {
+      display: flex;
+      align-items: center;
       width: 206px !important;
       margin: 10px 0 !important;
       color: @font-color;
       border-radius: @border-radius;
       span {
-        color: @font-color;
+        color: @font-color-dark;
       }
       &:hover {
         color: @font-color-dark;
         span {
-          color: @font-color;
+          color: @font-color-dark;
         }
+      }
+      .anticon {
+        font-size: 24px !important;
       }
     }
     .ant-menu-item-selected {
@@ -59,6 +68,9 @@
         span {
           color: @white;
         }
+      }
+      svg {
+        // filter:invert(100%);
       }
     }
   }
@@ -74,6 +86,7 @@
   .balance-container {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
+    margin-bottom: 20px;
     .balance {
       color: @font-color-dark;
       font-weight: 500;

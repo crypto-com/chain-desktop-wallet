@@ -1,10 +1,17 @@
 import React from 'react';
-// import ReactDOM from 'react-dom';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Layout, Menu, Table, Space, Dropdown, Tabs } from 'antd';
 // import MenuContentBlock from '../../components/MenuContentBlock/MenuContentBlock';
 // import { Link } from 'react-router-dom';
+import Icon from '@ant-design/icons';
+// import SvgIcon from '@material-ui/core/SvgIcon';
+// import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
+import WalletIcon from '../../assets/icon-wallet-grey.svg';
+import IconHome from '../../svg/IconHome';
+import IconSend from '../../svg/IconSend';
+import IconReceive from '../../svg/IconReceive';
+import IconAddress from '../../svg/IconAddress';
 
 const { Header, Content, Footer, Sider } = Layout;
 const siderWidth = '256px';
@@ -110,7 +117,7 @@ const StakingData = [
   },
 ];
 
-const menu = (
+const walletMenu = (
   <Menu>
     <Menu.Item>
       <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">
@@ -148,10 +155,18 @@ function HomePage() {
           <div className="logo" />
           <div className="version">SAMPLE WALLET v0.0.1</div>
           <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-            <Menu.Item key="1">Home</Menu.Item>
-            <Menu.Item key="2">Address</Menu.Item>
-            <Menu.Item key="3">Send</Menu.Item>
-            <Menu.Item key="4">Receive</Menu.Item>
+            <Menu.Item key="1" icon={<Icon component={IconHome} />}>
+              Home
+            </Menu.Item>
+            <Menu.Item key="2" icon={<Icon component={IconAddress} />}>
+              Address
+            </Menu.Item>
+            <Menu.Item key="3" icon={<Icon component={IconSend} />}>
+              Send
+            </Menu.Item>
+            <Menu.Item key="4" icon={<Icon component={IconReceive} />}>
+              Receive
+            </Menu.Item>
           </Menu>
           {/* <div className='back-to-welcome'>
             <Link to='welcome'>
@@ -159,17 +174,20 @@ function HomePage() {
             </Link>
           </div> */}
 
-          <Dropdown overlay={menu} placement="topCenter" className="wallet-selection">
-            <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-              Wallet - Test 1{/* <DownOutlined /> */}
-            </a>
+          <Dropdown overlay={walletMenu} placement="topCenter" className="wallet-selection">
+            {/* <a className="ant-dropdown-link" onClick={e => e.preventDefault()}> */}
+            <div>
+              <img src={WalletIcon} alt="walletIcon" /> Wallet - Test 1
+            </div>
+            {/* <DownOutlined /> */}
+            {/* </a> */}
           </Dropdown>
         </Sider>
         <Layout className="site-layout" style={{ marginLeft: siderWidth }}>
-          <Header className="site-layout-background" style={{ padding: 0, background: '#f0f2f5' }}>
+          <Header className="site-layout-background" style={{ padding: 0, background: '#f8f8f8' }}>
             Welcome Back!
           </Header>
-          <Content style={{ margin: '24px 16px 0' }}>
+          <Content style={{ margin: '16px 16px 0' }}>
             <div
               className="site-layout-background balance-container"
               style={{ padding: 24, textAlign: 'center' }}
@@ -188,14 +206,14 @@ function HomePage() {
                 <Table
                   columns={TransactionColumns}
                   dataSource={TransactionData}
-                  style={{ minHeight: 500 }}
+                  // style={{ minHeight: 500 }}
                 />
               </TabPane>
               <TabPane tab="Staking" key="2">
                 <Table
                   columns={StakingColumns}
                   dataSource={StakingData}
-                  style={{ minHeight: 500 }}
+                  // style={{ minHeight: 500 }}
                 />
               </TabPane>
             </Tabs>
