@@ -35,6 +35,10 @@ class AssetService {
       return asset;
     });
   }
+
+  public async fetchDefaultWalletAsset(): Promise<UserAsset> {
+    return (await this.fetchCurrentWalletAssets())[0];
+  }
 }
 
 export const assetService = new AssetService();
