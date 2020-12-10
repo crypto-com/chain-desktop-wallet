@@ -4,8 +4,14 @@
     margin: 16px;
     background: rgba(255, 255, 255, 0.2);
   }
-  .site-layout .site-layout-background {
-    background: @white;
+  .ant-layout-sider{
+    .logo{
+      background: url(../../assets/logo-products-chain.svg);
+      background-size: contain;
+      background-repeat: no-repeat;
+      height: 24px;
+      margin: 24px 48px 24px 24px;
+    }
   }
   .ant-layout-sider,
   .ant-menu {
@@ -13,14 +19,15 @@
   }
   .ant-layout-header {
     padding-left: 20px !important;
+    margin: 20px 0;
     font-size: 24px;
   }
   .ant-menu {
     .ant-menu-item {
-      width: 180px !important;
+      width: 236px !important;
       margin: 10px !important;
       color: @font-color;
-      border-radius: 8px;
+      border-radius: @border-radius;
       span {
         color: @font-color;
       }
@@ -30,6 +37,31 @@
       background-color: @azure;
       span {
         color: @white;
+      }
+    }
+  }
+    
+  .ant-layout-content{
+    .site-layout-background {
+      background: @white;
+      border-radius: @border-radius;
+      box-shadow: 2px 0 12px 2px rgba(11, 20, 38, 0.05);
+    }
+  }
+
+  .balance-container{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    .balance{
+      text-align: left;
+      color: @font-color-dark;
+      font-weight: 500;
+      .title{
+        font-size: 12px;
+        opacity: 0.5;
+      }
+      .quantity{
+        font-size: 24px;
       }
     }
   }
