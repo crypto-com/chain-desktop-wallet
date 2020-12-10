@@ -23,4 +23,30 @@ describe('Testing cryptographic functions', () => {
       '993ac70b6306d33883ba049dd68d98cec94c29f6ec7506bc8dc5a6e52cfec9d2b5d1d9a30580131879a763520005c4098ba185b2d5a3e47b77bf3d6499891c92',
     );
   });
+
+  it('Test data encryption & decryption', () => {
+    const phrase =
+      'ramp sock spice enrich exhibit skate empower process kit pudding olive mesh friend camp labor coconut devote shell argue system pig then provide nose';
+
+    const encryptionKey = 'somePass$1100ZX';
+    const encryptedPhrase = cryptographer.encrypt(phrase, encryptionKey);
+
+    const decryptedPhrase = cryptographer.decrypt(encryptedPhrase, encryptionKey);
+
+    expect(decryptedPhrase).to.eq(
+      'ramp sock spice enrich exhibit skate empower process kit pudding olive mesh friend camp labor coconut devote shell argue system pig then provide nose',
+    );
+
+    const phrase2 =
+      'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
+
+    const encryptionKey2 = 'sdSpASS34@@Secure';
+    const encryptedPhrase2 = cryptographer.encrypt(phrase2, encryptionKey2);
+
+    const decryptedPhrase2 = cryptographer.decrypt(encryptedPhrase2, encryptionKey2);
+
+    expect(decryptedPhrase2).to.eq(
+      'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone',
+    );
+  });
 });

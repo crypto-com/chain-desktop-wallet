@@ -1,5 +1,6 @@
 import scrypt from 'scrypt-js';
 import { utils } from '@crypto-com/chain-jslib';
+import { AES, enc } from 'crypto-js';
 import { getRandomId } from './RandomGen';
 
 export interface HashResult {
@@ -40,6 +41,16 @@ class Cryptographer {
     // console.log(`Salt: ${saltNormalized} | data: ${normalizedData} | Derived: ${output}`);
 
     return { data: output };
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public encrypt(data: string, key: string) {
+    return AES.encrypt(data, key).toString();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public decrypt(ciphertext: string, key: string) {
+    return AES.decrypt(ciphertext, key).toString(enc.Utf8);
   }
 
   // eslint-disable-next-line class-methods-use-this
