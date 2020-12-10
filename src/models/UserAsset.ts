@@ -16,7 +16,7 @@ export interface UserAsset {
   description: string;
 }
 
-export interface AssetPrice {
+export interface AssetMarketPrice {
   price: string;
 
   currency: string;
@@ -25,3 +25,11 @@ export interface AssetPrice {
 
   dailyChange: string;
 }
+
+export const getAssetPriceIdFrom = (assetSymbol: string, currency: string) => {
+  return `${assetSymbol}-${currency}`.toUpperCase();
+};
+
+export const getAssetPriceId = (assetPrice: AssetMarketPrice) => {
+  return getAssetPriceIdFrom(assetPrice.assetSymbol, assetPrice.currency);
+};

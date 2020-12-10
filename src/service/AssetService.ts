@@ -1,6 +1,7 @@
 import { StorageService } from '../storage/StorageService';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import { UserAsset } from '../models/UserAsset';
+import { croMarketPriceApi } from './rpc/MarketApi';
 
 class AssetService {
   private readonly storageService: StorageService;
@@ -40,7 +41,20 @@ class AssetService {
     return (await this.fetchCurrentWalletAssets())[0];
   }
 
-  // public async loadAndSaveAssetPrices() {}
+  public async loadAndSaveAssetPrices() {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    const assets: UserAsset[] = await this.fetchCurrentWalletAssets();
+
+    await Promise.all(
+      assets.map(async asset => {
+        const assetPrice = await croMarketPriceApi.getAssetPrice(
+          asset.symbol,
+          currentSession.currency,
+        );
+        await this.storageService.saveAssetMarketPrice(assetPrice);
+      }),
+    );
+  }
 }
 
 export const assetService = new AssetService();

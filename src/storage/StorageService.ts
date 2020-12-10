@@ -2,7 +2,12 @@
 import { Wallet } from '../models/Wallet';
 import { DatabaseManager } from './DatabaseManager';
 import { Session } from '../models/Session';
-import { UserAsset } from '../models/UserAsset';
+import {
+  AssetMarketPrice,
+  getAssetPriceId,
+  getAssetPriceIdFrom,
+  UserAsset,
+} from '../models/UserAsset';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -41,6 +46,20 @@ export class StorageService {
       { $set: session },
       { upsert: true },
     );
+  }
+
+  public async saveAssetMarketPrice(assetPrice: AssetMarketPrice) {
+    const assetPriceId = getAssetPriceId(assetPrice);
+    return this.db.marketPriceStore.update(
+      { _id: assetPriceId },
+      { $set: assetPrice },
+      { upsert: true },
+    );
+  }
+
+  public async retrieveAssetPrice(assetSymbol: string, currency: string) {
+    const assetPriceId = getAssetPriceIdFrom(assetSymbol, currency);
+    return this.db.marketPriceStore.findOne<AssetMarketPrice>({ _id: assetPriceId });
   }
 
   public retrieveCurrentSession() {

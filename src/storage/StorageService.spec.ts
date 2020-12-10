@@ -6,7 +6,7 @@ import { StorageService } from './StorageService';
 import { Session } from '../models/Session';
 import { Wallet } from '../models/Wallet';
 import { getRandomId } from '../crypto/RandomGen';
-import { UserAsset } from '../models/UserAsset';
+import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 
 function buildTestWallet() {
   const testNetConfig = DefaultWalletConfigs.TestNetConfig;
@@ -63,8 +63,8 @@ describe('Testing Storage Service', () => {
     expect(fetchedWallets.length).to.eq(10);
   });
 
-  it('Test  assets storage', async () => {
-    const mockWalletStore = new StorageService(`test-session-storage-${getRandomId()}`);
+  it('Test assets storage', async () => {
+    const mockWalletStore = new StorageService(`test-assets-storage-${getRandomId()}`);
 
     const WALLET_ID = '12dc3b3b90bc';
     const asset: UserAsset = {
@@ -95,5 +95,37 @@ describe('Testing Storage Service', () => {
     expect(updatedAssets[0].identifier).to.eq('cbd4bab2cbfd2b3');
     expect(updatedAssets[0].symbol).to.eq('BEST');
     expect(updatedAssets.length).to.eq(1);
+  });
+
+  it('Test asset market price storage', async () => {
+    const mockWalletStore = new StorageService(`test-market-storage-${getRandomId()}`);
+
+    const assetMarketPrice: AssetMarketPrice = {
+      assetSymbol: 'CRO',
+      currency: 'USD',
+      dailyChange: '-2.48',
+      price: '0.071',
+    };
+
+    await mockWalletStore.saveAssetMarketPrice(assetMarketPrice);
+
+    const fetchedAsset = await mockWalletStore.retrieveAssetPrice('CRO', 'USD');
+
+    expect(fetchedAsset.assetSymbol).to.eq('CRO');
+    expect(fetchedAsset.currency).to.eq('USD');
+    expect(fetchedAsset.price).to.eq('0.071');
+    expect(fetchedAsset.dailyChange).to.eq('-2.48');
+
+    fetchedAsset.price = '0.0981';
+    fetchedAsset.dailyChange = '+10.85';
+
+    await mockWalletStore.saveAssetMarketPrice(fetchedAsset);
+
+    const updatedAsset = await mockWalletStore.retrieveAssetPrice('CRO', 'USD');
+
+    expect(updatedAsset.assetSymbol).to.eq('CRO');
+    expect(updatedAsset.currency).to.eq('USD');
+    expect(updatedAsset.price).to.eq('0.0981');
+    expect(updatedAsset.dailyChange).to.eq('+10.85');
   });
 });
