@@ -31,7 +31,6 @@ const TransactionColumns = [
     dataIndex: 'time',
     key: 'time',
   },
-
 ];
 
 const TransactionData = [
@@ -142,23 +141,17 @@ function HomePage() {
             height: '100vh',
             position: 'fixed',
             left: 0,
+            padding: '24px',
           }}
           width={siderWidth}
         >
           <div className="logo" />
+          <div className="version">SAMPLE WALLET v0.0.1</div>
           <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-            <Menu.Item key="1">
-              Home
-            </Menu.Item>
-            <Menu.Item key="2">
-              Address
-            </Menu.Item>
-            <Menu.Item key="3">
-              Send
-            </Menu.Item>
-            <Menu.Item key="4">
-              Receive
-            </Menu.Item>
+            <Menu.Item key="1">Home</Menu.Item>
+            <Menu.Item key="2">Address</Menu.Item>
+            <Menu.Item key="3">Send</Menu.Item>
+            <Menu.Item key="4">Receive</Menu.Item>
           </Menu>
           {/* <div className='back-to-welcome'>
             <Link to='welcome'>
@@ -166,16 +159,21 @@ function HomePage() {
             </Link>
           </div> */}
 
-          <Dropdown overlay={menu} placement="topCenter">
+          <Dropdown overlay={menu} placement="topCenter" className="wallet-selection">
             <a className="ant-dropdown-link" onClick={e => e.preventDefault()}>
-              Wallet - Test 1{/* Hover me <DownOutlined /> */}
+              Wallet - Test 1{/* <DownOutlined /> */}
             </a>
           </Dropdown>
         </Sider>
         <Layout className="site-layout" style={{ marginLeft: siderWidth }}>
-          <Header className="site-layout-background" style={{ padding: 0, background: '#f0f2f5' }} >Welcome Back!</Header>
+          <Header className="site-layout-background" style={{ padding: 0, background: '#f0f2f5' }}>
+            Welcome Back!
+          </Header>
           <Content style={{ margin: '24px 16px 0' }}>
-            <div className="site-layout-background balance-container" style={{ padding: 24, textAlign: 'center' }}>
+            <div
+              className="site-layout-background balance-container"
+              style={{ padding: 24, textAlign: 'center' }}
+            >
               <div className="balance">
                 <div className="title">TOTAL BALANCE</div>
                 <div className="quantity">500,000 CRO</div>
@@ -187,10 +185,18 @@ function HomePage() {
             </div>
             <Tabs defaultActiveKey="1">
               <TabPane tab="Transactions" key="1">
-                <Table columns={TransactionColumns} dataSource={TransactionData} style={{ minHeight: 500 }} />
+                <Table
+                  columns={TransactionColumns}
+                  dataSource={TransactionData}
+                  style={{ minHeight: 500 }}
+                />
               </TabPane>
               <TabPane tab="Staking" key="2">
-                <Table columns={StakingColumns} dataSource={StakingData} style={{ minHeight: 500 }} />
+                <Table
+                  columns={StakingColumns}
+                  dataSource={StakingData}
+                  style={{ minHeight: 500 }}
+                />
               </TabPane>
             </Tabs>
             {/* <MenuContentBlock title='Transaction' className="table">

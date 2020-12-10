@@ -4,13 +4,23 @@
     margin: 16px;
     background: rgba(255, 255, 255, 0.2);
   }
-  .ant-layout-sider{
-    .logo{
-      background: url(../../assets/logo-products-chain.svg);
-      background-size: contain;
-      background-repeat: no-repeat;
+  .ant-layout-sider {
+    .logo {
+      position: relative;
       height: 24px;
-      margin: 24px 48px 24px 24px;
+      margin-bottom: 20px;
+      background: url('../../assets/logo-products-chain.svg');
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+    .version {
+      color: @font-color;
+      font-size: 12px;
+    }
+    .wallet-selection {
+      position: absolute;
+      bottom: 0;
+      margin-bottom: 20px;
     }
   }
   .ant-layout-sider,
@@ -18,18 +28,24 @@
     background: @background-color !important;
   }
   .ant-layout-header {
-    padding-left: 20px !important;
     margin: 20px 0;
+    padding-left: 20px !important;
     font-size: 24px;
   }
   .ant-menu {
     .ant-menu-item {
-      width: 236px !important;
-      margin: 10px !important;
+      width: 206px !important;
+      margin: 10px 0 !important;
       color: @font-color;
       border-radius: @border-radius;
       span {
         color: @font-color;
+      }
+      &:hover {
+        color: @font-color-dark;
+        span {
+          color: @font-color;
+        }
       }
     }
     .ant-menu-item-selected {
@@ -38,10 +54,16 @@
       span {
         color: @white;
       }
+      &:hover {
+        color: @white;
+        span {
+          color: @white;
+        }
+      }
     }
   }
-    
-  .ant-layout-content{
+
+  .ant-layout-content {
     .site-layout-background {
       background: @white;
       border-radius: @border-radius;
@@ -49,18 +71,18 @@
     }
   }
 
-  .balance-container{
+  .balance-container {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
-    .balance{
-      text-align: left;
+    .balance {
       color: @font-color-dark;
       font-weight: 500;
-      .title{
+      text-align: left;
+      .title {
         font-size: 12px;
         opacity: 0.5;
       }
-      .quantity{
+      .quantity {
         font-size: 24px;
       }
     }
