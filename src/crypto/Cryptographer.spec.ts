@@ -49,4 +49,11 @@ describe('Testing cryptographic functions', () => {
       'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone',
     );
   });
+
+  it('Test random salt generator', () => {
+    for (let i = 0; i < 10; i++) {
+      expect(cryptographer.generateSalt()).to.not.eq(null);
+      expect(cryptographer.generateSalt().length).to.eq(128);
+    }
+  });
 });
