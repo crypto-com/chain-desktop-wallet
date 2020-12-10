@@ -4,11 +4,12 @@ export class Session {
   // Session holds currently selected wallet
   public readonly wallet: Wallet;
 
-  // TODO : More sessions data to be added in subsequent tasks
+  public readonly currency: string;
 
   public static SESSION_ID = 'SESSION_ID';
 
-  constructor(wallet: Wallet) {
+  constructor(wallet: Wallet, currency: string = 'USD') {
     this.wallet = wallet;
+    this.currency = currency;
   }
 }
