@@ -7,6 +7,7 @@ import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import { Session } from '../../models/Session';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -70,7 +71,8 @@ const FormRestore = () => {
       config: selectedNetwork,
     };
     try {
-      await walletService.restoreAndSaveWallet(importOptions);
+      const wallet = await walletService.restoreAndSaveWallet(importOptions);
+      await walletService.setCurrentSession(new Session(wallet));
       showSuccessModal();
       form.resetFields();
       // Jump to home screen

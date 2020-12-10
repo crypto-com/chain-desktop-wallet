@@ -1,4 +1,5 @@
 import { CroNetwork } from '@crypto-com/chain-jslib/lib/dist/core/cro';
+import { getRandomId } from '../crypto/RandomGen';
 
 export type WalletConfig = {
   name: string;
@@ -26,6 +27,19 @@ const MainNetConfig: WalletConfig = {
 export const DefaultWalletConfigs = {
   TestNetConfig,
   MainNetConfig,
+};
+
+// Every created wallet get initialized with a new CRO asset
+export const DefaultAsset = {
+  balance: '0',
+  description:
+    'Crypto.com Coin (CRO) is the native token of the Crypto.com Chain. The Crypto.com Chain was created to build a network of cryptocurrency projects, and develop merchants’ ability to accept crypto as a form of payment. The Crypto.com Chain is a high performing native blockchain solution, which will make the transaction flows between crypto users and merchants accepting crypto seamless, cost-efficient and secure.\\r\\n\\r\\nBusinesses can use Crypto.com pay Checkout and/or Invoice to enable customers to complete checkout and pay for goods and services with cryptocurrencies using the Crypto.com Wallet App. Businesses receive all their payments instantly in CRO or stable coins, or in fiat.',
+  icon_url:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c1248c15568a4017c20aa87/cro.png',
+  identifier: getRandomId(),
+  name: 'Crypto.com Coin',
+  symbol: 'CRO',
+  stakedBalance: '0',
 };
 
 // This type is a copy of the Network type defined inside chain-js

@@ -14,6 +14,7 @@ export class WalletCreator {
       address,
       config: options.config,
       encryptedPhrase,
+      hasBeenEncrypted: false,
     };
   }
 

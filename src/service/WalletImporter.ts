@@ -21,6 +21,7 @@ export class WalletImporter {
       address,
       config: options.config,
       encryptedPhrase,
+      hasBeenEncrypted: false,
     };
   }
 }
