@@ -55,6 +55,12 @@ const cssModuleRegex = /\.module\.css$/;
 const lessRegex = /\.(less)$/;
 const lessModuleRegex = /\.module\.(less)$/;
 
+const lessToJS = require('less-vars-to-js');
+// Where your variables.less file lives
+const themeVariables = lessToJS(
+  fs.readFileSync(path.resolve(__dirname, '../src/variables.less'), 'utf8')
+);
+
 const hasJsxRuntime = (() => {
   if (process.env.DISABLE_NEW_JSX_TRANSFORM === 'true') {
     return false;
@@ -483,6 +489,7 @@ module.exports = function(webpackEnv) {
                     lessOptions: {
                       javascriptEnabled: true,
                       // strictMath: true,
+                      modifyVars: themeVariables, // make your antd custom effective
                     },
                   },
                 },
