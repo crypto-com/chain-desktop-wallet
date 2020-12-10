@@ -39,6 +39,8 @@ class AssetService {
   public async fetchDefaultWalletAsset(): Promise<UserAsset> {
     return (await this.fetchCurrentWalletAssets())[0];
   }
+
+  // public async loadAndSaveAssetPrices() {}
 }
 
 export const assetService = new AssetService();

@@ -46,6 +46,7 @@ describe('Testing Storage Service', () => {
 
     const currentSession = await mockWalletStore.retrieveCurrentSession();
     expect(currentSession.wallet.name).to.eq('My-TestNet-Wallet');
+    expect(currentSession.currency).to.eq('USD');
     expect(currentSession.wallet.identifier).to.eq(walletIdentifier);
     // eslint-disable-next-line no-underscore-dangle
     expect(currentSession._id).to.eq(Session.SESSION_ID);
