@@ -31,6 +31,7 @@
     "react-router-dom": "^5.2.0",
     "react-sticky-mouse-tooltip": "^0.0.1",
     "recoil": "^0.1.2",
+    "scrypt-js": "^3.0.1",
     "ts-pnp": "1.2.0",
     "typescript": "4.0.5",
     "url-loader": "4.1.1"
