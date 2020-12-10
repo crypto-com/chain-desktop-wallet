@@ -7,6 +7,8 @@ export interface UserAsset {
 
   balance: string;
 
+  stakedBalance: string;
+
   walletId: string;
 
   icon_url: string;

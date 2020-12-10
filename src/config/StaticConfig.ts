@@ -39,6 +39,7 @@ export const DefaultAsset = {
   identifier: getRandomId(),
   name: 'Crypto.com Coin',
   symbol: 'CRO',
+  stakedBalance: '0',
 };
 
 // This type is a copy of the Network type defined inside chain-js
