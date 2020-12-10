@@ -11,7 +11,7 @@ describe('Testing cryptographic functions', () => {
       'ff8aaa88d95817568093f1b8bdafe2a5684ee7aac6f43fa61130069018c6655f64a6712c116a8c985137b7a954545f91ffc68a1135f5d5123c03ca2b98a6813b3d66ddd36a4291f212b7ec111656';
 
     const data = 'somePass$1100ZX';
-    const data2 = 'somePass$1100ZX';
+    const data2 = 'someAwesomePass##';
     const hashResult = cryptographer.computeHash(data, salt);
 
     expect(hashResult.data).to.eq(
@@ -20,7 +20,7 @@ describe('Testing cryptographic functions', () => {
 
     const hashResult2 = cryptographer.computeHash(data2, salt2);
     expect(hashResult2.data).to.eq(
-      '854c3ac3bb68cc7c33a46d88c8a86f4f18469515b98172c35a67867c5a06b490cf9b7a62db80a4acbd8b2a64829a5e21eeaf461a0fc2b2862a59795a271247f3',
+      '993ac70b6306d33883ba049dd68d98cec94c29f6ec7506bc8dc5a6e52cfec9d2b5d1d9a30580131879a763520005c4098ba185b2d5a3e47b77bf3d6499891c92',
     );
   });
 });
