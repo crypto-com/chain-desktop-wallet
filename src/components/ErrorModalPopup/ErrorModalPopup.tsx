@@ -27,6 +27,7 @@ const ErrorModalPopup: React.FC<ErrorModalPopupProps> = props => {
         onOk={props.handleOk}
         onCancel={props.handleCancel}
         footer={props.footer}
+        className="error-popup"
       >
         <ErrorXmark />
         {props.children}

@@ -1,0 +1,110 @@
+.home-layout {
+  .ant-layout-sider {
+    position: fixed;
+    left: 0;
+    width: @sider-width !important;
+    min-width: @sider-width !important;
+    max-width: @sider-width !important;
+    height: 100vh;
+    padding: @sider-padding-lr;
+    overflow: auto;
+    .ant-menu {
+      .ant-menu-item {
+        display: flex;
+        align-items: center;
+        width: calc(@sider-width - 2 * @sider-padding-lr) !important;
+        margin: 10px 0 !important;
+        color: @font-color;
+        border-radius: @border-radius;
+        span, span a{
+          color: @font-color-dark;
+        }
+        &:hover {
+          color: @font-color-dark;
+          span {
+            color: @font-color-dark;
+          }
+        }
+        .anticon {
+          font-size: 24px !important;
+        }
+      }
+      .ant-menu-item-selected {
+        color: @white;
+        background-color: @azure;
+        span, span a{
+          color: @white;
+        }
+        &:hover {
+          color: @white;
+          span {
+            color: @white;
+          }
+        }
+      }
+    }
+    .logo {
+      position: relative;
+      height: 24px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+      background: url('../../assets/logo-products-chain.svg');
+      background-repeat: no-repeat;
+      background-size: contain;
+    }
+    .version {
+      color: @font-color;
+      font-size: 12px;
+    }
+    .wallet-selection {
+      position: absolute;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      width: calc(@sider-width - 2 * @sider-padding-lr);
+      margin-bottom: 20px;
+      cursor: pointer;
+      img {
+        margin-right: 10px;
+        margin-left: 24px;
+      }
+      span {
+        position: absolute;
+        right: 0;
+      }
+      svg {
+        transition: transform 0.1s linear;
+      }
+      &.ant-dropdown-open {
+        svg {
+          transform: rotate(180deg);
+        }
+      }
+    }
+    .ant-menu-item:hover {
+      background: #e4f4ff;
+    }
+  }
+  .ant-layout-sider,
+  .ant-menu {
+    background: @background-color !important;
+  }
+  .ant-layout-header {
+    height: auto;
+    margin: 36px 0 0 0;
+    padding-left: 36px !important;
+    font-size: 24px;
+    line-height: inherit;
+  }
+  .ant-layout-content {
+    margin: 16px 32px 0;
+    .site-layout-background {
+      background: @white;
+      border-radius: @border-radius;
+      box-shadow: 2px 0 12px 2px rgba(11, 20, 38, 0.05);
+    }
+  }
+  .site-layout {
+    margin-left: @sider-width;
+  }
+}
