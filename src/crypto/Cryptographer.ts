@@ -55,9 +55,6 @@ class Cryptographer {
       this.dkLen,
     );
     const output = utils.Bytes.fromUint8Array(key).toHexString();
-
-    // console.log(`Salt: ${saltNormalized} | data: ${normalizedData} | Derived: ${output}`);
-
     return { data: output };
   }
 
