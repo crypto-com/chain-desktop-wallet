@@ -33,17 +33,16 @@ const HomeMenu = () => {
   return (
     <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
       <Menu.Item key="1" icon={<Icon component={IconHome} />}>
-          <Link to="/home">Home</Link>
+        <Link to="/home">Home</Link>
       </Menu.Item>
       <Menu.Item key="2" icon={<Icon component={IconAddress} />}>
         Address
       </Menu.Item>
       <Menu.Item key="3" icon={<Icon component={IconSend} />}>
-          <Link to="/send">Send</Link>
-          
+        <Link to="/send">Send</Link>
       </Menu.Item>
       <Menu.Item key="4" icon={<Icon component={IconReceive} />}>
-        Receive
+        <Link to="/receive">Receive</Link>
       </Menu.Item>
     </Menu>
   );

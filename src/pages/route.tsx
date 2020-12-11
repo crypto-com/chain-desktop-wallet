@@ -8,6 +8,7 @@ import CreatePage from './create/create';
 import BackupPage from './backup/backup';
 import HomePage from './home/home';
 import SendPage from './send/send';
+import ReceivePage from './receive/receive';
 import HomeLayout from '../layouts/home/home';
 
 function RouteHub() {
@@ -44,7 +45,6 @@ function RouteHub() {
       path: '/create/backup',
       component: <BackupPage />,
     },
-
   ];
 
   const routeHomeLayoutItems = [
@@ -60,7 +60,13 @@ function RouteHub() {
       path: '/send',
       component: <SendPage />,
     },
-  ]
+    {
+      name: 'Receive Page',
+      key: 'receive',
+      path: '/receive',
+      component: <ReceivePage />,
+    },
+  ];
 
   return (
     <Router>
