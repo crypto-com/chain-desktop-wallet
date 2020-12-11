@@ -74,7 +74,7 @@ const FormSend = () => {
           ]}
         >
           <>
-            <div className="title">Send</div>
+            <div className="title">Confirm Transaction</div>
             <div className="description">Please review the below information. </div>
             <div className="item">
               <div className="label">To Address</div>
