@@ -17,7 +17,7 @@ const tailLayout = {
 const availableAmount = '250,000';
 const FormSend = () => {
   const [form] = Form.useForm();
-  const [formValues, setFormValues] = useState({ address: '', amount: '' });
+  const [formValues, setFormValues] = useState({ address: '', amount: '', memo: '' });
   const [isModalVisible, setIsModalVisible] = useState(false);
   const showModal = () => {
     setFormValues(form.getFieldsValue());
@@ -83,6 +83,10 @@ const FormSend = () => {
             <div className="item">
               <div className="label">Amount</div>
               <div>{`${formValues?.amount} CRO`}</div>
+            </div>
+            <div className="item">
+              <div className="label">Memo</div>
+              <div>{`${formValues?.memo}`}</div>
             </div>
           </>
         </ModalPopup>
