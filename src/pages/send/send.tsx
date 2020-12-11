@@ -60,7 +60,6 @@ const FormSend = () => {
           isModalVisible={isModalVisible}
           handleCancel={handleCancel}
           handleOk={handleOk}
-          title="Please confirm your transaction"
           button={
             <Button type="primary" htmlType="submit">
               Review
@@ -68,14 +67,21 @@ const FormSend = () => {
           }
           footer={[
             <Button key="submit" type="primary" onClick={handleOk}>
-              Confirm
+              Confirm to send
             </Button>,
           ]}
         >
           <>
-            <div>Please review the below information. </div>
-            <div>{`Send to address: ${formValues?.address}`}</div>
-            <div>{`Send Amount: ${formValues?.amount}`}</div>
+            <div className="title">Send</div>
+            <div className="description">Please review the below information. </div>
+            <div className="item">
+              <div className="label">To Address</div>
+              <div className="address">{`${formValues?.address}`}</div>
+            </div>
+            <div className="item">
+              <div className="label">Amount</div>
+              <div>{`${formValues?.amount} CRO`}</div>
+            </div>
           </>
         </ModalPopup>
       </Form.Item>
