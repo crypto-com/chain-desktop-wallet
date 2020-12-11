@@ -29,7 +29,7 @@ describe('Testing cryptographic functions', () => {
       'ramp sock spice enrich exhibit skate empower process kit pudding olive mesh friend camp labor coconut devote shell argue system pig then provide nose';
 
     const encryptionKey = 'somePass$1100ZX';
-    const iv = cryptographer.generateIV();
+    const iv = await cryptographer.generateIV();
     const encryptionResult = await cryptographer.encrypt(phrase, encryptionKey, iv);
 
     const decryptedPhrase = await cryptographer.decrypt(encryptionResult.cipher, encryptionKey, iv);
@@ -42,7 +42,7 @@ describe('Testing cryptographic functions', () => {
       'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
 
     const encryptionKey2 = 'sdSpASS34@@Secure';
-    const iv2 = cryptographer.generateIV();
+    const iv2 = await cryptographer.generateIV();
     const encryptionResult2 = await cryptographer.encrypt(phrase2, encryptionKey2, iv2);
 
     const decryptedPhrase2 = await cryptographer.decrypt(
