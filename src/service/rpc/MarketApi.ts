@@ -11,7 +11,7 @@ export class CroMarketApi implements IMarketApi {
 
   constructor() {
     this.axiosClient = axios.create({
-      baseURL: 'https://cors-anywhere.herokuapp.com/https://chain.crypto.com/api',
+      baseURL: 'https://chain.crypto.com/api',
     });
   }
 
