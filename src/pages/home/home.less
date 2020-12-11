@@ -21,8 +21,28 @@
     .wallet-selection {
       position: absolute;
       bottom: 0;
+      // margin-left: 20px;
+      display: flex;
+      align-items: center;
+      width: 208px;
       margin-bottom: 20px;
-      margin-left: 20px;
+      cursor: pointer;
+      img {
+        margin-right: 10px;
+        margin-left: 24px;
+      }
+      span {
+        position: absolute;
+        right: 0;
+      }
+      svg {
+        transition: transform 0.1s linear;
+      }
+      &.ant-dropdown-open {
+        svg {
+          transform: rotate(180deg);
+        }
+      }
     }
   }
   .ant-layout-sider,

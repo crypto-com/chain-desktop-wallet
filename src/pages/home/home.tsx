@@ -3,8 +3,8 @@ import './home.less';
 import 'antd/dist/antd.css';
 import { Layout, Menu, Table, Space, Dropdown, Tabs } from 'antd';
 // import MenuContentBlock from '../../components/MenuContentBlock/MenuContentBlock';
-// import { Link } from 'react-router-dom';
-import Icon from '@ant-design/icons';
+import { Link } from 'react-router-dom';
+import Icon, { CaretDownOutlined } from '@ant-design/icons';
 // import SvgIcon from '@material-ui/core/SvgIcon';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
@@ -120,20 +120,12 @@ const StakingData = [
 const walletMenu = (
   <Menu>
     <Menu.Item>
-      <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">
-        Create Wallet
-      </a>
+      <Link to="/create">Create Wallet</Link>
     </Menu.Item>
     <Menu.Item>
-      <a target="_blank" rel="noopener noreferrer" href="http://www.taobao.com/">
-        Restore Wallet
-      </a>
+      <Link to="/restore">Restore Wallet</Link>
     </Menu.Item>
-    <Menu.Item>
-      <a target="_blank" rel="noopener noreferrer" href="http://www.tmall.com/">
-        Wallet List
-      </a>
-    </Menu.Item>
+    <Menu.Item>Wallet List</Menu.Item>
   </Menu>
 );
 const { TabPane } = Tabs;
@@ -174,12 +166,18 @@ function HomePage() {
             </Link>
           </div> */}
 
-          <Dropdown overlay={walletMenu} placement="topCenter" className="wallet-selection">
+          <Dropdown
+            overlay={walletMenu}
+            placement="topCenter"
+            className="wallet-selection"
+            arrow
+            trigger={['click']}
+          >
             {/* <a className="ant-dropdown-link" onClick={e => e.preventDefault()}> */}
             <div>
               <img src={WalletIcon} alt="walletIcon" /> Wallet - Test 1
+              <CaretDownOutlined />
             </div>
-            {/* <DownOutlined /> */}
             {/* </a> */}
           </Dropdown>
         </Sider>
