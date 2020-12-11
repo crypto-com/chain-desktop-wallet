@@ -41,7 +41,7 @@ const FormSend = () => {
       onFinish={showModal}
       requiredMark={false}
     >
-      <Form.Item name="address" label="To Address" rules={[{ required: true }]}>
+      <Form.Item name="address" label="Recipient Address" rules={[{ required: true }]}>
         <Input placeholder="tcro..." />
       </Form.Item>
       <div className="amount">
