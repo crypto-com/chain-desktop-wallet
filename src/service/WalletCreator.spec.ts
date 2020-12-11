@@ -19,7 +19,7 @@ describe('Testing Wallet Creation', () => {
 
     expect(testNetWallet.address.startsWith('tcro')).to.eq(true);
     expect(testNetWallet.encryptedPhrase.length > 0).to.eq(true);
-    expect(testNetWallet.identifier.length).to.eq(12);
+    expect(testNetWallet.identifier.length).to.eq(16);
   });
 
   it('Test creating a new wallet with main-net configuration', () => {
@@ -36,7 +36,7 @@ describe('Testing Wallet Creation', () => {
 
     expect(mainNetWallet.address.startsWith('cro')).to.eq(true);
     expect(mainNetWallet.encryptedPhrase.length > 0).to.eq(true);
-    expect(mainNetWallet.identifier.length).to.eq(12);
+    expect(mainNetWallet.identifier.length).to.eq(16);
   });
 
   it('Test creating wallet from custom configurations ', () => {
