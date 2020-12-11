@@ -2,10 +2,8 @@ import React from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Layout, Menu, Table, Space, Dropdown, Tabs } from 'antd';
-// import MenuContentBlock from '../../components/MenuContentBlock/MenuContentBlock';
 import { Link } from 'react-router-dom';
 import Icon, { CaretDownOutlined } from '@ant-design/icons';
-// import SvgIcon from '@material-ui/core/SvgIcon';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
@@ -14,6 +12,9 @@ import IconReceive from '../../svg/IconReceive';
 import IconAddress from '../../svg/IconAddress';
 
 const { Header, Content, Footer, Sider } = Layout;
+const { TabPane } = Tabs;
+const totalBalance = '500,000';
+const stakedBalance = '250,000';
 const siderWidth = '256px';
 
 const TransactionColumns = [
@@ -104,15 +105,15 @@ const StakingData = [
   {
     key: '2',
     index: '2',
-    address: 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj',
-    amount: '500, 000',
+    address: 'tcro1uevms2nv4f2dhvm5u7sgus2yncgh7gdwn6urwe',
+    amount: '300, 000',
     tags: ['loser'],
   },
   {
     key: '3',
     index: '3',
-    address: 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj',
-    amount: '500, 000',
+    address: 'tcro1uvvmzes9kazpkt359exm67qqj384l7c74mjgrr',
+    amount: '100, 000',
     tags: ['cool', 'teacher'],
   },
 ];
@@ -128,7 +129,25 @@ const walletMenu = (
     <Menu.Item>Wallet List</Menu.Item>
   </Menu>
 );
-const { TabPane } = Tabs;
+
+const HomeMenu = () => {
+  return (
+    <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+    <Menu.Item key="1" icon={<Icon component={IconHome} />}>
+      Home
+    </Menu.Item>
+    <Menu.Item key="2" icon={<Icon component={IconAddress} />}>
+      Address
+    </Menu.Item>
+    <Menu.Item key="3" icon={<Icon component={IconSend} />}>
+      Send
+    </Menu.Item>
+    <Menu.Item key="4" icon={<Icon component={IconReceive} />}>
+      Receive
+    </Menu.Item>
+  </Menu>
+  )
+}
 
 function HomePage() {
   return (
@@ -146,26 +165,7 @@ function HomePage() {
         >
           <div className="logo" />
           <div className="version">SAMPLE WALLET v0.0.1</div>
-          <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-            <Menu.Item key="1" icon={<Icon component={IconHome} />}>
-              Home
-            </Menu.Item>
-            <Menu.Item key="2" icon={<Icon component={IconAddress} />}>
-              Address
-            </Menu.Item>
-            <Menu.Item key="3" icon={<Icon component={IconSend} />}>
-              Send
-            </Menu.Item>
-            <Menu.Item key="4" icon={<Icon component={IconReceive} />}>
-              Receive
-            </Menu.Item>
-          </Menu>
-          {/* <div className='back-to-welcome'>
-            <Link to='welcome'>
-              Back to welcome
-            </Link>
-          </div> */}
-
+          <HomeMenu />
           <Dropdown
             overlay={walletMenu}
             placement="topCenter"
@@ -173,12 +173,10 @@ function HomePage() {
             arrow
             trigger={['click']}
           >
-            {/* <a className="ant-dropdown-link" onClick={e => e.preventDefault()}> */}
             <div>
               <img src={WalletIcon} alt="walletIcon" /> Wallet - Test 1
               <CaretDownOutlined />
             </div>
-            {/* </a> */}
           </Dropdown>
         </Sider>
         <Layout className="site-layout" style={{ marginLeft: siderWidth }}>
@@ -192,11 +190,11 @@ function HomePage() {
             >
               <div className="balance">
                 <div className="title">TOTAL BALANCE</div>
-                <div className="quantity">500,000 CRO</div>
+                <div className="quantity">{totalBalance} CRO</div>
               </div>
               <div className="balance">
                 <div className="title">STAKED BALANCE</div>
-                <div className="quantity">250,000 CRO</div>
+                <div className="quantity">{stakedBalance} CRO</div>
               </div>
             </div>
             <Tabs defaultActiveKey="1">
@@ -204,20 +202,15 @@ function HomePage() {
                 <Table
                   columns={TransactionColumns}
                   dataSource={TransactionData}
-                  // style={{ minHeight: 500 }}
                 />
               </TabPane>
               <TabPane tab="Staking" key="2">
                 <Table
                   columns={StakingColumns}
                   dataSource={StakingData}
-                  // style={{ minHeight: 500 }}
                 />
               </TabPane>
             </Tabs>
-            {/* <MenuContentBlock title='Transaction' className="table">
-              <Table columns={columns} dataSource={data} style={{ minHeight: 500 }} />
-            </MenuContentBlock> */}
           </Content>
           <Footer style={{ textAlign: 'center' }} />
         </Layout>
