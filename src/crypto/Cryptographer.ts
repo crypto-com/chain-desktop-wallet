@@ -6,6 +6,16 @@ export interface HashResult {
   data: string;
 }
 
+export interface EncryptionResult {
+  cipher: string;
+  iv: InitialVector;
+}
+
+export interface InitialVector {
+  words: number[];
+  sigBytes: number;
+}
+
 class Cryptographer {
   // Cpu cost
   private readonly N = 2048;
@@ -19,7 +29,9 @@ class Cryptographer {
   // Generated hash length in bytes
   private readonly dkLen = 64;
 
-  private readonly SALT_BYTE_LENGTH = 64;
+  private readonly saltLen = 64;
+
+  private readonly ivLen = 24;
 
   private readonly cypherOptions = {
     mode: mode.CTR,
@@ -49,17 +61,37 @@ class Cryptographer {
     return { data: output };
   }
 
-  public encrypt(data: string, key: string) {
-    return AES.encrypt(data, key, this.cypherOptions).toString();
+  public generateIV(): InitialVector {
+    const wordArray = lib.WordArray.random(this.ivLen);
+    return {
+      words: wordArray.words,
+      sigBytes: wordArray.sigBytes,
+    };
+  }
+
+  public async encrypt(data: string, key: string, iv: InitialVector): Promise<EncryptionResult> {
+    const ivWordArray = lib.WordArray.create(iv.words, iv.sigBytes);
+    const cipher = AES.encrypt(data, key, {
+      ...this.cypherOptions,
+      iv: ivWordArray,
+    }).toString();
+    return {
+      cipher,
+      iv,
+    };
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public decrypt(ciphertext: string, key: string) {
-    return AES.decrypt(ciphertext, key, this.cypherOptions).toString(enc.Utf8);
+  public async decrypt(ciphertext: string, key: string, iv: InitialVector): Promise<string> {
+    const ivWordArray = lib.WordArray.create(iv.words, iv.sigBytes);
+    return AES.decrypt(ciphertext, key, {
+      ...this.cypherOptions,
+      iv: ivWordArray,
+    }).toString(enc.Utf8);
   }
 
   public generateSalt(): string {
-    return lib.WordArray.random(this.SALT_BYTE_LENGTH).toString();
+    return lib.WordArray.random(this.saltLen).toString();
   }
 }
 
