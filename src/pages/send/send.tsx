@@ -53,6 +53,9 @@ const FormSend = () => {
           <div className="available-amount">{availableAmount} CRO</div>
         </div>
       </div>
+      <Form.Item name="memo" label="Memo (Optional)">
+        <Input />
+      </Form.Item>
 
       <Form.Item {...tailLayout}>
         <ModalPopup
@@ -90,21 +93,21 @@ const FormSend = () => {
 
 function SendPage() {
   return (
-      <Layout className="site-layout">
-        <Header className="site-layout-background">Send</Header>
-        <Content>
-          <div className="site-layout-background send-content">
-            <div className="container">
-              <div className="description">
-                Move funds from your transfer address to another transfer address or deposit stake
-                to a staking address.
-              </div>
-              <FormSend />
+    <Layout className="site-layout">
+      <Header className="site-layout-background">Send</Header>
+      <Content>
+        <div className="site-layout-background send-content">
+          <div className="container">
+            <div className="description">
+              Move funds from your transfer address to another transfer address or deposit stake to
+              a staking address.
             </div>
+            <FormSend />
           </div>
-        </Content>
-        <Footer />
-      </Layout>
+        </div>
+      </Content>
+      <Footer />
+    </Layout>
   );
 }
 

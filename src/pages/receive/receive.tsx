@@ -25,7 +25,7 @@ function ReceivePage() {
           <div className="container">
             <div className="description">Share your wallet address to receive payments.</div>
             <div className="address">
-              <QRCode value={walletAddress} />
+              <QRCode value={walletAddress} size={180} />
               <div>{walletAddress}</div>
             </div>
             <CopyToClipboard text={walletAddress}>
