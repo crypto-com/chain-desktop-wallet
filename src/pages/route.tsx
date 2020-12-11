@@ -8,7 +8,7 @@ import CreatePage from './create/create';
 import BackupPage from './backup/backup';
 import HomePage from './home/home';
 import SendPage from './send/send';
-// import HomeLayout from '../layouts/home/home';
+import HomeLayout from '../layouts/home/home';
 
 function RouteHub() {
   // const [page, setPage] = useState('welcome');
@@ -44,6 +44,10 @@ function RouteHub() {
       path: '/create/backup',
       component: <BackupPage />,
     },
+
+  ];
+
+  const routeHomeLayoutItems = [
     {
       name: 'Home Page',
       key: 'home',
@@ -56,7 +60,7 @@ function RouteHub() {
       path: '/send',
       component: <SendPage />,
     },
-  ];
+  ]
 
   return (
     <Router>
@@ -71,6 +75,15 @@ function RouteHub() {
             </Route>
           );
         })}
+        <HomeLayout>
+          {routeHomeLayoutItems.map(item => {
+            return (
+              <Route exact path={item.path} key={item.path}>
+                {item.component}
+              </Route>
+            );
+          })}
+        </HomeLayout>
         <Redirect to="/" />
       </Switch>
     </Router>

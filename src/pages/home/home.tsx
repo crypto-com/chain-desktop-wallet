@@ -4,8 +4,6 @@ import 'antd/dist/antd.css';
 import { Layout, Table, Space, Tabs } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 
-import HomeLayout from '../../layouts/home/home';
-
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const totalBalance = '500,000';
@@ -115,7 +113,6 @@ const StakingData = [
 
 function HomePage() {
   return (
-    <HomeLayout>
       <Layout className="site-layout">
         <Header className="site-layout-background">Welcome Back!</Header>
         <Content>
@@ -140,7 +137,6 @@ function HomePage() {
         </Content>
         <Footer />
       </Layout>
-    </HomeLayout>
   );
 }
 

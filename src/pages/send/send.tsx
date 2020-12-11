@@ -4,7 +4,6 @@ import 'antd/dist/antd.css';
 import { Layout, Form, Input, Button } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 
-import HomeLayout from '../../layouts/home/home';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
 const { Header, Content, Footer } = Layout;
@@ -91,7 +90,6 @@ const FormSend = () => {
 
 function SendPage() {
   return (
-    <HomeLayout>
       <Layout className="site-layout">
         <Header className="site-layout-background">Send</Header>
         <Content>
@@ -107,7 +105,6 @@ function SendPage() {
         </Content>
         <Footer />
       </Layout>
-    </HomeLayout>
   );
 }
 
