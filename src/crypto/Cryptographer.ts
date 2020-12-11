@@ -61,7 +61,7 @@ class Cryptographer {
     return { data: output };
   }
 
-  public generateIV(): InitialVector {
+  public async generateIV(): Promise<InitialVector> {
     const wordArray = lib.WordArray.random(this.ivLen);
     return {
       words: wordArray.words,
