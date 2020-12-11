@@ -7,6 +7,8 @@ import RestorePage from './restore/restore';
 import CreatePage from './create/create';
 import BackupPage from './backup/backup';
 import HomePage from './home/home';
+import SendPage from './send/send';
+// import HomeLayout from '../layouts/home/home';
 
 function RouteHub() {
   // const [page, setPage] = useState('welcome');
@@ -48,25 +50,29 @@ function RouteHub() {
       path: '/home',
       component: <HomePage />,
     },
+    {
+      name: 'Send Page',
+      key: 'send',
+      path: '/send',
+      component: <SendPage />,
+    },
   ];
 
   return (
     <Router>
-      <div>
-        <Switch>
-          <Route exact path={routeIndex.path} key={routeIndex.key}>
-            {routeIndex.component}
-          </Route>
-          {routeItems.map(item => {
-            return (
-              <Route exact path={item.path} key={item.path}>
-                {item.component}
-              </Route>
-            );
-          })}
-          <Redirect to="/" />
-        </Switch>
-      </div>
+      <Switch>
+        <Route exact path={routeIndex.path} key={routeIndex.key}>
+          {routeIndex.component}
+        </Route>
+        {routeItems.map(item => {
+          return (
+            <Route exact path={item.path} key={item.path}>
+              {item.component}
+            </Route>
+          );
+        })}
+        <Redirect to="/" />
+      </Switch>
     </Router>
   );
 }
