@@ -1,3 +1,5 @@
+@sider-width: 256px;
+@sider-padding-lr: 24px;
 .home-page {
   #components-layout-demo-fixed-sider .logo {
     height: 32px;
@@ -5,6 +7,14 @@
     background: rgba(255, 255, 255, 0.2);
   }
   .ant-layout-sider {
+    position: fixed;
+    left: 0;
+    width: @sider-width !important;
+    min-width: @sider-width !important;
+    max-width: @sider-width !important;
+    height: 100vh;
+    padding: @sider-padding-lr;
+    overflow: auto;
     .logo {
       position: relative;
       height: 24px;
@@ -21,10 +31,9 @@
     .wallet-selection {
       position: absolute;
       bottom: 0;
-      // margin-left: 20px;
       display: flex;
       align-items: center;
-      width: 208px;
+      width: calc(@sider-width - 2 * @sider-padding-lr);
       margin-bottom: 20px;
       cursor: pointer;
       img {
@@ -52,7 +61,7 @@
   .ant-layout-header {
     height: auto;
     margin: 36px 0 0 0;
-    padding-left: 20px !important;
+    padding-left: 36px !important;
     font-size: 24px;
     line-height: inherit;
   }
@@ -60,7 +69,7 @@
     .ant-menu-item {
       display: flex;
       align-items: center;
-      width: 206px !important;
+      width: calc(@sider-width - 2 * @sider-padding-lr) !important;
       margin: 10px 0 !important;
       color: @font-color;
       border-radius: @border-radius;
@@ -89,13 +98,13 @@
           color: @white;
         }
       }
-      svg {
-        // filter:invert(100%);
-      }
     }
   }
-
+  .site-layout {
+    margin-left: @sider-width;
+  }
   .ant-layout-content {
+    margin: 16px 32px 0;
     .site-layout-background {
       background: @white;
       border-radius: @border-radius;
@@ -107,6 +116,8 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr 1fr;
     margin-bottom: 20px;
+    padding: 24px;
+    text-align: center;
     .balance {
       color: @font-color-dark;
       font-weight: 500;

@@ -15,7 +15,6 @@ const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
 const totalBalance = '500,000';
 const stakedBalance = '250,000';
-const siderWidth = '256px';
 
 const TransactionColumns = [
   {
@@ -133,36 +132,27 @@ const walletMenu = (
 const HomeMenu = () => {
   return (
     <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-    <Menu.Item key="1" icon={<Icon component={IconHome} />}>
-      Home
-    </Menu.Item>
-    <Menu.Item key="2" icon={<Icon component={IconAddress} />}>
-      Address
-    </Menu.Item>
-    <Menu.Item key="3" icon={<Icon component={IconSend} />}>
-      Send
-    </Menu.Item>
-    <Menu.Item key="4" icon={<Icon component={IconReceive} />}>
-      Receive
-    </Menu.Item>
-  </Menu>
-  )
-}
+      <Menu.Item key="1" icon={<Icon component={IconHome} />}>
+        Home
+      </Menu.Item>
+      <Menu.Item key="2" icon={<Icon component={IconAddress} />}>
+        Address
+      </Menu.Item>
+      <Menu.Item key="3" icon={<Icon component={IconSend} />}>
+        Send
+      </Menu.Item>
+      <Menu.Item key="4" icon={<Icon component={IconReceive} />}>
+        Receive
+      </Menu.Item>
+    </Menu>
+  );
+};
 
 function HomePage() {
   return (
     <main className="home-page">
       <Layout>
-        <Sider
-          style={{
-            overflow: 'auto',
-            height: '100vh',
-            position: 'fixed',
-            left: 0,
-            padding: '24px',
-          }}
-          width={siderWidth}
-        >
+        <Sider>
           <div className="logo" />
           <div className="version">SAMPLE WALLET v0.0.1</div>
           <HomeMenu />
@@ -179,15 +169,10 @@ function HomePage() {
             </div>
           </Dropdown>
         </Sider>
-        <Layout className="site-layout" style={{ marginLeft: siderWidth }}>
-          <Header className="site-layout-background" style={{ padding: 0, background: '#f8f8f8' }}>
-            Welcome Back!
-          </Header>
-          <Content style={{ margin: '16px 16px 0' }}>
-            <div
-              className="site-layout-background balance-container"
-              style={{ padding: 24, textAlign: 'center' }}
-            >
+        <Layout className="site-layout">
+          <Header className="site-layout-background">Welcome Back!</Header>
+          <Content>
+            <div className="site-layout-background balance-container">
               <div className="balance">
                 <div className="title">TOTAL BALANCE</div>
                 <div className="quantity">{totalBalance} CRO</div>
@@ -199,20 +184,14 @@ function HomePage() {
             </div>
             <Tabs defaultActiveKey="1">
               <TabPane tab="Transactions" key="1">
-                <Table
-                  columns={TransactionColumns}
-                  dataSource={TransactionData}
-                />
+                <Table columns={TransactionColumns} dataSource={TransactionData} />
               </TabPane>
               <TabPane tab="Staking" key="2">
-                <Table
-                  columns={StakingColumns}
-                  dataSource={StakingData}
-                />
+                <Table columns={StakingColumns} dataSource={StakingData} />
               </TabPane>
             </Tabs>
           </Content>
-          <Footer style={{ textAlign: 'center' }} />
+          <Footer />
         </Layout>
       </Layout>
     </main>
