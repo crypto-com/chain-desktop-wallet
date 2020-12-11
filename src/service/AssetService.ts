@@ -1,6 +1,6 @@
 import { StorageService } from '../storage/StorageService';
 import { NodeRpcService } from './rpc/NodeRpcService';
-import { UserAsset } from '../models/UserAsset';
+import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 
 class AssetService {
@@ -54,6 +54,16 @@ class AssetService {
         await this.storageService.saveAssetMarketPrice(assetPrice);
       }),
     );
+  }
+
+  public async retrieveAssetPrice(
+    assetSymbol: string,
+    currency: string = 'USD',
+  ): Promise<AssetMarketPrice> {
+    const price = await this.storageService.retrieveAssetPrice(assetSymbol, currency);
+    return {
+      ...price,
+    };
   }
 }
 
