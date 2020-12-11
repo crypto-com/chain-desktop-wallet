@@ -1,6 +1,6 @@
 import scrypt from 'scrypt-js';
 import { utils } from '@crypto-com/chain-jslib';
-import { AES, enc, lib } from 'crypto-js';
+import { AES, enc, lib, mode, pad } from 'crypto-js';
 
 export interface HashResult {
   data: string;
@@ -20,6 +20,11 @@ class Cryptographer {
   private readonly dkLen = 64;
 
   private readonly SALT_BYTE_LENGTH = 64;
+
+  private readonly cypherOptions = {
+    mode: mode.CTR,
+    padding: pad.Pkcs7,
+  };
 
   public computeHash(data: string, salt: string): HashResult {
     const normalizedData: string = data.normalize();
@@ -44,14 +49,13 @@ class Cryptographer {
     return { data: output };
   }
 
-  // eslint-disable-next-line class-methods-use-this
   public encrypt(data: string, key: string) {
-    return AES.encrypt(data, key).toString();
+    return AES.encrypt(data, key, this.cypherOptions).toString();
   }
 
   // eslint-disable-next-line class-methods-use-this
   public decrypt(ciphertext: string, key: string) {
-    return AES.decrypt(ciphertext, key).toString(enc.Utf8);
+    return AES.decrypt(ciphertext, key, this.cypherOptions).toString(enc.Utf8);
   }
 
   public generateSalt(): string {
