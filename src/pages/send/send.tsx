@@ -118,10 +118,17 @@ const FormSend = () => {
               <div className="label">Amount</div>
               <div>{`${formValues?.amount} CRO`}</div>
             </div>
-            <div className="item">
-              <div className="label">Memo</div>
-              <div>{`${formValues?.memo ?? ''}`}</div>
-            </div>
+
+            {formValues?.memo !== undefined &&
+            formValues?.memo !== null &&
+            formValues.memo !== '' ? (
+              <div className="item">
+                <div className="label">Memo</div>
+                <div>{`${formValues?.memo}`}</div>
+              </div>
+            ) : (
+              <div />
+            )}
           </>
         </ModalPopup>
 
