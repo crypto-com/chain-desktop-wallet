@@ -23,7 +23,8 @@ export class NodeRpcService implements INodeRpcService {
   }
 
   public static async init(baseUrl: string) {
-    const client = await StargateClient.connect(baseUrl);
+    const cors = 'https://cors-anywhere.herokuapp.com/';
+    const client = await StargateClient.connect(cors + baseUrl);
     return new NodeRpcService(client);
   }
 

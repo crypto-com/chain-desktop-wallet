@@ -5,6 +5,8 @@ import { Layout, Form, Input, Button } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import { walletService } from '../../service/WalletService';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 
 const { Header, Content, Footer } = Layout;
 const layout = {
@@ -18,18 +20,46 @@ const availableAmount = '250,000';
 const FormSend = () => {
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({ address: '', amount: '', memo: '' });
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
+  const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [transactionHash, setTransactionHash] = useState('');
+
   const showModal = () => {
     setFormValues(form.getFieldsValue());
-    setIsModalVisible(true);
+    setIsVisibleConfirmationModal(true);
   };
 
-  const handleOk = () => {
-    setIsModalVisible(false);
+  const onConfirmTransfer = async () => {
+    try {
+      setConfirmLoading(true);
+      const hash = await walletService.sendTransfer(
+        formValues.address,
+        formValues.amount,
+        formValues.memo,
+      );
+      setTransactionHash(hash);
+
+      setIsVisibleConfirmationModal(false);
+      setConfirmLoading(false);
+      setIsSuccessTransferModalVisible(true);
+
+      form.resetFields();
+    } catch (e) {
+      setIsVisibleConfirmationModal(false);
+      setConfirmLoading(false);
+
+      // eslint-disable-next-line no-console
+      console.log('Error occurred while transfer', e);
+    }
   };
 
   const handleCancel = () => {
-    setIsModalVisible(false);
+    setIsVisibleConfirmationModal(false);
+  };
+
+  const closeSuccessModal = () => {
+    setIsSuccessTransferModalVisible(false);
   };
 
   return (
@@ -59,19 +89,16 @@ const FormSend = () => {
 
       <Form.Item {...tailLayout}>
         <ModalPopup
-          isModalVisible={isModalVisible}
+          isModalVisible={isConfirmationModalVisible}
           handleCancel={handleCancel}
-          handleOk={handleOk}
+          handleOk={onConfirmTransfer}
+          confirmationLoading={confirmLoading}
           button={
             <Button type="primary" htmlType="submit">
               Review
             </Button>
           }
-          footer={[
-            <Button key="submit" type="primary" onClick={handleOk}>
-              Confirm to send
-            </Button>,
-          ]}
+          okText="Confirm"
         >
           <>
             <div className="title">Confirm Transaction</div>
@@ -90,6 +117,24 @@ const FormSend = () => {
             </div>
           </>
         </ModalPopup>
+
+        <SuccessModalPopup
+          isModalVisible={isSuccessTransferModalVisible}
+          handleCancel={closeSuccessModal}
+          handleOk={closeSuccessModal}
+          title="Success!"
+          button={null}
+          footer={[
+            <Button key="submit" type="primary" onClick={closeSuccessModal}>
+              Ok Thanks
+            </Button>,
+          ]}
+        >
+          <>
+            <div>Your transfer was successful!</div>
+            <div>{transactionHash}</div>
+          </>
+        </SuccessModalPopup>
       </Form.Item>
     </Form>
   );

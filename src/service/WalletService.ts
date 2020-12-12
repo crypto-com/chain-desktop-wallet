@@ -19,17 +19,18 @@ class WalletService {
     this.storageService = new StorageService('app-db');
   }
 
-  public async sendTransfer(fromAddress: string, toAddress: string, amount: string, memo: string) {
+  public async sendTransfer(toAddress: string, amount: string, memo: string) {
     const {
       nodeRpc,
       accountNumber,
       accountSequence,
       phrase,
+      currentWallet,
       transactionSigner,
     } = await this.prepareTransaction();
 
     const transfer: TransferTransaction = {
-      fromAddress,
+      fromAddress: currentWallet.address,
       toAddress,
       amount,
       memo,
@@ -114,6 +115,7 @@ class WalletService {
       accountNumber,
       accountSequence,
       phrase,
+      currentWallet,
       transactionSigner,
     };
   }
