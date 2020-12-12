@@ -7,6 +7,7 @@ import { Layout, Form, Input, Button } from 'antd';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 
 const { Header, Content, Footer } = Layout;
 const layout = {
@@ -19,11 +20,12 @@ const tailLayout = {
 const availableAmount = '250,000';
 const FormSend = () => {
   const [form] = Form.useForm();
-  const [formValues, setFormValues] = useState({ address: '', amount: '', memo: '' });
+  const [formValues, setFormValues] = useState({ recipientAddress: '', amount: '', memo: '' });
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [transactionHash, setTransactionHash] = useState('');
+  const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
 
   const showModal = () => {
     setFormValues(form.getFieldsValue());
@@ -31,13 +33,14 @@ const FormSend = () => {
   };
 
   const onConfirmTransfer = async () => {
+    const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
     try {
       setConfirmLoading(true);
-      const hash = await walletService.sendTransfer(
-        formValues.address,
-        formValues.amount,
-        formValues.memo,
-      );
+      const hash = await walletService.sendTransfer({
+        toAddress: formValues.recipientAddress,
+        amount: formValues.amount,
+        memo,
+      });
       setTransactionHash(hash);
 
       setIsVisibleConfirmationModal(false);
@@ -48,7 +51,7 @@ const FormSend = () => {
     } catch (e) {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
-
+      setIsErrorTransferModalVisible(true);
       // eslint-disable-next-line no-console
       console.log('Error occurred while transfer', e);
     }
@@ -62,6 +65,10 @@ const FormSend = () => {
     setIsSuccessTransferModalVisible(false);
   };
 
+  const closeErrorModal = () => {
+    setIsErrorTransferModalVisible(false);
+  };
+
   return (
     <Form
       {...layout}
@@ -71,7 +78,7 @@ const FormSend = () => {
       onFinish={showModal}
       requiredMark={false}
     >
-      <Form.Item name="address" label="Recipient Address" rules={[{ required: true }]}>
+      <Form.Item name="recipientAddress" label="Recipient Address" rules={[{ required: true }]}>
         <Input placeholder="tcro..." />
       </Form.Item>
       <div className="amount">
@@ -105,7 +112,7 @@ const FormSend = () => {
             <div className="description">Please review the below information. </div>
             <div className="item">
               <div className="label">To Address</div>
-              <div className="address">{`${formValues?.address}`}</div>
+              <div className="address">{`${formValues?.recipientAddress}`}</div>
             </div>
             <div className="item">
               <div className="label">Amount</div>
@@ -113,7 +120,7 @@ const FormSend = () => {
             </div>
             <div className="item">
               <div className="label">Memo</div>
-              <div>{`${formValues?.memo}`}</div>
+              <div>{`${formValues?.memo ?? ''}`}</div>
             </div>
           </>
         </ModalPopup>
@@ -135,6 +142,17 @@ const FormSend = () => {
             <div>{transactionHash}</div>
           </>
         </SuccessModalPopup>
+        <ErrorModalPopup
+          isModalVisible={isErrorTransferModalVisible}
+          handleCancel={closeErrorModal}
+          handleOk={closeErrorModal}
+          title="An error happened!"
+          footer={[]}
+        >
+          <>
+            <div>The transfer transaction failed. Please try again later</div>
+          </>
+        </ErrorModalPopup>
       </Form.Item>
     </Form>
   );
