@@ -12,6 +12,12 @@ import {
   WithdrawStakingReward,
 } from './signers/TransactionSupported';
 
+export interface TransferRequest {
+  toAddress: string;
+  amount: string;
+  memo: string;
+}
+
 class WalletService {
   private readonly storageService: StorageService;
 
@@ -19,20 +25,21 @@ class WalletService {
     this.storageService = new StorageService('app-db');
   }
 
-  public async sendTransfer(fromAddress: string, toAddress: string, amount: string, memo: string) {
+  public async sendTransfer(transferRequest: TransferRequest) {
     const {
       nodeRpc,
       accountNumber,
       accountSequence,
       phrase,
+      currentWallet,
       transactionSigner,
     } = await this.prepareTransaction();
 
     const transfer: TransferTransaction = {
-      fromAddress,
-      toAddress,
-      amount,
-      memo,
+      fromAddress: currentWallet.address,
+      toAddress: transferRequest.toAddress,
+      amount: transferRequest.amount,
+      memo: transferRequest.memo,
       accountNumber,
       accountSequence,
     };
@@ -114,6 +121,7 @@ class WalletService {
       accountNumber,
       accountSequence,
       phrase,
+      currentWallet,
       transactionSigner,
     };
   }
