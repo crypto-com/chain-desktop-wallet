@@ -8,6 +8,15 @@ module.exports = {
     'react-hooks'
   ],
   rules: {
+    "@typescript-eslint/type-annotation-spacing": "off",
+    "@typescript-eslint/triple-slash-reference": "off",
+    "@typescript-eslint/consistent-indexed-object-style":"off",
+    "@typescript-eslint/semi":"off",
+    "@typescript-eslint/ban-types": "off",
+    "@typescript-eslint/consistent-type-imports": "off",
+    "@typescript-eslint/consistent-type-definitions": "off",
+    "@typescript-eslint/method-signature-style":"off",
+    "@typescript-eslint/array-type":'off',
     'jsx-a11y/accessible-emoji': 'off',
     'no-new-wrappers': 'off',
     'no-extra-boolean-cast': 'off',
