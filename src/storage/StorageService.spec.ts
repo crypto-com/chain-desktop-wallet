@@ -59,7 +59,7 @@ describe('Testing Storage Service', () => {
       mockWalletStore.saveWallet(wallet);
     }
 
-    const fetchedWallets = await mockWalletStore.fetchWallets();
+    const fetchedWallets = await mockWalletStore.retrieveAllWallets();
     expect(fetchedWallets.length).to.eq(10);
   });
 
@@ -79,7 +79,7 @@ describe('Testing Storage Service', () => {
     };
 
     await mockWalletStore.saveAsset(asset);
-    const assets = await mockWalletStore.fetchAssetsByWallet(WALLET_ID);
+    const assets = await mockWalletStore.retrieveAssetsByWallet(WALLET_ID);
 
     expect(assets[0].balance).to.eq('0');
     expect(assets[0].identifier).to.eq('cbd4bab2cbfd2b3');
@@ -90,7 +90,7 @@ describe('Testing Storage Service', () => {
     asset.balance = '250000'; // New balance
 
     await mockWalletStore.saveAsset(asset);
-    const updatedAssets = await mockWalletStore.fetchAssetsByWallet(WALLET_ID);
+    const updatedAssets = await mockWalletStore.retrieveAssetsByWallet(WALLET_ID);
     expect(updatedAssets[0].balance).to.eq('250000');
     expect(updatedAssets[0].identifier).to.eq('cbd4bab2cbfd2b3');
     expect(updatedAssets[0].symbol).to.eq('BEST');

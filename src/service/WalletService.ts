@@ -169,8 +169,8 @@ class WalletService {
   }
 
   // Load all persisted wallets
-  public async loadAllWallets(): Promise<Wallet[]> {
-    const wallets = await this.storageService.fetchWallets();
+  public async retrieveAllWallets(): Promise<Wallet[]> {
+    const wallets = await this.storageService.retrieveAllWallets();
     if (!wallets) {
       return [];
     }
@@ -182,7 +182,7 @@ class WalletService {
 
   // This is used to check whether the user should be shown the welcome screen or being redirected straight to their home screen
   public async hasWalletBeenCreated(): Promise<boolean> {
-    const allWallets = await this.loadAllWallets();
+    const allWallets = await this.retrieveAllWallets();
     return allWallets.length > 0;
   }
 

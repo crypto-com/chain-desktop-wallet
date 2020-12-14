@@ -32,11 +32,11 @@ export class StorageService {
     return this.db.walletStore.findOne<Wallet>({ identifier });
   }
 
-  public async fetchWallets() {
+  public async retrieveAllWallets() {
     return this.db.walletStore.find<Wallet>({});
   }
 
-  public async fetchAssetsByWallet(walletId: string) {
+  public async retrieveAssetsByWallet(walletId: string) {
     return this.db.assetStore.find<UserAsset>({ walletId });
   }
 
