@@ -29,7 +29,7 @@ const FormRestore = () => {
 
   const handleSuccessOk = () => {
     setIsSuccessModalVisible(false);
-    history.push('home');
+    history.push('/home');
   };
 
   const handleSuccessCancel = () => {

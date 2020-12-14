@@ -1,6 +1,6 @@
 import React from 'react';
 // import React, { useState } from 'react';
-import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+import { HashRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
 
 import WelcomePage from './welcome/welcome';
 import RestorePage from './restore/restore';
