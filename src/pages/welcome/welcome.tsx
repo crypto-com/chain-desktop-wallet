@@ -20,7 +20,7 @@ function WelcomePage() {
       fetchWalletData();
       didMountRef.current = true;
     } else if (hasWallet) {
-      history.push('home');
+      history.push('/home');
     }
   }, [hasWallet, history]);
 
