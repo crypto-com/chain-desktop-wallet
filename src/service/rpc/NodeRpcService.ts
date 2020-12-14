@@ -29,7 +29,12 @@ export class NodeRpcService implements INodeRpcService {
   }
 
   public async loadAccountBalance(address: string, assetDenom: string): Promise<string> {
-    return (await this.client.getBalance(address, assetDenom))?.amount ?? '0';
+    const response = await this.client.getBalance(address, assetDenom);
+
+    // eslint-disable-next-line no-console
+    console.log(`address: ${address} | assetDenom: ${assetDenom} | response: ${response}`);
+
+    return response?.amount ?? '0';
   }
 
   public async loadSequenceNumber(address: string): Promise<number> {

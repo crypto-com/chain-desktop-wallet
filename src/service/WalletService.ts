@@ -1,7 +1,13 @@
 import { Wallet } from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import { WalletCreateOptions, WalletCreator } from './WalletCreator';
-import { DefaultAsset, DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
+import {
+  APP_DB_NAMESPACE,
+  DefaultAsset,
+  DefaultWalletConfigs,
+  Network,
+  WalletConfig,
+} from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import { TransactionSigner } from './signers/TransactionSigner';
@@ -22,7 +28,7 @@ class WalletService {
   private readonly storageService: StorageService;
 
   constructor() {
-    this.storageService = new StorageService('app-db');
+    this.storageService = new StorageService(APP_DB_NAMESPACE);
   }
 
   public async sendTransfer(transferRequest: TransferRequest) {
@@ -142,14 +148,15 @@ class WalletService {
   public async createAndSaveWallet(createOptions: WalletCreateOptions): Promise<Wallet> {
     const newWallet = WalletCreator.create(createOptions);
     await this.persistWallet(newWallet);
-    await this.persistInitialAsset(newWallet.identifier);
+    await this.persistInitialAsset(newWallet.identifier, newWallet.config.network);
     return newWallet;
   }
 
-  public async persistInitialAsset(walletId: string) {
+  public async persistInitialAsset(walletId: string, network: Network) {
+    const defaultAsset = DefaultAsset(network);
     await this.storageService.saveAsset({
       walletId,
-      ...DefaultAsset,
+      ...defaultAsset,
     });
   }
 
@@ -157,13 +164,16 @@ class WalletService {
   public async restoreAndSaveWallet(importOptions: WalletImportOptions): Promise<Wallet> {
     const importedWallet = WalletImporter.import(importOptions);
     await this.persistWallet(importedWallet);
-    await this.persistInitialAsset(importedWallet.identifier);
+    await this.persistInitialAsset(importedWallet.identifier, importedWallet.config.network);
     return importedWallet;
   }
 
   // Load all persisted wallets
   public async loadAllWallets(): Promise<Wallet[]> {
     const wallets = await this.storageService.fetchWallets();
+    if (!wallets) {
+      return [];
+    }
     return wallets.map(
       data =>
         new Wallet(data.identifier, data.name, data.address, data.config, data.encryptedPhrase),

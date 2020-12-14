@@ -4,6 +4,7 @@ import { RecoilRoot } from 'recoil';
 import * as serviceWorker from './serviceWorker';
 import RouteHub from './pages/route';
 import './index.less';
+import { task } from './service/tasks/BackgroundJob';
 
 ReactDOM.render(
   <RecoilRoot>
@@ -16,3 +17,4 @@ ReactDOM.render(
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();
+task.runJobs();

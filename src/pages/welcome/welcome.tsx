@@ -14,6 +14,8 @@ function WelcomePage() {
   useEffect(() => {
     const fetchWalletData = async () => {
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
+      // eslint-disable-next-line no-console
+      console.log('HAS_WALLET_BEEN =>', hasWalletBeenCreated);
       setHasWallet(hasWalletBeenCreated);
     };
     if (!didMountRef.current) {
