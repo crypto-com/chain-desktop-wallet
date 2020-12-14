@@ -4,7 +4,7 @@ import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import { TransactionSigner } from './TransactionSigner';
 
 describe('Testing TransactionSigner', () => {
-  it('test transfer transaction signing ', () => {
+  it('test transfer transaction signing ', async () => {
     const testNetConfig = DefaultWalletConfigs.TestNetConfig;
 
     const phrase =
@@ -12,7 +12,7 @@ describe('Testing TransactionSigner', () => {
 
     const signer = new TransactionSigner(testNetConfig);
 
-    const signedTransferHex = signer.signTransfer(
+    const signedTransferHex = await signer.signTransfer(
       {
         accountNumber: 0,
         accountSequence: 2,
@@ -29,7 +29,7 @@ describe('Testing TransactionSigner', () => {
     );
   });
 
-  it('test delegate transaction signing ', () => {
+  it('test delegate transaction signing ', async () => {
     const testNetConfig = DefaultWalletConfigs.TestNetConfig;
 
     const phrase =
@@ -37,7 +37,7 @@ describe('Testing TransactionSigner', () => {
 
     const signer = new TransactionSigner(testNetConfig);
 
-    const signedDelegateTxHex = signer.signDelegateTx(
+    const signedDelegateTxHex = await signer.signDelegateTx(
       {
         accountNumber: 12,
         accountSequence: 0,
@@ -54,7 +54,7 @@ describe('Testing TransactionSigner', () => {
     );
   });
 
-  it('test withdraw delegation reward transaction signing ', () => {
+  it('test withdraw delegation reward transaction signing ', async () => {
     const testNetConfig = DefaultWalletConfigs.TestNetConfig;
 
     const phrase =
@@ -62,7 +62,7 @@ describe('Testing TransactionSigner', () => {
 
     const signer = new TransactionSigner(testNetConfig);
 
-    const withdrawStakingRewardTxHex = signer.signWithdrawStakingRewardTx(
+    const withdrawStakingRewardTxHex = await signer.signWithdrawStakingRewardTx(
       {
         accountNumber: 20,
         accountSequence: 1,

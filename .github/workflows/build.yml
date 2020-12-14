@@ -24,6 +24,10 @@ jobs:
         with:
           node-version: 12
 
+      - name: Install deps with big timeout
+        run: |
+          yarn install --network-timeout 600000
+
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
