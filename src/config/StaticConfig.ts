@@ -43,6 +43,7 @@ export const DefaultAsset = (network: Network) => {
     identifier: getRandomId(),
     name: 'Crypto.com Coin',
     symbol: assetSymbol,
+    mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
   };
 };

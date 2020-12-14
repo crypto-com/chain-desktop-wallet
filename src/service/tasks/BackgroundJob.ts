@@ -20,5 +20,5 @@ class BackgroundTask {
   }
 }
 
-const interval = 10_000; // Milliseconds
+const interval = 20_000; // 20 seconds
 export const task = new BackgroundTask(interval);

@@ -3,6 +3,10 @@ export interface UserAsset {
 
   symbol: string;
 
+  // This is to be used solely for markets data since testnet market prices is always non existent
+  // That's why for all testnet assets a mainnet symbol is needed to help fetch market prices
+  mainnetSymbol: string;
+
   name: string;
 
   balance: string;

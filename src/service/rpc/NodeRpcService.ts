@@ -23,17 +23,12 @@ export class NodeRpcService implements INodeRpcService {
   }
 
   public static async init(baseUrl: string) {
-    const cors = 'https://cors-anywhere.herokuapp.com/';
-    const client = await StargateClient.connect(cors + baseUrl);
+    const client = await StargateClient.connect(baseUrl);
     return new NodeRpcService(client);
   }
 
   public async loadAccountBalance(address: string, assetDenom: string): Promise<string> {
     const response = await this.client.getBalance(address, assetDenom);
-
-    // eslint-disable-next-line no-console
-    console.log(`address: ${address} | assetDenom: ${assetDenom} | response: ${response}`);
-
     return response?.amount ?? '0';
   }
 

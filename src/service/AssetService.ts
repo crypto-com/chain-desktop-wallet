@@ -26,12 +26,11 @@ class AssetService {
 
     await Promise.all(
       assets.map(async asset => {
+        const baseDenomination = currentSession.wallet.config.network.coin.baseDenom;
         asset.balance = await nodeRpc.loadAccountBalance(
           currentSession.wallet.address,
-          asset.symbol,
+          baseDenomination,
         );
-        // eslint-disable-next-line no-console
-        console.log('LOADED_ASSET_BALANCE: ', asset.balance);
         await this.storageService.saveAsset(asset);
       }),
     );
@@ -64,9 +63,9 @@ class AssetService {
     }
 
     await Promise.all(
-      assets.map(async asset => {
+      assets.map(async (asset: UserAsset) => {
         const assetPrice = await croMarketPriceApi.getAssetPrice(
-          asset.symbol,
+          asset.mainnetSymbol,
           currentSession.currency,
         );
         // eslint-disable-next-line no-console
