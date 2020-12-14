@@ -8,7 +8,15 @@ import {
   WithdrawStakingReward,
 } from './TransactionSupported';
 
-export class TransactionSigner {
+export interface ITransactionSigner {
+  signTransfer(transaction: TransferTransaction, phrase: string): Promise<string>;
+
+  signDelegateTx(transaction: DelegateTransaction, phrase: string): Promise<string>;
+
+  signWithdrawStakingRewardTx(transaction: WithdrawStakingReward, phrase: string): Promise<string>;
+}
+
+export class TransactionSigner implements ITransactionSigner {
   public readonly config: WalletConfig;
 
   constructor(config: WalletConfig) {
@@ -27,7 +35,7 @@ export class TransactionSigner {
     return { cro, keyPair, rawTx };
   }
 
-  public signTransfer(transaction: TransferTransaction, phrase: string): string {
+  public async signTransfer(transaction: TransferTransaction, phrase: string): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
 
     const msgSend = new cro.bank.MsgSend({
@@ -51,7 +59,7 @@ export class TransactionSigner {
       .getHexEncoded();
   }
 
-  public signDelegateTx(transaction: DelegateTransaction, phrase: string): string {
+  public async signDelegateTx(transaction: DelegateTransaction, phrase: string): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
 
     const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
@@ -76,7 +84,10 @@ export class TransactionSigner {
       .getHexEncoded();
   }
 
-  public signWithdrawStakingRewardTx(transaction: WithdrawStakingReward, phrase: string): string {
+  public async signWithdrawStakingRewardTx(
+    transaction: WithdrawStakingReward,
+    phrase: string,
+  ): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
 
     const msgWithdrawDelegatorReward = new cro.distribution.MsgWithdrawDelegatorReward({

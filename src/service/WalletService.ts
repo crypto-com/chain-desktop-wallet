@@ -44,7 +44,7 @@ class WalletService {
       accountSequence,
     };
 
-    const signedTxHex = transactionSigner.signTransfer(transfer, phrase);
+    const signedTxHex = await transactionSigner.signTransfer(transfer, phrase);
     return nodeRpc.broadcastTransaction(signedTxHex);
   }
 
@@ -71,7 +71,7 @@ class WalletService {
       accountSequence,
     };
 
-    const signedTxHex = transactionSigner.signDelegateTx(delegateTransaction, phrase);
+    const signedTxHex = await transactionSigner.signDelegateTx(delegateTransaction, phrase);
     return nodeRpc.broadcastTransaction(signedTxHex);
   }
 
@@ -97,7 +97,7 @@ class WalletService {
       accountSequence,
     };
 
-    const signedTxHex = transactionSigner.signWithdrawStakingRewardTx(
+    const signedTxHex = await transactionSigner.signWithdrawStakingRewardTx(
       withdrawStakingReward,
       phrase,
     );
