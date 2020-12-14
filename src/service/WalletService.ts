@@ -11,6 +11,7 @@ import {
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import { TransactionSigner } from './signers/TransactionSigner';
+import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
 import { Session } from '../models/Session';
 import {
   DelegateTransactionUnsigned,
@@ -31,6 +32,7 @@ import {
   TransferTransactionList,
 } from '../models/Transaction';
 import { chainIndexAPI } from './rpc/ChainIndexingAPI';
+import { LocalWalletSignerProvider, LedgerWalletSignerProvider } from './signers/SignerProvider';
 
 export interface TransferRequest {
   toAddress: string;
@@ -69,6 +71,7 @@ class WalletService {
       accountSequence,
       currentSession,
       transactionSigner,
+      ledgerTransactionSigner,
     } = await this.prepareTransaction();
 
     const scaledAmount = this.getScaledAmount(transferRequest.amount, transferRequest.asset);
@@ -105,6 +108,7 @@ class WalletService {
       accountSequence,
       currentSession,
       transactionSigner,
+      ledgerTransactionSigner,
     } = await this.prepareTransaction();
 
     const delegationAmountScaled = this.getScaledAmount(
@@ -138,6 +142,7 @@ class WalletService {
       accountSequence,
       currentSession,
       transactionSigner,
+      ledgerTransactionSigner,
     } = await this.prepareTransaction();
 
     const withdrawStakingReward: WithdrawStakingRewardUnsigned = {
@@ -159,13 +164,19 @@ class WalletService {
 
   public async prepareTransaction() {
     const currentSession = await this.storageService.retrieveCurrentSession();
+    const currentWallet = currentSession.wallet;
 
     const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
 
     const accountNumber = await nodeRpc.fetchAccountNumber(currentSession.wallet.address);
     const accountSequence = await nodeRpc.loadSequenceNumber(currentSession.wallet.address);
 
-    const transactionSigner = new TransactionSigner(currentSession.wallet.config);
+    const phrase = currentSession.wallet.encryptedPhrase;
+    const wallet = new LocalWalletSignerProvider(phrase, currentWallet.config.derivationPath);
+    const transactionSigner = new TransactionSigner(currentWallet.config, wallet);
+
+    const ledgerWallet = new LedgerWalletSignerProvider();
+    const ledgerTransactionSigner = new LedgerTransactionSigner(currentWallet.config, ledgerWallet);
 
     return {
       nodeRpc,
@@ -173,6 +184,7 @@ class WalletService {
       accountSequence,
       currentSession,
       transactionSigner,
+      ledgerTransactionSigner,
     };
   }
 

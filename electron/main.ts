@@ -2,10 +2,14 @@ import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
-
+import { IpcMain } from './IpcMain';
 let win: BrowserWindow | null = null;
 
 function createWindow() {
+  //IpcMain.setup();
+  let ipcmain = new IpcMain();
+  ipcmain.setup();
+
   win = new BrowserWindow({
     width: 1280,
     height: 800,

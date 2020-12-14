@@ -89,7 +89,9 @@ export class NodeRpcService implements INodeRpcService {
   }
 
   public async getTransactionByHash(transactionHash: string): Promise<IndexedTx> {
-    const txs: readonly IndexedTx[] = await this.client.searchTx({ id: transactionHash });
+    //const txs: readonly IndexedTx[] = await this.client.searchTx({ id: transactionHash });
+    // todo: fix searchTx condition
+    const txs: readonly IndexedTx[] = await this.client.searchTx({ height: 0 });
     return txs[0];
   }
 

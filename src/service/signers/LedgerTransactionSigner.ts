@@ -10,19 +10,16 @@ import {
   WithdrawStakingRewardUnsigned,
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
+import { ITransactionSigner } from './TransactionSigner';
 
-export interface ITransactionSigner {
-  signTransfer(transaction: TransferTransactionUnsigned, phrase: string): Promise<string>;
-
-  signDelegateTx(transaction: DelegateTransactionUnsigned, phrase: string): Promise<string>;
-
-  signWithdrawStakingRewardTx(
-    transaction: WithdrawStakingRewardUnsigned,
-    phrase: string,
-  ): Promise<string>;
+function convertFromObjectToBytes(rawMessage: any): Bytes {
+  let stringMessage = JSON.stringify(rawMessage);
+  let bufferMessage = Buffer.from(stringMessage);
+  let bytesMessage = Bytes.fromBuffer(bufferMessage);
+  return bytesMessage;
 }
 
-export class TransactionSigner implements ITransactionSigner {
+export class LedgerTransactionSigner implements ITransactionSigner {
   public readonly config: WalletConfig;
 
   public readonly signerProvider: ISignerProvider;
@@ -60,7 +57,24 @@ export class TransactionSigner implements ITransactionSigner {
       })
       .toSignable();
 
-    const signature = await this.signerProvider.sign(signableTx.toSignDoc(0));
+    let fee = { amount: [{ amount: '0', denom: Units.BASE }], gas: '2000000' };
+    let value = {
+      amount: { amount: transaction.amount, denom: Units.BASE },
+      from_address: transaction.fromAddress,
+      to_address: transaction.toAddress,
+    };
+    let msg = { type: 'cosmos-sdk/MsgWithdrawDelegatorReward', value: value };
+
+    let rawMessage = {
+      account_number: transaction.accountNumber.toString(),
+      chain_id: this.config.network.chainId,
+      fee: fee,
+      memo: '',
+      msgs: [msg],
+      sequence: transaction.accountSequence,
+    };
+    let bytesMessage = convertFromObjectToBytes(rawMessage);
+    const signature = await this.signerProvider.sign(bytesMessage);
 
     return signableTx
       .setSignature(0, signature)
@@ -81,6 +95,15 @@ export class TransactionSigner implements ITransactionSigner {
       amount: delegateAmount,
     });
 
+    const signableTx = rawTx
+      .appendMessage(msgDelegate)
+      .addSigner({
+        publicKey: await this.signerProvider.getPubKey(),
+        accountNumber: new Big(transaction.accountNumber),
+        accountSequence: new Big(transaction.accountSequence),
+      })
+      .toSignable();
+
     let fee = { amount: [{ amount: '0', denom: Units.BASE }], gas: '2000000' };
     let value = {
       amount: { amount: transaction.amount, denom: Units.BASE },
@@ -91,23 +114,16 @@ export class TransactionSigner implements ITransactionSigner {
 
     let rawMessage = {
       account_number: transaction.accountNumber.toString(),
-      chain_id: 'testnet',
+      chain_id: this.config.network.chainId,
       fee: fee,
       memo: '',
       msgs: [msg],
       sequence: transaction.accountSequence,
     };
 
-    const signableTx = rawTx
-      .appendMessage(msgDelegate)
-      .addSigner({
-        publicKey: await this.signerProvider.getPubKey(),
-        accountNumber: new Big(transaction.accountNumber),
-        accountSequence: new Big(transaction.accountSequence),
-      })
-      .toSignable();
+    let bytesMessage = convertFromObjectToBytes(rawMessage);
 
-    const signature = await this.signerProvider.sign(signableTx.toSignDoc(0));
+    const signature = await this.signerProvider.sign(bytesMessage);
 
     return signableTx
       .setSignature(0, signature)
@@ -134,7 +150,25 @@ export class TransactionSigner implements ITransactionSigner {
         accountSequence: new Big(transaction.accountSequence),
       })
       .toSignable();
-    const signature = await this.signerProvider.sign(signableTx.toSignDoc(0));
+
+    let fee = { amount: [{ amount: '0', denom: Units.BASE }], gas: '2000000' };
+    let value = {
+      delegator_address: transaction.delegatorAddress,
+      validator_address: transaction.validatorAddress,
+    };
+    let msg = { type: 'cosmos-sdk/MsgWithdrawDelegatorReward', value: value };
+
+    let rawMessage = {
+      account_number: transaction.accountNumber.toString(),
+      chain_id: this.config.network.chainId,
+      fee: fee,
+      memo: '',
+      msgs: [msg],
+      sequence: transaction.accountSequence,
+    };
+    let bytesMessage = convertFromObjectToBytes(rawMessage);
+
+    const signature = await this.signerProvider.sign(bytesMessage);
     return signableTx
       .setSignature(0, signature)
       .toSigned()
