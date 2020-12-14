@@ -18,6 +18,11 @@ jobs:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
+      - name: setup dependencies
+        if: startsWith(matrix.os, 'ubuntu')
+        with: 
+          sudo apt-get install -y libudev-dev
+
       - name: Check out Git repository
         uses: actions/checkout@v1
 

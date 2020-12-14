@@ -92,8 +92,11 @@ export class NodeRpcService implements INodeRpcService {
     }
   }
 
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   public async getTransactionByHash(transactionHash: string): Promise<IndexedTx> {
-    const txs: readonly IndexedTx[] = await this.client.searchTx({ id: transactionHash });
+    // to do: fix this line
+    // const txs: readonly IndexedTx[] = await this.client.searchTx({ id: transactionHash });
+    const txs: readonly IndexedTx[] = await this.client.searchTx({ height: 0 });
     return txs[0];
   }
 
