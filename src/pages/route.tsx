@@ -1,7 +1,12 @@
 import React from 'react';
-// import React, { useState } from 'react';
-import { HashRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
-
+import {
+  BrowserRouter,
+  HashRouter as ElectronRouter,
+  Switch,
+  Route,
+  Redirect,
+} from 'react-router-dom';
+import { isElectron } from '../utils/utils';
 import WelcomePage from './welcome/welcome';
 import RestorePage from './restore/restore';
 import CreatePage from './create/create';
@@ -11,8 +16,20 @@ import SendPage from './send/send';
 import ReceivePage from './receive/receive';
 import HomeLayout from '../layouts/home/home';
 
+interface RouterProps {
+  children: React.ReactNode;
+}
+
+// Electron build: <HashRouter>, Web build: <BrowserRouter>
+const Router: React.FC<RouterProps> = props => {
+  return isElectron() ? (
+    <ElectronRouter>{props.children}</ElectronRouter>
+  ) : (
+    <BrowserRouter>{props.children}</BrowserRouter>
+  );
+};
+
 function RouteHub() {
-  // const [page, setPage] = useState('welcome');
   const routeIndex = {
     name: 'Welcome Page',
     key: 'welcome',

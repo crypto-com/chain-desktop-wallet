@@ -8,7 +8,7 @@ import logo from '../../assets/logo-products-chain.svg';
 
 function WelcomePage() {
   const history = useHistory();
-  const [hasWallet, setHasWallet] = useState(false);
+  const [hasWallet, setHasWallet] = useState(false); // Default as false. useEffect will only re-render if result of hasWalletBeenCreated === true
   const didMountRef = useRef(false);
 
   useEffect(() => {

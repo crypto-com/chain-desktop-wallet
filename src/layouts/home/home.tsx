@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Layout, Menu, Dropdown } from 'antd';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import Icon, { CaretDownOutlined } from '@ant-design/icons';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
@@ -10,6 +10,7 @@ import IconHome from '../../svg/IconHome';
 import IconSend from '../../svg/IconSend';
 import IconReceive from '../../svg/IconReceive';
 import IconAddress from '../../svg/IconAddress';
+import { walletService } from '../../service/WalletService';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -30,6 +31,24 @@ const walletMenu = (
 );
 
 const HomeMenu = () => {
+  const history = useHistory();
+  const [hasWallet, setHasWallet] = useState(true); // Default as true. useEffect will only re-render if result of hasWalletBeenCreated === false
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    const fetchWalletData = async () => {
+      const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
+      // eslint-disable-next-line no-console
+      setHasWallet(hasWalletBeenCreated);
+    };
+    if (!didMountRef.current) {
+      fetchWalletData();
+      didMountRef.current = true;
+    } else if (!hasWallet) {
+      history.push('/welcome');
+    }
+  }, [hasWallet, history]);
+
   return (
     <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
       <Menu.Item key="1" icon={<Icon component={IconHome} />}>
