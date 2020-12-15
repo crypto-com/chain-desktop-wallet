@@ -92,7 +92,7 @@ const FormSend = () => {
           rules={[
             { required: true, message: 'Transfer amount is required' },
             {
-              pattern: /^(?:\d*)$/,
+              pattern: /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/,
               message: 'Transfer amount should be a number',
             },
           ]}
