@@ -89,7 +89,13 @@ const FormSend = () => {
         <Form.Item
           name="amount"
           label="Sending Amount"
-          rules={[{ required: true, message: 'Transfer amount is required' }]}
+          rules={[
+            { required: true, message: 'Transfer amount is required' },
+            {
+              pattern: /^(?:\d*)$/,
+              message: 'Transfer amount should be a number',
+            },
+          ]}
         >
           <Input />
         </Form.Item>
