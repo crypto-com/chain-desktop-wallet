@@ -117,8 +117,6 @@ function HomePage() {
   useEffect(() => {
     const fetchWalletData = async () => {
       const currentAsset = await assetService.retrieveDefaultWalletAsset();
-      // eslint-disable-next-line no-console
-      console.log(currentAsset);
       setUserAsset(currentAsset);
     };
     if (!didMountRef.current) {

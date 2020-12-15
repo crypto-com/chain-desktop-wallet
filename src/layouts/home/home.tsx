@@ -11,6 +11,7 @@ import IconSend from '../../svg/IconSend';
 import IconReceive from '../../svg/IconReceive';
 import IconAddress from '../../svg/IconAddress';
 import { walletService } from '../../service/WalletService';
+import { Wallet } from '../../models/Wallet';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -33,6 +34,7 @@ const walletMenu = (
 const HomeMenu = () => {
   const history = useHistory();
   const [hasWallet, setHasWallet] = useState(true); // Default as true. useEffect will only re-render if result of hasWalletBeenCreated === false
+  const [allWallets, setAllWallets] = useState<Wallet[]>();
   const didMountRef = useRef(false);
   const locationPath = useLocation().pathname;
   const paths = ['/home', '/address', '/send', '/receive'];
@@ -45,8 +47,10 @@ const HomeMenu = () => {
   useEffect(() => {
     const fetchWalletData = async () => {
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
+      const allWalletsData = await walletService.retrieveAllWallets();
       // eslint-disable-next-line no-console
       setHasWallet(hasWalletBeenCreated);
+      setAllWallets(allWalletsData);
     };
     if (!didMountRef.current) {
       fetchWalletData();
@@ -54,7 +58,7 @@ const HomeMenu = () => {
     } else if (!hasWallet) {
       history.push('/welcome');
     }
-  }, [hasWallet, history]);
+  }, [hasWallet, allWallets, history]);
 
   return (
     <Menu theme="dark" mode="inline" defaultSelectedKeys={[menuSelectedKey]}>

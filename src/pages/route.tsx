@@ -1,4 +1,7 @@
-import React from 'react';
+import React, {
+  // useState,
+  useEffect,
+} from 'react';
 import {
   BrowserRouter,
   HashRouter as ElectronRouter,
@@ -6,7 +9,10 @@ import {
   Route,
   Redirect,
 } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
 import { isElectron } from '../utils/utils';
+import { sessionState } from '../recoil/atom';
+
 import WelcomePage from './welcome/welcome';
 import RestorePage from './restore/restore';
 import CreatePage from './create/create';
@@ -15,6 +21,7 @@ import HomePage from './home/home';
 import SendPage from './send/send';
 import ReceivePage from './receive/receive';
 import HomeLayout from '../layouts/home/home';
+import { walletService } from '../service/WalletService';
 
 interface RouterProps {
   children: React.ReactNode;
@@ -30,6 +37,21 @@ const Router: React.FC<RouterProps> = props => {
 };
 
 function RouteHub() {
+  const [session, setSession] = useRecoilState(sessionState);
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const sessionData = await walletService.retrieveCurrentSession();
+      setSession(sessionData);
+    };
+    // if (!didMountRef.current) {
+    fetchSession();
+    // didMountRef.current = true;
+    // } else if (!hasWallet) {
+    // history.push('/welcome');
+    // }
+  }, [session, setSession]);
+
   const routeIndex = {
     name: 'Welcome Page',
     key: 'welcome',

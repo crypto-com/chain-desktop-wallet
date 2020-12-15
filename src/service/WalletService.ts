@@ -201,6 +201,10 @@ class WalletService {
   public async setCurrentSession(session: Session) {
     await this.storageService.setSession(session);
   }
+
+  public async retrieveCurrentSession(): Promise<Session> {
+    return this.storageService.retrieveCurrentSession();
+  }
 }
 
 export const walletService = new WalletService();
