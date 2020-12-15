@@ -1,22 +1,22 @@
-export interface CommonTransaction {
+export interface TransactionUnsigned {
   memo: string;
   accountNumber: number;
   accountSequence: number;
 }
 
-export interface TransferTransaction extends CommonTransaction {
+export interface TransferTransactionUnsigned extends TransactionUnsigned {
   fromAddress: string;
   toAddress: string;
   amount: string;
 }
 
-export interface DelegateTransaction extends CommonTransaction {
+export interface DelegateTransactionUnsigned extends TransactionUnsigned {
   delegatorAddress: string;
   validatorAddress: string;
   amount: string;
 }
 
-export interface WithdrawStakingReward extends CommonTransaction {
+export interface WithdrawStakingRewardUnsigned extends TransactionUnsigned {
   delegatorAddress: string;
   validatorAddress: string;
 }

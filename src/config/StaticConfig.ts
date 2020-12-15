@@ -4,6 +4,7 @@ import { getRandomId } from '../crypto/RandomGen';
 export const APP_DB_NAMESPACE = 'data-store';
 
 export type WalletConfig = {
+  enabled: boolean;
   name: string;
   nodeUrl: string;
   derivationPath: string;
@@ -11,6 +12,7 @@ export type WalletConfig = {
 };
 
 const TestNetConfig: WalletConfig = {
+  enabled: true,
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",
   nodeUrl: 'https://testnet-croeseid-1.crypto.com:26657',
@@ -18,10 +20,27 @@ const TestNetConfig: WalletConfig = {
 };
 
 const MainNetConfig: WalletConfig = {
+  enabled: false,
   name: 'MAINNET',
   derivationPath: "44'/394'/0'/0/0",
   nodeUrl: 'TO_BE_DECIDED',
   network: CroNetwork.Mainnet,
+};
+
+// Supposed to be fully customizable by the user when it will be supported
+const CustomDevNet: WalletConfig = {
+  derivationPath: '',
+  enabled: false,
+  name: 'CUSTOM DEVNET',
+  network: {
+    chainId: '',
+    addressPrefix: '',
+    bip44Path: { coinType: 0, account: 0 },
+    validatorPubKeyPrefix: '',
+    validatorAddressPrefix: '',
+    coin: { baseDenom: '', croDenom: '' },
+  },
+  nodeUrl: '',
 };
 
 // Available wallet configs will be presented to the user on wallet creation
@@ -29,6 +48,7 @@ const MainNetConfig: WalletConfig = {
 export const DefaultWalletConfigs = {
   TestNetConfig,
   MainNetConfig,
+  CustomDevNet,
 };
 
 // Every created wallet get initialized with a new CRO asset
@@ -45,6 +65,7 @@ export const DefaultAsset = (network: Network) => {
     symbol: assetSymbol,
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
+    decimals: 8,
   };
 };
 

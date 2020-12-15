@@ -78,11 +78,25 @@ const FormSend = () => {
       onFinish={showModal}
       requiredMark={false}
     >
-      <Form.Item name="recipientAddress" label="Recipient Address" rules={[{ required: true }]}>
+      <Form.Item
+        name="recipientAddress"
+        label="Recipient Address"
+        rules={[{ required: true, message: 'Recipient address is required' }]}
+      >
         <Input placeholder="tcro..." />
       </Form.Item>
       <div className="amount">
-        <Form.Item name="amount" label="Sending Amount" rules={[{ required: true }]}>
+        <Form.Item
+          name="amount"
+          label="Sending Amount"
+          rules={[
+            { required: true, message: 'Transfer amount is required' },
+            {
+              pattern: /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/,
+              message: 'Transfer amount should be a number',
+            },
+          ]}
+        >
           <Input />
         </Form.Item>
         <div className="available">

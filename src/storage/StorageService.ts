@@ -8,6 +8,7 @@ import {
   getAssetPriceIdFrom,
   UserAsset,
 } from '../models/UserAsset';
+import { StakingTransactionData, TransferTransactionData } from '../models/Transaction';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -17,7 +18,7 @@ export class StorageService {
   }
 
   public async saveWallet(wallet: Wallet) {
-    return this.db.walletStore.update(
+    return this.db.walletStore.update<Wallet>(
       { identifier: wallet.identifier },
       { $set: wallet },
       { upsert: true },
@@ -25,7 +26,11 @@ export class StorageService {
   }
 
   public async saveAsset(asset: UserAsset) {
-    return this.db.assetStore.update({ _id: asset.identifier }, { $set: asset }, { upsert: true });
+    return this.db.assetStore.update<UserAsset>(
+      { _id: asset.identifier },
+      { $set: asset },
+      { upsert: true },
+    );
   }
 
   public async findWalletByIdentifier(identifier: string) {
@@ -41,7 +46,7 @@ export class StorageService {
   }
 
   public async setSession(session: Session) {
-    return this.db.sessionStore.update(
+    return this.db.sessionStore.update<Session>(
       { _id: Session.SESSION_ID },
       { $set: session },
       { upsert: true },
@@ -50,7 +55,7 @@ export class StorageService {
 
   public async saveAssetMarketPrice(assetPrice: AssetMarketPrice) {
     const assetPriceId = getAssetPriceId(assetPrice);
-    return this.db.marketPriceStore.update(
+    return this.db.marketPriceStore.update<AssetMarketPrice>(
       { _id: assetPriceId },
       { $set: assetPrice },
       { upsert: true },
@@ -64,5 +69,29 @@ export class StorageService {
 
   public retrieveCurrentSession() {
     return this.db.sessionStore.findOne<Session>({ _id: Session.SESSION_ID });
+  }
+
+  public async saveTransferTransaction(transferTransaction: TransferTransactionData) {
+    return this.db.transferStore.update<TransferTransactionData>(
+      { hash: transferTransaction.hash },
+      { $set: transferTransaction },
+      { upsert: true },
+    );
+  }
+
+  public async retrieveAllTransferTransactions() {
+    return this.db.transferStore.find<TransferTransactionData>({});
+  }
+
+  public async saveStakingTransaction(stakingTransaction: StakingTransactionData) {
+    return this.db.stakingStore.update<StakingTransactionData>(
+      { hash: stakingTransaction.hash },
+      { $set: stakingTransaction },
+      { upsert: true },
+    );
+  }
+
+  public async retrieveAllStakingTransactions() {
+    return this.db.transferStore.find<StakingTransactionData>({});
   }
 }
