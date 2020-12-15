@@ -7,6 +7,7 @@ import { Session } from '../models/Session';
 import { Wallet } from '../models/Wallet';
 import { getRandomId } from '../crypto/RandomGen';
 import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
+import { TransactionStatus, TransferTransactionData } from '../models/Transaction';
 
 function buildTestWallet() {
   const testNetConfig = DefaultWalletConfigs.TestNetConfig;
@@ -68,6 +69,8 @@ describe('Testing Storage Service', () => {
 
     const WALLET_ID = '12dc3b3b90bc';
     const asset: UserAsset = {
+      decimals: 8,
+      mainnetSymbol: '',
       balance: '0',
       description: 'The best asset',
       icon_url: 'some url',
@@ -127,5 +130,29 @@ describe('Testing Storage Service', () => {
     expect(updatedAsset.currency).to.eq('USD');
     expect(updatedAsset.price).to.eq('0.0981');
     expect(updatedAsset.dailyChange).to.eq('+10.85');
+  });
+
+  it('Testing transactions store', async () => {
+    const mockWalletStore = new StorageService(`test-transactions-storage-${getRandomId()}`);
+
+    const transactionData: TransferTransactionData = {
+      amount: '250400',
+      assetSymbol: 'TCRO',
+      date: 'Tue Dec 15 2020 11:27:54 GMT+0300 (East Africa Time)',
+      hash: 'AFEBA2DE9891AF22040359C8AACEF2836E8BF1276D66505DE36559F3E912EFF8',
+      memo: 'Hello ZX',
+      receiverAddress: 'tcro172vcpddyavr3mpjrwx4p44h4vlncyj7g0mh06e',
+      senderAddress: 'tcrocncl1nrztwwgrgjg4gtctgul80menh7p04n4vzy5dk3',
+      status: TransactionStatus.PENDING,
+    };
+
+    await mockWalletStore.saveTransferTransaction(transactionData);
+
+    const fetchedTxs = await mockWalletStore.retrieveAllTransferTransactions();
+
+    expect(fetchedTxs[0].memo).to.eq('Hello ZX');
+    expect(fetchedTxs[0].date).to.eq('Tue Dec 15 2020 11:27:54 GMT+0300 (East Africa Time)');
+    expect(fetchedTxs[0].senderAddress).to.eq('tcrocncl1nrztwwgrgjg4gtctgul80menh7p04n4vzy5dk3');
+    expect(fetchedTxs[0].receiverAddress).to.eq('tcro172vcpddyavr3mpjrwx4p44h4vlncyj7g0mh06e');
   });
 });

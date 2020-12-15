@@ -2,18 +2,21 @@ import sdk from '@crypto-com/chain-jslib';
 import { Big, HDKey, Secp256k1KeyPair, Units } from '../types/ChainJsLib';
 import { WalletConfig } from '../../config/StaticConfig';
 import {
-  CommonTransaction,
-  DelegateTransaction,
-  TransferTransaction,
-  WithdrawStakingReward,
+  TransactionUnsigned,
+  DelegateTransactionUnsigned,
+  TransferTransactionUnsigned,
+  WithdrawStakingRewardUnsigned,
 } from './TransactionSupported';
 
 export interface ITransactionSigner {
-  signTransfer(transaction: TransferTransaction, phrase: string): Promise<string>;
+  signTransfer(transaction: TransferTransactionUnsigned, phrase: string): Promise<string>;
 
-  signDelegateTx(transaction: DelegateTransaction, phrase: string): Promise<string>;
+  signDelegateTx(transaction: DelegateTransactionUnsigned, phrase: string): Promise<string>;
 
-  signWithdrawStakingRewardTx(transaction: WithdrawStakingReward, phrase: string): Promise<string>;
+  signWithdrawStakingRewardTx(
+    transaction: WithdrawStakingRewardUnsigned,
+    phrase: string,
+  ): Promise<string>;
 }
 
 export class TransactionSigner implements ITransactionSigner {
@@ -23,7 +26,7 @@ export class TransactionSigner implements ITransactionSigner {
     this.config = config;
   }
 
-  public getTransactionInfo(phrase: string, transaction: CommonTransaction) {
+  public getTransactionInfo(phrase: string, transaction: TransactionUnsigned) {
     const cro = sdk.CroSDK({ network: this.config.network });
 
     const importedHDKey = HDKey.fromMnemonic(phrase);
@@ -35,7 +38,10 @@ export class TransactionSigner implements ITransactionSigner {
     return { cro, keyPair, rawTx };
   }
 
-  public async signTransfer(transaction: TransferTransaction, phrase: string): Promise<string> {
+  public async signTransfer(
+    transaction: TransferTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
 
     const msgSend = new cro.bank.MsgSend({
@@ -59,7 +65,10 @@ export class TransactionSigner implements ITransactionSigner {
       .getHexEncoded();
   }
 
-  public async signDelegateTx(transaction: DelegateTransaction, phrase: string): Promise<string> {
+  public async signDelegateTx(
+    transaction: DelegateTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
 
     const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
@@ -85,7 +94,7 @@ export class TransactionSigner implements ITransactionSigner {
   }
 
   public async signWithdrawStakingRewardTx(
-    transaction: WithdrawStakingReward,
+    transaction: WithdrawStakingRewardUnsigned,
     phrase: string,
   ): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);

@@ -13,9 +13,9 @@ import { NodeRpcService } from './rpc/NodeRpcService';
 import { TransactionSigner } from './signers/TransactionSigner';
 import { Session } from '../models/Session';
 import {
-  DelegateTransaction,
-  TransferTransaction,
-  WithdrawStakingReward,
+  DelegateTransactionUnsigned,
+  TransferTransactionUnsigned,
+  WithdrawStakingRewardUnsigned,
 } from './signers/TransactionSupported';
 
 export interface TransferRequest {
@@ -41,7 +41,7 @@ class WalletService {
       transactionSigner,
     } = await this.prepareTransaction();
 
-    const transfer: TransferTransaction = {
+    const transfer: TransferTransactionUnsigned = {
       fromAddress: currentWallet.address,
       toAddress: transferRequest.toAddress,
       amount: transferRequest.amount,
@@ -68,7 +68,7 @@ class WalletService {
       transactionSigner,
     } = await this.prepareTransaction();
 
-    const delegateTransaction: DelegateTransaction = {
+    const delegateTransaction: DelegateTransactionUnsigned = {
       delegatorAddress,
       validatorAddress,
       amount,
@@ -95,7 +95,7 @@ class WalletService {
       transactionSigner,
     } = await this.prepareTransaction();
 
-    const withdrawStakingReward: WithdrawStakingReward = {
+    const withdrawStakingReward: WithdrawStakingRewardUnsigned = {
       delegatorAddress,
       validatorAddress,
       memo,
@@ -140,8 +140,11 @@ class WalletService {
 
   // eslint-disable-next-line class-methods-use-this
   public supportedConfigs(): WalletConfig[] {
-    // TODO : Custom configuration wallets will be enabled on future iterations
-    return [DefaultWalletConfigs.TestNetConfig, DefaultWalletConfigs.MainNetConfig];
+    return [
+      DefaultWalletConfigs.TestNetConfig,
+      DefaultWalletConfigs.MainNetConfig,
+      DefaultWalletConfigs.CustomDevNet,
+    ];
   }
 
   // Create a new wallet and persist it on the db

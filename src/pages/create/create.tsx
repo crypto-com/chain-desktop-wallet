@@ -98,13 +98,17 @@ const FormCreate = () => {
       name="control-ref"
       onFinish={onWalletCreateFinish}
     >
-      <Form.Item name="name" label="Wallet Name" rules={[{ required: true }]}>
+      <Form.Item
+        name="name"
+        label="Wallet Name"
+        rules={[{ required: true, message: 'Wallet name is required' }]}
+      >
         <Input placeholder="Wallet name" />
       </Form.Item>
       <Form.Item name="network" label="Network" rules={[{ required: true }]}>
         <Select placeholder="Select wallet network" onChange={onNetworkChange}>
           {walletService.supportedConfigs().map(config => (
-            <Select.Option key={config.name} value={config.name}>
+            <Select.Option key={config.name} value={config.name} disabled={!config.enabled}>
               {config.name}
             </Select.Option>
           ))}

@@ -1,5 +1,9 @@
 import Datastore from 'nedb-promises';
 
+function getStore(namespace: string, store: string) {
+  return Datastore.create(`./data/${namespace}.${store}.db`);
+}
+
 export class DatabaseManager {
   public readonly sessionStore: Datastore;
 
@@ -9,10 +13,16 @@ export class DatabaseManager {
 
   public readonly marketPriceStore: Datastore;
 
+  public readonly transferStore: Datastore;
+
+  public readonly stakingStore: Datastore;
+
   constructor(namespace: string) {
-    this.sessionStore = Datastore.create(`./data/${namespace}.session.db`);
-    this.walletStore = Datastore.create(`./data/${namespace}.wallets.db`);
-    this.assetStore = Datastore.create(`./data/${namespace}.assets.db`);
-    this.marketPriceStore = Datastore.create(`./data/${namespace}.market_price.db`);
+    this.sessionStore = getStore(namespace, 'session');
+    this.walletStore = getStore(namespace, 'wallets');
+    this.assetStore = getStore(namespace, 'assets');
+    this.marketPriceStore = getStore(namespace, 'markets-prices');
+    this.transferStore = getStore(namespace, 'transfers');
+    this.stakingStore = getStore(namespace, 'staking');
   }
 }

@@ -18,6 +18,10 @@ export interface UserAsset {
   icon_url: string;
 
   description: string;
+
+  // Specify the 10^decimals conversion to go from BASE TO ASSET
+  // E.g = 1 TCRO = 1O^8 BASETCRO
+  decimals: number;
 }
 
 export interface AssetMarketPrice {
