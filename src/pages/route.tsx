@@ -99,15 +99,19 @@ function RouteHub() {
           );
         })}
         <HomeLayout>
-          {routeHomeLayoutItems.map(item => {
-            return (
-              <Route exact path={item.path} key={item.path}>
-                {item.component}
-              </Route>
-            );
-          })}
+          <Switch>
+            {routeHomeLayoutItems.map(item => {
+              return (
+                <Route exact path={item.path} key={item.path}>
+                  {item.component}
+                </Route>
+              );
+            })}
+            <Route>
+              <Redirect to="/home" />
+            </Route>
+          </Switch>
         </HomeLayout>
-        <Redirect to="/" />
       </Switch>
     </Router>
   );
