@@ -15,6 +15,14 @@ export interface INodeRpcService {
   getTransactionByHash(transactionHash: string): Promise<IndexedTx>;
 }
 
+export interface BroadcastResponse {
+  readonly height: number;
+  readonly code?: number;
+  readonly transactionHash: string;
+  readonly rawLog?: string;
+  readonly data?: Uint8Array;
+}
+
 export class NodeRpcService implements INodeRpcService {
   public readonly client: StargateClient;
 
@@ -42,7 +50,10 @@ export class NodeRpcService implements INodeRpcService {
 
   public async broadcastTransaction(signedTxHex: string): Promise<string> {
     const signedBytes = Bytes.fromHexString(signedTxHex).toUint8Array();
-    const broadcastResponse = await this.client.broadcastTx(signedBytes);
+    const broadcastResponse: BroadcastResponse = await this.client.broadcastTx(signedBytes);
+    if (broadcastResponse.code) {
+      throw new Error(broadcastResponse.rawLog);
+    }
     return broadcastResponse.transactionHash;
   }
 
