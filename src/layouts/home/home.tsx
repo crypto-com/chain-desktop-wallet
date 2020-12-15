@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Layout, Menu, Dropdown } from 'antd';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useHistory, useLocation } from 'react-router-dom';
 import Icon, { CaretDownOutlined } from '@ant-design/icons';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
@@ -34,6 +34,13 @@ const HomeMenu = () => {
   const history = useHistory();
   const [hasWallet, setHasWallet] = useState(true); // Default as true. useEffect will only re-render if result of hasWalletBeenCreated === false
   const didMountRef = useRef(false);
+  const locationPath = useLocation().pathname;
+  const paths = ['/home', '/address', '/send', '/receive'];
+
+  let menuSelectedKey = locationPath;
+  if (!paths.includes(menuSelectedKey)) {
+    menuSelectedKey = '/home';
+  }
 
   useEffect(() => {
     const fetchWalletData = async () => {
@@ -50,17 +57,17 @@ const HomeMenu = () => {
   }, [hasWallet, history]);
 
   return (
-    <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-      <Menu.Item key="1" icon={<Icon component={IconHome} />}>
+    <Menu theme="dark" mode="inline" defaultSelectedKeys={[menuSelectedKey]}>
+      <Menu.Item key="/home" icon={<Icon component={IconHome} />}>
         <Link to="/home">Home</Link>
       </Menu.Item>
-      <Menu.Item key="2" icon={<Icon component={IconAddress} />}>
+      <Menu.Item key="/address" icon={<Icon component={IconAddress} />}>
         Address
       </Menu.Item>
-      <Menu.Item key="3" icon={<Icon component={IconSend} />}>
+      <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
         <Link to="/send">Send</Link>
       </Menu.Item>
-      <Menu.Item key="4" icon={<Icon component={IconReceive} />}>
+      <Menu.Item key="/receive" icon={<Icon component={IconReceive} />}>
         <Link to="/receive">Receive</Link>
       </Menu.Item>
     </Menu>
