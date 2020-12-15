@@ -70,8 +70,6 @@ class AssetService {
           asset.mainnetSymbol,
           currentSession.currency,
         );
-        // eslint-disable-next-line no-console
-        console.log('LOADED_ASSET_PRICE: ', assetPrice);
         await this.storageService.saveAssetMarketPrice(assetPrice);
       }),
     );
