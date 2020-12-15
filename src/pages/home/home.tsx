@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Layout, Table, Space, Tabs } from 'antd';
+import { assetService } from '../../service/AssetService';
+import { UserAsset } from '../../models/UserAsset';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
-const totalBalance = '500,000';
-const stakedBalance = '250,000';
 
 const TransactionColumns = [
   {
@@ -110,33 +110,52 @@ const StakingData = [
   },
 ];
 
-
 function HomePage() {
+  const [userAsset, setUserAsset] = useState<UserAsset>();
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    const fetchWalletData = async () => {
+      const currentAsset = await assetService.retrieveDefaultWalletAsset();
+      // eslint-disable-next-line no-console
+      console.log(currentAsset);
+      setUserAsset(currentAsset);
+    };
+    if (!didMountRef.current) {
+      fetchWalletData();
+      didMountRef.current = true;
+    }
+  }, [userAsset]);
+
   return (
-      <Layout className="site-layout">
-        <Header className="site-layout-background">Welcome Back!</Header>
-        <Content>
-          <div className="site-layout-background balance-container">
-            <div className="balance">
-              <div className="title">TOTAL BALANCE</div>
-              <div className="quantity">{totalBalance} CRO</div>
-            </div>
-            <div className="balance">
-              <div className="title">STAKED BALANCE</div>
-              <div className="quantity">{stakedBalance} CRO</div>
+    <Layout className="site-layout">
+      <Header className="site-layout-background">Welcome Back!</Header>
+      <Content>
+        <div className="site-layout-background balance-container">
+          <div className="balance">
+            <div className="title">TOTAL BALANCE</div>
+            <div className="quantity">
+              {userAsset?.balance} {userAsset?.symbol}
             </div>
           </div>
-          <Tabs defaultActiveKey="1">
-            <TabPane tab="Transactions" key="1">
-              <Table columns={TransactionColumns} dataSource={TransactionData} />
-            </TabPane>
-            <TabPane tab="Staking" key="2">
-              <Table columns={StakingColumns} dataSource={StakingData} />
-            </TabPane>
-          </Tabs>
-        </Content>
-        <Footer />
-      </Layout>
+          <div className="balance">
+            <div className="title">STAKED BALANCE</div>
+            <div className="quantity">
+              {userAsset?.stakedBalance} {userAsset?.symbol}
+            </div>
+          </div>
+        </div>
+        <Tabs defaultActiveKey="1">
+          <TabPane tab="Transactions" key="1">
+            <Table columns={TransactionColumns} dataSource={TransactionData} />
+          </TabPane>
+          <TabPane tab="Staking" key="2">
+            <Table columns={StakingColumns} dataSource={StakingData} />
+          </TabPane>
+        </Tabs>
+      </Content>
+      <Footer />
+    </Layout>
   );
 }
 
