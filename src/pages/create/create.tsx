@@ -187,6 +187,7 @@ function CreatePage() {
           successButtonText="Next"
           onValidatePassword={async (password: string) => {
             // TODO
+            // eslint-disable-next-line no-console
             console.log(password);
             return {
               valid: true,
