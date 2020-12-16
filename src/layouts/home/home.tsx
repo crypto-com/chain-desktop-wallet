@@ -5,12 +5,16 @@ import { Layout, Menu, Dropdown } from 'antd';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Icon, { CaretDownOutlined } from '@ant-design/icons';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
+import { useRecoilState } from 'recoil';
+
+import { sessionState, walletAssetState } from '../../recoil/atom';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 import IconSend from '../../svg/IconSend';
 import IconReceive from '../../svg/IconReceive';
 import IconAddress from '../../svg/IconAddress';
 import { walletService } from '../../service/WalletService';
+import { assetService } from '../../service/AssetService';
 import { Wallet } from '../../models/Wallet';
 
 interface HomeLayoutProps {
@@ -35,6 +39,23 @@ const HomeMenu = () => {
   const history = useHistory();
   const [hasWallet, setHasWallet] = useState(true); // Default as true. useEffect will only re-render if result of hasWalletBeenCreated === false
   const [allWallets, setAllWallets] = useState<Wallet[]>();
+  const [session, setSession] = useRecoilState(sessionState);
+  const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+
+  useEffect(() => {
+    const fetchDB = async () => {
+      const sessionData = await walletService.retrieveCurrentSession();
+      const currentAsset = await assetService.retrieveDefaultWalletAsset();
+      setSession(sessionData);
+      setUserAsset(currentAsset);
+    };
+    // if (!didMountRef.current) {
+    fetchDB();
+    // didMountRef.current = true;
+    // } else if (!hasWallet) {
+    // history.push('/welcome');
+    // }
+  }, [session, setSession, userAsset, setUserAsset]);
   const didMountRef = useRef(false);
   const locationPath = useLocation().pathname;
   const paths = ['/home', '/address', '/send', '/receive'];
