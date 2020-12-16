@@ -146,7 +146,7 @@ const FormRestore = () => {
               errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
             };
           }}
-          successText="Wallet created and encrypted successfully"
+          successText="Wallet restored and encrypted successfully !"
           title="Provide application password"
           visible={inputPasswordVisible}
           successButtonText="Go to Home"
