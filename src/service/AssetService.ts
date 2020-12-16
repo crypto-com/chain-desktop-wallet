@@ -19,7 +19,7 @@ class AssetService {
     }
     const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
 
-    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets();
+    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
 
     if (!assets || assets.length === 0) {
       return;
@@ -41,8 +41,7 @@ class AssetService {
     await this.storageService.setSession(session);
   }
 
-  public async retrieveCurrentWalletAssets(): Promise<UserAsset[]> {
-    const currentSession = await this.storageService.retrieveCurrentSession();
+  public async retrieveCurrentWalletAssets(currentSession: Session): Promise<UserAsset[]> {
     const assets = await this.storageService.retrieveAssetsByWallet(
       currentSession.wallet.identifier,
     );
@@ -53,8 +52,8 @@ class AssetService {
     });
   }
 
-  public async retrieveDefaultWalletAsset(): Promise<UserAsset> {
-    return (await this.retrieveCurrentWalletAssets())[0];
+  public async retrieveDefaultWalletAsset(currentSession: Session): Promise<UserAsset> {
+    return (await this.retrieveCurrentWalletAssets(currentSession))[0];
   }
 
   public async loadAndSaveAssetPrices() {
@@ -63,7 +62,7 @@ class AssetService {
       return;
     }
 
-    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets();
+    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
 
     if (!assets || assets.length === 0) {
       return;

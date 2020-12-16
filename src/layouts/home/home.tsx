@@ -36,7 +36,7 @@ function HomeLayout(props: HomeLayoutProps) {
     const fetchDB = async () => {
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
       const sessionData = await walletService.retrieveCurrentSession();
-      const currentAsset = await assetService.retrieveDefaultWalletAsset();
+      const currentAsset = await assetService.retrieveDefaultWalletAsset(sessionData);
       const allWalletsData = await walletService.retrieveAllWallets();
       setHasWallet(hasWalletBeenCreated);
       setSession(sessionData);
@@ -84,7 +84,7 @@ function HomeLayout(props: HomeLayoutProps) {
       await walletService.setCurrentSession(new Session(walletList[e.key]));
       await assetService.setCurrentSession(new Session(walletList[e.key]));
       const currentSession = await walletService.retrieveCurrentSession();
-      const currentAsset = await assetService.retrieveDefaultWalletAsset();
+      const currentAsset = await assetService.retrieveDefaultWalletAsset(session);
       setSession(currentSession);
       setUserAsset(currentAsset);
     };
