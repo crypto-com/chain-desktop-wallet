@@ -108,7 +108,7 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
           {validationErrMsg ? (
             <div>
               <ErrorXmark />
-              <div className="result-message result-alert-message">{validationErrMsg}</div>
+              <div className="result-message">{validationErrMsg}</div>
             </div>
           ) : (
             <div>
