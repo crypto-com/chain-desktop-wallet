@@ -10,7 +10,7 @@ import { secretStoreService } from '../../storage/SecretStoreService';
 function WelcomePage() {
   const history = useHistory();
   const [hasWallet, setHasWallet] = useState(false); // Default as false. useEffect will only re-render if result of hasWalletBeenCreated === true
-  const [hasPasswordBeenSet, sethasPasswordBeenSet] = useState(false);
+  const [hasPasswordBeenSet, setHasPasswordBeenSet] = useState(true);
   const didMountRef = useRef(false);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ function WelcomePage() {
       // eslint-disable-next-line no-console
       console.log('hasPasswordBeenSet: ', hasPasswordBeenSet, 'isPasswordSet:', isPasswordSet);
 
-      sethasPasswordBeenSet(isPasswordSet);
+      setHasPasswordBeenSet(isPasswordSet);
       setHasWallet(hasWalletBeenCreated);
     };
     if (!didMountRef.current) {
