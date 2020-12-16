@@ -7,6 +7,7 @@ import {
   Redirect,
 } from 'react-router-dom';
 import { isElectron } from '../utils/utils';
+
 import WelcomePage from './welcome/welcome';
 import RestorePage from './restore/restore';
 import CreatePage from './create/create';
