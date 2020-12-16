@@ -1,5 +1,5 @@
 import { DatabaseManager } from './DatabaseManager';
-import { EncryptedCredential, EncryptionResult, EncryptedSeed } from '../models/SecretStorage';
+import { EncryptedCredential, EncryptedSeed, EncryptionResult } from '../models/SecretStorage';
 import { cryptographer } from '../crypto/Cryptographer';
 
 class SecretStoreService {
@@ -36,7 +36,16 @@ class SecretStoreService {
       data,
       walletId,
     };
-    return this.db.seedStore.insert<EncryptedSeed>(encryptedSeed);
+    return this.db.seedStore.update<EncryptedSeed>(
+      { _id: walletId },
+      { $set: encryptedSeed },
+      { upsert: true },
+    );
+  }
+
+  public async decryptPhrase(password: string, walletId: string) {
+    const encryptedSeed = await this.db.seedStore.findOne<EncryptedSeed>({ walletId });
+    return cryptographer.decrypt(encryptedSeed.data.cipher, password, encryptedSeed.data.iv);
   }
 }
 

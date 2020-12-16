@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import './backup.less';
@@ -12,8 +12,6 @@ import logo from '../../assets/logo-products-chain.svg';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { cryptographer } from '../../crypto/Cryptographer';
-import { Session } from '../../models/Session';
 
 function BackupPage() {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -33,14 +31,7 @@ function BackupPage() {
     if (!wallet) {
       return;
     }
-    const iv = await cryptographer.generateIV();
-    const encryptionResult = await cryptographer.encrypt(wallet.encryptedPhrase, password, iv);
-    wallet.encryptedPhrase = encryptionResult.cipher;
-
-    await walletService.persistWallet(wallet);
-    await secretStoreService.persistEncryptedPhrase(wallet.identifier, encryptionResult);
-
-    await walletService.setCurrentSession(new Session(wallet));
+    await walletService.encryptWalletAndSetSession(password, wallet);
     history.push('/home');
   };
 

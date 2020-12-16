@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import './restore.less';
-import { Form, Input, Select } from 'antd';
+import { Button, Form, Input, Select } from 'antd';
 import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import { Session } from '../../models/Session';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
-import { cryptographer } from '../../crypto/Cryptographer';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -69,21 +67,9 @@ const FormRestore = () => {
     };
     try {
       const wallet = await walletService.restoreWallet(importOptions);
-      const initialVector = await cryptographer.generateIV();
-      const encryptionResult = await cryptographer.encrypt(
-        wallet.encryptedPhrase,
-        password,
-        initialVector,
-      );
-      wallet.encryptedPhrase = encryptionResult.cipher;
-
-      await walletService.persistWallet(wallet);
-      await secretStoreService.persistEncryptedPhrase(wallet.identifier, encryptionResult);
-
-      await walletService.setCurrentSession(new Session(wallet));
+      await walletService.encryptWalletAndSetSession(password, wallet);
       goToHome();
       form.resetFields();
-
       return;
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -132,6 +118,10 @@ const FormRestore = () => {
         </Select>
       </Form.Item>
       <Form.Item {...tailLayout}>
+        <Button type="primary" htmlType="submit">
+          Restore Wallet
+        </Button>
+
         <PasswordFormModal
           description="Input the application password to encrypt the wallet to be restored"
           okButtonText="Encrypt wallet"

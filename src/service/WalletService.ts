@@ -17,11 +17,14 @@ import {
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
 } from './signers/TransactionSupported';
+import { cryptographer } from '../crypto/Cryptographer';
+import { secretStoreService } from '../storage/SecretStoreService';
 
 export interface TransferRequest {
   toAddress: string;
   amount: string;
   memo: string;
+  decryptedPhrase: string;
 }
 
 class WalletService {
@@ -36,7 +39,6 @@ class WalletService {
       nodeRpc,
       accountNumber,
       accountSequence,
-      phrase,
       currentWallet,
       transactionSigner,
     } = await this.prepareTransaction();
@@ -50,7 +52,10 @@ class WalletService {
       accountSequence,
     };
 
-    const signedTxHex = await transactionSigner.signTransfer(transfer, phrase);
+    const signedTxHex = await transactionSigner.signTransfer(
+      transfer,
+      transferRequest.decryptedPhrase,
+    );
     return nodeRpc.broadcastTransaction(signedTxHex);
   }
 
@@ -59,12 +64,12 @@ class WalletService {
     validatorAddress: string,
     amount: string,
     memo: string,
+    decryptedPhrase: string,
   ) {
     const {
       nodeRpc,
       accountNumber,
       accountSequence,
-      phrase,
       transactionSigner,
     } = await this.prepareTransaction();
 
@@ -77,7 +82,10 @@ class WalletService {
       accountSequence,
     };
 
-    const signedTxHex = await transactionSigner.signDelegateTx(delegateTransaction, phrase);
+    const signedTxHex = await transactionSigner.signDelegateTx(
+      delegateTransaction,
+      decryptedPhrase,
+    );
     return nodeRpc.broadcastTransaction(signedTxHex);
   }
 
@@ -86,12 +94,12 @@ class WalletService {
     validatorAddress: string,
     amount: string,
     memo: string,
+    decryptedPhrase: string,
   ) {
     const {
       nodeRpc,
       accountNumber,
       accountSequence,
-      phrase,
       transactionSigner,
     } = await this.prepareTransaction();
 
@@ -105,7 +113,7 @@ class WalletService {
 
     const signedTxHex = await transactionSigner.signWithdrawStakingRewardTx(
       withdrawStakingReward,
-      phrase,
+      decryptedPhrase,
     );
     return nodeRpc.broadcastTransaction(signedTxHex);
   }
@@ -119,23 +127,15 @@ class WalletService {
     const accountNumber = await nodeRpc.fetchAccountNumber(currentWallet.address);
     const accountSequence = await nodeRpc.loadSequenceNumber(currentWallet.address);
 
-    const phrase = await this.decryptPhrase(currentSession);
     const transactionSigner = new TransactionSigner(currentWallet.config);
 
     return {
       nodeRpc,
       accountNumber,
       accountSequence,
-      phrase,
       currentWallet,
       transactionSigner,
     };
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  public async decryptPhrase(session: Session): Promise<string> {
-    // TODO : Implement actual phrase decryption
-    return Promise.resolve(session.wallet.encryptedPhrase);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -209,6 +209,24 @@ class WalletService {
 
   public async setCurrentSession(session: Session) {
     await this.storageService.setSession(session);
+  }
+
+  public async encryptWalletAndSetSession(key: string, wallet: Wallet): Promise<void> {
+    const initialVector = await cryptographer.generateIV();
+    const encryptionResult = await cryptographer.encrypt(
+      wallet.encryptedPhrase,
+      key,
+      initialVector,
+    );
+    wallet.encryptedPhrase = encryptionResult.cipher;
+
+    await this.persistWallet(wallet);
+    await secretStoreService.persistEncryptedPhrase(wallet.identifier, encryptionResult);
+    await this.setCurrentSession(new Session(wallet));
+  }
+
+  public async retrieveCurrentSession(): Promise<Session> {
+    return this.storageService.retrieveCurrentSession();
   }
 }
 
