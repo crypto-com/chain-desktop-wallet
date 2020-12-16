@@ -37,10 +37,6 @@ class AssetService {
     );
   }
 
-  public async setCurrentSession(session: Session) {
-    await this.storageService.setSession(session);
-  }
-
   public async retrieveCurrentWalletAssets(currentSession: Session): Promise<UserAsset[]> {
     const assets = await this.storageService.retrieveAssetsByWallet(
       currentSession.wallet.identifier,

@@ -82,9 +82,8 @@ function HomeLayout(props: HomeLayoutProps) {
   const WalletMenu = () => {
     const walletClick = async e => {
       await walletService.setCurrentSession(new Session(walletList[e.key]));
-      await assetService.setCurrentSession(new Session(walletList[e.key]));
       const currentSession = await walletService.retrieveCurrentSession();
-      const currentAsset = await assetService.retrieveDefaultWalletAsset(session);
+      const currentAsset = await assetService.retrieveDefaultWalletAsset(currentSession);
       setSession(currentSession);
       setUserAsset(currentAsset);
     };
