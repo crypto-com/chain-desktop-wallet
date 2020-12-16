@@ -45,11 +45,10 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
           label="Set Password"
           rules={[
             { required: true, message: 'Password is required' },
-            { min: 8, message: 'Password should be at least 8 characters' },
             {
               pattern: /^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
               message:
-                'The password should have at least one letter, one number and one special character',
+                'The password should be 8 character long and have at least one letter, one number and one special character',
             },
           ]}
         >
@@ -59,7 +58,18 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
           <Form.Item
             name="passwordConfirm"
             label="Confirm Password"
-            rules={[{ required: true, message: 'Password confirmation is required' }]}
+            rules={[
+              { required: true, message: 'Password confirmation is required' },
+              ({ getFieldValue }) => ({
+                validator(rule, value) {
+                  if (!value || getFieldValue('password') === value) {
+                    return Promise.resolve();
+                  }
+                  // eslint-disable-next-line prefer-promise-reject-errors
+                  return Promise.reject('The password confirmation should match');
+                },
+              }),
+            ]}
           >
             <Input.Password placeholder="Confirm the password" />
           </Form.Item>

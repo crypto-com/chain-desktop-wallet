@@ -21,7 +21,7 @@ const SignUpPage = () => {
           description="Before creating a new wallet, please create your app password. It will be used to encrypt your wallet seeds."
           visible
           confirmPassword
-          okButtonText="Create"
+          okButtonText="Create Account"
           successText="You have successfully created your app password"
           successButtonText="Next"
           onValidatePassword={async (password: string) => {
