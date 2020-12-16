@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Layout, Menu, Dropdown, Spin } from 'antd';
+import { Dropdown, Layout, Menu, Spin } from 'antd';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Icon, { CaretDownOutlined, LoadingOutlined } from '@ant-design/icons';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
@@ -14,7 +14,6 @@ import IconSend from '../../svg/IconSend';
 import IconReceive from '../../svg/IconReceive';
 import IconAddress from '../../svg/IconAddress';
 import { walletService } from '../../service/WalletService';
-import { assetService } from '../../service/AssetService';
 import { Session } from '../../models/Session';
 
 interface HomeLayoutProps {
@@ -39,7 +38,12 @@ function HomeLayout(props: HomeLayoutProps) {
       setLoading(true);
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
       const sessionData = await walletService.retrieveCurrentSession();
-      const currentAsset = await assetService.retrieveDefaultWalletAsset(sessionData);
+      // eslint-disable-next-line no-console
+      console.log('sessionData', sessionData);
+      const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+      // eslint-disable-next-line no-console
+      console.log('currentAsset', currentAsset);
+
       const allWalletsData = await walletService.retrieveAllWallets();
       setHasWallet(hasWalletBeenCreated);
       setSession(sessionData);
@@ -88,7 +92,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setLoading(true);
       await walletService.setCurrentSession(new Session(walletList[e.key]));
       const currentSession = await walletService.retrieveCurrentSession();
-      const currentAsset = await assetService.retrieveDefaultWalletAsset(currentSession);
+      const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setSession(currentSession);
       setUserAsset(currentAsset);
       setLoading(false);
@@ -136,7 +140,11 @@ function HomeLayout(props: HomeLayoutProps) {
             </div>
           </Dropdown>
         </Sider>
-        { loading ? <Spin indicator={<LoadingOutlined style={{ fontSize: 96 }} spin />}/> : props.children}
+        {loading ? (
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 96 }} spin />} />
+        ) : (
+          props.children
+        )}
       </Layout>
     </main>
   );
