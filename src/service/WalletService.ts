@@ -201,7 +201,7 @@ class WalletService {
 
   public async setCurrentSession(session: Session): Promise<void> {
     await this.storageService.setSession(session);
-    return assetService.syncData();
+    return assetService.syncData(session);
   }
 
   public async retrieveCurrentSession(): Promise<Session> {

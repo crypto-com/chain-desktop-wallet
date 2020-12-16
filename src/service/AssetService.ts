@@ -12,8 +12,9 @@ class AssetService {
     this.storageService = new StorageService(APP_DB_NAMESPACE);
   }
 
-  public async fetchAndUpdateBalances() {
-    const currentSession = await this.storageService.retrieveCurrentSession();
+  public async fetchAndUpdateBalances(session: Session | null = null) {
+    const currentSession =
+      session == null ? await this.storageService.retrieveCurrentSession() : session;
     if (!currentSession) {
       return;
     }
@@ -52,8 +53,9 @@ class AssetService {
     return (await this.retrieveCurrentWalletAssets(currentSession))[0];
   }
 
-  public async loadAndSaveAssetPrices() {
-    const currentSession = await this.storageService.retrieveCurrentSession();
+  public async loadAndSaveAssetPrices(session: Session | null = null) {
+    const currentSession =
+      session == null ? await this.storageService.retrieveCurrentSession() : session;
     if (!currentSession) {
       return;
     }
@@ -85,10 +87,10 @@ class AssetService {
     };
   }
 
-  public async syncData(): Promise<void> {
+  public async syncData(session: Session): Promise<void> {
     try {
-      await this.fetchAndUpdateBalances();
-      return this.loadAndSaveAssetPrices();
+      await this.fetchAndUpdateBalances(session);
+      return this.loadAndSaveAssetPrices(session);
       // eslint-disable-next-line no-empty
     } catch (e) {
       return Promise.resolve();
