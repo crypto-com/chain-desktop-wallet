@@ -10,6 +10,7 @@ import { WalletCreateOptions } from '../../service/WalletCreator';
 import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import { Session } from '../../models/Session';
+import PasswordFormModal from '../../components/passwordForm/passwordFormModal';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -141,13 +142,46 @@ const FormCreate = () => {
 };
 
 function CreatePage() {
+  const [hasAppPassword, setHasAppPassword] = useState<boolean>(false);
+  const history = useHistory();
+  // TODO: load app password and see if it exists
+  // setHasAppPassword(false);
+  const handlePasswordSubmitted = async (password: string) => {
+    // TODO: store app password
+    console.log(password);
+    setHasAppPassword(true);
+  };
+  const handlePasswordCancelled = () => {
+    history.push({
+      pathname: '/',
+    });
+  };
+
   return (
     <main className="create-page">
       <div className="header">
         <img src={logo} className="logo" alt="logo" />
       </div>
       <div className="container">
-        <div>
+        <PasswordFormModal
+          title="Create App Password"
+          description="Before creating a new wallet, please create your app password. It will be used to encrypt your wallet seeds."
+          visible={!hasAppPassword}
+          confirmPassword
+          okButtonText="Create"
+          successText="You have successfully created a password"
+          successButtonText="Next"
+          onValidatePassword={async (password: string) => {
+            // TODO
+            console.log(password);
+            return {
+              valid: true,
+            };
+          }}
+          onSuccess={handlePasswordSubmitted}
+          onCancel={handlePasswordCancelled}
+        />
+        <div style={{ display: hasAppPassword ? 'block' : 'none' }}>
           <div className="title">Create wallet</div>
           <div className="slogan">Create a name and select the network for your wallet.</div>
           <FormCreate />
