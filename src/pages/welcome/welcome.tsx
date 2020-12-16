@@ -37,7 +37,6 @@ function WelcomePage() {
           <div className="slogan">
             Our Sample Chain Wallet supports wallet management and funds transfer.
           </div>
-
           <div className="button-container">
             <Link to="/restore">
               <Button>Restore Wallet</Button>
