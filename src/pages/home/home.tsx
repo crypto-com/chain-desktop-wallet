@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Layout, Table, Space, Tabs } from 'antd';
-import { assetService } from '../../service/AssetService';
+import { useRecoilValue } from 'recoil';
 import { UserAsset } from '../../models/UserAsset';
+import { walletAssetState } from '../../recoil/atom';
+
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 
 const { Header, Content, Footer } = Layout;
@@ -111,19 +113,7 @@ const StakingData = [
 ];
 
 function HomePage() {
-  const [userAsset, setUserAsset] = useState<UserAsset>();
-  const didMountRef = useRef(false);
-
-  useEffect(() => {
-    const fetchWalletData = async () => {
-      const currentAsset = await assetService.retrieveDefaultWalletAsset();
-      setUserAsset(currentAsset);
-    };
-    if (!didMountRef.current) {
-      fetchWalletData();
-      didMountRef.current = true;
-    }
-  }, [userAsset]);
+  const userAsset: UserAsset = useRecoilValue<UserAsset>(walletAssetState);
 
   return (
     <Layout className="site-layout">

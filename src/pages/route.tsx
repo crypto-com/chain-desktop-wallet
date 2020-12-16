@@ -11,7 +11,7 @@ import {
 } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { isElectron } from '../utils/utils';
-import { sessionState } from '../recoil/atom';
+import { sessionState, walletAssetState } from '../recoil/atom';
 
 import WelcomePage from './welcome/welcome';
 import RestorePage from './restore/restore';
@@ -22,6 +22,7 @@ import SendPage from './send/send';
 import ReceivePage from './receive/receive';
 import HomeLayout from '../layouts/home/home';
 import { walletService } from '../service/WalletService';
+import { assetService } from '../service/AssetService';
 
 interface RouterProps {
   children: React.ReactNode;
@@ -38,19 +39,22 @@ const Router: React.FC<RouterProps> = props => {
 
 function RouteHub() {
   const [session, setSession] = useRecoilState(sessionState);
+  const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
 
   useEffect(() => {
-    const fetchSession = async () => {
+    const fetchDB = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
-      setSession(sessionData);
+      const currentAsset = await assetService.retrieveDefaultWalletAsset();
+      setSession(sessionData ?? null);
+      setUserAsset(currentAsset ?? null);
     };
     // if (!didMountRef.current) {
-    fetchSession();
+    fetchDB();
     // didMountRef.current = true;
     // } else if (!hasWallet) {
     // history.push('/welcome');
     // }
-  }, [session, setSession]);
+  }, [session, setSession, userAsset, setUserAsset]);
 
   const routeIndex = {
     name: 'Welcome Page',
