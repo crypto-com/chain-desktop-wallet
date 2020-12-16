@@ -34,4 +34,9 @@ const walletAssetState = atom({
   default: asset,
 });
 
-export { walletIdentifierState, sessionState, walletAssetState };
+const walletListState = atom({
+  key: 'walletList',
+  default: [wallet],
+});
+
+export { walletIdentifierState, sessionState, walletAssetState, walletListState };
