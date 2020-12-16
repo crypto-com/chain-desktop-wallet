@@ -1,8 +1,7 @@
 import { DatabaseManager } from './DatabaseManager';
 import { Credential } from '../models/SecretStorage';
-import { Session } from '../models/Session';
 
-export class SecretStoreService {
+class SecretStoreService {
   private readonly db: DatabaseManager;
 
   private readonly CREDENTIAL_STORED_ID = 'CREDENTIAL_STORED_ID';
@@ -13,9 +12,16 @@ export class SecretStoreService {
 
   public async savePassword(credential: Credential) {
     return this.db.credentialStore.update<Credential>(
-      { _id: Session.SESSION_ID },
+      { _id: this.CREDENTIAL_STORED_ID },
       { $set: credential },
       { upsert: true },
     );
   }
+
+  public async hasPasswordBeenSet(): Promise<boolean> {
+    const creds = await this.db.credentialStore.find({});
+    return creds.length > 0;
+  }
 }
+
+export const secretStoreService = new SecretStoreService('secrets');

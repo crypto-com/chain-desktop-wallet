@@ -40,11 +40,27 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
         onChange={props.onChange}
         onFinish={onFormFinish}
       >
-        <Form.Item name="password" label="App Password" rules={[{ required: true }]}>
+        <Form.Item
+          name="password"
+          label="Set Password"
+          rules={[
+            { required: true, message: 'Password is required' },
+            { min: 8, message: 'Password should be at least 8 characters' },
+            {
+              pattern: /^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
+              message:
+                'The password should have at least one letter, one number and one special character',
+            },
+          ]}
+        >
           <Input.Password placeholder="App password" />
         </Form.Item>
         {props.confirmPassword && (
-          <Form.Item name="passwordConfirm" label="Confirm Password" rules={[{ required: true }]}>
+          <Form.Item
+            name="passwordConfirm"
+            label="Confirm Password"
+            rules={[{ required: true, message: 'Password confirmation is required' }]}
+          >
             <Input.Password placeholder="Confirm the password" />
           </Form.Item>
         )}
