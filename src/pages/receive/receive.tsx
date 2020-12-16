@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
 import QRCode from 'qrcode.react';
+import { useRecoilValue } from 'recoil';
 import './receive.less';
 import 'antd/dist/antd.css';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Layout } from 'antd';
 import MouseTooltip from 'react-sticky-mouse-tooltip';
 import { CopyOutlined } from '@ant-design/icons';
+import { sessionState } from '../../recoil/atom';
+import { Session } from '../../models/Session';
 
 const { Header, Content, Footer } = Layout;
-const walletAddress = 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj';
+
 function ReceivePage() {
   const [mouseTooltip, setMouseTooltip] = useState(false);
+  const session: Session = useRecoilValue<Session>(sessionState);
   const onCopyClick = () => {
     setMouseTooltip(true);
     setTimeout(() => {
@@ -25,10 +29,10 @@ function ReceivePage() {
           <div className="container">
             <div className="description">Share your wallet address to receive payments.</div>
             <div className="address">
-              <QRCode value={walletAddress} size={180} />
-              <div>{walletAddress}</div>
+              <QRCode value={session.wallet.address} size={180} />
+              <div>{session.wallet.address}</div>
             </div>
-            <CopyToClipboard text={walletAddress}>
+            <CopyToClipboard text={session.wallet.address}>
               <div className="copy" onClick={onCopyClick}>
                 <CopyOutlined /> Copy address
                 <MouseTooltip

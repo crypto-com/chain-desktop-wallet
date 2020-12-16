@@ -1,4 +1,4 @@
-import { assetService } from '../AssetService';
+import { walletService } from '../WalletService';
 
 class BackgroundTask {
   public readonly interval: number;
@@ -10,8 +10,8 @@ class BackgroundTask {
   public runJobs() {
     setInterval(async () => {
       try {
-        await assetService.loadAndSaveAssetPrices();
-        await assetService.fetchAndUpdateBalances();
+        await walletService.loadAndSaveAssetPrices();
+        await walletService.fetchAndUpdateBalances();
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error(`Error while running background task: ${e}`);

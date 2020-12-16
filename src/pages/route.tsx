@@ -7,6 +7,7 @@ import {
   Redirect,
 } from 'react-router-dom';
 import { isElectron } from '../utils/utils';
+
 import WelcomePage from './welcome/welcome';
 import RestorePage from './restore/restore';
 import CreatePage from './create/create';
@@ -15,6 +16,7 @@ import HomePage from './home/home';
 import SendPage from './send/send';
 import ReceivePage from './receive/receive';
 import HomeLayout from '../layouts/home/home';
+
 
 interface RouterProps {
   children: React.ReactNode;
@@ -30,6 +32,7 @@ const Router: React.FC<RouterProps> = props => {
 };
 
 function RouteHub() {
+
   const routeIndex = {
     name: 'Welcome Page',
     key: 'welcome',
