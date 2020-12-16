@@ -38,11 +38,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setLoading(true);
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
       const sessionData = await walletService.retrieveCurrentSession();
-      // eslint-disable-next-line no-console
-      console.log('sessionData', sessionData);
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
-      // eslint-disable-next-line no-console
-      console.log('currentAsset', currentAsset);
 
       const allWalletsData = await walletService.retrieveAllWallets();
       setHasWallet(hasWalletBeenCreated);
