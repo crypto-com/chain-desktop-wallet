@@ -2,7 +2,7 @@ import { DatabaseManager } from './DatabaseManager';
 import { EncryptedCredential, EncryptedSeed, EncryptionResult } from '../models/SecretStorage';
 import { cryptographer } from '../crypto/Cryptographer';
 
-class SecretStoreService {
+export class SecretStoreService {
   private readonly db: DatabaseManager;
 
   private readonly CREDENTIAL_STORED_ID = 'CREDENTIAL_STORED_ID';
