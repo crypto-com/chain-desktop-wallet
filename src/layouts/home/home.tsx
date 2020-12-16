@@ -70,6 +70,9 @@ const HomeMenu = () => {
       <Menu.Item key="/receive" icon={<Icon component={IconReceive} />}>
         <Link to="/receive">Receive</Link>
       </Menu.Item>
+      <Menu.Item key="/staking" icon={<Icon component={IconSend} />}>
+        <Link to="/staking">Staking</Link>
+      </Menu.Item>
     </Menu>
   );
 };
