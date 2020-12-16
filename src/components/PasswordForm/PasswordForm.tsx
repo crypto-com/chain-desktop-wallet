@@ -48,7 +48,7 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
             {
               pattern: /^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
               message:
-                'The password should be 8 character long and have at least one letter, one number and one special character',
+                'The password should be at least 8 character containing a letter, a number and a special character',
             },
           ]}
         >
