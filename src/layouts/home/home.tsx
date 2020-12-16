@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Layout, Menu, Dropdown } from 'antd';
+import { Layout, Menu, Dropdown, Spin } from 'antd';
 import { Link, useHistory, useLocation } from 'react-router-dom';
-import Icon, { CaretDownOutlined } from '@ant-design/icons';
+import Icon, { CaretDownOutlined, LoadingOutlined } from '@ant-design/icons';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilState } from 'recoil';
 
@@ -30,10 +30,13 @@ function HomeLayout(props: HomeLayoutProps) {
   const [session, setSession] = useRecoilState(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
+  const [loading, setLoading] = useState(false);
+
   const didMountRef = useRef(false);
 
   useEffect(() => {
     const fetchDB = async () => {
+      setLoading(true);
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await assetService.retrieveDefaultWalletAsset(sessionData);
@@ -42,6 +45,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setSession(sessionData);
       setUserAsset(currentAsset);
       setWalletList(allWalletsData);
+      setLoading(false);
     };
 
     if (!didMountRef.current) {
@@ -81,11 +85,13 @@ function HomeLayout(props: HomeLayoutProps) {
 
   const WalletMenu = () => {
     const walletClick = async e => {
+      setLoading(true);
       await walletService.setCurrentSession(new Session(walletList[e.key]));
       const currentSession = await walletService.retrieveCurrentSession();
       const currentAsset = await assetService.retrieveDefaultWalletAsset(currentSession);
       setSession(currentSession);
       setUserAsset(currentAsset);
+      setLoading(false);
     };
 
     return (
@@ -130,7 +136,7 @@ function HomeLayout(props: HomeLayoutProps) {
             </div>
           </Dropdown>
         </Sider>
-        {props.children}
+        { loading ? <Spin indicator={<LoadingOutlined style={{ fontSize: 96 }} spin />}/> : props.children}
       </Layout>
     </main>
   );
