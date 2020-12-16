@@ -148,6 +148,7 @@ function CreatePage() {
   // setHasAppPassword(false);
   const handlePasswordSubmitted = async (password: string) => {
     // TODO: store app password
+    // eslint-disable-next-line no-console
     console.log(password);
     setHasAppPassword(true);
   };
