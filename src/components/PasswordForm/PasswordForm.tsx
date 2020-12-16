@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, Input } from 'antd';
-import './passwordForm.less';
+import './PasswordForm.less';
 
 interface PasswordFormProps {
   className?: string;

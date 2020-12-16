@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import './passwordFormPage.less';
+import './PasswordFormModal.less';
+import Modal from 'antd/lib/modal/Modal';
 import { Button } from 'antd';
-import PasswordForm from './passwordForm';
-import ResultModalPopup from '../ResultModalPopup/ResultModalPopup';
+import PasswordForm from './PasswordForm';
+import SuccessCheckmark from '../SuccessCheckmark/SuccessCheckmark';
+import ErrorXmark from '../ErrorXmark/ErrorXmark';
 
-interface PasswordFormPageProps {
+interface PasswordFormModalProps {
   title: string;
   description?: string;
   // Control visibility of the component
@@ -37,7 +39,7 @@ interface PasswordFormPageProps {
 
 type DisplayComponent = 'form' | 'result';
 
-const PasswordFormPage: React.FC<PasswordFormPageProps> = props => {
+const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
   const [appPassword, setAppPassword] = useState<string>();
   const [displayComponent, setDisplayComponent] = useState<DisplayComponent>('form');
   const [validationErrMsg, setValidatorErrMsg] = useState<string>();
@@ -50,17 +52,6 @@ const PasswordFormPage: React.FC<PasswordFormPageProps> = props => {
       return;
     }
     await props.onSuccess(appPassword!);
-    setDisplayComponent('form');
-  };
-  const onModalCancel = () => {
-    if (validationErrMsg !== '') {
-      props.onCancel();
-      setDisplayComponent('form');
-      return;
-    }
-
-    // Clicking cancel on success result behaves the same as clicking ok button on the modal
-    onModalFinish();
   };
   const onFormFinish = async (password: string) => {
     const result = await props.onValidatePassword(password);
@@ -84,46 +75,51 @@ const PasswordFormPage: React.FC<PasswordFormPageProps> = props => {
     setValidatorErrMsg('');
     setDisplayComponent('form');
   };
-
   return (
-    <div className="password-form-page" style={{ display: props.visible ? 'block' : 'none' }}>
-      <div className="title">{props.title}</div>
-      <div className="description">{props.description}</div>
-      <PasswordForm
-        visible
-        confirmPassword={props.confirmPassword}
-        onOk={onFormFinish}
-        onChange={onFormChange}
-        onErr={onFormErr}
-      >
-        <ResultModalPopup
-          isModalVisible={displayComponent === 'result'}
-          handleCancel={onModalCancel}
-          handleOk={onModalFinish}
-          title={props.title}
-          button={
-            <Button type="primary" htmlType="submit">
-              {props.okButtonText || 'Submit'}
+    <Modal
+      className="password-form-modal"
+      title={props.title}
+      visible={props.visible}
+      footer={
+        displayComponent === 'result' && (
+          <div style={{ textAlign: 'center' }}>
+            <Button key="submit" type="primary" onClick={onModalFinish}>
+              {resultButtonText}
             </Button>
-          }
-          footer={[
-            <div key="submit" style={{ textAlign: 'center' }}>
-              <Button type="primary" onClick={onModalFinish}>
-                {resultButtonText}
-              </Button>
-            </div>,
-          ]}
-          success={validationErrMsg === ''}
+          </div>
+        )
+      }
+      onCancel={props.onCancel}
+    >
+      {displayComponent === 'form' ? (
+        <PasswordForm
+          visible
+          confirmPassword={props.confirmPassword}
+          onOk={onFormFinish}
+          onChange={onFormChange}
+          onErr={onFormErr}
         >
+          <Button type="primary" htmlType="submit">
+            {props.okButtonText || 'Submit'}
+          </Button>
+        </PasswordForm>
+      ) : (
+        <div className="result">
           {validationErrMsg ? (
-            <div className="result-message result-alert-message">{validationErrMsg}</div>
+            <div>
+              <ErrorXmark />
+              <div className="result-message">{validationErrMsg}</div>
+            </div>
           ) : (
-            <div className="result-message">{props.successText}</div>
+            <div>
+              <SuccessCheckmark />
+              <div className="result-message">{props.successText}</div>
+            </div>
           )}
-        </ResultModalPopup>
-      </PasswordForm>
-    </div>
+        </div>
+      )}
+    </Modal>
   );
 };
 
-export default PasswordFormPage;
+export default PasswordFormModal;

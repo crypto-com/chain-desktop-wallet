@@ -10,8 +10,8 @@ import { WalletCreateOptions } from '../../service/WalletCreator';
 import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import { Session } from '../../models/Session';
-// import PasswordFormModal from '../../components/passwordForm/passwordFormModal';
-import PasswordFormPage from '../../components/passwordForm/passwordFormPage';
+// import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import PasswordFormContainer from '../../components/PasswordForm/PasswordFormContainer';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -178,7 +178,7 @@ function CreatePage() {
           onSuccess={handlePasswordSubmitted}
           onCancel={handlePasswordCancelled}
         /> */}
-        <PasswordFormPage
+        <PasswordFormContainer
           title="Create App Password"
           description="Before creating a new wallet, please create your app password. It will be used to encrypt your wallet seeds."
           visible={!hasAppPassword}
