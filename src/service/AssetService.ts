@@ -89,6 +89,16 @@ class AssetService {
       ...price,
     };
   }
+
+  public async syncData(): Promise<void> {
+    try {
+      await this.fetchAndUpdateBalances();
+      return this.loadAndSaveAssetPrices();
+      // eslint-disable-next-line no-empty
+    } catch (e) {
+      return Promise.resolve();
+    }
+  }
 }
 
 export const assetService = new AssetService();
