@@ -18,9 +18,9 @@ const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
 const availableAmount = '250,000';
-const FormSend = () => {
+const FormStake = () => {
   const [form] = Form.useForm();
-  const [formValues, setFormValues] = useState({ recipientAddress: '', amount: '', memo: '' });
+  const [formValues, setFormValues] = useState({ stakingAddress: '', amount: '', memo: '' });
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -37,7 +37,7 @@ const FormSend = () => {
     try {
       setConfirmLoading(true);
       const hash = await walletService.sendTransfer({
-        toAddress: formValues.recipientAddress,
+        toAddress: formValues.stakingAddress,
         amount: formValues.amount,
         memo,
       });
@@ -79,21 +79,21 @@ const FormSend = () => {
       requiredMark={false}
     >
       <Form.Item
-        name="recipientAddress"
-        label="Recipient Address"
-        rules={[{ required: true, message: 'Recipient address is required' }]}
+        name="stakingAddress"
+        label="Staking Address"
+        rules={[{ required: true, message: 'Staking address is required' }]}
       >
         <Input placeholder="tcro..." />
       </Form.Item>
       <div className="amount">
         <Form.Item
           name="amount"
-          label="Sending Amount"
+          label="Staking Amount"
           rules={[
-            { required: true, message: 'Transfer amount is required' },
+            { required: true, message: 'Staking amount is required' },
             {
               pattern: /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/,
-              message: 'Transfer amount should be a number',
+              message: 'Staking amount should be a number',
             },
           ]}
         >
@@ -126,7 +126,7 @@ const FormSend = () => {
             <div className="description">Please review the below information. </div>
             <div className="item">
               <div className="label">To Address</div>
-              <div className="address">{`${formValues?.recipientAddress}`}</div>
+              <div className="address">{`${formValues?.stakingAddress}`}</div>
             </div>
             <div className="item">
               <div className="label">Amount</div>
@@ -171,7 +171,7 @@ const FormSend = () => {
           footer={[]}
         >
           <>
-            <div>The transfer transaction failed. Please try again later</div>
+            <div>The staking transaction failed. Please try again later</div>
           </>
         </ErrorModalPopup>
       </Form.Item>
@@ -182,15 +182,14 @@ const FormSend = () => {
 function StakingPage() {
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">Send</Header>
+      <Header className="site-layout-background">Staking</Header>
       <Content>
-        <div className="site-layout-background send-content">
+        <div className="site-layout-background stake-content">
           <div className="container">
             <div className="description">
-              Move funds from your transfer address to another transfer address or deposit stake to
-              a staking address.
+              Deposit fund to a staking address.
             </div>
-            <FormSend />
+            <FormStake />
           </div>
         </div>
       </Content>
