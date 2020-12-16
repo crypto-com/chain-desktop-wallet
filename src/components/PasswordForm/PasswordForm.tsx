@@ -42,7 +42,7 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
       >
         <Form.Item
           name="password"
-          label="Set Password"
+          label="App Password"
           rules={[
             { required: true, message: 'Password is required' },
             {

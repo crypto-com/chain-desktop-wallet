@@ -1,6 +1,11 @@
 // Hashed credential
-export interface Credential {
+export interface EncryptedCredential {
   hash: HashResult;
+}
+
+export interface EncryptedSeed {
+  walletId: string;
+  data: EncryptionResult;
 }
 
 export interface WalletEncrypted {

@@ -151,11 +151,10 @@ class WalletService {
   public async createAndSaveWallet(createOptions: WalletCreateOptions): Promise<Wallet> {
     const newWallet = WalletCreator.create(createOptions);
     await this.persistWallet(newWallet);
-    await this.persistInitialAsset(newWallet.identifier, newWallet.config.network);
     return newWallet;
   }
 
-  public async persistInitialAsset(walletId: string, network: Network) {
+  private async persistInitialAsset(walletId: string, network: Network) {
     const defaultAsset = DefaultAsset(network);
     await this.storageService.saveAsset({
       walletId,
@@ -167,8 +166,17 @@ class WalletService {
   public async restoreAndSaveWallet(importOptions: WalletImportOptions): Promise<Wallet> {
     const importedWallet = WalletImporter.import(importOptions);
     await this.persistWallet(importedWallet);
-    await this.persistInitialAsset(importedWallet.identifier, importedWallet.config.network);
     return importedWallet;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async restoreWallet(importOptions: WalletImportOptions): Promise<Wallet> {
+    return WalletImporter.import(importOptions);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async createWallet(createOptions: WalletCreateOptions): Promise<Wallet> {
+    return WalletCreator.create(createOptions);
   }
 
   // Load all persisted wallets
@@ -192,6 +200,7 @@ class WalletService {
   // Save freshly created or imported wallet
   public async persistWallet(wallet: Wallet) {
     await this.storageService.saveWallet(wallet);
+    await this.persistInitialAsset(wallet.identifier, wallet.config.network);
   }
 
   public async findWalletByIdentifier(identifier: string): Promise<Wallet> {
