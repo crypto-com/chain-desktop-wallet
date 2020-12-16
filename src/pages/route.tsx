@@ -15,6 +15,7 @@ import HomePage from './home/home';
 import SendPage from './send/send';
 import ReceivePage from './receive/receive';
 import HomeLayout from '../layouts/home/home';
+import SignUpPage from './signup/signup';
 
 interface RouterProps {
   children: React.ReactNode;
@@ -61,6 +62,12 @@ function RouteHub() {
       key: 'backup',
       path: '/create/backup',
       component: <BackupPage />,
+    },
+    {
+      name: 'SignUp Page',
+      key: 'signUp',
+      path: '/signUp',
+      component: <SignUpPage />,
     },
   ];
 
