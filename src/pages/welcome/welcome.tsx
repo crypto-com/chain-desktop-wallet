@@ -18,9 +18,6 @@ function WelcomePage() {
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
       const isPasswordSet = await secretStoreService.hasPasswordBeenSet();
 
-      // eslint-disable-next-line no-console
-      console.log('hasPasswordBeenSet: ', hasPasswordBeenSet, 'isPasswordSet:', isPasswordSet);
-
       setHasPasswordBeenSet(isPasswordSet);
       setHasWallet(hasWalletBeenCreated);
     };

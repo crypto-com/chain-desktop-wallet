@@ -13,8 +13,6 @@ const SignUpPage = () => {
     const salt = cryptographer.generateSalt();
     const hashResult = cryptographer.computeHash(password, salt);
     await secretStoreService.savePassword({ hash: hashResult });
-    // eslint-disable-next-line no-console
-    console.log('Saved hashed password: ', hashResult);
     history.push('/welcome');
   };
   const handlePasswordCancelled = () => {};

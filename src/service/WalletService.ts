@@ -174,11 +174,6 @@ class WalletService {
     return WalletImporter.import(importOptions);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  public async createWallet(createOptions: WalletCreateOptions): Promise<Wallet> {
-    return WalletCreator.create(createOptions);
-  }
-
   // Load all persisted wallets
   public async retrieveAllWallets(): Promise<Wallet[]> {
     const wallets = await this.storageService.retrieveAllWallets();
