@@ -3,6 +3,7 @@ import { NodeRpcService } from './rpc/NodeRpcService';
 import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import { APP_DB_NAMESPACE } from '../config/StaticConfig';
+import { Session } from '../models/Session';
 
 class AssetService {
   private readonly storageService: StorageService;
@@ -34,6 +35,10 @@ class AssetService {
         await this.storageService.saveAsset(asset);
       }),
     );
+  }
+
+  public async setCurrentSession(session: Session) {
+    await this.storageService.setSession(session);
   }
 
   public async retrieveCurrentWalletAssets(): Promise<UserAsset[]> {
