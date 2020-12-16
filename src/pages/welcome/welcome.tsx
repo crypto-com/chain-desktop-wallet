@@ -10,25 +10,26 @@ import { secretStoreService } from '../../storage/SecretStoreService';
 function WelcomePage() {
   const history = useHistory();
   const [hasWallet, setHasWallet] = useState(false); // Default as false. useEffect will only re-render if result of hasWalletBeenCreated === true
-  const [hasPasswordBeenSet, setHasPasswordBeenSet] = useState(false);
+  const [hasPasswordBeenSet, sethasPasswordBeenSet] = useState(false);
   const didMountRef = useRef(false);
 
   useEffect(() => {
     const fetchWalletData = async () => {
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
       const isPasswordSet = await secretStoreService.hasPasswordBeenSet();
+
       // eslint-disable-next-line no-console
-      console.log('HAS_WALLET_BEEN =>', hasWalletBeenCreated);
+      console.log('hasPasswordBeenSet: ', hasPasswordBeenSet, 'isPasswordSet:', isPasswordSet);
+
+      sethasPasswordBeenSet(isPasswordSet);
       setHasWallet(hasWalletBeenCreated);
-      setHasPasswordBeenSet(isPasswordSet);
     };
     if (!didMountRef.current) {
       fetchWalletData();
       didMountRef.current = true;
-    }
-    if (!hasPasswordBeenSet) {
+    } else if (!hasPasswordBeenSet) {
       history.push('/signUp');
-    } else if (hasWallet) {
+    } else if (hasWallet && hasPasswordBeenSet) {
       history.push('/home');
     }
   }, [hasPasswordBeenSet, hasWallet, history]);

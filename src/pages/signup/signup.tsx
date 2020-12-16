@@ -1,13 +1,21 @@
 import React from 'react';
 import './signup.less';
+import { useHistory } from 'react-router-dom';
 import logo from '../../assets/logo-products-chain.svg';
 import PasswordFormContainer from '../../components/PasswordForm/PasswordFormContainer';
+import { cryptographer } from '../../crypto/Cryptographer';
+import { secretStoreService } from '../../storage/SecretStoreService';
 
 const SignUpPage = () => {
+  const history = useHistory();
+
   const handlePasswordSubmitted = async (password: string) => {
-    // TODO: store app password
+    const salt = cryptographer.generateSalt();
+    const hashResult = cryptographer.computeHash(password, salt);
+    await secretStoreService.savePassword({ hash: hashResult });
     // eslint-disable-next-line no-console
-    console.log(password);
+    console.log('Saved hashed password: ', hashResult);
+    history.push('/welcome');
   };
   const handlePasswordCancelled = () => {};
   return (
@@ -24,10 +32,7 @@ const SignUpPage = () => {
           okButtonText="Create Account"
           successText="You have successfully created your app password"
           successButtonText="Next"
-          onValidatePassword={async (password: string) => {
-            // TODO
-            // eslint-disable-next-line no-console
-            console.log(password);
+          onValidatePassword={async () => {
             return {
               valid: true,
             };
