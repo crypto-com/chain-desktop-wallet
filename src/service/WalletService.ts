@@ -17,6 +17,7 @@ import {
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
 } from './signers/TransactionSupported';
+import { assetService } from './AssetService';
 
 export interface TransferRequest {
   toAddress: string;
@@ -198,8 +199,9 @@ class WalletService {
     return this.storageService.findWalletByIdentifier(identifier);
   }
 
-  public async setCurrentSession(session: Session) {
+  public async setCurrentSession(session: Session): Promise<void> {
     await this.storageService.setSession(session);
+    return assetService.syncData();
   }
 
   public async retrieveCurrentSession(): Promise<Session> {
