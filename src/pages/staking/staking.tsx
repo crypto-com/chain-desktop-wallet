@@ -3,11 +3,12 @@ import './staking.less';
 import 'antd/dist/antd.css';
 import { Layout, Form, Input, Button, Tabs } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
-
+import { useRecoilValue } from 'recoil';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import { walletAssetState } from '../../recoil/atom';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -18,7 +19,6 @@ const layout = {
 const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
-const availableAmount = '250,000';
 
 const FormDepositStake = () => {
   const [form] = Form.useForm();
@@ -28,6 +28,7 @@ const FormDepositStake = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [transactionHash, setTransactionHash] = useState('');
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
+  const walletAsset = useRecoilValue(walletAssetState);
 
   const showModal = () => {
     setFormValues(form.getFieldsValue());
@@ -105,7 +106,7 @@ const FormDepositStake = () => {
         </Form.Item>
         <div className="available">
           <span>Available: </span>
-          <div className="available-amount">{availableAmount} CRO</div>
+          <div className="available-amount">{walletAsset.balance} CRO</div>
         </div>
       </div>
       <Form.Item {...tailLayout}>
