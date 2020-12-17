@@ -24,15 +24,6 @@ export interface UserAsset {
   decimals: number;
 }
 
-export const scaledBalance = (asset: UserAsset) => {
-  const baseBalance = Number(asset.balance);
-  if (baseBalance === 0) {
-    return baseBalance;
-  }
-
-  return baseBalance / 10 ** asset.decimals;
-};
-
 export interface AssetMarketPrice {
   price: string;
 
@@ -42,6 +33,15 @@ export interface AssetMarketPrice {
 
   dailyChange: string;
 }
+
+export const scaledBalance = (asset: UserAsset) => {
+  const baseBalance = Number(asset.balance);
+  if (baseBalance === 0) {
+    return baseBalance;
+  }
+  // 1 CRO = 10^8 BASECRO
+  return (baseBalance / 10 ** asset.decimals).toFixed(4);
+};
 
 export const getAssetPriceIdFrom = (assetSymbol: string, currency: string) => {
   return `${assetSymbol}-${currency}`.toUpperCase();

@@ -67,6 +67,7 @@ const FormSend = () => {
       const hash = await walletService.sendTransfer({
         toAddress: formValues.recipientAddress,
         amount: formValues.amount,
+        asset: userAsset,
         memo,
         decryptedPhrase,
       });

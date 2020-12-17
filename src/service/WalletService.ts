@@ -27,6 +27,7 @@ export interface TransferRequest {
   amount: string;
   memo: string;
   decryptedPhrase: string;
+  asset: UserAsset;
 }
 
 class WalletService {
@@ -45,10 +46,11 @@ class WalletService {
       transactionSigner,
     } = await this.prepareTransaction();
 
+    const scaledAmount = Number(transferRequest.amount) * 10 ** transferRequest.asset.decimals;
     const transfer: TransferTransactionUnsigned = {
       fromAddress: currentWallet.address,
       toAddress: transferRequest.toAddress,
-      amount: transferRequest.amount,
+      amount: String(scaledAmount),
       memo: transferRequest.memo,
       accountNumber,
       accountSequence,
