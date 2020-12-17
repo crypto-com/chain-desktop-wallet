@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
-import { Layout, Form, Input, Button, Tabs } from 'antd';
+import { Layout, Form, Input, Button, Tabs, Table } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilValue } from 'recoil';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
@@ -220,99 +220,133 @@ const FormUnbondStake = () => {
   const closeErrorModal = () => {
     setIsErrorTransferModalVisible(false);
   };
+  const StakingColumns = [
+    {
+      title: 'Address',
+      dataIndex: 'address',
+      key: 'address',
+      render: text => (
+        <a
+          onClick={() => {
+            form.setFieldsValue({
+              stakingAddress: text,
+            });
+          }}
+        >
+          {text}
+        </a>
+      ),
+    },
+    {
+      title: 'Amount',
+      dataIndex: 'amount',
+      key: 'amount',
+    },
+  ];
+
+  const StakingData = [
+    {
+      key: '1',
+      address: 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj',
+      amount: '500, 000',
+      tags: ['nice', 'developer'],
+    },
+    {
+      key: '2',
+      address: 'tcro1uevms2nv4f2dhvm5u7sgus2yncgh7gdwn6urwe',
+      amount: '300, 000',
+      tags: ['loser'],
+    },
+    {
+      key: '3',
+      address: 'tcro1uvvmzes9kazpkt359exm67qqj384l7c74mjgrr',
+      amount: '100, 000',
+      tags: ['cool', 'teacher'],
+    },
+  ];
+
+  const StakingTable = () => {
+    return <Table columns={StakingColumns} dataSource={StakingData} />;
+  };
 
   return (
-    <Form
-      {...layout}
-      layout="vertical"
-      form={form}
-      name="control-ref"
-      onFinish={showModal}
-      requiredMark={false}
-    >
-      <Form.Item
-        name="stakingAddress"
-        label="Unbond Staking Address"
-        rules={[{ required: true, message: 'Staking address is required' }]}
+    <div>
+      <StakingTable />
+
+      <Form
+        {...layout}
+        layout="vertical"
+        form={form}
+        name="control-ref"
+        onFinish={showModal}
+        requiredMark={false}
       >
-        <Input placeholder="tcro..." />
-      </Form.Item>
-      {/* <div className="amount">
         <Form.Item
-          name="amount"
-          label="Staking Amount"
-          rules={[
-            { required: true, message: 'Staking amount is required' },
-            {
-              pattern: /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/,
-              message: 'Staking amount should be a number',
-            },
-          ]}
+          name="stakingAddress"
+          label="Unbond Staking Address"
+          rules={[{ required: true, message: 'Staking address is required' }]}
         >
-          <Input />
+          <Input disabled placeholder="Click address in the table to fill" />
         </Form.Item>
-        <div className="available">
-          <span>Available: </span>
-          <div className="available-amount">{availableAmount} CRO</div>
-        </div>
-      </div> */}
-      <Form.Item {...tailLayout}>
-        <ModalPopup
-          isModalVisible={isConfirmationModalVisible}
-          handleCancel={handleCancel}
-          handleOk={onConfirmTransfer}
-          confirmationLoading={confirmLoading}
-          button={
-            <Button type="primary" htmlType="submit">
-              Review
-            </Button>
-          }
-          okText="Confirm"
-        >
-          <>
-            <div className="title">Confirm Transaction</div>
-            <div className="description">Please review the below information. </div>
-            <div className="item">
-              <div className="label">Unbond From Address</div>
-              <div className="address">{`${formValues?.stakingAddress}`}</div>
-            </div>
-            {/* <div className="item">
+
+        <Form.Item {...tailLayout}>
+          <ModalPopup
+            isModalVisible={isConfirmationModalVisible}
+            handleCancel={handleCancel}
+            handleOk={onConfirmTransfer}
+            confirmationLoading={confirmLoading}
+            button={
+              <Button type="primary" htmlType="submit">
+                Review
+              </Button>
+            }
+            okText="Confirm"
+          >
+            <>
+              <div className="title">Confirm Transaction</div>
+              <div className="description">Please review the below information. </div>
+              <div className="item">
+                <div className="label">Unbond From Address</div>
+                <div className="address">{`${formValues?.stakingAddress}`}</div>
+              </div>
+              {/* <div className="item">
               <div className="label">Amount</div>
               <div>{`${formValues?.amount} CRO`}</div>
             </div> */}
-          </>
-        </ModalPopup>
+            </>
+          </ModalPopup>
 
-        <SuccessModalPopup
-          isModalVisible={isSuccessTransferModalVisible}
-          handleCancel={closeSuccessModal}
-          handleOk={closeSuccessModal}
-          title="Success!"
-          button={null}
-          footer={[
-            <Button key="submit" type="primary" onClick={closeSuccessModal}>
-              Ok Thanks
-            </Button>,
-          ]}
-        >
-          <>
-            <div>Your transfer was successful!</div>
-            <div>{transactionHash}</div>
-          </>
-        </SuccessModalPopup>
-        <ErrorModalPopup
-          isModalVisible={isErrorTransferModalVisible}
-          handleCancel={closeErrorModal}
-          handleOk={closeErrorModal}
-          title="An error happened!"
-          footer={[]}
-        >
-          <>
-            <div>The staking transaction failed. Please try again later</div>
-          </>
-        </ErrorModalPopup>
-      </Form.Item>
-    </Form>
+          <SuccessModalPopup
+            isModalVisible={isSuccessTransferModalVisible}
+            handleCancel={closeSuccessModal}
+            handleOk={closeSuccessModal}
+            title="Success!"
+            button={null}
+            footer={[
+              <Button key="submit" type="primary" onClick={closeSuccessModal}>
+                Ok Thanks
+              </Button>,
+            ]}
+          >
+            <>
+              <div>Your transfer was successful!</div>
+              <div>{transactionHash}</div>
+            </>
+          </SuccessModalPopup>
+          <ErrorModalPopup
+            isModalVisible={isErrorTransferModalVisible}
+            handleCancel={closeErrorModal}
+            handleOk={closeErrorModal}
+            title="An error happened!"
+            footer={[]}
+          >
+            <>
+              <div>The staking transaction failed. Please try again later</div>
+            </>
+          </ErrorModalPopup>
+        </Form.Item>
+      </Form>
+    </div>
   );
 };
 
