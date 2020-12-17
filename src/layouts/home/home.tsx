@@ -35,7 +35,7 @@ const HomeMenu = () => {
   const [hasWallet, setHasWallet] = useState(true); // Default as true. useEffect will only re-render if result of hasWalletBeenCreated === false
   const didMountRef = useRef(false);
   const locationPath = useLocation().pathname;
-  const paths = ['/home', '/address', '/send', '/receive'];
+  const paths = ['/home', '/address', '/send', '/receive', '/staking'];
 
   let menuSelectedKey = locationPath;
   if (!paths.includes(menuSelectedKey)) {
