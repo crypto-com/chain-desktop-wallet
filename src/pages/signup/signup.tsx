@@ -23,12 +23,12 @@ const SignUpPage = () => {
       </div>
       <div className="container">
         <PasswordFormContainer
-          title="Create App Password"
-          description="Before creating a new wallet, please create your app password. It will be used to encrypt your wallet seeds."
+          title="Create Application Password"
+          description="Before creating a new wallet, please create your application password. It will be used to encrypt your wallet seeds."
           visible
           confirmPassword
-          okButtonText="Create Account"
-          successText="You have successfully created your app password"
+          okButtonText="Create Password"
+          successText="You have successfully created your application password"
           successButtonText="Next"
           onValidatePassword={async () => {
             return {
