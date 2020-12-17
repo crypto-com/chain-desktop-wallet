@@ -70,6 +70,7 @@ const FormSend = () => {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setIsSuccessTransferModalVisible(true);
+      setInputPasswordVisible(false);
 
       form.resetFields();
     } catch (e) {
