@@ -56,7 +56,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   const HomeMenu = () => {
     const locationPath = useLocation().pathname;
-    const paths = ['/home', '/address', '/send', '/receive', '/staking'];
+    const paths = ['/home', '/staking', '/send', '/receive'];
 
     let menuSelectedKey = locationPath;
     if (!paths.includes(menuSelectedKey)) {
@@ -68,17 +68,14 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/home" icon={<Icon component={IconHome} />}>
           <Link to="/home">Home</Link>
         </Menu.Item>
-        <Menu.Item key="/address" icon={<Icon component={IconAddress} />}>
-          Address
+        <Menu.Item key="/staking" icon={<Icon component={IconAddress} />}>
+          <Link to="/staking">Staking</Link>
         </Menu.Item>
         <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">Send</Link>
         </Menu.Item>
         <Menu.Item key="/receive" icon={<Icon component={IconReceive} />}>
           <Link to="/receive">Receive</Link>
-        </Menu.Item>
-        <Menu.Item key="/staking" icon={<Icon component={IconSend} />}>
-          <Link to="/staking">Staking</Link>
         </Menu.Item>
       </Menu>
     );

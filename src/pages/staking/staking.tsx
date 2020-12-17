@@ -8,6 +8,8 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import { secretStoreService } from '../../storage/SecretStoreService';
 import { walletAssetState } from '../../recoil/atom';
 
 const { Header, Content, Footer } = Layout;
@@ -22,29 +24,57 @@ const tailLayout = {
 
 const FormDepositStake = () => {
   const [form] = Form.useForm();
-  const [formValues, setFormValues] = useState({ stakingAddress: '', amount: '', memo: '' });
+  const [formValues, setFormValues] = useState({
+    stakingAddress: '',
+    amount: '',
+    memo: '',
+    decryptedPhrase: '',
+  });
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [transactionHash, setTransactionHash] = useState('');
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const walletAsset = useRecoilValue(walletAssetState);
 
-  const showModal = () => {
+  const showConfirmationModal = () => {
+    setInputPasswordVisible(false);
     setFormValues(form.getFieldsValue());
     setIsVisibleConfirmationModal(true);
   };
 
+  const showPasswordInput = () => {
+    if (decryptedPhrase) {
+      showConfirmationModal();
+    }
+    setInputPasswordVisible(true);
+  };
+
+  const onWalletDecryptFinish = async (password: string) => {
+    const currentSession = await walletService.retrieveCurrentSession();
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      currentSession.wallet.identifier,
+    );
+    setDecryptedPhrase(phraseDecrypted);
+    showConfirmationModal();
+  };
+
   const onConfirmTransfer = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
+    if (!decryptedPhrase) {
+      return;
+    }
     try {
       setConfirmLoading(true);
-      // TODO: walletService.depositStake
-
+      // TODO: walletService.depositStaking
       const hash = await walletService.sendTransfer({
         toAddress: formValues.stakingAddress,
         amount: formValues.amount,
         memo,
+        decryptedPhrase,
       });
       setTransactionHash(hash);
 
@@ -56,6 +86,7 @@ const FormDepositStake = () => {
     } catch (e) {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
+      setInputPasswordVisible(false);
       setIsErrorTransferModalVisible(true);
       // eslint-disable-next-line no-console
       console.log('Error occurred while transfer', e);
@@ -80,7 +111,7 @@ const FormDepositStake = () => {
       layout="vertical"
       form={form}
       name="control-ref"
-      onFinish={showModal}
+      onFinish={showPasswordInput}
       requiredMark={false}
     >
       <Form.Item
@@ -135,7 +166,26 @@ const FormDepositStake = () => {
             </div>
           </>
         </ModalPopup>
-
+        <PasswordFormModal
+          description="Input the application password decrypt wallet"
+          okButtonText="Decrypt wallet"
+          onCancel={() => {
+            setInputPasswordVisible(false);
+          }}
+          onSuccess={onWalletDecryptFinish}
+          onValidatePassword={async (password: string) => {
+            const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+            return {
+              valid: isValid,
+              errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+            };
+          }}
+          successText="Wallet decrypted successfully !"
+          title="Provide application password"
+          visible={inputPasswordVisible}
+          successButtonText="Continue"
+          confirmPassword={false}
+        />
         <SuccessModalPopup
           isModalVisible={isSuccessTransferModalVisible}
           handleCancel={closeSuccessModal}
@@ -171,27 +221,56 @@ const FormDepositStake = () => {
 
 const FormUnbondStake = () => {
   const [form] = Form.useForm();
-  const [formValues, setFormValues] = useState({ stakingAddress: '', amount: '', memo: '' });
+  const [formValues, setFormValues] = useState({
+    stakingAddress: '',
+    amount: '',
+    memo: '',
+    decryptedPhrase: '',
+  });
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [transactionHash, setTransactionHash] = useState('');
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
 
-  const showModal = () => {
+  const showConfirmationModal = () => {
+    setInputPasswordVisible(false);
     setFormValues(form.getFieldsValue());
     setIsVisibleConfirmationModal(true);
   };
 
+  const showPasswordInput = () => {
+    if (decryptedPhrase) {
+      showConfirmationModal();
+    }
+    setInputPasswordVisible(true);
+  };
+
+  const onWalletDecryptFinish = async (password: string) => {
+    const currentSession = await walletService.retrieveCurrentSession();
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      currentSession.wallet.identifier,
+    );
+    setDecryptedPhrase(phraseDecrypted);
+    showConfirmationModal();
+  };
+
   const onConfirmTransfer = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
+    if (!decryptedPhrase) {
+      return;
+    }
     try {
       setConfirmLoading(true);
-      // TODO: walletService.unbondStake
+      // TODO: walletService.depositStaking
       const hash = await walletService.sendTransfer({
         toAddress: formValues.stakingAddress,
         amount: formValues.amount,
         memo,
+        decryptedPhrase,
       });
       setTransactionHash(hash);
 
@@ -203,6 +282,7 @@ const FormUnbondStake = () => {
     } catch (e) {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
+      setInputPasswordVisible(false);
       setIsErrorTransferModalVisible(true);
       // eslint-disable-next-line no-console
       console.log('Error occurred while transfer', e);
@@ -220,6 +300,7 @@ const FormUnbondStake = () => {
   const closeErrorModal = () => {
     setIsErrorTransferModalVisible(false);
   };
+
   const StakingColumns = [
     {
       title: 'Address',
@@ -278,7 +359,7 @@ const FormUnbondStake = () => {
         layout="vertical"
         form={form}
         name="control-ref"
-        onFinish={showModal}
+        onFinish={showPasswordInput}
         requiredMark={false}
       >
         <Form.Item
@@ -315,7 +396,26 @@ const FormUnbondStake = () => {
             </div> */}
             </>
           </ModalPopup>
-
+          <PasswordFormModal
+            description="Input the application password decrypt wallet"
+            okButtonText="Decrypt wallet"
+            onCancel={() => {
+              setInputPasswordVisible(false);
+            }}
+            onSuccess={onWalletDecryptFinish}
+            onValidatePassword={async (password: string) => {
+              const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+              return {
+                valid: isValid,
+                errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+              };
+            }}
+            successText="Wallet decrypted successfully !"
+            title="Provide application password"
+            visible={inputPasswordVisible}
+            successButtonText="Continue"
+            confirmPassword={false}
+          />
           <SuccessModalPopup
             isModalVisible={isSuccessTransferModalVisible}
             handleCancel={closeSuccessModal}
