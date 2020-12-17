@@ -115,9 +115,9 @@ const FormDepositStake = () => {
       requiredMark={false}
     >
       <Form.Item
-        name="stakingAddress"
-        label="Deposit Staking Address"
-        rules={[{ required: true, message: 'Staking address is required' }]}
+        name="validatorAddress"
+        label="Validator address"
+        rules={[{ required: true, message: 'Validator address is required' }]}
       >
         <Input placeholder="tcro..." />
       </Form.Item>
