@@ -219,7 +219,7 @@ const FormDepositStake = () => {
   );
 };
 
-const FormUnbondStake = () => {
+const FormWithdrawStakingReward = () => {
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({
     stakingAddress: '',
