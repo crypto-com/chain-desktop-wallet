@@ -157,7 +157,7 @@ const FormDepositStake = () => {
             <div className="title">Confirm Transaction</div>
             <div className="description">Please review the below information. </div>
             <div className="item">
-              <div className="label">Deposit To Address</div>
+              <div className="label">Delegating to Validator</div>
               <div className="address">{`${formValues?.stakingAddress}`}</div>
             </div>
             <div className="item">
