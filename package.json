@@ -66,7 +66,11 @@
     "src/**/*.{js,jsx,tsx,ts,less,md,json}": [
       "prettier --write"
     ],
-    "src/**/*.less": "stylelint --syntax less",
+    "src/**/*.less": [
+      "stylelint --fix less",
+      "stylelint --fix --syntax less",
+      "stylelint --syntax less"
+    ],
     "src/**/*.{js,jsx,ts,tsx}": "yarn lint:js"
   },
   "build": {

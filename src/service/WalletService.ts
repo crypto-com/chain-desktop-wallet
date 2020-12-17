@@ -17,6 +17,8 @@ import {
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
 } from './signers/TransactionSupported';
+import { cryptographer } from '../crypto/Cryptographer';
+import { secretStoreService } from '../storage/SecretStoreService';
 import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 
@@ -24,6 +26,7 @@ export interface TransferRequest {
   toAddress: string;
   amount: string;
   memo: string;
+  decryptedPhrase: string;
 }
 
 class WalletService {
@@ -38,7 +41,6 @@ class WalletService {
       nodeRpc,
       accountNumber,
       accountSequence,
-      phrase,
       currentWallet,
       transactionSigner,
     } = await this.prepareTransaction();
@@ -52,7 +54,10 @@ class WalletService {
       accountSequence,
     };
 
-    const signedTxHex = await transactionSigner.signTransfer(transfer, phrase);
+    const signedTxHex = await transactionSigner.signTransfer(
+      transfer,
+      transferRequest.decryptedPhrase,
+    );
     return nodeRpc.broadcastTransaction(signedTxHex);
   }
 
@@ -61,12 +66,12 @@ class WalletService {
     validatorAddress: string,
     amount: string,
     memo: string,
+    decryptedPhrase: string,
   ) {
     const {
       nodeRpc,
       accountNumber,
       accountSequence,
-      phrase,
       transactionSigner,
     } = await this.prepareTransaction();
 
@@ -79,7 +84,10 @@ class WalletService {
       accountSequence,
     };
 
-    const signedTxHex = await transactionSigner.signDelegateTx(delegateTransaction, phrase);
+    const signedTxHex = await transactionSigner.signDelegateTx(
+      delegateTransaction,
+      decryptedPhrase,
+    );
     return nodeRpc.broadcastTransaction(signedTxHex);
   }
 
@@ -88,12 +96,12 @@ class WalletService {
     validatorAddress: string,
     amount: string,
     memo: string,
+    decryptedPhrase: string,
   ) {
     const {
       nodeRpc,
       accountNumber,
       accountSequence,
-      phrase,
       transactionSigner,
     } = await this.prepareTransaction();
 
@@ -107,7 +115,7 @@ class WalletService {
 
     const signedTxHex = await transactionSigner.signWithdrawStakingRewardTx(
       withdrawStakingReward,
-      phrase,
+      decryptedPhrase,
     );
     return nodeRpc.broadcastTransaction(signedTxHex);
   }
@@ -121,23 +129,15 @@ class WalletService {
     const accountNumber = await nodeRpc.fetchAccountNumber(currentWallet.address);
     const accountSequence = await nodeRpc.loadSequenceNumber(currentWallet.address);
 
-    const phrase = await this.decryptPhrase(currentSession);
     const transactionSigner = new TransactionSigner(currentWallet.config);
 
     return {
       nodeRpc,
       accountNumber,
       accountSequence,
-      phrase,
       currentWallet,
       transactionSigner,
     };
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  public async decryptPhrase(session: Session): Promise<string> {
-    // TODO : Implement actual phrase decryption
-    return Promise.resolve(session.wallet.encryptedPhrase);
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -153,7 +153,6 @@ class WalletService {
   public async createAndSaveWallet(createOptions: WalletCreateOptions): Promise<Wallet> {
     const newWallet = WalletCreator.create(createOptions);
     await this.persistWallet(newWallet);
-    await this.persistInitialAsset(newWallet.identifier, newWallet.config.network);
     return newWallet;
   }
 
@@ -170,8 +169,12 @@ class WalletService {
   public async restoreAndSaveWallet(importOptions: WalletImportOptions): Promise<Wallet> {
     const importedWallet = WalletImporter.import(importOptions);
     await this.persistWallet(importedWallet);
-    await this.persistInitialAsset(importedWallet.identifier, importedWallet.config.network);
     return importedWallet;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async restoreWallet(importOptions: WalletImportOptions): Promise<Wallet> {
+    return WalletImporter.import(importOptions);
   }
 
   // Load all persisted wallets
@@ -195,6 +198,7 @@ class WalletService {
   // Save freshly created or imported wallet
   public async persistWallet(wallet: Wallet) {
     await this.storageService.saveWallet(wallet);
+    await this.persistInitialAsset(wallet.identifier, wallet.config.network);
   }
 
   public async findWalletByIdentifier(identifier: string): Promise<Wallet> {
@@ -204,10 +208,6 @@ class WalletService {
   public async setCurrentSession(session: Session): Promise<void> {
     await this.storageService.setSession(session);
     return this.syncData(session);
-  }
-
-  public async retrieveCurrentSession(): Promise<Session> {
-    return this.storageService.retrieveCurrentSession();
   }
 
   public async fetchAndUpdateBalances(session: Session | null = null) {
@@ -293,6 +293,24 @@ class WalletService {
     } catch (e) {
       return Promise.resolve();
     }
+  }
+
+  public async encryptWalletAndSetSession(key: string, wallet: Wallet): Promise<void> {
+    const initialVector = await cryptographer.generateIV();
+    const encryptionResult = await cryptographer.encrypt(
+      wallet.encryptedPhrase,
+      key,
+      initialVector,
+    );
+    wallet.encryptedPhrase = encryptionResult.cipher;
+
+    await this.persistWallet(wallet);
+    await secretStoreService.persistEncryptedPhrase(wallet.identifier, encryptionResult);
+    await this.setCurrentSession(new Session(wallet));
+  }
+
+  public async retrieveCurrentSession(): Promise<Session> {
+    return this.storageService.retrieveCurrentSession();
   }
 }
 

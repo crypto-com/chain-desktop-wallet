@@ -7,7 +7,7 @@ export class Wallet {
 
   public readonly address: string;
 
-  public readonly encryptedPhrase: string;
+  public encryptedPhrase: string;
 
   public readonly config: WalletConfig;
 
