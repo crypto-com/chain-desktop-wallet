@@ -6,6 +6,7 @@ import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import BackButton from '../../components/BackButton/BackButton';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 
@@ -161,6 +162,7 @@ const FormRestore = () => {
 function RestorePage() {
   return (
     <main className="restore-page">
+      <BackButton />
       <div className="header">
         <img src={logo} className="logo" alt="logo" />
       </div>
