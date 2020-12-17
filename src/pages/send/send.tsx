@@ -112,7 +112,18 @@ const FormSend = () => {
       <Form.Item
         name="recipientAddress"
         label="Recipient Address"
-        rules={[{ required: true, message: 'Recipient address is required' }]}
+        rules={[
+          { required: true, message: 'Recipient address is required' },
+          {
+            pattern: RegExp(
+              `^(${userAsset.symbol.toString().toLocaleLowerCase()})[a-zA-HJ-NP-Z0-9]{20,120}$`,
+              'i',
+            ),
+            message: `The recipient address should be a valid ${userAsset.symbol
+              .toString()
+              .toUpperCase()} address`,
+          },
+        ]}
       >
         <Input placeholder="tcro..." />
       </Form.Item>
