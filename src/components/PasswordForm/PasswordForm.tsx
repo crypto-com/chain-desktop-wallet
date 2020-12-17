@@ -16,6 +16,8 @@ interface PasswordFormProps {
   onOk: (password: string) => void;
   onErr: (errMsg: string) => void;
   onChange: () => void;
+
+  shouldValidate?: boolean;
 }
 
 const PasswordForm: React.FC<PasswordFormProps> = props => {
@@ -40,11 +42,39 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
         onChange={props.onChange}
         onFinish={onFormFinish}
       >
-        <Form.Item name="password" label="App Password" rules={[{ required: true }]}>
+        <Form.Item
+          name="password"
+          label="App Password"
+          rules={[
+            { required: true, message: 'Password is required' },
+            props.shouldValidate
+              ? {
+                  pattern: /^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
+                  message:
+                    'The password should be at least 8 character containing a letter, a number and a special character',
+                }
+              : {},
+          ]}
+        >
           <Input.Password placeholder="App password" />
         </Form.Item>
         {props.confirmPassword && (
-          <Form.Item name="passwordConfirm" label="Confirm Password" rules={[{ required: true }]}>
+          <Form.Item
+            name="passwordConfirm"
+            label="Confirm Password"
+            rules={[
+              { required: true, message: 'Password confirmation is required' },
+              ({ getFieldValue }) => ({
+                validator(rule, value) {
+                  if (!value || getFieldValue('password') === value) {
+                    return Promise.resolve();
+                  }
+                  // eslint-disable-next-line prefer-promise-reject-errors
+                  return Promise.reject('The password confirmation should match');
+                },
+              }),
+            ]}
+          >
             <Input.Password placeholder="Confirm the password" />
           </Form.Item>
         )}

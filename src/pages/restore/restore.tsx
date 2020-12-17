@@ -5,9 +5,9 @@ import { Button, Form, Input, Select } from 'antd';
 import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
-import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import { Session } from '../../models/Session';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import { secretStoreService } from '../../storage/SecretStoreService';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -20,20 +20,15 @@ const tailLayout = {
 const FormRestore = () => {
   const [form] = Form.useForm();
   const history = useHistory();
-  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
 
-  const showSuccessModal = () => {
-    setIsSuccessModalVisible(true);
-  };
+  // const showSuccessModal = () => {
+  //   setIsSuccessModalVisible(true);
+  // };
 
-  const handleSuccessOk = () => {
-    setIsSuccessModalVisible(false);
+  const goToHome = () => {
     history.push('/home');
-  };
-
-  const handleSuccessCancel = () => {
-    setIsSuccessModalVisible(false);
   };
 
   const showErrorModal = () => {
@@ -52,7 +47,7 @@ const FormRestore = () => {
     form.setFieldsValue({ network });
   };
 
-  const onWalletImportFinish = async () => {
+  const onWalletImportFinish = async (password: string) => {
     const { name, mnemonic, network } = form.getFieldsValue();
     if (!name || !mnemonic || !network) {
       return;
@@ -71,12 +66,10 @@ const FormRestore = () => {
       config: selectedNetwork,
     };
     try {
-      const wallet = await walletService.restoreAndSaveWallet(importOptions);
-      await walletService.setCurrentSession(new Session(wallet));
-      showSuccessModal();
+      const wallet = await walletService.restoreWallet(importOptions);
+      await walletService.encryptWalletAndSetSession(password, wallet);
+      goToHome();
       form.resetFields();
-      // Jump to home screen
-
       return;
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -92,7 +85,9 @@ const FormRestore = () => {
       layout="vertical"
       form={form}
       name="control-ref"
-      onFinish={onWalletImportFinish}
+      onFinish={() => {
+        setInputPasswordVisible(true);
+      }}
     >
       <Form.Item
         name="name"
@@ -123,26 +118,30 @@ const FormRestore = () => {
         </Select>
       </Form.Item>
       <Form.Item {...tailLayout}>
-        <SuccessModalPopup
-          isModalVisible={isSuccessModalVisible}
-          handleCancel={handleSuccessCancel}
-          handleOk={handleSuccessOk}
-          title="Successful!"
-          button={
-            <Button type="primary" htmlType="submit">
-              Restore Wallet
-            </Button>
-          }
-          footer={[
-            <Button key="submit" type="primary" onClick={handleSuccessOk}>
-              Next
-            </Button>,
-          ]}
-        >
-          <>
-            <div>Your wallet has been restored!</div>
-          </>
-        </SuccessModalPopup>
+        <Button type="primary" htmlType="submit">
+          Restore Wallet
+        </Button>
+
+        <PasswordFormModal
+          description="Input the application password to encrypt the wallet to be restored"
+          okButtonText="Encrypt wallet"
+          onCancel={() => {
+            setInputPasswordVisible(false);
+          }}
+          onSuccess={onWalletImportFinish}
+          onValidatePassword={async (password: string) => {
+            const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+            return {
+              valid: isValid,
+              errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+            };
+          }}
+          successText="Wallet restored and encrypted successfully !"
+          title="Provide application password"
+          visible={inputPasswordVisible}
+          successButtonText="Go to Home"
+          confirmPassword={false}
+        />
         <ErrorModalPopup
           isModalVisible={isErrorModalVisible}
           handleCancel={handleErrorCancel}

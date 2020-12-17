@@ -5,26 +5,31 @@ import { Button } from 'antd';
 import { Link, useHistory } from 'react-router-dom';
 import { walletService } from '../../service/WalletService';
 import logo from '../../assets/logo-products-chain.svg';
+import { secretStoreService } from '../../storage/SecretStoreService';
 
 function WelcomePage() {
   const history = useHistory();
   const [hasWallet, setHasWallet] = useState(false); // Default as false. useEffect will only re-render if result of hasWalletBeenCreated === true
+  const [hasPasswordBeenSet, setHasPasswordBeenSet] = useState(true);
   const didMountRef = useRef(false);
 
   useEffect(() => {
     const fetchWalletData = async () => {
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
-      // eslint-disable-next-line no-console
-      console.log('HAS_WALLET_BEEN =>', hasWalletBeenCreated);
+      const isPasswordSet = await secretStoreService.hasPasswordBeenSet();
+
+      setHasPasswordBeenSet(isPasswordSet);
       setHasWallet(hasWalletBeenCreated);
     };
     if (!didMountRef.current) {
       fetchWalletData();
       didMountRef.current = true;
-    } else if (hasWallet) {
+    } else if (!hasPasswordBeenSet) {
+      history.push('/signUp');
+    } else if (hasWallet && hasPasswordBeenSet) {
       history.push('/home');
     }
-  }, [hasWallet, history]);
+  }, [hasPasswordBeenSet, hasWallet, history]);
 
   return (
     <main className="welcome-page">

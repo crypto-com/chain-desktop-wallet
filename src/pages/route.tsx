@@ -16,6 +16,7 @@ import HomePage from './home/home';
 import SendPage from './send/send';
 import ReceivePage from './receive/receive';
 import StakingPage from './staking/staking';
+import SignUpPage from './signup/signup';
 import HomeLayout from '../layouts/home/home';
 
 interface RouterProps {
@@ -63,6 +64,12 @@ function RouteHub() {
       key: 'backup',
       path: '/create/backup',
       component: <BackupPage />,
+    },
+    {
+      name: 'SignUp Page',
+      key: 'signUp',
+      path: '/signUp',
+      component: <SignUpPage />,
     },
   ];
 

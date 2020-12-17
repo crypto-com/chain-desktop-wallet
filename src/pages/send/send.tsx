@@ -10,6 +10,8 @@ import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { walletAssetState } from '../../recoil/atom';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import { secretStoreService } from '../../storage/SecretStoreService';
 
 const { Header, Content, Footer } = Layout;
 const layout = {
@@ -27,21 +29,45 @@ const FormSend = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [transactionHash, setTransactionHash] = useState('');
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const walletAsset = useRecoilValue(walletAssetState);
-
-  const showModal = () => {
+  
+  const showConfirmationModal = () => {
+    setInputPasswordVisible(false);
     setFormValues(form.getFieldsValue());
     setIsVisibleConfirmationModal(true);
   };
 
+  const showPasswordInput = () => {
+    if (decryptedPhrase) {
+      showConfirmationModal();
+    }
+    setInputPasswordVisible(true);
+  };
+
+  const onWalletDecryptFinish = async (password: string) => {
+    const currentSession = await walletService.retrieveCurrentSession();
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      currentSession.wallet.identifier,
+    );
+    setDecryptedPhrase(phraseDecrypted);
+    showConfirmationModal();
+  };
+
   const onConfirmTransfer = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
+    if (!decryptedPhrase) {
+      return;
+    }
     try {
       setConfirmLoading(true);
       const hash = await walletService.sendTransfer({
         toAddress: formValues.recipientAddress,
         amount: formValues.amount,
         memo,
+        decryptedPhrase,
       });
       setTransactionHash(hash);
 
@@ -53,6 +79,7 @@ const FormSend = () => {
     } catch (e) {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
+      setInputPasswordVisible(false);
       setIsErrorTransferModalVisible(true);
       // eslint-disable-next-line no-console
       console.log('Error occurred while transfer', e);
@@ -77,7 +104,7 @@ const FormSend = () => {
       layout="vertical"
       form={form}
       name="control-ref"
-      onFinish={showModal}
+      onFinish={showPasswordInput}
       requiredMark={false}
     >
       <Form.Item
@@ -118,7 +145,7 @@ const FormSend = () => {
           confirmationLoading={confirmLoading}
           button={
             <Button type="primary" htmlType="submit">
-              Review
+              Continue
             </Button>
           }
           okText="Confirm"
@@ -147,6 +174,27 @@ const FormSend = () => {
             )}
           </>
         </ModalPopup>
+
+        <PasswordFormModal
+          description="Input the application password decrypt wallet"
+          okButtonText="Decrypt wallet"
+          onCancel={() => {
+            setInputPasswordVisible(false);
+          }}
+          onSuccess={onWalletDecryptFinish}
+          onValidatePassword={async (password: string) => {
+            const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+            return {
+              valid: isValid,
+              errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+            };
+          }}
+          successText="Wallet decrypted successfully !"
+          title="Provide application password"
+          visible={inputPasswordVisible}
+          successButtonText="Continue"
+          confirmPassword={false}
+        />
 
         <SuccessModalPopup
           isModalVisible={isSuccessTransferModalVisible}

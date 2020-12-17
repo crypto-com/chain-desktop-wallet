@@ -1,20 +1,7 @@
 import scrypt from 'scrypt-js';
 import { utils } from '@crypto-com/chain-jslib';
 import { AES, enc, lib, mode, pad } from 'crypto-js';
-
-export interface HashResult {
-  data: string;
-}
-
-export interface EncryptionResult {
-  cipher: string;
-  iv: InitialVector;
-}
-
-export interface InitialVector {
-  words: number[];
-  sigBytes: number;
-}
+import { EncryptionResult, HashResult, InitialVector } from '../models/SecretStorage';
 
 class Cryptographer {
   // Cpu cost
@@ -55,7 +42,7 @@ class Cryptographer {
       this.dkLen,
     );
     const output = utils.Bytes.fromUint8Array(key).toHexString();
-    return { data: output };
+    return { data: output, salt };
   }
 
   public async generateIV(): Promise<InitialVector> {
