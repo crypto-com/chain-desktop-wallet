@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import './send.less';
 import 'antd/dist/antd.css';
 import { Layout, Form, Input, Button } from 'antd';
-// import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
-
 import { useRecoilValue } from 'recoil';
+
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -15,13 +14,8 @@ import { scaledBalance, UserAsset } from '../../models/UserAsset';
 import { walletAssetState } from '../../recoil/atom';
 
 const { Header, Content, Footer } = Layout;
-const layout = {
-  // labelCol: { span: 8 },
-  // wrapperCol: { span: 16 },
-};
-const tailLayout = {
-  // wrapperCol: { offset: 8, span: 16 },
-};
+const layout = {};
+const tailLayout = {};
 const FormSend = () => {
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({ recipientAddress: '', amount: '', memo: '' });

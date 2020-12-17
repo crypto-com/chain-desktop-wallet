@@ -15,8 +15,9 @@ import BackupPage from './backup/backup';
 import HomePage from './home/home';
 import SendPage from './send/send';
 import ReceivePage from './receive/receive';
-import HomeLayout from '../layouts/home/home';
+import StakingPage from './staking/staking';
 import SignUpPage from './signup/signup';
+import HomeLayout from '../layouts/home/home';
 
 interface RouterProps {
   children: React.ReactNode;
@@ -90,6 +91,12 @@ function RouteHub() {
       key: 'receive',
       path: '/receive',
       component: <ReceivePage />,
+    },
+    {
+      name: 'Staking Page',
+      key: 'staking',
+      path: '/staking',
+      component: <StakingPage />,
     },
   ];
 
