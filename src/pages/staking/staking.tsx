@@ -38,6 +38,8 @@ const FormDepositStake = () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
     try {
       setConfirmLoading(true);
+      // TODO: walletService.depositStake
+
       const hash = await walletService.sendTransfer({
         toAddress: formValues.stakingAddress,
         amount: formValues.amount,
@@ -123,7 +125,7 @@ const FormDepositStake = () => {
             <div className="title">Confirm Transaction</div>
             <div className="description">Please review the below information. </div>
             <div className="item">
-              <div className="label">To Address</div>
+              <div className="label">Deposit To Address</div>
               <div className="address">{`${formValues?.stakingAddress}`}</div>
             </div>
             <div className="item">
@@ -184,6 +186,7 @@ const FormUnbondStake = () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
     try {
       setConfirmLoading(true);
+      // TODO: walletService.unbondStake
       const hash = await walletService.sendTransfer({
         toAddress: formValues.stakingAddress,
         amount: formValues.amount,
@@ -269,13 +272,13 @@ const FormUnbondStake = () => {
             <div className="title">Confirm Transaction</div>
             <div className="description">Please review the below information. </div>
             <div className="item">
-              <div className="label">To Address</div>
+              <div className="label">Unbond From Address</div>
               <div className="address">{`${formValues?.stakingAddress}`}</div>
             </div>
-            <div className="item">
+            {/* <div className="item">
               <div className="label">Amount</div>
               <div>{`${formValues?.amount} CRO`}</div>
-            </div>
+            </div> */}
           </>
         </ModalPopup>
 
