@@ -12,6 +12,7 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import { Session } from '../../models/Session';
 // import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import PasswordFormContainer from '../../components/PasswordForm/PasswordFormContainer';
+import BackButton from '../../components/BackButton/BackButton';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -156,6 +157,7 @@ function CreatePage() {
 
   return (
     <main className="create-page">
+      <BackButton />
       <div className="header">
         <img src={logo} className="logo" alt="logo" />
       </div>

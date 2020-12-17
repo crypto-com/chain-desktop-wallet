@@ -10,6 +10,7 @@ import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import logo from '../../assets/logo-products-chain.svg';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import BackButton from '../../components/BackButton/BackButton';
 
 function BackupPage() {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -62,6 +63,7 @@ function BackupPage() {
 
   return (
     <main className="backup-page">
+      <BackButton />
       <div className="header">
         <img src={logo} className="logo" alt="logo" />
       </div>

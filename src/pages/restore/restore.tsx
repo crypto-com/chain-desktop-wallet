@@ -8,6 +8,7 @@ import { WalletImportOptions } from '../../service/WalletImporter';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { Session } from '../../models/Session';
+import BackButton from '../../components/BackButton/BackButton';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -162,6 +163,7 @@ const FormRestore = () => {
 function RestorePage() {
   return (
     <main className="restore-page">
+      <BackButton />
       <div className="header">
         <img src={logo} className="logo" alt="logo" />
       </div>
