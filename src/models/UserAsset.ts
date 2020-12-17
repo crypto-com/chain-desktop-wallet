@@ -34,13 +34,22 @@ export interface AssetMarketPrice {
   dailyChange: string;
 }
 
-export const scaledBalance = (asset: UserAsset) => {
-  const baseBalance = Number(asset.balance);
-  if (baseBalance === 0) {
-    return baseBalance;
+export const scaledAmount = (baseAmount: string, decimals: number) => {
+  const balance = Number(baseAmount);
+
+  if (balance === 0) {
+    return balance;
   }
   // 1 CRO = 10^8 BASECRO
-  return (baseBalance / 10 ** asset.decimals).toFixed(4);
+  return (balance / 10 ** decimals).toFixed(4);
+};
+
+export const scaledBalance = (asset: UserAsset) => {
+  return scaledAmount(asset.balance, asset.decimals);
+};
+
+export const scaledStakingBalance = (asset: UserAsset) => {
+  return scaledAmount(asset.stakedBalance, asset.decimals);
 };
 
 export const getAssetPriceIdFrom = (assetSymbol: string, currency: string) => {

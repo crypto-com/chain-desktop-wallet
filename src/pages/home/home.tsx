@@ -3,7 +3,7 @@ import './home.less';
 import 'antd/dist/antd.css';
 import { Layout, Table, Space, Tabs } from 'antd';
 import { useRecoilValue } from 'recoil';
-import { scaledBalance, UserAsset } from '../../models/UserAsset';
+import { scaledBalance, scaledStakingBalance, UserAsset } from '../../models/UserAsset';
 import { walletAssetState } from '../../recoil/atom';
 
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
@@ -129,7 +129,7 @@ function HomePage() {
           <div className="balance">
             <div className="title">STAKED BALANCE</div>
             <div className="quantity">
-              {userAsset?.stakedBalance} {userAsset?.symbol}
+              {scaledStakingBalance(userAsset)} {userAsset?.symbol}
             </div>
           </div>
         </div>
