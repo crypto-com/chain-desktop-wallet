@@ -57,7 +57,7 @@ export class NodeRpcService implements INodeRpcService {
 
     if (broadcastResponse.code) {
       // eslint-disable-next-line no-console
-      console.error('ERROR_XX', broadcastResponse);
+      console.error('ERROR_BROADCAST_XX', broadcastResponse);
       throw new Error(broadcastResponse.rawLog);
     }
     return broadcastResponse.transactionHash;
