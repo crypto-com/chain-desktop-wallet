@@ -6,7 +6,6 @@ import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import { Session } from '../../models/Session';
 import BackButton from '../../components/BackButton/BackButton';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';

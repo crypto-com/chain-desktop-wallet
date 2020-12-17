@@ -11,7 +11,7 @@ import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import { Session } from '../../models/Session';
 // import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import PasswordFormContainer from '../../components/PasswordForm/PasswordFormContainer';
+// import PasswordFormContainer from '../../components/PasswordForm/PasswordFormContainer';
 import BackButton from '../../components/BackButton/BackButton';
 
 const layout = {
