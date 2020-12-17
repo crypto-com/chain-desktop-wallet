@@ -41,7 +41,7 @@ export const scaledAmount = (baseAmount: string, decimals: number) => {
     return balance;
   }
   // 1 CRO = 10^8 BASECRO
-  return (balance / 10 ** decimals).toFixed(4);
+  return Number((balance / 10 ** decimals).toFixed(4));
 };
 
 export const scaledBalance = (asset: UserAsset) => {

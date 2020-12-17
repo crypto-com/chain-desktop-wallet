@@ -42,13 +42,13 @@ class WalletService {
       nodeRpc,
       accountNumber,
       accountSequence,
-      currentWallet,
+      currentSession,
       transactionSigner,
     } = await this.prepareTransaction();
 
     const scaledAmount = Number(transferRequest.amount) * 10 ** transferRequest.asset.decimals;
     const transfer: TransferTransactionUnsigned = {
-      fromAddress: currentWallet.address,
+      fromAddress: currentSession.wallet.address,
       toAddress: transferRequest.toAddress,
       amount: String(scaledAmount),
       memo: transferRequest.memo,
@@ -60,7 +60,9 @@ class WalletService {
       transfer,
       transferRequest.decryptedPhrase,
     );
-    return nodeRpc.broadcastTransaction(signedTxHex);
+    const transactionHash = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.syncData(currentSession);
+    return transactionHash;
   }
 
   public async sendDelegateTransaction(
@@ -124,20 +126,19 @@ class WalletService {
 
   public async prepareTransaction() {
     const currentSession = await this.storageService.retrieveCurrentSession();
-    const currentWallet = currentSession.wallet;
 
-    const nodeRpc = await NodeRpcService.init(currentWallet.config.nodeUrl);
+    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
 
-    const accountNumber = await nodeRpc.fetchAccountNumber(currentWallet.address);
-    const accountSequence = await nodeRpc.loadSequenceNumber(currentWallet.address);
+    const accountNumber = await nodeRpc.fetchAccountNumber(currentSession.wallet.address);
+    const accountSequence = await nodeRpc.loadSequenceNumber(currentSession.wallet.address);
 
-    const transactionSigner = new TransactionSigner(currentWallet.config);
+    const transactionSigner = new TransactionSigner(currentSession.wallet.config);
 
     return {
       nodeRpc,
       accountNumber,
       accountSequence,
-      currentWallet,
+      currentSession,
       transactionSigner,
     };
   }
