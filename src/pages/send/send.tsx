@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './send.less';
 import 'antd/dist/antd.css';
-import { Layout, Form, Input, Button } from 'antd';
+import { Button, Form, Input, Layout } from 'antd';
 import { useRecoilValue } from 'recoil';
 
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
