@@ -73,6 +73,7 @@ const FormDepositStake = () => {
       const hash = await walletService.sendTransfer({
         toAddress: formValues.stakingAddress,
         amount: formValues.amount,
+        asset: walletAsset,
         memo,
         decryptedPhrase,
       });
@@ -234,6 +235,7 @@ const FormWithdrawStakingReward = () => {
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const walletAsset = useRecoilValue(walletAssetState);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -270,6 +272,7 @@ const FormWithdrawStakingReward = () => {
       const hash = await walletService.sendTransfer({
         toAddress: formValues.stakingAddress,
         amount: formValues.amount,
+        asset: walletAsset,
         memo,
         decryptedPhrase,
       });
