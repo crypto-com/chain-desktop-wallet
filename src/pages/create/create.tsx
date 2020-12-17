@@ -11,6 +11,8 @@ import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import { Session } from '../../models/Session';
 // import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+// import PasswordFormContainer from '../../components/PasswordForm/PasswordFormContainer';
+import BackButton from '../../components/BackButton/BackButton';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -144,6 +146,7 @@ const FormCreate = () => {
 function CreatePage() {
   return (
     <main className="create-page">
+      <BackButton />
       <div className="header">
         <img src={logo} className="logo" alt="logo" />
       </div>
