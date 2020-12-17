@@ -24,6 +24,15 @@ export interface UserAsset {
   decimals: number;
 }
 
+export const scaledBalance = (asset: UserAsset) => {
+  const baseBalance = Number(asset.balance);
+  if (baseBalance === 0) {
+    return baseBalance;
+  }
+
+  return baseBalance / 10 ** asset.decimals;
+};
+
 export interface AssetMarketPrice {
   price: string;
 
