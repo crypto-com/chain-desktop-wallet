@@ -124,7 +124,7 @@ const FormDepositStake = () => {
       <div className="amount">
         <Form.Item
           name="amount"
-          label="Staking Amount"
+          label="Delegation Amount"
           rules={[
             { required: true, message: 'Staking amount is required' },
             {
