@@ -13,11 +13,11 @@ import RestorePage from './restore/restore';
 import CreatePage from './create/create';
 import BackupPage from './backup/backup';
 import HomePage from './home/home';
-import SendPage from './send/send';
 import ReceivePage from './receive/receive';
 import StakingPage from './staking/staking';
 import SignUpPage from './signup/signup';
 import HomeLayout from '../layouts/home/home';
+import SendPage from './send/send';
 
 interface RouterProps {
   children: React.ReactNode;
