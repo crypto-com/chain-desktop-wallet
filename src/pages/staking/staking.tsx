@@ -11,6 +11,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { walletAssetState } from '../../recoil/atom';
+import { scaledBalance } from '../../models/UserAsset';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -138,7 +139,7 @@ const FormDepositStake = () => {
         </Form.Item>
         <div className="available">
           <span>Available: </span>
-          <div className="available-amount">{walletAsset.balance} CRO</div>
+          <div className="available-amount">{scaledBalance(walletAsset)} CRO</div>
         </div>
       </div>
       <Form.Item {...tailLayout}>
