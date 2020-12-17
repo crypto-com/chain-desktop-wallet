@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
-import { Layout, Form, Input, Button, Tabs, Table } from 'antd';
+import { Layout, Form, Input, Button, Tabs, Table, Space } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilValue } from 'recoil';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
@@ -261,6 +261,7 @@ const FormWithdrawStakingReward = () => {
   const onConfirmTransfer = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
     if (!decryptedPhrase) {
+      setIsVisibleConfirmationModal(false)
       return;
     }
     try {
@@ -303,7 +304,7 @@ const FormWithdrawStakingReward = () => {
 
   const StakingColumns = [
     {
-      title: 'Address',
+      title: 'Validation Address',
       dataIndex: 'address',
       key: 'address',
       render: text => (
@@ -319,9 +320,33 @@ const FormWithdrawStakingReward = () => {
       ),
     },
     {
-      title: 'Amount',
+      title: 'Delegated Amount',
       dataIndex: 'amount',
       key: 'amount',
+    },
+    {
+      title: 'Reward',
+      dataIndex: 'reward',
+      key: 'reward',
+    },
+    {
+      title: 'Action',
+      dataIndex: 'address',
+      key: 'address',
+      render: text => (
+        <Space size="middle">
+          <a
+            onClick={() => {
+              form.setFieldsValue({
+                stakingAddress: text,
+              });
+              form.submit();
+            }}
+          >
+            Withdraw Reward
+          </a>
+        </Space>
+      ),
     },
   ];
 
@@ -330,19 +355,23 @@ const FormWithdrawStakingReward = () => {
       key: '1',
       address: 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj',
       amount: '500, 000',
+      reward: '500',
       tags: ['nice', 'developer'],
     },
     {
       key: '2',
       address: 'tcro1uevms2nv4f2dhvm5u7sgus2yncgh7gdwn6urwe',
       amount: '300, 000',
+      reward: '300',
       tags: ['loser'],
     },
     {
       key: '3',
       address: 'tcro1uvvmzes9kazpkt359exm67qqj384l7c74mjgrr',
       amount: '100, 000',
+      reward: '100',
       tags: ['cool', 'teacher'],
+      
     },
   ];
 
@@ -362,38 +391,30 @@ const FormWithdrawStakingReward = () => {
         onFinish={showPasswordInput}
         requiredMark={false}
       >
-        <Form.Item
-          name="stakingAddress"
-          label="Unbond Staking Address"
-          rules={[{ required: true, message: 'Staking address is required' }]}
-        >
-          <Input disabled placeholder="Click address in the table to fill" />
-        </Form.Item>
 
-        <Form.Item {...tailLayout}>
-          <ModalPopup
+        <ModalPopup
             isModalVisible={isConfirmationModalVisible}
             handleCancel={handleCancel}
             handleOk={onConfirmTransfer}
             confirmationLoading={confirmLoading}
-            button={
-              <Button type="primary" htmlType="submit">
-                Review
-              </Button>
-            }
+            // button={
+            //   <Button type="primary" htmlType="submit">
+            //     Review
+            //   </Button>
+            // }
             okText="Confirm"
           >
             <>
               <div className="title">Confirm Transaction</div>
               <div className="description">Please review the below information. </div>
               <div className="item">
-                <div className="label">Unbond From Address</div>
+                <div className="label">Withdraw Reward From Address</div>
                 <div className="address">{`${formValues?.stakingAddress}`}</div>
               </div>
-              {/* <div className="item">
-              <div className="label">Amount</div>
-              <div>{`${formValues?.amount} CRO`}</div>
-            </div> */}
+              <div className="item">
+              <div className="label">Rewards</div>
+              <div>500 CRO</div>
+            </div>
             </>
           </ModalPopup>
           <PasswordFormModal
@@ -444,7 +465,7 @@ const FormWithdrawStakingReward = () => {
               <div>The staking transaction failed. Please try again later</div>
             </>
           </ErrorModalPopup>
-        </Form.Item>
+
       </Form>
     </div>
   );
@@ -457,19 +478,19 @@ function StakingPage() {
 
       <Content>
         <Tabs defaultActiveKey="1">
-          <TabPane tab="Deposit Stake" key="1">
+          <TabPane tab="Delegate Funds" key="1">
             <div className="site-layout-background stake-content">
               <div className="container">
-                <div className="description">Deposit fund to a staking address.</div>
+                <div className="description">Delegate funds to validator.</div>
                 <FormDepositStake />
               </div>
             </div>
           </TabPane>
-          <TabPane tab="Unbond Stake" key="2">
+          <TabPane tab="Withdraw Rewards" key="2">
             <div className="site-layout-background stake-content">
               <div className="container">
-                <div className="description">Unbond fund from a staking address.</div>
-                <FormUnbondStake />
+                <div className="description">Withdraw rewards from delegated funds.</div>
+                <FormWithdrawStakingReward />
               </div>
             </div>
           </TabPane>
