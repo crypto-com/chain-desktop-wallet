@@ -30,7 +30,6 @@ function HomeLayout(props: HomeLayoutProps) {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [loading, setLoading] = useState(false);
-
   const didMountRef = useRef(false);
 
   useEffect(() => {
@@ -39,7 +38,6 @@ function HomeLayout(props: HomeLayoutProps) {
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
-
       const allWalletsData = await walletService.retrieveAllWallets();
       setHasWallet(hasWalletBeenCreated);
       setSession(sessionData);
@@ -58,7 +56,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   const HomeMenu = () => {
     const locationPath = useLocation().pathname;
-    const paths = ['/home', '/address', '/send', '/receive'];
+    const paths = ['/home', '/staking', '/send', '/receive'];
 
     let menuSelectedKey = locationPath;
     if (!paths.includes(menuSelectedKey)) {
@@ -70,8 +68,8 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/home" icon={<Icon component={IconHome} />}>
           <Link to="/home">Home</Link>
         </Menu.Item>
-        <Menu.Item key="/address" icon={<Icon component={IconAddress} />}>
-          Address
+        <Menu.Item key="/staking" icon={<Icon component={IconAddress} />}>
+          <Link to="/staking">Staking</Link>
         </Menu.Item>
         <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">Send</Link>

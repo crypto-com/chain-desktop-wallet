@@ -3,11 +3,13 @@ import './send.less';
 import 'antd/dist/antd.css';
 import { Layout, Form, Input, Button } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
+import { useRecoilValue } from 'recoil';
 
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import { walletAssetState } from '../../recoil/atom';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 
@@ -19,7 +21,6 @@ const layout = {
 const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
-const availableAmount = '250,000';
 const FormSend = () => {
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({ recipientAddress: '', amount: '', memo: '' });
@@ -30,7 +31,8 @@ const FormSend = () => {
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
-
+  const walletAsset = useRecoilValue(walletAssetState);
+  
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
     setFormValues(form.getFieldsValue());
@@ -128,7 +130,7 @@ const FormSend = () => {
         </Form.Item>
         <div className="available">
           <span>Available: </span>
-          <div className="available-amount">{availableAmount} CRO</div>
+          <div className="available-amount">{walletAsset.balance} CRO</div>
         </div>
       </div>
       <Form.Item name="memo" label="Memo (Optional)">
