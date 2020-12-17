@@ -16,6 +16,8 @@ interface PasswordFormProps {
   onOk: (password: string) => void;
   onErr: (errMsg: string) => void;
   onChange: () => void;
+
+  shouldValidate?: boolean;
 }
 
 const PasswordForm: React.FC<PasswordFormProps> = props => {
@@ -45,11 +47,13 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
           label="App Password"
           rules={[
             { required: true, message: 'Password is required' },
-            {
-              pattern: /^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
-              message:
-                'The password should be at least 8 character containing a letter, a number and a special character',
-            },
+            props.shouldValidate
+              ? {
+                  pattern: /^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
+                  message:
+                    'The password should be at least 8 character containing a letter, a number and a special character',
+                }
+              : {},
           ]}
         >
           <Input.Password placeholder="App password" />
