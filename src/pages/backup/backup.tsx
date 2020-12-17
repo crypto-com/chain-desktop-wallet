@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import './backup.less';
@@ -11,6 +11,8 @@ import { walletService } from '../../service/WalletService';
 import logo from '../../assets/logo-products-chain.svg';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import BackButton from '../../components/BackButton/BackButton';
+import { secretStoreService } from '../../storage/SecretStoreService';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
 function BackupPage() {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -20,8 +22,17 @@ function BackupPage() {
   const walletIdentifier: string = useRecoilValue(walletIdentifierState);
   const didMountRef = useRef(false);
   const history = useHistory();
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
 
   const handleOk = () => {
+    setInputPasswordVisible(true);
+  };
+
+  const onWalletBackupFinish = async (password: string) => {
+    if (!wallet) {
+      return;
+    }
+    await walletService.encryptWalletAndSetSession(password, wallet);
     history.push('/home');
   };
 
@@ -120,6 +131,26 @@ function BackupPage() {
               <div>Please try again.</div>
             </>
           </ErrorModalPopup>
+          <PasswordFormModal
+            description="Input the application password to encrypt the wallet to be restored"
+            okButtonText="Encrypt wallet"
+            onCancel={() => {
+              setInputPasswordVisible(false);
+            }}
+            onSuccess={onWalletBackupFinish}
+            onValidatePassword={async (password: string) => {
+              const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+              return {
+                valid: isValid,
+                errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+              };
+            }}
+            successText="Wallet created and encrypted successfully !"
+            title="Provide application password"
+            visible={inputPasswordVisible}
+            successButtonText="Go to Home"
+            confirmPassword={false}
+          />
         </div>
       </div>
     </main>

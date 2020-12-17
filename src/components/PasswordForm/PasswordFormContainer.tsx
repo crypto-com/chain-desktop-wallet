@@ -95,6 +95,7 @@ const PasswordFormContainer: React.FC<PasswordFormPageProps> = props => {
         onOk={onFormFinish}
         onChange={onFormChange}
         onErr={onFormErr}
+        shouldValidate
       >
         <ResultModalPopup
           isModalVisible={displayComponent === 'result'}
