@@ -43,13 +43,13 @@ const PasswordFormContainer: React.FC<PasswordFormPageProps> = props => {
   const [validationErrMsg, setValidatorErrMsg] = useState<string>();
   const [resultButtonText, setResultButtonText] = useState<string>();
 
-  const onModalFinish = async () => {
+  const onModalFinish = () => {
     if (validationErrMsg !== '') {
       setValidatorErrMsg('');
       setDisplayComponent('form');
       return;
     }
-    await props.onSuccess(appPassword!);
+    props.onSuccess(appPassword!);
     setDisplayComponent('form');
   };
   const onModalCancel = () => {
