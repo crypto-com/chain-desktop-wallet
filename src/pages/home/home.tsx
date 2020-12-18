@@ -79,7 +79,9 @@ function HomePage() {
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
-      const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations();
+      const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
+        sessionData.wallet.identifier,
+      );
 
       const stakingTabularData = allDelegations.map(dlg => {
         const stakedAmount = scaledAmount(dlg.stakedAmount, currentAsset.decimals).toString();

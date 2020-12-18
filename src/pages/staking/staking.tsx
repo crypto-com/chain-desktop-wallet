@@ -275,7 +275,9 @@ const FormWithdrawStakingReward = () => {
     const syncRewardsData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
-      const allRewards: RewardTransaction[] = await walletService.retrieveAllRewards();
+      const allRewards: RewardTransaction[] = await walletService.retrieveAllRewards(
+        sessionData.wallet.identifier,
+      );
 
       const rewardsTabularData = allRewards.map(reward => {
         const rewardData: RewardsTabularData = {

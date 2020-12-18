@@ -8,8 +8,9 @@ import {
   UserAsset,
 } from '../models/UserAsset';
 import {
-  RewardTransaction,
+  RewardTransactionList,
   StakingTransactionData,
+  StakingTransactionList,
   TransferTransactionData,
 } from '../models/Transaction';
 
@@ -94,21 +95,21 @@ export class StorageService {
     );
   }
 
-  public async saveStakingTransactions(stakingTransactions: Array<StakingTransactionData>) {
-    await this.db.stakingStore.remove({}, { multi: true });
+  public async saveStakingTransactions(stakingTransactions: StakingTransactionList) {
+    await this.db.stakingStore.remove({ walletId: stakingTransactions.walletId }, { multi: true });
     return this.db.stakingStore.insert(stakingTransactions);
   }
 
-  public async saveRewardList(rewardTransactions: Array<RewardTransaction>) {
-    await this.db.rewardStore.remove({}, { multi: true });
+  public async saveRewardList(rewardTransactions: RewardTransactionList) {
+    await this.db.rewardStore.remove({ walletId: rewardTransactions.walletId }, { multi: true });
     return this.db.rewardStore.insert(rewardTransactions);
   }
 
-  public async retrieveAllStakingTransactions() {
-    return this.db.stakingStore.find<StakingTransactionData>({});
+  public async retrieveAllStakingTransactions(walletId: string) {
+    return this.db.stakingStore.findOne<StakingTransactionList>({ walletId });
   }
 
-  public async retrieveAllRewards() {
-    return this.db.rewardStore.find<RewardTransaction>({});
+  public async retrieveAllRewards(walletId: string) {
+    return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
   }
 }

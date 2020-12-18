@@ -21,7 +21,12 @@ import { cryptographer } from '../crypto/Cryptographer';
 import { secretStoreService } from '../storage/SecretStoreService';
 import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
-import { RewardTransaction, StakingTransactionData } from '../models/Transaction';
+import {
+  RewardTransaction,
+  RewardTransactionList,
+  StakingTransactionData,
+  StakingTransactionList,
+} from '../models/Transaction';
 
 export interface TransferRequest {
   toAddress: string;
@@ -246,15 +251,21 @@ class WalletService {
     await Promise.all(
       assets.map(async asset => {
         const baseDenomination = currentSession.wallet.config.network.coin.baseDenom;
-        asset.balance = await nodeRpc.loadAccountBalance(
-          currentSession.wallet.address,
-          baseDenomination,
-        );
-        asset.stakedBalance = await nodeRpc.loadStakingBalance(
-          currentSession.wallet.address,
-          baseDenomination,
-        );
-        await this.storageService.saveAsset(asset);
+        try {
+          asset.balance = await nodeRpc.loadAccountBalance(
+            currentSession.wallet.address,
+            baseDenomination,
+          );
+          asset.stakedBalance = await nodeRpc.loadStakingBalance(
+            currentSession.wallet.address,
+            baseDenomination,
+          );
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.log('BALANCE_FETCH_ERROR', { asset });
+        } finally {
+          await this.storageService.saveAsset(asset);
+        }
       }),
     );
   }
@@ -269,7 +280,7 @@ class WalletService {
     const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
     const baseDenomination = currentSession.wallet.config.network.coin.baseDenom;
 
-    const delegations = await nodeRpc.loadDelegations(
+    const delegations = await nodeRpc.fetchDelegationBalance(
       currentSession.wallet.address,
       baseDenomination,
     );
@@ -279,8 +290,18 @@ class WalletService {
       baseDenomination,
     );
 
-    await this.saveDelegationsList(delegations);
-    await this.saveRewards(rewards);
+    const walletId = currentSession.wallet.identifier;
+
+    await this.saveDelegationsList({
+      totalBalance: delegations.totalBalance,
+      transactions: delegations.transactions,
+      walletId,
+    });
+
+    await this.saveRewards({
+      transactions: rewards,
+      walletId,
+    });
   }
 
   public async retrieveCurrentWalletAssets(currentSession: Session): Promise<UserAsset[]> {
@@ -372,25 +393,29 @@ class WalletService {
     return this.storageService.retrieveCurrentSession();
   }
 
-  public async saveDelegationsList(stakingTransactionList: Array<StakingTransactionData>) {
-    return this.storageService.saveStakingTransactions(stakingTransactionList);
+  public async saveDelegationsList(stakingTransactions: StakingTransactionList) {
+    return this.storageService.saveStakingTransactions(stakingTransactions);
   }
 
-  public async saveRewards(rewards: Array<RewardTransaction>) {
-    return this.storageService.saveRewardList(rewards);
+  public async saveRewards(rewardTransactions: RewardTransactionList) {
+    return this.storageService.saveRewardList(rewardTransactions);
   }
 
-  public async retrieveAllDelegations(): Promise<StakingTransactionData[]> {
-    const transactions = await this.storageService.retrieveAllStakingTransactions();
-    return transactions.map(data => {
+  public async retrieveAllDelegations(walletId: string): Promise<StakingTransactionData[]> {
+    const stakingTransactionList: StakingTransactionList = await this.storageService.retrieveAllStakingTransactions(
+      walletId,
+    );
+    return stakingTransactionList.transactions.map(data => {
       const stakingTransaction: StakingTransactionData = { ...data };
       return stakingTransaction;
     });
   }
 
-  public async retrieveAllRewards(): Promise<RewardTransaction[]> {
-    const rewards = await this.storageService.retrieveAllRewards();
-    return rewards.map(data => {
+  public async retrieveAllRewards(walletId: string): Promise<RewardTransaction[]> {
+    const rewardTransactionList: RewardTransactionList = await this.storageService.retrieveAllRewards(
+      walletId,
+    );
+    return rewardTransactionList.transactions.map(data => {
       const rewardTransaction: RewardTransaction = { ...data };
       return rewardTransaction;
     });
