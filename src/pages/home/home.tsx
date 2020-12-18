@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Layout, Space, Table, Tabs } from 'antd';
+import { Layout, Table, Tabs } from 'antd';
 import { useRecoilState } from 'recoil';
-import { scaledBalance, scaledStakingBalance } from '../../models/UserAsset';
+import { scaledAmount, scaledBalance, scaledStakingBalance } from '../../models/UserAsset';
 import { walletAssetState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
+import { StakingTransactionData } from '../../models/Transaction';
 
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 
@@ -67,60 +68,74 @@ const StakingColumns = [
     key: 'index',
   },
   {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
+    title: 'Validator Address',
+    dataIndex: 'validatorAddress',
+    key: 'validatorAddress',
     render: text => <a>{text}</a>,
   },
   {
     title: 'Amount',
-    dataIndex: 'amount',
-    key: 'amount',
+    dataIndex: 'stakedAmount',
+    key: 'stakedAmount',
   },
   {
-    title: 'Action',
-    key: 'action',
-    render: () => (
-      <Space size="middle">
-        <a>Deposit Stake</a>
-        <a>Unbond Stake</a>
-      </Space>
-    ),
+    title: 'Delegator Address',
+    dataIndex: 'delegatorAddress',
+    key: 'delegatorAddress',
+    render: text => <a>{text}</a>,
   },
 ];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const StakingData = [
   {
-    key: '1',
     index: '1',
-    address: 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj',
+    validatorAddress: 'tcrocncl1nrztwwgrgjg4gtctgul80menh7p04n4vzy5dk3',
+    delegatorAddress: 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj',
     amount: '500, 000',
-    tags: ['nice', 'developer'],
   },
   {
-    key: '2',
     index: '2',
-    address: 'tcro1uevms2nv4f2dhvm5u7sgus2yncgh7gdwn6urwe',
+    validatorAddress: 'tcrocncl1ksc47uta0223khljsjzgtvzj8gfmkexy6r42k9',
+    delegatorAddress: 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj',
     amount: '300, 000',
-    tags: ['loser'],
   },
   {
-    key: '3',
     index: '3',
-    address: 'tcro1uvvmzes9kazpkt359exm67qqj384l7c74mjgrr',
+    validatorAddress: 'tcrocncl1nrztwwgrgjg4gtctgul80menh7p04n4vzy5dk3',
+    delegatorAddress: 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj',
     amount: '100, 000',
-    tags: ['cool', 'teacher'],
   },
 ];
+
+interface StakingTabularData {
+  key: string;
+  stakedAmount: string;
+  validatorAddress: string;
+  delegatorAddress: string;
+}
 
 function HomePage() {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
 
   useEffect(() => {
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+      const loadedDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations();
 
+      const stakingTabularData = loadedDelegations.map(dlg => {
+        const stakedAmount = scaledAmount(dlg.stakedAmount, currentAsset.decimals).toString();
+        const data: StakingTabularData = {
+          key: dlg.validatorAddress + dlg.stakedAmount,
+          delegatorAddress: dlg.delegatorAddress,
+          validatorAddress: dlg.validatorAddress,
+          stakedAmount: `${stakedAmount}  ${currentAsset.symbol}`,
+        };
+        return data;
+      });
+      setDelegations(stakingTabularData);
       setUserAsset(currentAsset);
     };
 
@@ -149,8 +164,8 @@ function HomePage() {
           <TabPane tab="Transactions" key="1">
             <Table columns={TransactionColumns} dataSource={TransactionData} />
           </TabPane>
-          <TabPane tab="Staking" key="2">
-            <Table columns={StakingColumns} dataSource={StakingData} />
+          <TabPane tab="Delegations" key="2">
+            <Table columns={StakingColumns} dataSource={delegations} />
           </TabPane>
         </Tabs>
       </Content>

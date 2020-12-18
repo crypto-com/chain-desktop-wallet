@@ -105,7 +105,7 @@ export class StorageService {
   }
 
   public async retrieveAllStakingTransactions() {
-    return this.db.transferStore.find<StakingTransactionData>({});
+    return this.db.stakingStore.find<StakingTransactionData>({});
   }
 
   public async retrieveAllRewards() {
