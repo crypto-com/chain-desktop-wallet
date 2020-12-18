@@ -10,8 +10,8 @@ class BackgroundTask {
   public runJobs() {
     setInterval(async () => {
       try {
-        await walletService.loadAndSaveAssetPrices();
-        await walletService.fetchAndUpdateBalances();
+        await walletService.syncData();
+        await walletService.syncTransactionsData();
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error(`Error while running background task: ${e}`);

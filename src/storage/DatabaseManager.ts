@@ -17,6 +17,8 @@ export class DatabaseManager {
 
   public readonly stakingStore: Datastore;
 
+  public readonly rewardStore: Datastore;
+
   public readonly seedStore: Datastore;
 
   public readonly credentialStore: Datastore;
@@ -28,6 +30,7 @@ export class DatabaseManager {
     this.marketPriceStore = getStore(namespace, 'markets-prices');
     this.transferStore = getStore(namespace, 'transfers');
     this.stakingStore = getStore(namespace, 'staking');
+    this.rewardStore = getStore(namespace, 'rewards');
     this.credentialStore = getStore(namespace, 'credential');
     this.seedStore = getStore(namespace, 'seeds');
   }

@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Wallet } from '../models/Wallet';
 import { DatabaseManager } from './DatabaseManager';
 import { Session } from '../models/Session';
@@ -8,7 +7,11 @@ import {
   getAssetPriceIdFrom,
   UserAsset,
 } from '../models/UserAsset';
-import { StakingTransactionData, TransferTransactionData } from '../models/Transaction';
+import {
+  RewardTransaction,
+  StakingTransactionData,
+  TransferTransactionData,
+} from '../models/Transaction';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -91,7 +94,21 @@ export class StorageService {
     );
   }
 
+  public async saveStakingTransactions(stakingTransactions: Array<StakingTransactionData>) {
+    await this.db.stakingStore.remove({}, { multi: true });
+    return this.db.stakingStore.insert(stakingTransactions);
+  }
+
+  public async saveRewardList(rewardTransactions: Array<RewardTransaction>) {
+    await this.db.rewardStore.remove({}, { multi: true });
+    return this.db.rewardStore.insert(rewardTransactions);
+  }
+
   public async retrieveAllStakingTransactions() {
     return this.db.transferStore.find<StakingTransactionData>({});
+  }
+
+  public async retrieveAllRewards() {
+    return this.db.rewardStore.find<RewardTransaction>({});
   }
 }

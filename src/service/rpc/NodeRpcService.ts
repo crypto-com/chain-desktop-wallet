@@ -3,7 +3,13 @@ import { IndexedTx } from '@cosmjs/stargate/types/stargateclient';
 import axios, { AxiosInstance } from 'axios';
 import { Bytes } from '../types/ChainJsLib';
 import { CosmosPorts } from '../../config/StaticConfig';
-import { DelegationResult } from './NodeRpcModels';
+import { DelegationResult, RewardResponse } from './NodeRpcModels';
+import {
+  RewardTransaction,
+  StakingTransactionData,
+  StakingTransactionList,
+  TransactionStatus,
+} from '../../models/Transaction';
 
 export interface INodeRpcService {
   loadAccountBalance(address: string, assetDenom: string): Promise<string>;
@@ -19,7 +25,7 @@ export interface INodeRpcService {
 
   // loadAllTransferTxs(address: string): Promise<TransactionList>;
 
-  fetchDelegationBalance(address: string, assetSymbol: string): Promise<string>;
+  fetchDelegationBalance(address: string, assetSymbol: string): Promise<StakingTransactionList>;
 }
 
 export interface BroadcastResponse {
@@ -81,18 +87,71 @@ export class NodeRpcService implements INodeRpcService {
     return txs[0];
   }
 
-  public async fetchDelegationBalance(address: string, assetSymbol: string): Promise<string> {
+  public async fetchDelegationBalance(
+    address: string,
+    assetSymbol: string,
+  ): Promise<StakingTransactionList> {
     const response = await this.proxyClient.get<DelegationResult>(
       `/cosmos/staking/v1beta1/delegations/${address}`,
     );
     const delegationResponses = response.data.delegation_responses;
     let totalSum = 0;
+    const delegationTransactionList: Array<StakingTransactionData> = [];
     delegationResponses
       .filter(delegation => delegation.balance.denom === assetSymbol)
       .forEach(delegation => {
         totalSum += Number(delegation.balance.amount);
+        delegationTransactionList.push({
+          assetSymbol: delegation.balance.denom.toString().toUpperCase(),
+          date: '',
+          delegatorAddress: delegation.delegation.delegator_address,
+          hash: '',
+          memo: '',
+          stakedAmount: delegation.balance.amount,
+          status: TransactionStatus.SUCCESS,
+          validatorAddress: delegation.delegation.validator_address,
+        });
       });
 
-    return String(totalSum);
+    return { totalBalance: String(totalSum), transactions: delegationTransactionList };
+  }
+
+  public async fetchStakingRewards(
+    address: string,
+    assetSymbol: string,
+  ): Promise<Array<RewardTransaction>> {
+    const response = await this.proxyClient.get<RewardResponse>(
+      `cosmos/distribution/v1beta1/delegators/${address}/rewards`,
+    );
+    const { rewards } = response.data;
+    const rewardList: Array<RewardTransaction> = [];
+    rewards.forEach(stakingReward => {
+      let localRewardSum = 0;
+      stakingReward.reward.forEach(rw => {
+        if (rw.denom === assetSymbol) {
+          localRewardSum += Number(rw.amount);
+        }
+      });
+      rewardList.push({
+        amount: String(localRewardSum),
+        delegatorAddress: address,
+        validatorAddress: stakingReward.validator_address,
+      });
+    });
+
+    return rewardList;
+  }
+
+  public async loadStakingBalance(address: string, assetSymbol: string): Promise<string> {
+    const delegationList = await this.fetchDelegationBalance(address, assetSymbol);
+    return delegationList.totalBalance;
+  }
+
+  public async loadDelegations(
+    address: string,
+    assetSymbol: string,
+  ): Promise<Array<StakingTransactionData>> {
+    const delegationList = await this.fetchDelegationBalance(address, assetSymbol);
+    return delegationList.transactions;
   }
 }
