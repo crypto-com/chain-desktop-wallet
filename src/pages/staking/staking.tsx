@@ -511,19 +511,19 @@ function StakingPage() {
 
       <Content>
         <Tabs defaultActiveKey="1">
-          <TabPane tab="Delegate Funds" key="1">
-            <div className="site-layout-background stake-content">
-              <div className="container">
-                <div className="description">Delegate funds to validator.</div>
-                <FormDelegationRequest />
-              </div>
-            </div>
-          </TabPane>
-          <TabPane tab="Withdraw Rewards" key="2">
+          <TabPane tab="Staking Rewards" key="1">
             <div className="site-layout-background stake-content">
               <div className="container">
                 <div className="description">Withdraw rewards from delegated funds.</div>
                 <FormWithdrawStakingReward />
+              </div>
+            </div>
+          </TabPane>
+          <TabPane tab="Delegate Funds" key="2">
+            <div className="site-layout-background stake-content">
+              <div className="container">
+                <div className="description">Delegate funds to validator.</div>
+                <FormDelegationRequest />
               </div>
             </div>
           </TabPane>
