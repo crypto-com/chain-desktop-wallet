@@ -23,6 +23,7 @@ const FormRestore = () => {
   const history = useHistory();
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
 
   // const showSuccessModal = () => {
   //   setIsSuccessModalVisible(true);
@@ -49,6 +50,7 @@ const FormRestore = () => {
   };
 
   const onWalletImportFinish = async (password: string) => {
+    setIsButtonLoading(true);
     const { name, mnemonic, network } = form.getFieldsValue();
     if (!name || !mnemonic || !network) {
       return;
@@ -126,6 +128,7 @@ const FormRestore = () => {
         <PasswordFormModal
           description="Input the application password to encrypt the wallet to be restored"
           okButtonText="Encrypt wallet"
+          isButtonLoading={isButtonLoading}
           onCancel={() => {
             setInputPasswordVisible(false);
           }}
