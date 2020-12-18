@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, Layout, Space, Table, Tabs } from 'antd';
@@ -266,6 +266,7 @@ const FormWithdrawStakingReward = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const walletAsset = useRecoilValue(walletAssetState);
+  const didMountRef = useRef(false);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
@@ -290,7 +291,10 @@ const FormWithdrawStakingReward = () => {
       setRewards(rewardsTabularData);
     };
 
-    syncRewardsData();
+    if (!didMountRef.current) {
+      syncRewardsData();
+      didMountRef.current = true;
+    }
   }, [rewards]);
 
   const showConfirmationModal = () => {

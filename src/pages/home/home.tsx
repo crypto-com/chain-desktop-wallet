@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Layout, Table, Tabs } from 'antd';
@@ -96,6 +96,7 @@ interface StakingTabularData {
 function HomePage() {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
+  const didMountRef = useRef(false);
 
   useEffect(() => {
     const syncAssetData = async () => {
@@ -117,8 +118,11 @@ function HomePage() {
       setUserAsset(currentAsset);
     };
 
-    syncAssetData();
-  }, [setUserAsset, delegations]);
+    if (!didMountRef.current) {
+      syncAssetData();
+      didMountRef.current = true;
+    }
+  }, [delegations, setUserAsset]);
 
   return (
     <Layout className="site-layout">
