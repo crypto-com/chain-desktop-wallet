@@ -249,6 +249,10 @@ class WalletService {
           currentSession.wallet.address,
           baseDenomination,
         );
+        asset.stakedBalance = await nodeRpc.fetchDelegationBalance(
+          currentSession.wallet.address,
+          baseDenomination,
+        );
         await this.storageService.saveAsset(asset);
       }),
     );

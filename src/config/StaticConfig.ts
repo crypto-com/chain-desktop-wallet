@@ -3,6 +3,11 @@ import { getRandomId } from '../crypto/RandomGen';
 
 export const APP_DB_NAMESPACE = 'data-store';
 
+export const CosmosPorts = {
+  Main: ':26657',
+  Proxy: ':1317',
+};
+
 export type WalletConfig = {
   enabled: boolean;
   name: string;
@@ -15,7 +20,7 @@ const TestNetConfig: WalletConfig = {
   enabled: true,
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",
-  nodeUrl: 'https://testnet-croeseid-1.crypto.com:26657',
+  nodeUrl: 'https://testnet-croeseid-1.crypto.com',
   network: CroNetwork.Testnet,
 };
 

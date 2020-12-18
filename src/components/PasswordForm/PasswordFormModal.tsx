@@ -24,6 +24,8 @@ interface PasswordFormModalProps {
   // Button text on password is validated
   successButtonText?: string;
 
+  isButtonLoading?: boolean;
+
   // TODO: use secure-string
   onValidatePassword: (
     password: string,
@@ -80,10 +82,16 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
       className="password-form-modal"
       title={props.title}
       visible={props.visible}
+      confirmLoading={props.isButtonLoading}
       footer={
         displayComponent === 'result' && (
           <div style={{ textAlign: 'center' }}>
-            <Button key="submit" type="primary" onClick={onModalFinish}>
+            <Button
+              key="submit"
+              type="primary"
+              onClick={onModalFinish}
+              loading={props.isButtonLoading}
+            >
               {resultButtonText}
             </Button>
           </div>
