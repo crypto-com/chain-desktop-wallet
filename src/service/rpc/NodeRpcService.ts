@@ -1,6 +1,9 @@
 import { StargateClient } from '@cosmjs/stargate';
 import { IndexedTx } from '@cosmjs/stargate/types/stargateclient';
+import axios, { AxiosInstance } from 'axios';
 import { Bytes } from '../types/ChainJsLib';
+import { CosmosPorts } from '../../config/StaticConfig';
+import { DelegationResult } from './NodeRpcModels';
 
 export interface INodeRpcService {
   loadAccountBalance(address: string, assetDenom: string): Promise<string>;
@@ -13,6 +16,10 @@ export interface INodeRpcService {
   broadcastTransaction(signedTxHex: string): Promise<string>;
 
   getTransactionByHash(transactionHash: string): Promise<IndexedTx>;
+
+  // loadAllTransferTxs(address: string): Promise<TransactionList>;
+
+  fetchDelegationBalance(address: string, assetSymbol: string): Promise<string>;
 }
 
 export interface BroadcastResponse {
@@ -24,15 +31,21 @@ export interface BroadcastResponse {
 }
 
 export class NodeRpcService implements INodeRpcService {
-  public readonly client: StargateClient;
+  private readonly client: StargateClient;
 
-  private constructor(client: StargateClient) {
+  private readonly proxyClient: AxiosInstance; // :1317 port
+
+  private constructor(client: StargateClient, proxyClient: AxiosInstance) {
     this.client = client;
+    this.proxyClient = proxyClient;
   }
 
   public static async init(baseUrl: string) {
-    const client = await StargateClient.connect(baseUrl);
-    return new NodeRpcService(client);
+    const client = await StargateClient.connect(baseUrl + CosmosPorts.Main);
+    const proxyClient = axios.create({
+      baseURL: baseUrl + CosmosPorts.Proxy,
+    });
+    return new NodeRpcService(client, proxyClient);
   }
 
   public async loadAccountBalance(address: string, assetDenom: string): Promise<string> {
@@ -66,5 +79,20 @@ export class NodeRpcService implements INodeRpcService {
   public async getTransactionByHash(transactionHash: string): Promise<IndexedTx> {
     const txs: readonly IndexedTx[] = await this.client.searchTx({ id: transactionHash });
     return txs[0];
+  }
+
+  public async fetchDelegationBalance(address: string, assetSymbol: string): Promise<string> {
+    const response = await this.proxyClient.get<DelegationResult>(
+      `/cosmos/staking/v1beta1/delegations/${address}`,
+    );
+    const delegationResponses = response.data.delegation_responses;
+    let totalSum = 0;
+    delegationResponses
+      .filter(delegation => delegation.balance.denom === assetSymbol)
+      .forEach(delegation => {
+        totalSum += Number(delegation.balance.amount);
+      });
+
+    return String(totalSum);
   }
 }

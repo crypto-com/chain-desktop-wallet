@@ -23,3 +23,5 @@ export interface StakingTransactionData extends TransactionData {
   validatorAddress: string;
   stakedAmount: string;
 }
+
+export interface Reward {}
