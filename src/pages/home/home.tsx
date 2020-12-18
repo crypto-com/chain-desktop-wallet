@@ -86,28 +86,6 @@ const StakingColumns = [
   },
 ];
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const StakingData = [
-  {
-    index: '1',
-    validatorAddress: 'tcrocncl1nrztwwgrgjg4gtctgul80menh7p04n4vzy5dk3',
-    delegatorAddress: 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj',
-    amount: '500, 000',
-  },
-  {
-    index: '2',
-    validatorAddress: 'tcrocncl1ksc47uta0223khljsjzgtvzj8gfmkexy6r42k9',
-    delegatorAddress: 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj',
-    amount: '300, 000',
-  },
-  {
-    index: '3',
-    validatorAddress: 'tcrocncl1nrztwwgrgjg4gtctgul80menh7p04n4vzy5dk3',
-    delegatorAddress: 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj',
-    amount: '100, 000',
-  },
-];
-
 interface StakingTabularData {
   key: string;
   stakedAmount: string;
@@ -123,9 +101,9 @@ function HomePage() {
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
-      const loadedDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations();
+      const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations();
 
-      const stakingTabularData = loadedDelegations.map(dlg => {
+      const stakingTabularData = allDelegations.map(dlg => {
         const stakedAmount = scaledAmount(dlg.stakedAmount, currentAsset.decimals).toString();
         const data: StakingTabularData = {
           key: dlg.validatorAddress + dlg.stakedAmount,
@@ -140,7 +118,7 @@ function HomePage() {
     };
 
     syncAssetData();
-  }, [setUserAsset]);
+  }, [setUserAsset, delegations]);
 
   return (
     <Layout className="site-layout">
