@@ -223,7 +223,7 @@ const FormDelegationRequest = () => {
           ]}
         >
           <>
-            <div>Your transfer was successful!</div>
+            <div>Your delegation transaction was successful!</div>
             <div>{transactionHash}</div>
           </>
         </SuccessModalPopup>
