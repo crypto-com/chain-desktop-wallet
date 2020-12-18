@@ -30,6 +30,14 @@ export interface TransferRequest {
   asset: UserAsset;
 }
 
+export interface DelegationRequest {
+  validatorAddress: string;
+  amount: string;
+  memo: string;
+  asset: UserAsset;
+  decryptedPhrase: string;
+}
+
 class WalletService {
   private readonly storageService: StorageService;
 
@@ -46,7 +54,8 @@ class WalletService {
       transactionSigner,
     } = await this.prepareTransaction();
 
-    const scaledAmount = Number(transferRequest.amount) * 10 ** transferRequest.asset.decimals;
+    const scaledAmount = this.getScaledAmount(transferRequest.amount, transferRequest.asset);
+
     const transfer: TransferTransactionUnsigned = {
       fromAddress: currentSession.wallet.address,
       toAddress: transferRequest.toAddress,
@@ -65,34 +74,40 @@ class WalletService {
     return transactionHash;
   }
 
-  public async sendDelegateTransaction(
-    delegatorAddress: string,
-    validatorAddress: string,
-    amount: string,
-    memo: string,
-    decryptedPhrase: string,
-  ) {
+  // eslint-disable-next-line class-methods-use-this
+  private getScaledAmount(amount: string, asset: UserAsset): number {
+    return Number(amount) * 10 ** asset.decimals;
+  }
+
+  public async sendDelegateTransaction(delegationRequest: DelegationRequest) {
     const {
       nodeRpc,
       accountNumber,
       accountSequence,
+      currentSession,
       transactionSigner,
     } = await this.prepareTransaction();
 
+    const delegationAmountScaled = this.getScaledAmount(
+      delegationRequest.amount,
+      delegationRequest.asset,
+    );
     const delegateTransaction: DelegateTransactionUnsigned = {
-      delegatorAddress,
-      validatorAddress,
-      amount,
-      memo,
+      delegatorAddress: currentSession.wallet.address,
+      validatorAddress: delegationRequest.validatorAddress,
+      amount: String(delegationAmountScaled),
+      memo: delegationRequest.memo,
       accountNumber,
       accountSequence,
     };
 
     const signedTxHex = await transactionSigner.signDelegateTx(
       delegateTransaction,
-      decryptedPhrase,
+      delegationRequest.decryptedPhrase,
     );
-    return nodeRpc.broadcastTransaction(signedTxHex);
+    const transactionHash = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.syncData(currentSession);
+    return transactionHash;
   }
 
   public async sendStakingRewardWithdrawalTx(

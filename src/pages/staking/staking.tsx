@@ -23,13 +23,12 @@ const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
 
-const FormDepositStake = () => {
+const FormDelegationRequest = () => {
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({
-    stakingAddress: '',
+    validatorAddress: '',
     amount: '',
     memo: '',
-    decryptedPhrase: '',
   });
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
@@ -63,16 +62,15 @@ const FormDepositStake = () => {
     showConfirmationModal();
   };
 
-  const onConfirmTransfer = async () => {
+  const onConfirmDelegation = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
     if (!decryptedPhrase) {
       return;
     }
     try {
       setConfirmLoading(true);
-      // TODO: walletService.depositStaking
-      const hash = await walletService.sendTransfer({
-        toAddress: formValues.stakingAddress,
+      const hash = await walletService.sendDelegateTransaction({
+        validatorAddress: formValues.validatorAddress,
         amount: formValues.amount,
         asset: walletAsset,
         memo,
@@ -119,7 +117,18 @@ const FormDepositStake = () => {
       <Form.Item
         name="validatorAddress"
         label="Validator address"
-        rules={[{ required: true, message: 'Validator address is required' }]}
+        rules={[
+          { required: true, message: 'Validator address is required' },
+          {
+            pattern: RegExp(
+              `^(${walletAsset.symbol
+                .toString()
+                .toLocaleLowerCase()}cncl)[a-zA-HJ-NP-Z0-9]{20,150}$`,
+              'i',
+            ),
+            message: `The address provided is not a correct validator address`,
+          },
+        ]}
       >
         <Input placeholder="tcro..." />
       </Form.Item>
@@ -142,11 +151,14 @@ const FormDepositStake = () => {
           <div className="available-amount">{scaledBalance(walletAsset)} CRO</div>
         </div>
       </div>
+      <Form.Item name="memo" label="Memo (Optional)">
+        <Input />
+      </Form.Item>
       <Form.Item {...tailLayout}>
         <ModalPopup
           isModalVisible={isConfirmationModalVisible}
           handleCancel={handleCancel}
-          handleOk={onConfirmTransfer}
+          handleOk={onConfirmDelegation}
           confirmationLoading={confirmLoading}
           button={
             <Button type="primary" htmlType="submit">
@@ -160,12 +172,22 @@ const FormDepositStake = () => {
             <div className="description">Please review the below information. </div>
             <div className="item">
               <div className="label">Delegating to Validator</div>
-              <div className="address">{`${formValues?.stakingAddress}`}</div>
+              <div className="address">{`${formValues?.validatorAddress}`}</div>
             </div>
             <div className="item">
               <div className="label">Amount</div>
               <div>{`${formValues?.amount} CRO`}</div>
             </div>
+            {formValues?.memo !== undefined &&
+            formValues?.memo !== null &&
+            formValues.memo !== '' ? (
+              <div className="item">
+                <div className="label">Memo</div>
+                <div>{`${formValues?.memo}`}</div>
+              </div>
+            ) : (
+              <div />
+            )}
           </>
         </ModalPopup>
         <PasswordFormModal
@@ -483,7 +505,7 @@ function StakingPage() {
             <div className="site-layout-background stake-content">
               <div className="container">
                 <div className="description">Delegate funds to validator.</div>
-                <FormDepositStake />
+                <FormDelegationRequest />
               </div>
             </div>
           </TabPane>
