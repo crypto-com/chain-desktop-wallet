@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Layout, Table, Tabs } from 'antd';
@@ -61,31 +61,6 @@ const TransactionData = [
   },
 ];
 
-const StakingColumns = [
-  {
-    title: 'Index',
-    dataIndex: 'index',
-    key: 'index',
-  },
-  {
-    title: 'Validator Address',
-    dataIndex: 'validatorAddress',
-    key: 'validatorAddress',
-    render: text => <a>{text}</a>,
-  },
-  {
-    title: 'Amount',
-    dataIndex: 'stakedAmount',
-    key: 'stakedAmount',
-  },
-  {
-    title: 'Delegator Address',
-    dataIndex: 'delegatorAddress',
-    key: 'delegatorAddress',
-    render: text => <a>{text}</a>,
-  },
-];
-
 interface StakingTabularData {
   key: string;
   stakedAmount: string;
@@ -96,9 +71,10 @@ interface StakingTabularData {
 function HomePage() {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
-  const didMountRef = useRef(false);
 
   useEffect(() => {
+    let unmounted = false;
+
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
@@ -114,15 +90,43 @@ function HomePage() {
         };
         return data;
       });
-      setDelegations(stakingTabularData);
-      setUserAsset(currentAsset);
+
+      if (!unmounted) {
+        setDelegations(stakingTabularData);
+        setUserAsset(currentAsset);
+      }
     };
 
-    if (!didMountRef.current) {
-      syncAssetData();
-      didMountRef.current = true;
-    }
+    syncAssetData();
+    return () => {
+      unmounted = true;
+    };
   }, [delegations, setUserAsset]);
+
+  const StakingColumns = [
+    {
+      title: 'Index',
+      dataIndex: 'index',
+      key: 'index',
+    },
+    {
+      title: 'Validator Address',
+      dataIndex: 'validatorAddress',
+      key: 'validatorAddress',
+      render: text => <a>{text}</a>,
+    },
+    {
+      title: 'Amount',
+      dataIndex: 'stakedAmount',
+      key: 'stakedAmount',
+    },
+    {
+      title: 'Delegator Address',
+      dataIndex: 'delegatorAddress',
+      key: 'delegatorAddress',
+      render: text => <a>{text}</a>,
+    },
+  ];
 
   return (
     <Layout className="site-layout">
