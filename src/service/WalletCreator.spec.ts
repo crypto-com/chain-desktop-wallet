@@ -41,6 +41,7 @@ describe('Testing Wallet Creation', () => {
 
   it('Test creating wallet from custom configurations ', () => {
     const customConfig: WalletConfig = {
+      enabled: false,
       derivationPath: "44'/245'/0'/0/0",
       name: 'Pystaport-Custom-Network',
       network: {

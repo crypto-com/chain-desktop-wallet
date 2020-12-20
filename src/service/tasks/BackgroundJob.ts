@@ -10,8 +10,8 @@ class BackgroundTask {
   public runJobs() {
     setInterval(async () => {
       try {
-        await walletService.loadAndSaveAssetPrices();
-        await walletService.fetchAndUpdateBalances();
+        await walletService.syncData();
+        await walletService.syncTransactionsData();
       } catch (e) {
         // eslint-disable-next-line no-console
         console.error(`Error while running background task: ${e}`);
@@ -20,5 +20,5 @@ class BackgroundTask {
   }
 }
 
-const interval = 20_000; // 20 seconds
+const interval = 30_000; // 30 seconds
 export const task = new BackgroundTask(interval);

@@ -1,11 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Layout, Space, Table, Tabs } from 'antd';
+import { Layout, Table, Tabs } from 'antd';
 import { useRecoilState } from 'recoil';
-import { scaledBalance, scaledStakingBalance } from '../../models/UserAsset';
+import { scaledAmount, scaledBalance, scaledStakingBalance } from '../../models/UserAsset';
 import { walletAssetState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
+import { StakingTransactionData } from '../../models/Transaction';
 
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 
@@ -60,72 +61,79 @@ const TransactionData = [
   },
 ];
 
-const StakingColumns = [
-  {
-    title: 'Index',
-    dataIndex: 'index',
-    key: 'index',
-  },
-  {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
-    render: text => <a>{text}</a>,
-  },
-  {
-    title: 'Amount',
-    dataIndex: 'amount',
-    key: 'amount',
-  },
-  {
-    title: 'Action',
-    key: 'action',
-    render: () => (
-      <Space size="middle">
-        <a>Deposit Stake</a>
-        <a>Unbond Stake</a>
-      </Space>
-    ),
-  },
-];
-
-const StakingData = [
-  {
-    key: '1',
-    index: '1',
-    address: 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj',
-    amount: '500, 000',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    index: '2',
-    address: 'tcro1uevms2nv4f2dhvm5u7sgus2yncgh7gdwn6urwe',
-    amount: '300, 000',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    index: '3',
-    address: 'tcro1uvvmzes9kazpkt359exm67qqj384l7c74mjgrr',
-    amount: '100, 000',
-    tags: ['cool', 'teacher'],
-  },
-];
+interface StakingTabularData {
+  key: string;
+  stakedAmount: string;
+  validatorAddress: string;
+  delegatorAddress: string;
+}
 
 function HomePage() {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
+  const didMountRef = useRef(false);
 
   useEffect(() => {
+    let unmounted = false;
+
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+      const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
+        sessionData.wallet.identifier,
+      );
 
-      setUserAsset(currentAsset);
+      const stakingTabularData = allDelegations.map(dlg => {
+        const stakedAmount = scaledAmount(dlg.stakedAmount, currentAsset.decimals).toString();
+        const data: StakingTabularData = {
+          key: dlg.validatorAddress + dlg.stakedAmount,
+          delegatorAddress: dlg.delegatorAddress,
+          validatorAddress: dlg.validatorAddress,
+          stakedAmount: `${stakedAmount}  ${currentAsset.symbol}`,
+        };
+        return data;
+      });
+
+      if (!unmounted) {
+        setDelegations(stakingTabularData);
+        setUserAsset(currentAsset);
+      }
     };
 
-    syncAssetData();
-  }, [setUserAsset]);
+    if (!didMountRef.current) {
+      syncAssetData();
+      didMountRef.current = true;
+    }
+
+    return () => {
+      unmounted = true;
+    };
+  }, [delegations, setUserAsset]);
+
+  const StakingColumns = [
+    {
+      title: 'Index',
+      dataIndex: 'index',
+      key: 'index',
+    },
+    {
+      title: 'Validator Address',
+      dataIndex: 'validatorAddress',
+      key: 'validatorAddress',
+      render: text => <a>{text}</a>,
+    },
+    {
+      title: 'Amount',
+      dataIndex: 'stakedAmount',
+      key: 'stakedAmount',
+    },
+    {
+      title: 'Delegator Address',
+      dataIndex: 'delegatorAddress',
+      key: 'delegatorAddress',
+      render: text => <a>{text}</a>,
+    },
+  ];
 
   return (
     <Layout className="site-layout">
@@ -149,8 +157,8 @@ function HomePage() {
           <TabPane tab="Transactions" key="1">
             <Table columns={TransactionColumns} dataSource={TransactionData} />
           </TabPane>
-          <TabPane tab="Staking" key="2">
-            <Table columns={StakingColumns} dataSource={StakingData} />
+          <TabPane tab="Delegations" key="2">
+            <Table columns={StakingColumns} dataSource={delegations} />
           </TabPane>
         </Tabs>
       </Content>

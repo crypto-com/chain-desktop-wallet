@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
-import { Layout, Form, Input, Button, Tabs, Table, Space } from 'antd';
+import { Button, Form, Input, Layout, Space, Table, Tabs } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilValue } from 'recoil';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
@@ -11,7 +11,8 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { walletAssetState } from '../../recoil/atom';
-import { scaledBalance } from '../../models/UserAsset';
+import { scaledAmount, scaledBalance } from '../../models/UserAsset';
+import { RewardTransaction } from '../../models/Transaction';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -22,6 +23,12 @@ const layout = {
 const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
+
+interface RewardsTabularData {
+  key: string;
+  rewardAmount: string;
+  validatorAddress: string;
+}
 
 const FormDelegationRequest = () => {
   const [form] = Form.useForm();
@@ -259,6 +266,38 @@ const FormWithdrawStakingReward = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const walletAsset = useRecoilValue(walletAssetState);
+  const didMountRef = useRef(false);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
+
+  useEffect(() => {
+    const syncRewardsData = async () => {
+      const sessionData = await walletService.retrieveCurrentSession();
+      const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+      const allRewards: RewardTransaction[] = await walletService.retrieveAllRewards(
+        sessionData.wallet.identifier,
+      );
+
+      const rewardsTabularData = allRewards.map(reward => {
+        const rewardData: RewardsTabularData = {
+          key: `${reward.validatorAddress}${reward.amount}`,
+          rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${
+            currentAsset.symbol
+          }`,
+          validatorAddress: reward.validatorAddress,
+        };
+        return rewardData;
+      });
+
+      setRewards(rewardsTabularData);
+    };
+
+    if (!didMountRef.current) {
+      syncRewardsData();
+      didMountRef.current = true;
+    }
+  }, [rewards]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -328,16 +367,16 @@ const FormWithdrawStakingReward = () => {
     setIsErrorTransferModalVisible(false);
   };
 
-  const StakingColumns = [
+  const rewardColumns = [
     {
-      title: 'Validation Address',
-      dataIndex: 'address',
-      key: 'address',
+      title: 'Validator Address',
+      dataIndex: 'validatorAddress',
+      key: 'validatorAddress',
       render: text => (
         <a
           onClick={() => {
             form.setFieldsValue({
-              stakingAddress: text,
+              validatorAddress: text,
             });
           }}
         >
@@ -346,14 +385,9 @@ const FormWithdrawStakingReward = () => {
       ),
     },
     {
-      title: 'Delegated Amount',
-      dataIndex: 'amount',
-      key: 'amount',
-    },
-    {
-      title: 'Reward',
-      dataIndex: 'reward',
-      key: 'reward',
+      title: 'Reward Amount',
+      dataIndex: 'rewardAmount',
+      key: 'rewardAmount',
     },
     {
       title: 'Action',
@@ -364,7 +398,7 @@ const FormWithdrawStakingReward = () => {
           <a
             onClick={() => {
               form.setFieldsValue({
-                stakingAddress: text,
+                validatorAddress: text,
               });
               form.submit();
             }}
@@ -376,32 +410,8 @@ const FormWithdrawStakingReward = () => {
     },
   ];
 
-  const StakingData = [
-    {
-      key: '1',
-      address: 'tcro1reyshfdygf7673xm9p8v0xvtd96m6cd6dzswyj',
-      amount: '500, 000',
-      reward: '500',
-      tags: ['nice', 'developer'],
-    },
-    {
-      key: '2',
-      address: 'tcro1uevms2nv4f2dhvm5u7sgus2yncgh7gdwn6urwe',
-      amount: '300, 000',
-      reward: '300',
-      tags: ['loser'],
-    },
-    {
-      key: '3',
-      address: 'tcro1uvvmzes9kazpkt359exm67qqj384l7c74mjgrr',
-      amount: '100, 000',
-      reward: '100',
-      tags: ['cool', 'teacher'],
-    },
-  ];
-
   const StakingTable = () => {
-    return <Table columns={StakingColumns} dataSource={StakingData} />;
+    return <Table columns={rewardColumns} dataSource={rewards} />;
   };
 
   return (
@@ -501,19 +511,19 @@ function StakingPage() {
 
       <Content>
         <Tabs defaultActiveKey="1">
-          <TabPane tab="Delegate Funds" key="1">
-            <div className="site-layout-background stake-content">
-              <div className="container">
-                <div className="description">Delegate funds to validator.</div>
-                <FormDelegationRequest />
-              </div>
-            </div>
-          </TabPane>
-          <TabPane tab="Withdraw Rewards" key="2">
+          <TabPane tab="Staking Rewards" key="1">
             <div className="site-layout-background stake-content">
               <div className="container">
                 <div className="description">Withdraw rewards from delegated funds.</div>
                 <FormWithdrawStakingReward />
+              </div>
+            </div>
+          </TabPane>
+          <TabPane tab="Delegate Funds" key="2">
+            <div className="site-layout-background stake-content">
+              <div className="container">
+                <div className="description">Delegate funds to validator.</div>
+                <FormDelegationRequest />
               </div>
             </div>
           </TabPane>

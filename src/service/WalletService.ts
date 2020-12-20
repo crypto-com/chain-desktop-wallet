@@ -21,6 +21,12 @@ import { cryptographer } from '../crypto/Cryptographer';
 import { secretStoreService } from '../storage/SecretStoreService';
 import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
+import {
+  RewardTransaction,
+  RewardTransactionList,
+  StakingTransactionData,
+  StakingTransactionList,
+} from '../models/Transaction';
 
 export interface TransferRequest {
   toAddress: string;
@@ -245,17 +251,57 @@ class WalletService {
     await Promise.all(
       assets.map(async asset => {
         const baseDenomination = currentSession.wallet.config.network.coin.baseDenom;
-        asset.balance = await nodeRpc.loadAccountBalance(
-          currentSession.wallet.address,
-          baseDenomination,
-        );
-        asset.stakedBalance = await nodeRpc.fetchDelegationBalance(
-          currentSession.wallet.address,
-          baseDenomination,
-        );
-        await this.storageService.saveAsset(asset);
+        try {
+          asset.balance = await nodeRpc.loadAccountBalance(
+            currentSession.wallet.address,
+            baseDenomination,
+          );
+          asset.stakedBalance = await nodeRpc.loadStakingBalance(
+            currentSession.wallet.address,
+            baseDenomination,
+          );
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.log('BALANCE_FETCH_ERROR', { asset });
+        } finally {
+          await this.storageService.saveAsset(asset);
+        }
       }),
     );
+  }
+
+  public async fetchAndUpdateTransactions(session: Session | null = null) {
+    const currentSession =
+      session == null ? await this.storageService.retrieveCurrentSession() : session;
+    if (!currentSession) {
+      return;
+    }
+
+    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    const baseDenomination = currentSession.wallet.config.network.coin.baseDenom;
+
+    const delegations = await nodeRpc.fetchDelegationBalance(
+      currentSession.wallet.address,
+      baseDenomination,
+    );
+
+    const rewards = await nodeRpc.fetchStakingRewards(
+      currentSession.wallet.address,
+      baseDenomination,
+    );
+
+    const walletId = currentSession.wallet.identifier;
+
+    await this.saveDelegationsList({
+      totalBalance: delegations.totalBalance,
+      transactions: delegations.transactions,
+      walletId,
+    });
+
+    await this.saveRewards({
+      transactions: rewards,
+      walletId,
+    });
   }
 
   public async retrieveCurrentWalletAssets(currentSession: Session): Promise<UserAsset[]> {
@@ -307,12 +353,24 @@ class WalletService {
     };
   }
 
-  public async syncData(session: Session): Promise<void> {
+  public async syncData(session: Session | null = null): Promise<void> {
     try {
       await this.fetchAndUpdateBalances(session);
       return this.loadAndSaveAssetPrices(session);
       // eslint-disable-next-line no-empty
     } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('SYNC_ERROR', e);
+      return Promise.resolve();
+    }
+  }
+
+  public async syncTransactionsData(session: Session | null = null): Promise<void> {
+    try {
+      return await this.fetchAndUpdateTransactions(session);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('SYNC_ERROR', e);
       return Promise.resolve();
     }
   }
@@ -333,6 +391,42 @@ class WalletService {
 
   public async retrieveCurrentSession(): Promise<Session> {
     return this.storageService.retrieveCurrentSession();
+  }
+
+  public async saveDelegationsList(stakingTransactions: StakingTransactionList) {
+    return this.storageService.saveStakingTransactions(stakingTransactions);
+  }
+
+  public async saveRewards(rewardTransactions: RewardTransactionList) {
+    return this.storageService.saveRewardList(rewardTransactions);
+  }
+
+  public async retrieveAllDelegations(walletId: string): Promise<StakingTransactionData[]> {
+    const stakingTransactionList: StakingTransactionList = await this.storageService.retrieveAllStakingTransactions(
+      walletId,
+    );
+    if (!stakingTransactionList) {
+      return [];
+    }
+    return stakingTransactionList.transactions.map(data => {
+      const stakingTransaction: StakingTransactionData = { ...data };
+      return stakingTransaction;
+    });
+  }
+
+  public async retrieveAllRewards(walletId: string): Promise<RewardTransaction[]> {
+    const rewardTransactionList: RewardTransactionList = await this.storageService.retrieveAllRewards(
+      walletId,
+    );
+
+    if (!rewardTransactionList) {
+      return [];
+    }
+
+    return rewardTransactionList.transactions.map(data => {
+      const rewardTransaction: RewardTransaction = { ...data };
+      return rewardTransaction;
+    });
   }
 }
 

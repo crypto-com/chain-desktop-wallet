@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Wallet } from '../models/Wallet';
 import { DatabaseManager } from './DatabaseManager';
 import { Session } from '../models/Session';
@@ -8,7 +7,12 @@ import {
   getAssetPriceIdFrom,
   UserAsset,
 } from '../models/UserAsset';
-import { StakingTransactionData, TransferTransactionData } from '../models/Transaction';
+import {
+  RewardTransactionList,
+  StakingTransactionData,
+  StakingTransactionList,
+  TransferTransactionData,
+} from '../models/Transaction';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -91,7 +95,21 @@ export class StorageService {
     );
   }
 
-  public async retrieveAllStakingTransactions() {
-    return this.db.transferStore.find<StakingTransactionData>({});
+  public async saveStakingTransactions(stakingTransactions: StakingTransactionList) {
+    await this.db.stakingStore.remove({ walletId: stakingTransactions.walletId }, { multi: true });
+    return this.db.stakingStore.insert(stakingTransactions);
+  }
+
+  public async saveRewardList(rewardTransactions: RewardTransactionList) {
+    await this.db.rewardStore.remove({ walletId: rewardTransactions.walletId }, { multi: true });
+    return this.db.rewardStore.insert(rewardTransactions);
+  }
+
+  public async retrieveAllStakingTransactions(walletId: string) {
+    return this.db.stakingStore.findOne<StakingTransactionList>({ walletId });
+  }
+
+  public async retrieveAllRewards(walletId: string) {
+    return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
   }
 }

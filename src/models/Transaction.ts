@@ -24,4 +24,19 @@ export interface StakingTransactionData extends TransactionData {
   stakedAmount: string;
 }
 
-export interface Reward {}
+export interface StakingTransactionList {
+  transactions: Array<StakingTransactionData>;
+  totalBalance: string;
+  walletId: string;
+}
+
+export interface RewardTransactionList {
+  transactions: Array<RewardTransaction>;
+  walletId: string;
+}
+
+export interface RewardTransaction {
+  delegatorAddress: string;
+  validatorAddress: string;
+  amount: string;
+}
