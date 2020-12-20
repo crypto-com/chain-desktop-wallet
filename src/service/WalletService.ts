@@ -405,6 +405,9 @@ class WalletService {
     const stakingTransactionList: StakingTransactionList = await this.storageService.retrieveAllStakingTransactions(
       walletId,
     );
+    if (!stakingTransactionList) {
+      return [];
+    }
     return stakingTransactionList.transactions.map(data => {
       const stakingTransaction: StakingTransactionData = { ...data };
       return stakingTransaction;
@@ -415,6 +418,11 @@ class WalletService {
     const rewardTransactionList: RewardTransactionList = await this.storageService.retrieveAllRewards(
       walletId,
     );
+
+    if (!rewardTransactionList) {
+      return [];
+    }
+
     return rewardTransactionList.transactions.map(data => {
       const rewardTransaction: RewardTransaction = { ...data };
       return rewardTransaction;
