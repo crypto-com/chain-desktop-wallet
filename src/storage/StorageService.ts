@@ -76,13 +76,23 @@ export class StorageService {
     return this.db.sessionStore.findOne<Session>({ _id: Session.SESSION_ID });
   }
 
-  public async saveTransferTransaction(transferTransaction: TransferTransactionData) {
-    // TODO : Update to reflect the new persistence scheme
-    return this.db.transferStore.update<TransferTransactionData>(
-      { hash: transferTransaction.hash },
-      { $set: transferTransaction },
-      { upsert: true },
-    );
+  public async saveTransferTransaction(
+    transferTransaction: TransferTransactionData,
+    walletId: string,
+  ) {
+    const currentTransfers = await this.retrieveAllTransferTransactions(walletId);
+    let transactions: Array<TransferTransactionData> = [];
+    if (currentTransfers) {
+      currentTransfers.transactions.push(transferTransaction);
+      transactions = currentTransfers.transactions;
+    } else {
+      transactions.push(transferTransaction);
+    }
+
+    return this.saveTransferTransactions({
+      transactions,
+      walletId,
+    });
   }
 
   public async saveStakingTransaction(stakingTransaction: StakingTransactionData) {
