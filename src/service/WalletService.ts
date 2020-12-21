@@ -26,7 +26,10 @@ import {
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
+  TransferTransactionData,
+  TransferTransactionList,
 } from '../models/Transaction';
+import { chainIndexAPI } from './rpc/ChainIndexingAPI';
 
 export interface TransferRequest {
   toAddress: string;
@@ -292,7 +295,19 @@ class WalletService {
       baseDenomination,
     );
 
+    const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
+      currentSession.wallet.address,
+    );
+
+    // eslint-disable-next-line no-console
+    console.log('transferTransactions', transferTransactions);
+
     const walletId = currentSession.wallet.identifier;
+
+    await this.saveTransfers({
+      transactions: transferTransactions,
+      walletId,
+    });
 
     await this.saveDelegationsList({
       totalBalance: delegations.totalBalance,
@@ -403,6 +418,10 @@ class WalletService {
     return this.storageService.saveRewardList(rewardTransactions);
   }
 
+  public async saveTransfers(rewardTransactions: TransferTransactionList) {
+    return this.storageService.saveTransferTransactions(rewardTransactions);
+  }
+
   public async retrieveAllDelegations(walletId: string): Promise<StakingTransactionData[]> {
     const stakingTransactionList: StakingTransactionList = await this.storageService.retrieveAllStakingTransactions(
       walletId,
@@ -428,6 +447,21 @@ class WalletService {
     return rewardTransactionList.transactions.map(data => {
       const rewardTransaction: RewardTransaction = { ...data };
       return rewardTransaction;
+    });
+  }
+
+  public async retrieveAllTransfers(walletId: string): Promise<TransferTransactionData[]> {
+    const transactionList: TransferTransactionList = await this.storageService.retrieveAllTransferTransactions(
+      walletId,
+    );
+
+    if (!transactionList) {
+      return [];
+    }
+
+    return transactionList.transactions.map(data => {
+      const transactionData: TransferTransactionData = { ...data };
+      return transactionData;
     });
   }
 }

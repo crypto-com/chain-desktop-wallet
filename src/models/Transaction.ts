@@ -35,6 +35,11 @@ export interface RewardTransactionList {
   walletId: string;
 }
 
+export interface TransferTransactionList {
+  transactions: Array<TransferTransactionData>;
+  walletId: string;
+}
+
 export interface RewardTransaction {
   delegatorAddress: string;
   validatorAddress: string;

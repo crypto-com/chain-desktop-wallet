@@ -3,10 +3,15 @@ import './home.less';
 import 'antd/dist/antd.css';
 import { Layout, Table, Tabs } from 'antd';
 import { useRecoilState } from 'recoil';
-import { scaledAmount, scaledBalance, scaledStakingBalance } from '../../models/UserAsset';
+import {
+  scaledAmount,
+  scaledBalance,
+  scaledStakingBalance,
+  UserAsset,
+} from '../../models/UserAsset';
 import { walletAssetState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
-import { StakingTransactionData } from '../../models/Transaction';
+import { StakingTransactionData, TransferTransactionData } from '../../models/Transaction';
 
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 
@@ -21,8 +26,8 @@ const TransactionColumns = [
   },
   {
     title: 'Transaction Hash',
-    dataIndex: 'txhash',
-    key: 'txhash',
+    dataIndex: 'transactionHash',
+    key: 'transactionHash',
     render: text => <a>{text}</a>,
   },
   {
@@ -31,33 +36,14 @@ const TransactionColumns = [
     key: 'amount',
   },
   {
+    title: 'Recipient',
+    dataIndex: 'recipientAddress',
+    key: 'recipientAddress',
+  },
+  {
     title: 'Time',
     dataIndex: 'time',
     key: 'time',
-  },
-];
-
-const TransactionData = [
-  {
-    key: '1',
-    index: '1',
-    txhash: '0x0edbd6…e0470dc1',
-    amount: '500, 000',
-    time: '31/12/2020 23:59:59',
-  },
-  {
-    key: '2',
-    index: '2',
-    txhash: '0x7a53b75…8104be15',
-    amount: '500, 000',
-    time: '31/12/2020 23:59:59',
-  },
-  {
-    key: '3',
-    index: '3',
-    txhash: '0x7a53b75…8104be15',
-    amount: '500, 000',
-    time: '31/12/2020 23:59:59',
   },
 ];
 
@@ -68,10 +54,46 @@ interface StakingTabularData {
   delegatorAddress: string;
 }
 
+interface TransferTabularData {
+  key: string;
+  transactionHash: string;
+  recipientAddress: string;
+  amount: string;
+  time: string;
+}
+
 function HomePage() {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
+  const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const didMountRef = useRef(false);
+
+  function convertDelegations(allDelegations: StakingTransactionData[], currentAsset: UserAsset) {
+    return allDelegations.map(dlg => {
+      const stakedAmount = scaledAmount(dlg.stakedAmount, currentAsset.decimals).toString();
+      const data: StakingTabularData = {
+        key: dlg.validatorAddress + dlg.stakedAmount,
+        delegatorAddress: dlg.delegatorAddress,
+        validatorAddress: dlg.validatorAddress,
+        stakedAmount: `${stakedAmount}  ${currentAsset.symbol}`,
+      };
+      return data;
+    });
+  }
+
+  function convertTransfers(allTransfers: TransferTransactionData[], currentAsset: UserAsset) {
+    return allTransfers.map(transfer => {
+      const transferAmount = scaledAmount(transfer.amount, currentAsset.decimals).toString();
+      const data: TransferTabularData = {
+        key: transfer.hash + transfer.receiverAddress + transfer.amount,
+        recipientAddress: transfer.receiverAddress,
+        transactionHash: transfer.hash,
+        time: transfer.date,
+        amount: `${transferAmount}  ${currentAsset.symbol}`,
+      };
+      return data;
+    });
+  }
 
   useEffect(() => {
     let unmounted = false;
@@ -82,20 +104,16 @@ function HomePage() {
       const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
         sessionData.wallet.identifier,
       );
+      const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
+        sessionData.wallet.identifier,
+      );
 
-      const stakingTabularData = allDelegations.map(dlg => {
-        const stakedAmount = scaledAmount(dlg.stakedAmount, currentAsset.decimals).toString();
-        const data: StakingTabularData = {
-          key: dlg.validatorAddress + dlg.stakedAmount,
-          delegatorAddress: dlg.delegatorAddress,
-          validatorAddress: dlg.validatorAddress,
-          stakedAmount: `${stakedAmount}  ${currentAsset.symbol}`,
-        };
-        return data;
-      });
+      const stakingTabularData = convertDelegations(allDelegations, currentAsset);
+      const transferTabularData = convertTransfers(allTransfers, currentAsset);
 
       if (!unmounted) {
         setDelegations(stakingTabularData);
+        setTransfers(transferTabularData);
         setUserAsset(currentAsset);
       }
     };
@@ -155,7 +173,7 @@ function HomePage() {
         </div>
         <Tabs defaultActiveKey="1">
           <TabPane tab="Transactions" key="1">
-            <Table columns={TransactionColumns} dataSource={TransactionData} />
+            <Table columns={TransactionColumns} dataSource={transfers} />
           </TabPane>
           <TabPane tab="Delegations" key="2">
             <Table columns={StakingColumns} dataSource={delegations} />
