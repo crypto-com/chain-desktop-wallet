@@ -267,7 +267,7 @@ const FormWithdrawStakingReward = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
 
-  const convert = (allRewards: RewardTransaction[], currentAsset: UserAsset) => {
+  const convertToTabularData = (allRewards: RewardTransaction[], currentAsset: UserAsset) => {
     return allRewards.map(reward => {
       const rewardData: RewardsTabularData = {
         key: `${reward.validatorAddress}${reward.amount}`,
@@ -288,7 +288,7 @@ const FormWithdrawStakingReward = () => {
         sessionData.wallet.identifier,
       );
 
-      const rewardsTabularData = convert(allRewards, currentAsset);
+      const rewardsTabularData = convertToTabularData(allRewards, currentAsset);
       setRewards(rewardsTabularData);
     };
 
