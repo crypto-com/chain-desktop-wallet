@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Input, Layout, Space, Table, Tabs } from 'antd';
+import { Button, Form, Input, Layout, Table, Tabs } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilValue } from 'recoil';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
@@ -11,7 +11,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { walletAssetState } from '../../recoil/atom';
-import { scaledAmount, scaledBalance } from '../../models/UserAsset';
+import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { RewardTransaction } from '../../models/Transaction';
 
 const { Header, Content, Footer } = Layout;
@@ -251,12 +251,9 @@ const FormDelegationRequest = () => {
 };
 
 const FormWithdrawStakingReward = () => {
-  const [form] = Form.useForm();
-  const [formValues, setFormValues] = useState({
-    stakingAddress: '',
-    amount: '',
-    memo: '',
-    decryptedPhrase: '',
+  const [withdrawValues, setWithdrawValues] = useState({
+    validatorAddress: '',
+    rewardAmount: '',
   });
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
@@ -265,11 +262,23 @@ const FormWithdrawStakingReward = () => {
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
-  const walletAsset = useRecoilValue(walletAssetState);
   const didMountRef = useRef(false);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
+
+  const convertToTabularData = (allRewards: RewardTransaction[], currentAsset: UserAsset) => {
+    return allRewards.map(reward => {
+      const rewardData: RewardsTabularData = {
+        key: `${reward.validatorAddress}${reward.amount}`,
+        rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${
+          currentAsset.symbol
+        }`,
+        validatorAddress: reward.validatorAddress,
+      };
+      return rewardData;
+    });
+  };
 
   useEffect(() => {
     const syncRewardsData = async () => {
@@ -279,17 +288,7 @@ const FormWithdrawStakingReward = () => {
         sessionData.wallet.identifier,
       );
 
-      const rewardsTabularData = allRewards.map(reward => {
-        const rewardData: RewardsTabularData = {
-          key: `${reward.validatorAddress}${reward.amount}`,
-          rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${
-            currentAsset.symbol
-          }`,
-          validatorAddress: reward.validatorAddress,
-        };
-        return rewardData;
-      });
-
+      const rewardsTabularData = convertToTabularData(allRewards, currentAsset);
       setRewards(rewardsTabularData);
     };
 
@@ -301,7 +300,6 @@ const FormWithdrawStakingReward = () => {
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
-    setFormValues(form.getFieldsValue());
     setIsVisibleConfirmationModal(true);
   };
 
@@ -323,19 +321,14 @@ const FormWithdrawStakingReward = () => {
   };
 
   const onConfirmTransfer = async () => {
-    const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
     if (!decryptedPhrase) {
       setIsVisibleConfirmationModal(false);
       return;
     }
     try {
       setConfirmLoading(true);
-      // TODO: walletService.depositStaking
-      const hash = await walletService.sendTransfer({
-        toAddress: formValues.stakingAddress,
-        amount: formValues.amount,
-        asset: walletAsset,
-        memo,
+      const hash = await walletService.sendStakingRewardWithdrawalTx({
+        validatorAddress: withdrawValues.validatorAddress,
         decryptedPhrase,
       });
       setTransactionHash(hash);
@@ -343,8 +336,6 @@ const FormWithdrawStakingReward = () => {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setIsSuccessTransferModalVisible(true);
-
-      form.resetFields();
     } catch (e) {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
@@ -372,17 +363,7 @@ const FormWithdrawStakingReward = () => {
       title: 'Validator Address',
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
-      render: text => (
-        <a
-          onClick={() => {
-            form.setFieldsValue({
-              validatorAddress: text,
-            });
-          }}
-        >
-          {text}
-        </a>
-      ),
+      render: text => <a>{text}</a>,
     },
     {
       title: 'Reward Amount',
@@ -391,115 +372,118 @@ const FormWithdrawStakingReward = () => {
     },
     {
       title: 'Action',
-      dataIndex: 'address',
-      key: 'address',
-      render: text => (
-        <Space size="middle">
-          <a
-            onClick={() => {
-              form.setFieldsValue({
-                validatorAddress: text,
-              });
-              form.submit();
-            }}
-          >
-            Withdraw Reward
-          </a>
-        </Space>
+      dataIndex: 'withdrawAction',
+      key: 'withdrawAction',
+      render: () => (
+        <a
+          onClick={() => {
+            setTimeout(() => {
+              showPasswordInput();
+            }, 200);
+          }}
+        >
+          Withdraw Reward
+        </a>
       ),
     },
   ];
 
   const StakingTable = () => {
-    return <Table columns={rewardColumns} dataSource={rewards} />;
+    return (
+      <Table
+        columns={rewardColumns}
+        dataSource={rewards}
+        onRow={record => {
+          return {
+            onClick: () => {
+              setWithdrawValues({
+                validatorAddress: record.validatorAddress,
+                rewardAmount: record.rewardAmount,
+              });
+            },
+          };
+        }}
+      />
+    );
   };
 
   return (
     <div>
       <StakingTable />
 
-      <Form
-        {...layout}
-        layout="vertical"
-        form={form}
-        name="control-ref"
-        onFinish={showPasswordInput}
-        requiredMark={false}
+      <ModalPopup
+        isModalVisible={isConfirmationModalVisible}
+        handleCancel={handleCancel}
+        handleOk={onConfirmTransfer}
+        confirmationLoading={confirmLoading}
+        // button={
+        //   <Button type="primary" htmlType="submit">
+        //     Review
+        //   </Button>
+        // }
+        okText="Confirm"
       >
-        <ModalPopup
-          isModalVisible={isConfirmationModalVisible}
-          handleCancel={handleCancel}
-          handleOk={onConfirmTransfer}
-          confirmationLoading={confirmLoading}
-          // button={
-          //   <Button type="primary" htmlType="submit">
-          //     Review
-          //   </Button>
-          // }
-          okText="Confirm"
-        >
-          <>
-            <div className="title">Confirm Transaction</div>
-            <div className="description">Please review the below information. </div>
-            <div className="item">
-              <div className="label">Withdraw Reward From Address</div>
-              <div className="address">{`${formValues?.stakingAddress}`}</div>
-            </div>
-            <div className="item">
-              <div className="label">Rewards</div>
-              <div>500 CRO</div>
-            </div>
-          </>
-        </ModalPopup>
-        <PasswordFormModal
-          description="Input the application password decrypt wallet"
-          okButtonText="Decrypt wallet"
-          onCancel={() => {
-            setInputPasswordVisible(false);
-          }}
-          onSuccess={onWalletDecryptFinish}
-          onValidatePassword={async (password: string) => {
-            const isValid = await secretStoreService.checkIfPasswordIsValid(password);
-            return {
-              valid: isValid,
-              errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
-            };
-          }}
-          successText="Wallet decrypted successfully !"
-          title="Provide application password"
-          visible={inputPasswordVisible}
-          successButtonText="Continue"
-          confirmPassword={false}
-        />
-        <SuccessModalPopup
-          isModalVisible={isSuccessTransferModalVisible}
-          handleCancel={closeSuccessModal}
-          handleOk={closeSuccessModal}
-          title="Success!"
-          button={null}
-          footer={[
-            <Button key="submit" type="primary" onClick={closeSuccessModal}>
-              Ok Thanks
-            </Button>,
-          ]}
-        >
-          <>
-            <div>Your transfer was successful!</div>
-            <div>{transactionHash}</div>
-          </>
-        </SuccessModalPopup>
-        <ErrorModalPopup
-          isModalVisible={isErrorTransferModalVisible}
-          handleCancel={closeErrorModal}
-          handleOk={closeErrorModal}
-          title="An error happened!"
-          footer={[]}
-        >
-          <>
-            <div>The staking transaction failed. Please try again later</div>
-          </>
-        </ErrorModalPopup>
-      </Form>
+        <>
+          <div className="title">Confirm Transaction</div>
+          <div className="description">Please review the below information. </div>
+          <div className="item">
+            <div className="label">Withdraw Reward From Validator</div>
+            <div className="address">{`${withdrawValues?.validatorAddress}`}</div>
+          </div>
+          <div className="item">
+            <div className="label">Rewards</div>
+            <div>{`${withdrawValues.rewardAmount}`}</div>
+          </div>
+        </>
+      </ModalPopup>
+      <PasswordFormModal
+        description="Input the application password decrypt wallet"
+        okButtonText="Decrypt wallet"
+        onCancel={() => {
+          setInputPasswordVisible(false);
+        }}
+        onSuccess={onWalletDecryptFinish}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          return {
+            valid: isValid,
+            errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+          };
+        }}
+        successText="Wallet decrypted successfully !"
+        title="Provide application password"
+        visible={inputPasswordVisible}
+        successButtonText="Continue"
+        confirmPassword={false}
+      />
+      <SuccessModalPopup
+        isModalVisible={isSuccessTransferModalVisible}
+        handleCancel={closeSuccessModal}
+        handleOk={closeSuccessModal}
+        title="Success!"
+        button={null}
+        footer={[
+          <Button key="submit" type="primary" onClick={closeSuccessModal}>
+            Ok Thanks
+          </Button>,
+        ]}
+      >
+        <>
+          <div>Your rewards withdrawal transaction was broadcasted successfully !</div>
+          <div>{transactionHash}</div>
+        </>
+      </SuccessModalPopup>
+      <ErrorModalPopup
+        isModalVisible={isErrorTransferModalVisible}
+        handleCancel={closeErrorModal}
+        handleOk={closeErrorModal}
+        title="An error happened!"
+        footer={[]}
+      >
+        <>
+          <div>The reward withdrawal transaction failed. Please try again later</div>
+        </>
+      </ErrorModalPopup>
     </div>
   );
 };

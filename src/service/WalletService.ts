@@ -44,6 +44,11 @@ export interface DelegationRequest {
   decryptedPhrase: string;
 }
 
+export interface WithdrawStakingRewardRequest {
+  validatorAddress: string;
+  decryptedPhrase: string;
+}
+
 class WalletService {
   private readonly storageService: StorageService;
 
@@ -116,33 +121,30 @@ class WalletService {
     return transactionHash;
   }
 
-  public async sendStakingRewardWithdrawalTx(
-    delegatorAddress: string,
-    validatorAddress: string,
-    amount: string,
-    memo: string,
-    decryptedPhrase: string,
-  ) {
+  public async sendStakingRewardWithdrawalTx(rewardWithdrawRequest: WithdrawStakingRewardRequest) {
     const {
       nodeRpc,
       accountNumber,
       accountSequence,
+      currentSession,
       transactionSigner,
     } = await this.prepareTransaction();
 
     const withdrawStakingReward: WithdrawStakingRewardUnsigned = {
-      delegatorAddress,
-      validatorAddress,
-      memo,
+      delegatorAddress: currentSession.wallet.address,
+      validatorAddress: rewardWithdrawRequest.validatorAddress,
+      memo: '',
       accountNumber,
       accountSequence,
     };
 
     const signedTxHex = await transactionSigner.signWithdrawStakingRewardTx(
       withdrawStakingReward,
-      decryptedPhrase,
+      rewardWithdrawRequest.decryptedPhrase,
     );
-    return nodeRpc.broadcastTransaction(signedTxHex);
+    const transactionHash = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.syncData(currentSession);
+    return transactionHash;
   }
 
   public async prepareTransaction() {
