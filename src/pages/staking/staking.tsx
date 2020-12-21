@@ -11,7 +11,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { walletAssetState } from '../../recoil/atom';
-import { scaledAmount, scaledBalance } from '../../models/UserAsset';
+import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { RewardTransaction } from '../../models/Transaction';
 
 const { Header, Content, Footer } = Layout;
@@ -262,11 +262,23 @@ const FormWithdrawStakingReward = () => {
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
-  // const walletAsset = useRecoilValue(walletAssetState);
   const didMountRef = useRef(false);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
+
+  const convert = (allRewards: RewardTransaction[], currentAsset: UserAsset) => {
+    return allRewards.map(reward => {
+      const rewardData: RewardsTabularData = {
+        key: `${reward.validatorAddress}${reward.amount}`,
+        rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${
+          currentAsset.symbol
+        }`,
+        validatorAddress: reward.validatorAddress,
+      };
+      return rewardData;
+    });
+  };
 
   useEffect(() => {
     const syncRewardsData = async () => {
@@ -276,17 +288,7 @@ const FormWithdrawStakingReward = () => {
         sessionData.wallet.identifier,
       );
 
-      const rewardsTabularData = allRewards.map(reward => {
-        const rewardData: RewardsTabularData = {
-          key: `${reward.validatorAddress}${reward.amount}`,
-          rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${
-            currentAsset.symbol
-          }`,
-          validatorAddress: reward.validatorAddress,
-        };
-        return rewardData;
-      });
-
+      const rewardsTabularData = convert(allRewards, currentAsset);
       setRewards(rewardsTabularData);
     };
 
@@ -341,8 +343,6 @@ const FormWithdrawStakingReward = () => {
       setIsErrorTransferModalVisible(true);
       // eslint-disable-next-line no-console
       console.log('Error occurred while transfer', e);
-    } finally {
-      await walletService.syncTransactionsData();
     }
   };
 
