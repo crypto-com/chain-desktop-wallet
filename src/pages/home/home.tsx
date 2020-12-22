@@ -18,17 +18,16 @@ import { StakingTransactionData, TransferTransactionData } from '../../models/Tr
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 
+const middleEllipsis = (str: string) => {
+  return `${str.substr(0, 15)}...${str.substr(str.length - 15, str.length)}`;
+};
+
 const TransactionColumns = [
-  {
-    title: 'Index',
-    dataIndex: 'index',
-    key: 'index',
-  },
   {
     title: 'Transaction Hash',
     dataIndex: 'transactionHash',
     key: 'transactionHash',
-    render: text => <a>{text}</a>,
+    render: text => <a data-original={text}>{middleEllipsis(text)}</a>,
   },
   {
     title: 'Amount',
@@ -39,6 +38,7 @@ const TransactionColumns = [
     title: 'Recipient',
     dataIndex: 'recipientAddress',
     key: 'recipientAddress',
+    render: text => <a data-original={text}>{middleEllipsis(text)}</a>,
   },
   {
     title: 'Time',
@@ -88,7 +88,8 @@ function HomePage() {
         key: transfer.hash + transfer.receiverAddress + transfer.amount,
         recipientAddress: transfer.receiverAddress,
         transactionHash: transfer.hash,
-        time: transfer.date,
+        time: new Date(transfer.date).toLocaleString(),
+        // time: Date.parse(transfer.date).toLocaleString(),
         amount: `${transferAmount}  ${currentAsset.symbol}`,
       };
       return data;

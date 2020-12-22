@@ -77,7 +77,6 @@ const FormRestore = () => {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('issue on wallet import', e);
-      // TODO : Show pop up displaying the issue on wallet import
       showErrorModal();
     }
   };

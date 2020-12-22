@@ -74,10 +74,6 @@ export class NodeRpcService implements INodeRpcService {
     try {
       const signedBytes = Bytes.fromHexString(signedTxHex).toUint8Array();
       const broadcastResponse: BroadcastResponse = await this.client.broadcastTx(signedBytes);
-
-      // TODO : Handle timeout errors
-      // {"code":-32603,"message":"Internal error","data":"timed out waiting for tx to be included in a block"}
-
       return {
         transactionHash: broadcastResponse.transactionHash,
       };
