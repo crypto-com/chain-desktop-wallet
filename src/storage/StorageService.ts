@@ -12,6 +12,7 @@ import {
   StakingTransactionData,
   StakingTransactionList,
   TransferTransactionData,
+  TransferTransactionList,
 } from '../models/Transaction';
 
 export class StorageService {
@@ -75,16 +76,23 @@ export class StorageService {
     return this.db.sessionStore.findOne<Session>({ _id: Session.SESSION_ID });
   }
 
-  public async saveTransferTransaction(transferTransaction: TransferTransactionData) {
-    return this.db.transferStore.update<TransferTransactionData>(
-      { hash: transferTransaction.hash },
-      { $set: transferTransaction },
-      { upsert: true },
-    );
-  }
+  public async saveTransferTransaction(
+    transferTransaction: TransferTransactionData,
+    walletId: string,
+  ) {
+    const currentTransfers = await this.retrieveAllTransferTransactions(walletId);
+    let transactions: Array<TransferTransactionData> = [];
+    if (currentTransfers) {
+      currentTransfers.transactions.push(transferTransaction);
+      transactions = currentTransfers.transactions;
+    } else {
+      transactions.push(transferTransaction);
+    }
 
-  public async retrieveAllTransferTransactions() {
-    return this.db.transferStore.find<TransferTransactionData>({});
+    return this.saveTransferTransactions({
+      transactions,
+      walletId,
+    });
   }
 
   public async saveStakingTransaction(stakingTransaction: StakingTransactionData) {
@@ -111,5 +119,17 @@ export class StorageService {
 
   public async retrieveAllRewards(walletId: string) {
     return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
+  }
+
+  public async saveTransferTransactions(transferTransactionList: TransferTransactionList) {
+    await this.db.transferStore.remove(
+      { walletId: transferTransactionList.walletId },
+      { multi: true },
+    );
+    return this.db.transferStore.insert<TransferTransactionList>(transferTransactionList);
+  }
+
+  public async retrieveAllTransferTransactions(walletId: string) {
+    return this.db.transferStore.findOne<TransferTransactionList>({ walletId });
   }
 }

@@ -5,6 +5,7 @@ import { Bytes } from '../types/ChainJsLib';
 import { CosmosPorts } from '../../config/StaticConfig';
 import { DelegationResult, RewardResponse } from './NodeRpcModels';
 import {
+  BroadCastResult,
   RewardTransaction,
   StakingTransactionData,
   StakingTransactionList,
@@ -19,7 +20,7 @@ export interface INodeRpcService {
   fetchAccountNumber(address: string): Promise<number>;
 
   // Broadcast trx return trx hash
-  broadcastTransaction(signedTxHex: string): Promise<string>;
+  broadcastTransaction(signedTxHex: string): Promise<BroadCastResult>;
 
   getTransactionByHash(transactionHash: string): Promise<IndexedTx>;
 
@@ -31,6 +32,7 @@ export interface INodeRpcService {
 export interface BroadcastResponse {
   readonly height: number;
   readonly code?: number;
+  readonly message?: string;
   readonly transactionHash: string;
   readonly rawLog?: string;
   readonly data?: Uint8Array;
@@ -67,19 +69,23 @@ export class NodeRpcService implements INodeRpcService {
     return (await this.client.getAccount(address))?.accountNumber ?? 0;
   }
 
-  public async broadcastTransaction(signedTxHex: string): Promise<string> {
-    const signedBytes = Bytes.fromHexString(signedTxHex).toUint8Array();
-    const broadcastResponse: BroadcastResponse = await this.client.broadcastTx(signedBytes);
-
-    // TODO : Handle timeout errors
-    // {"code":-32603,"message":"Internal error","data":"timed out waiting for tx to be included in a block"}
-
-    if (broadcastResponse.code) {
-      // eslint-disable-next-line no-console
-      // console.error('ERROR_BROADCAST_XX', broadcastResponse);
-      throw new Error(broadcastResponse.rawLog);
+  public async broadcastTransaction(signedTxHex: string): Promise<BroadCastResult> {
+    const TIME_OUT_ERROR = 'timed out waiting for tx to be included in a block';
+    try {
+      const signedBytes = Bytes.fromHexString(signedTxHex).toUint8Array();
+      const broadcastResponse: BroadcastResponse = await this.client.broadcastTx(signedBytes);
+      return {
+        transactionHash: broadcastResponse.transactionHash,
+      };
+    } catch (e) {
+      if (e.toString().includes(TIME_OUT_ERROR)) {
+        return {
+          code: -32603,
+          message: TIME_OUT_ERROR,
+        };
+      }
+      throw e;
     }
-    return broadcastResponse.transactionHash;
   }
 
   public async getTransactionByHash(transactionHash: string): Promise<IndexedTx> {

@@ -12,6 +12,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { scaledBalance, UserAsset } from '../../models/UserAsset';
 import { walletAssetState } from '../../recoil/atom';
+import { BroadCastResult } from '../../models/Transaction';
 
 const { Header, Content, Footer } = Layout;
 const layout = {};
@@ -22,7 +23,7 @@ const FormSend = () => {
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [transactionHash, setTransactionHash] = useState('');
+  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
@@ -58,14 +59,15 @@ const FormSend = () => {
     }
     try {
       setConfirmLoading(true);
-      const hash = await walletService.sendTransfer({
+      const sendResult = await walletService.sendTransfer({
         toAddress: formValues.recipientAddress,
         amount: formValues.amount,
         asset: userAsset,
         memo,
         decryptedPhrase,
       });
-      setTransactionHash(hash);
+
+      setBroadcastResult(sendResult);
 
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
@@ -219,8 +221,14 @@ const FormSend = () => {
           ]}
         >
           <>
-            <div>Your transfer was successful!</div>
-            <div>{transactionHash}</div>
+            {broadcastResult?.code !== undefined &&
+            broadcastResult?.code !== null &&
+            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+              <div>The transaction timed out but it will be included in the subsequent blocks</div>
+            ) : (
+              <div>The transaction was broad-casted successfully !</div>
+            )}
+            <div>{broadcastResult.transactionHash ?? ''}</div>
           </>
         </SuccessModalPopup>
         <ErrorModalPopup

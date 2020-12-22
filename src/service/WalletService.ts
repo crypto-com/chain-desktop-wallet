@@ -22,11 +22,15 @@ import { secretStoreService } from '../storage/SecretStoreService';
 import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
+  BroadCastResult,
   RewardTransaction,
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
+  TransferTransactionData,
+  TransferTransactionList,
 } from '../models/Transaction';
+import { chainIndexAPI } from './rpc/ChainIndexingAPI';
 
 export interface TransferRequest {
   toAddress: string;
@@ -56,7 +60,9 @@ class WalletService {
     this.storageService = new StorageService(APP_DB_NAMESPACE);
   }
 
-  public async sendTransfer(transferRequest: TransferRequest) {
+  public readonly BROADCAST_TIMEOUT_CODE = -32603;
+
+  public async sendTransfer(transferRequest: TransferRequest): Promise<BroadCastResult> {
     const {
       nodeRpc,
       accountNumber,
@@ -80,9 +86,9 @@ class WalletService {
       transfer,
       transferRequest.decryptedPhrase,
     );
-    const transactionHash = await nodeRpc.broadcastTransaction(signedTxHex);
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
     await this.syncData(currentSession);
-    return transactionHash;
+    return broadCastResult;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -90,7 +96,9 @@ class WalletService {
     return Number(amount) * 10 ** asset.decimals;
   }
 
-  public async sendDelegateTransaction(delegationRequest: DelegationRequest) {
+  public async sendDelegateTransaction(
+    delegationRequest: DelegationRequest,
+  ): Promise<BroadCastResult> {
     const {
       nodeRpc,
       accountNumber,
@@ -116,12 +124,14 @@ class WalletService {
       delegateTransaction,
       delegationRequest.decryptedPhrase,
     );
-    const transactionHash = await nodeRpc.broadcastTransaction(signedTxHex);
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
     await this.syncData(currentSession);
-    return transactionHash;
+    return broadCastResult;
   }
 
-  public async sendStakingRewardWithdrawalTx(rewardWithdrawRequest: WithdrawStakingRewardRequest) {
+  public async sendStakingRewardWithdrawalTx(
+    rewardWithdrawRequest: WithdrawStakingRewardRequest,
+  ): Promise<BroadCastResult> {
     const {
       nodeRpc,
       accountNumber,
@@ -142,9 +152,9 @@ class WalletService {
       withdrawStakingReward,
       rewardWithdrawRequest.decryptedPhrase,
     );
-    const transactionHash = await nodeRpc.broadcastTransaction(signedTxHex);
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
     await this.syncData(currentSession);
-    return transactionHash;
+    return broadCastResult;
   }
 
   public async prepareTransaction() {
@@ -292,7 +302,19 @@ class WalletService {
       baseDenomination,
     );
 
+    const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
+      currentSession.wallet.address,
+    );
+
     const walletId = currentSession.wallet.identifier;
+
+    // eslint-disable-next-line no-console
+    console.log('transferTransactions', transferTransactions);
+
+    await this.saveTransfers({
+      transactions: transferTransactions,
+      walletId,
+    });
 
     await this.saveDelegationsList({
       totalBalance: delegations.totalBalance,
@@ -403,6 +425,10 @@ class WalletService {
     return this.storageService.saveRewardList(rewardTransactions);
   }
 
+  public async saveTransfers(rewardTransactions: TransferTransactionList) {
+    return this.storageService.saveTransferTransactions(rewardTransactions);
+  }
+
   public async retrieveAllDelegations(walletId: string): Promise<StakingTransactionData[]> {
     const stakingTransactionList: StakingTransactionList = await this.storageService.retrieveAllStakingTransactions(
       walletId,
@@ -428,6 +454,21 @@ class WalletService {
     return rewardTransactionList.transactions.map(data => {
       const rewardTransaction: RewardTransaction = { ...data };
       return rewardTransaction;
+    });
+  }
+
+  public async retrieveAllTransfers(walletId: string): Promise<TransferTransactionData[]> {
+    const transactionList: TransferTransactionList = await this.storageService.retrieveAllTransferTransactions(
+      walletId,
+    );
+
+    if (!transactionList) {
+      return [];
+    }
+
+    return transactionList.transactions.map(data => {
+      const transactionData: TransferTransactionData = { ...data };
+      return transactionData;
     });
   }
 }
