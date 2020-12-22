@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './send.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, Layout } from 'antd';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
@@ -11,7 +11,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { scaledBalance } from '../../models/UserAsset';
-import { walletAssetState } from '../../recoil/atom';
+import { sessionState, walletAssetState } from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
 
 const { Header, Content, Footer } = Layout;
@@ -28,6 +28,7 @@ const FormSend = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const currentSession = useRecoilValue(sessionState);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -43,7 +44,6 @@ const FormSend = () => {
   };
 
   const onWalletDecryptFinish = async (password: string) => {
-    const currentSession = await walletService.retrieveCurrentSession();
     const phraseDecrypted = await secretStoreService.decryptPhrase(
       password,
       currentSession.wallet.identifier,
@@ -73,7 +73,6 @@ const FormSend = () => {
       setConfirmLoading(false);
       setIsSuccessTransferModalVisible(true);
       setInputPasswordVisible(false);
-      const currentSession = await walletService.retrieveCurrentSession();
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setWalletAsset(currentWalletAsset);
 
