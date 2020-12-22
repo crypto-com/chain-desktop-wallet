@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Layout, Table, Tabs } from 'antd';
+import { Layout, Table, Tabs, Typography } from 'antd';
 import { useRecoilState } from 'recoil';
 import {
   scaledAmount,
@@ -11,7 +11,14 @@ import {
 } from '../../models/UserAsset';
 import { walletAssetState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
-import { StakingTransactionData, TransferTransactionData } from '../../models/Transaction';
+import {
+  StakingTransactionData,
+  TransactionDirection,
+  TransferTransactionData,
+} from '../../models/Transaction';
+import { Session } from '../../models/Session';
+
+const { Text } = Typography;
 
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 
@@ -19,7 +26,7 @@ const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 
 const middleEllipsis = (str: string) => {
-  return `${str.substr(0, 15)}...${str.substr(str.length - 15, str.length)}`;
+  return `${str.substr(0, 12)}...${str.substr(str.length - 12, str.length)}`;
 };
 
 const TransactionColumns = [
@@ -33,12 +40,23 @@ const TransactionColumns = [
     title: 'Amount',
     dataIndex: 'amount',
     key: 'amount',
+    render: (text, record: TransferTabularData) => {
+      const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
+      const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+
+      return (
+        <Text type={color}>
+          {sign}
+          {text}
+        </Text>
+      );
+    },
   },
   {
     title: 'Recipient',
     dataIndex: 'recipientAddress',
     key: 'recipientAddress',
-    render: text => <a data-original={text}>{middleEllipsis(text)}</a>,
+    render: text => <div data-original={text}>{middleEllipsis(text)}</div>,
   },
   {
     title: 'Time',
@@ -60,6 +78,7 @@ interface TransferTabularData {
   recipientAddress: string;
   amount: string;
   time: string;
+  direction: TransactionDirection;
 }
 
 function HomePage() {
@@ -75,13 +94,27 @@ function HomePage() {
         key: dlg.validatorAddress + dlg.stakedAmount,
         delegatorAddress: dlg.delegatorAddress,
         validatorAddress: dlg.validatorAddress,
-        stakedAmount: `${stakedAmount}  ${currentAsset.symbol}`,
+        stakedAmount: `${stakedAmount} ${currentAsset.symbol}`,
       };
       return data;
     });
   }
 
-  function convertTransfers(allTransfers: TransferTransactionData[], currentAsset: UserAsset) {
+  function convertTransfers(
+    allTransfers: TransferTransactionData[],
+    currentAsset: UserAsset,
+    sessionData: Session,
+  ) {
+    const { address } = sessionData.wallet;
+    function getDirection(from: string, to: string): TransactionDirection {
+      if (address === from && address === to) {
+        return TransactionDirection.SELF;
+      }
+      if (address === from) {
+        return TransactionDirection.OUTGOING;
+      }
+      return TransactionDirection.INCOMING;
+    }
     return allTransfers.map(transfer => {
       const transferAmount = scaledAmount(transfer.amount, currentAsset.decimals).toString();
       const data: TransferTabularData = {
@@ -89,8 +122,8 @@ function HomePage() {
         recipientAddress: transfer.receiverAddress,
         transactionHash: transfer.hash,
         time: new Date(transfer.date).toLocaleString(),
-        // time: Date.parse(transfer.date).toLocaleString(),
         amount: `${transferAmount}  ${currentAsset.symbol}`,
+        direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
       };
       return data;
     });
@@ -110,7 +143,7 @@ function HomePage() {
       );
 
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
-      const transferTabularData = convertTransfers(allTransfers, currentAsset);
+      const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
       if (!unmounted) {
         setDelegations(stakingTabularData);
@@ -130,11 +163,6 @@ function HomePage() {
   }, [delegations, setUserAsset]);
 
   const StakingColumns = [
-    {
-      title: 'Index',
-      dataIndex: 'index',
-      key: 'index',
-    },
     {
       title: 'Validator Address',
       dataIndex: 'validatorAddress',

@@ -4,6 +4,12 @@ export enum TransactionStatus {
   FAILED = 'FAILED',
 }
 
+export enum TransactionDirection {
+  INCOMING,
+  OUTGOING,
+  SELF,
+}
+
 export interface TransactionData {
   hash: string;
   memo: string | null;

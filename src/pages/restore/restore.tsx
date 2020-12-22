@@ -9,6 +9,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import BackButton from '../../components/BackButton/BackButton';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
+import { Session } from '../../models/Session';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -71,6 +72,7 @@ const FormRestore = () => {
     try {
       const wallet = await walletService.restoreWallet(importOptions);
       await walletService.encryptWalletAndSetSession(password, wallet);
+      await walletService.syncTransactionsData(new Session(wallet));
       goToHome();
       form.resetFields();
       return;
