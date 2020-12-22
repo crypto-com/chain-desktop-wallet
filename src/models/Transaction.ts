@@ -4,6 +4,12 @@ export enum TransactionStatus {
   FAILED = 'FAILED',
 }
 
+export enum TransactionDirection {
+  INCOMING,
+  OUTGOING,
+  SELF,
+}
+
 export interface TransactionData {
   hash: string;
   memo: string | null;
@@ -35,8 +41,19 @@ export interface RewardTransactionList {
   walletId: string;
 }
 
+export interface TransferTransactionList {
+  transactions: Array<TransferTransactionData>;
+  walletId: string;
+}
+
 export interface RewardTransaction {
   delegatorAddress: string;
   validatorAddress: string;
   amount: string;
+}
+
+export interface BroadCastResult {
+  readonly transactionHash?: string;
+  readonly message?: string;
+  readonly code?: number;
 }

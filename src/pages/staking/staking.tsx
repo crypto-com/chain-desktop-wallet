@@ -12,7 +12,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { walletAssetState, sessionState } from '../../recoil/atom';
 import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
-import { RewardTransaction } from '../../models/Transaction';
+import { BroadCastResult, RewardTransaction } from '../../models/Transaction';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -40,7 +40,7 @@ const FormDelegationRequest = () => {
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [transactionHash, setTransactionHash] = useState('');
+  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
@@ -76,14 +76,14 @@ const FormDelegationRequest = () => {
     }
     try {
       setConfirmLoading(true);
-      const hash = await walletService.sendDelegateTransaction({
+      const stakingResult = await walletService.sendDelegateTransaction({
         validatorAddress: formValues.validatorAddress,
         amount: formValues.amount,
         asset: walletAsset,
         memo,
         decryptedPhrase,
       });
-      setTransactionHash(hash);
+      setBroadcastResult(stakingResult);
 
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
@@ -231,8 +231,14 @@ const FormDelegationRequest = () => {
           ]}
         >
           <>
-            <div>Your delegation transaction was successful!</div>
-            <div>{transactionHash}</div>
+            {broadcastResult?.code !== undefined &&
+            broadcastResult?.code !== null &&
+            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+              <div>The transaction timed out but it will be included in the subsequent blocks</div>
+            ) : (
+              <div>Your delegation transaction was successful !</div>
+            )}
+            <div>{broadcastResult.transactionHash ?? ''}</div>
           </>
         </SuccessModalPopup>
         <ErrorModalPopup
@@ -259,7 +265,7 @@ const FormWithdrawStakingReward = () => {
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [transactionHash, setTransactionHash] = useState('');
+  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
@@ -271,16 +277,18 @@ const FormWithdrawStakingReward = () => {
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
 
   const convertToTabularData = (allRewards: RewardTransaction[], currentAsset: UserAsset) => {
-    return allRewards.map(reward => {
-      const rewardData: RewardsTabularData = {
-        key: `${reward.validatorAddress}${reward.amount}`,
-        rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${
-          currentAsset.symbol
-        }`,
-        validatorAddress: reward.validatorAddress,
-      };
-      return rewardData;
-    });
+    return allRewards
+      .filter(reward => Number(reward.amount) > 0)
+      .map(reward => {
+        const rewardData: RewardsTabularData = {
+          key: `${reward.validatorAddress}${reward.amount}`,
+          rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${
+            currentAsset.symbol
+          }`,
+          validatorAddress: reward.validatorAddress,
+        };
+        return rewardData;
+      });
   };
 
   useEffect(() => {
@@ -327,11 +335,11 @@ const FormWithdrawStakingReward = () => {
     }
     try {
       setConfirmLoading(true);
-      const hash = await walletService.sendStakingRewardWithdrawalTx({
+      const rewardWithdrawResult = await walletService.sendStakingRewardWithdrawalTx({
         validatorAddress: withdrawValues.validatorAddress,
         decryptedPhrase,
       });
-      setTransactionHash(hash);
+      setBroadcastResult(rewardWithdrawResult);
 
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
@@ -471,8 +479,14 @@ const FormWithdrawStakingReward = () => {
         ]}
       >
         <>
-          <div>Your rewards withdrawal transaction was broadcasted successfully !</div>
-          <div>{transactionHash}</div>
+          {broadcastResult?.code !== undefined &&
+          broadcastResult?.code !== null &&
+          broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+            <div>The transaction timed out but it will be included in the subsequent blocks</div>
+          ) : (
+            <div>Your rewards withdrawal transaction was broadcasted successfully !</div>
+          )}
+          <div>{broadcastResult.transactionHash ?? ''}</div>
         </>
       </SuccessModalPopup>
       <ErrorModalPopup
