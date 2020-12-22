@@ -215,15 +215,15 @@ const FormDelegationRequest = () => {
               <div>{`${formValues?.amount} ${walletAsset.symbol}`}</div>
             </div>
             {formValues?.memo !== undefined &&
-            formValues?.memo !== null &&
-            formValues.memo !== '' ? (
-              <div className="item">
-                <div className="label">Memo</div>
-                <div>{`${formValues?.memo}`}</div>
-              </div>
-            ) : (
-              <div />
-            )}
+              formValues?.memo !== null &&
+              formValues.memo !== '' ? (
+                <div className="item">
+                  <div className="label">Memo</div>
+                  <div>{`${formValues?.memo}`}</div>
+                </div>
+              ) : (
+                <div />
+              )}
           </>
         </ModalPopup>
         <PasswordFormModal
@@ -260,14 +260,14 @@ const FormDelegationRequest = () => {
         >
           <>
             {broadcastResult?.code !== undefined &&
-            broadcastResult?.code !== null &&
-            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div className="description">
-                The transaction timed out but it will be included in the subsequent blocks
-              </div>
-            ) : (
-              <div className="description">Your delegation transaction was successful !</div>
-            )}
+              broadcastResult?.code !== null &&
+              broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+                <div className="description">
+                  The transaction timed out but it will be included in the subsequent blocks
+                </div>
+              ) : (
+                <div className="description">Your delegation transaction was successful !</div>
+              )}
             {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
           </>
         </SuccessModalPopup>
@@ -314,9 +314,8 @@ const FormWithdrawStakingReward = () => {
       .map(reward => {
         const rewardData: RewardsTabularData = {
           key: `${reward.validatorAddress}${reward.amount}`,
-          rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${
-            currentAsset.symbol
-          }`,
+          rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${currentAsset.symbol
+            }`,
           validatorAddress: reward.validatorAddress,
         };
         return rewardData;
@@ -527,16 +526,16 @@ const FormWithdrawStakingReward = () => {
       >
         <>
           {broadcastResult?.code !== undefined &&
-          broadcastResult?.code !== null &&
-          broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">
-              The transaction timed out but it will be included in the subsequent blocks
-            </div>
-          ) : (
-            <div className="description">
-              Your rewards withdrawal transaction was broadcasted successfully !
-            </div>
-          )}
+            broadcastResult?.code !== null &&
+            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+              <div className="description">
+                The transaction timed out but it will be included in the subsequent blocks
+              </div>
+            ) : (
+              <div className="description">
+                Your rewards withdrawal transaction was broadcasted successfully !
+              </div>
+            )}
           {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
         </>
       </SuccessModalPopup>

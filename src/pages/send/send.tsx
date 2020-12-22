@@ -204,12 +204,12 @@ const FormSend = () => {
             <div className="item">
               <div className="label">Memo</div>
               {formValues?.memo !== undefined &&
-              formValues?.memo !== null &&
-              formValues.memo !== '' ? (
-                <div>{`${formValues?.memo}`}</div>
-              ) : (
-                <div>--</div>
-              )}
+                formValues?.memo !== null &&
+                formValues.memo !== '' ? (
+                  <div>{`${formValues?.memo}`}</div>
+                ) : (
+                  <div>--</div>
+                )}
             </div>
           </>
         </ModalPopup>
@@ -249,14 +249,14 @@ const FormSend = () => {
         >
           <>
             {broadcastResult?.code !== undefined &&
-            broadcastResult?.code !== null &&
-            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div className="description">
-                The transaction timed out but it will be included in the subsequent blocks
-              </div>
-            ) : (
-              <div className="description">The transaction was broad-casted successfully!</div>
-            )}
+              broadcastResult?.code !== null &&
+              broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+                <div className="description">
+                  The transaction timed out but it will be included in the subsequent blocks
+                </div>
+              ) : (
+                <div className="description">The transaction was broad-casted successfully!</div>
+              )}
             {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
           </>
         </SuccessModalPopup>
