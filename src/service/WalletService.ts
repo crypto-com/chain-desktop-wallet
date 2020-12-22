@@ -30,7 +30,7 @@ import {
   TransferTransactionData,
   TransferTransactionList,
 } from '../models/Transaction';
-import { chainIndexAPI } from './rpc/ChainIndexingAPI';
+// import { chainIndexAPI } from './rpc/ChainIndexingAPI';
 
 export interface TransferRequest {
   toAddress: string;
@@ -302,19 +302,17 @@ class WalletService {
       baseDenomination,
     );
 
-    const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
-      currentSession.wallet.address,
-    );
-
-    // eslint-disable-next-line no-console
-    console.log('transferTransactions', transferTransactions);
+    // TODO: TO BE RE-ENABLED WHEN CORS ISSUE IS FIXED
+    // const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
+    //   currentSession.wallet.address,
+    // );
 
     const walletId = currentSession.wallet.identifier;
 
-    await this.saveTransfers({
-      transactions: transferTransactions,
-      walletId,
-    });
+    // await this.saveTransfers({
+    //   transactions: transferTransactions,
+    //   walletId,
+    // });
 
     await this.saveDelegationsList({
       totalBalance: delegations.totalBalance,
