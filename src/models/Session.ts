@@ -12,4 +12,12 @@ export class Session {
     this.wallet = wallet;
     this.currency = currency;
   }
+
+  public getBaseDenomination(): string {
+    return this.wallet.config.network.coin.baseDenom;
+  }
+
+  public getCurrentWalletId(): string {
+    return this.wallet.identifier;
+  }
 }

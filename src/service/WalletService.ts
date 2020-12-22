@@ -283,49 +283,66 @@ class WalletService {
   }
 
   public async fetchAndUpdateTransactions(session: Session | null = null) {
-    const currentSession =
+    const currentSession: Session =
       session == null ? await this.storageService.retrieveCurrentSession() : session;
     if (!currentSession) {
       return;
     }
 
     const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-    const baseDenomination = currentSession.wallet.config.network.coin.baseDenom;
 
-    const delegations = await nodeRpc.fetchDelegationBalance(
-      currentSession.wallet.address,
-      baseDenomination,
-    );
+    await this.fetchAndSaveDelegations(nodeRpc, currentSession);
+    await this.fetchAndSaveRewards(nodeRpc, currentSession);
+    await this.fetchAndSaveTransfers(currentSession);
+  }
 
-    const rewards = await nodeRpc.fetchStakingRewards(
-      currentSession.wallet.address,
-      baseDenomination,
-    );
+  public async fetchAndSaveTransfers(currentSession: Session) {
+    try {
+      const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
+        currentSession.wallet.address,
+      );
 
-    const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
-      currentSession.wallet.address,
-    );
+      await this.saveTransfers({
+        transactions: transferTransactions,
+        walletId: currentSession.wallet.identifier,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_TRANSFERS', e);
+    }
+  }
 
-    const walletId = currentSession.wallet.identifier;
+  public async fetchAndSaveRewards(nodeRpc: NodeRpcService, currentSession: Session) {
+    try {
+      const rewards = await nodeRpc.fetchStakingRewards(
+        currentSession.wallet.address,
+        currentSession.wallet.config.network.coin.baseDenom,
+      );
+      await this.saveRewards({
+        transactions: rewards,
+        walletId: currentSession.wallet.identifier,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_REWARDS', e);
+    }
+  }
 
-    // eslint-disable-next-line no-console
-    console.log('transferTransactions', transferTransactions);
-
-    await this.saveTransfers({
-      transactions: transferTransactions,
-      walletId,
-    });
-
-    await this.saveDelegationsList({
-      totalBalance: delegations.totalBalance,
-      transactions: delegations.transactions,
-      walletId,
-    });
-
-    await this.saveRewards({
-      transactions: rewards,
-      walletId,
-    });
+  public async fetchAndSaveDelegations(nodeRpc: NodeRpcService, currentSession: Session) {
+    try {
+      const delegations = await nodeRpc.fetchDelegationBalance(
+        currentSession.wallet.address,
+        currentSession.wallet.config.network.coin.baseDenom,
+      );
+      await this.saveDelegationsList({
+        totalBalance: delegations.totalBalance,
+        transactions: delegations.transactions,
+        walletId: currentSession.wallet.identifier,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_DELEGATIONS', e);
+    }
   }
 
   public async retrieveCurrentWalletAssets(currentSession: Session): Promise<UserAsset[]> {
