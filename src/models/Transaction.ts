@@ -45,3 +45,9 @@ export interface RewardTransaction {
   validatorAddress: string;
   amount: string;
 }
+
+export interface BroadCastResult {
+  readonly transactionHash?: string;
+  readonly message?: string;
+  readonly code?: number;
+}

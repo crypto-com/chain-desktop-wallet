@@ -22,6 +22,7 @@ import { secretStoreService } from '../storage/SecretStoreService';
 import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
+  BroadCastResult,
   RewardTransaction,
   RewardTransactionList,
   StakingTransactionData,
@@ -59,7 +60,9 @@ class WalletService {
     this.storageService = new StorageService(APP_DB_NAMESPACE);
   }
 
-  public async sendTransfer(transferRequest: TransferRequest) {
+  public readonly BROADCAST_TIMEOUT_CODE = -32603;
+
+  public async sendTransfer(transferRequest: TransferRequest): Promise<BroadCastResult> {
     const {
       nodeRpc,
       accountNumber,
@@ -83,9 +86,9 @@ class WalletService {
       transfer,
       transferRequest.decryptedPhrase,
     );
-    const transactionHash = await nodeRpc.broadcastTransaction(signedTxHex);
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
     await this.syncData(currentSession);
-    return transactionHash;
+    return broadCastResult;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -93,7 +96,9 @@ class WalletService {
     return Number(amount) * 10 ** asset.decimals;
   }
 
-  public async sendDelegateTransaction(delegationRequest: DelegationRequest) {
+  public async sendDelegateTransaction(
+    delegationRequest: DelegationRequest,
+  ): Promise<BroadCastResult> {
     const {
       nodeRpc,
       accountNumber,
@@ -119,12 +124,14 @@ class WalletService {
       delegateTransaction,
       delegationRequest.decryptedPhrase,
     );
-    const transactionHash = await nodeRpc.broadcastTransaction(signedTxHex);
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
     await this.syncData(currentSession);
-    return transactionHash;
+    return broadCastResult;
   }
 
-  public async sendStakingRewardWithdrawalTx(rewardWithdrawRequest: WithdrawStakingRewardRequest) {
+  public async sendStakingRewardWithdrawalTx(
+    rewardWithdrawRequest: WithdrawStakingRewardRequest,
+  ): Promise<BroadCastResult> {
     const {
       nodeRpc,
       accountNumber,
@@ -145,9 +152,9 @@ class WalletService {
       withdrawStakingReward,
       rewardWithdrawRequest.decryptedPhrase,
     );
-    const transactionHash = await nodeRpc.broadcastTransaction(signedTxHex);
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
     await this.syncData(currentSession);
-    return transactionHash;
+    return broadCastResult;
   }
 
   public async prepareTransaction() {
