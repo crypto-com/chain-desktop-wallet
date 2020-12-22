@@ -305,7 +305,7 @@ const FormWithdrawStakingReward = () => {
       syncRewardsData();
       didMountRef.current = true;
     }
-  }, [rewards]);
+  }, [rewards, currentSession, walletAsset]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
