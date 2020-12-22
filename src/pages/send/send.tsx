@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './send.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, Layout } from 'antd';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
@@ -10,8 +10,8 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
-import { scaledBalance, UserAsset } from '../../models/UserAsset';
-import { walletAssetState } from '../../recoil/atom';
+import { scaledBalance } from '../../models/UserAsset';
+import { sessionState, walletAssetState } from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
 
 const { Header, Content, Footer } = Layout;
@@ -27,7 +27,8 @@ const FormSend = () => {
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
-  const userAsset: UserAsset = useRecoilValue<UserAsset>(walletAssetState);
+  const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const currentSession = useRecoilValue(sessionState);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -43,7 +44,6 @@ const FormSend = () => {
   };
 
   const onWalletDecryptFinish = async (password: string) => {
-    const currentSession = await walletService.retrieveCurrentSession();
     const phraseDecrypted = await secretStoreService.decryptPhrase(
       password,
       currentSession.wallet.identifier,
@@ -62,7 +62,7 @@ const FormSend = () => {
       const sendResult = await walletService.sendTransfer({
         toAddress: formValues.recipientAddress,
         amount: formValues.amount,
-        asset: userAsset,
+        asset: walletAsset,
         memo,
         decryptedPhrase,
       });
@@ -73,6 +73,8 @@ const FormSend = () => {
       setConfirmLoading(false);
       setIsSuccessTransferModalVisible(true);
       setInputPasswordVisible(false);
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      setWalletAsset(currentWalletAsset);
 
       form.resetFields();
     } catch (e) {
@@ -113,10 +115,10 @@ const FormSend = () => {
           { required: true, message: 'Recipient address is required' },
           {
             pattern: RegExp(
-              `^(${userAsset.symbol.toString().toLocaleLowerCase()})[a-zA-HJ-NP-Z0-9]{20,120}$`,
+              `^(${walletAsset.symbol.toString().toLocaleLowerCase()})[a-zA-HJ-NP-Z0-9]{20,120}$`,
               'i',
             ),
-            message: `The recipient address should be a valid ${userAsset.symbol
+            message: `The recipient address should be a valid ${walletAsset.symbol
               .toString()
               .toUpperCase()} address`,
           },
@@ -141,7 +143,7 @@ const FormSend = () => {
         <div className="available">
           <span>Available: </span>
           <div className="available-amount">
-            {scaledBalance(userAsset)} {userAsset.symbol}
+            {scaledBalance(walletAsset)} {walletAsset.symbol}
           </div>
         </div>
       </div>

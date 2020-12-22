@@ -3,14 +3,14 @@ import './staking.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, Layout, Table, Tabs } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
-import { walletAssetState } from '../../recoil/atom';
+import { walletAssetState, sessionState } from '../../recoil/atom';
 import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction } from '../../models/Transaction';
 
@@ -44,7 +44,8 @@ const FormDelegationRequest = () => {
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
-  const walletAsset = useRecoilValue(walletAssetState);
+  const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const currentSession = useRecoilValue(sessionState);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -60,7 +61,6 @@ const FormDelegationRequest = () => {
   };
 
   const onWalletDecryptFinish = async (password: string) => {
-    const currentSession = await walletService.retrieveCurrentSession();
     const phraseDecrypted = await secretStoreService.decryptPhrase(
       password,
       currentSession.wallet.identifier,
@@ -88,7 +88,8 @@ const FormDelegationRequest = () => {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setIsSuccessTransferModalVisible(true);
-
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      setWalletAsset(currentWalletAsset);
       form.resetFields();
     } catch (e) {
       setIsVisibleConfirmationModal(false);
@@ -268,6 +269,8 @@ const FormWithdrawStakingReward = () => {
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const currentSession = useRecoilValue(sessionState);
   const didMountRef = useRef(false);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -290,13 +293,11 @@ const FormWithdrawStakingReward = () => {
 
   useEffect(() => {
     const syncRewardsData = async () => {
-      const sessionData = await walletService.retrieveCurrentSession();
-      const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
       const allRewards: RewardTransaction[] = await walletService.retrieveAllRewards(
-        sessionData.wallet.identifier,
+        currentSession.wallet.identifier,
       );
 
-      const rewardsTabularData = convertToTabularData(allRewards, currentAsset);
+      const rewardsTabularData = convertToTabularData(allRewards, walletAsset);
       setRewards(rewardsTabularData);
     };
 
@@ -304,7 +305,7 @@ const FormWithdrawStakingReward = () => {
       syncRewardsData();
       didMountRef.current = true;
     }
-  }, [rewards]);
+  }, [rewards, currentSession, walletAsset]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -319,7 +320,6 @@ const FormWithdrawStakingReward = () => {
   };
 
   const onWalletDecryptFinish = async (password: string) => {
-    const currentSession = await walletService.retrieveCurrentSession();
     const phraseDecrypted = await secretStoreService.decryptPhrase(
       password,
       currentSession.wallet.identifier,
@@ -344,6 +344,8 @@ const FormWithdrawStakingReward = () => {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setIsSuccessTransferModalVisible(true);
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      setWalletAsset(currentWalletAsset);
     } catch (e) {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
