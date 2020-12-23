@@ -255,13 +255,13 @@ function SendPage() {
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">Send</Header>
+      <div className="header-description">
+        Move funds from your transfer address to another transfer address or deposit stake to a
+        staking address.
+      </div>
       <Content>
         <div className="site-layout-background send-content">
           <div className="container">
-            <div className="description">
-              Move funds from your transfer address to another transfer address or deposit stake to
-              a staking address.
-            </div>
             <FormSend />
           </div>
         </div>

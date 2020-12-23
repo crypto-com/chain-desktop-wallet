@@ -24,17 +24,17 @@ function ReceivePage() {
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">Receive</Header>
+      <div className="header-description">Receive funds by sharing the below wallet address.</div>
       <Content>
         <div className="site-layout-background receive-content">
           <div className="container">
-            <div className="description">Share your wallet address to receive payments.</div>
             <div className="address">
               <QRCode value={session.wallet.address} size={180} />
-              <div>{session.wallet.address}</div>
+              <div className="name">{session.wallet.name}</div>
             </div>
             <CopyToClipboard text={session.wallet.address}>
               <div className="copy" onClick={onCopyClick}>
-                <CopyOutlined /> Copy address
+                {session.wallet.address} <CopyOutlined />
                 <MouseTooltip
                   offsetX={15}
                   offsetY={0}
