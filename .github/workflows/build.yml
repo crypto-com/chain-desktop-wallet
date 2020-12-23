@@ -28,16 +28,18 @@ jobs:
         run: |
           yarn install --network-timeout 600000
 
-      - name: Log release reference
-        run: |
-          echo "********* START RELEASE REF **********"
-          echo ${{ github.ref }}
-          echo "********* END RELEASE REF ************"
 
       - name: Extract branch name
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
+
+      - name: Log release reference
+        run: |
+          echo "********* START RELEASE REF **********"
+          echo ${{ github.ref }}
+          echo ${{ steps.extract_branch.outputs.branch }}
+          echo "********* END RELEASE REF ************"
 
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
