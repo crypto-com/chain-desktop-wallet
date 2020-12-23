@@ -3,7 +3,12 @@ import './home.less';
 import 'antd/dist/antd.css';
 import { Dropdown, Layout, Menu, Spin } from 'antd';
 import { Link, useHistory, useLocation } from 'react-router-dom';
-import Icon, { CaretDownOutlined, LoadingOutlined } from '@ant-design/icons';
+import Icon, {
+  CaretDownOutlined,
+  LoadingOutlined,
+  ReloadOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilState } from 'recoil';
 
@@ -13,6 +18,7 @@ import IconHome from '../../svg/IconHome';
 import IconSend from '../../svg/IconSend';
 import IconReceive from '../../svg/IconReceive';
 import IconAddress from '../../svg/IconAddress';
+import IconWallet from '../../svg/IconWallet';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
 
@@ -98,13 +104,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
     return (
       <Menu>
-        <Menu.Item>
-          <Link to="/create">Create Wallet</Link>
-        </Menu.Item>
-        <Menu.Item>
-          <Link to="/restore">Restore Wallet</Link>
-        </Menu.Item>
-        <SubMenu title="Wallet List">
+        <SubMenu title="Wallet List" icon={<Icon component={IconWallet} />}>
           {walletList.map((item, index) => {
             return (
               <Menu.Item key={index} onClick={walletClick}>
@@ -113,6 +113,18 @@ function HomeLayout(props: HomeLayoutProps) {
             );
           })}
         </SubMenu>
+        <Menu.Item className="restore-wallet-item">
+          <Link to="/restore">
+            <ReloadOutlined />
+            Restore Wallet
+          </Link>
+        </Menu.Item>
+        <Menu.Item className="create-wallet-item">
+          <Link to="/create">
+            <PlusOutlined />
+            Create Wallet
+          </Link>
+        </Menu.Item>
       </Menu>
     );
   };
