@@ -28,6 +28,12 @@ jobs:
         run: |
           yarn install --network-timeout 600000
 
+      - name: Log release reference
+        run: |
+          echo "********* START RELEASE REF **********"
+          echo ${{ github.ref }}
+          echo "********* END RELEASE REF ************"
+
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
