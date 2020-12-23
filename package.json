@@ -76,18 +76,26 @@
   "build": {
     "appId": "chain.crypto.com.chain-desktop-wallet",
     "files": [
-      "build/**/*"
+      "!**/*",
+      "./bundle/**/*"
     ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.finance",
+      "darkModeSupport": true
+    },
+    "linux": {
+      "category": "Utility"
+    },
+    "dmg": {
+      "icon": false
+    },
     "directories": {
       "buildResources": "assets"
-    },
-    "publish": [
-      {
-        "provider": "github",
-        "releaseType": "release",
-        "publishAutoUpdate": false
-      }
-    ]
+    }
   },
   "eslintConfig": {
     "extends": "react-app"
