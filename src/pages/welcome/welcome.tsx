@@ -44,10 +44,10 @@ function WelcomePage() {
           </div>
           <div className="button-container">
             <Link to="/restore">
-              <Button>Restore Wallet</Button>
+              <Button type="primary">Restore Wallet</Button>
             </Link>
             <Link to="/create">
-              <Button type="primary">Create Wallet</Button>
+              <Button>Create Wallet</Button>
             </Link>
           </div>
         </div>

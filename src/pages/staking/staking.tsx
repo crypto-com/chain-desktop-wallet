@@ -201,7 +201,7 @@ const FormDelegationRequest = () => {
           </>
         </ModalPopup>
         <PasswordFormModal
-          description="Input the application password decrypt wallet"
+          description="Input the app password decrypt wallet"
           okButtonText="Decrypt wallet"
           onCancel={() => {
             setInputPasswordVisible(false);
@@ -215,7 +215,7 @@ const FormDelegationRequest = () => {
             };
           }}
           successText="Wallet decrypted successfully !"
-          title="Provide application password"
+          title="Provide app password"
           visible={inputPasswordVisible}
           successButtonText="Continue"
           confirmPassword={false}
@@ -449,7 +449,7 @@ const FormWithdrawStakingReward = () => {
         </>
       </ModalPopup>
       <PasswordFormModal
-        description="Input the application password decrypt wallet"
+        description="Input the app password decrypt wallet"
         okButtonText="Decrypt wallet"
         onCancel={() => {
           setInputPasswordVisible(false);
@@ -463,7 +463,7 @@ const FormWithdrawStakingReward = () => {
           };
         }}
         successText="Wallet decrypted successfully !"
-        title="Provide application password"
+        title="Provide app password"
         visible={inputPasswordVisible}
         successButtonText="Continue"
         confirmPassword={false}

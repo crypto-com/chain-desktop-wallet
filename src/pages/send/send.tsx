@@ -192,7 +192,7 @@ const FormSend = () => {
         </ModalPopup>
 
         <PasswordFormModal
-          description="Input the application password decrypt wallet"
+          description="Input the app password decrypt wallet"
           okButtonText="Decrypt wallet"
           onCancel={() => {
             setInputPasswordVisible(false);
@@ -206,7 +206,7 @@ const FormSend = () => {
             };
           }}
           successText="Wallet decrypted successfully !"
-          title="Provide application password"
+          title="Provide app password"
           visible={inputPasswordVisible}
           successButtonText="Continue"
           confirmPassword={false}

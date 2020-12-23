@@ -132,7 +132,7 @@ function BackupPage() {
             </>
           </ErrorModalPopup>
           <PasswordFormModal
-            description="Input the application password to encrypt the wallet to be restored"
+            description="Input the app password to encrypt the wallet to be restored"
             okButtonText="Encrypt wallet"
             onCancel={() => {
               setInputPasswordVisible(false);
@@ -146,7 +146,7 @@ function BackupPage() {
               };
             }}
             successText="Wallet created and encrypted successfully !"
-            title="Provide application password"
+            title="Provide app password"
             visible={inputPasswordVisible}
             successButtonText="Go to Home"
             confirmPassword={false}

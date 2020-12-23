@@ -56,7 +56,7 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
               : {},
           ]}
         >
-          <Input.Password placeholder="App password" />
+          <Input.Password placeholder="Enter your app password" />
         </Form.Item>
         {props.confirmPassword && (
           <Form.Item

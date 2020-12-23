@@ -107,7 +107,7 @@ const FormCreate = () => {
         hasFeedback
         rules={[{ required: true, message: 'Wallet name is required' }]}
       >
-        <Input placeholder="Wallet name" />
+        <Input maxLength={36} placeholder="Wallet name" />
       </Form.Item>
       <Form.Item name="network" label="Network" rules={[{ required: true }]}>
         <Select placeholder="Select wallet network" onChange={onNetworkChange}>
