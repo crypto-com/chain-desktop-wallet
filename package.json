@@ -1,6 +1,6 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Crypto.com Chain Desktop Wallet",
   "author": "Crypto.com <chain@crypto.com>",
   "license": "Apache-2.0",
@@ -74,13 +74,20 @@
     "src/**/*.{js,jsx,ts,tsx}": "yarn lint:js"
   },
   "build": {
-    "extends": null,
+    "appId": "chain.crypto.com.chain-desktop-wallet",
     "files": [
       "build/**/*"
     ],
     "directories": {
       "buildResources": "assets"
-    }
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "releaseType": "release",
+        "publishAutoUpdate": false
+      }
+    ]
   },
   "eslintConfig": {
     "extends": "react-app"
