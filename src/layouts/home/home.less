@@ -69,11 +69,13 @@
       display: flex;
       align-items: center;
       width: calc(@sider-width - 2 * @sider-padding-lr);
+      height: 40px;
       margin-bottom: 20px;
+      border-radius: @border-radius;
       cursor: pointer;
       img {
         margin-right: 10px;
-        margin-left: 24px;
+        margin-left: 18px;
       }
       span {
         position: absolute;
@@ -83,7 +85,9 @@
         transition: transform 0.1s linear;
       }
       &.ant-dropdown-open {
+        background: rgba(17, 153, 250, 0.1);
         svg {
+          margin-right: 10px;
           transform: rotate(180deg);
         }
       }
@@ -116,7 +120,17 @@
   }
 }
 .ant-dropdown {
-  .ant-menu-item a {
-    color: @azure;
+  ul.ant-menu-root {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px 3px rgba(0, 0, 0, 0.05);
   }
+  .ant-menu-item {
+    a {
+      color: @azure;
+    }
+  }
+}
+.ant-menu-submenu-popup ul {
+  margin-top: -5px !important;
 }

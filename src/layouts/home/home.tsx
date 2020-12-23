@@ -154,7 +154,7 @@ function HomeLayout(props: HomeLayoutProps) {
             overlay={<WalletMenu />}
             placement="topCenter"
             className="wallet-selection"
-            arrow
+            // arrow
             trigger={['click']}
           >
             <div>
