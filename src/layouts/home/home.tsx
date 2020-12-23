@@ -8,6 +8,7 @@ import Icon, {
   LoadingOutlined,
   ReloadOutlined,
   PlusOutlined,
+  CheckOutlined,
 } from '@ant-design/icons';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilState } from 'recoil';
@@ -108,10 +109,23 @@ function HomeLayout(props: HomeLayoutProps) {
           {walletList.map((item, index) => {
             return (
               <Menu.Item key={index} onClick={walletClick}>
-                {item.name}
+                {item.name}{' '}
+                {session.wallet.identifier === item.identifier ? (
+                  <CheckOutlined
+                    style={{
+                      fontSize: '18px',
+                      color: '#1199fa',
+                      position: 'absolute',
+                      right: '5px',
+                      top: '10px',
+                    }}
+                  />
+                ) : (
+                  ''
+                )}
               </Menu.Item>
             );
-          })}
+          }, session)}
         </SubMenu>
         <Menu.Item className="restore-wallet-item">
           <Link to="/restore">
