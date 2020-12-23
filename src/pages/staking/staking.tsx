@@ -125,6 +125,7 @@ const FormDelegationRequest = () => {
       <Form.Item
         name="validatorAddress"
         label="Validator address"
+        hasFeedback
         rules={[
           { required: true, message: 'Validator address is required' },
           {
@@ -144,6 +145,7 @@ const FormDelegationRequest = () => {
         <Form.Item
           name="amount"
           label="Delegation Amount"
+          hasFeedback
           rules={[
             { required: true, message: 'Staking amount is required' },
             {

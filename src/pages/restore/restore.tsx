@@ -96,6 +96,7 @@ const FormRestore = () => {
       <Form.Item
         name="name"
         label="Wallet Name"
+        hasFeedback
         rules={[{ required: true, message: 'Wallet name is required' }]}
       >
         <Input placeholder="Wallet name" />
@@ -103,6 +104,7 @@ const FormRestore = () => {
       <Form.Item
         name="mnemonic"
         label="Mnemonic Phrase"
+        hasFeedback
         rules={[{ required: true, message: 'The mnemonic phrase is required' }]}
       >
         <Input.TextArea autoSize={{ minRows: 3, maxRows: 3 }} placeholder="Mnemonic phrase" />

@@ -104,6 +104,7 @@ const FormCreate = () => {
       <Form.Item
         name="name"
         label="Wallet Name"
+        hasFeedback
         rules={[{ required: true, message: 'Wallet name is required' }]}
       >
         <Input placeholder="Wallet name" />

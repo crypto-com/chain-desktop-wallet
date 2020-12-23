@@ -111,6 +111,7 @@ const FormSend = () => {
       <Form.Item
         name="recipientAddress"
         label="Recipient Address"
+        hasFeedback
         rules={[
           { required: true, message: 'Recipient address is required' },
           {
@@ -130,6 +131,7 @@ const FormSend = () => {
         <Form.Item
           name="amount"
           label="Sending Amount"
+          hasFeedback
           rules={[
             { required: true, message: 'Transfer amount is required' },
             {
