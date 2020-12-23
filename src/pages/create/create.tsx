@@ -146,11 +146,12 @@ const FormCreate = () => {
 function CreatePage() {
   return (
     <main className="create-page">
-      <BackButton />
       <div className="header">
         <img src={logo} className="logo" alt="logo" />
       </div>
       <div className="container">
+        <BackButton />
+
         <div>
           <div className="title">Create wallet</div>
           <div className="slogan">Create a name and select the network for your wallet.</div>

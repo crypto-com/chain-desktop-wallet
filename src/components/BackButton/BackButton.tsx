@@ -1,6 +1,6 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { LeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import './BackButton.less';
 
@@ -13,7 +13,7 @@ const BackButton = () => {
 
   return (
     <div className="back-button" onClick={backTo}>
-      <LeftOutlined />
+      <ArrowLeftOutlined />
     </div>
   );
 };
