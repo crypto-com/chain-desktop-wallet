@@ -105,11 +105,34 @@ function HomeLayout(props: HomeLayoutProps) {
 
     return (
       <Menu>
-        <SubMenu title="Wallet List" icon={<Icon component={IconWallet} />}>
-          {walletList.map((item, index) => {
+        {walletList.length > 5 ? (
+          <SubMenu title="Wallet List" icon={<Icon component={IconWallet} />}>
+            {walletList.map((item, index) => {
+              return (
+                <Menu.Item key={index} onClick={walletClick}>
+                  {item.name}
+                  {session.wallet.identifier === item.identifier ? (
+                    <CheckOutlined
+                      style={{
+                        fontSize: '18px',
+                        color: '#1199fa',
+                        position: 'absolute',
+                        right: '5px',
+                        top: '10px',
+                      }}
+                    />
+                  ) : (
+                    ''
+                  )}
+                </Menu.Item>
+              );
+            }, session)}
+          </SubMenu>
+        ) : (
+          walletList.map((item, index) => {
             return (
-              <Menu.Item key={index} onClick={walletClick}>
-                {item.name}{' '}
+              <Menu.Item key={index} onClick={walletClick} icon={<Icon component={IconWallet} />}>
+                {item.name}
                 {session.wallet.identifier === item.identifier ? (
                   <CheckOutlined
                     style={{
@@ -125,8 +148,9 @@ function HomeLayout(props: HomeLayoutProps) {
                 )}
               </Menu.Item>
             );
-          }, session)}
-        </SubMenu>
+          }, session)
+        )}
+
         <Menu.Item className="restore-wallet-item">
           <Link to="/restore">
             <ReloadOutlined />
