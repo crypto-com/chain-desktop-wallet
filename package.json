@@ -77,8 +77,7 @@
   "build": {
     "appId": "chain.crypto.com.chain-desktop-wallet",
     "files": [
-      "!**/*",
-      "./bundle/**/*"
+      "build/**/*"
     ],
     "mac": {
       "target": [
