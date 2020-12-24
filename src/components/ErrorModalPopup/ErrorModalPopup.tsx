@@ -22,7 +22,6 @@ const ErrorModalPopup: React.FC<ErrorModalPopupProps> = props => {
     <>
       {props.button}
       <Modal
-        title={props.title}
         visible={props.isModalVisible}
         onOk={props.handleOk}
         onCancel={props.handleCancel}
@@ -30,6 +29,7 @@ const ErrorModalPopup: React.FC<ErrorModalPopupProps> = props => {
         className="error-popup"
       >
         <ErrorXmark />
+        <div className="title">{props.title}</div>
         {props.children}
       </Modal>
     </>

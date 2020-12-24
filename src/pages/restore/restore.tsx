@@ -96,6 +96,7 @@ const FormRestore = () => {
       <Form.Item
         name="name"
         label="Wallet Name"
+        hasFeedback
         rules={[{ required: true, message: 'Wallet name is required' }]}
       >
         <Input placeholder="Wallet name" />
@@ -103,6 +104,7 @@ const FormRestore = () => {
       <Form.Item
         name="mnemonic"
         label="Mnemonic Phrase"
+        hasFeedback
         rules={[{ required: true, message: 'The mnemonic phrase is required' }]}
       >
         <Input.TextArea autoSize={{ minRows: 3, maxRows: 3 }} placeholder="Mnemonic phrase" />
@@ -127,7 +129,7 @@ const FormRestore = () => {
         </Button>
 
         <PasswordFormModal
-          description="Input the application password to encrypt the wallet to be restored"
+          description="Input the app password to encrypt the wallet to be restored"
           okButtonText="Encrypt wallet"
           isButtonLoading={isButtonLoading}
           onCancel={() => {
@@ -142,7 +144,7 @@ const FormRestore = () => {
             };
           }}
           successText="Wallet restored and encrypted successfully !"
-          title="Provide application password"
+          title="Provide app password"
           visible={inputPasswordVisible}
           successButtonText="Go to Home"
           confirmPassword={false}
@@ -155,7 +157,7 @@ const FormRestore = () => {
           footer={[]}
         >
           <>
-            <div>Your Mnemonic Phrase is invalid. Please check again.</div>
+            <div className="description">Your Mnemonic Phrase is invalid. Please check again.</div>
           </>
         </ErrorModalPopup>
       </Form.Item>
@@ -166,11 +168,11 @@ const FormRestore = () => {
 function RestorePage() {
   return (
     <main className="restore-page">
-      <BackButton />
       <div className="header">
         <img src={logo} className="logo" alt="logo" />
       </div>
       <div className="container">
+        <BackButton />
         <div>
           <div className="title">Restore wallet</div>
           <div className="slogan">Create a name and select the network for your wallet.</div>

@@ -22,7 +22,6 @@ const SuccessModalPopup: React.FC<SuccessModalPopupProps> = props => {
     <>
       {props.button}
       <Modal
-        title={props.title}
         visible={props.isModalVisible}
         onOk={props.handleOk}
         onCancel={props.handleCancel}
@@ -30,6 +29,7 @@ const SuccessModalPopup: React.FC<SuccessModalPopupProps> = props => {
         className="success-popup"
       >
         <SuccessCheckmark />
+        <div className="title">{props.title}</div>
         {props.children}
       </Modal>
     </>

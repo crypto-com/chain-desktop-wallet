@@ -111,6 +111,7 @@ const FormSend = () => {
       <Form.Item
         name="recipientAddress"
         label="Recipient Address"
+        hasFeedback
         rules={[
           { required: true, message: 'Recipient address is required' },
           {
@@ -130,6 +131,7 @@ const FormSend = () => {
         <Form.Item
           name="amount"
           label="Sending Amount"
+          hasFeedback
           rules={[
             { required: true, message: 'Transfer amount is required' },
             {
@@ -175,22 +177,21 @@ const FormSend = () => {
               <div className="label">Amount</div>
               <div>{`${formValues?.amount} CRO`}</div>
             </div>
-
-            {formValues?.memo !== undefined &&
-            formValues?.memo !== null &&
-            formValues.memo !== '' ? (
-              <div className="item">
-                <div className="label">Memo</div>
+            <div className="item">
+              <div className="label">Memo</div>
+              {formValues?.memo !== undefined &&
+              formValues?.memo !== null &&
+              formValues.memo !== '' ? (
                 <div>{`${formValues?.memo}`}</div>
-              </div>
-            ) : (
-              <div />
-            )}
+              ) : (
+                <div>--</div>
+              )}
+            </div>
           </>
         </ModalPopup>
 
         <PasswordFormModal
-          description="Input the application password decrypt wallet"
+          description="Input the app password decrypt wallet"
           okButtonText="Decrypt wallet"
           onCancel={() => {
             setInputPasswordVisible(false);
@@ -204,7 +205,7 @@ const FormSend = () => {
             };
           }}
           successText="Wallet decrypted successfully !"
-          title="Provide application password"
+          title="Provide app password"
           visible={inputPasswordVisible}
           successButtonText="Continue"
           confirmPassword={false}
@@ -241,7 +242,9 @@ const FormSend = () => {
           footer={[]}
         >
           <>
-            <div>The transfer transaction failed. Please try again later</div>
+            <div className="description">
+              The transfer transaction failed. Please try again later
+            </div>
           </>
         </ErrorModalPopup>
       </Form.Item>
@@ -253,13 +256,13 @@ function SendPage() {
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">Send</Header>
+      <div className="header-description">
+        Move funds from your transfer address to another transfer address or deposit stake to a
+        staking address.
+      </div>
       <Content>
         <div className="site-layout-background send-content">
           <div className="container">
-            <div className="description">
-              Move funds from your transfer address to another transfer address or deposit stake to
-              a staking address.
-            </div>
             <FormSend />
           </div>
         </div>

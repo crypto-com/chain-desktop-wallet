@@ -125,6 +125,7 @@ const FormDelegationRequest = () => {
       <Form.Item
         name="validatorAddress"
         label="Validator address"
+        hasFeedback
         rules={[
           { required: true, message: 'Validator address is required' },
           {
@@ -144,6 +145,7 @@ const FormDelegationRequest = () => {
         <Form.Item
           name="amount"
           label="Delegation Amount"
+          hasFeedback
           rules={[
             { required: true, message: 'Staking amount is required' },
             {
@@ -156,7 +158,9 @@ const FormDelegationRequest = () => {
         </Form.Item>
         <div className="available">
           <span>Available: </span>
-          <div className="available-amount">{scaledBalance(walletAsset)} CRO</div>
+          <div className="available-amount">
+            {scaledBalance(walletAsset)} {walletAsset.symbol}
+          </div>
         </div>
       </div>
       <Form.Item name="memo" label="Memo (Optional)">
@@ -199,7 +203,7 @@ const FormDelegationRequest = () => {
           </>
         </ModalPopup>
         <PasswordFormModal
-          description="Input the application password decrypt wallet"
+          description="Input the app password decrypt wallet"
           okButtonText="Decrypt wallet"
           onCancel={() => {
             setInputPasswordVisible(false);
@@ -213,7 +217,7 @@ const FormDelegationRequest = () => {
             };
           }}
           successText="Wallet decrypted successfully !"
-          title="Provide application password"
+          title="Provide app password"
           visible={inputPasswordVisible}
           successButtonText="Continue"
           confirmPassword={false}
@@ -234,9 +238,11 @@ const FormDelegationRequest = () => {
             {broadcastResult?.code !== undefined &&
             broadcastResult?.code !== null &&
             broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div>The transaction timed out but it will be included in the subsequent blocks</div>
+              <div className="description">
+                The transaction timed out but it will be included in the subsequent blocks
+              </div>
             ) : (
-              <div>Your delegation transaction was successful !</div>
+              <div className="description">Your delegation transaction was successful !</div>
             )}
             <div>{broadcastResult.transactionHash ?? ''}</div>
           </>
@@ -249,7 +255,9 @@ const FormDelegationRequest = () => {
           footer={[]}
         >
           <>
-            <div>The staking transaction failed. Please try again later</div>
+            <div className="description">
+              The staking transaction failed. Please try again later
+            </div>
           </>
         </ErrorModalPopup>
       </Form.Item>
@@ -447,7 +455,7 @@ const FormWithdrawStakingReward = () => {
         </>
       </ModalPopup>
       <PasswordFormModal
-        description="Input the application password decrypt wallet"
+        description="Input the app password decrypt wallet"
         okButtonText="Decrypt wallet"
         onCancel={() => {
           setInputPasswordVisible(false);
@@ -461,7 +469,7 @@ const FormWithdrawStakingReward = () => {
           };
         }}
         successText="Wallet decrypted successfully !"
-        title="Provide application password"
+        title="Provide app password"
         visible={inputPasswordVisible}
         successButtonText="Continue"
         confirmPassword={false}
@@ -497,7 +505,9 @@ const FormWithdrawStakingReward = () => {
         footer={[]}
       >
         <>
-          <div>The reward withdrawal transaction failed. Please try again later</div>
+          <div className="description">
+            The reward withdrawal transaction failed. Please try again later
+          </div>
         </>
       </ErrorModalPopup>
     </div>
