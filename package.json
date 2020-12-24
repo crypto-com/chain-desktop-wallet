@@ -1,7 +1,8 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.0.3",
-  "description": "Crypto.com Chain Desktop Wallet",
+  "version": "0.0.7",
+  "description": "Crypto.com Chain Desktop Wallet App",
+  "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.com <chain@crypto.com>",
   "license": "Apache-2.0",
   "homepage": ".",
@@ -74,10 +75,24 @@
     "src/**/*.{js,jsx,ts,tsx}": "yarn lint:js"
   },
   "build": {
-    "extends": null,
+    "appId": "chain.crypto.com.chain-desktop-wallet",
     "files": [
       "build/**/*"
     ],
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.finance",
+      "darkModeSupport": true
+    },
+    "linux": {
+      "category": "Utility"
+    },
+    "dmg": {
+      "icon": false
+    },
     "directories": {
       "buildResources": "assets"
     }

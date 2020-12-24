@@ -6,6 +6,8 @@ on:
   push:
     branches:
       - master
+    tags:
+      - '*'
 
 jobs:
   release:
@@ -27,6 +29,20 @@ jobs:
       - name: Install deps with big timeout
         run: |
           yarn install --network-timeout 600000
+
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v1
+        # Only install Snapcraft on Ubuntu
+        if: startsWith(matrix.os, 'ubuntu')
+        with:
+          # Log in to Snap Store
+          snapcraft_token: ${{ secrets.snapcraft_token }}
+
+      - name: Log release reference
+        run: |
+          echo "********* START RELEASE REF **********"
+          echo ${{ github.ref }}
+          echo "********* END RELEASE REF ************"
 
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
