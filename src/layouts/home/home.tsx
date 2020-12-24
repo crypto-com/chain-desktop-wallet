@@ -10,7 +10,6 @@ import Icon, {
   PlusOutlined,
   CheckOutlined,
 } from '@ant-design/icons';
-// import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilState } from 'recoil';
 
 import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
@@ -18,7 +17,7 @@ import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 import IconSend from '../../svg/IconSend';
 import IconReceive from '../../svg/IconReceive';
-import IconAddress from '../../svg/IconAddress';
+import IconStaking from '../../svg/IconStaking';
 import IconWallet from '../../svg/IconWallet';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
@@ -75,7 +74,7 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/home" icon={<Icon component={IconHome} />}>
           <Link to="/home">Home</Link>
         </Menu.Item>
-        <Menu.Item key="/staking" icon={<Icon component={IconAddress} />}>
+        <Menu.Item key="/staking" icon={<Icon component={IconStaking} />}>
           <Link to="/staking">Staking</Link>
         </Menu.Item>
         <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
