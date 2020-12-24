@@ -158,7 +158,9 @@ const FormDelegationRequest = () => {
         </Form.Item>
         <div className="available">
           <span>Available: </span>
-          <div className="available-amount">{scaledBalance(walletAsset)} CRO</div>
+          <div className="available-amount">
+            {scaledBalance(walletAsset)} {walletAsset.symbol}
+          </div>
         </div>
       </div>
       <Form.Item name="memo" label="Memo (Optional)">
