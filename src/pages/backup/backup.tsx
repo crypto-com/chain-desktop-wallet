@@ -128,7 +128,7 @@ function BackupPage() {
             footer={[]}
           >
             <>
-              <div>Please try again.</div>
+              <div className="description">Please try again.</div>
             </>
           </ErrorModalPopup>
           <PasswordFormModal

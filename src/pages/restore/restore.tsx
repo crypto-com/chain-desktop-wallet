@@ -157,7 +157,7 @@ const FormRestore = () => {
           footer={[]}
         >
           <>
-            <div>Your Mnemonic Phrase is invalid. Please check again.</div>
+            <div className="description">Your Mnemonic Phrase is invalid. Please check again.</div>
           </>
         </ErrorModalPopup>
       </Form.Item>

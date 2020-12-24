@@ -242,7 +242,9 @@ const FormSend = () => {
           footer={[]}
         >
           <>
-            <div>The transfer transaction failed. Please try again later</div>
+            <div className="description">
+              The transfer transaction failed. Please try again later
+            </div>
           </>
         </ErrorModalPopup>
       </Form.Item>

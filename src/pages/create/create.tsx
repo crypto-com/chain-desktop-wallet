@@ -136,7 +136,7 @@ const FormCreate = () => {
           ]}
         >
           <>
-            <div>Your wallet has been created!</div>
+            <div className="description">Your wallet has been created!</div>
           </>
         </SuccessModalPopup>
       </Form.Item>
