@@ -75,7 +75,7 @@ const SignUpPage = () => {
         ) : (
           <>
             <SuccessCheckmark />
-            <div className="title">Create App Password Success</div>
+            <div className="title">App Password Created Successfully </div>
             <div className="slogan">
               You have successfully created your app password. You can proceed to restore or create
               a wallet.
