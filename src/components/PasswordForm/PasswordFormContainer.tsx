@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './PasswordFormConatiner.less';
 import { Button } from 'antd';
 import PasswordForm from './PasswordForm';
-import ResultModalPopup from '../ResultModalPopup/ResultModalPopup';
+// import ResultModalPopup from '../ResultModalPopup/ResultModalPopup';
 
 interface PasswordFormPageProps {
   title: string;
@@ -35,54 +35,23 @@ interface PasswordFormPageProps {
   onCancel: () => void;
 }
 
-type DisplayComponent = 'form' | 'result';
-
 const PasswordFormContainer: React.FC<PasswordFormPageProps> = props => {
-  const [appPassword, setAppPassword] = useState<string>();
-  const [displayComponent, setDisplayComponent] = useState<DisplayComponent>('form');
   const [validationErrMsg, setValidatorErrMsg] = useState<string>();
-  const [resultButtonText, setResultButtonText] = useState<string>();
-
-  const onModalFinish = () => {
-    if (validationErrMsg !== '') {
-      setValidatorErrMsg('');
-      setDisplayComponent('form');
-      return;
-    }
-    props.onSuccess(appPassword!);
-    setDisplayComponent('form');
-  };
-  const onModalCancel = () => {
-    if (validationErrMsg !== '') {
-      props.onCancel();
-      setDisplayComponent('form');
-      return;
-    }
-
-    // Clicking cancel on success result behaves the same as clicking ok button on the modal
-    onModalFinish();
-  };
   const onFormFinish = async (password: string) => {
     const result = await props.onValidatePassword(password);
     if (!result.valid) {
       setValidatorErrMsg(result.errMsg);
-      setResultButtonText('Retry');
-      setDisplayComponent('result');
+      // eslint-disable-next-line
+      console.error(validationErrMsg);
       return;
     }
-
-    setAppPassword(password);
-    setResultButtonText(props.successButtonText);
-    setDisplayComponent('result');
+    props.onSuccess(password);
   };
   const onFormErr = (errMsg: string) => {
     setValidatorErrMsg(errMsg);
-    setResultButtonText('Retry');
-    setDisplayComponent('result');
   };
   const onFormChange = () => {
     setValidatorErrMsg('');
-    setDisplayComponent('form');
   };
 
   return (
@@ -97,31 +66,9 @@ const PasswordFormContainer: React.FC<PasswordFormPageProps> = props => {
         onErr={onFormErr}
         shouldValidate
       >
-        <ResultModalPopup
-          isModalVisible={displayComponent === 'result'}
-          handleCancel={onModalCancel}
-          handleOk={onModalFinish}
-          title={props.title}
-          button={
-            <Button type="primary" htmlType="submit">
-              {props.okButtonText || 'Submit'}
-            </Button>
-          }
-          footer={[
-            <div key="submit" style={{ textAlign: 'center' }}>
-              <Button type="primary" onClick={onModalFinish}>
-                {resultButtonText}
-              </Button>
-            </div>,
-          ]}
-          success={validationErrMsg === ''}
-        >
-          {validationErrMsg ? (
-            <div className="result-message result-alert-message">{validationErrMsg}</div>
-          ) : (
-            <div className="result-message">{props.successText}</div>
-          )}
-        </ResultModalPopup>
+        <Button type="primary" htmlType="submit">
+          {props.okButtonText || 'Submit'}
+        </Button>
       </PasswordForm>
     </div>
   );

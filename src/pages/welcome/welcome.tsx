@@ -24,10 +24,10 @@ function WelcomePage() {
     if (!didMountRef.current) {
       fetchWalletData();
       didMountRef.current = true;
-    } else if (!hasPasswordBeenSet) {
-      history.push('/signUp');
     } else if (hasWallet && hasPasswordBeenSet) {
       history.push('/home');
+    } else if (hasPasswordBeenSet) {
+      history.push('/signUp');
     }
   }, [hasPasswordBeenSet, hasWallet, history]);
 
@@ -43,12 +43,12 @@ function WelcomePage() {
             Our Sample Chain Wallet supports wallet management and funds transfer.
           </div>
           <div className="button-container">
-            <Link to="/restore">
-              <Button type="primary">Restore Wallet</Button>
+            <Link to="/signup">
+              <Button type="primary">Get Started</Button>
             </Link>
-            <Link to="/create">
+            {/* <Link to="/create">
               <Button>Create Wallet</Button>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </div>

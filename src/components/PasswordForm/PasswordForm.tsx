@@ -61,7 +61,7 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
         {props.confirmPassword && (
           <Form.Item
             name="passwordConfirm"
-            label="Confirm Password"
+            label="Confirm App Password"
             rules={[
               { required: true, message: 'Password confirmation is required' },
               ({ getFieldValue }) => ({
@@ -75,7 +75,7 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
               }),
             ]}
           >
-            <Input.Password placeholder="Confirm the password" />
+            <Input.Password placeholder="Confirm app password" />
           </Form.Item>
         )}
         <Form.Item wrapperCol={{ span: 12, offset: 6 }}>{props.children}</Form.Item>
