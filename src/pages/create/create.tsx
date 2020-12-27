@@ -104,9 +104,10 @@ const FormCreate = () => {
       <Form.Item
         name="name"
         label="Wallet Name"
+        hasFeedback
         rules={[{ required: true, message: 'Wallet name is required' }]}
       >
-        <Input placeholder="Wallet name" />
+        <Input maxLength={36} placeholder="Wallet name" />
       </Form.Item>
       <Form.Item name="network" label="Network" rules={[{ required: true }]}>
         <Select placeholder="Select wallet network" onChange={onNetworkChange}>
@@ -135,7 +136,7 @@ const FormCreate = () => {
           ]}
         >
           <>
-            <div>Your wallet has been created!</div>
+            <div className="description">Your wallet has been created!</div>
           </>
         </SuccessModalPopup>
       </Form.Item>
@@ -146,11 +147,12 @@ const FormCreate = () => {
 function CreatePage() {
   return (
     <main className="create-page">
-      <BackButton />
       <div className="header">
         <img src={logo} className="logo" alt="logo" />
       </div>
       <div className="container">
+        <BackButton />
+
         <div>
           <div className="title">Create wallet</div>
           <div className="slogan">Create a name and select the network for your wallet.</div>

@@ -3,8 +3,13 @@ import './home.less';
 import 'antd/dist/antd.css';
 import { Dropdown, Layout, Menu, Spin } from 'antd';
 import { Link, useHistory, useLocation } from 'react-router-dom';
-import Icon, { CaretDownOutlined, LoadingOutlined } from '@ant-design/icons';
-// import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
+import Icon, {
+  CaretDownOutlined,
+  LoadingOutlined,
+  ReloadOutlined,
+  PlusOutlined,
+  CheckOutlined,
+} from '@ant-design/icons';
 import { useRecoilState } from 'recoil';
 
 import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
@@ -12,7 +17,8 @@ import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 import IconSend from '../../svg/IconSend';
 import IconReceive from '../../svg/IconReceive';
-import IconAddress from '../../svg/IconAddress';
+import IconStaking from '../../svg/IconStaking';
+import IconWallet from '../../svg/IconWallet';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
 
@@ -68,7 +74,7 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/home" icon={<Icon component={IconHome} />}>
           <Link to="/home">Home</Link>
         </Menu.Item>
-        <Menu.Item key="/staking" icon={<Icon component={IconAddress} />}>
+        <Menu.Item key="/staking" icon={<Icon component={IconStaking} />}>
           <Link to="/staking">Staking</Link>
         </Menu.Item>
         <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
@@ -98,21 +104,64 @@ function HomeLayout(props: HomeLayoutProps) {
 
     return (
       <Menu>
-        <Menu.Item>
-          <Link to="/create">Create Wallet</Link>
-        </Menu.Item>
-        <Menu.Item>
-          <Link to="/restore">Restore Wallet</Link>
-        </Menu.Item>
-        <SubMenu title="Wallet List">
-          {walletList.map((item, index) => {
+        {walletList.length > 5 ? (
+          <SubMenu title="Wallet List" icon={<Icon component={IconWallet} />}>
+            {walletList.map((item, index) => {
+              return (
+                <Menu.Item key={index} onClick={walletClick}>
+                  {item.name}
+                  {session.wallet.identifier === item.identifier ? (
+                    <CheckOutlined
+                      style={{
+                        fontSize: '18px',
+                        color: '#1199fa',
+                        position: 'absolute',
+                        right: '5px',
+                        top: '10px',
+                      }}
+                    />
+                  ) : (
+                    ''
+                  )}
+                </Menu.Item>
+              );
+            }, session)}
+          </SubMenu>
+        ) : (
+          walletList.map((item, index) => {
             return (
-              <Menu.Item key={index} onClick={walletClick}>
+              <Menu.Item key={index} onClick={walletClick} icon={<Icon component={IconWallet} />}>
                 {item.name}
+                {session.wallet.identifier === item.identifier ? (
+                  <CheckOutlined
+                    style={{
+                      fontSize: '18px',
+                      color: '#1199fa',
+                      position: 'absolute',
+                      right: '5px',
+                      top: '10px',
+                    }}
+                  />
+                ) : (
+                  ''
+                )}
               </Menu.Item>
             );
-          })}
-        </SubMenu>
+          }, session)
+        )}
+
+        <Menu.Item className="restore-wallet-item">
+          <Link to="/restore">
+            <ReloadOutlined />
+            Restore Wallet
+          </Link>
+        </Menu.Item>
+        <Menu.Item className="create-wallet-item">
+          <Link to="/create">
+            <PlusOutlined />
+            Create Wallet
+          </Link>
+        </Menu.Item>
       </Menu>
     );
   };
@@ -128,7 +177,7 @@ function HomeLayout(props: HomeLayoutProps) {
             overlay={<WalletMenu />}
             placement="topCenter"
             className="wallet-selection"
-            arrow
+            // arrow
             trigger={['click']}
           >
             <div>
