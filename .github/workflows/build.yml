@@ -36,7 +36,7 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')
         with:
           # Log in to Snap Store
-          snapcraft_token: ${{ secrets.snapcraft_token }}
+          snapcraft_token: ${{ secrets.SNAPCRAFT_TOKEN }}
 
       - name: Log release reference
         run: |
