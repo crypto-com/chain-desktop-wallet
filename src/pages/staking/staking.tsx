@@ -441,7 +441,6 @@ const FormWithdrawStakingReward = () => {
   return (
     <div>
       <StakingTable />
-
       <ModalPopup
         isModalVisible={isConfirmationModalVisible}
         handleCancel={handleCancel}
