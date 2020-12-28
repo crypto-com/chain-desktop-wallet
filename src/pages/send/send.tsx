@@ -133,12 +133,16 @@ const FormSend = () => {
           label="Sending Amount"
           hasFeedback
           rules={[
-            { required: true, message: 'Transfer amount is required' },
+            { required: true, message: 'Sending amount is required' },
             {
-              // pattern: /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/,
+              pattern: /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/,
+              message: 'Please enter a valid sending amount',
+            },
+            {
               max: scaledBalance(walletAsset),
+              min: 0,
               type: 'number',
-              message: 'Please enter a valid transfer amount',
+              message: 'The sending amount exceeds your available wallet balance',
             },
           ]}
         >
