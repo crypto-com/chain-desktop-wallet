@@ -146,6 +146,7 @@ const FormDelegationRequest = () => {
           name="amount"
           label="Delegation Amount"
           hasFeedback
+          validateFirst
           rules={[
             { required: true, message: 'Staking amount is required' },
             {

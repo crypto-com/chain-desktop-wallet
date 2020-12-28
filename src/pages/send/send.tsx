@@ -132,6 +132,7 @@ const FormSend = () => {
           name="amount"
           label="Sending Amount"
           hasFeedback
+          validateFirst
           rules={[
             { required: true, message: 'Sending amount is required' },
             {
