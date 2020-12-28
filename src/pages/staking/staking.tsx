@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Input, Layout, Table, Tabs } from 'antd';
+import { Button, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
@@ -146,15 +146,22 @@ const FormDelegationRequest = () => {
           name="amount"
           label="Delegation Amount"
           hasFeedback
+          validateFirst
           rules={[
             { required: true, message: 'Staking amount is required' },
             {
               pattern: /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/,
-              message: 'Staking amount should be a number',
+              message: 'Please enter a valid staking amount',
+            },
+            {
+              max: scaledBalance(walletAsset),
+              min: 0,
+              type: 'number',
+              message: 'The staking amount exceeds your available wallet balance',
             },
           ]}
         >
-          <Input />
+          <InputNumber />
         </Form.Item>
         <div className="available">
           <span>Available: </span>
@@ -243,7 +250,7 @@ const FormDelegationRequest = () => {
           button={null}
           footer={[
             <Button key="submit" type="primary" onClick={closeSuccessModal}>
-              Ok Thanks
+              Ok
             </Button>,
           ]}
         >
@@ -257,7 +264,7 @@ const FormDelegationRequest = () => {
             ) : (
               <div className="description">Your delegation transaction was successful !</div>
             )}
-            <div>{broadcastResult.transactionHash ?? ''}</div>
+            {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
           </>
         </SuccessModalPopup>
         <ErrorModalPopup
@@ -510,7 +517,7 @@ const FormWithdrawStakingReward = () => {
         button={null}
         footer={[
           <Button key="submit" type="primary" onClick={closeSuccessModal}>
-            Ok Thanks
+            Ok
           </Button>,
         ]}
       >
@@ -518,11 +525,15 @@ const FormWithdrawStakingReward = () => {
           {broadcastResult?.code !== undefined &&
           broadcastResult?.code !== null &&
           broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div>The transaction timed out but it will be included in the subsequent blocks</div>
+            <div className="description">
+              The transaction timed out but it will be included in the subsequent blocks
+            </div>
           ) : (
-            <div>Your rewards withdrawal transaction was broadcasted successfully !</div>
+            <div className="description">
+              Your rewards withdrawal transaction was broadcasted successfully !
+            </div>
           )}
-          <div>{broadcastResult.transactionHash ?? ''}</div>
+          {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
         </>
       </SuccessModalPopup>
       <ErrorModalPopup
