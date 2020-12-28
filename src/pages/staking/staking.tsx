@@ -149,7 +149,7 @@ const FormDelegationRequest = () => {
           rules={[
             { required: true, message: 'Staking amount is required' },
             {
-              pattern: /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/,
+              // pattern: /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/,
               max: scaledBalance(walletAsset),
               type: 'number',
               message: 'Please enter a valid staking amount',
