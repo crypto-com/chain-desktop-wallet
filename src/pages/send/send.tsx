@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './send.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Input, Layout } from 'antd';
+import { Button, Form, Input, InputNumber, Layout } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
@@ -136,11 +136,13 @@ const FormSend = () => {
             { required: true, message: 'Transfer amount is required' },
             {
               pattern: /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/,
-              message: 'Transfer amount should be a number',
+              max: scaledBalance(walletAsset),
+              type: 'number',
+              message: 'Please enter a valid transfer amount',
             },
           ]}
         >
-          <Input />
+          <InputNumber />
         </Form.Item>
         <div className="available">
           <span>Available: </span>
@@ -219,7 +221,7 @@ const FormSend = () => {
           button={null}
           footer={[
             <Button key="submit" type="primary" onClick={closeSuccessModal}>
-              Ok Thanks
+              Ok
             </Button>,
           ]}
         >
@@ -227,11 +229,13 @@ const FormSend = () => {
             {broadcastResult?.code !== undefined &&
             broadcastResult?.code !== null &&
             broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div>The transaction timed out but it will be included in the subsequent blocks</div>
+              <div className="description">
+                The transaction timed out but it will be included in the subsequent blocks
+              </div>
             ) : (
-              <div>The transaction was broad-casted successfully !</div>
+              <div className="description">The transaction was broad-casted successfully!</div>
             )}
-            <div>{broadcastResult.transactionHash ?? ''}</div>
+            {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
           </>
         </SuccessModalPopup>
         <ErrorModalPopup
