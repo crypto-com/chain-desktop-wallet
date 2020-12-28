@@ -381,7 +381,15 @@ const FormWithdrawStakingReward = () => {
       title: 'Validator Address',
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
-      render: text => <a>{text}</a>,
+      render: text => (
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+        >
+          {text}
+        </a>
+      ),
     },
     {
       title: 'Reward Amount',
