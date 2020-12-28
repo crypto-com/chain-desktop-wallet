@@ -176,7 +176,15 @@ function HomePage() {
       title: 'Validator Address',
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
-      render: text => <a>{text}</a>,
+      render: text => (
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href={`https://chain.crypto.com/explorer/validator/${text}`}
+        >
+          {text}
+        </a>
+      ),
     },
     {
       title: 'Amount',
