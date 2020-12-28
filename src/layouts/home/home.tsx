@@ -149,19 +149,24 @@ function HomeLayout(props: HomeLayoutProps) {
             );
           }, session)
         )}
-
-        <Menu.Item className="restore-wallet-item">
-          <Link to="/restore">
-            <ReloadOutlined />
-            Restore Wallet
-          </Link>
-        </Menu.Item>
-        <Menu.Item className="create-wallet-item">
-          <Link to="/create">
-            <PlusOutlined />
-            Create Wallet
-          </Link>
-        </Menu.Item>
+        {walletList.length < 10 ? (
+          <>
+            <Menu.Item className="restore-wallet-item">
+              <Link to="/restore">
+                <ReloadOutlined />
+                Restore Wallet
+              </Link>
+            </Menu.Item>
+            <Menu.Item className="create-wallet-item">
+              <Link to="/create">
+                <PlusOutlined />
+                Create Wallet
+              </Link>
+            </Menu.Item>
+          </>
+        ) : (
+          ''
+        )}
       </Menu>
     );
   };
