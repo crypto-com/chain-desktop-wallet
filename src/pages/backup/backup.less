@@ -5,7 +5,7 @@
     '. container .'
     '. . .';
   grid-template-rows: 20vh 80vh;
-  grid-template-columns: 10vw 80vw 10vw;
+  grid-template-columns: auto 600px auto;
   background: @background-color;
   .header {
     display: flex;
@@ -20,6 +20,7 @@
   }
 
   .container {
+    position: relative;
     display: block;
     grid-area: container;
     align-items: center;
@@ -33,7 +34,7 @@
     }
 
     .slogan {
-      width: 60vw;
+      // width: 60vw;
       margin: auto;
       color: @font-color-dark;
       font-size: 14px;
