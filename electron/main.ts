@@ -24,6 +24,12 @@ function createWindow() {
 
   win.on('closed', () => (win = null));
 
+  // Open default browser when direct to external
+  win.webContents.on('new-window', function(e, url) {
+    e.preventDefault();
+    require('electron').shell.openExternal(url);
+  });
+
   // Hot Reloading
   if (isDev) {
     // 'node_modules/.bin/electronPath'

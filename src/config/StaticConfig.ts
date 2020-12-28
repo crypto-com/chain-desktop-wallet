@@ -12,6 +12,7 @@ export type WalletConfig = {
   enabled: boolean;
   name: string;
   nodeUrl: string;
+  explorerUrl: string;
   derivationPath: string;
   network: Network;
 };
@@ -21,6 +22,7 @@ const TestNetConfig: WalletConfig = {
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",
   nodeUrl: 'https://testnet-croeseid-1.crypto.com',
+  explorerUrl: 'https://chain.crypto.com/explorer',
   network: CroNetwork.Testnet,
 };
 
@@ -29,6 +31,7 @@ const MainNetConfig: WalletConfig = {
   name: 'MAINNET',
   derivationPath: "44'/394'/0'/0/0",
   nodeUrl: 'TO_BE_DECIDED',
+  explorerUrl: 'TO_BE_DECIDED',
   network: CroNetwork.Mainnet,
 };
 
@@ -46,6 +49,7 @@ const CustomDevNet: WalletConfig = {
     coin: { baseDenom: '', croDenom: '' },
   },
   nodeUrl: '',
+  explorerUrl: '',
 };
 
 // Available wallet configs will be presented to the user on wallet creation
