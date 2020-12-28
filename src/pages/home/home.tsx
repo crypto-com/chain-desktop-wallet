@@ -34,7 +34,16 @@ const TransactionColumns = [
     title: 'Transaction Hash',
     dataIndex: 'transactionHash',
     key: 'transactionHash',
-    render: text => <a data-original={text}>{middleEllipsis(text)}</a>,
+    render: text => (
+      <a
+        data-original={text}
+        target="_blank"
+        rel="noreferrer"
+        href={`https://chain.crypto.com/explorer/tx/${text}`}
+      >
+        {middleEllipsis(text)}
+      </a>
+    ),
   },
   {
     title: 'Amount',
