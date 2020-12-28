@@ -172,6 +172,19 @@ const FormSend = () => {
             </Button>
           }
           okText="Confirm"
+          footer={[
+            <Button
+              key="submit"
+              type="primary"
+              loading={confirmLoading}
+              onClick={onConfirmTransfer}
+            >
+              Confirm
+            </Button>,
+            <Button key="back" type="link" onClick={handleCancel}>
+              Cancel
+            </Button>,
+          ]}
         >
           <>
             <div className="title">Confirm Transaction</div>

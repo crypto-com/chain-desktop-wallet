@@ -74,17 +74,16 @@ function BackupPage() {
 
   return (
     <main className="backup-page">
-      <BackButton />
       <div className="header">
         <img src={logo} className="logo" alt="logo" />
       </div>
       <div className="container">
+        <BackButton />
         <div>
           <div className="title">Backup Recovery Phrase</div>
           <div className="slogan">
             The recovery phrase will only be shown once, backup the 24-word phrase now and keep it
-            safe. <br />
-            You would need your recovery phrase to restore and access wallet.
+            safe. You would need your recovery phrase to restore and access wallet.
           </div>
           <div>
             <CopyToClipboard text={wallet?.encryptedPhrase}>

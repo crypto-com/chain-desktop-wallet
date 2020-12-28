@@ -184,6 +184,19 @@ const FormDelegationRequest = () => {
               Review
             </Button>
           }
+          footer={[
+            <Button
+              key="submit"
+              type="primary"
+              loading={confirmLoading}
+              onClick={onConfirmDelegation}
+            >
+              Confirm
+            </Button>,
+            <Button key="back" type="link" onClick={handleCancel}>
+              Cancel
+            </Button>,
+          ]}
           okText="Confirm"
         >
           <>
@@ -388,7 +401,15 @@ const FormWithdrawStakingReward = () => {
       title: 'Validator Address',
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
-      render: text => <a>{text}</a>,
+      render: text => (
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+        >
+          {text}
+        </a>
+      ),
     },
     {
       title: 'Reward Amount',
@@ -435,7 +456,6 @@ const FormWithdrawStakingReward = () => {
   return (
     <div>
       <StakingTable />
-
       <ModalPopup
         isModalVisible={isConfirmationModalVisible}
         handleCancel={handleCancel}
@@ -446,6 +466,14 @@ const FormWithdrawStakingReward = () => {
         //     Review
         //   </Button>
         // }
+        footer={[
+          <Button key="submit" type="primary" loading={confirmLoading} onClick={onConfirmTransfer}>
+            Confirm
+          </Button>,
+          <Button key="back" type="link" onClick={handleCancel}>
+            Cancel
+          </Button>,
+        ]}
         okText="Confirm"
       >
         <>
