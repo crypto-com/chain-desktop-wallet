@@ -2,14 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Layout, Table, Tabs, Typography } from 'antd';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import {
   scaledAmount,
   scaledBalance,
   scaledStakingBalance,
   UserAsset,
 } from '../../models/UserAsset';
-import { walletAssetState } from '../../recoil/atom';
+import { sessionState, walletAssetState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
   StakingTransactionData,
@@ -29,51 +29,6 @@ const middleEllipsis = (str: string) => {
   return `${str.substr(0, 12)}...${str.substr(str.length - 12, str.length)}`;
 };
 
-const TransactionColumns = [
-  {
-    title: 'Transaction Hash',
-    dataIndex: 'transactionHash',
-    key: 'transactionHash',
-    render: text => (
-      <a
-        data-original={text}
-        target="_blank"
-        rel="noreferrer"
-        href={`https://chain.crypto.com/explorer/tx/${text}`}
-      >
-        {middleEllipsis(text)}
-      </a>
-    ),
-  },
-  {
-    title: 'Amount',
-    dataIndex: 'amount',
-    key: 'amount',
-    render: (text, record: TransferTabularData) => {
-      const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
-      const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
-
-      return (
-        <Text type={color}>
-          {sign}
-          {text}
-        </Text>
-      );
-    },
-  },
-  {
-    title: 'Recipient',
-    dataIndex: 'recipientAddress',
-    key: 'recipientAddress',
-    render: text => <div data-original={text}>{middleEllipsis(text)}</div>,
-  },
-  {
-    title: 'Time',
-    dataIndex: 'time',
-    key: 'time',
-  },
-];
-
 interface StakingTabularData {
   key: string;
   stakedAmount: string;
@@ -92,6 +47,7 @@ interface TransferTabularData {
 
 function HomePage() {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const currentSession = useRecoilValue(sessionState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const didMountRef = useRef(false);
@@ -180,7 +136,7 @@ function HomePage() {
         <a
           target="_blank"
           rel="noreferrer"
-          href={`https://chain.crypto.com/explorer/validator/${text}`}
+          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
         >
           {text}
         </a>
@@ -196,6 +152,51 @@ function HomePage() {
       dataIndex: 'delegatorAddress',
       key: 'delegatorAddress',
       render: text => <a>{text}</a>,
+    },
+  ];
+
+  const TransactionColumns = [
+    {
+      title: 'Transaction Hash',
+      dataIndex: 'transactionHash',
+      key: 'transactionHash',
+      render: text => (
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/tx/${text}`}
+        >
+          {middleEllipsis(text)}
+        </a>
+      ),
+    },
+    {
+      title: 'Amount',
+      dataIndex: 'amount',
+      key: 'amount',
+      render: (text, record: TransferTabularData) => {
+        const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
+        const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+
+        return (
+          <Text type={color}>
+            {sign}
+            {text}
+          </Text>
+        );
+      },
+    },
+    {
+      title: 'Recipient',
+      dataIndex: 'recipientAddress',
+      key: 'recipientAddress',
+      render: text => <div data-original={text}>{middleEllipsis(text)}</div>,
+    },
+    {
+      title: 'Time',
+      dataIndex: 'time',
+      key: 'time',
     },
   ];
 

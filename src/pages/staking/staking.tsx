@@ -385,7 +385,7 @@ const FormWithdrawStakingReward = () => {
         <a
           target="_blank"
           rel="noreferrer"
-          href={`https://chain.crypto.com/explorer/validator/${text}`}
+          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
         >
           {text}
         </a>
