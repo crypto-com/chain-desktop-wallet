@@ -64,50 +64,53 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
         >
           <Input.Password placeholder="Enter your app password" />
         </Form.Item>
-        <div className="password-strength-meter">
-          Password strength:
-          <Progress
-            strokeColor={{
-              '0%': '#1199fa',
-              '100%': '#87d068',
-            }}
-            format={percent => {
-              if (percent! < 25) {
-                return 'worst';
-              }
-              if (percent! < 50) {
-                return 'bad';
-              }
-              if (percent! < 75) {
-                return 'weak';
-              }
-              if (percent! < 100) {
-                return 'good';
-              }
-              return 'strong';
-            }}
-            percent={(strength / 4) * 100}
-          />
-        </div>
+
         {props.confirmPassword && (
-          <Form.Item
-            name="passwordConfirm"
-            label="Confirm App Password"
-            rules={[
-              { required: true, message: 'Password confirmation is required' },
-              ({ getFieldValue }) => ({
-                validator(rule, value) {
-                  if (!value || getFieldValue('password') === value) {
-                    return Promise.resolve();
+          <>
+            <div className="password-strength-meter">
+              Password strength:
+              <Progress
+                strokeColor={{
+                  '0%': '#1199fa',
+                  '100%': '#87d068',
+                }}
+                format={percent => {
+                  if (percent! < 25) {
+                    return 'worst';
                   }
-                  // eslint-disable-next-line prefer-promise-reject-errors
-                  return Promise.reject('The password confirmation should match');
-                },
-              }),
-            ]}
-          >
-            <Input.Password placeholder="Confirm app password" />
-          </Form.Item>
+                  if (percent! < 50) {
+                    return 'bad';
+                  }
+                  if (percent! < 75) {
+                    return 'weak';
+                  }
+                  if (percent! < 100) {
+                    return 'good';
+                  }
+                  return 'strong';
+                }}
+                percent={(strength / 4) * 100}
+              />
+            </div>
+            <Form.Item
+              name="passwordConfirm"
+              label="Confirm App Password"
+              rules={[
+                { required: true, message: 'Password confirmation is required' },
+                ({ getFieldValue }) => ({
+                  validator(rule, value) {
+                    if (!value || getFieldValue('password') === value) {
+                      return Promise.resolve();
+                    }
+                    // eslint-disable-next-line prefer-promise-reject-errors
+                    return Promise.reject('The password confirmation should match');
+                  },
+                }),
+              ]}
+            >
+              <Input.Password placeholder="Confirm app password" />
+            </Form.Item>
+          </>
         )}
         <Form.Item wrapperCol={{ span: 12, offset: 6 }}>{props.children}</Form.Item>
       </Form>
