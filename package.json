@@ -40,7 +40,8 @@
     "scrypt-js": "^3.0.1",
     "ts-pnp": "1.2.0",
     "typescript": "4.0.5",
-    "url-loader": "4.1.1"
+    "url-loader": "4.1.1",
+    "zxcvbn": "^4.4.2"
   },
   "scripts": {
     "start": "node scripts/start.js",

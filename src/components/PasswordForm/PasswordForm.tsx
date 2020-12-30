@@ -1,5 +1,6 @@
-import React from 'react';
-import { Form, Input } from 'antd';
+import React, { useState } from 'react';
+import { Form, Input, Progress } from 'antd';
+import zxcvbn from 'zxcvbn';
 import './PasswordForm.less';
 
 interface PasswordFormProps {
@@ -22,6 +23,7 @@ interface PasswordFormProps {
 
 const PasswordForm: React.FC<PasswordFormProps> = props => {
   const [form] = Form.useForm();
+  const [strength, setStrength] = useState<number>(0);
   const onFormFinish = ({ password, passwordConfirm }) => {
     if (props.confirmPassword && password !== passwordConfirm) {
       props.onErr('Password Mismatch');
@@ -39,7 +41,11 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
         layout="vertical"
         form={form}
         name="control-ref"
-        onChange={props.onChange}
+        onChange={() => {
+          // `score` ranges from 0-4
+          setStrength(zxcvbn(form.getFieldsValue().password).score);
+          props.onChange();
+        }}
         onFinish={onFormFinish}
       >
         <Form.Item
@@ -58,6 +64,31 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
         >
           <Input.Password placeholder="Enter your app password" />
         </Form.Item>
+        <div className="password-strength-meter">
+          Password strength:
+          <Progress
+            strokeColor={{
+              '0%': '#1199fa',
+              '100%': '#87d068',
+            }}
+            format={percent => {
+              if (percent! < 25) {
+                return 'worst';
+              }
+              if (percent! < 50) {
+                return 'bad';
+              }
+              if (percent! < 75) {
+                return 'weak';
+              }
+              if (percent! < 100) {
+                return 'good';
+              }
+              return 'strong';
+            }}
+            percent={(strength / 4) * 100}
+          />
+        </div>
         {props.confirmPassword && (
           <Form.Item
             name="passwordConfirm"
