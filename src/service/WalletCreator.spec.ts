@@ -15,7 +15,7 @@ describe('Testing Wallet Creation', () => {
 
     expect(testNetWallet.name).to.eq('My-TestNet-Wallet');
     expect(testNetWallet.config).to.eq(testNetConfig);
-    expect(testNetWallet.config.network.chainId).to.eq('testnet-croeseid');
+    expect(testNetWallet.config.network.chainId).to.eq('testnet-croeseid-2');
 
     expect(testNetWallet.address.startsWith('tcro')).to.eq(true);
     expect(testNetWallet.encryptedPhrase.length > 0).to.eq(true);
