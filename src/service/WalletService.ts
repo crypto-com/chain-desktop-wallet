@@ -300,7 +300,7 @@ class WalletService {
 
     await Promise.all([
       this.fetchAndSaveDelegations(nodeRpc, currentSession),
-      this.fetchAndSaveDelegations(nodeRpc, currentSession),
+      this.fetchAndSaveRewards(nodeRpc, currentSession),
       this.fetchAndSaveTransfers(currentSession),
     ]);
   }
