@@ -24,3 +24,7 @@ export function isElectron() {
 
   return false;
 }
+
+export function trimString(name: String, maxLength = 18) {
+  return name.length > maxLength ? `${name.substring(0, maxLength)}...` : name;
+}
