@@ -136,6 +136,10 @@ const FormSend = () => {
           rules={[
             { required: true, message: 'Sending amount is required' },
             {
+              pattern: /[^0]+/,
+              message: 'Sending amount cannot be 0',
+            },
+            {
               pattern: /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/,
               message: 'Please enter a valid sending amount',
             },
@@ -143,7 +147,7 @@ const FormSend = () => {
               max: scaledBalance(walletAsset),
               min: 0,
               type: 'number',
-              message: 'The sending amount exceeds your available wallet balance',
+              message: 'Sending amount exceeds your available wallet balance',
             },
           ]}
         >
