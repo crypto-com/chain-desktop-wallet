@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import './restore.less';
 import { Button, Form, Input, Select } from 'antd';
+import { HDKey } from '../../service/types/ChainJsLib';
 import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
@@ -105,7 +106,20 @@ const FormRestore = () => {
         name="mnemonic"
         label="Mnemonic Phrase"
         hasFeedback
-        rules={[{ required: true, message: 'The mnemonic phrase is required' }]}
+        validateFirst
+        rules={[
+          { required: true, message: 'The mnemonic phrase is required' },
+          () => ({
+            validator(_, value) {
+              try {
+                HDKey.fromMnemonic(value);
+              } catch (e) {
+                return Promise.reject(new Error('Please enter a valid mnemonic phrase'));
+              }
+              return Promise.resolve();
+            },
+          }),
+        ]}
       >
         <Input.TextArea autoSize={{ minRows: 3, maxRows: 3 }} placeholder="Mnemonic phrase" />
       </Form.Item>
