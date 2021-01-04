@@ -27,6 +27,7 @@ export class TransactionSigner implements ITransactionSigner {
   }
 
   public getTransactionInfo(phrase: string, transaction: TransactionUnsigned) {
+    this.setCustomFee(transaction);
     const cro = sdk.CroSDK({ network: this.config.network });
 
     const importedHDKey = HDKey.fromMnemonic(phrase);
@@ -36,10 +37,18 @@ export class TransactionSigner implements ITransactionSigner {
     const rawTx = new cro.RawTransaction();
     rawTx.setMemo(transaction.memo);
 
-    const fee = new cro.Coin('5000', Units.BASE);
-    rawTx.setFee(fee);
+    if (transaction.fee) {
+      const fee = new cro.Coin(transaction.fee, Units.BASE);
+      rawTx.setFee(fee);
+    }
 
     return { cro, keyPair, rawTx };
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public setCustomFee(transaction: TransactionUnsigned) {
+    transaction.fee = '5000';
+    return transaction;
   }
 
   public async signTransfer(

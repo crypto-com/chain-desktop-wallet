@@ -2,6 +2,7 @@ import 'mocha';
 import { expect } from 'chai';
 import { DefaultWalletConfigs, WalletConfig } from '../../config/StaticConfig';
 import { TransactionSigner } from './TransactionSigner';
+import { TransactionUnsigned } from './TransactionSupported';
 
 const testNet = DefaultWalletConfigs.TestNetConfig;
 // Overridden testnet chainId
@@ -13,12 +14,20 @@ const testNetConfig: WalletConfig = {
   },
 };
 
+class MockTransactionSigner extends TransactionSigner {
+  // eslint-disable-next-line class-methods-use-this
+  public setCustomFee(transaction: TransactionUnsigned) {
+    /// Do nothing, returns same tx
+    return transaction;
+  }
+}
+
 describe('Testing TransactionSigner', () => {
   it('test transfer transaction signing ', async () => {
     const phrase =
       'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
 
-    const signer = new TransactionSigner(testNetConfig);
+    const signer = new MockTransactionSigner(testNetConfig);
 
     const signedTransferHex = await signer.signTransfer(
       {
@@ -41,7 +50,7 @@ describe('Testing TransactionSigner', () => {
     const phrase =
       'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
 
-    const signer = new TransactionSigner(testNetConfig);
+    const signer = new MockTransactionSigner(testNetConfig);
 
     const signedDelegateTxHex = await signer.signDelegateTx(
       {
@@ -64,7 +73,7 @@ describe('Testing TransactionSigner', () => {
     const phrase =
       'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
 
-    const signer = new TransactionSigner(testNetConfig);
+    const signer = new MockTransactionSigner(testNetConfig);
 
     const withdrawStakingRewardTxHex = await signer.signWithdrawStakingRewardTx(
       {
