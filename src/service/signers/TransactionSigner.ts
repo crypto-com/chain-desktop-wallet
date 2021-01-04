@@ -35,6 +35,10 @@ export class TransactionSigner implements ITransactionSigner {
 
     const rawTx = new cro.RawTransaction();
     rawTx.setMemo(transaction.memo);
+
+    const fee = new cro.Coin('5000', Units.BASE);
+    rawTx.setFee(fee);
+
     return { cro, keyPair, rawTx };
   }
 

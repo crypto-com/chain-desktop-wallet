@@ -74,6 +74,10 @@ export class NodeRpcService implements INodeRpcService {
     try {
       const signedBytes = Bytes.fromHexString(signedTxHex).toUint8Array();
       const broadcastResponse: BroadcastResponse = await this.client.broadcastTx(signedBytes);
+      if (!broadcastResponse.data || broadcastResponse.code !== undefined) {
+        // noinspection ExceptionCaughtLocallyJS
+        throw new TypeError(`Transaction failed: ${broadcastResponse}`);
+      }
       return {
         transactionHash: broadcastResponse.transactionHash,
       };
