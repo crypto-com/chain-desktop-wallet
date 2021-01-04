@@ -13,6 +13,7 @@ import Icon, {
 import { useRecoilState } from 'recoil';
 
 import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
+import { trimString } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 import IconSend from '../../svg/IconSend';
@@ -109,7 +110,7 @@ function HomeLayout(props: HomeLayoutProps) {
             {walletList.map((item, index) => {
               return (
                 <Menu.Item key={index} onClick={walletClick}>
-                  {item.name}
+                  {trimString(item.name)}
                   {session.wallet.identifier === item.identifier ? (
                     <CheckOutlined
                       style={{
@@ -131,7 +132,7 @@ function HomeLayout(props: HomeLayoutProps) {
           walletList.map((item, index) => {
             return (
               <Menu.Item key={index} onClick={walletClick} icon={<Icon component={IconWallet} />}>
-                {item.name}
+                {trimString(item.name)}
                 {session.wallet.identifier === item.identifier ? (
                   <CheckOutlined
                     style={{
@@ -187,7 +188,7 @@ function HomeLayout(props: HomeLayoutProps) {
           >
             <div>
               <img src={WalletIcon} alt="walletIcon" />
-              {session?.wallet.name}
+              {trimString(session?.wallet.name)}
               <CaretDownOutlined />
             </div>
           </Dropdown>

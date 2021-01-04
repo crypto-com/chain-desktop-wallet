@@ -9,10 +9,12 @@ function createWindow() {
   win = new BrowserWindow({
     width: 1280,
     height: 800,
+    minWidth: 1080,
+    minHeight: 702,
     webPreferences: {
       nodeIntegration: true,
     },
-    resizable: false,
+    resizable: true,
   });
 
   if (isDev) {
