@@ -2,6 +2,7 @@ export interface TransactionUnsigned {
   memo: string;
   accountNumber: number;
   accountSequence: number;
+  fee?: string | undefined;
 }
 
 export interface TransferTransactionUnsigned extends TransactionUnsigned {

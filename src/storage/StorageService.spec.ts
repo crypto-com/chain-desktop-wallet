@@ -33,7 +33,7 @@ describe('Testing Storage Service', () => {
     const loadedWallet = await mockWalletStore.findWalletByIdentifier(walletIdentifier);
     expect(loadedWallet.name).to.eq('My-TestNet-Wallet');
     expect(loadedWallet.address).to.eq(newWalletAddress);
-    expect(loadedWallet.config.network.chainId).to.eq('testnet-croeseid-1');
+    expect(loadedWallet.config.network.chainId).to.eq('testnet-croeseid-2');
   });
 
   it('Test session storage ', async () => {

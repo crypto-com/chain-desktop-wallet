@@ -1,16 +1,33 @@
 import 'mocha';
 import { expect } from 'chai';
-import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import { DefaultWalletConfigs, WalletConfig } from '../../config/StaticConfig';
 import { TransactionSigner } from './TransactionSigner';
+import { TransactionUnsigned } from './TransactionSupported';
+
+const testNet = DefaultWalletConfigs.TestNetConfig;
+// Overridden testnet chainId
+const testNetConfig: WalletConfig = {
+  ...testNet,
+  network: {
+    ...testNet.network,
+    chainId: 'testnet-croeseid-1',
+  },
+};
+
+class MockTransactionSigner extends TransactionSigner {
+  // eslint-disable-next-line class-methods-use-this
+  public setCustomFee(transaction: TransactionUnsigned) {
+    /// Do nothing, returns same tx
+    return transaction;
+  }
+}
 
 describe('Testing TransactionSigner', () => {
   it('test transfer transaction signing ', async () => {
-    const testNetConfig = DefaultWalletConfigs.TestNetConfig;
-
     const phrase =
       'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
 
-    const signer = new TransactionSigner(testNetConfig);
+    const signer = new MockTransactionSigner(testNetConfig);
 
     const signedTransferHex = await signer.signTransfer(
       {
@@ -30,12 +47,10 @@ describe('Testing TransactionSigner', () => {
   });
 
   it('test delegate transaction signing ', async () => {
-    const testNetConfig = DefaultWalletConfigs.TestNetConfig;
-
     const phrase =
       'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
 
-    const signer = new TransactionSigner(testNetConfig);
+    const signer = new MockTransactionSigner(testNetConfig);
 
     const signedDelegateTxHex = await signer.signDelegateTx(
       {
@@ -55,12 +70,10 @@ describe('Testing TransactionSigner', () => {
   });
 
   it('test withdraw delegation reward transaction signing ', async () => {
-    const testNetConfig = DefaultWalletConfigs.TestNetConfig;
-
     const phrase =
       'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
 
-    const signer = new TransactionSigner(testNetConfig);
+    const signer = new MockTransactionSigner(testNetConfig);
 
     const withdrawStakingRewardTxHex = await signer.signWithdrawStakingRewardTx(
       {

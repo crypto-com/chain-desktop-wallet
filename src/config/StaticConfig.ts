@@ -21,9 +21,12 @@ const TestNetConfig: WalletConfig = {
   enabled: true,
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",
-  nodeUrl: 'https://testnet-croeseid-1.crypto.com',
+  nodeUrl: 'https://testnet-croeseid.crypto.com',
   explorerUrl: 'https://chain.crypto.com/explorer',
-  network: CroNetwork.Testnet,
+  network: {
+    ...CroNetwork.Testnet,
+    chainId: 'testnet-croeseid-2',
+  },
 };
 
 const MainNetConfig: WalletConfig = {
