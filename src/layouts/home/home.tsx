@@ -96,8 +96,7 @@ function HomeLayout(props: HomeLayoutProps) {
       const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setSession(currentSession);
       setUserAsset(currentAsset);
-      await walletService.syncData(currentSession);
-      await walletService.syncTransactionsData(currentSession);
+      await walletService.syncAll(currentSession);
 
       setLoading(false);
     };

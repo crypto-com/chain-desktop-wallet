@@ -87,7 +87,7 @@ class WalletService {
       transferRequest.decryptedPhrase,
     );
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncData(currentSession);
+    await this.syncAll(currentSession);
     return broadCastResult;
   }
 
@@ -125,8 +125,15 @@ class WalletService {
       delegationRequest.decryptedPhrase,
     );
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncData(currentSession);
+    await this.syncAll(currentSession);
     return broadCastResult;
+  }
+
+  public async syncAll(currentSession: Session) {
+    await Promise.all([
+      this.syncBalancesData(currentSession),
+      this.syncTransactionsData(currentSession),
+    ]);
   }
 
   public async sendStakingRewardWithdrawalTx(
@@ -153,7 +160,7 @@ class WalletService {
       rewardWithdrawRequest.decryptedPhrase,
     );
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncData(currentSession);
+    await this.syncAll(currentSession);
     return broadCastResult;
   }
 
@@ -243,7 +250,7 @@ class WalletService {
 
   public async setCurrentSession(session: Session): Promise<void> {
     await this.storageService.setSession(session);
-    return this.syncData(session);
+    return this.syncBalancesData(session);
   }
 
   public async fetchAndUpdateBalances(session: Session | null = null) {
@@ -291,9 +298,11 @@ class WalletService {
 
     const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
 
-    await this.fetchAndSaveDelegations(nodeRpc, currentSession);
-    await this.fetchAndSaveRewards(nodeRpc, currentSession);
-    await this.fetchAndSaveTransfers(currentSession);
+    await Promise.all([
+      this.fetchAndSaveDelegations(nodeRpc, currentSession),
+      this.fetchAndSaveDelegations(nodeRpc, currentSession),
+      this.fetchAndSaveTransfers(currentSession),
+    ]);
   }
 
   public async fetchAndSaveTransfers(currentSession: Session) {
@@ -394,7 +403,7 @@ class WalletService {
     };
   }
 
-  public async syncData(session: Session | null = null): Promise<void> {
+  public async syncBalancesData(session: Session | null = null): Promise<void> {
     try {
       await this.fetchAndUpdateBalances(session);
       return this.loadAndSaveAssetPrices(session);
