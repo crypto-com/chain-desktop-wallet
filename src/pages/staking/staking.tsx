@@ -212,7 +212,7 @@ const FormDelegationRequest = () => {
             </div>
             <div className="item">
               <div className="label">Amount</div>
-              <div>{`${formValues?.amount} CRO`}</div>
+              <div>{`${formValues?.amount} ${walletAsset.symbol}`}</div>
             </div>
             {formValues?.memo !== undefined &&
             formValues?.memo !== null &&

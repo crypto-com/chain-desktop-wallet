@@ -73,7 +73,7 @@ const FormRestore = () => {
     try {
       const wallet = await walletService.restoreWallet(importOptions);
       await walletService.encryptWalletAndSetSession(password, wallet);
-      await walletService.syncTransactionsData(new Session(wallet));
+      await walletService.syncAll(new Session(wallet));
       goToHome();
       form.resetFields();
       return;

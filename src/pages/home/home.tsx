@@ -45,54 +45,54 @@ interface TransferTabularData {
   direction: TransactionDirection;
 }
 
+function convertDelegations(allDelegations: StakingTransactionData[], currentAsset: UserAsset) {
+  return allDelegations.map(dlg => {
+    const stakedAmount = scaledAmount(dlg.stakedAmount, currentAsset.decimals).toString();
+    const data: StakingTabularData = {
+      key: dlg.validatorAddress + dlg.stakedAmount,
+      delegatorAddress: dlg.delegatorAddress,
+      validatorAddress: dlg.validatorAddress,
+      stakedAmount: `${stakedAmount} ${currentAsset.symbol}`,
+    };
+    return data;
+  });
+}
+
+function convertTransfers(
+  allTransfers: TransferTransactionData[],
+  currentAsset: UserAsset,
+  sessionData: Session,
+) {
+  const { address } = sessionData.wallet;
+  function getDirection(from: string, to: string): TransactionDirection {
+    if (address === from && address === to) {
+      return TransactionDirection.SELF;
+    }
+    if (address === from) {
+      return TransactionDirection.OUTGOING;
+    }
+    return TransactionDirection.INCOMING;
+  }
+  return allTransfers.map(transfer => {
+    const transferAmount = scaledAmount(transfer.amount, currentAsset.decimals).toString();
+    const data: TransferTabularData = {
+      key: transfer.hash + transfer.receiverAddress + transfer.amount,
+      recipientAddress: transfer.receiverAddress,
+      transactionHash: transfer.hash,
+      time: new Date(transfer.date).toLocaleString(),
+      amount: `${transferAmount}  ${currentAsset.symbol}`,
+      direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
+    };
+    return data;
+  });
+}
+
 function HomePage() {
-  const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const currentSession = useRecoilValue(sessionState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
+  const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const didMountRef = useRef(false);
-
-  function convertDelegations(allDelegations: StakingTransactionData[], currentAsset: UserAsset) {
-    return allDelegations.map(dlg => {
-      const stakedAmount = scaledAmount(dlg.stakedAmount, currentAsset.decimals).toString();
-      const data: StakingTabularData = {
-        key: dlg.validatorAddress + dlg.stakedAmount,
-        delegatorAddress: dlg.delegatorAddress,
-        validatorAddress: dlg.validatorAddress,
-        stakedAmount: `${stakedAmount} ${currentAsset.symbol}`,
-      };
-      return data;
-    });
-  }
-
-  function convertTransfers(
-    allTransfers: TransferTransactionData[],
-    currentAsset: UserAsset,
-    sessionData: Session,
-  ) {
-    const { address } = sessionData.wallet;
-    function getDirection(from: string, to: string): TransactionDirection {
-      if (address === from && address === to) {
-        return TransactionDirection.SELF;
-      }
-      if (address === from) {
-        return TransactionDirection.OUTGOING;
-      }
-      return TransactionDirection.INCOMING;
-    }
-    return allTransfers.map(transfer => {
-      const transferAmount = scaledAmount(transfer.amount, currentAsset.decimals).toString();
-      const data: TransferTabularData = {
-        key: transfer.hash + transfer.receiverAddress + transfer.amount,
-        recipientAddress: transfer.receiverAddress,
-        transactionHash: transfer.hash,
-        time: new Date(transfer.date).toLocaleString(),
-        amount: `${transferAmount}  ${currentAsset.symbol}`,
-        direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
-      };
-      return data;
-    });
-  }
 
   useEffect(() => {
     let unmounted = false;
