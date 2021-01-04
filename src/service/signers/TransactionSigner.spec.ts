@@ -1,12 +1,20 @@
 import 'mocha';
 import { expect } from 'chai';
-import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import { DefaultWalletConfigs, WalletConfig } from '../../config/StaticConfig';
 import { TransactionSigner } from './TransactionSigner';
+
+const testNet = DefaultWalletConfigs.TestNetConfig;
+// Overridden testnet chainId
+const testNetConfig: WalletConfig = {
+  ...testNet,
+  network: {
+    ...testNet.network,
+    chainId: 'testnet-croeseid-1',
+  },
+};
 
 describe('Testing TransactionSigner', () => {
   it('test transfer transaction signing ', async () => {
-    const testNetConfig = DefaultWalletConfigs.TestNetConfig;
-
     const phrase =
       'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
 
@@ -30,8 +38,6 @@ describe('Testing TransactionSigner', () => {
   });
 
   it('test delegate transaction signing ', async () => {
-    const testNetConfig = DefaultWalletConfigs.TestNetConfig;
-
     const phrase =
       'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
 
@@ -55,8 +61,6 @@ describe('Testing TransactionSigner', () => {
   });
 
   it('test withdraw delegation reward transaction signing ', async () => {
-    const testNetConfig = DefaultWalletConfigs.TestNetConfig;
-
     const phrase =
       'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
 
