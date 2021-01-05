@@ -4,7 +4,7 @@ import { DefaultWalletConfigs } from '../config/StaticConfig';
 import { WalletCreateOptions, WalletCreator } from '../service/WalletCreator';
 import { StorageService } from './StorageService';
 import { Session } from '../models/Session';
-import { Wallet } from '../models/Wallet';
+import { NodeData, Wallet } from '../models/Wallet';
 import { getRandomId } from '../crypto/RandomGen';
 import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { TransactionStatus, TransferTransactionData } from '../models/Transaction';
@@ -62,6 +62,39 @@ describe('Testing Storage Service', () => {
 
     const fetchedWallets = await mockWalletStore.retrieveAllWallets();
     expect(fetchedWallets.length).to.eq(10);
+  });
+
+  it('Test updating wallet node data', async () => {
+    const mockWalletStore = new StorageService(`test-update-node-${getRandomId()}`);
+    const wallet: Wallet = buildTestWallet();
+    const walletId = wallet.identifier;
+
+    await mockWalletStore.saveWallet(wallet);
+
+    const newChainId = 'new-testnet-id-xv';
+    const nodeData: NodeData = { walletId, chainId: newChainId };
+    await mockWalletStore.updateWalletNode(nodeData);
+
+    const updatedWalletConfig = await mockWalletStore.findWalletByIdentifier(walletId);
+    expect(updatedWalletConfig.config.network.chainId).to.eq(newChainId);
+
+    const newNodeUrl = 'https://testnet-new-croeseid.crypto-4.org';
+    const nodeData2: NodeData = { walletId, nodeUrl: newNodeUrl };
+    await mockWalletStore.updateWalletNode(nodeData2);
+
+    const updatedWalletConfig2 = await mockWalletStore.findWalletByIdentifier(walletId);
+    expect(updatedWalletConfig2.config.nodeUrl).to.eq(newNodeUrl);
+
+    const nodeData3: NodeData = {
+      walletId,
+      nodeUrl: 'https://another-new-node-url-test-1.com',
+      chainId: 'another-new-chainId-test',
+    };
+    await mockWalletStore.updateWalletNode(nodeData3);
+
+    const updatedWalletConfig3 = await mockWalletStore.findWalletByIdentifier(walletId);
+    expect(updatedWalletConfig3.config.nodeUrl).to.eq(nodeData3.nodeUrl);
+    expect(updatedWalletConfig3.config.network.chainId).to.eq(nodeData3.chainId);
   });
 
   it('Test assets storage', async () => {

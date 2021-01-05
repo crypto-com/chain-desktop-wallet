@@ -1,4 +1,4 @@
-import { Wallet } from '../models/Wallet';
+import { NodeData, Wallet } from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import { WalletCreateOptions, WalletCreator } from './WalletCreator';
 import {
@@ -242,6 +242,10 @@ class WalletService {
   public async persistWallet(wallet: Wallet) {
     await this.storageService.saveWallet(wallet);
     await this.persistInitialAsset(wallet.identifier, wallet.config.network);
+  }
+
+  public async updateWalletNodeConfig(nodeData: NodeData) {
+    return this.storageService.updateWalletNode(nodeData);
   }
 
   public async findWalletByIdentifier(identifier: string): Promise<Wallet> {

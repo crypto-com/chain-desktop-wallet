@@ -1,4 +1,4 @@
-import { Wallet } from '../models/Wallet';
+import { NodeData, Wallet } from '../models/Wallet';
 import { DatabaseManager } from './DatabaseManager';
 import { Session } from '../models/Session';
 import {
@@ -26,6 +26,26 @@ export class StorageService {
     return this.db.walletStore.update<Wallet>(
       { identifier: wallet.identifier },
       { $set: wallet },
+      { upsert: true },
+    );
+  }
+
+  public async updateWalletNode(nodeData: NodeData) {
+    if (!nodeData.chainId && !nodeData.nodeUrl) {
+      return Promise.resolve();
+    }
+    const previousWallet = await this.findWalletByIdentifier(nodeData.walletId);
+    if (nodeData.chainId) {
+      previousWallet.config.network.chainId = nodeData.chainId;
+    }
+
+    if (nodeData.nodeUrl) {
+      previousWallet.config.nodeUrl = nodeData.nodeUrl;
+    }
+
+    return this.db.walletStore.update<Wallet>(
+      { identifier: previousWallet.identifier },
+      { $set: previousWallet },
       { upsert: true },
     );
   }
