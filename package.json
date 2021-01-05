@@ -51,7 +51,7 @@
     "electron:dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:windev": "concurrently \"SET BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:pre-build": "yarn build && tsc -p electron",
-    "electron:build": "yarn build && tsc -p electron && electron-builder --publish=never",
+    "electron:build": "rm -rf build && rm -rf dist  && yarn build && tsc -p electron && electron-builder --publish=never",
     "lint-staged": "lint-staged",
     "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
     "prettier": "prettier --write '/src/**/*.{js,jsx,tsx,ts,less,md,json}'"
@@ -76,6 +76,7 @@
     "src/**/*.{js,jsx,ts,tsx}": "yarn lint:js"
   },
   "build": {
+    "productName": "Chain Desktop Wallet",
     "appId": "chain.crypto.com.chain-desktop-wallet",
     "files": [
       "build/**/*"
