@@ -112,7 +112,8 @@ const FormRestore = () => {
           () => ({
             validator(_, value) {
               try {
-                HDKey.fromMnemonic(value);
+                const trimmedMnemonic = value.toString().trim();
+                HDKey.fromMnemonic(trimmedMnemonic);
               } catch (e) {
                 return Promise.reject(new Error('Please enter a valid mnemonic phrase'));
               }

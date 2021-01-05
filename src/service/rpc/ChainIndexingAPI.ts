@@ -10,9 +10,8 @@ class ChainIndexingAPI implements IChainIndexingAPI {
   private readonly axiosClient: AxiosInstance;
 
   constructor() {
-    const cors = 'https://cors-anywhere.herokuapp.com/';
     this.axiosClient = axios.create({
-      baseURL: `${cors}https://chain.crypto.com/explorer/api/v1`,
+      baseURL: `https://chain.crypto.com/explorer/api/v1`,
     });
   }
 
