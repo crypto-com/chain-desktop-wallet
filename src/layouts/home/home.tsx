@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Dropdown, Layout, Menu, Spin } from 'antd';
+import { Dropdown, Layout, Menu, Spin, Button } from 'antd';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Icon, {
   CaretDownOutlined,
@@ -23,6 +23,7 @@ import IconStaking from '../../svg/IconStaking';
 import IconWallet from '../../svg/IconWallet';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -39,7 +40,21 @@ function HomeLayout(props: HomeLayoutProps) {
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [loading, setLoading] = useState(false);
   const [ledgerConnected, setLedgerConnected] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const didMountRef = useRef(false);
+
+  const showModal = () => {
+    setIsModalVisible(true);
+  };
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
 
   useEffect(() => {
     const fetchDB = async () => {
@@ -104,8 +119,13 @@ function HomeLayout(props: HomeLayoutProps) {
       setLoading(false);
     };
 
-    const connectToLedger = () => {
-      setLedgerConnected(!ledgerConnected);
+    const connectLedger = () => {
+      showModal();
+      setLedgerConnected(true);
+    };
+
+    const disconnectLedger = () => {
+      setLedgerConnected(false);
     };
 
     return (
@@ -156,13 +176,8 @@ function HomeLayout(props: HomeLayoutProps) {
           }, session)
         )}
         {ledgerConnected ? (
-          <Menu.Item className="ledger-wallet-item" onClick={connectToLedger}>
-            <LinkOutlined />
-            Connect to Ledger
-          </Menu.Item>
-        ) : (
           <>
-            <Menu.Item className="ledger-wallet-item" onClick={connectToLedger}>
+            <Menu.Item className="ledger-wallet-item" onClick={disconnectLedger}>
               <LinkOutlined />
               Disconnect Ledger
             </Menu.Item>
@@ -188,6 +203,13 @@ function HomeLayout(props: HomeLayoutProps) {
                 );
               }, session)}
             </SubMenu>
+          </>
+        ) : (
+          <>
+            <Menu.Item className="ledger-wallet-item" onClick={connectLedger}>
+              <LinkOutlined />
+              Connect to Ledger
+            </Menu.Item>
           </>
         )}
         {walletList.length < 10 ? (
@@ -239,6 +261,19 @@ function HomeLayout(props: HomeLayoutProps) {
           props.children
         )}
       </Layout>
+      <SuccessModalPopup
+        isModalVisible={isModalVisible}
+        handleCancel={handleCancel}
+        handleOk={handleOk}
+        title="Success!"
+        footer={[
+          <Button key="submit" type="primary" onClick={handleOk}>
+            Close
+          </Button>,
+        ]}
+      >
+        Connected to Ledger!
+      </SuccessModalPopup>
     </main>
   );
 }
