@@ -31,3 +31,9 @@ export class Wallet {
     this.encryptedPhrase = encryptedPhrase;
   }
 }
+
+export interface NodeData {
+  walletId: string;
+  chainId?: string | undefined;
+  nodeUrl?: string | undefined;
+}
