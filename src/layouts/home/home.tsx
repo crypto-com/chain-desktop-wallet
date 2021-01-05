@@ -9,6 +9,7 @@ import Icon, {
   ReloadOutlined,
   PlusOutlined,
   CheckOutlined,
+  LinkOutlined,
 } from '@ant-design/icons';
 import { useRecoilState } from 'recoil';
 
@@ -37,6 +38,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [loading, setLoading] = useState(false);
+  const [ledgerConnected, setLedgerConnected] = useState(false);
   const didMountRef = useRef(false);
 
   useEffect(() => {
@@ -102,6 +104,10 @@ function HomeLayout(props: HomeLayoutProps) {
       setLoading(false);
     };
 
+    const connectToLedger = () => {
+      setLedgerConnected(!ledgerConnected);
+    };
+
     return (
       <Menu>
         {walletList.length > 5 ? (
@@ -148,6 +154,41 @@ function HomeLayout(props: HomeLayoutProps) {
               </Menu.Item>
             );
           }, session)
+        )}
+        {ledgerConnected ? (
+          <Menu.Item className="ledger-wallet-item" onClick={connectToLedger}>
+            <LinkOutlined />
+            Connect to Ledger
+          </Menu.Item>
+        ) : (
+          <>
+            <Menu.Item className="ledger-wallet-item" onClick={connectToLedger}>
+              <LinkOutlined />
+              Disconnect Ledger
+            </Menu.Item>
+            <SubMenu title="Ledger Wallet List" icon={<Icon component={IconWallet} />}>
+              {walletList.map((item, index) => {
+                return (
+                  <Menu.Item key={index} onClick={walletClick}>
+                    {trimString(item.name)}
+                    {session.wallet.identifier === item.identifier ? (
+                      <CheckOutlined
+                        style={{
+                          fontSize: '18px',
+                          color: '#1199fa',
+                          position: 'absolute',
+                          right: '5px',
+                          top: '10px',
+                        }}
+                      />
+                    ) : (
+                      ''
+                    )}
+                  </Menu.Item>
+                );
+              }, session)}
+            </SubMenu>
+          </>
         )}
         {walletList.length < 10 ? (
           <>
