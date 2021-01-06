@@ -39,10 +39,16 @@ jobs:
           # Log in to Snap Store
           snapcraft_token: ${{ secrets.snapcraft_token }}
 
+      - name: Extract current branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
       - name: Log release reference
         run: |
           echo "********* START RELEASE REF **********"
           echo ${{ github.ref }}
+          echo ${{ steps.extract_branch.outputs.branch }}
           echo "********* END RELEASE REF ************"
 
       - name: Build/release Electron app
@@ -57,4 +63,4 @@ jobs:
 
           # If the commit is tagged with a version (e.g. "v1.0.0"),
           # release the app after building
-          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+          release: ${{ steps.extract_branch.outputs.branch == 'dev' }}
