@@ -73,7 +73,7 @@ const FormSettings = () => {
         chainId: defaultSettings.network.chainId,
       });
     }
-  }, []);
+  }, [form, defaultSettings]);
 
   const onFinish = values => {
     // TO-DO save network config
