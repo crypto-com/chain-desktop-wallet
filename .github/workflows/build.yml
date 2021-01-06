@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - master
+      - dev
     tags:
       - '*'
 
@@ -36,7 +37,7 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')
         with:
           # Log in to Snap Store
-          snapcraft_token: ${{ secrets.SNAPCRAFT_TOKEN }}
+          snapcraft_token: ${{ secrets.snapcraft_token }}
 
       - name: Log release reference
         run: |
