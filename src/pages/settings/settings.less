@@ -1,0 +1,37 @@
+.settings-content {
+  padding: 24px;
+  .container {
+    .description {
+      margin-bottom: 20px;
+      color: @font-color;
+    }
+    .amount {
+      .ant-form-item {
+        margin: 0;
+      }
+      .available {
+        position: relative;
+        margin: 5px 0 20px 0;
+        span {
+          color: @font-color;
+        }
+        .available-amount {
+          position: absolute;
+          right: 0;
+          bottom: 0;
+        }
+      }
+    }
+    .ant-form {
+      max-width: 500px;
+      .ant-input[disabled] {
+        color: #000;
+        background: #fff !important;
+      }
+    }
+    .ant-btn {
+      width: 100%;
+      margin: 0;
+    }
+  }
+}
