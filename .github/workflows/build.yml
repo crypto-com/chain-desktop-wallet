@@ -63,4 +63,4 @@ jobs:
 
           # If the commit is tagged with a version (e.g. "v1.0.0"),
           # release the app after building
-          release: ${{ startsWith(steps.extract_branch.outputs.branch, 'dev') }}
+          release: ${{ steps.extract_branch.outputs.branch == 'dev') }}
