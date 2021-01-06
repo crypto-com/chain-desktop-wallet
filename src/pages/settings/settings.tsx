@@ -20,7 +20,7 @@ const FormGeneral = () => {
     <>
       <Form.Item
         name="name"
-        label="Name"
+        label="Wallet Name"
         requiredMark="optional"
         rules={[
           {
