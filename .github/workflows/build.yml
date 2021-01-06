@@ -6,6 +6,7 @@ on:
   push:
     branches:
       - master
+      - dev
     tags:
       - '*'
 
@@ -36,12 +37,18 @@ jobs:
         if: startsWith(matrix.os, 'ubuntu')
         with:
           # Log in to Snap Store
-          snapcraft_token: ${{ secrets.SNAPCRAFT_TOKEN }}
+          snapcraft_token: ${{ secrets.snapcraft_token }}
+
+      - name: Extract current branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
 
       - name: Log release reference
         run: |
           echo "********* START RELEASE REF **********"
           echo ${{ github.ref }}
+          echo ${{ steps.extract_branch.outputs.branch }}
           echo "********* END RELEASE REF ************"
 
       - name: Build/release Electron app
@@ -54,6 +61,5 @@ jobs:
           # (No need to define this secret in the repo settings)
           github_token: ${{ secrets.github_token }}
 
-          # If the commit is tagged with a version (e.g. "v1.0.0"),
-          # release the app after building
-          release: ${{ startsWith(github.ref, 'refs/tags/v') }}
+          # When a push is done to master, the binary builds are released directly
+          release: ${{ steps.extract_branch.outputs.branch == 'master' }}
