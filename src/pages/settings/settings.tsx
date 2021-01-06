@@ -32,7 +32,7 @@ const FormGeneral = () => {
       </Form.Item>
       <Form.Item
         name="nodeUrl"
-        label="Node Url"
+        label="Node URL"
         requiredMark="optional"
         rules={[
           {
