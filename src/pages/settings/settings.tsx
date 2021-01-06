@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import './settings.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, Layout, Tabs } from 'antd';
@@ -21,17 +21,7 @@ const FormGeneral = () => {
       <Form.Item
         name="name"
         label="Name"
-        rules={[
-          {
-            required: true,
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item
-        name="derivationPath"
-        label="Derivation Path"
+        requiredMark="optional"
         rules={[
           {
             required: true,
@@ -43,24 +33,7 @@ const FormGeneral = () => {
       <Form.Item
         name="nodeUrl"
         label="Node Url"
-        rules={[
-          {
-            required: true,
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-    </>
-  );
-};
-
-const FormNetwork = () => {
-  return (
-    <>
-      <Form.Item
-        name="addressPrefix"
-        label="Address Prefix"
+        requiredMark="optional"
         rules={[
           {
             required: true,
@@ -72,6 +45,7 @@ const FormNetwork = () => {
       <Form.Item
         name="chainId"
         label="Chain ID"
+        requiredMark="optional"
         rules={[
           {
             required: true,
@@ -83,38 +57,23 @@ const FormNetwork = () => {
     </>
   );
 };
-const FormCoin = () => {
-  return (
-    <>
-      <Form.Item
-        name="baseDenom"
-        label="Base Denom"
-        rules={[
-          {
-            required: true,
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item
-        name="croDenom"
-        label="CRO Denom"
-        rules={[
-          {
-            required: true,
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-    </>
-  );
-};
+
 const FormSettings = () => {
   const [form] = Form.useForm();
   const session = useRecoilValue(sessionState);
   const defaultSettings = session.wallet.config;
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      form.setFieldsValue({
+        name: defaultSettings.name,
+        nodeUrl: defaultSettings.nodeUrl,
+        chainId: defaultSettings.network.chainId,
+      });
+    }
+  }, []);
 
   const onFinish = values => {
     // TO-DO save network config
@@ -126,11 +85,7 @@ const FormSettings = () => {
     form.setFieldsValue({
       name: defaultSettings.name,
       nodeUrl: defaultSettings.nodeUrl,
-      derivationPath: defaultSettings.derivationPath,
-      addressPrefix: defaultSettings.network.addressPrefix,
       chainId: defaultSettings.network.chainId,
-      baseDenom: defaultSettings.network.coin.baseDenom,
-      croDenom: defaultSettings.network.coin.croDenom,
     });
   };
 
@@ -142,22 +97,6 @@ const FormSettings = () => {
             <div className="container">
               <div className="description">General settings</div>
               <FormGeneral />
-            </div>
-          </div>
-        </TabPane>
-        <TabPane tab="Network" key="2">
-          <div className="site-layout-background stake-content">
-            <div className="container">
-              <div className="description">Network settings</div>
-              <FormNetwork />
-            </div>
-          </div>
-        </TabPane>
-        <TabPane tab="Coin" key="3">
-          <div className="site-layout-background stake-content">
-            <div className="container">
-              <div className="description">Coin settings</div>
-              <FormCoin />
             </div>
           </div>
         </TabPane>
