@@ -1,12 +1,9 @@
-import React from // useEffect,
-// useRef
-'react';
+import React from 'react';
 import './settings.less';
 import 'antd/dist/antd.css';
+import { Button, Form, Input, Layout, Tabs } from 'antd';
 import { useRecoilValue } from 'recoil';
 import { sessionState } from '../../recoil/atom';
-import { Button, Form, Input, Layout, Tabs } from 'antd';
-// import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -117,17 +114,11 @@ const FormCoin = () => {
 const FormSettings = () => {
   const [form] = Form.useForm();
   const session = useRecoilValue(sessionState);
-  // const didMountRef = useRef(false);
-
-  // useEffect(() => {
-  //   if (!didMountRef.current) {
-  //     didMountRef.current = true;
-  //   }
-  // }, [session])
-
   const defaultSettings = session.wallet.config;
 
   const onFinish = values => {
+    // TO-DO save network config
+    // eslint-disable-next-line
     console.log(values);
   };
 
