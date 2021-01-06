@@ -90,10 +90,10 @@ const FormSettings = () => {
   };
 
   return (
-    <Form {...layout} form={form} name="control-hooks" onFinish={onFinish}>
+    <Form {...layout} layout="vertical" form={form} name="control-hooks" onFinish={onFinish}>
       <Tabs defaultActiveKey="1">
         <TabPane tab="General" key="1">
-          <div className="site-layout-background stake-content">
+          <div className="site-layout-background settings-content">
             <div className="container">
               <div className="description">General settings</div>
               <FormGeneral />
