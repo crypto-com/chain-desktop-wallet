@@ -1,6 +1,10 @@
-import React from 'react';
+import React from // useEffect,
+// useRef
+'react';
 import './settings.less';
 import 'antd/dist/antd.css';
+import { useRecoilValue } from 'recoil';
+import { sessionState } from '../../recoil/atom';
 import { Button, Form, Input, Layout, Tabs } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 
@@ -58,7 +62,7 @@ const FormNetwork = () => {
   return (
     <>
       <Form.Item
-        name="address"
+        name="addressPrefix"
         label="Address Prefix"
         rules={[
           {
@@ -112,6 +116,16 @@ const FormCoin = () => {
 };
 const FormSettings = () => {
   const [form] = Form.useForm();
+  const session = useRecoilValue(sessionState);
+  // const didMountRef = useRef(false);
+
+  // useEffect(() => {
+  //   if (!didMountRef.current) {
+  //     didMountRef.current = true;
+  //   }
+  // }, [session])
+
+  const defaultSettings = session.wallet.config;
 
   const onFinish = values => {
     console.log(values);
@@ -119,13 +133,13 @@ const FormSettings = () => {
 
   const onFill = () => {
     form.setFieldsValue({
-      name: 'Hello world!',
-      nodeUrl: 'https://testnet-croeseid.crypto.com',
-      derivationPath: "m/44'/1'/0/0/0",
-      address: 'tcro',
-      chainId: 'testnet-croeseid-2',
-      baseDenom: 'TCRO',
-      croDenom: 'TCRO',
+      name: defaultSettings.name,
+      nodeUrl: defaultSettings.nodeUrl,
+      derivationPath: defaultSettings.derivationPath,
+      addressPrefix: defaultSettings.network.addressPrefix,
+      chainId: defaultSettings.network.chainId,
+      baseDenom: defaultSettings.network.coin.baseDenom,
+      croDenom: defaultSettings.network.coin.croDenom,
     });
   };
 
