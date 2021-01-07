@@ -76,7 +76,7 @@
     "src/**/*.{js,jsx,ts,tsx}": "yarn lint:js"
   },
   "build": {
-    "productName": "Chain Desktop Wallet",
+    "productName": "Crypto.com Chain Desktop Wallet (Beta)",
     "appId": "chain.crypto.com.chain-desktop-wallet",
     "files": [
       "build/**/*"
