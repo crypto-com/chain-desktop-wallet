@@ -123,6 +123,18 @@ const FormSend = () => {
               .toString()
               .toUpperCase()} address`,
           },
+          () => ({
+            validator(rule, value) {
+              const validatorPrefix = currentSession.wallet.config.network.validatorAddressPrefix;
+              if (value && value.startsWith(validatorPrefix)) {
+                // eslint-disable-next-line prefer-promise-reject-errors
+                return Promise.reject(
+                  'Expected a receiving address, but a validator address was input',
+                );
+              }
+              return Promise.resolve();
+            },
+          }),
         ]}
       >
         <Input placeholder="tcro..." />
