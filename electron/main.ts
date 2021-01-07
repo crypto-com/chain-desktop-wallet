@@ -13,6 +13,7 @@ function createWindow() {
     minHeight: 702,
     webPreferences: {
       nodeIntegration: true,
+      devTools: isDev,
     },
     resizable: true,
   });
