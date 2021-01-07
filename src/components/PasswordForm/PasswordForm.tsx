@@ -72,7 +72,7 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
               <Progress
                 strokeColor={{
                   '0%': '#1199fa',
-                  '100%': '#87d068',
+                  '100%': '#20bca4',
                 }}
                 format={percent => {
                   if (percent! < 25) {
