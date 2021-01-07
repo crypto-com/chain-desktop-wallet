@@ -15,7 +15,7 @@ export class Wallet {
   // it gets encrypted once the user provide a password,
   // which will later be used as encryption key
   // This will be set to true once the wallet phrase has been encrypted
-  public readonly hasBeenEncrypted: boolean = false;
+  public hasBeenEncrypted: boolean = false;
 
   constructor(
     id: string,
