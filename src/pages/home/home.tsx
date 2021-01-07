@@ -79,7 +79,7 @@ function convertTransfers(
       key: transfer.hash + transfer.receiverAddress + transfer.amount,
       recipientAddress: transfer.receiverAddress,
       transactionHash: transfer.hash,
-      time: new Date(transfer.date).toLocaleString(),
+      time: new Date(transfer.date).toLocaleString('en-US'),
       amount: `${transferAmount}  ${currentAsset.symbol}`,
       direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
     };
