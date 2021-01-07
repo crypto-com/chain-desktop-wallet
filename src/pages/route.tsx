@@ -15,6 +15,7 @@ import BackupPage from './backup/backup';
 import HomePage from './home/home';
 import ReceivePage from './receive/receive';
 import StakingPage from './staking/staking';
+import SettingsPage from './settings/settings';
 import SignUpPage from './signup/signup';
 import HomeLayout from '../layouts/home/home';
 import SendPage from './send/send';
@@ -97,6 +98,12 @@ function RouteHub() {
       key: 'staking',
       path: '/staking',
       component: <StakingPage />,
+    },
+    {
+      name: 'Settings Page',
+      key: 'settings',
+      path: '/settings',
+      component: <SettingsPage />,
     },
   ];
 

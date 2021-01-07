@@ -437,6 +437,7 @@ class WalletService {
       initialVector,
     );
     wallet.encryptedPhrase = encryptionResult.cipher;
+    wallet.hasBeenEncrypted = true;
 
     await this.persistWallet(wallet);
     await secretStoreService.persistEncryptedPhrase(wallet.identifier, encryptionResult);
