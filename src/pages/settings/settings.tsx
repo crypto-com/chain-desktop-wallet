@@ -1,9 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './settings.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, Layout, Tabs } from 'antd';
 import { useRecoilValue } from 'recoil';
 import { sessionState } from '../../recoil/atom';
+import { walletService } from '../../service/WalletService';
+import { NodeData } from '../../models/Wallet';
+import { Session } from '../../models/Session';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -19,9 +22,8 @@ const FormGeneral = () => {
   return (
     <>
       <Form.Item
-        name="name"
+        name="networkName"
         label="Wallet Name"
-        requiredMark="optional"
         rules={[
           {
             required: true,
@@ -33,7 +35,6 @@ const FormGeneral = () => {
       <Form.Item
         name="nodeUrl"
         label="Node URL"
-        requiredMark="optional"
         rules={[
           {
             required: true,
@@ -45,7 +46,6 @@ const FormGeneral = () => {
       <Form.Item
         name="chainId"
         label="Chain ID"
-        requiredMark="optional"
         rules={[
           {
             required: true,
@@ -60,6 +60,7 @@ const FormGeneral = () => {
 
 const FormSettings = () => {
   const [form] = Form.useForm();
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
   const session = useRecoilValue(sessionState);
   const defaultSettings = session.wallet.config;
   const didMountRef = useRef(false);
@@ -75,22 +76,38 @@ const FormSettings = () => {
     }
   }, [form, defaultSettings]);
 
-  const onFinish = values => {
+  const onFinish = async values => {
     // TO-DO save network config
-    // eslint-disable-next-line
-    console.log(values);
+    setIsButtonLoading(true);
+    const nodeData: NodeData = {
+      walletId: session.wallet.identifier,
+      chainId: values.chainId,
+      nodeUrl: values.nodeUrl,
+      networkName: values.networkName,
+    };
+    const wallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
+    await walletService.updateWalletNodeConfig(nodeData);
+    walletService.setCurrentSession(new Session(wallet));
+    setIsButtonLoading(false);
   };
 
   const onFill = () => {
     form.setFieldsValue({
-      name: defaultSettings.name,
+      networkName: defaultSettings.name,
       nodeUrl: defaultSettings.nodeUrl,
       chainId: defaultSettings.network.chainId,
     });
   };
 
   return (
-    <Form {...layout} layout="vertical" form={form} name="control-hooks" onFinish={onFinish}>
+    <Form
+      {...layout}
+      layout="vertical"
+      form={form}
+      name="control-hooks"
+      requiredMark="optional"
+      onFinish={onFinish}
+    >
       <Tabs defaultActiveKey="1">
         <TabPane tab="General" key="1">
           <div className="site-layout-background settings-content">
@@ -102,7 +119,7 @@ const FormSettings = () => {
         </TabPane>
       </Tabs>
       <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit">
+        <Button type="primary" htmlType="submit" loading={isButtonLoading}>
           Save
         </Button>
         <Button type="link" htmlType="button" onClick={onFill}>
