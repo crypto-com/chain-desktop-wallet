@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 *Unreleased*
 
-## [0.0.13] - 2021-01-07
+## [v0.0.13] - 2021-01-07
 
 ### Added Features
 
