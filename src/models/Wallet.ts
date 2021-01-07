@@ -36,5 +36,4 @@ export interface NodeData {
   walletId: string;
   chainId?: string | undefined;
   nodeUrl?: string | undefined;
-  networkName?: string | undefined;
 }

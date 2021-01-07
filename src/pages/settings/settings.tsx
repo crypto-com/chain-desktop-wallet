@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import './settings.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, Layout, Tabs } from 'antd';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { sessionState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import { NodeData } from '../../models/Wallet';
@@ -22,22 +22,15 @@ const FormGeneral = () => {
   return (
     <>
       <Form.Item
-        name="networkName"
-        label="Wallet Name"
-        rules={[
-          {
-            required: true,
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item
         name="nodeUrl"
         label="Node URL"
         rules={[
           {
             required: true,
+          },
+          {
+            pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
+            message: 'Please enter a valid node url',
           },
         ]}
       >
@@ -61,7 +54,7 @@ const FormGeneral = () => {
 const FormSettings = () => {
   const [form] = Form.useForm();
   const [isButtonLoading, setIsButtonLoading] = useState(false);
-  const session = useRecoilValue(sessionState);
+  const [session, setSession] = useRecoilState(sessionState);
   const defaultSettings = session.wallet.config;
   const didMountRef = useRef(false);
 
@@ -69,7 +62,6 @@ const FormSettings = () => {
     if (!didMountRef.current) {
       didMountRef.current = true;
       form.setFieldsValue({
-        name: defaultSettings.name,
         nodeUrl: defaultSettings.nodeUrl,
         chainId: defaultSettings.network.chainId,
       });
@@ -77,23 +69,29 @@ const FormSettings = () => {
   }, [form, defaultSettings]);
 
   const onFinish = async values => {
-    // TO-DO save network config
+    if (
+      defaultSettings.nodeUrl === values.nodeUrl &&
+      defaultSettings.network.chainId === values.chainId
+    ) {
+      // No update was done, return here
+      return;
+    }
     setIsButtonLoading(true);
     const nodeData: NodeData = {
       walletId: session.wallet.identifier,
       chainId: values.chainId,
       nodeUrl: values.nodeUrl,
-      networkName: values.networkName,
     };
-    const wallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
     await walletService.updateWalletNodeConfig(nodeData);
-    walletService.setCurrentSession(new Session(wallet));
+    const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
+    const newSession = new Session(updatedWallet);
+    await walletService.setCurrentSession(newSession);
+    setSession(newSession);
     setIsButtonLoading(false);
   };
 
   const onFill = () => {
     form.setFieldsValue({
-      networkName: defaultSettings.name,
       nodeUrl: defaultSettings.nodeUrl,
       chainId: defaultSettings.network.chainId,
     });
@@ -109,7 +107,7 @@ const FormSettings = () => {
       onFinish={onFinish}
     >
       <Tabs defaultActiveKey="1">
-        <TabPane tab="General" key="1">
+        <TabPane tab="Node Configuration" key="1">
           <div className="site-layout-background settings-content">
             <div className="container">
               <div className="description">General settings</div>
