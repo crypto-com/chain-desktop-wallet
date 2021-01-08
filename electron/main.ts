@@ -16,6 +16,7 @@ function createWindow() {
       devTools: isDev,
     },
     resizable: true,
+    icon: path.join(__dirname, '..', 'src', 'assets', 'logo.png')
   });
 
   if (isDev) {
