@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Input, Progress } from 'antd';
-import zxcvbn from 'zxcvbn';
 import './PasswordForm.less';
+
+const zxcvbn = require('zxcvbn');
 
 interface PasswordFormProps {
   className?: string;
