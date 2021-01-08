@@ -96,7 +96,7 @@
       "icon": false
     },
     "directories": {
-      "buildResources": "assets"
+      "buildResources": "build"
     }
   },
   "eslintConfig": {
