@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, nativeImage } from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
@@ -6,6 +6,8 @@ import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-insta
 let win: BrowserWindow | null = null;
 
 function createWindow() {
+  const iconPath = path.join(__dirname, '..', 'public', 'icon.png');
+  const iconImage = nativeImage.createFromPath(iconPath);
   win = new BrowserWindow({
     width: 1280,
     height: 800,
@@ -16,7 +18,7 @@ function createWindow() {
       devTools: isDev,
     },
     resizable: true,
-    icon: path.join(__dirname, '..', 'public', 'icon.png')
+    icon: iconImage,
   });
 
   if (isDev) {
