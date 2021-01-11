@@ -1,15 +1,19 @@
-import { app, BrowserWindow, nativeImage } from 'electron';
+import { app, BrowserWindow, nativeImage, Menu } from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 
+if (!isDev) Menu.setApplicationMenu(null); // Hide menus on prod builds (Not needed)
+
 let win: BrowserWindow | null = null;
 
 function createWindow() {
-  const publicDir = path.join(__dirname, '/public').replace(/\\/g, '\\\\');
-  const iconPath = path.join(publicDir, 'icon.png');
+  const iconPath = path.join(__dirname, '/public/icon.png').replace(/\\/g, '\\\\');
   const iconImage = nativeImage.createFromPath(iconPath);
+  iconImage.setTemplateImage(true);
+
   win = new BrowserWindow({
+    autoHideMenuBar: true,
     width: 1280,
     height: 800,
     minWidth: 1080,
@@ -25,7 +29,6 @@ function createWindow() {
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
   } else {
-    // 'build/index.html'
     win.loadURL(`file://${__dirname}/../index.html`);
   }
 
