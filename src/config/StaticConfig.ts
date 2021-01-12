@@ -41,7 +41,7 @@ const MainNetConfig: WalletConfig = {
 // Supposed to be fully customizable by the user when it will be supported
 const CustomDevNet: WalletConfig = {
   derivationPath: '',
-  enabled: false,
+  enabled: true,
   name: 'CUSTOM DEVNET',
   network: {
     chainId: '',
