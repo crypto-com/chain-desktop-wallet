@@ -10,7 +10,6 @@ on:
 jobs:
   release:
     runs-on: ${{ matrix.os }}
-    environment: deployment
 
     strategy:
       matrix:
