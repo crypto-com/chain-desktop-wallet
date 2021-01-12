@@ -13,6 +13,7 @@ on:
 jobs:
   release:
     runs-on: ${{ matrix.os }}
+    environment: deployment
 
     strategy:
       matrix:
@@ -62,4 +63,8 @@ jobs:
           github_token: ${{ secrets.github_token }}
 
           # When a push is done to master, the binary builds are released directly
-          release: ${{ steps.extract_branch.outputs.branch == 'master' }}
+          # Temporarily set to dev for testing
+          release: ${{ steps.extract_branch.outputs.branch == 'dev' }}
+
+          mac_certs: ${{ secrets.mac_certs }}
+          mac_certs_password: ${{ secrets.mac_certs_password }}
