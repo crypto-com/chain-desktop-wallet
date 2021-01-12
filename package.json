@@ -51,7 +51,7 @@
     "electron:dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:windev": "concurrently \"SET BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:pre-build": "yarn build && tsc -p electron",
-    "electron:build": "rm -rf build && rm -rf dist  && yarn build && tsc -p electron && electron-builder --publish=never",
+    "electron:build": "rimraf build && rimraf dist  && yarn build && tsc -p electron && electron-builder --publish=never",
     "lint-staged": "lint-staged",
     "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
     "prettier": "prettier --write '/src/**/*.{js,jsx,tsx,ts,less,md,json}'"
@@ -188,6 +188,7 @@
     "terser-webpack-plugin": "4.2.3",
     "wait-on": "^5.2.0",
     "webpack": "4.44.2",
+    "rimraf": "3.0.2",
     "webpack-dev-server": "3.11.0",
     "webpack-manifest-plugin": "2.2.0",
     "workbox-webpack-plugin": "5.1.4"
