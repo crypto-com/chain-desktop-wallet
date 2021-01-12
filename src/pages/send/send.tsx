@@ -268,7 +268,7 @@ const FormSend = () => {
                 The transaction timed out but it will be included in the subsequent blocks
               </div>
             ) : (
-              <div className="description">The transaction was broad-casted successfully!</div>
+              <div className="description">The transaction was broadcasted successfully!</div>
             )}
             {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
           </>

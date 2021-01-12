@@ -79,7 +79,10 @@
     "productName": "Crypto.com Chain Desktop Wallet (Beta)",
     "appId": "chain.crypto.com.chain-desktop-wallet",
     "files": [
-      "build/**/*"
+      "./build/**/*",
+      "./dist/**/*",
+      "./public/*",
+      "./public/**/*"
     ],
     "mac": {
       "target": [
@@ -96,7 +99,7 @@
       "icon": false
     },
     "directories": {
-      "buildResources": "assets"
+      "buildResources": "build"
     }
   },
   "eslintConfig": {

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Input, Progress } from 'antd';
-import zxcvbn from 'zxcvbn';
 import './PasswordForm.less';
+
+const zxcvbn = require('zxcvbn');
 
 interface PasswordFormProps {
   className?: string;
@@ -72,7 +73,7 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
               <Progress
                 strokeColor={{
                   '0%': '#1199fa',
-                  '100%': '#87d068',
+                  '100%': '#20bca4',
                 }}
                 format={percent => {
                   if (percent! < 25) {

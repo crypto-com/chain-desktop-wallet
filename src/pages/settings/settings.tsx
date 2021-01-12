@@ -110,20 +110,20 @@ const FormSettings = () => {
         <TabPane tab="Node Configuration" key="1">
           <div className="site-layout-background settings-content">
             <div className="container">
-              <div className="description">General settings</div>
+              {/* <div className="description">General settings</div> */}
               <FormGeneral />
+              <Form.Item {...tailLayout} className="button">
+                <Button type="primary" htmlType="submit" loading={isButtonLoading}>
+                  Save
+                </Button>
+                <Button type="link" htmlType="button" onClick={onFill}>
+                  Restore Default
+                </Button>
+              </Form.Item>
             </div>
           </div>
         </TabPane>
       </Tabs>
-      <Form.Item {...tailLayout}>
-        <Button type="primary" htmlType="submit" loading={isButtonLoading}>
-          Save
-        </Button>
-        <Button type="link" htmlType="button" onClick={onFill}>
-          Default Settings
-        </Button>
-      </Form.Item>
     </Form>
   );
 };
@@ -132,6 +132,9 @@ function SettingsPage() {
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">Settings</Header>
+      <div className="header-description">
+        An invalid configuration might result in wallet malfunction.
+      </div>
       <Content>
         <FormSettings />
       </Content>
