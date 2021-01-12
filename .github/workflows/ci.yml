@@ -39,7 +39,3 @@ jobs:
       - name: Build For The Web Target
         run: |
           yarn build
-
-      - name: Test general binary build
-        run: |
-          yarn electron:build
