@@ -3,8 +3,6 @@ import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 
-if (!isDev) Menu.setApplicationMenu(null); // Hide menus on prod builds (Not needed)
-
 let win: BrowserWindow | null = null;
 
 function createWindow() {
@@ -25,6 +23,12 @@ function createWindow() {
     resizable: true,
     icon: iconImage,
   });
+
+  // Note that all efforts to hide menus only work on Windows and Linux
+  // The option Menu.setApplicationMenu(null) seemed to have worked on all platforms, but it had some breaking behaviors
+  // It killed the clipboard copying capability and added a delay on startup
+  win.setMenuBarVisibility(false);
+  win.removeMenu();
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
