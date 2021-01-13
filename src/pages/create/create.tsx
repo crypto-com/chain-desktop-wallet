@@ -32,6 +32,7 @@ interface FormCustomConfigProps {
 interface FormCreateProps {
   isModalVisible: boolean;
   isCreateDisable: boolean;
+  isSelectFieldDisable: boolean;
   handleCancel: () => void;
   handleOk: () => void;
   onNetworkChange: (network: string) => void;
@@ -192,7 +193,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         <Input maxLength={36} placeholder="Wallet name" />
       </Form.Item>
       <Form.Item name="network" label="Network" rules={[{ required: true }]}>
-        <Select placeholder="Select wallet network" onChange={props.onNetworkChange}>
+        <Select
+          placeholder="Select wallet network"
+          onChange={props.onNetworkChange}
+          disabled={props.isSelectFieldDisable}
+        >
           {walletService.supportedConfigs().map(config => (
             <Select.Option key={config.name} value={config.name} disabled={!config.enabled}>
               {config.name}
@@ -232,6 +237,7 @@ const CreatePage = () => {
   const [walletIdentifier, setWalletIdentifier] = useRecoilState(walletIdentifierState);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isCreateDisable, setIsCreateDisable] = useState(false);
+  const [isSelectFieldDisable, setIsSelectFieldDisable] = useState(true);
   const [isCustomConfig, setIsCustomConfig] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const didMountRef = useRef(false);
@@ -293,6 +299,15 @@ const CreatePage = () => {
     form.resetFields();
   };
 
+  const onChange = () => {
+    const { name } = form.getFieldsValue();
+    if (name !== '') {
+      setIsSelectFieldDisable(false);
+    } else {
+      setIsSelectFieldDisable(true);
+    }
+  };
+
   useEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true;
@@ -327,11 +342,13 @@ const CreatePage = () => {
             form={form}
             name="control-ref"
             onFinish={onWalletCreateFinish}
+            onChange={onChange}
           >
             {!isCustomConfig || isConnected ? (
               <FormCreate
                 isCreateDisable={isCreateDisable}
                 isModalVisible={isModalVisible}
+                isSelectFieldDisable={isSelectFieldDisable}
                 handleOk={handleOk}
                 handleCancel={handleCancel}
                 onNetworkChange={onNetworkChange}

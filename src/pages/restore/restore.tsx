@@ -31,6 +31,7 @@ interface FormCustomConfigProps {
 interface FormRestoreProps {
   isModalVisible: boolean;
   isRestoreDisable: boolean;
+  isSelectFieldDisable: boolean;
   onNetworkChange: (network: string) => void;
 }
 
@@ -216,6 +217,7 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
           // placeholder="Select a option and change input text above"
           onChange={props.onNetworkChange}
           // allowClear
+          disabled={props.isSelectFieldDisable}
         >
           {walletService.supportedConfigs().map(config => (
             <Select.Option key={config.name} value={config.name} disabled={!config.enabled}>
@@ -242,6 +244,7 @@ function RestorePage() {
   const [isCustomConfig, setIsCustomConfig] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [isRestoreDisable, setIsRestoreDisable] = useState(false);
+  const [isSelectFieldDisable, setIsSelectFieldDisable] = useState(true);
 
   // const showSuccessModal = () => {
   //   setIsSuccessModalVisible(true);
@@ -305,6 +308,15 @@ function RestorePage() {
     }
   };
 
+  const onChange = () => {
+    const { name, mnemonic } = form.getFieldsValue();
+    if (name !== '' && mnemonic !== '') {
+      setIsSelectFieldDisable(false);
+    } else {
+      setIsSelectFieldDisable(true);
+    }
+  };
+
   return (
     <main className="restore-page">
       <div className="header">
@@ -323,12 +335,14 @@ function RestorePage() {
             onFinish={() => {
               setInputPasswordVisible(true);
             }}
+            onChange={onChange}
           >
             {!isCustomConfig || isConnected ? (
               <FormRestore
                 isRestoreDisable={isRestoreDisable}
                 isModalVisible={inputPasswordVisible}
                 onNetworkChange={onNetworkChange}
+                isSelectFieldDisable={isSelectFieldDisable}
               />
             ) : (
               <FormCustomConfig
