@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import './restore.less';
 import { Button, Form, Input, Select } from 'antd';
+import { FormInstance } from 'antd/lib/form';
 import { HDKey } from '../../service/types/ChainJsLib';
 import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
-
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import BackButton from '../../components/BackButton/BackButton';
@@ -30,10 +30,14 @@ interface FormCustomConfigProps {
 }
 
 interface FormRestoreProps {
-  isModalVisible: boolean;
+  form: FormInstance;
   isRestoreDisable: boolean;
   isSelectFieldDisable: boolean;
-  onNetworkChange: (network: string) => void;
+  setIsSelectFieldDisable: (arg: boolean) => void;
+  setIsCustomConfig: (arg: boolean) => void;
+  setIsConnected: (arg: boolean) => void;
+  setIsRestoreDisable: (arg: boolean) => void;
+  networkConfig: any;
 }
 
 const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
@@ -190,8 +194,91 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
 };
 
 const FormRestore: React.FC<FormRestoreProps> = props => {
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const history = useHistory();
+
+  const goToHome = () => {
+    history.push('/home');
+  };
+
+  const showErrorModal = () => {
+    setIsErrorModalVisible(true);
+  };
+
+  const handleErrorOk = () => {
+    setIsErrorModalVisible(false);
+  };
+
+  const handleErrorCancel = () => {
+    setIsErrorModalVisible(false);
+  };
+
+  const onChange = () => {
+    const { name, mnemonic } = props.form.getFieldsValue();
+    if (name !== '' && mnemonic !== '') {
+      props.setIsSelectFieldDisable(false);
+    } else {
+      props.setIsSelectFieldDisable(true);
+    }
+  };
+
+  const onNetworkChange = (network: string) => {
+    props.form.setFieldsValue({ network });
+    if (network === DefaultWalletConfigs.CustomDevNet.name) {
+      props.setIsCustomConfig(true);
+      props.setIsConnected(false);
+      props.setIsRestoreDisable(true);
+    }
+  };
+
+  const onWalletImportFinish = async (password: string) => {
+    setIsButtonLoading(true);
+    // eslint-disable-next-line no-console
+    console.log(props.networkConfig);
+    const { name, mnemonic, network } = props.form.getFieldsValue();
+    if (!name || !mnemonic || !network) {
+      return;
+    }
+    const selectedNetwork = walletService
+      .supportedConfigs()
+      .find(config => config.name === network);
+
+    if (!selectedNetwork) {
+      return;
+    }
+
+    const importOptions: WalletImportOptions = {
+      walletName: name,
+      phrase: mnemonic.toString().trim(),
+      config: selectedNetwork,
+    };
+    try {
+      const wallet = await walletService.restoreWallet(importOptions);
+      await walletService.encryptWalletAndSetSession(password, wallet);
+      await walletService.syncAll(new Session(wallet));
+      goToHome();
+      props.form.resetFields();
+      return;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('issue on wallet import', e);
+      showErrorModal();
+    }
+  };
+
   return (
-    <>
+    <Form
+      {...layout}
+      layout="vertical"
+      form={props.form}
+      name="control-ref"
+      onFinish={() => {
+        setInputPasswordVisible(true);
+      }}
+      onChange={onChange}
+    >
       <Form.Item
         name="name"
         label="Wallet Name"
@@ -226,7 +313,7 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
         <Select
           placeholder="Select wallet network"
           // placeholder="Select a option and change input text above"
-          onChange={props.onNetworkChange}
+          onChange={onNetworkChange}
           // allowClear
           disabled={props.isSelectFieldDisable}
         >
@@ -242,94 +329,53 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
           Restore Wallet
         </Button>
       </Form.Item>
-    </>
+      <PasswordFormModal
+        description="Input the app password to encrypt the wallet to be restored"
+        okButtonText="Encrypt wallet"
+        isButtonLoading={isButtonLoading}
+        onCancel={() => {
+          setInputPasswordVisible(false);
+        }}
+        onSuccess={onWalletImportFinish}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          return {
+            valid: isValid,
+            errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+          };
+        }}
+        successText="Wallet restored and encrypted successfully !"
+        title="Provide app password"
+        visible={inputPasswordVisible}
+        successButtonText="Go to Home"
+        confirmPassword={false}
+      />
+      <ErrorModalPopup
+        isModalVisible={isErrorModalVisible}
+        handleCancel={handleErrorCancel}
+        handleOk={handleErrorOk}
+        title="An error happened!"
+        footer={[]}
+      >
+        <>
+          <div className="description">Your Mnemonic Phrase is invalid. Please check again.</div>
+        </>
+      </ErrorModalPopup>
+    </Form>
   );
 };
 
 function RestorePage() {
   const [form] = Form.useForm();
-  const history = useHistory();
-  const [networkConfig, setNetworkConfig] = useState();
-  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
-  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
-  const [isButtonLoading, setIsButtonLoading] = useState(false);
+  const [isRestoreDisable, setIsRestoreDisable] = useState(false);
   const [isCustomConfig, setIsCustomConfig] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
-  const [isRestoreDisable, setIsRestoreDisable] = useState(false);
   const [isSelectFieldDisable, setIsSelectFieldDisable] = useState(true);
+  const [networkConfig, setNetworkConfig] = useState();
 
   // const showSuccessModal = () => {
   //   setIsSuccessModalVisible(true);
   // };
-
-  const goToHome = () => {
-    history.push('/home');
-  };
-
-  const showErrorModal = () => {
-    setIsErrorModalVisible(true);
-  };
-
-  const handleErrorOk = () => {
-    setIsErrorModalVisible(false);
-  };
-
-  const handleErrorCancel = () => {
-    setIsErrorModalVisible(false);
-  };
-
-  const onNetworkChange = (network: string) => {
-    form.setFieldsValue({ network });
-    if (network === DefaultWalletConfigs.CustomDevNet.name) {
-      setIsCustomConfig(true);
-      setIsConnected(false);
-      setIsRestoreDisable(true);
-    }
-  };
-
-  const onWalletImportFinish = async (password: string) => {
-    setIsButtonLoading(true);
-    // eslint-disable-next-line no-console
-    console.log(networkConfig);
-    const { name, mnemonic, network } = form.getFieldsValue();
-    if (!name || !mnemonic || !network) {
-      return;
-    }
-    const selectedNetwork = walletService
-      .supportedConfigs()
-      .find(config => config.name === network);
-
-    if (!selectedNetwork) {
-      return;
-    }
-
-    const importOptions: WalletImportOptions = {
-      walletName: name,
-      phrase: mnemonic.toString().trim(),
-      config: selectedNetwork,
-    };
-    try {
-      const wallet = await walletService.restoreWallet(importOptions);
-      await walletService.encryptWalletAndSetSession(password, wallet);
-      await walletService.syncAll(new Session(wallet));
-      goToHome();
-      form.resetFields();
-      return;
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('issue on wallet import', e);
-      showErrorModal();
-    }
-  };
-
-  const onChange = () => {
-    const { name, mnemonic } = form.getFieldsValue();
-    if (name !== '' && mnemonic !== '') {
-      setIsSelectFieldDisable(false);
-    } else {
-      setIsSelectFieldDisable(true);
-    }
-  };
 
   return (
     <main className="restore-page">
@@ -339,67 +385,33 @@ function RestorePage() {
       <div className="container">
         <BackButton />
         <div>
-          <div className="title">Restore wallet</div>
-          <div className="slogan">Create a name and select the network for your wallet.</div>
-          <Form
-            {...layout}
-            layout="vertical"
-            form={form}
-            name="control-ref"
-            onFinish={() => {
-              setInputPasswordVisible(true);
-            }}
-            onChange={onChange}
-          >
-            {!isCustomConfig || isConnected ? (
-              <FormRestore
-                isRestoreDisable={isRestoreDisable}
-                isModalVisible={inputPasswordVisible}
-                onNetworkChange={onNetworkChange}
-                isSelectFieldDisable={isSelectFieldDisable}
-              />
-            ) : (
-              <FormCustomConfig
-                setIsConnected={setIsConnected}
-                setIsRestoreDisable={setIsRestoreDisable}
-                setNetworkConfig={setNetworkConfig}
-              />
-            )}
-          </Form>
-          <PasswordFormModal
-            description="Input the app password to encrypt the wallet to be restored"
-            okButtonText="Encrypt wallet"
-            isButtonLoading={isButtonLoading}
-            onCancel={() => {
-              setInputPasswordVisible(false);
-            }}
-            onSuccess={onWalletImportFinish}
-            onValidatePassword={async (password: string) => {
-              const isValid = await secretStoreService.checkIfPasswordIsValid(password);
-              return {
-                valid: isValid,
-                errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
-              };
-            }}
-            successText="Wallet restored and encrypted successfully !"
-            title="Provide app password"
-            visible={inputPasswordVisible}
-            successButtonText="Go to Home"
-            confirmPassword={false}
-          />
-          <ErrorModalPopup
-            isModalVisible={isErrorModalVisible}
-            handleCancel={handleErrorCancel}
-            handleOk={handleErrorOk}
-            title="An error happened!"
-            footer={[]}
-          >
-            <>
-              <div className="description">
-                Your Mnemonic Phrase is invalid. Please check again.
-              </div>
-            </>
-          </ErrorModalPopup>
+          <div className="title">
+            {!isCustomConfig || isConnected ? 'Restore Wallet' : 'Custom Configuration'}
+          </div>
+          <div className="slogan">
+            {!isCustomConfig || isConnected
+              ? 'Create a name and select the network for your wallet.'
+              : 'Fill in the below to connect to this custom network.'}
+          </div>
+
+          {!isCustomConfig || isConnected ? (
+            <FormRestore
+              form={form}
+              isRestoreDisable={isRestoreDisable}
+              isSelectFieldDisable={isSelectFieldDisable}
+              setIsSelectFieldDisable={setIsSelectFieldDisable}
+              setIsCustomConfig={setIsCustomConfig}
+              setIsConnected={setIsConnected}
+              setIsRestoreDisable={setIsRestoreDisable}
+              networkConfig={networkConfig}
+            />
+          ) : (
+            <FormCustomConfig
+              setIsConnected={setIsConnected}
+              setIsRestoreDisable={setIsRestoreDisable}
+              setNetworkConfig={setNetworkConfig}
+            />
+          )}
         </div>
       </div>
     </main>

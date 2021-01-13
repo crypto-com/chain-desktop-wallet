@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { Button, Form, Input, Select } from 'antd';
+import { FormInstance } from 'antd/lib/form';
 import { walletIdentifierState } from '../../recoil/atom';
 import './create.less';
 import { Wallet } from '../../models/Wallet';
@@ -31,12 +32,15 @@ interface FormCustomConfigProps {
 }
 
 interface FormCreateProps {
-  isModalVisible: boolean;
+  form: FormInstance;
   isCreateDisable: boolean;
   isSelectFieldDisable: boolean;
-  handleCancel: () => void;
-  handleOk: () => void;
-  onNetworkChange: (network: string) => void;
+  setWalletIdentifier: (walletIdentifier: string) => void;
+  setIsCustomConfig: (arg: boolean) => void;
+  setIsConnected: (arg: boolean) => void;
+  setIsCreateDisable: (arg: boolean) => void;
+  setIsSelectFieldDisable: (arg: boolean) => void;
+  networkConfig: any;
 }
 
 const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
@@ -192,94 +196,44 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
 };
 
 const FormCreate: React.FC<FormCreateProps> = props => {
-  return (
-    <>
-      <Form.Item
-        name="name"
-        label="Wallet Name"
-        hasFeedback
-        rules={[{ required: true, message: 'Wallet name is required' }]}
-      >
-        <Input maxLength={36} placeholder="Wallet name" />
-      </Form.Item>
-      <Form.Item name="network" label="Network" rules={[{ required: true }]}>
-        <Select
-          placeholder="Select wallet network"
-          onChange={props.onNetworkChange}
-          disabled={props.isSelectFieldDisable}
-        >
-          {walletService.supportedConfigs().map(config => (
-            <Select.Option key={config.name} value={config.name} disabled={!config.enabled}>
-              {config.name}
-            </Select.Option>
-          ))}
-        </Select>
-      </Form.Item>
-      <Form.Item {...tailLayout}>
-        <SuccessModalPopup
-          isModalVisible={props.isModalVisible}
-          handleCancel={props.handleCancel}
-          handleOk={props.handleOk}
-          title="Success!"
-          button={
-            <Button type="primary" htmlType="submit" disabled={props.isCreateDisable}>
-              Create Wallet
-            </Button>
-          }
-          footer={[
-            <Button key="submit" type="primary" onClick={props.handleOk}>
-              Next
-            </Button>,
-          ]}
-        >
-          <>
-            <div className="description">Your wallet has been created!</div>
-          </>
-        </SuccessModalPopup>
-      </Form.Item>
-    </>
-  );
-};
-
-const CreatePage = () => {
-  const [form] = Form.useForm();
-  const [wallet, setWallet] = useState<Wallet>();
-  const [walletIdentifier, setWalletIdentifier] = useRecoilState(walletIdentifierState);
-  const [networkConfig, setNetworkConfig] = useState();
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isCreateDisable, setIsCreateDisable] = useState(false);
-  const [isSelectFieldDisable, setIsSelectFieldDisable] = useState(true);
-  const [isCustomConfig, setIsCustomConfig] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
-  const didMountRef = useRef(false);
-  const history = useHistory();
+  const [wallet, setWallet] = useState<Wallet>();
 
   const showModal = () => {
     setIsModalVisible(true);
   };
   const handleOk = () => {
     setIsModalVisible(false);
-    setWalletIdentifier(wallet?.identifier ?? '');
+    props.setWalletIdentifier(wallet?.identifier ?? '');
   };
 
   const handleCancel = () => {
     setIsModalVisible(false);
-    setWalletIdentifier(wallet?.identifier ?? '');
+    props.setWalletIdentifier(wallet?.identifier ?? '');
+  };
+
+  const onChange = () => {
+    const { name } = props.form.getFieldsValue();
+    if (name !== '') {
+      props.setIsSelectFieldDisable(false);
+    } else {
+      props.setIsSelectFieldDisable(true);
+    }
   };
 
   const onNetworkChange = (network: string) => {
-    form.setFieldsValue({ network });
+    props.form.setFieldsValue({ network });
     if (network === DefaultWalletConfigs.CustomDevNet.name) {
-      setIsCustomConfig(true);
-      setIsConnected(false);
-      setIsCreateDisable(true);
+      props.setIsCustomConfig(true);
+      props.setIsConnected(false);
+      props.setIsCreateDisable(true);
     }
   };
 
   const onWalletCreateFinish = async () => {
-    const { name, network } = form.getFieldsValue();
+    const { name, network } = props.form.getFieldsValue();
     // eslint-disable-next-line no-console
-    console.log(networkConfig);
+    console.log(props.networkConfig);
     if (!name || !network) {
       return;
     }
@@ -309,17 +263,75 @@ const CreatePage = () => {
       return;
     }
 
-    form.resetFields();
+    props.form.resetFields();
   };
 
-  const onChange = () => {
-    const { name } = form.getFieldsValue();
-    if (name !== '') {
-      setIsSelectFieldDisable(false);
-    } else {
-      setIsSelectFieldDisable(true);
-    }
-  };
+  return (
+    <Form
+      {...layout}
+      layout="vertical"
+      form={props.form}
+      name="control-ref"
+      onFinish={onWalletCreateFinish}
+      onChange={onChange}
+    >
+      <Form.Item
+        name="name"
+        label="Wallet Name"
+        hasFeedback
+        rules={[{ required: true, message: 'Wallet name is required' }]}
+      >
+        <Input maxLength={36} placeholder="Wallet name" />
+      </Form.Item>
+      <Form.Item name="network" label="Network" rules={[{ required: true }]}>
+        <Select
+          placeholder="Select wallet network"
+          onChange={onNetworkChange}
+          disabled={props.isSelectFieldDisable}
+        >
+          {walletService.supportedConfigs().map(config => (
+            <Select.Option key={config.name} value={config.name} disabled={!config.enabled}>
+              {config.name}
+            </Select.Option>
+          ))}
+        </Select>
+      </Form.Item>
+      <Form.Item {...tailLayout}>
+        <SuccessModalPopup
+          isModalVisible={isModalVisible}
+          handleCancel={handleCancel}
+          handleOk={handleOk}
+          title="Success!"
+          button={
+            <Button type="primary" htmlType="submit" disabled={props.isCreateDisable}>
+              Create Wallet
+            </Button>
+          }
+          footer={[
+            <Button key="submit" type="primary" onClick={handleOk}>
+              Next
+            </Button>,
+          ]}
+        >
+          <>
+            <div className="description">Your wallet has been created!</div>
+          </>
+        </SuccessModalPopup>
+      </Form.Item>
+    </Form>
+  );
+};
+
+const CreatePage = () => {
+  const [form] = Form.useForm();
+  const [isCreateDisable, setIsCreateDisable] = useState(false);
+  const [isCustomConfig, setIsCustomConfig] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isSelectFieldDisable, setIsSelectFieldDisable] = useState(true);
+  const [networkConfig, setNetworkConfig] = useState();
+  const [walletIdentifier, setWalletIdentifier] = useRecoilState(walletIdentifierState);
+  const didMountRef = useRef(false);
+  const history = useHistory();
 
   useEffect(() => {
     if (!didMountRef.current) {
@@ -349,31 +361,26 @@ const CreatePage = () => {
               ? 'Create a name and select the network for your wallet.'
               : 'Fill in the below to connect to this custom network.'}
           </div>
-          <Form
-            {...layout}
-            layout="vertical"
-            form={form}
-            name="control-ref"
-            onFinish={onWalletCreateFinish}
-            onChange={onChange}
-          >
-            {!isCustomConfig || isConnected ? (
-              <FormCreate
-                isCreateDisable={isCreateDisable}
-                isModalVisible={isModalVisible}
-                isSelectFieldDisable={isSelectFieldDisable}
-                handleOk={handleOk}
-                handleCancel={handleCancel}
-                onNetworkChange={onNetworkChange}
-              />
-            ) : (
-              <FormCustomConfig
-                setIsConnected={setIsConnected}
-                setIsCreateDisable={setIsCreateDisable}
-                setNetworkConfig={setNetworkConfig}
-              />
-            )}
-          </Form>
+
+          {!isCustomConfig || isConnected ? (
+            <FormCreate
+              form={form}
+              isCreateDisable={isCreateDisable}
+              isSelectFieldDisable={isSelectFieldDisable}
+              setIsSelectFieldDisable={setIsSelectFieldDisable}
+              setWalletIdentifier={setWalletIdentifier}
+              setIsCustomConfig={setIsCustomConfig}
+              setIsConnected={setIsConnected}
+              setIsCreateDisable={setIsCreateDisable}
+              networkConfig={networkConfig}
+            />
+          ) : (
+            <FormCustomConfig
+              setIsConnected={setIsConnected}
+              setIsCreateDisable={setIsCreateDisable}
+              setNetworkConfig={setNetworkConfig}
+            />
+          )}
         </div>
       </div>
     </main>
