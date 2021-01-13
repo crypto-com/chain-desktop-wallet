@@ -36,6 +36,7 @@ interface FormRestoreProps {
 }
 
 const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
+  const [form] = Form.useForm();
   const isNodeValid = true;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
@@ -68,15 +69,19 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
 
   const checkNodeConnectivity = () => {
     // TO-DO Node Connectivity check
-    if (isNodeValid) {
-      showModal();
-    } else {
-      showErrorModal();
-    }
+    form.validateFields().then(values => {
+      // eslint-disable-next-line no-console
+      console.log(values);
+      if (isNodeValid) {
+        showModal();
+      } else {
+        showErrorModal();
+      }
+    });
   };
 
   return (
-    <>
+    <Form layout="vertical" form={form} name="control-ref">
       <div className="row">
         <Form.Item
           name="networkName"
@@ -100,7 +105,13 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         name="nodeUrl"
         label="Node URL"
         hasFeedback
-        rules={[{ required: true, message: 'Node URL is required' }]}
+        rules={[
+          { required: true, message: 'Node URL is required' },
+          {
+            pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
+            message: 'Please enter a valid node url',
+          },
+        ]}
       >
         <Input placeholder="Node URL" />
       </Form.Item>
@@ -147,7 +158,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         handleOk={handleOk}
         title="Success!"
         button={
-          <Button type="primary" onClick={checkNodeConnectivity}>
+          <Button type="primary" htmlType="submit" onClick={checkNodeConnectivity}>
             Connect
           </Button>
         }
@@ -174,7 +185,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
           </div>
         </>
       </ErrorModalPopup>
-    </>
+    </Form>
   );
 };
 
