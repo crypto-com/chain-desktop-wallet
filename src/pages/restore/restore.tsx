@@ -26,6 +26,7 @@ const tailLayout = {
 interface FormCustomConfigProps {
   setIsConnected: (arg: boolean) => void;
   setIsRestoreDisable: (arg: boolean) => void;
+  setNetworkConfig: (arg: any) => void;
 }
 
 interface FormRestoreProps {
@@ -70,10 +71,9 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
   const checkNodeConnectivity = () => {
     // TO-DO Node Connectivity check
     form.validateFields().then(values => {
-      // eslint-disable-next-line no-console
-      console.log(values);
       if (isNodeValid) {
         showModal();
+        props.setNetworkConfig(values);
       } else {
         showErrorModal();
       }
@@ -249,6 +249,7 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
 function RestorePage() {
   const [form] = Form.useForm();
   const history = useHistory();
+  const [networkConfig, setNetworkConfig] = useState();
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
@@ -288,6 +289,8 @@ function RestorePage() {
 
   const onWalletImportFinish = async (password: string) => {
     setIsButtonLoading(true);
+    // eslint-disable-next-line no-console
+    console.log(networkConfig);
     const { name, mnemonic, network } = form.getFieldsValue();
     if (!name || !mnemonic || !network) {
       return;
@@ -359,6 +362,7 @@ function RestorePage() {
               <FormCustomConfig
                 setIsConnected={setIsConnected}
                 setIsRestoreDisable={setIsRestoreDisable}
+                setNetworkConfig={setNetworkConfig}
               />
             )}
           </Form>

@@ -27,6 +27,7 @@ const tailLayout = {
 interface FormCustomConfigProps {
   setIsConnected: (arg: boolean) => void;
   setIsCreateDisable: (arg: boolean) => void;
+  setNetworkConfig: (arg: any) => void;
 }
 
 interface FormCreateProps {
@@ -73,10 +74,9 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
   const checkNodeConnectivity = () => {
     // TO-DO Node Connectivity check
     form.validateFields().then(values => {
-      // eslint-disable-next-line no-console
-      console.log(values);
       if (isNodeValid) {
         showModal();
+        props.setNetworkConfig(values);
       } else {
         showErrorModal();
       }
@@ -103,12 +103,17 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
           <Input maxLength={36} placeholder="Derivation Path" />
         </Form.Item>
       </div>
-
       <Form.Item
         name="nodeUrl"
         label="Node URL"
         hasFeedback
-        rules={[{ required: true, message: 'Node URL is required' }]}
+        rules={[
+          { required: true, message: 'Node URL is required' },
+          {
+            pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
+            message: 'Please enter a valid node url',
+          },
+        ]}
       >
         <Input placeholder="Node URL" />
       </Form.Item>
@@ -240,6 +245,7 @@ const CreatePage = () => {
   const [form] = Form.useForm();
   const [wallet, setWallet] = useState<Wallet>();
   const [walletIdentifier, setWalletIdentifier] = useRecoilState(walletIdentifierState);
+  const [networkConfig, setNetworkConfig] = useState();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isCreateDisable, setIsCreateDisable] = useState(false);
   const [isSelectFieldDisable, setIsSelectFieldDisable] = useState(true);
@@ -272,6 +278,8 @@ const CreatePage = () => {
 
   const onWalletCreateFinish = async () => {
     const { name, network } = form.getFieldsValue();
+    // eslint-disable-next-line no-console
+    console.log(networkConfig);
     if (!name || !network) {
       return;
     }
@@ -362,6 +370,7 @@ const CreatePage = () => {
               <FormCustomConfig
                 setIsConnected={setIsConnected}
                 setIsCreateDisable={setIsCreateDisable}
+                setNetworkConfig={setNetworkConfig}
               />
             )}
           </Form>
