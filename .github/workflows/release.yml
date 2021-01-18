@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - master
+      - dev # This is done temporarily for testing purposes
 
 jobs:
   release:
@@ -48,6 +49,13 @@ jobs:
           echo ${{ steps.extract_branch.outputs.branch }}
           echo "********* END RELEASE REF ************"
 
+      - name: Prepare for app notarization (MacOS)
+        if: startsWith(matrix.os, 'macos')
+        # Import Apple API key for app notarization on macOS
+        run: |
+          mkdir -p ~/private_keys/
+          echo '${{ secrets.mac_api_key }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id }}.p8
+
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
         with:
@@ -60,7 +68,12 @@ jobs:
 
           # When a push is done to master, the binary builds are released directly
           # Temporarily set to dev for testing
-          release: ${{ steps.extract_branch.outputs.branch == 'master' }}
+          release: ${{ steps.extract_branch.outputs.branch == 'dev' }}
 
           mac_certs: ${{ secrets.mac_certs }}
           mac_certs_password: ${{ secrets.mac_certs_password }}
+
+        env:
+          # macOS notarization API key
+          API_KEY_ID: ${{ secrets.mac_api_key_id }}
+          API_KEY_ISSUER_ID: ${{ secrets.mac_api_key_issuer_id }}
