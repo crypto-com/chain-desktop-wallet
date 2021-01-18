@@ -16,6 +16,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
 function BackupPage() {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [goHomeButtonLoading, setGoHomeButtonLoading] = useState(false);
   const [mouseTooltip, setMouseTooltip] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
@@ -29,10 +30,12 @@ function BackupPage() {
   };
 
   const onWalletBackupFinish = async (password: string) => {
+    setGoHomeButtonLoading(true);
     if (!wallet) {
       return;
     }
     await walletService.encryptWalletAndSetSession(password, wallet);
+    setGoHomeButtonLoading(false);
     history.push('/home');
   };
 
@@ -133,6 +136,7 @@ function BackupPage() {
           <PasswordFormModal
             description="Input the app password to encrypt the wallet to be restored"
             okButtonText="Encrypt wallet"
+            isButtonLoading={goHomeButtonLoading}
             onCancel={() => {
               setInputPasswordVisible(false);
             }}

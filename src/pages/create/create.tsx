@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { Button, Form, Input, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { walletIdentifierState } from '../../recoil/atom';
 import './create.less';
-import { reconstructCustomConfig, Wallet } from '../../models/Wallet';
+import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions } from '../../service/WalletCreator';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
@@ -98,9 +98,15 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         name="derivationPath"
         label="Derivation Path"
         hasFeedback
-        rules={[{ required: true, message: 'Derivation Path is required' }]}
+        rules={[
+          { required: true, message: 'Derivation Path is required' },
+          {
+            pattern: /^m\/\d+'?\/\d+'?\/\d+'?\/\d+'?\/\d+'?$/,
+            message: 'Please enter a valid derivation path',
+          },
+        ]}
       >
-        <Input maxLength={36} placeholder="Derivation Path" />
+        <Input maxLength={64} placeholder="Derivation Path" />
       </Form.Item>
       <Form.Item
         name="nodeUrl"
@@ -183,7 +189,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
       >
         <>
           <div className="description">
-            Your Network Configuration is invalid. Please check again.
+            Could not connect to the specified node URL. Please check again.
           </div>
         </>
       </ErrorModalPopup>
@@ -247,22 +253,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     if (!name || !network) {
       return;
     }
-    let selectedNetworkConfig = walletService
-      .supportedConfigs()
-      .find(config => config.name === network);
-
-    // If the dev-net custom network was selected, we pass the values that were input in the dev-net config UI fields
-    if (selectedNetworkConfig?.name === DefaultWalletConfigs.CustomDevNet.name) {
-      let customDevnetConfig;
-      if (props.networkConfig) {
-        customDevnetConfig = reconstructCustomConfig(props.networkConfig);
-        selectedNetworkConfig = customDevnetConfig;
-
-        // eslint-disable-next-line no-console
-        console.log('props.networkConfig', selectedNetworkConfig);
-      }
-    }
-
+    const selectedNetworkConfig = walletService.getSelectedNetwork(network, props);
     if (!selectedNetworkConfig) {
       return;
     }
