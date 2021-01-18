@@ -95,7 +95,13 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         name="derivationPath"
         label="Derivation Path"
         hasFeedback
-        rules={[{ required: true, message: 'Derivation Path is required' }]}
+        rules={[
+          { required: true, message: 'Derivation Path is required' },
+          {
+            pattern: /^m\/\d+'?\/\d+'?\/\d+'?\/\d+'?\/\d+'?$/,
+            message: 'Please enter a valid derivation path',
+          },
+        ]}
       >
         <Input maxLength={36} placeholder="Derivation Path" />
       </Form.Item>
