@@ -1,6 +1,6 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "Crypto.com Chain Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.com <chain@crypto.com>",
@@ -52,7 +52,7 @@
     "electron:dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:windev": "concurrently \"SET BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:pre-build": "yarn build && yarn copy-macos-manifest && tsc -p electron",
-    "copy-macos-manifest": "copyfiles entitlements.mac.plist ./build/",
+    "copy-macos-manifest": "copyfiles entitlements* ./build/",
     "clean-builds": "rimraf build && rimraf dist",
     "electron:build": "yarn clean-builds && yarn build && yarn copy-macos-manifest && tsc -p electron && electron-builder --publish=never",
     "lint-staged": "lint-staged",
@@ -87,8 +87,11 @@
       "./public/*",
       "./public/**/*"
     ],
+    "afterSign": "electron-builder-notarize",
     "mac": {
       "hardenedRuntime": true,
+      "entitlements": "./build/entitlements.mac.plist",
+      "entitlementsInherit": "./build/entitlements.mac.plist",
       "target": [
         "dmg",
         "zip"
