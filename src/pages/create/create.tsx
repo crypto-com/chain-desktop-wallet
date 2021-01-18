@@ -5,7 +5,7 @@ import { Button, Form, Input, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { walletIdentifierState } from '../../recoil/atom';
 import './create.less';
-import { Wallet } from '../../models/Wallet';
+import { reconstructCustomConfig, Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions } from '../../service/WalletCreator';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
@@ -45,8 +45,8 @@ interface FormCreateProps {
 
 const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
   const [form] = Form.useForm();
-  const isNodeValid = true;
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [checkingNodeConnection, setCheckingNodeConnection] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
 
   const showModal = () => {
@@ -75,10 +75,15 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
     setIsErrorModalVisible(false);
   };
 
-  const checkNodeConnectivity = () => {
+  const checkNodeConnectivity = async () => {
     // TO-DO Node Connectivity check
-    form.validateFields().then(values => {
-      if (isNodeValid) {
+    form.validateFields().then(async values => {
+      setCheckingNodeConnection(true);
+      const { nodeUrl } = values;
+      const isNodeLive = await walletService.checkNodeIsLive(nodeUrl);
+      setCheckingNodeConnection(false);
+
+      if (isNodeLive) {
         showModal();
         props.setNetworkConfig(values);
       } else {
@@ -155,7 +160,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         handleOk={handleOk}
         title="Success!"
         button={
-          <Button type="primary" onClick={checkNodeConnectivity}>
+          <Button type="primary" onClick={checkNodeConnectivity} loading={checkingNodeConnection}>
             Connect
           </Button>
         }
@@ -188,6 +193,8 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
 
 const FormCreate: React.FC<FormCreateProps> = props => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
 
   const showModal = () => {
@@ -201,6 +208,18 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const handleCancel = () => {
     setIsModalVisible(false);
     props.setWalletIdentifier(wallet?.identifier ?? '');
+  };
+
+  const handleErrorOk = () => {
+    setIsErrorModalVisible(false);
+  };
+
+  const handleErrorCancel = () => {
+    setIsErrorModalVisible(false);
+  };
+
+  const showErrorModal = () => {
+    setIsErrorModalVisible(true);
   };
 
   const onChange = () => {
@@ -222,35 +241,49 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   };
 
   const onWalletCreateFinish = async () => {
+    setCreateLoading(true);
     const { name, network } = props.form.getFieldsValue();
-    // eslint-disable-next-line no-console
-    console.log(props.networkConfig);
+
     if (!name || !network) {
       return;
     }
-    const selectedNetwork = walletService
+    let selectedNetworkConfig = walletService
       .supportedConfigs()
       .find(config => config.name === network);
 
-    if (!selectedNetwork) {
+    // If the dev-net custom network was selected, we pass the values that were input in the dev-net config UI fields
+    if (selectedNetworkConfig?.name === DefaultWalletConfigs.CustomDevNet.name) {
+      let customDevnetConfig;
+      if (props.networkConfig) {
+        customDevnetConfig = reconstructCustomConfig(props.networkConfig);
+        selectedNetworkConfig = customDevnetConfig;
+
+        // eslint-disable-next-line no-console
+        console.log('props.networkConfig', selectedNetworkConfig);
+      }
+    }
+
+    if (!selectedNetworkConfig) {
       return;
     }
 
     const createOptions: WalletCreateOptions = {
       walletName: name,
-      config: selectedNetwork,
+      config: selectedNetworkConfig,
     };
 
     try {
       const createdWallet = await walletService.createAndSaveWallet(createOptions);
       await walletService.setCurrentSession(new Session(createdWallet));
       setWallet(createdWallet);
+      setCreateLoading(false);
       showModal();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('issue on wallet create', e);
 
-      // TODO : Show pop up on failure to create wallet
+      setCreateLoading(false);
+      showErrorModal();
       return;
     }
 
@@ -294,7 +327,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           handleOk={handleOk}
           title="Success!"
           button={
-            <Button type="primary" htmlType="submit" disabled={props.isCreateDisable}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              disabled={props.isCreateDisable}
+              loading={createLoading}
+            >
               Create Wallet
             </Button>
           }
@@ -308,6 +346,19 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             <div className="description">Your wallet has been created!</div>
           </>
         </SuccessModalPopup>
+        <ErrorModalPopup
+          isModalVisible={isErrorModalVisible}
+          handleCancel={handleErrorCancel}
+          handleOk={handleErrorOk}
+          title="An error happened!"
+          footer={[]}
+        >
+          <>
+            <div className="description">
+              Failed to create wallet, the derivation phrase might be incorrect.
+            </div>
+          </>
+        </ErrorModalPopup>
       </Form.Item>
     </Form>
   );

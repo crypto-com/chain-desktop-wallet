@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { NodeData, Wallet } from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import { WalletCreateOptions, WalletCreator } from './WalletCreator';
@@ -501,6 +502,21 @@ class WalletService {
       const transactionData: TransferTransactionData = { ...data };
       return transactionData;
     });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async checkNodeIsLive(nodeUrl: string): Promise<boolean> {
+    try {
+      await axios.head(nodeUrl);
+      return true;
+    } catch (error) {
+      if (error && error.response) {
+        const { status } = error.response;
+        return !(status >= 400 && status < 500);
+      }
+    }
+
+    return false;
   }
 }
 
