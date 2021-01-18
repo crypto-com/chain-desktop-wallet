@@ -86,25 +86,14 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
 
   return (
     <Form layout="vertical" form={form} name="control-ref">
-      <div className="row">
-        <Form.Item
-          name="networkName"
-          label="Network Name"
-          hasFeedback
-          rules={[{ required: true, message: 'Network Name is required' }]}
-        >
-          <Input maxLength={36} placeholder="Network Name" />
-        </Form.Item>
-        <Form.Item
-          name="derivationPath"
-          label="Derivation Path"
-          hasFeedback
-          rules={[{ required: true, message: 'Derivation Path is required' }]}
-        >
-          <Input maxLength={36} placeholder="Derivation Path" />
-        </Form.Item>
-      </div>
-
+      <Form.Item
+        name="derivationPath"
+        label="Derivation Path"
+        hasFeedback
+        rules={[{ required: true, message: 'Derivation Path is required' }]}
+      >
+        <Input maxLength={36} placeholder="Derivation Path" />
+      </Form.Item>
       <Form.Item
         name="nodeUrl"
         label="Node URL"
@@ -119,6 +108,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
       >
         <Input placeholder="Node URL" />
       </Form.Item>
+
       <div className="row">
         <Form.Item
           name="addressPrefix"
