@@ -355,7 +355,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         >
           <>
             <div className="description">
-              Failed to create wallet, the derivation phrase might be incorrect.
+              Failed to create wallet, the derivation path might be incorrect.
             </div>
           </>
         </ErrorModalPopup>
