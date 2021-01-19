@@ -42,7 +42,7 @@ interface FormRestoreProps {
 
 const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
   const [form] = Form.useForm();
-  const isNodeValid = true;
+  const [checkingNodeConnection, setCheckingNodeConnection] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
 
@@ -72,10 +72,15 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
     setIsErrorModalVisible(false);
   };
 
-  const checkNodeConnectivity = () => {
+  const checkNodeConnectivity = async () => {
     // TO-DO Node Connectivity check
-    form.validateFields().then(values => {
-      if (isNodeValid) {
+    form.validateFields().then(async values => {
+      setCheckingNodeConnection(true);
+      const { nodeUrl } = values;
+      const isNodeLive = await walletService.checkNodeIsLive(nodeUrl);
+      setCheckingNodeConnection(false);
+
+      if (isNodeLive) {
         showModal();
         props.setNetworkConfig(values);
       } else {
@@ -90,7 +95,13 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         name="derivationPath"
         label="Derivation Path"
         hasFeedback
-        rules={[{ required: true, message: 'Derivation Path is required' }]}
+        rules={[
+          { required: true, message: 'Derivation Path is required' },
+          {
+            pattern: /^m\/\d+'?\/\d+'?\/\d+'?\/\d+'?\/\d+'?$/,
+            message: 'Please enter a valid derivation path',
+          },
+        ]}
       >
         <Input maxLength={36} placeholder="Derivation Path" />
       </Form.Item>
@@ -152,7 +163,12 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         handleOk={handleOk}
         title="Success!"
         button={
-          <Button type="primary" htmlType="submit" onClick={checkNodeConnectivity}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            onClick={checkNodeConnectivity}
+            loading={checkingNodeConnection}
+          >
             Connect
           </Button>
         }
@@ -175,7 +191,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
       >
         <>
           <div className="description">
-            Your Network Configuration is invalid. Please check again.
+            Could not connect to the specified node URL. Please check again.
           </div>
         </>
       </ErrorModalPopup>
@@ -225,24 +241,19 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
 
   const onWalletImportFinish = async (password: string) => {
     setIsButtonLoading(true);
-    // eslint-disable-next-line no-console
-    console.log(props.networkConfig);
     const { name, mnemonic, network } = props.form.getFieldsValue();
     if (!name || !mnemonic || !network) {
       return;
     }
-    const selectedNetwork = walletService
-      .supportedConfigs()
-      .find(config => config.name === network);
-
-    if (!selectedNetwork) {
+    const selectedNetworkConfig = walletService.getSelectedNetwork(network, props);
+    if (!selectedNetworkConfig) {
       return;
     }
 
     const importOptions: WalletImportOptions = {
       walletName: name,
       phrase: mnemonic.toString().trim(),
-      config: selectedNetwork,
+      config: selectedNetworkConfig,
     };
     try {
       const wallet = await walletService.restoreWallet(importOptions);

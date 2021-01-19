@@ -1,4 +1,4 @@
-import { WalletConfig } from '../config/StaticConfig';
+import { DefaultWalletConfigs, Network, WalletConfig } from '../config/StaticConfig';
 
 export class Wallet {
   public readonly identifier: string;
@@ -36,4 +36,32 @@ export interface NodeData {
   walletId: string;
   chainId?: string | undefined;
   nodeUrl?: string | undefined;
+}
+
+export interface CustomConfigFormValue {
+  derivationPath: string;
+  chainId: string;
+  addressPrefix: string;
+  baseDenom: string;
+  croDenom: string;
+  nodeUrl: string;
+}
+
+export function reconstructCustomConfig(formValues: CustomConfigFormValue): WalletConfig {
+  const customNetwork: Network = {
+    addressPrefix: formValues.addressPrefix,
+    bip44Path: { account: 0, coinType: 0 },
+    chainId: formValues.chainId,
+    coin: { baseDenom: formValues.baseDenom, croDenom: formValues.croDenom },
+    validatorAddressPrefix: '', // Ignored
+    validatorPubKeyPrefix: '', // Ignored
+  };
+  return {
+    derivationPath: formValues.derivationPath,
+    enabled: true,
+    explorerUrl: '',
+    name: DefaultWalletConfigs.CustomDevNet.name,
+    network: customNetwork,
+    nodeUrl: formValues.nodeUrl,
+  };
 }

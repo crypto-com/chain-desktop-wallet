@@ -1,4 +1,5 @@
-import { NodeData, Wallet } from '../models/Wallet';
+import axios from 'axios';
+import { NodeData, reconstructCustomConfig, Wallet } from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import { WalletCreateOptions, WalletCreator } from './WalletCreator';
 import {
@@ -501,6 +502,38 @@ class WalletService {
       const transactionData: TransferTransactionData = { ...data };
       return transactionData;
     });
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async checkNodeIsLive(nodeUrl: string): Promise<boolean> {
+    try {
+      await axios.head(nodeUrl);
+      return true;
+    } catch (error) {
+      if (error && error.response) {
+        const { status } = error.response;
+        return !(status >= 400 && status < 500);
+      }
+    }
+
+    return false;
+  }
+
+  public getSelectedNetwork(network, props) {
+    let selectedNetworkConfig = this.supportedConfigs().find(config => config.name === network);
+
+    // If the dev-net custom network was selected, we pass the values that were input in the dev-net config UI fields
+    if (selectedNetworkConfig?.name === DefaultWalletConfigs.CustomDevNet.name) {
+      let customDevnetConfig;
+      if (props.networkConfig) {
+        customDevnetConfig = reconstructCustomConfig(props.networkConfig);
+        selectedNetworkConfig = customDevnetConfig;
+
+        // eslint-disable-next-line no-console
+        console.log('props.networkConfig', selectedNetworkConfig);
+      }
+    }
+    return selectedNetworkConfig;
   }
 }
 

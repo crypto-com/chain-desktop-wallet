@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { Button, Form, Input, Select } from 'antd';
@@ -45,8 +45,8 @@ interface FormCreateProps {
 
 const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
   const [form] = Form.useForm();
-  const isNodeValid = true;
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [checkingNodeConnection, setCheckingNodeConnection] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
 
   const showModal = () => {
@@ -75,10 +75,15 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
     setIsErrorModalVisible(false);
   };
 
-  const checkNodeConnectivity = () => {
+  const checkNodeConnectivity = async () => {
     // TO-DO Node Connectivity check
-    form.validateFields().then(values => {
-      if (isNodeValid) {
+    form.validateFields().then(async values => {
+      setCheckingNodeConnection(true);
+      const { nodeUrl } = values;
+      const isNodeLive = await walletService.checkNodeIsLive(nodeUrl);
+      setCheckingNodeConnection(false);
+
+      if (isNodeLive) {
         showModal();
         props.setNetworkConfig(values);
       } else {
@@ -93,9 +98,15 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         name="derivationPath"
         label="Derivation Path"
         hasFeedback
-        rules={[{ required: true, message: 'Derivation Path is required' }]}
+        rules={[
+          { required: true, message: 'Derivation Path is required' },
+          {
+            pattern: /^m\/\d+'?\/\d+'?\/\d+'?\/\d+'?\/\d+'?$/,
+            message: 'Please enter a valid derivation path',
+          },
+        ]}
       >
-        <Input maxLength={36} placeholder="Derivation Path" />
+        <Input maxLength={64} placeholder="Derivation Path" />
       </Form.Item>
       <Form.Item
         name="nodeUrl"
@@ -155,7 +166,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         handleOk={handleOk}
         title="Success!"
         button={
-          <Button type="primary" onClick={checkNodeConnectivity}>
+          <Button type="primary" onClick={checkNodeConnectivity} loading={checkingNodeConnection}>
             Connect
           </Button>
         }
@@ -178,7 +189,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
       >
         <>
           <div className="description">
-            Your Network Configuration is invalid. Please check again.
+            Could not connect to the specified node URL. Please check again.
           </div>
         </>
       </ErrorModalPopup>
@@ -188,6 +199,8 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
 
 const FormCreate: React.FC<FormCreateProps> = props => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
 
   const showModal = () => {
@@ -201,6 +214,18 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const handleCancel = () => {
     setIsModalVisible(false);
     props.setWalletIdentifier(wallet?.identifier ?? '');
+  };
+
+  const handleErrorOk = () => {
+    setIsErrorModalVisible(false);
+  };
+
+  const handleErrorCancel = () => {
+    setIsErrorModalVisible(false);
+  };
+
+  const showErrorModal = () => {
+    setIsErrorModalVisible(true);
   };
 
   const onChange = () => {
@@ -222,35 +247,34 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   };
 
   const onWalletCreateFinish = async () => {
+    setCreateLoading(true);
     const { name, network } = props.form.getFieldsValue();
-    // eslint-disable-next-line no-console
-    console.log(props.networkConfig);
+
     if (!name || !network) {
       return;
     }
-    const selectedNetwork = walletService
-      .supportedConfigs()
-      .find(config => config.name === network);
-
-    if (!selectedNetwork) {
+    const selectedNetworkConfig = walletService.getSelectedNetwork(network, props);
+    if (!selectedNetworkConfig) {
       return;
     }
 
     const createOptions: WalletCreateOptions = {
       walletName: name,
-      config: selectedNetwork,
+      config: selectedNetworkConfig,
     };
 
     try {
       const createdWallet = await walletService.createAndSaveWallet(createOptions);
       await walletService.setCurrentSession(new Session(createdWallet));
       setWallet(createdWallet);
+      setCreateLoading(false);
       showModal();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('issue on wallet create', e);
 
-      // TODO : Show pop up on failure to create wallet
+      setCreateLoading(false);
+      showErrorModal();
       return;
     }
 
@@ -294,7 +318,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           handleOk={handleOk}
           title="Success!"
           button={
-            <Button type="primary" htmlType="submit" disabled={props.isCreateDisable}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              disabled={props.isCreateDisable}
+              loading={createLoading}
+            >
               Create Wallet
             </Button>
           }
@@ -308,6 +337,19 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             <div className="description">Your wallet has been created!</div>
           </>
         </SuccessModalPopup>
+        <ErrorModalPopup
+          isModalVisible={isErrorModalVisible}
+          handleCancel={handleErrorCancel}
+          handleOk={handleErrorOk}
+          title="An error happened!"
+          footer={[]}
+        >
+          <>
+            <div className="description">
+              Failed to create wallet, the derivation path might be incorrect.
+            </div>
+          </>
+        </ErrorModalPopup>
       </Form.Item>
     </Form>
   );
