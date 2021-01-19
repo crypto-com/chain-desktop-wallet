@@ -32,7 +32,7 @@ const TestNetConfig: WalletConfig = {
 const MainNetConfig: WalletConfig = {
   enabled: false,
   name: 'MAINNET',
-  derivationPath: "44'/394'/0'/0/0",
+  derivationPath: "m/44'/394'/0'/0/0",
   nodeUrl: 'TO_BE_DECIDED',
   explorerUrl: 'TO_BE_DECIDED',
   network: CroNetwork.Mainnet,
@@ -41,7 +41,7 @@ const MainNetConfig: WalletConfig = {
 // Supposed to be fully customizable by the user when it will be supported
 const CustomDevNet: WalletConfig = {
   derivationPath: '',
-  enabled: false,
+  enabled: true,
   name: 'CUSTOM DEVNET',
   network: {
     chainId: '',
