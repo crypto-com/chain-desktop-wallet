@@ -1,6 +1,6 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "Crypto.com Chain Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.com <chain@crypto.com>",
@@ -90,13 +90,14 @@
     "afterSign": "electron-builder-notarize",
     "mac": {
       "hardenedRuntime": true,
+      "gatekeeperAssess": false,
       "entitlements": "./build/entitlements.mac.plist",
       "entitlementsInherit": "./build/entitlements.mac.plist",
       "target": [
         "dmg",
         "zip"
       ],
-      "category": "public.app-category.finance",
+      "category": "public.app-category.utilities",
       "darkModeSupport": true
     },
     "linux": {
