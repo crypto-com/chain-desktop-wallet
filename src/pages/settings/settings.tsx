@@ -24,6 +24,7 @@ const FormGeneral = () => {
       <Form.Item
         name="nodeUrl"
         label="Node URL"
+        hasFeedback
         rules={[
           {
             required: true,
@@ -37,8 +38,23 @@ const FormGeneral = () => {
         <Input />
       </Form.Item>
       <Form.Item
+        name="indexingUrl"
+        label="Chain Indexing URL"
+        hasFeedback
+        rules={[
+          { required: true, message: 'Chain Indexing URL is required' },
+          {
+            pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
+            message: 'Please enter a valid indexing url',
+          },
+        ]}
+      >
+        <Input placeholder="Chain Indexing URL" />
+      </Form.Item>
+      <Form.Item
         name="chainId"
         label="Chain ID"
+        hasFeedback
         rules={[
           {
             required: true,
@@ -64,6 +80,7 @@ const FormSettings = () => {
       form.setFieldsValue({
         nodeUrl: defaultSettings.nodeUrl,
         chainId: defaultSettings.network.chainId,
+        indexingUrl: defaultSettings.indexingUrl,
       });
     }
   }, [form, defaultSettings]);
@@ -71,6 +88,7 @@ const FormSettings = () => {
   const onFinish = async values => {
     if (
       defaultSettings.nodeUrl === values.nodeUrl &&
+      defaultSettings.indexingUrl === values.indexingUrl &&
       defaultSettings.network.chainId === values.chainId
     ) {
       // No update was done, return here
@@ -81,7 +99,9 @@ const FormSettings = () => {
       walletId: session.wallet.identifier,
       chainId: values.chainId,
       nodeUrl: values.nodeUrl,
+      indexingUrl: values.indexingUrl,
     };
+
     await walletService.updateWalletNodeConfig(nodeData);
     const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
     const newSession = new Session(updatedWallet);
@@ -94,6 +114,7 @@ const FormSettings = () => {
     form.setFieldsValue({
       nodeUrl: defaultSettings.nodeUrl,
       chainId: defaultSettings.network.chainId,
+      indexingUrl: defaultSettings.indexingUrl,
     });
   };
 

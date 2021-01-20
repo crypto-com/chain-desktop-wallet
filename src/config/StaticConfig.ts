@@ -11,8 +11,9 @@ export const CosmosPorts = {
 export type WalletConfig = {
   enabled: boolean;
   name: string;
-  nodeUrl: string;
   explorerUrl: string;
+  nodeUrl: string;
+  indexingUrl: string;
   derivationPath: string;
   network: Network;
 };
@@ -21,8 +22,9 @@ const TestNetConfig: WalletConfig = {
   enabled: true,
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",
-  nodeUrl: 'https://testnet-croeseid.crypto.com',
   explorerUrl: 'https://chain.crypto.com/explorer',
+  indexingUrl: 'https://chain.crypto.com/explorer/api/v1/',
+  nodeUrl: 'https://testnet-croeseid.crypto.com',
   network: {
     ...CroNetwork.Testnet,
     chainId: 'testnet-croeseid-2',
@@ -35,6 +37,7 @@ const MainNetConfig: WalletConfig = {
   derivationPath: "m/44'/394'/0'/0/0",
   nodeUrl: 'TO_BE_DECIDED',
   explorerUrl: 'TO_BE_DECIDED',
+  indexingUrl: 'TO_BE_DECIDED',
   network: CroNetwork.Mainnet,
 };
 
@@ -52,6 +55,7 @@ const CustomDevNet: WalletConfig = {
     coin: { baseDenom: '', croDenom: '' },
   },
   nodeUrl: '',
+  indexingUrl: '',
   explorerUrl: '',
 };
 

@@ -1,18 +1,26 @@
 import axios, { AxiosInstance } from 'axios';
 import { TransferListResponse } from './ChainIndexingModels';
 import { TransactionStatus, TransferTransactionData } from '../../models/Transaction';
+import { DefaultWalletConfigs } from '../../config/StaticConfig';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(address: string): Promise<Array<TransferTransactionData>>;
 }
 
-class ChainIndexingAPI implements IChainIndexingAPI {
+export class ChainIndexingAPI implements IChainIndexingAPI {
   private readonly axiosClient: AxiosInstance;
 
-  constructor() {
-    this.axiosClient = axios.create({
-      baseURL: `https://chain.crypto.com/explorer/api/v1`,
+  private constructor(axiosClient: AxiosInstance) {
+    this.axiosClient = axiosClient;
+  }
+
+  public static init(baseUrl: string) {
+    const defaultIndexingUrl = DefaultWalletConfigs.TestNetConfig.indexingUrl;
+    const chainIndexBaseUrl = !baseUrl ? defaultIndexingUrl : baseUrl;
+    const axiosClient = axios.create({
+      baseURL: chainIndexBaseUrl,
     });
+    return new ChainIndexingAPI(axiosClient);
   }
 
   public async fetchAllTransferTransactions(
@@ -38,5 +46,3 @@ class ChainIndexingAPI implements IChainIndexingAPI {
     });
   }
 }
-
-export const chainIndexAPI = new ChainIndexingAPI();

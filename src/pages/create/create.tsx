@@ -123,6 +123,24 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         <Input placeholder="Node URL" />
       </Form.Item>
 
+      <Form.Item
+        name="indexingUrl"
+        label="Chain Indexing URL"
+        hasFeedback
+        rules={[
+          { required: true, message: 'Chain Indexing URL is required' },
+          {
+            pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
+            message: 'Please enter a valid indexing url',
+          },
+        ]}
+      >
+        <Input
+          placeholder="Chain Indexing URL"
+          defaultValue={DefaultWalletConfigs.TestNetConfig.indexingUrl}
+        />
+      </Form.Item>
+
       <div className="row">
         <Form.Item
           name="addressPrefix"
@@ -167,7 +185,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         title="Success!"
         button={
           <Button type="primary" onClick={checkNodeConnectivity} loading={checkingNodeConnection}>
-            Connect
+            Connect Node
           </Button>
         }
         footer={[
