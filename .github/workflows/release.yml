@@ -5,8 +5,6 @@ on:
   push:
     branches:
       - master
-      - dev # This is done temporarily for testing purposes
-
 jobs:
   release:
     runs-on: ${{ matrix.os }}
@@ -66,9 +64,8 @@ jobs:
           # (No need to define this secret in the repo settings)
           github_token: ${{ secrets.github_token }}
 
-          # When a push is done to master, the binary builds are released directly
-          # Temporarily set to dev for testing
-          release: ${{ steps.extract_branch.outputs.branch == 'dev' }}
+          # When a push is done to master, the action builds binaries for all OS and they are then released directly
+          release: ${{ steps.extract_branch.outputs.branch == 'master' }}
 
           mac_certs: ${{ secrets.mac_certs }}
           mac_certs_password: ${{ secrets.mac_certs_password }}
