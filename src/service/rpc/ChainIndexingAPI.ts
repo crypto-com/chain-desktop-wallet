@@ -6,13 +6,18 @@ export interface IChainIndexingAPI {
   fetchAllTransferTransactions(address: string): Promise<Array<TransferTransactionData>>;
 }
 
-class ChainIndexingAPI implements IChainIndexingAPI {
+export class ChainIndexingAPI implements IChainIndexingAPI {
   private readonly axiosClient: AxiosInstance;
 
-  constructor() {
-    this.axiosClient = axios.create({
-      baseURL: `https://chain.crypto.com/explorer/api/v1`,
+  private constructor(axiosClient: AxiosInstance) {
+    this.axiosClient = axiosClient;
+  }
+
+  public static init(baseUrl: string) {
+    const axiosClient = axios.create({
+      baseURL: baseUrl,
     });
+    return new ChainIndexingAPI(axiosClient);
   }
 
   public async fetchAllTransferTransactions(
@@ -38,5 +43,3 @@ class ChainIndexingAPI implements IChainIndexingAPI {
     });
   }
 }
-
-export const chainIndexAPI = new ChainIndexingAPI();

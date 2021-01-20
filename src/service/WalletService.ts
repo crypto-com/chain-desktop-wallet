@@ -31,7 +31,7 @@ import {
   TransferTransactionData,
   TransferTransactionList,
 } from '../models/Transaction';
-import { chainIndexAPI } from './rpc/ChainIndexingAPI';
+import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 
 export interface TransferRequest {
   toAddress: string;
@@ -312,6 +312,7 @@ class WalletService {
 
   public async fetchAndSaveTransfers(currentSession: Session) {
     try {
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
       const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
         currentSession.wallet.address,
       );

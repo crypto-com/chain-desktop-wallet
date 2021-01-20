@@ -45,6 +45,7 @@ export interface CustomConfigFormValue {
   baseDenom: string;
   croDenom: string;
   nodeUrl: string;
+  indexingUrl: string;
 }
 
 export function reconstructCustomConfig(formValues: CustomConfigFormValue): WalletConfig {
@@ -63,5 +64,6 @@ export function reconstructCustomConfig(formValues: CustomConfigFormValue): Wall
     name: DefaultWalletConfigs.CustomDevNet.name,
     network: customNetwork,
     nodeUrl: formValues.nodeUrl,
+    indexingUrl: formValues.indexingUrl,
   };
 }
