@@ -77,13 +77,18 @@ describe('Testing Storage Service', () => {
 
     const updatedWalletConfig = await mockWalletStore.findWalletByIdentifier(walletId);
     expect(updatedWalletConfig.config.network.chainId).to.eq(newChainId);
+    expect(updatedWalletConfig.config.indexingUrl).to.eq(
+      DefaultWalletConfigs.TestNetConfig.indexingUrl,
+    );
 
     const newNodeUrl = 'https://testnet-new-croeseid.crypto-4.org';
-    const nodeData2: NodeData = { walletId, nodeUrl: newNodeUrl };
+    const newIndexingUrl = 'https://crossfire.crypto.com/api/v1/';
+    const nodeData2: NodeData = { walletId, nodeUrl: newNodeUrl, indexingUrl: newIndexingUrl };
     await mockWalletStore.updateWalletNode(nodeData2);
 
     const updatedWalletConfig2 = await mockWalletStore.findWalletByIdentifier(walletId);
     expect(updatedWalletConfig2.config.nodeUrl).to.eq(newNodeUrl);
+    expect(updatedWalletConfig2.config.indexingUrl).to.eq(newIndexingUrl);
 
     const nodeData3: NodeData = {
       walletId,
