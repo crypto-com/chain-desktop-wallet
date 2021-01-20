@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { TransferListResponse } from './ChainIndexingModels';
 import { TransactionStatus, TransferTransactionData } from '../../models/Transaction';
+import { DefaultWalletConfigs } from '../../config/StaticConfig';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(address: string): Promise<Array<TransferTransactionData>>;
@@ -14,8 +15,10 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   }
 
   public static init(baseUrl: string) {
+    const defaultIndexingUrl = DefaultWalletConfigs.TestNetConfig.indexingUrl;
+    const chainIndexBaseUrl = !baseUrl ? defaultIndexingUrl : baseUrl;
     const axiosClient = axios.create({
-      baseURL: baseUrl,
+      baseURL: chainIndexBaseUrl,
     });
     return new ChainIndexingAPI(axiosClient);
   }
