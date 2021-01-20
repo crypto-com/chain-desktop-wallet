@@ -16,21 +16,9 @@ export type WalletConfig = {
   indexingUrl: string;
   derivationPath: string;
   network: Network;
-  // nodeUrlConfig: NodeUrlConfig;
 };
 
-// export type NodeUrlConfig = {
-//   indexingUrl: string; // For transfer transaction indexing endpoint
-//   cosmosUrl: string;
-//   tendermintUrl: string;
-// };
-
 const TestNetConfig: WalletConfig = {
-  // nodeUrlConfig: {
-  //   indexingUrl: 'https://chain.crypto.com/explorer/api/v1/',
-  //   cosmosUrl: 'https://testnet-croeseid.crypto.com',
-  //   tendermintUrl: 'https://testnet-croeseid.crypto.com',
-  // },
   enabled: true,
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",

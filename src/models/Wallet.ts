@@ -36,6 +36,7 @@ export interface NodeData {
   walletId: string;
   chainId?: string | undefined;
   nodeUrl?: string | undefined;
+  indexingUrl?: string | undefined;
 }
 
 export interface CustomConfigFormValue {

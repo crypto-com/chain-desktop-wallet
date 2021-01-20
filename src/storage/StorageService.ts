@@ -43,6 +43,10 @@ export class StorageService {
       previousWallet.config.nodeUrl = nodeData.nodeUrl;
     }
 
+    if (nodeData.indexingUrl) {
+      previousWallet.config.indexingUrl = nodeData.indexingUrl;
+    }
+
     return this.db.walletStore.update<Wallet>(
       { identifier: previousWallet.identifier },
       { $set: previousWallet },
