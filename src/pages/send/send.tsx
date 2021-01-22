@@ -13,6 +13,7 @@ import { scaledBalance } from '../../models/UserAsset';
 import { sessionState, walletAssetState } from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
+import { fromScientificNotation } from '../../utils/NumberUtils';
 
 const { Header, Content, Footer } = Layout;
 const layout = {};
@@ -37,7 +38,7 @@ const FormSend = () => {
     setFormValues({
       ...form.getFieldsValue(),
       // Replace scientific notation to plain string values
-      amount: Number(form.getFieldValue('amount')).toFixed(walletAsset.decimals),
+      amount: fromScientificNotation(form.getFieldValue('amount')),
     });
     setIsVisibleConfirmationModal(true);
   };

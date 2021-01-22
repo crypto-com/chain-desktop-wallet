@@ -43,6 +43,7 @@ export interface CustomConfigFormValue {
   derivationPath: string;
   chainId: string;
   addressPrefix: string;
+  validatorPrefix: string;
   baseDenom: string;
   croDenom: string;
   nodeUrl: string;
@@ -55,7 +56,7 @@ export function reconstructCustomConfig(formValues: CustomConfigFormValue): Wall
     bip44Path: { account: 0, coinType: 0 },
     chainId: formValues.chainId,
     coin: { baseDenom: formValues.baseDenom, croDenom: formValues.croDenom },
-    validatorAddressPrefix: '', // Ignored
+    validatorAddressPrefix: formValues.validatorPrefix,
     validatorPubKeyPrefix: '', // Ignored
   };
   return {

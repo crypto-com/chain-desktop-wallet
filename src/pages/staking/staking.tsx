@@ -14,6 +14,7 @@ import { walletAssetState, sessionState } from '../../recoil/atom';
 import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
+import { fromScientificNotation } from '../../utils/NumberUtils';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -53,7 +54,7 @@ const FormDelegationRequest = () => {
     setFormValues({
       ...form.getFieldsValue(),
       // Replace scientific notation to plain string values
-      amount: Number(form.getFieldValue('amount')).toFixed(walletAsset.decimals),
+      amount: fromScientificNotation(form.getFieldValue('amount')),
     });
     setIsVisibleConfirmationModal(true);
   };
@@ -119,7 +120,6 @@ const FormDelegationRequest = () => {
   };
 
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
-
   return (
     <Form
       {...layout}

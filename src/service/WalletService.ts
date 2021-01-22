@@ -2,7 +2,6 @@ import axios from 'axios';
 import { NodeData, reconstructCustomConfig, Wallet } from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import { WalletCreateOptions, WalletCreator } from './WalletCreator';
-import { Big } from '../utils/ChainJsLib';
 import {
   APP_DB_NAMESPACE,
   DefaultAsset,
@@ -33,6 +32,7 @@ import {
   TransferTransactionList,
 } from '../models/Transaction';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
+import { getBaseScaledAmount } from '../utils/NumberUtils';
 
 export interface TransferRequest {
   toAddress: string;
@@ -73,10 +73,7 @@ class WalletService {
       transactionSigner,
     } = await this.prepareTransaction();
 
-    const scaledBaseAmount = this.getBaseScaledAmount(
-      transferRequest.amount,
-      transferRequest.asset,
-    );
+    const scaledBaseAmount = getBaseScaledAmount(transferRequest.amount, transferRequest.asset);
 
     const transfer: TransferTransactionUnsigned = {
       fromAddress: currentSession.wallet.address,
@@ -96,13 +93,6 @@ class WalletService {
     return broadCastResult;
   }
 
-  // E.g : 1 CRO = 10^8 BASECRO
-  // eslint-disable-next-line class-methods-use-this
-  public getBaseScaledAmount(amount: string, asset: UserAsset): string {
-    const exp = Big(10).pow(asset.decimals);
-    return String(Big(amount).times(exp));
-  }
-
   public async sendDelegateTransaction(
     delegationRequest: DelegationRequest,
   ): Promise<BroadCastResult> {
@@ -114,7 +104,7 @@ class WalletService {
       transactionSigner,
     } = await this.prepareTransaction();
 
-    const delegationAmountScaled = this.getBaseScaledAmount(
+    const delegationAmountScaled = getBaseScaledAmount(
       delegationRequest.amount,
       delegationRequest.asset,
     );
