@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import './restore.less';
 import { Button, Form, Input, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import { HDKey } from '../../service/types/ChainJsLib';
+import { HDKey } from '../../utils/ChainJsLib';
 import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';

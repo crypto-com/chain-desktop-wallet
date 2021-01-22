@@ -13,6 +13,7 @@ import { secretStoreService } from '../../storage/SecretStoreService';
 import { walletAssetState, sessionState } from '../../recoil/atom';
 import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction } from '../../models/Transaction';
+import { TransactionUtils } from '../../utils/TransactionUtils';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -49,7 +50,11 @@ const FormDelegationRequest = () => {
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
-    setFormValues(form.getFieldsValue());
+    setFormValues({
+      ...form.getFieldsValue(),
+      // Replace scientific notation to plain string values
+      amount: Number(form.getFieldValue('amount')).toFixed(walletAsset.decimals),
+    });
     setIsVisibleConfirmationModal(true);
   };
 
@@ -113,6 +118,8 @@ const FormDelegationRequest = () => {
     setIsErrorTransferModalVisible(false);
   };
 
+  const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
+
   return (
     <Form
       {...layout}
@@ -153,10 +160,7 @@ const FormDelegationRequest = () => {
               pattern: /[^0]+/,
               message: 'Staking amount cannot be 0',
             },
-            {
-              pattern: /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/,
-              message: 'Please enter a valid staking amount',
-            },
+            customAmountValidator,
             {
               max: scaledBalance(walletAsset),
               min: 0,

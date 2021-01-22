@@ -38,6 +38,9 @@ describe('Testing WalletImporter', () => {
 
   it('Test importing wallet with custom configurations', () => {
     const customConfig: WalletConfig = {
+      indexingUrl: '',
+      explorerUrl: '',
+      enabled: true,
       derivationPath: "44'/245'/0'/0/0",
       name: 'Pystaport-Custom-Network',
       network: {

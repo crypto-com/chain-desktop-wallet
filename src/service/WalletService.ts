@@ -2,6 +2,7 @@ import axios from 'axios';
 import { NodeData, reconstructCustomConfig, Wallet } from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import { WalletCreateOptions, WalletCreator } from './WalletCreator';
+import { Big } from '../utils/ChainJsLib';
 import {
   APP_DB_NAMESPACE,
   DefaultAsset,
@@ -72,12 +73,15 @@ class WalletService {
       transactionSigner,
     } = await this.prepareTransaction();
 
-    const scaledAmount = this.getScaledAmount(transferRequest.amount, transferRequest.asset);
+    const scaledBaseAmount = this.getBaseScaledAmount(
+      transferRequest.amount,
+      transferRequest.asset,
+    );
 
     const transfer: TransferTransactionUnsigned = {
       fromAddress: currentSession.wallet.address,
       toAddress: transferRequest.toAddress,
-      amount: String(scaledAmount),
+      amount: scaledBaseAmount,
       memo: transferRequest.memo,
       accountNumber,
       accountSequence,
@@ -92,9 +96,11 @@ class WalletService {
     return broadCastResult;
   }
 
+  // E.g : 1 CRO = 10^8 BASECRO
   // eslint-disable-next-line class-methods-use-this
-  private getScaledAmount(amount: string, asset: UserAsset): number {
-    return Number(amount) * 10 ** asset.decimals;
+  public getBaseScaledAmount(amount: string, asset: UserAsset): string {
+    const exp = Big(10).pow(asset.decimals);
+    return String(Big(amount).times(exp));
   }
 
   public async sendDelegateTransaction(
@@ -108,14 +114,14 @@ class WalletService {
       transactionSigner,
     } = await this.prepareTransaction();
 
-    const delegationAmountScaled = this.getScaledAmount(
+    const delegationAmountScaled = this.getBaseScaledAmount(
       delegationRequest.amount,
       delegationRequest.asset,
     );
     const delegateTransaction: DelegateTransactionUnsigned = {
       delegatorAddress: currentSession.wallet.address,
       validatorAddress: delegationRequest.validatorAddress,
-      amount: String(delegationAmountScaled),
+      amount: delegationAmountScaled,
       memo: delegationRequest.memo,
       accountNumber,
       accountSequence,
