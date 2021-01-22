@@ -1378,6 +1378,15 @@
     type-tagger "^1.0.0"
     unorm "^1.5.0"
 
+"@cosmjs/encoding@0.23.1":
+  version "0.23.1"
+  resolved "https://registry.yarnpkg.com/@cosmjs/encoding/-/encoding-0.23.1.tgz#b51cd2813499cfdeeb0f9cc7d050a45eb8b27bf4"
+  integrity sha512-rP5O3vYo0k6W329J+u5uKqJNrhmR4QTngLgsDvP/qsRRBfEiirhk+TQC8gjUlgnzoiCKCtWsiOyFP1z9Me9HIw==
+  dependencies:
+    base64-js "^1.3.0"
+    bech32 "^1.1.4"
+    readonly-date "^1.0.0"
+
 "@cosmjs/encoding@^0.24.0-alpha.10":
   version "0.24.0-alpha.10"
   resolved "https://registry.yarnpkg.com/@cosmjs/encoding/-/encoding-0.24.0-alpha.10.tgz"
@@ -1405,6 +1414,13 @@
     "@cosmjs/math" "^0.24.0-alpha.10"
     "@cosmjs/utils" "^0.24.0-alpha.10"
     axios "^0.19.0"
+
+"@cosmjs/math@0.23.1":
+  version "0.23.1"
+  resolved "https://registry.yarnpkg.com/@cosmjs/math/-/math-0.23.1.tgz#706f38742a9a1f6561cf2c4510f8e5ab001fc5e6"
+  integrity sha512-xjGGogFZXLdmRumE1Wr+GlPfKznIl5Qa6K6QyZr4IjBhfB6/ZzLUihliDJp2d8zbjBJgQt9RUwP/PaFQ/yGQNg==
+  dependencies:
+    bn.js "^4.11.8"
 
 "@cosmjs/math@^0.24.0-alpha.10":
   version "0.24.0-alpha.10"
@@ -1476,14 +1492,16 @@
   resolved "https://registry.yarnpkg.com/@cosmjs/utils/-/utils-0.24.0-alpha.10.tgz"
   integrity sha512-SfsJOpthTUQLcU4HLfU1I7xnVvy1bqvY3DJnOvCdRsHmmiTVtFwoKZLAjkUv3rarMtg7qiZxdUvnUAbaQf0Wyw==
 
-"@crypto-com/chain-jslib@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@crypto-com/chain-jslib/-/chain-jslib-0.0.4.tgz"
-  integrity sha512-ZUQsm8UUzDGL6lb8IunOCdrw4mgTZycCWBvAZPizFUbWdxT++3JJvEyZDytsH2RSwbjH4s/1cuwgex5gEN9Spw==
+"@crypto-com/chain-jslib@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@crypto-com/chain-jslib/-/chain-jslib-0.0.5.tgz#488d2d47b039d7b182a9bb4a6afb2200216cd494"
+  integrity sha512-VVJrmM9fTyVJZUWPrYrnN7TieyNvTzLEGCUvEjY5VhXNEKFFiYnsDpPCowcNz+Cn8EEo8HwKjEN8fKkciHsv5A==
   dependencies:
+    "@cosmjs/encoding" "0.23.1"
+    "@cosmjs/math" "0.23.1"
     "@types/debug" "4.1.5"
     "@types/lodash" "4.14.162"
-    axios "0.21.0"
+    axios "0.21.1"
     bech32 "1.1.4"
     big.js "6.0.0"
     bip32 "2.0.6"
@@ -2123,6 +2141,11 @@
   integrity sha512-S63Dt4CZOkuTmpLGGWtT/mQdVORJOpx6SZWGVaP56dda/0Nx5nEe82K7/LAm8zYr6SfMq+1N2OreIOrHAx656w==
   dependencies:
     "@babel/types" "^7.3.0"
+
+"@types/big.js@^6.0.2":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@types/big.js/-/big.js-6.0.2.tgz#a86938c1bb4511e69d91f69823cacc3f48ff1fa3"
+  integrity sha512-7NdmOT3zjtghMofDwP1nAJCJWVjc/96V5msXRAZ4lPrvpGlajA95VQec7OXwA2wQaVmhjt+F5ko8pjvQU1tTFA==
 
 "@types/chai@^4.2.14":
   version "4.2.14"
@@ -3300,10 +3323,10 @@ axe-core@^4.0.2:
   resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-4.1.1.tgz"
   integrity sha512-5Kgy8Cz6LPC9DJcNb3yjAXTu3XihQgEdnIg50c//zOC/MyLP0Clg+Y8Sh9ZjjnvBrDZU4DgXS9C3T9r4/scGZQ==
 
-axios@0.21.0:
-  version "0.21.0"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.0.tgz"
-  integrity sha512-fmkJBknJKoZwem3/IKSSLpkdNXZeBu5Q7GA/aRsr2btgrptmSCxi2oFjZHqGdK9DoTil9PIHlPIZw2EcRJXRvw==
+axios@0.21.1, axios@^0.21.1:
+  version "0.21.1"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.1.tgz#22563481962f4d6bde9a76d516ef0e5d3c09b2b8"
+  integrity sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==
   dependencies:
     follow-redirects "^1.10.0"
 
@@ -3313,13 +3336,6 @@ axios@^0.19.0, axios@^0.19.2:
   integrity sha512-fjgm5MvRHLhx+osE2xoekY70AhARk3a6hkN+3Io1jc00jtquGvxYlKlsFUhmUET0V5te6CcZI7lcv2Ym61mjHA==
   dependencies:
     follow-redirects "1.5.10"
-
-axios@^0.21.1:
-  version "0.21.1"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.1.tgz#22563481962f4d6bde9a76d516ef0e5d3c09b2b8"
-  integrity sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==
-  dependencies:
-    follow-redirects "^1.10.0"
 
 axobject-query@^2.2.0:
   version "2.2.0"

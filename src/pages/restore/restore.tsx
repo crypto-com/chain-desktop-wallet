@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import './restore.less';
 import { Button, Form, Input, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import { HDKey } from '../../service/types/ChainJsLib';
+import { HDKey } from '../../utils/ChainJsLib';
 import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
@@ -90,21 +90,14 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
   };
 
   return (
-    <Form layout="vertical" form={form} name="control-ref">
-      <Form.Item
-        name="derivationPath"
-        label="Derivation Path"
-        hasFeedback
-        rules={[
-          { required: true, message: 'Derivation Path is required' },
-          {
-            pattern: /^m\/\d+'?\/\d+'?\/\d+'?\/\d+'?\/\d+'?$/,
-            message: 'Please enter a valid derivation path',
-          },
-        ]}
-      >
-        <Input maxLength={36} placeholder="Derivation Path" />
-      </Form.Item>
+    <Form
+      layout="vertical"
+      form={form}
+      name="control-ref"
+      initialValues={{
+        indexingUrl: DefaultWalletConfigs.TestNetConfig.indexingUrl,
+      }}
+    >
       <Form.Item
         name="nodeUrl"
         label="Node URL"
@@ -132,11 +125,33 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
           },
         ]}
       >
-        <Input
-          placeholder="Chain Indexing URL"
-          defaultValue={DefaultWalletConfigs.TestNetConfig.indexingUrl}
-        />
+        <Input placeholder="Chain Indexing URL" />
       </Form.Item>
+
+      <div className="row">
+        <Form.Item
+          name="derivationPath"
+          label="Derivation Path"
+          hasFeedback
+          rules={[
+            { required: true, message: 'Derivation Path is required' },
+            {
+              pattern: /^m\/\d+'?\/\d+'?\/\d+'?\/\d+'?\/\d+'?$/,
+              message: 'Please enter a valid derivation path',
+            },
+          ]}
+        >
+          <Input maxLength={64} placeholder="Derivation Path" />
+        </Form.Item>
+        <Form.Item
+          name="validatorPrefix"
+          label="Validator Prefix"
+          hasFeedback
+          rules={[{ required: true, message: 'Validator Prefix is required' }]}
+        >
+          <Input placeholder="Validator Prefix" />
+        </Form.Item>
+      </div>
 
       <div className="row">
         <Form.Item

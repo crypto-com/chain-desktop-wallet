@@ -32,6 +32,7 @@ import {
   TransferTransactionList,
 } from '../models/Transaction';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
+import { getBaseScaledAmount } from '../utils/NumberUtils';
 
 export interface TransferRequest {
   toAddress: string;
@@ -72,12 +73,12 @@ class WalletService {
       transactionSigner,
     } = await this.prepareTransaction();
 
-    const scaledAmount = this.getScaledAmount(transferRequest.amount, transferRequest.asset);
+    const scaledBaseAmount = getBaseScaledAmount(transferRequest.amount, transferRequest.asset);
 
     const transfer: TransferTransactionUnsigned = {
       fromAddress: currentSession.wallet.address,
       toAddress: transferRequest.toAddress,
-      amount: String(scaledAmount),
+      amount: scaledBaseAmount,
       memo: transferRequest.memo,
       accountNumber,
       accountSequence,
@@ -92,11 +93,6 @@ class WalletService {
     return broadCastResult;
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  private getScaledAmount(amount: string, asset: UserAsset): number {
-    return Number(amount) * 10 ** asset.decimals;
-  }
-
   public async sendDelegateTransaction(
     delegationRequest: DelegationRequest,
   ): Promise<BroadCastResult> {
@@ -108,14 +104,14 @@ class WalletService {
       transactionSigner,
     } = await this.prepareTransaction();
 
-    const delegationAmountScaled = this.getScaledAmount(
+    const delegationAmountScaled = getBaseScaledAmount(
       delegationRequest.amount,
       delegationRequest.asset,
     );
     const delegateTransaction: DelegateTransactionUnsigned = {
       delegatorAddress: currentSession.wallet.address,
       validatorAddress: delegationRequest.validatorAddress,
-      amount: String(delegationAmountScaled),
+      amount: delegationAmountScaled,
       memo: delegationRequest.memo,
       accountNumber,
       accountSequence,
