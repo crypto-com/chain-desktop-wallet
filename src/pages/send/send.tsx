@@ -3,6 +3,7 @@ import './send.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber, Layout } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -106,9 +107,10 @@ const FormSend = () => {
     setIsErrorTransferModalVisible(false);
   };
 
-  const customAddressValidator = TransactionUtils.receivingAddressValidator(
+  const customAddressValidator = TransactionUtils.addressValidator(
     currentSession,
     walletAsset,
+    AddressType.USER,
   );
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
 

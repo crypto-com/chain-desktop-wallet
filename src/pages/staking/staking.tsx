@@ -4,6 +4,7 @@ import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -120,6 +121,11 @@ const FormDelegationRequest = () => {
   };
 
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
+  const customAddressValidator = TransactionUtils.addressValidator(
+    currentSession,
+    walletAsset,
+    AddressType.VALIDATOR,
+  );
   return (
     <Form
       {...layout}
@@ -133,17 +139,10 @@ const FormDelegationRequest = () => {
         name="validatorAddress"
         label="Validator address"
         hasFeedback
+        validateFirst
         rules={[
           { required: true, message: 'Validator address is required' },
-          {
-            pattern: RegExp(
-              `^(${walletAsset.symbol
-                .toString()
-                .toLocaleLowerCase()}cncl)[a-zA-HJ-NP-Z0-9]{20,150}$`,
-              'i',
-            ),
-            message: `The address provided is not a correct validator address`,
-          },
+          customAddressValidator,
         ]}
       >
         <Input placeholder="tcro..." />

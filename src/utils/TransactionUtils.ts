@@ -3,14 +3,20 @@ import { Session } from '../models/Session';
 import { UserAsset } from '../models/UserAsset';
 
 export class TransactionUtils {
-  public static receivingAddressValidator(currentSession: Session, walletAsset: UserAsset) {
+  public static addressValidator(
+    currentSession: Session,
+    walletAsset: UserAsset,
+    type: AddressType,
+  ) {
+    const addressType = type === AddressType.VALIDATOR ? 'validator' : 'receiving';
     return () => ({
       validator(rule, value) {
+        const reason = `Invalid ${walletAsset.symbol} ${addressType} address provided`;
         try {
           const addressValidator = new AddressValidator({
             address: value,
             network: currentSession.wallet.config.network,
-            type: AddressType.USER,
+            type,
           });
 
           if (addressValidator.isValid()) {
@@ -18,10 +24,10 @@ export class TransactionUtils {
           }
 
           // eslint-disable-next-line prefer-promise-reject-errors
-          return Promise.reject(`Invalid ${walletAsset.symbol} receiving address`);
+          return Promise.reject(reason);
         } catch (e) {
           // eslint-disable-next-line prefer-promise-reject-errors
-          return Promise.reject(`Invalid ${walletAsset.symbol} receiving address`);
+          return Promise.reject(reason);
         }
       },
     });
