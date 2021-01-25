@@ -3,10 +3,16 @@
     "target": "es5",
     "module": "commonjs",
     "sourceMap": true,
+    "allowJs": true,
+    "skipLibCheck": true,
     "strict": true,
     "outDir": "../build",
     "rootDir": "../",
+    "moduleResolution": "node",
     "noEmitOnError": true,
-    "typeRoots": ["node_modules/@types"]
+    "esModuleInterop": true ,
+    "typeRoots": ["node_modules/@types"],
+    "types":["long"],
+    "experimentalDecorators": true  
   }
 }

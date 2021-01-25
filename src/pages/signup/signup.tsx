@@ -54,7 +54,7 @@ const SignUpPage = () => {
       <div className="container">
         {displayComponent === 'form' ? (
           <>
-            <BackButton />
+            <BackButton backTo="/" />
             <PasswordFormContainer
               title="Create App Password"
               description="Before creating a new wallet, please create your app password. It will be used to encrypt your wallet seeds."

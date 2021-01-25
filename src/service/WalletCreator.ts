@@ -14,6 +14,7 @@ export class WalletCreator {
       config: options.config,
       encryptedPhrase,
       hasBeenEncrypted: false,
+      walletType: options.walletType,
     };
   }
 
@@ -34,8 +35,11 @@ export class WalletCreateOptions {
 
   public readonly walletName: string;
 
-  constructor(walletConfig: WalletConfig, walletName: string) {
+  public readonly walletType: string;
+
+  constructor(walletConfig: WalletConfig, walletName: string, walletType: string) {
     this.config = walletConfig;
     this.walletName = walletName;
+    this.walletType = walletType;
   }
 }
