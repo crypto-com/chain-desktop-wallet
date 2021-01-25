@@ -22,10 +22,18 @@ jobs:
         with:
           path: node_modules
           key: ${{ runner.os }}-node12-${{ hashFiles('**/package-lock.json') }}
-      
+
+      - name: Refresh 
+        run:  |
+          sudo apt-get update 
+
+      - name: Setup dependencies
+        run:  |
+          sudo apt-get install -y libusb-1.0-0-dev libudev-dev  
+ 
       - name: Install deps and tools
         run: |
-          yarn install
+          yarn install 
 
       - name: Run All Tests
         run: |

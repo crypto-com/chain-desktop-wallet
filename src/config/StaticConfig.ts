@@ -43,16 +43,16 @@ const MainNetConfig: WalletConfig = {
 
 // Supposed to be fully customizable by the user when it will be supported
 const CustomDevNet: WalletConfig = {
-  derivationPath: '',
+  derivationPath: "m/44'/394'/0'/0/0",
   enabled: true,
   name: 'CUSTOM DEVNET',
   network: {
-    chainId: '',
-    addressPrefix: '',
-    bip44Path: { coinType: 0, account: 0 },
-    validatorPubKeyPrefix: '',
-    validatorAddressPrefix: '',
-    coin: { baseDenom: '', croDenom: '' },
+    chainId: 'test',
+    addressPrefix: 'cro',
+    bip44Path: { coinType: 394, account: 0 },
+    validatorPubKeyPrefix: 'crocnclpub',
+    validatorAddressPrefix: 'crocncl',
+    coin: { baseDenom: 'basecro', croDenom: 'cro' },
   },
   nodeUrl: '',
   indexingUrl: '',

@@ -1,20 +1,30 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { Button, Form, Input, Select } from 'antd';
+import { Button, Form, Input, Select, Checkbox } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { walletIdentifierState, walletTempBackupState } from '../../recoil/atom';
 import './create.less';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions, WalletCreator } from '../../service/WalletCreator';
-import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import { DefaultWalletConfigs, CosmosPorts } from '../../config/StaticConfig';
 import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 // import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 // import PasswordFormContainer from '../../components/PasswordForm/PasswordFormContainer';
 import BackButton from '../../components/BackButton/BackButton';
+import { secretStoreService } from '../../storage/SecretStoreService';
+import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup';
+import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
+import IconLedger from '../../svg/IconLedger';
+import {
+  createLedgerDevice,
+  LEDGER_WALLET_TYPE,
+  NORMAL_WALLET_TYPE,
+} from '../../service/LedgerService';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -33,12 +43,16 @@ interface FormCustomConfigProps {
 interface FormCreateProps {
   form: FormInstance;
   isCreateDisable: boolean;
-  isSelectFieldDisable: boolean;
+  isNetworkSelectFieldDisable: boolean;
+  isWalletSelectFieldDisable: boolean;
   setWalletIdentifier: (walletIdentifier: string) => void;
   setIsCustomConfig: (arg: boolean) => void;
   setIsConnected: (arg: boolean) => void;
   setIsCreateDisable: (arg: boolean) => void;
-  setIsSelectFieldDisable: (arg: boolean) => void;
+  setIsNetworkSelectFieldDisable: (arg: boolean) => void;
+  setIsWalletSelectFieldDisable: (arg: boolean) => void;
+  setLedgerConnected: (arg: boolean) => void;
+  setIsModalVisible: (arg: boolean) => void;
   networkConfig: any;
 }
 
@@ -79,7 +93,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
     form.validateFields().then(async values => {
       setCheckingNodeConnection(true);
       const { nodeUrl } = values;
-      const isNodeLive = await walletService.checkNodeIsLive(nodeUrl);
+      const isNodeLive = await walletService.checkNodeIsLive(`${nodeUrl}${CosmosPorts.Main}`);
       setCheckingNodeConnection(false);
 
       if (isNodeLive) {
@@ -98,6 +112,13 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
       name="control-ref"
       initialValues={{
         indexingUrl: DefaultWalletConfigs.TestNetConfig.indexingUrl,
+        nodeUrl: 'http://127.0.0.1',
+        derivationPath: "m/44'/394'/0'/0/0",
+        validatorPrefix: 'crocncl',
+        croDenom: 'cro',
+        baseDenom: 'basecro',
+        chainId: 'test',
+        addressPrefix: 'cro',
       }}
     >
       <Form.Item
@@ -199,7 +220,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         title="Success!"
         button={
           <Button type="primary" onClick={checkNodeConnectivity} loading={checkingNodeConnection}>
-            Connect Node
+            Connect
           </Button>
         }
         footer={[
@@ -236,6 +257,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const [wallet, setWallet] = useState<Wallet>();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(walletTempBackupState);
+  const [hwcheck, setHwcheck] = useState(!props.isWalletSelectFieldDisable);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -264,11 +286,20 @@ const FormCreate: React.FC<FormCreateProps> = props => {
 
   const onChange = () => {
     const { name } = props.form.getFieldsValue();
-    if (name !== '') {
-      props.setIsSelectFieldDisable(false);
+    if (typeof name === 'undefined') {
+      props.setIsNetworkSelectFieldDisable(true);
+    } else if (name !== '') {
+      props.setIsNetworkSelectFieldDisable(false);
     } else {
-      props.setIsSelectFieldDisable(true);
+      props.setIsNetworkSelectFieldDisable(true);
     }
+  };
+
+  const onCheckboxChange = e => {
+    setHwcheck(!hwcheck);
+    props.setIsWalletSelectFieldDisable(!e.target.checked);
+    if (e.target.checked) props.form.setFieldsValue({ walletType: LEDGER_WALLET_TYPE });
+    else props.form.setFieldsValue({ walletType: NORMAL_WALLET_TYPE });
   };
 
   const onNetworkChange = (network: string) => {
@@ -280,13 +311,15 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     }
   };
 
-  const onWalletCreateFinish = async () => {
+  // eslint-disable-next-line
+  const onWalletCreateFinishCore = async () => {
     setCreateLoading(true);
-    const { name, network } = props.form.getFieldsValue();
+    const { name, walletType, network } = props.form.getFieldsValue();
 
-    if (!name || !network) {
+    if (!name || !walletType || !network) {
       return;
     }
+
     const selectedNetworkConfig = walletService.getSelectedNetwork(network, props);
     if (!selectedNetworkConfig) {
       return;
@@ -295,24 +328,53 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     const createOptions: WalletCreateOptions = {
       walletName: name,
       config: selectedNetworkConfig,
+      walletType,
     };
 
     try {
       const createdWallet = WalletCreator.create(createOptions);
       setWalletTempBackupSeed(createdWallet);
-
       setWallet(createdWallet);
       setCreateLoading(false);
       showModal();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('issue on wallet create', e);
+
       setCreateLoading(false);
       showErrorModal();
       return;
     }
 
     props.form.resetFields();
+  };
+
+  const onWalletCreateFinish = async () => {
+    const { walletType } = props.form.getFieldsValue();
+    if (walletType === NORMAL_WALLET_TYPE) {
+      onWalletCreateFinishCore();
+      return;
+    }
+    props.setIsModalVisible(true);
+    props.setLedgerConnected(false);
+    let hwok = false;
+    const device = createLedgerDevice();
+    try {
+      // check ledger device ok
+      await device.getPubKey(0);
+      props.setLedgerConnected(true);
+      hwok = true;
+    } catch (e) {
+      props.setLedgerConnected(false);
+    }
+    await new Promise(resolve => {
+      setTimeout(resolve, 2000);
+    });
+    props.setIsModalVisible(false);
+    if (hwok) {
+      // proceed
+      onWalletCreateFinishCore();
+    }
   };
 
   return (
@@ -332,11 +394,34 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       >
         <Input maxLength={36} placeholder="Wallet name" />
       </Form.Item>
+      <Checkbox onChange={onCheckboxChange} checked={hwcheck}>
+        Want to create with hardware wallet?
+      </Checkbox>
+      <Form.Item
+        name="walletType"
+        label="Wallet Type"
+        initialValue="normal"
+        hidden={props.isWalletSelectFieldDisable}
+      >
+        <Select
+          placeholder="Select wallet type"
+          // onChange={onChange}
+          disabled={props.isWalletSelectFieldDisable}
+          defaultValue="normal"
+        >
+          <Select.Option key="normal" value="normal">
+            Normal
+          </Select.Option>
+          <Select.Option key="ledger" value="ledger">
+            Ledger
+          </Select.Option>
+        </Select>
+      </Form.Item>
       <Form.Item name="network" label="Network" rules={[{ required: true }]}>
         <Select
           placeholder="Select wallet network"
           onChange={onNetworkChange}
-          disabled={props.isSelectFieldDisable}
+          disabled={props.isNetworkSelectFieldDisable}
         >
           {walletService.supportedConfigs().map(config => (
             <Select.Option key={config.name} value={config.name} disabled={!config.enabled}>
@@ -394,22 +479,60 @@ const CreatePage = () => {
   const [isCreateDisable, setIsCreateDisable] = useState(false);
   const [isCustomConfig, setIsCustomConfig] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
-  const [isSelectFieldDisable, setIsSelectFieldDisable] = useState(true);
+  const [isNetworkSelectFieldDisable, setIsNetworkSelectFieldDisable] = useState(true);
+  const [isWalletSelectFieldDisable, setIsWalletSelectFieldDisable] = useState(true);
   const [networkConfig, setNetworkConfig] = useState();
   const [walletIdentifier, setWalletIdentifier] = useRecoilState(walletIdentifierState);
   const didMountRef = useRef(false);
   const history = useHistory();
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [goHomeButtonLoading, setGoHomeButtonLoading] = useState(false);
+  const [wallet, setWallet] = useState<Wallet>();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [ledgerConnected, setLedgerConnected] = useState(false);
+  const [walletTempBackupSeed] = useRecoilState(walletTempBackupState);
+
+  const handleOk = () => {
+    setIsModalVisible(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+  };
+
+  const onWalletBackupFinish = async (password: string) => {
+    setGoHomeButtonLoading(true);
+    if (!wallet) {
+      return;
+    }
+    await walletService.encryptWalletAndSetSession(password, wallet);
+    setGoHomeButtonLoading(false);
+    history.push('/home');
+  };
 
   useEffect(() => {
+    const fetchWalletData = async () => {
+      const fetchedWallet = walletTempBackupSeed;
+      if (fetchedWallet === undefined || fetchedWallet === null) return;
+      setWallet(fetchedWallet);
+
+      if (fetchedWallet.walletType === LEDGER_WALLET_TYPE) {
+        setInputPasswordVisible(true);
+      } else {
+        // Jump to backup screen after walletIdentifier created & setWalletIdentifier finished
+        history.push({
+          pathname: '/create/backup',
+          state: { walletIdentifier },
+        });
+      }
+    };
+
     if (!didMountRef.current) {
       didMountRef.current = true;
     } else {
-      // Jump to backup screen after walletIdentifier created & setWalletIdentifier finished
-      history.push({
-        pathname: '/create/backup',
-        state: { walletIdentifier },
-      });
+      fetchWalletData();
     }
+    // eslint-disable-next-line
   }, [walletIdentifier, history]);
 
   return (
@@ -433,13 +556,17 @@ const CreatePage = () => {
             <FormCreate
               form={form}
               isCreateDisable={isCreateDisable}
-              isSelectFieldDisable={isSelectFieldDisable}
-              setIsSelectFieldDisable={setIsSelectFieldDisable}
+              isNetworkSelectFieldDisable={isNetworkSelectFieldDisable}
+              isWalletSelectFieldDisable={isWalletSelectFieldDisable}
+              setIsNetworkSelectFieldDisable={setIsNetworkSelectFieldDisable}
+              setIsWalletSelectFieldDisable={setIsWalletSelectFieldDisable}
               setWalletIdentifier={setWalletIdentifier}
               setIsCustomConfig={setIsCustomConfig}
               setIsConnected={setIsConnected}
               setIsCreateDisable={setIsCreateDisable}
               networkConfig={networkConfig}
+              setLedgerConnected={setLedgerConnected}
+              setIsModalVisible={setIsModalVisible}
             />
           ) : (
             <FormCustomConfig
@@ -448,8 +575,45 @@ const CreatePage = () => {
               setNetworkConfig={setNetworkConfig}
             />
           )}
+
+          <PasswordFormModal
+            description="Input the app password to encrypt the wallet to be restored"
+            okButtonText="Encrypt wallet"
+            isButtonLoading={goHomeButtonLoading}
+            onCancel={() => {
+              setInputPasswordVisible(false);
+            }}
+            onSuccess={onWalletBackupFinish}
+            onValidatePassword={async (password: string) => {
+              const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+              return {
+                valid: isValid,
+                errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+              };
+            }}
+            successText="Wallet created and encrypted successfully !"
+            title="Provide app password"
+            visible={inputPasswordVisible}
+            successButtonText="Go to Home"
+            confirmPassword={false}
+          />
         </div>
       </div>
+
+      <LedgerModalPopup
+        isModalVisible={isModalVisible}
+        handleCancel={handleCancel}
+        handleOk={handleOk}
+        title={ledgerConnected ? 'Success!' : 'Connect your Ledger Device'}
+        footer={[]}
+        image={ledgerConnected ? <SuccessCheckmark /> : <IconLedger />}
+      >
+        <div className="description">
+          {ledgerConnected
+            ? 'Your ledger device has been connected successfully.'
+            : 'Please confirm connection on your Ledger Device'}
+        </div>
+      </LedgerModalPopup>
     </main>
   );
 };

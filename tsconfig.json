@@ -15,7 +15,8 @@
     "noEmit": true,
     "jsx": "react",
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": false
+    "noImplicitAny": false,
+    "experimentalDecorators": true  
   },
   "include": ["src", "typings.d.ts"]
 }

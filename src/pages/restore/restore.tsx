@@ -14,6 +14,7 @@ import BackButton from '../../components/BackButton/BackButton';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { Session } from '../../models/Session';
+import { NORMAL_WALLET_TYPE } from '../../service/LedgerService';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -287,6 +288,7 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
       walletName: name,
       phrase: mnemonic.toString().trim(),
       config: selectedNetworkConfig,
+      walletType: NORMAL_WALLET_TYPE,
     };
     try {
       const wallet = await walletService.restoreWallet(importOptions);
