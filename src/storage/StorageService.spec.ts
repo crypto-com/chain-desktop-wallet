@@ -9,10 +9,13 @@ import { getRandomId } from '../crypto/RandomGen';
 import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { TransactionStatus, TransferTransactionData } from '../models/Transaction';
 
+jest.setTimeout(10_000);
+
 function buildTestWallet() {
   const testNetConfig = DefaultWalletConfigs.TestNetConfig;
 
   const createOptions: WalletCreateOptions = {
+    walletType: 'normal',
     config: testNetConfig,
     walletName: 'My-TestNet-Wallet',
   };

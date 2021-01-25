@@ -76,12 +76,14 @@ const FormSend = () => {
     }
     try {
       setConfirmLoading(true);
+      const { walletType } = currentSession.wallet;
       const sendResult = await walletService.sendTransfer({
         toAddress: formValues.recipientAddress,
         amount: formValues.amount,
         asset: walletAsset,
         memo,
         decryptedPhrase,
+        walletType,
       });
 
       setBroadcastResult(sendResult);

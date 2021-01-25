@@ -19,6 +19,14 @@ jobs:
         with:
           node-version: 12
 
+      - name: Refresh
+        run: |
+          sudo apt-get update
+
+      - name: Setup dependencies
+        run: |
+          sudo apt-get install -y libusb-1.0-0-dev libudev-dev
+
       - name: Install deps with big timeout
         run: |
           yarn install --network-timeout 600000

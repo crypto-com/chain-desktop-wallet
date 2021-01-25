@@ -63,7 +63,7 @@ export class NodeRpcService implements INodeRpcService {
       const broadcastResponse = await this.client.broadcastTx(signedBytes);
       if (isBroadcastTxFailure(broadcastResponse)) {
         // noinspection ExceptionCaughtLocallyJS
-        throw new TypeError(`Transaction failed: ${broadcastResponse}`);
+        throw new TypeError(`Transaction failed: ${JSON.stringify(broadcastResponse)}`);
       }
       return {
         transactionHash: broadcastResponse.transactionHash,

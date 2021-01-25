@@ -4,8 +4,17 @@ import { Session } from '../models/Session';
 import { Wallet } from '../models/Wallet';
 import { UserAsset } from '../models/UserAsset';
 import { ValidatorModel } from '../models/Transaction';
+import { NORMAL_WALLET_TYPE } from '../service/LedgerService';
 
-const wallet = new Wallet('', '', '', DefaultWalletConfigs.TestNetConfig, '');
+const wallet = new Wallet(
+  '',
+  '',
+  '',
+  DefaultWalletConfigs.TestNetConfig,
+  '',
+  false,
+  NORMAL_WALLET_TYPE,
+);
 const session = new Session(wallet, 'USD');
 const asset: UserAsset = {
   identifier: '',
