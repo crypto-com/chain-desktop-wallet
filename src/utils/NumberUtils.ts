@@ -2,7 +2,7 @@ import { UserAsset } from '../models/UserAsset';
 import { Big } from './ChainJsLib';
 
 export function fromScientificNotation(value) {
-  return String(Big(value));
+  return Big(value).toFixed();
 }
 
 // E.g : 1 CRO = 10^8 BASECRO
