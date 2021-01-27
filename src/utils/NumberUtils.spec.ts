@@ -26,5 +26,8 @@ describe('Testing Number utils', () => {
     expect(fromScientificNotation('3E-4')).to.eq('0.0003');
     expect(fromScientificNotation('42E-4')).to.eq('0.0042');
     expect(fromScientificNotation('1440')).to.eq('1440');
+
+    expect(fromScientificNotation('1e-8')).to.eq('0.00000001');
+    expect(fromScientificNotation('3e-8')).to.eq('0.00000003');
   });
 });
