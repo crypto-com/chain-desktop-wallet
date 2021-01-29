@@ -1,6 +1,6 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.0.12",
+  "version": "0.0.18",
   "description": "Crypto.com Chain Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.com <chain@crypto.com>",
@@ -11,7 +11,7 @@
   "dependencies": {
     "@ant-design/icons": "^4.3.0",
     "@cosmjs/stargate": "^0.24.0-alpha.10",
-    "@crypto-com/chain-jslib": "^0.0.4",
+    "@crypto-com/chain-jslib": "^0.0.5",
     "@types/crypto-js": "^4.0.1",
     "@types/electron-devtools-installer": "^2.2.0",
     "@types/node": "^14.14.10",
@@ -22,6 +22,7 @@
     "axios": "^0.21.1",
     "bfj": "^7.0.2",
     "camelcase": "^6.1.0",
+    "copyfiles": "^2.4.1",
     "crypto-js": "^4.0.0",
     "electron-devtools-installer": "^3.1.1",
     "electron-is-dev": "^1.2.0",
@@ -50,8 +51,10 @@
     "postinstall": "electron-builder install-app-deps",
     "electron:dev": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:windev": "concurrently \"SET BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
-    "electron:pre-build": "yarn build && tsc -p electron",
-    "electron:build": "rm -rf build && rm -rf dist  && yarn build && tsc -p electron && electron-builder --publish=never",
+    "electron:pre-build": "yarn build && yarn copy-macos-manifest && tsc -p electron",
+    "copy-macos-manifest": "copyfiles entitlements* ./build/",
+    "clean-builds": "rimraf build && rimraf dist",
+    "electron:build": "yarn clean-builds && yarn build && yarn copy-macos-manifest && tsc -p electron && electron-builder --publish=never",
     "lint-staged": "lint-staged",
     "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
     "prettier": "prettier --write '/src/**/*.{js,jsx,tsx,ts,less,md,json}'"
@@ -79,14 +82,22 @@
     "productName": "Crypto.com Chain Desktop Wallet (Beta)",
     "appId": "chain.crypto.com.chain-desktop-wallet",
     "files": [
-      "build/**/*"
+      "./build/**/*",
+      "./dist/**/*",
+      "./public/*",
+      "./public/**/*"
     ],
+    "afterSign": "electron-builder-notarize",
     "mac": {
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "./build/entitlements.mac.plist",
+      "entitlementsInherit": "./build/entitlements.mac.plist",
       "target": [
         "dmg",
         "zip"
       ],
-      "category": "public.app-category.finance",
+      "category": "public.app-category.utilities",
       "darkModeSupport": true
     },
     "linux": {
@@ -96,7 +107,7 @@
       "icon": false
     },
     "directories": {
-      "buildResources": "assets"
+      "buildResources": "build"
     }
   },
   "eslintConfig": {
@@ -137,8 +148,9 @@
     "css-loader": "4.3.0",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
-    "electron": "^11.0.3",
+    "electron": "^11.1.0",
     "electron-builder": "^22.9.1",
+    "electron-builder-notarize": "^1.2.0",
     "eslint": "^7.10.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-eslint-comments": "^3.2.0",
@@ -178,6 +190,7 @@
     "react-dev-utils": "^11.0.1",
     "resolve": "1.18.1",
     "resolve-url-loader": "^3.1.2",
+    "rimraf": "3.0.2",
     "sass-loader": "8.0.2",
     "semver": "7.3.2",
     "style-loader": "1.3.0",

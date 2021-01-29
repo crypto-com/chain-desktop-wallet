@@ -1,7 +1,7 @@
 import sdk from '@crypto-com/chain-jslib';
 import { Wallet } from '../models/Wallet';
 import { WalletConfig } from '../config/StaticConfig';
-import { HDKey, Secp256k1KeyPair } from './types/ChainJsLib';
+import { HDKey, Secp256k1KeyPair } from '../utils/ChainJsLib';
 import { getRandomId } from '../crypto/RandomGen';
 
 export class WalletImporter {

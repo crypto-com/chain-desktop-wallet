@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, nativeImage, Menu } from 'electron';
 import * as path from 'path';
 import * as isDev from 'electron-is-dev';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
@@ -6,21 +6,33 @@ import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-insta
 let win: BrowserWindow | null = null;
 
 function createWindow() {
+  const iconPath = path.join(__dirname, '/public/icon.png').replace(/\\/g, '\\\\');
+  const iconImage = nativeImage.createFromPath(iconPath);
+  iconImage.setTemplateImage(true);
+
   win = new BrowserWindow({
+    autoHideMenuBar: true,
     width: 1280,
     height: 800,
     minWidth: 1080,
     minHeight: 702,
     webPreferences: {
       nodeIntegration: true,
+      devTools: isDev,
     },
     resizable: true,
+    icon: iconImage,
   });
+
+  // Note that all efforts to hide menus only work on Windows and Linux
+  // The option Menu.setApplicationMenu(null) seemed to have worked on all platforms, but it had some breaking behaviors
+  // It killed the clipboard copying capability and added a delay on startup
+  win.setMenuBarVisibility(false);
+  win.removeMenu();
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
   } else {
-    // 'build/index.html'
     win.loadURL(`file://${__dirname}/../index.html`);
   }
 

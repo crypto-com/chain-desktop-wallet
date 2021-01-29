@@ -1,5 +1,5 @@
 import sdk from '@crypto-com/chain-jslib';
-import { Big, HDKey, Secp256k1KeyPair, Units } from '../types/ChainJsLib';
+import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
 import { WalletConfig } from '../../config/StaticConfig';
 import {
   TransactionUnsigned,

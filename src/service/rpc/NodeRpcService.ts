@@ -1,7 +1,7 @@
 import { StargateClient } from '@cosmjs/stargate';
 import { IndexedTx } from '@cosmjs/stargate/types/stargateclient';
 import axios, { AxiosInstance } from 'axios';
-import { Bytes } from '../types/ChainJsLib';
+import { Bytes } from '../../utils/ChainJsLib';
 import { CosmosPorts } from '../../config/StaticConfig';
 import { DelegationResult, RewardResponse } from './NodeRpcModels';
 import {

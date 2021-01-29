@@ -3,7 +3,7 @@ import './send.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber, Layout } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
-
+import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -13,10 +13,13 @@ import { secretStoreService } from '../../storage/SecretStoreService';
 import { scaledBalance } from '../../models/UserAsset';
 import { sessionState, walletAssetState } from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
+import { TransactionUtils } from '../../utils/TransactionUtils';
+import { fromScientificNotation } from '../../utils/NumberUtils';
 
 const { Header, Content, Footer } = Layout;
 const layout = {};
 const tailLayout = {};
+
 const FormSend = () => {
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({ recipientAddress: '', amount: '', memo: '' });
@@ -32,7 +35,12 @@ const FormSend = () => {
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
-    setFormValues(form.getFieldsValue());
+
+    setFormValues({
+      ...form.getFieldsValue(),
+      // Replace scientific notation to plain string values
+      amount: fromScientificNotation(form.getFieldValue('amount')),
+    });
     setIsVisibleConfirmationModal(true);
   };
 
@@ -99,6 +107,14 @@ const FormSend = () => {
     setIsErrorTransferModalVisible(false);
   };
 
+  const customAddressValidator = TransactionUtils.addressValidator(
+    currentSession,
+    walletAsset,
+    AddressType.USER,
+  );
+  const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
+
+  const scaleUpBalance = scaledBalance(walletAsset); // From BaseXYZ balance to XYZ balance
   return (
     <Form
       {...layout}
@@ -112,17 +128,10 @@ const FormSend = () => {
         name="recipientAddress"
         label="Recipient Address"
         hasFeedback
+        validateFirst
         rules={[
           { required: true, message: 'Recipient address is required' },
-          {
-            pattern: RegExp(
-              `^(${walletAsset.symbol.toString().toLocaleLowerCase()})[a-zA-HJ-NP-Z0-9]{20,120}$`,
-              'i',
-            ),
-            message: `The recipient address should be a valid ${walletAsset.symbol
-              .toString()
-              .toUpperCase()} address`,
-          },
+          customAddressValidator,
         ]}
       >
         <Input placeholder="tcro..." />
@@ -139,12 +148,9 @@ const FormSend = () => {
               pattern: /[^0]+/,
               message: 'Sending amount cannot be 0',
             },
+            customAmountValidator,
             {
-              pattern: /^(0|[1-9]\d*)?(\.\d+)?(?<=\d)$/,
-              message: 'Please enter a valid sending amount',
-            },
-            {
-              max: scaledBalance(walletAsset),
+              max: scaleUpBalance,
               min: 0,
               type: 'number',
               message: 'Sending amount exceeds your available wallet balance',
@@ -156,7 +162,7 @@ const FormSend = () => {
         <div className="available">
           <span>Available: </span>
           <div className="available-amount">
-            {scaledBalance(walletAsset)} {walletAsset.symbol}
+            {scaleUpBalance} {walletAsset.symbol}
           </div>
         </div>
       </div>
@@ -255,7 +261,7 @@ const FormSend = () => {
                 The transaction timed out but it will be included in the subsequent blocks
               </div>
             ) : (
-              <div className="description">The transaction was broad-casted successfully!</div>
+              <div className="description">The transaction was broadcasted successfully!</div>
             )}
             {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
           </>
