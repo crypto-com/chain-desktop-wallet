@@ -310,6 +310,7 @@ class WalletService {
     try {
       const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
       const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
+        currentSession.wallet.config.network.coin.baseDenom,
         currentSession.wallet.address,
       );
 
