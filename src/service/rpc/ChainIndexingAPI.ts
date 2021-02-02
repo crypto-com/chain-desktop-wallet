@@ -4,7 +4,10 @@ import { TransactionStatus, TransferTransactionData } from '../../models/Transac
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 
 export interface IChainIndexingAPI {
-  fetchAllTransferTransactions(address: string): Promise<Array<TransferTransactionData>>;
+  fetchAllTransferTransactions(
+    baseAssetSymbol: string,
+    address: string,
+  ): Promise<Array<TransferTransactionData>>;
 }
 
 export class ChainIndexingAPI implements IChainIndexingAPI {
@@ -24,6 +27,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   }
 
   public async fetchAllTransferTransactions(
+    baseAssetSymbol: string,
     address: string,
   ): Promise<Array<TransferTransactionData>> {
     const transferListResponse = await this.axiosClient.get<TransferListResponse>(
@@ -31,8 +35,11 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     );
 
     return transferListResponse.data.result.map(transfer => {
+      const assetAmount = transfer.data.amount.filter(
+        amount => amount.denom === baseAssetSymbol,
+      )[0];
       const transferData: TransferTransactionData = {
-        amount: transfer.data.amount,
+        amount: assetAmount.amount,
         assetSymbol: 'TCRO', // Hardcoded for now
         date: transfer.blockTime,
         hash: transfer.transactionHash,

@@ -1,5 +1,4 @@
-import { StargateClient } from '@cosmjs/stargate';
-import { IndexedTx } from '@cosmjs/stargate/types/stargateclient';
+import { isBroadcastTxFailure, StargateClient } from '@cosmjs/stargate';
 import axios, { AxiosInstance } from 'axios';
 import { Bytes } from '../../utils/ChainJsLib';
 import { CosmosPorts } from '../../config/StaticConfig';
@@ -22,20 +21,7 @@ export interface INodeRpcService {
   // Broadcast trx return trx hash
   broadcastTransaction(signedTxHex: string): Promise<BroadCastResult>;
 
-  getTransactionByHash(transactionHash: string): Promise<IndexedTx>;
-
-  // loadAllTransferTxs(address: string): Promise<TransactionList>;
-
   fetchDelegationBalance(address: string, assetSymbol: string): Promise<StakingTransactionList>;
-}
-
-export interface BroadcastResponse {
-  readonly height: number;
-  readonly code?: number;
-  readonly message?: string;
-  readonly transactionHash: string;
-  readonly rawLog?: string;
-  readonly data?: Uint8Array;
 }
 
 export class NodeRpcService implements INodeRpcService {
@@ -73,8 +59,8 @@ export class NodeRpcService implements INodeRpcService {
     const TIME_OUT_ERROR = 'timed out waiting for tx to be included in a block';
     try {
       const signedBytes = Bytes.fromHexString(signedTxHex).toUint8Array();
-      const broadcastResponse: BroadcastResponse = await this.client.broadcastTx(signedBytes);
-      if (!broadcastResponse.data || broadcastResponse.code !== undefined) {
+      const broadcastResponse = await this.client.broadcastTx(signedBytes);
+      if (isBroadcastTxFailure(broadcastResponse)) {
         // noinspection ExceptionCaughtLocallyJS
         throw new TypeError(`Transaction failed: ${broadcastResponse}`);
       }
@@ -90,11 +76,6 @@ export class NodeRpcService implements INodeRpcService {
       }
       throw e;
     }
-  }
-
-  public async getTransactionByHash(transactionHash: string): Promise<IndexedTx> {
-    const txs: readonly IndexedTx[] = await this.client.searchTx({ id: transactionHash });
-    return txs[0];
   }
 
   public async fetchDelegationBalance(
