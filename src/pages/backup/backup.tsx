@@ -10,7 +10,6 @@ import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import logo from '../../assets/logo-products-chain.svg';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import BackButton from '../../components/BackButton/BackButton';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
@@ -81,7 +80,6 @@ function BackupPage() {
         <img src={logo} className="logo" alt="logo" />
       </div>
       <div className="container">
-        <BackButton />
         <div>
           <div className="title">Backup Recovery Phrase</div>
           <div className="slogan">
