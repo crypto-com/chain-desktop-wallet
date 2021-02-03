@@ -225,7 +225,14 @@ class WalletService {
     }
     return wallets.map(
       data =>
-        new Wallet(data.identifier, data.name, data.address, data.config, data.encryptedPhrase),
+        new Wallet(
+          data.identifier,
+          data.name,
+          data.address,
+          data.config,
+          data.encryptedPhrase,
+          data.hasBeenEncrypted,
+        ),
     );
   }
 
