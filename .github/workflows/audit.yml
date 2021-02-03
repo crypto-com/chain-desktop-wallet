@@ -8,7 +8,7 @@ on:
       - dev
 
 jobs:
-  release:
+  audit:
     runs-on: ${{ matrix.os }}
 
     strategy:
