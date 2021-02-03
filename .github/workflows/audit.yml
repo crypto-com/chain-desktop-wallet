@@ -1,0 +1,33 @@
+# https://github.com/samuelmeuli/action-electron-builder
+name: Build Executables
+
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Install deps with big timeout
+        run: |
+          yarn install --network-timeout 600000
+
+      - name: Audit dependencies
+        run: |
+          yarn audit
