@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import './backup.less';
 import { Button, Checkbox } from 'antd';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import MouseTooltip from 'react-sticky-mouse-tooltip';
-import { walletIdentifierState } from '../../recoil/atom';
+import { walletIdentifierState, walletTempBackupState } from '../../recoil/atom';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import logo from '../../assets/logo-products-chain.svg';
@@ -20,6 +20,7 @@ function BackupPage() {
   const [wallet, setWallet] = useState<Wallet>();
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const walletIdentifier: string = useRecoilValue(walletIdentifierState);
+  const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(walletTempBackupState);
   const didMountRef = useRef(false);
   const history = useHistory();
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
@@ -35,6 +36,9 @@ function BackupPage() {
     }
     await walletService.encryptWalletAndSetSession(password, wallet);
     setGoHomeButtonLoading(false);
+
+    // Flush recoil state - remove temporary seed values
+    setWalletTempBackupSeed(null);
     history.push('/home');
   };
 
@@ -59,9 +63,13 @@ function BackupPage() {
   };
 
   const fetchWallet = async () => {
-    const fetchedWallet = await walletService.findWalletByIdentifier(walletIdentifier);
-    if (fetchedWallet !== null) {
-      setWallet(fetchedWallet);
+    if (walletTempBackupSeed && walletIdentifier === walletTempBackupSeed.identifier) {
+      // Recoil data gets passed to a local object here. It might seem like unnecessary duplication
+      // But it's important since internal recoil state is read only and wouldn't be reset later
+      const localWallet: Wallet = {
+        ...walletTempBackupSeed,
+      };
+      setWallet(localWallet);
     } else {
       showErrorModal();
     }
