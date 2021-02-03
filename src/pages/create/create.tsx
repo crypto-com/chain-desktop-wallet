@@ -3,9 +3,9 @@ import { useHistory } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { Button, Form, Input, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import { walletIdentifierState, walletTempBackupSeedState } from '../../recoil/atom';
+import { walletIdentifierState, walletTempBackupState } from '../../recoil/atom';
 import './create.less';
-import { setPhrase, Wallet } from '../../models/Wallet';
+import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions, WalletCreator } from '../../service/WalletCreator';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
@@ -235,7 +235,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const [createLoading, setCreateLoading] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(walletTempBackupSeedState);
+  const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(walletTempBackupState);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -299,15 +299,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
 
     try {
       const createdWallet = WalletCreator.create(createOptions);
-      setWalletTempBackupSeed({
-        walletId: createdWallet.identifier,
-        seed: createdWallet.encryptedPhrase,
-      });
-      // Clean phrase before on-disk (NeDB) persistence
-      const safeTemporaryWallet = setPhrase(createdWallet, '');
-
-      // The temporarily persisted wallet doesn't have a plain text seed at this point
-      await walletService.persistWallet(safeTemporaryWallet);
+      setWalletTempBackupSeed(createdWallet);
 
       setWallet(createdWallet);
       setCreateLoading(false);

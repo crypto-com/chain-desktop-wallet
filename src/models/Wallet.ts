@@ -52,11 +52,6 @@ export interface CustomConfigFormValue {
   indexingUrl: string;
 }
 
-export function setPhrase(wallet: Wallet, phrase: string): Wallet {
-  wallet.encryptedPhrase = phrase;
-  return wallet;
-}
-
 export function reconstructCustomConfig(formValues: CustomConfigFormValue): WalletConfig {
   const customNetwork: Network = {
     addressPrefix: formValues.addressPrefix,
