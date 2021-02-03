@@ -12,7 +12,6 @@ import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import { Session } from '../../models/Session';
 // import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 // import PasswordFormContainer from '../../components/PasswordForm/PasswordFormContainer';
 import BackButton from '../../components/BackButton/BackButton';
@@ -298,7 +297,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
 
     try {
       const createdWallet = await walletService.createAndSaveWallet(createOptions);
-      await walletService.setCurrentSession(new Session(createdWallet));
+      // await walletService.setCurrentSession(new Session(createdWallet));
       setWallet(createdWallet);
       setCreateLoading(false);
       showModal();

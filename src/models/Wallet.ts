@@ -23,12 +23,14 @@ export class Wallet {
     address: string,
     config: WalletConfig,
     encryptedPhrase: string,
+    hasBeenEncrypted: boolean = false,
   ) {
     this.identifier = id;
     this.name = name;
     this.address = address;
     this.config = config;
     this.encryptedPhrase = encryptedPhrase;
+    this.hasBeenEncrypted = hasBeenEncrypted;
   }
 }
 

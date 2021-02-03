@@ -50,7 +50,9 @@ function HomeLayout(props: HomeLayoutProps) {
       setHasWallet(hasWalletBeenCreated);
       setSession(sessionData);
       setUserAsset(currentAsset);
-      setWalletList(allWalletsData);
+
+      const readyToUseWallets = allWalletsData.filter(wallet => wallet.hasBeenEncrypted);
+      setWalletList(readyToUseWallets);
       setLoading(false);
     };
 
