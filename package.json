@@ -256,5 +256,9 @@
     "presets": [
       "react-app"
     ]
+  },
+  "resolutions": {
+    "@umijs/fabric/stylelint-config-rational-order/stylelint": "13.9.0",
+    "@umijs/fabric/stylelint-config-rational-order/stylelint/meow/yargs-parser": "20.2.4"
   }
 }
