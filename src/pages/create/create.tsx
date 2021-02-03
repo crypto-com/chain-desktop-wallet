@@ -3,16 +3,15 @@ import { useHistory } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { Button, Form, Input, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import { walletIdentifierState } from '../../recoil/atom';
+import { walletIdentifierState, walletTempBackupState } from '../../recoil/atom';
 import './create.less';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
-import { WalletCreateOptions } from '../../service/WalletCreator';
+import { WalletCreateOptions, WalletCreator } from '../../service/WalletCreator';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import { Session } from '../../models/Session';
 // import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 // import PasswordFormContainer from '../../components/PasswordForm/PasswordFormContainer';
 import BackButton from '../../components/BackButton/BackButton';
@@ -235,6 +234,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(walletTempBackupState);
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -297,8 +298,9 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     };
 
     try {
-      const createdWallet = await walletService.createAndSaveWallet(createOptions);
-      await walletService.setCurrentSession(new Session(createdWallet));
+      const createdWallet = WalletCreator.create(createOptions);
+      setWalletTempBackupSeed(createdWallet);
+
       setWallet(createdWallet);
       setCreateLoading(false);
       showModal();

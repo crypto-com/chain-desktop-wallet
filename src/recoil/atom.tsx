@@ -39,4 +39,16 @@ const walletListState = atom({
   default: [wallet],
 });
 
-export { walletIdentifierState, sessionState, walletAssetState, walletListState };
+// Will hold the wallet seed temporarily and will be flushed after backup phase
+const walletTempBackupState = atom<Wallet | null>({
+  key: 'walletTempBackupSeed',
+  default: null,
+});
+
+export {
+  walletIdentifierState,
+  sessionState,
+  walletAssetState,
+  walletListState,
+  walletTempBackupState,
+};

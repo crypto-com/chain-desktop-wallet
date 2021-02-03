@@ -50,6 +50,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setHasWallet(hasWalletBeenCreated);
       setSession(sessionData);
       setUserAsset(currentAsset);
+
       setWalletList(allWalletsData);
       setLoading(false);
     };

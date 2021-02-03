@@ -223,10 +223,19 @@ class WalletService {
     if (!wallets) {
       return [];
     }
-    return wallets.map(
-      data =>
-        new Wallet(data.identifier, data.name, data.address, data.config, data.encryptedPhrase),
-    );
+    return wallets
+      .filter(wallet => wallet.hasBeenEncrypted)
+      .map(
+        data =>
+          new Wallet(
+            data.identifier,
+            data.name,
+            data.address,
+            data.config,
+            data.encryptedPhrase,
+            data.hasBeenEncrypted,
+          ),
+      );
   }
 
   // This is used to check whether the user should be shown the welcome screen or being redirected straight to their home screen
