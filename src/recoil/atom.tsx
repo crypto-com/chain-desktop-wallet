@@ -39,4 +39,23 @@ const walletListState = atom({
   default: [wallet],
 });
 
-export { walletIdentifierState, sessionState, walletAssetState, walletListState };
+export interface TempBackupSeed {
+  walletId: string;
+  seed: string;
+}
+// Will hold the seed temporarily and will be flushed after backup phase
+const walletTempBackupSeedState = atom<TempBackupSeed>({
+  key: 'walletTempBackupSeed',
+  default: {
+    walletId: '',
+    seed: '',
+  },
+});
+
+export {
+  walletIdentifierState,
+  sessionState,
+  walletAssetState,
+  walletListState,
+  walletTempBackupSeedState,
+};
