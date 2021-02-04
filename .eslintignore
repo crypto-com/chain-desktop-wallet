@@ -1,3 +1,5 @@
 node_modules
 dist
 build
+src/react-app-env.d.ts
+src/serviceWorker.ts
