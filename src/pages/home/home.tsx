@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Layout, Table, Tabs, Typography } from 'antd';
+import { Layout, Table, Tabs, Tag, Typography } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import {
   scaledAmount,
@@ -14,6 +14,7 @@ import { walletService } from '../../service/WalletService';
 import {
   StakingTransactionData,
   TransactionDirection,
+  TransactionStatus,
   TransferTransactionData,
 } from '../../models/Transaction';
 import { Session } from '../../models/Session';
@@ -43,6 +44,7 @@ interface TransferTabularData {
   amount: string;
   time: string;
   direction: TransactionDirection;
+  status: TransactionStatus;
 }
 
 function convertDelegations(allDelegations: StakingTransactionData[], currentAsset: UserAsset) {
@@ -82,6 +84,7 @@ function convertTransfers(
       time: new Date(transfer.date).toLocaleString(),
       amount: `${transferAmount}  ${currentAsset.symbol}`,
       direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
+      status: transfer.status,
     };
     return data;
   });
@@ -197,6 +200,29 @@ function HomePage() {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (text, record: TransferTabularData) => {
+        // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
+        // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+        let statusColor;
+        if (record.status === TransactionStatus.SUCCESS) {
+          statusColor = 'success';
+        } else if (record.status === TransactionStatus.FAILED) {
+          statusColor = 'error';
+        } else {
+          statusColor = 'processing';
+        }
+
+        return (
+          <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+            {record.status.toString()}
+          </Tag>
+        );
+      },
     },
   ];
 
