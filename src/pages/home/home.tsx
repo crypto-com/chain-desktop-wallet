@@ -217,7 +217,11 @@ function HomePage() {
           statusColor = 'processing';
         }
 
-        return <Tag color={statusColor}>{record.status.toString()}</Tag>;
+        return (
+          <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+            {record.status.toString()}
+          </Tag>
+        );
       },
     },
   ];
