@@ -1,5 +1,5 @@
 # https://github.com/samuelmeuli/action-electron-builder
-name: Build Executables
+name: Run audit checks
 
 on:
   pull_request:
@@ -9,12 +9,7 @@ on:
 
 jobs:
   audit:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-
+    runs-on: ubuntu-latest
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v1
