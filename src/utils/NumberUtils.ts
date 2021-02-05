@@ -1,5 +1,6 @@
-import { UserAsset } from '../models/UserAsset';
+import { scaledBalance, UserAsset } from '../models/UserAsset';
 import { Big } from './ChainJsLib';
+import { FIXED_DEFAULT_FEE } from '../config/StaticConfig';
 
 export function fromScientificNotation(value) {
   return Big(value).toFixed();
@@ -27,4 +28,24 @@ export function getUINormalScaleAmount(amount: string, decimals: number): string
   return Big(amount)
     .div(exp)
     .toFixed(4);
+}
+
+export function getCurrentMinAssetAmount(userAsset: UserAsset) {
+  const exp = Big(10).pow(userAsset.decimals);
+  return Big(1)
+    .div(exp)
+    .toNumber();
+}
+
+// When user selects option to send max amount,
+// transaction fee gets deduced to the sent amount for the transaction to be successful
+export function adjustedTransactionAmount(formAmount: string, walletAsset: UserAsset): string {
+  const availableBalance = Big(scaledBalance(walletAsset));
+  const fixedFee = getNormalScaleAmount(`${FIXED_DEFAULT_FEE}`, walletAsset);
+
+  const amountAndFee = Big(formAmount).add(fixedFee);
+  if (amountAndFee.gt(availableBalance)) {
+    return availableBalance.minus(fixedFee).toFixed();
+  }
+  return formAmount;
 }

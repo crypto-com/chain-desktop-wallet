@@ -1,6 +1,7 @@
 import 'mocha';
 import { expect } from 'chai';
 import {
+  adjustedTransactionAmount,
   fromScientificNotation,
   getBaseScaledAmount,
   getNormalScaleAmount,
@@ -40,5 +41,23 @@ describe('Testing Number utils', () => {
 
     expect(fromScientificNotation('1e-8')).to.eq('0.00000001');
     expect(fromScientificNotation('3e-8')).to.eq('0.00000003');
+  });
+
+  it('Test adjusting transaction amount when exceeds balance', () => {
+    const asset: UserAsset = {
+      decimals: 8,
+      mainnetSymbol: '',
+      balance: '24500400',
+      description: 'The best asset',
+      icon_url: 'some url',
+      identifier: 'cbd4bab2cbfd2b3',
+      name: 'Best Asset',
+      symbol: 'BEST',
+      walletId: '',
+      stakedBalance: '0',
+    };
+
+    expect(adjustedTransactionAmount('0.245', asset)).to.eq('0.24495');
+    expect(adjustedTransactionAmount('0.1223', asset)).to.eq('0.1223');
   });
 });

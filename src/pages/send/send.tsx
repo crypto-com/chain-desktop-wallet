@@ -4,7 +4,6 @@ import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber, Layout } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
-import { Big } from '@crypto-com/chain-jslib/lib/dist/utils/big';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -15,7 +14,12 @@ import { scaledBalance } from '../../models/UserAsset';
 import { sessionState, walletAssetState } from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import { fromScientificNotation, getNormalScaleAmount } from '../../utils/NumberUtils';
+import {
+  adjustedTransactionAmount,
+  fromScientificNotation,
+  getCurrentMinAssetAmount,
+  getNormalScaleAmount,
+} from '../../utils/NumberUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 
 const { Header, Content, Footer } = Layout;
@@ -37,19 +41,14 @@ const FormSend = () => {
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
-
-    let fieldValue = form.getFieldValue('amount');
-    const availableBalance = Big(scaledBalance(walletAsset));
-    const fixedFee = getNormalScaleAmount(`${FIXED_DEFAULT_FEE}`, walletAsset);
-
-    const amountAndFee = Big(fieldValue).add(fixedFee);
-    if (amountAndFee.gt(availableBalance)) {
-      fieldValue = availableBalance.minus(fixedFee);
-    }
+    const transferInoputAmount = adjustedTransactionAmount(
+      form.getFieldValue('amount'),
+      walletAsset,
+    );
     setFormValues({
       ...form.getFieldsValue(),
       // Replace scientific notation to plain string values
-      amount: fromScientificNotation(fieldValue),
+      amount: fromScientificNotation(transferInoputAmount),
     });
     setIsVisibleConfirmationModal(true);
   };
@@ -125,6 +124,8 @@ const FormSend = () => {
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
 
   const scaleUpBalance = scaledBalance(walletAsset); // From BaseXYZ balance to XYZ balance
+  const currentMinAssetAmount = getCurrentMinAssetAmount(walletAsset);
+  const maximumSendAmount = Number(scaleUpBalance);
   return (
     <Form
       {...layout}
@@ -160,10 +161,16 @@ const FormSend = () => {
             },
             customAmountValidator,
             {
-              max: Number(scaleUpBalance),
-              min: 0,
+              max: maximumSendAmount,
               type: 'number',
               message: 'Sending amount exceeds your available wallet balance',
+            },
+            {
+              min: currentMinAssetAmount,
+              type: 'number',
+              message: `Sending amount is lower than minimum allowed of ${fromScientificNotation(
+                currentMinAssetAmount,
+              )} ${walletAsset.symbol}`,
             },
           ]}
         >
