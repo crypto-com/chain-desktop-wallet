@@ -4,6 +4,7 @@ import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber, Layout } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
+import { Big } from '@crypto-com/chain-jslib/lib/dist/utils/big';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -14,7 +15,8 @@ import { scaledBalance } from '../../models/UserAsset';
 import { sessionState, walletAssetState } from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import { fromScientificNotation } from '../../utils/NumberUtils';
+import { fromScientificNotation, getNormalScaleAmount } from '../../utils/NumberUtils';
+import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 
 const { Header, Content, Footer } = Layout;
 const layout = {};
@@ -36,10 +38,18 @@ const FormSend = () => {
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
 
+    let fieldValue = form.getFieldValue('amount');
+    const availableBalance = Big(scaledBalance(walletAsset));
+    const fixedFee = getNormalScaleAmount(`${FIXED_DEFAULT_FEE}`, walletAsset);
+
+    const amountAndFee = Big(fieldValue).add(fixedFee);
+    if (amountAndFee.gt(availableBalance)) {
+      fieldValue = availableBalance.minus(fixedFee);
+    }
     setFormValues({
       ...form.getFieldsValue(),
       // Replace scientific notation to plain string values
-      amount: fromScientificNotation(form.getFieldValue('amount')),
+      amount: fromScientificNotation(fieldValue),
     });
     setIsVisibleConfirmationModal(true);
   };
@@ -150,7 +160,7 @@ const FormSend = () => {
             },
             customAmountValidator,
             {
-              max: scaleUpBalance,
+              max: Number(scaleUpBalance),
               min: 0,
               type: 'number',
               message: 'Sending amount exceeds your available wallet balance',
@@ -205,7 +215,13 @@ const FormSend = () => {
             </div>
             <div className="item">
               <div className="label">Amount</div>
-              <div>{`${formValues?.amount} CRO`}</div>
+              <div>{`${formValues?.amount} ${walletAsset.symbol}`}</div>
+            </div>
+            <div className="item">
+              <div className="label">Transaction Fee</div>
+              <div>{`${getNormalScaleAmount(String(FIXED_DEFAULT_FEE), walletAsset)} ${
+                walletAsset.symbol
+              }`}</div>
             </div>
             <div className="item">
               <div className="label">Memo</div>

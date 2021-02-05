@@ -161,7 +161,7 @@ const FormDelegationRequest = () => {
             },
             customAmountValidator,
             {
-              max: scaledBalance(walletAsset),
+              max: Number(scaledBalance(walletAsset)),
               min: 0,
               type: 'number',
               message: 'Staking amount exceeds your available wallet balance',
