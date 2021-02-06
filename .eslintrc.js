@@ -20,7 +20,7 @@ module.exports = {
     '@typescript-eslint/ban-types': 'off',
     '@typescript-eslint/type-annotation-spacing': 'off',
     '@typescript-eslint/array-type': 'off',
-    'object-curly-spacing': 'off',
+    '@typescript-eslint/object-curly-spacing': 'off',
     'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/*.spec.ts'] }],
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': [
