@@ -21,6 +21,7 @@ module.exports = {
     '@typescript-eslint/type-annotation-spacing': 'off',
     '@typescript-eslint/array-type': 'off',
     '@typescript-eslint/object-curly-spacing': 'off',
+    '@typescript-eslint/return-await': 'off',
     'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/*.spec.ts'] }],
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': [
