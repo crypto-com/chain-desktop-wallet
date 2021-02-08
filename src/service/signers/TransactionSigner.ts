@@ -1,6 +1,6 @@
 import sdk from '@crypto-com/chain-jslib';
 import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
-import { WalletConfig } from '../../config/StaticConfig';
+import { FIXED_DEFAULT_FEE, WalletConfig } from '../../config/StaticConfig';
 import {
   TransactionUnsigned,
   DelegateTransactionUnsigned,
@@ -47,7 +47,7 @@ export class TransactionSigner implements ITransactionSigner {
 
   // eslint-disable-next-line class-methods-use-this
   public setCustomFee(transaction: TransactionUnsigned) {
-    transaction.fee = '5000';
+    transaction.fee = `${FIXED_DEFAULT_FEE}`;
     return transaction;
   }
 

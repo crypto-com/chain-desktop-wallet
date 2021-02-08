@@ -15,7 +15,11 @@ import { walletAssetState, sessionState } from '../../recoil/atom';
 import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import { fromScientificNotation } from '../../utils/NumberUtils';
+import {
+  adjustedTransactionAmount,
+  fromScientificNotation,
+  getCurrentMinAssetAmount,
+} from '../../utils/NumberUtils';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -52,10 +56,12 @@ const FormDelegationRequest = () => {
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
+    const stakeInputAmount = adjustedTransactionAmount(form.getFieldValue('amount'), walletAsset);
+
     setFormValues({
       ...form.getFieldsValue(),
       // Replace scientific notation to plain string values
-      amount: fromScientificNotation(form.getFieldValue('amount')),
+      amount: fromScientificNotation(stakeInputAmount),
     });
     setIsVisibleConfirmationModal(true);
   };
@@ -126,6 +132,9 @@ const FormDelegationRequest = () => {
     walletAsset,
     AddressType.VALIDATOR,
   );
+
+  const currentMinAssetAmount = getCurrentMinAssetAmount(walletAsset);
+  const maximumStakeAmount = Number(scaledBalance(walletAsset));
   return (
     <Form
       {...layout}
@@ -161,10 +170,16 @@ const FormDelegationRequest = () => {
             },
             customAmountValidator,
             {
-              max: scaledBalance(walletAsset),
-              min: 0,
+              max: maximumStakeAmount,
               type: 'number',
               message: 'Staking amount exceeds your available wallet balance',
+            },
+            {
+              min: currentMinAssetAmount,
+              type: 'number',
+              message: `Staking amount is lower than minimum allowed of ${fromScientificNotation(
+                currentMinAssetAmount,
+              )} ${walletAsset.symbol}`,
             },
           ]}
         >

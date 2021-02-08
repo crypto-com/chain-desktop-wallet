@@ -1,3 +1,5 @@
+import { getUINormalScaleAmount } from '../utils/NumberUtils';
+
 export interface UserAsset {
   identifier: string;
 
@@ -35,21 +37,15 @@ export interface AssetMarketPrice {
 }
 
 export const scaledAmount = (baseAmount: string, decimals: number) => {
-  const balance = Number(baseAmount);
-
-  if (balance === 0) {
-    return balance;
-  }
-  // 1 CRO = 10^8 BASECRO
-  return Number((balance / 10 ** decimals).toFixed(4));
+  return getUINormalScaleAmount(baseAmount, decimals);
 };
 
 export const scaledBalance = (asset: UserAsset) => {
-  return scaledAmount(asset.balance, asset.decimals);
+  return getUINormalScaleAmount(asset.balance, asset.decimals);
 };
 
 export const scaledStakingBalance = (asset: UserAsset) => {
-  return scaledAmount(asset.stakedBalance, asset.decimals);
+  return getUINormalScaleAmount(asset.stakedBalance, asset.decimals);
 };
 
 export const getAssetPriceIdFrom = (assetSymbol: string, currency: string) => {
