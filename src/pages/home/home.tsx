@@ -94,8 +94,8 @@ function HomePage() {
   const currentSession = useRecoilValue(sessionState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
-  const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
+  const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const didMountRef = useRef(false);
 
   useEffect(() => {
@@ -135,7 +135,7 @@ function HomePage() {
     return () => {
       unmounted = true;
     };
-  }, [delegations, setUserAsset, setValidatorTopList]);
+  }, [delegations, userAsset, validatorTopList]);
 
   const StakingColumns = [
     {
