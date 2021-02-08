@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 *Unreleased*
 
+## [v0.0.20] - 2021-02-08
+
+### Added Features
+
+- Good handling of maximum transfer or staking transactions
+- Show user the fee that is being deducted on the transaction
+- Present UI/UX tag of the transaction status in the transfer transaction listing
+
+### Security Fixes & Improvements
+
+- Replace previous pre-encryption disk persistence by temporary memory state that's flushed later on
+
+
 ## [v0.0.13] - 2021-01-07
 
 ### Added Features
