@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
+import { AutoComplete, Button, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
@@ -11,7 +11,7 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
-import { walletAssetState, sessionState } from '../../recoil/atom';
+import { walletAssetState, sessionState, validatorTopListState } from '../../recoil/atom';
 import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
@@ -52,6 +52,7 @@ const FormDelegationRequest = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const validatorTopList = useRecoilValue(validatorTopListState);
   const currentSession = useRecoilValue(sessionState);
 
   const showConfirmationModal = () => {
@@ -154,7 +155,17 @@ const FormDelegationRequest = () => {
           customAddressValidator,
         ]}
       >
-        <Input placeholder="tcro..." />
+        <AutoComplete
+          options={validatorTopList.map(e => {
+            return {
+              value: e.validatorAddress,
+            };
+          })}
+          placeholder="Enter validator address"
+          filterOption={(inputValue, option) =>
+            option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
+          }
+        />
       </Form.Item>
       <div className="amount">
         <Form.Item
