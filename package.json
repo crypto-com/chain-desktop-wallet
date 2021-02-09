@@ -60,7 +60,7 @@
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --watchAll=false",
-    "postinstall": "node scripts/postinstall.js && electron-builder install-app-deps",
+    "postinstall": "electron-builder install-app-deps",
     "electron:dev": "export NODE_ENV=development && yarn electron:devcore",
     "electron:devcore": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
     "electron:windev": "concurrently \"SET BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
