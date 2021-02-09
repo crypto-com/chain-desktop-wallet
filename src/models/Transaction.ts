@@ -57,3 +57,9 @@ export interface BroadCastResult {
   readonly message?: string;
   readonly code?: number;
 }
+
+export interface ValidatorModel {
+  readonly validatorAddress: string;
+  readonly currentCommissionRate: string;
+  readonly currentShares: string;
+}

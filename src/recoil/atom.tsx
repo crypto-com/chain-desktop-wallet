@@ -3,6 +3,7 @@ import { DefaultWalletConfigs } from '../config/StaticConfig';
 import { Session } from '../models/Session';
 import { Wallet } from '../models/Wallet';
 import { UserAsset } from '../models/UserAsset';
+import { ValidatorModel } from '../models/Transaction';
 
 const wallet = new Wallet('', '', '', DefaultWalletConfigs.TestNetConfig, '');
 const session = new Session(wallet, 'USD');
@@ -45,10 +46,16 @@ const walletTempBackupState = atom<Wallet | null>({
   default: null,
 });
 
+const validatorTopListState = atom<ValidatorModel[]>({
+  key: 'validatorTopList',
+  default: [],
+});
+
 export {
   walletIdentifierState,
   sessionState,
   walletAssetState,
   walletListState,
   walletTempBackupState,
+  validatorTopListState,
 };

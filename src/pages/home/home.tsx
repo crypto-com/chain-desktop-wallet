@@ -9,7 +9,7 @@ import {
   scaledStakingBalance,
   UserAsset,
 } from '../../models/UserAsset';
-import { sessionState, walletAssetState } from '../../recoil/atom';
+import { sessionState, validatorTopListState, walletAssetState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
   StakingTransactionData,
@@ -94,6 +94,7 @@ function HomePage() {
   const currentSession = useRecoilValue(sessionState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
+  const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const didMountRef = useRef(false);
 
@@ -110,6 +111,11 @@ function HomePage() {
         sessionData.wallet.identifier,
       );
 
+      const currentValidatorList =
+        validatorTopList.length === 0
+          ? await walletService.getLatestTopValidators()
+          : validatorTopList;
+
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
@@ -117,6 +123,7 @@ function HomePage() {
         setDelegations(stakingTabularData);
         setTransfers(transferTabularData);
         setUserAsset(currentAsset);
+        setValidatorTopList(currentValidatorList);
       }
     };
 
@@ -128,7 +135,7 @@ function HomePage() {
     return () => {
       unmounted = true;
     };
-  }, [delegations, setUserAsset]);
+  }, [delegations, userAsset, validatorTopList]);
 
   const StakingColumns = [
     {

@@ -30,6 +30,7 @@ import {
   StakingTransactionList,
   TransferTransactionData,
   TransferTransactionList,
+  ValidatorModel,
 } from '../models/Transaction';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
@@ -541,6 +542,18 @@ class WalletService {
       }
     }
     return selectedNetworkConfig;
+  }
+
+  public async getLatestTopValidators(): Promise<ValidatorModel[]> {
+    try {
+      const currentSession = await this.storageService.retrieveCurrentSession();
+      const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+      return nodeRpc.loadTopValidators();
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING TOP VALIDATORS', e);
+      return [];
+    }
   }
 }
 
