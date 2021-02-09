@@ -156,15 +156,17 @@ const FormDelegationRequest = () => {
         ]}
       >
         <AutoComplete
-          options={validatorTopList.map(e => {
-            return {
-              value: e.validatorAddress,
-            };
-          })}
+          options={[
+            {
+              label: 'Top Validators',
+              options: validatorTopList.map(e => {
+                return {
+                  value: e.validatorAddress,
+                };
+              }),
+            },
+          ]}
           placeholder="Enter validator address"
-          filterOption={(inputValue, option) =>
-            option!.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
-          }
         />
       </Form.Item>
       <div className="amount">
