@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 *Unreleased*
 
+## [v0.0.21] - 2021-02-10
+
+### Added Features
+
+- Provide staking validators option for users when trying to delegate funds
+
+
 ## [v0.0.20] - 2021-02-08
 
 ### Added Features
