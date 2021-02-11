@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { TransferListResponse } from './ChainIndexingModels';
+import { TransferListResponse, TransferResult } from './ChainIndexingModels';
 import { TransactionStatus, TransferTransactionData } from '../../models/Transaction';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 
@@ -34,6 +34,13 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       `/accounts/${address}/messages?order=height.desc&filter.msgType=MsgSend`,
     );
 
+    function getStatus(transfer: TransferResult) {
+      if (transfer.success) {
+        return TransactionStatus.SUCCESS;
+      }
+      return TransactionStatus.FAILED;
+    }
+
     return transferListResponse.data.result.map(transfer => {
       const assetAmount = transfer.data.amount.filter(
         amount => amount.denom === baseAssetSymbol,
@@ -46,7 +53,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
         memo: '',
         receiverAddress: transfer.data.toAddress,
         senderAddress: transfer.data.fromAddress,
-        status: TransactionStatus.SUCCESS,
+        status: getStatus(transfer),
       };
 
       return transferData;

@@ -2,13 +2,14 @@ import { isBroadcastTxFailure, StargateClient } from '@cosmjs/stargate';
 import axios, { AxiosInstance } from 'axios';
 import { Bytes } from '../../utils/ChainJsLib';
 import { CosmosPorts } from '../../config/StaticConfig';
-import { DelegationResult, RewardResponse } from './NodeRpcModels';
+import { DelegationResult, RewardResponse, ValidatorListResponse } from './NodeRpcModels';
 import {
   BroadCastResult,
   RewardTransaction,
   StakingTransactionData,
   StakingTransactionList,
   TransactionStatus,
+  ValidatorModel,
 } from '../../models/Transaction';
 
 export interface INodeRpcService {
@@ -148,5 +149,24 @@ export class NodeRpcService implements INodeRpcService {
   ): Promise<Array<StakingTransactionData>> {
     const delegationList = await this.fetchDelegationBalance(address, assetSymbol);
     return delegationList.transactions;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async loadTopValidators(): Promise<ValidatorModel[]> {
+    const response = await this.proxyClient.get<ValidatorListResponse>(
+      `/cosmos/staking/v1beta1/validators`,
+    );
+
+    return response.data.validators
+      .filter(v => !v.jailed)
+      .slice(0, 6)
+      .map(unjailedValidator => {
+        const validator: ValidatorModel = {
+          currentShares: unjailedValidator.delegator_shares,
+          currentCommissionRate: unjailedValidator.commission.commission_rates.rate,
+          validatorAddress: unjailedValidator.operator_address,
+        };
+        return validator;
+      });
   }
 }

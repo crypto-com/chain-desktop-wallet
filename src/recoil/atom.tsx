@@ -3,6 +3,7 @@ import { DefaultWalletConfigs } from '../config/StaticConfig';
 import { Session } from '../models/Session';
 import { Wallet } from '../models/Wallet';
 import { UserAsset } from '../models/UserAsset';
+import { ValidatorModel } from '../models/Transaction';
 
 const wallet = new Wallet('', '', '', DefaultWalletConfigs.TestNetConfig, '');
 const session = new Session(wallet, 'USD');
@@ -39,4 +40,22 @@ const walletListState = atom({
   default: [wallet],
 });
 
-export { walletIdentifierState, sessionState, walletAssetState, walletListState };
+// Will hold the wallet seed temporarily and will be flushed after backup phase
+const walletTempBackupState = atom<Wallet | null>({
+  key: 'walletTempBackupSeed',
+  default: null,
+});
+
+const validatorTopListState = atom<ValidatorModel[]>({
+  key: 'validatorTopList',
+  default: [],
+});
+
+export {
+  walletIdentifierState,
+  sessionState,
+  walletAssetState,
+  walletListState,
+  walletTempBackupState,
+  validatorTopListState,
+};

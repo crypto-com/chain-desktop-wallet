@@ -1,6 +1,12 @@
 import 'mocha';
 import { expect } from 'chai';
-import { fromScientificNotation, getBaseScaledAmount } from './NumberUtils';
+import {
+  adjustedTransactionAmount,
+  fromScientificNotation,
+  getBaseScaledAmount,
+  getNormalScaleAmount,
+  getUINormalScaleAmount,
+} from './NumberUtils';
 import { UserAsset } from '../models/UserAsset';
 
 describe('Testing Number utils', () => {
@@ -20,6 +26,12 @@ describe('Testing Number utils', () => {
 
     expect(getBaseScaledAmount('0.00000003', asset)).to.eq('3');
     expect(getBaseScaledAmount('0.0000000299', asset)).to.eq('2.99');
+
+    expect(getNormalScaleAmount('5000', asset)).to.eq('0.00005');
+    expect(getNormalScaleAmount('524005000', asset)).to.eq('5.24005');
+
+    expect(getUINormalScaleAmount('2458999245545', asset.decimals)).to.eq('24589.9925');
+    expect(getUINormalScaleAmount('334005045600', asset.decimals)).to.eq('3340.0505');
   });
 
   it('Test conversion from scientific notation', () => {
@@ -29,5 +41,23 @@ describe('Testing Number utils', () => {
 
     expect(fromScientificNotation('1e-8')).to.eq('0.00000001');
     expect(fromScientificNotation('3e-8')).to.eq('0.00000003');
+  });
+
+  it('Test adjusting transaction amount when exceeds balance', () => {
+    const asset: UserAsset = {
+      decimals: 8,
+      mainnetSymbol: '',
+      balance: '24500400',
+      description: 'The best asset',
+      icon_url: 'some url',
+      identifier: 'cbd4bab2cbfd2b3',
+      name: 'Best Asset',
+      symbol: 'BEST',
+      walletId: '',
+      stakedBalance: '0',
+    };
+
+    expect(adjustedTransactionAmount('0.245', asset)).to.eq('0.24495');
+    expect(adjustedTransactionAmount('0.1223', asset)).to.eq('0.1223');
   });
 });

@@ -95,3 +95,5 @@ export type Network = {
   validatorAddressPrefix: string;
   coin: { baseDenom: string; croDenom: string };
 };
+
+export const FIXED_DEFAULT_FEE = 5_000;

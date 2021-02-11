@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Layout, Table, Tabs, Typography } from 'antd';
+import { Layout, Table, Tabs, Tag, Typography } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import {
   scaledAmount,
@@ -9,11 +9,12 @@ import {
   scaledStakingBalance,
   UserAsset,
 } from '../../models/UserAsset';
-import { sessionState, walletAssetState } from '../../recoil/atom';
+import { sessionState, validatorTopListState, walletAssetState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
   StakingTransactionData,
   TransactionDirection,
+  TransactionStatus,
   TransferTransactionData,
 } from '../../models/Transaction';
 import { Session } from '../../models/Session';
@@ -43,6 +44,7 @@ interface TransferTabularData {
   amount: string;
   time: string;
   direction: TransactionDirection;
+  status: TransactionStatus;
 }
 
 function convertDelegations(allDelegations: StakingTransactionData[], currentAsset: UserAsset) {
@@ -82,6 +84,7 @@ function convertTransfers(
       time: new Date(transfer.date).toLocaleString(),
       amount: `${transferAmount}  ${currentAsset.symbol}`,
       direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
+      status: transfer.status,
     };
     return data;
   });
@@ -91,6 +94,7 @@ function HomePage() {
   const currentSession = useRecoilValue(sessionState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
+  const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const didMountRef = useRef(false);
 
@@ -107,6 +111,11 @@ function HomePage() {
         sessionData.wallet.identifier,
       );
 
+      const currentValidatorList =
+        validatorTopList.length === 0
+          ? await walletService.getLatestTopValidators()
+          : validatorTopList;
+
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
@@ -114,6 +123,7 @@ function HomePage() {
         setDelegations(stakingTabularData);
         setTransfers(transferTabularData);
         setUserAsset(currentAsset);
+        setValidatorTopList(currentValidatorList);
       }
     };
 
@@ -125,7 +135,7 @@ function HomePage() {
     return () => {
       unmounted = true;
     };
-  }, [delegations, setUserAsset]);
+  }, [delegations, userAsset, validatorTopList]);
 
   const StakingColumns = [
     {
@@ -197,6 +207,29 @@ function HomePage() {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (text, record: TransferTabularData) => {
+        // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
+        // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+        let statusColor;
+        if (record.status === TransactionStatus.SUCCESS) {
+          statusColor = 'success';
+        } else if (record.status === TransactionStatus.FAILED) {
+          statusColor = 'error';
+        } else {
+          statusColor = 'processing';
+        }
+
+        return (
+          <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+            {record.status.toString()}
+          </Tag>
+        );
+      },
     },
   ];
 

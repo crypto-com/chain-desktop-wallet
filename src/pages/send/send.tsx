@@ -14,7 +14,13 @@ import { scaledBalance } from '../../models/UserAsset';
 import { sessionState, walletAssetState } from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import { fromScientificNotation } from '../../utils/NumberUtils';
+import {
+  adjustedTransactionAmount,
+  fromScientificNotation,
+  getCurrentMinAssetAmount,
+  getNormalScaleAmount,
+} from '../../utils/NumberUtils';
+import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 
 const { Header, Content, Footer } = Layout;
 const layout = {};
@@ -35,11 +41,14 @@ const FormSend = () => {
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
-
+    const transferInoputAmount = adjustedTransactionAmount(
+      form.getFieldValue('amount'),
+      walletAsset,
+    );
     setFormValues({
       ...form.getFieldsValue(),
       // Replace scientific notation to plain string values
-      amount: fromScientificNotation(form.getFieldValue('amount')),
+      amount: fromScientificNotation(transferInoputAmount),
     });
     setIsVisibleConfirmationModal(true);
   };
@@ -115,6 +124,8 @@ const FormSend = () => {
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
 
   const scaleUpBalance = scaledBalance(walletAsset); // From BaseXYZ balance to XYZ balance
+  const currentMinAssetAmount = getCurrentMinAssetAmount(walletAsset);
+  const maximumSendAmount = Number(scaleUpBalance);
   return (
     <Form
       {...layout}
@@ -150,10 +161,16 @@ const FormSend = () => {
             },
             customAmountValidator,
             {
-              max: scaleUpBalance,
-              min: 0,
+              max: maximumSendAmount,
               type: 'number',
               message: 'Sending amount exceeds your available wallet balance',
+            },
+            {
+              min: currentMinAssetAmount,
+              type: 'number',
+              message: `Sending amount is lower than minimum allowed of ${fromScientificNotation(
+                currentMinAssetAmount,
+              )} ${walletAsset.symbol}`,
             },
           ]}
         >
@@ -205,7 +222,13 @@ const FormSend = () => {
             </div>
             <div className="item">
               <div className="label">Amount</div>
-              <div>{`${formValues?.amount} CRO`}</div>
+              <div>{`${formValues?.amount} ${walletAsset.symbol}`}</div>
+            </div>
+            <div className="item">
+              <div className="label">Transaction Fee</div>
+              <div>{`${getNormalScaleAmount(String(FIXED_DEFAULT_FEE), walletAsset)} ${
+                walletAsset.symbol
+              }`}</div>
             </div>
             <div className="item">
               <div className="label">Memo</div>

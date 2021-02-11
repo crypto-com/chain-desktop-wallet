@@ -1,0 +1,28 @@
+# https://github.com/samuelmeuli/action-electron-builder
+name: Run audit checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Install deps with big timeout
+        run: |
+          yarn install --network-timeout 600000
+
+      - name: Audit dependencies
+        run: |
+          yarn audit
