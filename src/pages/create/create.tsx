@@ -112,7 +112,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
       name="control-ref"
       initialValues={{
         indexingUrl: DefaultWalletConfigs.TestNetConfig.indexingUrl,
-        nodeUrl: 'http://mynode',
+        nodeUrl: 'http://127.0.0.1',
         derivationPath: "m/44'/394'/0'/0/0",
         validatorPrefix: 'crocncl',
         croDenom: 'cro',
@@ -385,6 +385,9 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       name="control-ref"
       onFinish={onWalletCreateFinish}
       onChange={onChange}
+      initialValues={{
+        walletType: 'normal',
+      }}
     >
       <Form.Item
         name="name"
@@ -403,12 +406,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         initialValue="normal"
         hidden={props.isWalletSelectFieldDisable}
       >
-        <Select
-          placeholder="Select wallet type"
-          // onChange={onChange}
-          disabled={props.isWalletSelectFieldDisable}
-          defaultValue="normal"
-        >
+        <Select placeholder="Select wallet type" disabled={props.isWalletSelectFieldDisable}>
           <Select.Option key="normal" value="normal">
             Normal
           </Select.Option>
