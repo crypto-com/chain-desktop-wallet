@@ -4,11 +4,19 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 
 import './BackButton.less';
 
-const BackButton = () => {
+interface BackButtonProps {
+  backTo?: string;
+}
+
+const BackButton: React.FC<BackButtonProps> = props => {
   const history = useHistory();
 
   const backTo = () => {
-    history.goBack();
+    if (props.backTo) {
+      history.push(props.backTo);
+    } else {
+      history.goBack();
+    }
   };
 
   return (
