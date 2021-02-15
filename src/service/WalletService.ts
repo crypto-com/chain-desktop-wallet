@@ -16,6 +16,7 @@ import { Session } from '../models/Session';
 import {
   DelegateTransactionUnsigned,
   TransferTransactionUnsigned,
+  UndelegateTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
 } from './signers/TransactionSupported';
 import { cryptographer } from '../crypto/Cryptographer';
@@ -54,6 +55,8 @@ export interface DelegationRequest {
   decryptedPhrase: string;
   walletType: string; // normal, ledger
 }
+
+export interface UndelegationRequest extends DelegationRequest {}
 
 export interface WithdrawStakingRewardRequest {
   validatorAddress: string;
@@ -142,6 +145,48 @@ class WalletService {
       signedTxHex = await transactionSigner.signDelegateTx(
         delegateTransaction,
         delegationRequest.decryptedPhrase,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.syncAll(currentSession);
+    return broadCastResult;
+  }
+
+  public async sendUnDelegateTransaction(
+    undelegationRequest: UndelegationRequest,
+  ): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      // TODO : Support Ledger un-delegations on next iterations
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      ledgerTransactionSigner,
+    } = await this.prepareTransaction();
+
+    const undelegationAmountScaled = getBaseScaledAmount(
+      undelegationRequest.amount,
+      undelegationRequest.asset,
+    );
+    const undelegateTransaction: UndelegateTransactionUnsigned = {
+      delegatorAddress: currentSession.wallet.address,
+      validatorAddress: undelegationRequest.validatorAddress,
+      amount: undelegationAmountScaled,
+      memo: undelegationRequest.memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string;
+    if (undelegationRequest.walletType === LEDGER_WALLET_TYPE) {
+      throw new TypeError('Undelegate not supported yet by Ledger');
+    } else {
+      signedTxHex = await transactionSigner.signUndelegateTx(
+        undelegateTransaction,
+        undelegationRequest.decryptedPhrase,
       );
     }
 

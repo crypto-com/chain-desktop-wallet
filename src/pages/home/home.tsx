@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Layout, Table, Tabs, Tag, Typography } from 'antd';
+import { Button, Layout, Table, Tabs, Tag, Typography } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import {
   scaledAmount,
@@ -12,12 +12,18 @@ import {
 import { sessionState, validatorTopListState, walletAssetState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
+  BroadCastResult,
   StakingTransactionData,
   TransactionDirection,
   TransactionStatus,
   TransferTransactionData,
 } from '../../models/Transaction';
 import { Session } from '../../models/Session';
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import { secretStoreService } from '../../storage/SecretStoreService';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 
 const { Text } = Typography;
 
@@ -32,6 +38,7 @@ const middleEllipsis = (str: string) => {
 
 interface StakingTabularData {
   key: string;
+  stakedAmountWithSymbol: string;
   stakedAmount: string;
   validatorAddress: string;
   delegatorAddress: string;
@@ -54,7 +61,8 @@ function convertDelegations(allDelegations: StakingTransactionData[], currentAss
       key: dlg.validatorAddress + dlg.stakedAmount,
       delegatorAddress: dlg.delegatorAddress,
       validatorAddress: dlg.validatorAddress,
-      stakedAmount: `${stakedAmount} ${currentAsset.symbol}`,
+      stakedAmountWithSymbol: `${stakedAmount} ${currentAsset.symbol}`,
+      stakedAmount,
     };
     return data;
   });
@@ -66,6 +74,7 @@ function convertTransfers(
   sessionData: Session,
 ) {
   const { address } = sessionData.wallet;
+
   function getDirection(from: string, to: string): TransactionDirection {
     if (address === from && address === to) {
       return TransactionDirection.SELF;
@@ -75,6 +84,7 @@ function convertTransfers(
     }
     return TransactionDirection.INCOMING;
   }
+
   return allTransfers.map(transfer => {
     const transferAmount = scaledAmount(transfer.amount, currentAsset.decimals).toString();
     const data: TransferTabularData = {
@@ -97,6 +107,11 @@ function HomePage() {
   const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const didMountRef = useRef(false);
+
+  const [undelegateFormValues, setUndelegateFormValues] = useState({
+    validatorAddress: '',
+    undelegateAmount: '',
+  });
 
   useEffect(() => {
     let unmounted = false;
@@ -136,34 +151,6 @@ function HomePage() {
       unmounted = true;
     };
   }, [delegations, userAsset, validatorTopList]);
-
-  const StakingColumns = [
-    {
-      title: 'Validator Address',
-      dataIndex: 'validatorAddress',
-      key: 'validatorAddress',
-      render: text => (
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
-        >
-          {text}
-        </a>
-      ),
-    },
-    {
-      title: 'Amount',
-      dataIndex: 'stakedAmount',
-      key: 'stakedAmount',
-    },
-    {
-      title: 'Delegator Address',
-      dataIndex: 'delegatorAddress',
-      key: 'delegatorAddress',
-      render: text => <a>{text}</a>,
-    },
-  ];
 
   const TransactionColumns = [
     {
@@ -233,6 +220,126 @@ function HomePage() {
     },
   ];
 
+  const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
+  const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
+
+  const showConfirmationModal = () => {
+    setInputPasswordVisible(false);
+    setIsVisibleConfirmationModal(true);
+  };
+
+  const onWalletDecryptFinish = async (password: string) => {
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      currentSession.wallet.identifier,
+    );
+    setDecryptedPhrase(phraseDecrypted);
+    showConfirmationModal();
+  };
+
+  const showPasswordInput = () => {
+    if (decryptedPhrase) {
+      showConfirmationModal();
+    }
+    setInputPasswordVisible(true);
+  };
+
+  const handleCancel = () => {
+    setIsVisibleConfirmationModal(false);
+  };
+
+  const closeSuccessModal = () => {
+    setIsSuccessTransferModalVisible(false);
+  };
+
+  const closeErrorModal = () => {
+    setIsErrorTransferModalVisible(false);
+  };
+
+  const onConfirmUnDelegation = async () => {
+    if (!decryptedPhrase) {
+      return;
+    }
+    try {
+      setConfirmLoading(true);
+      const { walletType } = currentSession.wallet;
+      const stakingResult = await walletService.sendUnDelegateTransaction({
+        validatorAddress: undelegateFormValues.validatorAddress,
+        amount: undelegateFormValues.undelegateAmount,
+        asset: userAsset,
+        memo: '',
+        decryptedPhrase,
+        walletType,
+      });
+      setBroadcastResult(stakingResult);
+
+      setIsVisibleConfirmationModal(false);
+      setConfirmLoading(false);
+      setIsSuccessTransferModalVisible(true);
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      setUserAsset(currentWalletAsset);
+      // form.resetFields();
+    } catch (e) {
+      setIsVisibleConfirmationModal(false);
+      setConfirmLoading(false);
+      setInputPasswordVisible(false);
+      setIsErrorTransferModalVisible(true);
+      // eslint-disable-next-line no-console
+      console.log('Error occurred while transfer', e);
+    }
+  };
+
+  const StakingColumns = [
+    {
+      title: 'Validator Address',
+      dataIndex: 'validatorAddress',
+      key: 'validatorAddress',
+      render: text => (
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+        >
+          {text}
+        </a>
+      ),
+    },
+    {
+      title: 'Amount',
+      dataIndex: 'stakedAmount',
+      key: 'stakedAmount',
+    },
+    {
+      title: 'Delegator Address',
+      dataIndex: 'delegatorAddress',
+      key: 'delegatorAddress',
+      render: text => <a>{text}</a>,
+    },
+    {
+      title: 'Undelegate',
+      dataIndex: 'undelegateAction',
+      key: 'undelegateAction',
+      render: () => (
+        <a
+          onClick={() => {
+            setTimeout(() => {
+              showPasswordInput();
+            }, 200);
+          }}
+        >
+          <Text type="danger">Undelegate Stake</Text>
+        </a>
+      ),
+    },
+  ];
+
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">Welcome Back!</Header>
@@ -256,9 +363,115 @@ function HomePage() {
             <Table columns={TransactionColumns} dataSource={transfers} />
           </TabPane>
           <TabPane tab="Delegations" key="2">
-            <Table columns={StakingColumns} dataSource={delegations} />
+            <Table
+              columns={StakingColumns}
+              dataSource={delegations}
+              onRow={record => {
+                return {
+                  onClick: () => {
+                    setUndelegateFormValues({
+                      validatorAddress: record.validatorAddress,
+                      undelegateAmount: record.stakedAmount,
+                    });
+                  },
+                };
+              }}
+            />
           </TabPane>
         </Tabs>
+        <div>
+          <ModalPopup
+            isModalVisible={isConfirmationModalVisible}
+            handleCancel={handleCancel}
+            handleOk={onConfirmUnDelegation}
+            confirmationLoading={confirmLoading}
+            footer={[
+              <Button
+                key="submit"
+                type="primary"
+                loading={confirmLoading}
+                onClick={onConfirmUnDelegation}
+              >
+                Confirm
+              </Button>,
+              <Button key="back" type="link" onClick={handleCancel}>
+                Cancel
+              </Button>,
+            ]}
+            okText="Confirm"
+          >
+            <>
+              <div className="title">Confirm Undelegate Transaction</div>
+              <div className="description">Please review the below information. </div>
+              <div className="item">
+                <div className="label">Undelegate Amount From Validator</div>
+                <div className="address">{`${undelegateFormValues?.validatorAddress}`}</div>
+              </div>
+              <div className="item">
+                <div className="label">Undelegate Amount</div>
+                <div>{`${undelegateFormValues.undelegateAmount}`}</div>
+              </div>
+            </>
+          </ModalPopup>
+          <PasswordFormModal
+            description="Input the app password decrypt wallet"
+            okButtonText="Decrypt wallet"
+            onCancel={() => {
+              setInputPasswordVisible(false);
+            }}
+            onSuccess={onWalletDecryptFinish}
+            onValidatePassword={async (password: string) => {
+              const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+              return {
+                valid: isValid,
+                errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+              };
+            }}
+            successText="Wallet decrypted successfully !"
+            title="Provide app password"
+            visible={inputPasswordVisible}
+            successButtonText="Continue"
+            confirmPassword={false}
+          />
+
+          <SuccessModalPopup
+            isModalVisible={isSuccessTransferModalVisible}
+            handleCancel={closeSuccessModal}
+            handleOk={closeSuccessModal}
+            title="Success!"
+            button={null}
+            footer={[
+              <Button key="submit" type="primary" onClick={closeSuccessModal}>
+                Ok
+              </Button>,
+            ]}
+          >
+            <>
+              {broadcastResult?.code !== undefined &&
+              broadcastResult?.code !== null &&
+              broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+                <div className="description">
+                  The transaction timed out but it will be included in the subsequent blocks
+                </div>
+              ) : (
+                <div className="description">Your undelegation transaction was successful !</div>
+              )}
+            </>
+          </SuccessModalPopup>
+          <ErrorModalPopup
+            isModalVisible={isErrorTransferModalVisible}
+            handleCancel={closeErrorModal}
+            handleOk={closeErrorModal}
+            title="An error happened!"
+            footer={[]}
+          >
+            <>
+              <div className="description">
+                The undelegation transaction failed. Please try again later
+              </div>
+            </>
+          </ErrorModalPopup>
+        </div>
       </Content>
       <Footer />
     </Layout>

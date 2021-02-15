@@ -6,6 +6,7 @@ import {
   DelegateTransactionUnsigned,
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
+  UndelegateTransactionUnsigned,
 } from './TransactionSupported';
 
 export interface ITransactionSigner {
@@ -119,6 +120,33 @@ export class TransactionSigner implements ITransactionSigner {
 
     const signableTx = rawTx
       .appendMessage(msgWithdrawDelegatorReward)
+      .addSigner({
+        publicKey: keyPair.getPubKey(),
+        accountNumber: new Big(transaction.accountNumber),
+        accountSequence: new Big(transaction.accountSequence),
+      })
+      .toSignable();
+
+    return signableTx
+      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
+      .toSigned()
+      .getHexEncoded();
+  }
+
+  public async signUndelegateTx(
+    transaction: UndelegateTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
+
+    const msgUndelegate = new cro.staking.MsgUndelegate({
+      delegatorAddress: transaction.delegatorAddress,
+      validatorAddress: transaction.validatorAddress,
+      amount: new cro.Coin(transaction.amount, Units.BASE),
+    });
+
+    const signableTx = rawTx
+      .appendMessage(msgUndelegate)
       .addSigner({
         publicKey: keyPair.getPubKey(),
         accountNumber: new Big(transaction.accountNumber),

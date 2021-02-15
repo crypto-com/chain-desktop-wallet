@@ -500,11 +500,6 @@ const FormWithdrawStakingReward = () => {
         handleCancel={handleCancel}
         handleOk={onConfirmTransfer}
         confirmationLoading={confirmLoading}
-        // button={
-        //   <Button type="primary" htmlType="submit">
-        //     Review
-        //   </Button>
-        // }
         footer={[
           <Button key="submit" type="primary" loading={confirmLoading} onClick={onConfirmTransfer}>
             Confirm
