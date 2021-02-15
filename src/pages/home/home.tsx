@@ -55,17 +55,19 @@ interface TransferTabularData {
 }
 
 function convertDelegations(allDelegations: StakingTransactionData[], currentAsset: UserAsset) {
-  return allDelegations.map(dlg => {
-    const stakedAmount = scaledAmount(dlg.stakedAmount, currentAsset.decimals).toString();
-    const data: StakingTabularData = {
-      key: dlg.validatorAddress + dlg.stakedAmount,
-      delegatorAddress: dlg.delegatorAddress,
-      validatorAddress: dlg.validatorAddress,
-      stakedAmountWithSymbol: `${stakedAmount} ${currentAsset.symbol}`,
-      stakedAmount,
-    };
-    return data;
-  });
+  return allDelegations
+    .map(dlg => {
+      const stakedAmount = scaledAmount(dlg.stakedAmount, currentAsset.decimals).toString();
+      const data: StakingTabularData = {
+        key: dlg.validatorAddress + dlg.stakedAmount,
+        delegatorAddress: dlg.delegatorAddress,
+        validatorAddress: dlg.validatorAddress,
+        stakedAmountWithSymbol: `${stakedAmount} ${currentAsset.symbol}`,
+        stakedAmount,
+      };
+      return data;
+    })
+    .filter(dlg => Number(dlg.stakedAmount) > 0);
 }
 
 function convertTransfers(
@@ -270,7 +272,7 @@ function HomePage() {
     try {
       setConfirmLoading(true);
       const { walletType } = currentSession.wallet;
-      const stakingResult = await walletService.sendUnDelegateTransaction({
+      const unstakingResult = await walletService.sendUnDelegateTransaction({
         validatorAddress: undelegateFormValues.validatorAddress,
         amount: undelegateFormValues.undelegateAmount,
         asset: userAsset,
@@ -278,7 +280,10 @@ function HomePage() {
         decryptedPhrase,
         walletType,
       });
-      setBroadcastResult(stakingResult);
+
+      // eslint-disable-next-line no-console
+      console.log('unstakingResult', JSON.stringify(unstakingResult));
+      setBroadcastResult(unstakingResult);
 
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
@@ -312,9 +317,9 @@ function HomePage() {
       ),
     },
     {
-      title: 'Amount',
-      dataIndex: 'stakedAmount',
-      key: 'stakedAmount',
+      title: 'Staked Amount',
+      dataIndex: 'stakedAmountWithSymbol',
+      key: 'stakedAmountWithSymbol',
     },
     {
       title: 'Delegator Address',
@@ -402,14 +407,20 @@ function HomePage() {
           >
             <>
               <div className="title">Confirm Undelegate Transaction</div>
-              <div className="description">Please review the below information. </div>
+              <div className="description">Please review the below information.</div>
               <div className="item">
-                <div className="label">Undelegate Amount From Validator</div>
+                <div className="label">Undelegate From Validator</div>
                 <div className="address">{`${undelegateFormValues?.validatorAddress}`}</div>
               </div>
               <div className="item">
                 <div className="label">Undelegate Amount</div>
                 <div>{`${undelegateFormValues.undelegateAmount}`}</div>
+              </div>
+              <div>
+                <Typography.Paragraph type="warning">
+                  Please do understand that undelegation usually completes a number of days after
+                  the transaction has been broadcasted.
+                </Typography.Paragraph>
               </div>
             </>
           </ModalPopup>
