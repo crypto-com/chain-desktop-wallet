@@ -162,9 +162,6 @@ class WalletService {
       accountSequence,
       currentSession,
       transactionSigner,
-      // TODO : Support Ledger un-delegations on next iterations
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      ledgerTransactionSigner,
     } = await this.prepareTransaction();
 
     const undelegationAmountScaled = getBaseScaledAmount(
@@ -182,6 +179,7 @@ class WalletService {
 
     let signedTxHex: string;
     if (undelegationRequest.walletType === LEDGER_WALLET_TYPE) {
+      // TODO : Support Ledger un-delegations on next iterations
       throw new TypeError('Undelegate not supported yet by Ledger');
     } else {
       signedTxHex = await transactionSigner.signUndelegateTx(
