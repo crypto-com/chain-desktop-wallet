@@ -462,8 +462,8 @@ function HomePage() {
               </div>
               <div>
                 <Typography.Paragraph type="warning">
-                  Please do understand that undelegation usually completes a number of days after
-                  the transaction has been broadcasted.
+                  Please do understand that undelegation is fully completed a number of days (~21)
+                  after the transaction has been broadcasted.
                 </Typography.Paragraph>
               </div>
             </>
