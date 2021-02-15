@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Button, Layout, Table, Tabs, Tag, Typography } from 'antd';
+import { Button, Form, InputNumber, Layout, Table, Tabs, Tag, Typography } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import {
   scaledAmount,
@@ -31,6 +31,10 @@ const { Text } = Typography;
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
+const layout = {
+  // labelCol: { span: 8 },
+  // wrapperCol: { span: 16 },
+};
 
 const middleEllipsis = (str: string) => {
   return `${str.substr(0, 12)}...${str.substr(str.length - 12, str.length)}`;
@@ -109,6 +113,19 @@ function HomePage() {
   const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const didMountRef = useRef(false);
+
+  // Undelegate action related states changes
+  const [form] = Form.useForm();
+
+  const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
+  const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
 
   const [undelegateFormValues, setUndelegateFormValues] = useState({
     validatorAddress: '',
@@ -222,16 +239,6 @@ function HomePage() {
     },
   ];
 
-  const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
-  const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-
-  const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
-  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
-
-  const [decryptedPhrase, setDecryptedPhrase] = useState('');
-  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
-
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
     setIsVisibleConfirmationModal(true);
@@ -253,16 +260,19 @@ function HomePage() {
     setInputPasswordVisible(true);
   };
 
-  const handleCancel = () => {
+  const handleCancelConfirmationModal = () => {
     setIsVisibleConfirmationModal(false);
+    setInputPasswordVisible(false);
   };
 
   const closeSuccessModal = () => {
     setIsSuccessTransferModalVisible(false);
+    setInputPasswordVisible(false);
   };
 
   const closeErrorModal = () => {
     setIsErrorTransferModalVisible(false);
+    setInputPasswordVisible(false);
   };
 
   const onConfirmUnDelegation = async () => {
@@ -272,17 +282,17 @@ function HomePage() {
     try {
       setConfirmLoading(true);
       const { walletType } = currentSession.wallet;
+      const undelegateAmount = form.getFieldValue('undelegateAmount');
+
       const unstakingResult = await walletService.sendUnDelegateTransaction({
         validatorAddress: undelegateFormValues.validatorAddress,
-        amount: undelegateFormValues.undelegateAmount,
+        amount: undelegateAmount,
         asset: userAsset,
         memo: '',
         decryptedPhrase,
         walletType,
       });
 
-      // eslint-disable-next-line no-console
-      console.log('unstakingResult', JSON.stringify(unstakingResult));
       setBroadcastResult(unstakingResult);
 
       setIsVisibleConfirmationModal(false);
@@ -290,7 +300,14 @@ function HomePage() {
       setIsSuccessTransferModalVisible(true);
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setUserAsset(currentWalletAsset);
-      // form.resetFields();
+      setInputPasswordVisible(false);
+
+      // Reset values
+      form.resetFields();
+      setUndelegateFormValues({
+        validatorAddress: '',
+        undelegateAmount: '',
+      });
     } catch (e) {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
@@ -387,7 +404,7 @@ function HomePage() {
         <div>
           <ModalPopup
             isModalVisible={isConfirmationModalVisible}
-            handleCancel={handleCancel}
+            handleCancel={handleCancelConfirmationModal}
             handleOk={onConfirmUnDelegation}
             confirmationLoading={confirmLoading}
             footer={[
@@ -399,7 +416,7 @@ function HomePage() {
               >
                 Confirm
               </Button>,
-              <Button key="back" type="link" onClick={handleCancel}>
+              <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
                 Cancel
               </Button>,
             ]}
@@ -413,8 +430,35 @@ function HomePage() {
                 <div className="address">{`${undelegateFormValues?.validatorAddress}`}</div>
               </div>
               <div className="item">
-                <div className="label">Undelegate Amount</div>
-                <div>{`${undelegateFormValues.undelegateAmount}`}</div>
+                <Form
+                  form={form}
+                  {...layout}
+                  layout="vertical"
+                  requiredMark={false}
+                  initialValues={{
+                    undelegateAmount: undelegateFormValues.undelegateAmount,
+                  }}
+                >
+                  <Form.Item
+                    name="undelegateAmount"
+                    label="Undelegate Amount"
+                    validateFirst
+                    rules={[
+                      { required: true, message: 'Undelegate amount is required' },
+                      {
+                        pattern: /[^0]+/,
+                        message: 'Undelegate amount cannot be 0',
+                      },
+                      {
+                        max: Number(undelegateFormValues.undelegateAmount),
+                        type: 'number',
+                        message: 'Undelegate amount cannot be bigger than currently delegated',
+                      },
+                    ]}
+                  >
+                    <InputNumber />
+                  </Form.Item>
+                </Form>
               </div>
               <div>
                 <Typography.Paragraph type="warning">
