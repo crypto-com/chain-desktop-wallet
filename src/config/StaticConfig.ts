@@ -47,6 +47,7 @@ const CustomDevNet: WalletConfig = {
   enabled: true,
   name: 'CUSTOM DEVNET',
   network: {
+    defaultNodeUrl: '',
     chainId: 'test',
     addressPrefix: 'cro',
     bip44Path: { coinType: 394, account: 0 },
@@ -88,6 +89,7 @@ export const DefaultAsset = (network: Network) => {
 // This type is a copy of the Network type defined inside chain-js
 // The redefinition is a work-around on limitation to lib to export it
 export type Network = {
+  defaultNodeUrl: string;
   chainId: string;
   addressPrefix: string;
   bip44Path: { coinType: number; account: number };
