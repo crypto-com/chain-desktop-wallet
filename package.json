@@ -69,7 +69,7 @@
     "clean-builds": "rimraf build && rimraf dist",
     "electron:build": "yarn clean-builds && yarn build && yarn copy-macos-manifest && tsc -p electron && electron-builder --publish=never",
     "lint-staged": "lint-staged",
-    "lint:js": "eslint --cache --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
+    "lint:js": "eslint --cache --fix --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
     "prettier": "prettier --write '/src/**/*.{js,jsx,tsx,ts,less,md,json}'"
   },
   "gitHooks": {

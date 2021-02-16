@@ -106,6 +106,8 @@ const FormDelegationRequest = () => {
       setIsSuccessTransferModalVisible(true);
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setWalletAsset(currentWalletAsset);
+      setInputPasswordVisible(false);
+
       form.resetFields();
     } catch (e) {
       setIsVisibleConfirmationModal(false);
@@ -423,8 +425,9 @@ const FormWithdrawStakingReward = () => {
     }
   };
 
-  const handleCancel = () => {
+  const handleCancelConfirmationModal = () => {
     setIsVisibleConfirmationModal(false);
+    setInputPasswordVisible(false);
   };
 
   const closeSuccessModal = () => {
@@ -497,19 +500,14 @@ const FormWithdrawStakingReward = () => {
       <StakingTable />
       <ModalPopup
         isModalVisible={isConfirmationModalVisible}
-        handleCancel={handleCancel}
+        handleCancel={handleCancelConfirmationModal}
         handleOk={onConfirmTransfer}
         confirmationLoading={confirmLoading}
-        // button={
-        //   <Button type="primary" htmlType="submit">
-        //     Review
-        //   </Button>
-        // }
         footer={[
           <Button key="submit" type="primary" loading={confirmLoading} onClick={onConfirmTransfer}>
             Confirm
           </Button>,
-          <Button key="back" type="link" onClick={handleCancel}>
+          <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
             Cancel
           </Button>,
         ]}

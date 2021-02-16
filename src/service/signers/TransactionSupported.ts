@@ -21,3 +21,9 @@ export interface WithdrawStakingRewardUnsigned extends TransactionUnsigned {
   delegatorAddress: string;
   validatorAddress: string;
 }
+
+export interface UndelegateTransactionUnsigned extends TransactionUnsigned {
+  delegatorAddress: string;
+  validatorAddress: string;
+  amount: string;
+}
