@@ -58,6 +58,7 @@ export interface CustomConfigFormValue {
 
 export function reconstructCustomConfig(formValues: CustomConfigFormValue): WalletConfig {
   const customNetwork: Network = {
+    defaultNodeUrl: '',
     addressPrefix: formValues.addressPrefix,
     bip44Path: { account: 0, coinType: 0 },
     chainId: formValues.chainId,

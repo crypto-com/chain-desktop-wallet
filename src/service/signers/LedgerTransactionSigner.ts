@@ -7,6 +7,7 @@ import {
   DelegateTransactionUnsigned,
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
+  UndelegateTransactionUnsigned,
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
 import { ITransactionSigner } from './TransactionSigner';
@@ -124,6 +125,40 @@ export class LedgerTransactionSigner implements ITransactionSigner {
 
     const signableTx = rawTx
       .appendMessage(msgWithdrawDelegatorReward)
+      .addSigner({
+        publicKey: pubkey,
+        accountNumber: new Big(transaction.accountNumber),
+        accountSequence: new Big(transaction.accountSequence),
+        signMode: 0, //   LEGACY_AMINO_JSON = 0, DIRECT = 1,
+      })
+      .toSignable();
+
+    const bytesMessage: Bytes = signableTx.toSignDocument(0);
+
+    const signature = await this.signerProvider.sign(bytesMessage);
+    return signableTx
+      .setSignature(0, signature)
+      .toSigned()
+      .getHexEncoded();
+  }
+
+  public async signUndelegateTx(
+    transaction: UndelegateTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
+
+    const msgUndelegate = new cro.staking.MsgUndelegate({
+      delegatorAddress: transaction.delegatorAddress,
+      validatorAddress: transaction.validatorAddress,
+      amount: new cro.Coin(transaction.amount, Units.BASE),
+    });
+
+    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0)).toUint8Array();
+    const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
+
+    const signableTx = rawTx
+      .appendMessage(msgUndelegate)
       .addSigner({
         publicKey: pubkey,
         accountNumber: new Big(transaction.accountNumber),

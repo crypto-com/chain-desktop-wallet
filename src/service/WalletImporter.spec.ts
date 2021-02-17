@@ -44,6 +44,7 @@ describe('Testing WalletImporter', () => {
       derivationPath: "44'/245'/0'/0/0",
       name: 'Pystaport-Custom-Network',
       network: {
+        defaultNodeUrl: '',
         chainId: 'chainmaind',
         addressPrefix: 'pcro',
         validatorAddressPrefix: 'pcrocncl',
