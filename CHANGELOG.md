@@ -4,12 +4,19 @@ All notable changes to this project will be documented in this file.
 
 *Unreleased*
 
+## [v0.0.22] - 2021-02-17
+
+### Added Features
+
+- Added support for Ledger based wallet on creation
+- Introduced initial support for undelegation transactions, for both normal wallets and Ledger wallets
+
+
 ## [v0.0.21] - 2021-02-10
 
 ### Added Features
 
 - Provide staking validators option for users when trying to delegate funds
-
 
 ## [v0.0.20] - 2021-02-08
 
