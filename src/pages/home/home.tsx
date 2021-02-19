@@ -1,7 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Button, Form, InputNumber, Layout, Table, Tabs, Tag, Typography } from 'antd';
+import {
+  Alert,
+  Button,
+  Form,
+  InputNumber,
+  Layout,
+  notification,
+  Table,
+  Tabs,
+  Tag,
+  Typography,
+} from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import {
   scaledAmount,
@@ -9,7 +20,7 @@ import {
   scaledStakingBalance,
   UserAsset,
 } from '../../models/UserAsset';
-import { sessionState, validatorTopListState, walletAssetState } from '../../recoil/atom';
+import { sessionState, walletAssetState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
   BroadCastResult,
@@ -24,6 +35,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
 
 const { Text } = Typography;
 
@@ -106,11 +118,14 @@ function convertTransfers(
   });
 }
 
+const isWalletNotLive = (config: WalletConfig) => {
+  return config.nodeUrl === NOT_KNOWN_YET_VALUE && config.indexingUrl === NOT_KNOWN_YET_VALUE;
+};
+
 function HomePage() {
   const currentSession = useRecoilValue(sessionState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
-  const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const didMountRef = useRef(false);
 
@@ -124,6 +139,8 @@ function HomePage() {
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
 
+  const [hasShownNotLiveWallet, setHasShownNotLiveWallet] = useState(false);
+
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
 
@@ -131,6 +148,19 @@ function HomePage() {
     validatorAddress: '',
     undelegateAmount: '',
   });
+
+  const showWalletStateNotification = (config: WalletConfig) => {
+    setTimeout(async () => {
+      if (isWalletNotLive(config) && !hasShownNotLiveWallet) {
+        notification.warning({
+          message: `Wallet Info`,
+          description: `The wallet created will be limited only to display address because its ${config.name} configuration is not live yet`,
+          placement: 'topRight',
+          duration: 0,
+        });
+      }
+    }, 200);
+  };
 
   useEffect(() => {
     let unmounted = false;
@@ -145,19 +175,16 @@ function HomePage() {
         sessionData.wallet.identifier,
       );
 
-      const currentValidatorList =
-        validatorTopList.length === 0
-          ? await walletService.getLatestTopValidators()
-          : validatorTopList;
-
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
       if (!unmounted) {
+        showWalletStateNotification(currentSession.wallet.config);
+
         setDelegations(stakingTabularData);
         setTransfers(transferTabularData);
         setUserAsset(currentAsset);
-        setValidatorTopList(currentValidatorList);
+        setHasShownNotLiveWallet(true);
       }
     };
 
@@ -169,7 +196,7 @@ function HomePage() {
     return () => {
       unmounted = true;
     };
-  }, [delegations, userAsset, validatorTopList]);
+  }, [delegations, userAsset, hasShownNotLiveWallet]);
 
   const TransactionColumns = [
     {
@@ -461,10 +488,11 @@ function HomePage() {
                 </Form>
               </div>
               <div>
-                <Typography.Paragraph type="warning">
-                  Please do understand that undelegation is fully completed a number of days (~21)
-                  after the transaction has been broadcasted.
-                </Typography.Paragraph>
+                <Alert
+                  type="info"
+                  message="Please do understand that undelegation is fully completed a number of days (~21) after the transaction has been broadcasted."
+                  showIcon
+                />
               </div>
             </>
           </ModalPopup>
@@ -506,10 +534,10 @@ function HomePage() {
               broadcastResult?.code !== null &&
               broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
                 <div className="description">
-                  The transaction timed out but it will be included in the subsequent blocks
+                  The transaction timed out but it will be included in the subsequent blocks !
                 </div>
               ) : (
-                <div className="description">Your undelegation transaction was successful !</div>
+                <div className="description">Your undelegation transaction was successful</div>
               )}
             </>
           </SuccessModalPopup>

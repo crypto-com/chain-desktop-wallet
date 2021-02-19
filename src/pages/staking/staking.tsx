@@ -52,8 +52,33 @@ const FormDelegationRequest = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
-  const validatorTopList = useRecoilValue(validatorTopListState);
   const currentSession = useRecoilValue(sessionState);
+  const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    let unmounted = false;
+
+    const syncValidatorsData = async () => {
+      const currentValidatorList =
+        validatorTopList.length === 0
+          ? await walletService.getLatestTopValidators()
+          : validatorTopList;
+
+      if (!unmounted) {
+        setValidatorTopList(currentValidatorList);
+      }
+    };
+
+    if (!didMountRef.current) {
+      syncValidatorsData();
+      didMountRef.current = true;
+    }
+
+    return () => {
+      unmounted = true;
+    };
+  }, [validatorTopList]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);

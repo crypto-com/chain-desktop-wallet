@@ -6,6 +6,7 @@ import {
   DefaultAsset,
   DefaultWalletConfigs,
   Network,
+  NOT_KNOWN_YET_VALUE,
   WalletConfig,
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
@@ -196,11 +197,18 @@ class WalletService {
     return broadCastResult;
   }
 
-  public async syncAll(currentSession: Session) {
-    await Promise.all([
-      this.syncBalancesData(currentSession),
-      this.syncTransactionsData(currentSession),
-    ]);
+  public async syncAll(currentSession: Session | null = null) {
+    const session =
+      currentSession == null ? await this.storageService.retrieveCurrentSession() : currentSession;
+    if (!currentSession) {
+      return;
+    }
+    // Stop background fetch tasks in not ready wallets configurations
+    if (session.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+      return;
+    }
+
+    await Promise.all([this.syncBalancesData(session), this.syncTransactionsData(session)]);
   }
 
   public async sendStakingRewardWithdrawalTx(
@@ -504,6 +512,10 @@ class WalletService {
   }
 
   public async syncBalancesData(session: Session | null = null): Promise<void> {
+    // Stop background fetch tasks in not ready wallets configurations
+    if (session?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+      return Promise.resolve();
+    }
     try {
       await this.fetchAndUpdateBalances(session);
       return await this.loadAndSaveAssetPrices(session);
@@ -644,6 +656,9 @@ class WalletService {
   public async getLatestTopValidators(): Promise<ValidatorModel[]> {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
+      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+        return Promise.resolve([]);
+      }
       const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
       return nodeRpc.loadTopValidators();
     } catch (e) {
