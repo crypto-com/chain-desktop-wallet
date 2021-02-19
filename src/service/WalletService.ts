@@ -203,7 +203,7 @@ class WalletService {
     if (!currentSession) {
       return;
     }
-    // Stop background fetch tasks in not ready wallets configurations
+    // Stop background fetch tasks if the wallet configuration network is not live yet
     if (session.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return;
     }
@@ -512,7 +512,7 @@ class WalletService {
   }
 
   public async syncBalancesData(session: Session | null = null): Promise<void> {
-    // Stop background fetch tasks in not ready wallets configurations
+    // Stop background fetch tasks if the wallet configuration network is not live yet
     if (session?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve();
     }
