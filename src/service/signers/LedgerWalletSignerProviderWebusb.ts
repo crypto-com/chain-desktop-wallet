@@ -9,13 +9,13 @@ export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
     this.provider = new LedgerSignerWebusb();
   }
 
-  public async getPubKey(index: number): Promise<Bytes> {
-    const result = await this.provider.enable(index, 'cro'); // dummy value
+  public async getPubKey(index: number,showLedgerDisplay: boolean): Promise<Bytes> {
+    const result = await this.provider.enable(index, 'cro',showLedgerDisplay); // dummy value
     return result[1];
   }
 
-  public async getAddress(index: number, addressPrefix: string): Promise<string> {
-    const result = await this.provider.enable(index, addressPrefix);
+  public async getAddress(index: number, addressPrefix: string, showLedgerDisplay: boolean): Promise<string> {
+    const result = await this.provider.enable(index, addressPrefix, showLedgerDisplay);
     return result[0];
   }
 

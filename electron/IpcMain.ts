@@ -20,7 +20,8 @@ export class IpcMain {
       try {
         let index = arg.index;
         let addressPrefix = arg.addressPrefix;
-        const info = await this.provider.enable(index, addressPrefix);
+        let showLedgerDisplay = arg.showLedgerDisplay;
+        const info = await this.provider.enable(index, addressPrefix, showLedgerDisplay);
         let accountInfo = info[0];
         let accountPubKey = info[1].toUint8Array();
         ret = {

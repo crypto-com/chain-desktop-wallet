@@ -358,14 +358,15 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     props.setIsModalVisible(true);
     props.setLedgerConnected(false);
     let hwok = false;
-    const device = createLedgerDevice();
     try {
+      const device = createLedgerDevice();
       // check ledger device ok
-      await device.getPubKey(0);
+      await device.getPubKey(0, true);
       props.setLedgerConnected(true);
       hwok = true;
     } catch (e) {
       props.setLedgerConnected(false);
+      alert(`Cannot detect ledger device ${e}`);
     }
     await new Promise(resolve => {
       setTimeout(resolve, 2000);

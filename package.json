@@ -200,7 +200,7 @@
     "prettier": "1.19.1",
     "prompts": "2.4.0",
     "react-app-polyfill": "2.0.0",
-    "react-dev-utils": "11.0.1",
+    "react-dev-utils": "11.0.2",
     "resolve": "1.18.1",
     "resolve-url-loader": "3.1.2",
     "rimraf": "3.0.2",
@@ -272,6 +272,7 @@
   },
   "resolutions": {
     "@umijs/fabric/stylelint-config-rational-order/stylelint": "13.9.0",
-    "@umijs/fabric/stylelint-config-rational-order/stylelint/meow/yargs-parser": "20.2.4"
+    "@umijs/fabric/stylelint-config-rational-order/stylelint/meow/yargs-parser": "20.2.4",
+    "immer": "8.0.1"
   }
 }

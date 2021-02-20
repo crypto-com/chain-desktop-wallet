@@ -137,6 +137,9 @@ const FormSend = () => {
       onFinish={showPasswordInput}
       requiredMark={false}
     >
+      <div className="sender">Sender Address</div>
+      <div className="sender">{currentSession.wallet.address}</div>
+
       <Form.Item
         name="recipientAddress"
         label="Recipient Address"
