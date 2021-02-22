@@ -66,16 +66,16 @@ function ReceivePage() {
                 </MouseTooltip>
               </div>
             </CopyToClipboard>
-          </div>
-        </div>
-
-        {isLedger && (
-          <div className="ledger">
-            <Button type="primary" onClick={clickCheckLedger}>
-              Check Ledger
+            {!isLedger && (
+              <div className="ledger">
+                <Button type="primary" onClick={clickCheckLedger}>
+                  Check Ledger
             </Button>
+              </div>
+            )}
           </div>
-        )}
+
+        </div>
       </Content>
       <Footer />
     </Layout>
