@@ -66,11 +66,11 @@ function ReceivePage() {
                 </MouseTooltip>
               </div>
             </CopyToClipboard>
-            {!isLedger && (
+            {isLedger && (
               <div className="ledger">
                 <Button type="primary" onClick={clickCheckLedger}>
-                  Check Ledger
-            </Button>
+                  Verify address on Ledger
+                </Button>
               </div>
             )}
           </div>
