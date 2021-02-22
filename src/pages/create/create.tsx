@@ -366,6 +366,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       hwok = true;
     } catch (e) {
       props.setLedgerConnected(false);
+      // eslint-disable-next-line no-alert
       alert(`Cannot detect ledger device ${e}`);
     }
     await new Promise(resolve => {

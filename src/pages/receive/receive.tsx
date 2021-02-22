@@ -32,6 +32,7 @@ function ReceivePage() {
         await device.getAddress(0, addressprefix, true);
       }
     } catch (e) {
+      // eslint-disable-next-line no-alert
       alert(`Cannot detect ledger device ${e}`);
     }
   };
