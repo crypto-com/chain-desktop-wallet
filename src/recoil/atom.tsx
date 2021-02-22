@@ -60,6 +60,11 @@ const validatorTopListState = atom<ValidatorModel[]>({
   default: [],
 });
 
+const hasShownWarningOnWalletTypeState = atom<boolean>({
+  key: 'hasShownWarningOnWalletTypeState',
+  default: false,
+});
+
 export {
   walletIdentifierState,
   sessionState,
@@ -67,4 +72,5 @@ export {
   walletListState,
   walletTempBackupState,
   validatorTopListState,
+  hasShownWarningOnWalletTypeState,
 };

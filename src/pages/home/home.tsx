@@ -20,7 +20,11 @@ import {
   scaledStakingBalance,
   UserAsset,
 } from '../../models/UserAsset';
-import { sessionState, walletAssetState } from '../../recoil/atom';
+import {
+  hasShownWarningOnWalletTypeState,
+  sessionState,
+  walletAssetState,
+} from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
   BroadCastResult,
@@ -139,7 +143,9 @@ function HomePage() {
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
 
-  const [hasShownNotLiveWallet, setHasShownNotLiveWallet] = useState(false);
+  const [hasShownNotLiveWallet, setHasShownNotLiveWallet] = useRecoilState(
+    hasShownWarningOnWalletTypeState,
+  );
 
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
