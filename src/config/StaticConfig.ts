@@ -25,19 +25,20 @@ const TestNetConfig: WalletConfig = {
   explorerUrl: 'https://chain.crypto.com/explorer',
   indexingUrl: 'https://chain.crypto.com/explorer/api/v1/',
   nodeUrl: 'https://testnet-croeseid.crypto.com',
-  network: {
-    ...CroNetwork.Testnet,
-    chainId: 'testnet-croeseid-2',
-  },
+  network: CroNetwork.Testnet,
 };
 
+// This constant value is used when actual values are not known yet
+// For instance :
+export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
+
 const MainNetConfig: WalletConfig = {
-  enabled: false,
+  enabled: true,
   name: 'MAINNET',
   derivationPath: "m/44'/394'/0'/0/0",
-  nodeUrl: 'TO_BE_DECIDED',
-  explorerUrl: 'TO_BE_DECIDED',
-  indexingUrl: 'TO_BE_DECIDED',
+  nodeUrl: NOT_KNOWN_YET_VALUE,
+  explorerUrl: NOT_KNOWN_YET_VALUE,
+  indexingUrl: NOT_KNOWN_YET_VALUE,
   network: CroNetwork.Mainnet,
 };
 
