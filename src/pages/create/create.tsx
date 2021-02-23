@@ -363,11 +363,21 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       // check ledger device ok
       await device.getPubKey(0, true);
       props.setLedgerConnected(true);
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
       props.setIsModalVisible(false);
 
       hwok = true;
     } catch (e) {
       props.setLedgerConnected(false);
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+      props.setIsModalVisible(false);
+
       notification.error({
         message: `Cannot detect any Ledger device`,
         description: `Please connect with your Ledger device`,
