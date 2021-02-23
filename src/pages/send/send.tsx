@@ -137,6 +137,9 @@ const FormSend = () => {
       onFinish={showPasswordInput}
       requiredMark={false}
     >
+      {/* <div className="sender">Sender Address</div> */}
+      {/* <div className="sender">{currentSession.wallet.address}</div> */}
+
       <Form.Item
         name="recipientAddress"
         label="Recipient Address"
@@ -219,6 +222,10 @@ const FormSend = () => {
             <div className="title">Confirm Transaction</div>
             <div className="description">Please review the below information. </div>
             <div className="item">
+              <div className="label">Sender Address</div>
+              <div className="address">{`${currentSession.wallet.address}`}</div>
+            </div>
+            <div className="item">
               <div className="label">To Address</div>
               <div className="address">{`${formValues?.recipientAddress}`}</div>
             </div>
@@ -228,19 +235,18 @@ const FormSend = () => {
             </div>
             <div className="item">
               <div className="label">Transaction Fee</div>
-              <div>{`${getNormalScaleAmount(String(FIXED_DEFAULT_FEE), walletAsset)} ${
-                walletAsset.symbol
-              }`}</div>
+              <div>{`${getNormalScaleAmount(String(FIXED_DEFAULT_FEE), walletAsset)} ${walletAsset.symbol
+                }`}</div>
             </div>
             <div className="item">
               <div className="label">Memo</div>
               {formValues?.memo !== undefined &&
-              formValues?.memo !== null &&
-              formValues.memo !== '' ? (
-                <div>{`${formValues?.memo}`}</div>
-              ) : (
-                <div>--</div>
-              )}
+                formValues?.memo !== null &&
+                formValues.memo !== '' ? (
+                  <div>{`${formValues?.memo}`}</div>
+                ) : (
+                  <div>--</div>
+                )}
             </div>
           </>
         </ModalPopup>
@@ -280,14 +286,14 @@ const FormSend = () => {
         >
           <>
             {broadcastResult?.code !== undefined &&
-            broadcastResult?.code !== null &&
-            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div className="description">
-                The transaction timed out but it will be included in the subsequent blocks
-              </div>
-            ) : (
-              <div className="description">The transaction was broadcasted successfully!</div>
-            )}
+              broadcastResult?.code !== null &&
+              broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+                <div className="description">
+                  The transaction timed out but it will be included in the subsequent blocks
+                </div>
+              ) : (
+                <div className="description">The transaction was broadcasted successfully!</div>
+              )}
             {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
           </>
         </SuccessModalPopup>

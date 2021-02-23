@@ -9,13 +9,17 @@ export class LedgerWalletSignerProviderNative implements ISignerProvider {
     this.ipcRender = new IpcRender();
   }
 
-  public async getPubKey(index: number): Promise<Bytes> {
-    const pubkey = await this.ipcRender.getPubKey(index);
+  public async getPubKey(index: number, showLedgerDisplay: boolean): Promise<Bytes> {
+    const pubkey = await this.ipcRender.getPubKey(index, showLedgerDisplay);
     return pubkey;
   }
 
-  public async getAddress(index: number, addressPrefix: string): Promise<string> {
-    const address = await this.ipcRender.getAddress(index, addressPrefix);
+  public async getAddress(
+    index: number,
+    addressPrefix: string,
+    showLedgerDisplay: boolean,
+  ): Promise<string> {
+    const address = await this.ipcRender.getAddress(index, addressPrefix, showLedgerDisplay);
     return address;
   }
 

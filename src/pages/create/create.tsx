@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { Button, Form, Input, Select, Checkbox } from 'antd';
+import { Button, Form, Input, Select, Checkbox, notification } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { walletIdentifierState, walletTempBackupState } from '../../recoil/atom';
 import './create.less';
@@ -358,19 +358,36 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     props.setIsModalVisible(true);
     props.setLedgerConnected(false);
     let hwok = false;
-    const device = createLedgerDevice();
     try {
+      const device = createLedgerDevice();
       // check ledger device ok
-      await device.getPubKey(0);
+      await device.getPubKey(0, true);
       props.setLedgerConnected(true);
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+      props.setIsModalVisible(false);
+
       hwok = true;
     } catch (e) {
       props.setLedgerConnected(false);
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+      props.setIsModalVisible(false);
+
+      notification.error({
+        message: `Cannot detect any Ledger device`,
+        description: `Please connect with your Ledger device`,
+        placement: 'topRight',
+        duration: 3,
+      });
     }
     await new Promise(resolve => {
       setTimeout(resolve, 2000);
     });
-    props.setIsModalVisible(false);
     if (hwok) {
       // proceed
       onWalletCreateFinishCore();

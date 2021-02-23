@@ -49,7 +49,11 @@ export class LedgerSigner {
   }
 
   // tuple : address, pubkey
-  public async enable(index: number, addressPrefix: string): Promise<[string, Bytes]> {
+  public async enable(
+    index: number,
+    addressPrefix: string,
+    showLedgerDisplay: boolean /* display address in ledger */,
+  ): Promise<[string, Bytes]> {
     await this.createTransport();
 
     let response = await this.app.getVersion();
@@ -61,8 +65,11 @@ export class LedgerSigner {
     // for string: `m/44'/394'/${this.account}'/0/${index}`;
     this.path = [44, 394, this.account, 0, index];
 
-    response = await this.app.getAddressAndPubKey(this.path, addressPrefix);
-
+    if (showLedgerDisplay) {
+      response = await this.app.showAddressAndPubKey(this.path, addressPrefix);
+    } else {
+      response = await this.app.getAddressAndPubKey(this.path, addressPrefix);
+    }
     if (response.error_message !== 'No errors') {
       throw new Error(`[${response.error_message}] ${response.error_message}`);
     }
