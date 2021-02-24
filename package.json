@@ -10,9 +10,9 @@
   "private": true,
   "dependencies": {
     "@ant-design/icons": "^4.3.0",
-    "@cosmjs/stargate": "^0.24.0-alpha.22",
     "@babel/helper-builder-react-jsx": "^7.10.4",
     "@babel/helper-builder-react-jsx-experimental": "^7.12.11",
+    "@cosmjs/stargate": "^0.24.0-alpha.22",
     "@crypto-com/chain-jslib": "^0.0.10",
     "@ledgerhq/hw-transport-node-hid": "^5.41.0",
     "@ledgerhq/hw-transport-webhid": "^5.38.0",
@@ -28,7 +28,9 @@
     "@types/react-router-dom": "^5.1.6",
     "antd": "^4.9.1",
     "axios": "^0.21.1",
+    "bech32": "^1.1.4",
     "bfj": "^7.0.2",
+    "big.js": "^6.0.3",
     "camelcase": "^6.1.0",
     "copyfiles": "^2.4.1",
     "crypto-js": "^4.0.0",
@@ -53,8 +55,7 @@
     "typescript": "4.0.5",
     "url-loader": "4.1.1",
     "usb": "^1.6.3",
-    "zxcvbn": "^4.4.2",
-    "bech32": "^1.1.4"
+    "zxcvbn": "^4.4.2"
   },
   "scripts": {
     "start": "node scripts/start.js",
