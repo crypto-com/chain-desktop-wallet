@@ -267,6 +267,10 @@ const FormDelegationRequest = () => {
             <div className="title">Confirm Transaction</div>
             <div className="description">Please review the below information. </div>
             <div className="item">
+              <div className="label">Sender Address</div>
+              <div className="address">{`${currentSession.wallet.address}`}</div>
+            </div>
+            <div className="item">
               <div className="label">Delegating to Validator</div>
               <div className="address">{`${formValues?.validatorAddress}`}</div>
             </div>
@@ -275,15 +279,15 @@ const FormDelegationRequest = () => {
               <div>{`${formValues?.amount} ${walletAsset.symbol}`}</div>
             </div>
             {formValues?.memo !== undefined &&
-            formValues?.memo !== null &&
-            formValues.memo !== '' ? (
-              <div className="item">
-                <div className="label">Memo</div>
-                <div>{`${formValues?.memo}`}</div>
-              </div>
-            ) : (
-              <div />
-            )}
+              formValues?.memo !== null &&
+              formValues.memo !== '' ? (
+                <div className="item">
+                  <div className="label">Memo</div>
+                  <div>{`${formValues?.memo}`}</div>
+                </div>
+              ) : (
+                <div />
+              )}
           </>
         </ModalPopup>
         <PasswordFormModal
@@ -320,14 +324,14 @@ const FormDelegationRequest = () => {
         >
           <>
             {broadcastResult?.code !== undefined &&
-            broadcastResult?.code !== null &&
-            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div className="description">
-                The transaction timed out but it will be included in the subsequent blocks
-              </div>
-            ) : (
-              <div className="description">Your delegation transaction was successful !</div>
-            )}
+              broadcastResult?.code !== null &&
+              broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+                <div className="description">
+                  The transaction timed out but it will be included in the subsequent blocks
+                </div>
+              ) : (
+                <div className="description">Your delegation transaction was successful !</div>
+              )}
             {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
           </>
         </SuccessModalPopup>
@@ -374,9 +378,8 @@ const FormWithdrawStakingReward = () => {
       .map(reward => {
         const rewardData: RewardsTabularData = {
           key: `${reward.validatorAddress}${reward.amount}`,
-          rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${
-            currentAsset.symbol
-          }`,
+          rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${currentAsset.symbol
+            }`,
           validatorAddress: reward.validatorAddress,
         };
         return rewardData;
@@ -542,6 +545,10 @@ const FormWithdrawStakingReward = () => {
           <div className="title">Confirm Transaction</div>
           <div className="description">Please review the below information. </div>
           <div className="item">
+            <div className="label">Sender Address</div>
+            <div className="address">{`${currentSession.wallet.address}`}</div>
+          </div>
+          <div className="item">
             <div className="label">Withdraw Reward From Validator</div>
             <div className="address">{`${withdrawValues?.validatorAddress}`}</div>
           </div>
@@ -585,16 +592,16 @@ const FormWithdrawStakingReward = () => {
       >
         <>
           {broadcastResult?.code !== undefined &&
-          broadcastResult?.code !== null &&
-          broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">
-              The transaction timed out but it will be included in the subsequent blocks
-            </div>
-          ) : (
-            <div className="description">
-              Your rewards withdrawal transaction was broadcasted successfully !
-            </div>
-          )}
+            broadcastResult?.code !== null &&
+            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+              <div className="description">
+                The transaction timed out but it will be included in the subsequent blocks
+              </div>
+            ) : (
+              <div className="description">
+                Your rewards withdrawal transaction was broadcasted successfully !
+              </div>
+            )}
           {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
         </>
       </SuccessModalPopup>

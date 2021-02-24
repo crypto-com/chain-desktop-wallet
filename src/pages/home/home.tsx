@@ -459,6 +459,10 @@ function HomePage() {
               <div className="title">Confirm Undelegate Transaction</div>
               <div className="description">Please review the below information.</div>
               <div className="item">
+                <div className="label">Sender Address</div>
+                <div className="address">{`${currentSession.wallet.address}`}</div>
+              </div>
+              <div className="item">
                 <div className="label">Undelegate From Validator</div>
                 <div className="address">{`${undelegateFormValues?.validatorAddress}`}</div>
               </div>
@@ -537,14 +541,14 @@ function HomePage() {
           >
             <>
               {broadcastResult?.code !== undefined &&
-              broadcastResult?.code !== null &&
-              broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-                <div className="description">
-                  The transaction timed out but it will be included in the subsequent blocks !
-                </div>
-              ) : (
-                <div className="description">Your undelegation transaction was successful</div>
-              )}
+                broadcastResult?.code !== null &&
+                broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+                  <div className="description">
+                    The transaction timed out but it will be included in the subsequent blocks !
+                  </div>
+                ) : (
+                  <div className="description">Your undelegation transaction was successful</div>
+                )}
             </>
           </SuccessModalPopup>
           <ErrorModalPopup
