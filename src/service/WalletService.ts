@@ -200,7 +200,8 @@ class WalletService {
   public async syncAll(currentSession: Session | null = null) {
     const session =
       currentSession == null ? await this.storageService.retrieveCurrentSession() : currentSession;
-    if (!currentSession) {
+
+    if (!session) {
       return;
     }
     // Stop background fetch tasks if the wallet configuration network is not live yet
