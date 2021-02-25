@@ -197,19 +197,22 @@ class WalletService {
     return broadCastResult;
   }
 
-  public async syncAll(currentSession: Session | null = null) {
-    const session =
-      currentSession == null ? await this.storageService.retrieveCurrentSession() : currentSession;
+  public async syncAll(session: Session | null = null) {
+    const currentSession =
+      session == null ? await this.storageService.retrieveCurrentSession() : session;
 
-    if (!session) {
+    if (!currentSession) {
       return;
     }
     // Stop background fetch tasks if the wallet configuration network is not live yet
-    if (session.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+    if (currentSession.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return;
     }
 
-    await Promise.all([this.syncBalancesData(session), this.syncTransactionsData(session)]);
+    await Promise.all([
+      this.syncBalancesData(currentSession),
+      this.syncTransactionsData(currentSession),
+    ]);
   }
 
   public async sendStakingRewardWithdrawalTx(

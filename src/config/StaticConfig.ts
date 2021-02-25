@@ -2,6 +2,7 @@ import { CroNetwork } from '@crypto-com/chain-jslib/lib/dist/core/cro';
 import { getRandomId } from '../crypto/RandomGen';
 
 export const APP_DB_NAMESPACE = 'data-store';
+export const MARKET_API_BASE_URL = 'https://crypto.org/api';
 
 export const CosmosPorts = {
   Main: ':26657',
