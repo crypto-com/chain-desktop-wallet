@@ -1,6 +1,9 @@
+import { Big } from 'big.js';
 import { scaledBalance, UserAsset } from '../models/UserAsset';
-import { Big } from './ChainJsLib';
 import { FIXED_DEFAULT_FEE } from '../config/StaticConfig';
+
+// Here we are telling the library to NOT DO any rounding, either up or down
+Big.RM = 0;
 
 export function fromScientificNotation(value) {
   return Big(value).toFixed();
