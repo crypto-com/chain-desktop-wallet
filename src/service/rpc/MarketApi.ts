@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import { AssetMarketPrice } from '../../models/UserAsset';
 import { CroPrice } from './CroMarketApiModels';
+import { MARKET_API_BASE_URL } from '../../config/StaticConfig';
 
 export interface IMarketApi {
   getAssetPrice(assetSymbol: string, currency: string): Promise<AssetMarketPrice>;
@@ -11,7 +12,7 @@ export class CroMarketApi implements IMarketApi {
 
   constructor() {
     this.axiosClient = axios.create({
-      baseURL: 'https://chain.crypto.com/api',
+      baseURL: MARKET_API_BASE_URL,
     });
   }
 
