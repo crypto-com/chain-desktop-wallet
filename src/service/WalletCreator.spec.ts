@@ -45,6 +45,7 @@ describe('Testing Wallet Creation', () => {
       derivationPath: "44'/245'/0'/0/0",
       name: 'Pystaport-Custom-Network',
       network: {
+        defaultNodeUrl: '',
         chainId: 'pystaportnet',
         addressPrefix: 'pcro',
         validatorAddressPrefix: 'pcrocncl',

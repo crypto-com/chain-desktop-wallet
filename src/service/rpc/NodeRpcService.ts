@@ -63,7 +63,7 @@ export class NodeRpcService implements INodeRpcService {
       const broadcastResponse = await this.client.broadcastTx(signedBytes);
       if (isBroadcastTxFailure(broadcastResponse)) {
         // noinspection ExceptionCaughtLocallyJS
-        throw new TypeError(`Transaction failed: ${broadcastResponse}`);
+        throw new TypeError(`Transaction failed: ${JSON.stringify(broadcastResponse)}`);
       }
       return {
         transactionHash: broadcastResponse.transactionHash,
@@ -90,7 +90,10 @@ export class NodeRpcService implements INodeRpcService {
     let totalSum = 0;
     const delegationTransactionList: Array<StakingTransactionData> = [];
     delegationResponses
-      .filter(delegation => delegation.balance.denom === assetSymbol)
+      .filter(
+        delegation =>
+          delegation.balance.denom === assetSymbol && Number(delegation.balance.amount) > 0,
+      )
       .forEach(delegation => {
         totalSum += Number(delegation.balance.amount);
         delegationTransactionList.push({

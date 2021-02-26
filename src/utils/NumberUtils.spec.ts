@@ -30,8 +30,10 @@ describe('Testing Number utils', () => {
     expect(getNormalScaleAmount('5000', asset)).to.eq('0.00005');
     expect(getNormalScaleAmount('524005000', asset)).to.eq('5.24005');
 
-    expect(getUINormalScaleAmount('2458999245545', asset.decimals)).to.eq('24589.9925');
-    expect(getUINormalScaleAmount('334005045600', asset.decimals)).to.eq('3340.0505');
+    expect(getUINormalScaleAmount('2458999245545', asset.decimals)).to.eq('24589.9924');
+    expect(getUINormalScaleAmount('334005045600', asset.decimals)).to.eq('3340.0504');
+
+    expect(getUINormalScaleAmount('499995000', asset.decimals)).to.eq('4.9999');
   });
 
   it('Test conversion from scientific notation', () => {

@@ -2,6 +2,7 @@ import { CroNetwork } from '@crypto-com/chain-jslib/lib/dist/core/cro';
 import { getRandomId } from '../crypto/RandomGen';
 
 export const APP_DB_NAMESPACE = 'data-store';
+export const MARKET_API_BASE_URL = 'https://crypto.org/api';
 
 export const CosmosPorts = {
   Main: ':26657',
@@ -22,37 +23,39 @@ const TestNetConfig: WalletConfig = {
   enabled: true,
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",
-  explorerUrl: 'https://chain.crypto.com/explorer',
-  indexingUrl: 'https://chain.crypto.com/explorer/api/v1/',
+  explorerUrl: 'https://crypto.org/explorer',
+  indexingUrl: 'https://crypto.org/explorer/api/v1/',
   nodeUrl: 'https://testnet-croeseid.crypto.com',
-  network: {
-    ...CroNetwork.Testnet,
-    chainId: 'testnet-croeseid-2',
-  },
+  network: CroNetwork.Testnet,
 };
 
+// This constant value is used when actual values are not known yet
+// For instance :
+export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
+
 const MainNetConfig: WalletConfig = {
-  enabled: false,
+  enabled: true,
   name: 'MAINNET',
   derivationPath: "m/44'/394'/0'/0/0",
-  nodeUrl: 'TO_BE_DECIDED',
-  explorerUrl: 'TO_BE_DECIDED',
-  indexingUrl: 'TO_BE_DECIDED',
+  nodeUrl: NOT_KNOWN_YET_VALUE,
+  explorerUrl: NOT_KNOWN_YET_VALUE,
+  indexingUrl: NOT_KNOWN_YET_VALUE,
   network: CroNetwork.Mainnet,
 };
 
 // Supposed to be fully customizable by the user when it will be supported
 const CustomDevNet: WalletConfig = {
-  derivationPath: '',
+  derivationPath: "m/44'/394'/0'/0/0",
   enabled: true,
   name: 'CUSTOM DEVNET',
   network: {
-    chainId: '',
-    addressPrefix: '',
-    bip44Path: { coinType: 0, account: 0 },
-    validatorPubKeyPrefix: '',
-    validatorAddressPrefix: '',
-    coin: { baseDenom: '', croDenom: '' },
+    defaultNodeUrl: '',
+    chainId: 'test',
+    addressPrefix: 'cro',
+    bip44Path: { coinType: 394, account: 0 },
+    validatorPubKeyPrefix: 'crocnclpub',
+    validatorAddressPrefix: 'crocncl',
+    coin: { baseDenom: 'basecro', croDenom: 'cro' },
   },
   nodeUrl: '',
   indexingUrl: '',
@@ -88,6 +91,7 @@ export const DefaultAsset = (network: Network) => {
 // This type is a copy of the Network type defined inside chain-js
 // The redefinition is a work-around on limitation to lib to export it
 export type Network = {
+  defaultNodeUrl: string;
   chainId: string;
   addressPrefix: string;
   bip44Path: { coinType: number; account: number };

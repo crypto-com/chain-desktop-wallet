@@ -5,7 +5,7 @@ export class Wallet {
 
   public readonly name: string;
 
-  public readonly address: string;
+  public address: string;
 
   public encryptedPhrase: string;
 
@@ -17,6 +17,8 @@ export class Wallet {
   // This will be set to true once the wallet phrase has been encrypted
   public hasBeenEncrypted: boolean = false;
 
+  public readonly walletType: string;
+
   constructor(
     id: string,
     name: string,
@@ -24,6 +26,7 @@ export class Wallet {
     config: WalletConfig,
     encryptedPhrase: string,
     hasBeenEncrypted: boolean = false,
+    walletType: string,
   ) {
     this.identifier = id;
     this.name = name;
@@ -31,6 +34,7 @@ export class Wallet {
     this.config = config;
     this.encryptedPhrase = encryptedPhrase;
     this.hasBeenEncrypted = hasBeenEncrypted;
+    this.walletType = walletType;
   }
 }
 
@@ -54,6 +58,7 @@ export interface CustomConfigFormValue {
 
 export function reconstructCustomConfig(formValues: CustomConfigFormValue): WalletConfig {
   const customNetwork: Network = {
+    defaultNodeUrl: '',
     addressPrefix: formValues.addressPrefix,
     bip44Path: { account: 0, coinType: 0 },
     chainId: formValues.chainId,

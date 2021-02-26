@@ -16,6 +16,10 @@ jobs:
         os: [macos-latest, ubuntu-latest, windows-latest]
 
     steps:
+      - name: setup dependencies
+        if: startsWith(matrix.os, 'ubuntu')
+        run: sudo apt-get update && sudo apt-get install -y libusb-1.0-0-dev  libudev-dev
+
       - name: Check out Git repository
         uses: actions/checkout@v1
 
@@ -31,7 +35,6 @@ jobs:
       - name: Build App
         uses: samuelmeuli/action-electron-builder@v1
         with:
-
           build_script_name: electron:pre-build
 
           # GitHub token, automatically provided to the action

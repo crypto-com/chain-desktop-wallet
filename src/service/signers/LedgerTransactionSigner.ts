@@ -1,6 +1,7 @@
+import { Bytes } from '@crypto-com/chain-jslib/lib/dist/utils/bytes/bytes';
 import sdk from '@crypto-com/chain-jslib';
-import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
-import { FIXED_DEFAULT_FEE, WalletConfig } from '../../config/StaticConfig';
+import { Big, Units } from '../../utils/ChainJsLib';
+import { WalletConfig, FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 import {
   TransactionUnsigned,
   DelegateTransactionUnsigned,
@@ -8,33 +9,22 @@ import {
   WithdrawStakingRewardUnsigned,
   UndelegateTransactionUnsigned,
 } from './TransactionSupported';
+import { ISignerProvider } from './SignerProvider';
+import { ITransactionSigner } from './TransactionSigner';
 
-export interface ITransactionSigner {
-  signTransfer(transaction: TransferTransactionUnsigned, phrase: string): Promise<string>;
-
-  signDelegateTx(transaction: DelegateTransactionUnsigned, phrase: string): Promise<string>;
-
-  signWithdrawStakingRewardTx(
-    transaction: WithdrawStakingRewardUnsigned,
-    phrase: string,
-  ): Promise<string>;
-}
-
-export class TransactionSigner implements ITransactionSigner {
+export class LedgerTransactionSigner implements ITransactionSigner {
   public readonly config: WalletConfig;
 
-  constructor(config: WalletConfig) {
+  public readonly signerProvider: ISignerProvider;
+
+  constructor(config: WalletConfig, signerProvider: ISignerProvider) {
     this.config = config;
+    this.signerProvider = signerProvider;
   }
 
   public getTransactionInfo(phrase: string, transaction: TransactionUnsigned) {
     this.setCustomFee(transaction);
     const cro = sdk.CroSDK({ network: this.config.network });
-
-    const importedHDKey = HDKey.fromMnemonic(phrase);
-    const privateKey = importedHDKey.derivePrivKey(this.config.derivationPath);
-    const keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
-
     const rawTx = new cro.RawTransaction();
     rawTx.setMemo(transaction.memo);
 
@@ -43,7 +33,7 @@ export class TransactionSigner implements ITransactionSigner {
       rawTx.setFee(fee);
     }
 
-    return { cro, keyPair, rawTx };
+    return { cro, rawTx };
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -56,7 +46,7 @@ export class TransactionSigner implements ITransactionSigner {
     transaction: TransferTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
-    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
 
     const msgSend = new cro.bank.MsgSend({
       fromAddress: transaction.fromAddress,
@@ -64,17 +54,23 @@ export class TransactionSigner implements ITransactionSigner {
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
+    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0, false)).toUint8Array();
+    const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
     const signableTx = rawTx
       .appendMessage(msgSend)
       .addSigner({
-        publicKey: keyPair.getPubKey(),
+        publicKey: pubkey,
         accountNumber: new Big(transaction.accountNumber),
         accountSequence: new Big(transaction.accountSequence),
+        signMode: 0, //   LEGACY_AMINO_JSON = 0, DIRECT = 1,
       })
       .toSignable();
 
+    const bytesMessage: Bytes = signableTx.toSignDocument(0);
+    const signature = await this.signerProvider.sign(bytesMessage);
+
     return signableTx
-      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
+      .setSignature(0, signature)
       .toSigned()
       .getHexEncoded();
   }
@@ -83,7 +79,7 @@ export class TransactionSigner implements ITransactionSigner {
     transaction: DelegateTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
-    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
 
     const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
     const msgDelegate = new cro.staking.MsgDelegate({
@@ -92,17 +88,23 @@ export class TransactionSigner implements ITransactionSigner {
       amount: delegateAmount,
     });
 
+    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0, false)).toUint8Array();
+    const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
     const signableTx = rawTx
       .appendMessage(msgDelegate)
       .addSigner({
-        publicKey: keyPair.getPubKey(),
+        publicKey: pubkey,
         accountNumber: new Big(transaction.accountNumber),
         accountSequence: new Big(transaction.accountSequence),
+        signMode: 0, //   LEGACY_AMINO_JSON = 0, DIRECT = 1,
       })
       .toSignable();
 
+    const bytesMessage: Bytes = signableTx.toSignDocument(0);
+    const signature = await this.signerProvider.sign(bytesMessage);
+
     return signableTx
-      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
+      .setSignature(0, signature)
       .toSigned()
       .getHexEncoded();
   }
@@ -111,24 +113,31 @@ export class TransactionSigner implements ITransactionSigner {
     transaction: WithdrawStakingRewardUnsigned,
     phrase: string,
   ): Promise<string> {
-    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
 
     const msgWithdrawDelegatorReward = new cro.distribution.MsgWithdrawDelegatorReward({
       delegatorAddress: transaction.delegatorAddress,
       validatorAddress: transaction.validatorAddress,
     });
 
+    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0,false)).toUint8Array();
+    const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
+
     const signableTx = rawTx
       .appendMessage(msgWithdrawDelegatorReward)
       .addSigner({
-        publicKey: keyPair.getPubKey(),
+        publicKey: pubkey,
         accountNumber: new Big(transaction.accountNumber),
         accountSequence: new Big(transaction.accountSequence),
+        signMode: 0, //   LEGACY_AMINO_JSON = 0, DIRECT = 1,
       })
       .toSignable();
 
+    const bytesMessage: Bytes = signableTx.toSignDocument(0);
+
+    const signature = await this.signerProvider.sign(bytesMessage);
     return signableTx
-      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
+      .setSignature(0, signature)
       .toSigned()
       .getHexEncoded();
   }
@@ -137,7 +146,7 @@ export class TransactionSigner implements ITransactionSigner {
     transaction: UndelegateTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
-    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
 
     const msgUndelegate = new cro.staking.MsgUndelegate({
       delegatorAddress: transaction.delegatorAddress,
@@ -145,17 +154,24 @@ export class TransactionSigner implements ITransactionSigner {
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
+    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0,false)).toUint8Array();
+    const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
+
     const signableTx = rawTx
       .appendMessage(msgUndelegate)
       .addSigner({
-        publicKey: keyPair.getPubKey(),
+        publicKey: pubkey,
         accountNumber: new Big(transaction.accountNumber),
         accountSequence: new Big(transaction.accountSequence),
+        signMode: 0, //   LEGACY_AMINO_JSON = 0, DIRECT = 1,
       })
       .toSignable();
 
+    const bytesMessage: Bytes = signableTx.toSignDocument(0);
+
+    const signature = await this.signerProvider.sign(bytesMessage);
     return signableTx
-      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
+      .setSignature(0, signature)
       .toSigned()
       .getHexEncoded();
   }
