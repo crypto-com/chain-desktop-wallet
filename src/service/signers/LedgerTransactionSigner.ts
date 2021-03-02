@@ -22,7 +22,7 @@ export class LedgerTransactionSigner implements ITransactionSigner {
     this.signerProvider = signerProvider;
   }
 
-  public getTransactionInfo(phrase: string, transaction: TransactionUnsigned) {
+  public getTransactionInfo(_phrase: string, transaction: TransactionUnsigned) {
     this.setCustomFee(transaction);
     const cro = sdk.CroSDK({ network: this.config.network });
     const rawTx = new cro.RawTransaction();
@@ -120,7 +120,7 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       validatorAddress: transaction.validatorAddress,
     });
 
-    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0,false)).toUint8Array();
+    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0, false)).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
 
     const signableTx = rawTx
@@ -154,7 +154,7 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0,false)).toUint8Array();
+    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0, false)).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
 
     const signableTx = rawTx
