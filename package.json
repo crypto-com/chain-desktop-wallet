@@ -21,6 +21,7 @@
     "@types/crypto-js": "^4.0.1",
     "@types/electron": "^1.6.10",
     "@types/electron-devtools-installer": "^2.2.0",
+    "@types/ledgerhq__hw-transport-node-hid": "^4.22.2",
     "@types/long": "^4.0.1",
     "@types/node": "^14.14.10",
     "@types/react": "^17.0.0",
