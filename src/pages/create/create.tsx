@@ -361,7 +361,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     try {
       const device = createLedgerDevice();
       // check ledger device ok
-      await device.getPubKey(0, true);
+      await device.getPubKey(0, false);
       props.setLedgerConnected(true);
 
       await new Promise(resolve => {
