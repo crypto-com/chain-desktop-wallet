@@ -225,7 +225,7 @@ async function main() {
   const accountNumber =  await nodeRpc.fetchAccountNumber(ledgerAddress);
   console.log("get account number ", accountNumber);
   const accountSequence = await nodeRpc.loadSequenceNumber(ledgerAddress);
-  console.log("get accountSequence ", accountSequence);
+  console.log("get account sequence ", accountSequence);
   const signedTxHex = await signer.signTransfer(
       {
         accountNumber: accountNumber,
