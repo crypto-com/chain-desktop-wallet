@@ -33,7 +33,7 @@ function runCmd(cmd) {
   });
 }
 
-export class LedgerSignerZemu extends LedgerSigner {
+class LedgerSignerZemu extends LedgerSigner {
   public sim: any;
   public click_times: number;
 
@@ -72,8 +72,6 @@ export class LedgerSignerZemu extends LedgerSigner {
         runCmd(cmd);
         if (i === 3) {
           await Zemu.default.sleep(3000);
-          console.log("right click");
-          await this.sim.clickRight();
           console.log("right click");
           await this.sim.clickRight();
           console.log("right click");
@@ -189,13 +187,13 @@ export class LedgerWalletSignerProviderZemu implements ISignerProvider {
   }
 
   public async getPubKey(index: number): Promise<Bytes> {
-    const result = await this.provider.enable(index, 'cro', true); // dummy value
+    const result = await this.provider.enable(index, 'cro', false); // dummy value
     await this.provider.closeTransport();
     return result[1];
   }
 
   public async getAddress(index: number, addressPrefix: string): Promise<string> {
-    const result = await this.provider.enable(index, addressPrefix, true);
+    const result = await this.provider.enable(index, addressPrefix, false);
     await this.provider.closeTransport();
     return result[0];
   }
