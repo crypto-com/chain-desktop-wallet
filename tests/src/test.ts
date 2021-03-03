@@ -10,6 +10,7 @@ import {NodeRpcService} from "../../src/service/rpc/NodeRpcService";
 const { exec } = require("child_process");
 import chai from "chai";
 
+const SLEEP_MS = 30000;
 const APP_PATH = path.resolve(`./app/bin/app.elf`);
 const seed = 'equip will roof matter pink blind book anxiety banner elbow sun young';
 const SIM_OPTIONS = {
@@ -54,7 +55,7 @@ class LedgerSignerZemu extends LedgerSigner {
       this.app = new CosmosApp(this.sim.getTransport());
       console.log("start zemu grpc server");
       this.sim.startgrpcServer("localhost", "3002");
-      await Zemu.default.sleep(5000);
+      await Zemu.default.sleep(SLEEP_MS);
     }
     // note: chain-maind need support zemu, so build it from `make build ledger=ZEMU` in chain-maind src
     const cmd1 = "chain-maind init testnode --chain-id test -o";
@@ -67,11 +68,11 @@ class LedgerSignerZemu extends LedgerSigner {
     const commands = [cmd1, cmd2, cmd3, cmd4, cmd5, cmd6, cmd7];
     let i = 0;
     for (let cmd of commands) {
-        await Zemu.default.sleep(3000);
+        await Zemu.default.sleep(SLEEP_MS);
         i += 1;
         runCmd(cmd);
         if (i === 3) {
-          await Zemu.default.sleep(3000);
+          await Zemu.default.sleep(SLEEP_MS);
           console.log("right click");
           await this.sim.clickRight();
           console.log("right click");
@@ -86,8 +87,7 @@ class LedgerSignerZemu extends LedgerSigner {
     this.sim.stopgrpcServer();
     console.log("start chain-maind");
     exec("sed -i.bak 's/cors_allowed_origins = \\[\\]/cors_allowed_origins = [\"*\"]/g' $HOME/.chain-maind/config/config.toml");
-    await Zemu.default.sleep(3000);
-    // spawn("chain-maind", ["start", "--home", "$HOME/.chain-maind"]);
+    await Zemu.default.sleep(SLEEP_MS);
     exec("chain-maind start --home $HOME/.chain-maind&");
     console.log("start chain-maind finished");
   }
@@ -120,7 +120,7 @@ class LedgerSignerZemu extends LedgerSigner {
     console.log("message in sign function:", message);
 
     const signatureRequest = this.app.sign(this.path, message.toUint8Array());
-    await Zemu.default.sleep(10000);
+    await Zemu.default.sleep(SLEEP_MS);
 
     for (var i=0; i< this.click_times; i++) {
       await Zemu.default.sleep(100);
@@ -208,7 +208,7 @@ export class LedgerWalletSignerProviderZemu implements ISignerProvider {
 async function main() {
   const signerProvider = new LedgerWalletSignerProviderZemu();
   await signerProvider.provider.initChain();
-  await Zemu.default.sleep(10000);
+  await Zemu.default.sleep(SLEEP_MS);
   const walletConfig = CustomDevNet;
   walletConfig.nodeUrl = "http://127.0.0.1";
   const signer = new LedgerTransactionSigner(
@@ -221,7 +221,7 @@ async function main() {
   signerProvider.provider.setClickTimes(7);
   const ledgerAddress = 'cro1tzhdkuc328cgh2hycyfddtdpqfwwu42yq3qgkr';
   const nodeRpc = await NodeRpcService.init(walletConfig.nodeUrl);
-  await Zemu.default.sleep(20000);
+  await Zemu.default.sleep(SLEEP_MS);
   const accountNumber =  await nodeRpc.fetchAccountNumber(ledgerAddress);
   console.log("get account number ", accountNumber);
   const accountSequence = await nodeRpc.loadSequenceNumber(ledgerAddress);
@@ -241,7 +241,7 @@ async function main() {
   console.log(signedTxHex);
   const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
   console.log("broadCast result:", broadCastResult);
-  await Zemu.default.sleep(10000);
+  await Zemu.default.sleep(SLEEP_MS*3);
   console.log("get sender's balance")
   const senderBalance = await nodeRpc.loadAccountBalance(ledgerAddress, "basecro");
   console.log("sender's balance:", senderBalance);
