@@ -13,7 +13,7 @@
     "@babel/helper-builder-react-jsx": "^7.10.4",
     "@babel/helper-builder-react-jsx-experimental": "^7.12.11",
     "@cosmjs/stargate": "^0.24.0-alpha.22",
-    "@crypto-com/chain-jslib": "linfeng-crypto/chain-jslib#dev2",
+    "@crypto-com/chain-jslib": "^0.0.10",
     "@ledgerhq/hw-transport-node-hid": "^5.41.0",
     "@ledgerhq/hw-transport-webhid": "^5.38.0",
     "@ledgerhq/hw-transport-webusb": "^5.38.0",
