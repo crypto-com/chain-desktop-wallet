@@ -1,7 +1,7 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.0.23",
-  "description": "Crypto.org Chain Desktop Wallet App",
+  "version": "0.0.24",
+  "description": "Crypto.com Chain Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.org <chain@crypto.org>",
   "license": "Apache-2.0",
