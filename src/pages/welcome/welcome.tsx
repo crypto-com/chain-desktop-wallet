@@ -38,7 +38,7 @@ function WelcomePage() {
       </div>
       <div className="container">
         <div>
-          <div className="title">Crypto.com Chain Wallet</div>
+          <div className="title">Crypto.org Chain Wallet</div>
           <div className="slogan">
             Our Sample Chain Wallet supports wallet management and funds transfer.
           </div>

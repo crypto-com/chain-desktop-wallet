@@ -1,9 +1,9 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "Crypto.com Chain Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
-  "author": "Crypto.com <chain@crypto.com>",
+  "author": "Crypto.org <chain@crypto.org>",
   "license": "Apache-2.0",
   "homepage": ".",
   "main": "build/electron/main.js",
@@ -21,6 +21,7 @@
     "@types/crypto-js": "^4.0.1",
     "@types/electron": "^1.6.10",
     "@types/electron-devtools-installer": "^2.2.0",
+    "@types/ledgerhq__hw-transport-node-hid": "^4.22.2",
     "@types/long": "^4.0.1",
     "@types/node": "^14.14.10",
     "@types/react": "^17.0.0",
@@ -93,8 +94,8 @@
     "src/**/*.{js,jsx,ts,tsx}": "yarn lint:js"
   },
   "build": {
-    "productName": "Crypto.com Chain Desktop Wallet (Beta)",
-    "appId": "chain.crypto.com.chain-desktop-wallet",
+    "productName": "Crypto.org Chain Desktop Wallet (Beta)",
+    "appId": "chain.crypto.org.chain-desktop-wallet",
     "files": [
       "./build/**/*",
       "./dist/**/*",

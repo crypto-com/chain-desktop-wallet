@@ -25,7 +25,7 @@ const TestNetConfig: WalletConfig = {
   derivationPath: "m/44'/1'/0'/0/0",
   explorerUrl: 'https://crypto.org/explorer',
   indexingUrl: 'https://crypto.org/explorer/api/v1/',
-  nodeUrl: 'https://testnet-croeseid.crypto.com',
+  nodeUrl: 'https://testnet-croeseid.crypto.org',
   network: CroNetwork.Testnet,
 };
 
@@ -76,11 +76,11 @@ export const DefaultAsset = (network: Network) => {
   return {
     balance: '0',
     description:
-      'Crypto.com Coin (CRO) is the native token of the Crypto.com Chain. The Crypto.com Chain was created to build a network of cryptocurrency projects, and develop merchants’ ability to accept crypto as a form of payment. The Crypto.com Chain is a high performing native blockchain solution, which will make the transaction flows between crypto users and merchants accepting crypto seamless, cost-efficient and secure.\\r\\n\\r\\nBusinesses can use Crypto.com pay Checkout and/or Invoice to enable customers to complete checkout and pay for goods and services with cryptocurrencies using the Crypto.com Wallet App. Businesses receive all their payments instantly in CRO or stable coins, or in fiat.',
+      'Crypto.org Coin (CRO) is the native token of the Crypto.org Chain. The Crypto.org Chain was created to build a network of cryptocurrency projects, and develop merchants’ ability to accept crypto as a form of payment. The Crypto.org Chain is a high performing native blockchain solution, which will make the transaction flows between crypto users and merchants accepting crypto seamless, cost-efficient and secure.\\r\\n\\r\\nBusinesses can use Crypto.org pay Checkout and/or Invoice to enable customers to complete checkout and pay for goods and services with cryptocurrencies using the Crypto.org Wallet App. Businesses receive all their payments instantly in CRO or stable coins, or in fiat.',
     icon_url:
       'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c1248c15568a4017c20aa87/cro.png',
     identifier: getRandomId(),
-    name: 'Crypto.com Coin',
+    name: 'Crypto.org Coin',
     symbol: assetSymbol,
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
