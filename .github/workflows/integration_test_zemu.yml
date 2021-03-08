@@ -5,7 +5,7 @@ on:
   pull_request:
   push:
     branches:
-      - zemu-support5
+      - dev
 
 jobs:
   zemu_test:
