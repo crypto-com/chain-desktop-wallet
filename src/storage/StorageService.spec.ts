@@ -202,4 +202,36 @@ describe('Testing Storage Service', () => {
       'tcro172vcpddyavr3mpjrwx4p44h4vlncyj7g0mh06e',
     );
   });
+
+  it('Test wallet deletion', async () => {
+    const wallet = buildTestWallet();
+    const newWalletAddress = wallet.address;
+    const walletIdentifier = wallet.identifier;
+
+    const mockWalletStore = new StorageService(`test-wallet-deletion-${getRandomId()}`);
+
+    // Persist wallet in the db
+    await mockWalletStore.saveWallet(wallet);
+
+    const loadedWallet = await mockWalletStore.findWalletByIdentifier(walletIdentifier);
+    const allWallets = await mockWalletStore.retrieveAllWallets();
+
+    expect(allWallets.length).to.gt(0);
+    expect(allWallets.length).to.eq(1);
+
+    expect(loadedWallet).to.not.eq(null);
+    expect(loadedWallet.name).to.eq('My-TestNet-Wallet');
+    expect(loadedWallet.address).to.eq(newWalletAddress);
+    expect(loadedWallet.config.network.chainId).to.eq('testnet-croeseid-2');
+
+    await mockWalletStore.deleteWallet(walletIdentifier);
+    const loadedWalletAfterDeletion = await mockWalletStore.findWalletByIdentifier(
+      walletIdentifier,
+    );
+    const allWalletsAfterDeletion = await mockWalletStore.retrieveAllWallets();
+
+    expect(loadedWalletAfterDeletion).to.eq(null);
+    expect(allWalletsAfterDeletion.length).to.lt(1);
+    expect(allWalletsAfterDeletion.length).to.eq(0);
+  });
 });

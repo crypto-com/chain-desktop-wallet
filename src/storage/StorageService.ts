@@ -30,6 +30,10 @@ export class StorageService {
     );
   }
 
+  public async deleteWallet(walletID: string) {
+    return this.db.walletStore.remove({ identifier: walletID }, { multi: true });
+  }
+
   public async updateWalletNode(nodeData: NodeData) {
     if (!nodeData.chainId && !nodeData.nodeUrl) {
       return Promise.resolve();
