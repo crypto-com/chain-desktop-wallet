@@ -4,13 +4,26 @@ All notable changes to this project will be documented in this file.
 
 *Unreleased*
 
+*Released*
+
+## [v0.0.24] - 2021-03-04
+
+### Bug Fixes
+
+- Fixed an issue that could block wallet creation with Ledger devices
+
+## [v0.0.23] - 2021-03-01
+
+### Bug Fixes
+
+- Fixed an issue that could cause the application crashed on Mac OS
+
 ## [v0.0.22] - 2021-02-17
 
 ### Added Features
 
 - Added support for Ledger based wallet on creation
 - Introduced initial support for undelegation transactions, for both normal wallets and Ledger wallets
-
 
 ## [v0.0.21] - 2021-02-10
 

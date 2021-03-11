@@ -85,7 +85,7 @@ describe('Testing Storage Service', () => {
     );
 
     const newNodeUrl = 'https://testnet-new-croeseid.crypto-4.org';
-    const newIndexingUrl = 'https://crossfire.crypto.com/api/v1/';
+    const newIndexingUrl = 'https://crossfire.crypto.org/api/v1/';
     const nodeData2: NodeData = { walletId, nodeUrl: newNodeUrl, indexingUrl: newIndexingUrl };
     await mockWalletStore.updateWalletNode(nodeData2);
 
