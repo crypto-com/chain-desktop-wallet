@@ -349,6 +349,10 @@ class WalletService {
     await this.persistInitialAsset(wallet.identifier, wallet.config.network);
   }
 
+  public async deleteWallet(walletIdentifier: string) {
+    await this.storageService.deleteWallet(walletIdentifier);
+  }
+
   public async updateWalletNodeConfig(nodeData: NodeData) {
     return this.storageService.updateWalletNode(nodeData);
   }
