@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.0.25] - 2021-03-12
+
+### Bug Fixes
+- Updated dependency vulnerability issue on react-dev-util
+
+### Additions
+- More integration tests
+
 ## [v0.0.24] - 2021-03-04
 
 ### Bug Fixes

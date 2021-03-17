@@ -1,6 +1,6 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "description": "Crypto.com Chain Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.org <chain@crypto.org>",
@@ -202,7 +202,7 @@
     "prettier": "1.19.1",
     "prompts": "2.4.0",
     "react-app-polyfill": "2.0.0",
-    "react-dev-utils": "11.0.2",
+    "react-dev-utils": ">=11.0.4",
     "resolve": "1.18.1",
     "resolve-url-loader": "3.1.2",
     "rimraf": "3.0.2",

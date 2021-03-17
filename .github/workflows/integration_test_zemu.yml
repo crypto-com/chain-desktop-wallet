@@ -1,0 +1,39 @@
+# https://github.com/samuelmeuli/action-electron-builder
+name: Run zemu integration test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+
+jobs:
+  zemu_test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+
+      - name: Setup dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y libusb-1.0-0-dev libudev-dev
+
+      - name: Install deps with big timeout
+        run: |
+          yarn install --network-timeout 600000
+
+      - name: Install deps with big timeout for tests
+        run: |
+          cd tests && yarn install --network-timeout 600000
+
+      - name: install chain-maind
+        run: sudo mv ./tests/app/bin/chain-maind /usr/local/bin
+
+      - name: run test
+        run: |
+          cd tests && yarn build && yarn start
