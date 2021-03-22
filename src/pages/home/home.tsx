@@ -30,6 +30,7 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
 import { UndelegateFormComponent } from './UndelegateFormComponent';
+import { RedelegateFormComponent } from './RedelegateFormComponent';
 
 const { Text } = Typography;
 
@@ -307,23 +308,43 @@ function HomePage() {
     setInputPasswordVisible(false);
   };
 
-  const onConfirmUnDelegation = async () => {
+  const onConfirmDelegationAction = async () => {
     if (!decryptedPhrase) {
       return;
     }
     try {
       setConfirmLoading(true);
       const { walletType } = currentSession.wallet;
-      const undelegateAmount = form.getFieldValue('undelegateAmount');
 
-      const unstakingResult = await walletService.sendUnDelegateTransaction({
-        validatorAddress: undelegateFormValues.validatorAddress,
-        amount: undelegateAmount,
-        asset: userAsset,
-        memo: '',
-        decryptedPhrase,
-        walletType,
-      });
+      // TODO : Here switch between undelegation and redelegation
+
+      let broadcastedTransaction: BroadCastResult | null = null;
+
+      if (delegationActionType === StakingActionType.UNDELEGATE) {
+        const undelegateAmount = form.getFieldValue('undelegateAmount');
+        broadcastedTransaction = await walletService.sendUnDelegateTransaction({
+          validatorAddress: undelegateFormValues.validatorAddress,
+          amount: undelegateAmount,
+          asset: userAsset,
+          memo: '',
+          decryptedPhrase,
+          walletType,
+        });
+      } else if (delegationActionType === StakingActionType.REDELEGATE) {
+        const redelegateAmount = form.getFieldValue('redelegateAmount');
+        const validatorDesAddress = form.getFieldValue('validatorDestinationAddress');
+        broadcastedTransaction = await walletService.sendReDelegateTransaction({
+          validatorSourceAddress: redelegateFormValues.validatorOriginAddress,
+          validatorDestinationAddress: validatorDesAddress,
+          amount: redelegateAmount,
+          asset: userAsset,
+          memo: '',
+          decryptedPhrase,
+          walletType,
+        });
+      } else {
+        return;
+      }
 
       const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
         currentSession.wallet.identifier,
@@ -332,7 +353,7 @@ function HomePage() {
       const delegationTabularData = convertDelegations(allDelegations, userAsset);
       setDelegations(delegationTabularData);
 
-      setBroadcastResult(unstakingResult);
+      setBroadcastResult(broadcastedTransaction);
 
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
@@ -343,10 +364,19 @@ function HomePage() {
 
       // Reset values
       form.resetFields();
-      setUndelegateFormValues({
-        validatorAddress: '',
-        undelegateAmount: '',
-      });
+
+      if (delegationActionType === StakingActionType.UNDELEGATE) {
+        setUndelegateFormValues({
+          validatorAddress: '',
+          undelegateAmount: '',
+        });
+      } else if (delegationActionType === StakingActionType.REDELEGATE) {
+        setRedelegateFormValues({
+          redelegateAmount: '',
+          validatorDestinationAddress: '',
+          validatorOriginAddress: '',
+        });
+      }
     } catch (e) {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
@@ -375,8 +405,15 @@ function HomePage() {
         validatorAddress,
         undelegateAmount: stakedAmount,
       });
-      showPasswordInput();
+    } else if (newStakingAction === StakingActionType.REDELEGATE) {
+      setRedelegateFormValues({
+        redelegateAmount: stakedAmount,
+        validatorOriginAddress: validatorAddress,
+        validatorDestinationAddress: '',
+      });
     }
+
+    showPasswordInput();
   };
 
   const StakingColumns = [
@@ -415,15 +452,7 @@ function HomePage() {
           actionType: StakingActionType.UNDELEGATE,
         };
         return (
-          <a
-            // onClick={() => {
-            //   setTimeout(() => {
-            //     showPasswordInput();
-            //   }, 200);
-            // }}
-            data-id={JSON.stringify(clickData)}
-            onClick={onDelegationCellsClicked}
-          >
+          <a data-id={JSON.stringify(clickData)} onClick={onDelegationCellsClicked}>
             <Text type="danger">Undelegate Stake</Text>
           </a>
         );
@@ -490,14 +519,14 @@ function HomePage() {
           <ModalPopup
             isModalVisible={isConfirmationModalVisible}
             handleCancel={handleCancelConfirmationModal}
-            handleOk={onConfirmUnDelegation}
+            handleOk={onConfirmDelegationAction}
             confirmationLoading={confirmLoading}
             footer={[
               <Button
                 key="submit"
                 type="primary"
                 loading={confirmLoading}
-                onClick={onConfirmUnDelegation}
+                onClick={onConfirmDelegationAction}
               >
                 Confirm
               </Button>,
@@ -507,11 +536,20 @@ function HomePage() {
             ]}
             okText="Confirm"
           >
-            <UndelegateFormComponent
-              currentSession={currentSession}
-              undelegateFormValues={undelegateFormValues}
-              form={form}
-            />
+            {delegationActionType === StakingActionType.UNDELEGATE ? (
+              <UndelegateFormComponent
+                currentSession={currentSession}
+                undelegateFormValues={undelegateFormValues}
+                form={form}
+              />
+            ) : (
+              <RedelegateFormComponent
+                currentSession={currentSession}
+                redelegateFormValues={redelegateFormValues}
+                walletAsset={userAsset}
+                form={form}
+              />
+            )}
           </ModalPopup>
           <PasswordFormModal
             description="Input the app password decrypt wallet"
@@ -554,7 +592,11 @@ function HomePage() {
                   The transaction timed out but it will be included in the subsequent blocks !
                 </div>
               ) : (
-                <div className="description">Your undelegation transaction was successful</div>
+                <div className="description">
+                  {delegationActionType === StakingActionType.UNDELEGATE
+                    ? 'Your undelegation transaction was successful'
+                    : 'Your redelegation transaction was successful'}
+                </div>
               )}
             </>
           </SuccessModalPopup>
@@ -568,6 +610,9 @@ function HomePage() {
             <>
               <div className="description">
                 The undelegation transaction failed. Please try again later
+                {delegationActionType === StakingActionType.UNDELEGATE
+                  ? 'The undelegation transaction failed. Please try again later'
+                  : 'The redelegation transaction failed. Please try again later'}
               </div>
             </>
           </ErrorModalPopup>

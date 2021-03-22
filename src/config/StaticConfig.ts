@@ -24,7 +24,7 @@ const TestNetConfig: WalletConfig = {
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",
   explorerUrl: 'https://crypto.org/explorer',
-  indexingUrl: 'https://crypto.org/explorer/api/v1/',
+  indexingUrl: 'https://crypto.org/explorer/croeseid/api/v1/',
   nodeUrl: CroNetwork.Testnet.defaultNodeUrl,
   network: CroNetwork.Testnet,
 };
@@ -101,3 +101,4 @@ export type Network = {
 };
 
 export const FIXED_DEFAULT_FEE = 5_000;
+export const FIXED_DEFAULT_GAS_LIMIT = 300_000;
