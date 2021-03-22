@@ -325,6 +325,13 @@ function HomePage() {
         walletType,
       });
 
+      const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
+        currentSession.wallet.identifier,
+      );
+
+      const delegationTabularData = convertDelegations(allDelegations, userAsset);
+      setDelegations(delegationTabularData);
+
       setBroadcastResult(unstakingResult);
 
       setIsVisibleConfirmationModal(false);
