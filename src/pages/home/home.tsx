@@ -382,21 +382,12 @@ function HomePage() {
       setConfirmLoading(false);
       setInputPasswordVisible(false);
       setIsErrorTransferModalVisible(true);
-      // eslint-disable-next-line no-console
-      console.log('Error occurred while transfer', e);
     }
   };
 
   const onDelegationCellsClicked = e => {
     const eventData = JSON.parse(e.currentTarget.dataset.id);
     const { validatorAddress, stakedAmount, actionType } = eventData;
-
-    console.log('Cell clicked: ', {
-      eventData,
-      actionType,
-      validatorAddress,
-      stakedAmount,
-    });
     const newStakingAction: StakingActionType = StakingActionType[actionType];
     setDelegationActionType(newStakingAction);
 
