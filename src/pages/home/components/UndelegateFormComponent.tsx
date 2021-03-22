@@ -1,7 +1,7 @@
 import { FormInstance } from 'antd/lib/form';
 import { Alert, Form, InputNumber } from 'antd';
 import React from 'react';
-import { Session } from '../../models/Session';
+import { Session } from '../../../models/Session';
 
 export const UndelegateFormComponent = (props: {
   currentSession: Session;

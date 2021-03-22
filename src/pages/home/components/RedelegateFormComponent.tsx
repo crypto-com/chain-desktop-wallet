@@ -2,9 +2,9 @@ import { FormInstance } from 'antd/lib/form';
 import { Form, Input, InputNumber } from 'antd';
 import React from 'react';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
-import { Session } from '../../models/Session';
-import { TransactionUtils } from '../../utils/TransactionUtils';
-import { UserAsset } from '../../models/UserAsset';
+import { Session } from '../../../models/Session';
+import { TransactionUtils } from '../../../utils/TransactionUtils';
+import { UserAsset } from '../../../models/UserAsset';
 
 export function RedelegateFormComponent(props: {
   currentSession: Session;

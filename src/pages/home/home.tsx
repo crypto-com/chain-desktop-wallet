@@ -29,8 +29,8 @@ import { secretStoreService } from '../../storage/SecretStoreService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
-import { UndelegateFormComponent } from './UndelegateFormComponent';
-import { RedelegateFormComponent } from './RedelegateFormComponent';
+import { UndelegateFormComponent } from './components/UndelegateFormComponent';
+import { RedelegateFormComponent } from './components/RedelegateFormComponent';
 
 const { Text } = Typography;
 
