@@ -288,8 +288,8 @@ class WalletService {
   // eslint-disable-next-line class-methods-use-this
   public supportedConfigs(): WalletConfig[] {
     return [
-      DefaultWalletConfigs.TestNetConfig,
       DefaultWalletConfigs.MainNetConfig,
+      DefaultWalletConfigs.TestNetConfig,
       DefaultWalletConfigs.CustomDevNet,
     ];
   }
