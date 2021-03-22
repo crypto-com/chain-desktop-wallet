@@ -1,10 +1,12 @@
 import { FormInstance } from 'antd/lib/form';
-import { Form, Input, InputNumber } from 'antd';
+import { Form, InputNumber, AutoComplete } from 'antd';
+import { useRecoilValue } from 'recoil';
 import React from 'react';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 import { Session } from '../../../models/Session';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { UserAsset } from '../../../models/UserAsset';
+import { validatorTopListState } from '../../../recoil/atom';
 
 export function RedelegateFormComponent(props: {
   currentSession: Session;
@@ -21,6 +23,9 @@ export function RedelegateFormComponent(props: {
     props.walletAsset,
     AddressType.VALIDATOR,
   );
+
+  const validatorTopList = useRecoilValue(validatorTopListState);
+
   return (
     <>
       <div className="title">Confirm Redelegate Transaction</div>
@@ -52,7 +57,19 @@ export function RedelegateFormComponent(props: {
               customAddressValidator,
             ]}
           >
-            <Input />
+            <AutoComplete
+              options={[
+                {
+                  label: 'Top Validators',
+                  options: validatorTopList.map(e => {
+                    return {
+                      value: e.validatorAddress,
+                    };
+                  }),
+                },
+              ]}
+              placeholder="Enter validator address"
+            />
           </Form.Item>
 
           <Form.Item

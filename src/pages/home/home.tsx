@@ -13,6 +13,7 @@ import {
   hasShownWarningOnWalletTypeState,
   sessionState,
   walletAssetState,
+  validatorTopListState,
 } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
@@ -121,6 +122,7 @@ function HomePage() {
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
   const didMountRef = useRef(false);
 
   // Undelegate action related states changes
@@ -194,15 +196,25 @@ function HomePage() {
       }
     };
 
+    const syncValidatorsData = async () => {
+      const currentValidatorList =
+        validatorTopList.length === 0
+          ? await walletService.getLatestTopValidators()
+          : validatorTopList;
+
+      setValidatorTopList(currentValidatorList);
+    };
+
     if (!didMountRef.current) {
       syncAssetData();
+      syncValidatorsData();
       didMountRef.current = true;
     }
 
     return () => {
       unmounted = true;
     };
-  }, [delegations, userAsset, hasShownNotLiveWallet]);
+  }, [delegations, userAsset, validatorTopList, hasShownNotLiveWallet]);
 
   const TransactionColumns = [
     {
