@@ -132,6 +132,12 @@ const FormSend = () => {
     maximumSendAmount,
     'Sending amount exceeds your available wallet balance',
   );
+  const customMinValidator = TransactionUtils.minValidator(
+    fromScientificNotation(currentMinAssetAmount),
+    `Sending amount is lower than minimum allowed of ${fromScientificNotation(
+      currentMinAssetAmount,
+    )} ${walletAsset.symbol}`,
+  );
 
   return (
     <Form
@@ -171,13 +177,7 @@ const FormSend = () => {
             },
             customAmountValidator,
             customMaxValidator,
-            {
-              min: currentMinAssetAmount,
-              type: 'number',
-              message: `Sending amount is lower than minimum allowed of ${fromScientificNotation(
-                currentMinAssetAmount,
-              )} ${walletAsset.symbol}`,
-            },
+            customMinValidator,
           ]}
         >
           <InputNumber />

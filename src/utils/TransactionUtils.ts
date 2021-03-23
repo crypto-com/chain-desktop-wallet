@@ -58,6 +58,18 @@ export class TransactionUtils {
     });
   }
 
+  public static minValidator(min: string, reason: string) {
+    return () => ({
+      validator(rule, value) {
+        if (Big(value).gte(min)) {
+          return Promise.resolve();
+        }
+        // eslint-disable-next-line prefer-promise-reject-errors
+        return Promise.reject(reason);
+      },
+    });
+  }
+
   // public static maxMinValidation(currentBalance: string, inputValue: string) {
   //   const currentBalanceAmount = Big(currentBalance);
   //   const inputAmount = Big(inputValue);

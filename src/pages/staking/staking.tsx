@@ -169,6 +169,12 @@ const FormDelegationRequest = () => {
     maximumStakeAmount,
     'Staking amount exceeds your available wallet balance',
   );
+  const customMinValidator = TransactionUtils.minValidator(
+    fromScientificNotation(currentMinAssetAmount),
+    `Staking amount is lower than minimum allowed of ${fromScientificNotation(
+      currentMinAssetAmount,
+    )} ${walletAsset.symbol}`,
+  );
 
   return (
     <Form
@@ -217,13 +223,7 @@ const FormDelegationRequest = () => {
             },
             customAmountValidator,
             customMaxValidator,
-            {
-              min: currentMinAssetAmount,
-              type: 'number',
-              message: `Staking amount is lower than minimum allowed of ${fromScientificNotation(
-                currentMinAssetAmount,
-              )} ${walletAsset.symbol}`,
-            },
+            customMinValidator,
           ]}
         >
           <InputNumber />
