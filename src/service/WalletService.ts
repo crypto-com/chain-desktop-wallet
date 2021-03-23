@@ -16,6 +16,7 @@ import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
 import { Session } from '../models/Session';
 import {
   DelegateTransactionUnsigned,
+  RedelegateTransactionUnsigned,
   TransferTransactionUnsigned,
   UndelegateTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
@@ -38,32 +39,13 @@ import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
 import { ISignerProvider } from './signers/SignerProvider';
-
-export interface TransferRequest {
-  toAddress: string;
-  amount: string;
-  memo: string;
-  decryptedPhrase: string;
-  asset: UserAsset;
-  walletType: string; // normal, ledger
-}
-
-export interface DelegationRequest {
-  validatorAddress: string;
-  amount: string;
-  memo: string;
-  asset: UserAsset;
-  decryptedPhrase: string;
-  walletType: string; // normal, ledger
-}
-
-export interface UndelegationRequest extends DelegationRequest {}
-
-export interface WithdrawStakingRewardRequest {
-  validatorAddress: string;
-  decryptedPhrase: string;
-  walletType: string; // normal, ledger
-}
+import {
+  DelegationRequest,
+  RedelegationRequest,
+  TransferRequest,
+  UndelegationRequest,
+  WithdrawStakingRewardRequest,
+} from './TransactionRequestModels';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -189,6 +171,50 @@ class WalletService {
       signedTxHex = await transactionSigner.signUndelegateTx(
         undelegateTransaction,
         undelegationRequest.decryptedPhrase,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.syncAll(currentSession);
+    return broadCastResult;
+  }
+
+  public async sendReDelegateTransaction(
+    redelegationRequest: RedelegationRequest,
+  ): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.prepareTransaction();
+
+    const redelegationAmountScaled = getBaseScaledAmount(
+      redelegationRequest.amount,
+      redelegationRequest.asset,
+    );
+    const redelegateTransactionUnsigned: RedelegateTransactionUnsigned = {
+      delegatorAddress: currentSession.wallet.address,
+      sourceValidatorAddress: redelegationRequest.validatorSourceAddress,
+      destinationValidatorAddress: redelegationRequest.validatorDestinationAddress,
+      amount: redelegationAmountScaled,
+      memo: redelegationRequest.memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string;
+    if (redelegationRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signRedelegateTx(
+        redelegateTransactionUnsigned,
+        redelegationRequest.decryptedPhrase,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signRedelegateTx(
+        redelegateTransactionUnsigned,
+        redelegationRequest.decryptedPhrase,
       );
     }
 
