@@ -46,7 +46,7 @@ export class TransactionUtils {
     });
   }
 
-  public static validateMax(max: string, reason: string) {
+  public static maxValidator(max: string, reason: string) {
     return () => ({
       validator(rule, value) {
         if (!Big(value).gt(max)) {
