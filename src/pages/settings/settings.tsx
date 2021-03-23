@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Input, Layout, Tabs, Alert } from 'antd';
+import { Button, Form, Input, Layout, Tabs, Alert, Checkbox } from 'antd';
 import { useRecoilState } from 'recoil';
 import { sessionState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
@@ -73,6 +73,7 @@ const FormSettings = () => {
   const [form] = Form.useForm();
   const [confirmDeleteForm] = Form.useForm();
   const [isButtonLoading, setIsButtonLoading] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [session, setSession] = useRecoilState(sessionState);
@@ -167,14 +168,14 @@ const FormSettings = () => {
             <div className="container">
               <div className="description">
                 Once you delete the storage, you will lose access to all you wallets. The only way
-                to regain wallet access is by restoring wallet recovery mnemonic phrase. <br />
+                to regain wallet access is by restoring wallet mnemonic phrase. <br />
               </div>
               <Button
                 type="primary"
                 loading={isButtonLoading}
                 onClick={() => setIsConfirmationModalVisible(true)}
               >
-                Remove
+                Delete Storage
               </Button>
             </div>
           </div>
@@ -190,14 +191,24 @@ const FormSettings = () => {
                 loading={isButtonLoading}
                 onClick={() => setIsConfirmDeleteVisible(true)}
                 hidden={isConfirmDeleteVisible}
+                disabled={isButtonDisabled}
               >
                 Confirm
+              </Button>,
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isButtonLoading}
+                hidden={!isConfirmDeleteVisible}
+                onClick={confirmDeleteForm.submit}
+              >
+                Delete Storage
               </Button>,
               <Button
                 key="back"
                 type="link"
                 onClick={handleCancelConfirmationModal}
-                hidden={isConfirmDeleteVisible}
+                // hidden={isConfirmDeleteVisible}
               >
                 Cancel
               </Button>,
@@ -206,56 +217,64 @@ const FormSettings = () => {
           >
             <>
               <div className="title">Confirm Delete Storage</div>
-              <div className="description">
-                You may wish to verify your recovery mnemonic phrase before deletion to ensure that
-                you can restore this wallet in the future.
-              </div>
-              {/* <div className="item">
+
+              {!isConfirmDeleteVisible ? (
+                <>
+                  <div className="description">
+                    You may wish to verify your recovery mnemonic phrase before deletion to ensure
+                    that you can restore this wallet in the future.
+                  </div>
+                  {/* <div className="item">
                 <div className="label">Sender Address</div>
               </div>
               <div className="item">
                 <div className="label">Undelegate From Validator</div>
               </div> */}
-              <div>
-                <Alert
-                  type="warning"
-                  message="Are you sure you want to delete the storage? If you have not backed up your mnemonic phrase, you will result in losing your funds forever."
-                  showIcon
-                />
-              </div>
-              {isConfirmDeleteVisible ? (
-                <Form
-                  {...layout}
-                  layout="vertical"
-                  form={confirmDeleteForm}
-                  name="control-hooks"
-                  requiredMark="optional"
-                  onFinish={onConfirmDelete}
-                >
-                  <Form.Item
-                    name="delete"
-                    label="Please enter DELETE"
-                    hasFeedback
-                    rules={[
-                      {
-                        required: true,
-                      },
-                      {
-                        pattern: /DELETE/,
-                        message: 'Please enter DELETE',
-                      },
-                    ]}
-                  >
-                    <Input />
-                  </Form.Item>
-                  <Form.Item {...tailLayout} className="button">
-                    <Button type="primary" htmlType="submit" loading={isButtonLoading}>
-                      Delete Storage
-                    </Button>
-                  </Form.Item>
-                </Form>
+                  <div className="item">
+                    <Alert
+                      type="warning"
+                      message="Are you sure you want to delete the storage? If you have not backed up your wallet mnemonic phrase, you will result in losing your funds forever."
+                      showIcon
+                    />
+                  </div>
+                  <div className="item">
+                    <Checkbox
+                      checked={!isButtonDisabled}
+                      onChange={() => setIsButtonDisabled(!isButtonDisabled)}
+                    >
+                      I understand that the only way to regain access is by restoring wallet
+                      mnemonic phrase.
+                    </Checkbox>
+                  </div>
+                </>
               ) : (
-                ''
+                <div className="item">
+                  <Form
+                    {...layout}
+                    layout="vertical"
+                    form={confirmDeleteForm}
+                    name="control-hooks"
+                    requiredMark="optional"
+                    onFinish={onConfirmDelete}
+                  >
+                    <Form.Item
+                      name="delete"
+                      label="Please enter DELETE"
+                      hasFeedback
+                      rules={[
+                        {
+                          required: true,
+                        },
+                        {
+                          pattern: /DELETE/,
+                          message: 'Please enter DELETE',
+                        },
+                      ]}
+                    >
+                      <Input />
+                    </Form.Item>
+                  </Form>
+                </div>
               )}
             </>
           </ModalPopup>
