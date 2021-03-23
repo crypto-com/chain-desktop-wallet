@@ -71,11 +71,11 @@ const FormGeneral = () => {
 
 const FormSettings = () => {
   const [form] = Form.useForm();
-  const [confirmDeleteForm] = Form.useForm();
+  const [confirmClearForm] = Form.useForm();
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
-  const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
+  const [isConfirmClearVisible, setIsConfirmClearVisible] = useState(false);
   const [session, setSession] = useRecoilState(sessionState);
   const defaultSettings = session.wallet.config;
   const didMountRef = useRef(false);
@@ -127,10 +127,10 @@ const FormSettings = () => {
 
   const handleCancelConfirmationModal = () => {
     setIsConfirmationModalVisible(false);
-    setIsConfirmDeleteVisible(false);
+    setIsConfirmClearVisible(false);
   };
 
-  const onConfirmDelete = () => {
+  const onConfirmClear = () => {
     setIsConfirmationModalVisible(false);
     setIsButtonLoading(true);
     indexedDB.deleteDatabase('NeDB');
@@ -166,35 +166,37 @@ const FormSettings = () => {
             </div>
           </div>
         </TabPane>
-        <TabPane tab="Delete Storage" key="2">
+        <TabPane tab="Clear Storage" key="2">
           <div className="site-layout-background settings-content">
             <div className="container">
               <div className="description">
-                Once you delete the storage, you will lose access to all you wallets. The only way
-                to regain wallet access is by restoring wallet mnemonic phrase. <br />
+                Once you clear the storage, you will lose access to all you wallets. The only way to
+                regain wallet access is by restoring wallet mnemonic phrase. <br />
               </div>
               <Button
                 type="primary"
                 loading={isButtonLoading}
                 onClick={() => setIsConfirmationModalVisible(true)}
+                danger
               >
-                Delete Storage
+                Clear Storage
               </Button>
             </div>
           </div>
           <ModalPopup
             isModalVisible={isConfirmationModalVisible}
             handleCancel={handleCancelConfirmationModal}
-            handleOk={onConfirmDelete}
+            handleOk={onConfirmClear}
             confirmationLoading={isButtonLoading}
             footer={[
               <Button
                 key="submit"
                 type="primary"
                 loading={isButtonLoading}
-                onClick={() => setIsConfirmDeleteVisible(true)}
-                hidden={isConfirmDeleteVisible}
+                onClick={() => setIsConfirmClearVisible(true)}
+                hidden={isConfirmClearVisible}
                 disabled={isButtonDisabled}
+                danger
               >
                 Confirm
               </Button>,
@@ -202,16 +204,17 @@ const FormSettings = () => {
                 type="primary"
                 htmlType="submit"
                 loading={isButtonLoading}
-                hidden={!isConfirmDeleteVisible}
-                onClick={confirmDeleteForm.submit}
+                hidden={!isConfirmClearVisible}
+                onClick={confirmClearForm.submit}
+                danger
               >
-                Delete Storage
+                Clear Storage
               </Button>,
               <Button
                 key="back"
                 type="link"
                 onClick={handleCancelConfirmationModal}
-                // hidden={isConfirmDeleteVisible}
+                // hidden={isConfirmClearVisible}
               >
                 Cancel
               </Button>,
@@ -219,9 +222,9 @@ const FormSettings = () => {
             okText="Confirm"
           >
             <>
-              <div className="title">Confirm Delete Storage</div>
+              <div className="title">Confirm Clear Storage</div>
 
-              {!isConfirmDeleteVisible ? (
+              {!isConfirmClearVisible ? (
                 <>
                   <div className="description">
                     You may wish to verify your recovery mnemonic phrase before deletion to ensure
@@ -236,7 +239,7 @@ const FormSettings = () => {
                   <div className="item">
                     <Alert
                       type="warning"
-                      message="Are you sure you want to delete the storage? If you have not backed up your wallet mnemonic phrase, you will result in losing your funds forever."
+                      message="Are you sure you want to clear the storage? If you have not backed up your wallet mnemonic phrase, you will result in losing your funds forever."
                       showIcon
                     />
                   </div>
@@ -255,22 +258,22 @@ const FormSettings = () => {
                   <Form
                     {...layout}
                     layout="vertical"
-                    form={confirmDeleteForm}
+                    form={confirmClearForm}
                     name="control-hooks"
                     requiredMark="optional"
-                    onFinish={onConfirmDelete}
+                    onFinish={onConfirmClear}
                   >
                     <Form.Item
-                      name="delete"
-                      label="Please enter DELETE"
+                      name="clear"
+                      label="Please enter CLEAR"
                       hasFeedback
                       rules={[
                         {
                           required: true,
                         },
                         {
-                          pattern: /DELETE/,
-                          message: 'Please enter DELETE',
+                          pattern: /CLEAR/,
+                          message: 'Please enter CLEAR',
                         },
                       ]}
                     >
