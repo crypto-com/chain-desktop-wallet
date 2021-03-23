@@ -132,9 +132,12 @@ const FormSettings = () => {
 
   const onConfirmDelete = () => {
     setIsConfirmationModalVisible(false);
+    setIsButtonLoading(true);
     indexedDB.deleteDatabase('NeDB');
-    history.replace('/');
-    history.go(0);
+    setTimeout(() => {
+      history.replace('/');
+      history.go(0);
+    }, 2000);
   };
 
   return (
