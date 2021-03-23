@@ -1,7 +1,11 @@
 import { Bytes } from '@crypto-com/chain-jslib/lib/dist/utils/bytes/bytes';
 import sdk from '@crypto-com/chain-jslib';
 import { Big, Units } from '../../utils/ChainJsLib';
-import { WalletConfig, FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
+import {
+  WalletConfig,
+  FIXED_DEFAULT_FEE,
+  FIXED_DEFAULT_GAS_LIMIT,
+} from '../../config/StaticConfig';
 import {
   TransactionUnsigned,
   DelegateTransactionUnsigned,
@@ -57,6 +61,7 @@ export class LedgerTransactionSigner implements ITransactionSigner {
   // eslint-disable-next-line class-methods-use-this
   public setCustomFee(transaction: TransactionUnsigned) {
     transaction.fee = `${FIXED_DEFAULT_FEE}`;
+    transaction.gasLimit = `${FIXED_DEFAULT_GAS_LIMIT}`;
     return transaction;
   }
 
