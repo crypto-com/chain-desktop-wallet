@@ -23,6 +23,10 @@ export function RedelegateFormComponent(props: {
     props.walletAsset,
     AddressType.VALIDATOR,
   );
+  const validateMax = TransactionUtils.validateMax(
+    props.redelegateFormValues.redelegateAmount,
+    `Undelegate amount cannot be bigger than currently delegated`,
+  );
 
   const validatorTopList = useRecoilValue(validatorTopListState);
 
@@ -82,14 +86,10 @@ export function RedelegateFormComponent(props: {
                 pattern: /[^0]+/,
                 message: 'Undelegate amount cannot be 0',
               },
-              {
-                max: Number(props.redelegateFormValues.redelegateAmount),
-                type: 'number',
-                message: 'Undelegate amount cannot be bigger than currently delegated',
-              },
+              validateMax,
             ]}
           >
-            <InputNumber />
+            <InputNumber stringMode />
           </Form.Item>
         </Form>
       </div>
