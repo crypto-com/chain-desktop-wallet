@@ -77,7 +77,7 @@ const FormGeneral = () => {
             },
           ]}
         >
-          <InputNumber precision={0} type="number" />
+          <InputNumber precision={0} min={1} />
         </Form.Item>
         <Form.Item
           name="gasLimit"
@@ -89,7 +89,7 @@ const FormGeneral = () => {
             },
           ]}
         >
-          <InputNumber precision={0} />
+          <InputNumber precision={0} min={1} />
         </Form.Item>
       </div>
     </>
