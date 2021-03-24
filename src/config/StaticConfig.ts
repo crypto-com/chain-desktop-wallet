@@ -23,9 +23,9 @@ const TestNetConfig: WalletConfig = {
   enabled: true,
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",
-  explorerUrl: 'https://crypto.org/explorer',
-  indexingUrl: 'https://crypto.org/explorer/api/v1/',
-  nodeUrl: 'https://testnet-croeseid.crypto.org',
+  explorerUrl: 'https://crypto.org/explorer/croeseid',
+  indexingUrl: 'https://crypto.org/explorer/croeseid/api/v1/',
+  nodeUrl: CroNetwork.Testnet.defaultNodeUrl,
   network: CroNetwork.Testnet,
 };
 
@@ -37,9 +37,9 @@ const MainNetConfig: WalletConfig = {
   enabled: true,
   name: 'MAINNET',
   derivationPath: "m/44'/394'/0'/0/0",
-  nodeUrl: NOT_KNOWN_YET_VALUE,
-  explorerUrl: NOT_KNOWN_YET_VALUE,
-  indexingUrl: NOT_KNOWN_YET_VALUE,
+  nodeUrl: CroNetwork.Mainnet.defaultNodeUrl,
+  explorerUrl: 'https://crypto.org/explorer',
+  indexingUrl: 'https://crypto.org/explorer/api/v1/',
   network: CroNetwork.Mainnet,
 };
 
@@ -101,3 +101,4 @@ export type Network = {
 };
 
 export const FIXED_DEFAULT_FEE = 5_000;
+export const FIXED_DEFAULT_GAS_LIMIT = 300_000;

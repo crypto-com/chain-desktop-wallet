@@ -1,13 +1,19 @@
 import { Bytes } from '@crypto-com/chain-jslib/lib/dist/utils/bytes/bytes';
 import sdk from '@crypto-com/chain-jslib';
 import { Big, Units } from '../../utils/ChainJsLib';
-import { WalletConfig, FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
+import {
+  WalletConfig,
+  FIXED_DEFAULT_FEE,
+  FIXED_DEFAULT_GAS_LIMIT,
+} from '../../config/StaticConfig';
 import {
   TransactionUnsigned,
   DelegateTransactionUnsigned,
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
   UndelegateTransactionUnsigned,
+  RedelegateTransactionUnsigned,
+  CustomFeeRequest,
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
 import { ITransactionSigner } from './TransactionSigner';
@@ -25,7 +31,11 @@ export class LedgerTransactionSigner implements ITransactionSigner {
     this.addressIndex = addressIndex;
   }
 
-  public getTransactionInfo(_phrase: string, transaction: TransactionUnsigned) {
+  public getTransactionInfo(
+    _phrase: string,
+    transaction: TransactionUnsigned,
+    customFeeRequest?: CustomFeeRequest,
+  ) {
     this.setCustomFee(transaction);
     const cro = sdk.CroSDK({ network: this.config.network });
     const rawTx = new cro.RawTransaction();
@@ -33,7 +43,19 @@ export class LedgerTransactionSigner implements ITransactionSigner {
 
     if (transaction.fee) {
       const fee = new cro.Coin(transaction.fee, Units.BASE);
+      const gasLimit = transaction.gasLimit as string;
+
       rawTx.setFee(fee);
+      rawTx.setGasLimit(gasLimit);
+    }
+
+    // Custom transaction fees from a transaction type
+    if (customFeeRequest) {
+      const fee = new cro.Coin(customFeeRequest.fee, Units.BASE);
+      const gasLimit = customFeeRequest.gasLimit as string;
+
+      rawTx.setFee(fee);
+      rawTx.setGasLimit(gasLimit);
     }
 
     return { cro, rawTx };
@@ -42,6 +64,7 @@ export class LedgerTransactionSigner implements ITransactionSigner {
   // eslint-disable-next-line class-methods-use-this
   public setCustomFee(transaction: TransactionUnsigned) {
     transaction.fee = `${FIXED_DEFAULT_FEE}`;
+    transaction.gasLimit = `${FIXED_DEFAULT_GAS_LIMIT}`;
     return transaction;
   }
 
@@ -170,6 +193,42 @@ export class LedgerTransactionSigner implements ITransactionSigner {
 
     const signableTx = rawTx
       .appendMessage(msgUndelegate)
+      .addSigner({
+        publicKey: pubkey,
+        accountNumber: new Big(transaction.accountNumber),
+        accountSequence: new Big(transaction.accountSequence),
+        signMode: 0, //   LEGACY_AMINO_JSON = 0, DIRECT = 1,
+      })
+      .toSignable();
+
+    const bytesMessage: Bytes = signableTx.toSignDocument(0);
+
+    const signature = await this.signerProvider.sign(bytesMessage);
+    return signableTx
+      .setSignature(0, signature)
+      .toSigned()
+      .getHexEncoded();
+  }
+
+  public async signRedelegateTx(
+    transaction: RedelegateTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const customFeeRequest = { fee: '20000', gasLimit: '400000' };
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, customFeeRequest);
+
+    const msgBeginRedelegate = new cro.staking.MsgBeginRedelegate({
+      delegatorAddress: transaction.delegatorAddress,
+      validatorSrcAddress: transaction.sourceValidatorAddress,
+      validatorDstAddress: transaction.destinationValidatorAddress,
+      amount: new cro.Coin(transaction.amount, Units.BASE),
+    });
+
+    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0, false)).toUint8Array();
+    const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
+
+    const signableTx = rawTx
+      .appendMessage(msgBeginRedelegate)
       .addSigner({
         publicKey: pubkey,
         accountNumber: new Big(transaction.accountNumber),
