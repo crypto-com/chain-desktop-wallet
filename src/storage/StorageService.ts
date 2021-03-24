@@ -1,4 +1,4 @@
-import { NodeData, Wallet } from '../models/Wallet';
+import { SettingsDataUpdate, Wallet } from '../models/Wallet';
 import { DatabaseManager } from './DatabaseManager';
 import { Session } from '../models/Session';
 import {
@@ -34,21 +34,35 @@ export class StorageService {
     return this.db.walletStore.remove({ identifier: walletID }, { multi: true });
   }
 
-  public async updateWalletNode(nodeData: NodeData) {
-    if (!nodeData.chainId && !nodeData.nodeUrl) {
+  public async updateWalletSettings(dataUpdate: SettingsDataUpdate) {
+    if (
+      !dataUpdate.chainId &&
+      !dataUpdate.nodeUrl &&
+      !dataUpdate.indexingUrl &&
+      !dataUpdate.networkFee &&
+      !dataUpdate.gasLimit
+    ) {
       return Promise.resolve();
     }
-    const previousWallet = await this.findWalletByIdentifier(nodeData.walletId);
-    if (nodeData.chainId) {
-      previousWallet.config.network.chainId = nodeData.chainId;
+    const previousWallet = await this.findWalletByIdentifier(dataUpdate.walletId);
+    if (dataUpdate.chainId) {
+      previousWallet.config.network.chainId = dataUpdate.chainId;
     }
 
-    if (nodeData.nodeUrl) {
-      previousWallet.config.nodeUrl = nodeData.nodeUrl;
+    if (dataUpdate.nodeUrl) {
+      previousWallet.config.nodeUrl = dataUpdate.nodeUrl;
     }
 
-    if (nodeData.indexingUrl) {
-      previousWallet.config.indexingUrl = nodeData.indexingUrl;
+    if (dataUpdate.indexingUrl) {
+      previousWallet.config.indexingUrl = dataUpdate.indexingUrl;
+    }
+
+    if (dataUpdate.networkFee) {
+      previousWallet.config.fee.networkFee = dataUpdate.networkFee;
+    }
+
+    if (dataUpdate.gasLimit) {
+      previousWallet.config.fee.gasLimit = dataUpdate.gasLimit;
     }
 
     return this.db.walletStore.update<Wallet>(

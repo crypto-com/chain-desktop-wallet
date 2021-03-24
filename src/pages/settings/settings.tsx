@@ -2,11 +2,12 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Input, Layout, Tabs, Alert, Checkbox } from 'antd';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Button, Form, Input, Layout, Tabs, Alert, Checkbox, InputNumber } from 'antd';
 import { useRecoilState } from 'recoil';
 import { sessionState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
-import { NodeData } from '../../models/Wallet';
+import { SettingsDataUpdate } from '../../models/Wallet';
 import { Session } from '../../models/Session';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
@@ -65,6 +66,32 @@ const FormGeneral = () => {
       >
         <Input />
       </Form.Item>
+      <div className="row">
+        <Form.Item
+          name="networkFee"
+          label="Network Fee"
+          hasFeedback
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <InputNumber precision={0} min={1} />
+        </Form.Item>
+        <Form.Item
+          name="gasLimit"
+          label="Gas Limit"
+          hasFeedback
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <InputNumber precision={0} min={1} />
+        </Form.Item>
+      </div>
     </>
   );
 };
@@ -88,6 +115,8 @@ const FormSettings = () => {
         nodeUrl: defaultSettings.nodeUrl,
         chainId: defaultSettings.network.chainId,
         indexingUrl: defaultSettings.indexingUrl,
+        networkFee: defaultSettings.fee.networkFee,
+        gasLimit: defaultSettings.fee.gasLimit,
       });
     }
   }, [form, defaultSettings]);
@@ -96,20 +125,24 @@ const FormSettings = () => {
     if (
       defaultSettings.nodeUrl === values.nodeUrl &&
       defaultSettings.indexingUrl === values.indexingUrl &&
-      defaultSettings.network.chainId === values.chainId
+      defaultSettings.network.chainId === values.chainId &&
+      defaultSettings.fee.gasLimit === values.gasLimit &&
+      defaultSettings.fee.networkFee === values.networkFee
     ) {
-      // No update was done, return here
+      // No value was updated, we stop here
       return;
     }
     setIsButtonLoading(true);
-    const nodeData: NodeData = {
+    const settingsDataUpdate: SettingsDataUpdate = {
       walletId: session.wallet.identifier,
       chainId: values.chainId,
       nodeUrl: values.nodeUrl,
       indexingUrl: values.indexingUrl,
+      networkFee: String(values.networkFee),
+      gasLimit: String(values.gasLimit),
     };
 
-    await walletService.updateWalletNodeConfig(nodeData);
+    await walletService.updateWalletNodeConfig(settingsDataUpdate);
     const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
     const newSession = new Session(updatedWallet);
     await walletService.setCurrentSession(newSession);
@@ -117,7 +150,7 @@ const FormSettings = () => {
     setIsButtonLoading(false);
   };
 
-  const onFill = () => {
+  const onRestoreDefaults = () => {
     form.setFieldsValue({
       nodeUrl: defaultSettings.nodeUrl,
       chainId: defaultSettings.network.chainId,
@@ -153,13 +186,12 @@ const FormSettings = () => {
         <TabPane tab="Node Configuration" key="1">
           <div className="site-layout-background settings-content">
             <div className="container">
-              {/* <div className="description">General settings</div> */}
               <FormGeneral />
               <Form.Item {...tailLayout} className="button">
                 <Button type="primary" htmlType="submit" loading={isButtonLoading}>
                   Save
                 </Button>
-                <Button type="link" htmlType="button" onClick={onFill}>
+                <Button type="link" htmlType="button" onClick={onRestoreDefaults}>
                   Restore Default
                 </Button>
               </Form.Item>
