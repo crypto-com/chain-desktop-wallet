@@ -545,14 +545,16 @@ class WalletService {
     };
   }
 
-  public async syncBalancesData(session: Session | null = null): Promise<void> {
+  public async syncBalancesData(session: Session | null = null): Promise<any> {
     // Stop background fetch tasks if the wallet configuration network is not live yet
     if (session?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve();
     }
     try {
-      await this.fetchAndUpdateBalances(session);
-      return await this.loadAndSaveAssetPrices(session);
+      return await Promise.all([
+        await this.fetchAndUpdateBalances(session),
+        await this.loadAndSaveAssetPrices(session),
+      ]);
       // eslint-disable-next-line no-empty
     } catch (e) {
       // eslint-disable-next-line no-console
