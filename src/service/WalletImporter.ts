@@ -21,6 +21,7 @@ export class WalletImporter {
       encryptedPhrase: mnemonic,
       hasBeenEncrypted: false,
       walletType: options.walletType,
+      addressIndex: options.addressIndex,
     };
   }
 }
@@ -34,10 +35,19 @@ export class WalletImportOptions {
 
   public readonly walletType: string;
 
-  constructor(walletName: string, walletConfig: WalletConfig, phrase: string, walletType: string) {
+  public readonly addressIndex: number;
+
+  constructor(
+    walletName: string,
+    walletConfig: WalletConfig,
+    phrase: string,
+    walletType: string,
+    addressIndex: number,
+  ) {
     this.walletName = walletName;
     this.config = walletConfig;
     this.phrase = phrase;
     this.walletType = walletType;
+    this.addressIndex = addressIndex;
   }
 }

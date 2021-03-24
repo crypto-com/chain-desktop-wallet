@@ -14,6 +14,7 @@ const wallet = new Wallet(
   '',
   false,
   NORMAL_WALLET_TYPE,
+  0, // addressIndex default
 );
 const session = new Session(wallet, 'USD');
 const asset: UserAsset = {
