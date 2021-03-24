@@ -1,3 +1,4 @@
+import Big from 'big.js';
 import { AddressType, AddressValidator } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 import { Session } from '../models/Session';
 import { UserAsset } from '../models/UserAsset';
@@ -41,6 +42,30 @@ export class TransactionUtils {
         }
         // eslint-disable-next-line prefer-promise-reject-errors
         return Promise.reject(`Invalid sending amount`);
+      },
+    });
+  }
+
+  public static maxValidator(max: string, reason: string) {
+    return () => ({
+      validator(rule, value) {
+        if (!Big(value).gt(max)) {
+          return Promise.resolve();
+        }
+        // eslint-disable-next-line prefer-promise-reject-errors
+        return Promise.reject(reason);
+      },
+    });
+  }
+
+  public static minValidator(min: string, reason: string) {
+    return () => ({
+      validator(rule, value) {
+        if (Big(value).gte(min)) {
+          return Promise.resolve();
+        }
+        // eslint-disable-next-line prefer-promise-reject-errors
+        return Promise.reject(reason);
       },
     });
   }
