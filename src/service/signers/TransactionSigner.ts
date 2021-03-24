@@ -1,6 +1,10 @@
 import sdk from '@crypto-com/chain-jslib';
 import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
-import { WalletConfig } from '../../config/StaticConfig';
+import {
+  FIXED_DEFAULT_FEE,
+  FIXED_DEFAULT_GAS_LIMIT,
+  WalletConfig,
+} from '../../config/StaticConfig';
 import {
   TransactionUnsigned,
   DelegateTransactionUnsigned,
@@ -38,7 +42,9 @@ export class TransactionSigner implements ITransactionSigner {
     const rawTx = new cro.RawTransaction();
     rawTx.setMemo(transaction.memo);
 
-    const { networkFee, gasLimit } = this.config.fee;
+    const networkFee = this.config.fee.networkFee ?? FIXED_DEFAULT_FEE;
+    const gasLimit = this.config.fee.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT;
+
     const fee = new cro.Coin(networkFee, Units.BASE);
 
     rawTx.setFee(fee);

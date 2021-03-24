@@ -1,5 +1,6 @@
 import { Big } from 'big.js';
 import { scaledBalance, UserAsset } from '../models/UserAsset';
+import { FIXED_DEFAULT_FEE } from '../config/StaticConfig';
 
 // Here we are telling the library to NOT DO any rounding, either up or down
 Big.RM = 0;
@@ -46,8 +47,10 @@ export function adjustedTransactionAmount(
   walletAsset: UserAsset,
   fee: string,
 ): string {
+  // Handle case for existing users
+  const currentFee = fee ?? FIXED_DEFAULT_FEE;
   const availableBalance = Big(scaledBalance(walletAsset));
-  const fixedFee = getNormalScaleAmount(fee, walletAsset);
+  const fixedFee = getNormalScaleAmount(currentFee, walletAsset);
 
   const amountAndFee = Big(formAmount).add(fixedFee);
   if (amountAndFee.gt(availableBalance)) {

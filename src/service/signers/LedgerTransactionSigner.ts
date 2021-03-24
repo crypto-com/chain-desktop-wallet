@@ -1,7 +1,11 @@
 import { Bytes } from '@crypto-com/chain-jslib/lib/dist/utils/bytes/bytes';
 import sdk from '@crypto-com/chain-jslib';
 import { Big, Units } from '../../utils/ChainJsLib';
-import { WalletConfig } from '../../config/StaticConfig';
+import {
+  FIXED_DEFAULT_FEE,
+  FIXED_DEFAULT_GAS_LIMIT,
+  WalletConfig,
+} from '../../config/StaticConfig';
 import {
   TransactionUnsigned,
   DelegateTransactionUnsigned,
@@ -28,8 +32,10 @@ export class LedgerTransactionSigner implements ITransactionSigner {
     const rawTx = new cro.RawTransaction();
     rawTx.setMemo(transaction.memo);
 
-    const fee = new cro.Coin(this.config.fee.networkFee, Units.BASE);
-    const { gasLimit } = this.config.fee;
+    const networkFee = this.config.fee.networkFee ?? FIXED_DEFAULT_FEE;
+    const gasLimit = this.config.fee.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT;
+
+    const fee = new cro.Coin(networkFee, Units.BASE);
 
     rawTx.setFee(fee);
     rawTx.setGasLimit(gasLimit);

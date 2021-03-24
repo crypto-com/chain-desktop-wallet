@@ -20,6 +20,7 @@ import {
   getCurrentMinAssetAmount,
   getNormalScaleAmount,
 } from '../../utils/NumberUtils';
+import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 
 const { Header, Content, Footer } = Layout;
 const layout = {};
@@ -237,7 +238,7 @@ const FormSend = () => {
             <div className="item">
               <div className="label">Transaction Fee</div>
               <div>{`${getNormalScaleAmount(
-                currentSession.wallet.config.fee.networkFee,
+                currentSession.wallet.config.fee.networkFee ?? FIXED_DEFAULT_FEE,
                 walletAsset,
               )} ${walletAsset.symbol}`}</div>
             </div>
