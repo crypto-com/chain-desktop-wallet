@@ -379,7 +379,7 @@ class WalletService {
   }
 
   public async updateWalletNodeConfig(nodeData: SettingsDataUpdate) {
-    return this.storageService.updateWalletNode(nodeData);
+    return this.storageService.updateWalletSettings(nodeData);
   }
 
   public async findWalletByIdentifier(identifier: string): Promise<Wallet> {

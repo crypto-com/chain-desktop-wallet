@@ -67,8 +67,49 @@ describe('Testing Storage Service', () => {
     expect(fetchedWallets.length).to.eq(10);
   });
 
-  it('Test updating wallet node data', async () => {
-    const mockWalletStore = new StorageService(`test-update-node-${getRandomId()}`);
+  it('Test updating wallet fees settings', async () => {
+    const mockWalletStore = new StorageService(`test-update-walle-fees-settings-${getRandomId()}`);
+    const wallet: Wallet = buildTestWallet();
+    const walletId = wallet.identifier;
+    await mockWalletStore.saveWallet(wallet);
+
+    const newFee = {
+      networkFee: '33000',
+      gasLimit: '400000',
+    };
+
+    const nodeData: SettingsDataUpdate = {
+      walletId,
+      gasLimit: newFee.gasLimit,
+      networkFee: newFee.networkFee,
+    };
+    await mockWalletStore.updateWalletSettings(nodeData);
+
+    const updatedWalletConfig = await mockWalletStore.findWalletByIdentifier(walletId);
+    console.log(updatedWalletConfig);
+
+    expect(updatedWalletConfig.config.fee.networkFee).to.eq(newFee.networkFee);
+    expect(updatedWalletConfig.config.fee.gasLimit).to.eq(newFee.gasLimit);
+
+    const newFee2 = {
+      networkFee: '38000',
+      gasLimit: '480000',
+    };
+
+    const nodeData2: SettingsDataUpdate = {
+      walletId,
+      gasLimit: newFee2.gasLimit,
+      networkFee: newFee2.networkFee,
+    };
+    await mockWalletStore.updateWalletSettings(nodeData2);
+
+    const updatedWalletConfig2 = await mockWalletStore.findWalletByIdentifier(walletId);
+    expect(updatedWalletConfig2.config.fee.networkFee).to.eq(newFee2.networkFee);
+    expect(updatedWalletConfig2.config.fee.gasLimit).to.eq(newFee2.gasLimit);
+  });
+
+  it('Test updating wallet settings data', async () => {
+    const mockWalletStore = new StorageService(`test-update-wallet-settings-${getRandomId()}`);
     const wallet: Wallet = buildTestWallet();
     const walletId = wallet.identifier;
 
@@ -76,7 +117,7 @@ describe('Testing Storage Service', () => {
 
     const newChainId = 'new-testnet-id-xv';
     const nodeData: SettingsDataUpdate = { walletId, chainId: newChainId };
-    await mockWalletStore.updateWalletNode(nodeData);
+    await mockWalletStore.updateWalletSettings(nodeData);
 
     const updatedWalletConfig = await mockWalletStore.findWalletByIdentifier(walletId);
     expect(updatedWalletConfig.config.network.chainId).to.eq(newChainId);
@@ -91,7 +132,7 @@ describe('Testing Storage Service', () => {
       nodeUrl: newNodeUrl,
       indexingUrl: newIndexingUrl,
     };
-    await mockWalletStore.updateWalletNode(nodeData2);
+    await mockWalletStore.updateWalletSettings(nodeData2);
 
     const updatedWalletConfig2 = await mockWalletStore.findWalletByIdentifier(walletId);
     expect(updatedWalletConfig2.config.nodeUrl).to.eq(newNodeUrl);
@@ -102,7 +143,7 @@ describe('Testing Storage Service', () => {
       nodeUrl: 'https://another-new-node-url-test-1.com',
       chainId: 'another-new-chainId-test',
     };
-    await mockWalletStore.updateWalletNode(nodeData3);
+    await mockWalletStore.updateWalletSettings(nodeData3);
 
     const updatedWalletConfig3 = await mockWalletStore.findWalletByIdentifier(walletId);
     expect(updatedWalletConfig3.config.nodeUrl).to.eq(nodeData3.nodeUrl);
