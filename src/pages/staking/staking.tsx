@@ -13,7 +13,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { walletAssetState, sessionState, validatorTopListState } from '../../recoil/atom';
 import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
-import { BroadCastResult, RewardTransaction } from '../../models/Transaction';
+import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   adjustedTransactionAmount,
@@ -37,6 +37,13 @@ interface RewardsTabularData {
   validatorAddress: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+interface ValidatorsTabularData {
+  key: string;
+  validatorAddress: string;
+  commissionRate: string;
+  currentShares: string;
+}
 const FormDelegationRequest = () => {
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({
@@ -624,7 +631,75 @@ const FormWithdrawStakingReward = () => {
   );
 };
 
+function convertValidators(allValidators: ValidatorModel[], currentAsset: UserAsset) {
+  return allValidators.map(validator => {
+    const data: ValidatorsTabularData = {
+      key: validator.validatorAddress + validator.currentCommissionRate,
+      commissionRate: validator.currentCommissionRate,
+      validatorAddress: validator.validatorAddress,
+      currentShares: `${validator.currentShares} ${currentAsset.symbol}`,
+    };
+    return data;
+  });
+}
 function StakingPage() {
+  const currentSession = useRecoilValue(sessionState);
+  const [validators, setValidators] = useState<ValidatorsTabularData[]>([]);
+  const didMountRef = useRef(false);
+
+  // @ts-ignore
+  useEffect(() => {
+    let unmounted = false;
+
+    const getValidatorsData = async () => {
+      const sessionData = await walletService.retrieveCurrentSession();
+      const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+      const allValidators: ValidatorModel[] = await walletService.getLatestTopValidators();
+
+      const validatorsTabularData = convertValidators(allValidators, currentAsset);
+
+      if (!unmounted) {
+        setValidators(validatorsTabularData);
+      }
+    };
+
+    if (!didMountRef.current) {
+      getValidatorsData();
+      didMountRef.current = true;
+    }
+    return () => {
+      unmounted = true;
+    };
+  }, [validators, currentSession]);
+
+  const ValidatorsColumns = [
+    {
+      title: 'Validator Address',
+      dataIndex: 'validatorAddress',
+      key: 'validatorAddress',
+      render: text => (
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+        >
+          {text}
+        </a>
+      ),
+    },
+    {
+      title: 'Total Staked Amount',
+      dataIndex: 'currentShares',
+      key: 'currentShares',
+    },
+    {
+      title: 'Commission Rate',
+      dataIndex: 'commissionRate',
+      key: 'commissionRate',
+      render: text => `${parseFloat(text).toFixed(4)}%`,
+      // render: text => <a>{middleEllipsis(text, 8)}</a>,
+    },
+  ];
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">Staking</Header>
@@ -644,6 +719,13 @@ function StakingPage() {
               <div className="container">
                 <div className="description">Delegate funds to validator.</div>
                 <FormDelegationRequest />
+              </div>
+            </div>
+          </TabPane>
+          <TabPane tab="Validators" key="3">
+            <div className="site-layout-background stake-content">
+              <div className="container">
+                <Table columns={ValidatorsColumns} dataSource={validators} />
               </div>
             </div>
           </TabPane>
