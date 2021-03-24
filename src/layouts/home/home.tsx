@@ -302,7 +302,7 @@ function HomeLayout(props: HomeLayoutProps) {
                 <div className="item">
                   <Alert
                     type="warning"
-                    message="Are you sure you want to delete the wallet? If you have not backed up your wallet mnemonic phrase, you will result in losing your funds forever."
+                    message="Are you sure you want to delete the wallet? If you have not backed up your wallet mnemonic phrase, this will result in losing your funds forever."
                     showIcon
                   />
                 </div>
