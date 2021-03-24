@@ -16,6 +16,7 @@ interface ModalPopupProps {
   footer?: Array<React.ReactNode>;
   confirmationLoading?: boolean;
   okText?: string;
+  closable?: boolean;
 }
 
 const ModalPopup: React.FC<ModalPopupProps> = props => {
@@ -30,6 +31,7 @@ const ModalPopup: React.FC<ModalPopupProps> = props => {
         footer={props.footer}
         confirmLoading={props.confirmationLoading}
         okText={props.okText}
+        closable={props.closable}
       >
         {props.children}
       </Modal>
