@@ -25,6 +25,7 @@ import IconWallet from '../../svg/IconWallet';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
+import packageJson from '../../../package.json';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -229,12 +230,14 @@ function HomeLayout(props: HomeLayoutProps) {
     );
   };
 
+  const buildVersion = packageJson.version;
+
   return (
     <main className="home-layout">
       <Layout>
         <Sider>
           <div className="logo" />
-          <div className="version">SAMPLE WALLET v0.0.1</div>
+          <div className="version">SAMPLE WALLET v{buildVersion}</div>
           <HomeMenu />
           <Dropdown
             overlay={<WalletMenu />}
