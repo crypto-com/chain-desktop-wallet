@@ -8,6 +8,7 @@ describe('Testing Wallet Creation', () => {
     const testNetConfig = DefaultWalletConfigs.TestNetConfig;
 
     const createOptions: WalletCreateOptions = {
+      walletType: 'normal',
       config: testNetConfig,
       walletName: 'My-TestNet-Wallet',
     };
@@ -26,6 +27,7 @@ describe('Testing Wallet Creation', () => {
     const mainNetConfig = DefaultWalletConfigs.MainNetConfig;
 
     const createOptions: WalletCreateOptions = {
+      walletType: 'normal',
       config: mainNetConfig,
       walletName: 'My-MainNet-Wallet',
     };
@@ -37,10 +39,13 @@ describe('Testing Wallet Creation', () => {
     expect(mainNetWallet.address.startsWith('cro')).to.eq(true);
     expect(mainNetWallet.encryptedPhrase.length > 0).to.eq(true);
     expect(mainNetWallet.identifier.length).to.eq(16);
+    expect(mainNetConfig.derivationPath).to.eq("m/44'/394'/0'/0/0");
   });
 
   it('Test creating wallet from custom configurations ', () => {
     const customConfig: WalletConfig = {
+      explorerUrl: '',
+      indexingUrl: '',
       enabled: false,
       derivationPath: "44'/245'/0'/0/0",
       name: 'Pystaport-Custom-Network',
@@ -63,6 +68,7 @@ describe('Testing Wallet Creation', () => {
     };
 
     const createOptions: WalletCreateOptions = {
+      walletType: 'normal',
       config: customConfig,
       walletName: 'My-Custom-Config-Wallet',
     };
