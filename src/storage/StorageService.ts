@@ -1,4 +1,4 @@
-import { NodeData, Wallet } from '../models/Wallet';
+import { SettingsDataUpdate, Wallet } from '../models/Wallet';
 import { DatabaseManager } from './DatabaseManager';
 import { Session } from '../models/Session';
 import {
@@ -34,7 +34,7 @@ export class StorageService {
     return this.db.walletStore.remove({ identifier: walletID }, { multi: true });
   }
 
-  public async updateWalletNode(nodeData: NodeData) {
+  public async updateWalletNode(nodeData: SettingsDataUpdate) {
     if (!nodeData.chainId && !nodeData.nodeUrl) {
       return Promise.resolve();
     }
@@ -49,6 +49,14 @@ export class StorageService {
 
     if (nodeData.indexingUrl) {
       previousWallet.config.indexingUrl = nodeData.indexingUrl;
+    }
+
+    if (nodeData.networkFee) {
+      previousWallet.config.fee.networkFee = nodeData.networkFee;
+    }
+
+    if (nodeData.gasLimit) {
+      previousWallet.config.fee.gasLimit = nodeData.gasLimit;
     }
 
     return this.db.walletStore.update<Wallet>(

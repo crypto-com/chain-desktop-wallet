@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { NodeData, reconstructCustomConfig, Wallet } from '../models/Wallet';
+import { reconstructCustomConfig, SettingsDataUpdate, Wallet } from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import {
   APP_DB_NAMESPACE,
@@ -37,7 +37,7 @@ import {
 } from '../models/Transaction';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
-import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
+import { createLedgerDevice, LEDGER_WALLET_TYPE } from './LedgerService';
 import { ISignerProvider } from './signers/SignerProvider';
 import {
   DelegationRequest,
@@ -300,7 +300,6 @@ class WalletService {
       tmpWalletConfig,
       signerProvider,
     );
-
     return {
       nodeRpc,
       accountNumber,
@@ -379,7 +378,7 @@ class WalletService {
     await this.storageService.deleteWallet(walletIdentifier);
   }
 
-  public async updateWalletNodeConfig(nodeData: NodeData) {
+  public async updateWalletNodeConfig(nodeData: SettingsDataUpdate) {
     return this.storageService.updateWalletNode(nodeData);
   }
 

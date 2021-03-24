@@ -1,11 +1,7 @@
 import { Bytes } from '@crypto-com/chain-jslib/lib/dist/utils/bytes/bytes';
 import sdk from '@crypto-com/chain-jslib';
 import { Big, Units } from '../../utils/ChainJsLib';
-import {
-  WalletConfig,
-  FIXED_DEFAULT_FEE,
-  FIXED_DEFAULT_GAS_LIMIT,
-} from '../../config/StaticConfig';
+import { WalletConfig } from '../../config/StaticConfig';
 import {
   TransactionUnsigned,
   DelegateTransactionUnsigned,
@@ -13,7 +9,6 @@ import {
   WithdrawStakingRewardUnsigned,
   UndelegateTransactionUnsigned,
   RedelegateTransactionUnsigned,
-  CustomFeeRequest,
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
 import { ITransactionSigner } from './TransactionSigner';
@@ -28,41 +23,17 @@ export class LedgerTransactionSigner implements ITransactionSigner {
     this.signerProvider = signerProvider;
   }
 
-  public getTransactionInfo(
-    _phrase: string,
-    transaction: TransactionUnsigned,
-    customFeeRequest?: CustomFeeRequest,
-  ) {
-    this.setCustomFee(transaction);
+  public getTransactionInfo(_phrase: string, transaction: TransactionUnsigned) {
     const cro = sdk.CroSDK({ network: this.config.network });
     const rawTx = new cro.RawTransaction();
     rawTx.setMemo(transaction.memo);
 
-    if (transaction.fee) {
-      const fee = new cro.Coin(transaction.fee, Units.BASE);
-      const gasLimit = transaction.gasLimit as string;
+    const fee = new cro.Coin(this.config.fee.networkFee, Units.BASE);
+    const { gasLimit } = this.config.fee;
 
-      rawTx.setFee(fee);
-      rawTx.setGasLimit(gasLimit);
-    }
-
-    // Custom transaction fees from a transaction type
-    if (customFeeRequest) {
-      const fee = new cro.Coin(customFeeRequest.fee, Units.BASE);
-      const gasLimit = customFeeRequest.gasLimit as string;
-
-      rawTx.setFee(fee);
-      rawTx.setGasLimit(gasLimit);
-    }
-
+    rawTx.setFee(fee);
+    rawTx.setGasLimit(gasLimit);
     return { cro, rawTx };
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  public setCustomFee(transaction: TransactionUnsigned) {
-    transaction.fee = `${FIXED_DEFAULT_FEE}`;
-    transaction.gasLimit = `${FIXED_DEFAULT_GAS_LIMIT}`;
-    return transaction;
   }
 
   public async signTransfer(
@@ -203,8 +174,7 @@ export class LedgerTransactionSigner implements ITransactionSigner {
     transaction: RedelegateTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
-    const customFeeRequest = { fee: '20000', gasLimit: '400000' };
-    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, customFeeRequest);
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
 
     const msgBeginRedelegate = new cro.staking.MsgBeginRedelegate({
       delegatorAddress: transaction.delegatorAddress,

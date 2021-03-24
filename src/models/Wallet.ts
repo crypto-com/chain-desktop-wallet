@@ -1,4 +1,10 @@
-import { DefaultWalletConfigs, Network, WalletConfig } from '../config/StaticConfig';
+import {
+  DefaultWalletConfigs,
+  FIXED_DEFAULT_FEE,
+  FIXED_DEFAULT_GAS_LIMIT,
+  Network,
+  WalletConfig,
+} from '../config/StaticConfig';
 
 export class Wallet {
   public readonly identifier: string;
@@ -38,11 +44,13 @@ export class Wallet {
   }
 }
 
-export interface NodeData {
+export interface SettingsDataUpdate {
   walletId: string;
   chainId?: string | undefined;
   nodeUrl?: string | undefined;
   indexingUrl?: string | undefined;
+  gasLimit?: string | undefined;
+  networkFee?: string | undefined;
 }
 
 export interface CustomConfigFormValue {
@@ -74,5 +82,9 @@ export function reconstructCustomConfig(formValues: CustomConfigFormValue): Wall
     network: customNetwork,
     nodeUrl: formValues.nodeUrl,
     indexingUrl: formValues.indexingUrl,
+    fee: {
+      gasLimit: FIXED_DEFAULT_GAS_LIMIT,
+      networkFee: FIXED_DEFAULT_FEE,
+    },
   };
 }

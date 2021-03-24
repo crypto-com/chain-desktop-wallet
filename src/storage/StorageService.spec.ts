@@ -4,7 +4,7 @@ import { DefaultWalletConfigs } from '../config/StaticConfig';
 import { WalletCreateOptions, WalletCreator } from '../service/WalletCreator';
 import { StorageService } from './StorageService';
 import { Session } from '../models/Session';
-import { NodeData, Wallet } from '../models/Wallet';
+import { SettingsDataUpdate, Wallet } from '../models/Wallet';
 import { getRandomId } from '../crypto/RandomGen';
 import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { TransactionStatus, TransferTransactionData } from '../models/Transaction';
@@ -75,7 +75,7 @@ describe('Testing Storage Service', () => {
     await mockWalletStore.saveWallet(wallet);
 
     const newChainId = 'new-testnet-id-xv';
-    const nodeData: NodeData = { walletId, chainId: newChainId };
+    const nodeData: SettingsDataUpdate = { walletId, chainId: newChainId };
     await mockWalletStore.updateWalletNode(nodeData);
 
     const updatedWalletConfig = await mockWalletStore.findWalletByIdentifier(walletId);
@@ -86,14 +86,18 @@ describe('Testing Storage Service', () => {
 
     const newNodeUrl = 'https://testnet-new-croeseid.crypto-4.org';
     const newIndexingUrl = 'https://crossfire.crypto.org/api/v1/';
-    const nodeData2: NodeData = { walletId, nodeUrl: newNodeUrl, indexingUrl: newIndexingUrl };
+    const nodeData2: SettingsDataUpdate = {
+      walletId,
+      nodeUrl: newNodeUrl,
+      indexingUrl: newIndexingUrl,
+    };
     await mockWalletStore.updateWalletNode(nodeData2);
 
     const updatedWalletConfig2 = await mockWalletStore.findWalletByIdentifier(walletId);
     expect(updatedWalletConfig2.config.nodeUrl).to.eq(newNodeUrl);
     expect(updatedWalletConfig2.config.indexingUrl).to.eq(newIndexingUrl);
 
-    const nodeData3: NodeData = {
+    const nodeData3: SettingsDataUpdate = {
       walletId,
       nodeUrl: 'https://another-new-node-url-test-1.com',
       chainId: 'another-new-chainId-test',
