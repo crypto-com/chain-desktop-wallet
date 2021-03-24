@@ -1,5 +1,6 @@
 import { isBroadcastTxFailure, StargateClient } from '@cosmjs/stargate';
 import axios, { AxiosInstance } from 'axios';
+import { Big } from 'big.js';
 import { Bytes } from '../../utils/ChainJsLib';
 import { CosmosPorts } from '../../config/StaticConfig';
 import { DelegationResult, RewardResponse, ValidatorListResponse } from './NodeRpcModels';
@@ -10,6 +11,7 @@ import {
   StakingTransactionList,
   TransactionStatus,
   ValidatorModel,
+  ValidatorModelExtended,
 } from '../../models/Transaction';
 
 export interface INodeRpcService {
@@ -167,6 +169,26 @@ export class NodeRpcService implements INodeRpcService {
         const validator: ValidatorModel = {
           currentShares: unjailedValidator.delegator_shares,
           currentCommissionRate: unjailedValidator.commission.commission_rates.rate,
+          validatorAddress: unjailedValidator.operator_address,
+        };
+        return validator;
+      });
+  }
+
+  public async loadBondedValidators(): Promise<ValidatorModelExtended[]> {
+    const response = await this.proxyClient.get<ValidatorListResponse>(
+      `/cosmos/staking/v1beta1/validators`,
+    );
+
+    return response.data.validators
+      .filter(v => !v.jailed)
+      .sort((v1, v2) => Big(v2.delegator_shares).cmp(Big(v1.delegator_shares)))
+      .map(unjailedValidator => {
+        const validator: ValidatorModelExtended = {
+          validatorName: unjailedValidator.description.moniker,
+          currentShares: unjailedValidator.delegator_shares,
+          currentCommissionRate: unjailedValidator.commission.commission_rates.rate,
+          maxCommissionRate: unjailedValidator.commission.commission_rates.max_rate,
           validatorAddress: unjailedValidator.operator_address,
         };
         return validator;

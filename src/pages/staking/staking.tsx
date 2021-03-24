@@ -13,7 +13,11 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { walletAssetState, sessionState, validatorTopListState } from '../../recoil/atom';
 import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
-import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
+import {
+  BroadCastResult,
+  RewardTransaction,
+  ValidatorModelExtended,
+} from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   adjustedTransactionAmount,
@@ -40,8 +44,10 @@ interface RewardsTabularData {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface ValidatorsTabularData {
   key: string;
+  validatorName: string;
   validatorAddress: string;
   commissionRate: string;
+  maxCommissionRate: string;
   currentShares: string;
 }
 const FormDelegationRequest = () => {
@@ -631,13 +637,15 @@ const FormWithdrawStakingReward = () => {
   );
 };
 
-function convertValidators(allValidators: ValidatorModel[], currentAsset: UserAsset) {
+function convertValidators(allValidators: ValidatorModelExtended[], currentAsset: UserAsset) {
   return allValidators.map(validator => {
     const data: ValidatorsTabularData = {
       key: validator.validatorAddress + validator.currentCommissionRate,
-      commissionRate: validator.currentCommissionRate,
+      validatorName: validator.validatorName,
       validatorAddress: validator.validatorAddress,
-      currentShares: `${validator.currentShares} ${currentAsset.symbol}`,
+      commissionRate: validator.currentCommissionRate,
+      maxCommissionRate: validator.maxCommissionRate,
+      currentShares: `${parseFloat(validator.currentShares).toFixed(4)} ${currentAsset.symbol}`,
     };
     return data;
   });
@@ -654,7 +662,7 @@ function StakingPage() {
     const getValidatorsData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
-      const allValidators: ValidatorModel[] = await walletService.getLatestTopValidators();
+      const allValidators: ValidatorModelExtended[] = await walletService.getBondedValidators();
 
       const validatorsTabularData = convertValidators(allValidators, currentAsset);
 
@@ -673,6 +681,11 @@ function StakingPage() {
   }, [validators, currentSession]);
 
   const ValidatorsColumns = [
+    {
+      title: 'Name',
+      dataIndex: 'validatorName',
+      key: 'validatorName',
+    },
     {
       title: 'Validator Address',
       dataIndex: 'validatorAddress',
@@ -696,8 +709,13 @@ function StakingPage() {
       title: 'Commission Rate',
       dataIndex: 'commissionRate',
       key: 'commissionRate',
-      render: text => `${parseFloat(text).toFixed(4)}%`,
-      // render: text => <a>{middleEllipsis(text, 8)}</a>,
+      render: text => `${(parseFloat(text) * 100).toFixed(2)}%`,
+    },
+    {
+      title: 'Max Commission Rate',
+      dataIndex: 'maxCommissionRate',
+      key: 'maxCommissionRate',
+      render: text => `${(parseFloat(text) * 100).toFixed(2)}%`,
     },
   ];
   return (

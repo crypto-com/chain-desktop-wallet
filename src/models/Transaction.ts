@@ -63,3 +63,11 @@ export interface ValidatorModel {
   readonly currentCommissionRate: string;
   readonly currentShares: string;
 }
+
+export interface ValidatorModelExtended {
+  readonly validatorName: string;
+  readonly validatorAddress: string;
+  readonly currentCommissionRate: string;
+  readonly maxCommissionRate: string;
+  readonly currentShares: string;
+}
