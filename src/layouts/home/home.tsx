@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Dropdown, Layout, Menu, Spin } from 'antd';
+import { Dropdown, Layout, Menu, Spin, Button, Alert, Checkbox, Form, Input } from 'antd';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Icon, {
   CaretDownOutlined,
@@ -10,6 +10,7 @@ import Icon, {
   PlusOutlined,
   CheckOutlined,
   SettingOutlined,
+  DeleteOutlined,
 } from '@ant-design/icons';
 import { useRecoilState } from 'recoil';
 
@@ -21,6 +22,7 @@ import IconSend from '../../svg/IconSend';
 import IconReceive from '../../svg/IconReceive';
 import IconStaking from '../../svg/IconStaking';
 import IconWallet from '../../svg/IconWallet';
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
 
@@ -33,12 +35,50 @@ const { SubMenu } = Menu;
 
 function HomeLayout(props: HomeLayoutProps) {
   const history = useHistory();
+  const [confirmDeleteForm] = Form.useForm();
   const [hasWallet, setHasWallet] = useState(true); // Default as true. useEffect will only re-render if result of hasWalletBeenCreated === false
   const [session, setSession] = useRecoilState(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [loading, setLoading] = useState(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
+  const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
+
+  const onWalletDeleteFinish = async () => {
+    setIsButtonLoading(true);
+    setLoading(true);
+
+    if (!session) {
+      return;
+    }
+    await walletService.deleteWallet(session.wallet.identifier);
+
+    // Switch to existing default wallet
+    const allWalletsData = await walletService.retrieveAllWallets();
+    setWalletList(allWalletsData);
+    await walletService.setCurrentSession(new Session(walletList[0]));
+    const currentSession = await walletService.retrieveCurrentSession();
+    const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+    setSession(currentSession);
+    setUserAsset(currentAsset);
+    await walletService.syncAll(currentSession);
+
+    setIsButtonLoading(false);
+    setIsConfirmationModalVisible(false);
+    setLoading(false);
+  };
+
+  const handleCancel = () => {
+    setIsConfirmationModalVisible(false);
+    setIsConfirmDeleteVisible(false);
+  };
+
+  const showPasswordModal = () => {
+    setIsConfirmationModalVisible(false);
+  };
 
   useEffect(() => {
     const fetchDB = async () => {
@@ -172,6 +212,19 @@ function HomeLayout(props: HomeLayoutProps) {
         ) : (
           ''
         )}
+        {walletList.length > 1 ? (
+          <>
+            <Menu.Item
+              className="delete-wallet-item"
+              onClick={() => setIsConfirmationModalVisible(true)}
+            >
+              <DeleteOutlined />
+              Delete Wallet
+            </Menu.Item>
+          </>
+        ) : (
+          ''
+        )}
       </Menu>
     );
   };
@@ -202,6 +255,97 @@ function HomeLayout(props: HomeLayoutProps) {
         ) : (
           props.children
         )}
+        <ModalPopup
+          isModalVisible={isConfirmationModalVisible}
+          handleCancel={handleCancel}
+          handleOk={showPasswordModal}
+          confirmationLoading={isButtonLoading}
+          closable={!isButtonLoading}
+          okText="Confirm"
+          footer={[
+            <Button
+              key="submit"
+              type="primary"
+              loading={isButtonLoading}
+              onClick={() => setIsConfirmDeleteVisible(true)}
+              disabled={isButtonDisabled}
+              hidden={isConfirmDeleteVisible}
+              danger
+            >
+              Confirm
+            </Button>,
+            <Button
+              key="submit"
+              type="primary"
+              loading={isButtonLoading}
+              onClick={confirmDeleteForm.submit}
+              disabled={isButtonDisabled}
+              hidden={!isConfirmDeleteVisible}
+              danger
+            >
+              Delete Wallet
+            </Button>,
+            <Button key="back" type="link" onClick={handleCancel} disabled={isButtonLoading}>
+              Cancel
+            </Button>,
+          ]}
+        >
+          <>
+            <div className="title">Confirm Wallet Deletion</div>
+            <div className="description">Please review the below information. </div>
+            <div className="item">
+              <div className="label">Delete Wallet Address</div>
+              <div className="address">{`${session.wallet.address}`}</div>
+            </div>
+            {!isConfirmDeleteVisible ? (
+              <>
+                <div className="item">
+                  <Alert
+                    type="warning"
+                    message="Are you sure you want to delete the wallet? If you have not backed up your wallet mnemonic phrase, you will result in losing your funds forever."
+                    showIcon
+                  />
+                </div>
+                <div className="item">
+                  <Checkbox
+                    checked={!isButtonDisabled}
+                    onChange={() => setIsButtonDisabled(!isButtonDisabled)}
+                  >
+                    I understand that the only way to regain access is by restoring wallet mnemonic
+                    phrase.
+                  </Checkbox>
+                </div>
+              </>
+            ) : (
+              <div className="item">
+                <Form
+                  layout="vertical"
+                  form={confirmDeleteForm}
+                  name="control-hooks"
+                  requiredMark="optional"
+                  onFinish={onWalletDeleteFinish}
+                >
+                  <Form.Item
+                    name="delete"
+                    label="Please enter DELETE"
+                    hasFeedback
+                    rules={[
+                      {
+                        required: true,
+                      },
+                      {
+                        pattern: /DELETE/,
+                        message: 'Please enter DELETE',
+                      },
+                    ]}
+                  >
+                    <Input />
+                  </Form.Item>
+                </Form>
+              </div>
+            )}
+          </>
+        </ModalPopup>
       </Layout>
     </main>
   );

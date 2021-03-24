@@ -230,12 +230,6 @@ const FormSettings = () => {
                     You may wish to verify your recovery mnemonic phrase before deletion to ensure
                     that you can restore this wallet in the future.
                   </div>
-                  {/* <div className="item">
-                <div className="label">Sender Address</div>
-              </div>
-              <div className="item">
-                <div className="label">Undelegate From Validator</div>
-              </div> */}
                   <div className="item">
                     <Alert
                       type="warning"
