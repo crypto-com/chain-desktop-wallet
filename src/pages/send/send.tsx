@@ -189,10 +189,9 @@ const FormSend = () => {
           </div>
         </div>
       </div>
-      <Form.Item name="memo" label="Memo (Optional)">
+      <Form.Item name="memo" label="Memo (Optional)" hidden>
         <Input />
       </Form.Item>
-
       <Form.Item {...tailLayout}>
         <ModalPopup
           isModalVisible={isConfirmationModalVisible}
