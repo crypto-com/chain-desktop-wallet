@@ -17,16 +17,27 @@ export type WalletConfig = {
   indexingUrl: string;
   derivationPath: string;
   network: Network;
+  fee: {
+    gasLimit: string;
+    networkFee: string;
+  };
 };
+
+export const FIXED_DEFAULT_FEE = String(10_000);
+export const FIXED_DEFAULT_GAS_LIMIT = String(300_000);
 
 const TestNetConfig: WalletConfig = {
   enabled: true,
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",
-  explorerUrl: 'https://crypto.org/explorer',
-  indexingUrl: 'https://crypto.org/explorer/api/v1/',
-  nodeUrl: 'https://testnet-croeseid.crypto.org',
+  explorerUrl: 'https://crypto.org/explorer/croeseid',
+  indexingUrl: 'https://crypto.org/explorer/croeseid/api/v1/',
+  nodeUrl: CroNetwork.Testnet.defaultNodeUrl,
   network: CroNetwork.Testnet,
+  fee: {
+    gasLimit: FIXED_DEFAULT_GAS_LIMIT,
+    networkFee: FIXED_DEFAULT_FEE,
+  },
 };
 
 // This constant value is used when actual values are not known yet
@@ -37,10 +48,14 @@ const MainNetConfig: WalletConfig = {
   enabled: true,
   name: 'MAINNET',
   derivationPath: "m/44'/394'/0'/0/0",
-  nodeUrl: NOT_KNOWN_YET_VALUE,
-  explorerUrl: NOT_KNOWN_YET_VALUE,
-  indexingUrl: NOT_KNOWN_YET_VALUE,
+  nodeUrl: CroNetwork.Mainnet.defaultNodeUrl,
+  explorerUrl: 'https://crypto.org/explorer',
+  indexingUrl: 'https://crypto.org/explorer/api/v1/',
   network: CroNetwork.Mainnet,
+  fee: {
+    gasLimit: FIXED_DEFAULT_GAS_LIMIT,
+    networkFee: FIXED_DEFAULT_FEE,
+  },
 };
 
 // Supposed to be fully customizable by the user when it will be supported
@@ -60,6 +75,10 @@ export const CustomDevNet: WalletConfig = {
   nodeUrl: '',
   indexingUrl: '',
   explorerUrl: '',
+  fee: {
+    gasLimit: FIXED_DEFAULT_GAS_LIMIT,
+    networkFee: FIXED_DEFAULT_FEE,
+  },
 };
 
 // Available wallet configs will be presented to the user on wallet creation
@@ -99,5 +118,3 @@ export type Network = {
   validatorAddressPrefix: string;
   coin: { baseDenom: string; croDenom: string };
 };
-
-export const FIXED_DEFAULT_FEE = 5_000;

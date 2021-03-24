@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { NodeData, reconstructCustomConfig, Wallet } from '../models/Wallet';
+import { reconstructCustomConfig, SettingsDataUpdate, Wallet } from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import {
   APP_DB_NAMESPACE,
@@ -16,6 +16,7 @@ import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
 import { Session } from '../models/Session';
 import {
   DelegateTransactionUnsigned,
+  RedelegateTransactionUnsigned,
   TransferTransactionUnsigned,
   UndelegateTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
@@ -36,34 +37,15 @@ import {
 } from '../models/Transaction';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
-import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
+import { createLedgerDevice, LEDGER_WALLET_TYPE } from './LedgerService';
 import { ISignerProvider } from './signers/SignerProvider';
-
-export interface TransferRequest {
-  toAddress: string;
-  amount: string;
-  memo: string;
-  decryptedPhrase: string;
-  asset: UserAsset;
-  walletType: string; // normal, ledger
-}
-
-export interface DelegationRequest {
-  validatorAddress: string;
-  amount: string;
-  memo: string;
-  asset: UserAsset;
-  decryptedPhrase: string;
-  walletType: string; // normal, ledger
-}
-
-export interface UndelegationRequest extends DelegationRequest {}
-
-export interface WithdrawStakingRewardRequest {
-  validatorAddress: string;
-  decryptedPhrase: string;
-  walletType: string; // normal, ledger
-}
+import {
+  DelegationRequest,
+  RedelegationRequest,
+  TransferRequest,
+  UndelegationRequest,
+  WithdrawStakingRewardRequest,
+} from './TransactionRequestModels';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -197,6 +179,50 @@ class WalletService {
     return broadCastResult;
   }
 
+  public async sendReDelegateTransaction(
+    redelegationRequest: RedelegationRequest,
+  ): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.prepareTransaction();
+
+    const redelegationAmountScaled = getBaseScaledAmount(
+      redelegationRequest.amount,
+      redelegationRequest.asset,
+    );
+    const redelegateTransactionUnsigned: RedelegateTransactionUnsigned = {
+      delegatorAddress: currentSession.wallet.address,
+      sourceValidatorAddress: redelegationRequest.validatorSourceAddress,
+      destinationValidatorAddress: redelegationRequest.validatorDestinationAddress,
+      amount: redelegationAmountScaled,
+      memo: redelegationRequest.memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string;
+    if (redelegationRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signRedelegateTx(
+        redelegateTransactionUnsigned,
+        redelegationRequest.decryptedPhrase,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signRedelegateTx(
+        redelegateTransactionUnsigned,
+        redelegationRequest.decryptedPhrase,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.syncAll(currentSession);
+    return broadCastResult;
+  }
+
   public async syncAll(session: Session | null = null) {
     const currentSession =
       session == null ? await this.storageService.retrieveCurrentSession() : session;
@@ -273,8 +299,8 @@ class WalletService {
       // currentWallet.config,
       tmpWalletConfig,
       signerProvider,
+      currentWallet.addressIndex,
     );
-
     return {
       nodeRpc,
       accountNumber,
@@ -288,8 +314,8 @@ class WalletService {
   // eslint-disable-next-line class-methods-use-this
   public supportedConfigs(): WalletConfig[] {
     return [
-      DefaultWalletConfigs.TestNetConfig,
       DefaultWalletConfigs.MainNetConfig,
+      DefaultWalletConfigs.TestNetConfig,
       DefaultWalletConfigs.CustomDevNet,
     ];
   }
@@ -333,6 +359,7 @@ class WalletService {
             data.encryptedPhrase,
             data.hasBeenEncrypted,
             data.walletType,
+            data.addressIndex,
           ),
       );
   }
@@ -353,8 +380,8 @@ class WalletService {
     await this.storageService.deleteWallet(walletIdentifier);
   }
 
-  public async updateWalletNodeConfig(nodeData: NodeData) {
-    return this.storageService.updateWalletNode(nodeData);
+  public async updateWalletNodeConfig(nodeData: SettingsDataUpdate) {
+    return this.storageService.updateWalletSettings(nodeData);
   }
 
   public async findWalletByIdentifier(identifier: string): Promise<Wallet> {
@@ -519,14 +546,16 @@ class WalletService {
     };
   }
 
-  public async syncBalancesData(session: Session | null = null): Promise<void> {
+  public async syncBalancesData(session: Session | null = null): Promise<any> {
     // Stop background fetch tasks if the wallet configuration network is not live yet
     if (session?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve();
     }
     try {
-      await this.fetchAndUpdateBalances(session);
-      return await this.loadAndSaveAssetPrices(session);
+      return await Promise.all([
+        await this.fetchAndUpdateBalances(session),
+        await this.loadAndSaveAssetPrices(session),
+      ]);
       // eslint-disable-next-line no-empty
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -552,7 +581,7 @@ class WalletService {
     // fetch first address , ledger identifier
     if (wallet.walletType === LEDGER_WALLET_TYPE) {
       const device: ISignerProvider = createLedgerDevice();
-      const address = await device.getAddress(0, addressprefix, false);
+      const address = await device.getAddress(wallet.addressIndex, addressprefix, false);
       wallet.address = address;
     }
 

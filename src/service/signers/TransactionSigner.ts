@@ -1,12 +1,17 @@
 import sdk from '@crypto-com/chain-jslib';
 import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
-import { FIXED_DEFAULT_FEE, WalletConfig } from '../../config/StaticConfig';
+import {
+  FIXED_DEFAULT_FEE,
+  FIXED_DEFAULT_GAS_LIMIT,
+  WalletConfig,
+} from '../../config/StaticConfig';
 import {
   TransactionUnsigned,
   DelegateTransactionUnsigned,
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
   UndelegateTransactionUnsigned,
+  RedelegateTransactionUnsigned,
 } from './TransactionSupported';
 
 export interface ITransactionSigner {
@@ -28,7 +33,6 @@ export class TransactionSigner implements ITransactionSigner {
   }
 
   public getTransactionInfo(phrase: string, transaction: TransactionUnsigned) {
-    this.setCustomFee(transaction);
     const cro = sdk.CroSDK({ network: this.config.network });
 
     const importedHDKey = HDKey.fromMnemonic(phrase);
@@ -38,18 +42,15 @@ export class TransactionSigner implements ITransactionSigner {
     const rawTx = new cro.RawTransaction();
     rawTx.setMemo(transaction.memo);
 
-    if (transaction.fee) {
-      const fee = new cro.Coin(transaction.fee, Units.BASE);
-      rawTx.setFee(fee);
-    }
+    const networkFee = this.config.fee.networkFee ?? FIXED_DEFAULT_FEE;
+    const gasLimit = this.config.fee.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT;
+
+    const fee = new cro.Coin(networkFee, Units.BASE);
+
+    rawTx.setFee(fee);
+    rawTx.setGasLimit(gasLimit);
 
     return { cro, keyPair, rawTx };
-  }
-
-  // eslint-disable-next-line class-methods-use-this
-  public setCustomFee(transaction: TransactionUnsigned) {
-    transaction.fee = `${FIXED_DEFAULT_FEE}`;
-    return transaction;
   }
 
   public async signTransfer(
@@ -147,6 +148,34 @@ export class TransactionSigner implements ITransactionSigner {
 
     const signableTx = rawTx
       .appendMessage(msgUndelegate)
+      .addSigner({
+        publicKey: keyPair.getPubKey(),
+        accountNumber: new Big(transaction.accountNumber),
+        accountSequence: new Big(transaction.accountSequence),
+      })
+      .toSignable();
+
+    return signableTx
+      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
+      .toSigned()
+      .getHexEncoded();
+  }
+
+  public async signRedelegateTx(
+    transaction: RedelegateTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
+
+    const msgBeginRedelegate = new cro.staking.MsgBeginRedelegate({
+      delegatorAddress: transaction.delegatorAddress,
+      validatorSrcAddress: transaction.sourceValidatorAddress,
+      validatorDstAddress: transaction.destinationValidatorAddress,
+      amount: new cro.Coin(transaction.amount, Units.BASE),
+    });
+
+    const signableTx = rawTx
+      .appendMessage(msgBeginRedelegate)
       .addSigner({
         publicKey: keyPair.getPubKey(),
         accountNumber: new Big(transaction.accountNumber),

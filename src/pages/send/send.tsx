@@ -44,6 +44,7 @@ const FormSend = () => {
     const transferInoputAmount = adjustedTransactionAmount(
       form.getFieldValue('amount'),
       walletAsset,
+      currentSession.wallet.config.fee.networkFee,
     );
     setFormValues({
       ...form.getFieldsValue(),
@@ -118,16 +119,27 @@ const FormSend = () => {
     setIsErrorTransferModalVisible(false);
   };
 
+  const scaleUpBalance = scaledBalance(walletAsset); // From BaseXYZ balance to XYZ balance
+  const currentMinAssetAmount = getCurrentMinAssetAmount(walletAsset);
+  const maximumSendAmount = scaleUpBalance;
+
   const customAddressValidator = TransactionUtils.addressValidator(
     currentSession,
     walletAsset,
     AddressType.USER,
   );
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
+  const customMaxValidator = TransactionUtils.maxValidator(
+    maximumSendAmount,
+    'Sending amount exceeds your available wallet balance',
+  );
+  const customMinValidator = TransactionUtils.minValidator(
+    fromScientificNotation(currentMinAssetAmount),
+    `Sending amount is lower than minimum allowed of ${fromScientificNotation(
+      currentMinAssetAmount,
+    )} ${walletAsset.symbol}`,
+  );
 
-  const scaleUpBalance = scaledBalance(walletAsset); // From BaseXYZ balance to XYZ balance
-  const currentMinAssetAmount = getCurrentMinAssetAmount(walletAsset);
-  const maximumSendAmount = Number(scaleUpBalance);
   return (
     <Form
       {...layout}
@@ -165,18 +177,8 @@ const FormSend = () => {
               message: 'Sending amount cannot be 0',
             },
             customAmountValidator,
-            {
-              max: maximumSendAmount,
-              type: 'number',
-              message: 'Sending amount exceeds your available wallet balance',
-            },
-            {
-              min: currentMinAssetAmount,
-              type: 'number',
-              message: `Sending amount is lower than minimum allowed of ${fromScientificNotation(
-                currentMinAssetAmount,
-              )} ${walletAsset.symbol}`,
-            },
+            customMaxValidator,
+            customMinValidator,
           ]}
         >
           <InputNumber />
@@ -235,18 +237,20 @@ const FormSend = () => {
             </div>
             <div className="item">
               <div className="label">Transaction Fee</div>
-              <div>{`${getNormalScaleAmount(String(FIXED_DEFAULT_FEE), walletAsset)} ${walletAsset.symbol
-                }`}</div>
+              <div>{`${getNormalScaleAmount(
+                currentSession.wallet.config.fee.networkFee ?? FIXED_DEFAULT_FEE,
+                walletAsset,
+              )} ${walletAsset.symbol}`}</div>
             </div>
             <div className="item">
               <div className="label">Memo</div>
               {formValues?.memo !== undefined &&
-                formValues?.memo !== null &&
-                formValues.memo !== '' ? (
-                  <div>{`${formValues?.memo}`}</div>
-                ) : (
-                  <div>--</div>
-                )}
+              formValues?.memo !== null &&
+              formValues.memo !== '' ? (
+                <div>{`${formValues?.memo}`}</div>
+              ) : (
+                <div>--</div>
+              )}
             </div>
           </>
         </ModalPopup>
@@ -286,14 +290,14 @@ const FormSend = () => {
         >
           <>
             {broadcastResult?.code !== undefined &&
-              broadcastResult?.code !== null &&
-              broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-                <div className="description">
-                  The transaction timed out but it will be included in the subsequent blocks
-                </div>
-              ) : (
-                <div className="description">The transaction was broadcasted successfully!</div>
-              )}
+            broadcastResult?.code !== null &&
+            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+              <div className="description">
+                The transaction timed out but it will be included in the subsequent blocks
+              </div>
+            ) : (
+              <div className="description">The transaction was broadcasted successfully!</div>
+            )}
             {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
           </>
         </SuccessModalPopup>

@@ -82,7 +82,11 @@ const FormDelegationRequest = () => {
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
-    const stakeInputAmount = adjustedTransactionAmount(form.getFieldValue('amount'), walletAsset);
+    const stakeInputAmount = adjustedTransactionAmount(
+      form.getFieldValue('amount'),
+      walletAsset,
+      currentSession.wallet.config.fee.networkFee,
+    );
 
     setFormValues({
       ...form.getFieldsValue(),
@@ -156,15 +160,26 @@ const FormDelegationRequest = () => {
     setIsErrorTransferModalVisible(false);
   };
 
+  const currentMinAssetAmount = getCurrentMinAssetAmount(walletAsset);
+  const maximumStakeAmount = scaledBalance(walletAsset);
+
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
   const customAddressValidator = TransactionUtils.addressValidator(
     currentSession,
     walletAsset,
     AddressType.VALIDATOR,
   );
+  const customMaxValidator = TransactionUtils.maxValidator(
+    maximumStakeAmount,
+    'Staking amount exceeds your available wallet balance',
+  );
+  const customMinValidator = TransactionUtils.minValidator(
+    fromScientificNotation(currentMinAssetAmount),
+    `Staking amount is lower than minimum allowed of ${fromScientificNotation(
+      currentMinAssetAmount,
+    )} ${walletAsset.symbol}`,
+  );
 
-  const currentMinAssetAmount = getCurrentMinAssetAmount(walletAsset);
-  const maximumStakeAmount = Number(scaledBalance(walletAsset));
   return (
     <Form
       {...layout}
@@ -211,18 +226,8 @@ const FormDelegationRequest = () => {
               message: 'Staking amount cannot be 0',
             },
             customAmountValidator,
-            {
-              max: maximumStakeAmount,
-              type: 'number',
-              message: 'Staking amount exceeds your available wallet balance',
-            },
-            {
-              min: currentMinAssetAmount,
-              type: 'number',
-              message: `Staking amount is lower than minimum allowed of ${fromScientificNotation(
-                currentMinAssetAmount,
-              )} ${walletAsset.symbol}`,
-            },
+            customMaxValidator,
+            customMinValidator,
           ]}
         >
           <InputNumber />
@@ -279,15 +284,15 @@ const FormDelegationRequest = () => {
               <div>{`${formValues?.amount} ${walletAsset.symbol}`}</div>
             </div>
             {formValues?.memo !== undefined &&
-              formValues?.memo !== null &&
-              formValues.memo !== '' ? (
-                <div className="item">
-                  <div className="label">Memo</div>
-                  <div>{`${formValues?.memo}`}</div>
-                </div>
-              ) : (
-                <div />
-              )}
+            formValues?.memo !== null &&
+            formValues.memo !== '' ? (
+              <div className="item">
+                <div className="label">Memo</div>
+                <div>{`${formValues?.memo}`}</div>
+              </div>
+            ) : (
+              <div />
+            )}
           </>
         </ModalPopup>
         <PasswordFormModal
@@ -324,14 +329,14 @@ const FormDelegationRequest = () => {
         >
           <>
             {broadcastResult?.code !== undefined &&
-              broadcastResult?.code !== null &&
-              broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-                <div className="description">
-                  The transaction timed out but it will be included in the subsequent blocks
-                </div>
-              ) : (
-                <div className="description">Your delegation transaction was successful !</div>
-              )}
+            broadcastResult?.code !== null &&
+            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+              <div className="description">
+                The transaction timed out but it will be included in the subsequent blocks
+              </div>
+            ) : (
+              <div className="description">Your delegation transaction was successful !</div>
+            )}
             {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
           </>
         </SuccessModalPopup>
@@ -378,8 +383,9 @@ const FormWithdrawStakingReward = () => {
       .map(reward => {
         const rewardData: RewardsTabularData = {
           key: `${reward.validatorAddress}${reward.amount}`,
-          rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${currentAsset.symbol
-            }`,
+          rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${
+            currentAsset.symbol
+          }`,
           validatorAddress: reward.validatorAddress,
         };
         return rewardData;
@@ -592,16 +598,16 @@ const FormWithdrawStakingReward = () => {
       >
         <>
           {broadcastResult?.code !== undefined &&
-            broadcastResult?.code !== null &&
-            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div className="description">
-                The transaction timed out but it will be included in the subsequent blocks
-              </div>
-            ) : (
-              <div className="description">
-                Your rewards withdrawal transaction was broadcasted successfully !
-              </div>
-            )}
+          broadcastResult?.code !== null &&
+          broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+            <div className="description">
+              The transaction timed out but it will be included in the subsequent blocks
+            </div>
+          ) : (
+            <div className="description">
+              Your rewards withdrawal transaction was broadcasted successfully !
+            </div>
+          )}
           {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
         </>
       </SuccessModalPopup>

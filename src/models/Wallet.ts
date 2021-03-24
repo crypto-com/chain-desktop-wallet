@@ -1,4 +1,10 @@
-import { DefaultWalletConfigs, Network, WalletConfig } from '../config/StaticConfig';
+import {
+  DefaultWalletConfigs,
+  FIXED_DEFAULT_FEE,
+  FIXED_DEFAULT_GAS_LIMIT,
+  Network,
+  WalletConfig,
+} from '../config/StaticConfig';
 
 export class Wallet {
   public readonly identifier: string;
@@ -19,6 +25,8 @@ export class Wallet {
 
   public readonly walletType: string;
 
+  public readonly addressIndex: number; // for ledger
+
   constructor(
     id: string,
     name: string,
@@ -27,6 +35,7 @@ export class Wallet {
     encryptedPhrase: string,
     hasBeenEncrypted: boolean = false,
     walletType: string,
+    addressIndex: number,
   ) {
     this.identifier = id;
     this.name = name;
@@ -35,14 +44,17 @@ export class Wallet {
     this.encryptedPhrase = encryptedPhrase;
     this.hasBeenEncrypted = hasBeenEncrypted;
     this.walletType = walletType;
+    this.addressIndex = addressIndex;
   }
 }
 
-export interface NodeData {
+export interface SettingsDataUpdate {
   walletId: string;
   chainId?: string | undefined;
   nodeUrl?: string | undefined;
   indexingUrl?: string | undefined;
+  gasLimit?: string | undefined;
+  networkFee?: string | undefined;
 }
 
 export interface CustomConfigFormValue {
@@ -74,5 +86,9 @@ export function reconstructCustomConfig(formValues: CustomConfigFormValue): Wall
     network: customNetwork,
     nodeUrl: formValues.nodeUrl,
     indexingUrl: formValues.indexingUrl,
+    fee: {
+      gasLimit: FIXED_DEFAULT_GAS_LIMIT,
+      networkFee: FIXED_DEFAULT_FEE,
+    },
   };
 }

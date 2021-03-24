@@ -8,6 +8,7 @@ import {
   getUINormalScaleAmount,
 } from './NumberUtils';
 import { UserAsset } from '../models/UserAsset';
+import { DefaultWalletConfigs } from '../config/StaticConfig';
 
 describe('Testing Number utils', () => {
   it('Test floating point precision ', () => {
@@ -59,7 +60,9 @@ describe('Testing Number utils', () => {
       stakedBalance: '0',
     };
 
-    expect(adjustedTransactionAmount('0.245', asset)).to.eq('0.24495');
-    expect(adjustedTransactionAmount('0.1223', asset)).to.eq('0.1223');
+    const { networkFee } = DefaultWalletConfigs.TestNetConfig.fee;
+
+    expect(adjustedTransactionAmount('0.245', asset, networkFee)).to.eq('0.2449');
+    expect(adjustedTransactionAmount('0.1223', asset, networkFee)).to.eq('0.1223');
   });
 });

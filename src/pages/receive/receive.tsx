@@ -25,11 +25,11 @@ function ReceivePage() {
 
   const clickCheckLedger = async () => {
     try {
-      const { walletType, config } = session.wallet;
+      const { addressIndex, walletType, config } = session.wallet;
       const addressprefix = config.network.addressPrefix;
       if (LEDGER_WALLET_TYPE === walletType) {
         const device = createLedgerDevice();
-        await device.getAddress(0, addressprefix, true);
+        await device.getAddress(addressIndex, addressprefix, true);
       }
     } catch (e) {
       notification.error({
