@@ -25,6 +25,8 @@ export class Wallet {
 
   public readonly walletType: string;
 
+  public readonly addressIndex: number; // for ledger
+
   constructor(
     id: string,
     name: string,
@@ -33,6 +35,7 @@ export class Wallet {
     encryptedPhrase: string,
     hasBeenEncrypted: boolean = false,
     walletType: string,
+    addressIndex: number,
   ) {
     this.identifier = id;
     this.name = name;
@@ -41,6 +44,7 @@ export class Wallet {
     this.encryptedPhrase = encryptedPhrase;
     this.hasBeenEncrypted = hasBeenEncrypted;
     this.walletType = walletType;
+    this.addressIndex = addressIndex;
   }
 }
 

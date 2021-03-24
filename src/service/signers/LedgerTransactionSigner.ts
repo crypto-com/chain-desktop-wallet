@@ -22,9 +22,12 @@ export class LedgerTransactionSigner implements ITransactionSigner {
 
   public readonly signerProvider: ISignerProvider;
 
-  constructor(config: WalletConfig, signerProvider: ISignerProvider) {
+  public readonly addressIndex: number;
+
+  constructor(config: WalletConfig, signerProvider: ISignerProvider, addressIndex: number) {
     this.config = config;
     this.signerProvider = signerProvider;
+    this.addressIndex = addressIndex;
   }
 
   public getTransactionInfo(_phrase: string, transaction: TransactionUnsigned) {
@@ -54,7 +57,9 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0, false)).toUint8Array();
+    const pubkeyoriginal = await (
+      await this.signerProvider.getPubKey(this.addressIndex, false)
+    ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
     const signableTx = rawTx
       .appendMessage(msgSend)
@@ -88,7 +93,9 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       amount: delegateAmount,
     });
 
-    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0, false)).toUint8Array();
+    const pubkeyoriginal = await (
+      await this.signerProvider.getPubKey(this.addressIndex, false)
+    ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
     const signableTx = rawTx
       .appendMessage(msgDelegate)
@@ -120,7 +127,9 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       validatorAddress: transaction.validatorAddress,
     });
 
-    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0, false)).toUint8Array();
+    const pubkeyoriginal = await (
+      await this.signerProvider.getPubKey(this.addressIndex, false)
+    ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
 
     const signableTx = rawTx
@@ -154,7 +163,9 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0, false)).toUint8Array();
+    const pubkeyoriginal = await (
+      await this.signerProvider.getPubKey(this.addressIndex, false)
+    ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
 
     const signableTx = rawTx

@@ -299,6 +299,7 @@ class WalletService {
       // currentWallet.config,
       tmpWalletConfig,
       signerProvider,
+      currentWallet.addressIndex,
     );
     return {
       nodeRpc,
@@ -358,6 +359,7 @@ class WalletService {
             data.encryptedPhrase,
             data.hasBeenEncrypted,
             data.walletType,
+            data.addressIndex,
           ),
       );
   }
@@ -579,7 +581,7 @@ class WalletService {
     // fetch first address , ledger identifier
     if (wallet.walletType === LEDGER_WALLET_TYPE) {
       const device: ISignerProvider = createLedgerDevice();
-      const address = await device.getAddress(0, addressprefix, false);
+      const address = await device.getAddress(wallet.addressIndex, addressprefix, false);
       wallet.address = address;
     }
 
