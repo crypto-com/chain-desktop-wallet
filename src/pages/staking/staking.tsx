@@ -82,7 +82,11 @@ const FormDelegationRequest = () => {
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
-    const stakeInputAmount = adjustedTransactionAmount(form.getFieldValue('amount'), walletAsset);
+    const stakeInputAmount = adjustedTransactionAmount(
+      form.getFieldValue('amount'),
+      walletAsset,
+      currentSession.wallet.config.fee.networkFee,
+    );
 
     setFormValues({
       ...form.getFieldsValue(),

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { NodeData, reconstructCustomConfig, Wallet } from '../models/Wallet';
+import { reconstructCustomConfig, SettingsDataUpdate, Wallet } from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import {
   APP_DB_NAMESPACE,
@@ -37,7 +37,7 @@ import {
 } from '../models/Transaction';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
-import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
+import { createLedgerDevice, LEDGER_WALLET_TYPE } from './LedgerService';
 import { ISignerProvider } from './signers/SignerProvider';
 import {
   DelegationRequest,
@@ -301,7 +301,6 @@ class WalletService {
       signerProvider,
       currentWallet.addressIndex,
     );
-
     return {
       nodeRpc,
       accountNumber,
@@ -381,8 +380,8 @@ class WalletService {
     await this.storageService.deleteWallet(walletIdentifier);
   }
 
-  public async updateWalletNodeConfig(nodeData: NodeData) {
-    return this.storageService.updateWalletNode(nodeData);
+  public async updateWalletNodeConfig(nodeData: SettingsDataUpdate) {
+    return this.storageService.updateWalletSettings(nodeData);
   }
 
   public async findWalletByIdentifier(identifier: string): Promise<Wallet> {
@@ -547,14 +546,16 @@ class WalletService {
     };
   }
 
-  public async syncBalancesData(session: Session | null = null): Promise<void> {
+  public async syncBalancesData(session: Session | null = null): Promise<any> {
     // Stop background fetch tasks if the wallet configuration network is not live yet
     if (session?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve();
     }
     try {
-      await this.fetchAndUpdateBalances(session);
-      return await this.loadAndSaveAssetPrices(session);
+      return await Promise.all([
+        await this.fetchAndUpdateBalances(session),
+        await this.loadAndSaveAssetPrices(session),
+      ]);
       // eslint-disable-next-line no-empty
     } catch (e) {
       // eslint-disable-next-line no-console
