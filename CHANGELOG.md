@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
 - First release with mainnet configuration support
 - Added capability to customize gas limit and network fee on transactions
 - Introduced a capability to specify address index for Ledger wallet creations
-
+- Added support for re-delegation in the wallet
 
 ## [v0.0.25] - 2021-03-12
 
