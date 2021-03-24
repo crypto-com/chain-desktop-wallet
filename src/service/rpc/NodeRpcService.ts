@@ -164,6 +164,7 @@ export class NodeRpcService implements INodeRpcService {
 
     return response.data.validators
       .filter(v => !v.jailed)
+      .sort((v1, v2) => Big(v2.delegator_shares).cmp(Big(v1.delegator_shares)))
       .slice(0, 6)
       .map(unjailedValidator => {
         const validator: ValidatorModel = {
