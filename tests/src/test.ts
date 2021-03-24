@@ -214,6 +214,7 @@ async function main() {
   const signer = new LedgerTransactionSigner(
       walletConfig,
       signerProvider,
+      0,
   );
   console.log(signer);
 
