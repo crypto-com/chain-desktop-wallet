@@ -314,8 +314,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   // eslint-disable-next-line
   const onWalletCreateFinishCore = async () => {
     setCreateLoading(true);
-    const { name, walletType, network } = props.form.getFieldsValue();
-
+    const { addressIndex, name, walletType, network } = props.form.getFieldsValue();
     if (!name || !walletType || !network) {
       return;
     }
@@ -329,6 +328,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       walletName: name,
       config: selectedNetworkConfig,
       walletType,
+      addressIndex,
     };
 
     try {
@@ -350,7 +350,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   };
 
   const onWalletCreateFinish = async () => {
-    const { walletType } = props.form.getFieldsValue();
+    const { walletType, addressIndex } = props.form.getFieldsValue();
+
     if (walletType === NORMAL_WALLET_TYPE) {
       onWalletCreateFinishCore();
       return;
@@ -361,7 +362,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     try {
       const device = createLedgerDevice();
       // check ledger device ok
-      await device.getPubKey(0, false);
+      await device.getPubKey(addressIndex, false);
       props.setLedgerConnected(true);
 
       await new Promise(resolve => {
@@ -431,6 +432,24 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             Ledger
           </Select.Option>
         </Select>
+      </Form.Item>
+      <Form.Item
+        name="addressIndex"
+        label="Address Index"
+        initialValue="0"
+        rules={[
+          {
+            required: true,
+            message: 'Please input your address index',
+          },
+          {
+            pattern: /^0$|^[1-9][0-9]?$|^100$/,
+            message: 'Index between 0 - 100',
+          },
+        ]}
+        hidden={props.isWalletSelectFieldDisable}
+      >
+        <Input placeholder="0" defaultValue="0" />
       </Form.Item>
       <Form.Item name="network" label="Network" rules={[{ required: true }]}>
         <Select

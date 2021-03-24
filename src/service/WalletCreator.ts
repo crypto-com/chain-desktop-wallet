@@ -15,6 +15,7 @@ export class WalletCreator {
       encryptedPhrase,
       hasBeenEncrypted: false,
       walletType: options.walletType,
+      addressIndex: options.addressIndex,
     };
   }
 
@@ -37,9 +38,17 @@ export class WalletCreateOptions {
 
   public readonly walletType: string;
 
-  constructor(walletConfig: WalletConfig, walletName: string, walletType: string) {
+  public readonly addressIndex: number;
+
+  constructor(
+    walletConfig: WalletConfig,
+    walletName: string,
+    walletType: string,
+    addressIndex: number,
+  ) {
     this.config = walletConfig;
     this.walletName = walletName;
     this.walletType = walletType;
+    this.addressIndex = addressIndex;
   }
 }
