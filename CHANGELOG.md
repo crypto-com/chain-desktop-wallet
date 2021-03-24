@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+
+## [v0.1.0] - 2021-03-24
+
+### Additions
+- First release with mainnet configuration support
+- Added capability to customize gas limit and network fee on transactions
+- Introduced a capability to specify address index for Ledger wallet creations
+
+
 ## [v0.0.25] - 2021-03-12
 
 ### Bug Fixes
