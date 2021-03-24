@@ -86,7 +86,6 @@ describe('Testing Storage Service', () => {
     await mockWalletStore.updateWalletSettings(nodeData);
 
     const updatedWalletConfig = await mockWalletStore.findWalletByIdentifier(walletId);
-    console.log(updatedWalletConfig);
 
     expect(updatedWalletConfig.config.fee.networkFee).to.eq(newFee.networkFee);
     expect(updatedWalletConfig.config.fee.gasLimit).to.eq(newFee.gasLimit);
