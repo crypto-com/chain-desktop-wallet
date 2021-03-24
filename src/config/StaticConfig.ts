@@ -23,7 +23,7 @@ const TestNetConfig: WalletConfig = {
   enabled: true,
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",
-  explorerUrl: 'https://crypto.org/explorer',
+  explorerUrl: 'https://crypto.org/explorer/croeseid',
   indexingUrl: 'https://crypto.org/explorer/croeseid/api/v1/',
   nodeUrl: CroNetwork.Testnet.defaultNodeUrl,
   network: CroNetwork.Testnet,
@@ -38,8 +38,8 @@ const MainNetConfig: WalletConfig = {
   name: 'MAINNET',
   derivationPath: "m/44'/394'/0'/0/0",
   nodeUrl: CroNetwork.Mainnet.defaultNodeUrl,
-  explorerUrl: NOT_KNOWN_YET_VALUE,
-  indexingUrl: NOT_KNOWN_YET_VALUE,
+  explorerUrl: 'https://crypto.org/explorer',
+  indexingUrl: 'https://crypto.org/explorer/api/v1/',
   network: CroNetwork.Mainnet,
 };
 
