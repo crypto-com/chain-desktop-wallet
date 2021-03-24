@@ -138,8 +138,8 @@ const FormSettings = () => {
       chainId: values.chainId,
       nodeUrl: values.nodeUrl,
       indexingUrl: values.indexingUrl,
-      networkFee: values.networkFee,
-      gasLimit: values.gasLimit,
+      networkFee: String(values.networkFee),
+      gasLimit: String(values.gasLimit),
     };
 
     await walletService.updateWalletNodeConfig(settingsDataUpdate);
