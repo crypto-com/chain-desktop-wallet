@@ -42,8 +42,10 @@ export class TransactionSigner implements ITransactionSigner {
     const rawTx = new cro.RawTransaction();
     rawTx.setMemo(transaction.memo);
 
-    const networkFee = this.config.fee.networkFee ?? FIXED_DEFAULT_FEE;
-    const gasLimit = this.config.fee.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT;
+    const networkFee =
+      this.config.fee !== undefined ? this.config.fee.networkFee : FIXED_DEFAULT_FEE;
+    const gasLimit =
+      this.config.fee !== undefined ? this.config.fee.gasLimit : FIXED_DEFAULT_GAS_LIMIT;
 
     const fee = new cro.Coin(networkFee, Units.BASE);
 
