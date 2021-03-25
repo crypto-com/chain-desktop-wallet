@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.1.1] - 2021-03-25
+
+### Bug Fixes
+- Fix blank screens issues on older databases
+- Fetch a new validator set to the store on wallet change event
+
 
 ## [v0.1.0] - 2021-03-24
 
