@@ -57,6 +57,12 @@ export class StorageService {
       previousWallet.config.indexingUrl = dataUpdate.indexingUrl;
     }
 
+    if (previousWallet.config.fee === undefined)
+      previousWallet.config.fee = {
+        gasLimit: '0',
+        networkFee: '0',
+      };
+
     if (dataUpdate.networkFee) {
       previousWallet.config.fee.networkFee = dataUpdate.networkFee;
     }
