@@ -12,9 +12,14 @@ import Icon, {
   SettingOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 
-import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
+import {
+  sessionState,
+  validatorTopListState,
+  walletAssetState,
+  walletListState,
+} from '../../recoil/atom';
 import { trimString } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
@@ -47,6 +52,17 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
+  const setValidatorTopList = useSetRecoilState(validatorTopListState);
+
+  async function fetchAndSetNewValidators() {
+    try {
+      const currentValidatorList = await walletService.getLatestTopValidators();
+      setValidatorTopList(currentValidatorList);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Failed loading new wallet validators list', e);
+    }
+  }
 
   const onWalletDeleteFinish = async () => {
     setIsButtonLoading(true);
@@ -66,6 +82,7 @@ function HomeLayout(props: HomeLayoutProps) {
     setSession(currentSession);
     setUserAsset(currentAsset);
     await walletService.syncAll(currentSession);
+    await fetchAndSetNewValidators();
 
     setIsButtonLoading(false);
     setIsConfirmationModalVisible(false);
@@ -91,8 +108,8 @@ function HomeLayout(props: HomeLayoutProps) {
       setHasWallet(hasWalletBeenCreated);
       setSession(sessionData);
       setUserAsset(currentAsset);
-
       setWalletList(allWalletsData);
+      await fetchAndSetNewValidators();
       setLoading(false);
     };
 
@@ -144,7 +161,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setSession(currentSession);
       setUserAsset(currentAsset);
       await walletService.syncAll(currentSession);
-
+      await fetchAndSetNewValidators();
       setLoading(false);
     };
 
