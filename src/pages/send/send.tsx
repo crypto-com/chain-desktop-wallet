@@ -44,7 +44,10 @@ const FormSend = () => {
     const transferInoputAmount = adjustedTransactionAmount(
       form.getFieldValue('amount'),
       walletAsset,
-      currentSession.wallet.config.fee.networkFee,
+      currentSession.wallet.config.fee !== undefined &&
+        currentSession.wallet.config.fee.networkFee !== undefined
+        ? currentSession.wallet.config.fee.networkFee
+        : FIXED_DEFAULT_FEE,
     );
     setFormValues({
       ...form.getFieldsValue(),
@@ -238,7 +241,10 @@ const FormSend = () => {
             <div className="item">
               <div className="label">Transaction Fee</div>
               <div>{`${getNormalScaleAmount(
-                currentSession.wallet.config.fee.networkFee ?? FIXED_DEFAULT_FEE,
+                currentSession.wallet.config.fee !== undefined &&
+                  currentSession.wallet.config.fee.networkFee !== undefined
+                  ? currentSession.wallet.config.fee.networkFee
+                  : FIXED_DEFAULT_FEE,
                 walletAsset,
               )} ${walletAsset.symbol}`}</div>
             </div>

@@ -15,6 +15,7 @@ import { walletAssetState, sessionState, validatorTopListState } from '../../rec
 import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
+import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 import {
   adjustedTransactionAmount,
   fromScientificNotation,
@@ -82,10 +83,17 @@ const FormDelegationRequest = () => {
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
+
+    const networkFee =
+      currentSession.wallet.config.fee !== undefined &&
+      currentSession.wallet.config.fee.networkFee !== undefined
+        ? currentSession.wallet.config.fee.networkFee
+        : FIXED_DEFAULT_FEE;
+
     const stakeInputAmount = adjustedTransactionAmount(
       form.getFieldValue('amount'),
       walletAsset,
-      currentSession.wallet.config.fee.networkFee,
+      networkFee,
     );
 
     setFormValues({
