@@ -11,6 +11,8 @@ import { SettingsDataUpdate } from '../../models/Wallet';
 import { Session } from '../../models/Session';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
+import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
+
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const layout = {
@@ -107,27 +109,42 @@ const FormSettings = () => {
   const defaultSettings = session.wallet.config;
   const didMountRef = useRef(false);
   const history = useHistory();
+  let networkFee = FIXED_DEFAULT_FEE;
+  let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
 
   useEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true;
+
+      if (defaultSettings.fee !== undefined) {
+        networkFee = defaultSettings.fee.networkFee;
+      }
+      if (defaultSettings.fee !== undefined) {
+        gasLimit = defaultSettings.fee.gasLimit;
+      }
+
       form.setFieldsValue({
         nodeUrl: defaultSettings.nodeUrl,
         chainId: defaultSettings.network.chainId,
         indexingUrl: defaultSettings.indexingUrl,
-        networkFee: defaultSettings.fee.networkFee,
-        gasLimit: defaultSettings.fee.gasLimit,
+        networkFee,
+        gasLimit,
       });
     }
   }, [form, defaultSettings]);
 
   const onFinish = async values => {
+    const defaultGasLimit =
+      defaultSettings.fee !== undefined ? defaultSettings.fee.gasLimit : FIXED_DEFAULT_GAS_LIMIT;
+    const defaultNetworkFee =
+      defaultSettings.fee !== undefined ? defaultSettings.fee.networkFee : FIXED_DEFAULT_FEE;
+
     if (
       defaultSettings.nodeUrl === values.nodeUrl &&
       defaultSettings.indexingUrl === values.indexingUrl &&
       defaultSettings.network.chainId === values.chainId &&
-      defaultSettings.fee.gasLimit === values.gasLimit &&
-      defaultSettings.fee.networkFee === values.networkFee
+      defaultGasLimit === values.gasLimit &&
+      defaultNetworkFee === values.networkFee
     ) {
       // No value was updated, we stop here
       return;
