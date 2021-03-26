@@ -14,6 +14,8 @@ export const UndelegateFormComponent = (props: {
     'Undelegate amount cannot be bigger than currently delegated',
   );
 
+  const undelegatePeriod = props.currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
+
   return (
     <>
       <div className="title">Confirm Undelegate Transaction</div>
@@ -55,7 +57,7 @@ export const UndelegateFormComponent = (props: {
       <div>
         <Alert
           type="info"
-          message="Please do understand that undelegation is fully completed a number of days (~28) after the transaction has been broadcasted."
+          message={`Please do understand that undelegation is fully completed a number of days (~${undelegatePeriod}) after the transaction has been broadcasted.`}
           showIcon
         />
       </div>
