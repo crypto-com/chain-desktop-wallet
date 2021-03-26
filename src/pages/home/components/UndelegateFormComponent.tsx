@@ -55,7 +55,7 @@ export const UndelegateFormComponent = (props: {
       <div>
         <Alert
           type="info"
-          message="Please do understand that undelegation is fully completed a number of days (~21) after the transaction has been broadcasted."
+          message="Please do understand that undelegation is fully completed a number of days (~28) after the transaction has been broadcasted."
           showIcon
         />
       </div>
