@@ -87,11 +87,17 @@ function HomeLayout(props: HomeLayoutProps) {
     setIsButtonLoading(false);
     setIsConfirmationModalVisible(false);
     setLoading(false);
+    setIsButtonDisabled(true);
+    setIsConfirmDeleteVisible(false);
+    confirmDeleteForm.resetFields();
   };
 
   const handleCancel = () => {
     setIsConfirmationModalVisible(false);
     setIsConfirmDeleteVisible(false);
+    setIsButtonDisabled(true);
+    setIsConfirmDeleteVisible(false);
+    confirmDeleteForm.resetFields();
   };
 
   const showPasswordModal = () => {
