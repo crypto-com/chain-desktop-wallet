@@ -59,7 +59,7 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    const pubkeyoriginal = await (
+    const pubkeyoriginal = (
       await this.signerProvider.getPubKey(this.addressIndex, false)
     ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
@@ -95,7 +95,7 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       amount: delegateAmount,
     });
 
-    const pubkeyoriginal = await (
+    const pubkeyoriginal = (
       await this.signerProvider.getPubKey(this.addressIndex, false)
     ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
@@ -129,7 +129,7 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       validatorAddress: transaction.validatorAddress,
     });
 
-    const pubkeyoriginal = await (
+    const pubkeyoriginal = (
       await this.signerProvider.getPubKey(this.addressIndex, false)
     ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
@@ -165,7 +165,7 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    const pubkeyoriginal = await (
+    const pubkeyoriginal = (
       await this.signerProvider.getPubKey(this.addressIndex, false)
     ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
@@ -202,7 +202,9 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    const pubkeyoriginal = await (await this.signerProvider.getPubKey(0, false)).toUint8Array();
+    const pubkeyoriginal = (
+      await this.signerProvider.getPubKey(this.addressIndex, false)
+    ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
 
     const signableTx = rawTx
