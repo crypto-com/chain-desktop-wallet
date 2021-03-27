@@ -62,6 +62,7 @@ export class NodeRpcService implements INodeRpcService {
     try {
       const signedBytes = Bytes.fromHexString(signedTxHex).toUint8Array();
       const broadcastResponse = await this.client.broadcastTx(signedBytes);
+      // eslint-disable-next-line no-console
       console.log(`tx failure= ${JSON.stringify(broadcastResponse)}`);
       if (isBroadcastTxFailure(broadcastResponse)) {
         // noinspection ExceptionCaughtLocallyJS
