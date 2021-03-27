@@ -165,7 +165,7 @@ const FormSend = () => {
           customAddressValidator,
         ]}
       >
-        <Input placeholder="tcro..." />
+        <Input placeholder={`${currentSession.wallet.config.network.coin.croDenom}...`} />
       </Form.Item>
       <div className="amount">
         <Form.Item

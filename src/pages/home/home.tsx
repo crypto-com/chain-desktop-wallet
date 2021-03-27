@@ -612,7 +612,6 @@ function HomePage() {
           >
             <>
               <div className="description">
-                The undelegation transaction failed. Please try again later
                 {delegationActionType === StakingActionType.UNDELEGATE
                   ? 'The undelegation transaction failed. Please try again later'
                   : 'The redelegation transaction failed. Please try again later'}
