@@ -165,7 +165,7 @@ const FormSend = () => {
           customAddressValidator,
         ]}
       >
-        <Input placeholder="tcro..." />
+        <Input placeholder="Enter recipient address" />
       </Form.Item>
       <div className="amount">
         <Form.Item
