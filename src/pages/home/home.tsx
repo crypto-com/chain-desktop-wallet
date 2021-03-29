@@ -3,7 +3,6 @@ import './home.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import Big from 'big.js';
 import { scaledBalance, scaledStakingBalance, UserAsset } from '../../models/UserAsset';
 import {
   hasShownWarningOnWalletTypeState,
@@ -28,7 +27,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
 import { UndelegateFormComponent } from './components/UndelegateFormComponent';
 import { RedelegateFormComponent } from './components/RedelegateFormComponent';
-import { getUINormalScaleAmount } from '../../utils/NumberUtils';
+import { getUIDynamicAmount } from '../../utils/NumberUtils';
 
 const { Text } = Typography;
 
@@ -65,12 +64,7 @@ interface TransferTabularData {
 function convertDelegations(allDelegations: StakingTransactionData[], currentAsset: UserAsset) {
   return allDelegations
     .map(dlg => {
-      let stakedAmount = getUINormalScaleAmount(dlg.stakedAmount, currentAsset.decimals, 4);
-
-      // For very small transfer do show up to max decimal numbers
-      if (Big(stakedAmount).lte(Big(1))) {
-        stakedAmount = getUINormalScaleAmount(dlg.stakedAmount, currentAsset.decimals, 8);
-      }
+      const stakedAmount = getUIDynamicAmount(dlg.stakedAmount, currentAsset);
       const data: StakingTabularData = {
         key: dlg.validatorAddress + dlg.stakedAmount,
         delegatorAddress: dlg.delegatorAddress,
@@ -101,13 +95,7 @@ function convertTransfers(
   }
 
   return allTransfers.map(transfer => {
-    let transferAmount = getUINormalScaleAmount(transfer.amount, currentAsset.decimals, 4);
-
-    // For very small transfer do show up to max decimal numbers
-    if (Big(transferAmount).lte(Big(1))) {
-      transferAmount = getUINormalScaleAmount(transfer.amount, currentAsset.decimals, 8);
-    }
-
+    const transferAmount = getUIDynamicAmount(transfer.amount, currentAsset);
     const data: TransferTabularData = {
       key: transfer.hash + transfer.receiverAddress + transfer.amount,
       recipientAddress: transfer.receiverAddress,

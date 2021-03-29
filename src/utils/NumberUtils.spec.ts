@@ -5,6 +5,7 @@ import {
   fromScientificNotation,
   getBaseScaledAmount,
   getNormalScaleAmount,
+  getUIDynamicAmount,
   getUINormalScaleAmount,
 } from './NumberUtils';
 import { UserAsset } from '../models/UserAsset';
@@ -38,6 +39,27 @@ describe('Testing Number utils', () => {
 
     expect(getUINormalScaleAmount('499995000', asset.decimals, 8)).to.eq('4.99995000');
     expect(getUINormalScaleAmount('334005045600', asset.decimals, 8)).to.eq('3340.05045600');
+  });
+
+  it('Test Dynamic amount display', () => {
+    const asset: UserAsset = {
+      decimals: 8,
+      mainnetSymbol: '',
+      balance: '0',
+      description: 'The best asset',
+      icon_url: 'some url',
+      identifier: 'cbd4bab2cbfd2b3',
+      name: 'Best Asset',
+      symbol: 'BEST',
+      walletId: '',
+      stakedBalance: '0',
+    };
+
+    expect(getUIDynamicAmount('499995000', asset)).to.eq('4.9999');
+    expect(getUIDynamicAmount('334005045600', asset)).to.eq('3340.0504');
+
+    expect(getUIDynamicAmount('49999501', asset)).to.eq('0.49999501');
+    expect(getUIDynamicAmount('50456031', asset)).to.eq('0.50456031');
   });
 
   it('Test conversion from scientific notation', () => {

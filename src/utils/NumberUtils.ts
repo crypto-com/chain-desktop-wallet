@@ -38,6 +38,15 @@ export function getUINormalScaleAmount(
     .toFixed(dp);
 }
 
+// For very small transactions amounts => do show up to max decimal numbers
+export function getUIDynamicAmount(amount: string, currentAsset: UserAsset) {
+  let finalAmount = getUINormalScaleAmount(amount, currentAsset.decimals, 4);
+  if (Big(finalAmount).lte(Big(1))) {
+    finalAmount = getUINormalScaleAmount(amount, currentAsset.decimals, 8);
+  }
+  return finalAmount;
+}
+
 export function getCurrentMinAssetAmount(userAsset: UserAsset) {
   const exp = Big(10).pow(userAsset.decimals);
   return Big(1)
