@@ -18,6 +18,7 @@ function buildTestWallet() {
     walletType: 'normal',
     config: testNetConfig,
     walletName: 'My-TestNet-Wallet',
+    addressIndex: 0,
   };
   return WalletCreator.create(createOptions);
 }
@@ -135,6 +136,7 @@ describe('Testing Storage Service', () => {
 
     const updatedWalletConfig2 = await mockWalletStore.findWalletByIdentifier(walletId);
     expect(updatedWalletConfig2.config.nodeUrl).to.eq(newNodeUrl);
+    expect(updatedWalletConfig2.config.network.defaultNodeUrl).to.eq(newNodeUrl);
     expect(updatedWalletConfig2.config.indexingUrl).to.eq(newIndexingUrl);
 
     const nodeData3: SettingsDataUpdate = {
@@ -146,6 +148,7 @@ describe('Testing Storage Service', () => {
 
     const updatedWalletConfig3 = await mockWalletStore.findWalletByIdentifier(walletId);
     expect(updatedWalletConfig3.config.nodeUrl).to.eq(nodeData3.nodeUrl);
+    expect(updatedWalletConfig3.config.network.defaultNodeUrl).to.eq(nodeData3.nodeUrl);
     expect(updatedWalletConfig3.config.network.chainId).to.eq(nodeData3.chainId);
   });
 
