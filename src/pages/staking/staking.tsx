@@ -50,6 +50,7 @@ const FormDelegationRequest = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
+  const [errorMessages, setErrorMessages] = useState([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
@@ -147,6 +148,7 @@ const FormDelegationRequest = () => {
 
       form.resetFields();
     } catch (e) {
+      setErrorMessages(e.message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -357,7 +359,11 @@ const FormDelegationRequest = () => {
         >
           <>
             <div className="description">
-              The staking transaction failed. Please try again later
+              The staking transaction failed. Please try again later.
+              <br />
+              {errorMessages.map((err, idx) => (
+                <div key={idx}>- {err}</div>
+              ))}
             </div>
           </>
         </ErrorModalPopup>
@@ -376,6 +382,7 @@ const FormWithdrawStakingReward = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
+  const [errorMessages, setErrorMessages] = useState([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
@@ -458,6 +465,7 @@ const FormWithdrawStakingReward = () => {
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setWalletAsset(currentWalletAsset);
     } catch (e) {
+      setErrorMessages(e.message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -628,7 +636,11 @@ const FormWithdrawStakingReward = () => {
       >
         <>
           <div className="description">
-            The reward withdrawal transaction failed. Please try again later
+            The reward withdrawal transaction failed. Please try again later.
+            <br />
+            {errorMessages.map((err, idx) => (
+              <div key={idx}>- {err}</div>
+            ))}
           </div>
         </>
       </ErrorModalPopup>

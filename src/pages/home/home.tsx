@@ -141,7 +141,7 @@ function HomePage() {
 
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
-  const [errorMessage, setErrorMessage] = useState([]);
+  const [errorMessages, setErrorMessages] = useState([]);
 
   const [undelegateFormValues, setUndelegateFormValues] = useState({
     validatorAddress: '',
@@ -390,7 +390,7 @@ function HomePage() {
         });
       }
     } catch (e) {
-      setErrorMessage(e.message.split(': '));
+      setErrorMessages(e.message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -617,10 +617,8 @@ function HomePage() {
                   ? 'The undelegation transaction failed. Please try again later.'
                   : 'The redelegation transaction failed. Please try again later.'}
                 <br />
-                {errorMessage.map(err => (
-                  <>
-                    <br />- {err}
-                  </>
+                {errorMessages.map((err, idx) => (
+                  <div key={idx}>- {err}</div>
                 ))}
               </div>
             </>
