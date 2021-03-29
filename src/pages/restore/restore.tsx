@@ -315,6 +315,9 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
         setInputPasswordVisible(true);
       }}
       onChange={onChange}
+      initialValues={{
+        network: 'MAINNET',
+      }}
     >
       <Form.Item
         name="name"
