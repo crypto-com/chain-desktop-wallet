@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from 'antd';
+import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { scaledBalance, scaledStakingBalance, UserAsset } from '../../models/UserAsset';
 import {
@@ -119,6 +120,7 @@ function HomePage() {
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
+  const [syncLoading, setSyncLoading] = useState(false);
   const didMountRef = useRef(false);
 
   // Undelegate action related states changes
@@ -165,6 +167,32 @@ function HomePage() {
         });
       }
     }, 200);
+  };
+
+  const onSyncBtnCall = async () => {
+    setSyncLoading(true);
+
+    await walletService.syncAll();
+    const sessionData = await walletService.retrieveCurrentSession();
+    const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+    const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
+      sessionData.wallet.identifier,
+    );
+    const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
+      sessionData.wallet.identifier,
+    );
+
+    const stakingTabularData = convertDelegations(allDelegations, currentAsset);
+    const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
+
+    showWalletStateNotification(currentSession.wallet.config);
+
+    setDelegations(stakingTabularData);
+    setTransfers(transferTabularData);
+    setUserAsset(currentAsset);
+    setHasShownNotLiveWallet(true);
+
+    setSyncLoading(false);
   };
 
   useEffect(() => {
@@ -478,7 +506,16 @@ function HomePage() {
 
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">Welcome Back!</Header>
+      <Header className="site-layout-background">
+        Welcome Back!
+        <SyncOutlined
+          onClick={() => {
+            onSyncBtnCall();
+          }}
+          style={{ position: 'absolute', right: '36px', marginTop: '6px' }}
+          spin={syncLoading}
+        />
+      </Header>
       <Content>
         <div className="site-layout-background balance-container">
           <div className="balance">
