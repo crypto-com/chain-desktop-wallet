@@ -456,6 +456,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           placeholder="Select wallet network"
           onChange={onNetworkChange}
           disabled={props.isNetworkSelectFieldDisable}
+          defaultValue="MAINNET"
         >
           {walletService.supportedConfigs().map(config => (
             <Select.Option key={config.name} value={config.name} disabled={!config.enabled}>

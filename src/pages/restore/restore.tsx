@@ -353,6 +353,7 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
           onChange={onNetworkChange}
           // allowClear
           disabled={props.isSelectFieldDisable}
+          defaultValue="MAINNET"
         >
           {walletService.supportedConfigs().map(config => (
             <Select.Option key={config.name} value={config.name} disabled={!config.enabled}>
