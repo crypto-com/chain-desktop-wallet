@@ -405,6 +405,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       onChange={onChange}
       initialValues={{
         walletType: 'normal',
+        addressIndex: '0',
+        network: 'MAINNET',
       }}
     >
       <Form.Item
@@ -418,12 +420,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       <Checkbox onChange={onCheckboxChange} checked={hwcheck}>
         Want to create with hardware wallet?
       </Checkbox>
-      <Form.Item
-        name="walletType"
-        label="Wallet Type"
-        initialValue="normal"
-        hidden={props.isWalletSelectFieldDisable}
-      >
+      <Form.Item name="walletType" label="Wallet Type" hidden={props.isWalletSelectFieldDisable}>
         <Select placeholder="Select wallet type" disabled={props.isWalletSelectFieldDisable}>
           <Select.Option key="normal" value="normal">
             Normal
@@ -436,7 +433,6 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       <Form.Item
         name="addressIndex"
         label="Address Index"
-        initialValue="0"
         rules={[
           {
             required: true,
@@ -449,7 +445,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         ]}
         hidden={props.isWalletSelectFieldDisable}
       >
-        <Input placeholder="0" defaultValue="0" />
+        <Input placeholder="0" />
       </Form.Item>
       <Form.Item name="network" label="Network" rules={[{ required: true }]}>
         <Select
