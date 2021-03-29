@@ -141,6 +141,7 @@ function HomePage() {
 
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
+  const [errorMessage, setErrorMessage] = useState([]);
 
   const [undelegateFormValues, setUndelegateFormValues] = useState({
     validatorAddress: '',
@@ -329,7 +330,6 @@ function HomePage() {
       const { walletType } = currentSession.wallet;
 
       // TODO : Here switch between undelegation and redelegation
-
       let broadcastedTransaction: BroadCastResult | null = null;
 
       if (delegationActionType === StakingActionType.UNDELEGATE) {
@@ -390,6 +390,7 @@ function HomePage() {
         });
       }
     } catch (e) {
+      setErrorMessage(e.message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -613,8 +614,14 @@ function HomePage() {
             <>
               <div className="description">
                 {delegationActionType === StakingActionType.UNDELEGATE
-                  ? 'The undelegation transaction failed. Please try again later'
-                  : 'The redelegation transaction failed. Please try again later'}
+                  ? 'The undelegation transaction failed. Please try again later.'
+                  : 'The redelegation transaction failed. Please try again later.'}
+                <br />
+                {errorMessage.map(err => (
+                  <>
+                    <br />- {err}
+                  </>
+                ))}
               </div>
             </>
           </ErrorModalPopup>
