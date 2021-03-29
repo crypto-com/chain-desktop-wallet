@@ -26,11 +26,16 @@ export function getNormalScaleAmount(amount: string, asset: UserAsset): string {
 }
 
 /// Get normal scale amount but fixed to 4 decimals
-export function getUINormalScaleAmount(amount: string, decimals: number): string {
+export function getUINormalScaleAmount(
+  amount: string,
+  decimals: number,
+  decimalPoint?: number,
+): string {
   const exp = Big(10).pow(decimals);
+  const dp = decimalPoint || 4;
   return Big(amount)
     .div(exp)
-    .toFixed(4);
+    .toFixed(dp);
 }
 
 export function getCurrentMinAssetAmount(userAsset: UserAsset) {

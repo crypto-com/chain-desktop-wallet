@@ -3,17 +3,13 @@ import './home.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import {
-  scaledAmount,
-  scaledBalance,
-  scaledStakingBalance,
-  UserAsset,
-} from '../../models/UserAsset';
+import Big from 'big.js';
+import { scaledBalance, scaledStakingBalance, UserAsset } from '../../models/UserAsset';
 import {
   hasShownWarningOnWalletTypeState,
   sessionState,
-  walletAssetState,
   validatorTopListState,
+  walletAssetState,
 } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
@@ -32,6 +28,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
 import { UndelegateFormComponent } from './components/UndelegateFormComponent';
 import { RedelegateFormComponent } from './components/RedelegateFormComponent';
+import { getUINormalScaleAmount } from '../../utils/NumberUtils';
 
 const { Text } = Typography;
 
@@ -68,7 +65,12 @@ interface TransferTabularData {
 function convertDelegations(allDelegations: StakingTransactionData[], currentAsset: UserAsset) {
   return allDelegations
     .map(dlg => {
-      const stakedAmount = scaledAmount(dlg.stakedAmount, currentAsset.decimals).toString();
+      let stakedAmount = getUINormalScaleAmount(dlg.stakedAmount, currentAsset.decimals, 4);
+
+      // For very small transfer do show up to max decimal numbers
+      if (Big(stakedAmount).lte(Big(1))) {
+        stakedAmount = getUINormalScaleAmount(dlg.stakedAmount, currentAsset.decimals, 8);
+      }
       const data: StakingTabularData = {
         key: dlg.validatorAddress + dlg.stakedAmount,
         delegatorAddress: dlg.delegatorAddress,
@@ -99,7 +101,13 @@ function convertTransfers(
   }
 
   return allTransfers.map(transfer => {
-    const transferAmount = scaledAmount(transfer.amount, currentAsset.decimals).toString();
+    let transferAmount = getUINormalScaleAmount(transfer.amount, currentAsset.decimals, 4);
+
+    // For very small transfer do show up to max decimal numbers
+    if (Big(transferAmount).lte(Big(1))) {
+      transferAmount = getUINormalScaleAmount(transfer.amount, currentAsset.decimals, 8);
+    }
+
     const data: TransferTabularData = {
       key: transfer.hash + transfer.receiverAddress + transfer.amount,
       recipientAddress: transfer.receiverAddress,

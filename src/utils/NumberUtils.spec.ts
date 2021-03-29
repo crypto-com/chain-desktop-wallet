@@ -35,6 +35,9 @@ describe('Testing Number utils', () => {
     expect(getUINormalScaleAmount('334005045600', asset.decimals)).to.eq('3340.0504');
 
     expect(getUINormalScaleAmount('499995000', asset.decimals)).to.eq('4.9999');
+
+    expect(getUINormalScaleAmount('499995000', asset.decimals, 8)).to.eq('4.99995000');
+    expect(getUINormalScaleAmount('334005045600', asset.decimals, 8)).to.eq('3340.05045600');
   });
 
   it('Test conversion from scientific notation', () => {
