@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.1.2] - 2021-03-29
+
+### Bug Fixes
+- Fix transaction failures on Ledger custom index wallet creations
+- Remove MacOS zip binary from release builds which was not being signed
+
+### Additions
+- Show detailed error messages on all transaction failure types
+- Present up to 8 decimals places for extra-small numbers amounts in transaction views
+- Add a physical refresh button for loading and syncing the latest transactions and balance states
+
 ## [v0.1.1] - 2021-03-25
 
 ### Bug Fixes
