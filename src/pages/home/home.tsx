@@ -2,6 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from 'antd';
+import {
+  SyncOutlined,
+} from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import {
   scaledAmount,
@@ -123,6 +126,7 @@ function HomePage() {
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
+  const [syncLoading, setSyncLoading] = useState(false);
   const didMountRef = useRef(false);
 
   // Undelegate action related states changes
@@ -170,44 +174,52 @@ function HomePage() {
     }, 200);
   };
 
+  const syncAssetData = async (unmounted) => {
+    const sessionData = await walletService.retrieveCurrentSession();
+    const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+    const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
+      sessionData.wallet.identifier,
+    );
+    const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
+      sessionData.wallet.identifier,
+    );
+
+    const stakingTabularData = convertDelegations(allDelegations, currentAsset);
+    const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
+
+    if (!unmounted) {
+      showWalletStateNotification(currentSession.wallet.config);
+
+      setDelegations(stakingTabularData);
+      setTransfers(transferTabularData);
+      setUserAsset(currentAsset);
+      setHasShownNotLiveWallet(true);
+    }
+  };
+
+  const syncValidatorsData = async () => {
+    const currentValidatorList =
+      validatorTopList.length === 0
+        ? await walletService.getLatestTopValidators()
+        : validatorTopList;
+
+    setValidatorTopList(currentValidatorList);
+  };
+  
+  const syncAllData = async (unmounted) => {
+    setSyncLoading(true);
+    await syncAssetData(unmounted);
+    await syncValidatorsData();
+    setTimeout(() => {
+      setSyncLoading(false);
+    }, 1000)
+  }
+  
   useEffect(() => {
     let unmounted = false;
 
-    const syncAssetData = async () => {
-      const sessionData = await walletService.retrieveCurrentSession();
-      const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
-      const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
-        sessionData.wallet.identifier,
-      );
-      const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
-        sessionData.wallet.identifier,
-      );
-
-      const stakingTabularData = convertDelegations(allDelegations, currentAsset);
-      const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
-
-      if (!unmounted) {
-        showWalletStateNotification(currentSession.wallet.config);
-
-        setDelegations(stakingTabularData);
-        setTransfers(transferTabularData);
-        setUserAsset(currentAsset);
-        setHasShownNotLiveWallet(true);
-      }
-    };
-
-    const syncValidatorsData = async () => {
-      const currentValidatorList =
-        validatorTopList.length === 0
-          ? await walletService.getLatestTopValidators()
-          : validatorTopList;
-
-      setValidatorTopList(currentValidatorList);
-    };
-
     if (!didMountRef.current) {
-      syncAssetData();
-      syncValidatorsData();
+      syncAllData(unmounted);
       didMountRef.current = true;
     }
 
@@ -481,7 +493,11 @@ function HomePage() {
 
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">Welcome Back!</Header>
+      <Header className="site-layout-background">Welcome Back! 
+        <SyncOutlined onClick={() => {
+          syncAllData(false);
+        }} style={{position: 'absolute', right: '36px', marginTop: '6px'}} spin={syncLoading} />
+      </Header>
       <Content>
         <div className="site-layout-background balance-container">
           <div className="balance">
