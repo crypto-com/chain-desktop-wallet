@@ -617,9 +617,13 @@ function HomePage() {
                   ? 'The undelegation transaction failed. Please try again later.'
                   : 'The redelegation transaction failed. Please try again later.'}
                 <br />
-                {errorMessages.map((err, idx) => (
-                  <div key={idx}>- {err}</div>
-                ))}
+                {errorMessages
+                  .filter((item, idx) => {
+                    return errorMessages.indexOf(item) === idx;
+                  })
+                  .map((err, idx) => (
+                    <div key={idx}>- {err}</div>
+                  ))}
               </div>
             </>
           </ErrorModalPopup>

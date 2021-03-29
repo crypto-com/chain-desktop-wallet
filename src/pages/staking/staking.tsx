@@ -361,9 +361,13 @@ const FormDelegationRequest = () => {
             <div className="description">
               The staking transaction failed. Please try again later.
               <br />
-              {errorMessages.map((err, idx) => (
-                <div key={idx}>- {err}</div>
-              ))}
+              {errorMessages
+                .filter((item, idx) => {
+                  return errorMessages.indexOf(item) === idx;
+                })
+                .map((err, idx) => (
+                  <div key={idx}>- {err}</div>
+                ))}
             </div>
           </>
         </ErrorModalPopup>
@@ -638,9 +642,13 @@ const FormWithdrawStakingReward = () => {
           <div className="description">
             The reward withdrawal transaction failed. Please try again later.
             <br />
-            {errorMessages.map((err, idx) => (
-              <div key={idx}>- {err}</div>
-            ))}
+            {errorMessages
+              .filter((item, idx) => {
+                return errorMessages.indexOf(item) === idx;
+              })
+              .map((err, idx) => (
+                <div key={idx}>- {err}</div>
+              ))}
           </div>
         </>
       </ErrorModalPopup>
