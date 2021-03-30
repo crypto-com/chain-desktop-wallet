@@ -523,6 +523,7 @@ function HomePage() {
             <div className="quantity">
               {scaledBalance(userAsset)} {userAsset?.symbol}
             </div>
+            <div className="fiat">$111 USD</div>
           </div>
           <div className="balance">
             <div className="title">STAKED BALANCE</div>
