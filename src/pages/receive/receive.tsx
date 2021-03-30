@@ -5,7 +5,6 @@ import './receive.less';
 import 'antd/dist/antd.css';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Layout, Button, notification } from 'antd';
-import MouseTooltip from 'react-sticky-mouse-tooltip';
 import { CopyOutlined } from '@ant-design/icons';
 import { sessionState } from '../../recoil/atom';
 import { Session } from '../../models/Session';
@@ -14,7 +13,6 @@ import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerServ
 const { Header, Content, Footer } = Layout;
 
 function ReceivePage() {
-  const [mouseTooltip, setMouseTooltip] = useState(false);
   const session: Session = useRecoilValue<Session>(sessionState);
   const [isLedger, setIsLedger] = useState(false);
 
@@ -42,11 +40,17 @@ function ReceivePage() {
   };
 
   const onCopyClick = () => {
-    setMouseTooltip(true);
     setTimeout(() => {
-      setMouseTooltip(false);
+      notification.success({
+        message: `Address Copied!`,
+        description: `Current account is successfully copied to your clipboard`,
+        placement: 'topRight',
+        duration: 2,
+        key: 'copy',
+      });
     }, 100);
   };
+
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">Receive</Header>
@@ -60,14 +64,8 @@ function ReceivePage() {
             </div>
             <CopyToClipboard text={session.wallet.address}>
               <div className="copy" onClick={onCopyClick}>
-                {session.wallet.address} <CopyOutlined />
-                <MouseTooltip
-                  offsetX={15}
-                  offsetY={0}
-                  className={`mouse-tooltip ${mouseTooltip ? '' : 'hide'}`}
-                >
-                  <span>Copied!</span>
-                </MouseTooltip>
+                {session.wallet.address}
+                <CopyOutlined />
               </div>
             </CopyToClipboard>
             {isLedger && (
