@@ -177,8 +177,15 @@ function HomePage() {
     }, 200);
   };
 
+  const fetchMarketData = async () => {
+    const res = await walletService.retrieveAssetPrice(userAsset.mainnetSymbol, 'usd');
+    setMarketData(res);
+  };
+
   const onSyncBtnCall = async () => {
     setSyncLoading(true);
+
+    fetchMarketData();
 
     await walletService.syncAll();
     const sessionData = await walletService.retrieveCurrentSession();
@@ -236,11 +243,6 @@ function HomePage() {
           : validatorTopList;
 
       setValidatorTopList(currentValidatorList);
-    };
-
-    const fetchMarketData = async () => {
-      const res = await walletService.retrieveAssetPrice('cro', 'usd');
-      setMarketData(res);
     };
 
     if (!didMountRef.current) {
