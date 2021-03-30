@@ -55,3 +55,11 @@ export const getAssetPriceIdFrom = (assetSymbol: string, currency: string) => {
 export const getAssetPriceId = (assetPrice: AssetMarketPrice) => {
   return getAssetPriceIdFrom(assetPrice.assetSymbol, assetPrice.currency);
 };
+
+export const getAssetBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
+  return (parseFloat(marketPrice.price) * parseFloat(scaledBalance(asset))).toFixed(2);
+};
+
+export const getAssetStakingBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
+  return (parseFloat(marketPrice.price) * parseFloat(scaledStakingBalance(asset))).toFixed(2);
+};
