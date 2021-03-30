@@ -5,14 +5,15 @@ import { AutoComplete, Button, Form, Input, InputNumber, Layout, Table, Tabs } f
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
+import Big from 'big.js';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
-import { walletAssetState, sessionState, validatorTopListState } from '../../recoil/atom';
-import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
+import { sessionState, validatorTopListState, walletAssetState } from '../../recoil/atom';
+import { scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
@@ -20,6 +21,7 @@ import {
   adjustedTransactionAmount,
   fromScientificNotation,
   getCurrentMinAssetAmount,
+  getUIDynamicAmount,
 } from '../../utils/NumberUtils';
 
 const { Header, Content, Footer } = Layout;
@@ -50,6 +52,7 @@ const FormDelegationRequest = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
+  const [errorMessages, setErrorMessages] = useState([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
@@ -147,6 +150,7 @@ const FormDelegationRequest = () => {
 
       form.resetFields();
     } catch (e) {
+      setErrorMessages(e.message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -357,7 +361,15 @@ const FormDelegationRequest = () => {
         >
           <>
             <div className="description">
-              The staking transaction failed. Please try again later
+              The staking transaction failed. Please try again later.
+              <br />
+              {errorMessages
+                .filter((item, idx) => {
+                  return errorMessages.indexOf(item) === idx;
+                })
+                .map((err, idx) => (
+                  <div key={idx}>- {err}</div>
+                ))}
             </div>
           </>
         </ErrorModalPopup>
@@ -376,6 +388,7 @@ const FormWithdrawStakingReward = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
+  const [errorMessages, setErrorMessages] = useState([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
@@ -387,13 +400,12 @@ const FormWithdrawStakingReward = () => {
 
   const convertToTabularData = (allRewards: RewardTransaction[], currentAsset: UserAsset) => {
     return allRewards
-      .filter(reward => Number(reward.amount) > 0)
+      .filter(reward => Big(reward.amount).gte(Big(0)))
       .map(reward => {
+        const rewardAmount = getUIDynamicAmount(reward.amount, currentAsset);
         const rewardData: RewardsTabularData = {
           key: `${reward.validatorAddress}${reward.amount}`,
-          rewardAmount: `${scaledAmount(reward.amount, currentAsset.decimals)} ${
-            currentAsset.symbol
-          }`,
+          rewardAmount: `${rewardAmount} ${currentAsset.symbol}`,
           validatorAddress: reward.validatorAddress,
         };
         return rewardData;
@@ -458,6 +470,7 @@ const FormWithdrawStakingReward = () => {
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setWalletAsset(currentWalletAsset);
     } catch (e) {
+      setErrorMessages(e.message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -628,7 +641,15 @@ const FormWithdrawStakingReward = () => {
       >
         <>
           <div className="description">
-            The reward withdrawal transaction failed. Please try again later
+            The reward withdrawal transaction failed. Please try again later.
+            <br />
+            {errorMessages
+              .filter((item, idx) => {
+                return errorMessages.indexOf(item) === idx;
+              })
+              .map((err, idx) => (
+                <div key={idx}>- {err}</div>
+              ))}
           </div>
         </>
       </ErrorModalPopup>

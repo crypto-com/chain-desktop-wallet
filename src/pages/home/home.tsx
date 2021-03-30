@@ -2,18 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from 'antd';
+import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import {
-  scaledAmount,
-  scaledBalance,
-  scaledStakingBalance,
-  UserAsset,
-} from '../../models/UserAsset';
+import { scaledBalance, scaledStakingBalance, UserAsset } from '../../models/UserAsset';
 import {
   hasShownWarningOnWalletTypeState,
   sessionState,
-  walletAssetState,
   validatorTopListState,
+  walletAssetState,
 } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
@@ -32,6 +28,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
 import { UndelegateFormComponent } from './components/UndelegateFormComponent';
 import { RedelegateFormComponent } from './components/RedelegateFormComponent';
+import { getUIDynamicAmount } from '../../utils/NumberUtils';
 
 const { Text } = Typography;
 
@@ -68,7 +65,7 @@ interface TransferTabularData {
 function convertDelegations(allDelegations: StakingTransactionData[], currentAsset: UserAsset) {
   return allDelegations
     .map(dlg => {
-      const stakedAmount = scaledAmount(dlg.stakedAmount, currentAsset.decimals).toString();
+      const stakedAmount = getUIDynamicAmount(dlg.stakedAmount, currentAsset);
       const data: StakingTabularData = {
         key: dlg.validatorAddress + dlg.stakedAmount,
         delegatorAddress: dlg.delegatorAddress,
@@ -99,7 +96,7 @@ function convertTransfers(
   }
 
   return allTransfers.map(transfer => {
-    const transferAmount = scaledAmount(transfer.amount, currentAsset.decimals).toString();
+    const transferAmount = getUIDynamicAmount(transfer.amount, currentAsset);
     const data: TransferTabularData = {
       key: transfer.hash + transfer.receiverAddress + transfer.amount,
       recipientAddress: transfer.receiverAddress,
@@ -123,6 +120,7 @@ function HomePage() {
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
+  const [syncLoading, setSyncLoading] = useState(false);
   const didMountRef = useRef(false);
 
   // Undelegate action related states changes
@@ -141,6 +139,7 @@ function HomePage() {
 
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
+  const [errorMessages, setErrorMessages] = useState([]);
 
   const [undelegateFormValues, setUndelegateFormValues] = useState({
     validatorAddress: '',
@@ -168,6 +167,32 @@ function HomePage() {
         });
       }
     }, 200);
+  };
+
+  const onSyncBtnCall = async () => {
+    setSyncLoading(true);
+
+    await walletService.syncAll();
+    const sessionData = await walletService.retrieveCurrentSession();
+    const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+    const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
+      sessionData.wallet.identifier,
+    );
+    const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
+      sessionData.wallet.identifier,
+    );
+
+    const stakingTabularData = convertDelegations(allDelegations, currentAsset);
+    const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
+
+    showWalletStateNotification(currentSession.wallet.config);
+
+    setDelegations(stakingTabularData);
+    setTransfers(transferTabularData);
+    setUserAsset(currentAsset);
+    setHasShownNotLiveWallet(true);
+
+    setSyncLoading(false);
   };
 
   useEffect(() => {
@@ -329,7 +354,6 @@ function HomePage() {
       const { walletType } = currentSession.wallet;
 
       // TODO : Here switch between undelegation and redelegation
-
       let broadcastedTransaction: BroadCastResult | null = null;
 
       if (delegationActionType === StakingActionType.UNDELEGATE) {
@@ -390,6 +414,7 @@ function HomePage() {
         });
       }
     } catch (e) {
+      setErrorMessages(e.message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -481,7 +506,16 @@ function HomePage() {
 
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">Welcome Back!</Header>
+      <Header className="site-layout-background">
+        Welcome Back!
+        <SyncOutlined
+          onClick={() => {
+            onSyncBtnCall();
+          }}
+          style={{ position: 'absolute', right: '36px', marginTop: '6px' }}
+          spin={syncLoading}
+        />
+      </Header>
       <Content>
         <div className="site-layout-background balance-container">
           <div className="balance">
@@ -612,10 +646,17 @@ function HomePage() {
           >
             <>
               <div className="description">
-                The undelegation transaction failed. Please try again later
                 {delegationActionType === StakingActionType.UNDELEGATE
-                  ? 'The undelegation transaction failed. Please try again later'
-                  : 'The redelegation transaction failed. Please try again later'}
+                  ? 'The undelegation transaction failed. Please try again later.'
+                  : 'The redelegation transaction failed. Please try again later.'}
+                <br />
+                {errorMessages
+                  .filter((item, idx) => {
+                    return errorMessages.indexOf(item) === idx;
+                  })
+                  .map((err, idx) => (
+                    <div key={idx}>- {err}</div>
+                  ))}
               </div>
             </>
           </ErrorModalPopup>

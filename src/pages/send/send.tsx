@@ -34,6 +34,7 @@ const FormSend = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
+  const [errorMessages, setErrorMessages] = useState([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
@@ -101,6 +102,7 @@ const FormSend = () => {
 
       form.resetFields();
     } catch (e) {
+      setErrorMessages(e.message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -165,7 +167,7 @@ const FormSend = () => {
           customAddressValidator,
         ]}
       >
-        <Input placeholder="tcro..." />
+        <Input placeholder="Enter recipient address" />
       </Form.Item>
       <div className="amount">
         <Form.Item
@@ -316,7 +318,15 @@ const FormSend = () => {
         >
           <>
             <div className="description">
-              The transfer transaction failed. Please try again later
+              The transfer transaction failed. Please try again later.
+              <br />
+              {errorMessages
+                .filter((item, idx) => {
+                  return errorMessages.indexOf(item) === idx;
+                })
+                .map((err, idx) => (
+                  <div key={idx}>- {err}</div>
+                ))}
             </div>
           </>
         </ErrorModalPopup>

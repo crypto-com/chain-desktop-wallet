@@ -51,6 +51,7 @@ export class StorageService {
 
     if (dataUpdate.nodeUrl) {
       previousWallet.config.nodeUrl = dataUpdate.nodeUrl;
+      previousWallet.config.network.defaultNodeUrl = dataUpdate.nodeUrl;
     }
 
     if (dataUpdate.indexingUrl) {
