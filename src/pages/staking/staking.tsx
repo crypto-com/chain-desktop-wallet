@@ -249,7 +249,9 @@ const FormDelegationRequest = () => {
       title: 'Commission Rate',
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
-      render: currentCommissionRate => <span>{new Big(currentCommissionRate).toFixed(4)}</span>,
+      render: currentCommissionRate => (
+        <span>{new Big(currentCommissionRate).times(100).toFixed(2)}%</span>
+      ),
     },
     {
       title: 'Action',
