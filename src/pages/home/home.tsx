@@ -14,7 +14,6 @@ import {
 import {
   hasShownWarningOnWalletTypeState,
   sessionState,
-  validatorTopListState,
   marketState,
   walletAssetState,
 } from '../../recoil/atom';
@@ -127,7 +126,6 @@ function HomePage() {
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [marketData, setMarketData] = useRecoilState(marketState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
-  const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
   const [syncLoading, setSyncLoading] = useState(false);
   const didMountRef = useRef(false);
 
@@ -177,15 +175,8 @@ function HomePage() {
     }, 200);
   };
 
-  const fetchMarketData = async () => {
-    const res = await walletService.retrieveAssetPrice(userAsset.mainnetSymbol, 'usd');
-    setMarketData(res);
-  };
-
   const onSyncBtnCall = async () => {
     setSyncLoading(true);
-
-    fetchMarketData();
 
     await walletService.syncAll();
     const sessionData = await walletService.retrieveCurrentSession();
@@ -226,36 +217,27 @@ function HomePage() {
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
+      const marketPrice = await walletService.retrieveAssetPrice(userAsset.mainnetSymbol, 'usd');
+
       if (!unmounted) {
         showWalletStateNotification(currentSession.wallet.config);
-
         setDelegations(stakingTabularData);
         setTransfers(transferTabularData);
         setUserAsset(currentAsset);
+        setMarketData(marketPrice);
         setHasShownNotLiveWallet(true);
       }
     };
 
-    const syncValidatorsData = async () => {
-      const currentValidatorList =
-        validatorTopList.length === 0
-          ? await walletService.getLatestTopValidators()
-          : validatorTopList;
-
-      setValidatorTopList(currentValidatorList);
-    };
-
     if (!didMountRef.current) {
       syncAssetData();
-      syncValidatorsData();
-      fetchMarketData();
       didMountRef.current = true;
     }
 
     return () => {
       unmounted = true;
     };
-  }, [delegations, userAsset, validatorTopList, hasShownNotLiveWallet]);
+  }, [delegations, userAsset, hasShownNotLiveWallet]);
 
   const TransactionColumns = [
     {

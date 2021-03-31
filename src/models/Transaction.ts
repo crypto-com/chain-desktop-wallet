@@ -46,6 +46,11 @@ export interface TransferTransactionList {
   walletId: string;
 }
 
+export interface ValidatorList {
+  validators: Array<ValidatorModel>;
+  walletId: string;
+}
+
 export interface RewardTransaction {
   delegatorAddress: string;
   validatorAddress: string;
@@ -59,7 +64,11 @@ export interface BroadCastResult {
 }
 
 export interface ValidatorModel {
+  readonly validatorName: string;
   readonly validatorAddress: string;
+  readonly validatorWebSite: string;
+  readonly securityContact: string;
   readonly currentCommissionRate: string;
+  readonly maxCommissionRate: string;
   readonly currentShares: string;
 }

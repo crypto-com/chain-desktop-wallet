@@ -12,9 +12,9 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
-import { sessionState, validatorTopListState, walletAssetState } from '../../recoil/atom';
+import { sessionState, walletAssetState } from '../../recoil/atom';
 import { scaledBalance, UserAsset } from '../../models/UserAsset';
-import { BroadCastResult, RewardTransaction } from '../../models/Transaction';
+import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 import {
@@ -57,17 +57,16 @@ const FormDelegationRequest = () => {
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const currentSession = useRecoilValue(sessionState);
-  const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
+  const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
   const didMountRef = useRef(false);
 
   useEffect(() => {
     let unmounted = false;
 
     const syncValidatorsData = async () => {
-      const currentValidatorList =
-        validatorTopList.length === 0
-          ? await walletService.getLatestTopValidators()
-          : validatorTopList;
+      const currentValidatorList = await walletService.retrieveTopValidators(
+        currentSession.wallet.identifier,
+      );
 
       if (!unmounted) {
         setValidatorTopList(currentValidatorList);
@@ -82,7 +81,7 @@ const FormDelegationRequest = () => {
     return () => {
       unmounted = true;
     };
-  }, [validatorTopList]);
+  }, [validatorTopList, setValidatorTopList]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
