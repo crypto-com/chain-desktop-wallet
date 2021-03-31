@@ -13,6 +13,7 @@ import {
   StakingTransactionList,
   TransferTransactionData,
   TransferTransactionList,
+  ValidatorList,
 } from '../models/Transaction';
 
 export class StorageService {
@@ -180,5 +181,14 @@ export class StorageService {
 
   public async retrieveAllTransferTransactions(walletId: string) {
     return this.db.transferStore.findOne<TransferTransactionList>({ walletId });
+  }
+
+  public async saveValidators(validatorList: ValidatorList) {
+    await this.db.validatorStore.remove({ walletId: validatorList.walletId }, { multi: true });
+    return this.db.validatorStore.insert<ValidatorList>(validatorList);
+  }
+
+  public async retrieveAllValidators(walletId: string) {
+    return this.db.validatorStore.findOne<ValidatorList>({ walletId });
   }
 }

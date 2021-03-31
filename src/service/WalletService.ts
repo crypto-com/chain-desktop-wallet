@@ -443,6 +443,7 @@ class WalletService {
       this.fetchAndSaveDelegations(nodeRpc, currentSession),
       this.fetchAndSaveRewards(nodeRpc, currentSession),
       this.fetchAndSaveTransfers(currentSession),
+      this.fetchAndSaveValidators(currentSession),
     ]);
   }
 
@@ -494,6 +495,19 @@ class WalletService {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_DELEGATIONS', e);
+    }
+  }
+
+  public async fetchAndSaveValidators(currentSession: Session) {
+    try {
+      const validators = await this.getLatestTopValidators();
+      await this.storageService.saveValidators({
+        walletId: currentSession.wallet.identifier,
+        validators,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_VALIDATORS', e);
     }
   }
 
@@ -690,7 +704,15 @@ class WalletService {
     return selectedNetworkConfig;
   }
 
-  public async getLatestTopValidators(): Promise<ValidatorModel[]> {
+  public async retrieveTopValidators(walletId: string): Promise<ValidatorModel[]> {
+    const validatorSet = await this.storageService.retrieveAllValidators(walletId);
+    if (!validatorSet) {
+      return [];
+    }
+    return validatorSet.validators;
+  }
+
+  private async getLatestTopValidators(): Promise<ValidatorModel[]> {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
