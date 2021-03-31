@@ -62,6 +62,16 @@ const FormDelegationRequest = () => {
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
   const didMountRef = useRef(false);
 
+  const processValidatorList = (validatorList: ValidatorModel[]) => {
+    return validatorList.map((validator, idx) => {
+      const validatorModel = {
+        ...validator,
+        key: `${idx}`,
+      };
+      return validatorModel;
+    });
+  };
+
   useEffect(() => {
     let unmounted = false;
 
@@ -71,7 +81,8 @@ const FormDelegationRequest = () => {
       );
 
       if (!unmounted) {
-        setValidatorTopList(currentValidatorList);
+        const validatorList = processValidatorList(currentValidatorList);
+        setValidatorTopList(validatorList);
       }
     };
 
@@ -201,8 +212,11 @@ const FormDelegationRequest = () => {
     },
     {
       title: 'Domain',
-      dataIndex: 'validatorWebsite',
-      key: 'validatorWebsite',
+      dataIndex: 'validatorWebSite',
+      key: 'validatorWebSite',
+      render: validatorWebSite => {
+        return validatorWebSite === '' ? 'n.a.' : <a>{validatorWebSite}</a>;
+      },
     },
     {
       title: 'Address',
@@ -213,7 +227,7 @@ const FormDelegationRequest = () => {
       title: 'Commission Rate',
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
-      render: record => <span>{new Big(record).toFixed(4)}</span>,
+      render: currentCommissionRate => <span>{new Big(currentCommissionRate).toFixed(4)}</span>,
     },
     {
       title: 'Action',
