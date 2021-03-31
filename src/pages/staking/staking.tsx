@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
-import { AutoComplete, Button, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
+import { Button, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
 import { OrderedListOutlined } from '@ant-design/icons';
-// import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 import Big from 'big.js';
@@ -57,6 +56,7 @@ const FormDelegationRequest = () => {
   const [errorMessages, setErrorMessages] = useState([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const currentSession = useRecoilValue(sessionState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
@@ -193,9 +193,45 @@ const FormDelegationRequest = () => {
     )} ${walletAsset.symbol}`,
   );
 
-  const onValidatorList = () => {
-    // console.log('hi')
-  };
+  const validatorColumns = [
+    {
+      title: 'Name',
+      dataIndex: 'validatorName',
+      key: 'validatorName',
+    },
+    {
+      title: 'Domain',
+      dataIndex: 'validatorWebsite',
+      key: 'validatorWebsite',
+    },
+    {
+      title: 'Address',
+      dataIndex: 'validatorAddress',
+      key: 'validatorAddress',
+    },
+    {
+      title: 'Commission Rate',
+      dataIndex: 'currentCommissionRate',
+      key: 'currentCommissionRate',
+      render: record => <span>{new Big(record).toFixed(4)}</span>,
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: record => (
+        <a
+          onClick={() => {
+            setIsValidatorListVisible(false);
+            form.setFieldsValue({
+              validatorAddress: record.validatorAddress,
+            });
+          }}
+        >
+          Select
+        </a>
+      ),
+    },
+  ];
 
   return (
     <Form
@@ -206,6 +242,26 @@ const FormDelegationRequest = () => {
       onFinish={showPasswordInput}
       requiredMark={false}
     >
+      <>
+        <ModalPopup
+          isModalVisible={isValidatorListVisible}
+          handleCancel={() => setIsValidatorListVisible(false)}
+          handleOk={() => setIsValidatorListVisible(false)}
+          className="validator-modal"
+          footer={[]}
+          okText="Confirm"
+        >
+          <div className="title">Validator List</div>
+          <div className="description">Please select one of the validator.</div>
+          <div className="item">
+            <Table
+              dataSource={validatorTopList}
+              columns={validatorColumns}
+              pagination={{ showSizeChanger: false }}
+            />
+          </div>
+        </ModalPopup>
+      </>
       <Form.Item
         name="validatorAddress"
         label="Validator address"
@@ -215,26 +271,13 @@ const FormDelegationRequest = () => {
           { required: true, message: 'Validator address is required' },
           customAddressValidator,
         ]}
+        className="input-validator-address"
       >
-        <AutoComplete
-          options={[
-            {
-              label: 'Top Validators',
-              options: validatorTopList.map(e => {
-                return {
-                  value: e.validatorAddress,
-                };
-              }),
-            },
-          ]}
-        >
-          {/* <Input placeholder="Enter validator address" addonAfter={<OrderedListOutlined onClick={() => console.log('hi')} />} /> */}
-          <Search
-            placeholder="Enter validator address"
-            enterButton={<OrderedListOutlined />}
-            onSearch={onValidatorList}
-          />
-        </AutoComplete>
+        <Search
+          placeholder="Enter validator address"
+          enterButton={<OrderedListOutlined />}
+          onSearch={() => setIsValidatorListVisible(true)}
+        />
       </Form.Item>
       <div className="amount">
         <Form.Item

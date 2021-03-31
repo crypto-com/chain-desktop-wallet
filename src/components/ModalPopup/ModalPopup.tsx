@@ -32,6 +32,8 @@ const ModalPopup: React.FC<ModalPopupProps> = props => {
         confirmLoading={props.confirmationLoading}
         okText={props.okText}
         closable={props.closable}
+        style={props.style}
+        className={props.className}
       >
         {props.children}
       </Modal>
