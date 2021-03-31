@@ -26,6 +26,7 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
 import packageJson from '../../../package.json';
+import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -321,7 +322,11 @@ function HomeLayout(props: HomeLayoutProps) {
                 <div className="item">
                   <Alert
                     type="warning"
-                    message="Are you sure you want to delete the wallet? If you have not backed up your wallet mnemonic phrase, this will result in losing your funds forever."
+                    message={`Are you sure you want to delete the wallet? ${
+                      session.wallet.walletType !== LEDGER_WALLET_TYPE
+                        ? 'If you have not backed up your wallet mnemonic phrase, this will result in losing your funds forever.'
+                        : ''
+                    }`}
                     showIcon
                   />
                 </div>
@@ -330,8 +335,9 @@ function HomeLayout(props: HomeLayoutProps) {
                     checked={!isButtonDisabled}
                     onChange={() => setIsButtonDisabled(!isButtonDisabled)}
                   >
-                    I understand that the only way to regain access is by restoring wallet mnemonic
-                    phrase.
+                    {session.wallet.walletType !== LEDGER_WALLET_TYPE
+                      ? 'I understand that the only way to regain access is by restoring wallet mnemonic phrase.'
+                      : 'I understand that the only way to regain access is by using the same ledger device with the correct address index'}
                   </Checkbox>
                 </div>
               </>

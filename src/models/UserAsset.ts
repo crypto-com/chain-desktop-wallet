@@ -1,3 +1,4 @@
+import Big from 'big.js';
 import { getUINormalScaleAmount } from '../utils/NumberUtils';
 
 export interface UserAsset {
@@ -54,4 +55,16 @@ export const getAssetPriceIdFrom = (assetSymbol: string, currency: string) => {
 
 export const getAssetPriceId = (assetPrice: AssetMarketPrice) => {
   return getAssetPriceIdFrom(assetPrice.assetSymbol, assetPrice.currency);
+};
+
+export const getAssetBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
+  const bigAsset = new Big(scaledBalance(asset));
+  const bigMarketPrice = new Big(marketPrice.price);
+  return bigAsset.times(bigMarketPrice).toFixed(2);
+};
+
+export const getAssetStakingBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
+  const bigAsset = new Big(scaledStakingBalance(asset));
+  const bigMarketPrice = new Big(marketPrice.price);
+  return bigAsset.times(bigMarketPrice).toFixed(2);
 };

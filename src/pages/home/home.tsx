@@ -4,10 +4,17 @@ import 'antd/dist/antd.css';
 import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { scaledBalance, scaledStakingBalance, UserAsset } from '../../models/UserAsset';
+import {
+  scaledBalance,
+  scaledStakingBalance,
+  getAssetBalancePrice,
+  getAssetStakingBalancePrice,
+  UserAsset,
+} from '../../models/UserAsset';
 import {
   hasShownWarningOnWalletTypeState,
   sessionState,
+  marketState,
   walletAssetState,
 } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
@@ -117,6 +124,7 @@ function HomePage() {
   const currentSession = useRecoilValue(sessionState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
+  const [marketData, setMarketData] = useRecoilState(marketState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [syncLoading, setSyncLoading] = useState(false);
   const didMountRef = useRef(false);
@@ -209,11 +217,14 @@ function HomePage() {
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
+      const marketPrice = await walletService.retrieveAssetPrice(userAsset.mainnetSymbol, 'usd');
+
       if (!unmounted) {
         showWalletStateNotification(currentSession.wallet.config);
         setDelegations(stakingTabularData);
         setTransfers(transferTabularData);
         setUserAsset(currentAsset);
+        setMarketData(marketPrice);
         setHasShownNotLiveWallet(true);
       }
     };
@@ -510,11 +521,17 @@ function HomePage() {
             <div className="quantity">
               {scaledBalance(userAsset)} {userAsset?.symbol}
             </div>
+            <div className="fiat">
+              ${getAssetBalancePrice(userAsset, marketData)} {marketData?.currency}
+            </div>
           </div>
           <div className="balance">
             <div className="title">STAKED BALANCE</div>
             <div className="quantity">
               {scaledStakingBalance(userAsset)} {userAsset?.symbol}
+            </div>
+            <div className="fiat">
+              ${getAssetStakingBalancePrice(userAsset, marketData)} {marketData?.currency}
             </div>
           </div>
         </div>
