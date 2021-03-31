@@ -2,7 +2,7 @@ import { atom } from 'recoil';
 import { DefaultWalletConfigs } from '../config/StaticConfig';
 import { Session } from '../models/Session';
 import { Wallet } from '../models/Wallet';
-import { UserAsset } from '../models/UserAsset';
+import { UserAsset, AssetMarketPrice } from '../models/UserAsset';
 import { ValidatorModel } from '../models/Transaction';
 import { NORMAL_WALLET_TYPE } from '../service/LedgerService';
 
@@ -29,6 +29,12 @@ const asset: UserAsset = {
   description: 'Default Asset',
   decimals: 1,
 };
+const market: AssetMarketPrice = {
+  assetSymbol: 'CRO',
+  currency: 'USD',
+  dailyChange: '+0.00',
+  price: '0.000',
+};
 
 const walletIdentifierState = atom({
   key: 'walletIdentifier',
@@ -38,6 +44,11 @@ const walletIdentifierState = atom({
 const sessionState = atom({
   key: 'session',
   default: session,
+});
+
+const marketState = atom({
+  key: 'market',
+  default: market,
 });
 
 const walletAssetState = atom({
@@ -69,6 +80,7 @@ const hasShownWarningOnWalletTypeState = atom<boolean>({
 export {
   walletIdentifierState,
   sessionState,
+  marketState,
   walletAssetState,
   walletListState,
   walletTempBackupState,
