@@ -8,7 +8,6 @@ import { scaledBalance, scaledStakingBalance, UserAsset } from '../../models/Use
 import {
   hasShownWarningOnWalletTypeState,
   sessionState,
-  validatorTopListState,
   walletAssetState,
 } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
@@ -119,7 +118,6 @@ function HomePage() {
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
-  const [validatorTopList, setValidatorTopList] = useRecoilState(validatorTopListState);
   const [syncLoading, setSyncLoading] = useState(false);
   const didMountRef = useRef(false);
 
@@ -213,7 +211,6 @@ function HomePage() {
 
       if (!unmounted) {
         showWalletStateNotification(currentSession.wallet.config);
-
         setDelegations(stakingTabularData);
         setTransfers(transferTabularData);
         setUserAsset(currentAsset);
@@ -221,25 +218,15 @@ function HomePage() {
       }
     };
 
-    const syncValidatorsData = async () => {
-      const currentValidatorList =
-        validatorTopList.length === 0
-          ? await walletService.getLatestTopValidators()
-          : validatorTopList;
-
-      setValidatorTopList(currentValidatorList);
-    };
-
     if (!didMountRef.current) {
       syncAssetData();
-      syncValidatorsData();
       didMountRef.current = true;
     }
 
     return () => {
       unmounted = true;
     };
-  }, [delegations, userAsset, validatorTopList, hasShownNotLiveWallet]);
+  }, [delegations, userAsset, hasShownNotLiveWallet]);
 
   const TransactionColumns = [
     {

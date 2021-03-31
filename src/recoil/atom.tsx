@@ -3,7 +3,6 @@ import { DefaultWalletConfigs } from '../config/StaticConfig';
 import { Session } from '../models/Session';
 import { Wallet } from '../models/Wallet';
 import { UserAsset } from '../models/UserAsset';
-import { ValidatorModel } from '../models/Transaction';
 import { NORMAL_WALLET_TYPE } from '../service/LedgerService';
 
 const wallet = new Wallet(
@@ -56,11 +55,6 @@ const walletTempBackupState = atom<Wallet | null>({
   default: null,
 });
 
-const validatorTopListState = atom<ValidatorModel[]>({
-  key: 'validatorTopList',
-  default: [],
-});
-
 const hasShownWarningOnWalletTypeState = atom<boolean>({
   key: 'hasShownWarningOnWalletTypeState',
   default: false,
@@ -72,6 +66,5 @@ export {
   walletAssetState,
   walletListState,
   walletTempBackupState,
-  validatorTopListState,
   hasShownWarningOnWalletTypeState,
 };
