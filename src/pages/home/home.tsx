@@ -35,15 +35,12 @@ import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
 import { UndelegateFormComponent } from './components/UndelegateFormComponent';
 import { RedelegateFormComponent } from './components/RedelegateFormComponent';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
+import { middleEllipsis } from '../../utils/utils';
 
 const { Text } = Typography;
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
-
-const middleEllipsis = (str: string, len: number) => {
-  return `${str.substr(0, len)}...${str.substr(str.length - len, str.length)}`;
-};
 
 enum StakingActionType {
   UNDELEGATE = 'UNDELEGATE',

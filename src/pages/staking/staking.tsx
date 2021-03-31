@@ -23,6 +23,7 @@ import {
   getCurrentMinAssetAmount,
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
+import { middleEllipsis } from '../../utils/utils';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -215,13 +216,34 @@ const FormDelegationRequest = () => {
       dataIndex: 'validatorWebSite',
       key: 'validatorWebSite',
       render: validatorWebSite => {
-        return validatorWebSite === '' ? 'n.a.' : <a>{validatorWebSite}</a>;
+        return validatorWebSite === '' ? (
+          'n.a.'
+        ) : (
+          <a
+            data-original={validatorWebSite}
+            target="_blank"
+            rel="noreferrer"
+            href={`${validatorWebSite}`}
+          >
+            {validatorWebSite}
+          </a>
+        );
       },
     },
     {
       title: 'Address',
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
+      render: validatorAddress => (
+        <a
+          data-original={validatorAddress}
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/validator/${validatorAddress}`}
+        >
+          {middleEllipsis(validatorAddress, 12)}
+        </a>
+      ),
     },
     {
       title: 'Commission Rate',
