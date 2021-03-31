@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
 import { AutoComplete, Button, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
+import { OrderedListOutlined } from '@ant-design/icons';
 // import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
@@ -25,6 +26,7 @@ import {
 } from '../../utils/NumberUtils';
 
 const { Header, Content, Footer } = Layout;
+const { Search } = Input;
 const { TabPane } = Tabs;
 const layout = {
   // labelCol: { span: 8 },
@@ -192,6 +194,10 @@ const FormDelegationRequest = () => {
     )} ${walletAsset.symbol}`,
   );
 
+  const onValidatorList = () => {
+    // console.log('hi')
+  };
+
   return (
     <Form
       {...layout}
@@ -222,8 +228,14 @@ const FormDelegationRequest = () => {
               }),
             },
           ]}
-          placeholder="Enter validator address"
-        />
+        >
+          {/* <Input placeholder="Enter validator address" addonAfter={<OrderedListOutlined onClick={() => console.log('hi')} />} /> */}
+          <Search
+            placeholder="Enter validator address"
+            enterButton={<OrderedListOutlined />}
+            onSearch={onValidatorList}
+          />
+        </AutoComplete>
       </Form.Item>
       <div className="amount">
         <Form.Item
