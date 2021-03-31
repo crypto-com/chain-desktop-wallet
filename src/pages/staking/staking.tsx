@@ -264,6 +264,7 @@ const FormDelegationRequest = () => {
           className="validator-modal"
           footer={[]}
           okText="Confirm"
+          width={1000}
         >
           <div className="title">Validator List</div>
           <div className="description">Please select one of the validator.</div>
