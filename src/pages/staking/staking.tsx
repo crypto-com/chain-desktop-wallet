@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
+import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
 import { OrderedListOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
@@ -58,6 +58,7 @@ const FormDelegationRequest = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
+  const [showMemo, setShowMemo] = useState(false);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const currentSession = useRecoilValue(sessionState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
@@ -271,6 +272,10 @@ const FormDelegationRequest = () => {
     },
   ];
 
+  function onShowMemoChange() {
+    setShowMemo(!showMemo);
+  }
+
   return (
     <Form
       {...layout}
@@ -344,9 +349,18 @@ const FormDelegationRequest = () => {
           </div>
         </div>
       </div>
-      <Form.Item name="memo" label="Memo (Optional)">
-        <Input />
-      </Form.Item>
+      <Checkbox onChange={onShowMemoChange} checked={showMemo}>
+        Want to set custom memo?
+      </Checkbox>
+      {showMemo ? (
+        <div style={{ paddingTop: '12px' }}>
+          <Form.Item name="memo" label="Memo (Optional)">
+            <Input />
+          </Form.Item>
+        </div>
+      ) : (
+        <div />
+      )}
       <Form.Item {...tailLayout}>
         <ModalPopup
           isModalVisible={isConfirmationModalVisible}
