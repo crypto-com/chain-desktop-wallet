@@ -1,5 +1,5 @@
 import { FormInstance } from 'antd/lib/form';
-import { AutoComplete, Form, InputNumber } from 'antd';
+import { AutoComplete, Form, InputNumber, Alert } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 import { Session } from '../../../models/Session';
@@ -31,6 +31,8 @@ export function RedelegateFormComponent(props: {
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
 
   const didMountRef = useRef(false);
+
+  const redelegatePeriod = props.currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
 
   useEffect(() => {
     let unmounted = false;
@@ -117,6 +119,13 @@ export function RedelegateFormComponent(props: {
             <InputNumber stringMode />
           </Form.Item>
         </Form>
+      </div>
+      <div>
+        <Alert
+          type="info"
+          message={`Funds can be redelegated once every ${redelegatePeriod} days. At any time, one account can only have at most 7 records of redelegation and unbonding that is in the ${redelegatePeriod} days effective unbonding periods.`}
+          showIcon
+        />
       </div>
     </>
   );
