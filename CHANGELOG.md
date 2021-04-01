@@ -6,8 +6,7 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
-## [v0.1.3] - 2021-05-01
-
+## [v0.1.3] - 2021-04-01
 
 ### Additions
 - A newly revamped validator pop up screen selection
