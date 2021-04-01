@@ -1,4 +1,4 @@
-import { SettingsDataUpdate, Wallet } from '../models/Wallet';
+import { DisableDefaultMemoSettings, SettingsDataUpdate, Wallet } from '../models/Wallet';
 import { DatabaseManager } from './DatabaseManager';
 import { Session } from '../models/Session';
 import {
@@ -13,6 +13,7 @@ import {
   StakingTransactionList,
   TransferTransactionData,
   TransferTransactionList,
+  ValidatorList,
 } from '../models/Transaction';
 
 export class StorageService {
@@ -32,6 +33,18 @@ export class StorageService {
 
   public async deleteWallet(walletID: string) {
     return this.db.walletStore.remove({ identifier: walletID }, { multi: true });
+  }
+
+  public async updateDisabledDefaultMemo(disableDefaultMemoSettings: DisableDefaultMemoSettings) {
+    const previousWallet = await this.findWalletByIdentifier(disableDefaultMemoSettings.walletId);
+    previousWallet.config.disableDefaultClientMemo =
+      disableDefaultMemoSettings.disableDefaultMemoAppend;
+
+    return this.db.walletStore.update<Wallet>(
+      { identifier: previousWallet.identifier },
+      { $set: previousWallet },
+      { upsert: true },
+    );
   }
 
   public async updateWalletSettings(dataUpdate: SettingsDataUpdate) {
@@ -180,5 +193,14 @@ export class StorageService {
 
   public async retrieveAllTransferTransactions(walletId: string) {
     return this.db.transferStore.findOne<TransferTransactionList>({ walletId });
+  }
+
+  public async saveValidators(validatorList: ValidatorList) {
+    await this.db.validatorStore.remove({ walletId: validatorList.walletId }, { multi: true });
+    return this.db.validatorStore.insert<ValidatorList>(validatorList);
+  }
+
+  public async retrieveAllValidators(walletId: string) {
+    return this.db.validatorStore.findOne<ValidatorList>({ walletId });
   }
 }

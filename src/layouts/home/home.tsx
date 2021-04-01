@@ -1,25 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Dropdown, Layout, Menu, Spin, Button, Alert, Checkbox, Form, Input } from 'antd';
+import { Alert, Button, Checkbox, Dropdown, Form, Input, Layout, Menu, Spin } from 'antd';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Icon, {
   CaretDownOutlined,
-  LoadingOutlined,
-  ReloadOutlined,
-  PlusOutlined,
   CheckOutlined,
-  SettingOutlined,
   DeleteOutlined,
+  LoadingOutlined,
+  PlusOutlined,
+  ReloadOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
 
-import {
-  sessionState,
-  validatorTopListState,
-  walletAssetState,
-  walletListState,
-} from '../../recoil/atom';
+import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
 import { trimString } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
@@ -31,6 +26,7 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
 import packageJson from '../../../package.json';
+import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -52,12 +48,10 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
-  const setValidatorTopList = useSetRecoilState(validatorTopListState);
 
   async function fetchAndSetNewValidators() {
     try {
-      const currentValidatorList = await walletService.getLatestTopValidators();
-      setValidatorTopList(currentValidatorList);
+      await walletService.fetchAndSaveValidators(session);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet validators list', e);
@@ -328,7 +322,11 @@ function HomeLayout(props: HomeLayoutProps) {
                 <div className="item">
                   <Alert
                     type="warning"
-                    message="Are you sure you want to delete the wallet? If you have not backed up your wallet mnemonic phrase, this will result in losing your funds forever."
+                    message={`Are you sure you want to delete the wallet? ${
+                      session.wallet.walletType !== LEDGER_WALLET_TYPE
+                        ? 'If you have not backed up your wallet mnemonic phrase, this will result in losing your funds forever.'
+                        : ''
+                    }`}
                     showIcon
                   />
                 </div>
@@ -337,8 +335,9 @@ function HomeLayout(props: HomeLayoutProps) {
                     checked={!isButtonDisabled}
                     onChange={() => setIsButtonDisabled(!isButtonDisabled)}
                   >
-                    I understand that the only way to regain access is by restoring wallet mnemonic
-                    phrase.
+                    {session.wallet.walletType !== LEDGER_WALLET_TYPE
+                      ? 'I understand that the only way to regain access is by restoring wallet mnemonic phrase.'
+                      : 'I understand that the only way to regain access is by using the same ledger device with the correct address index'}
                   </Checkbox>
                 </div>
               </>

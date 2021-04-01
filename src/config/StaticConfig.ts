@@ -3,6 +3,7 @@ import { getRandomId } from '../crypto/RandomGen';
 
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
+export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';
 
 export const CosmosPorts = {
   Main: ':26657',
@@ -17,6 +18,7 @@ export type WalletConfig = {
   indexingUrl: string;
   derivationPath: string;
   network: Network;
+  disableDefaultClientMemo: boolean;
   fee: {
     gasLimit: string;
     networkFee: string;
@@ -34,6 +36,7 @@ const TestNetConfig: WalletConfig = {
   indexingUrl: 'https://crypto.org/explorer/croeseid/api/v1/',
   nodeUrl: CroNetwork.Testnet.defaultNodeUrl,
   network: CroNetwork.Testnet,
+  disableDefaultClientMemo: false,
   fee: {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
@@ -52,6 +55,7 @@ const MainNetConfig: WalletConfig = {
   explorerUrl: 'https://crypto.org/explorer',
   indexingUrl: 'https://crypto.org/explorer/api/v1/',
   network: CroNetwork.Mainnet,
+  disableDefaultClientMemo: false,
   fee: {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
@@ -63,6 +67,7 @@ export const CustomDevNet: WalletConfig = {
   derivationPath: "m/44'/394'/0'/0/0",
   enabled: true,
   name: 'CUSTOM DEVNET',
+  disableDefaultClientMemo: false,
   network: {
     defaultNodeUrl: '',
     chainId: 'test',

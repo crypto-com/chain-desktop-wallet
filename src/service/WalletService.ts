@@ -1,8 +1,14 @@
 import axios from 'axios';
-import { reconstructCustomConfig, SettingsDataUpdate, Wallet } from '../models/Wallet';
+import {
+  DisableDefaultMemoSettings,
+  reconstructCustomConfig,
+  SettingsDataUpdate,
+  Wallet,
+} from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import {
   APP_DB_NAMESPACE,
+  DEFAULT_CLIENT_MEMO,
   DefaultAsset,
   DefaultWalletConfigs,
   Network,
@@ -109,11 +115,17 @@ class WalletService {
       delegationRequest.amount,
       delegationRequest.asset,
     );
+
+    let { memo } = delegationRequest;
+    if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
+      memo = DEFAULT_CLIENT_MEMO;
+    }
+
     const delegateTransaction: DelegateTransactionUnsigned = {
       delegatorAddress: currentSession.wallet.address,
       validatorAddress: delegationRequest.validatorAddress,
       amount: String(delegationAmountScaled),
-      memo: delegationRequest.memo,
+      memo,
       accountNumber,
       accountSequence,
     };
@@ -152,11 +164,17 @@ class WalletService {
       undelegationRequest.amount,
       undelegationRequest.asset,
     );
+
+    let { memo } = undelegationRequest;
+    if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
+      memo = DEFAULT_CLIENT_MEMO;
+    }
+
     const undelegateTransaction: UndelegateTransactionUnsigned = {
       delegatorAddress: currentSession.wallet.address,
       validatorAddress: undelegationRequest.validatorAddress,
       amount: undelegationAmountScaled,
-      memo: undelegationRequest.memo,
+      memo,
       accountNumber,
       accountSequence,
     };
@@ -195,12 +213,17 @@ class WalletService {
       redelegationRequest.amount,
       redelegationRequest.asset,
     );
+    let { memo } = redelegationRequest;
+    if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
+      memo = DEFAULT_CLIENT_MEMO;
+    }
+
     const redelegateTransactionUnsigned: RedelegateTransactionUnsigned = {
       delegatorAddress: currentSession.wallet.address,
       sourceValidatorAddress: redelegationRequest.validatorSourceAddress,
       destinationValidatorAddress: redelegationRequest.validatorDestinationAddress,
       amount: redelegationAmountScaled,
-      memo: redelegationRequest.memo,
+      memo,
       accountNumber,
       accountSequence,
     };
@@ -384,6 +407,12 @@ class WalletService {
     return this.storageService.updateWalletSettings(nodeData);
   }
 
+  public async updateDefaultMemoDisabledSettings(
+    disableDefaultMemoSettings: DisableDefaultMemoSettings,
+  ) {
+    return this.storageService.updateDisabledDefaultMemo(disableDefaultMemoSettings);
+  }
+
   public async findWalletByIdentifier(identifier: string): Promise<Wallet> {
     return this.storageService.findWalletByIdentifier(identifier);
   }
@@ -443,6 +472,7 @@ class WalletService {
       this.fetchAndSaveDelegations(nodeRpc, currentSession),
       this.fetchAndSaveRewards(nodeRpc, currentSession),
       this.fetchAndSaveTransfers(currentSession),
+      this.fetchAndSaveValidators(currentSession),
     ]);
   }
 
@@ -494,6 +524,19 @@ class WalletService {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_DELEGATIONS', e);
+    }
+  }
+
+  public async fetchAndSaveValidators(currentSession: Session) {
+    try {
+      const validators = await this.getLatestTopValidators();
+      await this.storageService.saveValidators({
+        walletId: currentSession.wallet.identifier,
+        validators,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_VALIDATORS', e);
     }
   }
 
@@ -690,7 +733,15 @@ class WalletService {
     return selectedNetworkConfig;
   }
 
-  public async getLatestTopValidators(): Promise<ValidatorModel[]> {
+  public async retrieveTopValidators(walletId: string): Promise<ValidatorModel[]> {
+    const validatorSet = await this.storageService.retrieveAllValidators(walletId);
+    if (!validatorSet) {
+      return [];
+    }
+    return validatorSet.validators;
+  }
+
+  private async getLatestTopValidators(): Promise<ValidatorModel[]> {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {

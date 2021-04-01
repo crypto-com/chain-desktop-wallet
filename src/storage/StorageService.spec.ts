@@ -69,7 +69,7 @@ describe('Testing Storage Service', () => {
   });
 
   it('Test updating wallet fees settings', async () => {
-    const mockWalletStore = new StorageService(`test-update-walle-fees-settings-${getRandomId()}`);
+    const mockWalletStore = new StorageService(`test-update-wallet-fees-settings-${getRandomId()}`);
     const wallet: Wallet = buildTestWallet();
     const walletId = wallet.identifier;
     await mockWalletStore.saveWallet(wallet);
@@ -150,6 +150,29 @@ describe('Testing Storage Service', () => {
     expect(updatedWalletConfig3.config.nodeUrl).to.eq(nodeData3.nodeUrl);
     expect(updatedWalletConfig3.config.network.defaultNodeUrl).to.eq(nodeData3.nodeUrl);
     expect(updatedWalletConfig3.config.network.chainId).to.eq(nodeData3.chainId);
+  });
+
+  it('Test wallet config : Enable and Disable default memo', async () => {
+    const mockWalletStore = new StorageService(`test-update-wallet-memo-settings-${getRandomId()}`);
+    const wallet: Wallet = buildTestWallet();
+    const walletId = wallet.identifier;
+
+    await mockWalletStore.saveWallet(wallet);
+    await mockWalletStore.updateDisabledDefaultMemo({
+      walletId,
+      disableDefaultMemoAppend: true,
+    });
+
+    const updatedWalletConfig = await mockWalletStore.findWalletByIdentifier(walletId);
+    expect(updatedWalletConfig.config.disableDefaultClientMemo).to.eq(true);
+
+    await mockWalletStore.updateDisabledDefaultMemo({
+      walletId,
+      disableDefaultMemoAppend: false,
+    });
+
+    const updatedWalletConfig2 = await mockWalletStore.findWalletByIdentifier(walletId);
+    expect(updatedWalletConfig2.config.disableDefaultClientMemo).to.eq(false);
   });
 
   it('Test assets storage', async () => {

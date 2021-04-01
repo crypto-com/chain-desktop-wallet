@@ -3,11 +3,11 @@ import { useHistory } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Button, Form, Input, Layout, Tabs, Alert, Checkbox, InputNumber } from 'antd';
+import { Button, Form, Input, Layout, Tabs, Alert, Checkbox, InputNumber, message } from 'antd';
 import { useRecoilState } from 'recoil';
 import { sessionState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
-import { SettingsDataUpdate } from '../../models/Wallet';
+import { DisableDefaultMemoSettings, SettingsDataUpdate } from '../../models/Wallet';
 import { Session } from '../../models/Session';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
@@ -97,6 +97,81 @@ const FormGeneral = () => {
     </>
   );
 };
+
+function MetaInfoComponent() {
+  const [session, setSession] = useRecoilState(sessionState);
+  const [updateLoading, setUpdateLoading] = useState(false);
+
+  const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    let unmounted = false;
+
+    const SyncConfig = async () => {
+      const defaultMemoDisabled = session.wallet.config.disableDefaultClientMemo;
+      if (!unmounted) {
+        setDefaultMemoStateDisabled(defaultMemoDisabled);
+      }
+    };
+
+    if (!didMountRef.current) {
+      SyncConfig();
+      didMountRef.current = true;
+    }
+
+    return () => {
+      unmounted = true;
+    };
+  }, [defaultMemoStateDisabled, setDefaultMemoStateDisabled]);
+
+  async function onAllowDefaultMemoChange() {
+    setUpdateLoading(true);
+
+    const newState = !defaultMemoStateDisabled;
+    setDefaultMemoStateDisabled(newState);
+
+    const disableMemoSettingsUpdate: DisableDefaultMemoSettings = {
+      walletId: session.wallet.identifier,
+      disableDefaultMemoAppend: newState,
+    };
+
+    await walletService.updateDefaultMemoDisabledSettings(disableMemoSettingsUpdate);
+
+    const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
+    const newSession = new Session(updatedWallet);
+    await walletService.setCurrentSession(newSession);
+
+    setSession(newSession);
+    setUpdateLoading(false);
+    message.success(
+      `Default client memo settings has been ${newState ? 'disabled' : 'enabled'} successfully`,
+    );
+  }
+
+  return (
+    <div>
+      <div className="site-layout-background settings-content">
+        <div className="container">
+          <div className="item">
+            <div className="description">
+              We do set a default memo value on staking transactions that do not have any memo value
+              set during the confirmation process.
+              <br />
+            </div>
+            <Checkbox
+              checked={defaultMemoStateDisabled}
+              onChange={onAllowDefaultMemoChange}
+              disabled={updateLoading}
+            >
+              Disable the default wallet client to append memo info
+            </Checkbox>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const FormSettings = () => {
   const [form] = Form.useForm();
@@ -215,7 +290,10 @@ const FormSettings = () => {
             </div>
           </div>
         </TabPane>
-        <TabPane tab="Clear Storage" key="2">
+        <TabPane tab="Metadata Configuration" key="2">
+          <MetaInfoComponent />
+        </TabPane>
+        <TabPane tab="Clear Storage" key="3">
           <div className="site-layout-background settings-content">
             <div className="container">
               <div className="description">

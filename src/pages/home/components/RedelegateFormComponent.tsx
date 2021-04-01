@@ -1,12 +1,12 @@
 import { FormInstance } from 'antd/lib/form';
-import { Form, InputNumber, AutoComplete } from 'antd';
-import { useRecoilValue } from 'recoil';
-import React from 'react';
+import { AutoComplete, Form, InputNumber, Alert } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 import { Session } from '../../../models/Session';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { UserAsset } from '../../../models/UserAsset';
-import { validatorTopListState } from '../../../recoil/atom';
+import { ValidatorModel } from '../../../models/Transaction';
+import { walletService } from '../../../service/WalletService';
 
 export function RedelegateFormComponent(props: {
   currentSession: Session;
@@ -28,7 +28,34 @@ export function RedelegateFormComponent(props: {
     'Undelegate amount cannot be bigger than currently delegated',
   );
 
-  const validatorTopList = useRecoilValue(validatorTopListState);
+  const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
+
+  const didMountRef = useRef(false);
+
+  const redelegatePeriod = props.currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
+
+  useEffect(() => {
+    let unmounted = false;
+
+    const syncValidatorsData = async () => {
+      const currentValidatorList = await walletService.retrieveTopValidators(
+        props.currentSession.wallet.identifier,
+      );
+
+      if (!unmounted) {
+        setValidatorTopList(currentValidatorList);
+      }
+    };
+
+    if (!didMountRef.current) {
+      syncValidatorsData();
+      didMountRef.current = true;
+    }
+
+    return () => {
+      unmounted = true;
+    };
+  }, [validatorTopList, setValidatorTopList]);
 
   return (
     <>
@@ -92,6 +119,13 @@ export function RedelegateFormComponent(props: {
             <InputNumber stringMode />
           </Form.Item>
         </Form>
+      </div>
+      <div>
+        <Alert
+          type="info"
+          message={`Funds can be redelegated once every ${redelegatePeriod} days. At any time, one account can only have at most 7 records of redelegation and unbonding that is in the ${redelegatePeriod} days effective unbonding periods.`}
+          showIcon
+        />
       </div>
     </>
   );
