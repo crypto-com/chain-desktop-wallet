@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - A newly revamped validator pop up screen selection
 - Now loading up to 20 top validators for selection
 - Show assets values in USD price on home screen
+- Show more informative notice on redelegate confirmations
 
 ### Bug Fixes
 - Removed the extra text and space that was being added when address is copied
