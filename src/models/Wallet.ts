@@ -57,6 +57,11 @@ export interface SettingsDataUpdate {
   networkFee?: string | undefined;
 }
 
+export interface DisableDefaultMemoSettings {
+  walletId: string;
+  disableDefaultMemoAppend: boolean;
+}
+
 export interface CustomConfigFormValue {
   derivationPath: string;
   chainId: string;
@@ -86,6 +91,7 @@ export function reconstructCustomConfig(formValues: CustomConfigFormValue): Wall
     network: customNetwork,
     nodeUrl: formValues.nodeUrl,
     indexingUrl: formValues.indexingUrl,
+    disableDefaultClientMemo: false,
     fee: {
       gasLimit: FIXED_DEFAULT_GAS_LIMIT,
       networkFee: FIXED_DEFAULT_FEE,

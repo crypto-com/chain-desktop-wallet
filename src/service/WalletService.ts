@@ -1,8 +1,14 @@
 import axios from 'axios';
-import { reconstructCustomConfig, SettingsDataUpdate, Wallet } from '../models/Wallet';
+import {
+  DisableDefaultMemoSettings,
+  reconstructCustomConfig,
+  SettingsDataUpdate,
+  Wallet,
+} from '../models/Wallet';
 import { StorageService } from '../storage/StorageService';
 import {
   APP_DB_NAMESPACE,
+  DEFAULT_CLIENT_MEMO,
   DefaultAsset,
   DefaultWalletConfigs,
   Network,
@@ -109,11 +115,17 @@ class WalletService {
       delegationRequest.amount,
       delegationRequest.asset,
     );
+
+    let { memo } = delegationRequest;
+    if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
+      memo = DEFAULT_CLIENT_MEMO;
+    }
+
     const delegateTransaction: DelegateTransactionUnsigned = {
       delegatorAddress: currentSession.wallet.address,
       validatorAddress: delegationRequest.validatorAddress,
       amount: String(delegationAmountScaled),
-      memo: delegationRequest.memo,
+      memo,
       accountNumber,
       accountSequence,
     };
@@ -382,6 +394,12 @@ class WalletService {
 
   public async updateWalletNodeConfig(nodeData: SettingsDataUpdate) {
     return this.storageService.updateWalletSettings(nodeData);
+  }
+
+  public async updateDefaultMemoDisabledSettings(
+    disableDefaultMemoSettings: DisableDefaultMemoSettings,
+  ) {
+    return this.storageService.updateDisabledDefaultMemo(disableDefaultMemoSettings);
   }
 
   public async findWalletByIdentifier(identifier: string): Promise<Wallet> {
