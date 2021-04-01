@@ -155,8 +155,8 @@ function MetaInfoComponent() {
         <div className="container">
           <div className="item">
             <div className="description">
-              We do set a default memo value on transactions that do not have anything setup during
-              the confirmation process
+              We do set a default memo value on staking transactions that do not have any memo value
+              set during the confirmation process.
               <br />
             </div>
             <Checkbox
