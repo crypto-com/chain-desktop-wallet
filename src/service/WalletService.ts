@@ -164,11 +164,17 @@ class WalletService {
       undelegationRequest.amount,
       undelegationRequest.asset,
     );
+
+    let { memo } = undelegationRequest;
+    if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
+      memo = DEFAULT_CLIENT_MEMO;
+    }
+
     const undelegateTransaction: UndelegateTransactionUnsigned = {
       delegatorAddress: currentSession.wallet.address,
       validatorAddress: undelegationRequest.validatorAddress,
       amount: undelegationAmountScaled,
-      memo: undelegationRequest.memo,
+      memo,
       accountNumber,
       accountSequence,
     };
@@ -207,12 +213,17 @@ class WalletService {
       redelegationRequest.amount,
       redelegationRequest.asset,
     );
+    let { memo } = redelegationRequest;
+    if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
+      memo = DEFAULT_CLIENT_MEMO;
+    }
+
     const redelegateTransactionUnsigned: RedelegateTransactionUnsigned = {
       delegatorAddress: currentSession.wallet.address,
       sourceValidatorAddress: redelegationRequest.validatorSourceAddress,
       destinationValidatorAddress: redelegationRequest.validatorDestinationAddress,
       amount: redelegationAmountScaled,
-      memo: redelegationRequest.memo,
+      memo,
       accountNumber,
       accountSequence,
     };
