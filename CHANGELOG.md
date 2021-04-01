@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Now loading up to 20 top validators for selection
 - Show assets values in USD price on home screen
 - Show more informative notice on redelegate confirmations
+- Append default client desktop memo when no memo is provided
 
 ### Bug Fixes
 - Removed the extra text and space that was being added when address is copied
