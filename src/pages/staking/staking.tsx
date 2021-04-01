@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
-import { AutoComplete, Button, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
-// import {ReactComponent as HomeIcon} from '../../assets/icon-home-white.svg';
+import { Button, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
+import { OrderedListOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 import Big from 'big.js';
@@ -23,8 +23,10 @@ import {
   getCurrentMinAssetAmount,
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
+import { middleEllipsis } from '../../utils/utils';
 
 const { Header, Content, Footer } = Layout;
+const { Search } = Input;
 const { TabPane } = Tabs;
 const layout = {
   // labelCol: { span: 8 },
@@ -55,10 +57,21 @@ const FormDelegationRequest = () => {
   const [errorMessages, setErrorMessages] = useState([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const currentSession = useRecoilValue(sessionState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
   const didMountRef = useRef(false);
+
+  const processValidatorList = (validatorList: ValidatorModel[]) => {
+    return validatorList.map((validator, idx) => {
+      const validatorModel = {
+        ...validator,
+        key: `${idx}`,
+      };
+      return validatorModel;
+    });
+  };
 
   useEffect(() => {
     let unmounted = false;
@@ -69,7 +82,8 @@ const FormDelegationRequest = () => {
       );
 
       if (!unmounted) {
-        setValidatorTopList(currentValidatorList);
+        const validatorList = processValidatorList(currentValidatorList);
+        setValidatorTopList(validatorList);
       }
     };
 
@@ -191,6 +205,72 @@ const FormDelegationRequest = () => {
     )} ${walletAsset.symbol}`,
   );
 
+  const validatorColumns = [
+    {
+      title: 'Name',
+      dataIndex: 'validatorName',
+      key: 'validatorName',
+    },
+    {
+      title: 'Domain',
+      dataIndex: 'validatorWebSite',
+      key: 'validatorWebSite',
+      render: validatorWebSite => {
+        return validatorWebSite === '' ? (
+          'n.a.'
+        ) : (
+          <a
+            data-original={validatorWebSite}
+            target="_blank"
+            rel="noreferrer"
+            href={`${validatorWebSite}`}
+          >
+            {validatorWebSite}
+          </a>
+        );
+      },
+    },
+    {
+      title: 'Address',
+      dataIndex: 'validatorAddress',
+      key: 'validatorAddress',
+      render: validatorAddress => (
+        <a
+          data-original={validatorAddress}
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/validator/${validatorAddress}`}
+        >
+          {middleEllipsis(validatorAddress, 12)}
+        </a>
+      ),
+    },
+    {
+      title: 'Commission Rate',
+      dataIndex: 'currentCommissionRate',
+      key: 'currentCommissionRate',
+      render: currentCommissionRate => (
+        <span>{new Big(currentCommissionRate).times(100).toFixed(2)}%</span>
+      ),
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: record => (
+        <a
+          onClick={() => {
+            setIsValidatorListVisible(false);
+            form.setFieldsValue({
+              validatorAddress: record.validatorAddress,
+            });
+          }}
+        >
+          Select
+        </a>
+      ),
+    },
+  ];
+
   return (
     <Form
       {...layout}
@@ -200,6 +280,27 @@ const FormDelegationRequest = () => {
       onFinish={showPasswordInput}
       requiredMark={false}
     >
+      <>
+        <ModalPopup
+          isModalVisible={isValidatorListVisible}
+          handleCancel={() => setIsValidatorListVisible(false)}
+          handleOk={() => setIsValidatorListVisible(false)}
+          className="validator-modal"
+          footer={[]}
+          okText="Confirm"
+          width={1000}
+        >
+          <div className="title">Validator List</div>
+          <div className="description">Please select one of the validator.</div>
+          <div className="item">
+            <Table
+              dataSource={validatorTopList}
+              columns={validatorColumns}
+              pagination={{ showSizeChanger: false }}
+            />
+          </div>
+        </ModalPopup>
+      </>
       <Form.Item
         name="validatorAddress"
         label="Validator address"
@@ -209,19 +310,12 @@ const FormDelegationRequest = () => {
           { required: true, message: 'Validator address is required' },
           customAddressValidator,
         ]}
+        className="input-validator-address"
       >
-        <AutoComplete
-          options={[
-            {
-              label: 'Top Validators',
-              options: validatorTopList.map(e => {
-                return {
-                  value: e.validatorAddress,
-                };
-              }),
-            },
-          ]}
+        <Search
           placeholder="Enter validator address"
+          enterButton={<OrderedListOutlined />}
+          onSearch={() => setIsValidatorListVisible(true)}
         />
       </Form.Item>
       <div className="amount">
