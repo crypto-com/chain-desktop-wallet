@@ -37,7 +37,7 @@ export interface DelegationResponse {
 }
 
 export interface Pagination {
-  next_key?: any;
+  next_key: string | null;
   total: string;
 }
 
@@ -99,6 +99,7 @@ export interface Commission {
 
 export interface Validator {
   operator_address: string;
+  consensus_pubkey: ValidatorPubKeyResponse;
   jailed: boolean;
   status: string;
   tokens: string;
@@ -110,6 +111,30 @@ export interface Validator {
   min_self_delegation: string;
 }
 
+export interface ValidatorPubKeyResponse {
+  '@type': string;
+  key: string;
+}
+
 export interface ValidatorListResponse {
   validators: Validator[];
+  pagination: Pagination;
+}
+
+export interface ValidatorSetResponse {
+  readonly height: string;
+  readonly result: {
+    block_height: string;
+    validators: Array<{
+      address: string;
+      pub_key: ValidatorPubKey;
+      proposer_priority: string;
+      voting_power: string;
+    }>;
+  };
+}
+
+export interface ValidatorPubKey {
+  readonly type: string;
+  readonly value: string;
 }
