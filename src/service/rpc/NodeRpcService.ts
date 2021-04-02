@@ -195,8 +195,7 @@ export class NodeRpcService implements INodeRpcService {
       .filter(v => v.status === 'BOND_STATUS_BONDED')
       .filter(v => !v.jailed)
       .filter(v => !!activeValidators[v.pubKey.value])
-      .sort((v1, v2) => Big(v2.currentShares).cmp(Big(v1.currentShares)))
-      .slice(0, 20);
+      .sort((v1, v2) => Big(v2.currentShares).cmp(Big(v1.currentShares)));
   }
 
   private async fetchLatestActiveValidators(): Promise<ValidatorPubKey[]> {

@@ -4,6 +4,7 @@ import 'antd/dist/antd.css';
 import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import numeral from 'numeral';
 import {
   scaledBalance,
   scaledStakingBalance,
@@ -516,19 +517,27 @@ function HomePage() {
           <div className="balance">
             <div className="title">TOTAL BALANCE</div>
             <div className="quantity">
-              {scaledBalance(userAsset)} {userAsset?.symbol}
+              {numeral(scaledBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
             </div>
             <div className="fiat">
-              ${getAssetBalancePrice(userAsset, marketData)} {marketData?.currency}
+              {marketData && marketData.price
+                ? `${numeral(getAssetBalancePrice(userAsset, marketData)).format('$0,0.00')} ${
+                    marketData?.currency
+                  }`
+                : ''}
             </div>
           </div>
           <div className="balance">
             <div className="title">STAKED BALANCE</div>
             <div className="quantity">
-              {scaledStakingBalance(userAsset)} {userAsset?.symbol}
+              {numeral(scaledStakingBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
             </div>
             <div className="fiat">
-              ${getAssetStakingBalancePrice(userAsset, marketData)} {marketData?.currency}
+              {marketData && marketData.price
+                ? `${numeral(getAssetStakingBalancePrice(userAsset, marketData)).format(
+                    '$0,0.00',
+                  )} ${marketData?.currency}`
+                : ''}
             </div>
           </div>
         </div>

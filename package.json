@@ -155,6 +155,7 @@
     "@types/jest": "26.0.16",
     "@types/mocha": "8.0.4",
     "@types/moxios": "^0.4.10",
+    "@types/numeral": "^2.0.1",
     "@types/qrcode.react": "1.0.1",
     "@typescript-eslint/eslint-plugin": "4.5.0",
     "@typescript-eslint/parser": "4.5.0",

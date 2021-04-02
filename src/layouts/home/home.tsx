@@ -76,7 +76,6 @@ function HomeLayout(props: HomeLayoutProps) {
     setSession(currentSession);
     setUserAsset(currentAsset);
     await walletService.syncAll(currentSession);
-    await fetchAndSetNewValidators();
 
     setIsButtonLoading(false);
     setIsConfirmationModalVisible(false);

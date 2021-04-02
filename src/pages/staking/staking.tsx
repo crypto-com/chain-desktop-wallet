@@ -80,7 +80,7 @@ const FormDelegationRequest = () => {
 
     const syncValidatorsData = async () => {
       const currentValidatorList = await walletService.retrieveTopValidators(
-        currentSession.wallet.identifier,
+        currentSession.wallet.config.network.chainId,
       );
 
       if (!unmounted) {
@@ -254,7 +254,7 @@ const FormDelegationRequest = () => {
           rel="noreferrer"
           href={`${currentSession.wallet.config.explorerUrl}/validator/${validatorAddress}`}
         >
-          {middleEllipsis(validatorAddress, 6)}
+          {middleEllipsis(validatorAddress, 10)}
         </a>
       ),
     },
@@ -274,7 +274,7 @@ const FormDelegationRequest = () => {
       },
     },
     {
-      title: 'Commission Rate',
+      title: 'Rate',
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
       sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),

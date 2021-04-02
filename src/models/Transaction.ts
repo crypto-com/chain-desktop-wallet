@@ -50,7 +50,7 @@ export interface TransferTransactionList {
 
 export interface ValidatorList {
   validators: Array<ValidatorModel>;
-  walletId: string;
+  chainId: string;
 }
 
 export interface RewardTransaction {

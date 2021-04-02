@@ -196,11 +196,11 @@ export class StorageService {
   }
 
   public async saveValidators(validatorList: ValidatorList) {
-    await this.db.validatorStore.remove({ walletId: validatorList.walletId }, { multi: true });
+    await this.db.validatorStore.remove({ chainId: validatorList.chainId }, { multi: true });
     return this.db.validatorStore.insert<ValidatorList>(validatorList);
   }
 
-  public async retrieveAllValidators(walletId: string) {
-    return this.db.validatorStore.findOne<ValidatorList>({ walletId });
+  public async retrieveAllValidators(chainId: string) {
+    return this.db.validatorStore.findOne<ValidatorList>({ chainId });
   }
 }
