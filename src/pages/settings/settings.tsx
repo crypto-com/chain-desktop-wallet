@@ -155,16 +155,15 @@ function MetaInfoComponent() {
         <div className="container">
           <div className="item">
             <div className="description">
-              We do set a default memo value on staking transactions that do not have any memo value
-              set during the confirmation process.
-              <br />
+              A default memo message will be used for staking transactions if a custom memo is not
+              provided.
             </div>
             <Checkbox
               checked={defaultMemoStateDisabled}
               onChange={onAllowDefaultMemoChange}
               disabled={updateLoading}
             >
-              Disable the default wallet client to append memo info
+              Disable default memo message
             </Checkbox>
           </div>
         </div>
