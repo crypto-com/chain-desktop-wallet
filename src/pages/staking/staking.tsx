@@ -265,7 +265,6 @@ const FormDelegationRequest = () => {
       sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
       defaultSortOrder: 'descend' as any,
       render: currentTokens => {
-        console.log(scaledAmount(currentTokens, 8));
         return (
           <span>
             {numeral(scaledAmount(currentTokens, 8)).format('0,0.00')}{' '}
