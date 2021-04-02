@@ -3,7 +3,13 @@ import axios, { AxiosInstance } from 'axios';
 import { Big } from 'big.js';
 import { Bytes } from '../../utils/ChainJsLib';
 import { CosmosPorts } from '../../config/StaticConfig';
-import { DelegationResult, RewardResponse, ValidatorListResponse } from './NodeRpcModels';
+import {
+  DelegationResult,
+  RewardResponse,
+  ValidatorListResponse,
+  ValidatorPubKey,
+  ValidatorSetResponse,
+} from './NodeRpcModels';
 import {
   BroadCastResult,
   RewardTransaction,
@@ -24,6 +30,12 @@ export interface INodeRpcService {
   broadcastTransaction(signedTxHex: string): Promise<BroadCastResult>;
 
   fetchDelegationBalance(address: string, assetSymbol: string): Promise<StakingTransactionList>;
+
+  fetchStakingRewards(address: string, assetSymbol: string): Promise<Array<RewardTransaction>>;
+
+  loadStakingBalance(address: string, assetSymbol: string): Promise<string>;
+
+  loadTopValidators(): Promise<ValidatorModel[]>;
 }
 
 export class NodeRpcService implements INodeRpcService {
@@ -31,7 +43,7 @@ export class NodeRpcService implements INodeRpcService {
 
   private readonly proxyClient: AxiosInstance; // :1317 port
 
-  private constructor(client: StargateClient, proxyClient: AxiosInstance) {
+  constructor(client: StargateClient, proxyClient: AxiosInstance) {
     this.client = client;
     this.proxyClient = proxyClient;
   }
@@ -157,25 +169,70 @@ export class NodeRpcService implements INodeRpcService {
 
   // eslint-disable-next-line class-methods-use-this
   public async loadTopValidators(): Promise<ValidatorModel[]> {
-    const response = await this.proxyClient.get<ValidatorListResponse>(
-      `/cosmos/staking/v1beta1/validators?status=BOND_STATUS_BONDED`,
+    let validators: ValidatorModel[] = [];
+    let nextKey: string | null = null;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      let fetchedValidators: ValidatorModel[];
+      // eslint-disable-next-line no-await-in-loop
+      [fetchedValidators, nextKey] = await this.fetchValidators(nextKey);
+
+      validators = [...validators, ...fetchedValidators];
+      if (nextKey === null) {
+        break;
+      }
+    }
+
+    const activeValidators = (await this.fetchLatestActiveValidators()).reduce(
+      (pubKeyMap, validator) => {
+        pubKeyMap[validator.value] = true;
+        return pubKeyMap;
+      },
+      {},
     );
 
-    return response.data.validators
+    return validators
+      .filter(v => v.status === 'BOND_STATUS_BONDED')
       .filter(v => !v.jailed)
-      .sort((v1, v2) => Big(v2.delegator_shares).cmp(Big(v1.delegator_shares)))
-      .slice(0, 20)
-      .map(unjailedValidator => {
-        const validator: ValidatorModel = {
-          validatorWebSite: unjailedValidator.description.website,
-          maxCommissionRate: unjailedValidator.commission.commission_rates.max_rate,
-          securityContact: unjailedValidator.description.security_contact,
-          validatorName: unjailedValidator.description.moniker,
-          currentShares: unjailedValidator.delegator_shares,
-          currentCommissionRate: unjailedValidator.commission.commission_rates.rate,
-          validatorAddress: unjailedValidator.operator_address,
-        };
-        return validator;
-      });
+      .filter(v => !!activeValidators[v.pubKey.value])
+      .sort((v1, v2) => Big(v2.currentShares).cmp(Big(v1.currentShares)))
+      .slice(0, 20);
+  }
+
+  private async fetchLatestActiveValidators(): Promise<ValidatorPubKey[]> {
+    const response = await this.proxyClient.get<ValidatorSetResponse>('/validatorsets/latest');
+
+    return response.data.result.validators.map(v => v.pub_key);
+  }
+
+  private async fetchValidators(
+    pagination: string | null,
+  ): Promise<[ValidatorModel[], PaginationNextKey]> {
+    const baseUrl = '/cosmos/staking/v1beta1/validators';
+    const url =
+      pagination === null ? baseUrl : `${baseUrl}?pagination.key=${encodeURIComponent(pagination)}`;
+    const response = await this.proxyClient.get<ValidatorListResponse>(url);
+
+    return [
+      response.data.validators.map(validator => ({
+        status: validator.status,
+        jailed: validator.jailed,
+        validatorWebSite: validator.description.website,
+        maxCommissionRate: validator.commission.commission_rates.max_rate,
+        securityContact: validator.description.security_contact,
+        validatorName: validator.description.moniker,
+        currentTokens: validator.tokens,
+        currentShares: validator.delegator_shares,
+        currentCommissionRate: validator.commission.commission_rates.rate,
+        validatorAddress: validator.operator_address,
+        pubKey: {
+          type: validator.consensus_pubkey['@type'],
+          value: validator.consensus_pubkey.key,
+        },
+      })),
+      response.data.pagination.next_key,
+    ];
   }
 }
+
+type PaginationNextKey = string | null;
