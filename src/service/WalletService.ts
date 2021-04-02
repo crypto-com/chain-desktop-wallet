@@ -531,7 +531,7 @@ class WalletService {
     try {
       const validators = await this.getLatestTopValidators();
       await this.storageService.saveValidators({
-        walletId: currentSession.wallet.identifier,
+        chainId: currentSession.wallet.config.network.chainId,
         validators,
       });
     } catch (e) {
@@ -733,8 +733,8 @@ class WalletService {
     return selectedNetworkConfig;
   }
 
-  public async retrieveTopValidators(walletId: string): Promise<ValidatorModel[]> {
-    const validatorSet = await this.storageService.retrieveAllValidators(walletId);
+  public async retrieveTopValidators(chainId: string): Promise<ValidatorModel[]> {
+    const validatorSet = await this.storageService.retrieveAllValidators(chainId);
     if (!validatorSet) {
       return [];
     }
