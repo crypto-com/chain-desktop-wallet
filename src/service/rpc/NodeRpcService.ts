@@ -158,7 +158,7 @@ export class NodeRpcService implements INodeRpcService {
   // eslint-disable-next-line class-methods-use-this
   public async loadTopValidators(): Promise<ValidatorModel[]> {
     const response = await this.proxyClient.get<ValidatorListResponse>(
-      `/cosmos/staking/v1beta1/validators`,
+      `/cosmos/staking/v1beta1/validators?status=BOND_STATUS_BONDED`,
     );
 
     return response.data.validators
