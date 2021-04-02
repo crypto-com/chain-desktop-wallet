@@ -286,6 +286,7 @@
     "@umijs/fabric/stylelint-config-rational-order/stylelint": "13.9.0",
     "@umijs/fabric/stylelint-config-rational-order/stylelint/meow/yargs-parser": "20.2.4",
     "immer": "8.0.1",
-    "xmldom": "0.5.0"
+    "xmldom": "0.5.0",
+    "is-svg": "4.2.2"
   }
 }
