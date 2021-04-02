@@ -24,7 +24,7 @@ import {
   getCurrentMinAssetAmount,
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
-import { middleEllipsis } from '../../utils/utils';
+import { middleEllipsis, ellipsis } from '../../utils/utils';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -219,7 +219,7 @@ const FormDelegationRequest = () => {
           rel="noreferrer"
           href={`${currentSession.wallet.config.explorerUrl}/validator/${record.validatorAddress}`}
         >
-          {validatorName}
+          {ellipsis(validatorName, 24)}
         </a>
       ),
     },
@@ -237,7 +237,7 @@ const FormDelegationRequest = () => {
             rel="noreferrer"
             href={`${validatorWebSite}`}
           >
-            {validatorWebSite}
+            {ellipsis(validatorWebSite, 24)}
           </a>
         );
       },
