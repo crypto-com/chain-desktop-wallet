@@ -6,6 +6,7 @@ import { OrderedListOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 import Big from 'big.js';
+import numeral from 'numeral';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -13,7 +14,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { sessionState, walletAssetState } from '../../recoil/atom';
-import { scaledBalance, UserAsset } from '../../models/UserAsset';
+import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
@@ -23,7 +24,7 @@ import {
   getCurrentMinAssetAmount,
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
-import { middleEllipsis } from '../../utils/utils';
+import { middleEllipsis, ellipsis } from '../../utils/utils';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -79,7 +80,7 @@ const FormDelegationRequest = () => {
 
     const syncValidatorsData = async () => {
       const currentValidatorList = await walletService.retrieveTopValidators(
-        currentSession.wallet.identifier,
+        currentSession.wallet.config.network.chainId,
       );
 
       if (!unmounted) {
@@ -211,9 +212,19 @@ const FormDelegationRequest = () => {
       title: 'Name',
       dataIndex: 'validatorName',
       key: 'validatorName',
+      render: (validatorName, record) => (
+        <a
+          data-original={record.validatorAddress}
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/validator/${record.validatorAddress}`}
+        >
+          {ellipsis(validatorName, 24)}
+        </a>
+      ),
     },
     {
-      title: 'Domain',
+      title: 'Website',
       dataIndex: 'validatorWebSite',
       key: 'validatorWebSite',
       render: validatorWebSite => {
@@ -226,7 +237,7 @@ const FormDelegationRequest = () => {
             rel="noreferrer"
             href={`${validatorWebSite}`}
           >
-            {validatorWebSite}
+            {ellipsis(validatorWebSite, 24)}
           </a>
         );
       },
@@ -238,18 +249,35 @@ const FormDelegationRequest = () => {
       render: validatorAddress => (
         <a
           data-original={validatorAddress}
+          title={validatorAddress}
           target="_blank"
           rel="noreferrer"
           href={`${currentSession.wallet.config.explorerUrl}/validator/${validatorAddress}`}
         >
-          {middleEllipsis(validatorAddress, 12)}
+          {middleEllipsis(validatorAddress, 10)}
         </a>
       ),
     },
     {
-      title: 'Commission Rate',
+      title: 'Voting Power',
+      dataIndex: 'currentTokens',
+      key: 'currentTokens',
+      sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
+      defaultSortOrder: 'descend' as any,
+      render: currentTokens => {
+        return (
+          <span>
+            {numeral(scaledAmount(currentTokens, 8)).format('0,0.00')}{' '}
+            {currentSession.wallet.config.network.coin.croDenom.toUpperCase()}
+          </span>
+        );
+      },
+    },
+    {
+      title: 'Rate',
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
+      sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
       render: currentCommissionRate => (
         <span>{new Big(currentCommissionRate).times(100).toFixed(2)}%</span>
       ),

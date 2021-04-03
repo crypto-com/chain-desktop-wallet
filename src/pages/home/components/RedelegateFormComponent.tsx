@@ -39,7 +39,7 @@ export function RedelegateFormComponent(props: {
 
     const syncValidatorsData = async () => {
       const currentValidatorList = await walletService.retrieveTopValidators(
-        props.currentSession.wallet.identifier,
+        props.currentSession.wallet.config.network.chainId,
       );
 
       if (!unmounted) {

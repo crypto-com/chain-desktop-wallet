@@ -6,6 +6,15 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.1.4] - 2021-04-02
+
+### Bug Fixes
+- Load correct top validator set data - Avoid loading inactive validators
+- Handle cases where the prices were not loaded from the market API
+
+### Additions
+- Load up to 100 active and bonded validators
+
 ## [v0.1.3] - 2021-04-01
 
 ### Additions

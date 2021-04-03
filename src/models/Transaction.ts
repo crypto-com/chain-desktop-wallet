@@ -1,3 +1,5 @@
+import { ValidatorPubKey } from '../service/rpc/NodeRpcModels';
+
 export enum TransactionStatus {
   SUCCESS = 'SUCCESS',
   PENDING = 'PENDING',
@@ -48,7 +50,7 @@ export interface TransferTransactionList {
 
 export interface ValidatorList {
   validators: Array<ValidatorModel>;
-  walletId: string;
+  chainId: string;
 }
 
 export interface RewardTransaction {
@@ -64,11 +66,15 @@ export interface BroadCastResult {
 }
 
 export interface ValidatorModel {
+  readonly status: string;
+  readonly jailed: boolean;
   readonly validatorName: string;
   readonly validatorAddress: string;
   readonly validatorWebSite: string;
   readonly securityContact: string;
   readonly currentCommissionRate: string;
   readonly maxCommissionRate: string;
+  readonly currentTokens: string;
   readonly currentShares: string;
+  readonly pubKey: ValidatorPubKey;
 }
