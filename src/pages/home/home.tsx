@@ -122,8 +122,8 @@ function HomePage() {
   const currentSession = useRecoilValue(sessionState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
-  const [marketData, setMarketData] = useRecoilState(marketState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const marketData = useRecoilValue(marketState);
   const [syncLoading, setSyncLoading] = useState(false);
   const didMountRef = useRef(false);
 
@@ -215,14 +215,11 @@ function HomePage() {
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
-      const marketPrice = await walletService.retrieveAssetPrice(userAsset.mainnetSymbol, 'usd');
-
       if (!unmounted) {
         showWalletStateNotification(currentSession.wallet.config);
         setDelegations(stakingTabularData);
         setTransfers(transferTabularData);
         setUserAsset(currentAsset);
-        setMarketData(marketPrice);
         setHasShownNotLiveWallet(true);
       }
     };
