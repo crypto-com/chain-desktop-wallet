@@ -4,7 +4,9 @@ import { Big } from 'big.js';
 import { Bytes } from '../../utils/ChainJsLib';
 import { NodePorts } from '../../config/StaticConfig';
 import {
+  AllProposalResponse,
   DelegationResult,
+  Proposal,
   RewardResponse,
   ValidatorListResponse,
   ValidatorPubKey,
@@ -162,11 +164,39 @@ export class NodeRpcService implements INodeRpcService {
     return delegationList.totalBalance;
   }
 
-  public async loadProposals() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async loadProposals(proposalStatus: string) {
+    let proposals: Proposal[] = [];
+    let nextKey: string | null = null;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      let fetchedProposals: Proposal[];
+      // eslint-disable-next-line no-await-in-loop
+      [fetchedProposals, nextKey] = await this.loadProposalsPaginated(nextKey);
+      const filteredProposals = fetchedProposals.filter(
+        proposal => proposal.status.toLowerCase() === proposalStatus.toLowerCase(),
+      );
+
+      proposals = [...proposals, ...filteredProposals];
+      if (nextKey === null) {
+        break;
+      }
+    }
+
+    return proposals;
+  }
+
+  public async loadProposalsPaginated(
+    nextPage: string | null,
+  ): Promise<[Proposal[], PaginationNextKey]> {
+    const baseUrl = `/cosmos/gov/v1beta1/proposals`;
+    const url =
+      nextPage === null ? baseUrl : `${baseUrl}?pagination.key=${encodeURIComponent(nextPage)}`;
+    const response = await this.cosmosClient.get<AllProposalResponse>(url);
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const response = await this.cosmosClient.get<DelegationResult>(
-      `/cosmos/staking/v1beta1/proposals`,
-    );
+    const { proposals, pagination } = response.data;
+    return [proposals, pagination.next_key];
   }
 
   public async loadDelegations(
