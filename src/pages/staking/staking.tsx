@@ -545,13 +545,16 @@ const FormWithdrawStakingReward = () => {
       .filter(reward => Big(reward.amount).gte(Big(0)))
       .map(reward => {
         const rewardAmount = getUIDynamicAmount(reward.amount, currentAsset);
-        const marketPrice = new Big(currentMarketPrice.price);
-        const rewardMarketPrice = new Big(rewardAmount).times(marketPrice).toFixed(2);
-
+        const marketPrice = marketData && marketData.price ? new Big(currentMarketPrice.price) : '';
+        const rewardMarketPrice =
+          marketData && marketData.price ? new Big(rewardAmount).times(marketPrice).toFixed(2) : '';
         const rewardData: RewardsTabularData = {
           key: `${reward.validatorAddress}${reward.amount}`,
           rewardAmount: `${rewardAmount} ${currentAsset.symbol}`,
-          rewardMarketPrice: `$${rewardMarketPrice} USD`,
+          rewardMarketPrice:
+            rewardMarketPrice !== ''
+              ? `${numeral(rewardMarketPrice).format('$0,0.00')} ${marketData?.currency}`
+              : ``,
           validatorAddress: reward.validatorAddress,
         };
         return rewardData;
