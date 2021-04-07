@@ -25,6 +25,7 @@ import {
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
 import { middleEllipsis, ellipsis } from '../../utils/utils';
+import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -123,7 +124,7 @@ const FormDelegationRequest = () => {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase) {
+    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       showConfirmationModal();
     }
     setInputPasswordVisible(true);
