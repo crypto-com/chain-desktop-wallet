@@ -14,6 +14,7 @@ import CreatePage from './create/create';
 import BackupPage from './backup/backup';
 import HomePage from './home/home';
 import ReceivePage from './receive/receive';
+import WalletPage from './wallet/wallet';
 import StakingPage from './staking/staking';
 import SettingsPage from './settings/settings';
 import SignUpPage from './signup/signup';
@@ -104,6 +105,12 @@ function RouteHub() {
       key: 'settings',
       path: '/settings',
       component: <SettingsPage />,
+    },
+    {
+      name: 'Wallet Page',
+      key: 'wallet',
+      path: '/wallet',
+      component: <WalletPage />,
     },
   ];
 

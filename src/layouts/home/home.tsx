@@ -242,6 +242,13 @@ function HomeLayout(props: HomeLayoutProps) {
         ) : (
           ''
         )}
+        <Menu.Item>
+          <Link to="/wallet">
+            {/* <IconWallet /> */}
+            <Icon component={IconWallet} />
+            Wallet List
+          </Link>
+        </Menu.Item>
       </Menu>
     );
   };
