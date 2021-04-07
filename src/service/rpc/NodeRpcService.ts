@@ -2,7 +2,7 @@ import { isBroadcastTxFailure, StargateClient } from '@cosmjs/stargate';
 import axios, { AxiosInstance } from 'axios';
 import { Big } from 'big.js';
 import { Bytes } from '../../utils/ChainJsLib';
-import { CosmosPorts } from '../../config/StaticConfig';
+import { NodePorts } from '../../config/StaticConfig';
 import {
   DelegationResult,
   RewardResponse,
@@ -42,41 +42,41 @@ export interface INodeRpcService {
 const MAX_VALIDATOR_LOAD = 100;
 
 export class NodeRpcService implements INodeRpcService {
-  private readonly client: StargateClient;
+  private readonly tendermintClient: StargateClient;
 
-  private readonly proxyClient: AxiosInstance; // :1317 port
+  private readonly cosmosClient: AxiosInstance; // :1317 port
 
   constructor(client: StargateClient, proxyClient: AxiosInstance) {
-    this.client = client;
-    this.proxyClient = proxyClient;
+    this.tendermintClient = client;
+    this.cosmosClient = proxyClient;
   }
 
   public static async init(baseUrl: string) {
-    const client = await StargateClient.connect(baseUrl + CosmosPorts.Main);
+    const client = await StargateClient.connect(baseUrl + NodePorts.Tendermint);
     const proxyClient = axios.create({
-      baseURL: baseUrl + CosmosPorts.Proxy,
+      baseURL: baseUrl + NodePorts.Cosmos,
     });
     return new NodeRpcService(client, proxyClient);
   }
 
   public async loadAccountBalance(address: string, assetDenom: string): Promise<string> {
-    const response = await this.client.getBalance(address, assetDenom);
+    const response = await this.tendermintClient.getBalance(address, assetDenom);
     return response?.amount ?? '0';
   }
 
   public async loadSequenceNumber(address: string): Promise<number> {
-    return (await this.client.getAccount(address))?.sequence ?? 0;
+    return (await this.tendermintClient.getAccount(address))?.sequence ?? 0;
   }
 
   public async fetchAccountNumber(address: string): Promise<number> {
-    return (await this.client.getAccount(address))?.accountNumber ?? 0;
+    return (await this.tendermintClient.getAccount(address))?.accountNumber ?? 0;
   }
 
   public async broadcastTransaction(signedTxHex: string): Promise<BroadCastResult> {
     const TIME_OUT_ERROR = 'timed out waiting for tx to be included in a block';
     try {
       const signedBytes = Bytes.fromHexString(signedTxHex).toUint8Array();
-      const broadcastResponse = await this.client.broadcastTx(signedBytes);
+      const broadcastResponse = await this.tendermintClient.broadcastTx(signedBytes);
       if (isBroadcastTxFailure(broadcastResponse)) {
         // noinspection ExceptionCaughtLocallyJS
         throw new TypeError(`${broadcastResponse.rawLog}`);
@@ -99,7 +99,7 @@ export class NodeRpcService implements INodeRpcService {
     address: string,
     assetSymbol: string,
   ): Promise<StakingTransactionList> {
-    const response = await this.proxyClient.get<DelegationResult>(
+    const response = await this.cosmosClient.get<DelegationResult>(
       `/cosmos/staking/v1beta1/delegations/${address}`,
     );
     const delegationResponses = response.data.delegation_responses;
@@ -135,7 +135,7 @@ export class NodeRpcService implements INodeRpcService {
     address: string,
     assetSymbol: string,
   ): Promise<Array<RewardTransaction>> {
-    const response = await this.proxyClient.get<RewardResponse>(
+    const response = await this.cosmosClient.get<RewardResponse>(
       `cosmos/distribution/v1beta1/delegators/${address}/rewards`,
     );
     const { rewards } = response.data;
@@ -160,6 +160,13 @@ export class NodeRpcService implements INodeRpcService {
   public async loadStakingBalance(address: string, assetSymbol: string): Promise<string> {
     const delegationList = await this.fetchDelegationBalance(address, assetSymbol);
     return delegationList.totalBalance;
+  }
+
+  public async loadProposals() {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const response = await this.cosmosClient.get<DelegationResult>(
+      `/cosmos/staking/v1beta1/proposals`,
+    );
   }
 
   public async loadDelegations(
@@ -203,7 +210,7 @@ export class NodeRpcService implements INodeRpcService {
   }
 
   private async fetchLatestActiveValidators(): Promise<ValidatorPubKey[]> {
-    const response = await this.proxyClient.get<ValidatorSetResponse>('/validatorsets/latest');
+    const response = await this.cosmosClient.get<ValidatorSetResponse>('/validatorsets/latest');
 
     return response.data.result.validators.map(v => v.pub_key);
   }
@@ -214,7 +221,7 @@ export class NodeRpcService implements INodeRpcService {
     const baseUrl = '/cosmos/staking/v1beta1/validators';
     const url =
       pagination === null ? baseUrl : `${baseUrl}?pagination.key=${encodeURIComponent(pagination)}`;
-    const response = await this.proxyClient.get<ValidatorListResponse>(url);
+    const response = await this.cosmosClient.get<ValidatorListResponse>(url);
 
     return [
       response.data.validators.map(validator => ({

@@ -8,7 +8,7 @@ import './create.less';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions, WalletCreator } from '../../service/WalletCreator';
-import { DefaultWalletConfigs, CosmosPorts } from '../../config/StaticConfig';
+import { DefaultWalletConfigs, NodePorts } from '../../config/StaticConfig';
 import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
@@ -93,7 +93,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
     form.validateFields().then(async values => {
       setCheckingNodeConnection(true);
       const { nodeUrl } = values;
-      const isNodeLive = await walletService.checkNodeIsLive(`${nodeUrl}${CosmosPorts.Main}`);
+      const isNodeLive = await walletService.checkNodeIsLive(`${nodeUrl}${NodePorts.Tendermint}`);
       setCheckingNodeConnection(false);
 
       if (isNodeLive) {
