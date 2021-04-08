@@ -54,7 +54,7 @@ export interface ValidatorList {
 }
 
 export interface ProposalList {
-  proposals: Array<Proposal>;
+  proposals: Array<ProposalModel>;
   chainId: string;
 }
 
@@ -83,6 +83,8 @@ export interface ValidatorModel {
   readonly currentShares: string;
   readonly pubKey: ValidatorPubKey;
 }
+
+export interface ProposalModel extends Proposal {}
 
 export const ProposalStatuses = {
   PROPOSAL_STATUS_UNSPECIFIED: 'PROPOSAL_STATUS_UNSPECIFIED',

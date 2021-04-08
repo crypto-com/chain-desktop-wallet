@@ -33,6 +33,7 @@ import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
+  ProposalModel,
   ProposalStatuses,
   RewardTransaction,
   RewardTransactionList,
@@ -53,7 +54,6 @@ import {
   UndelegationRequest,
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
-import { Proposal } from './rpc/NodeRpcModels';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -757,6 +757,14 @@ class WalletService {
     return validatorSet.validators;
   }
 
+  public async retrieveProposals(chainId: string): Promise<ProposalModel[]> {
+    const proposalSet = await this.storageService.retrieveAllProposals(chainId);
+    if (!proposalSet) {
+      return [];
+    }
+    return proposalSet.proposals;
+  }
+
   private async getLatestTopValidators(): Promise<ValidatorModel[]> {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
@@ -772,7 +780,7 @@ class WalletService {
     }
   }
 
-  private async getLatestProposals(): Promise<Proposal[]> {
+  private async getLatestProposals(): Promise<ProposalModel[]> {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
