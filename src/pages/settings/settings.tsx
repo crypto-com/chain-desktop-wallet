@@ -246,6 +246,10 @@ const FormSettings = () => {
       nodeUrl: defaultSettings.nodeUrl,
       chainId: defaultSettings.network.chainId,
       indexingUrl: defaultSettings.indexingUrl,
+      networkFee:
+        defaultSettings.fee && defaultSettings.fee.networkFee ? defaultSettings.fee.networkFee : '',
+      gasLimit:
+        defaultSettings.fee && defaultSettings.fee.gasLimit ? defaultSettings.fee.gasLimit : '',
     });
   };
 
