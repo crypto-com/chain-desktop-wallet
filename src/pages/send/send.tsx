@@ -21,6 +21,7 @@ import {
   getNormalScaleAmount,
 } from '../../utils/NumberUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
+import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
 const layout = {};
@@ -59,10 +60,11 @@ const FormSend = () => {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase) {
+    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       showConfirmationModal();
+    } else {
+      setInputPasswordVisible(true);
     }
-    setInputPasswordVisible(true);
   };
 
   const onWalletDecryptFinish = async (password: string) => {
@@ -76,7 +78,7 @@ const FormSend = () => {
 
   const onConfirmTransfer = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
-    if (!decryptedPhrase) {
+    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
       return;
     }
     try {
