@@ -13,6 +13,9 @@ All notable changes to this project will be documented in this file.
 - Show reward amounts in fiat currency conversion (USD)
 - Remove requirements of wallets confirmation on Ledger based wallets
 
+### Bug Fixes
+- On Settings page, when clicking discard changes/restore unsaved changes, 
+  network fee and gasLimit changes are now discarded back to previous state
 
 ## [v0.1.4] - 2021-04-02
 
