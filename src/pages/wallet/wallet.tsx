@@ -4,6 +4,7 @@ import { useRecoilValue, useRecoilState } from 'recoil';
 import './wallet.less';
 import 'antd/dist/antd.css';
 import { Layout, Table, Space } from 'antd';
+import { CheckOutlined } from '@ant-design/icons';
 import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
@@ -12,44 +13,20 @@ import { walletService } from '../../service/WalletService';
 const { Header, Content, Footer } = Layout;
 
 function WalletPage() {
-  // const session: Session = useRecoilValue<Session>(sessionState);
   const [session, setSession] = useRecoilState<Session>(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
-  // const [walletList, setWalletList] = useState([]);
   const walletList = useRecoilValue(walletListState);
-  // const [walletList, setWalletList] = useRecoilState(walletListState);
   const [processedWalletList, setProcessedWalletList] = useState([]);
   const didMountRef = useRef(false);
 
-  console.log(session);
-  console.log(userAsset);
-  console.log(walletList);
-
   const walletSelect = async e => {
-    // setLoading(true);
     await walletService.setCurrentSession(new Session(walletList[e.key]));
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
     setSession(currentSession);
     setUserAsset(currentAsset);
     await walletService.syncAll(currentSession);
-    // await fetchAndSetNewValidators();
-    // setLoading(false);
   };
-
-  // const walletDelete = async e => {
-  //   await walletService.deleteWallet(e.identifier);
-
-  //   // Switch to existing default wallet
-  //   const allWalletsData = await walletService.retrieveAllWallets();
-  //   setWalletList(allWalletsData);
-  //   await walletService.setCurrentSession(new Session(walletList[0]));
-  //   const currentSession = await walletService.retrieveCurrentSession();
-  //   const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
-  //   setSession(currentSession);
-  //   setUserAsset(currentAsset);
-  //   await walletService.syncAll(currentSession);
-  // }
 
   const processWalletList = wallets => {
     const list = wallets.map((wallet, idx) => {
@@ -89,7 +66,7 @@ function WalletPage() {
     return () => {
       unmounted = true;
     };
-  });
+  }, [session]);
 
   const columns = [
     {
@@ -122,7 +99,14 @@ function WalletPage() {
         return (
           <Space size="middle">
             {userAsset.walletId === record.identifier ? (
-              'Selected'
+              <CheckOutlined
+                style={{
+                  fontSize: '18px',
+                  color: '#1199fa',
+                  position: 'absolute',
+                  top: '10px',
+                }}
+              />
             ) : (
               <a
                 onClick={() => {
@@ -132,13 +116,6 @@ function WalletPage() {
                 Select
               </a>
             )}
-            {/* <a
-            onClick={() => {
-              walletDelete(record);
-            }}
-          >
-            Delete
-          </a> */}
           </Space>
         );
       },

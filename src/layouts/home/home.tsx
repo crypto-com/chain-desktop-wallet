@@ -5,7 +5,7 @@ import { Alert, Button, Checkbox, Dropdown, Form, Input, Layout, Menu, Spin } fr
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Icon, {
   CaretDownOutlined,
-  CheckOutlined,
+  // CheckOutlined,
   DeleteOutlined,
   LoadingOutlined,
   PlusOutlined,
@@ -33,7 +33,7 @@ interface HomeLayoutProps {
 }
 
 const { Sider } = Layout;
-const { SubMenu } = Menu;
+// const { SubMenu } = Menu;
 
 function HomeLayout(props: HomeLayoutProps) {
   const history = useHistory();
@@ -151,22 +151,22 @@ function HomeLayout(props: HomeLayoutProps) {
   };
 
   const WalletMenu = () => {
-    const walletClick = async e => {
-      setLoading(true);
+    // const walletClick = async e => {
+    //   setLoading(true);
 
-      await walletService.setCurrentSession(new Session(walletList[e.key]));
-      const currentSession = await walletService.retrieveCurrentSession();
-      const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
-      setSession(currentSession);
-      setUserAsset(currentAsset);
-      await walletService.syncAll(currentSession);
-      await fetchAndSetNewValidators();
-      setLoading(false);
-    };
+    //   await walletService.setCurrentSession(new Session(walletList[e.key]));
+    //   const currentSession = await walletService.retrieveCurrentSession();
+    //   const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+    //   setSession(currentSession);
+    //   setUserAsset(currentAsset);
+    //   await walletService.syncAll(currentSession);
+    //   await fetchAndSetNewValidators();
+    //   setLoading(false);
+    // };
 
     return (
       <Menu>
-        {walletList.length > 5 ? (
+        {/* {walletList.length > 5 ? (
           <SubMenu title="Wallet List" icon={<Icon component={IconWallet} />}>
             {walletList.map((item, index) => {
               return (
@@ -210,8 +210,8 @@ function HomeLayout(props: HomeLayoutProps) {
               </Menu.Item>
             );
           }, session)
-        )}
-        {walletList.length < 10 ? (
+        )} */}
+        {walletList.length < 100 ? (
           <>
             <Menu.Item className="restore-wallet-item">
               <Link to="/restore">
