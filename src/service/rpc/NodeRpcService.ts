@@ -165,7 +165,7 @@ export class NodeRpcService implements INodeRpcService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public async loadProposals(proposalStatus: string) {
+  public async loadProposals(proposalStatus: string[]) {
     let proposals: Proposal[] = [];
     let nextKey: string | null = null;
     // eslint-disable-next-line no-constant-condition
@@ -173,8 +173,8 @@ export class NodeRpcService implements INodeRpcService {
       let fetchedProposals: Proposal[];
       // eslint-disable-next-line no-await-in-loop
       [fetchedProposals, nextKey] = await this.loadProposalsPaginated(nextKey);
-      const filteredProposals = fetchedProposals.filter(
-        proposal => proposal.status.toLowerCase() === proposalStatus.toLowerCase(),
+      const filteredProposals = fetchedProposals.filter(proposal =>
+        proposalStatus.includes(proposal.status),
       );
 
       proposals = [...proposals, ...filteredProposals];

@@ -33,6 +33,7 @@ import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
+  ProposalStatuses,
   RewardTransaction,
   RewardTransactionList,
   StakingTransactionData,
@@ -52,6 +53,7 @@ import {
   UndelegationRequest,
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
+import { Proposal } from './rpc/NodeRpcModels';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -473,6 +475,7 @@ class WalletService {
       this.fetchAndSaveRewards(nodeRpc, currentSession),
       this.fetchAndSaveTransfers(currentSession),
       this.fetchAndSaveValidators(currentSession),
+      this.fetchAndSaveProposals(currentSession),
     ]);
   }
 
@@ -537,6 +540,19 @@ class WalletService {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_VALIDATORS', e);
+    }
+  }
+
+  public async fetchAndSaveProposals(currentSession: Session) {
+    try {
+      const proposals = await this.getLatestProposals();
+      await this.storageService.saveProposals({
+        chainId: currentSession.wallet.config.network.chainId,
+        proposals,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_SAVE_PROPOSALS', e);
     }
   }
 
@@ -752,6 +768,24 @@ class WalletService {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING TOP VALIDATORS', e);
+      return [];
+    }
+  }
+
+  private async getLatestProposals(): Promise<Proposal[]> {
+    try {
+      const currentSession = await this.storageService.retrieveCurrentSession();
+      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+        return Promise.resolve([]);
+      }
+      const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+      return nodeRpc.loadProposals([
+        ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD,
+        ProposalStatuses.PROPOSAL_STATUS_DEPOSIT_PERIOD,
+      ]);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING PROPOSALS', e);
       return [];
     }
   }

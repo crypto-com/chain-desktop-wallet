@@ -1,4 +1,4 @@
-import { ValidatorPubKey } from '../service/rpc/NodeRpcModels';
+import { Proposal, ValidatorPubKey } from '../service/rpc/NodeRpcModels';
 
 export enum TransactionStatus {
   SUCCESS = 'SUCCESS',
@@ -50,6 +50,11 @@ export interface TransferTransactionList {
 
 export interface ValidatorList {
   validators: Array<ValidatorModel>;
+  chainId: string;
+}
+
+export interface ProposalList {
+  proposals: Array<Proposal>;
   chainId: string;
 }
 

@@ -8,6 +8,7 @@ import {
   UserAsset,
 } from '../models/UserAsset';
 import {
+  ProposalList,
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
@@ -202,5 +203,14 @@ export class StorageService {
 
   public async retrieveAllValidators(chainId: string) {
     return this.db.validatorStore.findOne<ValidatorList>({ chainId });
+  }
+
+  public async saveProposals(proposalList: ProposalList) {
+    await this.db.proposalStore.remove({ chainId: proposalList.chainId }, { multi: true });
+    return this.db.proposalStore.insert<ProposalList>(proposalList);
+  }
+
+  public async retrieveAllProposals(chainId: string) {
+    return this.db.proposalStore.findOne<ProposalList>({ chainId });
   }
 }
