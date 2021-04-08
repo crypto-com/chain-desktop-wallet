@@ -246,6 +246,10 @@ const FormSettings = () => {
       nodeUrl: defaultSettings.nodeUrl,
       chainId: defaultSettings.network.chainId,
       indexingUrl: defaultSettings.indexingUrl,
+      networkFee:
+        defaultSettings.fee && defaultSettings.fee.networkFee ? defaultSettings.fee.networkFee : '',
+      gasLimit:
+        defaultSettings.fee && defaultSettings.fee.gasLimit ? defaultSettings.fee.gasLimit : '',
     });
   };
 
@@ -283,7 +287,7 @@ const FormSettings = () => {
                   Save
                 </Button>
                 <Button type="link" htmlType="button" onClick={onRestoreDefaults}>
-                  Restore Default
+                  Discard Changes
                 </Button>
               </Form.Item>
             </div>

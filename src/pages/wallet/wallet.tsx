@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import './wallet.less';
 import 'antd/dist/antd.css';
-import { Layout, Table, Space, Spin } from 'antd';
+import { Layout, Table, Space, Spin, Typography } from 'antd';
 import { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
 import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
 import { Session } from '../../models/Session';
@@ -11,6 +11,7 @@ import { walletService } from '../../service/WalletService';
 // import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
+const { Text } = Typography;
 
 function WalletPage() {
   const [session, setSession] = useRecoilState<Session>(sessionState);
@@ -88,6 +89,7 @@ function WalletPage() {
       title: 'Address',
       dataIndex: 'address',
       key: 'address',
+      render: text => <Text type="success">{text}</Text>,
     },
     {
       title: 'Wallet Type',
