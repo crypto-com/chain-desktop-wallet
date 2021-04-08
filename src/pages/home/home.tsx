@@ -37,6 +37,7 @@ import { UndelegateFormComponent } from './components/UndelegateFormComponent';
 import { RedelegateFormComponent } from './components/RedelegateFormComponent';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis } from '../../utils/utils';
+import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 
 const { Text } = Typography;
 
@@ -317,10 +318,11 @@ function HomePage() {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase) {
+    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       showConfirmationModal();
+    } else {
+      setInputPasswordVisible(true);
     }
-    setInputPasswordVisible(true);
   };
 
   const handleCancelConfirmationModal = () => {
@@ -339,7 +341,7 @@ function HomePage() {
   };
 
   const onConfirmDelegationAction = async () => {
-    if (!decryptedPhrase) {
+    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
       return;
     }
     try {

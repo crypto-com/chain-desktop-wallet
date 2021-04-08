@@ -25,6 +25,7 @@ import {
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
 import { middleEllipsis, ellipsis } from '../../utils/utils';
+import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -124,10 +125,11 @@ const FormDelegationRequest = () => {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase) {
+    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       showConfirmationModal();
+    } else {
+      setInputPasswordVisible(true);
     }
-    setInputPasswordVisible(true);
   };
 
   const onWalletDecryptFinish = async (password: string) => {
@@ -141,7 +143,7 @@ const FormDelegationRequest = () => {
 
   const onConfirmDelegation = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
-    if (!decryptedPhrase) {
+    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
       return;
     }
     try {
@@ -583,10 +585,11 @@ const FormWithdrawStakingReward = () => {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase) {
+    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       showConfirmationModal();
+    } else {
+      setInputPasswordVisible(true);
     }
-    setInputPasswordVisible(true);
   };
 
   const onWalletDecryptFinish = async (password: string) => {
@@ -599,7 +602,7 @@ const FormWithdrawStakingReward = () => {
   };
 
   const onConfirmTransfer = async () => {
-    if (!decryptedPhrase) {
+    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
       setIsVisibleConfirmationModal(false);
       return;
     }
