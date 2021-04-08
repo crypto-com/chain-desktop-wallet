@@ -5,7 +5,6 @@ import { Alert, Button, Checkbox, Dropdown, Form, Input, Layout, Menu, Spin } fr
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Icon, {
   CaretDownOutlined,
-  // CheckOutlined,
   DeleteOutlined,
   LoadingOutlined,
   PlusOutlined,
@@ -33,7 +32,6 @@ interface HomeLayoutProps {
 }
 
 const { Sider } = Layout;
-// const { SubMenu } = Menu;
 
 function HomeLayout(props: HomeLayoutProps) {
   const history = useHistory();
@@ -169,67 +167,9 @@ function HomeLayout(props: HomeLayoutProps) {
   };
 
   const WalletMenu = () => {
-    // const walletClick = async e => {
-    //   setLoading(true);
-
-    //   await walletService.setCurrentSession(new Session(walletList[e.key]));
-    //   const currentSession = await walletService.retrieveCurrentSession();
-    //   const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
-    //   setSession(currentSession);
-    //   setUserAsset(currentAsset);
-    //   await walletService.syncAll(currentSession);
-    //   await fetchAndSetNewValidators();
-    //   setLoading(false);
-    // };
-
     return (
       <Menu>
-        {/* {walletList.length > 5 ? (
-          <SubMenu title="Wallet List" icon={<Icon component={IconWallet} />}>
-            {walletList.map((item, index) => {
-              return (
-                <Menu.Item key={index} onClick={walletClick}>
-                  {trimString(item.name)}
-                  {session.wallet.identifier === item.identifier ? (
-                    <CheckOutlined
-                      style={{
-                        fontSize: '18px',
-                        color: '#1199fa',
-                        position: 'absolute',
-                        right: '5px',
-                        top: '10px',
-                      }}
-                    />
-                  ) : (
-                    ''
-                  )}
-                </Menu.Item>
-              );
-            }, session)}
-          </SubMenu>
-        ) : (
-          walletList.map((item, index) => {
-            return (
-              <Menu.Item key={index} onClick={walletClick} icon={<Icon component={IconWallet} />}>
-                {trimString(item.name)}
-                {session.wallet.identifier === item.identifier ? (
-                  <CheckOutlined
-                    style={{
-                      fontSize: '18px',
-                      color: '#1199fa',
-                      position: 'absolute',
-                      right: '5px',
-                      top: '10px',
-                    }}
-                  />
-                ) : (
-                  ''
-                )}
-              </Menu.Item>
-            );
-          }, session)
-        )} */}
-        {walletList.length < 100 ? (
+        {walletList.length <= 100 ? (
           <>
             <Menu.Item className="restore-wallet-item">
               <Link to="/restore">
