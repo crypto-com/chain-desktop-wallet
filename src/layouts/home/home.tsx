@@ -5,7 +5,6 @@ import { Alert, Button, Checkbox, Dropdown, Form, Input, Layout, Menu, Spin } fr
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Icon, {
   CaretDownOutlined,
-  CheckOutlined,
   DeleteOutlined,
   LoadingOutlined,
   PlusOutlined,
@@ -14,7 +13,7 @@ import Icon, {
 } from '@ant-design/icons';
 import { useRecoilState } from 'recoil';
 
-import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
+import { sessionState, walletAssetState, walletListState, marketState } from '../../recoil/atom';
 import { trimString } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
@@ -33,7 +32,6 @@ interface HomeLayoutProps {
 }
 
 const { Sider } = Layout;
-const { SubMenu } = Menu;
 
 function HomeLayout(props: HomeLayoutProps) {
   const history = useHistory();
@@ -42,6 +40,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [session, setSession] = useRecoilState(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
+  const [marketData, setMarketData] = useRecoilState(marketState);
   const [loading, setLoading] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
@@ -104,10 +103,16 @@ function HomeLayout(props: HomeLayoutProps) {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
       const allWalletsData = await walletService.retrieveAllWallets();
+      const currentMarketData = await walletService.retrieveAssetPrice(
+        currentAsset.mainnetSymbol,
+        'usd',
+      );
+
       setHasWallet(hasWalletBeenCreated);
       setSession(sessionData);
       setUserAsset(currentAsset);
       setWalletList(allWalletsData);
+      setMarketData(currentMarketData);
       await fetchAndSetNewValidators();
       setLoading(false);
     };
@@ -118,11 +123,22 @@ function HomeLayout(props: HomeLayoutProps) {
     } else if (!hasWallet) {
       history.push('/welcome');
     }
-  }, [history, hasWallet, session, setSession, userAsset, setUserAsset, walletList, setWalletList]);
+  }, [
+    history,
+    hasWallet,
+    session,
+    setSession,
+    userAsset,
+    setUserAsset,
+    walletList,
+    setWalletList,
+    marketData,
+    setMarketData,
+  ]);
 
   const HomeMenu = () => {
     const locationPath = useLocation().pathname;
-    const paths = ['/home', '/staking', '/send', '/receive', '/settings'];
+    const paths = ['/home', '/staking', '/send', '/receive', '/settings', '/wallet'];
 
     let menuSelectedKey = locationPath;
     if (!paths.includes(menuSelectedKey)) {
@@ -151,67 +167,9 @@ function HomeLayout(props: HomeLayoutProps) {
   };
 
   const WalletMenu = () => {
-    const walletClick = async e => {
-      setLoading(true);
-
-      await walletService.setCurrentSession(new Session(walletList[e.key]));
-      const currentSession = await walletService.retrieveCurrentSession();
-      const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
-      setSession(currentSession);
-      setUserAsset(currentAsset);
-      await walletService.syncAll(currentSession);
-      await fetchAndSetNewValidators();
-      setLoading(false);
-    };
-
     return (
       <Menu>
-        {walletList.length > 5 ? (
-          <SubMenu title="Wallet List" icon={<Icon component={IconWallet} />}>
-            {walletList.map((item, index) => {
-              return (
-                <Menu.Item key={index} onClick={walletClick}>
-                  {trimString(item.name)}
-                  {session.wallet.identifier === item.identifier ? (
-                    <CheckOutlined
-                      style={{
-                        fontSize: '18px',
-                        color: '#1199fa',
-                        position: 'absolute',
-                        right: '5px',
-                        top: '10px',
-                      }}
-                    />
-                  ) : (
-                    ''
-                  )}
-                </Menu.Item>
-              );
-            }, session)}
-          </SubMenu>
-        ) : (
-          walletList.map((item, index) => {
-            return (
-              <Menu.Item key={index} onClick={walletClick} icon={<Icon component={IconWallet} />}>
-                {trimString(item.name)}
-                {session.wallet.identifier === item.identifier ? (
-                  <CheckOutlined
-                    style={{
-                      fontSize: '18px',
-                      color: '#1199fa',
-                      position: 'absolute',
-                      right: '5px',
-                      top: '10px',
-                    }}
-                  />
-                ) : (
-                  ''
-                )}
-              </Menu.Item>
-            );
-          }, session)
-        )}
-        {walletList.length < 10 ? (
+        {walletList.length <= 100 ? (
           <>
             <Menu.Item className="restore-wallet-item">
               <Link to="/restore">
@@ -242,6 +200,13 @@ function HomeLayout(props: HomeLayoutProps) {
         ) : (
           ''
         )}
+        <Menu.Item>
+          <Link to="/wallet">
+            {/* <IconWallet /> */}
+            <Icon component={IconWallet} />
+            Wallet List
+          </Link>
+        </Menu.Item>
       </Menu>
     );
   };
