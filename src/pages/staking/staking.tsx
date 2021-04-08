@@ -13,8 +13,8 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
-import { sessionState, walletAssetState } from '../../recoil/atom';
-import { scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
+import { marketState, sessionState, walletAssetState } from '../../recoil/atom';
+import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
@@ -25,6 +25,7 @@ import {
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
 import { middleEllipsis, ellipsis } from '../../utils/utils';
+import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -40,6 +41,7 @@ const tailLayout = {
 interface RewardsTabularData {
   key: string;
   rewardAmount: string;
+  rewardMarketPrice: string;
   validatorAddress: string;
 }
 
@@ -123,10 +125,11 @@ const FormDelegationRequest = () => {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase) {
+    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       showConfirmationModal();
+    } else {
+      setInputPasswordVisible(true);
     }
-    setInputPasswordVisible(true);
   };
 
   const onWalletDecryptFinish = async (password: string) => {
@@ -140,7 +143,7 @@ const FormDelegationRequest = () => {
 
   const onConfirmDelegation = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
-    if (!decryptedPhrase) {
+    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
       return;
     }
     try {
@@ -517,6 +520,7 @@ const FormWithdrawStakingReward = () => {
   const [withdrawValues, setWithdrawValues] = useState({
     validatorAddress: '',
     rewardAmount: '',
+    rewardMarketPrice: '',
   });
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
@@ -527,20 +531,32 @@ const FormWithdrawStakingReward = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const marketData = useRecoilValue(marketState);
   const currentSession = useRecoilValue(sessionState);
   const didMountRef = useRef(false);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
 
-  const convertToTabularData = (allRewards: RewardTransaction[], currentAsset: UserAsset) => {
+  const convertToTabularData = (
+    allRewards: RewardTransaction[],
+    currentAsset: UserAsset,
+    currentMarketPrice: AssetMarketPrice,
+  ) => {
     return allRewards
       .filter(reward => Big(reward.amount).gte(Big(0)))
       .map(reward => {
         const rewardAmount = getUIDynamicAmount(reward.amount, currentAsset);
+        const marketPrice = marketData && marketData.price ? new Big(currentMarketPrice.price) : '';
+        const rewardMarketPrice =
+          marketData && marketData.price ? new Big(rewardAmount).times(marketPrice).toFixed(2) : '';
         const rewardData: RewardsTabularData = {
           key: `${reward.validatorAddress}${reward.amount}`,
           rewardAmount: `${rewardAmount} ${currentAsset.symbol}`,
+          rewardMarketPrice:
+            rewardMarketPrice !== ''
+              ? `${numeral(rewardMarketPrice).format('$0,0.00')} ${marketData?.currency}`
+              : ``,
           validatorAddress: reward.validatorAddress,
         };
         return rewardData;
@@ -553,7 +569,7 @@ const FormWithdrawStakingReward = () => {
         currentSession.wallet.identifier,
       );
 
-      const rewardsTabularData = convertToTabularData(allRewards, walletAsset);
+      const rewardsTabularData = convertToTabularData(allRewards, walletAsset, marketData);
       setRewards(rewardsTabularData);
     };
 
@@ -569,10 +585,11 @@ const FormWithdrawStakingReward = () => {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase) {
+    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       showConfirmationModal();
+    } else {
+      setInputPasswordVisible(true);
     }
-    setInputPasswordVisible(true);
   };
 
   const onWalletDecryptFinish = async (password: string) => {
@@ -585,7 +602,7 @@ const FormWithdrawStakingReward = () => {
   };
 
   const onConfirmTransfer = async () => {
-    if (!decryptedPhrase) {
+    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
       setIsVisibleConfirmationModal(false);
       return;
     }
@@ -645,8 +662,15 @@ const FormWithdrawStakingReward = () => {
     },
     {
       title: 'Reward Amount',
-      dataIndex: 'rewardAmount',
       key: 'rewardAmount',
+      render: record => {
+        return (
+          <>
+            {record.rewardAmount} <br />
+            <span style={{ color: '#1199fa' }}>{record.rewardMarketPrice}</span>
+          </>
+        );
+      },
     },
     {
       title: 'Action',
@@ -677,6 +701,7 @@ const FormWithdrawStakingReward = () => {
               setWithdrawValues({
                 validatorAddress: record.validatorAddress,
                 rewardAmount: record.rewardAmount,
+                rewardMarketPrice: record.rewardMarketPrice,
               });
             },
           };
@@ -693,6 +718,7 @@ const FormWithdrawStakingReward = () => {
         handleCancel={handleCancelConfirmationModal}
         handleOk={onConfirmTransfer}
         confirmationLoading={confirmLoading}
+        className="reward-modal"
         footer={[
           <Button key="submit" type="primary" loading={confirmLoading} onClick={onConfirmTransfer}>
             Confirm
@@ -717,6 +743,7 @@ const FormWithdrawStakingReward = () => {
           <div className="item">
             <div className="label">Rewards</div>
             <div>{`${withdrawValues.rewardAmount}`}</div>
+            <div className="fiat">{`${withdrawValues.rewardMarketPrice}`}</div>
           </div>
         </>
       </ModalPopup>

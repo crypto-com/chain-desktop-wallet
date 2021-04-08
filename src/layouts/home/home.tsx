@@ -14,7 +14,7 @@ import Icon, {
 } from '@ant-design/icons';
 import { useRecoilState } from 'recoil';
 
-import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
+import { sessionState, walletAssetState, walletListState, marketState } from '../../recoil/atom';
 import { trimString } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
@@ -42,6 +42,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [session, setSession] = useRecoilState(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
+  const [marketData, setMarketData] = useRecoilState(marketState);
   const [loading, setLoading] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
@@ -104,10 +105,16 @@ function HomeLayout(props: HomeLayoutProps) {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
       const allWalletsData = await walletService.retrieveAllWallets();
+      const currentMarketData = await walletService.retrieveAssetPrice(
+        currentAsset.mainnetSymbol,
+        'usd',
+      );
+
       setHasWallet(hasWalletBeenCreated);
       setSession(sessionData);
       setUserAsset(currentAsset);
       setWalletList(allWalletsData);
+      setMarketData(currentMarketData);
       await fetchAndSetNewValidators();
       setLoading(false);
     };
@@ -118,7 +125,18 @@ function HomeLayout(props: HomeLayoutProps) {
     } else if (!hasWallet) {
       history.push('/welcome');
     }
-  }, [history, hasWallet, session, setSession, userAsset, setUserAsset, walletList, setWalletList]);
+  }, [
+    history,
+    hasWallet,
+    session,
+    setSession,
+    userAsset,
+    setUserAsset,
+    walletList,
+    setWalletList,
+    marketData,
+    setMarketData,
+  ]);
 
   const HomeMenu = () => {
     const locationPath = useLocation().pathname;

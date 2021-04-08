@@ -37,6 +37,7 @@ import { UndelegateFormComponent } from './components/UndelegateFormComponent';
 import { RedelegateFormComponent } from './components/RedelegateFormComponent';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis } from '../../utils/utils';
+import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 
 const { Text } = Typography;
 
@@ -122,8 +123,8 @@ function HomePage() {
   const currentSession = useRecoilValue(sessionState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
-  const [marketData, setMarketData] = useRecoilState(marketState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const marketData = useRecoilValue(marketState);
   const [syncLoading, setSyncLoading] = useState(false);
   const didMountRef = useRef(false);
 
@@ -215,14 +216,11 @@ function HomePage() {
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
-      const marketPrice = await walletService.retrieveAssetPrice(userAsset.mainnetSymbol, 'usd');
-
       if (!unmounted) {
         showWalletStateNotification(currentSession.wallet.config);
         setDelegations(stakingTabularData);
         setTransfers(transferTabularData);
         setUserAsset(currentAsset);
-        setMarketData(marketPrice);
         setHasShownNotLiveWallet(true);
       }
     };
@@ -320,10 +318,11 @@ function HomePage() {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase) {
+    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       showConfirmationModal();
+    } else {
+      setInputPasswordVisible(true);
     }
-    setInputPasswordVisible(true);
   };
 
   const handleCancelConfirmationModal = () => {
@@ -342,7 +341,7 @@ function HomePage() {
   };
 
   const onConfirmDelegationAction = async () => {
-    if (!decryptedPhrase) {
+    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
       return;
     }
     try {
