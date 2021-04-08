@@ -287,7 +287,7 @@ const FormSettings = () => {
                   Save
                 </Button>
                 <Button type="link" htmlType="button" onClick={onRestoreDefaults}>
-                  Restore Default
+                  Discard Changes
                 </Button>
               </Form.Item>
             </div>
