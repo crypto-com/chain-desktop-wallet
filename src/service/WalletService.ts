@@ -25,6 +25,7 @@ import {
   RedelegateTransactionUnsigned,
   TransferTransactionUnsigned,
   UndelegateTransactionUnsigned,
+  VoteTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
 } from './signers/TransactionSupported';
 import { cryptographer } from '../crypto/Cryptographer';
@@ -52,6 +53,7 @@ import {
   RedelegationRequest,
   TransferRequest,
   UndelegationRequest,
+  VoteRequest,
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
 
@@ -240,6 +242,44 @@ class WalletService {
       signedTxHex = await transactionSigner.signRedelegateTx(
         redelegateTransactionUnsigned,
         redelegationRequest.decryptedPhrase,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.syncAll(currentSession);
+    return broadCastResult;
+  }
+
+  public async sendVote(voteRequest: VoteRequest): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.prepareTransaction();
+
+    const voteTransactionUnsigned: VoteTransactionUnsigned = {
+      option: voteRequest.voteOption,
+      voter: currentSession.wallet.address,
+      proposalID: voteRequest.proposalID,
+      memo: voteRequest.memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+
+    if (voteRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signVoteTransaction(
+        voteTransactionUnsigned,
+        voteRequest.decryptedPhrase,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signVoteTransaction(
+        voteTransactionUnsigned,
+        voteRequest.decryptedPhrase,
       );
     }
 
