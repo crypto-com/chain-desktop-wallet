@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.1.5] - 2021-04-08
+
+### Additions
+- Allow up to 100 wallets creations
+- Show reward amounts in fiat currency conversion (USD)
+- Remove requirements of wallets confirmation on Ledger based wallets
+
+
 ## [v0.1.4] - 2021-04-02
 
 ### Bug Fixes
