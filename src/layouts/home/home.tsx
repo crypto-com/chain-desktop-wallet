@@ -122,7 +122,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   const HomeMenu = () => {
     const locationPath = useLocation().pathname;
-    const paths = ['/home', '/staking', '/send', '/receive', '/settings'];
+    const paths = ['/home', '/staking', '/send', '/receive', '/settings', '/wallet'];
 
     let menuSelectedKey = locationPath;
     if (!paths.includes(menuSelectedKey)) {

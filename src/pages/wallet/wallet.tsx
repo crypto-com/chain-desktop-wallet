@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import './wallet.less';
 import 'antd/dist/antd.css';
-import { Layout, Table } from 'antd';
+import { Layout, Table, Space } from 'antd';
 import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
@@ -15,17 +15,18 @@ function WalletPage() {
   // const session: Session = useRecoilValue<Session>(sessionState);
   const [session, setSession] = useRecoilState<Session>(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
-  const [walletList, setWalletList] = useState([]);
-  const allWalletsData = useRecoilValue(walletListState);
+  // const [walletList, setWalletList] = useState([]);
+  const walletList = useRecoilValue(walletListState);
+  // const [walletList, setWalletList] = useRecoilState(walletListState);
+  const [processedWalletList, setProcessedWalletList] = useState([]);
   const didMountRef = useRef(false);
 
   console.log(session);
   console.log(userAsset);
-  console.log(allWalletsData);
+  console.log(walletList);
 
   const walletSelect = async e => {
     // setLoading(true);
-    console.log(e);
     await walletService.setCurrentSession(new Session(walletList[e.key]));
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
@@ -36,14 +37,38 @@ function WalletPage() {
     // setLoading(false);
   };
 
+  // const walletDelete = async e => {
+  //   await walletService.deleteWallet(e.identifier);
+
+  //   // Switch to existing default wallet
+  //   const allWalletsData = await walletService.retrieveAllWallets();
+  //   setWalletList(allWalletsData);
+  //   await walletService.setCurrentSession(new Session(walletList[0]));
+  //   const currentSession = await walletService.retrieveCurrentSession();
+  //   const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+  //   setSession(currentSession);
+  //   setUserAsset(currentAsset);
+  //   await walletService.syncAll(currentSession);
+  // }
+
   const processWalletList = wallets => {
-    return wallets.map((wallet, idx) => {
+    const list = wallets.map((wallet, idx) => {
       const walletModel = {
         ...wallet,
         key: `${idx}`,
       };
       return walletModel;
     });
+    list.sort((x, y) => {
+      if (x.identifier === userAsset.walletId) {
+        return -1;
+      }
+      if (y.identifier === userAsset.walletId) {
+        return 1;
+      }
+      return 0;
+    });
+    return list;
   };
 
   useEffect(() => {
@@ -51,8 +76,8 @@ function WalletPage() {
 
     const syncWalletList = () => {
       if (!unmounted) {
-        const wallets = processWalletList(allWalletsData);
-        setWalletList(wallets);
+        const wallets = processWalletList(walletList);
+        setProcessedWalletList(wallets);
       }
     };
 
@@ -67,12 +92,6 @@ function WalletPage() {
   });
 
   const columns = [
-    // {
-    //   title: 'No.',
-    //   dataIndex: 'key',
-    //   key: 'key',
-    //   render: key => (key.parseInt+1)
-    // },
     {
       title: 'Name',
       dataIndex: 'name',
@@ -84,30 +103,45 @@ function WalletPage() {
       key: 'address',
     },
     {
+      title: 'Wallet Type',
+      dataIndex: 'walletType',
+      key: 'walletType',
+      render: walletType => walletType.charAt(0).toUpperCase() + walletType.slice(1),
+    },
+    {
       title: 'Network',
-      // dataIndex: 'walletType',
       key: 'network',
       render: record => {
         return record.config.name;
       },
     },
     {
-      title: 'Type',
-      dataIndex: 'walletType',
-      key: 'walletType',
-    },
-    {
       title: 'Action',
       key: 'action',
-      render: record => (
-        <a
-          onClick={() => {
-            walletSelect(record);
-          }}
-        >
-          Select
-        </a>
-      ),
+      render: record => {
+        return (
+          <Space size="middle">
+            {userAsset.walletId === record.identifier ? (
+              'Selected'
+            ) : (
+              <a
+                onClick={() => {
+                  walletSelect(record);
+                }}
+              >
+                Select
+              </a>
+            )}
+            {/* <a
+            onClick={() => {
+              walletDelete(record);
+            }}
+          >
+            Delete
+          </a> */}
+          </Space>
+        );
+      },
     },
   ];
 
@@ -118,7 +152,7 @@ function WalletPage() {
       <Content>
         <div className="site-layout-background wallet-content">
           <div className="container">
-            <Table dataSource={walletList} columns={columns} />
+            <Table dataSource={processedWalletList} columns={columns} />
           </div>
         </div>
       </Content>
