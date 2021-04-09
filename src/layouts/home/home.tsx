@@ -9,6 +9,7 @@ import Icon, {
   LoadingOutlined,
   PlusOutlined,
   ReloadOutlined,
+  BankOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
 import { useRecoilState } from 'recoil';
@@ -138,7 +139,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   const HomeMenu = () => {
     const locationPath = useLocation().pathname;
-    const paths = ['/home', '/staking', '/send', '/receive', '/settings', '/wallet'];
+    const paths = ['/home', '/staking', '/send', '/receive', '/settings', '/governance', '/wallet'];
 
     let menuSelectedKey = locationPath;
     if (!paths.includes(menuSelectedKey)) {
@@ -158,6 +159,9 @@ function HomeLayout(props: HomeLayoutProps) {
         </Menu.Item>
         <Menu.Item key="/receive" icon={<Icon component={IconReceive} />}>
           <Link to="/receive">Receive</Link>
+        </Menu.Item>
+        <Menu.Item key="/governance" icon={<BankOutlined />}>
+          <Link to="/governance">Governance</Link>
         </Menu.Item>
         <Menu.Item key="/settings" icon={<SettingOutlined />}>
           <Link to="/settings">Settings</Link>
