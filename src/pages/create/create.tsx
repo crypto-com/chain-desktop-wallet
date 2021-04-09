@@ -8,7 +8,7 @@ import './create.less';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions, WalletCreator } from '../../service/WalletCreator';
-import { DefaultWalletConfigs, CosmosPorts } from '../../config/StaticConfig';
+import { LedgerWalletMaximum, DefaultWalletConfigs, CosmosPorts } from '../../config/StaticConfig';
 import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
@@ -25,6 +25,7 @@ import {
   LEDGER_WALLET_TYPE,
   NORMAL_WALLET_TYPE,
 } from '../../service/LedgerService';
+import { TransactionUtils } from '../../utils/TransactionUtils';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -395,6 +396,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     }
   };
 
+  const customMaxValidator = TransactionUtils.maxValidator(
+    `${LedgerWalletMaximum}`,
+    `Address index exceeds ${LedgerWalletMaximum}`,
+  );
+  const customMinValidator = TransactionUtils.minValidator('0', 'Address index is lower than 0');
+
   return (
     <Form
       {...layout}
@@ -438,10 +445,9 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             required: true,
             message: 'Please input your address index',
           },
-          {
-            pattern: /^[0-9]{1,9}$/,
-            message: 'Index between 0 - 999999999',
-          },
+
+          customMinValidator,
+          customMaxValidator,
         ]}
         hidden={props.isWalletSelectFieldDisable}
       >
