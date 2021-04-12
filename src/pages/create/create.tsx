@@ -401,6 +401,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     `Address index exceeds ${LedgerWalletMaximum}`,
   );
   const customMinValidator = TransactionUtils.minValidator('0', 'Address index is lower than 0');
+  const addressIndexValidator = TransactionUtils.rangeValidator(
+    `0`,
+    `${LedgerWalletMaximum}`,
+    `Address index should be between 0 ~ ${LedgerWalletMaximum} (both inclusive)`,
+  );
 
   return (
     <Form
@@ -448,6 +453,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
 
           customMinValidator,
           customMaxValidator,
+          addressIndexValidator,
         ]}
         hidden={props.isWalletSelectFieldDisable}
       >
