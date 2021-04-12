@@ -35,6 +35,20 @@ export class StorageService {
     return this.db.walletStore.remove({ identifier: walletID }, { multi: true });
   }
 
+  public async updateGeneralSettingsPropagation(
+    networkName: string,
+    enabledGeneralSettings: boolean,
+  ) {
+    await this.db.walletStore.update<Wallet>(
+      { name: networkName },
+      {
+        $set: {
+          enableGeneralSettings: enabledGeneralSettings,
+        },
+      },
+    );
+  }
+
   public async updateDisabledDefaultMemo(disableDefaultMemoSettings: DisableDefaultMemoSettings) {
     const previousWallet = await this.findWalletByIdentifier(disableDefaultMemoSettings.walletId);
     previousWallet.config.disableDefaultClientMemo =

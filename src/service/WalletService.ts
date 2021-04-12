@@ -417,9 +417,8 @@ class WalletService {
     return this.storageService.findWalletByIdentifier(identifier);
   }
 
-  public async setCurrentSession(session: Session): Promise<void> {
-    await this.storageService.setSession(session);
-    return this.syncBalancesData(session);
+  public async setCurrentSession(session: Session): Promise<number> {
+    return await this.storageService.setSession(session);
   }
 
   public async fetchAndUpdateBalances(session: Session | null = null) {

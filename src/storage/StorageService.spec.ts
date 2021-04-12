@@ -11,13 +11,25 @@ import { TransactionStatus, TransferTransactionData } from '../models/Transactio
 
 jest.setTimeout(10_000);
 
-function buildTestWallet() {
+function buildTestWallet(name?: string) {
   const testNetConfig = DefaultWalletConfigs.TestNetConfig;
 
   const createOptions: WalletCreateOptions = {
     walletType: 'normal',
     config: testNetConfig,
-    walletName: 'My-TestNet-Wallet',
+    walletName: name || 'My-TestNet-Wallet',
+    addressIndex: 0,
+  };
+  return WalletCreator.create(createOptions);
+}
+
+function buildMainnetWallet(name?: string) {
+  const mainNetConfig = DefaultWalletConfigs.MainNetConfig;
+
+  const createOptions: WalletCreateOptions = {
+    walletType: 'normal',
+    config: mainNetConfig,
+    walletName: name || 'My-Mainnet-Wallet',
     addressIndex: 0,
   };
   return WalletCreator.create(createOptions);
@@ -303,5 +315,35 @@ describe('Testing Storage Service', () => {
     expect(loadedWalletAfterDeletion).to.eq(null);
     expect(allWalletsAfterDeletion.length).to.lt(1);
     expect(allWalletsAfterDeletion.length).to.eq(0);
+  });
+
+  it('Test general settings enable/disable ', async () => {
+    const walletTestnet1 = buildTestWallet('My-TEST-WalletZZ');
+    // const walletTestnet1ID = walletTestnet1.identifier;
+
+    const walletTestnet2 = buildTestWallet('TheBestTestnetWalletZ');
+    // const walletTestnet2ID = walletTestnet2.identifier;
+
+    const walletTestnet3 = buildTestWallet('TheTestnetWalletZ');
+    // const walletTestnet3ID = walletTestnet3.identifier;
+
+    const walletMainnet1 = buildMainnetWallet('MainNetWalletX');
+    const walletMainnet2 = buildMainnetWallet('MainNetWalletX22');
+
+    const mockWalletStore = new StorageService(
+      `test-general-settings-propagation-${getRandomId()}`,
+    );
+    // Persist wallet in the db
+
+    await Promise.all([
+      await mockWalletStore.saveWallet(walletTestnet1),
+      await mockWalletStore.saveWallet(walletTestnet2),
+      await mockWalletStore.saveWallet(walletTestnet3),
+
+      await mockWalletStore.saveWallet(walletMainnet1),
+      await mockWalletStore.saveWallet(walletMainnet2),
+    ]);
+
+    await mockWalletStore.updateGeneralSettingsPropagation('TESTNET', true);
   });
 });

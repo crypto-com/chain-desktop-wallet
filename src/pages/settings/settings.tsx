@@ -23,7 +23,44 @@ const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
 
-const FormGeneral = () => {
+const GeneralSettingsForm = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [session, setSession] = useRecoilState(sessionState);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [enabledGeneralSettings, setEnabledGeneralSettings] = useState<boolean>(false);
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    let unmounted = false;
+
+    const SyncConfig = async () => {
+      const enabledGeneralWalletsSettings = session.wallet.config.enableGeneralSettings;
+      if (!unmounted) {
+        setEnabledGeneralSettings(enabledGeneralWalletsSettings);
+      }
+    };
+
+    if (!didMountRef.current) {
+      SyncConfig();
+      didMountRef.current = true;
+    }
+
+    return () => {
+      unmounted = true;
+    };
+  }, [enabledGeneralSettings, setEnabledGeneralSettings]);
+
+  function onEnableGeneralWalletConfig() {
+    setUpdateLoading(true);
+    const newState = !enabledGeneralSettings;
+    setEnabledGeneralSettings(newState);
+
+    message.success(
+      `General settings propagation has been ${newState ? 'enabled' : 'disabled'} successfully`,
+    );
+    setUpdateLoading(false);
+  }
+
   return (
     <>
       <Form.Item
@@ -93,6 +130,15 @@ const FormGeneral = () => {
         >
           <InputNumber precision={0} min={1} />
         </Form.Item>
+      </div>
+      <div className="item">
+        <Checkbox
+          checked={enabledGeneralSettings}
+          onChange={onEnableGeneralWalletConfig}
+          disabled={updateLoading}
+        >
+          Propagate the settings to all other wallets on {session.wallet.config.name}
+        </Checkbox>
       </div>
     </>
   );
@@ -281,7 +327,7 @@ const FormSettings = () => {
         <TabPane tab="Node Configuration" key="1">
           <div className="site-layout-background settings-content">
             <div className="container">
-              <FormGeneral />
+              <GeneralSettingsForm />
               <Form.Item {...tailLayout} className="button">
                 <Button type="primary" htmlType="submit" loading={isButtonLoading}>
                   Save
