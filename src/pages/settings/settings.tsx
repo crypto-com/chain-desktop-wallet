@@ -38,7 +38,7 @@ const GeneralSettingsForm = () => {
     let unmounted = false;
 
     const SyncConfig = async () => {
-      const enabledGeneralWalletsSettings = session.wallet.config.enableGeneralSettings;
+      const enabledGeneralWalletsSettings: boolean = session.wallet.config.enableGeneralSettings;
       if (!unmounted) {
         setEnabledGeneralSettings(enabledGeneralWalletsSettings);
       }
