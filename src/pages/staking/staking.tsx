@@ -13,7 +13,12 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
-import { marketState, sessionState, walletAssetState } from '../../recoil/atom';
+import {
+  marketState,
+  sessionState,
+  walletAssetState,
+  ledgerIsExpertModeState,
+} from '../../recoil/atom';
 import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
@@ -25,7 +30,7 @@ import {
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
 import { middleEllipsis, ellipsis } from '../../utils/utils';
-import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -64,6 +69,7 @@ const FormDelegationRequest = () => {
   const [showMemo, setShowMemo] = useState(false);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const currentSession = useRecoilValue(sessionState);
+  const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
   const didMountRef = useRef(false);
 
@@ -143,12 +149,12 @@ const FormDelegationRequest = () => {
 
   const onConfirmDelegation = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
-    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
+    const { walletType, config } = currentSession.wallet;
+    if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
       return;
     }
     try {
       setConfirmLoading(true);
-      const { walletType } = currentSession.wallet;
       const stakingResult = await walletService.sendDelegateTransaction({
         validatorAddress: formValues.validatorAddress,
         amount: formValues.amount,
@@ -168,6 +174,19 @@ const FormDelegationRequest = () => {
 
       form.resetFields();
     } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        try {
+          const addressprefix = config.network.addressPrefix;
+          const device = createLedgerDevice();
+          const address = await device.getAddress(0, addressprefix, false);
+          if (address) {
+            setLedgerIsExpertMode(true);
+          }
+        } catch (err) {
+          setLedgerIsExpertMode(false);
+        }
+      }
+
       setErrorMessages(e.message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
@@ -508,6 +527,11 @@ const FormDelegationRequest = () => {
                 .map((err, idx) => (
                   <div key={idx}>- {err}</div>
                 ))}
+              {ledgerIsExpertMode ? (
+                <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
+              ) : (
+                ''
+              )}
             </div>
           </>
         </ErrorModalPopup>
@@ -531,6 +555,7 @@ const FormWithdrawStakingReward = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const marketData = useRecoilValue(marketState);
   const currentSession = useRecoilValue(sessionState);
   const didMountRef = useRef(false);
@@ -602,13 +627,13 @@ const FormWithdrawStakingReward = () => {
   };
 
   const onConfirmTransfer = async () => {
+    const { walletType, config } = currentSession.wallet;
     if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
       setIsVisibleConfirmationModal(false);
       return;
     }
     try {
       setConfirmLoading(true);
-      const { walletType } = currentSession.wallet;
       const rewardWithdrawResult = await walletService.sendStakingRewardWithdrawalTx({
         validatorAddress: withdrawValues.validatorAddress,
         decryptedPhrase,
@@ -622,6 +647,19 @@ const FormWithdrawStakingReward = () => {
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setWalletAsset(currentWalletAsset);
     } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        try {
+          const addressprefix = config.network.addressPrefix;
+          const device = createLedgerDevice();
+          const address = await device.getAddress(0, addressprefix, false);
+          if (address) {
+            setLedgerIsExpertMode(true);
+          }
+        } catch (err) {
+          setLedgerIsExpertMode(false);
+        }
+      }
+
       setErrorMessages(e.message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
@@ -812,6 +850,11 @@ const FormWithdrawStakingReward = () => {
               .map((err, idx) => (
                 <div key={idx}>- {err}</div>
               ))}
+            {ledgerIsExpertMode ? (
+              <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
+            ) : (
+              ''
+            )}
           </div>
         </>
       </ErrorModalPopup>
