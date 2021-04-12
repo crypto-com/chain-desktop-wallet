@@ -95,11 +95,6 @@ export class StorageService {
       updateConfigSettings['config.fee.gasLimit'] = dataUpdate.gasLimit;
     }
 
-    console.log('Propagating updates', {
-      updateConfigSettings,
-      network: previousWallet.config.name,
-    });
-
     return await this.db.walletStore.update<Wallet>(
       { 'config.name': previousWallet.config.name },
       {

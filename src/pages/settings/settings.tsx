@@ -310,7 +310,13 @@ const FormSettings = () => {
     setWalletList(allNewUpdatedWallets);
 
     setIsButtonLoading(false);
-    message.success('Wallet settings updated successfully');
+    message.success(
+      `Wallet settings updated successfully ${
+        session.wallet.config.enableGeneralSettings
+          ? `on all ${session.wallet.config.name} wallets`
+          : ''
+      }`,
+    );
   };
 
   const onRestoreDefaults = () => {
