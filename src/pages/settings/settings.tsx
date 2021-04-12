@@ -4,8 +4,8 @@ import './settings.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Button, Form, Input, Layout, Tabs, Alert, Checkbox, InputNumber, message } from 'antd';
-import { useRecoilState } from 'recoil';
-import { sessionState } from '../../recoil/atom';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { sessionState, walletListState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
   DisableDefaultMemoSettings,
@@ -245,12 +245,17 @@ const FormSettings = () => {
   const defaultSettings = session.wallet.config;
   const didMountRef = useRef(false);
   const history = useHistory();
+
+  const setWalletList = useSetRecoilState(walletListState);
+
   let networkFee = FIXED_DEFAULT_FEE;
   let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
 
   useEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true;
+
+      console.log('defaultSettings', defaultSettings);
 
       if (defaultSettings.fee !== undefined) {
         networkFee = defaultSettings.fee.networkFee;
@@ -300,7 +305,12 @@ const FormSettings = () => {
     const newSession = new Session(updatedWallet);
     await walletService.setCurrentSession(newSession);
     setSession(newSession);
+
+    const allNewUpdatedWallets = await walletService.retrieveAllWallets();
+    setWalletList(allNewUpdatedWallets);
+
     setIsButtonLoading(false);
+    message.success('Wallet settings updated successfully');
   };
 
   const onRestoreDefaults = () => {

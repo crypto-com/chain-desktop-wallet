@@ -319,7 +319,7 @@ describe('Testing Storage Service', () => {
 
   it('Test general settings enable/disable ', async () => {
     const walletTestnet1 = buildTestWallet('My-TEST-WalletZZ');
-    // const walletTestnet1ID = walletTestnet1.identifier;
+    const walletTestnet1ID = walletTestnet1.identifier;
 
     const walletTestnet2 = buildTestWallet('TheBestTestnetWalletZ');
     // const walletTestnet2ID = walletTestnet2.identifier;
@@ -333,7 +333,6 @@ describe('Testing Storage Service', () => {
     const mockWalletStore = new StorageService(
       `test-general-settings-propagation-${getRandomId()}`,
     );
-    // Persist wallet in the db
 
     await Promise.all([
       await mockWalletStore.saveWallet(walletTestnet1),
@@ -352,12 +351,28 @@ describe('Testing Storage Service', () => {
 
     // GeneralSettingsPropagation updated for TESTNET wallets
     await mockWalletStore.updateGeneralSettingsPropagation('TESTNET', true);
+    const dataSettings: SettingsDataUpdate = {
+      chainId: 'testnet-xxx-2',
+      gasLimit: '330000',
+      indexingUrl: 'https://crypto.org/explorer/croeseid/api/v1/',
+      networkFee: '12020',
+      nodeUrl: 'https://www.new-node-url-croeseid.crypto.org',
+      walletId: walletTestnet1ID,
+    };
+    await mockWalletStore.updateWalletSettings(dataSettings);
 
     const allWallets = await mockWalletStore.retrieveAllWallets();
     // eslint-disable-next-line no-restricted-syntax
     for (const wallet of allWallets) {
       if (wallet.config.name === 'TESTNET') {
         expect(wallet.config.enableGeneralSettings).to.eq(true);
+        expect(wallet.config.network.chainId).to.eq('testnet-xxx-2');
+        expect(wallet.config.fee.gasLimit).to.eq('330000');
+        expect(wallet.config.fee.networkFee).to.eq('12020');
+        expect(wallet.config.nodeUrl).to.eq('https://www.new-node-url-croeseid.crypto.org');
+        expect(wallet.config.network.defaultNodeUrl).to.eq(
+          'https://www.new-node-url-croeseid.crypto.org',
+        );
       } else {
         expect(wallet.config.enableGeneralSettings).to.eq(false);
       }

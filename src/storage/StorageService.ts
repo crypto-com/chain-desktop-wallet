@@ -15,6 +15,7 @@ import {
   TransferTransactionList,
   ValidatorList,
 } from '../models/Transaction';
+import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../config/StaticConfig';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -62,6 +63,54 @@ export class StorageService {
     );
   }
 
+  private async handleGeneralWalletSettingsUpdate(
+    dataUpdate: SettingsDataUpdate,
+    previousWallet: Wallet,
+  ) {
+    const updateConfigSettings = {};
+
+    if (dataUpdate.chainId) {
+      updateConfigSettings['config.network.chainId'] = dataUpdate.chainId;
+    }
+
+    if (dataUpdate.nodeUrl) {
+      updateConfigSettings['config.network.defaultNodeUrl'] = dataUpdate.nodeUrl;
+      updateConfigSettings['config.nodeUrl'] = dataUpdate.nodeUrl;
+    }
+
+    if (dataUpdate.indexingUrl) {
+      updateConfigSettings['config.indexingUrl'] = dataUpdate.indexingUrl;
+    }
+
+    if (!previousWallet.config.fee) {
+      updateConfigSettings['config.fee.gasLimit'] = FIXED_DEFAULT_GAS_LIMIT;
+      updateConfigSettings['config.fee.networkFee'] = FIXED_DEFAULT_FEE;
+    }
+
+    if (dataUpdate.networkFee) {
+      updateConfigSettings['config.fee.networkFee'] = dataUpdate.networkFee;
+    }
+
+    if (dataUpdate.gasLimit) {
+      updateConfigSettings['config.fee.gasLimit'] = dataUpdate.gasLimit;
+    }
+
+    console.log('Propagating updates', {
+      updateConfigSettings,
+      network: previousWallet.config.name,
+    });
+
+    return await this.db.walletStore.update<Wallet>(
+      { 'config.name': previousWallet.config.name },
+      {
+        $set: {
+          ...updateConfigSettings,
+        },
+      },
+      { multi: true },
+    );
+  }
+
   public async updateWalletSettings(dataUpdate: SettingsDataUpdate) {
     if (
       !dataUpdate.chainId &&
@@ -73,6 +122,12 @@ export class StorageService {
       return Promise.resolve();
     }
     const previousWallet = await this.findWalletByIdentifier(dataUpdate.walletId);
+
+    // Handle when general settings has been enabled
+    if (previousWallet.config.enableGeneralSettings) {
+      return this.handleGeneralWalletSettingsUpdate(dataUpdate, previousWallet);
+    }
+
     if (dataUpdate.chainId) {
       previousWallet.config.network.chainId = dataUpdate.chainId;
     }
