@@ -30,7 +30,7 @@ import {
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
 import { middleEllipsis, ellipsis } from '../../utils/utils';
-import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
+import { LEDGER_WALLET_TYPE, detectLedgerExpertMode } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -149,7 +149,7 @@ const FormDelegationRequest = () => {
 
   const onConfirmDelegation = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
-    const { walletType, config } = currentSession.wallet;
+    const { walletType } = currentSession.wallet;
     if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
       return;
     }
@@ -175,16 +175,7 @@ const FormDelegationRequest = () => {
       form.resetFields();
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        try {
-          const addressprefix = config.network.addressPrefix;
-          const device = createLedgerDevice();
-          const address = await device.getAddress(0, addressprefix, false);
-          if (address) {
-            setLedgerIsExpertMode(true);
-          }
-        } catch (err) {
-          setLedgerIsExpertMode(false);
-        }
+        setLedgerIsExpertMode(await detectLedgerExpertMode());
       }
 
       setErrorMessages(e.message.split(': '));
@@ -627,7 +618,7 @@ const FormWithdrawStakingReward = () => {
   };
 
   const onConfirmTransfer = async () => {
-    const { walletType, config } = currentSession.wallet;
+    const { walletType } = currentSession.wallet;
     if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
       setIsVisibleConfirmationModal(false);
       return;
@@ -648,16 +639,7 @@ const FormWithdrawStakingReward = () => {
       setWalletAsset(currentWalletAsset);
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        try {
-          const addressprefix = config.network.addressPrefix;
-          const device = createLedgerDevice();
-          const address = await device.getAddress(0, addressprefix, false);
-          if (address) {
-            setLedgerIsExpertMode(true);
-          }
-        } catch (err) {
-          setLedgerIsExpertMode(false);
-        }
+        setLedgerIsExpertMode(await detectLedgerExpertMode());
       }
 
       setErrorMessages(e.message.split(': '));

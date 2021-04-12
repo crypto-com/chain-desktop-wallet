@@ -58,6 +58,7 @@ export class LedgerSigner {
 
     let response = await this.app.getVersion();
     if (response.error_message !== 'No errors') {
+      await this.closeTransport();
       throw new Error(`[${response.error_message}] ${response.error_message}`);
     }
 
@@ -71,6 +72,7 @@ export class LedgerSigner {
       response = await this.app.getAddressAndPubKey(this.path, addressPrefix);
     }
     if (response.error_message !== 'No errors') {
+      await this.closeTransport();
       throw new Error(`[${response.error_message}] ${response.error_message}`);
     }
     const pubkey = Bytes.fromUint8Array(LedgerSigner.pubkeyToBytes(response.compressed_pk));
@@ -89,6 +91,7 @@ export class LedgerSigner {
 
     const response = await this.app.sign(this.path, message.toUint8Array());
     if (response.error_message !== 'No errors') {
+      await this.closeTransport();
       throw new Error(`[${response.error_message}] ${response.error_message}`);
     }
 
@@ -105,6 +108,7 @@ export class LedgerSigner {
     //  = 7 bytes of overhead
     let { signature } = response;
     if (signature[0] !== 0x30) {
+      await this.closeTransport();
       throw new Error('Ledger assertion failed: Expected a signature header of 0x30');
     }
 
@@ -126,6 +130,7 @@ export class LedgerSigner {
 
     signature = Buffer.concat([sigR, sigS]);
     if (signature.length !== 64) {
+      await this.closeTransport();
       throw new Error(`Ledger assertion failed: incorrect signature length ${signature.length}`);
     }
     const bytes = Bytes.fromUint8Array(new Uint8Array(signature));

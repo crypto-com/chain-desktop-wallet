@@ -38,7 +38,7 @@ import { UndelegateFormComponent } from './components/UndelegateFormComponent';
 import { RedelegateFormComponent } from './components/RedelegateFormComponent';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis } from '../../utils/utils';
-import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
+import { LEDGER_WALLET_TYPE, detectLedgerExpertMode } from '../../service/LedgerService';
 
 const { Text } = Typography;
 
@@ -343,7 +343,7 @@ function HomePage() {
   };
 
   const onConfirmDelegationAction = async () => {
-    const { walletType, config } = currentSession.wallet;
+    const { walletType } = currentSession.wallet;
 
     if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
       return;
@@ -413,16 +413,7 @@ function HomePage() {
       }
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        try {
-          const addressprefix = config.network.addressPrefix;
-          const device = createLedgerDevice();
-          const address = await device.getAddress(0, addressprefix, false);
-          if (address) {
-            setLedgerIsExpertMode(true);
-          }
-        } catch (err) {
-          setLedgerIsExpertMode(false);
-        }
+        setLedgerIsExpertMode(await detectLedgerExpertMode());
       }
 
       setErrorMessages(e.message.split(': '));
