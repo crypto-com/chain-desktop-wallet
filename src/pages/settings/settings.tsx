@@ -7,7 +7,11 @@ import { Button, Form, Input, Layout, Tabs, Alert, Checkbox, InputNumber, messag
 import { useRecoilState } from 'recoil';
 import { sessionState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
-import { DisableDefaultMemoSettings, SettingsDataUpdate } from '../../models/Wallet';
+import {
+  DisableDefaultMemoSettings,
+  EnableGeneralSettingsPropagation,
+  SettingsDataUpdate,
+} from '../../models/Wallet';
 import { Session } from '../../models/Session';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
@@ -50,11 +54,23 @@ const GeneralSettingsForm = () => {
     };
   }, [enabledGeneralSettings, setEnabledGeneralSettings]);
 
-  function onEnableGeneralWalletConfig() {
+  async function onEnableGeneralWalletConfig() {
     setUpdateLoading(true);
     const newState = !enabledGeneralSettings;
     setEnabledGeneralSettings(newState);
 
+    const enableGeneralSettingsPropagation: EnableGeneralSettingsPropagation = {
+      networkName: session.wallet.config.name,
+      enabledGeneralSettings: newState,
+    };
+
+    await walletService.updateGeneralSettingsPropagation(enableGeneralSettingsPropagation);
+
+    const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
+    const newSession = new Session(updatedWallet);
+    await walletService.setCurrentSession(newSession);
+
+    setSession(newSession);
     message.success(
       `General settings propagation has been ${newState ? 'enabled' : 'disabled'} successfully`,
     );
@@ -137,7 +153,7 @@ const GeneralSettingsForm = () => {
           onChange={onEnableGeneralWalletConfig}
           disabled={updateLoading}
         >
-          Propagate the settings to all other wallets on {session.wallet.config.name}
+          Propagate the settings changes to all other wallets on {session.wallet.config.name}
         </Checkbox>
       </div>
     </>

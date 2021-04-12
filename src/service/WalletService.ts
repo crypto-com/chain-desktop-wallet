@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {
   DisableDefaultMemoSettings,
+  EnableGeneralSettingsPropagation,
   reconstructCustomConfig,
   SettingsDataUpdate,
   Wallet,
@@ -411,6 +412,15 @@ class WalletService {
     disableDefaultMemoSettings: DisableDefaultMemoSettings,
   ) {
     return this.storageService.updateDisabledDefaultMemo(disableDefaultMemoSettings);
+  }
+
+  public async updateGeneralSettingsPropagation(
+    enableGeneralSettingsPropagation: EnableGeneralSettingsPropagation,
+  ) {
+    return this.storageService.updateGeneralSettingsPropagation(
+      enableGeneralSettingsPropagation.networkName,
+      enableGeneralSettingsPropagation.enabledGeneralSettings,
+    );
   }
 
   public async findWalletByIdentifier(identifier: string): Promise<Wallet> {

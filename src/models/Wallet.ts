@@ -62,6 +62,11 @@ export interface DisableDefaultMemoSettings {
   disableDefaultMemoAppend: boolean;
 }
 
+export interface EnableGeneralSettingsPropagation {
+  networkName: string;
+  enabledGeneralSettings: boolean;
+}
+
 export interface CustomConfigFormValue {
   derivationPath: string;
   chainId: string;
