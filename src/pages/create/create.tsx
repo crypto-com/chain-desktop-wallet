@@ -450,7 +450,6 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             required: true,
             message: 'Please input your address index',
           },
-
           customMinValidator,
           customMaxValidator,
           addressIndexValidator,

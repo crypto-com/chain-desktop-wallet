@@ -15,7 +15,9 @@ export class IpcRender implements ISignerProvider {
       showLedgerDisplay,
       message: 'enableWallet request for getPubKey',
     });
-    if (!arg.success) throw new Error('getPubKey fail');
+    if (!arg.success) {
+      throw new Error(`getPubKey fail: ${arg.error}`);
+    }
     const ret = Bytes.fromBuffer(Buffer.from(arg.pubKey));
     return ret;
   }
@@ -33,7 +35,9 @@ export class IpcRender implements ISignerProvider {
       showLedgerDisplay,
       message: 'enableWallet request for getAddress',
     });
-    if (!arg.success) throw new Error('get address fail');
+    if (!arg.success) {
+      throw new Error(`get address fail: ${arg.error}`);
+    }
     return arg.account;
   }
 
@@ -42,7 +46,9 @@ export class IpcRender implements ISignerProvider {
   async sign(message: Bytes): Promise<Bytes> {
     const stringMessage = message.toBuffer().toString();
     const arg = electron.ipcRenderer.sendSync('signMessage', stringMessage);
-    if (!arg.success) throw new Error('sign fail');
+    if (!arg.success) {
+      throw new Error(`sign fail: ${arg.error}`);
+    }
 
     return Bytes.fromBuffer(Buffer.from(arg.signed));
   }

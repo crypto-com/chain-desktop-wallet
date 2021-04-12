@@ -33,7 +33,7 @@ export class IpcMain {
       } catch (e) {
         ret = {
           success: false,
-          error: JSON.stringify(e),
+          error: e.toString(),
         };
         console.error('enableWallet error ' + e);
       } finally {
@@ -57,7 +57,7 @@ export class IpcMain {
       } catch (e) {
         ret = {
           success: false,
-          error: JSON.stringify(e),
+          error: e.toString(),
         };
         console.error('signMessage error ' + e);
       }
