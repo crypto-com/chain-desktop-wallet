@@ -40,12 +40,13 @@ export class StorageService {
     enabledGeneralSettings: boolean,
   ) {
     await this.db.walletStore.update<Wallet>(
-      { name: networkName },
+      { 'config.name': networkName },
       {
         $set: {
-          enableGeneralSettings: enabledGeneralSettings,
+          'config.enableGeneralSettings': enabledGeneralSettings,
         },
       },
+      { multi: true },
     );
   }
 

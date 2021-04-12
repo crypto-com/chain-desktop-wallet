@@ -344,6 +344,32 @@ describe('Testing Storage Service', () => {
       await mockWalletStore.saveWallet(walletMainnet2),
     ]);
 
+    const allWalletsBefore = await mockWalletStore.retrieveAllWallets();
+    // eslint-disable-next-line no-restricted-syntax
+    for (const wallet of allWalletsBefore) {
+      expect(wallet.config.enableGeneralSettings).to.eq(false);
+    }
+
+    // GeneralSettingsPropagation updated for TESTNET wallets
     await mockWalletStore.updateGeneralSettingsPropagation('TESTNET', true);
+
+    const allWallets = await mockWalletStore.retrieveAllWallets();
+    // eslint-disable-next-line no-restricted-syntax
+    for (const wallet of allWallets) {
+      if (wallet.config.name === 'TESTNET') {
+        expect(wallet.config.enableGeneralSettings).to.eq(true);
+      } else {
+        expect(wallet.config.enableGeneralSettings).to.eq(false);
+      }
+    }
+
+    // GeneralSettingsPropagation now updated for MAINNET wallets
+    await mockWalletStore.updateGeneralSettingsPropagation('MAINNET', true);
+    const allWalletsAfterMainnetEnabledPropagation = await mockWalletStore.retrieveAllWallets();
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const wallet of allWalletsAfterMainnetEnabledPropagation) {
+      expect(wallet.config.enableGeneralSettings).to.eq(true);
+    }
   });
 });
