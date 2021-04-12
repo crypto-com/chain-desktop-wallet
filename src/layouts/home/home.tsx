@@ -58,6 +58,15 @@ function HomeLayout(props: HomeLayoutProps) {
     }
   }
 
+  async function fetchAndSetNewProposals() {
+    try {
+      await walletService.fetchAndSaveProposals(session);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Failed loading new wallet proposals', e);
+    }
+  }
+
   const onWalletDeleteFinish = async () => {
     setIsButtonLoading(true);
     setLoading(true);
@@ -115,6 +124,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
       await fetchAndSetNewValidators();
+      await fetchAndSetNewProposals();
       setLoading(false);
     };
 
@@ -219,7 +229,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   return (
     <main className="home-layout">
-      <Layout>
+      <Layout className={loading ? 'loading' : ''}>
         <Sider>
           <div className="logo" />
           <div className="version">SAMPLE WALLET v{buildVersion}</div>
