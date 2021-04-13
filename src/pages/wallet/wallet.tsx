@@ -137,7 +137,7 @@ function WalletPage() {
 
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">Wallet</Header>
+      <Header className="site-layout-background">All Wallets</Header>
       <div className="header-description">You may review all your wallets here.</div>
       <Content>
         <div className="site-layout-background wallet-content">
