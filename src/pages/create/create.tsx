@@ -438,10 +438,6 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             required: true,
             message: 'Please input your address index',
           },
-          {
-            pattern: /^0$|^[1-9][0-9]?$|^100$/,
-            message: 'Index between 0 - 100',
-          },
         ]}
         hidden={props.isWalletSelectFieldDisable}
       >
