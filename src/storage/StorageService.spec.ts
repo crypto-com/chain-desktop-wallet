@@ -11,13 +11,25 @@ import { TransactionStatus, TransferTransactionData } from '../models/Transactio
 
 jest.setTimeout(10_000);
 
-function buildTestWallet() {
+function buildTestWallet(name?: string) {
   const testNetConfig = DefaultWalletConfigs.TestNetConfig;
 
   const createOptions: WalletCreateOptions = {
     walletType: 'normal',
     config: testNetConfig,
-    walletName: 'My-TestNet-Wallet',
+    walletName: name || 'My-TestNet-Wallet',
+    addressIndex: 0,
+  };
+  return WalletCreator.create(createOptions);
+}
+
+function buildMainnetWallet(name?: string) {
+  const mainNetConfig = DefaultWalletConfigs.MainNetConfig;
+
+  const createOptions: WalletCreateOptions = {
+    walletType: 'normal',
+    config: mainNetConfig,
+    walletName: name || 'My-Mainnet-Wallet',
     addressIndex: 0,
   };
   return WalletCreator.create(createOptions);
@@ -303,5 +315,107 @@ describe('Testing Storage Service', () => {
     expect(loadedWalletAfterDeletion).to.eq(null);
     expect(allWalletsAfterDeletion.length).to.lt(1);
     expect(allWalletsAfterDeletion.length).to.eq(0);
+  });
+
+  it('Test general settings enable/disable ', async () => {
+    const walletTestnet1 = buildTestWallet('My-TEST-WalletZZ');
+    const walletTestnet1ID = walletTestnet1.identifier;
+
+    const walletTestnet2 = buildTestWallet('TheBestTestnetWalletZ');
+    const walletTestnet3 = buildTestWallet('TheTestnetWalletZ');
+
+    const walletMainnet1 = buildMainnetWallet('MainNetWalletX');
+    const walletMainnet1ID = walletMainnet1.identifier;
+    const walletMainnet2 = buildMainnetWallet('MainNetWalletX22');
+
+    const mockWalletStore = new StorageService(
+      `test-general-settings-propagation-${getRandomId()}`,
+    );
+
+    await Promise.all([
+      await mockWalletStore.saveWallet(walletTestnet1),
+      await mockWalletStore.saveWallet(walletTestnet2),
+      await mockWalletStore.saveWallet(walletTestnet3),
+
+      await mockWalletStore.saveWallet(walletMainnet1),
+      await mockWalletStore.saveWallet(walletMainnet2),
+    ]);
+
+    const allWalletsBefore = await mockWalletStore.retrieveAllWallets();
+    // eslint-disable-next-line no-restricted-syntax
+    for (const wallet of allWalletsBefore) {
+      expect(wallet.config.enableGeneralSettings).to.eq(false);
+    }
+
+    // GeneralSettingsPropagation updated for TESTNET wallets
+    await mockWalletStore.updateGeneralSettingsPropagation('TESTNET', true);
+
+    const dataSettings: SettingsDataUpdate = {
+      chainId: 'testnet-xxx-2',
+      gasLimit: '330000',
+      indexingUrl: 'https://crypto.org/explorer/croeseid/api/v1/',
+      networkFee: '12020',
+      nodeUrl: 'https://www.new-node-url-croeseid.crypto.org',
+      walletId: walletTestnet1ID,
+    };
+
+    await mockWalletStore.updateWalletSettings(dataSettings);
+    const allWallets = await mockWalletStore.retrieveAllWallets();
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const wallet of allWallets) {
+      if (wallet.config.name === 'TESTNET') {
+        expect(wallet.config.enableGeneralSettings).to.eq(true);
+        expect(wallet.config.network.chainId).to.eq('testnet-xxx-2');
+        expect(wallet.config.fee.gasLimit).to.eq('330000');
+        expect(wallet.config.fee.networkFee).to.eq('12020');
+        expect(wallet.config.nodeUrl).to.eq('https://www.new-node-url-croeseid.crypto.org');
+        expect(wallet.config.network.defaultNodeUrl).to.eq(
+          'https://www.new-node-url-croeseid.crypto.org',
+        );
+      } else {
+        expect(wallet.config.enableGeneralSettings).to.eq(false);
+        expect(wallet.config).to.eqls(DefaultWalletConfigs.MainNetConfig);
+      }
+    }
+
+    // GeneralSettingsPropagation now updated for MAINNET wallets
+    await mockWalletStore.updateGeneralSettingsPropagation('MAINNET', true);
+    const dataSettingsMainnet: SettingsDataUpdate = {
+      chainId: 'MainnetZZ-ChainID',
+      gasLimit: '3300022',
+      indexingUrl: 'https://crypto.org/explorer/mainnet/api/v1/',
+      networkFee: '12022',
+      nodeUrl: 'https://www.new-node-url-mainnet.crypto.org',
+      walletId: walletMainnet1ID,
+    };
+
+    await mockWalletStore.updateWalletSettings(dataSettingsMainnet);
+    const allWalletsAfterMainnetEnabledPropagation = await mockWalletStore.retrieveAllWallets();
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const wallet of allWalletsAfterMainnetEnabledPropagation) {
+      expect(wallet.config.enableGeneralSettings).to.eq(true);
+      if (wallet.config.name === 'MAINNET') {
+        expect(wallet.config.network.chainId).to.eq('MainnetZZ-ChainID');
+        expect(wallet.config.fee.gasLimit).to.eq('3300022');
+        expect(wallet.config.fee.networkFee).to.eq('12022');
+        expect(wallet.config.nodeUrl).to.eq('https://www.new-node-url-mainnet.crypto.org');
+        expect(wallet.config.network.defaultNodeUrl).to.eq(
+          'https://www.new-node-url-mainnet.crypto.org',
+        );
+      }
+
+      if (wallet.config.name === 'TESTNET') {
+        expect(wallet.config.enableGeneralSettings).to.eq(true);
+        expect(wallet.config.network.chainId).to.eq('testnet-xxx-2');
+        expect(wallet.config.fee.gasLimit).to.eq('330000');
+        expect(wallet.config.fee.networkFee).to.eq('12020');
+        expect(wallet.config.nodeUrl).to.eq('https://www.new-node-url-croeseid.crypto.org');
+        expect(wallet.config.network.defaultNodeUrl).to.eq(
+          'https://www.new-node-url-croeseid.crypto.org',
+        );
+      }
+    }
   });
 });
