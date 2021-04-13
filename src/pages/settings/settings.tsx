@@ -28,7 +28,6 @@ const tailLayout = {
 };
 
 const GeneralSettingsForm = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [session, setSession] = useRecoilState(sessionState);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [enabledGeneralSettings, setEnabledGeneralSettings] = useState<boolean>(false);
@@ -153,7 +152,7 @@ const GeneralSettingsForm = () => {
           onChange={onEnableGeneralWalletConfig}
           disabled={updateLoading}
         >
-          Propagate the settings changes to all other wallets on {session.wallet.config.name}
+          Propagate the settings changes to all your other wallets on {session.wallet.config.name}
         </Checkbox>
       </div>
     </>
@@ -254,8 +253,6 @@ const FormSettings = () => {
   useEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true;
-
-      console.log('defaultSettings', defaultSettings);
 
       if (defaultSettings.fee !== undefined) {
         networkFee = defaultSettings.fee.networkFee;
