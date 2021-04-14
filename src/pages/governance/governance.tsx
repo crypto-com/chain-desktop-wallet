@@ -134,15 +134,6 @@ const GovernancePage = () => {
 
   const onVote = async () => {
     showPasswordInput();
-
-    // await walletService.sendVote({
-    //   voteOption,
-    //   proposalID: proposal.proposal_id,
-    //   memo: '',
-    //   decryptedPhrase: '',
-    //   asset: userAsset,
-    //   walletType: currentSession.wallet.walletType
-    // })
   };
 
   const onConfirm = async () => {
@@ -152,7 +143,6 @@ const GovernancePage = () => {
         voteOption,
         proposalID: '1',
         memo: '',
-        // decryptedPhrase: '',
         decryptedPhrase,
         asset: userAsset,
         walletType: currentSession.wallet.walletType,
@@ -234,17 +224,39 @@ const GovernancePage = () => {
       default:
         statusColor = 'default';
     }
-    // if (status === ProposalStatuses.PROPOSAL_STATUS_UNSPECIFIED) {
-    //   statusColor = 'success';
-    // } else if (status === ProposalStatuses.PROPOSAL_STATUS_UNSPECIFIED) {
-    //   statusColor = 'error';
-    // } else {
-    //   statusColor = 'processing';
-    // }
-
     return (
       <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
         {status}
+      </Tag>
+    );
+  };
+
+  const processVoteTag = vote => {
+    let voteColor;
+    let voteMessage;
+    switch (vote) {
+      case VoteOptions.YES:
+        voteColor = 'success';
+        voteMessage = 'Yes - Support';
+        break;
+      case VoteOptions.NO:
+        voteColor = 'error';
+        voteMessage = 'No - Do not Support';
+        break;
+      case VoteOptions.NO_WITH_VETO:
+        voteColor = 'error';
+        voteMessage = 'No - Do not Support with Veto';
+        break;
+      case VoteOptions.ABSTAIN:
+        voteColor = 'default';
+        voteMessage = 'Abstain';
+        break;
+      default:
+        voteColor = 'default';
+    }
+    return (
+      <Tag style={{ border: 'none', padding: '5px 14px' }} color={voteColor}>
+        {voteMessage}
       </Tag>
     );
   };
@@ -313,7 +325,6 @@ const GovernancePage = () => {
                           </span>
                         }
                       />
-                      {/* <div>{item.status}</div> */}
                     </List.Item>
                   )}
                   pagination={{
@@ -367,7 +378,6 @@ const GovernancePage = () => {
                           </span>
                         }
                       />
-                      {/* <div>{item.status}</div> */}
                     </List.Item>
                   )}
                   pagination={{
@@ -421,7 +431,6 @@ const GovernancePage = () => {
                           </span>
                         }
                       />
-                      {/* <div>{item.status}</div> */}
                     </List.Item>
                   )}
                   pagination={{
@@ -475,7 +484,6 @@ const GovernancePage = () => {
                           </span>
                         }
                       />
-                      {/* <div>{item.status}</div> */}
                     </List.Item>
                   )}
                   pagination={{
@@ -616,7 +624,7 @@ const GovernancePage = () => {
           </div>
           <div className="item">
             <div className="label">Vote</div>
-            <div>{`${voteOption}`}</div>
+            <div>{processVoteTag(voteOption)}</div>
           </div>
           {/* {formValues?.memo !== undefined &&
             formValues?.memo !== null &&
