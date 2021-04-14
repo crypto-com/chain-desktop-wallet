@@ -59,7 +59,7 @@ export class LedgerSigner {
     let response = await this.app.getVersion();
     if (response.error_message !== 'No errors') {
       await this.closeTransport();
-      throw new Error(`[${response.error_message}] ${response.error_message}`);
+      throw new Error(`${response.error_message}`);
     }
 
     // purpose(44), coin(394), account(0), change(0), index(0)
@@ -73,7 +73,7 @@ export class LedgerSigner {
     }
     if (response.error_message !== 'No errors') {
       await this.closeTransport();
-      throw new Error(`[${response.error_message}] ${response.error_message}`);
+      throw new Error(`${response.error_message}`);
     }
     const pubkey = Bytes.fromUint8Array(LedgerSigner.pubkeyToBytes(response.compressed_pk));
 
@@ -92,7 +92,7 @@ export class LedgerSigner {
     const response = await this.app.sign(this.path, message.toUint8Array());
     if (response.error_message !== 'No errors') {
       await this.closeTransport();
-      throw new Error(`[${response.error_message}] ${response.error_message}`);
+      throw new Error(`${response.error_message}`);
     }
 
     // Ledger has encoded the sig in ASN1 DER format, but we need a 64-byte buffer of <r,s>
