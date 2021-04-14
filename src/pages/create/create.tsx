@@ -21,6 +21,7 @@ import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
 import IconLedger from '../../svg/IconLedger';
 import {
+  detectLedgerNormalMode,
   createLedgerDevice,
   LEDGER_WALLET_TYPE,
   NORMAL_WALLET_TYPE,
@@ -373,6 +374,16 @@ const FormCreate: React.FC<FormCreateProps> = props => {
 
       hwok = true;
     } catch (e) {
+      let message = `Cannot detect any Ledger device`;
+      let description = `Please connect with your Ledger device`;
+      if (walletType === LEDGER_WALLET_TYPE) {
+        const isNormalMode = await detectLedgerNormalMode();
+        if (isNormalMode) {
+          message = `No Expert Mode`;
+          description = 'Please ensure that your have enabled Expert mode on your ledger device.';
+        }
+      }
+
       props.setLedgerConnected(false);
 
       await new Promise(resolve => {
@@ -381,10 +392,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       props.setIsModalVisible(false);
 
       notification.error({
-        message: `Cannot detect any Ledger device`,
-        description: `Please connect with your Ledger device`,
+        message,
+        description,
         placement: 'topRight',
-        duration: 3,
+        duration: 20,
       });
     }
     await new Promise(resolve => {

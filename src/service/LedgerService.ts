@@ -19,12 +19,12 @@ export function createLedgerDevice(): ISignerProvider {
 }
 
 // true: ledger is expert-mode
-export async function detectLedgerExpertMode(): Promise<boolean> {
+export async function detectLedgerNormalMode(): Promise<boolean> {
   try {
     const device = createLedgerDevice();
     await device.getPubKey(LedgerWalletMaximum, false);
-    return true;
-  } catch (err) {
     return false;
+  } catch (err) {
+    return true;
   }
 }
