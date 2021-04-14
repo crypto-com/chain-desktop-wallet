@@ -185,7 +185,7 @@ const GovernancePage = () => {
     });
   };
 
-  const processTag = status => {
+  const processStatusTag = status => {
     let statusColor;
     switch (status) {
       case ProposalStatuses.PROPOSAL_STATUS_UNSPECIFIED:
@@ -300,7 +300,7 @@ const GovernancePage = () => {
                       <List.Item.Meta
                         title={
                           <>
-                            {processTag(item.status)} <a>{item.content.title}</a>
+                            {processStatusTag(item.status)} <a>{item.content.title}</a>
                           </>
                         }
                         description={
@@ -353,7 +353,7 @@ const GovernancePage = () => {
                       <List.Item.Meta
                         title={
                           <>
-                            {processTag(item.status)} <a>{item.content.title}</a>
+                            {processStatusTag(item.status)} <a>{item.content.title}</a>
                           </>
                         }
                         description={
@@ -406,7 +406,7 @@ const GovernancePage = () => {
                       <List.Item.Meta
                         title={
                           <>
-                            {processTag(item.status)} <a>{item.content.title}</a>
+                            {processStatusTag(item.status)} <a>{item.content.title}</a>
                           </>
                         }
                         description={
@@ -459,7 +459,7 @@ const GovernancePage = () => {
                       <List.Item.Meta
                         title={
                           <>
-                            {processTag(item.status)} <a>{item.content.title}</a>
+                            {processStatusTag(item.status)} <a>{item.content.title}</a>
                           </>
                         }
                         description={
@@ -493,7 +493,7 @@ const GovernancePage = () => {
           <Content>
             <div className="title">{proposal?.content.title}</div>
             <div className="item">
-              <div className="status">{processTag(proposal?.status)}</div>
+              <div className="status">{processStatusTag(proposal?.status)}</div>
             </div>
             <div className="item">
               <div className="date">
