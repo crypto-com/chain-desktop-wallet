@@ -71,6 +71,11 @@ const hasShownWarningOnWalletTypeState = atom<boolean>({
   default: false,
 });
 
+const ledgerIsExpertModeState = atom<boolean>({
+  key: 'ledgerExpertMode',
+  default: false,
+});
+
 export {
   walletIdentifierState,
   sessionState,
@@ -79,4 +84,5 @@ export {
   walletListState,
   walletTempBackupState,
   hasShownWarningOnWalletTypeState,
+  ledgerIsExpertModeState,
 };
