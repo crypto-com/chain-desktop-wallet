@@ -9,7 +9,7 @@ import { DislikeOutlined, LikeOutlined } from '@ant-design/icons';
 
 import { useRecoilValue } from 'recoil';
 import { sessionState, walletAssetState } from '../../recoil/atom';
-
+import { getUIVoteAmount } from '../../utils/NumberUtils';
 import {
   ProposalModel,
   ProposalStatuses,
@@ -280,8 +280,19 @@ const GovernancePage = () => {
                     <List.Item
                       key={item.proposal_id}
                       actions={[
-                        <IconText icon={LikeOutlined} text="156" key="list-vertical-yes-o" />,
-                        <IconText icon={DislikeOutlined} text="2" key="list-vertical-no-o" />,
+                        <IconText
+                          icon={LikeOutlined}
+                          text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                          key="list-vertical-yes-o"
+                        />,
+                        <IconText
+                          icon={DislikeOutlined}
+                          text={getUIVoteAmount(
+                            item.final_tally_result.no + item.final_tally_result.no_with_veto,
+                            userAsset,
+                          )}
+                          key="list-vertical-no-o"
+                        />,
                       ]}
                       onClick={() => {
                         showModal();
@@ -323,8 +334,19 @@ const GovernancePage = () => {
                     <List.Item
                       key={item.proposal_id}
                       actions={[
-                        <IconText icon={LikeOutlined} text="156" key="list-vertical-yes-o" />,
-                        <IconText icon={DislikeOutlined} text="2" key="list-vertical-no-o" />,
+                        <IconText
+                          icon={LikeOutlined}
+                          text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                          key="list-vertical-yes-o"
+                        />,
+                        <IconText
+                          icon={DislikeOutlined}
+                          text={getUIVoteAmount(
+                            item.final_tally_result.no + item.final_tally_result.no_with_veto,
+                            userAsset,
+                          )}
+                          key="list-vertical-no-o"
+                        />,
                       ]}
                       onClick={() => {
                         showModal();
@@ -366,8 +388,19 @@ const GovernancePage = () => {
                     <List.Item
                       key={item.proposal_id}
                       actions={[
-                        <IconText icon={LikeOutlined} text="156" key="list-vertical-yes-o" />,
-                        <IconText icon={DislikeOutlined} text="2" key="list-vertical-no-o" />,
+                        <IconText
+                          icon={LikeOutlined}
+                          text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                          key="list-vertical-yes-o"
+                        />,
+                        <IconText
+                          icon={DislikeOutlined}
+                          text={getUIVoteAmount(
+                            item.final_tally_result.no + item.final_tally_result.no_with_veto,
+                            userAsset,
+                          )}
+                          key="list-vertical-no-o"
+                        />,
                       ]}
                       onClick={() => {
                         showModal();
@@ -409,8 +442,19 @@ const GovernancePage = () => {
                     <List.Item
                       key={item.proposal_id}
                       actions={[
-                        <IconText icon={LikeOutlined} text="156" key="list-vertical-yes-o" />,
-                        <IconText icon={DislikeOutlined} text="2" key="list-vertical-no-o" />,
+                        <IconText
+                          icon={LikeOutlined}
+                          text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                          key="list-vertical-yes-o"
+                        />,
+                        <IconText
+                          icon={DislikeOutlined}
+                          text={getUIVoteAmount(
+                            item.final_tally_result.no + item.final_tally_result.no_with_veto,
+                            userAsset,
+                          )}
+                          key="list-vertical-no-o"
+                        />,
                       ]}
                       onClick={() => {
                         showModal();

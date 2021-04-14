@@ -47,6 +47,48 @@ export function getUIDynamicAmount(amount: string, currentAsset: UserAsset) {
   return finalAmount;
 }
 
+export function getUIVoteAmount(amount: string, asset: UserAsset) {
+  const exp = Big(10).pow(asset.decimals);
+  const voteAmount = Big(amount)
+    .div(exp)
+    .toFixed();
+  let returnVoteAmount = '';
+  if (
+    Big(voteAmount)
+      .div(Big(10).pow(9))
+      .gte(Big(1))
+  ) {
+    returnVoteAmount = `${Big(voteAmount)
+      .div(Big(10).pow(9))
+      .toFixed(3)
+      .toString()}B`;
+  } else if (
+    Big(voteAmount)
+      .div(Big(10).pow(6))
+      .gte(Big(1))
+  ) {
+    returnVoteAmount = `${Big(voteAmount)
+      .div(Big(10).pow(6))
+      .toFixed(3)
+      .toString()}M`;
+  } else if (
+    Big(voteAmount)
+      .div(Big(10).pow(3))
+      .gte(Big(1))
+  ) {
+    returnVoteAmount = `${Big(voteAmount)
+      .div(Big(10).pow(3))
+      .toFixed(3)
+      .toString()}K`;
+  } else {
+    returnVoteAmount = `${Big(voteAmount)
+      .div(Big(10))
+      .toFixed(3)
+      .toString()}`;
+  }
+  return returnVoteAmount;
+}
+
 export function getCurrentMinAssetAmount(userAsset: UserAsset) {
   const exp = Big(10).pow(userAsset.decimals);
   return Big(1)
