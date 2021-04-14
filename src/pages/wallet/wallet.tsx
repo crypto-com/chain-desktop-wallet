@@ -95,7 +95,11 @@ function WalletPage() {
       title: 'Wallet Type',
       dataIndex: 'walletType',
       key: 'walletType',
-      render: walletType => walletType.charAt(0).toUpperCase() + walletType.slice(1),
+      // Old wallets (Before Ledger support ) did not have a wallet type property on creation : So they would crash on this level
+      render: walletType =>
+        walletType && walletType.length > 2
+          ? walletType.charAt(0).toUpperCase() + walletType.slice(1)
+          : '',
     },
     {
       title: 'Network',
