@@ -829,11 +829,8 @@ class WalletService {
       const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
       return nodeRpc.loadProposals([
         ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD,
-        // ProposalStatuses.PROPOSAL_STATUS_DEPOSIT_PERIOD,
-        // ProposalStatuses.PROPOSAL_STATUS_UNSPECIFIED,
         ProposalStatuses.PROPOSAL_STATUS_PASSED,
-        ProposalStatuses.PROPOSAL_STATUS_REJECTED,
-        // ProposalStatuses.PROPOSAL_STATUS_FAILED,
+        ProposalStatuses.PROPOSAL_STATUS_FAILED,
       ]);
     } catch (e) {
       // eslint-disable-next-line no-console

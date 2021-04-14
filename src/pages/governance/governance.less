@@ -40,10 +40,25 @@
         width: 100%;
       }
     }
+    .ant-list-item {
+      cursor: pointer;
+    }
   }
 }
 
 .proposal-modal {
+  width: 800px !important;
+  .ant-layout,
+  .ant-layout-sider {
+    background: #fff;
+  }
+  .ant-layout {
+    margin: 10px;
+    .ant-layout-content {
+      margin: 0 10px;
+    }
+  }
+
   .ant-card-head-title {
     color: @azure;
     // font-weight: bold;
@@ -66,6 +81,10 @@
     // .ant-radio-button-wrapper-checked{
 
     // }
+  }
+  .ant-btn {
+    width: 100%;
+    margin: 10px 0 0 0;
   }
   // .result{
 
