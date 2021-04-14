@@ -18,13 +18,18 @@ export function createLedgerDevice(): ISignerProvider {
   return signerProvider;
 }
 
-// true: ledger is expert-mode
-export async function detectLedgerNormalMode(): Promise<boolean> {
+// NORMAL
+// EXPERT
+// DISCONNECTED
+export async function detectLedgerStatus(): Promise<String> {
   try {
     const device = createLedgerDevice();
     await device.getPubKey(LedgerWalletMaximum, false);
-    return false;
+    return 'EXPERT';
   } catch (err) {
-    return true;
+    const findResult = err.toString().search('Conditions not satisfied');
+    if (findResult >= 0) return 'NORMAL';
+
+    return 'DISCONNECTED';
   }
 }

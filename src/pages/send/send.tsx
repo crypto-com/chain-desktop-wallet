@@ -21,7 +21,7 @@ import {
   getNormalScaleAmount,
 } from '../../utils/NumberUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
-import { LEDGER_WALLET_TYPE, detectLedgerNormalMode } from '../../service/LedgerService';
+import { LEDGER_WALLET_TYPE, detectLedgerStatus } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
 const layout = {};
@@ -106,7 +106,7 @@ const FormSend = () => {
       form.resetFields();
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(await detectLedgerNormalMode());
+        setLedgerIsExpertMode((await detectLedgerStatus()) === 'NORMAL');
       }
 
       setErrorMessages(e.message.split(': '));

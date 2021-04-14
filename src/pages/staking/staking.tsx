@@ -30,7 +30,7 @@ import {
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
 import { middleEllipsis, ellipsis } from '../../utils/utils';
-import { LEDGER_WALLET_TYPE, detectLedgerNormalMode } from '../../service/LedgerService';
+import { LEDGER_WALLET_TYPE, detectLedgerStatus } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -175,7 +175,7 @@ const FormDelegationRequest = () => {
       form.resetFields();
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(await detectLedgerNormalMode());
+        setLedgerIsExpertMode((await detectLedgerStatus()) === 'NORMAL');
       }
 
       setErrorMessages(e.message.split(': '));
@@ -639,7 +639,7 @@ const FormWithdrawStakingReward = () => {
       setWalletAsset(currentWalletAsset);
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(await detectLedgerNormalMode());
+        setLedgerIsExpertMode((await detectLedgerStatus()) === 'NORMAL');
       }
 
       setErrorMessages(e.message.split(': '));
