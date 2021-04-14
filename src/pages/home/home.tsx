@@ -17,6 +17,7 @@ import {
   sessionState,
   marketState,
   walletAssetState,
+  ledgerIsExpertModeState,
 } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
@@ -37,7 +38,7 @@ import { UndelegateFormComponent } from './components/UndelegateFormComponent';
 import { RedelegateFormComponent } from './components/RedelegateFormComponent';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis } from '../../utils/utils';
-import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import { LEDGER_WALLET_TYPE, detectLedgerStatus } from '../../service/LedgerService';
 
 const { Text } = Typography;
 
@@ -125,6 +126,7 @@ function HomePage() {
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const marketData = useRecoilValue(marketState);
+  const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [syncLoading, setSyncLoading] = useState(false);
   const didMountRef = useRef(false);
 
@@ -341,12 +343,13 @@ function HomePage() {
   };
 
   const onConfirmDelegationAction = async () => {
-    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
+    const { walletType } = currentSession.wallet;
+
+    if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
       return;
     }
     try {
       setConfirmLoading(true);
-      const { walletType } = currentSession.wallet;
 
       // TODO : Here switch between undelegation and redelegation
       let broadcastedTransaction: BroadCastResult | null = null;
@@ -409,6 +412,10 @@ function HomePage() {
         });
       }
     } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode((await detectLedgerStatus()) === 'NORMAL');
+      }
+
       setErrorMessages(e.message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
@@ -666,6 +673,11 @@ function HomePage() {
                   .map((err, idx) => (
                     <div key={idx}>- {err}</div>
                   ))}
+                {ledgerIsExpertMode ? (
+                  <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
+                ) : (
+                  ''
+                )}
               </div>
             </>
           </ErrorModalPopup>

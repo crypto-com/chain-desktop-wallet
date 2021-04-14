@@ -11,7 +11,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { scaledBalance } from '../../models/UserAsset';
-import { sessionState, walletAssetState } from '../../recoil/atom';
+import { sessionState, walletAssetState, ledgerIsExpertModeState } from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
@@ -21,7 +21,7 @@ import {
   getNormalScaleAmount,
 } from '../../utils/NumberUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
-import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import { LEDGER_WALLET_TYPE, detectLedgerStatus } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
 const layout = {};
@@ -39,6 +39,7 @@ const FormSend = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const currentSession = useRecoilValue(sessionState);
 
   const showConfirmationModal = () => {
@@ -78,12 +79,12 @@ const FormSend = () => {
 
   const onConfirmTransfer = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
-    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
+    const { walletType } = currentSession.wallet;
+    if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
       return;
     }
     try {
       setConfirmLoading(true);
-      const { walletType } = currentSession.wallet;
       const sendResult = await walletService.sendTransfer({
         toAddress: formValues.recipientAddress,
         amount: formValues.amount,
@@ -104,6 +105,10 @@ const FormSend = () => {
 
       form.resetFields();
     } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode((await detectLedgerStatus()) === 'NORMAL');
+      }
+
       setErrorMessages(e.message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
@@ -329,6 +334,11 @@ const FormSend = () => {
                 .map((err, idx) => (
                   <div key={idx}>- {err}</div>
                 ))}
+              {ledgerIsExpertMode ? (
+                <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
+              ) : (
+                ''
+              )}
             </div>
           </>
         </ErrorModalPopup>

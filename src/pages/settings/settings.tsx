@@ -4,10 +4,14 @@ import './settings.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Button, Form, Input, Layout, Tabs, Alert, Checkbox, InputNumber, message } from 'antd';
-import { useRecoilState } from 'recoil';
-import { sessionState } from '../../recoil/atom';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { sessionState, walletListState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
-import { DisableDefaultMemoSettings, SettingsDataUpdate } from '../../models/Wallet';
+import {
+  DisableDefaultMemoSettings,
+  EnableGeneralSettingsPropagation,
+  SettingsDataUpdate,
+} from '../../models/Wallet';
 import { Session } from '../../models/Session';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
@@ -23,7 +27,55 @@ const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
 
-const FormGeneral = () => {
+const GeneralSettingsForm = () => {
+  const [session, setSession] = useRecoilState(sessionState);
+  const [updateLoading, setUpdateLoading] = useState(false);
+  const [enabledGeneralSettings, setEnabledGeneralSettings] = useState<boolean>(false);
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    let unmounted = false;
+
+    const SyncConfig = async () => {
+      const enabledGeneralWalletsSettings: boolean = session.wallet.config.enableGeneralSettings;
+      if (!unmounted) {
+        setEnabledGeneralSettings(enabledGeneralWalletsSettings);
+      }
+    };
+
+    if (!didMountRef.current) {
+      SyncConfig();
+      didMountRef.current = true;
+    }
+
+    return () => {
+      unmounted = true;
+    };
+  }, [enabledGeneralSettings, setEnabledGeneralSettings]);
+
+  async function onEnableGeneralWalletConfig() {
+    setUpdateLoading(true);
+    const newState = !enabledGeneralSettings;
+    setEnabledGeneralSettings(newState);
+
+    const enableGeneralSettingsPropagation: EnableGeneralSettingsPropagation = {
+      networkName: session.wallet.config.name,
+      enabledGeneralSettings: newState,
+    };
+
+    await walletService.updateGeneralSettingsPropagation(enableGeneralSettingsPropagation);
+
+    const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
+    const newSession = new Session(updatedWallet);
+    await walletService.setCurrentSession(newSession);
+
+    setSession(newSession);
+    message.success(
+      `General settings propagation has been ${newState ? 'enabled' : 'disabled'} successfully`,
+    );
+    setUpdateLoading(false);
+  }
+
   return (
     <>
       <Form.Item
@@ -93,6 +145,15 @@ const FormGeneral = () => {
         >
           <InputNumber precision={0} min={1} />
         </Form.Item>
+      </div>
+      <div className="item">
+        <Checkbox
+          checked={enabledGeneralSettings}
+          onChange={onEnableGeneralWalletConfig}
+          disabled={updateLoading}
+        >
+          Propagate the settings changes to all your other wallets on {session.wallet.config.name}
+        </Checkbox>
       </div>
     </>
   );
@@ -183,6 +244,9 @@ const FormSettings = () => {
   const defaultSettings = session.wallet.config;
   const didMountRef = useRef(false);
   const history = useHistory();
+
+  const setWalletList = useSetRecoilState(walletListState);
+
   let networkFee = FIXED_DEFAULT_FEE;
   let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
 
@@ -238,7 +302,18 @@ const FormSettings = () => {
     const newSession = new Session(updatedWallet);
     await walletService.setCurrentSession(newSession);
     setSession(newSession);
+
+    const allNewUpdatedWallets = await walletService.retrieveAllWallets();
+    setWalletList(allNewUpdatedWallets);
+
     setIsButtonLoading(false);
+    message.success(
+      `Wallet settings updated successfully ${
+        session.wallet.config.enableGeneralSettings
+          ? `on all ${session.wallet.config.name} wallets`
+          : ''
+      }`,
+    );
   };
 
   const onRestoreDefaults = () => {
@@ -281,7 +356,7 @@ const FormSettings = () => {
         <TabPane tab="Node Configuration" key="1">
           <div className="site-layout-background settings-content">
             <div className="container">
-              <FormGeneral />
+              <GeneralSettingsForm />
               <Form.Item {...tailLayout} className="button">
                 <Button type="primary" htmlType="submit" loading={isButtonLoading}>
                   Save
