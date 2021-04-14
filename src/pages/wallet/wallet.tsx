@@ -8,6 +8,7 @@ import { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
 import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
+import { NORMAL_WALLET_TYPE } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -99,7 +100,7 @@ function WalletPage() {
       render: walletType =>
         walletType && walletType.length > 2
           ? walletType.charAt(0).toUpperCase() + walletType.slice(1)
-          : '',
+          : NORMAL_WALLET_TYPE,
     },
     {
       title: 'Network',
