@@ -58,7 +58,8 @@ export class LedgerSigner {
 
     let response = await this.app.getVersion();
     if (response.error_message !== 'No errors') {
-      throw new Error(`[${response.error_message}] ${response.error_message}`);
+      await this.closeTransport();
+      throw new Error(`${response.error_message}`);
     }
 
     // purpose(44), coin(394), account(0), change(0), index(0)
@@ -71,7 +72,8 @@ export class LedgerSigner {
       response = await this.app.getAddressAndPubKey(this.path, addressPrefix);
     }
     if (response.error_message !== 'No errors') {
-      throw new Error(`[${response.error_message}] ${response.error_message}`);
+      await this.closeTransport();
+      throw new Error(`${response.error_message}`);
     }
     const pubkey = Bytes.fromUint8Array(LedgerSigner.pubkeyToBytes(response.compressed_pk));
 
@@ -89,7 +91,8 @@ export class LedgerSigner {
 
     const response = await this.app.sign(this.path, message.toUint8Array());
     if (response.error_message !== 'No errors') {
-      throw new Error(`[${response.error_message}] ${response.error_message}`);
+      await this.closeTransport();
+      throw new Error(`${response.error_message}`);
     }
 
     // Ledger has encoded the sig in ASN1 DER format, but we need a 64-byte buffer of <r,s>
@@ -105,6 +108,7 @@ export class LedgerSigner {
     //  = 7 bytes of overhead
     let { signature } = response;
     if (signature[0] !== 0x30) {
+      await this.closeTransport();
       throw new Error('Ledger assertion failed: Expected a signature header of 0x30');
     }
 
@@ -126,6 +130,7 @@ export class LedgerSigner {
 
     signature = Buffer.concat([sigR, sigS]);
     if (signature.length !== 64) {
+      await this.closeTransport();
       throw new Error(`Ledger assertion failed: incorrect signature length ${signature.length}`);
     }
     const bytes = Bytes.fromUint8Array(new Uint8Array(signature));
