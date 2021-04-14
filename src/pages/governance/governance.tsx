@@ -6,9 +6,9 @@ import 'antd/dist/antd.css';
 import { Layout, Tabs, List, Space, Radio, Button, Card, Progress, Tag } from 'antd';
 import Big from 'big.js';
 import { DislikeOutlined, LikeOutlined } from '@ant-design/icons';
-
 import { useRecoilValue } from 'recoil';
 import { sessionState, walletAssetState } from '../../recoil/atom';
+
 import { getUIVoteAmount } from '../../utils/NumberUtils';
 import {
   ProposalModel,
@@ -23,6 +23,7 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -91,24 +92,6 @@ const GovernancePage = () => {
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
     setIsVisibleConfirmationModal(true);
-    // const networkFee =
-    //   currentSession.wallet.config.fee !== undefined &&
-    //   currentSession.wallet.config.fee.networkFee !== undefined
-    //     ? currentSession.wallet.config.fee.networkFee
-    //     : FIXED_DEFAULT_FEE;
-
-    // const stakeInputAmount = adjustedTransactionAmount(
-    //   form.getFieldValue('amount'),
-    //   walletAsset,
-    //   networkFee,
-    // );
-
-    // setFormValues({
-    //   ...form.getFieldsValue(),
-    //   // Replace scientific notation to plain string values
-    //   amount: fromScientificNotation(stakeInputAmount),
-    // });
-    // setIsVisibleConfirmationModal(true);
   };
 
   const showPasswordInput = () => {
@@ -139,10 +122,14 @@ const GovernancePage = () => {
   const onConfirm = async () => {
     setConfirmLoading(true);
     try {
+      const proposalID =
+        proposal?.proposal_id !== null && proposal?.proposal_id !== undefined
+          ? proposal?.proposal_id
+          : '';
       const sendResult = await walletService.sendVote({
         voteOption,
-        proposalID: '1',
-        memo: '',
+        proposalID,
+        memo: DEFAULT_CLIENT_MEMO,
         decryptedPhrase,
         asset: userAsset,
         walletType: currentSession.wallet.walletType,
@@ -186,7 +173,6 @@ const GovernancePage = () => {
     setProposalFigures({
       yes: {
         vote: yesValue.div(10000000).toFixed(),
-        // vote: yesValue.toString(),
         rate: yesRate,
       },
       no: {
@@ -194,7 +180,6 @@ const GovernancePage = () => {
           .plus(noWithVetoValue)
           .div(10000000)
           .toFixed(),
-        // vote: noValue.plus(noWithVetoValue).toString(),
         rate: noRate,
       },
     });
@@ -519,7 +504,6 @@ const GovernancePage = () => {
 
             <div className="description">{proposal?.content.description}</div>
             <div className="item">
-              {/* <div className="label">Delete Wallet Address</div> */}
               {proposal?.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD ? (
                 <Card title="Cast your vote">
                   <Radio.Group onChange={onRadioChange} value={voteOption}>
@@ -595,12 +579,6 @@ const GovernancePage = () => {
         isModalVisible={isConfirmationModalVisible}
         handleCancel={handleCancelConfirmationModal}
         handleOk={handleOk}
-        // confirmationLoading={confirmLoading}
-        // button={
-        //   <Button type="primary" htmlType="submit">
-        //     Review
-        //   </Button>
-        // }
         footer={[
           <Button key="submit" type="primary" loading={confirmLoading} onClick={onConfirm}>
             Confirm
@@ -626,16 +604,6 @@ const GovernancePage = () => {
             <div className="label">Vote</div>
             <div>{processVoteTag(voteOption)}</div>
           </div>
-          {/* {formValues?.memo !== undefined &&
-            formValues?.memo !== null &&
-            formValues.memo !== '' ? (
-              <div className="item">
-                <div className="label">Memo</div>
-                <div>{`${formValues?.memo}`}</div>
-              </div>
-            ) : (
-              <div />
-            )} */}
         </>
       </ModalPopup>
       <SuccessModalPopup
