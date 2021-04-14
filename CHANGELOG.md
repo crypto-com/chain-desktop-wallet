@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
-## [v0.1.5] - 2021-04-14
+## [v0.1.6] - 2021-04-14
 
 ### Additions
 - Added capability to sort wallets by wallet names and wallet types
