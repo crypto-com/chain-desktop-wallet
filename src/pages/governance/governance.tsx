@@ -19,6 +19,8 @@ import {
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 
@@ -39,7 +41,10 @@ const GovernancePage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [errorMessages, setErrorMessages] = useState([]);
   const [proposal, setProposal] = useState<ProposalModel>();
   const [proposalFigures, setProposalFigures] = useState({
     yes: {
@@ -57,8 +62,6 @@ const GovernancePage = () => {
   const userAsset = useRecoilValue(walletAssetState);
   const didMountRef = useRef(false);
 
-  console.log(userAsset);
-
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -73,6 +76,16 @@ const GovernancePage = () => {
 
   const handleCancelConfirmationModal = () => {
     setIsVisibleConfirmationModal(false);
+  };
+
+  const closeSuccessModal = () => {
+    setIsSuccessModalVisible(false);
+    setIsModalVisible(false);
+    setIsVisibleConfirmationModal(false);
+  };
+
+  const closeErrorModal = () => {
+    setIsErrorModalVisible(false);
   };
 
   const showConfirmationModal = () => {
@@ -139,19 +152,18 @@ const GovernancePage = () => {
         voteOption,
         proposalID: '1',
         memo: '',
-        decryptedPhrase: '',
-        // decryptedPhrase: decryptedPhrase,
+        // decryptedPhrase: '',
+        decryptedPhrase,
         asset: userAsset,
         walletType: currentSession.wallet.walletType,
       });
       setBroadcastResult(sendResult);
-      console.log(broadcastResult);
     } catch (e) {
-      // setErrorMessages(e.message.split(': '));
+      setErrorMessages(e.message.split(': '));
       // setIsVisibleConfirmationModal(false);
       // setConfirmLoading(false);
       // setInputPasswordVisible(false);
-      // setIsErrorTransferModalVisible(true);
+      setIsErrorModalVisible(true);
       // eslint-disable-next-line no-console
       console.log('Error occurred while transfer', e);
     }
@@ -294,18 +306,9 @@ const GovernancePage = () => {
                     </List.Item>
                   )}
                   pagination={{
-                    onChange: page => {
-                      console.log(page);
-                    },
                     pageSize: 10,
                   }}
-                >
-                  {/* {this.state.loading && this.state.hasMore && (
-                    <div className="demo-loading-container">
-                      <Spin />
-                    </div>
-                  )} */}
-                </List>
+                />
               </div>
             </div>
           </TabPane>
@@ -346,18 +349,9 @@ const GovernancePage = () => {
                     </List.Item>
                   )}
                   pagination={{
-                    onChange: page => {
-                      console.log(page);
-                    },
                     pageSize: 10,
                   }}
-                >
-                  {/* {this.state.loading && this.state.hasMore && (
-                    <div className="demo-loading-container">
-                      <Spin />
-                    </div>
-                  )} */}
-                </List>
+                />
               </div>
             </div>
           </TabPane>
@@ -398,18 +392,9 @@ const GovernancePage = () => {
                     </List.Item>
                   )}
                   pagination={{
-                    onChange: page => {
-                      console.log(page);
-                    },
                     pageSize: 10,
                   }}
-                >
-                  {/* {this.state.loading && this.state.hasMore && (
-                    <div className="demo-loading-container">
-                      <Spin />
-                    </div>
-                  )} */}
-                </List>
+                />
               </div>
             </div>
           </TabPane>
@@ -450,18 +435,9 @@ const GovernancePage = () => {
                     </List.Item>
                   )}
                   pagination={{
-                    onChange: page => {
-                      console.log(page);
-                    },
                     pageSize: 10,
                   }}
-                >
-                  {/* {this.state.loading && this.state.hasMore && (
-                    <div className="demo-loading-container">
-                      <Spin />
-                    </div>
-                  )} */}
-                </List>
+                />
               </div>
             </div>
           </TabPane>
@@ -494,7 +470,7 @@ const GovernancePage = () => {
               {/* <div className="label">Delete Wallet Address</div> */}
               {proposal?.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD ? (
                 <Card title="Cast your vote">
-                  <Radio.Group onChange={onRadioChange} value={voteOption} buttonStyle="solid">
+                  <Radio.Group onChange={onRadioChange} value={voteOption}>
                     <Radio.Button value={VoteOptions.YES}>Yes - Support</Radio.Button>
                     <Radio.Button value={VoteOptions.NO}>No - Do not Support</Radio.Button>
                     <Radio.Button value={VoteOptions.NO_WITH_VETO}>
@@ -610,6 +586,52 @@ const GovernancePage = () => {
             )} */}
         </>
       </ModalPopup>
+      <SuccessModalPopup
+        isModalVisible={isSuccessModalVisible}
+        handleCancel={closeSuccessModal}
+        handleOk={closeSuccessModal}
+        title="Success!"
+        button={null}
+        footer={[
+          <Button key="submit" type="primary" onClick={closeSuccessModal}>
+            Ok
+          </Button>,
+        ]}
+      >
+        <>
+          {broadcastResult?.code !== undefined &&
+          broadcastResult?.code !== null &&
+          broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+            <div className="description">
+              The transaction timed out but it will be included in the subsequent blocks
+            </div>
+          ) : (
+            <div className="description">The transaction was broadcasted successfully!</div>
+          )}
+          {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
+        </>
+      </SuccessModalPopup>
+      <ErrorModalPopup
+        isModalVisible={isErrorModalVisible}
+        handleCancel={closeErrorModal}
+        handleOk={closeErrorModal}
+        title="An error happened!"
+        footer={[]}
+      >
+        <>
+          <div className="description">
+            The transfer transaction failed. Please try again later.
+            <br />
+            {errorMessages
+              .filter((item, idx) => {
+                return errorMessages.indexOf(item) === idx;
+              })
+              .map((err, idx) => (
+                <div key={idx}>- {err}</div>
+              ))}
+          </div>
+        </>
+      </ErrorModalPopup>
     </Layout>
   );
 };
