@@ -2,7 +2,7 @@ import { isBroadcastTxFailure, StargateClient } from '@cosmjs/stargate';
 import axios, { AxiosInstance } from 'axios';
 import { Big } from 'big.js';
 import { Bytes } from '../../utils/ChainJsLib';
-import { NodePorts } from '../../config/StaticConfig';
+import { CosmosPorts } from '../../config/StaticConfig';
 import {
   AllProposalResponse,
   DelegationResult,
@@ -54,9 +54,9 @@ export class NodeRpcService implements INodeRpcService {
   }
 
   public static async init(baseUrl: string) {
-    const client = await StargateClient.connect(baseUrl + NodePorts.Tendermint);
+    const client = await StargateClient.connect(baseUrl + CosmosPorts.Main);
     const proxyClient = axios.create({
-      baseURL: baseUrl + NodePorts.Cosmos,
+      baseURL: baseUrl + CosmosPorts.Proxy,
     });
     return new NodeRpcService(client, proxyClient);
   }

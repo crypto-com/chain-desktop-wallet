@@ -27,6 +27,7 @@ import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
 import packageJson from '../../../package.json';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import { LedgerWalletMaximum } from '../../config/StaticConfig';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -183,7 +184,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const WalletMenu = () => {
     return (
       <Menu>
-        {walletList.length <= 100 ? (
+        {walletList.length <= LedgerWalletMaximum ? (
           <>
             <Menu.Item className="restore-wallet-item">
               <Link to="/restore">
