@@ -137,8 +137,8 @@ const GovernancePage = () => {
       setBroadcastResult(sendResult);
     } catch (e) {
       setErrorMessages(e.message.split(': '));
-      // setIsVisibleConfirmationModal(false);
-      // setConfirmLoading(false);
+      setIsVisibleConfirmationModal(false);
+      setConfirmLoading(false);
       // setInputPasswordVisible(false);
       setIsErrorModalVisible(true);
       // eslint-disable-next-line no-console
@@ -187,6 +187,10 @@ const GovernancePage = () => {
 
   const processStatusTag = status => {
     let statusColor;
+    const statusMessage =
+      status !== null && status !== undefined
+        ? status.replace('PROPOSAL_STATUS', '').replaceAll('_', ' ')
+        : '';
     switch (status) {
       case ProposalStatuses.PROPOSAL_STATUS_UNSPECIFIED:
         statusColor = 'default';
@@ -211,7 +215,7 @@ const GovernancePage = () => {
     }
     return (
       <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-        {status}
+        {statusMessage}
       </Tag>
     );
   };
@@ -300,7 +304,8 @@ const GovernancePage = () => {
                       <List.Item.Meta
                         title={
                           <>
-                            {processStatusTag(item.status)} <a>{item.content.title}</a>
+                            {processStatusTag(item.status)} #{item.proposal_id}{' '}
+                            <a>{item.content.title}</a>
                           </>
                         }
                         description={
@@ -353,7 +358,8 @@ const GovernancePage = () => {
                       <List.Item.Meta
                         title={
                           <>
-                            {processStatusTag(item.status)} <a>{item.content.title}</a>
+                            {processStatusTag(item.status)} #{item.proposal_id}{' '}
+                            <a>{item.content.title}</a>
                           </>
                         }
                         description={
@@ -406,7 +412,8 @@ const GovernancePage = () => {
                       <List.Item.Meta
                         title={
                           <>
-                            {processStatusTag(item.status)} <a>{item.content.title}</a>
+                            {processStatusTag(item.status)} #{item.proposal_id}{' '}
+                            <a>{item.content.title}</a>
                           </>
                         }
                         description={
@@ -459,7 +466,8 @@ const GovernancePage = () => {
                       <List.Item.Meta
                         title={
                           <>
-                            {processStatusTag(item.status)} <a>{item.content.title}</a>
+                            {processStatusTag(item.status)} #{item.proposal_id}{' '}
+                            <a>{item.content.title}</a>
                           </>
                         }
                         description={
@@ -598,7 +606,7 @@ const GovernancePage = () => {
           </div>
           <div className="item">
             <div className="label">Vote to Proposal</div>
-            <div className="address">{`[Proposal ID: ${proposal?.proposal_id}] ${proposal?.content.title}`}</div>
+            <div className="address">{`#${proposal?.proposal_id} ${proposal?.content.title}`}</div>
           </div>
           <div className="item">
             <div className="label">Vote</div>
