@@ -8,6 +8,7 @@ import { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
 import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
+import { NORMAL_WALLET_TYPE } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -95,7 +96,11 @@ function WalletPage() {
       title: 'Wallet Type',
       dataIndex: 'walletType',
       key: 'walletType',
-      render: walletType => walletType.charAt(0).toUpperCase() + walletType.slice(1),
+      // Old wallets (Before Ledger support ) did not have a wallet type property on creation : So they would crash on this level
+      render: walletType =>
+        walletType && walletType.length > 2
+          ? walletType.charAt(0).toUpperCase() + walletType.slice(1)
+          : NORMAL_WALLET_TYPE,
     },
     {
       title: 'Network',
