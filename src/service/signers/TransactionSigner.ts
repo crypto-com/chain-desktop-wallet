@@ -12,6 +12,7 @@ import {
   WithdrawStakingRewardUnsigned,
   UndelegateTransactionUnsigned,
   RedelegateTransactionUnsigned,
+  VoteTransactionUnsigned,
 } from './TransactionSupported';
 
 export interface ITransactionSigner {
@@ -69,6 +70,33 @@ export class TransactionSigner implements ITransactionSigner {
 
     const signableTx = rawTx
       .appendMessage(msgSend)
+      .addSigner({
+        publicKey: keyPair.getPubKey(),
+        accountNumber: new Big(transaction.accountNumber),
+        accountSequence: new Big(transaction.accountSequence),
+      })
+      .toSignable();
+
+    return signableTx
+      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
+      .toSigned()
+      .getHexEncoded();
+  }
+
+  public async signVoteTransaction(
+    transaction: VoteTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
+
+    const msgVote = new cro.gov.MsgVote({
+      voter: transaction.voter,
+      option: transaction.option,
+      proposalId: Big(transaction.proposalID),
+    });
+
+    const signableTx = rawTx
+      .appendMessage(msgVote)
       .addSigner({
         publicKey: keyPair.getPubKey(),
         accountNumber: new Big(transaction.accountNumber),

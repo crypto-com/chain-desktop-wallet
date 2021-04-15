@@ -26,6 +26,7 @@ import {
   RedelegateTransactionUnsigned,
   TransferTransactionUnsigned,
   UndelegateTransactionUnsigned,
+  VoteTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
 } from './signers/TransactionSupported';
 import { cryptographer } from '../crypto/Cryptographer';
@@ -34,6 +35,8 @@ import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
+  ProposalModel,
+  ProposalStatuses,
   RewardTransaction,
   RewardTransactionList,
   StakingTransactionData,
@@ -51,6 +54,7 @@ import {
   RedelegationRequest,
   TransferRequest,
   UndelegationRequest,
+  VoteRequest,
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
 
@@ -239,6 +243,44 @@ class WalletService {
       signedTxHex = await transactionSigner.signRedelegateTx(
         redelegateTransactionUnsigned,
         redelegationRequest.decryptedPhrase,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.syncAll(currentSession);
+    return broadCastResult;
+  }
+
+  public async sendVote(voteRequest: VoteRequest): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.prepareTransaction();
+
+    const voteTransactionUnsigned: VoteTransactionUnsigned = {
+      option: voteRequest.voteOption,
+      voter: currentSession.wallet.address,
+      proposalID: voteRequest.proposalID,
+      memo: voteRequest.memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+
+    if (voteRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signVoteTransaction(
+        voteTransactionUnsigned,
+        voteRequest.decryptedPhrase,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signVoteTransaction(
+        voteTransactionUnsigned,
+        voteRequest.decryptedPhrase,
       );
     }
 
@@ -482,6 +524,7 @@ class WalletService {
       this.fetchAndSaveRewards(nodeRpc, currentSession),
       this.fetchAndSaveTransfers(currentSession),
       this.fetchAndSaveValidators(currentSession),
+      this.fetchAndSaveProposals(currentSession),
     ]);
   }
 
@@ -546,6 +589,19 @@ class WalletService {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_VALIDATORS', e);
+    }
+  }
+
+  public async fetchAndSaveProposals(currentSession: Session) {
+    try {
+      const proposals = await this.getLatestProposals();
+      await this.storageService.saveProposals({
+        chainId: currentSession.wallet.config.network.chainId,
+        proposals,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_SAVE_PROPOSALS', e);
     }
   }
 
@@ -750,6 +806,14 @@ class WalletService {
     return validatorSet.validators;
   }
 
+  public async retrieveProposals(chainId: string): Promise<ProposalModel[]> {
+    const proposalSet = await this.storageService.retrieveAllProposals(chainId);
+    if (!proposalSet) {
+      return [];
+    }
+    return proposalSet.proposals;
+  }
+
   private async getLatestTopValidators(): Promise<ValidatorModel[]> {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
@@ -761,6 +825,25 @@ class WalletService {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING TOP VALIDATORS', e);
+      return [];
+    }
+  }
+
+  private async getLatestProposals(): Promise<ProposalModel[]> {
+    try {
+      const currentSession = await this.storageService.retrieveCurrentSession();
+      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+        return Promise.resolve([]);
+      }
+      const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+      return nodeRpc.loadProposals([
+        ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD,
+        ProposalStatuses.PROPOSAL_STATUS_PASSED,
+        ProposalStatuses.PROPOSAL_STATUS_FAILED,
+      ]);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING PROPOSALS', e);
       return [];
     }
   }

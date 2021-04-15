@@ -1,3 +1,5 @@
+import { VoteOptions } from '../../models/Transaction';
+
 export interface TransactionUnsigned {
   memo: string;
   accountNumber: number;
@@ -8,6 +10,12 @@ export interface TransferTransactionUnsigned extends TransactionUnsigned {
   fromAddress: string;
   toAddress: string;
   amount: string;
+}
+
+export interface VoteTransactionUnsigned extends TransactionUnsigned {
+  voter: string;
+  option: VoteOptions;
+  proposalID: string;
 }
 
 export interface DelegateTransactionUnsigned extends TransactionUnsigned {
