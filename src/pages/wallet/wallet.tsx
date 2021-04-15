@@ -1,14 +1,13 @@
 // import React, { useState, useEffect } from 'react';
-import React, { useState, useEffect, useRef } from 'react';
-import { useRecoilValue, useRecoilState } from 'recoil';
+import React, { useEffect, useRef, useState } from 'react';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import './wallet.less';
 import 'antd/dist/antd.css';
-import { Layout, Table, Space, Spin, Typography } from 'antd';
+import { Layout, Space, Spin, Table, Typography } from 'antd';
 import { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
 import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
-// import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -84,6 +83,7 @@ function WalletPage() {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
+      sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
       title: 'Address',
@@ -100,6 +100,7 @@ function WalletPage() {
     {
       title: 'Network',
       key: 'network',
+      sorter: (a, b) => a.config.name.localeCompare(b.config.name),
       render: record => {
         return record.config.name;
       },
@@ -136,7 +137,7 @@ function WalletPage() {
 
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">Wallet</Header>
+      <Header className="site-layout-background">All Wallets</Header>
       <div className="header-description">You may review all your wallets here.</div>
       <Content>
         <div className="site-layout-background wallet-content">

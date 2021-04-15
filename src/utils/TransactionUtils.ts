@@ -46,6 +46,19 @@ export class TransactionUtils {
     });
   }
 
+  // min <= value <= max , both inclusive
+  public static rangeValidator(min: string, max: string, reason: string) {
+    return () => ({
+      validator(rule, value) {
+        if (Big(value).gte(min) && !Big(value).gt(max)) {
+          return Promise.resolve();
+        }
+        // eslint-disable-next-line prefer-promise-reject-errors
+        return Promise.reject(reason);
+      },
+    });
+  }
+
   public static maxValidator(max: string, reason: string) {
     return () => ({
       validator(rule, value) {
