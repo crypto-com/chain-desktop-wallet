@@ -22,7 +22,7 @@ import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark
 import IconLedger from '../../svg/IconLedger';
 import {
   createLedgerDevice,
-  detectLedgerStatus,
+  detectConditionsError,
   LEDGER_WALLET_TYPE,
   NORMAL_WALLET_TYPE,
 } from '../../service/LedgerService';
@@ -377,8 +377,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       let message = `Cannot detect any Ledger device`;
       let description = `Please connect with your Ledger device`;
       if (walletType === LEDGER_WALLET_TYPE) {
-        const ledgerStatus = await detectLedgerStatus();
-        if (ledgerStatus === 'NORMAL') {
+        if (detectConditionsError(e.toString())) {
           message = `No Expert Mode`;
           description = 'Please ensure that your have enabled Expert mode on your ledger device.';
         }
