@@ -13,7 +13,7 @@ import { getUIVoteAmount } from '../../utils/NumberUtils';
 import {
   ProposalModel,
   ProposalStatuses,
-  VoteOptions,
+  VoteOption,
   BroadCastResult,
 } from '../../models/Transaction';
 import { walletService } from '../../service/WalletService';
@@ -37,7 +37,7 @@ const IconText = ({ icon, text }) => (
 
 const GovernancePage = () => {
   // const [form] = Form.useForm();
-  const [voteOption, setVoteOption] = useState<VoteOptions>(VoteOptions.ABSTAIN);
+  const [voteOption, setVoteOption] = useState<VoteOption>(VoteOption.VOTE_OPTION_ABSTAIN);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -220,19 +220,19 @@ const GovernancePage = () => {
     let voteColor;
     let voteMessage;
     switch (vote) {
-      case VoteOptions.YES:
+      case VoteOption.VOTE_OPTION_YES:
         voteColor = 'success';
         voteMessage = 'Yes - Support';
         break;
-      case VoteOptions.NO:
+      case VoteOption.VOTE_OPTION_NO:
         voteColor = 'error';
         voteMessage = 'No - Do not Support';
         break;
-      case VoteOptions.NO_WITH_VETO:
+      case VoteOption.VOTE_OPTION_NO_WITH_VETO:
         voteColor = 'error';
         voteMessage = 'No - Do not Support with Veto';
         break;
-      case VoteOptions.ABSTAIN:
+      case VoteOption.VOTE_OPTION_ABSTAIN:
         voteColor = 'default';
         voteMessage = 'Abstain';
         break;
@@ -507,12 +507,14 @@ const GovernancePage = () => {
               {proposal?.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD ? (
                 <Card title="Cast your vote">
                   <Radio.Group onChange={onRadioChange} value={voteOption}>
-                    <Radio.Button value={VoteOptions.YES}>Yes - Support</Radio.Button>
-                    <Radio.Button value={VoteOptions.NO}>No - Do not Support</Radio.Button>
-                    <Radio.Button value={VoteOptions.NO_WITH_VETO}>
+                    <Radio.Button value={VoteOption.VOTE_OPTION_YES}>Yes - Support</Radio.Button>
+                    <Radio.Button value={VoteOption.VOTE_OPTION_NO}>
+                      No - Do not Support
+                    </Radio.Button>
+                    <Radio.Button value={VoteOption.VOTE_OPTION_NO_WITH_VETO}>
                       No with Veto - Do not Support with Veto
                     </Radio.Button>
-                    <Radio.Button value={VoteOptions.ABSTAIN}>Abstain</Radio.Button>
+                    <Radio.Button value={VoteOption.VOTE_OPTION_ABSTAIN}>Abstain</Radio.Button>
                   </Radio.Group>
                   {/* <div className="item"> */}
                   <Button type="primary" disabled={!voteOption} onClick={onVote}>

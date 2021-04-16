@@ -1,4 +1,4 @@
-import { VoteOptions } from '../../models/Transaction';
+import { VoteOption } from '../../models/Transaction';
 
 export interface TransactionUnsigned {
   memo: string;
@@ -14,7 +14,7 @@ export interface TransferTransactionUnsigned extends TransactionUnsigned {
 
 export interface VoteTransactionUnsigned extends TransactionUnsigned {
   voter: string;
-  option: VoteOptions;
+  option: VoteOption;
   proposalID: string;
 }
 

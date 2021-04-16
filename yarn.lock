@@ -1385,10 +1385,10 @@
   resolved "https://registry.yarnpkg.com/@cosmjs/utils/-/utils-0.24.1.tgz#0adfefe63b7f17222bc2bc12f71296f35e7ad378"
   integrity sha512-VA3WFx1lMFb7esp9BqHWkDgMvHoA3D9w+uDRvWhVRpUpDc7RYHxMbWExASjz+gNblTCg556WJGzF64tXnf9tdQ==
 
-"@crypto-com/chain-jslib@^0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@crypto-com/chain-jslib/-/chain-jslib-0.0.13.tgz#d3b2c675e19c77a570955619bc8cf663f2c1e194"
-  integrity sha512-Y75ILb92Z3Mpg3pvX9Wbbuog30DjeNXv5pu+S3DGvaU9sCy5jgZw3+2tLG7p6jtfiDVK2gdZZ39ikMUB0y95Tg==
+"@crypto-com/chain-jslib@0.0.14":
+  version "0.0.14"
+  resolved "https://registry.yarnpkg.com/@crypto-com/chain-jslib/-/chain-jslib-0.0.14.tgz#fd58f004477e9d17dbb967c833c70393b45ebca4"
+  integrity sha512-9JNKubrFTb6KIzy4Vjaz3vr7TLT/6GNrqOIfFl9RQb+sSgKg/ewKnIXAe45+QdlY44BCP8koejkek9m9NSyv3g==
   dependencies:
     "@cosmjs/encoding" "0.23.1"
     "@cosmjs/math" "0.23.1"
@@ -13843,14 +13843,7 @@ sshpk@^1.7.0:
     safer-buffer "^2.0.2"
     tweetnacl "~0.14.0"
 
-ssri@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.yarnpkg.com/ssri/-/ssri-6.0.1.tgz#2a3c41b28dd45b62b63676ecb74001265ae9edd8"
-  integrity sha512-3Wge10hNcT1Kur4PDFwEieXSCMCJs/7WvSACcrMYrNp+b8kDL1/0wJch5Ni2WrtwEa2IO8OsVfeKIciKCDx/QA==
-  dependencies:
-    figgy-pudding "^3.5.1"
-
-ssri@^8.0.1:
+ssri@8.0.1, ssri@^6.0.1, ssri@^8.0.1:
   version "8.0.1"
   resolved "https://registry.yarnpkg.com/ssri/-/ssri-8.0.1.tgz#638e4e439e2ffbd2cd289776d5ca457c4f51a2af"
   integrity sha512-97qShzy1AiyxvPNIkLWoGua7xoQzzPjQ0HAH4B0rWKo7SZ6USuPcrUiAFrws0UH8RrbWmgq3LMTObhPIHbbBeQ==

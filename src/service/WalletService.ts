@@ -285,7 +285,9 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncAll(currentSession);
+    // eslint-disable-next-line no-console
+    console.log('Broadcasted vote transaction', JSON.stringify(broadCastResult));
+    await this.fetchAndSaveProposals(currentSession);
     return broadCastResult;
   }
 
