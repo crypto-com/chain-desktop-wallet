@@ -38,7 +38,7 @@ import { UndelegateFormComponent } from './components/UndelegateFormComponent';
 import { RedelegateFormComponent } from './components/RedelegateFormComponent';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis } from '../../utils/utils';
-import { LEDGER_WALLET_TYPE, detectLedgerStatus } from '../../service/LedgerService';
+import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
 
 const { Text } = Typography;
 
@@ -413,7 +413,7 @@ function HomePage() {
       }
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode((await detectLedgerStatus()) === 'NORMAL');
+        setLedgerIsExpertMode(detectConditionsError(e.toString()));
       }
 
       setErrorMessages(e.message.split(': '));
