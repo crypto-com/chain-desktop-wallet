@@ -135,6 +135,10 @@ const GovernancePage = () => {
         walletType: currentSession.wallet.walletType,
       });
       setBroadcastResult(sendResult);
+      setIsVisibleConfirmationModal(false);
+      setConfirmLoading(false);
+      setInputPasswordVisible(false);
+      setIsSuccessModalVisible(true);
     } catch (e) {
       setErrorMessages(e.message.split(': '));
       setIsVisibleConfirmationModal(false);
@@ -280,21 +284,25 @@ const GovernancePage = () => {
                   renderItem={item => (
                     <List.Item
                       key={item.proposal_id}
-                      actions={[
-                        <IconText
-                          icon={LikeOutlined}
-                          text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
-                          key="list-vertical-yes-o"
-                        />,
-                        <IconText
-                          icon={DislikeOutlined}
-                          text={getUIVoteAmount(
-                            item.final_tally_result.no + item.final_tally_result.no_with_veto,
-                            userAsset,
-                          )}
-                          key="list-vertical-no-o"
-                        />,
-                      ]}
+                      actions={
+                        item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
+                          ? []
+                          : [
+                              <IconText
+                                icon={LikeOutlined}
+                                text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                                key="list-vertical-yes-o"
+                              />,
+                              <IconText
+                                icon={DislikeOutlined}
+                                text={getUIVoteAmount(
+                                  item.final_tally_result.no + item.final_tally_result.no_with_veto,
+                                  userAsset,
+                                )}
+                                key="list-vertical-no-o"
+                              />,
+                            ]
+                      }
                       onClick={() => {
                         showModal();
                         setProposal(item);
@@ -334,21 +342,25 @@ const GovernancePage = () => {
                   renderItem={item => (
                     <List.Item
                       key={item.proposal_id}
-                      actions={[
-                        <IconText
-                          icon={LikeOutlined}
-                          text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
-                          key="list-vertical-yes-o"
-                        />,
-                        <IconText
-                          icon={DislikeOutlined}
-                          text={getUIVoteAmount(
-                            item.final_tally_result.no + item.final_tally_result.no_with_veto,
-                            userAsset,
-                          )}
-                          key="list-vertical-no-o"
-                        />,
-                      ]}
+                      actions={
+                        item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
+                          ? []
+                          : [
+                              <IconText
+                                icon={LikeOutlined}
+                                text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                                key="list-vertical-yes-o"
+                              />,
+                              <IconText
+                                icon={DislikeOutlined}
+                                text={getUIVoteAmount(
+                                  item.final_tally_result.no + item.final_tally_result.no_with_veto,
+                                  userAsset,
+                                )}
+                                key="list-vertical-no-o"
+                              />,
+                            ]
+                      }
                       onClick={() => {
                         showModal();
                         setProposal(item);
@@ -388,21 +400,25 @@ const GovernancePage = () => {
                   renderItem={item => (
                     <List.Item
                       key={item.proposal_id}
-                      actions={[
-                        <IconText
-                          icon={LikeOutlined}
-                          text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
-                          key="list-vertical-yes-o"
-                        />,
-                        <IconText
-                          icon={DislikeOutlined}
-                          text={getUIVoteAmount(
-                            item.final_tally_result.no + item.final_tally_result.no_with_veto,
-                            userAsset,
-                          )}
-                          key="list-vertical-no-o"
-                        />,
-                      ]}
+                      actions={
+                        item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
+                          ? []
+                          : [
+                              <IconText
+                                icon={LikeOutlined}
+                                text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                                key="list-vertical-yes-o"
+                              />,
+                              <IconText
+                                icon={DislikeOutlined}
+                                text={getUIVoteAmount(
+                                  item.final_tally_result.no + item.final_tally_result.no_with_veto,
+                                  userAsset,
+                                )}
+                                key="list-vertical-no-o"
+                              />,
+                            ]
+                      }
                       onClick={() => {
                         showModal();
                         setProposal(item);
@@ -442,21 +458,25 @@ const GovernancePage = () => {
                   renderItem={item => (
                     <List.Item
                       key={item.proposal_id}
-                      actions={[
-                        <IconText
-                          icon={LikeOutlined}
-                          text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
-                          key="list-vertical-yes-o"
-                        />,
-                        <IconText
-                          icon={DislikeOutlined}
-                          text={getUIVoteAmount(
-                            item.final_tally_result.no + item.final_tally_result.no_with_veto,
-                            userAsset,
-                          )}
-                          key="list-vertical-no-o"
-                        />,
-                      ]}
+                      actions={
+                        item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
+                          ? []
+                          : [
+                              <IconText
+                                icon={LikeOutlined}
+                                text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                                key="list-vertical-yes-o"
+                              />,
+                              <IconText
+                                icon={DislikeOutlined}
+                                text={getUIVoteAmount(
+                                  item.final_tally_result.no + item.final_tally_result.no_with_veto,
+                                  userAsset,
+                                )}
+                                key="list-vertical-no-o"
+                              />,
+                            ]
+                      }
                       onClick={() => {
                         showModal();
                         setProposal(item);
