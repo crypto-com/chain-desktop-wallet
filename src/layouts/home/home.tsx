@@ -231,7 +231,7 @@ function HomeLayout(props: HomeLayoutProps) {
   return (
     <main className="home-layout">
       <Layout className={loading ? 'loading' : ''}>
-        <Sider>
+        <Sider className="home-sider">
           <div className="logo" />
           <div className="version">SAMPLE WALLET v{buildVersion}</div>
           <HomeMenu />

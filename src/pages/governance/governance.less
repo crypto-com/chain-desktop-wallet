@@ -1,4 +1,5 @@
 .governance-content {
+  position: relative;
   padding: 24px;
   .container {
     // max-width: 500px;
@@ -25,7 +26,7 @@
     }
     .ant-btn {
       width: 100%;
-      max-width: 190px;
+      // max-width: 190px;
       margin: 24px 0 -24px 0;
     }
     .row {
@@ -44,10 +45,32 @@
       cursor: pointer;
     }
   }
+  .back-button {
+    margin: 12px 0;
+  }
 }
 
-.proposal-modal {
-  width: 800px !important;
+.ant-layout-content .proposal-detail {
+  background: #fff;
+  .title {
+    margin-top: 16px;
+    font-size: 24px;
+  }
+  .description {
+    max-width: 800px;
+    color: @font-color;
+  }
+  .item {
+    margin: 30px 0;
+    .label {
+      color: @font-color;
+    }
+    .address {
+      padding: 10px 8px;
+      background: #f0f0f0;
+      border-radius: 4px;
+    }
+  }
   .ant-layout,
   .ant-layout-sider {
     background: #fff;
@@ -64,7 +87,6 @@
 
   .ant-card-head-title {
     color: @azure;
-    // font-weight: bold;
   }
   .ant-radio-group {
     width: 100%;
@@ -84,9 +106,5 @@
     .ant-radio-button-wrapper-checked {
       border: 1px solid @azure;
     }
-  }
-  .ant-btn {
-    width: 100%;
-    margin: 10px 0 0 0;
   }
 }
