@@ -13,6 +13,11 @@ import { NORMAL_WALLET_TYPE } from '../../service/LedgerService';
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
 
+enum sortOrder {
+  asc = 'ascend',
+  desc = 'descend',
+}
+
 function WalletPage() {
   const [session, setSession] = useRecoilState<Session>(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
@@ -85,6 +90,7 @@ function WalletPage() {
       dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
+      defaultSortOrder: sortOrder.asc,
     },
     {
       title: 'Address',
