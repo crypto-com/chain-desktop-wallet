@@ -395,7 +395,7 @@ const GovernancePage = () => {
                           size="small"
                           status="normal"
                           strokeColor={{
-                            from: '#73ef88',
+                            from: '#31ac46',
                             to: '#1a7905',
                           }}
                         />
@@ -407,7 +407,7 @@ const GovernancePage = () => {
                         <Progress
                           percent={parseFloat(proposalFigures.no.rate)}
                           strokeColor={{
-                            from: '#f27474',
+                            from: '#ec7777',
                             to: '#f27474',
                           }}
                           size="small"
@@ -421,8 +421,8 @@ const GovernancePage = () => {
                         <Progress
                           percent={parseFloat(proposalFigures.noWithVeto.rate)}
                           strokeColor={{
-                            from: '#f2b574',
-                            to: '#faab0e',
+                            from: '#e2c24d',
+                            to: '#f3a408',
                           }}
                           size="small"
                           status="normal"
@@ -436,7 +436,7 @@ const GovernancePage = () => {
                           percent={parseFloat(proposalFigures.abstain.rate)}
                           strokeColor={{
                             from: '#dbdddc',
-                            to: '#d5d7d7',
+                            to: '#b1b3b3',
                           }}
                           size="small"
                           status="normal"
