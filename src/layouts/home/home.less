@@ -1,13 +1,15 @@
 .home-layout {
   .ant-layout {
-    // for loading spin icon
-    height: 100vh;
     .header-description {
       margin: 16px 0 6px 36px;
       color: @font-color;
     }
+    &.loading {
+      // for loading spin icon
+      height: 100vh;
+    }
   }
-  .ant-layout-sider {
+  .ant-layout-sider.home-sider {
     position: fixed;
     left: 0;
     width: @sider-width !important;
@@ -41,7 +43,7 @@
       }
       .ant-menu-item-selected {
         color: @white;
-        background-color: @azure;
+        background-color: @azure !important;
         span,
         span a {
           color: @white;
@@ -100,7 +102,7 @@
       background: #e4f4ff;
     }
   }
-  .ant-layout-sider,
+  .ant-layout-sider.home-sider,
   .ant-menu {
     background: @background-color !important;
   }

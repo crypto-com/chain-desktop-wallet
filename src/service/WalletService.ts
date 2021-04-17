@@ -57,6 +57,7 @@ import {
   VoteRequest,
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
+import { FinalTallyResult } from './rpc/NodeRpcModels';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -285,7 +286,7 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncAll(currentSession);
+    await this.fetchAndSaveProposals(currentSession);
     return broadCastResult;
   }
 
@@ -840,12 +841,22 @@ class WalletService {
         ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD,
         ProposalStatuses.PROPOSAL_STATUS_PASSED,
         ProposalStatuses.PROPOSAL_STATUS_FAILED,
+        ProposalStatuses.PROPOSAL_STATUS_REJECTED,
       ]);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING PROPOSALS', e);
       return [];
     }
+  }
+
+  public async loadLatestProposalTally(proposalID: string): Promise<FinalTallyResult | null> {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+      return Promise.resolve(null);
+    }
+    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    return nodeRpc.loadLatestTally(proposalID);
   }
 }
 

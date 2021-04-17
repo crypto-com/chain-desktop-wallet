@@ -16,6 +16,7 @@ import HomePage from './home/home';
 import ReceivePage from './receive/receive';
 import WalletPage from './wallet/wallet';
 import StakingPage from './staking/staking';
+import GovernancePage from './governance/governance';
 import SettingsPage from './settings/settings';
 import SignUpPage from './signup/signup';
 import HomeLayout from '../layouts/home/home';
@@ -99,6 +100,12 @@ function RouteHub() {
       key: 'staking',
       path: '/staking',
       component: <StakingPage />,
+    },
+    {
+      name: 'Governance Page',
+      key: 'governance',
+      path: '/governance',
+      component: <GovernancePage />,
     },
     {
       name: 'Settings Page',

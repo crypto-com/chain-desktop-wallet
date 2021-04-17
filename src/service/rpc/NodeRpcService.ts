@@ -6,6 +6,8 @@ import { NodePorts } from '../../config/StaticConfig';
 import {
   AllProposalResponse,
   DelegationResult,
+  FinalTallyResult,
+  LoadedTallyResponse,
   Proposal,
   RewardResponse,
   ValidatorListResponse,
@@ -162,6 +164,19 @@ export class NodeRpcService implements INodeRpcService {
   public async loadStakingBalance(address: string, assetSymbol: string): Promise<string> {
     const delegationList = await this.fetchDelegationBalance(address, assetSymbol);
     return delegationList.totalBalance;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async loadLatestTally(proposalID: string): Promise<FinalTallyResult | null> {
+    try {
+      const url = `/cosmos/gov/v1beta1/proposals/${proposalID}/tally`;
+      const response = await this.cosmosClient.get<LoadedTallyResponse>(url);
+      return response.data.tally;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOAD_TALLY', e);
+      return null;
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
