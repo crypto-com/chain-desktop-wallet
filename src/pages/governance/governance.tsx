@@ -57,6 +57,14 @@ const GovernancePage = () => {
       vote: '',
       rate: '',
     },
+    noWithVeto: {
+      vote: '',
+      rate: '',
+    },
+    abstain: {
+      vote: '',
+      rate: '',
+    },
   });
   const [proposalList, setProposalList] = useState<ProposalModel[]>();
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
@@ -143,11 +151,11 @@ const GovernancePage = () => {
     const yesValue = new Big(_proposal.final_tally_result.yes);
     const noValue = new Big(_proposal.final_tally_result.no);
     const noWithVetoValue = new Big(_proposal.final_tally_result.no_with_veto);
-    const abstain = new Big(_proposal.final_tally_result.abstain);
+    const abstainValue = new Big(_proposal.final_tally_result.abstain);
     const totalVotes = yesValue
       .plus(noValue)
       .plus(noWithVetoValue)
-      .plus(abstain);
+      .plus(abstainValue);
     // in percentage
     const yesRate = totalVotes.gt('0')
       ? yesValue
@@ -155,24 +163,57 @@ const GovernancePage = () => {
           .times(100)
           .toPrecision(2)
       : `n.a.`;
+
     const noRate = totalVotes.gt('0')
+      ? noValue
+          .plus(noValue)
+          .div(totalVotes)
+          .times(100)
+          .toPrecision(2)
+      : `n.a.`;
+
+    const noWithVetoRate = totalVotes.gt('0')
       ? noValue
           .plus(noWithVetoValue)
           .div(totalVotes)
           .times(100)
           .toPrecision(2)
       : `n.a.`;
+
+    const abstainRate = totalVotes.gt('0')
+      ? noValue
+          .plus(abstainValue)
+          .div(totalVotes)
+          .times(100)
+          .toPrecision(2)
+      : `n.a.`;
+
+    const baseUnitDenominator = 1_0000_0000;
     setProposalFigures({
       yes: {
-        vote: yesValue.div(10000000).toFixed(),
+        vote: yesValue.div(baseUnitDenominator).toFixed(),
         rate: yesRate,
       },
       no: {
         vote: noValue
-          .plus(noWithVetoValue)
-          .div(10000000)
+          .plus(noValue)
+          .div(baseUnitDenominator)
           .toFixed(),
         rate: noRate,
+      },
+      noWithVeto: {
+        vote: noValue
+          .plus(noWithVetoValue)
+          .div(baseUnitDenominator)
+          .toFixed(),
+        rate: noWithVetoRate,
+      },
+      abstain: {
+        vote: noValue
+          .plus(abstainValue)
+          .div(baseUnitDenominator)
+          .toFixed(),
+        rate: abstainRate,
       },
     });
   };
@@ -244,11 +285,12 @@ const GovernancePage = () => {
 
   useEffect(() => {
     const fetchProposalList = async () => {
-      const list = await walletService.retrieveProposals(
+      const list: ProposalModel[] = await walletService.retrieveProposals(
         currentSession.wallet.config.network.chainId,
       );
 
-      setProposalList(list);
+      const latestProposalOnTop = list.reverse();
+      setProposalList(latestProposalOnTop);
     };
 
     if (!didMountRef.current) {
@@ -278,7 +320,9 @@ const GovernancePage = () => {
                       Proposal List
                     </div>
                   </a>
-                  <div className="title">{proposal?.content.title}</div>
+                  <div className="title">
+                    {proposal?.content.title} #ID-{proposal?.proposal_id}
+                  </div>
                   <div className="item">
                     <div className="status">{processStatusTag(proposal?.status)}</div>
                   </div>
@@ -334,6 +378,10 @@ const GovernancePage = () => {
                         percent={parseFloat(proposalFigures.yes.rate)}
                         size="small"
                         status="normal"
+                        strokeColor={{
+                          from: '#73ef88',
+                          to: '#1a7905',
+                        }}
                       />
                     </div>
                     <div>
@@ -345,6 +393,34 @@ const GovernancePage = () => {
                         strokeColor={{
                           from: '#f27474',
                           to: '#f27474',
+                        }}
+                        size="small"
+                        status="normal"
+                      />
+                    </div>
+                    <div>
+                      No with Veto - Do not support
+                      <br />
+                      {/* Vote:  {proposalFigures.no.vote} */}
+                      <Progress
+                        percent={parseFloat(proposalFigures.noWithVeto.rate)}
+                        strokeColor={{
+                          from: '#f2b574',
+                          to: '#faab0e',
+                        }}
+                        size="small"
+                        status="normal"
+                      />
+                    </div>
+                    <div>
+                      Abstain - No side
+                      <br />
+                      {/* Vote:  {proposalFigures.no.vote} */}
+                      <Progress
+                        percent={parseFloat(proposalFigures.abstain.rate)}
+                        strokeColor={{
+                          from: '#dbdddc',
+                          to: '#d5d7d7',
                         }}
                         size="small"
                         status="normal"
@@ -483,26 +559,7 @@ const GovernancePage = () => {
                     renderItem={item => (
                       <List.Item
                         key={item.proposal_id}
-                        actions={
-                          item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
-                            ? []
-                            : [
-                                <IconText
-                                  icon={LikeOutlined}
-                                  text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
-                                  key="list-vertical-yes-o"
-                                />,
-                                <IconText
-                                  icon={DislikeOutlined}
-                                  text={getUIVoteAmount(
-                                    item.final_tally_result.no +
-                                      item.final_tally_result.no_with_veto,
-                                    userAsset,
-                                  )}
-                                  key="list-vertical-no-o"
-                                />,
-                              ]
-                        }
+                        actions={[]}
                         onClick={() => {
                           setProposal(item);
                           setIsProposalVisible(true);
@@ -542,26 +599,47 @@ const GovernancePage = () => {
                     renderItem={item => (
                       <List.Item
                         key={item.proposal_id}
-                        actions={
-                          item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
-                            ? []
-                            : [
-                                <IconText
-                                  icon={LikeOutlined}
-                                  text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
-                                  key="list-vertical-yes-o"
-                                />,
-                                <IconText
-                                  icon={DislikeOutlined}
-                                  text={getUIVoteAmount(
-                                    item.final_tally_result.no +
-                                      item.final_tally_result.no_with_veto,
-                                    userAsset,
-                                  )}
-                                  key="list-vertical-no-o"
-                                />,
-                              ]
-                        }
+                        actions={[]}
+                        onClick={() => {
+                          setProposal(item);
+                          setIsProposalVisible(true);
+                          processProposalFigures(item);
+                        }}
+                      >
+                        <List.Item.Meta
+                          title={
+                            <>
+                              {processStatusTag(item.status)} #{item.proposal_id}{' '}
+                              <a>{item.content.title}</a>
+                            </>
+                          }
+                          description={
+                            <span>
+                              Start: {moment(item.voting_start_time).format('DD/MM/YYYY')} End:{' '}
+                              {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                            </span>
+                          }
+                        />
+                      </List.Item>
+                    )}
+                    pagination={{
+                      pageSize: 10,
+                    }}
+                  />
+                </div>
+              </div>
+            </TabPane>
+            <TabPane tab="Rejected" key="5">
+              <div className="site-layout-background governance-content">
+                <div className="container">
+                  <List
+                    dataSource={proposalList?.filter(item => {
+                      return item.status === ProposalStatuses.PROPOSAL_STATUS_REJECTED;
+                    })}
+                    renderItem={item => (
+                      <List.Item
+                        key={item.proposal_id}
+                        actions={[]}
                         onClick={() => {
                           setProposal(item);
                           setIsProposalVisible(true);
