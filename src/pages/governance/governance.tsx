@@ -3,7 +3,7 @@ import moment from 'moment';
 import './governance.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Layout, Tabs, List, Space, Radio, Button, Card, Progress, Tag } from 'antd';
+import { Layout, Tabs, List, Space, Radio, Button, Card, Progress, Tag, Spin } from 'antd';
 import Big from 'big.js';
 import { DislikeOutlined, LikeOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { useRecoilValue } from 'recoil';
@@ -48,7 +48,7 @@ const GovernancePage = () => {
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
   const [proposal, setProposal] = useState<ProposalModel>();
-  const [proposalFigures, setProposalFigures] = useState({
+  const initialFiguresStates = {
     yes: {
       vote: '',
       rate: '',
@@ -65,12 +65,14 @@ const GovernancePage = () => {
       vote: '',
       rate: '',
     },
-  });
+  };
+  const [proposalFigures, setProposalFigures] = useState(initialFiguresStates);
   const [proposalList, setProposalList] = useState<ProposalModel[]>();
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const currentSession = useRecoilValue(sessionState);
   const userAsset = useRecoilValue(walletAssetState);
   const didMountRef = useRef(false);
+  const [isLoadingTally, setIsLoadingTally] = useState(false);
 
   const handleCancelConfirmationModal = () => {
     setIsVisibleConfirmationModal(false);
@@ -115,43 +117,26 @@ const GovernancePage = () => {
     showPasswordInput();
   };
 
-  const onConfirm = async () => {
-    setConfirmLoading(true);
-    try {
-      const proposalID =
-        proposal?.proposal_id !== null && proposal?.proposal_id !== undefined
-          ? proposal?.proposal_id
-          : '';
-      const sendResult = await walletService.sendVote({
-        voteOption,
-        proposalID,
-        memo: DEFAULT_CLIENT_MEMO,
-        decryptedPhrase,
-        asset: userAsset,
-        walletType: currentSession.wallet.walletType,
-      });
-      setBroadcastResult(sendResult);
-      setIsVisibleConfirmationModal(false);
-      setConfirmLoading(false);
-      setInputPasswordVisible(false);
-      setIsSuccessModalVisible(true);
-    } catch (e) {
-      setErrorMessages(e.message.split(': '));
-      setIsVisibleConfirmationModal(false);
-      setConfirmLoading(false);
-      // setInputPasswordVisible(false);
-      setIsErrorModalVisible(true);
-      // eslint-disable-next-line no-console
-      console.log('Error occurred while transfer', e);
-    }
-    setConfirmLoading(false);
-  };
+  const processProposalFigures = async (_proposal: ProposalModel) => {
+    let currentProposalTally = _proposal.final_tally_result;
 
-  const processProposalFigures = _proposal => {
-    const yesValue = new Big(_proposal.final_tally_result.yes);
-    const noValue = new Big(_proposal.final_tally_result.no);
-    const noWithVetoValue = new Big(_proposal.final_tally_result.no_with_veto);
-    const abstainValue = new Big(_proposal.final_tally_result.abstain);
+    // Reset previous state figures
+    setProposalFigures(initialFiguresStates);
+
+    // Load latest tally result if proposal is in voting period
+    if (_proposal.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD) {
+      setIsLoadingTally(true);
+      const latestTally = await walletService.loadLatestProposalTally(_proposal.proposal_id);
+      if (!latestTally) {
+        return;
+      }
+      currentProposalTally = latestTally;
+      setIsLoadingTally(false);
+    }
+    const yesValue = new Big(currentProposalTally.yes);
+    const noValue = new Big(currentProposalTally.no);
+    const noWithVetoValue = new Big(currentProposalTally.no_with_veto);
+    const abstainValue = new Big(currentProposalTally.abstain);
     const totalVotes = yesValue
       .plus(noValue)
       .plus(noWithVetoValue)
@@ -216,6 +201,46 @@ const GovernancePage = () => {
         rate: abstainRate,
       },
     });
+  };
+
+  const onConfirm = async () => {
+    if (!proposal) {
+      return;
+    }
+
+    setConfirmLoading(true);
+    try {
+      const proposalID =
+        proposal?.proposal_id !== null && proposal?.proposal_id !== undefined
+          ? proposal?.proposal_id
+          : '';
+      const sendResult = await walletService.sendVote({
+        voteOption,
+        proposalID,
+        memo: DEFAULT_CLIENT_MEMO,
+        decryptedPhrase,
+        asset: userAsset,
+        walletType: currentSession.wallet.walletType,
+      });
+
+      // Update latest tally result
+      await processProposalFigures(proposal);
+
+      setBroadcastResult(sendResult);
+      setIsVisibleConfirmationModal(false);
+      setConfirmLoading(false);
+      setInputPasswordVisible(false);
+      setIsSuccessModalVisible(true);
+    } catch (e) {
+      setErrorMessages(e.message.split(': '));
+      setIsVisibleConfirmationModal(false);
+      setConfirmLoading(false);
+      // setInputPasswordVisible(false);
+      setIsErrorModalVisible(true);
+      // eslint-disable-next-line no-console
+      console.log('Error occurred while transfer', e);
+    }
+    setConfirmLoading(false);
   };
 
   const processStatusTag = status => {
@@ -369,64 +394,66 @@ const GovernancePage = () => {
                   </div>
                 </Content>
                 <Sider width="300px">
-                  <Card title="Current results">
-                    <div>
-                      Yes - Support
-                      <br />
-                      {/* Vote: {proposalFigures.yes.vote} */}
-                      <Progress
-                        percent={parseFloat(proposalFigures.yes.rate)}
-                        size="small"
-                        status="normal"
-                        strokeColor={{
-                          from: '#73ef88',
-                          to: '#1a7905',
-                        }}
-                      />
-                    </div>
-                    <div>
-                      No - Do not support
-                      <br />
-                      {/* Vote:  {proposalFigures.no.vote} */}
-                      <Progress
-                        percent={parseFloat(proposalFigures.no.rate)}
-                        strokeColor={{
-                          from: '#f27474',
-                          to: '#f27474',
-                        }}
-                        size="small"
-                        status="normal"
-                      />
-                    </div>
-                    <div>
-                      No with Veto - Do not support
-                      <br />
-                      {/* Vote:  {proposalFigures.no.vote} */}
-                      <Progress
-                        percent={parseFloat(proposalFigures.noWithVeto.rate)}
-                        strokeColor={{
-                          from: '#f2b574',
-                          to: '#faab0e',
-                        }}
-                        size="small"
-                        status="normal"
-                      />
-                    </div>
-                    <div>
-                      Abstain - No side
-                      <br />
-                      {/* Vote:  {proposalFigures.no.vote} */}
-                      <Progress
-                        percent={parseFloat(proposalFigures.abstain.rate)}
-                        strokeColor={{
-                          from: '#dbdddc',
-                          to: '#d5d7d7',
-                        }}
-                        size="small"
-                        status="normal"
-                      />
-                    </div>
-                  </Card>
+                  <Spin spinning={isLoadingTally} tip="Loading latest results">
+                    <Card title="Current results" style={{ padding: '4px' }}>
+                      <div>
+                        Yes - Support
+                        <br />
+                        {/* Vote: {proposalFigures.yes.vote} */}
+                        <Progress
+                          percent={parseFloat(proposalFigures.yes.rate)}
+                          size="small"
+                          status="normal"
+                          strokeColor={{
+                            from: '#73ef88',
+                            to: '#1a7905',
+                          }}
+                        />
+                      </div>
+                      <div>
+                        No - Do not support
+                        <br />
+                        {/* Vote:  {proposalFigures.no.vote} */}
+                        <Progress
+                          percent={parseFloat(proposalFigures.no.rate)}
+                          strokeColor={{
+                            from: '#f27474',
+                            to: '#f27474',
+                          }}
+                          size="small"
+                          status="normal"
+                        />
+                      </div>
+                      <div>
+                        No with Veto - Do not support
+                        <br />
+                        {/* Vote:  {proposalFigures.no.vote} */}
+                        <Progress
+                          percent={parseFloat(proposalFigures.noWithVeto.rate)}
+                          strokeColor={{
+                            from: '#f2b574',
+                            to: '#faab0e',
+                          }}
+                          size="small"
+                          status="normal"
+                        />
+                      </div>
+                      <div>
+                        Abstain - No side
+                        <br />
+                        {/* Vote:  {proposalFigures.no.vote} */}
+                        <Progress
+                          percent={parseFloat(proposalFigures.abstain.rate)}
+                          strokeColor={{
+                            from: '#dbdddc',
+                            to: '#d5d7d7',
+                          }}
+                          size="small"
+                          status="normal"
+                        />
+                      </div>
+                    </Card>
+                  </Spin>
                 </Sider>
               </Layout>
             </div>
@@ -438,7 +465,7 @@ const GovernancePage = () => {
                 <div className="container">
                   <List
                     dataSource={proposalList}
-                    renderItem={item => (
+                    renderItem={(item: ProposalModel) => (
                       <List.Item
                         key={item.proposal_id}
                         actions={

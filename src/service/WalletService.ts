@@ -57,6 +57,7 @@ import {
   VoteRequest,
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
+import { FinalTallyResult } from './rpc/NodeRpcModels';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -847,6 +848,15 @@ class WalletService {
       console.log('FAILED_LOADING PROPOSALS', e);
       return [];
     }
+  }
+
+  public async loadLatestProposalTally(proposalID: string): Promise<FinalTallyResult | null> {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+      return Promise.resolve(null);
+    }
+    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    return nodeRpc.loadLatestTally(proposalID);
   }
 }
 
