@@ -440,7 +440,7 @@ const GovernancePage = () => {
                         />
                       </div>
                       <div>
-                        Abstain - No side
+                        Abstain - Undecided
                         <br />
                         {/* Vote:  {proposalFigures.no.vote} */}
                         <Progress
