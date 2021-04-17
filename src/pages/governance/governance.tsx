@@ -386,7 +386,7 @@ const GovernancePage = () => {
                 <Sider width="300px">
                   <Spin spinning={isLoadingTally} tip="Loading latest results">
                     <Card title="Current results" style={{ padding: '4px' }}>
-                      <div>
+                      <div className="vote-result-section">
                         Yes - Support
                         <br />
                         {/* Vote: {proposalFigures.yes.vote} */}
@@ -400,7 +400,8 @@ const GovernancePage = () => {
                           }}
                         />
                       </div>
-                      <div>
+
+                      <div className="vote-result-section">
                         No - Do not support
                         <br />
                         {/* Vote:  {proposalFigures.no.vote} */}
@@ -414,7 +415,8 @@ const GovernancePage = () => {
                           status="normal"
                         />
                       </div>
-                      <div>
+
+                      <div className="vote-result-section">
                         No with Veto - Do not support
                         <br />
                         {/* Vote:  {proposalFigures.no.vote} */}
@@ -428,7 +430,8 @@ const GovernancePage = () => {
                           status="normal"
                         />
                       </div>
-                      <div>
+
+                      <div className="vote-result-section">
                         Abstain - Undecided
                         <br />
                         {/* Vote:  {proposalFigures.no.vote} */}
