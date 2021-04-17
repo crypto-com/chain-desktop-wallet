@@ -128,6 +128,7 @@ const GovernancePage = () => {
       setIsLoadingTally(true);
       const latestTally = await walletService.loadLatestProposalTally(_proposal.proposal_id);
       if (!latestTally) {
+        setIsLoadingTally(false);
         return;
       }
       currentProposalTally = latestTally;
