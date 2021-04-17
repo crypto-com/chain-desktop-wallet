@@ -128,7 +128,7 @@ const GovernancePage = () => {
       setIsLoadingTally(true);
       const latestTally = await walletService.loadLatestProposalTally(_proposal.proposal_id);
       if (!latestTally) {
-        setIsLoadingTally(false);
+        // When not connected or couldn't load tally - Let it show that it couldn't load by spinning
         return;
       }
       currentProposalTally = latestTally;
