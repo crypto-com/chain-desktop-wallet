@@ -173,6 +173,7 @@ export class NodeRpcService implements INodeRpcService {
       const response = await this.cosmosClient.get<LoadedTallyResponse>(url);
       return response.data.tally;
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log('FAILED_LOAD_TALLY', e);
       return null;
     }

@@ -134,6 +134,7 @@ const GovernancePage = () => {
       currentProposalTally = latestTally;
       setIsLoadingTally(false);
     }
+
     const yesValue = new Big(currentProposalTally.yes);
     const noValue = new Big(currentProposalTally.no);
     const noWithVetoValue = new Big(currentProposalTally.no_with_veto);
@@ -152,23 +153,20 @@ const GovernancePage = () => {
 
     const noRate = totalVotes.gt('0')
       ? noValue
-          .plus(noValue)
           .div(totalVotes)
           .times(100)
           .toPrecision(2)
       : `n.a.`;
 
     const noWithVetoRate = totalVotes.gt('0')
-      ? noValue
-          .plus(noWithVetoValue)
+      ? noWithVetoValue
           .div(totalVotes)
           .times(100)
           .toPrecision(2)
       : `n.a.`;
 
     const abstainRate = totalVotes.gt('0')
-      ? noValue
-          .plus(abstainValue)
+      ? abstainValue
           .div(totalVotes)
           .times(100)
           .toPrecision(2)
@@ -181,24 +179,15 @@ const GovernancePage = () => {
         rate: yesRate,
       },
       no: {
-        vote: noValue
-          .plus(noValue)
-          .div(baseUnitDenominator)
-          .toFixed(),
+        vote: noValue.div(baseUnitDenominator).toFixed(),
         rate: noRate,
       },
       noWithVeto: {
-        vote: noValue
-          .plus(noWithVetoValue)
-          .div(baseUnitDenominator)
-          .toFixed(),
+        vote: noWithVetoValue.div(baseUnitDenominator).toFixed(),
         rate: noWithVetoRate,
       },
       abstain: {
-        vote: noValue
-          .plus(abstainValue)
-          .div(baseUnitDenominator)
-          .toFixed(),
+        vote: abstainValue.div(baseUnitDenominator).toFixed(),
         rate: abstainRate,
       },
     });
@@ -385,7 +374,7 @@ const GovernancePage = () => {
                         </Radio.Group>
                         {/* <div className="item"> */}
                         <Button type="primary" disabled={!voteOption} onClick={onVote}>
-                          Vote
+                          Send Vote
                         </Button>
                         {/* </div> */}
                       </Card>
@@ -772,7 +761,7 @@ const GovernancePage = () => {
               The transaction timed out but it will be included in the subsequent blocks
             </div>
           ) : (
-            <div className="description">The transaction was broadcasted successfully!</div>
+            <div className="description">Your vote was broadcasted successfully!</div>
           )}
           {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
         </>
@@ -786,7 +775,7 @@ const GovernancePage = () => {
       >
         <>
           <div className="description">
-            The transfer transaction failed. Please try again later.
+            The vote transaction failed. Please try again later.
             <br />
             {errorMessages
               .filter((item, idx) => {
