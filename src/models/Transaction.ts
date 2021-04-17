@@ -1,4 +1,4 @@
-import { ValidatorPubKey } from '../service/rpc/NodeRpcModels';
+import { Proposal, ValidatorPubKey } from '../service/rpc/NodeRpcModels';
 
 export enum TransactionStatus {
   SUCCESS = 'SUCCESS',
@@ -53,6 +53,11 @@ export interface ValidatorList {
   chainId: string;
 }
 
+export interface ProposalList {
+  proposals: Array<ProposalModel>;
+  chainId: string;
+}
+
 export interface RewardTransaction {
   delegatorAddress: string;
   validatorAddress: string;
@@ -77,4 +82,23 @@ export interface ValidatorModel {
   readonly currentTokens: string;
   readonly currentShares: string;
   readonly pubKey: ValidatorPubKey;
+}
+
+export interface ProposalModel extends Proposal {}
+
+export const ProposalStatuses = {
+  PROPOSAL_STATUS_UNSPECIFIED: 'PROPOSAL_STATUS_UNSPECIFIED',
+  PROPOSAL_STATUS_DEPOSIT_PERIOD: 'PROPOSAL_STATUS_DEPOSIT_PERIOD',
+  PROPOSAL_STATUS_VOTING_PERIOD: 'PROPOSAL_STATUS_VOTING_PERIOD',
+  PROPOSAL_STATUS_PASSED: 'PROPOSAL_STATUS_PASSED',
+  PROPOSAL_STATUS_REJECTED: 'PROPOSAL_STATUS_REJECTED',
+  PROPOSAL_STATUS_FAILED: 'PROPOSAL_STATUS_FAILED',
+};
+
+export enum VoteOption {
+  VOTE_OPTION_UNSPECIFIED = 0,
+  VOTE_OPTION_YES = 1,
+  VOTE_OPTION_ABSTAIN = 2,
+  VOTE_OPTION_NO = 3,
+  VOTE_OPTION_NO_WITH_VETO = 4,
 }

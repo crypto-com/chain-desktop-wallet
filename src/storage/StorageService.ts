@@ -8,6 +8,7 @@ import {
   UserAsset,
 } from '../models/UserAsset';
 import {
+  ProposalList,
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
@@ -231,11 +232,17 @@ export class StorageService {
   }
 
   public async saveStakingTransactions(stakingTransactions: StakingTransactionList) {
+    if (stakingTransactions.transactions.length === 0) {
+      return Promise.resolve();
+    }
     await this.db.stakingStore.remove({ walletId: stakingTransactions.walletId }, { multi: true });
     return this.db.stakingStore.insert(stakingTransactions);
   }
 
   public async saveRewardList(rewardTransactions: RewardTransactionList) {
+    if (rewardTransactions.transactions.length === 0) {
+      return Promise.resolve();
+    }
     await this.db.rewardStore.remove({ walletId: rewardTransactions.walletId }, { multi: true });
     return this.db.rewardStore.insert(rewardTransactions);
   }
@@ -249,6 +256,9 @@ export class StorageService {
   }
 
   public async saveTransferTransactions(transferTransactionList: TransferTransactionList) {
+    if (transferTransactionList.transactions.length === 0) {
+      return Promise.resolve();
+    }
     await this.db.transferStore.remove(
       { walletId: transferTransactionList.walletId },
       { multi: true },
@@ -261,11 +271,26 @@ export class StorageService {
   }
 
   public async saveValidators(validatorList: ValidatorList) {
+    if (validatorList.validators.length === 0) {
+      return Promise.resolve();
+    }
     await this.db.validatorStore.remove({ chainId: validatorList.chainId }, { multi: true });
     return this.db.validatorStore.insert<ValidatorList>(validatorList);
   }
 
   public async retrieveAllValidators(chainId: string) {
     return this.db.validatorStore.findOne<ValidatorList>({ chainId });
+  }
+
+  public async saveProposals(proposalList: ProposalList) {
+    if (proposalList.proposals.length === 0) {
+      return Promise.resolve();
+    }
+    await this.db.proposalStore.remove({ chainId: proposalList.chainId }, { multi: true });
+    return this.db.proposalStore.insert<ProposalList>(proposalList);
+  }
+
+  public async retrieveAllProposals(chainId: string) {
+    return this.db.proposalStore.findOne<ProposalList>({ chainId });
   }
 }

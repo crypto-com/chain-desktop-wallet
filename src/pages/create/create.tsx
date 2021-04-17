@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { Button, Form, Input, Select, Checkbox, notification } from 'antd';
+import { Button, Checkbox, Form, Input, notification, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { walletIdentifierState, walletTempBackupState } from '../../recoil/atom';
 import './create.less';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions, WalletCreator } from '../../service/WalletCreator';
-import { LedgerWalletMaximum, DefaultWalletConfigs, CosmosPorts } from '../../config/StaticConfig';
+import { DefaultWalletConfigs, LedgerWalletMaximum, NodePorts } from '../../config/StaticConfig';
 import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
@@ -21,8 +21,8 @@ import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
 import IconLedger from '../../svg/IconLedger';
 import {
-  detectLedgerStatus,
   createLedgerDevice,
+  detectConditionsError,
   LEDGER_WALLET_TYPE,
   NORMAL_WALLET_TYPE,
 } from '../../service/LedgerService';
@@ -95,7 +95,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
     form.validateFields().then(async values => {
       setCheckingNodeConnection(true);
       const { nodeUrl } = values;
-      const isNodeLive = await walletService.checkNodeIsLive(`${nodeUrl}${CosmosPorts.Main}`);
+      const isNodeLive = await walletService.checkNodeIsLive(`${nodeUrl}${NodePorts.Tendermint}`);
       setCheckingNodeConnection(false);
 
       if (isNodeLive) {
@@ -377,8 +377,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       let message = `Cannot detect any Ledger device`;
       let description = `Please connect with your Ledger device`;
       if (walletType === LEDGER_WALLET_TYPE) {
-        const ledgerStatus = await detectLedgerStatus();
-        if (ledgerStatus === 'NORMAL') {
+        if (detectConditionsError(e.toString())) {
           message = `No Expert Mode`;
           description = 'Please ensure that your have enabled Expert mode on your ledger device.';
         }

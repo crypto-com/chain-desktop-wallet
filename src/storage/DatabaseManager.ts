@@ -25,6 +25,8 @@ export class DatabaseManager {
 
   public readonly validatorStore: Datastore;
 
+  public readonly proposalStore: Datastore;
+
   constructor(namespace: string) {
     this.sessionStore = getStore(namespace, 'session');
     this.walletStore = getStore(namespace, 'wallets');
@@ -36,5 +38,6 @@ export class DatabaseManager {
     this.credentialStore = getStore(namespace, 'credential');
     this.seedStore = getStore(namespace, 'seeds');
     this.validatorStore = getStore(namespace, 'validators');
+    this.proposalStore = getStore(namespace, 'proposals');
   }
 }

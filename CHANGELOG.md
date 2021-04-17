@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.2.0] - 2021-04-17
+
+### Additions
+- Governance support added to the desktop wallet app
+- Supporting all proposal types listing and grouping 
+- Support vote broadcasting on current selected proposal
+
 ## [v0.1.6] - 2021-04-14
 
 ### Additions

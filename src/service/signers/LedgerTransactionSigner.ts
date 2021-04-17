@@ -13,6 +13,7 @@ import {
   WithdrawStakingRewardUnsigned,
   UndelegateTransactionUnsigned,
   RedelegateTransactionUnsigned,
+  VoteTransactionUnsigned,
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
 import { ITransactionSigner } from './TransactionSigner';
@@ -65,6 +66,41 @@ export class LedgerTransactionSigner implements ITransactionSigner {
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
     const signableTx = rawTx
       .appendMessage(msgSend)
+      .addSigner({
+        publicKey: pubkey,
+        accountNumber: new Big(transaction.accountNumber),
+        accountSequence: new Big(transaction.accountSequence),
+        signMode: 0, //   LEGACY_AMINO_JSON = 0, DIRECT = 1,
+      })
+      .toSignable();
+
+    const bytesMessage: Bytes = signableTx.toSignDocument(0);
+    const signature = await this.signerProvider.sign(bytesMessage);
+
+    return signableTx
+      .setSignature(0, signature)
+      .toSigned()
+      .getHexEncoded();
+  }
+
+  public async signVoteTransaction(
+    transaction: VoteTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
+
+    const msgVote = new cro.gov.MsgVote({
+      voter: transaction.voter,
+      option: transaction.option,
+      proposalId: Big(transaction.proposalID),
+    });
+
+    const pubkeyoriginal = (
+      await this.signerProvider.getPubKey(this.addressIndex, false)
+    ).toUint8Array();
+    const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
+    const signableTx = rawTx
+      .appendMessage(msgVote)
       .addSigner({
         publicKey: pubkey,
         accountNumber: new Big(transaction.accountNumber),

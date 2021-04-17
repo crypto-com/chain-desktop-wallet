@@ -1,8 +1,18 @@
 import { UserAsset } from '../models/UserAsset';
+import { VoteOption } from '../models/Transaction';
 
 export interface TransferRequest {
   toAddress: string;
   amount: string;
+  memo: string;
+  decryptedPhrase: string;
+  asset: UserAsset;
+  walletType: string; // normal, ledger
+}
+
+export interface VoteRequest {
+  voteOption: VoteOption;
+  proposalID: string;
   memo: string;
   decryptedPhrase: string;
   asset: UserAsset;
