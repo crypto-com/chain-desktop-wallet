@@ -1,5 +1,5 @@
 import { UserAsset } from '../models/UserAsset';
-import { VoteOptions } from '../models/Transaction';
+import { VoteOption } from '../models/Transaction';
 
 export interface TransferRequest {
   toAddress: string;
@@ -11,7 +11,7 @@ export interface TransferRequest {
 }
 
 export interface VoteRequest {
-  voteOption: VoteOptions;
+  voteOption: VoteOption;
   proposalID: string;
   memo: string;
   decryptedPhrase: string;

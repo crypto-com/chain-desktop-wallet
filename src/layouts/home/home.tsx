@@ -9,6 +9,7 @@ import Icon, {
   LoadingOutlined,
   PlusOutlined,
   ReloadOutlined,
+  BankOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
 import { useRecoilState } from 'recoil';
@@ -55,6 +56,15 @@ function HomeLayout(props: HomeLayoutProps) {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet validators list', e);
+    }
+  }
+
+  async function fetchAndSetNewProposals() {
+    try {
+      await walletService.fetchAndSaveProposals(session);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Failed loading new wallet proposals', e);
     }
   }
 
@@ -115,6 +125,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
       await fetchAndSetNewValidators();
+      await fetchAndSetNewProposals();
       setLoading(false);
     };
 
@@ -139,7 +150,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   const HomeMenu = () => {
     const locationPath = useLocation().pathname;
-    const paths = ['/home', '/staking', '/send', '/receive', '/settings', '/wallet'];
+    const paths = ['/home', '/staking', '/send', '/receive', '/settings', '/governance', '/wallet'];
 
     let menuSelectedKey = locationPath;
     if (!paths.includes(menuSelectedKey)) {
@@ -159,6 +170,9 @@ function HomeLayout(props: HomeLayoutProps) {
         </Menu.Item>
         <Menu.Item key="/receive" icon={<Icon component={IconReceive} />}>
           <Link to="/receive">Receive</Link>
+        </Menu.Item>
+        <Menu.Item key="/governance" icon={<BankOutlined />}>
+          <Link to="/governance">Governance</Link>
         </Menu.Item>
         <Menu.Item key="/settings" icon={<SettingOutlined />}>
           <Link to="/settings">Settings</Link>
@@ -216,8 +230,8 @@ function HomeLayout(props: HomeLayoutProps) {
 
   return (
     <main className="home-layout">
-      <Layout>
-        <Sider>
+      <Layout className={loading ? 'loading' : ''}>
+        <Sider className="home-sider">
           <div className="logo" />
           <div className="version">SAMPLE WALLET v{buildVersion}</div>
           <HomeMenu />

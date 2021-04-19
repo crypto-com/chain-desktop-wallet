@@ -1,0 +1,113 @@
+.governance-content {
+  position: relative;
+  padding: 24px;
+  .container {
+    // max-width: 500px;
+    .description {
+      margin-bottom: 20px;
+      color: @font-color;
+    }
+    .amount {
+      .ant-form-item {
+        margin: 0;
+      }
+      .available {
+        position: relative;
+        margin: 5px 0 20px 0;
+        span {
+          color: @font-color;
+        }
+        .available-amount {
+          position: absolute;
+          right: 0;
+          bottom: 0;
+        }
+      }
+    }
+    .ant-btn {
+      width: 100%;
+      // max-width: 190px;
+      margin: 24px 0 -24px 0;
+    }
+    .row {
+      .ant-form-item {
+        display: inline-block;
+        width: 48%;
+      }
+      .ant-form-item:first-of-type {
+        margin-right: 4%;
+      }
+      .ant-form-item-label {
+        width: 100%;
+      }
+    }
+    .ant-list-item {
+      cursor: pointer;
+    }
+  }
+  .back-button {
+    margin: 12px 0;
+  }
+}
+
+.ant-layout-content .proposal-detail {
+  background: #fff;
+  .title {
+    margin-top: 16px;
+    font-size: 24px;
+  }
+  .description {
+    max-width: 800px;
+    color: @font-color;
+  }
+  .item {
+    margin: 30px 0;
+    .label {
+      color: @font-color;
+    }
+    .address {
+      padding: 10px 8px;
+      background: #f0f0f0;
+      border-radius: 4px;
+    }
+  }
+  .ant-layout,
+  .ant-layout-sider {
+    background: #fff;
+  }
+  .ant-layout {
+    margin: 10px;
+    .ant-layout-content {
+      margin: 0 10px;
+      .description {
+        white-space: pre-line;
+      }
+    }
+  }
+
+  .ant-card-head-title {
+    color: @azure;
+  }
+  .vote-result-section {
+    padding-bottom: 10px;
+  }
+  .ant-radio-group {
+    width: 100%;
+    text-align: center;
+    .ant-radio-button-wrapper {
+      display: block;
+      height: 46px;
+      margin-bottom: 8px;
+      line-height: 46px;
+      border: 1px solid #d9d9d9;
+      border-radius: @border-radius;
+
+      &::before {
+        width: 0;
+      }
+    }
+    .ant-radio-button-wrapper-checked {
+      border: 1px solid @azure;
+    }
+  }
+}

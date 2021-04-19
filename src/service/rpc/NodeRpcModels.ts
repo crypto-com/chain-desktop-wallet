@@ -183,3 +183,7 @@ export interface AllProposalResponse {
   proposals: Proposal[];
   pagination: Pagination;
 }
+
+export interface LoadedTallyResponse {
+  tally: FinalTallyResult;
+}
