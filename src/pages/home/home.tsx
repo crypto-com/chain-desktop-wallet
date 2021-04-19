@@ -203,8 +203,6 @@ function HomePage() {
   };
 
   useEffect(() => {
-    let unmounted = false;
-
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
@@ -218,23 +216,17 @@ function HomePage() {
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
-      if (!unmounted) {
-        showWalletStateNotification(currentSession.wallet.config);
-        setDelegations(stakingTabularData);
-        setTransfers(transferTabularData);
-        setUserAsset(currentAsset);
-        setHasShownNotLiveWallet(true);
-      }
+      showWalletStateNotification(currentSession.wallet.config);
+      setDelegations(stakingTabularData);
+      setTransfers(transferTabularData);
+      setUserAsset(currentAsset);
+      setHasShownNotLiveWallet(true);
     };
 
     if (!didMountRef.current) {
       syncAssetData();
       didMountRef.current = true;
     }
-
-    return () => {
-      unmounted = true;
-    };
   }, [delegations, userAsset, hasShownNotLiveWallet]);
 
   const TransactionColumns = [
