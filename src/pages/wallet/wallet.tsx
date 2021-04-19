@@ -113,15 +113,20 @@ function WalletPage() {
       key: 'walletType',
       children: [
         {
-          title: session?.wallet.walletType,
+          // Old wallets (Before Ledger support ) did not have a wallet type property on creation : So they would crash on this level
+          title:
+            session?.wallet.walletType && session?.wallet.walletType.length > 2
+              ? session?.wallet.walletType.charAt(0).toUpperCase() +
+                session?.wallet.walletType.slice(1)
+              : NORMAL_WALLET_TYPE,
           dataIndex: 'walletType',
+          // Same as title above
+          render: walletType =>
+            walletType && walletType.length > 2
+              ? walletType.charAt(0).toUpperCase() + walletType.slice(1)
+              : NORMAL_WALLET_TYPE,
         },
       ],
-      // Old wallets (Before Ledger support ) did not have a wallet type property on creation : So they would crash on this level
-      render: walletType =>
-        walletType && walletType.length > 2
-          ? walletType.charAt(0).toUpperCase() + walletType.slice(1)
-          : NORMAL_WALLET_TYPE,
     },
     {
       title: 'Network',
