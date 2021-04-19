@@ -230,7 +230,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   return (
     <main className="home-layout">
-      <Layout className={loading ? 'loading' : ''}>
+      <Layout>
         <Sider className="home-sider">
           <div className="logo" />
           <div className="version">SAMPLE WALLET v{buildVersion}</div>
@@ -249,11 +249,11 @@ function HomeLayout(props: HomeLayoutProps) {
             </div>
           </Dropdown>
         </Sider>
-        {loading ? (
-          <Spin indicator={<LoadingOutlined style={{ fontSize: 96 }} spin />} />
-        ) : (
-          props.children
-        )}
+        <div className="home-page">
+          <Spin spinning={loading} indicator={<LoadingOutlined style={{ fontSize: 96 }} />}>
+            <div className="container">{props.children}</div>
+          </Spin>
+        </div>
         <ModalPopup
           isModalVisible={isConfirmationModalVisible}
           handleCancel={handleCancel}
