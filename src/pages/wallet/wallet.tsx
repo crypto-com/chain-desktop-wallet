@@ -3,12 +3,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import './wallet.less';
 import 'antd/dist/antd.css';
-import { Layout, Space, Spin, Table, Typography } from 'antd';
-import { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
+import { Layout, Space, Spin, Table, Typography, Tag } from 'antd';
+import Icon, { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
 import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
-import { NORMAL_WALLET_TYPE } from '../../service/LedgerService';
+import { LEDGER_WALLET_TYPE, NORMAL_WALLET_TYPE } from '../../service/LedgerService';
+import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import IconLedger from '../../svg/IconLedger';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -39,6 +41,29 @@ function WalletPage() {
     }, []);
 
     return list;
+  };
+
+  const processNetworkTag = (network, selectedWallet) => {
+    let networkColor;
+
+    switch (network) {
+      case DefaultWalletConfigs.MainNetConfig.name:
+        networkColor = 'success';
+        break;
+      case DefaultWalletConfigs.TestNetConfig.name:
+        networkColor = 'error';
+        break;
+      default:
+        networkColor = 'default';
+    }
+    return (
+      <Tag
+        style={{ border: 'none', padding: '5px 14px', fontSize: selectedWallet ? '14px' : '12px' }}
+        color={networkColor}
+      >
+        {network}
+      </Tag>
+    );
   };
 
   const walletSelect = async e => {
@@ -115,16 +140,30 @@ function WalletPage() {
         {
           // Old wallets (Before Ledger support ) did not have a wallet type property on creation : So they would crash on this level
           title:
-            session?.wallet.walletType && session?.wallet.walletType.length > 2
-              ? session?.wallet.walletType.charAt(0).toUpperCase() +
-                session?.wallet.walletType.slice(1)
-              : NORMAL_WALLET_TYPE,
+            session?.wallet.walletType && session?.wallet.walletType.length > 2 ? (
+              <>
+                {session?.wallet.walletType.charAt(0).toUpperCase() +
+                  session?.wallet.walletType.slice(1)}
+                {session?.wallet.walletType === LEDGER_WALLET_TYPE ? (
+                  <Icon component={IconLedger} />
+                ) : (
+                  ''
+                )}
+              </>
+            ) : (
+              NORMAL_WALLET_TYPE
+            ),
           dataIndex: 'walletType',
           // Same as title above
           render: walletType =>
-            walletType && walletType.length > 2
-              ? walletType.charAt(0).toUpperCase() + walletType.slice(1)
-              : NORMAL_WALLET_TYPE,
+            walletType && walletType.length > 2 ? (
+              <>
+                {walletType.charAt(0).toUpperCase() + walletType.slice(1)}
+                {walletType === LEDGER_WALLET_TYPE ? <Icon component={IconLedger} /> : ''}
+              </>
+            ) : (
+              NORMAL_WALLET_TYPE
+            ),
         },
       ],
     },
@@ -133,9 +172,9 @@ function WalletPage() {
       key: 'network',
       children: [
         {
-          title: session?.wallet.config.name,
+          title: processNetworkTag(session?.wallet.config.name, true),
           render: record => {
-            return record.config.name;
+            return processNetworkTag(record.config.name, false);
           },
         },
       ],
@@ -149,7 +188,7 @@ function WalletPage() {
           title: (
             <CheckOutlined
               style={{
-                fontSize: '18px',
+                fontSize: '22px',
                 color: '#1199fa',
                 position: 'absolute',
                 top: '20px',
