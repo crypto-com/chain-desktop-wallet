@@ -249,7 +249,7 @@ function HomeLayout(props: HomeLayoutProps) {
             </div>
           </Dropdown>
         </Sider>
-        <div className="home-page">
+        <div className={`home-page ${loading ? 'loading' : ''}`}>
           <Spin spinning={loading} indicator={<LoadingOutlined style={{ fontSize: 96 }} />}>
             <div className="container">{props.children}</div>
           </Spin>

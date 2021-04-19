@@ -122,8 +122,12 @@
     height: 100vh;
     margin-left: @sider-width;
     > .ant-spin-nested-loading :not(.ant-spin-container) .ant-spin {
-      height: 100vh !important;
       max-height: none !important;
+    }
+    &.loading {
+      .ant-spin {
+        height: 100vh !important;
+      }
     }
   }
 }
