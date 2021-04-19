@@ -27,23 +27,17 @@ function WalletPage() {
   const didMountRef = useRef(false);
 
   const processWalletList = (wallets, currentAsset) => {
-    const list = wallets.map((wallet, idx) => {
+    const list = wallets.reduce((resultList, wallet, idx) => {
       const walletModel = {
         ...wallet,
         key: `${idx}`,
       };
-      return walletModel;
-    });
-    // Move current wallet to the top
-    list.sort((x, y) => {
-      if (x.identifier === currentAsset.walletId) {
-        return -1;
+      if (wallet.identifier !== currentAsset.walletId) {
+        resultList.push(walletModel);
       }
-      if (y.identifier === currentAsset.walletId) {
-        return 1;
-      }
-      return 0;
-    });
+      return resultList;
+    }, []);
+
     return list;
   };
 
@@ -89,19 +83,40 @@ function WalletPage() {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      children: [
+        {
+          title: session?.wallet.name,
+          dataIndex: 'name',
+          sortDirections: [],
+          sorter: (a, b) => a.name.localeCompare(b.name),
+          defaultSortOrder: sortOrder.asc,
+        },
+      ],
       defaultSortOrder: sortOrder.asc,
+      sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
       title: 'Address',
       dataIndex: 'address',
       key: 'address',
+      children: [
+        {
+          title: session?.wallet.address,
+          dataIndex: 'address',
+        },
+      ],
       render: text => <Text type="success">{text}</Text>,
     },
     {
       title: 'Wallet Type',
       dataIndex: 'walletType',
       key: 'walletType',
+      children: [
+        {
+          title: session?.wallet.walletType,
+          dataIndex: 'walletType',
+        },
+      ],
       // Old wallets (Before Ledger support ) did not have a wallet type property on creation : So they would crash on this level
       render: walletType =>
         walletType && walletType.length > 2
@@ -111,38 +126,46 @@ function WalletPage() {
     {
       title: 'Network',
       key: 'network',
+      children: [
+        {
+          title: session?.wallet.config.name,
+          render: record => {
+            return record.config.name;
+          },
+        },
+      ],
       sorter: (a, b) => a.config.name.localeCompare(b.config.name),
-      render: record => {
-        return record.config.name;
-      },
     },
     {
       title: 'Action',
       key: 'action',
-      render: record => {
-        return (
-          <Space size="middle">
-            {userAsset.walletId === record.identifier ? (
-              <CheckOutlined
-                style={{
-                  fontSize: '18px',
-                  color: '#1199fa',
-                  position: 'absolute',
-                  top: '10px',
-                }}
-              />
-            ) : (
-              <a
-                onClick={() => {
-                  walletSelect(record);
-                }}
-              >
-                Select
-              </a>
-            )}
-          </Space>
-        );
-      },
+      children: [
+        {
+          title: (
+            <CheckOutlined
+              style={{
+                fontSize: '18px',
+                color: '#1199fa',
+                position: 'absolute',
+                top: '20px',
+              }}
+            />
+          ),
+          render: record => {
+            return (
+              <Space size="middle">
+                <a
+                  onClick={() => {
+                    walletSelect(record);
+                  }}
+                >
+                  Select
+                </a>
+              </Space>
+            );
+          },
+        },
+      ],
     },
   ];
 
