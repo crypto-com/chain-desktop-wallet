@@ -76,6 +76,11 @@ const ledgerIsExpertModeState = atom<boolean>({
   default: false,
 });
 
+const fetchingDBState = atom<boolean>({
+  key: 'fetchingDB',
+  default: false,
+});
+
 export {
   walletIdentifierState,
   sessionState,
@@ -85,4 +90,5 @@ export {
   walletTempBackupState,
   hasShownWarningOnWalletTypeState,
   ledgerIsExpertModeState,
+  fetchingDBState,
 };

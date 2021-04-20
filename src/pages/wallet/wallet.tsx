@@ -1,11 +1,16 @@
 // import React, { useState, useEffect } from 'react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import './wallet.less';
 import 'antd/dist/antd.css';
 import { Layout, Space, Spin, Table, Typography } from 'antd';
 import { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
-import { sessionState, walletAssetState, walletListState } from '../../recoil/atom';
+import {
+  sessionState,
+  walletAssetState,
+  walletListState,
+  fetchingDBState,
+} from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
 import { NORMAL_WALLET_TYPE } from '../../service/LedgerService';
@@ -16,12 +21,12 @@ const { Text } = Typography;
 function WalletPage() {
   const [session, setSession] = useRecoilState<Session>(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const fetchingDB = useRecoilValue(fetchingDBState);
   const walletList = useRecoilValue(walletListState);
   const [loading, setLoading] = useState(false);
   const [processedWalletList, setProcessedWalletList] = useState([]);
-  const didMountRef = useRef(false);
 
-  const processWalletList = (wallets, currentAsset) => {
+  const processWalletList = wallets => {
     const list = wallets.map((wallet, idx) => {
       const walletModel = {
         ...wallet,
@@ -31,10 +36,10 @@ function WalletPage() {
     });
     // Move current wallet to the top
     list.sort((x, y) => {
-      if (x.identifier === currentAsset.walletId) {
+      if (x.identifier === session.wallet.identifier) {
         return -1;
       }
-      if (y.identifier === currentAsset.walletId) {
+      if (y.identifier === session.wallet.identifier) {
         return 1;
       }
       return 0;
@@ -53,31 +58,19 @@ function WalletPage() {
     await walletService.syncAll(currentSession);
 
     // Update walletList sorting
-    const wallets = processWalletList(walletList, currentAsset);
+    const wallets = processWalletList(walletList);
     setProcessedWalletList(wallets);
-
     setLoading(false);
   };
 
   useEffect(() => {
-    let unmounted = false;
-
     const syncWalletList = () => {
-      if (!unmounted) {
-        const wallets = processWalletList(walletList, userAsset);
-        setProcessedWalletList(wallets);
-      }
+      const wallets = processWalletList(walletList);
+      setProcessedWalletList(wallets);
     };
 
-    if (!didMountRef.current) {
-      syncWalletList();
-      didMountRef.current = true;
-    }
-
-    return () => {
-      unmounted = true;
-    };
-  }, [session]);
+    syncWalletList();
+  }, [fetchingDB]);
 
   const columns = [
     {

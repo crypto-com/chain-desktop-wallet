@@ -18,6 +18,7 @@ import {
   sessionState,
   walletAssetState,
   ledgerIsExpertModeState,
+  fetchingDBState,
 } from '../../recoil/atom';
 import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
@@ -69,6 +70,7 @@ const FormDelegationRequest = () => {
   const [showMemo, setShowMemo] = useState(false);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const currentSession = useRecoilValue(sessionState);
+
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
   const didMountRef = useRef(false);
@@ -549,7 +551,7 @@ const FormWithdrawStakingReward = () => {
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const marketData = useRecoilValue(marketState);
   const currentSession = useRecoilValue(sessionState);
-  const didMountRef = useRef(false);
+  const fetchingDB = useRecoilValue(fetchingDBState);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
@@ -589,11 +591,8 @@ const FormWithdrawStakingReward = () => {
       setRewards(rewardsTabularData);
     };
 
-    if (!didMountRef.current) {
-      syncRewardsData();
-      didMountRef.current = true;
-    }
-  }, [rewards, currentSession, walletAsset]);
+    syncRewardsData();
+  }, [fetchingDB]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
