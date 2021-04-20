@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
 import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
@@ -70,10 +70,10 @@ const FormDelegationRequest = () => {
   const [showMemo, setShowMemo] = useState(false);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const currentSession = useRecoilValue(sessionState);
+  const fetchingDB = useRecoilValue(fetchingDBState);
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
-  const didMountRef = useRef(false);
 
   const processValidatorList = (validatorList: ValidatorModel[]) => {
     return validatorList.map((validator, idx) => {
@@ -86,28 +86,17 @@ const FormDelegationRequest = () => {
   };
 
   useEffect(() => {
-    let unmounted = false;
-
     const syncValidatorsData = async () => {
       const currentValidatorList = await walletService.retrieveTopValidators(
         currentSession.wallet.config.network.chainId,
       );
 
-      if (!unmounted) {
-        const validatorList = processValidatorList(currentValidatorList);
-        setValidatorTopList(validatorList);
-      }
+      const validatorList = processValidatorList(currentValidatorList);
+      setValidatorTopList(validatorList);
     };
 
-    if (!didMountRef.current) {
-      syncValidatorsData();
-      didMountRef.current = true;
-    }
-
-    return () => {
-      unmounted = true;
-    };
-  }, [validatorTopList, setValidatorTopList]);
+    syncValidatorsData();
+  }, [fetchingDB]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
