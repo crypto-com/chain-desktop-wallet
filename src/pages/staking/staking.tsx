@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
 import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
@@ -18,6 +18,7 @@ import {
   sessionState,
   walletAssetState,
   ledgerIsExpertModeState,
+  fetchingDBState,
 } from '../../recoil/atom';
 import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
@@ -69,9 +70,10 @@ const FormDelegationRequest = () => {
   const [showMemo, setShowMemo] = useState(false);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const currentSession = useRecoilValue(sessionState);
+  const fetchingDB = useRecoilValue(fetchingDBState);
+
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
-  const didMountRef = useRef(false);
 
   const processValidatorList = (validatorList: ValidatorModel[]) => {
     return validatorList.map((validator, idx) => {
@@ -84,28 +86,17 @@ const FormDelegationRequest = () => {
   };
 
   useEffect(() => {
-    let unmounted = false;
-
     const syncValidatorsData = async () => {
       const currentValidatorList = await walletService.retrieveTopValidators(
         currentSession.wallet.config.network.chainId,
       );
 
-      if (!unmounted) {
-        const validatorList = processValidatorList(currentValidatorList);
-        setValidatorTopList(validatorList);
-      }
+      const validatorList = processValidatorList(currentValidatorList);
+      setValidatorTopList(validatorList);
     };
 
-    if (!didMountRef.current) {
-      syncValidatorsData();
-      didMountRef.current = true;
-    }
-
-    return () => {
-      unmounted = true;
-    };
-  }, [validatorTopList, setValidatorTopList]);
+    syncValidatorsData();
+  }, [fetchingDB]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -549,7 +540,7 @@ const FormWithdrawStakingReward = () => {
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const marketData = useRecoilValue(marketState);
   const currentSession = useRecoilValue(sessionState);
-  const didMountRef = useRef(false);
+  const fetchingDB = useRecoilValue(fetchingDBState);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
@@ -589,11 +580,8 @@ const FormWithdrawStakingReward = () => {
       setRewards(rewardsTabularData);
     };
 
-    if (!didMountRef.current) {
-      syncRewardsData();
-      didMountRef.current = true;
-    }
-  }, [rewards, currentSession, walletAsset]);
+    syncRewardsData();
+  }, [fetchingDB]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);

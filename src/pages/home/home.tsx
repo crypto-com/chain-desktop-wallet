@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from 'antd';
@@ -18,6 +18,7 @@ import {
   marketState,
   walletAssetState,
   ledgerIsExpertModeState,
+  fetchingDBState,
 } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
@@ -127,8 +128,7 @@ function HomePage() {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
-  const [syncLoading, setSyncLoading] = useState(false);
-  const didMountRef = useRef(false);
+  const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
 
   // Undelegate action related states changes
   const [form] = Form.useForm();
@@ -177,7 +177,7 @@ function HomePage() {
   };
 
   const onSyncBtnCall = async () => {
-    setSyncLoading(true);
+    setFetchingDB(true);
 
     await walletService.syncAll();
     const sessionData = await walletService.retrieveCurrentSession();
@@ -199,12 +199,10 @@ function HomePage() {
     setUserAsset(currentAsset);
     setHasShownNotLiveWallet(true);
 
-    setSyncLoading(false);
+    setFetchingDB(false);
   };
 
   useEffect(() => {
-    let unmounted = false;
-
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
@@ -218,24 +216,15 @@ function HomePage() {
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
-      if (!unmounted) {
-        showWalletStateNotification(currentSession.wallet.config);
-        setDelegations(stakingTabularData);
-        setTransfers(transferTabularData);
-        setUserAsset(currentAsset);
-        setHasShownNotLiveWallet(true);
-      }
+      showWalletStateNotification(currentSession.wallet.config);
+      setDelegations(stakingTabularData);
+      setTransfers(transferTabularData);
+      setUserAsset(currentAsset);
+      setHasShownNotLiveWallet(true);
     };
 
-    if (!didMountRef.current) {
-      syncAssetData();
-      didMountRef.current = true;
-    }
-
-    return () => {
-      unmounted = true;
-    };
-  }, [delegations, userAsset, hasShownNotLiveWallet]);
+    syncAssetData();
+  }, [fetchingDB]);
 
   const TransactionColumns = [
     {
@@ -515,7 +504,7 @@ function HomePage() {
             onSyncBtnCall();
           }}
           style={{ position: 'absolute', right: '36px', marginTop: '6px' }}
-          spin={syncLoading}
+          spin={fetchingDB}
         />
       </Header>
       <Content>
