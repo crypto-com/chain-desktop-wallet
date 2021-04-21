@@ -4,10 +4,6 @@
       margin: 16px 0 6px 36px;
       color: @font-color;
     }
-    &.loading {
-      // for loading spin icon
-      height: 100vh;
-    }
   }
   .ant-layout-sider.home-sider {
     position: fixed;
@@ -121,8 +117,18 @@
       box-shadow: 2px 0 12px 2px rgba(11, 20, 38, 0.05);
     }
   }
-  .site-layout {
+  .home-page {
+    width: 100%;
+    height: 100vh;
     margin-left: @sider-width;
+    > .ant-spin-nested-loading :not(.ant-spin-container) .ant-spin {
+      max-height: none !important;
+    }
+    &.loading {
+      .ant-spin {
+        height: 100vh !important;
+      }
+    }
   }
 }
 .ant-dropdown {
