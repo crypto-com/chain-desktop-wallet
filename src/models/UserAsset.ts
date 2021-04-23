@@ -45,8 +45,16 @@ export const scaledBalance = (asset: UserAsset) => {
   return getUINormalScaleAmount(asset.balance, asset.decimals);
 };
 
+export const scaledBalanceFull = (asset: UserAsset) => {
+  return getUINormalScaleAmount(asset.balance, asset.decimals, asset.decimals);
+};
+
 export const scaledStakingBalance = (asset: UserAsset) => {
   return getUINormalScaleAmount(asset.stakedBalance, asset.decimals);
+};
+
+export const scaledStakingBalanceFull = (asset: UserAsset) => {
+  return getUINormalScaleAmount(asset.stakedBalance, asset.decimals, asset.decimals);
 };
 
 export const getAssetPriceIdFrom = (assetSymbol: string, currency: string) => {
