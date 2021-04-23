@@ -512,7 +512,7 @@ function HomePage() {
           <div className="balance">
             <div className="title">TOTAL BALANCE</div>
             <div className="quantity">
-              {numeral(scaledBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
+              {numeral(scaledBalance(userAsset)).format('0,0.[00000000]')} {userAsset?.symbol}
             </div>
             <div className="fiat">
               {marketData && marketData.price
@@ -525,7 +525,7 @@ function HomePage() {
           <div className="balance">
             <div className="title">STAKED BALANCE</div>
             <div className="quantity">
-              {numeral(scaledStakingBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
+              {numeral(scaledStakingBalance(userAsset)).format('0,0.[00000000]')} {userAsset?.symbol}
             </div>
             <div className="fiat">
               {marketData && marketData.price
