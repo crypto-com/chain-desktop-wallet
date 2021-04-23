@@ -41,8 +41,6 @@ function WalletPage() {
       };
       if (wallet.identifier !== session.wallet.identifier) {
         resultList.push(walletModel);
-      } else {
-        console.log(wallet.name);
       }
       return resultList;
     }, []);
