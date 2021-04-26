@@ -7,6 +7,7 @@ import {
   getNormalScaleAmount,
   getUIDynamicAmount,
   getUINormalScaleAmount,
+  getFormattedAmount
 } from './NumberUtils';
 import { UserAsset } from '../models/UserAsset';
 import { DefaultWalletConfigs } from '../config/StaticConfig';
