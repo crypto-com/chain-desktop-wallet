@@ -317,7 +317,6 @@ const GovernancePage = () => {
       fetchProposalList();
       didMountRef.current = true;
     }
-    console.log(proposalFigures);
     // eslint-disable-next-line
   }, [proposalList, setProposalList]);
 
