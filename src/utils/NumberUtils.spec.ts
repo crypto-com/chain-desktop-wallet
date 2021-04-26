@@ -90,4 +90,12 @@ describe('Testing Number utils', () => {
     expect(adjustedTransactionAmount('0.245', asset, networkFee)).to.eq('0.2449');
     expect(adjustedTransactionAmount('0.1223', asset, networkFee)).to.eq('0.1223');
   });
+  
+  it('Test amount formatting', () => {
+    expect(getFormattedAmount('123456789.12345678')).to.eq('123,456,789.12345678');
+    expect(getFormattedAmount('123456789.00100')).to.eq('123,456,789.001');
+    expect(getFormattedAmount('12345678.001001')).to.eq('12,345,678.001001');
+    expect(getFormattedAmount('0.0000')).to.eq('0');
+    expect(getFormattedAmount('1.0000')).to.eq('1');
+  });
 });
