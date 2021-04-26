@@ -116,16 +116,19 @@ export function adjustedTransactionAmount(
 }
 
 export function getFormattedAmount(amount: string): string {
-  // replace hardcoded separators if/when localization is available
+  // replace hardcoded separators when localization is available
   const decimalSeparator = '.';
   const thousandSeparator = ',';
 
   const elements = amount.split(decimalSeparator);
-  let integers = elements[0];
-  const decimals = elements.length > 1 ? decimalSeparator + elements[1].replace(/[0]+$/, '') : '';
+  let result = elements[0];
+  const decimals = elements.length > 1 ? elements[1].replace(/[0]+$/, '') : '';
   const rgxThousand = /(\d+)(\d{3})/;
-  while (rgxThousand.test(integers)) {
-    integers = integers.replace(rgxThousand, `$1${thousandSeparator}$2`);
+  while (rgxThousand.test(result)) {
+    result = result.replace(rgxThousand, `$1${thousandSeparator}$2`);
   }
-  return integers + decimals;
+  if (decimals.length > 0) {
+    result = result + decimalSeparator + decimals;
+  }
+  return result;
 }
