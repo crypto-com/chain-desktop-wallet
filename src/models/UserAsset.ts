@@ -25,6 +25,10 @@ export interface UserAsset {
   // Specify the 10^decimals conversion to go from BASE TO ASSET
   // E.g = 1 TCRO = 1O^8 BASETCRO
   decimals: number;
+
+  denomTracePath?: string;
+
+  ibcDenomHash?: string;
 }
 
 export interface AssetMarketPrice {

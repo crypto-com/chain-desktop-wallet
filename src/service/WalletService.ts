@@ -511,6 +511,33 @@ class WalletService {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
+  public async initialIBCAssetsFetching(currentSession: Session) {
+    // const currentSession: Session = await this.storageService.retrieveCurrentSession()
+    if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+      return Promise.resolve(null);
+    }
+    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+
+    const ibcAssets: UserAsset[] = await nodeRpc.loadIBCAssets(currentSession);
+
+    await ibcAssets.map(async ibcAsset => {
+      const denomTrace = await nodeRpc.getIBCAssetTrace(ibcAsset.ibcDenomHash!);
+      ibcAsset.denomTracePath = denomTrace.path;
+      ibcAsset.symbol = denomTrace.base_denom;
+      ibcAsset.mainnetSymbol = denomTrace.base_denom;
+      ibcAsset.walletId = currentSession.wallet.identifier;
+
+      // TODO: Decimals hardcoded for now
+      ibcAsset.decimals = 8;
+
+      await this.storageService.saveAsset(ibcAsset);
+      return ibcAsset;
+    });
+
+    return Promise.resolve();
+  }
+
   public async fetchAndUpdateTransactions(session: Session | null = null) {
     const currentSession: Session =
       session == null ? await this.storageService.retrieveCurrentSession() : session;

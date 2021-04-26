@@ -5,7 +5,10 @@ import { Bytes } from '../../utils/ChainJsLib';
 import { NodePorts } from '../../config/StaticConfig';
 import {
   AllProposalResponse,
+  BalanceResponse,
   DelegationResult,
+  DenomTrace,
+  DenomTraceResponse,
   FinalTallyResult,
   LoadedTallyResponse,
   Proposal,
@@ -22,6 +25,8 @@ import {
   TransactionStatus,
   ValidatorModel,
 } from '../../models/Transaction';
+import { Session } from '../../models/Session';
+import { UserAsset } from '../../models/UserAsset';
 
 export interface INodeRpcService {
   loadAccountBalance(address: string, assetDenom: string): Promise<string>;
@@ -40,6 +45,10 @@ export interface INodeRpcService {
   loadStakingBalance(address: string, assetSymbol: string): Promise<string>;
 
   loadTopValidators(): Promise<ValidatorModel[]>;
+
+  loadIBCAssets(session: Session): Promise<UserAsset[]>;
+
+  getIBCAssetTrace(ibcHash: string): Promise<DenomTrace>;
 }
 
 // Load all 100 active validators
@@ -287,6 +296,31 @@ export class NodeRpcService implements INodeRpcService {
       })),
       response.data.pagination.next_key,
     ];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
+  async loadIBCAssets(session: Session): Promise<UserAsset[]> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const assets = await this.cosmosClient.get<BalanceResponse>(
+      `cosmos/bank/v1beta1/balances/${session.wallet.address}`,
+    );
+
+    // 1. Load current accounts IBC assets
+
+    // 2. Check if they are already in the cache, if not : fetch asset meta data and persist in the ibc cache
+
+    // 3. If assets already in the cache, just updated balance
+
+    return Promise.all([]);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
+  async getIBCAssetTrace(ibcHash: string): Promise<DenomTrace> {
+    const denomTraceResponse = await this.cosmosClient.get<DenomTraceResponse>(
+      `ibc/applications/transfer/v1beta1/denom_traces/${ibcHash}`,
+    );
+
+    return denomTraceResponse.data.denom_trace;
   }
 }
 
