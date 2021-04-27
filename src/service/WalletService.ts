@@ -637,14 +637,10 @@ class WalletService {
       currentSession.wallet.identifier,
     );
 
-    const userAssets = assets.map(data => {
+    return assets.map(data => {
       const asset: UserAsset = { ...data };
       return asset;
     });
-
-    // eslint-disable-next-line no-console
-    console.log('ALL_USER_ASSETS', userAssets);
-    return userAssets;
   }
 
   public async retrieveDefaultWalletAsset(currentSession: Session): Promise<UserAsset> {
