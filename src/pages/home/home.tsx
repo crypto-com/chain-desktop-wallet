@@ -180,8 +180,11 @@ function HomePage() {
     setFetchingDB(true);
 
     await walletService.syncAll();
+
     const sessionData = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+    await walletService.IBCAssetsFetch(sessionData);
+
     const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
       sessionData.wallet.identifier,
     );

@@ -300,18 +300,49 @@ export class NodeRpcService implements INodeRpcService {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
   async loadIBCAssets(session: Session): Promise<UserAsset[]> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const assets = await this.cosmosClient.get<BalanceResponse>(
-      `cosmos/bank/v1beta1/balances/${session.wallet.address}`,
-    );
+    const ibcAssets: UserAsset[] = [];
+    let nextKey: string | null = null;
+    const { address } = session.wallet;
 
-    // 1. Load current accounts IBC assets
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const baseUrl = `/cosmos/bank/v1beta1/balances/${address}`;
+      const url =
+        nextKey !== null ? `${baseUrl}?pagination.key=${encodeURIComponent(nextKey)}` : baseUrl;
 
-    // 2. Check if they are already in the cache, if not : fetch asset meta data and persist in the ibc cache
+      // eslint-disable-next-line no-await-in-loop
+      const assetBalanceResponse = await this.cosmosClient.get<BalanceResponse>(url);
+      const loadedIbcAssets = assetBalanceResponse.data.balances
+        .filter(balance => balance.denom.startsWith('ibc/'))
+        .map(balance => {
+          const ibcDenom = balance.denom;
+          const ibcDenomHash = ibcDenom.split('/').pop();
+          const asset: UserAsset = {
+            balance: balance.amount,
+            decimals: 8,
+            description: '',
+            icon_url: '',
+            identifier: `${ibcDenom}__${session.wallet.identifier}`,
+            mainnetSymbol: ibcDenom,
+            name: ibcDenom,
+            stakedBalance: '0',
+            symbol: ibcDenom,
+            walletId: session.wallet.identifier,
+            ibcDenomHash,
+          };
+          return asset;
+        });
 
-    // 3. If assets already in the cache, just updated balance
+      ibcAssets.push(...loadedIbcAssets);
+      const { pagination } = assetBalanceResponse.data;
 
-    return Promise.all([]);
+      if (pagination.next_key === null) {
+        break;
+      }
+      nextKey = pagination.next_key;
+    }
+
+    return ibcAssets;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
