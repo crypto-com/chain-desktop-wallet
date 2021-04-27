@@ -69,6 +69,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
           return transferData;
         });
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log('FAILED_LOADING_TRANSFERS', { data, baseAssetSymbol, address });
       return [];
     }
