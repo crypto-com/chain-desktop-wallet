@@ -66,8 +66,6 @@ function HomeLayout(props: HomeLayoutProps) {
   }
 
   async function fetchAndSaveIBCWalletAssets(fetchSession: Session) {
-    // eslint-disable-next-line no-console
-    console.log('fetchAndSaveIBCWalletAssets>>>', fetchSession);
     try {
       await walletService.IBCAssetsFetch(fetchSession);
     } catch (e) {
