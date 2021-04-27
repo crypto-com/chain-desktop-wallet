@@ -5,7 +5,12 @@ import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Layout, Tabs, List, Space, Radio, Button, Card, Progress, Tag, Spin } from 'antd';
 import Big from 'big.js';
-import { DislikeOutlined, LikeOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import {
+  DislikeOutlined,
+  LikeOutlined,
+  ArrowLeftOutlined,
+  LoadingOutlined,
+} from '@ant-design/icons';
 import { useRecoilValue } from 'recoil';
 import { sessionState, walletAssetState } from '../../recoil/atom';
 
@@ -148,28 +153,28 @@ const GovernancePage = () => {
       ? yesValue
           .div(totalVotes)
           .times(100)
-          .toPrecision(2)
+          .toFixed(2)
       : `n.a.`;
 
     const noRate = totalVotes.gt('0')
       ? noValue
           .div(totalVotes)
           .times(100)
-          .toPrecision(2)
+          .toFixed(2)
       : `n.a.`;
 
     const noWithVetoRate = totalVotes.gt('0')
       ? noWithVetoValue
           .div(totalVotes)
           .times(100)
-          .toPrecision(2)
+          .toFixed(2)
       : `n.a.`;
 
     const abstainRate = totalVotes.gt('0')
       ? abstainValue
           .div(totalVotes)
           .times(100)
-          .toPrecision(2)
+          .toFixed(2)
       : `n.a.`;
 
     const baseUnitDenominator = 1_0000_0000;
@@ -384,7 +389,11 @@ const GovernancePage = () => {
                   </div>
                 </Content>
                 <Sider width="300px">
-                  <Spin spinning={isLoadingTally} tip="Loading latest results">
+                  <Spin
+                    spinning={isLoadingTally}
+                    indicator={<LoadingOutlined />}
+                    tip="Loading latest results"
+                  >
                     <Card title="Current results" style={{ padding: '4px' }}>
                       <div className="vote-result-section">
                         Yes - Support
