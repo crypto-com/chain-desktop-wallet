@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { TransferListResponse, TransferResult } from './ChainIndexingModels';
+import { TransferDataAmount, TransferListResponse, TransferResult } from './ChainIndexingModels';
 import { TransactionStatus, TransferTransactionData } from '../../models/Transaction';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 
@@ -43,7 +43,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
     const { data } = transferListResponse;
 
-    function getTransferAmount(transfer) {
+    function getTransferAmount(transfer): TransferDataAmount | null {
       return transfer.data.amount.filter(amount => amount.denom === baseAssetSymbol)[0];
     }
 
@@ -56,7 +56,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
         .map(transfer => {
           const assetAmount = getTransferAmount(transfer);
           const transferData: TransferTransactionData = {
-            amount: assetAmount.amount,
+            amount: assetAmount?.amount ?? '0',
             assetSymbol: 'TCRO', // Hardcoded for now
             date: transfer.blockTime,
             hash: transfer.transactionHash,
