@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import './wallet.less';
 import 'antd/dist/antd.css';
-import { Layout, Space, Spin, Table, Typography } from 'antd';
-import { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
+import { Layout, Space, Spin, Table, Typography, Tag } from 'antd';
+import Icon, { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
 import {
   sessionState,
   walletAssetState,
@@ -13,10 +13,18 @@ import {
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
-import { NORMAL_WALLET_TYPE } from '../../service/LedgerService';
+import { LEDGER_WALLET_TYPE, NORMAL_WALLET_TYPE } from '../../service/LedgerService';
+import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import IconLedger from '../../svg/IconLedger';
+import IconWallet from '../../svg/IconWallet';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
+
+enum sortOrder {
+  asc = 'ascend',
+  desc = 'descend',
+}
 
 function WalletPage() {
   const [session, setSession] = useRecoilState<Session>(sessionState);
@@ -27,24 +35,41 @@ function WalletPage() {
   const [processedWalletList, setProcessedWalletList] = useState([]);
 
   const processWalletList = wallets => {
-    const list = wallets.map((wallet, idx) => {
+    const list = wallets.reduce((resultList, wallet, idx) => {
       const walletModel = {
         ...wallet,
         key: `${idx}`,
       };
-      return walletModel;
-    });
-    // Move current wallet to the top
-    list.sort((x, y) => {
-      if (x.identifier === session.wallet.identifier) {
-        return -1;
+      if (wallet.identifier !== session.wallet.identifier) {
+        resultList.push(walletModel);
       }
-      if (y.identifier === session.wallet.identifier) {
-        return 1;
-      }
-      return 0;
-    });
+      return resultList;
+    }, []);
+
     return list;
+  };
+
+  const processNetworkTag = (network, selectedWallet) => {
+    let networkColor;
+
+    switch (network) {
+      case DefaultWalletConfigs.MainNetConfig.name:
+        networkColor = 'success';
+        break;
+      case DefaultWalletConfigs.TestNetConfig.name:
+        networkColor = 'error';
+        break;
+      default:
+        networkColor = 'default';
+    }
+    return (
+      <Tag
+        style={{ border: 'none', padding: '5px 14px', fontSize: selectedWallet ? '14px' : '12px' }}
+        color={networkColor}
+      >
+        {network}
+      </Tag>
+    );
   };
 
   const walletSelect = async e => {
@@ -57,9 +82,6 @@ function WalletPage() {
     setUserAsset(currentAsset);
     await walletService.syncAll(currentSession);
 
-    // Update walletList sorting
-    const wallets = processWalletList(walletList);
-    setProcessedWalletList(wallets);
     setLoading(false);
   };
 
@@ -70,66 +92,123 @@ function WalletPage() {
     };
 
     syncWalletList();
-  }, [fetchingDB]);
+  }, [fetchingDB, userAsset]);
 
   const columns = [
     {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
+      children: [
+        {
+          title: session?.wallet.name,
+          dataIndex: 'name',
+          sortDirections: [],
+          sorter: (a, b) => a.name.localeCompare(b.name),
+          defaultSortOrder: sortOrder.asc,
+        },
+      ],
+      defaultSortOrder: sortOrder.asc,
       sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
       title: 'Address',
       dataIndex: 'address',
       key: 'address',
+      children: [
+        {
+          title: session?.wallet.address,
+          dataIndex: 'address',
+        },
+      ],
       render: text => <Text type="success">{text}</Text>,
     },
     {
       title: 'Wallet Type',
       dataIndex: 'walletType',
       key: 'walletType',
-      // Old wallets (Before Ledger support ) did not have a wallet type property on creation : So they would crash on this level
-      render: walletType =>
-        walletType && walletType.length > 2
-          ? walletType.charAt(0).toUpperCase() + walletType.slice(1)
-          : NORMAL_WALLET_TYPE,
+      children: [
+        {
+          // Old wallets (Before Ledger support ) did not have a wallet type property on creation : So they would crash on this level
+          title:
+            session?.wallet.walletType && session?.wallet.walletType.length > 2 ? (
+              <>
+                {session?.wallet.walletType.charAt(0).toUpperCase() +
+                  session?.wallet.walletType.slice(1)}{' '}
+                {session?.wallet.walletType === LEDGER_WALLET_TYPE ? (
+                  <Icon component={IconLedger} />
+                ) : (
+                  <Icon component={IconWallet} />
+                )}
+              </>
+            ) : (
+              <>
+                {NORMAL_WALLET_TYPE} <Icon component={IconWallet} />
+              </>
+            ),
+          dataIndex: 'walletType',
+          // Same as title above
+          render: walletType =>
+            walletType && walletType.length > 2 ? (
+              <>
+                {walletType.charAt(0).toUpperCase() + walletType.slice(1)}{' '}
+                {walletType === LEDGER_WALLET_TYPE ? (
+                  <Icon component={IconLedger} />
+                ) : (
+                  <Icon component={IconWallet} />
+                )}
+              </>
+            ) : (
+              <>
+                {NORMAL_WALLET_TYPE} <Icon component={IconWallet} />
+              </>
+            ),
+        },
+      ],
     },
     {
       title: 'Network',
       key: 'network',
+      children: [
+        {
+          title: processNetworkTag(session?.wallet.config.name, true),
+          render: record => {
+            return processNetworkTag(record.config.name, false);
+          },
+        },
+      ],
       sorter: (a, b) => a.config.name.localeCompare(b.config.name),
-      render: record => {
-        return record.config.name;
-      },
     },
     {
       title: 'Action',
       key: 'action',
-      render: record => {
-        return (
-          <Space size="middle">
-            {userAsset.walletId === record.identifier ? (
-              <CheckOutlined
-                style={{
-                  fontSize: '18px',
-                  color: '#1199fa',
-                  position: 'absolute',
-                  top: '10px',
-                }}
-              />
-            ) : (
-              <a
-                onClick={() => {
-                  walletSelect(record);
-                }}
-              >
-                Select
-              </a>
-            )}
-          </Space>
-        );
-      },
+      children: [
+        {
+          title: (
+            <CheckOutlined
+              style={{
+                fontSize: '22px',
+                color: '#1199fa',
+                position: 'absolute',
+                top: '20px',
+              }}
+            />
+          ),
+          render: record => {
+            return (
+              <Space size="middle">
+                <a
+                  onClick={() => {
+                    walletSelect(record);
+                  }}
+                >
+                  Select
+                </a>
+              </Space>
+            );
+          },
+        },
+      ],
     },
   ];
 
