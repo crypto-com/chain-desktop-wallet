@@ -1,5 +1,6 @@
 import { CroNetwork } from '@crypto-com/chain-jslib/lib/dist/core/cro';
 import { getRandomId } from '../crypto/RandomGen';
+import { UserAssetType } from '../models/UserAsset';
 
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
@@ -117,6 +118,7 @@ export const DefaultAsset = (network: Network) => {
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
     decimals: 8,
+    assetType: UserAssetType.NORMAL,
   };
 };
 

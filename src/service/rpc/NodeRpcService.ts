@@ -26,7 +26,7 @@ import {
   ValidatorModel,
 } from '../../models/Transaction';
 import { Session } from '../../models/Session';
-import { UserAsset } from '../../models/UserAsset';
+import { UserAsset, UserAssetType } from '../../models/UserAsset';
 
 export interface INodeRpcService {
   loadAccountBalance(address: string, assetDenom: string): Promise<string>;
@@ -329,6 +329,7 @@ export class NodeRpcService implements INodeRpcService {
             symbol: ibcDenom,
             walletId: session.wallet.identifier,
             ibcDenomHash,
+            assetType: UserAssetType.IBC,
           };
           return asset;
         });

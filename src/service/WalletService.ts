@@ -31,7 +31,7 @@ import {
 } from './signers/TransactionSupported';
 import { cryptographer } from '../crypto/Cryptographer';
 import { secretStoreService } from '../storage/SecretStoreService';
-import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
+import { AssetMarketPrice, UserAsset, UserAssetType } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
@@ -491,8 +491,14 @@ class WalletService {
 
     await Promise.all(
       assets.map(async asset => {
-        const baseDenomination = currentSession.wallet.config.network.coin.baseDenom;
+        const baseDenomination =
+          asset.assetType !== UserAssetType.IBC
+            ? currentSession.wallet.config.network.coin.baseDenom
+            : `ibc/${asset.ibcDenomHash}`;
+
         try {
+          // eslint-disable-next-line no-console
+          console.log(`Loading balance for ${baseDenomination}`);
           asset.balance = await nodeRpc.loadAccountBalance(
             currentSession.wallet.address,
             baseDenomination,
@@ -501,6 +507,8 @@ class WalletService {
             currentSession.wallet.address,
             baseDenomination,
           );
+          // eslint-disable-next-line no-console
+          console.log(`Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance}`);
         } catch (e) {
           // eslint-disable-next-line no-console
           console.log('BALANCE_FETCH_ERROR', { asset });

@@ -29,6 +29,13 @@ export interface UserAsset {
   denomTracePath?: string;
 
   ibcDenomHash?: string;
+
+  assetType?: UserAssetType;
+}
+
+export enum UserAssetType {
+  NORMAL = 'NORMAL',
+  IBC = 'IBC',
 }
 
 export interface AssetMarketPrice {
