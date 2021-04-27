@@ -16,6 +16,7 @@ import { walletService } from '../../service/WalletService';
 import { LEDGER_WALLET_TYPE, NORMAL_WALLET_TYPE } from '../../service/LedgerService';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import IconLedger from '../../svg/IconLedger';
+import IconWallet from '../../svg/IconWallet';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -137,11 +138,13 @@ function WalletPage() {
                 {session?.wallet.walletType === LEDGER_WALLET_TYPE ? (
                   <Icon component={IconLedger} />
                 ) : (
-                  ''
+                  <Icon component={IconWallet} />
                 )}
               </>
             ) : (
-              NORMAL_WALLET_TYPE
+              <>
+                {NORMAL_WALLET_TYPE} <Icon component={IconWallet} />
+              </>
             ),
           dataIndex: 'walletType',
           // Same as title above
@@ -149,10 +152,16 @@ function WalletPage() {
             walletType && walletType.length > 2 ? (
               <>
                 {walletType.charAt(0).toUpperCase() + walletType.slice(1)}{' '}
-                {walletType === LEDGER_WALLET_TYPE ? <Icon component={IconLedger} /> : ''}
+                {walletType === LEDGER_WALLET_TYPE ? (
+                  <Icon component={IconLedger} />
+                ) : (
+                  <Icon component={IconWallet} />
+                )}
               </>
             ) : (
-              NORMAL_WALLET_TYPE
+              <>
+                {NORMAL_WALLET_TYPE} <Icon component={IconWallet} />
+              </>
             ),
         },
       ],
