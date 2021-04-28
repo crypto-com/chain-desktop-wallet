@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.2.1] - 2021-04-28
+
+### Additions
+- Proper sorting on wallets list
+- Avoid transactions fetching to fail if wallet receives an IBC asset
+- Replace opaque loading spinner when loading wallet info
+
 ## [v0.2.0] - 2021-04-17
 
 ### Additions
