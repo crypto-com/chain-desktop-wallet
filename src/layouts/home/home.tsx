@@ -14,7 +14,13 @@ import Icon, {
 } from '@ant-design/icons';
 import { useRecoilState } from 'recoil';
 
-import { sessionState, walletAssetState, walletListState, marketState } from '../../recoil/atom';
+import {
+  sessionState,
+  walletAssetState,
+  walletListState,
+  marketState,
+  fetchingDBState,
+} from '../../recoil/atom';
 import { trimString } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
@@ -43,7 +49,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [marketData, setMarketData] = useRecoilState(marketState);
-  const [loading, setLoading] = useState(false);
+  const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
@@ -70,7 +76,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   const onWalletDeleteFinish = async () => {
     setIsButtonLoading(true);
-    setLoading(true);
+    setFetchingDB(true);
 
     if (!session) {
       return;
@@ -89,7 +95,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
     setIsButtonLoading(false);
     setIsConfirmationModalVisible(false);
-    setLoading(false);
+    setFetchingDB(false);
     setIsButtonDisabled(true);
     setIsConfirmDeleteVisible(false);
     confirmDeleteForm.resetFields();
@@ -109,7 +115,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   useEffect(() => {
     const fetchDB = async () => {
-      setLoading(true);
+      setFetchingDB(true);
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
@@ -126,7 +132,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setMarketData(currentMarketData);
       await fetchAndSetNewValidators();
       await fetchAndSetNewProposals();
-      setLoading(false);
+      setFetchingDB(false);
     };
 
     if (!didMountRef.current) {
@@ -230,7 +236,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   return (
     <main className="home-layout">
-      <Layout className={loading ? 'loading' : ''}>
+      <Layout>
         <Sider className="home-sider">
           <div className="logo" />
           <div className="version">SAMPLE WALLET v{buildVersion}</div>
@@ -249,11 +255,11 @@ function HomeLayout(props: HomeLayoutProps) {
             </div>
           </Dropdown>
         </Sider>
-        {loading ? (
-          <Spin indicator={<LoadingOutlined style={{ fontSize: 96 }} spin />} />
-        ) : (
-          props.children
-        )}
+        <div className={`home-page ${fetchingDB ? 'loading' : ''}`}>
+          <Spin spinning={fetchingDB} indicator={<LoadingOutlined style={{ fontSize: 96 }} />}>
+            <div className="container">{props.children}</div>
+          </Spin>
+        </div>
         <ModalPopup
           isModalVisible={isConfirmationModalVisible}
           handleCancel={handleCancel}

@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { TransferListResponse, TransferResult } from './ChainIndexingModels';
+import { TransferDataAmount, TransferListResponse, TransferResult } from './ChainIndexingModels';
 import { TransactionStatus, TransferTransactionData } from '../../models/Transaction';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 
@@ -41,22 +41,37 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       return TransactionStatus.FAILED;
     }
 
-    return transferListResponse.data.result.map(transfer => {
-      const assetAmount = transfer.data.amount.filter(
-        amount => amount.denom === baseAssetSymbol,
-      )[0];
-      const transferData: TransferTransactionData = {
-        amount: assetAmount.amount,
-        assetSymbol: 'TCRO', // Hardcoded for now
-        date: transfer.blockTime,
-        hash: transfer.transactionHash,
-        memo: '',
-        receiverAddress: transfer.data.toAddress,
-        senderAddress: transfer.data.fromAddress,
-        status: getStatus(transfer),
-      };
+    const { data } = transferListResponse;
 
-      return transferData;
-    });
+    function getTransferAmount(transfer): TransferDataAmount | null {
+      return transfer.data.amount.filter(amount => amount.denom === baseAssetSymbol)[0];
+    }
+
+    try {
+      return data.result
+        .filter(trx => {
+          const transferAmount = getTransferAmount(trx);
+          return transferAmount !== undefined && transferAmount !== null;
+        })
+        .map(transfer => {
+          const assetAmount = getTransferAmount(transfer);
+          const transferData: TransferTransactionData = {
+            amount: assetAmount?.amount ?? '0',
+            assetSymbol: 'TCRO', // Hardcoded for now
+            date: transfer.blockTime,
+            hash: transfer.transactionHash,
+            memo: '',
+            receiverAddress: transfer.data.toAddress,
+            senderAddress: transfer.data.fromAddress,
+            status: getStatus(transfer),
+          };
+
+          return transferData;
+        });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING_TRANSFERS', { data, baseAssetSymbol, address });
+      return [];
+    }
   }
 }
