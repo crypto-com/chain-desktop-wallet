@@ -183,7 +183,7 @@ const FormSend = () => {
       >
         <Input placeholder="Enter recipient address" />
       </Form.Item>
-      <Form.Item name="ibcToken" label="Sending Token">
+      <Form.Item name="ibcToken" label="Select Asset">
         {/* <Input.Group compact> */}
         <Select>
           {walletIBCAssets.map(item => {

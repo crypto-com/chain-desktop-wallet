@@ -42,6 +42,7 @@ import { RedelegateFormComponent } from './components/RedelegateFormComponent';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
+import logoCro from '../../assets/AssetLogo/cro.png';
 
 const { Text } = Typography;
 
@@ -242,9 +243,15 @@ function HomePage() {
   const AssetColumns = [
     {
       title: 'Asset',
-      dataIndex: 'name',
+      // dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
+      render: record => (
+        <div className="name">
+          <img src={logoCro} alt="cro" />
+          {record.name} ({record.symbol})
+        </div>
+      ),
     },
     {
       title: 'Price',
@@ -575,7 +582,7 @@ function HomePage() {
                 new Big(getAssetStakingBalancePrice(userAsset, marketData))
                   .add(new Big(getAssetBalancePrice(userAsset, marketData)))
                   .toFixed(4),
-              ).format('0,0.0000')}{' '}
+              ).format('0,0.00')}{' '}
               USD
             </div>
           </div>
@@ -609,7 +616,7 @@ function HomePage() {
         <Tabs defaultActiveKey="1">
           <TabPane tab="Assets" key="1">
             {/* <Table columns={AssetColumns} dataSource={assetSource} /> */}
-            <Table columns={AssetColumns} dataSource={walletIBCAssets} />
+            <Table columns={AssetColumns} dataSource={walletIBCAssets} className="asset-table" />
           </TabPane>
           <TabPane tab="Transactions" key="2">
             <Table columns={TransactionColumns} dataSource={transfers} />
