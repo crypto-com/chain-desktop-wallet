@@ -55,6 +55,11 @@ const walletAssetState = atom({
   default: asset,
 });
 
+const walletIBCAssetsState = atom({
+  key: 'walletIBCAssets',
+  default: [asset],
+});
+
 const walletListState = atom({
   key: 'walletList',
   default: [wallet],
@@ -86,6 +91,7 @@ export {
   sessionState,
   marketState,
   walletAssetState,
+  walletIBCAssetsState,
   walletListState,
   walletTempBackupState,
   hasShownWarningOnWalletTypeState,

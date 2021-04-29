@@ -5,6 +5,7 @@ import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import numeral from 'numeral';
+import Big from 'big.js';
 import {
   scaledBalance,
   scaledStakingBalance,
@@ -17,6 +18,7 @@ import {
   sessionState,
   marketState,
   walletAssetState,
+  walletIBCAssetsState,
   ledgerIsExpertModeState,
   fetchingDBState,
 } from '../../recoil/atom';
@@ -126,10 +128,10 @@ function HomePage() {
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const [walletIBCAssets, setWalletIBCAssets] = useRecoilState(walletIBCAssetsState);
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
-
   // Undelegate action related states changes
   const [form] = Form.useForm();
 
@@ -205,6 +207,10 @@ function HomePage() {
     setFetchingDB(false);
   };
 
+  // const calculateTotalAssetBalance = (assets : UserAsset[]) => {
+
+  // }
+
   useEffect(() => {
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
@@ -219,15 +225,64 @@ function HomePage() {
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
+      const ibcAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
+      setWalletIBCAssets(ibcAssets);
+
       showWalletStateNotification(currentSession.wallet.config);
       setDelegations(stakingTabularData);
       setTransfers(transferTabularData);
       setUserAsset(currentAsset);
+
       setHasShownNotLiveWallet(true);
     };
 
     syncAssetData();
   }, [fetchingDB]);
+
+  const AssetColumns = [
+    {
+      title: 'Asset',
+      dataIndex: 'name',
+      key: 'name',
+      sorter: (a, b) => a.name.localeCompare(b.name),
+    },
+    {
+      title: 'Price',
+      // dataIndex: 'price',
+      key: 'price',
+      render: record => (
+        <>
+          {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
+            ? `${numeral(marketData.price).format('$0,0.00')} ${marketData?.currency}`
+            : '$--'}
+        </>
+      ),
+    },
+    {
+      title: 'Amount',
+      // dataIndex: 'amount',
+      key: 'amount',
+      render: record => (
+        <>
+          {numeral(scaledBalance(record)).format('0,0.0000')} {record.symbol}
+        </>
+      ),
+    },
+    {
+      title: 'Value',
+      // dataIndex: 'value',
+      key: 'value',
+      render: record => (
+        <>
+          {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
+            ? `${numeral(getAssetBalancePrice(userAsset, marketData)).format('$0,0.00')} ${
+                marketData?.currency
+              }`
+            : '$--'}
+        </>
+      ),
+    },
+  ];
 
   const TransactionColumns = [
     {
@@ -513,7 +568,19 @@ function HomePage() {
       <Content>
         <div className="site-layout-background balance-container">
           <div className="balance">
-            <div className="title">TOTAL BALANCE</div>
+            <div className="title">TOTAL ASSET BALANCE</div>
+            <div className="quantity">
+              $
+              {numeral(
+                new Big(getAssetStakingBalancePrice(userAsset, marketData))
+                  .add(new Big(getAssetBalancePrice(userAsset, marketData)))
+                  .toFixed(4),
+              ).format('0,0.0000')}{' '}
+              USD
+            </div>
+          </div>
+          <div className="balance">
+            <div className="title">CRO BALANCE</div>
             <div className="quantity">
               {numeral(scaledBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
             </div>
@@ -526,7 +593,7 @@ function HomePage() {
             </div>
           </div>
           <div className="balance">
-            <div className="title">STAKED BALANCE</div>
+            <div className="title">STAKED CRO BALANCE</div>
             <div className="quantity">
               {numeral(scaledStakingBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
             </div>
@@ -540,10 +607,14 @@ function HomePage() {
           </div>
         </div>
         <Tabs defaultActiveKey="1">
-          <TabPane tab="Transactions" key="1">
+          <TabPane tab="Assets" key="1">
+            {/* <Table columns={AssetColumns} dataSource={assetSource} /> */}
+            <Table columns={AssetColumns} dataSource={walletIBCAssets} />
+          </TabPane>
+          <TabPane tab="Transactions" key="2">
             <Table columns={TransactionColumns} dataSource={transfers} />
           </TabPane>
-          <TabPane tab="Delegations" key="2">
+          <TabPane tab="Delegations" key="3">
             <Table
               columns={StakingColumns}
               dataSource={delegations}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './send.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Input, InputNumber, Layout } from 'antd';
+import { Button, Form, Input, InputNumber, Layout, Select } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
@@ -11,7 +11,12 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { scaledBalance } from '../../models/UserAsset';
-import { sessionState, walletAssetState, ledgerIsExpertModeState } from '../../recoil/atom';
+import {
+  sessionState,
+  walletAssetState,
+  walletIBCAssetsState,
+  ledgerIsExpertModeState,
+} from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
@@ -24,6 +29,7 @@ import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
 
 const { Header, Content, Footer } = Layout;
+const { Option } = Select;
 const layout = {};
 const tailLayout = {};
 
@@ -41,6 +47,7 @@ const FormSend = () => {
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const currentSession = useRecoilValue(sessionState);
+  const walletIBCAssets = useRecoilValue(walletIBCAssetsState);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -175,6 +182,16 @@ const FormSend = () => {
         ]}
       >
         <Input placeholder="Enter recipient address" />
+      </Form.Item>
+      <Form.Item name="ibcToken" label="Sending Token">
+        {/* <Input.Group compact> */}
+        <Select>
+          {walletIBCAssets.map(item => {
+            return <Option value={item.symbol}>{item.symbol}</Option>;
+          })}
+        </Select>
+        {/* <Input style={{ width: '50%' }} defaultValue="Xihu District, Hangzhou" /> */}
+        {/* </Input.Group> */}
       </Form.Item>
       <div className="amount">
         <Form.Item
