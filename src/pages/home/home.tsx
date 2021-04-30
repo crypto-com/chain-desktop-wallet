@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from 'antd';
+import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography, Avatar } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import numeral from 'numeral';
@@ -245,7 +245,23 @@ function HomePage() {
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: record => (
         <div className="name">
-          <img src={logoCro} alt="cro" />
+          {record.mainnetSymbol === 'CRO' ? (
+            <img src={logoCro} alt="cro" />
+          ) : (
+            <Avatar
+              style={{
+                color: '#1199fa',
+                backgroundColor: '#e4f4ff',
+                marginRight: '10px',
+                height: '22px',
+                width: '22px',
+                fontSize: '12px',
+                lineHeight: '22px',
+              }}
+            >
+              {record.symbol[0].toUpperCase()}
+            </Avatar>
+          )}
           {record.name} ({record.symbol})
         </div>
       ),
