@@ -14,7 +14,7 @@ import { scaledBalance } from '../../models/UserAsset';
 import {
   sessionState,
   walletAssetState,
-  walletIBCAssetsState,
+  walletAllAssetsState,
   ledgerIsExpertModeState,
 } from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
@@ -49,7 +49,7 @@ const FormSend = () => {
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const currentSession = useRecoilValue(sessionState);
-  const walletIBCAssets = useRecoilValue(walletIBCAssetsState);
+  const walletAllAssets = useRecoilValue(walletAllAssetsState);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -140,7 +140,7 @@ const FormSend = () => {
     setIsErrorTransferModalVisible(false);
   };
 
-  const currentMinAssetAmount = getCurrentMinAssetAmount(walletIBCAssets[selectedAsset]);
+  const currentMinAssetAmount = getCurrentMinAssetAmount(walletAllAssets[selectedAsset]);
   const maximumSendAmount = availableBalance;
 
   const customAddressValidator = TransactionUtils.addressValidator(
@@ -157,12 +157,12 @@ const FormSend = () => {
     fromScientificNotation(currentMinAssetAmount),
     `Sending amount is lower than minimum allowed of ${fromScientificNotation(
       currentMinAssetAmount,
-    )} ${walletIBCAssets[selectedAsset].symbol}`,
+    )} ${walletAllAssets[selectedAsset].symbol}`,
   );
 
   useEffect(() => {
-    setAvailableBalance(scaledBalance(walletIBCAssets[selectedAsset]));
-  }, [walletIBCAssets, selectedAsset]);
+    setAvailableBalance(scaledBalance(walletAllAssets[selectedAsset]));
+  }, [walletAllAssets, selectedAsset]);
 
   return (
     <Form
@@ -196,7 +196,7 @@ const FormSend = () => {
             setSelectedAsset(value);
           }}
         >
-          {walletIBCAssets.map((item, idx) => {
+          {walletAllAssets.map((item, idx) => {
             return <Option value={idx}>{item.symbol}</Option>;
           })}
         </Select>
@@ -225,7 +225,7 @@ const FormSend = () => {
         <div className="available">
           <span>Available: </span>
           <div className="available-amount">
-            {availableBalance} {walletIBCAssets[selectedAsset].symbol}
+            {availableBalance} {walletAllAssets[selectedAsset].symbol}
           </div>
         </div>
       </div>
@@ -272,7 +272,7 @@ const FormSend = () => {
             </div>
             <div className="item">
               <div className="label">Amount</div>
-              <div>{`${formValues?.amount} ${walletIBCAssets[selectedAsset].symbol}`}</div>
+              <div>{`${formValues?.amount} ${walletAllAssets[selectedAsset].symbol}`}</div>
             </div>
             <div className="item">
               <div className="label">Transaction Fee</div>
@@ -281,8 +281,8 @@ const FormSend = () => {
                   currentSession.wallet.config.fee.networkFee !== undefined
                   ? currentSession.wallet.config.fee.networkFee
                   : FIXED_DEFAULT_FEE,
-                walletIBCAssets[selectedAsset],
-              )} ${walletIBCAssets[selectedAsset].symbol}`}</div>
+                walletAllAssets[selectedAsset],
+              )} ${walletAllAssets[selectedAsset].symbol}`}</div>
             </div>
             <div className="item">
               <div className="label">Memo</div>

@@ -18,7 +18,7 @@ import {
   sessionState,
   marketState,
   walletAssetState,
-  walletIBCAssetsState,
+  walletAllAssetsState,
   ledgerIsExpertModeState,
   fetchingDBState,
 } from '../../recoil/atom';
@@ -129,7 +129,7 @@ function HomePage() {
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
-  const walletIBCAssets = useRecoilValue(walletIBCAssetsState);
+  const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
@@ -631,7 +631,7 @@ function HomePage() {
         <Tabs defaultActiveKey="1">
           <TabPane tab="Assets" key="1">
             {/* <Table columns={AssetColumns} dataSource={assetSource} /> */}
-            <Table columns={AssetColumns} dataSource={walletIBCAssets} className="asset-table" />
+            <Table columns={AssetColumns} dataSource={walletAllAssets} className="asset-table" />
           </TabPane>
           <TabPane tab="Transactions" key="2">
             <Table columns={TransactionColumns} dataSource={transfers} />

@@ -17,7 +17,7 @@ import { useRecoilState } from 'recoil';
 import {
   sessionState,
   walletAssetState,
-  walletIBCAssetsState,
+  walletAllAssetsState,
   walletListState,
   marketState,
   fetchingDBState,
@@ -48,7 +48,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [hasWallet, setHasWallet] = useState(true); // Default as true. useEffect will only re-render if result of hasWalletBeenCreated === false
   const [session, setSession] = useRecoilState(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
-  const [walletIBCAssets, setWalletIBCAssets] = useRecoilState(walletIBCAssetsState);
+  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [marketData, setMarketData] = useRecoilState(marketState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
@@ -130,7 +130,7 @@ function HomeLayout(props: HomeLayoutProps) {
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
-      const ibcAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
+      const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
       const allWalletsData = await walletService.retrieveAllWallets();
       const currentMarketData = await walletService.retrieveAssetPrice(
         currentAsset.mainnetSymbol,
@@ -140,7 +140,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setHasWallet(hasWalletBeenCreated);
       setSession(sessionData);
       setUserAsset(currentAsset);
-      setWalletIBCAssets(ibcAssets);
+      setWalletAllAssets(allAssets);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
 
@@ -164,8 +164,8 @@ function HomeLayout(props: HomeLayoutProps) {
     setSession,
     userAsset,
     setUserAsset,
-    walletIBCAssets,
-    setWalletIBCAssets,
+    walletAllAssets,
+    setWalletAllAssets,
     walletList,
     setWalletList,
     marketData,
