@@ -129,7 +129,7 @@ function HomePage() {
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
-  const [walletIBCAssets, setWalletIBCAssets] = useRecoilState(walletIBCAssetsState);
+  const walletIBCAssets = useRecoilValue(walletIBCAssetsState);
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
@@ -226,9 +226,6 @@ function HomePage() {
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
-      const ibcAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
-      setWalletIBCAssets(ibcAssets);
-
       showWalletStateNotification(currentSession.wallet.config);
       setDelegations(stakingTabularData);
       setTransfers(transferTabularData);
@@ -266,7 +263,7 @@ function HomePage() {
       ),
     },
     {
-      title: 'Amount',
+      title: 'Balance',
       // dataIndex: 'amount',
       key: 'amount',
       render: record => (

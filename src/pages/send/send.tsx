@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './send.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber, Layout, Select } from 'antd';
@@ -44,6 +44,8 @@ const FormSend = () => {
   const [errorMessages, setErrorMessages] = useState([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [availableBalance, setAvailableBalance] = useState('--');
+  const [selectedAsset, setSelectedAsset] = useState(0); // CRO / TCRO as default
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const currentSession = useRecoilValue(sessionState);
@@ -138,9 +140,8 @@ const FormSend = () => {
     setIsErrorTransferModalVisible(false);
   };
 
-  const scaleUpBalance = scaledBalance(walletAsset); // From BaseXYZ balance to XYZ balance
-  const currentMinAssetAmount = getCurrentMinAssetAmount(walletAsset);
-  const maximumSendAmount = scaleUpBalance;
+  const currentMinAssetAmount = getCurrentMinAssetAmount(walletIBCAssets[selectedAsset]);
+  const maximumSendAmount = availableBalance;
 
   const customAddressValidator = TransactionUtils.addressValidator(
     currentSession,
@@ -156,8 +157,12 @@ const FormSend = () => {
     fromScientificNotation(currentMinAssetAmount),
     `Sending amount is lower than minimum allowed of ${fromScientificNotation(
       currentMinAssetAmount,
-    )} ${walletAsset.symbol}`,
+    )} ${walletIBCAssets[selectedAsset].symbol}`,
   );
+
+  useEffect(() => {
+    setAvailableBalance(scaledBalance(walletIBCAssets[selectedAsset]));
+  }, [walletIBCAssets, selectedAsset]);
 
   return (
     <Form
@@ -185,9 +190,14 @@ const FormSend = () => {
       </Form.Item>
       <Form.Item name="ibcToken" label="Select Asset">
         {/* <Input.Group compact> */}
-        <Select>
-          {walletIBCAssets.map(item => {
-            return <Option value={item.symbol}>{item.symbol}</Option>;
+        <Select
+          defaultValue={0}
+          onChange={(value: number) => {
+            setSelectedAsset(value);
+          }}
+        >
+          {walletIBCAssets.map((item, idx) => {
+            return <Option value={idx}>{item.symbol}</Option>;
           })}
         </Select>
         {/* <Input style={{ width: '50%' }} defaultValue="Xihu District, Hangzhou" /> */}
@@ -215,7 +225,7 @@ const FormSend = () => {
         <div className="available">
           <span>Available: </span>
           <div className="available-amount">
-            {scaleUpBalance} {walletAsset.symbol}
+            {availableBalance} {walletIBCAssets[selectedAsset].symbol}
           </div>
         </div>
       </div>
@@ -262,7 +272,7 @@ const FormSend = () => {
             </div>
             <div className="item">
               <div className="label">Amount</div>
-              <div>{`${formValues?.amount} ${walletAsset.symbol}`}</div>
+              <div>{`${formValues?.amount} ${walletIBCAssets[selectedAsset].symbol}`}</div>
             </div>
             <div className="item">
               <div className="label">Transaction Fee</div>
@@ -271,8 +281,8 @@ const FormSend = () => {
                   currentSession.wallet.config.fee.networkFee !== undefined
                   ? currentSession.wallet.config.fee.networkFee
                   : FIXED_DEFAULT_FEE,
-                walletAsset,
-              )} ${walletAsset.symbol}`}</div>
+                walletIBCAssets[selectedAsset],
+              )} ${walletIBCAssets[selectedAsset].symbol}`}</div>
             </div>
             <div className="item">
               <div className="label">Memo</div>
