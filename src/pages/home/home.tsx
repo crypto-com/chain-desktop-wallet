@@ -282,11 +282,13 @@ function HomePage() {
       title: 'Balance',
       // dataIndex: 'amount',
       key: 'amount',
-      render: record => (
-        <>
-          {numeral(scaledBalance(record)).format('0,0.0000')} {record.symbol}
-        </>
-      ),
+      render: (record: UserAsset) => {
+        return (
+          <>
+            {getUIDynamicAmount(record.balance, record)} {record.symbol}
+          </>
+        );
+      },
     },
     {
       title: 'Value',

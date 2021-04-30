@@ -36,3 +36,10 @@ export function middleEllipsis(str: string, len: number) {
 export function ellipsis(str: string, len: number) {
   return str.length <= len ? `${str}` : `${str.substr(0, len)}...`;
 }
+
+export function capitalizeFirstLetter(value: string) {
+  if (!value || value.length < 2) {
+    return '';
+  }
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}

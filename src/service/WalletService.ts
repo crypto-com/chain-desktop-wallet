@@ -58,6 +58,7 @@ import {
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
+import { capitalizeFirstLetter } from '../utils/utils';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -530,10 +531,12 @@ class WalletService {
 
     const persistedAssets = ibcAssets.map(async ibcAsset => {
       const denomTrace = await nodeRpc.getIBCAssetTrace(ibcAsset.ibcDenomHash!);
+      const baseDenom = capitalizeFirstLetter(denomTrace.base_denom);
+
       ibcAsset.denomTracePath = denomTrace.path;
-      ibcAsset.symbol = denomTrace.base_denom;
-      ibcAsset.mainnetSymbol = denomTrace.base_denom;
-      ibcAsset.name = denomTrace.base_denom;
+      ibcAsset.symbol = baseDenom;
+      ibcAsset.mainnetSymbol = baseDenom;
+      ibcAsset.name = baseDenom;
       ibcAsset.walletId = currentSession.wallet.identifier;
       await this.storageService.saveAsset(ibcAsset);
       return ibcAsset;
