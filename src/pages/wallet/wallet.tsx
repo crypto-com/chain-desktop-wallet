@@ -8,6 +8,7 @@ import Icon, { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
 import {
   sessionState,
   walletAssetState,
+  walletAllAssetsState,
   walletListState,
   fetchingDBState,
 } from '../../recoil/atom';
@@ -29,6 +30,7 @@ enum sortOrder {
 function WalletPage() {
   const [session, setSession] = useRecoilState<Session>(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const fetchingDB = useRecoilValue(fetchingDBState);
   const walletList = useRecoilValue(walletListState);
   const [loading, setLoading] = useState(false);
@@ -78,8 +80,10 @@ function WalletPage() {
     await walletService.setCurrentSession(new Session(walletList[e.key]));
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+    const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
     setSession(currentSession);
     setUserAsset(currentAsset);
+    setWalletAllAssets(allAssets);
     await walletService.syncAll(currentSession);
 
     setLoading(false);
@@ -92,7 +96,7 @@ function WalletPage() {
     };
 
     syncWalletList();
-  }, [fetchingDB, userAsset]);
+  }, [fetchingDB, userAsset, walletAllAssets]);
 
   const columns = [
     {

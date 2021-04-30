@@ -100,8 +100,11 @@ function HomeLayout(props: HomeLayoutProps) {
     await walletService.setCurrentSession(new Session(walletList[0]));
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+    const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
+
     setSession(currentSession);
     setUserAsset(currentAsset);
+    setWalletAllAssets(allAssets);
     await walletService.syncAll(currentSession);
 
     setIsButtonLoading(false);

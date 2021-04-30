@@ -188,21 +188,22 @@ const FormSend = () => {
       >
         <Input placeholder="Enter recipient address" />
       </Form.Item>
-      <Form.Item name="ibcToken" label="Select Asset">
-        {/* <Input.Group compact> */}
-        <Select
-          defaultValue={0}
-          onChange={(value: number) => {
-            setSelectedAsset(value);
-          }}
-        >
-          {walletAllAssets.map((item, idx) => {
-            return <Option value={idx}>{item.symbol}</Option>;
-          })}
-        </Select>
-        {/* <Input style={{ width: '50%' }} defaultValue="Xihu District, Hangzhou" /> */}
-        {/* </Input.Group> */}
-      </Form.Item>
+      {walletAllAssets.length > 1 ? (
+        <Form.Item name="ibcToken" label="Select Asset">
+          <Select
+            defaultValue={0}
+            onChange={(value: number) => {
+              setSelectedAsset(value);
+            }}
+          >
+            {walletAllAssets.map((item, idx) => {
+              return <Option value={idx}>{item.symbol}</Option>;
+            })}
+          </Select>
+        </Form.Item>
+      ) : (
+        <></>
+      )}
       <div className="amount">
         <Form.Item
           name="amount"

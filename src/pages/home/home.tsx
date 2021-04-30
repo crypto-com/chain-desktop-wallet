@@ -629,14 +629,17 @@ function HomePage() {
           </div>
         </div>
         <Tabs defaultActiveKey="1">
-          <TabPane tab="Assets" key="1">
-            {/* <Table columns={AssetColumns} dataSource={assetSource} /> */}
-            <Table columns={AssetColumns} dataSource={walletAllAssets} className="asset-table" />
-          </TabPane>
-          <TabPane tab="Transactions" key="2">
+          {walletAllAssets.length > 1 ? (
+            <TabPane tab="Assets" key="1">
+              <Table columns={AssetColumns} dataSource={walletAllAssets} className="asset-table" />
+            </TabPane>
+          ) : (
+            <></>
+          )}
+          <TabPane tab="Transactions" key={walletAllAssets.length > 1 ? '2' : '1'}>
             <Table columns={TransactionColumns} dataSource={transfers} />
           </TabPane>
-          <TabPane tab="Delegations" key="3">
+          <TabPane tab="Delegations" key={walletAllAssets.length > 1 ? '3' : '2'}>
             <Table
               columns={StakingColumns}
               dataSource={delegations}
