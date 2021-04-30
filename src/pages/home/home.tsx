@@ -12,6 +12,7 @@ import {
   getAssetBalancePrice,
   getAssetStakingBalancePrice,
   UserAsset,
+  UserAssetType,
 } from '../../models/UserAsset';
 import {
   hasShownWarningOnWalletTypeState,
@@ -245,7 +246,7 @@ function HomePage() {
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: record => (
         <div className="name">
-          {record.mainnetSymbol === 'CRO' ? (
+          {record.assetType !== UserAssetType.IBC ? (
             <img src={logoCro} alt="cro" />
           ) : (
             <Avatar
