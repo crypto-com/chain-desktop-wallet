@@ -19,6 +19,7 @@ import {
   walletAssetState,
   walletListState,
   marketState,
+  validatorListState,
   fetchingDBState,
 } from '../../recoil/atom';
 import { trimString } from '../../utils/utils';
@@ -49,6 +50,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [marketData, setMarketData] = useRecoilState(marketState);
+  const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
@@ -124,12 +126,16 @@ function HomeLayout(props: HomeLayoutProps) {
         currentAsset.mainnetSymbol,
         'usd',
       );
+      const currentValidatorList = await walletService.retrieveTopValidators(
+        sessionData.wallet.config.network.chainId,
+      );
 
       setHasWallet(hasWalletBeenCreated);
       setSession(sessionData);
       setUserAsset(currentAsset);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
+      setValidatorList(currentValidatorList);
       await fetchAndSetNewValidators();
       await fetchAndSetNewProposals();
       setFetchingDB(false);
@@ -152,6 +158,8 @@ function HomeLayout(props: HomeLayoutProps) {
     setWalletList,
     marketData,
     setMarketData,
+    validatorList,
+    setValidatorList,
   ]);
 
   const HomeMenu = () => {

@@ -1,14 +1,15 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRecoilValue } from 'recoil';
 import { FormInstance } from 'antd/lib/form';
 import { Form, InputNumber, Alert, Table, Input } from 'antd';
 import { OrderedListOutlined } from '@ant-design/icons';
 import numeral from 'numeral';
 import Big from 'big.js';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
+import { validatorListState, fetchingDBState } from '../../../recoil/atom';
 import { Session } from '../../../models/Session';
 import { UserAsset, scaledAmount } from '../../../models/UserAsset';
 import { ValidatorModel } from '../../../models/Transaction';
-import { walletService } from '../../../service/WalletService';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { middleEllipsis, ellipsis } from '../../../utils/utils';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
@@ -25,10 +26,10 @@ const RedelegateFormComponent = (props: {
   };
   form: FormInstance;
 }) => {
+  const currentValidatorList = useRecoilValue(validatorListState);
+  const fetchingDB = useRecoilValue(fetchingDBState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
   const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
-
-  const didMountRef = useRef(false);
 
   const redelegatePeriod = props.currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
 
@@ -135,28 +136,27 @@ const RedelegateFormComponent = (props: {
     'Undelegate amount cannot be bigger than currently delegated',
   );
 
-  useEffect(() => {
-    let unmounted = false;
-
-    const syncValidatorsData = async () => {
-      const currentValidatorList = await walletService.retrieveTopValidators(
-        props.currentSession.wallet.config.network.chainId,
-      );
-
-      if (!unmounted) {
-        setValidatorTopList(currentValidatorList);
-      }
-    };
-
-    if (!didMountRef.current) {
-      syncValidatorsData();
-      didMountRef.current = true;
+  const processValidatorList = (validatorList: ValidatorModel[] | null) => {
+    if (validatorList) {
+      return validatorList.map((validator, idx) => {
+        const validatorModel = {
+          ...validator,
+          key: `${idx}`,
+        };
+        return validatorModel;
+      });
     }
+    return [];
+  };
 
-    return () => {
-      unmounted = true;
+  useEffect(() => {
+    const syncValidatorsData = async () => {
+      const validatorList = processValidatorList(currentValidatorList);
+      setValidatorTopList(validatorList);
     };
-  }, [validatorTopList, setValidatorTopList]);
+
+    syncValidatorsData();
+  }, [fetchingDB, currentValidatorList]);
 
   return (
     <div className="redelegate-form">

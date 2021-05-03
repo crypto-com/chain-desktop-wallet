@@ -19,6 +19,7 @@ import {
   walletAssetState,
   ledgerIsExpertModeState,
   fetchingDBState,
+  validatorListState,
 } from '../../recoil/atom';
 import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
@@ -69,34 +70,34 @@ const FormDelegationRequest = () => {
   const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
   const [showMemo, setShowMemo] = useState(false);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const currentValidatorList = useRecoilValue(validatorListState);
   const currentSession = useRecoilValue(sessionState);
   const fetchingDB = useRecoilValue(fetchingDBState);
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
 
-  const processValidatorList = (validatorList: ValidatorModel[]) => {
-    return validatorList.map((validator, idx) => {
-      const validatorModel = {
-        ...validator,
-        key: `${idx}`,
-      };
-      return validatorModel;
-    });
+  const processValidatorList = (validatorList: ValidatorModel[] | null) => {
+    if (validatorList) {
+      return validatorList.map((validator, idx) => {
+        const validatorModel = {
+          ...validator,
+          key: `${idx}`,
+        };
+        return validatorModel;
+      });
+    }
+    return [];
   };
 
   useEffect(() => {
     const syncValidatorsData = async () => {
-      const currentValidatorList = await walletService.retrieveTopValidators(
-        currentSession.wallet.config.network.chainId,
-      );
-
       const validatorList = processValidatorList(currentValidatorList);
       setValidatorTopList(validatorList);
     };
 
     syncValidatorsData();
-  }, [fetchingDB]);
+  }, [fetchingDB, currentValidatorList]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
