@@ -278,7 +278,7 @@ const FormDelegationRequest = () => {
       },
     },
     {
-      title: 'Rate',
+      title: 'Commission',
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
       sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
