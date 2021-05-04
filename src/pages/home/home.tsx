@@ -36,7 +36,7 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
 import { UndelegateFormComponent } from './components/UndelegateFormComponent';
-import { RedelegateFormComponent } from './components/RedelegateFormComponent';
+import RedelegateFormComponent from './components/RedelegateFormComponent';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';

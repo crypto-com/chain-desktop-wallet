@@ -9,6 +9,7 @@ import {
   sessionState,
   walletAssetState,
   walletListState,
+  validatorListState,
   fetchingDBState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
@@ -29,6 +30,7 @@ enum sortOrder {
 function WalletPage() {
   const [session, setSession] = useRecoilState<Session>(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
   const walletList = useRecoilValue(walletListState);
   const [loading, setLoading] = useState(false);
@@ -81,6 +83,10 @@ function WalletPage() {
     setSession(currentSession);
     setUserAsset(currentAsset);
     await walletService.syncAll(currentSession);
+    const currentValidatorList = await walletService.retrieveTopValidators(
+      currentSession.wallet.config.network.chainId,
+    );
+    setValidatorList(currentValidatorList);
 
     setLoading(false);
   };
@@ -92,7 +98,7 @@ function WalletPage() {
     };
 
     syncWalletList();
-  }, [fetchingDB, userAsset]);
+  }, [fetchingDB, userAsset, validatorList]);
 
   const columns = [
     {
