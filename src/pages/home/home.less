@@ -25,6 +25,60 @@
   }
 }
 
+.nft-container {
+  display: grid;
+  // grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+  // row-gap: 20px;
+  margin-bottom: 20px;
+  padding: 24px;
+  text-align: center;
+
+  .view-selection {
+    text-align: right;
+    .ant-radio-button-wrapper {
+      border: none;
+      box-shadow: none;
+      transition: none;
+    }
+    .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+      box-shadow: none;
+    }
+    .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before {
+      background-color: transparent;
+    }
+    .ant-radio-button-wrapper:not(:first-child)::before {
+      background-color: transparent;
+    }
+  }
+
+  .nft {
+    .ant-avatar {
+      width: 24px;
+      height: 24px;
+      // padding: 0 5px 5px 0;
+      margin-right: 5px;
+    }
+  }
+
+  // .nft {
+  //   color: @font-color-dark;
+  //   font-weight: 500;
+  //   text-align: left;
+  //   .title {
+  //     font-size: 12px;
+  //     opacity: 0.5;
+  //   }
+
+  //   .quantity {
+  //     font-size: 24px;
+  //   }
+
+  //   .fiat {
+  //     color: @azure;
+  //   }
+  // }
+}
+
 .redelegate-form {
   .input-validator-address {
     .ant-form-item-children-icon {

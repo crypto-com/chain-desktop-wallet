@@ -1,10 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from 'antd';
+import {
+  Button,
+  Form,
+  Layout,
+  notification,
+  Table,
+  Tabs,
+  Tag,
+  Typography,
+  Card,
+  List,
+  Avatar,
+} from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import numeral from 'numeral';
+import axios from 'axios';
 import {
   scaledBalance,
   scaledStakingBalance,
@@ -45,6 +58,7 @@ const { Text } = Typography;
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
+const { Meta } = Card;
 
 enum StakingActionType {
   UNDELEGATE = 'UNDELEGATE',
@@ -129,6 +143,9 @@ function HomePage() {
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
+
+  const [nftList, setNftList] = useState<any[]>([]);
+  // const [nftView, setNftView] = useState('grid');
 
   // Undelegate action related states changes
   const [form] = Form.useForm();
@@ -221,6 +238,16 @@ function HomePage() {
       setTransfers(transferTabularData);
       setUserAsset(currentAsset);
       setHasShownNotLiveWallet(true);
+
+      const nftApi = await axios
+        .create({
+          baseURL: 'https://api.opensea.io/api/v1/',
+        })
+        .get(
+          'assets?order_direction=desc&offset=0&limit=2&owner=0x701a24d812e4d9827ec8dd2b3eed726ffd9b4065',
+        );
+
+      setNftList(nftApi.data.assets);
     };
 
     syncAssetData();
@@ -495,6 +522,11 @@ function HomePage() {
     },
   ];
 
+  // const nftViewOptions = [
+  //   { label: <MenuOutlined />, value: 'list' },
+  //   { label: <AppstoreOutlined />, value: 'grid' },
+  // ];
+
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">
@@ -536,25 +568,69 @@ function HomePage() {
             </div>
           </div>
         </div>
+        My NFT
+        <div className="site-layout-background nft-container">
+          {/* <div className="view-selection">
+              <Radio.Group
+                options={nftViewOptions}
+                defaultValue="grid"
+                onChange={(e) => {
+                  setNftView(e.target.value)
+                }}
+                // value={value4}
+                optionType="button"
+              />
+          </div> */}
+          <List
+            grid={{
+              gutter: 16,
+              xs: 1,
+              sm: 2,
+              md: 4,
+              lg: 4,
+              xl: 5,
+              xxl: 5,
+            }}
+            dataSource={nftList}
+            renderItem={item => (
+              <List.Item>
+                <Card
+                  style={{ width: 170 }}
+                  cover={<img alt="example" src={item?.image_thumbnail_url} />}
+                  hoverable
+                  onClick={() => {
+                    // setNft(item);
+                    // setIsNftVisible(true);
+                  }}
+                  className="nft"
+                >
+                  <Meta
+                    title={item?.name}
+                    description={
+                      <>
+                        <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
+                        CryptoPunks
+                      </>
+                    }
+                  />
+                </Card>
+              </List.Item>
+            )}
+            // pagination={{
+            //   pageSize: 5,
+            // }}
+            pagination={false}
+          />
+        </div>
         <Tabs defaultActiveKey="1">
           <TabPane tab="Transactions" key="1">
             <Table columns={TransactionColumns} dataSource={transfers} />
           </TabPane>
           <TabPane tab="Delegations" key="2">
-            <Table
-              columns={StakingColumns}
-              dataSource={delegations}
-              // onRow={record => {
-              //   return {
-              //     onClick: () => {
-              //       setUndelegateFormValues({
-              //         validatorAddress: record.validatorAddress,
-              //         undelegateAmount: record.stakedAmount,
-              //       });
-              //     },
-              //   };
-              // }}
-            />
+            <Table columns={StakingColumns} dataSource={delegations} />
+          </TabPane>
+          <TabPane tab="NFT Transactions" key="3">
+            <Table columns={StakingColumns} dataSource={delegations} />
           </TabPane>
         </Tabs>
         <div>
