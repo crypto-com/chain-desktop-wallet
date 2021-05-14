@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import './home.less';
 import 'antd/dist/antd.css';
 import {
@@ -568,9 +569,10 @@ function HomePage() {
             </div>
           </div>
         </div>
-        My NFT
-        <div className="site-layout-background nft-container">
-          {/* <div className="view-selection">
+        <Tabs defaultActiveKey="1">
+          <TabPane tab="My NFT" key="1">
+            <div className="site-layout-background nft-container">
+              {/* <div className="view-selection">
               <Radio.Group
                 options={nftViewOptions}
                 defaultValue="grid"
@@ -581,47 +583,49 @@ function HomePage() {
                 optionType="button"
               />
           </div> */}
-          <List
-            grid={{
-              gutter: 16,
-              xs: 1,
-              sm: 2,
-              md: 4,
-              lg: 4,
-              xl: 5,
-              xxl: 5,
-            }}
-            dataSource={nftList}
-            renderItem={item => (
-              <List.Item>
-                <Card
-                  style={{ width: 170 }}
-                  cover={<img alt="example" src={item?.image_thumbnail_url} />}
-                  hoverable
-                  onClick={() => {
-                    // setNft(item);
-                    // setIsNftVisible(true);
-                  }}
-                  className="nft"
-                >
-                  <Meta
-                    title={item?.name}
-                    description={
-                      <>
-                        <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
-                        CryptoPunks
-                      </>
-                    }
-                  />
-                </Card>
-              </List.Item>
-            )}
-            // pagination={{
-            //   pageSize: 5,
-            // }}
-            pagination={false}
-          />
-        </div>
+              <List
+                grid={{
+                  gutter: 16,
+                  xs: 1,
+                  sm: 2,
+                  md: 4,
+                  lg: 4,
+                  xl: 5,
+                  xxl: 5,
+                }}
+                dataSource={nftList}
+                renderItem={item => (
+                  <List.Item>
+                    <Card
+                      style={{ width: 170 }}
+                      cover={<img alt="example" src={item?.image_thumbnail_url} />}
+                      hoverable
+                      onClick={() => {
+                        // setNft(item);
+                        // setIsNftVisible(true);
+                      }}
+                      className="nft"
+                    >
+                      <Meta
+                        title={item?.name}
+                        description={
+                          <>
+                            <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
+                            CryptoPunks
+                          </>
+                        }
+                      />
+                    </Card>
+                  </List.Item>
+                )}
+                pagination={false}
+              />
+              <Link to="/nft" style={{ textAlign: 'right' }}>
+                See all
+              </Link>
+            </div>
+          </TabPane>
+        </Tabs>
         <Tabs defaultActiveKey="1">
           <TabPane tab="Transactions" key="1">
             <Table columns={TransactionColumns} dataSource={transfers} />
