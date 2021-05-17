@@ -2,9 +2,15 @@ import { app, BrowserWindow, nativeImage, Menu } from 'electron';
 import * as path from 'path';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import { IpcMain } from './IpcMain';
+const { actionEvent } = require('./UsageAnalytics');
+
+(global as any).actionEvent = actionEvent;
+
+
 let win: BrowserWindow | null = null;
 let ipcmain: IpcMain | null = null;
 const isDev = process.env.NODE_ENV === 'development'; // change true, in developing mode
+
 
 function createWindow() {
   const iconPath = path.join(__dirname, '/public/icon.png').replace(/\\/g, '\\\\');
@@ -22,6 +28,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       devTools: isDev,
+      enableRemoteModule: true
     },
     resizable: true,
     icon: iconImage,
@@ -70,6 +77,7 @@ function createWindow() {
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
+  actionEvent('App', 'Close', 'AppClosed', 1)
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -77,6 +85,7 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
   if (win === null) {
+    actionEvent('App', 'Open', 'AppOpened', 0)
     createWindow();
   }
 });

@@ -4,6 +4,9 @@ import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber, Layout } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
+// eslint-disable-next-line import/no-extraneous-dependencies
+// import {remote} from 'electron';
+
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -22,6 +25,12 @@ import {
 } from '../../utils/NumberUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
+
+const electron = window.require('electron');
+
+console.log('electron', electron);
+
+const actionEvent = electron.remote.getGlobal('actionEvent');
 
 const { Header, Content, Footer } = Layout;
 const layout = {};
@@ -104,6 +113,7 @@ const FormSend = () => {
       setWalletAsset(currentWalletAsset);
 
       form.resetFields();
+      actionEvent('Transaction', 'Transfer', 'FundsTransferred', 11);
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
         setLedgerIsExpertMode(detectConditionsError(e.toString()));
