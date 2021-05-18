@@ -30,6 +30,9 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
 
+const electron = window.require('electron');
+const pageView = electron.remote.getGlobal('pageView');
+
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
 
@@ -317,6 +320,8 @@ const GovernancePage = () => {
       fetchProposalList();
       didMountRef.current = true;
     }
+
+    pageView('Governance');
     // eslint-disable-next-line
   }, [proposalList, setProposalList]);
 

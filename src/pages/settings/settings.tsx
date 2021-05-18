@@ -17,6 +17,9 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
 
+const electron = window.require('electron');
+const pageView = electron.remote.getGlobal('pageView');
+
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const layout = {
@@ -41,6 +44,8 @@ const GeneralSettingsForm = () => {
       if (!unmounted) {
         setEnabledGeneralSettings(enabledGeneralWalletsSettings);
       }
+
+      pageView('Settings');
     };
 
     if (!didMountRef.current) {

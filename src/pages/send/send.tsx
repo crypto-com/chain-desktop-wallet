@@ -32,9 +32,6 @@ const transactionEvent = electron.remote.getGlobal('transactionEvent');
 const actionEvent = electron.remote.getGlobal('actionEvent');
 const pageView = electron.remote.getGlobal('pageView');
 
-// eslint-disable-next-line no-console
-// console.log({transactionEvent, actionEvent})
-
 const { Header, Content, Footer } = Layout;
 const layout = {};
 const tailLayout = {};

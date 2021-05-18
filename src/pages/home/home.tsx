@@ -41,6 +41,9 @@ import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
 
+const electron = window.require('electron');
+const pageView = electron.remote.getGlobal('pageView');
+
 const { Text } = Typography;
 
 const { Header, Content, Footer } = Layout;
@@ -221,6 +224,8 @@ function HomePage() {
       setTransfers(transferTabularData);
       setUserAsset(currentAsset);
       setHasShownNotLiveWallet(true);
+
+      pageView('Home');
     };
 
     syncAssetData();

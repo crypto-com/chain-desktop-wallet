@@ -6,7 +6,7 @@ const getUACode = electron.remote.getGlobal('getUACode');
 const getGAnalyticsCode = electron.remote.getGlobal('getGAnalyticsCode');
 
 export class AnalyticsService {
-  private userAgent: ua.Visitor | null = null;
+  private readonly userAgent: ua.Visitor | null = null;
 
   public constructor() {
     this.userAgent = this.userAgent || AnalyticsService.initUA();

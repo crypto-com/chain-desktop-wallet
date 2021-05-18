@@ -10,6 +10,9 @@ import { sessionState } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
 
+const electron = window.require('electron');
+const pageView = electron.remote.getGlobal('pageView');
+
 const { Header, Content, Footer } = Layout;
 
 function ReceivePage() {
@@ -19,6 +22,7 @@ function ReceivePage() {
   useEffect(() => {
     const { walletType } = session.wallet;
     setIsLedger(LEDGER_WALLET_TYPE === walletType);
+    pageView('Receive');
   });
 
   const clickCheckLedger = async () => {
