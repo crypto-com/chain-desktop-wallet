@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {
   DisableDefaultMemoSettings,
+  DisableGASettings,
   EnableGeneralSettingsPropagation,
   reconstructCustomConfig,
   SettingsDataUpdate,
@@ -455,6 +456,10 @@ class WalletService {
     disableDefaultMemoSettings: DisableDefaultMemoSettings,
   ) {
     return this.storageService.updateDisabledDefaultMemo(disableDefaultMemoSettings);
+  }
+
+  public async updateGADisabledSettings(disableGASettings: DisableGASettings) {
+    return this.storageService.updateDisabledGA(disableGASettings);
   }
 
   public async updateGeneralSettingsPropagation(
