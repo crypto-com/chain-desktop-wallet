@@ -4,6 +4,8 @@ import { getRandomId } from '../crypto/RandomGen';
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
 export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';
+// Google Analytics
+export const GOOGLE_ANALYTICS_UA_CODE = '';
 
 export const NodePorts = {
   Tendermint: ':26657',
@@ -21,6 +23,7 @@ export type WalletConfig = {
   derivationPath: string;
   network: Network;
   disableDefaultClientMemo: boolean;
+  disableGA: boolean;
   // When enabled all settings update will be propagated to all wallets of the same network.
   // E.g: User updates nodeURL in one mainnet wallet, all other mainnet wallets will have the new nodeURL
   enableGeneralSettings: boolean;
@@ -43,6 +46,7 @@ const TestNetConfig: WalletConfig = {
   nodeUrl: CroNetwork.Testnet.defaultNodeUrl,
   network: CroNetwork.Testnet,
   disableDefaultClientMemo: false,
+  disableGA: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,
   fee: {
@@ -64,6 +68,7 @@ const MainNetConfig: WalletConfig = {
   indexingUrl: 'https://crypto.org/explorer/api/v1/',
   network: CroNetwork.Mainnet,
   disableDefaultClientMemo: false,
+  disableGA: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,
   fee: {
@@ -78,6 +83,7 @@ export const CustomDevNet: WalletConfig = {
   enabled: true,
   name: 'CUSTOM DEVNET',
   disableDefaultClientMemo: false,
+  disableGA: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,
   network: {

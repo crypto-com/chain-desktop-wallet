@@ -1,4 +1,9 @@
-import { DisableDefaultMemoSettings, SettingsDataUpdate, Wallet } from '../models/Wallet';
+import {
+  DisableDefaultMemoSettings,
+  DisableGASettings,
+  SettingsDataUpdate,
+  Wallet,
+} from '../models/Wallet';
 import { DatabaseManager } from './DatabaseManager';
 import { Session } from '../models/Session';
 import {
@@ -56,6 +61,17 @@ export class StorageService {
     const previousWallet = await this.findWalletByIdentifier(disableDefaultMemoSettings.walletId);
     previousWallet.config.disableDefaultClientMemo =
       disableDefaultMemoSettings.disableDefaultMemoAppend;
+
+    return this.db.walletStore.update<Wallet>(
+      { identifier: previousWallet.identifier },
+      { $set: previousWallet },
+      { upsert: true },
+    );
+  }
+
+  public async updateDisabledGA(disableGASettings: DisableGASettings) {
+    const previousWallet = await this.findWalletByIdentifier(disableGASettings.walletId);
+    previousWallet.config.disableGA = disableGASettings.disableGA;
 
     return this.db.walletStore.update<Wallet>(
       { identifier: previousWallet.identifier },

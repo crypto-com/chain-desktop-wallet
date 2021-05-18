@@ -3,12 +3,24 @@ import { useHistory } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Button, Form, Input, Layout, Tabs, Alert, Checkbox, InputNumber, message } from 'antd';
+import {
+  Button,
+  Form,
+  Input,
+  Layout,
+  Tabs,
+  Alert,
+  Checkbox,
+  InputNumber,
+  message,
+  Switch,
+} from 'antd';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { sessionState, walletListState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
   DisableDefaultMemoSettings,
+  DisableGASettings,
   EnableGeneralSettingsPropagation,
   SettingsDataUpdate,
 } from '../../models/Wallet';
@@ -169,6 +181,8 @@ function MetaInfoComponent() {
   const [updateLoading, setUpdateLoading] = useState(false);
 
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
+  const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
+
   const didMountRef = useRef(false);
 
   useEffect(() => {
@@ -176,8 +190,10 @@ function MetaInfoComponent() {
 
     const SyncConfig = async () => {
       const defaultMemoDisabled = session.wallet.config.disableDefaultClientMemo;
+      const defaultGADisabled = session.wallet.config.disableGA;
       if (!unmounted) {
         setDefaultMemoStateDisabled(defaultMemoDisabled);
+        setDefaultGAStateDisabled(defaultGADisabled);
       }
     };
 
@@ -189,7 +205,12 @@ function MetaInfoComponent() {
     return () => {
       unmounted = true;
     };
-  }, [defaultMemoStateDisabled, setDefaultMemoStateDisabled]);
+  }, [
+    defaultMemoStateDisabled,
+    setDefaultMemoStateDisabled,
+    defaultGAStateDisabled,
+    setDefaultGAStateDisabled,
+  ]);
 
   async function onAllowDefaultMemoChange() {
     setUpdateLoading(true);
@@ -215,22 +236,59 @@ function MetaInfoComponent() {
     );
   }
 
+  async function onAllowDefaultGAChange() {
+    setUpdateLoading(true);
+
+    const newState = !defaultGAStateDisabled;
+    setDefaultGAStateDisabled(newState);
+
+    const disableGASettingsUpdate: DisableGASettings = {
+      walletId: session.wallet.identifier,
+      disableGA: newState,
+    };
+
+    await walletService.updateGADisabledSettings(disableGASettingsUpdate);
+
+    const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
+    const newSession = new Session(updatedWallet);
+    await walletService.setCurrentSession(newSession);
+
+    setSession(newSession);
+    setUpdateLoading(false);
+    message.success(
+      `Google Analytics settings has been ${newState ? 'disabled' : 'enabled'} successfully`,
+    );
+  }
+
   return (
     <div>
       <div className="site-layout-background settings-content">
         <div className="container">
           <div className="item">
+            <div className="title">Default memo message</div>
             <div className="description">
               A default memo message will be used for staking transactions if a custom memo is not
               provided.
             </div>
-            <Checkbox
-              checked={defaultMemoStateDisabled}
+            <Switch
+              checked={!defaultMemoStateDisabled}
               onChange={onAllowDefaultMemoChange}
               disabled={updateLoading}
-            >
-              Disable default memo message
-            </Checkbox>
+            />{' '}
+            {defaultMemoStateDisabled ? 'Disabled' : 'Enabled'}
+          </div>
+          <div className="item">
+            <div className="title">Google Analytics</div>
+            <div className="description">
+              The data send to Google Analysis will help us prioritize future development for new
+              features and functionalities.
+            </div>
+            <Switch
+              checked={!defaultGAStateDisabled}
+              onChange={onAllowDefaultGAChange}
+              disabled={updateLoading}
+            />{' '}
+            {defaultGAStateDisabled ? 'Disabled' : 'Enabled'}
           </div>
         </div>
       </div>
