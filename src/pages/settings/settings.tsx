@@ -14,6 +14,7 @@ import {
   InputNumber,
   message,
   Switch,
+  Divider,
 } from 'antd';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { sessionState, walletListState } from '../../recoil/atom';
@@ -256,7 +257,7 @@ function MetaInfoComponent() {
     setSession(newSession);
     setUpdateLoading(false);
     message.success(
-      `Google Analytics settings has been ${newState ? 'disabled' : 'enabled'} successfully`,
+      `Analytics settings has been ${newState ? 'disabled' : 'enabled'} successfully`,
     );
   }
 
@@ -265,7 +266,7 @@ function MetaInfoComponent() {
       <div className="site-layout-background settings-content">
         <div className="container">
           <div className="item">
-            <div className="title">Default memo message</div>
+            <div className="title">Default Memo</div>
             <div className="description">
               A default memo message will be used for staking transactions if a custom memo is not
               provided.
@@ -277,11 +278,12 @@ function MetaInfoComponent() {
             />{' '}
             {defaultMemoStateDisabled ? 'Disabled' : 'Enabled'}
           </div>
+          <Divider />
           <div className="item">
-            <div className="title">Google Analytics</div>
+            <div className="title">Data Analytics</div>
             <div className="description">
-              The data send to Google Analysis will help us prioritize future development for new
-              features and functionalities.
+              The data collected for analytics is used to prioritize development for new features
+              and functionalities and also to improve implemented features
             </div>
             <Switch
               checked={!defaultGAStateDisabled}
@@ -431,7 +433,7 @@ const FormSettings = () => {
             </div>
           </div>
         </TabPane>
-        <TabPane tab="Metadata Configuration" key="2">
+        <TabPane tab="General Configuration" key="2">
           <MetaInfoComponent />
         </TabPane>
         <TabPane tab="Clear Storage" key="3">

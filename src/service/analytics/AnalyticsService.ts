@@ -36,12 +36,19 @@ export class AnalyticsService {
     const previousID = getUACode() || localStorage.getItem('userid');
     const userId = previousID || uuidv4();
 
-    console.log('userId', userId !== previousID ? `New userid${userId}` : `Existing User${userId}`);
-
     localStorage.setItem('userid', userId);
     const trackingCode = getGAnalyticsCode();
 
     return ua(trackingCode, userId);
+  }
+
+  public recordPageView(pageName: string) {
+    if (this.currentSession.wallet.config.analyticsDisabled) {
+      // DONT RECORD WHEN ANALYTICS IS DISABLED
+      return;
+    }
+
+    this.userAgent?.pageview(pageName).send();
   }
 
   public transactionEvent(transactionId: string, value: string, transactionType: string) {
