@@ -60,11 +60,15 @@ export class AnalyticsService {
   }
 
   public logPage(pageName: string) {
-    if (this.currentSession.wallet.config.analyticsDisabled) {
-      // DONT RECORD WHEN ANALYTICS IS DISABLED
-      return;
-    }
+    try {
+      if (this.currentSession.wallet.config.analyticsDisabled) {
+        // DONT RECORD WHEN ANALYTICS IS DISABLED
+        return;
+      }
 
-    pageView(pageName).send();
+      pageView(pageName).send();
+    } catch (e) {
+      // Ignore
+    }
   }
 }
