@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './send.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber, Layout } from 'antd';
@@ -25,12 +25,15 @@ import {
 } from '../../utils/NumberUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
+import { analyticsService } from '../../service/analytics/AnalyticsService';
 
 const electron = window.require('electron');
-
-console.log('electron', electron);
-
+const transactionEvent = electron.remote.getGlobal('transactionEvent');
 const actionEvent = electron.remote.getGlobal('actionEvent');
+const pageView = electron.remote.getGlobal('pageView');
+
+// eslint-disable-next-line no-console
+// console.log({transactionEvent, actionEvent})
 
 const { Header, Content, Footer } = Layout;
 const layout = {};
@@ -50,6 +53,11 @@ const FormSend = () => {
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const currentSession = useRecoilValue(sessionState);
+
+  useEffect(() => {
+    pageView('Send');
+    analyticsService.recordEvent('SendPage', 'OpenSendPage', '', '');
+  }, []);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -86,6 +94,33 @@ const FormSend = () => {
     showConfirmationModal();
   };
 
+  function logEvent() {
+    try {
+      actionEvent('TransferTransaction', 'Transfer', 'FundsTransfer', formValues.amount);
+
+      analyticsService.recordEvent(
+        'TransferTransaction',
+        'Transfer',
+        'FundsTransfer',
+        formValues.amount,
+      );
+
+      analyticsService.transactionEvent(
+        broadcastResult.transactionHash || '',
+        formValues.amount,
+        'TransferTransaction',
+      );
+
+      transactionEvent(
+        broadcastResult.transactionHash || '',
+        formValues.amount,
+        'TransferTransaction',
+      );
+    } catch (e) {
+      console.log('Error logging event', e);
+    }
+  }
+
   const onConfirmTransfer = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
     const { walletType } = currentSession.wallet;
@@ -103,6 +138,8 @@ const FormSend = () => {
         walletType,
       });
 
+      logEvent();
+
       setBroadcastResult(sendResult);
 
       setIsVisibleConfirmationModal(false);
@@ -113,7 +150,6 @@ const FormSend = () => {
       setWalletAsset(currentWalletAsset);
 
       form.resetFields();
-      actionEvent('Transaction', 'Transfer', 'FundsTransferred', 11);
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
         setLedgerIsExpertMode(detectConditionsError(e.toString()));

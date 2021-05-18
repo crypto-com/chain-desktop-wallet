@@ -1,10 +1,15 @@
 import { app, BrowserWindow, nativeImage, Menu } from 'electron';
 import * as path from 'path';
+
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import { IpcMain } from './IpcMain';
-const { actionEvent } = require('./UsageAnalytics');
+const { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } = require('./UsageAnalytics');
 
 (global as any).actionEvent = actionEvent;
+(global as any).transactionEvent = transactionEvent;
+(global as any).pageView = pageView;
+(global as any).getUACode = getUACode;
+(global as any).getGAnalyticsCode = getGAnalyticsCode;
 
 
 let win: BrowserWindow | null = null;
@@ -40,6 +45,7 @@ function createWindow() {
   win.setMenuBarVisibility(false);
   win.removeMenu();
 
+
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
   } else {
@@ -64,6 +70,7 @@ function createWindow() {
     });
   }
 
+
   // DevTools
   installExtension(REACT_DEVELOPER_TOOLS)
     .then(name => console.log(`Added Extension:  ${name}`))
@@ -72,12 +79,15 @@ function createWindow() {
   if (isDev) {
     win.webContents.openDevTools();
   }
+
+  actionEvent('App', 'Open', 'AppOpened', 0)
+
 }
 
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
-  actionEvent('App', 'Close', 'AppClosed', 1)
+  actionEvent('App', 'Close', 'AppClosed', 0)
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -85,7 +95,6 @@ app.on('window-all-closed', () => {
 
 app.on('activate', () => {
   if (win === null) {
-    actionEvent('App', 'Open', 'AppOpened', 0)
     createWindow();
   }
 });

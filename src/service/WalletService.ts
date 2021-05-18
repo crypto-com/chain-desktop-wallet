@@ -668,7 +668,7 @@ class WalletService {
       // eslint-disable-next-line no-empty
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.log('SYNC_ERROR', e);
+      // console.log('SYNC_ERROR', e);
       return Promise.resolve();
     }
   }
