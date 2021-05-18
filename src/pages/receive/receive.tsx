@@ -9,20 +9,19 @@ import { CopyOutlined } from '@ant-design/icons';
 import { sessionState } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
-
-const electron = window.require('electron');
-const pageView = electron.remote.getGlobal('pageView');
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer } = Layout;
 
 function ReceivePage() {
   const session: Session = useRecoilValue<Session>(sessionState);
   const [isLedger, setIsLedger] = useState(false);
+  const analyticsService = new AnalyticsService(session);
 
   useEffect(() => {
     const { walletType } = session.wallet;
     setIsLedger(LEDGER_WALLET_TYPE === walletType);
-    pageView('Receive');
+    analyticsService.logPage('Receive');
   });
 
   const clickCheckLedger = async () => {

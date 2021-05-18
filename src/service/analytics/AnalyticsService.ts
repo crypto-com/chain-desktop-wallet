@@ -1,64 +1,70 @@
-import { v4 as uuidv4 } from 'uuid';
-import ua from 'universal-analytics';
 import { Session } from '../../models/Session';
 
 const electron = window.require('electron');
-const getUACode = electron.remote.getGlobal('getUACode');
-const getGAnalyticsCode = electron.remote.getGlobal('getGAnalyticsCode');
+
+// Load all analytics functions from the main electron process
+const transactionEvent = electron.remote.getGlobal('transactionEvent');
+const actionEvent = electron.remote.getGlobal('actionEvent');
+const pageView = electron.remote.getGlobal('pageView');
+
+export enum AnalyticsTxType {
+  TransferTransaction = 'TransferTransaction',
+  StakingTransaction = 'StakingTransaction',
+}
+
+export enum AnalyticsActions {
+  FundsTransfer = 'FundsTransfer',
+  FundsStaked = 'FundsStaked',
+}
+
+export enum AnalyticsCategory {
+  Transfer = 'Transfer',
+  Delegate = 'Delegate',
+  PageView = 'PageView',
+  Voting = 'Voting',
+}
 
 export class AnalyticsService {
-  private readonly userAgent: ua.Visitor | null = null;
-
   private readonly currentSession: Session;
 
   public constructor(session: Session) {
-    this.userAgent = this.userAgent || AnalyticsService.initUA();
     this.currentSession = session;
   }
 
-  public recordEvent(category: any, action: any, label: any, value: any) {
-    if (this.currentSession.wallet.config.analyticsDisabled) {
-      // DONT RECORD WHEN ANALYTICS IS DISABLED
-      return;
-    }
-    this.userAgent
-      ?.event({
-        ec: category,
-        ea: action,
-        el: label,
-        ev: value,
-      })
-      .send();
-  }
-
   // eslint-disable-next-line class-methods-use-this
-  private static initUA() {
-    const previousID = getUACode() || localStorage.getItem('userid');
-    const userId = previousID || uuidv4();
-
-    localStorage.setItem('userid', userId);
-    const trackingCode = getGAnalyticsCode();
-
-    return ua(trackingCode, userId);
-  }
-
-  public recordPageView(pageName: string) {
+  public logTransactionEvent(
+    txHash: string,
+    txAmount: string,
+    analyticsTxType: AnalyticsTxType,
+    analyticsAction: AnalyticsActions,
+    analyticsCategory: AnalyticsCategory,
+  ) {
     if (this.currentSession.wallet.config.analyticsDisabled) {
       // DONT RECORD WHEN ANALYTICS IS DISABLED
       return;
     }
 
-    this.userAgent?.pageview(pageName).send();
+    try {
+      actionEvent(
+        analyticsTxType.toString(),
+        analyticsCategory.toString(),
+        analyticsAction.toString(),
+        txAmount,
+      );
+
+      transactionEvent(txHash, txAmount, analyticsTxType.toString());
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Error logging event', e);
+    }
   }
 
-  public transactionEvent(transactionId: string, value: string, transactionType: string) {
+  public logPage(pageName: string) {
     if (this.currentSession.wallet.config.analyticsDisabled) {
       // DONT RECORD WHEN ANALYTICS IS DISABLED
       return;
     }
-    this.userAgent
-      ?.transaction(transactionId, value, '', '', transactionType)
-      .item(value, 1)
-      .send();
+
+    pageView(pageName).send();
   }
 }

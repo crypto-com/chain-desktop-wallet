@@ -33,9 +33,12 @@ import {
 } from '../../utils/NumberUtils';
 import { middleEllipsis, ellipsis } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
-
-const electron = window.require('electron');
-const pageView = electron.remote.getGlobal('pageView');
+import {
+  AnalyticsActions,
+  AnalyticsCategory,
+  AnalyticsService,
+  AnalyticsTxType,
+} from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -80,6 +83,8 @@ const FormDelegationRequest = () => {
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
 
+  const analyticsService = new AnalyticsService(currentSession);
+
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
     if (validatorList) {
       return validatorList.map((validator, idx) => {
@@ -99,7 +104,7 @@ const FormDelegationRequest = () => {
       setValidatorTopList(validatorList);
     };
 
-    pageView('Staking');
+    analyticsService.logPage('Staking');
 
     syncValidatorsData();
   }, [fetchingDB, currentValidatorList]);
@@ -160,6 +165,15 @@ const FormDelegationRequest = () => {
         decryptedPhrase,
         walletType,
       });
+
+      analyticsService.logTransactionEvent(
+        broadcastResult.transactionHash as string,
+        formValues.amount,
+        AnalyticsTxType.StakingTransaction,
+        AnalyticsActions.FundsStaked,
+        AnalyticsCategory.Delegate,
+      );
+
       setBroadcastResult(stakingResult);
 
       setIsVisibleConfirmationModal(false);

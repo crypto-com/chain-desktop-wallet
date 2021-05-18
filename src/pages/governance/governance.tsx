@@ -29,9 +29,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
-
-const electron = window.require('electron');
-const pageView = electron.remote.getGlobal('pageView');
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -81,6 +79,8 @@ const GovernancePage = () => {
   const userAsset = useRecoilValue(walletAssetState);
   const didMountRef = useRef(false);
   const [isLoadingTally, setIsLoadingTally] = useState(false);
+
+  const analyticsService = new AnalyticsService(currentSession);
 
   const handleCancelConfirmationModal = () => {
     setIsVisibleConfirmationModal(false);
@@ -321,7 +321,7 @@ const GovernancePage = () => {
       didMountRef.current = true;
     }
 
-    pageView('Governance');
+    analyticsService.logPage('Governance');
     // eslint-disable-next-line
   }, [proposalList, setProposalList]);
 

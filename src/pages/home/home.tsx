@@ -40,9 +40,7 @@ import RedelegateFormComponent from './components/RedelegateFormComponent';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
-
-const electron = window.require('electron');
-const pageView = electron.remote.getGlobal('pageView');
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 const { Text } = Typography;
 
@@ -166,6 +164,8 @@ function HomePage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [delegationActionType, setDelegationActionType] = useState<StakingActionType>();
 
+  const analyticsService = new AnalyticsService(currentSession);
+
   const showWalletStateNotification = (config: WalletConfig) => {
     setTimeout(async () => {
       if (isWalletNotLive(config) && !hasShownNotLiveWallet) {
@@ -225,7 +225,7 @@ function HomePage() {
       setUserAsset(currentAsset);
       setHasShownNotLiveWallet(true);
 
-      pageView('Home');
+      analyticsService.logPage('Home');
     };
 
     syncAssetData();

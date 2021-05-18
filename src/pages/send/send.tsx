@@ -6,7 +6,6 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import {remote} from 'electron';
-
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -14,7 +13,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { scaledBalance } from '../../models/UserAsset';
-import { sessionState, walletAssetState, ledgerIsExpertModeState } from '../../recoil/atom';
+import { ledgerIsExpertModeState, sessionState, walletAssetState } from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
@@ -24,13 +23,13 @@ import {
   getNormalScaleAmount,
 } from '../../utils/NumberUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
-import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
-import { AnalyticsService } from '../../service/analytics/AnalyticsService';
-
-const electron = window.require('electron');
-const transactionEvent = electron.remote.getGlobal('transactionEvent');
-const actionEvent = electron.remote.getGlobal('actionEvent');
-const pageView = electron.remote.getGlobal('pageView');
+import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import {
+  AnalyticsActions,
+  AnalyticsCategory,
+  AnalyticsService,
+  AnalyticsTxType,
+} from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer } = Layout;
 const layout = {};
@@ -54,8 +53,7 @@ const FormSend = () => {
   const analyticsService = new AnalyticsService(currentSession);
 
   useEffect(() => {
-    pageView('Send');
-    analyticsService.recordEvent('SendPage', 'OpenSendPage', '', '');
+    analyticsService.logPage('Send');
   }, []);
 
   const showConfirmationModal = () => {
@@ -93,34 +91,6 @@ const FormSend = () => {
     showConfirmationModal();
   };
 
-  function logEvent() {
-    try {
-      actionEvent('TransferTransaction', 'Transfer', 'FundsTransfer', formValues.amount);
-
-      analyticsService.recordEvent(
-        'TransferTransaction',
-        'Transfer',
-        'FundsTransfer',
-        formValues.amount,
-      );
-
-      analyticsService.transactionEvent(
-        broadcastResult.transactionHash || '',
-        formValues.amount,
-        'TransferTransaction',
-      );
-
-      transactionEvent(
-        broadcastResult.transactionHash || '',
-        formValues.amount,
-        'TransferTransaction',
-      );
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log('Error logging event', e);
-    }
-  }
-
   const onConfirmTransfer = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
     const { walletType } = currentSession.wallet;
@@ -138,7 +108,13 @@ const FormSend = () => {
         walletType,
       });
 
-      logEvent();
+      analyticsService.logTransactionEvent(
+        broadcastResult.transactionHash as string,
+        formValues.amount,
+        AnalyticsTxType.TransferTransaction,
+        AnalyticsActions.FundsTransfer,
+        AnalyticsCategory.Transfer,
+      );
 
       setBroadcastResult(sendResult);
 

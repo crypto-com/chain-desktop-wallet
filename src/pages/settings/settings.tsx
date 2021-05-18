@@ -29,9 +29,7 @@ import { Session } from '../../models/Session';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
-
-const electron = window.require('electron');
-const pageView = electron.remote.getGlobal('pageView');
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -48,6 +46,7 @@ const GeneralSettingsForm = () => {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [enabledGeneralSettings, setEnabledGeneralSettings] = useState<boolean>(false);
   const didMountRef = useRef(false);
+  const analyticsService = new AnalyticsService(session);
 
   useEffect(() => {
     let unmounted = false;
@@ -58,7 +57,7 @@ const GeneralSettingsForm = () => {
         setEnabledGeneralSettings(enabledGeneralWalletsSettings);
       }
 
-      pageView('Settings');
+      analyticsService.logPage('Settings');
     };
 
     if (!didMountRef.current) {
