@@ -116,6 +116,7 @@ const FormSend = () => {
         'TransferTransaction',
       );
     } catch (e) {
+      // eslint-disable-next-line no-console
       console.log('Error logging event', e);
     }
   }
