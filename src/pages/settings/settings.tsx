@@ -190,7 +190,7 @@ function MetaInfoComponent() {
 
     const SyncConfig = async () => {
       const defaultMemoDisabled = session.wallet.config.disableDefaultClientMemo;
-      const defaultGADisabled = session.wallet.config.disableGA;
+      const defaultGADisabled = session.wallet.config.analyticsDisabled;
       if (!unmounted) {
         setDefaultMemoStateDisabled(defaultMemoDisabled);
         setDefaultGAStateDisabled(defaultGADisabled);
@@ -244,7 +244,7 @@ function MetaInfoComponent() {
 
     const disableGASettingsUpdate: DisableGASettings = {
       walletId: session.wallet.identifier,
-      disableGA: newState,
+      analyticsDisabled: newState,
     };
 
     await walletService.updateGADisabledSettings(disableGASettingsUpdate);

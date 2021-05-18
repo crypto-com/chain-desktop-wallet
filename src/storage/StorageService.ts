@@ -71,7 +71,7 @@ export class StorageService {
 
   public async updateDisabledGA(disableGASettings: DisableGASettings) {
     const previousWallet = await this.findWalletByIdentifier(disableGASettings.walletId);
-    previousWallet.config.disableGA = disableGASettings.disableGA;
+    previousWallet.config.analyticsDisabled = disableGASettings.analyticsDisabled;
 
     return this.db.walletStore.update<Wallet>(
       { identifier: previousWallet.identifier },

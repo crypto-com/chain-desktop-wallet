@@ -64,7 +64,7 @@ export interface DisableDefaultMemoSettings {
 
 export interface DisableGASettings {
   walletId: string;
-  disableGA: boolean;
+  analyticsDisabled: boolean;
 }
 
 export interface EnableGeneralSettingsPropagation {
@@ -102,8 +102,8 @@ export function reconstructCustomConfig(formValues: CustomConfigFormValue): Wall
     nodeUrl: formValues.nodeUrl,
     indexingUrl: formValues.indexingUrl,
     disableDefaultClientMemo: false,
-    disableGA: false,
     enableGeneralSettings: false,
+    analyticsDisabled: false,
     fee: {
       gasLimit: FIXED_DEFAULT_GAS_LIMIT,
       networkFee: FIXED_DEFAULT_FEE,
