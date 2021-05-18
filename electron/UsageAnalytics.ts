@@ -28,27 +28,33 @@ function getUACode() {
 }
 
 function actionEvent(category: any, action: any, label: any, value: any) {
-    agent.event({
-        ec: category,
-        ea: action,
-        el: label,
-        ev: value,
-    }).send();
+    try {
+        agent.event({
+            ec: category,
+            ea: action,
+            el: label,
+            ev: value,
+        }).send();
+    } catch (e) {}
 }
 
 function transactionEvent(transactionId: string, value: string, transactionType: string) {
-    agent.transaction(
-        transactionId,
-        value,
-        '',
-        '',
-        transactionType)
-        .item(value, 1)
-        .send();
+    try {
+        agent.transaction(
+            transactionId,
+            value,
+            '',
+            '',
+            transactionType)
+            .item(value, 1)
+            .send();
+    } catch (e) {}
 }
 
 function pageView(pageName: string) {
-    agent.pageview(pageName ).send()
+    try {
+        agent.pageview(pageName).send()
+    } catch (e) {}
 }
 
 module.exports = { getUACode, getGAnalyticsCode, actionEvent, transactionEvent, pageView };
