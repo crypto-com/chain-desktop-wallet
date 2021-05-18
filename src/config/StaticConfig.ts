@@ -4,8 +4,6 @@ import { getRandomId } from '../crypto/RandomGen';
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
 export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';
-// Google Analytics
-export const GOOGLE_ANALYTICS_UA_CODE = '';
 
 export const NodePorts = {
   Tendermint: ':26657',
