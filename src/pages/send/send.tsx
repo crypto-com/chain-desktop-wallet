@@ -25,7 +25,7 @@ import {
 } from '../../utils/NumberUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
-import { analyticsService } from '../../service/analytics/AnalyticsService';
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 const electron = window.require('electron');
 const transactionEvent = electron.remote.getGlobal('transactionEvent');
@@ -50,6 +50,8 @@ const FormSend = () => {
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const currentSession = useRecoilValue(sessionState);
+
+  const analyticsService = new AnalyticsService(currentSession);
 
   useEffect(() => {
     pageView('Send');
