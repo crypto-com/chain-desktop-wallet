@@ -319,9 +319,9 @@ const GovernancePage = () => {
     if (!didMountRef.current) {
       fetchProposalList();
       didMountRef.current = true;
+      analyticsService.logPage('Governance');
     }
 
-    analyticsService.logPage('Governance');
     // eslint-disable-next-line
   }, [proposalList, setProposalList]);
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './send.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber, Layout } from 'antd';
@@ -49,11 +49,15 @@ const FormSend = () => {
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const currentSession = useRecoilValue(sessionState);
+  const didMountRef = useRef(false);
 
   const analyticsService = new AnalyticsService(currentSession);
 
   useEffect(() => {
-    analyticsService.logPage('Send');
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Send');
+    }
   }, []);
 
   const showConfirmationModal = () => {

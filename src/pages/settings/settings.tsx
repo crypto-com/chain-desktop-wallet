@@ -56,13 +56,12 @@ const GeneralSettingsForm = () => {
       if (!unmounted) {
         setEnabledGeneralSettings(enabledGeneralWalletsSettings);
       }
-
-      analyticsService.logPage('Settings');
     };
 
     if (!didMountRef.current) {
       SyncConfig();
       didMountRef.current = true;
+      analyticsService.logPage('Settings');
     }
 
     return () => {

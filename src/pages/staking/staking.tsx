@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
 import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
@@ -103,8 +103,6 @@ const FormDelegationRequest = () => {
       const validatorList = processValidatorList(currentValidatorList);
       setValidatorTopList(validatorList);
     };
-
-    analyticsService.logPage('Staking');
 
     syncValidatorsData();
   }, [fetchingDB, currentValidatorList]);
@@ -852,7 +850,18 @@ const FormWithdrawStakingReward = () => {
   );
 };
 
-function StakingPage() {
+const StakingPage = () => {
+  const currentSession = useRecoilValue(sessionState);
+  const analyticsService = new AnalyticsService(currentSession);
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Staking');
+    }
+  }, []);
+
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">Staking</Header>
@@ -880,6 +889,6 @@ function StakingPage() {
       <Footer />
     </Layout>
   );
-}
+};
 
 export default StakingPage;

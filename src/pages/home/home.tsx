@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from 'antd';
@@ -130,6 +130,7 @@ function HomePage() {
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
+  const didMountRef = useRef(false);
 
   // Undelegate action related states changes
   const [form] = Form.useForm();
@@ -224,11 +225,14 @@ function HomePage() {
       setTransfers(transferTabularData);
       setUserAsset(currentAsset);
       setHasShownNotLiveWallet(true);
-
-      analyticsService.logPage('Home');
     };
 
     syncAssetData();
+
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Home');
+    }
   }, [fetchingDB]);
 
   const TransactionColumns = [

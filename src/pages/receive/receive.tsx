@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import QRCode from 'qrcode.react';
 import { useRecoilValue } from 'recoil';
 import './receive.less';
@@ -16,12 +16,16 @@ const { Header, Content, Footer } = Layout;
 function ReceivePage() {
   const session: Session = useRecoilValue<Session>(sessionState);
   const [isLedger, setIsLedger] = useState(false);
+  const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
 
   useEffect(() => {
     const { walletType } = session.wallet;
     setIsLedger(LEDGER_WALLET_TYPE === walletType);
-    analyticsService.logPage('Receive');
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Receive');
+    }
   });
 
   const clickCheckLedger = async () => {
