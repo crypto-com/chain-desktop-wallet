@@ -212,6 +212,7 @@
     "moxios": "^0.4.0",
     "optimize-css-assets-webpack-plugin": "5.0.4",
     "pnp-webpack-plugin": "1.6.4",
+    "postcss": "8.2.15",
     "postcss-flexbugs-fixes": "4.2.1",
     "postcss-loader": "3.0.0",
     "postcss-normalize": "8.0.1",
@@ -299,6 +300,7 @@
     "ssri": "8.0.1",
     "hosted-git-info": "3.0.8",
     "underscore": "1.12.1",
-    "trim": "0.0.3"
+    "trim": "0.0.3",
+    "postcss": "8.2.15"
   }
 }
