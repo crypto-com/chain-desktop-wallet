@@ -70,8 +70,7 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
-    "pre-build": "yarn clean-builds",
-    "build": "node scripts/build.js",
+    "build": "yarn clean-builds && node scripts/build.js",
     "test": "node scripts/test.js --watchAll=false",
     "postinstall": "electron-builder install-app-deps",
     "electron:dev": "export NODE_ENV=development && yarn electron:devcore",
