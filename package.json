@@ -212,9 +212,9 @@
     "moxios": "^0.4.0",
     "optimize-css-assets-webpack-plugin": "5.0.4",
     "pnp-webpack-plugin": "1.6.4",
-    "postcss-flexbugs-fixes": "4.2.1",
-    "postcss-loader": "3.0.0",
-    "postcss-normalize": "8.0.1",
+    "postcss-flexbugs-fixes": "5.0.2",
+    "postcss-loader": "5.3.0",
+    "postcss-normalize": "10.0.0",
     "postcss-preset-env": "6.7.0",
     "postcss-safe-parser": "5.0.2",
     "prettier": "1.19.1",
@@ -296,6 +296,7 @@
     "immer": "8.0.1",
     "xmldom": "0.5.0",
     "is-svg": "4.2.2",
-    "ssri": "8.0.1"
+    "ssri": "8.0.1",
+    "postcss": "8.2.15"
   }
 }
