@@ -296,6 +296,10 @@
     "immer": "8.0.1",
     "xmldom": "0.5.0",
     "is-svg": "4.2.2",
-    "ssri": "8.0.1"
+    "ssri": "8.0.1",
+    "postcss": "8.2.15",
+    "hosted-git-info": "3.0.8",
+    "underscore": "1.12.1",
+    "trim": "0.0.3"
   }
 }
