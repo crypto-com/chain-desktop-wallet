@@ -9,7 +9,7 @@
   "main": "build/electron/main.js",
   "private": true,
   "dependencies": {
-    "@ant-design/icons": "^4.3.0",
+    "@ant-design/icons": "^4.6.2",
     "@babel/helper-builder-react-jsx": "^7.10.4",
     "@babel/helper-builder-react-jsx-experimental": "^7.12.11",
     "@cosmjs/stargate": "^0.24.0-alpha.22",
@@ -27,7 +27,7 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/react-router-dom": "^5.1.6",
-    "antd": "^4.9.1",
+    "antd": "4.15.6",
     "axios": "^0.21.1",
     "bech32": "^1.1.4",
     "bfj": "^7.0.2",
@@ -70,6 +70,7 @@
   },
   "scripts": {
     "start": "node scripts/start.js",
+    "pre-build": "yarn clean-builds",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --watchAll=false",
     "postinstall": "electron-builder install-app-deps",
@@ -297,7 +298,6 @@
     "xmldom": "0.5.0",
     "is-svg": "4.2.2",
     "ssri": "8.0.1",
-    "postcss": "8.2.15",
     "hosted-git-info": "3.0.8",
     "underscore": "1.12.1",
     "trim": "0.0.3"
