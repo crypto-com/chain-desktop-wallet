@@ -140,10 +140,14 @@ function HomeLayout(props: HomeLayoutProps) {
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
       setValidatorList(currentValidatorList);
-      setIsAnnouncementVisible(!announcementShown);
       await fetchAndSetNewValidators();
       await fetchAndSetNewProposals();
       setFetchingDB(false);
+
+      // Timeout for loading
+      setTimeout(() => {
+        setIsAnnouncementVisible(!announcementShown);
+      }, 2000);
     };
 
     if (!didMountRef.current) {
@@ -379,7 +383,7 @@ function HomeLayout(props: HomeLayoutProps) {
           footer={[]}
         >
           <>
-            <div className="title">Data Analytics is added!</div>
+            <div className="title">Data Analytics is added</div>
             <div className="description">
               You can help improve Crypto.org Chain Wallet by having Data Analytics enabled and let
               us know how you use the app. The data will help us prioritize future development for
