@@ -32,5 +32,12 @@ jobs:
           yarn install --network-timeout 600000
 
       - name: Audit dependencies
+        #  1 for INFO
+        #  2 for LOW
+        #  4 for MODERATE
+        #  8 for HIGH
+        #  16 for CRITICAL
+        # Only high and critical vulnerabilities should be accounted for
+        # https://github.com/yarnpkg/yarn/issues/7260
         run: |
-          yarn audit --filter high
+          yarn audit; [[ $? -ge 8 ]] && exit 1 || exit 0
