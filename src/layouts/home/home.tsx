@@ -13,6 +13,7 @@ import Icon, {
   SettingOutlined,
 } from '@ant-design/icons';
 import { useRecoilState } from 'recoil';
+// import { LocalStorage } from "node-localstorage";
 
 import {
   sessionState,
@@ -30,6 +31,7 @@ import IconReceive from '../../svg/IconReceive';
 import IconStaking from '../../svg/IconStaking';
 import IconWallet from '../../svg/IconWallet';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import Announcement from '../../components/Announcement/Announcement';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
 import packageJson from '../../../package.json';
@@ -41,6 +43,11 @@ interface HomeLayoutProps {
 }
 
 const { Sider } = Layout;
+let n = 0;
+
+// global.localStorage = new LocalStorage('./scratch');
+// global.localStorage.setItem('Name', 'Manish Mandal')
+// console.log(global.localStorage.getItem('Name'))
 
 function HomeLayout(props: HomeLayoutProps) {
   const history = useHistory();
@@ -244,127 +251,137 @@ function HomeLayout(props: HomeLayoutProps) {
 
   return (
     <main className="home-layout">
-      <Layout>
-        <Sider className="home-sider">
-          <div className="logo" />
-          <div className="version">SAMPLE WALLET v{buildVersion}</div>
-          <HomeMenu />
-          <Dropdown
-            overlay={<WalletMenu />}
-            placement="topCenter"
-            className="wallet-selection"
-            // arrow
-            trigger={['click']}
-          >
-            <div>
-              <img src={WalletIcon} alt="walletIcon" />
-              {trimString(session?.wallet.name)}
-              <CaretDownOutlined />
-            </div>
-          </Dropdown>
-        </Sider>
-        <div className={`home-page ${fetchingDB ? 'loading' : ''}`}>
-          <Spin spinning={fetchingDB} indicator={<LoadingOutlined style={{ fontSize: 96 }} />}>
-            <div className="container">{props.children}</div>
-          </Spin>
-        </div>
-        <ModalPopup
-          isModalVisible={isConfirmationModalVisible}
-          handleCancel={handleCancel}
-          handleOk={showPasswordModal}
-          confirmationLoading={isButtonLoading}
-          closable={!isButtonLoading}
-          okText="Confirm"
-          footer={[
-            <Button
-              key="submit"
-              type="primary"
-              loading={isButtonLoading}
-              onClick={() => setIsConfirmDeleteVisible(true)}
-              disabled={isButtonDisabled}
-              hidden={isConfirmDeleteVisible}
-              danger
-            >
-              Confirm
-            </Button>,
-            <Button
-              key="submit"
-              type="primary"
-              loading={isButtonLoading}
-              onClick={confirmDeleteForm.submit}
-              disabled={isButtonDisabled}
-              hidden={!isConfirmDeleteVisible}
-              danger
-            >
-              Delete Wallet
-            </Button>,
-            <Button key="back" type="link" onClick={handleCancel} disabled={isButtonLoading}>
-              Cancel
-            </Button>,
-          ]}
+      {n === 0 ? (
+        <div
+          onClick={() => {
+            n++;
+          }}
         >
-          <>
-            <div className="title">Confirm Wallet Deletion</div>
-            <div className="description">Please review the below information. </div>
-            <div className="item">
-              <div className="label">Delete Wallet Address</div>
-              <div className="address">{`${session.wallet.address}`}</div>
-            </div>
-            {!isConfirmDeleteVisible ? (
-              <>
-                <div className="item">
-                  <Alert
-                    type="warning"
-                    message={`Are you sure you want to delete the wallet? ${
-                      session.wallet.walletType !== LEDGER_WALLET_TYPE
-                        ? 'If you have not backed up your wallet mnemonic phrase, this will result in losing your funds forever.'
-                        : ''
-                    }`}
-                    showIcon
-                  />
-                </div>
-                <div className="item">
-                  <Checkbox
-                    checked={!isButtonDisabled}
-                    onChange={() => setIsButtonDisabled(!isButtonDisabled)}
-                  >
-                    {session.wallet.walletType !== LEDGER_WALLET_TYPE
-                      ? 'I understand that the only way to regain access is by restoring wallet mnemonic phrase.'
-                      : 'I understand that the only way to regain access is by using the same ledger device with the correct address index'}
-                  </Checkbox>
-                </div>
-              </>
-            ) : (
-              <div className="item">
-                <Form
-                  layout="vertical"
-                  form={confirmDeleteForm}
-                  name="control-hooks"
-                  requiredMark="optional"
-                  onFinish={onWalletDeleteFinish}
-                >
-                  <Form.Item
-                    name="delete"
-                    label="Please enter DELETE"
-                    hasFeedback
-                    rules={[
-                      {
-                        required: true,
-                      },
-                      {
-                        pattern: /DELETE/,
-                        message: 'Please enter DELETE',
-                      },
-                    ]}
-                  >
-                    <Input />
-                  </Form.Item>
-                </Form>
+          <Announcement />
+        </div>
+      ) : (
+        <Layout>
+          <Sider className="home-sider">
+            <div className="logo" />
+            <div className="version">SAMPLE WALLET v{buildVersion}</div>
+            <HomeMenu />
+            <Dropdown
+              overlay={<WalletMenu />}
+              placement="topCenter"
+              className="wallet-selection"
+              // arrow
+              trigger={['click']}
+            >
+              <div>
+                <img src={WalletIcon} alt="walletIcon" />
+                {trimString(session?.wallet.name)}
+                <CaretDownOutlined />
               </div>
-            )}
-          </>
-        </ModalPopup>
-      </Layout>
+            </Dropdown>
+          </Sider>
+          <div className={`home-page ${fetchingDB ? 'loading' : ''}`}>
+            <Spin spinning={fetchingDB} indicator={<LoadingOutlined style={{ fontSize: 96 }} />}>
+              <div className="container">{props.children}</div>
+            </Spin>
+          </div>
+          <ModalPopup
+            isModalVisible={isConfirmationModalVisible}
+            handleCancel={handleCancel}
+            handleOk={showPasswordModal}
+            confirmationLoading={isButtonLoading}
+            closable={!isButtonLoading}
+            okText="Confirm"
+            footer={[
+              <Button
+                key="submit"
+                type="primary"
+                loading={isButtonLoading}
+                onClick={() => setIsConfirmDeleteVisible(true)}
+                disabled={isButtonDisabled}
+                hidden={isConfirmDeleteVisible}
+                danger
+              >
+                Confirm
+              </Button>,
+              <Button
+                key="submit"
+                type="primary"
+                loading={isButtonLoading}
+                onClick={confirmDeleteForm.submit}
+                disabled={isButtonDisabled}
+                hidden={!isConfirmDeleteVisible}
+                danger
+              >
+                Delete Wallet
+              </Button>,
+              <Button key="back" type="link" onClick={handleCancel} disabled={isButtonLoading}>
+                Cancel
+              </Button>,
+            ]}
+          >
+            <>
+              <div className="title">Confirm Wallet Deletion</div>
+              <div className="description">Please review the below information. </div>
+              <div className="item">
+                <div className="label">Delete Wallet Address</div>
+                <div className="address">{`${session.wallet.address}`}</div>
+              </div>
+              {!isConfirmDeleteVisible ? (
+                <>
+                  <div className="item">
+                    <Alert
+                      type="warning"
+                      message={`Are you sure you want to delete the wallet? ${
+                        session.wallet.walletType !== LEDGER_WALLET_TYPE
+                          ? 'If you have not backed up your wallet mnemonic phrase, this will result in losing your funds forever.'
+                          : ''
+                      }`}
+                      showIcon
+                    />
+                  </div>
+                  <div className="item">
+                    <Checkbox
+                      checked={!isButtonDisabled}
+                      onChange={() => setIsButtonDisabled(!isButtonDisabled)}
+                    >
+                      {session.wallet.walletType !== LEDGER_WALLET_TYPE
+                        ? 'I understand that the only way to regain access is by restoring wallet mnemonic phrase.'
+                        : 'I understand that the only way to regain access is by using the same ledger device with the correct address index'}
+                    </Checkbox>
+                  </div>
+                </>
+              ) : (
+                <div className="item">
+                  <Form
+                    layout="vertical"
+                    form={confirmDeleteForm}
+                    name="control-hooks"
+                    requiredMark="optional"
+                    onFinish={onWalletDeleteFinish}
+                  >
+                    <Form.Item
+                      name="delete"
+                      label="Please enter DELETE"
+                      hasFeedback
+                      rules={[
+                        {
+                          required: true,
+                        },
+                        {
+                          pattern: /DELETE/,
+                          message: 'Please enter DELETE',
+                        },
+                      ]}
+                    >
+                      <Input />
+                    </Form.Item>
+                  </Form>
+                </div>
+              )}
+            </>
+          </ModalPopup>
+        </Layout>
+      )}
     </main>
   );
 }
