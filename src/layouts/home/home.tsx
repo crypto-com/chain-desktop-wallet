@@ -379,16 +379,13 @@ function HomeLayout(props: HomeLayoutProps) {
           footer={[]}
         >
           <>
-            <div className="title">
-              [SAMPLE WALLET v0.2.3] <br />
-              Google Analytics is added!
-            </div>
+            <div className="title">Data Analytics is added!</div>
             <div className="description">
-              You can help improve Crypto.org Chain Wallet by having Google Analytics enabled and
-              let us know how you use the app. The data will help us prioritize future development
-              for new features and functionalities. <br />
+              You can help improve Crypto.org Chain Wallet by having Data Analytics enabled and let
+              us know how you use the app. The data will help us prioritize future development for
+              new features and functionalities. <br />
               <br />
-              You may disable Google Analytics anytime under General Configuration in{' '}
+              You may disable Data Analytics anytime under General Configuration in{' '}
               <Link
                 to="/settings"
                 onClick={() => {
