@@ -13,7 +13,6 @@ import Icon, {
   SettingOutlined,
 } from '@ant-design/icons';
 import { useRecoilState } from 'recoil';
-// import { LocalStorage } from "node-localstorage";
 
 import {
   sessionState,
@@ -37,17 +36,13 @@ import { Session } from '../../models/Session';
 import packageJson from '../../../package.json';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { LedgerWalletMaximum } from '../../config/StaticConfig';
+import { generalConfigService } from '../../storage/GeneralConfigService';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
 }
 
 const { Sider } = Layout;
-let n = 0;
-
-// global.localStorage = new LocalStorage('./scratch');
-// global.localStorage.setItem('Name', 'Manish Mandal')
-// console.log(global.localStorage.getItem('Name'))
 
 function HomeLayout(props: HomeLayoutProps) {
   const history = useHistory();
@@ -62,6 +57,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+  const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
 
@@ -137,12 +133,15 @@ function HomeLayout(props: HomeLayoutProps) {
         sessionData.wallet.config.network.chainId,
       );
 
+      const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
+
       setHasWallet(hasWalletBeenCreated);
       setSession(sessionData);
       setUserAsset(currentAsset);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
       setValidatorList(currentValidatorList);
+      setIsAnnouncementVisible(!announcementShown);
       await fetchAndSetNewValidators();
       await fetchAndSetNewProposals();
       setFetchingDB(false);
@@ -251,14 +250,8 @@ function HomeLayout(props: HomeLayoutProps) {
 
   return (
     <main className="home-layout">
-      {n === 0 ? (
-        <div
-          onClick={() => {
-            n++;
-          }}
-        >
-          <Announcement />
-        </div>
+      {isAnnouncementVisible ? (
+        <Announcement setIsAnnouncementVisible={setIsAnnouncementVisible} />
       ) : (
         <Layout>
           <Sider className="home-sider">

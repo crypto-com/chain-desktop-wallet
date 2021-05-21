@@ -1,7 +1,7 @@
 import { DatabaseManager } from './DatabaseManager';
 import { GeneralConfig } from '../config/GeneralConfig';
 
-export class GeneralConfigService {
+class GeneralConfigService {
   private readonly db: DatabaseManager;
 
   private readonly GENERAL_CONFIG_ID = 'GENERAL_CONFIG_ID';
