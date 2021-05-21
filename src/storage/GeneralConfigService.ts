@@ -48,3 +48,5 @@ export class GeneralConfigService {
     return savedConfig.hasEverShownAnalyticsPopup;
   }
 }
+
+export const generalConfigService = new GeneralConfigService('general-config');
