@@ -4,7 +4,7 @@ import ua from "universal-analytics";
 import { v4 as uuidv4 } from 'uuid';
 
 const DEV_UA_CODE =  'UA-197149286-1'
-const PROD_UA_CODE =  'UA-197252159-1'
+const PROD_UA_CODE =  'UA-99317940-17'
 
 function getGAnalyticsCode() {
     const isDev = process.env.NODE_ENV === 'development';
