@@ -27,6 +27,9 @@ export class DatabaseManager {
 
   public readonly proposalStore: Datastore;
 
+  // This is for configuration that span across all wallets
+  public readonly generalConfigStore: Datastore;
+
   constructor(namespace: string) {
     this.sessionStore = getStore(namespace, 'session');
     this.walletStore = getStore(namespace, 'wallets');
@@ -39,5 +42,6 @@ export class DatabaseManager {
     this.seedStore = getStore(namespace, 'seeds');
     this.validatorStore = getStore(namespace, 'validators');
     this.proposalStore = getStore(namespace, 'proposals');
+    this.generalConfigStore = getStore(namespace, 'generalConfigStore');
   }
 }
