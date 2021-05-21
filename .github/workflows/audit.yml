@@ -33,4 +33,4 @@ jobs:
 
       - name: Audit dependencies
         run: |
-          yarn audit --audit-level=high
+          yarn audit --level=high
