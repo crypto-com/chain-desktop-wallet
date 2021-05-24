@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Additions
 - Added data analytics
+- Show validator list view on redelegation flow
 - Updated dependencies to secure versions.
 
 ## [v0.2.1] - 2021-04-28
