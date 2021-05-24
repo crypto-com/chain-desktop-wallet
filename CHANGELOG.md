@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.2.2] - 2021-05-24
+
+### Additions
+- Added data analytics
+- Updated dependencies to secure versions.
+
 ## [v0.2.1] - 2021-04-28
 
 ### Additions
