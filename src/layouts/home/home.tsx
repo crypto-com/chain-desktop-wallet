@@ -383,18 +383,19 @@ function HomeLayout(props: HomeLayoutProps) {
           footer={[]}
         >
           <>
-            <div className="title">Data Analytics is added</div>
+            <div className="title">Data analytics was added</div>
             <div className="description">
-              You can help improve Crypto.org Chain Wallet by having Data Analytics enabled and let
-              us know how you use the app. The data will help us prioritize future development for
-              new features and functionalities. <br />
+              You can help improve Crypto.org Chain Wallet by having Data Analytics enabled. The
+              data collected will help the development team prioritize new features and improve
+              existing functionalities. <br />
               <br />
-              You may disable Data Analytics anytime under General Configuration in{' '}
+              You can always come back to disable Data Analytics anytime under General Configuration
+              in{' '}
               <Link
                 to="/settings"
-                onClick={() => {
+                onClick={async () => {
                   setIsAnnouncementVisible(false);
-                  generalConfigService.setHasShownAnalyticsPopup(true);
+                  await generalConfigService.setHasShownAnalyticsPopup(true);
                 }}
               >
                 Settings
