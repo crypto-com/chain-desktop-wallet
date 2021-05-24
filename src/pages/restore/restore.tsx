@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 import './restore.less';
 import { Button, Form, Input, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { HDKey } from '../../utils/ChainJsLib';
+import { sessionState } from '../../recoil/atom';
 import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
@@ -15,6 +17,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { Session } from '../../models/Session';
 import { NORMAL_WALLET_TYPE } from '../../service/LedgerService';
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -412,10 +415,17 @@ function RestorePage() {
   const [isConnected, setIsConnected] = useState(false);
   const [isSelectFieldDisable, setIsSelectFieldDisable] = useState(true);
   const [networkConfig, setNetworkConfig] = useState();
+  const currentSession = useRecoilValue(sessionState);
+  const didMountRef = useRef(false);
 
-  // const showSuccessModal = () => {
-  //   setIsSuccessModalVisible(true);
-  // };
+  const analyticsService = new AnalyticsService(currentSession);
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Restore');
+    }
+  }, []);
 
   return (
     <main className="restore-page">

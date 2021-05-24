@@ -1,10 +1,21 @@
 import { app, BrowserWindow, nativeImage, Menu } from 'electron';
 import * as path from 'path';
+
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import { IpcMain } from './IpcMain';
+const { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } = require('./UsageAnalytics');
+
+(global as any).actionEvent = actionEvent;
+(global as any).transactionEvent = transactionEvent;
+(global as any).pageView = pageView;
+(global as any).getUACode = getUACode;
+(global as any).getGAnalyticsCode = getGAnalyticsCode;
+
+
 let win: BrowserWindow | null = null;
 let ipcmain: IpcMain | null = null;
 const isDev = process.env.NODE_ENV === 'development'; // change true, in developing mode
+
 
 function createWindow() {
   const iconPath = path.join(__dirname, '/public/icon.png').replace(/\\/g, '\\\\');
@@ -22,6 +33,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       devTools: isDev,
+      enableRemoteModule: true
     },
     resizable: true,
     icon: iconImage,
@@ -32,6 +44,7 @@ function createWindow() {
   // It killed the clipboard copying capability and added a delay on startup
   win.setMenuBarVisibility(false);
   win.removeMenu();
+
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
@@ -57,6 +70,7 @@ function createWindow() {
     });
   }
 
+
   // DevTools
   installExtension(REACT_DEVELOPER_TOOLS)
     .then(name => console.log(`Added Extension:  ${name}`))
@@ -65,11 +79,15 @@ function createWindow() {
   if (isDev) {
     win.webContents.openDevTools();
   }
+
+  actionEvent('App', 'Open', 'AppOpened', 0)
+
 }
 
 app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
+  actionEvent('App', 'Close', 'AppClosed', 0)
   if (process.platform !== 'darwin') {
     app.quit();
   }

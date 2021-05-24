@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './send.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber, Layout } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
+// eslint-disable-next-line import/no-extraneous-dependencies
+// import {remote} from 'electron';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -11,7 +13,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { scaledBalance } from '../../models/UserAsset';
-import { sessionState, walletAssetState, ledgerIsExpertModeState } from '../../recoil/atom';
+import { ledgerIsExpertModeState, sessionState, walletAssetState } from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
@@ -21,7 +23,13 @@ import {
   getNormalScaleAmount,
 } from '../../utils/NumberUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
-import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
+import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import {
+  AnalyticsActions,
+  AnalyticsCategory,
+  AnalyticsService,
+  AnalyticsTxType,
+} from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer } = Layout;
 const layout = {};
@@ -41,6 +49,16 @@ const FormSend = () => {
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const currentSession = useRecoilValue(sessionState);
+  const didMountRef = useRef(false);
+
+  const analyticsService = new AnalyticsService(currentSession);
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Send');
+    }
+  }, []);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -93,6 +111,14 @@ const FormSend = () => {
         decryptedPhrase,
         walletType,
       });
+
+      analyticsService.logTransactionEvent(
+        broadcastResult.transactionHash as string,
+        formValues.amount,
+        AnalyticsTxType.TransferTransaction,
+        AnalyticsActions.FundsTransfer,
+        AnalyticsCategory.Transfer,
+      );
 
       setBroadcastResult(sendResult);
 

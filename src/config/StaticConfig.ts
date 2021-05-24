@@ -24,6 +24,7 @@ export type WalletConfig = {
   // When enabled all settings update will be propagated to all wallets of the same network.
   // E.g: User updates nodeURL in one mainnet wallet, all other mainnet wallets will have the new nodeURL
   enableGeneralSettings: boolean;
+  analyticsDisabled: boolean;
   fee: {
     gasLimit: string;
     networkFee: string;
@@ -43,6 +44,7 @@ const TestNetConfig: WalletConfig = {
   network: CroNetwork.Testnet,
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
+  analyticsDisabled: false,
   fee: {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
@@ -63,6 +65,7 @@ const MainNetConfig: WalletConfig = {
   network: CroNetwork.Mainnet,
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
+  analyticsDisabled: false,
   fee: {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
@@ -76,6 +79,7 @@ export const CustomDevNet: WalletConfig = {
   name: 'CUSTOM DEVNET',
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
+  analyticsDisabled: false,
   network: {
     defaultNodeUrl: '',
     chainId: 'test',

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
 import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
@@ -33,6 +33,12 @@ import {
 } from '../../utils/NumberUtils';
 import { middleEllipsis, ellipsis } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
+import {
+  AnalyticsActions,
+  AnalyticsCategory,
+  AnalyticsService,
+  AnalyticsTxType,
+} from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -76,6 +82,8 @@ const FormDelegationRequest = () => {
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
+
+  const analyticsService = new AnalyticsService(currentSession);
 
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
     if (validatorList) {
@@ -155,6 +163,15 @@ const FormDelegationRequest = () => {
         decryptedPhrase,
         walletType,
       });
+
+      analyticsService.logTransactionEvent(
+        broadcastResult.transactionHash as string,
+        formValues.amount,
+        AnalyticsTxType.StakingTransaction,
+        AnalyticsActions.FundsStaked,
+        AnalyticsCategory.Delegate,
+      );
+
       setBroadcastResult(stakingResult);
 
       setIsVisibleConfirmationModal(false);
@@ -833,7 +850,18 @@ const FormWithdrawStakingReward = () => {
   );
 };
 
-function StakingPage() {
+const StakingPage = () => {
+  const currentSession = useRecoilValue(sessionState);
+  const analyticsService = new AnalyticsService(currentSession);
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Staking');
+    }
+  }, []);
+
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">Staking</Header>
@@ -861,6 +889,6 @@ function StakingPage() {
       <Footer />
     </Layout>
   );
-}
+};
 
 export default StakingPage;
