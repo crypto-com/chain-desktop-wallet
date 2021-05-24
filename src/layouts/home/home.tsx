@@ -19,6 +19,7 @@ import {
   walletAssetState,
   walletListState,
   marketState,
+  validatorListState,
   fetchingDBState,
 } from '../../recoil/atom';
 import { trimString } from '../../utils/utils';
@@ -34,6 +35,7 @@ import { Session } from '../../models/Session';
 import packageJson from '../../../package.json';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { LedgerWalletMaximum } from '../../config/StaticConfig';
+import { generalConfigService } from '../../storage/GeneralConfigService';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -49,10 +51,12 @@ function HomeLayout(props: HomeLayoutProps) {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [marketData, setMarketData] = useRecoilState(marketState);
+  const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+  const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
 
@@ -124,15 +128,26 @@ function HomeLayout(props: HomeLayoutProps) {
         currentAsset.mainnetSymbol,
         'usd',
       );
+      const currentValidatorList = await walletService.retrieveTopValidators(
+        sessionData.wallet.config.network.chainId,
+      );
+
+      const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
 
       setHasWallet(hasWalletBeenCreated);
       setSession(sessionData);
       setUserAsset(currentAsset);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
+      setValidatorList(currentValidatorList);
       await fetchAndSetNewValidators();
       await fetchAndSetNewProposals();
       setFetchingDB(false);
+
+      // Timeout for loading
+      setTimeout(() => {
+        setIsAnnouncementVisible(!announcementShown);
+      }, 2000);
     };
 
     if (!didMountRef.current) {
@@ -152,6 +167,8 @@ function HomeLayout(props: HomeLayoutProps) {
     setWalletList,
     marketData,
     setMarketData,
+    validatorList,
+    setValidatorList,
   ]);
 
   const HomeMenu = () => {
@@ -354,6 +371,37 @@ function HomeLayout(props: HomeLayoutProps) {
                 </Form>
               </div>
             )}
+          </>
+        </ModalPopup>
+        <ModalPopup
+          isModalVisible={isAnnouncementVisible}
+          handleCancel={() => {
+            setIsAnnouncementVisible(false);
+            generalConfigService.setHasShownAnalyticsPopup(true);
+          }}
+          handleOk={() => {}}
+          footer={[]}
+        >
+          <>
+            <div className="title">Data analytics was added</div>
+            <div className="description">
+              You can help improve Crypto.org Chain Wallet by having Data Analytics enabled. The
+              data collected will help the development team prioritize new features and improve
+              existing functionalities. <br />
+              <br />
+              You can always come back to disable Data Analytics anytime under General Configuration
+              in{' '}
+              <Link
+                to="/settings"
+                onClick={async () => {
+                  setIsAnnouncementVisible(false);
+                  await generalConfigService.setHasShownAnalyticsPopup(true);
+                }}
+              >
+                Settings
+              </Link>
+              .
+            </div>
           </>
         </ModalPopup>
       </Layout>

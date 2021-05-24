@@ -1,5 +1,4 @@
-// import React, { useState, useEffect } from 'react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import './wallet.less';
 import 'antd/dist/antd.css';
@@ -9,11 +8,13 @@ import {
   sessionState,
   walletAssetState,
   walletListState,
+  validatorListState,
   fetchingDBState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
 import { LEDGER_WALLET_TYPE, NORMAL_WALLET_TYPE } from '../../service/LedgerService';
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import IconLedger from '../../svg/IconLedger';
 import IconWallet from '../../svg/IconWallet';
@@ -29,10 +30,14 @@ enum sortOrder {
 function WalletPage() {
   const [session, setSession] = useRecoilState<Session>(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
   const walletList = useRecoilValue(walletListState);
   const [loading, setLoading] = useState(false);
   const [processedWalletList, setProcessedWalletList] = useState([]);
+  const didMountRef = useRef(false);
+
+  const analyticsService = new AnalyticsService(session);
 
   const processWalletList = wallets => {
     const list = wallets.reduce((resultList, wallet, idx) => {
@@ -81,6 +86,10 @@ function WalletPage() {
     setSession(currentSession);
     setUserAsset(currentAsset);
     await walletService.syncAll(currentSession);
+    const currentValidatorList = await walletService.retrieveTopValidators(
+      currentSession.wallet.config.network.chainId,
+    );
+    setValidatorList(currentValidatorList);
 
     setLoading(false);
   };
@@ -92,7 +101,12 @@ function WalletPage() {
     };
 
     syncWalletList();
-  }, [fetchingDB, userAsset]);
+
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Wallet');
+    }
+  }, [fetchingDB, userAsset, validatorList]);
 
   const columns = [
     {

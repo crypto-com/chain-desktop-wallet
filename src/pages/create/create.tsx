@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { Button, Checkbox, Form, Input, notification, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
-import { walletIdentifierState, walletTempBackupState } from '../../recoil/atom';
+import { walletIdentifierState, walletTempBackupState, sessionState } from '../../recoil/atom';
 import './create.less';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
@@ -17,6 +17,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 // import PasswordFormContainer from '../../components/PasswordForm/PasswordFormContainer';
 import BackButton from '../../components/BackButton/BackButton';
 import { secretStoreService } from '../../storage/SecretStoreService';
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup';
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
 import IconLedger from '../../svg/IconLedger';
@@ -535,6 +536,9 @@ const CreatePage = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [ledgerConnected, setLedgerConnected] = useState(false);
   const [walletTempBackupSeed] = useRecoilState(walletTempBackupState);
+  const currentSession = useRecoilValue(sessionState);
+
+  const analyticsService = new AnalyticsService(currentSession);
 
   const handleOk = () => {
     setIsModalVisible(false);
@@ -573,6 +577,7 @@ const CreatePage = () => {
 
     if (!didMountRef.current) {
       didMountRef.current = true;
+      analyticsService.logPage('Create');
     } else {
       fetchWalletData();
     }

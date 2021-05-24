@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {
   DisableDefaultMemoSettings,
+  DisableGASettings,
   EnableGeneralSettingsPropagation,
   reconstructCustomConfig,
   SettingsDataUpdate,
@@ -457,6 +458,10 @@ class WalletService {
     return this.storageService.updateDisabledDefaultMemo(disableDefaultMemoSettings);
   }
 
+  public async updateGADisabledSettings(disableGASettings: DisableGASettings) {
+    return this.storageService.updateDisabledGA(disableGASettings);
+  }
+
   public async updateGeneralSettingsPropagation(
     enableGeneralSettingsPropagation: EnableGeneralSettingsPropagation,
   ) {
@@ -668,7 +673,7 @@ class WalletService {
       // eslint-disable-next-line no-empty
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.log('SYNC_ERROR', e);
+      // console.log('SYNC_ERROR', e);
       return Promise.resolve();
     }
   }

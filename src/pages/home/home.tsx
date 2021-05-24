@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from 'antd';
@@ -36,10 +36,11 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
 import { UndelegateFormComponent } from './components/UndelegateFormComponent';
-import { RedelegateFormComponent } from './components/RedelegateFormComponent';
+import RedelegateFormComponent from './components/RedelegateFormComponent';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 const { Text } = Typography;
 
@@ -129,6 +130,7 @@ function HomePage() {
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
+  const didMountRef = useRef(false);
 
   // Undelegate action related states changes
   const [form] = Form.useForm();
@@ -162,6 +164,8 @@ function HomePage() {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [delegationActionType, setDelegationActionType] = useState<StakingActionType>();
+
+  const analyticsService = new AnalyticsService(currentSession);
 
   const showWalletStateNotification = (config: WalletConfig) => {
     setTimeout(async () => {
@@ -224,6 +228,11 @@ function HomePage() {
     };
 
     syncAssetData();
+
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Home');
+    }
   }, [fetchingDB]);
 
   const TransactionColumns = [

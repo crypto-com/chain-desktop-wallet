@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
 import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
@@ -19,6 +19,7 @@ import {
   walletAssetState,
   ledgerIsExpertModeState,
   fetchingDBState,
+  validatorListState,
 } from '../../recoil/atom';
 import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
@@ -32,6 +33,12 @@ import {
 } from '../../utils/NumberUtils';
 import { middleEllipsis, ellipsis } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
+import {
+  AnalyticsActions,
+  AnalyticsCategory,
+  AnalyticsService,
+  AnalyticsTxType,
+} from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -69,34 +76,36 @@ const FormDelegationRequest = () => {
   const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
   const [showMemo, setShowMemo] = useState(false);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const currentValidatorList = useRecoilValue(validatorListState);
   const currentSession = useRecoilValue(sessionState);
   const fetchingDB = useRecoilValue(fetchingDBState);
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
 
-  const processValidatorList = (validatorList: ValidatorModel[]) => {
-    return validatorList.map((validator, idx) => {
-      const validatorModel = {
-        ...validator,
-        key: `${idx}`,
-      };
-      return validatorModel;
-    });
+  const analyticsService = new AnalyticsService(currentSession);
+
+  const processValidatorList = (validatorList: ValidatorModel[] | null) => {
+    if (validatorList) {
+      return validatorList.map((validator, idx) => {
+        const validatorModel = {
+          ...validator,
+          key: `${idx}`,
+        };
+        return validatorModel;
+      });
+    }
+    return [];
   };
 
   useEffect(() => {
     const syncValidatorsData = async () => {
-      const currentValidatorList = await walletService.retrieveTopValidators(
-        currentSession.wallet.config.network.chainId,
-      );
-
       const validatorList = processValidatorList(currentValidatorList);
       setValidatorTopList(validatorList);
     };
 
     syncValidatorsData();
-  }, [fetchingDB]);
+  }, [fetchingDB, currentValidatorList]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -154,6 +163,15 @@ const FormDelegationRequest = () => {
         decryptedPhrase,
         walletType,
       });
+
+      analyticsService.logTransactionEvent(
+        broadcastResult.transactionHash as string,
+        formValues.amount,
+        AnalyticsTxType.StakingTransaction,
+        AnalyticsActions.FundsStaked,
+        AnalyticsCategory.Delegate,
+      );
+
       setBroadcastResult(stakingResult);
 
       setIsVisibleConfirmationModal(false);
@@ -278,7 +296,7 @@ const FormDelegationRequest = () => {
       },
     },
     {
-      title: 'Rate',
+      title: 'Commission',
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
       sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
@@ -832,7 +850,18 @@ const FormWithdrawStakingReward = () => {
   );
 };
 
-function StakingPage() {
+const StakingPage = () => {
+  const currentSession = useRecoilValue(sessionState);
+  const analyticsService = new AnalyticsService(currentSession);
+  const didMountRef = useRef(false);
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Staking');
+    }
+  }, []);
+
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">Staking</Header>
@@ -860,6 +889,6 @@ function StakingPage() {
       <Footer />
     </Layout>
   );
-}
+};
 
 export default StakingPage;
