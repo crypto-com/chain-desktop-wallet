@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import './nft.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Layout, Card, Tabs, List, Avatar, Radio } from 'antd';
-import { ArrowLeftOutlined, MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { Layout, Card, Tabs, List, Avatar, Radio, Table } from 'antd';
+import { MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useRecoilValue } from 'recoil';
 import axios from 'axios';
 import {
@@ -18,13 +18,14 @@ import {
 } from '../../models/Transaction';
 import { walletService } from '../../service/WalletService';
 // import { secretStoreService } from '../../storage/SecretStoreService';
-// import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
 // import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 // import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 // import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 // import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 // import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
 // import { ellipsis } from '../../utils/utils';
+// import { middleEllipsis } from '../../utils/utils';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -39,7 +40,7 @@ const NftPage = () => {
   // const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   // const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   // const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
-  const [isNftVisible, setIsNftVisible] = useState(false);
+  const [isNftModalVisible, setIsNftModalVisible] = useState(false);
   // const [decryptedPhrase, setDecryptedPhrase] = useState('');
   // const [errorMessages, setErrorMessages] = useState([]);
   const [nft, setNft] = useState<any>();
@@ -165,64 +166,77 @@ const NftPage = () => {
     // eslint-disable-next-line
   }, [proposalList, setProposalList]);
 
+  const NftColumns = [
+    {
+      title: 'Transaction Hash',
+      dataIndex: 'transactionHash',
+      key: 'transactionHash',
+      render: text => (
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/tx/${text}`}
+        >
+          {/* {middleEllipsis(text, 12)} */}
+          {text}
+        </a>
+      ),
+    },
+    {
+      title: 'Drop Name',
+      dataIndex: 'name',
+      key: 'name',
+      render: name => {
+        return { name };
+      },
+    },
+    {
+      title: 'Collectible Name',
+      dataIndex: 'recipientAddress',
+      key: 'recipientAddress',
+      render: text => <div data-original={text}>{text}</div>,
+    },
+    {
+      title: 'Edition',
+      dataIndex: 'recipientAddress',
+      key: 'recipientAddress',
+      render: text => <div data-original={text}>{text}</div>,
+    },
+    {
+      title: 'Time',
+      dataIndex: 'time',
+      key: 'time',
+    },
+    {
+      title: 'View',
+      dataIndex: 'view',
+      key: 'viewAction',
+      render: () => {
+        return <a>View</a>;
+      },
+    },
+  ];
+
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">My NFT</Header>
       <div className="header-description">An overview of your NFT Collection.</div>
       <Content>
-        {isNftVisible ? (
-          <div className="site-layout-background nft-content">
-            <div className="container">
-              <Layout className="nft-detail">
-                <Content>
-                  <a>
-                    <div
-                      className="back-button"
-                      onClick={() => setIsNftVisible(false)}
-                      style={{ fontSize: '16px' }}
-                    >
-                      <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} /> Back to
-                      NFT List
-                    </div>
-                  </a>
-                  <div className="nft-image">
-                    <img alt="example" src={nft?.image_url} />
-                  </div>
-                </Content>
-                <Sider width="500px">
-                  <>
-                    <div className="title">{nft?.name}</div>
-                    <div className="item">
-                      <div className="status">#{nft.id} Edition: </div>
-                    </div>
-                    <div className="item">
-                      {/* <div className="date">
-                      Start: {moment(nft?.voting_start_time).format('DD/MM/YYYY, h:mm A')}{' '}
-                      <br />
-                      End: {moment(nft?.voting_end_time).format('DD/MM/YYYY, h:mm A')}
-                    </div> */}
-                    </div>
-
-                    <div className="description">{nft?.description}</div>
-                  </>
-                </Sider>
-              </Layout>
-            </div>
-          </div>
-        ) : (
-          <Tabs defaultActiveKey="1">
-            <TabPane tab="NFT Collection" key="1">
-              <div className="site-layout-background nft-content">
-                <div className="view-selection">
-                  <Radio.Group
-                    options={nftViewOptions}
-                    defaultValue="grid"
-                    onChange={e => {
-                      setNftView(e.target.value);
-                    }}
-                    optionType="button"
-                  />
-                </div>
+        <Tabs defaultActiveKey="1">
+          <TabPane tab="NFT Collection" key="1">
+            <div className="site-layout-background nft-content">
+              <div className="view-selection">
+                <Radio.Group
+                  options={nftViewOptions}
+                  defaultValue="grid"
+                  onChange={e => {
+                    setNftView(e.target.value);
+                  }}
+                  optionType="button"
+                />
+              </div>
+              {nftView === 'grid' ? (
                 <List
                   grid={{
                     gutter: 16,
@@ -234,43 +248,75 @@ const NftPage = () => {
                     xxl: 3,
                   }}
                   dataSource={nftList}
-                  renderItem={item =>
-                    nftView === 'grid' ? (
-                      <List.Item>
-                        <Card
-                          style={{ width: 200 }}
-                          cover={<img alt="example" src={item?.image_thumbnail_url} />}
-                          hoverable
-                          onClick={() => {
-                            setNft(item);
-                            setIsNftVisible(true);
-                          }}
-                          className="nft"
-                        >
-                          <Meta
-                            title={item?.name}
-                            description={
-                              <>
-                                <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
-                                CryptoPunks
-                              </>
-                            }
-                          />
-                        </Card>
-                      </List.Item>
-                    ) : (
-                      <></>
-                    )
-                  }
+                  renderItem={item => (
+                    <List.Item>
+                      <Card
+                        style={{ width: 200 }}
+                        cover={<img alt="example" src={item?.image_thumbnail_url} />}
+                        hoverable
+                        onClick={() => {
+                          setNft(item);
+                          setIsNftModalVisible(true);
+                        }}
+                        className="nft"
+                      >
+                        <Meta
+                          title={item?.name}
+                          description={
+                            <>
+                              <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
+                              CryptoPunks
+                            </>
+                          }
+                        />
+                      </Card>
+                    </List.Item>
+                  )}
                   pagination={{
                     pageSize: 6,
                   }}
                 />
-              </div>
-            </TabPane>
-          </Tabs>
-        )}
+              ) : (
+                <Table columns={NftColumns} dataSource={nftList} />
+              )}
+            </div>
+          </TabPane>
+        </Tabs>
       </Content>
+      <ModalPopup
+        isModalVisible={isNftModalVisible}
+        handleCancel={() => setIsNftModalVisible(false)}
+        handleOk={() => {}}
+        // confirmationLoading={confirmLoading}
+        footer={[]}
+        okText="Confirm"
+        className="nft-modal"
+      >
+        <Layout className="nft-detail">
+          <Content>
+            <div className="nft-image">
+              <img alt="example" src={nft?.image_url} />
+            </div>
+          </Content>
+          <Sider width="50%">
+            <>
+              <div className="title">{nft?.name}</div>
+              <div className="item">
+                <div className="status">#{nft?.id} Edition: </div>
+              </div>
+              <div className="item">
+                {/* <div className="date">
+                      Start: {moment(nft?.voting_start_time).format('DD/MM/YYYY, h:mm A')}{' '}
+                      <br />
+                      End: {moment(nft?.voting_end_time).format('DD/MM/YYYY, h:mm A')}
+                    </div> */}
+              </div>
+
+              <div className="description">{nft?.description}</div>
+            </>
+          </Sider>
+        </Layout>
+      </ModalPopup>
       <Footer />
       {/* <PasswordFormModal
         description="Input the app password decrypt wallet"

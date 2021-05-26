@@ -62,72 +62,51 @@
     margin: 12px 0;
   }
 }
-
-.ant-layout-content .nft-detail {
-  background: #fff;
-  .nft-image img {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    max-width: 400px;
-    margin: 50px auto;
-  }
-  .title {
-    margin-top: 16px;
-    font-size: 24px;
-  }
-  .description {
-    max-width: 800px;
-    color: @font-color;
-  }
-  .item {
-    margin: 30px 0;
-    .label {
+.nft-modal {
+  width: 1000px !important;
+  .nft-detail {
+    background: #fff;
+    .nft-image img {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      max-width: 400px;
+      margin: 50px auto;
+    }
+    .title {
+      margin-top: 16px;
+      font-size: 24px;
+    }
+    .description {
+      max-width: 800px;
       color: @font-color;
     }
-    .address {
-      padding: 10px 8px;
-      background: #f0f0f0;
-      border-radius: 4px;
+    .item {
+      margin: 30px 0;
+      .label {
+        color: @font-color;
+      }
+      .address {
+        padding: 10px 8px;
+        background: rgba(196, 196, 196, 0.1);
+        border-radius: 4px;
+      }
     }
-  }
-  .ant-layout,
-  .ant-layout-sider {
-    background: #fff;
-  }
-  .ant-layout {
-    margin: 10px;
+    // .ant-layout,
+    .ant-layout-sider {
+      background: #fff;
+    }
     .ant-layout-content {
-      margin: 0 10px;
-      .description {
-        white-space: pre-line;
-      }
+      background: #f8f8f8;
     }
-  }
-
-  .ant-card-head-title {
-    color: @azure;
-  }
-  .vote-result-section {
-    padding-bottom: 10px;
-  }
-  .ant-radio-group {
-    width: 100%;
-    text-align: center;
-    .ant-radio-button-wrapper {
-      display: block;
-      height: 46px;
-      margin-bottom: 8px;
-      line-height: 46px;
-      border: 1px solid #d9d9d9;
-      border-radius: @border-radius;
-
-      &::before {
-        width: 0;
-      }
-    }
-    .ant-radio-button-wrapper-checked {
-      border: 1px solid @azure;
-    }
+    // &.ant-layout {
+    //   margin: 10px;
+    //   .ant-layout-content {
+    //     margin: 0 10px;
+    //     .description {
+    //       white-space: pre-line;
+    //     }
+    //   }
+    // }
   }
 }
