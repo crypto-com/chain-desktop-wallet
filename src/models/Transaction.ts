@@ -1,4 +1,5 @@
 import { Proposal, ValidatorPubKey } from '../service/rpc/NodeRpcModels';
+import { NftResponse } from '../service/rpc/ChainIndexingModels';
 
 export enum TransactionStatus {
   SUCCESS = 'SUCCESS',
@@ -48,6 +49,11 @@ export interface TransferTransactionList {
   walletId: string;
 }
 
+export interface NFTList {
+  nfts: Array<NftModel>;
+  walletId: string;
+}
+
 export interface ValidatorList {
   validators: Array<ValidatorModel>;
   chainId: string;
@@ -85,6 +91,7 @@ export interface ValidatorModel {
 }
 
 export interface ProposalModel extends Proposal {}
+export interface NftModel extends NftResponse {}
 
 export const ProposalStatuses = {
   PROPOSAL_STATUS_UNSPECIFIED: 'PROPOSAL_STATUS_UNSPECIFIED',

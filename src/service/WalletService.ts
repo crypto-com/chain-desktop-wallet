@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {
   DisableDefaultMemoSettings,
+  DisableGASettings,
   EnableGeneralSettingsPropagation,
   reconstructCustomConfig,
   SettingsDataUpdate,
@@ -35,6 +36,7 @@ import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
+  NftModel,
   ProposalModel,
   ProposalStatuses,
   RewardTransaction,
@@ -457,6 +459,10 @@ class WalletService {
     return this.storageService.updateDisabledDefaultMemo(disableDefaultMemoSettings);
   }
 
+  public async updateGADisabledSettings(disableGASettings: DisableGASettings) {
+    return this.storageService.updateDisabledGA(disableGASettings);
+  }
+
   public async updateGeneralSettingsPropagation(
     enableGeneralSettingsPropagation: EnableGeneralSettingsPropagation,
   ) {
@@ -525,7 +531,7 @@ class WalletService {
       this.fetchAndSaveRewards(nodeRpc, currentSession),
       this.fetchAndSaveTransfers(currentSession),
       this.fetchAndSaveValidators(currentSession),
-      this.fetchAndSaveProposals(currentSession),
+      // this.fetchAndSaveProposals(currentSession),
     ]);
   }
 
@@ -606,6 +612,19 @@ class WalletService {
     }
   }
 
+  public async fetchAndSaveNFTs(currentSession: Session) {
+    try {
+      const nfts = await this.loadAllCurrentAccountNFTs();
+      await this.storageService.saveNFTs({
+        walletId: currentSession.wallet.identifier,
+        nfts,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_SAVE_PROPOSALS', e);
+    }
+  }
+
   public async retrieveCurrentWalletAssets(currentSession: Session): Promise<UserAsset[]> {
     const assets = await this.storageService.retrieveAssetsByWallet(
       currentSession.wallet.identifier,
@@ -668,7 +687,7 @@ class WalletService {
       // eslint-disable-next-line no-empty
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.log('SYNC_ERROR', e);
+      // console.log('SYNC_ERROR', e);
       return Promise.resolve();
     }
   }
@@ -815,6 +834,14 @@ class WalletService {
     return proposalSet.proposals;
   }
 
+  public async retrieveNFTs(walletID: string): Promise<NftModel[]> {
+    const nftSet = await this.storageService.retrieveAllNfts(walletID);
+    if (!nftSet) {
+      return [];
+    }
+    return nftSet.nfts;
+  }
+
   private async getLatestTopValidators(): Promise<ValidatorModel[]> {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
@@ -846,6 +873,21 @@ class WalletService {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING PROPOSALS', e);
+      return [];
+    }
+  }
+
+  private async loadAllCurrentAccountNFTs(): Promise<NftModel[]> {
+    try {
+      const currentSession = await this.storageService.retrieveCurrentSession();
+      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+        return Promise.resolve([]);
+      }
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      return chainIndexAPI.getAccountNFTList(currentSession.wallet.address);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING NFTs', e);
       return [];
     }
   }

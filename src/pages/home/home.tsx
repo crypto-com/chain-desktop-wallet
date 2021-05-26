@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './home.less';
 import 'antd/dist/antd.css';
@@ -54,6 +54,7 @@ import RedelegateFormComponent from './components/RedelegateFormComponent';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 const { Text } = Typography;
 
@@ -144,6 +145,7 @@ function HomePage() {
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
+  const didMountRef = useRef(false);
 
   const [nftList, setNftList] = useState<any[]>([]);
   // const [nftView, setNftView] = useState('grid');
@@ -181,6 +183,8 @@ function HomePage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [delegationActionType, setDelegationActionType] = useState<StakingActionType>();
 
+  const analyticsService = new AnalyticsService(currentSession);
+
   const showWalletStateNotification = (config: WalletConfig) => {
     setTimeout(async () => {
       if (isWalletNotLive(config) && !hasShownNotLiveWallet) {
@@ -217,6 +221,7 @@ function HomePage() {
     setUserAsset(currentAsset);
     setHasShownNotLiveWallet(true);
 
+    await walletService.fetchAndSaveNFTs(sessionData);
     setFetchingDB(false);
   };
 
@@ -252,6 +257,11 @@ function HomePage() {
     };
 
     syncAssetData();
+
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Home');
+    }
   }, [fetchingDB]);
 
   const TransactionColumns = [

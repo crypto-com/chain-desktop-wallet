@@ -3,12 +3,25 @@ import { useHistory } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Button, Form, Input, Layout, Tabs, Alert, Checkbox, InputNumber, message } from 'antd';
+import {
+  Button,
+  Form,
+  Input,
+  Layout,
+  Tabs,
+  Alert,
+  Checkbox,
+  InputNumber,
+  message,
+  Switch,
+  Divider,
+} from 'antd';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { sessionState, walletListState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
   DisableDefaultMemoSettings,
+  DisableGASettings,
   EnableGeneralSettingsPropagation,
   SettingsDataUpdate,
 } from '../../models/Wallet';
@@ -16,6 +29,7 @@ import { Session } from '../../models/Session';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -32,6 +46,7 @@ const GeneralSettingsForm = () => {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [enabledGeneralSettings, setEnabledGeneralSettings] = useState<boolean>(false);
   const didMountRef = useRef(false);
+  const analyticsService = new AnalyticsService(session);
 
   useEffect(() => {
     let unmounted = false;
@@ -46,6 +61,7 @@ const GeneralSettingsForm = () => {
     if (!didMountRef.current) {
       SyncConfig();
       didMountRef.current = true;
+      analyticsService.logPage('Settings');
     }
 
     return () => {
@@ -164,6 +180,8 @@ function MetaInfoComponent() {
   const [updateLoading, setUpdateLoading] = useState(false);
 
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
+  const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
+
   const didMountRef = useRef(false);
 
   useEffect(() => {
@@ -171,8 +189,10 @@ function MetaInfoComponent() {
 
     const SyncConfig = async () => {
       const defaultMemoDisabled = session.wallet.config.disableDefaultClientMemo;
+      const defaultGADisabled = session.wallet.config.analyticsDisabled;
       if (!unmounted) {
         setDefaultMemoStateDisabled(defaultMemoDisabled);
+        setDefaultGAStateDisabled(defaultGADisabled);
       }
     };
 
@@ -184,7 +204,12 @@ function MetaInfoComponent() {
     return () => {
       unmounted = true;
     };
-  }, [defaultMemoStateDisabled, setDefaultMemoStateDisabled]);
+  }, [
+    defaultMemoStateDisabled,
+    setDefaultMemoStateDisabled,
+    defaultGAStateDisabled,
+    setDefaultGAStateDisabled,
+  ]);
 
   async function onAllowDefaultMemoChange() {
     setUpdateLoading(true);
@@ -210,22 +235,60 @@ function MetaInfoComponent() {
     );
   }
 
+  async function onAllowDefaultGAChange() {
+    setUpdateLoading(true);
+
+    const newState = !defaultGAStateDisabled;
+    setDefaultGAStateDisabled(newState);
+
+    const disableGASettingsUpdate: DisableGASettings = {
+      walletId: session.wallet.identifier,
+      analyticsDisabled: newState,
+    };
+
+    await walletService.updateGADisabledSettings(disableGASettingsUpdate);
+
+    const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
+    const newSession = new Session(updatedWallet);
+    await walletService.setCurrentSession(newSession);
+
+    setSession(newSession);
+    setUpdateLoading(false);
+    message.success(
+      `Analytics settings has been ${newState ? 'disabled' : 'enabled'} successfully`,
+    );
+  }
+
   return (
     <div>
       <div className="site-layout-background settings-content">
         <div className="container">
           <div className="item">
+            <div className="title">Default Memo</div>
             <div className="description">
               A default memo message will be used for staking transactions if a custom memo is not
               provided.
             </div>
-            <Checkbox
-              checked={defaultMemoStateDisabled}
+            <Switch
+              checked={!defaultMemoStateDisabled}
               onChange={onAllowDefaultMemoChange}
               disabled={updateLoading}
-            >
-              Disable default memo message
-            </Checkbox>
+            />{' '}
+            {defaultMemoStateDisabled ? 'Disabled' : 'Enabled'}
+          </div>
+          <Divider />
+          <div className="item">
+            <div className="title">Data Analytics</div>
+            <div className="description">
+              The data collected for analytics is used to prioritize development for new features
+              and functionalities and also to improve implemented features
+            </div>
+            <Switch
+              checked={!defaultGAStateDisabled}
+              onChange={onAllowDefaultGAChange}
+              disabled={updateLoading}
+            />{' '}
+            {defaultGAStateDisabled ? 'Disabled' : 'Enabled'}
           </div>
         </div>
       </div>
@@ -368,7 +431,7 @@ const FormSettings = () => {
             </div>
           </div>
         </TabPane>
-        <TabPane tab="Metadata Configuration" key="2">
+        <TabPane tab="General Configuration" key="2">
           <MetaInfoComponent />
         </TabPane>
         <TabPane tab="Clear Storage" key="3">

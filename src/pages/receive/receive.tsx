@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import QRCode from 'qrcode.react';
 import { useRecoilValue } from 'recoil';
 import './receive.less';
@@ -9,16 +9,23 @@ import { CopyOutlined } from '@ant-design/icons';
 import { sessionState } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer } = Layout;
 
 function ReceivePage() {
   const session: Session = useRecoilValue<Session>(sessionState);
   const [isLedger, setIsLedger] = useState(false);
+  const didMountRef = useRef(false);
+  const analyticsService = new AnalyticsService(session);
 
   useEffect(() => {
     const { walletType } = session.wallet;
     setIsLedger(LEDGER_WALLET_TYPE === walletType);
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Receive');
+    }
   });
 
   const clickCheckLedger = async () => {

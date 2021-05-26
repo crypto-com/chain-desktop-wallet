@@ -1,4 +1,9 @@
-import { DisableDefaultMemoSettings, SettingsDataUpdate, Wallet } from '../models/Wallet';
+import {
+  DisableDefaultMemoSettings,
+  DisableGASettings,
+  SettingsDataUpdate,
+  Wallet,
+} from '../models/Wallet';
 import { DatabaseManager } from './DatabaseManager';
 import { Session } from '../models/Session';
 import {
@@ -8,6 +13,7 @@ import {
   UserAsset,
 } from '../models/UserAsset';
 import {
+  NFTList,
   ProposalList,
   RewardTransactionList,
   StakingTransactionData,
@@ -56,6 +62,17 @@ export class StorageService {
     const previousWallet = await this.findWalletByIdentifier(disableDefaultMemoSettings.walletId);
     previousWallet.config.disableDefaultClientMemo =
       disableDefaultMemoSettings.disableDefaultMemoAppend;
+
+    return this.db.walletStore.update<Wallet>(
+      { identifier: previousWallet.identifier },
+      { $set: previousWallet },
+      { upsert: true },
+    );
+  }
+
+  public async updateDisabledGA(disableGASettings: DisableGASettings) {
+    const previousWallet = await this.findWalletByIdentifier(disableGASettings.walletId);
+    previousWallet.config.analyticsDisabled = disableGASettings.analyticsDisabled;
 
     return this.db.walletStore.update<Wallet>(
       { identifier: previousWallet.identifier },
@@ -292,5 +309,17 @@ export class StorageService {
 
   public async retrieveAllProposals(chainId: string) {
     return this.db.proposalStore.findOne<ProposalList>({ chainId });
+  }
+
+  public async saveNFTs(nftList: NFTList) {
+    if (!nftList || nftList.nfts.length === 0) {
+      return Promise.resolve();
+    }
+    await this.db.nftStore.remove({ walletId: nftList.walletId }, { multi: true });
+    return this.db.nftStore.insert<NFTList>(nftList);
+  }
+
+  public async retrieveAllNfts(walletId: string) {
+    return this.db.nftStore.findOne<NFTList>({ walletId });
   }
 }

@@ -1,5 +1,11 @@
 import axios, { AxiosInstance } from 'axios';
-import { TransferDataAmount, TransferListResponse, TransferResult } from './ChainIndexingModels';
+import {
+  NftListResponse,
+  NftResponse,
+  TransferDataAmount,
+  TransferListResponse,
+  TransferResult,
+} from './ChainIndexingModels';
 import { TransactionStatus, TransferTransactionData } from '../../models/Transaction';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 
@@ -24,6 +30,32 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       baseURL: chainIndexBaseUrl,
     });
     return new ChainIndexingAPI(axiosClient);
+  }
+
+  public async getAccountNFTList(account: string): Promise<NftResponse[]> {
+    let paginationPage = 1;
+    const nftsListRequest = await this.axiosClient.get<NftListResponse>(
+      `/nfts/accounts/${account}/tokens?page=${paginationPage}`,
+    );
+    const nftsListResponse: NftListResponse = nftsListRequest.data;
+
+    let { pagination } = nftsListResponse;
+
+    const nftLists = nftsListResponse.result;
+
+    while (pagination.total_page > pagination.current_page) {
+      paginationPage += 1;
+      // eslint-disable-next-line no-await-in-loop
+      const pageNftsListRequest = await this.axiosClient.get<NftListResponse>(
+        `/nfts/accounts/${account}/tokens?page=${paginationPage}`,
+      );
+      const pageNftsListResponse: NftListResponse = pageNftsListRequest.data;
+
+      pagination = pageNftsListResponse.pagination;
+      nftLists.push(...pageNftsListResponse.result);
+    }
+
+    return nftLists;
   }
 
   public async fetchAllTransferTransactions(
