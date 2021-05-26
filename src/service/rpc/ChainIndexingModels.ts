@@ -31,3 +31,33 @@ export interface TransferResult {
 export interface TransferListResponse {
   result: TransferResult[];
 }
+
+/// Nft models
+
+export interface NftResponse {
+  denomId: string;
+  tokenId: string;
+  drop: string;
+  tokenBurned: boolean;
+  tokenName: string;
+  tokenURI: string;
+  tokenData: string;
+  tokenMinter: string;
+  tokenOwner: string;
+  tokenMintedAt: string;
+  tokenLastEditedAt: string;
+  denomName: string;
+  denomSchema: string;
+}
+
+export interface NftListResponse {
+  result: NftResponse[];
+  pagination: NftListPagination;
+}
+
+export interface NftListPagination {
+  total_record: number;
+  total_page: number;
+  current_page: number;
+  limit: number;
+}
