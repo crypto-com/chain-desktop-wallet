@@ -203,6 +203,7 @@ function HomePage() {
     setUserAsset(currentAsset);
     setHasShownNotLiveWallet(true);
 
+    await walletService.fetchAndSaveNFTs(sessionData);
     setFetchingDB(false);
   };
 

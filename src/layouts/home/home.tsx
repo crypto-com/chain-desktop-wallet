@@ -78,6 +78,15 @@ function HomeLayout(props: HomeLayoutProps) {
     }
   }
 
+  async function fetchAndSetNFTs() {
+    try {
+      await walletService.fetchAndSaveNFTs(session);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Failed loading new wallet NFTs', e);
+    }
+  }
+
   const onWalletDeleteFinish = async () => {
     setIsButtonLoading(true);
     setFetchingDB(true);
@@ -140,8 +149,17 @@ function HomeLayout(props: HomeLayoutProps) {
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
       setValidatorList(currentValidatorList);
-      await fetchAndSetNewValidators();
-      await fetchAndSetNewProposals();
+
+      await Promise.all([
+        await fetchAndSetNewValidators(),
+        await fetchAndSetNewProposals(),
+        await fetchAndSetNFTs(),
+      ]);
+
+      const currentNFTs = await walletService.retrieveNFTs(sessionData.wallet.identifier);
+      // eslint-disable-next-line no-console
+      console.log('currentNFTs', currentNFTs);
+
       setFetchingDB(false);
 
       // Timeout for loading

@@ -49,6 +49,11 @@ export interface TransferTransactionList {
   walletId: string;
 }
 
+export interface NFTList {
+  nfts: Array<NftModel>;
+  walletId: string;
+}
+
 export interface ValidatorList {
   validators: Array<ValidatorModel>;
   chainId: string;
