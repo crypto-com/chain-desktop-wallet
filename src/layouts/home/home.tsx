@@ -157,10 +157,6 @@ function HomeLayout(props: HomeLayoutProps) {
         await fetchAndSetNFTs(),
       ]);
 
-      const currentNFTs = await walletService.retrieveNFTs(sessionData.wallet.identifier);
-      // eslint-disable-next-line no-console
-      console.log('currentNFTs', currentNFTs);
-
       setFetchingDB(false);
 
       // Timeout for loading
