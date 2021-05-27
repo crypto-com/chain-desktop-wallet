@@ -180,7 +180,7 @@ function HomePage() {
     }, 200);
   };
 
-  const onSyncBtnCall = async () => {
+  const onSyncAndRefreshBtnCall = async () => {
     setFetchingDB(true);
 
     await walletService.syncAll();
@@ -220,6 +220,11 @@ function HomePage() {
 
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
+      await walletService.fetchAndSaveNFTs(sessionData);
+
+      const nftsList = await walletService.retrieveNFTs(sessionData.wallet.identifier);
+      // eslint-disable-next-line no-console
+      console.log('nftsList', nftsList);
 
       showWalletStateNotification(currentSession.wallet.config);
       setDelegations(stakingTabularData);
@@ -511,7 +516,7 @@ function HomePage() {
         Welcome Back!
         <SyncOutlined
           onClick={() => {
-            onSyncBtnCall();
+            onSyncAndRefreshBtnCall();
           }}
           style={{ position: 'absolute', right: '36px', marginTop: '6px' }}
           spin={fetchingDB}
