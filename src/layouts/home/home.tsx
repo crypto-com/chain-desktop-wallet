@@ -10,7 +10,6 @@ import Icon, {
   PlusOutlined,
   ReloadOutlined,
   BankOutlined,
-  ShopOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
 import { useRecoilState } from 'recoil';
@@ -29,6 +28,7 @@ import IconHome from '../../svg/IconHome';
 import IconSend from '../../svg/IconSend';
 import IconReceive from '../../svg/IconReceive';
 import IconStaking from '../../svg/IconStaking';
+import IconNft from '../../svg/IconNft';
 import IconWallet from '../../svg/IconWallet';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
@@ -221,7 +221,7 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/governance" icon={<BankOutlined />}>
           <Link to="/governance">Governance</Link>
         </Menu.Item>
-        <Menu.Item key="/nft" icon={<ShopOutlined />}>
+        <Menu.Item key="/nft" icon={<Icon component={IconNft} />}>
           <Link to="/nft">My NFT</Link>
         </Menu.Item>
         <Menu.Item key="/settings" icon={<SettingOutlined />}>
