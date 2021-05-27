@@ -92,8 +92,20 @@
         border-radius: 4px;
       }
     }
+    .table-row {
+      display: grid;
+      grid-template-columns: 50% 50%;
+      margin-bottom: 10px;
+      :last-child:not(a) {
+        color: @font-color;
+      }
+    }
+    .goto-marketplace {
+      text-align: center;
+    }
     // .ant-layout,
     .ant-layout-sider {
+      padding-left: 32px;
       background: #fff;
     }
     .ant-layout-content {

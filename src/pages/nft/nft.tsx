@@ -301,18 +301,41 @@ const NftPage = () => {
           <Sider width="50%">
             <>
               <div className="title">{nft?.name}</div>
+              <Meta
+                // title={nft?.name}
+                description={
+                  <>
+                    <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
+                    CryptoPunks
+                  </>
+                }
+              />
               <div className="item">
-                <div className="status">#{nft?.id} Edition: </div>
+                <div className="status">About the Drop</div>
+                {/* <div className="status">#{nft?.id} Edition: </div> */}
               </div>
               <div className="item">
-                {/* <div className="date">
-                      Start: {moment(nft?.voting_start_time).format('DD/MM/YYYY, h:mm A')}{' '}
-                      <br />
-                      End: {moment(nft?.voting_end_time).format('DD/MM/YYYY, h:mm A')}
-                    </div> */}
+                <div className="description">{nft?.description}</div>
               </div>
-
-              <div className="description">{nft?.description}</div>
+              <div className="item">
+                <div className="table-row">
+                  <div>NFT Name</div>
+                  <div>Light Glitches of Osaka</div>
+                </div>
+                <div className="table-row">
+                  <div>NFT ID</div>
+                  <div>edition-123</div>
+                </div>
+                <div className="table-row">
+                  <div>IPFS URL</div>
+                  <a href="https://ipfs.io/ipfs/QmWU5HBZMBNRcti2wPAdtDvKec6XHMB5cccKZb5YFyFios/image.png">
+                    https://ipfs.io/ipfs/QmWU5HBZMBNRcti2wPAdtDvKec6XHMB5cccKZb5YFyFios/image.png
+                  </a>
+                </div>
+              </div>
+              <div className="item goto-marketplace">
+                <a>View on Crypto.com NFT</a>
+              </div>
             </>
           </Sider>
         </Layout>
