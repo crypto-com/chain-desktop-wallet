@@ -29,6 +29,7 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 // import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
 // import { ellipsis } from '../../utils/utils';
 // import { middleEllipsis } from '../../utils/utils';
+import nftThumbnail from '../../assets/nft-thumbnail.png';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -234,7 +235,9 @@ const NftPage = () => {
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">My NFT</Header>
-      <div className="header-description">An overview of your NFT Collection.</div>
+      <div className="header-description">
+        An overview of your NFT Collection on Crypto.org Chain
+      </div>
       <Content>
         <Tabs defaultActiveKey="1">
           <TabPane tab="NFT Collection" key="1">
@@ -266,7 +269,14 @@ const NftPage = () => {
                       <Card
                         style={{ width: 200 }}
                         cover={
-                          <img alt="example" src={item?.denomSchema.properties.image.description} />
+                          <img
+                            alt={item?.denomName}
+                            src={
+                              item?.denomSchema.properties.image.description
+                                ? item?.denomSchema.properties.image.description
+                                : nftThumbnail
+                            }
+                          />
                         }
                         hoverable
                         onClick={() => {
@@ -311,7 +321,14 @@ const NftPage = () => {
         <Layout className="nft-detail">
           <Content>
             <div className="nft-image">
-              <img alt="example" src={nft?.denomSchema.properties.image.description} />
+              <img
+                alt={nft?.denomName}
+                src={
+                  nft?.denomSchema.properties.image.description
+                    ? nft?.denomSchema.properties.image.description
+                    : nftThumbnail
+                }
+              />
             </div>
           </Content>
           <Sider width="50%">

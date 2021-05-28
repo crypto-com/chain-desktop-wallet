@@ -56,6 +56,7 @@ import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import nftThumbnail from '../../assets/nft-thumbnail.png';
 
 const { Text } = Typography;
 
@@ -618,7 +619,14 @@ function HomePage() {
                     <Card
                       style={{ width: 170 }}
                       cover={
-                        <img alt="example" src={item?.denomSchema.properties.image.description} />
+                        <img
+                          alt={item?.denomName}
+                          src={
+                            item?.denomSchema.properties.image.description
+                              ? item?.denomSchema.properties.image.description
+                              : nftThumbnail
+                          }
+                        />
                       }
                       hoverable
                       // onClick={() => {
