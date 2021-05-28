@@ -21,6 +21,7 @@ import {
   marketState,
   validatorListState,
   fetchingDBState,
+  nftListState,
 } from '../../recoil/atom';
 import { trimString } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
@@ -53,6 +54,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [marketData, setMarketData] = useRecoilState(marketState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
+  const [nftList, setNftList] = useRecoilState(nftListState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
@@ -138,9 +140,6 @@ function HomeLayout(props: HomeLayoutProps) {
         currentAsset.mainnetSymbol,
         'usd',
       );
-      const currentValidatorList = await walletService.retrieveTopValidators(
-        sessionData.wallet.config.network.chainId,
-      );
 
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
 
@@ -149,13 +148,20 @@ function HomeLayout(props: HomeLayoutProps) {
       setUserAsset(currentAsset);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
-      setValidatorList(currentValidatorList);
 
       await Promise.all([
         await fetchAndSetNewValidators(),
         await fetchAndSetNewProposals(),
         await fetchAndSetNFTs(),
       ]);
+
+      const currentValidatorList = await walletService.retrieveTopValidators(
+        sessionData.wallet.config.network.chainId,
+      );
+      const currentNftList = await walletService.retrieveNFTs(sessionData.wallet.identifier);
+
+      setValidatorList(currentValidatorList);
+      setNftList(currentNftList);
 
       setFetchingDB(false);
 
@@ -184,6 +190,8 @@ function HomeLayout(props: HomeLayoutProps) {
     setMarketData,
     validatorList,
     setValidatorList,
+    nftList,
+    setNftList,
   ]);
 
   const HomeMenu = () => {

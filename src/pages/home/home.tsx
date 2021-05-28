@@ -18,7 +18,7 @@ import {
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import numeral from 'numeral';
-import axios from 'axios';
+// import axios from 'axios';
 import {
   scaledBalance,
   scaledStakingBalance,
@@ -31,12 +31,15 @@ import {
   sessionState,
   marketState,
   walletAssetState,
+  nftListState,
   ledgerIsExpertModeState,
   fetchingDBState,
 } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
   BroadCastResult,
+  NftModel,
+  // NftModel,
   StakingTransactionData,
   TransactionDirection,
   TransactionStatus,
@@ -142,12 +145,13 @@ function HomePage() {
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const nftList = useRecoilValue(nftListState);
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const didMountRef = useRef(false);
 
-  const [nftList, setNftList] = useState<any[]>([]);
+  const [processedNftList, setProcessedNftList] = useState<any[]>([]);
   // const [nftView, setNftView] = useState('grid');
 
   // Undelegate action related states changes
@@ -225,6 +229,20 @@ function HomePage() {
     setFetchingDB(false);
   };
 
+  const processNftList = (currentList: NftModel[] | undefined) => {
+    if (currentList) {
+      return currentList.map((nft, idx) => {
+        const nftModel = {
+          ...nft,
+          key: `${idx}`,
+          denomSchema: JSON.parse(nft.denomSchema),
+        };
+        return nftModel;
+      });
+    }
+    return [];
+  };
+
   useEffect(() => {
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
@@ -238,11 +256,15 @@ function HomePage() {
 
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
-      await walletService.fetchAndSaveNFTs(sessionData);
+      // await walletService.fetchAndSaveNFTs(sessionData);
 
-      const nftsList = await walletService.retrieveNFTs(sessionData.wallet.identifier);
+      // const nftsList = await walletService.retrieveNFTs(sessionData.wallet.identifier);
       // eslint-disable-next-line no-console
-      console.log('nftsList', nftsList);
+      console.log('nftList', nftList);
+
+      const currentNftList = processNftList(nftList);
+      console.log('currentNftList', currentNftList);
+      setProcessedNftList(currentNftList);
 
       showWalletStateNotification(currentSession.wallet.config);
       setDelegations(stakingTabularData);
@@ -250,15 +272,15 @@ function HomePage() {
       setUserAsset(currentAsset);
       setHasShownNotLiveWallet(true);
 
-      const nftApi = await axios
-        .create({
-          baseURL: 'https://api.opensea.io/api/v1/',
-        })
-        .get(
-          'assets?order_direction=desc&offset=0&limit=2&owner=0x701a24d812e4d9827ec8dd2b3eed726ffd9b4065',
-        );
+      // const nftApi = await axios
+      //   .create({
+      //     baseURL: 'https://api.opensea.io/api/v1/',
+      //   })
+      //   .get(
+      //     'assets?order_direction=desc&offset=0&limit=2&owner=0x701a24d812e4d9827ec8dd2b3eed726ffd9b4065',
+      //   );
 
-      setNftList(nftApi.data.assets);
+      // setNftList(nftApi.data.assets);
     };
 
     syncAssetData();
@@ -608,21 +630,23 @@ function HomePage() {
                   xl: 5,
                   xxl: 5,
                 }}
-                dataSource={nftList}
+                dataSource={processedNftList}
                 renderItem={item => (
                   <List.Item>
                     <Card
                       style={{ width: 170 }}
-                      cover={<img alt="example" src={item?.image_thumbnail_url} />}
+                      cover={
+                        <img alt="example" src={item?.denomSchema.properties.image.description} />
+                      }
                       hoverable
-                      onClick={() => {
-                        // setNft(item);
-                        // setIsNftVisible(true);
-                      }}
+                      // onClick={() => {
+                      // setNft(item);
+                      // setIsNftVisible(true);
+                      // }}
                       className="nft"
                     >
                       <Meta
-                        title={item?.name}
+                        title={item?.denomSchema.properties.name.description}
                         description={
                           <>
                             <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
