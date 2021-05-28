@@ -18,7 +18,6 @@ import {
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import numeral from 'numeral';
-// import axios from 'axios';
 import {
   scaledBalance,
   scaledStakingBalance,
@@ -39,7 +38,6 @@ import { walletService } from '../../service/WalletService';
 import {
   BroadCastResult,
   NftModel,
-  // NftModel,
   StakingTransactionData,
   TransactionDirection,
   TransactionStatus,
@@ -256,14 +254,8 @@ function HomePage() {
 
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
-      // await walletService.fetchAndSaveNFTs(sessionData);
-
-      // const nftsList = await walletService.retrieveNFTs(sessionData.wallet.identifier);
-      // eslint-disable-next-line no-console
-      console.log('nftList', nftList);
 
       const currentNftList = processNftList(nftList);
-      console.log('currentNftList', currentNftList);
       setProcessedNftList(currentNftList);
 
       showWalletStateNotification(currentSession.wallet.config);
@@ -271,16 +263,6 @@ function HomePage() {
       setTransfers(transferTabularData);
       setUserAsset(currentAsset);
       setHasShownNotLiveWallet(true);
-
-      // const nftApi = await axios
-      //   .create({
-      //     baseURL: 'https://api.opensea.io/api/v1/',
-      //   })
-      //   .get(
-      //     'assets?order_direction=desc&offset=0&limit=2&owner=0x701a24d812e4d9827ec8dd2b3eed726ffd9b4065',
-      //   );
-
-      // setNftList(nftApi.data.assets);
     };
 
     syncAssetData();

@@ -1,22 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import './nft.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Layout, Card, Tabs, List, Avatar, Radio, Table } from 'antd';
 import { MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useRecoilValue } from 'recoil';
-import axios from 'axios';
+// import axios from 'axios';
 import {
   sessionState,
+  nftListState,
+  fetchingDBState,
   // walletAssetState
 } from '../../recoil/atom';
 
 import {
-  ProposalModel,
+  NftModel,
+  // ProposalModel,
   // VoteOption,
   // BroadCastResult,
 } from '../../models/Transaction';
-import { walletService } from '../../service/WalletService';
+// import { walletService } from '../../service/WalletService';
 // import { secretStoreService } from '../../storage/SecretStoreService';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 // import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -45,13 +48,15 @@ const NftPage = () => {
   // const [errorMessages, setErrorMessages] = useState([]);
   const [nft, setNft] = useState<any>();
 
-  const [proposalList, setProposalList] = useState<ProposalModel[]>();
+  // const [proposalList, setProposalList] = useState<ProposalModel[]>();
+  const nftList = useRecoilValue(nftListState);
+  const fetchingDB = useRecoilValue(fetchingDBState);
+
   // const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const currentSession = useRecoilValue(sessionState);
   // const userAsset = useRecoilValue(walletAssetState);
-  const didMountRef = useRef(false);
 
-  const [nftList, setNftList] = useState<any[]>([]);
+  const [processedNftList, setProcessedNftList] = useState<any[]>([]);
   const [nftView, setNftView] = useState('grid');
 
   // const handleCancelConfirmationModal = () => {
@@ -139,32 +144,27 @@ const NftPage = () => {
     { label: <AppstoreOutlined />, value: 'grid' },
   ];
 
-  useEffect(() => {
-    const fetchProposalList = async () => {
-      const list: ProposalModel[] = await walletService.retrieveProposals(
-        currentSession.wallet.config.network.chainId,
-      );
-
-      const nftApi = await axios
-        .create({
-          baseURL: 'https://api.opensea.io/api/v1/',
-        })
-        .get(
-          'assets?order_direction=desc&offset=0&limit=2&owner=0x701a24d812e4d9827ec8dd2b3eed726ffd9b4065',
-        );
-
-      setNftList(nftApi.data.assets.concat(nftApi.data.assets).concat(nftApi.data.assets));
-
-      const latestProposalOnTop = list.reverse();
-      setProposalList(latestProposalOnTop);
-    };
-
-    if (!didMountRef.current) {
-      fetchProposalList();
-      didMountRef.current = true;
+  const processNftList = (currentList: NftModel[] | undefined) => {
+    if (currentList) {
+      return currentList.map((item, idx) => {
+        const nftModel = {
+          ...item,
+          key: `${idx}`,
+          denomSchema: JSON.parse(item.denomSchema),
+        };
+        return nftModel;
+      });
     }
-    // eslint-disable-next-line
-  }, [proposalList, setProposalList]);
+    return [];
+  };
+
+  useEffect(() => {
+    const fetchNftList = async () => {
+      const currentNftList = processNftList(nftList);
+      setProcessedNftList(currentNftList);
+    };
+    fetchNftList();
+  }, [fetchingDB]);
 
   const NftColumns = [
     {
@@ -247,12 +247,14 @@ const NftPage = () => {
                     xl: 3,
                     xxl: 3,
                   }}
-                  dataSource={nftList}
+                  dataSource={processedNftList}
                   renderItem={item => (
                     <List.Item>
                       <Card
                         style={{ width: 200 }}
-                        cover={<img alt="example" src={item?.image_thumbnail_url} />}
+                        cover={
+                          <img alt="example" src={item?.denomSchema.properties.image.description} />
+                        }
                         hoverable
                         onClick={() => {
                           setNft(item);
@@ -261,7 +263,7 @@ const NftPage = () => {
                         className="nft"
                       >
                         <Meta
-                          title={item?.name}
+                          title={item?.denomSchema.properties.name.description}
                           description={
                             <>
                               <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
@@ -275,9 +277,10 @@ const NftPage = () => {
                   pagination={{
                     pageSize: 6,
                   }}
+                  loading={fetchingDB}
                 />
               ) : (
-                <Table columns={NftColumns} dataSource={nftList} />
+                <Table columns={NftColumns} dataSource={processedNftList} />
               )}
             </div>
           </TabPane>
@@ -295,12 +298,12 @@ const NftPage = () => {
         <Layout className="nft-detail">
           <Content>
             <div className="nft-image">
-              <img alt="example" src={nft?.image_url} />
+              <img alt="example" src={nft?.denomSchema.properties.image.description} />
             </div>
           </Content>
           <Sider width="50%">
             <>
-              <div className="title">{nft?.name}</div>
+              <div className="title">{nft?.denomSchema.properties.name.description}</div>
               <Meta
                 // title={nft?.name}
                 description={
@@ -315,7 +318,9 @@ const NftPage = () => {
                 {/* <div className="status">#{nft?.id} Edition: </div> */}
               </div>
               <div className="item">
-                <div className="description">{nft?.description}</div>
+                <div className="description">
+                  {nft?.denomSchema.properties.description.description}
+                </div>
               </div>
               <div className="item">
                 <div className="table-row">
