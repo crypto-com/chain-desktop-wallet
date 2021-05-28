@@ -185,35 +185,48 @@ const NftPage = () => {
     },
     {
       title: 'Drop Name',
-      dataIndex: 'name',
+      // dataIndex: 'name',
       key: 'name',
-      render: name => {
-        return { name };
+      render: record => {
+        return record.denomSchema.properties.name.description;
       },
     },
     {
       title: 'Collectible Name',
-      dataIndex: 'recipientAddress',
-      key: 'recipientAddress',
-      render: text => <div data-original={text}>{text}</div>,
+      // dataIndex: 'recipientAddress',
+      key: 'collectibleName',
+      render: record => {
+        return record.denomSchema.properties.name.description;
+      },
     },
     {
       title: 'Edition',
-      dataIndex: 'recipientAddress',
-      key: 'recipientAddress',
-      render: text => <div data-original={text}>{text}</div>,
+      // dataIndex: 'recipientAddress',
+      key: 'edition',
+      render: record => {
+        return record.tokenId;
+      },
     },
     {
       title: 'Time',
-      dataIndex: 'time',
+      // dataIndex: 'time',
       key: 'time',
     },
     {
       title: 'View',
-      dataIndex: 'view',
+      // dataIndex: 'view',
       key: 'viewAction',
-      render: () => {
-        return <a>View</a>;
+      render: record => {
+        return (
+          <a
+            onClick={() => {
+              setNft(record);
+              setIsNftModalVisible(true);
+            }}
+          >
+            View
+          </a>
+        );
       },
     },
   ];
@@ -325,16 +338,21 @@ const NftPage = () => {
               <div className="item">
                 <div className="table-row">
                   <div>NFT Name</div>
-                  <div>Light Glitches of Osaka</div>
+                  <div>{nft?.denomName}</div>
                 </div>
                 <div className="table-row">
                   <div>NFT ID</div>
-                  <div>edition-123</div>
+                  <div>{nft?.tokenId}</div>
                 </div>
                 <div className="table-row">
                   <div>IPFS URL</div>
-                  <a href="https://ipfs.io/ipfs/QmWU5HBZMBNRcti2wPAdtDvKec6XHMB5cccKZb5YFyFios/image.png">
-                    https://ipfs.io/ipfs/QmWU5HBZMBNRcti2wPAdtDvKec6XHMB5cccKZb5YFyFios/image.png
+                  <a
+                    data-original={nft?.denomName}
+                    target="_blank"
+                    rel="noreferrer"
+                    href={nft?.denomSchema.properties.image.description}
+                  >
+                    {nft?.denomSchema.properties.image.description}
                   </a>
                 </div>
               </div>
