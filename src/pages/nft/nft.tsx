@@ -148,11 +148,20 @@ const NftPage = () => {
   const processNftList = (currentList: NftModel[] | undefined) => {
     if (currentList) {
       return currentList.map((item, idx) => {
-        const nftModel = {
-          ...item,
-          key: `${idx}`,
-          denomSchema: JSON.parse(item.denomSchema),
-        };
+        let nftModel;
+        try {
+          nftModel = {
+            ...item,
+            key: `${idx}`,
+            denomSchema: JSON.parse(item.denomSchema),
+          };
+        } catch {
+          nftModel = {
+            ...item,
+            key: `${idx}`,
+            denomSchema: item.denomSchema,
+          };
+        }
         return nftModel;
       });
     }
@@ -272,7 +281,7 @@ const NftPage = () => {
                           <img
                             alt={item?.denomName}
                             src={
-                              item?.denomSchema.properties.image.description
+                              item?.denomSchema.properties
                                 ? item?.denomSchema.properties.image.description
                                 : nftThumbnail
                             }
@@ -286,7 +295,11 @@ const NftPage = () => {
                         className="nft"
                       >
                         <Meta
-                          title={item?.denomSchema.properties.name.description}
+                          title={
+                            item?.denomSchema.properties
+                              ? item?.denomSchema.properties.name.description
+                              : item?.denomName
+                          }
                           description={
                             <>
                               <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
@@ -324,7 +337,7 @@ const NftPage = () => {
               <img
                 alt={nft?.denomName}
                 src={
-                  nft?.denomSchema.properties.image.description
+                  nft?.denomSchema.properties
                     ? nft?.denomSchema.properties.image.description
                     : nftThumbnail
                 }
@@ -333,7 +346,11 @@ const NftPage = () => {
           </Content>
           <Sider width="50%">
             <>
-              <div className="title">{nft?.denomSchema.properties.name.description}</div>
+              <div className="title">
+                {nft?.denomSchema.properties
+                  ? nft?.denomSchema.properties.name.description
+                  : nft?.denomName}
+              </div>
               <Meta
                 // title={nft?.name}
                 description={
@@ -349,7 +366,9 @@ const NftPage = () => {
               </div>
               <div className="item">
                 <div className="description">
-                  {nft?.denomSchema.properties.description.description}
+                  {nft?.denomSchema.properties
+                    ? nft?.denomSchema.properties.description.description
+                    : 'none'}
                 </div>
               </div>
               <div className="item">
@@ -367,9 +386,9 @@ const NftPage = () => {
                     data-original={nft?.denomName}
                     target="_blank"
                     rel="noreferrer"
-                    href={nft?.denomSchema.properties.image.description}
+                    // href={nft?.denomSchema.properties.image.description}
                   >
-                    {nft?.denomSchema.properties.image.description}
+                    {/* {nft?.denomSchema.properties.image.description} */}
                   </a>
                 </div>
               </div>

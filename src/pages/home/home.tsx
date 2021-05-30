@@ -229,13 +229,23 @@ function HomePage() {
   };
 
   const processNftList = (currentList: NftModel[] | undefined) => {
+    console.log(currentList);
     if (currentList) {
-      return currentList.map((nft, idx) => {
-        const nftModel = {
-          ...nft,
-          key: `${idx}`,
-          denomSchema: JSON.parse(nft.denomSchema),
-        };
+      return currentList.slice(0, 5).map((nft, idx) => {
+        let nftModel;
+        try {
+          nftModel = {
+            ...nft,
+            key: `${idx}`,
+            denomSchema: JSON.parse(nft.denomSchema),
+          };
+        } catch {
+          nftModel = {
+            ...nft,
+            key: `${idx}`,
+            denomSchema: nft.denomSchema,
+          };
+        }
         return nftModel;
       });
     }
@@ -622,7 +632,7 @@ function HomePage() {
                         <img
                           alt={item?.denomName}
                           src={
-                            item?.denomSchema.properties.image.description
+                            item?.denomSchema.properties
                               ? item?.denomSchema.properties.image.description
                               : nftThumbnail
                           }
@@ -636,7 +646,11 @@ function HomePage() {
                       className="nft"
                     >
                       <Meta
-                        title={item?.denomSchema.properties.name.description}
+                        title={
+                          item?.denomSchema.properties
+                            ? item?.denomSchema.properties.name.description
+                            : item?.denomName
+                        }
                         description={
                           <>
                             <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
