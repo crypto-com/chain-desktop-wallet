@@ -2,6 +2,8 @@ import axios, { AxiosInstance } from 'axios';
 import {
   NftListResponse,
   NftResponse,
+  NftTransactionListResponse,
+  NftTransactionResponse,
   TransferDataAmount,
   TransferListResponse,
   TransferResult,
@@ -58,9 +60,33 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     return nftLists;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
-  public async getNFTTransferHistory(account: string): Promise<NftResponse[]> {
-    return Promise.resolve([]);
+  public async getNFTTransferHistory(
+    tokenId: string,
+    denomId: string,
+  ): Promise<NftTransactionResponse[]> {
+    let paginationPage = 1;
+    const nftsTxListRequest = await this.axiosClient.get<NftTransactionListResponse>(
+      `/nfts/denoms/${denomId}/tokens/${tokenId}/transfers`,
+    );
+
+    const nftTxListResponse: NftTransactionListResponse = nftsTxListRequest.data;
+    let { pagination } = nftTxListResponse;
+
+    const nftTxLists = nftTxListResponse.result;
+
+    while (pagination.total_page > pagination.current_page) {
+      paginationPage += 1;
+      // eslint-disable-next-line no-await-in-loop
+      const pageNftTxListRequest = await this.axiosClient.get<NftTransactionListResponse>(
+        `/nfts/denoms/${denomId}/tokens/${tokenId}/transfers?page=${paginationPage}`,
+      );
+      const pageNftTxListResponse: NftTransactionListResponse = pageNftTxListRequest.data;
+      pagination = pageNftTxListResponse.pagination;
+
+      nftTxLists.push(...pageNftTxListResponse.result);
+    }
+
+    return nftTxLists;
   }
 
   public async fetchAllTransferTransactions(

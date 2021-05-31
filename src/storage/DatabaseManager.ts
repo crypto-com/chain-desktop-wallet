@@ -29,6 +29,8 @@ export class DatabaseManager {
 
   public readonly nftStore: Datastore;
 
+  public readonly nftTransferHistoryStore: Datastore;
+
   // This is for configuration that span across all wallets
   public readonly generalConfigStore: Datastore;
 
@@ -46,5 +48,6 @@ export class DatabaseManager {
     this.proposalStore = getStore(namespace, 'proposals');
     this.nftStore = getStore(namespace, 'nftStore');
     this.generalConfigStore = getStore(namespace, 'generalConfigStore');
+    this.nftTransferHistoryStore = getStore(namespace, 'nftTransferHistoryStore');
   }
 }

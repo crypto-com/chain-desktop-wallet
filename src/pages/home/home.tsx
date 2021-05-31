@@ -222,9 +222,9 @@ function HomePage() {
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
       await walletService.fetchAndSaveNFTs(sessionData);
 
-      const nftsList = await walletService.retrieveNFTs(sessionData.wallet.identifier);
-      // eslint-disable-next-line no-console
-      console.log('nftsList', nftsList);
+      // TODO: Remove test case load
+      const nftHistory = await walletService.loadNFTTransferHistory('specialart', 'specialx');
+      console.log('NFT_TRANSFER_HISTORY', nftHistory);
 
       showWalletStateNotification(currentSession.wallet.config);
       setDelegations(stakingTabularData);

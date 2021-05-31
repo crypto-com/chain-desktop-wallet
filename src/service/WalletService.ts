@@ -37,6 +37,7 @@ import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
   NftModel,
+  NftTransferModel,
   ProposalModel,
   ProposalStatuses,
   RewardTransaction,
@@ -889,6 +890,42 @@ class WalletService {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING NFTs', e);
       return [];
+    }
+  }
+
+  public async loadNFTTransferHistory(
+    tokenId: string,
+    denomId: string,
+  ): Promise<NftTransferModel[]> {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+      return Promise.resolve([]);
+    }
+
+    try {
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      const nftTransferTransactions = await chainIndexAPI.getNFTTransferHistory(tokenId, denomId);
+
+      await this.storageService.saveNFTTransferHistory({
+        transfers: nftTransferTransactions,
+        walletId: currentSession.wallet.identifier,
+        tokenId,
+        denomId,
+      });
+
+      return nftTransferTransactions;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING NFT Transfer history, returning DB data', e);
+      const localTransferHistory = await this.storageService.retrieveNFTTransferHistory(
+        currentSession.wallet.identifier,
+        tokenId,
+        denomId,
+      );
+      if (!localTransferHistory) {
+        return [];
+      }
+      return localTransferHistory.transfers;
     }
   }
 
