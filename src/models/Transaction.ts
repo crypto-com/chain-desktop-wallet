@@ -54,11 +54,15 @@ export interface NFTList {
   walletId: string;
 }
 
+export interface NFTQueryParams {
+  tokenId: string;
+  denomId: string;
+}
+
 export interface NFTTransactionHistory {
   transfers: Array<NftTransferModel>;
   walletId: string;
-  denomId: string;
-  tokenId: string;
+  nftQuery: NFTQueryParams;
 }
 
 export interface ValidatorList {

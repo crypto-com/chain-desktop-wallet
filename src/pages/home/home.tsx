@@ -223,7 +223,10 @@ function HomePage() {
       await walletService.fetchAndSaveNFTs(sessionData);
 
       // TODO: Remove test case load
-      const nftHistory = await walletService.loadNFTTransferHistory('specialart', 'specialx');
+      const nftHistory = await walletService.loadNFTTransferHistory({
+        tokenId: 'specialart',
+        denomId: 'specialx',
+      });
       console.log('NFT_TRANSFER_HISTORY', nftHistory);
 
       showWalletStateNotification(currentSession.wallet.config);

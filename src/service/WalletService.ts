@@ -37,6 +37,7 @@ import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
   NftModel,
+  NFTQueryParams,
   NftTransferModel,
   ProposalModel,
   ProposalStatuses,
@@ -893,10 +894,7 @@ class WalletService {
     }
   }
 
-  public async loadNFTTransferHistory(
-    tokenId: string,
-    denomId: string,
-  ): Promise<NftTransferModel[]> {
+  public async loadNFTTransferHistory(nftQuery: NFTQueryParams): Promise<NftTransferModel[]> {
     const currentSession = await this.storageService.retrieveCurrentSession();
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve([]);
@@ -904,13 +902,12 @@ class WalletService {
 
     try {
       const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-      const nftTransferTransactions = await chainIndexAPI.getNFTTransferHistory(tokenId, denomId);
+      const nftTransferTransactions = await chainIndexAPI.getNFTTransferHistory(nftQuery);
 
       await this.storageService.saveNFTTransferHistory({
         transfers: nftTransferTransactions,
         walletId: currentSession.wallet.identifier,
-        tokenId,
-        denomId,
+        nftQuery,
       });
 
       return nftTransferTransactions;
@@ -919,9 +916,10 @@ class WalletService {
       console.log('FAILED_LOADING NFT Transfer history, returning DB data', e);
       const localTransferHistory = await this.storageService.retrieveNFTTransferHistory(
         currentSession.wallet.identifier,
-        tokenId,
-        denomId,
+        nftQuery,
       );
+
+      console.log('Returned DB localTransferHistory', localTransferHistory);
       if (!localTransferHistory) {
         return [];
       }

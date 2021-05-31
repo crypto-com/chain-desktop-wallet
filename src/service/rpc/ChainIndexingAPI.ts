@@ -8,7 +8,11 @@ import {
   TransferListResponse,
   TransferResult,
 } from './ChainIndexingModels';
-import { TransactionStatus, TransferTransactionData } from '../../models/Transaction';
+import {
+  NFTQueryParams,
+  TransactionStatus,
+  TransferTransactionData,
+} from '../../models/Transaction';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 
 export interface IChainIndexingAPI {
@@ -60,11 +64,9 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     return nftLists;
   }
 
-  public async getNFTTransferHistory(
-    tokenId: string,
-    denomId: string,
-  ): Promise<NftTransactionResponse[]> {
+  public async getNFTTransferHistory(nftQuery: NFTQueryParams): Promise<NftTransactionResponse[]> {
     let paginationPage = 1;
+    const { denomId, tokenId } = nftQuery;
     const nftsTxListRequest = await this.axiosClient.get<NftTransactionListResponse>(
       `/nfts/denoms/${denomId}/tokens/${tokenId}/transfers`,
     );

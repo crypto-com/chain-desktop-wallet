@@ -14,6 +14,7 @@ import {
 } from '../models/UserAsset';
 import {
   NFTList,
+  NFTQueryParams,
   NFTTransactionHistory,
   ProposalList,
   RewardTransactionList,
@@ -327,8 +328,7 @@ export class StorageService {
     await this.db.nftStore.remove(
       {
         walletId: nftTransactionHistory.walletId,
-        tokenId: nftTransactionHistory.tokenId,
-        denomId: nftTransactionHistory.denomId,
+        nftQuery: nftTransactionHistory.nftQuery,
       },
       { multi: true },
     );
@@ -340,7 +340,7 @@ export class StorageService {
     return this.db.nftStore.findOne<NFTList>({ walletId });
   }
 
-  public async retrieveNFTTransferHistory(walletId: string, tokenId: string, denomId: string) {
-    return this.db.nftStore.findOne<NFTTransactionHistory>({ walletId, tokenId, denomId });
+  public async retrieveNFTTransferHistory(walletId: string, nftQuery: NFTQueryParams) {
+    return this.db.nftStore.findOne<NFTTransactionHistory>({ walletId, nftQuery });
   }
 }
