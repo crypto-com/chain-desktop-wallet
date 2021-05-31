@@ -58,6 +58,11 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     return nftLists;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
+  public async getNFTTransferHistory(account: string): Promise<NftResponse[]> {
+    return Promise.resolve([]);
+  }
+
   public async fetchAllTransferTransactions(
     baseAssetSymbol: string,
     address: string,
