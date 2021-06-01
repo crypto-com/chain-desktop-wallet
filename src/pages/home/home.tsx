@@ -53,7 +53,7 @@ import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
 import { UndelegateFormComponent } from './components/UndelegateFormComponent';
 import RedelegateFormComponent from './components/RedelegateFormComponent';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
-import { middleEllipsis } from '../../utils/utils';
+import { middleEllipsis, isJson } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
@@ -63,6 +63,8 @@ const { Text } = Typography;
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const { Meta } = Card;
+
+const maxNftPreview = 5;
 
 enum StakingActionType {
   UNDELEGATE = 'UNDELEGATE',
@@ -229,23 +231,18 @@ function HomePage() {
   };
 
   const processNftList = (currentList: NftModel[] | undefined) => {
-    console.log(currentList);
     if (currentList) {
-      return currentList.slice(0, 5).map((nft, idx) => {
-        let nftModel;
-        try {
-          nftModel = {
-            ...nft,
-            key: `${idx}`,
-            denomSchema: JSON.parse(nft.denomSchema),
-          };
-        } catch {
-          nftModel = {
-            ...nft,
-            key: `${idx}`,
-            denomSchema: nft.denomSchema,
-          };
-        }
+      return currentList.slice(0, maxNftPreview).map((item, idx) => {
+        const denomSchema = isJson(item.denomSchema)
+          ? JSON.parse(item.denomSchema)
+          : item.denomSchema;
+        const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
+        const nftModel = {
+          ...item,
+          key: `${idx}`,
+          denomSchema,
+          tokenData,
+        };
         return nftModel;
       });
     }
@@ -267,6 +264,7 @@ function HomePage() {
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
       const currentNftList = processNftList(nftList);
+      console.log('processed', currentNftList);
       setProcessedNftList(currentNftList);
       // TODO: Remove test case load
       const nftHistory = await walletService.loadNFTTransferHistory({
@@ -637,11 +635,7 @@ function HomePage() {
                       cover={
                         <img
                           alt={item?.denomName}
-                          src={
-                            item?.denomSchema.properties
-                              ? item?.denomSchema.properties.image.description
-                              : nftThumbnail
-                          }
+                          src={item?.tokenData.image ? item?.tokenData.image : nftThumbnail}
                         />
                       }
                       hoverable
@@ -652,15 +646,11 @@ function HomePage() {
                       className="nft"
                     >
                       <Meta
-                        title={
-                          item?.denomSchema.properties
-                            ? item?.denomSchema.properties.name.description
-                            : item?.denomName
-                        }
+                        title={item?.tokenData.drop ? item?.tokenData.drop : item?.denomName}
                         description={
                           <>
                             <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
-                            CryptoPunks
+                            {middleEllipsis(item?.tokenOwner, 6)}
                           </>
                         }
                       />

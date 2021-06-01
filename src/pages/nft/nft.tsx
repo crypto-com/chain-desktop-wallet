@@ -28,7 +28,7 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 // import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 // import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
 // import { ellipsis } from '../../utils/utils';
-// import { middleEllipsis } from '../../utils/utils';
+import { middleEllipsis, isJson } from '../../utils/utils';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -148,20 +148,16 @@ const NftPage = () => {
   const processNftList = (currentList: NftModel[] | undefined) => {
     if (currentList) {
       return currentList.map((item, idx) => {
-        let nftModel;
-        try {
-          nftModel = {
-            ...item,
-            key: `${idx}`,
-            denomSchema: JSON.parse(item.denomSchema),
-          };
-        } catch {
-          nftModel = {
-            ...item,
-            key: `${idx}`,
-            denomSchema: item.denomSchema,
-          };
-        }
+        const denomSchema = isJson(item.denomSchema)
+          ? JSON.parse(item.denomSchema)
+          : item.denomSchema;
+        const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
+        const nftModel = {
+          ...item,
+          key: `${idx}`,
+          denomSchema,
+          tokenData,
+        };
         return nftModel;
       });
     }
@@ -280,11 +276,7 @@ const NftPage = () => {
                         cover={
                           <img
                             alt={item?.denomName}
-                            src={
-                              item?.denomSchema.properties
-                                ? item?.denomSchema.properties.image.description
-                                : nftThumbnail
-                            }
+                            src={item?.tokenData.image ? item?.tokenData.image : nftThumbnail}
                           />
                         }
                         hoverable
@@ -295,15 +287,11 @@ const NftPage = () => {
                         className="nft"
                       >
                         <Meta
-                          title={
-                            item?.denomSchema.properties
-                              ? item?.denomSchema.properties.name.description
-                              : item?.denomName
-                          }
+                          title={item?.tokenData.drop ? item?.tokenData.drop : item?.denomName}
                           description={
                             <>
                               <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
-                              CryptoPunks
+                              {middleEllipsis(item?.tokenOwner, 6)}
                             </>
                           }
                         />
@@ -336,27 +324,21 @@ const NftPage = () => {
             <div className="nft-image">
               <img
                 alt={nft?.denomName}
-                src={
-                  nft?.denomSchema.properties
-                    ? nft?.denomSchema.properties.image.description
-                    : nftThumbnail
-                }
+                src={nft?.tokenData.image ? nft?.tokenData.image : nftThumbnail}
               />
             </div>
           </Content>
           <Sider width="50%">
             <>
               <div className="title">
-                {nft?.denomSchema.properties
-                  ? nft?.denomSchema.properties.name.description
-                  : nft?.denomName}
+                {nft?.tokenData.drop ? nft?.tokenData.drop : nft?.denomName}
               </div>
               <Meta
                 // title={nft?.name}
                 description={
                   <>
                     <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
-                    CryptoPunks
+                    {nft?.tokenOwner}
                   </>
                 }
               />
@@ -366,9 +348,7 @@ const NftPage = () => {
               </div>
               <div className="item">
                 <div className="description">
-                  {nft?.denomSchema.properties
-                    ? nft?.denomSchema.properties.description.description
-                    : 'none'}
+                  {nft?.tokenData.description ? nft?.tokenData.description : 'none'}
                 </div>
               </div>
               <div className="item">
@@ -386,9 +366,9 @@ const NftPage = () => {
                     data-original={nft?.denomName}
                     target="_blank"
                     rel="noreferrer"
-                    // href={nft?.denomSchema.properties.image.description}
+                    href={nft?.tokenData.image ? nft?.tokenData.image : ''}
                   >
-                    {/* {nft?.denomSchema.properties.image.description} */}
+                    {nft?.tokenData.image ? nft?.tokenData.image : ''}
                   </a>
                 </div>
               </div>
