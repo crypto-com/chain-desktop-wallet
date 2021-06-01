@@ -8,6 +8,8 @@ describe('Testing WalletImporter', () => {
     const testNetConfig = DefaultWalletConfigs.TestNetConfig;
 
     const importOptions: WalletImportOptions = {
+      addressIndex: 0,
+      walletType: 'normal',
       config: testNetConfig,
       phrase:
         'ramp sock spice enrich exhibit skate empower process kit pudding olive mesh friend camp labor coconut devote shell argue system pig then provide nose',
@@ -24,6 +26,8 @@ describe('Testing WalletImporter', () => {
     const mainNetConfig = DefaultWalletConfigs.MainNetConfig;
 
     const importOptions: WalletImportOptions = {
+      addressIndex: 0,
+      walletType: 'normal',
       config: mainNetConfig,
       phrase:
         'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone',
@@ -43,6 +47,9 @@ describe('Testing WalletImporter', () => {
       enabled: true,
       derivationPath: "44'/245'/0'/0/0",
       name: 'Pystaport-Custom-Network',
+      enableGeneralSettings: false,
+      disableDefaultClientMemo: false,
+      analyticsDisabled: false,
       network: {
         defaultNodeUrl: '',
         chainId: 'chainmaind',
@@ -57,11 +64,14 @@ describe('Testing WalletImporter', () => {
           coinType: 1,
           account: 0,
         },
+        rpcUrl: '',
       },
       nodeUrl: '123.18.45.12:3400',
     };
 
     const importOptions: WalletImportOptions = {
+      addressIndex: 0,
+      walletType: 'normal',
       phrase:
         'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone',
       config: customConfig,

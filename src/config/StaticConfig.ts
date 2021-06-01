@@ -51,6 +51,23 @@ const TestNetConfig: WalletConfig = {
   },
 };
 
+const TestNetCroeseid3: WalletConfig = {
+  enabled: true,
+  name: 'TESTNET CROESEID 3',
+  derivationPath: "m/44'/1'/0'/0/0",
+  explorerUrl: 'https://crypto.org/explorer/croeseid3',
+  indexingUrl: 'https://crypto.org/explorer/croeseid3/api/v1/',
+  nodeUrl: CroNetwork.TestnetCroeseid3.defaultNodeUrl,
+  network: CroNetwork.TestnetCroeseid3,
+  disableDefaultClientMemo: false,
+  enableGeneralSettings: false,
+  analyticsDisabled: false,
+  fee: {
+    gasLimit: FIXED_DEFAULT_GAS_LIMIT,
+    networkFee: FIXED_DEFAULT_FEE,
+  },
+};
+
 // This constant value is used when actual values are not known yet
 // For instance :
 export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
@@ -88,6 +105,7 @@ export const CustomDevNet: WalletConfig = {
     validatorPubKeyPrefix: 'crocnclpub',
     validatorAddressPrefix: 'crocncl',
     coin: { baseDenom: 'basecro', croDenom: 'cro' },
+    rpcUrl: '',
   },
   nodeUrl: '',
   indexingUrl: '',
@@ -104,6 +122,7 @@ export const DefaultWalletConfigs = {
   TestNetConfig,
   MainNetConfig,
   CustomDevNet,
+  TestNetCroeseid3,
 };
 
 // Every created wallet get initialized with a new CRO asset
@@ -134,4 +153,5 @@ export type Network = {
   validatorPubKeyPrefix: string;
   validatorAddressPrefix: string;
   coin: { baseDenom: string; croDenom: string };
+  rpcUrl: string;
 };
