@@ -268,6 +268,12 @@ function HomePage() {
 
       const currentNftList = processNftList(nftList);
       setProcessedNftList(currentNftList);
+      // TODO: Remove test case load
+      const nftHistory = await walletService.loadNFTTransferHistory({
+        tokenId: 'specialart',
+        denomId: 'specialx',
+      });
+      console.log('NFT_TRANSFER_HISTORY', nftHistory);
 
       showWalletStateNotification(currentSession.wallet.config);
       setDelegations(stakingTabularData);

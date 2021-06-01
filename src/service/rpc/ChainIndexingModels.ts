@@ -52,12 +52,47 @@ export interface NftResponse {
 
 export interface NftListResponse {
   result: NftResponse[];
-  pagination: NftListPagination;
+  pagination: NftPagination;
 }
 
-export interface NftListPagination {
+export interface NftPagination {
   total_record: number;
   total_page: number;
   current_page: number;
   limit: number;
+}
+
+/// NFT transfer history
+
+export interface NftTransactionData {
+  uuid: string;
+  height: number;
+  msgName: string;
+  version: number;
+  msgIndex: number;
+  recipient: string;
+  name: string;
+  txHash: string;
+  denomId: string;
+  tokenId: string;
+  sender: string;
+}
+
+export interface NftTransactionResponse {
+  denomId: string;
+  tokenId: string;
+  drop?: any;
+  blockHeight: number;
+  blockHash: string;
+  blockTime: string;
+  transactionHash: string;
+  success: boolean;
+  messageIndex: number;
+  messageType: string;
+  data: NftTransactionData;
+}
+
+export interface NftTransactionListResponse {
+  result: NftTransactionResponse[];
+  pagination: NftPagination;
 }
