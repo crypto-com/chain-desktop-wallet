@@ -36,6 +36,9 @@ import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
+  NftModel,
+  NFTQueryParams,
+  NftTransferModel,
   ProposalModel,
   ProposalStatuses,
   RewardTransaction,
@@ -530,7 +533,7 @@ class WalletService {
       this.fetchAndSaveRewards(nodeRpc, currentSession),
       this.fetchAndSaveTransfers(currentSession),
       this.fetchAndSaveValidators(currentSession),
-      this.fetchAndSaveProposals(currentSession),
+      // this.fetchAndSaveProposals(currentSession),
     ]);
   }
 
@@ -604,6 +607,19 @@ class WalletService {
       await this.storageService.saveProposals({
         chainId: currentSession.wallet.config.network.chainId,
         proposals,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_SAVE_PROPOSALS', e);
+    }
+  }
+
+  public async fetchAndSaveNFTs(currentSession: Session) {
+    try {
+      const nfts = await this.loadAllCurrentAccountNFTs();
+      await this.storageService.saveNFTs({
+        walletId: currentSession.wallet.identifier,
+        nfts,
       });
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -820,6 +836,14 @@ class WalletService {
     return proposalSet.proposals;
   }
 
+  public async retrieveNFTs(walletID: string): Promise<NftModel[]> {
+    const nftSet = await this.storageService.retrieveAllNfts(walletID);
+    if (!nftSet) {
+      return [];
+    }
+    return nftSet.nfts;
+  }
+
   private async getLatestTopValidators(): Promise<ValidatorModel[]> {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
@@ -852,6 +876,53 @@ class WalletService {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING PROPOSALS', e);
       return [];
+    }
+  }
+
+  private async loadAllCurrentAccountNFTs(): Promise<NftModel[]> {
+    try {
+      const currentSession = await this.storageService.retrieveCurrentSession();
+      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+        return Promise.resolve([]);
+      }
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      return chainIndexAPI.getAccountNFTList(currentSession.wallet.address);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING NFTs', e);
+      return [];
+    }
+  }
+
+  public async loadNFTTransferHistory(nftQuery: NFTQueryParams): Promise<NftTransferModel[]> {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+      return Promise.resolve([]);
+    }
+
+    try {
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      const nftTransferTransactions = await chainIndexAPI.getNFTTransferHistory(nftQuery);
+
+      await this.storageService.saveNFTTransferHistory({
+        transfers: nftTransferTransactions,
+        walletId: currentSession.wallet.identifier,
+        nftQuery,
+      });
+
+      return nftTransferTransactions;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING NFT Transfer history, returning DB data', e);
+      const localTransferHistory = await this.storageService.retrieveNFTTransferHistory(
+        currentSession.wallet.identifier,
+        nftQuery,
+      );
+
+      if (!localTransferHistory) {
+        return [];
+      }
+      return localTransferHistory.transfers;
     }
   }
 

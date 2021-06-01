@@ -13,6 +13,9 @@ import {
   UserAsset,
 } from '../models/UserAsset';
 import {
+  NFTList,
+  NFTQueryParams,
+  NFTTransactionHistory,
   ProposalList,
   RewardTransactionList,
   StakingTransactionData,
@@ -308,5 +311,36 @@ export class StorageService {
 
   public async retrieveAllProposals(chainId: string) {
     return this.db.proposalStore.findOne<ProposalList>({ chainId });
+  }
+
+  public async saveNFTs(nftList: NFTList) {
+    if (!nftList || nftList.nfts.length === 0) {
+      return Promise.resolve();
+    }
+    await this.db.nftStore.remove({ walletId: nftList.walletId }, { multi: true });
+    return this.db.nftStore.insert<NFTList>(nftList);
+  }
+
+  public async saveNFTTransferHistory(nftTransactionHistory: NFTTransactionHistory) {
+    if (!nftTransactionHistory || nftTransactionHistory.transfers.length === 0) {
+      return Promise.resolve();
+    }
+    await this.db.nftStore.remove(
+      {
+        walletId: nftTransactionHistory.walletId,
+        nftQuery: nftTransactionHistory.nftQuery,
+      },
+      { multi: true },
+    );
+
+    return this.db.nftStore.insert<NFTTransactionHistory>(nftTransactionHistory);
+  }
+
+  public async retrieveAllNfts(walletId: string) {
+    return this.db.nftStore.findOne<NFTList>({ walletId });
+  }
+
+  public async retrieveNFTTransferHistory(walletId: string, nftQuery: NFTQueryParams) {
+    return this.db.nftStore.findOne<NFTTransactionHistory>({ walletId, nftQuery });
   }
 }

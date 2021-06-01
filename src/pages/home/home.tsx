@@ -180,7 +180,7 @@ function HomePage() {
     }, 200);
   };
 
-  const onSyncBtnCall = async () => {
+  const onSyncAndRefreshBtnCall = async () => {
     setFetchingDB(true);
 
     await walletService.syncAll();
@@ -203,6 +203,7 @@ function HomePage() {
     setUserAsset(currentAsset);
     setHasShownNotLiveWallet(true);
 
+    await walletService.fetchAndSaveNFTs(sessionData);
     setFetchingDB(false);
   };
 
@@ -219,6 +220,15 @@ function HomePage() {
 
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
+      await walletService.fetchAndSaveNFTs(sessionData);
+
+      // TODO: Remove test case load
+      const nftHistory = await walletService.loadNFTTransferHistory({
+        tokenId: 'specialart',
+        denomId: 'specialx',
+      });
+      // eslint-disable-next-line no-console
+      console.log('NFT_TRANSFER_HISTORY', nftHistory);
 
       showWalletStateNotification(currentSession.wallet.config);
       setDelegations(stakingTabularData);
@@ -510,7 +520,7 @@ function HomePage() {
         Welcome Back!
         <SyncOutlined
           onClick={() => {
-            onSyncBtnCall();
+            onSyncAndRefreshBtnCall();
           }}
           style={{ position: 'absolute', right: '36px', marginTop: '6px' }}
           spin={fetchingDB}
