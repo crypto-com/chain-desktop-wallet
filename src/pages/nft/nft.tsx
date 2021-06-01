@@ -7,7 +7,7 @@ import { MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useRecoilValue } from 'recoil';
 // import axios from 'axios';
 import {
-  sessionState,
+  // sessionState,
   nftListState,
   fetchingDBState,
   // walletAssetState
@@ -54,7 +54,7 @@ const NftPage = () => {
   const fetchingDB = useRecoilValue(fetchingDBState);
 
   // const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
-  const currentSession = useRecoilValue(sessionState);
+  // const currentSession = useRecoilValue(sessionState);
   // const userAsset = useRecoilValue(walletAssetState);
 
   const [processedNftList, setProcessedNftList] = useState<any[]>([]);
@@ -174,35 +174,11 @@ const NftPage = () => {
 
   const NftColumns = [
     {
-      title: 'Transaction Hash',
-      dataIndex: 'transactionHash',
-      key: 'transactionHash',
-      render: text => (
-        <a
-          data-original={text}
-          target="_blank"
-          rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/tx/${text}`}
-        >
-          {/* {middleEllipsis(text, 12)} */}
-          {text}
-        </a>
-      ),
-    },
-    {
       title: 'Drop Name',
       // dataIndex: 'name',
       key: 'name',
       render: record => {
-        return record.denomSchema.properties.name.description;
-      },
-    },
-    {
-      title: 'Collectible Name',
-      // dataIndex: 'recipientAddress',
-      key: 'collectibleName',
-      render: record => {
-        return record.denomSchema.properties.name.description;
+        return record.tokenData.drop ? record.tokenData.drop : 'n.a.';
       },
     },
     {
@@ -213,11 +189,11 @@ const NftPage = () => {
         return record.tokenId;
       },
     },
-    {
-      title: 'Time',
-      // dataIndex: 'time',
-      key: 'time',
-    },
+    // {
+    //   title: 'Time',
+    //   // dataIndex: 'time',
+    //   key: 'time',
+    // },
     {
       title: 'View',
       // dataIndex: 'view',
@@ -290,7 +266,13 @@ const NftPage = () => {
                           title={item?.tokenData.drop ? item?.tokenData.drop : item?.denomName}
                           description={
                             <>
-                              <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
+                              <Avatar
+                                style={{
+                                  background:
+                                    'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                  verticalAlign: 'middle',
+                                }}
+                              />
                               {middleEllipsis(item?.tokenOwner, 6)}
                             </>
                           }
@@ -333,20 +315,25 @@ const NftPage = () => {
               <div className="title">
                 {nft?.tokenData.drop ? nft?.tokenData.drop : nft?.denomName}
               </div>
-              <Meta
-                // title={nft?.name}
-                description={
-                  <>
-                    <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
-                    {nft?.tokenOwner}
-                  </>
-                }
-              />
               <div className="item">
-                <div className="status">About the Drop</div>
-                {/* <div className="status">#{nft?.id} Edition: </div> */}
+                <Meta
+                  // title={nft?.name}
+                  description={
+                    <>
+                      <Avatar
+                        style={{
+                          background:
+                            'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                          verticalAlign: 'middle',
+                        }}
+                      />
+                      {nft?.tokenOwner}
+                    </>
+                  }
+                />
               </div>
               <div className="item">
+                <div className="subtitle">About the Drop</div>
                 <div className="description">
                   {nft?.tokenData.description ? nft?.tokenData.description : 'none'}
                 </div>

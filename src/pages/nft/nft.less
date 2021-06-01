@@ -48,8 +48,8 @@
       padding-right: 0;
       padding-left: 0;
       .ant-avatar {
-        width: 24px;
-        height: 24px;
+        width: 23px;
+        height: 23px;
         // padding: 0 5px 5px 0;
         margin-right: 5px;
       }
@@ -72,24 +72,38 @@
   width: 1000px !important;
   .nft-detail {
     background: #fff;
+    .ant-layout-content,
     .nft-image,
     img {
       display: flex;
       align-items: center;
       justify-content: center;
       max-width: 400px;
-      margin: 50px auto;
+      // margin: 50px auto;
     }
     .title {
       margin-top: 16px;
       font-size: 24px;
     }
+    .ant-card-meta {
+      margin-top: 30px;
+      .ant-avatar {
+        width: 25px;
+        height: 25px;
+        // padding: 0 5px 5px 0;
+        margin-right: 8px;
+      }
+    }
+
     .description {
       max-width: 800px;
       color: @font-color;
     }
     .item {
       margin: 30px 0;
+      .subtitle {
+        margin: 10px 0;
+      }
       .label {
         color: @font-color;
       }

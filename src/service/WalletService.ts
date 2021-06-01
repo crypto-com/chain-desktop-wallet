@@ -918,7 +918,7 @@ class WalletService {
         currentSession.wallet.identifier,
         nftQuery,
       );
-
+      // eslint-disable-next-line no-console
       console.log('Returned DB localTransferHistory', localTransferHistory);
       if (!localTransferHistory) {
         return [];

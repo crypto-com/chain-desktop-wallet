@@ -264,14 +264,12 @@ function HomePage() {
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
 
       const currentNftList = processNftList(nftList);
-      console.log('processed', currentNftList);
       setProcessedNftList(currentNftList);
       // TODO: Remove test case load
-      const nftHistory = await walletService.loadNFTTransferHistory({
-        tokenId: 'specialart',
-        denomId: 'specialx',
-      });
-      console.log('NFT_TRANSFER_HISTORY', nftHistory);
+      // const nftHistory = await walletService.loadNFTTransferHistory({
+      //   tokenId: 'specialart',
+      //   denomId: 'specialx',
+      // });
 
       showWalletStateNotification(currentSession.wallet.config);
       setDelegations(stakingTabularData);
@@ -649,7 +647,13 @@ function HomePage() {
                         title={item?.tokenData.drop ? item?.tokenData.drop : item?.denomName}
                         description={
                           <>
-                            <Avatar src="https://avatars.githubusercontent.com/u/7971415?s=40&v=4" />
+                            <Avatar
+                              style={{
+                                background:
+                                  'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                verticalAlign: 'middle',
+                              }}
+                            />
                             {middleEllipsis(item?.tokenOwner, 6)}
                           </>
                         }
