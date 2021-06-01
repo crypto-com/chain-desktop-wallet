@@ -919,7 +919,6 @@ class WalletService {
         nftQuery,
       );
 
-      console.log('Returned DB localTransferHistory', localTransferHistory);
       if (!localTransferHistory) {
         return [];
       }

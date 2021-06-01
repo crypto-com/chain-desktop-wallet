@@ -227,6 +227,7 @@ function HomePage() {
         tokenId: 'specialart',
         denomId: 'specialx',
       });
+      // eslint-disable-next-line no-console
       console.log('NFT_TRANSFER_HISTORY', nftHistory);
 
       showWalletStateNotification(currentSession.wallet.config);
