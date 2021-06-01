@@ -300,6 +300,7 @@
     "ssri": "8.0.1",
     "hosted-git-info": "3.0.8",
     "underscore": "1.12.1",
-    "trim": "0.0.3"
+    "trim": "0.0.3",
+    "dns-packet": "5.2.2"
   }
 }
