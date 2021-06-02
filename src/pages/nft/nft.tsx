@@ -5,6 +5,7 @@ import 'antd/dist/antd.css';
 import { Layout, Card, Tabs, List, Avatar, Radio, Table } from 'antd';
 import { MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useRecoilValue } from 'recoil';
+import ReactPlayer from 'react-player';
 // import axios from 'axios';
 import {
   // sessionState,
@@ -47,6 +48,9 @@ const NftPage = () => {
   const [isNftModalVisible, setIsNftModalVisible] = useState(false);
   // const [decryptedPhrase, setDecryptedPhrase] = useState('');
   // const [errorMessages, setErrorMessages] = useState([]);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [videoUrl, setVideoUrl] = useState<string | undefined>('');
+
   const [nft, setNft] = useState<any>();
 
   // const [proposalList, setProposalList] = useState<ProposalModel[]>();
@@ -203,6 +207,8 @@ const NftPage = () => {
           <a
             onClick={() => {
               setNft(record);
+              setVideoUrl(record?.tokenData.animation_url);
+              setIsVideoPlaying(true);
               setIsNftModalVisible(true);
             }}
           >
@@ -258,6 +264,8 @@ const NftPage = () => {
                         hoverable
                         onClick={() => {
                           setNft(item);
+                          setVideoUrl(item?.tokenData.animation_url);
+                          setIsVideoPlaying(true);
                           setIsNftModalVisible(true);
                         }}
                         className="nft"
@@ -294,7 +302,14 @@ const NftPage = () => {
       </Content>
       <ModalPopup
         isModalVisible={isNftModalVisible}
-        handleCancel={() => setIsNftModalVisible(false)}
+        handleCancel={() => {
+          // Stop the video when closing
+          setIsVideoPlaying(false);
+          setVideoUrl(undefined);
+          setTimeout(() => {
+            setIsNftModalVisible(false);
+          }, 10);
+        }}
         handleOk={() => {}}
         // confirmationLoading={confirmLoading}
         footer={[]}
@@ -304,10 +319,25 @@ const NftPage = () => {
         <Layout className="nft-detail">
           <Content>
             <div className="nft-image">
-              <img
-                alt={nft?.denomName}
-                src={nft?.tokenData.image ? nft?.tokenData.image : nftThumbnail}
-              />
+              {nft?.tokenData.mimeType === 'video/mp4' ? (
+                <ReactPlayer
+                  url={videoUrl}
+                  config={{
+                    file: {
+                      attributes: {
+                        controlsList: 'nodownload',
+                      },
+                    },
+                  }}
+                  controls
+                  playing={isVideoPlaying}
+                />
+              ) : (
+                <img
+                  alt={nft?.denomName}
+                  src={nft?.tokenData.image ? nft?.tokenData.image : nftThumbnail}
+                />
+              )}
             </div>
           </Content>
           <Sider width="50%">
