@@ -48,6 +48,7 @@ export interface NftResponse {
   tokenLastEditedAt: string;
   denomName: string;
   denomSchema: string;
+  marketplaceUrl: string;
 }
 
 export interface NftListResponse {

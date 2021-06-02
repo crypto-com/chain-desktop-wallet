@@ -14,6 +14,7 @@ import {
   TransferTransactionData,
 } from '../../models/Transaction';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import { croNftApi } from './NftApi';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(
@@ -60,6 +61,14 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       pagination = pageNftsListResponse.pagination;
       nftLists.push(...pageNftsListResponse.result);
     }
+
+    nftLists.map(async item => {
+      const nftMarketplaceUrl = await croNftApi.getNftTokenMarketplaceUrl(
+        item.denomId,
+        item.tokenId,
+      );
+      item.marketplaceUrl = nftMarketplaceUrl;
+    });
 
     return nftLists;
   }
