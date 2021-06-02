@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.2.3] - 2021-06-03
+
+### Additions
+- Implemented search for the wallet list view
+- Added support for croeseid testnet version 3
+
 ## [v0.2.2] - 2021-05-24
 
 ### Additions
