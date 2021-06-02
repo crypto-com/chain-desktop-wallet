@@ -3,7 +3,7 @@ import './nft.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Layout, Card, Tabs, List, Avatar, Radio, Table } from 'antd';
-import { MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
+import Icon, { MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useRecoilValue } from 'recoil';
 import ReactPlayer from 'react-player';
 // import axios from 'axios';
@@ -30,6 +30,7 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 // import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
 // import { ellipsis } from '../../utils/utils';
 import { middleEllipsis, isJson } from '../../utils/utils';
+import IconPlayer from '../../svg/IconPlayer';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -256,10 +257,17 @@ const NftPage = () => {
                       <Card
                         style={{ width: 200 }}
                         cover={
-                          <img
-                            alt={item?.denomName}
-                            src={item?.tokenData.image ? item?.tokenData.image : nftThumbnail}
-                          />
+                          <>
+                            <img
+                              alt={item?.denomName}
+                              src={item?.tokenData.image ? item?.tokenData.image : nftThumbnail}
+                            />
+                            {item?.tokenData.mimeType === 'video/mp4' ? (
+                              <Icon component={IconPlayer} />
+                            ) : (
+                              ''
+                            )}
+                          </>
                         }
                         hoverable
                         onClick={() => {
