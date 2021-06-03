@@ -1,8 +1,13 @@
 import axios, { AxiosInstance } from 'axios';
 import { NV_GRAPHQL_API_ENDPOINT } from '../../config/StaticConfig';
 
+export interface MintByCDCRequest {
+  denomId: String;
+  tokenIds: [String];
+}
+
 export interface INftApi {
-  getNftTokenMarketplaceUrl(denomId: string, tokenId: string): Promise<any>;
+  getNftListMarketplaceData(payload: MintByCDCRequest[]): Promise<any>;
 }
 
 export class NftApi implements INftApi {
@@ -14,25 +19,19 @@ export class NftApi implements INftApi {
     });
   }
 
-  public async getNftTokenMarketplaceUrl(denomId: string, tokenId: string): Promise<string> {
+  public async getNftListMarketplaceData(payload: MintByCDCRequest[]): Promise<any> {
     const result = await this.axiosClient.post('', {
       operationName: null,
-      // variables: {
-      //   denomId: 'u5bdc5e3e5ac9db7d489adb5fa3a68a5f',
-      //   tokenId: 'edition2'
-      // },
       variables: {
-        denomId,
-        tokenId,
+        payload,
       },
-      query: `query ($denomId: String!, $tokenId: String!) {
-        public {
-          nftExplorerLink (
-            denomId: $denomId,
-            tokenId: $tokenId
-          ) {
-            link
-          }
+      query: ` query ($payload: [MintByCDCRequest!]!) {
+        isMintedByCDC(
+          payload: $payload
+        ) {
+          isMinted
+          denomId
+          tokenId
         }
       }
       `,
@@ -41,7 +40,7 @@ export class NftApi implements INftApi {
       return '';
     }
 
-    return result.data.data.public.nftExplorerLink.link;
+    return result.data.data.isMintedByCDC;
   }
 }
 

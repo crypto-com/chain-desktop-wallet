@@ -14,7 +14,7 @@ import {
   TransferTransactionData,
 } from '../../models/Transaction';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
-import { croNftApi } from './NftApi';
+import { croNftApi, MintByCDCRequest } from './NftApi';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(
@@ -62,13 +62,16 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       nftLists.push(...pageNftsListResponse.result);
     }
 
-    nftLists.map(async item => {
-      const nftMarketplaceUrl = await croNftApi.getNftTokenMarketplaceUrl(
-        item.denomId,
-        item.tokenId,
-      );
-      item.marketplaceUrl = nftMarketplaceUrl;
+    const payload: MintByCDCRequest[] = nftLists.map(item => {
+      return {
+        denomId: item.denomId,
+        tokenIds: [item.tokenId],
+      };
     });
+
+    // TO-DO
+    const nftMarketplaceData = await croNftApi.getNftListMarketplaceData(payload);
+    console.log(nftMarketplaceData);
 
     return nftLists;
   }
