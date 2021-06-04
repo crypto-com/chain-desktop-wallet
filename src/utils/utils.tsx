@@ -45,3 +45,12 @@ export function isJson(val: string) {
   }
   return true;
 }
+
+export function splitToChunks(arr: any[], len: number) {
+  const arrays: any[] = [];
+  // const result =
+  for (let i = 0, j = arr.length; i < j; i += len) {
+    arrays.push(arr.slice(i, i + len));
+  }
+  return arrays;
+}

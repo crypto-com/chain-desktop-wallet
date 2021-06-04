@@ -16,6 +16,7 @@ import {
 } from '../../models/Transaction';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
+import { splitToChunks } from '../../utils/utils';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(
@@ -75,8 +76,19 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       };
     });
 
+    const payloadChunks = splitToChunks(payload, 10);
+
     try {
-      const nftMarketplaceData = await croNftApi.getNftListMarketplaceData(payload);
+      const results = await Promise.all(
+        payloadChunks.map(async chunks => {
+          return await croNftApi.getNftListMarketplaceData(chunks);
+        }),
+      );
+
+      const nftMarketplaceData: any = [];
+      for (let i = 0; i < results.length; i++) {
+        nftMarketplaceData.push(...results[i]);
+      }
 
       if (nftMarketplaceData.length !== 0) {
         return nftMarketplaceData.map((item, idx) => {
