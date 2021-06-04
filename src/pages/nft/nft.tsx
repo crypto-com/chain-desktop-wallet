@@ -260,7 +260,11 @@ const NftPage = () => {
                           <>
                             <img
                               alt={item?.denomName}
-                              src={item?.tokenData.image ? item?.tokenData.image : nftThumbnail}
+                              src={
+                                item?.isMintedByCDC && item?.tokenData.image
+                                  ? item?.tokenData.image
+                                  : nftThumbnail
+                              }
                             />
                             {item?.tokenData.mimeType === 'video/mp4' ? (
                               <Icon component={IconPlayer} />
@@ -327,7 +331,7 @@ const NftPage = () => {
         <Layout className="nft-detail">
           <Content>
             <div className="nft-image">
-              {nft?.tokenData.mimeType === 'video/mp4' ? (
+              {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
                 <ReactPlayer
                   url={videoUrl}
                   config={{
@@ -343,7 +347,9 @@ const NftPage = () => {
               ) : (
                 <img
                   alt={nft?.denomName}
-                  src={nft?.tokenData.image ? nft?.tokenData.image : nftThumbnail}
+                  src={
+                    nft?.isMintedByCDC && nft?.tokenData.image ? nft?.tokenData.image : nftThumbnail
+                  }
                 />
               )}
             </div>
@@ -385,17 +391,27 @@ const NftPage = () => {
                   <div>NFT ID</div>
                   <div>{nft?.tokenId}</div>
                 </div>
-                <div className="table-row">
-                  <div>IPFS URL</div>
-                  <a
-                    data-original={nft?.denomName}
-                    target="_blank"
-                    rel="noreferrer"
-                    href={nft?.tokenData.image ? nft?.tokenData.image : ''}
-                  >
-                    {nft?.tokenData.image ? nft?.tokenData.image : ''}
-                  </a>
-                </div>
+                {nft?.tokenData.mimeType ? (
+                  <div className="table-row">
+                    <div>IPFS URL</div>
+                    <a
+                      data-original={nft?.denomName}
+                      target="_blank"
+                      rel="noreferrer"
+                      href={
+                        nft?.tokenData.mimeType === 'video/mp4'
+                          ? nft?.tokenData.animation_url
+                          : nft?.tokenData.image
+                      }
+                    >
+                      {nft?.tokenData.mimeType === 'video/mp4'
+                        ? nft?.tokenData.animation_url
+                        : nft?.tokenData.image}
+                    </a>
+                  </div>
+                ) : (
+                  ''
+                )}
               </div>
               <div className="item goto-marketplace">
                 {nft?.marketplaceLink !== '' ? (
