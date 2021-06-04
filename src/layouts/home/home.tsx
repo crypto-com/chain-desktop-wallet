@@ -30,6 +30,7 @@ import IconReceive from '../../svg/IconReceive';
 import IconStaking from '../../svg/IconStaking';
 import IconWallet from '../../svg/IconWallet';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
 import packageJson from '../../../package.json';
@@ -57,6 +58,8 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+  const [isSuccessDeleteModalVisible, setIsSuccessDeleteModalVisible] = useState(false);
+
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
@@ -100,6 +103,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
     setIsButtonLoading(false);
     setIsConfirmationModalVisible(false);
+    setIsSuccessDeleteModalVisible(true);
     setFetchingDB(false);
     setIsButtonDisabled(true);
     setIsConfirmDeleteVisible(false);
@@ -380,6 +384,38 @@ function HomeLayout(props: HomeLayoutProps) {
             )}
           </>
         </ModalPopup>
+        <SuccessModalPopup
+          isModalVisible={isSuccessDeleteModalVisible}
+          handleCancel={() => {
+            setIsSuccessDeleteModalVisible(false);
+          }}
+          handleOk={() => {
+            setIsSuccessDeleteModalVisible(false);
+          }}
+          title="Success!"
+          button={null}
+          footer={[
+            <Button
+              key="submit"
+              type="primary"
+              onClick={() => {
+                setIsSuccessDeleteModalVisible(false);
+              }}
+            >
+              Ok
+            </Button>,
+          ]}
+        >
+          <>
+            <div className="description">
+              Wallet Address
+              <br />
+              {deleteWalletAddress}
+              <br />
+              has been deleted.
+            </div>
+          </>
+        </SuccessModalPopup>
         <ModalPopup
           isModalVisible={isAnnouncementVisible}
           handleCancel={() => {
