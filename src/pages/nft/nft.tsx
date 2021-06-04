@@ -249,7 +249,7 @@ const NftPage = () => {
                     md: 3,
                     lg: 3,
                     xl: 3,
-                    xxl: 3,
+                    xxl: 6,
                   }}
                   dataSource={processedNftList}
                   renderItem={item => (
