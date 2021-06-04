@@ -63,27 +63,27 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
 
-  async function fetchAndSetNewValidators() {
+  async function fetchAndSetNewValidators(currentSession) {
     try {
-      await walletService.fetchAndSaveValidators(session);
+      await walletService.fetchAndSaveValidators(currentSession);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet validators list', e);
     }
   }
 
-  async function fetchAndSetNewProposals() {
+  async function fetchAndSetNewProposals(currentSession) {
     try {
-      await walletService.fetchAndSaveProposals(session);
+      await walletService.fetchAndSaveProposals(currentSession);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet proposals', e);
     }
   }
 
-  async function fetchAndSetNFTs() {
+  async function fetchAndSetNFTs(currentSession) {
     try {
-      await walletService.fetchAndSaveNFTs(session);
+      await walletService.fetchAndSaveNFTs(currentSession);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet NFTs', e);
@@ -133,8 +133,8 @@ function HomeLayout(props: HomeLayoutProps) {
     const fetchDB = async () => {
       setFetchingDB(true);
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
-      const sessionData = await walletService.retrieveCurrentSession();
-      const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+      const currentSession = await walletService.retrieveCurrentSession();
+      const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       const allWalletsData = await walletService.retrieveAllWallets();
       const currentMarketData = await walletService.retrieveAssetPrice(
         currentAsset.mainnetSymbol,
@@ -142,23 +142,22 @@ function HomeLayout(props: HomeLayoutProps) {
       );
 
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
-
       setHasWallet(hasWalletBeenCreated);
-      setSession(sessionData);
+      setSession(currentSession);
       setUserAsset(currentAsset);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
 
       await Promise.all([
-        await fetchAndSetNewValidators(),
-        await fetchAndSetNewProposals(),
-        await fetchAndSetNFTs(),
+        await fetchAndSetNewValidators(currentSession),
+        await fetchAndSetNewProposals(currentSession),
+        await fetchAndSetNFTs(currentSession),
       ]);
 
       const currentValidatorList = await walletService.retrieveTopValidators(
-        sessionData.wallet.config.network.chainId,
+        currentSession.wallet.config.network.chainId,
       );
-      const currentNftList = await walletService.retrieveNFTs(sessionData.wallet.identifier);
+      const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
 
       setValidatorList(currentValidatorList);
       setNftList(currentNftList);
