@@ -387,6 +387,7 @@ class WalletService {
     return [
       DefaultWalletConfigs.MainNetConfig,
       DefaultWalletConfigs.TestNetConfig,
+      DefaultWalletConfigs.TestNetCroeseid3,
       DefaultWalletConfigs.CustomDevNet,
     ];
   }

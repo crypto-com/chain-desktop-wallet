@@ -92,6 +92,7 @@ export function reconstructCustomConfig(formValues: CustomConfigFormValue): Wall
     coin: { baseDenom: formValues.baseDenom, croDenom: formValues.croDenom },
     validatorAddressPrefix: formValues.validatorPrefix,
     validatorPubKeyPrefix: '', // Ignored
+    rpcUrl: '',
   };
   return {
     derivationPath: formValues.derivationPath,
