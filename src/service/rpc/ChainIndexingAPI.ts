@@ -74,21 +74,21 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
         tokenIds: [item.tokenId],
       };
     });
-    let nftListWithMarketplaceData;
 
     try {
       const nftMarketplaceData = await croNftApi.getNftListMarketplaceData(payload);
 
       if (nftMarketplaceData.length !== 0) {
-        nftListWithMarketplaceData = nftMarketplaceData.map((item, idx) => {
+        return nftMarketplaceData.map((item, idx) => {
           return {
             ...nftLists[idx],
             isMintedByCDC: item.isMintedByCDC,
             nftMarketplaceLink: item.link ? item.link : '',
           };
         });
+        // eslint-disable-next-line no-else-return
       } else {
-        nftListWithMarketplaceData = nftLists.map((item, idx) => {
+        return nftLists.map((item, idx) => {
           return {
             ...nftLists[idx],
             isMintedByCDC: false,
@@ -97,7 +97,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
         });
       }
     } catch (e) {
-      nftListWithMarketplaceData = nftLists.map((item, idx) => {
+      return nftLists.map((item, idx) => {
         return {
           ...nftLists[idx],
           isMintedByCDC: false,
@@ -105,7 +105,6 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
         };
       });
     }
-    return nftListWithMarketplaceData;
   }
 
   public async getNFTTransferHistory(nftQuery: NFTQueryParams): Promise<NftTransactionResponse[]> {

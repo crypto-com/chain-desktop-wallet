@@ -621,7 +621,7 @@ function HomePage() {
                   xs: 1,
                   sm: 2,
                   md: 4,
-                  lg: 4,
+                  lg: 5,
                   xl: 5,
                   xxl: 5,
                 }}

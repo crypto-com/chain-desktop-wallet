@@ -180,28 +180,27 @@ const NftPage = () => {
   const NftColumns = [
     {
       title: 'Drop Name',
-      // dataIndex: 'name',
       key: 'name',
       render: record => {
         return record.tokenData.drop ? record.tokenData.drop : 'n.a.';
       },
     },
     {
-      title: 'Edition',
-      // dataIndex: 'recipientAddress',
-      key: 'edition',
+      title: 'NFT Name',
+      key: 'denomId',
+      render: record => {
+        return record.denomId;
+      },
+    },
+    {
+      title: 'NFT ID',
+      key: 'tokenId',
       render: record => {
         return record.tokenId;
       },
     },
-    // {
-    //   title: 'Time',
-    //   // dataIndex: 'time',
-    //   key: 'time',
-    // },
     {
       title: 'View',
-      // dataIndex: 'view',
       key: 'viewAction',
       render: record => {
         return (
@@ -379,7 +378,7 @@ const NftPage = () => {
               <div className="item">
                 <div className="subtitle">About the Drop</div>
                 <div className="description">
-                  {nft?.tokenData.description ? nft?.tokenData.description : 'none'}
+                  {nft?.tokenData.description ? nft?.tokenData.description : 'n.a.'}
                 </div>
               </div>
               <div className="item">
@@ -393,7 +392,7 @@ const NftPage = () => {
                 </div>
                 {nft?.tokenData.mimeType ? (
                   <div className="table-row">
-                    <div>IPFS URL</div>
+                    <div>CONTENT URL</div>
                     <a
                       data-original={nft?.denomName}
                       target="_blank"
