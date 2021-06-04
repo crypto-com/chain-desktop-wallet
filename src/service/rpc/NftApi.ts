@@ -36,8 +36,9 @@ export class NftApi implements INftApi {
       }
       `,
     });
+
     if (result.status !== 200 || result.data.errors) {
-      return '';
+      return [];
     }
 
     return result.data.data.isMintedByCDC;

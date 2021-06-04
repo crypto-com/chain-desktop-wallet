@@ -69,11 +69,28 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       };
     });
 
-    // TO-DO
     const nftMarketplaceData = await croNftApi.getNftListMarketplaceData(payload);
-    console.log(nftMarketplaceData);
 
-    return nftLists;
+    let nftListWithMarketplaceData;
+
+    if (nftMarketplaceData.length !== 0) {
+      nftListWithMarketplaceData = nftMarketplaceData.map((item, idx) => {
+        return {
+          ...nftLists[idx],
+          isMintedByCDC: item.isMintedByCDC,
+          nftMarketplaceLink: item.link ? item.link : '',
+        };
+      });
+    } else {
+      nftListWithMarketplaceData = nftLists.map((item, idx) => {
+        return {
+          ...nftLists[idx],
+          isMintedByCDC: false,
+          marketplaceLink: '',
+        };
+      });
+    }
+    return nftListWithMarketplaceData;
   }
 
   public async getNFTTransferHistory(nftQuery: NFTQueryParams): Promise<NftTransactionResponse[]> {

@@ -48,7 +48,8 @@ export interface NftResponse {
   tokenLastEditedAt: string;
   denomName: string;
   denomSchema: string;
-  marketplaceUrl: string;
+  isMintedByCDC: boolean;
+  marketplaceLink: string;
 }
 
 export interface NftListResponse {
