@@ -392,12 +392,14 @@ const FormSettings = () => {
   };
 
   const handleCancelConfirmationModal = () => {
-    setIsConfirmationModalVisible(false);
-    setIsConfirmClearVisible(false);
+    if (!isButtonLoading) {
+      setIsConfirmationModalVisible(false);
+      setIsConfirmClearVisible(false);
+    }
   };
 
   const onConfirmClear = () => {
-    setIsConfirmationModalVisible(false);
+    // setIsConfirmationModalVisible(false);
     setIsButtonLoading(true);
     indexedDB.deleteDatabase('NeDB');
     setTimeout(() => {
@@ -456,6 +458,7 @@ const FormSettings = () => {
             handleCancel={handleCancelConfirmationModal}
             handleOk={onConfirmClear}
             confirmationLoading={isButtonLoading}
+            closable={!isButtonLoading}
             footer={[
               <Button
                 key="submit"
@@ -534,7 +537,7 @@ const FormSettings = () => {
                           required: true,
                         },
                         {
-                          pattern: /CLEAR/,
+                          pattern: /^CLEAR$/,
                           message: 'Please enter CLEAR',
                         },
                       ]}

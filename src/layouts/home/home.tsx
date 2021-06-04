@@ -30,6 +30,7 @@ import IconReceive from '../../svg/IconReceive';
 import IconStaking from '../../svg/IconStaking';
 import IconWallet from '../../svg/IconWallet';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
 import packageJson from '../../../package.json';
@@ -46,6 +47,7 @@ const { Sider } = Layout;
 function HomeLayout(props: HomeLayoutProps) {
   const history = useHistory();
   const [confirmDeleteForm] = Form.useForm();
+  const [deleteWalletAddress, setDeleteWalletAddress] = useState('');
   const [hasWallet, setHasWallet] = useState(true); // Default as true. useEffect will only re-render if result of hasWalletBeenCreated === false
   const [session, setSession] = useRecoilState(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
@@ -56,6 +58,8 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+  const [isSuccessDeleteModalVisible, setIsSuccessDeleteModalVisible] = useState(false);
+
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
@@ -99,6 +103,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
     setIsButtonLoading(false);
     setIsConfirmationModalVisible(false);
+    setIsSuccessDeleteModalVisible(true);
     setFetchingDB(false);
     setIsButtonDisabled(true);
     setIsConfirmDeleteVisible(false);
@@ -106,11 +111,13 @@ function HomeLayout(props: HomeLayoutProps) {
   };
 
   const handleCancel = () => {
-    setIsConfirmationModalVisible(false);
-    setIsConfirmDeleteVisible(false);
-    setIsButtonDisabled(true);
-    setIsConfirmDeleteVisible(false);
-    confirmDeleteForm.resetFields();
+    if (!isButtonLoading) {
+      setIsConfirmationModalVisible(false);
+      setIsConfirmDeleteVisible(false);
+      setIsButtonDisabled(true);
+      setIsConfirmDeleteVisible(false);
+      confirmDeleteForm.resetFields();
+    }
   };
 
   const showPasswordModal = () => {
@@ -229,7 +236,10 @@ function HomeLayout(props: HomeLayoutProps) {
           <>
             <Menu.Item
               className="delete-wallet-item"
-              onClick={() => setIsConfirmationModalVisible(true)}
+              onClick={() => {
+                setDeleteWalletAddress(session.wallet.address);
+                setIsConfirmationModalVisible(true);
+              }}
             >
               <DeleteOutlined />
               Delete Wallet
@@ -317,7 +327,8 @@ function HomeLayout(props: HomeLayoutProps) {
             <div className="description">Please review the below information. </div>
             <div className="item">
               <div className="label">Delete Wallet Address</div>
-              <div className="address">{`${session.wallet.address}`}</div>
+              {/* <div className="address">{`${session.wallet.address}`}</div> */}
+              <div className="address">{`${deleteWalletAddress}`}</div>
             </div>
             {!isConfirmDeleteVisible ? (
               <>
@@ -361,7 +372,7 @@ function HomeLayout(props: HomeLayoutProps) {
                         required: true,
                       },
                       {
-                        pattern: /DELETE/,
+                        pattern: /^DELETE$/,
                         message: 'Please enter DELETE',
                       },
                     ]}
@@ -373,6 +384,38 @@ function HomeLayout(props: HomeLayoutProps) {
             )}
           </>
         </ModalPopup>
+        <SuccessModalPopup
+          isModalVisible={isSuccessDeleteModalVisible}
+          handleCancel={() => {
+            setIsSuccessDeleteModalVisible(false);
+          }}
+          handleOk={() => {
+            setIsSuccessDeleteModalVisible(false);
+          }}
+          title="Success!"
+          button={null}
+          footer={[
+            <Button
+              key="submit"
+              type="primary"
+              onClick={() => {
+                setIsSuccessDeleteModalVisible(false);
+              }}
+            >
+              Ok
+            </Button>,
+          ]}
+        >
+          <>
+            <div className="description">
+              Wallet Address
+              <br />
+              {deleteWalletAddress}
+              <br />
+              has been deleted.
+            </div>
+          </>
+        </SuccessModalPopup>
         <ModalPopup
           isModalVisible={isAnnouncementVisible}
           handleCancel={() => {
