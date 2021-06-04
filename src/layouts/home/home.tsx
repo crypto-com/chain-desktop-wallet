@@ -46,6 +46,7 @@ const { Sider } = Layout;
 function HomeLayout(props: HomeLayoutProps) {
   const history = useHistory();
   const [confirmDeleteForm] = Form.useForm();
+  const [deleteWalletAddress, setDeleteWalletAddress] = useState('');
   const [hasWallet, setHasWallet] = useState(true); // Default as true. useEffect will only re-render if result of hasWalletBeenCreated === false
   const [session, setSession] = useRecoilState(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
@@ -106,11 +107,13 @@ function HomeLayout(props: HomeLayoutProps) {
   };
 
   const handleCancel = () => {
-    setIsConfirmationModalVisible(false);
-    setIsConfirmDeleteVisible(false);
-    setIsButtonDisabled(true);
-    setIsConfirmDeleteVisible(false);
-    confirmDeleteForm.resetFields();
+    if (!isButtonLoading) {
+      setIsConfirmationModalVisible(false);
+      setIsConfirmDeleteVisible(false);
+      setIsButtonDisabled(true);
+      setIsConfirmDeleteVisible(false);
+      confirmDeleteForm.resetFields();
+    }
   };
 
   const showPasswordModal = () => {
@@ -229,7 +232,10 @@ function HomeLayout(props: HomeLayoutProps) {
           <>
             <Menu.Item
               className="delete-wallet-item"
-              onClick={() => setIsConfirmationModalVisible(true)}
+              onClick={() => {
+                setDeleteWalletAddress(session.wallet.address);
+                setIsConfirmationModalVisible(true);
+              }}
             >
               <DeleteOutlined />
               Delete Wallet
@@ -317,7 +323,8 @@ function HomeLayout(props: HomeLayoutProps) {
             <div className="description">Please review the below information. </div>
             <div className="item">
               <div className="label">Delete Wallet Address</div>
-              <div className="address">{`${session.wallet.address}`}</div>
+              {/* <div className="address">{`${session.wallet.address}`}</div> */}
+              <div className="address">{`${deleteWalletAddress}`}</div>
             </div>
             {!isConfirmDeleteVisible ? (
               <>
@@ -361,7 +368,7 @@ function HomeLayout(props: HomeLayoutProps) {
                         required: true,
                       },
                       {
-                        pattern: /DELETE/,
+                        pattern: /^DELETE$/,
                         message: 'Please enter DELETE',
                       },
                     ]}
