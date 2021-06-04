@@ -617,10 +617,16 @@ class WalletService {
   public async fetchAndSaveNFTs(currentSession: Session) {
     try {
       const nfts = await this.loadAllCurrentAccountNFTs();
+      // eslint-disable-next-line no-console
+      console.log({ nfts });
+
       await this.storageService.saveNFTs({
         walletId: currentSession.wallet.identifier,
         nfts,
       });
+
+      // eslint-disable-next-line no-console
+      console.log('saved nfts');
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_SAVE_PROPOSALS', e);
