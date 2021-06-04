@@ -12,6 +12,7 @@ import {
   NFTQueryParams,
   TransactionStatus,
   TransferTransactionData,
+  NftModel,
 } from '../../models/Transaction';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
@@ -62,26 +63,40 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       nftLists.push(...pageNftsListResponse.result);
     }
 
+    return nftLists;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async getNftListMarketplaceData(nftLists: NftResponse[]): Promise<NftModel[]> {
     const payload: MintByCDCRequest[] = nftLists.map(item => {
       return {
         denomId: item.denomId,
         tokenIds: [item.tokenId],
       };
     });
-
-    const nftMarketplaceData = await croNftApi.getNftListMarketplaceData(payload);
-
     let nftListWithMarketplaceData;
 
-    if (nftMarketplaceData.length !== 0) {
-      nftListWithMarketplaceData = nftMarketplaceData.map((item, idx) => {
-        return {
-          ...nftLists[idx],
-          isMintedByCDC: item.isMintedByCDC,
-          nftMarketplaceLink: item.link ? item.link : '',
-        };
-      });
-    } else {
+    try {
+      const nftMarketplaceData = await croNftApi.getNftListMarketplaceData(payload);
+
+      if (nftMarketplaceData.length !== 0) {
+        nftListWithMarketplaceData = nftMarketplaceData.map((item, idx) => {
+          return {
+            ...nftLists[idx],
+            isMintedByCDC: item.isMintedByCDC,
+            nftMarketplaceLink: item.link ? item.link : '',
+          };
+        });
+      } else {
+        nftListWithMarketplaceData = nftLists.map((item, idx) => {
+          return {
+            ...nftLists[idx],
+            isMintedByCDC: false,
+            marketplaceLink: '',
+          };
+        });
+      }
+    } catch (e) {
       nftListWithMarketplaceData = nftLists.map((item, idx) => {
         return {
           ...nftLists[idx],

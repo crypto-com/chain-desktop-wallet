@@ -398,14 +398,18 @@ const NftPage = () => {
                 </div>
               </div>
               <div className="item goto-marketplace">
-                <a
-                  data-original={nft?.denomName}
-                  target="_blank"
-                  rel="noreferrer"
-                  href={nft?.marketplaceLink}
-                >
-                  View on Crypto.com NFT
-                </a>
+                {nft?.marketplaceLink !== '' ? (
+                  <a
+                    data-original={nft?.denomName}
+                    target="_blank"
+                    rel="noreferrer"
+                    href={nft?.marketplaceLink}
+                  >
+                    View on Crypto.com NFT
+                  </a>
+                ) : (
+                  ''
+                )}
               </div>
             </>
           </Sider>
