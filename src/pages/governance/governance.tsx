@@ -487,8 +487,9 @@ const GovernancePage = () => {
                                 <IconText
                                   icon={DislikeOutlined}
                                   text={getUIVoteAmount(
-                                    item.final_tally_result.no +
-                                      item.final_tally_result.no_with_veto,
+                                    Big(item.final_tally_result.no)
+                                      .add(item.final_tally_result.no_with_veto)
+                                      .toFixed(),
                                     userAsset,
                                   )}
                                   key="list-vertical-no-o"
@@ -546,8 +547,9 @@ const GovernancePage = () => {
                                 <IconText
                                   icon={DislikeOutlined}
                                   text={getUIVoteAmount(
-                                    item.final_tally_result.no +
-                                      item.final_tally_result.no_with_veto,
+                                    Big(item.final_tally_result.no)
+                                      .add(item.final_tally_result.no_with_veto)
+                                      .toFixed(),
                                     userAsset,
                                   )}
                                   key="list-vertical-no-o"
