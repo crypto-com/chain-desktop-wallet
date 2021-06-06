@@ -321,11 +321,15 @@ export class StorageService {
     return this.db.nftStore.insert<NFTList>(nftList);
   }
 
+  public async retrieveAllNfts(walletId: string) {
+    return this.db.nftStore.findOne<NFTList>({ walletId });
+  }
+
   public async saveNFTTransferHistory(nftTransactionHistory: NFTTransactionHistory) {
     if (!nftTransactionHistory || nftTransactionHistory.transfers.length === 0) {
       return Promise.resolve();
     }
-    await this.db.nftStore.remove(
+    await this.db.nftTransferHistoryStore.remove(
       {
         walletId: nftTransactionHistory.walletId,
         nftQuery: nftTransactionHistory.nftQuery,
@@ -333,14 +337,10 @@ export class StorageService {
       { multi: true },
     );
 
-    return this.db.nftStore.insert<NFTTransactionHistory>(nftTransactionHistory);
-  }
-
-  public async retrieveAllNfts(walletId: string) {
-    return this.db.nftStore.findOne<NFTList>({ walletId });
+    return this.db.nftTransferHistoryStore.insert<NFTTransactionHistory>(nftTransactionHistory);
   }
 
   public async retrieveNFTTransferHistory(walletId: string, nftQuery: NFTQueryParams) {
-    return this.db.nftStore.findOne<NFTTransactionHistory>({ walletId, nftQuery });
+    return this.db.nftTransferHistoryStore.findOne<NFTTransactionHistory>({ walletId, nftQuery });
   }
 }

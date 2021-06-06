@@ -102,7 +102,10 @@ export interface ValidatorModel {
 }
 
 export interface ProposalModel extends Proposal {}
-export interface NftModel extends NftResponse {}
+export interface NftModel extends NftResponse {
+  isMintedByCDC: boolean;
+  marketplaceLink: string;
+}
 export interface NftTransferModel extends NftTransactionResponse {}
 
 export const ProposalStatuses = {
