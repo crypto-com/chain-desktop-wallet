@@ -13,6 +13,7 @@ import {
   UndelegateTransactionUnsigned,
   RedelegateTransactionUnsigned,
   VoteTransactionUnsigned,
+  NFTTransferUnsigned,
 } from './TransactionSupported';
 
 export interface ITransactionSigner {
@@ -93,6 +94,31 @@ export class TransactionSigner implements ITransactionSigner {
       voter: transaction.voter,
       option: transaction.option,
       proposalId: Big(transaction.proposalID),
+    });
+
+    const signableTx = rawTx
+      .appendMessage(msgVote)
+      .addSigner({
+        publicKey: keyPair.getPubKey(),
+        accountNumber: new Big(transaction.accountNumber),
+        accountSequence: new Big(transaction.accountSequence),
+      })
+      .toSignable();
+
+    return signableTx
+      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
+      .toSigned()
+      .getHexEncoded();
+  }
+
+  public async signNFTTransfer(transaction: NFTTransferUnsigned, phrase: string): Promise<string> {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
+
+    const msgVote = new cro.nft.MsgTransferNFT({
+      id: transaction.tokenId,
+      sender: transaction.sender,
+      denomId: transaction.denomId,
+      recipient: transaction.recipient,
     });
 
     const signableTx = rawTx
