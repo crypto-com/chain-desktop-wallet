@@ -114,7 +114,7 @@ export class TransactionSigner implements ITransactionSigner {
   public async signNFTTransfer(transaction: NFTTransferUnsigned, phrase: string): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
 
-    const msgVote = new cro.nft.MsgTransferNFT({
+    const msgTransferNFT = new cro.nft.MsgTransferNFT({
       id: transaction.tokenId,
       sender: transaction.sender,
       denomId: transaction.denomId,
@@ -122,7 +122,7 @@ export class TransactionSigner implements ITransactionSigner {
     });
 
     const signableTx = rawTx
-      .appendMessage(msgVote)
+      .appendMessage(msgTransferNFT)
       .addSigner({
         publicKey: keyPair.getPubKey(),
         accountNumber: new Big(transaction.accountNumber),
