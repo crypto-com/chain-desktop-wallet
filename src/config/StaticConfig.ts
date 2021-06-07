@@ -105,7 +105,6 @@ export const CustomDevNet: WalletConfig = {
     validatorPubKeyPrefix: 'crocnclpub',
     validatorAddressPrefix: 'crocncl',
     coin: { baseDenom: 'basecro', croDenom: 'cro' },
-    rpcUrl: '',
   },
   nodeUrl: '',
   indexingUrl: '',
