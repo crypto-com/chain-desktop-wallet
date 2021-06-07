@@ -2,17 +2,13 @@ import React, { useState, useEffect } from 'react';
 import './nft.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Layout, Card, Tabs, List, Avatar, Radio, Table, Button } from 'antd';
+import { Layout, Card, Tabs, List, Avatar, Radio, Table, Button, Form, Input } from 'antd';
 import Icon, { MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useRecoilValue } from 'recoil';
 import ReactPlayer from 'react-player';
+import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 // import axios from 'axios';
-import {
-  // sessionState,
-  nftListState,
-  fetchingDBState,
-  // walletAssetState
-} from '../../recoil/atom';
+import { sessionState, nftListState, fetchingDBState, walletAssetState } from '../../recoil/atom';
 
 import {
   NftModel,
@@ -34,13 +30,18 @@ import IconPlayer from '../../svg/IconPlayer';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 // import nftThumbnail from '../../assets/nft1.jpg';
 // import nftThumbnail from '../../assets/original.jpeg';
+import { TransactionUtils } from '../../utils/TransactionUtils';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
 const { Meta } = Card;
+const layout = {};
 
 const NftPage = () => {
   // const [form] = Form.useForm();
+  const [transferForm] = Form.useForm();
+  const currentSession = useRecoilValue(sessionState);
+  const walletAsset = useRecoilValue(walletAssetState);
   // const [voteOption, setVoteOption] = useState<VoteOption>(VoteOption.VOTE_OPTION_ABSTAIN);
   // const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   // const [isModalVisible, setIsModalVisible] = useState(false);
@@ -50,6 +51,8 @@ const NftPage = () => {
   // const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [isNftModalVisible, setIsNftModalVisible] = useState(false);
   const [isNftTransferModalVisible, setIsNftTransferModalVisible] = useState(false);
+  const [isNftTransferConfirmVisible, setIsNftTransferConfirmVisible] = useState(false);
+
   // const [decryptedPhrase, setDecryptedPhrase] = useState('');
   // const [errorMessages, setErrorMessages] = useState([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -171,6 +174,12 @@ const NftPage = () => {
     }
     return [];
   };
+
+  const customAddressValidator = TransactionUtils.addressValidator(
+    currentSession,
+    walletAsset,
+    AddressType.USER,
+  );
 
   useEffect(() => {
     const fetchNftList = async () => {
@@ -444,59 +453,161 @@ const NftPage = () => {
       </ModalPopup>
       <ModalPopup
         isModalVisible={isNftTransferModalVisible}
-        handleCancel={() => setIsNftTransferModalVisible(false)}
+        handleCancel={() => {
+          setIsNftTransferModalVisible(false);
+          setIsNftTransferConfirmVisible(false);
+          transferForm.resetFields();
+        }}
         handleOk={() => {}}
         footer={[
-          <Button key="submit" type="primary">
-            Confirm
-          </Button>,
-          <Button key="back" type="link" onClick={() => setIsNftTransferModalVisible(false)}>
+          isNftTransferConfirmVisible ? (
+            <Button key="submit" type="primary" onClick={() => {}}>
+              Confirm Transfer
+            </Button>
+          ) : (
+            <Button
+              key="submit"
+              type="primary"
+              htmlType="submit"
+              onClick={() => {
+                transferForm.submit();
+              }}
+            >
+              Next
+            </Button>
+          ),
+          <Button
+            key="back"
+            type="link"
+            onClick={() => {
+              if (isNftTransferConfirmVisible) {
+                setIsNftTransferConfirmVisible(false);
+              } else {
+                setIsNftTransferModalVisible(false);
+                transferForm.resetFields();
+              }
+            }}
+          >
             Cancel
           </Button>,
         ]}
+        // footer={[]}
         okText="Confirm"
         className="nft-transfer-modal"
       >
         <>
-          <div className="title">Transfer NFT</div>
-          <div className="description">Fill in the information below to transfer your NFT</div>
-          <div className="item">
-            <div className="nft-image">
-              {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
-                <ReactPlayer
-                  url={videoUrl}
-                  config={{
-                    file: {
-                      attributes: {
-                        controlsList: 'nodownload',
-                      },
-                    },
-                  }}
-                  controls
-                  playing={isVideoPlaying}
-                />
-              ) : (
-                <img
-                  alt={nft?.denomName}
-                  src={
-                    nft?.isMintedByCDC && nft?.tokenData.image ? nft?.tokenData.image : nftThumbnail
-                  }
-                />
-              )}
-            </div>
-          </div>
-          <div className="item">
-            <div className="label">Sending</div>
-            <div className="address">{`${nft?.drop}`}</div>
-          </div>
-          {/* <div className="item">
-            <div className="label">Vote to Proposal</div>
-            <div className="address">{`#${nft?.proposal_id} ${nft?.content.title}`}</div>
-          </div>
-          <div className="item">
-            <div className="label">Vote</div>
-            <div>{processVoteTag(voteOption)}</div>
-          </div> */}
+          {isNftTransferConfirmVisible ? (
+            <>
+              <div className="title">Confirm Transfer</div>
+              <div className="description">Please review the information below</div>
+              <div className="item">
+                <div className="nft-image">
+                  {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
+                    <ReactPlayer
+                      url={videoUrl}
+                      config={{
+                        file: {
+                          attributes: {
+                            controlsList: 'nodownload',
+                          },
+                        },
+                      }}
+                      controls
+                      playing={isVideoPlaying}
+                    />
+                  ) : (
+                    <img
+                      alt={nft?.denomName}
+                      src={
+                        nft?.isMintedByCDC && nft?.tokenData.image
+                          ? nft?.tokenData.image
+                          : nftThumbnail
+                      }
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="item">
+                <div className="label">To</div>
+                <div className="address">{`${transferForm.getFieldValue('recipientAddress')}`}</div>
+              </div>
+              <div className="item">
+                This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address
+                that is not compatible with the Crypto.org Chain NFT token standard will result in
+                the permanent loss of your asset.
+              </div>
+              <div className="item">
+                <div className="label">NFT Name</div>
+                <div>{`${nft?.denomId}`}</div>
+              </div>
+              <div className="item">
+                <div className="label">NFT ID</div>
+                <div>{`${nft?.tokenId}`}</div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="title">Transfer NFT</div>
+              <div className="description">Fill in the information below to transfer your NFT</div>
+              <div className="item">
+                <div className="nft-image">
+                  {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
+                    <ReactPlayer
+                      url={videoUrl}
+                      config={{
+                        file: {
+                          attributes: {
+                            controlsList: 'nodownload',
+                          },
+                        },
+                      }}
+                      controls
+                      playing={isVideoPlaying}
+                    />
+                  ) : (
+                    <img
+                      alt={nft?.denomName}
+                      src={
+                        nft?.isMintedByCDC && nft?.tokenData.image
+                          ? nft?.tokenData.image
+                          : nftThumbnail
+                      }
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="item">
+                <div className="label">Sending</div>
+                <div className="address">{`${nft?.drop}`}</div>
+              </div>
+              <Form
+                {...layout}
+                layout="vertical"
+                form={transferForm}
+                name="control-ref"
+                onFinish={() => setIsNftTransferConfirmVisible(true)}
+                requiredMark={false}
+              >
+                {/* <div className="sender">Sender Address</div> */}
+                {/* <div className="sender">{currentSession.wallet.address}</div> */}
+                <Form.Item
+                  name="recipientAddress"
+                  label="Recipient Address"
+                  hasFeedback
+                  validateFirst
+                  rules={[
+                    { required: true, message: 'Recipient address is required' },
+                    customAddressValidator,
+                  ]}
+                >
+                  <Input placeholder="Enter recipient address" />
+                </Form.Item>
+                This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address
+                that is not compatible with the Crypto.org Chain NFT token standard will result in
+                the permanent loss of your asset.
+              </Form>
+            </>
+          )}
         </>
       </ModalPopup>
       <Footer />
