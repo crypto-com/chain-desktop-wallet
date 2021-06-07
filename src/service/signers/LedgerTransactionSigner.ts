@@ -1,5 +1,5 @@
-import { Bytes } from '@crypto-com/chain-jslib/lib/dist/utils/bytes/bytes';
-import sdk from '@crypto-com/chain-jslib';
+import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
+import sdk from '@crypto-org-chain/chain-jslib';
 import { Big, Units } from '../../utils/ChainJsLib';
 import {
   FIXED_DEFAULT_FEE,
