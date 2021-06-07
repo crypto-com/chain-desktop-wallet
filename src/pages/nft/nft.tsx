@@ -4,24 +4,31 @@ import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Layout, Card, Tabs, List, Avatar, Radio, Table, Button, Form, Input } from 'antd';
 import Icon, { MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import ReactPlayer from 'react-player';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
 // import axios from 'axios';
-import { sessionState, nftListState, fetchingDBState, walletAssetState } from '../../recoil/atom';
+import {
+  sessionState,
+  nftListState,
+  fetchingDBState,
+  walletAssetState,
+  ledgerIsExpertModeState,
+} from '../../recoil/atom';
 
 import {
   NftModel,
   // ProposalModel,
   // VoteOption,
-  // BroadCastResult,
+  BroadCastResult,
 } from '../../models/Transaction';
 // import { walletService } from '../../service/WalletService';
 // import { secretStoreService } from '../../storage/SecretStoreService';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
-// import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
-// import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-// import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import { walletService } from '../../service/WalletService';
 // import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 // import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
 // import { ellipsis } from '../../utils/utils';
@@ -31,6 +38,14 @@ import nftThumbnail from '../../assets/nft-thumbnail.png';
 // import nftThumbnail from '../../assets/nft1.jpg';
 // import nftThumbnail from '../../assets/original.jpeg';
 import { TransactionUtils } from '../../utils/TransactionUtils';
+import { secretStoreService } from '../../storage/SecretStoreService';
+import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import {
+  AnalyticsActions,
+  AnalyticsCategory,
+  AnalyticsService,
+  AnalyticsTxType,
+} from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -38,22 +53,32 @@ const { Meta } = Card;
 const layout = {};
 
 const NftPage = () => {
-  // const [form] = Form.useForm();
-  const [transferForm] = Form.useForm();
+  const [form] = Form.useForm();
+  const [formValues, setFormValues] = useState({
+    tokenId: '',
+    denomId: '',
+    senderAddress: '',
+    recipientAddress: '',
+    amount: '',
+    memo: '',
+  });
   const currentSession = useRecoilValue(sessionState);
-  const walletAsset = useRecoilValue(walletAssetState);
+  const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   // const [voteOption, setVoteOption] = useState<VoteOption>(VoteOption.VOTE_OPTION_ABSTAIN);
   // const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   // const [isModalVisible, setIsModalVisible] = useState(false);
-  // const [confirmLoading, setConfirmLoading] = useState(false);
-  // const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
-  // const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
-  // const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+  const [errorMessages, setErrorMessages] = useState([]);
   const [isNftModalVisible, setIsNftModalVisible] = useState(false);
   const [isNftTransferModalVisible, setIsNftTransferModalVisible] = useState(false);
   const [isNftTransferConfirmVisible, setIsNftTransferConfirmVisible] = useState(false);
 
-  // const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
   // const [errorMessages, setErrorMessages] = useState([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | undefined>('');
@@ -71,18 +96,21 @@ const NftPage = () => {
   const [processedNftList, setProcessedNftList] = useState<any[]>([]);
   const [nftView, setNftView] = useState('grid');
 
+  const analyticsService = new AnalyticsService(currentSession);
+
   // const handleCancelConfirmationModal = () => {
   //   setIsVisibleConfirmationModal(false);
   // };
 
-  // const closeSuccessModal = () => {
-  //   setIsSuccessModalVisible(false);
-  //   setIsVisibleConfirmationModal(false);
-  // };
+  const closeSuccessModal = () => {
+    setIsSuccessModalVisible(false);
+    setIsNftModalVisible(false);
+    setIsNftTransferConfirmVisible(false);
+  };
 
-  // const closeErrorModal = () => {
-  //   setIsErrorModalVisible(false);
-  // };
+  const closeErrorModal = () => {
+    setIsErrorModalVisible(false);
+  };
 
   // const showConfirmationModal = () => {
   //   setInputPasswordVisible(false);
@@ -180,6 +208,91 @@ const NftPage = () => {
     walletAsset,
     AddressType.USER,
   );
+
+  const showConfirmationModal = () => {
+    setInputPasswordVisible(false);
+    setIsNftTransferConfirmVisible(true);
+    setFormValues({
+      ...form.getFieldsValue(),
+      // Replace scientific notation to plain string values
+      denomId: nft?.denomId,
+      tokenId: nft?.tokenId,
+      senderAddress: currentSession.wallet.address,
+    });
+    console.log(form.getFieldsValue());
+    console.log(formValues);
+  };
+
+  const showPasswordInput = () => {
+    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      showConfirmationModal();
+    } else {
+      setInputPasswordVisible(true);
+    }
+  };
+
+  const onWalletDecryptFinish = async (password: string) => {
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      currentSession.wallet.identifier,
+    );
+    setDecryptedPhrase(phraseDecrypted);
+    showConfirmationModal();
+  };
+
+  const onConfirmTransfer = async () => {
+    const { walletType } = currentSession.wallet;
+    const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
+    if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
+      return;
+    }
+    try {
+      setConfirmLoading(true);
+      const sendResult = await walletService.sendNFT({
+        tokenId: formValues.tokenId,
+        denomId: formValues.denomId,
+        sender: formValues.senderAddress,
+        recipient: formValues.recipientAddress,
+        memo,
+        decryptedPhrase,
+        asset: walletAsset,
+        walletType,
+      });
+
+      analyticsService.logTransactionEvent(
+        broadcastResult.transactionHash as string,
+        formValues.amount,
+        AnalyticsTxType.TransferTransaction,
+        AnalyticsActions.FundsTransfer,
+        AnalyticsCategory.Transfer,
+      );
+
+      setBroadcastResult(sendResult);
+
+      setIsNftModalVisible(false);
+      setIsNftTransferConfirmVisible(false);
+      setConfirmLoading(false);
+      setIsSuccessModalVisible(true);
+      setInputPasswordVisible(false);
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      setWalletAsset(currentWalletAsset);
+
+      form.resetFields();
+    } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+      }
+
+      setErrorMessages(e.message.split(': '));
+      setIsNftModalVisible(false);
+      // setIsNftTransferConfirmVisible(false)
+      setConfirmLoading(false);
+      setInputPasswordVisible(false);
+      setIsErrorModalVisible(true);
+      // eslint-disable-next-line no-console
+      console.log('Error occurred while transfer', e);
+    }
+  };
 
   useEffect(() => {
     const fetchNftList = async () => {
@@ -456,12 +569,17 @@ const NftPage = () => {
         handleCancel={() => {
           setIsNftTransferModalVisible(false);
           setIsNftTransferConfirmVisible(false);
-          transferForm.resetFields();
+          form.resetFields();
         }}
         handleOk={() => {}}
         footer={[
           isNftTransferConfirmVisible ? (
-            <Button key="submit" type="primary" onClick={() => {}}>
+            <Button
+              key="submit"
+              type="primary"
+              onClick={onConfirmTransfer}
+              loading={confirmLoading}
+            >
               Confirm Transfer
             </Button>
           ) : (
@@ -470,7 +588,7 @@ const NftPage = () => {
               type="primary"
               htmlType="submit"
               onClick={() => {
-                transferForm.submit();
+                form.submit();
               }}
             >
               Next
@@ -484,7 +602,7 @@ const NftPage = () => {
                 setIsNftTransferConfirmVisible(false);
               } else {
                 setIsNftTransferModalVisible(false);
-                transferForm.resetFields();
+                form.resetFields();
               }
             }}
           >
@@ -529,7 +647,7 @@ const NftPage = () => {
               </div>
               <div className="item">
                 <div className="label">To</div>
-                <div className="address">{`${transferForm.getFieldValue('recipientAddress')}`}</div>
+                <div className="address">{`${form.getFieldValue('recipientAddress')}`}</div>
               </div>
               <div className="item">
                 This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address
@@ -538,11 +656,11 @@ const NftPage = () => {
               </div>
               <div className="item">
                 <div className="label">NFT Name</div>
-                <div>{`${nft?.denomId}`}</div>
+                <div>{`${formValues.denomId}`}</div>
               </div>
               <div className="item">
                 <div className="label">NFT ID</div>
-                <div>{`${nft?.tokenId}`}</div>
+                <div>{`${formValues.tokenId}`}</div>
               </div>
             </>
           ) : (
@@ -583,9 +701,9 @@ const NftPage = () => {
               <Form
                 {...layout}
                 layout="vertical"
-                form={transferForm}
+                form={form}
                 name="control-ref"
-                onFinish={() => setIsNftTransferConfirmVisible(true)}
+                onFinish={showPasswordInput}
                 requiredMark={false}
               >
                 {/* <div className="sender">Sender Address</div> */}
@@ -611,7 +729,7 @@ const NftPage = () => {
         </>
       </ModalPopup>
       <Footer />
-      {/* <PasswordFormModal
+      <PasswordFormModal
         description="Input the app password decrypt wallet"
         okButtonText="Decrypt wallet"
         onCancel={() => {
@@ -630,7 +748,7 @@ const NftPage = () => {
         visible={inputPasswordVisible}
         successButtonText="Continue"
         confirmPassword={false}
-      /> */}
+      />
       {/* <ModalPopup
         isModalVisible={isConfirmationModalVisible}
         handleCancel={handleCancelConfirmationModal}
@@ -662,7 +780,7 @@ const NftPage = () => {
           </div>
         </>
       </ModalPopup> */}
-      {/* <SuccessModalPopup
+      <SuccessModalPopup
         isModalVisible={isSuccessModalVisible}
         handleCancel={closeSuccessModal}
         handleOk={closeSuccessModal}
@@ -676,8 +794,8 @@ const NftPage = () => {
       >
         <>
           {broadcastResult?.code !== undefined &&
-            broadcastResult?.code !== null &&
-            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+          broadcastResult?.code !== null &&
+          broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
             <div className="description">
               The transaction timed out but it will be included in the subsequent blocks
             </div>
@@ -685,8 +803,8 @@ const NftPage = () => {
             <div className="description">Your vote was broadcasted successfully!</div>
           )}
         </>
-      </SuccessModalPopup> */}
-      {/* <ErrorModalPopup
+      </SuccessModalPopup>
+      <ErrorModalPopup
         isModalVisible={isErrorModalVisible}
         handleCancel={closeErrorModal}
         handleOk={closeErrorModal}
@@ -704,9 +822,14 @@ const NftPage = () => {
               .map((err, idx) => (
                 <div key={idx}>- {err}</div>
               ))}
+            {ledgerIsExpertMode ? (
+              <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
+            ) : (
+              ''
+            )}
           </div>
         </>
-      </ErrorModalPopup> */}
+      </ErrorModalPopup>
     </Layout>
   );
 };
