@@ -213,14 +213,12 @@ const NftPage = () => {
     setInputPasswordVisible(false);
     setIsNftTransferConfirmVisible(true);
     setFormValues({
-      ...form.getFieldsValue(),
+      ...form.getFieldsValue(true),
       // Replace scientific notation to plain string values
       denomId: nft?.denomId,
       tokenId: nft?.tokenId,
       senderAddress: currentSession.wallet.address,
     });
-    console.log(form.getFieldsValue());
-    console.log(formValues);
   };
 
   const showPasswordInput = () => {
@@ -270,6 +268,7 @@ const NftPage = () => {
       setBroadcastResult(sendResult);
 
       setIsNftModalVisible(false);
+      setIsNftTransferModalVisible(false);
       setIsNftTransferConfirmVisible(false);
       setConfirmLoading(false);
       setIsSuccessModalVisible(true);
