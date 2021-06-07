@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './nft.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Layout, Card, Tabs, List, Avatar, Radio, Table } from 'antd';
+import { Layout, Card, Tabs, List, Avatar, Radio, Table, Button } from 'antd';
 import Icon, { MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useRecoilValue } from 'recoil';
 import ReactPlayer from 'react-player';
@@ -32,6 +32,8 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { middleEllipsis, isJson } from '../../utils/utils';
 import IconPlayer from '../../svg/IconPlayer';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
+// import nftThumbnail from '../../assets/nft1.jpg';
+// import nftThumbnail from '../../assets/original.jpeg';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -47,6 +49,7 @@ const NftPage = () => {
   // const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   // const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [isNftModalVisible, setIsNftModalVisible] = useState(false);
+  const [isNftTransferModalVisible, setIsNftTransferModalVisible] = useState(false);
   // const [decryptedPhrase, setDecryptedPhrase] = useState('');
   // const [errorMessages, setErrorMessages] = useState([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -412,6 +415,15 @@ const NftPage = () => {
                   ''
                 )}
               </div>
+              <div className="item">
+                <Button
+                  key="submit"
+                  type="primary"
+                  onClick={() => setIsNftTransferModalVisible(true)}
+                >
+                  Transfer NFT
+                </Button>
+              </div>
               <div className="item goto-marketplace">
                 {nft?.marketplaceLink !== '' ? (
                   <a
@@ -429,6 +441,63 @@ const NftPage = () => {
             </>
           </Sider>
         </Layout>
+      </ModalPopup>
+      <ModalPopup
+        isModalVisible={isNftTransferModalVisible}
+        handleCancel={() => setIsNftTransferModalVisible(false)}
+        handleOk={() => {}}
+        footer={[
+          <Button key="submit" type="primary">
+            Confirm
+          </Button>,
+          <Button key="back" type="link" onClick={() => setIsNftTransferModalVisible(false)}>
+            Cancel
+          </Button>,
+        ]}
+        okText="Confirm"
+        className="nft-transfer-modal"
+      >
+        <>
+          <div className="title">Transfer NFT</div>
+          <div className="description">Fill in the information below to transfer your NFT</div>
+          <div className="item">
+            <div className="nft-image">
+              {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
+                <ReactPlayer
+                  url={videoUrl}
+                  config={{
+                    file: {
+                      attributes: {
+                        controlsList: 'nodownload',
+                      },
+                    },
+                  }}
+                  controls
+                  playing={isVideoPlaying}
+                />
+              ) : (
+                <img
+                  alt={nft?.denomName}
+                  src={
+                    nft?.isMintedByCDC && nft?.tokenData.image ? nft?.tokenData.image : nftThumbnail
+                  }
+                />
+              )}
+            </div>
+          </div>
+          <div className="item">
+            <div className="label">Sending</div>
+            <div className="address">{`${nft?.drop}`}</div>
+          </div>
+          {/* <div className="item">
+            <div className="label">Vote to Proposal</div>
+            <div className="address">{`#${nft?.proposal_id} ${nft?.content.title}`}</div>
+          </div>
+          <div className="item">
+            <div className="label">Vote</div>
+            <div>{processVoteTag(voteOption)}</div>
+          </div> */}
+        </>
       </ModalPopup>
       <Footer />
       {/* <PasswordFormModal
