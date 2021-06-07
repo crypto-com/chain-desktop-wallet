@@ -1,4 +1,4 @@
-import sdk from '@crypto-com/chain-jslib';
+import sdk from '@crypto-org-chain/chain-jslib';
 import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
 import {
   FIXED_DEFAULT_FEE,

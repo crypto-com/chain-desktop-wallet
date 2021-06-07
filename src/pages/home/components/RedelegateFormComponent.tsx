@@ -5,7 +5,7 @@ import { Form, InputNumber, Alert, Table, Input } from 'antd';
 import { OrderedListOutlined } from '@ant-design/icons';
 import numeral from 'numeral';
 import Big from 'big.js';
-import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
+import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { validatorListState, fetchingDBState } from '../../../recoil/atom';
 import { Session } from '../../../models/Session';
 import { UserAsset, scaledAmount } from '../../../models/UserAsset';
