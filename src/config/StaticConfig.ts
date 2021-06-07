@@ -1,4 +1,4 @@
-import { CroNetwork } from '@crypto-com/chain-jslib/lib/dist/core/cro';
+import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import { getRandomId } from '../crypto/RandomGen';
 
 export const APP_DB_NAMESPACE = 'data-store';
@@ -105,7 +105,6 @@ export const CustomDevNet: WalletConfig = {
     validatorPubKeyPrefix: 'crocnclpub',
     validatorAddressPrefix: 'crocncl',
     coin: { baseDenom: 'basecro', croDenom: 'cro' },
-    rpcUrl: '',
   },
   nodeUrl: '',
   indexingUrl: '',
@@ -153,5 +152,5 @@ export type Network = {
   validatorPubKeyPrefix: string;
   validatorAddressPrefix: string;
   coin: { baseDenom: string; croDenom: string };
-  rpcUrl: string;
+  rpcUrl?: string;
 };

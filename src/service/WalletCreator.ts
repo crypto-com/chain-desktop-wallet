@@ -1,4 +1,4 @@
-import sdk from '@crypto-com/chain-jslib';
+import sdk from '@crypto-org-chain/chain-jslib';
 import { Wallet } from '../models/Wallet';
 import { WalletConfig } from '../config/StaticConfig';
 import { HDKey, Secp256k1KeyPair } from '../utils/ChainJsLib';

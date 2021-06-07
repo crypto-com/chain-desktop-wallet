@@ -4,7 +4,7 @@ import 'antd/dist/antd.css';
 import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
 import { OrderedListOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
+import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import Big from 'big.js';
 import numeral from 'numeral';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';

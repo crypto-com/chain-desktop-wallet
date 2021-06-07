@@ -1,5 +1,8 @@
 import Big from 'big.js';
-import { AddressType, AddressValidator } from '@crypto-com/chain-jslib/lib/dist/utils/address';
+import {
+  AddressType,
+  AddressValidator,
+} from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { Session } from '../models/Session';
 import { UserAsset } from '../models/UserAsset';
 
