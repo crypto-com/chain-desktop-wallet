@@ -24,6 +24,7 @@ import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
 import { Session } from '../models/Session';
 import {
   DelegateTransactionUnsigned,
+  NFTTransferUnsigned,
   RedelegateTransactionUnsigned,
   TransferTransactionUnsigned,
   UndelegateTransactionUnsigned,
@@ -56,6 +57,7 @@ import { createLedgerDevice, LEDGER_WALLET_TYPE } from './LedgerService';
 import { ISignerProvider } from './signers/SignerProvider';
 import {
   DelegationRequest,
+  NFTTransferRequest,
   RedelegationRequest,
   TransferRequest,
   UndelegationRequest,
@@ -308,6 +310,46 @@ class WalletService {
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
     await this.fetchAndSaveProposals(currentSession);
+    return broadCastResult;
+  }
+
+  public async sendNFT(nftTransferRequest: NFTTransferRequest): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.prepareTransaction();
+
+    const nftTransferUnsigned: NFTTransferUnsigned = {
+      tokenId: nftTransferRequest.tokenId,
+      denomId: nftTransferRequest.denomId,
+      sender: nftTransferRequest.sender,
+      recipient: nftTransferRequest.recipient,
+
+      memo: nftTransferRequest.memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+
+    if (nftTransferRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signNFTTransfer(
+        nftTransferUnsigned,
+        nftTransferRequest.decryptedPhrase,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signNFTTransfer(
+        nftTransferUnsigned,
+        nftTransferRequest.decryptedPhrase,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.fetchAndSaveNFTs(currentSession);
     return broadCastResult;
   }
 
