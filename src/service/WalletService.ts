@@ -105,7 +105,12 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncAll(currentSession);
+
+    await Promise.all([
+      await this.fetchAndSaveTransfers(currentSession),
+      await this.fetchAndUpdateBalances(currentSession),
+    ]);
+
     return broadCastResult;
   }
 
@@ -154,7 +159,11 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncAll(currentSession);
+    await Promise.all([
+      await this.fetchAndUpdateBalances(currentSession),
+      await this.fetchAndSaveDelegations(nodeRpc, currentSession),
+    ]);
+
     return broadCastResult;
   }
 
@@ -203,7 +212,11 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncAll(currentSession);
+    await Promise.all([
+      await this.fetchAndUpdateBalances(currentSession),
+      await this.fetchAndSaveDelegations(nodeRpc, currentSession),
+    ]);
+
     return broadCastResult;
   }
 
@@ -252,7 +265,10 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncAll(currentSession);
+    await Promise.all([
+      await this.fetchAndUpdateBalances(currentSession),
+      await this.fetchAndSaveDelegations(nodeRpc, currentSession),
+    ]);
     return broadCastResult;
   }
 
@@ -534,7 +550,6 @@ class WalletService {
       this.fetchAndSaveRewards(nodeRpc, currentSession),
       this.fetchAndSaveTransfers(currentSession),
       this.fetchAndSaveValidators(currentSession),
-      // this.fetchAndSaveProposals(currentSession),
     ]);
   }
 
