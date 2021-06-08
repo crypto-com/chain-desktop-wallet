@@ -10,6 +10,7 @@ import {
   walletListState,
   validatorListState,
   fetchingDBState,
+  nftListState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
@@ -31,6 +32,7 @@ function WalletPage() {
   const [session, setSession] = useRecoilState<Session>(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
+  const [nftList, setNftList] = useRecoilState(nftListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
   const walletList = useRecoilValue(walletListState);
   const [loading, setLoading] = useState(false);
@@ -86,8 +88,10 @@ function WalletPage() {
     await walletService.setCurrentSession(new Session(walletList[e.key]));
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+    const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
     setSession(currentSession);
     setUserAsset(currentAsset);
+    setNftList(currentNftList);
     await walletService.syncAll(currentSession);
     const currentValidatorList = await walletService.retrieveTopValidators(
       currentSession.wallet.config.network.chainId,
@@ -120,7 +124,7 @@ function WalletPage() {
       didMountRef.current = true;
       analyticsService.logPage('Wallet');
     }
-  }, [fetchingDB, userAsset, validatorList]);
+  }, [fetchingDB, userAsset, nftList, validatorList]);
 
   const columns = [
     {

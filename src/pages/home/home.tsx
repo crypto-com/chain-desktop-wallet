@@ -1,7 +1,20 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Layout, notification, Table, Tabs, Tag, Typography } from 'antd';
+import {
+  Button,
+  Form,
+  Layout,
+  notification,
+  Table,
+  Tabs,
+  Tag,
+  Typography,
+  Card,
+  List,
+  Avatar,
+} from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import numeral from 'numeral';
@@ -17,12 +30,14 @@ import {
   sessionState,
   marketState,
   walletAssetState,
+  nftListState,
   ledgerIsExpertModeState,
   fetchingDBState,
 } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
   BroadCastResult,
+  NftModel,
   StakingTransactionData,
   TransactionDirection,
   TransactionStatus,
@@ -38,14 +53,18 @@ import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
 import { UndelegateFormComponent } from './components/UndelegateFormComponent';
 import RedelegateFormComponent from './components/RedelegateFormComponent';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
-import { middleEllipsis } from '../../utils/utils';
+import { middleEllipsis, isJson } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import nftThumbnail from '../../assets/nft-thumbnail.png';
 
 const { Text } = Typography;
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
+const { Meta } = Card;
+
+const maxNftPreview = 5;
 
 enum StakingActionType {
   UNDELEGATE = 'UNDELEGATE',
@@ -127,10 +146,14 @@ function HomePage() {
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const nftList = useRecoilValue(nftListState);
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const didMountRef = useRef(false);
+
+  const [processedNftList, setProcessedNftList] = useState<any[]>([]);
+  // const [nftView, setNftView] = useState('grid');
 
   // Undelegate action related states changes
   const [form] = Form.useForm();
@@ -207,6 +230,25 @@ function HomePage() {
     setFetchingDB(false);
   };
 
+  const processNftList = (currentList: NftModel[] | undefined) => {
+    if (currentList) {
+      return currentList.slice(0, maxNftPreview).map((item, idx) => {
+        const denomSchema = isJson(item.denomSchema)
+          ? JSON.parse(item.denomSchema)
+          : item.denomSchema;
+        const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
+        const nftModel = {
+          ...item,
+          key: `${idx}`,
+          denomSchema,
+          tokenData,
+        };
+        return nftModel;
+      });
+    }
+    return [];
+  };
+
   useEffect(() => {
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
@@ -220,15 +262,14 @@ function HomePage() {
 
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
-      await walletService.fetchAndSaveNFTs(sessionData);
 
+      const currentNftList = processNftList(nftList);
+      setProcessedNftList(currentNftList);
       // TODO: Remove test case load
-      const nftHistory = await walletService.loadNFTTransferHistory({
-        tokenId: 'specialart',
-        denomId: 'specialx',
-      });
-      // eslint-disable-next-line no-console
-      console.log('NFT_TRANSFER_HISTORY', nftHistory);
+      // const nftHistory = await walletService.loadNFTTransferHistory({
+      //   tokenId: 'specialart',
+      //   denomId: 'specialx',
+      // });
 
       showWalletStateNotification(currentSession.wallet.config);
       setDelegations(stakingTabularData);
@@ -514,6 +555,11 @@ function HomePage() {
     },
   ];
 
+  // const nftViewOptions = [
+  //   { label: <MenuOutlined />, value: 'list' },
+  //   { label: <AppstoreOutlined />, value: 'grid' },
+  // ];
+
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">
@@ -556,24 +602,82 @@ function HomePage() {
           </div>
         </div>
         <Tabs defaultActiveKey="1">
+          <TabPane tab="My NFT" key="1">
+            <div className="site-layout-background nft-container">
+              {/* <div className="view-selection">
+              <Radio.Group
+                options={nftViewOptions}
+                defaultValue="grid"
+                onChange={(e) => {
+                  setNftView(e.target.value)
+                }}
+                // value={value4}
+                optionType="button"
+              />
+          </div> */}
+              <List
+                grid={{
+                  gutter: 16,
+                  xs: 1,
+                  sm: 2,
+                  md: 4,
+                  lg: 5,
+                  xl: 5,
+                  xxl: 5,
+                }}
+                dataSource={processedNftList}
+                renderItem={item => (
+                  <List.Item>
+                    <Card
+                      style={{ width: 170 }}
+                      cover={
+                        <img
+                          alt={item?.denomName}
+                          src={item?.tokenData.image ? item?.tokenData.image : nftThumbnail}
+                        />
+                      }
+                      hoverable
+                      // onClick={() => {
+                      // setNft(item);
+                      // setIsNftVisible(true);
+                      // }}
+                      className="nft"
+                    >
+                      <Meta
+                        title={item?.tokenData.drop ? item?.tokenData.drop : item?.denomName}
+                        description={
+                          <>
+                            <Avatar
+                              style={{
+                                background:
+                                  'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                verticalAlign: 'middle',
+                              }}
+                            />
+                            {middleEllipsis(item?.tokenOwner, 6)}
+                          </>
+                        }
+                      />
+                    </Card>
+                  </List.Item>
+                )}
+                pagination={false}
+              />
+              <Link to="/nft" style={{ textAlign: 'right' }}>
+                See all
+              </Link>
+            </div>
+          </TabPane>
+        </Tabs>
+        <Tabs defaultActiveKey="1">
           <TabPane tab="Transactions" key="1">
             <Table columns={TransactionColumns} dataSource={transfers} />
           </TabPane>
           <TabPane tab="Delegations" key="2">
-            <Table
-              columns={StakingColumns}
-              dataSource={delegations}
-              // onRow={record => {
-              //   return {
-              //     onClick: () => {
-              //       setUndelegateFormValues({
-              //         validatorAddress: record.validatorAddress,
-              //         undelegateAmount: record.stakedAmount,
-              //       });
-              //     },
-              //   };
-              // }}
-            />
+            <Table columns={StakingColumns} dataSource={delegations} />
+          </TabPane>
+          <TabPane tab="NFT Transactions" key="3">
+            <Table columns={StakingColumns} dataSource={delegations} />
           </TabPane>
         </Tabs>
         <div>

@@ -21,6 +21,7 @@ import {
   marketState,
   validatorListState,
   fetchingDBState,
+  nftListState,
 } from '../../recoil/atom';
 import { trimString } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
@@ -28,6 +29,7 @@ import IconHome from '../../svg/IconHome';
 import IconSend from '../../svg/IconSend';
 import IconReceive from '../../svg/IconReceive';
 import IconStaking from '../../svg/IconStaking';
+import IconNft from '../../svg/IconNft';
 import IconWallet from '../../svg/IconWallet';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -54,6 +56,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [marketData, setMarketData] = useRecoilState(marketState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
+  const [nftList, setNftList] = useRecoilState(nftListState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
@@ -64,27 +67,27 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
 
-  async function fetchAndSetNewValidators() {
+  async function fetchAndSetNewValidators(currentSession) {
     try {
-      await walletService.fetchAndSaveValidators(session);
+      await walletService.fetchAndSaveValidators(currentSession);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet validators list', e);
     }
   }
 
-  async function fetchAndSetNewProposals() {
+  async function fetchAndSetNewProposals(currentSession) {
     try {
-      await walletService.fetchAndSaveProposals(session);
+      await walletService.fetchAndSaveProposals(currentSession);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet proposals', e);
     }
   }
 
-  async function fetchAndSetNFTs() {
+  async function fetchAndSetNFTs(currentSession) {
     try {
-      await walletService.fetchAndSaveNFTs(session);
+      await walletService.fetchAndSaveNFTs(currentSession);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet NFTs', e);
@@ -137,31 +140,34 @@ function HomeLayout(props: HomeLayoutProps) {
     const fetchDB = async () => {
       setFetchingDB(true);
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
-      const sessionData = await walletService.retrieveCurrentSession();
-      const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+      const currentSession = await walletService.retrieveCurrentSession();
+      const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       const allWalletsData = await walletService.retrieveAllWallets();
       const currentMarketData = await walletService.retrieveAssetPrice(
         currentAsset.mainnetSymbol,
         'usd',
       );
-      const currentValidatorList = await walletService.retrieveTopValidators(
-        sessionData.wallet.config.network.chainId,
-      );
 
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
-
       setHasWallet(hasWalletBeenCreated);
-      setSession(sessionData);
+      setSession(currentSession);
       setUserAsset(currentAsset);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
-      setValidatorList(currentValidatorList);
 
       await Promise.all([
-        await fetchAndSetNewValidators(),
-        await fetchAndSetNewProposals(),
-        await fetchAndSetNFTs(),
+        await fetchAndSetNewValidators(currentSession),
+        await fetchAndSetNewProposals(currentSession),
+        await fetchAndSetNFTs(currentSession),
       ]);
+
+      const currentValidatorList = await walletService.retrieveTopValidators(
+        currentSession.wallet.config.network.chainId,
+      );
+      const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
+
+      setValidatorList(currentValidatorList);
+      setNftList(currentNftList);
 
       setFetchingDB(false);
 
@@ -190,11 +196,22 @@ function HomeLayout(props: HomeLayoutProps) {
     setMarketData,
     validatorList,
     setValidatorList,
+    nftList,
+    setNftList,
   ]);
 
   const HomeMenu = () => {
     const locationPath = useLocation().pathname;
-    const paths = ['/home', '/staking', '/send', '/receive', '/settings', '/governance', '/wallet'];
+    const paths = [
+      '/home',
+      '/staking',
+      '/send',
+      '/receive',
+      '/settings',
+      '/governance',
+      '/nft',
+      '/wallet',
+    ];
 
     let menuSelectedKey = locationPath;
     if (!paths.includes(menuSelectedKey)) {
@@ -217,6 +234,9 @@ function HomeLayout(props: HomeLayoutProps) {
         </Menu.Item>
         <Menu.Item key="/governance" icon={<BankOutlined />}>
           <Link to="/governance">Governance</Link>
+        </Menu.Item>
+        <Menu.Item key="/nft" icon={<Icon component={IconNft} />}>
+          <Link to="/nft">My NFT</Link>
         </Menu.Item>
         <Menu.Item key="/settings" icon={<SettingOutlined />}>
           <Link to="/settings">Settings</Link>

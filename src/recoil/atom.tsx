@@ -3,7 +3,7 @@ import { DefaultWalletConfigs } from '../config/StaticConfig';
 import { Session } from '../models/Session';
 import { Wallet } from '../models/Wallet';
 import { UserAsset, AssetMarketPrice } from '../models/UserAsset';
-import { ValidatorModel } from '../models/Transaction';
+import { ValidatorModel, NftModel } from '../models/Transaction';
 import { NORMAL_WALLET_TYPE } from '../service/LedgerService';
 
 const wallet = new Wallet(
@@ -72,6 +72,11 @@ const validatorListState = atom<ValidatorModel[] | null>({
   default: null,
 });
 
+const nftListState = atom<NftModel[] | undefined>({
+  key: 'nftList',
+  default: undefined,
+});
+
 const hasShownWarningOnWalletTypeState = atom<boolean>({
   key: 'hasShownWarningOnWalletTypeState',
   default: false,
@@ -95,6 +100,7 @@ export {
   walletListState,
   walletTempBackupState,
   validatorListState,
+  nftListState,
   hasShownWarningOnWalletTypeState,
   ledgerIsExpertModeState,
   fetchingDBState,

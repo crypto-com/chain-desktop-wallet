@@ -660,6 +660,7 @@ class WalletService {
   public async fetchAndSaveNFTs(currentSession: Session) {
     try {
       const nfts = await this.loadAllCurrentAccountNFTs();
+
       await this.storageService.saveNFTs({
         walletId: currentSession.wallet.identifier,
         nfts,
@@ -929,7 +930,8 @@ class WalletService {
         return Promise.resolve([]);
       }
       const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-      return chainIndexAPI.getAccountNFTList(currentSession.wallet.address);
+      const nftList = await chainIndexAPI.getAccountNFTList(currentSession.wallet.address);
+      return await chainIndexAPI.getNftListMarketplaceData(nftList);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING NFTs', e);
@@ -961,7 +963,6 @@ class WalletService {
         currentSession.wallet.identifier,
         nftQuery,
       );
-
       if (!localTransferHistory) {
         return [];
       }
