@@ -96,3 +96,35 @@ export interface NftTransactionListResponse {
   result: NftTransactionResponse[];
   pagination: NftPagination;
 }
+
+/// NFT account transactions data
+
+export interface NFTAccountTransactionData {
+  msgIndex: number;
+  recipient: string;
+  txHash: string;
+  uuid: string;
+  height: number;
+  sender: string;
+  denomId: string;
+  msgName: string;
+  tokenId: string;
+  version: number;
+  name: string;
+}
+
+export interface NFTAccountTransactionResponse {
+  account: string;
+  blockHeight: number;
+  blockHash: string;
+  blockTime: string;
+  transactionHash: string;
+  success: boolean;
+  messageIndex: number;
+  messageType: string;
+  data: NFTAccountTransactionData;
+}
+
+export interface NFTAccountTransactionListResponse {
+  result: NFTAccountTransactionResponse[];
+}

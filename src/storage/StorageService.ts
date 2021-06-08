@@ -13,6 +13,7 @@ import {
   UserAsset,
 } from '../models/UserAsset';
 import {
+  NFTAccountTransactionList,
   NFTList,
   NFTQueryParams,
   NFTTransactionHistory,
@@ -287,6 +288,23 @@ export class StorageService {
 
   public async retrieveAllTransferTransactions(walletId: string) {
     return this.db.transferStore.findOne<TransferTransactionList>({ walletId });
+  }
+
+  public async saveNFTAccountTransactions(nftAccountTransactionList: NFTAccountTransactionList) {
+    if (nftAccountTransactionList.transactions.length === 0) {
+      return Promise.resolve();
+    }
+    await this.db.nftAccountTxStore.remove(
+      { walletId: nftAccountTransactionList.walletId },
+      { multi: true },
+    );
+    return this.db.nftAccountTxStore.insert<NFTAccountTransactionList>(nftAccountTransactionList);
+  }
+
+  public async retrieveAllNFTAccountTransactions(
+    walletId: string,
+  ): Promise<NFTAccountTransactionList> {
+    return this.db.nftAccountTxStore.findOne<NFTAccountTransactionList>({ walletId });
   }
 
   public async saveValidators(validatorList: ValidatorList) {

@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import {
+  NFTAccountTransactionListResponse,
   NftListResponse,
   NftResponse,
   NftTransactionListResponse,
@@ -192,6 +193,23 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING_TRANSFERS', { data, baseAssetSymbol, address });
       return [];
+    }
+  }
+
+  public async fetchAllAccountNFTsTransactions(
+    address: string,
+  ): Promise<NFTAccountTransactionListResponse> {
+    try {
+      const nftTxsListResponse = await this.axiosClient.get<NFTAccountTransactionListResponse>(
+        `accounts/${address}/messages?order=height.desc&filter.msgType=MsgTransferNFT,MsgMintNFT,MsgIssueDenom`,
+      );
+      return nftTxsListResponse.data;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING_NFT_ACCOUNT_TXs', e);
+      return {
+        result: [],
+      };
     }
   }
 }

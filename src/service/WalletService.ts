@@ -36,6 +36,7 @@ import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
+  NFTAccountTransactionModel,
   NftModel,
   NFTQueryParams,
   NftTransferModel,
@@ -550,6 +551,7 @@ class WalletService {
       this.fetchAndSaveRewards(nodeRpc, currentSession),
       this.fetchAndSaveTransfers(currentSession),
       this.fetchAndSaveValidators(currentSession),
+      this.fetchAndSaveNFTAccountTxs(currentSession),
     ]);
   }
 
@@ -569,6 +571,35 @@ class WalletService {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_TRANSFERS', e);
     }
+  }
+
+  public async fetchAndSaveNFTAccountTxs(currentSession: Session) {
+    try {
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      const nftAccountTransactionList = await chainIndexAPI.fetchAllAccountNFTsTransactions(
+        currentSession.wallet.address,
+      );
+
+      await this.storageService.saveNFTAccountTransactions({
+        transactions: nftAccountTransactionList.result,
+        walletId: currentSession.wallet.identifier,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_SAVE_NFT_ACCOUNT_TXs', e);
+    }
+  }
+
+  public async getAllNFTAccountTxs(
+    currentSession: Session,
+  ): Promise<Array<NFTAccountTransactionModel>> {
+    const nftAccountTxs = await this.storageService.retrieveAllNFTAccountTransactions(
+      currentSession.wallet.identifier,
+    );
+    if (!nftAccountTxs) {
+      return [];
+    }
+    return nftAccountTxs.transactions;
   }
 
   public async fetchAndSaveRewards(nodeRpc: NodeRpcService, currentSession: Session) {
