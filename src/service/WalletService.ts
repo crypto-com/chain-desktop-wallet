@@ -323,13 +323,15 @@ class WalletService {
       ledgerTransactionSigner,
     } = await this.prepareTransaction();
 
+    const memo = !nftTransferRequest.memo ? DEFAULT_CLIENT_MEMO : nftTransferRequest.memo;
+
     const nftTransferUnsigned: NFTTransferUnsigned = {
       tokenId: nftTransferRequest.tokenId,
       denomId: nftTransferRequest.denomId,
       sender: nftTransferRequest.sender,
       recipient: nftTransferRequest.recipient,
 
-      memo: nftTransferRequest.memo,
+      memo,
       accountNumber,
       accountSequence,
     };
