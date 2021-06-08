@@ -555,11 +555,6 @@ function HomePage() {
     },
   ];
 
-  // const nftViewOptions = [
-  //   { label: <MenuOutlined />, value: 'list' },
-  //   { label: <AppstoreOutlined />, value: 'grid' },
-  // ];
-
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">
@@ -604,17 +599,6 @@ function HomePage() {
         <Tabs defaultActiveKey="1">
           <TabPane tab="My NFT" key="1">
             <div className="site-layout-background nft-container">
-              {/* <div className="view-selection">
-              <Radio.Group
-                options={nftViewOptions}
-                defaultValue="grid"
-                onChange={(e) => {
-                  setNftView(e.target.value)
-                }}
-                // value={value4}
-                optionType="button"
-              />
-          </div> */}
               <List
                 grid={{
                   gutter: 16,
@@ -633,14 +617,14 @@ function HomePage() {
                       cover={
                         <img
                           alt={item?.denomName}
-                          src={item?.tokenData.image ? item?.tokenData.image : nftThumbnail}
+                          src={
+                            item?.isMintedByCDC && item?.tokenData.image
+                              ? item?.tokenData.image
+                              : nftThumbnail
+                          }
                         />
                       }
                       hoverable
-                      // onClick={() => {
-                      // setNft(item);
-                      // setIsNftVisible(true);
-                      // }}
                       className="nft"
                     >
                       <Meta
@@ -676,9 +660,9 @@ function HomePage() {
           <TabPane tab="Delegations" key="2">
             <Table columns={StakingColumns} dataSource={delegations} />
           </TabPane>
-          <TabPane tab="NFT Transactions" key="3">
+          {/* <TabPane tab="NFT Transactions" key="3">
             <Table columns={StakingColumns} dataSource={delegations} />
-          </TabPane>
+          </TabPane> */}
         </Tabs>
         <div>
           <ModalPopup
