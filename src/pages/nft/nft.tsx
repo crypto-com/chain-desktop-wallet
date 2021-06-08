@@ -7,7 +7,6 @@ import Icon, { MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import ReactPlayer from 'react-player';
 import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
-// import axios from 'axios';
 import {
   sessionState,
   nftListState,
@@ -16,27 +15,15 @@ import {
   ledgerIsExpertModeState,
 } from '../../recoil/atom';
 
-import {
-  NftModel,
-  // ProposalModel,
-  // VoteOption,
-  BroadCastResult,
-} from '../../models/Transaction';
-// import { walletService } from '../../service/WalletService';
-// import { secretStoreService } from '../../storage/SecretStoreService';
+import { NftModel, BroadCastResult } from '../../models/Transaction';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { walletService } from '../../service/WalletService';
-// import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
-// import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
-// import { ellipsis } from '../../utils/utils';
 import { middleEllipsis, isJson } from '../../utils/utils';
 import IconPlayer from '../../svg/IconPlayer';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
-// import nftThumbnail from '../../assets/nft1.jpg';
-// import nftThumbnail from '../../assets/original.jpeg';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
@@ -65,9 +52,6 @@ const NftPage = () => {
   const currentSession = useRecoilValue(sessionState);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
-  // const [voteOption, setVoteOption] = useState<VoteOption>(VoteOption.VOTE_OPTION_ABSTAIN);
-  // const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
-  // const [isModalVisible, setIsModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
@@ -79,28 +63,18 @@ const NftPage = () => {
   const [isNftTransferConfirmVisible, setIsNftTransferConfirmVisible] = useState(false);
 
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
-  // const [errorMessages, setErrorMessages] = useState([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | undefined>('');
 
   const [nft, setNft] = useState<any>();
 
-  // const [proposalList, setProposalList] = useState<ProposalModel[]>();
   const nftList = useRecoilValue(nftListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
-
-  // const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
-  // const currentSession = useRecoilValue(sessionState);
-  // const userAsset = useRecoilValue(walletAssetState);
 
   const [processedNftList, setProcessedNftList] = useState<any[]>([]);
   const [nftView, setNftView] = useState('grid');
 
   const analyticsService = new AnalyticsService(currentSession);
-
-  // const handleCancelConfirmationModal = () => {
-  //   setIsVisibleConfirmationModal(false);
-  // };
 
   const closeSuccessModal = () => {
     setIsSuccessModalVisible(false);
@@ -111,73 +85,6 @@ const NftPage = () => {
   const closeErrorModal = () => {
     setIsErrorModalVisible(false);
   };
-
-  // const showConfirmationModal = () => {
-  //   setInputPasswordVisible(false);
-  //   setIsVisibleConfirmationModal(true);
-  // };
-
-  // const showPasswordInput = () => {
-  //   if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-  //     showConfirmationModal();
-  //   } else {
-  //     setInputPasswordVisible(true);
-  //   }
-  // };
-
-  // const onWalletDecryptFinish = async (password: string) => {
-  //   const phraseDecrypted = await secretStoreService.decryptPhrase(
-  //     password,
-  //     currentSession.wallet.identifier,
-  //   );
-  //   setDecryptedPhrase(phraseDecrypted);
-  //   showConfirmationModal();
-  // };
-
-  // const onRadioChange = e => {
-  //   setVoteOption(e.target.value);
-  // };
-
-  // const onVote = async () => {
-  //   showPasswordInput();
-  // };
-
-  // const onConfirm = async () => {
-  //   if (!nft) {
-  //     return;
-  //   }
-
-  //   setConfirmLoading(true);
-  //   try {
-  //     // const proposalID =
-  //     //   nft?.proposal_id !== null && nft?.proposal_id !== undefined
-  //     //     ? nft?.proposal_id
-  //     //     : '';
-  //     // const sendResult = await walletService.sendVote({
-  //     //   voteOption,
-  //     //   proposalID,
-  //     //   memo: DEFAULT_CLIENT_MEMO,
-  //     //   decryptedPhrase,
-  //     //   asset: userAsset,
-  //     //   walletType: currentSession.wallet.walletType,
-  //     // });
-
-  //     // setBroadcastResult(sendResult);
-  //     setIsVisibleConfirmationModal(false);
-  //     setConfirmLoading(false);
-  //     // setInputPasswordVisible(false);
-  //     // setIsSuccessModalVisible(true);
-  //   } catch (e) {
-  //     // setErrorMessages(e.message.split(': '));
-  //     setIsVisibleConfirmationModal(false);
-  //     setConfirmLoading(false);
-  //     // setInputPasswordVisible(false);
-  //     // setIsErrorModalVisible(true);
-  //     // eslint-disable-next-line no-console
-  //     console.log('Error occurred while transfer', e);
-  //   }
-  //   setConfirmLoading(false);
-  // };
 
   const nftViewOptions = [
     { label: <MenuOutlined />, value: 'list' },
@@ -748,37 +655,6 @@ const NftPage = () => {
         successButtonText="Continue"
         confirmPassword={false}
       />
-      {/* <ModalPopup
-        isModalVisible={isConfirmationModalVisible}
-        handleCancel={handleCancelConfirmationModal}
-        handleOk={() => { }}
-        footer={[
-          <Button key="submit" type="primary" loading={confirmLoading} onClick={onConfirm}>
-            Confirm
-          </Button>,
-          <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
-            Cancel
-          </Button>,
-        ]}
-        okText="Confirm"
-      >
-        <>
-          <div className="title">Confirm Vote Transaction</div>
-          <div className="description">Please review the below information. </div>
-          <div className="item">
-            <div className="label">Sender Address</div>
-            <div className="address">{`${currentSession.wallet.address}`}</div>
-          </div>
-          <div className="item">
-            <div className="label">Vote to Proposal</div>
-            <div className="address">{`#${nft?.proposal_id} ${nft?.content.title}`}</div>
-          </div>
-          <div className="item">
-            <div className="label">Vote</div>
-            <div>{processVoteTag(voteOption)}</div>
-          </div>
-        </>
-      </ModalPopup> */}
       <SuccessModalPopup
         isModalVisible={isSuccessModalVisible}
         handleCancel={closeSuccessModal}
