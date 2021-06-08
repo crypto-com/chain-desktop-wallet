@@ -5,7 +5,7 @@ import { LedgerSigner } from '../../src/service/signers/LedgerSigner';
 import { ISignerProvider } from '../../src/service/signers/SignerProvider';
 import { LedgerTransactionSigner } from '../../src/service/signers/LedgerTransactionSigner';
 import {CustomDevNet} from '../../src/config/StaticConfig';
-import { Bytes } from '@crypto-com/chain-jslib/lib/dist/utils/bytes/bytes';
+import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import {NodeRpcService} from "../../src/service/rpc/NodeRpcService";
 const { exec } = require("child_process");
 import chai from "chai";

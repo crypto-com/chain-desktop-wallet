@@ -1,5 +1,5 @@
 import scrypt from 'scrypt-js';
-import { utils } from '@crypto-com/chain-jslib';
+import { utils } from '@crypto-org-chain/chain-jslib';
 import { AES, enc, lib, mode, pad } from 'crypto-js';
 import { EncryptionResult, HashResult, InitialVector } from '../models/SecretStorage';
 

@@ -13,7 +13,7 @@
     "@babel/helper-builder-react-jsx": "^7.10.4",
     "@babel/helper-builder-react-jsx-experimental": "^7.12.11",
     "@cosmjs/stargate": "^0.24.0-alpha.22",
-    "@crypto-com/chain-jslib": "0.0.19",
+    "@crypto-org-chain/chain-jslib": "0.0.21",
     "@ledgerhq/hw-transport-node-hid": "^5.41.0",
     "@ledgerhq/hw-transport-webhid": "^5.38.0",
     "@ledgerhq/hw-transport-webusb": "^5.38.0",
@@ -302,6 +302,8 @@
     "hosted-git-info": "3.0.8",
     "underscore": "1.12.1",
     "trim": "0.0.3",
-    "dns-packet": "5.2.2"
+    "dns-packet": "5.2.2",
+    "css-what": "5.0.1",
+    "trim-newlines": "4.0.1"
   }
 }

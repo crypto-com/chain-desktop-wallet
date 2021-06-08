@@ -226,6 +226,11 @@ function HomePage() {
     setUserAsset(currentAsset);
     setHasShownNotLiveWallet(true);
 
+    const nftAccountTxs = await walletService.getAllNFTAccountTxs(sessionData);
+    // TODO : Logs to be removed
+    // eslint-disable-next-line no-console
+    console.log({ nftAccountTxs });
+
     await walletService.fetchAndSaveNFTs(sessionData);
     setFetchingDB(false);
   };
