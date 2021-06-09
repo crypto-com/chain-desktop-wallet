@@ -692,7 +692,7 @@ function HomePage() {
       title: 'Recipient',
       dataIndex: 'recipientAddress',
       key: 'recipientAddress',
-      render: text => <div data-original={text}>{text ? middleEllipsis(text, 6) : 'n.a.'}</div>,
+      render: text => <div data-original={text}>{text ? middleEllipsis(text, 12) : 'n.a.'}</div>,
     },
     {
       title: 'Time',
