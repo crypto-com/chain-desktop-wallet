@@ -168,6 +168,7 @@ function convertNftTransfers(
   //   return TransactionDirection.INCOMING;
   // }
 
+  // eslint-disable-next-line no-console
   console.log(allTransfers);
   return allTransfers.map(transfer => {
     // const transferAmount = getUIDynamicAmount(transfer.amount, currentAsset);
