@@ -45,7 +45,15 @@ export interface NftTransactionData {
   };
   receiverAddress: string;
   blockTime: string;
-  // status: boolean;
+  status: boolean;
+}
+
+export enum NftTransactionType {
+  ISSUE_DENOM = 'MsgIssueDenom',
+  MINT_NFT = 'MsgMintNFT',
+  EDIT_NFT = 'MsgEditNFT',
+  BURN_NFT = 'MsgBurnNFT',
+  TRANSFER_NFT = 'MsgTransferNFT',
 }
 
 export interface NftAccountTransactionData extends NftAccountTransactionResponse {}
