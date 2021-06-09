@@ -37,9 +37,9 @@ import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
-  NFTAccountTransactionModel,
+  NftAccountTransactionData,
   NftModel,
-  NFTQueryParams,
+  NftQueryParams,
   NftTransferModel,
   ProposalModel,
   ProposalStatuses,
@@ -636,7 +636,7 @@ class WalletService {
 
   public async getAllNFTAccountTxs(
     currentSession: Session,
-  ): Promise<Array<NFTAccountTransactionModel>> {
+  ): Promise<Array<NftAccountTransactionData>> {
     const nftAccountTxs = await this.storageService.retrieveAllNFTAccountTransactions(
       currentSession.wallet.identifier,
     );
@@ -987,7 +987,7 @@ class WalletService {
     }
   }
 
-  public async loadNFTTransferHistory(nftQuery: NFTQueryParams): Promise<NftTransferModel[]> {
+  public async loadNFTTransferHistory(nftQuery: NftQueryParams): Promise<NftTransferModel[]> {
     const currentSession = await this.storageService.retrieveCurrentSession();
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve([]);

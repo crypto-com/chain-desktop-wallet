@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import {
-  NFTAccountTransactionListResponse,
+  NftAccountTransactionListResponse,
   NftListResponse,
   NftResponse,
   NftTransactionListResponse,
@@ -10,7 +10,7 @@ import {
   TransferResult,
 } from './ChainIndexingModels';
 import {
-  NFTQueryParams,
+  NftQueryParams,
   TransactionStatus,
   TransferTransactionData,
   NftModel,
@@ -120,7 +120,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     }
   }
 
-  public async getNFTTransferHistory(nftQuery: NFTQueryParams): Promise<NftTransactionResponse[]> {
+  public async getNFTTransferHistory(nftQuery: NftQueryParams): Promise<NftTransactionResponse[]> {
     let paginationPage = 1;
     const { denomId, tokenId } = nftQuery;
     const nftsTxListRequest = await this.axiosClient.get<NftTransactionListResponse>(
@@ -198,9 +198,9 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   public async fetchAllAccountNFTsTransactions(
     address: string,
-  ): Promise<NFTAccountTransactionListResponse> {
+  ): Promise<NftAccountTransactionListResponse> {
     try {
-      const nftTxsListResponse = await this.axiosClient.get<NFTAccountTransactionListResponse>(
+      const nftTxsListResponse = await this.axiosClient.get<NftAccountTransactionListResponse>(
         `accounts/${address}/messages?order=height.desc&filter.msgType=MsgTransferNFT,MsgMintNFT,MsgIssueDenom`,
       );
       return nftTxsListResponse.data;
