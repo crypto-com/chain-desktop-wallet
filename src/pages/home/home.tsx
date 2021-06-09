@@ -630,7 +630,7 @@ function HomePage() {
           rel="noreferrer"
           href={`${currentSession.wallet.config.explorerUrl}/tx/${text}`}
         >
-          {middleEllipsis(text, 12)}
+          {middleEllipsis(text, 6)}
         </a>
       ),
     },
