@@ -3,7 +3,7 @@ import './nft.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Layout, Card, Tabs, List, Avatar, Radio, Table, Button, Form, Input } from 'antd';
-import Icon, { MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
+import Icon, { MenuOutlined, AppstoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import ReactPlayer from 'react-player';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
@@ -21,7 +21,7 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { walletService } from '../../service/WalletService';
-import { middleEllipsis, isJson } from '../../utils/utils';
+import { ellipsis, middleEllipsis, isJson } from '../../utils/utils';
 import IconPlayer from '../../svg/IconPlayer';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 import { TransactionUtils } from '../../utils/TransactionUtils';
@@ -33,6 +33,7 @@ import {
   AnalyticsService,
   AnalyticsTxType,
 } from '../../service/analytics/AnalyticsService';
+import IconTick from '../../svg/IconTick';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -313,7 +314,11 @@ const NftPage = () => {
                         className="nft"
                       >
                         <Meta
-                          title={item?.tokenData.drop ? item?.tokenData.drop : item?.denomName}
+                          title={
+                            item?.tokenData.drop
+                              ? ellipsis(item?.tokenData.drop, 20)
+                              : ellipsis(item?.denomId, 20)
+                          }
                           description={
                             <>
                               <Avatar
@@ -323,7 +328,8 @@ const NftPage = () => {
                                   verticalAlign: 'middle',
                                 }}
                               />
-                              {middleEllipsis(item?.tokenOwner, 6)}
+                              {middleEllipsis(item?.tokenOwner, 6)}{' '}
+                              {item?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
                             </>
                           }
                         />
@@ -387,7 +393,7 @@ const NftPage = () => {
           <Sider width="50%">
             <>
               <div className="title">
-                {nft?.tokenData.drop ? nft?.tokenData.drop : nft?.denomName}
+                {nft?.tokenData.drop ? nft?.tokenData.drop : nft?.denomId}
               </div>
               <div className="item">
                 <Meta
@@ -401,7 +407,8 @@ const NftPage = () => {
                           verticalAlign: 'middle',
                         }}
                       />
-                      {nft?.tokenOwner}
+                      {nft?.tokenOwner}{' '}
+                      {nft?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
                     </>
                   }
                 />
@@ -523,7 +530,7 @@ const NftPage = () => {
           {isNftTransferConfirmVisible ? (
             <>
               <div className="title">Confirm Transfer</div>
-              <div className="description">Please review the information below</div>
+              <div className="description">Please review the information below.</div>
               <div className="item">
                 <div className="nft-image">
                   {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
@@ -555,10 +562,17 @@ const NftPage = () => {
                 <div className="label">To</div>
                 <div className="address">{`${form.getFieldValue('recipientAddress')}`}</div>
               </div>
-              <div className="item">
-                This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address
-                that is not compatible with the Crypto.org Chain NFT token standard will result in
-                the permanent loss of your asset.
+              <div className="item notice">
+                <Layout>
+                  <Sider width="20px">
+                    <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                  </Sider>
+                  <Content>
+                    This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address
+                    that is not compatible with the Crypto.org Chain NFT token standard will result
+                    in the permanent loss of your asset.
+                  </Content>
+                </Layout>
               </div>
               <div className="item">
                 <div className="label">NFT Name</div>
@@ -572,7 +586,7 @@ const NftPage = () => {
           ) : (
             <>
               <div className="title">Transfer NFT</div>
-              <div className="description">Fill in the information below to transfer your NFT</div>
+              <div className="description">Fill in the information below to transfer your NFT.</div>
               <div className="item">
                 <div className="nft-image">
                   {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
@@ -602,7 +616,9 @@ const NftPage = () => {
               </div>
               <div className="item">
                 <div className="label">Sending</div>
-                <div className="address">{`${nft?.drop}`}</div>
+                <div className="address">
+                  {nft?.tokenData.drop ? nft?.tokenData.drop : nft?.denomId}
+                </div>
               </div>
               <Form
                 {...layout}
@@ -626,10 +642,19 @@ const NftPage = () => {
                 >
                   <Input placeholder="Enter recipient address" />
                 </Form.Item>
-                This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address
-                that is not compatible with the Crypto.org Chain NFT token standard will result in
-                the permanent loss of your asset.
               </Form>
+              <div className="item notice">
+                <Layout>
+                  <Sider width="20px">
+                    <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                  </Sider>
+                  <Content>
+                    This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address
+                    that is not compatible with the Crypto.org Chain NFT token standard will result
+                    in the permanent loss of your asset.
+                  </Content>
+                </Layout>
+              </div>
             </>
           )}
         </>

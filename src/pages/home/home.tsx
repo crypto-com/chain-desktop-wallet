@@ -57,6 +57,7 @@ import { middleEllipsis, isJson } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
+import IconTick from '../../svg/IconTick';
 
 const { Text } = Typography;
 
@@ -643,7 +644,8 @@ function HomePage() {
                                 verticalAlign: 'middle',
                               }}
                             />
-                            {middleEllipsis(item?.tokenOwner, 6)}
+                            {middleEllipsis(item?.tokenOwner, 6)}{' '}
+                            {item?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
                           </>
                         }
                       />
