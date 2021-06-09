@@ -708,6 +708,9 @@ class WalletService {
   public async fetchAndSaveNFTs(currentSession: Session) {
     try {
       const nfts = await this.loadAllCurrentAccountNFTs();
+      if (!nfts) {
+        return;
+      }
 
       await this.storageService.saveNFTs({
         walletId: currentSession.wallet.identifier,
@@ -971,7 +974,7 @@ class WalletService {
     }
   }
 
-  private async loadAllCurrentAccountNFTs(): Promise<NftModel[]> {
+  private async loadAllCurrentAccountNFTs(): Promise<NftModel[] | null> {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
@@ -983,7 +986,7 @@ class WalletService {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING NFTs', e);
-      return [];
+      return null;
     }
   }
 

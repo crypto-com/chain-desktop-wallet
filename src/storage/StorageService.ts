@@ -332,7 +332,7 @@ export class StorageService {
   }
 
   public async saveNFTs(nftList: NftList) {
-    if (!nftList || nftList.nfts.length === 0) {
+    if (!nftList) {
       return Promise.resolve();
     }
     await this.db.nftStore.remove({ walletId: nftList.walletId }, { multi: true });
