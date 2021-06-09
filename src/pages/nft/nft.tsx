@@ -6,7 +6,7 @@ import { Layout, Card, Tabs, List, Avatar, Radio, Table, Button, Form, Input } f
 import Icon, { MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import ReactPlayer from 'react-player';
-import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
+import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import {
   sessionState,
   nftListState,
