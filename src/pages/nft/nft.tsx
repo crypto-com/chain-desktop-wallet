@@ -255,7 +255,7 @@ const NftPage = () => {
     <Layout className="site-layout">
       <Header className="site-layout-background">My NFT</Header>
       <div className="header-description">
-        An overview of your NFT Collection on Crypto.org Chain
+        An overview of your NFT Collection on Crypto.org Chain.
       </div>
       <Content>
         <Tabs defaultActiveKey="1">
