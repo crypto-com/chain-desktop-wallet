@@ -700,7 +700,7 @@ const NftPage = () => {
               The transaction timed out but it will be included in the subsequent blocks
             </div>
           ) : (
-            <div className="description">Your vote was broadcasted successfully!</div>
+            <div className="description">Your NFT transaction was broadcasted successfully!</div>
           )}
         </>
       </SuccessModalPopup>

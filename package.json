@@ -304,6 +304,7 @@
     "trim": "0.0.3",
     "dns-packet": "5.2.2",
     "css-what": "5.0.1",
-    "trim-newlines": "3.0.0"
+    "trim-newlines": "3.0.1",
+    "normalize-url": "5.3.1"
   }
 }
