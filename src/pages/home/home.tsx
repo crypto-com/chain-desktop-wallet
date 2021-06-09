@@ -699,25 +699,6 @@ function HomePage() {
       dataIndex: 'time',
       key: 'time',
     },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (text, record: NftTransferTabularData) => {
-        let statusColor;
-        if (record.status) {
-          statusColor = 'success';
-        } else {
-          statusColor = 'error';
-        }
-
-        return (
-          <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-            {record.status ? 'SUCCESS' : 'FAILED'}
-          </Tag>
-        );
-      },
-    },
   ];
 
   return (
