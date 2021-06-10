@@ -17,6 +17,7 @@ import ReceivePage from './receive/receive';
 import WalletPage from './wallet/wallet';
 import StakingPage from './staking/staking';
 import GovernancePage from './governance/governance';
+import NftPage from './nft/nft';
 import SettingsPage from './settings/settings';
 import SignUpPage from './signup/signup';
 import HomeLayout from '../layouts/home/home';
@@ -106,6 +107,12 @@ function RouteHub() {
       key: 'governance',
       path: '/governance',
       component: <GovernancePage />,
+    },
+    {
+      name: 'Nft Page',
+      key: 'nft',
+      path: '/nft',
+      component: <NftPage />,
     },
     {
       name: 'Settings Page',

@@ -19,6 +19,18 @@ export interface VoteRequest {
   walletType: string; // normal, ledger
 }
 
+export interface NFTTransferRequest {
+  tokenId: string;
+  denomId: string;
+  sender: string;
+  recipient: string;
+
+  memo: string;
+  decryptedPhrase: string;
+  asset: UserAsset;
+  walletType: string; // normal, ledger
+}
+
 export interface DelegationRequest {
   validatorAddress: string;
   amount: string;

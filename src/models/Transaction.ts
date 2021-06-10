@@ -1,4 +1,9 @@
 import { Proposal, ValidatorPubKey } from '../service/rpc/NodeRpcModels';
+import {
+  NftAccountTransactionResponse,
+  NftResponse,
+  NftTransactionResponse,
+} from '../service/rpc/ChainIndexingModels';
 
 export enum TransactionStatus {
   SUCCESS = 'SUCCESS',
@@ -32,6 +37,27 @@ export interface StakingTransactionData extends TransactionData {
   stakedAmount: string;
 }
 
+export interface NftTransactionData {
+  transactionHash: string;
+  data: {
+    denomId: string;
+    tokenId: string;
+  };
+  receiverAddress: string;
+  blockTime: string;
+  status: boolean;
+}
+
+export enum NftTransactionType {
+  ISSUE_DENOM = 'MsgIssueDenom',
+  MINT_NFT = 'MsgMintNFT',
+  EDIT_NFT = 'MsgEditNFT',
+  BURN_NFT = 'MsgBurnNFT',
+  TRANSFER_NFT = 'MsgTransferNFT',
+}
+
+export interface NftAccountTransactionData extends NftAccountTransactionResponse {}
+
 export interface StakingTransactionList {
   transactions: Array<StakingTransactionData>;
   totalBalance: string;
@@ -46,6 +72,22 @@ export interface RewardTransactionList {
 export interface TransferTransactionList {
   transactions: Array<TransferTransactionData>;
   walletId: string;
+}
+
+export interface NftList {
+  nfts: Array<NftModel>;
+  walletId: string;
+}
+
+export interface NftQueryParams {
+  tokenId: string;
+  denomId: string;
+}
+
+export interface NftTransactionHistory {
+  transfers: Array<NftTransferModel>;
+  walletId: string;
+  nftQuery: NftQueryParams;
 }
 
 export interface ValidatorList {
@@ -85,6 +127,17 @@ export interface ValidatorModel {
 }
 
 export interface ProposalModel extends Proposal {}
+export interface NftModel extends NftResponse {
+  isMintedByCDC: boolean;
+  marketplaceLink: string;
+}
+export interface NftTransferModel extends NftTransactionResponse {}
+// export interface NFTAccountTransactionModel extends NFTAccountTransactionResponse {}
+
+export interface NftAccountTransactionList {
+  transactions: Array<NftAccountTransactionData>;
+  walletId: string;
+}
 
 export const ProposalStatuses = {
   PROPOSAL_STATUS_UNSPECIFIED: 'PROPOSAL_STATUS_UNSPECIFIED',
