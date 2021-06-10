@@ -13,8 +13,8 @@ All notable changes to this project will be documented in this file.
 - Added support for croeseid testnet version 3
 - Add a new NFT UI tab and NFT section on the home screen 
 - Load, persist in the DB, and show to the UI all current accounts NFTs
+- Add support to send and receive NFTs: Sign and broadcast NFT transactions
 - Add capability to load the previous account NFT related transaction history: Send, Receive, Mint, Issue, etc, ...
-- Add capability to send and receive NFTs: Sign and broadcast NFT transactions
 
 ## [v0.2.2] - 2021-05-24
 
