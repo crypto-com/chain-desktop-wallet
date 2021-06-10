@@ -121,6 +121,7 @@ const NftPage = () => {
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
     setIsNftTransferConfirmVisible(true);
+    setIsNftTransferModalVisible(true);
     setFormValues({
       ...form.getFieldsValue(true),
       // Replace scientific notation to plain string values
@@ -135,6 +136,7 @@ const NftPage = () => {
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
+      setIsNftTransferModalVisible(false);
     }
   };
 
@@ -458,7 +460,10 @@ const NftPage = () => {
                 <Button
                   key="submit"
                   type="primary"
-                  onClick={() => setIsNftTransferModalVisible(true)}
+                  onClick={() => {
+                    setIsNftTransferModalVisible(true);
+                    setIsNftModalVisible(false);
+                  }}
                 >
                   Transfer NFT
                 </Button>
@@ -486,6 +491,7 @@ const NftPage = () => {
         handleCancel={() => {
           setIsNftTransferModalVisible(false);
           setIsNftTransferConfirmVisible(false);
+          setIsNftModalVisible(true);
           form.resetFields();
         }}
         handleOk={() => {}}
@@ -519,6 +525,7 @@ const NftPage = () => {
                 setIsNftTransferConfirmVisible(false);
               } else {
                 setIsNftTransferModalVisible(false);
+                setIsNftModalVisible(true);
                 form.resetFields();
               }
             }}
@@ -669,6 +676,7 @@ const NftPage = () => {
         okButtonText="Decrypt wallet"
         onCancel={() => {
           setInputPasswordVisible(false);
+          setIsNftTransferModalVisible(true);
         }}
         onSuccess={onWalletDecryptFinish}
         onValidatePassword={async (password: string) => {
