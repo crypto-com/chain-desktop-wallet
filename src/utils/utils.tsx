@@ -54,3 +54,7 @@ export function splitToChunks(arr: any[], len: number) {
   }
   return arrays;
 }
+
+export function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

@@ -176,19 +176,23 @@ const NftPage = () => {
         AnalyticsCategory.Transfer,
       );
 
+      const latestLoadedNFTs = await walletService.retrieveNFTs(currentSession.wallet.identifier);
+      setNftList(latestLoadedNFTs);
+      const processedNFTsLists = processNftList(latestLoadedNFTs);
+      setProcessedNftList(processedNFTsLists);
+
       setBroadcastResult(sendResult);
 
       setIsNftModalVisible(false);
       setIsNftTransferModalVisible(false);
       setIsNftTransferConfirmVisible(false);
       setConfirmLoading(false);
+
       setIsSuccessModalVisible(true);
       setInputPasswordVisible(false);
 
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setWalletAsset(currentWalletAsset);
-      const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
-      setNftList(currentNftList);
 
       form.resetFields();
     } catch (e) {

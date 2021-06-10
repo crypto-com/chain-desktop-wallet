@@ -65,6 +65,7 @@ import {
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
+import { sleep } from '../utils/utils';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -351,7 +352,13 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.fetchAndSaveNFTs(currentSession);
+
+    // It takes a few seconds for the indexing service to sync latest NFT state
+    await sleep(5_000);
+    await Promise.all([
+      this.fetchAndSaveNFTs(currentSession),
+      this.fetchAndSaveNFTAccountTxs(currentSession),
+    ]);
     return broadCastResult;
   }
 
