@@ -16,7 +16,7 @@ import {
   Avatar,
 } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
 
 import {
@@ -205,7 +205,7 @@ function HomePage() {
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
-  const nftList = useRecoilValue(nftListState);
+  const setNFTList = useSetRecoilState(nftListState);
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
@@ -479,12 +479,15 @@ function HomePage() {
         sessionData,
       );
 
+      const allNFTs: NftModel[] = await walletService.retrieveNFTs(sessionData.wallet.identifier);
+      const currentNftList = processNftList(allNFTs);
+      setProcessedNftList(currentNftList);
+      setNFTList(allNFTs);
+
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
       const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
       const nftTransferTabularData = convertNftTransfers(allNftTransfer);
 
-      const currentNftList = processNftList(nftList);
-      setProcessedNftList(currentNftList);
       showWalletStateNotification(currentSession.wallet.config);
       setDelegations(stakingTabularData);
       setTransfers(transferTabularData);

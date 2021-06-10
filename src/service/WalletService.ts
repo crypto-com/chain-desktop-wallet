@@ -409,7 +409,10 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncAll(currentSession);
+    await Promise.all([
+      await this.fetchAndSaveRewards(nodeRpc, currentSession),
+      await this.fetchAndUpdateBalances(currentSession),
+    ]);
     return broadCastResult;
   }
 
@@ -709,6 +712,8 @@ class WalletService {
   public async fetchAndSaveNFTs(currentSession: Session) {
     try {
       const nfts = await this.loadAllCurrentAccountNFTs();
+      // eslint-disable-next-line no-console
+      console.log('Loaded NFTs', { nfts });
       if (!nfts) {
         return;
       }
