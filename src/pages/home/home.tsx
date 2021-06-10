@@ -18,13 +18,7 @@ import {
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import numeral from 'numeral';
-import {
-  scaledBalance,
-  scaledStakingBalance,
-  getAssetBalancePrice,
-  getAssetStakingBalancePrice,
-  UserAsset,
-} from '../../models/UserAsset';
+
 import {
   hasShownWarningOnWalletTypeState,
   sessionState,
@@ -34,7 +28,17 @@ import {
   ledgerIsExpertModeState,
   fetchingDBState,
 } from '../../recoil/atom';
-import { walletService } from '../../service/WalletService';
+import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
+import { getUIDynamicAmount } from '../../utils/NumberUtils';
+import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
+import {
+  scaledBalance,
+  scaledStakingBalance,
+  getAssetBalancePrice,
+  getAssetStakingBalancePrice,
+  UserAsset,
+} from '../../models/UserAsset';
+import { Session } from '../../models/Session';
 import {
   BroadCastResult,
   NftModel,
@@ -45,21 +49,21 @@ import {
   NftAccountTransactionData,
   NftTransactionType,
 } from '../../models/Transaction';
-import { Session } from '../../models/Session';
-import ModalPopup from '../../components/ModalPopup/ModalPopup';
-import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { secretStoreService } from '../../storage/SecretStoreService';
-import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
-import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
-import { UndelegateFormComponent } from './components/UndelegateFormComponent';
-import RedelegateFormComponent from './components/RedelegateFormComponent';
-import { getUIDynamicAmount } from '../../utils/NumberUtils';
-import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
+
+import { walletService } from '../../service/WalletService';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
-import nftThumbnail from '../../assets/nft-thumbnail.png';
+import { secretStoreService } from '../../storage/SecretStoreService';
+
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import { UndelegateFormComponent } from './components/UndelegateFormComponent';
+import RedelegateFormComponent from './components/RedelegateFormComponent';
+
 import IconTick from '../../svg/IconTick';
+import nftThumbnail from '../../assets/nft-thumbnail.png';
 
 const { Text } = Typography;
 
@@ -99,9 +103,7 @@ interface NftTransferTabularData {
   denomId: string;
   tokenId: string;
   recipientAddress: string;
-  // amount: string;
   time: string;
-  // direction: TransactionDirection;
   status: TransactionStatus;
 }
 
@@ -210,7 +212,6 @@ function HomePage() {
   const didMountRef = useRef(false);
 
   const [processedNftList, setProcessedNftList] = useState<any[]>([]);
-  // const [nftView, setNftView] = useState('grid');
 
   // Undelegate action related states changes
   const [form] = Form.useForm();
@@ -246,6 +247,157 @@ function HomePage() {
   const [delegationActionType, setDelegationActionType] = useState<StakingActionType>();
 
   const analyticsService = new AnalyticsService(currentSession);
+
+  const TransactionColumns = [
+    {
+      title: 'Transaction Hash',
+      dataIndex: 'transactionHash',
+      key: 'transactionHash',
+      render: text => (
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/tx/${text}`}
+        >
+          {middleEllipsis(text, 12)}
+        </a>
+      ),
+    },
+    {
+      title: 'Amount',
+      dataIndex: 'amount',
+      key: 'amount',
+      render: (text, record: TransferTabularData) => {
+        const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
+        const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+
+        return (
+          <Text type={color}>
+            {sign}
+            {text}
+          </Text>
+        );
+      },
+    },
+    {
+      title: 'Recipient',
+      dataIndex: 'recipientAddress',
+      key: 'recipientAddress',
+      render: text => <div data-original={text}>{middleEllipsis(text, 12)}</div>,
+    },
+    {
+      title: 'Time',
+      dataIndex: 'time',
+      key: 'time',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (text, record: TransferTabularData) => {
+        // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
+        // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+        let statusColor;
+        if (record.status === TransactionStatus.SUCCESS) {
+          statusColor = 'success';
+        } else if (record.status === TransactionStatus.FAILED) {
+          statusColor = 'error';
+        } else {
+          statusColor = 'processing';
+        }
+
+        return (
+          <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+            {record.status.toString()}
+          </Tag>
+        );
+      },
+    },
+  ];
+
+  const NftTransactionColumns = [
+    {
+      title: 'Transaction Hash',
+      dataIndex: 'transactionHash',
+      key: 'transactionHash',
+      render: text => (
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/tx/${text}`}
+        >
+          {middleEllipsis(text, 6)}
+        </a>
+      ),
+    },
+    {
+      title: 'Type',
+      dataIndex: 'messageType',
+      key: 'messageType',
+      render: (text, record: NftTransferTabularData) => {
+        let statusColor;
+        if (record.messageType === NftTransactionType.MINT_NFT) {
+          statusColor = 'success';
+        } else if (record.messageType === NftTransactionType.TRANSFER_NFT) {
+          statusColor = 'processing';
+        } else {
+          statusColor = 'default';
+        }
+
+        switch (record.messageType) {
+          case NftTransactionType.MINT_NFT:
+            return (
+              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+                Mint NFT
+              </Tag>
+            );
+          case NftTransactionType.TRANSFER_NFT:
+            return (
+              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+                Transfer NFT
+              </Tag>
+            );
+          case NftTransactionType.ISSUE_DENOM:
+            return (
+              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+                Issue Denom
+              </Tag>
+            );
+          default:
+            return (
+              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+                {record.messageType}
+              </Tag>
+            );
+        }
+      },
+    },
+    {
+      title: 'NFT Name',
+      dataIndex: 'denomId',
+      key: 'denomId',
+      render: text => <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>,
+    },
+    {
+      title: 'NFT ID',
+      dataIndex: 'tokenId',
+      key: 'tokenId',
+      render: text => <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>,
+    },
+    {
+      title: 'Recipient',
+      dataIndex: 'recipientAddress',
+      key: 'recipientAddress',
+      render: text => <div data-original={text}>{text ? middleEllipsis(text, 12) : 'n.a.'}</div>,
+    },
+    {
+      title: 'Time',
+      dataIndex: 'time',
+      key: 'time',
+    },
+  ];
 
   const showWalletStateNotification = (config: WalletConfig) => {
     setTimeout(async () => {
@@ -348,74 +500,6 @@ function HomePage() {
       analyticsService.logPage('Home');
     }
   }, [fetchingDB]);
-
-  const TransactionColumns = [
-    {
-      title: 'Transaction Hash',
-      dataIndex: 'transactionHash',
-      key: 'transactionHash',
-      render: text => (
-        <a
-          data-original={text}
-          target="_blank"
-          rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/tx/${text}`}
-        >
-          {middleEllipsis(text, 12)}
-        </a>
-      ),
-    },
-    {
-      title: 'Amount',
-      dataIndex: 'amount',
-      key: 'amount',
-      render: (text, record: TransferTabularData) => {
-        const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
-        const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
-
-        return (
-          <Text type={color}>
-            {sign}
-            {text}
-          </Text>
-        );
-      },
-    },
-    {
-      title: 'Recipient',
-      dataIndex: 'recipientAddress',
-      key: 'recipientAddress',
-      render: text => <div data-original={text}>{middleEllipsis(text, 12)}</div>,
-    },
-    {
-      title: 'Time',
-      dataIndex: 'time',
-      key: 'time',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (text, record: TransferTabularData) => {
-        // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
-        // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
-        let statusColor;
-        if (record.status === TransactionStatus.SUCCESS) {
-          statusColor = 'success';
-        } else if (record.status === TransactionStatus.FAILED) {
-          statusColor = 'error';
-        } else {
-          statusColor = 'processing';
-        }
-
-        return (
-          <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-            {record.status.toString()}
-          </Tag>
-        );
-      },
-    },
-  ];
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -615,89 +699,6 @@ function HomePage() {
           </a>
         );
       },
-    },
-  ];
-
-  const NftTransactionColumns = [
-    {
-      title: 'Transaction Hash',
-      dataIndex: 'transactionHash',
-      key: 'transactionHash',
-      render: text => (
-        <a
-          data-original={text}
-          target="_blank"
-          rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/tx/${text}`}
-        >
-          {middleEllipsis(text, 6)}
-        </a>
-      ),
-    },
-    {
-      title: 'Type',
-      dataIndex: 'messageType',
-      key: 'messageType',
-      render: (text, record: NftTransferTabularData) => {
-        let statusColor;
-        if (record.messageType === NftTransactionType.MINT_NFT) {
-          statusColor = 'success';
-        } else if (record.messageType === NftTransactionType.TRANSFER_NFT) {
-          statusColor = 'processing';
-        } else {
-          statusColor = 'default';
-        }
-
-        switch (record.messageType) {
-          case NftTransactionType.MINT_NFT:
-            return (
-              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-                Mint NFT
-              </Tag>
-            );
-          case NftTransactionType.TRANSFER_NFT:
-            return (
-              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-                Transfer NFT
-              </Tag>
-            );
-          case NftTransactionType.ISSUE_DENOM:
-            return (
-              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-                Issue Denom
-              </Tag>
-            );
-          default:
-            return (
-              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-                {record.messageType}
-              </Tag>
-            );
-        }
-      },
-    },
-    {
-      title: 'NFT Name',
-      dataIndex: 'denomId',
-      key: 'denomId',
-      render: text => <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>,
-    },
-    {
-      title: 'NFT ID',
-      dataIndex: 'tokenId',
-      key: 'tokenId',
-      render: text => <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>,
-    },
-    {
-      title: 'Recipient',
-      dataIndex: 'recipientAddress',
-      key: 'recipientAddress',
-      render: text => <div data-original={text}>{text ? middleEllipsis(text, 12) : 'n.a.'}</div>,
-    },
-    {
-      title: 'Time',
-      dataIndex: 'time',
-      key: 'time',
     },
   ];
 

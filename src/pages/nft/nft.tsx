@@ -7,6 +7,7 @@ import Icon, { MenuOutlined, AppstoreOutlined, ExclamationCircleOutlined } from 
 import { useRecoilValue, useRecoilState } from 'recoil';
 import ReactPlayer from 'react-player';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
+
 import {
   sessionState,
   nftListState,
@@ -14,17 +15,11 @@ import {
   walletAssetState,
   ledgerIsExpertModeState,
 } from '../../recoil/atom';
-
-import { NftModel, BroadCastResult } from '../../models/Transaction';
-import ModalPopup from '../../components/ModalPopup/ModalPopup';
-import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
-import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { walletService } from '../../service/WalletService';
 import { ellipsis, middleEllipsis, isJson } from '../../utils/utils';
-import IconPlayer from '../../svg/IconPlayer';
-import nftThumbnail from '../../assets/nft-thumbnail.png';
+import { NftModel, BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
+
+import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import {
@@ -33,7 +28,15 @@ import {
   AnalyticsService,
   AnalyticsTxType,
 } from '../../service/analytics/AnalyticsService';
+
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+
 import IconTick from '../../svg/IconTick';
+import IconPlayer from '../../svg/IconPlayer';
+import nftThumbnail from '../../assets/nft-thumbnail.png';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -53,29 +56,32 @@ const NftPage = () => {
   const currentSession = useRecoilValue(sessionState);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
+  const [nftList, setNftList] = useRecoilState(nftListState);
+  const fetchingDB = useRecoilValue(fetchingDBState);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
+  const [errorMessages, setErrorMessages] = useState([]);
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
+
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
-  const [errorMessages, setErrorMessages] = useState([]);
   const [isNftModalVisible, setIsNftModalVisible] = useState(false);
   const [isNftTransferModalVisible, setIsNftTransferModalVisible] = useState(false);
   const [isNftTransferConfirmVisible, setIsNftTransferConfirmVisible] = useState(false);
 
-  const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [nft, setNft] = useState<any>();
+  const [nftView, setNftView] = useState('grid');
+  const [processedNftList, setProcessedNftList] = useState<any[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | undefined>('');
 
-  const [nft, setNft] = useState<any>();
-
-  const [nftList, setNftList] = useRecoilState(nftListState);
-  const fetchingDB = useRecoilValue(fetchingDBState);
-
-  const [processedNftList, setProcessedNftList] = useState<any[]>([]);
-  const [nftView, setNftView] = useState('grid');
-
   const analyticsService = new AnalyticsService(currentSession);
+
+  const nftViewOptions = [
+    { label: <MenuOutlined />, value: 'list' },
+    { label: <AppstoreOutlined />, value: 'grid' },
+  ];
 
   const closeSuccessModal = () => {
     setIsSuccessModalVisible(false);
@@ -86,11 +92,6 @@ const NftPage = () => {
   const closeErrorModal = () => {
     setIsErrorModalVisible(false);
   };
-
-  const nftViewOptions = [
-    { label: <MenuOutlined />, value: 'list' },
-    { label: <AppstoreOutlined />, value: 'grid' },
-  ];
 
   const processNftList = (currentList: NftModel[] | undefined) => {
     if (currentList) {
