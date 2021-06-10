@@ -338,7 +338,9 @@ function HomePage() {
       key: 'messageType',
       render: (text, record: NftTransferTabularData) => {
         let statusColor;
-        if (record.messageType === NftTransactionType.MINT_NFT) {
+        if (!record.status) {
+          statusColor = 'error';
+        } else if (record.messageType === NftTransactionType.MINT_NFT) {
           statusColor = 'success';
         } else if (record.messageType === NftTransactionType.TRANSFER_NFT) {
           statusColor = 'processing';
@@ -346,31 +348,61 @@ function HomePage() {
           statusColor = 'default';
         }
 
-        switch (record.messageType) {
-          case NftTransactionType.MINT_NFT:
+        if (record.status) {
+          if (record.messageType === NftTransactionType.MINT_NFT) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
                 Mint NFT
               </Tag>
             );
-          case NftTransactionType.TRANSFER_NFT:
+            // eslint-disable-next-line no-else-return
+          } else if (record.messageType === NftTransactionType.TRANSFER_NFT) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-                Transfer NFT
+                {record.recipientAddress === currentSession.wallet.address
+                  ? 'Receive NFT'
+                  : 'Sent NFT'}
               </Tag>
             );
-          case NftTransactionType.ISSUE_DENOM:
+          } else if (record.messageType === NftTransactionType.ISSUE_DENOM) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
                 Issue Denom
               </Tag>
             );
-          default:
+          }
+          return (
+            <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+              {record.messageType}
+            </Tag>
+          );
+          // eslint-disable-next-line no-else-return
+        } else {
+          if (record.messageType === NftTransactionType.MINT_NFT) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-                {record.messageType}
+                Failed Mint
               </Tag>
             );
+            // eslint-disable-next-line no-else-return
+          } else if (record.messageType === NftTransactionType.TRANSFER_NFT) {
+            return (
+              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+                Failed Transfer
+              </Tag>
+            );
+          } else if (record.messageType === NftTransactionType.ISSUE_DENOM) {
+            return (
+              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+                Failed Issue
+              </Tag>
+            );
+          }
+          return (
+            <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+              Failed {record.messageType}
+            </Tag>
+          );
         }
       },
     },
