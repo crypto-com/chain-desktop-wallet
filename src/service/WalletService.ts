@@ -370,6 +370,7 @@ class WalletService {
     await Promise.all([
       this.syncBalancesData(currentSession),
       this.syncTransactionsData(currentSession),
+      this.fetchAndSaveNFTs(currentSession),
     ]);
   }
 
