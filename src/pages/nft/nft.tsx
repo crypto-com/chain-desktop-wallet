@@ -69,7 +69,7 @@ const NftPage = () => {
 
   const [nft, setNft] = useState<any>();
 
-  const nftList = useRecoilValue(nftListState);
+  const [nftList, setNftList] = useRecoilState(nftListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
 
   const [processedNftList, setProcessedNftList] = useState<any[]>([]);
@@ -181,8 +181,11 @@ const NftPage = () => {
       setConfirmLoading(false);
       setIsSuccessModalVisible(true);
       setInputPasswordVisible(false);
+
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setWalletAsset(currentWalletAsset);
+      const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
+      setNftList(currentNftList);
 
       form.resetFields();
     } catch (e) {

@@ -161,14 +161,14 @@ function convertNftTransfers(allTransfers: NftAccountTransactionData[]) {
     return TransactionStatus.FAILED;
   }
   function getType(transfer: NftAccountTransactionData) {
-    if (transfer.messageType === 'MsgIssueDenom') {
+    if (transfer.messageType === NftTransactionType.ISSUE_DENOM) {
       return NftTransactionType.ISSUE_DENOM;
       // eslint-disable-next-line no-else-return
-    } else if (transfer.messageType === 'MsgMintNFT') {
+    } else if (transfer.messageType === NftTransactionType.MINT_NFT) {
       return NftTransactionType.MINT_NFT;
-    } else if (transfer.messageType === 'MsgEditNFT') {
+    } else if (transfer.messageType === NftTransactionType.EDIT_NFT) {
       return NftTransactionType.EDIT_NFT;
-    } else if (transfer.messageType === 'MsgBurnNFT') {
+    } else if (transfer.messageType === NftTransactionType.BURN_NFT) {
       return NftTransactionType.BURN_NFT;
     }
     return NftTransactionType.TRANSFER_NFT;
