@@ -6,11 +6,15 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
-## [v0.2.3] - 2021-06-03
+## [v0.2.3] - 2021-06-11
 
 ### Additions
 - Implemented search for the wallet list view
 - Added support for croeseid testnet version 3
+- Add a new NFT UI tab and NFT section on the home screen 
+- Load, persist in the DB, and show to the UI all current accounts NFTs
+- Add capability to load the previous account NFT related transaction history: Send, Receive, Mint, Issue, etc, ...
+- Add capability to send and receive NFTs: Sign and broadcast NFT transactions
 
 ## [v0.2.2] - 2021-05-24
 
