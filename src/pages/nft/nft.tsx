@@ -2,153 +2,96 @@ import React, { useState, useEffect } from 'react';
 import './nft.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Layout, Card, Tabs, List, Avatar, Radio, Table } from 'antd';
-import Icon, { MenuOutlined, AppstoreOutlined } from '@ant-design/icons';
-import { useRecoilValue } from 'recoil';
+import { Layout, Card, Tabs, List, Avatar, Radio, Table, Button, Form, Input } from 'antd';
+import Icon, { MenuOutlined, AppstoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import ReactPlayer from 'react-player';
-// import axios from 'axios';
-import {
-  // sessionState,
-  nftListState,
-  fetchingDBState,
-  // walletAssetState
-} from '../../recoil/atom';
+import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 
 import {
-  NftModel,
-  // ProposalModel,
-  // VoteOption,
-  // BroadCastResult,
-} from '../../models/Transaction';
-// import { walletService } from '../../service/WalletService';
-// import { secretStoreService } from '../../storage/SecretStoreService';
+  sessionState,
+  nftListState,
+  fetchingDBState,
+  walletAssetState,
+  ledgerIsExpertModeState,
+} from '../../recoil/atom';
+import { ellipsis, middleEllipsis, isJson } from '../../utils/utils';
+import { NftModel, BroadCastResult } from '../../models/Transaction';
+import { TransactionUtils } from '../../utils/TransactionUtils';
+
+import { walletService } from '../../service/WalletService';
+import { secretStoreService } from '../../storage/SecretStoreService';
+import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import {
+  AnalyticsActions,
+  AnalyticsCategory,
+  AnalyticsService,
+  AnalyticsTxType,
+} from '../../service/analytics/AnalyticsService';
+
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
-// import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
-// import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-// import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-// import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
-// import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
-// import { ellipsis } from '../../utils/utils';
-import { middleEllipsis, isJson } from '../../utils/utils';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+
+import IconTick from '../../svg/IconTick';
 import IconPlayer from '../../svg/IconPlayer';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
 const { Meta } = Card;
+const layout = {};
 
 const NftPage = () => {
-  // const [form] = Form.useForm();
-  // const [voteOption, setVoteOption] = useState<VoteOption>(VoteOption.VOTE_OPTION_ABSTAIN);
-  // const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
-  // const [isModalVisible, setIsModalVisible] = useState(false);
-  // const [confirmLoading, setConfirmLoading] = useState(false);
-  // const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
-  // const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
-  // const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+  const [form] = Form.useForm();
+  const [formValues, setFormValues] = useState({
+    tokenId: '',
+    denomId: '',
+    senderAddress: '',
+    recipientAddress: '',
+    amount: '',
+    memo: '',
+  });
+  const currentSession = useRecoilValue(sessionState);
+  const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
+  const [nftList, setNftList] = useRecoilState(nftListState);
+  const fetchingDB = useRecoilValue(fetchingDBState);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
+  const [errorMessages, setErrorMessages] = useState([]);
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
+
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [isNftModalVisible, setIsNftModalVisible] = useState(false);
-  // const [decryptedPhrase, setDecryptedPhrase] = useState('');
-  // const [errorMessages, setErrorMessages] = useState([]);
+  const [isNftTransferModalVisible, setIsNftTransferModalVisible] = useState(false);
+  const [isNftTransferConfirmVisible, setIsNftTransferConfirmVisible] = useState(false);
+
+  const [nft, setNft] = useState<any>();
+  const [nftView, setNftView] = useState('grid');
+  const [processedNftList, setProcessedNftList] = useState<any[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | undefined>('');
 
-  const [nft, setNft] = useState<any>();
-
-  // const [proposalList, setProposalList] = useState<ProposalModel[]>();
-  const nftList = useRecoilValue(nftListState);
-  const fetchingDB = useRecoilValue(fetchingDBState);
-
-  // const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
-  // const currentSession = useRecoilValue(sessionState);
-  // const userAsset = useRecoilValue(walletAssetState);
-
-  const [processedNftList, setProcessedNftList] = useState<any[]>([]);
-  const [nftView, setNftView] = useState('grid');
-
-  // const handleCancelConfirmationModal = () => {
-  //   setIsVisibleConfirmationModal(false);
-  // };
-
-  // const closeSuccessModal = () => {
-  //   setIsSuccessModalVisible(false);
-  //   setIsVisibleConfirmationModal(false);
-  // };
-
-  // const closeErrorModal = () => {
-  //   setIsErrorModalVisible(false);
-  // };
-
-  // const showConfirmationModal = () => {
-  //   setInputPasswordVisible(false);
-  //   setIsVisibleConfirmationModal(true);
-  // };
-
-  // const showPasswordInput = () => {
-  //   if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-  //     showConfirmationModal();
-  //   } else {
-  //     setInputPasswordVisible(true);
-  //   }
-  // };
-
-  // const onWalletDecryptFinish = async (password: string) => {
-  //   const phraseDecrypted = await secretStoreService.decryptPhrase(
-  //     password,
-  //     currentSession.wallet.identifier,
-  //   );
-  //   setDecryptedPhrase(phraseDecrypted);
-  //   showConfirmationModal();
-  // };
-
-  // const onRadioChange = e => {
-  //   setVoteOption(e.target.value);
-  // };
-
-  // const onVote = async () => {
-  //   showPasswordInput();
-  // };
-
-  // const onConfirm = async () => {
-  //   if (!nft) {
-  //     return;
-  //   }
-
-  //   setConfirmLoading(true);
-  //   try {
-  //     // const proposalID =
-  //     //   nft?.proposal_id !== null && nft?.proposal_id !== undefined
-  //     //     ? nft?.proposal_id
-  //     //     : '';
-  //     // const sendResult = await walletService.sendVote({
-  //     //   voteOption,
-  //     //   proposalID,
-  //     //   memo: DEFAULT_CLIENT_MEMO,
-  //     //   decryptedPhrase,
-  //     //   asset: userAsset,
-  //     //   walletType: currentSession.wallet.walletType,
-  //     // });
-
-  //     // setBroadcastResult(sendResult);
-  //     setIsVisibleConfirmationModal(false);
-  //     setConfirmLoading(false);
-  //     // setInputPasswordVisible(false);
-  //     // setIsSuccessModalVisible(true);
-  //   } catch (e) {
-  //     // setErrorMessages(e.message.split(': '));
-  //     setIsVisibleConfirmationModal(false);
-  //     setConfirmLoading(false);
-  //     // setInputPasswordVisible(false);
-  //     // setIsErrorModalVisible(true);
-  //     // eslint-disable-next-line no-console
-  //     console.log('Error occurred while transfer', e);
-  //   }
-  //   setConfirmLoading(false);
-  // };
+  const analyticsService = new AnalyticsService(currentSession);
 
   const nftViewOptions = [
     { label: <MenuOutlined />, value: 'list' },
     { label: <AppstoreOutlined />, value: 'grid' },
   ];
+
+  const closeSuccessModal = () => {
+    setIsSuccessModalVisible(false);
+    setIsNftModalVisible(false);
+    setIsNftTransferConfirmVisible(false);
+  };
+
+  const closeErrorModal = () => {
+    setIsErrorModalVisible(false);
+  };
 
   const processNftList = (currentList: NftModel[] | undefined) => {
     if (currentList) {
@@ -167,6 +110,105 @@ const NftPage = () => {
       });
     }
     return [];
+  };
+
+  const customAddressValidator = TransactionUtils.addressValidator(
+    currentSession,
+    walletAsset,
+    AddressType.USER,
+  );
+
+  const showConfirmationModal = () => {
+    setInputPasswordVisible(false);
+    setIsNftTransferConfirmVisible(true);
+    setIsNftTransferModalVisible(true);
+    setFormValues({
+      ...form.getFieldsValue(true),
+      // Replace scientific notation to plain string values
+      denomId: nft?.denomId,
+      tokenId: nft?.tokenId,
+      senderAddress: currentSession.wallet.address,
+    });
+  };
+
+  const showPasswordInput = () => {
+    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      showConfirmationModal();
+    } else {
+      setInputPasswordVisible(true);
+      setIsNftTransferModalVisible(false);
+    }
+  };
+
+  const onWalletDecryptFinish = async (password: string) => {
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      currentSession.wallet.identifier,
+    );
+    setDecryptedPhrase(phraseDecrypted);
+    showConfirmationModal();
+  };
+
+  const onConfirmTransfer = async () => {
+    const { walletType } = currentSession.wallet;
+    const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
+    if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
+      return;
+    }
+    try {
+      setConfirmLoading(true);
+      const sendResult = await walletService.sendNFT({
+        tokenId: formValues.tokenId,
+        denomId: formValues.denomId,
+        sender: formValues.senderAddress,
+        recipient: formValues.recipientAddress,
+        memo,
+        decryptedPhrase,
+        asset: walletAsset,
+        walletType,
+      });
+
+      analyticsService.logTransactionEvent(
+        broadcastResult.transactionHash as string,
+        formValues.amount,
+        AnalyticsTxType.TransferTransaction,
+        AnalyticsActions.FundsTransfer,
+        AnalyticsCategory.Transfer,
+      );
+
+      const latestLoadedNFTs = await walletService.retrieveNFTs(currentSession.wallet.identifier);
+      setNftList(latestLoadedNFTs);
+      const processedNFTsLists = processNftList(latestLoadedNFTs);
+      setProcessedNftList(processedNFTsLists);
+
+      setBroadcastResult(sendResult);
+
+      setIsNftModalVisible(false);
+      setIsNftTransferModalVisible(false);
+      setIsNftTransferConfirmVisible(false);
+      setConfirmLoading(false);
+
+      setIsSuccessModalVisible(true);
+      setInputPasswordVisible(false);
+
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      setWalletAsset(currentWalletAsset);
+
+      form.resetFields();
+    } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+      }
+
+      setErrorMessages(e.message.split(': '));
+      setIsNftModalVisible(false);
+      // setIsNftTransferConfirmVisible(false)
+      setConfirmLoading(false);
+      setInputPasswordVisible(false);
+      setIsErrorModalVisible(true);
+      // eslint-disable-next-line no-console
+      console.log('Error occurred while transfer', e);
+    }
   };
 
   useEffect(() => {
@@ -223,7 +265,7 @@ const NftPage = () => {
     <Layout className="site-layout">
       <Header className="site-layout-background">My NFT</Header>
       <div className="header-description">
-        An overview of your NFT Collection on Crypto.org Chain
+        An overview of your NFT Collection on Crypto.org Chain.
       </div>
       <Content>
         <Tabs defaultActiveKey="1">
@@ -282,7 +324,11 @@ const NftPage = () => {
                         className="nft"
                       >
                         <Meta
-                          title={item?.tokenData.drop ? item?.tokenData.drop : item?.denomName}
+                          title={
+                            item?.tokenData.drop
+                              ? ellipsis(item?.tokenData.drop, 20)
+                              : ellipsis(item?.denomId, 20)
+                          }
                           description={
                             <>
                               <Avatar
@@ -292,7 +338,8 @@ const NftPage = () => {
                                   verticalAlign: 'middle',
                                 }}
                               />
-                              {middleEllipsis(item?.tokenOwner, 6)}
+                              {middleEllipsis(item?.tokenOwner, 6)}{' '}
+                              {item?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
                             </>
                           }
                         />
@@ -356,7 +403,7 @@ const NftPage = () => {
           <Sider width="50%">
             <>
               <div className="title">
-                {nft?.tokenData.drop ? nft?.tokenData.drop : nft?.denomName}
+                {nft?.tokenData.drop ? nft?.tokenData.drop : nft?.denomId}
               </div>
               <div className="item">
                 <Meta
@@ -370,7 +417,8 @@ const NftPage = () => {
                           verticalAlign: 'middle',
                         }}
                       />
-                      {nft?.tokenOwner}
+                      {nft?.tokenOwner}{' '}
+                      {nft?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
                     </>
                   }
                 />
@@ -412,6 +460,18 @@ const NftPage = () => {
                   ''
                 )}
               </div>
+              <div className="item">
+                <Button
+                  key="submit"
+                  type="primary"
+                  onClick={() => {
+                    setIsNftTransferModalVisible(true);
+                    setIsNftModalVisible(false);
+                  }}
+                >
+                  Transfer NFT
+                </Button>
+              </div>
               <div className="item goto-marketplace">
                 {nft?.marketplaceLink !== '' ? (
                   <a
@@ -430,12 +490,197 @@ const NftPage = () => {
           </Sider>
         </Layout>
       </ModalPopup>
+      <ModalPopup
+        isModalVisible={isNftTransferModalVisible}
+        handleCancel={() => {
+          setIsNftTransferModalVisible(false);
+          setIsNftTransferConfirmVisible(false);
+          setIsNftModalVisible(true);
+          form.resetFields();
+        }}
+        handleOk={() => {}}
+        footer={[
+          isNftTransferConfirmVisible ? (
+            <Button
+              key="submit"
+              type="primary"
+              onClick={onConfirmTransfer}
+              loading={confirmLoading}
+            >
+              Confirm Transfer
+            </Button>
+          ) : (
+            <Button
+              key="submit"
+              type="primary"
+              htmlType="submit"
+              onClick={() => {
+                form.submit();
+              }}
+            >
+              Next
+            </Button>
+          ),
+          <Button
+            key="back"
+            type="link"
+            onClick={() => {
+              if (isNftTransferConfirmVisible) {
+                setIsNftTransferConfirmVisible(false);
+              } else {
+                setIsNftTransferModalVisible(false);
+                setIsNftModalVisible(true);
+                form.resetFields();
+              }
+            }}
+          >
+            Cancel
+          </Button>,
+        ]}
+        // footer={[]}
+        okText="Confirm"
+        className="nft-transfer-modal"
+      >
+        <>
+          {isNftTransferConfirmVisible ? (
+            <>
+              <div className="title">Confirm Transfer</div>
+              <div className="description">Please review the information below.</div>
+              <div className="item">
+                <div className="nft-image">
+                  {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
+                    <ReactPlayer
+                      url={videoUrl}
+                      config={{
+                        file: {
+                          attributes: {
+                            controlsList: 'nodownload',
+                          },
+                        },
+                      }}
+                      controls
+                      playing={isVideoPlaying}
+                    />
+                  ) : (
+                    <img
+                      alt={nft?.denomName}
+                      src={
+                        nft?.isMintedByCDC && nft?.tokenData.image
+                          ? nft?.tokenData.image
+                          : nftThumbnail
+                      }
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="item">
+                <div className="label">To</div>
+                <div className="address">{`${form.getFieldValue('recipientAddress')}`}</div>
+              </div>
+              <div className="item notice">
+                <Layout>
+                  <Sider width="20px">
+                    <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                  </Sider>
+                  <Content>
+                    This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address
+                    that is not compatible with the Crypto.org Chain NFT token standard will result
+                    in the permanent loss of your asset.
+                  </Content>
+                </Layout>
+              </div>
+              <div className="item">
+                <div className="label">NFT Name</div>
+                <div>{`${formValues.denomId}`}</div>
+              </div>
+              <div className="item">
+                <div className="label">NFT ID</div>
+                <div>{`${formValues.tokenId}`}</div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="title">Transfer NFT</div>
+              <div className="description">Fill in the information below to transfer your NFT.</div>
+              <div className="item">
+                <div className="nft-image">
+                  {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
+                    <ReactPlayer
+                      url={videoUrl}
+                      config={{
+                        file: {
+                          attributes: {
+                            controlsList: 'nodownload',
+                          },
+                        },
+                      }}
+                      controls
+                      playing={isVideoPlaying}
+                    />
+                  ) : (
+                    <img
+                      alt={nft?.denomName}
+                      src={
+                        nft?.isMintedByCDC && nft?.tokenData.image
+                          ? nft?.tokenData.image
+                          : nftThumbnail
+                      }
+                    />
+                  )}
+                </div>
+              </div>
+              <div className="item">
+                <div className="label">Sending</div>
+                <div className="address">
+                  {nft?.tokenData.drop ? nft?.tokenData.drop : nft?.denomId}
+                </div>
+              </div>
+              <Form
+                {...layout}
+                layout="vertical"
+                form={form}
+                name="control-ref"
+                onFinish={showPasswordInput}
+                requiredMark={false}
+              >
+                {/* <div className="sender">Sender Address</div> */}
+                {/* <div className="sender">{currentSession.wallet.address}</div> */}
+                <Form.Item
+                  name="recipientAddress"
+                  label="Recipient Address"
+                  hasFeedback
+                  validateFirst
+                  rules={[
+                    { required: true, message: 'Recipient address is required' },
+                    customAddressValidator,
+                  ]}
+                >
+                  <Input placeholder="Enter recipient address" />
+                </Form.Item>
+              </Form>
+              <div className="item notice">
+                <Layout>
+                  <Sider width="20px">
+                    <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                  </Sider>
+                  <Content>
+                    This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address
+                    that is not compatible with the Crypto.org Chain NFT token standard will result
+                    in the permanent loss of your asset.
+                  </Content>
+                </Layout>
+              </div>
+            </>
+          )}
+        </>
+      </ModalPopup>
       <Footer />
-      {/* <PasswordFormModal
+      <PasswordFormModal
         description="Input the app password decrypt wallet"
         okButtonText="Decrypt wallet"
         onCancel={() => {
           setInputPasswordVisible(false);
+          setIsNftTransferModalVisible(true);
         }}
         onSuccess={onWalletDecryptFinish}
         onValidatePassword={async (password: string) => {
@@ -450,39 +695,8 @@ const NftPage = () => {
         visible={inputPasswordVisible}
         successButtonText="Continue"
         confirmPassword={false}
-      /> */}
-      {/* <ModalPopup
-        isModalVisible={isConfirmationModalVisible}
-        handleCancel={handleCancelConfirmationModal}
-        handleOk={() => { }}
-        footer={[
-          <Button key="submit" type="primary" loading={confirmLoading} onClick={onConfirm}>
-            Confirm
-          </Button>,
-          <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
-            Cancel
-          </Button>,
-        ]}
-        okText="Confirm"
-      >
-        <>
-          <div className="title">Confirm Vote Transaction</div>
-          <div className="description">Please review the below information. </div>
-          <div className="item">
-            <div className="label">Sender Address</div>
-            <div className="address">{`${currentSession.wallet.address}`}</div>
-          </div>
-          <div className="item">
-            <div className="label">Vote to Proposal</div>
-            <div className="address">{`#${nft?.proposal_id} ${nft?.content.title}`}</div>
-          </div>
-          <div className="item">
-            <div className="label">Vote</div>
-            <div>{processVoteTag(voteOption)}</div>
-          </div>
-        </>
-      </ModalPopup> */}
-      {/* <SuccessModalPopup
+      />
+      <SuccessModalPopup
         isModalVisible={isSuccessModalVisible}
         handleCancel={closeSuccessModal}
         handleOk={closeSuccessModal}
@@ -496,17 +710,17 @@ const NftPage = () => {
       >
         <>
           {broadcastResult?.code !== undefined &&
-            broadcastResult?.code !== null &&
-            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+          broadcastResult?.code !== null &&
+          broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
             <div className="description">
               The transaction timed out but it will be included in the subsequent blocks
             </div>
           ) : (
-            <div className="description">Your vote was broadcasted successfully!</div>
+            <div className="description">Your NFT transaction was broadcasted successfully!</div>
           )}
         </>
-      </SuccessModalPopup> */}
-      {/* <ErrorModalPopup
+      </SuccessModalPopup>
+      <ErrorModalPopup
         isModalVisible={isErrorModalVisible}
         handleCancel={closeErrorModal}
         handleOk={closeErrorModal}
@@ -524,9 +738,14 @@ const NftPage = () => {
               .map((err, idx) => (
                 <div key={idx}>- {err}</div>
               ))}
+            {ledgerIsExpertMode ? (
+              <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
+            ) : (
+              ''
+            )}
           </div>
         </>
-      </ErrorModalPopup> */}
+      </ErrorModalPopup>
     </Layout>
   );
 };

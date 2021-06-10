@@ -1,6 +1,6 @@
 import { Proposal, ValidatorPubKey } from '../service/rpc/NodeRpcModels';
 import {
-  NFTAccountTransactionResponse,
+  NftAccountTransactionResponse,
   NftResponse,
   NftTransactionResponse,
 } from '../service/rpc/ChainIndexingModels';
@@ -37,6 +37,27 @@ export interface StakingTransactionData extends TransactionData {
   stakedAmount: string;
 }
 
+export interface NftTransactionData {
+  transactionHash: string;
+  data: {
+    denomId: string;
+    tokenId: string;
+  };
+  receiverAddress: string;
+  blockTime: string;
+  status: boolean;
+}
+
+export enum NftTransactionType {
+  ISSUE_DENOM = 'MsgIssueDenom',
+  MINT_NFT = 'MsgMintNFT',
+  EDIT_NFT = 'MsgEditNFT',
+  BURN_NFT = 'MsgBurnNFT',
+  TRANSFER_NFT = 'MsgTransferNFT',
+}
+
+export interface NftAccountTransactionData extends NftAccountTransactionResponse {}
+
 export interface StakingTransactionList {
   transactions: Array<StakingTransactionData>;
   totalBalance: string;
@@ -53,20 +74,20 @@ export interface TransferTransactionList {
   walletId: string;
 }
 
-export interface NFTList {
+export interface NftList {
   nfts: Array<NftModel>;
   walletId: string;
 }
 
-export interface NFTQueryParams {
+export interface NftQueryParams {
   tokenId: string;
   denomId: string;
 }
 
-export interface NFTTransactionHistory {
+export interface NftTransactionHistory {
   transfers: Array<NftTransferModel>;
   walletId: string;
-  nftQuery: NFTQueryParams;
+  nftQuery: NftQueryParams;
 }
 
 export interface ValidatorList {
@@ -111,10 +132,10 @@ export interface NftModel extends NftResponse {
   marketplaceLink: string;
 }
 export interface NftTransferModel extends NftTransactionResponse {}
-export interface NFTAccountTransactionModel extends NFTAccountTransactionResponse {}
+// export interface NFTAccountTransactionModel extends NFTAccountTransactionResponse {}
 
-export interface NFTAccountTransactionList {
-  transactions: Array<NFTAccountTransactionModel>;
+export interface NftAccountTransactionList {
+  transactions: Array<NftAccountTransactionData>;
   walletId: string;
 }
 

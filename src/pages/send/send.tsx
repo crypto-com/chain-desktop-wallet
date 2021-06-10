@@ -62,7 +62,7 @@ const FormSend = () => {
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
-    const transferInoputAmount = adjustedTransactionAmount(
+    const transferInputAmount = adjustedTransactionAmount(
       form.getFieldValue('amount'),
       walletAsset,
       currentSession.wallet.config.fee !== undefined &&
@@ -73,7 +73,7 @@ const FormSend = () => {
     setFormValues({
       ...form.getFieldsValue(),
       // Replace scientific notation to plain string values
-      amount: fromScientificNotation(transferInoputAmount),
+      amount: fromScientificNotation(transferInputAmount),
     });
     setIsVisibleConfirmationModal(true);
   };

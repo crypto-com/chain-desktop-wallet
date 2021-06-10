@@ -16,15 +16,9 @@ import {
   Avatar,
 } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
-import {
-  scaledBalance,
-  scaledStakingBalance,
-  getAssetBalancePrice,
-  getAssetStakingBalancePrice,
-  UserAsset,
-} from '../../models/UserAsset';
+
 import {
   hasShownWarningOnWalletTypeState,
   sessionState,
@@ -34,7 +28,17 @@ import {
   ledgerIsExpertModeState,
   fetchingDBState,
 } from '../../recoil/atom';
-import { walletService } from '../../service/WalletService';
+import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
+import { getUIDynamicAmount } from '../../utils/NumberUtils';
+import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
+import {
+  scaledBalance,
+  scaledStakingBalance,
+  getAssetBalancePrice,
+  getAssetStakingBalancePrice,
+  UserAsset,
+} from '../../models/UserAsset';
+import { Session } from '../../models/Session';
 import {
   BroadCastResult,
   NftModel,
@@ -42,20 +46,23 @@ import {
   TransactionDirection,
   TransactionStatus,
   TransferTransactionData,
+  NftAccountTransactionData,
+  NftTransactionType,
 } from '../../models/Transaction';
-import { Session } from '../../models/Session';
-import ModalPopup from '../../components/ModalPopup/ModalPopup';
-import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { secretStoreService } from '../../storage/SecretStoreService';
-import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
-import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
-import { UndelegateFormComponent } from './components/UndelegateFormComponent';
-import RedelegateFormComponent from './components/RedelegateFormComponent';
-import { getUIDynamicAmount } from '../../utils/NumberUtils';
-import { middleEllipsis, isJson } from '../../utils/utils';
+
+import { walletService } from '../../service/WalletService';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import { secretStoreService } from '../../storage/SecretStoreService';
+
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import { UndelegateFormComponent } from './components/UndelegateFormComponent';
+import RedelegateFormComponent from './components/RedelegateFormComponent';
+
+import IconTick from '../../svg/IconTick';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 
 const { Text } = Typography;
@@ -86,6 +93,17 @@ interface TransferTabularData {
   amount: string;
   time: string;
   direction: TransactionDirection;
+  status: TransactionStatus;
+}
+
+interface NftTransferTabularData {
+  key: string;
+  transactionHash: string;
+  messageType: NftTransactionType;
+  denomId: string;
+  tokenId: string;
+  recipientAddress: string;
+  time: string;
   status: TransactionStatus;
 }
 
@@ -137,6 +155,46 @@ function convertTransfers(
   });
 }
 
+function convertNftTransfers(allTransfers: NftAccountTransactionData[]) {
+  function getStatus(transfer: NftAccountTransactionData) {
+    if (transfer.success) {
+      return TransactionStatus.SUCCESS;
+    }
+    return TransactionStatus.FAILED;
+  }
+  function getType(transfer: NftAccountTransactionData) {
+    if (transfer.messageType === NftTransactionType.ISSUE_DENOM) {
+      return NftTransactionType.ISSUE_DENOM;
+      // eslint-disable-next-line no-else-return
+    } else if (transfer.messageType === NftTransactionType.MINT_NFT) {
+      return NftTransactionType.MINT_NFT;
+    } else if (transfer.messageType === NftTransactionType.EDIT_NFT) {
+      return NftTransactionType.EDIT_NFT;
+    } else if (transfer.messageType === NftTransactionType.BURN_NFT) {
+      return NftTransactionType.BURN_NFT;
+    }
+    return NftTransactionType.TRANSFER_NFT;
+  }
+
+  return allTransfers.map(transfer => {
+    const data: NftTransferTabularData = {
+      key:
+        transfer.transactionHash +
+        transfer.data.recipient +
+        transfer.data.denomId +
+        transfer.data.tokenId,
+      transactionHash: transfer.transactionHash,
+      messageType: getType(transfer),
+      denomId: transfer.data.denomId,
+      tokenId: transfer.data.tokenId,
+      recipientAddress: transfer.data.recipient,
+      time: new Date(transfer.blockTime).toLocaleString(),
+      status: getStatus(transfer),
+    };
+    return data;
+  });
+}
+
 const isWalletNotLive = (config: WalletConfig) => {
   return config.nodeUrl === NOT_KNOWN_YET_VALUE && config.indexingUrl === NOT_KNOWN_YET_VALUE;
 };
@@ -145,15 +203,15 @@ function HomePage() {
   const currentSession = useRecoilValue(sessionState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
+  const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
-  const nftList = useRecoilValue(nftListState);
+  const setNFTList = useSetRecoilState(nftListState);
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const didMountRef = useRef(false);
 
   const [processedNftList, setProcessedNftList] = useState<any[]>([]);
-  // const [nftView, setNftView] = useState('grid');
 
   // Undelegate action related states changes
   const [form] = Form.useForm();
@@ -189,107 +247,6 @@ function HomePage() {
   const [delegationActionType, setDelegationActionType] = useState<StakingActionType>();
 
   const analyticsService = new AnalyticsService(currentSession);
-
-  const showWalletStateNotification = (config: WalletConfig) => {
-    setTimeout(async () => {
-      if (isWalletNotLive(config) && !hasShownNotLiveWallet) {
-        notification.warning({
-          message: `Wallet Info`,
-          description: `The wallet created will be limited only to display address because its ${config.name} configuration is not live yet`,
-          placement: 'topRight',
-          duration: 0,
-        });
-      }
-    }, 200);
-  };
-
-  const onSyncAndRefreshBtnCall = async () => {
-    setFetchingDB(true);
-
-    await walletService.syncAll();
-    const sessionData = await walletService.retrieveCurrentSession();
-    const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
-    const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
-      sessionData.wallet.identifier,
-    );
-    const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
-      sessionData.wallet.identifier,
-    );
-
-    const stakingTabularData = convertDelegations(allDelegations, currentAsset);
-    const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
-
-    showWalletStateNotification(currentSession.wallet.config);
-
-    setDelegations(stakingTabularData);
-    setTransfers(transferTabularData);
-    setUserAsset(currentAsset);
-    setHasShownNotLiveWallet(true);
-
-    const nftAccountTxs = await walletService.getAllNFTAccountTxs(sessionData);
-    // TODO : Logs to be removed
-    // eslint-disable-next-line no-console
-    console.log({ nftAccountTxs });
-
-    await walletService.fetchAndSaveNFTs(sessionData);
-    setFetchingDB(false);
-  };
-
-  const processNftList = (currentList: NftModel[] | undefined) => {
-    if (currentList) {
-      return currentList.slice(0, maxNftPreview).map((item, idx) => {
-        const denomSchema = isJson(item.denomSchema)
-          ? JSON.parse(item.denomSchema)
-          : item.denomSchema;
-        const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
-        const nftModel = {
-          ...item,
-          key: `${idx}`,
-          denomSchema,
-          tokenData,
-        };
-        return nftModel;
-      });
-    }
-    return [];
-  };
-
-  useEffect(() => {
-    const syncAssetData = async () => {
-      const sessionData = await walletService.retrieveCurrentSession();
-      const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
-      const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
-        sessionData.wallet.identifier,
-      );
-      const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
-        sessionData.wallet.identifier,
-      );
-
-      const stakingTabularData = convertDelegations(allDelegations, currentAsset);
-      const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
-
-      const currentNftList = processNftList(nftList);
-      setProcessedNftList(currentNftList);
-      // TODO: Remove test case load
-      // const nftHistory = await walletService.loadNFTTransferHistory({
-      //   tokenId: 'specialart',
-      //   denomId: 'specialx',
-      // });
-
-      showWalletStateNotification(currentSession.wallet.config);
-      setDelegations(stakingTabularData);
-      setTransfers(transferTabularData);
-      setUserAsset(currentAsset);
-      setHasShownNotLiveWallet(true);
-    };
-
-    syncAssetData();
-
-    if (!didMountRef.current) {
-      didMountRef.current = true;
-      analyticsService.logPage('Home');
-    }
-  }, [fetchingDB]);
 
   const TransactionColumns = [
     {
@@ -358,6 +315,227 @@ function HomePage() {
       },
     },
   ];
+
+  const NftTransactionColumns = [
+    {
+      title: 'Transaction Hash',
+      dataIndex: 'transactionHash',
+      key: 'transactionHash',
+      render: text => (
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/tx/${text}`}
+        >
+          {middleEllipsis(text, 6)}
+        </a>
+      ),
+    },
+    {
+      title: 'Type',
+      dataIndex: 'messageType',
+      key: 'messageType',
+      render: (text, record: NftTransferTabularData) => {
+        let statusColor;
+        if (!record.status) {
+          statusColor = 'error';
+        } else if (record.messageType === NftTransactionType.MINT_NFT) {
+          statusColor = 'success';
+        } else if (record.messageType === NftTransactionType.TRANSFER_NFT) {
+          statusColor =
+            record.recipientAddress === currentSession.wallet.address ? 'processing' : 'error';
+        } else {
+          statusColor = 'default';
+        }
+
+        if (record.status) {
+          if (record.messageType === NftTransactionType.MINT_NFT) {
+            return (
+              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+                Mint NFT
+              </Tag>
+            );
+            // eslint-disable-next-line no-else-return
+          } else if (record.messageType === NftTransactionType.TRANSFER_NFT) {
+            return (
+              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+                {record.recipientAddress === currentSession.wallet.address
+                  ? 'Received NFT'
+                  : 'Sent NFT'}
+              </Tag>
+            );
+          } else if (record.messageType === NftTransactionType.ISSUE_DENOM) {
+            return (
+              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+                Issue Denom
+              </Tag>
+            );
+          }
+          return (
+            <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+              {record.messageType}
+            </Tag>
+          );
+          // eslint-disable-next-line no-else-return
+        } else {
+          if (record.messageType === NftTransactionType.MINT_NFT) {
+            return (
+              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+                Failed Mint
+              </Tag>
+            );
+            // eslint-disable-next-line no-else-return
+          } else if (record.messageType === NftTransactionType.TRANSFER_NFT) {
+            return (
+              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+                Failed Transfer
+              </Tag>
+            );
+          } else if (record.messageType === NftTransactionType.ISSUE_DENOM) {
+            return (
+              <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+                Failed Issue
+              </Tag>
+            );
+          }
+          return (
+            <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+              Failed {record.messageType}
+            </Tag>
+          );
+        }
+      },
+    },
+    {
+      title: 'NFT Name',
+      dataIndex: 'denomId',
+      key: 'denomId',
+      render: text => <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>,
+    },
+    {
+      title: 'NFT ID',
+      dataIndex: 'tokenId',
+      key: 'tokenId',
+      render: text => <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>,
+    },
+    {
+      title: 'Recipient',
+      dataIndex: 'recipientAddress',
+      key: 'recipientAddress',
+      render: text => <div data-original={text}>{text ? middleEllipsis(text, 12) : 'n.a.'}</div>,
+    },
+    {
+      title: 'Time',
+      dataIndex: 'time',
+      key: 'time',
+    },
+  ];
+
+  const showWalletStateNotification = (config: WalletConfig) => {
+    setTimeout(async () => {
+      if (isWalletNotLive(config) && !hasShownNotLiveWallet) {
+        notification.warning({
+          message: `Wallet Info`,
+          description: `The wallet created will be limited only to display address because its ${config.name} configuration is not live yet`,
+          placement: 'topRight',
+          duration: 0,
+        });
+      }
+    }, 200);
+  };
+
+  const onSyncAndRefreshBtnCall = async () => {
+    setFetchingDB(true);
+
+    await walletService.syncAll();
+    const sessionData = await walletService.retrieveCurrentSession();
+    const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+    const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
+      sessionData.wallet.identifier,
+    );
+    const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
+      sessionData.wallet.identifier,
+    );
+
+    const allNftTransfer: NftAccountTransactionData[] = await walletService.getAllNFTAccountTxs(
+      sessionData,
+    );
+
+    const stakingTabularData = convertDelegations(allDelegations, currentAsset);
+    const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
+    const nftTransferTabularData = convertNftTransfers(allNftTransfer);
+
+    showWalletStateNotification(currentSession.wallet.config);
+
+    setDelegations(stakingTabularData);
+    setTransfers(transferTabularData);
+    setNftTransfers(nftTransferTabularData);
+    setUserAsset(currentAsset);
+    setHasShownNotLiveWallet(true);
+
+    await walletService.fetchAndSaveNFTs(sessionData);
+    setFetchingDB(false);
+  };
+
+  const processNftList = (currentList: NftModel[] | undefined) => {
+    if (currentList) {
+      return currentList.slice(0, maxNftPreview).map((item, idx) => {
+        const denomSchema = isJson(item.denomSchema)
+          ? JSON.parse(item.denomSchema)
+          : item.denomSchema;
+        const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
+        const nftModel = {
+          ...item,
+          key: `${idx}`,
+          denomSchema,
+          tokenData,
+        };
+        return nftModel;
+      });
+    }
+    return [];
+  };
+
+  useEffect(() => {
+    const syncAssetData = async () => {
+      const sessionData = await walletService.retrieveCurrentSession();
+      const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+      const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
+        sessionData.wallet.identifier,
+      );
+      const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
+        sessionData.wallet.identifier,
+      );
+
+      const allNftTransfer: NftAccountTransactionData[] = await walletService.getAllNFTAccountTxs(
+        sessionData,
+      );
+
+      const allNFTs: NftModel[] = await walletService.retrieveNFTs(sessionData.wallet.identifier);
+      const currentNftList = processNftList(allNFTs);
+      setProcessedNftList(currentNftList);
+      setNFTList(allNFTs);
+
+      const stakingTabularData = convertDelegations(allDelegations, currentAsset);
+      const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
+      const nftTransferTabularData = convertNftTransfers(allNftTransfer);
+
+      showWalletStateNotification(currentSession.wallet.config);
+      setDelegations(stakingTabularData);
+      setTransfers(transferTabularData);
+      setNftTransfers(nftTransferTabularData);
+      setUserAsset(currentAsset);
+      setHasShownNotLiveWallet(true);
+    };
+
+    syncAssetData();
+
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Home');
+    }
+  }, [fetchingDB]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -560,11 +738,6 @@ function HomePage() {
     },
   ];
 
-  // const nftViewOptions = [
-  //   { label: <MenuOutlined />, value: 'list' },
-  //   { label: <AppstoreOutlined />, value: 'grid' },
-  // ];
-
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">
@@ -609,17 +782,6 @@ function HomePage() {
         <Tabs defaultActiveKey="1">
           <TabPane tab="My NFT" key="1">
             <div className="site-layout-background nft-container">
-              {/* <div className="view-selection">
-              <Radio.Group
-                options={nftViewOptions}
-                defaultValue="grid"
-                onChange={(e) => {
-                  setNftView(e.target.value)
-                }}
-                // value={value4}
-                optionType="button"
-              />
-          </div> */}
               <List
                 grid={{
                   gutter: 16,
@@ -638,14 +800,14 @@ function HomePage() {
                       cover={
                         <img
                           alt={item?.denomName}
-                          src={item?.tokenData.image ? item?.tokenData.image : nftThumbnail}
+                          src={
+                            item?.isMintedByCDC && item?.tokenData.image
+                              ? item?.tokenData.image
+                              : nftThumbnail
+                          }
                         />
                       }
                       hoverable
-                      // onClick={() => {
-                      // setNft(item);
-                      // setIsNftVisible(true);
-                      // }}
                       className="nft"
                     >
                       <Meta
@@ -659,7 +821,8 @@ function HomePage() {
                                 verticalAlign: 'middle',
                               }}
                             />
-                            {middleEllipsis(item?.tokenOwner, 6)}
+                            {middleEllipsis(item?.tokenOwner, 6)}{' '}
+                            {item?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
                           </>
                         }
                       />
@@ -682,7 +845,7 @@ function HomePage() {
             <Table columns={StakingColumns} dataSource={delegations} />
           </TabPane>
           <TabPane tab="NFT Transactions" key="3">
-            <Table columns={StakingColumns} dataSource={delegations} />
+            <Table columns={NftTransactionColumns} dataSource={nftTransfers} />
           </TabPane>
         </Tabs>
         <div>

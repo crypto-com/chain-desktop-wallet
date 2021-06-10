@@ -37,9 +37,9 @@ import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
-  NFTAccountTransactionModel,
+  NftAccountTransactionData,
   NftModel,
-  NFTQueryParams,
+  NftQueryParams,
   NftTransferModel,
   ProposalModel,
   ProposalStatuses,
@@ -65,6 +65,7 @@ import {
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
+import { sleep } from '../utils/utils';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -351,7 +352,13 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.fetchAndSaveNFTs(currentSession);
+
+    // It takes a few seconds for the indexing service to sync latest NFT state
+    await sleep(5_000);
+    await Promise.all([
+      this.fetchAndSaveNFTs(currentSession),
+      this.fetchAndSaveNFTAccountTxs(currentSession),
+    ]);
     return broadCastResult;
   }
 
@@ -370,6 +377,7 @@ class WalletService {
     await Promise.all([
       this.syncBalancesData(currentSession),
       this.syncTransactionsData(currentSession),
+      this.fetchAndSaveNFTs(currentSession),
     ]);
   }
 
@@ -408,7 +416,10 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncAll(currentSession);
+    await Promise.all([
+      await this.fetchAndSaveRewards(nodeRpc, currentSession),
+      await this.fetchAndUpdateBalances(currentSession),
+    ]);
     return broadCastResult;
   }
 
@@ -636,7 +647,7 @@ class WalletService {
 
   public async getAllNFTAccountTxs(
     currentSession: Session,
-  ): Promise<Array<NFTAccountTransactionModel>> {
+  ): Promise<Array<NftAccountTransactionData>> {
     const nftAccountTxs = await this.storageService.retrieveAllNFTAccountTransactions(
       currentSession.wallet.identifier,
     );
@@ -708,6 +719,9 @@ class WalletService {
   public async fetchAndSaveNFTs(currentSession: Session) {
     try {
       const nfts = await this.loadAllCurrentAccountNFTs();
+      if (!nfts) {
+        return;
+      }
 
       await this.storageService.saveNFTs({
         walletId: currentSession.wallet.identifier,
@@ -971,7 +985,7 @@ class WalletService {
     }
   }
 
-  private async loadAllCurrentAccountNFTs(): Promise<NftModel[]> {
+  private async loadAllCurrentAccountNFTs(): Promise<NftModel[] | null> {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
@@ -983,11 +997,11 @@ class WalletService {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING NFTs', e);
-      return [];
+      return null;
     }
   }
 
-  public async loadNFTTransferHistory(nftQuery: NFTQueryParams): Promise<NftTransferModel[]> {
+  public async loadNFTTransferHistory(nftQuery: NftQueryParams): Promise<NftTransferModel[]> {
     const currentSession = await this.storageService.retrieveCurrentSession();
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve([]);

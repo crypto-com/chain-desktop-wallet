@@ -99,7 +99,7 @@ export interface NftTransactionListResponse {
 
 /// NFT account transactions data
 
-export interface NFTAccountTransactionData {
+export interface NftAccountTransactionData {
   msgIndex: number;
   recipient: string;
   txHash: string;
@@ -113,7 +113,7 @@ export interface NFTAccountTransactionData {
   name: string;
 }
 
-export interface NFTAccountTransactionResponse {
+export interface NftAccountTransactionResponse {
   account: string;
   blockHeight: number;
   blockHash: string;
@@ -122,9 +122,9 @@ export interface NFTAccountTransactionResponse {
   success: boolean;
   messageIndex: number;
   messageType: string;
-  data: NFTAccountTransactionData;
+  data: NftAccountTransactionData;
 }
 
-export interface NFTAccountTransactionListResponse {
-  result: NFTAccountTransactionResponse[];
+export interface NftAccountTransactionListResponse {
+  result: NftAccountTransactionResponse[];
 }
