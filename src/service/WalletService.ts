@@ -719,8 +719,6 @@ class WalletService {
   public async fetchAndSaveNFTs(currentSession: Session) {
     try {
       const nfts = await this.loadAllCurrentAccountNFTs();
-      // eslint-disable-next-line no-console
-      console.log('Loaded NFTs', { nfts });
       if (!nfts) {
         return;
       }
