@@ -343,7 +343,8 @@ function HomePage() {
         } else if (record.messageType === NftTransactionType.MINT_NFT) {
           statusColor = 'success';
         } else if (record.messageType === NftTransactionType.TRANSFER_NFT) {
-          statusColor = 'processing';
+          statusColor =
+            record.recipientAddress === currentSession.wallet.address ? 'processing' : 'error';
         } else {
           statusColor = 'default';
         }
@@ -360,7 +361,7 @@ function HomePage() {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
                 {record.recipientAddress === currentSession.wallet.address
-                  ? 'Receive NFT'
+                  ? 'Received NFT'
                   : 'Sent NFT'}
               </Tag>
             );
