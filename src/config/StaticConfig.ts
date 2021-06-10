@@ -3,7 +3,7 @@ import { getRandomId } from '../crypto/RandomGen';
 
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
-export const NV_GRAPHQL_API_ENDPOINT = 'https://3ona.co/nft-api/graphql';
+export const NV_GRAPHQL_API_ENDPOINT = 'https://crypto.com/nft-api/graphql';
 export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';
 
 export const NodePorts = {
