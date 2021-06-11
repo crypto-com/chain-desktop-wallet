@@ -354,7 +354,7 @@ function HomePage() {
           if (record.messageType === NftTransactionType.MINT_NFT) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-                Mint NFT
+                Minted NFT
               </Tag>
             );
             // eslint-disable-next-line no-else-return
@@ -369,7 +369,7 @@ function HomePage() {
           } else if (record.messageType === NftTransactionType.ISSUE_DENOM) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-                Issue Denom
+                Issued Denom
               </Tag>
             );
           }
