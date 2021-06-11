@@ -29,6 +29,7 @@ export class NftApi implements INftApi {
         isMintedByCDC(
           payload: $payload
         ) {
+          link
           isMinted
           denomId
           tokenId
