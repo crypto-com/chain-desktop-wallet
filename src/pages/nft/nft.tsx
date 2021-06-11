@@ -16,7 +16,7 @@ import {
   ledgerIsExpertModeState,
 } from '../../recoil/atom';
 import { ellipsis, middleEllipsis, isJson } from '../../utils/utils';
-import { NftModel, BroadCastResult } from '../../models/Transaction';
+import { NftModel, NftProcessedModel, BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 
 import { walletService } from '../../service/WalletService';
@@ -72,7 +72,7 @@ const NftPage = () => {
 
   const [nft, setNft] = useState<any>();
   const [nftView, setNftView] = useState('grid');
-  const [processedNftList, setProcessedNftList] = useState<any[]>([]);
+  const [processedNftList, setProcessedNftList] = useState<NftProcessedModel[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | undefined>('');
 
@@ -95,14 +95,13 @@ const NftPage = () => {
 
   const processNftList = (currentList: NftModel[] | undefined) => {
     if (currentList) {
-      return currentList.map((item, idx) => {
+      return currentList.map(item => {
         const denomSchema = isJson(item.denomSchema)
           ? JSON.parse(item.denomSchema)
           : item.denomSchema;
         const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
-        const nftModel = {
+        const nftModel: NftProcessedModel = {
           ...item,
-          key: `${idx}`,
           denomSchema,
           tokenData,
         };

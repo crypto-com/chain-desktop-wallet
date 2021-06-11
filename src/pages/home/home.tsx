@@ -42,6 +42,7 @@ import { Session } from '../../models/Session';
 import {
   BroadCastResult,
   NftModel,
+  NftProcessedModel,
   StakingTransactionData,
   TransactionDirection,
   TransactionStatus,
@@ -211,7 +212,7 @@ function HomePage() {
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const didMountRef = useRef(false);
 
-  const [processedNftList, setProcessedNftList] = useState<any[]>([]);
+  const [processedNftList, setProcessedNftList] = useState<NftProcessedModel[]>([]);
 
   // Undelegate action related states changes
   const [form] = Form.useForm();
@@ -480,14 +481,13 @@ function HomePage() {
 
   const processNftList = (currentList: NftModel[] | undefined) => {
     if (currentList) {
-      return currentList.slice(0, maxNftPreview).map((item, idx) => {
+      return currentList.slice(0, maxNftPreview).map(item => {
         const denomSchema = isJson(item.denomSchema)
           ? JSON.parse(item.denomSchema)
           : item.denomSchema;
         const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
-        const nftModel = {
+        const nftModel: NftProcessedModel = {
           ...item,
-          key: `${idx}`,
           denomSchema,
           tokenData,
         };

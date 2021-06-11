@@ -127,10 +127,24 @@ export interface ValidatorModel {
 }
 
 export interface ProposalModel extends Proposal {}
+
+export interface NftTokenData {
+  drop?: string;
+  description?: string;
+  image?: string;
+  mimeType?: string;
+  animation_url?: string;
+}
+
 export interface NftModel extends NftResponse {
   isMintedByCDC: boolean;
   marketplaceLink: string;
 }
+
+export interface NftProcessedModel extends Omit<NftModel, 'tokenData'> {
+  tokenData: NftTokenData;
+}
+
 export interface NftTransferModel extends NftTransactionResponse {}
 // export interface NFTAccountTransactionModel extends NFTAccountTransactionResponse {}
 
