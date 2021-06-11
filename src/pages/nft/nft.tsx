@@ -117,11 +117,24 @@ const NftPage = () => {
     AddressType.USER,
   );
 
+  const supportedVideo = (mimeType: string | undefined) => {
+    switch (mimeType) {
+      case 'video/mp4':
+      case 'video/webm':
+      case 'video/ogg':
+      case 'audio/ogg':
+      case 'audio/mpeg':
+        return true;
+      default:
+        return false;
+    }
+  };
+
   const renderPreview = (_nft: NftProcessedModel | undefined, showThumbnail: boolean = true) => {
-    if (!showThumbnail && _nft?.tokenData.mimeType === 'video/mp4') {
+    if (!showThumbnail && supportedVideo(_nft?.tokenData.mimeType)) {
       return (
         <ReactPlayer
-          url={`${videoUrl}s`}
+          url={videoUrl}
           config={{
             file: {
               attributes: {
