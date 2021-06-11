@@ -70,7 +70,13 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   // eslint-disable-next-line class-methods-use-this
   public async getNftListMarketplaceData(nftLists: NftResponse[]): Promise<NftModel[]> {
+    const returnNftList: NftModel[] = [];
     const payload: MintByCDCRequest[] = nftLists.map(item => {
+      returnNftList[`${item.denomId}-${item.tokenId}`] = {
+        ...item,
+        isMintedByCDC: false,
+        marketplaceLink: '',
+      };
       return {
         denomId: item.denomId,
         tokenIds: [item.tokenId],
@@ -86,37 +92,18 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
         }),
       );
 
-      const nftMarketplaceData: any = [];
-      for (let i = 0; i < results.length; i++) {
-        nftMarketplaceData.push(...results[i]);
-      }
-
-      if (nftMarketplaceData.length !== 0) {
-        return nftMarketplaceData.map((item, idx) => {
-          return {
-            ...nftLists[idx],
-            isMintedByCDC: item.isMintedByCDC,
-            nftMarketplaceLink: item.link ? item.link : '',
+      results.forEach(result => {
+        result.forEach(item => {
+          returnNftList[`${item.denomId}-${item.tokenId}`] = {
+            ...returnNftList[`${item.denomId}-${item.tokenId}`],
+            isMintedByCDC: item.isMinted,
+            marketplaceLink: item.link ? item.link : '',
           };
         });
-        // eslint-disable-next-line no-else-return
-      } else {
-        return nftLists.map((item, idx) => {
-          return {
-            ...nftLists[idx],
-            isMintedByCDC: false,
-            marketplaceLink: '',
-          };
-        });
-      }
-    } catch (e) {
-      return nftLists.map((item, idx) => {
-        return {
-          ...nftLists[idx],
-          isMintedByCDC: false,
-          marketplaceLink: '',
-        };
       });
+      return Object.values(returnNftList);
+    } catch (e) {
+      return Object.values(returnNftList);
     }
   }
 
