@@ -339,7 +339,7 @@ const NftPage = () => {
                         cover={
                           <>
                             {renderPreview(item)}
-                            {item?.tokenData.mimeType === 'video/mp4' ? (
+                            {supportedVideo(item?.tokenData.mimeType) ? (
                               <Icon component={IconPlayer} />
                             ) : (
                               ''
@@ -448,18 +448,18 @@ const NftPage = () => {
                 </div>
                 {nft?.tokenData.mimeType ? (
                   <div className="table-row">
-                    <div>CONTENT URL</div>
+                    <div>Content URL</div>
                     <a
                       data-original={nft?.denomName}
                       target="_blank"
                       rel="noreferrer"
                       href={
-                        nft?.tokenData.mimeType === 'video/mp4'
+                        supportedVideo(nft?.tokenData.mimeType)
                           ? nft?.tokenData.animation_url
                           : nft?.tokenData.image
                       }
                     >
-                      {nft?.tokenData.mimeType === 'video/mp4'
+                      {supportedVideo(nft?.tokenData.mimeType)
                         ? nft?.tokenData.animation_url
                         : nft?.tokenData.image}
                     </a>
@@ -591,7 +591,7 @@ const NftPage = () => {
               <div className="item">
                 <div className="label">Sending</div>
                 <div className="address">
-                  {nft?.tokenData.drop ? nft?.tokenData.drop : nft?.denomId}
+                  {nft?.tokenData.drop ? nft?.tokenData.drop : `${nft?.denomId} - #${nft?.tokenId}`}
                 </div>
               </div>
               <Form
