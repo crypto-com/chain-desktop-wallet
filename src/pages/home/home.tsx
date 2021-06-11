@@ -433,6 +433,18 @@ function HomePage() {
     },
   ];
 
+  const renderPreview = (_nft: NftProcessedModel) => {
+    return (
+      <img
+        alt={_nft?.denomName}
+        src={_nft?.tokenData.image ? _nft?.tokenData.image : nftThumbnail}
+        onError={e => {
+          (e.target as HTMLImageElement).src = nftThumbnail;
+        }}
+      />
+    );
+  };
+
   const showWalletStateNotification = (config: WalletConfig) => {
     setTimeout(async () => {
       if (isWalletNotLive(config) && !hasShownNotLiveWallet) {
@@ -797,16 +809,7 @@ function HomePage() {
                   <List.Item>
                     <Card
                       style={{ width: 170 }}
-                      cover={
-                        <img
-                          alt={item?.denomName}
-                          src={
-                            item?.isMintedByCDC && item?.tokenData.image
-                              ? item?.tokenData.image
-                              : nftThumbnail
-                          }
-                        />
-                      }
+                      cover={renderPreview(item)}
                       hoverable
                       className="nft"
                     >

@@ -70,7 +70,7 @@ const NftPage = () => {
   const [isNftTransferModalVisible, setIsNftTransferModalVisible] = useState(false);
   const [isNftTransferConfirmVisible, setIsNftTransferConfirmVisible] = useState(false);
 
-  const [nft, setNft] = useState<any>();
+  const [nft, setNft] = useState<NftProcessedModel | undefined>();
   const [nftView, setNftView] = useState('grid');
   const [processedNftList, setProcessedNftList] = useState<NftProcessedModel[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -116,6 +116,34 @@ const NftPage = () => {
     walletAsset,
     AddressType.USER,
   );
+
+  const renderPreview = (_nft: NftProcessedModel | undefined, showThumbnail: boolean = true) => {
+    if (!showThumbnail && _nft?.tokenData.mimeType === 'video/mp4') {
+      return (
+        <ReactPlayer
+          url={`${videoUrl}s`}
+          config={{
+            file: {
+              attributes: {
+                controlsList: 'nodownload',
+              },
+            },
+          }}
+          controls
+          playing={isVideoPlaying}
+        />
+      );
+    }
+    return (
+      <img
+        alt={_nft?.denomName}
+        src={_nft?.tokenData.image ? _nft?.tokenData.image : nftThumbnail}
+        onError={e => {
+          (e.target as HTMLImageElement).src = nftThumbnail;
+        }}
+      />
+    );
+  };
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -298,14 +326,7 @@ const NftPage = () => {
                         style={{ width: 200 }}
                         cover={
                           <>
-                            <img
-                              alt={item?.denomName}
-                              src={
-                                item?.isMintedByCDC && item?.tokenData.image
-                                  ? item?.tokenData.image
-                                  : nftThumbnail
-                              }
-                            />
+                            {renderPreview(item)}
                             {item?.tokenData.mimeType === 'video/mp4' ? (
                               <Icon component={IconPlayer} />
                             ) : (
@@ -375,29 +396,7 @@ const NftPage = () => {
       >
         <Layout className="nft-detail">
           <Content>
-            <div className="nft-image">
-              {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
-                <ReactPlayer
-                  url={videoUrl}
-                  config={{
-                    file: {
-                      attributes: {
-                        controlsList: 'nodownload',
-                      },
-                    },
-                  }}
-                  controls
-                  playing={isVideoPlaying}
-                />
-              ) : (
-                <img
-                  alt={nft?.denomName}
-                  src={
-                    nft?.isMintedByCDC && nft?.tokenData.image ? nft?.tokenData.image : nftThumbnail
-                  }
-                />
-              )}
-            </div>
+            <div className="nft-image">{renderPreview(nft, false)}</div>
           </Content>
           <Sider width="50%">
             <>
@@ -406,7 +405,6 @@ const NftPage = () => {
               </div>
               <div className="item">
                 <Meta
-                  // title={nft?.name}
                   description={
                     <>
                       <Avatar
@@ -546,31 +544,7 @@ const NftPage = () => {
               <div className="title">Confirm Transfer</div>
               <div className="description">Please review the information below.</div>
               <div className="item">
-                <div className="nft-image">
-                  {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
-                    <ReactPlayer
-                      url={videoUrl}
-                      config={{
-                        file: {
-                          attributes: {
-                            controlsList: 'nodownload',
-                          },
-                        },
-                      }}
-                      controls
-                      playing={isVideoPlaying}
-                    />
-                  ) : (
-                    <img
-                      alt={nft?.denomName}
-                      src={
-                        nft?.isMintedByCDC && nft?.tokenData.image
-                          ? nft?.tokenData.image
-                          : nftThumbnail
-                      }
-                    />
-                  )}
-                </div>
+                <div className="nft-image">{renderPreview(nft)}</div>
               </div>
               <div className="item">
                 <div className="label">To</div>
@@ -602,31 +576,7 @@ const NftPage = () => {
               <div className="title">Transfer NFT</div>
               <div className="description">Fill in the information below to transfer your NFT.</div>
               <div className="item">
-                <div className="nft-image">
-                  {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
-                    <ReactPlayer
-                      url={videoUrl}
-                      config={{
-                        file: {
-                          attributes: {
-                            controlsList: 'nodownload',
-                          },
-                        },
-                      }}
-                      controls
-                      playing={isVideoPlaying}
-                    />
-                  ) : (
-                    <img
-                      alt={nft?.denomName}
-                      src={
-                        nft?.isMintedByCDC && nft?.tokenData.image
-                          ? nft?.tokenData.image
-                          : nftThumbnail
-                      }
-                    />
-                  )}
-                </div>
+                <div className="nft-image">{renderPreview(nft)}</div>
               </div>
               <div className="item">
                 <div className="label">Sending</div>
