@@ -242,7 +242,6 @@ const NftPage = () => {
 
       setErrorMessages(e.message.split(': '));
       setIsNftModalVisible(false);
-      // setIsNftTransferConfirmVisible(false)
       setConfirmLoading(false);
       setInputPasswordVisible(false);
       setIsErrorModalVisible(true);
@@ -402,7 +401,6 @@ const NftPage = () => {
           }, 10);
         }}
         handleOk={() => {}}
-        // confirmationLoading={confirmLoading}
         footer={[]}
         okText="Confirm"
         className="nft-modal"
@@ -547,7 +545,6 @@ const NftPage = () => {
             Cancel
           </Button>,
         ]}
-        // footer={[]}
         okText="Confirm"
         className="nft-transfer-modal"
       >
