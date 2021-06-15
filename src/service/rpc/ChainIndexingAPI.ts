@@ -70,9 +70,9 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   // eslint-disable-next-line class-methods-use-this
   public async getNftListMarketplaceData(nftLists: NftResponse[]): Promise<NftModel[]> {
-    const returnNftList: NftModel[] = [];
+    const nftListMap: NftModel[] = [];
     const payload: MintByCDCRequest[] = nftLists.map(item => {
-      returnNftList[`${item.denomId}-${item.tokenId}`] = {
+      nftListMap[`${item.denomId}-${item.tokenId}`] = {
         ...item,
         isMintedByCDC: false,
         marketplaceLink: '',
@@ -94,16 +94,16 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
       results.forEach(result => {
         result.forEach(item => {
-          returnNftList[`${item.denomId}-${item.tokenId}`] = {
-            ...returnNftList[`${item.denomId}-${item.tokenId}`],
+          nftListMap[`${item.denomId}-${item.tokenId}`] = {
+            ...nftListMap[`${item.denomId}-${item.tokenId}`],
             isMintedByCDC: item.isMinted,
             marketplaceLink: item.link ? item.link : '',
           };
         });
       });
-      return Object.values(returnNftList);
+      return Object.values(nftListMap);
     } catch (e) {
-      return Object.values(returnNftList);
+      return Object.values(nftListMap);
     }
   }
 

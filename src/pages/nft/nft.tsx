@@ -359,7 +359,7 @@ const NftPage = () => {
                           title={
                             item?.tokenData.drop
                               ? ellipsis(item?.tokenData.drop, 20)
-                              : ellipsis(item?.denomId, 20)
+                              : ellipsis(`${item?.denomId} - #${item?.tokenId}`, 20)
                           }
                           description={
                             <>
@@ -370,7 +370,7 @@ const NftPage = () => {
                                   verticalAlign: 'middle',
                                 }}
                               />
-                              {middleEllipsis(item?.tokenOwner, 6)}{' '}
+                              {middleEllipsis(item?.tokenMinter, 6)}{' '}
                               {item?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
                             </>
                           }
@@ -412,7 +412,7 @@ const NftPage = () => {
           <Sider width="50%">
             <>
               <div className="title">
-                {nft?.tokenData.drop ? nft?.tokenData.drop : nft?.denomId}
+                {nft?.tokenData.drop ? nft?.tokenData.drop : `${nft?.denomId} - #${nft?.tokenId}`}
               </div>
               <div className="item">
                 <Meta
@@ -425,7 +425,7 @@ const NftPage = () => {
                           verticalAlign: 'middle',
                         }}
                       />
-                      {nft?.tokenOwner}{' '}
+                      {nft?.tokenMinter}{' '}
                       {nft?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
                     </>
                   }
