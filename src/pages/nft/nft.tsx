@@ -267,21 +267,21 @@ const NftPage = () => {
       },
     },
     {
-      title: 'NFT Name',
+      title: 'Denom Name',
       key: 'denomId',
       render: record => {
         return record.denomId;
       },
     },
     {
-      title: 'NFT ID',
+      title: 'Token ID',
       key: 'tokenId',
       render: record => {
         return record.tokenId;
       },
     },
     {
-      title: 'View',
+      title: 'Action',
       key: 'viewAction',
       render: record => {
         return (
@@ -439,11 +439,11 @@ const NftPage = () => {
               </div>
               <div className="item">
                 <div className="table-row">
-                  <div>NFT Name</div>
+                  <div>Denom Name</div>
                   <div>{nft?.denomName}</div>
                 </div>
                 <div className="table-row">
-                  <div>NFT ID</div>
+                  <div>Token ID</div>
                   <div>{nft?.tokenId}</div>
                 </div>
                 {nft?.tokenData.mimeType ? (
@@ -573,11 +573,11 @@ const NftPage = () => {
                 </Layout>
               </div>
               <div className="item">
-                <div className="label">NFT Name</div>
+                <div className="label">Denom Name</div>
                 <div>{`${formValues.denomId}`}</div>
               </div>
               <div className="item">
-                <div className="label">NFT ID</div>
+                <div className="label">Token ID</div>
                 <div>{`${formValues.tokenId}`}</div>
               </div>
             </>
