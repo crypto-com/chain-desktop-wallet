@@ -362,6 +362,54 @@ class WalletService {
     return broadCastResult;
   }
 
+  // public async mintNFT(nftTransferRequest: NFTTransferRequest): Promise<BroadCastResult> {
+  //   const {
+  //     nodeRpc,
+  //     accountNumber,
+  //     accountSequence,
+  //     currentSession,
+  //     transactionSigner,
+  //     ledgerTransactionSigner,
+  //   } = await this.prepareTransaction();
+  //
+  //   const memo = !nftTransferRequest.memo ? DEFAULT_CLIENT_MEMO : nftTransferRequest.memo;
+  //
+  //   const nftTransferUnsigned: NFTTransferUnsigned = {
+  //     tokenId: nftTransferRequest.tokenId,
+  //     denomId: nftTransferRequest.denomId,
+  //     sender: nftTransferRequest.sender,
+  //     recipient: nftTransferRequest.recipient,
+  //
+  //     memo,
+  //     accountNumber,
+  //     accountSequence,
+  //   };
+  //
+  //   let signedTxHex: string = '';
+  //
+  //   if (nftTransferRequest.walletType === LEDGER_WALLET_TYPE) {
+  //     signedTxHex = await ledgerTransactionSigner.signNFTTransfer(
+  //         nftTransferUnsigned,
+  //         nftTransferRequest.decryptedPhrase,
+  //     );
+  //   } else {
+  //     signedTxHex = await transactionSigner.signNFTTransfer(
+  //         nftTransferUnsigned,
+  //         nftTransferRequest.decryptedPhrase,
+  //     );
+  //   }
+  //
+  //   const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+  //
+  //   // It takes a few seconds for the indexing service to sync latest NFT state
+  //   await sleep(5_000);
+  //   await Promise.all([
+  //     this.fetchAndSaveNFTs(currentSession),
+  //     this.fetchAndSaveNFTAccountTxs(currentSession),
+  //   ]);
+  //   return broadCastResult;
+  // }
+
   public async syncAll(session: Session | null = null) {
     const currentSession =
       session == null ? await this.storageService.retrieveCurrentSession() : session;
