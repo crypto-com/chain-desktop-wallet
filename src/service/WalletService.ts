@@ -719,7 +719,7 @@ class WalletService {
   public async fetchAndSaveNFTs(currentSession: Session) {
     try {
       const nfts = await this.loadAllCurrentAccountNFTs();
-      if (!nfts) {
+      if (nfts === null) {
         return;
       }
 
