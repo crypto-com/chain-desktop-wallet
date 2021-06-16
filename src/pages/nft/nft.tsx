@@ -16,8 +16,10 @@ import {
   ledgerIsExpertModeState,
 } from '../../recoil/atom';
 import { ellipsis, middleEllipsis, isJson } from '../../utils/utils';
+import { getUINormalScaleAmount } from '../../utils/NumberUtils';
 import { NftModel, NftProcessedModel, BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
+import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
@@ -82,6 +84,12 @@ const NftPage = () => {
     { label: <MenuOutlined />, value: 'list' },
     { label: <AppstoreOutlined />, value: 'grid' },
   ];
+
+  const networkFee =
+    currentSession.wallet.config.fee !== undefined &&
+    currentSession.wallet.config.fee.networkFee !== undefined
+      ? currentSession.wallet.config.fee.networkFee
+      : FIXED_DEFAULT_FEE;
 
   const closeSuccessModal = () => {
     setIsSuccessModalVisible(false);
@@ -522,6 +530,7 @@ const NftPage = () => {
               key="submit"
               type="primary"
               htmlType="submit"
+              disabled={networkFee > walletAsset.balance}
               onClick={() => {
                 form.submit();
               }}
@@ -580,6 +589,12 @@ const NftPage = () => {
                 <div className="label">Token ID</div>
                 <div>{`${formValues.tokenId}`}</div>
               </div>
+              <div className="item">
+                <div className="label">Transaction Fee</div>
+                <div>
+                  {getUINormalScaleAmount(networkFee, walletAsset.decimals)} {walletAsset.symbol}
+                </div>
+              </div>
             </>
           ) : (
             <>
@@ -602,8 +617,6 @@ const NftPage = () => {
                 onFinish={showPasswordInput}
                 requiredMark={false}
               >
-                {/* <div className="sender">Sender Address</div> */}
-                {/* <div className="sender">{currentSession.wallet.address}</div> */}
                 <Form.Item
                   name="recipientAddress"
                   label="Recipient Address"
@@ -617,6 +630,22 @@ const NftPage = () => {
                   <Input placeholder="Enter recipient address" />
                 </Form.Item>
               </Form>
+              {networkFee > walletAsset.balance ? (
+                <div className="item notice">
+                  <Layout>
+                    <Sider width="20px">
+                      <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                    </Sider>
+                    <Content>
+                      Insufficient balance. Please ensure you have at least{' '}
+                      {getUINormalScaleAmount(networkFee, walletAsset.decimals)}{' '}
+                      {walletAsset.symbol} for network fee.
+                    </Content>
+                  </Layout>
+                </div>
+              ) : (
+                ''
+              )}
               <div className="item notice">
                 <Layout>
                   <Sider width="20px">
