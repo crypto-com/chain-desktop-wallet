@@ -688,7 +688,7 @@ const NftPage = () => {
       >
         <>
           <div className="description">
-            The vote transaction failed. Please try again later.
+            The NFT transaction failed. Please try again later.
             <br />
             {errorMessages
               .filter((item, idx) => {
