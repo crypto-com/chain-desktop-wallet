@@ -289,6 +289,22 @@ const NftPage = () => {
       },
     },
     {
+      title: 'Creator',
+      key: 'creator',
+      render: record => {
+        return (
+          <a
+            data-original={record.tokenMinter}
+            target="_blank"
+            rel="noreferrer"
+            href={`${currentSession.wallet.config.explorerUrl}/account/${record.tokenMinter}`}
+          >
+            {middleEllipsis(record.tokenMinter, 8)}
+          </a>
+        );
+      },
+    },
+    {
       title: 'Action',
       key: 'viewAction',
       render: record => {
@@ -433,7 +449,14 @@ const NftPage = () => {
                           verticalAlign: 'middle',
                         }}
                       />
-                      {nft?.tokenMinter}{' '}
+                      <a
+                        data-original={nft?.tokenMinter}
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`${currentSession.wallet.config.explorerUrl}/account/${nft?.tokenMinter}`}
+                      >
+                        {nft?.tokenMinter}
+                      </a>
                       {nft?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
                     </>
                   }
