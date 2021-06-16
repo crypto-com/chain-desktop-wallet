@@ -285,7 +285,16 @@ function HomePage() {
       title: 'Recipient',
       dataIndex: 'recipientAddress',
       key: 'recipientAddress',
-      render: text => <div data-original={text}>{middleEllipsis(text, 12)}</div>,
+      render: text => (
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
+        >
+          {middleEllipsis(text, 12)}
+        </a>
+      ),
     },
     {
       title: 'Time',
@@ -424,7 +433,20 @@ function HomePage() {
       title: 'Recipient',
       dataIndex: 'recipientAddress',
       key: 'recipientAddress',
-      render: text => <div data-original={text}>{text ? middleEllipsis(text, 12) : 'n.a.'}</div>,
+      render: text => {
+        return text ? (
+          <a
+            data-original={text}
+            target="_blank"
+            rel="noreferrer"
+            href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
+          >
+            {middleEllipsis(text, 12)}
+          </a>
+        ) : (
+          <div data-original={text}>n.a.</div>
+        );
+      },
     },
     {
       title: 'Time',
@@ -714,7 +736,16 @@ function HomePage() {
       title: 'Delegator Address',
       dataIndex: 'delegatorAddress',
       key: 'delegatorAddress',
-      render: text => <a>{middleEllipsis(text, 8)}</a>,
+      render: text => (
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
+        >
+          {middleEllipsis(text, 8)}
+        </a>
+      ),
     },
     {
       title: 'Undelegate',
