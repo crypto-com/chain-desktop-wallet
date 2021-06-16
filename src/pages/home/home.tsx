@@ -42,6 +42,7 @@ import { Session } from '../../models/Session';
 import {
   BroadCastResult,
   NftModel,
+  NftProcessedModel,
   StakingTransactionData,
   TransactionDirection,
   TransactionStatus,
@@ -211,7 +212,7 @@ function HomePage() {
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const didMountRef = useRef(false);
 
-  const [processedNftList, setProcessedNftList] = useState<any[]>([]);
+  const [processedNftList, setProcessedNftList] = useState<NftProcessedModel[]>([]);
 
   // Undelegate action related states changes
   const [form] = Form.useForm();
@@ -353,7 +354,7 @@ function HomePage() {
           if (record.messageType === NftTransactionType.MINT_NFT) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-                Mint NFT
+                Minted NFT
               </Tag>
             );
             // eslint-disable-next-line no-else-return
@@ -368,7 +369,7 @@ function HomePage() {
           } else if (record.messageType === NftTransactionType.ISSUE_DENOM) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-                Issue Denom
+                Issued Denom
               </Tag>
             );
           }
@@ -432,6 +433,18 @@ function HomePage() {
     },
   ];
 
+  const renderPreview = (_nft: NftProcessedModel) => {
+    return (
+      <img
+        alt={_nft?.denomName}
+        src={_nft?.tokenData.image ? _nft?.tokenData.image : nftThumbnail}
+        onError={e => {
+          (e.target as HTMLImageElement).src = nftThumbnail;
+        }}
+      />
+    );
+  };
+
   const showWalletStateNotification = (config: WalletConfig) => {
     setTimeout(async () => {
       if (isWalletNotLive(config) && !hasShownNotLiveWallet) {
@@ -480,14 +493,13 @@ function HomePage() {
 
   const processNftList = (currentList: NftModel[] | undefined) => {
     if (currentList) {
-      return currentList.slice(0, maxNftPreview).map((item, idx) => {
+      return currentList.slice(0, maxNftPreview).map(item => {
         const denomSchema = isJson(item.denomSchema)
           ? JSON.parse(item.denomSchema)
           : item.denomSchema;
         const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
-        const nftModel = {
+        const nftModel: NftProcessedModel = {
           ...item,
-          key: `${idx}`,
           denomSchema,
           tokenData,
         };
@@ -797,16 +809,7 @@ function HomePage() {
                   <List.Item>
                     <Card
                       style={{ width: 170 }}
-                      cover={
-                        <img
-                          alt={item?.denomName}
-                          src={
-                            item?.isMintedByCDC && item?.tokenData.image
-                              ? item?.tokenData.image
-                              : nftThumbnail
-                          }
-                        />
-                      }
+                      cover={renderPreview(item)}
                       hoverable
                       className="nft"
                     >

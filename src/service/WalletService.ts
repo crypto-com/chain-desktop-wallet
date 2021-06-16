@@ -729,7 +729,7 @@ class WalletService {
       });
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.error('FAILED_TO_LOAD_SAVE_PROPOSALS', e);
+      console.error('FAILED_TO_LOAD_SAVE_NFTS', e);
     }
   }
 
