@@ -845,7 +845,11 @@ function HomePage() {
                       className="nft"
                     >
                       <Meta
-                        title={item?.tokenData.drop ? item?.tokenData.drop : item?.denomName}
+                        title={
+                          item?.tokenData.drop
+                            ? item?.tokenData.drop
+                            : `${item?.denomId} - #${item?.tokenId}`
+                        }
                         description={
                           <>
                             <Avatar
@@ -855,7 +859,7 @@ function HomePage() {
                                 verticalAlign: 'middle',
                               }}
                             />
-                            {middleEllipsis(item?.tokenOwner, 6)}{' '}
+                            {middleEllipsis(item?.tokenMinter, 6)}{' '}
                             {item?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
                           </>
                         }
