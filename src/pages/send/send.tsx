@@ -3,7 +3,7 @@ import './send.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber, Layout } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
+import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import {remote} from 'electron';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
@@ -62,7 +62,7 @@ const FormSend = () => {
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
-    const transferInoputAmount = adjustedTransactionAmount(
+    const transferInputAmount = adjustedTransactionAmount(
       form.getFieldValue('amount'),
       walletAsset,
       currentSession.wallet.config.fee !== undefined &&
@@ -73,7 +73,7 @@ const FormSend = () => {
     setFormValues({
       ...form.getFieldsValue(),
       // Replace scientific notation to plain string values
-      amount: fromScientificNotation(transferInoputAmount),
+      amount: fromScientificNotation(transferInputAmount),
     });
     setIsVisibleConfirmationModal(true);
   };

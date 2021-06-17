@@ -1,8 +1,9 @@
-import { CroNetwork } from '@crypto-com/chain-jslib/lib/dist/core/cro';
+import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import { getRandomId } from '../crypto/RandomGen';
 
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
+export const NV_GRAPHQL_API_ENDPOINT = 'https://crypto.com/nft-api/graphql';
 export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';
 
 export const NodePorts = {
@@ -42,6 +43,23 @@ const TestNetConfig: WalletConfig = {
   indexingUrl: 'https://crypto.org/explorer/croeseid/api/v1/',
   nodeUrl: CroNetwork.Testnet.defaultNodeUrl,
   network: CroNetwork.Testnet,
+  disableDefaultClientMemo: false,
+  enableGeneralSettings: false,
+  analyticsDisabled: false,
+  fee: {
+    gasLimit: FIXED_DEFAULT_GAS_LIMIT,
+    networkFee: FIXED_DEFAULT_FEE,
+  },
+};
+
+const TestNetCroeseid3: WalletConfig = {
+  enabled: true,
+  name: 'TESTNET CROESEID 3',
+  derivationPath: "m/44'/1'/0'/0/0",
+  explorerUrl: 'https://crypto.org/explorer/croeseid3',
+  indexingUrl: 'https://crypto.org/explorer/croeseid3/api/v1/',
+  nodeUrl: CroNetwork.TestnetCroeseid3.defaultNodeUrl,
+  network: CroNetwork.TestnetCroeseid3,
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,
@@ -104,6 +122,7 @@ export const DefaultWalletConfigs = {
   TestNetConfig,
   MainNetConfig,
   CustomDevNet,
+  TestNetCroeseid3,
 };
 
 // Every created wallet get initialized with a new CRO asset
@@ -134,4 +153,5 @@ export type Network = {
   validatorPubKeyPrefix: string;
   validatorAddressPrefix: string;
   coin: { baseDenom: string; croDenom: string };
+  rpcUrl?: string;
 };

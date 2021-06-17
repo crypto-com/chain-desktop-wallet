@@ -21,6 +21,7 @@ import {
   marketState,
   validatorListState,
   fetchingDBState,
+  nftListState,
 } from '../../recoil/atom';
 import { trimString } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
@@ -28,8 +29,10 @@ import IconHome from '../../svg/IconHome';
 import IconSend from '../../svg/IconSend';
 import IconReceive from '../../svg/IconReceive';
 import IconStaking from '../../svg/IconStaking';
+import IconNft from '../../svg/IconNft';
 import IconWallet from '../../svg/IconWallet';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
 import packageJson from '../../../package.json';
@@ -46,35 +49,48 @@ const { Sider } = Layout;
 function HomeLayout(props: HomeLayoutProps) {
   const history = useHistory();
   const [confirmDeleteForm] = Form.useForm();
+  const [deleteWalletAddress, setDeleteWalletAddress] = useState('');
   const [hasWallet, setHasWallet] = useState(true); // Default as true. useEffect will only re-render if result of hasWalletBeenCreated === false
   const [session, setSession] = useRecoilState(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [marketData, setMarketData] = useRecoilState(marketState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
+  const [nftList, setNftList] = useRecoilState(nftListState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+  const [isSuccessDeleteModalVisible, setIsSuccessDeleteModalVisible] = useState(false);
+
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
 
-  async function fetchAndSetNewValidators() {
+  async function fetchAndSetNewValidators(currentSession) {
     try {
-      await walletService.fetchAndSaveValidators(session);
+      await walletService.fetchAndSaveValidators(currentSession);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet validators list', e);
     }
   }
 
-  async function fetchAndSetNewProposals() {
+  async function fetchAndSetNewProposals(currentSession) {
     try {
-      await walletService.fetchAndSaveProposals(session);
+      await walletService.fetchAndSaveProposals(currentSession);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet proposals', e);
+    }
+  }
+
+  async function fetchAndSetNFTs(currentSession) {
+    try {
+      await walletService.fetchAndSaveNFTs(currentSession);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Failed loading new wallet NFTs', e);
     }
   }
 
@@ -99,6 +115,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
     setIsButtonLoading(false);
     setIsConfirmationModalVisible(false);
+    setIsSuccessDeleteModalVisible(true);
     setFetchingDB(false);
     setIsButtonDisabled(true);
     setIsConfirmDeleteVisible(false);
@@ -106,11 +123,13 @@ function HomeLayout(props: HomeLayoutProps) {
   };
 
   const handleCancel = () => {
-    setIsConfirmationModalVisible(false);
-    setIsConfirmDeleteVisible(false);
-    setIsButtonDisabled(true);
-    setIsConfirmDeleteVisible(false);
-    confirmDeleteForm.resetFields();
+    if (!isButtonLoading) {
+      setIsConfirmationModalVisible(false);
+      setIsConfirmDeleteVisible(false);
+      setIsButtonDisabled(true);
+      setIsConfirmDeleteVisible(false);
+      confirmDeleteForm.resetFields();
+    }
   };
 
   const showPasswordModal = () => {
@@ -121,27 +140,35 @@ function HomeLayout(props: HomeLayoutProps) {
     const fetchDB = async () => {
       setFetchingDB(true);
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
-      const sessionData = await walletService.retrieveCurrentSession();
-      const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+      const currentSession = await walletService.retrieveCurrentSession();
+      const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       const allWalletsData = await walletService.retrieveAllWallets();
       const currentMarketData = await walletService.retrieveAssetPrice(
         currentAsset.mainnetSymbol,
         'usd',
       );
-      const currentValidatorList = await walletService.retrieveTopValidators(
-        sessionData.wallet.config.network.chainId,
-      );
 
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
-
       setHasWallet(hasWalletBeenCreated);
-      setSession(sessionData);
+      setSession(currentSession);
       setUserAsset(currentAsset);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
+
+      await Promise.all([
+        await fetchAndSetNewValidators(currentSession),
+        await fetchAndSetNewProposals(currentSession),
+        await fetchAndSetNFTs(currentSession),
+      ]);
+
+      const currentValidatorList = await walletService.retrieveTopValidators(
+        currentSession.wallet.config.network.chainId,
+      );
+      const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
+
       setValidatorList(currentValidatorList);
-      await fetchAndSetNewValidators();
-      await fetchAndSetNewProposals();
+      setNftList(currentNftList);
+
       setFetchingDB(false);
 
       // Timeout for loading
@@ -169,11 +196,22 @@ function HomeLayout(props: HomeLayoutProps) {
     setMarketData,
     validatorList,
     setValidatorList,
+    nftList,
+    setNftList,
   ]);
 
   const HomeMenu = () => {
     const locationPath = useLocation().pathname;
-    const paths = ['/home', '/staking', '/send', '/receive', '/settings', '/governance', '/wallet'];
+    const paths = [
+      '/home',
+      '/staking',
+      '/send',
+      '/receive',
+      '/settings',
+      '/governance',
+      '/nft',
+      '/wallet',
+    ];
 
     let menuSelectedKey = locationPath;
     if (!paths.includes(menuSelectedKey)) {
@@ -196,6 +234,9 @@ function HomeLayout(props: HomeLayoutProps) {
         </Menu.Item>
         <Menu.Item key="/governance" icon={<BankOutlined />}>
           <Link to="/governance">Governance</Link>
+        </Menu.Item>
+        <Menu.Item key="/nft" icon={<Icon component={IconNft} />}>
+          <Link to="/nft">My NFT</Link>
         </Menu.Item>
         <Menu.Item key="/settings" icon={<SettingOutlined />}>
           <Link to="/settings">Settings</Link>
@@ -229,7 +270,10 @@ function HomeLayout(props: HomeLayoutProps) {
           <>
             <Menu.Item
               className="delete-wallet-item"
-              onClick={() => setIsConfirmationModalVisible(true)}
+              onClick={() => {
+                setDeleteWalletAddress(session.wallet.address);
+                setIsConfirmationModalVisible(true);
+              }}
             >
               <DeleteOutlined />
               Delete Wallet
@@ -317,7 +361,8 @@ function HomeLayout(props: HomeLayoutProps) {
             <div className="description">Please review the below information. </div>
             <div className="item">
               <div className="label">Delete Wallet Address</div>
-              <div className="address">{`${session.wallet.address}`}</div>
+              {/* <div className="address">{`${session.wallet.address}`}</div> */}
+              <div className="address">{`${deleteWalletAddress}`}</div>
             </div>
             {!isConfirmDeleteVisible ? (
               <>
@@ -361,7 +406,7 @@ function HomeLayout(props: HomeLayoutProps) {
                         required: true,
                       },
                       {
-                        pattern: /DELETE/,
+                        pattern: /^DELETE$/,
                         message: 'Please enter DELETE',
                       },
                     ]}
@@ -373,6 +418,38 @@ function HomeLayout(props: HomeLayoutProps) {
             )}
           </>
         </ModalPopup>
+        <SuccessModalPopup
+          isModalVisible={isSuccessDeleteModalVisible}
+          handleCancel={() => {
+            setIsSuccessDeleteModalVisible(false);
+          }}
+          handleOk={() => {
+            setIsSuccessDeleteModalVisible(false);
+          }}
+          title="Success!"
+          button={null}
+          footer={[
+            <Button
+              key="submit"
+              type="primary"
+              onClick={() => {
+                setIsSuccessDeleteModalVisible(false);
+              }}
+            >
+              Ok
+            </Button>,
+          ]}
+        >
+          <>
+            <div className="description">
+              Wallet Address
+              <br />
+              {deleteWalletAddress}
+              <br />
+              has been deleted.
+            </div>
+          </>
+        </SuccessModalPopup>
         <ModalPopup
           isModalVisible={isAnnouncementVisible}
           handleCancel={() => {

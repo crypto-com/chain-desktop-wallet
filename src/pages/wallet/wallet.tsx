@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import './wallet.less';
 import 'antd/dist/antd.css';
-import { Layout, Space, Spin, Table, Typography, Tag } from 'antd';
+import { Layout, Space, Spin, Table, Typography, Tag, AutoComplete } from 'antd';
 import Icon, { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
 import {
   sessionState,
@@ -10,6 +10,7 @@ import {
   walletListState,
   validatorListState,
   fetchingDBState,
+  nftListState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
@@ -31,6 +32,7 @@ function WalletPage() {
   const [session, setSession] = useRecoilState<Session>(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
+  const [nftList, setNftList] = useRecoilState(nftListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
   const walletList = useRecoilValue(walletListState);
   const [loading, setLoading] = useState(false);
@@ -64,6 +66,9 @@ function WalletPage() {
       case DefaultWalletConfigs.TestNetConfig.name:
         networkColor = 'error';
         break;
+      case DefaultWalletConfigs.TestNetCroeseid3.name:
+        networkColor = 'error';
+        break;
       default:
         networkColor = 'default';
     }
@@ -83,8 +88,10 @@ function WalletPage() {
     await walletService.setCurrentSession(new Session(walletList[e.key]));
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+    const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
     setSession(currentSession);
     setUserAsset(currentAsset);
+    setNftList(currentNftList);
     await walletService.syncAll(currentSession);
     const currentValidatorList = await walletService.retrieveTopValidators(
       currentSession.wallet.config.network.chainId,
@@ -92,6 +99,17 @@ function WalletPage() {
     setValidatorList(currentValidatorList);
 
     setLoading(false);
+  };
+
+  const onSearch = value => {
+    const newWalletList = walletList.filter(wallet => {
+      return (
+        wallet.name.toLowerCase().indexOf(value.toLowerCase()) !== -1 ||
+        wallet.address.toLowerCase().indexOf(value.toLowerCase()) !== -1 ||
+        value === ''
+      );
+    });
+    setProcessedWalletList(processWalletList(newWalletList));
   };
 
   useEffect(() => {
@@ -106,7 +124,7 @@ function WalletPage() {
       didMountRef.current = true;
       analyticsService.logPage('Wallet');
     }
-  }, [fetchingDB, userAsset, validatorList]);
+  }, [fetchingDB, userAsset, nftList, validatorList]);
 
   const columns = [
     {
@@ -233,6 +251,13 @@ function WalletPage() {
       <Content>
         <div className="site-layout-background wallet-content">
           <div className="container">
+            <div className="item">
+              <AutoComplete
+                style={{ width: 400 }}
+                onSearch={onSearch}
+                placeholder="Search by Name, Address..."
+              />
+            </div>
             <Table
               dataSource={processedWalletList}
               columns={columns}

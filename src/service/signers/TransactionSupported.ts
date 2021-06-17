@@ -18,6 +18,13 @@ export interface VoteTransactionUnsigned extends TransactionUnsigned {
   proposalID: string;
 }
 
+export interface NFTTransferUnsigned extends TransactionUnsigned {
+  tokenId: string;
+  denomId: string;
+  sender: string;
+  recipient: string;
+}
+
 export interface DelegateTransactionUnsigned extends TransactionUnsigned {
   delegatorAddress: string;
   validatorAddress: string;

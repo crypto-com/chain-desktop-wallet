@@ -1,5 +1,5 @@
-import { Bytes } from '@crypto-com/chain-jslib/lib/dist/utils/bytes/bytes';
-import sdk from '@crypto-com/chain-jslib';
+import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
+import sdk from '@crypto-org-chain/chain-jslib';
 import { Big, Units } from '../../utils/ChainJsLib';
 import {
   FIXED_DEFAULT_FEE,
@@ -256,6 +256,39 @@ export class LedgerTransactionSigner implements ITransactionSigner {
     const bytesMessage: Bytes = signableTx.toSignDocument(0);
 
     const signature = await this.signerProvider.sign(bytesMessage);
+    return signableTx
+      .setSignature(0, signature)
+      .toSigned()
+      .getHexEncoded();
+  }
+
+  async signNFTTransfer(transaction: any, decryptedPhrase: string) {
+    const { cro, rawTx } = this.getTransactionInfo(decryptedPhrase, transaction);
+
+    const msgTransferNFT = new cro.nft.MsgTransferNFT({
+      id: transaction.tokenId,
+      sender: transaction.sender,
+      denomId: transaction.denomId,
+      recipient: transaction.recipient,
+    });
+
+    const pubkeyoriginal = (
+      await this.signerProvider.getPubKey(this.addressIndex, false)
+    ).toUint8Array();
+    const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
+    const signableTx = rawTx
+      .appendMessage(msgTransferNFT)
+      .addSigner({
+        publicKey: pubkey,
+        accountNumber: new Big(transaction.accountNumber),
+        accountSequence: new Big(transaction.accountSequence),
+        signMode: 0, //   LEGACY_AMINO_JSON = 0, DIRECT = 1,
+      })
+      .toSignable();
+
+    const bytesMessage: Bytes = signableTx.toSignDocument(0);
+    const signature = await this.signerProvider.sign(bytesMessage);
+
     return signableTx
       .setSignature(0, signature)
       .toSigned()
