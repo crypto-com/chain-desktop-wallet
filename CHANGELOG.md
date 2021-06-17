@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
-## [v0.2.3] - 2021-06-11
+## [v0.2.3] - 2021-06-17
 
 ### Additions
 - Implemented search for the wallet list view
