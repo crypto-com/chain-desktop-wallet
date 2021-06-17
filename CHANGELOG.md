@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 ### Additions
 - Implemented search for the wallet list view
 - Added support for croeseid testnet version 3
+- Fix governance votes tally numbers  
 - Add a new NFT UI tab and NFT section on the home screen 
 - Load, persist in the DB, and show to the UI all current accounts NFTs
 - Add support to send and receive NFTs: Sign and broadcast NFT transactions
