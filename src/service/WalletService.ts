@@ -364,7 +364,7 @@ class WalletService {
     return broadCastResult;
   }
 
-  public async mintNFT(nftMintRequest: NFTMintRequest): Promise<BroadCastResult> {
+  public async broadcastMintNFT(nftMintRequest: NFTMintRequest): Promise<BroadCastResult> {
     const {
       nodeRpc,
       accountNumber,
