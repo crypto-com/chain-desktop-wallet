@@ -2,11 +2,32 @@ import React, { useState, useEffect } from 'react';
 import './nft.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Layout, Card, Tabs, List, Avatar, Radio, Table, Button, Form, Input } from 'antd';
-import Icon, { MenuOutlined, AppstoreOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import {
+  Layout,
+  Card,
+  Tabs,
+  List,
+  Avatar,
+  Radio,
+  Table,
+  Button,
+  Form,
+  Input,
+  Upload,
+  Switch,
+  message,
+} from 'antd';
+import Icon, {
+  MenuOutlined,
+  AppstoreOutlined,
+  ExclamationCircleOutlined,
+  LoadingOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import ReactPlayer from 'react-player';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
+import axios from 'axios';
 
 import {
   sessionState,
@@ -15,7 +36,7 @@ import {
   walletAssetState,
   ledgerIsExpertModeState,
 } from '../../recoil/atom';
-import { ellipsis, middleEllipsis, isJson } from '../../utils/utils';
+import { ellipsis, middleEllipsis, isJson, convertIpfsToHttp } from '../../utils/utils';
 import { getUINormalScaleAmount } from '../../utils/NumberUtils';
 import { NftModel, NftProcessedModel, BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
@@ -44,6 +65,209 @@ const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
 const { Meta } = Card;
 const layout = {};
+
+const FormMintNft = () => {
+  const [form] = Form.useForm();
+  const currentSession = useRecoilValue(sessionState);
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [imageUrl, setImageUrl] = useState('');
+  // const [formValues, setFormValues] = useState({
+  //   file: '',
+  //   tokenData: '',
+  //   tokenId: '',
+  //   denomId: '',
+  //   memo: '',
+  // });
+
+  const showConfirmationModal = () => {
+    setInputPasswordVisible(false);
+    // setFormValues({
+    //   ...form.getFieldsValue(true),
+    //   // Replace scientific notation to plain string values
+    //   denomId: nft?.denomId,
+    //   tokenId: nft?.tokenId,
+    //   senderAddress: currentSession.wallet.address,
+    // });
+  };
+
+  const showPasswordInput = () => {
+    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      showConfirmationModal();
+    } else {
+      setInputPasswordVisible(true);
+      // setIsNftTransferModalVisible(false);
+    }
+  };
+
+  const onWalletDecryptFinish = async (password: string) => {
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      currentSession.wallet.identifier,
+    );
+    setDecryptedPhrase(phraseDecrypted);
+    showConfirmationModal();
+  };
+
+  function beforeUpload(file) {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+      message.error('You can only upload JPG/PNG file!');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('Image must smaller than 2MB!');
+    }
+    return isJpgOrPng && isLt2M;
+  }
+
+  // function getBase64(img, callback) {
+  //   const reader = new FileReader();
+  //   reader.addEventListener('load', () => callback(reader.result));
+  //   reader.readAsDataURL(img);
+  // }
+
+  const handleChange = info => {
+    if (info.file.status === 'uploading') {
+      setUploading(true);
+      return;
+    }
+    setUploading(false);
+    // if (info.file.status === 'done') {
+    // Get this url from response in real world.
+    // getBase64(info.file.originFileObj, (url) => {
+    //   setImageUrl(url);
+    //   setUploading(false);
+    // });
+    // }
+  };
+
+  const uploadButton = (
+    <div>
+      {uploading ? <LoadingOutlined /> : <PlusOutlined />}
+      <div style={{ marginTop: 8 }}>Upload</div>
+    </div>
+  );
+
+  return (
+    <>
+      <Form
+        {...layout}
+        layout="vertical"
+        form={form}
+        name="control-ref"
+        onFinish={showPasswordInput}
+        requiredMark={false}
+      >
+        <Form.Item
+          name="denomId"
+          label="Denom Name"
+          hasFeedback
+          validateFirst
+          rules={[{ required: true, message: 'Drop Name is required' }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          name="tokenId"
+          label="Token ID"
+          hasFeedback
+          validateFirst
+          rules={[{ required: true, message: 'Token ID is required' }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          name="drop"
+          label="Drop Name"
+          hasFeedback
+          validateFirst
+          rules={[
+            { required: true, message: 'Drop Name is required' },
+            {
+              pattern: /[^0]+/,
+              message: 'Staking amount cannot be 0',
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Switch />
+        <br />
+        <br />
+        <br />
+        <Upload
+          name="avatar"
+          listType="picture-card"
+          className="avatar-uploader"
+          showUploadList={false}
+          action={async (file: any) => {
+            console.log(file);
+            console.log(file.path);
+            setUploading(true);
+            const formData = new FormData();
+            formData.append('file', file);
+            const result = await axios
+              .create({
+                baseURL: 'https://crypto.org/ipfs-middleware-server',
+              })
+              .post('uploads', formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data',
+                },
+              });
+            console.log(result);
+
+            if (result.data.status === 200) {
+              // const parseResult = JSON.parse(result.data.ipfsUrl);
+
+              // console.log(parseResult.image)
+              const url = convertIpfsToHttp(result.data.ipfsUrl);
+              console.log(url);
+              const imagePath: any = await axios
+                .create({
+                  baseURL: url,
+                })
+                .get('');
+              console.log(imagePath);
+              const returnImagePath = convertIpfsToHttp(imagePath.data.image);
+              setImageUrl(returnImagePath);
+              setUploading(false);
+              return returnImagePath;
+            }
+            return '';
+          }}
+          beforeUpload={beforeUpload}
+          onChange={handleChange}
+        >
+          {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+        </Upload>
+      </Form>
+      <PasswordFormModal
+        description="Input the app password decrypt wallet"
+        okButtonText="Decrypt wallet"
+        onCancel={() => {
+          setInputPasswordVisible(false);
+          // setIsNftTransferModalVisible(true);
+        }}
+        onSuccess={onWalletDecryptFinish}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          return {
+            valid: isValid,
+            errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+          };
+        }}
+        successText="Wallet decrypted successfully !"
+        title="Provide app password"
+        visible={inputPasswordVisible}
+        successButtonText="Continue"
+        confirmPassword={false}
+      />
+    </>
+  );
+};
 
 const NftPage = () => {
   const [form] = Form.useForm();
@@ -411,352 +635,374 @@ const NftPage = () => {
                 <Table columns={NftColumns} dataSource={processedNftList} />
               )}
             </div>
+            <>
+              <ModalPopup
+                isModalVisible={isNftModalVisible}
+                handleCancel={() => {
+                  // Stop the video when closing
+                  setIsVideoPlaying(false);
+                  setVideoUrl(undefined);
+                  setTimeout(() => {
+                    setIsNftModalVisible(false);
+                  }, 10);
+                }}
+                handleOk={() => {}}
+                footer={[]}
+                okText="Confirm"
+                className="nft-modal"
+              >
+                <Layout className="nft-detail">
+                  <Content>
+                    <div className="nft-image">{renderPreview(nft, false)}</div>
+                  </Content>
+                  <Sider width="50%">
+                    <>
+                      <div className="title">
+                        {nft?.tokenData.drop
+                          ? nft?.tokenData.drop
+                          : `${nft?.denomId} - #${nft?.tokenId}`}
+                      </div>
+                      <div className="item">
+                        <Meta
+                          description={
+                            <>
+                              <Avatar
+                                style={{
+                                  background:
+                                    'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                  verticalAlign: 'middle',
+                                }}
+                              />
+                              <a
+                                data-original={nft?.tokenMinter}
+                                target="_blank"
+                                rel="noreferrer"
+                                href={`${currentSession.wallet.config.explorerUrl}/account/${nft?.tokenMinter}`}
+                              >
+                                {nft?.tokenMinter}
+                              </a>
+                              {nft?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
+                            </>
+                          }
+                        />
+                      </div>
+                      <div className="item">
+                        <div className="subtitle">About the Drop</div>
+                        <div className="description">
+                          {nft?.tokenData.description ? nft?.tokenData.description : 'n.a.'}
+                        </div>
+                      </div>
+                      <div className="item">
+                        <div className="table-row">
+                          <div>Denom Name</div>
+                          <div>{nft?.denomName}</div>
+                        </div>
+                        <div className="table-row">
+                          <div>Token ID</div>
+                          <div>{nft?.tokenId}</div>
+                        </div>
+                        {nft?.tokenData.mimeType ? (
+                          <div className="table-row">
+                            <div>Content URL</div>
+                            <a
+                              data-original={nft?.denomName}
+                              target="_blank"
+                              rel="noreferrer"
+                              href={
+                                supportedVideo(nft?.tokenData.mimeType)
+                                  ? nft?.tokenData.animation_url
+                                  : nft?.tokenData.image
+                              }
+                            >
+                              {supportedVideo(nft?.tokenData.mimeType)
+                                ? nft?.tokenData.animation_url
+                                : nft?.tokenData.image}
+                            </a>
+                          </div>
+                        ) : (
+                          ''
+                        )}
+                      </div>
+                      <div className="item">
+                        <Button
+                          key="submit"
+                          type="primary"
+                          onClick={() => {
+                            setIsNftTransferModalVisible(true);
+                            setIsNftModalVisible(false);
+                          }}
+                        >
+                          Transfer NFT
+                        </Button>
+                      </div>
+                      <div className="item goto-marketplace">
+                        {nft?.marketplaceLink !== '' ? (
+                          <a
+                            data-original={nft?.denomName}
+                            target="_blank"
+                            rel="noreferrer"
+                            href={nft?.marketplaceLink}
+                          >
+                            View on Crypto.com NFT
+                          </a>
+                        ) : (
+                          ''
+                        )}
+                      </div>
+                    </>
+                  </Sider>
+                </Layout>
+              </ModalPopup>
+              <ModalPopup
+                isModalVisible={isNftTransferModalVisible}
+                handleCancel={() => {
+                  setIsNftTransferModalVisible(false);
+                  setIsNftTransferConfirmVisible(false);
+                  setIsNftModalVisible(true);
+                  form.resetFields();
+                }}
+                handleOk={() => {}}
+                footer={[
+                  isNftTransferConfirmVisible ? (
+                    <Button
+                      key="submit"
+                      type="primary"
+                      onClick={onConfirmTransfer}
+                      loading={confirmLoading}
+                    >
+                      Confirm Transfer
+                    </Button>
+                  ) : (
+                    <Button
+                      key="submit"
+                      type="primary"
+                      htmlType="submit"
+                      disabled={networkFee > walletAsset.balance}
+                      onClick={() => {
+                        form.submit();
+                      }}
+                    >
+                      Next
+                    </Button>
+                  ),
+                  <Button
+                    key="back"
+                    type="link"
+                    onClick={() => {
+                      if (isNftTransferConfirmVisible) {
+                        setIsNftTransferConfirmVisible(false);
+                      } else {
+                        setIsNftTransferModalVisible(false);
+                        setIsNftModalVisible(true);
+                        form.resetFields();
+                      }
+                    }}
+                  >
+                    Cancel
+                  </Button>,
+                ]}
+                okText="Confirm"
+                className="nft-transfer-modal"
+              >
+                <>
+                  {isNftTransferConfirmVisible ? (
+                    <>
+                      <div className="title">Confirm Transfer</div>
+                      <div className="description">Please review the information below.</div>
+                      <div className="item">
+                        <div className="nft-image">{renderPreview(nft)}</div>
+                      </div>
+                      <div className="item">
+                        <div className="label">To</div>
+                        <div className="address">{`${form.getFieldValue('recipientAddress')}`}</div>
+                      </div>
+                      <div className="item notice">
+                        <Layout>
+                          <Sider width="20px">
+                            <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                          </Sider>
+                          <Content>
+                            This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient
+                            address that is not compatible with the Crypto.org Chain NFT token
+                            standard will result in the permanent loss of your asset.
+                          </Content>
+                        </Layout>
+                      </div>
+                      <div className="item">
+                        <div className="label">Denom Name</div>
+                        <div>{`${formValues.denomId}`}</div>
+                      </div>
+                      <div className="item">
+                        <div className="label">Token ID</div>
+                        <div>{`${formValues.tokenId}`}</div>
+                      </div>
+                      <div className="item">
+                        <div className="label">Transaction Fee</div>
+                        <div>
+                          {getUINormalScaleAmount(networkFee, walletAsset.decimals)}{' '}
+                          {walletAsset.symbol}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="title">Transfer NFT</div>
+                      <div className="description">
+                        Fill in the information below to transfer your NFT.
+                      </div>
+                      <div className="item">
+                        <div className="nft-image">{renderPreview(nft)}</div>
+                      </div>
+                      <div className="item">
+                        <div className="label">Sending</div>
+                        <div className="address">
+                          {nft?.tokenData.drop
+                            ? nft?.tokenData.drop
+                            : `${nft?.denomId} - #${nft?.tokenId}`}
+                        </div>
+                      </div>
+                      <Form
+                        {...layout}
+                        layout="vertical"
+                        form={form}
+                        name="control-ref"
+                        onFinish={showPasswordInput}
+                        requiredMark={false}
+                      >
+                        <Form.Item
+                          name="recipientAddress"
+                          label="Recipient Address"
+                          hasFeedback
+                          validateFirst
+                          rules={[
+                            { required: true, message: 'Recipient address is required' },
+                            customAddressValidator,
+                          ]}
+                        >
+                          <Input placeholder="Enter recipient address" />
+                        </Form.Item>
+                      </Form>
+                      {networkFee > walletAsset.balance ? (
+                        <div className="item notice">
+                          <Layout>
+                            <Sider width="20px">
+                              <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                            </Sider>
+                            <Content>
+                              Insufficient balance. Please ensure you have at least{' '}
+                              {getUINormalScaleAmount(networkFee, walletAsset.decimals)}{' '}
+                              {walletAsset.symbol} for network fee.
+                            </Content>
+                          </Layout>
+                        </div>
+                      ) : (
+                        ''
+                      )}
+                      <div className="item notice">
+                        <Layout>
+                          <Sider width="20px">
+                            <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                          </Sider>
+                          <Content>
+                            This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient
+                            address that is not compatible with the Crypto.org Chain NFT token
+                            standard will result in the permanent loss of your asset.
+                          </Content>
+                        </Layout>
+                      </div>
+                    </>
+                  )}
+                </>
+              </ModalPopup>
+              <PasswordFormModal
+                description="Input the app password decrypt wallet"
+                okButtonText="Decrypt wallet"
+                onCancel={() => {
+                  setInputPasswordVisible(false);
+                  setIsNftTransferModalVisible(true);
+                }}
+                onSuccess={onWalletDecryptFinish}
+                onValidatePassword={async (password: string) => {
+                  const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+                  return {
+                    valid: isValid,
+                    errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+                  };
+                }}
+                successText="Wallet decrypted successfully !"
+                title="Provide app password"
+                visible={inputPasswordVisible}
+                successButtonText="Continue"
+                confirmPassword={false}
+              />
+              <SuccessModalPopup
+                isModalVisible={isSuccessModalVisible}
+                handleCancel={closeSuccessModal}
+                handleOk={closeSuccessModal}
+                title="Success!"
+                button={null}
+                footer={[
+                  <Button key="submit" type="primary" onClick={closeSuccessModal}>
+                    Ok
+                  </Button>,
+                ]}
+              >
+                <>
+                  {broadcastResult?.code !== undefined &&
+                  broadcastResult?.code !== null &&
+                  broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+                    <div className="description">
+                      The transaction timed out but it will be included in the subsequent blocks
+                    </div>
+                  ) : (
+                    <div className="description">
+                      Your NFT transaction was broadcasted successfully!
+                    </div>
+                  )}
+                </>
+              </SuccessModalPopup>
+              <ErrorModalPopup
+                isModalVisible={isErrorModalVisible}
+                handleCancel={closeErrorModal}
+                handleOk={closeErrorModal}
+                title="An error happened!"
+                footer={[]}
+              >
+                <>
+                  <div className="description">
+                    The NFT transaction failed. Please try again later.
+                    <br />
+                    {errorMessages
+                      .filter((item, idx) => {
+                        return errorMessages.indexOf(item) === idx;
+                      })
+                      .map((err, idx) => (
+                        <div key={idx}>- {err}</div>
+                      ))}
+                    {ledgerIsExpertMode ? (
+                      <div>
+                        Please ensure that your have enabled Expert mode on your ledger device.
+                      </div>
+                    ) : (
+                      ''
+                    )}
+                  </div>
+                </>
+              </ErrorModalPopup>
+            </>
+          </TabPane>
+          <TabPane tab="NFT Mint" key="2">
+            <div className="site-layout-background nft-content">
+              <div className="container">
+                <div className="description">Mint your NFT on Crypto.org chain.</div>
+                <FormMintNft />
+              </div>
+            </div>
           </TabPane>
         </Tabs>
       </Content>
-      <ModalPopup
-        isModalVisible={isNftModalVisible}
-        handleCancel={() => {
-          // Stop the video when closing
-          setIsVideoPlaying(false);
-          setVideoUrl(undefined);
-          setTimeout(() => {
-            setIsNftModalVisible(false);
-          }, 10);
-        }}
-        handleOk={() => {}}
-        footer={[]}
-        okText="Confirm"
-        className="nft-modal"
-      >
-        <Layout className="nft-detail">
-          <Content>
-            <div className="nft-image">{renderPreview(nft, false)}</div>
-          </Content>
-          <Sider width="50%">
-            <>
-              <div className="title">
-                {nft?.tokenData.drop ? nft?.tokenData.drop : `${nft?.denomId} - #${nft?.tokenId}`}
-              </div>
-              <div className="item">
-                <Meta
-                  description={
-                    <>
-                      <Avatar
-                        style={{
-                          background:
-                            'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
-                          verticalAlign: 'middle',
-                        }}
-                      />
-                      <a
-                        data-original={nft?.tokenMinter}
-                        target="_blank"
-                        rel="noreferrer"
-                        href={`${currentSession.wallet.config.explorerUrl}/account/${nft?.tokenMinter}`}
-                      >
-                        {nft?.tokenMinter}
-                      </a>
-                      {nft?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
-                    </>
-                  }
-                />
-              </div>
-              <div className="item">
-                <div className="subtitle">About the Drop</div>
-                <div className="description">
-                  {nft?.tokenData.description ? nft?.tokenData.description : 'n.a.'}
-                </div>
-              </div>
-              <div className="item">
-                <div className="table-row">
-                  <div>Denom Name</div>
-                  <div>{nft?.denomName}</div>
-                </div>
-                <div className="table-row">
-                  <div>Token ID</div>
-                  <div>{nft?.tokenId}</div>
-                </div>
-                {nft?.tokenData.mimeType ? (
-                  <div className="table-row">
-                    <div>Content URL</div>
-                    <a
-                      data-original={nft?.denomName}
-                      target="_blank"
-                      rel="noreferrer"
-                      href={
-                        supportedVideo(nft?.tokenData.mimeType)
-                          ? nft?.tokenData.animation_url
-                          : nft?.tokenData.image
-                      }
-                    >
-                      {supportedVideo(nft?.tokenData.mimeType)
-                        ? nft?.tokenData.animation_url
-                        : nft?.tokenData.image}
-                    </a>
-                  </div>
-                ) : (
-                  ''
-                )}
-              </div>
-              <div className="item">
-                <Button
-                  key="submit"
-                  type="primary"
-                  onClick={() => {
-                    setIsNftTransferModalVisible(true);
-                    setIsNftModalVisible(false);
-                  }}
-                >
-                  Transfer NFT
-                </Button>
-              </div>
-              <div className="item goto-marketplace">
-                {nft?.marketplaceLink !== '' ? (
-                  <a
-                    data-original={nft?.denomName}
-                    target="_blank"
-                    rel="noreferrer"
-                    href={nft?.marketplaceLink}
-                  >
-                    View on Crypto.com NFT
-                  </a>
-                ) : (
-                  ''
-                )}
-              </div>
-            </>
-          </Sider>
-        </Layout>
-      </ModalPopup>
-      <ModalPopup
-        isModalVisible={isNftTransferModalVisible}
-        handleCancel={() => {
-          setIsNftTransferModalVisible(false);
-          setIsNftTransferConfirmVisible(false);
-          setIsNftModalVisible(true);
-          form.resetFields();
-        }}
-        handleOk={() => {}}
-        footer={[
-          isNftTransferConfirmVisible ? (
-            <Button
-              key="submit"
-              type="primary"
-              onClick={onConfirmTransfer}
-              loading={confirmLoading}
-            >
-              Confirm Transfer
-            </Button>
-          ) : (
-            <Button
-              key="submit"
-              type="primary"
-              htmlType="submit"
-              disabled={networkFee > walletAsset.balance}
-              onClick={() => {
-                form.submit();
-              }}
-            >
-              Next
-            </Button>
-          ),
-          <Button
-            key="back"
-            type="link"
-            onClick={() => {
-              if (isNftTransferConfirmVisible) {
-                setIsNftTransferConfirmVisible(false);
-              } else {
-                setIsNftTransferModalVisible(false);
-                setIsNftModalVisible(true);
-                form.resetFields();
-              }
-            }}
-          >
-            Cancel
-          </Button>,
-        ]}
-        okText="Confirm"
-        className="nft-transfer-modal"
-      >
-        <>
-          {isNftTransferConfirmVisible ? (
-            <>
-              <div className="title">Confirm Transfer</div>
-              <div className="description">Please review the information below.</div>
-              <div className="item">
-                <div className="nft-image">{renderPreview(nft)}</div>
-              </div>
-              <div className="item">
-                <div className="label">To</div>
-                <div className="address">{`${form.getFieldValue('recipientAddress')}`}</div>
-              </div>
-              <div className="item notice">
-                <Layout>
-                  <Sider width="20px">
-                    <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
-                  </Sider>
-                  <Content>
-                    This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address
-                    that is not compatible with the Crypto.org Chain NFT token standard will result
-                    in the permanent loss of your asset.
-                  </Content>
-                </Layout>
-              </div>
-              <div className="item">
-                <div className="label">Denom Name</div>
-                <div>{`${formValues.denomId}`}</div>
-              </div>
-              <div className="item">
-                <div className="label">Token ID</div>
-                <div>{`${formValues.tokenId}`}</div>
-              </div>
-              <div className="item">
-                <div className="label">Transaction Fee</div>
-                <div>
-                  {getUINormalScaleAmount(networkFee, walletAsset.decimals)} {walletAsset.symbol}
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="title">Transfer NFT</div>
-              <div className="description">Fill in the information below to transfer your NFT.</div>
-              <div className="item">
-                <div className="nft-image">{renderPreview(nft)}</div>
-              </div>
-              <div className="item">
-                <div className="label">Sending</div>
-                <div className="address">
-                  {nft?.tokenData.drop ? nft?.tokenData.drop : `${nft?.denomId} - #${nft?.tokenId}`}
-                </div>
-              </div>
-              <Form
-                {...layout}
-                layout="vertical"
-                form={form}
-                name="control-ref"
-                onFinish={showPasswordInput}
-                requiredMark={false}
-              >
-                <Form.Item
-                  name="recipientAddress"
-                  label="Recipient Address"
-                  hasFeedback
-                  validateFirst
-                  rules={[
-                    { required: true, message: 'Recipient address is required' },
-                    customAddressValidator,
-                  ]}
-                >
-                  <Input placeholder="Enter recipient address" />
-                </Form.Item>
-              </Form>
-              {networkFee > walletAsset.balance ? (
-                <div className="item notice">
-                  <Layout>
-                    <Sider width="20px">
-                      <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
-                    </Sider>
-                    <Content>
-                      Insufficient balance. Please ensure you have at least{' '}
-                      {getUINormalScaleAmount(networkFee, walletAsset.decimals)}{' '}
-                      {walletAsset.symbol} for network fee.
-                    </Content>
-                  </Layout>
-                </div>
-              ) : (
-                ''
-              )}
-              <div className="item notice">
-                <Layout>
-                  <Sider width="20px">
-                    <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
-                  </Sider>
-                  <Content>
-                    This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address
-                    that is not compatible with the Crypto.org Chain NFT token standard will result
-                    in the permanent loss of your asset.
-                  </Content>
-                </Layout>
-              </div>
-            </>
-          )}
-        </>
-      </ModalPopup>
+
       <Footer />
-      <PasswordFormModal
-        description="Input the app password decrypt wallet"
-        okButtonText="Decrypt wallet"
-        onCancel={() => {
-          setInputPasswordVisible(false);
-          setIsNftTransferModalVisible(true);
-        }}
-        onSuccess={onWalletDecryptFinish}
-        onValidatePassword={async (password: string) => {
-          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
-          return {
-            valid: isValid,
-            errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
-          };
-        }}
-        successText="Wallet decrypted successfully !"
-        title="Provide app password"
-        visible={inputPasswordVisible}
-        successButtonText="Continue"
-        confirmPassword={false}
-      />
-      <SuccessModalPopup
-        isModalVisible={isSuccessModalVisible}
-        handleCancel={closeSuccessModal}
-        handleOk={closeSuccessModal}
-        title="Success!"
-        button={null}
-        footer={[
-          <Button key="submit" type="primary" onClick={closeSuccessModal}>
-            Ok
-          </Button>,
-        ]}
-      >
-        <>
-          {broadcastResult?.code !== undefined &&
-          broadcastResult?.code !== null &&
-          broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">
-              The transaction timed out but it will be included in the subsequent blocks
-            </div>
-          ) : (
-            <div className="description">Your NFT transaction was broadcasted successfully!</div>
-          )}
-        </>
-      </SuccessModalPopup>
-      <ErrorModalPopup
-        isModalVisible={isErrorModalVisible}
-        handleCancel={closeErrorModal}
-        handleOk={closeErrorModal}
-        title="An error happened!"
-        footer={[]}
-      >
-        <>
-          <div className="description">
-            The NFT transaction failed. Please try again later.
-            <br />
-            {errorMessages
-              .filter((item, idx) => {
-                return errorMessages.indexOf(item) === idx;
-              })
-              .map((err, idx) => (
-                <div key={idx}>- {err}</div>
-              ))}
-            {ledgerIsExpertMode ? (
-              <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
-            ) : (
-              ''
-            )}
-          </div>
-        </>
-      </ErrorModalPopup>
     </Layout>
   );
 };
