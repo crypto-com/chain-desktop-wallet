@@ -16,8 +16,10 @@ import {
   ledgerIsExpertModeState,
 } from '../../recoil/atom';
 import { ellipsis, middleEllipsis, isJson } from '../../utils/utils';
-import { NftModel, BroadCastResult } from '../../models/Transaction';
+import { getUINormalScaleAmount } from '../../utils/NumberUtils';
+import { NftModel, NftProcessedModel, BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
+import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
@@ -70,9 +72,9 @@ const NftPage = () => {
   const [isNftTransferModalVisible, setIsNftTransferModalVisible] = useState(false);
   const [isNftTransferConfirmVisible, setIsNftTransferConfirmVisible] = useState(false);
 
-  const [nft, setNft] = useState<any>();
+  const [nft, setNft] = useState<NftProcessedModel | undefined>();
   const [nftView, setNftView] = useState('grid');
-  const [processedNftList, setProcessedNftList] = useState<any[]>([]);
+  const [processedNftList, setProcessedNftList] = useState<NftProcessedModel[]>([]);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | undefined>('');
 
@@ -82,6 +84,12 @@ const NftPage = () => {
     { label: <MenuOutlined />, value: 'list' },
     { label: <AppstoreOutlined />, value: 'grid' },
   ];
+
+  const networkFee =
+    currentSession.wallet.config.fee !== undefined &&
+    currentSession.wallet.config.fee.networkFee !== undefined
+      ? currentSession.wallet.config.fee.networkFee
+      : FIXED_DEFAULT_FEE;
 
   const closeSuccessModal = () => {
     setIsSuccessModalVisible(false);
@@ -95,14 +103,13 @@ const NftPage = () => {
 
   const processNftList = (currentList: NftModel[] | undefined) => {
     if (currentList) {
-      return currentList.map((item, idx) => {
+      return currentList.map(item => {
         const denomSchema = isJson(item.denomSchema)
           ? JSON.parse(item.denomSchema)
           : item.denomSchema;
         const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
-        const nftModel = {
+        const nftModel: NftProcessedModel = {
           ...item,
-          key: `${idx}`,
           denomSchema,
           tokenData,
         };
@@ -117,6 +124,47 @@ const NftPage = () => {
     walletAsset,
     AddressType.USER,
   );
+
+  const supportedVideo = (mimeType: string | undefined) => {
+    switch (mimeType) {
+      case 'video/mp4':
+      case 'video/webm':
+      case 'video/ogg':
+      case 'audio/ogg':
+      case 'audio/mpeg':
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  const renderPreview = (_nft: NftProcessedModel | undefined, showThumbnail: boolean = true) => {
+    if (!showThumbnail && supportedVideo(_nft?.tokenData.mimeType)) {
+      return (
+        <ReactPlayer
+          url={videoUrl}
+          config={{
+            file: {
+              attributes: {
+                controlsList: 'nodownload',
+              },
+            },
+          }}
+          controls
+          playing={isVideoPlaying}
+        />
+      );
+    }
+    return (
+      <img
+        alt={_nft?.denomName}
+        src={_nft?.tokenData.image ? _nft?.tokenData.image : nftThumbnail}
+        onError={e => {
+          (e.target as HTMLImageElement).src = nftThumbnail;
+        }}
+      />
+    );
+  };
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -202,7 +250,6 @@ const NftPage = () => {
 
       setErrorMessages(e.message.split(': '));
       setIsNftModalVisible(false);
-      // setIsNftTransferConfirmVisible(false)
       setConfirmLoading(false);
       setInputPasswordVisible(false);
       setIsErrorModalVisible(true);
@@ -228,21 +275,37 @@ const NftPage = () => {
       },
     },
     {
-      title: 'NFT Name',
+      title: 'Denom Name',
       key: 'denomId',
       render: record => {
         return record.denomId;
       },
     },
     {
-      title: 'NFT ID',
+      title: 'Token ID',
       key: 'tokenId',
       render: record => {
         return record.tokenId;
       },
     },
     {
-      title: 'View',
+      title: 'Creator',
+      key: 'creator',
+      render: record => {
+        return (
+          <a
+            data-original={record.tokenMinter}
+            target="_blank"
+            rel="noreferrer"
+            href={`${currentSession.wallet.config.explorerUrl}/account/${record.tokenMinter}`}
+          >
+            {middleEllipsis(record.tokenMinter, 8)}
+          </a>
+        );
+      },
+    },
+    {
+      title: 'Action',
       key: 'viewAction',
       render: record => {
         return (
@@ -299,15 +362,8 @@ const NftPage = () => {
                         style={{ width: 200 }}
                         cover={
                           <>
-                            <img
-                              alt={item?.denomName}
-                              src={
-                                item?.isMintedByCDC && item?.tokenData.image
-                                  ? item?.tokenData.image
-                                  : nftThumbnail
-                              }
-                            />
-                            {item?.tokenData.mimeType === 'video/mp4' ? (
+                            {renderPreview(item)}
+                            {supportedVideo(item?.tokenData.mimeType) ? (
                               <Icon component={IconPlayer} />
                             ) : (
                               ''
@@ -327,7 +383,7 @@ const NftPage = () => {
                           title={
                             item?.tokenData.drop
                               ? ellipsis(item?.tokenData.drop, 20)
-                              : ellipsis(item?.denomId, 20)
+                              : ellipsis(`${item?.denomId} - #${item?.tokenId}`, 20)
                           }
                           description={
                             <>
@@ -338,7 +394,7 @@ const NftPage = () => {
                                   verticalAlign: 'middle',
                                 }}
                               />
-                              {middleEllipsis(item?.tokenOwner, 6)}{' '}
+                              {middleEllipsis(item?.tokenMinter, 6)}{' '}
                               {item?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
                             </>
                           }
@@ -369,45 +425,21 @@ const NftPage = () => {
           }, 10);
         }}
         handleOk={() => {}}
-        // confirmationLoading={confirmLoading}
         footer={[]}
         okText="Confirm"
         className="nft-modal"
       >
         <Layout className="nft-detail">
           <Content>
-            <div className="nft-image">
-              {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
-                <ReactPlayer
-                  url={videoUrl}
-                  config={{
-                    file: {
-                      attributes: {
-                        controlsList: 'nodownload',
-                      },
-                    },
-                  }}
-                  controls
-                  playing={isVideoPlaying}
-                />
-              ) : (
-                <img
-                  alt={nft?.denomName}
-                  src={
-                    nft?.isMintedByCDC && nft?.tokenData.image ? nft?.tokenData.image : nftThumbnail
-                  }
-                />
-              )}
-            </div>
+            <div className="nft-image">{renderPreview(nft, false)}</div>
           </Content>
           <Sider width="50%">
             <>
               <div className="title">
-                {nft?.tokenData.drop ? nft?.tokenData.drop : nft?.denomId}
+                {nft?.tokenData.drop ? nft?.tokenData.drop : `${nft?.denomId} - #${nft?.tokenId}`}
               </div>
               <div className="item">
                 <Meta
-                  // title={nft?.name}
                   description={
                     <>
                       <Avatar
@@ -417,7 +449,14 @@ const NftPage = () => {
                           verticalAlign: 'middle',
                         }}
                       />
-                      {nft?.tokenOwner}{' '}
+                      <a
+                        data-original={nft?.tokenMinter}
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`${currentSession.wallet.config.explorerUrl}/account/${nft?.tokenMinter}`}
+                      >
+                        {nft?.tokenMinter}
+                      </a>
                       {nft?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
                     </>
                   }
@@ -431,27 +470,27 @@ const NftPage = () => {
               </div>
               <div className="item">
                 <div className="table-row">
-                  <div>NFT Name</div>
+                  <div>Denom Name</div>
                   <div>{nft?.denomName}</div>
                 </div>
                 <div className="table-row">
-                  <div>NFT ID</div>
+                  <div>Token ID</div>
                   <div>{nft?.tokenId}</div>
                 </div>
                 {nft?.tokenData.mimeType ? (
                   <div className="table-row">
-                    <div>CONTENT URL</div>
+                    <div>Content URL</div>
                     <a
                       data-original={nft?.denomName}
                       target="_blank"
                       rel="noreferrer"
                       href={
-                        nft?.tokenData.mimeType === 'video/mp4'
+                        supportedVideo(nft?.tokenData.mimeType)
                           ? nft?.tokenData.animation_url
                           : nft?.tokenData.image
                       }
                     >
-                      {nft?.tokenData.mimeType === 'video/mp4'
+                      {supportedVideo(nft?.tokenData.mimeType)
                         ? nft?.tokenData.animation_url
                         : nft?.tokenData.image}
                     </a>
@@ -514,6 +553,7 @@ const NftPage = () => {
               key="submit"
               type="primary"
               htmlType="submit"
+              disabled={networkFee > walletAsset.balance}
               onClick={() => {
                 form.submit();
               }}
@@ -537,7 +577,6 @@ const NftPage = () => {
             Cancel
           </Button>,
         ]}
-        // footer={[]}
         okText="Confirm"
         className="nft-transfer-modal"
       >
@@ -547,31 +586,7 @@ const NftPage = () => {
               <div className="title">Confirm Transfer</div>
               <div className="description">Please review the information below.</div>
               <div className="item">
-                <div className="nft-image">
-                  {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
-                    <ReactPlayer
-                      url={videoUrl}
-                      config={{
-                        file: {
-                          attributes: {
-                            controlsList: 'nodownload',
-                          },
-                        },
-                      }}
-                      controls
-                      playing={isVideoPlaying}
-                    />
-                  ) : (
-                    <img
-                      alt={nft?.denomName}
-                      src={
-                        nft?.isMintedByCDC && nft?.tokenData.image
-                          ? nft?.tokenData.image
-                          : nftThumbnail
-                      }
-                    />
-                  )}
-                </div>
+                <div className="nft-image">{renderPreview(nft)}</div>
               </div>
               <div className="item">
                 <div className="label">To</div>
@@ -590,12 +605,18 @@ const NftPage = () => {
                 </Layout>
               </div>
               <div className="item">
-                <div className="label">NFT Name</div>
+                <div className="label">Denom Name</div>
                 <div>{`${formValues.denomId}`}</div>
               </div>
               <div className="item">
-                <div className="label">NFT ID</div>
+                <div className="label">Token ID</div>
                 <div>{`${formValues.tokenId}`}</div>
+              </div>
+              <div className="item">
+                <div className="label">Transaction Fee</div>
+                <div>
+                  {getUINormalScaleAmount(networkFee, walletAsset.decimals)} {walletAsset.symbol}
+                </div>
               </div>
             </>
           ) : (
@@ -603,36 +624,12 @@ const NftPage = () => {
               <div className="title">Transfer NFT</div>
               <div className="description">Fill in the information below to transfer your NFT.</div>
               <div className="item">
-                <div className="nft-image">
-                  {nft?.isMintedByCDC && nft?.tokenData.mimeType === 'video/mp4' ? (
-                    <ReactPlayer
-                      url={videoUrl}
-                      config={{
-                        file: {
-                          attributes: {
-                            controlsList: 'nodownload',
-                          },
-                        },
-                      }}
-                      controls
-                      playing={isVideoPlaying}
-                    />
-                  ) : (
-                    <img
-                      alt={nft?.denomName}
-                      src={
-                        nft?.isMintedByCDC && nft?.tokenData.image
-                          ? nft?.tokenData.image
-                          : nftThumbnail
-                      }
-                    />
-                  )}
-                </div>
+                <div className="nft-image">{renderPreview(nft)}</div>
               </div>
               <div className="item">
                 <div className="label">Sending</div>
                 <div className="address">
-                  {nft?.tokenData.drop ? nft?.tokenData.drop : nft?.denomId}
+                  {nft?.tokenData.drop ? nft?.tokenData.drop : `${nft?.denomId} - #${nft?.tokenId}`}
                 </div>
               </div>
               <Form
@@ -643,8 +640,6 @@ const NftPage = () => {
                 onFinish={showPasswordInput}
                 requiredMark={false}
               >
-                {/* <div className="sender">Sender Address</div> */}
-                {/* <div className="sender">{currentSession.wallet.address}</div> */}
                 <Form.Item
                   name="recipientAddress"
                   label="Recipient Address"
@@ -658,6 +653,22 @@ const NftPage = () => {
                   <Input placeholder="Enter recipient address" />
                 </Form.Item>
               </Form>
+              {networkFee > walletAsset.balance ? (
+                <div className="item notice">
+                  <Layout>
+                    <Sider width="20px">
+                      <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                    </Sider>
+                    <Content>
+                      Insufficient balance. Please ensure you have at least{' '}
+                      {getUINormalScaleAmount(networkFee, walletAsset.decimals)}{' '}
+                      {walletAsset.symbol} for network fee.
+                    </Content>
+                  </Layout>
+                </div>
+              ) : (
+                ''
+              )}
               <div className="item notice">
                 <Layout>
                   <Sider width="20px">
@@ -729,7 +740,7 @@ const NftPage = () => {
       >
         <>
           <div className="description">
-            The vote transaction failed. Please try again later.
+            The NFT transaction failed. Please try again later.
             <br />
             {errorMessages
               .filter((item, idx) => {

@@ -354,7 +354,7 @@ class WalletService {
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
 
     // It takes a few seconds for the indexing service to sync latest NFT state
-    await sleep(5_000);
+    await sleep(7_000);
     await Promise.all([
       this.fetchAndSaveNFTs(currentSession),
       this.fetchAndSaveNFTAccountTxs(currentSession),
@@ -767,7 +767,7 @@ class WalletService {
   public async fetchAndSaveNFTs(currentSession: Session) {
     try {
       const nfts = await this.loadAllCurrentAccountNFTs();
-      if (!nfts) {
+      if (nfts === null) {
         return;
       }
 
@@ -777,7 +777,7 @@ class WalletService {
       });
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.error('FAILED_TO_LOAD_SAVE_PROPOSALS', e);
+      console.error('FAILED_TO_LOAD_SAVE_NFTS', e);
     }
   }
 

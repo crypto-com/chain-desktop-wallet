@@ -42,6 +42,7 @@ import { Session } from '../../models/Session';
 import {
   BroadCastResult,
   NftModel,
+  NftProcessedModel,
   StakingTransactionData,
   TransactionDirection,
   TransactionStatus,
@@ -211,7 +212,7 @@ function HomePage() {
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const didMountRef = useRef(false);
 
-  const [processedNftList, setProcessedNftList] = useState<any[]>([]);
+  const [processedNftList, setProcessedNftList] = useState<NftProcessedModel[]>([]);
 
   // Undelegate action related states changes
   const [form] = Form.useForm();
@@ -284,7 +285,16 @@ function HomePage() {
       title: 'Recipient',
       dataIndex: 'recipientAddress',
       key: 'recipientAddress',
-      render: text => <div data-original={text}>{middleEllipsis(text, 12)}</div>,
+      render: text => (
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
+        >
+          {middleEllipsis(text, 12)}
+        </a>
+      ),
     },
     {
       title: 'Time',
@@ -353,7 +363,7 @@ function HomePage() {
           if (record.messageType === NftTransactionType.MINT_NFT) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-                Mint NFT
+                Minted NFT
               </Tag>
             );
             // eslint-disable-next-line no-else-return
@@ -368,7 +378,7 @@ function HomePage() {
           } else if (record.messageType === NftTransactionType.ISSUE_DENOM) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-                Issue Denom
+                Issued Denom
               </Tag>
             );
           }
@@ -423,7 +433,20 @@ function HomePage() {
       title: 'Recipient',
       dataIndex: 'recipientAddress',
       key: 'recipientAddress',
-      render: text => <div data-original={text}>{text ? middleEllipsis(text, 12) : 'n.a.'}</div>,
+      render: text => {
+        return text ? (
+          <a
+            data-original={text}
+            target="_blank"
+            rel="noreferrer"
+            href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
+          >
+            {middleEllipsis(text, 12)}
+          </a>
+        ) : (
+          <div data-original={text}>n.a.</div>
+        );
+      },
     },
     {
       title: 'Time',
@@ -431,6 +454,18 @@ function HomePage() {
       key: 'time',
     },
   ];
+
+  const renderPreview = (_nft: NftProcessedModel) => {
+    return (
+      <img
+        alt={_nft?.denomName}
+        src={_nft?.tokenData.image ? _nft?.tokenData.image : nftThumbnail}
+        onError={e => {
+          (e.target as HTMLImageElement).src = nftThumbnail;
+        }}
+      />
+    );
+  };
 
   const showWalletStateNotification = (config: WalletConfig) => {
     setTimeout(async () => {
@@ -480,14 +515,13 @@ function HomePage() {
 
   const processNftList = (currentList: NftModel[] | undefined) => {
     if (currentList) {
-      return currentList.slice(0, maxNftPreview).map((item, idx) => {
+      return currentList.slice(0, maxNftPreview).map(item => {
         const denomSchema = isJson(item.denomSchema)
           ? JSON.parse(item.denomSchema)
           : item.denomSchema;
         const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
-        const nftModel = {
+        const nftModel: NftProcessedModel = {
           ...item,
-          key: `${idx}`,
           denomSchema,
           tokenData,
         };
@@ -702,7 +736,16 @@ function HomePage() {
       title: 'Delegator Address',
       dataIndex: 'delegatorAddress',
       key: 'delegatorAddress',
-      render: text => <a>{middleEllipsis(text, 8)}</a>,
+      render: text => (
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
+        >
+          {middleEllipsis(text, 8)}
+        </a>
+      ),
     },
     {
       title: 'Undelegate',
@@ -797,21 +840,16 @@ function HomePage() {
                   <List.Item>
                     <Card
                       style={{ width: 170 }}
-                      cover={
-                        <img
-                          alt={item?.denomName}
-                          src={
-                            item?.isMintedByCDC && item?.tokenData.image
-                              ? item?.tokenData.image
-                              : nftThumbnail
-                          }
-                        />
-                      }
+                      cover={renderPreview(item)}
                       hoverable
                       className="nft"
                     >
                       <Meta
-                        title={item?.tokenData.drop ? item?.tokenData.drop : item?.denomName}
+                        title={
+                          item?.tokenData.drop
+                            ? item?.tokenData.drop
+                            : `${item?.denomId} - #${item?.tokenId}`
+                        }
                         description={
                           <>
                             <Avatar
@@ -821,7 +859,7 @@ function HomePage() {
                                 verticalAlign: 'middle',
                               }}
                             />
-                            {middleEllipsis(item?.tokenOwner, 6)}{' '}
+                            {middleEllipsis(item?.tokenMinter, 6)}{' '}
                             {item?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
                           </>
                         }
