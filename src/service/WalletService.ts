@@ -24,6 +24,7 @@ import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
 import { Session } from '../models/Session';
 import {
   DelegateTransactionUnsigned,
+  NFTMintUnsigned,
   NFTTransferUnsigned,
   RedelegateTransactionUnsigned,
   TransferTransactionUnsigned,
@@ -57,6 +58,7 @@ import { createLedgerDevice, LEDGER_WALLET_TYPE } from './LedgerService';
 import { ISignerProvider } from './signers/SignerProvider';
 import {
   DelegationRequest,
+  NFTMintRequest,
   NFTTransferRequest,
   RedelegationRequest,
   TransferRequest,
@@ -355,6 +357,57 @@ class WalletService {
 
     // It takes a few seconds for the indexing service to sync latest NFT state
     await sleep(7_000);
+    await Promise.all([
+      this.fetchAndSaveNFTs(currentSession),
+      this.fetchAndSaveNFTAccountTxs(currentSession),
+    ]);
+    return broadCastResult;
+  }
+
+  public async broadcastMintNFT(nftMintRequest: NFTMintRequest): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.prepareTransaction();
+
+    const memo = !nftMintRequest.memo ? DEFAULT_CLIENT_MEMO : nftMintRequest.memo;
+
+    const nftMintUnsigned: NFTMintUnsigned = {
+      data: nftMintRequest.data,
+      name: nftMintRequest.name,
+      uri: nftMintRequest.uri,
+      tokenId: nftMintRequest.tokenId,
+      denomId: nftMintRequest.denomId,
+      sender: nftMintRequest.sender,
+      recipient: nftMintRequest.recipient,
+
+      memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+
+    if (nftMintRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signNFTMint(
+        nftMintUnsigned,
+        nftMintRequest.decryptedPhrase,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signNFTMint(
+        nftMintUnsigned,
+        nftMintRequest.decryptedPhrase,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+
+    // It takes a few seconds for the indexing service to sync latest NFT state
+    await sleep(5_000);
     await Promise.all([
       this.fetchAndSaveNFTs(currentSession),
       this.fetchAndSaveNFTAccountTxs(currentSession),
