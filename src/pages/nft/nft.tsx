@@ -16,6 +16,7 @@ import {
   Upload,
   Switch,
   message,
+  notification,
 } from 'antd';
 import Icon, {
   MenuOutlined,
@@ -66,6 +67,19 @@ const { TabPane } = Tabs;
 const { Meta } = Card;
 const layout = {};
 
+const supportedVideo = (mimeType: string | undefined) => {
+  switch (mimeType) {
+    case 'video/mp4':
+    case 'video/webm':
+    case 'video/ogg':
+    case 'audio/ogg':
+    case 'audio/mpeg':
+      return true;
+    default:
+      return false;
+  }
+};
+
 const FormMintNft = () => {
   const [form] = Form.useForm();
   const currentSession = useRecoilValue(sessionState);
@@ -111,15 +125,29 @@ const FormMintNft = () => {
   };
 
   function beforeUpload(file) {
+    const isVideo = file.type.indexOf('video') !== -1;
+    const isSupportedVideo = supportedVideo(file.type);
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-    if (!isJpgOrPng) {
-      message.error('You can only upload JPG/PNG file!');
+    const isImageTooLarge = file.size / 1024 / 1024 > 1;
+    const isVideoTooLarge = file.size / 1024 / 1024 > 3;
+    console.log(file.size / 1024 / 1024);
+    if (isVideo) {
+      if (!isSupportedVideo) {
+        message.error('You can only upload mp4 file!');
+      }
+      if (isVideoTooLarge) {
+        message.error('Video must smaller than 1MB!');
+      }
+    } else {
+      if (!isJpgOrPng) {
+        message.error('You can only upload JPG/PNG file!');
+      }
+      if (isImageTooLarge) {
+        message.error('Image must smaller than 1MB!');
+      }
     }
-    const isLt2M = file.size / 1024 / 1024 < 2;
-    if (!isLt2M) {
-      message.error('Image must smaller than 2MB!');
-    }
-    return isJpgOrPng && isLt2M;
+
+    return (isVideo && isSupportedVideo && !isVideoTooLarge) || (isJpgOrPng && !isImageTooLarge);
   }
 
   // function getBase64(img, callback) {
@@ -203,39 +231,52 @@ const FormMintNft = () => {
           className="avatar-uploader"
           showUploadList={false}
           action={async (file: any) => {
-            console.log(file);
-            console.log(file.path);
             setUploading(true);
-            const formData = new FormData();
-            formData.append('file', file);
-            const result = await axios
-              .create({
-                baseURL: 'https://crypto.org/ipfs-middleware-server',
-              })
-              .post('uploads', formData, {
-                headers: {
-                  'Content-Type': 'multipart/form-data',
-                },
-              });
-            console.log(result);
-
-            if (result.data.status === 200) {
-              // const parseResult = JSON.parse(result.data.ipfsUrl);
-
-              // console.log(parseResult.image)
-              const url = convertIpfsToHttp(result.data.ipfsUrl);
-              console.log(url);
-              const imagePath: any = await axios
+            try {
+              const formData = new FormData();
+              formData.append('file', file);
+              const result = await axios
                 .create({
-                  baseURL: url,
+                  // baseURL: 'https://crypto.org/ipfs-middleware-server',
+                  baseURL: 'http://localhost:3001',
                 })
-                .get('');
-              console.log(imagePath);
-              const returnImagePath = convertIpfsToHttp(imagePath.data.image);
-              setImageUrl(returnImagePath);
-              setUploading(false);
-              return returnImagePath;
+                .post('uploads', formData, {
+                  headers: {
+                    'Content-Type': 'multipart/form-data',
+                  },
+                });
+              console.log(result);
+
+              if (result.data.status === 200) {
+                // console.log(parseResult.image)
+                const url = convertIpfsToHttp(result.data.ipfsUrl);
+                console.log(url);
+                const imagePath: any = await axios
+                  .create({
+                    baseURL: url,
+                  })
+                  .get('');
+                console.log(imagePath);
+                const returnImagePath = convertIpfsToHttp(imagePath.data.image);
+                setImageUrl(returnImagePath);
+                setUploading(false);
+                return returnImagePath;
+              }
+              notification.error({
+                message: 'Upload failed',
+                description: 'Please confirm your connection & try again later.',
+                placement: 'topRight',
+                duration: 20,
+              });
+            } catch (e) {
+              notification.error({
+                message: 'Upload failed',
+                description: 'Please confirm your connection & try again later.',
+                placement: 'topRight',
+                duration: 20,
+              });
             }
+
             return '';
           }}
           beforeUpload={beforeUpload}
@@ -348,19 +389,6 @@ const NftPage = () => {
     walletAsset,
     AddressType.USER,
   );
-
-  const supportedVideo = (mimeType: string | undefined) => {
-    switch (mimeType) {
-      case 'video/mp4':
-      case 'video/webm':
-      case 'video/ogg':
-      case 'audio/ogg':
-      case 'audio/mpeg':
-        return true;
-      default:
-        return false;
-    }
-  };
 
   const renderPreview = (_nft: NftProcessedModel | undefined, showThumbnail: boolean = true) => {
     if (!showThumbnail && supportedVideo(_nft?.tokenData.mimeType)) {
