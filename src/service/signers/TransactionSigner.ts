@@ -14,6 +14,7 @@ import {
   RedelegateTransactionUnsigned,
   VoteTransactionUnsigned,
   NFTTransferUnsigned,
+  NFTMintUnsigned,
 } from './TransactionSupported';
 
 export interface ITransactionSigner {
@@ -123,6 +124,34 @@ export class TransactionSigner implements ITransactionSigner {
 
     const signableTx = rawTx
       .appendMessage(msgTransferNFT)
+      .addSigner({
+        publicKey: keyPair.getPubKey(),
+        accountNumber: new Big(transaction.accountNumber),
+        accountSequence: new Big(transaction.accountSequence),
+      })
+      .toSignable();
+
+    return signableTx
+      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
+      .toSigned()
+      .getHexEncoded();
+  }
+
+  public async signNFTMint(transaction: NFTMintUnsigned, phrase: string): Promise<string> {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
+
+    const msgMintNFT = new cro.nft.MsgMintNFT({
+      id: transaction.tokenId,
+      name: transaction.name,
+      sender: transaction.sender,
+      denomId: transaction.denomId,
+      uri: transaction.uri,
+      data: transaction.data,
+      recipient: transaction.recipient,
+    });
+
+    const signableTx = rawTx
+      .appendMessage(msgMintNFT)
       .addSigner({
         publicKey: keyPair.getPubKey(),
         accountNumber: new Big(transaction.accountNumber),
