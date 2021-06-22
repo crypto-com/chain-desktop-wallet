@@ -14,16 +14,21 @@ import {
   Form,
   Input,
   Upload,
-  Switch,
+  // Switch,
   message,
   notification,
 } from 'antd';
+// import {
+//   UploadFile
+// } from 'antd/lib/upload/interface';
 import Icon, {
   MenuOutlined,
   AppstoreOutlined,
   ExclamationCircleOutlined,
   LoadingOutlined,
   PlusOutlined,
+  EyeOutlined,
+  // UploadOutlined
 } from '@ant-design/icons';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import ReactPlayer from 'react-player';
@@ -85,8 +90,10 @@ const FormMintNft = () => {
   const currentSession = useRecoilValue(sessionState);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [isPreviewModalVisible, setIsPreviewModalVisible] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
+  const [files, setFiles] = useState<any[]>([]);
   // const [formValues, setFormValues] = useState({
   //   file: '',
   //   tokenData: '',
@@ -124,13 +131,12 @@ const FormMintNft = () => {
     showConfirmationModal();
   };
 
-  function beforeUpload(file) {
+  const beforeUpload = file => {
     const isVideo = file.type.indexOf('video') !== -1;
     const isSupportedVideo = supportedVideo(file.type);
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     const isImageTooLarge = file.size / 1024 / 1024 > 1;
     const isVideoTooLarge = file.size / 1024 / 1024 > 3;
-    console.log(file.size / 1024 / 1024);
     if (isVideo) {
       if (!isSupportedVideo) {
         message.error('You can only upload mp4 file!');
@@ -148,28 +154,49 @@ const FormMintNft = () => {
     }
 
     return (isVideo && isSupportedVideo && !isVideoTooLarge) || (isJpgOrPng && !isImageTooLarge);
-  }
+  };
 
-  // function getBase64(img, callback) {
-  //   const reader = new FileReader();
-  //   reader.addEventListener('load', () => callback(reader.result));
-  //   reader.readAsDataURL(img);
+  // function getBase64(file) {
+  //   // const reader = new FileReader();
+  //   // reader.addEventListener('load', () => callback(reader.result));
+  //   // reader.readAsDataURL(img);
+  //   return new Promise((resolve, reject) => {
+  //     const reader = new FileReader();
+  //     reader.readAsDataURL(file);
+  //     reader.onload = () => resolve(reader.result);
+  //     reader.onerror = error => reject(error);
+  //   });
   // }
 
-  const handleChange = info => {
-    if (info.file.status === 'uploading') {
-      setUploading(true);
-      return;
-    }
-    setUploading(false);
-    // if (info.file.status === 'done') {
-    // Get this url from response in real world.
-    // getBase64(info.file.originFileObj, (url) => {
-    //   setImageUrl(url);
-    //   setUploading(false);
-    // });
-    // }
+  // const handleChange = info => {
+  //   if (info.file.status === 'uploading') {
+  //     setUploading(true);
+  //     return;
+  //   }
+  //   setUploading(false);
+  //   // if (info.file.status === 'done') {
+  //   // Get this url from response in real world.
+  //   // getBase64(info.file.originFileObj, (url) => {
+  //   //   setImageUrl(url);
+  //   //   setUploading(false);
+  //   // });
+  //   // }
+  // };
+
+  const handleChange = ({ fileList }) => {
+    console.log(fileList);
+    setFiles(fileList);
   };
+
+  // const handlePreview = async file => {
+  //   if (!file.url && !file.preview) {
+  //     file.preview = await getBase64(file.originFileObj);
+  //   }
+  //   console.log(imageUrl)
+  //   // setImageUrl(file.url || file.preview)
+  //   // setIsPreviewModalVisible(true)
+  //   // previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
+  // };
 
   const uploadButton = (
     <div>
@@ -177,6 +204,74 @@ const FormMintNft = () => {
       <div style={{ marginTop: 8 }}>Upload</div>
     </div>
   );
+
+  // function blobToFile(theBlob, fileName, path) {
+  //   // A Blob() is almost a File() - it's just missing the two properties below which we will add
+  //   theBlob.lastModifiedDate = new Date();
+  //   theBlob.name = fileName;
+  //   theBlob.path = path
+  //   return theBlob;
+  // }
+
+  const customRequest = async option => {
+    const { onProgress, onError, onSuccess, action, file } = option;
+    const url = action;
+    const isVideo = file.type.indexOf('video') !== -1;
+    const isSupportedVideo = supportedVideo(file.type);
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    const formData = new FormData();
+    // const waitUntilImageLoaded = (resolve, _image) => {
+    //   setTimeout(() => {
+    //     if (_image) {
+    //       resolve()
+    //     }
+    //     waitUntilImageLoaded(resolve, _image);
+    //   }, 1000);
+    // };
+    // await new Promise(resolve => waitUntilImageLoaded(resolve, imageUrl));
+    // const type = 'image/png';
+
+    setUploading(true);
+    if (isVideo && isSupportedVideo) {
+      formData.append('videoFile', file);
+      formData.append('imageFile', file);
+    } else if (isJpgOrPng) {
+      formData.append('imageFile', file);
+    } else {
+      onError();
+    }
+
+    try {
+      const response = await axios.post(url, formData, {
+        onUploadProgress: e => {
+          onProgress({ percent: (e.loaded / e.total) * 100 });
+        },
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.data.status === 200) {
+        // console.log(parseResult.image)
+        const ipfsUrl = convertIpfsToHttp(response.data.ipfsUrl);
+        const imagePath: any = await axios.get(ipfsUrl);
+        console.log(imagePath);
+        const returnImagePath = convertIpfsToHttp(imagePath.data.image);
+        setImageUrl(returnImagePath);
+        setUploading(false);
+        onSuccess(response);
+      }
+    } catch (e) {
+      onError(e);
+      notification.error({
+        message: 'Upload failed',
+        description: 'Please confirm your connection & try again later.',
+        placement: 'topRight',
+        duration: 5,
+      });
+      setUploading(false);
+    }
+  };
 
   return (
     <>
@@ -221,69 +316,64 @@ const FormMintNft = () => {
         >
           <Input />
         </Form.Item>
-        <Switch />
+        {/* <Switch /> */}
         <br />
         <br />
         <br />
-        <Upload
-          name="avatar"
-          listType="picture-card"
-          className="avatar-uploader"
-          showUploadList={false}
-          action={async (file: any) => {
-            setUploading(true);
-            try {
-              const formData = new FormData();
-              formData.append('file', file);
-              const result = await axios
-                .create({
-                  // baseURL: 'https://crypto.org/ipfs-middleware-server',
-                  baseURL: 'http://localhost:3001',
-                })
-                .post('uploads', formData, {
-                  headers: {
-                    'Content-Type': 'multipart/form-data',
-                  },
-                });
-              console.log(result);
-
-              if (result.data.status === 200) {
-                // console.log(parseResult.image)
-                const url = convertIpfsToHttp(result.data.ipfsUrl);
-                console.log(url);
-                const imagePath: any = await axios
-                  .create({
-                    baseURL: url,
-                  })
-                  .get('');
-                console.log(imagePath);
-                const returnImagePath = convertIpfsToHttp(imagePath.data.image);
-                setImageUrl(returnImagePath);
-                setUploading(false);
-                return returnImagePath;
-              }
-              notification.error({
-                message: 'Upload failed',
-                description: 'Please confirm your connection & try again later.',
-                placement: 'topRight',
-                duration: 20,
-              });
-            } catch (e) {
-              notification.error({
-                message: 'Upload failed',
-                description: 'Please confirm your connection & try again later.',
-                placement: 'topRight',
-                duration: 20,
-              });
-            }
-
-            return '';
-          }}
-          beforeUpload={beforeUpload}
-          onChange={handleChange}
-        >
-          {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
-        </Upload>
+        <div className="item">
+          <div>
+            <Upload
+              name="avatar"
+              listType="picture-card"
+              className="avatar-uploader"
+              // showUploadList={false}
+              fileList={files}
+              customRequest={customRequest}
+              action="http://localhost:3001/uploads"
+              // action='https://crypto.org/ipfs-middleware-server/uploads'
+              beforeUpload={beforeUpload}
+              onChange={handleChange}
+              // onPreview={handlePreview}
+            >
+              {/* {imageUrl ? <img src={imageUrl} alt="avatar" style={{ maxWidth: '100%', maxHeight: '100%' }} /> : uploadButton} */}
+              {files.length > 1 ? null : uploadButton}
+            </Upload>
+            {imageUrl ? (
+              <>
+                <a
+                  onClick={() => {
+                    setIsPreviewModalVisible(true);
+                  }}
+                >
+                  <EyeOutlined /> Preview
+                </a>
+                <ModalPopup
+                  isModalVisible={isPreviewModalVisible}
+                  handleCancel={() => {
+                    // Stop the video when closing
+                    // setIsVideoPlaying(false);
+                    // setVideoUrl(undefined);
+                    // setTimeout(() => {
+                    //   setIsNftModalVisible(false);
+                    // }, 10);
+                    setIsPreviewModalVisible(false);
+                  }}
+                  handleOk={() => {}}
+                  footer={[]}
+                  // okText="Confirm"
+                  // className="nft-modal"
+                >
+                  <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+                </ModalPopup>
+              </>
+            ) : (
+              ''
+            )}
+          </div>
+        </div>
+        <Button key="submit" type="primary" onClick={() => {}}>
+          Mint NFT
+        </Button>
       </Form>
       <PasswordFormModal
         description="Input the app password decrypt wallet"
