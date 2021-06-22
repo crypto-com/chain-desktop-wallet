@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+
+## [v0.2.4] - 2021-06-22
+
+### Bug Fixes
+- Add bytes padding for signing related issues on some Ledger devices
+
 ## [v0.2.3] - 2021-06-17
 
 ### Additions
