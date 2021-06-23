@@ -25,10 +25,10 @@ import Icon, {
   MenuOutlined,
   AppstoreOutlined,
   ExclamationCircleOutlined,
-  LoadingOutlined,
-  PlusOutlined,
+  // LoadingOutlined,
+  // PlusOutlined,
   EyeOutlined,
-  // UploadOutlined
+  UploadOutlined,
 } from '@ant-design/icons';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import ReactPlayer from 'react-player';
@@ -71,6 +71,7 @@ const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
 const { Meta } = Card;
 const layout = {};
+const { TextArea } = Input;
 
 const supportedVideo = (mimeType: string | undefined) => {
   switch (mimeType) {
@@ -91,9 +92,13 @@ const FormMintNft = () => {
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [isPreviewModalVisible, setIsPreviewModalVisible] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [isPreviewButtonVisible, setIsPreviewButtonvisible] = useState(false);
+  // const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
   const [files, setFiles] = useState<any[]>([]);
+  const [isUploadButtonVisible, setIsUploadButtonVisible] = useState(true);
+  const [fileType, setFileType] = useState('');
   // const [formValues, setFormValues] = useState({
   //   file: '',
   //   tokenData: '',
@@ -132,28 +137,37 @@ const FormMintNft = () => {
   };
 
   const beforeUpload = file => {
+    let error = false;
     const isVideo = file.type.indexOf('video') !== -1;
     const isSupportedVideo = supportedVideo(file.type);
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     const isImageTooLarge = file.size / 1024 / 1024 > 1;
-    const isVideoTooLarge = file.size / 1024 / 1024 > 3;
-    if (isVideo) {
+    const isVideoTooLarge = file.size / 1024 / 1024 > 5;
+    if (isVideo && fileType.indexOf('video') === -1) {
       if (!isSupportedVideo) {
         message.error('You can only upload mp4 file!');
+        error = true;
       }
       if (isVideoTooLarge) {
         message.error('Video must smaller than 1MB!');
+        error = true;
       }
     } else {
       if (!isJpgOrPng) {
         message.error('You can only upload JPG/PNG file!');
+        error = true;
       }
       if (isImageTooLarge) {
         message.error('Image must smaller than 1MB!');
+        error = true;
       }
     }
 
-    return (isVideo && isSupportedVideo && !isVideoTooLarge) || (isJpgOrPng && !isImageTooLarge);
+    if (error) {
+      return Upload.LIST_IGNORE;
+    }
+
+    return true;
   };
 
   // function getBase64(file) {
@@ -184,34 +198,38 @@ const FormMintNft = () => {
   // };
 
   const handleChange = ({ fileList }) => {
-    console.log(fileList);
+    if (fileList.length === 0) {
+      setIsUploadButtonVisible(true);
+      setFileType('');
+    } else if (fileList.length === 1) {
+      if (fileList[0].type.indexOf('video') !== -1) {
+        setIsUploadButtonVisible(true);
+      } else {
+        setIsUploadButtonVisible(false);
+      }
+      setFileType(fileList[0].type);
+    } else {
+      setIsUploadButtonVisible(false);
+    }
     setFiles(fileList);
   };
 
-  // const handlePreview = async file => {
-  //   if (!file.url && !file.preview) {
-  //     file.preview = await getBase64(file.originFileObj);
-  //   }
-  //   console.log(imageUrl)
-  //   // setImageUrl(file.url || file.preview)
-  //   // setIsPreviewModalVisible(true)
-  //   // previewTitle: file.name || file.url.substring(file.url.lastIndexOf('/') + 1),
-  // };
-
   const uploadButton = (
     <div>
-      {uploading ? <LoadingOutlined /> : <PlusOutlined />}
-      <div style={{ marginTop: 8 }}>Upload</div>
+      {/* {uploading ? <LoadingOutlined /> : <PlusOutlined />} */}
+      <UploadOutlined />
+      <div style={{ marginTop: 8 }}>
+        {fileType.indexOf('video') !== -1 ? (
+          `Upload Thumbnail`
+        ) : (
+          <>
+            Upload <br />
+            Image / Video
+          </>
+        )}
+      </div>
     </div>
   );
-
-  // function blobToFile(theBlob, fileName, path) {
-  //   // A Blob() is almost a File() - it's just missing the two properties below which we will add
-  //   theBlob.lastModifiedDate = new Date();
-  //   theBlob.name = fileName;
-  //   theBlob.path = path
-  //   return theBlob;
-  // }
 
   const customRequest = async option => {
     const { onProgress, onError, onSuccess, action, file } = option;
@@ -231,14 +249,22 @@ const FormMintNft = () => {
     // await new Promise(resolve => waitUntilImageLoaded(resolve, imageUrl));
     // const type = 'image/png';
 
-    setUploading(true);
+    // setUploading(true);
+
+    // Uploaded Video
+    if (files.length >= 2) {
+      formData.append('videoFile', files[0].originFileObj);
+    }
+
     if (isVideo && isSupportedVideo) {
-      formData.append('videoFile', file);
-      formData.append('imageFile', file);
+      onSuccess();
+      return;
+      // eslint-disable-next-line no-else-return
     } else if (isJpgOrPng) {
       formData.append('imageFile', file);
     } else {
       onError();
+      return;
     }
 
     try {
@@ -252,16 +278,18 @@ const FormMintNft = () => {
       });
 
       if (response.data.status === 200) {
-        // console.log(parseResult.image)
         const ipfsUrl = convertIpfsToHttp(response.data.ipfsUrl);
-        const imagePath: any = await axios.get(ipfsUrl);
-        console.log(imagePath);
-        const returnImagePath = convertIpfsToHttp(imagePath.data.image);
-        setImageUrl(returnImagePath);
-        setUploading(false);
+        const media: any = await axios.get(ipfsUrl);
+        setImageUrl(convertIpfsToHttp(media.data.image));
+        if (media.data.animation_url) {
+          setVideoUrl(convertIpfsToHttp(media.data.animation_url));
+        }
+        // setUploading(false);
+        setIsPreviewButtonvisible(true);
         onSuccess(response);
       }
     } catch (e) {
+      setIsPreviewButtonvisible(false);
       onError(e);
       notification.error({
         message: 'Upload failed',
@@ -269,7 +297,7 @@ const FormMintNft = () => {
         placement: 'topRight',
         duration: 5,
       });
-      setUploading(false);
+      // setUploading(false);
     }
   };
 
@@ -306,15 +334,12 @@ const FormMintNft = () => {
           label="Drop Name"
           hasFeedback
           validateFirst
-          rules={[
-            { required: true, message: 'Drop Name is required' },
-            {
-              pattern: /[^0]+/,
-              message: 'Staking amount cannot be 0',
-            },
-          ]}
+          rules={[{ required: true, message: 'Drop Name is required' }]}
         >
           <Input />
+        </Form.Item>
+        <Form.Item name="description" label="Drop Description" hasFeedback>
+          <TextArea showCount maxLength={100} />
         </Form.Item>
         {/* <Switch /> */}
         <br />
@@ -326,19 +351,28 @@ const FormMintNft = () => {
               name="avatar"
               listType="picture-card"
               className="avatar-uploader"
-              // showUploadList={false}
+              showUploadList={{
+                showPreviewIcon: false,
+              }}
               fileList={files}
               customRequest={customRequest}
-              action="http://localhost:3001/uploads"
-              // action='https://crypto.org/ipfs-middleware-server/uploads'
+              // action="http://localhost:3001/uploads"
+              action="https://crypto.org/ipfs-middleware-server/uploads"
               beforeUpload={beforeUpload}
               onChange={handleChange}
+              accept="audio/*,video/*,image/*"
               // onPreview={handlePreview}
+              onRemove={() => {
+                setIsPreviewButtonvisible(false);
+                setImageUrl('');
+                setVideoUrl('');
+                setFileType('');
+              }}
             >
               {/* {imageUrl ? <img src={imageUrl} alt="avatar" style={{ maxWidth: '100%', maxHeight: '100%' }} /> : uploadButton} */}
-              {files.length > 1 ? null : uploadButton}
+              {isUploadButtonVisible ? uploadButton : null}
             </Upload>
-            {imageUrl ? (
+            {isPreviewButtonVisible ? (
               <>
                 <a
                   onClick={() => {
@@ -363,7 +397,30 @@ const FormMintNft = () => {
                   // okText="Confirm"
                   // className="nft-modal"
                 >
-                  <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+                  {videoUrl !== '' ? (
+                    <>
+                      Thumbnail:
+                      <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+                      Video:
+                      <ReactPlayer
+                        url={videoUrl}
+                        config={{
+                          file: {
+                            attributes: {
+                              controlsList: 'nodownload',
+                            },
+                          },
+                        }}
+                        controls
+                        playing={isPreviewModalVisible}
+                      />
+                    </>
+                  ) : (
+                    <>
+                      Image:
+                      <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+                    </>
+                  )}
                 </ModalPopup>
               </>
             ) : (
@@ -372,7 +429,7 @@ const FormMintNft = () => {
           </div>
         </div>
         <Button key="submit" type="primary" onClick={() => {}}>
-          Mint NFT
+          Review
         </Button>
       </Form>
       <PasswordFormModal
