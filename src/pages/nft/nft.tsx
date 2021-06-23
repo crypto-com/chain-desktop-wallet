@@ -316,7 +316,13 @@ const FormMintNft = () => {
           label="Denom Name"
           hasFeedback
           validateFirst
-          rules={[{ required: true, message: 'Drop Name is required' }]}
+          rules={[
+            { required: true, message: 'Denom ID is required' },
+            {
+              pattern: /(^[a-z](([a-z0-9]){0,31})$)/,
+              message: 'Denom ID can only be alphabetic & less than 32 characters',
+            },
+          ]}
         >
           <Input />
         </Form.Item>
@@ -325,7 +331,13 @@ const FormMintNft = () => {
           label="Token ID"
           hasFeedback
           validateFirst
-          rules={[{ required: true, message: 'Token ID is required' }]}
+          rules={[
+            { required: true, message: 'Token ID is required' },
+            {
+              pattern: /(^[a-z](([a-z0-9]){0,31})$)/,
+              message: 'Token ID can only be alphabetic & less than 32 characters',
+            },
+          ]}
         >
           <Input />
         </Form.Item>
@@ -345,7 +357,12 @@ const FormMintNft = () => {
         <br />
         <br />
         <br />
-        <div className="item">
+        <Form.Item
+          name="files"
+          label="Files"
+          hasFeedback
+          rules={[{ required: true, message: 'Media File is required' }]}
+        >
           <div>
             <Upload
               name="avatar"
@@ -381,56 +398,58 @@ const FormMintNft = () => {
                 >
                   <EyeOutlined /> Preview
                 </a>
-                <ModalPopup
-                  isModalVisible={isPreviewModalVisible}
-                  handleCancel={() => {
-                    // Stop the video when closing
-                    // setIsVideoPlaying(false);
-                    // setVideoUrl(undefined);
-                    // setTimeout(() => {
-                    //   setIsNftModalVisible(false);
-                    // }, 10);
-                    setIsPreviewModalVisible(false);
-                  }}
-                  handleOk={() => {}}
-                  footer={[]}
-                  // okText="Confirm"
-                  // className="nft-modal"
-                >
-                  {videoUrl !== '' ? (
-                    <>
-                      Thumbnail:
-                      <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
-                      Video:
-                      <ReactPlayer
-                        url={videoUrl}
-                        config={{
-                          file: {
-                            attributes: {
-                              controlsList: 'nodownload',
-                            },
-                          },
-                        }}
-                        controls
-                        playing={isPreviewModalVisible}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      Image:
-                      <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
-                    </>
-                  )}
-                </ModalPopup>
               </>
             ) : (
               ''
             )}
           </div>
-        </div>
-        <Button key="submit" type="primary" onClick={() => {}}>
-          Review
-        </Button>
+        </Form.Item>
+        <ModalPopup
+          isModalVisible={isPreviewModalVisible}
+          handleCancel={() => {
+            // Stop the video when closing
+            // setIsVideoPlaying(false);
+            // setVideoUrl(undefined);
+            // setTimeout(() => {
+            //   setIsNftModalVisible(false);
+            // }, 10);
+            setIsPreviewModalVisible(false);
+          }}
+          handleOk={() => {}}
+          footer={[]}
+          button={
+            <Button htmlType="submit" type="primary" onClick={() => {}}>
+              Review
+            </Button>
+          }
+          // okText="Confirm"
+          // className="nft-modal"
+        >
+          {videoUrl !== '' ? (
+            <>
+              Thumbnail:
+              <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+              Video:
+              <ReactPlayer
+                url={videoUrl}
+                config={{
+                  file: {
+                    attributes: {
+                      controlsList: 'nodownload',
+                    },
+                  },
+                }}
+                controls
+                playing={isPreviewModalVisible}
+              />
+            </>
+          ) : (
+            <>
+              Image:
+              <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+            </>
+          )}
+        </ModalPopup>
       </Form>
       <PasswordFormModal
         description="Input the app password decrypt wallet"
@@ -1169,7 +1188,9 @@ const NftPage = () => {
           <TabPane tab="NFT Mint" key="2">
             <div className="site-layout-background nft-content">
               <div className="container">
-                <div className="description">Mint your NFT on Crypto.org chain.</div>
+                <div className="description">
+                  Mint your NFT with Image or Video on Crypto.org chain.
+                </div>
                 <FormMintNft />
               </div>
             </div>
