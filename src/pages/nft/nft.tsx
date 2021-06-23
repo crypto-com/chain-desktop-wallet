@@ -27,7 +27,7 @@ import Icon, {
   ExclamationCircleOutlined,
   // LoadingOutlined,
   // PlusOutlined,
-  EyeOutlined,
+  // EyeOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
 import { useRecoilValue, useRecoilState } from 'recoil';
@@ -91,13 +91,15 @@ const FormMintNft = () => {
   const currentSession = useRecoilValue(sessionState);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
-  const [isPreviewModalVisible, setIsPreviewModalVisible] = useState(false);
-  const [isPreviewButtonVisible, setIsPreviewButtonvisible] = useState(false);
+  // const [isPreviewModalVisible, setIsPreviewModalVisible] = useState(false);
+  // const [isPreviewButtonVisible, setIsPreviewButtonvisible] = useState(false);
+  const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   // const [uploading, setUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [files, setFiles] = useState<any[]>([]);
   const [isUploadButtonVisible, setIsUploadButtonVisible] = useState(true);
+  const [isUploadSuccess, setIsUploadSuccess] = useState(false);
   const [fileType, setFileType] = useState('');
   // const [formValues, setFormValues] = useState({
   //   file: '',
@@ -107,8 +109,20 @@ const FormMintNft = () => {
   //   memo: '',
   // });
 
+  const fileUploadValidator = () => ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    validator(rule, value) {
+      const reason = `File Upload hasn't completed`;
+      if (isUploadSuccess) {
+        return Promise.resolve();
+      }
+      return Promise.reject(reason);
+    },
+  });
+
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
+    setIsVisibleConfirmationModal(true);
     // setFormValues({
     //   ...form.getFieldsValue(true),
     //   // Replace scientific notation to plain string values
@@ -263,6 +277,7 @@ const FormMintNft = () => {
     } else if (isJpgOrPng) {
       formData.append('imageFile', file);
     } else {
+      setIsUploadSuccess(false);
       onError();
       return;
     }
@@ -285,11 +300,13 @@ const FormMintNft = () => {
           setVideoUrl(convertIpfsToHttp(media.data.animation_url));
         }
         // setUploading(false);
-        setIsPreviewButtonvisible(true);
+        // setIsPreviewButtonvisible(true);
+        setIsUploadSuccess(true);
         onSuccess(response);
       }
     } catch (e) {
-      setIsPreviewButtonvisible(false);
+      // setIsPreviewButtonvisible(false);
+      setIsUploadSuccess(false);
       onError(e);
       notification.error({
         message: 'Upload failed',
@@ -360,8 +377,8 @@ const FormMintNft = () => {
         <Form.Item
           name="files"
           label="Files"
-          hasFeedback
-          rules={[{ required: true, message: 'Media File is required' }]}
+          // hasFeedback
+          rules={[{ required: true, message: 'Media File is required' }, fileUploadValidator]}
         >
           <div>
             <Upload
@@ -380,7 +397,7 @@ const FormMintNft = () => {
               accept="audio/*,video/*,image/*"
               // onPreview={handlePreview}
               onRemove={() => {
-                setIsPreviewButtonvisible(false);
+                // setIsPreviewButtonvisible(false);
                 setImageUrl('');
                 setVideoUrl('');
                 setFileType('');
@@ -389,7 +406,7 @@ const FormMintNft = () => {
               {/* {imageUrl ? <img src={imageUrl} alt="avatar" style={{ maxWidth: '100%', maxHeight: '100%' }} /> : uploadButton} */}
               {isUploadButtonVisible ? uploadButton : null}
             </Upload>
-            {isPreviewButtonVisible ? (
+            {/* {isPreviewButtonVisible ? (
               <>
                 <a
                   onClick={() => {
@@ -401,11 +418,11 @@ const FormMintNft = () => {
               </>
             ) : (
               ''
-            )}
+            )} */}
           </div>
         </Form.Item>
         <ModalPopup
-          isModalVisible={isPreviewModalVisible}
+          isModalVisible={isConfirmationModalVisible}
           handleCancel={() => {
             // Stop the video when closing
             // setIsVideoPlaying(false);
@@ -413,7 +430,7 @@ const FormMintNft = () => {
             // setTimeout(() => {
             //   setIsNftModalVisible(false);
             // }, 10);
-            setIsPreviewModalVisible(false);
+            setIsVisibleConfirmationModal(false);
           }}
           handleOk={() => {}}
           footer={[]}
@@ -440,7 +457,7 @@ const FormMintNft = () => {
                   },
                 }}
                 controls
-                playing={isPreviewModalVisible}
+                playing={isConfirmationModalVisible}
               />
             </>
           ) : (
