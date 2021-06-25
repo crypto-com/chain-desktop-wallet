@@ -89,6 +89,8 @@ const supportedVideo = (mimeType: string | undefined) => {
 const FormMintNft = () => {
   const [form] = Form.useForm();
   const currentSession = useRecoilValue(sessionState);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   // const [isPreviewModalVisible, setIsPreviewModalVisible] = useState(false);
@@ -101,13 +103,20 @@ const FormMintNft = () => {
   const [isUploadButtonVisible, setIsUploadButtonVisible] = useState(true);
   const [isUploadSuccess, setIsUploadSuccess] = useState(false);
   const [fileType, setFileType] = useState('');
-  // const [formValues, setFormValues] = useState({
-  //   file: '',
-  //   tokenData: '',
-  //   tokenId: '',
-  //   denomId: '',
-  //   memo: '',
-  // });
+  const [formValues, setFormValues] = useState({
+    fileList: '',
+    // tokenData: '',
+    tokenId: '',
+    denomId: '',
+    drop: '',
+    memo: '',
+  });
+
+  const networkFee =
+    currentSession.wallet.config.fee !== undefined &&
+    currentSession.wallet.config.fee.networkFee !== undefined
+      ? currentSession.wallet.config.fee.networkFee
+      : FIXED_DEFAULT_FEE;
 
   const fileUploadValidator = () => ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -123,13 +132,13 @@ const FormMintNft = () => {
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
     setIsVisibleConfirmationModal(true);
-    // setFormValues({
-    //   ...form.getFieldsValue(true),
-    //   // Replace scientific notation to plain string values
-    //   denomId: nft?.denomId,
-    //   tokenId: nft?.tokenId,
-    //   senderAddress: currentSession.wallet.address,
-    // });
+    setFormValues({
+      ...form.getFieldsValue(true),
+      // Replace scientific notation to plain string values
+      // denomId: nft?.denomId,
+      // tokenId: nft?.tokenId,
+      // senderAddress: currentSession.wallet.address,
+    });
   };
 
   const showPasswordInput = () => {
@@ -390,8 +399,8 @@ const FormMintNft = () => {
               }}
               fileList={files}
               customRequest={customRequest}
-              // action="http://localhost:3001/uploads"
-              action="https://crypto.org/ipfs-middleware-server/uploads"
+              action="http://localhost:3001/uploads"
+              // action="https://crypto.org/ipfs-middleware-server/uploads"
               beforeUpload={beforeUpload}
               onChange={handleChange}
               accept="audio/*,video/*,image/*"
@@ -421,7 +430,7 @@ const FormMintNft = () => {
             )} */}
           </div>
         </Form.Item>
-        <ModalPopup
+        {/* <ModalPopup
           isModalVisible={isConfirmationModalVisible}
           handleCancel={() => {
             // Stop the video when closing
@@ -432,15 +441,15 @@ const FormMintNft = () => {
             // }, 10);
             setIsVisibleConfirmationModal(false);
           }}
-          handleOk={() => {}}
+          handleOk={() => { }}
           footer={[]}
           button={
-            <Button htmlType="submit" type="primary" onClick={() => {}}>
+            <Button htmlType="submit" type="primary" onClick={() => { }}>
               Review
             </Button>
           }
-          // okText="Confirm"
-          // className="nft-modal"
+        // okText="Confirm"
+        // className="nft-modal"
         >
           {videoUrl !== '' ? (
             <>
@@ -466,6 +475,119 @@ const FormMintNft = () => {
               <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
             </>
           )}
+        </ModalPopup> */}
+        <ModalPopup
+          isModalVisible={isConfirmationModalVisible}
+          handleCancel={() => {
+            setIsVisibleConfirmationModal(false);
+            // form.resetFields();
+          }}
+          handleOk={() => {}}
+          footer={[
+            <Button
+              key="submit"
+              type="primary"
+              onClick={() => {}}
+              // loading={confirmLoading}
+            >
+              Confirm Mint NFT
+            </Button>,
+            <Button
+              key="back"
+              type="link"
+              onClick={() => {
+                setIsVisibleConfirmationModal(false);
+                // form.resetFields();
+              }}
+            >
+              Cancel
+            </Button>,
+          ]}
+          button={
+            <Button htmlType="submit" type="primary" onClick={() => {}}>
+              Review
+            </Button>
+          }
+          okText="Confirm"
+          className="nft-mint-modal"
+        >
+          <>
+            <>
+              <div className="title">Confirm NFT Mint</div>
+              <div className="description">Please review the information below.</div>
+              <div className="item">
+                <div className="nft-image">
+                  <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+                </div>
+              </div>
+              {fileType.indexOf('video') !== -1 ? (
+                <div className="item">
+                  <div className="nft-video">
+                    <ReactPlayer
+                      url={videoUrl}
+                      config={{
+                        file: {
+                          attributes: {
+                            controlsList: 'nodownload',
+                          },
+                        },
+                      }}
+                      controls
+                      playing={isConfirmationModalVisible}
+                    />
+                  </div>
+                </div>
+              ) : (
+                ''
+              )}
+              <div className="item">
+                <div className="label">Denom Name</div>
+                <div>{`${formValues.denomId}`}</div>
+              </div>
+              <div className="item">
+                <div className="label">Token ID</div>
+                <div>{`${formValues.tokenId}`}</div>
+              </div>
+              <div className="item">
+                <div className="label">Drop Name</div>
+                <div>{`${formValues.drop}`}</div>
+              </div>
+              <div className="item">
+                <div className="label">Transaction Fee</div>
+                <div>
+                  {getUINormalScaleAmount(networkFee, walletAsset.decimals)} {walletAsset.symbol}
+                </div>
+              </div>
+              {networkFee > walletAsset.balance ? (
+                <div className="item notice">
+                  <Layout>
+                    <Sider width="20px">
+                      <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                    </Sider>
+                    <Content>
+                      Insufficient balance. Please ensure you have at least{' '}
+                      {getUINormalScaleAmount(networkFee, walletAsset.decimals)}{' '}
+                      {walletAsset.symbol} for network fee.
+                    </Content>
+                  </Layout>
+                </div>
+              ) : (
+                ''
+              )}
+              <div className="item notice">
+                <Layout>
+                  <Sider width="20px">
+                    <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                  </Sider>
+                  <Content>
+                    This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address
+                    that is not compatible with the Crypto.org Chain NFT token standard will result
+                    in the permanent loss of your asset.
+                  </Content>
+                </Layout>
+              </div>
+            </>
+          </>
         </ModalPopup>
       </Form>
       <PasswordFormModal
