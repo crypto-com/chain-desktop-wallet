@@ -91,26 +91,40 @@ const FormMintNft = () => {
   const currentSession = useRecoilValue(sessionState);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
+
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   // const [isPreviewModalVisible, setIsPreviewModalVisible] = useState(false);
   // const [isPreviewButtonVisible, setIsPreviewButtonvisible] = useState(false);
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   // const [uploading, setUploading] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [imageUrl, setImageUrl] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [files, setFiles] = useState<any[]>([]);
   const [isUploadButtonVisible, setIsUploadButtonVisible] = useState(true);
   const [isUploadSuccess, setIsUploadSuccess] = useState(false);
   const [fileType, setFileType] = useState('');
+  const [errorMessages, setErrorMessages] = useState([]);
+
   const [formValues, setFormValues] = useState({
     fileList: '',
-    // tokenData: '',
     tokenId: '',
     denomId: '',
     drop: '',
+    senderAddress: '',
+    recipientAddress: '',
+    data: '',
+    uri: '',
+    amount: '',
     memo: '',
   });
+
+  const analyticsService = new AnalyticsService(currentSession);
 
   const networkFee =
     currentSession.wallet.config.fee !== undefined &&
@@ -118,10 +132,19 @@ const FormMintNft = () => {
       ? currentSession.wallet.config.fee.networkFee
       : FIXED_DEFAULT_FEE;
 
+  const closeSuccessModal = () => {
+    setIsSuccessModalVisible(false);
+    setIsVisibleConfirmationModal(false);
+  };
+
+  const closeErrorModal = () => {
+    setIsErrorModalVisible(false);
+  };
+
   const fileUploadValidator = () => ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     validator(rule, value) {
-      const reason = `File Upload hasn't completed`;
+      const reason = `Files Upload hasn't completed`;
       if (isUploadSuccess) {
         return Promise.resolve();
       }
@@ -137,7 +160,10 @@ const FormMintNft = () => {
       // Replace scientific notation to plain string values
       // denomId: nft?.denomId,
       // tokenId: nft?.tokenId,
-      // senderAddress: currentSession.wallet.address,
+      senderAddress: currentSession.wallet.address,
+      recipientAddress: currentSession.wallet.address,
+      uri: 'https://crypto.org',
+      data: "{name: 'abc', description: 'abc'}",
     });
   };
 
@@ -193,33 +219,6 @@ const FormMintNft = () => {
     return true;
   };
 
-  // function getBase64(file) {
-  //   // const reader = new FileReader();
-  //   // reader.addEventListener('load', () => callback(reader.result));
-  //   // reader.readAsDataURL(img);
-  //   return new Promise((resolve, reject) => {
-  //     const reader = new FileReader();
-  //     reader.readAsDataURL(file);
-  //     reader.onload = () => resolve(reader.result);
-  //     reader.onerror = error => reject(error);
-  //   });
-  // }
-
-  // const handleChange = info => {
-  //   if (info.file.status === 'uploading') {
-  //     setUploading(true);
-  //     return;
-  //   }
-  //   setUploading(false);
-  //   // if (info.file.status === 'done') {
-  //   // Get this url from response in real world.
-  //   // getBase64(info.file.originFileObj, (url) => {
-  //   //   setImageUrl(url);
-  //   //   setUploading(false);
-  //   // });
-  //   // }
-  // };
-
   const handleChange = ({ fileList }) => {
     if (fileList.length === 0) {
       setIsUploadButtonVisible(true);
@@ -235,6 +234,70 @@ const FormMintNft = () => {
       setIsUploadButtonVisible(false);
     }
     setFiles(fileList);
+  };
+
+  const onMintNft = async () => {
+    const { walletType } = currentSession.wallet;
+    const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
+    if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
+      return;
+    }
+    try {
+      setConfirmLoading(true);
+      const sendResult = await walletService.broadcastMintNFT({
+        tokenId: formValues.tokenId,
+        denomId: formValues.denomId,
+        sender: formValues.senderAddress,
+        recipient: formValues.recipientAddress,
+        data: formValues.data,
+        name: formValues.drop,
+        uri: formValues.uri,
+        memo,
+        decryptedPhrase,
+        asset: walletAsset,
+        walletType,
+      });
+
+      analyticsService.logTransactionEvent(
+        broadcastResult.transactionHash as string,
+        formValues.amount,
+        AnalyticsTxType.TransferTransaction,
+        AnalyticsActions.FundsTransfer,
+        AnalyticsCategory.Transfer,
+      );
+
+      // const latestLoadedNFTs = await walletService.retrieveNFTs(currentSession.wallet.identifier);
+      // setNftList(latestLoadedNFTs);
+      // const processedNFTsLists = processNftList(latestLoadedNFTs);
+      // setProcessedNftList(processedNFTsLists);
+
+      setBroadcastResult(sendResult);
+
+      // setIsNftModalVisible(false);
+      // setIsNftTransferModalVisible(false);
+      // setIsNftTransferConfirmVisible(false);
+      setConfirmLoading(false);
+
+      setIsSuccessModalVisible(true);
+      // setInputPasswordVisible(false);
+
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      setWalletAsset(currentWalletAsset);
+
+      form.resetFields();
+    } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+      }
+
+      setErrorMessages(e.message.split(': '));
+      setIsVisibleConfirmationModal(false);
+      setConfirmLoading(false);
+      setInputPasswordVisible(false);
+      setIsErrorModalVisible(true);
+      // eslint-disable-next-line no-console
+      console.log('Error occurred while transfer', e);
+    }
   };
 
   const uploadButton = (
@@ -345,8 +408,8 @@ const FormMintNft = () => {
           rules={[
             { required: true, message: 'Denom ID is required' },
             {
-              pattern: /(^[a-z](([a-z0-9]){0,31})$)/,
-              message: 'Denom ID can only be alphabetic & less than 32 characters',
+              pattern: /(^[a-z](([a-z0-9]){2,31})$)/,
+              message: 'Denom ID can only be alphabetic & between 3 and 32 characters',
             },
           ]}
         >
@@ -360,8 +423,8 @@ const FormMintNft = () => {
           rules={[
             { required: true, message: 'Token ID is required' },
             {
-              pattern: /(^[a-z](([a-z0-9]){0,31})$)/,
-              message: 'Token ID can only be alphabetic & less than 32 characters',
+              pattern: /(^[a-z](([a-z0-9]){2,31})$)/,
+              message: 'Token ID can only be alphabetic & between 3 and 32 characters',
             },
           ]}
         >
@@ -385,9 +448,9 @@ const FormMintNft = () => {
         <br />
         <Form.Item
           name="files"
-          label="Files"
+          label="Media Files"
           // hasFeedback
-          rules={[{ required: true, message: 'Media File is required' }, fileUploadValidator]}
+          rules={[{ required: true, message: 'Media Files is required' }, fileUploadValidator]}
         >
           <div>
             <Upload
@@ -404,7 +467,6 @@ const FormMintNft = () => {
               beforeUpload={beforeUpload}
               onChange={handleChange}
               accept="audio/*,video/*,image/*"
-              // onPreview={handlePreview}
               onRemove={() => {
                 // setIsPreviewButtonvisible(false);
                 setImageUrl('');
@@ -415,67 +477,8 @@ const FormMintNft = () => {
               {/* {imageUrl ? <img src={imageUrl} alt="avatar" style={{ maxWidth: '100%', maxHeight: '100%' }} /> : uploadButton} */}
               {isUploadButtonVisible ? uploadButton : null}
             </Upload>
-            {/* {isPreviewButtonVisible ? (
-              <>
-                <a
-                  onClick={() => {
-                    setIsPreviewModalVisible(true);
-                  }}
-                >
-                  <EyeOutlined /> Preview
-                </a>
-              </>
-            ) : (
-              ''
-            )} */}
           </div>
         </Form.Item>
-        {/* <ModalPopup
-          isModalVisible={isConfirmationModalVisible}
-          handleCancel={() => {
-            // Stop the video when closing
-            // setIsVideoPlaying(false);
-            // setVideoUrl(undefined);
-            // setTimeout(() => {
-            //   setIsNftModalVisible(false);
-            // }, 10);
-            setIsVisibleConfirmationModal(false);
-          }}
-          handleOk={() => { }}
-          footer={[]}
-          button={
-            <Button htmlType="submit" type="primary" onClick={() => { }}>
-              Review
-            </Button>
-          }
-        // okText="Confirm"
-        // className="nft-modal"
-        >
-          {videoUrl !== '' ? (
-            <>
-              Thumbnail:
-              <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
-              Video:
-              <ReactPlayer
-                url={videoUrl}
-                config={{
-                  file: {
-                    attributes: {
-                      controlsList: 'nodownload',
-                    },
-                  },
-                }}
-                controls
-                playing={isConfirmationModalVisible}
-              />
-            </>
-          ) : (
-            <>
-              Image:
-              <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
-            </>
-          )}
-        </ModalPopup> */}
         <ModalPopup
           isModalVisible={isConfirmationModalVisible}
           handleCancel={() => {
@@ -484,12 +487,7 @@ const FormMintNft = () => {
           }}
           handleOk={() => {}}
           footer={[
-            <Button
-              key="submit"
-              type="primary"
-              onClick={() => {}}
-              // loading={confirmLoading}
-            >
+            <Button key="submit" type="primary" onClick={onMintNft} loading={confirmLoading}>
               Confirm Mint NFT
             </Button>,
             <Button
@@ -611,6 +609,56 @@ const FormMintNft = () => {
         successButtonText="Continue"
         confirmPassword={false}
       />
+      <SuccessModalPopup
+        isModalVisible={isSuccessModalVisible}
+        handleCancel={closeSuccessModal}
+        handleOk={closeSuccessModal}
+        title="Success!"
+        button={null}
+        footer={[
+          <Button key="submit" type="primary" onClick={closeSuccessModal}>
+            Ok
+          </Button>,
+        ]}
+      >
+        <>
+          {broadcastResult?.code !== undefined &&
+          broadcastResult?.code !== null &&
+          broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+            <div className="description">
+              The transaction timed out but it will be included in the subsequent blocks
+            </div>
+          ) : (
+            <div className="description">Your NFT transaction was broadcasted successfully!</div>
+          )}
+        </>
+      </SuccessModalPopup>
+      <ErrorModalPopup
+        isModalVisible={isErrorModalVisible}
+        handleCancel={closeErrorModal}
+        handleOk={closeErrorModal}
+        title="An error happened!"
+        footer={[]}
+      >
+        <>
+          <div className="description">
+            The NFT transaction failed. Please try again later.
+            <br />
+            {errorMessages
+              .filter((item, idx) => {
+                return errorMessages.indexOf(item) === idx;
+              })
+              .map((err, idx) => (
+                <div key={idx}>- {err}</div>
+              ))}
+            {ledgerIsExpertMode ? (
+              <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
+            ) : (
+              ''
+            )}
+          </div>
+        </>
+      </ErrorModalPopup>
     </>
   );
 };
