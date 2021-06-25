@@ -25,6 +25,16 @@ export interface NFTTransferUnsigned extends TransactionUnsigned {
   recipient: string;
 }
 
+export interface NFTMintUnsigned extends TransactionUnsigned {
+  tokenId: string;
+  denomId: string;
+  name: string;
+  uri: string;
+  data: string;
+  sender: string;
+  recipient: string;
+}
+
 export interface DelegateTransactionUnsigned extends TransactionUnsigned {
   delegatorAddress: string;
   validatorAddress: string;
