@@ -35,6 +35,9 @@ export type WalletConfig = {
 export const FIXED_DEFAULT_FEE = String(10_000);
 export const FIXED_DEFAULT_GAS_LIMIT = String(300_000);
 
+export const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+export const MAX_VIDEO_SIZE = 20 * 1024 * 1024;
+
 const TestNetConfig: WalletConfig = {
   enabled: true,
   name: 'TESTNET',

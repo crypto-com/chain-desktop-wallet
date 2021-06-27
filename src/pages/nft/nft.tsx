@@ -46,7 +46,7 @@ import { ellipsis, middleEllipsis, isJson, convertIpfsToHttp } from '../../utils
 import { getUINormalScaleAmount } from '../../utils/NumberUtils';
 import { NftModel, NftProcessedModel, BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
+import { FIXED_DEFAULT_FEE, MAX_IMAGE_SIZE, MAX_VIDEO_SIZE } from '../../config/StaticConfig';
 
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
@@ -76,10 +76,10 @@ const { TextArea } = Input;
 const supportedVideo = (mimeType: string | undefined) => {
   switch (mimeType) {
     case 'video/mp4':
-    case 'video/webm':
-    case 'video/ogg':
-    case 'audio/ogg':
-    case 'audio/mpeg':
+      // case 'video/webm':
+      // case 'video/ogg':
+      // case 'audio/ogg':
+      // case 'audio/mpeg':
       return true;
     default:
       return false;
@@ -190,15 +190,15 @@ const FormMintNft = () => {
     const isVideo = file.type.indexOf('video') !== -1;
     const isSupportedVideo = supportedVideo(file.type);
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-    const isImageTooLarge = file.size / 1024 / 1024 > 1;
-    const isVideoTooLarge = file.size / 1024 / 1024 > 5;
+    const isImageTooLarge = file.size > MAX_IMAGE_SIZE;
+    const isVideoTooLarge = file.size > MAX_VIDEO_SIZE;
     if (isVideo && fileType.indexOf('video') === -1) {
       if (!isSupportedVideo) {
-        message.error('You can only upload mp4 file!');
+        message.error('You can only upload MP4 file!');
         error = true;
       }
       if (isVideoTooLarge) {
-        message.error('Video must smaller than 1MB!');
+        message.error('Video must smaller than 20MB!');
         error = true;
       }
     } else {
@@ -207,7 +207,7 @@ const FormMintNft = () => {
         error = true;
       }
       if (isImageTooLarge) {
-        message.error('Image must smaller than 1MB!');
+        message.error('Image must smaller than 10MB!');
         error = true;
       }
     }
@@ -426,7 +426,7 @@ const FormMintNft = () => {
             },
           ]}
         >
-          <Input />
+          <Input maxLength={64} />
         </Form.Item>
         <Form.Item
           name="tokenId"
@@ -436,12 +436,12 @@ const FormMintNft = () => {
           rules={[
             { required: true, message: 'Token ID is required' },
             {
-              pattern: /(^[a-z](([a-z0-9]){2,31})$)/,
-              message: 'Token ID can only be alphabetic & between 3 and 32 characters',
+              pattern: /(^[a-z](([a-z0-9]){2,63})$)/,
+              message: 'Token ID can only be alphabetic & between 3 and 64 characters',
             },
           ]}
         >
-          <Input />
+          <Input maxLength={64} />
         </Form.Item>
         <Form.Item
           name="drop"
@@ -450,10 +450,10 @@ const FormMintNft = () => {
           validateFirst
           rules={[{ required: true, message: 'Drop Name is required' }]}
         >
-          <Input />
+          <Input maxLength={64} />
         </Form.Item>
         <Form.Item name="description" label="Drop Description" hasFeedback>
-          <TextArea showCount maxLength={100} />
+          <TextArea showCount maxLength={1000} />
         </Form.Item>
         {/* <Switch /> */}
         <Form.Item
