@@ -432,7 +432,7 @@ const FormMintNft = () => {
             },
           ]}
         >
-          <Input maxLength={64} />
+          <Input maxLength={64} placeholder='e.g. "denomid123"' />
         </Form.Item>
         <Form.Item
           name="tokenId"
@@ -447,7 +447,7 @@ const FormMintNft = () => {
             },
           ]}
         >
-          <Input maxLength={64} />
+          <Input maxLength={64} placeholder='e.g. "edition123"' />
         </Form.Item>
         <Form.Item
           name="drop"
@@ -456,10 +456,14 @@ const FormMintNft = () => {
           validateFirst
           rules={[{ required: true, message: 'Drop Name is required' }]}
         >
-          <Input maxLength={64} />
+          <Input maxLength={64} placeholder='e.g. "Crypto.org Genesis"' />
         </Form.Item>
         <Form.Item name="description" label="Drop Description" hasFeedback>
-          <TextArea showCount maxLength={1000} />
+          <TextArea
+            showCount
+            maxLength={1000}
+            placeholder='e.g. "Commemorating the launch of the Crypto.org Chain and the Crypto.com NFT Platform..."'
+          />
         </Form.Item>
         {/* <Switch /> */}
         <Form.Item
@@ -647,7 +651,7 @@ const FormMintNft = () => {
               The transaction timed out but it will be included in the subsequent blocks
             </div>
           ) : (
-            <div className="description">Your NFT transaction was broadcasted successfully!</div>
+            <div className="description">Your NFT was minted successfully!</div>
           )}
         </>
       </SuccessModalPopup>
