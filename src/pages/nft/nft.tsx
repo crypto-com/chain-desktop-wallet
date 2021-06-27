@@ -285,7 +285,7 @@ const FormMintNft = () => {
       // setIsNftTransferModalVisible(false);
       // setIsNftTransferConfirmVisible(false);
       setConfirmLoading(false);
-
+      setIsVisibleConfirmationModal(false);
       setIsSuccessModalVisible(true);
       // setInputPasswordVisible(false);
 
@@ -293,6 +293,12 @@ const FormMintNft = () => {
       setWalletAsset(currentWalletAsset);
 
       form.resetFields();
+      setIpfsMediaJsonUrl('');
+      setImageUrl('');
+      setVideoUrl('');
+      setFiles([]);
+      setFileType('');
+      setIsUploadButtonVisible(true);
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
         setLedgerIsExpertMode(detectConditionsError(e.toString()));
@@ -492,20 +498,22 @@ const FormMintNft = () => {
         <ModalPopup
           isModalVisible={isConfirmationModalVisible}
           handleCancel={() => {
-            setIsVisibleConfirmationModal(false);
-            // form.resetFields();
+            if (!confirmLoading) {
+              setIsVisibleConfirmationModal(false);
+            }
           }}
           handleOk={() => {}}
           footer={[
             <Button key="submit" type="primary" onClick={onMintNft} loading={confirmLoading}>
-              Confirm Mint NFT
+              Confirm
             </Button>,
             <Button
               key="back"
               type="link"
               onClick={() => {
-                setIsVisibleConfirmationModal(false);
-                // form.resetFields();
+                if (!confirmLoading) {
+                  setIsVisibleConfirmationModal(false);
+                }
               }}
             >
               Cancel
@@ -561,6 +569,10 @@ const FormMintNft = () => {
                 <div>{`${formValues.drop}`}</div>
               </div>
               <div className="item">
+                <div className="label">Drop Description</div>
+                <div>{`${ellipsis(formValues.description, 1000)}`}</div>
+              </div>
+              <div className="item">
                 <div className="label">Transaction Fee</div>
                 <div>
                   {getUINormalScaleAmount(networkFee, walletAsset.decimals)} {walletAsset.symbol}
@@ -587,11 +599,7 @@ const FormMintNft = () => {
                   <Sider width="20px">
                     <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
                   </Sider>
-                  <Content>
-                    This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address
-                    that is not compatible with the Crypto.org Chain NFT token standard will result
-                    in the permanent loss of your asset.
-                  </Content>
+                  <Content>This NFT will be minted on the Crypto.org Chain.</Content>
                 </Layout>
               </div>
             </>
