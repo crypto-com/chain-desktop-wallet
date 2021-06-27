@@ -103,6 +103,7 @@ const FormMintNft = () => {
   // const [uploading, setUploading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
+  const [ipfsMediaJsonUrl, setIpfsMediaJsonUrl] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
   const [files, setFiles] = useState<any[]>([]);
@@ -116,6 +117,7 @@ const FormMintNft = () => {
     tokenId: '',
     denomId: '',
     drop: '',
+    description: '',
     senderAddress: '',
     recipientAddress: '',
     data: '',
@@ -162,8 +164,6 @@ const FormMintNft = () => {
       // tokenId: nft?.tokenId,
       senderAddress: currentSession.wallet.address,
       recipientAddress: currentSession.wallet.address,
-      uri: 'https://crypto.org',
-      data: "{name: 'abc', description: 'abc'}",
     });
   };
 
@@ -242,6 +242,14 @@ const FormMintNft = () => {
     if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
       return;
     }
+    const data = {
+      name: formValues.drop,
+      drop: formValues.drop,
+      description: formValues.description,
+      image: imageUrl,
+      animation_url: fileType.indexOf('video') !== -1 ? videoUrl : undefined,
+      mimeType: fileType,
+    };
     try {
       setConfirmLoading(true);
       const sendResult = await walletService.broadcastMintNFT({
@@ -249,9 +257,9 @@ const FormMintNft = () => {
         denomId: formValues.denomId,
         sender: formValues.senderAddress,
         recipient: formValues.recipientAddress,
-        data: formValues.data,
+        data: JSON.stringify(data),
         name: formValues.drop,
-        uri: formValues.uri,
+        uri: ipfsMediaJsonUrl,
         memo,
         decryptedPhrase,
         asset: walletAsset,
@@ -306,11 +314,15 @@ const FormMintNft = () => {
       <UploadOutlined />
       <div style={{ marginTop: 8 }}>
         {fileType.indexOf('video') !== -1 ? (
-          `Upload Thumbnail`
+          <>
+            Video Thumbnail
+            <br />
+            JPG, PNG
+          </>
         ) : (
           <>
-            Upload <br />
-            Image / Video
+            Image: JPG, PNG <br />
+            Video: MP4
           </>
         )}
       </div>
@@ -366,6 +378,7 @@ const FormMintNft = () => {
 
       if (response.data.status === 200) {
         const ipfsUrl = convertIpfsToHttp(response.data.ipfsUrl);
+        setIpfsMediaJsonUrl(ipfsUrl);
         const media: any = await axios.get(ipfsUrl);
         setImageUrl(convertIpfsToHttp(media.data.image));
         if (media.data.animation_url) {
@@ -408,8 +421,8 @@ const FormMintNft = () => {
           rules={[
             { required: true, message: 'Denom ID is required' },
             {
-              pattern: /(^[a-z](([a-z0-9]){2,31})$)/,
-              message: 'Denom ID can only be alphabetic & between 3 and 32 characters',
+              pattern: /(^[a-z](([a-z0-9]){2,63})$)/,
+              message: 'Denom ID can only be alphabetic & between 3 and 64 characters',
             },
           ]}
         >
@@ -443,14 +456,11 @@ const FormMintNft = () => {
           <TextArea showCount maxLength={100} />
         </Form.Item>
         {/* <Switch /> */}
-        <br />
-        <br />
-        <br />
         <Form.Item
           name="files"
-          label="Media Files"
+          label="Upload Files"
           // hasFeedback
-          rules={[{ required: true, message: 'Media Files is required' }, fileUploadValidator]}
+          rules={[{ required: true, message: 'Upload Files is required' }, fileUploadValidator]}
         >
           <div>
             <Upload
