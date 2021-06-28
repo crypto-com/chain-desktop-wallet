@@ -90,33 +90,14 @@ const supportedVideo = (mimeType: string | undefined) => {
   }
 };
 
+const multiplyFee = (fee: string, multiply: number) => {
+  return Big(fee)
+    .times(multiply)
+    .toString();
+};
+
 const FormMintNft = () => {
   const [form] = Form.useForm();
-  const currentSession = useRecoilValue(sessionState);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
-  const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [nftList, setNftList] = useRecoilState(nftListState);
-
-  const [decryptedPhrase, setDecryptedPhrase] = useState('');
-  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
-  const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
-  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
-  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
-  const [ipfsMediaJsonUrl, setIpfsMediaJsonUrl] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [videoUrl, setVideoUrl] = useState('');
-  const [files, setFiles] = useState<any[]>([]);
-  const [isUploadButtonVisible, setIsUploadButtonVisible] = useState(true);
-  const [isUploadSuccess, setIsUploadSuccess] = useState(false);
-  const [isDenomIdOwner, setIsDenomIdOwner] = useState(false);
-  const [isDenomIdIssued, setIsDenomIdIssued] = useState(false);
-  const [fileType, setFileType] = useState('');
-  const [errorMessages, setErrorMessages] = useState([]);
-
   const [formValues, setFormValues] = useState({
     fileList: '',
     tokenId: '',
@@ -130,6 +111,32 @@ const FormMintNft = () => {
     amount: '',
     memo: '',
   });
+  const currentSession = useRecoilValue(sessionState);
+  const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [nftList, setNftList] = useRecoilState(nftListState);
+
+  const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
+  const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+  const [isUploadButtonVisible, setIsUploadButtonVisible] = useState(true);
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+
+  const [isUploadSuccess, setIsUploadSuccess] = useState(false);
+  const [isDenomIdOwner, setIsDenomIdOwner] = useState(false);
+  const [isDenomIdIssued, setIsDenomIdIssued] = useState(false);
+
+  const [ipfsMediaJsonUrl, setIpfsMediaJsonUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
+  const [files, setFiles] = useState<any[]>([]);
+  const [fileType, setFileType] = useState('');
+
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
+  const [errorMessages, setErrorMessages] = useState([]);
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -138,12 +145,6 @@ const FormMintNft = () => {
     currentSession.wallet.config.fee.networkFee !== undefined
       ? currentSession.wallet.config.fee.networkFee
       : FIXED_DEFAULT_FEE;
-
-  const multiplyFee = (fee: string, multiply: number) => {
-    return Big(fee)
-      .times(multiply)
-      .toString();
-  };
 
   const closeSuccessModal = () => {
     setIsSuccessModalVisible(false);
@@ -194,7 +195,6 @@ const FormMintNft = () => {
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
-      // setIsNftTransferModalVisible(false);
     }
   };
 
@@ -359,7 +359,6 @@ const FormMintNft = () => {
 
   const uploadButton = (
     <div>
-      {/* {uploading ? <LoadingOutlined /> : <PlusOutlined />} */}
       <UploadOutlined />
       <div style={{ marginTop: 8 }}>
         {isVideo(fileType) ? (
@@ -420,13 +419,10 @@ const FormMintNft = () => {
         if (media.data.animation_url) {
           setVideoUrl(convertIpfsToHttp(media.data.animation_url));
         }
-        // setUploading(false);
-        // setIsPreviewButtonvisible(true);
         setIsUploadSuccess(true);
         onSuccess(response);
       }
     } catch (e) {
-      // setIsPreviewButtonvisible(false);
       setIsUploadSuccess(false);
       onError(e);
       notification.error({
@@ -435,7 +431,6 @@ const FormMintNft = () => {
         placement: 'topRight',
         duration: 5,
       });
-      // setUploading(false);
     }
   };
 
@@ -524,7 +519,6 @@ const FormMintNft = () => {
                 }
               }}
             >
-              {/* {imageUrl ? <img src={imageUrl} alt="avatar" style={{ maxWidth: '100%', maxHeight: '100%' }} /> : uploadButton} */}
               {isUploadButtonVisible ? uploadButton : null}
             </Upload>
           </div>
@@ -757,24 +751,26 @@ const NftPage = () => {
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [nftList, setNftList] = useRecoilState(nftListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
-  const didMountRef = useRef(false);
-  const [confirmLoading, setConfirmLoading] = useState(false);
-  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
-  const [errorMessages, setErrorMessages] = useState([]);
-  const [decryptedPhrase, setDecryptedPhrase] = useState('');
 
-  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [isNftModalVisible, setIsNftModalVisible] = useState(false);
   const [isNftTransferModalVisible, setIsNftTransferModalVisible] = useState(false);
   const [isNftTransferConfirmVisible, setIsNftTransferConfirmVisible] = useState(false);
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
 
   const [nft, setNft] = useState<NftProcessedModel | undefined>();
-  const [nftView, setNftView] = useState('grid');
   const [processedNftList, setProcessedNftList] = useState<NftProcessedModel[]>([]);
+  const [nftView, setNftView] = useState('grid');
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | undefined>('');
+
+  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
+  const [errorMessages, setErrorMessages] = useState([]);
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
+
+  const didMountRef = useRef(false);
 
   const analyticsService = new AnalyticsService(currentSession);
 
