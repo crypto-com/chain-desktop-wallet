@@ -18,6 +18,7 @@ import {
   message,
   notification,
 } from 'antd';
+import Big from 'big.js';
 // import {
 //   UploadFile
 // } from 'antd/lib/upload/interface';
@@ -145,6 +146,12 @@ const FormMintNft = () => {
     currentSession.wallet.config.fee.networkFee !== undefined
       ? currentSession.wallet.config.fee.networkFee
       : FIXED_DEFAULT_FEE;
+
+  const multiplyFee = (fee: string, multiply: number) => {
+    return Big(fee)
+      .times(multiply)
+      .toString();
+  };
 
   const closeSuccessModal = () => {
     setIsSuccessModalVisible(false);
@@ -622,10 +629,14 @@ const FormMintNft = () => {
               <div className="item">
                 <div className="label">Transaction Fee</div>
                 <div>
-                  {getUINormalScaleAmount(networkFee, walletAsset.decimals)} {walletAsset.symbol}
+                  {getUINormalScaleAmount(
+                    multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1),
+                    walletAsset.decimals,
+                  )}{' '}
+                  {walletAsset.symbol}
                 </div>
               </div>
-              {networkFee > walletAsset.balance ? (
+              {multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1) > walletAsset.balance ? (
                 <div className="item notice">
                   <Layout>
                     <Sider width="20px">
@@ -633,7 +644,10 @@ const FormMintNft = () => {
                     </Sider>
                     <Content>
                       Insufficient balance. Please ensure you have at least{' '}
-                      {getUINormalScaleAmount(networkFee, walletAsset.decimals)}{' '}
+                      {getUINormalScaleAmount(
+                        multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1),
+                        walletAsset.decimals,
+                      )}{' '}
                       {walletAsset.symbol} for network fee.
                     </Content>
                   </Layout>
