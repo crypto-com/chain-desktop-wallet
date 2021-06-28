@@ -378,19 +378,6 @@ const FormMintNft = () => {
     const isSupportedVideo = supportedVideo(file.type);
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     const formData = new FormData();
-    // const waitUntilImageLoaded = (resolve, _image) => {
-    //   setTimeout(() => {
-    //     if (_image) {
-    //       resolve()
-    //     }
-    //     waitUntilImageLoaded(resolve, _image);
-    //   }, 1000);
-    // };
-    // await new Promise(resolve => waitUntilImageLoaded(resolve, imageUrl));
-    // const type = 'image/png';
-
-    // setUploading(true);
-
     // Uploaded Video
     if (files.length >= 2) {
       formData.append('videoFile', files[0].originFileObj);
@@ -544,7 +531,13 @@ const FormMintNft = () => {
           }}
           handleOk={() => {}}
           footer={[
-            <Button key="submit" type="primary" onClick={onMintNft} loading={confirmLoading}>
+            <Button
+              key="submit"
+              type="primary"
+              onClick={onMintNft}
+              loading={confirmLoading}
+              disabled={isDenomIdIssued && !isDenomIdOwner}
+            >
               Confirm
             </Button>,
             <Button
@@ -560,12 +553,7 @@ const FormMintNft = () => {
             </Button>,
           ]}
           button={
-            <Button
-              htmlType="submit"
-              type="primary"
-              onClick={() => {}}
-              disabled={isDenomIdIssued && !isDenomIdOwner}
-            >
+            <Button htmlType="submit" type="primary" onClick={() => {}}>
               Review
             </Button>
           }

@@ -4,14 +4,18 @@
 .ant-btn:not(.ant-upload-list-item-card-actions-btn) {
   height: 48px;
   margin: 10px;
-  color: @azure;
   font-weight: 600;
   font-size: 16px;
   line-height: 1.38;
-  background: transparent;
-  border: solid 2px @azure;
   border-radius: 4px;
-
+  &:first-of-type {
+    margin: 0;
+  }
+  &:not([disabled]) {
+    color: @azure;
+    background: transparent;
+    border: solid 2px @azure;
+  }
   &.ant-btn-primary:not([disabled]):not(.ant-btn-dangerous) {
     color: @white;
     background: @azure;
