@@ -78,6 +78,10 @@ const { Meta } = Card;
 const layout = {};
 const { TextArea } = Input;
 
+const isVideo = (type: string | undefined) => {
+  return type?.indexOf('video') !== -1;
+};
+
 const supportedVideo = (mimeType: string | undefined) => {
   switch (mimeType) {
     case 'video/mp4':
@@ -205,12 +209,12 @@ const FormMintNft = () => {
 
   const beforeUpload = file => {
     let error = false;
-    const isVideo = file.type.indexOf('video') !== -1;
+    const isVideoFile = isVideo(file.type);
     const isSupportedVideo = supportedVideo(file.type);
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     const isImageTooLarge = file.size > MAX_IMAGE_SIZE;
     const isVideoTooLarge = file.size > MAX_VIDEO_SIZE;
-    if (isVideo && fileType.indexOf('video') === -1) {
+    if (isVideoFile && !isVideo(fileType)) {
       if (!isSupportedVideo) {
         message.error('You can only upload MP4 file!');
         error = true;
@@ -240,9 +244,10 @@ const FormMintNft = () => {
   const handleChange = ({ fileList }) => {
     if (fileList.length === 0) {
       setIsUploadButtonVisible(true);
+      setIsUploadSuccess(false);
       setFileType('');
     } else if (fileList.length === 1) {
-      if (fileList[0].type.indexOf('video') !== -1) {
+      if (isVideo(fileList[0].type)) {
         setIsUploadButtonVisible(true);
       } else {
         setIsUploadButtonVisible(false);
@@ -265,7 +270,7 @@ const FormMintNft = () => {
       drop: formValues.drop,
       description: formValues.description,
       image: imageUrl,
-      animation_url: fileType.indexOf('video') !== -1 ? videoUrl : undefined,
+      animation_url: isVideo(fileType) ? videoUrl : undefined,
       mimeType: fileType,
     };
     try {
@@ -337,7 +342,7 @@ const FormMintNft = () => {
       {/* {uploading ? <LoadingOutlined /> : <PlusOutlined />} */}
       <UploadOutlined />
       <div style={{ marginTop: 8 }}>
-        {fileType.indexOf('video') !== -1 ? (
+        {isVideo(fileType) ? (
           <>
             Video Thumbnail
             <br />
@@ -356,7 +361,7 @@ const FormMintNft = () => {
   const customRequest = async option => {
     const { onProgress, onError, onSuccess, action, file } = option;
     const url = action;
-    const isVideo = file.type.indexOf('video') !== -1;
+    const isVideoFile = isVideo(file.type);
     const isSupportedVideo = supportedVideo(file.type);
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     const formData = new FormData();
@@ -378,7 +383,7 @@ const FormMintNft = () => {
       formData.append('videoFile', files[0].originFileObj);
     }
 
-    if (isVideo && isSupportedVideo) {
+    if (isVideoFile && isSupportedVideo) {
       onSuccess();
       return;
       // eslint-disable-next-line no-else-return
@@ -506,7 +511,7 @@ const FormMintNft = () => {
               onChange={handleChange}
               accept="audio/*,video/*,image/*"
               onRemove={file => {
-                if (file.type?.indexOf('video') !== -1) {
+                if (isVideo(file.type)) {
                   setVideoUrl('');
                 } else {
                   setImageUrl('');
@@ -559,7 +564,7 @@ const FormMintNft = () => {
                   <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
                 </div>
               </div>
-              {fileType.indexOf('video') !== -1 ? (
+              {isVideo(fileType) ? (
                 <div className="item">
                   <div className="nft-video">
                     <ReactPlayer
