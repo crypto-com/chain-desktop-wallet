@@ -497,7 +497,7 @@ class WalletService {
     const withdrawStakingReward: WithdrawStakingRewardUnsigned = {
       delegatorAddress: currentSession.wallet.address,
       validatorAddress: rewardWithdrawRequest.validatorAddress,
-      memo: '',
+      memo: DEFAULT_CLIENT_MEMO,
       accountNumber,
       accountSequence,
     };
