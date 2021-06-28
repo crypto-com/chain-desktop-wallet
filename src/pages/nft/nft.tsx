@@ -166,17 +166,6 @@ const FormMintNft = () => {
     },
   });
 
-  const denomIdValidator = () => ({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    validator(rule, value) {
-      const reason = `This Denom Name was registered by another address.`;
-      if (isUploadSuccess) {
-        return Promise.resolve();
-      }
-      return Promise.reject(reason);
-    },
-  });
-
   const showConfirmationModal = async () => {
     setInputPasswordVisible(false);
     setIsVisibleConfirmationModal(true);
@@ -477,7 +466,6 @@ const FormMintNft = () => {
               pattern: /(^[a-z](([a-z0-9]){2,63})$)/,
               message: 'Denom ID can only be alphabetic & between 3 and 64 characters',
             },
-            denomIdValidator,
           ]}
         >
           <Input maxLength={64} placeholder='e.g. "denomid123"' />
@@ -621,12 +609,10 @@ const FormMintNft = () => {
                 <div className="item notice">
                   <Layout>
                     <Sider width="20px">
-                      <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                      <ExclamationCircleOutlined style={{ color: '#f27474' }} />
                     </Sider>
                     <Content>
-                      Insufficient balance. Please ensure you have at least{' '}
-                      {getUINormalScaleAmount(networkFee, walletAsset.decimals)}{' '}
-                      {walletAsset.symbol} for network fee.
+                      The Denom Name is registered by another address. Please choose another one.
                     </Content>
                   </Layout>
                 </div>
@@ -655,7 +641,7 @@ const FormMintNft = () => {
                 <div className="item notice">
                   <Layout>
                     <Sider width="20px">
-                      <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                      <ExclamationCircleOutlined style={{ color: '#f27474' }} />
                     </Sider>
                     <Content>
                       Insufficient balance. Please ensure you have at least{' '}
