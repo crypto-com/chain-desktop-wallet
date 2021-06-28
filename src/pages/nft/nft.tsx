@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './nft.less';
 import 'antd/dist/antd.css';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   Layout,
   Card,
@@ -14,21 +13,14 @@ import {
   Form,
   Input,
   Upload,
-  // Switch,
   message,
   notification,
 } from 'antd';
 import Big from 'big.js';
-// import {
-//   UploadFile
-// } from 'antd/lib/upload/interface';
 import Icon, {
   MenuOutlined,
   AppstoreOutlined,
   ExclamationCircleOutlined,
-  // LoadingOutlined,
-  // PlusOutlined,
-  // EyeOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
 import { useRecoilValue, useRecoilState } from 'recoil';
@@ -299,6 +291,14 @@ const FormMintNft = () => {
         });
 
         setBroadcastResult(issueDenomResult);
+
+        analyticsService.logTransactionEvent(
+          issueDenomResult.transactionHash as string,
+          formValues.amount,
+          AnalyticsTxType.NftTransaction,
+          AnalyticsActions.NftIssue,
+          AnalyticsCategory.Nft,
+        );
       }
 
       const mintNftResult = await walletService.broadcastMintNFT({
@@ -320,9 +320,9 @@ const FormMintNft = () => {
       analyticsService.logTransactionEvent(
         mintNftResult.transactionHash as string,
         formValues.amount,
-        AnalyticsTxType.TransferTransaction,
-        AnalyticsActions.FundsTransfer,
-        AnalyticsCategory.Transfer,
+        AnalyticsTxType.NftTransaction,
+        AnalyticsActions.NftMint,
+        AnalyticsCategory.Nft,
       );
 
       setConfirmLoading(false);
@@ -757,6 +757,7 @@ const NftPage = () => {
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [nftList, setNftList] = useRecoilState(nftListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
+  const didMountRef = useRef(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [errorMessages, setErrorMessages] = useState([]);
@@ -903,9 +904,9 @@ const NftPage = () => {
       analyticsService.logTransactionEvent(
         sendResult.transactionHash as string,
         formValues.amount,
-        AnalyticsTxType.TransferTransaction,
-        AnalyticsActions.FundsTransfer,
-        AnalyticsCategory.Transfer,
+        AnalyticsTxType.NftTransaction,
+        AnalyticsActions.NftTransfer,
+        AnalyticsCategory.Nft,
       );
 
       const latestLoadedNFTs = await walletService.retrieveNFTs(currentSession.wallet.identifier);
@@ -948,6 +949,10 @@ const NftPage = () => {
       setProcessedNftList(currentNftList);
     };
     fetchNftList();
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('NFT');
+    }
   }, [fetchingDB]);
 
   const NftColumns = [
