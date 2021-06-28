@@ -115,8 +115,8 @@ class WalletService {
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
 
     await Promise.all([
-      await this.fetchAndSaveTransfers(currentSession),
       await this.fetchAndUpdateBalances(currentSession),
+      await this.fetchAndSaveTransfers(currentSession),
     ]);
 
     return broadCastResult;
