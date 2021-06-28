@@ -49,6 +49,8 @@ import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT,
   FIXED_DEFAULT_FEE,
+  NFT_IMAGE_DENOM_SCHEMA,
+  NFT_VIDEO_DENOM_SCHEMA,
   MAX_IMAGE_SIZE,
   MAX_VIDEO_SIZE,
 } from '../../config/StaticConfig';
@@ -106,12 +108,9 @@ const FormMintNft = () => {
 
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
-  // const [isPreviewModalVisible, setIsPreviewModalVisible] = useState(false);
-  // const [isPreviewButtonVisible, setIsPreviewButtonvisible] = useState(false);
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
-  // const [uploading, setUploading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [ipfsMediaJsonUrl, setIpfsMediaJsonUrl] = useState('');
@@ -275,7 +274,23 @@ const FormMintNft = () => {
     };
     try {
       setConfirmLoading(true);
-      const sendResult = await walletService.broadcastMintNFT({
+
+      const issueDenomResult = await walletService.broadcastNFTDenomIssueTx({
+        tokenId: formValues.tokenId,
+        name: formValues.tokenId,
+        sender: formValues.senderAddress,
+        schema: isVideo(fileType)
+          ? JSON.stringify(NFT_VIDEO_DENOM_SCHEMA)
+          : JSON.stringify(NFT_IMAGE_DENOM_SCHEMA),
+        memo,
+        decryptedPhrase,
+        asset: walletAsset,
+        walletType,
+      });
+
+      setBroadcastResult(issueDenomResult);
+
+      const mintNftResult = await walletService.broadcastMintNFT({
         tokenId: formValues.tokenId,
         denomId: formValues.denomId,
         sender: formValues.senderAddress,
@@ -289,31 +304,25 @@ const FormMintNft = () => {
         walletType,
       });
 
+      setBroadcastResult(mintNftResult);
+
       analyticsService.logTransactionEvent(
-        broadcastResult.transactionHash as string,
+        mintNftResult.transactionHash as string,
         formValues.amount,
         AnalyticsTxType.TransferTransaction,
         AnalyticsActions.FundsTransfer,
         AnalyticsCategory.Transfer,
       );
 
-      setBroadcastResult(sendResult);
-
-      // setIsNftModalVisible(false);
-      // setIsNftTransferModalVisible(false);
-      // setIsNftTransferConfirmVisible(false);
       setConfirmLoading(false);
       setIsVisibleConfirmationModal(false);
       setIsSuccessModalVisible(true);
-      // setInputPasswordVisible(false);
 
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setWalletAsset(currentWalletAsset);
 
       const latestLoadedNFTs = await walletService.retrieveNFTs(currentSession.wallet.identifier);
       setNftList(latestLoadedNFTs);
-      // const processedNFTsLists = processNftList(latestLoadedNFTs);
-      // setProcessedNftList(processedNFTsLists);
 
       form.resetFields();
       setIpfsMediaJsonUrl('');
@@ -868,7 +877,7 @@ const NftPage = () => {
       });
 
       analyticsService.logTransactionEvent(
-        broadcastResult.transactionHash as string,
+        sendResult.transactionHash as string,
         formValues.amount,
         AnalyticsTxType.TransferTransaction,
         AnalyticsActions.FundsTransfer,
