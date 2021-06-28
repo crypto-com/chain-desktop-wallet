@@ -49,6 +49,8 @@ import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT,
   FIXED_DEFAULT_FEE,
+  NFT_IMAGE_DENOM_SCHEMA,
+  NFT_VIDEO_DENOM_SCHEMA,
   MAX_IMAGE_SIZE,
   MAX_VIDEO_SIZE,
 } from '../../config/StaticConfig';
@@ -78,6 +80,10 @@ const { Meta } = Card;
 const layout = {};
 const { TextArea } = Input;
 
+const isVideo = (type: string | undefined) => {
+  return type?.indexOf('video') !== -1;
+};
+
 const supportedVideo = (mimeType: string | undefined) => {
   switch (mimeType) {
     case 'video/mp4':
@@ -102,12 +108,9 @@ const FormMintNft = () => {
 
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
-  // const [isPreviewModalVisible, setIsPreviewModalVisible] = useState(false);
-  // const [isPreviewButtonVisible, setIsPreviewButtonvisible] = useState(false);
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
-  // const [uploading, setUploading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [ipfsMediaJsonUrl, setIpfsMediaJsonUrl] = useState('');
@@ -164,7 +167,7 @@ const FormMintNft = () => {
   const denomIdValidator = () => ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     validator(rule, value) {
-      const reason = `This Denom Name was registered by another address. Please use another one.`;
+      const reason = `This Denom Name was registered by another address.`;
       if (isUploadSuccess) {
         return Promise.resolve();
       }
@@ -205,12 +208,12 @@ const FormMintNft = () => {
 
   const beforeUpload = file => {
     let error = false;
-    const isVideo = file.type.indexOf('video') !== -1;
+    const isVideoFile = isVideo(file.type);
     const isSupportedVideo = supportedVideo(file.type);
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     const isImageTooLarge = file.size > MAX_IMAGE_SIZE;
     const isVideoTooLarge = file.size > MAX_VIDEO_SIZE;
-    if (isVideo && fileType.indexOf('video') === -1) {
+    if (isVideoFile && !isVideo(fileType)) {
       if (!isSupportedVideo) {
         message.error('You can only upload MP4 file!');
         error = true;
@@ -240,9 +243,10 @@ const FormMintNft = () => {
   const handleChange = ({ fileList }) => {
     if (fileList.length === 0) {
       setIsUploadButtonVisible(true);
+      setIsUploadSuccess(false);
       setFileType('');
     } else if (fileList.length === 1) {
-      if (fileList[0].type.indexOf('video') !== -1) {
+      if (isVideo(fileList[0].type)) {
         setIsUploadButtonVisible(true);
       } else {
         setIsUploadButtonVisible(false);
@@ -265,12 +269,28 @@ const FormMintNft = () => {
       drop: formValues.drop,
       description: formValues.description,
       image: imageUrl,
-      animation_url: fileType.indexOf('video') !== -1 ? videoUrl : undefined,
+      animation_url: isVideo(fileType) ? videoUrl : undefined,
       mimeType: fileType,
     };
     try {
       setConfirmLoading(true);
-      const sendResult = await walletService.broadcastMintNFT({
+
+      const issueDenomResult = await walletService.broadcastNFTDenomIssueTx({
+        tokenId: formValues.tokenId,
+        name: formValues.tokenId,
+        sender: formValues.senderAddress,
+        schema: isVideo(fileType)
+          ? JSON.stringify(NFT_VIDEO_DENOM_SCHEMA)
+          : JSON.stringify(NFT_IMAGE_DENOM_SCHEMA),
+        memo,
+        decryptedPhrase,
+        asset: walletAsset,
+        walletType,
+      });
+
+      setBroadcastResult(issueDenomResult);
+
+      const mintNftResult = await walletService.broadcastMintNFT({
         tokenId: formValues.tokenId,
         denomId: formValues.denomId,
         sender: formValues.senderAddress,
@@ -284,31 +304,25 @@ const FormMintNft = () => {
         walletType,
       });
 
+      setBroadcastResult(mintNftResult);
+
       analyticsService.logTransactionEvent(
-        broadcastResult.transactionHash as string,
+        mintNftResult.transactionHash as string,
         formValues.amount,
         AnalyticsTxType.TransferTransaction,
         AnalyticsActions.FundsTransfer,
         AnalyticsCategory.Transfer,
       );
 
-      setBroadcastResult(sendResult);
-
-      // setIsNftModalVisible(false);
-      // setIsNftTransferModalVisible(false);
-      // setIsNftTransferConfirmVisible(false);
       setConfirmLoading(false);
       setIsVisibleConfirmationModal(false);
       setIsSuccessModalVisible(true);
-      // setInputPasswordVisible(false);
 
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setWalletAsset(currentWalletAsset);
 
       const latestLoadedNFTs = await walletService.retrieveNFTs(currentSession.wallet.identifier);
       setNftList(latestLoadedNFTs);
-      // const processedNFTsLists = processNftList(latestLoadedNFTs);
-      // setProcessedNftList(processedNFTsLists);
 
       form.resetFields();
       setIpfsMediaJsonUrl('');
@@ -337,7 +351,7 @@ const FormMintNft = () => {
       {/* {uploading ? <LoadingOutlined /> : <PlusOutlined />} */}
       <UploadOutlined />
       <div style={{ marginTop: 8 }}>
-        {fileType.indexOf('video') !== -1 ? (
+        {isVideo(fileType) ? (
           <>
             Video Thumbnail
             <br />
@@ -356,7 +370,7 @@ const FormMintNft = () => {
   const customRequest = async option => {
     const { onProgress, onError, onSuccess, action, file } = option;
     const url = action;
-    const isVideo = file.type.indexOf('video') !== -1;
+    const isVideoFile = isVideo(file.type);
     const isSupportedVideo = supportedVideo(file.type);
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     const formData = new FormData();
@@ -378,7 +392,7 @@ const FormMintNft = () => {
       formData.append('videoFile', files[0].originFileObj);
     }
 
-    if (isVideo && isSupportedVideo) {
+    if (isVideoFile && isSupportedVideo) {
       onSuccess();
       return;
       // eslint-disable-next-line no-else-return
@@ -506,7 +520,7 @@ const FormMintNft = () => {
               onChange={handleChange}
               accept="audio/*,video/*,image/*"
               onRemove={file => {
-                if (file.type?.indexOf('video') !== -1) {
+                if (isVideo(file.type)) {
                   setVideoUrl('');
                 } else {
                   setImageUrl('');
@@ -559,7 +573,7 @@ const FormMintNft = () => {
                   <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
                 </div>
               </div>
-              {fileType.indexOf('video') !== -1 ? (
+              {isVideo(fileType) ? (
                 <div className="item">
                   <div className="nft-video">
                     <ReactPlayer
@@ -863,7 +877,7 @@ const NftPage = () => {
       });
 
       analyticsService.logTransactionEvent(
-        broadcastResult.transactionHash as string,
+        sendResult.transactionHash as string,
         formValues.amount,
         AnalyticsTxType.TransferTransaction,
         AnalyticsActions.FundsTransfer,
@@ -917,7 +931,8 @@ const NftPage = () => {
       title: 'Drop Name',
       key: 'name',
       render: record => {
-        return record.tokenData.drop ? record.tokenData.drop : 'n.a.';
+        const { drop, name } = record.tokenData;
+        return name || drop ? name || drop : 'n.a.';
       },
     },
     {
@@ -1027,8 +1042,8 @@ const NftPage = () => {
                       >
                         <Meta
                           title={
-                            item?.tokenData.drop
-                              ? ellipsis(item?.tokenData.drop, 20)
+                            item.tokenData.name || item.tokenData.drop
+                              ? ellipsis(item.tokenData.name! || item.tokenData.drop!, 20)
                               : ellipsis(`${item?.denomId} - #${item?.tokenId}`, 20)
                           }
                           description={
@@ -1080,8 +1095,8 @@ const NftPage = () => {
                   <Sider width="50%">
                     <>
                       <div className="title">
-                        {nft?.tokenData.drop
-                          ? nft?.tokenData.drop
+                        {nft?.tokenData.name || nft?.tokenData.drop
+                          ? nft?.tokenData.name || nft?.tokenData.drop
                           : `${nft?.denomId} - #${nft?.tokenId}`}
                       </div>
                       <div className="item">
@@ -1278,8 +1293,8 @@ const NftPage = () => {
                       <div className="item">
                         <div className="label">Sending</div>
                         <div className="address">
-                          {nft?.tokenData.drop
-                            ? nft?.tokenData.drop
+                          {nft?.tokenData.name || nft?.tokenData.drop
+                            ? nft?.tokenData.name || nft?.tokenData.drop
                             : `${nft?.denomId} - #${nft?.tokenId}`}
                         </div>
                       </div>

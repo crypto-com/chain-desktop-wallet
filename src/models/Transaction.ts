@@ -129,6 +129,7 @@ export interface ValidatorModel {
 export interface ProposalModel extends Proposal {}
 
 export interface NftTokenData {
+  name?: string;
   drop?: string;
   description?: string;
   image?: string;

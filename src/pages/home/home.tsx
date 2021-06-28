@@ -846,8 +846,8 @@ function HomePage() {
                     >
                       <Meta
                         title={
-                          item?.tokenData.drop
-                            ? item?.tokenData.drop
+                          item?.tokenData.name
+                            ? item?.tokenData.name
                             : `${item?.denomId} - #${item?.tokenId}`
                         }
                         description={
