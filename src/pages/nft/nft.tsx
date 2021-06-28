@@ -168,7 +168,7 @@ const FormMintNft = () => {
   const denomIdValidator = () => ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     validator(rule, value) {
-      const reason = `This Denom Name was registered by another address. Please use another one.`;
+      const reason = `This Denom Name was registered by another address.`;
       if (isUploadSuccess) {
         return Promise.resolve();
       }
@@ -922,7 +922,8 @@ const NftPage = () => {
       title: 'Drop Name',
       key: 'name',
       render: record => {
-        return record.tokenData.drop ? record.tokenData.drop : 'n.a.';
+        const { drop, name } = record.tokenData;
+        return name || drop ? name || drop : 'n.a.';
       },
     },
     {
@@ -1032,8 +1033,8 @@ const NftPage = () => {
                       >
                         <Meta
                           title={
-                            item?.tokenData.drop
-                              ? ellipsis(item?.tokenData.drop, 20)
+                            item.tokenData.name || item.tokenData.drop
+                              ? ellipsis(item.tokenData.name! || item.tokenData.drop!, 20)
                               : ellipsis(`${item?.denomId} - #${item?.tokenId}`, 20)
                           }
                           description={
@@ -1085,8 +1086,8 @@ const NftPage = () => {
                   <Sider width="50%">
                     <>
                       <div className="title">
-                        {nft?.tokenData.drop
-                          ? nft?.tokenData.drop
+                        {nft?.tokenData.name || nft?.tokenData.drop
+                          ? nft?.tokenData.name || nft?.tokenData.drop
                           : `${nft?.denomId} - #${nft?.tokenId}`}
                       </div>
                       <div className="item">
@@ -1283,8 +1284,8 @@ const NftPage = () => {
                       <div className="item">
                         <div className="label">Sending</div>
                         <div className="address">
-                          {nft?.tokenData.drop
-                            ? nft?.tokenData.drop
+                          {nft?.tokenData.name || nft?.tokenData.drop
+                            ? nft?.tokenData.name || nft?.tokenData.drop
                             : `${nft?.denomId} - #${nft?.tokenId}`}
                         </div>
                       </div>
