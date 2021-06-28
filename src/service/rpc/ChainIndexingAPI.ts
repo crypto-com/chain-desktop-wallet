@@ -1,6 +1,7 @@
 import axios, { AxiosInstance } from 'axios';
 import {
   NftAccountTransactionListResponse,
+  NftDenomResponse,
   NftListResponse,
   NftResponse,
   NftTransactionListResponse,
@@ -196,6 +197,19 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       console.log('FAILED_LOADING_NFT_ACCOUNT_TXs', e);
       return {
         result: [],
+      };
+    }
+  }
+
+  public async fetchNftDenomData(denomId: string): Promise<NftDenomResponse> {
+    try {
+      const denomIdInfo = await this.axiosClient.get<NftDenomResponse>(`nfts/denoms/${denomId}`);
+      return denomIdInfo.data;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING_NFT_DENOM_INFO', e);
+      return {
+        result: null,
       };
     }
   }

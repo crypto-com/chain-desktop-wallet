@@ -119,6 +119,8 @@ const FormMintNft = () => {
   const [files, setFiles] = useState<any[]>([]);
   const [isUploadButtonVisible, setIsUploadButtonVisible] = useState(true);
   const [isUploadSuccess, setIsUploadSuccess] = useState(false);
+  const [isDenomIdOwner, setIsDenomIdOwner] = useState(false);
+  const [isDenomIdIssued, setIsDenomIdIssued] = useState(false);
   const [fileType, setFileType] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
 
@@ -175,17 +177,28 @@ const FormMintNft = () => {
     },
   });
 
-  const showConfirmationModal = () => {
+  const showConfirmationModal = async () => {
     setInputPasswordVisible(false);
     setIsVisibleConfirmationModal(true);
     setFormValues({
       ...form.getFieldsValue(true),
-      // Replace scientific notation to plain string values
-      // denomId: nft?.denomId,
-      // tokenId: nft?.tokenId,
       senderAddress: currentSession.wallet.address,
       recipientAddress: currentSession.wallet.address,
     });
+    const denomData = await walletService.getDenomIdData(formValues.denomId);
+    if (denomData) {
+      // Denom ID registered
+      setIsDenomIdIssued(true);
+      if (denomData.denomCreator === currentSession.wallet.address) {
+        setIsDenomIdOwner(true);
+      } else {
+        setIsDenomIdOwner(false);
+      }
+    } else {
+      // Denom ID not registered yet
+      setIsDenomIdIssued(false);
+      setIsDenomIdOwner(true);
+    }
   };
 
   const showPasswordInput = () => {
@@ -275,20 +288,22 @@ const FormMintNft = () => {
     try {
       setConfirmLoading(true);
 
-      const issueDenomResult = await walletService.broadcastNFTDenomIssueTx({
-        tokenId: formValues.tokenId,
-        name: formValues.tokenId,
-        sender: formValues.senderAddress,
-        schema: isVideo(fileType)
-          ? JSON.stringify(NFT_VIDEO_DENOM_SCHEMA)
-          : JSON.stringify(NFT_IMAGE_DENOM_SCHEMA),
-        memo,
-        decryptedPhrase,
-        asset: walletAsset,
-        walletType,
-      });
+      if (!isDenomIdIssued) {
+        const issueDenomResult = await walletService.broadcastNFTDenomIssueTx({
+          tokenId: formValues.tokenId,
+          name: formValues.tokenId,
+          sender: formValues.senderAddress,
+          schema: isVideo(fileType)
+            ? JSON.stringify(NFT_VIDEO_DENOM_SCHEMA)
+            : JSON.stringify(NFT_IMAGE_DENOM_SCHEMA),
+          memo,
+          decryptedPhrase,
+          asset: walletAsset,
+          walletType,
+        });
 
-      setBroadcastResult(issueDenomResult);
+        setBroadcastResult(issueDenomResult);
+      }
 
       const mintNftResult = await walletService.broadcastMintNFT({
         tokenId: formValues.tokenId,
@@ -557,7 +572,12 @@ const FormMintNft = () => {
             </Button>,
           ]}
           button={
-            <Button htmlType="submit" type="primary" onClick={() => {}}>
+            <Button
+              htmlType="submit"
+              type="primary"
+              onClick={() => {}}
+              disabled={isDenomIdIssued && !isDenomIdOwner}
+            >
               Review
             </Button>
           }
@@ -597,6 +617,22 @@ const FormMintNft = () => {
                 <div className="label">Denom Name</div>
                 <div>{`${formValues.denomId}`}</div>
               </div>
+              {isDenomIdIssued && !isDenomIdOwner ? (
+                <div className="item notice">
+                  <Layout>
+                    <Sider width="20px">
+                      <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                    </Sider>
+                    <Content>
+                      Insufficient balance. Please ensure you have at least{' '}
+                      {getUINormalScaleAmount(networkFee, walletAsset.decimals)}{' '}
+                      {walletAsset.symbol} for network fee.
+                    </Content>
+                  </Layout>
+                </div>
+              ) : (
+                ''
+              )}
               <div className="item">
                 <div className="label">Token ID</div>
                 <div>{`${formValues.tokenId}`}</div>

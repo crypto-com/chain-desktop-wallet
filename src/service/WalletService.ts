@@ -41,6 +41,7 @@ import {
   BroadCastResult,
   NftAccountTransactionData,
   NftModel,
+  NftDenomModel,
   NftQueryParams,
   NftTransferModel,
   ProposalModel,
@@ -1130,6 +1131,24 @@ class WalletService {
         return [];
       }
       return localTransferHistory.transfers;
+    }
+  }
+
+  public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+      return Promise.resolve(null);
+    }
+    try {
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      const nftDenomData = await chainIndexAPI.fetchNftDenomData(denomId);
+
+      return nftDenomData.result;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING NFT denom data', e);
+
+      return null;
     }
   }
 
