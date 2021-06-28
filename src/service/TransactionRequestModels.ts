@@ -46,6 +46,18 @@ export interface NFTMintRequest {
   walletType: string; // normal, ledger
 }
 
+export interface NFTDenomIssueRequest {
+  tokenId: string;
+  name: string;
+  sender: string;
+  schema: string;
+
+  memo: string;
+  decryptedPhrase: string;
+  asset: UserAsset;
+  walletType: string; // normal, ledger
+}
+
 export interface DelegationRequest {
   validatorAddress: string;
   amount: string;

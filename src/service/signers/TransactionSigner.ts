@@ -1,4 +1,5 @@
 import sdk from '@crypto-org-chain/chain-jslib';
+import { CosmosMsg } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/msg/cosmosMsg';
 import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
 import {
   FIXED_DEFAULT_FEE,
@@ -15,6 +16,7 @@ import {
   VoteTransactionUnsigned,
   NFTTransferUnsigned,
   NFTMintUnsigned,
+  NFTDenomIssueUnsigned,
 } from './TransactionSupported';
 
 export interface ITransactionSigner {
@@ -70,19 +72,7 @@ export class TransactionSigner implements ITransactionSigner {
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    const signableTx = rawTx
-      .appendMessage(msgSend)
-      .addSigner({
-        publicKey: keyPair.getPubKey(),
-        accountNumber: new Big(transaction.accountNumber),
-        accountSequence: new Big(transaction.accountSequence),
-      })
-      .toSignable();
-
-    return signableTx
-      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
-      .toSigned()
-      .getHexEncoded();
+    return this.getSignedMessageTransaction(msgSend, transaction, keyPair, rawTx);
   }
 
   public async signVoteTransaction(
@@ -97,19 +87,7 @@ export class TransactionSigner implements ITransactionSigner {
       proposalId: Big(transaction.proposalID),
     });
 
-    const signableTx = rawTx
-      .appendMessage(msgVote)
-      .addSigner({
-        publicKey: keyPair.getPubKey(),
-        accountNumber: new Big(transaction.accountNumber),
-        accountSequence: new Big(transaction.accountSequence),
-      })
-      .toSignable();
-
-    return signableTx
-      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
-      .toSigned()
-      .getHexEncoded();
+    return this.getSignedMessageTransaction(msgVote, transaction, keyPair, rawTx);
   }
 
   public async signNFTTransfer(transaction: NFTTransferUnsigned, phrase: string): Promise<string> {
@@ -122,19 +100,7 @@ export class TransactionSigner implements ITransactionSigner {
       recipient: transaction.recipient,
     });
 
-    const signableTx = rawTx
-      .appendMessage(msgTransferNFT)
-      .addSigner({
-        publicKey: keyPair.getPubKey(),
-        accountNumber: new Big(transaction.accountNumber),
-        accountSequence: new Big(transaction.accountSequence),
-      })
-      .toSignable();
-
-    return signableTx
-      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
-      .toSigned()
-      .getHexEncoded();
+    return this.getSignedMessageTransaction(msgTransferNFT, transaction, keyPair, rawTx);
   }
 
   public async signNFTMint(transaction: NFTMintUnsigned, phrase: string): Promise<string> {
@@ -150,19 +116,23 @@ export class TransactionSigner implements ITransactionSigner {
       recipient: transaction.recipient,
     });
 
-    const signableTx = rawTx
-      .appendMessage(msgMintNFT)
-      .addSigner({
-        publicKey: keyPair.getPubKey(),
-        accountNumber: new Big(transaction.accountNumber),
-        accountSequence: new Big(transaction.accountSequence),
-      })
-      .toSignable();
+    return this.getSignedMessageTransaction(msgMintNFT, transaction, keyPair, rawTx);
+  }
 
-    return signableTx
-      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
-      .toSigned()
-      .getHexEncoded();
+  public async signNFTDenomIssue(
+    transaction: NFTDenomIssueUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
+
+    const msgIssueDenom = new cro.nft.MsgIssueDenom({
+      id: transaction.tokenId,
+      name: transaction.name,
+      sender: transaction.sender,
+      schema: transaction.schema,
+    });
+
+    return this.getSignedMessageTransaction(msgIssueDenom, transaction, keyPair, rawTx);
   }
 
   public async signDelegateTx(
@@ -178,19 +148,7 @@ export class TransactionSigner implements ITransactionSigner {
       amount: delegateAmount,
     });
 
-    const signableTx = rawTx
-      .appendMessage(msgDelegate)
-      .addSigner({
-        publicKey: keyPair.getPubKey(),
-        accountNumber: new Big(transaction.accountNumber),
-        accountSequence: new Big(transaction.accountSequence),
-      })
-      .toSignable();
-
-    return signableTx
-      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
-      .toSigned()
-      .getHexEncoded();
+    return this.getSignedMessageTransaction(msgDelegate, transaction, keyPair, rawTx);
   }
 
   public async signWithdrawStakingRewardTx(
@@ -204,19 +162,12 @@ export class TransactionSigner implements ITransactionSigner {
       validatorAddress: transaction.validatorAddress,
     });
 
-    const signableTx = rawTx
-      .appendMessage(msgWithdrawDelegatorReward)
-      .addSigner({
-        publicKey: keyPair.getPubKey(),
-        accountNumber: new Big(transaction.accountNumber),
-        accountSequence: new Big(transaction.accountSequence),
-      })
-      .toSignable();
-
-    return signableTx
-      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
-      .toSigned()
-      .getHexEncoded();
+    return this.getSignedMessageTransaction(
+      msgWithdrawDelegatorReward,
+      transaction,
+      keyPair,
+      rawTx,
+    );
   }
 
   public async signUndelegateTx(
@@ -231,19 +182,7 @@ export class TransactionSigner implements ITransactionSigner {
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    const signableTx = rawTx
-      .appendMessage(msgUndelegate)
-      .addSigner({
-        publicKey: keyPair.getPubKey(),
-        accountNumber: new Big(transaction.accountNumber),
-        accountSequence: new Big(transaction.accountSequence),
-      })
-      .toSignable();
-
-    return signableTx
-      .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
-      .toSigned()
-      .getHexEncoded();
+    return this.getSignedMessageTransaction(msgUndelegate, transaction, keyPair, rawTx);
   }
 
   public async signRedelegateTx(
@@ -259,8 +198,18 @@ export class TransactionSigner implements ITransactionSigner {
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
+    return this.getSignedMessageTransaction(msgBeginRedelegate, transaction, keyPair, rawTx);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async getSignedMessageTransaction(
+    message: CosmosMsg,
+    transaction: TransactionUnsigned,
+    keyPair,
+    rawTx,
+  ) {
     const signableTx = rawTx
-      .appendMessage(msgBeginRedelegate)
+      .appendMessage(message)
       .addSigner({
         publicKey: keyPair.getPubKey(),
         accountNumber: new Big(transaction.accountNumber),
