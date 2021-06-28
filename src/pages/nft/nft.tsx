@@ -46,7 +46,12 @@ import { ellipsis, middleEllipsis, isJson, convertIpfsToHttp } from '../../utils
 import { getUINormalScaleAmount } from '../../utils/NumberUtils';
 import { NftModel, NftProcessedModel, BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import { FIXED_DEFAULT_FEE, MAX_IMAGE_SIZE, MAX_VIDEO_SIZE } from '../../config/StaticConfig';
+import {
+  IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT,
+  FIXED_DEFAULT_FEE,
+  MAX_IMAGE_SIZE,
+  MAX_VIDEO_SIZE,
+} from '../../config/StaticConfig';
 
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
@@ -92,6 +97,8 @@ const FormMintNft = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [nftList, setNftList] = useRecoilState(nftListState);
 
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
@@ -147,6 +154,17 @@ const FormMintNft = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     validator(rule, value) {
       const reason = `Files Upload hasn't completed`;
+      if (isUploadSuccess) {
+        return Promise.resolve();
+      }
+      return Promise.reject(reason);
+    },
+  });
+
+  const denomIdValidator = () => ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    validator(rule, value) {
+      const reason = `This Denom Name was registered by another address. Please use another one.`;
       if (isUploadSuccess) {
         return Promise.resolve();
       }
@@ -274,11 +292,6 @@ const FormMintNft = () => {
         AnalyticsCategory.Transfer,
       );
 
-      // const latestLoadedNFTs = await walletService.retrieveNFTs(currentSession.wallet.identifier);
-      // setNftList(latestLoadedNFTs);
-      // const processedNFTsLists = processNftList(latestLoadedNFTs);
-      // setProcessedNftList(processedNFTsLists);
-
       setBroadcastResult(sendResult);
 
       // setIsNftModalVisible(false);
@@ -291,6 +304,11 @@ const FormMintNft = () => {
 
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setWalletAsset(currentWalletAsset);
+
+      const latestLoadedNFTs = await walletService.retrieveNFTs(currentSession.wallet.identifier);
+      setNftList(latestLoadedNFTs);
+      // const processedNFTsLists = processNftList(latestLoadedNFTs);
+      // setProcessedNftList(processedNFTsLists);
 
       form.resetFields();
       setIpfsMediaJsonUrl('');
@@ -430,6 +448,7 @@ const FormMintNft = () => {
               pattern: /(^[a-z](([a-z0-9]){2,63})$)/,
               message: 'Denom ID can only be alphabetic & between 3 and 64 characters',
             },
+            denomIdValidator,
           ]}
         >
           <Input maxLength={64} placeholder='e.g. "denomid123"' />
@@ -482,16 +501,16 @@ const FormMintNft = () => {
               }}
               fileList={files}
               customRequest={customRequest}
-              action="http://localhost:3001/uploads"
-              // action="https://crypto.org/ipfs-middleware-server/uploads"
+              action={IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT}
               beforeUpload={beforeUpload}
               onChange={handleChange}
               accept="audio/*,video/*,image/*"
-              onRemove={() => {
-                // setIsPreviewButtonvisible(false);
-                setImageUrl('');
-                setVideoUrl('');
-                setFileType('');
+              onRemove={file => {
+                if (file.type?.indexOf('video') !== -1) {
+                  setVideoUrl('');
+                } else {
+                  setImageUrl('');
+                }
               }}
             >
               {/* {imageUrl ? <img src={imageUrl} alt="avatar" style={{ maxWidth: '100%', maxHeight: '100%' }} /> : uploadButton} */}

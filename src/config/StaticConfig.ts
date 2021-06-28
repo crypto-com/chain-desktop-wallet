@@ -4,6 +4,8 @@ import { getRandomId } from '../crypto/RandomGen';
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
 export const NV_GRAPHQL_API_ENDPOINT = 'https://crypto.com/nft-api/graphql';
+export const IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT =
+  'https://crypto.org/ipfs-middleware-server/uploads';
 export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';
 
 export const NodePorts = {
