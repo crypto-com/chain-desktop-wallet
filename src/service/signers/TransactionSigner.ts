@@ -126,7 +126,7 @@ export class TransactionSigner implements ITransactionSigner {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
 
     const msgIssueDenom = new cro.nft.MsgIssueDenom({
-      id: transaction.tokenId,
+      id: transaction.denomId,
       name: transaction.name,
       sender: transaction.sender,
       schema: transaction.schema,

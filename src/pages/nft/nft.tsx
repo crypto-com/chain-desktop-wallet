@@ -35,7 +35,7 @@ import {
   walletAssetState,
   ledgerIsExpertModeState,
 } from '../../recoil/atom';
-import { ellipsis, middleEllipsis, isJson, convertIpfsToHttp } from '../../utils/utils';
+import { ellipsis, middleEllipsis, isJson, convertIpfsToHttp, sleep } from '../../utils/utils';
 import { getUINormalScaleAmount } from '../../utils/NumberUtils';
 import { NftModel, NftProcessedModel, BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
@@ -278,8 +278,8 @@ const FormMintNft = () => {
 
       if (!isDenomIdIssued) {
         const issueDenomResult = await walletService.broadcastNFTDenomIssueTx({
-          tokenId: formValues.tokenId,
-          name: formValues.tokenId,
+          denomId: formValues.denomId,
+          name: formValues.denomId,
           sender: formValues.senderAddress,
           schema: isVideo(fileType)
             ? JSON.stringify(NFT_VIDEO_DENOM_SCHEMA)
@@ -290,8 +290,6 @@ const FormMintNft = () => {
           walletType,
         });
 
-        setBroadcastResult(issueDenomResult);
-
         analyticsService.logTransactionEvent(
           issueDenomResult.transactionHash as string,
           formValues.amount,
@@ -299,6 +297,12 @@ const FormMintNft = () => {
           AnalyticsActions.NftIssue,
           AnalyticsCategory.Nft,
         );
+
+        // eslint-disable-next-line no-console
+        console.log('Denom Issue', issueDenomResult);
+
+        // Wait a bit for denom mint sync
+        await sleep(4_000);
       }
 
       const mintNftResult = await walletService.broadcastMintNFT({
