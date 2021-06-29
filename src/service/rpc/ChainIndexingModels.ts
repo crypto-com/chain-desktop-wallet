@@ -128,3 +128,16 @@ export interface NftAccountTransactionResponse {
 export interface NftAccountTransactionListResponse {
   result: NftAccountTransactionResponse[];
 }
+
+export interface NftDenomData {
+  denomId: string;
+  denomName: string;
+  denomSchema: string;
+  denomCreator: string;
+  denomCreatedAt: string;
+  denomCreatedAtBlockHeight: number;
+}
+
+export interface NftDenomResponse {
+  result: NftDenomData | null;
+}

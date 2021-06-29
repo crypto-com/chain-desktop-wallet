@@ -3,6 +3,7 @@ import {
   NftAccountTransactionResponse,
   NftResponse,
   NftTransactionResponse,
+  NftDenomData,
 } from '../service/rpc/ChainIndexingModels';
 
 export enum TransactionStatus {
@@ -129,6 +130,7 @@ export interface ValidatorModel {
 export interface ProposalModel extends Proposal {}
 
 export interface NftTokenData {
+  name?: string;
   drop?: string;
   description?: string;
   image?: string;
@@ -140,6 +142,8 @@ export interface NftModel extends NftResponse {
   isMintedByCDC: boolean;
   marketplaceLink: string;
 }
+
+export interface NftDenomModel extends NftDenomData {}
 
 export interface NftProcessedModel extends Omit<NftModel, 'tokenData'> {
   tokenData: NftTokenData;

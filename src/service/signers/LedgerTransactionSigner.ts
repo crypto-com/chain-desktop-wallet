@@ -176,10 +176,10 @@ export class LedgerTransactionSigner implements ITransactionSigner {
     const { cro, rawTx } = this.getTransactionInfo(decryptedPhrase, transaction);
 
     const msgIssueDenom = new cro.nft.MsgIssueDenom({
-      id: transaction.tokenId,
+      id: transaction.denomId,
       name: transaction.name,
       sender: transaction.sender,
-      schema: 'schema',
+      schema: transaction.schema,
     });
 
     return this.getSignedMessageTransaction(transaction, msgIssueDenom, rawTx);

@@ -47,7 +47,7 @@ export interface NFTMintRequest {
 }
 
 export interface NFTDenomIssueRequest {
-  tokenId: string;
+  denomId: string;
   name: string;
   sender: string;
   schema: string;
