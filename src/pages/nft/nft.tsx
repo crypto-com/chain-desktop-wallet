@@ -1461,7 +1461,7 @@ const NftPage = () => {
               </ErrorModalPopup>
             </>
           </TabPane>
-          <TabPane tab="NFT Mint" key="2">
+          <TabPane tab="Mint NFT" key="2">
             <div className="site-layout-background nft-content">
               <div className="container">
                 <div className="description">
