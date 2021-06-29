@@ -35,17 +35,21 @@
 
   .view-selection {
     text-align: right;
+
     .ant-radio-button-wrapper {
       border: none;
       box-shadow: none;
       transition: none;
     }
+
     .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
       box-shadow: none;
     }
+
     .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before {
       background-color: transparent;
     }
+
     .ant-radio-button-wrapper:not(:first-child)::before {
       background-color: transparent;
     }
@@ -55,24 +59,33 @@
     border: none;
     box-shadow: none !important;
     cursor: default;
+
     .ant-card-cover {
       display: flex;
       align-items: center;
       justify-content: center;
       width: 200px;
       height: 200px;
+      object-fit: cover;
       background: #f8f8f8;
+
       @media only screen and (max-width: 1400px) {
         width: 160px;
         height: 160px;
       }
+
       img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
         border-radius: 4px;
       }
     }
+
     .ant-card-body {
       padding-right: 0;
       padding-left: 0;
+
       .ant-avatar {
         width: 23px;
         height: 23px;
@@ -107,6 +120,7 @@
       right: 48px !important;
     }
   }
+
   .ant-input-search-button {
     margin: 0 !important;
     background-color: transparent;
