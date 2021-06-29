@@ -26,7 +26,7 @@ import Icon, {
   UploadOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
-import { useRecoilValue, useRecoilState } from 'recoil';
+import { useRecoilValue, useRecoilState, useSetRecoilState } from 'recoil';
 import ReactPlayer from 'react-player';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import axios from 'axios';
@@ -117,8 +117,7 @@ const FormMintNft = () => {
   const currentSession = useRecoilValue(sessionState);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [nftList, setNftList] = useRecoilState(nftListState);
+  const setNftList = useSetRecoilState(nftListState);
 
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
