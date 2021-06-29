@@ -852,6 +852,21 @@ const NftPage = () => {
     );
   };
 
+  const renderNftTitle = (_nft: NftProcessedModel | undefined, length: number = 0) => {
+    if (_nft?.tokenData && _nft?.tokenData.name) {
+      return length > 0 ? ellipsis(_nft?.tokenData.name, length) : _nft?.tokenData.name;
+    }
+    if (_nft?.tokenData && _nft?.tokenData.drop) {
+      return length > 0 ? ellipsis(_nft?.tokenData.drop, length) : _nft?.tokenData.drop;
+    }
+    if (_nft) {
+      return length > 0
+        ? ellipsis(`${_nft?.denomId} - #${_nft?.tokenId}`, length)
+        : `${_nft?.denomId} - #${_nft?.tokenId}`;
+    }
+    return 'n.a.';
+  };
+
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
     setIsNftTransferConfirmVisible(true);
@@ -1071,11 +1086,7 @@ const NftPage = () => {
                         className="nft"
                       >
                         <Meta
-                          title={
-                            item.tokenData.name || item.tokenData.drop
-                              ? ellipsis(item.tokenData.name! || item.tokenData.drop!, 20)
-                              : ellipsis(`${item?.denomId} - #${item?.tokenId}`, 20)
-                          }
+                          title={renderNftTitle(item, 20)}
                           description={
                             <>
                               <Avatar
@@ -1124,11 +1135,7 @@ const NftPage = () => {
                   </Content>
                   <Sider width="50%">
                     <>
-                      <div className="title">
-                        {nft?.tokenData.name || nft?.tokenData.drop
-                          ? nft?.tokenData.name || nft?.tokenData.drop
-                          : `${nft?.denomId} - #${nft?.tokenId}`}
-                      </div>
+                      <div className="title">{renderNftTitle(nft)}</div>
                       <div className="item">
                         <Meta
                           description={
@@ -1322,11 +1329,7 @@ const NftPage = () => {
                       </div>
                       <div className="item">
                         <div className="label">Sending</div>
-                        <div className="address">
-                          {nft?.tokenData.name || nft?.tokenData.drop
-                            ? nft?.tokenData.name || nft?.tokenData.drop
-                            : `${nft?.denomId} - #${nft?.tokenId}`}
-                        </div>
+                        <div className="address">{renderNftTitle(nft)}</div>
                       </div>
                       <Form
                         {...layout}
