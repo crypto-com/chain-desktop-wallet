@@ -576,10 +576,8 @@ const FormMintNft = () => {
               <div className="item">
                 <div className="nft-image">
                   <Image
-                    // width={200}
                     style={{ width: '100%', height: '100%' }}
                     src={imageUrl}
-                    // src={`https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png?${random}`}
                     alt="avatar"
                     placeholder={<Spin spinning indicator={<LoadingOutlined />} />}
                     onError={e => {
