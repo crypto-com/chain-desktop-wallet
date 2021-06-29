@@ -174,7 +174,8 @@ const FormMintNft = () => {
       senderAddress: currentSession.wallet.address,
       recipientAddress: currentSession.wallet.address,
     });
-    const denomData = await walletService.getDenomIdData(formValues.denomId);
+    const denomData = await walletService.getDenomIdData(form.getFieldValue('denomId'));
+
     if (denomData) {
       // Denom ID registered
       setIsDenomIdIssued(true);
