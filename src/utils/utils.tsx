@@ -58,3 +58,10 @@ export function splitToChunks(arr: any[], len: number) {
 export function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+export function convertIpfsToHttp(ipfsUrl: string) {
+  if (ipfsUrl.indexOf('ipfs://') === 0) {
+    return ipfsUrl.replace(/ipfs:\/\//i, 'https://ipfs.io/ipfs/');
+  }
+  throw new Error('Invalid IPFS URL');
+}

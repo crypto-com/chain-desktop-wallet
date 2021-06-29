@@ -10,11 +10,15 @@ const pageView = electron.remote.getGlobal('pageView');
 export enum AnalyticsTxType {
   TransferTransaction = 'TransferTransaction',
   StakingTransaction = 'StakingTransaction',
+  NftTransaction = 'NftTransaction',
 }
 
 export enum AnalyticsActions {
   FundsTransfer = 'FundsTransfer',
   FundsStaked = 'FundsStaked',
+  NftTransfer = 'NftTransfer',
+  NftIssue = 'NftIssue',
+  NftMint = 'NftMint',
 }
 
 export enum AnalyticsCategory {
@@ -22,6 +26,7 @@ export enum AnalyticsCategory {
   Delegate = 'Delegate',
   PageView = 'PageView',
   Voting = 'Voting',
+  Nft = 'Nft',
 }
 
 export class AnalyticsService {

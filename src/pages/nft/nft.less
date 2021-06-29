@@ -6,7 +6,10 @@
       margin-bottom: 20px;
       color: @font-color;
     }
-    .ant-btn {
+    .ant-form {
+      max-width: 500px;
+    }
+    .ant-btn:not(.ant-upload-list-item-card-actions-btn) {
       width: 100%;
       margin: 24px 0 -24px 0;
     }
@@ -40,10 +43,14 @@
       margin: auto;
       background: #f8f8f8;
       img {
-        width: auto;
-        max-width: 200px;
-        height: auto;
-        max-height: 200px;
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        // width: auto;
+        // max-width: 200px;
+        // height: auto;
+        // max-height: 200px;
         border-radius: 4px;
       }
       span.anticon {
@@ -73,6 +80,14 @@
   }
   .back-button {
     margin: 12px 0;
+  }
+  .ant-upload.ant-upload-select-picture-card {
+    width: 30%;
+  }
+  .ant-upload-list-picture-card {
+    .ant-upload-list-picture-card-container {
+      width: 30%;
+    }
   }
 }
 .nft-modal {
@@ -155,7 +170,8 @@
     }
   }
 }
-.nft-transfer-modal {
+.nft-transfer-modal,
+.nft-mint-modal {
   .nft-image {
     display: flex;
     align-items: center;
@@ -166,10 +182,29 @@
     background: #f8f8f8;
     img {
       width: auto;
-      max-width: 200px;
+      max-width: 200px !important;
       height: auto;
-      max-height: 200px;
+      max-height: 200px !important;
     }
+    .ant-image-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      .ant-spin.ant-spin-spinning {
+        left: 0;
+      }
+    }
+  }
+  .nft-video {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    background: #f8f8f8;
   }
   .item {
     .ant-layout,
