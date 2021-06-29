@@ -582,6 +582,9 @@ const FormMintNft = () => {
                     // src={`https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png?${random}`}
                     alt="avatar"
                     placeholder={<Spin spinning indicator={<LoadingOutlined />} />}
+                    onError={e => {
+                      (e.target as HTMLImageElement).src = nftThumbnail;
+                    }}
                   />
                 </div>
               </div>
@@ -862,17 +865,15 @@ const NftPage = () => {
     );
   };
 
-  const renderNftTitle = (_nft: NftProcessedModel | undefined, length: number = 0) => {
+  const renderNftTitle = (_nft: NftProcessedModel | undefined, length: number = 999) => {
     if (_nft?.tokenData && _nft?.tokenData.name) {
-      return length > 0 ? ellipsis(_nft?.tokenData.name, length) : _nft?.tokenData.name;
+      return ellipsis(_nft?.tokenData.name, length);
     }
     if (_nft?.tokenData && _nft?.tokenData.drop) {
-      return length > 0 ? ellipsis(_nft?.tokenData.drop, length) : _nft?.tokenData.drop;
+      return ellipsis(_nft?.tokenData.drop, length);
     }
     if (_nft) {
-      return length > 0
-        ? ellipsis(`${_nft?.denomId} - #${_nft?.tokenId}`, length)
-        : `${_nft?.denomId} - #${_nft?.tokenId}`;
+      return ellipsis(`${_nft?.denomId} - #${_nft?.tokenId}`, length);
     }
     return 'n.a.';
   };
