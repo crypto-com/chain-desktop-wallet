@@ -13,6 +13,8 @@ import {
   Form,
   Input,
   Upload,
+  Image,
+  Spin,
   message,
   notification,
 } from 'antd';
@@ -22,6 +24,7 @@ import Icon, {
   AppstoreOutlined,
   ExclamationCircleOutlined,
   UploadOutlined,
+  LoadingOutlined,
 } from '@ant-design/icons';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import ReactPlayer from 'react-player';
@@ -568,11 +571,18 @@ const FormMintNft = () => {
         >
           <>
             <>
-              <div className="title">Confirm NFT Mint</div>
+              <div className="title">Confirm Mint NFT</div>
               <div className="description">Please review the information below.</div>
               <div className="item">
                 <div className="nft-image">
-                  <img src={imageUrl} alt="avatar" style={{ width: '100%' }} />
+                  <Image
+                    // width={200}
+                    style={{ width: '100%', height: '100%' }}
+                    src={imageUrl}
+                    // src={`https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png?${random}`}
+                    alt="avatar"
+                    placeholder={<Spin spinning indicator={<LoadingOutlined />} />}
+                  />
                 </div>
               </div>
               {isVideo(fileType) ? (
@@ -969,7 +979,7 @@ const NftPage = () => {
       didMountRef.current = true;
       analyticsService.logPage('NFT');
     }
-  }, [fetchingDB]);
+  }, [fetchingDB, nftList]);
 
   const NftColumns = [
     {
@@ -1461,7 +1471,7 @@ const NftPage = () => {
               </ErrorModalPopup>
             </>
           </TabPane>
-          <TabPane tab="NFT Mint" key="2">
+          <TabPane tab="Mint NFT" key="2">
             <div className="site-layout-background nft-content">
               <div className="container">
                 <div className="description">
