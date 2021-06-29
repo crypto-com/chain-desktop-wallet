@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.3.0] - 2021-06-30
+
+### Additions
+- NFT support - all basic features now completed : View NFTs, Send NFTs, Mint NFTs
+- Introduced capability to mint NFTs directly from the desktop wallet
+- Add implicit denom issuance when minting NFTs with a new denom that does not exist yet.
+
+
+### Bug Fixes
+- Add bytes padding for signing related issues on some Ledger devices
+
 
 ## [v0.2.4] - 2021-06-22
 
