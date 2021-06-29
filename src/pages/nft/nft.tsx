@@ -454,7 +454,7 @@ const FormMintNft = () => {
       >
         <Form.Item
           name="denomId"
-          label="Denom Name"
+          label="Denom ID"
           hasFeedback
           validateFirst
           rules={[
@@ -607,7 +607,7 @@ const FormMintNft = () => {
                 ''
               )}
               <div className="item">
-                <div className="label">Denom Name</div>
+                <div className="label">Denom ID</div>
                 <div>{`${formValues.denomId}`}</div>
               </div>
               {isDenomIdIssued && !isDenomIdOwner ? (
@@ -617,7 +617,7 @@ const FormMintNft = () => {
                       <ExclamationCircleOutlined style={{ color: '#f27474' }} />
                     </Sider>
                     <Content>
-                      The Denom Name is registered by another address. Please choose another one.
+                      The Denom ID is registered by another address. Please choose another one.
                     </Content>
                   </Layout>
                 </div>
@@ -990,7 +990,7 @@ const NftPage = () => {
       },
     },
     {
-      title: 'Denom Name',
+      title: 'Denom ID',
       key: 'denomId',
       render: record => {
         return record.denomId;
@@ -1177,6 +1177,10 @@ const NftPage = () => {
                       </div>
                       <div className="item">
                         <div className="table-row">
+                          <div>Denom ID</div>
+                          <div>{nft?.denomId}</div>
+                        </div>
+                        <div className="table-row">
                           <div>Denom Name</div>
                           <div>{nft?.denomName}</div>
                         </div>
@@ -1188,7 +1192,7 @@ const NftPage = () => {
                           <div className="table-row">
                             <div>Content URL</div>
                             <a
-                              data-original={nft?.denomName}
+                              data-original={nft?.denomId}
                               target="_blank"
                               rel="noreferrer"
                               href={
@@ -1312,7 +1316,7 @@ const NftPage = () => {
                         </Layout>
                       </div>
                       <div className="item">
-                        <div className="label">Denom Name</div>
+                        <div className="label">Denom ID</div>
                         <div>{`${formValues.denomId}`}</div>
                       </div>
                       <div className="item">
