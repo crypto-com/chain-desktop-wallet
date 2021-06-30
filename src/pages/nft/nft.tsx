@@ -835,7 +835,11 @@ const NftPage = () => {
   );
 
   const renderPreview = (_nft: NftProcessedModel | undefined, showThumbnail: boolean = true) => {
-    if (!showThumbnail && supportedVideo(_nft?.tokenData.mimeType)) {
+    if (
+      !showThumbnail &&
+      (supportedVideo(_nft?.tokenData.mimeType) ||
+        supportedVideo(_nft?.tokenData.animationMimeType))
+    ) {
       return (
         <ReactPlayer
           url={videoUrl}
@@ -1026,7 +1030,7 @@ const NftPage = () => {
           <a
             onClick={() => {
               setNft(record);
-              setVideoUrl(record?.tokenData.animation_url);
+              setVideoUrl(record?.tokenData.animation_url || record?.tokenData.animationUrl);
               setIsVideoPlaying(true);
               setIsNftModalVisible(true);
             }}
@@ -1077,7 +1081,8 @@ const NftPage = () => {
                         cover={
                           <>
                             {renderPreview(item)}
-                            {supportedVideo(item?.tokenData.mimeType) ? (
+                            {supportedVideo(item?.tokenData.mimeType) ||
+                            supportedVideo(item?.tokenData.animationMimeType) ? (
                               <Icon component={IconPlayer} />
                             ) : (
                               ''
@@ -1087,7 +1092,9 @@ const NftPage = () => {
                         hoverable
                         onClick={() => {
                           setNft(item);
-                          setVideoUrl(item?.tokenData.animation_url);
+                          setVideoUrl(
+                            item?.tokenData.animation_url || item?.tokenData.animationUrl,
+                          );
                           setIsVideoPlaying(true);
                           setIsNftModalVisible(true);
                         }}
@@ -1195,13 +1202,15 @@ const NftPage = () => {
                               target="_blank"
                               rel="noreferrer"
                               href={
-                                supportedVideo(nft?.tokenData.mimeType)
-                                  ? nft?.tokenData.animation_url
+                                supportedVideo(nft?.tokenData.mimeType) ||
+                                supportedVideo(nft?.tokenData.animationMimeType)
+                                  ? nft?.tokenData.animation_url || nft?.tokenData.animationUrl
                                   : nft?.tokenData.image
                               }
                             >
-                              {supportedVideo(nft?.tokenData.mimeType)
-                                ? nft?.tokenData.animation_url
+                              {supportedVideo(nft?.tokenData.mimeType) ||
+                              supportedVideo(nft?.tokenData.animationMimeType)
+                                ? nft?.tokenData.animation_url || nft?.tokenData.animationUrl
                                 : nft?.tokenData.image}
                             </a>
                           </div>
