@@ -136,6 +136,8 @@ export interface NftTokenData {
   image?: string;
   mimeType?: string;
   animation_url?: string;
+  animationUrl?: string;
+  animationMimeType?: string;
 }
 
 export interface NftModel extends NftResponse {
