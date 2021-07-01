@@ -38,7 +38,14 @@ import {
   walletAssetState,
   ledgerIsExpertModeState,
 } from '../../recoil/atom';
-import { ellipsis, middleEllipsis, isJson, convertIpfsToHttp, sleep } from '../../utils/utils';
+import {
+  ellipsis,
+  middleEllipsis,
+  isJson,
+  convertIpfsToHttp,
+  sleep,
+  useWindowSize,
+} from '../../utils/utils';
 import { getUINormalScaleAmount } from '../../utils/NumberUtils';
 import { NftModel, NftProcessedModel, BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
@@ -460,7 +467,8 @@ const FormMintNft = () => {
             { required: true, message: 'Denom ID is required' },
             {
               pattern: /(^[a-z](([a-z0-9]){2,63})$)/,
-              message: 'Denom ID can only be alphabetic & between 3 and 64 characters',
+              message:
+                'Denom ID can only start with lowercase letter, followed by alphabetic or number between 3 and 64 characters',
             },
           ]}
         >
@@ -475,7 +483,8 @@ const FormMintNft = () => {
             { required: true, message: 'Token ID is required' },
             {
               pattern: /(^[a-z](([a-z0-9]){2,63})$)/,
-              message: 'Token ID can only be alphabetic & between 3 and 64 characters',
+              message:
+                'Token ID can only start with lowercase alphabetic, followed by alphabetic or number between 3 and 64 characters',
             },
           ]}
         >
@@ -497,7 +506,6 @@ const FormMintNft = () => {
             placeholder='e.g. "Commemorating the launch of the Crypto.org Chain and the Crypto.com NFT Platform..."'
           />
         </Form.Item>
-        {/* <Switch /> */}
         <Form.Item
           name="files"
           label="Upload Files"
@@ -800,6 +808,18 @@ const NftPage = () => {
       ? currentSession.wallet.config.fee.networkFee
       : FIXED_DEFAULT_FEE;
 
+  const size = useWindowSize();
+
+  const handlePageSize = () => {
+    if (size.width > 1461) {
+      return 10;
+    }
+    if (size.width > 1096) {
+      return 8;
+    }
+    return 6;
+  };
+
   const closeSuccessModal = () => {
     setIsSuccessModalVisible(false);
     setIsNftModalVisible(false);
@@ -1070,8 +1090,8 @@ const NftPage = () => {
                     sm: 2,
                     md: 3,
                     lg: 3,
-                    xl: 3,
-                    xxl: 6,
+                    xl: 4,
+                    xxl: 5,
                   }}
                   dataSource={processedNftList}
                   renderItem={item => (
@@ -1120,7 +1140,7 @@ const NftPage = () => {
                     </List.Item>
                   )}
                   pagination={{
-                    pageSize: 6,
+                    pageSize: handlePageSize(),
                   }}
                   loading={fetchingDB}
                 />
