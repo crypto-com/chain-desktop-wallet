@@ -468,7 +468,7 @@ const FormMintNft = () => {
             {
               pattern: /(^[a-z](([a-z0-9]){2,63})$)/,
               message:
-                'Denom ID can only start with lowercase letter, followed by alphabetic or number between 3 and 64 characters',
+                'Denom ID can only start with lowercase alphabetic, followed by lowercase alphabetic or number between 3 and 64 characters',
             },
           ]}
         >
@@ -484,7 +484,7 @@ const FormMintNft = () => {
             {
               pattern: /(^[a-z](([a-z0-9]){2,63})$)/,
               message:
-                'Token ID can only start with lowercase alphabetic, followed by alphabetic or number between 3 and 64 characters',
+                'Token ID can only start with lowercase alphabetic, followed by lowercase alphabetic or number between 3 and 64 characters',
             },
           ]}
         >
