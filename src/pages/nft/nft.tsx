@@ -486,9 +486,17 @@ const FormMintNft = () => {
           rules={[
             { required: true, message: 'Denom ID is required' },
             {
+              min: 3,
+              max: 64,
+              message: 'Expected length to be between 3 and 64 characters',
+            },
+            {
+              pattern: /^[a-z]/,
+              message: 'Denom ID can only start with lowercase alphabetic',
+            },
+            {
               pattern: /(^[a-z](([a-z0-9]){2,63})$)/,
-              message:
-                'Denom ID can only start with lowercase alphabetic, followed by lowercase alphabetic or number between 3 and 64 characters',
+              message: 'Expected only alphabetic characters or numbers',
             },
           ]}
         >
@@ -502,9 +510,17 @@ const FormMintNft = () => {
           rules={[
             { required: true, message: 'Token ID is required' },
             {
+              min: 3,
+              max: 64,
+              message: 'Expected length to be between 3 and 64 characters',
+            },
+            {
+              pattern: /^[a-z]/,
+              message: 'Denom ID can only start with lowercase alphabetic',
+            },
+            {
               pattern: /(^[a-z](([a-z0-9]){2,63})$)/,
-              message:
-                'Token ID can only start with lowercase alphabetic, followed by lowercase alphabetic or number between 3 and 64 characters',
+              message: 'Expected only alphabetic characters or numbers',
             },
           ]}
         >
