@@ -38,7 +38,14 @@ import {
   walletAssetState,
   ledgerIsExpertModeState,
 } from '../../recoil/atom';
-import { ellipsis, middleEllipsis, isJson, convertIpfsToHttp, sleep } from '../../utils/utils';
+import {
+  ellipsis,
+  middleEllipsis,
+  isJson,
+  convertIpfsToHttp,
+  sleep,
+  useWindowSize,
+} from '../../utils/utils';
 import { getUINormalScaleAmount } from '../../utils/NumberUtils';
 import { NftModel, NftProcessedModel, BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
@@ -127,6 +134,8 @@ const FormMintNft = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   const [isUploadSuccess, setIsUploadSuccess] = useState(false);
+  const [isBeforeUpload, setIsBeforeUpload] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
   const [isDenomIdOwner, setIsDenomIdOwner] = useState(false);
   const [isDenomIdIssued, setIsDenomIdIssued] = useState(false);
 
@@ -160,9 +169,20 @@ const FormMintNft = () => {
   const fileUploadValidator = () => ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     validator(rule, value) {
-      const reason = `Files Upload hasn't completed`;
-      if (isUploadSuccess) {
+      const reason = `File upload failed. Please upload again.`;
+      if (
+        (isUploadSuccess && !isVideo(fileType) && files.length === 1) ||
+        (isUploadSuccess && isVideo(fileType) && files.length === 2)
+      ) {
         return Promise.resolve();
+      }
+      // Hide the error before uploading anything
+      if (isBeforeUpload) {
+        return Promise.reject();
+      }
+      // Hide the error when uploading or upload video in progress
+      if (isUploading || (files.length === 1 && isVideo(fileType))) {
+        return Promise.reject();
       }
       return Promise.reject(reason);
     },
@@ -259,6 +279,7 @@ const FormMintNft = () => {
     } else {
       setIsUploadButtonVisible(false);
     }
+    setIsBeforeUpload(false);
     setFiles(fileList);
   };
 
@@ -391,18 +412,22 @@ const FormMintNft = () => {
     const isSupportedVideo = supportedVideo(file.type);
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     const formData = new FormData();
+
+    setIsUploading(true);
     // Uploaded Video
     if (files.length >= 2) {
       formData.append('videoFile', files[0].originFileObj);
     }
 
     if (isVideoFile && isSupportedVideo) {
+      setIsUploading(false);
       onSuccess();
       return;
       // eslint-disable-next-line no-else-return
     } else if (isJpgOrPng) {
       formData.append('imageFile', file);
     } else {
+      setIsUploading(false);
       setIsUploadSuccess(false);
       onError();
       return;
@@ -427,10 +452,12 @@ const FormMintNft = () => {
           setVideoUrl(convertIpfsToHttp(media.data.animation_url));
         }
         setIsUploadSuccess(true);
+        setIsUploading(false);
         onSuccess(response);
       }
     } catch (e) {
       setIsUploadSuccess(false);
+      setIsUploading(false);
       onError(e);
       notification.error({
         message: 'Upload failed',
@@ -459,8 +486,17 @@ const FormMintNft = () => {
           rules={[
             { required: true, message: 'Denom ID is required' },
             {
+              min: 3,
+              max: 64,
+              message: 'Expected length to be between 3 and 64 characters',
+            },
+            {
+              pattern: /^[a-z]/,
+              message: 'Denom ID can only start with lowercase alphabetic',
+            },
+            {
               pattern: /(^[a-z](([a-z0-9]){2,63})$)/,
-              message: 'Denom ID can only be alphabetic & between 3 and 64 characters',
+              message: 'Expected only alphabetic characters or numbers',
             },
           ]}
         >
@@ -474,8 +510,17 @@ const FormMintNft = () => {
           rules={[
             { required: true, message: 'Token ID is required' },
             {
+              min: 3,
+              max: 64,
+              message: 'Expected length to be between 3 and 64 characters',
+            },
+            {
+              pattern: /^[a-z]/,
+              message: 'Denom ID can only start with lowercase alphabetic',
+            },
+            {
               pattern: /(^[a-z](([a-z0-9]){2,63})$)/,
-              message: 'Token ID can only be alphabetic & between 3 and 64 characters',
+              message: 'Expected only alphabetic characters or numbers',
             },
           ]}
         >
@@ -497,10 +542,10 @@ const FormMintNft = () => {
             placeholder='e.g. "Commemorating the launch of the Crypto.org Chain and the Crypto.com NFT Platform..."'
           />
         </Form.Item>
-        {/* <Switch /> */}
         <Form.Item
           name="files"
           label="Upload Files"
+          validateFirst
           // hasFeedback
           rules={[{ required: true, message: 'Upload Files is required' }, fileUploadValidator]}
         >
@@ -524,10 +569,32 @@ const FormMintNft = () => {
                 } else {
                   setImageUrl('');
                 }
+                setIsBeforeUpload(true);
+                setIsUploadSuccess(false);
               }}
             >
               {isUploadButtonVisible ? uploadButton : null}
             </Upload>
+            {isUploading ? (
+              <>
+                <Spin
+                  spinning
+                  indicator={<LoadingOutlined />}
+                  style={{ left: 'auto', marginRight: '5px' }}
+                />{' '}
+                Please wait until file upload finished
+              </>
+            ) : (
+              ''
+            )}
+            {isVideo(fileType) && files.length === 1 ? (
+              <>
+                <ExclamationCircleOutlined style={{ color: '#1199fa', marginRight: '5px' }} /> You
+                have to upload a thumbnail for the video
+              </>
+            ) : (
+              ''
+            )}
           </div>
         </Form.Item>
         <ModalPopup
@@ -631,10 +698,14 @@ const FormMintNft = () => {
                 <div className="label">Drop Name</div>
                 <div>{`${formValues.drop}`}</div>
               </div>
-              <div className="item">
-                <div className="label">Drop Description</div>
-                <div>{`${ellipsis(formValues.description, 1000)}`}</div>
-              </div>
+              {formValues.description ? (
+                <div className="item">
+                  <div className="label">Drop Description</div>
+                  <div>{`${formValues.description}`}</div>
+                </div>
+              ) : (
+                <></>
+              )}
               <div className="item">
                 <div className="label">Transaction Fee</div>
                 <div>
@@ -799,6 +870,18 @@ const NftPage = () => {
     currentSession.wallet.config.fee.networkFee !== undefined
       ? currentSession.wallet.config.fee.networkFee
       : FIXED_DEFAULT_FEE;
+
+  const size = useWindowSize();
+
+  const handlePageSize = () => {
+    if (size.width > 1461) {
+      return 10;
+    }
+    if (size.width > 1096) {
+      return 8;
+    }
+    return 6;
+  };
 
   const closeSuccessModal = () => {
     setIsSuccessModalVisible(false);
@@ -1070,8 +1153,8 @@ const NftPage = () => {
                     sm: 2,
                     md: 3,
                     lg: 3,
-                    xl: 3,
-                    xxl: 6,
+                    xl: 4,
+                    xxl: 5,
                   }}
                   dataSource={processedNftList}
                   renderItem={item => (
@@ -1120,7 +1203,7 @@ const NftPage = () => {
                     </List.Item>
                   )}
                   pagination={{
-                    pageSize: 6,
+                    pageSize: handlePageSize(),
                   }}
                   loading={fetchingDB}
                 />
