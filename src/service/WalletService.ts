@@ -24,6 +24,8 @@ import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
 import { Session } from '../models/Session';
 import {
   DelegateTransactionUnsigned,
+  NFTDenomIssueUnsigned,
+  NFTMintUnsigned,
   NFTTransferUnsigned,
   RedelegateTransactionUnsigned,
   TransferTransactionUnsigned,
@@ -39,6 +41,7 @@ import {
   BroadCastResult,
   NftAccountTransactionData,
   NftModel,
+  NftDenomModel,
   NftQueryParams,
   NftTransferModel,
   ProposalModel,
@@ -57,6 +60,8 @@ import { createLedgerDevice, LEDGER_WALLET_TYPE } from './LedgerService';
 import { ISignerProvider } from './signers/SignerProvider';
 import {
   DelegationRequest,
+  NFTDenomIssueRequest,
+  NFTMintRequest,
   NFTTransferRequest,
   RedelegationRequest,
   TransferRequest,
@@ -111,8 +116,8 @@ class WalletService {
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
 
     await Promise.all([
-      await this.fetchAndSaveTransfers(currentSession),
       await this.fetchAndUpdateBalances(currentSession),
+      await this.fetchAndSaveTransfers(currentSession),
     ]);
 
     return broadCastResult;
@@ -362,6 +367,103 @@ class WalletService {
     return broadCastResult;
   }
 
+  public async broadcastMintNFT(nftMintRequest: NFTMintRequest): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.prepareTransaction();
+
+    const memo = !nftMintRequest.memo ? DEFAULT_CLIENT_MEMO : nftMintRequest.memo;
+
+    const nftMintUnsigned: NFTMintUnsigned = {
+      data: nftMintRequest.data,
+      name: nftMintRequest.name,
+      uri: nftMintRequest.uri,
+      tokenId: nftMintRequest.tokenId,
+      denomId: nftMintRequest.denomId,
+      sender: nftMintRequest.sender,
+      recipient: nftMintRequest.recipient,
+
+      memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+
+    if (nftMintRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signNFTMint(
+        nftMintUnsigned,
+        nftMintRequest.decryptedPhrase,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signNFTMint(
+        nftMintUnsigned,
+        nftMintRequest.decryptedPhrase,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+
+    // It takes a few seconds for the indexing service to sync latest NFT state
+    await sleep(5_000);
+    await Promise.all([
+      this.fetchAndSaveNFTs(currentSession),
+      this.fetchAndSaveNFTAccountTxs(currentSession),
+    ]);
+    return broadCastResult;
+  }
+
+  public async broadcastNFTDenomIssueTx(
+    nftDenomIssueRequest: NFTDenomIssueRequest,
+  ): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.prepareTransaction();
+
+    const memo = !nftDenomIssueRequest.memo ? DEFAULT_CLIENT_MEMO : nftDenomIssueRequest.memo;
+
+    const nftDenomIssueUnsigned: NFTDenomIssueUnsigned = {
+      ...nftDenomIssueRequest,
+      memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+
+    if (nftDenomIssueRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signNFTDenomIssue(
+        nftDenomIssueUnsigned,
+        nftDenomIssueRequest.decryptedPhrase,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signNFTDenomIssue(
+        nftDenomIssueUnsigned,
+        nftDenomIssueRequest.decryptedPhrase,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+
+    // It takes a few seconds for the indexing service to sync latest NFT state
+    await sleep(5_000);
+    await Promise.all([
+      this.fetchAndSaveNFTs(currentSession),
+      this.fetchAndSaveNFTAccountTxs(currentSession),
+    ]);
+    return broadCastResult;
+  }
+
   public async syncAll(session: Session | null = null) {
     const currentSession =
       session == null ? await this.storageService.retrieveCurrentSession() : session;
@@ -396,7 +498,7 @@ class WalletService {
     const withdrawStakingReward: WithdrawStakingRewardUnsigned = {
       delegatorAddress: currentSession.wallet.address,
       validatorAddress: rewardWithdrawRequest.validatorAddress,
-      memo: '',
+      memo: DEFAULT_CLIENT_MEMO,
       accountNumber,
       accountSequence,
     };
@@ -1029,6 +1131,24 @@ class WalletService {
         return [];
       }
       return localTransferHistory.transfers;
+    }
+  }
+
+  public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+      return Promise.resolve(null);
+    }
+    try {
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      const nftDenomData = await chainIndexAPI.fetchNftDenomData(denomId);
+
+      return nftDenomData.result;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING NFT denom data', e);
+
+      return null;
     }
   }
 

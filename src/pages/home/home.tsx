@@ -467,6 +467,19 @@ function HomePage() {
     );
   };
 
+  const renderNftTitle = (_nft: NftProcessedModel | undefined, length: number = 999) => {
+    if (_nft?.tokenData && _nft?.tokenData.name) {
+      return ellipsis(_nft?.tokenData.name, length);
+    }
+    if (_nft?.tokenData && _nft?.tokenData.drop) {
+      return ellipsis(_nft?.tokenData.drop, length);
+    }
+    if (_nft) {
+      return ellipsis(`${_nft?.denomId} - #${_nft?.tokenId}`, length);
+    }
+    return 'n.a.';
+  };
+
   const showWalletStateNotification = (config: WalletConfig) => {
     setTimeout(async () => {
       if (isWalletNotLive(config) && !hasShownNotLiveWallet) {
@@ -845,11 +858,7 @@ function HomePage() {
                       className="nft"
                     >
                       <Meta
-                        title={
-                          item?.tokenData.drop
-                            ? item?.tokenData.drop
-                            : `${item?.denomId} - #${item?.tokenId}`
-                        }
+                        title={renderNftTitle(item)}
                         description={
                           <>
                             <Avatar
