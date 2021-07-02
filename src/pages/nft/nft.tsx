@@ -134,6 +134,8 @@ const FormMintNft = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   const [isUploadSuccess, setIsUploadSuccess] = useState(false);
+  const [isBeforeUpload, setIsBeforeUpload] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
   const [isDenomIdOwner, setIsDenomIdOwner] = useState(false);
   const [isDenomIdIssued, setIsDenomIdIssued] = useState(false);
 
@@ -167,9 +169,20 @@ const FormMintNft = () => {
   const fileUploadValidator = () => ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     validator(rule, value) {
-      const reason = `Files Upload hasn't completed`;
-      if (isUploadSuccess) {
+      const reason = `File upload failed. Please upload again.`;
+      if (
+        (isUploadSuccess && !isVideo(fileType) && files.length === 1) ||
+        (isUploadSuccess && isVideo(fileType) && files.length === 2)
+      ) {
         return Promise.resolve();
+      }
+      // Hide the error before uploading anything
+      if (isBeforeUpload) {
+        return Promise.reject();
+      }
+      // Hide the error when uploading or upload video in progress
+      if (isUploading || (files.length === 1 && isVideo(fileType))) {
+        return Promise.reject();
       }
       return Promise.reject(reason);
     },
@@ -266,6 +279,7 @@ const FormMintNft = () => {
     } else {
       setIsUploadButtonVisible(false);
     }
+    setIsBeforeUpload(false);
     setFiles(fileList);
   };
 
@@ -398,18 +412,22 @@ const FormMintNft = () => {
     const isSupportedVideo = supportedVideo(file.type);
     const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
     const formData = new FormData();
+
+    setIsUploading(true);
     // Uploaded Video
     if (files.length >= 2) {
       formData.append('videoFile', files[0].originFileObj);
     }
 
     if (isVideoFile && isSupportedVideo) {
+      setIsUploading(false);
       onSuccess();
       return;
       // eslint-disable-next-line no-else-return
     } else if (isJpgOrPng) {
       formData.append('imageFile', file);
     } else {
+      setIsUploading(false);
       setIsUploadSuccess(false);
       onError();
       return;
@@ -434,10 +452,12 @@ const FormMintNft = () => {
           setVideoUrl(convertIpfsToHttp(media.data.animation_url));
         }
         setIsUploadSuccess(true);
+        setIsUploading(false);
         onSuccess(response);
       }
     } catch (e) {
       setIsUploadSuccess(false);
+      setIsUploading(false);
       onError(e);
       notification.error({
         message: 'Upload failed',
@@ -509,6 +529,7 @@ const FormMintNft = () => {
         <Form.Item
           name="files"
           label="Upload Files"
+          validateFirst
           // hasFeedback
           rules={[{ required: true, message: 'Upload Files is required' }, fileUploadValidator]}
         >
@@ -532,10 +553,32 @@ const FormMintNft = () => {
                 } else {
                   setImageUrl('');
                 }
+                setIsBeforeUpload(true);
+                setIsUploadSuccess(false);
               }}
             >
               {isUploadButtonVisible ? uploadButton : null}
             </Upload>
+            {isUploading ? (
+              <>
+                <Spin
+                  spinning
+                  indicator={<LoadingOutlined />}
+                  style={{ left: 'auto', marginRight: '5px' }}
+                />{' '}
+                Please wait until file upload finished
+              </>
+            ) : (
+              ''
+            )}
+            {isVideo(fileType) && files.length === 1 ? (
+              <>
+                <ExclamationCircleOutlined style={{ color: '#1199fa', marginRight: '5px' }} /> You
+                have to upload a thumbnail for the video
+              </>
+            ) : (
+              ''
+            )}
           </div>
         </Form.Item>
         <ModalPopup
@@ -639,10 +682,14 @@ const FormMintNft = () => {
                 <div className="label">Drop Name</div>
                 <div>{`${formValues.drop}`}</div>
               </div>
-              <div className="item">
-                <div className="label">Drop Description</div>
-                <div>{`${ellipsis(formValues.description, 1000)}`}</div>
-              </div>
+              {formValues.description ? (
+                <div className="item">
+                  <div className="label">Drop Description</div>
+                  <div>{`${formValues.description}`}</div>
+                </div>
+              ) : (
+                <></>
+              )}
               <div className="item">
                 <div className="label">Transaction Fee</div>
                 <div>
