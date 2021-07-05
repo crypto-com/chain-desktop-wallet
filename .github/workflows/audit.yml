@@ -3,9 +3,6 @@ name: Run audit checks
 
 on:
   pull_request:
-  push:
-    branches:
-      - dev
 
 jobs:
   audit:
