@@ -169,7 +169,9 @@ const FormMintNft = () => {
   const fileUploadValidator = () => ({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     validator(rule, value) {
-      const reason = `File upload failed. Please upload again.`;
+      if (files.length === 0) {
+        return Promise.reject(new Error('Upload Files is required'));
+      }
       if (
         (isUploadSuccess && !isVideo(fileType) && files.length === 1) ||
         (isUploadSuccess && isVideo(fileType) && files.length === 2)
@@ -184,7 +186,7 @@ const FormMintNft = () => {
       if (isUploading || (files.length === 1 && isVideo(fileType))) {
         return Promise.reject();
       }
-      return Promise.reject(reason);
+      return Promise.reject(new Error('File upload failed. Please upload again.'));
     },
   });
 
@@ -547,7 +549,7 @@ const FormMintNft = () => {
           label="Upload Files"
           validateFirst
           // hasFeedback
-          rules={[{ required: true, message: 'Upload Files is required' }, fileUploadValidator]}
+          rules={[fileUploadValidator]}
         >
           <div>
             <Upload
