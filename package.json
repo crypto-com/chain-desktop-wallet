@@ -120,7 +120,8 @@
       "entitlementsInherit": "./build/entitlements.mac.plist",
       "target": [
         "dmg",
-        "zip"
+        "zip",
+        "pkg"
       ],
       "category": "public.app-category.utilities",
       "darkModeSupport": true
