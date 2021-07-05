@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.3.1] - 2021-07-5
+
+### Bug Fixes
+- Fix issue when using drag and drop for uploads.
+
+
 ## [v0.3.0] - 2021-06-30
 
 ### Additions
