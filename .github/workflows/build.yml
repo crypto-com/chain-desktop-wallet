@@ -3,9 +3,6 @@ name: Build Executables
 
 on:
   pull_request:
-  push:
-    branches:
-      - dev
 
 jobs:
   release:
