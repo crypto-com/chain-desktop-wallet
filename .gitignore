@@ -32,3 +32,4 @@ package-lock.json
 
 tinker/
 data/
+/debug.log

@@ -37,6 +37,7 @@
     "crypto-js": "^4.0.0",
     "electron-devtools-installer": "^3.1.1",
     "electron-is-dev": "^1.2.0",
+    "electron-log": "^4.3.5",
     "electron-reload": "^1.5.0",
     "electron-updater": "^4.3.9",
     "ledger-cosmos-js": "^2.1.8",
