@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.3.2] - 2021-07-5
+
+- Sample release to test auto updater during development
+
 ## [v0.3.1] - 2021-07-5
 
 ### Bug Fixes
