@@ -3,9 +3,6 @@ name: Run zemu integration test
 
 on:
   pull_request:
-  push:
-    branches:
-      - dev
 
 jobs:
   zemu_test:
