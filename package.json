@@ -27,7 +27,7 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/react-router-dom": "^5.1.6",
-    "antd": "4.15.6",
+    "antd": "4.16.0",
     "axios": "^0.21.1",
     "bech32": "^1.1.4",
     "bfj": "^7.0.2",
