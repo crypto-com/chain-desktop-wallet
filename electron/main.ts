@@ -1,6 +1,5 @@
 import { app, BrowserWindow, nativeImage, Menu } from 'electron';
-
-// TODO : Run latest version of electron builder with merged fixes
+const { ipcMain } = require('electron');
 
 
 import * as path from 'path';
@@ -24,41 +23,6 @@ let win: BrowserWindow | null = null;
 let ipcmain: IpcMain | null = null;
 // const isDev = process.env.NODE_ENV === 'development'; // change true, in developing mode
 const isDev = true
-
-
-
-// Updater log setup
-log.transports.file.level = "debug"
-autoUpdater.logger = log
-log.info('App starting...');
-
-function sendStatusToWindow(text: string) {
-  log.info(text);
-  win?.webContents.send('message', text);
-}
-
-autoUpdater.on('checking-for-update', () => {
-  sendStatusToWindow('Checking for update...');
-})
-autoUpdater.on('update-available', (info) => {
-  sendStatusToWindow('Update available.');
-})
-autoUpdater.on('update-not-available', (info) => {
-  sendStatusToWindow('Update not available.');
-})
-autoUpdater.on('error', (err) => {
-  sendStatusToWindow('Error in auto-updater. ' + err);
-})
-autoUpdater.on('download-progress', (progressObj) => {
-  let log_message = "Download speed: " + progressObj.bytesPerSecond;
-  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
-  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-  sendStatusToWindow(log_message);
-})
-autoUpdater.on('update-downloaded', (info) => {
-  sendStatusToWindow('Update downloaded');
-});
-
 
 function createWindow() {
   const iconPath = path.join(__dirname, '/public/icon.png').replace(/\\/g, '\\\\');
@@ -98,6 +62,10 @@ function createWindow() {
 
   win.on('closed', () => (win = null));
 
+  win.once('ready-to-show', () => {
+    autoUpdater.checkForUpdatesAndNotify();
+  });
+
   // Open default browser when direct to external
   win.webContents.on('new-window', function(e, url) {
     e.preventDefault();
@@ -125,6 +93,8 @@ function createWindow() {
   }
 
   actionEvent('App', 'Open', 'AppOpened', 0)
+
+
 }
 
 app.on('window-all-closed', () => {
@@ -141,9 +111,23 @@ app.on('activate', () => {
 });
 
 app.on('ready', function()  {
-  // Create UI window
   createWindow()
-
-  // Handle update checks
-  autoUpdater.checkForUpdatesAndNotify()
 });
+
+ipcMain.on('app_version', (event) => {
+  event.sender.send('app_version', { version: app.getVersion() });
+});
+
+autoUpdater.on('update-available', () => {
+  win?.webContents.send('update_available');
+});
+
+autoUpdater.on('update-downloaded', () => {
+  win?.webContents.send('update_downloaded');
+});
+
+ipcMain.on('restart_app', () => {
+  autoUpdater.quitAndInstall();
+});
+
+

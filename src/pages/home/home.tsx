@@ -66,6 +66,8 @@ import RedelegateFormComponent from './components/RedelegateFormComponent';
 import IconTick from '../../svg/IconTick';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 
+const { ipcRenderer } = window.require('electron');
+
 const { Text } = Typography;
 
 const { Header, Content, Footer } = Layout;
@@ -544,6 +546,56 @@ function HomePage() {
     return [];
   };
 
+  function listenToNewVersionUpdates() {
+    ipcRenderer.on('update_available', () => {
+      ipcRenderer.removeAllListeners('update_available');
+      const newVersionNotificationKey = `open${Date.now()}`;
+      notification.open({
+        message: 'Update Available',
+        description: 'A new update is available. Downloading now...',
+        btn: (
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => notification.close(newVersionNotificationKey)}
+          >
+            Close
+          </Button>
+        ),
+
+        key: newVersionNotificationKey,
+        onClose: () => {},
+      });
+    });
+  }
+
+  function listenToUpdatesDownloaded() {
+    ipcRenderer.on('update_downloaded', () => {
+      ipcRenderer.removeAllListeners('update_downloaded');
+      const newVersionNotificationKey = `open${Date.now()}`;
+
+      notification.open({
+        message: 'Update Available',
+        description: 'Update Downloaded. It will be installed on restart. Restart now?',
+        btn: (
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => {
+              ipcRenderer.send('restart_app');
+              notification.close(newVersionNotificationKey);
+            }}
+          >
+            Restart
+          </Button>
+        ),
+
+        key: newVersionNotificationKey,
+        onClose: () => {},
+      });
+    });
+  }
+
   useEffect(() => {
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
@@ -577,6 +629,8 @@ function HomePage() {
     };
 
     syncAssetData();
+    listenToNewVersionUpdates();
+    listenToUpdatesDownloaded();
 
     if (!didMountRef.current) {
       didMountRef.current = true;
