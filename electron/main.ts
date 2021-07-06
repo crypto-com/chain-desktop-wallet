@@ -1,8 +1,16 @@
 import { app, BrowserWindow, nativeImage, Menu } from 'electron';
+
+// TODO : Run latest version of electron builder with merged fixes
+
+
 import * as path from 'path';
 
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import { IpcMain } from './IpcMain';
+import {autoUpdater} from "electron-updater";
+const log = require('electron-log');
+
+
 const { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } = require('./UsageAnalytics');
 
 (global as any).actionEvent = actionEvent;
@@ -14,7 +22,42 @@ const { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } 
 
 let win: BrowserWindow | null = null;
 let ipcmain: IpcMain | null = null;
-const isDev = process.env.NODE_ENV === 'development'; // change true, in developing mode
+// const isDev = process.env.NODE_ENV === 'development'; // change true, in developing mode
+const isDev = true
+
+
+
+// Updater log setup
+log.transports.file.level = "debug"
+autoUpdater.logger = log
+log.info('App starting...');
+
+function sendStatusToWindow(text: string) {
+  log.info(text);
+  win?.webContents.send('message', text);
+}
+
+autoUpdater.on('checking-for-update', () => {
+  sendStatusToWindow('Checking for update...');
+})
+autoUpdater.on('update-available', (info) => {
+  sendStatusToWindow('Update available.');
+})
+autoUpdater.on('update-not-available', (info) => {
+  sendStatusToWindow('Update not available.');
+})
+autoUpdater.on('error', (err) => {
+  sendStatusToWindow('Error in auto-updater. ' + err);
+})
+autoUpdater.on('download-progress', (progressObj) => {
+  let log_message = "Download speed: " + progressObj.bytesPerSecond;
+  log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
+  log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
+  sendStatusToWindow(log_message);
+})
+autoUpdater.on('update-downloaded', (info) => {
+  sendStatusToWindow('Update downloaded');
+});
 
 
 function createWindow() {
@@ -33,7 +76,8 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       devTools: isDev,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      contextIsolation: false,
     },
     resizable: true,
     icon: iconImage,
@@ -81,10 +125,7 @@ function createWindow() {
   }
 
   actionEvent('App', 'Open', 'AppOpened', 0)
-
 }
-
-app.on('ready', createWindow);
 
 app.on('window-all-closed', () => {
   actionEvent('App', 'Close', 'AppClosed', 0)
@@ -97,4 +138,12 @@ app.on('activate', () => {
   if (win === null) {
     createWindow();
   }
+});
+
+app.on('ready', function()  {
+  // Create UI window
+  createWindow()
+
+  // Handle update checks
+  autoUpdater.checkForUpdatesAndNotify()
 });
