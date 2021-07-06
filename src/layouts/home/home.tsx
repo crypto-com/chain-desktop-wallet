@@ -23,7 +23,7 @@ import {
   fetchingDBState,
   nftListState,
 } from '../../recoil/atom';
-import { trimString } from '../../utils/utils';
+import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 import IconSend from '../../svg/IconSend';
@@ -311,7 +311,7 @@ function HomeLayout(props: HomeLayoutProps) {
           >
             <div>
               <img src={WalletIcon} alt="walletIcon" />
-              {trimString(session?.wallet.name)}
+              {ellipsis(session?.wallet.name, 16)}
               <CaretDownOutlined />
             </div>
           </Dropdown>
