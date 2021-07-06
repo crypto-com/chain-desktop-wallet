@@ -93,8 +93,6 @@ function createWindow() {
   }
 
   actionEvent('App', 'Open', 'AppOpened', 0)
-
-
 }
 
 app.on('window-all-closed', () => {
@@ -119,10 +117,12 @@ ipcMain.on('app_version', (event) => {
 });
 
 autoUpdater.on('update-available', () => {
+  console.log('update-available')
   win?.webContents.send('update_available');
 });
 
 autoUpdater.on('update-downloaded', () => {
+  console.log('update-downloaded')
   win?.webContents.send('update_downloaded');
 });
 
