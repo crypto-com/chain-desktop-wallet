@@ -76,7 +76,8 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       devTools: isDev,
-      enableRemoteModule: true
+      enableRemoteModule: true,
+      contextIsolation: false,
     },
     resizable: true,
     icon: iconImage,
