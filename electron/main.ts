@@ -1,5 +1,7 @@
 import { app, BrowserWindow, nativeImage, Menu } from 'electron';
 
+// TODO : Run latest version of electron builder with merged fixes
+
 
 import * as path from 'path';
 
