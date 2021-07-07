@@ -57,13 +57,6 @@ autoUpdater.on('download-progress', (progressObj) => {
   sendStatusToWindow(log_message);
 })
 
-
-if (isDev) {
-  // Useful for some dev/debugging tasks, but download can
-  // not be validated becuase dev app is not signed
-  autoUpdater.updateConfigPath = path.join(__dirname, 'dev-app-update.yml');
-}
-
 function createWindow() {
   const iconPath = path.join(__dirname, '/public/icon.png').replace(/\\/g, '\\\\');
   const iconImage = nativeImage.createFromPath(iconPath);
@@ -102,10 +95,6 @@ function createWindow() {
   }
 
   win.on('closed', () => (win = null));
-
-  // win.once('ready-to-show', () => {
-  //   autoUpdater.checkForUpdatesAndNotify();
-  // });
 
   // Open default browser when direct to external
   win.webContents.on('new-window', function(e, url) {
@@ -157,9 +146,6 @@ app.on('activate', async () => {
 
 app.on('ready',  async function()  {
   createWindow()
-  //
-  // await new Promise(resolve => setTimeout(resolve, 6_000));
-  // autoUpdater.checkForUpdatesAndNotify();
 });
 
 ipcMain.on('app_version', (event) => {

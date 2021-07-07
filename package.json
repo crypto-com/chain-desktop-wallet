@@ -106,11 +106,6 @@
     "src/**/*.{js,jsx,ts,tsx}": "yarn lint:js"
   },
   "build": {
-    "publish": [{
-      "provider": "github",
-      "owner": "crypto-com",
-      "repo": "chain-desktop-wallet"
-    }],
     "productName": "Crypto.org Chain Desktop Wallet (Beta)",
     "appId": "chain.crypto.org.chain-desktop-wallet",
     "files": [
