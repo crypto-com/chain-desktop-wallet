@@ -23,7 +23,7 @@ import {
   fetchingDBState,
   nftListState,
 } from '../../recoil/atom';
-import { trimString } from '../../utils/utils';
+import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 import IconSend from '../../svg/IconSend';
@@ -106,7 +106,7 @@ function HomeLayout(props: HomeLayoutProps) {
     // Switch to existing default wallet
     const allWalletsData = await walletService.retrieveAllWallets();
     setWalletList(allWalletsData);
-    await walletService.setCurrentSession(new Session(walletList[0]));
+    await walletService.setCurrentSession(new Session(allWalletsData[0]));
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
     setSession(currentSession);
@@ -311,7 +311,7 @@ function HomeLayout(props: HomeLayoutProps) {
           >
             <div>
               <img src={WalletIcon} alt="walletIcon" />
-              {trimString(session?.wallet.name)}
+              {ellipsis(session?.wallet.name, 16)}
               <CaretDownOutlined />
             </div>
           </Dropdown>

@@ -27,10 +27,6 @@ export function isElectron() {
   return false;
 }
 
-export function trimString(name: String, maxLength = 18) {
-  return name.length > maxLength ? `${name.substring(0, maxLength)}...` : name;
-}
-
 export function middleEllipsis(str: string, len: number) {
   return `${str.substr(0, len)}...${str.substr(str.length - len, str.length)}`;
 }
