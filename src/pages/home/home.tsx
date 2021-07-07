@@ -553,6 +553,7 @@ function HomePage() {
       notification.open({
         message: 'Update Available',
         description: 'A new update is available. Downloading now...',
+        duration: 6,
         btn: (
           <Button
             type="primary"
@@ -575,7 +576,7 @@ function HomePage() {
       const newVersionNotificationKey = `open${Date.now()}`;
 
       notification.open({
-        message: 'Update Available',
+        message: 'Download Complete',
         description: 'Update Downloaded. It will be installed on restart. Restart now?',
         btn: (
           <Button
