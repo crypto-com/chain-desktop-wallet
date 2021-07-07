@@ -549,23 +549,16 @@ function HomePage() {
   function listenToNewVersionUpdates() {
     ipcRenderer.on('update_available', () => {
       ipcRenderer.removeAllListeners('update_available');
-      const newVersionNotificationKey = `open${Date.now()}`;
-      notification.open({
+
+      const newVersionNotificationKey = `open-update_available`;
+      notification.close(newVersionNotificationKey);
+
+      notification.info({
         message: 'Update Available',
         description: 'A new update is available. Downloading now...',
         duration: 6,
-        btn: (
-          <Button
-            type="primary"
-            size="small"
-            onClick={() => notification.close(newVersionNotificationKey)}
-          >
-            Close
-          </Button>
-        ),
-
         key: newVersionNotificationKey,
-        onClose: () => {},
+        placement: 'topRight',
       });
     });
   }
@@ -573,26 +566,16 @@ function HomePage() {
   function listenToUpdatesDownloaded() {
     ipcRenderer.on('update_downloaded', () => {
       ipcRenderer.removeAllListeners('update_downloaded');
-      const newVersionNotificationKey = `open${Date.now()}`;
 
-      notification.open({
+      const newVersionNotificationKey = `open-update_downloaded`;
+      notification.close(newVersionNotificationKey);
+
+      notification.success({
         message: 'Download Complete',
-        description: 'Update Downloaded. It will be installed on restart. Restart now?',
-        btn: (
-          <Button
-            type="primary"
-            size="small"
-            onClick={() => {
-              ipcRenderer.send('restart_app');
-              notification.close(newVersionNotificationKey);
-            }}
-          >
-            Restart
-          </Button>
-        ),
-
+        description: 'Update Downloaded. It will be installed on restart',
+        duration: 6,
         key: newVersionNotificationKey,
-        onClose: () => {},
+        placement: 'topRight',
       });
     });
   }
