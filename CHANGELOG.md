@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 ## [v0.3.4] - 2021-07-8
 
 - Sample test release for auto updater feature implementation
+- Note that this release won't be published, it will stay as draft for testing
+- The sole purpose of this release is to investigate if a signed binary would behave as expected with the auto-updater
 
 ## [v0.3.3] - 2021-07-6
 
