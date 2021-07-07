@@ -106,7 +106,7 @@ function HomeLayout(props: HomeLayoutProps) {
     // Switch to existing default wallet
     const allWalletsData = await walletService.retrieveAllWallets();
     setWalletList(allWalletsData);
-    await walletService.setCurrentSession(new Session(walletList[0]));
+    await walletService.setCurrentSession(new Session(allWalletsData[0]));
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
     setSession(currentSession);
