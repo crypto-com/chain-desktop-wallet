@@ -551,7 +551,7 @@ function HomePage() {
       ipcRenderer.removeAllListeners('update_available');
 
       const newVersionNotificationKey = `open-update_available`;
-      notification.close(newVersionNotificationKey);
+      // notification.close(newVersionNotificationKey);
 
       notification.info({
         message: 'Update Available',
@@ -568,7 +568,7 @@ function HomePage() {
       ipcRenderer.removeAllListeners('update_downloaded');
 
       const newVersionNotificationKey = `open-update_downloaded`;
-      notification.close(newVersionNotificationKey);
+      // notification.close(newVersionNotificationKey);
 
       notification.success({
         message: 'Download Complete',

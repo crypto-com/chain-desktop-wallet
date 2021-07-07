@@ -30,21 +30,25 @@ log.info('App starting...');
 
 function sendStatusToWindow(text: string) {
   log.info(text);
-  win?.webContents.send('message', text);
+  win?.webContents.send(text);
 }
 
 autoUpdater.on('checking-for-update', () => {
   sendStatusToWindow('Checking for update...');
 })
-autoUpdater.on('update-available', (info) => {
-  sendStatusToWindow(`Update available. ${info}`);
-})
-autoUpdater.on('update-not-available', (info) => {
-  sendStatusToWindow(`Update not available.${info}`);
-})
+
 autoUpdater.on('error', (err) => {
   sendStatusToWindow(`Error in auto-updater. ${err}`);
 })
+
+autoUpdater.on('update-available', (info) => {
+  sendStatusToWindow('update_available');
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  sendStatusToWindow('update_downloaded');
+});
+
 autoUpdater.on('download-progress', (progressObj) => {
   let log_message = "Download speed: " + progressObj.bytesPerSecond;
   log_message = `${log_message} - Downloaded ${Big(progressObj.percent).toFixed(2)}%`;
@@ -52,9 +56,7 @@ autoUpdater.on('download-progress', (progressObj) => {
 
   sendStatusToWindow(log_message);
 })
-autoUpdater.on('update-downloaded', (info) => {
-  sendStatusToWindow(`Update downloaded. ${info}`);
-});
+
 
 if (isDev) {
   // Useful for some dev/debugging tasks, but download can
@@ -127,9 +129,9 @@ function createWindow() {
     .then(name => console.log(`Added Extension:  ${name}`))
     .catch(err => console.log('An error occurred: ', err));
 
-  if (isDev) {
+  // if (isDev) {
     win.webContents.openDevTools();
-  }
+  // }
 
   actionEvent('App', 'Open', 'AppOpened', 0)
 }
@@ -148,25 +150,20 @@ app.on('activate', async () => {
   }
 
   sendStatusToWindow('activate event called')
-  await new Promise(resolve => setTimeout(resolve, 5_000));
+  await new Promise(resolve => setTimeout(resolve, 10_000));
   autoUpdater.checkForUpdatesAndNotify();
 
 });
 
-app.on('ready',  function()  {
+app.on('ready',  async function()  {
   createWindow()
+  //
+  // await new Promise(resolve => setTimeout(resolve, 6_000));
+  // autoUpdater.checkForUpdatesAndNotify();
 });
 
 ipcMain.on('app_version', (event) => {
   event.sender.send('app_version', { version: app.getVersion() });
-});
-
-autoUpdater.on('update-available', () => {
-  sendStatusToWindow('update_available');
-});
-
-autoUpdater.on('update-downloaded', () => {
-  sendStatusToWindow('update_downloaded');
 });
 
 ipcMain.on('restart_app', () => {
