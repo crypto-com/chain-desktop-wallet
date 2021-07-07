@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.3.4] - 2021-07-8
+
+- Sample test release for auto updater feature implementation
+
+## [v0.3.3] - 2021-07-6
+
+- Fixed small layout issues on wallet creation page
+
 ## [v0.3.2] - 2021-07-5
 
 - Sample release to test auto updater during development
