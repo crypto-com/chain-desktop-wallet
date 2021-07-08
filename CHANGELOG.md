@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.3.6] - 2021-07-8
+
+- Minor cleanup after testing auto updater in closed track release
+
+
 ## [v0.3.5] - 2021-07-8
 
 - [AutoUpdater] Empty sample release to test if v0.3.4 can detect new versions available and update them accordingly

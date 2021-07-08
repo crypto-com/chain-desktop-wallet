@@ -72,8 +72,7 @@ function createWindow() {
     minHeight: 702,
     webPreferences: {
       nodeIntegration: true,
-      devTools: true,
-      // devTools: isDev,
+      devTools: isDev,
       enableRemoteModule: true,
       contextIsolation: false,
     },
@@ -118,9 +117,9 @@ function createWindow() {
     .then(name => console.log(`Added Extension:  ${name}`))
     .catch(err => console.log('An error occurred: ', err));
 
-  // if (isDev) {
+  if (isDev) {
     win.webContents.openDevTools();
-  // }
+  }
 
   actionEvent('App', 'Open', 'AppOpened', 0)
 }
