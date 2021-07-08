@@ -66,6 +66,8 @@ import RedelegateFormComponent from './components/RedelegateFormComponent';
 import IconTick from '../../svg/IconTick';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 
+const { ipcRenderer } = window.require('electron');
+
 const { Text } = Typography;
 
 const { Header, Content, Footer } = Layout;
@@ -544,6 +546,41 @@ function HomePage() {
     return [];
   };
 
+  function listenToNewVersionUpdates() {
+    ipcRenderer.on('update_available', () => {
+      ipcRenderer.removeAllListeners('update_available');
+
+      const newVersionNotificationKey = `open-update_available`;
+
+      notification.info({
+        message: 'Update Available',
+        description: 'A new update is available. Downloading now...',
+        duration: 6,
+        key: newVersionNotificationKey,
+        placement: 'topRight',
+      });
+    });
+  }
+
+  function listenToUpdatesDownloaded() {
+    ipcRenderer.on('update_downloaded', () => {
+      ipcRenderer.removeAllListeners('update_downloaded');
+
+      const newVersionNotificationKey = `open-update_downloaded`;
+
+      notification.success({
+        message: 'Download Complete',
+        description: 'Update Downloaded. It will be installed on restart',
+        duration: 6,
+        key: newVersionNotificationKey,
+        placement: 'topRight',
+        onClose: () => {
+          ipcRenderer.send('restart_app');
+        },
+      });
+    });
+  }
+
   useEffect(() => {
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
@@ -577,6 +614,8 @@ function HomePage() {
     };
 
     syncAssetData();
+    listenToNewVersionUpdates();
+    listenToUpdatesDownloaded();
 
     if (!didMountRef.current) {
       didMountRef.current = true;
