@@ -857,33 +857,6 @@ function HomePage() {
           style={{ position: 'absolute', right: '36px', marginTop: '6px' }}
           spin={fetchingDB}
         />
-        {/* <SyncOutlined */}
-        {/*    onClick={() => { */}
-        {/*      const btn = ( */}
-        {/*          <Button type="primary" size="small" className="btn-restart" onClick={ */}
-        {/*            () => { */}
-        {/*              ipcRenderer.send('restart_app'); */}
-        {/*              // eslint-disable-next-line no-console */}
-        {/*              console.log('UI:restart_app') */}
-        {/*              // notification.close('newVersionNotificationKey') */}
-        {/*            } */}
-        {/*          } */}
-        {/*          style={{height: '30px', margin: '0px', lineHeight: 1.0}} */}
-        {/*          > */}
-        {/*            Restart Now */}
-        {/*          </Button> */}
-        {/*      ); */}
-        {/*      notification.success({ */}
-        {/*        message: 'Download Complete', */}
-        {/*        description: 'Update downloaded successfully. It will be installed on restart.', */}
-        {/*        duration: 30, */}
-        {/*        key: 'newVersionNotificationKey', */}
-        {/*        placement: 'topRight', */}
-        {/*        btn, */}
-        {/*      }); */}
-        {/*    }} */}
-        {/*    style={{ position: 'absolute', right: '86px', marginTop: '6px' }} */}
-        {/* /> */}
       </Header>
       <Content>
         <div className="site-layout-background balance-container">
