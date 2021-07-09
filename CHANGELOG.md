@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.3.7] - 2021-07-8
+
+- Remove previous implicit automatic quit and update after update download
+- Add optional "Restart Now" button after update download
+
 ## [v0.3.6] - 2021-07-8
 
 - Minor cleanup after testing auto updater in closed track release
