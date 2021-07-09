@@ -555,7 +555,7 @@ function HomePage() {
       notification.info({
         message: 'Update Available',
         description: 'A new update is available. Downloading now...',
-        duration: 6,
+        duration: 10,
         key: newVersionNotificationKey,
         placement: 'topRight',
       });
@@ -568,15 +568,28 @@ function HomePage() {
 
       const newVersionNotificationKey = `open-update_downloaded`;
 
+      const restartBtn = (
+        <Button
+          type="primary"
+          size="small"
+          className="btn-restart"
+          onClick={() => {
+            ipcRenderer.send('restart_app');
+            notification.close(newVersionNotificationKey);
+          }}
+          style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+        >
+          Restart Now
+        </Button>
+      );
+
       notification.success({
         message: 'Download Complete',
-        description: 'Update Downloaded. It will be installed on restart',
-        duration: 6,
+        description: 'Update downloaded successfully. It will be installed on restart.',
+        duration: 20,
         key: newVersionNotificationKey,
         placement: 'topRight',
-        onClose: () => {
-          ipcRenderer.send('restart_app');
-        },
+        btn: restartBtn,
       });
     });
   }
