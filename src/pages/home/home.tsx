@@ -555,7 +555,7 @@ function HomePage() {
       notification.info({
         message: 'Update Available',
         description: 'A new update is available. Downloading now...',
-        duration: 20,
+        duration: 10,
         key: newVersionNotificationKey,
         placement: 'topRight',
       });
