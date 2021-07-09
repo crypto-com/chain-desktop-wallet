@@ -15,7 +15,7 @@ import {
   List,
   Avatar,
 } from 'antd';
-import { LoadingOutlined, SyncOutlined } from '@ant-design/icons';
+import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
 
@@ -558,7 +558,6 @@ function HomePage() {
         duration: 20,
         key: newVersionNotificationKey,
         placement: 'topRight',
-        icon: <LoadingOutlined style={{ color: '#1199fa' }} />,
       });
     });
   }
