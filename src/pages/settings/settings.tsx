@@ -15,8 +15,10 @@ import {
   message,
   Switch,
   Divider,
+  Select,
 } from 'antd';
 import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useTranslation } from 'react-i18next';
 import { sessionState, walletListState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import {
@@ -33,6 +35,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
+const { Option } = Select;
 const layout = {
   // labelCol: { span: 8 },
   // wrapperCol: { span: 16 },
@@ -181,6 +184,7 @@ function MetaInfoComponent() {
 
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
+  const [t, i18n] = useTranslation();
 
   const didMountRef = useRef(false);
 
@@ -263,6 +267,23 @@ function MetaInfoComponent() {
     <div>
       <div className="site-layout-background settings-content">
         <div className="container">
+          <div className="item">
+            <div className="title">{t('language')}</div>
+            <div className="description">
+              A default memo message will be used for staking transactions if a custom memo is not
+              provided.
+            </div>
+            <Select
+              style={{ width: 240 }}
+              onChange={value => {
+                i18n.changeLanguage(value?.toString());
+              }}
+            >
+              <Option value="en">English</Option>
+              <Option value="zh">中文</Option>
+            </Select>
+          </div>
+          <Divider />
           <div className="item">
             <div className="title">Default Memo</div>
             <div className="description">
@@ -555,7 +576,7 @@ const FormSettings = () => {
   );
 };
 
-function SettingsPage() {
+const SettingsPage = () => {
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">Settings</Header>
@@ -568,6 +589,6 @@ function SettingsPage() {
       <Footer />
     </Layout>
   );
-}
+};
 
 export default SettingsPage;
