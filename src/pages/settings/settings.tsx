@@ -30,7 +30,11 @@ import {
 import { Session } from '../../models/Session';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
-import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
+import {
+  DEFAULT_LANGUAGE_CODE,
+  FIXED_DEFAULT_FEE,
+  FIXED_DEFAULT_GAS_LIMIT,
+} from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 
@@ -183,7 +187,7 @@ function MetaInfoComponent() {
   const [session, setSession] = useRecoilState(sessionState);
   const [updateLoading, setUpdateLoading] = useState(false);
 
-  const [defaultLanguageState, setDefaultLanguageState] = useState<string>('en');
+  const [defaultLanguageState, setDefaultLanguageState] = useState<string>(DEFAULT_LANGUAGE_CODE);
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
   const [t, i18n] = useTranslation();
@@ -285,8 +289,8 @@ function MetaInfoComponent() {
               provided.
             </div>
             <Select style={{ width: 240 }} onChange={onSwitchLanguage} value={defaultLanguageState}>
-              <Option value="en">English</Option>
-              <Option value="zh">中文</Option>
+              <Option value="enUs">English</Option>
+              <Option value="zhHk">中文</Option>
             </Select>
           </div>
           <Divider />

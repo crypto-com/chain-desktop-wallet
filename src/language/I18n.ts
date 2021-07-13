@@ -3,6 +3,8 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 import { generalConfigService } from '../storage/GeneralConfigService';
+import enUs from './en-us.json';
+import zhHk from './zh-hk.json';
 
 let savedLanguage: string = '';
 
@@ -24,23 +26,12 @@ i18n
   .init({
     debug: true,
     lng: savedLanguage,
-    // fallbackLng: 'zh',
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
     resources: {
-      en: {
-        translation: {
-          language: 'Language',
-          welcome: 'Welcome Back!',
-        },
-      },
-      zh: {
-        translation: {
-          language: '語言',
-          welcome: '歡迎!',
-        },
-      },
+      enUs,
+      zhHk,
     },
   });
 
