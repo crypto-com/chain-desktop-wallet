@@ -15,6 +15,8 @@ export const NodePorts = {
 // maximum in ledger: 2147483647
 export const LedgerWalletMaximum = 2147483647;
 
+export const DEFAULT_LANGUAGE_CODE = 'en';
+
 export type WalletConfig = {
   enabled: boolean;
   name: string;

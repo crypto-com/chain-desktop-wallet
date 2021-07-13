@@ -32,6 +32,7 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import { generalConfigService } from '../../storage/GeneralConfigService';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -182,6 +183,7 @@ function MetaInfoComponent() {
   const [session, setSession] = useRecoilState(sessionState);
   const [updateLoading, setUpdateLoading] = useState(false);
 
+  const [defaultLanguageState, setDefaultLanguageState] = useState<string>('en');
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
   const [t, i18n] = useTranslation();
@@ -192,9 +194,12 @@ function MetaInfoComponent() {
     let unmounted = false;
 
     const SyncConfig = async () => {
+      const defaultLanguage = await generalConfigService.getLanguage();
       const defaultMemoDisabled = session.wallet.config.disableDefaultClientMemo;
       const defaultGADisabled = session.wallet.config.analyticsDisabled;
       if (!unmounted) {
+        setDefaultLanguageState(defaultLanguage);
+        console.log(defaultLanguage);
         setDefaultMemoStateDisabled(defaultMemoDisabled);
         setDefaultGAStateDisabled(defaultGADisabled);
       }
@@ -214,6 +219,12 @@ function MetaInfoComponent() {
     defaultGAStateDisabled,
     setDefaultGAStateDisabled,
   ]);
+
+  const onSwitchLanguage = value => {
+    setDefaultLanguageState(value!.toString());
+    i18n.changeLanguage(value!.toString());
+    generalConfigService.setLanguage(value!.toString());
+  };
 
   async function onAllowDefaultMemoChange() {
     setUpdateLoading(true);
@@ -273,12 +284,7 @@ function MetaInfoComponent() {
               A default memo message will be used for staking transactions if a custom memo is not
               provided.
             </div>
-            <Select
-              style={{ width: 240 }}
-              onChange={value => {
-                i18n.changeLanguage(value?.toString());
-              }}
-            >
+            <Select style={{ width: 240 }} onChange={onSwitchLanguage} value={defaultLanguageState}>
               <Option value="en">English</Option>
               <Option value="zh">中文</Option>
             </Select>

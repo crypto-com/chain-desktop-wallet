@@ -2,4 +2,5 @@
 // It's config object for the all app
 export interface GeneralConfig {
   hasEverShownAnalyticsPopup: boolean;
+  languageCode: string;
 }

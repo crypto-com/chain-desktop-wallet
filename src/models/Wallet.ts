@@ -57,6 +57,11 @@ export interface SettingsDataUpdate {
   networkFee?: string | undefined;
 }
 
+export interface LanguageSettings {
+  walletId: string;
+  langaugeCode: string;
+}
+
 export interface DisableDefaultMemoSettings {
   walletId: string;
   disableDefaultMemoAppend: boolean;
