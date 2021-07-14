@@ -1,36 +1,118 @@
 {
   "enUs": {
     "translation": {
+      "general": {
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "confirm": "Confirm",
+        "cancel": "Cancel",
+        "save": "Save",
+        "discard": "Discard Changes"
+      },
       "home": {
         "welcome": "Welcome Back!"
       },
       "settings": {
+        "title": "Settings",
+        "description": "An invalid configuration might result in wallet malfunction.",
+        "tab1": "Node Configuration",
+        "tab2": "General Configuration",
+        "tab3": "Clear Storage",
+        "form1": {
+          "nodeUrl": {
+            "label": "Node URL",
+            "error1": "Please enter a valid node url"
+          },
+          "indexingUrl": {
+            "label": "Chain Indexing URL",
+            "error1": "Chain Indexing URL is required",
+            "error2": "Please enter a valid indexing url"
+          },
+          "chainId": {
+            "label": "Chain ID",
+            "error1": "Chain ID is required"
+          },
+          "networkFee": {
+            "label": "Network Fee",
+            "error1": "Network Fee is required"
+          },
+          "gasLimit": {
+            "label": "Gas Limit",
+            "error1": "Gas Limit is required"
+          }
+        },
         "language": {
           "title": "Language"
         },
         "memo": {
           "title": "Default Memo",
-          "description": "A default memo message will be used for staking transactions if a custom memo is not provided.",
-          "part1": "Part 1",
-          "part2": "Part 2"
+          "description": "A default memo message will be used for staking transactions if a custom memo is not provided."
         },
-        "googleAnalytics": "Google Analytics"
+        "dataAnalytics": {
+          "title": "Data Analytics",
+          "description": "The data collected for analytics is used to prioritize development for new features and functionalities and also to improve implemented features."
+        },
+        "clearStorage": {
+          "description": "Once you clear the storage, you will lose access to all you wallets. The only way to regain wallet access is by restoring wallet mnemonic phrase.",
+          "button1": "Clear Storage",
+          "modal": {
+            "title": "Confirm Clear Storage",
+            "description1": "You may wish to verify your recovery mnemonic phrase before deletion to ensure that you can restore this wallet in the future.",
+            "warning": "Are you sure you want to clear the storage? If you have not backed up your wallet mnemonic phrase, you will result in losing your funds forever.\n",
+            "disclaimer": "I understand that the only way to regain access is by restoring wallet mnemonic phrase.",
+            "form1": {
+              "clear": {
+                "label": "Please enter CLEAR",
+                "error1": "Please enter CLEAR"
+              }
+            }
+          }
+        }
       }
     }
   },
   "zhHk": {
     "translation": {
+      "general": {
+        "enabled": "開啟",
+        "disabled": "關閉",
+        "confirm": "確認",
+        "cancel": "取消",
+        "save": "保存",
+        "discard": "取消"
+      },
       "home": {
         "welcome": "歡迎"
       },
       "settings": {
+        "title": "設定",
+        "tab1": "節點配置",
+        "tab3": "重置",
+        "form1": {
+          "nodeUrl": {
+            "label": "節點 URL"
+          },
+          "networkFee": {
+            "label": "交易費用"
+          },
+          "gasLimit": {
+            "label": "Gas 費用"
+          }
+        },
         "language": {
           "title": "語言"
         },
-        "googleAnalytics": "Google Analytics",
         "memo": {
-          "part1": "部份 1",
-          "part2": "部份 2"
+          "title": "預設留言"
+        },
+        "dataAnalytics": {
+          "title": "資料分析"
+        },
+        "clearStorage": {
+          "button1": "重置",
+          "modal": {
+            "title": "確認重置"
+          }
         }
       }
     }
@@ -44,10 +126,9 @@
         "language": {
           "title": "Langue"
         },
-        "googleAnalytics": "Analytique Google",
-        "memo": {
-          "part1": "Partie 1",
-          "part2": "Partie 2"
+        "dataAnalytics": {
+          "title": "Analytique Google",
+          "description": "Analytique Google"
         }
       }
     }

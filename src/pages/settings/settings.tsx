@@ -56,6 +56,8 @@ const GeneralSettingsForm = () => {
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
 
+  const [t] = useTranslation();
+
   useEffect(() => {
     let unmounted = false;
 
@@ -104,7 +106,7 @@ const GeneralSettingsForm = () => {
     <>
       <Form.Item
         name="nodeUrl"
-        label="Node URL"
+        label={t('settings.form1.nodeUrl.label')}
         hasFeedback
         rules={[
           {
@@ -112,7 +114,7 @@ const GeneralSettingsForm = () => {
           },
           {
             pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
-            message: 'Please enter a valid node url',
+            message: t('settings.form1.nodeUrl.error1'),
           },
         ]}
       >
@@ -120,25 +122,26 @@ const GeneralSettingsForm = () => {
       </Form.Item>
       <Form.Item
         name="indexingUrl"
-        label="Chain Indexing URL"
+        label={t('settings.form1.indexingUrl.label')}
         hasFeedback
         rules={[
-          { required: true, message: 'Chain Indexing URL is required' },
+          { required: true, message: t('settings.form1.indexingUrl.error1') },
           {
             pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
-            message: 'Please enter a valid indexing url',
+            message: t('settings.form1.indexingUrl.error2'),
           },
         ]}
       >
-        <Input placeholder="Chain Indexing URL" />
+        <Input placeholder={t('settings.form1.indexingUrl.label')} />
       </Form.Item>
       <Form.Item
         name="chainId"
-        label="Chain ID"
+        label={t('settings.form1.chainId.label')}
         hasFeedback
         rules={[
           {
             required: true,
+            message: t('settings.form1.chainId.error1'),
           },
         ]}
       >
@@ -147,11 +150,12 @@ const GeneralSettingsForm = () => {
       <div className="row">
         <Form.Item
           name="networkFee"
-          label="Network Fee"
+          label={t('settings.form1.networkFee.label')}
           hasFeedback
           rules={[
             {
               required: true,
+              message: t('settings.form1.networkFee.error1'),
             },
           ]}
         >
@@ -159,11 +163,12 @@ const GeneralSettingsForm = () => {
         </Form.Item>
         <Form.Item
           name="gasLimit"
-          label="Gas Limit"
+          label={t('settings.form1.gasLimit.label')}
           hasFeedback
           rules={[
             {
               required: true,
+              message: t('settings.form1.gasLimit.error1'),
             },
           ]}
         >
@@ -299,21 +304,18 @@ function MetaInfoComponent() {
               onChange={onAllowDefaultMemoChange}
               disabled={updateLoading}
             />{' '}
-            {defaultMemoStateDisabled ? 'Disabled' : 'Enabled'}
+            {defaultMemoStateDisabled ? t('general.disabled') : t('general.enabled')}
           </div>
           <Divider />
           <div className="item">
-            <div className="title">Data Analytics</div>
-            <div className="description">
-              The data collected for analytics is used to prioritize development for new features
-              and functionalities and also to improve implemented features
-            </div>
+            <div className="title">{t('settings.dataAnalytics.title')}</div>
+            <div className="description">{t('settings.dataAnalytics.description')}</div>
             <Switch
               checked={!defaultGAStateDisabled}
               onChange={onAllowDefaultGAChange}
               disabled={updateLoading}
             />{' '}
-            {defaultGAStateDisabled ? 'Disabled' : 'Enabled'}
+            {defaultGAStateDisabled ? t('general.disabled') : t('general.enabled')}
           </div>
         </div>
       </div>
@@ -334,6 +336,8 @@ const FormSettings = () => {
   const history = useHistory();
 
   const setWalletList = useSetRecoilState(walletListState);
+
+  const [t] = useTranslation();
 
   let networkFee = FIXED_DEFAULT_FEE;
   let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
@@ -443,38 +447,35 @@ const FormSettings = () => {
       onFinish={onFinish}
     >
       <Tabs defaultActiveKey="1">
-        <TabPane tab="Node Configuration" key="1">
+        <TabPane tab={t('settings.tab1')} key="1">
           <div className="site-layout-background settings-content">
             <div className="container">
               <GeneralSettingsForm />
               <Form.Item {...tailLayout} className="button">
                 <Button type="primary" htmlType="submit" loading={isButtonLoading}>
-                  Save
+                  {t('general.save')}
                 </Button>
                 <Button type="link" htmlType="button" onClick={onRestoreDefaults}>
-                  Discard Changes
+                  {t('general.discard')}
                 </Button>
               </Form.Item>
             </div>
           </div>
         </TabPane>
-        <TabPane tab="General Configuration" key="2">
+        <TabPane tab={t('settings.tab2')} key="2">
           <MetaInfoComponent />
         </TabPane>
-        <TabPane tab="Clear Storage" key="3">
+        <TabPane tab={t('settings.tab3')} key="3">
           <div className="site-layout-background settings-content">
             <div className="container">
-              <div className="description">
-                Once you clear the storage, you will lose access to all you wallets. The only way to
-                regain wallet access is by restoring wallet mnemonic phrase. <br />
-              </div>
+              <div className="description">{t('settings.clearStorage.description')}</div>
               <Button
                 type="primary"
                 loading={isButtonLoading}
                 onClick={() => setIsConfirmationModalVisible(true)}
                 danger
               >
-                Clear Storage
+                {t('settings.clearStorage.button1')}
               </Button>
             </div>
           </div>
@@ -494,7 +495,7 @@ const FormSettings = () => {
                 disabled={isButtonDisabled}
                 danger
               >
-                Confirm
+                {t('general.confirm')}
               </Button>,
               <Button
                 type="primary"
@@ -504,7 +505,7 @@ const FormSettings = () => {
                 onClick={confirmClearForm.submit}
                 danger
               >
-                Clear Storage
+                {t('settings.clearStorage.button1')}
               </Button>,
               <Button
                 key="back"
@@ -512,24 +513,21 @@ const FormSettings = () => {
                 onClick={handleCancelConfirmationModal}
                 // hidden={isConfirmClearVisible}
               >
-                Cancel
+                {t('general.cancel')}
               </Button>,
             ]}
             okText="Confirm"
           >
             <>
-              <div className="title">Confirm Clear Storage</div>
+              <div className="title">{t('settings.clearStorage.modal.title')}</div>
 
               {!isConfirmClearVisible ? (
                 <>
-                  <div className="description">
-                    You may wish to verify your recovery mnemonic phrase before deletion to ensure
-                    that you can restore this wallet in the future.
-                  </div>
+                  <div className="description">{t('settings.clearStorage.modal.description1')}</div>
                   <div className="item">
                     <Alert
                       type="warning"
-                      message="Are you sure you want to clear the storage? If you have not backed up your wallet mnemonic phrase, you will result in losing your funds forever."
+                      message={t('settings.clearStorage.modal.warning')}
                       showIcon
                     />
                   </div>
@@ -538,8 +536,7 @@ const FormSettings = () => {
                       checked={!isButtonDisabled}
                       onChange={() => setIsButtonDisabled(!isButtonDisabled)}
                     >
-                      I understand that the only way to regain access is by restoring wallet
-                      mnemonic phrase.
+                      {t('settings.clearStorage.modal.disclaimer')}
                     </Checkbox>
                   </div>
                 </>
@@ -555,7 +552,7 @@ const FormSettings = () => {
                   >
                     <Form.Item
                       name="clear"
-                      label="Please enter CLEAR"
+                      label={t('settings.clearStorage.modal.form1.clear.label')}
                       hasFeedback
                       rules={[
                         {
@@ -563,7 +560,7 @@ const FormSettings = () => {
                         },
                         {
                           pattern: /^CLEAR$/,
-                          message: 'Please enter CLEAR',
+                          message: t('settings.clearStorage.modal.form1.clear.error1'),
                         },
                       ]}
                     >
@@ -581,12 +578,11 @@ const FormSettings = () => {
 };
 
 const SettingsPage = () => {
+  const [t] = useTranslation();
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">Settings</Header>
-      <div className="header-description">
-        An invalid configuration might result in wallet malfunction.
-      </div>
+      <Header className="site-layout-background">{t('settings.title')}</Header>
+      <div className="header-description">{t('settings.description')}</div>
       <Content>
         <FormSettings />
       </Content>
