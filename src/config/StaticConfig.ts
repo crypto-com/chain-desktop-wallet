@@ -16,6 +16,10 @@ export const NodePorts = {
 export const LedgerWalletMaximum = 2147483647;
 
 export const DEFAULT_LANGUAGE_CODE = 'enUs';
+export const SUPPORTED_LANGUAGE = [
+  { value: 'enUs', label: 'English' },
+  { value: 'zhHk', label: '中文' },
+];
 
 export type WalletConfig = {
   enabled: boolean;

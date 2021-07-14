@@ -13,6 +13,7 @@ import Icon, {
   SettingOutlined,
 } from '@ant-design/icons';
 import { useRecoilState } from 'recoil';
+import { useTranslation } from 'react-i18next';
 
 import {
   sessionState,
@@ -66,6 +67,8 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
+
+  const [t] = useTranslation();
 
   async function fetchAndSetNewValidators(currentSession) {
     try {
@@ -221,25 +224,25 @@ function HomeLayout(props: HomeLayoutProps) {
     return (
       <Menu theme="dark" mode="inline" defaultSelectedKeys={[menuSelectedKey]}>
         <Menu.Item key="/home" icon={<Icon component={IconHome} />}>
-          <Link to="/home">Home</Link>
+          <Link to="/home">{t('navbar.home')}</Link>
         </Menu.Item>
         <Menu.Item key="/staking" icon={<Icon component={IconStaking} />}>
-          <Link to="/staking">Staking</Link>
+          <Link to="/staking">{t('navbar.staking')}</Link>
         </Menu.Item>
         <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
-          <Link to="/send">Send</Link>
+          <Link to="/send">{t('navbar.send')}</Link>
         </Menu.Item>
         <Menu.Item key="/receive" icon={<Icon component={IconReceive} />}>
-          <Link to="/receive">Receive</Link>
+          <Link to="/receive">{t('navbar.receive')}</Link>
         </Menu.Item>
         <Menu.Item key="/governance" icon={<BankOutlined />}>
-          <Link to="/governance">Governance</Link>
+          <Link to="/governance">{t('navbar.governance')}</Link>
         </Menu.Item>
         <Menu.Item key="/nft" icon={<Icon component={IconNft} />}>
-          <Link to="/nft">My NFT</Link>
+          <Link to="/nft">{t('navbar.nft')}</Link>
         </Menu.Item>
         <Menu.Item key="/settings" icon={<SettingOutlined />}>
-          <Link to="/settings">Settings</Link>
+          <Link to="/settings">{t('navbar.settings')}</Link>
         </Menu.Item>
       </Menu>
     );
@@ -253,13 +256,13 @@ function HomeLayout(props: HomeLayoutProps) {
             <Menu.Item className="restore-wallet-item">
               <Link to="/restore">
                 <ReloadOutlined />
-                Restore Wallet
+                {t('navbar.wallet.restore')}
               </Link>
             </Menu.Item>
             <Menu.Item className="create-wallet-item">
               <Link to="/create">
                 <PlusOutlined />
-                Create Wallet
+                {t('navbar.wallet.create')}
               </Link>
             </Menu.Item>
           </>
@@ -276,7 +279,7 @@ function HomeLayout(props: HomeLayoutProps) {
               }}
             >
               <DeleteOutlined />
-              Delete Wallet
+              {t('navbar.wallet.delete')}
             </Menu.Item>
           </>
         ) : (
@@ -286,7 +289,7 @@ function HomeLayout(props: HomeLayoutProps) {
           <Link to="/wallet">
             {/* <IconWallet /> */}
             <Icon component={IconWallet} />
-            Wallet List
+            {t('navbar.wallet.list')}
           </Link>
         </Menu.Item>
       </Menu>
@@ -338,7 +341,7 @@ function HomeLayout(props: HomeLayoutProps) {
               hidden={isConfirmDeleteVisible}
               danger
             >
-              Confirm
+              {t('general.confirm')}
             </Button>,
             <Button
               key="submit"
@@ -349,18 +352,18 @@ function HomeLayout(props: HomeLayoutProps) {
               hidden={!isConfirmDeleteVisible}
               danger
             >
-              Delete Wallet
+              {t('navbar.wallet.delete')}
             </Button>,
             <Button key="back" type="link" onClick={handleCancel} disabled={isButtonLoading}>
-              Cancel
+              {t('general.cancel')}
             </Button>,
           ]}
         >
           <>
-            <div className="title">Confirm Wallet Deletion</div>
-            <div className="description">Please review the below information. </div>
+            <div className="title">{t('navbar.wallet.modal.title')}</div>
+            <div className="description">{t('navbar.wallet.modal.description')}</div>
             <div className="item">
-              <div className="label">Delete Wallet Address</div>
+              <div className="label">{t('navbar.wallet.modal.form1.address.label')}</div>
               {/* <div className="address">{`${session.wallet.address}`}</div> */}
               <div className="address">{`${deleteWalletAddress}`}</div>
             </div>
@@ -369,9 +372,9 @@ function HomeLayout(props: HomeLayoutProps) {
                 <div className="item">
                   <Alert
                     type="warning"
-                    message={`Are you sure you want to delete the wallet? ${
+                    message={`${t('navbar.wallet.modal.warning1')} ${
                       session.wallet.walletType !== LEDGER_WALLET_TYPE
-                        ? 'If you have not backed up your wallet mnemonic phrase, this will result in losing your funds forever.'
+                        ? t('navbar.wallet.modal.warning2')
                         : ''
                     }`}
                     showIcon
@@ -383,8 +386,8 @@ function HomeLayout(props: HomeLayoutProps) {
                     onChange={() => setIsButtonDisabled(!isButtonDisabled)}
                   >
                     {session.wallet.walletType !== LEDGER_WALLET_TYPE
-                      ? 'I understand that the only way to regain access is by restoring wallet mnemonic phrase.'
-                      : 'I understand that the only way to regain access is by using the same ledger device with the correct address index'}
+                      ? t('navbar.wallet.modal.checkbox1')
+                      : t('navbar.wallet.modal.checkbox2')}
                   </Checkbox>
                 </div>
               </>
@@ -399,15 +402,16 @@ function HomeLayout(props: HomeLayoutProps) {
                 >
                   <Form.Item
                     name="delete"
-                    label="Please enter DELETE"
+                    label={t('navbar.wallet.modal.form1.delete.label')}
                     hasFeedback
                     rules={[
                       {
                         required: true,
+                        message: t('navbar.wallet.modal.form1.delete.error1'),
                       },
                       {
                         pattern: /^DELETE$/,
-                        message: 'Please enter DELETE',
+                        message: t('navbar.wallet.modal.form1.delete.error1'),
                       },
                     ]}
                   >
@@ -436,17 +440,17 @@ function HomeLayout(props: HomeLayoutProps) {
                 setIsSuccessDeleteModalVisible(false);
               }}
             >
-              Ok
+              {t('general.ok')}
             </Button>,
           ]}
         >
           <>
             <div className="description">
-              Wallet Address
+              {t('navbar.wallet.successModal.message1')}
               <br />
               {deleteWalletAddress}
               <br />
-              has been deleted.
+              {t('navbar.wallet.successModal.message2')}
             </div>
           </>
         </SuccessModalPopup>
@@ -460,14 +464,9 @@ function HomeLayout(props: HomeLayoutProps) {
           footer={[]}
         >
           <>
-            <div className="title">Data analytics was added</div>
+            <div className="title">{t('announcement.modal.title')}</div>
             <div className="description">
-              You can help improve Crypto.org Chain Wallet by having Data Analytics enabled. The
-              data collected will help the development team prioritize new features and improve
-              existing functionalities. <br />
-              <br />
-              You can always come back to disable Data Analytics anytime under General Configuration
-              in{' '}
+              {t('announcement.modal.description1')}{' '}
               <Link
                 to="/settings"
                 onClick={async () => {
@@ -475,9 +474,9 @@ function HomeLayout(props: HomeLayoutProps) {
                   await generalConfigService.setHasShownAnalyticsPopup(true);
                 }}
               >
-                Settings
+                {t('navbar.settings')}
               </Link>
-              .
+              {t('announcement.modal.description2')}
             </div>
           </>
         </ModalPopup>

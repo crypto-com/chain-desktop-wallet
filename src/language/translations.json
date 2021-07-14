@@ -1,16 +1,74 @@
 {
   "enUs": {
     "translation": {
+      "language": "English",
       "general": {
         "enabled": "Enabled",
         "disabled": "Disabled",
         "confirm": "Confirm",
         "cancel": "Cancel",
         "save": "Save",
-        "discard": "Discard Changes"
+        "discard": "Discard Changes",
+        "ok": "Ok"
+      },
+      "navbar": {
+        "home": "Home",
+        "staking": "Staking",
+        "send": "Send",
+        "receive": "Receive",
+        "governance": "Governance",
+        "nft": "My NFT",
+        "settings": "Settings",
+        "wallet": {
+          "list": "Wallet List",
+          "restore": "Restore Wallet",
+          "create": "Create Wallet",
+          "delete": "Delete Wallet",
+          "modal": {
+            "title": "Confirm Wallet Deletion",
+            "description": "Please review the below information.",
+            "form1": {
+              "address": {
+                "label": "Delete Wallet Address"
+              },
+              "delete": {
+                "label": "Please enter DELETE",
+                "error1": "Please enter DELETE"
+              }
+            },
+            "warning1": "Are you sure you want to delete the wallet?",
+            "warning2": "If you have not backed up your wallet mnemonic phrase, this will result in losing your funds forever.",
+            "checkbox1": "I understand that the only way to regain access is by restoring wallet mnemonic phrase.",
+            "checkbox2": "I understand that the only way to regain access is by using the same ledger device with the correct address index"
+          },
+          "successModal": {
+            "message1": "Wallet Address",
+            "message2": "has been deleted."
+          }
+        }
+      },
+      "announcement": {
+        "modal": {
+          "title": "Data analytics was added",
+          "description1": "You can help improve Crypto.org Chain Wallet by having Data Analytics enabled. The data collected will help the development team prioritize new features and improve existing functionalities.\n\nYou can always come back to disable Data Analytics anytime under General Configuration in",
+          "description2": "."
+        }
       },
       "home": {
         "welcome": "Welcome Back!"
+      },
+      "receive": {
+        "title": "Receive",
+        "description": "Receive funds by sharing the below wallet address.",
+        "notification1": {
+          "title": "Address Copied!",
+          "description": "Current account is successfully copied to your clipboard"
+        },
+        "notification2": {
+          "title": "Cannot detect any Ledger device",
+          "description": "Please connect with your Ledger device"
+        },
+        "button": "Verify address on Ledger"
       },
       "settings": {
         "title": "Settings",
@@ -73,16 +131,64 @@
   },
   "zhHk": {
     "translation": {
+      "language": "繁體中文",
       "general": {
         "enabled": "開啟",
         "disabled": "關閉",
         "confirm": "確認",
         "cancel": "取消",
         "save": "保存",
-        "discard": "取消"
+        "discard": "取消",
+        "ok": "Ok"
+      },
+      "navbar": {
+        "home": "主頁",
+        "staking": "抵押",
+        "send": "發送",
+        "receive": "接收",
+        "governance": "治理",
+        "nft": "我的NFT",
+        "settings": "設置",
+        "wallet": {
+          "list": "所有錢包",
+          "restore": "復原錢包",
+          "create": "新增錢包",
+          "delete": "刪除錢包",
+          "modal": {
+            "title": "確認刪除錢包",
+            "description": "請檢查以下內容",
+            "form1": {
+              "address": {
+                "label": "刪除錢包地址"
+              },
+              "delete": {
+                "label": "請輸入 DELETE",
+                "error1": "請輸入 DELETE"
+              }
+            },
+            "warning1": "你確定要刪除這個錢包？"
+          },
+          "successModal": {
+            "message1": "錢包地址",
+            "message2": "已被刪除。"
+          }
+        }
       },
       "home": {
         "welcome": "歡迎"
+      },
+      "receive": {
+        "title": "接收",
+        "description": "分享你的錢包地址來接收款項",
+        "notification1": {
+          "title": "複製地址！",
+          "description": "這個地址已儲存到你的剪貼板。"
+        },
+        "notification2": {
+          "title": "未能偵測到你的 Ledger 硬體錢包 ",
+          "description": "請連接你的 Ledger 硬體錢包 "
+        },
+        "button": "驗證你的 Ledger 錢包"
       },
       "settings": {
         "title": "設定",

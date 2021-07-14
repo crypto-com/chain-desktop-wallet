@@ -32,6 +32,7 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
 import {
   DEFAULT_LANGUAGE_CODE,
+  SUPPORTED_LANGUAGE,
   FIXED_DEFAULT_FEE,
   FIXED_DEFAULT_GAS_LIMIT,
 } from '../../config/StaticConfig';
@@ -291,8 +292,9 @@ function MetaInfoComponent() {
             {/* <div className="description">
             </div> */}
             <Select style={{ width: 240 }} onChange={onSwitchLanguage} value={defaultLanguageState}>
-              <Option value="enUs">English</Option>
-              <Option value="zhHk">中文</Option>
+              {SUPPORTED_LANGUAGE.map(item => {
+                return <Option value={item.value}>{item.label}</Option>;
+              })}
             </Select>
           </div>
           <Divider />

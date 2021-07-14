@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import QRCode from 'qrcode.react';
 import { useRecoilValue } from 'recoil';
+import { useTranslation } from 'react-i18next';
 import './receive.less';
 import 'antd/dist/antd.css';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
@@ -18,6 +19,8 @@ function ReceivePage() {
   const [isLedger, setIsLedger] = useState(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
+
+  const [t] = useTranslation();
 
   useEffect(() => {
     const { walletType } = session.wallet;
@@ -38,8 +41,8 @@ function ReceivePage() {
       }
     } catch (e) {
       notification.error({
-        message: `Cannot detect any Ledger device`,
-        description: `Please connect with your Ledger device`,
+        message: t('receive.notification2.title'),
+        description: t('receive.notification2.description'),
         placement: 'topRight',
         duration: 3,
       });
@@ -49,8 +52,8 @@ function ReceivePage() {
   const onCopyClick = () => {
     setTimeout(() => {
       notification.success({
-        message: `Address Copied!`,
-        description: `Current account is successfully copied to your clipboard`,
+        message: t('receive.notification1.title'),
+        description: t('receive.notification1.description'),
         placement: 'topRight',
         duration: 2,
         key: 'copy',
@@ -60,8 +63,8 @@ function ReceivePage() {
 
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">Receive</Header>
-      <div className="header-description">Receive funds by sharing the below wallet address.</div>
+      <Header className="site-layout-background">{t('receive.title')}</Header>
+      <div className="header-description">{t('receive.description')}</div>
       <Content>
         <div className="site-layout-background receive-content">
           <div className="container">
@@ -78,7 +81,7 @@ function ReceivePage() {
             {isLedger && (
               <div className="ledger">
                 <Button type="primary" onClick={clickCheckLedger}>
-                  Verify address on Ledger
+                  {t('receive.button')}
                 </Button>
               </div>
             )}
