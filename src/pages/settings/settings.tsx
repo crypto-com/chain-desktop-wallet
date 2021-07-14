@@ -203,7 +203,6 @@ function MetaInfoComponent() {
       const defaultGADisabled = session.wallet.config.analyticsDisabled;
       if (!unmounted) {
         setDefaultLanguageState(defaultLanguage);
-        console.log(defaultLanguage);
         setDefaultMemoStateDisabled(defaultMemoDisabled);
         setDefaultGAStateDisabled(defaultGADisabled);
       }
@@ -283,11 +282,9 @@ function MetaInfoComponent() {
       <div className="site-layout-background settings-content">
         <div className="container">
           <div className="item">
-            <div className="title">{t('language')}</div>
-            <div className="description">
-              A default memo message will be used for staking transactions if a custom memo is not
-              provided.
-            </div>
+            <div className="title">{t('settings.language.title')}</div>
+            {/* <div className="description">
+            </div> */}
             <Select style={{ width: 240 }} onChange={onSwitchLanguage} value={defaultLanguageState}>
               <Option value="enUs">English</Option>
               <Option value="zhHk">中文</Option>
@@ -295,11 +292,8 @@ function MetaInfoComponent() {
           </div>
           <Divider />
           <div className="item">
-            <div className="title">Default Memo</div>
-            <div className="description">
-              A default memo message will be used for staking transactions if a custom memo is not
-              provided.
-            </div>
+            <div className="title">{t('settings.memo.title')}</div>
+            <div className="description">{t('settings.memo.description')}</div>
             <Switch
               checked={!defaultMemoStateDisabled}
               onChange={onAllowDefaultMemoChange}

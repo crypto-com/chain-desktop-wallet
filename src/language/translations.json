@@ -1,0 +1,55 @@
+{
+  "enUs": {
+    "translation": {
+      "home": {
+        "welcome": "Welcome Back!"
+      },
+      "settings": {
+        "language": {
+          "title": "Language"
+        },
+        "memo": {
+          "title": "Default Memo",
+          "description": "A default memo message will be used for staking transactions if a custom memo is not provided.",
+          "part1": "Part 1",
+          "part2": "Part 2"
+        },
+        "googleAnalytics": "Google Analytics"
+      }
+    }
+  },
+  "zhHk": {
+    "translation": {
+      "home": {
+        "welcome": "歡迎"
+      },
+      "settings": {
+        "language": {
+          "title": "語言"
+        },
+        "googleAnalytics": "Google Analytics",
+        "memo": {
+          "part1": "部份 1",
+          "part2": "部份 2"
+        }
+      }
+    }
+  },
+  "frFR": {
+    "translation": {
+      "home": {
+        "welcome": "Bienvenue de nouveau"
+      },
+      "settings": {
+        "language": {
+          "title": "Langue"
+        },
+        "googleAnalytics": "Analytique Google",
+        "memo": {
+          "part1": "Partie 1",
+          "part2": "Partie 2"
+        }
+      }
+    }
+  }
+}

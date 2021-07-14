@@ -3,8 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 import { generalConfigService } from '../storage/GeneralConfigService';
-import enUs from './en-us.json';
-import zhHk from './zh-hk.json';
+import translations from './translations.json';
 
 let savedLanguage: string = '';
 
@@ -29,10 +28,7 @@ i18n
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
-    resources: {
-      enUs,
-      zhHk,
-    },
+    resources: translations,
   });
 
 export default i18n;
