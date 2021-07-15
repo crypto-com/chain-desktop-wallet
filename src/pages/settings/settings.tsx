@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   Button,
   Form,
@@ -37,8 +36,8 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
+import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
-// import { splitToChunks } from '../../utils/utils';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -187,13 +186,12 @@ const GeneralSettingsForm = () => {
 function MetaInfoComponent() {
   const [session, setSession] = useRecoilState(sessionState);
   const [updateLoading, setUpdateLoading] = useState(false);
-
+  const { walletType } = session.wallet;
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
 
   const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState<string>();
-  // const [decryptedPhraseArray, setDecryptedPhraseArray] = useState<string[][]>([[]]);
   const [isExportRecoveryPhraseModalVisible, setIsExportRecoveryPhraseModalVisible] = useState<
     boolean
   >(false);
@@ -241,8 +239,6 @@ function MetaInfoComponent() {
     );
   };
 
-  // const perPage = 1;
-
   const sliderSettings = {
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
@@ -253,18 +249,6 @@ function MetaInfoComponent() {
     beforeChange: (oldIndex, newIndex) => {
       setCurrentSlide(newIndex);
     },
-  };
-
-  const onCopyClick = () => {
-    setTimeout(() => {
-      notification.success({
-        message: `Recovery Phrase Copied!`,
-        description: `Recovery Phrase is successfully copied to your clipboard`,
-        placement: 'topRight',
-        duration: 2,
-        key: 'copy',
-      });
-    }, 100);
   };
 
   useEffect(() => {
@@ -304,7 +288,6 @@ function MetaInfoComponent() {
       session.wallet.identifier,
     );
     setDecryptedPhrase(phraseDecrypted);
-    // setDecryptedPhraseArray(splitToChunks(phraseDecrypted.split(' '), perPage));
 
     setInputPasswordVisible(false);
     setIsExportRecoveryPhraseModalVisible(true);
@@ -358,6 +341,24 @@ function MetaInfoComponent() {
     );
   }
 
+  const onCopyClick = () => {
+    setTimeout(() => {
+      notification.success({
+        message: `Recovery Phrase Copied!`,
+        description: `Recovery Phrase is successfully copied to your clipboard`,
+        placement: 'topRight',
+        duration: 2,
+        key: 'copy',
+      });
+    }, 100);
+  };
+
+  const onExportRecoveryPhraseCancel = () => {
+    setIsExportRecoveryPhraseModalVisible(false);
+    setDecryptedPhrase('');
+    recoveryPhraseSlider?.goTo(0);
+  };
+
   return (
     <div>
       <div className="site-layout-background settings-content">
@@ -389,21 +390,27 @@ function MetaInfoComponent() {
             />{' '}
             {defaultGAStateDisabled ? 'Disabled' : 'Enabled'}
           </div>
-          <Divider />
-          <div className="item">
-            <div className="title">Export your Recovery Phrase</div>
-            <div className="description">
-              You are required to enter your App Password for this action.
-            </div>
-            <Button
-              type="primary"
-              onClick={() => {
-                showPasswordInput();
-              }}
-            >
-              Export
-            </Button>
-          </div>
+          {walletType !== LEDGER_WALLET_TYPE ? (
+            <>
+              <Divider />
+              <div className="item">
+                <div className="title">Export your Recovery Phrase</div>
+                <div className="description">
+                  You are required to enter your App Password for this action.
+                </div>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    showPasswordInput();
+                  }}
+                >
+                  Export
+                </Button>
+              </div>
+            </>
+          ) : (
+            <></>
+          )}
         </div>
       </div>
       <PasswordFormModal
@@ -420,7 +427,7 @@ function MetaInfoComponent() {
             errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
           };
         }}
-        successText="Wallet decrypted successfully !"
+        successText="Wallet decrypted successfully!"
         title="Provide app password"
         visible={inputPasswordVisible}
         successButtonText="Continue"
@@ -430,34 +437,15 @@ function MetaInfoComponent() {
       <ModalPopup
         className="export-recovery-phrase-modal"
         isModalVisible={isExportRecoveryPhraseModalVisible}
-        handleCancel={() => {
-          setIsExportRecoveryPhraseModalVisible(false);
-          recoveryPhraseSlider?.goTo(0);
-        }}
+        handleCancel={onExportRecoveryPhraseCancel}
         handleOk={() => setIsExportRecoveryPhraseModalVisible(false)}
-        // confirmationLoading={isButtonLoading}
-        // closable={!isButtonLoading}
         footer={[
           <CopyToClipboard key="copy" text={decryptedPhrase}>
-            <Button
-              type="primary"
-              onClick={() => {
-                onCopyClick();
-              }}
-            >
+            <Button type="primary" onClick={onCopyClick}>
               Copy
             </Button>
           </CopyToClipboard>,
-          <Button
-            key="back"
-            type="link"
-            onClick={() => {
-              setIsExportRecoveryPhraseModalVisible(false);
-              recoveryPhraseSlider?.goTo(0);
-            }}
-            // hidden={isConfirmClearVisible}
-            // disabled={isButtonDisabled}
-          >
+          <Button key="back" type="link" onClick={onExportRecoveryPhraseCancel}>
             Close
           </Button>,
         ]}
@@ -465,7 +453,6 @@ function MetaInfoComponent() {
         title="Your Recovery Phrases"
       >
         <>
-          {/* <div className="title"></div> */}
           <div className="description">
             Swipe to reveal all words. Write them down in the right order.
           </div>
@@ -502,6 +489,7 @@ function MetaInfoComponent() {
                   onClick={() => {
                     recoveryPhraseSlider?.goTo(Math.floor(index / Math.max(1, itemsPerPage)));
                   }}
+                  key={index + 1}
                 >
                   {index + 1}
                 </div>
@@ -624,7 +612,6 @@ const FormSettings = () => {
   };
 
   const onConfirmClear = () => {
-    // setIsConfirmationModalVisible(false);
     setIsButtonLoading(true);
     indexedDB.deleteDatabase('NeDB');
     setTimeout(() => {
@@ -706,12 +693,7 @@ const FormSettings = () => {
               >
                 Clear Storage
               </Button>,
-              <Button
-                key="back"
-                type="link"
-                onClick={handleCancelConfirmationModal}
-                // hidden={isConfirmClearVisible}
-              >
+              <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
                 Cancel
               </Button>,
             ]}
