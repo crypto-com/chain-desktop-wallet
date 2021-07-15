@@ -6,10 +6,22 @@
         "enabled": "Enabled",
         "disabled": "Disabled",
         "confirm": "Confirm",
+        "continue": "Continue",
         "cancel": "Cancel",
         "save": "Save",
         "discard": "Discard Changes",
-        "ok": "Ok"
+        "ok": "Ok",
+        "required": "is required",
+        "validator": "validator",
+        "receiving": "receiving",
+        "available": "Available",
+        "addressValidator": {
+          "reason1": "Invalid",
+          "reason2": "address provided"
+        },
+        "validTransactionAmountValidator": {
+          "reason": "Invalid sending amount"
+        }
       },
       "navbar": {
         "home": "Home",
@@ -57,6 +69,22 @@
       "home": {
         "welcome": "Welcome Back!"
       },
+      "send": {
+        "title": "Send",
+        "description": "Move funds from your transfer address to another transfer address or deposit stake to a staking address.\n",
+        "form1": {
+          "recipientAddress": {
+            "label": "Recipient Address",
+            "placeholder": "Enter recipient address"
+          },
+          "amount": {
+            "label": "Sending Amount",
+            "error1": "Sending Amount cannot be 0",
+            "error2": "Sending amount exceeds your available wallet balance",
+            "error3": "Sending amount is lower than minimum allowed of"
+          }
+        }
+      },
       "receive": {
         "title": "Receive",
         "description": "Receive funds by sharing the below wallet address.",
@@ -83,20 +111,16 @@
           },
           "indexingUrl": {
             "label": "Chain Indexing URL",
-            "error1": "Chain Indexing URL is required",
-            "error2": "Please enter a valid indexing url"
+            "error1": "Please enter a valid indexing url"
           },
           "chainId": {
-            "label": "Chain ID",
-            "error1": "Chain ID is required"
+            "label": "Chain ID"
           },
           "networkFee": {
-            "label": "Network Fee",
-            "error1": "Network Fee is required"
+            "label": "Network Fee"
           },
           "gasLimit": {
-            "label": "Gas Limit",
-            "error1": "Gas Limit is required"
+            "label": "Gas Limit"
           }
         },
         "language": {
@@ -136,10 +160,22 @@
         "enabled": "開啟",
         "disabled": "關閉",
         "confirm": "確認",
+        "continue": "繼續",
         "cancel": "取消",
         "save": "保存",
         "discard": "取消",
-        "ok": "Ok"
+        "ok": "Ok",
+        "required": "必須輸入",
+        "validator": "驗證節點",
+        "receiving": "接收",
+        "available": "可使用",
+        "addressValidator": {
+          "reason1": "無效的",
+          "reason2": "地址"
+        },
+        "validTransactionAmountValidator": {
+          "reason": "無效的轉帳款項"
+        }
       },
       "navbar": {
         "home": "主頁",
@@ -176,6 +212,16 @@
       },
       "home": {
         "welcome": "歡迎"
+      },
+      "send": {
+        "form1": {
+          "amount": {
+            "label": "轉帳款項",
+            "error1": "轉帳款項不能為 0",
+            "error2": "你的錢包沒有足夠的款項",
+            "error3": "你所輸入的轉帳款項少於最低可轉帳款項"
+          }
+        }
       },
       "receive": {
         "title": "接收",

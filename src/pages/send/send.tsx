@@ -3,6 +3,7 @@ import './send.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber, Layout } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { useTranslation } from 'react-i18next';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import {remote} from 'electron';
@@ -52,6 +53,8 @@ const FormSend = () => {
   const didMountRef = useRef(false);
 
   const analyticsService = new AnalyticsService(currentSession);
+
+  const [t] = useTranslation();
 
   useEffect(() => {
     if (!didMountRef.current) {
@@ -169,13 +172,13 @@ const FormSend = () => {
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
   const customMaxValidator = TransactionUtils.maxValidator(
     maximumSendAmount,
-    'Sending amount exceeds your available wallet balance',
+    t('send.form1.amount.error2'),
   );
   const customMinValidator = TransactionUtils.minValidator(
     fromScientificNotation(currentMinAssetAmount),
-    `Sending amount is lower than minimum allowed of ${fromScientificNotation(
-      currentMinAssetAmount,
-    )} ${walletAsset.symbol}`,
+    `${t('send.form1.amount.error3')} ${fromScientificNotation(currentMinAssetAmount)} ${
+      walletAsset.symbol
+    }`,
   );
 
   return (
@@ -192,27 +195,30 @@ const FormSend = () => {
 
       <Form.Item
         name="recipientAddress"
-        label="Recipient Address"
+        label={t('send.form1.recipientAddress.label')}
         hasFeedback
         validateFirst
         rules={[
-          { required: true, message: 'Recipient address is required' },
+          {
+            required: true,
+            message: `${t('send.form1.recipientAddress.label')} ${t('general.required')}`,
+          },
           customAddressValidator,
         ]}
       >
-        <Input placeholder="Enter recipient address" />
+        <Input placeholder={t('send.form1.recipientAddress.placeholder')} />
       </Form.Item>
       <div className="amount">
         <Form.Item
           name="amount"
-          label="Sending Amount"
+          label={t('send.form1.amount.label')}
           hasFeedback
           validateFirst
           rules={[
-            { required: true, message: 'Sending amount is required' },
+            { required: true, message: `${t('send.form1.amount.label')} ${t('general.required')}` },
             {
               pattern: /[^0]+/,
-              message: 'Sending amount cannot be 0',
+              message: `${t('send.form1.amount.label')} ${t('general.required')}`,
             },
             customAmountValidator,
             customMaxValidator,
@@ -222,7 +228,7 @@ const FormSend = () => {
           <InputNumber />
         </Form.Item>
         <div className="available">
-          <span>Available: </span>
+          <span>{t('general.available')}: </span>
           <div className="available-amount">
             {scaleUpBalance} {walletAsset.symbol}
           </div>
@@ -240,7 +246,7 @@ const FormSend = () => {
           confirmationLoading={confirmLoading}
           button={
             <Button type="primary" htmlType="submit">
-              Continue
+              {t('general.continue')}
             </Button>
           }
           okText="Confirm"
@@ -251,10 +257,10 @@ const FormSend = () => {
               loading={confirmLoading}
               onClick={onConfirmTransfer}
             >
-              Confirm
+              {t('general.confirm')}
             </Button>,
             <Button key="back" type="link" onClick={handleCancel}>
-              Cancel
+              {t('general.cancel')}
             </Button>,
           ]}
         >
@@ -373,14 +379,13 @@ const FormSend = () => {
   );
 };
 
-function SendPage() {
+const SendPage = () => {
+  const [t] = useTranslation();
+
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">Send</Header>
-      <div className="header-description">
-        Move funds from your transfer address to another transfer address or deposit stake to a
-        staking address.
-      </div>
+      <Header className="site-layout-background">{t('send.title')}</Header>
+      <div className="header-description">{t('send.description')}</div>
       <Content>
         <div className="site-layout-background send-content">
           <div className="container">
@@ -391,6 +396,6 @@ function SendPage() {
       <Footer />
     </Layout>
   );
-}
+};
 
 export default SendPage;

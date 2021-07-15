@@ -112,6 +112,7 @@ const GeneralSettingsForm = () => {
         rules={[
           {
             required: true,
+            message: `${t('settings.form1.nodeUrl.label')} ${t('general.required')}`,
           },
           {
             pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
@@ -126,10 +127,13 @@ const GeneralSettingsForm = () => {
         label={t('settings.form1.indexingUrl.label')}
         hasFeedback
         rules={[
-          { required: true, message: t('settings.form1.indexingUrl.error1') },
+          {
+            required: true,
+            message: `${t('settings.form1.indexingUrl.label')} ${t('general.required')}`,
+          },
           {
             pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
-            message: t('settings.form1.indexingUrl.error2'),
+            message: t('settings.form1.indexingUrl.error1'),
           },
         ]}
       >
@@ -142,7 +146,7 @@ const GeneralSettingsForm = () => {
         rules={[
           {
             required: true,
-            message: t('settings.form1.chainId.error1'),
+            message: `${t('settings.form1.chainId.label')} ${t('general.required')}`,
           },
         ]}
       >
@@ -156,7 +160,7 @@ const GeneralSettingsForm = () => {
           rules={[
             {
               required: true,
-              message: t('settings.form1.networkFee.error1'),
+              message: `${t('settings.form1.networkFee.label')} ${t('general.required')}`,
             },
           ]}
         >
@@ -169,7 +173,7 @@ const GeneralSettingsForm = () => {
           rules={[
             {
               required: true,
-              message: t('settings.form1.gasLimit.error1'),
+              message: `${t('settings.form1.gasLimit.label')} ${t('general.required')}`,
             },
           ]}
         >
