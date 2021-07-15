@@ -391,6 +391,7 @@ function MetaInfoComponent() {
               You are required to enter your App Password for this action.
             </div>
             <Button
+              type="primary"
               onClick={() => {
                 showPasswordInput();
               }}
@@ -432,7 +433,7 @@ function MetaInfoComponent() {
         // confirmationLoading={isButtonLoading}
         // closable={!isButtonLoading}
         footer={[
-          <CopyToClipboard text={decryptedPhrase}>
+          <CopyToClipboard key="copy" text={decryptedPhrase}>
             <Button
               type="primary"
               onClick={() => {
@@ -451,8 +452,6 @@ function MetaInfoComponent() {
             }}
             // hidden={isConfirmClearVisible}
             // disabled={isButtonDisabled}
-
-            danger
           >
             Close
           </Button>,
