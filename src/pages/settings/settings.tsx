@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, CSSProperties } from 'react';
 import { useHistory } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
@@ -15,10 +15,14 @@ import {
   message,
   Switch,
   Divider,
+  Carousel,
 } from 'antd';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useRecoilState, useSetRecoilState } from 'recoil';
+import { CarouselRef } from 'antd/lib/carousel';
 import { sessionState, walletListState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
+import { secretStoreService } from '../../storage/SecretStoreService';
 import {
   DisableDefaultMemoSettings,
   DisableGASettings,
@@ -27,9 +31,11 @@ import {
 } from '../../models/Wallet';
 import { Session } from '../../models/Session';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import { splitToChunks } from '../../utils/utils';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -182,6 +188,14 @@ function MetaInfoComponent() {
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
 
+  const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [decryptedPhraseArray, setDecryptedPhraseArray] = useState<string[][]>([[]]);
+  const [isExportSeedModalVisible, setIsExportSeedModalVisible] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // const [seedSlider, setSeedSlider] = useState<CarouselRef | null>(null);
+
   const didMountRef = useRef(false);
 
   useEffect(() => {
@@ -210,6 +224,30 @@ function MetaInfoComponent() {
     defaultGAStateDisabled,
     setDefaultGAStateDisabled,
   ]);
+
+  const showPasswordInput = () => {
+    // if (decryptedPhrase) {
+    // showConfirmationModal();
+    // } else {
+    // console.log(decryptedPhrase)
+    setInputPasswordVisible(true);
+    // }
+  };
+
+  const onWalletDecryptFinish = async (password: string) => {
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      session.wallet.identifier,
+    );
+    setDecryptedPhrase(phraseDecrypted);
+    setDecryptedPhraseArray(splitToChunks(phraseDecrypted.split(' '), 3));
+    console.log(decryptedPhraseArray);
+    console.log(splitToChunks(phraseDecrypted.split(' '), 3));
+
+    setInputPasswordVisible(false);
+    // showConfirmationModal();
+    setIsExportSeedModalVisible(true);
+  };
 
   async function onAllowDefaultMemoChange() {
     setUpdateLoading(true);
@@ -259,6 +297,59 @@ function MetaInfoComponent() {
     );
   }
 
+  const contentStyle: CSSProperties = {
+    height: '160px',
+    color: '#fff',
+    lineHeight: '160px',
+    textAlign: 'center',
+    background: '#364d79',
+  };
+
+  const SampleNextArrow = props => {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          color: 'black',
+          fontSize: '15px',
+          lineHeight: '1.5715',
+        }}
+        onClick={onClick}
+      >
+        <RightOutlined />
+      </div>
+    );
+  };
+
+  const SamplePrevArrow = props => {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          color: 'black',
+          fontSize: '15px',
+          lineHeight: '1.5715',
+        }}
+        onClick={onClick}
+      >
+        <LeftOutlined />
+      </div>
+    );
+  };
+
+  const settings = {
+    nextArrow: <SampleNextArrow />,
+    prevArrow: <SamplePrevArrow />,
+    infinite: false,
+    initialSlide: 0,
+  };
+
+  let seedSlider: CarouselRef | null = null;
+
   return (
     <div>
       <div className="site-layout-background settings-content">
@@ -290,8 +381,101 @@ function MetaInfoComponent() {
             />{' '}
             {defaultGAStateDisabled ? 'Disabled' : 'Enabled'}
           </div>
+          <Divider />
+          <div className="item">
+            <div className="title">Export your recovery phrase</div>
+            <div className="description">
+              You are required to enter your App Password for this action.
+            </div>
+            <Button
+              onClick={() => {
+                showPasswordInput();
+              }}
+            >
+              Export
+            </Button>
+          </div>
         </div>
       </div>
+      <PasswordFormModal
+        description="Input the app password decrypt wallet"
+        okButtonText="Decrypt wallet"
+        onCancel={() => {
+          setInputPasswordVisible(false);
+        }}
+        onSuccess={onWalletDecryptFinish}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          return {
+            valid: isValid,
+            errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+          };
+        }}
+        successText="Wallet decrypted successfully !"
+        title="Provide app password"
+        visible={inputPasswordVisible}
+        successButtonText="Continue"
+        confirmPassword={false}
+        repeatValidation
+      />
+      <ModalPopup
+        className="export-seed-modal"
+        isModalVisible={isExportSeedModalVisible}
+        handleCancel={() => {
+          setIsExportSeedModalVisible(false);
+          seedSlider?.goTo(0);
+        }}
+        handleOk={() => setIsExportSeedModalVisible(false)}
+        // confirmationLoading={isButtonLoading}
+        // closable={!isButtonLoading}
+        footer={[
+          <Button
+            key="submit"
+            type="primary"
+            onClick={() => {
+              setIsExportSeedModalVisible(false);
+              seedSlider?.goTo(0);
+            }}
+            // hidden={isConfirmClearVisible}
+            // disabled={isButtonDisabled}
+            danger
+          >
+            Close
+          </Button>,
+        ]}
+        okText="Confirm"
+        title="Your Recovery Phrases"
+      >
+        <>
+          {/* <div className="title"></div> */}
+          <div className="description">
+            Swipe to reveal all words. Write them down in the right order.
+          </div>
+          <Carousel
+            arrows
+            {...settings}
+            style={{ width: '300px', margin: 'auto' }}
+            ref={slider => {
+              seedSlider = slider;
+            }}
+          >
+            {decryptedPhraseArray.map((array, arrayIndex) => {
+              return (
+                <div className="phrase" key={arrayIndex} style={contentStyle}>
+                  {array.map((item, itemIndex) => {
+                    return (
+                      <div>
+                        <span>{itemIndex + 1 + arrayIndex * 3}. </span>
+                        {item}{' '}
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </Carousel>
+        </>
+      </ModalPopup>
     </div>
   );
 }
