@@ -49,3 +49,36 @@
     }
   }
 }
+
+.export-recovery-phrase-modal {
+  width: 600px !important;
+  .recovery-phrase-slider {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 450px;
+    height: 120px;
+    margin: auto;
+    .page {
+      > div {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-evenly;
+      }
+      .phrase {
+        width: 140px;
+        margin: 7px 14px;
+        padding: 7px;
+        text-align: center;
+        border-bottom: 2px solid rgba(128, 128, 128, 0.1);
+        span {
+          color: @font-color;
+          opacity: 0.5;
+        }
+      }
+    }
+    .slick-dots.slick-dots-bottom {
+      display: none !important;
+    }
+  }
+}

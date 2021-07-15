@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, CSSProperties } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
@@ -16,10 +16,13 @@ import {
   Switch,
   Divider,
   Carousel,
+  notification,
 } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { CarouselRef } from 'antd/lib/carousel';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+
 import { sessionState, walletListState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
@@ -35,7 +38,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
-import { splitToChunks } from '../../utils/utils';
+// import { splitToChunks } from '../../utils/utils';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -189,14 +192,75 @@ function MetaInfoComponent() {
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
 
   const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [decryptedPhrase, setDecryptedPhrase] = useState('');
-  const [decryptedPhraseArray, setDecryptedPhraseArray] = useState<string[][]>([[]]);
-  const [isExportSeedModalVisible, setIsExportSeedModalVisible] = useState<boolean>(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // const [seedSlider, setSeedSlider] = useState<CarouselRef | null>(null);
+  const [decryptedPhrase, setDecryptedPhrase] = useState<string>();
+  // const [decryptedPhraseArray, setDecryptedPhraseArray] = useState<string[][]>([[]]);
+  const [isExportRecoveryPhraseModalVisible, setIsExportRecoveryPhraseModalVisible] = useState<
+    boolean
+  >(false);
 
   const didMountRef = useRef(false);
+
+  // Slider related
+  let recoveryPhraseSlider: CarouselRef | null = null;
+
+  const NextArrow = props => {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          color: 'black',
+          fontSize: '15px',
+          lineHeight: '1.5715',
+        }}
+        onClick={onClick}
+      >
+        <RightOutlined />
+      </div>
+    );
+  };
+
+  const PrevArrow = props => {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          color: 'black',
+          fontSize: '15px',
+          lineHeight: '1.5715',
+        }}
+        onClick={onClick}
+      >
+        <LeftOutlined />
+      </div>
+    );
+  };
+
+  // const perPage = 1;
+
+  const sliderSettings = {
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
+    infinite: false,
+    initialSlide: 0,
+    slidesPerRow: 3,
+    variableWidth: false,
+  };
+
+  const onCopyClick = () => {
+    setTimeout(() => {
+      notification.success({
+        message: `Recovery Phrase Copied!`,
+        description: `Recovery Phrase is successfully copied to your clipboard`,
+        placement: 'topRight',
+        duration: 2,
+        key: 'copy',
+      });
+    }, 100);
+  };
 
   useEffect(() => {
     let unmounted = false;
@@ -226,12 +290,7 @@ function MetaInfoComponent() {
   ]);
 
   const showPasswordInput = () => {
-    // if (decryptedPhrase) {
-    // showConfirmationModal();
-    // } else {
-    // console.log(decryptedPhrase)
     setInputPasswordVisible(true);
-    // }
   };
 
   const onWalletDecryptFinish = async (password: string) => {
@@ -240,13 +299,10 @@ function MetaInfoComponent() {
       session.wallet.identifier,
     );
     setDecryptedPhrase(phraseDecrypted);
-    setDecryptedPhraseArray(splitToChunks(phraseDecrypted.split(' '), 3));
-    console.log(decryptedPhraseArray);
-    console.log(splitToChunks(phraseDecrypted.split(' '), 3));
+    // setDecryptedPhraseArray(splitToChunks(phraseDecrypted.split(' '), perPage));
 
     setInputPasswordVisible(false);
-    // showConfirmationModal();
-    setIsExportSeedModalVisible(true);
+    setIsExportRecoveryPhraseModalVisible(true);
   };
 
   async function onAllowDefaultMemoChange() {
@@ -296,59 +352,6 @@ function MetaInfoComponent() {
       `Analytics settings has been ${newState ? 'disabled' : 'enabled'} successfully`,
     );
   }
-
-  const contentStyle: CSSProperties = {
-    height: '160px',
-    color: '#fff',
-    lineHeight: '160px',
-    textAlign: 'center',
-    background: '#364d79',
-  };
-
-  const SampleNextArrow = props => {
-    const { className, style, onClick } = props;
-    return (
-      <div
-        className={className}
-        style={{
-          ...style,
-          color: 'black',
-          fontSize: '15px',
-          lineHeight: '1.5715',
-        }}
-        onClick={onClick}
-      >
-        <RightOutlined />
-      </div>
-    );
-  };
-
-  const SamplePrevArrow = props => {
-    const { className, style, onClick } = props;
-    return (
-      <div
-        className={className}
-        style={{
-          ...style,
-          color: 'black',
-          fontSize: '15px',
-          lineHeight: '1.5715',
-        }}
-        onClick={onClick}
-      >
-        <LeftOutlined />
-      </div>
-    );
-  };
-
-  const settings = {
-    nextArrow: <SampleNextArrow />,
-    prevArrow: <SamplePrevArrow />,
-    infinite: false,
-    initialSlide: 0,
-  };
-
-  let seedSlider: CarouselRef | null = null;
 
   return (
     <div>
@@ -419,25 +422,36 @@ function MetaInfoComponent() {
         repeatValidation
       />
       <ModalPopup
-        className="export-seed-modal"
-        isModalVisible={isExportSeedModalVisible}
+        className="export-recovery-phrase-modal"
+        isModalVisible={isExportRecoveryPhraseModalVisible}
         handleCancel={() => {
-          setIsExportSeedModalVisible(false);
-          seedSlider?.goTo(0);
+          setIsExportRecoveryPhraseModalVisible(false);
+          recoveryPhraseSlider?.goTo(0);
         }}
-        handleOk={() => setIsExportSeedModalVisible(false)}
+        handleOk={() => setIsExportRecoveryPhraseModalVisible(false)}
         // confirmationLoading={isButtonLoading}
         // closable={!isButtonLoading}
         footer={[
+          <CopyToClipboard text={decryptedPhrase}>
+            <Button
+              type="primary"
+              onClick={() => {
+                onCopyClick();
+              }}
+            >
+              Copy
+            </Button>
+          </CopyToClipboard>,
           <Button
-            key="submit"
-            type="primary"
+            key="back"
+            type="link"
             onClick={() => {
-              setIsExportSeedModalVisible(false);
-              seedSlider?.goTo(0);
+              setIsExportRecoveryPhraseModalVisible(false);
+              recoveryPhraseSlider?.goTo(0);
             }}
             // hidden={isConfirmClearVisible}
             // disabled={isButtonDisabled}
+
             danger
           >
             Close
@@ -451,29 +465,36 @@ function MetaInfoComponent() {
           <div className="description">
             Swipe to reveal all words. Write them down in the right order.
           </div>
-          <Carousel
-            arrows
-            {...settings}
-            style={{ width: '300px', margin: 'auto' }}
-            ref={slider => {
-              seedSlider = slider;
-            }}
-          >
-            {decryptedPhraseArray.map((array, arrayIndex) => {
-              return (
-                <div className="phrase" key={arrayIndex} style={contentStyle}>
-                  {array.map((item, itemIndex) => {
-                    return (
-                      <div>
-                        <span>{itemIndex + 1 + arrayIndex * 3}. </span>
+          <div className="item">
+            <Carousel
+              className="recovery-phrase-slider"
+              arrows
+              {...sliderSettings}
+              ref={slider => {
+                recoveryPhraseSlider = slider;
+              }}
+            >
+              {decryptedPhrase?.split(' ').map((item, index) => {
+                return (
+                  <div className="page" key={index}>
+                    <div>
+                      <div className="phrase">
+                        <span>{index + 1}. </span>
                         {item}{' '}
                       </div>
-                    );
-                  })}
-                </div>
-              );
-            })}
-          </Carousel>
+                    </div>
+                  </div>
+                );
+              })}
+            </Carousel>
+          </div>
+          <div className="item">
+            <Alert
+              type="warning"
+              message="Protect your funds and do not share your recovery phrase with anyone."
+              showIcon
+            />
+          </div>
         </>
       </ModalPopup>
     </div>
