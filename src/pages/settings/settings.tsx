@@ -380,7 +380,7 @@ function MetaInfoComponent() {
             <div className="title">Data Analytics</div>
             <div className="description">
               The data collected for analytics is used to prioritize development for new features
-              and functionalities and also to improve implemented features
+              and functionalities and also to improve implemented features.
             </div>
             <Switch
               checked={!defaultGAStateDisabled}
@@ -391,7 +391,7 @@ function MetaInfoComponent() {
           </div>
           <Divider />
           <div className="item">
-            <div className="title">Export your recovery phrase</div>
+            <div className="title">Export your Recovery Phrase</div>
             <div className="description">
               You are required to enter your App Password for this action.
             </div>
