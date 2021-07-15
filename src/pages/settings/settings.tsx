@@ -197,11 +197,13 @@ function MetaInfoComponent() {
   const [isExportRecoveryPhraseModalVisible, setIsExportRecoveryPhraseModalVisible] = useState<
     boolean
   >(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const didMountRef = useRef(false);
 
   // Slider related
   let recoveryPhraseSlider: CarouselRef | null = null;
+  const itemsPerPage = 3;
 
   const NextArrow = props => {
     const { className, style, onClick } = props;
@@ -246,8 +248,11 @@ function MetaInfoComponent() {
     prevArrow: <PrevArrow />,
     infinite: false,
     initialSlide: 0,
-    slidesPerRow: 3,
+    slidesPerRow: itemsPerPage,
     variableWidth: false,
+    beforeChange: (oldIndex, newIndex) => {
+      setCurrentSlide(newIndex);
+    },
   };
 
   const onCopyClick = () => {
@@ -479,13 +484,29 @@ function MetaInfoComponent() {
                     <div>
                       <div className="phrase">
                         <span>{index + 1}. </span>
-                        {item}{' '}
+                        {item}
                       </div>
                     </div>
                   </div>
                 );
               })}
             </Carousel>
+          </div>
+          <div className="item phrase-block-container">
+            {decryptedPhrase?.split(' ').map((item, index) => {
+              const isCurrent =
+                index >= currentSlide * itemsPerPage && index < (currentSlide + 1) * itemsPerPage;
+              return (
+                <div
+                  className={`phrase-block ${isCurrent ? 'current' : ''}`}
+                  onClick={() => {
+                    recoveryPhraseSlider?.goTo(Math.floor(index / Math.max(1, itemsPerPage)));
+                  }}
+                >
+                  {index + 1}
+                </div>
+              );
+            })}
           </div>
           <div className="item">
             <Alert
