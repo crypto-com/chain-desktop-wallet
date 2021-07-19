@@ -19,6 +19,8 @@
         "action": "Action",
         "select": "Select",
         "review": "Review",
+        "copy": "Copy",
+        "close": "Close",
         "addressValidator": {
           "reason1": "Invalid",
           "reason2": "address provided"
@@ -224,6 +226,11 @@
             "label": "Gas Limit"
           }
         },
+        "message": {
+          "success1": "Wallet settings updated successfully",
+          "success2": "on all",
+          "success3": "wallets"
+        },
         "language": {
           "title": "Language"
         },
@@ -234,6 +241,16 @@
         "dataAnalytics": {
           "title": "Data Analytics",
           "description": "The data collected for analytics is used to prioritize development for new features and functionalities and also to improve implemented features."
+        },
+        "exportRecoveryPhrase": {
+          "title": "Export your Recovery Phrase",
+          "description": "You are required to enter your App Password for this action.",
+          "button": "Export",
+          "modal1": {
+            "title": "Your Recovery Phrases",
+            "description": "Swipe to reveal all words. Write them down in the right order.",
+            "warning": "Protect your funds and do not share your recovery phrase with anyone."
+          }
         },
         "clearStorage": {
           "description": "Once you clear the storage, you will lose access to all you wallets. The only way to regain wallet access is by restoring wallet mnemonic phrase.",
@@ -273,6 +290,8 @@
         "available": "可使用",
         "action": "操作",
         "select": "選擇",
+        "copy": "複製",
+        "close": "關閉",
         "addressValidator": {
           "reason1": "無效的",
           "reason2": "地址"
@@ -345,6 +364,7 @@
       "settings": {
         "title": "設定",
         "tab1": "節點配置",
+        "tab2": "一般配置",
         "tab3": "重置",
         "form1": {
           "nodeUrl": {
@@ -357,6 +377,11 @@
             "label": "Gas 費用"
           }
         },
+        "message": {
+          "success1": "已成功更新錢包設定",
+          "success2": "所有",
+          "success3": "錢包"
+        },
         "language": {
           "title": "語言"
         },
@@ -365,6 +390,14 @@
         },
         "dataAnalytics": {
           "title": "資料分析"
+        },
+        "exportRecoveryPhrase": {
+          "title": "導出助記詞",
+          "description": "你需要輸入你的密碼來進行這操作。",
+          "button": "導出",
+          "modal1": {
+            "title": "你的助記詞"
+          }
         },
         "clearStorage": {
           "button1": "重置",
