@@ -428,17 +428,15 @@ function MetaInfoComponent() {
             <>
               <Divider />
               <div className="item">
-                <div className="title">Export your Recovery Phrase</div>
-                <div className="description">
-                  You are required to enter your App Password for this action.
-                </div>
+                <div className="title">{t('settings.exportRecoveryPhrase.title')}</div>
+                <div className="description">{t('settings.exportRecoveryPhrase.description')}</div>
                 <Button
                   type="primary"
                   onClick={() => {
                     showPasswordInput();
                   }}
                 >
-                  Export
+                  {t('settings.exportRecoveryPhrase.button')}
                 </Button>
               </div>
             </>
@@ -448,8 +446,8 @@ function MetaInfoComponent() {
         </div>
       </div>
       <PasswordFormModal
-        description="Input the app password decrypt wallet"
-        okButtonText="Decrypt wallet"
+        description={t('general.passwordFormModal.description')}
+        okButtonText={t('general.passwordFormModal.okButton')}
         onCancel={() => {
           setInputPasswordVisible(false);
         }}
@@ -458,13 +456,13 @@ function MetaInfoComponent() {
           const isValid = await secretStoreService.checkIfPasswordIsValid(password);
           return {
             valid: isValid,
-            errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
           };
         }}
-        successText="Wallet decrypted successfully!"
-        title="Provide app password"
+        successText={t('general.passwordFormModal.success')}
+        title={t('general.passwordFormModal.title')}
         visible={inputPasswordVisible}
-        successButtonText="Continue"
+        successButtonText={t('general.continue')}
         confirmPassword={false}
         repeatValidation
       />
@@ -476,20 +474,18 @@ function MetaInfoComponent() {
         footer={[
           <CopyToClipboard key="copy" text={decryptedPhrase}>
             <Button type="primary" onClick={onCopyClick}>
-              Copy
+              {t('general.copy')}
             </Button>
           </CopyToClipboard>,
           <Button key="back" type="link" onClick={onExportRecoveryPhraseCancel}>
-            Close
+            {t('general.close')}
           </Button>,
         ]}
-        okText="Confirm"
-        title="Your Recovery Phrases"
+        okText={t('general.confirm')}
+        title={t('settings.exportRecoveryPhrase.modal1.title')}
       >
         <>
-          <div className="description">
-            Swipe to reveal all words. Write them down in the right order.
-          </div>
+          <div className="description">{t('settings.exportRecoveryPhrase.modal1.description')}</div>
           <div className="item">
             <Carousel
               className="recovery-phrase-slider"
@@ -533,7 +529,7 @@ function MetaInfoComponent() {
           <div className="item">
             <Alert
               type="warning"
-              message="Protect your funds and do not share your recovery phrase with anyone."
+              message={t('settings.exportRecoveryPhrase.modal1.warning')}
               showIcon
             />
           </div>
@@ -620,9 +616,11 @@ const FormSettings = () => {
 
     setIsButtonLoading(false);
     message.success(
-      `Wallet settings updated successfully ${
+      `${t('settings.message.success1')} ${
         session.wallet.config.enableGeneralSettings
-          ? `on all ${session.wallet.config.name} wallets`
+          ? `(${t('settings.message.success2')} ${session.wallet.config.name} ${t(
+              'settings.message.success3',
+            )})`
           : ''
       }`,
     );
