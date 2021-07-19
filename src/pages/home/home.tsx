@@ -489,8 +489,10 @@ function HomePage() {
     setTimeout(async () => {
       if (isWalletNotLive(config) && !hasShownNotLiveWallet) {
         notification.warning({
-          message: `Wallet Info`,
-          description: `The wallet created will be limited only to display address because its ${config.name} configuration is not live yet`,
+          message: t('home.notification.walletInfo1'),
+          description: `${t('home.notification.walletInfo2')} ${config.name} ${t(
+            'home.notification.walletInfo3',
+          )}`,
           placement: 'topRight',
           duration: 0,
         });
@@ -556,8 +558,8 @@ function HomePage() {
       const newVersionNotificationKey = `open-update_available`;
 
       notification.info({
-        message: 'Update Available',
-        description: 'A new update is available. Downloading now...',
+        message: t('home.notification.updateAvailable1'),
+        description: t('home.notification.updateAvailable2'),
         duration: 10,
         key: newVersionNotificationKey,
         placement: 'topRight',
@@ -582,13 +584,13 @@ function HomePage() {
           }}
           style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
         >
-          Restart Now
+          {t('home.notification.downloadComplete3')}
         </Button>
       );
 
       notification.success({
-        message: 'Download Complete',
-        description: 'Update downloaded successfully. It will be installed on restart.',
+        message: t('home.notification.downloadComplete1'),
+        description: t('home.notification.downloadComplete2'),
         duration: 20,
         key: newVersionNotificationKey,
         placement: 'topRight',

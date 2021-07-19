@@ -157,6 +157,16 @@
             "recipientAddress": "Recipient",
             "time": "Time"
           }
+        },
+        "notification": {
+          "walletInfo1": "Wallet Info",
+          "walletInfo2": "The wallet created will be limited only to display address because its",
+          "walletInfo3": "configuration is not live yet",
+          "updateAvailable1": "Update Available",
+          "updateAvailable2": "A new update is available. Downloading now...",
+          "downloadComplete1": "Download Complete",
+          "downloadComplete2": "Update downloaded successfully. It will be installed on restart.",
+          "downloadComplete3": "Restart Now"
         }
       },
       "send": {
@@ -288,7 +298,7 @@
             "description2": "wallets"
           }
         },
-        "message": {
+        "notification": {
           "success1": "Wallet settings updated successfully",
           "success2": "on all",
           "success3": "wallets",
@@ -448,7 +458,7 @@
             "description2": "錢包"
           }
         },
-        "message": {
+        "notification": {
           "success1": "已成功更新錢包設定",
           "success2": "所有",
           "success3": "錢包"

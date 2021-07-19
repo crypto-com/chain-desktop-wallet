@@ -106,7 +106,7 @@ const GeneralSettingsForm = () => {
 
     setSession(newSession);
     message.success(
-      `${t('settings.message.generalSettings1')} ${
+      `${t('settings.notification.generalSettings1')} ${
         newState ? t('general.enabled') : t('general.disabled')
       }`,
     );
@@ -345,7 +345,7 @@ function MetaInfoComponent() {
     setSession(newSession);
     setUpdateLoading(false);
     message.success(
-      `${t('settings.message.defaultMemo1')} ${
+      `${t('settings.notification.defaultMemo1')} ${
         newState ? t('general.disabled') : t('general.enabled')
       }`,
     );
@@ -371,7 +371,7 @@ function MetaInfoComponent() {
     setSession(newSession);
     setUpdateLoading(false);
     message.success(
-      `${t('settings.message.analytics1')} ${
+      `${t('settings.notification.analytics1')} ${
         newState ? t('general.disabled') : t('general.enabled')
       }`,
     );
@@ -380,8 +380,8 @@ function MetaInfoComponent() {
   const onCopyClick = () => {
     setTimeout(() => {
       notification.success({
-        message: t('settings.message.recover1'),
-        description: t('settings.message.recover2'),
+        message: t('settings.notification.recover1'),
+        description: t('settings.notification.recover2'),
         placement: 'topRight',
         duration: 2,
         key: 'copy',
@@ -623,10 +623,10 @@ const FormSettings = () => {
 
     setIsButtonLoading(false);
     message.success(
-      `${t('settings.message.success1')} ${
+      `${t('settings.notification.success1')} ${
         session.wallet.config.enableGeneralSettings
-          ? `(${t('settings.message.success2')} ${session.wallet.config.name} ${t(
-              'settings.message.success3',
+          ? `(${t('settings.notification.success2')} ${session.wallet.config.name} ${t(
+              'settings.notification.success3',
             )})`
           : ''
       }`,
