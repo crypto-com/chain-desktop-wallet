@@ -54,6 +54,9 @@
           },
           "redelegation": {
             "description": "Your redelegation transaction was successful"
+          },
+          "vote": {
+            "description": "Your vote was broadcasted successfully!"
           }
         },
         "errorModalPopup": {
@@ -72,6 +75,9 @@
           },
           "redelegation": {
             "description": "The redelegation transaction failed. Please try again later."
+          },
+          "vote": {
+            "description": "The vote transaction failed. Please try again later."
           },
           "ledgerExportMode": "Please ensure that your have enabled Expert mode on your ledger device."
         }
@@ -267,6 +273,32 @@
           "label1": "Sender Address",
           "label2": "Withdraw Reward From Validator",
           "label3": "Rewards"
+        }
+      },
+      "governance": {
+        "title": "Governance",
+        "description": "You may see all proposals and cast your votes here.",
+        "tab1": "All",
+        "tab2": "Voting",
+        "tab3": "Passed",
+        "tab4": "Failed",
+        "tab5": "Rejected",
+        "voteOption": {
+          "yes": "Support",
+          "no": "Do not Support",
+          "noWithVeto": "Do not Support with Veto",
+          "abstain": "Undecided"
+        },
+        "backToList": "Back to Proposal List",
+        "start": "Start",
+        "end": "End",
+        "sendVote": "Send Vote",
+        "modal1": {
+          "title": "Confirm Vote Transaction",
+          "description": "Please review the below information. ",
+          "label1": "Sender Address",
+          "label2": "Vote to Proposal",
+          "label3": "Vote"
         }
       },
       "settings": {
