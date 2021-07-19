@@ -4,6 +4,7 @@ import 'antd/dist/antd.css';
 import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
 import { OrderedListOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { useTranslation } from 'react-i18next';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import Big from 'big.js';
 import numeral from 'numeral';
@@ -84,6 +85,8 @@ const FormDelegationRequest = () => {
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
 
   const analyticsService = new AnalyticsService(currentSession);
+
+  const [t] = useTranslation();
 
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
     if (validatorList) {
@@ -465,8 +468,8 @@ const FormDelegationRequest = () => {
           </>
         </ModalPopup>
         <PasswordFormModal
-          description="Input the app password decrypt wallet"
-          okButtonText="Decrypt wallet"
+          description={t('general.passwordFormModal.description')}
+          okButtonText={t('general.passwordFormModal.okButton')}
           onCancel={() => {
             setInputPasswordVisible(false);
           }}
@@ -475,13 +478,13 @@ const FormDelegationRequest = () => {
             const isValid = await secretStoreService.checkIfPasswordIsValid(password);
             return {
               valid: isValid,
-              errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+              errMsg: !isValid ? t('general.passwordFormModal.error') : '',
             };
           }}
-          successText="Wallet decrypted successfully !"
-          title="Provide app password"
+          successText={t('general.passwordFormModal.success')}
+          title={t('general.passwordFormModal.title')}
           visible={inputPasswordVisible}
-          successButtonText="Continue"
+          successButtonText={t('general.continue')}
           confirmPassword={false}
         />
         <SuccessModalPopup
@@ -855,6 +858,8 @@ const StakingPage = () => {
   const analyticsService = new AnalyticsService(currentSession);
   const didMountRef = useRef(false);
 
+  const [t] = useTranslation();
+
   useEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true;
@@ -864,22 +869,22 @@ const StakingPage = () => {
 
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">Staking</Header>
+      <Header className="site-layout-background">{t('staking.title')}</Header>
 
       <Content>
         <Tabs defaultActiveKey="1">
-          <TabPane tab="Staking Rewards" key="1">
+          <TabPane tab={t('staking.tab1')} key="1">
             <div className="site-layout-background stake-content">
               <div className="container">
-                <div className="description">Withdraw rewards from delegated funds.</div>
+                <div className="description">{t('staking.description1')}</div>
                 <FormWithdrawStakingReward />
               </div>
             </div>
           </TabPane>
-          <TabPane tab="Delegate Funds" key="2">
+          <TabPane tab={t('staking.tab2')} key="2">
             <div className="site-layout-background stake-content">
               <div className="container">
-                <div className="description">Delegate funds to validator.</div>
+                <div className="description">{t('staking.description2')}</div>
                 <FormDelegationRequest />
               </div>
             </div>
