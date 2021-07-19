@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   Button,
   Form,
@@ -16,11 +15,18 @@ import {
   Switch,
   Divider,
   Select,
+  Carousel,
+  notification,
 } from 'antd';
+import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
+import { CarouselRef } from 'antd/lib/carousel';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
+
 import { sessionState, walletListState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
+import { secretStoreService } from '../../storage/SecretStoreService';
 import {
   DisableDefaultMemoSettings,
   DisableGASettings,
@@ -29,6 +35,7 @@ import {
 } from '../../models/Wallet';
 import { Session } from '../../models/Session';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
 import {
   DEFAULT_LANGUAGE_CODE,
@@ -36,6 +43,7 @@ import {
   FIXED_DEFAULT_FEE,
   FIXED_DEFAULT_GAS_LIMIT,
 } from '../../config/StaticConfig';
+import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 
@@ -196,13 +204,73 @@ const GeneralSettingsForm = () => {
 function MetaInfoComponent() {
   const [session, setSession] = useRecoilState(sessionState);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const { walletType } = session.wallet;
 
   const [defaultLanguageState, setDefaultLanguageState] = useState<string>(DEFAULT_LANGUAGE_CODE);
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
   const [t, i18n] = useTranslation();
 
+  const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
+  const [decryptedPhrase, setDecryptedPhrase] = useState<string>();
+  const [isExportRecoveryPhraseModalVisible, setIsExportRecoveryPhraseModalVisible] = useState<
+    boolean
+  >(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
   const didMountRef = useRef(false);
+
+  // Slider related
+  let recoveryPhraseSlider: CarouselRef | null = null;
+  const itemsPerPage = 3;
+
+  const NextArrow = props => {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          color: 'black',
+          fontSize: '15px',
+          lineHeight: '1.5715',
+        }}
+        onClick={onClick}
+      >
+        <RightOutlined />
+      </div>
+    );
+  };
+
+  const PrevArrow = props => {
+    const { className, style, onClick } = props;
+    return (
+      <div
+        className={className}
+        style={{
+          ...style,
+          color: 'black',
+          fontSize: '15px',
+          lineHeight: '1.5715',
+        }}
+        onClick={onClick}
+      >
+        <LeftOutlined />
+      </div>
+    );
+  };
+
+  const sliderSettings = {
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
+    infinite: false,
+    initialSlide: 0,
+    slidesPerRow: itemsPerPage,
+    variableWidth: false,
+    beforeChange: (oldIndex, newIndex) => {
+      setCurrentSlide(newIndex);
+    },
+  };
 
   useEffect(() => {
     let unmounted = false;
@@ -237,6 +305,21 @@ function MetaInfoComponent() {
     setDefaultLanguageState(value!.toString());
     i18n.changeLanguage(value!.toString());
     generalConfigService.setLanguage(value!.toString());
+  };
+
+  const showPasswordInput = () => {
+    setInputPasswordVisible(true);
+  };
+
+  const onWalletDecryptFinish = async (password: string) => {
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      session.wallet.identifier,
+    );
+    setDecryptedPhrase(phraseDecrypted);
+
+    setInputPasswordVisible(false);
+    setIsExportRecoveryPhraseModalVisible(true);
   };
 
   async function onAllowDefaultMemoChange() {
@@ -287,6 +370,24 @@ function MetaInfoComponent() {
     );
   }
 
+  const onCopyClick = () => {
+    setTimeout(() => {
+      notification.success({
+        message: `Recovery Phrase Copied!`,
+        description: `Recovery Phrase is successfully copied to your clipboard`,
+        placement: 'topRight',
+        duration: 2,
+        key: 'copy',
+      });
+    }, 100);
+  };
+
+  const onExportRecoveryPhraseCancel = () => {
+    setIsExportRecoveryPhraseModalVisible(false);
+    setDecryptedPhrase('');
+    recoveryPhraseSlider?.goTo(0);
+  };
+
   return (
     <div>
       <div className="site-layout-background settings-content">
@@ -323,8 +424,121 @@ function MetaInfoComponent() {
             />{' '}
             {defaultGAStateDisabled ? t('general.disabled') : t('general.enabled')}
           </div>
+          {walletType !== LEDGER_WALLET_TYPE ? (
+            <>
+              <Divider />
+              <div className="item">
+                <div className="title">Export your Recovery Phrase</div>
+                <div className="description">
+                  You are required to enter your App Password for this action.
+                </div>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    showPasswordInput();
+                  }}
+                >
+                  Export
+                </Button>
+              </div>
+            </>
+          ) : (
+            <></>
+          )}
         </div>
       </div>
+      <PasswordFormModal
+        description="Input the app password decrypt wallet"
+        okButtonText="Decrypt wallet"
+        onCancel={() => {
+          setInputPasswordVisible(false);
+        }}
+        onSuccess={onWalletDecryptFinish}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          return {
+            valid: isValid,
+            errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+          };
+        }}
+        successText="Wallet decrypted successfully!"
+        title="Provide app password"
+        visible={inputPasswordVisible}
+        successButtonText="Continue"
+        confirmPassword={false}
+        repeatValidation
+      />
+      <ModalPopup
+        className="export-recovery-phrase-modal"
+        isModalVisible={isExportRecoveryPhraseModalVisible}
+        handleCancel={onExportRecoveryPhraseCancel}
+        handleOk={() => setIsExportRecoveryPhraseModalVisible(false)}
+        footer={[
+          <CopyToClipboard key="copy" text={decryptedPhrase}>
+            <Button type="primary" onClick={onCopyClick}>
+              Copy
+            </Button>
+          </CopyToClipboard>,
+          <Button key="back" type="link" onClick={onExportRecoveryPhraseCancel}>
+            Close
+          </Button>,
+        ]}
+        okText="Confirm"
+        title="Your Recovery Phrases"
+      >
+        <>
+          <div className="description">
+            Swipe to reveal all words. Write them down in the right order.
+          </div>
+          <div className="item">
+            <Carousel
+              className="recovery-phrase-slider"
+              arrows
+              {...sliderSettings}
+              ref={slider => {
+                recoveryPhraseSlider = slider;
+              }}
+            >
+              {decryptedPhrase?.split(' ').map((item, index) => {
+                return (
+                  <div className="page" key={index}>
+                    <div>
+                      <div className="phrase">
+                        <span>{index + 1}. </span>
+                        {item}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </Carousel>
+          </div>
+          <div className="item phrase-block-container">
+            {decryptedPhrase?.split(' ').map((item, index) => {
+              const isCurrent =
+                index >= currentSlide * itemsPerPage && index < (currentSlide + 1) * itemsPerPage;
+              return (
+                <div
+                  className={`phrase-block ${isCurrent ? 'current' : ''}`}
+                  onClick={() => {
+                    recoveryPhraseSlider?.goTo(Math.floor(index / Math.max(1, itemsPerPage)));
+                  }}
+                  key={index + 1}
+                >
+                  {index + 1}
+                </div>
+              );
+            })}
+          </div>
+          <div className="item">
+            <Alert
+              type="warning"
+              message="Protect your funds and do not share your recovery phrase with anyone."
+              showIcon
+            />
+          </div>
+        </>
+      </ModalPopup>
     </div>
   );
 }
@@ -434,7 +648,6 @@ const FormSettings = () => {
   };
 
   const onConfirmClear = () => {
-    // setIsConfirmationModalVisible(false);
     setIsButtonLoading(true);
     indexedDB.deleteDatabase('NeDB');
     setTimeout(() => {
@@ -513,12 +726,8 @@ const FormSettings = () => {
               >
                 {t('settings.clearStorage.button1')}
               </Button>,
-              <Button
-                key="back"
-                type="link"
-                onClick={handleCancelConfirmationModal}
-                // hidden={isConfirmClearVisible}
-              >
+
+              <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
                 {t('general.cancel')}
               </Button>,
             ]}

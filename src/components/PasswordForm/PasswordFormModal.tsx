@@ -26,6 +26,9 @@ interface PasswordFormModalProps {
 
   isButtonLoading?: boolean;
 
+  // Will ask for password again even after password was validated before
+  repeatValidation?: boolean;
+
   // TODO: use secure-string
   onValidatePassword: (
     password: string,
@@ -54,6 +57,10 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
       return;
     }
     await props.onSuccess(appPassword!);
+    if (props.repeatValidation) {
+      setAppPassword('');
+      setDisplayComponent('form');
+    }
   };
   const onFormFinish = async (password: string) => {
     const result = await props.onValidatePassword(password);
