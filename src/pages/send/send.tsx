@@ -265,22 +265,22 @@ const FormSend = () => {
           ]}
         >
           <>
-            <div className="title">Confirm Transaction</div>
-            <div className="description">Please review the below information. </div>
+            <div className="title">{t('send.modal1.title')}</div>
+            <div className="description">{t('send.modal1.description')}</div>
             <div className="item">
-              <div className="label">Sender Address</div>
+              <div className="label">{t('send.modal1.label1')}</div>
               <div className="address">{`${currentSession.wallet.address}`}</div>
             </div>
             <div className="item">
-              <div className="label">To Address</div>
+              <div className="label">{t('send.modal1.label2')}</div>
               <div className="address">{`${formValues?.recipientAddress}`}</div>
             </div>
             <div className="item">
-              <div className="label">Amount</div>
+              <div className="label">{t('send.modal1.label3')}</div>
               <div>{`${formValues?.amount} ${walletAsset.symbol}`}</div>
             </div>
             <div className="item">
-              <div className="label">Transaction Fee</div>
+              <div className="label">{t('send.modal1.label4')}</div>
               <div>{`${getNormalScaleAmount(
                 currentSession.wallet.config.fee !== undefined &&
                   currentSession.wallet.config.fee.networkFee !== undefined
@@ -290,7 +290,7 @@ const FormSend = () => {
               )} ${walletAsset.symbol}`}</div>
             </div>
             <div className="item">
-              <div className="label">Memo</div>
+              <div className="label">{t('send.modal1.label5')}</div>
               {formValues?.memo !== undefined &&
               formValues?.memo !== null &&
               formValues.memo !== '' ? (
@@ -303,8 +303,8 @@ const FormSend = () => {
         </ModalPopup>
 
         <PasswordFormModal
-          description="Input the app password decrypt wallet"
-          okButtonText="Decrypt wallet"
+          description={t('general.passwordFormModal.description')}
+          okButtonText={t('general.passwordFormModal.okButton')}
           onCancel={() => {
             setInputPasswordVisible(false);
           }}
@@ -313,13 +313,13 @@ const FormSend = () => {
             const isValid = await secretStoreService.checkIfPasswordIsValid(password);
             return {
               valid: isValid,
-              errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+              errMsg: !isValid ? t('general.passwordFormModal.error') : '',
             };
           }}
-          successText="Wallet decrypted successfully !"
-          title="Provide app password"
+          successText={t('general.passwordFormModal.success')}
+          title={t('general.passwordFormModal.title')}
           visible={inputPasswordVisible}
-          successButtonText="Continue"
+          successButtonText={t('general.continue')}
           confirmPassword={false}
         />
 
@@ -327,11 +327,11 @@ const FormSend = () => {
           isModalVisible={isSuccessTransferModalVisible}
           handleCancel={closeSuccessModal}
           handleOk={closeSuccessModal}
-          title="Success!"
+          title={t('general.successModalPopup.title')}
           button={null}
           footer={[
             <Button key="submit" type="primary" onClick={closeSuccessModal}>
-              Ok
+              {t('general.ok')}
             </Button>,
           ]}
         >
@@ -339,11 +339,9 @@ const FormSend = () => {
             {broadcastResult?.code !== undefined &&
             broadcastResult?.code !== null &&
             broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div className="description">
-                The transaction timed out but it will be included in the subsequent blocks
-              </div>
+              <div className="description">{t('general.successModalPopup.description1')}</div>
             ) : (
-              <div className="description">The transaction was broadcasted successfully!</div>
+              <div className="description">{t('general.successModalPopup.description2')}</div>
             )}
             {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
           </>
@@ -352,12 +350,12 @@ const FormSend = () => {
           isModalVisible={isErrorTransferModalVisible}
           handleCancel={closeErrorModal}
           handleOk={closeErrorModal}
-          title="An error happened!"
+          title={t('general.errorModalPopup.title')}
           footer={[]}
         >
           <>
             <div className="description">
-              The transfer transaction failed. Please try again later.
+              {t('general.errorModalPopup.description1')}
               <br />
               {errorMessages
                 .filter((item, idx) => {
@@ -366,11 +364,7 @@ const FormSend = () => {
                 .map((err, idx) => (
                   <div key={idx}>- {err}</div>
                 ))}
-              {ledgerIsExpertMode ? (
-                <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
-              ) : (
-                ''
-              )}
+              {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.description2')}</div> : ''}
             </div>
           </>
         </ErrorModalPopup>

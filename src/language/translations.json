@@ -21,6 +21,23 @@
         },
         "validTransactionAmountValidator": {
           "reason": "Invalid sending amount"
+        },
+        "passwordFormModal": {
+          "title": "Provide app password",
+          "description": "Input the app password decrypt wallet",
+          "error": "The password provided is incorrect. Please try again",
+          "success": "Wallet decrypted successfully!",
+          "okButton": "Decrypt wallet"
+        },
+        "successModalPopup": {
+          "title": "Success!",
+          "description1": "The transaction timed out but it will be included in the subsequent blocks",
+          "description2": "The transaction was broadcasted successfully!"
+        },
+        "errorModalPopup": {
+          "title": "An error happened!",
+          "description1": "The transfer transaction failed. Please try again later.",
+          "description2": "Please ensure that your have enabled Expert mode on your ledger device."
         }
       },
       "navbar": {
@@ -83,6 +100,15 @@
             "error2": "Sending amount exceeds your available wallet balance",
             "error3": "Sending amount is lower than minimum allowed of"
           }
+        },
+        "modal1": {
+          "title": "Confirm Transaction",
+          "description": "Please review the below information. ",
+          "label1": "Sender Address",
+          "label2": "To Address",
+          "label3": "Amount",
+          "label4": "Transaction Fee",
+          "label5": "Memo"
         }
       },
       "receive": {
@@ -175,6 +201,9 @@
         },
         "validTransactionAmountValidator": {
           "reason": "無效的轉帳款項"
+        },
+        "successModalPopup": {
+          "title": "成功！"
         }
       },
       "navbar": {
@@ -271,6 +300,9 @@
   },
   "frFR": {
     "translation": {
+      "general": {
+        "continue": " "
+      },
       "home": {
         "welcome": "Bienvenue de nouveau"
       },
