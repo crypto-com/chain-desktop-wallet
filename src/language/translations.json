@@ -144,7 +144,7 @@
             "validatorAddress": "Validator Address",
             "stakedAmountWithSymbol": "Staked Amount",
             "delegatorAddress": "Delegator Address",
-            "delegatorAction": "Undelegate",
+            "undelegateAction": "Undelegate",
             "redelegateAction": "Redelegate",
             "action1": "Undelegate Stake",
             "action2": "Redelegate Stake"
