@@ -511,9 +511,13 @@ const FormDelegationRequest = () => {
             {broadcastResult?.code !== undefined &&
             broadcastResult?.code !== null &&
             broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div className="description">{t('general.successModalPopup.description1')}</div>
+              <div className="description">
+                {t('general.successModalPopup.timeout.description')}
+              </div>
             ) : (
-              <div className="description">{t('general.successModalPopup.description2')}</div>
+              <div className="description">
+                {t('general.successModalPopup.staking.description')}
+              </div>
             )}
             {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
           </>
@@ -816,9 +820,9 @@ const FormWithdrawStakingReward = () => {
           {broadcastResult?.code !== undefined &&
           broadcastResult?.code !== null &&
           broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">{t('general.successModalPopup.description1')}</div>
+            <div className="description">{t('general.successModalPopup.timeout.description')}</div>
           ) : (
-            <div className="description">{t('general.successModalPopup.description3')}</div>
+            <div className="description">{t('general.successModalPopup.reward.description')}</div>
           )}
           {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
         </>

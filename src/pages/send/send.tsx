@@ -342,9 +342,13 @@ const FormSend = () => {
             {broadcastResult?.code !== undefined &&
             broadcastResult?.code !== null &&
             broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div className="description">{t('general.successModalPopup.description1')}</div>
+              <div className="description">
+                {t('general.successModalPopup.timeout.description')}
+              </div>
             ) : (
-              <div className="description">{t('general.successModalPopup.description2')}</div>
+              <div className="description">
+                {t('general.successModalPopup.transfer.description')}
+              </div>
             )}
             {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
           </>

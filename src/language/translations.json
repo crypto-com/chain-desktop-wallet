@@ -37,9 +37,24 @@
         },
         "successModalPopup": {
           "title": "Success!",
-          "description1": "The transaction timed out but it will be included in the subsequent blocks",
-          "description2": "The transaction was broadcasted successfully!",
-          "description3": "Your rewards withdrawal transaction was broadcasted successfully!"
+          "timeout": {
+            "description": "The transaction timed out but it will be included in the subsequent blocks"
+          },
+          "transfer": {
+            "description": "The transaction was broadcasted successfully!"
+          },
+          "staking": {
+            "description": "The staking transaction was broadcasted successfully!"
+          },
+          "reward": {
+            "description": "Your rewards withdrawal transaction was broadcasted successfully!"
+          },
+          "undelegation": {
+            "description": "Your undelegation transaction was successful"
+          },
+          "redelegation": {
+            "description": "Your redelegation transaction was successful"
+          }
         },
         "errorModalPopup": {
           "title": "An error happened!",
@@ -51,6 +66,12 @@
           },
           "reward": {
             "description": "The reward withdrawal transaction failed. Please try again later."
+          },
+          "undelegation": {
+            "description": "The undelegation transaction failed. Please try again later."
+          },
+          "redelegation": {
+            "description": "The redelegation transaction failed. Please try again later."
           },
           "ledgerExportMode": "Please ensure that your have enabled Expert mode on your ledger device."
         }
@@ -99,7 +120,44 @@
         }
       },
       "home": {
-        "welcome": "Welcome Back!"
+        "title": "Welcome Back!",
+        "balance": {
+          "title1": "TOTAL BALANCE",
+          "title2": "STAKED BALANCE"
+        },
+        "nft": {
+          "tab1": "My NFT",
+          "seeAll": "See All"
+        },
+        "transactions": {
+          "tab1": "Transactions",
+          "tab2": "Delegations",
+          "tab3": "NFT Transactions",
+          "table1": {
+            "transactionHash": "Transaction Hash",
+            "amount": "Amount",
+            "recipientAddress": "Recipient Address",
+            "time": "Time",
+            "status": "Status"
+          },
+          "table2": {
+            "validatorAddress": "Validator Address",
+            "stakedAmountWithSymbol": "Staked Amount",
+            "delegatorAddress": "Delegator Address",
+            "delegatorAction": "Undelegate",
+            "redelegateAction": "Redelegate",
+            "action1": "Undelegate Stake",
+            "action2": "Redelegate Stake"
+          },
+          "table3": {
+            "transactionHash": "Transaction Hash",
+            "messageType": "Type",
+            "denomId": "NFT Name",
+            "tokenId": "NFT ID",
+            "recipientAddress": "Recipient",
+            "time": "Time"
+          }
+        }
       },
       "send": {
         "title": "Send",
@@ -346,7 +404,7 @@
         }
       },
       "home": {
-        "welcome": "歡迎"
+        "title": "歡迎"
       },
       "send": {
         "formSend": {
@@ -406,7 +464,7 @@
         },
         "exportRecoveryPhrase": {
           "title": "導出助記詞",
-          "description": "你需要輸入你的密碼來進行這操作。",
+          "description": "需要輸入你的密碼來進行此操作。",
           "button": "導出",
           "modal1": {
             "title": "你的助記詞"
@@ -427,7 +485,7 @@
         "continue": " "
       },
       "home": {
-        "welcome": "Bienvenue de nouveau"
+        "title": "Bienvenue de nouveau"
       },
       "settings": {
         "language": {
