@@ -224,12 +224,21 @@
           },
           "gasLimit": {
             "label": "Gas Limit"
+          },
+          "checkbox1": {
+            "description1": "Propagate the settings changes to all your ",
+            "description2": "wallets"
           }
         },
         "message": {
           "success1": "Wallet settings updated successfully",
           "success2": "on all",
-          "success3": "wallets"
+          "success3": "wallets",
+          "recover1": "Recovery Phrase Copied!",
+          "recover2": "Recovery Phrase is successfully copied to your clipboard",
+          "analytics1": "Analytics settings has been",
+          "defaultMemo1": "Default client memo settings has been",
+          "generalSettings1": "General settings propagation has been"
         },
         "language": {
           "title": "Language"
@@ -375,6 +384,10 @@
           },
           "gasLimit": {
             "label": "Gas 費用"
+          },
+          "checkbox1": {
+            "description1": "將設定更新至所有",
+            "description2": "錢包"
           }
         },
         "message": {

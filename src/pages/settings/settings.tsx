@@ -106,7 +106,9 @@ const GeneralSettingsForm = () => {
 
     setSession(newSession);
     message.success(
-      `General settings propagation has been ${newState ? 'enabled' : 'disabled'} successfully`,
+      `${t('settings.message.generalSettings1')} ${
+        newState ? t('general.enabled') : t('general.disabled')
+      }`,
     );
     setUpdateLoading(false);
   }
@@ -194,7 +196,8 @@ const GeneralSettingsForm = () => {
           onChange={onEnableGeneralWalletConfig}
           disabled={updateLoading}
         >
-          Propagate the settings changes to all your other wallets on {session.wallet.config.name}
+          {t('settings.form1.checkbox1.description1')} {session.wallet.config.name}{' '}
+          {t('settings.form1.checkbox1.description2')}
         </Checkbox>
       </div>
     </>
@@ -342,7 +345,9 @@ function MetaInfoComponent() {
     setSession(newSession);
     setUpdateLoading(false);
     message.success(
-      `Default client memo settings has been ${newState ? 'disabled' : 'enabled'} successfully`,
+      `${t('settings.message.defaultMemo1')} ${
+        newState ? t('general.disabled') : t('general.enabled')
+      }`,
     );
   }
 
@@ -366,15 +371,17 @@ function MetaInfoComponent() {
     setSession(newSession);
     setUpdateLoading(false);
     message.success(
-      `Analytics settings has been ${newState ? 'disabled' : 'enabled'} successfully`,
+      `${t('settings.message.analytics1')} ${
+        newState ? t('general.disabled') : t('general.enabled')
+      }`,
     );
   }
 
   const onCopyClick = () => {
     setTimeout(() => {
       notification.success({
-        message: `Recovery Phrase Copied!`,
-        description: `Recovery Phrase is successfully copied to your clipboard`,
+        message: t('settings.message.recover1'),
+        description: t('settings.message.recover2'),
         placement: 'topRight',
         duration: 2,
         key: 'copy',
