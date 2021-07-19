@@ -12,9 +12,13 @@
         "discard": "Discard Changes",
         "ok": "Ok",
         "required": "is required",
+        "cannot0": "cannot be 0",
         "validator": "validator",
         "receiving": "receiving",
         "available": "Available",
+        "action": "Action",
+        "select": "Select",
+        "review": "Review",
         "addressValidator": {
           "reason1": "Invalid",
           "reason2": "address provided"
@@ -32,12 +36,21 @@
         "successModalPopup": {
           "title": "Success!",
           "description1": "The transaction timed out but it will be included in the subsequent blocks",
-          "description2": "The transaction was broadcasted successfully!"
+          "description2": "The transaction was broadcasted successfully!",
+          "description3": "Your rewards withdrawal transaction was broadcasted successfully!"
         },
         "errorModalPopup": {
           "title": "An error happened!",
-          "description1": "The transfer transaction failed. Please try again later.",
-          "description2": "Please ensure that your have enabled Expert mode on your ledger device."
+          "transfer": {
+            "description": "The transfer transaction failed. Please try again later."
+          },
+          "staking": {
+            "description": "The staking transaction failed. Please try again later."
+          },
+          "reward": {
+            "description": "The reward withdrawal transaction failed. Please try again later."
+          },
+          "ledgerExportMode": "Please ensure that your have enabled Expert mode on your ledger device."
         }
       },
       "navbar": {
@@ -89,16 +102,18 @@
       "send": {
         "title": "Send",
         "description": "Move funds from your transfer address to another transfer address or deposit stake to a staking address.\n",
-        "form1": {
+        "formSend": {
           "recipientAddress": {
             "label": "Recipient Address",
             "placeholder": "Enter recipient address"
           },
           "amount": {
             "label": "Sending Amount",
-            "error1": "Sending Amount cannot be 0",
-            "error2": "Sending amount exceeds your available wallet balance",
-            "error3": "Sending amount is lower than minimum allowed of"
+            "error1": "Sending Amount exceeds your available wallet balance",
+            "error2": "Sending Amount is lower than minimum allowed of"
+          },
+          "memo": {
+            "label": "Memo (Optional)"
           }
         },
         "modal1": {
@@ -123,6 +138,66 @@
           "description": "Please connect with your Ledger device"
         },
         "button": "Verify address on Ledger"
+      },
+      "staking": {
+        "title": "Staking",
+        "tab1": "Staking Rewards",
+        "tab2": "Delegate Funds",
+        "description1": "Withdraw rewards from delegated funds.\n",
+        "description2": "Delegate funds to validator.",
+        "maxValidator": {
+          "error": "Staking amount exceeds your available wallet balance"
+        },
+        "minValidator": {
+          "error": "Staking amount is lower than minimum allowed of "
+        },
+        "validatorList": {
+          "table": {
+            "title": "Validator List",
+            "description": "Please select one of the validator.",
+            "validatorName": "Name",
+            "validatorWebsite": "Website",
+            "validatorAddress": "Address",
+            "currentTokens": "Voting Power",
+            "currentCommissionRate": "Commission",
+            "action": "Action"
+          }
+        },
+        "formWithdralStakingReward": {
+          "table": {
+            "validatorName": "Name",
+            "rewardAmount": "Reward Amount",
+            "action1": "Withdraw Reward"
+          }
+        },
+        "formDelegation": {
+          "validatorAddress": {
+            "label": "Validator address",
+            "placeholder": "Enter validator address"
+          },
+          "amount": {
+            "label": "Delegation Amount"
+          },
+          "checkbox1": "Want to set custom memo?",
+          "memo": {
+            "label": "Memo (Optional)"
+          }
+        },
+        "modal1": {
+          "title": "Confirm Transaction",
+          "description": "Please review the below information.",
+          "label1": "Sender Address",
+          "label2": "Delegating to Validator",
+          "label3": "Amount",
+          "label4": "Memo"
+        },
+        "modal2": {
+          "title": "Confirm Transaction",
+          "description": "Please review the below information.",
+          "label1": "Sender Address",
+          "label2": "Withdraw Reward From Validator",
+          "label3": "Rewards"
+        }
       },
       "settings": {
         "title": "Settings",
@@ -192,9 +267,12 @@
         "discard": "取消",
         "ok": "Ok",
         "required": "必須輸入",
+        "cannot0": "不能為 0",
         "validator": "驗證節點",
         "receiving": "接收",
         "available": "可使用",
+        "action": "操作",
+        "select": "選擇",
         "addressValidator": {
           "reason1": "無效的",
           "reason2": "地址"
@@ -243,12 +321,11 @@
         "welcome": "歡迎"
       },
       "send": {
-        "form1": {
+        "formSend": {
           "amount": {
             "label": "轉帳款項",
-            "error1": "轉帳款項不能為 0",
-            "error2": "你的錢包沒有足夠的款項",
-            "error3": "你所輸入的轉帳款項少於最低可轉帳款項"
+            "error1": "你的錢包沒有足夠的款項",
+            "error2": "你所輸入的轉帳款項少於最低可轉帳款項"
           }
         }
       },

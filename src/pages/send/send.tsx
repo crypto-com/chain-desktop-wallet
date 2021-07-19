@@ -172,11 +172,11 @@ const FormSend = () => {
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
   const customMaxValidator = TransactionUtils.maxValidator(
     maximumSendAmount,
-    t('send.form1.amount.error2'),
+    t('send.formSend.amount.error1'),
   );
   const customMinValidator = TransactionUtils.minValidator(
     fromScientificNotation(currentMinAssetAmount),
-    `${t('send.form1.amount.error3')} ${fromScientificNotation(currentMinAssetAmount)} ${
+    `${t('send.formSend.amount.error2')} ${fromScientificNotation(currentMinAssetAmount)} ${
       walletAsset.symbol
     }`,
   );
@@ -195,30 +195,33 @@ const FormSend = () => {
 
       <Form.Item
         name="recipientAddress"
-        label={t('send.form1.recipientAddress.label')}
+        label={t('send.formSend.recipientAddress.label')}
         hasFeedback
         validateFirst
         rules={[
           {
             required: true,
-            message: `${t('send.form1.recipientAddress.label')} ${t('general.required')}`,
+            message: `${t('send.formSend.recipientAddress.label')} ${t('general.required')}`,
           },
           customAddressValidator,
         ]}
       >
-        <Input placeholder={t('send.form1.recipientAddress.placeholder')} />
+        <Input placeholder={t('send.formSend.recipientAddress.placeholder')} />
       </Form.Item>
       <div className="amount">
         <Form.Item
           name="amount"
-          label={t('send.form1.amount.label')}
+          label={t('send.formSend.amount.label')}
           hasFeedback
           validateFirst
           rules={[
-            { required: true, message: `${t('send.form1.amount.label')} ${t('general.required')}` },
+            {
+              required: true,
+              message: `${t('send.formSend.amount.label')} ${t('general.required')}`,
+            },
             {
               pattern: /[^0]+/,
-              message: `${t('send.form1.amount.label')} ${t('general.required')}`,
+              message: `${t('send.formSend.amount.label')} ${t('general.cannot0')}`,
             },
             customAmountValidator,
             customMaxValidator,
@@ -234,7 +237,7 @@ const FormSend = () => {
           </div>
         </div>
       </div>
-      <Form.Item name="memo" label="Memo (Optional)">
+      <Form.Item name="memo" label={t('send.formSend.memo.label')}>
         <Input />
       </Form.Item>
 
@@ -355,7 +358,7 @@ const FormSend = () => {
         >
           <>
             <div className="description">
-              {t('general.errorModalPopup.description1')}
+              {t('general.errorModalPopup.transfer.description')}
               <br />
               {errorMessages
                 .filter((item, idx) => {
@@ -364,7 +367,7 @@ const FormSend = () => {
                 .map((err, idx) => (
                   <div key={idx}>- {err}</div>
                 ))}
-              {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.description2')}</div> : ''}
+              {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
             </div>
           </>
         </ErrorModalPopup>

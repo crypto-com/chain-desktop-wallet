@@ -223,18 +223,18 @@ const FormDelegationRequest = () => {
   );
   const customMaxValidator = TransactionUtils.maxValidator(
     maximumStakeAmount,
-    'Staking amount exceeds your available wallet balance',
+    t('staking.maxValidator.error'),
   );
   const customMinValidator = TransactionUtils.minValidator(
     fromScientificNotation(currentMinAssetAmount),
-    `Staking amount is lower than minimum allowed of ${fromScientificNotation(
-      currentMinAssetAmount,
-    )} ${walletAsset.symbol}`,
+    `${t('staking.minValidator.error')} ${fromScientificNotation(currentMinAssetAmount)} ${
+      walletAsset.symbol
+    }`,
   );
 
   const validatorColumns = [
     {
-      title: 'Name',
+      title: t('staking.validatorList.table.validatorName'),
       dataIndex: 'validatorName',
       key: 'validatorName',
       render: (validatorName, record) => (
@@ -249,7 +249,7 @@ const FormDelegationRequest = () => {
       ),
     },
     {
-      title: 'Website',
+      title: t('staking.validatorList.table.validatorWebsite'),
       dataIndex: 'validatorWebSite',
       key: 'validatorWebSite',
       render: validatorWebSite => {
@@ -268,7 +268,7 @@ const FormDelegationRequest = () => {
       },
     },
     {
-      title: 'Address',
+      title: t('staking.validatorList.table.validatorAddress'),
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
       render: validatorAddress => (
@@ -284,7 +284,7 @@ const FormDelegationRequest = () => {
       ),
     },
     {
-      title: 'Voting Power',
+      title: t('staking.validatorList.table.currentTokens'),
       dataIndex: 'currentTokens',
       key: 'currentTokens',
       sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
@@ -299,7 +299,7 @@ const FormDelegationRequest = () => {
       },
     },
     {
-      title: 'Commission',
+      title: t('staking.validatorList.table.currentCommissionRate'),
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
       sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
@@ -308,7 +308,7 @@ const FormDelegationRequest = () => {
       ),
     },
     {
-      title: 'Action',
+      title: t('general.action'),
       key: 'action',
       render: record => (
         <a
@@ -319,7 +319,7 @@ const FormDelegationRequest = () => {
             });
           }}
         >
-          Select
+          {t('general.select')}
         </a>
       ),
     },
@@ -348,8 +348,8 @@ const FormDelegationRequest = () => {
           okText="Confirm"
           width={1000}
         >
-          <div className="title">Validator List</div>
-          <div className="description">Please select one of the validator.</div>
+          <div className="title">{t('staking.validatorList.table.title')}</div>
+          <div className="description">{t('staking.validatorList.table.description')}</div>
           <div className="item">
             <Table
               dataSource={validatorTopList}
@@ -361,17 +361,22 @@ const FormDelegationRequest = () => {
       </>
       <Form.Item
         name="validatorAddress"
-        label="Validator address"
+        label={t('staking.formDelegation.validatorAddress.label')}
         hasFeedback
         validateFirst
         rules={[
-          { required: true, message: 'Validator address is required' },
+          {
+            required: true,
+            message: `${t('staking.formDelegation.validatorAddress.label')} ${t(
+              'general.required',
+            )}`,
+          },
           customAddressValidator,
         ]}
         className="input-validator-address"
       >
         <Search
-          placeholder="Enter validator address"
+          placeholder={t('staking.formDelegation.validatorAddress.placeholder')}
           enterButton={<OrderedListOutlined />}
           onSearch={() => setIsValidatorListVisible(true)}
         />
@@ -379,14 +384,17 @@ const FormDelegationRequest = () => {
       <div className="amount">
         <Form.Item
           name="amount"
-          label="Delegation Amount"
+          label={t('staking.formDelegation.amount.label')}
           hasFeedback
           validateFirst
           rules={[
-            { required: true, message: 'Staking amount is required' },
+            {
+              required: true,
+              message: `${t('staking.formDelegation.amount.label')} ${t('general.required')}`,
+            },
             {
               pattern: /[^0]+/,
-              message: 'Staking amount cannot be 0',
+              message: `${t('staking.formDelegation.amount.label')} ${t('general.cannot0')}`,
             },
             customAmountValidator,
             customMaxValidator,
@@ -396,18 +404,18 @@ const FormDelegationRequest = () => {
           <InputNumber />
         </Form.Item>
         <div className="available">
-          <span>Available: </span>
+          <span>{t('general.available')}: </span>
           <div className="available-amount">
             {scaledBalance(walletAsset)} {walletAsset.symbol}
           </div>
         </div>
       </div>
       <Checkbox onChange={onShowMemoChange} checked={showMemo}>
-        Want to set custom memo?
+        {t('staking.formDelegation.checkbox1')}
       </Checkbox>
       {showMemo ? (
         <div style={{ paddingTop: '12px' }}>
-          <Form.Item name="memo" label="Memo (Optional)">
+          <Form.Item name="memo" label={t('staking.formDelegation.memo.label')}>
             <Input />
           </Form.Item>
         </div>
@@ -422,7 +430,7 @@ const FormDelegationRequest = () => {
           confirmationLoading={confirmLoading}
           button={
             <Button type="primary" htmlType="submit">
-              Review
+              {t('general.review')}
             </Button>
           }
           footer={[
@@ -432,34 +440,34 @@ const FormDelegationRequest = () => {
               loading={confirmLoading}
               onClick={onConfirmDelegation}
             >
-              Confirm
+              {t('general.confirm')}
             </Button>,
             <Button key="back" type="link" onClick={handleCancel}>
-              Cancel
+              {t('general.cancel')}
             </Button>,
           ]}
           okText="Confirm"
         >
           <>
-            <div className="title">Confirm Transaction</div>
-            <div className="description">Please review the below information. </div>
+            <div className="title">{t('staking.modal1.title')}</div>
+            <div className="description">{t('staking.modal1.description')}</div>
             <div className="item">
-              <div className="label">Sender Address</div>
+              <div className="label">{t('staking.modal1.label1')}</div>
               <div className="address">{`${currentSession.wallet.address}`}</div>
             </div>
             <div className="item">
-              <div className="label">Delegating to Validator</div>
+              <div className="label">{t('staking.modal1.label2')}</div>
               <div className="address">{`${formValues?.validatorAddress}`}</div>
             </div>
             <div className="item">
-              <div className="label">Amount</div>
+              <div className="label">{t('staking.modal1.label3')}</div>
               <div>{`${formValues?.amount} ${walletAsset.symbol}`}</div>
             </div>
             {formValues?.memo !== undefined &&
             formValues?.memo !== null &&
             formValues.memo !== '' ? (
               <div className="item">
-                <div className="label">Memo</div>
+                <div className="label">{t('staking.modal1.label4')}</div>
                 <div>{`${formValues?.memo}`}</div>
               </div>
             ) : (
@@ -495,7 +503,7 @@ const FormDelegationRequest = () => {
           button={null}
           footer={[
             <Button key="submit" type="primary" onClick={closeSuccessModal}>
-              Ok
+              {t('general.ok')}
             </Button>,
           ]}
         >
@@ -503,11 +511,9 @@ const FormDelegationRequest = () => {
             {broadcastResult?.code !== undefined &&
             broadcastResult?.code !== null &&
             broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div className="description">
-                The transaction timed out but it will be included in the subsequent blocks
-              </div>
+              <div className="description">{t('general.successModalPopup.description1')}</div>
             ) : (
-              <div className="description">Your delegation transaction was successful !</div>
+              <div className="description">{t('general.successModalPopup.description2')}</div>
             )}
             {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
           </>
@@ -521,7 +527,7 @@ const FormDelegationRequest = () => {
         >
           <>
             <div className="description">
-              The staking transaction failed. Please try again later.
+              {t('general.errorModalPopup.staking.description')}
               <br />
               {errorMessages
                 .filter((item, idx) => {
@@ -530,11 +536,7 @@ const FormDelegationRequest = () => {
                 .map((err, idx) => (
                   <div key={idx}>- {err}</div>
                 ))}
-              {ledgerIsExpertMode ? (
-                <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
-              ) : (
-                ''
-              )}
+              {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
             </div>
           </>
         </ErrorModalPopup>
@@ -565,6 +567,8 @@ const FormWithdrawStakingReward = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
+
+  const [t] = useTranslation();
 
   const convertToTabularData = (
     allRewards: RewardTransaction[],
@@ -676,7 +680,7 @@ const FormWithdrawStakingReward = () => {
 
   const rewardColumns = [
     {
-      title: 'Validator Address',
+      title: t('staking.formWithdralStakingReward.table.validatorName'),
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
       render: text => (
@@ -690,7 +694,7 @@ const FormWithdrawStakingReward = () => {
       ),
     },
     {
-      title: 'Reward Amount',
+      title: t('staking.formWithdralStakingReward.table.rewardAmount'),
       key: 'rewardAmount',
       render: record => {
         return (
@@ -702,7 +706,7 @@ const FormWithdrawStakingReward = () => {
       },
     },
     {
-      title: 'Action',
+      title: t('general.action'),
       dataIndex: 'withdrawAction',
       key: 'withdrawAction',
       render: () => (
@@ -713,7 +717,7 @@ const FormWithdrawStakingReward = () => {
             }, 200);
           }}
         >
-          Withdraw Reward
+          {t('staking.formWithdralStakingReward.table.action1')}
         </a>
       ),
     },
@@ -750,35 +754,35 @@ const FormWithdrawStakingReward = () => {
         className="reward-modal"
         footer={[
           <Button key="submit" type="primary" loading={confirmLoading} onClick={onConfirmTransfer}>
-            Confirm
+            {t('general.confirm')}
           </Button>,
           <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
-            Cancel
+            {t('general.cancel')}
           </Button>,
         ]}
-        okText="Confirm"
+        okText={t('general.confirm')}
       >
         <>
-          <div className="title">Confirm Transaction</div>
-          <div className="description">Please review the below information. </div>
+          <div className="title">{t('staking.modal2.title')}</div>
+          <div className="description">{t('staking.modal2.description')}</div>
           <div className="item">
-            <div className="label">Sender Address</div>
+            <div className="label">{t('staking.modal2.label1')}</div>
             <div className="address">{`${currentSession.wallet.address}`}</div>
           </div>
           <div className="item">
-            <div className="label">Withdraw Reward From Validator</div>
+            <div className="label">{t('staking.modal2.label2')}</div>
             <div className="address">{`${withdrawValues?.validatorAddress}`}</div>
           </div>
           <div className="item">
-            <div className="label">Rewards</div>
+            <div className="label">{t('staking.modal2.label3')}</div>
             <div>{`${withdrawValues.rewardAmount}`}</div>
             <div className="fiat">{`${withdrawValues.rewardMarketPrice}`}</div>
           </div>
         </>
       </ModalPopup>
       <PasswordFormModal
-        description="Input the app password decrypt wallet"
-        okButtonText="Decrypt wallet"
+        description={t('general.passwordFormModal.description')}
+        okButtonText={t('general.passwordFormModal.okButton')}
         onCancel={() => {
           setInputPasswordVisible(false);
         }}
@@ -787,24 +791,24 @@ const FormWithdrawStakingReward = () => {
           const isValid = await secretStoreService.checkIfPasswordIsValid(password);
           return {
             valid: isValid,
-            errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
           };
         }}
-        successText="Wallet decrypted successfully !"
-        title="Provide app password"
+        successText={t('general.passwordFormModal.success')}
+        title={t('general.passwordFormModal.title')}
         visible={inputPasswordVisible}
-        successButtonText="Continue"
+        successButtonText={t('general.continue')}
         confirmPassword={false}
       />
       <SuccessModalPopup
         isModalVisible={isSuccessTransferModalVisible}
         handleCancel={closeSuccessModal}
         handleOk={closeSuccessModal}
-        title="Success!"
+        title={t('general.successModalPopup.title')}
         button={null}
         footer={[
           <Button key="submit" type="primary" onClick={closeSuccessModal}>
-            Ok
+            {t('general.ok')}
           </Button>,
         ]}
       >
@@ -812,13 +816,9 @@ const FormWithdrawStakingReward = () => {
           {broadcastResult?.code !== undefined &&
           broadcastResult?.code !== null &&
           broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">
-              The transaction timed out but it will be included in the subsequent blocks
-            </div>
+            <div className="description">{t('general.successModalPopup.description1')}</div>
           ) : (
-            <div className="description">
-              Your rewards withdrawal transaction was broadcasted successfully !
-            </div>
+            <div className="description">{t('general.successModalPopup.description3')}</div>
           )}
           {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
         </>
@@ -827,12 +827,12 @@ const FormWithdrawStakingReward = () => {
         isModalVisible={isErrorTransferModalVisible}
         handleCancel={closeErrorModal}
         handleOk={closeErrorModal}
-        title="An error happened!"
+        title={t('general.errorModalPopup.title')}
         footer={[]}
       >
         <>
           <div className="description">
-            The reward withdrawal transaction failed. Please try again later.
+            {t('general.errorModalPopup.reward.description')}
             <br />
             {errorMessages
               .filter((item, idx) => {
@@ -841,11 +841,7 @@ const FormWithdrawStakingReward = () => {
               .map((err, idx) => (
                 <div key={idx}>- {err}</div>
               ))}
-            {ledgerIsExpertMode ? (
-              <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
-            ) : (
-              ''
-            )}
+            {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
           </div>
         </>
       </ErrorModalPopup>
