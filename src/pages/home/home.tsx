@@ -489,9 +489,9 @@ function HomePage() {
     setTimeout(async () => {
       if (isWalletNotLive(config) && !hasShownNotLiveWallet) {
         notification.warning({
-          message: t('home.notification.walletInfo1'),
-          description: `${t('home.notification.walletInfo2')} ${config.name} ${t(
-            'home.notification.walletInfo3',
+          message: t('home.notification.walletInfo.message'),
+          description: `${t('home.notification.walletInfo.description1')} ${config.name} ${t(
+            'home.notification.walletInfo.description2',
           )}`,
           placement: 'topRight',
           duration: 0,
@@ -558,8 +558,8 @@ function HomePage() {
       const newVersionNotificationKey = `open-update_available`;
 
       notification.info({
-        message: t('home.notification.updateAvailable1'),
-        description: t('home.notification.updateAvailable2'),
+        message: t('home.notification.updateAvailable.message'),
+        description: t('home.notification.updateAvailable.description'),
         duration: 10,
         key: newVersionNotificationKey,
         placement: 'topRight',
@@ -584,13 +584,13 @@ function HomePage() {
           }}
           style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
         >
-          {t('home.notification.downloadComplete3')}
+          {t('home.notification.downloadComplete.button')}
         </Button>
       );
 
       notification.success({
-        message: t('home.notification.downloadComplete1'),
-        description: t('home.notification.downloadComplete2'),
+        message: t('home.notification.downloadComplete.message'),
+        description: t('home.notification.downloadComplete.description'),
         duration: 20,
         key: newVersionNotificationKey,
         placement: 'topRight',

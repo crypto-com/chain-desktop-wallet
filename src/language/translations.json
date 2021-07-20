@@ -57,6 +57,9 @@
           },
           "vote": {
             "description": "Your vote was broadcasted successfully!"
+          },
+          "nftTransfer": {
+            "description": "Your NFT transaction was broadcasted successfully!"
           }
         },
         "errorModalPopup": {
@@ -78,6 +81,9 @@
           },
           "vote": {
             "description": "The vote transaction failed. Please try again later."
+          },
+          "nftTransfer": {
+            "description": "The NFT transaction failed. Please try again later."
           },
           "ledgerExportMode": "Please ensure that your have enabled Expert mode on your ledger device."
         }
@@ -165,14 +171,20 @@
           }
         },
         "notification": {
-          "walletInfo1": "Wallet Info",
-          "walletInfo2": "The wallet created will be limited only to display address because its",
-          "walletInfo3": "configuration is not live yet",
-          "updateAvailable1": "Update Available",
-          "updateAvailable2": "A new update is available. Downloading now...",
-          "downloadComplete1": "Download Complete",
-          "downloadComplete2": "Update downloaded successfully. It will be installed on restart.",
-          "downloadComplete3": "Restart Now"
+          "walletInfo": {
+            "message": "Wallet Info",
+            "description1": "The wallet created will be limited only to display address because its",
+            "description2": "configuration is not live yet"
+          },
+          "updateAvailable": {
+            "message": "Update Available",
+            "description": "A new update is available. Downloading now..."
+          },
+          "downloadComplete": {
+            "message": "Download Complete",
+            "description": "Update downloaded successfully. It will be installed on restart.",
+            "button": "Restart Now"
+          }
         }
       },
       "send": {
@@ -205,13 +217,15 @@
       "receive": {
         "title": "Receive",
         "description": "Receive funds by sharing the below wallet address.",
-        "notification1": {
-          "title": "Address Copied!",
-          "description": "Current account is successfully copied to your clipboard"
-        },
-        "notification2": {
-          "title": "Cannot detect any Ledger device",
-          "description": "Please connect with your Ledger device"
+        "notification": {
+          "addressCopy": {
+            "message": "Address Copied!",
+            "description": "Current account is successfully copied to your clipboard"
+          },
+          "ledgerConnect": {
+            "message": "Cannot detect any Ledger device",
+            "description": "Please connect with your Ledger device"
+          }
         },
         "button": "Verify address on Ledger"
       },
@@ -301,6 +315,66 @@
           "label3": "Vote"
         }
       },
+      "nft": {
+        "title": "My NFT",
+        "description": "An overview of your NFT Collection on Crypto.org Chain.",
+        "tab1": "NFT Collection",
+        "tab2": "Mint NFT",
+        "formMintNft": {
+          "description": "Mint your NFT with Image or Video on Crypto.org chain.",
+          "denomId": {
+            "label": "Denom ID",
+            "placeholder": "e.g. ",
+            "error1": "Expected length to be between",
+            "error2": "and",
+            "error3": "characters",
+            "error4": "Expected only start with lowercase alphabetic",
+            "error5": "Expected only alphabetic characters or numbers"
+          },
+          "tokenId": {
+            "label": "Token ID",
+            "placeholder": "e.g.",
+            "error1": "Expected length to be between",
+            "error2": "and",
+            "error3": "characters",
+            "error4": "Expected only start with lowercase alphabetic",
+            "error5": "Expected only alphabetic characters or numbers"
+          },
+          "drop": {
+            "label": "Drop Name",
+            "placeholder": "e.g."
+          },
+          "files": {
+            "label": "Upload Files",
+            "description1": "Please wait until file upload finished",
+            "description2": "You have to upload a thumbnail for the video"
+          }
+        },
+        "fileUploadValidator": {
+          "error1": "Upload Files is required",
+          "error2": "File upload failed. Please upload again."
+        },
+        "beforeUpload": {
+          "error1": "You can only upload ",
+          "error2": "Video size must be smaller than",
+          "error3": "Image size must be smaller than"
+        },
+        "media": {
+          "image": "Image",
+          "video": "Video",
+          "thumbnail": "Thumbnail"
+        },
+        "notification": {
+          "uploadFailed": {
+            "message": "Upload failed",
+            "description": "Please confirm your connection & try again later."
+          }
+        },
+        "modal1": {
+          "title": "Confirm Mint NFT",
+          "description": "Please review the information below."
+        }
+      },
       "settings": {
         "title": "Settings",
         "description": "An invalid configuration might result in wallet malfunction.",
@@ -330,15 +404,19 @@
             "description2": "wallets"
           }
         },
-        "notification": {
+        "message": {
           "success1": "Wallet settings updated successfully",
           "success2": "on all",
           "success3": "wallets",
-          "recover1": "Recovery Phrase Copied!",
-          "recover2": "Recovery Phrase is successfully copied to your clipboard",
           "analytics1": "Analytics settings has been",
           "defaultMemo1": "Default client memo settings has been",
           "generalSettings1": "General settings propagation has been"
+        },
+        "notification": {
+          "recover": {
+            "message": "Recovery Phrase Copied!",
+            "description": "Recovery Phrase is successfully copied to your clipboard"
+          }
         },
         "language": {
           "title": "Language"
@@ -460,13 +538,15 @@
       "receive": {
         "title": "接收",
         "description": "分享你的錢包地址來接收款項",
-        "notification1": {
-          "title": "複製地址！",
-          "description": "這個地址已儲存到你的剪貼板。"
-        },
-        "notification2": {
-          "title": "未能偵測到你的 Ledger 硬體錢包 ",
-          "description": "請連接你的 Ledger 硬體錢包 "
+        "notification": {
+          "addressCopy": {
+            "message": "複製地址！",
+            "description": "這個地址已儲存到你的剪貼板。"
+          },
+          "ledgerConnect": {
+            "message": "未能偵測到你的 Ledger 硬體錢包 ",
+            "description": "請連接你的 Ledger 硬體錢包 "
+          }
         },
         "button": "驗證你的 Ledger 錢包"
       },
@@ -490,7 +570,7 @@
             "description2": "錢包"
           }
         },
-        "notification": {
+        "message": {
           "success1": "已成功更新錢包設定",
           "success2": "所有",
           "success3": "錢包"

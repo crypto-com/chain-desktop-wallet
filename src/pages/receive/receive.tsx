@@ -41,8 +41,8 @@ function ReceivePage() {
       }
     } catch (e) {
       notification.error({
-        message: t('receive.notification2.title'),
-        description: t('receive.notification2.description'),
+        message: t('receive.notification.ledgerConnect.message'),
+        description: t('receive.notification.ledgerConnect.description'),
         placement: 'topRight',
         duration: 3,
       });
@@ -52,8 +52,8 @@ function ReceivePage() {
   const onCopyClick = () => {
     setTimeout(() => {
       notification.success({
-        message: t('receive.notification1.title'),
-        description: t('receive.notification1.description'),
+        message: t('receive.notification.addressCopy.message'),
+        description: t('receive.notification.addressCopy.description'),
         placement: 'topRight',
         duration: 2,
         key: 'copy',
