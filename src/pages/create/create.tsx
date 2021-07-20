@@ -549,7 +549,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
               disabled={props.isCreateDisable}
               loading={createLoading}
             >
-              {t('general.successModalPopup.walletCreate.button')}
+              {t('general.successModalPopup.createWallet.button')}
             </Button>
           }
           footer={[
@@ -560,7 +560,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         >
           <>
             <div className="description">
-              {t('general.successModalPopup.walletCreate.description')}
+              {t('general.successModalPopup.createWallet.description')}
             </div>
           </>
         </SuccessModalPopup>
@@ -573,7 +573,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         >
           <>
             <div className="description">
-              {t('general.errorModalPopup.walletCreate.description')}
+              {t('general.errorModalPopup.createWallet.description')}
             </div>
           </>
         </ErrorModalPopup>
