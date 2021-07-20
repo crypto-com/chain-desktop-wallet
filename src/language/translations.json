@@ -21,6 +21,7 @@
         "review": "Review",
         "copy": "Copy",
         "close": "Close",
+        "connect": "Connect",
         "addressValidator": {
           "reason1": "Invalid",
           "reason2": "address provided"
@@ -33,12 +34,25 @@
           "description": "Input the app password decrypt wallet",
           "error": "The password provided is incorrect. Please try again",
           "success": "Wallet decrypted successfully!",
-          "okButton": "Decrypt wallet"
+          "okButton": "Decrypt wallet",
+          "createWallet": {
+            "description": "Input the app password to encrypt the wallet to be restored",
+            "okButton": "Encrypt wallet",
+            "success": "Wallet created and encrypted successfully!",
+            "successButton": "Go to Home"
+          }
         },
         "successModalPopup": {
           "title": "Success!",
           "timeout": {
             "description": "The transaction timed out but it will be included in the subsequent blocks"
+          },
+          "nodeConnect": {
+            "description": "Your node is connected!"
+          },
+          "walletCreate": {
+            "description": "Your wallet has been created!",
+            "button": "Create Wallet"
           },
           "transfer": {
             "description": "The transaction was broadcasted successfully!"
@@ -67,6 +81,12 @@
         },
         "errorModalPopup": {
           "title": "An error happened!",
+          "nodeConnect": {
+            "description": "Could not connect to the specified node URL. Please check again."
+          },
+          "walletCreate": {
+            "description": "Failed to create wallet, the derivation path might be incorrect."
+          },
           "transfer": {
             "description": "The transfer transaction failed. Please try again later."
           },
@@ -92,6 +112,89 @@
             "description": "The NFT minting transaction failed. Please try again later."
           },
           "ledgerExportMode": "Please ensure that your have enabled Expert mode on your ledger device."
+        }
+      },
+      "welcome": {
+        "slogan": "Our Sample Chain Wallet supports wallet management and funds transfer.",
+        "button": "Get Started"
+      },
+      "signup": {
+        "title": "App Password Created Successfully",
+        "slogan": "You have successfully created your app password. You can proceed to restore or create a wallet.",
+        "button1": "Restore Wallet",
+        "button2": "Create Wallet",
+        "passwordFormContainer": {
+          "title": "Create App Password",
+          "description": "Before creating a new wallet, please create your app password. It will be used to encrypt your wallet seeds.",
+          "okButton": "Create App Password",
+          "success": "You have successfully created your app password. You can proceed to restore or create a wallet."
+        }
+      },
+      "create": {
+        "title1": "Create Wallet",
+        "title2": "Custom Configuration",
+        "slogan1": "Create a name and select the network for your wallet.",
+        "slogan2": "Fill in the below to connect to this custom network.",
+        "formCustomConfig": {
+          "nodeUrl": {
+            "label": "Node URL",
+            "error1": "Please enter a valid Node URL"
+          },
+          "indexingUrl": {
+            "label": "Chain Indexing URL",
+            "error1": "Please enter a valid Chain Indexing URL"
+          },
+          "derivationPath": {
+            "label": "Derivation Path",
+            "error1": "Please enter a valid Derivation Path"
+          },
+          "validatorPrefix": {
+            "label": "Validator Prefix"
+          },
+          "addressPrefix": {
+            "label": "Address Prefix"
+          },
+          "chainId": {
+            "label": "Chain ID"
+          },
+          "baseDenom": {
+            "label": "Base Denom"
+          },
+          "croDenom": {
+            "label": "CRO Denom"
+          }
+        },
+        "notification": {
+          "ledger": {
+            "message1": "Cannot detect any Ledger device",
+            "message2": "No Expert Mode",
+            "description1": "Please connect with your Ledger device",
+            "description2": "Please ensure that your have enabled Expert mode on your ledger device"
+          }
+        },
+        "addressIndexValidator": {
+          "error": "Address index should be between 0 ~ "
+        },
+        "formCreate": {
+          "name": {
+            "label": "Wallet Name"
+          },
+          "walletType": {
+            "label": "Wallet Type"
+          },
+          "addressIndex": {
+            "label": "Address Index"
+          },
+          "network": {
+            "label": "Network"
+          },
+          "checkbox1": "Want to create with hardware wallet?"
+        },
+        "ledgerModalPopup": {
+          "title1": "Success!",
+          "title2": "Connect your Ledger Device",
+          "description1": "Your ledger device has been connected successfully.",
+          "description2": "Please confirm connection on your Ledger Device"
         }
       },
       "navbar": {
@@ -445,11 +548,11 @@
         "form1": {
           "nodeUrl": {
             "label": "Node URL",
-            "error1": "Please enter a valid node url"
+            "error1": "Please enter a valid Node URL"
           },
           "indexingUrl": {
             "label": "Chain Indexing URL",
-            "error1": "Please enter a valid indexing url"
+            "error1": "Please enter a valid Chain Indexing URL"
           },
           "chainId": {
             "label": "Chain ID"
@@ -548,8 +651,18 @@
           "reason": "無效的轉帳款項"
         },
         "successModalPopup": {
-          "title": "成功！"
+          "title": "成功！",
+          "walletCreate": {
+            "button": "建立錢包"
+          }
         }
+      },
+      "signup": {
+        "button1": "復原錢包",
+        "button2": "建立錢包"
+      },
+      "create": {
+        "title1": "建立錢包"
       },
       "navbar": {
         "home": "主頁",
@@ -562,7 +675,7 @@
         "wallet": {
           "list": "所有錢包",
           "restore": "復原錢包",
-          "create": "新增錢包",
+          "create": "建立錢包",
           "delete": "刪除錢包",
           "modal": {
             "title": "確認刪除錢包",

@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { Button, Checkbox, Form, Input, notification, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
+import { useTranslation } from 'react-i18next';
 import { walletIdentifierState, walletTempBackupState, sessionState } from '../../recoil/atom';
 import './create.less';
 import { Wallet } from '../../models/Wallet';
@@ -65,6 +66,8 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
   const [checkingNodeConnection, setCheckingNodeConnection] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
 
+  const [t] = useTranslation();
+
   const showModal = () => {
     setIsModalVisible(true);
   };
@@ -126,93 +129,133 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
     >
       <Form.Item
         name="nodeUrl"
-        label="Node URL"
+        label={t('create.formCustomConfig.nodeUrl.label')}
         hasFeedback
         rules={[
-          { required: true, message: 'Node URL is required' },
+          {
+            required: true,
+            message: `${t('create.formCustomConfig.nodeUrl.label')} ${t('general.required')}`,
+          },
           {
             pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
-            message: 'Please enter a valid node url',
+            message: t('create.formCustomConfig.nodeUrl.error1'),
           },
         ]}
       >
-        <Input placeholder="Node URL" />
+        <Input placeholder={t('create.formCustomConfig.nodeUrl.label')} />
       </Form.Item>
 
       <Form.Item
         name="indexingUrl"
-        label="Chain Indexing URL"
+        label={t('create.formCustomConfig.indexingUrl.label')}
         hasFeedback
         rules={[
-          { required: true, message: 'Chain Indexing URL is required' },
+          {
+            required: true,
+            message: `${t('create.formCustomConfig.indexingUrl.label')} ${t('general.required')}`,
+          },
           {
             pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
-            message: 'Please enter a valid indexing url',
+            message: t('create.formCustomConfig.indexingUrl.error1'),
           },
         ]}
       >
-        <Input placeholder="Chain Indexing URL" />
+        <Input placeholder={t('create.formCustomConfig.indexingUrl.label')} />
       </Form.Item>
 
       <div className="row">
         <Form.Item
           name="derivationPath"
-          label="Derivation Path"
+          label={t('create.formCustomConfig.derivationPath.label')}
           hasFeedback
           rules={[
-            { required: true, message: 'Derivation Path is required' },
+            {
+              required: true,
+              message: `${t('create.formCustomConfig.derivationPath.label')} ${t(
+                'general.required',
+              )}`,
+            },
             {
               pattern: /^m\/\d+'?\/\d+'?\/\d+'?\/\d+'?\/\d+'?$/,
-              message: 'Please enter a valid derivation path',
+              message: t('create.formCustomConfig.derivationPath.error1'),
             },
           ]}
         >
-          <Input maxLength={64} placeholder="Derivation Path" />
+          <Input maxLength={64} placeholder={t('create.formCustomConfig.derivationPath.label')} />
         </Form.Item>
         <Form.Item
           name="validatorPrefix"
-          label="Validator Prefix"
+          label={t('create.formCustomConfig.validatorPrefix.label')}
           hasFeedback
-          rules={[{ required: true, message: 'Validator Prefix is required' }]}
+          rules={[
+            {
+              required: true,
+              message: `${t('create.formCustomConfig.validatorPrefix.label')} ${t(
+                'general.required',
+              )}`,
+            },
+          ]}
         >
-          <Input placeholder="Validator Prefix" />
+          <Input placeholder={t('create.formCustomConfig.validatorPrefix.label')} />
         </Form.Item>
       </div>
 
       <div className="row">
         <Form.Item
           name="addressPrefix"
-          label="Address Prefix"
+          label={t('create.formCustomConfig.addressPrefix.label')}
           hasFeedback
-          rules={[{ required: true, message: 'Address Prefix is required' }]}
+          rules={[
+            {
+              required: true,
+              message: `${t('create.formCustomConfig.addressPrefix.label')} ${t(
+                'general.required',
+              )}`,
+            },
+          ]}
         >
-          <Input placeholder="Address Prefix" />
+          <Input placeholder={t('create.formCustomConfig.addressPrefix.label')} />
         </Form.Item>
         <Form.Item
           name="chainId"
-          label="Chain ID"
+          label={t('create.formCustomConfig.chainId.label')}
           hasFeedback
-          rules={[{ required: true, message: 'Chain ID is required' }]}
+          rules={[
+            {
+              required: true,
+              message: `${t('create.formCustomConfig.chainId.label')} ${t('general.required')}`,
+            },
+          ]}
         >
-          <Input placeholder="Chain ID" />
+          <Input placeholder={t('create.formCustomConfig.chainId.label')} />
         </Form.Item>
       </div>
       <div className="row">
         <Form.Item
           name="baseDenom"
-          label="Base Denom"
+          label={t('create.formCustomConfig.baseDenom.label')}
           hasFeedback
-          rules={[{ required: true, message: 'Base Denom is required' }]}
+          rules={[
+            {
+              required: true,
+              message: `${t('create.formCustomConfig.baseDenom.label')} ${t('general.required')}`,
+            },
+          ]}
         >
-          <Input placeholder="Base Denom" />
+          <Input placeholder={t('create.formCustomConfig.baseDenom.label')} />
         </Form.Item>
         <Form.Item
           name="croDenom"
-          label="CRO Denom"
+          label={t('create.formCustomConfig.croDenom.label')}
           hasFeedback
-          rules={[{ required: true, message: 'CRO Denom is required' }]}
+          rules={[
+            {
+              required: true,
+              message: `${t('create.formCustomConfig.croDenom.label')} ${t('general.required')}`,
+            },
+          ]}
         >
-          <Input placeholder="CRO Denom" />
+          <Input placeholder={t('create.formCustomConfig.croDenom.label')} />
         </Form.Item>
       </div>
 
@@ -220,33 +263,33 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         isModalVisible={isModalVisible}
         handleCancel={handleCancel}
         handleOk={handleOk}
-        title="Success!"
+        title={t('general.successModalPopup.title')}
         button={
           <Button type="primary" onClick={checkNodeConnectivity} loading={checkingNodeConnection}>
-            Connect
+            {t('general.connect')}
           </Button>
         }
         footer={[
           <Button key="submit" type="primary" onClick={handleOk}>
-            Next
+            {t('general.continue')}
           </Button>,
         ]}
       >
         <>
-          <div className="description">Your node is connected!</div>
+          <div className="description">
+            {t('general.successModalPopup.nodeConnect.description')}
+          </div>
         </>
       </SuccessModalPopup>
       <ErrorModalPopup
         isModalVisible={isErrorModalVisible}
         handleCancel={handleErrorCancel}
         handleOk={handleErrorOk}
-        title="An error happened!"
+        title={t('general.errorModalPopup.title')}
         footer={[]}
       >
         <>
-          <div className="description">
-            Could not connect to the specified node URL. Please check again.
-          </div>
+          <div className="description">{t('general.errorModalPopup.nodeConnect.description')}</div>
         </>
       </ErrorModalPopup>
     </Form>
@@ -261,6 +304,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(walletTempBackupState);
   const [hwcheck, setHwcheck] = useState(!props.isWalletSelectFieldDisable);
+
+  const [t] = useTranslation();
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -375,12 +420,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
 
       hwok = true;
     } catch (e) {
-      let message = `Cannot detect any Ledger device`;
-      let description = `Please connect with your Ledger device`;
+      let message = `${t('create.notification.ledger.message1')}`;
+      let description = `${t('create.notification.ledger.description1')}`;
       if (walletType === LEDGER_WALLET_TYPE) {
         if (detectConditionsError(e.toString())) {
-          message = `No Expert Mode`;
-          description = 'Please ensure that your have enabled Expert mode on your ledger device.';
+          message = `${t('create.notification.ledger.message2')}`;
+          description = `${t('create.notification.ledger.message2')}`;
         }
       }
 
@@ -410,7 +455,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const addressIndexValidator = TransactionUtils.rangeValidator(
     `0`,
     `${LedgerWalletMaximum}`,
-    `Address index should be between 0 ~ ${LedgerWalletMaximum} (both inclusive)`,
+    `${t('create.addressIndexValidator.error')} ${LedgerWalletMaximum}`,
   );
 
   return (
@@ -429,17 +474,29 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     >
       <Form.Item
         name="name"
-        label="Wallet Name"
+        label={t('create.formCreate.name.label')}
         hasFeedback
-        rules={[{ required: true, message: 'Wallet name is required' }]}
+        rules={[
+          {
+            required: true,
+            message: `${t('create.formCreate.name.label')} ${t('general.required')}`,
+          },
+        ]}
       >
-        <Input maxLength={36} placeholder="Wallet name" />
+        <Input maxLength={36} placeholder={t('create.formCreate.name.label')} />
       </Form.Item>
       <Checkbox onChange={onCheckboxChange} checked={hwcheck}>
-        Want to create with hardware wallet?
+        {t('create.formCreate.checkbox1')}
       </Checkbox>
-      <Form.Item name="walletType" label="Wallet Type" hidden={props.isWalletSelectFieldDisable}>
-        <Select placeholder="Select wallet type" disabled={props.isWalletSelectFieldDisable}>
+      <Form.Item
+        name="walletType"
+        label={t('create.formCreate.walletType.label')}
+        hidden={props.isWalletSelectFieldDisable}
+      >
+        <Select
+          placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
+          disabled={props.isWalletSelectFieldDisable}
+        >
           <Select.Option key="normal" value="normal">
             Normal
           </Select.Option>
@@ -450,11 +507,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       </Form.Item>
       <Form.Item
         name="addressIndex"
-        label="Address Index"
+        label={t('create.formCreate.addressIndex.label')}
         rules={[
           {
             required: true,
-            message: 'Please input your address index',
+            message: `${t('create.formCreate.addressIndex.label')} ${t('general.required')}`,
           },
           addressIndexValidator,
         ]}
@@ -462,9 +519,13 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       >
         <Input placeholder="0" />
       </Form.Item>
-      <Form.Item name="network" label="Network" rules={[{ required: true }]}>
+      <Form.Item
+        name="network"
+        label={t('create.formCreate.network.label')}
+        rules={[{ required: true }]}
+      >
         <Select
-          placeholder="Select wallet network"
+          placeholder={`${t('general.select')} ${t('create.formCreate.network.label')}`}
           onChange={onNetworkChange}
           disabled={props.isNetworkSelectFieldDisable}
         >
@@ -480,7 +541,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           isModalVisible={isModalVisible}
           handleCancel={handleCancel}
           handleOk={handleOk}
-          title="Success!"
+          title={t('general.successModalPopup.title')}
           button={
             <Button
               type="primary"
@@ -488,29 +549,31 @@ const FormCreate: React.FC<FormCreateProps> = props => {
               disabled={props.isCreateDisable}
               loading={createLoading}
             >
-              Create Wallet
+              {t('general.successModalPopup.walletCreate.button')}
             </Button>
           }
           footer={[
             <Button key="submit" type="primary" onClick={handleOk}>
-              Next
+              {t('general.continue')}
             </Button>,
           ]}
         >
           <>
-            <div className="description">Your wallet has been created!</div>
+            <div className="description">
+              {t('general.successModalPopup.walletCreate.description')}
+            </div>
           </>
         </SuccessModalPopup>
         <ErrorModalPopup
           isModalVisible={isErrorModalVisible}
           handleCancel={handleErrorCancel}
           handleOk={handleErrorOk}
-          title="An error happened!"
+          title={t('general.errorModalPopup.title')}
           footer={[]}
         >
           <>
             <div className="description">
-              Failed to create wallet, the derivation path might be incorrect.
+              {t('general.errorModalPopup.walletCreate.description')}
             </div>
           </>
         </ErrorModalPopup>
@@ -539,6 +602,8 @@ const CreatePage = () => {
   const currentSession = useRecoilValue(sessionState);
 
   const analyticsService = new AnalyticsService(currentSession);
+
+  const [t] = useTranslation();
 
   const handleOk = () => {
     setIsModalVisible(false);
@@ -593,12 +658,10 @@ const CreatePage = () => {
         <BackButton />
         <div>
           <div className="title">
-            {!isCustomConfig || isConnected ? 'Create Wallet' : 'Custom Configuration'}
+            {!isCustomConfig || isConnected ? t('create.title1') : t('create.title2')}
           </div>
           <div className="slogan">
-            {!isCustomConfig || isConnected
-              ? 'Create a name and select the network for your wallet.'
-              : 'Fill in the below to connect to this custom network.'}
+            {!isCustomConfig || isConnected ? t('create.slogan1') : t('create.slogan2')}
           </div>
 
           {!isCustomConfig || isConnected ? (
@@ -626,8 +689,8 @@ const CreatePage = () => {
           )}
 
           <PasswordFormModal
-            description="Input the app password to encrypt the wallet to be restored"
-            okButtonText="Encrypt wallet"
+            description={t('general.passwordFormModal.createWallet.description')}
+            okButtonText={t('general.passwordFormModal.createWallet.okButton')}
             isButtonLoading={goHomeButtonLoading}
             onCancel={() => {
               setInputPasswordVisible(false);
@@ -637,13 +700,13 @@ const CreatePage = () => {
               const isValid = await secretStoreService.checkIfPasswordIsValid(password);
               return {
                 valid: isValid,
-                errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+                errMsg: !isValid ? t('general.passwordFormModal.error') : '',
               };
             }}
-            successText="Wallet created and encrypted successfully !"
-            title="Provide app password"
+            successText={t('general.passwordFormModal.createWallet.success')}
+            title={t('general.passwordFormModal.title')}
             visible={inputPasswordVisible}
-            successButtonText="Go to Home"
+            successButtonText={t('general.passwordFormModal.createWallet.successButton')}
             confirmPassword={false}
           />
         </div>
@@ -653,14 +716,18 @@ const CreatePage = () => {
         isModalVisible={isModalVisible}
         handleCancel={handleCancel}
         handleOk={handleOk}
-        title={ledgerConnected ? 'Success!' : 'Connect your Ledger Device'}
+        title={
+          ledgerConnected
+            ? t('create.ledgerModalPopup.title1')
+            : t('create.ledgerModalPopup.title2')
+        }
         footer={[]}
         image={ledgerConnected ? <SuccessCheckmark /> : <IconLedger />}
       >
         <div className="description">
           {ledgerConnected
-            ? 'Your ledger device has been connected successfully.'
-            : 'Please confirm connection on your Ledger Device'}
+            ? t('create.ledgerModalPopup.description1')
+            : t('create.ledgerModalPopup.description2')}
         </div>
       </LedgerModalPopup>
     </main>
