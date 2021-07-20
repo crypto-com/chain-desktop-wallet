@@ -402,16 +402,16 @@ function HomeLayout(props: HomeLayoutProps) {
                 >
                   <Form.Item
                     name="delete"
-                    label={t('navbar.wallet.modal.form1.delete.label')}
+                    label={`${t('navbar.wallet.modal.form1.delete.label')} DELETE`}
                     hasFeedback
                     rules={[
                       {
                         required: true,
-                        message: t('navbar.wallet.modal.form1.delete.error1'),
+                        message: `${t('navbar.wallet.modal.form1.delete.error1')} DELETE`,
                       },
                       {
                         pattern: /^DELETE$/,
-                        message: t('navbar.wallet.modal.form1.delete.error1'),
+                        message: `${t('navbar.wallet.modal.form1.delete.error1')} DELETE`,
                       },
                     ]}
                   >

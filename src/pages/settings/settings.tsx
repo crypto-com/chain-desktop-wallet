@@ -772,15 +772,16 @@ const FormSettings = () => {
                   >
                     <Form.Item
                       name="clear"
-                      label={t('settings.clearStorage.modal.form1.clear.label')}
+                      label={`${t('settings.clearStorage.modal.form1.clear.label')} CLEAR`}
                       hasFeedback
                       rules={[
                         {
                           required: true,
+                          message: `${t('settings.clearStorage.modal.form1.clear.error1')} CLEAR`,
                         },
                         {
                           pattern: /^CLEAR$/,
-                          message: t('settings.clearStorage.modal.form1.clear.error1'),
+                          message: `${t('settings.clearStorage.modal.form1.clear.error1')} CLEAR`,
                         },
                       ]}
                     >

@@ -36,7 +36,7 @@
           "success": "Wallet decrypted successfully!",
           "okButton": "Decrypt wallet",
           "createWallet": {
-            "description": "Input the app password to encrypt the wallet to be restored",
+            "description": "Input the app password to encrypt the wallet to be created",
             "okButton": "Encrypt wallet",
             "success": "Wallet created and encrypted successfully!",
             "successButton": "Go to Home"
@@ -275,8 +275,8 @@
                 "label": "Delete Wallet Address"
               },
               "delete": {
-                "label": "Please enter DELETE",
-                "error1": "Please enter DELETE"
+                "label": "Please enter",
+                "error1": "Please enter"
               }
             },
             "warning1": "Are you sure you want to delete the wallet?",
@@ -679,12 +679,12 @@
           "modal": {
             "title": "Confirm Clear Storage",
             "description1": "You may wish to verify your recovery mnemonic phrase before deletion to ensure that you can restore this wallet in the future.",
-            "warning": "Are you sure you want to clear the storage? If you have not backed up your wallet mnemonic phrase, you will result in losing your funds forever.\n",
+            "warning": "Are you sure you want to clear the storage? If you have not backed up your wallet mnemonic phrase, you will result in losing your funds forever.",
             "disclaimer": "I understand that the only way to regain access is by restoring wallet mnemonic phrase.",
             "form1": {
               "clear": {
-                "label": "Please enter CLEAR",
-                "error1": "Please enter CLEAR"
+                "label": "Please enter",
+                "error1": "Please enter"
               }
             }
           }
@@ -711,14 +711,35 @@
         "available": "可使用",
         "action": "操作",
         "select": "選擇",
+        "review": "檢查",
         "copy": "複製",
         "close": "關閉",
+        "connect": "連接",
         "addressValidator": {
           "reason1": "無效的",
           "reason2": "地址"
         },
         "validTransactionAmountValidator": {
           "reason": "無效的轉帳款項"
+        },
+        "passwordFormModal": {
+          "title": "輸入密碼",
+          "description": "請輸入密碼以解鎖錢包",
+          "error": "密碼不正確，請重新輸入。",
+          "success": "錢包解鎖成功！",
+          "okButton": "解鎖錢包",
+          "createWallet": {
+            "description": "請輸入密碼以加密建立的錢包",
+            "okButton": "加密錢包",
+            "success": "成功建立及加密錢包！",
+            "successButton": "返回主頁"
+          },
+          "restoreWallet": {
+            "description": "請輸入密碼以加密復原的錢包",
+            "okButton": "加密錢包",
+            "success": "成功復原及加密錢包！",
+            "successButton": "返回主頁"
+          }
         },
         "successModalPopup": {
           "title": "成功！",
@@ -755,8 +776,8 @@
                 "label": "刪除錢包地址"
               },
               "delete": {
-                "label": "請輸入 DELETE",
-                "error1": "請輸入 DELETE"
+                "label": "請輸入",
+                "error1": "請輸入"
               }
             },
             "warning1": "你確定要刪除這個錢包？"
@@ -768,7 +789,18 @@
         }
       },
       "home": {
-        "title": "歡迎"
+        "title": "歡迎",
+        "nft": {
+          "tab1": "我的NFT",
+          "seeAll": "所有"
+        },
+        "transactions": {
+          "tab1": "交易",
+          "table1": {
+            "time": "時間",
+            "status": "狀態"
+          }
+        }
       },
       "send": {
         "formSend": {
@@ -793,6 +825,38 @@
           }
         },
         "button": "驗證你的 Ledger 錢包"
+      },
+      "staking": {
+        "validatorList": {
+          "table": {
+            "action": "操作"
+          }
+        }
+      },
+      "governance": {
+        "title": "治理",
+        "tab1": "所有",
+        "tab2": "投票中",
+        "tab3": "已通過",
+        "tab5": "被否決",
+        "start": "開始",
+        "end": "結束",
+        "modal1": {
+          "label3": "投票"
+        }
+      },
+      "nft": {
+        "title": "我的NFT",
+        "media": {
+          "image": "圖片",
+          "video": "影片",
+          "thumbnail": "封面"
+        },
+        "nftCollection": {
+          "table1": {
+            "viewAction": "操作"
+          }
+        }
       },
       "settings": {
         "title": "設定",
@@ -839,7 +903,13 @@
         "clearStorage": {
           "button1": "重置",
           "modal": {
-            "title": "確認重置"
+            "title": "確認重置",
+            "form1": {
+              "clear": {
+                "label": "請輸入",
+                "error1": "請輸入"
+              }
+            }
           }
         }
       }
