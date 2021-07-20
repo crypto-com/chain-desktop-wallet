@@ -40,6 +40,12 @@
             "okButton": "Encrypt wallet",
             "success": "Wallet created and encrypted successfully!",
             "successButton": "Go to Home"
+          },
+          "restoreWallet": {
+            "description": "Input the app password to encrypt the wallet to be restored",
+            "okButton": "Encrypt wallet",
+            "success": "Wallet restored and encrypted successfully!",
+            "successButton": "Go to Home"
           }
         },
         "successModalPopup": {
@@ -50,7 +56,7 @@
           "nodeConnect": {
             "description": "Your node is connected!"
           },
-          "walletCreate": {
+          "createWallet": {
             "description": "Your wallet has been created!",
             "button": "Create Wallet"
           },
@@ -82,10 +88,13 @@
         "errorModalPopup": {
           "title": "An error happened!",
           "nodeConnect": {
-            "description": "Could not connect to the specified node URL. Please check again."
+            "description": "Could not connect to the specified Node URL. Please check again."
           },
-          "walletCreate": {
+          "createWallet": {
             "description": "Failed to create wallet, the derivation path might be incorrect."
+          },
+          "restoreWallet": {
+            "description": "Your Mnemonic Phrase is invalid. Please check again."
           },
           "transfer": {
             "description": "The transfer transaction failed. Please try again later."
@@ -197,6 +206,54 @@
           "description2": "Please confirm connection on your Ledger Device"
         }
       },
+      "restore": {
+        "title1": "Restore Wallet",
+        "title2": "Custom Configuration",
+        "slogan1": "Create a name and select the network for your wallet.",
+        "slogan2": "Fill in the below to connect to this custom network.",
+        "formCustomConfig": {
+          "nodeUrl": {
+            "label": "Node URL",
+            "error1": "Please enter a valid Node URL"
+          },
+          "indexingUrl": {
+            "label": "Chain Indexing URL",
+            "error1": "Please enter a valid Chain Indexing URL"
+          },
+          "derivationPath": {
+            "label": "Derivation Path",
+            "error1": "Please enter a valid Derivation Path"
+          },
+          "validatorPrefix": {
+            "label": "Validator Prefix"
+          },
+          "addressPrefix": {
+            "label": "Address Prefix"
+          },
+          "chainId": {
+            "label": "Chain ID"
+          },
+          "baseDenom": {
+            "label": "Base Denom"
+          },
+          "croDenom": {
+            "label": "CRO Denom"
+          }
+        },
+        "formRestore": {
+          "name": {
+            "label": "Wallet Name"
+          },
+          "mnemonic": {
+            "label": "Mnemonic Phrase",
+            "validatorError": "Please enter a valid mnemonic phrase"
+          },
+          "network": {
+            "label": "Network"
+          },
+          "button": "Restore Wallet"
+        }
+      },
       "navbar": {
         "home": "Home",
         "staking": "Staking",
@@ -231,6 +288,19 @@
             "message1": "Wallet Address",
             "message2": "has been deleted."
           }
+        }
+      },
+      "wallet": {
+        "title": "All Wallets",
+        "description": "You may review all your wallets here.",
+        "search": {
+          "placeholder": "Search by Name, Address..."
+        },
+        "table1": {
+          "name": "Name",
+          "address": "Address",
+          "walletType": "Wallet Type",
+          "network": "Network"
         }
       },
       "announcement": {
@@ -652,7 +722,7 @@
         },
         "successModalPopup": {
           "title": "成功！",
-          "walletCreate": {
+          "createWallet": {
             "button": "建立錢包"
           }
         }
