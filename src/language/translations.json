@@ -60,6 +60,9 @@
           },
           "nftTransfer": {
             "description": "Your NFT transaction was broadcasted successfully!"
+          },
+          "nftMint": {
+            "description": "Your NFT was minted successfully!"
           }
         },
         "errorModalPopup": {
@@ -83,7 +86,10 @@
             "description": "The vote transaction failed. Please try again later."
           },
           "nftTransfer": {
-            "description": "The NFT transaction failed. Please try again later."
+            "description": "The NFT transfer transaction failed. Please try again later."
+          },
+          "nftMint": {
+            "description": "The NFT minting transaction failed. Please try again later."
           },
           "ledgerExportMode": "Please ensure that your have enabled Expert mode on your ledger device."
         }
@@ -164,8 +170,8 @@
           "table3": {
             "transactionHash": "Transaction Hash",
             "messageType": "Type",
-            "denomId": "NFT Name",
-            "tokenId": "NFT ID",
+            "denomId": "Denom ID",
+            "tokenId": "Token ID",
             "recipientAddress": "Recipient",
             "time": "Time"
           }
@@ -320,8 +326,30 @@
         "description": "An overview of your NFT Collection on Crypto.org Chain.",
         "tab1": "NFT Collection",
         "tab2": "Mint NFT",
+        "container": {
+          "description": "Mint your NFT with Image or Video on Crypto.org chain."
+        },
+        "fileUploadValidator": {
+          "error1": "Upload Files is required",
+          "error2": "File upload failed. Please upload again."
+        },
+        "beforeUpload": {
+          "error1": "You can only upload ",
+          "error2": "Video size must be smaller than",
+          "error3": "Image size must be smaller than"
+        },
+        "media": {
+          "image": "Image",
+          "video": "Video",
+          "thumbnail": "Thumbnail"
+        },
+        "notification": {
+          "uploadFailed": {
+            "message": "Upload failed",
+            "description": "Please confirm your connection & try again later."
+          }
+        },
         "formMintNft": {
-          "description": "Mint your NFT with Image or Video on Crypto.org chain.",
           "denomId": {
             "label": "Denom ID",
             "placeholder": "e.g. ",
@@ -344,35 +372,68 @@
             "label": "Drop Name",
             "placeholder": "e.g."
           },
+          "description": {
+            "label": "Drop Description",
+            "placeholder": "e.g."
+          },
           "files": {
             "label": "Upload Files",
             "description1": "Please wait until file upload finished",
             "description2": "You have to upload a thumbnail for the video"
           }
         },
-        "fileUploadValidator": {
-          "error1": "Upload Files is required",
-          "error2": "File upload failed. Please upload again."
-        },
-        "beforeUpload": {
-          "error1": "You can only upload ",
-          "error2": "Video size must be smaller than",
-          "error3": "Image size must be smaller than"
-        },
-        "media": {
-          "image": "Image",
-          "video": "Video",
-          "thumbnail": "Thumbnail"
-        },
-        "notification": {
-          "uploadFailed": {
-            "message": "Upload failed",
-            "description": "Please confirm your connection & try again later."
-          }
-        },
         "modal1": {
           "title": "Confirm Mint NFT",
-          "description": "Please review the information below."
+          "description": "Please review the information below.",
+          "label1": "Denom ID",
+          "label2": "Token ID",
+          "label3": "Drop Name",
+          "label4": "Drop Description",
+          "label5": "Transaction Fee",
+          "notice1": "The Denom ID is registered by another address. Please choose another one.",
+          "notice2": "Insufficient balance. Please ensure you have at least",
+          "notice3": "for network fee.",
+          "notice4": "This NFT will be minted on the Crypto.org Chain."
+        },
+        "modal2": {
+          "title": "Confirm Transfer",
+          "description": "Please review the information below.",
+          "label1": "To",
+          "label2": "Denom ID",
+          "label3": "Token ID",
+          "label4": "Transaction Fee",
+          "notice1": "This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address that is not compatible with the Crypto.org Chain NFT token standard will result in the permanent loss of your asset.",
+          "button1": "Confirm Transfer"
+        },
+        "modal3": {
+          "title": "Transfer NFT",
+          "description": "Fill in the information below to transfer your NFT.",
+          "label1": "Sending",
+          "form": {
+            "recipientAddress": {
+              "label": "Recipient Address",
+              "placeholder": "Enter Recipient Address"
+            }
+          }
+        },
+        "nftCollection": {
+          "table1": {
+            "name": "Drop Name",
+            "denomId": "Denom ID",
+            "tokenId": "Token ID",
+            "creator": "Creator",
+            "viewAction": "Action",
+            "action1": "View"
+          }
+        },
+        "detailModal": {
+          "subtitle": "About the Drop",
+          "label1": "Denom ID",
+          "label2": "Denom Name",
+          "label3": "Token ID",
+          "label4": "Content URL",
+          "button1": "Transfer NFT",
+          "button2": "View on Crypto.com NFT"
         }
       },
       "settings": {

@@ -708,7 +708,7 @@ const FormMintNft = () => {
                 ''
               )}
               <div className="item">
-                <div className="label">Denom ID</div>
+                <div className="label">{t('nft.modal1.label1')}</div>
                 <div>{`${formValues.denomId}`}</div>
               </div>
               {isDenomIdIssued && !isDenomIdOwner ? (
@@ -717,32 +717,30 @@ const FormMintNft = () => {
                     <Sider width="20px">
                       <ExclamationCircleOutlined style={{ color: '#f27474' }} />
                     </Sider>
-                    <Content>
-                      The Denom ID is registered by another address. Please choose another one.
-                    </Content>
+                    <Content>{t('nft.modal1.notice1')}</Content>
                   </Layout>
                 </div>
               ) : (
                 ''
               )}
               <div className="item">
-                <div className="label">Token ID</div>
+                <div className="label">{t('nft.modal1.label2')}</div>
                 <div>{`${formValues.tokenId}`}</div>
               </div>
               <div className="item">
-                <div className="label">Drop Name</div>
+                <div className="label">{t('nft.modal1.label3')}</div>
                 <div>{`${formValues.drop}`}</div>
               </div>
               {formValues.description ? (
                 <div className="item">
-                  <div className="label">Drop Description</div>
+                  <div className="label">{t('nft.modal1.label4')}</div>
                   <div>{`${formValues.description}`}</div>
                 </div>
               ) : (
                 <></>
               )}
               <div className="item">
-                <div className="label">Transaction Fee</div>
+                <div className="label">{t('nft.modal1.label5')}</div>
                 <div>
                   {getUINormalScaleAmount(
                     multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1),
@@ -758,12 +756,10 @@ const FormMintNft = () => {
                       <ExclamationCircleOutlined style={{ color: '#f27474' }} />
                     </Sider>
                     <Content>
-                      Insufficient balance. Please ensure you have at least{' '}
-                      {getUINormalScaleAmount(
+                      {`${t('nft.modal1.notice2')} ${getUINormalScaleAmount(
                         multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1),
                         walletAsset.decimals,
-                      )}{' '}
-                      {walletAsset.symbol} for network fee.
+                      )} ${walletAsset.symbol} ${t('nft.modal1.notice3')}`}
                     </Content>
                   </Layout>
                 </div>
@@ -775,7 +771,7 @@ const FormMintNft = () => {
                   <Sider width="20px">
                     <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
                   </Sider>
-                  <Content>This NFT will be minted on the Crypto.org Chain.</Content>
+                  <Content>{t('nft.modal1.notice4')}</Content>
                 </Layout>
               </div>
             </>
@@ -783,8 +779,8 @@ const FormMintNft = () => {
         </ModalPopup>
       </Form>
       <PasswordFormModal
-        description="Input the app password decrypt wallet"
-        okButtonText="Decrypt wallet"
+        description={t('general.passwordFormModal.description')}
+        okButtonText={t('general.passwordFormModal.okButton')}
         onCancel={() => {
           setInputPasswordVisible(false);
           // setIsNftTransferModalVisible(true);
@@ -794,24 +790,24 @@ const FormMintNft = () => {
           const isValid = await secretStoreService.checkIfPasswordIsValid(password);
           return {
             valid: isValid,
-            errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
           };
         }}
-        successText="Wallet decrypted successfully !"
-        title="Provide app password"
+        successText={t('general.passwordFormModal.success')}
+        title={t('general.passwordFormModal.title')}
         visible={inputPasswordVisible}
-        successButtonText="Continue"
+        successButtonText={t('general.continue')}
         confirmPassword={false}
       />
       <SuccessModalPopup
         isModalVisible={isSuccessModalVisible}
         handleCancel={closeSuccessModal}
         handleOk={closeSuccessModal}
-        title="Success!"
+        title={t('general.successModalPopup.title')}
         button={null}
         footer={[
           <Button key="submit" type="primary" onClick={closeSuccessModal}>
-            Ok
+            {t('general.ok')}
           </Button>,
         ]}
       >
@@ -819,11 +815,9 @@ const FormMintNft = () => {
           {broadcastResult?.code !== undefined &&
           broadcastResult?.code !== null &&
           broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">
-              The transaction timed out but it will be included in the subsequent blocks
-            </div>
+            <div className="description">{t('general.successModalPopup.timeout.description')}</div>
           ) : (
-            <div className="description">Your NFT was minted successfully!</div>
+            <div className="description">{t('general.successModalPopup.nftMint.description')}</div>
           )}
         </>
       </SuccessModalPopup>
@@ -831,12 +825,12 @@ const FormMintNft = () => {
         isModalVisible={isErrorModalVisible}
         handleCancel={closeErrorModal}
         handleOk={closeErrorModal}
-        title="An error happened!"
+        title={t('general.errorModalPopup.title')}
         footer={[]}
       >
         <>
           <div className="description">
-            The NFT transaction failed. Please try again later.
+            {t('general.errorModalPopup.nftMint.description')}
             <br />
             {errorMessages
               .filter((item, idx) => {
@@ -845,11 +839,7 @@ const FormMintNft = () => {
               .map((err, idx) => (
                 <div key={idx}>- {err}</div>
               ))}
-            {ledgerIsExpertMode ? (
-              <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
-            ) : (
-              ''
-            )}
+            {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
           </div>
         </>
       </ErrorModalPopup>
@@ -1105,7 +1095,7 @@ const NftPage = () => {
 
   const NftColumns = [
     {
-      title: 'Drop Name',
+      title: t('nft.nftCollection.table1.name'),
       key: 'name',
       render: record => {
         const { drop, name } = record.tokenData;
@@ -1113,21 +1103,21 @@ const NftPage = () => {
       },
     },
     {
-      title: 'Denom ID',
+      title: t('nft.nftCollection.table1.denomId'),
       key: 'denomId',
       render: record => {
         return record.denomId;
       },
     },
     {
-      title: 'Token ID',
+      title: t('nft.nftCollection.table1.tokenId'),
       key: 'tokenId',
       render: record => {
         return record.tokenId;
       },
     },
     {
-      title: 'Creator',
+      title: t('nft.nftCollection.table1.creator'),
       key: 'creator',
       render: record => {
         return (
@@ -1143,7 +1133,7 @@ const NftPage = () => {
       },
     },
     {
-      title: 'Action',
+      title: t('nft.nftCollection.table1.viewAction'),
       key: 'viewAction',
       render: record => {
         return (
@@ -1155,7 +1145,7 @@ const NftPage = () => {
               setIsNftModalVisible(true);
             }}
           >
-            View
+            {t('nft.nftCollection.table1.action1')}
           </a>
         );
       },
@@ -1294,27 +1284,27 @@ const NftPage = () => {
                         />
                       </div>
                       <div className="item">
-                        <div className="subtitle">About the Drop</div>
+                        <div className="subtitle">{t('nft.detailModal.subtitle')}</div>
                         <div className="description">
                           {nft?.tokenData.description ? nft?.tokenData.description : 'n.a.'}
                         </div>
                       </div>
                       <div className="item">
                         <div className="table-row">
-                          <div>Denom ID</div>
+                          <div>{t('nft.detailModal.label1')}</div>
                           <div>{nft?.denomId}</div>
                         </div>
                         <div className="table-row">
-                          <div>Denom Name</div>
+                          <div>{t('nft.detailModal.label2')}</div>
                           <div>{nft?.denomName}</div>
                         </div>
                         <div className="table-row">
-                          <div>Token ID</div>
+                          <div>{t('nft.detailModal.label3')}</div>
                           <div>{nft?.tokenId}</div>
                         </div>
                         {nft?.tokenData.mimeType ? (
                           <div className="table-row">
-                            <div>Content URL</div>
+                            <div>{t('nft.detailModal.label4')}</div>
                             <a
                               data-original={nft?.denomId}
                               target="_blank"
@@ -1345,7 +1335,7 @@ const NftPage = () => {
                             setIsNftModalVisible(false);
                           }}
                         >
-                          Transfer NFT
+                          {t('nft.detailModal.button1')}
                         </Button>
                       </div>
                       <div className="item goto-marketplace">
@@ -1356,7 +1346,7 @@ const NftPage = () => {
                             rel="noreferrer"
                             href={nft?.marketplaceLink}
                           >
-                            View on Crypto.com NFT
+                            {t('nft.detailModal.button2')}
                           </a>
                         ) : (
                           ''
@@ -1383,7 +1373,7 @@ const NftPage = () => {
                       onClick={onConfirmTransfer}
                       loading={confirmLoading}
                     >
-                      Confirm Transfer
+                      {t('nft.modal2.button1')}
                     </Button>
                   ) : (
                     <Button
@@ -1395,7 +1385,7 @@ const NftPage = () => {
                         form.submit();
                       }}
                     >
-                      Next
+                      {t('general.continue')}
                     </Button>
                   ),
                   <Button
@@ -1411,7 +1401,7 @@ const NftPage = () => {
                       }
                     }}
                   >
-                    Cancel
+                    {t('general.cancel')}
                   </Button>,
                 ]}
                 okText="Confirm"
@@ -1420,13 +1410,13 @@ const NftPage = () => {
                 <>
                   {isNftTransferConfirmVisible ? (
                     <>
-                      <div className="title">Confirm Transfer</div>
-                      <div className="description">Please review the information below.</div>
+                      <div className="title">{t('nft.modal2.title')}</div>
+                      <div className="description">{t('nft.modal2.description')}</div>
                       <div className="item">
                         <div className="nft-image">{renderPreview(nft)}</div>
                       </div>
                       <div className="item">
-                        <div className="label">To</div>
+                        <div className="label">{t('nft.modal2.label1')}</div>
                         <div className="address">{`${form.getFieldValue('recipientAddress')}`}</div>
                       </div>
                       <div className="item notice">
@@ -1434,23 +1424,19 @@ const NftPage = () => {
                           <Sider width="20px">
                             <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
                           </Sider>
-                          <Content>
-                            This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient
-                            address that is not compatible with the Crypto.org Chain NFT token
-                            standard will result in the permanent loss of your asset.
-                          </Content>
+                          <Content>{t('nft.modal2.notice1')}</Content>
                         </Layout>
                       </div>
                       <div className="item">
-                        <div className="label">Denom ID</div>
+                        <div className="label">{t('nft.modal2.label2')}</div>
                         <div>{`${formValues.denomId}`}</div>
                       </div>
                       <div className="item">
-                        <div className="label">Token ID</div>
+                        <div className="label">{t('nft.modal2.label3')}</div>
                         <div>{`${formValues.tokenId}`}</div>
                       </div>
                       <div className="item">
-                        <div className="label">Transaction Fee</div>
+                        <div className="label">{t('nft.modal2.label4')}</div>
                         <div>
                           {getUINormalScaleAmount(networkFee, walletAsset.decimals)}{' '}
                           {walletAsset.symbol}
@@ -1459,15 +1445,13 @@ const NftPage = () => {
                     </>
                   ) : (
                     <>
-                      <div className="title">Transfer NFT</div>
-                      <div className="description">
-                        Fill in the information below to transfer your NFT.
-                      </div>
+                      <div className="title">{t('nft.modal3.title')}</div>
+                      <div className="description">{t('nft.modal3.description')}</div>
                       <div className="item">
                         <div className="nft-image">{renderPreview(nft)}</div>
                       </div>
                       <div className="item">
-                        <div className="label">Sending</div>
+                        <div className="label">{t('nft.modal3.label1')}</div>
                         <div className="address">{renderNftTitle(nft)}</div>
                       </div>
                       <Form
@@ -1480,15 +1464,20 @@ const NftPage = () => {
                       >
                         <Form.Item
                           name="recipientAddress"
-                          label="Recipient Address"
+                          label={t('nft.modal3.form.recipientAddress.label')}
                           hasFeedback
                           validateFirst
                           rules={[
-                            { required: true, message: 'Recipient address is required' },
+                            {
+                              required: true,
+                              message: `${t('nft.modal3.form.recipientAddress.label')} ${t(
+                                'general.required',
+                              )}`,
+                            },
                             customAddressValidator,
                           ]}
                         >
-                          <Input placeholder="Enter recipient address" />
+                          <Input placeholder={t('nft.modal3.form.recipientAddress.placeholder')} />
                         </Form.Item>
                       </Form>
                       {networkFee > walletAsset.balance ? (
@@ -1498,9 +1487,10 @@ const NftPage = () => {
                               <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
                             </Sider>
                             <Content>
-                              Insufficient balance. Please ensure you have at least{' '}
-                              {getUINormalScaleAmount(networkFee, walletAsset.decimals)}{' '}
-                              {walletAsset.symbol} for network fee.
+                              {`${t('nft.modal1.notice2')} ${getUINormalScaleAmount(
+                                networkFee,
+                                walletAsset.decimals,
+                              )} ${walletAsset.symbol} ${t('nft.modal1.notice3')}`}
                             </Content>
                           </Layout>
                         </div>
@@ -1512,11 +1502,7 @@ const NftPage = () => {
                           <Sider width="20px">
                             <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
                           </Sider>
-                          <Content>
-                            This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient
-                            address that is not compatible with the Crypto.org Chain NFT token
-                            standard will result in the permanent loss of your asset.
-                          </Content>
+                          <Content>{t('nft.modal2.notice1')}</Content>
                         </Layout>
                       </div>
                     </>
@@ -1601,7 +1587,7 @@ const NftPage = () => {
           <TabPane tab={t('nft.tab2')} key="2">
             <div className="site-layout-background nft-content">
               <div className="container">
-                <div className="description">{t('nft.formMintNft.description')}</div>
+                <div className="description">{t('nft.container.description')}</div>
                 <FormMintNft />
               </div>
             </div>
