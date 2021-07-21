@@ -137,14 +137,13 @@ app.on('activate', async () => {
     createWindow();
   }
 
-  sendStatusToWindow('activate event called')
-  await new Promise(resolve => setTimeout(resolve, 10_000));
-  autoUpdater.checkForUpdatesAndNotify();
-
 });
 
 app.on('ready',  async function()  {
   createWindow()
+
+  await new Promise(resolve => setTimeout(resolve, 20_000));
+  autoUpdater.checkForUpdatesAndNotify();
 });
 
 ipcMain.on('app_version', (event) => {
