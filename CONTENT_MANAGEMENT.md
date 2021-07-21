@@ -30,7 +30,6 @@ export function MyComponent() {
 
 ### Procedure
 Whenever you've modified any contents inside the [Spreadsheet](https://docs.google.com/spreadsheets/d/1QTqPb97jr6zOD7krA4pAXHYx51CiSkJYq7m71OYcLok/edit#gid=0), you will need to do the following steps properly in order to take effective:
-1. Choose `Desktop Wallet` Tab
+1. Choose `Desktop Wallet` Sheet
 2. In the Navbar Menu, choose `Export JSON` => `Export JSON for this sheet`
-3. The script will generate the JSON. Wait until it's finished.
-4. Copy the generated JSON and paste it inside `translations.json`
+3. Copy the generated JSON and paste it inside [`translations.json`](./translation.json)
