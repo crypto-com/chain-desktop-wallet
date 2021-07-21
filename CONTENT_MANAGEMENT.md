@@ -1,5 +1,5 @@
-# Instructions on Language Management
-All the language contents are managed inside the Google Spreadsheet [`Desktop Wallet Language`](https://docs.google.com/spreadsheets/d/1QTqPb97jr6zOD7krA4pAXHYx51CiSkJYq7m71OYcLok/edit#gid=0), with an Apps Script [`csvToJson.gs`](https://script.google.com/home/projects/1X1WCMV0tbQsXvlkV70Kw_3gvF85zSxeqkUnTuDhul_EcdWG9ZU4_Z6ow/edit) for exporting the Multi-Language content as JSON. 
+# Instructions on Multi-Language Content Management
+All the language contents are managed inside the Google Spreadsheet [`Desktop Wallet Language`](https://docs.google.com/spreadsheets/d/1QTqPb97jr6zOD7krA4pAXHYx51CiSkJYq7m71OYcLok/edit#gid=0), with an Apps Script [`csvToJson.gs`](https://script.google.com/home/projects/1X1WCMV0tbQsXvlkV70Kw_3gvF85zSxeqkUnTuDhul_EcdWG9ZU4_Z6ow/edit) (a sample is also kept in [`./src/language/csvToJson.gs`](./src/language/csvToJson.gs)) for exporting the Multi-Language content as JSON. 
 
 If you need the access, please contact: [matthew.to@crypto.com](mailto:matthew.to@crypto.com) or [eddy.wanny@crypto.com](mailto:eddy.wanny@crypto.com)
 
