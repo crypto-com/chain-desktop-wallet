@@ -1,5 +1,5 @@
 {
-  "enUs": {
+  "enUS": {
     "translation": {
       "language": "English",
       "general": {
@@ -692,7 +692,7 @@
       }
     }
   },
-  "zhHk": {
+  "zhHK": {
     "translation": {
       "language": "繁體中文",
       "general": {
@@ -915,6 +915,9 @@
       }
     }
   },
+  "zhCN": {
+    "translation": {}
+  },
   "frFR": {
     "translation": {
       "general": {
@@ -933,5 +936,29 @@
         }
       }
     }
+  },
+  "koKR": {
+    "translation": {}
+  },
+  "itIT": {
+    "translation": {}
+  },
+  "esES": {
+    "translation": {}
+  },
+  "trTR": {
+    "translation": {}
+  },
+  "jaJP": {
+    "translation": {}
+  },
+  "viVN": {
+    "translation": {}
+  },
+  "ibo": {
+    "translation": {}
+  },
+  "arAE": {
+    "translation": {}
   }
 }
