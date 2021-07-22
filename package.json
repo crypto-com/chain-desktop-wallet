@@ -57,6 +57,7 @@
     "react-refresh": "0.8.3",
     "react-router-dom": "5.2.0",
     "react-script": "2.0.5",
+    "react-i18next": "11.11.1",
     "react-sticky-mouse-tooltip": "0.0.1",
     "recoil": "0.1.3",
     "scrypt-js": "3.0.1",
