@@ -465,19 +465,7 @@ function HomeLayout(props: HomeLayoutProps) {
         >
           <>
             <div className="title">{t('announcement.modal.title')}</div>
-            <div className="description">
-              {t('announcement.modal.description1')}{' '}
-              <Link
-                to="/settings"
-                onClick={async () => {
-                  setIsAnnouncementVisible(false);
-                  await generalConfigService.setHasShownAnalyticsPopup(true);
-                }}
-              >
-                {t('navbar.settings')}
-              </Link>
-              {t('announcement.modal.description2')}
-            </div>
+            <div className="description">{t('announcement.modal.description1')}</div>
           </>
         </ModalPopup>
       </Layout>

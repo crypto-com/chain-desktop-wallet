@@ -18,7 +18,8 @@ export const LedgerWalletMaximum = 2147483647;
 export const DEFAULT_LANGUAGE_CODE = 'enUS';
 export const SUPPORTED_LANGUAGE = [
   { value: 'enUS', label: 'English' },
-  { value: 'zhHK', label: '中文' },
+  { value: 'zhHK', label: '繁體中文' },
+  { value: 'zhCN', label: '简体中文' },
 ];
 
 export type WalletConfig = {
