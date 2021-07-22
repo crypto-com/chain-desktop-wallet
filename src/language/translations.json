@@ -2085,6 +2085,7 @@
         "continue": "Continuer",
         "cancel": "Annuler",
         "save": "Sauvegarder",
+        "discard": "Ignorer les changements",
         "ok": "Ok",
         "required": "est requis",
         "cannot0": "ne peut pas être 0",
@@ -2108,6 +2109,17 @@
         "dataAnalytics": {
           "title": "Analytique Google",
           "description": "Analytique Google"
+        },
+        "clearStorage": {
+          "modal": {
+            "disclaimer": "Je comprend que la seule manière de récupérer le compte est de restaurer la phrase mnémonique du portefeuille.",
+            "form1": {
+              "clear": {
+                "label": "Veuillez insérer",
+                "error1": "Veuillez insérer"
+              }
+            }
+          }
         }
       }
     }
@@ -2821,7 +2833,7 @@
     "translation": {
       "language": "Türkçe",
       "general": {
-        "enabled": "Etkinle"
+        "enabled": "Etkinleştir"
       }
     }
   },
@@ -2836,5 +2848,30 @@
   },
   "arAE": {
     "translation": {}
+  },
+  "deDE": {
+    "translation": {
+      "language": "Deutsch",
+      "general": {
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
+        "confirm": "Bestätigen",
+        "continue": "Fortsetzen",
+        "cancel": "Abbrechen",
+        "save": "Speichern",
+        "discard": "Änderungen verwerfen",
+        "ok": "Ok",
+        "required": "ist erforderlich",
+        "cannot0": "kann nicht 0 sein",
+        "validator": "Prüfer",
+        "receiving": "empfangend",
+        "available": "Verfügbar",
+        "action": "Action",
+        "select": "Auswählen",
+        "review": "Überprüfung",
+        "copy": "Kopierien",
+        "close": "Schließen"
+      }
+    }
   }
 }

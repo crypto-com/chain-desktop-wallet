@@ -20,6 +20,7 @@ export const SUPPORTED_LANGUAGE = [
   { value: 'enUS', label: 'English' },
   { value: 'zhHK', label: '繁體中文' },
   { value: 'zhCN', label: '简体中文' },
+  { value: 'koKR', label: '한국어' },
 ];
 
 export type WalletConfig = {
