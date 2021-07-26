@@ -3,6 +3,7 @@ import './welcome.less';
 import 'antd/dist/antd.css';
 import { Button } from 'antd';
 import { Link, useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { walletService } from '../../service/WalletService';
 import logo from '../../assets/logo-products-chain.svg';
 import { secretStoreService } from '../../storage/SecretStoreService';
@@ -12,6 +13,8 @@ function WelcomePage() {
   const [hasWallet, setHasWallet] = useState(false); // Default as false. useEffect will only re-render if result of hasWalletBeenCreated === true
   const [hasPasswordBeenSet, setHasPasswordBeenSet] = useState(true);
   const didMountRef = useRef(false);
+
+  const [t] = useTranslation();
 
   useEffect(() => {
     const fetchWalletData = async () => {
@@ -39,12 +42,10 @@ function WelcomePage() {
       <div className="container">
         <div>
           <div className="title">Crypto.org Chain Wallet</div>
-          <div className="slogan">
-            Our Sample Chain Wallet supports wallet management and funds transfer.
-          </div>
+          <div className="slogan">{t('welcome.slogan')}</div>
           <div className="button-container">
             <Link to="/signup">
-              <Button type="primary">Get Started</Button>
+              <Button type="primary">{t('welcome.button')}</Button>
             </Link>
             {/* <Link to="/create">
               <Button>Create Wallet</Button>

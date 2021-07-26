@@ -1,5 +1,6 @@
 import { DatabaseManager } from './DatabaseManager';
 import { GeneralConfig } from '../config/GeneralConfig';
+import { DEFAULT_LANGUAGE_CODE } from '../config/StaticConfig';
 
 export class GeneralConfigService {
   private readonly db: DatabaseManager;
@@ -18,6 +19,38 @@ export class GeneralConfigService {
     );
   }
 
+  public async setLanguage(languageCode: string) {
+    const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
+      _id: this.GENERAL_CONFIG_ID,
+    });
+
+    // If config object is not yet created
+    if (!savedConfig) {
+      const newConfig: GeneralConfig = {
+        ...(savedConfig as GeneralConfig),
+        languageCode,
+      };
+      return this.saveGeneralConfig(newConfig);
+    }
+    savedConfig.languageCode = languageCode;
+    return this.saveGeneralConfig(savedConfig);
+  }
+
+  public async getLanguage(): Promise<string> {
+    const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
+      _id: this.GENERAL_CONFIG_ID,
+    });
+    if (!savedConfig) {
+      const newConfig: GeneralConfig = {
+        ...(savedConfig as GeneralConfig),
+        hasEverShownAnalyticsPopup: false,
+      };
+      await this.saveGeneralConfig(newConfig);
+      return DEFAULT_LANGUAGE_CODE;
+    }
+    return savedConfig.languageCode ? savedConfig.languageCode : DEFAULT_LANGUAGE_CODE;
+  }
+
   public async setHasShownAnalyticsPopup(hasShownAnalyticsPopup: boolean) {
     const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
       _id: this.GENERAL_CONFIG_ID,
@@ -26,6 +59,7 @@ export class GeneralConfigService {
     // If config object is not yet created
     if (!savedConfig) {
       const newConfig: GeneralConfig = {
+        ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: hasShownAnalyticsPopup,
       };
       return this.saveGeneralConfig(newConfig);
@@ -40,6 +74,7 @@ export class GeneralConfigService {
     });
     if (!savedConfig) {
       const newConfig: GeneralConfig = {
+        ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
       };
       await this.saveGeneralConfig(newConfig);
