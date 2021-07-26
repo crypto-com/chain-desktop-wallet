@@ -29,11 +29,7 @@ jobs:
         run: |
           yarn install --network-timeout 600000
 
-      - name: Build App
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          build_script_name: electron:pre-build
+      - name: Build App Binaries
+        run: |
+          yarn electron:build
 
-          # GitHub token, automatically provided to the action
-          # (No need to define this secret in the repo settings)
-          github_token: ${{ secrets.github_token }}
