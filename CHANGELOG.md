@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.4.0] - 2021-07-27
+
+### Additions
+- Added support for auto updater on Windows
+- Initial support for internationalization and language support.
+- Remove obsolete croeseid v2 network configuration
+
+
 ## [v0.3.9] - 2021-07-26
 
 - Add support for seed phrase export to the wallet
