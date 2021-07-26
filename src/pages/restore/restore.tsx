@@ -4,6 +4,7 @@ import { useRecoilValue } from 'recoil';
 import './restore.less';
 import { Button, Form, Input, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
+import { useTranslation } from 'react-i18next';
 import { HDKey } from '../../utils/ChainJsLib';
 import { sessionState } from '../../recoil/atom';
 import logo from '../../assets/logo-products-chain.svg';
@@ -49,6 +50,8 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
   const [checkingNodeConnection, setCheckingNodeConnection] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+
+  const [t] = useTranslation();
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -104,93 +107,133 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
     >
       <Form.Item
         name="nodeUrl"
-        label="Node URL"
+        label={t('restore.formCustomConfig.nodeUrl.label')}
         hasFeedback
         rules={[
-          { required: true, message: 'Node URL is required' },
+          {
+            required: true,
+            message: `${t('restore.formCustomConfig.nodeUrl.label')} ${t('general.required')}`,
+          },
           {
             pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
-            message: 'Please enter a valid node url',
+            message: t('restore.formCustomConfig.nodeUrl.error1'),
           },
         ]}
       >
-        <Input placeholder="Node URL" />
+        <Input placeholder={t('restore.formCustomConfig.nodeUrl.label')} />
       </Form.Item>
 
       <Form.Item
         name="indexingUrl"
-        label="Chain Indexing URL"
+        label={t('restore.formCustomConfig.indexingUrl.label')}
         hasFeedback
         rules={[
-          { required: true, message: 'Chain Indexing URL is required' },
+          {
+            required: true,
+            message: `${t('restore.formCustomConfig.indexingUrl.label')} ${t('general.required')}`,
+          },
           {
             pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
-            message: 'Please enter a valid indexing url',
+            message: t('restore.formCustomConfig.indexingUrl.error1'),
           },
         ]}
       >
-        <Input placeholder="Chain Indexing URL" />
+        <Input placeholder={t('restore.formCustomConfig.indexingUrl.label')} />
       </Form.Item>
 
       <div className="row">
         <Form.Item
           name="derivationPath"
-          label="Derivation Path"
+          label={t('restore.formCustomConfig.derivationPath.label')}
           hasFeedback
           rules={[
-            { required: true, message: 'Derivation Path is required' },
+            {
+              required: true,
+              message: `${t('restore.formCustomConfig.derivationPath.label')} ${t(
+                'general.required',
+              )}`,
+            },
             {
               pattern: /^m\/\d+'?\/\d+'?\/\d+'?\/\d+'?\/\d+'?$/,
-              message: 'Please enter a valid derivation path',
+              message: t('restore.formCustomConfig.derivationPath.error1'),
             },
           ]}
         >
-          <Input maxLength={64} placeholder="Derivation Path" />
+          <Input maxLength={64} placeholder={t('restore.formCustomConfig.derivationPath.label')} />
         </Form.Item>
         <Form.Item
           name="validatorPrefix"
-          label="Validator Prefix"
+          label={t('restore.formCustomConfig.validatorPrefix.label')}
           hasFeedback
-          rules={[{ required: true, message: 'Validator Prefix is required' }]}
+          rules={[
+            {
+              required: true,
+              message: `${t('restore.formCustomConfig.validatorPrefix.label')} ${t(
+                'general.required',
+              )}`,
+            },
+          ]}
         >
-          <Input placeholder="Validator Prefix" />
+          <Input placeholder={t('restore.formCustomConfig.validatorPrefix.label')} />
         </Form.Item>
       </div>
 
       <div className="row">
         <Form.Item
           name="addressPrefix"
-          label="Address Prefix"
+          label={t('restore.formCustomConfig.addressPrefix.label')}
           hasFeedback
-          rules={[{ required: true, message: 'Address Prefix is required' }]}
+          rules={[
+            {
+              required: true,
+              message: `${t('restore.formCustomConfig.addressPrefix.label')} ${t(
+                'general.required',
+              )}`,
+            },
+          ]}
         >
-          <Input placeholder="Address Prefix" />
+          <Input placeholder={t('restore.formCustomConfig.addressPrefix.label')} />
         </Form.Item>
         <Form.Item
           name="chainId"
-          label="Chain ID"
+          label={t('restore.formCustomConfig.chainId.label')}
           hasFeedback
-          rules={[{ required: true, message: 'Chain ID is required' }]}
+          rules={[
+            {
+              required: true,
+              message: `${t('restore.formCustomConfig.chainId.label')} ${t('general.required')}`,
+            },
+          ]}
         >
-          <Input placeholder="Chain ID" />
+          <Input placeholder={t('restore.formCustomConfig.chainId.label')} />
         </Form.Item>
       </div>
       <div className="row">
         <Form.Item
           name="baseDenom"
-          label="Base Denom"
+          label={t('restore.formCustomConfig.baseDenom.label')}
           hasFeedback
-          rules={[{ required: true, message: 'Base Denom is required' }]}
+          rules={[
+            {
+              required: true,
+              message: `${t('restore.formCustomConfig.baseDenom.label')} ${t('general.required')}`,
+            },
+          ]}
         >
-          <Input placeholder="Base Denom" />
+          <Input placeholder={t('restore.formCustomConfig.baseDenom.label')} />
         </Form.Item>
         <Form.Item
           name="croDenom"
-          label="CRO Denom"
+          label={t('restore.formCustomConfig.croDenom.label')}
           hasFeedback
-          rules={[{ required: true, message: 'CRO Denom is required' }]}
+          rules={[
+            {
+              required: true,
+              message: `${t('restore.formCustomConfig.croDenom.label')} ${t('general.required')}`,
+            },
+          ]}
         >
-          <Input placeholder="CRO Denom" />
+          <Input placeholder={t('restore.formCustomConfig.croDenom.label')} />
         </Form.Item>
       </div>
 
@@ -198,7 +241,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         isModalVisible={isModalVisible}
         handleCancel={handleCancel}
         handleOk={handleOk}
-        title="Success!"
+        title={t('general.successModalPopup.title')}
         button={
           <Button
             type="primary"
@@ -206,30 +249,30 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
             onClick={checkNodeConnectivity}
             loading={checkingNodeConnection}
           >
-            Connect Node
+            {t('general.connect')}
           </Button>
         }
         footer={[
           <Button key="submit" type="primary" onClick={handleOk}>
-            Next
+            {t('general.continue')}
           </Button>,
         ]}
       >
         <>
-          <div className="description">Your node is connected!</div>
+          <div className="description">
+            {t('general.successModalPopup.nodeConnect.description')}
+          </div>
         </>
       </SuccessModalPopup>
       <ErrorModalPopup
         isModalVisible={isErrorModalVisible}
         handleCancel={handleErrorCancel}
         handleOk={handleErrorOk}
-        title="An error happened!"
+        title={t('general.errorModalPopup.title')}
         footer={[]}
       >
         <>
-          <div className="description">
-            Could not connect to the specified node URL. Please check again.
-          </div>
+          <div className="description">{t('general.errorModalPopup.nodeConnect.description')}</div>
         </>
       </ErrorModalPopup>
     </Form>
@@ -241,6 +284,8 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const history = useHistory();
+
+  const [t] = useTranslation();
 
   const goToHome = () => {
     history.push('/home');
@@ -324,37 +369,52 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
     >
       <Form.Item
         name="name"
-        label="Wallet Name"
+        label={t('restore.formRestore.name.label')}
         hasFeedback
-        rules={[{ required: true, message: 'Wallet name is required' }]}
+        rules={[
+          {
+            required: true,
+            message: `${t('restore.formRestore.name.label')} ${t('general.required')}`,
+          },
+        ]}
       >
-        <Input placeholder="Wallet name" />
+        <Input placeholder={t('restore.formRestore.name.label')} />
       </Form.Item>
       <Form.Item
         name="mnemonic"
-        label="Mnemonic Phrase"
+        label={t('restore.formRestore.mnemonic.label')}
         hasFeedback
         validateFirst
         rules={[
-          { required: true, message: 'The mnemonic phrase is required' },
+          {
+            required: true,
+            message: `${t('restore.formRestore.mnemonic.label')} ${t('general.required')}`,
+          },
           () => ({
             validator(_, value) {
               try {
                 const trimmedMnemonic = value.toString().trim();
                 HDKey.fromMnemonic(trimmedMnemonic);
               } catch (e) {
-                return Promise.reject(new Error('Please enter a valid mnemonic phrase'));
+                return Promise.reject(new Error(t('restore.formRestore.mnemonic.validatorError')));
               }
               return Promise.resolve();
             },
           }),
         ]}
       >
-        <Input.TextArea autoSize={{ minRows: 3, maxRows: 3 }} placeholder="Mnemonic phrase" />
+        <Input.TextArea
+          autoSize={{ minRows: 3, maxRows: 3 }}
+          placeholder={t('restore.formRestore.mnemonic.label')}
+        />
       </Form.Item>
-      <Form.Item name="network" label="Network" rules={[{ required: true }]}>
+      <Form.Item
+        name="network"
+        label={t('restore.formRestore.network.label')}
+        rules={[{ required: true }]}
+      >
         <Select
-          placeholder="Select wallet network"
+          placeholder={`${t('general.select')} ${t('restore.formRestore.network.label')}`}
           // placeholder="Select a option and change input text above"
           onChange={onNetworkChange}
           // allowClear
@@ -369,12 +429,12 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
       </Form.Item>
       <Form.Item {...tailLayout}>
         <Button type="primary" htmlType="submit">
-          Restore Wallet
+          {t('restore.formRestore.button')}
         </Button>
       </Form.Item>
       <PasswordFormModal
-        description="Input the app password to encrypt the wallet to be restored"
-        okButtonText="Encrypt wallet"
+        description={t('general.passwordFormModal.restoreWallet.description')}
+        okButtonText={t('general.passwordFormModal.restoreWallet.okButton')}
         isButtonLoading={isButtonLoading}
         onCancel={() => {
           setInputPasswordVisible(false);
@@ -384,24 +444,26 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
           const isValid = await secretStoreService.checkIfPasswordIsValid(password);
           return {
             valid: isValid,
-            errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
           };
         }}
-        successText="Wallet restored and encrypted successfully !"
-        title="Provide app password"
+        successText={t('general.passwordFormModal.restoreWallet.success')}
+        title={t('general.passwordFormModal.title')}
         visible={inputPasswordVisible}
-        successButtonText="Go to Home"
+        successButtonText={t('general.passwordFormModal.restoreWallet.successButton')}
         confirmPassword={false}
       />
       <ErrorModalPopup
         isModalVisible={isErrorModalVisible}
         handleCancel={handleErrorCancel}
         handleOk={handleErrorOk}
-        title="An error happened!"
+        title={t('general.errorModalPopup.title')}
         footer={[]}
       >
         <>
-          <div className="description">Your Mnemonic Phrase is invalid. Please check again.</div>
+          <div className="description">
+            {t('general.errorModalPopup.restoreWallet.description')}
+          </div>
         </>
       </ErrorModalPopup>
     </Form>
@@ -420,6 +482,8 @@ function RestorePage() {
 
   const analyticsService = new AnalyticsService(currentSession);
 
+  const [t] = useTranslation();
+
   useEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true;
@@ -436,12 +500,10 @@ function RestorePage() {
         <BackButton />
         <div>
           <div className="title">
-            {!isCustomConfig || isConnected ? 'Restore Wallet' : 'Custom Configuration'}
+            {!isCustomConfig || isConnected ? t('restore.title1') : t('restore.title2')}
           </div>
           <div className="slogan">
-            {!isCustomConfig || isConnected
-              ? 'Create a name and select the network for your wallet.'
-              : 'Fill in the below to connect to this custom network.'}
+            {!isCustomConfig || isConnected ? t('restore.slogan1') : t('restore.slogan2')}
           </div>
 
           {!isCustomConfig || isConnected ? (
