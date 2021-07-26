@@ -5,6 +5,7 @@ import * as serviceWorker from './serviceWorker';
 import RouteHub from './pages/route';
 import './index.less';
 import { task } from './service/tasks/BackgroundJob';
+import './language/I18n';
 
 ReactDOM.render(
   <RecoilRoot>

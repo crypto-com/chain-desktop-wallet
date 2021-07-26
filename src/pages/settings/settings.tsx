@@ -14,11 +14,13 @@ import {
   message,
   Switch,
   Divider,
+  Select,
   Carousel,
   notification,
 } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useTranslation } from 'react-i18next';
 import { CarouselRef } from 'antd/lib/carousel';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
@@ -35,12 +37,19 @@ import { Session } from '../../models/Session';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
-import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
+import {
+  DEFAULT_LANGUAGE_CODE,
+  SUPPORTED_LANGUAGE,
+  FIXED_DEFAULT_FEE,
+  FIXED_DEFAULT_GAS_LIMIT,
+} from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import { generalConfigService } from '../../storage/GeneralConfigService';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
+const { Option } = Select;
 const layout = {
   // labelCol: { span: 8 },
   // wrapperCol: { span: 16 },
@@ -55,6 +64,8 @@ const GeneralSettingsForm = () => {
   const [enabledGeneralSettings, setEnabledGeneralSettings] = useState<boolean>(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
+
+  const [t] = useTranslation();
 
   useEffect(() => {
     let unmounted = false;
@@ -95,7 +106,9 @@ const GeneralSettingsForm = () => {
 
     setSession(newSession);
     message.success(
-      `General settings propagation has been ${newState ? 'enabled' : 'disabled'} successfully`,
+      `${t('settings.message.generalSettings1')} ${
+        newState ? t('general.enabled') : t('general.disabled')
+      }`,
     );
     setUpdateLoading(false);
   }
@@ -104,15 +117,16 @@ const GeneralSettingsForm = () => {
     <>
       <Form.Item
         name="nodeUrl"
-        label="Node URL"
+        label={t('settings.form1.nodeUrl.label')}
         hasFeedback
         rules={[
           {
             required: true,
+            message: `${t('settings.form1.nodeUrl.label')} ${t('general.required')}`,
           },
           {
             pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
-            message: 'Please enter a valid node url',
+            message: t('settings.form1.nodeUrl.error1'),
           },
         ]}
       >
@@ -120,25 +134,29 @@ const GeneralSettingsForm = () => {
       </Form.Item>
       <Form.Item
         name="indexingUrl"
-        label="Chain Indexing URL"
-        hasFeedback
-        rules={[
-          { required: true, message: 'Chain Indexing URL is required' },
-          {
-            pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
-            message: 'Please enter a valid indexing url',
-          },
-        ]}
-      >
-        <Input placeholder="Chain Indexing URL" />
-      </Form.Item>
-      <Form.Item
-        name="chainId"
-        label="Chain ID"
+        label={t('settings.form1.indexingUrl.label')}
         hasFeedback
         rules={[
           {
             required: true,
+            message: `${t('settings.form1.indexingUrl.label')} ${t('general.required')}`,
+          },
+          {
+            pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
+            message: t('settings.form1.indexingUrl.error1'),
+          },
+        ]}
+      >
+        <Input placeholder={t('settings.form1.indexingUrl.label')} />
+      </Form.Item>
+      <Form.Item
+        name="chainId"
+        label={t('settings.form1.chainId.label')}
+        hasFeedback
+        rules={[
+          {
+            required: true,
+            message: `${t('settings.form1.chainId.label')} ${t('general.required')}`,
           },
         ]}
       >
@@ -147,11 +165,12 @@ const GeneralSettingsForm = () => {
       <div className="row">
         <Form.Item
           name="networkFee"
-          label="Network Fee"
+          label={t('settings.form1.networkFee.label')}
           hasFeedback
           rules={[
             {
               required: true,
+              message: `${t('settings.form1.networkFee.label')} ${t('general.required')}`,
             },
           ]}
         >
@@ -159,11 +178,12 @@ const GeneralSettingsForm = () => {
         </Form.Item>
         <Form.Item
           name="gasLimit"
-          label="Gas Limit"
+          label={t('settings.form1.gasLimit.label')}
           hasFeedback
           rules={[
             {
               required: true,
+              message: `${t('settings.form1.gasLimit.label')} ${t('general.required')}`,
             },
           ]}
         >
@@ -176,7 +196,8 @@ const GeneralSettingsForm = () => {
           onChange={onEnableGeneralWalletConfig}
           disabled={updateLoading}
         >
-          Propagate the settings changes to all your other wallets on {session.wallet.config.name}
+          {t('settings.form1.checkbox1.description1')} {session.wallet.config.name}{' '}
+          {t('settings.form1.checkbox1.description2')}
         </Checkbox>
       </div>
     </>
@@ -187,8 +208,11 @@ function MetaInfoComponent() {
   const [session, setSession] = useRecoilState(sessionState);
   const [updateLoading, setUpdateLoading] = useState(false);
   const { walletType } = session.wallet;
+
+  const [defaultLanguageState, setDefaultLanguageState] = useState<string>(DEFAULT_LANGUAGE_CODE);
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
+  const [t, i18n] = useTranslation();
 
   const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState<string>();
@@ -255,9 +279,11 @@ function MetaInfoComponent() {
     let unmounted = false;
 
     const SyncConfig = async () => {
+      const defaultLanguage = await generalConfigService.getLanguage();
       const defaultMemoDisabled = session.wallet.config.disableDefaultClientMemo;
       const defaultGADisabled = session.wallet.config.analyticsDisabled;
       if (!unmounted) {
+        setDefaultLanguageState(defaultLanguage);
         setDefaultMemoStateDisabled(defaultMemoDisabled);
         setDefaultGAStateDisabled(defaultGADisabled);
       }
@@ -277,6 +303,12 @@ function MetaInfoComponent() {
     defaultGAStateDisabled,
     setDefaultGAStateDisabled,
   ]);
+
+  const onSwitchLanguage = value => {
+    setDefaultLanguageState(value!.toString());
+    i18n.changeLanguage(value!.toString());
+    generalConfigService.setLanguage(value!.toString());
+  };
 
   const showPasswordInput = () => {
     setInputPasswordVisible(true);
@@ -313,7 +345,9 @@ function MetaInfoComponent() {
     setSession(newSession);
     setUpdateLoading(false);
     message.success(
-      `Default client memo settings has been ${newState ? 'disabled' : 'enabled'} successfully`,
+      `${t('settings.message.defaultMemo1')} ${
+        newState ? t('general.disabled') : t('general.enabled')
+      }`,
     );
   }
 
@@ -337,15 +371,17 @@ function MetaInfoComponent() {
     setSession(newSession);
     setUpdateLoading(false);
     message.success(
-      `Analytics settings has been ${newState ? 'disabled' : 'enabled'} successfully`,
+      `${t('settings.message.analytics1')} ${
+        newState ? t('general.disabled') : t('general.enabled')
+      }`,
     );
   }
 
   const onCopyClick = () => {
     setTimeout(() => {
       notification.success({
-        message: `Recovery Phrase Copied!`,
-        description: `Recovery Phrase is successfully copied to your clipboard`,
+        message: t('settings.notification.recover.message'),
+        description: t('settings.notification.recover.description'),
         placement: 'topRight',
         duration: 2,
         key: 'copy',
@@ -364,47 +400,50 @@ function MetaInfoComponent() {
       <div className="site-layout-background settings-content">
         <div className="container">
           <div className="item">
-            <div className="title">Default Memo</div>
-            <div className="description">
-              A default memo message will be used for staking transactions if a custom memo is not
-              provided.
-            </div>
+            <div className="title">{t('settings.language.title')}</div>
+            {/* <div className="description">
+            </div> */}
+            <Select style={{ width: 240 }} onChange={onSwitchLanguage} value={defaultLanguageState}>
+              {SUPPORTED_LANGUAGE.map(item => {
+                return <Option value={item.value}>{item.label}</Option>;
+              })}
+            </Select>
+          </div>
+          <Divider />
+          <div className="item">
+            <div className="title">{t('settings.memo.title')}</div>
+            <div className="description">{t('settings.memo.description')}</div>
             <Switch
               checked={!defaultMemoStateDisabled}
               onChange={onAllowDefaultMemoChange}
               disabled={updateLoading}
             />{' '}
-            {defaultMemoStateDisabled ? 'Disabled' : 'Enabled'}
+            {defaultMemoStateDisabled ? t('general.disabled') : t('general.enabled')}
           </div>
           <Divider />
           <div className="item">
-            <div className="title">Data Analytics</div>
-            <div className="description">
-              The data collected for analytics is used to prioritize development for new features
-              and functionalities and also to improve implemented features.
-            </div>
+            <div className="title">{t('settings.dataAnalytics.title')}</div>
+            <div className="description">{t('settings.dataAnalytics.description')}</div>
             <Switch
               checked={!defaultGAStateDisabled}
               onChange={onAllowDefaultGAChange}
               disabled={updateLoading}
             />{' '}
-            {defaultGAStateDisabled ? 'Disabled' : 'Enabled'}
+            {defaultGAStateDisabled ? t('general.disabled') : t('general.enabled')}
           </div>
           {walletType !== LEDGER_WALLET_TYPE ? (
             <>
               <Divider />
               <div className="item">
-                <div className="title">Export your Recovery Phrase</div>
-                <div className="description">
-                  You are required to enter your App Password for this action.
-                </div>
+                <div className="title">{t('settings.exportRecoveryPhrase.title')}</div>
+                <div className="description">{t('settings.exportRecoveryPhrase.description')}</div>
                 <Button
                   type="primary"
                   onClick={() => {
                     showPasswordInput();
                   }}
                 >
-                  Export
+                  {t('settings.exportRecoveryPhrase.button')}
                 </Button>
               </div>
             </>
@@ -414,8 +453,8 @@ function MetaInfoComponent() {
         </div>
       </div>
       <PasswordFormModal
-        description="Input the app password decrypt wallet"
-        okButtonText="Decrypt wallet"
+        description={t('general.passwordFormModal.description')}
+        okButtonText={t('general.passwordFormModal.okButton')}
         onCancel={() => {
           setInputPasswordVisible(false);
         }}
@@ -424,13 +463,13 @@ function MetaInfoComponent() {
           const isValid = await secretStoreService.checkIfPasswordIsValid(password);
           return {
             valid: isValid,
-            errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
           };
         }}
-        successText="Wallet decrypted successfully!"
-        title="Provide app password"
+        successText={t('general.passwordFormModal.success')}
+        title={t('general.passwordFormModal.title')}
         visible={inputPasswordVisible}
-        successButtonText="Continue"
+        successButtonText={t('general.continue')}
         confirmPassword={false}
         repeatValidation
       />
@@ -442,20 +481,18 @@ function MetaInfoComponent() {
         footer={[
           <CopyToClipboard key="copy" text={decryptedPhrase}>
             <Button type="primary" onClick={onCopyClick}>
-              Copy
+              {t('general.copy')}
             </Button>
           </CopyToClipboard>,
           <Button key="back" type="link" onClick={onExportRecoveryPhraseCancel}>
-            Close
+            {t('general.close')}
           </Button>,
         ]}
-        okText="Confirm"
-        title="Your Recovery Phrases"
+        okText={t('general.confirm')}
+        title={t('settings.exportRecoveryPhrase.modal1.title')}
       >
         <>
-          <div className="description">
-            Swipe to reveal all words. Write them down in the right order.
-          </div>
+          <div className="description">{t('settings.exportRecoveryPhrase.modal1.description')}</div>
           <div className="item">
             <Carousel
               className="recovery-phrase-slider"
@@ -499,7 +536,7 @@ function MetaInfoComponent() {
           <div className="item">
             <Alert
               type="warning"
-              message="Protect your funds and do not share your recovery phrase with anyone."
+              message={t('settings.exportRecoveryPhrase.modal1.warning')}
               showIcon
             />
           </div>
@@ -522,6 +559,8 @@ const FormSettings = () => {
   const history = useHistory();
 
   const setWalletList = useSetRecoilState(walletListState);
+
+  const [t] = useTranslation();
 
   let networkFee = FIXED_DEFAULT_FEE;
   let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
@@ -584,9 +623,11 @@ const FormSettings = () => {
 
     setIsButtonLoading(false);
     message.success(
-      `Wallet settings updated successfully ${
+      `${t('settings.message.success1')} ${
         session.wallet.config.enableGeneralSettings
-          ? `on all ${session.wallet.config.name} wallets`
+          ? `(${t('settings.message.success2')} ${session.wallet.config.name} ${t(
+              'settings.message.success3',
+            )})`
           : ''
       }`,
     );
@@ -630,38 +671,35 @@ const FormSettings = () => {
       onFinish={onFinish}
     >
       <Tabs defaultActiveKey="1">
-        <TabPane tab="Node Configuration" key="1">
+        <TabPane tab={t('settings.tab1')} key="1">
           <div className="site-layout-background settings-content">
             <div className="container">
               <GeneralSettingsForm />
               <Form.Item {...tailLayout} className="button">
                 <Button type="primary" htmlType="submit" loading={isButtonLoading}>
-                  Save
+                  {t('general.save')}
                 </Button>
                 <Button type="link" htmlType="button" onClick={onRestoreDefaults}>
-                  Discard Changes
+                  {t('general.discard')}
                 </Button>
               </Form.Item>
             </div>
           </div>
         </TabPane>
-        <TabPane tab="General Configuration" key="2">
+        <TabPane tab={t('settings.tab2')} key="2">
           <MetaInfoComponent />
         </TabPane>
-        <TabPane tab="Clear Storage" key="3">
+        <TabPane tab={t('settings.tab3')} key="3">
           <div className="site-layout-background settings-content">
             <div className="container">
-              <div className="description">
-                Once you clear the storage, you will lose access to all you wallets. The only way to
-                regain wallet access is by restoring wallet mnemonic phrase. <br />
-              </div>
+              <div className="description">{t('settings.clearStorage.description')}</div>
               <Button
                 type="primary"
                 loading={isButtonLoading}
                 onClick={() => setIsConfirmationModalVisible(true)}
                 danger
               >
-                Clear Storage
+                {t('settings.clearStorage.button1')}
               </Button>
             </div>
           </div>
@@ -681,7 +719,7 @@ const FormSettings = () => {
                 disabled={isButtonDisabled}
                 danger
               >
-                Confirm
+                {t('general.confirm')}
               </Button>,
               <Button
                 type="primary"
@@ -691,27 +729,25 @@ const FormSettings = () => {
                 onClick={confirmClearForm.submit}
                 danger
               >
-                Clear Storage
+                {t('settings.clearStorage.button1')}
               </Button>,
+
               <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
-                Cancel
+                {t('general.cancel')}
               </Button>,
             ]}
             okText="Confirm"
           >
             <>
-              <div className="title">Confirm Clear Storage</div>
+              <div className="title">{t('settings.clearStorage.modal.title')}</div>
 
               {!isConfirmClearVisible ? (
                 <>
-                  <div className="description">
-                    You may wish to verify your recovery mnemonic phrase before deletion to ensure
-                    that you can restore this wallet in the future.
-                  </div>
+                  <div className="description">{t('settings.clearStorage.modal.description1')}</div>
                   <div className="item">
                     <Alert
                       type="warning"
-                      message="Are you sure you want to clear the storage? If you have not backed up your wallet mnemonic phrase, you will result in losing your funds forever."
+                      message={t('settings.clearStorage.modal.warning')}
                       showIcon
                     />
                   </div>
@@ -720,8 +756,7 @@ const FormSettings = () => {
                       checked={!isButtonDisabled}
                       onChange={() => setIsButtonDisabled(!isButtonDisabled)}
                     >
-                      I understand that the only way to regain access is by restoring wallet
-                      mnemonic phrase.
+                      {t('settings.clearStorage.modal.disclaimer')}
                     </Checkbox>
                   </div>
                 </>
@@ -737,15 +772,16 @@ const FormSettings = () => {
                   >
                     <Form.Item
                       name="clear"
-                      label="Please enter CLEAR"
+                      label={`${t('settings.clearStorage.modal.form1.clear.label')} CLEAR`}
                       hasFeedback
                       rules={[
                         {
                           required: true,
+                          message: `${t('settings.clearStorage.modal.form1.clear.error1')} CLEAR`,
                         },
                         {
                           pattern: /^CLEAR$/,
-                          message: 'Please enter CLEAR',
+                          message: `${t('settings.clearStorage.modal.form1.clear.error1')} CLEAR`,
                         },
                       ]}
                     >
@@ -762,19 +798,18 @@ const FormSettings = () => {
   );
 };
 
-function SettingsPage() {
+const SettingsPage = () => {
+  const [t] = useTranslation();
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">Settings</Header>
-      <div className="header-description">
-        An invalid configuration might result in wallet malfunction.
-      </div>
+      <Header className="site-layout-background">{t('settings.title')}</Header>
+      <div className="header-description">{t('settings.description')}</div>
       <Content>
         <FormSettings />
       </Content>
       <Footer />
     </Layout>
   );
-}
+};
 
 export default SettingsPage;
