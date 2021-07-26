@@ -4,6 +4,7 @@ import './wallet.less';
 import 'antd/dist/antd.css';
 import { Layout, Space, Spin, Table, Typography, Tag, AutoComplete } from 'antd';
 import Icon, { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import {
   sessionState,
   walletAssetState,
@@ -40,6 +41,8 @@ function WalletPage() {
   const didMountRef = useRef(false);
 
   const analyticsService = new AnalyticsService(session);
+
+  const [t] = useTranslation();
 
   const processWalletList = wallets => {
     const list = wallets.reduce((resultList, wallet, idx) => {
@@ -128,7 +131,7 @@ function WalletPage() {
 
   const columns = [
     {
-      title: 'Name',
+      title: t('wallet.table1.name'),
       dataIndex: 'name',
       key: 'name',
       children: [
@@ -144,7 +147,7 @@ function WalletPage() {
       sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
-      title: 'Address',
+      title: t('wallet.table1.address'),
       dataIndex: 'address',
       key: 'address',
       children: [
@@ -156,7 +159,7 @@ function WalletPage() {
       render: text => <Text type="success">{text}</Text>,
     },
     {
-      title: 'Wallet Type',
+      title: t('wallet.table1.walletType'),
       dataIndex: 'walletType',
       key: 'walletType',
       children: [
@@ -199,7 +202,7 @@ function WalletPage() {
       ],
     },
     {
-      title: 'Network',
+      title: t('wallet.table1.network'),
       key: 'network',
       children: [
         {
@@ -212,7 +215,7 @@ function WalletPage() {
       sorter: (a, b) => a.config.name.localeCompare(b.config.name),
     },
     {
-      title: 'Action',
+      title: t('general.action'),
       key: 'action',
       children: [
         {
@@ -234,7 +237,7 @@ function WalletPage() {
                     walletSelect(record);
                   }}
                 >
-                  Select
+                  {t('general.select')}
                 </a>
               </Space>
             );
@@ -246,8 +249,8 @@ function WalletPage() {
 
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">All Wallets</Header>
-      <div className="header-description">You may review all your wallets here.</div>
+      <Header className="site-layout-background">{t('wallet.title')}</Header>
+      <div className="header-description">{t('wallet.description')}</div>
       <Content>
         <div className="site-layout-background wallet-content">
           <div className="container">
@@ -255,7 +258,7 @@ function WalletPage() {
               <AutoComplete
                 style={{ width: 400 }}
                 onSearch={onSearch}
-                placeholder="Search by Name, Address..."
+                placeholder={t('wallet.search.placeholder')}
               />
             </div>
             <Table
