@@ -34,6 +34,7 @@
     "big.js": "6.0.3",
     "camelcase": "6.2.0",
     "copyfiles": "2.4.1",
+    "cross-env": "7.0.3",
     "crypto-js": "4.0.0",
     "electron-devtools-installer": "3.1.1",
     "electron-is-dev": "1.2.0",
@@ -81,7 +82,7 @@
     "electron:pre-build": "yarn build && yarn copy-macos-manifest && tsc -p electron",
     "copy-macos-manifest": "copyfiles entitlements* ./build/",
     "clean-builds": "rimraf build && rimraf dist",
-    "electron:build": "yarn clean-builds && yarn build && yarn copy-macos-manifest && tsc -p electron && electron-builder --publish=never",
+    "electron:build": "cross-env NODE_OPTIONS=--max_old_space_size=4096 && yarn clean-builds && yarn build && yarn copy-macos-manifest && tsc -p electron && electron-builder --publish=never",
     "lint-staged": "lint-staged",
     "lint:js": "eslint --cache --fix --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
     "prettier": "prettier --write '/src/**/*.{js,jsx,tsx,ts,less,md,json}'"
