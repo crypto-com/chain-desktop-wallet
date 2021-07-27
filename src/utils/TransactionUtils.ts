@@ -5,6 +5,7 @@ import {
 } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { Session } from '../models/Session';
 import { UserAsset } from '../models/UserAsset';
+import i18n from '../language/I18n';
 
 export class TransactionUtils {
   public static addressValidator(
@@ -12,10 +13,13 @@ export class TransactionUtils {
     walletAsset: UserAsset,
     type: AddressType,
   ) {
-    const addressType = type === AddressType.VALIDATOR ? 'validator' : 'receiving';
+    const addressType =
+      type === AddressType.VALIDATOR ? i18n.t('general.validator') : i18n.t('general.receiving');
     return () => ({
       validator(rule, value) {
-        const reason = `Invalid ${walletAsset.symbol} ${addressType} address provided`;
+        const reason = `${i18n.t('general.addressValidator.reason1')} ${
+          walletAsset.symbol
+        } ${addressType} ${i18n.t('general.addressValidator.reason2')}`;
         try {
           const addressValidator = new AddressValidator({
             address: value,
@@ -44,7 +48,7 @@ export class TransactionUtils {
           return Promise.resolve();
         }
         // eslint-disable-next-line prefer-promise-reject-errors
-        return Promise.reject(`Invalid sending amount`);
+        return Promise.reject(`${i18n.t('general.validTransactionAmountValidator.reason')}`);
       },
     });
   }

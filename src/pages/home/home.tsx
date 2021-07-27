@@ -18,6 +18,7 @@ import {
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
+import { useTranslation } from 'react-i18next';
 
 import {
   hasShownWarningOnWalletTypeState,
@@ -251,9 +252,11 @@ function HomePage() {
 
   const analyticsService = new AnalyticsService(currentSession);
 
+  const [t] = useTranslation();
+
   const TransactionColumns = [
     {
-      title: 'Transaction Hash',
+      title: t('home.transactions.table1.transactionHash'),
       dataIndex: 'transactionHash',
       key: 'transactionHash',
       render: text => (
@@ -268,7 +271,7 @@ function HomePage() {
       ),
     },
     {
-      title: 'Amount',
+      title: t('home.transactions.table1.amount'),
       dataIndex: 'amount',
       key: 'amount',
       render: (text, record: TransferTabularData) => {
@@ -284,7 +287,7 @@ function HomePage() {
       },
     },
     {
-      title: 'Recipient',
+      title: t('home.transactions.table1.recipientAddress'),
       dataIndex: 'recipientAddress',
       key: 'recipientAddress',
       render: text => (
@@ -299,12 +302,12 @@ function HomePage() {
       ),
     },
     {
-      title: 'Time',
+      title: t('home.transactions.table1.time'),
       dataIndex: 'time',
       key: 'time',
     },
     {
-      title: 'Status',
+      title: t('home.transactions.table1.status'),
       dataIndex: 'status',
       key: 'status',
       render: (text, record: TransferTabularData) => {
@@ -330,7 +333,7 @@ function HomePage() {
 
   const NftTransactionColumns = [
     {
-      title: 'Transaction Hash',
+      title: t('home.transactions.table3.transactionHash'),
       dataIndex: 'transactionHash',
       key: 'transactionHash',
       render: text => (
@@ -345,7 +348,7 @@ function HomePage() {
       ),
     },
     {
-      title: 'Type',
+      title: t('home.transactions.table3.messageType'),
       dataIndex: 'messageType',
       key: 'messageType',
       render: (text, record: NftTransferTabularData) => {
@@ -420,19 +423,19 @@ function HomePage() {
       },
     },
     {
-      title: 'NFT Name',
+      title: t('home.transactions.table3.denomId'),
       dataIndex: 'denomId',
       key: 'denomId',
       render: text => <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>,
     },
     {
-      title: 'NFT ID',
+      title: t('home.transactions.table3.tokenId'),
       dataIndex: 'tokenId',
       key: 'tokenId',
       render: text => <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>,
     },
     {
-      title: 'Recipient',
+      title: t('home.transactions.table3.recipientAddress'),
       dataIndex: 'recipientAddress',
       key: 'recipientAddress',
       render: text => {
@@ -451,7 +454,7 @@ function HomePage() {
       },
     },
     {
-      title: 'Time',
+      title: t('home.transactions.table3.time'),
       dataIndex: 'time',
       key: 'time',
     },
@@ -486,8 +489,10 @@ function HomePage() {
     setTimeout(async () => {
       if (isWalletNotLive(config) && !hasShownNotLiveWallet) {
         notification.warning({
-          message: `Wallet Info`,
-          description: `The wallet created will be limited only to display address because its ${config.name} configuration is not live yet`,
+          message: t('home.notification.walletInfo.message'),
+          description: `${t('home.notification.walletInfo.description1')} ${config.name} ${t(
+            'home.notification.walletInfo.description2',
+          )}`,
           placement: 'topRight',
           duration: 0,
         });
@@ -553,8 +558,8 @@ function HomePage() {
       const newVersionNotificationKey = `open-update_available`;
 
       notification.info({
-        message: 'Update Available',
-        description: 'A new update is available. Downloading now...',
+        message: t('home.notification.updateAvailable.message'),
+        description: t('home.notification.updateAvailable.description'),
         duration: 10,
         key: newVersionNotificationKey,
         placement: 'topRight',
@@ -579,13 +584,13 @@ function HomePage() {
           }}
           style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
         >
-          Restart Now
+          {t('home.notification.downloadComplete.button')}
         </Button>
       );
 
       notification.success({
-        message: 'Download Complete',
-        description: 'Update downloaded successfully. It will be installed on restart.',
+        message: t('home.notification.downloadComplete.message'),
+        description: t('home.notification.downloadComplete.description'),
         duration: 20,
         key: newVersionNotificationKey,
         placement: 'topRight',
@@ -779,7 +784,7 @@ function HomePage() {
 
   const StakingColumns = [
     {
-      title: 'Validator Address',
+      title: t('home.transactions.table2.validatorAddress'),
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
       render: text => (
@@ -793,12 +798,12 @@ function HomePage() {
       ),
     },
     {
-      title: 'Staked Amount',
+      title: t('home.transactions.table2.stakedAmountWithSymbol'),
       dataIndex: 'stakedAmountWithSymbol',
       key: 'stakedAmountWithSymbol',
     },
     {
-      title: 'Delegator Address',
+      title: t('home.transactions.table2.delegatorAddress'),
       dataIndex: 'delegatorAddress',
       key: 'delegatorAddress',
       render: text => (
@@ -813,7 +818,7 @@ function HomePage() {
       ),
     },
     {
-      title: 'Undelegate',
+      title: t('home.transactions.table2.undelegateAction'),
       dataIndex: 'undelegateAction',
       key: 'undelegateAction',
       render: (text, record: StakingTabularData) => {
@@ -823,13 +828,13 @@ function HomePage() {
         };
         return (
           <a data-id={JSON.stringify(clickData)} onClick={onDelegationCellsClicked}>
-            <Text type="danger">Undelegate Stake</Text>
+            <Text type="danger">{t('home.transactions.table2.action1')}</Text>
           </a>
         );
       },
     },
     {
-      title: 'Redelegate',
+      title: t('home.transactions.table2.redelegateAction'),
       dataIndex: 'redelegate',
       key: 'redelegateAction',
       render: (text, record: StakingTabularData) => {
@@ -839,7 +844,7 @@ function HomePage() {
         };
         return (
           <a data-id={JSON.stringify(clickData)} onClick={onDelegationCellsClicked}>
-            <Text type="success">Redelegate Stake</Text>
+            <Text type="success">{t('home.transactions.table2.action2')}</Text>
           </a>
         );
       },
@@ -849,7 +854,7 @@ function HomePage() {
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">
-        Welcome Back!
+        {t('home.title')}
         <SyncOutlined
           onClick={() => {
             onSyncAndRefreshBtnCall();
@@ -861,7 +866,7 @@ function HomePage() {
       <Content>
         <div className="site-layout-background balance-container">
           <div className="balance">
-            <div className="title">TOTAL BALANCE</div>
+            <div className="title">{t('home.balance.title1')}</div>
             <div className="quantity">
               {numeral(scaledBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
             </div>
@@ -874,7 +879,7 @@ function HomePage() {
             </div>
           </div>
           <div className="balance">
-            <div className="title">STAKED BALANCE</div>
+            <div className="title">{t('home.balance.title2')}</div>
             <div className="quantity">
               {numeral(scaledStakingBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
             </div>
@@ -888,7 +893,7 @@ function HomePage() {
           </div>
         </div>
         <Tabs defaultActiveKey="1">
-          <TabPane tab="My NFT" key="1">
+          <TabPane tab={t('home.nft.tab1')} key="1">
             <div className="site-layout-background nft-container">
               <List
                 grid={{
@@ -931,19 +936,19 @@ function HomePage() {
                 pagination={false}
               />
               <Link to="/nft" style={{ textAlign: 'right' }}>
-                See all
+                {t('home.nft.seeAll')}
               </Link>
             </div>
           </TabPane>
         </Tabs>
         <Tabs defaultActiveKey="1">
-          <TabPane tab="Transactions" key="1">
+          <TabPane tab={t('home.transactions.tab1')} key="1">
             <Table columns={TransactionColumns} dataSource={transfers} />
           </TabPane>
-          <TabPane tab="Delegations" key="2">
+          <TabPane tab={t('home.transactions.tab2')} key="2">
             <Table columns={StakingColumns} dataSource={delegations} />
           </TabPane>
-          <TabPane tab="NFT Transactions" key="3">
+          <TabPane tab={t('home.transactions.tab3')} key="3">
             <Table columns={NftTransactionColumns} dataSource={nftTransfers} />
           </TabPane>
         </Tabs>
@@ -960,13 +965,13 @@ function HomePage() {
                 loading={confirmLoading}
                 onClick={onConfirmDelegationAction}
               >
-                Confirm
+                {t('general.confirm')}
               </Button>,
               <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
-                Cancel
+                {t('general.cancel')}
               </Button>,
             ]}
-            okText="Confirm"
+            okText={t('general.confirm')}
           >
             {delegationActionType === StakingActionType.UNDELEGATE ? (
               <UndelegateFormComponent
@@ -984,8 +989,8 @@ function HomePage() {
             )}
           </ModalPopup>
           <PasswordFormModal
-            description="Input the app password decrypt wallet"
-            okButtonText="Decrypt wallet"
+            description={t('general.passwordFormModal.description')}
+            okButtonText={t('general.passwordFormModal.okButton')}
             onCancel={() => {
               setInputPasswordVisible(false);
             }}
@@ -994,13 +999,13 @@ function HomePage() {
               const isValid = await secretStoreService.checkIfPasswordIsValid(password);
               return {
                 valid: isValid,
-                errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+                errMsg: !isValid ? t('general.passwordFormModal.error') : '',
               };
             }}
-            successText="Wallet decrypted successfully !"
-            title="Provide app password"
+            successText={t('general.passwordFormModal.success')}
+            title={t('general.passwordFormModal.title')}
             visible={inputPasswordVisible}
-            successButtonText="Continue"
+            successButtonText={t('general.continue')}
             confirmPassword={false}
           />
 
@@ -1008,11 +1013,11 @@ function HomePage() {
             isModalVisible={isSuccessTransferModalVisible}
             handleCancel={closeSuccessModal}
             handleOk={closeSuccessModal}
-            title="Success!"
+            title={t('general.successModalPopup.title')}
             button={null}
             footer={[
               <Button key="submit" type="primary" onClick={closeSuccessModal}>
-                Ok
+                {t('general.ok')}
               </Button>,
             ]}
           >
@@ -1021,13 +1026,13 @@ function HomePage() {
               broadcastResult?.code !== null &&
               broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
                 <div className="description">
-                  The transaction timed out but it will be included in the subsequent blocks !
+                  {t('general.successModalPopup.timeout.description')}
                 </div>
               ) : (
                 <div className="description">
                   {delegationActionType === StakingActionType.UNDELEGATE
-                    ? 'Your undelegation transaction was successful'
-                    : 'Your redelegation transaction was successful'}
+                    ? t('general.successModalPopup.undelegation.description')
+                    : t('general.successModalPopup.redelegation.description')}
                 </div>
               )}
             </>
@@ -1036,14 +1041,14 @@ function HomePage() {
             isModalVisible={isErrorTransferModalVisible}
             handleCancel={closeErrorModal}
             handleOk={closeErrorModal}
-            title="An error happened!"
+            title={t('general.errorModalPopup.title')}
             footer={[]}
           >
             <>
               <div className="description">
                 {delegationActionType === StakingActionType.UNDELEGATE
-                  ? 'The undelegation transaction failed. Please try again later.'
-                  : 'The redelegation transaction failed. Please try again later.'}
+                  ? t('general.errorModalPopup.undelegation.description')
+                  : t('general.errorModalPopup.redelegation.description')}
                 <br />
                 {errorMessages
                   .filter((item, idx) => {
@@ -1053,7 +1058,7 @@ function HomePage() {
                     <div key={idx}>- {err}</div>
                   ))}
                 {ledgerIsExpertMode ? (
-                  <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
+                  <div>{t('general.errorModalPopup.ledgerExportMode')}</div>
                 ) : (
                   ''
                 )}

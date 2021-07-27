@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './signup.less';
 import { Link, useHistory } from 'react-router-dom';
 import { Button } from 'antd';
+import { useTranslation } from 'react-i18next';
 import logo from '../../assets/logo-products-chain.svg';
 import PasswordFormContainer from '../../components/PasswordForm/PasswordFormContainer';
 import { cryptographer } from '../../crypto/Cryptographer';
@@ -18,6 +19,8 @@ const SignUpPage = () => {
   const [hasWallet, setHasWallet] = useState(false); // Default as false. useEffect will only re-render if result of hasWalletBeenCreated === true
   const [hasPasswordBeenSet, setHasPasswordBeenSet] = useState(true);
   const didMountRef = useRef(false);
+
+  const [t] = useTranslation();
 
   const handlePasswordSubmitted = async (password: string) => {
     const salt = cryptographer.generateSalt();
@@ -56,13 +59,13 @@ const SignUpPage = () => {
           <>
             <BackButton backTo="/" />
             <PasswordFormContainer
-              title="Create App Password"
-              description="Before creating a new wallet, please create your app password. It will be used to encrypt your wallet seeds."
+              title={t('signup.passwordFormContainer.title')}
+              description={t('signup.passwordFormContainer.description')}
               visible
               confirmPassword
-              okButtonText="Create App Password"
-              successText="You have successfully created your app password. You can proceed to restore or create a wallet."
-              successButtonText="Next"
+              okButtonText={t('signup.passwordFormContainer.okButton')}
+              successText={t('signup.passwordFormContainer.success')}
+              successButtonText={t('general.continue')}
               onValidatePassword={async () => {
                 return {
                   valid: true,
@@ -75,17 +78,14 @@ const SignUpPage = () => {
         ) : (
           <>
             <SuccessCheckmark />
-            <div className="title">App Password Created Successfully </div>
-            <div className="slogan">
-              You have successfully created your app password. You can proceed to restore or create
-              a wallet.
-            </div>
+            <div className="title">{t('signup.title')}</div>
+            <div className="slogan">{t('signup.slogan')}</div>
             <div className="button-container">
               <Link to="/restore">
-                <Button type="primary">Restore Wallet</Button>
+                <Button type="primary">{t('signup.button1')}</Button>
               </Link>
               <Link to="/create">
-                <Button>Create Wallet</Button>
+                <Button>{t('signup.button2')}</Button>
               </Link>
             </div>
           </>

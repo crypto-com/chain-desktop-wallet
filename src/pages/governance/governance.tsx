@@ -12,6 +12,7 @@ import {
   LoadingOutlined,
 } from '@ant-design/icons';
 import { useRecoilValue } from 'recoil';
+import { useTranslation } from 'react-i18next';
 import { sessionState, walletAssetState } from '../../recoil/atom';
 
 import { getUIVoteAmount } from '../../utils/NumberUtils';
@@ -81,6 +82,8 @@ const GovernancePage = () => {
   const [isLoadingTally, setIsLoadingTally] = useState(false);
 
   const analyticsService = new AnalyticsService(currentSession);
+
+  const [t] = useTranslation();
 
   const handleCancelConfirmationModal = () => {
     setIsVisibleConfirmationModal(false);
@@ -282,19 +285,19 @@ const GovernancePage = () => {
     switch (vote) {
       case VoteOption.VOTE_OPTION_YES:
         voteColor = 'success';
-        voteMessage = 'Yes - Support';
+        voteMessage = `Yes - ${t('governance.voteOption.yes')}`;
         break;
       case VoteOption.VOTE_OPTION_NO:
         voteColor = 'error';
-        voteMessage = 'No - Do not Support';
+        voteMessage = `No - ${t('governance.voteOption.no')}`;
         break;
       case VoteOption.VOTE_OPTION_NO_WITH_VETO:
         voteColor = 'error';
-        voteMessage = 'No - Do not Support with Veto';
+        voteMessage = `No with Veto - ${t('governance.voteOption.noWithVeto')}`;
         break;
       case VoteOption.VOTE_OPTION_ABSTAIN:
         voteColor = 'default';
-        voteMessage = 'Abstain';
+        voteMessage = `Abstain - ${t('governance.voteOption.abstain')}`;
         break;
       default:
         voteColor = 'default';
@@ -327,8 +330,8 @@ const GovernancePage = () => {
 
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">Governance</Header>
-      <div className="header-description">You may see all proposals and cast your votes here.</div>
+      <Header className="site-layout-background">{t('governance.title')}</Header>
+      <div className="header-description">{t('governance.description')}</div>
       <Content>
         {isProposalVisible ? (
           <div className="site-layout-background governance-content">
@@ -341,8 +344,8 @@ const GovernancePage = () => {
                       onClick={() => setIsProposalVisible(false)}
                       style={{ fontSize: '16px' }}
                     >
-                      <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} /> Back to
-                      Proposal List
+                      <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
+                      {t('governance.backToList')}
                     </div>
                   </a>
                   <div className="title">
@@ -353,9 +356,10 @@ const GovernancePage = () => {
                   </div>
                   <div className="item">
                     <div className="date">
-                      Start: {moment(proposal?.voting_start_time).format('DD/MM/YYYY, h:mm A')}{' '}
-                      <br />
-                      End: {moment(proposal?.voting_end_time).format('DD/MM/YYYY, h:mm A')}
+                      {t('governance.start')}:{' '}
+                      {moment(proposal?.voting_start_time).format('DD/MM/YYYY, h:mm A')} <br />
+                      {t('governance.end')}:{' '}
+                      {moment(proposal?.voting_end_time).format('DD/MM/YYYY, h:mm A')}
                     </div>
                   </div>
 
@@ -370,21 +374,21 @@ const GovernancePage = () => {
                       >
                         <Radio.Group onChange={onRadioChange} value={voteOption}>
                           <Radio.Button value={VoteOption.VOTE_OPTION_YES}>
-                            Yes - Support
+                            Yes - {t('governance.voteOption.yes')}
                           </Radio.Button>
                           <Radio.Button value={VoteOption.VOTE_OPTION_NO}>
-                            No - Do not Support
+                            No - {t('governance.voteOption.no')}
                           </Radio.Button>
                           <Radio.Button value={VoteOption.VOTE_OPTION_NO_WITH_VETO}>
-                            No with Veto - Do not Support with Veto
+                            No with Veto - {t('governance.voteOption.noWithVeto')}
                           </Radio.Button>
                           <Radio.Button value={VoteOption.VOTE_OPTION_ABSTAIN}>
-                            Abstain
+                            Abstain - {t('governance.voteOption.abstain')}
                           </Radio.Button>
                         </Radio.Group>
                         {/* <div className="item"> */}
                         <Button type="primary" disabled={!voteOption} onClick={onVote}>
-                          Send Vote
+                          {t('governance.sendVote')}
                         </Button>
                         {/* </div> */}
                       </Card>
@@ -401,7 +405,7 @@ const GovernancePage = () => {
                   >
                     <Card title="Current results" style={{ padding: '4px' }}>
                       <div className="vote-result-section">
-                        Yes - Support
+                        Yes - {t('governance.voteOption.yes')}
                         <br />
                         {/* Vote: {proposalFigures.yes.vote} */}
                         <Progress
@@ -416,7 +420,7 @@ const GovernancePage = () => {
                       </div>
 
                       <div className="vote-result-section">
-                        No - Do not support
+                        No - {t('governance.voteOption.no')}
                         <br />
                         {/* Vote:  {proposalFigures.no.vote} */}
                         <Progress
@@ -431,7 +435,7 @@ const GovernancePage = () => {
                       </div>
 
                       <div className="vote-result-section">
-                        No with Veto - Do not support
+                        No with Veto - {t('governance.voteOption.noWithVeto')}
                         <br />
                         {/* Vote:  {proposalFigures.no.vote} */}
                         <Progress
@@ -446,7 +450,7 @@ const GovernancePage = () => {
                       </div>
 
                       <div className="vote-result-section">
-                        Abstain - Undecided
+                        Abstain - {t('governance.voteOption.abstain')}
                         <br />
                         {/* Vote:  {proposalFigures.no.vote} */}
                         <Progress
@@ -467,7 +471,7 @@ const GovernancePage = () => {
           </div>
         ) : (
           <Tabs defaultActiveKey="1">
-            <TabPane tab="All" key="1">
+            <TabPane tab={t('governance.tab1')} key="1">
               <div className="site-layout-background governance-content">
                 <div className="container">
                   <List
@@ -511,7 +515,9 @@ const GovernancePage = () => {
                           }
                           description={
                             <span>
-                              Start: {moment(item.voting_start_time).format('DD/MM/YYYY')} End:{' '}
+                              {t('governance.start')}:{' '}
+                              {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
+                              {t('governance.end')}:{' '}
                               {moment(item.voting_end_time).format('DD/MM/YYYY')}
                             </span>
                           }
@@ -525,7 +531,7 @@ const GovernancePage = () => {
                 </div>
               </div>
             </TabPane>
-            <TabPane tab="Voting" key="2">
+            <TabPane tab={t('governance.tab2')} key="2">
               <div className="site-layout-background governance-content">
                 <div className="container">
                   <List
@@ -571,7 +577,9 @@ const GovernancePage = () => {
                           }
                           description={
                             <span>
-                              Start: {moment(item.voting_start_time).format('DD/MM/YYYY')} End:{' '}
+                              {t('governance.start')}:{' '}
+                              {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
+                              {t('governance.end')}:{' '}
                               {moment(item.voting_end_time).format('DD/MM/YYYY')}
                             </span>
                           }
@@ -585,7 +593,7 @@ const GovernancePage = () => {
                 </div>
               </div>
             </TabPane>
-            <TabPane tab="Passed" key="3">
+            <TabPane tab={t('governance.tab3')} key="3">
               <div className="site-layout-background governance-content">
                 <div className="container">
                   <List
@@ -611,7 +619,9 @@ const GovernancePage = () => {
                           }
                           description={
                             <span>
-                              Start: {moment(item.voting_start_time).format('DD/MM/YYYY')} End:{' '}
+                              {t('governance.start')}:{' '}
+                              {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
+                              {t('governance.end')}:{' '}
                               {moment(item.voting_end_time).format('DD/MM/YYYY')}
                             </span>
                           }
@@ -625,7 +635,7 @@ const GovernancePage = () => {
                 </div>
               </div>
             </TabPane>
-            <TabPane tab="Failed" key="4">
+            <TabPane tab={t('governance.tab4')} key="4">
               <div className="site-layout-background governance-content">
                 <div className="container">
                   <List
@@ -651,7 +661,9 @@ const GovernancePage = () => {
                           }
                           description={
                             <span>
-                              Start: {moment(item.voting_start_time).format('DD/MM/YYYY')} End:{' '}
+                              {t('governance.start')}:{' '}
+                              {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
+                              {t('governance.end')}:{' '}
                               {moment(item.voting_end_time).format('DD/MM/YYYY')}
                             </span>
                           }
@@ -665,7 +677,7 @@ const GovernancePage = () => {
                 </div>
               </div>
             </TabPane>
-            <TabPane tab="Rejected" key="5">
+            <TabPane tab={t('governance.tab5')} key="5">
               <div className="site-layout-background governance-content">
                 <div className="container">
                   <List
@@ -691,7 +703,9 @@ const GovernancePage = () => {
                           }
                           description={
                             <span>
-                              Start: {moment(item.voting_start_time).format('DD/MM/YYYY')} End:{' '}
+                              {t('governance.start')}:{' '}
+                              {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
+                              {t('governance.end')}:{' '}
                               {moment(item.voting_end_time).format('DD/MM/YYYY')}
                             </span>
                           }
@@ -710,8 +724,8 @@ const GovernancePage = () => {
       </Content>
       <Footer />
       <PasswordFormModal
-        description="Input the app password decrypt wallet"
-        okButtonText="Decrypt wallet"
+        description={t('general.passwordFormModal.description')}
+        okButtonText={t('general.passwordFormModal.okButton')}
         onCancel={() => {
           setInputPasswordVisible(false);
         }}
@@ -720,13 +734,13 @@ const GovernancePage = () => {
           const isValid = await secretStoreService.checkIfPasswordIsValid(password);
           return {
             valid: isValid,
-            errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
           };
         }}
-        successText="Wallet decrypted successfully !"
-        title="Provide app password"
+        successText={t('general.passwordFormModal.success')}
+        title={t('general.passwordFormModal.title')}
         visible={inputPasswordVisible}
-        successButtonText="Continue"
+        successButtonText={t('general.continue')}
         confirmPassword={false}
       />
       <ModalPopup
@@ -735,27 +749,27 @@ const GovernancePage = () => {
         handleOk={() => {}}
         footer={[
           <Button key="submit" type="primary" loading={confirmLoading} onClick={onConfirm}>
-            Confirm
+            {t('general.confirm')}
           </Button>,
           <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
-            Cancel
+            {t('general.cancel')}
           </Button>,
         ]}
-        okText="Confirm"
+        okText={t('general.confirm')}
       >
         <>
-          <div className="title">Confirm Vote Transaction</div>
-          <div className="description">Please review the below information. </div>
+          <div className="title">{t('governance.modal1.title')}</div>
+          <div className="description">{t('governance.modal1.description')}</div>
           <div className="item">
-            <div className="label">Sender Address</div>
+            <div className="label">{t('governance.modal1.label1')}</div>
             <div className="address">{`${currentSession.wallet.address}`}</div>
           </div>
           <div className="item">
-            <div className="label">Vote to Proposal</div>
+            <div className="label">{t('governance.modal1.label2')}</div>
             <div className="address">{`#${proposal?.proposal_id} ${proposal?.content.title}`}</div>
           </div>
           <div className="item">
-            <div className="label">Vote</div>
+            <div className="label">{t('governance.modal1.label3')}</div>
             <div>{processVoteTag(voteOption)}</div>
           </div>
         </>
@@ -764,11 +778,11 @@ const GovernancePage = () => {
         isModalVisible={isSuccessModalVisible}
         handleCancel={closeSuccessModal}
         handleOk={closeSuccessModal}
-        title="Success!"
+        title={t('general.successModalPopup.title')}
         button={null}
         footer={[
           <Button key="submit" type="primary" onClick={closeSuccessModal}>
-            Ok
+            {t('general.ok')}
           </Button>,
         ]}
       >
@@ -776,11 +790,9 @@ const GovernancePage = () => {
           {broadcastResult?.code !== undefined &&
           broadcastResult?.code !== null &&
           broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">
-              The transaction timed out but it will be included in the subsequent blocks
-            </div>
+            <div className="description">{t('general.successModalPopup.timeout.description')}</div>
           ) : (
-            <div className="description">Your vote was broadcasted successfully!</div>
+            <div className="description">{t('general.successModalPopup.vote.description')}</div>
           )}
           {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
         </>
@@ -789,12 +801,12 @@ const GovernancePage = () => {
         isModalVisible={isErrorModalVisible}
         handleCancel={closeErrorModal}
         handleOk={closeErrorModal}
-        title="An error happened!"
+        title={t('general.errorModalPopup.title')}
         footer={[]}
       >
         <>
           <div className="description">
-            The vote transaction failed. Please try again later.
+            {t('general.errorModalPopup.vote.description')}
             <br />
             {errorMessages
               .filter((item, idx) => {
