@@ -13,6 +13,9 @@ Please refer to the [release page](https://github.com/crypto-com/chain-desktop-w
 ## Contributing
 Please abide by the [Code of Conduct](./CODE_OF_CONDUCT.md) in all interactions, and the [contributing guidelines](./CONTRIBUTING.md) when submitting code.
 
+### Multi-Language Content Management
+Please refer to the [Instructions on Multi-Language Content Management](./CONTENT_MANAGEMENT.md) for any content updates. 
+
 ## License
 [Apache 2.0](./LICENSE)
 

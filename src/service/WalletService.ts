@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {
   DisableDefaultMemoSettings,
+  DisableGASettings,
   EnableGeneralSettingsPropagation,
   reconstructCustomConfig,
   SettingsDataUpdate,
@@ -23,6 +24,9 @@ import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
 import { Session } from '../models/Session';
 import {
   DelegateTransactionUnsigned,
+  NFTDenomIssueUnsigned,
+  NFTMintUnsigned,
+  NFTTransferUnsigned,
   RedelegateTransactionUnsigned,
   TransferTransactionUnsigned,
   UndelegateTransactionUnsigned,
@@ -35,6 +39,11 @@ import { AssetMarketPrice, UserAsset, UserAssetType } from '../models/UserAsset'
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
+  NftAccountTransactionData,
+  NftModel,
+  NftDenomModel,
+  NftQueryParams,
+  NftTransferModel,
   ProposalModel,
   ProposalStatuses,
   RewardTransaction,
@@ -51,6 +60,9 @@ import { createLedgerDevice, LEDGER_WALLET_TYPE } from './LedgerService';
 import { ISignerProvider } from './signers/SignerProvider';
 import {
   DelegationRequest,
+  NFTDenomIssueRequest,
+  NFTMintRequest,
+  NFTTransferRequest,
   RedelegationRequest,
   TransferRequest,
   UndelegationRequest,
@@ -58,6 +70,7 @@ import {
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
+import { sleep } from '../utils/utils';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -101,7 +114,12 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncAll(currentSession);
+
+    await Promise.all([
+      await this.fetchAndUpdateBalances(currentSession),
+      await this.fetchAndSaveTransfers(currentSession),
+    ]);
+
     return broadCastResult;
   }
 
@@ -150,7 +168,11 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncAll(currentSession);
+    await Promise.all([
+      await this.fetchAndUpdateBalances(currentSession),
+      await this.fetchAndSaveDelegations(nodeRpc, currentSession),
+    ]);
+
     return broadCastResult;
   }
 
@@ -199,7 +221,11 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncAll(currentSession);
+    await Promise.all([
+      await this.fetchAndUpdateBalances(currentSession),
+      await this.fetchAndSaveDelegations(nodeRpc, currentSession),
+    ]);
+
     return broadCastResult;
   }
 
@@ -248,7 +274,10 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncAll(currentSession);
+    await Promise.all([
+      await this.fetchAndUpdateBalances(currentSession),
+      await this.fetchAndSaveDelegations(nodeRpc, currentSession),
+    ]);
     return broadCastResult;
   }
 
@@ -290,6 +319,151 @@ class WalletService {
     return broadCastResult;
   }
 
+  public async sendNFT(nftTransferRequest: NFTTransferRequest): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.prepareTransaction();
+
+    const memo = !nftTransferRequest.memo ? DEFAULT_CLIENT_MEMO : nftTransferRequest.memo;
+
+    const nftTransferUnsigned: NFTTransferUnsigned = {
+      tokenId: nftTransferRequest.tokenId,
+      denomId: nftTransferRequest.denomId,
+      sender: nftTransferRequest.sender,
+      recipient: nftTransferRequest.recipient,
+
+      memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+
+    if (nftTransferRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signNFTTransfer(
+        nftTransferUnsigned,
+        nftTransferRequest.decryptedPhrase,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signNFTTransfer(
+        nftTransferUnsigned,
+        nftTransferRequest.decryptedPhrase,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+
+    // It takes a few seconds for the indexing service to sync latest NFT state
+    await sleep(7_000);
+    await Promise.all([
+      this.fetchAndSaveNFTs(currentSession),
+      this.fetchAndSaveNFTAccountTxs(currentSession),
+    ]);
+    return broadCastResult;
+  }
+
+  public async broadcastMintNFT(nftMintRequest: NFTMintRequest): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.prepareTransaction();
+
+    const memo = !nftMintRequest.memo ? DEFAULT_CLIENT_MEMO : nftMintRequest.memo;
+
+    const nftMintUnsigned: NFTMintUnsigned = {
+      data: nftMintRequest.data,
+      name: nftMintRequest.name,
+      uri: nftMintRequest.uri,
+      tokenId: nftMintRequest.tokenId,
+      denomId: nftMintRequest.denomId,
+      sender: nftMintRequest.sender,
+      recipient: nftMintRequest.recipient,
+
+      memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+
+    if (nftMintRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signNFTMint(
+        nftMintUnsigned,
+        nftMintRequest.decryptedPhrase,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signNFTMint(
+        nftMintUnsigned,
+        nftMintRequest.decryptedPhrase,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+
+    // It takes a few seconds for the indexing service to sync latest NFT state
+    await sleep(5_000);
+    await Promise.all([
+      this.fetchAndSaveNFTs(currentSession),
+      this.fetchAndSaveNFTAccountTxs(currentSession),
+    ]);
+    return broadCastResult;
+  }
+
+  public async broadcastNFTDenomIssueTx(
+    nftDenomIssueRequest: NFTDenomIssueRequest,
+  ): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.prepareTransaction();
+
+    const memo = !nftDenomIssueRequest.memo ? DEFAULT_CLIENT_MEMO : nftDenomIssueRequest.memo;
+
+    const nftDenomIssueUnsigned: NFTDenomIssueUnsigned = {
+      ...nftDenomIssueRequest,
+      memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+
+    if (nftDenomIssueRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signNFTDenomIssue(
+        nftDenomIssueUnsigned,
+        nftDenomIssueRequest.decryptedPhrase,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signNFTDenomIssue(
+        nftDenomIssueUnsigned,
+        nftDenomIssueRequest.decryptedPhrase,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+
+    // It takes a few seconds for the indexing service to sync latest NFT state
+    await sleep(5_000);
+    await Promise.all([
+      this.fetchAndSaveNFTs(currentSession),
+      this.fetchAndSaveNFTAccountTxs(currentSession),
+    ]);
+    return broadCastResult;
+  }
+
   public async syncAll(session: Session | null = null) {
     const currentSession =
       session == null ? await this.storageService.retrieveCurrentSession() : session;
@@ -305,6 +479,7 @@ class WalletService {
     await Promise.all([
       this.syncBalancesData(currentSession),
       this.syncTransactionsData(currentSession),
+      this.fetchAndSaveNFTs(currentSession),
     ]);
   }
 
@@ -323,7 +498,7 @@ class WalletService {
     const withdrawStakingReward: WithdrawStakingRewardUnsigned = {
       delegatorAddress: currentSession.wallet.address,
       validatorAddress: rewardWithdrawRequest.validatorAddress,
-      memo: '',
+      memo: DEFAULT_CLIENT_MEMO,
       accountNumber,
       accountSequence,
     };
@@ -343,7 +518,10 @@ class WalletService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.syncAll(currentSession);
+    await Promise.all([
+      await this.fetchAndSaveRewards(nodeRpc, currentSession),
+      await this.fetchAndUpdateBalances(currentSession),
+    ]);
     return broadCastResult;
   }
 
@@ -382,7 +560,7 @@ class WalletService {
   public supportedConfigs(): WalletConfig[] {
     return [
       DefaultWalletConfigs.MainNetConfig,
-      DefaultWalletConfigs.TestNetConfig,
+      DefaultWalletConfigs.TestNetCroeseid3,
       DefaultWalletConfigs.CustomDevNet,
     ];
   }
@@ -455,6 +633,10 @@ class WalletService {
     disableDefaultMemoSettings: DisableDefaultMemoSettings,
   ) {
     return this.storageService.updateDisabledDefaultMemo(disableDefaultMemoSettings);
+  }
+
+  public async updateGADisabledSettings(disableGASettings: DisableGASettings) {
+    return this.storageService.updateDisabledGA(disableGASettings);
   }
 
   public async updateGeneralSettingsPropagation(
@@ -559,7 +741,7 @@ class WalletService {
       this.fetchAndSaveRewards(nodeRpc, currentSession),
       this.fetchAndSaveTransfers(currentSession),
       this.fetchAndSaveValidators(currentSession),
-      this.fetchAndSaveProposals(currentSession),
+      this.fetchAndSaveNFTAccountTxs(currentSession),
     ]);
   }
 
@@ -579,6 +761,35 @@ class WalletService {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_TRANSFERS', e);
     }
+  }
+
+  public async fetchAndSaveNFTAccountTxs(currentSession: Session) {
+    try {
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      const nftAccountTransactionList = await chainIndexAPI.fetchAllAccountNFTsTransactions(
+        currentSession.wallet.address,
+      );
+
+      await this.storageService.saveNFTAccountTransactions({
+        transactions: nftAccountTransactionList.result,
+        walletId: currentSession.wallet.identifier,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_SAVE_NFT_ACCOUNT_TXs', e);
+    }
+  }
+
+  public async getAllNFTAccountTxs(
+    currentSession: Session,
+  ): Promise<Array<NftAccountTransactionData>> {
+    const nftAccountTxs = await this.storageService.retrieveAllNFTAccountTransactions(
+      currentSession.wallet.identifier,
+    );
+    if (!nftAccountTxs) {
+      return [];
+    }
+    return nftAccountTxs.transactions;
   }
 
   public async fetchAndSaveRewards(nodeRpc: NodeRpcService, currentSession: Session) {
@@ -637,6 +848,23 @@ class WalletService {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_SAVE_PROPOSALS', e);
+    }
+  }
+
+  public async fetchAndSaveNFTs(currentSession: Session) {
+    try {
+      const nfts = await this.loadAllCurrentAccountNFTs();
+      if (nfts === null) {
+        return;
+      }
+
+      await this.storageService.saveNFTs({
+        walletId: currentSession.wallet.identifier,
+        nfts,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_SAVE_NFTS', e);
     }
   }
 
@@ -702,7 +930,7 @@ class WalletService {
       // eslint-disable-next-line no-empty
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.log('SYNC_ERROR', e);
+      // console.log('SYNC_ERROR', e);
       return Promise.resolve();
     }
   }
@@ -849,6 +1077,14 @@ class WalletService {
     return proposalSet.proposals;
   }
 
+  public async retrieveNFTs(walletID: string): Promise<NftModel[]> {
+    const nftSet = await this.storageService.retrieveAllNfts(walletID);
+    if (!nftSet) {
+      return [];
+    }
+    return nftSet.nfts;
+  }
+
   private async getLatestTopValidators(): Promise<ValidatorModel[]> {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
@@ -881,6 +1117,71 @@ class WalletService {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING PROPOSALS', e);
       return [];
+    }
+  }
+
+  private async loadAllCurrentAccountNFTs(): Promise<NftModel[] | null> {
+    try {
+      const currentSession = await this.storageService.retrieveCurrentSession();
+      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+        return Promise.resolve([]);
+      }
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      const nftList = await chainIndexAPI.getAccountNFTList(currentSession.wallet.address);
+      return await chainIndexAPI.getNftListMarketplaceData(nftList);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING NFTs', e);
+      return null;
+    }
+  }
+
+  public async loadNFTTransferHistory(nftQuery: NftQueryParams): Promise<NftTransferModel[]> {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+      return Promise.resolve([]);
+    }
+
+    try {
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      const nftTransferTransactions = await chainIndexAPI.getNFTTransferHistory(nftQuery);
+
+      await this.storageService.saveNFTTransferHistory({
+        transfers: nftTransferTransactions,
+        walletId: currentSession.wallet.identifier,
+        nftQuery,
+      });
+
+      return nftTransferTransactions;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING NFT Transfer history, returning DB data', e);
+      const localTransferHistory = await this.storageService.retrieveNFTTransferHistory(
+        currentSession.wallet.identifier,
+        nftQuery,
+      );
+      if (!localTransferHistory) {
+        return [];
+      }
+      return localTransferHistory.transfers;
+    }
+  }
+
+  public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+      return Promise.resolve(null);
+    }
+    try {
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      const nftDenomData = await chainIndexAPI.fetchNftDenomData(denomId);
+
+      return nftDenomData.result;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING NFT denom data', e);
+
+      return null;
     }
   }
 

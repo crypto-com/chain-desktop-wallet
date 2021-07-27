@@ -1,5 +1,5 @@
 # Only run on master push
-name: Build and Release Executables
+name: Release Executables Binaries
 
 on:
   push:

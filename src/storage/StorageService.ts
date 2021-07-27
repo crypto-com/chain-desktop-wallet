@@ -1,4 +1,9 @@
-import { DisableDefaultMemoSettings, SettingsDataUpdate, Wallet } from '../models/Wallet';
+import {
+  DisableDefaultMemoSettings,
+  DisableGASettings,
+  SettingsDataUpdate,
+  Wallet,
+} from '../models/Wallet';
 import { DatabaseManager } from './DatabaseManager';
 import { Session } from '../models/Session';
 import {
@@ -8,6 +13,10 @@ import {
   UserAsset,
 } from '../models/UserAsset';
 import {
+  NftAccountTransactionList,
+  NftList,
+  NftQueryParams,
+  NftTransactionHistory,
   ProposalList,
   RewardTransactionList,
   StakingTransactionData,
@@ -56,6 +65,17 @@ export class StorageService {
     const previousWallet = await this.findWalletByIdentifier(disableDefaultMemoSettings.walletId);
     previousWallet.config.disableDefaultClientMemo =
       disableDefaultMemoSettings.disableDefaultMemoAppend;
+
+    return this.db.walletStore.update<Wallet>(
+      { identifier: previousWallet.identifier },
+      { $set: previousWallet },
+      { upsert: true },
+    );
+  }
+
+  public async updateDisabledGA(disableGASettings: DisableGASettings) {
+    const previousWallet = await this.findWalletByIdentifier(disableGASettings.walletId);
+    previousWallet.config.analyticsDisabled = disableGASettings.analyticsDisabled;
 
     return this.db.walletStore.update<Wallet>(
       { identifier: previousWallet.identifier },
@@ -270,6 +290,23 @@ export class StorageService {
     return this.db.transferStore.findOne<TransferTransactionList>({ walletId });
   }
 
+  public async saveNFTAccountTransactions(nftAccountTransactionList: NftAccountTransactionList) {
+    if (nftAccountTransactionList.transactions.length === 0) {
+      return Promise.resolve();
+    }
+    await this.db.nftAccountTxStore.remove(
+      { walletId: nftAccountTransactionList.walletId },
+      { multi: true },
+    );
+    return this.db.nftAccountTxStore.insert<NftAccountTransactionList>(nftAccountTransactionList);
+  }
+
+  public async retrieveAllNFTAccountTransactions(
+    walletId: string,
+  ): Promise<NftAccountTransactionList> {
+    return this.db.nftAccountTxStore.findOne<NftAccountTransactionList>({ walletId });
+  }
+
   public async saveValidators(validatorList: ValidatorList) {
     if (validatorList.validators.length === 0) {
       return Promise.resolve();
@@ -292,5 +329,36 @@ export class StorageService {
 
   public async retrieveAllProposals(chainId: string) {
     return this.db.proposalStore.findOne<ProposalList>({ chainId });
+  }
+
+  public async saveNFTs(nftList: NftList) {
+    if (!nftList) {
+      return Promise.resolve();
+    }
+    await this.db.nftStore.remove({ walletId: nftList.walletId }, { multi: true });
+    return this.db.nftStore.insert<NftList>(nftList);
+  }
+
+  public async retrieveAllNfts(walletId: string) {
+    return this.db.nftStore.findOne<NftList>({ walletId });
+  }
+
+  public async saveNFTTransferHistory(nftTransactionHistory: NftTransactionHistory) {
+    if (!nftTransactionHistory || nftTransactionHistory.transfers.length === 0) {
+      return Promise.resolve();
+    }
+    await this.db.nftTransferHistoryStore.remove(
+      {
+        walletId: nftTransactionHistory.walletId,
+        nftQuery: nftTransactionHistory.nftQuery,
+      },
+      { multi: true },
+    );
+
+    return this.db.nftTransferHistoryStore.insert<NftTransactionHistory>(nftTransactionHistory);
+  }
+
+  public async retrieveNFTTransferHistory(walletId: string, nftQuery: NftQueryParams) {
+    return this.db.nftTransferHistoryStore.findOne<NftTransactionHistory>({ walletId, nftQuery });
   }
 }

@@ -8,6 +8,7 @@ describe('Testing Wallet Creation', () => {
     const testNetConfig = DefaultWalletConfigs.TestNetConfig;
 
     const createOptions: WalletCreateOptions = {
+      addressIndex: 0,
       walletType: 'normal',
       config: testNetConfig,
       walletName: 'My-TestNet-Wallet',
@@ -27,6 +28,7 @@ describe('Testing Wallet Creation', () => {
     const mainNetConfig = DefaultWalletConfigs.MainNetConfig;
 
     const createOptions: WalletCreateOptions = {
+      addressIndex: 0,
       walletType: 'normal',
       config: mainNetConfig,
       walletName: 'My-MainNet-Wallet',
@@ -49,6 +51,13 @@ describe('Testing Wallet Creation', () => {
       enabled: false,
       derivationPath: "44'/245'/0'/0/0",
       name: 'Pystaport-Custom-Network',
+      enableGeneralSettings: false,
+      disableDefaultClientMemo: false,
+      analyticsDisabled: false,
+      fee: {
+        gasLimit: '',
+        networkFee: '',
+      },
       network: {
         defaultNodeUrl: '',
         chainId: 'pystaportnet',
@@ -63,11 +72,13 @@ describe('Testing Wallet Creation', () => {
           coinType: 1,
           account: 0,
         },
+        rpcUrl: '',
       },
       nodeUrl: '123.18.45.12:3400',
     };
 
     const createOptions: WalletCreateOptions = {
+      addressIndex: 0,
       walletType: 'normal',
       config: customConfig,
       walletName: 'My-Custom-Config-Wallet',

@@ -1,10 +1,61 @@
-import { app, BrowserWindow, nativeImage, Menu } from 'electron';
+import { app, BrowserWindow, nativeImage, Menu, ipcMain } from 'electron';
+
 import * as path from 'path';
+
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import { IpcMain } from './IpcMain';
+import {autoUpdater} from "electron-updater";
+import log from "electron-log";
+import Big from "big.js";
+
+
+
+const { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } = require('./UsageAnalytics');
+
+(global as any).actionEvent = actionEvent;
+(global as any).transactionEvent = transactionEvent;
+(global as any).pageView = pageView;
+(global as any).getUACode = getUACode;
+(global as any).getGAnalyticsCode = getGAnalyticsCode;
+
+
 let win: BrowserWindow | null = null;
 let ipcmain: IpcMain | null = null;
 const isDev = process.env.NODE_ENV === 'development'; // change true, in developing mode
+
+// Updater log setup
+log.transports.file.level = "debug"
+autoUpdater.logger = log
+log.info('App starting...');
+
+function sendStatusToWindow(text: string) {
+  log.info(text);
+  win?.webContents.send(text);
+}
+
+autoUpdater.on('checking-for-update', () => {
+  sendStatusToWindow('Checking for update...');
+})
+
+autoUpdater.on('error', (err) => {
+  sendStatusToWindow(`Error in auto-updater. ${err}`);
+})
+
+autoUpdater.on('update-available', (info) => {
+  sendStatusToWindow('update_available');
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  sendStatusToWindow('update_downloaded');
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  let log_message = "Download speed: " + progressObj.bytesPerSecond;
+  log_message = `${log_message} - Downloaded ${Big(progressObj.percent).toFixed(2)}%`;
+  log_message = `${log_message} (${progressObj.transferred}/${progressObj.total})`;
+
+  sendStatusToWindow(log_message);
+})
 
 function createWindow() {
   const iconPath = path.join(__dirname, '/public/icon.png').replace(/\\/g, '\\\\');
@@ -22,6 +73,8 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       devTools: isDev,
+      enableRemoteModule: true,
+      contextIsolation: false,
     },
     resizable: true,
     icon: iconImage,
@@ -32,6 +85,7 @@ function createWindow() {
   // It killed the clipboard copying capability and added a delay on startup
   win.setMenuBarVisibility(false);
   win.removeMenu();
+
 
   if (isDev) {
     win.loadURL('http://localhost:3000/index.html');
@@ -57,6 +111,7 @@ function createWindow() {
     });
   }
 
+
   // DevTools
   installExtension(REACT_DEVELOPER_TOOLS)
     .then(name => console.log(`Added Extension:  ${name}`))
@@ -65,18 +120,38 @@ function createWindow() {
   if (isDev) {
     win.webContents.openDevTools();
   }
+
+  actionEvent('App', 'Open', 'AppOpened', 0)
 }
 
-app.on('ready', createWindow);
-
 app.on('window-all-closed', () => {
+  actionEvent('App', 'Close', 'AppClosed', 0)
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
-app.on('activate', () => {
+app.on('activate', async () => {
+
   if (win === null) {
     createWindow();
   }
+
 });
+
+app.on('ready',  async function()  {
+  createWindow()
+
+  await new Promise(resolve => setTimeout(resolve, 20_000));
+  autoUpdater.checkForUpdatesAndNotify();
+});
+
+ipcMain.on('app_version', (event) => {
+  event.sender.send('app_version', { version: app.getVersion() });
+});
+
+ipcMain.on('restart_app', () => {
+  autoUpdater.quitAndInstall();
+});
+
+

@@ -1,0 +1,2877 @@
+{
+  "enUS": {
+    "translation": {
+      "language": "English",
+      "general": {
+        "enabled": "Enabled",
+        "disabled": "Disabled",
+        "confirm": "Confirm",
+        "continue": "Continue",
+        "cancel": "Cancel",
+        "save": "Save",
+        "discard": "Discard Changes",
+        "ok": "Ok",
+        "required": "is required",
+        "cannot0": "cannot be 0",
+        "validator": "validator",
+        "receiving": "receiving",
+        "available": "Available",
+        "action": "Action",
+        "select": "Select",
+        "review": "Review",
+        "copy": "Copy",
+        "close": "Close",
+        "connect": "Connect",
+        "addressValidator": {
+          "reason1": "Invalid",
+          "reason2": "address provided"
+        },
+        "validTransactionAmountValidator": {
+          "reason": "Invalid sending amount"
+        },
+        "passwordFormModal": {
+          "title": "Provide app password",
+          "description": "Input the app password decrypt wallet",
+          "error": "The password provided is incorrect. Please try again",
+          "success": "Wallet decrypted successfully!",
+          "okButton": "Decrypt wallet",
+          "createWallet": {
+            "description": "Input the app password to encrypt the wallet to be created",
+            "okButton": "Encrypt wallet",
+            "success": "Wallet created and encrypted successfully!",
+            "successButton": "Go to Home"
+          },
+          "restoreWallet": {
+            "description": "Input the app password to encrypt the wallet to be restored",
+            "okButton": "Encrypt wallet",
+            "success": "Wallet restored and encrypted successfully!",
+            "successButton": "Go to Home"
+          }
+        },
+        "successModalPopup": {
+          "title": "Success!",
+          "timeout": {
+            "description": "The transaction timed out but it will be included in the subsequent blocks"
+          },
+          "nodeConnect": {
+            "description": "Your node is connected!"
+          },
+          "createWallet": {
+            "description": "Your wallet has been created!",
+            "button": "Create Wallet"
+          },
+          "transfer": {
+            "description": "The transaction was broadcasted successfully!"
+          },
+          "staking": {
+            "description": "The staking transaction was broadcasted successfully!"
+          },
+          "reward": {
+            "description": "Your rewards withdrawal transaction was broadcasted successfully!"
+          },
+          "undelegation": {
+            "description": "Your undelegation transaction was successful"
+          },
+          "redelegation": {
+            "description": "Your redelegation transaction was successful"
+          },
+          "vote": {
+            "description": "Your vote was broadcasted successfully!"
+          },
+          "nftTransfer": {
+            "description": "Your NFT transaction was broadcasted successfully!"
+          },
+          "nftMint": {
+            "description": "Your NFT was minted successfully!"
+          }
+        },
+        "errorModalPopup": {
+          "title": "An error happened!",
+          "nodeConnect": {
+            "description": "Could not connect to the specified Node URL. Please check again."
+          },
+          "createWallet": {
+            "description": "Failed to create wallet, the derivation path might be incorrect."
+          },
+          "restoreWallet": {
+            "description": "Your Mnemonic Phrase is invalid. Please check again."
+          },
+          "transfer": {
+            "description": "The transfer transaction failed. Please try again later."
+          },
+          "staking": {
+            "description": "The staking transaction failed. Please try again later."
+          },
+          "reward": {
+            "description": "The reward withdrawal transaction failed. Please try again later."
+          },
+          "undelegation": {
+            "description": "The undelegation transaction failed. Please try again later."
+          },
+          "redelegation": {
+            "description": "The redelegation transaction failed. Please try again later."
+          },
+          "vote": {
+            "description": "The vote transaction failed. Please try again later."
+          },
+          "nftTransfer": {
+            "description": "The NFT transfer transaction failed. Please try again later."
+          },
+          "nftMint": {
+            "description": "The NFT minting transaction failed. Please try again later."
+          },
+          "ledgerExportMode": "Please ensure that your have enabled Expert mode on your Ledger device."
+        }
+      },
+      "welcome": {
+        "slogan": "Our Sample Chain Wallet supports wallet management and funds transfer.",
+        "button": "Get Started"
+      },
+      "signup": {
+        "title": "App Password Created Successfully",
+        "slogan": "You have successfully created your app password. You can proceed to restore or create a wallet.",
+        "button1": "Restore Wallet",
+        "button2": "Create Wallet",
+        "passwordFormContainer": {
+          "title": "Create App Password",
+          "description": "Before creating a new wallet, please create your app password. It will be used to encrypt your wallet seeds.",
+          "okButton": "Create App Password",
+          "success": "You have successfully created your app password. You can proceed to restore or create a wallet."
+        }
+      },
+      "create": {
+        "title1": "Create Wallet",
+        "title2": "Custom Configuration",
+        "slogan1": "Create a name and select the network for your wallet.",
+        "slogan2": "Fill in the below to connect to this custom network.",
+        "formCustomConfig": {
+          "nodeUrl": {
+            "label": "Node URL",
+            "error1": "Please enter a valid Node URL"
+          },
+          "indexingUrl": {
+            "label": "Chain Indexing URL",
+            "error1": "Please enter a valid Chain Indexing URL"
+          },
+          "derivationPath": {
+            "label": "Derivation Path",
+            "error1": "Please enter a valid Derivation Path"
+          },
+          "validatorPrefix": {
+            "label": "Validator Prefix"
+          },
+          "addressPrefix": {
+            "label": "Address Prefix"
+          },
+          "chainId": {
+            "label": "Chain ID"
+          },
+          "baseDenom": {
+            "label": "Base Denom"
+          },
+          "croDenom": {
+            "label": "CRO Denom"
+          }
+        },
+        "notification": {
+          "ledger": {
+            "message1": "Cannot detect any Ledger device",
+            "message2": "No Expert Mode",
+            "description1": "Please connect with your Ledger device",
+            "description2": "Please ensure that your have enabled Expert mode on your ledger device"
+          }
+        },
+        "addressIndexValidator": {
+          "error": "Address index should be between 0 ~ "
+        },
+        "formCreate": {
+          "name": {
+            "label": "Wallet Name"
+          },
+          "walletType": {
+            "label": "Wallet Type"
+          },
+          "addressIndex": {
+            "label": "Address Index"
+          },
+          "network": {
+            "label": "Network"
+          },
+          "checkbox1": "Want to create with hardware wallet?"
+        },
+        "ledgerModalPopup": {
+          "title1": "Success!",
+          "title2": "Connect your Ledger Device",
+          "description1": "Your Ledger device has been connected successfully.",
+          "description2": "Please confirm connection on your Ledger Device"
+        }
+      },
+      "restore": {
+        "title1": "Restore Wallet",
+        "title2": "Custom Configuration",
+        "slogan1": "Create a name and select the network for your wallet.",
+        "slogan2": "Fill in the below to connect to this custom network.",
+        "formCustomConfig": {
+          "nodeUrl": {
+            "label": "Node URL",
+            "error1": "Please enter a valid Node URL"
+          },
+          "indexingUrl": {
+            "label": "Chain Indexing URL",
+            "error1": "Please enter a valid Chain Indexing URL"
+          },
+          "derivationPath": {
+            "label": "Derivation Path",
+            "error1": "Please enter a valid Derivation Path"
+          },
+          "validatorPrefix": {
+            "label": "Validator Prefix"
+          },
+          "addressPrefix": {
+            "label": "Address Prefix"
+          },
+          "chainId": {
+            "label": "Chain ID"
+          },
+          "baseDenom": {
+            "label": "Base Denom"
+          },
+          "croDenom": {
+            "label": "CRO Denom"
+          }
+        },
+        "formRestore": {
+          "name": {
+            "label": "Wallet Name"
+          },
+          "mnemonic": {
+            "label": "Mnemonic Phrase",
+            "validatorError": "Please enter a valid mnemonic phrase"
+          },
+          "network": {
+            "label": "Network"
+          },
+          "button": "Restore Wallet"
+        }
+      },
+      "navbar": {
+        "home": "Home",
+        "staking": "Staking",
+        "send": "Send",
+        "receive": "Receive",
+        "governance": "Governance",
+        "nft": "My NFT",
+        "settings": "Settings",
+        "wallet": {
+          "list": "Wallet List",
+          "restore": "Restore Wallet",
+          "create": "Create Wallet",
+          "delete": "Delete Wallet",
+          "modal": {
+            "title": "Confirm Wallet Deletion",
+            "description": "Please review the below information.",
+            "form1": {
+              "address": {
+                "label": "Delete Wallet Address"
+              },
+              "delete": {
+                "label": "Please enter",
+                "error1": "Please enter"
+              }
+            },
+            "warning1": "Are you sure you want to delete the wallet?",
+            "warning2": "If you have not backed up your wallet mnemonic phrase, this will result in losing your funds forever.",
+            "checkbox1": "I understand that the only way to regain access is by restoring wallet mnemonic phrase.",
+            "checkbox2": "I understand that the only way to regain access is by using the same Ledger device with the correct address index"
+          },
+          "successModal": {
+            "message1": "Wallet Address",
+            "message2": "has been deleted."
+          }
+        }
+      },
+      "wallet": {
+        "title": "All Wallets",
+        "description": "You may review all your wallets here.",
+        "search": {
+          "placeholder": "Search by Name, Address..."
+        },
+        "table1": {
+          "name": "Name",
+          "address": "Address",
+          "walletType": "Wallet Type",
+          "network": "Network"
+        }
+      },
+      "announcement": {
+        "modal": {
+          "title": "Data analytics was added",
+          "description1": "You can help improve Crypto.org Chain Wallet by having Data Analytics enabled. The data collected will help the development team prioritize new features and improve existing functionalities.\n\nYou can always come back to disable Data Analytics anytime under General Configuration in Settings. "
+        }
+      },
+      "home": {
+        "title": "Welcome Back!",
+        "balance": {
+          "title1": "TOTAL BALANCE",
+          "title2": "STAKED BALANCE"
+        },
+        "nft": {
+          "tab1": "My NFT",
+          "seeAll": "See All"
+        },
+        "transactions": {
+          "tab1": "Transactions",
+          "tab2": "Delegations",
+          "tab3": "NFT Transactions",
+          "table1": {
+            "transactionHash": "Transaction Hash",
+            "amount": "Amount",
+            "recipientAddress": "Recipient Address",
+            "time": "Time",
+            "status": "Status"
+          },
+          "table2": {
+            "validatorAddress": "Validator Address",
+            "stakedAmountWithSymbol": "Staked Amount",
+            "delegatorAddress": "Delegator Address",
+            "undelegateAction": "Undelegate",
+            "redelegateAction": "Redelegate",
+            "action1": "Undelegate Stake",
+            "action2": "Redelegate Stake"
+          },
+          "table3": {
+            "transactionHash": "Transaction Hash",
+            "messageType": "Type",
+            "denomId": "Denom ID",
+            "tokenId": "Token ID",
+            "recipientAddress": "Recipient",
+            "time": "Time"
+          }
+        },
+        "notification": {
+          "walletInfo": {
+            "message": "Wallet Info",
+            "description1": "The wallet created will be limited only to display address because its",
+            "description2": "configuration is not live yet"
+          },
+          "updateAvailable": {
+            "message": "Update Available",
+            "description": "A new update is available. Downloading now..."
+          },
+          "downloadComplete": {
+            "message": "Download Complete",
+            "description": "Update downloaded successfully. It will be installed on restart.",
+            "button": "Restart Now"
+          }
+        }
+      },
+      "send": {
+        "title": "Send",
+        "description": "Move funds from your address to another wallet address.",
+        "formSend": {
+          "recipientAddress": {
+            "label": "Recipient Address",
+            "placeholder": "Enter recipient address"
+          },
+          "amount": {
+            "label": "Sending Amount",
+            "error1": "Sending Amount exceeds your available wallet balance",
+            "error2": "Sending Amount is lower than minimum allowed of"
+          },
+          "memo": {
+            "label": "Memo (Optional)"
+          }
+        },
+        "modal1": {
+          "title": "Confirm Transaction",
+          "description": "Please review the below information. ",
+          "label1": "Sender Address",
+          "label2": "To Address",
+          "label3": "Amount",
+          "label4": "Transaction Fee",
+          "label5": "Memo"
+        }
+      },
+      "receive": {
+        "title": "Receive",
+        "description": "Receive funds by sharing the below wallet address.",
+        "notification": {
+          "addressCopy": {
+            "message": "Address Copied!",
+            "description": "Current account is successfully copied to your clipboard"
+          },
+          "ledgerConnect": {
+            "message": "Cannot detect any Ledger device",
+            "description": "Please connect with your Ledger device"
+          }
+        },
+        "button": "Verify address on Ledger"
+      },
+      "staking": {
+        "title": "Staking",
+        "tab1": "Staking Rewards",
+        "tab2": "Delegate Funds",
+        "description1": "Withdraw rewards from delegated funds.\n",
+        "description2": "Delegate funds to validator.",
+        "maxValidator": {
+          "error": "Staking amount exceeds your available wallet balance"
+        },
+        "minValidator": {
+          "error": "Staking amount is lower than minimum allowed of "
+        },
+        "validatorList": {
+          "table": {
+            "title": "Validator List",
+            "description": "Please select one of the validator.",
+            "validatorName": "Name",
+            "validatorWebsite": "Website",
+            "validatorAddress": "Address",
+            "currentTokens": "Voting Power",
+            "currentCommissionRate": "Commission",
+            "action": "Action"
+          }
+        },
+        "formWithdralStakingReward": {
+          "table": {
+            "validatorName": "Name",
+            "rewardAmount": "Reward Amount",
+            "action1": "Withdraw Reward"
+          }
+        },
+        "formDelegation": {
+          "validatorAddress": {
+            "label": "Validator address",
+            "placeholder": "Enter validator address"
+          },
+          "amount": {
+            "label": "Delegation Amount"
+          },
+          "checkbox1": "Want to set custom memo?",
+          "memo": {
+            "label": "Memo (Optional)"
+          }
+        },
+        "modal1": {
+          "title": "Confirm Transaction",
+          "description": "Please review the below information.",
+          "label1": "Sender Address",
+          "label2": "Delegating to Validator",
+          "label3": "Amount",
+          "label4": "Memo"
+        },
+        "modal2": {
+          "title": "Confirm Transaction",
+          "description": "Please review the below information.",
+          "label1": "Sender Address",
+          "label2": "Withdraw Reward From Validator",
+          "label3": "Rewards"
+        }
+      },
+      "governance": {
+        "title": "Governance",
+        "description": "You may see all proposals and cast your votes here.",
+        "tab1": "All",
+        "tab2": "Voting",
+        "tab3": "Passed",
+        "tab4": "Failed",
+        "tab5": "Rejected",
+        "voteOption": {
+          "yes": "Support",
+          "no": "Do not Support",
+          "noWithVeto": "Do not Support with Veto",
+          "abstain": "Undecided"
+        },
+        "backToList": "Back to Proposal List",
+        "start": "Start",
+        "end": "End",
+        "sendVote": "Send Vote",
+        "modal1": {
+          "title": "Confirm Vote Transaction",
+          "description": "Please review the below information. ",
+          "label1": "Sender Address",
+          "label2": "Vote to Proposal",
+          "label3": "Vote"
+        }
+      },
+      "nft": {
+        "title": "My NFT",
+        "description": "An overview of your NFT Collection on Crypto.org Chain.",
+        "tab1": "NFT Collection",
+        "tab2": "Mint NFT",
+        "container": {
+          "description": "Mint your NFT with Image or Video on Crypto.org chain."
+        },
+        "fileUploadValidator": {
+          "error1": "Upload Files is required",
+          "error2": "File upload failed. Please upload again."
+        },
+        "beforeUpload": {
+          "error1": "You can only upload ",
+          "error2": "Video size must be smaller than",
+          "error3": "Image size must be smaller than"
+        },
+        "media": {
+          "image": "Image",
+          "video": "Video",
+          "thumbnail": "Thumbnail"
+        },
+        "notification": {
+          "uploadFailed": {
+            "message": "Upload failed",
+            "description": "Please confirm your connection & try again later."
+          }
+        },
+        "formMintNft": {
+          "denomId": {
+            "label": "Denom ID",
+            "placeholder": "e.g. ",
+            "error1": "Expected length to be between",
+            "error2": "and",
+            "error3": "characters",
+            "error4": "Expected only start with lowercase alphabetic",
+            "error5": "Expected only alphabetic characters or numbers"
+          },
+          "tokenId": {
+            "label": "Token ID",
+            "placeholder": "e.g.",
+            "error1": "Expected length to be between",
+            "error2": "and",
+            "error3": "characters",
+            "error4": "Expected only start with lowercase alphabetic",
+            "error5": "Expected only alphabetic characters or numbers"
+          },
+          "drop": {
+            "label": "Drop Name",
+            "placeholder": "e.g."
+          },
+          "description": {
+            "label": "Drop Description",
+            "placeholder": "e.g."
+          },
+          "files": {
+            "label": "Upload Files",
+            "description1": "Please wait until file upload finished",
+            "description2": "You have to upload a thumbnail for the video"
+          }
+        },
+        "modal1": {
+          "title": "Confirm Mint NFT",
+          "description": "Please review the information below.",
+          "label1": "Denom ID",
+          "label2": "Token ID",
+          "label3": "Drop Name",
+          "label4": "Drop Description",
+          "label5": "Transaction Fee",
+          "notice1": "The Denom ID is registered by another address. Please choose another one.",
+          "notice2": "Insufficient balance. Please ensure you have at least",
+          "notice3": "for network fee.",
+          "notice4": "This NFT will be minted on the Crypto.org Chain."
+        },
+        "modal2": {
+          "title": "Confirm Transfer",
+          "description": "Please review the information below.",
+          "label1": "To",
+          "label2": "Denom ID",
+          "label3": "Token ID",
+          "label4": "Transaction Fee",
+          "notice1": "This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address that is not compatible with the Crypto.org Chain NFT token standard will result in the permanent loss of your asset.",
+          "button1": "Confirm Transfer"
+        },
+        "modal3": {
+          "title": "Transfer NFT",
+          "description": "Fill in the information below to transfer your NFT.",
+          "label1": "Sending",
+          "form": {
+            "recipientAddress": {
+              "label": "Recipient Address",
+              "placeholder": "Enter Recipient Address"
+            }
+          }
+        },
+        "nftCollection": {
+          "table1": {
+            "name": "Drop Name",
+            "denomId": "Denom ID",
+            "tokenId": "Token ID",
+            "creator": "Creator",
+            "viewAction": "Action",
+            "action1": "View"
+          }
+        },
+        "detailModal": {
+          "subtitle": "About the Drop",
+          "label1": "Denom ID",
+          "label2": "Denom Name",
+          "label3": "Token ID",
+          "label4": "Content URL",
+          "button1": "Transfer NFT",
+          "button2": "View on Crypto.com NFT"
+        }
+      },
+      "settings": {
+        "title": "Settings",
+        "description": "An invalid configuration might result in wallet malfunction.",
+        "tab1": "Node Configuration",
+        "tab2": "General Configuration",
+        "tab3": "Clear Storage",
+        "form1": {
+          "nodeUrl": {
+            "label": "Node URL",
+            "error1": "Please enter a valid Node URL"
+          },
+          "indexingUrl": {
+            "label": "Chain Indexing URL",
+            "error1": "Please enter a valid Chain Indexing URL"
+          },
+          "chainId": {
+            "label": "Chain ID"
+          },
+          "networkFee": {
+            "label": "Network Fee"
+          },
+          "gasLimit": {
+            "label": "Gas Limit"
+          },
+          "checkbox1": {
+            "description1": "Propagate the settings changes to all your ",
+            "description2": "wallets"
+          }
+        },
+        "message": {
+          "success1": "Wallet settings updated successfully",
+          "success2": "on all",
+          "success3": "wallets",
+          "analytics1": "Analytics settings has been",
+          "defaultMemo1": "Default client memo settings has been",
+          "generalSettings1": "General settings propagation has been"
+        },
+        "notification": {
+          "recover": {
+            "message": "Recovery Phrase Copied!",
+            "description": "Recovery Phrase is successfully copied to your clipboard"
+          }
+        },
+        "language": {
+          "title": "Language"
+        },
+        "memo": {
+          "title": "Default Memo",
+          "description": "A default memo message will be used for transactions if a custom memo is not provided."
+        },
+        "dataAnalytics": {
+          "title": "Data Analytics",
+          "description": "The data collected for analytics is used to prioritize development for new features and functionalities and also to improve implemented features."
+        },
+        "exportRecoveryPhrase": {
+          "title": "Export your Recovery Phrase",
+          "description": "You are required to enter your App Password for this action.",
+          "button": "Export",
+          "modal1": {
+            "title": "Your Recovery Phrases",
+            "description": "Swipe to reveal all words. Write them down in the right order.",
+            "warning": "Protect your funds and do not share your recovery phrase with anyone."
+          }
+        },
+        "clearStorage": {
+          "description": "Once you clear the storage, you will lose access to all you wallets. The only way to regain wallet access is by restoring wallet mnemonic phrase.",
+          "button1": "Clear Storage",
+          "modal": {
+            "title": "Confirm Clear Storage",
+            "description1": "You may wish to verify your recovery mnemonic phrase before deletion to ensure that you can restore this wallet in the future.",
+            "warning": "Are you sure you want to clear the storage? If you have not backed up your wallet mnemonic phrase, you will result in losing your funds forever.",
+            "disclaimer": "I understand that the only way to regain access is by restoring wallet mnemonic phrase.",
+            "form1": {
+              "clear": {
+                "label": "Please enter",
+                "error1": "Please enter"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "zhHK": {
+    "translation": {
+      "language": "繁體中文",
+      "general": {
+        "enabled": "開啟",
+        "disabled": "關閉",
+        "confirm": "確定",
+        "continue": "繼續",
+        "cancel": "取消",
+        "save": "保存",
+        "discard": "取消",
+        "ok": "Ok",
+        "required": "必須輸入",
+        "cannot0": "不能為 0",
+        "validator": "驗證者",
+        "receiving": "接收",
+        "available": "可使用",
+        "action": "操作",
+        "select": "選擇",
+        "review": "檢查",
+        "copy": "複製",
+        "close": "關閉",
+        "connect": "連接",
+        "addressValidator": {
+          "reason1": "無效的",
+          "reason2": "地址"
+        },
+        "validTransactionAmountValidator": {
+          "reason": "無效的轉賬款項"
+        },
+        "passwordFormModal": {
+          "title": "輸入密碼",
+          "description": "請輸入密碼以解鎖錢包",
+          "error": "密碼不正確，請重新輸入。",
+          "success": "錢包解鎖成功！",
+          "okButton": "解鎖錢包",
+          "createWallet": {
+            "description": "請輸入密碼以加密等待創建的錢包",
+            "okButton": "加密錢包",
+            "success": "成功創建及加密錢包！",
+            "successButton": "返回主頁"
+          },
+          "restoreWallet": {
+            "description": "請輸入密碼以加密等待復原的錢包",
+            "okButton": "加密錢包",
+            "success": "成功復原及加密錢包！",
+            "successButton": "返回主頁"
+          }
+        },
+        "successModalPopup": {
+          "title": "成功！",
+          "timeout": {
+            "description": "交易超時但會被包含在後續區塊中"
+          },
+          "nodeConnect": {
+            "description": "你的節點已經連接！"
+          },
+          "createWallet": {
+            "description": "你的錢包已經創建！",
+            "button": "創建錢包"
+          },
+          "transfer": {
+            "description": "此交易已經成功廣播！"
+          },
+          "staking": {
+            "description": "此抵押交易已經成功廣播！"
+          },
+          "reward": {
+            "description": "你的獎勵提取交易已經成功廣播！"
+          },
+          "undelegation": {
+            "description": "你的贖回委託交易已經成功"
+          },
+          "redelegation": {
+            "description": "你的重新委託交易已經成功"
+          },
+          "vote": {
+            "description": "你的投票已經成功廣播！"
+          },
+          "nftTransfer": {
+            "description": "你的NFT 交易已經成功廣播！"
+          },
+          "nftMint": {
+            "description": "你的NFT 已經成功鑄造！"
+          }
+        },
+        "errorModalPopup": {
+          "title": "發生錯誤！",
+          "nodeConnect": {
+            "description": "無法連接到指定的節點URL。請再次檢查。"
+          },
+          "createWallet": {
+            "description": "創建錢包失敗，衍生路徑可能有誤。"
+          },
+          "restoreWallet": {
+            "description": "你的助記詞無效。請再次檢查。"
+          },
+          "transfer": {
+            "description": "轉賬交易失敗。請稍後再試。"
+          },
+          "staking": {
+            "description": "抵押交易失敗。請稍後再試。"
+          },
+          "reward": {
+            "description": "獎勵提取交易失敗。請稍後再試。"
+          },
+          "undelegation": {
+            "description": "贖回委託交易失敗。請稍後再試。"
+          },
+          "redelegation": {
+            "description": "重新委託交易失敗。請稍後再試。"
+          },
+          "vote": {
+            "description": "投票交易失敗。請稍後再試。"
+          },
+          "nftTransfer": {
+            "description": "NFT 轉發交易失敗。請稍後再試。"
+          },
+          "nftMint": {
+            "description": "NFT 鑄造交易失敗。請稍後再試。"
+          },
+          "ledgerExportMode": "請確保你的Ledger錢包已經開啟專家模式。"
+        }
+      },
+      "welcome": {
+        "slogan": "我們的樣本錢包支持錢包管理和資金轉賬。",
+        "button": "開始"
+      },
+      "signup": {
+        "title": "應用密碼創建成功",
+        "slogan": "你已經成功創建你的應用密碼。現在可以進一步復原錢包或者創建錢包。",
+        "button1": "復原錢包",
+        "button2": "創建錢包",
+        "passwordFormContainer": {
+          "title": "創建應用密碼",
+          "description": "在創建新錢包之前，請先創建應用密碼。應用密碼會用來加密你的私鑰種子。",
+          "okButton": "創建應用密碼",
+          "success": "你已經成功創建你的應用密碼。現在可以進一步復原錢包或者創建錢包。"
+        }
+      },
+      "create": {
+        "title1": "創建錢包",
+        "title2": "自定義配置",
+        "slogan1": "為你的錢包創建名字和選擇網絡",
+        "slogan2": "填寫以下信息以連接自定義網絡",
+        "formCustomConfig": {
+          "nodeUrl": {
+            "label": "節點 URL",
+            "error1": "請填寫有效的節點 URL"
+          },
+          "indexingUrl": {
+            "label": "鏈索引 URL",
+            "error1": "請填寫有效的鏈索引 URL"
+          },
+          "derivationPath": {
+            "label": "衍生路徑",
+            "error1": "請填寫有效的衍生路徑"
+          },
+          "validatorPrefix": {
+            "label": "驗證者前綴"
+          },
+          "addressPrefix": {
+            "label": "地址前綴"
+          },
+          "chainId": {
+            "label": "鏈 ID"
+          },
+          "baseDenom": {
+            "label": "基本面值"
+          },
+          "croDenom": {
+            "label": "CRO 面值"
+          }
+        },
+        "notification": {
+          "ledger": {
+            "message1": "無法檢測到任何Ledger錢包",
+            "message2": "專家模式未開啟",
+            "description1": "請連接你的Ledger錢包",
+            "description2": "請確保你的Ledger錢包已經開啟專家模式"
+          }
+        },
+        "addressIndexValidator": {
+          "error": "地址索引範圍應該是0~"
+        },
+        "formCreate": {
+          "name": {
+            "label": "錢包名稱"
+          },
+          "walletType": {
+            "label": "錢包種類"
+          },
+          "addressIndex": {
+            "label": "地址索引"
+          },
+          "network": {
+            "label": "網絡"
+          },
+          "checkbox1": "想要創建硬件錢包？"
+        },
+        "ledgerModalPopup": {
+          "title1": "成功！",
+          "title2": "連接你的Ledger 錢包",
+          "description1": "你的Ledger錢包已經成功連接。",
+          "description2": "請在Ledger錢包上確認連接"
+        }
+      },
+      "restore": {
+        "title1": "復原錢包",
+        "title2": "自定義配置",
+        "slogan1": "為你的錢包創建名字和選擇網絡。",
+        "slogan2": "填寫以下信息以連接自定義網絡。",
+        "formCustomConfig": {
+          "nodeUrl": {
+            "label": "節點 URL",
+            "error1": "請填寫有效的節點 URL"
+          },
+          "indexingUrl": {
+            "label": "鏈索引 URL",
+            "error1": "請填寫有效的鏈索引URL"
+          },
+          "derivationPath": {
+            "label": "衍生路徑",
+            "error1": "請填寫有效的衍生路徑"
+          },
+          "validatorPrefix": {
+            "label": "驗證者前綴"
+          },
+          "addressPrefix": {
+            "label": "地址前綴"
+          },
+          "chainId": {
+            "label": "鏈 ID"
+          },
+          "baseDenom": {
+            "label": "基本面值"
+          },
+          "croDenom": {
+            "label": "CRO 面值"
+          }
+        },
+        "formRestore": {
+          "name": {
+            "label": "錢包名稱"
+          },
+          "mnemonic": {
+            "label": "助記詞",
+            "validatorError": "請輸入有效的助記詞"
+          },
+          "network": {
+            "label": "網絡"
+          },
+          "button": "復原錢包"
+        }
+      },
+      "navbar": {
+        "home": "主頁",
+        "staking": "抵押",
+        "send": "發送",
+        "receive": "接收",
+        "governance": "治理",
+        "nft": "我的NFT",
+        "settings": "設置",
+        "wallet": {
+          "list": "所有錢包",
+          "restore": "復原錢包",
+          "create": "創建錢包",
+          "delete": "刪除錢包",
+          "modal": {
+            "title": "確認刪除錢包",
+            "description": "請檢查以下內容",
+            "form1": {
+              "address": {
+                "label": "刪除錢包地址"
+              },
+              "delete": {
+                "label": "請輸入",
+                "error1": "請輸入"
+              }
+            },
+            "warning1": "你確定要刪除這個錢包？",
+            "warning2": "如果你沒有備份你的錢包助記詞，這將導致你的資金永遠丟失。",
+            "checkbox1": "我了解重新獲得訪問權限的唯一方法是復原錢包助記詞。",
+            "checkbox2": "我了解重新獲得訪問權限的唯一方法是使用具有正確地址索引的相同Ledger錢包"
+          },
+          "successModal": {
+            "message1": "錢包地址",
+            "message2": "已被刪除。"
+          }
+        }
+      },
+      "wallet": {
+        "title": "錢包列表",
+        "description": "你可以在這裡查看你所有的錢包。",
+        "search": {
+          "placeholder": "用名稱或地址搜索..."
+        },
+        "table1": {
+          "name": "名稱",
+          "address": "地址",
+          "walletType": "錢包種類",
+          "network": "網絡"
+        }
+      },
+      "announcement": {
+        "modal": {
+          "title": "數據分析已添加",
+          "description1": "您可以通過啟用數據分析來幫助改進 Crypto.org 鏈錢包。收集的數據將幫助開發團隊優先考慮新功能並改進現有功能。\n\n您可以隨時返回到 “設定” 內的 “基本設定” 以禁用數據分析"
+        }
+      },
+      "home": {
+        "title": "歡迎",
+        "balance": {
+          "title1": "總餘額",
+          "title2": "抵押餘額"
+        },
+        "nft": {
+          "tab1": "我的NFT",
+          "seeAll": "所有"
+        },
+        "transactions": {
+          "tab1": "交易",
+          "tab2": "委託",
+          "tab3": "NFT交易",
+          "table1": {
+            "transactionHash": "交易哈希值",
+            "amount": "數量",
+            "recipientAddress": "收款人地址",
+            "time": "時間",
+            "status": "狀態"
+          },
+          "table2": {
+            "validatorAddress": "驗證者地址",
+            "stakedAmountWithSymbol": "抵押數量",
+            "delegatorAddress": "委託人地址",
+            "undelegateAction": "贖回委託",
+            "redelegateAction": "重新委託",
+            "action1": "贖回委託",
+            "action2": "重新委託"
+          },
+          "table3": {
+            "transactionHash": "交易哈希值",
+            "messageType": "類別",
+            "denomId": "系列 ID",
+            "tokenId": "代幣ID",
+            "recipientAddress": "收款人",
+            "time": "時間"
+          }
+        },
+        "notification": {
+          "walletInfo": {
+            "message": "錢包資料",
+            "description1": "創建的錢包將僅限於顯示地址，因為它的",
+            "description2": "配置尚未生效"
+          },
+          "updateAvailable": {
+            "message": "有新的更新",
+            "description": "有一個更新，下載中⋯"
+          },
+          "downloadComplete": {
+            "message": "下載完成",
+            "description": "成功下載更新，重啟程式以完成安裝。",
+            "button": "現在重啟程式"
+          }
+        }
+      },
+      "send": {
+        "title": "發送",
+        "description": "轉賬到其他錢包地址",
+        "formSend": {
+          "recipientAddress": {
+            "label": "收款人地址",
+            "placeholder": "輸入收款人地址"
+          },
+          "amount": {
+            "label": "轉賬款項",
+            "error1": "你的錢包沒有足夠的款項",
+            "error2": "你所輸入的轉賬款項少於最低可轉賬款項"
+          },
+          "memo": {
+            "label": "留言（可留空）"
+          }
+        },
+        "modal1": {
+          "title": "確認交易",
+          "description": "請檢查以下內容：",
+          "label1": "發送人地址",
+          "label2": "收款人地址",
+          "label3": "數目",
+          "label4": "交易費用",
+          "label5": "留言"
+        }
+      },
+      "receive": {
+        "title": "接收",
+        "description": "分享你的錢包地址來接收款項",
+        "notification": {
+          "addressCopy": {
+            "message": "複製地址！",
+            "description": "這個地址已儲存到你的剪貼板。"
+          },
+          "ledgerConnect": {
+            "message": "未能偵測到你的 Ledger 硬體錢包 ",
+            "description": "請連接你的 Ledger 硬體錢包 "
+          }
+        },
+        "button": "驗證你的 Ledger 錢包"
+      },
+      "staking": {
+        "title": "抵押",
+        "tab1": "抵押獎勵",
+        "tab2": "委託資金",
+        "description1": "從委託資金提取獎勵。",
+        "description2": "委託資金至驗證者。",
+        "maxValidator": {
+          "error": "抵押數目大於你的錢包餘額"
+        },
+        "minValidator": {
+          "error": "抵押數目少於"
+        },
+        "validatorList": {
+          "table": {
+            "title": "驗證者列表",
+            "description": "請選擇其中一個驗證者。",
+            "validatorName": "名稱",
+            "validatorWebsite": "網址",
+            "validatorAddress": "地址",
+            "currentTokens": "投票能量",
+            "currentCommissionRate": "佣金",
+            "action": "操作"
+          }
+        },
+        "formWithdralStakingReward": {
+          "table": {
+            "validatorName": "名稱",
+            "rewardAmount": "獎勵數目",
+            "action1": "提取獎勵"
+          }
+        },
+        "formDelegation": {
+          "validatorAddress": {
+            "label": "驗證者地址",
+            "placeholder": "輸入驗證者地址"
+          },
+          "amount": {
+            "label": "委託數目"
+          },
+          "checkbox1": "想要設定留言？",
+          "memo": {
+            "label": "留言（可留空）"
+          }
+        },
+        "modal1": {
+          "title": "確認交易",
+          "description": "請檢查以下內容：",
+          "label1": "發送人地址",
+          "label2": "委託至驗證者",
+          "label3": "數目",
+          "label4": "留言"
+        },
+        "modal2": {
+          "title": "確認交易",
+          "description": "請檢查以下內容：",
+          "label1": "發送人地址",
+          "label2": "從驗證者提取獎勵",
+          "label3": "獎勵"
+        }
+      },
+      "governance": {
+        "title": "治理",
+        "description": "你可以在這裡看到所有提案並行使你的投票權。",
+        "tab1": "所有",
+        "tab2": "投票中",
+        "tab3": "已通過",
+        "tab4": "不通過",
+        "tab5": "被否決",
+        "voteOption": {
+          "yes": "支持",
+          "no": "不支持",
+          "noWithVeto": "不支持並否決",
+          "abstain": "未決定"
+        },
+        "backToList": "返回",
+        "start": "開始",
+        "end": "結束",
+        "sendVote": "發送投票",
+        "modal1": {
+          "title": "確認投票交易",
+          "description": "請檢查以下內容：",
+          "label1": "發送人地址",
+          "label2": "投票提案",
+          "label3": "投票"
+        }
+      },
+      "nft": {
+        "title": "我的NFT",
+        "description": "你在 Crypto.org 鏈上收藏的 NFT 概覽",
+        "tab1": "NFT 收藏",
+        "tab2": "鑄造 NFT ",
+        "container": {
+          "description": "在 Crypto.org 鏈上以圖片或影片鑄造你的專屬 NFT "
+        },
+        "fileUploadValidator": {
+          "error1": "必須上傳檔案",
+          "error2": "檔案上傳失敗，請重新上傳。"
+        },
+        "beforeUpload": {
+          "error1": "你只可以上傳",
+          "error2": "影片大小必須小於",
+          "error3": "圖片大小必須小於"
+        },
+        "media": {
+          "image": "圖片",
+          "video": "影片",
+          "thumbnail": "封面"
+        },
+        "notification": {
+          "uploadFailed": {
+            "message": "上傳失敗",
+            "description": "請確認你的網絡連結正常後再度嘗試。"
+          }
+        },
+        "formMintNft": {
+          "denomId": {
+            "label": "系列 ID",
+            "placeholder": "例如：",
+            "error1": "長度只能為",
+            "error2": "至",
+            "error3": "個字母",
+            "error4": "只能由小寫英文字母開始",
+            "error5": "只能由小寫英文字母及數字組成"
+          },
+          "tokenId": {
+            "label": "代幣 ID",
+            "placeholder": "例如：",
+            "error1": "長度只能為",
+            "error2": "至",
+            "error3": "個字母",
+            "error4": "只能由小寫英文字母開始",
+            "error5": "只能由小寫英文字母及數字組成"
+          },
+          "drop": {
+            "label": "名稱",
+            "placeholder": "例如："
+          },
+          "description": {
+            "label": "描述",
+            "placeholder": "例如："
+          },
+          "files": {
+            "label": "上傳檔案",
+            "description1": "請等待檔案上傳完成",
+            "description2": "你還需要上傳影片的封面圖片"
+          }
+        },
+        "modal1": {
+          "title": "確認 NFT 鑄造",
+          "description": "請檢查以下內容：",
+          "label1": "系列 ID",
+          "label2": "代幣 ID",
+          "label3": "名稱",
+          "label4": "描述",
+          "label5": "交易費用",
+          "notice1": "這個 系列 ID 已被其他地址註冊，請選擇另外一個 ID。",
+          "notice2": "餘額不足。請確保你最少有",
+          "notice3": "來支付交易費。",
+          "notice4": "這 NFT 會鑄造到 Crypto.org 鏈上。"
+        },
+        "modal2": {
+          "title": "確認轉發",
+          "description": "請檢查以下內容：",
+          "label1": "到",
+          "label2": "系列 ID",
+          "label3": "代幣 ID",
+          "label4": "交易費用",
+          "notice1": "這為 Crypto.org 鏈上的 NFT，轉發此 NFT 到不支援 Crypto.org 代幣標準的地址將會造成你的 NFT 永久損失。",
+          "button1": "確定轉發"
+        },
+        "modal3": {
+          "title": "轉發 NFT ",
+          "description": "填寫以下資料以轉發你的NFT ",
+          "label1": "發送",
+          "form": {
+            "recipientAddress": {
+              "label": "收款人地址",
+              "placeholder": "輸入收款人地址"
+            }
+          }
+        },
+        "nftCollection": {
+          "table1": {
+            "name": "名稱",
+            "denomId": "系列 ID",
+            "tokenId": "代幣 ID",
+            "creator": "創建人",
+            "viewAction": "操作",
+            "action1": "瀏覽"
+          }
+        },
+        "detailModal": {
+          "subtitle": "關於",
+          "label1": "系列 ID",
+          "label2": "系列名稱",
+          "label3": "代幣 ID",
+          "label4": "內容 URL ",
+          "button1": "轉發 NFT ",
+          "button2": "於 Crypto.com NFT 上瀏覽"
+        }
+      },
+      "settings": {
+        "title": "設定",
+        "description": "錯誤的設定將會令錢包不能被正常使用。",
+        "tab1": "節點設定",
+        "tab2": "一般設定",
+        "tab3": "重置",
+        "form1": {
+          "nodeUrl": {
+            "label": "節點 URL",
+            "error1": "請輸入有效的節點 URL"
+          },
+          "indexingUrl": {
+            "label": "鏈索引 URL",
+            "error1": "請輸入有效的鏈索引 URL"
+          },
+          "chainId": {
+            "label": "鏈 ID"
+          },
+          "networkFee": {
+            "label": "交易費用"
+          },
+          "gasLimit": {
+            "label": "Gas 費用"
+          },
+          "checkbox1": {
+            "description1": "將設定更新至所有",
+            "description2": "錢包"
+          }
+        },
+        "message": {
+          "success1": "已成功更新錢包設定",
+          "success2": "所有",
+          "success3": "錢包",
+          "analytics1": "資料分析已",
+          "defaultMemo1": "預設留言已",
+          "generalSettings1": "基本設定"
+        },
+        "notification": {
+          "recover": {
+            "message": "已複製助記詞！",
+            "description": "助記詞已成功複製到剪貼板"
+          }
+        },
+        "language": {
+          "title": "語言"
+        },
+        "memo": {
+          "title": "預設留言",
+          "description": "如交易沒有提供任何留言，將使用預設的留言。"
+        },
+        "dataAnalytics": {
+          "title": "資料分析",
+          "description": "收集的數據將幫助開發團隊優先考慮新功能並改進現有功能。"
+        },
+        "exportRecoveryPhrase": {
+          "title": "導出助記詞",
+          "description": "需要輸入你的密碼來進行此操作。",
+          "button": "導出",
+          "modal1": {
+            "title": "你的助記詞",
+            "description": "請查閱所有的助記詞，並以正確的次序記錄下來。",
+            "warning": "請好好保管並不要分享你的助記詞以保障資金的安全。"
+          }
+        },
+        "clearStorage": {
+          "description": "當你重置這個程式，你將會失去所有錢包的使用權。保管好錢包助記詞是你唯一能重新復原錢包使用權的方法。",
+          "button1": "重置",
+          "modal": {
+            "title": "確認重置",
+            "description1": "你或許需要確認你的所有錢包助記詞，以確保未來你能夠復原錢包的使用權。",
+            "warning": "你確定你要重置這個程式？如果你沒有備份好你所有錢包的助記詞，你將會永遠失去所有錢包內的資金。",
+            "disclaimer": "我明白我只能夠透過錢包的助記詞來恢復錢包的使用權。",
+            "form1": {
+              "clear": {
+                "label": "請輸入",
+                "error1": "請輸入"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "zhCN": {
+    "translation": {
+      "language": "简体中文",
+      "general": {
+        "enabled": "开启",
+        "disabled": "关闭",
+        "confirm": "确定",
+        "continue": "继续",
+        "cancel": "取消",
+        "save": "保存",
+        "discard": "取消",
+        "ok": "好的",
+        "required": "必须输入",
+        "cannot0": "不能为 0",
+        "validator": "验证者",
+        "receiving": "接收",
+        "available": "可使用",
+        "action": "操作",
+        "select": "选择",
+        "review": "检查",
+        "copy": "复制",
+        "close": "关闭",
+        "connect": "连接",
+        "addressValidator": {
+          "reason1": "无效的",
+          "reason2": "地址"
+        },
+        "validTransactionAmountValidator": {
+          "reason": "无效的转账款项"
+        },
+        "passwordFormModal": {
+          "title": "输入密码",
+          "description": "请输入密码以解锁钱包",
+          "error": "密码不正确，请重新输入。",
+          "success": "钱包解锁成功！",
+          "okButton": "解锁钱包",
+          "createWallet": {
+            "description": "请输入密码以加密等待创建的钱包",
+            "okButton": "加密钱包",
+            "success": "成功创建及加密钱包！",
+            "successButton": "返回主页"
+          },
+          "restoreWallet": {
+            "description": "请输入密码以加密等待复原的钱包",
+            "okButton": "加密钱包",
+            "success": "成功复原及加密钱包！",
+            "successButton": "返回主页"
+          }
+        },
+        "successModalPopup": {
+          "title": "成功！",
+          "timeout": {
+            "description": "交易超时但会被包含在后续区块中"
+          },
+          "nodeConnect": {
+            "description": "你的节点已经连接！"
+          },
+          "createWallet": {
+            "description": "你的钱包已经创建！",
+            "button": "创建钱包"
+          },
+          "transfer": {
+            "description": "此交易已经成功广播！"
+          },
+          "staking": {
+            "description": "此抵押交易已经成功广播！"
+          },
+          "reward": {
+            "description": "你的奖励提取交易已经成功广播！"
+          },
+          "undelegation": {
+            "description": "你的赎回委托交易已经成功"
+          },
+          "redelegation": {
+            "description": "你的重新委托交易已经成功"
+          },
+          "vote": {
+            "description": "你的投票已经成功广播！"
+          },
+          "nftTransfer": {
+            "description": "你的NFT 交易已经成功广播！"
+          },
+          "nftMint": {
+            "description": "你的NFT 已经成功铸造！"
+          }
+        },
+        "errorModalPopup": {
+          "title": "发生错误！",
+          "nodeConnect": {
+            "description": "无法连接到指定的节点URL。 请再次检查。"
+          },
+          "createWallet": {
+            "description": "创建钱包失败，衍生路径可能有误。"
+          },
+          "restoreWallet": {
+            "description": "你的助记词无效。 请再次检查。"
+          },
+          "transfer": {
+            "description": "转账交易失败。 请稍后再试。"
+          },
+          "staking": {
+            "description": "抵押交易失败。 请稍后再试。"
+          },
+          "reward": {
+            "description": "奖励提取交易失败。 请稍后再试。"
+          },
+          "undelegation": {
+            "description": "赎回委托交易失败。 请稍后再试。"
+          },
+          "redelegation": {
+            "description": "重新委托交易失败。 请稍后再试。"
+          },
+          "vote": {
+            "description": "投票交易失败。 请稍后再试。"
+          },
+          "nftTransfer": {
+            "description": "NFT 转账交易失败。 请稍后再试。"
+          },
+          "nftMint": {
+            "description": "NFT 铸造交易失败。 请稍后再试。"
+          },
+          "ledgerExportMode": "请确保你的Ledger钱包已经开启专家模式。"
+        }
+      },
+      "welcome": {
+        "slogan": "我们的样本钱包支持钱包管理和资金转账。",
+        "button": "开始"
+      },
+      "signup": {
+        "title": "应用密码创建成功",
+        "slogan": "你已经成功创建你的应用密码。现在可以进一步复原钱包或者创建钱包。",
+        "button1": "复原钱包",
+        "button2": "创建钱包",
+        "passwordFormContainer": {
+          "title": "创建应用密码",
+          "description": "在创建新钱包之前，请先创建应用密码。 应用密码会用来加密你的私钥种子。",
+          "okButton": "创建应用密码",
+          "success": "你已经成功创建你的应用密码。现在可以进一步复原钱包或者创建钱包。"
+        }
+      },
+      "create": {
+        "title1": "创建钱包",
+        "title2": "自定义配置",
+        "slogan1": "为你的钱包创建名字和选择网络",
+        "slogan2": "填写以下信息以连接自定义网络",
+        "formCustomConfig": {
+          "nodeUrl": {
+            "label": "节点 URL",
+            "error1": "请填写有效的节点URL"
+          },
+          "indexingUrl": {
+            "label": "链索引 URL",
+            "error1": "请填写有效的链索引 URL"
+          },
+          "derivationPath": {
+            "label": "衍生路径",
+            "error1": "请填写有效的衍生路径"
+          },
+          "validatorPrefix": {
+            "label": "验证者前缀"
+          },
+          "addressPrefix": {
+            "label": "地址前缀"
+          },
+          "chainId": {
+            "label": "链 ID"
+          },
+          "baseDenom": {
+            "label": "基本面值"
+          },
+          "croDenom": {
+            "label": "CRO 面值"
+          }
+        },
+        "notification": {
+          "ledger": {
+            "message1": "无法检测到任何Ledger钱包",
+            "message2": "专家模式未开启",
+            "description1": "请连接你的Ledger钱包",
+            "description2": "请确保你的Ledger钱包已经开启专家模式"
+          }
+        },
+        "addressIndexValidator": {
+          "error": "地址索引范围应该是0~"
+        },
+        "formCreate": {
+          "name": {
+            "label": "钱包名称"
+          },
+          "walletType": {
+            "label": "钱包种类"
+          },
+          "addressIndex": {
+            "label": "地址索引"
+          },
+          "network": {
+            "label": "网络"
+          },
+          "checkbox1": "想要创建硬件钱包？"
+        },
+        "ledgerModalPopup": {
+          "title1": "成功！",
+          "title2": "连接你的Ledger 钱包",
+          "description1": "你的Ledger钱包已经成功连接。",
+          "description2": "请在Ledger钱包上确认连接"
+        }
+      },
+      "restore": {
+        "title1": "复原钱包",
+        "title2": "自定义配置",
+        "slogan1": "为你的钱包创建名字和选择网络。",
+        "slogan2": "填写以下信息以连接自定义网络。",
+        "formCustomConfig": {
+          "nodeUrl": {
+            "label": "节点 URL",
+            "error1": "请填写有效的节点 URL"
+          },
+          "indexingUrl": {
+            "label": "链索引 URL",
+            "error1": "请填写有效的链索引URL"
+          },
+          "derivationPath": {
+            "label": "衍生路径",
+            "error1": "请填写有效的衍生路径"
+          },
+          "validatorPrefix": {
+            "label": "验证者前缀"
+          },
+          "addressPrefix": {
+            "label": "地址前缀"
+          },
+          "chainId": {
+            "label": "链 ID"
+          },
+          "baseDenom": {
+            "label": "基本面值"
+          },
+          "croDenom": {
+            "label": "CRO 面值"
+          }
+        },
+        "formRestore": {
+          "name": {
+            "label": "钱包名称"
+          },
+          "mnemonic": {
+            "label": "助记词",
+            "validatorError": "请输入有效的助记词"
+          },
+          "network": {
+            "label": "网络"
+          },
+          "button": "复原钱包"
+        }
+      },
+      "navbar": {
+        "home": "主页",
+        "staking": "抵押",
+        "send": "发送",
+        "receive": "接收",
+        "governance": "治理",
+        "nft": "我的NFT",
+        "settings": "设置",
+        "wallet": {
+          "list": "所有钱包",
+          "restore": "复原钱包",
+          "create": "创建钱包",
+          "delete": "删除钱包",
+          "modal": {
+            "title": "确认删除钱包",
+            "description": "请检查以下内容",
+            "form1": {
+              "address": {
+                "label": "删除钱包地址"
+              },
+              "delete": {
+                "label": "请输入",
+                "error1": "请输入"
+              }
+            },
+            "warning1": "你确定要删除这个钱包？",
+            "warning2": "如果你没有备份你的钱包助记词，这将导致你的资金永远丢失。",
+            "checkbox1": "我了解重新获得访问权限的唯一方法是复原钱包助记词。",
+            "checkbox2": "我了解重新获得访问权限的唯一方法是使用具有正确地址索引的相同Ledger钱包"
+          },
+          "successModal": {
+            "message1": "钱包地址",
+            "message2": "已被删除。"
+          }
+        }
+      },
+      "wallet": {
+        "title": "钱包列表",
+        "description": "你可以在这里查看你所有的钱包。",
+        "search": {
+          "placeholder": "用名称或地址搜索..."
+        },
+        "table1": {
+          "name": "名称",
+          "address": "地址",
+          "walletType": "钱包种类",
+          "network": "网络"
+        }
+      },
+      "announcement": {
+        "modal": {
+          "title": "数据分析已添加",
+          "description1": "您可以通过启用数据分析来帮助改进 Crypto.org 链钱包。 收集的数据将帮助开发团队优先考虑新功能并改进现有功能。 \n\n您可以随时返回到 \"配置\" 里的 \"常规配置\" 以禁用数据分析"
+        }
+      },
+      "home": {
+        "title": "欢迎",
+        "balance": {
+          "title1": "总余额",
+          "title2": "抵押余额"
+        },
+        "nft": {
+          "tab1": "我的NFT",
+          "seeAll": "所有"
+        },
+        "transactions": {
+          "tab1": "交易",
+          "tab2": "委托",
+          "tab3": "NFT交易",
+          "table1": {
+            "transactionHash": "交易哈希值",
+            "amount": "数量",
+            "recipientAddress": "收款人地址",
+            "time": "时间",
+            "status": "状态"
+          },
+          "table2": {
+            "validatorAddress": "验证者地址",
+            "stakedAmountWithSymbol": "抵押数量",
+            "delegatorAddress": "委托人地址",
+            "undelegateAction": "赎回委托",
+            "redelegateAction": "重新委托",
+            "action1": "赎回委托",
+            "action2": "重新委托"
+          },
+          "table3": {
+            "transactionHash": "交易哈希值",
+            "messageType": "类别",
+            "denomId": "系列 ID",
+            "tokenId": "代币ID",
+            "recipientAddress": "收款人",
+            "time": "时间"
+          }
+        },
+        "notification": {
+          "walletInfo": {
+            "message": "钱包资料",
+            "description1": "创建的钱包将仅限于显示地址，因为它的",
+            "description2": "配置尚未生效"
+          },
+          "updateAvailable": {
+            "message": "有新的更新",
+            "description": "有一个更新，下载中⋯"
+          },
+          "downloadComplete": {
+            "message": "下载完成",
+            "description": "成功下载更新，重启程序以完成安装。",
+            "button": "现在重启程序"
+          }
+        }
+      },
+      "send": {
+        "title": "发送",
+        "description": "转账到其他钱包地址",
+        "formSend": {
+          "recipientAddress": {
+            "label": "收款人地址",
+            "placeholder": "输入收款人地址"
+          },
+          "amount": {
+            "label": "汇款金额",
+            "error1": "发送金额超过您的可用钱包余额",
+            "error2": "发送金额低于允许的最低金额"
+          },
+          "memo": {
+            "label": "留言（可选）"
+          }
+        },
+        "modal1": {
+          "title": "确认交易",
+          "description": "请检查以下内容：",
+          "label1": "发送人地址",
+          "label2": "收款人地址",
+          "label3": "数目",
+          "label4": "交易费用",
+          "label5": "留言"
+        }
+      },
+      "receive": {
+        "title": "接收",
+        "description": "分享你的钱包地址来接收款项",
+        "notification": {
+          "addressCopy": {
+            "message": "复制地址！",
+            "description": "这个地址已储存到你的剪贴板。"
+          },
+          "ledgerConnect": {
+            "message": "未能检测到你的 Ledger 硬件钱包",
+            "description": "请连接你的 Ledger 硬件钱包"
+          }
+        },
+        "button": "验证你的 Ledger 钱包"
+      },
+      "staking": {
+        "title": "抵押",
+        "tab1": "抵押奖励",
+        "tab2": "委托资金",
+        "description1": "从委托资金提取奖励。",
+        "description2": "委托资金至验证者。",
+        "maxValidator": {
+          "error": "抵押数目大于你的钱包余额"
+        },
+        "minValidator": {
+          "error": "抵押数目少于"
+        },
+        "validatorList": {
+          "table": {
+            "title": "验证者列表",
+            "description": "请选择其中一个验证者。",
+            "validatorName": "名称",
+            "validatorWebsite": "网址",
+            "validatorAddress": "地址",
+            "currentTokens": "投票权",
+            "currentCommissionRate": "佣金",
+            "action": "操作"
+          }
+        },
+        "formWithdralStakingReward": {
+          "table": {
+            "validatorName": "名称",
+            "rewardAmount": "奖励数目",
+            "action1": "提取奖励"
+          }
+        },
+        "formDelegation": {
+          "validatorAddress": {
+            "label": "验证者地址",
+            "placeholder": "输入验证者地址"
+          },
+          "amount": {
+            "label": "委托数目"
+          },
+          "checkbox1": "想要设定留言？",
+          "memo": {
+            "label": "留言（可留空）"
+          }
+        },
+        "modal1": {
+          "title": "确认交易",
+          "description": "请检查以下内容：",
+          "label1": "发送人地址",
+          "label2": "委托至验证者",
+          "label3": "数目",
+          "label4": "留言"
+        },
+        "modal2": {
+          "title": "确认交易",
+          "description": "请检查以下内容：",
+          "label1": "发送人地址",
+          "label2": "从验证者提取奖励",
+          "label3": "奖励"
+        }
+      },
+      "governance": {
+        "title": "治理",
+        "description": "你可以在这里看到所有提案并行使你的投票权。",
+        "tab1": "所有",
+        "tab2": "投票中",
+        "tab3": "已通过",
+        "tab4": "不通过",
+        "tab5": "被否决",
+        "voteOption": {
+          "yes": "支持",
+          "no": "不支持",
+          "noWithVeto": "不支持并否决",
+          "abstain": "未决定"
+        },
+        "backToList": "返回",
+        "start": "开始",
+        "end": "结束",
+        "sendVote": "发送投票",
+        "modal1": {
+          "title": "确认投票交易",
+          "description": "请检查以下内容：",
+          "label1": "发送人地址",
+          "label2": "投票提案",
+          "label3": "投票"
+        }
+      },
+      "nft": {
+        "title": "我的NFT",
+        "description": "你在 Crypto.org 链上收藏的 NFT 概览",
+        "tab1": "NFT 收藏",
+        "tab2": "铸造 NFT",
+        "container": {
+          "description": "在Crypto.org 链上以图片或视频铸造你的专属 NFT"
+        },
+        "fileUploadValidator": {
+          "error1": "必须上传档案",
+          "error2": "文件上传失败，请重新上传。"
+        },
+        "beforeUpload": {
+          "error1": "你只可以上传",
+          "error2": "影片大小必须小于",
+          "error3": "图片大小必须小于"
+        },
+        "media": {
+          "image": "图片",
+          "video": "影片",
+          "thumbnail": "封面"
+        },
+        "notification": {
+          "uploadFailed": {
+            "message": "上传失败",
+            "description": "请确认你的网络连接正常后再度尝试。"
+          }
+        },
+        "formMintNft": {
+          "denomId": {
+            "label": "系列 ID",
+            "placeholder": "例如：",
+            "error1": "长度只能为",
+            "error2": "至",
+            "error3": "个字母",
+            "error4": "只能由小写英文字母开始",
+            "error5": "只能由小写英文字母及数字组成"
+          },
+          "tokenId": {
+            "label": "代币 ID",
+            "placeholder": "例如：",
+            "error1": "长度只能为",
+            "error2": "至",
+            "error3": "个字母",
+            "error4": "只能由小写英文字母开始",
+            "error5": "只能由小写英文字母及数字组成"
+          },
+          "drop": {
+            "label": "名称",
+            "placeholder": "例如："
+          },
+          "description": {
+            "label": "描述",
+            "placeholder": "例如："
+          },
+          "files": {
+            "label": "上传文件",
+            "description1": "请等待档案上传完成",
+            "description2": "你还需要上传影片的封面图片"
+          }
+        },
+        "modal1": {
+          "title": "确认 NFT 铸造",
+          "description": "请检查以下内容：",
+          "label1": "系列 ID",
+          "label2": "代币 ID",
+          "label3": "名称",
+          "label4": "描述",
+          "label5": "交易费用",
+          "notice1": "这个系列 ID 已被其他地址注册，请选择另外一个 ID。",
+          "notice2": "余额不足。 请确保你最少有",
+          "notice3": "来支付交易费。",
+          "notice4": "这 NFT 会铸造到 Crypto.org 链上。"
+        },
+        "modal2": {
+          "title": "确认转账",
+          "description": "请检查以下内容：",
+          "label1": "到",
+          "label2": "系列 ID",
+          "label3": "代币 ID",
+          "label4": "交易费用",
+          "notice1": "这为 Crypto.org 链上的 NFT，转发此 NFT 到不支持 Crypto.org 代币标准的地址将会造成你的 NFT 永久损失。",
+          "button1": "确认转发"
+        },
+        "modal3": {
+          "title": "转发 NFT",
+          "description": "填写以下数据以转发你的NFT",
+          "label1": "发送",
+          "form": {
+            "recipientAddress": {
+              "label": "收款人地址",
+              "placeholder": "输入收款人地址"
+            }
+          }
+        },
+        "nftCollection": {
+          "table1": {
+            "name": "名称",
+            "denomId": "系列 ID",
+            "tokenId": "代币 ID",
+            "creator": "创建人",
+            "viewAction": "操作",
+            "action1": "浏览"
+          }
+        },
+        "detailModal": {
+          "subtitle": "关于",
+          "label1": "系列 ID",
+          "label2": "系列名称",
+          "label3": "代币 ID",
+          "label4": "内容 URL",
+          "button1": "转发 NFT",
+          "button2": "在 Crypto.com NFT 上浏览"
+        }
+      },
+      "settings": {
+        "title": "配置",
+        "description": "错误的配置将会令钱包不能被正常使用。",
+        "tab1": "节点配置",
+        "tab2": "常规配置",
+        "tab3": "重置",
+        "form1": {
+          "nodeUrl": {
+            "label": "节点 URL",
+            "error1": "请输入有效的节点 URL"
+          },
+          "indexingUrl": {
+            "label": "链索引 URL",
+            "error1": "请输入有效的链索引 URL"
+          },
+          "chainId": {
+            "label": "链 ID"
+          },
+          "networkFee": {
+            "label": "交易费用"
+          },
+          "gasLimit": {
+            "label": "Gas 费用"
+          },
+          "checkbox1": {
+            "description1": "将设定更新至所有",
+            "description2": "钱包"
+          }
+        },
+        "message": {
+          "success1": "已成功更新钱包设定",
+          "success2": "所有",
+          "success3": "钱包",
+          "analytics1": "资料分析已",
+          "defaultMemo1": "默认留言已",
+          "generalSettings1": "常规配置项已"
+        },
+        "notification": {
+          "recover": {
+            "message": "已复制助记词！",
+            "description": "助记词已成功复制到剪贴板"
+          }
+        },
+        "language": {
+          "title": "语言"
+        },
+        "memo": {
+          "title": "默认留言",
+          "description": "如交易没有提供任何留言，将使用默认的留言。"
+        },
+        "dataAnalytics": {
+          "title": "资料分析",
+          "description": "收集的数据将帮助开发团队优先考虑新功能并改进现有功能。"
+        },
+        "exportRecoveryPhrase": {
+          "title": "导出助记词",
+          "description": "需要输入你的密码来进行此操作。",
+          "button": "导出",
+          "modal1": {
+            "title": "你的助记词",
+            "description": "请查阅所有的助记词，并以正确的次序记录下来。",
+            "warning": "请好好保管并不要分享你的助记词以保障资金的安全。"
+          }
+        },
+        "clearStorage": {
+          "description": "当你重置这个程序，你将会失去所有钱包的使用权。 保管好钱包助记词是你唯一能重新复原钱包使用权的方法。",
+          "button1": "重置",
+          "modal": {
+            "title": "确认重置",
+            "description1": "你或许需要确认你的所有钱包助记词，以确保未来你能够复原钱包的使用权。",
+            "warning": "你确定你要重置这个程序？ 如果你没有备份好你所有钱包的助记词，你将会永远失去钱包内的所有资金。",
+            "disclaimer": "我明白我只能够通过钱包的助记词来恢复钱包的使用权。",
+            "form1": {
+              "clear": {
+                "label": "请输入",
+                "error1": "请输入"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "frFR": {
+    "translation": {
+      "language": "Langue",
+      "general": {
+        "enabled": "Activé",
+        "disabled": "Desactivé",
+        "confirm": "Confirmer",
+        "continue": "Continuer",
+        "cancel": "Annuler",
+        "save": "Sauvegarder",
+        "discard": "Ignorer les changements",
+        "ok": "Ok",
+        "required": "est requis",
+        "cannot0": "ne peut pas être 0",
+        "action": "Action",
+        "select": "Selectionne",
+        "review": "Revoir",
+        "copy": "Copier",
+        "close": "Fermer",
+        "connect": "Connecter",
+        "addressValidator": {
+          "reason1": "Invalide"
+        }
+      },
+      "home": {
+        "title": "Bienvenue de nouveau"
+      },
+      "settings": {
+        "language": {
+          "title": "Langue"
+        },
+        "dataAnalytics": {
+          "title": "Analytique Google",
+          "description": "Analytique Google"
+        },
+        "clearStorage": {
+          "modal": {
+            "disclaimer": "Je comprend que la seule manière de récupérer le compte est de restaurer la phrase mnémonique du portefeuille.",
+            "form1": {
+              "clear": {
+                "label": "Veuillez insérer",
+                "error1": "Veuillez insérer"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "koKR": {
+    "translation": {
+      "language": "한국어",
+      "general": {
+        "enabled": "켜짐",
+        "disabled": "꺼짐",
+        "confirm": "확인",
+        "continue": "계속",
+        "cancel": "취소",
+        "save": "저장",
+        "discard": "변경사항 폐기",
+        "ok": "확인",
+        "required": "필수",
+        "cannot0": "0이 될 수 없음",
+        "validator": "밸리데이터",
+        "receiving": "수신 중",
+        "available": "가능",
+        "action": "활동",
+        "select": "선택",
+        "review": "리뷰",
+        "copy": "복사",
+        "close": "닫기",
+        "connect": "연결",
+        "addressValidator": {
+          "reason1": "무효",
+          "reason2": "주소 필요"
+        },
+        "validTransactionAmountValidator": {
+          "reason": "잘못된 송금 금액"
+        },
+        "passwordFormModal": {
+          "title": "패스워드 입력",
+          "description": "지갑 패스워드를 입력하세요",
+          "error": "패스워드가 틀립니다. 다시 확인해주세요",
+          "success": "지갑을 성공적으로 해독하였습니다",
+          "okButton": "지갑 해독",
+          "createWallet": {
+            "description": "만들 지갑을 암호화하기 위해서, 패스워드를 입력해주세요.",
+            "okButton": "지갑 암호화",
+            "success": "지갑이 생성되고, 암호화되었습니다",
+            "successButton": "홈 화면 가기"
+          },
+          "restoreWallet": {
+            "description": "지갑을 복원하기 위해 암호를 입력해주세요",
+            "okButton": "지갑 암호화",
+            "success": "지갑이 성공적으로 복원 및 암호화되었습니다",
+            "successButton": "홈 화면"
+          }
+        },
+        "successModalPopup": {
+          "title": "성공!",
+          "timeout": {
+            "description": "트랜잭션이 시간이 초과되었으나, 다음 블럭에 포함될 것입니다"
+          },
+          "nodeConnect": {
+            "description": "노드 연결!"
+          },
+          "createWallet": {
+            "description": "지갑 만들기 성공",
+            "button": "지갑 만들기"
+          },
+          "transfer": {
+            "description": "트랜잭션이 발송 성공"
+          },
+          "staking": {
+            "description": "스테이킹 트랜잭션이 성공했습니다"
+          },
+          "reward": {
+            "description": "보상 출금 틀랜잭션이 성공했습니다"
+          },
+          "undelegation": {
+            "description": "위임 취소 트랜잭션이 성공했습니다"
+          },
+          "redelegation": {
+            "description": "재위임 트랜잭션이 성공했습니다"
+          },
+          "vote": {
+            "description": "투표 트랜잭션이 성공하였습니다"
+          },
+          "nftTransfer": {
+            "description": "NFT 트랜잭션이 성공하였습니다."
+          },
+          "nftMint": {
+            "description": "NFT가 발행되었습니다"
+          }
+        },
+        "errorModalPopup": {
+          "title": "에러 발생!",
+          "nodeConnect": {
+            "description": "표기된 URL로 연결할 수 없습니다. 다시 확인해주세요"
+          },
+          "createWallet": {
+            "description": "지갑을 만들 수 없습니다. 지갑 생성 HDPATH가 정확한지 확인해주세요"
+          },
+          "restoreWallet": {
+            "description": "니모닉이 틀립니다. 다시 확인해주세요"
+          },
+          "transfer": {
+            "description": "전송 트랜잭션이 실패했습니다. 잠시 후에 다시 시도해주세요"
+          },
+          "staking": {
+            "description": "스테이킹  트랜잭션이 실패했습니다. 잠시 후에 다시 시도해주세요"
+          },
+          "reward": {
+            "description": "보상 출금에 실패했습니다. 잠시 후에 다시 시도해주세요"
+          },
+          "undelegation": {
+            "description": "위임 취소에 실패했습니다. 잠시 후에 다시 시도해주세요"
+          },
+          "redelegation": {
+            "description": "위임 변경에 실패했습니다. 잠시 후에 다시 시도해주세요"
+          },
+          "vote": {
+            "description": "투표 전송에 실패했습니다. 잠시 후에 다시 시도해주세요"
+          },
+          "nftTransfer": {
+            "description": "NFT 전송에 실패했습니다. 잠시 후에 다시 시도해주세요"
+          },
+          "nftMint": {
+            "description": "NFT 발행에 실패했습니다. 잠시 후에 다시 시도해주세요"
+          },
+          "ledgerExportMode": "레져 전문가 모드를 켜주세요"
+        }
+      },
+      "welcome": {
+        "slogan": "데스크탑 지갑으로 지갑 관리와 송금을 할 수 있습니다",
+        "button": "시작하기"
+      },
+      "signup": {
+        "title": "앱 패스워드가 잘 생성되었습니다",
+        "slogan": "지갑 암호가 잘 생성되었습니다.  지갑 생성과 가져오기를 계속 할 수 있습니다",
+        "button1": "지갑 가져오기",
+        "button2": "지갑 만들기",
+        "passwordFormContainer": {
+          "title": "앱 패스워드 만들기",
+          "description": "지갑을 만들기 전에, 앱 패워드를 생성해주세요",
+          "okButton": "앱 패스워드 만들기",
+          "success": "지갑 암호가 잘 생성되었습니다.  지갑 생성과 가져오기를 계속 할 수 있습니다"
+        }
+      },
+      "create": {
+        "title1": "지갑 만들기",
+        "title2": "커스텀 설정",
+        "slogan1": "지갑 이름과 네트워크를 설정하세요",
+        "slogan2": "커스텀 네트워크에 연결하기 위해, 아래를 입력해주세요",
+        "formCustomConfig": {
+          "nodeUrl": {
+            "label": "노드 URL",
+            "error1": "유효한 노드 URL을 입력하세요."
+          },
+          "indexingUrl": {
+            "label": "체인 인덱싱 URL",
+            "error1": "정확한 체인 인덱싱 URL을 입력하세요"
+          },
+          "derivationPath": {
+            "label": "지갑 HD 경로",
+            "error1": "정확한 HD 경로를 입력하세요"
+          },
+          "validatorPrefix": {
+            "label": "밸리데이터 프리픽스"
+          },
+          "addressPrefix": {
+            "label": "주소 프리픽스"
+          },
+          "chainId": {
+            "label": "체인 ID"
+          },
+          "baseDenom": {
+            "label": "기본 디놈"
+          },
+          "croDenom": {
+            "label": "CRO 디놈"
+          }
+        },
+        "notification": {
+          "ledger": {
+            "message1": "레져를 찾을 수 없습니다",
+            "message2": "전문가 모드가 아닙니다",
+            "description1": "레져를 연결해주세요",
+            "description2": "레져의 전문가 모드를 켰는지 확인해주세요"
+          }
+        },
+        "addressIndexValidator": {
+          "error": "주소 인덱스 0~"
+        },
+        "formCreate": {
+          "name": {
+            "label": "지갑 이름"
+          },
+          "walletType": {
+            "label": "지갑 종류"
+          },
+          "addressIndex": {
+            "label": "주소 인덱스"
+          },
+          "network": {
+            "label": "네트워크"
+          },
+          "checkbox1": "하드웨어 지갑을 만들까요?"
+        },
+        "ledgerModalPopup": {
+          "title1": "성공!",
+          "title2": "레져를 연결해주세요",
+          "description1": "레져가 잘 연결되었습니다",
+          "description2": "레져 연결을 확인해주세요"
+        }
+      },
+      "restore": {
+        "title1": "지갑 복원",
+        "title2": "커스텀 설정",
+        "slogan1": "지갑 이름과 네트워크를 설정해주세요",
+        "slogan2": "커서텀 네트워크 연결을 위해, 아래를 입력해주세요",
+        "formCustomConfig": {
+          "nodeUrl": {
+            "label": "노드 URL",
+            "error1": "유효한 노드 URL을 입력하세요."
+          },
+          "indexingUrl": {
+            "label": "체인 인덱싱 URL",
+            "error1": "유효한 체인 인덱싱 URL을 입력하세요"
+          },
+          "derivationPath": {
+            "label": "파생 경로",
+            "error1": "유효한 파생 경로를 입력하세요"
+          },
+          "validatorPrefix": {
+            "label": "밸리데이터 프리픽스"
+          },
+          "addressPrefix": {
+            "label": "어드레스 프리픽스"
+          },
+          "chainId": {
+            "label": "체인 ID"
+          },
+          "baseDenom": {
+            "label": "베이스 디놈"
+          },
+          "croDenom": {
+            "label": "CRO 디놈 "
+          }
+        },
+        "formRestore": {
+          "name": {
+            "label": "지갑 이름"
+          },
+          "mnemonic": {
+            "label": "니모닉",
+            "validatorError": "니모닉을 입력해주세요"
+          },
+          "network": {
+            "label": "네트워크"
+          },
+          "button": "지갑 가져오기"
+        }
+      },
+      "navbar": {
+        "home": "홈화면",
+        "staking": "스테이킹",
+        "send": "전송",
+        "receive": "수신",
+        "governance": "거버넌스",
+        "nft": "나의 NFT",
+        "settings": "설정",
+        "wallet": {
+          "list": "지갑 리스트",
+          "restore": "지갑 가져오기",
+          "create": "지갑 만들기",
+          "delete": "지갑 지우기",
+          "modal": {
+            "title": "지갑 삭제 확인",
+            "description": "아래 정보를 확인해주세요",
+            "form1": {
+              "address": {
+                "label": "지갑 주소 삭제"
+              },
+              "delete": {
+                "label": "입력해주세요",
+                "error1": "입력해주세요"
+              }
+            },
+            "warning1": "이 지갑을 지울까요?",
+            "warning2": "지갑 니모닉 문구를 백업하지 않으면 자금을 영원히 잃을 수 있습니다.",
+            "checkbox1": "액세스 권한을 다시 얻을 수 있는 유일한 방법은 지갑 니모닉 문구를 복원하는 것임을 이해합니다.",
+            "checkbox2": "액세스 권한을 다시 얻을 수 있는 유일한 방법은 올바른 주소 인덱스가 있는 동일한 레져를 사용하는 것임을 이해합니다."
+          },
+          "successModal": {
+            "message1": "지갑 주소",
+            "message2": "삭제됨"
+          }
+        }
+      },
+      "wallet": {
+        "title": "모든 지갑 리스트",
+        "description": "여기에서 모든 지갑을 검토할 수 있습니다.",
+        "search": {
+          "placeholder": "이름, 주소로 검색"
+        },
+        "table1": {
+          "name": "이름",
+          "address": "주소",
+          "walletType": "지갑 종류",
+          "network": "네트워크"
+        }
+      },
+      "announcement": {
+        "modal": {
+          "title": "데이터 분석이 추가되었습니다",
+          "description1": "데이터 분석을 활성화하여 Crypto.org 체인 지갑을 개선하는 데 도움을 줄 수 있습니다. 수집된 데이터는 개발 팀이 새로운 기능의 우선 순위를 지정하고 기존 기능을 개선하는 데 도움이 될 것입니다.\r\n\r\n일반 구성에서 언제든지  데이터 분석을 비활성화할 수 있습니다. "
+        }
+      },
+      "home": {
+        "title": "다시 오신 것을 환영합니다!",
+        "balance": {
+          "title1": "전체 금액",
+          "title2": "스테이킹 금액"
+        },
+        "nft": {
+          "tab1": "나의 NFT",
+          "seeAll": "모두 보기"
+        },
+        "transactions": {
+          "tab1": "트랜잭션",
+          "tab2": "위임",
+          "tab3": "NFT 트랜잭션",
+          "table1": {
+            "transactionHash": "트랜잭션 해쉬",
+            "amount": "금액",
+            "recipientAddress": "수신 주소",
+            "time": "시간",
+            "status": "상태"
+          },
+          "table2": {
+            "validatorAddress": "밸리데이터 주소",
+            "stakedAmountWithSymbol": "스테이킹 금액",
+            "delegatorAddress": "델리게이터 주소",
+            "undelegateAction": "위임 해제",
+            "redelegateAction": "위임 변경",
+            "action1": "위임 해제 스테이크",
+            "action2": "위임 변경 스테이크"
+          },
+          "table3": {
+            "transactionHash": "트랜잭션 해쉬",
+            "messageType": "종류",
+            "denomId": "디놈 ID",
+            "tokenId": "토큰 ID",
+            "recipientAddress": "수신인",
+            "time": "시간"
+          }
+        },
+        "notification": {
+          "walletInfo": {
+            "message": "지갑 정보",
+            "description1": "생성된 지갑은 표시 주소로만 제한됩니다.",
+            "description2": "구성이 아직 활성화되지 않았습니다."
+          },
+          "updateAvailable": {
+            "message": "업데이트 가능",
+            "description": "새로운 업데이트가 있습니다. 지금 다운로드합니다"
+          },
+          "downloadComplete": {
+            "message": "다운로드 완료",
+            "description": "업데이트가 성공적으로 다운로드되었습니다. 다시 시작하면 설치됩니다.",
+            "button": "지금 재시작합니다"
+          }
+        }
+      },
+      "send": {
+        "title": "송금",
+        "description": "다른 지갑 주소로 금액을 전송합니다",
+        "formSend": {
+          "recipientAddress": {
+            "label": "수신인 주소",
+            "placeholder": "수신인 주소를 입력하세요"
+          },
+          "amount": {
+            "label": "보낼 금액",
+            "error1": "송금 금액이 사용 가능한 지갑 잔액을 초과합니다.",
+            "error2": "송금 금액이 최소 금액보다 적습니다."
+          },
+          "memo": {
+            "label": "메모 (선택사항)"
+          }
+        },
+        "modal1": {
+          "title": "거래 확인",
+          "description": "아래 정보를 검토하십시오.",
+          "label1": "발신인 주소",
+          "label2": "수신인 주소",
+          "label3": "금액",
+          "label4": "거래 수수료",
+          "label5": "메모"
+        }
+      },
+      "receive": {
+        "title": "수신",
+        "description": "아래 지갑 주소로 금액을 받습니다.",
+        "notification": {
+          "addressCopy": {
+            "message": "주소 복사됨!",
+            "description": "현재 계정이 클립보드에 성공적으로 복사되었습니다."
+          },
+          "ledgerConnect": {
+            "message": "레져를 탐지할 수 없습니다",
+            "description": "레져를 연결하세요"
+          }
+        },
+        "button": "레져에서 주소를 확인합니다"
+      },
+      "staking": {
+        "title": "스테이킹",
+        "tab1": "스테이킹 보상",
+        "tab2": "금액 위임",
+        "description1": "위임된 금액에서 보상을 인출하세요",
+        "description2": "밸리데이터에게 금액을 위임합니다",
+        "maxValidator": {
+          "error": "스테이킹 금액이 사용 가능한 지갑 잔액을 초과합니다."
+        },
+        "minValidator": {
+          "error": "스테이킹 금액이 최소 금액보다 낮습니다."
+        },
+        "validatorList": {
+          "table": {
+            "title": "밸리데이터 리스트",
+            "description": "밸리데이터를 선택하세요",
+            "validatorName": "이름",
+            "validatorWebsite": "웹사이트",
+            "validatorAddress": "주소",
+            "currentTokens": "투표 파워",
+            "currentCommissionRate": "수수료율",
+            "action": "활동"
+          }
+        },
+        "formWithdralStakingReward": {
+          "table": {
+            "validatorName": "이름",
+            "rewardAmount": "보상 금액",
+            "action1": "보상 인출하기"
+          }
+        },
+        "formDelegation": {
+          "validatorAddress": {
+            "label": "밸리데이터 주소",
+            "placeholder": "밸리데이터 주소 입력"
+          },
+          "amount": {
+            "label": "위임 금액"
+          },
+          "checkbox1": "메모를 보시겠습니까?",
+          "memo": {
+            "label": "메모 (선택사항)"
+          }
+        },
+        "modal1": {
+          "title": "거래 확인",
+          "description": "아래 정보를 확인하세요",
+          "label1": "송신인 주소",
+          "label2": "밸리데이터에게 위임하기",
+          "label3": "금액",
+          "label4": "메모"
+        },
+        "modal2": {
+          "title": "거래 확인",
+          "description": "아래 정보를 확인하세요",
+          "label1": "송신인 주소",
+          "label2": "밸리데이터로부터 보상 인출하기",
+          "label3": "보상"
+        }
+      },
+      "governance": {
+        "title": "거버넌스",
+        "description": "여기에서 모든 제안을 보고 투표할 수 있습니다.",
+        "tab1": "모두",
+        "tab2": "투표",
+        "tab3": "가결됨",
+        "tab4": "실패함",
+        "tab5": "부결됨",
+        "voteOption": {
+          "yes": "지원",
+          "no": "지원하지 않음",
+          "noWithVeto": "거부권으로 지원하지 않음",
+          "abstain": "결정하지 않음"
+        },
+        "backToList": "제안 리스트로",
+        "start": "시작",
+        "end": "종료",
+        "sendVote": "투표 전송",
+        "modal1": {
+          "title": "투표 거래 확인",
+          "description": "아래 정보를 확인해주세요",
+          "label1": "송신인 주소",
+          "label2": "제안에 투표",
+          "label3": "투표"
+        }
+      },
+      "nft": {
+        "title": "나의 NFT",
+        "description": "Crypto.org Chain의 NFT 컬렉션에 대한 개요",
+        "tab1": "NFT 컬렉션",
+        "tab2": "NFT 발행",
+        "container": {
+          "description": "Crypto.org 체인에서 이미지 또는 비디오로 NFT를 발행하십시오."
+        },
+        "fileUploadValidator": {
+          "error1": "파일 업로드는 필수 항목입니다.",
+          "error2": "파일 업로드에 실패했습니다. 다시 업로드해주세요"
+        },
+        "beforeUpload": {
+          "error1": "업로드만 가능합니다",
+          "error2": "동영상 크기는 다음보다 작아야 합니다.",
+          "error3": "이미지 크기는 다음보다 작아야 합니다."
+        },
+        "media": {
+          "image": "이미지",
+          "video": "동영상",
+          "thumbnail": "썸네일"
+        },
+        "notification": {
+          "uploadFailed": {
+            "message": "업로드 실패",
+            "description": "연결을 확인하고 나중에 다시 시도하십시오."
+          }
+        },
+        "formMintNft": {
+          "denomId": {
+            "label": "디놈 ID",
+            "placeholder": "예제",
+            "error1": "예상 길이",
+            "error2": "그리고",
+            "error3": "문자열",
+            "error4": "소문자 알파벳으로만 시작해야 합니다.",
+            "error5": "영문자 또는 숫자만"
+          },
+          "tokenId": {
+            "label": "토큰 ID",
+            "placeholder": "예제",
+            "error1": "예상 길이",
+            "error2": "그리고",
+            "error3": "문자열",
+            "error4": "소문자 알파벳으로만 시작해야 합니다.",
+            "error5": "영문자 또는 숫자만"
+          },
+          "drop": {
+            "label": "이름 삭제",
+            "placeholder": "예제"
+          },
+          "description": {
+            "label": "설명 삭제",
+            "placeholder": "예제"
+          },
+          "files": {
+            "label": "파일 업로드",
+            "description1": "파일 업로드가 완료될 때까지 기다려 주세요",
+            "description2": "동영상의 썸네일을 업로드해야 합니다."
+          }
+        },
+        "modal1": {
+          "title": "NFT 발행 확인",
+          "description": "아래 정보를 검토하십시오.",
+          "label1": "디놈 ID",
+          "label2": "토큰 ID",
+          "label3": "이름 삭제",
+          "label4": "설명 삭제",
+          "label5": "거래 수수료",
+          "notice1": "디놈 ID가 다른 주소로 등록되었습니다.",
+          "notice2": "잔액 부족, 최소 잔액을 확인해 주세요.",
+          "notice3": "네트워크 수수료",
+          "notice4": "이 NFT는 Crypto.org 체인에서 발행됩니다."
+        },
+        "modal2": {
+          "title": "거래 확인",
+          "description": "아래 정보를 확인해주세요",
+          "label1": "에게",
+          "label2": "디놈 ID",
+          "label3": "토큰 ID",
+          "label4": "거래 수수료",
+          "notice1": "이 NFT는 Crypto.org 체인에서 발행됩니다.",
+          "button1": "거래 확인"
+        },
+        "modal3": {
+          "title": "NFT 거래",
+          "description": "NFT를 전송하려면 아래 정보를 입력하세요.",
+          "label1": "보내는 중",
+          "form": {
+            "recipientAddress": {
+              "label": "수신인 주소",
+              "placeholder": "수신인 주소 입력"
+            }
+          }
+        },
+        "nftCollection": {
+          "table1": {
+            "name": "이름 삭제",
+            "denomId": "디놈 ID",
+            "tokenId": "토큰 ID",
+            "creator": "창작자",
+            "viewAction": "활동",
+            "action1": "보기"
+          }
+        },
+        "detailModal": {
+          "subtitle": "삭제에 대해",
+          "label1": "디놈 ID",
+          "label2": "디놈 이름",
+          "label3": "토큰 ID",
+          "label4": "콘텐츠 URL",
+          "button1": "NFT 전송",
+          "button2": "크립토닷컴 NFT에서 보기"
+        }
+      },
+      "settings": {
+        "title": "설정",
+        "description": "잘못된 구성으로 인해 지갑이 오작동할 수 있습니다.",
+        "tab1": "노드 설정",
+        "tab2": "일반 설정",
+        "tab3": "스토리지 삭제",
+        "form1": {
+          "nodeUrl": {
+            "label": "노드 URL",
+            "error1": "유효한 노드 URL을 입력하세요."
+          },
+          "indexingUrl": {
+            "label": "체인 인덱싱 URL",
+            "error1": "유효한 체인 인덱싱 URL을 입력하세요."
+          },
+          "chainId": {
+            "label": "체인 ID"
+          },
+          "networkFee": {
+            "label": "네트워크 수수료"
+          },
+          "gasLimit": {
+            "label": "가스 리미트"
+          },
+          "checkbox1": {
+            "description1": "설정 변경 사항을 모두 적용합니다",
+            "description2": "지갑 리스트"
+          }
+        },
+        "message": {
+          "success1": "지갑 설정이 업데이트되었습니다.",
+          "success2": "모두",
+          "success3": "지갑 리스트",
+          "analytics1": "분석 설정이 되었습니다.",
+          "defaultMemo1": "기본 클라이언트 메모 설정은",
+          "generalSettings1": "일반 설정 전파는"
+        },
+        "notification": {
+          "recover": {
+            "message": "복구 문구가 복사되었습니다!",
+            "description": "복구 문구가 클립보드에 성공적으로 복사되었습니다."
+          }
+        },
+        "language": {
+          "title": "언어"
+        },
+        "memo": {
+          "title": "디폴트 메모",
+          "description": "사용자 지정 메모가 제공되지 않으면 기본 메모 메시지가 거래에 사용됩니다."
+        },
+        "dataAnalytics": {
+          "title": "데이터 분석",
+          "description": "분석을 위해 수집된 데이터는 새로운 기능에 대한 개발의 우선 순위를 지정하고 구현된 기능을 개선하는 데 사용됩니다."
+        },
+        "exportRecoveryPhrase": {
+          "title": "복구 문구 내보내기",
+          "description": "이 작업을 수행하려면 앱 비밀번호를 입력해야 합니다.",
+          "button": "내보내기",
+          "modal1": {
+            "title": "복구 문구",
+            "description": "스와이프하면 모든 단어가 나옵니다.  순서에 맞게 적으세요",
+            "warning": "복구 문구는 누구와도 공유하지 마세요"
+          }
+        },
+        "clearStorage": {
+          "description": "저장소를 비우면 모든 지갑에 액세스할 수 없게 됩니다. 니모닉 문구로만 복구할 수 있습니다",
+          "button1": "저장 공간 삭제",
+          "modal": {
+            "title": "저장 공간 삭제 확인",
+            "description1": "나중에 이 지갑을 복원할 수 있도록 삭제하기 전에 복구 니모닉 구문을 확인하는 것이 좋습니다.",
+            "warning": "저장소를 지우시겠습니까? 지갑 니모닉 문구를 백업하지 않으면 영원히 자금을 잃을 수 있습니다.",
+            "disclaimer": "액세스 권한을 다시 얻을 수 있는 유일한 방법은 지갑 니모닉 문구를 복원하는 것임을 이해합니다.",
+            "form1": {
+              "clear": {
+                "label": "입력하세요",
+                "error1": "입력하세요"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "itIT": {
+    "translation": {
+      "language": "हिंदी",
+      "general": {
+        "enabled": "सक्षम ",
+        "disabled": "असक्षम   ",
+        "confirm": "पुष्टि करें "
+      }
+    }
+  },
+  "esES": {
+    "translation": {}
+  },
+  "trTR": {
+    "translation": {
+      "language": "Türkçe",
+      "general": {
+        "enabled": "Etkinleştir"
+      }
+    }
+  },
+  "jaJP": {
+    "translation": {}
+  },
+  "viVN": {
+    "translation": {}
+  },
+  "igNG": {
+    "translation": {}
+  },
+  "arAE": {
+    "translation": {}
+  },
+  "deDE": {
+    "translation": {
+      "language": "Deutsch",
+      "general": {
+        "enabled": "Aktiviert",
+        "disabled": "Deaktiviert",
+        "confirm": "Bestätigen",
+        "continue": "Fortsetzen",
+        "cancel": "Abbrechen",
+        "save": "Speichern",
+        "discard": "Änderungen verwerfen",
+        "ok": "Ok",
+        "required": "ist erforderlich",
+        "cannot0": "kann nicht 0 sein",
+        "validator": "Prüfer",
+        "receiving": "empfangend",
+        "available": "Verfügbar",
+        "action": "Action",
+        "select": "Auswählen",
+        "review": "Überprüfung",
+        "copy": "Kopierien",
+        "close": "Schließen"
+      }
+    }
+  }
+}

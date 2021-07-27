@@ -47,46 +47,22 @@ export function getUIDynamicAmount(amount: string, currentAsset: UserAsset) {
   return finalAmount;
 }
 
+export const formatLargeNumber = (n): string => {
+  if (n < 1e3) return `${n}`;
+  if (n >= 1e3 && n < 1e6) return `${+(n / 1e3).toFixed(1)}K`;
+  if (n >= 1e6 && n < 1e9) return `${+(n / 1e6).toFixed(1)}M`;
+  if (n >= 1e9 && n < 1e12) return `${+(n / 1e9).toFixed(1)}B`;
+  if (n >= 1e12) return `${+(n / 1e12).toFixed(1)}T`;
+  return ``;
+};
+
 export function getUIVoteAmount(amount: string, asset: UserAsset) {
   const exp = Big(10).pow(asset.decimals);
   const voteAmount = Big(amount)
     .div(exp)
-    .toFixed();
-  let returnVoteAmount = '';
-  if (
-    Big(voteAmount)
-      .div(Big(10).pow(9))
-      .gte(Big(1))
-  ) {
-    returnVoteAmount = `${Big(voteAmount)
-      .div(Big(10).pow(9))
-      .toFixed(3)
-      .toString()}B`;
-  } else if (
-    Big(voteAmount)
-      .div(Big(10).pow(6))
-      .gte(Big(1))
-  ) {
-    returnVoteAmount = `${Big(voteAmount)
-      .div(Big(10).pow(6))
-      .toFixed(3)
-      .toString()}M`;
-  } else if (
-    Big(voteAmount)
-      .div(Big(10).pow(3))
-      .gte(Big(1))
-  ) {
-    returnVoteAmount = `${Big(voteAmount)
-      .div(Big(10).pow(3))
-      .toFixed(3)
-      .toString()}K`;
-  } else {
-    returnVoteAmount = `${Big(voteAmount)
-      .div(Big(10))
-      .toFixed(3)
-      .toString()}`;
-  }
-  return returnVoteAmount;
+    .toNumber();
+
+  return formatLargeNumber(voteAmount);
 }
 
 export function getCurrentMinAssetAmount(userAsset: UserAsset) {

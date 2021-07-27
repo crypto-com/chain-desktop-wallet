@@ -1,4 +1,4 @@
-import { Bytes } from '@crypto-com/chain-jslib/lib/dist/utils/bytes/bytes';
+import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 
 export interface ISignerProvider {
   getPubKey(index: number, showLedgerDisplay: boolean): Promise<Bytes>;

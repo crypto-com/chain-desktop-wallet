@@ -1,19 +1,22 @@
-// import React, { useState, useEffect } from 'react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import './wallet.less';
 import 'antd/dist/antd.css';
-import { Layout, Space, Spin, Table, Typography, Tag } from 'antd';
+import { Layout, Space, Spin, Table, Typography, Tag, AutoComplete } from 'antd';
 import Icon, { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 import {
   sessionState,
   walletAssetState,
   walletListState,
+  validatorListState,
   fetchingDBState,
+  nftListState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
 import { LEDGER_WALLET_TYPE, NORMAL_WALLET_TYPE } from '../../service/LedgerService';
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import IconLedger from '../../svg/IconLedger';
 import IconWallet from '../../svg/IconWallet';
@@ -29,10 +32,17 @@ enum sortOrder {
 function WalletPage() {
   const [session, setSession] = useRecoilState<Session>(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const [validatorList, setValidatorList] = useRecoilState(validatorListState);
+  const [nftList, setNftList] = useRecoilState(nftListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
   const walletList = useRecoilValue(walletListState);
   const [loading, setLoading] = useState(false);
   const [processedWalletList, setProcessedWalletList] = useState([]);
+  const didMountRef = useRef(false);
+
+  const analyticsService = new AnalyticsService(session);
+
+  const [t] = useTranslation();
 
   const processWalletList = wallets => {
     const list = wallets.reduce((resultList, wallet, idx) => {
@@ -59,6 +69,9 @@ function WalletPage() {
       case DefaultWalletConfigs.TestNetConfig.name:
         networkColor = 'error';
         break;
+      case DefaultWalletConfigs.TestNetCroeseid3.name:
+        networkColor = 'error';
+        break;
       default:
         networkColor = 'default';
     }
@@ -78,11 +91,28 @@ function WalletPage() {
     await walletService.setCurrentSession(new Session(walletList[e.key]));
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+    const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
     setSession(currentSession);
     setUserAsset(currentAsset);
+    setNftList(currentNftList);
     await walletService.syncAll(currentSession);
+    const currentValidatorList = await walletService.retrieveTopValidators(
+      currentSession.wallet.config.network.chainId,
+    );
+    setValidatorList(currentValidatorList);
 
     setLoading(false);
+  };
+
+  const onSearch = value => {
+    const newWalletList = walletList.filter(wallet => {
+      return (
+        wallet.name.toLowerCase().indexOf(value.toLowerCase()) !== -1 ||
+        wallet.address.toLowerCase().indexOf(value.toLowerCase()) !== -1 ||
+        value === ''
+      );
+    });
+    setProcessedWalletList(processWalletList(newWalletList));
   };
 
   useEffect(() => {
@@ -92,11 +122,16 @@ function WalletPage() {
     };
 
     syncWalletList();
-  }, [fetchingDB, userAsset]);
+
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Wallet');
+    }
+  }, [fetchingDB, userAsset, nftList, validatorList]);
 
   const columns = [
     {
-      title: 'Name',
+      title: t('wallet.table1.name'),
       dataIndex: 'name',
       key: 'name',
       children: [
@@ -112,7 +147,7 @@ function WalletPage() {
       sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
-      title: 'Address',
+      title: t('wallet.table1.address'),
       dataIndex: 'address',
       key: 'address',
       children: [
@@ -124,7 +159,7 @@ function WalletPage() {
       render: text => <Text type="success">{text}</Text>,
     },
     {
-      title: 'Wallet Type',
+      title: t('wallet.table1.walletType'),
       dataIndex: 'walletType',
       key: 'walletType',
       children: [
@@ -167,7 +202,7 @@ function WalletPage() {
       ],
     },
     {
-      title: 'Network',
+      title: t('wallet.table1.network'),
       key: 'network',
       children: [
         {
@@ -180,7 +215,7 @@ function WalletPage() {
       sorter: (a, b) => a.config.name.localeCompare(b.config.name),
     },
     {
-      title: 'Action',
+      title: t('general.action'),
       key: 'action',
       children: [
         {
@@ -202,7 +237,7 @@ function WalletPage() {
                     walletSelect(record);
                   }}
                 >
-                  Select
+                  {t('general.select')}
                 </a>
               </Space>
             );
@@ -214,11 +249,18 @@ function WalletPage() {
 
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">All Wallets</Header>
-      <div className="header-description">You may review all your wallets here.</div>
+      <Header className="site-layout-background">{t('wallet.title')}</Header>
+      <div className="header-description">{t('wallet.description')}</div>
       <Content>
         <div className="site-layout-background wallet-content">
           <div className="container">
+            <div className="item">
+              <AutoComplete
+                style={{ width: 400 }}
+                onSearch={onSearch}
+                placeholder={t('wallet.search.placeholder')}
+              />
+            </div>
             <Table
               dataSource={processedWalletList}
               columns={columns}

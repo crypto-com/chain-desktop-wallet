@@ -1,0 +1,221 @@
+.nft-content {
+  position: relative;
+  padding: 24px;
+  .container {
+    .description {
+      margin-bottom: 20px;
+      color: @font-color;
+    }
+    .ant-form {
+      max-width: 500px;
+    }
+    .ant-btn:not(.ant-upload-list-item-card-actions-btn) {
+      width: 100%;
+      margin: 24px 0 -24px 0;
+    }
+  }
+  .view-selection {
+    text-align: right;
+    .ant-radio-button-wrapper {
+      border: none;
+      box-shadow: none;
+      transition: none;
+    }
+    .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+      box-shadow: none;
+    }
+    .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled)::before {
+      background-color: transparent;
+    }
+    .ant-radio-button-wrapper:not(:first-child)::before {
+      background-color: transparent;
+    }
+  }
+  .ant-list.ant-list-grid {
+    max-width: 1200px;
+  }
+  .nft {
+    border: none;
+    box-shadow: none !important;
+    .ant-card-cover {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 200px;
+      height: 200px;
+      margin: auto;
+      background: #f8f8f8;
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        // width: auto;
+        // max-width: 200px;
+        // height: auto;
+        // max-height: 200px;
+        border-radius: 4px;
+      }
+      span.anticon {
+        position: absolute;
+        font-size: 48px;
+      }
+    }
+    .ant-card-body {
+      padding-right: 0;
+      padding-left: 0;
+      .ant-avatar {
+        width: 23px;
+        height: 23px;
+        // padding: 0 5px 5px 0;
+        margin-right: 5px;
+      }
+    }
+  }
+  .grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    min-width: 800px;
+    .ant-card {
+      margin-bottom: 12px;
+    }
+  }
+  .back-button {
+    margin: 12px 0;
+  }
+  .ant-upload.ant-upload-select-picture-card {
+    width: 30%;
+  }
+  .ant-upload-list-picture-card {
+    .ant-upload-list-picture-card-container {
+      width: 30%;
+    }
+  }
+}
+.nft-modal {
+  width: 1000px !important;
+  .nft-detail {
+    background: #fff;
+    .ant-card-meta a {
+      color: @font-color;
+    }
+    .ant-layout-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+    .nft-image {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      margin: auto;
+      background: #f8f8f8;
+      img {
+        width: auto;
+        max-width: 100%;
+        height: auto;
+        max-height: 600px;
+        border-radius: 4px;
+      }
+    }
+    .title {
+      margin-top: 16px;
+      font-size: 24px;
+    }
+    .ant-card-meta {
+      margin-top: 30px;
+      .ant-avatar {
+        width: 25px;
+        height: 25px;
+        margin-right: 8px;
+      }
+    }
+
+    .description {
+      max-width: 800px;
+      color: @font-color;
+    }
+    .item {
+      margin: 30px 0;
+      .subtitle {
+        margin: 10px 0;
+      }
+      .label {
+        color: @font-color;
+      }
+      .address {
+        padding: 10px 8px;
+        background: rgba(196, 196, 196, 0.1);
+        border-radius: 4px;
+      }
+      .ant-btn {
+        width: 100%;
+        margin: 0;
+      }
+    }
+    .table-row {
+      display: grid;
+      grid-template-columns: 50% 50%;
+      margin-bottom: 10px;
+      :last-child:not(a) {
+        color: @font-color;
+      }
+    }
+    .goto-marketplace {
+      text-align: center;
+    }
+    .ant-layout-sider {
+      padding-left: 32px;
+      background: #fff;
+    }
+  }
+}
+.nft-transfer-modal,
+.nft-mint-modal {
+  .nft-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 200px;
+    margin: auto;
+    background: #f8f8f8;
+    img {
+      width: auto;
+      max-width: 200px !important;
+      height: auto;
+      max-height: 200px !important;
+    }
+    .ant-image-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      .ant-spin.ant-spin-spinning {
+        left: 0;
+      }
+    }
+  }
+  .nft-video {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    background: #f8f8f8;
+  }
+  .item {
+    .ant-layout,
+    .ant-layout-sider {
+      background: #fff !important;
+    }
+    &.notice {
+      color: @font-color;
+    }
+  }
+}
