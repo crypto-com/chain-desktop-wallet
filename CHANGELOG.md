@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.4.1] - 2021-07-27
+- Void release to test auto updater on Windows systems
+
 ## [v0.4.0] - 2021-07-27
 
 ### Additions
