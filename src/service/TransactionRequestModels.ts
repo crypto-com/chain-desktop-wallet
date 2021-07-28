@@ -19,6 +19,45 @@ export interface VoteRequest {
   walletType: string; // normal, ledger
 }
 
+export interface NFTTransferRequest {
+  tokenId: string;
+  denomId: string;
+  sender: string;
+  recipient: string;
+
+  memo: string;
+  decryptedPhrase: string;
+  asset: UserAsset;
+  walletType: string; // normal, ledger
+}
+
+export interface NFTMintRequest {
+  tokenId: string;
+  denomId: string;
+  sender: string;
+  recipient: string;
+  data: string;
+  name: string;
+  uri: string;
+
+  memo: string;
+  decryptedPhrase: string;
+  asset: UserAsset;
+  walletType: string; // normal, ledger
+}
+
+export interface NFTDenomIssueRequest {
+  denomId: string;
+  name: string;
+  sender: string;
+  schema: string;
+
+  memo: string;
+  decryptedPhrase: string;
+  asset: UserAsset;
+  walletType: string; // normal, ledger
+}
+
 export interface DelegationRequest {
   validatorAddress: string;
   amount: string;

@@ -13,6 +13,7 @@ import Icon, {
   SettingOutlined,
 } from '@ant-design/icons';
 import { useRecoilState } from 'recoil';
+import { useTranslation } from 'react-i18next';
 
 import {
   sessionState,
@@ -20,21 +21,26 @@ import {
   walletAllAssetsState,
   walletListState,
   marketState,
+  validatorListState,
   fetchingDBState,
+  nftListState,
 } from '../../recoil/atom';
-import { trimString } from '../../utils/utils';
+import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 import IconSend from '../../svg/IconSend';
 import IconReceive from '../../svg/IconReceive';
 import IconStaking from '../../svg/IconStaking';
+import IconNft from '../../svg/IconNft';
 import IconWallet from '../../svg/IconWallet';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
 import packageJson from '../../../package.json';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { LedgerWalletMaximum } from '../../config/StaticConfig';
+import { generalConfigService } from '../../storage/GeneralConfigService';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -45,22 +51,30 @@ const { Sider } = Layout;
 function HomeLayout(props: HomeLayoutProps) {
   const history = useHistory();
   const [confirmDeleteForm] = Form.useForm();
+  const [deleteWalletAddress, setDeleteWalletAddress] = useState('');
   const [hasWallet, setHasWallet] = useState(true); // Default as true. useEffect will only re-render if result of hasWalletBeenCreated === false
   const [session, setSession] = useRecoilState(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [marketData, setMarketData] = useRecoilState(marketState);
+  const [validatorList, setValidatorList] = useRecoilState(validatorListState);
+  const [nftList, setNftList] = useRecoilState(nftListState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
+  const [isSuccessDeleteModalVisible, setIsSuccessDeleteModalVisible] = useState(false);
+
+  const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
 
-  async function fetchAndSetNewValidators() {
+  const [t] = useTranslation();
+
+  async function fetchAndSetNewValidators(currentSession) {
     try {
-      await walletService.fetchAndSaveValidators(session);
+      await walletService.fetchAndSaveValidators(currentSession);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet validators list', e);
@@ -76,12 +90,21 @@ function HomeLayout(props: HomeLayoutProps) {
     }
   }
 
-  async function fetchAndSetNewProposals() {
+  async function fetchAndSetNewProposals(currentSession) {
     try {
-      await walletService.fetchAndSaveProposals(session);
+      await walletService.fetchAndSaveProposals(currentSession);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet proposals', e);
+    }
+  }
+
+  async function fetchAndSetNFTs(currentSession) {
+    try {
+      await walletService.fetchAndSaveNFTs(currentSession);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Failed loading new wallet NFTs', e);
     }
   }
 
@@ -97,7 +120,7 @@ function HomeLayout(props: HomeLayoutProps) {
     // Switch to existing default wallet
     const allWalletsData = await walletService.retrieveAllWallets();
     setWalletList(allWalletsData);
-    await walletService.setCurrentSession(new Session(walletList[0]));
+    await walletService.setCurrentSession(new Session(allWalletsData[0]));
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
     const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
@@ -109,6 +132,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
     setIsButtonLoading(false);
     setIsConfirmationModalVisible(false);
+    setIsSuccessDeleteModalVisible(true);
     setFetchingDB(false);
     setIsButtonDisabled(true);
     setIsConfirmDeleteVisible(false);
@@ -116,11 +140,13 @@ function HomeLayout(props: HomeLayoutProps) {
   };
 
   const handleCancel = () => {
-    setIsConfirmationModalVisible(false);
-    setIsConfirmDeleteVisible(false);
-    setIsButtonDisabled(true);
-    setIsConfirmDeleteVisible(false);
-    confirmDeleteForm.resetFields();
+    if (!isButtonLoading) {
+      setIsConfirmationModalVisible(false);
+      setIsConfirmDeleteVisible(false);
+      setIsButtonDisabled(true);
+      setIsConfirmDeleteVisible(false);
+      confirmDeleteForm.resetFields();
+    }
   };
 
   const showPasswordModal = () => {
@@ -131,27 +157,44 @@ function HomeLayout(props: HomeLayoutProps) {
     const fetchDB = async () => {
       setFetchingDB(true);
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
-      const sessionData = await walletService.retrieveCurrentSession();
-      const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
-      const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
+      const currentSession = await walletService.retrieveCurrentSession();
+      const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
       const allWalletsData = await walletService.retrieveAllWallets();
       const currentMarketData = await walletService.retrieveAssetPrice(
         currentAsset.mainnetSymbol,
         'usd',
       );
 
+      const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
       setHasWallet(hasWalletBeenCreated);
-      setSession(sessionData);
+      setSession(currentSession);
       setUserAsset(currentAsset);
       setWalletAllAssets(allAssets);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
 
-      await fetchAndSetNewValidators();
-      await fetchAndSetNewProposals();
-      await fetchAndSaveIBCWalletAssets(sessionData);
+      await Promise.all([
+        await fetchAndSetNewValidators(currentSession),
+        await fetchAndSetNewProposals(currentSession),
+        await fetchAndSetNFTs(currentSession),
+        await fetchAndSaveIBCWalletAssets(currentSession),
+      ]);
+
+      const currentValidatorList = await walletService.retrieveTopValidators(
+        currentSession.wallet.config.network.chainId,
+      );
+      const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
+
+      setValidatorList(currentValidatorList);
+      setNftList(currentNftList);
 
       setFetchingDB(false);
+
+      // Timeout for loading
+      setTimeout(() => {
+        setIsAnnouncementVisible(!announcementShown);
+      }, 2000);
     };
 
     if (!didMountRef.current) {
@@ -173,11 +216,24 @@ function HomeLayout(props: HomeLayoutProps) {
     setWalletList,
     marketData,
     setMarketData,
+    validatorList,
+    setValidatorList,
+    nftList,
+    setNftList,
   ]);
 
   const HomeMenu = () => {
     const locationPath = useLocation().pathname;
-    const paths = ['/home', '/staking', '/send', '/receive', '/settings', '/governance', '/wallet'];
+    const paths = [
+      '/home',
+      '/staking',
+      '/send',
+      '/receive',
+      '/settings',
+      '/governance',
+      '/nft',
+      '/wallet',
+    ];
 
     let menuSelectedKey = locationPath;
     if (!paths.includes(menuSelectedKey)) {
@@ -187,22 +243,25 @@ function HomeLayout(props: HomeLayoutProps) {
     return (
       <Menu theme="dark" mode="inline" defaultSelectedKeys={[menuSelectedKey]}>
         <Menu.Item key="/home" icon={<Icon component={IconHome} />}>
-          <Link to="/home">Home</Link>
+          <Link to="/home">{t('navbar.home')}</Link>
         </Menu.Item>
         <Menu.Item key="/staking" icon={<Icon component={IconStaking} />}>
-          <Link to="/staking">Staking</Link>
+          <Link to="/staking">{t('navbar.staking')}</Link>
         </Menu.Item>
         <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
-          <Link to="/send">Send</Link>
+          <Link to="/send">{t('navbar.send')}</Link>
         </Menu.Item>
         <Menu.Item key="/receive" icon={<Icon component={IconReceive} />}>
-          <Link to="/receive">Receive</Link>
+          <Link to="/receive">{t('navbar.receive')}</Link>
         </Menu.Item>
         <Menu.Item key="/governance" icon={<BankOutlined />}>
-          <Link to="/governance">Governance</Link>
+          <Link to="/governance">{t('navbar.governance')}</Link>
+        </Menu.Item>
+        <Menu.Item key="/nft" icon={<Icon component={IconNft} />}>
+          <Link to="/nft">{t('navbar.nft')}</Link>
         </Menu.Item>
         <Menu.Item key="/settings" icon={<SettingOutlined />}>
-          <Link to="/settings">Settings</Link>
+          <Link to="/settings">{t('navbar.settings')}</Link>
         </Menu.Item>
       </Menu>
     );
@@ -216,13 +275,13 @@ function HomeLayout(props: HomeLayoutProps) {
             <Menu.Item className="restore-wallet-item">
               <Link to="/restore">
                 <ReloadOutlined />
-                Restore Wallet
+                {t('navbar.wallet.restore')}
               </Link>
             </Menu.Item>
             <Menu.Item className="create-wallet-item">
               <Link to="/create">
                 <PlusOutlined />
-                Create Wallet
+                {t('navbar.wallet.create')}
               </Link>
             </Menu.Item>
           </>
@@ -233,10 +292,13 @@ function HomeLayout(props: HomeLayoutProps) {
           <>
             <Menu.Item
               className="delete-wallet-item"
-              onClick={() => setIsConfirmationModalVisible(true)}
+              onClick={() => {
+                setDeleteWalletAddress(session.wallet.address);
+                setIsConfirmationModalVisible(true);
+              }}
             >
               <DeleteOutlined />
-              Delete Wallet
+              {t('navbar.wallet.delete')}
             </Menu.Item>
           </>
         ) : (
@@ -246,7 +308,7 @@ function HomeLayout(props: HomeLayoutProps) {
           <Link to="/wallet">
             {/* <IconWallet /> */}
             <Icon component={IconWallet} />
-            Wallet List
+            {t('navbar.wallet.list')}
           </Link>
         </Menu.Item>
       </Menu>
@@ -271,7 +333,7 @@ function HomeLayout(props: HomeLayoutProps) {
           >
             <div>
               <img src={WalletIcon} alt="walletIcon" />
-              {trimString(session?.wallet.name)}
+              {ellipsis(session?.wallet.name, 16)}
               <CaretDownOutlined />
             </div>
           </Dropdown>
@@ -298,7 +360,7 @@ function HomeLayout(props: HomeLayoutProps) {
               hidden={isConfirmDeleteVisible}
               danger
             >
-              Confirm
+              {t('general.confirm')}
             </Button>,
             <Button
               key="submit"
@@ -309,28 +371,29 @@ function HomeLayout(props: HomeLayoutProps) {
               hidden={!isConfirmDeleteVisible}
               danger
             >
-              Delete Wallet
+              {t('navbar.wallet.delete')}
             </Button>,
             <Button key="back" type="link" onClick={handleCancel} disabled={isButtonLoading}>
-              Cancel
+              {t('general.cancel')}
             </Button>,
           ]}
         >
           <>
-            <div className="title">Confirm Wallet Deletion</div>
-            <div className="description">Please review the below information. </div>
+            <div className="title">{t('navbar.wallet.modal.title')}</div>
+            <div className="description">{t('navbar.wallet.modal.description')}</div>
             <div className="item">
-              <div className="label">Delete Wallet Address</div>
-              <div className="address">{`${session.wallet.address}`}</div>
+              <div className="label">{t('navbar.wallet.modal.form1.address.label')}</div>
+              {/* <div className="address">{`${session.wallet.address}`}</div> */}
+              <div className="address">{`${deleteWalletAddress}`}</div>
             </div>
             {!isConfirmDeleteVisible ? (
               <>
                 <div className="item">
                   <Alert
                     type="warning"
-                    message={`Are you sure you want to delete the wallet? ${
+                    message={`${t('navbar.wallet.modal.warning1')} ${
                       session.wallet.walletType !== LEDGER_WALLET_TYPE
-                        ? 'If you have not backed up your wallet mnemonic phrase, this will result in losing your funds forever.'
+                        ? t('navbar.wallet.modal.warning2')
                         : ''
                     }`}
                     showIcon
@@ -342,8 +405,8 @@ function HomeLayout(props: HomeLayoutProps) {
                     onChange={() => setIsButtonDisabled(!isButtonDisabled)}
                   >
                     {session.wallet.walletType !== LEDGER_WALLET_TYPE
-                      ? 'I understand that the only way to regain access is by restoring wallet mnemonic phrase.'
-                      : 'I understand that the only way to regain access is by using the same ledger device with the correct address index'}
+                      ? t('navbar.wallet.modal.checkbox1')
+                      : t('navbar.wallet.modal.checkbox2')}
                   </Checkbox>
                 </div>
               </>
@@ -358,15 +421,16 @@ function HomeLayout(props: HomeLayoutProps) {
                 >
                   <Form.Item
                     name="delete"
-                    label="Please enter DELETE"
+                    label={`${t('navbar.wallet.modal.form1.delete.label')} DELETE`}
                     hasFeedback
                     rules={[
                       {
                         required: true,
+                        message: `${t('navbar.wallet.modal.form1.delete.error1')} DELETE`,
                       },
                       {
-                        pattern: /DELETE/,
-                        message: 'Please enter DELETE',
+                        pattern: /^DELETE$/,
+                        message: `${t('navbar.wallet.modal.form1.delete.error1')} DELETE`,
                       },
                     ]}
                   >
@@ -375,6 +439,52 @@ function HomeLayout(props: HomeLayoutProps) {
                 </Form>
               </div>
             )}
+          </>
+        </ModalPopup>
+        <SuccessModalPopup
+          isModalVisible={isSuccessDeleteModalVisible}
+          handleCancel={() => {
+            setIsSuccessDeleteModalVisible(false);
+          }}
+          handleOk={() => {
+            setIsSuccessDeleteModalVisible(false);
+          }}
+          title="Success!"
+          button={null}
+          footer={[
+            <Button
+              key="submit"
+              type="primary"
+              onClick={() => {
+                setIsSuccessDeleteModalVisible(false);
+              }}
+            >
+              {t('general.ok')}
+            </Button>,
+          ]}
+        >
+          <>
+            <div className="description">
+              {t('navbar.wallet.successModal.message1')}
+              <br />
+              {deleteWalletAddress}
+              <br />
+              {t('navbar.wallet.successModal.message2')}
+            </div>
+          </>
+        </SuccessModalPopup>
+        <ModalPopup
+          isModalVisible={isAnnouncementVisible}
+          handleCancel={() => {
+            setIsAnnouncementVisible(false);
+            generalConfigService.setHasShownAnalyticsPopup(true);
+          }}
+          handleOk={() => {}}
+          footer={[]}
+        >
+          <>
+            <div className="title">{t('announcement.modal.title')}</div>
+            <div className="description">{t('announcement.modal.description1')}</div>
           </>
         </ModalPopup>
       </Layout>

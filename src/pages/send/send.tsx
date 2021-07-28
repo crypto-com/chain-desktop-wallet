@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './send.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber, Layout, Select } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { AddressType } from '@crypto-com/chain-jslib/lib/dist/utils/address';
+import { useTranslation } from 'react-i18next';
+import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
+// eslint-disable-next-line import/no-extraneous-dependencies
+// import {remote} from 'electron';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -26,7 +29,13 @@ import {
   getNormalScaleAmount,
 } from '../../utils/NumberUtils';
 import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
-import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
+import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import {
+  AnalyticsActions,
+  AnalyticsCategory,
+  AnalyticsService,
+  AnalyticsTxType,
+} from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer } = Layout;
 const { Option } = Select;
@@ -50,10 +59,22 @@ const FormSend = () => {
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const currentSession = useRecoilValue(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  const didMountRef = useRef(false);
+
+  const analyticsService = new AnalyticsService(currentSession);
+
+  const [t] = useTranslation();
+
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      analyticsService.logPage('Send');
+    }
+  }, []);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
-    const transferInoputAmount = adjustedTransactionAmount(
+    const transferInputAmount = adjustedTransactionAmount(
       form.getFieldValue('amount'),
       walletAsset,
       currentSession.wallet.config.fee !== undefined &&
@@ -64,7 +85,7 @@ const FormSend = () => {
     setFormValues({
       ...form.getFieldsValue(),
       // Replace scientific notation to plain string values
-      amount: fromScientificNotation(transferInoputAmount),
+      amount: fromScientificNotation(transferInputAmount),
     });
     setIsVisibleConfirmationModal(true);
   };
@@ -102,6 +123,14 @@ const FormSend = () => {
         decryptedPhrase,
         walletType,
       });
+
+      analyticsService.logTransactionEvent(
+        broadcastResult.transactionHash as string,
+        formValues.amount,
+        AnalyticsTxType.TransferTransaction,
+        AnalyticsActions.FundsTransfer,
+        AnalyticsCategory.Transfer,
+      );
 
       setBroadcastResult(sendResult);
 
@@ -151,13 +180,13 @@ const FormSend = () => {
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
   const customMaxValidator = TransactionUtils.maxValidator(
     maximumSendAmount,
-    'Sending amount exceeds your available wallet balance',
+    t('send.formSend.amount.error1'),
   );
   const customMinValidator = TransactionUtils.minValidator(
     fromScientificNotation(currentMinAssetAmount),
-    `Sending amount is lower than minimum allowed of ${fromScientificNotation(
-      currentMinAssetAmount,
-    )} ${walletAllAssets[selectedAsset].symbol}`,
+    `${t('send.formSend.amount.error2')} ${fromScientificNotation(currentMinAssetAmount)} ${
+      walletAllAssets[selectedAsset].symbol
+    }`,
   );
 
   useEffect(() => {
@@ -178,15 +207,18 @@ const FormSend = () => {
 
       <Form.Item
         name="recipientAddress"
-        label="Recipient Address"
+        label={t('send.formSend.recipientAddress.label')}
         hasFeedback
         validateFirst
         rules={[
-          { required: true, message: 'Recipient address is required' },
+          {
+            required: true,
+            message: `${t('send.formSend.recipientAddress.label')} ${t('general.required')}`,
+          },
           customAddressValidator,
         ]}
       >
-        <Input placeholder="Enter recipient address" />
+        <Input placeholder={t('send.formSend.recipientAddress.placeholder')} />
       </Form.Item>
       {walletAllAssets.length > 1 ? (
         <Form.Item name="ibcToken" label="Select Asset">
@@ -207,14 +239,17 @@ const FormSend = () => {
       <div className="amount">
         <Form.Item
           name="amount"
-          label="Sending Amount"
+          label={t('send.formSend.amount.label')}
           hasFeedback
           validateFirst
           rules={[
-            { required: true, message: 'Sending amount is required' },
+            {
+              required: true,
+              message: `${t('send.formSend.amount.label')} ${t('general.required')}`,
+            },
             {
               pattern: /[^0]+/,
-              message: 'Sending amount cannot be 0',
+              message: `${t('send.formSend.amount.label')} ${t('general.cannot0')}`,
             },
             customAmountValidator,
             customMaxValidator,
@@ -224,13 +259,13 @@ const FormSend = () => {
           <InputNumber />
         </Form.Item>
         <div className="available">
-          <span>Available: </span>
+          <span>{t('general.available')}: </span>
           <div className="available-amount">
             {availableBalance} {walletAllAssets[selectedAsset].symbol}
           </div>
         </div>
       </div>
-      <Form.Item name="memo" label="Memo (Optional)">
+      <Form.Item name="memo" label={t('send.formSend.memo.label')}>
         <Input />
       </Form.Item>
 
@@ -242,7 +277,7 @@ const FormSend = () => {
           confirmationLoading={confirmLoading}
           button={
             <Button type="primary" htmlType="submit">
-              Continue
+              {t('general.continue')}
             </Button>
           }
           okText="Confirm"
@@ -253,30 +288,30 @@ const FormSend = () => {
               loading={confirmLoading}
               onClick={onConfirmTransfer}
             >
-              Confirm
+              {t('general.confirm')}
             </Button>,
             <Button key="back" type="link" onClick={handleCancel}>
-              Cancel
+              {t('general.cancel')}
             </Button>,
           ]}
         >
           <>
-            <div className="title">Confirm Transaction</div>
-            <div className="description">Please review the below information. </div>
+            <div className="title">{t('send.modal1.title')}</div>
+            <div className="description">{t('send.modal1.description')}</div>
             <div className="item">
-              <div className="label">Sender Address</div>
+              <div className="label">{t('send.modal1.label1')}</div>
               <div className="address">{`${currentSession.wallet.address}`}</div>
             </div>
             <div className="item">
-              <div className="label">To Address</div>
+              <div className="label">{t('send.modal1.label2')}</div>
               <div className="address">{`${formValues?.recipientAddress}`}</div>
             </div>
             <div className="item">
-              <div className="label">Amount</div>
+              <div className="label">{t('send.modal1.label3')}</div>
               <div>{`${formValues?.amount} ${walletAllAssets[selectedAsset].symbol}`}</div>
             </div>
             <div className="item">
-              <div className="label">Transaction Fee</div>
+              <div className="label">{t('send.modal1.label4')}</div>
               <div>{`${getNormalScaleAmount(
                 currentSession.wallet.config.fee !== undefined &&
                   currentSession.wallet.config.fee.networkFee !== undefined
@@ -286,7 +321,7 @@ const FormSend = () => {
               )} ${walletAllAssets[selectedAsset].symbol}`}</div>
             </div>
             <div className="item">
-              <div className="label">Memo</div>
+              <div className="label">{t('send.modal1.label5')}</div>
               {formValues?.memo !== undefined &&
               formValues?.memo !== null &&
               formValues.memo !== '' ? (
@@ -299,8 +334,8 @@ const FormSend = () => {
         </ModalPopup>
 
         <PasswordFormModal
-          description="Input the app password decrypt wallet"
-          okButtonText="Decrypt wallet"
+          description={t('general.passwordFormModal.description')}
+          okButtonText={t('general.passwordFormModal.okButton')}
           onCancel={() => {
             setInputPasswordVisible(false);
           }}
@@ -309,13 +344,13 @@ const FormSend = () => {
             const isValid = await secretStoreService.checkIfPasswordIsValid(password);
             return {
               valid: isValid,
-              errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+              errMsg: !isValid ? t('general.passwordFormModal.error') : '',
             };
           }}
-          successText="Wallet decrypted successfully !"
-          title="Provide app password"
+          successText={t('general.passwordFormModal.success')}
+          title={t('general.passwordFormModal.title')}
           visible={inputPasswordVisible}
-          successButtonText="Continue"
+          successButtonText={t('general.continue')}
           confirmPassword={false}
         />
 
@@ -323,11 +358,11 @@ const FormSend = () => {
           isModalVisible={isSuccessTransferModalVisible}
           handleCancel={closeSuccessModal}
           handleOk={closeSuccessModal}
-          title="Success!"
+          title={t('general.successModalPopup.title')}
           button={null}
           footer={[
             <Button key="submit" type="primary" onClick={closeSuccessModal}>
-              Ok
+              {t('general.ok')}
             </Button>,
           ]}
         >
@@ -336,10 +371,12 @@ const FormSend = () => {
             broadcastResult?.code !== null &&
             broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
               <div className="description">
-                The transaction timed out but it will be included in the subsequent blocks
+                {t('general.successModalPopup.timeout.description')}
               </div>
             ) : (
-              <div className="description">The transaction was broadcasted successfully!</div>
+              <div className="description">
+                {t('general.successModalPopup.transfer.description')}
+              </div>
             )}
             {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
           </>
@@ -348,12 +385,12 @@ const FormSend = () => {
           isModalVisible={isErrorTransferModalVisible}
           handleCancel={closeErrorModal}
           handleOk={closeErrorModal}
-          title="An error happened!"
+          title={t('general.errorModalPopup.title')}
           footer={[]}
         >
           <>
             <div className="description">
-              The transfer transaction failed. Please try again later.
+              {t('general.errorModalPopup.transfer.description')}
               <br />
               {errorMessages
                 .filter((item, idx) => {
@@ -362,11 +399,7 @@ const FormSend = () => {
                 .map((err, idx) => (
                   <div key={idx}>- {err}</div>
                 ))}
-              {ledgerIsExpertMode ? (
-                <div>Please ensure that your have enabled Expert mode on your ledger device.</div>
-              ) : (
-                ''
-              )}
+              {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
             </div>
           </>
         </ErrorModalPopup>
@@ -375,14 +408,13 @@ const FormSend = () => {
   );
 };
 
-function SendPage() {
+const SendPage = () => {
+  const [t] = useTranslation();
+
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">Send</Header>
-      <div className="header-description">
-        Move funds from your transfer address to another transfer address or deposit stake to a
-        staking address.
-      </div>
+      <Header className="site-layout-background">{t('send.title')}</Header>
+      <div className="header-description">{t('send.description')}</div>
       <Content>
         <div className="site-layout-background send-content">
           <div className="container">
@@ -393,6 +425,6 @@ function SendPage() {
       <Footer />
     </Layout>
   );
-}
+};
 
 export default SendPage;

@@ -1,9 +1,12 @@
-import { CroNetwork } from '@crypto-com/chain-jslib/lib/dist/core/cro';
+import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import { getRandomId } from '../crypto/RandomGen';
 import { UserAssetType } from '../models/UserAsset';
 
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
+export const NV_GRAPHQL_API_ENDPOINT = 'https://crypto.com/nft-api/graphql';
+export const IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT =
+  'https://crypto.org/ipfs-middleware-server/uploads';
 export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';
 
 export const NodePorts = {
@@ -12,6 +15,14 @@ export const NodePorts = {
 };
 // maximum in ledger: 2147483647
 export const LedgerWalletMaximum = 2147483647;
+
+export const DEFAULT_LANGUAGE_CODE = 'enUS';
+export const SUPPORTED_LANGUAGE = [
+  { value: 'enUS', label: 'English' },
+  { value: 'zhHK', label: '繁體中文' },
+  { value: 'zhCN', label: '简体中文' },
+  { value: 'koKR', label: '한국어' },
+];
 
 export type WalletConfig = {
   enabled: boolean;
@@ -25,6 +36,7 @@ export type WalletConfig = {
   // When enabled all settings update will be propagated to all wallets of the same network.
   // E.g: User updates nodeURL in one mainnet wallet, all other mainnet wallets will have the new nodeURL
   enableGeneralSettings: boolean;
+  analyticsDisabled: boolean;
   fee: {
     gasLimit: string;
     networkFee: string;
@@ -33,6 +45,58 @@ export type WalletConfig = {
 
 export const FIXED_DEFAULT_FEE = String(10_000);
 export const FIXED_DEFAULT_GAS_LIMIT = String(300_000);
+
+export const NFT_IMAGE_DENOM_SCHEMA = {
+  title: 'Asset Metadata',
+  type: 'Object',
+  properties: {
+    description: {
+      type: 'string',
+      description: 'Describes the asset to which this NFT represents',
+    },
+    name: {
+      type: 'string',
+      description: 'Identifies the asset to which this NFT represents',
+    },
+    image: {
+      type: 'string',
+      description: 'A URI pointing to a resource with mime type image',
+    },
+    mimeType: {
+      type: 'string',
+      description: 'Describes the type of represented NFT media',
+    },
+  },
+};
+export const NFT_VIDEO_DENOM_SCHEMA = {
+  title: 'Asset Metadata',
+  type: 'Object',
+  properties: {
+    description: {
+      type: 'string',
+      description: 'Describes the asset to which this NFT represents',
+    },
+    name: {
+      type: 'string',
+      description: 'Identifies the asset to which this NFT represents',
+    },
+    image: {
+      type: 'string',
+      description: 'A URI pointing to a resource with mime type image',
+    },
+    animation_url: {
+      type: 'string',
+      description: 'A URI pointing to a resource with mime type video',
+    },
+    mimeType: {
+      type: 'string',
+      description: 'Describes the type of represented NFT media',
+    },
+  },
+};
+
+export const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
+export const MAX_VIDEO_SIZE = 20 * 1024 * 1024;
 
 const TestNetConfig: WalletConfig = {
   enabled: true,
@@ -44,6 +108,24 @@ const TestNetConfig: WalletConfig = {
   network: CroNetwork.Testnet,
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
+  analyticsDisabled: false,
+  fee: {
+    gasLimit: FIXED_DEFAULT_GAS_LIMIT,
+    networkFee: FIXED_DEFAULT_FEE,
+  },
+};
+
+const TestNetCroeseid3: WalletConfig = {
+  enabled: true,
+  name: 'TESTNET CROESEID 3',
+  derivationPath: "m/44'/1'/0'/0/0",
+  explorerUrl: 'https://crypto.org/explorer/croeseid3',
+  indexingUrl: 'https://crypto.org/explorer/croeseid3/api/v1/',
+  nodeUrl: CroNetwork.TestnetCroeseid3.defaultNodeUrl,
+  network: CroNetwork.TestnetCroeseid3,
+  disableDefaultClientMemo: false,
+  enableGeneralSettings: false,
+  analyticsDisabled: false,
   fee: {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
@@ -64,6 +146,7 @@ const MainNetConfig: WalletConfig = {
   network: CroNetwork.Mainnet,
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
+  analyticsDisabled: false,
   fee: {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
@@ -77,6 +160,7 @@ export const CustomDevNet: WalletConfig = {
   name: 'CUSTOM DEVNET',
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
+  analyticsDisabled: false,
   network: {
     defaultNodeUrl: '',
     chainId: 'test',
@@ -101,6 +185,7 @@ export const DefaultWalletConfigs = {
   TestNetConfig,
   MainNetConfig,
   CustomDevNet,
+  TestNetCroeseid3,
 };
 
 // Every created wallet get initialized with a new CRO asset
@@ -132,4 +217,5 @@ export type Network = {
   validatorPubKeyPrefix: string;
   validatorAddressPrefix: string;
   coin: { baseDenom: string; croDenom: string };
+  rpcUrl?: string;
 };

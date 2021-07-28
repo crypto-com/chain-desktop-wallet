@@ -6,6 +6,97 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.4.1] - 2021-07-27
+- Void release to test auto updater on Windows systems
+
+## [v0.4.0] - 2021-07-27
+
+### Additions
+- Added support for auto updater on Windows
+- Initial support for internationalization and language support.
+- Remove obsolete croeseid v2 network configuration
+
+
+## [v0.3.9] - 2021-07-26
+
+- Add support for seed phrase export to the wallet
+- Update dependencies to secure versions
+
+## [v0.3.8] - 2021-07-15
+
+- Add support for seed phrase export to the wallet
+- Update dependencies to secure versions
+
+## [v0.3.7] - 2021-07-8
+
+- Remove previous implicit automatic quit and update after update download
+- Add optional "Restart Now" button after update download
+
+## [v0.3.6] - 2021-07-8
+
+- Minor cleanup after testing auto updater in closed track release
+
+
+## [v0.3.5] - 2021-07-8
+
+- [AutoUpdater] Empty sample release to test if v0.3.4 can detect new versions available and update them accordingly
+
+
+## [v0.3.4] - 2021-07-8
+
+- Sample test release for auto updater feature implementation
+- Note that this release won't be published, it will stay as draft for testing
+- The sole purpose of this release is to investigate if a signed binary would behave as expected with the auto-updater
+
+## [v0.3.3] - 2021-07-6
+
+- Fixed small layout issues on wallet creation page
+
+## [v0.3.2] - 2021-07-5
+
+- Sample release to test auto updater during development
+
+## [v0.3.1] - 2021-07-5
+
+### Bug Fixes
+- Fix issue when using drag and drop for uploads.
+
+
+## [v0.3.0] - 2021-06-30
+
+### Additions
+- NFT support - all basic features now completed : View NFTs, Send NFTs, Mint NFTs
+- Introduced capability to mint NFTs directly from the desktop wallet
+- Add implicit denom issuance when minting NFTs with a new denom that does not exist yet.
+
+
+### Bug Fixes
+- Add bytes padding for signing related issues on some Ledger devices
+
+
+## [v0.2.4] - 2021-06-22
+
+### Bug Fixes
+- Add bytes padding for signing related issues on some Ledger devices
+
+## [v0.2.3] - 2021-06-17
+
+### Additions
+- Implemented search for the wallet list view
+- Added support for croeseid testnet version 3
+- Fix governance votes tally numbers  
+- Add a new NFT UI tab and NFT section on the home screen 
+- Load, persist in the DB, and show to the UI all current accounts NFTs
+- Add support to send and receive NFTs: Sign and broadcast NFT transactions
+- Add capability to load the previous account NFT related transaction history: Send, Receive, Mint, Issue, etc, ...
+
+## [v0.2.2] - 2021-05-24
+
+### Additions
+- Added data analytics
+- Show validator list view on redelegation flow
+- Updated dependencies to secure versions.
+
 ## [v0.2.1] - 2021-04-28
 
 ### Additions
