@@ -1,33 +1,59 @@
 import sdk from '@crypto-org-chain/chain-jslib';
+import { ethers } from 'ethers';
 import { Wallet } from '../models/Wallet';
 import { WalletConfig } from '../config/StaticConfig';
 import { HDKey, Secp256k1KeyPair } from '../utils/ChainJsLib';
 import { getRandomId } from '../crypto/RandomGen';
+import { UserAsset } from '../models/UserAsset';
+import { CRO_ASSET, CRONOS_ASSET } from '../config/StaticAssets';
 
 export class WalletCreator {
   public static create(options: WalletCreateOptions): Wallet {
-    const { address, encryptedPhrase } = this.generate(options);
+    const walletIdentifier = getRandomId();
+    const { initialAssets, encryptedPhrase } = this.generate(options, walletIdentifier);
     return {
-      identifier: getRandomId(),
+      identifier: walletIdentifier,
       name: options.walletName,
-      address,
+      // This global wallet address is now obsolete
+      address: '',
       config: options.config,
       encryptedPhrase,
       hasBeenEncrypted: false,
       walletType: options.walletType,
       addressIndex: options.addressIndex,
+      assets: initialAssets,
     };
   }
 
-  private static generate(options: WalletCreateOptions) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public static generateAssets(config: WalletConfig) {}
+
+  private static generate(options: WalletCreateOptions, walletIdentifier: string) {
     const cro = sdk.CroSDK({ network: options.config.network });
     const phrase = HDKey.generateMnemonic(24);
 
     const privateKey = HDKey.fromMnemonic(phrase).derivePrivKey(options.config.derivationPath);
     const keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
-    const address = new cro.Address(keyPair).account();
+    const croAddress = new cro.Address(keyPair).account();
 
-    return { address, encryptedPhrase: phrase };
+    // EVM cronosAddress
+    const cronosAddress = ethers.Wallet.fromMnemonic(phrase).address;
+
+    // TODO : Generate assets here
+    const assets: UserAsset[] = [
+      {
+        ...CRO_ASSET(options.config.network),
+        walletId: walletIdentifier,
+        address: croAddress,
+      },
+      {
+        ...CRONOS_ASSET(options.config.network),
+        walletId: walletIdentifier,
+        address: cronosAddress,
+      },
+    ];
+
+    return { encryptedPhrase: phrase, initialAssets: assets };
   }
 }
 

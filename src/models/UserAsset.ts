@@ -31,11 +31,18 @@ export interface UserAsset {
   ibcDenomHash?: string;
 
   assetType?: UserAssetType;
+
+  address?: string;
 }
 
 export enum UserAssetType {
-  NORMAL = 'NORMAL',
+  // For Cosmos based assets
+  TENDERMINT = 'TENDERMINT',
+  // For Cosmos IBC assets
   IBC = 'IBC',
+
+  // For EVM based assets like CRONOS
+  EVM = 'EVM',
 }
 
 export interface AssetMarketPrice {

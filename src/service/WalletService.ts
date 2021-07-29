@@ -11,9 +11,7 @@ import { StorageService } from '../storage/StorageService';
 import {
   APP_DB_NAMESPACE,
   DEFAULT_CLIENT_MEMO,
-  DefaultAsset,
   DefaultWalletConfigs,
-  Network,
   NOT_KNOWN_YET_VALUE,
   WalletConfig,
 } from '../config/StaticConfig';
@@ -565,14 +563,21 @@ class WalletService {
     ];
   }
 
-  public async persistInitialAsset(walletId: string, network: Network) {
-    const defaultAsset: UserAsset = {
-      ...DefaultAsset(network),
-      walletId,
-    };
-
-    await this.storageService.saveAsset(defaultAsset);
-  }
+  // public async persistInitialAssets(walletId: string, network: Network) {
+  //   const croAsset: UserAsset = {
+  //     ...CRO_ASSET(network),
+  //     walletId,
+  //   };
+  //
+  //   // const cronosAsset: UserAsset = {
+  //   //   ...CRONOS_ASSET(network),
+  //   //   walletId,
+  //   // };
+  //
+  //   // await Promise.all([
+  //   await this.storageService.saveAsset(croAsset);
+  //   // ])
+  // }
 
   // Import or restore wallet and persist it on the db
   public async restoreAndSaveWallet(importOptions: WalletImportOptions): Promise<Wallet> {
@@ -618,7 +623,6 @@ class WalletService {
   // Save freshly created or imported wallet
   public async persistWallet(wallet: Wallet) {
     await this.storageService.saveWallet(wallet);
-    await this.persistInitialAsset(wallet.identifier, wallet.config.network);
   }
 
   public async deleteWallet(walletIdentifier: string) {
