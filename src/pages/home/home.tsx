@@ -984,7 +984,24 @@ function HomePage() {
           </div>
         </div>
         <Tabs defaultActiveKey="1">
-          <TabPane tab={t('home.nft.tab1')} key="1">
+          {isIbcVisible ? (
+            <TabPane tab="Assets" key="1">
+              <div className="site-layout-background asset-container">
+                <Table
+                  columns={AssetColumns}
+                  dataSource={walletAllAssets}
+                  className="asset-table"
+                  pagination={false}
+                />
+                <Link to="/receive" className="all">
+                  {t('home.nft.seeAll')}
+                </Link>
+              </div>
+            </TabPane>
+          ) : (
+            <></>
+          )}
+          <TabPane tab={t('home.nft.tab1')} key={isIbcVisible ? '2' : '1'}>
             <div className="site-layout-background nft-container">
               <List
                 grid={{
@@ -1033,20 +1050,13 @@ function HomePage() {
           </TabPane>
         </Tabs>
         <Tabs defaultActiveKey="1">
-          {isIbcVisible ? (
-            <TabPane tab="Assets" key="1">
-              <Table columns={AssetColumns} dataSource={walletAllAssets} className="asset-table" />
-            </TabPane>
-          ) : (
-            <></>
-          )}
-          <TabPane tab={t('home.transactions.tab1')} key={isIbcVisible ? '2' : '1'}>
+          <TabPane tab={t('home.transactions.tab1')} key="1">
             <Table columns={TransactionColumns} dataSource={transfers} />
           </TabPane>
-          <TabPane tab={t('home.transactions.tab2')} key={isIbcVisible ? '3' : '2'}>
+          <TabPane tab={t('home.transactions.tab2')} key="2">
             <Table columns={StakingColumns} dataSource={delegations} />
           </TabPane>
-          <TabPane tab={t('home.transactions.tab3')} key={isIbcVisible ? '4' : '3'}>
+          <TabPane tab={t('home.transactions.tab3')} key="3">
             <Table columns={NftTransactionColumns} dataSource={nftTransfers} />
           </TabPane>
         </Tabs>
