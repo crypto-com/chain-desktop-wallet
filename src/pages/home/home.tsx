@@ -28,6 +28,7 @@ import {
   walletAssetState,
   walletAllAssetsState,
   nftListState,
+  isIbcVisibleState,
   ledgerIsExpertModeState,
   fetchingDBState,
 } from '../../recoil/atom';
@@ -213,6 +214,7 @@ function HomePage() {
   const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const setNFTList = useSetRecoilState(nftListState);
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
@@ -1031,20 +1033,20 @@ function HomePage() {
           </TabPane>
         </Tabs>
         <Tabs defaultActiveKey="1">
-          {walletAllAssets.length > 1 ? (
+          {isIbcVisible ? (
             <TabPane tab="Assets" key="1">
               <Table columns={AssetColumns} dataSource={walletAllAssets} className="asset-table" />
             </TabPane>
           ) : (
             <></>
           )}
-          <TabPane tab={t('home.transactions.tab1')} key={walletAllAssets.length > 1 ? '2' : '1'}>
+          <TabPane tab={t('home.transactions.tab1')} key={isIbcVisible ? '2' : '1'}>
             <Table columns={TransactionColumns} dataSource={transfers} />
           </TabPane>
-          <TabPane tab={t('home.transactions.tab2')} key={walletAllAssets.length > 1 ? '3' : '2'}>
+          <TabPane tab={t('home.transactions.tab2')} key={isIbcVisible ? '3' : '2'}>
             <Table columns={StakingColumns} dataSource={delegations} />
           </TabPane>
-          <TabPane tab={t('home.transactions.tab3')} key={walletAllAssets.length > 1 ? '4' : '3'}>
+          <TabPane tab={t('home.transactions.tab3')} key={isIbcVisible ? '4' : '3'}>
             <Table columns={NftTransactionColumns} dataSource={nftTransfers} />
           </TabPane>
         </Tabs>

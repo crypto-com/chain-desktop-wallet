@@ -18,6 +18,7 @@ import {
   sessionState,
   walletAssetState,
   walletAllAssetsState,
+  isIbcVisibleState,
   ledgerIsExpertModeState,
 } from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
@@ -59,6 +60,7 @@ const FormSend = () => {
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const currentSession = useRecoilValue(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const didMountRef = useRef(false);
 
   const analyticsService = new AnalyticsService(currentSession);
@@ -220,7 +222,7 @@ const FormSend = () => {
       >
         <Input placeholder={t('send.formSend.recipientAddress.placeholder')} />
       </Form.Item>
-      {walletAllAssets.length > 1 ? (
+      {isIbcVisible ? (
         <Form.Item name="ibcToken" label="Select Asset">
           <Select
             defaultValue={0}

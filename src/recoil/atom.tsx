@@ -82,6 +82,11 @@ const nftListState = atom<NftModel[] | undefined>({
   default: undefined,
 });
 
+const isIbcVisibleState = atom<boolean>({
+  key: 'isIbcVisible',
+  default: false,
+});
+
 const hasShownWarningOnWalletTypeState = atom<boolean>({
   key: 'hasShownWarningOnWalletTypeState',
   default: false,
@@ -107,6 +112,7 @@ export {
   walletTempBackupState,
   validatorListState,
   nftListState,
+  isIbcVisibleState,
   hasShownWarningOnWalletTypeState,
   ledgerIsExpertModeState,
   fetchingDBState,

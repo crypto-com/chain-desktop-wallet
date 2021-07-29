@@ -12,7 +12,7 @@ import Icon, {
   BankOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -24,6 +24,7 @@ import {
   validatorListState,
   fetchingDBState,
   nftListState,
+  isIbcVisibleState,
 } from '../../recoil/atom';
 import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
@@ -61,6 +62,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const [nftList, setNftList] = useRecoilState(nftListState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
+  const setIsIbcVisible = useSetRecoilState(isIbcVisibleState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
@@ -124,10 +126,12 @@ function HomeLayout(props: HomeLayoutProps) {
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
     const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
+    const isIbcVisible = allAssets.length > 1;
 
     setSession(currentSession);
     setUserAsset(currentAsset);
     setWalletAllAssets(allAssets);
+    setIsIbcVisible(isIbcVisible);
     await walletService.syncAll(currentSession);
 
     setIsButtonLoading(false);
@@ -166,11 +170,13 @@ function HomeLayout(props: HomeLayoutProps) {
         'usd',
       );
 
+      const isIbcVisible = allAssets.length > 1;
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
       setHasWallet(hasWalletBeenCreated);
       setSession(currentSession);
       setUserAsset(currentAsset);
       setWalletAllAssets(allAssets);
+      setIsIbcVisible(isIbcVisible);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
 
