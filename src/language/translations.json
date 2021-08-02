@@ -145,6 +145,48 @@
           },
           "ledgerExportMode": "Please ensure that your have enabled Expert mode on your Ledger device."
         },
+        "redelegateFormComponent": {
+          "title": "Confirm Redelegate Transaction",
+          "description": "Please review the below information.",
+          "label1": "Sender Address",
+          "label2": "From Validator",
+          "table": {
+            "validatorDestinationAddress": {
+              "label": "To Validator Address",
+              "placeholder": "Enter validator address"
+            },
+            "redelegateAmount": {
+              "label": "Redelegate Amount"
+            }
+          },
+          "maxValidator": {
+            "error": "Redelegate Amount cannot be bigger than currently delegated"
+          },
+          "alert1": {
+            "message1": "Every ",
+            "message2": "days, funds can be redelegated once. At any time, one account can only have at most 7 records of redelegation and unbonding that is in the effective periods",
+            "message3": "days"
+          }
+        },
+        "undelegateFormComponent": {
+          "title": "Confirm Undelegate Transaction",
+          "description": "Please review the below information.",
+          "label1": "Sender Address",
+          "label2": "Undelegate From Validator",
+          "table": {
+            "undelegateAmount": {
+              "label": "Undelegate Amount"
+            }
+          },
+          "maxValidator": {
+            "error": "Undelegate Amount cannot be bigger than currently delegated"
+          },
+          "alert1": {
+            "message1": "Please do understand that undelegation takes a number of days to fully complete after the transaction has been broadcasted",
+            "message2": "days",
+            "message3": ". Until then, you are not able to use the undelegated funds yet."
+          }
+        },
         "table": {
           "triggerDesc": "Click to sort by descend",
           "triggerAsc": "Click to sort by ascend",
@@ -872,6 +914,48 @@
           },
           "ledgerExportMode": "請確保你的Ledger錢包已經開啟專家模式。"
         },
+        "redelegateFormComponent": {
+          "title": "確認重新委託交易",
+          "description": "請檢查以下內容",
+          "label1": "發送人地址",
+          "label2": "原驗證者地址",
+          "table": {
+            "validatorDestinationAddress": {
+              "label": "新驗證者地址",
+              "placeholder": "輸入驗證者地址"
+            },
+            "redelegateAmount": {
+              "label": "重新委託數量"
+            }
+          },
+          "maxValidator": {
+            "error": "重新委託數量不能大於現有抵押數量"
+          },
+          "alert1": {
+            "message1": "每",
+            "message2": "日可以重新委託一次。一個錢包地址於任何時候都最多只能有7個進行中的重新委託及贖回委託。",
+            "message3": "日"
+          }
+        },
+        "undelegateFormComponent": {
+          "title": "確認贖回委託交易",
+          "description": "請檢查以下內容",
+          "label1": "發送人地址",
+          "label2": "贖回委託的驗證者地址",
+          "table": {
+            "undelegateAmount": {
+              "label": "贖回委託數目"
+            }
+          },
+          "maxValidator": {
+            "error": "贖回委託數量不能大於現有抵押數量"
+          },
+          "alert1": {
+            "message1": "請注意，在贖回委託交易成功廣播後，還需要等待一段時間才能正式完成",
+            "message2": "日",
+            "message3": "。在正式完成之前，你並不能使用贖回的委託資金。"
+          }
+        },
         "table": {
           "triggerDesc": "按降序排序",
           "triggerAsc": "按升序排序",
@@ -1598,6 +1682,48 @@
             "description": "NFT 铸造交易失败。 请稍后再试。"
           },
           "ledgerExportMode": "请确保你的Ledger钱包已经开启专家模式。"
+        },
+        "redelegateFormComponent": {
+          "title": "确认重新委托交易",
+          "description": "请检查以下内容",
+          "label1": "发送人地址",
+          "label2": "原验证者地址",
+          "table": {
+            "validatorDestinationAddress": {
+              "label": "新验证者地址",
+              "placeholder": "输入验证者地址"
+            },
+            "redelegateAmount": {
+              "label": "重新委托数量"
+            }
+          },
+          "maxValidator": {
+            "error": "重新委托数量不能大于现有抵押数量"
+          },
+          "alert1": {
+            "message1": "每",
+            "message2": "日可以重新委托一次。一个钱包地址于任何时候都最多只能有7个进行中的重新委托及赎回委托。",
+            "message3": "日"
+          }
+        },
+        "undelegateFormComponent": {
+          "title": "确认赎回委托交易",
+          "description": "请检查以下内容",
+          "label1": "发送人地址",
+          "label2": "赎回委托的验证者地址",
+          "table": {
+            "undelegateAmount": {
+              "label": "赎回委托数目"
+            }
+          },
+          "maxValidator": {
+            "error": "赎回委托数量不能大于现有抵押数量"
+          },
+          "alert1": {
+            "message1": "请注意，在赎回委托交易成功广播后，还需要等待一段时间才能正式完成",
+            "message2": "日",
+            "message3": "。在正式完成之前，你並不能使用赎回的委托资金。"
+          }
         },
         "table": {
           "triggerDesc": "按降序排序",
@@ -2436,6 +2562,16 @@
           },
           "ledgerExportMode": "레져 전문가 모드를 켜주세요"
         },
+        "redelegateFormComponent": {
+          "description": "아래 정보를 확인해주세요",
+          "label1": "발신인 주소",
+          "table": {
+            "validatorDestinationAddress": {
+              "label": "검증인 주소",
+              "placeholder": "검증인 주소 입력"
+            }
+          }
+        },
         "table": {
           "triggerDesc": "내림차순으로 정렬",
           "triggerAsc": "오름차순 정렬",
@@ -3098,10 +3234,20 @@
         "passwordForm": {
           "password": {
             "label": "Uygulama şifresi",
-            "placeholder": "Uygulama şifresini girin"
+            "placeholder": "Uygulama şifresini girin",
+            "error1": "Uygulama şifresi en az 8 karakterden oluşmalı ve en az bir harf, numara ve özel karakter içermelidir"
+          },
+          "passwordConfirm": {
+            "label": "Uygulama şifresini doğrula",
+            "placeholder": "Uygulama şifresini doğrula",
+            "error1": "Doğrulama şifresi eşleşmedi"
           },
           "passwordStrength": {
             "title": "Şifre güvenlik seviyesi",
+            "worst": "Çok kötü",
+            "bad": "Kötü",
+            "weak": "Zayıf",
+            "good": "İyi",
             "strong": "Güçlü"
           }
         },
