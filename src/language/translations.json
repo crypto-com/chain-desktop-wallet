@@ -121,6 +121,11 @@
             "description": "The NFT minting transaction failed. Please try again later."
           },
           "ledgerExportMode": "Please ensure that your have enabled Expert mode on your Ledger device."
+        },
+        "table": {
+          "triggerDesc": "Click to sort by descend",
+          "triggerAsc": "Click to sort by ascend",
+          "cancelSort": "Click to cancel sort"
         }
       },
       "welcome": {
@@ -605,7 +610,7 @@
           "label3": "Token ID",
           "label4": "Content URL",
           "button1": "Transfer NFT",
-          "button2": "View on Crypto.com NFT"
+          "button2": "View on Crypto.com NFT Marketplace"
         }
       },
       "settings": {
@@ -813,6 +818,11 @@
             "description": "NFT 鑄造交易失敗。請稍後再試。"
           },
           "ledgerExportMode": "請確保你的Ledger錢包已經開啟專家模式。"
+        },
+        "table": {
+          "triggerDesc": "按降序排序",
+          "triggerAsc": "按升序排序",
+          "cancelSort": "取消排序"
         }
       },
       "welcome": {
@@ -1297,7 +1307,7 @@
           "label3": "代幣 ID",
           "label4": "內容 URL ",
           "button1": "轉發 NFT ",
-          "button2": "於 Crypto.com NFT 上瀏覽"
+          "button2": "於 Crypto.com NFT Marketplace 上瀏覽"
         }
       },
       "settings": {
@@ -1505,6 +1515,11 @@
             "description": "NFT 铸造交易失败。 请稍后再试。"
           },
           "ledgerExportMode": "请确保你的Ledger钱包已经开启专家模式。"
+        },
+        "table": {
+          "triggerDesc": "按降序排序",
+          "triggerAsc": "按升序排序",
+          "cancelSort": "取消排序"
         }
       },
       "welcome": {
@@ -1989,7 +2004,7 @@
           "label3": "代币 ID",
           "label4": "内容 URL",
           "button1": "转发 NFT",
-          "button2": "在 Crypto.com NFT 上浏览"
+          "button2": "在 Crypto.com NFT Marketplace 上浏览"
         }
       },
       "settings": {
@@ -2089,6 +2104,8 @@
         "ok": "Ok",
         "required": "est requis",
         "cannot0": "ne peut pas être 0",
+        "validator": "validateur",
+        "available": "Disponible",
         "action": "Action",
         "select": "Selectionne",
         "review": "Revoir",
@@ -2096,13 +2113,72 @@
         "close": "Fermer",
         "connect": "Connecter",
         "addressValidator": {
-          "reason1": "Invalide"
+          "reason1": "Incorrect",
+          "reason2": "adresse fournie"
+        },
+        "validTransactionAmountValidator": {
+          "reason": "montant à envoyer incorrect"
+        },
+        "passwordFormModal": {
+          "title": "Choisissez un mot de passe pour l'application",
+          "description": "Saisissez le mot de passe du porte feuille",
+          "error": "Le mot de passe saisi est incorrect. Réessayer encore",
+          "success": "Portefeuille décryption réussi!",
+          "okButton": "Décrypter le portefeuille",
+          "createWallet": {
+            "description": "Saisissez le mot de passe pour encrypter le porte feuille créé",
+            "okButton": "Encrypter le portefeuille",
+            "success": "Le portefeuille a été crée et bien encrypté!",
+            "successButton": "Menu principal"
+          }
+        },
+        "successModalPopup": {
+          "title": "Réussite!",
+          "nodeConnect": {
+            "description": "Votre node est connecté!"
+          },
+          "createWallet": {
+            "button": "Créer un portefeuille"
+          }
+        },
+        "errorModalPopup": {
+          "title": "Une erreur est survenue!"
+        }
+      },
+      "welcome": {
+        "button": "Commencer"
+      },
+      "signup": {
+        "button1": "Restaurer Portefeuille",
+        "button2": "Créer Portefeuille"
+      },
+      "create": {
+        "title1": "Créer Portefeuille",
+        "title2": "Configuration personnalisé",
+        "formCustomConfig": {
+          "nodeUrl": {
+            "label": "Node Url "
+          },
+          "indexingUrl": {
+            "label": "Indéxeur URL"
+          },
+          "chainId": {
+            "label": "Chain Id"
+          }
         }
       },
       "home": {
         "title": "Bienvenue de nouveau"
       },
+      "nft": {
+        "modal1": {
+          "title": "Confirme Creation du NFT"
+        }
+      },
       "settings": {
+        "message": {
+          "success3": "Portefeuilles"
+        },
         "language": {
           "title": "Langue"
         },
@@ -2110,8 +2186,14 @@
           "title": "Analytique Google",
           "description": "Analytique Google"
         },
+        "exportRecoveryPhrase": {
+          "button": "Exporter"
+        },
         "clearStorage": {
+          "button1": "Nettoyer les données",
           "modal": {
+            "title": "Confirmer le nettoyage des données",
+            "warning": "Êtes vous sûr de vouloir nettoyer vos données? Si la phrase mnémonique n'a pas été sauvegarder, les fonds ne seront pas récupérables",
             "disclaimer": "Je comprend que la seule manière de récupérer le compte est de restaurer la phrase mnémonique du portefeuille.",
             "form1": {
               "clear": {
@@ -2134,11 +2216,11 @@
         "continue": "계속",
         "cancel": "취소",
         "save": "저장",
-        "discard": "변경사항 폐기",
+        "discard": "변경사항 버리기",
         "ok": "확인",
         "required": "필수",
         "cannot0": "0이 될 수 없음",
-        "validator": "밸리데이터",
+        "validator": "검증인",
         "receiving": "수신 중",
         "available": "가능",
         "action": "활동",
@@ -2246,6 +2328,11 @@
             "description": "NFT 발행에 실패했습니다. 잠시 후에 다시 시도해주세요"
           },
           "ledgerExportMode": "레져 전문가 모드를 켜주세요"
+        },
+        "table": {
+          "triggerDesc": "내림차순으로 정렬",
+          "triggerAsc": "오름차순 정렬",
+          "cancelSort": "정렬 취소"
         }
       },
       "welcome": {
@@ -2283,7 +2370,7 @@
             "error1": "정확한 HD 경로를 입력하세요"
           },
           "validatorPrefix": {
-            "label": "밸리데이터 프리픽스"
+            "label": "검증인 프리픽스"
           },
           "addressPrefix": {
             "label": "주소 프리픽스"
@@ -2292,10 +2379,10 @@
             "label": "체인 ID"
           },
           "baseDenom": {
-            "label": "기본 디놈"
+            "label": "기본 단위"
           },
           "croDenom": {
-            "label": "CRO 디놈"
+            "label": "CRO 단위"
           }
         },
         "notification": {
@@ -2350,19 +2437,19 @@
             "error1": "유효한 파생 경로를 입력하세요"
           },
           "validatorPrefix": {
-            "label": "밸리데이터 프리픽스"
+            "label": "검증인 프리픽스"
           },
           "addressPrefix": {
-            "label": "어드레스 프리픽스"
+            "label": "주소 프리픽스"
           },
           "chainId": {
             "label": "체인 ID"
           },
           "baseDenom": {
-            "label": "베이스 디놈"
+            "label": "기본 단위"
           },
           "croDenom": {
-            "label": "CRO 디놈 "
+            "label": "CRO 단위"
           }
         },
         "formRestore": {
@@ -2456,18 +2543,18 @@
             "status": "상태"
           },
           "table2": {
-            "validatorAddress": "밸리데이터 주소",
+            "validatorAddress": "검증인 주소",
             "stakedAmountWithSymbol": "스테이킹 금액",
-            "delegatorAddress": "델리게이터 주소",
-            "undelegateAction": "위임 해제",
+            "delegatorAddress": "위임인 주소",
+            "undelegateAction": "위임 취소",
             "redelegateAction": "위임 변경",
-            "action1": "위임 해제 스테이크",
+            "action1": "위임 취소 스테이크",
             "action2": "위임 변경 스테이크"
           },
           "table3": {
             "transactionHash": "트랜잭션 해쉬",
             "messageType": "종류",
-            "denomId": "디놈 ID",
+            "denomId": "화폐명칭 ID",
             "tokenId": "토큰 ID",
             "recipientAddress": "수신인",
             "time": "시간"
@@ -2536,8 +2623,8 @@
         "title": "스테이킹",
         "tab1": "스테이킹 보상",
         "tab2": "금액 위임",
-        "description1": "위임된 금액에서 보상을 인출하세요",
-        "description2": "밸리데이터에게 금액을 위임합니다",
+        "description1": "위임된 금액에서 보상을 인출합니다",
+        "description2": "검증인에게 금액을 위임합니다",
         "maxValidator": {
           "error": "스테이킹 금액이 사용 가능한 지갑 잔액을 초과합니다."
         },
@@ -2546,8 +2633,8 @@
         },
         "validatorList": {
           "table": {
-            "title": "밸리데이터 리스트",
-            "description": "밸리데이터를 선택하세요",
+            "title": "검증인 리스트",
+            "description": "검증인을 선택하세요",
             "validatorName": "이름",
             "validatorWebsite": "웹사이트",
             "validatorAddress": "주소",
@@ -2565,11 +2652,11 @@
         },
         "formDelegation": {
           "validatorAddress": {
-            "label": "밸리데이터 주소",
-            "placeholder": "밸리데이터 주소 입력"
+            "label": "검증인 주소",
+            "placeholder": "검증인 주소 입력"
           },
           "amount": {
-            "label": "위임 금액"
+            "label": "위임된 금액"
           },
           "checkbox1": "메모를 보시겠습니까?",
           "memo": {
@@ -2580,7 +2667,7 @@
           "title": "거래 확인",
           "description": "아래 정보를 확인하세요",
           "label1": "송신인 주소",
-          "label2": "밸리데이터에게 위임하기",
+          "label2": "검증인에게 위임하기",
           "label3": "금액",
           "label4": "메모"
         },
@@ -2588,7 +2675,7 @@
           "title": "거래 확인",
           "description": "아래 정보를 확인하세요",
           "label1": "송신인 주소",
-          "label2": "밸리데이터로부터 보상 인출하기",
+          "label2": "검증인로부터 보상 인출하기",
           "label3": "보상"
         }
       },
@@ -2624,7 +2711,7 @@
         "tab1": "NFT 컬렉션",
         "tab2": "NFT 발행",
         "container": {
-          "description": "Crypto.org 체인에서 이미지 또는 비디오로 NFT를 발행하십시오."
+          "description": "Crypto.org 체인에서 이미지 또는 비디오로 NFT를 발행하세요"
         },
         "fileUploadValidator": {
           "error1": "파일 업로드는 필수 항목입니다.",
@@ -2648,7 +2735,7 @@
         },
         "formMintNft": {
           "denomId": {
-            "label": "디놈 ID",
+            "label": "화폐명칭 ID",
             "placeholder": "예제",
             "error1": "예상 길이",
             "error2": "그리고",
@@ -2682,13 +2769,13 @@
         "modal1": {
           "title": "NFT 발행 확인",
           "description": "아래 정보를 검토하십시오.",
-          "label1": "디놈 ID",
+          "label1": "화폐명칭 ID",
           "label2": "토큰 ID",
           "label3": "이름 삭제",
           "label4": "설명 삭제",
           "label5": "거래 수수료",
-          "notice1": "디놈 ID가 다른 주소로 등록되었습니다.",
-          "notice2": "잔액 부족, 최소 잔액을 확인해 주세요.",
+          "notice1": "화폐명칭 ID가 다른 주소로 등록되었습니다.",
+          "notice2": " 잔고가 부족합니다. 잔고를 다시 확인해 주세요.",
           "notice3": "네트워크 수수료",
           "notice4": "이 NFT는 Crypto.org 체인에서 발행됩니다."
         },
@@ -2696,7 +2783,7 @@
           "title": "거래 확인",
           "description": "아래 정보를 확인해주세요",
           "label1": "에게",
-          "label2": "디놈 ID",
+          "label2": "화폐명칭 ID",
           "label3": "토큰 ID",
           "label4": "거래 수수료",
           "notice1": "이 NFT는 Crypto.org 체인에서 발행됩니다.",
@@ -2716,7 +2803,7 @@
         "nftCollection": {
           "table1": {
             "name": "이름 삭제",
-            "denomId": "디놈 ID",
+            "denomId": "화폐명칭 ID",
             "tokenId": "토큰 ID",
             "creator": "창작자",
             "viewAction": "활동",
@@ -2725,8 +2812,8 @@
         },
         "detailModal": {
           "subtitle": "삭제에 대해",
-          "label1": "디놈 ID",
-          "label2": "디놈 이름",
+          "label1": "화폐명칭 ID",
+          "label2": "화폐명칭 이름",
           "label3": "토큰 ID",
           "label4": "콘텐츠 URL",
           "button1": "NFT 전송",
@@ -2822,32 +2909,165 @@
       "general": {
         "enabled": "सक्षम ",
         "disabled": "असक्षम   ",
-        "confirm": "पुष्टि करें "
+        "confirm": "पुष्टि करें ",
+        "continue": "जारी रखें",
+        "cancel": "रद्द करें ",
+        "save": "बचाये ",
+        "discard": "परिवर्तन त्यागें",
+        "ok": "ठीके ",
+        "required": "आवश्यक है",
+        "cannot0": "0 नहीं हो सकता ",
+        "receiving": "प्राप्त",
+        "available": "उपलब्ध",
+        "action": "कार्य",
+        "select": "चुनाव करें "
       }
     }
   },
   "esES": {
-    "translation": {}
+    "translation": {
+      "language": "Español",
+      "general": {
+        "enabled": "Habilitar",
+        "disabled": "Deshabilitar",
+        "confirm": "Confirmar",
+        "continue": "Continuar",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "discard": "Descartar",
+        "ok": "Ok",
+        "required": "Requerido",
+        "validator": "Validador",
+        "receiving": "Recibiendo",
+        "available": "Disponible",
+        "action": "Accion",
+        "select": "Seleccionar",
+        "review": "Revisar",
+        "copy": "Copiar",
+        "close": "Cerrar",
+        "connect": "Connectar",
+        "addressValidator": {
+          "reason1": "Invalido"
+        }
+      }
+    }
   },
   "trTR": {
     "translation": {
       "language": "Türkçe",
       "general": {
-        "enabled": "Etkinleştir"
+        "enabled": "Etkinleştir",
+        "disabled": "Etkisizleştir",
+        "confirm": "Onayla",
+        "continue": "Devam et",
+        "cancel": "Iptal et",
+        "save": "Kaydet",
+        "discard": "Değişiklikleri yoksay",
+        "ok": "Tamam",
+        "required": "Gerekli",
+        "cannot0": "0 olamaz",
+        "validator": "Onaylayıcı",
+        "receiving": "Alma",
+        "available": "Mevcut",
+        "action": "Aksiyon",
+        "select": "Seç",
+        "review": "gözden geçir",
+        "copy": "Kopyala",
+        "close": "Kapat",
+        "connect": "Bağlan",
+        "addressValidator": {
+          "reason1": "Geçersiz",
+          "reason2": "Adres sağlandı"
+        },
+        "validTransactionAmountValidator": {
+          "reason": "Geçersiz gönderim miktarı"
+        },
+        "passwordFormModal": {
+          "title": "Uygulama şifresini girin",
+          "description": "Cüzdanı açmak icin App şifresini girin",
+          "error": "Geçersiz şifre. Lütfen tekrar deneyiniz",
+          "success": "Cüzdan başarılı bir şekilde açıldı!",
+          "okButton": "Cüzdan şifresini çöz",
+          "createWallet": {
+            "description": "Oluşturulan cüzdanı şifrelemek için uygulama şifresini girin",
+            "okButton": "Cüzdanı şifrele",
+            "success": "Cüzdan başarılı bir şekilde oluşturuldu ve şifrelendi!",
+            "successButton": "Ana menüye dön"
+          },
+          "restoreWallet": {
+            "description": "Cüzdanı şifrelemek için uygulama şifresini girin",
+            "okButton": "Cüzdanı şifrele",
+            "success": "Cüzdan başarılı bir şekilde yeniden kuruldu ve şifrelendi",
+            "successButton": "Ana menüye dön"
+          }
+        },
+        "successModalPopup": {
+          "title": "İşlem başarılı!"
+        }
       }
     }
-  },
-  "jaJP": {
-    "translation": {}
   },
   "viVN": {
     "translation": {}
   },
   "igNG": {
-    "translation": {}
+    "translation": {
+      "language": "igbo"
+    }
   },
   "arAE": {
-    "translation": {}
+    "translation": {
+      "language": "العربية",
+      "general": {
+        "save": "احفظ",
+        "ok": "نعم",
+        "required": "مطلوب",
+        "available": "متاح",
+        "select": "اختار",
+        "review": "مراجعة",
+        "copy": "نسخ",
+        "addressValidator": {
+          "reason1": "غير صالح",
+          "reason2": "تم تقديم العنوان"
+        },
+        "validTransactionAmountValidator": {
+          "reason": "مبلغ الإرسال غير صالح"
+        },
+        "passwordFormModal": {
+          "title": "أدخل كلمة مرور التطبيق",
+          "success": "تم فك تشفير المحفظة بنجاح!",
+          "okButton": "فك تشفير المحفظة",
+          "createWallet": {
+            "okButton": "قم بتشفير المحفظة",
+            "successButton": "اذهب إلى الصفحة الرئيسية"
+          },
+          "restoreWallet": {
+            "successButton": "اذهب إلى الصفحة الرئيسية"
+          }
+        },
+        "successModalPopup": {
+          "title": "نجاح!",
+          "timeout": {
+            "description": "انتهت مهلة المعاملة ولكن سيتم تضمينها في الكتل اللاحقة"
+          },
+          "nodeConnect": {
+            "description": "العقدة الخاصة بك متصلة!"
+          },
+          "createWallet": {
+            "description": "تم إنشاء المحفظة الخاصة بك!"
+          },
+          "transfer": {
+            "description": "تم بث المعاملة بنجاح!"
+          },
+          "staking": {
+            "description": "تم بث معاملة Staking بنجاح!"
+          },
+          "reward": {
+            "description": "تم بث معاملة سحب المكافآت الخاصة بك بنجاح!"
+          }
+        }
+      }
+    }
   },
   "deDE": {
     "translation": {
@@ -2863,14 +3083,187 @@
         "ok": "Ok",
         "required": "ist erforderlich",
         "cannot0": "kann nicht 0 sein",
-        "validator": "Prüfer",
+        "validator": "Validator",
         "receiving": "empfangend",
         "available": "Verfügbar",
         "action": "Action",
         "select": "Auswählen",
         "review": "Überprüfung",
         "copy": "Kopierien",
-        "close": "Schließen"
+        "close": "Schließen",
+        "connect": "Verbinden",
+        "addressValidator": {
+          "reason1": "Ungültig",
+          "reason2": "Adresse"
+        },
+        "validTransactionAmountValidator": {
+          "reason": "Ungültiger schickender Betrag"
+        },
+        "passwordFormModal": {
+          "title": "Geben Sie Ihr Passwort ein",
+          "description": "Geben Sie Ihr Passwort ein, um die Wallet zu entschlüsseln",
+          "error": "Falsches Passwort. Bitte geben Sie Ihr Passwort erneut ein.",
+          "success": "Ihre Wallet wird erfolgreich entschlüsselt!",
+          "okButton": "Ihre Wallet entschlüsseln",
+          "createWallet": {
+            "description": "Geben Sie Ihr Passwort ein, um Ihre Wallet, die erstellt wird, zu verschlüsseln",
+            "okButton": "Ihre Wallet verschlüsseln",
+            "success": "Ihre Wallet wurde erfolgreich erstellt und verschlüsselt!",
+            "successButton": "Hauptseite"
+          },
+          "restoreWallet": {
+            "description": "Geben Sie Ihr Passwort ein, um Ihre Wallet, die wiederhergestellt wird, zu verschlüsseln",
+            "okButton": "Verschlüsseln Ihre Wallet",
+            "success": "Ihre Wallet wurde erfolgreich wiedergestellt und verschlüsselt!",
+            "successButton": "Hauptseite"
+          }
+        },
+        "successModalPopup": {
+          "title": "Erflog!",
+          "timeout": {
+            "description": "Die Transaktion hat ein Timeout. Sie wird im folgenden Block gesammelt"
+          },
+          "nodeConnect": {
+            "description": "Ihr Knoten ist angeschlossen!"
+          },
+          "createWallet": {
+            "description": "Ihre Wallet wurde erstellt!",
+            "button": "Erstellen Ihre Wallet"
+          },
+          "transfer": {
+            "description": "Die Transaktion wurde erfolgreich übergetragen!"
+          },
+          "staking": {
+            "description": "Die Staking Transaktion wurde erfolgreich übergetragen!"
+          },
+          "reward": {
+            "description": "Ihre Belohnungsabhebung Transaktion wurde erfolgreich übergetragen!"
+          },
+          "undelegation": {
+            "description": "Ihre Undelegation Transaktion war erfolgreich"
+          },
+          "redelegation": {
+            "description": "Ihre Redelegation Transaktion war erfolgreich"
+          },
+          "vote": {
+            "description": "Ihre Stimme wurde erfolgreich übergetragen."
+          },
+          "nftTransfer": {
+            "description": "Ihre NFT Transaktion wurde erfolgreich übergetragen!"
+          },
+          "nftMint": {
+            "description": "Ihr NFT wurde erfolgreich geprägt!"
+          }
+        },
+        "errorModalPopup": {
+          "title": "Ein Fehler ist aufgetreten!"
+        }
+      },
+      "welcome": {
+        "button": "Los geht's"
+      },
+      "signup": {
+        "button1": "Wallet wiederstellen",
+        "button2": "Wallet erstellen"
+      },
+      "create": {
+        "title1": "Wallet erstellen",
+        "formCustomConfig": {
+          "nodeUrl": {
+            "label": "Knoten URL"
+          },
+          "chainId": {
+            "label": "Chain ID"
+          }
+        },
+        "addressIndexValidator": {
+          "error": "Walletsname"
+        },
+        "formCreate": {
+          "name": {
+            "label": "Walletsart"
+          }
+        },
+        "ledgerModalPopup": {
+          "title1": "Erfolgreich!"
+        }
+      },
+      "navbar": {
+        "home": "Hauptseite"
+      },
+      "home": {
+        "transactions": {
+          "table2": {
+            "undelegateAction": "Undelegieren",
+            "redelegateAction": "Redelegieren"
+          },
+          "table3": {
+            "recipientAddress": "Empfäger",
+            "time": "Zeit"
+          }
+        }
+      },
+      "send": {
+        "title": "Senden",
+        "modal1": {
+          "label3": "Betrag"
+        }
+      },
+      "governance": {
+        "modal1": {
+          "label3": "Stimme"
+        }
+      },
+      "nft": {
+        "title": "Mein NFT",
+        "tab1": "NFT Sammlung",
+        "tab2": "NFT prägen",
+        "formMintNft": {
+          "denomId": {
+            "placeholder": "z. B."
+          },
+          "tokenId": {
+            "placeholder": "z. B."
+          },
+          "drop": {
+            "placeholder": "z. B."
+          },
+          "description": {
+            "placeholder": "z. B."
+          }
+        },
+        "modal2": {
+          "label1": "An"
+        }
+      },
+      "settings": {
+        "title": "Einstellungen",
+        "form1": {
+          "checkbox1": {
+            "description2": "Wallets"
+          }
+        },
+        "message": {
+          "success3": "Wallets"
+        },
+        "notification": {
+          "recover": {
+            "message": "Wiederherstellungsphrase kopiert"
+          }
+        },
+        "language": {
+          "title": "Sprache"
+        },
+        "clearStorage": {
+          "modal": {
+            "form1": {
+              "clear": {
+                "label": "Bitte geben Sie ein",
+                "error1": "Bitte geben Sie ein"
+              }
+            }
+          }
+        }
       }
     }
   }

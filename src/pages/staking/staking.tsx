@@ -25,7 +25,7 @@ import {
 import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
+import { FIXED_DEFAULT_FEE, TABLE_LOCALE } from '../../config/StaticConfig';
 import {
   adjustedTransactionAmount,
   fromScientificNotation,
@@ -352,6 +352,7 @@ const FormDelegationRequest = () => {
           <div className="description">{t('staking.validatorList.table.description')}</div>
           <div className="item">
             <Table
+              locale={TABLE_LOCALE}
               dataSource={validatorTopList}
               columns={validatorColumns}
               pagination={{ showSizeChanger: false }}
@@ -730,6 +731,7 @@ const FormWithdrawStakingReward = () => {
   const StakingTable = () => {
     return (
       <Table
+        locale={TABLE_LOCALE}
         columns={rewardColumns}
         dataSource={rewards}
         onRow={record => {
