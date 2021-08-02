@@ -500,7 +500,7 @@ const FormDelegationRequest = () => {
           isModalVisible={isSuccessTransferModalVisible}
           handleCancel={closeSuccessModal}
           handleOk={closeSuccessModal}
-          title="Success!"
+          title={t('general.successModalPopup.title')}
           button={null}
           footer={[
             <Button key="submit" type="primary" onClick={closeSuccessModal}>
