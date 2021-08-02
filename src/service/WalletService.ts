@@ -38,8 +38,8 @@ import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
   NftAccountTransactionData,
-  NftModel,
   NftDenomModel,
+  NftModel,
   NftQueryParams,
   NftTransferModel,
   ProposalModel,
@@ -861,10 +861,14 @@ class WalletService {
       currentSession.wallet.identifier,
     );
 
-    return assets.map(data => {
+    const legacyAssets = assets.map(data => {
       const asset: UserAsset = { ...data };
       return asset;
     });
+
+    // TODO : In the future we might need to re-think how to recreate new added assets on existing wallets
+
+    return currentSession.wallet.assets || legacyAssets;
   }
 
   public async retrieveDefaultWalletAsset(currentSession: Session): Promise<UserAsset> {
