@@ -28,7 +28,7 @@ export const CRONOS_ASSET = (network: Network) => {
     balance: '0',
     description: '',
     icon_url:
-      'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c1248c15568a4017c20aa87/cro.png',
+      'https://firebasestorage.googleapis.com/v0/b/chain-desktop-wallet.appspot.com/o/cronos_logo.png?alt=media&token=781c48a3-e89e-4dd4-87d3-d1a1b8e2e456',
     identifier: getRandomId(),
     name: 'Cronos Coin',
     symbol: 'CRONOS',

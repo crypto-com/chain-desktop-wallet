@@ -15,7 +15,7 @@ describe('Testing WalletImporter', () => {
         'ramp sock spice enrich exhibit skate empower process kit pudding olive mesh friend camp labor coconut devote shell argue system pig then provide nose',
       walletName: 'My-TestNet-Wallet',
     };
-    const testNetWallet = WalletImporter.import(importOptions);
+    const testNetWallet = new WalletImporter(importOptions).import();
 
     expect(testNetWallet.name).to.eq('My-TestNet-Wallet');
     expect(testNetWallet.address).to.eq('tcro15rsn69ze9r7g52tk0u6cyhu4edep88dxgtzm65');
@@ -33,7 +33,7 @@ describe('Testing WalletImporter', () => {
         'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone',
       walletName: 'My-MainNet-Wallet',
     };
-    const testNetWallet = WalletImporter.import(importOptions);
+    const testNetWallet = new WalletImporter(importOptions).import();
 
     expect(testNetWallet.name).to.eq('My-MainNet-Wallet');
     expect(testNetWallet.address).to.eq('cro1n0ejfh2ur2nslekrynvcwuwc9cccnhxfqn6sfs');
@@ -78,7 +78,7 @@ describe('Testing WalletImporter', () => {
       config: customConfig,
       walletName: 'My-Custom-Config-Wallet',
     };
-    const customWallet = WalletImporter.import(importOptions);
+    const customWallet = new WalletImporter(importOptions).import();
 
     expect(customWallet.address).to.eq('pcro1fdu6qgn3r4ptsx8z6v5hr5dsjvkjw6jkyrphvx');
     expect(customWallet.config).to.eq(customConfig);

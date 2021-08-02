@@ -563,32 +563,16 @@ class WalletService {
     ];
   }
 
-  // public async persistInitialAssets(walletId: string, network: Network) {
-  //   const croAsset: UserAsset = {
-  //     ...CRO_ASSET(network),
-  //     walletId,
-  //   };
-  //
-  //   // const cronosAsset: UserAsset = {
-  //   //   ...CRONOS_ASSET(network),
-  //   //   walletId,
-  //   // };
-  //
-  //   // await Promise.all([
-  //   await this.storageService.saveAsset(croAsset);
-  //   // ])
-  // }
-
   // Import or restore wallet and persist it on the db
   public async restoreAndSaveWallet(importOptions: WalletImportOptions): Promise<Wallet> {
-    const importedWallet = WalletImporter.import(importOptions);
+    const importedWallet = new WalletImporter(importOptions).import();
     await this.persistWallet(importedWallet);
     return importedWallet;
   }
 
   // eslint-disable-next-line class-methods-use-this
   public async restoreWallet(importOptions: WalletImportOptions): Promise<Wallet> {
-    return WalletImporter.import(importOptions);
+    return new WalletImporter(importOptions).import();
   }
 
   // Load all persisted wallets
