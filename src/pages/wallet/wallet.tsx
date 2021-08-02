@@ -17,7 +17,7 @@ import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
 import { LEDGER_WALLET_TYPE, NORMAL_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
-import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import { DefaultWalletConfigs, TABLE_LOCALE } from '../../config/StaticConfig';
 import IconLedger from '../../svg/IconLedger';
 import IconWallet from '../../svg/IconWallet';
 
@@ -262,6 +262,7 @@ function WalletPage() {
               />
             </div>
             <Table
+              locale={TABLE_LOCALE}
               dataSource={processedWalletList}
               columns={columns}
               loading={{

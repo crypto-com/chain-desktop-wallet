@@ -24,7 +24,8 @@
     "esModuleInterop": true ,
     "outDir": "./build",
     "typeRoots": ["node_modules/@types"],
-    "experimentalDecorators": true 
+    "experimentalDecorators": true,
+    "resolveJsonModule": true
   },
   "include": [
     "src/**/*",

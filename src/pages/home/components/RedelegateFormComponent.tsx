@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { FormInstance } from 'antd/lib/form';
 import { Form, InputNumber, Alert, Table, Input } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { OrderedListOutlined } from '@ant-design/icons';
 import numeral from 'numeral';
 import Big from 'big.js';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { validatorListState, fetchingDBState } from '../../../recoil/atom';
+import { TABLE_LOCALE } from '../../../config/StaticConfig';
 import { Session } from '../../../models/Session';
 import { UserAsset, scaledAmount } from '../../../models/UserAsset';
 import { ValidatorModel } from '../../../models/Transaction';
@@ -31,11 +33,13 @@ const RedelegateFormComponent = (props: {
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
   const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
 
+  const [t] = useTranslation();
+
   const redelegatePeriod = props.currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
 
   const validatorColumns = [
     {
-      title: 'Name',
+      title: t('staking.validatorList.table.validatorName'),
       dataIndex: 'validatorName',
       key: 'validatorName',
       render: (validatorName, record) => (
@@ -50,7 +54,7 @@ const RedelegateFormComponent = (props: {
       ),
     },
     {
-      title: 'Website',
+      title: t('staking.validatorList.table.validatorWebsite'),
       dataIndex: 'validatorWebSite',
       key: 'validatorWebSite',
       render: validatorWebSite => {
@@ -69,7 +73,7 @@ const RedelegateFormComponent = (props: {
       },
     },
     {
-      title: 'Address',
+      title: t('staking.validatorList.table.validatorAddress'),
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
       render: validatorAddress => (
@@ -85,7 +89,7 @@ const RedelegateFormComponent = (props: {
       ),
     },
     {
-      title: 'Voting Power',
+      title: t('staking.validatorList.table.currentTokens'),
       dataIndex: 'currentTokens',
       key: 'currentTokens',
       sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
@@ -100,7 +104,7 @@ const RedelegateFormComponent = (props: {
       },
     },
     {
-      title: 'Commission',
+      title: t('staking.validatorList.table.currentCommissionRate'),
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
       sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
@@ -109,7 +113,7 @@ const RedelegateFormComponent = (props: {
       ),
     },
     {
-      title: 'Action',
+      title: t('general.action'),
       key: 'action',
       render: record => (
         <a
@@ -120,7 +124,7 @@ const RedelegateFormComponent = (props: {
             });
           }}
         >
-          Select
+          {t('general.select')}
         </a>
       ),
     },
@@ -133,7 +137,7 @@ const RedelegateFormComponent = (props: {
   );
   const customMaxValidator = TransactionUtils.maxValidator(
     props.redelegateFormValues.redelegateAmount,
-    'Undelegate amount cannot be bigger than currently delegated',
+    t('general.redelegateFormComponent.maxValidator.error'),
   );
 
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
@@ -170,10 +174,11 @@ const RedelegateFormComponent = (props: {
           okText="Confirm"
           width={1000}
         >
-          <div className="title">Validator List</div>
-          <div className="description">Please select one of the validator.</div>
+          <div className="title">{t('staking.validatorList.table.title')}</div>
+          <div className="description">{t('staking.validatorList.table.description')}</div>
           <div className="item">
             <Table
+              locale={TABLE_LOCALE}
               dataSource={validatorTopList}
               columns={validatorColumns}
               pagination={{ showSizeChanger: false }}
@@ -181,14 +186,14 @@ const RedelegateFormComponent = (props: {
           </div>
         </ModalPopup>
       </>
-      <div className="title">Confirm Redelegate Transaction</div>
-      <div className="description">Please review the below information.</div>
+      <div className="title">{t('general.redelegateFormComponent.title')}</div>
+      <div className="description">{t('general.redelegateFormComponent.description')}</div>
       <div className="item">
-        <div className="label">Sender Address</div>
+        <div className="label">{t('general.redelegateFormComponent.label1')}</div>
         <div className="address">{`${props.currentSession.wallet.address}`}</div>
       </div>
       <div className="item">
-        <div className="label">Source Validator</div>
+        <div className="label">{t('general.redelegateFormComponent.label2')}</div>
         <div className="address">{`${props.redelegateFormValues?.validatorOriginAddress}`}</div>
       </div>
       <div className="item">
@@ -202,30 +207,44 @@ const RedelegateFormComponent = (props: {
         >
           <Form.Item
             name="validatorDestinationAddress"
-            label="Validator address"
+            label={t('general.redelegateFormComponent.table.validatorDestinationAddress.label')}
             hasFeedback
             validateFirst
             rules={[
-              { required: true, message: 'Validator address is required' },
+              {
+                required: true,
+                message: `${t(
+                  'general.redelegateFormComponent.table.validatorDestinationAddress.label',
+                )} ${t('general.required')}`,
+              },
               customAddressValidator,
             ]}
             className="input-validator-address"
           >
             <Search
-              placeholder="Enter validator address"
+              placeholder={t(
+                'general.redelegateFormComponent.table.validatorDestinationAddress.placeholder',
+              )}
               enterButton={<OrderedListOutlined />}
               onSearch={() => setIsValidatorListVisible(true)}
             />
           </Form.Item>
           <Form.Item
             name="redelegateAmount"
-            label="Redelegate Amount"
+            label={t('general.redelegateFormComponent.table.redelegateAmount.label')}
             validateFirst
             rules={[
-              { required: true, message: 'Undelegate amount is required' },
+              {
+                required: true,
+                message: `${t('general.redelegateFormComponent.table.redelegateAmount.label')} ${t(
+                  'general.required',
+                )}`,
+              },
               {
                 pattern: /[^0]+/,
-                message: 'Undelegate amount cannot be 0',
+                message: `${t('general.redelegateFormComponent.table.redelegateAmount.label')} ${t(
+                  'general.cannot0',
+                )}`,
               },
               customMaxValidator,
             ]}
@@ -237,7 +256,9 @@ const RedelegateFormComponent = (props: {
       <div>
         <Alert
           type="info"
-          message={`Funds can be redelegated once every ${redelegatePeriod} days. At any time, one account can only have at most 7 records of redelegation and unbonding that is in the ${redelegatePeriod} days effective unbonding periods.`}
+          message={`${t('general.redelegateFormComponent.alert1.message1')} ${redelegatePeriod} ${t(
+            'general.redelegateFormComponent.alert1.message2',
+          )} (${redelegatePeriod} ${t('general.redelegateFormComponent.alert1.message3')})`}
           showIcon
         />
       </div>
