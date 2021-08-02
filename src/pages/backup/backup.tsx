@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import './backup.less';
 import { Button, Checkbox } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import MouseTooltip from 'react-sticky-mouse-tooltip';
 import { walletIdentifierState, walletTempBackupState } from '../../recoil/atom';
@@ -13,7 +14,7 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
-function BackupPage() {
+const BackupPage = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [goHomeButtonLoading, setGoHomeButtonLoading] = useState(false);
   const [mouseTooltip, setMouseTooltip] = useState(false);
@@ -21,9 +22,11 @@ function BackupPage() {
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const walletIdentifier: string = useRecoilValue(walletIdentifierState);
   const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(walletTempBackupState);
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const didMountRef = useRef(false);
   const history = useHistory();
-  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+
+  const [t] = useTranslation();
 
   const handleOk = () => {
     setInputPasswordVisible(true);
@@ -89,11 +92,8 @@ function BackupPage() {
       </div>
       <div className="container">
         <div>
-          <div className="title">Backup Recovery Phrase</div>
-          <div className="slogan">
-            The recovery phrase will only be shown once, backup the 24-word phrase now and keep it
-            safe. You would need your recovery phrase to restore and access wallet.
-          </div>
+          <div className="title">{t('backup.title')}</div>
+          <div className="slogan">{t('backup.slogan')}</div>
           <div>
             <CopyToClipboard text={wallet?.encryptedPhrase}>
               <div onClick={onCopyClick}>
@@ -112,19 +112,17 @@ function BackupPage() {
                   offsetY={0}
                   className={`mouse-tooltip ${mouseTooltip ? '' : 'hide'}`}
                 >
-                  <span>Copied!</span>
+                  <span>{t('backup.copyButton')}</span>
                 </MouseTooltip>
               </div>
             </CopyToClipboard>
 
             <div>
-              <Checkbox onChange={checkboxOnChange}>
-                I understand the recovery phrase will be only shown once
-              </Checkbox>
+              <Checkbox onChange={checkboxOnChange}>{t('backup.checkbox')}</Checkbox>
             </div>
             <div>
               <Button key="submit" type="primary" disabled={isButtonDisabled} onClick={handleOk}>
-                I have written down my recovery phrase
+                {t('backup.button')}
               </Button>
             </div>
           </div>
@@ -132,16 +130,16 @@ function BackupPage() {
             isModalVisible={isErrorModalVisible}
             handleCancel={handleErrorCancel}
             handleOk={handleErrorCancel}
-            title="An error happened!"
+            title={t('general.errorModalPopup.title')}
             footer={[]}
           >
             <>
-              <div className="description">Please try again.</div>
+              <div className="description">{t('general.errorModalPopup.backup.description')}</div>
             </>
           </ErrorModalPopup>
           <PasswordFormModal
-            description="Input the app password to encrypt the wallet to be restored"
-            okButtonText="Encrypt wallet"
+            description={t('general.passwordFormModal.createWallet.description')}
+            okButtonText={t('general.passwordFormModal.createWallet.okButton')}
             isButtonLoading={goHomeButtonLoading}
             onCancel={() => {
               setInputPasswordVisible(false);
@@ -151,19 +149,19 @@ function BackupPage() {
               const isValid = await secretStoreService.checkIfPasswordIsValid(password);
               return {
                 valid: isValid,
-                errMsg: !isValid ? 'The password provided is incorrect, Please try again' : '',
+                errMsg: !isValid ? t('general.passwordFormModal.error') : '',
               };
             }}
-            successText="Wallet created and encrypted successfully !"
-            title="Provide app password"
+            successText={t('general.passwordFormModal.createWallet.success')}
+            title={t('general.passwordFormModal.title')}
             visible={inputPasswordVisible}
-            successButtonText="Go to Home"
+            successButtonText={t('general.passwordFormModal.createWallet.successButton')}
             confirmPassword={false}
           />
         </div>
       </div>
     </main>
   );
-}
+};
 
 export default BackupPage;

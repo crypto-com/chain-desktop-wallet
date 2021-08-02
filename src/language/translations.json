@@ -29,6 +29,26 @@
         "validTransactionAmountValidator": {
           "reason": "Invalid sending amount"
         },
+        "passwordForm": {
+          "password": {
+            "label": "App Password",
+            "placeholder": "Enter App Password",
+            "error1": "The password should be at least 8 character containing a letter, a number and a special character"
+          },
+          "passwordConfirm": {
+            "label": "Confirm App Password",
+            "placeholder": "Confirm App Password",
+            "error1": "The Confirm App Password doesn't match"
+          },
+          "passwordStrength": {
+            "title": "Password Strength:",
+            "worst": "worst",
+            "bad": "bad",
+            "weak": "weak",
+            "good": "good",
+            "strong": "strong"
+          }
+        },
         "passwordFormModal": {
           "title": "Provide app password",
           "description": "Input the app password decrypt wallet",
@@ -95,6 +115,9 @@
           },
           "restoreWallet": {
             "description": "Your Mnemonic Phrase is invalid. Please check again."
+          },
+          "backup": {
+            "description": "Please try again."
           },
           "transfer": {
             "description": "The transfer transaction failed. Please try again later."
@@ -259,6 +282,13 @@
           "button": "Restore Wallet"
         }
       },
+      "backup": {
+        "title": "Backup Recovery Phrase",
+        "slogan": "The recovery phrase will only be shown once, backup the 24-word phrase now and keep it safe. You would need your recovery phrase to restore and access wallet.",
+        "copyButton": "Recovery Phrases Copied!",
+        "checkbox": "I understand the recovery phrase will be only shown once",
+        "button": "I have written down my recovery phrase"
+      },
       "navbar": {
         "home": "Home",
         "staking": "Staking",
@@ -376,7 +406,7 @@
         "formSend": {
           "recipientAddress": {
             "label": "Recipient Address",
-            "placeholder": "Enter recipient address"
+            "placeholder": "Enter Recipient Address"
           },
           "amount": {
             "label": "Sending Amount",
@@ -726,6 +756,26 @@
         "validTransactionAmountValidator": {
           "reason": "無效的轉賬款項"
         },
+        "passwordForm": {
+          "password": {
+            "label": "密碼",
+            "placeholder": "輸入密碼",
+            "error1": "密碼需要至少8個字母，並包括英文字母、數字及特殊符號各一。"
+          },
+          "passwordConfirm": {
+            "label": "確認密碼",
+            "placeholder": "確認密碼",
+            "error1": "密碼不對應"
+          },
+          "passwordStrength": {
+            "title": "密碼強度：",
+            "worst": "最差",
+            "bad": "差",
+            "weak": "弱",
+            "good": "良好",
+            "strong": "強"
+          }
+        },
         "passwordFormModal": {
           "title": "輸入密碼",
           "description": "請輸入密碼以解鎖錢包",
@@ -793,6 +843,9 @@
           "restoreWallet": {
             "description": "你的助記詞無效。請再次檢查。"
           },
+          "backup": {
+            "description": "請再試一次。"
+          },
           "transfer": {
             "description": "轉賬交易失敗。請稍後再試。"
           },
@@ -830,15 +883,15 @@
         "button": "開始"
       },
       "signup": {
-        "title": "應用密碼創建成功",
-        "slogan": "你已經成功創建你的應用密碼。現在可以進一步復原錢包或者創建錢包。",
+        "title": "密碼創建成功",
+        "slogan": "你已經成功創建你的密碼。現在可以進一步復原錢包或者創建錢包。",
         "button1": "復原錢包",
         "button2": "創建錢包",
         "passwordFormContainer": {
-          "title": "創建應用密碼",
-          "description": "在創建新錢包之前，請先創建應用密碼。應用密碼會用來加密你的私鑰種子。",
-          "okButton": "創建應用密碼",
-          "success": "你已經成功創建你的應用密碼。現在可以進一步復原錢包或者創建錢包。"
+          "title": "創建密碼",
+          "description": "在創建新錢包之前，請先創建密碼。密碼會用來加密你的私鑰種子。",
+          "okButton": "創建密碼",
+          "success": "你已經成功創建你的密碼。現在可以進一步復原錢包或者創建錢包。"
         }
       },
       "create": {
@@ -955,6 +1008,13 @@
           },
           "button": "復原錢包"
         }
+      },
+      "backup": {
+        "title": "備份助記詞",
+        "slogan": "助記詞只會出現一次，請備份並妥善保存這24字的助記詞。你將需要這助記詞來復原和獲得銀包的訪問權限。",
+        "copyButton": "已複製助記詞！",
+        "checkbox": "我明白助記詞只會顯示一次",
+        "button": "我已備份了我的助記詞"
       },
       "navbar": {
         "home": "主頁",
@@ -1423,6 +1483,26 @@
         "validTransactionAmountValidator": {
           "reason": "无效的转账款项"
         },
+        "passwordForm": {
+          "password": {
+            "label": "密码",
+            "placeholder": "输入密码",
+            "error1": "密码需要至少8个字母，并包括英文字母、数字及特殊符号各一。"
+          },
+          "passwordConfirm": {
+            "label": "确认密码",
+            "placeholder": "确认密码",
+            "error1": "密码不对应"
+          },
+          "passwordStrength": {
+            "title": "密码強度：",
+            "worst": "最差劲",
+            "bad": "差劲",
+            "weak": "弱",
+            "good": "良好",
+            "strong": "强"
+          }
+        },
         "passwordFormModal": {
           "title": "输入密码",
           "description": "请输入密码以解锁钱包",
@@ -1490,6 +1570,9 @@
           "restoreWallet": {
             "description": "你的助记词无效。 请再次检查。"
           },
+          "backup": {
+            "description": "请再试一次。"
+          },
           "transfer": {
             "description": "转账交易失败。 请稍后再试。"
           },
@@ -1527,15 +1610,15 @@
         "button": "开始"
       },
       "signup": {
-        "title": "应用密码创建成功",
-        "slogan": "你已经成功创建你的应用密码。现在可以进一步复原钱包或者创建钱包。",
+        "title": "密码创建成功",
+        "slogan": "你已经成功创建你的密码。现在可以进一步复原钱包或者创建钱包。",
         "button1": "复原钱包",
         "button2": "创建钱包",
         "passwordFormContainer": {
-          "title": "创建应用密码",
-          "description": "在创建新钱包之前，请先创建应用密码。 应用密码会用来加密你的私钥种子。",
-          "okButton": "创建应用密码",
-          "success": "你已经成功创建你的应用密码。现在可以进一步复原钱包或者创建钱包。"
+          "title": "创建密码",
+          "description": "在创建新钱包之前，请先创建密码。 密码会用来加密你的私钥种子。",
+          "okButton": "创建密码",
+          "success": "你已经成功创建你的密码。现在可以进一步复原钱包或者创建钱包。"
         }
       },
       "create": {
@@ -1652,6 +1735,13 @@
           },
           "button": "复原钱包"
         }
+      },
+      "backup": {
+        "title": "备份助记词",
+        "slogan": "助记词只会出现一次，请备份并妥善保存这24字的助记词。你将需要这助记词来复原和获得银包的访问权限。",
+        "copyButton": "已复制助记词！",
+        "checkbox": "我明白助记词只会显示一次",
+        "button": "我已备份了我的助记词"
       },
       "navbar": {
         "home": "主页",
@@ -2119,6 +2209,11 @@
         "validTransactionAmountValidator": {
           "reason": "montant à envoyer incorrect"
         },
+        "passwordForm": {
+          "password": {
+            "placeholder": "Choisissez un mot de passe pour l'application"
+          }
+        },
         "passwordFormModal": {
           "title": "Choisissez un mot de passe pour l'application",
           "description": "Saisissez le mot de passe du porte feuille",
@@ -2236,6 +2331,15 @@
         "validTransactionAmountValidator": {
           "reason": "잘못된 송금 금액"
         },
+        "passwordForm": {
+          "password": {
+            "label": "패스워드",
+            "placeholder": "패스워드 입력"
+          },
+          "passwordStrength": {
+            "title": "패스워드 강도:"
+          }
+        },
         "passwordFormModal": {
           "title": "패스워드 입력",
           "description": "지갑 패스워드를 입력하세요",
@@ -2302,6 +2406,9 @@
           },
           "restoreWallet": {
             "description": "니모닉이 틀립니다. 다시 확인해주세요"
+          },
+          "backup": {
+            "description": "다시 시도해 주세요."
           },
           "transfer": {
             "description": "전송 트랜잭션이 실패했습니다. 잠시 후에 다시 시도해주세요"
@@ -2465,6 +2572,12 @@
           },
           "button": "지갑 가져오기"
         }
+      },
+      "backup": {
+        "title": "지원 니모닉",
+        "copyButton": "복구 문구가 복사되었습니다!",
+        "checkbox": "니모닉 문구가 한 번만 표시되는 것을 이해합니다",
+        "button": "내 니모닉 문구를 백업했습니다"
       },
       "navbar": {
         "home": "홈화면",
@@ -2982,6 +3095,16 @@
         "validTransactionAmountValidator": {
           "reason": "Geçersiz gönderim miktarı"
         },
+        "passwordForm": {
+          "password": {
+            "label": "Uygulama şifresi",
+            "placeholder": "Uygulama şifresini girin"
+          },
+          "passwordStrength": {
+            "title": "Şifre güvenlik seviyesi",
+            "strong": "Güçlü"
+          }
+        },
         "passwordFormModal": {
           "title": "Uygulama şifresini girin",
           "description": "Cüzdanı açmak icin App şifresini girin",
@@ -3032,6 +3155,11 @@
         },
         "validTransactionAmountValidator": {
           "reason": "مبلغ الإرسال غير صالح"
+        },
+        "passwordForm": {
+          "password": {
+            "placeholder": "أدخل كلمة مرور التطبيق"
+          }
         },
         "passwordFormModal": {
           "title": "أدخل كلمة مرور التطبيق",
@@ -3098,6 +3226,11 @@
         },
         "validTransactionAmountValidator": {
           "reason": "Ungültiger schickender Betrag"
+        },
+        "passwordForm": {
+          "password": {
+            "placeholder": "Geben Sie Ihr Passwort ein"
+          }
         },
         "passwordFormModal": {
           "title": "Geben Sie Ihr Passwort ein",
