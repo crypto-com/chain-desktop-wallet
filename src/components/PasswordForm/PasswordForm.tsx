@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Progress } from 'antd';
+import { useTranslation } from 'react-i18next';
 import './PasswordForm.less';
 
 const zxcvbn = require('zxcvbn');
@@ -25,6 +26,8 @@ interface PasswordFormProps {
 const PasswordForm: React.FC<PasswordFormProps> = props => {
   const [form] = Form.useForm();
   const [strength, setStrength] = useState<number>(0);
+  const [t] = useTranslation();
+
   const onFormFinish = ({ password, passwordConfirm }) => {
     if (props.confirmPassword && password !== passwordConfirm) {
       props.onErr('Password Mismatch');
@@ -51,25 +54,27 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
       >
         <Form.Item
           name="password"
-          label="App Password"
+          label={t('general.passwordForm.password.label')}
           rules={[
-            { required: true, message: 'Password is required' },
+            {
+              required: true,
+              message: `${t('general.passwordForm.password.label')} ${t('general.required')}`,
+            },
             props.shouldValidate
               ? {
                   pattern: /^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
-                  message:
-                    'The password should be at least 8 character containing a letter, a number and a special character',
+                  message: t('general.passwordForm.password.error1'),
                 }
               : {},
           ]}
         >
-          <Input.Password placeholder="Enter your app password" />
+          <Input.Password placeholder={t('general.passwordForm.password.placeholder')} />
         </Form.Item>
 
         {props.confirmPassword && (
           <>
             <div className="password-strength-meter">
-              Password strength:
+              {t('general.passwordForm.passwordStrength.title')}
               <Progress
                 strokeColor={{
                   '0%': '#1199fa',
@@ -77,39 +82,44 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
                 }}
                 format={percent => {
                   if (percent! < 25) {
-                    return 'worst';
+                    return t('general.passwordForm.passwordStrength.worst');
                   }
                   if (percent! < 50) {
-                    return 'bad';
+                    return t('general.passwordForm.passwordStrength.bad');
                   }
                   if (percent! < 75) {
-                    return 'weak';
+                    return t('general.passwordForm.passwordStrength.weak');
                   }
                   if (percent! < 100) {
-                    return 'good';
+                    return t('general.passwordForm.passwordStrength.good');
                   }
-                  return 'strong';
+                  return t('general.passwordForm.passwordStrength.strong');
                 }}
                 percent={(strength / 4) * 100}
               />
             </div>
             <Form.Item
               name="passwordConfirm"
-              label="Confirm App Password"
+              label={t('general.passwordForm.passwordConfirm.label')}
               rules={[
-                { required: true, message: 'Password confirmation is required' },
+                {
+                  required: true,
+                  message: `${t('general.passwordForm.passwordConfirm.label')} ${t(
+                    'general.required',
+                  )}`,
+                },
                 ({ getFieldValue }) => ({
                   validator(rule, value) {
                     if (!value || getFieldValue('password') === value) {
                       return Promise.resolve();
                     }
                     // eslint-disable-next-line prefer-promise-reject-errors
-                    return Promise.reject('The password confirmation should match');
+                    return Promise.reject(t('general.passwordForm.passwordConfirm.error1'));
                   },
                 }),
               ]}
             >
-              <Input.Password placeholder="Confirm app password" />
+              <Input.Password placeholder={t('general.passwordForm.passwordConfirm.label')} />
             </Form.Item>
           </>
         )}
