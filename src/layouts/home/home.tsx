@@ -440,7 +440,7 @@ function HomeLayout(props: HomeLayoutProps) {
           handleOk={() => {
             setIsSuccessDeleteModalVisible(false);
           }}
-          title="Success!"
+          title={t('general.successModalPopup.title')}
           button={null}
           footer={[
             <Button
