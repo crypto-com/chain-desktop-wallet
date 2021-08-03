@@ -1,16 +1,3 @@
-export interface TransactionReceipt {
-    status: boolean;
-    transactionHash: string;
-    transactionIndex: number;
-    blockHash: string;
-    blockNumber: number;
-    from: string;
-    to: string;
-    contractAddress?: string;
-    cumulativeGasUsed: number;
-    gasUsed: number;
-}
-
 interface ExplorerAPIResponse {
     message: string;
     status: "1" | "0";

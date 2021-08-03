@@ -1,7 +1,6 @@
-import { TransactionReceipt } from '../models/cronos.models';
-import { BlockTransactionObject } from 'web3-eth';
+import { BlockTransactionObject, TransactionReceipt } from 'web3-eth';
 
-export interface ICronosNodeRpcService {
+export interface IEvmRpc {
   // Node
   isNodeSyncing(): Promise<boolean>;
 
