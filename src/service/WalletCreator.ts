@@ -1,33 +1,42 @@
-import sdk from '@crypto-org-chain/chain-jslib';
 import { Wallet } from '../models/Wallet';
 import { WalletConfig } from '../config/StaticConfig';
-import { HDKey, Secp256k1KeyPair } from '../utils/ChainJsLib';
 import { getRandomId } from '../crypto/RandomGen';
+import { WalletBuiltResult, WalletOps } from './WalletOps';
+import { UserAssetType } from '../models/UserAsset';
 
-export class WalletCreator {
-  public static create(options: WalletCreateOptions): Wallet {
-    const { address, encryptedPhrase } = this.generate(options);
-    return {
-      identifier: getRandomId(),
+export class WalletCreator extends WalletOps {
+  private readonly createOptions: WalletCreateOptions;
+
+  constructor(options: WalletCreateOptions) {
+    super();
+    this.createOptions = options;
+  }
+
+  public create(): WalletBuiltResult {
+    const options = this.createOptions;
+    const walletIdentifier = getRandomId();
+    const { initialAssets, encryptedPhrase } = this.generate(options.config, walletIdentifier);
+
+    const defaultAsset = initialAssets.filter(
+      asset => asset.assetType === UserAssetType.TENDERMINT,
+    )[0];
+
+    const newWallet: Wallet = {
+      identifier: walletIdentifier,
       name: options.walletName,
-      address,
+      address: defaultAsset?.address || '',
       config: options.config,
       encryptedPhrase,
       hasBeenEncrypted: false,
       walletType: options.walletType,
       addressIndex: options.addressIndex,
+      // assets: initialAssets,
     };
-  }
 
-  private static generate(options: WalletCreateOptions) {
-    const cro = sdk.CroSDK({ network: options.config.network });
-    const phrase = HDKey.generateMnemonic(24);
-
-    const privateKey = HDKey.fromMnemonic(phrase).derivePrivKey(options.config.derivationPath);
-    const keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
-    const address = new cro.Address(keyPair).account();
-
-    return { address, encryptedPhrase: phrase };
+    return {
+      wallet: newWallet,
+      assets: initialAssets,
+    };
   }
 }
 

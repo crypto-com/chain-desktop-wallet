@@ -5,7 +5,10 @@ import { Bytes } from '../../utils/ChainJsLib';
 import { NodePorts } from '../../config/StaticConfig';
 import {
   AllProposalResponse,
+  BalanceResponse,
   DelegationResult,
+  DenomTrace,
+  DenomTraceResponse,
   FinalTallyResult,
   LoadedTallyResponse,
   Proposal,
@@ -22,6 +25,8 @@ import {
   TransactionStatus,
   ValidatorModel,
 } from '../../models/Transaction';
+import { Session } from '../../models/Session';
+import { UserAsset, UserAssetType } from '../../models/UserAsset';
 
 export interface INodeRpcService {
   loadAccountBalance(address: string, assetDenom: string): Promise<string>;
@@ -40,6 +45,10 @@ export interface INodeRpcService {
   loadStakingBalance(address: string, assetSymbol: string): Promise<string>;
 
   loadTopValidators(): Promise<ValidatorModel[]>;
+
+  loadIBCAssets(session: Session): Promise<UserAsset[]>;
+
+  getIBCAssetTrace(ibcHash: string): Promise<DenomTrace>;
 }
 
 // Load all 100 active validators
@@ -287,6 +296,63 @@ export class NodeRpcService implements INodeRpcService {
       })),
       response.data.pagination.next_key,
     ];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
+  async loadIBCAssets(session: Session): Promise<UserAsset[]> {
+    const ibcAssets: UserAsset[] = [];
+    let nextKey: string | null = null;
+    const { address } = session.wallet;
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const baseUrl = `/cosmos/bank/v1beta1/balances/${address}`;
+      const url =
+        nextKey !== null ? `${baseUrl}?pagination.key=${encodeURIComponent(nextKey)}` : baseUrl;
+
+      // eslint-disable-next-line no-await-in-loop
+      const assetBalanceResponse = await this.cosmosClient.get<BalanceResponse>(url);
+      const loadedIbcAssets = assetBalanceResponse.data.balances
+        .filter(balance => balance.denom.startsWith('ibc/'))
+        .map(balance => {
+          const ibcDenom = balance.denom;
+          const ibcDenomHash = ibcDenom.split('/').pop();
+          const asset: UserAsset = {
+            balance: balance.amount,
+            decimals: 8,
+            description: '',
+            icon_url: '',
+            identifier: `${ibcDenom}__${session.wallet.identifier}`,
+            mainnetSymbol: ibcDenom,
+            name: ibcDenom,
+            stakedBalance: '0',
+            symbol: ibcDenom,
+            walletId: session.wallet.identifier,
+            ibcDenomHash,
+            assetType: UserAssetType.IBC,
+          };
+          return asset;
+        });
+
+      ibcAssets.push(...loadedIbcAssets);
+      const { pagination } = assetBalanceResponse.data;
+
+      if (pagination.next_key === null) {
+        break;
+      }
+      nextKey = pagination.next_key;
+    }
+
+    return ibcAssets;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
+  async getIBCAssetTrace(ibcHash: string): Promise<DenomTrace> {
+    const denomTraceResponse = await this.cosmosClient.get<DenomTraceResponse>(
+      `ibc/applications/transfer/v1beta1/denom_traces/${ibcHash}`,
+    );
+
+    return denomTraceResponse.data.denom_trace;
   }
 }
 

@@ -9,7 +9,7 @@ import { getRandomId } from '../crypto/RandomGen';
 import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
 import { TransactionStatus, TransferTransactionData } from '../models/Transaction';
 
-jest.setTimeout(10_000);
+jest.setTimeout(20_000);
 
 function buildTestWallet(name?: string) {
   const testNetConfig = DefaultWalletConfigs.TestNetConfig;
@@ -20,7 +20,7 @@ function buildTestWallet(name?: string) {
     walletName: name || 'My-TestNet-Wallet',
     addressIndex: 0,
   };
-  return WalletCreator.create(createOptions);
+  return new WalletCreator(createOptions).create().wallet;
 }
 
 function buildMainnetWallet(name?: string) {
@@ -32,10 +32,10 @@ function buildMainnetWallet(name?: string) {
     walletName: name || 'My-Mainnet-Wallet',
     addressIndex: 0,
   };
-  return WalletCreator.create(createOptions);
+  return new WalletCreator(createOptions).create().wallet;
 }
 
-describe('Testing Storage Service', () => {
+describe('Testing Full Storage Service', () => {
   it('Test creating and storing a new wallet', async () => {
     const wallet = buildTestWallet();
     const newWalletAddress = wallet.address;

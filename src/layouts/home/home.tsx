@@ -79,6 +79,15 @@ function HomeLayout(props: HomeLayoutProps) {
     }
   }
 
+  async function fetchAndSaveIBCWalletAssets(fetchSession: Session) {
+    try {
+      await walletService.IBCAssetsFetch(fetchSession);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Failed loading new wallet validators list', e);
+    }
+  }
+
   async function fetchAndSetNewProposals(currentSession) {
     try {
       await walletService.fetchAndSaveProposals(currentSession);
@@ -162,6 +171,7 @@ function HomeLayout(props: HomeLayoutProps) {
         await fetchAndSetNewValidators(currentSession),
         await fetchAndSetNewProposals(currentSession),
         await fetchAndSetNFTs(currentSession),
+        await fetchAndSaveIBCWalletAssets(currentSession),
       ]);
 
       const currentValidatorList = await walletService.retrieveTopValidators(
