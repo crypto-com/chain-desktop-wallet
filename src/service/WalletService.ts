@@ -654,7 +654,6 @@ class WalletService {
     }
 
     const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-
     const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
 
     if (!assets || assets.length === 0) {
@@ -663,35 +662,45 @@ class WalletService {
 
     await Promise.all(
       assets.map(async asset => {
-        if (asset.assetType === UserAssetType.EVM) {
-          return;
-        }
+        switch (asset.assetType) {
+          case UserAssetType.EVM:
+            // TODO : Implement balance fetching for EVM - CRONOS asset
+            break;
 
-        const baseDenomination =
-          asset.assetType !== UserAssetType.IBC
-            ? currentSession.wallet.config.network.coin.baseDenom
-            : `ibc/${asset.ibcDenomHash}`;
+          case UserAssetType.TENDERMINT:
+          case UserAssetType.IBC:
+          case undefined:
+            // TODO : Handle case for legacy assets that got persisted without a assetType - undefined
+            try {
+              const baseDenomination =
+                asset.assetType !== UserAssetType.IBC
+                  ? currentSession.wallet.config.network.coin.baseDenom
+                  : `ibc/${asset.ibcDenomHash}`;
+              // eslint-disable-next-line no-console
+              console.log(`Loading balance for ${baseDenomination}`);
+              asset.balance = await nodeRpc.loadAccountBalance(
+                // Handling legacy wallets which had wallet.address
+                asset.address || currentSession.wallet.address,
+                baseDenomination,
+              );
+              asset.stakedBalance = await nodeRpc.loadStakingBalance(
+                // Handling legacy wallets which had wallet.address
+                asset.address || currentSession.wallet.address,
+                baseDenomination,
+              );
+              // eslint-disable-next-line no-console
+              console.log(`Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance}`);
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.log('BALANCE_FETCH_ERROR', { asset, e });
+            } finally {
+              await this.storageService.saveAsset(asset);
+            }
 
-        try {
-          // eslint-disable-next-line no-console
-          console.log(`Loading balance for ${baseDenomination}`);
-          asset.balance = await nodeRpc.loadAccountBalance(
-            // Handling legacy wallets which had wallet.address
-            asset.address || currentSession.wallet.address,
-            baseDenomination,
-          );
-          asset.stakedBalance = await nodeRpc.loadStakingBalance(
-            // Handling legacy wallets which had wallet.address
-            asset.address || currentSession.wallet.address,
-            baseDenomination,
-          );
-          // eslint-disable-next-line no-console
-          console.log(`Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance}`);
-        } catch (e) {
-          // eslint-disable-next-line no-console
-          console.log('BALANCE_FETCH_ERROR', { asset, e });
-        } finally {
-          await this.storageService.saveAsset(asset);
+            break;
+
+          default:
+            throw TypeError(`Unknown Asset type: ${asset}`);
         }
       }),
     );
