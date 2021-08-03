@@ -202,7 +202,6 @@ const ReceivePage = () => {
                   return {
                     onClick: () => {
                       setCurrentAsset(record);
-                      console.log(record);
                       setIsAssetVisible(true);
                     }, // click row
                   };
