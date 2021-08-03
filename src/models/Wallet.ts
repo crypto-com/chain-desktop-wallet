@@ -5,17 +5,21 @@ import {
   Network,
   WalletConfig,
 } from '../config/StaticConfig';
+import { UserAsset } from './UserAsset';
 
 export class Wallet {
   public readonly identifier: string;
 
   public readonly name: string;
 
+  // Legacy field - Relevant only for single asset wallets created
   public address: string;
 
   public encryptedPhrase: string;
 
   public readonly config: WalletConfig;
+
+  public readonly assets: UserAsset[];
 
   // Initially the wallet phrase is not encrypted,
   // it gets encrypted once the user provide a password,
@@ -45,6 +49,7 @@ export class Wallet {
     this.hasBeenEncrypted = hasBeenEncrypted;
     this.walletType = walletType;
     this.addressIndex = addressIndex;
+    this.assets = [];
   }
 }
 

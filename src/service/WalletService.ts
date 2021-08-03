@@ -11,9 +11,7 @@ import { StorageService } from '../storage/StorageService';
 import {
   APP_DB_NAMESPACE,
   DEFAULT_CLIENT_MEMO,
-  DefaultAsset,
   DefaultWalletConfigs,
-  Network,
   NOT_KNOWN_YET_VALUE,
   WalletConfig,
 } from '../config/StaticConfig';
@@ -40,8 +38,8 @@ import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
   NftAccountTransactionData,
-  NftModel,
   NftDenomModel,
+  NftModel,
   NftQueryParams,
   NftTransferModel,
   ProposalModel,
@@ -565,25 +563,16 @@ class WalletService {
     ];
   }
 
-  public async persistInitialAsset(walletId: string, network: Network) {
-    const defaultAsset: UserAsset = {
-      ...DefaultAsset(network),
-      walletId,
-    };
-
-    await this.storageService.saveAsset(defaultAsset);
-  }
-
   // Import or restore wallet and persist it on the db
   public async restoreAndSaveWallet(importOptions: WalletImportOptions): Promise<Wallet> {
-    const importedWallet = WalletImporter.import(importOptions);
+    const importedWallet = new WalletImporter(importOptions).import();
     await this.persistWallet(importedWallet);
     return importedWallet;
   }
 
   // eslint-disable-next-line class-methods-use-this
   public async restoreWallet(importOptions: WalletImportOptions): Promise<Wallet> {
-    return WalletImporter.import(importOptions);
+    return new WalletImporter(importOptions).import();
   }
 
   // Load all persisted wallets
@@ -618,7 +607,6 @@ class WalletService {
   // Save freshly created or imported wallet
   public async persistWallet(wallet: Wallet) {
     await this.storageService.saveWallet(wallet);
-    await this.persistInitialAsset(wallet.identifier, wallet.config.network);
   }
 
   public async deleteWallet(walletIdentifier: string) {
@@ -875,10 +863,14 @@ class WalletService {
       currentSession.wallet.identifier,
     );
 
-    return assets.map(data => {
+    const legacyAssets = assets.map(data => {
       const asset: UserAsset = { ...data };
       return asset;
     });
+
+    // TODO : In the future we might need to re-think how to recreate new added assets on existing wallets
+
+    return currentSession.wallet.assets || legacyAssets;
   }
 
   public async retrieveDefaultWalletAsset(currentSession: Session): Promise<UserAsset> {

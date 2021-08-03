@@ -1,27 +1,32 @@
-import sdk from '@crypto-org-chain/chain-jslib';
 import { Wallet } from '../models/Wallet';
 import { WalletConfig } from '../config/StaticConfig';
-import { HDKey, Secp256k1KeyPair } from '../utils/ChainJsLib';
 import { getRandomId } from '../crypto/RandomGen';
+import { WalletOps } from './WalletOps';
 
-export class WalletImporter {
-  public static import(options: WalletImportOptions): Wallet {
-    const cro = sdk.CroSDK({ network: options.config.network });
+export class WalletImporter extends WalletOps {
+  private readonly importOptions: WalletImportOptions;
 
-    const mnemonic = options.phrase;
-    const privateKey = HDKey.fromMnemonic(mnemonic).derivePrivKey(options.config.derivationPath);
-    const keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
-    const address = new cro.Address(keyPair).account();
+  constructor(importOptions: WalletImportOptions) {
+    super();
+    this.importOptions = importOptions;
+  }
+
+  public import(): Wallet {
+    const options = this.importOptions;
+    const walletIdentifier = getRandomId();
+    const { initialAssets, encryptedPhrase } = this.generate(options.config, walletIdentifier);
 
     return {
       identifier: getRandomId(),
       name: options.walletName,
-      address,
+      // Legacy field
+      address: '',
       config: options.config,
-      encryptedPhrase: mnemonic,
+      encryptedPhrase,
       hasBeenEncrypted: false,
       walletType: options.walletType,
       addressIndex: options.addressIndex,
+      assets: initialAssets,
     };
   }
 }
