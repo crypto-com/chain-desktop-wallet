@@ -126,7 +126,8 @@ function HomeLayout(props: HomeLayoutProps) {
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
     const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
-    const isIbcVisible = allAssets.length > 1;
+    // const isIbcVisible = allAssets.length > 1;
+    const isIbcVisible = false;
 
     setSession(currentSession);
     setUserAsset(currentAsset);
@@ -170,7 +171,8 @@ function HomeLayout(props: HomeLayoutProps) {
         'usd',
       );
 
-      const isIbcVisible = allAssets.length > 1;
+      // const isIbcVisible = allAssets.length > 1;
+      const isIbcVisible = false;
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
       setHasWallet(hasWalletBeenCreated);
       setSession(currentSession);
