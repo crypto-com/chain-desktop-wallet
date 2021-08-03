@@ -20,7 +20,7 @@ function buildTestWallet(name?: string) {
     walletName: name || 'My-TestNet-Wallet',
     addressIndex: 0,
   };
-  return WalletCreator.create(createOptions);
+  return new WalletCreator(createOptions).create().wallet;
 }
 
 function buildMainnetWallet(name?: string) {
@@ -32,7 +32,7 @@ function buildMainnetWallet(name?: string) {
     walletName: name || 'My-Mainnet-Wallet',
     addressIndex: 0,
   };
-  return WalletCreator.create(createOptions);
+  return new WalletCreator(createOptions).create().wallet;
 }
 
 describe('Testing Storage Service', () => {
