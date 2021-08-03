@@ -34,3 +34,6 @@ jobs:
         with:
           build_script_name: electron:pre-build
 
+          github_token: ${{ secrets.github_token }}
+
+
