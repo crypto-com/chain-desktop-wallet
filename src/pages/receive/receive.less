@@ -1,38 +1,66 @@
 .receive-content {
+  position: relative;
   padding: 24px;
+
   .container {
-    max-width: 500px;
+    // max-width: 500px;
     text-align: left;
-    .description {
-      margin-bottom: 20px;
-      color: @font-color;
-    }
-    .name {
-      padding: 16px 0 8px 0;
+
+    .ant-table-row {
+      cursor: pointer;
     }
 
-    .copy {
-      position: relative;
-      width: 100%;
-      padding: 16px;
-      font-size: 16px;
-      background: rgba(216, 216, 216, 0.2);
-      border-radius: 4px;
-      margin: 0 0 24px 0;
-      cursor: pointer;
-      .anticon {
-        position: absolute;
-        right: 16px;
-        color: @azure;
+    .asset-detail {
+      max-width: 600px;
+      background: #fff;
+
+      > .ant-layout-content {
+        margin-top: 32px;
+      }
+
+      .back-button {
+        margin: 24px 0;
+      }
+
+      .title {
+        margin: 16px 0;
         font-size: 24px;
       }
-    }
 
-    .ledger {
-      padding: 0;
-      .ant-btn{
+      .description {
+        margin-bottom: 20px;
+        color: @font-color;
+      }
+
+      .name {
+        padding: 16px 0 8px 0;
+      }
+
+      .copy {
+        position: relative;
         width: 100%;
-        margin: 24px 0;
+        margin: 0 0 24px 0;
+        padding: 16px;
+        font-size: 16px;
+        background: rgba(216, 216, 216, 0.2);
+        border-radius: 4px;
+        cursor: pointer;
+
+        .anticon {
+          position: absolute;
+          right: 16px;
+          color: @azure;
+          font-size: 24px;
+        }
+      }
+
+      .ledger {
+        padding: 0;
+
+        .ant-btn {
+          width: 100%;
+          margin: 24px 0;
+        }
       }
     }
   }
