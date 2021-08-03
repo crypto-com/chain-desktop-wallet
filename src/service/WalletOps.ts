@@ -3,6 +3,7 @@ import { AddressGenerator } from './AddressGenerator';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { CRO_ASSET, CRONOS_ASSET } from '../config/StaticAssets';
 import { HDKey } from '../utils/ChainJsLib';
+import { Wallet } from '../models/Wallet';
 
 export class WalletOps {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
@@ -24,9 +25,14 @@ export class WalletOps {
     return assets;
   }
 
-  public generate(config: WalletConfig, walletIdentifier: string) {
-    const phrase = HDKey.generateMnemonic(24);
+  public generate(config: WalletConfig, walletIdentifier: string, availablePhrase?: string) {
+    const phrase = availablePhrase || HDKey.generateMnemonic(24);
     const assets = this.generateAssets(config, walletIdentifier, phrase);
     return { encryptedPhrase: phrase, initialAssets: assets };
   }
+}
+
+export interface WalletBuiltResult {
+  wallet: Wallet;
+  assets: UserAsset[];
 }

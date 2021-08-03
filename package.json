@@ -1,6 +1,6 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Crypto.com Chain Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.org <chain@crypto.org>",
@@ -73,12 +73,11 @@
     "url-loader": "4.1.1",
     "usb": "1.6.5",
     "uuid": "8.3.2",
-    "web3": "^1.4.0",
     "zxcvbn": "4.4.2"
   },
   "scripts": {
     "start": "node scripts/start.js",
-    "build": "yarn clean-builds && node scripts/build.js",
+    "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 && yarn clean-builds && node scripts/build.js",
     "test": "node scripts/test.js --watchAll=false",
     "postinstall": "electron-builder install-app-deps",
     "electron:dev": "export NODE_ENV=development && yarn electron:devcore",
@@ -87,7 +86,7 @@
     "electron:pre-build": "yarn build && yarn copy-macos-manifest && tsc -p electron",
     "copy-macos-manifest": "copyfiles entitlements* ./build/",
     "clean-builds": "rimraf build && rimraf dist",
-    "electron:build": "cross-env NODE_OPTIONS=--max_old_space_size=4096 && yarn clean-builds && yarn build && yarn copy-macos-manifest && tsc -p electron && electron-builder --publish=never",
+    "electron:build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 && yarn clean-builds && yarn build && yarn copy-macos-manifest && tsc -p electron && electron-builder --publish=never",
     "lint-staged": "lint-staged",
     "lint:js": "eslint --cache --fix --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
     "prettier": "prettier --write '/src/**/*.{js,jsx,tsx,ts,less,md,json}'"

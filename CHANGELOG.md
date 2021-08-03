@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.4.2] - 2021-08-03
+- QA fixes on missing translations strings
+- Fix sorting ordering for translated strings
+
 ## [v0.4.1] - 2021-07-27
 - Void release to test auto updater on Windows systems
 

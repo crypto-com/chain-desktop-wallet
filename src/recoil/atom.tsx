@@ -16,7 +16,6 @@ const wallet = new Wallet(
   NORMAL_WALLET_TYPE,
   0, // addressIndex default
 );
-const session = new Session(wallet, 'USD');
 const asset: UserAsset = {
   identifier: '',
   symbol: 'CRO',
@@ -29,6 +28,9 @@ const asset: UserAsset = {
   description: 'Default Asset',
   decimals: 1,
 };
+
+const session = new Session(wallet, asset, 'USD');
+
 const market: AssetMarketPrice = {
   assetSymbol: 'CRO',
   currency: 'USD',

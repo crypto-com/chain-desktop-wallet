@@ -1,7 +1,8 @@
 import { Wallet } from '../models/Wallet';
 import { WalletConfig } from '../config/StaticConfig';
 import { getRandomId } from '../crypto/RandomGen';
-import { WalletOps } from './WalletOps';
+import { WalletBuiltResult, WalletOps } from './WalletOps';
+import { UserAssetType } from '../models/UserAsset';
 
 export class WalletCreator extends WalletOps {
   private readonly createOptions: WalletCreateOptions;
@@ -11,21 +12,29 @@ export class WalletCreator extends WalletOps {
     this.createOptions = options;
   }
 
-  public create(): Wallet {
+  public create(): WalletBuiltResult {
     const options = this.createOptions;
     const walletIdentifier = getRandomId();
     const { initialAssets, encryptedPhrase } = this.generate(options.config, walletIdentifier);
 
-    return {
+    const defaultAsset = initialAssets.filter(
+      asset => asset.assetType === UserAssetType.TENDERMINT,
+    )[0];
+
+    const newWallet: Wallet = {
       identifier: walletIdentifier,
       name: options.walletName,
-      // This global wallet address is now obsolete
-      address: '',
+      address: defaultAsset?.address || '',
       config: options.config,
       encryptedPhrase,
       hasBeenEncrypted: false,
       walletType: options.walletType,
       addressIndex: options.addressIndex,
+      // assets: initialAssets,
+    };
+
+    return {
+      wallet: newWallet,
       assets: initialAssets,
     };
   }
