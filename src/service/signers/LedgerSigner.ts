@@ -8,7 +8,7 @@ export class LedgerSigner {
 
   account: number;
 
-  constructor(account = 0) {
+  constructor(account: number = 0) {
     this.account = account;
   }
 

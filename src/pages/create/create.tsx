@@ -60,7 +60,7 @@ interface FormCreateProps {
   networkConfig: any;
 }
 
-const FormCustomConfig: React.FC<FormCustomConfigProps> = (props) => {
+const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [checkingNodeConnection, setCheckingNodeConnection] = useState(false);
@@ -96,7 +96,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = (props) => {
 
   const checkNodeConnectivity = async () => {
     // TO-DO Node Connectivity check
-    form.validateFields().then(async (values) => {
+    form.validateFields().then(async values => {
       setCheckingNodeConnection(true);
       const { nodeUrl } = values;
       const isNodeLive = await walletService.checkNodeIsLive(`${nodeUrl}${NodePorts.Tendermint}`);
@@ -296,7 +296,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = (props) => {
   );
 };
 
-const FormCreate: React.FC<FormCreateProps> = (props) => {
+const FormCreate: React.FC<FormCreateProps> = props => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
@@ -343,7 +343,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
     }
   };
 
-  const onCheckboxChange = (e) => {
+  const onCheckboxChange = e => {
     setHwcheck(!hwcheck);
     props.setIsWalletSelectFieldDisable(!e.target.checked);
     if (e.target.checked) props.form.setFieldsValue({ walletType: LEDGER_WALLET_TYPE });
@@ -413,7 +413,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
       await device.getPubKey(addressIndex, false);
       props.setLedgerConnected(true);
 
-      await new Promise((resolve) => {
+      await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
       props.setIsModalVisible(false);
@@ -431,7 +431,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
 
       props.setLedgerConnected(false);
 
-      await new Promise((resolve) => {
+      await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
       props.setIsModalVisible(false);
@@ -443,7 +443,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
         duration: 20,
       });
     }
-    await new Promise((resolve) => {
+    await new Promise(resolve => {
       setTimeout(resolve, 2000);
     });
     if (hwok) {
@@ -529,7 +529,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
           onChange={onNetworkChange}
           disabled={props.isNetworkSelectFieldDisable}
         >
-          {walletService.supportedConfigs().map((config) => (
+          {walletService.supportedConfigs().map(config => (
             <Select.Option key={config.name} value={config.name} disabled={!config.enabled}>
               {config.name}
             </Select.Option>

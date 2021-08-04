@@ -57,7 +57,7 @@ const RedelegateFormComponent = (props: {
       title: t('staking.validatorList.table.validatorWebsite'),
       dataIndex: 'validatorWebSite',
       key: 'validatorWebSite',
-      render: (validatorWebSite) => {
+      render: validatorWebSite => {
         return validatorWebSite === '' ? (
           'n.a.'
         ) : (
@@ -76,7 +76,7 @@ const RedelegateFormComponent = (props: {
       title: t('staking.validatorList.table.validatorAddress'),
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
-      render: (validatorAddress) => (
+      render: validatorAddress => (
         <a
           data-original={validatorAddress}
           title={validatorAddress}
@@ -94,7 +94,7 @@ const RedelegateFormComponent = (props: {
       key: 'currentTokens',
       sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
       defaultSortOrder: 'descend' as any,
-      render: (currentTokens) => {
+      render: currentTokens => {
         return (
           <span>
             {numeral(scaledAmount(currentTokens, 8)).format('0,0.00')}{' '}
@@ -108,14 +108,14 @@ const RedelegateFormComponent = (props: {
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
       sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
-      render: (currentCommissionRate) => (
+      render: currentCommissionRate => (
         <span>{new Big(currentCommissionRate).times(100).toFixed(2)}%</span>
       ),
     },
     {
       title: t('general.action'),
       key: 'action',
-      render: (record) => (
+      render: record => (
         <a
           onClick={() => {
             setIsValidatorListVisible(false);

@@ -72,7 +72,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   // eslint-disable-next-line class-methods-use-this
   public async getNftListMarketplaceData(nftLists: NftResponse[]): Promise<NftModel[]> {
     const nftListMap: NftModel[] = [];
-    const payload: MintByCDCRequest[] = nftLists.map((item) => {
+    const payload: MintByCDCRequest[] = nftLists.map(item => {
       nftListMap[`${item.denomId}-${item.tokenId}`] = {
         ...item,
         isMintedByCDC: false,
@@ -88,13 +88,13 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
     try {
       const results = await Promise.all(
-        payloadChunks.map(async (chunks) => {
+        payloadChunks.map(async chunks => {
           return await croNftApi.getNftListMarketplaceData(chunks);
         }),
       );
 
-      results.forEach((result) => {
-        result.forEach((item) => {
+      results.forEach(result => {
+        result.forEach(item => {
           nftListMap[`${item.denomId}-${item.tokenId}`] = {
             ...nftListMap[`${item.denomId}-${item.tokenId}`],
             isMintedByCDC: item.isMinted,
@@ -153,16 +153,16 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     const { data } = transferListResponse;
 
     function getTransferAmount(transfer): TransferDataAmount | null {
-      return transfer.data.amount.filter((amount) => amount.denom === baseAssetSymbol)[0];
+      return transfer.data.amount.filter(amount => amount.denom === baseAssetSymbol)[0];
     }
 
     try {
       return data.result
-        .filter((trx) => {
+        .filter(trx => {
           const transferAmount = getTransferAmount(trx);
           return transferAmount !== undefined && transferAmount !== null;
         })
-        .map((transfer) => {
+        .map(transfer => {
           const assetAmount = getTransferAmount(transfer);
           const transferData: TransferTransactionData = {
             amount: assetAmount?.amount ?? '0',

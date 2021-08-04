@@ -19,7 +19,7 @@ interface ResultModalPopupProps {
   footer?: Array<React.ReactNode>;
 }
 
-const ResultModalPopup: React.FC<ResultModalPopupProps> = (props) => {
+const ResultModalPopup: React.FC<ResultModalPopupProps> = props => {
   return (
     <>
       {props.button}
