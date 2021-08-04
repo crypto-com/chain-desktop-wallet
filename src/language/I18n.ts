@@ -2,11 +2,10 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-import { generalConfigService } from '../storage/GeneralConfigService';
 import translations from './translations.json';
 
 const languageDetector = new LanguageDetector(async () => {
-  return await generalConfigService.getLanguage();
+  return i18n.language;
 });
 
 i18n
