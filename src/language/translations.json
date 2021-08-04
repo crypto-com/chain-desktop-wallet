@@ -562,6 +562,8 @@
         "backToList": "Back to Proposal List",
         "start": "Start",
         "end": "End",
+        "result": "Current results",
+        "castVote": "Cast your vote",
         "sendVote": "Send Vote",
         "modal1": {
           "title": "Confirm Vote Transaction",
@@ -1332,6 +1334,8 @@
         "backToList": "返回",
         "start": "開始",
         "end": "結束",
+        "result": "當前結果",
+        "castVote": "投票",
         "sendVote": "發送投票",
         "modal1": {
           "title": "確認投票交易",
@@ -2102,6 +2106,8 @@
         "backToList": "返回",
         "start": "开始",
         "end": "结束",
+        "result": "当前结果",
+        "castVote": "投票",
         "sendVote": "发送投票",
         "modal1": {
           "title": "确认投票交易",
@@ -2993,6 +2999,8 @@
         "backToList": "제안 리스트로",
         "start": "시작",
         "end": "종료",
+        "result": "현재 결과",
+        "castVote": "투표",
         "sendVote": "투표 전송",
         "modal1": {
           "title": "투표 거래 확인",
