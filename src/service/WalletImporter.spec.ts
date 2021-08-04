@@ -2,7 +2,6 @@ import 'mocha';
 import { expect } from 'chai';
 import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
-import { UserAssetType } from '../models/UserAsset';
 
 describe('Testing WalletImporter', () => {
   it('Test importing wallet with testnet configuration', () => {
@@ -16,26 +15,11 @@ describe('Testing WalletImporter', () => {
         'ramp sock spice enrich exhibit skate empower process kit pudding olive mesh friend camp labor coconut devote shell argue system pig then provide nose',
       walletName: 'My-TestNet-Wallet',
     };
-    const testNetWallet = new WalletImporter(importOptions).import().wallet;
+    const testNetWallet = WalletImporter.import(importOptions);
 
     expect(testNetWallet.name).to.eq('My-TestNet-Wallet');
     expect(testNetWallet.address).to.eq('tcro15rsn69ze9r7g52tk0u6cyhu4edep88dxgtzm65');
     expect(testNetWallet.config).to.eq(testNetConfig);
-
-    const { assets } = new WalletImporter(importOptions).import();
-
-    expect(assets.length).to.eq(2);
-    expect(
-      assets
-        .filter((asset) => asset.assetType === UserAssetType.TENDERMINT)[0]
-        .address?.startsWith('tcro'),
-    ).to.eq(true);
-
-    expect(
-      assets.filter((asset) => asset.assetType === UserAssetType.EVM)[0].address?.startsWith('0x'),
-    ).to.eq(true);
-
-    expect(assets.filter((asset) => asset.assetType === UserAssetType.EVM)[0].decimals).to.eq(18);
   });
 
   it('Test importing wallet with main-net configuration', () => {
@@ -49,7 +33,7 @@ describe('Testing WalletImporter', () => {
         'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone',
       walletName: 'My-MainNet-Wallet',
     };
-    const testNetWallet = new WalletImporter(importOptions).import().wallet;
+    const testNetWallet = WalletImporter.import(importOptions);
 
     expect(testNetWallet.name).to.eq('My-MainNet-Wallet');
     expect(testNetWallet.address).to.eq('cro1n0ejfh2ur2nslekrynvcwuwc9cccnhxfqn6sfs');
@@ -58,14 +42,13 @@ describe('Testing WalletImporter', () => {
 
   it('Test importing wallet with custom configurations', () => {
     const customConfig: WalletConfig = {
-      disableDefaultClientMemo: false,
-      enableGeneralSettings: false,
-      fee: { gasLimit: '', networkFee: '' },
       indexingUrl: '',
       explorerUrl: '',
       enabled: true,
       derivationPath: "44'/245'/0'/0/0",
       name: 'Pystaport-Custom-Network',
+      enableGeneralSettings: false,
+      disableDefaultClientMemo: false,
       analyticsDisabled: false,
       network: {
         defaultNodeUrl: '',
@@ -94,7 +77,7 @@ describe('Testing WalletImporter', () => {
       config: customConfig,
       walletName: 'My-Custom-Config-Wallet',
     };
-    const customWallet = new WalletImporter(importOptions).import().wallet;
+    const customWallet = WalletImporter.import(importOptions);
 
     expect(customWallet.address).to.eq('pcro1fdu6qgn3r4ptsx8z6v5hr5dsjvkjw6jkyrphvx');
     expect(customWallet.config).to.eq(customConfig);

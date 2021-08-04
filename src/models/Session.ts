@@ -1,5 +1,4 @@
 import { Wallet } from './Wallet';
-import { UserAsset } from './UserAsset';
 
 export class Session {
   // Session holds currently selected wallet
@@ -7,13 +6,18 @@ export class Session {
 
   public readonly currency: string;
 
-  public readonly activeAsset?: UserAsset;
-
   public static SESSION_ID = 'SESSION_ID';
 
-  constructor(wallet: Wallet, activeAsset: UserAsset | undefined = undefined, currency = 'USD') {
+  constructor(wallet: Wallet, currency = 'USD') {
     this.wallet = wallet;
-    this.activeAsset = activeAsset;
     this.currency = currency;
+  }
+
+  public getBaseDenomination(): string {
+    return this.wallet.config.network.coin.baseDenom;
+  }
+
+  public getCurrentWalletId(): string {
+    return this.wallet.identifier;
   }
 }

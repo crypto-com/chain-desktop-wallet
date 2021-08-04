@@ -340,12 +340,9 @@ const FormRestore: React.FC<FormRestoreProps> = (props) => {
       addressIndex: 0, // this is for ledger, dummy value
     };
     try {
-      const restoreResult = await walletService.restoreWallet(importOptions);
-
-      await walletService.saveAssets(restoreResult.assets);
-      await walletService.encryptWalletAndSetSession(password, restoreResult.wallet);
-
-      await walletService.syncAll(new Session(restoreResult.wallet));
+      const wallet = await walletService.restoreWallet(importOptions);
+      await walletService.encryptWalletAndSetSession(password, wallet);
+      await walletService.syncAll(new Session(wallet));
       goToHome();
       props.form.resetFields();
       return;

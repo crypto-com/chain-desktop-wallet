@@ -195,9 +195,7 @@ export class StorageService {
   }
 
   public async retrieveAssetsByWallet(walletId: string) {
-    // const wallet = await this.db.walletStore.findOne<Wallet>({ identifier: walletId });
-    // const userAssets = wallet.assets;
-    return await this.db.assetStore.find<UserAsset>({ walletId });
+    return this.db.assetStore.find<UserAsset>({ walletId });
   }
 
   public async setSession(session: Session) {

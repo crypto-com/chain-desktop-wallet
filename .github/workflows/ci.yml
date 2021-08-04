@@ -30,14 +30,16 @@ jobs:
  
       - name: Install deps and tools
         run: |
-          yarn install
-
-      - name: Running Lint
-        run: |
-          yarn lint:js
+          yarn install 
 
       - name: Run All Tests
         run: |
           yarn test
 
-
+      - name: Running Lint
+        run: |
+          yarn lint:js
+          
+      - name: Build For The Web Target
+        run: |
+          yarn build

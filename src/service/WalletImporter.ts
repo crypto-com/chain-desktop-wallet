@@ -1,43 +1,27 @@
+import sdk from '@crypto-org-chain/chain-jslib';
 import { Wallet } from '../models/Wallet';
 import { WalletConfig } from '../config/StaticConfig';
+import { HDKey, Secp256k1KeyPair } from '../utils/ChainJsLib';
 import { getRandomId } from '../crypto/RandomGen';
-import { WalletBuiltResult, WalletOps } from './WalletOps';
-import { UserAssetType } from '../models/UserAsset';
 
-export class WalletImporter extends WalletOps {
-  private readonly importOptions: WalletImportOptions;
+export class WalletImporter {
+  public static import(options: WalletImportOptions): Wallet {
+    const cro = sdk.CroSDK({ network: options.config.network });
 
-  constructor(importOptions: WalletImportOptions) {
-    super();
-    this.importOptions = importOptions;
-  }
+    const mnemonic = options.phrase;
+    const privateKey = HDKey.fromMnemonic(mnemonic).derivePrivKey(options.config.derivationPath);
+    const keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
+    const address = new cro.Address(keyPair).account();
 
-  public import(): WalletBuiltResult {
-    const options = this.importOptions;
-    const walletIdentifier = getRandomId();
-    const { initialAssets, encryptedPhrase } = this.generate(
-      options.config,
-      walletIdentifier,
-      options.phrase,
-    );
-
-    const defaultAsset = initialAssets.filter(
-      (asset) => asset.assetType === UserAssetType.TENDERMINT,
-    )[0];
-
-    const importedWallet: Wallet = {
-      identifier: walletIdentifier,
+    return {
+      identifier: getRandomId(),
       name: options.walletName,
-      address: defaultAsset?.address || '',
+      address,
       config: options.config,
-      encryptedPhrase,
+      encryptedPhrase: mnemonic,
       hasBeenEncrypted: false,
       walletType: options.walletType,
       addressIndex: options.addressIndex,
-    };
-    return {
-      wallet: importedWallet,
-      assets: initialAssets,
     };
   }
 }
