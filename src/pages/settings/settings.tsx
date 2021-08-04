@@ -216,9 +216,8 @@ function MetaInfoComponent() {
 
   const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState<string>();
-  const [isExportRecoveryPhraseModalVisible, setIsExportRecoveryPhraseModalVisible] = useState<
-    boolean
-  >(false);
+  const [isExportRecoveryPhraseModalVisible, setIsExportRecoveryPhraseModalVisible] =
+    useState<boolean>(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const didMountRef = useRef(false);
@@ -227,7 +226,7 @@ function MetaInfoComponent() {
   let recoveryPhraseSlider: CarouselRef | null = null;
   const itemsPerPage = 3;
 
-  const NextArrow = props => {
+  const NextArrow = (props) => {
     const { className, style, onClick } = props;
     return (
       <div
@@ -245,7 +244,7 @@ function MetaInfoComponent() {
     );
   };
 
-  const PrevArrow = props => {
+  const PrevArrow = (props) => {
     const { className, style, onClick } = props;
     return (
       <div
@@ -304,7 +303,7 @@ function MetaInfoComponent() {
     setDefaultGAStateDisabled,
   ]);
 
-  const onSwitchLanguage = value => {
+  const onSwitchLanguage = (value) => {
     setDefaultLanguageState(value!.toString());
     i18n.changeLanguage(value!.toString());
     generalConfigService.setLanguage(value!.toString());
@@ -404,7 +403,7 @@ function MetaInfoComponent() {
             {/* <div className="description">
             </div> */}
             <Select style={{ width: 240 }} onChange={onSwitchLanguage} value={defaultLanguageState}>
-              {SUPPORTED_LANGUAGE.map(item => {
+              {SUPPORTED_LANGUAGE.map((item) => {
                 return <Option value={item.value}>{item.label}</Option>;
               })}
             </Select>
@@ -498,7 +497,7 @@ function MetaInfoComponent() {
               className="recovery-phrase-slider"
               arrows
               {...sliderSettings}
-              ref={slider => {
+              ref={(slider) => {
                 recoveryPhraseSlider = slider;
               }}
             >
@@ -586,7 +585,7 @@ const FormSettings = () => {
     }
   }, [form, defaultSettings]);
 
-  const onFinish = async values => {
+  const onFinish = async (values) => {
     const defaultGasLimit =
       defaultSettings.fee !== undefined ? defaultSettings.fee.gasLimit : FIXED_DEFAULT_GAS_LIMIT;
     const defaultNetworkFee =

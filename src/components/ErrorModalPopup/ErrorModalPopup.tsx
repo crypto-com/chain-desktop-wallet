@@ -17,7 +17,7 @@ interface ErrorModalPopupProps {
   footer?: Array<React.ReactNode>;
 }
 
-const ErrorModalPopup: React.FC<ErrorModalPopupProps> = props => {
+const ErrorModalPopup: React.FC<ErrorModalPopupProps> = (props) => {
   return (
     <>
       {props.button}

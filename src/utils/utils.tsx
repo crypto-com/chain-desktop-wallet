@@ -54,7 +54,7 @@ export function splitToChunks(arr: any[], len: number) {
 }
 
 export function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export function convertIpfsToHttp(ipfsUrl: string) {

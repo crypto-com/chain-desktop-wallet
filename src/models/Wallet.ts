@@ -21,7 +21,7 @@ export class Wallet {
   // it gets encrypted once the user provide a password,
   // which will later be used as encryption key
   // This will be set to true once the wallet phrase has been encrypted
-  public hasBeenEncrypted: boolean = false;
+  public hasBeenEncrypted = false;
 
   public readonly walletType: string;
 
@@ -33,7 +33,7 @@ export class Wallet {
     address: string,
     config: WalletConfig,
     encryptedPhrase: string,
-    hasBeenEncrypted: boolean = false,
+    hasBeenEncrypted = false,
     walletType: string,
     addressIndex: number,
   ) {

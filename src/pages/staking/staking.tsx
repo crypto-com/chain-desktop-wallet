@@ -252,7 +252,7 @@ const FormDelegationRequest = () => {
       title: t('staking.validatorList.table.validatorWebsite'),
       dataIndex: 'validatorWebSite',
       key: 'validatorWebSite',
-      render: validatorWebSite => {
+      render: (validatorWebSite) => {
         return validatorWebSite === '' ? (
           'n.a.'
         ) : (
@@ -271,7 +271,7 @@ const FormDelegationRequest = () => {
       title: t('staking.validatorList.table.validatorAddress'),
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
-      render: validatorAddress => (
+      render: (validatorAddress) => (
         <a
           data-original={validatorAddress}
           title={validatorAddress}
@@ -289,7 +289,7 @@ const FormDelegationRequest = () => {
       key: 'currentTokens',
       sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
       defaultSortOrder: 'descend' as any,
-      render: currentTokens => {
+      render: (currentTokens) => {
         return (
           <span>
             {numeral(scaledAmount(currentTokens, 8)).format('0,0.00')}{' '}
@@ -303,14 +303,14 @@ const FormDelegationRequest = () => {
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
       sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
-      render: currentCommissionRate => (
+      render: (currentCommissionRate) => (
         <span>{new Big(currentCommissionRate).times(100).toFixed(2)}%</span>
       ),
     },
     {
       title: t('general.action'),
       key: 'action',
-      render: record => (
+      render: (record) => (
         <a
           onClick={() => {
             setIsValidatorListVisible(false);
@@ -581,8 +581,8 @@ const FormWithdrawStakingReward = () => {
     currentMarketPrice: AssetMarketPrice,
   ) => {
     return allRewards
-      .filter(reward => Big(reward.amount).gte(Big(0)))
-      .map(reward => {
+      .filter((reward) => Big(reward.amount).gte(Big(0)))
+      .map((reward) => {
         const rewardAmount = getUIDynamicAmount(reward.amount, currentAsset);
         const marketPrice = marketData && marketData.price ? new Big(currentMarketPrice.price) : '';
         const rewardMarketPrice =
@@ -688,7 +688,7 @@ const FormWithdrawStakingReward = () => {
       title: t('staking.formWithdralStakingReward.table.validatorName'),
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
-      render: text => (
+      render: (text) => (
         <a
           target="_blank"
           rel="noreferrer"
@@ -701,7 +701,7 @@ const FormWithdrawStakingReward = () => {
     {
       title: t('staking.formWithdralStakingReward.table.rewardAmount'),
       key: 'rewardAmount',
-      render: record => {
+      render: (record) => {
         return (
           <>
             {record.rewardAmount} <br />
@@ -734,7 +734,7 @@ const FormWithdrawStakingReward = () => {
         locale={TABLE_LOCALE}
         columns={rewardColumns}
         dataSource={rewards}
-        onRow={record => {
+        onRow={(record) => {
           return {
             onClick: () => {
               setWithdrawValues({

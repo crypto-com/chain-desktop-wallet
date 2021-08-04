@@ -17,7 +17,7 @@ interface SuccessModalPopupProps {
   footer?: Array<React.ReactNode>;
 }
 
-const SuccessModalPopup: React.FC<SuccessModalPopupProps> = props => {
+const SuccessModalPopup: React.FC<SuccessModalPopupProps> = (props) => {
   return (
     <>
       {props.button}

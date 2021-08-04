@@ -23,9 +23,7 @@ interface PasswordFormPageProps {
   successButtonText?: string;
 
   // TODO: use secure-string
-  onValidatePassword: (
-    password: string,
-  ) => Promise<{
+  onValidatePassword: (password: string) => Promise<{
     valid: boolean;
     errMsg?: string;
   }>;
@@ -35,7 +33,7 @@ interface PasswordFormPageProps {
   onCancel: () => void;
 }
 
-const PasswordFormContainer: React.FC<PasswordFormPageProps> = props => {
+const PasswordFormContainer: React.FC<PasswordFormPageProps> = (props) => {
   const [validationErrMsg, setValidatorErrMsg] = useState<string>();
   const onFormFinish = async (password: string) => {
     const result = await props.onValidatePassword(password);

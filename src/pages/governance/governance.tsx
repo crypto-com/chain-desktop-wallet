@@ -120,7 +120,7 @@ const GovernancePage = () => {
     showConfirmationModal();
   };
 
-  const onRadioChange = e => {
+  const onRadioChange = (e) => {
     setVoteOption(e.target.value);
   };
 
@@ -150,37 +150,18 @@ const GovernancePage = () => {
     const noValue = new Big(currentProposalTally.no);
     const noWithVetoValue = new Big(currentProposalTally.no_with_veto);
     const abstainValue = new Big(currentProposalTally.abstain);
-    const totalVotes = yesValue
-      .plus(noValue)
-      .plus(noWithVetoValue)
-      .plus(abstainValue);
+    const totalVotes = yesValue.plus(noValue).plus(noWithVetoValue).plus(abstainValue);
     // in percentage
-    const yesRate = totalVotes.gt('0')
-      ? yesValue
-          .div(totalVotes)
-          .times(100)
-          .toFixed(2)
-      : `n.a.`;
+    const yesRate = totalVotes.gt('0') ? yesValue.div(totalVotes).times(100).toFixed(2) : `n.a.`;
 
-    const noRate = totalVotes.gt('0')
-      ? noValue
-          .div(totalVotes)
-          .times(100)
-          .toFixed(2)
-      : `n.a.`;
+    const noRate = totalVotes.gt('0') ? noValue.div(totalVotes).times(100).toFixed(2) : `n.a.`;
 
     const noWithVetoRate = totalVotes.gt('0')
-      ? noWithVetoValue
-          .div(totalVotes)
-          .times(100)
-          .toFixed(2)
+      ? noWithVetoValue.div(totalVotes).times(100).toFixed(2)
       : `n.a.`;
 
     const abstainRate = totalVotes.gt('0')
-      ? abstainValue
-          .div(totalVotes)
-          .times(100)
-          .toFixed(2)
+      ? abstainValue.div(totalVotes).times(100).toFixed(2)
       : `n.a.`;
 
     const baseUnitDenominator = 1_0000_0000;
@@ -244,7 +225,7 @@ const GovernancePage = () => {
     setConfirmLoading(false);
   };
 
-  const processStatusTag = status => {
+  const processStatusTag = (status) => {
     let statusColor;
     const statusMessage =
       status !== null && status !== undefined
@@ -279,7 +260,7 @@ const GovernancePage = () => {
     );
   };
 
-  const processVoteTag = vote => {
+  const processVoteTag = (vote) => {
     let voteColor;
     let voteMessage;
     switch (vote) {
@@ -535,10 +516,10 @@ const GovernancePage = () => {
               <div className="site-layout-background governance-content">
                 <div className="container">
                   <List
-                    dataSource={proposalList?.filter(item => {
+                    dataSource={proposalList?.filter((item) => {
                       return item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD;
                     })}
-                    renderItem={item => (
+                    renderItem={(item) => (
                       <List.Item
                         key={item.proposal_id}
                         actions={
@@ -597,10 +578,10 @@ const GovernancePage = () => {
               <div className="site-layout-background governance-content">
                 <div className="container">
                   <List
-                    dataSource={proposalList?.filter(item => {
+                    dataSource={proposalList?.filter((item) => {
                       return item.status === ProposalStatuses.PROPOSAL_STATUS_PASSED;
                     })}
-                    renderItem={item => (
+                    renderItem={(item) => (
                       <List.Item
                         key={item.proposal_id}
                         actions={[]}
@@ -639,10 +620,10 @@ const GovernancePage = () => {
               <div className="site-layout-background governance-content">
                 <div className="container">
                   <List
-                    dataSource={proposalList?.filter(item => {
+                    dataSource={proposalList?.filter((item) => {
                       return item.status === ProposalStatuses.PROPOSAL_STATUS_FAILED;
                     })}
-                    renderItem={item => (
+                    renderItem={(item) => (
                       <List.Item
                         key={item.proposal_id}
                         actions={[]}
@@ -681,10 +662,10 @@ const GovernancePage = () => {
               <div className="site-layout-background governance-content">
                 <div className="container">
                   <List
-                    dataSource={proposalList?.filter(item => {
+                    dataSource={proposalList?.filter((item) => {
                       return item.status === ProposalStatuses.PROPOSAL_STATUS_REJECTED;
                     })}
-                    renderItem={item => (
+                    renderItem={(item) => (
                       <List.Item
                         key={item.proposal_id}
                         actions={[]}

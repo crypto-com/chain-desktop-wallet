@@ -111,10 +111,10 @@ export class NodeRpcService implements INodeRpcService {
     const delegationTransactionList: Array<StakingTransactionData> = [];
     delegationResponses
       .filter(
-        delegation =>
+        (delegation) =>
           delegation.balance.denom === assetSymbol && Number(delegation.balance.amount) > 0,
       )
-      .forEach(delegation => {
+      .forEach((delegation) => {
         totalSum += Number(delegation.balance.amount);
         delegationTransactionList.push({
           assetSymbol: delegation.balance.denom.toString().toUpperCase(),
@@ -144,9 +144,9 @@ export class NodeRpcService implements INodeRpcService {
     );
     const { rewards } = response.data;
     const rewardList: Array<RewardTransaction> = [];
-    rewards.forEach(stakingReward => {
+    rewards.forEach((stakingReward) => {
       let localRewardSum = 0;
-      stakingReward.reward.forEach(rw => {
+      stakingReward.reward.forEach((rw) => {
         if (rw.denom === assetSymbol) {
           localRewardSum += Number(rw.amount);
         }
@@ -188,7 +188,7 @@ export class NodeRpcService implements INodeRpcService {
       let fetchedProposals: Proposal[];
       // eslint-disable-next-line no-await-in-loop
       [fetchedProposals, nextKey] = await this.loadProposalsPaginated(nextKey);
-      const filteredProposals = fetchedProposals.filter(proposal =>
+      const filteredProposals = fetchedProposals.filter((proposal) =>
         proposalStatus.includes(proposal.status),
       );
 
@@ -247,9 +247,9 @@ export class NodeRpcService implements INodeRpcService {
     );
 
     return validators
-      .filter(v => v.status === 'BOND_STATUS_BONDED')
-      .filter(v => !v.jailed)
-      .filter(v => !!activeValidators[v.pubKey.value])
+      .filter((v) => v.status === 'BOND_STATUS_BONDED')
+      .filter((v) => !v.jailed)
+      .filter((v) => !!activeValidators[v.pubKey.value])
       .sort((v1, v2) => Big(v2.currentShares).cmp(Big(v1.currentShares)))
       .slice(0, MAX_VALIDATOR_LOAD);
   }
@@ -257,7 +257,7 @@ export class NodeRpcService implements INodeRpcService {
   private async fetchLatestActiveValidators(): Promise<ValidatorPubKey[]> {
     const response = await this.cosmosClient.get<ValidatorSetResponse>('/validatorsets/latest');
 
-    return response.data.result.validators.map(v => v.pub_key);
+    return response.data.result.validators.map((v) => v.pub_key);
   }
 
   private async fetchValidators(
@@ -269,7 +269,7 @@ export class NodeRpcService implements INodeRpcService {
     const response = await this.cosmosClient.get<ValidatorListResponse>(url);
 
     return [
-      response.data.validators.map(validator => ({
+      response.data.validators.map((validator) => ({
         status: validator.status,
         jailed: validator.jailed,
         validatorWebSite: validator.description.website,

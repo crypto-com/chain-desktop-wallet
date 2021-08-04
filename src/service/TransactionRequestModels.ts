@@ -67,7 +67,7 @@ export interface DelegationRequest {
   walletType: string; // normal, ledger
 }
 
-export interface UndelegationRequest extends DelegationRequest {}
+export type UndelegationRequest = DelegationRequest;
 export interface RedelegationRequest {
   validatorSourceAddress: string;
   validatorDestinationAddress: string;

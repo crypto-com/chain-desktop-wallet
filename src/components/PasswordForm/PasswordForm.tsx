@@ -23,7 +23,7 @@ interface PasswordFormProps {
   shouldValidate?: boolean;
 }
 
-const PasswordForm: React.FC<PasswordFormProps> = props => {
+const PasswordForm: React.FC<PasswordFormProps> = (props) => {
   const [form] = Form.useForm();
   const [strength, setStrength] = useState<number>(0);
   const [t] = useTranslation();
@@ -80,7 +80,7 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
                   '0%': '#1199fa',
                   '100%': '#20bca4',
                 }}
-                format={percent => {
+                format={(percent) => {
                   if (percent! < 25) {
                     return t('general.passwordForm.passwordStrength.worst');
                   }

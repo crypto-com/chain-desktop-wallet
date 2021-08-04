@@ -103,9 +103,7 @@ const supportedVideo = (mimeType: string | undefined) => {
 };
 
 const multiplyFee = (fee: string, multiply: number) => {
-  return Big(fee)
-    .times(multiply)
-    .toString();
+  return Big(fee).times(multiply).toString();
 };
 
 const FormMintNft = () => {
@@ -236,7 +234,7 @@ const FormMintNft = () => {
     showConfirmationModal();
   };
 
-  const beforeUpload = file => {
+  const beforeUpload = (file) => {
     let error = false;
     const isVideoFile = isVideo(file.type);
     const isSupportedVideo = supportedVideo(file.type);
@@ -411,7 +409,7 @@ const FormMintNft = () => {
     </div>
   );
 
-  const customRequest = async option => {
+  const customRequest = async (option) => {
     const { onProgress, onError, onSuccess, action, file } = option;
     const url = action;
     const isVideoFile = isVideo(file.type);
@@ -441,7 +439,7 @@ const FormMintNft = () => {
 
     try {
       const response = await axios.post(url, formData, {
-        onUploadProgress: e => {
+        onUploadProgress: (e) => {
           onProgress({ percent: (e.loaded / e.total) * 100 });
         },
         headers: {
@@ -599,7 +597,7 @@ const FormMintNft = () => {
               beforeUpload={beforeUpload}
               onChange={handleChange}
               accept="audio/*,video/*,image/*"
-              onRemove={file => {
+              onRemove={(file) => {
                 if (isVideo(file.type)) {
                   setVideoUrl('');
                 } else {
@@ -682,7 +680,7 @@ const FormMintNft = () => {
                     src={imageUrl}
                     alt="avatar"
                     placeholder={<Spin spinning indicator={<LoadingOutlined />} />}
-                    onError={e => {
+                    onError={(e) => {
                       (e.target as HTMLImageElement).src = nftThumbnail;
                     }}
                   />
@@ -923,7 +921,7 @@ const NftPage = () => {
 
   const processNftList = (currentList: NftModel[] | undefined) => {
     if (currentList) {
-      return currentList.map(item => {
+      return currentList.map((item) => {
         const denomSchema = isJson(item.denomSchema)
           ? JSON.parse(item.denomSchema)
           : item.denomSchema;
@@ -945,7 +943,7 @@ const NftPage = () => {
     AddressType.USER,
   );
 
-  const renderPreview = (_nft: NftProcessedModel | undefined, showThumbnail: boolean = true) => {
+  const renderPreview = (_nft: NftProcessedModel | undefined, showThumbnail = true) => {
     if (
       !showThumbnail &&
       (supportedVideo(_nft?.tokenData.mimeType) ||
@@ -970,14 +968,14 @@ const NftPage = () => {
       <img
         alt={_nft?.denomName}
         src={_nft?.tokenData.image ? _nft?.tokenData.image : nftThumbnail}
-        onError={e => {
+        onError={(e) => {
           (e.target as HTMLImageElement).src = nftThumbnail;
         }}
       />
     );
   };
 
-  const renderNftTitle = (_nft: NftProcessedModel | undefined, length: number = 999) => {
+  const renderNftTitle = (_nft: NftProcessedModel | undefined, length = 999) => {
     if (_nft?.tokenData && _nft?.tokenData.name) {
       return ellipsis(_nft?.tokenData.name, length);
     }
@@ -1098,7 +1096,7 @@ const NftPage = () => {
     {
       title: t('nft.nftCollection.table1.name'),
       key: 'name',
-      render: record => {
+      render: (record) => {
         const { drop, name } = record.tokenData;
         return name || drop ? name || drop : 'n.a.';
       },
@@ -1106,21 +1104,21 @@ const NftPage = () => {
     {
       title: t('nft.nftCollection.table1.denomId'),
       key: 'denomId',
-      render: record => {
+      render: (record) => {
         return record.denomId;
       },
     },
     {
       title: t('nft.nftCollection.table1.tokenId'),
       key: 'tokenId',
-      render: record => {
+      render: (record) => {
         return record.tokenId;
       },
     },
     {
       title: t('nft.nftCollection.table1.creator'),
       key: 'creator',
-      render: record => {
+      render: (record) => {
         return (
           <a
             data-original={record.tokenMinter}
@@ -1136,7 +1134,7 @@ const NftPage = () => {
     {
       title: t('nft.nftCollection.table1.viewAction'),
       key: 'viewAction',
-      render: record => {
+      render: (record) => {
         return (
           <a
             onClick={() => {
@@ -1165,7 +1163,7 @@ const NftPage = () => {
                 <Radio.Group
                   options={nftViewOptions}
                   defaultValue="grid"
-                  onChange={e => {
+                  onChange={(e) => {
                     setNftView(e.target.value);
                   }}
                   optionType="button"
@@ -1183,7 +1181,7 @@ const NftPage = () => {
                     xxl: 5,
                   }}
                   dataSource={processedNftList}
-                  renderItem={item => (
+                  renderItem={(item) => (
                     <List.Item>
                       <Card
                         style={{ width: 200 }}

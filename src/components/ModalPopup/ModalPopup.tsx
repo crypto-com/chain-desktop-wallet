@@ -20,7 +20,7 @@ interface ModalPopupProps {
   width?: number;
 }
 
-const ModalPopup: React.FC<ModalPopupProps> = props => {
+const ModalPopup: React.FC<ModalPopupProps> = (props) => {
   return (
     <>
       {props.button}

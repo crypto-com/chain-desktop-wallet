@@ -8,7 +8,7 @@ interface BackButtonProps {
   backTo?: string;
 }
 
-const BackButton: React.FC<BackButtonProps> = props => {
+const BackButton: React.FC<BackButtonProps> = (props) => {
   const history = useHistory();
 
   const backTo = () => {

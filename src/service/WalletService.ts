@@ -102,7 +102,7 @@ class WalletService {
       accountSequence,
     };
 
-    let signedTxHex: string = '';
+    let signedTxHex = '';
 
     if (transferRequest.walletType === LEDGER_WALLET_TYPE) {
       signedTxHex = await ledgerTransactionSigner.signTransfer(
@@ -300,7 +300,7 @@ class WalletService {
       accountSequence,
     };
 
-    let signedTxHex: string = '';
+    let signedTxHex = '';
 
     if (voteRequest.walletType === LEDGER_WALLET_TYPE) {
       signedTxHex = await ledgerTransactionSigner.signVoteTransaction(
@@ -342,7 +342,7 @@ class WalletService {
       accountSequence,
     };
 
-    let signedTxHex: string = '';
+    let signedTxHex = '';
 
     if (nftTransferRequest.walletType === LEDGER_WALLET_TYPE) {
       signedTxHex = await ledgerTransactionSigner.signNFTTransfer(
@@ -393,7 +393,7 @@ class WalletService {
       accountSequence,
     };
 
-    let signedTxHex: string = '';
+    let signedTxHex = '';
 
     if (nftMintRequest.walletType === LEDGER_WALLET_TYPE) {
       signedTxHex = await ledgerTransactionSigner.signNFTMint(
@@ -439,7 +439,7 @@ class WalletService {
       accountSequence,
     };
 
-    let signedTxHex: string = '';
+    let signedTxHex = '';
 
     if (nftDenomIssueRequest.walletType === LEDGER_WALLET_TYPE) {
       signedTxHex = await ledgerTransactionSigner.signNFTDenomIssue(
@@ -593,9 +593,9 @@ class WalletService {
       return [];
     }
     return wallets
-      .filter(wallet => wallet.hasBeenEncrypted)
+      .filter((wallet) => wallet.hasBeenEncrypted)
       .map(
-        data =>
+        (data) =>
           new Wallet(
             data.identifier,
             data.name,
@@ -672,7 +672,7 @@ class WalletService {
     }
 
     await Promise.all(
-      assets.map(async asset => {
+      assets.map(async (asset) => {
         const baseDenomination = currentSession.wallet.config.network.coin.baseDenom;
         try {
           asset.balance = await nodeRpc.loadAccountBalance(
@@ -839,7 +839,7 @@ class WalletService {
       currentSession.wallet.identifier,
     );
 
-    return assets.map(data => {
+    return assets.map((data) => {
       const asset: UserAsset = { ...data };
       return asset;
     });
@@ -875,7 +875,7 @@ class WalletService {
 
   public async retrieveAssetPrice(
     assetSymbol: string,
-    currency: string = 'USD',
+    currency = 'USD',
   ): Promise<AssetMarketPrice> {
     const price = await this.storageService.retrieveAssetPrice(assetSymbol, currency);
     return {
@@ -953,43 +953,40 @@ class WalletService {
   }
 
   public async retrieveAllDelegations(walletId: string): Promise<StakingTransactionData[]> {
-    const stakingTransactionList: StakingTransactionList = await this.storageService.retrieveAllStakingTransactions(
-      walletId,
-    );
+    const stakingTransactionList: StakingTransactionList =
+      await this.storageService.retrieveAllStakingTransactions(walletId);
     if (!stakingTransactionList) {
       return [];
     }
-    return stakingTransactionList.transactions.map(data => {
+    return stakingTransactionList.transactions.map((data) => {
       const stakingTransaction: StakingTransactionData = { ...data };
       return stakingTransaction;
     });
   }
 
   public async retrieveAllRewards(walletId: string): Promise<RewardTransaction[]> {
-    const rewardTransactionList: RewardTransactionList = await this.storageService.retrieveAllRewards(
-      walletId,
-    );
+    const rewardTransactionList: RewardTransactionList =
+      await this.storageService.retrieveAllRewards(walletId);
 
     if (!rewardTransactionList) {
       return [];
     }
 
-    return rewardTransactionList.transactions.map(data => {
+    return rewardTransactionList.transactions.map((data) => {
       const rewardTransaction: RewardTransaction = { ...data };
       return rewardTransaction;
     });
   }
 
   public async retrieveAllTransfers(walletId: string): Promise<TransferTransactionData[]> {
-    const transactionList: TransferTransactionList = await this.storageService.retrieveAllTransferTransactions(
-      walletId,
-    );
+    const transactionList: TransferTransactionList =
+      await this.storageService.retrieveAllTransferTransactions(walletId);
 
     if (!transactionList) {
       return [];
     }
 
-    return transactionList.transactions.map(data => {
+    return transactionList.transactions.map((data) => {
       const transactionData: TransferTransactionData = { ...data };
       return transactionData;
     });
@@ -1011,7 +1008,7 @@ class WalletService {
   }
 
   public getSelectedNetwork(network, props) {
-    let selectedNetworkConfig = this.supportedConfigs().find(config => config.name === network);
+    let selectedNetworkConfig = this.supportedConfigs().find((config) => config.name === network);
 
     // If the dev-net custom network was selected, we pass the values that were input in the dev-net config UI fields
     if (selectedNetworkConfig?.name === DefaultWalletConfigs.CustomDevNet.name) {

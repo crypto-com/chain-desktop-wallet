@@ -8,7 +8,7 @@ export class Session {
 
   public static SESSION_ID = 'SESSION_ID';
 
-  constructor(wallet: Wallet, currency: string = 'USD') {
+  constructor(wallet: Wallet, currency = 'USD') {
     this.wallet = wallet;
     this.currency = currency;
   }

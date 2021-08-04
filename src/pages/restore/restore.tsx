@@ -45,7 +45,7 @@ interface FormRestoreProps {
   networkConfig: any;
 }
 
-const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
+const FormCustomConfig: React.FC<FormCustomConfigProps> = (props) => {
   const [form] = Form.useForm();
   const [checkingNodeConnection, setCheckingNodeConnection] = useState(false);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -81,7 +81,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
 
   const checkNodeConnectivity = async () => {
     // TO-DO Node Connectivity check
-    form.validateFields().then(async values => {
+    form.validateFields().then(async (values) => {
       setCheckingNodeConnection(true);
       const { nodeUrl } = values;
       const isNodeLive = await walletService.checkNodeIsLive(nodeUrl);
@@ -279,7 +279,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
   );
 };
 
-const FormRestore: React.FC<FormRestoreProps> = props => {
+const FormRestore: React.FC<FormRestoreProps> = (props) => {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
@@ -420,7 +420,7 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
           // allowClear
           disabled={props.isSelectFieldDisable}
         >
-          {walletService.supportedConfigs().map(config => (
+          {walletService.supportedConfigs().map((config) => (
             <Select.Option key={config.name} value={config.name} disabled={!config.enabled}>
               {config.name}
             </Select.Option>

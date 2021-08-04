@@ -28,7 +28,7 @@ interface RouterProps {
 }
 
 // Electron build: <HashRouter>, Web build: <BrowserRouter>
-const Router: React.FC<RouterProps> = props => {
+const Router: React.FC<RouterProps> = (props) => {
   return isElectron() ? (
     <ElectronRouter>{props.children}</ElectronRouter>
   ) : (
@@ -134,7 +134,7 @@ function RouteHub() {
         <Route exact path={routeIndex.path} key={routeIndex.key}>
           {routeIndex.component}
         </Route>
-        {routeItems.map(item => {
+        {routeItems.map((item) => {
           return (
             <Route exact path={item.path} key={item.path}>
               {item.component}
@@ -143,7 +143,7 @@ function RouteHub() {
         })}
         <HomeLayout>
           <Switch>
-            {routeHomeLayoutItems.map(item => {
+            {routeHomeLayoutItems.map((item) => {
               return (
                 <Route exact path={item.path} key={item.path}>
                   {item.component}
