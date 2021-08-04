@@ -10,12 +10,12 @@ import { TxListAPIResponse } from "../rpc/models/cronos.models";
 
 class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
-    async getTxsByAddress(_: string): Promise<TxListAPIResponse> {
+    getTxsByAddress = async (_address: string): Promise<TxListAPIResponse> => {
         // todo: implement the logic using `axios` client
         throw new Error("Method not implemented.");
     }
-    
-    async getPendingTxsByAddress(_: string): Promise<TxListAPIResponse> {
+
+    getPendingTxsByAddress = async (_address: string): Promise<TxListAPIResponse> => {
         // todo: implement the logic using `axios` client
         throw new Error("Method not implemented.");
     }
