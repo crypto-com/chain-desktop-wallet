@@ -29,7 +29,7 @@ import {
   ledgerIsExpertModeState,
   fetchingDBState,
 } from '../../recoil/atom';
-import { NOT_KNOWN_YET_VALUE, TABLE_LOCALE, WalletConfig } from '../../config/StaticConfig';
+import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
 import {
@@ -943,14 +943,34 @@ function HomePage() {
         </Tabs>
         <Tabs defaultActiveKey="1">
           <TabPane tab={t('home.transactions.tab1')} key="1">
-            <Table locale={TABLE_LOCALE} columns={TransactionColumns} dataSource={transfers} />
+            <Table
+              locale={{
+                triggerDesc: t('general.table.triggerDesc'),
+                triggerAsc: t('general.table.triggerAsc'),
+                cancelSort: t('general.table.cancelSort'),
+              }}
+              columns={TransactionColumns}
+              dataSource={transfers}
+            />
           </TabPane>
           <TabPane tab={t('home.transactions.tab2')} key="2">
-            <Table locale={TABLE_LOCALE} columns={StakingColumns} dataSource={delegations} />
+            <Table
+              locale={{
+                triggerDesc: t('general.table.triggerDesc'),
+                triggerAsc: t('general.table.triggerAsc'),
+                cancelSort: t('general.table.cancelSort'),
+              }}
+              columns={StakingColumns}
+              dataSource={delegations}
+            />
           </TabPane>
           <TabPane tab={t('home.transactions.tab3')} key="3">
             <Table
-              locale={TABLE_LOCALE}
+              locale={{
+                triggerDesc: t('general.table.triggerDesc'),
+                triggerAsc: t('general.table.triggerAsc'),
+                cancelSort: t('general.table.cancelSort'),
+              }}
               columns={NftTransactionColumns}
               dataSource={nftTransfers}
             />
