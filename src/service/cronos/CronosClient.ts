@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { EVMClient } from "../rpc/clients/EVMClient";
 import { ICronosChainIndexAPI } from "../rpc/interface/cronos.chainIndex";
 import { TxListAPIResponse } from "../rpc/models/cronos.models";
