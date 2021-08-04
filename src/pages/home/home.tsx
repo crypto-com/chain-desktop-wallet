@@ -113,7 +113,7 @@ interface NftTransferTabularData {
 
 function convertDelegations(allDelegations: StakingTransactionData[], currentAsset: UserAsset) {
   return allDelegations
-    .map((dlg) => {
+    .map(dlg => {
       const stakedAmount = getUIDynamicAmount(dlg.stakedAmount, currentAsset);
       const data: StakingTabularData = {
         key: dlg.validatorAddress + dlg.stakedAmount,
@@ -124,7 +124,7 @@ function convertDelegations(allDelegations: StakingTransactionData[], currentAss
       };
       return data;
     })
-    .filter((dlg) => Number(dlg.stakedAmount) > 0);
+    .filter(dlg => Number(dlg.stakedAmount) > 0);
 }
 
 function convertTransfers(
@@ -144,7 +144,7 @@ function convertTransfers(
     return TransactionDirection.INCOMING;
   }
 
-  return allTransfers.map((transfer) => {
+  return allTransfers.map(transfer => {
     const transferAmount = getUIDynamicAmount(transfer.amount, currentAsset);
     const data: TransferTabularData = {
       key: transfer.hash + transfer.receiverAddress + transfer.amount,
@@ -180,7 +180,7 @@ function convertNftTransfers(allTransfers: NftAccountTransactionData[]) {
     return NftTransactionType.TRANSFER_NFT;
   }
 
-  return allTransfers.map((transfer) => {
+  return allTransfers.map(transfer => {
     const data: NftTransferTabularData = {
       key:
         transfer.transactionHash +
@@ -259,7 +259,7 @@ function HomePage() {
       title: t('home.transactions.table1.transactionHash'),
       dataIndex: 'transactionHash',
       key: 'transactionHash',
-      render: (text) => (
+      render: text => (
         <a
           data-original={text}
           target="_blank"
@@ -290,7 +290,7 @@ function HomePage() {
       title: t('home.transactions.table1.recipientAddress'),
       dataIndex: 'recipientAddress',
       key: 'recipientAddress',
-      render: (text) => (
+      render: text => (
         <a
           data-original={text}
           target="_blank"
@@ -336,7 +336,7 @@ function HomePage() {
       title: t('home.transactions.table3.transactionHash'),
       dataIndex: 'transactionHash',
       key: 'transactionHash',
-      render: (text) => (
+      render: text => (
         <a
           data-original={text}
           target="_blank"
@@ -426,19 +426,19 @@ function HomePage() {
       title: t('home.transactions.table3.denomId'),
       dataIndex: 'denomId',
       key: 'denomId',
-      render: (text) => <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>,
+      render: text => <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>,
     },
     {
       title: t('home.transactions.table3.tokenId'),
       dataIndex: 'tokenId',
       key: 'tokenId',
-      render: (text) => <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>,
+      render: text => <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>,
     },
     {
       title: t('home.transactions.table3.recipientAddress'),
       dataIndex: 'recipientAddress',
       key: 'recipientAddress',
-      render: (text) => {
+      render: text => {
         return text ? (
           <a
             data-original={text}
@@ -465,14 +465,14 @@ function HomePage() {
       <img
         alt={_nft?.denomName}
         src={_nft?.tokenData.image ? _nft?.tokenData.image : nftThumbnail}
-        onError={(e) => {
+        onError={e => {
           (e.target as HTMLImageElement).src = nftThumbnail;
         }}
       />
     );
   };
 
-  const renderNftTitle = (_nft: NftProcessedModel | undefined, length = 999) => {
+  const renderNftTitle = (_nft: NftProcessedModel | undefined, length: number = 999) => {
     if (_nft?.tokenData && _nft?.tokenData.name) {
       return ellipsis(_nft?.tokenData.name, length);
     }
@@ -535,7 +535,7 @@ function HomePage() {
 
   const processNftList = (currentList: NftModel[] | undefined) => {
     if (currentList) {
-      return currentList.slice(0, maxNftPreview).map((item) => {
+      return currentList.slice(0, maxNftPreview).map(item => {
         const denomSchema = isJson(item.denomSchema)
           ? JSON.parse(item.denomSchema)
           : item.denomSchema;
@@ -760,7 +760,7 @@ function HomePage() {
     }
   };
 
-  const onDelegationCellsClicked = (e) => {
+  const onDelegationCellsClicked = e => {
     const eventData = JSON.parse(e.currentTarget.dataset.id);
     const { validatorAddress, stakedAmount, actionType } = eventData;
     const newStakingAction: StakingActionType = StakingActionType[actionType];
@@ -787,7 +787,7 @@ function HomePage() {
       title: t('home.transactions.table2.validatorAddress'),
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
-      render: (text) => (
+      render: text => (
         <a
           target="_blank"
           rel="noreferrer"
@@ -806,7 +806,7 @@ function HomePage() {
       title: t('home.transactions.table2.delegatorAddress'),
       dataIndex: 'delegatorAddress',
       key: 'delegatorAddress',
-      render: (text) => (
+      render: text => (
         <a
           data-original={text}
           target="_blank"
@@ -906,7 +906,7 @@ function HomePage() {
                   xxl: 5,
                 }}
                 dataSource={processedNftList}
-                renderItem={(item) => (
+                renderItem={item => (
                   <List.Item>
                     <Card
                       style={{ width: 170 }}

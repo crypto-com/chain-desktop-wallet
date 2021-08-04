@@ -203,6 +203,9 @@ export class LedgerTransactionSigner implements ITransactionSigner {
     const bytesMessage: Bytes = signableTx.toSignDocument(0);
     const signature = await this.signerProvider.sign(bytesMessage);
 
-    return signableTx.setSignature(0, signature).toSigned().getHexEncoded();
+    return signableTx
+      .setSignature(0, signature)
+      .toSigned()
+      .getHexEncoded();
   }
 }

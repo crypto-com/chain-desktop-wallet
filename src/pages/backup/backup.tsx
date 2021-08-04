@@ -54,7 +54,7 @@ const BackupPage = () => {
     history.push('/create');
   };
 
-  const checkboxOnChange = (e) => {
+  const checkboxOnChange = e => {
     setIsButtonDisabled(!e.target.checked);
   };
 

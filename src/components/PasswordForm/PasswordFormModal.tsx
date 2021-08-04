@@ -30,7 +30,9 @@ interface PasswordFormModalProps {
   repeatValidation?: boolean;
 
   // TODO: use secure-string
-  onValidatePassword: (password: string) => Promise<{
+  onValidatePassword: (
+    password: string,
+  ) => Promise<{
     valid: boolean;
     errMsg?: string;
   }>;
@@ -42,7 +44,7 @@ interface PasswordFormModalProps {
 
 type DisplayComponent = 'form' | 'result';
 
-const PasswordFormModal: React.FC<PasswordFormModalProps> = (props) => {
+const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
   const [appPassword, setAppPassword] = useState<string>();
   const [displayComponent, setDisplayComponent] = useState<DisplayComponent>('form');
   const [validationErrMsg, setValidatorErrMsg] = useState<string>();

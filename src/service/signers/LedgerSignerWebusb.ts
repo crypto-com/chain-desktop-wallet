@@ -5,7 +5,7 @@ import { LedgerSigner } from './LedgerSigner';
 export class LedgerSignerWebusb extends LedgerSigner {
   public transport: TransportWebHID;
 
-  constructor(account = 0) {
+  constructor(account: number = 0) {
     super(account);
   }
 

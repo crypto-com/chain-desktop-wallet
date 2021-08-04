@@ -57,7 +57,7 @@ export enum NftTransactionType {
   TRANSFER_NFT = 'MsgTransferNFT',
 }
 
-export type NftAccountTransactionData = NftAccountTransactionResponse;
+export interface NftAccountTransactionData extends NftAccountTransactionResponse {}
 
 export interface StakingTransactionList {
   transactions: Array<StakingTransactionData>;
@@ -127,7 +127,7 @@ export interface ValidatorModel {
   readonly pubKey: ValidatorPubKey;
 }
 
-export type ProposalModel = Proposal;
+export interface ProposalModel extends Proposal {}
 
 export interface NftTokenData {
   name?: string;
@@ -145,13 +145,13 @@ export interface NftModel extends NftResponse {
   marketplaceLink: string;
 }
 
-export type NftDenomModel = NftDenomData;
+export interface NftDenomModel extends NftDenomData {}
 
 export interface NftProcessedModel extends Omit<NftModel, 'tokenData'> {
   tokenData: NftTokenData;
 }
 
-export type NftTransferModel = NftTransactionResponse;
+export interface NftTransferModel extends NftTransactionResponse {}
 // export interface NFTAccountTransactionModel extends NFTAccountTransactionResponse {}
 
 export interface NftAccountTransactionList {

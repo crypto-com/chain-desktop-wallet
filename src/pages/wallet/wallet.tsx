@@ -44,7 +44,7 @@ function WalletPage() {
 
   const [t] = useTranslation();
 
-  const processWalletList = (wallets) => {
+  const processWalletList = wallets => {
     const list = wallets.reduce((resultList, wallet, idx) => {
       const walletModel = {
         ...wallet,
@@ -85,7 +85,7 @@ function WalletPage() {
     );
   };
 
-  const walletSelect = async (e) => {
+  const walletSelect = async e => {
     setLoading(true);
 
     await walletService.setCurrentSession(new Session(walletList[e.key]));
@@ -104,8 +104,8 @@ function WalletPage() {
     setLoading(false);
   };
 
-  const onSearch = (value) => {
-    const newWalletList = walletList.filter((wallet) => {
+  const onSearch = value => {
+    const newWalletList = walletList.filter(wallet => {
       return (
         wallet.name.toLowerCase().indexOf(value.toLowerCase()) !== -1 ||
         wallet.address.toLowerCase().indexOf(value.toLowerCase()) !== -1 ||
@@ -156,7 +156,7 @@ function WalletPage() {
           dataIndex: 'address',
         },
       ],
-      render: (text) => <Text type="success">{text}</Text>,
+      render: text => <Text type="success">{text}</Text>,
     },
     {
       title: t('wallet.table1.walletType'),
@@ -183,7 +183,7 @@ function WalletPage() {
             ),
           dataIndex: 'walletType',
           // Same as title above
-          render: (walletType) =>
+          render: walletType =>
             walletType && walletType.length > 2 ? (
               <>
                 {walletType.charAt(0).toUpperCase() + walletType.slice(1)}{' '}
@@ -207,7 +207,7 @@ function WalletPage() {
       children: [
         {
           title: processNetworkTag(session?.wallet.config.name, true),
-          render: (record) => {
+          render: record => {
             return processNetworkTag(record.config.name, false);
           },
         },
@@ -229,7 +229,7 @@ function WalletPage() {
               }}
             />
           ),
-          render: (record) => {
+          render: record => {
             return (
               <Space size="middle">
                 <a

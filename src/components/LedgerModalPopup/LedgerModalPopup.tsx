@@ -17,7 +17,7 @@ interface LedgerModalPopupProps {
   image: React.ReactNode;
 }
 
-const LedgerModalPopup: React.FC<LedgerModalPopupProps> = (props) => {
+const LedgerModalPopup: React.FC<LedgerModalPopupProps> = props => {
   return (
     <>
       {props.button}
