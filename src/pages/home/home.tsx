@@ -18,7 +18,7 @@ import {
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
-import Big from 'big.js';
+// import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -942,7 +942,7 @@ function HomePage() {
       </Header>
       <Content>
         <div className="site-layout-background balance-container">
-          <div className="balance">
+          {/* <div className="balance">
             <div className="title">TOTAL ASSET BALANCE</div>
             <div className="quantity">
               $
@@ -953,7 +953,7 @@ function HomePage() {
               ).format('0,0.00')}{' '}
               USD
             </div>
-          </div>
+          </div> */}
           <div className="balance">
             <div className="title">CRO BALANCE</div>
             {/* <div className="title">{t('home.balance.title1')}</div> */}
