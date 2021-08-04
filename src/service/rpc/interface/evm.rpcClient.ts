@@ -3,6 +3,7 @@ import { BlockTransactionObject, TransactionReceipt } from 'web3-eth';
 export interface IEvmRpc {
   // Node
   isNodeSyncing(): Promise<boolean>;
+  getChainId(): Promise<number>;
 
   // Address
   getNativeBalanceByAddress(address: string): Promise<string>;
@@ -10,12 +11,11 @@ export interface IEvmRpc {
 
   // Transaction
   getTransactionReceiptByHash(txHash: string): Promise<TransactionReceipt>
-  getTransactionReceiptByBlockHashAndIndex(blockHash: string, txIndex: number): Promise<TransactionReceipt>
 
   // Block
   getLatestBlockHeight(): Promise<number>;
   getBlock(blockHashOrBlockNumber: number | string): Promise<BlockTransactionObject>;
-  getBlockByHeight(height: string): Promise<BlockTransactionObject>;
+  getBlockByHeight(height: number): Promise<BlockTransactionObject>;
   getBlockByHash(blockHash: string): Promise<BlockTransactionObject>;
 
   // Broadcast
