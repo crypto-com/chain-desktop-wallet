@@ -21,6 +21,7 @@
         "review": "Review",
         "copy": "Copy",
         "close": "Close",
+        "retry": "Retry",
         "connect": "Connect",
         "addressValidator": {
           "reason1": "Invalid",
@@ -790,6 +791,7 @@
         "review": "檢查",
         "copy": "複製",
         "close": "關閉",
+        "retry": "重試",
         "connect": "連接",
         "addressValidator": {
           "reason1": "無效的",
@@ -1559,6 +1561,7 @@
         "review": "检查",
         "copy": "复制",
         "close": "关闭",
+        "retry": "重试",
         "connect": "连接",
         "addressValidator": {
           "reason1": "无效的",
@@ -2449,6 +2452,7 @@
         "review": "리뷰",
         "copy": "복사",
         "close": "닫기",
+        "retry": "재시도",
         "connect": "연결",
         "addressValidator": {
           "reason1": "무효",
@@ -3209,7 +3213,7 @@
         "disabled": "Etkisizleştir",
         "confirm": "Onayla",
         "continue": "Devam et",
-        "cancel": "Iptal et",
+        "cancel": "İptal et",
         "save": "Kaydet",
         "discard": "Değişiklikleri yoksay",
         "ok": "Tamam",
@@ -3223,6 +3227,7 @@
         "review": "gözden geçir",
         "copy": "Kopyala",
         "close": "Kapat",
+        "retry": "Tekrar dene",
         "connect": "Bağlan",
         "addressValidator": {
           "reason1": "Geçersiz",
@@ -3271,7 +3276,10 @@
           }
         },
         "successModalPopup": {
-          "title": "İşlem başarılı!"
+          "title": "İşlem başarılı!",
+          "createWallet": {
+            "button": "Cüzdan Oluştur"
+          }
         }
       }
     }

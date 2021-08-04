@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import './PasswordFormModal.less';
 import Modal from 'antd/lib/modal/Modal';
 import { Button } from 'antd';
@@ -50,6 +51,8 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
   const [validationErrMsg, setValidatorErrMsg] = useState<string>();
   const [resultButtonText, setResultButtonText] = useState<string>();
 
+  const [t] = useTranslation();
+
   const onModalFinish = async () => {
     if (validationErrMsg !== '') {
       setValidatorErrMsg('');
@@ -66,7 +69,7 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
     const result = await props.onValidatePassword(password);
     if (!result.valid) {
       setValidatorErrMsg(result.errMsg);
-      setResultButtonText('Retry');
+      setResultButtonText(t('general.retry'));
       setDisplayComponent('result');
       return;
     }
@@ -77,7 +80,7 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
   };
   const onFormErr = (errMsg: string) => {
     setValidatorErrMsg(errMsg);
-    setResultButtonText('Retry');
+    setResultButtonText(t('general.retry'));
     setDisplayComponent('result');
   };
   const onFormChange = () => {
