@@ -31,11 +31,11 @@ describe('Testing WalletImporter', () => {
         .address?.startsWith('tcro'),
     ).to.eq(true);
 
-    expect(
-      assets.filter(asset => asset.assetType === UserAssetType.EVM)[0].address?.startsWith('0x'),
-    ).to.eq(true);
+    const evmCronosAsset = assets.filter(asset => asset.assetType === UserAssetType.EVM)[0];
 
-    expect(assets.filter(asset => asset.assetType === UserAssetType.EVM)[0].decimals).to.eq(18);
+    expect(evmCronosAsset.address?.startsWith('0x')).to.eq(true);
+    expect(evmCronosAsset.decimals).to.eq(18);
+    expect(evmCronosAsset?.address).to.eq('0x23806BC778F56AaA1e20CD0d1A44078aFa8D65b0');
   });
 
   it('Test importing wallet with main-net configuration', () => {
@@ -54,6 +54,11 @@ describe('Testing WalletImporter', () => {
     expect(testNetWallet.name).to.eq('My-MainNet-Wallet');
     expect(testNetWallet.address).to.eq('cro1n0ejfh2ur2nslekrynvcwuwc9cccnhxfqn6sfs');
     expect(testNetWallet.config).to.eq(mainNetConfig);
+
+    const { assets } = new WalletImporter(importOptions).import();
+
+    const evmCronosAsset = assets.filter(asset => asset.assetType === UserAssetType.EVM)[0];
+    expect(evmCronosAsset?.address).to.eq('0xc2aFcEC3DAfAF1a4f47030eE35Fd1A1231C08256');
   });
 
   it('Test importing wallet with custom configurations', () => {
