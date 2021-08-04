@@ -25,6 +25,24 @@ export interface UserAsset {
   // Specify the 10^decimals conversion to go from BASE TO ASSET
   // E.g = 1 TCRO = 1O^8 BASETCRO
   decimals: number;
+
+  denomTracePath?: string;
+
+  ibcDenomHash?: string;
+
+  assetType?: UserAssetType;
+
+  address?: string;
+}
+
+export enum UserAssetType {
+  // For Cosmos based assets
+  TENDERMINT = 'TENDERMINT',
+  // For Cosmos IBC assets
+  IBC = 'IBC',
+
+  // For EVM based assets like CRONOS
+  EVM = 'EVM',
 }
 
 export interface AssetMarketPrice {
