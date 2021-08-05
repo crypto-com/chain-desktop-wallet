@@ -1,6 +1,5 @@
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import { getRandomId } from '../crypto/RandomGen';
-import i18n from '../language/I18n';
 
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
@@ -23,11 +22,6 @@ export const SUPPORTED_LANGUAGE = [
   { value: 'zhCN', label: '简体中文' },
   { value: 'koKR', label: '한국어' },
 ];
-export const TABLE_LOCALE = {
-  triggerDesc: i18n.t('general.table.triggerDesc'),
-  triggerAsc: i18n.t('general.table.triggerAsc'),
-  cancelSort: i18n.t('general.table.cancelSort'),
-};
 
 export type WalletConfig = {
   enabled: boolean;

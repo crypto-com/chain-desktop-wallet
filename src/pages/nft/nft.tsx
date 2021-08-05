@@ -51,7 +51,6 @@ import { getUINormalScaleAmount } from '../../utils/NumberUtils';
 import { NftModel, NftProcessedModel, BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
-  TABLE_LOCALE,
   IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT,
   FIXED_DEFAULT_FEE,
   NFT_IMAGE_DENOM_SCHEMA,
@@ -1234,7 +1233,15 @@ const NftPage = () => {
                   loading={fetchingDB}
                 />
               ) : (
-                <Table locale={TABLE_LOCALE} columns={NftColumns} dataSource={processedNftList} />
+                <Table
+                  locale={{
+                    triggerDesc: t('general.table.triggerDesc'),
+                    triggerAsc: t('general.table.triggerAsc'),
+                    cancelSort: t('general.table.cancelSort'),
+                  }}
+                  columns={NftColumns}
+                  dataSource={processedNftList}
+                />
               )}
             </div>
             <>

@@ -21,6 +21,7 @@
         "review": "Review",
         "copy": "Copy",
         "close": "Close",
+        "retry": "Retry",
         "connect": "Connect",
         "addressValidator": {
           "reason1": "Invalid",
@@ -561,6 +562,8 @@
         "backToList": "Back to Proposal List",
         "start": "Start",
         "end": "End",
+        "result": "Current results",
+        "castVote": "Cast your vote",
         "sendVote": "Send Vote",
         "modal1": {
           "title": "Confirm Vote Transaction",
@@ -790,6 +793,7 @@
         "review": "檢查",
         "copy": "複製",
         "close": "關閉",
+        "retry": "重試",
         "connect": "連接",
         "addressValidator": {
           "reason1": "無效的",
@@ -1330,6 +1334,8 @@
         "backToList": "返回",
         "start": "開始",
         "end": "結束",
+        "result": "當前結果",
+        "castVote": "投票",
         "sendVote": "發送投票",
         "modal1": {
           "title": "確認投票交易",
@@ -1559,6 +1565,7 @@
         "review": "检查",
         "copy": "复制",
         "close": "关闭",
+        "retry": "重试",
         "connect": "连接",
         "addressValidator": {
           "reason1": "无效的",
@@ -2099,6 +2106,8 @@
         "backToList": "返回",
         "start": "开始",
         "end": "结束",
+        "result": "当前结果",
+        "castVote": "投票",
         "sendVote": "发送投票",
         "modal1": {
           "title": "确认投票交易",
@@ -2449,21 +2458,33 @@
         "review": "리뷰",
         "copy": "복사",
         "close": "닫기",
+        "retry": "재시도",
         "connect": "연결",
         "addressValidator": {
           "reason1": "무효",
           "reason2": "주소 필요"
         },
         "validTransactionAmountValidator": {
-          "reason": "잘못된 송금 금액"
+          "reason": "잘못된 송금액"
         },
         "passwordForm": {
           "password": {
-            "label": "패스워드",
-            "placeholder": "패스워드 입력"
+            "label": "앱 패스워드",
+            "placeholder": "앱 패스워드 입력",
+            "error1": "패스워드의 최소 길이는 8글자이며, 숫자와 알파벳, 그리고 특수문자만 사용해야 합니다."
+          },
+          "passwordConfirm": {
+            "label": "앱 패스워드 확인",
+            "placeholder": "앱 패스워드 확인",
+            "error1": "앱 패스워드가 일치하지 않습니다"
           },
           "passwordStrength": {
-            "title": "패스워드 강도:"
+            "title": "패스워드 강도:",
+            "worst": "매우 나쁨",
+            "bad": "나쁨",
+            "weak": "약함",
+            "good": "좋음",
+            "strong": "매우 좋음"
           }
         },
         "passwordFormModal": {
@@ -2563,13 +2584,45 @@
           "ledgerExportMode": "레져 전문가 모드를 켜주세요"
         },
         "redelegateFormComponent": {
+          "title": "재위임 거래 확인",
           "description": "아래 정보를 확인해주세요",
-          "label1": "발신인 주소",
+          "label1": "송신인 주소",
+          "label2": "이전 검증인",
           "table": {
             "validatorDestinationAddress": {
-              "label": "검증인 주소",
+              "label": "새로운 검증인",
               "placeholder": "검증인 주소 입력"
+            },
+            "redelegateAmount": {
+              "label": "재위임 금액"
             }
+          },
+          "maxValidator": {
+            "error": "재위임 금액은 현재 위임된 금액보다 클수 없습니다"
+          },
+          "alert1": {
+            "message1": "모든",
+            "message2": "기간 및 자금은 한번만 재위임될 수 있습니다.언제나 하나의 계정은 유효 기간내에,  재위임 및 본딩 해제 기록을 최대 7개까지만 가질 수 있습니다.",
+            "message3": "기간"
+          }
+        },
+        "undelegateFormComponent": {
+          "title": "위임 취소 거래 확인",
+          "description": "아래 정보를 확인해주세요",
+          "label1": "송신인 주소",
+          "label2": "검증인으로부터 위임 취소",
+          "table": {
+            "undelegateAmount": {
+              "label": "위임 취소 금액"
+            }
+          },
+          "maxValidator": {
+            "error": "위임 취소 금액은 현재 위임된 금액보다 클 수 없습니다"
+          },
+          "alert1": {
+            "message1": "거래가 발송된 후 위임 취소가 완전히 완료되는 데 며칠이 소요됨을 양해바랍니다",
+            "message2": "일",
+            "message3": "그 때까지는 위임 취소된 금액을 사용할 수 없습니다."
           }
         },
         "table": {
@@ -2710,10 +2763,11 @@
         }
       },
       "backup": {
-        "title": "지원 니모닉",
-        "copyButton": "복구 문구가 복사되었습니다!",
+        "title": "니모닉 문구 백업",
+        "slogan": "니모닉 문구는 오직 한 번만 표시되므로 지금 24단어 문구를 백업하여 안전하게 보관하십시오지갑을 복원하고 액세스하려면 니모닉 문구가 필요합니다.",
+        "copyButton": "니모닉 문구가 복사되었습니다!",
         "checkbox": "니모닉 문구가 한 번만 표시되는 것을 이해합니다",
-        "button": "내 니모닉 문구를 백업했습니다"
+        "button": "나의 니모닉 문구를 백업했습니다"
       },
       "navbar": {
         "home": "홈화면",
@@ -2945,6 +2999,8 @@
         "backToList": "제안 리스트로",
         "start": "시작",
         "end": "종료",
+        "result": "현재 결과",
+        "castVote": "투표",
         "sendVote": "투표 전송",
         "modal1": {
           "title": "투표 거래 확인",
@@ -3108,8 +3164,8 @@
         },
         "notification": {
           "recover": {
-            "message": "복구 문구가 복사되었습니다!",
-            "description": "복구 문구가 클립보드에 성공적으로 복사되었습니다."
+            "message": "니모닉 문구가 복사되었습니다!",
+            "description": "니모닉 문구가 클립보드에 성공적으로 복사되었습니다."
           }
         },
         "language": {
@@ -3124,13 +3180,13 @@
           "description": "분석을 위해 수집된 데이터는 새로운 기능에 대한 개발의 우선 순위를 지정하고 구현된 기능을 개선하는 데 사용됩니다."
         },
         "exportRecoveryPhrase": {
-          "title": "복구 문구 내보내기",
+          "title": "니모닉 문구 내보내기",
           "description": "이 작업을 수행하려면 앱 비밀번호를 입력해야 합니다.",
           "button": "내보내기",
           "modal1": {
-            "title": "복구 문구",
+            "title": "니모닉 문구",
             "description": "스와이프하면 모든 단어가 나옵니다.  순서에 맞게 적으세요",
-            "warning": "복구 문구는 누구와도 공유하지 마세요"
+            "warning": "니모닉 문구는 누구와도 공유하지 마세요"
           }
         },
         "clearStorage": {
@@ -3140,7 +3196,7 @@
             "title": "저장 공간 삭제 확인",
             "description1": "나중에 이 지갑을 복원할 수 있도록 삭제하기 전에 복구 니모닉 구문을 확인하는 것이 좋습니다.",
             "warning": "저장소를 지우시겠습니까? 지갑 니모닉 문구를 백업하지 않으면 영원히 자금을 잃을 수 있습니다.",
-            "disclaimer": "액세스 권한을 다시 얻을 수 있는 유일한 방법은 지갑 니모닉 문구를 복원하는 것임을 이해합니다.",
+            "disclaimer": "액세스 권한을 다시 얻을 수 있는 유일한 방법은 지갑 니모닉 문구로 복원하는 것임을 이해합니다.",
             "form1": {
               "clear": {
                 "label": "입력하세요",
@@ -3209,7 +3265,7 @@
         "disabled": "Etkisizleştir",
         "confirm": "Onayla",
         "continue": "Devam et",
-        "cancel": "Iptal et",
+        "cancel": "İptal et",
         "save": "Kaydet",
         "discard": "Değişiklikleri yoksay",
         "ok": "Tamam",
@@ -3223,6 +3279,7 @@
         "review": "gözden geçir",
         "copy": "Kopyala",
         "close": "Kapat",
+        "retry": "Tekrar dene",
         "connect": "Bağlan",
         "addressValidator": {
           "reason1": "Geçersiz",
@@ -3271,7 +3328,10 @@
           }
         },
         "successModalPopup": {
-          "title": "İşlem başarılı!"
+          "title": "İşlem başarılı!",
+          "createWallet": {
+            "button": "Cüzdan Oluştur"
+          }
         }
       }
     }

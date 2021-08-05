@@ -279,7 +279,7 @@ function MetaInfoComponent() {
     let unmounted = false;
 
     const SyncConfig = async () => {
-      const defaultLanguage = await generalConfigService.getLanguage();
+      const defaultLanguage = i18n.language ? i18n.language : DEFAULT_LANGUAGE_CODE;
       const defaultMemoDisabled = session.wallet.config.disableDefaultClientMemo;
       const defaultGADisabled = session.wallet.config.analyticsDisabled;
       if (!unmounted) {
@@ -298,6 +298,8 @@ function MetaInfoComponent() {
       unmounted = true;
     };
   }, [
+    defaultLanguageState,
+    setDefaultLanguageState,
     defaultMemoStateDisabled,
     setDefaultMemoStateDisabled,
     defaultGAStateDisabled,
