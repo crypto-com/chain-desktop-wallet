@@ -4,7 +4,7 @@ import {
   AddressValidator,
 } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { Session } from '../models/Session';
-import { UserAsset } from '../models/UserAsset';
+import { UserAsset, UserAssetType } from '../models/UserAsset';
 import i18n from '../language/I18n';
 
 export class TransactionUtils {
@@ -88,6 +88,15 @@ export class TransactionUtils {
         return Promise.reject(reason);
       },
     });
+  }
+
+  public static getAssetFromAllAssets(allAssets: UserAsset[], assetType: UserAssetType) {
+    for (let i = 0; i < allAssets.length; i++) {
+      if (allAssets[i].assetType === assetType) {
+        return allAssets[i];
+      }
+    }
+    return allAssets[0];
   }
 
   // public static maxMinValidation(currentBalance: string, inputValue: string) {

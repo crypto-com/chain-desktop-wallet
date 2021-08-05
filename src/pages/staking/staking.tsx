@@ -18,14 +18,21 @@ import {
   marketState,
   sessionState,
   walletAssetState,
+  walletAllAssetsState,
   ledgerIsExpertModeState,
   fetchingDBState,
   validatorListState,
 } from '../../recoil/atom';
-import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
+import {
+  AssetMarketPrice,
+  scaledAmount,
+  scaledBalance,
+  UserAsset,
+  UserAssetType,
+} from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import { FIXED_DEFAULT_FEE, TABLE_LOCALE } from '../../config/StaticConfig';
+import { FIXED_DEFAULT_FEE, TABLE_LOCALE, DefaultWalletConfigs } from '../../config/StaticConfig';
 import {
   adjustedTransactionAmount,
   fromScientificNotation,
@@ -564,7 +571,9 @@ const FormWithdrawStakingReward = () => {
   const [errorMessages, setErrorMessages] = useState([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const marketData = useRecoilValue(marketState);
   const currentSession = useRecoilValue(sessionState);
@@ -574,6 +583,12 @@ const FormWithdrawStakingReward = () => {
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
 
   const [t] = useTranslation();
+
+  const assetType =
+    currentSession.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name
+      ? UserAssetType.TENDERMINT
+      : UserAssetType.TENDERMINT;
+  const croAsset = TransactionUtils.getAssetFromAllAssets(walletAllAssets, assetType);
 
   const convertToTabularData = (
     allRewards: RewardTransaction[],
@@ -606,7 +621,7 @@ const FormWithdrawStakingReward = () => {
         currentSession.wallet.identifier,
       );
 
-      const rewardsTabularData = convertToTabularData(allRewards, walletAsset, marketData);
+      const rewardsTabularData = convertToTabularData(allRewards, croAsset, marketData);
       setRewards(rewardsTabularData);
     };
 

@@ -32,8 +32,14 @@ import {
   ledgerIsExpertModeState,
   fetchingDBState,
 } from '../../recoil/atom';
-import { NOT_KNOWN_YET_VALUE, TABLE_LOCALE, WalletConfig } from '../../config/StaticConfig';
+import {
+  NOT_KNOWN_YET_VALUE,
+  TABLE_LOCALE,
+  WalletConfig,
+  DefaultWalletConfigs,
+} from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
+import { TransactionUtils } from '../../utils/TransactionUtils';
 import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
 import {
   scaledBalance,
@@ -133,7 +139,7 @@ function convertDelegations(allDelegations: StakingTransactionData[], currentAss
 
 function convertTransfers(
   allTransfers: TransferTransactionData[],
-  currentAsset: UserAsset,
+  allAssets: UserAsset[],
   sessionData: Session,
 ) {
   const { address } = sessionData.wallet;
@@ -149,13 +155,22 @@ function convertTransfers(
   }
 
   return allTransfers.map(transfer => {
-    const transferAmount = getUIDynamicAmount(transfer.amount, currentAsset);
+    const assetType =
+      sessionData.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name
+        ? UserAssetType.TENDERMINT
+        : UserAssetType.TENDERMINT;
+    const transferAmount = getUIDynamicAmount(
+      transfer.amount,
+      TransactionUtils.getAssetFromAllAssets(allAssets, assetType),
+    );
     const data: TransferTabularData = {
       key: transfer.hash + transfer.receiverAddress + transfer.amount,
       recipientAddress: transfer.receiverAddress,
       transactionHash: transfer.hash,
       time: new Date(transfer.date).toLocaleString(),
-      amount: `${transferAmount}  ${currentAsset.symbol}`,
+      amount: `${transferAmount} ${
+        TransactionUtils.getAssetFromAllAssets(allAssets, assetType).symbol
+      }`,
       direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
       status: transfer.status,
     };
@@ -260,6 +275,12 @@ function HomePage() {
 
   const [t] = useTranslation();
 
+  // const croAsset = currentSession.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name? TransactionUtils.getAssetFromAllAssets(walletAllAssets, UserAssetType.TENDERMINT) : userAsset;
+  const croAsset = TransactionUtils.getAssetFromAllAssets(
+    walletAllAssets,
+    UserAssetType.TENDERMINT,
+  );
+
   const AssetColumns = [
     {
       title: 'Asset',
@@ -352,7 +373,6 @@ function HomePage() {
       render: (text, record: TransferTabularData) => {
         const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
         const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
-
         return (
           <Text type={color}>
             {sign}
@@ -593,8 +613,8 @@ function HomePage() {
       sessionData,
     );
 
-    const stakingTabularData = convertDelegations(allDelegations, currentAsset);
-    const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
+    const stakingTabularData = convertDelegations(allDelegations, croAsset);
+    const transferTabularData = convertTransfers(allTransfers, walletAllAssets, sessionData);
     const nftTransferTabularData = convertNftTransfers(allNftTransfer);
 
     showWalletStateNotification(currentSession.wallet.config);
@@ -695,9 +715,8 @@ function HomePage() {
       const currentNftList = processNftList(allNFTs);
       setProcessedNftList(currentNftList);
       setNFTList(allNFTs);
-
-      const stakingTabularData = convertDelegations(allDelegations, currentAsset);
-      const transferTabularData = convertTransfers(allTransfers, currentAsset, sessionData);
+      const stakingTabularData = convertDelegations(allDelegations, croAsset);
+      const transferTabularData = convertTransfers(allTransfers, walletAllAssets, sessionData);
       const nftTransferTabularData = convertNftTransfers(allNftTransfer);
 
       showWalletStateNotification(currentSession.wallet.config);
@@ -958,11 +977,11 @@ function HomePage() {
             <div className="title">CRO BALANCE</div>
             {/* <div className="title">{t('home.balance.title1')}</div> */}
             <div className="quantity">
-              {numeral(scaledBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
+              {numeral(scaledBalance(croAsset)).format('0,0.0000')} {croAsset?.symbol}
             </div>
             <div className="fiat">
               {marketData && marketData.price
-                ? `${numeral(getAssetBalancePrice(userAsset, marketData)).format('$0,0.00')} ${
+                ? `${numeral(getAssetBalancePrice(croAsset, marketData)).format('$0,0.00')} ${
                     marketData?.currency
                   }`
                 : ''}
@@ -972,11 +991,11 @@ function HomePage() {
             <div className="title">STAKED CRO BALANCE</div>
             {/* <div className="title">{t('home.balance.title2')}</div> */}
             <div className="quantity">
-              {numeral(scaledStakingBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
+              {numeral(scaledStakingBalance(croAsset)).format('0,0.0000')} {croAsset?.symbol}
             </div>
             <div className="fiat">
               {marketData && marketData.price
-                ? `${numeral(getAssetStakingBalancePrice(userAsset, marketData)).format(
+                ? `${numeral(getAssetStakingBalancePrice(croAsset, marketData)).format(
                     '$0,0.00',
                   )} ${marketData?.currency}`
                 : ''}
