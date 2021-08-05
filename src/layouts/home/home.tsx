@@ -171,8 +171,8 @@ function HomeLayout(props: HomeLayoutProps) {
         'usd',
       );
 
-      // const isIbcVisible = allAssets.length > 1;
-      const isIbcVisible = false;
+      const isIbcVisible = allAssets.length > 1;
+      // const isIbcVisible = false;
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
       setHasWallet(hasWalletBeenCreated);
       setSession(currentSession);

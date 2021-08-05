@@ -280,6 +280,19 @@ function HomePage() {
     walletAllAssets,
     UserAssetType.TENDERMINT,
   );
+  const assetIcon = asset => {
+    const { assetType, icon_url, symbol } = asset;
+    switch (assetType) {
+      case UserAssetType.TENDERMINT:
+        return <img src={logoCro} alt="cro" className="asset-icon" />;
+      case UserAssetType.EVM:
+        return <img src={icon_url} alt="cronos" className="asset-icon" />;
+      case UserAssetType.IBC:
+        return <Avatar>{symbol[0].toUpperCase()}</Avatar>;
+      default:
+        return <Avatar>{symbol[0].toUpperCase()}</Avatar>;
+    }
+  };
 
   const AssetColumns = [
     {
@@ -287,28 +300,15 @@ function HomePage() {
       // dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
-      render: record => (
-        <div className="name">
-          {record.assetType !== UserAssetType.IBC ? (
-            <img src={logoCro} alt="cro" />
-          ) : (
-            <Avatar
-              style={{
-                color: '#1199fa',
-                backgroundColor: '#e4f4ff',
-                marginRight: '10px',
-                height: '22px',
-                width: '22px',
-                fontSize: '12px',
-                lineHeight: '22px',
-              }}
-            >
-              {record.symbol[0].toUpperCase()}
-            </Avatar>
-          )}
-          {record.name} ({record.symbol})
-        </div>
-      ),
+      render: record => {
+        const { name, symbol } = record;
+        return (
+          <div className="name">
+            {assetIcon(record)}
+            {name} ({symbol})
+          </div>
+        );
+      },
     },
     {
       title: 'Price',
