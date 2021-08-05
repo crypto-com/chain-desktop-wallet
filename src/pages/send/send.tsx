@@ -55,10 +55,10 @@ const FormSend = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [availableBalance, setAvailableBalance] = useState('--');
-  const [selectedAsset, setSelectedAsset] = useState(0); // CRO / TCRO as default
+  const [selectedAsset, setSelectedAsset] = useState('0'); // CRO / TCRO as default
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
-  const currentSession = useRecoilValue(sessionState);
+  const [currentSession, setCurrentSession] = useRecoilState(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const didMountRef = useRef(false);
@@ -225,13 +225,19 @@ const FormSend = () => {
       {isIbcVisible ? (
         <Form.Item name="ibcToken" label="Select Asset">
           <Select
-            defaultValue={0}
-            onChange={(value: number) => {
+            defaultValue="0"
+            value={selectedAsset}
+            onChange={value => {
               setSelectedAsset(value);
+              setCurrentSession({
+                ...currentSession,
+                activeAsset: walletAllAssets[value],
+              });
+              setWalletAsset(walletAllAssets[value]);
             }}
           >
             {walletAllAssets.map((item, idx) => {
-              return <Option value={idx}>{item.symbol}</Option>;
+              return <Option value={idx.toString()}>{item.symbol}</Option>;
             })}
           </Select>
         </Form.Item>
