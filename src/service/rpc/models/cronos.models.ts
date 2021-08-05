@@ -1,5 +1,6 @@
 interface ExplorerAPIResponse {
     message: string;
+    // "1": ok | "0" : not ok
     status: "1" | "0";
 }
 
@@ -9,6 +10,12 @@ export interface TxListAPIResponse extends ExplorerAPIResponse {
 
 export interface PendingTxListAPIResponse extends ExplorerAPIResponse {
     result: PendingTransactionDetail[];
+}
+
+export interface txListByAccountRequestParams {
+    module: 'account';
+    action: 'txlist' | 'pendingtxlist';
+    address: string;
 }
 
 export interface TransactionDetail {
