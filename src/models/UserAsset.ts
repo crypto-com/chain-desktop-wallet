@@ -33,6 +33,10 @@ export interface UserAsset {
   assetType?: UserAssetType;
 
   address?: string;
+
+  isLedgerSupportDisabled?: boolean;
+
+  isStakingDisabled?: boolean;
 }
 
 export enum UserAssetType {

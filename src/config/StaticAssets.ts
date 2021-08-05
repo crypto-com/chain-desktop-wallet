@@ -36,5 +36,8 @@ export const CRONOS_ASSET = (network: Network) => {
     stakedBalance: '0',
     decimals: 18,
     assetType: UserAssetType.EVM,
+    // Initially Ledger won't be supported on cronos asset
+    isLedgerSupportDisabled: true,
+    isStakingDisabled: true,
   };
 };
