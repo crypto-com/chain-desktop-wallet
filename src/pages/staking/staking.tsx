@@ -84,6 +84,7 @@ const FormDelegationRequest = () => {
   const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
   const [showMemo, setShowMemo] = useState(false);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const currentValidatorList = useRecoilValue(validatorListState);
   const currentSession = useRecoilValue(sessionState);
   const fetchingDB = useRecoilValue(fetchingDBState);
@@ -94,6 +95,14 @@ const FormDelegationRequest = () => {
   const analyticsService = new AnalyticsService(currentSession);
 
   const [t] = useTranslation();
+
+  // TO-DO temporary CRO Asset select
+  const assetType =
+    currentSession.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name
+      ? UserAssetType.TENDERMINT
+      : UserAssetType.TENDERMINT;
+  const croAsset = TransactionUtils.getAssetFromAllAssets(walletAllAssets, assetType);
+  setWalletAsset(croAsset);
 
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
     if (validatorList) {
@@ -571,7 +580,6 @@ const FormWithdrawStakingReward = () => {
   const [errorMessages, setErrorMessages] = useState([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
@@ -584,11 +592,13 @@ const FormWithdrawStakingReward = () => {
 
   const [t] = useTranslation();
 
+  // TO-DO temporary CRO Asset select
   const assetType =
     currentSession.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name
       ? UserAssetType.TENDERMINT
       : UserAssetType.TENDERMINT;
   const croAsset = TransactionUtils.getAssetFromAllAssets(walletAllAssets, assetType);
+  setWalletAsset(croAsset);
 
   const convertToTabularData = (
     allRewards: RewardTransaction[],
@@ -621,7 +631,7 @@ const FormWithdrawStakingReward = () => {
         currentSession.wallet.identifier,
       );
 
-      const rewardsTabularData = convertToTabularData(allRewards, croAsset, marketData);
+      const rewardsTabularData = convertToTabularData(allRewards, walletAsset, marketData);
       setRewards(rewardsTabularData);
     };
 
