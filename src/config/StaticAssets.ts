@@ -8,12 +8,12 @@ export const CRO_ASSET = (network: Network) => {
   const assetSymbol = network.coin.croDenom.toString().toUpperCase();
 
   const config: UserAssetConfig = {
-    chainId: '',
+    chainId: network.chainId,
     fee: { gasLimit: '', networkFee: '' },
     indexingUrl: '',
     isLedgerSupportDisabled: true,
     isStakingDisabled: true,
-    nodeUrl: network.rpcUrl || '',
+    nodeUrl: network.defaultNodeUrl,
   };
 
   return {
@@ -38,7 +38,7 @@ export const CRONOS_ASSET = (network: Network) => {
   const config: UserAssetConfig = {
     chainId: '',
     fee: { gasLimit: '', networkFee: '' },
-    indexingUrl: '',
+    indexingUrl: 'https://cronos-explorer.crypto.org/api',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
     nodeUrl: '',
