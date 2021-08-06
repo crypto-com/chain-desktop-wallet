@@ -1,10 +1,10 @@
 import 'mocha';
-import { CronosClient } from './CronosClient';
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { expect } from 'chai';
+import { CronosClient } from './CronosClient';
 
-describe('CronosClient', function () {
+describe('CronosClient', () => {
   let axiosMock: MockAdapter;
 
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe('CronosClient', function () {
   afterEach(() => {
     axiosMock.reset();
   });
-  it('should return the `txList` from chainIndexAPI ', async function () {
+  it('should return the `txList` from chainIndexAPI ', async () => {
     const txListStub = {
       message: 'OK',
       result: [
@@ -81,7 +81,10 @@ describe('CronosClient', function () {
         status: '0',
       });
 
-    const cronosClient = new CronosClient('https://cronos-testnet.crypto.org:8545/','https://cronos-chainindex.com');
+    const cronosClient = new CronosClient(
+      'https://cronos-testnet.crypto.org:8545/',
+      'https://cronos-chainindex.com',
+    );
 
     const txListRespone = await cronosClient.getTxsByAddress(
       '0x95F7C0B0dEF5Ec981709c5C47E32963E5450bF38',
@@ -100,7 +103,7 @@ describe('CronosClient', function () {
     expect(txListEmptyRespone.result).to.deep.equal([]);
   });
 
-  it('should return the `pendingTxList` from chainIndexAPI ', async function () {
+  it('should return the `pendingTxList` from chainIndexAPI ', async () => {
     const txPendingListStub = {
       message: 'OK',
       result: [
@@ -153,7 +156,10 @@ describe('CronosClient', function () {
         status: '0',
       });
 
-    const cronosClient = new CronosClient('https://cronos-testnet.crypto.org:8545/','https://cronos-chainindex.com');
+    const cronosClient = new CronosClient(
+      'https://cronos-testnet.crypto.org:8545/',
+      'https://cronos-chainindex.com',
+    );
     const txPendingListRespone = await cronosClient.getPendingTxsByAddress(
       '0x95F7C0B0dEF5Ec981709c5C47E32963E5450bF38',
       { page: '1', offset: '2' },
