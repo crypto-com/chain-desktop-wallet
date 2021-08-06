@@ -1,11 +1,21 @@
 // Every created wallet get initialized with a new CRO asset
 import { getRandomId } from '../crypto/RandomGen';
-import { UserAssetType } from '../models/UserAsset';
+import { UserAssetConfig, UserAssetType } from '../models/UserAsset';
 import { Network } from './StaticConfig';
 
 // Every created wallet get initialized with a new CRO asset
 export const CRO_ASSET = (network: Network) => {
   const assetSymbol = network.coin.croDenom.toString().toUpperCase();
+
+  const config: UserAssetConfig = {
+    chainId: '',
+    fee: { gasLimit: '', networkFee: '' },
+    indexingUrl: '',
+    isLedgerSupportDisabled: true,
+    isStakingDisabled: true,
+    nodeUrl: network.rpcUrl || '',
+  };
+
   return {
     balance: '0',
     description:
@@ -19,11 +29,20 @@ export const CRO_ASSET = (network: Network) => {
     stakedBalance: '0',
     decimals: 8,
     assetType: UserAssetType.TENDERMINT,
+    config,
   };
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CRONOS_ASSET = (network: Network) => {
+  const config: UserAssetConfig = {
+    chainId: '',
+    fee: { gasLimit: '', networkFee: '' },
+    indexingUrl: '',
+    isLedgerSupportDisabled: false,
+    isStakingDisabled: false,
+    nodeUrl: '',
+  };
   return {
     balance: '0',
     description: '',
@@ -39,5 +58,6 @@ export const CRONOS_ASSET = (network: Network) => {
     // Initially Ledger won't be supported on cronos asset
     isLedgerSupportDisabled: true,
     isStakingDisabled: true,
+    config,
   };
 };

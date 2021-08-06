@@ -1,6 +1,20 @@
 import Big from 'big.js';
 import { getUINormalScaleAmount } from '../utils/NumberUtils';
 
+// Need for asset level configuration since every asset now needs to know
+// Its own nodeUrl, indexingUrl, etc,....
+export interface UserAssetConfig {
+  nodeUrl: string;
+  indexingUrl: string;
+  chainId: string;
+  fee: {
+    gasLimit: string;
+    networkFee: string;
+  };
+  isLedgerSupportDisabled: boolean;
+  isStakingDisabled: boolean;
+}
+
 export interface UserAsset {
   identifier: string;
 
@@ -34,9 +48,7 @@ export interface UserAsset {
 
   address?: string;
 
-  isLedgerSupportDisabled?: boolean;
-
-  isStakingDisabled?: boolean;
+  config?: UserAssetConfig;
 }
 
 export enum UserAssetType {
