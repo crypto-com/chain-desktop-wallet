@@ -25,7 +25,6 @@ class EVMClient implements IEvmRpc {
     // Node
     async isNodeSyncing(): Promise<boolean> {
         const isSyncing = await this.web3.eth.isSyncing();
-        console.debug(isSyncing)
         if (isSyncing instanceof Object) {
             return true;
         }
@@ -50,7 +49,6 @@ class EVMClient implements IEvmRpc {
         if (!this.web3.utils.isAddress(address)) {
             throw new Error("Please provide a valid EVM compatible address.");
         }
-
         const pendingNonce = await this.web3.eth.getTransactionCount(address, "pending");
         return pendingNonce;
     }
