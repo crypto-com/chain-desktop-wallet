@@ -4,10 +4,10 @@ import { BlockTransactionObject, TransactionReceipt } from 'web3-eth';
 
 class EVMClient implements IEvmRpc {
 
-    private _web3: Web3;
+    private web3: Web3;
 
     constructor(web3Instance: Web3) {
-        this._web3 = web3Instance;
+        this.web3 = web3Instance;
     }
 
     public static create(web3HttpProviderUrl: string): EVMClient {
@@ -18,17 +18,13 @@ class EVMClient implements IEvmRpc {
         throw new Error("Please provide a valid HTTP Web3 Provider.");
     }
 
-    get web3(): Web3 {
-        return this._web3;
-    }
-
-    set web3(web3: Web3) {
-        this._web3 = web3;
+    public getWeb3(): Web3 {
+        return this.web3;
     }
 
     // Node
     async isNodeSyncing(): Promise<boolean> {
-        const isSyncing = await this._web3.eth.isSyncing();
+        const isSyncing = await this.web3.eth.isSyncing();
         console.debug(isSyncing)
         if (isSyncing instanceof Object) {
             return true;
@@ -37,31 +33,31 @@ class EVMClient implements IEvmRpc {
     }
 
     public async getChainId(): Promise<number> {
-        return await this._web3.eth.getChainId();
+        return await this.web3.eth.getChainId();
     }
 
     // Address
     async getNativeBalanceByAddress(address: string): Promise<string> {
-        if (!this._web3.utils.isAddress(address)) {
+        if (!this.web3.utils.isAddress(address)) {
             throw new Error("Please provide a valid EVM compatible address.");
         }
 
-        const nativeBalance = await this._web3.eth.getBalance(address, "latest");
+        const nativeBalance = await this.web3.eth.getBalance(address, "latest");
         return nativeBalance;
     }
 
     async getNextNonceByAddress(address: string): Promise<number> {
-        if (!this._web3.utils.isAddress(address)) {
+        if (!this.web3.utils.isAddress(address)) {
             throw new Error("Please provide a valid EVM compatible address.");
         }
 
-        const pendingNonce = await this._web3.eth.getTransactionCount(address, "pending");
+        const pendingNonce = await this.web3.eth.getTransactionCount(address, "pending");
         return pendingNonce;
     }
 
     // Transaction
     async getTransactionReceiptByHash(txHash: string): Promise<TransactionReceipt | null> {
-        const mayBeTxReceipt = await this._web3.eth.getTransactionReceipt(txHash);
+        const mayBeTxReceipt = await this.web3.eth.getTransactionReceipt(txHash);
         if (!mayBeTxReceipt) {
             return null;
         }
@@ -70,12 +66,12 @@ class EVMClient implements IEvmRpc {
 
     // Block
     async getLatestBlockHeight(): Promise<number> {
-        const blockHeight = await this._web3.eth.getBlockNumber();
+        const blockHeight = await this.web3.eth.getBlockNumber();
         return blockHeight;
     }
 
     async getBlock(blockHashOrBlockNumber: number | string): Promise<BlockTransactionObject> {
-        const blockTransactions = await this._web3.eth.getBlock(blockHashOrBlockNumber, true);
+        const blockTransactions = await this.web3.eth.getBlock(blockHashOrBlockNumber, true);
         return blockTransactions
     }
     async getBlockByHeight(height: number): Promise<BlockTransactionObject> {
@@ -89,7 +85,7 @@ class EVMClient implements IEvmRpc {
     // Broadcast
     async broadcastRawTransactionHex(signedTxHex: string): Promise<string> {
 
-        if (!this._web3.utils.isHex(signedTxHex)) {
+        if (!this.web3.utils.isHex(signedTxHex)) {
             throw new Error("Please provide a valid Hex string.");
 
         }
@@ -97,7 +93,7 @@ class EVMClient implements IEvmRpc {
             signedTxHex = `0x${signedTxHex}`
         }
 
-        const broadcastTx = await this._web3.eth.sendSignedTransaction(signedTxHex);
+        const broadcastTx = await this.web3.eth.sendSignedTransaction(signedTxHex);
 
         if (broadcastTx.status) {
             return broadcastTx.transactionHash;

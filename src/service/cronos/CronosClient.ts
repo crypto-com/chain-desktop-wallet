@@ -12,15 +12,30 @@ import {
 } from '../rpc/models/cronos.models';
 import axios, { AxiosResponse } from 'axios';
 
-const cronosExplorerAPIBaseURI = 'https://cronos-explorer.crypto.org/api';
 /**
  * name: CronosClient
  * purpose: This client can be used to handle `Cronos` related operations.
  */
 export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
-    constructor(web3ProviderURL: string) {
-        super(EVMClient.create(web3ProviderURL).web3);
+    private cronosExplorerAPIBaseURL: string;
+    constructor(web3ProviderURL: string, explorerAPIBaseURL: string) {
+        super(EVMClient.create(web3ProviderURL).getWeb3());
+        if (this.isValidHTTPURL(explorerAPIBaseURL)) {
+            this.cronosExplorerAPIBaseURL = explorerAPIBaseURL;
+        } else {
+            throw new Error("Invalid `explorerAPIBaseURL` provided.");
+        }
+    }
+
+    private isValidHTTPURL = (url: string): boolean => {
+        if (url.startsWith('https://')) {
+            return true;
+        } else if (url.startsWith('http://')) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     getTxsByAddress = async (
@@ -35,7 +50,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
         };
 
         const txListResponse: AxiosResponse<TxListAPIResponse> = await axios({
-            baseURL: cronosExplorerAPIBaseURI,
+            baseURL: this.cronosExplorerAPIBaseURL,
             url: '/api',
             params: requestParams,
         });
@@ -58,7 +73,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
         };
 
         const txListResponse: AxiosResponse<PendingTxListAPIResponse> = await axios({
-            baseURL: cronosExplorerAPIBaseURI,
+            baseURL: this.cronosExplorerAPIBaseURL,
             url: '/api',
             params: requestParams,
         });
