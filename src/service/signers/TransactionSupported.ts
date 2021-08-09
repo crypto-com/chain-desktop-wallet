@@ -4,6 +4,9 @@ export interface TransactionUnsigned {
   memo: string;
   accountNumber: number;
   accountSequence: number;
+  nonce?: number;
+  gasPrice?: number;
+  gasLimit?: number;
 }
 
 export interface TransferTransactionUnsigned extends TransactionUnsigned {

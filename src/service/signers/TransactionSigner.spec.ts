@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { DefaultWalletConfigs, WalletConfig } from '../../config/StaticConfig';
 import { TransactionSigner } from './TransactionSigner';
 import { TransactionUnsigned } from './TransactionSupported';
+import { EvmTransactionSigner } from './EvmTransactionSigner';
 
 const testNet = DefaultWalletConfigs.TestNetConfig;
 // Overridden testnet chainId
@@ -92,6 +93,32 @@ describe('Testing TransactionSigner', () => {
 
     expect(withdrawStakingRewardTxHex).to.eq(
       '0a9c010a99010a372f636f736d6f732e646973747269627574696f6e2e763162657461312e4d7367576974686472617744656c656761746f72526577617264125e0a2b7463726f313635747a63726832796c3833673871657178756567326735677a6775353779336665336b6333122f7463726f636e636c317265797368666479676637363733786d39703876307876746439366d3663643663616e687533126a0a500a460a1f2f636f736d6f732e63727970746f2e736563703235366b312e5075624b657912230a21030bf28c5f92c336db4703791691fa650fee408690b0a22c5ee4afb7e2508d32a712040a020801180112160a100a08626173657463726f12043530303010c09a0c1a40b0b4aa3a1f176c8e79b0ee64d3baab96ba7c6c6728a0dc42ed53372fb582fe7e6bcf320d5e61dc00d348dfecf1e62bad594bf73ab0b87539e399da48ece25246',
+    );
+  });
+
+  it('test signing EVM transactions ', async () => {
+    const phrase =
+      'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
+
+    const evmTransactionSigner = new EvmTransactionSigner();
+
+    const transferTxSignedHex = await evmTransactionSigner.signTransfer(
+      {
+        amount: '345',
+        fromAddress: '0xc2aFcEC3DAfAF1a4f47030eE35Fd1A1231C08256',
+        gasLimit: 20_000,
+        gasPrice: 5_000_000,
+        nonce: 12,
+        toAddress: '0x8875bF87684f46111dbc27725332CEA9C0f12D39',
+        accountNumber: 0,
+        accountSequence: 0,
+        memo: '',
+      },
+      phrase,
+    );
+
+    expect(transferTxSignedHex).to.eq(
+      '0xf86b0c834c4b40824e20948875bf87684f46111dbc27725332cea9c0f12d398912b3d6381c95c400008025a06d89a5535f1aedc2b7ee4acde19168e5528fa5579b6150e03cf8c35e843210d4a067bebff860cec5bcd8725951445ed2ca1a4899432e7dc5e2f1bfd7445c0abecf',
     );
   });
 });

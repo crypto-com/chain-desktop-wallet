@@ -1,4 +1,4 @@
-import { TxListAPIResponse, PendingTxListAPIResponse } from "../models/cronos.models";
+import { TxListAPIResponse, PendingTxListAPIResponse } from '../models/cronos.models';
 
 // Reference: https://cronos-explorer.crypto.org/api-docs
 
@@ -19,11 +19,13 @@ export interface txPendingListRequestOptions {
 export interface ICronosChainIndexAPI {
   // Transaction
   getTxsByAddress(address: string, options?: txListRequestOptions): Promise<TxListAPIResponse>;
-  getPendingTxsByAddress(address: string, options?: txPendingListRequestOptions): Promise<PendingTxListAPIResponse>;
+  getPendingTxsByAddress(
+    address: string,
+    options?: txPendingListRequestOptions,
+  ): Promise<PendingTxListAPIResponse>;
 
-  // Todo: 
+  // Todo:
   // - Internal Transactions
   // - Token transfers
   // - Multi-balance by Address
 }
-

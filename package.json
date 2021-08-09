@@ -41,6 +41,7 @@
     "electron-log": "4.3.5",
     "electron-reload": "1.5.0",
     "electron-updater": "4.3.9",
+    "ethereumjs-tx": "^2.1.2",
     "ethers": "^5.4.2",
     "i18next": "20.3.2",
     "i18next-browser-languagedetector": "6.1.2",

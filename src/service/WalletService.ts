@@ -71,6 +71,7 @@ import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter, sleep } from '../utils/utils';
 import { WalletBuiltResult } from './WalletOps';
 import { TransactionUtils } from '../utils/TransactionUtils';
+import { CronosClient } from './cronos/CronosClient';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -82,45 +83,62 @@ class WalletService {
   public readonly BROADCAST_TIMEOUT_CODE = -32603;
 
   public async sendTransfer(transferRequest: TransferRequest): Promise<BroadCastResult> {
-    const {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    switch (transferRequest.asset.assetType) {
+      case UserAssetType.TENDERMINT:
+      case UserAssetType.IBC:
+      case undefined: {
+        // Undefined case is for legacy reasons
+        const {
+          nodeRpc,
+          accountNumber,
+          accountSequence,
+          currentSession,
+          transactionSigner,
+          ledgerTransactionSigner,
+        } = await this.prepareTransaction();
 
-    const scaledBaseAmount = getBaseScaledAmount(transferRequest.amount, transferRequest.asset);
-    const fromAddress = currentSession.wallet.address;
-    const transfer: TransferTransactionUnsigned = {
-      fromAddress,
-      toAddress: transferRequest.toAddress,
-      amount: String(scaledBaseAmount),
-      memo: transferRequest.memo,
-      accountNumber,
-      accountSequence,
-    };
+        const scaledBaseAmount = getBaseScaledAmount(transferRequest.amount, transferRequest.asset);
+        const fromAddress = currentSession.wallet.address;
+        const transfer: TransferTransactionUnsigned = {
+          fromAddress,
+          toAddress: transferRequest.toAddress,
+          amount: String(scaledBaseAmount),
+          memo: transferRequest.memo,
+          accountNumber,
+          accountSequence,
+        };
 
-    let signedTxHex: string = '';
+        let signedTxHex: string = '';
 
-    if (transferRequest.walletType === LEDGER_WALLET_TYPE) {
-      signedTxHex = await ledgerTransactionSigner.signTransfer(
-        transfer,
-        transferRequest.decryptedPhrase,
-      );
-    } else {
-      signedTxHex = await transactionSigner.signTransfer(transfer, transferRequest.decryptedPhrase);
+        if (transferRequest.walletType === LEDGER_WALLET_TYPE) {
+          signedTxHex = await ledgerTransactionSigner.signTransfer(
+            transfer,
+            transferRequest.decryptedPhrase,
+          );
+        } else {
+          signedTxHex = await transactionSigner.signTransfer(
+            transfer,
+            transferRequest.decryptedPhrase,
+          );
+        }
+
+        const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+
+        await Promise.all([
+          await this.fetchAndUpdateBalances(currentSession),
+          await this.fetchAndSaveTransfers(currentSession),
+        ]);
+
+        return broadCastResult;
+      }
+
+      case UserAssetType.EVM:
+        // TODO: Implement EVM Transaction signing
+        return {};
+
+      default:
+        return {};
     }
-
-    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-
-    await Promise.all([
-      await this.fetchAndUpdateBalances(currentSession),
-      await this.fetchAndSaveTransfers(currentSession),
-    ]);
-
-    return broadCastResult;
   }
 
   public async sendDelegateTransaction(
@@ -656,6 +674,7 @@ class WalletService {
     }
 
     const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+
     const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
 
     if (!assets || assets.length === 0) {
@@ -666,13 +685,28 @@ class WalletService {
       assets.map(async asset => {
         switch (asset.assetType) {
           case UserAssetType.EVM:
-            // TODO : Implement balance fetching for EVM - CRONOS asset
+            if (!asset.config || !asset.address) {
+              return;
+            }
+            try {
+              const cronosClient = new CronosClient(
+                asset.config?.nodeUrl,
+                asset.config?.indexingUrl,
+              );
+
+              asset.balance = await cronosClient.getNativeBalanceByAddress(asset.address);
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
+            } finally {
+              await this.storageService.saveAsset(asset);
+            }
             break;
 
           case UserAssetType.TENDERMINT:
           case UserAssetType.IBC:
           case undefined:
-            // TODO : Handle case for legacy assets that got persisted without a assetType - undefined
+            // Handle case for legacy assets that got persisted without a assetType - undefined
             try {
               const baseDenomination =
                 asset.assetType !== UserAssetType.IBC

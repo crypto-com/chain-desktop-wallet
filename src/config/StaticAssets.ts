@@ -1,11 +1,21 @@
 // Every created wallet get initialized with a new CRO asset
 import { getRandomId } from '../crypto/RandomGen';
-import { UserAssetType } from '../models/UserAsset';
+import { UserAssetConfig, UserAssetType } from '../models/UserAsset';
 import { Network } from './StaticConfig';
 
 // Every created wallet get initialized with a new CRO asset
 export const CRO_ASSET = (network: Network) => {
   const assetSymbol = network.coin.croDenom.toString().toUpperCase();
+
+  const config: UserAssetConfig = {
+    chainId: network.chainId,
+    fee: { gasLimit: '', networkFee: '' },
+    indexingUrl: '',
+    isLedgerSupportDisabled: true,
+    isStakingDisabled: true,
+    nodeUrl: network.defaultNodeUrl,
+  };
+
   return {
     balance: '0',
     description:
@@ -19,11 +29,21 @@ export const CRO_ASSET = (network: Network) => {
     stakedBalance: '0',
     decimals: 8,
     assetType: UserAssetType.TENDERMINT,
+    isSecondaryAsset: false,
+    config,
   };
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CRONOS_ASSET = (network: Network) => {
+  const config: UserAssetConfig = {
+    chainId: '',
+    fee: { gasLimit: '', networkFee: '' },
+    indexingUrl: 'https://cronos-explorer.crypto.org/api',
+    isLedgerSupportDisabled: false,
+    isStakingDisabled: false,
+    nodeUrl: 'https://cronos-testnet.crypto.org:8545/',
+  };
   return {
     balance: '0',
     description: '',
@@ -32,9 +52,11 @@ export const CRONOS_ASSET = (network: Network) => {
     identifier: getRandomId(),
     name: 'Cronos Coin',
     symbol: 'CRONOS',
-    mainnetSymbol: 'CRONOS', // This is to be used solely for markets data since testnet market prices is always non existent
+    mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
     decimals: 18,
     assetType: UserAssetType.EVM,
+    isSecondaryAsset: true,
+    config,
   };
 };

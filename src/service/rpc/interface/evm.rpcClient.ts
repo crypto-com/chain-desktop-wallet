@@ -10,7 +10,7 @@ export interface IEvmRpc {
   getNextNonceByAddress(address: string): Promise<number>;
 
   // Transaction
-  getTransactionReceiptByHash(txHash: string): Promise<TransactionReceipt | null>
+  getTransactionReceiptByHash(txHash: string): Promise<TransactionReceipt | null>;
 
   // Block
   getLatestBlockHeight(): Promise<number>;
@@ -21,4 +21,3 @@ export interface IEvmRpc {
   // Broadcast
   broadcastRawTransactionHex(signedTxHex: string): Promise<string>;
 }
-
