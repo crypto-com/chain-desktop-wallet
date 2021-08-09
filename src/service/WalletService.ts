@@ -70,7 +70,6 @@ import {
 import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter, sleep } from '../utils/utils';
 import { WalletBuiltResult } from './WalletOps';
-import { TransactionUtils } from '../utils/TransactionUtils';
 import { CronosClient } from './cronos/CronosClient';
 
 class WalletService {
@@ -938,12 +937,13 @@ class WalletService {
     // eslint-disable-next-line no-console
     console.log('ALL_WALLET_ASSETS : ', allWalletAssets);
 
-    const assetType =
-      currentSession.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name
-        ? UserAssetType.TENDERMINT
-        : UserAssetType.TENDERMINT;
+    for (let i = 0; i < allWalletAssets.length; i++) {
+      if (!allWalletAssets[i].isSecondaryAsset) {
+        return allWalletAssets[i];
+      }
+    }
 
-    return TransactionUtils.getAssetFromAllAssets(allWalletAssets, assetType);
+    return allWalletAssets[0];
   }
 
   public async loadAndSaveAssetPrices(session: Session | null = null) {
