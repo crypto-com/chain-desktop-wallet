@@ -71,6 +71,7 @@ import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter, sleep } from '../utils/utils';
 import { WalletBuiltResult } from './WalletOps';
 import { TransactionUtils } from '../utils/TransactionUtils';
+import { CronosClient } from './cronos/CronosClient';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -673,6 +674,7 @@ class WalletService {
     }
 
     const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+
     const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
 
     if (!assets || assets.length === 0) {
@@ -683,13 +685,28 @@ class WalletService {
       assets.map(async asset => {
         switch (asset.assetType) {
           case UserAssetType.EVM:
-            // TODO : Implement balance fetching for EVM - CRONOS asset
+            if (!asset.config || !asset.address) {
+              return;
+            }
+            try {
+              const cronosClient = new CronosClient(
+                asset.config?.nodeUrl,
+                asset.config?.indexingUrl,
+              );
+
+              asset.balance = await cronosClient.getNativeBalanceByAddress(asset.address);
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
+            } finally {
+              await this.storageService.saveAsset(asset);
+            }
             break;
 
           case UserAssetType.TENDERMINT:
           case UserAssetType.IBC:
           case undefined:
-            // TODO : Handle case for legacy assets that got persisted without a assetType - undefined
+            // Handle case for legacy assets that got persisted without a assetType - undefined
             try {
               const baseDenomination =
                 asset.assetType !== UserAssetType.IBC

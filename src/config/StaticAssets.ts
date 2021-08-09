@@ -41,7 +41,7 @@ export const CRONOS_ASSET = (network: Network) => {
     indexingUrl: 'https://cronos-explorer.crypto.org/api',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
-    nodeUrl: '',
+    nodeUrl: 'https://cronos-testnet.crypto.org:8545/',
   };
   return {
     balance: '0',
