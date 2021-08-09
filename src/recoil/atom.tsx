@@ -58,6 +58,11 @@ const walletAssetState = atom({
   default: asset,
 });
 
+const walletAllAssetsState = atom({
+  key: 'walletAllAssets',
+  default: [asset],
+});
+
 const walletListState = atom({
   key: 'walletList',
   default: [wallet],
@@ -77,6 +82,11 @@ const validatorListState = atom<ValidatorModel[] | null>({
 const nftListState = atom<NftModel[] | undefined>({
   key: 'nftList',
   default: undefined,
+});
+
+const isIbcVisibleState = atom<boolean>({
+  key: 'isIbcVisible',
+  default: false,
 });
 
 const hasShownWarningOnWalletTypeState = atom<boolean>({
@@ -99,10 +109,12 @@ export {
   sessionState,
   marketState,
   walletAssetState,
+  walletAllAssetsState,
   walletListState,
   walletTempBackupState,
   validatorListState,
   nftListState,
+  isIbcVisibleState,
   hasShownWarningOnWalletTypeState,
   ledgerIsExpertModeState,
   fetchingDBState,

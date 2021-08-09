@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import {
   sessionState,
   walletAssetState,
+  walletAllAssetsState,
   walletListState,
   validatorListState,
   fetchingDBState,
@@ -32,6 +33,7 @@ enum sortOrder {
 function WalletPage() {
   const [session, setSession] = useRecoilState<Session>(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const [nftList, setNftList] = useRecoilState(nftListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
@@ -91,9 +93,11 @@ function WalletPage() {
     await walletService.setCurrentSession(new Session(walletList[e.key]));
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+    const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
     const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
     setSession(currentSession);
     setUserAsset(currentAsset);
+    setWalletAllAssets(allAssets);
     setNftList(currentNftList);
     await walletService.syncAll(currentSession);
     const currentValidatorList = await walletService.retrieveTopValidators(
@@ -127,7 +131,7 @@ function WalletPage() {
       didMountRef.current = true;
       analyticsService.logPage('Wallet');
     }
-  }, [fetchingDB, userAsset, nftList, validatorList]);
+  }, [fetchingDB, userAsset, walletAllAssets, nftList, validatorList]);
 
   const columns = [
     {

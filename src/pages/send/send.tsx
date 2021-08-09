@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './send.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Input, InputNumber, Layout } from 'antd';
+import { Button, Form, Input, InputNumber, Layout, Select } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
@@ -14,7 +14,13 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { scaledBalance } from '../../models/UserAsset';
-import { ledgerIsExpertModeState, sessionState, walletAssetState } from '../../recoil/atom';
+import {
+  sessionState,
+  walletAssetState,
+  walletAllAssetsState,
+  isIbcVisibleState,
+  ledgerIsExpertModeState,
+} from '../../recoil/atom';
 import { BroadCastResult } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
@@ -33,6 +39,7 @@ import {
 } from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer } = Layout;
+const { Option } = Select;
 const layout = {};
 const tailLayout = {};
 
@@ -47,9 +54,13 @@ const FormSend = () => {
   const [errorMessages, setErrorMessages] = useState([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [availableBalance, setAvailableBalance] = useState('--');
+  const [selectedAsset, setSelectedAsset] = useState('0'); // CRO / TCRO as default
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
-  const currentSession = useRecoilValue(sessionState);
+  const [currentSession, setCurrentSession] = useRecoilState(sessionState);
+  const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const didMountRef = useRef(false);
 
   const analyticsService = new AnalyticsService(currentSession);
@@ -160,9 +171,8 @@ const FormSend = () => {
     setIsErrorTransferModalVisible(false);
   };
 
-  const scaleUpBalance = scaledBalance(walletAsset); // From BaseXYZ balance to XYZ balance
-  const currentMinAssetAmount = getCurrentMinAssetAmount(walletAsset);
-  const maximumSendAmount = scaleUpBalance;
+  const currentMinAssetAmount = getCurrentMinAssetAmount(walletAllAssets[selectedAsset]);
+  const maximumSendAmount = availableBalance;
 
   const customAddressValidator = TransactionUtils.addressValidator(
     currentSession,
@@ -177,9 +187,13 @@ const FormSend = () => {
   const customMinValidator = TransactionUtils.minValidator(
     fromScientificNotation(currentMinAssetAmount),
     `${t('send.formSend.amount.error2')} ${fromScientificNotation(currentMinAssetAmount)} ${
-      walletAsset.symbol
+      walletAllAssets[selectedAsset].symbol
     }`,
   );
+
+  useEffect(() => {
+    setAvailableBalance(scaledBalance(walletAllAssets[selectedAsset]));
+  }, [walletAllAssets, selectedAsset]);
 
   return (
     <Form
@@ -208,6 +222,28 @@ const FormSend = () => {
       >
         <Input placeholder={t('send.formSend.recipientAddress.placeholder')} />
       </Form.Item>
+      {isIbcVisible ? (
+        <Form.Item name="ibcToken" label="Select Asset">
+          <Select
+            defaultValue="0"
+            value={selectedAsset}
+            onChange={value => {
+              setSelectedAsset(value);
+              setCurrentSession({
+                ...currentSession,
+                activeAsset: walletAllAssets[value],
+              });
+              setWalletAsset(walletAllAssets[value]);
+            }}
+          >
+            {walletAllAssets.map((item, idx) => {
+              return <Option value={idx.toString()}>{item.symbol}</Option>;
+            })}
+          </Select>
+        </Form.Item>
+      ) : (
+        <></>
+      )}
       <div className="amount">
         <Form.Item
           name="amount"
@@ -233,7 +269,7 @@ const FormSend = () => {
         <div className="available">
           <span>{t('general.available')}: </span>
           <div className="available-amount">
-            {scaleUpBalance} {walletAsset.symbol}
+            {availableBalance} {walletAllAssets[selectedAsset].symbol}
           </div>
         </div>
       </div>
@@ -280,7 +316,7 @@ const FormSend = () => {
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label3')}</div>
-              <div>{`${formValues?.amount} ${walletAsset.symbol}`}</div>
+              <div>{`${formValues?.amount} ${walletAllAssets[selectedAsset].symbol}`}</div>
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label4')}</div>
@@ -289,8 +325,8 @@ const FormSend = () => {
                   currentSession.wallet.config.fee.networkFee !== undefined
                   ? currentSession.wallet.config.fee.networkFee
                   : FIXED_DEFAULT_FEE,
-                walletAsset,
-              )} ${walletAsset.symbol}`}</div>
+                walletAllAssets[selectedAsset],
+              )} ${walletAllAssets[selectedAsset].symbol}`}</div>
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label5')}</div>
