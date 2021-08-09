@@ -12,17 +12,19 @@ import Icon, {
   BankOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
 import {
   sessionState,
   walletAssetState,
+  walletAllAssetsState,
   walletListState,
   marketState,
   validatorListState,
   fetchingDBState,
   nftListState,
+  isIbcVisibleState,
 } from '../../recoil/atom';
 import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
@@ -54,11 +56,13 @@ function HomeLayout(props: HomeLayoutProps) {
   const [hasWallet, setHasWallet] = useState(true); // Default as true. useEffect will only re-render if result of hasWalletBeenCreated === false
   const [session, setSession] = useRecoilState(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [marketData, setMarketData] = useRecoilState(marketState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const [nftList, setNftList] = useRecoilState(nftListState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
+  const setIsIbcVisible = useSetRecoilState(isIbcVisibleState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
@@ -121,8 +125,14 @@ function HomeLayout(props: HomeLayoutProps) {
     await walletService.setCurrentSession(new Session(allWalletsData[0]));
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+    const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
+    // const isIbcVisible = allAssets.length > 1;
+    const isIbcVisible = false;
+
     setSession(currentSession);
     setUserAsset(currentAsset);
+    setWalletAllAssets(allAssets);
+    setIsIbcVisible(isIbcVisible);
     await walletService.syncAll(currentSession);
 
     setIsButtonLoading(false);
@@ -154,16 +164,21 @@ function HomeLayout(props: HomeLayoutProps) {
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
       const currentSession = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
       const allWalletsData = await walletService.retrieveAllWallets();
       const currentMarketData = await walletService.retrieveAssetPrice(
         currentAsset.mainnetSymbol,
         'usd',
       );
 
+      const isIbcVisible = allAssets.length > 1;
+      // const isIbcVisible = false;
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
       setHasWallet(hasWalletBeenCreated);
       setSession(currentSession);
       setUserAsset(currentAsset);
+      setWalletAllAssets(allAssets);
+      setIsIbcVisible(isIbcVisible);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
 
@@ -203,6 +218,8 @@ function HomeLayout(props: HomeLayoutProps) {
     setSession,
     userAsset,
     setUserAsset,
+    walletAllAssets,
+    setWalletAllAssets,
     walletList,
     setWalletList,
     marketData,

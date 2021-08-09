@@ -68,8 +68,9 @@ import {
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
-import { sleep } from '../utils/utils';
+import { capitalizeFirstLetter, sleep } from '../utils/utils';
 import { WalletBuiltResult } from './WalletOps';
+import { TransactionUtils } from '../utils/TransactionUtils';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -559,6 +560,7 @@ class WalletService {
   public supportedConfigs(): WalletConfig[] {
     return [
       DefaultWalletConfigs.MainNetConfig,
+      DefaultWalletConfigs.TestNetConfig,
       DefaultWalletConfigs.TestNetCroeseid3,
       DefaultWalletConfigs.CustomDevNet,
     ];
@@ -717,10 +719,12 @@ class WalletService {
 
     const persistedAssets = ibcAssets.map(async ibcAsset => {
       const denomTrace = await nodeRpc.getIBCAssetTrace(ibcAsset.ibcDenomHash!);
+      const baseDenom = capitalizeFirstLetter(denomTrace.base_denom);
+
       ibcAsset.denomTracePath = denomTrace.path;
-      ibcAsset.symbol = denomTrace.base_denom;
-      ibcAsset.mainnetSymbol = denomTrace.base_denom;
-      ibcAsset.name = denomTrace.base_denom;
+      ibcAsset.symbol = baseDenom;
+      ibcAsset.mainnetSymbol = baseDenom;
+      ibcAsset.name = baseDenom;
       ibcAsset.walletId = currentSession.wallet.identifier;
       await this.storageService.saveAsset(ibcAsset);
       return ibcAsset;
@@ -900,7 +904,12 @@ class WalletService {
     // eslint-disable-next-line no-console
     console.log('ALL_WALLET_ASSETS : ', allWalletAssets);
 
-    return allWalletAssets[0];
+    const assetType =
+      currentSession.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name
+        ? UserAssetType.TENDERMINT
+        : UserAssetType.TENDERMINT;
+
+    return TransactionUtils.getAssetFromAllAssets(allWalletAssets, assetType);
   }
 
   public async loadAndSaveAssetPrices(session: Session | null = null) {
