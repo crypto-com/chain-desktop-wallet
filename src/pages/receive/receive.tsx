@@ -177,7 +177,7 @@ const ReceivePage = () => {
                   </a>
                   <div className="title">
                     {assetIcon(currentAsset)}
-                    {currentAsset?.name}
+                    {currentAsset?.name} ({currentAsset?.symbol})
                   </div>
                   <div className="address">
                     <QRCode value={session.wallet.address} size={180} />
