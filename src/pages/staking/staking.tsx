@@ -90,10 +90,22 @@ const FormDelegationRequest = () => {
 
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
     if (validatorList) {
+      let totalShares = new Big(0);
+
+      for (let i = 0; i < validatorList?.length; i++) {
+        totalShares = totalShares.add(validatorList[i].currentShares);
+      }
+
       return validatorList.map((validator, idx) => {
         const validatorModel = {
           ...validator,
           key: `${idx}`,
+          currentShares: validator.currentShares,
+          cumulativeShares: new Big(validator.currentShares)
+            .div(totalShares)
+            .times(100)
+            .toPrecision(2)
+            .toString(),
         };
         return validatorModel;
       });
@@ -296,6 +308,16 @@ const FormDelegationRequest = () => {
             {currentSession.wallet.config.network.coin.croDenom.toUpperCase()}
           </span>
         );
+      },
+    },
+    {
+      title: 'Cumulative Shares',
+      dataIndex: 'cumulativeShares',
+      key: 'cumulativeShares',
+      sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
+      defaultSortOrder: 'descend' as any,
+      render: cumulativeShares => {
+        return <span>{cumulativeShares} %</span>;
       },
     },
     {
