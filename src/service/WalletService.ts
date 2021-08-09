@@ -70,6 +70,7 @@ import {
 import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter, sleep } from '../utils/utils';
 import { WalletBuiltResult } from './WalletOps';
+import { TransactionUtils } from '../utils/TransactionUtils';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -903,7 +904,12 @@ class WalletService {
     // eslint-disable-next-line no-console
     console.log('ALL_WALLET_ASSETS : ', allWalletAssets);
 
-    return allWalletAssets[0];
+    const assetType =
+      currentSession.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name
+        ? UserAssetType.TENDERMINT
+        : UserAssetType.TENDERMINT;
+
+    return TransactionUtils.getAssetFromAllAssets(allWalletAssets, assetType);
   }
 
   public async loadAndSaveAssetPrices(session: Session | null = null) {
