@@ -51,13 +51,10 @@ export const CRONOS_ASSET = (network: Network) => {
     identifier: getRandomId(),
     name: 'Cronos Coin',
     symbol: 'CRONOS',
-    mainnetSymbol: 'CRONOS', // This is to be used solely for markets data since testnet market prices is always non existent
+    mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
     decimals: 18,
     assetType: UserAssetType.EVM,
-    // Initially Ledger won't be supported on cronos asset
-    isLedgerSupportDisabled: true,
-    isStakingDisabled: true,
     config,
   };
 };
