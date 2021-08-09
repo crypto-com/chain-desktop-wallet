@@ -49,6 +49,10 @@ export interface UserAsset {
   address?: string;
 
   config?: UserAssetConfig;
+
+  // This field is used to differentiate default asset and secondary assets,
+  // The original default asset have false or undefined on this field
+  isSecondaryAsset?: boolean;
 }
 
 export enum UserAssetType {

@@ -29,6 +29,7 @@ export const CRO_ASSET = (network: Network) => {
     stakedBalance: '0',
     decimals: 8,
     assetType: UserAssetType.TENDERMINT,
+    isSecondaryAsset: false,
     config,
   };
 };
@@ -55,6 +56,7 @@ export const CRONOS_ASSET = (network: Network) => {
     stakedBalance: '0',
     decimals: 18,
     assetType: UserAssetType.EVM,
+    isSecondaryAsset: true,
     config,
   };
 };
