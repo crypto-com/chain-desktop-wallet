@@ -89,6 +89,23 @@ const ReceivePage = () => {
     }
   };
 
+  const assetAddress = (asset, _session) => {
+    const { assetType, address } = asset;
+    // For IBC assets
+    const { wallet } = _session;
+
+    switch (assetType) {
+      case UserAssetType.TENDERMINT:
+        return address;
+      case UserAssetType.EVM:
+        return address;
+      case UserAssetType.IBC:
+        return wallet.address;
+      default:
+        return wallet.address;
+    }
+  };
+
   const AssetColumns = [
     {
       title: 'Asset',
@@ -180,12 +197,12 @@ const ReceivePage = () => {
                     {currentAsset?.name} ({currentAsset?.symbol})
                   </div>
                   <div className="address">
-                    <QRCode value={session.wallet.address} size={180} />
+                    <QRCode value={assetAddress(currentAsset, session)} size={180} />
                     <div className="name">{session.wallet.name}</div>
                   </div>
-                  <CopyToClipboard text={session.wallet.address}>
+                  <CopyToClipboard text={assetAddress(currentAsset, session)}>
                     <div className="copy" onClick={onCopyClick}>
-                      {session.wallet.address}
+                      {assetAddress(currentAsset, session)}
                       <CopyOutlined />
                     </div>
                   </CopyToClipboard>
