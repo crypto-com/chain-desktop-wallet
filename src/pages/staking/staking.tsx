@@ -23,13 +23,7 @@ import {
   fetchingDBState,
   validatorListState,
 } from '../../recoil/atom';
-import {
-  AssetMarketPrice,
-  scaledAmount,
-  scaledBalance,
-  UserAsset,
-  UserAssetType,
-} from '../../models/UserAsset';
+import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import { FIXED_DEFAULT_FEE, TABLE_LOCALE, DefaultWalletConfigs } from '../../config/StaticConfig';
@@ -99,8 +93,8 @@ const FormDelegationRequest = () => {
   // TO-DO temporary CRO Asset select
   const assetType =
     currentSession.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name
-      ? UserAssetType.TENDERMINT
-      : UserAssetType.TENDERMINT;
+      ? DefaultWalletConfigs.TestNetConfig.assetIdentifer?.cro
+      : DefaultWalletConfigs.MainNetConfig.assetIdentifer?.cro;
   const croAsset = TransactionUtils.getAssetFromAllAssets(walletAllAssets, assetType);
   setWalletAsset(croAsset);
 
@@ -595,8 +589,8 @@ const FormWithdrawStakingReward = () => {
   // TO-DO temporary CRO Asset select
   const assetType =
     currentSession.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name
-      ? UserAssetType.TENDERMINT
-      : UserAssetType.TENDERMINT;
+      ? DefaultWalletConfigs.TestNetConfig.assetIdentifer?.cro
+      : DefaultWalletConfigs.MainNetConfig.assetIdentifer?.cro;
   const croAsset = TransactionUtils.getAssetFromAllAssets(walletAllAssets, assetType);
   setWalletAsset(croAsset);
 

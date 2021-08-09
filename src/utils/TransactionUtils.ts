@@ -4,7 +4,7 @@ import {
   AddressValidator,
 } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { Session } from '../models/Session';
-import { UserAsset, UserAssetType } from '../models/UserAsset';
+import { UserAsset } from '../models/UserAsset';
 import i18n from '../language/I18n';
 
 export class TransactionUtils {
@@ -90,9 +90,9 @@ export class TransactionUtils {
     });
   }
 
-  public static getAssetFromAllAssets(allAssets: UserAsset[], assetType: UserAssetType) {
+  public static getAssetFromAllAssets(allAssets: UserAsset[], identifier: string | undefined) {
     for (let i = 0; i < allAssets.length; i++) {
-      if (allAssets[i].assetType === assetType) {
+      if (allAssets[i].identifier === identifier) {
         return allAssets[i];
       }
     }

@@ -157,8 +157,8 @@ function convertTransfers(
   return allTransfers.map(transfer => {
     const assetType =
       sessionData.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name
-        ? UserAssetType.TENDERMINT
-        : UserAssetType.TENDERMINT;
+        ? DefaultWalletConfigs.TestNetConfig.assetIdentifer?.cro
+        : DefaultWalletConfigs.MainNetConfig.assetIdentifer?.cro;
     const transferAmount = getUIDynamicAmount(
       transfer.amount,
       TransactionUtils.getAssetFromAllAssets(allAssets, assetType),
