@@ -8,7 +8,6 @@ import numeral from 'numeral';
 import Big from 'big.js';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { validatorListState, fetchingDBState } from '../../../recoil/atom';
-import { TABLE_LOCALE } from '../../../config/StaticConfig';
 import { Session } from '../../../models/Session';
 import { UserAsset, scaledAmount } from '../../../models/UserAsset';
 import { ValidatorModel } from '../../../models/Transaction';
@@ -178,7 +177,11 @@ const RedelegateFormComponent = (props: {
           <div className="description">{t('staking.validatorList.table.description')}</div>
           <div className="item">
             <Table
-              locale={TABLE_LOCALE}
+              locale={{
+                triggerDesc: t('general.table.triggerDesc'),
+                triggerAsc: t('general.table.triggerAsc'),
+                cancelSort: t('general.table.cancelSort'),
+              }}
               dataSource={validatorTopList}
               columns={validatorColumns}
               pagination={{ showSizeChanger: false }}
