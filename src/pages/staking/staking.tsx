@@ -13,6 +13,7 @@ import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import {
   marketState,
@@ -91,6 +92,7 @@ const FormDelegationRequest = () => {
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
     if (validatorList) {
       let totalShares = new Big(0);
+      let cumulativeShares = new Big(0);
 
       for (let i = 0; i < validatorList?.length; i++) {
         totalShares = totalShares.add(validatorList[i].currentShares);
@@ -101,12 +103,22 @@ const FormDelegationRequest = () => {
           ...validator,
           key: `${idx}`,
           currentShares: validator.currentShares,
-          cumulativeShares: new Big(validator.currentShares)
+          cumulativeShares: cumulativeShares.toPrecision(4).toString(),
+          cumulativeSharesExcludePercentage: cumulativeShares
             .div(totalShares)
             .times(100)
-            .toPrecision(2)
+            .toPrecision(4)
+            .toString(),
+          cumulativeSharesIncludePercentage: cumulativeShares
+            .add(new Big(validator.currentShares))
+            .div(totalShares)
+            .times(100)
+            .toPrecision(4)
             .toString(),
         };
+
+        cumulativeShares = cumulativeShares.add(new Big(validator.currentShares));
+
         return validatorModel;
       });
     }
@@ -312,12 +324,20 @@ const FormDelegationRequest = () => {
     },
     {
       title: 'Cumulative Shares',
-      dataIndex: 'cumulativeShares',
+      // dataIndex: 'cumulativeShares',
       key: 'cumulativeShares',
-      sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
+      // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
       defaultSortOrder: 'descend' as any,
-      render: cumulativeShares => {
-        return <span>{cumulativeShares} %</span>;
+      render: record => {
+        return (
+          <>
+            {/* <span>{record.cumulativeShares} %</span> */}
+            <ValidatorPowerPercentBar
+              percentExcludeCurrent={record.cumulativeSharesExcludePercentage} // light blue
+              percentIncludeCurrent={record.cumulativeSharesIncludePercentage} // primary blue
+            />
+          </>
+        );
       },
     },
     {
