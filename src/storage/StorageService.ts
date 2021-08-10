@@ -281,16 +281,16 @@ export class StorageService {
       return Promise.resolve();
     }
     await this.db.transferStore.remove(
-      { walletId: transferTransactionList.walletId, asset: transferTransactionList.asset },
+      { walletId: transferTransactionList.walletId, assetId: transferTransactionList.assetId },
       { multi: true },
     );
     return this.db.transferStore.insert<TransferTransactionList>(transferTransactionList);
   }
 
-  public async retrieveAllTransferTransactions(walletId: string, currentAsset?: UserAsset) {
+  public async retrieveAllTransferTransactions(walletId: string, assetID?: string) {
     return this.db.transferStore.findOne<TransferTransactionList>({
       walletId,
-      asset: currentAsset,
+      assetId: assetID,
     });
   }
 

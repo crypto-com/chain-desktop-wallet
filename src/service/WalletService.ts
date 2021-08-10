@@ -823,7 +823,7 @@ class WalletService {
               await this.saveTransfers({
                 transactions: transferTransactions,
                 walletId: currentSession.wallet.identifier,
-                asset: currentAsset,
+                assetId: currentAsset.identifier,
               });
             } catch (e) {
               // eslint-disable-next-line no-console
@@ -866,7 +866,7 @@ class WalletService {
               await this.saveTransfers({
                 transactions: loadedTransactions,
                 walletId: currentSession.wallet.identifier,
-                asset: currentAsset,
+                assetId: currentAsset?.identifier,
               });
             } catch (e) {
               // eslint-disable-next-line no-console
@@ -1149,7 +1149,7 @@ class WalletService {
   ): Promise<TransferTransactionData[]> {
     const transactionList: TransferTransactionList = await this.storageService.retrieveAllTransferTransactions(
       walletId,
-      currentAsset,
+      currentAsset?.identifier,
     );
 
     if (!transactionList) {
