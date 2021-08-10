@@ -19,6 +19,7 @@ const ValidatorPowerPercentBar: React.FC<ValidatorPowerPercentBarProps> = props 
           percent={percentIncludeCurrent}
           successPercent={percentExcludeCurrent}
           showInfo={false}
+          className="validator-power-percent-bar"
         />
       </div>
     </Tooltip>
