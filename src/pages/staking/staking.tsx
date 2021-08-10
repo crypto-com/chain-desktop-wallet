@@ -18,21 +18,14 @@ import {
   marketState,
   sessionState,
   walletAssetState,
-  walletAllAssetsState,
   ledgerIsExpertModeState,
   fetchingDBState,
   validatorListState,
 } from '../../recoil/atom';
-import {
-  AssetMarketPrice,
-  scaledAmount,
-  scaledBalance,
-  UserAsset,
-  UserAssetType,
-} from '../../models/UserAsset';
+import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import { FIXED_DEFAULT_FEE, TABLE_LOCALE, DefaultWalletConfigs } from '../../config/StaticConfig';
+import { FIXED_DEFAULT_FEE, TABLE_LOCALE } from '../../config/StaticConfig';
 import {
   adjustedTransactionAmount,
   fromScientificNotation,
@@ -84,7 +77,7 @@ const FormDelegationRequest = () => {
   const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
   const [showMemo, setShowMemo] = useState(false);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
-  const walletAllAssets = useRecoilValue(walletAllAssetsState);
+
   const currentValidatorList = useRecoilValue(validatorListState);
   const currentSession = useRecoilValue(sessionState);
   const fetchingDB = useRecoilValue(fetchingDBState);
@@ -95,14 +88,6 @@ const FormDelegationRequest = () => {
   const analyticsService = new AnalyticsService(currentSession);
 
   const [t] = useTranslation();
-
-  // TO-DO temporary CRO Asset select
-  const assetType =
-    currentSession.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name
-      ? UserAssetType.TENDERMINT
-      : UserAssetType.TENDERMINT;
-  const croAsset = TransactionUtils.getAssetFromAllAssets(walletAllAssets, assetType);
-  setWalletAsset(croAsset);
 
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
     if (validatorList) {
@@ -581,7 +566,8 @@ const FormWithdrawStakingReward = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
-  const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  // const walletAllAssets = useRecoilValue(walletAllAssetsState);
+
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const marketData = useRecoilValue(marketState);
   const currentSession = useRecoilValue(sessionState);
@@ -591,14 +577,6 @@ const FormWithdrawStakingReward = () => {
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
 
   const [t] = useTranslation();
-
-  // TO-DO temporary CRO Asset select
-  const assetType =
-    currentSession.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name
-      ? UserAssetType.TENDERMINT
-      : UserAssetType.TENDERMINT;
-  const croAsset = TransactionUtils.getAssetFromAllAssets(walletAllAssets, assetType);
-  setWalletAsset(croAsset);
 
   const convertToTabularData = (
     allRewards: RewardTransaction[],
@@ -630,6 +608,9 @@ const FormWithdrawStakingReward = () => {
       const allRewards: RewardTransaction[] = await walletService.retrieveAllRewards(
         currentSession.wallet.identifier,
       );
+
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      setWalletAsset(currentWalletAsset);
 
       const rewardsTabularData = convertToTabularData(allRewards, walletAsset, marketData);
       setRewards(rewardsTabularData);
@@ -678,8 +659,6 @@ const FormWithdrawStakingReward = () => {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setIsSuccessTransferModalVisible(true);
-      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
-      setWalletAsset(currentWalletAsset);
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
         setLedgerIsExpertMode(detectConditionsError(e.toString()));
