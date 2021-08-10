@@ -588,6 +588,7 @@ function HomePage() {
     );
     const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
       sessionData.wallet.identifier,
+      defaultWalletAsset,
     );
 
     const allNftTransfer: NftAccountTransactionData[] = await walletService.getAllNFTAccountTxs(
@@ -690,6 +691,7 @@ function HomePage() {
       );
       const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
         sessionData.wallet.identifier,
+        currentAsset,
       );
 
       const allNftTransfer: NftAccountTransactionData[] = await walletService.getAllNFTAccountTxs(

@@ -287,8 +287,11 @@ export class StorageService {
     return this.db.transferStore.insert<TransferTransactionList>(transferTransactionList);
   }
 
-  public async retrieveAllTransferTransactions(walletId: string) {
-    return this.db.transferStore.findOne<TransferTransactionList>({ walletId });
+  public async retrieveAllTransferTransactions(walletId: string, currentAsset?: UserAsset) {
+    return this.db.transferStore.findOne<TransferTransactionList>({
+      walletId,
+      asset: currentAsset,
+    });
   }
 
   public async saveNFTAccountTransactions(nftAccountTransactionList: NftAccountTransactionList) {

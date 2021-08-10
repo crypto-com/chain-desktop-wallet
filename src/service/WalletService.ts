@@ -1143,9 +1143,13 @@ class WalletService {
     });
   }
 
-  public async retrieveAllTransfers(walletId: string): Promise<TransferTransactionData[]> {
+  public async retrieveAllTransfers(
+    walletId: string,
+    currentAsset?: UserAsset,
+  ): Promise<TransferTransactionData[]> {
     const transactionList: TransferTransactionList = await this.storageService.retrieveAllTransferTransactions(
       walletId,
+      currentAsset,
     );
 
     if (!transactionList) {
