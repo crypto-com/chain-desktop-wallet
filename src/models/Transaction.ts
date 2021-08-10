@@ -5,6 +5,7 @@ import {
   NftTransactionResponse,
   NftDenomData,
 } from '../service/rpc/ChainIndexingModels';
+import { UserAsset } from './UserAsset';
 
 export enum TransactionStatus {
   SUCCESS = 'SUCCESS',
@@ -73,6 +74,7 @@ export interface RewardTransactionList {
 export interface TransferTransactionList {
   transactions: Array<TransferTransactionData>;
   walletId: string;
+  asset?: UserAsset;
 }
 
 export interface NftList {

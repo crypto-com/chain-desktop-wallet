@@ -48,6 +48,7 @@ import {
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
+  TransactionStatus,
   TransferTransactionData,
   TransferTransactionList,
   ValidatorModel,
@@ -799,21 +800,85 @@ class WalletService {
   }
 
   public async fetchAndSaveTransfers(currentSession: Session) {
-    try {
-      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-      const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
-        currentSession.wallet.config.network.coin.baseDenom,
-        currentSession.wallet.address,
-      );
+    // TODO : Make sync all assets configurations aware.
 
-      await this.saveTransfers({
-        transactions: transferTransactions,
-        walletId: currentSession.wallet.identifier,
-      });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('FAILED_TO_LOAD_TRANSFERS', e);
-    }
+    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
+
+    await Promise.all(
+      assets.map(async currentAsset => {
+        const indexingUrl =
+          currentAsset?.config?.indexingUrl || currentSession.wallet.config.indexingUrl;
+
+        switch (currentAsset.assetType) {
+          case UserAssetType.TENDERMINT:
+          case UserAssetType.IBC:
+          case undefined:
+            try {
+              const chainIndexAPI = ChainIndexingAPI.init(indexingUrl);
+              const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
+                currentSession.wallet.config.network.coin.baseDenom,
+                currentSession.wallet.address,
+              );
+
+              await this.saveTransfers({
+                transactions: transferTransactions,
+                walletId: currentSession.wallet.identifier,
+                asset: currentAsset,
+              });
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.error('FAILED_TO_LOAD_TRANSFERS', e);
+            }
+
+            break;
+          case UserAssetType.EVM:
+            try {
+              if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
+                return;
+              }
+
+              const cronosClient = new CronosClient(
+                currentAsset.config?.nodeUrl,
+                currentAsset.config?.indexingUrl,
+              );
+
+              // TODO : transform EVM transaction to current transaction data
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              const transactions = await cronosClient.getTxsByAddress(currentAsset.address);
+              const loadedTransactions = transactions.result.map(evmTx => {
+                const transferTx: TransferTransactionData = {
+                  amount: evmTx.value,
+                  assetSymbol: currentAsset.symbol,
+                  date: evmTx.timeStamp,
+                  hash: evmTx.hash,
+                  memo: '',
+                  receiverAddress: evmTx.to,
+                  senderAddress: evmTx.from,
+                  status: TransactionStatus.SUCCESS,
+                };
+
+                return transferTx;
+              });
+
+              // eslint-disable-next-line no-console
+              console.log('Loaded transactions', transactions, loadedTransactions);
+
+              await this.saveTransfers({
+                transactions: loadedTransactions,
+                walletId: currentSession.wallet.identifier,
+                asset: currentAsset,
+              });
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.error(`FAILED_TO_LOAD_TRANSFERS - ${currentAsset.assetType}`, e);
+            }
+
+            break;
+          default:
+            break;
+        }
+      }),
+    );
   }
 
   public async fetchAndSaveNFTAccountTxs(currentSession: Session) {
