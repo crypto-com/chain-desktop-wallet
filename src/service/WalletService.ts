@@ -133,6 +133,7 @@ class WalletService {
 
       case UserAssetType.EVM:
         // TODO: Implement EVM Transaction signing
+        // EVM Send code here
         return {};
 
       default:
