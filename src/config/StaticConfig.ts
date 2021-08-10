@@ -46,10 +46,6 @@ export type WalletConfig = {
     gasLimit: string;
     networkFee: string;
   };
-  assetIdentifer?: {
-    cro: string;
-    cronos: string;
-  };
 };
 
 export const FIXED_DEFAULT_FEE = String(10_000);
@@ -159,10 +155,6 @@ const MainNetConfig: WalletConfig = {
   fee: {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
-  },
-  assetIdentifer: {
-    cro: 'e9cc453a9e39718c',
-    cronos: 'd1a17aca33fd382c',
   },
 };
 

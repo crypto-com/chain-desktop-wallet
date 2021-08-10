@@ -18,7 +18,6 @@ import {
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
-// import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -32,14 +31,8 @@ import {
   ledgerIsExpertModeState,
   fetchingDBState,
 } from '../../recoil/atom';
-import {
-  NOT_KNOWN_YET_VALUE,
-  TABLE_LOCALE,
-  WalletConfig,
-  DefaultWalletConfigs,
-} from '../../config/StaticConfig';
+import { NOT_KNOWN_YET_VALUE, TABLE_LOCALE, WalletConfig } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
-import { TransactionUtils } from '../../utils/TransactionUtils';
 import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
 import {
   scaledBalance,
@@ -141,6 +134,7 @@ function convertTransfers(
   allTransfers: TransferTransactionData[],
   allAssets: UserAsset[],
   sessionData: Session,
+  defaultWalletAsset: UserAsset,
 ) {
   const { address } = sessionData.wallet;
 
@@ -155,22 +149,13 @@ function convertTransfers(
   }
 
   return allTransfers.map(transfer => {
-    const assetType =
-      sessionData.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name
-        ? DefaultWalletConfigs.TestNetConfig.assetIdentifer?.cro
-        : DefaultWalletConfigs.MainNetConfig.assetIdentifer?.cro;
-    const transferAmount = getUIDynamicAmount(
-      transfer.amount,
-      TransactionUtils.getAssetFromAllAssets(allAssets, assetType),
-    );
+    const transferAmount = getUIDynamicAmount(transfer.amount, defaultWalletAsset);
     const data: TransferTabularData = {
       key: transfer.hash + transfer.receiverAddress + transfer.amount,
       recipientAddress: transfer.receiverAddress,
       transactionHash: transfer.hash,
       time: new Date(transfer.date).toLocaleString(),
-      amount: `${transferAmount} ${
-        TransactionUtils.getAssetFromAllAssets(allAssets, assetType).symbol
-      }`,
+      amount: `${transferAmount} ${transfer.assetSymbol}`,
       direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
       status: transfer.status,
     };
@@ -270,16 +255,12 @@ function HomePage() {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [delegationActionType, setDelegationActionType] = useState<StakingActionType>();
+  const [defaultWalletAsset, setdefaultWalletAsset] = useState<UserAsset>();
 
   const analyticsService = new AnalyticsService(currentSession);
 
   const [t] = useTranslation();
 
-  // const croAsset = currentSession.wallet.config.name === DefaultWalletConfigs.TestNetConfig.name? TransactionUtils.getAssetFromAllAssets(walletAllAssets, UserAssetType.TENDERMINT) : userAsset;
-  const croAsset = TransactionUtils.getAssetFromAllAssets(
-    walletAllAssets,
-    UserAssetType.TENDERMINT,
-  );
   const assetIcon = asset => {
     const { assetType, icon_url, symbol } = asset;
     switch (assetType) {
@@ -613,8 +594,12 @@ function HomePage() {
       sessionData,
     );
 
-    const stakingTabularData = convertDelegations(allDelegations, croAsset);
-    const transferTabularData = convertTransfers(allTransfers, walletAllAssets, sessionData);
+    const stakingTabularData = defaultWalletAsset
+      ? convertDelegations(allDelegations, defaultWalletAsset)
+      : [];
+    const transferTabularData = defaultWalletAsset
+      ? convertTransfers(allTransfers, walletAllAssets, sessionData, defaultWalletAsset)
+      : [];
     const nftTransferTabularData = convertNftTransfers(allNftTransfer);
 
     showWalletStateNotification(currentSession.wallet.config);
@@ -715,8 +700,16 @@ function HomePage() {
       const currentNftList = processNftList(allNFTs);
       setProcessedNftList(currentNftList);
       setNFTList(allNFTs);
-      const stakingTabularData = convertDelegations(allDelegations, croAsset);
-      const transferTabularData = convertTransfers(allTransfers, walletAllAssets, sessionData);
+
+      setdefaultWalletAsset(currentAsset);
+
+      const stakingTabularData = convertDelegations(allDelegations, currentAsset);
+      const transferTabularData = convertTransfers(
+        allTransfers,
+        walletAllAssets,
+        sessionData,
+        currentAsset,
+      );
       const nftTransferTabularData = convertNftTransfers(allNftTransfer);
 
       showWalletStateNotification(currentSession.wallet.config);
@@ -975,27 +968,31 @@ function HomePage() {
           </div> */}
           <div className="balance">
             <div className="title">CRO BALANCE</div>
-            {/* <div className="title">{t('home.balance.title1')}</div> */}
-            <div className="quantity">
-              {numeral(scaledBalance(croAsset)).format('0,0.0000')} {croAsset?.symbol}
-            </div>
+            {defaultWalletAsset && (
+              <div className="quantity">
+                {numeral(scaledBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
+                {defaultWalletAsset?.symbol}
+              </div>
+            )}
             <div className="fiat">
-              {marketData && marketData.price
-                ? `${numeral(getAssetBalancePrice(croAsset, marketData)).format('$0,0.00')} ${
-                    marketData?.currency
-                  }`
+              {defaultWalletAsset && marketData && marketData.price
+                ? `${numeral(getAssetBalancePrice(defaultWalletAsset, marketData)).format(
+                    '$0,0.00',
+                  )} ${marketData?.currency}`
                 : ''}
             </div>
           </div>
           <div className="balance">
             <div className="title">STAKED CRO BALANCE</div>
-            {/* <div className="title">{t('home.balance.title2')}</div> */}
-            <div className="quantity">
-              {numeral(scaledStakingBalance(croAsset)).format('0,0.0000')} {croAsset?.symbol}
-            </div>
+            {defaultWalletAsset && (
+              <div className="quantity">
+                {numeral(scaledStakingBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
+                {defaultWalletAsset?.symbol}
+              </div>
+            )}
             <div className="fiat">
-              {marketData && marketData.price
-                ? `${numeral(getAssetStakingBalancePrice(croAsset, marketData)).format(
+              {defaultWalletAsset && marketData && marketData.price
+                ? `${numeral(getAssetStakingBalancePrice(defaultWalletAsset, marketData)).format(
                     '$0,0.00',
                   )} ${marketData?.currency}`
                 : ''}

@@ -89,30 +89,4 @@ export class TransactionUtils {
       },
     });
   }
-
-  public static getAssetFromAllAssets(allAssets: UserAsset[], identifier: string | undefined) {
-    for (let i = 0; i < allAssets.length; i++) {
-      if (allAssets[i].identifier === identifier) {
-        return allAssets[i];
-      }
-    }
-    return allAssets[0];
-  }
-
-  // public static maxMinValidation(currentBalance: string, inputValue: string) {
-  //   const currentBalanceAmount = Big(currentBalance);
-  //   const inputAmount = Big(inputValue);
-  //
-  //   if (inputAmount.gte(currentBalanceAmount)) {
-  //     // eslint-disable-next-line prefer-promise-reject-errors
-  //     return Promise.reject(`The amount input is greater than current balance`);
-  //   }
-  //
-  //   if (currentBalanceAmount.eq(Big(0))) {
-  //     // eslint-disable-next-line prefer-promise-reject-errors
-  //     return Promise.reject(`The amount should be bigger than zero`);
-  //   }
-  //
-  //   return Promise.resolve();
-  // }
 }
