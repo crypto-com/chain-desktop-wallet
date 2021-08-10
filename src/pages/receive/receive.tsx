@@ -19,7 +19,7 @@ import { getAssetBalancePrice, UserAsset, UserAssetType } from '../../models/Use
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
-import logoCro from '../../assets/AssetLogo/cro.png';
+// import logoCro from '../../assets/AssetLogo/cro.png';
 
 const { Header, Content, Footer } = Layout;
 
@@ -76,17 +76,13 @@ const ReceivePage = () => {
   };
 
   const assetIcon = asset => {
-    const { assetType, icon_url, symbol } = asset;
-    switch (assetType) {
-      case UserAssetType.TENDERMINT:
-        return <img src={logoCro} alt="cro" className="asset-icon" />;
-      case UserAssetType.EVM:
-        return <img src={icon_url} alt="cronos" className="asset-icon" />;
-      case UserAssetType.IBC:
-        return <Avatar>{symbol[0].toUpperCase()}</Avatar>;
-      default:
-        return <Avatar>{symbol[0].toUpperCase()}</Avatar>;
-    }
+    const { icon_url, symbol } = asset;
+
+    return icon_url ? (
+      <img src={icon_url} alt="cronos" className="asset-icon" />
+    ) : (
+      <Avatar>{symbol[0].toUpperCase()}</Avatar>
+    );
   };
 
   const assetAddress = (asset, _session) => {

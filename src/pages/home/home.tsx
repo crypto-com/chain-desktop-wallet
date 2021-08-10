@@ -40,7 +40,6 @@ import {
   getAssetBalancePrice,
   getAssetStakingBalancePrice,
   UserAsset,
-  UserAssetType,
 } from '../../models/UserAsset';
 import { Session } from '../../models/Session';
 import {
@@ -66,7 +65,7 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { UndelegateFormComponent } from './components/UndelegateFormComponent';
 import RedelegateFormComponent from './components/RedelegateFormComponent';
-import logoCro from '../../assets/AssetLogo/cro.png';
+// import logoCro from '../../assets/AssetLogo/cro.png';
 import IconTick from '../../svg/IconTick';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 
@@ -262,17 +261,13 @@ function HomePage() {
   const [t] = useTranslation();
 
   const assetIcon = asset => {
-    const { assetType, icon_url, symbol } = asset;
-    switch (assetType) {
-      case UserAssetType.TENDERMINT:
-        return <img src={logoCro} alt="cro" className="asset-icon" />;
-      case UserAssetType.EVM:
-        return <img src={icon_url} alt="cronos" className="asset-icon" />;
-      case UserAssetType.IBC:
-        return <Avatar>{symbol[0].toUpperCase()}</Avatar>;
-      default:
-        return <Avatar>{symbol[0].toUpperCase()}</Avatar>;
-    }
+    const { icon_url, symbol } = asset;
+
+    return icon_url ? (
+      <img src={icon_url} alt="cronos" className="asset-icon" />
+    ) : (
+      <Avatar>{symbol[0].toUpperCase()}</Avatar>
+    );
   };
 
   const AssetColumns = [
