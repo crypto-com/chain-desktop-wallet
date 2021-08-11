@@ -438,12 +438,11 @@ const FormDelegationRequest = () => {
                 expandIconColumnIndex: -1,
               }}
               rowClassName={record => {
-                const rowClassName =
+                const greyBackground =
                   new Big(record.cumulativeSharesIncludePercentage!)
                     .div(100)
                     .lte(CUMULATIVE_POWER_THRESHOLD) || record.displayWarningColumn;
-                console.log('rowClassName', rowClassName);
-                return rowClassName ? 'greyBackground' : '';
+                return greyBackground ? 'greyBackground' : '';
               }}
               defaultExpandAllRows
             />
