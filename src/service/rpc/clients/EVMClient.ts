@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { BlockTransactionObject, TransactionReceipt } from 'web3-eth';
+import { BlockTransactionObject, TransactionReceipt, TransactionConfig } from 'web3-eth';
 import { IEvmRpc } from '../interface/evm.rpcClient';
 
 class EVMClient implements IEvmRpc {
@@ -59,6 +59,16 @@ class EVMClient implements IEvmRpc {
       return null;
     }
     return mayBeTxReceipt;
+  }
+
+    // Fees
+  async getEstimatedGasPrice(): Promise<string> {
+    const estimatedGasPrice = await this.web3.eth.getGasPrice();
+    return estimatedGasPrice;
+  }
+  async estimateGas(txConfig: TransactionConfig): Promise<number> {
+    const estimatedGas = await this.web3.eth.estimateGas(txConfig);
+    return estimatedGas;
   }
 
   // Block
