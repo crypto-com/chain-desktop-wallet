@@ -1,4 +1,4 @@
-import { BlockTransactionObject, TransactionReceipt } from 'web3-eth';
+import { BlockTransactionObject, TransactionReceipt, TransactionConfig } from 'web3-eth';
 
 export interface IEvmRpc {
   // Node
@@ -11,6 +11,10 @@ export interface IEvmRpc {
 
   // Transaction
   getTransactionReceiptByHash(txHash: string): Promise<TransactionReceipt | null>;
+
+  // Fees
+  getEstimatedGasPrice(): Promise<string>;
+  estimateGas(txConfig: TransactionConfig): Promise<number>;
 
   // Block
   getLatestBlockHeight(): Promise<number>;
