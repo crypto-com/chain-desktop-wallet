@@ -72,6 +72,7 @@ import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter, sleep } from '../utils/utils';
 import { WalletBuiltResult } from './WalletOps';
 import { CronosClient } from './cronos/CronosClient';
+import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -83,30 +84,32 @@ class WalletService {
   public readonly BROADCAST_TIMEOUT_CODE = -32603;
 
   public async sendTransfer(transferRequest: TransferRequest): Promise<BroadCastResult> {
-    switch (transferRequest.asset.assetType) {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.prepareTransaction();
+
+    const currentAsset = transferRequest.asset;
+    const scaledBaseAmount = getBaseScaledAmount(transferRequest.amount, currentAsset);
+    const fromAddress = currentSession.wallet.address;
+    const transfer: TransferTransactionUnsigned = {
+      fromAddress,
+      toAddress: transferRequest.toAddress,
+      amount: String(scaledBaseAmount),
+      memo: transferRequest.memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    switch (currentAsset.assetType) {
       case UserAssetType.TENDERMINT:
       case UserAssetType.IBC:
       case undefined: {
         // Undefined case is for legacy reasons
-        const {
-          nodeRpc,
-          accountNumber,
-          accountSequence,
-          currentSession,
-          transactionSigner,
-          ledgerTransactionSigner,
-        } = await this.prepareTransaction();
-
-        const scaledBaseAmount = getBaseScaledAmount(transferRequest.amount, transferRequest.asset);
-        const fromAddress = currentSession.wallet.address;
-        const transfer: TransferTransactionUnsigned = {
-          fromAddress,
-          toAddress: transferRequest.toAddress,
-          amount: String(scaledBaseAmount),
-          memo: transferRequest.memo,
-          accountNumber,
-          accountSequence,
-        };
 
         let signedTxHex: string = '';
 
@@ -133,9 +136,45 @@ class WalletService {
       }
 
       case UserAssetType.EVM:
-        // TODO: Implement EVM Transaction signing
-        // EVM Send code here
-        return {};
+        try {
+          // TODO: Implement EVM Transaction signing
+          // EVM Send code here
+          if (currentAsset?.config?.isLedgerSupportDisabled) {
+            throw TypeError(
+              `${LEDGER_WALLET_TYPE} not supported yet for ${transferRequest.walletType} assets`,
+            );
+          }
+
+          if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
+            throw TypeError(`Missing asset config: ${currentAsset.config}`);
+          }
+
+          const cronosClient = new CronosClient(
+            currentAsset.config?.nodeUrl,
+            currentAsset.config?.indexingUrl,
+          );
+
+          transfer.nonce = await cronosClient.getNextNonceByAddress(currentAsset.address);
+
+          // eslint-disable-next-line no-console
+          console.log('EVM_TX', { txNonce: transfer.nonce });
+
+          const signedTx = await evmTransactionSigner.signTransfer(
+            transfer,
+            transferRequest.decryptedPhrase,
+          );
+          const result = await cronosClient.broadcastRawTransactionHex(signedTx);
+
+          return {
+            transactionHash: result,
+            message: '',
+            code: 200,
+          };
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.log(`ERROR_TRANSFERRING - ${currentAsset.assetType}`, e);
+          throw TypeError(e);
+        }
 
       default:
         return {};
@@ -687,6 +726,13 @@ class WalletService {
         switch (asset.assetType) {
           case UserAssetType.EVM:
             if (!asset.config || !asset.address) {
+              // eslint-disable-next-line no-console
+              console.log('NO_ASSET_CONFIG_0R_ADDRESS_FOUND', {
+                config: asset.config,
+                address: asset.address,
+              });
+              asset.balance = '0';
+              await this.storageService.saveAsset(asset);
               return;
             }
             try {
@@ -696,6 +742,8 @@ class WalletService {
               );
 
               asset.balance = await cronosClient.getNativeBalanceByAddress(asset.address);
+              // eslint-disable-next-line no-console
+              console.log(`${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`);
             } catch (e) {
               // eslint-disable-next-line no-console
               console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
@@ -713,8 +761,6 @@ class WalletService {
                 asset.assetType !== UserAssetType.IBC
                   ? currentSession.wallet.config.network.coin.baseDenom
                   : `ibc/${asset.ibcDenomHash}`;
-              // eslint-disable-next-line no-console
-              console.log(`Loading balance for ${baseDenomination}`);
               asset.balance = await nodeRpc.loadAccountBalance(
                 // Handling legacy wallets which had wallet.address
                 asset.address || currentSession.wallet.address,
@@ -726,7 +772,9 @@ class WalletService {
                 baseDenomination,
               );
               // eslint-disable-next-line no-console
-              console.log(`Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance}`);
+              console.log(
+                `${asset.symbol}: Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance} - ${asset.address}`,
+              );
             } catch (e) {
               // eslint-disable-next-line no-console
               console.log('BALANCE_FETCH_ERROR', { asset, e });

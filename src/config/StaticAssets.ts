@@ -36,9 +36,12 @@ export const CRO_ASSET = (network: Network) => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CRONOS_ASSET = (network: Network) => {
+  const DEFAULT_GAS_PRICE = 20_000_000_000; // 20 GWEI
+  const DEFAULT_GAS_LIMIT = 21_000; // 20 GWEI
+
   const config: UserAssetConfig = {
     chainId: '',
-    fee: { gasLimit: '', networkFee: '' },
+    fee: { gasLimit: `${DEFAULT_GAS_LIMIT}`, networkFee: `${DEFAULT_GAS_PRICE}` },
     indexingUrl: 'https://cronos-explorer.crypto.org/api',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,

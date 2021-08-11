@@ -7,13 +7,17 @@ import {
   WithdrawStakingRewardUnsigned,
 } from './TransactionSupported';
 
-export class EvmTransactionSigner implements ITransactionSigner {
+// TODO: To be removed, these will be part of the configuration
+const DEFAULT_GAS_PRICE = 20_000_000_000; // 20 GWEI
+const DEFAULT_GAS_LIMIT = 21_000; // 20 GWEI
+
+class EvmTransactionSigner implements ITransactionSigner {
   // eslint-disable-next-line class-methods-use-this
   public signTransfer(transaction: TransferTransactionUnsigned, phrase: string): Promise<string> {
     const txParams = {
       nonce: ethers.utils.hexValue(transaction.nonce || 0),
-      gasPrice: ethers.utils.hexValue(transaction.gasPrice || 0),
-      gasLimit: transaction.gasLimit,
+      gasPrice: ethers.utils.hexValue(transaction.gasPrice || DEFAULT_GAS_PRICE),
+      gasLimit: transaction.gasLimit || DEFAULT_GAS_LIMIT,
       to: transaction.toAddress,
       value: ethers.utils.parseEther(transaction.amount).toHexString(),
       data: '0x',
@@ -38,3 +42,5 @@ export class EvmTransactionSigner implements ITransactionSigner {
     return Promise.resolve('');
   }
 }
+
+export const evmTransactionSigner = new EvmTransactionSigner();

@@ -213,7 +213,7 @@ function HomePage() {
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
-  const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const setNFTList = useSetRecoilState(nftListState);
   const marketData = useRecoilValue(marketState);
@@ -319,15 +319,17 @@ function HomePage() {
       title: 'Value',
       // dataIndex: 'value',
       key: 'value',
-      render: record => (
-        <>
-          {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
-            ? `${numeral(getAssetBalancePrice(userAsset, marketData)).format('$0,0.00')} ${
-                marketData?.currency
-              }`
-            : '$--'}
-        </>
-      ),
+      render: record => {
+        return (
+          <>
+            {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
+              ? `${numeral(getAssetBalancePrice(record, marketData)).format('$0,0.00')} ${
+                  marketData?.currency
+                }`
+              : '$--'}
+          </>
+        );
+      },
     },
   ];
 
@@ -694,6 +696,8 @@ function HomePage() {
         currentAsset,
       );
 
+      const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
+
       const allNftTransfer: NftAccountTransactionData[] = await walletService.getAllNFTAccountTxs(
         sessionData,
       );
@@ -719,6 +723,7 @@ function HomePage() {
       setTransfers(transferTabularData);
       setNftTransfers(nftTransferTabularData);
       setUserAsset(currentAsset);
+      setWalletAllAssets(allAssets);
       setHasShownNotLiveWallet(true);
     };
 
