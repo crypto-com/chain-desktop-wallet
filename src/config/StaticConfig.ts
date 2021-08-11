@@ -14,6 +14,7 @@ export const NodePorts = {
 };
 // maximum in ledger: 2147483647
 export const LedgerWalletMaximum = 2147483647;
+export const CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD = 33.3;
 
 export const DEFAULT_LANGUAGE_CODE = 'enUS';
 export const SUPPORTED_LANGUAGE = [

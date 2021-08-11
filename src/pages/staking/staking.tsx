@@ -26,7 +26,10 @@ import {
 import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
+import {
+  FIXED_DEFAULT_FEE,
+  CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+} from '../../config/StaticConfig';
 import {
   adjustedTransactionAmount,
   fromScientificNotation,
@@ -52,8 +55,6 @@ const layout = {
 const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
-
-const CUMULATIVE_POWER_THRESHOLD = 0.33;
 
 interface RewardsTabularData {
   key: string;
@@ -122,10 +123,10 @@ const FormDelegationRequest = () => {
         };
 
         cumulativeShares = cumulativeShares.add(new Big(validator.currentShares));
-        const cumulativeSharesIncludePercentage = cumulativeShares.div(totalShares);
+        const cumulativeSharesIncludePercentage = cumulativeShares.div(totalShares).times(100);
 
         if (
-          cumulativeSharesIncludePercentage.gte(CUMULATIVE_POWER_THRESHOLD) &&
+          cumulativeSharesIncludePercentage.gte(CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD) &&
           !displayedWarningColumn
         ) {
           displayedWarningColumn = true;
@@ -135,7 +136,6 @@ const FormDelegationRequest = () => {
         const validatorModel = {
           ...preValidatorModel,
           cumulativeSharesIncludePercentage: cumulativeSharesIncludePercentage
-            .times(100)
             .toPrecision(4)
             .toString(),
           displayWarningColumn: willDisplayWarningColumn,
@@ -430,7 +430,7 @@ const FormDelegationRequest = () => {
                 rowExpandable: record => record.displayWarningColumn!,
                 expandedRowRender: record =>
                   record.displayWarningColumn && (
-                    <div className="cumulativeStake33">
+                    <div className="cumulative-stake33">
                       Cumulative stake above can halt the network: improve decentralization and
                       delegate to validators below
                     </div>
@@ -439,10 +439,10 @@ const FormDelegationRequest = () => {
               }}
               rowClassName={record => {
                 const greyBackground =
-                  new Big(record.cumulativeSharesIncludePercentage!)
-                    .div(100)
-                    .lte(CUMULATIVE_POWER_THRESHOLD) || record.displayWarningColumn;
-                return greyBackground ? 'greyBackground' : '';
+                  new Big(record.cumulativeSharesIncludePercentage!).lte(
+                    CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+                  ) || record.displayWarningColumn;
+                return greyBackground ? 'grey-background' : '';
               }}
               defaultExpandAllRows
             />
