@@ -66,6 +66,7 @@ class EVMClient implements IEvmRpc {
     const estimatedGasPrice = await this.web3.eth.getGasPrice();
     return estimatedGasPrice;
   }
+  
   async estimateGas(txConfig: TransactionConfig): Promise<number> {
     const estimatedGas = await this.web3.eth.estimateGas(txConfig);
     return estimatedGas;
