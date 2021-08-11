@@ -269,22 +269,24 @@ export class NodeRpcService implements INodeRpcService {
     const response = await this.cosmosClient.get<ValidatorListResponse>(url);
 
     return [
-      response.data.validators.map(validator => ({
-        status: validator.status,
-        jailed: validator.jailed,
-        validatorWebSite: validator.description.website,
-        maxCommissionRate: validator.commission.commission_rates.max_rate,
-        securityContact: validator.description.security_contact,
-        validatorName: validator.description.moniker,
-        currentTokens: validator.tokens,
-        currentShares: validator.delegator_shares,
-        currentCommissionRate: validator.commission.commission_rates.rate,
-        validatorAddress: validator.operator_address,
-        pubKey: {
-          type: validator.consensus_pubkey['@type'],
-          value: validator.consensus_pubkey.key,
-        },
-      })),
+      response.data.validators.map(validator => {
+        return {
+          status: validator.status,
+          jailed: validator.jailed,
+          validatorWebSite: validator.description.website,
+          maxCommissionRate: validator.commission.commission_rates.max_rate,
+          securityContact: validator.description.security_contact,
+          validatorName: validator.description.moniker,
+          currentTokens: validator.tokens,
+          currentShares: validator.delegator_shares,
+          currentCommissionRate: validator.commission.commission_rates.rate,
+          validatorAddress: validator.operator_address,
+          pubKey: {
+            type: validator.consensus_pubkey['@type'],
+            value: validator.consensus_pubkey.key,
+          },
+        };
+      }),
       response.data.pagination.next_key,
     ];
   }

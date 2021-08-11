@@ -53,6 +53,8 @@ const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
 
+const CUMULATIVE_POWER_THRESHOLD = 0.33;
+
 interface RewardsTabularData {
   key: string;
   rewardAmount: string;
@@ -98,26 +100,48 @@ const FormDelegationRequest = () => {
         totalShares = totalShares.add(validatorList[i].currentShares);
       }
 
+      let willDisplayWarningColumn = false;
+      let displayedWarningColumn = false;
+
       return validatorList.map((validator, idx) => {
-        const validatorModel = {
+        const preValidatorModel = {
           ...validator,
           key: `${idx}`,
-          currentShares: validator.currentShares,
           cumulativeShares: cumulativeShares.toPrecision(4).toString(),
           cumulativeSharesExcludePercentage: cumulativeShares
             .div(totalShares)
             .times(100)
             .toPrecision(4)
             .toString(),
-          cumulativeSharesIncludePercentage: cumulativeShares
-            .add(new Big(validator.currentShares))
-            .div(totalShares)
-            .times(100)
-            .toPrecision(4)
-            .toString(),
+          // cumulativeSharesIncludePercentage: cumulativeShares
+          //   .add(new Big(validator.currentShares))
+          //   .div(totalShares)
+          //   .times(100)
+          //   .toPrecision(4)
+          //   .toString(),
         };
 
         cumulativeShares = cumulativeShares.add(new Big(validator.currentShares));
+        const cumulativeSharesIncludePercentage = cumulativeShares.div(totalShares);
+
+        if (
+          cumulativeSharesIncludePercentage.gte(CUMULATIVE_POWER_THRESHOLD) &&
+          !displayedWarningColumn
+        ) {
+          displayedWarningColumn = true;
+          willDisplayWarningColumn = true;
+        }
+
+        const validatorModel = {
+          ...preValidatorModel,
+          cumulativeSharesIncludePercentage: cumulativeSharesIncludePercentage
+            .times(100)
+            .toPrecision(4)
+            .toString(),
+          displayWarningColumn: willDisplayWarningColumn,
+        };
+
+        willDisplayWarningColumn = false;
 
         return validatorModel;
       });
@@ -402,6 +426,26 @@ const FormDelegationRequest = () => {
               dataSource={validatorTopList}
               columns={validatorColumns}
               pagination={{ showSizeChanger: false }}
+              expandable={{
+                rowExpandable: record => record.displayWarningColumn!,
+                expandedRowRender: record =>
+                  record.displayWarningColumn && (
+                    <div className="cumulativeStake33">
+                      Cumulative stake above can halt the network: improve decentralization and
+                      delegate to validators below
+                    </div>
+                  ),
+                expandIconColumnIndex: -1,
+              }}
+              rowClassName={record => {
+                const rowClassName =
+                  new Big(record.cumulativeSharesIncludePercentage!)
+                    .div(100)
+                    .lte(CUMULATIVE_POWER_THRESHOLD) || record.displayWarningColumn;
+                console.log('rowClassName', rowClassName);
+                return rowClassName ? 'greyBackground' : '';
+              }}
+              defaultExpandAllRows
             />
           </div>
         </ModalPopup>
