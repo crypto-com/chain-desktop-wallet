@@ -4,7 +4,7 @@ import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import './assets.less';
 import 'antd/dist/antd.css';
-import { Layout, Table, Avatar } from 'antd';
+import { Layout, Table, Avatar, Button } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import {
   sessionState,
@@ -19,6 +19,7 @@ import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 // import logoCro from '../../assets/AssetLogo/cro.png';
 import ReceiveDetail from './components/ReceiveDetail';
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
 const { Header, Content, Footer } = Layout;
 
@@ -30,6 +31,7 @@ const AssetsPage = () => {
   // const [isLedger, setIsLedger] = useState(false);
   const [currentAsset, setCurrentAsset] = useState<UserAsset>();
   const [isAssetVisible, setIsAssetVisible] = useState(false);
+  const [isReceiveVisible, setIsReceiveVisible] = useState(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
 
@@ -138,7 +140,21 @@ const AssetsPage = () => {
                       Asset List
                     </div>
                   </a>
-                  <ReceiveDetail currentAsset={currentAsset} session={session} />
+                  <div className="title">
+                    {assetIcon(currentAsset)}
+                    {currentAsset?.name} ({currentAsset?.symbol})
+                  </div>
+                  <Button>Send</Button>
+                  <Button onClick={() => setIsReceiveVisible(true)}>Receive</Button>
+                  <ModalPopup
+                    isModalVisible={isReceiveVisible}
+                    handleCancel={() => setIsReceiveVisible(false)}
+                    handleOk={() => {}}
+                    className="receive-detail-modal"
+                    // confirmationLoading={confirmLoading}
+                  >
+                    <ReceiveDetail currentAsset={currentAsset} session={session} />
+                  </ModalPopup>
                 </Content>
               </Layout>
             ) : (

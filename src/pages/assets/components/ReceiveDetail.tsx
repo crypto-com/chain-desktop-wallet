@@ -7,6 +7,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Button, Avatar, notification } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 
+import './ReceiveDetail.less';
 import { Session } from '../../../models/Session';
 import { UserAsset, UserAssetType } from '../../../models/UserAsset';
 // import { getUIDynamicAmount } from '../../../utils/NumberUtils';
@@ -90,7 +91,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
   return (
     <>
       <div className="title">
-        {assetIcon(props.currentAsset)}
+        {assetIcon(currentAsset)}
         {currentAsset?.name} ({currentAsset?.symbol})
       </div>
       <div className="address">
