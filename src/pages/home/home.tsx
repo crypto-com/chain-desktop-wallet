@@ -317,7 +317,7 @@ function HomePage() {
       render: record => (
         <>
           {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
-            ? `${numeral(getAssetBalancePrice(userAsset, marketData)).format('$0,0.00')} ${
+            ? `${numeral(getAssetBalancePrice(record, marketData)).format('$0,0.00')} ${
                 marketData?.currency
               }`
             : '$--'}
