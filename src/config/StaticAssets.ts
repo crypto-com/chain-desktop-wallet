@@ -8,6 +8,8 @@ export const CRO_ASSET = (network: Network) => {
   const assetSymbol = network.coin.croDenom.toString().toUpperCase();
 
   const config: UserAssetConfig = {
+    addressValidationRegex: '',
+    validatorAddressRegex: '',
     chainId: network.chainId,
     fee: { gasLimit: '', networkFee: '' },
     indexingUrl: '',
@@ -40,7 +42,10 @@ export const CRONOS_ASSET = (network: Network) => {
   const DEFAULT_GAS_LIMIT = 21_000; // 20 GWEI
 
   const config: UserAssetConfig = {
-    chainId: '',
+    addressValidationRegex: '^(0x){1}[0-9a-fA-F]{40}$',
+    validatorAddressRegex: '',
+    // TODO : Need to separate mainnet vs testnet chainID
+    chainId: '338',
     fee: { gasLimit: `${DEFAULT_GAS_LIMIT}`, networkFee: `${DEFAULT_GAS_PRICE}` },
     indexingUrl: 'https://cronos-explorer.crypto.org/api',
     isLedgerSupportDisabled: false,

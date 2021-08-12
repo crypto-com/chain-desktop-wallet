@@ -84,6 +84,8 @@ class WalletService {
   public readonly BROADCAST_TIMEOUT_CODE = -32603;
 
   public async sendTransfer(transferRequest: TransferRequest): Promise<BroadCastResult> {
+    // eslint-disable-next-line no-console
+    console.log('TRANSFER_ASSET', transferRequest.asset);
     const {
       nodeRpc,
       accountNumber,
@@ -163,7 +165,11 @@ class WalletService {
             transfer,
             transferRequest.decryptedPhrase,
           );
+
           const result = await cronosClient.broadcastRawTransactionHex(signedTx);
+
+          // eslint-disable-next-line no-console
+          console.log('BROADCAST_RESULT', result);
 
           return {
             transactionHash: result,
