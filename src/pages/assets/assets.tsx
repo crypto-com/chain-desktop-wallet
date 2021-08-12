@@ -19,6 +19,7 @@ import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 // import logoCro from '../../assets/AssetLogo/cro.png';
 import ReceiveDetail from './components/ReceiveDetail';
+import FormSend from './components/FormSend';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
 const { Header, Content, Footer } = Layout;
@@ -31,6 +32,7 @@ const AssetsPage = () => {
   // const [isLedger, setIsLedger] = useState(false);
   const [currentAsset, setCurrentAsset] = useState<UserAsset>();
   const [isAssetVisible, setIsAssetVisible] = useState(false);
+  const [isSendVisible, setIsSendVisible] = useState(false);
   const [isReceiveVisible, setIsReceiveVisible] = useState(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
@@ -144,8 +146,17 @@ const AssetsPage = () => {
                     {assetIcon(currentAsset)}
                     {currentAsset?.name} ({currentAsset?.symbol})
                   </div>
-                  <Button>Send</Button>
+                  <Button onClick={() => setIsSendVisible(true)}>Send</Button>
                   <Button onClick={() => setIsReceiveVisible(true)}>Receive</Button>
+                  <ModalPopup
+                    isModalVisible={isSendVisible}
+                    handleCancel={() => setIsSendVisible(false)}
+                    handleOk={() => {}}
+                    className="send-detail-modal"
+                    // confirmationLoading={confirmLoading}
+                  >
+                    <FormSend />
+                  </ModalPopup>
                   <ModalPopup
                     isModalVisible={isReceiveVisible}
                     handleCancel={() => setIsReceiveVisible(false)}

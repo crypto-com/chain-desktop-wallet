@@ -20,7 +20,7 @@ import NftPage from './nft/nft';
 import SettingsPage from './settings/settings';
 import SignUpPage from './signup/signup';
 import HomeLayout from '../layouts/home/home';
-import SendPage from './send/send';
+// import SendPage from './send/send';
 import AssetsPage from './assets/assets';
 
 interface RouterProps {
@@ -84,12 +84,12 @@ function RouteHub() {
       path: '/home',
       component: <HomePage />,
     },
-    {
-      name: 'Send Page',
-      key: 'send',
-      path: '/send',
-      component: <SendPage />,
-    },
+    // {
+    //   name: 'Send Page',
+    //   key: 'send',
+    //   path: '/send',
+    //   component: <SendPage />,
+    // },
     {
       name: 'Assets Page',
       key: 'assets',

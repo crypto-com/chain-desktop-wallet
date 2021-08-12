@@ -29,7 +29,7 @@ import {
 import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
-import IconSend from '../../svg/IconSend';
+// import IconSend from '../../svg/IconSend';
 // import IconReceive from '../../svg/IconReceive';
 import IconStaking from '../../svg/IconStaking';
 import IconNft from '../../svg/IconNft';
@@ -235,7 +235,7 @@ function HomeLayout(props: HomeLayoutProps) {
     const paths = [
       '/home',
       '/staking',
-      '/send',
+      // '/send',
       '/assets',
       '/settings',
       '/governance',
@@ -256,9 +256,9 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/staking" icon={<Icon component={IconStaking} />}>
           <Link to="/staking">{t('navbar.staking')}</Link>
         </Menu.Item>
-        <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
+        {/* <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">{t('navbar.send')}</Link>
-        </Menu.Item>
+        </Menu.Item> */}
         <Menu.Item key="/assets" icon={<Icon component={IconWallet} />}>
           <Link to="/assets">{t('navbar.receive')}</Link>
         </Menu.Item>
