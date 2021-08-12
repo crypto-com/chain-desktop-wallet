@@ -146,6 +146,7 @@ const AssetsPage = () => {
                 columns={AssetColumns}
                 dataSource={walletAllAssets}
                 className="asset-table"
+                rowKey={record => record.identifier}
                 onRow={record => {
                   return {
                     onClick: () => {

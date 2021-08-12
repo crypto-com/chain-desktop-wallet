@@ -1001,6 +1001,7 @@ function HomePage() {
                 <Table
                   columns={AssetColumns}
                   dataSource={walletAllAssets}
+                  rowKey={record => record.identifier}
                   className="asset-table"
                   pagination={false}
                 />
@@ -1070,6 +1071,7 @@ function HomePage() {
               }}
               columns={TransactionColumns}
               dataSource={transfers}
+              rowKey={record => record.key}
             />
           </TabPane>
           <TabPane tab={t('home.transactions.tab2')} key="2">
@@ -1081,6 +1083,7 @@ function HomePage() {
               }}
               columns={StakingColumns}
               dataSource={delegations}
+              rowKey={record => record.key}
             />
           </TabPane>
           <TabPane tab={t('home.transactions.tab3')} key="3">
@@ -1092,6 +1095,7 @@ function HomePage() {
               }}
               columns={NftTransactionColumns}
               dataSource={nftTransfers}
+              rowKey={record => record.key}
             />
           </TabPane>
         </Tabs>

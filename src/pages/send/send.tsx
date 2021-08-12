@@ -223,9 +223,8 @@ const FormSend = () => {
         <Input placeholder={t('send.formSend.recipientAddress.placeholder')} />
       </Form.Item>
       {isIbcVisible ? (
-        <Form.Item name="ibcToken" label="Select Asset">
+        <Form.Item name="ibcToken" label="Select Asset" initialValue={selectedAsset}>
           <Select
-            defaultValue="0"
             value={selectedAsset}
             onChange={value => {
               setSelectedAsset(value);
@@ -237,7 +236,11 @@ const FormSend = () => {
             }}
           >
             {walletAllAssets.map((item, idx) => {
-              return <Option value={idx.toString()}>{item.symbol}</Option>;
+              return (
+                <Option key={idx} value={idx.toString()}>
+                  {item.symbol}
+                </Option>
+              );
             })}
           </Select>
         </Form.Item>
