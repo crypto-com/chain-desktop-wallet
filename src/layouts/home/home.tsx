@@ -30,7 +30,7 @@ import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 import IconSend from '../../svg/IconSend';
-import IconReceive from '../../svg/IconReceive';
+// import IconReceive from '../../svg/IconReceive';
 import IconStaking from '../../svg/IconStaking';
 import IconNft from '../../svg/IconNft';
 import IconWallet from '../../svg/IconWallet';
@@ -236,7 +236,7 @@ function HomeLayout(props: HomeLayoutProps) {
       '/home',
       '/staking',
       '/send',
-      '/receive',
+      '/assets',
       '/settings',
       '/governance',
       '/nft',
@@ -259,8 +259,8 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">{t('navbar.send')}</Link>
         </Menu.Item>
-        <Menu.Item key="/receive" icon={<Icon component={IconReceive} />}>
-          <Link to="/receive">{t('navbar.receive')}</Link>
+        <Menu.Item key="/assets" icon={<Icon component={IconWallet} />}>
+          <Link to="/assets">{t('navbar.receive')}</Link>
         </Menu.Item>
         <Menu.Item key="/governance" icon={<BankOutlined />}>
           <Link to="/governance">{t('navbar.governance')}</Link>

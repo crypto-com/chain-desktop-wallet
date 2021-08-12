@@ -13,7 +13,6 @@ import RestorePage from './restore/restore';
 import CreatePage from './create/create';
 import BackupPage from './backup/backup';
 import HomePage from './home/home';
-import ReceivePage from './receive/receive';
 import WalletPage from './wallet/wallet';
 import StakingPage from './staking/staking';
 import GovernancePage from './governance/governance';
@@ -22,6 +21,7 @@ import SettingsPage from './settings/settings';
 import SignUpPage from './signup/signup';
 import HomeLayout from '../layouts/home/home';
 import SendPage from './send/send';
+import AssetsPage from './assets/assets';
 
 interface RouterProps {
   children: React.ReactNode;
@@ -91,10 +91,10 @@ function RouteHub() {
       component: <SendPage />,
     },
     {
-      name: 'Receive Page',
-      key: 'receive',
-      path: '/receive',
-      component: <ReceivePage />,
+      name: 'Assets Page',
+      key: 'assets',
+      path: '/assets',
+      component: <AssetsPage />,
     },
     {
       name: 'Staking Page',

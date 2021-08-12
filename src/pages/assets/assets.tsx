@@ -3,7 +3,7 @@ import QRCode from 'qrcode.react';
 import { useRecoilValue } from 'recoil';
 import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
-import './receive.less';
+import './assets.less';
 import 'antd/dist/antd.css';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Layout, Button, Table, Avatar, notification } from 'antd';
@@ -23,7 +23,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 const { Header, Content, Footer } = Layout;
 
-const ReceivePage = () => {
+const AssetsPage = () => {
   const session: Session = useRecoilValue<Session>(sessionState);
   const userAsset = useRecoilValue(walletAssetState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
@@ -41,7 +41,7 @@ const ReceivePage = () => {
     setIsLedger(LEDGER_WALLET_TYPE === walletType);
     if (!didMountRef.current) {
       didMountRef.current = true;
-      analyticsService.logPage('Receive');
+      analyticsService.logPage('Assets');
     }
   });
 
@@ -173,7 +173,7 @@ const ReceivePage = () => {
       <Header className="site-layout-background">{t('receive.title')}</Header>
       <div className="header-description">{t('receive.description')}</div>
       <Content>
-        <div className="site-layout-background receive-content">
+        <div className="site-layout-background assets-content">
           <div className="container">
             {isAssetVisible ? (
               <Layout className="asset-detail">
@@ -235,4 +235,4 @@ const ReceivePage = () => {
   );
 };
 
-export default ReceivePage;
+export default AssetsPage;

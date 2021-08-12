@@ -1004,7 +1004,7 @@ function HomePage() {
                   className="asset-table"
                   pagination={false}
                 />
-                <Link to="/receive" className="all">
+                <Link to="/assets" className="all">
                   {t('home.nft.seeAll')}
                 </Link>
               </div>
