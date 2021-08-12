@@ -1,4 +1,5 @@
 // Every created wallet get initialized with a new CRO asset
+import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import { getRandomId } from '../crypto/RandomGen';
 import { UserAssetConfig, UserAssetType } from '../models/UserAsset';
 import { Network } from './StaticConfig';
@@ -41,17 +42,19 @@ export const CRONOS_ASSET = (network: Network) => {
   const DEFAULT_GAS_PRICE = 20_000_000_000; // 20 GWEI
   const DEFAULT_GAS_LIMIT = 21_000; // 20 GWEI
 
+  const isTestnet = [CroNetwork.TestnetCroeseid3, CroNetwork.Testnet].includes(network);
+
   const config: UserAssetConfig = {
     addressValidationRegex: '^(0x){1}[0-9a-fA-F]{40}$',
     validatorAddressRegex: '',
-    // TODO : Need to separate mainnet vs testnet chainID
-    chainId: '338',
+    chainId: isTestnet ? '338' : 'TO_BE_DECIDED',
     fee: { gasLimit: `${DEFAULT_GAS_LIMIT}`, networkFee: `${DEFAULT_GAS_PRICE}` },
-    indexingUrl: 'https://cronos-explorer.crypto.org/api',
+    indexingUrl: isTestnet ? 'https://cronos-explorer.crypto.org/api' : 'TO_BE_DECIDED',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
     nodeUrl: 'https://cronos-testnet.crypto.org:8545/',
   };
+
   return {
     balance: '0',
     description: '',
