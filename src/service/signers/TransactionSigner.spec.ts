@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { DefaultWalletConfigs, WalletConfig } from '../../config/StaticConfig';
 import { TransactionSigner } from './TransactionSigner';
 import { TransactionUnsigned } from './TransactionSupported';
-import { EvmTransactionSigner } from './EvmTransactionSigner';
+import { evmTransactionSigner } from './EvmTransactionSigner';
 
 const testNet = DefaultWalletConfigs.TestNetConfig;
 // Overridden testnet chainId
@@ -100,8 +100,6 @@ describe('Testing TransactionSigner', () => {
     const phrase =
       'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
 
-    const evmTransactionSigner = new EvmTransactionSigner();
-
     const transferTxSignedHex = await evmTransactionSigner.signTransfer(
       {
         amount: '345',
@@ -118,7 +116,7 @@ describe('Testing TransactionSigner', () => {
     );
 
     expect(transferTxSignedHex).to.eq(
-      '0xf86b0c834c4b40824e20948875bf87684f46111dbc27725332cea9c0f12d398912b3d6381c95c400008025a06d89a5535f1aedc2b7ee4acde19168e5528fa5579b6150e03cf8c35e843210d4a067bebff860cec5bcd8725951445ed2ca1a4899432e7dc5e2f1bfd7445c0abecf',
+      '0xf8660c834c4b40824e20948875bf87684f46111dbc27725332cea9c0f12d39820159808202c7a0bff29ef22755a9b24de7415ce0096e3432639a9f43721364e9ed86b72e672583a04909c81e00403b06c6a1a692eedc1da87cb29fdd6622d7482ffb75c4c232fb04',
     );
   });
 });

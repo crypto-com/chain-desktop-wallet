@@ -117,10 +117,13 @@ const FormSend = () => {
     }
     try {
       setConfirmLoading(true);
+      // eslint-disable-next-line no-console
+      console.log('SELECTED_ASSET', { active: currentSession.activeAsset, walletAsset });
+
       const sendResult = await walletService.sendTransfer({
         toAddress: formValues.recipientAddress,
         amount: formValues.amount,
-        asset: walletAsset,
+        asset: currentSession.activeAsset || walletAsset,
         memo,
         decryptedPhrase,
         walletType,
@@ -174,6 +177,7 @@ const FormSend = () => {
   const currentMinAssetAmount = getCurrentMinAssetAmount(walletAllAssets[selectedAsset]);
   const maximumSendAmount = availableBalance;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const customAddressValidator = TransactionUtils.addressValidator(
     currentSession,
     walletAsset,
@@ -217,13 +221,13 @@ const FormSend = () => {
             required: true,
             message: `${t('send.formSend.recipientAddress.label')} ${t('general.required')}`,
           },
-          customAddressValidator,
+          // customAddressValidator,
         ]}
       >
         <Input placeholder={t('send.formSend.recipientAddress.placeholder')} />
       </Form.Item>
       {isIbcVisible ? (
-        <Form.Item name="ibcToken" label="Select Asset" initialValue={selectedAsset}>
+        <Form.Item name="selectedAsset" label="Select Asset">
           <Select
             value={selectedAsset}
             onChange={value => {
@@ -311,7 +315,8 @@ const FormSend = () => {
             <div className="description">{t('send.modal1.description')}</div>
             <div className="item">
               <div className="label">{t('send.modal1.label1')}</div>
-              <div className="address">{`${currentSession.wallet.address}`}</div>
+              <div className="address">{`${currentSession.activeAsset?.address ||
+                currentSession.wallet.address}`}</div>
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label2')}</div>

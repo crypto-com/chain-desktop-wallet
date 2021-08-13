@@ -73,6 +73,7 @@ export interface RewardTransactionList {
 export interface TransferTransactionList {
   transactions: Array<TransferTransactionData>;
   walletId: string;
+  assetId?: string;
 }
 
 export interface NftList {

@@ -21,7 +21,6 @@ import {
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
-  TransferTransactionData,
   TransferTransactionList,
   ValidatorList,
 } from '../models/Transaction';
@@ -226,24 +225,24 @@ export class StorageService {
     return this.db.sessionStore.findOne<Session>({ _id: Session.SESSION_ID });
   }
 
-  public async saveTransferTransaction(
-    transferTransaction: TransferTransactionData,
-    walletId: string,
-  ) {
-    const currentTransfers = await this.retrieveAllTransferTransactions(walletId);
-    let transactions: Array<TransferTransactionData> = [];
-    if (currentTransfers) {
-      currentTransfers.transactions.push(transferTransaction);
-      transactions = currentTransfers.transactions;
-    } else {
-      transactions.push(transferTransaction);
-    }
-
-    return this.saveTransferTransactions({
-      transactions,
-      walletId,
-    });
-  }
+  // public async saveTransferTransaction(
+  //   transferTransaction: TransferTransactionData,
+  //   walletId: string,
+  // ) {
+  //   const currentTransfers = await this.retrieveAllTransferTransactions(walletId);
+  //   let transactions: Array<TransferTransactionData> = [];
+  //   if (currentTransfers) {
+  //     currentTransfers.transactions.push(transferTransaction);
+  //     transactions = currentTransfers.transactions;
+  //   } else {
+  //     transactions.push(transferTransaction);
+  //   }
+  //
+  //   return this.saveTransferTransactions({
+  //     transactions,
+  //     walletId,
+  //   });
+  // }
 
   public async saveStakingTransaction(stakingTransaction: StakingTransactionData) {
     return this.db.stakingStore.update<StakingTransactionData>(
@@ -282,14 +281,17 @@ export class StorageService {
       return Promise.resolve();
     }
     await this.db.transferStore.remove(
-      { walletId: transferTransactionList.walletId },
+      { walletId: transferTransactionList.walletId, assetId: transferTransactionList.assetId },
       { multi: true },
     );
     return this.db.transferStore.insert<TransferTransactionList>(transferTransactionList);
   }
 
-  public async retrieveAllTransferTransactions(walletId: string) {
-    return this.db.transferStore.findOne<TransferTransactionList>({ walletId });
+  public async retrieveAllTransferTransactions(walletId: string, assetID?: string) {
+    return this.db.transferStore.findOne<TransferTransactionList>({
+      walletId,
+      assetId: assetID,
+    });
   }
 
   public async saveNFTAccountTransactions(nftAccountTransactionList: NftAccountTransactionList) {

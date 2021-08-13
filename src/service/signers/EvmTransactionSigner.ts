@@ -1,5 +1,5 @@
-import { Transaction } from 'ethereumjs-tx';
 import { ethers } from 'ethers';
+import Web3 from 'web3';
 import { ITransactionSigner } from './TransactionSigner';
 import {
   DelegateTransactionUnsigned,
@@ -7,25 +7,29 @@ import {
   WithdrawStakingRewardUnsigned,
 } from './TransactionSupported';
 
-export class EvmTransactionSigner implements ITransactionSigner {
+// TODO: To be removed, these will be part of the configuration
+const DEFAULT_GAS_PRICE = 20_000_000_000; // 20 GWEI
+const DEFAULT_GAS_LIMIT = 21_000; //
+
+class EvmTransactionSigner implements ITransactionSigner {
   // eslint-disable-next-line class-methods-use-this
-  public signTransfer(transaction: TransferTransactionUnsigned, phrase: string): Promise<string> {
+  public async signTransfer(
+    transaction: TransferTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const web3 = new Web3('');
     const txParams = {
       nonce: ethers.utils.hexValue(transaction.nonce || 0),
-      gasPrice: ethers.utils.hexValue(transaction.gasPrice || 0),
-      gasLimit: transaction.gasLimit,
+      gasPrice: ethers.utils.hexValue(transaction.gasPrice || DEFAULT_GAS_PRICE),
+      gasLimit: transaction.gasLimit || DEFAULT_GAS_LIMIT,
       to: transaction.toAddress,
-      value: ethers.utils.parseEther(transaction.amount).toHexString(),
+      value: web3.utils.toHex(transaction.amount),
       data: '0x',
+      chainId: 338,
     };
 
-    const tx = new Transaction(txParams);
-
-    const { privateKey } = ethers.Wallet.fromMnemonic(phrase);
-    tx.sign(Buffer.from(privateKey.replace('0x', ''), 'hex'));
-
-    const signedTransactionHex = `0x${tx.serialize().toString('hex')}`;
-    return Promise.resolve(signedTransactionHex);
+    const signedTx = await ethers.Wallet.fromMnemonic(phrase).signTransaction(txParams);
+    return Promise.resolve(signedTx);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
@@ -38,3 +42,5 @@ export class EvmTransactionSigner implements ITransactionSigner {
     return Promise.resolve('');
   }
 }
+
+export const evmTransactionSigner = new EvmTransactionSigner();
