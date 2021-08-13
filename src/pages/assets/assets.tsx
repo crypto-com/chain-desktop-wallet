@@ -346,7 +346,6 @@ const AssetsPage = () => {
                       setAllTransfer(
                         convertTransfers(transfers, walletAllAssets, session, selectedAsset!),
                       );
-                      console.log('transfers', transfers);
                       setCurrentAsset(selectedAsset);
                       setIsAssetVisible(true);
                     }, // click row
