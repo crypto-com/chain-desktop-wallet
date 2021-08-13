@@ -206,7 +206,7 @@ const isWalletNotLive = (config: WalletConfig) => {
   return config.nodeUrl === NOT_KNOWN_YET_VALUE && config.indexingUrl === NOT_KNOWN_YET_VALUE;
 };
 
-function HomePage() {
+const HomePage = () => {
   const currentSession = useRecoilValue(sessionState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
@@ -1221,6 +1221,6 @@ function HomePage() {
       <Footer />
     </Layout>
   );
-}
+};
 
 export default HomePage;

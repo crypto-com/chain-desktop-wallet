@@ -4,7 +4,7 @@ import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber } from 'antd';
 import { useRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
-import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
+// import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 // eslint-disable-next-line import/no-extraneous-dependencies
 // import {remote} from 'electron';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
@@ -183,11 +183,11 @@ const FormSend: React.FC<FormSendProps> = props => {
   const currentMinAssetAmount = getCurrentMinAssetAmount(walletAsset!);
   const maximumSendAmount = availableBalance;
 
-  const customAddressValidator = TransactionUtils.addressValidator(
-    currentSession,
-    walletAsset!,
-    AddressType.USER,
-  );
+  //   const customAddressValidator = TransactionUtils.addressValidator(
+  //     currentSession,
+  //     walletAsset!,
+  //     AddressType.USER,
+  //   );
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
   const customMaxValidator = TransactionUtils.maxValidator(
     maximumSendAmount,
@@ -227,7 +227,7 @@ const FormSend: React.FC<FormSendProps> = props => {
             required: true,
             message: `${t('send.formSend.recipientAddress.label')} ${t('general.required')}`,
           },
-          customAddressValidator,
+          //   customAddressValidator,
         ]}
       >
         <Input placeholder={t('send.formSend.recipientAddress.placeholder')} />
