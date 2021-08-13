@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import { DefaultWalletConfigs, WalletConfig } from '../../config/StaticConfig';
 import { TransactionSigner } from './TransactionSigner';
 import { TransactionUnsigned } from './TransactionSupported';
-import { EvmTransactionSigner } from './EvmTransactionSigner';
+import { evmTransactionSigner } from './EvmTransactionSigner';
 
 const testNet = DefaultWalletConfigs.TestNetConfig;
 // Overridden testnet chainId
@@ -99,8 +99,6 @@ describe('Testing TransactionSigner', () => {
   it('test signing EVM transactions ', async () => {
     const phrase =
       'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone';
-
-    const evmTransactionSigner = new EvmTransactionSigner();
 
     const transferTxSignedHex = await evmTransactionSigner.signTransfer(
       {

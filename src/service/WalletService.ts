@@ -139,8 +139,6 @@ class WalletService {
 
       case UserAssetType.EVM:
         try {
-          // TODO: Implement EVM Transaction signing
-          // EVM Send code here
           if (currentAsset?.config?.isLedgerSupportDisabled) {
             throw TypeError(
               `${LEDGER_WALLET_TYPE} not supported yet for ${transferRequest.walletType} assets`,
