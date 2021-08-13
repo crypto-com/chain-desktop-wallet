@@ -3,9 +3,9 @@
 import 'mocha';
 import chai, { expect } from 'chai';
 import nock from 'nock';
+import { TransactionConfig } from 'web3-eth';
 import { IEvmRpc } from '../interface/evm.rpcClient';
 import { EVMClient } from './EVMClient';
-import { TransactionConfig } from 'web3-eth';
 
 chai.use(require('chai-as-promised'));
 
@@ -244,7 +244,7 @@ describe('Testing EVMClient', () => {
     });
     const evmRpcClient: IEvmRpc = EVMClient.create('https://cronos-testnet.crypto.org');
     const estimatedGasPrice = await evmRpcClient.getEstimatedGasPrice();
-    expect(estimatedGasPrice).to.eq("305462236");
+    expect(estimatedGasPrice).to.eq('305462236');
   });
   it('checks `estimateGas` ', async () => {
     nockScope.once().reply(200, {
@@ -252,11 +252,11 @@ describe('Testing EVMClient', () => {
       jsonrpc: '2.0',
       result: '0x1234f',
     });
-    const txConfig: TransactionConfig= {
+    const txConfig: TransactionConfig = {
       from: '0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe',
       to: '0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe',
-      value: '0x12341234'
-    }
+      value: '0x12341234',
+    };
     const evmRpcClient: IEvmRpc = EVMClient.create('https://cronos-testnet.crypto.org');
     const estimatedGas = await evmRpcClient.estimateGas(txConfig);
     expect(estimatedGas).to.eq(74575);

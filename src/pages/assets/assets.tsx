@@ -153,15 +153,21 @@ const AssetsPage = () => {
                     handleCancel={() => setIsSendVisible(false)}
                     handleOk={() => {}}
                     className="send-detail-modal"
+                    footer={[]}
                     // confirmationLoading={confirmLoading}
                   >
-                    <FormSend />
+                    <FormSend
+                      walletAsset={currentAsset}
+                      setWalletAsset={setCurrentAsset}
+                      currentSession={session}
+                    />
                   </ModalPopup>
                   <ModalPopup
                     isModalVisible={isReceiveVisible}
                     handleCancel={() => setIsReceiveVisible(false)}
                     handleOk={() => {}}
                     className="receive-detail-modal"
+                    footer={[]}
                     // confirmationLoading={confirmLoading}
                   >
                     <ReceiveDetail currentAsset={currentAsset} session={session} />
