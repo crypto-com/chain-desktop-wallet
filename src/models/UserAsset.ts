@@ -13,6 +13,8 @@ export interface UserAssetConfig {
   };
   isLedgerSupportDisabled: boolean;
   isStakingDisabled: boolean;
+  addressValidationRegex: string;
+  validatorAddressRegex: string;
 }
 
 export interface UserAsset {

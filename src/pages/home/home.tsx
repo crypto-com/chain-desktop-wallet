@@ -319,15 +319,17 @@ function HomePage() {
       title: 'Value',
       // dataIndex: 'value',
       key: 'value',
-      render: record => (
-        <>
-          {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
-            ? `${numeral(getAssetBalancePrice(record, marketData)).format('$0,0.00')} ${
-                marketData?.currency
-              }`
-            : '$--'}
-        </>
-      ),
+      render: record => {
+        return (
+          <>
+            {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
+              ? `${numeral(getAssetBalancePrice(record, marketData)).format('$0,0.00')} ${
+                  marketData?.currency
+                }`
+              : '$--'}
+          </>
+        );
+      },
     },
   ];
 
@@ -588,6 +590,7 @@ function HomePage() {
     );
     const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
       sessionData.wallet.identifier,
+      defaultWalletAsset,
     );
 
     const allNftTransfer: NftAccountTransactionData[] = await walletService.getAllNFTAccountTxs(
@@ -690,6 +693,7 @@ function HomePage() {
       );
       const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
         sessionData.wallet.identifier,
+        currentAsset,
       );
 
       const allNftTransfer: NftAccountTransactionData[] = await walletService.getAllNFTAccountTxs(
