@@ -852,8 +852,6 @@ class WalletService {
   }
 
   public async fetchAndSaveTransfers(currentSession: Session) {
-    // TODO : Make sync all assets configurations aware.
-
     const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
 
     await Promise.all(
@@ -894,7 +892,6 @@ class WalletService {
                 currentAsset.config?.indexingUrl,
               );
 
-              // TODO : transform EVM transaction to current transaction data
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const transactions = await cronosClient.getTxsByAddress(currentAsset.address);
               const loadedTransactions = transactions.result.map(evmTx => {
