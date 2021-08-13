@@ -89,7 +89,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
   };
 
   return (
-    <>
+    <div className="receive-detail">
       {/* <div className="title">
         {assetIcon(currentAsset)}
         {currentAsset?.name} ({currentAsset?.symbol})
@@ -111,7 +111,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
           </Button>
         </div>
       )}
-    </>
+    </div>
   );
 };
 
