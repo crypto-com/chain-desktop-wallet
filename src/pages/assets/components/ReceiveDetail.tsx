@@ -4,7 +4,7 @@ import QRCode from 'qrcode.react';
 import { useTranslation } from 'react-i18next';
 import 'antd/dist/antd.css';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { Button, Avatar, notification } from 'antd';
+import { Button, notification } from 'antd';
 import { CopyOutlined } from '@ant-design/icons';
 
 import './ReceiveDetail.less';
@@ -61,15 +61,15 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
     }, 100);
   };
 
-  const assetIcon = asset => {
-    const { icon_url, symbol } = asset;
+  // const assetIcon = asset => {
+  //   const { icon_url, symbol } = asset;
 
-    return icon_url ? (
-      <img src={icon_url} alt="cronos" className="asset-icon" />
-    ) : (
-      <Avatar>{symbol[0].toUpperCase()}</Avatar>
-    );
-  };
+  //   return icon_url ? (
+  //     <img src={icon_url} alt="cronos" className="asset-icon" />
+  //   ) : (
+  //     <Avatar>{symbol[0].toUpperCase()}</Avatar>
+  //   );
+  // };
 
   const assetAddress = (asset, _session) => {
     const { assetType, address } = asset;
@@ -90,10 +90,10 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
 
   return (
     <>
-      <div className="title">
+      {/* <div className="title">
         {assetIcon(currentAsset)}
         {currentAsset?.name} ({currentAsset?.symbol})
-      </div>
+      </div> */}
       <div className="address">
         <QRCode value={assetAddress(currentAsset, session)} size={180} />
         <div className="name">{session.wallet.name}</div>

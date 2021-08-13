@@ -212,6 +212,7 @@ const FormSend: React.FC<FormSendProps> = props => {
       name="control-ref"
       onFinish={showPasswordInput}
       requiredMark={false}
+      className="form-send"
     >
       {/* <div className="sender">Sender Address</div> */}
       {/* <div className="sender">{currentSession.wallet.address}</div> */}
@@ -231,31 +232,6 @@ const FormSend: React.FC<FormSendProps> = props => {
       >
         <Input placeholder={t('send.formSend.recipientAddress.placeholder')} />
       </Form.Item>
-      {/* {isIbcVisible ? (
-        <Form.Item name="ibcToken" label="Select Asset" initialValue={selectedAsset}>
-          <Select
-            value={selectedAsset}
-            onChange={value => {
-              setSelectedAsset(value);
-              setCurrentSession({
-                ...currentSession,
-                activeAsset: walletAllAssets[value],
-              });
-              setWalletAsset(walletAllAssets[value]);
-            }}
-          >
-            {walletAllAssets.map((item, idx) => {
-              return (
-                <Option key={idx} value={idx.toString()}>
-                  {item.symbol}
-                </Option>
-              );
-            })}
-          </Select>
-        </Form.Item>
-      ) : (
-        <></>
-      )} */}
       <div className="amount">
         <Form.Item
           name="amount"

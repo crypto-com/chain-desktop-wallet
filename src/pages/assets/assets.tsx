@@ -4,7 +4,7 @@ import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import './assets.less';
 import 'antd/dist/antd.css';
-import { Layout, Table, Avatar, Button } from 'antd';
+import { Layout, Table, Avatar, Tabs } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import {
   sessionState,
@@ -20,9 +20,10 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 // import logoCro from '../../assets/AssetLogo/cro.png';
 import ReceiveDetail from './components/ReceiveDetail';
 import FormSend from './components/FormSend';
-import ModalPopup from '../../components/ModalPopup/ModalPopup';
+// import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
 const { Header, Content, Footer } = Layout;
+const { TabPane } = Tabs;
 
 const AssetsPage = () => {
   const session: Session = useRecoilValue<Session>(sessionState);
@@ -32,8 +33,8 @@ const AssetsPage = () => {
   // const [isLedger, setIsLedger] = useState(false);
   const [currentAsset, setCurrentAsset] = useState<UserAsset>();
   const [isAssetVisible, setIsAssetVisible] = useState(false);
-  const [isSendVisible, setIsSendVisible] = useState(false);
-  const [isReceiveVisible, setIsReceiveVisible] = useState(false);
+  // const [isSendVisible, setIsSendVisible] = useState(false);
+  // const [isReceiveVisible, setIsReceiveVisible] = useState(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
 
@@ -146,9 +147,28 @@ const AssetsPage = () => {
                     {assetIcon(currentAsset)}
                     {currentAsset?.name} ({currentAsset?.symbol})
                   </div>
-                  <Button onClick={() => setIsSendVisible(true)}>Send</Button>
-                  <Button onClick={() => setIsReceiveVisible(true)}>Receive</Button>
-                  <ModalPopup
+                  <Tabs defaultActiveKey="1">
+                    <TabPane tab="Transaction" key="1">
+                      Tx
+                    </TabPane>
+                    <TabPane tab={t('send.title')} key="2">
+                      <FormSend
+                        walletAsset={currentAsset}
+                        setWalletAsset={setCurrentAsset}
+                        currentSession={session}
+                      />
+                    </TabPane>
+                    <TabPane tab={t('receive.title')} key="3">
+                      <ReceiveDetail currentAsset={currentAsset} session={session} />
+                    </TabPane>
+                  </Tabs>
+                  {/* {!isSendVisible && !isReceiveVisible
+                    ? <>
+                      <Button onClick={() => setIsSendVisible(true)}>Send</Button>
+                      <Button onClick={() => setIsReceiveVisible(true)}>Receive</Button>
+                    </>
+                    : <></>} */}
+                  {/* <ModalPopup
                     isModalVisible={isSendVisible}
                     handleCancel={() => setIsSendVisible(false)}
                     handleOk={() => {}}
@@ -156,22 +176,24 @@ const AssetsPage = () => {
                     footer={[]}
                     // confirmationLoading={confirmLoading}
                   >
-                    <FormSend
+                  <FormSend
                       walletAsset={currentAsset}
                       setWalletAsset={setCurrentAsset}
+                      setIsSendVisible={setIsSendVisible}
+                      setIsAssetVisible={setIsAssetVisible}
                       currentSession={session}
                     />
                   </ModalPopup>
                   <ModalPopup
                     isModalVisible={isReceiveVisible}
                     handleCancel={() => setIsReceiveVisible(false)}
-                    handleOk={() => {}}
+                    handleOk={() => { }}
                     className="receive-detail-modal"
                     footer={[]}
-                    // confirmationLoading={confirmLoading}
+                  // confirmationLoading={confirmLoading}
                   >
                     <ReceiveDetail currentAsset={currentAsset} session={session} />
-                  </ModalPopup>
+                  </ModalPopup> */}
                 </Content>
               </Layout>
             ) : (
