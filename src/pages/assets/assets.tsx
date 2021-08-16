@@ -9,7 +9,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import {
   sessionState,
   marketState,
-  walletAssetState,
+  // walletAssetState,
   walletAllAssetsState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
@@ -77,7 +77,7 @@ const convertTransfers = (
 
 const AssetsPage = () => {
   const session: Session = useRecoilValue<Session>(sessionState);
-  const userAsset = useRecoilValue(walletAssetState);
+  // const userAsset = useRecoilValue(walletAssetState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const marketData = useRecoilValue(marketState);
   // const [isLedger, setIsLedger] = useState(false);
@@ -155,7 +155,7 @@ const AssetsPage = () => {
       render: record => (
         <>
           {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
-            ? `${numeral(getAssetBalancePrice(userAsset, marketData)).format('$0,0.00')} ${
+            ? `${numeral(getAssetBalancePrice(record, marketData)).format('$0,0.00')} ${
                 marketData?.currency
               }`
             : '$--'}
@@ -260,11 +260,24 @@ const AssetsPage = () => {
                       {t('assets.backToList')}
                     </div>
                   </a>
-                  <div className="title">
+                  <div className="detail-container">
                     {assetIcon(currentAsset)}
-                    {currentAsset?.name} ({currentAsset?.symbol})
+                    <div className="balance">
+                      {getUIDynamicAmount(currentAsset!.balance, currentAsset!)}{' '}
+                      {currentAsset?.symbol}
+                    </div>
+                    <div className="value">
+                      {marketData &&
+                      marketData.price &&
+                      currentAsset?.mainnetSymbol === marketData.assetSymbol
+                        ? `${numeral(getAssetBalancePrice(currentAsset, marketData)).format(
+                            '$0,0.00',
+                          )} ${marketData?.currency}`
+                        : '$--'}
+                    </div>
                   </div>
-                  <Tabs defaultActiveKey="1">
+
+                  <Tabs defaultActiveKey="1" centered>
                     <TabPane tab={t('assets.tab1')} key="1">
                       <Table
                         columns={TransactionColumns}
