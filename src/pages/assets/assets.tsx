@@ -256,7 +256,7 @@ const AssetsPage = () => {
                       onClick={() => setIsAssetVisible(false)}
                       style={{ fontSize: '16px' }}
                     >
-                      <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />
+                      <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
                       {t('assets.backToList')}
                     </div>
                   </a>
