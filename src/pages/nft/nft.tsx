@@ -523,7 +523,7 @@ const FormMintNft = () => {
           rules={[
             {
               required: true,
-              message: `${t('nft.formMintNft.tokenId.label')} ${t('general.reqruied')}`,
+              message: `${t('nft.formMintNft.tokenId.label')} ${t('general.required')}`,
             },
             {
               min: 3,
