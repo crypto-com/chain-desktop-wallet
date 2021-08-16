@@ -212,7 +212,7 @@ const HomePage = () => {
   const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
-  const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const setNFTList = useSetRecoilState(nftListState);
   const marketData = useRecoilValue(marketState);
@@ -579,6 +579,7 @@ const HomePage = () => {
     await walletService.syncAll();
     const sessionData = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+    const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
     await walletService.IBCAssetsFetch(sessionData);
     const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
       sessionData.wallet.identifier,
@@ -606,6 +607,7 @@ const HomePage = () => {
     setTransfers(transferTabularData);
     setNftTransfers(nftTransferTabularData);
     setUserAsset(currentAsset);
+    setWalletAllAssets(allAssets);
     setHasShownNotLiveWallet(true);
 
     await walletService.fetchAndSaveNFTs(sessionData);
@@ -682,6 +684,7 @@ const HomePage = () => {
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+      const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
       await walletService.IBCAssetsFetch(sessionData);
       const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
         sessionData.wallet.identifier,
@@ -716,6 +719,7 @@ const HomePage = () => {
       setTransfers(transferTabularData);
       setNftTransfers(nftTransferTabularData);
       setUserAsset(currentAsset);
+      setWalletAllAssets(allAssets);
       setHasShownNotLiveWallet(true);
     };
 
