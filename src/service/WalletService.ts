@@ -895,10 +895,12 @@ class WalletService {
               // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const transactions = await cronosClient.getTxsByAddress(currentAsset.address);
               const loadedTransactions = transactions.result.map(evmTx => {
+                const transactionTime = new Date(Number(evmTx.timeStamp) * 1000).toISOString();
+
                 const transferTx: TransferTransactionData = {
                   amount: evmTx.value,
                   assetSymbol: currentAsset.symbol,
-                  date: evmTx.timeStamp,
+                  date: transactionTime,
                   hash: evmTx.hash,
                   memo: '',
                   receiverAddress: evmTx.to,
