@@ -272,7 +272,7 @@ const HomePage = () => {
 
   const AssetColumns = [
     {
-      title: 'Asset',
+      title: t('home.assetList.table.name'),
       // dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
@@ -287,7 +287,7 @@ const HomePage = () => {
       },
     },
     {
-      title: 'Price',
+      title: t('home.assetList.table.price'),
       // dataIndex: 'price',
       key: 'price',
       render: record => (
@@ -299,7 +299,7 @@ const HomePage = () => {
       ),
     },
     {
-      title: 'Balance',
+      title: t('home.assetList.table.amount'),
       // dataIndex: 'amount',
       key: 'amount',
       render: (record: UserAsset) => {
@@ -311,7 +311,7 @@ const HomePage = () => {
       },
     },
     {
-      title: 'Value',
+      title: t('home.assetList.table.value'),
       // dataIndex: 'value',
       key: 'value',
       render: record => {
@@ -1000,7 +1000,7 @@ const HomePage = () => {
         </div>
         <Tabs defaultActiveKey="1">
           {isIbcVisible ? (
-            <TabPane tab="Assets" key="1">
+            <TabPane tab={t('home.assetList.table.title')} key="1">
               <div className="site-layout-background asset-container">
                 <Table
                   columns={AssetColumns}

@@ -27,7 +27,6 @@ import {
   TransactionStatus,
   TransferTransactionData,
 } from '../../models/Transaction';
-// import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -85,8 +84,6 @@ const AssetsPage = () => {
   const [currentAsset, setCurrentAsset] = useState<UserAsset>();
   const [isAssetVisible, setIsAssetVisible] = useState(false);
   const [allTransfer, setAllTransfer] = useState<any>();
-  // const [isSendVisible, setIsSendVisible] = useState(false);
-  // const [isReceiveVisible, setIsReceiveVisible] = useState(false);
   // const [defaultWalletAsset, setdefaultWalletAsset] = useState<UserAsset>();
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
@@ -112,7 +109,7 @@ const AssetsPage = () => {
 
   const AssetColumns = [
     {
-      title: 'Asset',
+      title: t('assets.assetList.table.name'),
       // dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
@@ -128,7 +125,7 @@ const AssetsPage = () => {
       },
     },
     {
-      title: 'Price',
+      title: t('assets.assetList.table.price'),
       // dataIndex: 'price',
       key: 'price',
       render: record => (
@@ -140,7 +137,7 @@ const AssetsPage = () => {
       ),
     },
     {
-      title: 'Balance',
+      title: t('assets.assetList.table.amount'),
       // dataIndex: 'amount',
       key: 'amount',
       render: (record: UserAsset) => {
@@ -152,7 +149,7 @@ const AssetsPage = () => {
       },
     },
     {
-      title: 'Value',
+      title: t('assets.assetList.table.value'),
       // dataIndex: 'value',
       key: 'value',
       render: record => (
@@ -165,15 +162,6 @@ const AssetsPage = () => {
         </>
       ),
     },
-    // {
-    //   title: 'Action',
-    //   key: 'action',
-    //   render: record => {
-    //     return <>
-    //     {record.symbol}
-    //     </>
-    //   }
-    // }
   ];
 
   const TransactionColumns = [
@@ -254,8 +242,8 @@ const AssetsPage = () => {
 
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">{t('receive.title')}</Header>
-      <div className="header-description">{t('receive.description')}</div>
+      <Header className="site-layout-background">{t('assets.title')}</Header>
+      <div className="header-description">{t('assets.description')}</div>
       <Content>
         <div className="site-layout-background assets-content">
           <div className="container">
@@ -268,8 +256,8 @@ const AssetsPage = () => {
                       onClick={() => setIsAssetVisible(false)}
                       style={{ fontSize: '16px' }}
                     >
-                      <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} /> Back to
-                      Asset List
+                      <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />
+                      {t('assets.backToList')}
                     </div>
                   </a>
                   <div className="title">
@@ -277,7 +265,7 @@ const AssetsPage = () => {
                     {currentAsset?.name} ({currentAsset?.symbol})
                   </div>
                   <Tabs defaultActiveKey="1">
-                    <TabPane tab="Transaction" key="1">
+                    <TabPane tab={t('assets.tab1')} key="1">
                       <Table
                         columns={TransactionColumns}
                         dataSource={allTransfer}
@@ -285,49 +273,17 @@ const AssetsPage = () => {
                         rowKey={record => record.key}
                       />
                     </TabPane>
-                    <TabPane tab={t('send.title')} key="2">
+                    <TabPane tab={t('assets.tab2')} key="2">
                       <FormSend
                         walletAsset={currentAsset}
                         setWalletAsset={setCurrentAsset}
                         currentSession={session}
                       />
                     </TabPane>
-                    <TabPane tab={t('receive.title')} key="3">
+                    <TabPane tab={t('assets.tab3')} key="3">
                       <ReceiveDetail currentAsset={currentAsset} session={session} />
                     </TabPane>
                   </Tabs>
-                  {/* {!isSendVisible && !isReceiveVisible
-                    ? <>
-                      <Button onClick={() => setIsSendVisible(true)}>Send</Button>
-                      <Button onClick={() => setIsReceiveVisible(true)}>Receive</Button>
-                    </>
-                    : <></>} */}
-                  {/* <ModalPopup
-                    isModalVisible={isSendVisible}
-                    handleCancel={() => setIsSendVisible(false)}
-                    handleOk={() => {}}
-                    className="send-detail-modal"
-                    footer={[]}
-                    // confirmationLoading={confirmLoading}
-                  >
-                  <FormSend
-                      walletAsset={currentAsset}
-                      setWalletAsset={setCurrentAsset}
-                      setIsSendVisible={setIsSendVisible}
-                      setIsAssetVisible={setIsAssetVisible}
-                      currentSession={session}
-                    />
-                  </ModalPopup>
-                  <ModalPopup
-                    isModalVisible={isReceiveVisible}
-                    handleCancel={() => setIsReceiveVisible(false)}
-                    handleOk={() => { }}
-                    className="receive-detail-modal"
-                    footer={[]}
-                  // confirmationLoading={confirmLoading}
-                  >
-                    <ReceiveDetail currentAsset={currentAsset} session={session} />
-                  </ModalPopup> */}
                 </Content>
               </Layout>
             ) : (

@@ -10,10 +10,7 @@ import { CopyOutlined } from '@ant-design/icons';
 import './ReceiveDetail.less';
 import { Session } from '../../../models/Session';
 import { UserAsset, UserAssetType } from '../../../models/UserAsset';
-// import { getUIDynamicAmount } from '../../../utils/NumberUtils';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../../service/LedgerService';
-// import { AnalyticsService } from '../../../service/analytics/AnalyticsService';
-// import logoCro from '../../../assets/AssetLogo/cro.png';
 
 interface ReceiveDetailProps {
   currentAsset: UserAsset | undefined;

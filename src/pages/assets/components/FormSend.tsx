@@ -4,9 +4,7 @@ import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber } from 'antd';
 import { useRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
-// import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
-// eslint-disable-next-line import/no-extraneous-dependencies
-// import {remote} from 'electron';
+
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../../service/WalletService';
 import SuccessModalPopup from '../../../components/SuccessModalPopup/SuccessModalPopup';
@@ -15,13 +13,7 @@ import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModa
 import { secretStoreService } from '../../../storage/SecretStoreService';
 import { scaledBalance, UserAsset } from '../../../models/UserAsset';
 import { Session } from '../../../models/Session';
-import {
-  //   sessionState,
-  //   walletAssetState,
-  //   walletAllAssetsState,
-  //   isIbcVisibleState,
-  ledgerIsExpertModeState,
-} from '../../../recoil/atom';
+import { ledgerIsExpertModeState } from '../../../recoil/atom';
 import { BroadCastResult } from '../../../models/Transaction';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import {
@@ -39,13 +31,11 @@ import {
   AnalyticsTxType,
 } from '../../../service/analytics/AnalyticsService';
 
-// const { Header, Content, Footer } = Layout;
 const layout = {};
 const tailLayout = {};
 
 interface FormSendProps {
   walletAsset: UserAsset | undefined;
-  // setWalletAsset;
   setWalletAsset: React.Dispatch<React.SetStateAction<UserAsset | undefined>>;
   currentSession: Session;
 }
@@ -62,14 +52,10 @@ const FormSend: React.FC<FormSendProps> = props => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [availableBalance, setAvailableBalance] = useState('--');
-  //   const [selectedAsset, setSelectedAsset] = useState('0'); // CRO / TCRO as default
-  //   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
-  //   const [currentSession, setCurrentSession] = useRecoilState(sessionState);
-  //   const walletAllAssets = useRecoilValue(walletAllAssetsState);
-  //   const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const didMountRef = useRef(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { walletAsset, setWalletAsset, currentSession } = props;
 
   const analyticsService = new AnalyticsService(currentSession);
@@ -149,8 +135,8 @@ const FormSend: React.FC<FormSendProps> = props => {
       setConfirmLoading(false);
       setIsSuccessTransferModalVisible(true);
       setInputPasswordVisible(false);
-      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
-      setWalletAsset(currentWalletAsset);
+      //   const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      //   setWalletAsset(currentWalletAsset);
 
       form.resetFields();
     } catch (e) {
@@ -214,9 +200,6 @@ const FormSend: React.FC<FormSendProps> = props => {
       requiredMark={false}
       className="form-send"
     >
-      {/* <div className="sender">Sender Address</div> */}
-      {/* <div className="sender">{currentSession.wallet.address}</div> */}
-
       <Form.Item
         name="recipientAddress"
         label={t('send.formSend.recipientAddress.label')}
