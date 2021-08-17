@@ -27,7 +27,7 @@ import {
   walletAssetState,
   walletAllAssetsState,
   nftListState,
-  isIbcVisibleState,
+  // isIbcVisibleState,
   navbarMenuSelectedKeyState,
   ledgerIsExpertModeState,
   fetchingDBState,
@@ -42,15 +42,15 @@ import {
   getAssetStakingBalancePrice,
   UserAsset,
 } from '../../models/UserAsset';
-import { Session } from '../../models/Session';
+// import { Session } from '../../models/Session';
 import {
   BroadCastResult,
   NftModel,
   NftProcessedModel,
   StakingTransactionData,
-  TransactionDirection,
+  // TransactionDirection,
   TransactionStatus,
-  TransferTransactionData,
+  // TransferTransactionData,
   NftAccountTransactionData,
   NftTransactionType,
 } from '../../models/Transaction';
@@ -93,15 +93,15 @@ interface StakingTabularData {
   delegatorAddress: string;
 }
 
-interface TransferTabularData {
-  key: string;
-  transactionHash: string;
-  recipientAddress: string;
-  amount: string;
-  time: string;
-  direction: TransactionDirection;
-  status: TransactionStatus;
-}
+// interface TransferTabularData {
+//   key: string;
+//   transactionHash: string;
+//   recipientAddress: string;
+//   amount: string;
+//   time: string;
+//   direction: TransactionDirection;
+//   status: TransactionStatus;
+// }
 
 interface NftTransferTabularData {
   key: string;
@@ -130,38 +130,38 @@ function convertDelegations(allDelegations: StakingTransactionData[], currentAss
     .filter(dlg => Number(dlg.stakedAmount) > 0);
 }
 
-function convertTransfers(
-  allTransfers: TransferTransactionData[],
-  allAssets: UserAsset[],
-  sessionData: Session,
-  defaultWalletAsset: UserAsset,
-) {
-  const { address } = sessionData.wallet;
+// function convertTransfers(
+//   allTransfers: TransferTransactionData[],
+//   allAssets: UserAsset[],
+//   sessionData: Session,
+//   defaultWalletAsset: UserAsset,
+// ) {
+//   const { address } = sessionData.wallet;
 
-  function getDirection(from: string, to: string): TransactionDirection {
-    if (address === from && address === to) {
-      return TransactionDirection.SELF;
-    }
-    if (address === from) {
-      return TransactionDirection.OUTGOING;
-    }
-    return TransactionDirection.INCOMING;
-  }
+//   function getDirection(from: string, to: string): TransactionDirection {
+//     if (address === from && address === to) {
+//       return TransactionDirection.SELF;
+//     }
+//     if (address === from) {
+//       return TransactionDirection.OUTGOING;
+//     }
+//     return TransactionDirection.INCOMING;
+//   }
 
-  return allTransfers.map(transfer => {
-    const transferAmount = getUIDynamicAmount(transfer.amount, defaultWalletAsset);
-    const data: TransferTabularData = {
-      key: transfer.hash + transfer.receiverAddress + transfer.amount,
-      recipientAddress: transfer.receiverAddress,
-      transactionHash: transfer.hash,
-      time: new Date(transfer.date).toLocaleString(),
-      amount: `${transferAmount} ${transfer.assetSymbol}`,
-      direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
-      status: transfer.status,
-    };
-    return data;
-  });
-}
+//   return allTransfers.map(transfer => {
+//     const transferAmount = getUIDynamicAmount(transfer.amount, defaultWalletAsset);
+//     const data: TransferTabularData = {
+//       key: transfer.hash + transfer.receiverAddress + transfer.amount,
+//       recipientAddress: transfer.receiverAddress,
+//       transactionHash: transfer.hash,
+//       time: new Date(transfer.date).toLocaleString(),
+//       amount: `${transferAmount} ${transfer.assetSymbol}`,
+//       direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
+//       status: transfer.status,
+//     };
+//     return data;
+//   });
+// }
 
 function convertNftTransfers(allTransfers: NftAccountTransactionData[]) {
   function getStatus(transfer: NftAccountTransactionData) {
@@ -210,11 +210,11 @@ const isWalletNotLive = (config: WalletConfig) => {
 const HomePage = () => {
   const currentSession = useRecoilValue(sessionState);
   const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
-  const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
+  // const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
-  const isIbcVisible = useRecoilValue(isIbcVisibleState);
+  // const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setNFTList = useSetRecoilState(nftListState);
   const marketData = useRecoilValue(marketState);
@@ -330,81 +330,81 @@ const HomePage = () => {
     },
   ];
 
-  const TransactionColumns = [
-    {
-      title: t('home.transactions.table1.transactionHash'),
-      dataIndex: 'transactionHash',
-      key: 'transactionHash',
-      render: text => (
-        <a
-          data-original={text}
-          target="_blank"
-          rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/tx/${text}`}
-        >
-          {middleEllipsis(text, 12)}
-        </a>
-      ),
-    },
-    {
-      title: t('home.transactions.table1.amount'),
-      dataIndex: 'amount',
-      key: 'amount',
-      render: (text, record: TransferTabularData) => {
-        const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
-        const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
-        return (
-          <Text type={color}>
-            {sign}
-            {text}
-          </Text>
-        );
-      },
-    },
-    {
-      title: t('home.transactions.table1.recipientAddress'),
-      dataIndex: 'recipientAddress',
-      key: 'recipientAddress',
-      render: text => (
-        <a
-          data-original={text}
-          target="_blank"
-          rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
-        >
-          {middleEllipsis(text, 12)}
-        </a>
-      ),
-    },
-    {
-      title: t('home.transactions.table1.time'),
-      dataIndex: 'time',
-      key: 'time',
-    },
-    {
-      title: t('home.transactions.table1.status'),
-      dataIndex: 'status',
-      key: 'status',
-      render: (text, record: TransferTabularData) => {
-        // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
-        // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
-        let statusColor;
-        if (record.status === TransactionStatus.SUCCESS) {
-          statusColor = 'success';
-        } else if (record.status === TransactionStatus.FAILED) {
-          statusColor = 'error';
-        } else {
-          statusColor = 'processing';
-        }
+  // const TransactionColumns = [
+  //   {
+  //     title: t('home.transactions.table1.transactionHash'),
+  //     dataIndex: 'transactionHash',
+  //     key: 'transactionHash',
+  //     render: text => (
+  //       <a
+  //         data-original={text}
+  //         target="_blank"
+  //         rel="noreferrer"
+  //         href={`${currentSession.wallet.config.explorerUrl}/tx/${text}`}
+  //       >
+  //         {middleEllipsis(text, 12)}
+  //       </a>
+  //     ),
+  //   },
+  //   {
+  //     title: t('home.transactions.table1.amount'),
+  //     dataIndex: 'amount',
+  //     key: 'amount',
+  //     render: (text, record: TransferTabularData) => {
+  //       const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
+  //       const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+  //       return (
+  //         <Text type={color}>
+  //           {sign}
+  //           {text}
+  //         </Text>
+  //       );
+  //     },
+  //   },
+  //   {
+  //     title: t('home.transactions.table1.recipientAddress'),
+  //     dataIndex: 'recipientAddress',
+  //     key: 'recipientAddress',
+  //     render: text => (
+  //       <a
+  //         data-original={text}
+  //         target="_blank"
+  //         rel="noreferrer"
+  //         href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
+  //       >
+  //         {middleEllipsis(text, 12)}
+  //       </a>
+  //     ),
+  //   },
+  //   {
+  //     title: t('home.transactions.table1.time'),
+  //     dataIndex: 'time',
+  //     key: 'time',
+  //   },
+  //   {
+  //     title: t('home.transactions.table1.status'),
+  //     dataIndex: 'status',
+  //     key: 'status',
+  //     render: (text, record: TransferTabularData) => {
+  //       // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
+  //       // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+  //       let statusColor;
+  //       if (record.status === TransactionStatus.SUCCESS) {
+  //         statusColor = 'success';
+  //       } else if (record.status === TransactionStatus.FAILED) {
+  //         statusColor = 'error';
+  //       } else {
+  //         statusColor = 'processing';
+  //       }
 
-        return (
-          <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-            {record.status.toString()}
-          </Tag>
-        );
-      },
-    },
-  ];
+  //       return (
+  //         <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+  //           {record.status.toString()}
+  //         </Tag>
+  //       );
+  //     },
+  //   },
+  // ];
 
   const NftTransactionColumns = [
     {
@@ -586,10 +586,10 @@ const HomePage = () => {
     const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
       sessionData.wallet.identifier,
     );
-    const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
-      sessionData.wallet.identifier,
-      defaultWalletAsset,
-    );
+    // const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
+    //   sessionData.wallet.identifier,
+    //   defaultWalletAsset,
+    // );
 
     const allNftTransfer: NftAccountTransactionData[] = await walletService.getAllNFTAccountTxs(
       sessionData,
@@ -598,15 +598,15 @@ const HomePage = () => {
     const stakingTabularData = defaultWalletAsset
       ? convertDelegations(allDelegations, defaultWalletAsset)
       : [];
-    const transferTabularData = defaultWalletAsset
-      ? convertTransfers(allTransfers, allAssets, sessionData, defaultWalletAsset)
-      : [];
+    // const transferTabularData = defaultWalletAsset
+    //   ? convertTransfers(allTransfers, allAssets, sessionData, defaultWalletAsset)
+    //   : [];
     const nftTransferTabularData = convertNftTransfers(allNftTransfer);
 
     showWalletStateNotification(currentSession.wallet.config);
 
     setDelegations(stakingTabularData);
-    setTransfers(transferTabularData);
+    // setTransfers(transferTabularData);
     setNftTransfers(nftTransferTabularData);
     setUserAsset(currentAsset);
     setWalletAllAssets(allAssets);
@@ -691,10 +691,10 @@ const HomePage = () => {
       const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
         sessionData.wallet.identifier,
       );
-      const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
-        sessionData.wallet.identifier,
-        currentAsset,
-      );
+      // const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
+      //   sessionData.wallet.identifier,
+      //   currentAsset,
+      // );
 
       const allNftTransfer: NftAccountTransactionData[] = await walletService.getAllNFTAccountTxs(
         sessionData,
@@ -708,17 +708,17 @@ const HomePage = () => {
       setdefaultWalletAsset(currentAsset);
 
       const stakingTabularData = convertDelegations(allDelegations, currentAsset);
-      const transferTabularData = convertTransfers(
-        allTransfers,
-        walletAllAssets,
-        sessionData,
-        currentAsset,
-      );
+      // const transferTabularData = convertTransfers(
+      //   allTransfers,
+      //   walletAllAssets,
+      //   sessionData,
+      //   currentAsset,
+      // );
       const nftTransferTabularData = convertNftTransfers(allNftTransfer);
 
       showWalletStateNotification(currentSession.wallet.config);
       setDelegations(stakingTabularData);
-      setTransfers(transferTabularData);
+      // setTransfers(transferTabularData);
       setNftTransfers(nftTransferTabularData);
       setUserAsset(currentAsset);
       setWalletAllAssets(allAssets);
@@ -1006,25 +1006,7 @@ const HomePage = () => {
           </div>
         </div>
         <Tabs defaultActiveKey="1">
-          {isIbcVisible ? (
-            <TabPane tab={t('home.assetList.table.title')} key="1">
-              <div className="site-layout-background asset-container">
-                <Table
-                  columns={AssetColumns}
-                  dataSource={walletAllAssets}
-                  rowKey={record => record.identifier}
-                  className="asset-table"
-                  pagination={false}
-                />
-                <Link to="/send" className="all" onClick={() => setNavbarMenuSelectedKey('/send')}>
-                  {t('general.seeAll')}
-                </Link>
-              </div>
-            </TabPane>
-          ) : (
-            <></>
-          )}
-          <TabPane tab={t('home.nft.tab1')} key={isIbcVisible ? '2' : '1'}>
+          <TabPane tab={t('home.nft.tab1')} key="1">
             <div className="site-layout-background nft-container">
               <List
                 grid={{
@@ -1075,9 +1057,21 @@ const HomePage = () => {
               </Link>
             </div>
           </TabPane>
+          <TabPane tab={t('home.nft.tab2')} key="2">
+            <Table
+              locale={{
+                triggerDesc: t('general.table.triggerDesc'),
+                triggerAsc: t('general.table.triggerAsc'),
+                cancelSort: t('general.table.cancelSort'),
+              }}
+              columns={NftTransactionColumns}
+              dataSource={nftTransfers}
+              rowKey={record => record.key}
+            />
+          </TabPane>
         </Tabs>
         <Tabs defaultActiveKey="1">
-          <TabPane tab={t('home.transactions.tab1')} key="1">
+          {/* <TabPane tab={t('home.transactions.tab1')} key="1">
             <Table
               locale={{
                 triggerDesc: t('general.table.triggerDesc'),
@@ -1088,6 +1082,20 @@ const HomePage = () => {
               dataSource={transfers}
               rowKey={record => record.key}
             />
+          </TabPane> */}
+          <TabPane tab={t('home.transactions.tab1')} key="1">
+            <div className="site-layout-background asset-container">
+              <Table
+                columns={AssetColumns}
+                dataSource={walletAllAssets}
+                rowKey={record => record.identifier}
+                className="asset-table"
+                pagination={false}
+              />
+              <Link to="/send" className="all" onClick={() => setNavbarMenuSelectedKey('/send')}>
+                {t('general.seeAll')}
+              </Link>
+            </div>
           </TabPane>
           <TabPane tab={t('home.transactions.tab2')} key="2">
             <Table
@@ -1098,18 +1106,6 @@ const HomePage = () => {
               }}
               columns={StakingColumns}
               dataSource={delegations}
-              rowKey={record => record.key}
-            />
-          </TabPane>
-          <TabPane tab={t('home.transactions.tab3')} key="3">
-            <Table
-              locale={{
-                triggerDesc: t('general.table.triggerDesc'),
-                triggerAsc: t('general.table.triggerAsc'),
-                cancelSort: t('general.table.cancelSort'),
-              }}
-              columns={NftTransactionColumns}
-              dataSource={nftTransfers}
               rowKey={record => record.key}
             />
           </TabPane>

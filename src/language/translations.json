@@ -397,6 +397,7 @@
         },
         "nft": {
           "tab1": "My NFT",
+          "tab2": "NFT Transactions",
           "seeAll": "See All"
         },
         "assetList": {
@@ -409,7 +410,7 @@
           }
         },
         "transactions": {
-          "tab1": "Transactions",
+          "tab1": "Assets",
           "tab2": "Delegations",
           "tab3": "NFT Transactions",
           "table1": {
@@ -1196,6 +1197,7 @@
         },
         "nft": {
           "tab1": "我的NFT",
+          "tab2": "NFT交易",
           "seeAll": "所有"
         },
         "assetList": {
@@ -1208,7 +1210,7 @@
           }
         },
         "transactions": {
-          "tab1": "交易",
+          "tab1": "資金",
           "tab2": "委託",
           "tab3": "NFT交易",
           "table1": {
@@ -1995,6 +1997,7 @@
         },
         "nft": {
           "tab1": "我的NFT",
+          "tab2": "NFT交易",
           "seeAll": "所有"
         },
         "assetList": {
@@ -2007,7 +2010,7 @@
           }
         },
         "transactions": {
-          "tab1": "交易",
+          "tab1": "资金",
           "tab2": "委托",
           "tab3": "NFT交易",
           "table1": {
@@ -2915,6 +2918,7 @@
         },
         "nft": {
           "tab1": "나의 NFT",
+          "tab2": "NFT 트랜잭션",
           "seeAll": "모두 보기"
         },
         "assetList": {
@@ -2927,7 +2931,7 @@
           }
         },
         "transactions": {
-          "tab1": "트랜잭션",
+          "tab1": "금액",
           "tab2": "위임",
           "tab3": "NFT 트랜잭션",
           "table1": {
