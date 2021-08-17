@@ -597,7 +597,7 @@ const HomePage = () => {
       ? convertDelegations(allDelegations, defaultWalletAsset)
       : [];
     const transferTabularData = defaultWalletAsset
-      ? convertTransfers(allTransfers, walletAllAssets, sessionData, defaultWalletAsset)
+      ? convertTransfers(allTransfers, allAssets, sessionData, defaultWalletAsset)
       : [];
     const nftTransferTabularData = convertNftTransfers(allNftTransfer);
 
