@@ -23,6 +23,7 @@
         "close": "Close",
         "retry": "Retry",
         "connect": "Connect",
+        "seeAll": "See All",
         "addressValidator": {
           "reason1": "Invalid",
           "reason2": "address provided"
@@ -821,6 +822,7 @@
         "close": "關閉",
         "retry": "重試",
         "connect": "連接",
+        "seeAll": "所有",
         "addressValidator": {
           "reason1": "無效的",
           "reason2": "地址"
@@ -1619,6 +1621,7 @@
         "close": "关闭",
         "retry": "重试",
         "connect": "连接",
+        "seeAll": "所有",
         "addressValidator": {
           "reason1": "无效的",
           "reason2": "地址"
@@ -2538,6 +2541,7 @@
         "close": "닫기",
         "retry": "재시도",
         "connect": "연결",
+        "seeAll": "모두 보기",
         "addressValidator": {
           "reason1": "무효",
           "reason2": "주소 필요"

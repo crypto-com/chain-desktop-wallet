@@ -25,12 +25,13 @@ import {
   fetchingDBState,
   nftListState,
   isIbcVisibleState,
+  navbarMenuSelectedKeyState,
 } from '../../recoil/atom';
 import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
-// import IconSend from '../../svg/IconSend';
-// import IconReceive from '../../svg/IconReceive';
+import IconSend from '../../svg/IconSend';
+import IconReceive from '../../svg/IconReceive';
 import IconStaking from '../../svg/IconStaking';
 import IconNft from '../../svg/IconNft';
 import IconWallet from '../../svg/IconWallet';
@@ -61,6 +62,9 @@ function HomeLayout(props: HomeLayoutProps) {
   const [marketData, setMarketData] = useRecoilState(marketState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const [nftList, setNftList] = useRecoilState(nftListState);
+  const [navbarMenuSelectedKey, setNavbarMenuSelectedKey] = useRecoilState(
+    navbarMenuSelectedKeyState,
+  );
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const setIsIbcVisible = useSetRecoilState(isIbcVisibleState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -235,8 +239,8 @@ function HomeLayout(props: HomeLayoutProps) {
     const paths = [
       '/home',
       '/staking',
-      // '/send',
-      '/assets',
+      '/send',
+      '/receive',
       '/settings',
       '/governance',
       '/nft',
@@ -249,18 +253,26 @@ function HomeLayout(props: HomeLayoutProps) {
     }
 
     return (
-      <Menu theme="dark" mode="inline" defaultSelectedKeys={[menuSelectedKey]}>
+      <Menu
+        theme="dark"
+        mode="inline"
+        defaultSelectedKeys={[menuSelectedKey]}
+        selectedKeys={[navbarMenuSelectedKey]}
+        onClick={item => {
+          setNavbarMenuSelectedKey(item.key);
+        }}
+      >
         <Menu.Item key="/home" icon={<Icon component={IconHome} />}>
           <Link to="/home">{t('navbar.home')}</Link>
         </Menu.Item>
         <Menu.Item key="/staking" icon={<Icon component={IconStaking} />}>
           <Link to="/staking">{t('navbar.staking')}</Link>
         </Menu.Item>
-        {/* <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
+        <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">{t('navbar.send')}</Link>
-        </Menu.Item> */}
-        <Menu.Item key="/assets" icon={<Icon component={IconWallet} />}>
-          <Link to="/assets">{t('navbar.assets')}</Link>
+        </Menu.Item>
+        <Menu.Item key="/receive" icon={<Icon component={IconReceive} />}>
+          <Link to="/receive">{t('navbar.receive')}</Link>
         </Menu.Item>
         <Menu.Item key="/governance" icon={<BankOutlined />}>
           <Link to="/governance">{t('navbar.governance')}</Link>

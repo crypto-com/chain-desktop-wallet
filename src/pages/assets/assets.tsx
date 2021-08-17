@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import './assets.less';
@@ -11,6 +11,7 @@ import {
   marketState,
   // walletAssetState,
   walletAllAssetsState,
+  navbarMenuSelectedKeyState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { getAssetBalancePrice, UserAsset } from '../../models/UserAsset';
@@ -75,11 +76,19 @@ const convertTransfers = (
   });
 };
 
+// interface AssetPageProps {
+//   defaultTab: string;
+// }
+
 const AssetsPage = () => {
+  // const AssetsPage: React.FC<AssetPageProps> = props => {
   const session: Session = useRecoilValue<Session>(sessionState);
   // const userAsset = useRecoilValue(walletAssetState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const marketData = useRecoilValue(marketState);
+  const [navbarMenuSelectedKey, setNavbarMenuSelectedKey] = useRecoilState(
+    navbarMenuSelectedKeyState,
+  );
   // const [isLedger, setIsLedger] = useState(false);
   const [currentAsset, setCurrentAsset] = useState<UserAsset>();
   const [isAssetVisible, setIsAssetVisible] = useState(false);
@@ -277,7 +286,18 @@ const AssetsPage = () => {
                     </div>
                   </div>
 
-                  <Tabs defaultActiveKey="1" centered>
+                  <Tabs
+                    defaultActiveKey={navbarMenuSelectedKey === '/send' ? '2' : '3'}
+                    onTabClick={key => {
+                      if (key === '2') {
+                        setNavbarMenuSelectedKey('/send');
+                      }
+                      if (key === '3') {
+                        setNavbarMenuSelectedKey('/receive');
+                      }
+                    }}
+                    centered
+                  >
                     <TabPane tab={t('assets.tab1')} key="1">
                       <Table
                         columns={TransactionColumns}
@@ -293,6 +313,7 @@ const AssetsPage = () => {
                         currentSession={session}
                       />
                     </TabPane>
+
                     <TabPane tab={t('assets.tab3')} key="3">
                       <ReceiveDetail currentAsset={currentAsset} session={session} />
                     </TabPane>

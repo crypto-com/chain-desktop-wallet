@@ -28,6 +28,7 @@ import {
   walletAllAssetsState,
   nftListState,
   isIbcVisibleState,
+  navbarMenuSelectedKeyState,
   ledgerIsExpertModeState,
   fetchingDBState,
 } from '../../recoil/atom';
@@ -214,6 +215,7 @@ const HomePage = () => {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const isIbcVisible = useRecoilValue(isIbcVisibleState);
+  const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setNFTList = useSetRecoilState(nftListState);
   const marketData = useRecoilValue(marketState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
@@ -997,7 +999,8 @@ const HomePage = () => {
               {defaultWalletAsset && marketData && marketData.price
                 ? `${numeral(getAssetStakingBalancePrice(defaultWalletAsset, marketData)).format(
                     '$0,0.00',
-                  )} ${marketData?.currency}`
+                  )} ${marketData?.currency}
+                  `
                 : ''}
             </div>
           </div>
@@ -1013,8 +1016,8 @@ const HomePage = () => {
                   className="asset-table"
                   pagination={false}
                 />
-                <Link to="/assets" className="all">
-                  {t('home.nft.seeAll')}
+                <Link to="/send" className="all" onClick={() => setNavbarMenuSelectedKey('/send')}>
+                  {t('general.seeAll')}
                 </Link>
               </div>
             </TabPane>
@@ -1063,8 +1066,12 @@ const HomePage = () => {
                 )}
                 pagination={false}
               />
-              <Link to="/nft" style={{ textAlign: 'right' }}>
-                {t('home.nft.seeAll')}
+              <Link
+                to="/nft"
+                style={{ textAlign: 'right' }}
+                onClick={() => setNavbarMenuSelectedKey('/nft')}
+              >
+                {t('general.seeAll')}
               </Link>
             </div>
           </TabPane>
