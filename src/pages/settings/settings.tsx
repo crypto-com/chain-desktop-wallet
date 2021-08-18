@@ -63,22 +63,25 @@ const tailLayout = {
 const GeneralSettingsForm = () => {
   const [session, setSession] = useRecoilState(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
-  const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [updateLoading, setUpdateLoading] = useState(false);
   const [enabledGeneralSettings, setEnabledGeneralSettings] = useState<boolean>(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
   const locationState: any = useLocation().state;
+  const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>(
+    locationState ? locationState.currentAsset.identifier : walletAllAssets[0].identifier,
+  );
 
   const [t] = useTranslation();
 
   useEffect(() => {
     let unmounted = false;
 
+    setCurrentAssetIdentifier(
+      locationState ? locationState.currentAsset.identifier : walletAllAssets[0].identifier,
+    );
+
     const SyncConfig = async () => {
-      setCurrentAssetIdentifier(
-        locationState ? locationState.currentAsset.identifier : walletAllAssets[0].identifier,
-      );
       const enabledGeneralWalletsSettings: boolean = session.wallet.config.enableGeneralSettings;
       if (!unmounted) {
         setEnabledGeneralSettings(enabledGeneralWalletsSettings);
@@ -95,6 +98,7 @@ const GeneralSettingsForm = () => {
       unmounted = true;
     };
   }, [
+    walletAllAssets,
     currentAssetIdentifier,
     setCurrentAssetIdentifier,
     enabledGeneralSettings,
@@ -151,16 +155,12 @@ const GeneralSettingsForm = () => {
             message: `${t('settings.form1.nodeUrl.label')} ${t('general.required')}`,
           },
         ]}
+        initialValue={currentAssetIdentifier}
       >
-        <Select
-          style={{ width: 240 }}
-          onChange={onSwitchAsset}
-          value={currentAssetIdentifier}
-          defaultValue={currentAssetIdentifier}
-        >
+        <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
           {walletAllAssets.map(asset => {
             return (
-              <Option value={asset.identifier.toString()}>
+              <Option value={asset.identifier.toString()} key={asset.identifier.toString()}>
                 {assetIcon(asset)}
                 {`${asset.name} (${asset.symbol})`}
               </Option>
@@ -460,7 +460,11 @@ function MetaInfoComponent() {
             </div> */}
             <Select style={{ width: 240 }} onChange={onSwitchLanguage} value={defaultLanguageState}>
               {SUPPORTED_LANGUAGE.map(item => {
-                return <Option value={item.value}>{item.label}</Option>;
+                return (
+                  <Option value={item.value} key={item.value}>
+                    {item.label}
+                  </Option>
+                );
               })}
             </Select>
           </div>
