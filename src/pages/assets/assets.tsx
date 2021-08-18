@@ -128,7 +128,7 @@ const AssetsPage = () => {
             },
           }}
         >
-          Node Configuration
+          {t('assets.moreMenu.nodeConfiguration')}
         </Link>
       </Menu.Item>
     </Menu>

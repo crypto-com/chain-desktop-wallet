@@ -511,6 +511,9 @@
             "amount": "Balance",
             "value": "Value"
           }
+        },
+        "moreMenu": {
+          "nodeConfiguration": "Node Configuration"
         }
       },
       "staking": {
@@ -723,6 +726,9 @@
         "tab2": "General Configuration",
         "tab3": "Clear Storage",
         "form1": {
+          "asset": {
+            "label": "Asset"
+          },
           "nodeUrl": {
             "label": "Node URL",
             "error1": "Please enter a valid Node URL"
@@ -1311,6 +1317,9 @@
             "amount": "餘額",
             "value": "市值"
           }
+        },
+        "moreMenu": {
+          "nodeConfiguration": "節點設定"
         }
       },
       "staking": {
@@ -1523,6 +1532,9 @@
         "tab2": "一般設定",
         "tab3": "重置",
         "form1": {
+          "asset": {
+            "label": "資金"
+          },
           "nodeUrl": {
             "label": "節點 URL",
             "error1": "請輸入有效的節點 URL"
@@ -2111,6 +2123,9 @@
             "amount": "余额",
             "value": "市值"
           }
+        },
+        "moreMenu": {
+          "nodeConfiguration": "节点配置"
         }
       },
       "staking": {
@@ -2323,6 +2338,9 @@
         "tab2": "常规配置",
         "tab3": "重置",
         "form1": {
+          "asset": {
+            "label": "资金"
+          },
           "nodeUrl": {
             "label": "节点 URL",
             "error1": "请输入有效的节点 URL"
@@ -3030,6 +3048,9 @@
             "amount": "금액",
             "value": "시장 가치"
           }
+        },
+        "moreMenu": {
+          "nodeConfiguration": "노드 설정"
         }
       },
       "staking": {
@@ -3242,6 +3263,9 @@
         "tab2": "일반 설정",
         "tab3": "스토리지 삭제",
         "form1": {
+          "asset": {
+            "label": "금액"
+          },
           "nodeUrl": {
             "label": "노드 URL",
             "error1": "유효한 노드 URL을 입력하세요."

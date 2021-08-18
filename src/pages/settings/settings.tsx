@@ -148,11 +148,11 @@ const GeneralSettingsForm = () => {
     <>
       <Form.Item
         name="asset"
-        label="Asset"
+        label={t('settings.form1.asset.label')}
         rules={[
           {
             required: true,
-            message: `${t('settings.form1.nodeUrl.label')} ${t('general.required')}`,
+            message: `${t('settings.form1.asset.label')} ${t('general.required')}`,
           },
         ]}
         initialValue={currentAssetIdentifier}
