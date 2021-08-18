@@ -34,8 +34,19 @@
         margin-top: 32px;
       }
 
-      .back-button {
-        margin: 24px 0;
+      .detail-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: -24px;
+        .back-button {
+          position: relative;
+          // margin: 24px 0;
+          top: 0;
+        }
+        .anticon {
+          font-size: 20px;
+        }
       }
 
       .detail-container {
@@ -111,5 +122,12 @@
         }
       }
     }
+  }
+}
+
+.moreDropdown {
+  min-width: 200px;
+  li {
+    font-size: 16px;
   }
 }

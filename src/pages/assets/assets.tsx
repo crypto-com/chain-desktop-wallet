@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import './assets.less';
 import 'antd/dist/antd.css';
-import { Layout, Table, Avatar, Tabs, Tag, Typography } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Layout, Table, Avatar, Tabs, Tag, Typography, Dropdown, Menu } from 'antd';
+import { ArrowLeftOutlined, MoreOutlined } from '@ant-design/icons';
 import {
   sessionState,
   marketState,
@@ -115,6 +116,23 @@ const AssetsPage = () => {
       <Avatar>{symbol[0].toUpperCase()}</Avatar>
     );
   };
+
+  const moreMenu = (
+    <Menu className="moreDropdown">
+      <Menu.Item key="node-configuration">
+        <Link
+          to={{
+            pathname: '/settings',
+            state: {
+              currentAsset,
+            },
+          }}
+        >
+          Node Configuration
+        </Link>
+      </Menu.Item>
+    </Menu>
+  );
 
   const AssetColumns = [
     {
@@ -259,16 +277,22 @@ const AssetsPage = () => {
             {isAssetVisible ? (
               <Layout className="asset-detail">
                 <Content>
-                  <a>
-                    <div
-                      className="back-button"
-                      onClick={() => setIsAssetVisible(false)}
-                      style={{ fontSize: '16px' }}
-                    >
-                      <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
-                      {t('assets.backToList')}
-                    </div>
-                  </a>
+                  <div className="detail-header">
+                    <a>
+                      <div
+                        className="back-button"
+                        onClick={() => setIsAssetVisible(false)}
+                        style={{ fontSize: '16px' }}
+                      >
+                        <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
+                        {t('assets.backToList')}
+                      </div>
+                    </a>
+
+                    <Dropdown overlay={moreMenu} placement="bottomRight" trigger={['click']}>
+                      <MoreOutlined />
+                    </Dropdown>
+                  </div>
                   <div className="detail-container">
                     {assetIcon(currentAsset)}
                     <div className="balance">

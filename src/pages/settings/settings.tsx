@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
 import {
@@ -16,15 +16,16 @@ import {
   Divider,
   Select,
   Carousel,
+  Avatar,
   notification,
 } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { CarouselRef } from 'antd/lib/carousel';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { sessionState, walletListState } from '../../recoil/atom';
+import { sessionState, walletListState, walletAllAssetsState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import {
@@ -34,6 +35,7 @@ import {
   SettingsDataUpdate,
 } from '../../models/Wallet';
 import { Session } from '../../models/Session';
+// import { UserAsset } from '../../models/UserAsset';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
@@ -60,10 +62,13 @@ const tailLayout = {
 
 const GeneralSettingsForm = () => {
   const [session, setSession] = useRecoilState(sessionState);
+  const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [updateLoading, setUpdateLoading] = useState(false);
   const [enabledGeneralSettings, setEnabledGeneralSettings] = useState<boolean>(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
+  const locationState: any = useLocation().state;
 
   const [t] = useTranslation();
 
@@ -71,6 +76,9 @@ const GeneralSettingsForm = () => {
     let unmounted = false;
 
     const SyncConfig = async () => {
+      setCurrentAssetIdentifier(
+        locationState ? locationState.currentAsset.identifier : walletAllAssets[0].identifier,
+      );
       const enabledGeneralWalletsSettings: boolean = session.wallet.config.enableGeneralSettings;
       if (!unmounted) {
         setEnabledGeneralSettings(enabledGeneralWalletsSettings);
@@ -86,7 +94,12 @@ const GeneralSettingsForm = () => {
     return () => {
       unmounted = true;
     };
-  }, [enabledGeneralSettings, setEnabledGeneralSettings]);
+  }, [
+    currentAssetIdentifier,
+    setCurrentAssetIdentifier,
+    enabledGeneralSettings,
+    setEnabledGeneralSettings,
+  ]);
 
   async function onEnableGeneralWalletConfig() {
     setUpdateLoading(true);
@@ -113,8 +126,48 @@ const GeneralSettingsForm = () => {
     setUpdateLoading(false);
   }
 
+  const assetIcon = asset => {
+    const { icon_url, symbol } = asset;
+
+    return icon_url ? (
+      <img src={icon_url} alt="cronos" className="asset-icon" />
+    ) : (
+      <Avatar>{symbol[0].toUpperCase()}</Avatar>
+    );
+  };
+
+  const onSwitchAsset = value => {
+    setCurrentAssetIdentifier(value!.toString());
+  };
+
   return (
     <>
+      <Form.Item
+        name="asset"
+        label="Asset"
+        rules={[
+          {
+            required: true,
+            message: `${t('settings.form1.nodeUrl.label')} ${t('general.required')}`,
+          },
+        ]}
+      >
+        <Select
+          style={{ width: 240 }}
+          onChange={onSwitchAsset}
+          value={currentAssetIdentifier}
+          defaultValue={currentAssetIdentifier}
+        >
+          {walletAllAssets.map(asset => {
+            return (
+              <Option value={asset.identifier.toString()}>
+                {assetIcon(asset)}
+                {`${asset.name} (${asset.symbol})`}
+              </Option>
+            );
+          })}
+        </Select>
+      </Form.Item>
       <Form.Item
         name="nodeUrl"
         label={t('settings.form1.nodeUrl.label')}
