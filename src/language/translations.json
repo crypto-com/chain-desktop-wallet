@@ -727,7 +727,8 @@
         "tab3": "Clear Storage",
         "form1": {
           "asset": {
-            "label": "Asset"
+            "label": "Asset",
+            "description": "Node Configurations are customizable across different assets."
           },
           "nodeUrl": {
             "label": "Node URL",
@@ -1533,7 +1534,8 @@
         "tab3": "重置",
         "form1": {
           "asset": {
-            "label": "資金"
+            "label": "資金",
+            "description": "不同的資金有各自的節點設定"
           },
           "nodeUrl": {
             "label": "節點 URL",
@@ -2339,7 +2341,8 @@
         "tab3": "重置",
         "form1": {
           "asset": {
-            "label": "资金"
+            "label": "资金",
+            "description": "不同的资金有各自的节点设定"
           },
           "nodeUrl": {
             "label": "节点 URL",

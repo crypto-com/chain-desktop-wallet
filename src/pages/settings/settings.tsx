@@ -146,9 +146,11 @@ const GeneralSettingsForm = () => {
 
   return (
     <>
+      <div className="title">{t('settings.form1.asset.label')}</div>
+      <div className="description">{t('settings.form1.asset.description')}</div>
       <Form.Item
         name="asset"
-        label={t('settings.form1.asset.label')}
+        // label={t('settings.form1.asset.label')}
         rules={[
           {
             required: true,
@@ -168,6 +170,7 @@ const GeneralSettingsForm = () => {
           })}
         </Select>
       </Form.Item>
+      <Divider />
       <Form.Item
         name="nodeUrl"
         label={t('settings.form1.nodeUrl.label')}
