@@ -50,6 +50,17 @@ interface HomeLayoutProps {
 
 const { Sider } = Layout;
 
+const allPaths = [
+  '/home',
+  '/staking',
+  '/send',
+  '/receive',
+  '/settings',
+  '/governance',
+  '/nft',
+  '/wallet',
+];
+
 function HomeLayout(props: HomeLayoutProps) {
   const history = useHistory();
   const [confirmDeleteForm] = Form.useForm();
@@ -75,6 +86,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
+  const currentLocationPath = useLocation().pathname;
 
   const [t] = useTranslation();
 
@@ -211,6 +223,11 @@ function HomeLayout(props: HomeLayoutProps) {
 
     if (!didMountRef.current) {
       fetchDB();
+
+      if (allPaths.includes(currentLocationPath)) {
+        setNavbarMenuSelectedKey(currentLocationPath);
+      }
+
       didMountRef.current = true;
     } else if (!hasWallet) {
       history.push('/welcome');
@@ -235,20 +252,8 @@ function HomeLayout(props: HomeLayoutProps) {
   ]);
 
   const HomeMenu = () => {
-    const locationPath = useLocation().pathname;
-    const paths = [
-      '/home',
-      '/staking',
-      '/send',
-      '/receive',
-      '/settings',
-      '/governance',
-      '/nft',
-      '/wallet',
-    ];
-
-    let menuSelectedKey = locationPath;
-    if (!paths.includes(menuSelectedKey)) {
+    let menuSelectedKey = currentLocationPath;
+    if (!allPaths.includes(menuSelectedKey)) {
       menuSelectedKey = '/home';
     }
 

@@ -146,15 +146,15 @@ const GeneralSettingsForm = () => {
 
   return (
     <>
-      <div className="title">{t('settings.form1.asset.label')}</div>
-      <div className="description">{t('settings.form1.asset.description')}</div>
+      <div className="title">{t('settings.form1.assetIdentifier.label')}</div>
+      <div className="description">{t('settings.form1.assetIdentifier.description')}</div>
       <Form.Item
-        name="asset"
-        // label={t('settings.form1.asset.label')}
+        name="assetIdentifier"
+        // label={t('settings.form1.assetIdentifier.label')}
         rules={[
           {
             required: true,
-            message: `${t('settings.form1.asset.label')} ${t('general.required')}`,
+            message: `${t('settings.form1.assetIdentifier.label')} ${t('general.required')}`,
           },
         ]}
         initialValue={currentAssetIdentifier}
@@ -664,6 +664,7 @@ const FormSettings = () => {
       // No value was updated, we stop here
       return;
     }
+
     setIsButtonLoading(true);
     const settingsDataUpdate: SettingsDataUpdate = {
       walletId: session.wallet.identifier,
@@ -674,6 +675,7 @@ const FormSettings = () => {
       gasLimit: String(values.gasLimit),
     };
 
+    // TO-DO: values.assetIdentifier shall be passed to updateWalletNodeConfig()
     await walletService.updateWalletNodeConfig(settingsDataUpdate);
     const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
     const newSession = new Session(updatedWallet);

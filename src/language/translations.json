@@ -726,7 +726,7 @@
         "tab2": "General Configuration",
         "tab3": "Clear Storage",
         "form1": {
-          "asset": {
+          "assetIdentifier": {
             "label": "Asset",
             "description": "Node Configurations are customizable across different assets."
           },
@@ -1533,7 +1533,7 @@
         "tab2": "一般設定",
         "tab3": "重置",
         "form1": {
-          "asset": {
+          "assetIdentifier": {
             "label": "資金",
             "description": "不同的資金有各自的節點設定"
           },
@@ -2340,7 +2340,7 @@
         "tab2": "常规配置",
         "tab3": "重置",
         "form1": {
-          "asset": {
+          "assetIdentifier": {
             "label": "资金",
             "description": "不同的资金有各自的节点设定"
           },
@@ -3266,7 +3266,7 @@
         "tab2": "일반 설정",
         "tab3": "스토리지 삭제",
         "form1": {
-          "asset": {
+          "assetIdentifier": {
             "label": "금액"
           },
           "nodeUrl": {
