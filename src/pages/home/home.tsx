@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import './home.less';
 import 'antd/dist/antd.css';
 import { Button, Layout, notification, Table, Tabs, Tag, Card, List, Avatar } from 'antd';
@@ -163,6 +163,7 @@ const HomePage = () => {
   const marketData = useRecoilValue(marketState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const didMountRef = useRef(false);
+  const history = useHistory();
 
   const [processedNftList, setProcessedNftList] = useState<NftProcessedModel[]>([]);
 
@@ -720,6 +721,21 @@ const HomePage = () => {
                 rowKey={record => record.identifier}
                 className="asset-table"
                 pagination={false}
+                onRow={selectedAsset => {
+                  return {
+                    onClick: () => {
+                      // console.log('selectedAsset.identifier',selectedAsset.identifier)
+                      setNavbarMenuSelectedKey('/send');
+                      history.push({
+                        pathname: '/send',
+                        state: {
+                          from: '/home',
+                          identifier: selectedAsset.identifier,
+                        },
+                      });
+                    }, // click row
+                  };
+                }}
               />
               <Link to="/send" className="all" onClick={() => setNavbarMenuSelectedKey('/send')}>
                 {t('general.seeAll')}

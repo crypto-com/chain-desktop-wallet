@@ -520,8 +520,10 @@
         "title": "Staking",
         "tab1": "Staking Rewards",
         "tab2": "Delegate Funds",
+        "tab3": "Delegation Management",
         "description1": "Withdraw rewards from delegated funds.\n",
         "description2": "Delegate funds to validator.",
+        "description3": "Manage your delegated funds.",
         "maxValidator": {
           "error": "Staking amount exceeds your available wallet balance"
         },
@@ -1327,8 +1329,10 @@
         "title": "抵押",
         "tab1": "抵押獎勵",
         "tab2": "委託資金",
+        "tab3": "委託管理",
         "description1": "從委託資金提取獎勵。",
         "description2": "委託資金至驗證者。",
+        "description3": "管理你的已委託資金",
         "maxValidator": {
           "error": "抵押數目大於你的錢包餘額"
         },
@@ -2134,8 +2138,10 @@
         "title": "抵押",
         "tab1": "抵押奖励",
         "tab2": "委托资金",
+        "tab3": "委托资金",
         "description1": "从委托资金提取奖励。",
         "description2": "委托资金至验证者。",
+        "description3": "管理你的已委托资金",
         "maxValidator": {
           "error": "抵押数目大于你的钱包余额"
         },

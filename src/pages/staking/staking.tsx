@@ -579,7 +579,7 @@ const FormDelegationRequest = () => {
   );
 };
 
-const FormDelegation = () => {
+const FormDelegationOperations = () => {
   // Undelegate action related states changes
   const [form] = Form.useForm();
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
@@ -1318,14 +1318,19 @@ const StakingPage = () => {
               </div>
             </div>
           </TabPane>
-          <TabPane tab={t('home.transactions.tab2')} key="2">
-            <FormDelegation />
-          </TabPane>
-          <TabPane tab={t('staking.tab2')} key="3">
+          <TabPane tab={t('staking.tab2')} key="2">
             <div className="site-layout-background stake-content">
               <div className="container">
                 <div className="description">{t('staking.description2')}</div>
                 <FormDelegationRequest />
+              </div>
+            </div>
+          </TabPane>
+          <TabPane tab={t('staking.tab3')} key="3">
+            <div className="site-layout-background stake-content">
+              <div className="container">
+                <div className="description">{t('staking.description3')}</div>
+                <FormDelegationOperations />
               </div>
             </div>
           </TabPane>
