@@ -25,6 +25,7 @@ import {
   fetchingDBState,
   nftListState,
   isIbcVisibleState,
+  navbarMenuSelectedKeyState,
 } from '../../recoil/atom';
 import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
@@ -49,6 +50,17 @@ interface HomeLayoutProps {
 
 const { Sider } = Layout;
 
+const allPaths = [
+  '/home',
+  '/staking',
+  '/send',
+  '/receive',
+  '/settings',
+  '/governance',
+  '/nft',
+  '/wallet',
+];
+
 function HomeLayout(props: HomeLayoutProps) {
   const history = useHistory();
   const [confirmDeleteForm] = Form.useForm();
@@ -61,6 +73,9 @@ function HomeLayout(props: HomeLayoutProps) {
   const [marketData, setMarketData] = useRecoilState(marketState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const [nftList, setNftList] = useRecoilState(nftListState);
+  const [navbarMenuSelectedKey, setNavbarMenuSelectedKey] = useRecoilState(
+    navbarMenuSelectedKeyState,
+  );
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const setIsIbcVisible = useSetRecoilState(isIbcVisibleState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -71,6 +86,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
+  const currentLocationPath = useLocation().pathname;
 
   const [t] = useTranslation();
 
@@ -207,6 +223,11 @@ function HomeLayout(props: HomeLayoutProps) {
 
     if (!didMountRef.current) {
       fetchDB();
+
+      if (allPaths.includes(currentLocationPath)) {
+        setNavbarMenuSelectedKey(currentLocationPath);
+      }
+
       didMountRef.current = true;
     } else if (!hasWallet) {
       history.push('/welcome');
@@ -231,25 +252,21 @@ function HomeLayout(props: HomeLayoutProps) {
   ]);
 
   const HomeMenu = () => {
-    const locationPath = useLocation().pathname;
-    const paths = [
-      '/home',
-      '/staking',
-      '/send',
-      '/receive',
-      '/settings',
-      '/governance',
-      '/nft',
-      '/wallet',
-    ];
-
-    let menuSelectedKey = locationPath;
-    if (!paths.includes(menuSelectedKey)) {
+    let menuSelectedKey = currentLocationPath;
+    if (!allPaths.includes(menuSelectedKey)) {
       menuSelectedKey = '/home';
     }
 
     return (
-      <Menu theme="dark" mode="inline" defaultSelectedKeys={[menuSelectedKey]}>
+      <Menu
+        theme="dark"
+        mode="inline"
+        defaultSelectedKeys={[menuSelectedKey]}
+        selectedKeys={[navbarMenuSelectedKey]}
+        onClick={item => {
+          setNavbarMenuSelectedKey(item.key);
+        }}
+      >
         <Menu.Item key="/home" icon={<Icon component={IconHome} />}>
           <Link to="/home">{t('navbar.home')}</Link>
         </Menu.Item>

@@ -1,49 +1,46 @@
 import React, { useEffect, useState, useRef } from 'react';
-import './send.less';
+import './FormSend.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Input, InputNumber, Layout, Select } from 'antd';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { Button, Form, Input, InputNumber } from 'antd';
+import { useRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
-import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
-// eslint-disable-next-line import/no-extraneous-dependencies
-// import {remote} from 'electron';
-import ModalPopup from '../../components/ModalPopup/ModalPopup';
-import { walletService } from '../../service/WalletService';
-import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
-import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { secretStoreService } from '../../storage/SecretStoreService';
-import { scaledBalance } from '../../models/UserAsset';
-import {
-  sessionState,
-  walletAssetState,
-  walletAllAssetsState,
-  isIbcVisibleState,
-  ledgerIsExpertModeState,
-} from '../../recoil/atom';
-import { BroadCastResult } from '../../models/Transaction';
-import { TransactionUtils } from '../../utils/TransactionUtils';
+
+import ModalPopup from '../../../components/ModalPopup/ModalPopup';
+import { walletService } from '../../../service/WalletService';
+import SuccessModalPopup from '../../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
+import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
+import { secretStoreService } from '../../../storage/SecretStoreService';
+import { scaledBalance, UserAsset } from '../../../models/UserAsset';
+import { Session } from '../../../models/Session';
+import { ledgerIsExpertModeState } from '../../../recoil/atom';
+import { BroadCastResult } from '../../../models/Transaction';
+import { TransactionUtils } from '../../../utils/TransactionUtils';
 import {
   adjustedTransactionAmount,
   fromScientificNotation,
   getCurrentMinAssetAmount,
   getNormalScaleAmount,
-} from '../../utils/NumberUtils';
-import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
-import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+} from '../../../utils/NumberUtils';
+import { FIXED_DEFAULT_FEE } from '../../../config/StaticConfig';
+import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 import {
   AnalyticsActions,
   AnalyticsCategory,
   AnalyticsService,
   AnalyticsTxType,
-} from '../../service/analytics/AnalyticsService';
+} from '../../../service/analytics/AnalyticsService';
 
-const { Header, Content, Footer } = Layout;
-const { Option } = Select;
 const layout = {};
 const tailLayout = {};
 
-const FormSend = () => {
+interface FormSendProps {
+  walletAsset: UserAsset | undefined;
+  setWalletAsset: React.Dispatch<React.SetStateAction<UserAsset | undefined>>;
+  currentSession: Session;
+}
+
+const FormSend: React.FC<FormSendProps> = props => {
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({ recipientAddress: '', amount: '', memo: '' });
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
@@ -55,13 +52,11 @@ const FormSend = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [availableBalance, setAvailableBalance] = useState('--');
-  const [selectedAsset, setSelectedAsset] = useState('0'); // CRO / TCRO as default
-  const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
-  const [currentSession, setCurrentSession] = useRecoilState(sessionState);
-  const walletAllAssets = useRecoilValue(walletAllAssetsState);
-  const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const didMountRef = useRef(false);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { walletAsset, setWalletAsset, currentSession } = props;
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -78,7 +73,7 @@ const FormSend = () => {
     setInputPasswordVisible(false);
     const transferInputAmount = adjustedTransactionAmount(
       form.getFieldValue('amount'),
-      walletAsset,
+      walletAsset!,
       currentSession.wallet.config.fee !== undefined &&
         currentSession.wallet.config.fee.networkFee !== undefined
         ? currentSession.wallet.config.fee.networkFee
@@ -117,13 +112,10 @@ const FormSend = () => {
     }
     try {
       setConfirmLoading(true);
-      // eslint-disable-next-line no-console
-      console.log('SELECTED_ASSET', { active: currentSession.activeAsset, walletAsset });
-
       const sendResult = await walletService.sendTransfer({
         toAddress: formValues.recipientAddress,
         amount: formValues.amount,
-        asset: currentSession.activeAsset || walletAsset,
+        asset: walletAsset!,
         memo,
         decryptedPhrase,
         walletType,
@@ -143,8 +135,8 @@ const FormSend = () => {
       setConfirmLoading(false);
       setIsSuccessTransferModalVisible(true);
       setInputPasswordVisible(false);
-      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
-      setWalletAsset(currentWalletAsset);
+      //   const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      //   setWalletAsset(currentWalletAsset);
 
       form.resetFields();
     } catch (e) {
@@ -174,15 +166,14 @@ const FormSend = () => {
     setIsErrorTransferModalVisible(false);
   };
 
-  const currentMinAssetAmount = getCurrentMinAssetAmount(walletAllAssets[selectedAsset]);
+  const currentMinAssetAmount = getCurrentMinAssetAmount(walletAsset!);
   const maximumSendAmount = availableBalance;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const customAddressValidator = TransactionUtils.addressValidator(
-    currentSession,
-    walletAsset,
-    AddressType.USER,
-  );
+  //   const customAddressValidator = TransactionUtils.addressValidator(
+  //     currentSession,
+  //     walletAsset!,
+  //     AddressType.USER,
+  //   );
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
   const customMaxValidator = TransactionUtils.maxValidator(
     maximumSendAmount,
@@ -191,13 +182,13 @@ const FormSend = () => {
   const customMinValidator = TransactionUtils.minValidator(
     fromScientificNotation(currentMinAssetAmount),
     `${t('send.formSend.amount.error2')} ${fromScientificNotation(currentMinAssetAmount)} ${
-      walletAllAssets[selectedAsset].symbol
+      walletAsset?.symbol
     }`,
   );
 
   useEffect(() => {
-    setAvailableBalance(scaledBalance(walletAllAssets[selectedAsset]));
-  }, [walletAllAssets, selectedAsset]);
+    setAvailableBalance(scaledBalance(walletAsset!));
+  }, [walletAsset]);
 
   return (
     <Form
@@ -207,10 +198,8 @@ const FormSend = () => {
       name="control-ref"
       onFinish={showPasswordInput}
       requiredMark={false}
+      className="form-send"
     >
-      {/* <div className="sender">Sender Address</div> */}
-      {/* <div className="sender">{currentSession.wallet.address}</div> */}
-
       <Form.Item
         name="recipientAddress"
         label={t('send.formSend.recipientAddress.label')}
@@ -221,36 +210,11 @@ const FormSend = () => {
             required: true,
             message: `${t('send.formSend.recipientAddress.label')} ${t('general.required')}`,
           },
-          // customAddressValidator,
+          //   customAddressValidator,
         ]}
       >
         <Input placeholder={t('send.formSend.recipientAddress.placeholder')} />
       </Form.Item>
-      {isIbcVisible ? (
-        <Form.Item name="selectedAsset" label="Select Asset">
-          <Select
-            value={selectedAsset}
-            onChange={value => {
-              setSelectedAsset(value);
-              setCurrentSession({
-                ...currentSession,
-                activeAsset: walletAllAssets[value],
-              });
-              setWalletAsset(walletAllAssets[value]);
-            }}
-          >
-            {walletAllAssets.map((item, idx) => {
-              return (
-                <Option key={idx} value={idx.toString()}>
-                  {item.symbol}
-                </Option>
-              );
-            })}
-          </Select>
-        </Form.Item>
-      ) : (
-        <></>
-      )}
       <div className="amount">
         <Form.Item
           name="amount"
@@ -276,7 +240,7 @@ const FormSend = () => {
         <div className="available">
           <span>{t('general.available')}: </span>
           <div className="available-amount">
-            {availableBalance} {walletAllAssets[selectedAsset].symbol}
+            {availableBalance} {walletAsset?.symbol}
           </div>
         </div>
       </div>
@@ -315,8 +279,7 @@ const FormSend = () => {
             <div className="description">{t('send.modal1.description')}</div>
             <div className="item">
               <div className="label">{t('send.modal1.label1')}</div>
-              <div className="address">{`${currentSession.activeAsset?.address ||
-                currentSession.wallet.address}`}</div>
+              <div className="address">{`${currentSession.wallet.address}`}</div>
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label2')}</div>
@@ -324,7 +287,7 @@ const FormSend = () => {
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label3')}</div>
-              <div>{`${formValues?.amount} ${walletAllAssets[selectedAsset].symbol}`}</div>
+              <div>{`${formValues?.amount} ${walletAsset?.symbol}`}</div>
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label4')}</div>
@@ -333,8 +296,8 @@ const FormSend = () => {
                   currentSession.wallet.config.fee.networkFee !== undefined
                   ? currentSession.wallet.config.fee.networkFee
                   : FIXED_DEFAULT_FEE,
-                walletAllAssets[selectedAsset],
-              )} ${walletAllAssets[selectedAsset].symbol}`}</div>
+                walletAsset!,
+              )} ${walletAsset?.symbol}`}</div>
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label5')}</div>
@@ -424,23 +387,4 @@ const FormSend = () => {
   );
 };
 
-const SendPage = () => {
-  const [t] = useTranslation();
-
-  return (
-    <Layout className="site-layout">
-      <Header className="site-layout-background">{t('send.title')}</Header>
-      <div className="header-description">{t('send.description')}</div>
-      <Content>
-        <div className="site-layout-background send-content">
-          <div className="container">
-            <FormSend />
-          </div>
-        </div>
-      </Content>
-      <Footer />
-    </Layout>
-  );
-};
-
-export default SendPage;
+export default FormSend;

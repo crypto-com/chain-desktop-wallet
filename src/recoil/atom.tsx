@@ -89,6 +89,11 @@ const isIbcVisibleState = atom<boolean>({
   default: false,
 });
 
+const navbarMenuSelectedKeyState = atom<string>({
+  key: 'navbarMenuSelectedKey',
+  default: '/home',
+});
+
 const hasShownWarningOnWalletTypeState = atom<boolean>({
   key: 'hasShownWarningOnWalletTypeState',
   default: false,
@@ -115,6 +120,7 @@ export {
   validatorListState,
   nftListState,
   isIbcVisibleState,
+  navbarMenuSelectedKeyState,
   hasShownWarningOnWalletTypeState,
   ledgerIsExpertModeState,
   fetchingDBState,

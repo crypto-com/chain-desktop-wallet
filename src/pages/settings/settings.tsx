@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
 import {
@@ -16,15 +16,16 @@ import {
   Divider,
   Select,
   Carousel,
+  Avatar,
   notification,
 } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { CarouselRef } from 'antd/lib/carousel';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { sessionState, walletListState } from '../../recoil/atom';
+import { sessionState, walletListState, walletAllAssetsState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import {
@@ -34,6 +35,7 @@ import {
   SettingsDataUpdate,
 } from '../../models/Wallet';
 import { Session } from '../../models/Session';
+// import { UserAsset } from '../../models/UserAsset';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
@@ -58,14 +60,17 @@ const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
 
-const GeneralSettingsForm = () => {
+const GeneralSettingsForm = props => {
   const [session, setSession] = useRecoilState(sessionState);
+  const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [enabledGeneralSettings, setEnabledGeneralSettings] = useState<boolean>(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
 
   const [t] = useTranslation();
+
+  const { currentAssetIdentifier, setCurrentAssetIdentifier } = props;
 
   useEffect(() => {
     let unmounted = false;
@@ -113,8 +118,35 @@ const GeneralSettingsForm = () => {
     setUpdateLoading(false);
   }
 
+  const assetIcon = asset => {
+    const { icon_url, symbol } = asset;
+
+    return icon_url ? (
+      <img src={icon_url} alt="cronos" className="asset-icon" />
+    ) : (
+      <Avatar>{symbol[0].toUpperCase()}</Avatar>
+    );
+  };
+
+  const onSwitchAsset = value => {
+    setCurrentAssetIdentifier(value!.toString());
+  };
+
   return (
     <>
+      <div className="title">{t('settings.form1.assetIdentifier.label')}</div>
+      <div className="description">{t('settings.form1.assetIdentifier.description')}</div>
+      <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
+        {walletAllAssets.map(asset => {
+          return (
+            <Option value={asset.identifier.toString()} key={asset.identifier.toString()}>
+              {assetIcon(asset)}
+              {`${asset.name} (${asset.symbol})`}
+            </Option>
+          );
+        })}
+      </Select>
+      <Divider />
       <Form.Item
         name="nodeUrl"
         label={t('settings.form1.nodeUrl.label')}
@@ -407,7 +439,11 @@ function MetaInfoComponent() {
             </div> */}
             <Select style={{ width: 240 }} onChange={onSwitchLanguage} value={defaultLanguageState}>
               {SUPPORTED_LANGUAGE.map(item => {
-                return <Option value={item.value}>{item.label}</Option>;
+                return (
+                  <Option value={item.value} key={item.value}>
+                    {item.label}
+                  </Option>
+                );
               })}
             </Select>
           </div>
@@ -555,10 +591,14 @@ const FormSettings = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
   const [isConfirmClearVisible, setIsConfirmClearVisible] = useState(false);
+  const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [session, setSession] = useRecoilState(sessionState);
+  const walletAllAssets = useRecoilValue(walletAllAssetsState);
+
   const defaultSettings = session.wallet.config;
   const didMountRef = useRef(false);
   const history = useHistory();
+  const locationState: any = useLocation().state;
 
   const setWalletList = useSetRecoilState(walletListState);
 
@@ -568,6 +608,10 @@ const FormSettings = () => {
   let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
 
   useEffect(() => {
+    setCurrentAssetIdentifier(
+      locationState ? locationState.currentAsset.identifier : walletAllAssets[0].identifier,
+    );
+
     if (!didMountRef.current) {
       didMountRef.current = true;
 
@@ -586,7 +630,7 @@ const FormSettings = () => {
         gasLimit,
       });
     }
-  }, [form, defaultSettings]);
+  }, [form, defaultSettings, walletAllAssets]);
 
   const onFinish = async values => {
     const defaultGasLimit =
@@ -604,6 +648,7 @@ const FormSettings = () => {
       // No value was updated, we stop here
       return;
     }
+
     setIsButtonLoading(true);
     const settingsDataUpdate: SettingsDataUpdate = {
       walletId: session.wallet.identifier,
@@ -614,6 +659,8 @@ const FormSettings = () => {
       gasLimit: String(values.gasLimit),
     };
 
+    // TO-DO: currentAssetIdentifier shall be passed to updateWalletNodeConfig()
+    // await walletService.updateWalletNodeConfig(settingsDataUpdate, currentAssetIdentifier);
     await walletService.updateWalletNodeConfig(settingsDataUpdate);
     const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
     const newSession = new Session(updatedWallet);
@@ -676,7 +723,10 @@ const FormSettings = () => {
         <TabPane tab={t('settings.tab1')} key="1">
           <div className="site-layout-background settings-content">
             <div className="container">
-              <GeneralSettingsForm />
+              <GeneralSettingsForm
+                currentAssetIdentifier={currentAssetIdentifier}
+                setCurrentAssetIdentifier={setCurrentAssetIdentifier}
+              />
               <Form.Item {...tailLayout} className="button">
                 <Button type="primary" htmlType="submit" loading={isButtonLoading}>
                   {t('general.save')}
