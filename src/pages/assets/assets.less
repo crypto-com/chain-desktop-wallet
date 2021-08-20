@@ -1,10 +1,9 @@
-.receive-content {
+.assets-content {
   position: relative;
   padding: 24px;
-
   .container {
     // max-width: 500px;
-    text-align: left;
+    text-align: center;
 
     .ant-table-row {
       cursor: pointer;
@@ -23,18 +22,58 @@
       }
     }
 
+    .ant-tabs-nav {
+      margin: 0 0 20px 0;
+    }
+
     .asset-detail {
-      max-width: 600px;
+      // max-width: 600px;
       background: #fff;
 
       > .ant-layout-content {
         margin-top: 32px;
       }
 
-      .back-button {
-        margin: 24px 0;
+      .detail-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: -24px;
+        .back-button {
+          position: relative;
+          // margin: 24px 0;
+          top: 0;
+        }
+        .anticon {
+          font-size: 20px;
+        }
       }
 
+      .detail-container {
+        margin: 20px 0;
+        text-align: center;
+        .asset-icon {
+          height: 120px;
+          margin-bottom: 20px;
+          // margin-right: 10px;
+        }
+        .ant-avatar {
+          width: 120px;
+          height: 120px;
+          margin-right: 10px;
+          color: #1199fa;
+          font-size: 60px;
+          line-height: 120px;
+          background-color: #e4f4ff;
+        }
+        .balance {
+          font-size: 24px;
+        }
+        .value {
+          color: @azure;
+          font-size: 16px;
+        }
+      }
       .title {
         display: flex;
         align-items: center;
@@ -92,5 +131,12 @@
         }
       }
     }
+  }
+}
+
+.moreDropdown {
+  min-width: 200px;
+  li {
+    font-size: 16px;
   }
 }
