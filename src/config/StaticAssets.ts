@@ -7,13 +7,13 @@ import { Network } from './StaticConfig';
 // Every created wallet get initialized with a new CRO asset
 export const CRO_ASSET = (network: Network) => {
   const assetSymbol = network.coin.croDenom.toString().toUpperCase();
+  const isTestnet = [CroNetwork.TestnetCroeseid3, CroNetwork.Testnet].includes(network);
 
   const config: UserAssetConfig = {
-    addressValidationRegex: '',
-    validatorAddressRegex: '',
+    explorerUrl: isTestnet ? 'https://crypto.org/explorer/croeseid' : 'https://crypto.org/explorer',
     chainId: network.chainId,
-    fee: { gasLimit: '', networkFee: '' },
-    indexingUrl: '',
+    fee: { gasLimit: '300_000', networkFee: '10_000' },
+    indexingUrl: 'https://crypto.org/explorer/croeseid/api/v1/',
     isLedgerSupportDisabled: true,
     isStakingDisabled: true,
     nodeUrl: network.defaultNodeUrl,
@@ -39,16 +39,12 @@ export const CRO_ASSET = (network: Network) => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CRONOS_ASSET = (network: Network) => {
-  const DEFAULT_GAS_PRICE = 20_000_000_000; // 20 GWEI
-  const DEFAULT_GAS_LIMIT = 21_000; // 20 GWEI
-
   const isTestnet = [CroNetwork.TestnetCroeseid3, CroNetwork.Testnet].includes(network);
 
   const config: UserAssetConfig = {
-    addressValidationRegex: '^(0x){1}[0-9a-fA-F]{40}$',
-    validatorAddressRegex: '',
+    explorerUrl: 'https://cronos-explorer.crypto.org/',
     chainId: isTestnet ? '338' : 'TO_BE_DECIDED',
-    fee: { gasLimit: `${DEFAULT_GAS_LIMIT}`, networkFee: `${DEFAULT_GAS_PRICE}` },
+    fee: { gasLimit: `21_000`, networkFee: `20_000_000_000` },
     indexingUrl: isTestnet ? 'https://cronos-explorer.crypto.org/api' : 'TO_BE_DECIDED',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
