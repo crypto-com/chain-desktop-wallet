@@ -1,11 +1,9 @@
 import Big from 'big.js';
-import {
-  AddressType,
-  AddressValidator,
-} from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
+import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { Session } from '../models/Session';
 import { UserAsset } from '../models/UserAsset';
 import i18n from '../language/I18n';
+import { AssetAddressValidator } from '../service/AssetAddressValidator';
 
 export class TransactionUtils {
   public static addressValidator(
@@ -15,19 +13,21 @@ export class TransactionUtils {
   ) {
     const addressType =
       type === AddressType.VALIDATOR ? i18n.t('general.validator') : i18n.t('general.receiving');
+
     return () => ({
       validator(rule, value) {
         const reason = `${i18n.t('general.addressValidator.reason1')} ${
           walletAsset.symbol
         } ${addressType} ${i18n.t('general.addressValidator.reason2')}`;
-        try {
-          const addressValidator = new AddressValidator({
-            address: value,
-            network: currentSession.wallet.config.network,
-            type,
-          });
 
-          if (addressValidator.isValid()) {
+        const addressValidator = new AssetAddressValidator(
+          value,
+          currentSession.wallet.config,
+          walletAsset.assetType,
+        );
+
+        try {
+          if (addressValidator.validate(type)) {
             return Promise.resolve();
           }
 

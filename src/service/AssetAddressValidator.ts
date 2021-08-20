@@ -11,16 +11,17 @@ export class AssetAddressValidator {
 
   private readonly config: WalletConfig;
 
-  private readonly assetType: UserAssetType;
+  private readonly assetType?: UserAssetType;
 
-  constructor(address: string, config: WalletConfig, assetType: UserAssetType) {
+  constructor(address: string, config: WalletConfig, assetType?: UserAssetType) {
     this.address = address;
     this.config = config;
     this.assetType = assetType;
   }
 
-  public validate(addressType: AddressType) {
+  public validate(addressType: AddressType): boolean {
     switch (this.assetType) {
+      case undefined:
       case UserAssetType.TENDERMINT:
       case UserAssetType.IBC: {
         const addressValidator = new AddressValidator({
