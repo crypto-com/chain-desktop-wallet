@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
 import {
@@ -139,7 +139,20 @@ const GeneralSettingsForm = props => {
       <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
         {walletAllAssets.map(asset => {
           return (
-            <Option value={asset.identifier.toString()} key={asset.identifier.toString()}>
+            <Option
+              value={asset.identifier.toString()}
+              key={asset.identifier.toString()}
+              onClick={async () => {
+                setSession({
+                  ...session,
+                  activeAsset: asset,
+                });
+                await walletService.setCurrentSession({
+                  ...session,
+                  activeAsset: asset,
+                });
+              }}
+            >
               {assetIcon(asset)}
               {`${asset.name} (${asset.symbol})`}
             </Option>
@@ -598,7 +611,6 @@ const FormSettings = () => {
   const defaultSettings = session.wallet.config;
   const didMountRef = useRef(false);
   const history = useHistory();
-  const locationState: any = useLocation().state;
 
   const setWalletList = useSetRecoilState(walletListState);
 
@@ -608,9 +620,7 @@ const FormSettings = () => {
   let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
 
   useEffect(() => {
-    setCurrentAssetIdentifier(
-      locationState ? locationState.currentAsset.identifier : walletAllAssets[0].identifier,
-    );
+    setCurrentAssetIdentifier(session.activeAsset?.identifier);
 
     if (!didMountRef.current) {
       didMountRef.current = true;

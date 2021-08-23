@@ -151,10 +151,8 @@ const AssetsPage = () => {
         <Link
           to={{
             pathname: '/settings',
-            state: {
-              currentAsset,
-            },
           }}
+          onClick={() => setNavbarMenuSelectedKey('/settings')}
         >
           {t('assets.moreMenu.nodeConfiguration')}
         </Link>
