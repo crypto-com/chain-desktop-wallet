@@ -94,19 +94,30 @@ const AssetsPage = () => {
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
 
-  const locationState: any = useLocation().state;
-
   const [t] = useTranslation();
+
+  const locationState: any = useLocation().state ?? {
+    from: '',
+    identifier: '',
+  };
+
+  const getDefaultAssetTab = (_locationState, _navbarMenuSelectedKey) => {
+    if (_locationState.from === '/home' && _locationState.identifier) {
+      return '1';
+    }
+    if (_navbarMenuSelectedKey === '/send') {
+      return '2';
+    }
+    return '3';
+  };
 
   useEffect(() => {
     if (!didMountRef.current) {
-      if (locationState) {
-        if (locationState.from === '/home' && locationState.identifier) {
-          for (let i = 0; i < walletAllAssets.length; i++) {
-            if (walletAllAssets[i].identifier === locationState.identifier) {
-              setCurrentAsset(walletAllAssets[i]);
-              setIsAssetVisible(true);
-            }
+      if (locationState.from === '/home' && locationState.identifier) {
+        for (let i = 0; i < walletAllAssets.length; i++) {
+          if (walletAllAssets[i].identifier === locationState.identifier) {
+            setCurrentAsset(walletAllAssets[i]);
+            setIsAssetVisible(true);
           }
         }
       }
@@ -319,7 +330,7 @@ const AssetsPage = () => {
                   </div>
 
                   <Tabs
-                    defaultActiveKey={navbarMenuSelectedKey === '/send' ? '2' : '3'}
+                    defaultActiveKey={getDefaultAssetTab(locationState, navbarMenuSelectedKey)}
                     onTabClick={key => {
                       if (key === '2') {
                         setNavbarMenuSelectedKey('/send');
