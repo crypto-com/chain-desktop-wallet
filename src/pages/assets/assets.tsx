@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
@@ -77,12 +77,7 @@ const convertTransfers = (
   });
 };
 
-// interface AssetPageProps {
-//   defaultTab: string;
-// }
-
 const AssetsPage = () => {
-  // const AssetsPage: React.FC<AssetPageProps> = props => {
   const session: Session = useRecoilValue<Session>(sessionState);
   // const userAsset = useRecoilValue(walletAssetState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
@@ -94,14 +89,27 @@ const AssetsPage = () => {
   const [currentAsset, setCurrentAsset] = useState<UserAsset>();
   const [isAssetVisible, setIsAssetVisible] = useState(false);
   const [allTransfer, setAllTransfer] = useState<any>();
+
   // const [defaultWalletAsset, setdefaultWalletAsset] = useState<UserAsset>();
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
+
+  const locationState: any = useLocation().state;
 
   const [t] = useTranslation();
 
   useEffect(() => {
     if (!didMountRef.current) {
+      if (locationState) {
+        if (locationState.from === '/home' && locationState.identifier) {
+          for (let i = 0; i < walletAllAssets.length; i++) {
+            if (walletAllAssets[i].identifier === locationState.identifier) {
+              setCurrentAsset(walletAllAssets[i]);
+              setIsAssetVisible(true);
+            }
+          }
+        }
+      }
       didMountRef.current = true;
       analyticsService.logPage('Assets');
     }
