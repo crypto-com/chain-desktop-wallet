@@ -16,7 +16,7 @@ const wallet = new Wallet(
   NORMAL_WALLET_TYPE,
   0, // addressIndex default
 );
-const asset: UserAsset = {
+const defaultAsset: UserAsset = {
   identifier: '',
   symbol: 'CRO',
   mainnetSymbol: 'CRO',
@@ -29,7 +29,7 @@ const asset: UserAsset = {
   decimals: 1,
 };
 
-const session = new Session(wallet, asset, 'USD');
+const session = new Session(wallet, defaultAsset, 'USD');
 
 const market: AssetMarketPrice = {
   assetSymbol: 'CRO',
@@ -55,12 +55,12 @@ const marketState = atom({
 
 const walletAssetState = atom({
   key: 'walletAsset',
-  default: asset,
+  default: defaultAsset,
 });
 
 const walletAllAssetsState = atom({
   key: 'walletAllAssets',
-  default: [asset],
+  default: [defaultAsset],
 });
 
 const walletListState = atom({

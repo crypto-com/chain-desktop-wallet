@@ -153,7 +153,7 @@ const isWalletNotLive = (config: WalletConfig) => {
 };
 
 const HomePage = () => {
-  const currentSession = useRecoilValue(sessionState);
+  const [currentSession, setCurrentSession] = useRecoilState(sessionState);
   // const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
@@ -723,14 +723,21 @@ const HomePage = () => {
                 pagination={false}
                 onRow={selectedAsset => {
                   return {
-                    onClick: () => {
-                      // console.log('selectedAsset.identifier',selectedAsset.identifier)
+                    onClick: async () => {
                       setNavbarMenuSelectedKey('/send');
+                      setFetchingDB(true);
+                      setCurrentSession({
+                        ...currentSession,
+                        activeAsset: selectedAsset,
+                      });
+                      await walletService.setCurrentSession({
+                        ...currentSession,
+                        activeAsset: selectedAsset,
+                      });
                       history.push({
                         pathname: '/send',
                         state: {
                           from: '/home',
-                          identifier: selectedAsset.identifier,
                         },
                       });
                     }, // click row
