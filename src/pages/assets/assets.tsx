@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import './assets.less';
@@ -13,6 +13,7 @@ import {
   // walletAssetState,
   walletAllAssetsState,
   navbarMenuSelectedKeyState,
+  fetchingDBState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { getAssetBalancePrice, UserAsset } from '../../models/UserAsset';
@@ -78,15 +79,17 @@ const convertTransfers = (
 };
 
 const AssetsPage = () => {
-  const session: Session = useRecoilValue<Session>(sessionState);
+  const [session, setSession] = useRecoilState<Session>(sessionState);
   // const userAsset = useRecoilValue(walletAssetState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const marketData = useRecoilValue(marketState);
   const [navbarMenuSelectedKey, setNavbarMenuSelectedKey] = useRecoilState(
     navbarMenuSelectedKeyState,
   );
+  const setFetchingDB = useSetRecoilState(fetchingDBState);
+
   // const [isLedger, setIsLedger] = useState(false);
-  const [currentAsset, setCurrentAsset] = useState<UserAsset>();
+  const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(session.activeAsset);
   const [isAssetVisible, setIsAssetVisible] = useState(false);
   const [allTransfer, setAllTransfer] = useState<any>();
 
@@ -94,22 +97,39 @@ const AssetsPage = () => {
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
 
-  const locationState: any = useLocation().state;
-
   const [t] = useTranslation();
 
+  const locationState: any = useLocation().state ?? {
+    from: '',
+    identifier: '',
+  };
+
+  const getDefaultAssetTab = (_locationState, _navbarMenuSelectedKey) => {
+    if (_locationState.from === '/home' && session.activeAsset) {
+      return '1';
+    }
+    if (_navbarMenuSelectedKey === '/send') {
+      return '2';
+    }
+    return '3';
+  };
+
   useEffect(() => {
-    if (!didMountRef.current) {
-      if (locationState) {
-        if (locationState.from === '/home' && locationState.identifier) {
-          for (let i = 0; i < walletAllAssets.length; i++) {
-            if (walletAllAssets[i].identifier === locationState.identifier) {
-              setCurrentAsset(walletAllAssets[i]);
-              setIsAssetVisible(true);
-            }
-          }
-        }
+    const checkDirectedFrom = async () => {
+      if (locationState.from === '/home' && session.activeAsset) {
+        const transfers = await walletService.retrieveAllTransfers(
+          session.wallet.identifier,
+          session.activeAsset,
+        );
+        setAllTransfer(convertTransfers(transfers, walletAllAssets, session, session.activeAsset));
+        setCurrentAsset(session.activeAsset);
+        setIsAssetVisible(true);
+        setFetchingDB(false);
       }
+    };
+
+    if (!didMountRef.current) {
+      checkDirectedFrom();
       didMountRef.current = true;
       analyticsService.logPage('Assets');
     }
@@ -131,10 +151,8 @@ const AssetsPage = () => {
         <Link
           to={{
             pathname: '/settings',
-            state: {
-              currentAsset,
-            },
           }}
+          onClick={() => setNavbarMenuSelectedKey('/settings')}
         >
           {t('assets.moreMenu.nodeConfiguration')}
         </Link>
@@ -319,7 +337,7 @@ const AssetsPage = () => {
                   </div>
 
                   <Tabs
-                    defaultActiveKey={navbarMenuSelectedKey === '/send' ? '2' : '3'}
+                    defaultActiveKey={getDefaultAssetTab(locationState, navbarMenuSelectedKey)}
                     onTabClick={key => {
                       if (key === '2') {
                         setNavbarMenuSelectedKey('/send');
@@ -361,6 +379,14 @@ const AssetsPage = () => {
                 onRow={selectedAsset => {
                   return {
                     onClick: async () => {
+                      setSession({
+                        ...session,
+                        activeAsset: selectedAsset,
+                      });
+                      await walletService.setCurrentSession({
+                        ...session,
+                        activeAsset: selectedAsset,
+                      });
                       const transfers = await walletService.retrieveAllTransfers(
                         session.wallet.identifier,
                         selectedAsset,
