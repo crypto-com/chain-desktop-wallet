@@ -512,8 +512,6 @@ const HomePage = () => {
   };
 
   const checkNewlyAddedStaticAssets = (session: Session) => {
-    // eslint-disable-next-line no-console
-    console.log('checkNewlyAddedStaticAssets session', session);
     setTimeout(async () => {
       if (await walletService.checkIfWalletNeedAssetCreation(session)) {
         const newAssetAddedNotificationKey = 'newAssetAddedNotificationKey';

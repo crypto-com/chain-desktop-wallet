@@ -1379,7 +1379,6 @@ class WalletService {
     return existingStaticAssets.length < STATIC_ASSET_COUNT;
   }
 
-  // eslint-disable-next-line class-methods-use-this
   public async handleCurrentWalletAssetsMigration(phrase: string, session?: Session) {
     // 1. Check if current wallet has all expected static assets
     // 2. If static assets are missing, remove all existing non dynamic assets
