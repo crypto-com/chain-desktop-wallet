@@ -1370,9 +1370,11 @@ class WalletService {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public async handleAssetMigration() {
+  public async handleCurrentWalletAssetsMigration() {
     // 1. Check if current wallet has all expected static assets
-    // 2. If static assets are missing, remove all existing non dynamic assets and re-create static assets on the fly
+    // 2. If static assets are missing, remove all existing non dynamic assets
+    // 3. Prompt user password and re-create static assets on the fly
+    // 3. Run sync all to synchronize all assets states
   }
 
   public async loadLatestProposalTally(proposalID: string): Promise<FinalTallyResult | null> {
