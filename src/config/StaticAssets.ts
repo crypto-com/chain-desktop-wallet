@@ -1,8 +1,11 @@
 // Every created wallet get initialized with a new CRO asset
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import { getRandomId } from '../crypto/RandomGen';
-import { UserAssetConfig, UserAssetType } from '../models/UserAsset';
+import { AssetCreationType, UserAssetConfig, UserAssetType } from '../models/UserAsset';
 import { Network } from './StaticConfig';
+
+// This will be used later for asset recreation/migration
+export const STATIC_ASSET_COUNT = 2;
 
 // Every created wallet get initialized with a new CRO asset
 export const CRO_ASSET = (network: Network) => {
@@ -33,6 +36,7 @@ export const CRO_ASSET = (network: Network) => {
     decimals: 8,
     assetType: UserAssetType.TENDERMINT,
     isSecondaryAsset: false,
+    assetCreationType: AssetCreationType.STATIC,
     config,
   };
 };
@@ -64,6 +68,7 @@ export const CRONOS_ASSET = (network: Network) => {
     decimals: 18,
     assetType: UserAssetType.EVM,
     isSecondaryAsset: true,
+    assetCreationType: AssetCreationType.STATIC,
     config,
   };
 };

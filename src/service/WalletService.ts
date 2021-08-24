@@ -1369,6 +1369,12 @@ class WalletService {
     }
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  public async handleAssetMigration() {
+    // 1. Check if current wallet has all expected static assets
+    // 2. If static assets are missing, remove all existing non dynamic assets and re-create static assets on the fly
+  }
+
   public async loadLatestProposalTally(proposalID: string): Promise<FinalTallyResult | null> {
     const currentSession = await this.storageService.retrieveCurrentSession();
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
