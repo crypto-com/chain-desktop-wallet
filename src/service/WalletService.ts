@@ -1376,9 +1376,6 @@ class WalletService {
       AssetCreationType.STATIC,
       wallet.identifier,
     );
-    // eslint-disable-next-line no-console
-    console.log('existingStaticAssets', existingStaticAssets);
-
     return existingStaticAssets.length < STATIC_ASSET_COUNT;
   }
 

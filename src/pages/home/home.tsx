@@ -46,6 +46,8 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import IconTick from '../../svg/IconTick';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 import { Session } from '../../models/Session';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import { secretStoreService } from '../../storage/SecretStoreService';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -491,7 +493,27 @@ const HomePage = () => {
     }, 200);
   };
 
+  const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
+
+  const onWalletDecryptFinish = async (password: string) => {
+    setFetchingDB(true);
+    setInputPasswordVisible(false);
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      currentSession.wallet.identifier,
+    );
+
+    await walletService.handleCurrentWalletAssetsMigration(phraseDecrypted, currentSession);
+    setFetchingDB(false);
+  };
+
+  const showPasswordInput = () => {
+    setInputPasswordVisible(true);
+  };
+
   const checkNewlyAddedStaticAssets = (session: Session) => {
+    // eslint-disable-next-line no-console
+    console.log('checkNewlyAddedStaticAssets session', session);
     setTimeout(async () => {
       if (await walletService.checkIfWalletNeedAssetCreation(session)) {
         const newAssetAddedNotificationKey = 'newAssetAddedNotificationKey';
@@ -502,6 +524,7 @@ const HomePage = () => {
             size="small"
             className="btn-restart"
             onClick={() => {
+              showPasswordInput();
               notification.close(newAssetAddedNotificationKey);
             }}
             style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
@@ -519,7 +542,7 @@ const HomePage = () => {
           btn: createNewlyAddedAssets,
         });
       }
-    }, 6_000);
+    }, 12_000);
   };
 
   const onSyncAndRefreshBtnCall = async () => {
@@ -676,6 +699,28 @@ const HomePage = () => {
 
   return (
     <Layout className="site-layout">
+      <PasswordFormModal
+        description={t('general.passwordFormModal.description')}
+        okButtonText={t('general.passwordFormModal.okButton')}
+        onCancel={() => {
+          setInputPasswordVisible(false);
+        }}
+        onSuccess={onWalletDecryptFinish}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          return {
+            valid: isValid,
+            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
+          };
+        }}
+        successText={t('general.passwordFormModal.success')}
+        title={t('general.passwordFormModal.title')}
+        visible={inputPasswordVisible}
+        successButtonText={t('general.continue')}
+        confirmPassword={false}
+        repeatValidation
+      />
+
       <Header className="site-layout-background">
         {t('home.title')}
         <SyncOutlined

@@ -7,10 +7,17 @@ import { Network } from './StaticConfig';
 // This will be used later for asset recreation/migration
 export const STATIC_ASSET_COUNT = 2;
 
+const checkIfTestnet = (network: Network) => {
+  return (
+    [CroNetwork.TestnetCroeseid3, CroNetwork.Testnet].includes(network) ||
+    network.defaultNodeUrl.includes('testnet')
+  );
+};
+
 // Every created wallet get initialized with a new CRO asset
 export const CRO_ASSET = (network: Network) => {
   const assetSymbol = network.coin.croDenom.toString().toUpperCase();
-  const isTestnet = [CroNetwork.TestnetCroeseid3, CroNetwork.Testnet].includes(network);
+  const isTestnet = checkIfTestnet(network);
 
   const config: UserAssetConfig = {
     explorerUrl: isTestnet ? 'https://crypto.org/explorer/croeseid' : 'https://crypto.org/explorer',
@@ -43,7 +50,7 @@ export const CRO_ASSET = (network: Network) => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CRONOS_ASSET = (network: Network) => {
-  const isTestnet = [CroNetwork.TestnetCroeseid3, CroNetwork.Testnet].includes(network);
+  const isTestnet = checkIfTestnet(network);
 
   const config: UserAssetConfig = {
     explorerUrl: 'https://cronos-explorer.crypto.org/',
