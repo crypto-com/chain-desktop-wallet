@@ -33,7 +33,7 @@ import {
 } from './signers/TransactionSupported';
 import { cryptographer } from '../crypto/Cryptographer';
 import { secretStoreService } from '../storage/SecretStoreService';
-import { AssetMarketPrice, UserAsset, UserAssetType } from '../models/UserAsset';
+import { AssetCreationType, AssetMarketPrice, UserAsset, UserAssetType } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
@@ -70,9 +70,10 @@ import {
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter, sleep } from '../utils/utils';
-import { WalletBuiltResult } from './WalletOps';
+import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { CronosClient } from './cronos/CronosClient';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
+import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -1366,6 +1367,35 @@ class WalletService {
       console.log('FAILED_LOADING NFT denom data', e);
 
       return null;
+    }
+  }
+
+  public async checkIfWalletNeedAssetCreation(session: Session) {
+    const { wallet } = session;
+    const existingStaticAssets = await this.storageService.fetchAssetByCreationType(
+      AssetCreationType.STATIC,
+      wallet.identifier,
+    );
+    return existingStaticAssets.length < STATIC_ASSET_COUNT;
+  }
+
+  public async handleCurrentWalletAssetsMigration(phrase: string, session?: Session) {
+    // 1. Check if current wallet has all expected static assets
+    // 2. If static assets are missing, remove all existing non dynamic assets
+    // 3. Prompt user password and re-create static assets on the fly
+    // 3. Run sync all to synchronize all assets states
+
+    const currentSession = session || (await this.storageService.retrieveCurrentSession());
+    const { wallet } = currentSession;
+
+    if (await this.checkIfWalletNeedAssetCreation(currentSession)) {
+      await this.storageService.removeWalletAssets(wallet.identifier);
+
+      const walletOps = new WalletOps();
+      const assetGeneration = walletOps.generate(wallet.config, wallet.identifier, phrase);
+
+      await this.saveAssets(assetGeneration.initialAssets);
+      await this.syncAll(new Session(wallet));
     }
   }
 

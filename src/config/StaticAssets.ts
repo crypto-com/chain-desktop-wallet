@@ -1,13 +1,23 @@
 // Every created wallet get initialized with a new CRO asset
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import { getRandomId } from '../crypto/RandomGen';
-import { UserAssetConfig, UserAssetType } from '../models/UserAsset';
+import { AssetCreationType, UserAssetConfig, UserAssetType } from '../models/UserAsset';
 import { Network } from './StaticConfig';
+
+// This will be used later for asset recreation/migration
+export const STATIC_ASSET_COUNT = 2;
+
+const checkIfTestnet = (network: Network) => {
+  return (
+    [CroNetwork.TestnetCroeseid3, CroNetwork.Testnet].includes(network) ||
+    network.defaultNodeUrl.includes('testnet')
+  );
+};
 
 // Every created wallet get initialized with a new CRO asset
 export const CRO_ASSET = (network: Network) => {
   const assetSymbol = network.coin.croDenom.toString().toUpperCase();
-  const isTestnet = [CroNetwork.TestnetCroeseid3, CroNetwork.Testnet].includes(network);
+  const isTestnet = checkIfTestnet(network);
 
   const config: UserAssetConfig = {
     explorerUrl: isTestnet ? 'https://crypto.org/explorer/croeseid' : 'https://crypto.org/explorer',
@@ -33,13 +43,14 @@ export const CRO_ASSET = (network: Network) => {
     decimals: 8,
     assetType: UserAssetType.TENDERMINT,
     isSecondaryAsset: false,
+    assetCreationType: AssetCreationType.STATIC,
     config,
   };
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CRONOS_ASSET = (network: Network) => {
-  const isTestnet = [CroNetwork.TestnetCroeseid3, CroNetwork.Testnet].includes(network);
+  const isTestnet = checkIfTestnet(network);
 
   const config: UserAssetConfig = {
     explorerUrl: 'https://cronos-explorer.crypto.org/',
@@ -64,6 +75,7 @@ export const CRONOS_ASSET = (network: Network) => {
     decimals: 18,
     assetType: UserAssetType.EVM,
     isSecondaryAsset: true,
+    assetCreationType: AssetCreationType.STATIC,
     config,
   };
 };
