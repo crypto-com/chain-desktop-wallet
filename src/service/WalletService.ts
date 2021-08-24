@@ -1395,7 +1395,12 @@ class WalletService {
       const assetGeneration = walletOps.generate(wallet.config, wallet.identifier, phrase);
 
       await this.saveAssets(assetGeneration.initialAssets);
-      await this.syncAll(new Session(wallet));
+
+      const activeAsset = assetGeneration.initialAssets[0];
+      const newSession = new Session(wallet, activeAsset);
+      await this.setCurrentSession(newSession);
+
+      await this.syncAll(newSession);
     }
   }
 

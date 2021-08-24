@@ -631,7 +631,10 @@ const FormSettings = () => {
   let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
 
   useEffect(() => {
-    setCurrentAssetIdentifier(session.activeAsset?.identifier);
+    const selectedIdentifier = walletAllAssets.find(
+      asset => asset.identifier === session.activeAsset?.identifier,
+    )?.identifier;
+    setCurrentAssetIdentifier(selectedIdentifier || walletAllAssets[0].identifier);
 
     if (defaultSettings.fee !== undefined) {
       networkFee = defaultSettings.fee.networkFee;
