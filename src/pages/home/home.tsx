@@ -649,12 +649,6 @@ const HomePage = () => {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
       const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
-      await walletService.IBCAssetsFetch(sessionData);
-
-      // const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
-      //   sessionData.wallet.identifier,
-      //   currentAsset,
-      // );
 
       const allNftTransfer: NftAccountTransactionData[] = await walletService.getAllNFTAccountTxs(
         sessionData,
@@ -667,12 +661,6 @@ const HomePage = () => {
 
       setdefaultWalletAsset(currentAsset);
 
-      // const transferTabularData = convertTransfers(
-      //   allTransfers,
-      //   walletAllAssets,
-      //   sessionData,
-      //   currentAsset,
-      // );
       const nftTransferTabularData = convertNftTransfers(allNftTransfer);
 
       showWalletStateNotification(currentSession.wallet.config);
