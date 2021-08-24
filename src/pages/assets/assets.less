@@ -74,6 +74,36 @@
           font-size: 16px;
         }
       }
+
+      .tab-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 400px;
+        margin: auto;
+        > div {
+          margin: auto;
+        }
+        .tab {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 48px;
+          height: 48px;
+          margin: auto;
+          color: @font-color;
+          font-size: 22px;
+          text-align: center;
+          background: @white;
+          border-radius: 22px;
+          cursor: pointer;
+          &.active {
+            color: @white;
+            background: @azure;
+          }
+        }
+      }
+
       .title {
         display: flex;
         align-items: center;
