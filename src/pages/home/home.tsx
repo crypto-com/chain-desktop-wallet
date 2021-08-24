@@ -45,6 +45,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 // import logoCro from '../../assets/AssetLogo/cro.png';
 import IconTick from '../../svg/IconTick';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
+import { Session } from '../../models/Session';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -490,6 +491,37 @@ const HomePage = () => {
     }, 200);
   };
 
+  const checkNewlyAddedStaticAssets = (session: Session) => {
+    setTimeout(async () => {
+      if (await walletService.checkIfWalletNeedAssetCreation(session)) {
+        const newAssetAddedNotificationKey = 'newAssetAddedNotificationKey';
+
+        const createNewlyAddedAssets = (
+          <Button
+            type="primary"
+            size="small"
+            className="btn-restart"
+            onClick={() => {
+              notification.close(newAssetAddedNotificationKey);
+            }}
+            style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+          >
+            Enable
+          </Button>
+        );
+
+        notification.info({
+          message: 'New Assets Available',
+          description: 'Do you want to enable the newly added assets ?',
+          duration: 15,
+          key: newAssetAddedNotificationKey,
+          placement: 'topRight',
+          btn: createNewlyAddedAssets,
+        });
+      }
+    }, 6_000);
+  };
+
   const onSyncAndRefreshBtnCall = async () => {
     setFetchingDB(true);
 
@@ -623,6 +655,8 @@ const HomePage = () => {
       const nftTransferTabularData = convertNftTransfers(allNftTransfer);
 
       showWalletStateNotification(currentSession.wallet.config);
+      checkNewlyAddedStaticAssets(currentSession);
+
       // setTransfers(transferTabularData);
       setNftTransfers(nftTransferTabularData);
       // setUserAsset(currentAsset);
