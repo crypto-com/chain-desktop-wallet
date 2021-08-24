@@ -1,31 +1,31 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
 import {
+  Alert,
+  Avatar,
   Button,
+  Carousel,
+  Checkbox,
+  Divider,
   Form,
   Input,
-  Layout,
-  Tabs,
-  Alert,
-  Checkbox,
   InputNumber,
+  Layout,
   message,
-  Switch,
-  Divider,
-  Select,
-  Carousel,
-  Avatar,
   notification,
+  Select,
+  Switch,
+  Tabs,
 } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { CarouselRef } from 'antd/lib/carousel';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { sessionState, walletListState, walletAllAssetsState } from '../../recoil/atom';
+import { sessionState, walletAllAssetsState, walletListState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import {
@@ -41,13 +41,15 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
 import {
   DEFAULT_LANGUAGE_CODE,
-  SUPPORTED_LANGUAGE,
   FIXED_DEFAULT_FEE,
   FIXED_DEFAULT_GAS_LIMIT,
+  SUPPORTED_LANGUAGE,
+  WalletConfig,
 } from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
+import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -129,7 +131,16 @@ const GeneralSettingsForm = props => {
   };
 
   const onSwitchAsset = value => {
-    setCurrentAssetIdentifier(value!.toString());
+    setCurrentAssetIdentifier(value);
+    const selectedAsset = walletAllAssets.find(asset => asset.identifier === value);
+    setSession({
+      ...session,
+      activeAsset: selectedAsset,
+    });
+    walletService.setCurrentSession({
+      ...session,
+      activeAsset: selectedAsset,
+    });
   };
 
   return (
@@ -139,20 +150,7 @@ const GeneralSettingsForm = props => {
       <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
         {walletAllAssets.map(asset => {
           return (
-            <Option
-              value={asset.identifier.toString()}
-              key={asset.identifier.toString()}
-              onClick={async () => {
-                setSession({
-                  ...session,
-                  activeAsset: asset,
-                });
-                await walletService.setCurrentSession({
-                  ...session,
-                  activeAsset: asset,
-                });
-              }}
-            >
+            <Option value={asset.identifier} key={asset.identifier}>
               {assetIcon(asset)}
               {`${asset.name} (${asset.symbol})`}
             </Option>
@@ -597,6 +595,18 @@ function MetaInfoComponent() {
   );
 }
 
+function getAssetConfigFromWalletConfig(walletConfig: WalletConfig): UserAssetConfig {
+  return {
+    chainId: walletConfig.network.chainId,
+    explorerUrl: walletConfig.explorerUrl,
+    fee: { gasLimit: walletConfig.fee.gasLimit, networkFee: walletConfig.fee.networkFee },
+    indexingUrl: walletConfig.indexingUrl,
+    isLedgerSupportDisabled: false,
+    isStakingDisabled: false,
+    nodeUrl: walletConfig.nodeUrl,
+  };
+}
+
 const FormSettings = () => {
   const [form] = Form.useForm();
   const [confirmClearForm] = Form.useForm();
@@ -608,8 +618,9 @@ const FormSettings = () => {
   const [session, setSession] = useRecoilState(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
 
-  const defaultSettings = session.wallet.config;
-  const didMountRef = useRef(false);
+  const defaultSettings: UserAssetConfig =
+    session.activeAsset?.config || getAssetConfigFromWalletConfig(session.wallet.config);
+
   const history = useHistory();
 
   const setWalletList = useSetRecoilState(walletListState);
@@ -622,25 +633,21 @@ const FormSettings = () => {
   useEffect(() => {
     setCurrentAssetIdentifier(session.activeAsset?.identifier);
 
-    if (!didMountRef.current) {
-      didMountRef.current = true;
-
-      if (defaultSettings.fee !== undefined) {
-        networkFee = defaultSettings.fee.networkFee;
-      }
-      if (defaultSettings.fee !== undefined) {
-        gasLimit = defaultSettings.fee.gasLimit;
-      }
-
-      form.setFieldsValue({
-        nodeUrl: defaultSettings.nodeUrl,
-        chainId: defaultSettings.network.chainId,
-        indexingUrl: defaultSettings.indexingUrl,
-        networkFee,
-        gasLimit,
-      });
+    if (defaultSettings.fee !== undefined) {
+      networkFee = defaultSettings.fee.networkFee;
     }
-  }, [form, defaultSettings, walletAllAssets]);
+    if (defaultSettings.fee !== undefined) {
+      gasLimit = defaultSettings.fee.gasLimit;
+    }
+
+    form.setFieldsValue({
+      nodeUrl: defaultSettings.nodeUrl,
+      chainId: defaultSettings.chainId,
+      indexingUrl: defaultSettings.indexingUrl,
+      networkFee,
+      gasLimit,
+    });
+  }, [form, defaultSettings, walletAllAssets, setSession]);
 
   const onFinish = async values => {
     const defaultGasLimit =
@@ -651,7 +658,7 @@ const FormSettings = () => {
     if (
       defaultSettings.nodeUrl === values.nodeUrl &&
       defaultSettings.indexingUrl === values.indexingUrl &&
-      defaultSettings.network.chainId === values.chainId &&
+      defaultSettings.chainId === values.chainId &&
       defaultGasLimit === values.gasLimit &&
       defaultNetworkFee === values.networkFee
     ) {
@@ -673,9 +680,28 @@ const FormSettings = () => {
     // await walletService.updateWalletNodeConfig(settingsDataUpdate, currentAssetIdentifier);
     await walletService.updateWalletNodeConfig(settingsDataUpdate);
     const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
-    const newSession = new Session(updatedWallet);
-    await walletService.setCurrentSession(newSession);
+
+    // Save updated active asset settings.
+    const previousAssetConfig = session.activeAsset?.config;
+    const newlyUpdatedAsset: UserAsset = {
+      ...session.activeAsset!,
+      config: {
+        ...previousAssetConfig!,
+        explorerUrl: settingsDataUpdate.indexingUrl!,
+        chainId: settingsDataUpdate.chainId!,
+        fee: { gasLimit: settingsDataUpdate.gasLimit!, networkFee: settingsDataUpdate.networkFee! },
+        indexingUrl: settingsDataUpdate.indexingUrl!,
+        nodeUrl: settingsDataUpdate.nodeUrl!,
+      },
+    };
+
+    await walletService.saveAssets([newlyUpdatedAsset]);
+    setCurrentAssetIdentifier(newlyUpdatedAsset.identifier);
+
+    const newSession = new Session(updatedWallet, newlyUpdatedAsset);
     setSession(newSession);
+
+    await walletService.setCurrentSession(newSession);
 
     const allNewUpdatedWallets = await walletService.retrieveAllWallets();
     setWalletList(allNewUpdatedWallets);
@@ -695,7 +721,7 @@ const FormSettings = () => {
   const onRestoreDefaults = () => {
     form.setFieldsValue({
       nodeUrl: defaultSettings.nodeUrl,
-      chainId: defaultSettings.network.chainId,
+      chainId: defaultSettings.chainId,
       indexingUrl: defaultSettings.indexingUrl,
       networkFee:
         defaultSettings.fee && defaultSettings.fee.networkFee ? defaultSettings.fee.networkFee : '',

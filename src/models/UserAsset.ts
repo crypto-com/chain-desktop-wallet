@@ -6,6 +6,7 @@ import { getUINormalScaleAmount } from '../utils/NumberUtils';
 export interface UserAssetConfig {
   nodeUrl: string;
   indexingUrl: string;
+  explorerUrl: string;
   chainId: string;
   fee: {
     gasLimit: string;
@@ -13,8 +14,6 @@ export interface UserAssetConfig {
   };
   isLedgerSupportDisabled: boolean;
   isStakingDisabled: boolean;
-  addressValidationRegex: string;
-  validatorAddressRegex: string;
 }
 
 export interface UserAsset {
