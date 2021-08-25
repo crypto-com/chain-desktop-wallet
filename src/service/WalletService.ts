@@ -1,4 +1,5 @@
 import axios from 'axios';
+import _ from 'lodash';
 import {
   DisableDefaultMemoSettings,
   DisableGASettings,
@@ -87,57 +88,14 @@ class WalletService {
   public async sendTransfer(transferRequest: TransferRequest): Promise<BroadCastResult> {
     // eslint-disable-next-line no-console
     console.log('TRANSFER_ASSET', transferRequest.asset);
-    const {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    } = await this.prepareTransaction();
 
     const currentAsset = transferRequest.asset;
     const scaledBaseAmount = getBaseScaledAmount(transferRequest.amount, currentAsset);
+
+    const currentSession = await this.storageService.retrieveCurrentSession();
     const fromAddress = currentSession.wallet.address;
-    const transfer: TransferTransactionUnsigned = {
-      fromAddress,
-      toAddress: transferRequest.toAddress,
-      amount: String(scaledBaseAmount),
-      memo: transferRequest.memo,
-      accountNumber,
-      accountSequence,
-    };
 
     switch (currentAsset.assetType) {
-      case UserAssetType.TENDERMINT:
-      case UserAssetType.IBC:
-      case undefined: {
-        // Undefined case is for legacy reasons
-
-        let signedTxHex: string = '';
-
-        if (transferRequest.walletType === LEDGER_WALLET_TYPE) {
-          signedTxHex = await ledgerTransactionSigner.signTransfer(
-            transfer,
-            transferRequest.decryptedPhrase,
-          );
-        } else {
-          signedTxHex = await transactionSigner.signTransfer(
-            transfer,
-            transferRequest.decryptedPhrase,
-          );
-        }
-
-        const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-
-        await Promise.all([
-          await this.fetchAndUpdateBalances(currentSession),
-          await this.fetchAndSaveTransfers(currentSession),
-        ]);
-
-        return broadCastResult;
-      }
-
       case UserAssetType.EVM:
         try {
           if (currentAsset?.config?.isLedgerSupportDisabled) {
@@ -154,6 +112,15 @@ class WalletService {
             currentAsset.config?.nodeUrl,
             currentAsset.config?.indexingUrl,
           );
+
+          const transfer: TransferTransactionUnsigned = {
+            fromAddress,
+            toAddress: transferRequest.toAddress,
+            amount: String(scaledBaseAmount),
+            memo: transferRequest.memo,
+            accountNumber: 0,
+            accountSequence: 0,
+          };
 
           transfer.nonce = await cronosClient.getNextNonceByAddress(currentAsset.address);
 
@@ -180,6 +147,50 @@ class WalletService {
           console.log(`ERROR_TRANSFERRING - ${currentAsset.assetType}`, e);
           throw TypeError(e);
         }
+
+      case UserAssetType.TENDERMINT:
+      case UserAssetType.IBC:
+      case undefined: {
+        const {
+          nodeRpc,
+          accountNumber,
+          accountSequence,
+          transactionSigner,
+          ledgerTransactionSigner,
+        } = await this.prepareTransaction();
+
+        const transfer: TransferTransactionUnsigned = {
+          fromAddress,
+          toAddress: transferRequest.toAddress,
+          amount: String(scaledBaseAmount),
+          memo: transferRequest.memo,
+          accountNumber,
+          accountSequence,
+        };
+
+        let signedTxHex: string = '';
+
+        if (transferRequest.walletType === LEDGER_WALLET_TYPE) {
+          signedTxHex = await ledgerTransactionSigner.signTransfer(
+            transfer,
+            transferRequest.decryptedPhrase,
+          );
+        } else {
+          signedTxHex = await transactionSigner.signTransfer(
+            transfer,
+            transferRequest.decryptedPhrase,
+          );
+        }
+
+        const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+
+        await Promise.all([
+          await this.fetchAndUpdateBalances(currentSession),
+          await this.fetchAndSaveTransfers(currentSession),
+        ]);
+
+        return broadCastResult;
+      }
 
       default:
         return {};
@@ -543,6 +554,7 @@ class WalletService {
       this.syncBalancesData(currentSession),
       this.syncTransactionsData(currentSession),
       this.fetchAndSaveNFTs(currentSession),
+      this.fetchIBCAssets(currentSession),
     ]);
   }
 
@@ -797,7 +809,7 @@ class WalletService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
-  public async IBCAssetsFetch(currentSession: Session) {
+  public async fetchIBCAssets(currentSession: Session) {
     // const currentSession: Session = await this.storageService.retrieveCurrentSession()
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve(null);
@@ -805,7 +817,7 @@ class WalletService {
     const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
     const ibcAssets: UserAsset[] = await nodeRpc.loadIBCAssets(currentSession);
 
-    const persistedAssets = ibcAssets.map(async ibcAsset => {
+    const persistedAssets = await ibcAssets.map(async ibcAsset => {
       const denomTrace = await nodeRpc.getIBCAssetTrace(ibcAsset.ibcDenomHash!);
       const baseDenom = capitalizeFirstLetter(denomTrace.base_denom);
 
@@ -893,7 +905,6 @@ class WalletService {
                 currentAsset.config?.indexingUrl,
               );
 
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               const transactions = await cronosClient.getTxsByAddress(currentAsset.address);
               const loadedTransactions = transactions.result.map(evmTx => {
                 const transactionTime = new Date(Number(evmTx.timeStamp) * 1000).toISOString();
@@ -1044,11 +1055,14 @@ class WalletService {
       currentSession.wallet.identifier,
     );
 
-    // TODO : In the future we might need to re-think how to recreate new added assets on existing wallets
-    return assets.map(data => {
+    const userAssets = assets.map(data => {
       const asset: UserAsset = { ...data };
       return asset;
     });
+
+    // https://github.com/louischatriot/nedb/issues/185
+    // NeDB does not support distinct queries, it needs to be done programmatically
+    return _.uniqBy(userAssets, 'symbol');
   }
 
   public async retrieveDefaultWalletAsset(currentSession: Session): Promise<UserAsset> {
@@ -1377,7 +1391,16 @@ class WalletService {
       AssetCreationType.STATIC,
       wallet.identifier,
     );
-    return existingStaticAssets.length < STATIC_ASSET_COUNT;
+    const needAssetsCreation = existingStaticAssets.length < STATIC_ASSET_COUNT;
+    if (needAssetsCreation) {
+      // eslint-disable-next-line no-console
+      console.log('NEEDS_ASSETS_CREATIONS', {
+        assets: existingStaticAssets,
+        STATIC_ASSET_COUNT,
+        walletID: wallet.identifier,
+      });
+    }
+    return needAssetsCreation;
   }
 
   public async handleCurrentWalletAssetsMigration(phrase: string, session?: Session) {
