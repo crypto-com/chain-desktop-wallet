@@ -544,6 +544,7 @@ class WalletService {
       this.syncBalancesData(currentSession),
       this.syncTransactionsData(currentSession),
       this.fetchAndSaveNFTs(currentSession),
+      this.fetchIBCAssets(currentSession),
     ]);
   }
 
@@ -798,7 +799,7 @@ class WalletService {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
-  public async IBCAssetsFetch(currentSession: Session) {
+  public async fetchIBCAssets(currentSession: Session) {
     // const currentSession: Session = await this.storageService.retrieveCurrentSession()
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve(null);
@@ -806,7 +807,7 @@ class WalletService {
     const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
     const ibcAssets: UserAsset[] = await nodeRpc.loadIBCAssets(currentSession);
 
-    const persistedAssets = ibcAssets.map(async ibcAsset => {
+    const persistedAssets = await ibcAssets.map(async ibcAsset => {
       const denomTrace = await nodeRpc.getIBCAssetTrace(ibcAsset.ibcDenomHash!);
       const baseDenom = capitalizeFirstLetter(denomTrace.base_denom);
 

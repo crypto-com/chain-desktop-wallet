@@ -101,7 +101,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   async function fetchAndSaveIBCWalletAssets(fetchSession: Session) {
     try {
-      await walletService.IBCAssetsFetch(fetchSession);
+      await walletService.fetchIBCAssets(fetchSession);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet validators list', e);

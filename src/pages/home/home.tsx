@@ -550,7 +550,7 @@ const HomePage = () => {
     const sessionData = await walletService.retrieveCurrentSession();
     // const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
     const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
-    await walletService.IBCAssetsFetch(sessionData);
+    await walletService.fetchIBCAssets(sessionData);
 
     // const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
     //   sessionData.wallet.identifier,
