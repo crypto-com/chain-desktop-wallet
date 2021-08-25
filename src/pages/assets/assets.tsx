@@ -57,13 +57,13 @@ const convertTransfers = (
   sessionData: Session,
   defaultWalletAsset: UserAsset,
 ) => {
-  const { address } = sessionData.wallet;
+  const address = sessionData.activeAsset?.address?.toLowerCase();
 
   function getDirection(from: string, to: string): TransactionDirection {
-    if (address === from && address === to) {
+    if (address === from.toLowerCase() && address === to.toLowerCase()) {
       return TransactionDirection.SELF;
     }
-    if (address === from) {
+    if (address === from.toLowerCase()) {
       return TransactionDirection.OUTGOING;
     }
     return TransactionDirection.INCOMING;
@@ -71,6 +71,7 @@ const convertTransfers = (
 
   return allTransfers.map(transfer => {
     const transferAmount = getUIDynamicAmount(transfer.amount, defaultWalletAsset);
+
     const data: TransferTabularData = {
       key: transfer.hash + transfer.receiverAddress + transfer.amount,
       recipientAddress: transfer.receiverAddress,
@@ -438,6 +439,7 @@ const AssetsPage = () => {
                         session.wallet.identifier,
                         selectedAsset,
                       );
+
                       setAllTransfer(
                         convertTransfers(transfers, walletAllAssets, session, selectedAsset!),
                       );
