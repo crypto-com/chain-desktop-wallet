@@ -24,7 +24,10 @@ class EvmTransactionSigner implements ITransactionSigner {
       gasLimit: transaction.gasLimit || DEFAULT_GAS_LIMIT,
       to: transaction.toAddress,
       value: web3.utils.toHex(transaction.amount),
-      data: '0x',
+      data:
+        transaction.memo && transaction.memo.length > 0
+          ? web3.utils.utf8ToHex(transaction.memo)
+          : '0x',
       chainId: 338,
     };
 
