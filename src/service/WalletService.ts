@@ -1,4 +1,5 @@
 import axios from 'axios';
+import _ from 'lodash';
 import {
   DisableDefaultMemoSettings,
   DisableGASettings,
@@ -1043,11 +1044,14 @@ class WalletService {
       currentSession.wallet.identifier,
     );
 
-    // TODO : In the future we might need to re-think how to recreate new added assets on existing wallets
-    return assets.map(data => {
+    const userAssets = assets.map(data => {
       const asset: UserAsset = { ...data };
       return asset;
     });
+
+    // https://github.com/louischatriot/nedb/issues/185
+    // NeDB does not support distinct queries, it needs to be done programmatically
+    return _.uniqBy(userAssets, 'symbol');
   }
 
   public async retrieveDefaultWalletAsset(currentSession: Session): Promise<UserAsset> {
@@ -1376,7 +1380,16 @@ class WalletService {
       AssetCreationType.STATIC,
       wallet.identifier,
     );
-    return existingStaticAssets.length < STATIC_ASSET_COUNT;
+    const needAssetsCreation = existingStaticAssets.length < STATIC_ASSET_COUNT;
+    if (needAssetsCreation) {
+      // eslint-disable-next-line no-console
+      console.log('NEEDS_ASSETS_CREATIONS', {
+        assets: existingStaticAssets,
+        STATIC_ASSET_COUNT,
+        walletID: wallet.identifier,
+      });
+    }
+    return needAssetsCreation;
   }
 
   public async handleCurrentWalletAssetsMigration(phrase: string, session?: Session) {

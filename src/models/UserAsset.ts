@@ -14,6 +14,9 @@ export interface UserAssetConfig {
   };
   isLedgerSupportDisabled: boolean;
   isStakingDisabled: boolean;
+
+  // Some assets don't have support for memo
+  memoSupportDisabled?: boolean;
 }
 
 export interface UserAsset {

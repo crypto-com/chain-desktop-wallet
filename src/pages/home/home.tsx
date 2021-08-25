@@ -663,8 +663,8 @@ const HomePage = () => {
 
       const nftTransferTabularData = convertNftTransfers(allNftTransfer);
 
-      showWalletStateNotification(currentSession.wallet.config);
-      checkNewlyAddedStaticAssets(currentSession);
+      showWalletStateNotification(sessionData.wallet.config);
+      checkNewlyAddedStaticAssets(sessionData);
 
       // setTransfers(transferTabularData);
       setNftTransfers(nftTransferTabularData);

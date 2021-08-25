@@ -27,6 +27,7 @@ export const CRO_ASSET = (network: Network) => {
     isLedgerSupportDisabled: true,
     isStakingDisabled: true,
     nodeUrl: network.defaultNodeUrl,
+    memoSupportDisabled: false,
   };
 
   return {
@@ -60,6 +61,7 @@ export const CRONOS_ASSET = (network: Network) => {
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
     nodeUrl: 'https://cronos-testnet.crypto.org:8545/',
+    memoSupportDisabled: true,
   };
 
   return {
