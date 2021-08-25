@@ -399,7 +399,9 @@ const HomePage = () => {
               </Link>
             </div>
           </TabPane>
-          <TabPane tab={t('home.nft.tab1')} key="2">
+        </Tabs>
+        <Tabs>
+          <TabPane tab={t('home.nft.tab1')} key="1">
             <div className="site-layout-background nft-container">
               <List
                 grid={{
