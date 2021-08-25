@@ -246,12 +246,39 @@ export class NodeRpcService implements INodeRpcService {
       {},
     );
 
-    return validators
+    let topValidators = validators
       .filter(v => v.status === 'BOND_STATUS_BONDED')
       .filter(v => !v.jailed)
       .filter(v => !!activeValidators[v.pubKey.value])
       .sort((v1, v2) => Big(v2.currentShares).cmp(Big(v1.currentShares)))
       .slice(0, MAX_VALIDATOR_LOAD);
+
+    let totalShares = new Big(0);
+    topValidators.forEach(validator => {
+      totalShares = totalShares.add(validator.currentShares);
+    });
+
+    // Add cumulativeShares
+    let cumulativeShares = new Big(0);
+    topValidators = topValidators.map(validator => {
+      const validatorWithCumulativeShares = {
+        ...validator,
+        cumulativeShares: cumulativeShares.toString(),
+        cumulativeSharesExcludePercentage: cumulativeShares
+          .div(totalShares)
+          .times(100)
+          .toString(),
+        cumulativeSharesIncludePercentage: cumulativeShares
+          .add(new Big(validator.currentShares))
+          .div(totalShares)
+          .times(100)
+          .toString(),
+      };
+      cumulativeShares = cumulativeShares.add(new Big(validator.currentShares));
+      return validatorWithCumulativeShares;
+    });
+
+    return topValidators;
   }
 
   private async fetchLatestActiveValidators(): Promise<ValidatorPubKey[]> {
@@ -269,22 +296,24 @@ export class NodeRpcService implements INodeRpcService {
     const response = await this.cosmosClient.get<ValidatorListResponse>(url);
 
     return [
-      response.data.validators.map(validator => ({
-        status: validator.status,
-        jailed: validator.jailed,
-        validatorWebSite: validator.description.website,
-        maxCommissionRate: validator.commission.commission_rates.max_rate,
-        securityContact: validator.description.security_contact,
-        validatorName: validator.description.moniker,
-        currentTokens: validator.tokens,
-        currentShares: validator.delegator_shares,
-        currentCommissionRate: validator.commission.commission_rates.rate,
-        validatorAddress: validator.operator_address,
-        pubKey: {
-          type: validator.consensus_pubkey['@type'],
-          value: validator.consensus_pubkey.key,
-        },
-      })),
+      response.data.validators.map(validator => {
+        return {
+          status: validator.status,
+          jailed: validator.jailed,
+          validatorWebSite: validator.description.website,
+          maxCommissionRate: validator.commission.commission_rates.max_rate,
+          securityContact: validator.description.security_contact,
+          validatorName: validator.description.moniker,
+          currentTokens: validator.tokens,
+          currentShares: validator.delegator_shares,
+          currentCommissionRate: validator.commission.commission_rates.rate,
+          validatorAddress: validator.operator_address,
+          pubKey: {
+            type: validator.consensus_pubkey['@type'],
+            value: validator.consensus_pubkey.key,
+          },
+        };
+      }),
       response.data.pagination.next_key,
     ];
   }

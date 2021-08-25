@@ -13,6 +13,7 @@ import { walletService } from '../../service/WalletService';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import {
   marketState,
@@ -25,7 +26,10 @@ import {
 import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
 import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import { FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
+import {
+  FIXED_DEFAULT_FEE,
+  CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+} from '../../config/StaticConfig';
 import {
   adjustedTransactionAmount,
   fromScientificNotation,
@@ -90,11 +94,28 @@ const FormDelegationRequest = () => {
 
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
     if (validatorList) {
+      let willDisplayWarningColumn = false;
+      let displayedWarningColumn = false;
+
       return validatorList.map((validator, idx) => {
+        if (
+          new Big(validator.cumulativeSharesIncludePercentage!).gte(
+            CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+          ) &&
+          !displayedWarningColumn
+        ) {
+          displayedWarningColumn = true;
+          willDisplayWarningColumn = true;
+        }
+
         const validatorModel = {
           ...validator,
           key: `${idx}`,
+          displayWarningColumn: willDisplayWarningColumn,
         };
+
+        willDisplayWarningColumn = false;
+
         return validatorModel;
       });
     }
@@ -285,16 +306,34 @@ const FormDelegationRequest = () => {
     },
     {
       title: t('staking.validatorList.table.currentTokens'),
-      dataIndex: 'currentTokens',
+      dataIndex: 'currentShares',
       key: 'currentTokens',
       sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
       defaultSortOrder: 'descend' as any,
       render: currentTokens => {
         return (
           <span>
-            {numeral(scaledAmount(currentTokens, 8)).format('0,0.00')}{' '}
+            {numeral(scaledAmount(currentTokens, 8)).format('0,0')}{' '}
             {currentSession.wallet.config.network.coin.croDenom.toUpperCase()}
           </span>
+        );
+      },
+    },
+    {
+      title: 'Cumulative Shares',
+      // dataIndex: 'cumulativeShares',
+      key: 'cumulativeShares',
+      // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
+      defaultSortOrder: 'descend' as any,
+      render: record => {
+        return (
+          <>
+            {/* <span>{record.cumulativeShares} %</span> */}
+            <ValidatorPowerPercentBar
+              percentExcludeCurrent={record.cumulativeSharesExcludePercentage} // light blue
+              percentIncludeCurrent={record.cumulativeSharesIncludePercentage} // primary blue
+            />
+          </>
         );
       },
     },
@@ -346,7 +385,7 @@ const FormDelegationRequest = () => {
           className="validator-modal"
           footer={[]}
           okText="Confirm"
-          width={1000}
+          width={1200}
         >
           <div className="title">{t('staking.validatorList.table.title')}</div>
           <div className="description">{t('staking.validatorList.table.description')}</div>
@@ -360,6 +399,25 @@ const FormDelegationRequest = () => {
               dataSource={validatorTopList}
               columns={validatorColumns}
               pagination={{ showSizeChanger: false }}
+              expandable={{
+                rowExpandable: record => record.displayWarningColumn!,
+                expandedRowRender: record =>
+                  record.displayWarningColumn && (
+                    <div className="cumulative-stake33">
+                      Cumulative stake above can halt the network: improve decentralization and
+                      delegate to validators below
+                    </div>
+                  ),
+                expandIconColumnIndex: -1,
+              }}
+              rowClassName={record => {
+                const greyBackground =
+                  new Big(record.cumulativeSharesIncludePercentage!).lte(
+                    CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+                  ) || record.displayWarningColumn;
+                return greyBackground ? 'grey-background' : '';
+              }}
+              defaultExpandAllRows
             />
           </div>
         </ModalPopup>
