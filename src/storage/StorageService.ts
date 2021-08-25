@@ -188,7 +188,7 @@ export class StorageService {
 
   public async fetchAssetByCreationType(creationType: AssetCreationType, walletId) {
     return this.db.assetStore.find<UserAsset>({
-      assetCreationType: creationType.toString(),
+      assetCreationType: creationType,
       walletId,
     });
   }

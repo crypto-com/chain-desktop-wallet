@@ -177,7 +177,6 @@ const FormSend = () => {
   const currentMinAssetAmount = getCurrentMinAssetAmount(walletAllAssets[selectedAsset]);
   const maximumSendAmount = availableBalance;
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const customAddressValidator = TransactionUtils.addressValidator(
     currentSession,
     walletAsset,
@@ -221,7 +220,7 @@ const FormSend = () => {
             required: true,
             message: `${t('send.formSend.recipientAddress.label')} ${t('general.required')}`,
           },
-          // customAddressValidator,
+          customAddressValidator,
         ]}
       >
         <Input placeholder={t('send.formSend.recipientAddress.placeholder')} />

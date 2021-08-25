@@ -27,6 +27,7 @@ export const CRO_ASSET = (network: Network) => {
     isLedgerSupportDisabled: true,
     isStakingDisabled: true,
     nodeUrl: network.defaultNodeUrl,
+    memoSupportDisabled: false,
   };
 
   return {
@@ -55,11 +56,12 @@ export const CRONOS_ASSET = (network: Network) => {
   const config: UserAssetConfig = {
     explorerUrl: 'https://cronos-explorer.crypto.org/',
     chainId: isTestnet ? '338' : 'TO_BE_DECIDED',
-    fee: { gasLimit: `21000`, networkFee: `20000000000` },
+    fee: { gasLimit: `50000`, networkFee: `20000000000` },
     indexingUrl: isTestnet ? 'https://cronos-explorer.crypto.org/api' : 'TO_BE_DECIDED',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
     nodeUrl: 'https://cronos-testnet.crypto.org:8545/',
+    memoSupportDisabled: true,
   };
 
   return {

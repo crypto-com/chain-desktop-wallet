@@ -679,9 +679,9 @@ const FormSettings = () => {
       gasLimit: String(values.gasLimit),
     };
 
-    // TO-DO: currentAssetIdentifier shall be passed to updateWalletNodeConfig()
-    // await walletService.updateWalletNodeConfig(settingsDataUpdate, currentAssetIdentifier);
-    await walletService.updateWalletNodeConfig(settingsDataUpdate);
+    // TODO : Decide how the config updates would impact general configuration object
+    // await walletService.updateWalletNodeConfig(settingsDataUpdate);
+
     const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
 
     // Save updated active asset settings.

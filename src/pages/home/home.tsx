@@ -550,7 +550,7 @@ const HomePage = () => {
     const sessionData = await walletService.retrieveCurrentSession();
     // const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
     const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
-    await walletService.IBCAssetsFetch(sessionData);
+    await walletService.fetchIBCAssets(sessionData);
 
     // const allTransfers: TransferTransactionData[] = await walletService.retrieveAllTransfers(
     //   sessionData.wallet.identifier,
@@ -663,8 +663,8 @@ const HomePage = () => {
 
       const nftTransferTabularData = convertNftTransfers(allNftTransfer);
 
-      showWalletStateNotification(currentSession.wallet.config);
-      checkNewlyAddedStaticAssets(currentSession);
+      showWalletStateNotification(sessionData.wallet.config);
+      checkNewlyAddedStaticAssets(sessionData);
 
       // setTransfers(transferTabularData);
       setNftTransfers(nftTransferTabularData);
