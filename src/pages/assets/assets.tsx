@@ -30,6 +30,8 @@ import {
   TransactionStatus,
   TransferTransactionData,
 } from '../../models/Transaction';
+// import IconSend from '../../svg/IconSend';
+// import IconReceive from '../../svg/IconReceive';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -51,13 +53,13 @@ const convertTransfers = (
   sessionData: Session,
   defaultWalletAsset: UserAsset,
 ) => {
-  const { address } = sessionData.wallet;
+  const address = sessionData.activeAsset?.address?.toLowerCase();
 
   function getDirection(from: string, to: string): TransactionDirection {
-    if (address === from && address === to) {
+    if (address === from.toLowerCase() && address === to.toLowerCase()) {
       return TransactionDirection.SELF;
     }
-    if (address === from) {
+    if (address === from.toLowerCase()) {
       return TransactionDirection.OUTGOING;
     }
     return TransactionDirection.INCOMING;
@@ -65,6 +67,7 @@ const convertTransfers = (
 
   return allTransfers.map(transfer => {
     const transferAmount = getUIDynamicAmount(transfer.amount, defaultWalletAsset);
+
     const data: TransferTabularData = {
       key: transfer.hash + transfer.receiverAddress + transfer.amount,
       recipientAddress: transfer.receiverAddress,
@@ -91,6 +94,7 @@ const AssetsPage = () => {
   // const [isLedger, setIsLedger] = useState(false);
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(session.activeAsset);
   const [isAssetVisible, setIsAssetVisible] = useState(false);
+  const [activeAssetTab, setActiveAssetTab] = useState('1');
   const [allTransfer, setAllTransfer] = useState<any>();
 
   // const [defaultWalletAsset, setdefaultWalletAsset] = useState<UserAsset>();
@@ -338,7 +342,9 @@ const AssetsPage = () => {
 
                   <Tabs
                     defaultActiveKey={getDefaultAssetTab(locationState, navbarMenuSelectedKey)}
+                    activeKey={activeAssetTab}
                     onTabClick={key => {
+                      setActiveAssetTab(key);
                       if (key === '2') {
                         setNavbarMenuSelectedKey('/send');
                       }
@@ -347,6 +353,31 @@ const AssetsPage = () => {
                       }
                     }}
                     centered
+                    // renderTabBar={() => {
+                    //   // renderTabBar={(props) => {
+                    //   return (
+                    //     <div className="tab-container">
+                    //       <div onClick={() => setActiveAssetTab('2')}>
+                    //         <>
+                    //           <Icon
+                    //             className={`tab ${activeAssetTab === '2' ? 'active' : ''}`}
+                    //             component={IconSend}
+                    //           />
+                    //           {t('navbar.send')}
+                    //         </>
+                    //       </div>
+                    //       <div onClick={() => setActiveAssetTab('3')}>
+                    //         <>
+                    //           <Icon
+                    //             className={`tab ${activeAssetTab === '3' ? 'active' : ''}`}
+                    //             component={IconReceive}
+                    //           />
+                    //           {t('navbar.receive')}
+                    //         </>
+                    //       </div>
+                    //     </div>
+                    //   );
+                    // }}
                   >
                     <TabPane tab={t('assets.tab1')} key="1">
                       <Table
@@ -391,6 +422,7 @@ const AssetsPage = () => {
                         session.wallet.identifier,
                         selectedAsset,
                       );
+
                       setAllTransfer(
                         convertTransfers(transfers, walletAllAssets, session, selectedAsset!),
                       );

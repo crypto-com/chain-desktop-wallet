@@ -917,7 +917,8 @@ class WalletService {
                   memo: '',
                   receiverAddress: evmTx.to,
                   senderAddress: evmTx.from,
-                  status: TransactionStatus.SUCCESS,
+                  status:
+                    evmTx.isError === '1' ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
                 };
 
                 return transferTx;

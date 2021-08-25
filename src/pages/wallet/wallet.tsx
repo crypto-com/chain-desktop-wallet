@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
 import './wallet.less';
 import 'antd/dist/antd.css';
 import { Layout, Space, Spin, Table, Typography, Tag, AutoComplete } from 'antd';
@@ -11,6 +11,7 @@ import {
   walletAllAssetsState,
   walletListState,
   validatorListState,
+  navbarMenuSelectedKeyState,
   fetchingDBState,
   nftListState,
 } from '../../recoil/atom';
@@ -36,6 +37,7 @@ function WalletPage() {
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const [nftList, setNftList] = useRecoilState(nftListState);
+  const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const fetchingDB = useRecoilValue(fetchingDBState);
   const walletList = useRecoilValue(walletListState);
   const [loading, setLoading] = useState(false);
@@ -129,6 +131,7 @@ function WalletPage() {
 
     if (!didMountRef.current) {
       didMountRef.current = true;
+      setNavbarMenuSelectedKey('/wallet');
       analyticsService.logPage('Wallet');
     }
   }, [fetchingDB, userAsset, walletAllAssets, nftList, validatorList]);

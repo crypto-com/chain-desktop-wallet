@@ -61,6 +61,7 @@
           width: 120px;
           height: 120px;
           margin-right: 10px;
+          margin-bottom: 20px;
           color: #1199fa;
           font-size: 60px;
           line-height: 120px;
@@ -74,6 +75,40 @@
           font-size: 16px;
         }
       }
+
+      .tab-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 300px;
+        margin: auto;
+        margin-bottom: 20px;
+        > div {
+          margin: auto;
+        }
+        .tab {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 48px;
+          height: 48px;
+          margin: auto;
+          color: @font-color;
+          font-size: 22px;
+          text-align: center;
+          background: @white;
+          border-radius: 22px;
+          cursor: pointer;
+          &:hover {
+            background: #e4f4ff;
+          }
+          &.active {
+            color: @white;
+            background: @azure;
+          }
+        }
+      }
+
       .title {
         display: flex;
         align-items: center;
