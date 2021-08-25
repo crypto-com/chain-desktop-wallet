@@ -385,7 +385,7 @@ const FormDelegationRequest = () => {
           className="validator-modal"
           footer={[]}
           okText="Confirm"
-          width={1100}
+          width={1200}
         >
           <div className="title">{t('staking.validatorList.table.title')}</div>
           <div className="description">{t('staking.validatorList.table.description')}</div>
