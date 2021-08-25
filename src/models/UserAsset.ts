@@ -47,6 +47,8 @@ export interface UserAsset {
 
   assetType?: UserAssetType;
 
+  assetCreationType?: AssetCreationType;
+
   address?: string;
 
   config?: UserAssetConfig;
@@ -64,6 +66,14 @@ export enum UserAssetType {
 
   // For EVM based assets like CRONOS
   EVM = 'EVM',
+}
+
+export enum AssetCreationType {
+  // Assets that are created statically on wallets creation
+  STATIC = 'STATIC',
+
+  // These assets are dynamically created - For instance IBC assets, token assets, etc, ...
+  DYNAMIC = 'DYNAMIC',
 }
 
 export interface AssetMarketPrice {

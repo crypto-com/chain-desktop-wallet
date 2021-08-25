@@ -26,7 +26,7 @@ import {
   ValidatorModel,
 } from '../../models/Transaction';
 import { Session } from '../../models/Session';
-import { UserAsset, UserAssetType } from '../../models/UserAsset';
+import { AssetCreationType, UserAsset, UserAssetType } from '../../models/UserAsset';
 
 export interface INodeRpcService {
   loadAccountBalance(address: string, assetDenom: string): Promise<string>;
@@ -330,6 +330,7 @@ export class NodeRpcService implements INodeRpcService {
             walletId: session.wallet.identifier,
             ibcDenomHash,
             assetType: UserAssetType.IBC,
+            assetCreationType: AssetCreationType.DYNAMIC,
           };
           return asset;
         });

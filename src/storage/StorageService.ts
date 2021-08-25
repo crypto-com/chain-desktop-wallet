@@ -7,6 +7,7 @@ import {
 import { DatabaseManager } from './DatabaseManager';
 import { Session } from '../models/Session';
 import {
+  AssetCreationType,
   AssetMarketPrice,
   getAssetPriceId,
   getAssetPriceIdFrom,
@@ -183,6 +184,17 @@ export class StorageService {
       { $set: asset },
       { upsert: true },
     );
+  }
+
+  public async fetchAssetByCreationType(creationType: AssetCreationType, walletId) {
+    return this.db.assetStore.find<UserAsset>({
+      assetCreationType: creationType.toString(),
+      walletId,
+    });
+  }
+
+  public async removeWalletAssets(walletId: string) {
+    return this.db.assetStore.remove({ walletId }, { multi: true });
   }
 
   public async findWalletByIdentifier(identifier: string) {
