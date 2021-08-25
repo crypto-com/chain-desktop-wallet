@@ -6,7 +6,11 @@ import { useTranslation } from 'react-i18next';
 import './assets.less';
 import 'antd/dist/antd.css';
 import { Layout, Table, Avatar, Tabs, Tag, Typography, Dropdown, Menu } from 'antd';
-import Icon, { ArrowLeftOutlined, MoreOutlined } from '@ant-design/icons';
+import {
+  // Icon,
+  ArrowLeftOutlined,
+  MoreOutlined,
+} from '@ant-design/icons';
 import {
   sessionState,
   marketState,
@@ -30,8 +34,8 @@ import {
   TransactionStatus,
   TransferTransactionData,
 } from '../../models/Transaction';
-import IconSend from '../../svg/IconSend';
-import IconReceive from '../../svg/IconReceive';
+// import IconSend from '../../svg/IconSend';
+// import IconReceive from '../../svg/IconReceive';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -343,6 +347,7 @@ const AssetsPage = () => {
                     defaultActiveKey={getDefaultAssetTab(locationState, navbarMenuSelectedKey)}
                     activeKey={activeAssetTab}
                     onTabClick={key => {
+                      setActiveAssetTab(key);
                       if (key === '2') {
                         setNavbarMenuSelectedKey('/send');
                       }
@@ -351,44 +356,44 @@ const AssetsPage = () => {
                       }
                     }}
                     centered
-                    renderTabBar={() => {
-                      // renderTabBar={(props) => {
-                      return (
-                        <div className="tab-container">
-                          <div onClick={() => setActiveAssetTab('2')}>
-                            <>
-                              <Icon
-                                className={`tab ${activeAssetTab === '2' ? 'active' : ''}`}
-                                component={IconSend}
-                              />
-                              {t('navbar.send')}
-                            </>
-                          </div>
-                          <div onClick={() => setActiveAssetTab('3')}>
-                            <>
-                              <Icon
-                                className={`tab ${activeAssetTab === '3' ? 'active' : ''}`}
-                                component={IconReceive}
-                              />
-                              {t('navbar.receive')}
-                            </>
-                          </div>
-                          {/* {props.panes.map((tab) => {
-                          return <div onClick={() => setActiveAssetTab(tab.key)}>
-                            {tab.key === '2'
-                              ? <>
-                                <Icon className="tab" component={IconSend} />
-                                {tab.props.tab}
-                              </>
-                              : <>
-                                <Icon className="tab" component={IconReceive} />
-                                {tab.props.tab}
-                              </>}
-                          </div>
-                        })} */}
-                        </div>
-                      );
-                    }}
+                    // renderTabBar={() => {
+                    //   // renderTabBar={(props) => {
+                    //   return (
+                    //     <div className="tab-container">
+                    //       <div onClick={() => setActiveAssetTab('2')}>
+                    //         <>
+                    //           <Icon
+                    //             className={`tab ${activeAssetTab === '2' ? 'active' : ''}`}
+                    //             component={IconSend}
+                    //           />
+                    //           {t('navbar.send')}
+                    //         </>
+                    //       </div>
+                    //       <div onClick={() => setActiveAssetTab('3')}>
+                    //         <>
+                    //           <Icon
+                    //             className={`tab ${activeAssetTab === '3' ? 'active' : ''}`}
+                    //             component={IconReceive}
+                    //           />
+                    //           {t('navbar.receive')}
+                    //         </>
+                    //       </div>
+                    //       {/* {props.panes.map((tab) => {
+                    //       return <div onClick={() => setActiveAssetTab(tab.key)}>
+                    //         {tab.key === '2'
+                    //           ? <>
+                    //             <Icon className="tab" component={IconSend} />
+                    //             {tab.props.tab}
+                    //           </>
+                    //           : <>
+                    //             <Icon className="tab" component={IconReceive} />
+                    //             {tab.props.tab}
+                    //           </>}
+                    //       </div>
+                    //     })} */}
+                    //     </div>
+                    //   );
+                    // }}
                   >
                     <TabPane tab={t('assets.tab1')} key="1">
                       <Table

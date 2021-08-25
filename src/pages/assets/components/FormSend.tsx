@@ -281,7 +281,7 @@ const FormSend: React.FC<FormSendProps> = props => {
             <div className="description">{t('send.modal1.description')}</div>
             <div className="item">
               <div className="label">{t('send.modal1.label1')}</div>
-              <div className="address">{`${currentSession.wallet.address}`}</div>
+              <div className="address">{`${currentSession.activeAsset?.address}`}</div>
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label2')}</div>
