@@ -232,6 +232,18 @@ const GeneralSettingsForm = props => {
         >
           <InputNumber precision={0} min={1} />
         </Form.Item>
+        <Form.Item
+          name="denomName"
+          label={t('settings.form1.denomName.label')}
+          rules={[
+            {
+              required: true,
+              message: `${t('settings.form1.denomName.label')}`,
+            },
+          ]}
+        >
+          <InputNumber readOnly precision={0} min={1} />
+        </Form.Item>
       </div>
       <div className="item">
         <Checkbox
@@ -649,6 +661,7 @@ const FormSettings = () => {
       indexingUrl: defaultSettings.indexingUrl,
       networkFee,
       gasLimit,
+      denomName: session.wallet.config.network.coin.baseDenom
     });
   }, [form, defaultSettings, walletAllAssets, setSession]);
 
@@ -730,6 +743,7 @@ const FormSettings = () => {
         defaultSettings.fee && defaultSettings.fee.networkFee ? defaultSettings.fee.networkFee : '',
       gasLimit:
         defaultSettings.fee && defaultSettings.fee.gasLimit ? defaultSettings.fee.gasLimit : '',
+      denomName: session.wallet.config.network.coin.baseDenom ||  ''
     });
   };
 

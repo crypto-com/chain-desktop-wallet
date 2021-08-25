@@ -740,6 +740,9 @@
             "label": "Chain Indexing URL",
             "error1": "Please enter a valid Chain Indexing URL"
           },
+          "denomName": {
+            "label": "Base Denom"
+          },
           "chainId": {
             "label": "Chain ID"
           },
