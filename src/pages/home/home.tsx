@@ -259,8 +259,8 @@ const HomePage = () => {
     const sessionData = await walletService.retrieveCurrentSession();
     const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
 
-    showWalletStateNotification(currentSession.wallet.config);
-    checkNewlyAddedStaticAssets(currentSession);
+    showWalletStateNotification(sessionData.wallet.config);
+    checkNewlyAddedStaticAssets(sessionData);
     setWalletAllAssets(allAssets);
     setHasShownNotLiveWallet(true);
 
@@ -327,8 +327,8 @@ const HomePage = () => {
       setProcessedNftList(currentNftList);
       setNFTList(allNFTs);
       setdefaultWalletAsset(currentAsset);
-      showWalletStateNotification(currentSession.wallet.config);
-      checkNewlyAddedStaticAssets(currentSession);
+      showWalletStateNotification(sessionData.wallet.config);
+      checkNewlyAddedStaticAssets(sessionData);
       setWalletAllAssets(allAssets);
       setHasShownNotLiveWallet(true);
     };
