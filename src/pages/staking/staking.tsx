@@ -94,39 +94,14 @@ const FormDelegationRequest = () => {
 
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
     if (validatorList) {
-      let totalShares = new Big(0);
-      let cumulativeShares = new Big(0);
-
-      for (let i = 0; i < validatorList?.length; i++) {
-        totalShares = totalShares.add(validatorList[i].currentShares);
-      }
-
       let willDisplayWarningColumn = false;
       let displayedWarningColumn = false;
 
       return validatorList.map((validator, idx) => {
-        const preValidatorModel = {
-          ...validator,
-          key: `${idx}`,
-          cumulativeShares: cumulativeShares.toPrecision(4).toString(),
-          cumulativeSharesExcludePercentage: cumulativeShares
-            .div(totalShares)
-            .times(100)
-            .toPrecision(4)
-            .toString(),
-          // cumulativeSharesIncludePercentage: cumulativeShares
-          //   .add(new Big(validator.currentShares))
-          //   .div(totalShares)
-          //   .times(100)
-          //   .toPrecision(4)
-          //   .toString(),
-        };
-
-        cumulativeShares = cumulativeShares.add(new Big(validator.currentShares));
-        const cumulativeSharesIncludePercentage = cumulativeShares.div(totalShares).times(100);
-
         if (
-          cumulativeSharesIncludePercentage.gte(CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD) &&
+          new Big(validator.cumulativeSharesIncludePercentage!).gte(
+            CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+          ) &&
           !displayedWarningColumn
         ) {
           displayedWarningColumn = true;
@@ -134,10 +109,8 @@ const FormDelegationRequest = () => {
         }
 
         const validatorModel = {
-          ...preValidatorModel,
-          cumulativeSharesIncludePercentage: cumulativeSharesIncludePercentage
-            .toPrecision(4)
-            .toString(),
+          ...validator,
+          key: `${idx}`,
           displayWarningColumn: willDisplayWarningColumn,
         };
 
@@ -333,14 +306,14 @@ const FormDelegationRequest = () => {
     },
     {
       title: t('staking.validatorList.table.currentTokens'),
-      dataIndex: 'currentTokens',
+      dataIndex: 'currentShares',
       key: 'currentTokens',
       sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
       defaultSortOrder: 'descend' as any,
       render: currentTokens => {
         return (
           <span>
-            {numeral(scaledAmount(currentTokens, 8)).format('0,0.00')}{' '}
+            {numeral(scaledAmount(currentTokens, 8)).format('0,0')}{' '}
             {currentSession.wallet.config.network.coin.croDenom.toUpperCase()}
           </span>
         );
@@ -412,7 +385,7 @@ const FormDelegationRequest = () => {
           className="validator-modal"
           footer={[]}
           okText="Confirm"
-          width={1000}
+          width={1100}
         >
           <div className="title">{t('staking.validatorList.table.title')}</div>
           <div className="description">{t('staking.validatorList.table.description')}</div>

@@ -246,12 +246,39 @@ export class NodeRpcService implements INodeRpcService {
       {},
     );
 
-    return validators
+    let topValidators = validators
       .filter(v => v.status === 'BOND_STATUS_BONDED')
       .filter(v => !v.jailed)
       .filter(v => !!activeValidators[v.pubKey.value])
       .sort((v1, v2) => Big(v2.currentShares).cmp(Big(v1.currentShares)))
       .slice(0, MAX_VALIDATOR_LOAD);
+
+    let totalShares = new Big(0);
+    topValidators.forEach(validator => {
+      totalShares = totalShares.add(validator.currentShares);
+    });
+
+    // Add cumulativeShares
+    let cumulativeShares = new Big(0);
+    topValidators = topValidators.map(validator => {
+      const validatorWithCumulativeShares = {
+        ...validator,
+        cumulativeShares: cumulativeShares.toString(),
+        cumulativeSharesExcludePercentage: cumulativeShares
+          .div(totalShares)
+          .times(100)
+          .toString(),
+        cumulativeSharesIncludePercentage: cumulativeShares
+          .add(new Big(validator.currentShares))
+          .div(totalShares)
+          .times(100)
+          .toString(),
+      };
+      cumulativeShares = cumulativeShares.add(new Big(validator.currentShares));
+      return validatorWithCumulativeShares;
+    });
+
+    return topValidators;
   }
 
   private async fetchLatestActiveValidators(): Promise<ValidatorPubKey[]> {
