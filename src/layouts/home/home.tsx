@@ -193,7 +193,11 @@ function HomeLayout(props: HomeLayoutProps) {
     setInputPasswordVisible(true);
   };
 
-  const checkNewlyAddedStaticAssets = (walletSession: Session) => {
+  const checkNewlyAddedStaticAssets = (walletSession?: Session) => {
+    if (!walletSession || !walletSession.wallet) {
+      return;
+    }
+
     setTimeout(async () => {
       if (await walletService.checkIfWalletNeedAssetCreation(walletSession)) {
         const newAssetAddedNotificationKey = 'newAssetAddedNotificationKey';
@@ -222,7 +226,7 @@ function HomeLayout(props: HomeLayoutProps) {
           btn: createNewlyAddedAssets,
         });
       }
-    }, 12_000);
+    }, 30_000);
   };
 
   useEffect(() => {
