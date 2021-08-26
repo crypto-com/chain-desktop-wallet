@@ -226,7 +226,7 @@ function HomeLayout(props: HomeLayoutProps) {
           btn: createNewlyAddedAssets,
         });
       }
-    }, 30_000);
+    }, 15_000);
   };
 
   useEffect(() => {
