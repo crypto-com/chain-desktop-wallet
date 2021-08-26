@@ -749,9 +749,6 @@
           "gasLimit": {
             "label": "Gas Limit"
           },
-          "denomName": {
-            "label": "Base Denom"
-          },
           "checkbox1": {
             "description1": "Propagate the settings changes to all your ",
             "description2": "wallets"
@@ -1561,9 +1558,6 @@
           "gasLimit": {
             "label": "Gas 費用"
           },
-          "denomName": {
-            "label": "基本面值"
-          },
           "checkbox1": {
             "description1": "將設定更新至所有",
             "description2": "錢包"
@@ -2372,9 +2366,6 @@
           },
           "gasLimit": {
             "label": "Gas 费用"
-          },
-          "denomName": {
-            "label": "基本面值"
           },
           "checkbox1": {
             "description1": "将设定更新至所有",
@@ -3301,9 +3292,6 @@
           "gasLimit": {
             "label": "가스 리미트"
           },
-          "denomName": {
-            "label": "기본 단위"
-          },
           "checkbox1": {
             "description1": "설정 변경 사항을 모두 적용합니다",
             "description2": "지갑 리스트"
@@ -3397,7 +3385,6 @@
         "discard": "Descartar",
         "ok": "Ok",
         "required": "Requerido",
-        "cannot0": "0 no es un valor valido",
         "validator": "Validador",
         "receiving": "Recibiendo",
         "available": "Disponible",
@@ -3406,27 +3393,9 @@
         "review": "Revisar",
         "copy": "Copiar",
         "close": "Cerrar",
-        "retry": "Reintentar",
         "connect": "Connectar",
-        "seeAll": "Ver todo",
         "addressValidator": {
           "reason1": "Invalido"
-        },
-        "validTransactionAmountValidator": {
-          "reason": "Valor de envio invalido"
-        },
-        "passwordForm": {
-          "password": {
-            "label": "Contraseña",
-            "placeholder": "Introduzca la contraseña"
-          },
-          "passwordConfirm": {
-            "label": "Confirmar contraseña",
-            "error1": "Las contraseñas no coinciden"
-          },
-          "passwordStrength": {
-            "title": "Seguridad de la contraseña"
-          }
         }
       }
     }
@@ -3549,25 +3518,7 @@
   },
   "igNG": {
     "translation": {
-      "language": "igbo",
-      "general": {
-        "cancel": "kagbuo",
-        "save": "dozie",
-        "discard": "tụfuo mgbanwe",
-        "ok": "OK",
-        "required": "ihe achọrọ",
-        "cannot0": "enweghị ike ịbụ 0",
-        "validator": "validator",
-        "receiving": "na-anata",
-        "close": "mmechie",
-        "connect": "jikọọ"
-      },
-      "home": {
-        "nft": {
-          "tab1": "NFT m",
-          "tab2": "NFT Transakshion"
-        }
-      }
+      "language": "igbo"
     }
   },
   "arAE": {

@@ -209,15 +209,15 @@ const GeneralSettingsForm = props => {
         <Form.Item
           name="networkFee"
           label={t('settings.form1.networkFee.label')}
-          hasFeedback
           rules={[
             {
               required: true,
+              pattern: new RegExp(/^[0-9]+$/),
               message: `${t('settings.form1.networkFee.label')} ${t('general.required')}`,
             },
           ]}
         >
-          <InputNumber precision={0} min={1} />
+          <Input addonAfter={session.wallet.config.network.coin.baseDenom || ''}/>
         </Form.Item>
         <Form.Item
           name="gasLimit"
@@ -231,18 +231,6 @@ const GeneralSettingsForm = props => {
           ]}
         >
           <InputNumber precision={0} min={1} />
-        </Form.Item>
-        <Form.Item
-          name="denomName"
-          label={t('settings.form1.denomName.label')}
-          rules={[
-            {
-              required: true,
-              message: `${t('settings.form1.denomName.label')}`,
-            },
-          ]}
-        >
-          <InputNumber readOnly precision={0} min={1} />
         </Form.Item>
       </div>
       <div className="item">
@@ -661,7 +649,6 @@ const FormSettings = () => {
       indexingUrl: defaultSettings.indexingUrl,
       networkFee,
       gasLimit,
-      denomName: session.wallet.config.network.coin.baseDenom
     });
   }, [form, defaultSettings, walletAllAssets, setSession]);
 
@@ -743,7 +730,6 @@ const FormSettings = () => {
         defaultSettings.fee && defaultSettings.fee.networkFee ? defaultSettings.fee.networkFee : '',
       gasLimit:
         defaultSettings.fee && defaultSettings.fee.gasLimit ? defaultSettings.fee.gasLimit : '',
-      denomName: session.wallet.config.network.coin.baseDenom ||  ''
     });
   };
 
