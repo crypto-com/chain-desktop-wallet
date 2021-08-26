@@ -35,9 +35,6 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 // import logoCro from '../../assets/AssetLogo/cro.png';
 import IconTick from '../../svg/IconTick';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
-import { Session } from '../../models/Session';
-import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { secretStoreService } from '../../storage/SecretStoreService';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -184,56 +181,6 @@ const HomePage = () => {
     }, 200);
   };
 
-  const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
-
-  const onWalletDecryptFinish = async (password: string) => {
-    setFetchingDB(true);
-    setInputPasswordVisible(false);
-    const phraseDecrypted = await secretStoreService.decryptPhrase(
-      password,
-      currentSession.wallet.identifier,
-    );
-
-    await walletService.handleCurrentWalletAssetsMigration(phraseDecrypted, currentSession);
-    setFetchingDB(false);
-  };
-
-  const showPasswordInput = () => {
-    setInputPasswordVisible(true);
-  };
-
-  const checkNewlyAddedStaticAssets = (session: Session) => {
-    setTimeout(async () => {
-      if (await walletService.checkIfWalletNeedAssetCreation(session)) {
-        const newAssetAddedNotificationKey = 'newAssetAddedNotificationKey';
-
-        const createNewlyAddedAssets = (
-          <Button
-            type="primary"
-            size="small"
-            className="btn-restart"
-            onClick={() => {
-              showPasswordInput();
-              notification.close(newAssetAddedNotificationKey);
-            }}
-            style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
-          >
-            Enable
-          </Button>
-        );
-
-        notification.info({
-          message: 'New Assets Available',
-          description: 'Do you want to enable the newly added assets ?',
-          duration: 15,
-          key: newAssetAddedNotificationKey,
-          placement: 'topRight',
-          btn: createNewlyAddedAssets,
-        });
-      }
-    }, 12_000);
-  };
-
   const processNftList = (currentList: NftModel[] | undefined) => {
     if (currentList) {
       return currentList.slice(0, maxNftPreview).map(item => {
@@ -260,7 +207,6 @@ const HomePage = () => {
     const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
 
     showWalletStateNotification(sessionData.wallet.config);
-    checkNewlyAddedStaticAssets(sessionData);
     setWalletAllAssets(allAssets);
     setHasShownNotLiveWallet(true);
 
@@ -328,7 +274,6 @@ const HomePage = () => {
       setNFTList(allNFTs);
       setdefaultWalletAsset(currentAsset);
       showWalletStateNotification(sessionData.wallet.config);
-      checkNewlyAddedStaticAssets(sessionData);
       setWalletAllAssets(allAssets);
       setHasShownNotLiveWallet(true);
     };
@@ -345,28 +290,6 @@ const HomePage = () => {
 
   return (
     <Layout className="site-layout">
-      <PasswordFormModal
-        description={t('general.passwordFormModal.description')}
-        okButtonText={t('general.passwordFormModal.okButton')}
-        onCancel={() => {
-          setInputPasswordVisible(false);
-        }}
-        onSuccess={onWalletDecryptFinish}
-        onValidatePassword={async (password: string) => {
-          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
-          return {
-            valid: isValid,
-            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
-          };
-        }}
-        successText={t('general.passwordFormModal.success')}
-        title={t('general.passwordFormModal.title')}
-        visible={inputPasswordVisible}
-        successButtonText={t('general.continue')}
-        confirmPassword={false}
-        repeatValidation
-      />
-
       <Header className="site-layout-background">
         {t('home.title')}
         <SyncOutlined

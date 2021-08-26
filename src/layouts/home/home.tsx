@@ -1,7 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Alert, Button, Checkbox, Dropdown, Form, Input, Layout, Menu, Spin } from 'antd';
+import {
+  Alert,
+  Button,
+  Checkbox,
+  Dropdown,
+  Form,
+  Input,
+  Layout,
+  Menu,
+  notification,
+  Spin,
+} from 'antd';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Icon, {
   CaretDownOutlined,
@@ -43,6 +54,8 @@ import packageJson from '../../../package.json';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { LedgerWalletMaximum } from '../../config/StaticConfig';
 import { generalConfigService } from '../../storage/GeneralConfigService';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import { secretStoreService } from '../../storage/SecretStoreService';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -174,6 +187,44 @@ function HomeLayout(props: HomeLayoutProps) {
     setIsConfirmationModalVisible(false);
   };
 
+  const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
+
+  const showPasswordInput = () => {
+    setInputPasswordVisible(true);
+  };
+
+  const checkNewlyAddedStaticAssets = (walletSession: Session) => {
+    setTimeout(async () => {
+      if (await walletService.checkIfWalletNeedAssetCreation(walletSession)) {
+        const newAssetAddedNotificationKey = 'newAssetAddedNotificationKey';
+
+        const createNewlyAddedAssets = (
+          <Button
+            type="primary"
+            size="small"
+            className="btn-restart"
+            onClick={() => {
+              showPasswordInput();
+              notification.close(newAssetAddedNotificationKey);
+            }}
+            style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+          >
+            Enable
+          </Button>
+        );
+
+        notification.info({
+          message: 'New Assets Available',
+          description: 'Do you want to enable the newly added assets ?',
+          duration: 15,
+          key: newAssetAddedNotificationKey,
+          placement: 'topRight',
+          btn: createNewlyAddedAssets,
+        });
+      }
+    }, 12_000);
+  };
+
   useEffect(() => {
     const fetchDB = async () => {
       setFetchingDB(true);
@@ -183,7 +234,7 @@ function HomeLayout(props: HomeLayoutProps) {
       const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
       const allWalletsData = await walletService.retrieveAllWallets();
       const currentMarketData = await walletService.retrieveAssetPrice(
-        currentAsset.mainnetSymbol,
+        currentAsset?.mainnetSymbol,
         'usd',
       );
 
@@ -219,6 +270,8 @@ function HomeLayout(props: HomeLayoutProps) {
       setTimeout(() => {
         setIsAnnouncementVisible(!announcementShown);
       }, 2000);
+
+      checkNewlyAddedStaticAssets(currentSession);
     };
 
     if (!didMountRef.current) {
@@ -250,6 +303,18 @@ function HomeLayout(props: HomeLayoutProps) {
     nftList,
     setNftList,
   ]);
+
+  const onWalletDecryptFinishCreateFreshAssets = async (password: string) => {
+    setFetchingDB(true);
+    setInputPasswordVisible(false);
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      session.wallet.identifier,
+    );
+
+    await walletService.handleCurrentWalletAssetsMigration(phraseDecrypted, session);
+    setFetchingDB(false);
+  };
 
   const HomeMenu = () => {
     let menuSelectedKey = currentLocationPath;
@@ -344,6 +409,28 @@ function HomeLayout(props: HomeLayoutProps) {
 
   return (
     <main className="home-layout">
+      <PasswordFormModal
+        description={t('general.passwordFormModal.description')}
+        okButtonText={t('general.passwordFormModal.okButton')}
+        onCancel={() => {
+          setInputPasswordVisible(false);
+        }}
+        onSuccess={onWalletDecryptFinishCreateFreshAssets}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          return {
+            valid: isValid,
+            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
+          };
+        }}
+        successText={t('general.passwordFormModal.success')}
+        title={t('general.passwordFormModal.title')}
+        visible={inputPasswordVisible}
+        successButtonText={t('general.continue')}
+        confirmPassword={false}
+        repeatValidation
+      />
+
       <Layout>
         <Sider className="home-sider">
           <div className="logo" />
