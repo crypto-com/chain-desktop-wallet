@@ -207,7 +207,9 @@ const GeneralSettingsForm = props => {
       </Form.Item>
       <div className="row">
         <Form.Item
+          className={session.wallet.config.network.coin.baseDenom ? "network-fee" : ""}
           name="networkFee"
+          hasFeedback
           label={t('settings.form1.networkFee.label')}
           rules={[
             {
