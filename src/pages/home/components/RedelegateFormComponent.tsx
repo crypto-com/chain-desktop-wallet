@@ -13,7 +13,9 @@ import { UserAsset, scaledAmount } from '../../../models/UserAsset';
 import { ValidatorModel } from '../../../models/Transaction';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { middleEllipsis, ellipsis } from '../../../utils/utils';
+import { CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD } from '../../../config/StaticConfig';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
+import ValidatorPowerPercentBar from '../../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
 
 const { Search } = Input;
 
@@ -96,9 +98,27 @@ const RedelegateFormComponent = (props: {
       render: currentTokens => {
         return (
           <span>
-            {numeral(scaledAmount(currentTokens, 8)).format('0,0.00')}{' '}
+            {numeral(scaledAmount(currentTokens, 8)).format('0,0')}{' '}
             {props.currentSession.wallet.config.network.coin.croDenom.toUpperCase()}
           </span>
+        );
+      },
+    },
+    {
+      title: 'Cumulative Shares',
+      // dataIndex: 'cumulativeShares',
+      key: 'cumulativeShares',
+      // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
+      defaultSortOrder: 'descend' as any,
+      render: record => {
+        return (
+          <>
+            {/* <span>{record.cumulativeShares} %</span> */}
+            <ValidatorPowerPercentBar
+              percentExcludeCurrent={record.cumulativeSharesExcludePercentage} // light blue
+              percentIncludeCurrent={record.cumulativeSharesIncludePercentage} // primary blue
+            />
+          </>
         );
       },
     },
@@ -141,11 +161,28 @@ const RedelegateFormComponent = (props: {
 
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
     if (validatorList) {
+      let willDisplayWarningColumn = false;
+      let displayedWarningColumn = false;
+
       return validatorList.map((validator, idx) => {
+        if (
+          new Big(validator.cumulativeSharesIncludePercentage!).gte(
+            CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+          ) &&
+          !displayedWarningColumn
+        ) {
+          displayedWarningColumn = true;
+          willDisplayWarningColumn = true;
+        }
+
         const validatorModel = {
           ...validator,
           key: `${idx}`,
+          displayWarningColumn: willDisplayWarningColumn,
         };
+
+        willDisplayWarningColumn = false;
+
         return validatorModel;
       });
     }
@@ -171,7 +208,7 @@ const RedelegateFormComponent = (props: {
           className="validator-modal"
           footer={[]}
           okText="Confirm"
-          width={1000}
+          width={1200}
         >
           <div className="title">{t('staking.validatorList.table.title')}</div>
           <div className="description">{t('staking.validatorList.table.description')}</div>
@@ -185,6 +222,25 @@ const RedelegateFormComponent = (props: {
               dataSource={validatorTopList}
               columns={validatorColumns}
               pagination={{ showSizeChanger: false }}
+              expandable={{
+                rowExpandable: record => record.displayWarningColumn!,
+                expandedRowRender: record =>
+                  record.displayWarningColumn && (
+                    <div className="cumulative-stake33">
+                      Cumulative stake above can halt the network: improve decentralization and
+                      delegate to validators below
+                    </div>
+                  ),
+                expandIconColumnIndex: -1,
+              }}
+              rowClassName={record => {
+                const greyBackground =
+                  new Big(record.cumulativeSharesIncludePercentage!).lte(
+                    CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+                  ) || record.displayWarningColumn;
+                return greyBackground ? 'grey-background' : '';
+              }}
+              defaultExpandAllRows
             />
           </div>
         </ModalPopup>

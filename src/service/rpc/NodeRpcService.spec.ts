@@ -257,6 +257,9 @@ describe('Testing NodeRpcService', () => {
 
       return expect(nodeRpcService.loadTopValidators()).to.eventually.deep.equal([
         {
+          cumulativeShares: '0',
+          cumulativeSharesExcludePercentage: '0',
+          cumulativeSharesIncludePercentage: '50',
           currentCommissionRate: '0.100000000000000000',
           currentShares: '3',
           currentTokens: '3',
@@ -273,6 +276,9 @@ describe('Testing NodeRpcService', () => {
           },
         },
         {
+          cumulativeShares: '3',
+          cumulativeSharesExcludePercentage: '50',
+          cumulativeSharesIncludePercentage: '83.333333333333333333',
           currentCommissionRate: '0.100000000000000000',
           currentShares: '2',
           currentTokens: '2',
@@ -289,6 +295,9 @@ describe('Testing NodeRpcService', () => {
           },
         },
         {
+          cumulativeShares: '5',
+          cumulativeSharesExcludePercentage: '83.333333333333333333',
+          cumulativeSharesIncludePercentage: '100',
           currentCommissionRate: '0.100000000000000000',
           currentShares: '1',
           currentTokens: '1',
@@ -448,6 +457,9 @@ describe('Testing NodeRpcService', () => {
 
       return expect(nodeRpcService.loadTopValidators()).to.eventually.deep.equal([
         {
+          cumulativeShares: '0',
+          cumulativeSharesExcludePercentage: '0',
+          cumulativeSharesIncludePercentage: '100',
           currentCommissionRate: '0.100000000000000000',
           currentShares: '3',
           currentTokens: '3',
@@ -589,6 +601,9 @@ describe('Testing NodeRpcService', () => {
 
       return expect(nodeRpcService.loadTopValidators()).to.eventually.deep.equal([
         {
+          cumulativeShares: '0',
+          cumulativeSharesExcludePercentage: '0',
+          cumulativeSharesIncludePercentage: '100',
           currentCommissionRate: '0.100000000000000000',
           currentShares: '2',
           currentTokens: '2',

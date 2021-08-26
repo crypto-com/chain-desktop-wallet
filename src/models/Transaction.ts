@@ -126,6 +126,9 @@ export interface ValidatorModel {
   readonly currentTokens: string;
   readonly currentShares: string;
   readonly pubKey: ValidatorPubKey;
+  displayWarningColumn?: boolean;
+  cumulativeSharesIncludePercentage?: string;
+  cumulativeSharesExcludePercentage?: string;
 }
 
 export interface ProposalModel extends Proposal {}
