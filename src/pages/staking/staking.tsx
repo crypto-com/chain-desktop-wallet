@@ -1097,8 +1097,15 @@ const FormWithdrawStakingReward = () => {
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setWalletAsset(currentWalletAsset);
 
-      const rewardsTabularData = convertToTabularData(allRewards, walletAsset, marketData);
+      // Make sure the primary/default asset is the correct one
+      const primaryAsset =
+        walletAsset.identifier && walletAsset.name !== 'default'
+          ? walletAsset
+          : await walletService.retrieveDefaultWalletAsset(currentSession);
+
+      const rewardsTabularData = convertToTabularData(allRewards, primaryAsset, marketData);
       setRewards(rewardsTabularData);
+      setWalletAsset(primaryAsset);
     };
 
     syncRewardsData();
