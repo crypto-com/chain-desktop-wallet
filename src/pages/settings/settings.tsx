@@ -207,7 +207,7 @@ const GeneralSettingsForm = props => {
       </Form.Item>
       <div className="row">
         <Form.Item
-          className={session?.activeAsset?.symbol ? "network-fee" : ""}
+          className={session.wallet.config.network.coin.baseDenom ? "network-fee" : ""}
           name="networkFee"
           hasFeedback
           label={t('settings.form1.networkFee.label')}
@@ -219,7 +219,7 @@ const GeneralSettingsForm = props => {
             },
           ]}
         >
-          <Input addonAfter={session?.activeAsset?.symbol || ''}/>
+          <Input addonAfter={session.wallet.config.network.coin.baseDenom || ''}/>
         </Form.Item>
         <Form.Item
           name="gasLimit"
