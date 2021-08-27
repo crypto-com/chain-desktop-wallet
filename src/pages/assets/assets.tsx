@@ -51,10 +51,9 @@ const convertTransfers = (
   allTransfers: TransferTransactionData[],
   allAssets: UserAsset[],
   sessionData: Session,
-  defaultWalletAsset: UserAsset,
+  asset: UserAsset,
 ) => {
-  const address = sessionData.activeAsset?.address?.toLowerCase();
-
+  const address = asset.address?.toLowerCase() || sessionData.wallet.address.toLowerCase();
   function getDirection(from: string, to: string): TransactionDirection {
     if (address === from.toLowerCase() && address === to.toLowerCase()) {
       return TransactionDirection.SELF;
@@ -66,7 +65,7 @@ const convertTransfers = (
   }
 
   return allTransfers.map(transfer => {
-    const transferAmount = getUIDynamicAmount(transfer.amount, defaultWalletAsset);
+    const transferAmount = getUIDynamicAmount(transfer.amount, asset);
 
     const data: TransferTabularData = {
       key: transfer.hash + transfer.receiverAddress + transfer.amount,
@@ -86,9 +85,7 @@ const AssetsPage = () => {
   // const userAsset = useRecoilValue(walletAssetState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const marketData = useRecoilValue(marketState);
-  const [navbarMenuSelectedKey, setNavbarMenuSelectedKey] = useRecoilState(
-    navbarMenuSelectedKeyState,
-  );
+  const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setFetchingDB = useSetRecoilState(fetchingDBState);
 
   // const [isLedger, setIsLedger] = useState(false);
@@ -102,38 +99,41 @@ const AssetsPage = () => {
   const analyticsService = new AnalyticsService(session);
 
   const [t] = useTranslation();
-
+  const currentLocationPath = useLocation().pathname;
   const locationState: any = useLocation().state ?? {
     from: '',
     identifier: '',
   };
 
-  const getDefaultAssetTab = (_locationState, _navbarMenuSelectedKey) => {
-    if (_locationState.from === '/home' && session.activeAsset) {
-      return '1';
-    }
-    if (_navbarMenuSelectedKey === '/send') {
-      return '2';
-    }
-    return '3';
+  const syncTransfers = async asset => {
+    const transfers = await walletService.retrieveAllTransfers(session.wallet.identifier, asset);
+
+    setAllTransfer(convertTransfers(transfers, walletAllAssets, session, asset));
   };
 
   useEffect(() => {
     const checkDirectedFrom = async () => {
       if (locationState.from === '/home' && session.activeAsset) {
-        const transfers = await walletService.retrieveAllTransfers(
-          session.wallet.identifier,
-          session.activeAsset,
-        );
-        setAllTransfer(convertTransfers(transfers, walletAllAssets, session, session.activeAsset));
+        syncTransfers(session.activeAsset);
         setCurrentAsset(session.activeAsset);
         setIsAssetVisible(true);
         setFetchingDB(false);
       }
     };
 
+    const getDefaultAssetTab = _locationState => {
+      if (_locationState.from === '/home' && session.activeAsset) {
+        setActiveAssetTab('1');
+      } else if (currentLocationPath === '/send') {
+        setActiveAssetTab('2');
+      } else {
+        setActiveAssetTab('3');
+      }
+    };
+
     if (!didMountRef.current) {
       checkDirectedFrom();
+      getDefaultAssetTab(locationState);
       didMountRef.current = true;
       analyticsService.logPage('Assets');
     }
@@ -341,10 +341,12 @@ const AssetsPage = () => {
                   </div>
 
                   <Tabs
-                    defaultActiveKey={getDefaultAssetTab(locationState, navbarMenuSelectedKey)}
                     activeKey={activeAssetTab}
                     onTabClick={key => {
                       setActiveAssetTab(key);
+                      if (key === '1') {
+                        syncTransfers(currentAsset);
+                      }
                       if (key === '2') {
                         setNavbarMenuSelectedKey('/send');
                       }
@@ -418,14 +420,7 @@ const AssetsPage = () => {
                         ...session,
                         activeAsset: selectedAsset,
                       });
-                      const transfers = await walletService.retrieveAllTransfers(
-                        session.wallet.identifier,
-                        selectedAsset,
-                      );
-
-                      setAllTransfer(
-                        convertTransfers(transfers, walletAllAssets, session, selectedAsset!),
-                      );
+                      syncTransfers(selectedAsset);
                       setCurrentAsset(selectedAsset);
                       setIsAssetVisible(true);
                     }, // click row
