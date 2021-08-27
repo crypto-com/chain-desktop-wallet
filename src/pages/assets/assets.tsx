@@ -231,7 +231,8 @@ const AssetsPage = () => {
           data-original={text}
           target="_blank"
           rel="noreferrer"
-          href={`${session.wallet.config.explorerUrl}/tx/${text}`}
+          href={`${session.activeAsset?.config?.explorerUrl ||
+            session.wallet.config.explorerUrl}/tx/${text}`}
         >
           {middleEllipsis(text, 12)}
         </a>
