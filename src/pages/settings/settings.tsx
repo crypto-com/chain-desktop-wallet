@@ -679,8 +679,10 @@ const FormSettings = () => {
       gasLimit: String(values.gasLimit),
     };
 
-    // TODO : Decide how the config updates would impact general configuration object
-    // await walletService.updateWalletNodeConfig(settingsDataUpdate);
+    // This wallet level settings update should only imply the primary asset.
+    if (!session.activeAsset?.isSecondaryAsset) {
+      await walletService.updateWalletNodeConfig(settingsDataUpdate);
+    }
 
     const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
 
