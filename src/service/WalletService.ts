@@ -1055,10 +1055,12 @@ class WalletService {
       currentSession.wallet.identifier,
     );
 
-    const userAssets = assets.map(data => {
-      const asset: UserAsset = { ...data };
-      return asset;
-    });
+    const userAssets = assets
+      .filter(asset => asset.assetType !== UserAssetType.IBC)
+      .map(data => {
+        const asset: UserAsset = { ...data };
+        return asset;
+      });
 
     // https://github.com/louischatriot/nedb/issues/185
     // NeDB does not support distinct queries, it needs to be done programmatically
