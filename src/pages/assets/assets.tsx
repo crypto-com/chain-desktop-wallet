@@ -85,9 +85,7 @@ const AssetsPage = () => {
   // const userAsset = useRecoilValue(walletAssetState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const marketData = useRecoilValue(marketState);
-  const [navbarMenuSelectedKey, setNavbarMenuSelectedKey] = useRecoilState(
-    navbarMenuSelectedKeyState,
-  );
+  const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setFetchingDB = useSetRecoilState(fetchingDBState);
 
   // const [isLedger, setIsLedger] = useState(false);
@@ -101,20 +99,10 @@ const AssetsPage = () => {
   const analyticsService = new AnalyticsService(session);
 
   const [t] = useTranslation();
-
+  const currentLocationPath = useLocation().pathname;
   const locationState: any = useLocation().state ?? {
     from: '',
     identifier: '',
-  };
-
-  const getDefaultAssetTab = (_locationState, _navbarMenuSelectedKey) => {
-    if (_locationState.from === '/home' && session.activeAsset) {
-      return '1';
-    }
-    if (_navbarMenuSelectedKey === '/send') {
-      return '2';
-    }
-    return '3';
   };
 
   const syncTransfers = async asset => {
@@ -133,8 +121,19 @@ const AssetsPage = () => {
       }
     };
 
+    const getDefaultAssetTab = _locationState => {
+      if (_locationState.from === '/home' && session.activeAsset) {
+        setActiveAssetTab('1');
+      } else if (currentLocationPath === '/send') {
+        setActiveAssetTab('2');
+      } else {
+        setActiveAssetTab('3');
+      }
+    };
+
     if (!didMountRef.current) {
       checkDirectedFrom();
+      getDefaultAssetTab(locationState);
       didMountRef.current = true;
       analyticsService.logPage('Assets');
     }
@@ -342,7 +341,6 @@ const AssetsPage = () => {
                   </div>
 
                   <Tabs
-                    defaultActiveKey={getDefaultAssetTab(locationState, navbarMenuSelectedKey)}
                     activeKey={activeAssetTab}
                     onTabClick={key => {
                       setActiveAssetTab(key);
