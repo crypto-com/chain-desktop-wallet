@@ -99,7 +99,7 @@ const AssetsPage = () => {
   const analyticsService = new AnalyticsService(session);
 
   const [t] = useTranslation();
-  const currentLocationPath = useLocation().pathname;
+  // const currentLocationPath = useLocation().pathname;
   const locationState: any = useLocation().state ?? {
     from: '',
     identifier: '',
@@ -121,19 +121,19 @@ const AssetsPage = () => {
       }
     };
 
-    const getDefaultAssetTab = _locationState => {
-      if (_locationState.from === '/home' && session.activeAsset) {
-        setActiveAssetTab('1');
-      } else if (currentLocationPath === '/send') {
-        setActiveAssetTab('2');
-      } else {
-        setActiveAssetTab('3');
-      }
-    };
+    // const getDefaultAssetTab = _locationState => {
+    //   if (_locationState.from === '/home' && session.activeAsset) {
+    //     setActiveAssetTab('1');
+    //   } else if (currentLocationPath === '/send') {
+    //     setActiveAssetTab('2');
+    //   } else {
+    //     setActiveAssetTab('3');
+    //   }
+    // };
 
     if (!didMountRef.current) {
       checkDirectedFrom();
-      getDefaultAssetTab(locationState);
+      // getDefaultAssetTab(locationState);
       didMountRef.current = true;
       analyticsService.logPage('Assets');
     }
@@ -346,15 +346,16 @@ const AssetsPage = () => {
                     activeKey={activeAssetTab}
                     onTabClick={key => {
                       setActiveAssetTab(key);
-                      if (key === '1') {
-                        syncTransfers(currentAsset);
-                      }
-                      if (key === '2') {
-                        setNavbarMenuSelectedKey('/send');
-                      }
-                      if (key === '3') {
-                        setNavbarMenuSelectedKey('/receive');
-                      }
+                      // if (key === '1') {
+                      //   syncTransfers(currentAsset);
+                      //   setNavbarMenuSelectedKey('/assets');
+                      // }
+                      // if (key === '2') {
+                      //   setNavbarMenuSelectedKey('/send');
+                      // }
+                      // if (key === '3') {
+                      //   setNavbarMenuSelectedKey('/receive');
+                      // }
                     }}
                     centered
                     // renderTabBar={() => {

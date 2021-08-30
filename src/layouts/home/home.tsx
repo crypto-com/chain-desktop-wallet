@@ -41,8 +41,9 @@ import {
 import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
-import IconSend from '../../svg/IconSend';
-import IconReceive from '../../svg/IconReceive';
+// import IconSend from '../../svg/IconSend';
+// import IconReceive from '../../svg/IconReceive';
+import IconAssets from '../../svg/IconAssets';
 import IconStaking from '../../svg/IconStaking';
 import IconNft from '../../svg/IconNft';
 import IconWallet from '../../svg/IconWallet';
@@ -66,8 +67,9 @@ const { Sider } = Layout;
 const allPaths = [
   '/home',
   '/staking',
-  '/send',
-  '/receive',
+  // '/send',
+  // '/receive',
+  '/assets',
   '/settings',
   '/governance',
   '/nft',
@@ -342,12 +344,15 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/staking" icon={<Icon component={IconStaking} />}>
           <Link to="/staking">{t('navbar.staking')}</Link>
         </Menu.Item>
-        <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
+        <Menu.Item key="/assets" icon={<Icon component={IconAssets} />}>
+          <Link to="/assets">{t('navbar.assets')}</Link>
+        </Menu.Item>
+        {/* <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">{t('navbar.send')}</Link>
         </Menu.Item>
         <Menu.Item key="/receive" icon={<Icon component={IconReceive} />}>
           <Link to="/receive">{t('navbar.receive')}</Link>
-        </Menu.Item>
+        </Menu.Item> */}
         <Menu.Item key="/governance" icon={<BankOutlined />}>
           <Link to="/governance">{t('navbar.governance')}</Link>
         </Menu.Item>

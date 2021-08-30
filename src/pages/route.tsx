@@ -91,8 +91,8 @@ function RouteHub() {
     },
     {
       name: 'Assets Page',
-      key: 'receive',
-      path: '/receive',
+      key: 'assets',
+      path: '/assets',
       component: <AssetsPage />,
     },
     {

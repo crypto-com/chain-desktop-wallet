@@ -372,7 +372,7 @@ const HomePage = () => {
                 onRow={selectedAsset => {
                   return {
                     onClick: async () => {
-                      setNavbarMenuSelectedKey('/send');
+                      setNavbarMenuSelectedKey('/assets');
                       setFetchingDB(true);
                       setCurrentSession({
                         ...currentSession,
@@ -383,7 +383,7 @@ const HomePage = () => {
                         activeAsset: selectedAsset,
                       });
                       history.push({
-                        pathname: '/send',
+                        pathname: '/assets',
                         state: {
                           from: '/home',
                         },
@@ -392,7 +392,11 @@ const HomePage = () => {
                   };
                 }}
               />
-              <Link to="/send" className="all" onClick={() => setNavbarMenuSelectedKey('/send')}>
+              <Link
+                to="/assets"
+                className="all"
+                onClick={() => setNavbarMenuSelectedKey('/assets')}
+              >
                 {t('general.seeAll')}
               </Link>
             </div>
