@@ -41,9 +41,11 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
 import {
   DEFAULT_LANGUAGE_CODE,
+  DEFAULT_CURRENCY_CODE,
   FIXED_DEFAULT_FEE,
   FIXED_DEFAULT_GAS_LIMIT,
   SUPPORTED_LANGUAGE,
+  SUPPORTED_CURRENCY,
   WalletConfig,
 } from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
@@ -253,6 +255,7 @@ function MetaInfoComponent() {
   const { walletType } = session.wallet;
 
   const [defaultLanguageState, setDefaultLanguageState] = useState<string>(DEFAULT_LANGUAGE_CODE);
+  const [defaultCurrencyState, setDefaultCurrencyState] = useState<string>(DEFAULT_CURRENCY_CODE);
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
   const [t, i18n] = useTranslation();
@@ -343,6 +346,8 @@ function MetaInfoComponent() {
   }, [
     defaultLanguageState,
     setDefaultLanguageState,
+    defaultCurrencyState,
+    setDefaultCurrencyState,
     defaultMemoStateDisabled,
     setDefaultMemoStateDisabled,
     defaultGAStateDisabled,
@@ -353,6 +358,10 @@ function MetaInfoComponent() {
     setDefaultLanguageState(value!.toString());
     i18n.changeLanguage(value!.toString());
     generalConfigService.setLanguage(value!.toString());
+  };
+
+  const onSwitchCurrency = value => {
+    setDefaultCurrencyState(value!.toString());
   };
 
   const showPasswordInput = () => {
@@ -450,6 +459,21 @@ function MetaInfoComponent() {
             </div> */}
             <Select style={{ width: 240 }} onChange={onSwitchLanguage} value={defaultLanguageState}>
               {SUPPORTED_LANGUAGE.map(item => {
+                return (
+                  <Option value={item.value} key={item.value}>
+                    {item.label}
+                  </Option>
+                );
+              })}
+            </Select>
+          </div>
+          <Divider />
+          <div className="item">
+            <div className="title">{t('settings.currency.title')}</div>
+            {/* <div className="description">
+            </div> */}
+            <Select style={{ width: 240 }} onChange={onSwitchCurrency} value={defaultCurrencyState}>
+              {SUPPORTED_CURRENCY.map(item => {
                 return (
                   <Option value={item.value} key={item.value}>
                     {item.label}

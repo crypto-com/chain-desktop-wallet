@@ -23,6 +23,19 @@ export const SUPPORTED_LANGUAGE = [
   { value: 'koKR', label: '한국어' },
 ];
 
+export const DEFAULT_CURRENCY_CODE = 'usd';
+export const SUPPORTED_CURRENCY = [
+  { value: 'usd', label: 'USD - $' },
+  { value: 'gbp', label: 'GBP - £' },
+  { value: 'eur', label: 'EUR - €' },
+  { value: 'sgd', label: 'SGD - $' },
+  { value: 'cad', label: 'CAD - $' },
+  { value: 'aud', label: 'AUD - $' },
+  { value: 'nzd', label: 'NZD - $' },
+  { value: 'hkd', label: 'HKD - $' },
+  { value: 'twd', label: 'TWD - $' },
+];
+
 export type WalletConfig = {
   enabled: boolean;
   name: string;
