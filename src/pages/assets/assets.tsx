@@ -33,7 +33,7 @@ import {
 // import IconSend from '../../svg/IconSend';
 // import IconReceive from '../../svg/IconReceive';
 
-const { Header, Content, Footer } = Layout;
+const { Sider, Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
@@ -326,22 +326,25 @@ const AssetsPage = () => {
                     </Dropdown>
                   </div>
                   <div className="detail-container">
-                    {assetIcon(currentAsset)}
-                    <div className="balance">
-                      {getUIDynamicAmount(currentAsset!.balance, currentAsset!)}{' '}
-                      {currentAsset?.symbol}
-                    </div>
-                    <div className="value">
-                      {marketData &&
-                      marketData.price &&
-                      currentAsset?.mainnetSymbol === marketData.assetSymbol
-                        ? `${numeral(getAssetBalancePrice(currentAsset, marketData)).format(
-                            '$0,0.00',
-                          )} ${marketData?.currency}`
-                        : '$--'}
-                    </div>
+                    <Layout>
+                      <Sider width="80px">{assetIcon(currentAsset)}</Sider>
+                      <Content>
+                        <div className="balance">
+                          {getUIDynamicAmount(currentAsset!.balance, currentAsset!)}{' '}
+                          {currentAsset?.symbol}
+                        </div>
+                        <div className="value">
+                          {marketData &&
+                          marketData.price &&
+                          currentAsset?.mainnetSymbol === marketData.assetSymbol
+                            ? `${numeral(getAssetBalancePrice(currentAsset, marketData)).format(
+                                '$0,0.00',
+                              )} ${marketData?.currency}`
+                            : '$--'}
+                        </div>
+                      </Content>
+                    </Layout>
                   </div>
-
                   <Tabs
                     activeKey={activeAssetTab}
                     onTabClick={key => {
