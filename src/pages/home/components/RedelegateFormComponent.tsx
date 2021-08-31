@@ -33,7 +33,7 @@ const RedelegateFormComponent = (props: {
   const fetchingDB = useRecoilValue(fetchingDBState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
   const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
-
+  const [displayWarning, setDisplayWarning] = useState(true);
   const [t] = useTranslation();
 
   const redelegatePeriod = props.currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
@@ -93,7 +93,9 @@ const RedelegateFormComponent = (props: {
       title: t('staking.validatorList.table.currentTokens'),
       dataIndex: 'currentTokens',
       key: 'currentTokens',
-      sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
+      sorter: (a, b) => {
+        return new Big(a.currentTokens).cmp(new Big(b.currentTokens));
+      },
       defaultSortOrder: 'descend' as any,
       render: currentTokens => {
         return (
@@ -105,7 +107,7 @@ const RedelegateFormComponent = (props: {
       },
     },
     {
-      title: 'Cumulative Shares',
+      title: t('staking.validatorList.table.cumulativeShares'),
       // dataIndex: 'cumulativeShares',
       key: 'cumulativeShares',
       // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
@@ -126,7 +128,9 @@ const RedelegateFormComponent = (props: {
       title: t('staking.validatorList.table.currentCommissionRate'),
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
-      sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
+      sorter: (a, b) => {
+        return new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate));
+      },
       render: currentCommissionRate => (
         <span>{new Big(currentCommissionRate).times(100).toFixed(2)}%</span>
       ),
@@ -222,13 +226,23 @@ const RedelegateFormComponent = (props: {
               dataSource={validatorTopList}
               columns={validatorColumns}
               pagination={{ showSizeChanger: false }}
+              onChange={(pagination, filters, sorter: any) => {
+                if (
+                  (sorter.order === 'descend' && sorter.field === 'currentTokens') ||
+                  sorter.order === undefined
+                ) {
+                  setDisplayWarning(true);
+                } else {
+                  setDisplayWarning(false);
+                }
+              }}
               expandable={{
-                rowExpandable: record => record.displayWarningColumn!,
+                rowExpandable: record => record.displayWarningColumn! && displayWarning,
                 expandedRowRender: record =>
-                  record.displayWarningColumn && (
+                  record.displayWarningColumn &&
+                  displayWarning && (
                     <div className="cumulative-stake33">
-                      Cumulative stake above can halt the network: improve decentralization and
-                      delegate to validators below
+                      {t('staking.validatorList.table.warningCumulative')}
                     </div>
                   ),
                 expandIconColumnIndex: -1,

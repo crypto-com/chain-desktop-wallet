@@ -10,6 +10,7 @@ import {
   DenomTrace,
   DenomTraceResponse,
   FinalTallyResult,
+  IBCBalanceResponse,
   LoadedTallyResponse,
   Proposal,
   RewardResponse,
@@ -73,8 +74,11 @@ export class NodeRpcService implements INodeRpcService {
   }
 
   public async loadAccountBalance(address: string, assetDenom: string): Promise<string> {
-    const response = await this.tendermintClient.getBalance(address, assetDenom);
-    return response?.amount ?? '0';
+    const response = await this.cosmosClient.get<BalanceResponse>(
+      `/cosmos/bank/v1beta1/balances/${address}/${assetDenom}`,
+    );
+    const balanceData = response?.data;
+    return balanceData?.balance?.amount ?? '0';
   }
 
   public async loadSequenceNumber(address: string): Promise<number> {
@@ -340,7 +344,7 @@ export class NodeRpcService implements INodeRpcService {
         nextKey !== null ? `${baseUrl}?pagination.key=${encodeURIComponent(nextKey)}` : baseUrl;
 
       // eslint-disable-next-line no-await-in-loop
-      const assetBalanceResponse = await this.cosmosClient.get<BalanceResponse>(url);
+      const assetBalanceResponse = await this.cosmosClient.get<IBCBalanceResponse>(url);
       const loadedIbcAssets = assetBalanceResponse.data.balances
         .filter(balance => balance.denom.startsWith('ibc/'))
         .map(balance => {

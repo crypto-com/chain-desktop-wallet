@@ -534,11 +534,13 @@
           "table": {
             "title": "Validator List",
             "description": "Please select one of the validator.",
+            "warningCumulative": "Cumulative stake above can halt the network: improve decentralization and delegate to validators below",
             "validatorName": "Name",
             "validatorWebsite": "Website",
             "validatorAddress": "Address",
             "currentTokens": "Voting Power",
             "currentCommissionRate": "Commission",
+            "cumulativeShares": "Cumulative Shares",
             "action": "Action"
           }
         },
@@ -642,7 +644,7 @@
             "error2": "and",
             "error3": "characters",
             "error4": "Expected only start with lowercase alphabetic",
-            "error5": "Expected only alphabetic characters or numbers"
+            "error5": "Expected only lowercase alphabetic characters or numbers"
           },
           "tokenId": {
             "label": "Token ID",
@@ -651,7 +653,7 @@
             "error2": "and",
             "error3": "characters",
             "error4": "Expected only start with lowercase alphabetic",
-            "error5": "Expected only alphabetic characters or numbers"
+            "error5": "Expected only lowercase alphabetic characters or numbers"
           },
           "drop": {
             "label": "Drop Name",
@@ -749,6 +751,9 @@
           "gasLimit": {
             "label": "Gas Limit"
           },
+          "denomName": {
+            "label": "Base Denom"
+          },
           "checkbox1": {
             "description1": "Propagate the settings changes to all your ",
             "description2": "wallets"
@@ -760,7 +765,8 @@
           "success3": "wallets",
           "analytics1": "Analytics settings has been",
           "defaultMemo1": "Default client memo settings has been",
-          "generalSettings1": "General settings propagation has been"
+          "generalSettings1": "General settings propagation has been",
+          "currency1": "Currency has been switched to "
         },
         "notification": {
           "recover": {
@@ -770,6 +776,9 @@
         },
         "language": {
           "title": "Language"
+        },
+        "currency": {
+          "title": "Currency"
         },
         "memo": {
           "title": "Default Memo",
@@ -1343,11 +1352,13 @@
           "table": {
             "title": "驗證者列表",
             "description": "請選擇其中一個驗證者。",
+            "warningCumulative": "讓上方的驗證者的累積委託增加將可能導敢網絡停頓：為改善網絡的去中心化，請委託到下方的驗證者",
             "validatorName": "名稱",
             "validatorWebsite": "網址",
             "validatorAddress": "地址",
-            "currentTokens": "投票能量",
+            "currentTokens": "投票權",
             "currentCommissionRate": "佣金",
+            "cumulativeShares": "累積委託",
             "action": "操作"
           }
         },
@@ -1558,6 +1569,9 @@
           "gasLimit": {
             "label": "Gas 費用"
           },
+          "denomName": {
+            "label": "基本面值"
+          },
           "checkbox1": {
             "description1": "將設定更新至所有",
             "description2": "錢包"
@@ -1579,6 +1593,9 @@
         },
         "language": {
           "title": "語言"
+        },
+        "currency": {
+          "title": "匯率"
         },
         "memo": {
           "title": "預設留言",
@@ -2138,7 +2155,7 @@
         "title": "抵押",
         "tab1": "抵押奖励",
         "tab2": "委托资金",
-        "tab3": "委托资金",
+        "tab3": "委托管理",
         "description1": "从委托资金提取奖励。",
         "description2": "委托资金至验证者。",
         "description3": "管理你的已委托资金",
@@ -2152,11 +2169,13 @@
           "table": {
             "title": "验证者列表",
             "description": "请选择其中一个验证者。",
+            "warningCumulative": "让上方的验证者的累积委托增加将可能导敢网络停顿：为改善网络的去中心化，请委托到下方的验证者",
             "validatorName": "名称",
             "validatorWebsite": "网址",
             "validatorAddress": "地址",
             "currentTokens": "投票权",
             "currentCommissionRate": "佣金",
+            "cumulativeShares": "累积委托",
             "action": "操作"
           }
         },
@@ -2367,6 +2386,9 @@
           "gasLimit": {
             "label": "Gas 费用"
           },
+          "denomName": {
+            "label": "基本面值"
+          },
           "checkbox1": {
             "description1": "将设定更新至所有",
             "description2": "钱包"
@@ -2388,6 +2410,9 @@
         },
         "language": {
           "title": "语言"
+        },
+        "currency": {
+          "title": "汇率"
         },
         "memo": {
           "title": "默认留言",
@@ -3066,6 +3091,7 @@
         "title": "스테이킹",
         "tab1": "스테이킹 보상",
         "tab2": "금액 위임",
+        "tab3": "위임 관리",
         "description1": "위임된 금액에서 보상을 인출합니다",
         "description2": "검증인에게 금액을 위임합니다",
         "maxValidator": {
@@ -3083,6 +3109,7 @@
             "validatorAddress": "주소",
             "currentTokens": "투표 파워",
             "currentCommissionRate": "수수료율",
+            "cumulativeShares": "축적 투표",
             "action": "활동"
           }
         },
@@ -3292,6 +3319,9 @@
           "gasLimit": {
             "label": "가스 리미트"
           },
+          "denomName": {
+            "label": "기본 단위"
+          },
           "checkbox1": {
             "description1": "설정 변경 사항을 모두 적용합니다",
             "description2": "지갑 리스트"
@@ -3313,6 +3343,9 @@
         },
         "language": {
           "title": "언어"
+        },
+        "currency": {
+          "title": "환율"
         },
         "memo": {
           "title": "디폴트 메모",
@@ -3385,6 +3418,7 @@
         "discard": "Descartar",
         "ok": "Ok",
         "required": "Requerido",
+        "cannot0": "0 no es un valor valido",
         "validator": "Validador",
         "receiving": "Recibiendo",
         "available": "Disponible",
@@ -3393,9 +3427,27 @@
         "review": "Revisar",
         "copy": "Copiar",
         "close": "Cerrar",
+        "retry": "Reintentar",
         "connect": "Connectar",
+        "seeAll": "Ver todo",
         "addressValidator": {
           "reason1": "Invalido"
+        },
+        "validTransactionAmountValidator": {
+          "reason": "Valor de envio invalido"
+        },
+        "passwordForm": {
+          "password": {
+            "label": "Contraseña",
+            "placeholder": "Introduzca la contraseña"
+          },
+          "passwordConfirm": {
+            "label": "Confirmar contraseña",
+            "error1": "Las contraseñas no coinciden"
+          },
+          "passwordStrength": {
+            "title": "Seguridad de la contraseña"
+          }
         }
       }
     }
@@ -3518,7 +3570,25 @@
   },
   "igNG": {
     "translation": {
-      "language": "igbo"
+      "language": "igbo",
+      "general": {
+        "cancel": "kagbuo",
+        "save": "dozie",
+        "discard": "tụfuo mgbanwe",
+        "ok": "OK",
+        "required": "ihe achọrọ",
+        "cannot0": "enweghị ike ịbụ 0",
+        "validator": "validator",
+        "receiving": "na-anata",
+        "close": "mmechie",
+        "connect": "jikọọ"
+      },
+      "home": {
+        "nft": {
+          "tab1": "NFT m",
+          "tab2": "NFT Transakshion"
+        }
+      }
     }
   },
   "arAE": {
