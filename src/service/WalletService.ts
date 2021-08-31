@@ -1,5 +1,7 @@
 import axios from 'axios';
 import _ from 'lodash';
+import { TransactionConfig } from 'web3-eth';
+import Web3 from 'web3';
 import {
   DisableDefaultMemoSettings,
   DisableGASettings,
@@ -120,12 +122,32 @@ class WalletService {
             memo: transferRequest.memo,
             accountNumber: 0,
             accountSequence: 0,
+            asset: currentAsset,
+          };
+
+          const web3 = new Web3('');
+          const txConfig: TransactionConfig = {
+            from: currentAsset.address,
+            to: transferRequest.toAddress,
+            value: web3.utils.toWei(transferRequest.amount, 'ether'),
           };
 
           transfer.nonce = await cronosClient.getNextNonceByAddress(currentAsset.address);
 
+          const loadedGasPrice = web3.utils.toWei(
+            await cronosClient.getEstimatedGasPrice(),
+            'gwei',
+          );
+          transfer.gasPrice = Number(loadedGasPrice);
+
+          transfer.gasLimit = Number(await cronosClient.estimateGas(txConfig));
+
           // eslint-disable-next-line no-console
-          console.log('EVM_TX', { txNonce: transfer.nonce });
+          console.log('EVM_TX', {
+            txNonce: transfer.nonce,
+            gasPrice: transfer.gasPrice,
+            gasLimit: transfer.gasLimit,
+          });
 
           const signedTx = await evmTransactionSigner.signTransfer(
             transfer,
@@ -166,6 +188,7 @@ class WalletService {
           memo: transferRequest.memo,
           accountNumber,
           accountSequence,
+          asset: currentAsset,
         };
 
         let signedTxHex: string = '';

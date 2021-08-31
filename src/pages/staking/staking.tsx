@@ -730,7 +730,6 @@ const FormDelegationOperations = () => {
     try {
       setConfirmLoading(true);
 
-      // TODO : Here switch between undelegation and redelegation
       let broadcastedTransaction: BroadCastResult | null = null;
 
       if (delegationActionType === StakingActionType.UNDELEGATE) {
