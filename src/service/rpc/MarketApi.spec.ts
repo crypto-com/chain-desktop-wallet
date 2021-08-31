@@ -858,7 +858,7 @@ describe('MarketApi', () => {
     const croToFiatRate = await croMarketPriceApi.getAssetPrice('CRO', 'USD');
     expect(croToFiatRate.assetSymbol).to.equal('CRO');
     expect(croToFiatRate.currency).to.equal('USD');
-    expect(croToFiatRate.dailyChange).to.be.empty;
+    expect(croToFiatRate.dailyChange).to.eq('');
     expect(croToFiatRate.price).to.eq('3427.505');
 
   });
