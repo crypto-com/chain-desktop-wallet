@@ -29,6 +29,7 @@ import { sessionState, walletAllAssetsState, walletListState } from '../../recoi
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import {
+  DefaultCurrencySettings,
   DisableDefaultMemoSettings,
   DisableGASettings,
   EnableGeneralSettingsPropagation,
@@ -326,12 +327,16 @@ function MetaInfoComponent() {
 
     const SyncConfig = async () => {
       const defaultLanguage = i18n.language ? i18n.language : DEFAULT_LANGUAGE_CODE;
-      const defaultMemoDisabled = session.wallet.config.disableDefaultClientMemo;
-      const defaultGADisabled = session.wallet.config.analyticsDisabled;
+      const {
+        defaultCurrency,
+        disableDefaultClientMemo,
+        analyticsDisabled,
+      } = session.wallet.config;
       if (!unmounted) {
         setDefaultLanguageState(defaultLanguage);
-        setDefaultMemoStateDisabled(defaultMemoDisabled);
-        setDefaultGAStateDisabled(defaultGADisabled);
+        setDefaultCurrencyState(defaultCurrency);
+        setDefaultMemoStateDisabled(disableDefaultClientMemo);
+        setDefaultGAStateDisabled(analyticsDisabled);
       }
     };
 
@@ -360,7 +365,23 @@ function MetaInfoComponent() {
     generalConfigService.setLanguage(value!.toString());
   };
 
-  const onSwitchCurrency = value => {
+  const onSwitchCurrency = async value => {
+    setUpdateLoading(true);
+
+    const defaultCurrency: DefaultCurrencySettings = {
+      walletId: session.wallet.identifier,
+      defaultCurrency: value!.toString(),
+    };
+
+    await walletService.updateDefaultCurrency(defaultCurrency);
+
+    const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
+    const newSession = new Session(updatedWallet);
+    await walletService.setCurrentSession(newSession);
+
+    setSession(newSession);
+    setUpdateLoading(false);
+
     setDefaultCurrencyState(value!.toString());
   };
 

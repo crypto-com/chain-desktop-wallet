@@ -2,6 +2,7 @@ import {
   DefaultWalletConfigs,
   FIXED_DEFAULT_FEE,
   FIXED_DEFAULT_GAS_LIMIT,
+  DEFAULT_CURRENCY_CODE,
   Network,
   WalletConfig,
 } from '../config/StaticConfig';
@@ -59,6 +60,11 @@ export interface SettingsDataUpdate {
   networkFee?: string | undefined;
 }
 
+export interface DefaultCurrencySettings {
+  walletId: string;
+  defaultCurrency: string;
+}
+
 export interface DisableDefaultMemoSettings {
   walletId: string;
   disableDefaultMemoAppend: boolean;
@@ -106,6 +112,7 @@ export function reconstructCustomConfig(formValues: CustomConfigFormValue): Wall
     disableDefaultClientMemo: false,
     enableGeneralSettings: false,
     analyticsDisabled: false,
+    defaultCurrency: DEFAULT_CURRENCY_CODE,
     fee: {
       gasLimit: FIXED_DEFAULT_GAS_LIMIT,
       networkFee: FIXED_DEFAULT_FEE,

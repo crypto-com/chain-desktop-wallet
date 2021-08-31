@@ -1,4 +1,5 @@
 import {
+  DefaultCurrencySettings,
   DisableDefaultMemoSettings,
   DisableGASettings,
   SettingsDataUpdate,
@@ -58,6 +59,17 @@ export class StorageService {
         },
       },
       { multi: true },
+    );
+  }
+
+  public async updateDefaultCurrency(defaultCurrencySettings: DefaultCurrencySettings) {
+    const previousWallet = await this.findWalletByIdentifier(defaultCurrencySettings.walletId);
+    previousWallet.config.defaultCurrency = defaultCurrencySettings.defaultCurrency;
+
+    return this.db.walletStore.update<Wallet>(
+      { identifier: previousWallet.identifier },
+      { $set: previousWallet },
+      { upsert: true },
     );
   }
 

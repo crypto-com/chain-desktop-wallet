@@ -23,17 +23,17 @@ export const SUPPORTED_LANGUAGE = [
   { value: 'koKR', label: '한국어' },
 ];
 
-export const DEFAULT_CURRENCY_CODE = 'usd';
+export const DEFAULT_CURRENCY_CODE = 'USD';
 export const SUPPORTED_CURRENCY = [
-  { value: 'usd', label: 'USD - $' },
-  { value: 'gbp', label: 'GBP - £' },
-  { value: 'eur', label: 'EUR - €' },
-  { value: 'sgd', label: 'SGD - $' },
-  { value: 'cad', label: 'CAD - $' },
-  { value: 'aud', label: 'AUD - $' },
-  { value: 'nzd', label: 'NZD - $' },
-  { value: 'hkd', label: 'HKD - $' },
-  { value: 'twd', label: 'TWD - $' },
+  { value: 'USD', label: 'USD - $' },
+  { value: 'GBP', label: 'GBP - £' },
+  { value: 'EUR', label: 'EUR - €' },
+  { value: 'SGD', label: 'SGD - $' },
+  { value: 'CAD', label: 'CAD - $' },
+  { value: 'AUD', label: 'AUD - $' },
+  { value: 'NZD', label: 'NZD - $' },
+  { value: 'HKD', label: 'HKD - $' },
+  { value: 'TWD', label: 'TWD - $' },
 ];
 
 export type WalletConfig = {
@@ -49,6 +49,7 @@ export type WalletConfig = {
   // E.g: User updates nodeURL in one mainnet wallet, all other mainnet wallets will have the new nodeURL
   enableGeneralSettings: boolean;
   analyticsDisabled: boolean;
+  defaultCurrency: string;
   fee: {
     gasLimit: string;
     networkFee: string;
@@ -121,6 +122,7 @@ const TestNetConfig: WalletConfig = {
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,
+  defaultCurrency: DEFAULT_CURRENCY_CODE,
   fee: {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
@@ -138,6 +140,7 @@ const TestNetCroeseid3: WalletConfig = {
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,
+  defaultCurrency: DEFAULT_CURRENCY_CODE,
   fee: {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
@@ -159,6 +162,7 @@ const MainNetConfig: WalletConfig = {
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,
+  defaultCurrency: DEFAULT_CURRENCY_CODE,
   fee: {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
@@ -173,6 +177,7 @@ export const CustomDevNet: WalletConfig = {
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,
+  defaultCurrency: DEFAULT_CURRENCY_CODE,
   network: {
     defaultNodeUrl: '',
     chainId: 'test',
