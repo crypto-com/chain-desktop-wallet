@@ -21,7 +21,8 @@
     "@zondax/zemu": "leejw51crypto/zemu#master",
     "bech32": "^2.0.0",
     "ledger-cosmos-js": "^2.1.8",
-    "typescript": "^4.1.4"
+    "typescript": "^4.1.4",
+    "tslib": "1.10.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.8.4",
