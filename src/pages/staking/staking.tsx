@@ -87,6 +87,7 @@ const FormDelegationRequest = () => {
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
+  const [displayWarning, setDisplayWarning] = useState(true);
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -306,7 +307,7 @@ const FormDelegationRequest = () => {
     },
     {
       title: t('staking.validatorList.table.currentTokens'),
-      dataIndex: 'currentShares',
+      dataIndex: 'currentTokens',
       key: 'currentTokens',
       sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
       defaultSortOrder: 'descend' as any,
@@ -320,7 +321,7 @@ const FormDelegationRequest = () => {
       },
     },
     {
-      title: 'Cumulative Shares',
+      title: t('staking.validatorList.table.cumulativeShares'),
       // dataIndex: 'cumulativeShares',
       key: 'cumulativeShares',
       // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
@@ -399,13 +400,23 @@ const FormDelegationRequest = () => {
               dataSource={validatorTopList}
               columns={validatorColumns}
               pagination={{ showSizeChanger: false }}
+              onChange={(pagination, filters, sorter: any) => {
+                if (
+                  (sorter.order === 'descend' && sorter.field === 'currentTokens') ||
+                  sorter.order === undefined
+                ) {
+                  setDisplayWarning(true);
+                } else {
+                  setDisplayWarning(false);
+                }
+              }}
               expandable={{
-                rowExpandable: record => record.displayWarningColumn!,
+                rowExpandable: record => record.displayWarningColumn! && displayWarning,
                 expandedRowRender: record =>
-                  record.displayWarningColumn && (
+                  record.displayWarningColumn &&
+                  displayWarning && (
                     <div className="cumulative-stake33">
-                      Cumulative stake above can halt the network: improve decentralization and
-                      delegate to validators below
+                      {t('staking.validatorList.table.warningCumulative')}
                     </div>
                   ),
                 expandIconColumnIndex: -1,
