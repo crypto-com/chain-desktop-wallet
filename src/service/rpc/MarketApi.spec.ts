@@ -3,7 +3,6 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { expect } from 'chai';
 import { croMarketPriceApi } from './MarketApi';
-import { MARKET_API_BASE_URL } from '../../config/StaticConfig';
 
 describe('MarketApi', () => {
   let axiosMock: MockAdapter;

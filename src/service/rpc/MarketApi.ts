@@ -63,7 +63,7 @@ export class CroMarketApi implements IMarketApi {
       },
     });
 
-    if (fiatRateResp.status != 200) {
+    if (fiatRateResp.status !== 200) {
       throw Error('Could not find requested market price info from Coinbase');
     }
 
