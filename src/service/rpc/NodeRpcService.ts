@@ -5,6 +5,7 @@ import { Bytes } from '../../utils/ChainJsLib';
 import { NodePorts } from '../../config/StaticConfig';
 import {
   AllProposalResponse,
+  BalanceResponse,
   DelegationResult,
   FinalTallyResult,
   LoadedTallyResponse,
@@ -64,8 +65,11 @@ export class NodeRpcService implements INodeRpcService {
   }
 
   public async loadAccountBalance(address: string, assetDenom: string): Promise<string> {
-    const response = await this.tendermintClient.getBalance(address, assetDenom);
-    return response?.amount ?? '0';
+    const response = await this.cosmosClient.get<BalanceResponse>(
+      `/cosmos/bank/v1beta1/balances/${address}/${assetDenom}`,
+    );
+    const balanceData = response?.data;
+    return balanceData?.balance?.amount ?? '0';
   }
 
   public async loadSequenceNumber(address: string): Promise<number> {

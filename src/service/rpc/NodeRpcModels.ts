@@ -31,6 +31,10 @@ export interface Balance {
   amount: string;
 }
 
+export interface BalanceResponse {
+  balance: Balance;
+}
+
 export interface DelegationResponse {
   delegation: Delegation;
   balance: Balance;

@@ -679,6 +679,10 @@ class WalletService {
             currentSession.wallet.address,
             baseDenomination,
           );
+
+          // eslint-disable-next-line no-console
+          console.log('asset.balance.ddz', currentSession.wallet.address, asset.balance);
+
           asset.stakedBalance = await nodeRpc.loadStakingBalance(
             currentSession.wallet.address,
             baseDenomination,
