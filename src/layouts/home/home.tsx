@@ -241,6 +241,8 @@ function HomeLayout(props: HomeLayoutProps) {
       const allWalletsData = await walletService.retrieveAllWallets();
       const currentMarketData = await walletService.retrieveAssetPrice(
         currentAsset?.mainnetSymbol,
+        // TO-DO update selected currency from current session
+        // currentSession.currency
         'usd',
       );
 
