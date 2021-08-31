@@ -644,7 +644,7 @@
             "error2": "and",
             "error3": "characters",
             "error4": "Expected only start with lowercase alphabetic",
-            "error5": "Expected only alphabetic characters or numbers"
+            "error5": "Expected only lowercase alphabetic characters or numbers"
           },
           "tokenId": {
             "label": "Token ID",
@@ -653,7 +653,7 @@
             "error2": "and",
             "error3": "characters",
             "error4": "Expected only start with lowercase alphabetic",
-            "error5": "Expected only alphabetic characters or numbers"
+            "error5": "Expected only lowercase alphabetic characters or numbers"
           },
           "drop": {
             "label": "Drop Name",
@@ -1352,7 +1352,7 @@
           "table": {
             "title": "驗證者列表",
             "description": "請選擇其中一個驗證者。",
-            "warningCumulative": "繼續讓上方的驗證者的累積委託增加將可能導敢網絡停頓：為改善網絡的去中心化，請委託到下方的驗證者",
+            "warningCumulative": "讓上方的驗證者的累積委託增加將可能導敢網絡停頓：為改善網絡的去中心化，請委託到下方的驗證者",
             "validatorName": "名稱",
             "validatorWebsite": "網址",
             "validatorAddress": "地址",
@@ -2169,7 +2169,7 @@
           "table": {
             "title": "验证者列表",
             "description": "请选择其中一个验证者。",
-            "warningCumulative": "继续让上方的验证者的累积委托增加将可能导敢网络停顿：为改善网络的去中心化，请委托到下方的验证者",
+            "warningCumulative": "让上方的验证者的累积委托增加将可能导敢网络停顿：为改善网络的去中心化，请委托到下方的验证者",
             "validatorName": "名称",
             "validatorWebsite": "网址",
             "validatorAddress": "地址",
