@@ -1,3 +1,4 @@
+/*eslint-disable no-else-return*/
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { AssetMarketPrice } from '../../models/UserAsset';
 import { CroPrice } from './CroMarketApiModels';
@@ -18,6 +19,7 @@ export interface Data {
 
 export class CroMarketApi implements IMarketApi {
   private readonly axiosClient: AxiosInstance;
+
   private readonly coinbaseRateBaseUrl: string;
 
   constructor() {
@@ -43,15 +45,15 @@ export class CroMarketApi implements IMarketApi {
         dailyChange: croMarketPrice.data.coin.percent_change_native_24h,
         price: croMarketPrice.data.coin.price_native.amount,
       };
-    } else {
-      const fiatPrice = await this.getCryptoToFiatRateFromCoinbase(assetSymbol, currency);
-      return {
-        assetSymbol,
-        currency,
-        dailyChange: '',
-        price: fiatPrice,
-      };
     }
+
+    const fiatPrice = await this.getCryptoToFiatRateFromCoinbase(assetSymbol, currency);
+    return {
+      assetSymbol,
+      currency,
+      dailyChange: '',
+      price: fiatPrice,
+    };
   }
 
   private async getCryptoToFiatRateFromCoinbase(cryptoSymbol: string, fiatCurrency: string) {
