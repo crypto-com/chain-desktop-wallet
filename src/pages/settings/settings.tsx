@@ -381,6 +381,7 @@ function MetaInfoComponent() {
     };
     await walletService.setCurrentSession(newSession);
     setSession(newSession);
+    await walletService.loadAndSaveAssetPrices(newSession);
 
     const userAsset = walletAllAssets.filter(asset => {
       return !asset.isSecondaryAsset;

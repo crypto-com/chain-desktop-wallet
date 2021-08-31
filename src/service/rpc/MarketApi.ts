@@ -18,6 +18,7 @@ export interface Data {
 
 export class CroMarketApi implements IMarketApi {
   private readonly axiosClient: AxiosInstance;
+
   private readonly coinbaseRateBaseUrl: string;
 
   constructor() {
@@ -28,7 +29,6 @@ export class CroMarketApi implements IMarketApi {
   }
 
   public async getAssetPrice(assetSymbol: string, currency: string): Promise<AssetMarketPrice> {
-
     if (assetSymbol.toLowerCase() === 'cro' && currency.toLowerCase() === 'usd') {
       const croMarketPrice = await this.axiosClient.get<CroPrice>('/coins/show');
       const loadedSymbol = croMarketPrice.data.coin.symbol;
@@ -43,15 +43,15 @@ export class CroMarketApi implements IMarketApi {
         dailyChange: croMarketPrice.data.coin.percent_change_native_24h,
         price: croMarketPrice.data.coin.price_native.amount,
       };
-    } else {
-      const fiatPrice = await this.getCryptoToFiatRateFromCoinbase(assetSymbol, currency);
-      return {
-        assetSymbol,
-        currency,
-        dailyChange: '',
-        price: fiatPrice,
-      };
     }
+
+    const fiatPrice = await this.getCryptoToFiatRateFromCoinbase(assetSymbol, currency);
+    return {
+      assetSymbol,
+      currency,
+      dailyChange: '',
+      price: fiatPrice,
+    };
   }
 
   private async getCryptoToFiatRateFromCoinbase(cryptoSymbol: string, fiatCurrency: string) {
@@ -59,7 +59,7 @@ export class CroMarketApi implements IMarketApi {
       baseURL: this.coinbaseRateBaseUrl,
       url: '/exchange-rates',
       params: {
-        currency: cryptoSymbol
+        currency: cryptoSymbol,
       },
     });
 
@@ -68,7 +68,11 @@ export class CroMarketApi implements IMarketApi {
     }
 
     // Fetch Price from response
-    if (fiatRateResp.data && fiatRateResp.data.data.currency === cryptoSymbol && typeof fiatRateResp.data.data.rates[fiatCurrency] !== "undefined") {
+    if (
+      fiatRateResp.data &&
+      fiatRateResp.data.data.currency === cryptoSymbol &&
+      typeof fiatRateResp.data.data.rates[fiatCurrency] !== 'undefined'
+    ) {
       return fiatRateResp.data.data.rates[fiatCurrency];
     }
 
