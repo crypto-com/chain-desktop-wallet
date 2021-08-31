@@ -60,11 +60,6 @@ export interface SettingsDataUpdate {
   networkFee?: string | undefined;
 }
 
-export interface DefaultCurrencySettings {
-  walletId: string;
-  defaultCurrency: string;
-}
-
 export interface DisableDefaultMemoSettings {
   walletId: string;
   disableDefaultMemoAppend: boolean;

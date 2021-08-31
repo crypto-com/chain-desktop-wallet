@@ -1,7 +1,6 @@
 import axios from 'axios';
 import _ from 'lodash';
 import {
-  DefaultCurrencySettings,
   DisableDefaultMemoSettings,
   DisableGASettings,
   EnableGeneralSettingsPropagation,
@@ -695,10 +694,6 @@ class WalletService {
 
   public async updateWalletNodeConfig(nodeData: SettingsDataUpdate) {
     return this.storageService.updateWalletSettings(nodeData);
-  }
-
-  public async updateDefaultCurrency(defaultCurrencySettings: DefaultCurrencySettings) {
-    return this.storageService.updateDefaultCurrency(defaultCurrencySettings);
   }
 
   public async updateDefaultMemoDisabledSettings(
