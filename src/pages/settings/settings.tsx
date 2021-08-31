@@ -25,7 +25,12 @@ import { useTranslation } from 'react-i18next';
 import { CarouselRef } from 'antd/lib/carousel';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { sessionState, walletAllAssetsState, walletListState } from '../../recoil/atom';
+import {
+  marketState,
+  sessionState,
+  walletAllAssetsState,
+  walletListState,
+} from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import {
@@ -251,6 +256,8 @@ const GeneralSettingsForm = props => {
 
 function MetaInfoComponent() {
   const [session, setSession] = useRecoilState(sessionState);
+  const setMarketData = useSetRecoilState(marketState);
+  const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const [updateLoading, setUpdateLoading] = useState(false);
   const { walletType } = session.wallet;
 
@@ -362,19 +369,30 @@ function MetaInfoComponent() {
   };
 
   const onSwitchCurrency = async value => {
+    if (session.currency === value.toString()) {
+      return;
+    }
+
     setUpdateLoading(true);
 
     const newSession = {
       ...session,
       currency: value.toString(),
     };
-
     await walletService.setCurrentSession(newSession);
-
     setSession(newSession);
-    setUpdateLoading(false);
 
+    const userAsset = walletAllAssets.filter(asset => {
+      return !asset.isSecondaryAsset;
+    });
+    const currentMarketData = await walletService.retrieveAssetPrice(
+      userAsset[0]?.mainnetSymbol,
+      newSession.currency,
+    );
+    setMarketData(currentMarketData);
     setDefaultCurrencyState(value.toString());
+
+    setUpdateLoading(false);
   };
 
   const showPasswordInput = () => {
