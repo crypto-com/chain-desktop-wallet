@@ -1,4 +1,5 @@
 import { VoteOption } from '../../models/Transaction';
+import { UserAsset } from '../../models/UserAsset';
 
 export interface TransactionUnsigned {
   memo: string;
@@ -7,6 +8,7 @@ export interface TransactionUnsigned {
   nonce?: number;
   gasPrice?: number;
   gasLimit?: number;
+  asset?: UserAsset;
 }
 
 export interface TransferTransactionUnsigned extends TransactionUnsigned {

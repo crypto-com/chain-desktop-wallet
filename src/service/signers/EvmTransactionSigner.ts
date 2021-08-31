@@ -7,10 +7,6 @@ import {
   WithdrawStakingRewardUnsigned,
 } from './TransactionSupported';
 
-// TODO: To be removed, these will be part of the configuration
-const DEFAULT_GAS_PRICE = 20_000_000_000; // 20 GWEI
-const DEFAULT_GAS_LIMIT = 21_000; //
-
 class EvmTransactionSigner implements ITransactionSigner {
   // eslint-disable-next-line class-methods-use-this
   public async signTransfer(
@@ -18,10 +14,13 @@ class EvmTransactionSigner implements ITransactionSigner {
     phrase: string,
   ): Promise<string> {
     const web3 = new Web3('');
+
+    const transferAsset = transaction.asset;
+
     const txParams = {
-      nonce: ethers.utils.hexValue(transaction.nonce || 0),
-      gasPrice: ethers.utils.hexValue(transaction.gasPrice || DEFAULT_GAS_PRICE),
-      gasLimit: transaction.gasLimit || DEFAULT_GAS_LIMIT,
+      nonce: web3.utils.toHex(transaction.nonce || 0),
+      gasPrice: web3.utils.toHex(transaction.gasPrice || transferAsset?.config?.fee?.networkFee!),
+      gasLimit: transaction.gasLimit || transferAsset?.config?.fee?.gasLimit,
       to: transaction.toAddress,
       value: web3.utils.toHex(transaction.amount),
       data:
