@@ -534,11 +534,13 @@
           "table": {
             "title": "Validator List",
             "description": "Please select one of the validator.",
+            "warningCumulative": "Cumulative stake above can halt the network: improve decentralization and delegate to validators below",
             "validatorName": "Name",
             "validatorWebsite": "Website",
             "validatorAddress": "Address",
             "currentTokens": "Voting Power",
             "currentCommissionRate": "Commission",
+            "cumulativeShares": "Cumulative Shares",
             "action": "Action"
           }
         },
@@ -642,7 +644,7 @@
             "error2": "and",
             "error3": "characters",
             "error4": "Expected only start with lowercase alphabetic",
-            "error5": "Expected only alphabetic characters or numbers"
+            "error5": "Expected only lowercase alphabetic characters or numbers"
           },
           "tokenId": {
             "label": "Token ID",
@@ -651,7 +653,7 @@
             "error2": "and",
             "error3": "characters",
             "error4": "Expected only start with lowercase alphabetic",
-            "error5": "Expected only alphabetic characters or numbers"
+            "error5": "Expected only lowercase alphabetic characters or numbers"
           },
           "drop": {
             "label": "Drop Name",
@@ -763,7 +765,8 @@
           "success3": "wallets",
           "analytics1": "Analytics settings has been",
           "defaultMemo1": "Default client memo settings has been",
-          "generalSettings1": "General settings propagation has been"
+          "generalSettings1": "General settings propagation has been",
+          "currency1": "Currency has been switched to "
         },
         "notification": {
           "recover": {
@@ -1349,11 +1352,13 @@
           "table": {
             "title": "驗證者列表",
             "description": "請選擇其中一個驗證者。",
+            "warningCumulative": "讓上方的驗證者的累積委託增加將可能導敢網絡停頓：為改善網絡的去中心化，請委託到下方的驗證者",
             "validatorName": "名稱",
             "validatorWebsite": "網址",
             "validatorAddress": "地址",
-            "currentTokens": "投票能量",
+            "currentTokens": "投票權",
             "currentCommissionRate": "佣金",
+            "cumulativeShares": "累積委託",
             "action": "操作"
           }
         },
@@ -2150,7 +2155,7 @@
         "title": "抵押",
         "tab1": "抵押奖励",
         "tab2": "委托资金",
-        "tab3": "委托资金",
+        "tab3": "委托管理",
         "description1": "从委托资金提取奖励。",
         "description2": "委托资金至验证者。",
         "description3": "管理你的已委托资金",
@@ -2164,11 +2169,13 @@
           "table": {
             "title": "验证者列表",
             "description": "请选择其中一个验证者。",
+            "warningCumulative": "让上方的验证者的累积委托增加将可能导敢网络停顿：为改善网络的去中心化，请委托到下方的验证者",
             "validatorName": "名称",
             "validatorWebsite": "网址",
             "validatorAddress": "地址",
             "currentTokens": "投票权",
             "currentCommissionRate": "佣金",
+            "cumulativeShares": "累积委托",
             "action": "操作"
           }
         },
@@ -3084,6 +3091,7 @@
         "title": "스테이킹",
         "tab1": "스테이킹 보상",
         "tab2": "금액 위임",
+        "tab3": "위임 관리",
         "description1": "위임된 금액에서 보상을 인출합니다",
         "description2": "검증인에게 금액을 위임합니다",
         "maxValidator": {
@@ -3101,6 +3109,7 @@
             "validatorAddress": "주소",
             "currentTokens": "투표 파워",
             "currentCommissionRate": "수수료율",
+            "cumulativeShares": "축적 투표",
             "action": "활동"
           }
         },
