@@ -24,6 +24,7 @@ export const SUPPORTED_LANGUAGE = [
   { value: 'koKR', label: '한국어' },
 ];
 
+export const DEFAULT_ASSET_SYMBOL = 'CRO';
 export const DEFAULT_CURRENCY_CODE = 'USD';
 export const SUPPORTED_CURRENCY = [
   { value: 'USD', label: 'USD - $' },

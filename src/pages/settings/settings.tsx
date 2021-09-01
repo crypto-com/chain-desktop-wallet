@@ -46,6 +46,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
 import {
   DEFAULT_LANGUAGE_CODE,
+  DEFAULT_ASSET_SYMBOL,
   DEFAULT_CURRENCY_CODE,
   FIXED_DEFAULT_FEE,
   FIXED_DEFAULT_GAS_LIMIT,
@@ -257,7 +258,6 @@ const GeneralSettingsForm = props => {
 function MetaInfoComponent() {
   const [session, setSession] = useRecoilState(sessionState);
   const setMarketData = useSetRecoilState(marketState);
-  const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const [updateLoading, setUpdateLoading] = useState(false);
   const { walletType } = session.wallet;
 
@@ -383,13 +383,11 @@ function MetaInfoComponent() {
     setSession(newSession);
     await walletService.loadAndSaveAssetPrices(newSession);
 
-    const userAsset = walletAllAssets.filter(asset => {
-      return !asset.isSecondaryAsset;
-    });
     const currentMarketData = await walletService.retrieveAssetPrice(
-      userAsset[0]?.mainnetSymbol,
+      DEFAULT_ASSET_SYMBOL,
       newSession.currency,
     );
+
     setMarketData(currentMarketData);
     setDefaultCurrencyState(value.toString());
 
