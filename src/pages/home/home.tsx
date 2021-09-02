@@ -119,7 +119,7 @@ const HomePage = () => {
               ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
                   assetMarketData.price,
                 ).format('0,0.00')} ${assetMarketData?.currency}`
-              : `--`}
+              : `${SUPPORTED_CURRENCY.get(currentSession.currency)?.symbol}--`}
           </>
         );
       },
@@ -150,7 +150,7 @@ const HomePage = () => {
               ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
                   getAssetBalancePrice(record, assetMarketData),
                 ).format('0,0.00')} ${assetMarketData?.currency}`
-              : '--'}
+              : `${SUPPORTED_CURRENCY.get(currentSession.currency)?.symbol}--`}
           </>
         );
       },

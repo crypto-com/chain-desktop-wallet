@@ -201,7 +201,7 @@ const AssetsPage = () => {
               ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
                   assetMarketData.price,
                 ).format('0,0.00')} ${assetMarketData.currency}`
-              : '--'}
+              : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
           </>
         );
       },
@@ -232,7 +232,7 @@ const AssetsPage = () => {
               ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
                   getAssetBalancePrice(record, assetMarketData),
                 ).format('0,0.00')} ${assetMarketData?.currency}`
-              : '--'}
+              : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
           </>
         );
       },
@@ -360,7 +360,7 @@ const AssetsPage = () => {
                               }${numeral(
                                 getAssetBalancePrice(currentAsset, currentAssetMarketData),
                               ).format('0,0.00')} ${currentAssetMarketData?.currency}`
-                            : '--'}
+                            : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
                         </div>
                       </Content>
                     </Layout>
