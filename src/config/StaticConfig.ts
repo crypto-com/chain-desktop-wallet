@@ -29,7 +29,6 @@ export interface SupportedCurrency {
   symbol: string;
   label: string;
 }
-
 export const SUPPORTED_CURRENCY = new Map<string, SupportedCurrency>();
 SUPPORTED_CURRENCY.set('USD', { value: 'USD', label: 'USD - $', symbol: '$' });
 SUPPORTED_CURRENCY.set('GBP', { value: 'GBP', label: 'GBP - £', symbol: '£' });
@@ -40,6 +39,23 @@ SUPPORTED_CURRENCY.set('AUD', { value: 'AUD', label: 'AUD - $', symbol: '$' });
 SUPPORTED_CURRENCY.set('NZD', { value: 'NZD', label: 'NZD - $', symbol: '$' });
 SUPPORTED_CURRENCY.set('HKD', { value: 'HKD', label: 'HKD - $', symbol: '$' });
 SUPPORTED_CURRENCY.set('TWD', { value: 'TWD', label: 'TWD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('NOK', { value: 'NOK', label: 'NOK - kr', symbol: 'kr' });
+SUPPORTED_CURRENCY.set('SEK', { value: 'SEK', label: 'SEK - kr', symbol: 'kr' });
+SUPPORTED_CURRENCY.set('DKK', { value: 'DKK', label: 'DKK - kr', symbol: 'kr' });
+SUPPORTED_CURRENCY.set('CHF', { value: 'CHF', label: 'CHF - CHF', symbol: 'CHF' });
+SUPPORTED_CURRENCY.set('PLN', { value: 'PLN', label: 'PLN - zł', symbol: 'zł' });
+SUPPORTED_CURRENCY.set('ZAR', { value: 'ZAR', label: 'ZAR - R', symbol: 'R' });
+SUPPORTED_CURRENCY.set('KES', { value: 'KES', label: 'KES - KSh', symbol: 'KSh' });
+SUPPORTED_CURRENCY.set('RUB', { value: 'RUB', label: 'RUB - ₽', symbol: '₽' });
+SUPPORTED_CURRENCY.set('BGN', { value: 'BGN', label: 'BGN - Лв.', symbol: 'Лв.' });
+SUPPORTED_CURRENCY.set('RON', { value: 'RON', label: 'RON - lei', symbol: 'lei' });
+SUPPORTED_CURRENCY.set('ILS', { value: 'ILS', label: 'ILS - ₪', symbol: '₪' });
+SUPPORTED_CURRENCY.set('SAR', { value: 'SAR', label: 'SAR - ر.س', symbol: 'ر.س' });
+SUPPORTED_CURRENCY.set('AED', { value: 'AED', label: 'AED - د.إ', symbol: 'د.إ' });
+SUPPORTED_CURRENCY.set('HUF', { value: 'HUF', label: 'HUF - Ft', symbol: 'Ft' });
+SUPPORTED_CURRENCY.set('CZK', { value: 'CZK', label: 'CZK - Kč', symbol: 'Kč' });
+SUPPORTED_CURRENCY.set('BRL', { value: 'BRL', label: 'BRL - R$', symbol: 'R$' });
+SUPPORTED_CURRENCY.set('TRY', { value: 'TRY', label: 'TRY - ₺', symbol: '₺' });
 
 export type WalletConfig = {
   enabled: boolean;
