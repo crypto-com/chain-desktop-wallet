@@ -10,7 +10,7 @@ import Big from 'big.js';
 import numeral from 'numeral';
 
 import {
-  marketState,
+  allMarketState,
   sessionState,
   walletAssetState,
   ledgerIsExpertModeState,
@@ -53,6 +53,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { UndelegateFormComponent } from '../home/components/UndelegateFormComponent';
 import RedelegateFormComponent from '../home/components/RedelegateFormComponent';
 import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
+import { SUPPORTED_CURRENCY } from '../../config/dist/StaticConfig';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -1064,7 +1065,7 @@ const FormWithdrawStakingReward = () => {
   // const walletAllAssets = useRecoilValue(walletAllAssetsState);
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
-  const marketData = useRecoilValue(marketState);
+  const allMarketData = useRecoilValue(allMarketState);
   const currentSession = useRecoilValue(sessionState);
   const fetchingDB = useRecoilValue(fetchingDBState);
 
@@ -1082,15 +1083,20 @@ const FormWithdrawStakingReward = () => {
       .filter(reward => Big(reward.amount).gte(Big(0)))
       .map(reward => {
         const rewardAmount = getUIDynamicAmount(reward.amount, currentAsset);
-        const marketPrice = marketData && marketData.price ? new Big(currentMarketPrice.price) : '';
+        const marketPrice =
+          currentMarketPrice && currentMarketPrice.price ? new Big(currentMarketPrice.price) : '';
         const rewardMarketPrice =
-          marketData && marketData.price ? new Big(rewardAmount).times(marketPrice).toFixed(2) : '';
+          currentMarketPrice && currentMarketPrice.price
+            ? new Big(rewardAmount).times(marketPrice).toFixed(2)
+            : '';
         const rewardData: RewardsTabularData = {
           key: `${reward.validatorAddress}${reward.amount}`,
           rewardAmount: `${rewardAmount} ${currentAsset.symbol}`,
           rewardMarketPrice:
             rewardMarketPrice !== ''
-              ? `${numeral(rewardMarketPrice).format('$0,0.00')} ${marketData?.currency}`
+              ? `${SUPPORTED_CURRENCY.get(currentMarketPrice?.currency)?.symbol}${numeral(
+                  rewardMarketPrice,
+                ).format('0,0.00')} ${currentMarketPrice?.currency}`
               : ``,
           validatorAddress: reward.validatorAddress,
         };
@@ -1100,6 +1106,8 @@ const FormWithdrawStakingReward = () => {
 
   useEffect(() => {
     const syncRewardsData = async () => {
+      const currentMarketData = allMarketData[`${walletAsset?.symbol}-${currentSession?.currency}`];
+
       const allRewards: RewardTransaction[] = await walletService.retrieveAllRewards(
         currentSession.wallet.identifier,
       );
@@ -1113,7 +1121,7 @@ const FormWithdrawStakingReward = () => {
           ? walletAsset
           : await walletService.retrieveDefaultWalletAsset(currentSession);
 
-      const rewardsTabularData = convertToTabularData(allRewards, primaryAsset, marketData);
+      const rewardsTabularData = convertToTabularData(allRewards, primaryAsset, currentMarketData);
       setRewards(rewardsTabularData);
       setWalletAsset(primaryAsset);
     };
