@@ -71,7 +71,7 @@ const convertTransfers = (
       key: transfer.hash + transfer.receiverAddress + transfer.amount,
       recipientAddress: transfer.receiverAddress,
       transactionHash: transfer.hash,
-      time: new Date(transfer.date).toLocaleString(),
+      time: new Date(transfer.date).toString(),
       amount: `${transferAmount} ${transfer.assetSymbol}`,
       direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
       status: transfer.status,
