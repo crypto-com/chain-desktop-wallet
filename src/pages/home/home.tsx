@@ -109,15 +109,20 @@ const HomePage = () => {
       title: t('home.assetList.table.price'),
       // dataIndex: 'price',
       key: 'price',
-      render: record => (
-        <>
-          {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
-            ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                marketData.price,
-              ).format('0,0.00')} ${marketData?.currency}`
-            : `--`}
-        </>
-      ),
+      render: record => {
+        const assetMarketData = allMarketData[`${record.symbol}-${currentSession.currency}`];
+        return (
+          <>
+            {assetMarketData &&
+            assetMarketData.price &&
+            record.mainnetSymbol === assetMarketData.assetSymbol
+              ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
+                  assetMarketData.price,
+                ).format('0,0.00')} ${assetMarketData?.currency}`
+              : `--`}
+          </>
+        );
+      },
     },
     {
       title: t('home.assetList.table.amount'),
@@ -136,12 +141,15 @@ const HomePage = () => {
       // dataIndex: 'value',
       key: 'value',
       render: record => {
+        const assetMarketData = allMarketData[`${record.symbol}-${currentSession.currency}`];
         return (
           <>
-            {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
-              ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                  getAssetBalancePrice(record, marketData),
-                ).format('0,0.00')} ${marketData?.currency}`
+            {assetMarketData &&
+            assetMarketData.price &&
+            record.mainnetSymbol === assetMarketData.assetSymbol
+              ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
+                  getAssetBalancePrice(record, assetMarketData),
+                ).format('0,0.00')} ${assetMarketData?.currency}`
               : '--'}
           </>
         );
