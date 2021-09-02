@@ -28,6 +28,7 @@ import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   FIXED_DEFAULT_FEE,
   CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+  SUPPORTED_CURRENCY,
 } from '../../config/StaticConfig';
 import {
   adjustedTransactionAmount,
@@ -53,7 +54,6 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { UndelegateFormComponent } from '../home/components/UndelegateFormComponent';
 import RedelegateFormComponent from '../home/components/RedelegateFormComponent';
 import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
-import { SUPPORTED_CURRENCY } from '../../config/dist/StaticConfig';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
