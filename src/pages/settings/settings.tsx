@@ -52,6 +52,7 @@ import {
   SUPPORTED_LANGUAGE,
   SUPPORTED_CURRENCY,
   WalletConfig,
+  SupportedCurrency,
 } from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
@@ -265,6 +266,7 @@ function MetaInfoComponent() {
   const [defaultCurrencyState, setDefaultCurrencyState] = useState<string>(session.currency);
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
+  const [supportedCurrencies, setSupportedCurrencies] = useState<SupportedCurrency[]>([]);
   const [t, i18n] = useTranslation();
 
   const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
@@ -335,11 +337,18 @@ function MetaInfoComponent() {
       const defaultLanguage = i18n.language ? i18n.language : DEFAULT_LANGUAGE_CODE;
       const { currency } = session;
       const { disableDefaultClientMemo, analyticsDisabled } = session.wallet.config;
+
       if (!unmounted) {
         setDefaultLanguageState(defaultLanguage);
         setDefaultCurrencyState(currency);
         setDefaultMemoStateDisabled(disableDefaultClientMemo);
         setDefaultGAStateDisabled(analyticsDisabled);
+
+        const currencies: SupportedCurrency[] = [];
+        SUPPORTED_CURRENCY.forEach((item: SupportedCurrency) => {
+          currencies.push(item);
+        });
+        setSupportedCurrencies(currencies);
       }
     };
 
@@ -507,7 +516,7 @@ function MetaInfoComponent() {
             {/* <div className="description">
             </div> */}
             <Select style={{ width: 240 }} onChange={onSwitchCurrency} value={defaultCurrencyState}>
-              {SUPPORTED_CURRENCY.map(item => {
+              {supportedCurrencies.map(item => {
                 return (
                   <Option value={item.value} key={item.value}>
                     {item.label}

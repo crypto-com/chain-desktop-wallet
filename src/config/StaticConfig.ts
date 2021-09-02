@@ -24,17 +24,22 @@ export const SUPPORTED_LANGUAGE = [
   { value: 'koKR', label: '한국어' },
 ];
 
-export const SUPPORTED_CURRENCY = [
-  { value: 'USD', label: 'USD - $', symbol: '$' },
-  { value: 'GBP', label: 'GBP - £', symbol: '£' },
-  { value: 'EUR', label: 'EUR - €', symbol: '€' },
-  { value: 'SGD', label: 'SGD - $', symbol: '$' },
-  { value: 'CAD', label: 'CAD - $', symbol: '$' },
-  { value: 'AUD', label: 'AUD - $', symbol: '$' },
-  { value: 'NZD', label: 'NZD - $', symbol: '$' },
-  { value: 'HKD', label: 'HKD - $', symbol: '$' },
-  { value: 'TWD', label: 'TWD - $', symbol: '$' },
-];
+export interface SupportedCurrency {
+  value: string;
+  symbol: string;
+  label: string;
+}
+
+export const SUPPORTED_CURRENCY = new Map<string, SupportedCurrency>();
+SUPPORTED_CURRENCY.set('USD', { value: 'USD', label: 'USD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('GBP', { value: 'GBP', label: 'GBP - £', symbol: '£' });
+SUPPORTED_CURRENCY.set('EUR', { value: 'EUR', label: 'EUR - €', symbol: '€' });
+SUPPORTED_CURRENCY.set('SGD', { value: 'SGD', label: 'SGD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('CAD', { value: 'CAD', label: 'CAD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('AUD', { value: 'AUD', label: 'AUD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('NZD', { value: 'NZD', label: 'NZD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('HKD', { value: 'HKD', label: 'HKD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('TWD', { value: 'TWD', label: 'TWD - $', symbol: '$' });
 
 export type WalletConfig = {
   enabled: boolean;

@@ -18,7 +18,7 @@ import {
   navbarMenuSelectedKeyState,
   fetchingDBState,
 } from '../../recoil/atom';
-import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
+import { NOT_KNOWN_YET_VALUE, SUPPORTED_CURRENCY, WalletConfig } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
 import {
@@ -112,8 +112,10 @@ const HomePage = () => {
       render: record => (
         <>
           {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
-            ? `${numeral(marketData.price).format('$0,0.00')} ${marketData?.currency}`
-            : '$--'}
+            ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                marketData.price,
+              ).format('0,0.00')} ${marketData?.currency}`
+            : `--`}
         </>
       ),
     },
@@ -137,10 +139,10 @@ const HomePage = () => {
         return (
           <>
             {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
-              ? `${numeral(getAssetBalancePrice(record, marketData)).format('$0,0.00')} ${
-                  marketData?.currency
-                }`
-              : '$--'}
+              ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                  getAssetBalancePrice(record, marketData),
+                ).format('0,0.00')} ${marketData?.currency}`
+              : '--'}
           </>
         );
       },
@@ -280,6 +282,7 @@ const HomePage = () => {
       setNFTList(allNFTs);
       setdefaultWalletAsset(currentAsset);
       setMarketData(allMarketData[`${currentAsset.symbol}-${sessionData.currency}`]);
+
       showWalletStateNotification(sessionData.wallet.config);
       setWalletAllAssets(allAssets);
       setHasShownNotLiveWallet(true);
@@ -331,9 +334,9 @@ const HomePage = () => {
             )}
             <div className="fiat">
               {defaultWalletAsset && marketData && marketData.price
-                ? `${numeral(getAssetBalancePrice(defaultWalletAsset, marketData)).format(
-                    '$0,0.00',
-                  )} ${marketData?.currency}`
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetBalancePrice(defaultWalletAsset, marketData),
+                  ).format(`0,0.00`)} ${marketData?.currency}`
                 : ''}
             </div>
           </div>
@@ -347,9 +350,9 @@ const HomePage = () => {
             )}
             <div className="fiat">
               {defaultWalletAsset && marketData && marketData.price
-                ? `${numeral(getAssetStakingBalancePrice(defaultWalletAsset, marketData)).format(
-                    '$0,0.00',
-                  )} ${marketData?.currency}
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetStakingBalancePrice(defaultWalletAsset, marketData),
+                  ).format('0,0.00')} ${marketData?.currency}
                   `
                 : ''}
             </div>
