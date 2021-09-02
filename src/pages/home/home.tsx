@@ -110,7 +110,7 @@ const HomePage = () => {
       // dataIndex: 'price',
       key: 'price',
       render: record => {
-        const assetMarketData = allMarketData[`${record.symbol}-${currentSession.currency}`];
+        const assetMarketData = allMarketData[`${record.mainnetSymbol}-${currentSession.currency}`];
         return (
           <>
             {assetMarketData &&
@@ -141,7 +141,7 @@ const HomePage = () => {
       // dataIndex: 'value',
       key: 'value',
       render: record => {
-        const assetMarketData = allMarketData[`${record.symbol}-${currentSession.currency}`];
+        const assetMarketData = allMarketData[`${record.mainnetSymbol}-${currentSession.currency}`];
         return (
           <>
             {assetMarketData &&
@@ -289,7 +289,7 @@ const HomePage = () => {
       setProcessedNftList(currentNftList);
       setNFTList(allNFTs);
       setdefaultWalletAsset(currentAsset);
-      setMarketData(allMarketData[`${currentAsset.symbol}-${sessionData.currency}`]);
+      setMarketData(allMarketData[`${currentAsset?.mainnetSymbol}-${sessionData.currency}`]);
 
       showWalletStateNotification(sessionData.wallet.config);
       setWalletAllAssets(allAssets);
