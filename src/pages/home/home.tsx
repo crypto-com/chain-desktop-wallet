@@ -11,13 +11,14 @@ import { useTranslation } from 'react-i18next';
 import {
   hasShownWarningOnWalletTypeState,
   sessionState,
-  marketState,
+  // marketState,
+  allMarketState,
   walletAllAssetsState,
   nftListState,
   navbarMenuSelectedKeyState,
   fetchingDBState,
 } from '../../recoil/atom';
-import { NOT_KNOWN_YET_VALUE, WalletConfig } from '../../config/StaticConfig';
+import { NOT_KNOWN_YET_VALUE, SUPPORTED_CURRENCY, WalletConfig } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
 import {
@@ -26,7 +27,9 @@ import {
   getAssetBalancePrice,
   getAssetStakingBalancePrice,
   UserAsset,
+  AssetMarketPrice,
 } from '../../models/UserAsset';
+
 import { NftModel, NftProcessedModel } from '../../models/Transaction';
 
 import { walletService } from '../../service/WalletService';
@@ -56,7 +59,10 @@ const HomePage = () => {
   // const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setNFTList = useSetRecoilState(nftListState);
-  const marketData = useRecoilValue(marketState);
+  // const marketData = useRecoilValue(marketState);
+  const allMarketData = useRecoilValue(allMarketState);
+  const [marketData, setMarketData] = useState<AssetMarketPrice>();
+
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const didMountRef = useRef(false);
   const history = useHistory();
@@ -103,13 +109,20 @@ const HomePage = () => {
       title: t('home.assetList.table.price'),
       // dataIndex: 'price',
       key: 'price',
-      render: record => (
-        <>
-          {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
-            ? `${numeral(marketData.price).format('$0,0.00')} ${marketData?.currency}`
-            : '$--'}
-        </>
-      ),
+      render: record => {
+        const assetMarketData = allMarketData[`${record.mainnetSymbol}-${currentSession.currency}`];
+        return (
+          <>
+            {assetMarketData &&
+            assetMarketData.price &&
+            record.mainnetSymbol === assetMarketData.assetSymbol
+              ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
+                  assetMarketData.price,
+                ).format('0,0.00')} ${assetMarketData?.currency}`
+              : `${SUPPORTED_CURRENCY.get(currentSession.currency)?.symbol}--`}
+          </>
+        );
+      },
     },
     {
       title: t('home.assetList.table.amount'),
@@ -128,13 +141,16 @@ const HomePage = () => {
       // dataIndex: 'value',
       key: 'value',
       render: record => {
+        const assetMarketData = allMarketData[`${record.mainnetSymbol}-${currentSession.currency}`];
         return (
           <>
-            {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
-              ? `${numeral(getAssetBalancePrice(record, marketData)).format('$0,0.00')} ${
-                  marketData?.currency
-                }`
-              : '$--'}
+            {assetMarketData &&
+            assetMarketData.price &&
+            record.mainnetSymbol === assetMarketData.assetSymbol
+              ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
+                  getAssetBalancePrice(record, assetMarketData),
+                ).format('0,0.00')} ${assetMarketData?.currency}`
+              : `${SUPPORTED_CURRENCY.get(currentSession.currency)?.symbol}--`}
           </>
         );
       },
@@ -273,6 +289,8 @@ const HomePage = () => {
       setProcessedNftList(currentNftList);
       setNFTList(allNFTs);
       setdefaultWalletAsset(currentAsset);
+      setMarketData(allMarketData[`${currentAsset?.mainnetSymbol}-${sessionData.currency}`]);
+
       showWalletStateNotification(sessionData.wallet.config);
       setWalletAllAssets(allAssets);
       setHasShownNotLiveWallet(true);
@@ -324,9 +342,9 @@ const HomePage = () => {
             )}
             <div className="fiat">
               {defaultWalletAsset && marketData && marketData.price
-                ? `${numeral(getAssetBalancePrice(defaultWalletAsset, marketData)).format(
-                    '$0,0.00',
-                  )} ${marketData?.currency}`
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetBalancePrice(defaultWalletAsset, marketData),
+                  ).format(`0,0.00`)} ${marketData?.currency}`
                 : ''}
             </div>
           </div>
@@ -340,9 +358,9 @@ const HomePage = () => {
             )}
             <div className="fiat">
               {defaultWalletAsset && marketData && marketData.price
-                ? `${numeral(getAssetStakingBalancePrice(defaultWalletAsset, marketData)).format(
-                    '$0,0.00',
-                  )} ${marketData?.currency}
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetStakingBalancePrice(defaultWalletAsset, marketData),
+                  ).format('0,0.00')} ${marketData?.currency}
                   `
                 : ''}
             </div>
@@ -372,7 +390,7 @@ const HomePage = () => {
                 onRow={selectedAsset => {
                   return {
                     onClick: async () => {
-                      setNavbarMenuSelectedKey('/send');
+                      setNavbarMenuSelectedKey('/assets');
                       setFetchingDB(true);
                       setCurrentSession({
                         ...currentSession,
@@ -383,7 +401,7 @@ const HomePage = () => {
                         activeAsset: selectedAsset,
                       });
                       history.push({
-                        pathname: '/send',
+                        pathname: '/assets',
                         state: {
                           from: '/home',
                         },
@@ -392,7 +410,11 @@ const HomePage = () => {
                   };
                 }}
               />
-              <Link to="/send" className="all" onClick={() => setNavbarMenuSelectedKey('/send')}>
+              <Link
+                to="/assets"
+                className="all"
+                onClick={() => setNavbarMenuSelectedKey('/assets')}
+              >
                 {t('general.seeAll')}
               </Link>
             </div>

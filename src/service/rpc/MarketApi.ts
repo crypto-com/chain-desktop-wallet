@@ -43,7 +43,7 @@ export class CroMarketApi implements IMarketApi {
       baseURL: this.coinbaseRateBaseUrl,
       url: '/exchange-rates',
       params: {
-        currency: cryptoSymbol
+        currency: cryptoSymbol,
       },
     });
 
@@ -52,7 +52,11 @@ export class CroMarketApi implements IMarketApi {
     }
 
     // Fetch Price from response
-    if (fiatRateResp.data && fiatRateResp.data.data.currency === cryptoSymbol && typeof fiatRateResp.data.data.rates[fiatCurrency] !== "undefined") {
+    if (
+      fiatRateResp.data &&
+      fiatRateResp.data.data.currency === cryptoSymbol &&
+      typeof fiatRateResp.data.data.rates[fiatCurrency] !== 'undefined'
+    ) {
       return fiatRateResp.data.data.rates[fiatCurrency];
     }
 

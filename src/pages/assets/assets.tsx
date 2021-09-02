@@ -9,14 +9,16 @@ import { Layout, Table, Avatar, Tabs, Tag, Typography, Dropdown, Menu } from 'an
 import { ArrowLeftOutlined, MoreOutlined } from '@ant-design/icons';
 import {
   sessionState,
-  marketState,
+  allMarketState,
   // walletAssetState,
   walletAllAssetsState,
   navbarMenuSelectedKeyState,
   fetchingDBState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
-import { getAssetBalancePrice, UserAsset } from '../../models/UserAsset';
+import { AssetMarketPrice, getAssetBalancePrice, UserAsset } from '../../models/UserAsset';
+import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
+
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 // import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
@@ -33,7 +35,7 @@ import {
 // import IconSend from '../../svg/IconSend';
 // import IconReceive from '../../svg/IconReceive';
 
-const { Header, Content, Footer } = Layout;
+const { Sider, Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
@@ -84,12 +86,13 @@ const AssetsPage = () => {
   const [session, setSession] = useRecoilState<Session>(sessionState);
   // const userAsset = useRecoilValue(walletAssetState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
-  const marketData = useRecoilValue(marketState);
+  const allMarketData = useRecoilValue(allMarketState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setFetchingDB = useSetRecoilState(fetchingDBState);
 
   // const [isLedger, setIsLedger] = useState(false);
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(session.activeAsset);
+  const [currentAssetMarketData, setCurrentAssetMarketData] = useState<AssetMarketPrice>();
   const [isAssetVisible, setIsAssetVisible] = useState(false);
   const [activeAssetTab, setActiveAssetTab] = useState('1');
   const [allTransfer, setAllTransfer] = useState<any>();
@@ -99,7 +102,7 @@ const AssetsPage = () => {
   const analyticsService = new AnalyticsService(session);
 
   const [t] = useTranslation();
-  const currentLocationPath = useLocation().pathname;
+  // const currentLocationPath = useLocation().pathname;
   const locationState: any = useLocation().state ?? {
     from: '',
     identifier: '',
@@ -116,24 +119,27 @@ const AssetsPage = () => {
       if (locationState.from === '/home' && session.activeAsset) {
         syncTransfers(session.activeAsset);
         setCurrentAsset(session.activeAsset);
+        setCurrentAssetMarketData(
+          allMarketData[`${session.activeAsset.mainnetSymbol}-${session.currency}`],
+        );
         setIsAssetVisible(true);
         setFetchingDB(false);
       }
     };
 
-    const getDefaultAssetTab = _locationState => {
-      if (_locationState.from === '/home' && session.activeAsset) {
-        setActiveAssetTab('1');
-      } else if (currentLocationPath === '/send') {
-        setActiveAssetTab('2');
-      } else {
-        setActiveAssetTab('3');
-      }
-    };
+    // const getDefaultAssetTab = _locationState => {
+    //   if (_locationState.from === '/home' && session.activeAsset) {
+    //     setActiveAssetTab('1');
+    //   } else if (currentLocationPath === '/send') {
+    //     setActiveAssetTab('2');
+    //   } else {
+    //     setActiveAssetTab('3');
+    //   }
+    // };
 
     if (!didMountRef.current) {
       checkDirectedFrom();
-      getDefaultAssetTab(locationState);
+      // getDefaultAssetTab(locationState);
       didMountRef.current = true;
       analyticsService.logPage('Assets');
     }
@@ -185,13 +191,20 @@ const AssetsPage = () => {
       title: t('assets.assetList.table.price'),
       // dataIndex: 'price',
       key: 'price',
-      render: record => (
-        <>
-          {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
-            ? `${numeral(marketData.price).format('$0,0.00')} ${marketData?.currency}`
-            : '$--'}
-        </>
-      ),
+      render: record => {
+        const assetMarketData = allMarketData[`${record.mainnetSymbol}-${session.currency}`];
+        return (
+          <>
+            {assetMarketData &&
+            assetMarketData.price &&
+            record.mainnetSymbol === assetMarketData.assetSymbol
+              ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
+                  assetMarketData.price,
+                ).format('0,0.00')} ${assetMarketData.currency}`
+              : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
+          </>
+        );
+      },
     },
     {
       title: t('assets.assetList.table.amount'),
@@ -209,15 +222,20 @@ const AssetsPage = () => {
       title: t('assets.assetList.table.value'),
       // dataIndex: 'value',
       key: 'value',
-      render: record => (
-        <>
-          {marketData && marketData.price && record.mainnetSymbol === marketData.assetSymbol
-            ? `${numeral(getAssetBalancePrice(record, marketData)).format('$0,0.00')} ${
-                marketData?.currency
-              }`
-            : '$--'}
-        </>
-      ),
+      render: record => {
+        const assetMarketData = allMarketData[`${record.mainnetSymbol}-${session.currency}`];
+        return (
+          <>
+            {assetMarketData &&
+            assetMarketData.price &&
+            record.mainnetSymbol === assetMarketData.assetSymbol
+              ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
+                  getAssetBalancePrice(record, assetMarketData),
+                ).format('0,0.00')} ${assetMarketData?.currency}`
+              : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
+          </>
+        );
+      },
     },
   ];
 
@@ -326,35 +344,41 @@ const AssetsPage = () => {
                     </Dropdown>
                   </div>
                   <div className="detail-container">
-                    {assetIcon(currentAsset)}
-                    <div className="balance">
-                      {getUIDynamicAmount(currentAsset!.balance, currentAsset!)}{' '}
-                      {currentAsset?.symbol}
-                    </div>
-                    <div className="value">
-                      {marketData &&
-                      marketData.price &&
-                      currentAsset?.mainnetSymbol === marketData.assetSymbol
-                        ? `${numeral(getAssetBalancePrice(currentAsset, marketData)).format(
-                            '$0,0.00',
-                          )} ${marketData?.currency}`
-                        : '$--'}
-                    </div>
+                    <Layout>
+                      <Sider width="80px">{assetIcon(currentAsset)}</Sider>
+                      <Content>
+                        <div className="balance">
+                          {getUIDynamicAmount(currentAsset!.balance, currentAsset!)}{' '}
+                          {currentAsset?.symbol}
+                        </div>
+                        <div className="value">
+                          {currentAssetMarketData &&
+                          currentAssetMarketData.price &&
+                          currentAsset?.mainnetSymbol === currentAssetMarketData.assetSymbol
+                            ? `${
+                                SUPPORTED_CURRENCY.get(currentAssetMarketData.currency)?.symbol
+                              }${numeral(
+                                getAssetBalancePrice(currentAsset, currentAssetMarketData),
+                              ).format('0,0.00')} ${currentAssetMarketData?.currency}`
+                            : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
+                        </div>
+                      </Content>
+                    </Layout>
                   </div>
-
                   <Tabs
                     activeKey={activeAssetTab}
                     onTabClick={key => {
                       setActiveAssetTab(key);
-                      if (key === '1') {
-                        syncTransfers(currentAsset);
-                      }
-                      if (key === '2') {
-                        setNavbarMenuSelectedKey('/send');
-                      }
-                      if (key === '3') {
-                        setNavbarMenuSelectedKey('/receive');
-                      }
+                      // if (key === '1') {
+                      //   syncTransfers(currentAsset);
+                      //   setNavbarMenuSelectedKey('/assets');
+                      // }
+                      // if (key === '2') {
+                      //   setNavbarMenuSelectedKey('/send');
+                      // }
+                      // if (key === '3') {
+                      //   setNavbarMenuSelectedKey('/receive');
+                      // }
                     }}
                     centered
                     // renderTabBar={() => {
@@ -424,6 +448,9 @@ const AssetsPage = () => {
                       });
                       syncTransfers(selectedAsset);
                       setCurrentAsset(selectedAsset);
+                      setCurrentAssetMarketData(
+                        allMarketData[`${selectedAsset.mainnetSymbol}-${session.currency}`],
+                      );
                       setIsAssetVisible(true);
                     }, // click row
                   };

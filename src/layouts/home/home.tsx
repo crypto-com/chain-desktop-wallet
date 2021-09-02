@@ -32,6 +32,7 @@ import {
   walletAllAssetsState,
   walletListState,
   marketState,
+  allMarketState,
   validatorListState,
   fetchingDBState,
   nftListState,
@@ -41,8 +42,9 @@ import {
 import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
-import IconSend from '../../svg/IconSend';
-import IconReceive from '../../svg/IconReceive';
+// import IconSend from '../../svg/IconSend';
+// import IconReceive from '../../svg/IconReceive';
+import IconAssets from '../../svg/IconAssets';
 import IconStaking from '../../svg/IconStaking';
 import IconNft from '../../svg/IconNft';
 import IconWallet from '../../svg/IconWallet';
@@ -66,8 +68,9 @@ const { Sider } = Layout;
 const allPaths = [
   '/home',
   '/staking',
-  '/send',
-  '/receive',
+  // '/send',
+  // '/receive',
+  '/assets',
   '/settings',
   '/governance',
   '/nft',
@@ -84,6 +87,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [marketData, setMarketData] = useRecoilState(marketState);
+  const [allMarketData, setAllMarketData] = useRecoilState(allMarketState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const [nftList, setNftList] = useRecoilState(nftListState);
   const [navbarMenuSelectedKey, setNavbarMenuSelectedKey] = useRecoilState(
@@ -239,7 +243,10 @@ function HomeLayout(props: HomeLayoutProps) {
       const allWalletsData = await walletService.retrieveAllWallets();
       const currentMarketData = await walletService.retrieveAssetPrice(
         currentAsset?.mainnetSymbol,
-        'usd',
+        currentSession.currency,
+      );
+      const currentAllAssetsMarketData = await walletService.retrieveAllAssetsPrices(
+        currentSession.currency,
       );
 
       const isIbcVisible = allAssets.length > 1;
@@ -252,6 +259,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setIsIbcVisible(isIbcVisible);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
+      setAllMarketData(currentAllAssetsMarketData);
 
       await Promise.all([
         await fetchAndSetNewValidators(currentSession),
@@ -302,6 +310,8 @@ function HomeLayout(props: HomeLayoutProps) {
     setWalletList,
     marketData,
     setMarketData,
+    allMarketData,
+    setAllMarketData,
     validatorList,
     setValidatorList,
     nftList,
@@ -342,12 +352,15 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/staking" icon={<Icon component={IconStaking} />}>
           <Link to="/staking">{t('navbar.staking')}</Link>
         </Menu.Item>
-        <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
+        <Menu.Item key="/assets" icon={<Icon component={IconAssets} />}>
+          <Link to="/assets">{t('navbar.assets')}</Link>
+        </Menu.Item>
+        {/* <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">{t('navbar.send')}</Link>
         </Menu.Item>
         <Menu.Item key="/receive" icon={<Icon component={IconReceive} />}>
           <Link to="/receive">{t('navbar.receive')}</Link>
-        </Menu.Item>
+        </Menu.Item> */}
         <Menu.Item key="/governance" icon={<BankOutlined />}>
           <Link to="/governance">{t('navbar.governance')}</Link>
         </Menu.Item>

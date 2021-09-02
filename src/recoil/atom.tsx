@@ -53,6 +53,11 @@ const marketState = atom({
   default: market,
 });
 
+const allMarketState = atom({
+  key: 'allMarket',
+  default: [market],
+});
+
 const walletAssetState = atom({
   key: 'walletAsset',
   default: defaultAsset,
@@ -113,6 +118,7 @@ export {
   walletIdentifierState,
   sessionState,
   marketState,
+  allMarketState,
   walletAssetState,
   walletAllAssetsState,
   walletListState,

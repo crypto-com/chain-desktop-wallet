@@ -228,6 +228,10 @@ export class StorageService {
     );
   }
 
+  public async retrieveAllAssetsPrices(currency: string) {
+    return this.db.marketPriceStore.find<AssetMarketPrice>({ _id: new RegExp(currency) });
+  }
+
   public async retrieveAssetPrice(assetSymbol: string, currency: string) {
     const assetPriceId = getAssetPriceIdFrom(assetSymbol, currency);
     return this.db.marketPriceStore.findOne<AssetMarketPrice>({ _id: assetPriceId });

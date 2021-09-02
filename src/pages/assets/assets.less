@@ -51,20 +51,33 @@
 
       .detail-container {
         margin: 20px 0;
-        text-align: center;
+        text-align: left;
+        .ant-layout {
+          margin: 30px 0;
+        }
+        .ant-layout,
+        .ant-layout-sider {
+          background: @white;
+        }
+        .ant-layout-sider-children {
+          display: flex;
+          align-items: center;
+          justify-self: center;
+        }
+        .ant-layout-content {
+          margin: 0 0 0 10px;
+        }
         .asset-icon {
-          height: 120px;
-          margin-bottom: 20px;
-          // margin-right: 10px;
+          height: 68px;
         }
         .ant-avatar {
-          width: 120px;
-          height: 120px;
+          width: 68px;
+          height: 68px;
           margin-right: 10px;
           margin-bottom: 20px;
           color: #1199fa;
-          font-size: 60px;
-          line-height: 120px;
+          font-size: 34px;
+          line-height: 68px;
           background-color: #e4f4ff;
         }
         .balance {

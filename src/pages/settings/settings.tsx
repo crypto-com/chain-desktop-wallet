@@ -25,7 +25,13 @@ import { useTranslation } from 'react-i18next';
 import { CarouselRef } from 'antd/lib/carousel';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { sessionState, walletAllAssetsState, walletListState } from '../../recoil/atom';
+import {
+  // marketState,
+  allMarketState,
+  sessionState,
+  walletAllAssetsState,
+  walletListState,
+} from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import {
@@ -44,7 +50,9 @@ import {
   FIXED_DEFAULT_FEE,
   FIXED_DEFAULT_GAS_LIMIT,
   SUPPORTED_LANGUAGE,
+  SUPPORTED_CURRENCY,
   WalletConfig,
+  SupportedCurrency,
 } from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
@@ -249,12 +257,16 @@ const GeneralSettingsForm = props => {
 
 function MetaInfoComponent() {
   const [session, setSession] = useRecoilState(sessionState);
+  // const setMarketData = useSetRecoilState(marketState);
+  const setAllMarketData = useSetRecoilState(allMarketState);
   const [updateLoading, setUpdateLoading] = useState(false);
   const { walletType } = session.wallet;
 
   const [defaultLanguageState, setDefaultLanguageState] = useState<string>(DEFAULT_LANGUAGE_CODE);
+  const [defaultCurrencyState, setDefaultCurrencyState] = useState<string>(session.currency);
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
+  const [supportedCurrencies, setSupportedCurrencies] = useState<SupportedCurrency[]>([]);
   const [t, i18n] = useTranslation();
 
   const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
@@ -323,12 +335,20 @@ function MetaInfoComponent() {
 
     const SyncConfig = async () => {
       const defaultLanguage = i18n.language ? i18n.language : DEFAULT_LANGUAGE_CODE;
-      const defaultMemoDisabled = session.wallet.config.disableDefaultClientMemo;
-      const defaultGADisabled = session.wallet.config.analyticsDisabled;
+      const { currency } = session;
+      const { disableDefaultClientMemo, analyticsDisabled } = session.wallet.config;
+
       if (!unmounted) {
         setDefaultLanguageState(defaultLanguage);
-        setDefaultMemoStateDisabled(defaultMemoDisabled);
-        setDefaultGAStateDisabled(defaultGADisabled);
+        setDefaultCurrencyState(currency);
+        setDefaultMemoStateDisabled(disableDefaultClientMemo);
+        setDefaultGAStateDisabled(analyticsDisabled);
+
+        const currencies: SupportedCurrency[] = [];
+        SUPPORTED_CURRENCY.forEach((item: SupportedCurrency) => {
+          currencies.push(item);
+        });
+        setSupportedCurrencies(currencies);
       }
     };
 
@@ -343,6 +363,8 @@ function MetaInfoComponent() {
   }, [
     defaultLanguageState,
     setDefaultLanguageState,
+    defaultCurrencyState,
+    setDefaultCurrencyState,
     defaultMemoStateDisabled,
     setDefaultMemoStateDisabled,
     defaultGAStateDisabled,
@@ -353,6 +375,36 @@ function MetaInfoComponent() {
     setDefaultLanguageState(value!.toString());
     i18n.changeLanguage(value!.toString());
     generalConfigService.setLanguage(value!.toString());
+  };
+
+  const onSwitchCurrency = async value => {
+    if (session.currency === value.toString()) {
+      return;
+    }
+
+    setUpdateLoading(true);
+
+    const newSession = {
+      ...session,
+      currency: value.toString(),
+    };
+    await walletService.setCurrentSession(newSession);
+    setSession(newSession);
+    await walletService.loadAndSaveAssetPrices(newSession);
+
+    // const currentMarketData = await walletService.retrieveAssetPrice(
+    //   'CRO',
+    //   newSession.currency,
+    // );
+
+    // eslint-disable-next-line
+    const allMarketData = await walletService.retrieveAllAssetsPrices(newSession.currency);
+
+    setAllMarketData(allMarketData);
+    // setMarketData(currentMarketData);
+    setDefaultCurrencyState(value.toString());
+
+    setUpdateLoading(false);
   };
 
   const showPasswordInput = () => {
@@ -450,6 +502,21 @@ function MetaInfoComponent() {
             </div> */}
             <Select style={{ width: 240 }} onChange={onSwitchLanguage} value={defaultLanguageState}>
               {SUPPORTED_LANGUAGE.map(item => {
+                return (
+                  <Option value={item.value} key={item.value}>
+                    {item.label}
+                  </Option>
+                );
+              })}
+            </Select>
+          </div>
+          <Divider />
+          <div className="item">
+            <div className="title">{t('settings.currency.title')}</div>
+            {/* <div className="description">
+            </div> */}
+            <Select style={{ width: 240 }} onChange={onSwitchCurrency} value={defaultCurrencyState}>
+              {supportedCurrencies.map(item => {
                 return (
                   <Option value={item.value} key={item.value}>
                     {item.label}

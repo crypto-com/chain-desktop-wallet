@@ -89,10 +89,12 @@ function WalletPage() {
     );
   };
 
-  const walletSelect = async e => {
+  const onWalletSwitch = async e => {
     setLoading(true);
 
-    await walletService.setCurrentSession(new Session(walletList[e.key]));
+    await walletService.setCurrentSession(
+      new Session(walletList[e.key], undefined, session.currency),
+    );
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
     const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
@@ -241,7 +243,7 @@ function WalletPage() {
               <Space size="middle">
                 <a
                   onClick={() => {
-                    walletSelect(record);
+                    onWalletSwitch(record);
                   }}
                 >
                   {t('general.select')}
