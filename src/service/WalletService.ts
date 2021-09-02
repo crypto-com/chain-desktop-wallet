@@ -1128,6 +1128,21 @@ class WalletService {
     );
   }
 
+  public async retrieveAllAssetsPrices(currency: string): Promise<AssetMarketPrice[]> {
+    const assetsPrices = [];
+    const prices = await this.storageService.retrieveAllAssetsPrices(currency);
+    prices.forEach(data => {
+      // eslint-disable-next-line no-underscore-dangle
+      assetsPrices[data._id] = {
+        price: data.price,
+        currency: data.currency,
+        assetSymbol: data.assetSymbol,
+        dailyChange: data.dailyChange,
+      };
+    });
+    return assetsPrices;
+  }
+
   public async retrieveAssetPrice(
     assetSymbol: string,
     currency: string = 'USD',

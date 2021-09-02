@@ -24,18 +24,16 @@ export const SUPPORTED_LANGUAGE = [
   { value: 'koKR', label: '한국어' },
 ];
 
-export const DEFAULT_ASSET_SYMBOL = 'CRO';
-export const DEFAULT_CURRENCY_CODE = 'USD';
 export const SUPPORTED_CURRENCY = [
-  { value: 'USD', label: 'USD - $' },
-  { value: 'GBP', label: 'GBP - £' },
-  { value: 'EUR', label: 'EUR - €' },
-  { value: 'SGD', label: 'SGD - $' },
-  { value: 'CAD', label: 'CAD - $' },
-  { value: 'AUD', label: 'AUD - $' },
-  { value: 'NZD', label: 'NZD - $' },
-  { value: 'HKD', label: 'HKD - $' },
-  { value: 'TWD', label: 'TWD - $' },
+  { value: 'USD', label: 'USD - $', symbol: '$' },
+  { value: 'GBP', label: 'GBP - £', symbol: '£' },
+  { value: 'EUR', label: 'EUR - €', symbol: '€' },
+  { value: 'SGD', label: 'SGD - $', symbol: '$' },
+  { value: 'CAD', label: 'CAD - $', symbol: '$' },
+  { value: 'AUD', label: 'AUD - $', symbol: '$' },
+  { value: 'NZD', label: 'NZD - $', symbol: '$' },
+  { value: 'HKD', label: 'HKD - $', symbol: '$' },
+  { value: 'TWD', label: 'TWD - $', symbol: '$' },
 ];
 
 export type WalletConfig = {

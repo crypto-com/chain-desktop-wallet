@@ -26,7 +26,8 @@ import { CarouselRef } from 'antd/lib/carousel';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import {
-  marketState,
+  // marketState,
+  allMarketState,
   sessionState,
   walletAllAssetsState,
   walletListState,
@@ -46,8 +47,6 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
 import {
   DEFAULT_LANGUAGE_CODE,
-  DEFAULT_ASSET_SYMBOL,
-  DEFAULT_CURRENCY_CODE,
   FIXED_DEFAULT_FEE,
   FIXED_DEFAULT_GAS_LIMIT,
   SUPPORTED_LANGUAGE,
@@ -257,12 +256,13 @@ const GeneralSettingsForm = props => {
 
 function MetaInfoComponent() {
   const [session, setSession] = useRecoilState(sessionState);
-  const setMarketData = useSetRecoilState(marketState);
+  // const setMarketData = useSetRecoilState(marketState);
+  const setAllMarketData = useSetRecoilState(allMarketState);
   const [updateLoading, setUpdateLoading] = useState(false);
   const { walletType } = session.wallet;
 
   const [defaultLanguageState, setDefaultLanguageState] = useState<string>(DEFAULT_LANGUAGE_CODE);
-  const [defaultCurrencyState, setDefaultCurrencyState] = useState<string>(DEFAULT_CURRENCY_CODE);
+  const [defaultCurrencyState, setDefaultCurrencyState] = useState<string>(session.currency);
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
   const [t, i18n] = useTranslation();
@@ -383,12 +383,16 @@ function MetaInfoComponent() {
     setSession(newSession);
     await walletService.loadAndSaveAssetPrices(newSession);
 
-    const currentMarketData = await walletService.retrieveAssetPrice(
-      DEFAULT_ASSET_SYMBOL,
-      newSession.currency,
-    );
+    // const currentMarketData = await walletService.retrieveAssetPrice(
+    //   'CRO',
+    //   newSession.currency,
+    // );
 
-    setMarketData(currentMarketData);
+    // eslint-disable-next-line
+    const allMarketData = await walletService.retrieveAllAssetsPrices(newSession.currency);
+
+    setAllMarketData(allMarketData);
+    // setMarketData(currentMarketData);
     setDefaultCurrencyState(value.toString());
 
     setUpdateLoading(false);

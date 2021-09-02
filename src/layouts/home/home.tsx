@@ -32,6 +32,7 @@ import {
   walletAllAssetsState,
   walletListState,
   marketState,
+  allMarketState,
   validatorListState,
   fetchingDBState,
   nftListState,
@@ -86,6 +87,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [marketData, setMarketData] = useRecoilState(marketState);
+  const [allMarketData, setAllMarketData] = useRecoilState(allMarketState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const [nftList, setNftList] = useRecoilState(nftListState);
   const [navbarMenuSelectedKey, setNavbarMenuSelectedKey] = useRecoilState(
@@ -243,6 +245,9 @@ function HomeLayout(props: HomeLayoutProps) {
         currentAsset?.mainnetSymbol,
         currentSession.currency,
       );
+      const currentAllAssetsMarketData = await walletService.retrieveAllAssetsPrices(
+        currentSession.currency,
+      );
 
       const isIbcVisible = allAssets.length > 1;
       // const isIbcVisible = false;
@@ -254,6 +259,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setIsIbcVisible(isIbcVisible);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
+      setAllMarketData(currentAllAssetsMarketData);
 
       await Promise.all([
         await fetchAndSetNewValidators(currentSession),
@@ -304,6 +310,8 @@ function HomeLayout(props: HomeLayoutProps) {
     setWalletList,
     marketData,
     setMarketData,
+    allMarketData,
+    setAllMarketData,
     validatorList,
     setValidatorList,
     nftList,

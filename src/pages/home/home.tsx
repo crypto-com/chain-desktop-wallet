@@ -11,7 +11,8 @@ import { useTranslation } from 'react-i18next';
 import {
   hasShownWarningOnWalletTypeState,
   sessionState,
-  marketState,
+  // marketState,
+  allMarketState,
   walletAllAssetsState,
   nftListState,
   navbarMenuSelectedKeyState,
@@ -26,7 +27,9 @@ import {
   getAssetBalancePrice,
   getAssetStakingBalancePrice,
   UserAsset,
+  AssetMarketPrice,
 } from '../../models/UserAsset';
+
 import { NftModel, NftProcessedModel } from '../../models/Transaction';
 
 import { walletService } from '../../service/WalletService';
@@ -56,7 +59,10 @@ const HomePage = () => {
   // const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setNFTList = useSetRecoilState(nftListState);
-  const marketData = useRecoilValue(marketState);
+  // const marketData = useRecoilValue(marketState);
+  const allMarketData = useRecoilValue(allMarketState);
+  const [marketData, setMarketData] = useState<AssetMarketPrice>();
+
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const didMountRef = useRef(false);
   const history = useHistory();
@@ -273,6 +279,7 @@ const HomePage = () => {
       setProcessedNftList(currentNftList);
       setNFTList(allNFTs);
       setdefaultWalletAsset(currentAsset);
+      setMarketData(allMarketData[`${currentAsset.symbol}-${sessionData.currency}`]);
       showWalletStateNotification(sessionData.wallet.config);
       setWalletAllAssets(allAssets);
       setHasShownNotLiveWallet(true);
