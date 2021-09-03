@@ -11,12 +11,12 @@ export class WalletOps {
     const addressGenerator = new AddressGenerator(phrase, config);
     const assets: UserAsset[] = [
       {
-        ...CRO_ASSET(config.network),
+        ...CRO_ASSET(config),
         walletId: walletIdentifier,
         address: addressGenerator.getAddress(UserAssetType.TENDERMINT),
       },
       {
-        ...CRONOS_ASSET(config.network),
+        ...CRONOS_ASSET(config),
         walletId: walletIdentifier,
         address: addressGenerator.getAddress(UserAssetType.EVM),
       },
