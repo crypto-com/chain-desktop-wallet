@@ -369,10 +369,10 @@ const AssetsPage = () => {
                     activeKey={activeAssetTab}
                     onTabClick={key => {
                       setActiveAssetTab(key);
-                      // if (key === '1') {
-                      //   syncTransfers(currentAsset);
-                      //   setNavbarMenuSelectedKey('/assets');
-                      // }
+                      if (key === '1') {
+                        syncTransfers(currentAsset);
+                        setNavbarMenuSelectedKey('/assets');
+                      }
                       // if (key === '2') {
                       //   setNavbarMenuSelectedKey('/send');
                       // }
