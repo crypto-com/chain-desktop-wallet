@@ -667,6 +667,7 @@ module.exports = function(webpackEnv) {
           silent: true,
           // The formatter is invoked directly in WebpackDevServerUtils during development
           formatter: isEnvProduction ? typescriptFormatter : undefined,
+          memoryLimit: 8192,
         }),
       new ESLintPlugin({
         // Plugin options
