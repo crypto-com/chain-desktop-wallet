@@ -1,8 +1,8 @@
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
-import { getRandomId } from '../crypto/RandomGen';
 
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
+export const COINBASE_TICKER_API_BASE_URL = 'https://api.coinbase.com/v2/';
 export const NV_GRAPHQL_API_ENDPOINT = 'https://crypto.com/nft-api/graphql';
 export const IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT =
   'https://crypto.org/ipfs-middleware-server/uploads';
@@ -23,6 +23,39 @@ export const SUPPORTED_LANGUAGE = [
   { value: 'zhCN', label: '简体中文' },
   { value: 'koKR', label: '한국어' },
 ];
+
+export interface SupportedCurrency {
+  value: string;
+  symbol: string;
+  label: string;
+}
+export const SUPPORTED_CURRENCY = new Map<string, SupportedCurrency>();
+SUPPORTED_CURRENCY.set('USD', { value: 'USD', label: 'USD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('GBP', { value: 'GBP', label: 'GBP - £', symbol: '£' });
+SUPPORTED_CURRENCY.set('EUR', { value: 'EUR', label: 'EUR - €', symbol: '€' });
+SUPPORTED_CURRENCY.set('SGD', { value: 'SGD', label: 'SGD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('CAD', { value: 'CAD', label: 'CAD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('AUD', { value: 'AUD', label: 'AUD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('NZD', { value: 'NZD', label: 'NZD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('HKD', { value: 'HKD', label: 'HKD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('TWD', { value: 'TWD', label: 'TWD - $', symbol: '$' });
+SUPPORTED_CURRENCY.set('NOK', { value: 'NOK', label: 'NOK - kr', symbol: 'kr' });
+SUPPORTED_CURRENCY.set('SEK', { value: 'SEK', label: 'SEK - kr', symbol: 'kr' });
+SUPPORTED_CURRENCY.set('DKK', { value: 'DKK', label: 'DKK - kr', symbol: 'kr' });
+SUPPORTED_CURRENCY.set('CHF', { value: 'CHF', label: 'CHF - CHF', symbol: 'CHF' });
+SUPPORTED_CURRENCY.set('PLN', { value: 'PLN', label: 'PLN - zł', symbol: 'zł' });
+SUPPORTED_CURRENCY.set('ZAR', { value: 'ZAR', label: 'ZAR - R', symbol: 'R' });
+SUPPORTED_CURRENCY.set('KES', { value: 'KES', label: 'KES - KSh', symbol: 'KSh' });
+SUPPORTED_CURRENCY.set('RUB', { value: 'RUB', label: 'RUB - ₽', symbol: '₽' });
+SUPPORTED_CURRENCY.set('BGN', { value: 'BGN', label: 'BGN - Лв.', symbol: 'Лв.' });
+SUPPORTED_CURRENCY.set('RON', { value: 'RON', label: 'RON - lei', symbol: 'lei' });
+SUPPORTED_CURRENCY.set('ILS', { value: 'ILS', label: 'ILS - ₪', symbol: '₪' });
+SUPPORTED_CURRENCY.set('SAR', { value: 'SAR', label: 'SAR - ر.س', symbol: 'ر.س' });
+SUPPORTED_CURRENCY.set('AED', { value: 'AED', label: 'AED - د.إ', symbol: 'د.إ' });
+SUPPORTED_CURRENCY.set('HUF', { value: 'HUF', label: 'HUF - Ft', symbol: 'Ft' });
+SUPPORTED_CURRENCY.set('CZK', { value: 'CZK', label: 'CZK - Kč', symbol: 'Kč' });
+SUPPORTED_CURRENCY.set('BRL', { value: 'BRL', label: 'BRL - R$', symbol: 'R$' });
+SUPPORTED_CURRENCY.set('TRY', { value: 'TRY', label: 'TRY - ₺', symbol: '₺' });
 
 export type WalletConfig = {
   enabled: boolean;
@@ -115,7 +148,7 @@ const TestNetConfig: WalletConfig = {
   },
 };
 
-const TestNetCroeseid3: WalletConfig = {
+const TestNetCroeseid3Config: WalletConfig = {
   enabled: true,
   name: 'TESTNET CROESEID 3',
   derivationPath: "m/44'/1'/0'/0/0",
@@ -123,6 +156,40 @@ const TestNetCroeseid3: WalletConfig = {
   indexingUrl: 'https://crypto.org/explorer/croeseid3/api/v1/',
   nodeUrl: CroNetwork.TestnetCroeseid3.defaultNodeUrl,
   network: CroNetwork.TestnetCroeseid3,
+  disableDefaultClientMemo: false,
+  enableGeneralSettings: false,
+  analyticsDisabled: false,
+  fee: {
+    gasLimit: FIXED_DEFAULT_GAS_LIMIT,
+    networkFee: FIXED_DEFAULT_FEE,
+  },
+};
+
+const TestnetCroeseid4: Network = {
+  defaultNodeUrl: 'https://testnet-croeseid-4.crypto.org',
+  chainId: 'testnet-croeseid-4',
+  addressPrefix: 'tcro',
+  validatorAddressPrefix: 'tcrocncl',
+  validatorPubKeyPrefix: 'tcrocnclconspub',
+  coin: {
+    baseDenom: 'basetcro',
+    croDenom: 'tcro',
+  },
+  bip44Path: {
+    coinType: 1,
+    account: 0,
+  },
+  rpcUrl: 'https://testnet-croeseid-4.crypto.org:26657',
+};
+
+const TestNetCroeseid4Config: WalletConfig = {
+  enabled: true,
+  name: 'TESTNET CROESEID 4',
+  derivationPath: "m/44'/1'/0'/0/0",
+  explorerUrl: 'https://crypto.org/explorer/croeseid4',
+  indexingUrl: 'https://crypto.org/explorer/croeseid4/api/v1/',
+  nodeUrl: TestnetCroeseid4.defaultNodeUrl,
+  network: TestnetCroeseid4,
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,
@@ -185,25 +252,8 @@ export const DefaultWalletConfigs = {
   TestNetConfig,
   MainNetConfig,
   CustomDevNet,
-  TestNetCroeseid3,
-};
-
-// Every created wallet get initialized with a new CRO asset
-export const DefaultAsset = (network: Network) => {
-  const assetSymbol = network.coin.croDenom.toString().toUpperCase();
-  return {
-    balance: '0',
-    description:
-      'Crypto.org Coin (CRO) is the native token of the Crypto.org Chain. The Crypto.org Chain was created to build a network of cryptocurrency projects, and develop merchants’ ability to accept crypto as a form of payment. The Crypto.org Chain is a high performing native blockchain solution, which will make the transaction flows between crypto users and merchants accepting crypto seamless, cost-efficient and secure.\\r\\n\\r\\nBusinesses can use Crypto.org pay Checkout and/or Invoice to enable customers to complete checkout and pay for goods and services with cryptocurrencies using the Crypto.org Wallet App. Businesses receive all their payments instantly in CRO or stable coins, or in fiat.',
-    icon_url:
-      'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c1248c15568a4017c20aa87/cro.png',
-    identifier: getRandomId(),
-    name: 'Crypto.org Coin',
-    symbol: assetSymbol,
-    mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
-    stakedBalance: '0',
-    decimals: 8,
-  };
+  TestNetCroeseid4Config,
+  TestNetCroeseid3Config,
 };
 
 // This type is a copy of the Network type defined inside chain-js

@@ -1,6 +1,24 @@
 import Big from 'big.js';
 import { getUINormalScaleAmount } from '../utils/NumberUtils';
 
+// Need for asset level configuration since every asset now needs to know
+// Its own nodeUrl, indexingUrl, etc,....
+export interface UserAssetConfig {
+  nodeUrl: string;
+  indexingUrl: string;
+  explorerUrl: string;
+  chainId: string;
+  fee: {
+    gasLimit: string;
+    networkFee: string;
+  };
+  isLedgerSupportDisabled: boolean;
+  isStakingDisabled: boolean;
+
+  // Some assets don't have support for memo
+  memoSupportDisabled?: boolean;
+}
+
 export interface UserAsset {
   identifier: string;
 
@@ -8,6 +26,7 @@ export interface UserAsset {
 
   // This is to be used solely for markets data since testnet market prices is always non existent
   // That's why for all testnet assets a mainnet symbol is needed to help fetch market prices
+  // NOTE : Consider this property as the asset ticket symbol for market prices
   mainnetSymbol: string;
 
   name: string;
@@ -25,6 +44,40 @@ export interface UserAsset {
   // Specify the 10^decimals conversion to go from BASE TO ASSET
   // E.g = 1 TCRO = 1O^8 BASETCRO
   decimals: number;
+
+  denomTracePath?: string;
+
+  ibcDenomHash?: string;
+
+  assetType?: UserAssetType;
+
+  assetCreationType?: AssetCreationType;
+
+  address?: string;
+
+  config?: UserAssetConfig;
+
+  // This field is used to differentiate default asset and secondary assets,
+  // The original default asset have false or undefined on this field
+  isSecondaryAsset?: boolean;
+}
+
+export enum UserAssetType {
+  // For Cosmos based assets
+  TENDERMINT = 'TENDERMINT',
+  // For Cosmos IBC assets
+  IBC = 'IBC',
+
+  // For EVM based assets like CRONOS
+  EVM = 'EVM',
+}
+
+export enum AssetCreationType {
+  // Assets that are created statically on wallets creation
+  STATIC = 'STATIC',
+
+  // These assets are dynamically created - For instance IBC assets, token assets, etc, ...
+  DYNAMIC = 'DYNAMIC',
 }
 
 export interface AssetMarketPrice {

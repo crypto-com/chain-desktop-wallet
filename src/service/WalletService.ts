@@ -1,4 +1,7 @@
 import axios from 'axios';
+import _ from 'lodash';
+import { TransactionConfig } from 'web3-eth';
+import Web3 from 'web3';
 import {
   DisableDefaultMemoSettings,
   DisableGASettings,
@@ -11,9 +14,7 @@ import { StorageService } from '../storage/StorageService';
 import {
   APP_DB_NAMESPACE,
   DEFAULT_CLIENT_MEMO,
-  DefaultAsset,
   DefaultWalletConfigs,
-  Network,
   NOT_KNOWN_YET_VALUE,
   WalletConfig,
 } from '../config/StaticConfig';
@@ -35,13 +36,13 @@ import {
 } from './signers/TransactionSupported';
 import { cryptographer } from '../crypto/Cryptographer';
 import { secretStoreService } from '../storage/SecretStoreService';
-import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
+import { AssetCreationType, AssetMarketPrice, UserAsset, UserAssetType } from '../models/UserAsset';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
   NftAccountTransactionData,
-  NftModel,
   NftDenomModel,
+  NftModel,
   NftQueryParams,
   NftTransferModel,
   ProposalModel,
@@ -50,6 +51,7 @@ import {
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
+  TransactionStatus,
   TransferTransactionData,
   TransferTransactionList,
   ValidatorModel,
@@ -70,7 +72,11 @@ import {
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
-import { sleep } from '../utils/utils';
+import { capitalizeFirstLetter, sleep } from '../utils/utils';
+import { WalletBuiltResult, WalletOps } from './WalletOps';
+import { CronosClient } from './cronos/CronosClient';
+import { evmTransactionSigner } from './signers/EvmTransactionSigner';
+import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
 
 class WalletService {
   private readonly storageService: StorageService;
@@ -82,45 +88,136 @@ class WalletService {
   public readonly BROADCAST_TIMEOUT_CODE = -32603;
 
   public async sendTransfer(transferRequest: TransferRequest): Promise<BroadCastResult> {
-    const {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    // eslint-disable-next-line no-console
+    console.log('TRANSFER_ASSET', transferRequest.asset);
 
-    const scaledBaseAmount = getBaseScaledAmount(transferRequest.amount, transferRequest.asset);
+    const currentAsset = transferRequest.asset;
+    const scaledBaseAmount = getBaseScaledAmount(transferRequest.amount, currentAsset);
+
+    const currentSession = await this.storageService.retrieveCurrentSession();
     const fromAddress = currentSession.wallet.address;
-    const transfer: TransferTransactionUnsigned = {
-      fromAddress,
-      toAddress: transferRequest.toAddress,
-      amount: String(scaledBaseAmount),
-      memo: transferRequest.memo,
-      accountNumber,
-      accountSequence,
-    };
 
-    let signedTxHex: string = '';
+    switch (currentAsset.assetType) {
+      case UserAssetType.EVM:
+        try {
+          if (currentAsset?.config?.isLedgerSupportDisabled) {
+            throw TypeError(
+              `${LEDGER_WALLET_TYPE} not supported yet for ${transferRequest.walletType} assets`,
+            );
+          }
 
-    if (transferRequest.walletType === LEDGER_WALLET_TYPE) {
-      signedTxHex = await ledgerTransactionSigner.signTransfer(
-        transfer,
-        transferRequest.decryptedPhrase,
-      );
-    } else {
-      signedTxHex = await transactionSigner.signTransfer(transfer, transferRequest.decryptedPhrase);
+          if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
+            throw TypeError(`Missing asset config: ${currentAsset.config}`);
+          }
+
+          const cronosClient = new CronosClient(
+            currentAsset.config?.nodeUrl,
+            currentAsset.config?.indexingUrl,
+          );
+
+          const transfer: TransferTransactionUnsigned = {
+            fromAddress,
+            toAddress: transferRequest.toAddress,
+            amount: String(scaledBaseAmount),
+            memo: transferRequest.memo,
+            accountNumber: 0,
+            accountSequence: 0,
+            asset: currentAsset,
+          };
+
+          const web3 = new Web3('');
+          const txConfig: TransactionConfig = {
+            from: currentAsset.address,
+            to: transferRequest.toAddress,
+            value: web3.utils.toWei(transferRequest.amount, 'ether'),
+          };
+
+          transfer.nonce = await cronosClient.getNextNonceByAddress(currentAsset.address);
+
+          const loadedGasPrice = web3.utils.toWei(
+            await cronosClient.getEstimatedGasPrice(),
+            'gwei',
+          );
+          transfer.gasPrice = Number(loadedGasPrice);
+
+          transfer.gasLimit = Number(await cronosClient.estimateGas(txConfig));
+
+          // eslint-disable-next-line no-console
+          console.log('EVM_TX', {
+            txNonce: transfer.nonce,
+            gasPrice: transfer.gasPrice,
+            gasLimit: transfer.gasLimit,
+          });
+
+          const signedTx = await evmTransactionSigner.signTransfer(
+            transfer,
+            transferRequest.decryptedPhrase,
+          );
+
+          const result = await cronosClient.broadcastRawTransactionHex(signedTx);
+
+          // eslint-disable-next-line no-console
+          console.log('BROADCAST_RESULT', result);
+
+          return {
+            transactionHash: result,
+            message: '',
+            code: 200,
+          };
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.log(`ERROR_TRANSFERRING - ${currentAsset.assetType}`, e);
+          throw TypeError(e);
+        }
+
+      case UserAssetType.TENDERMINT:
+      case UserAssetType.IBC:
+      case undefined: {
+        const {
+          nodeRpc,
+          accountNumber,
+          accountSequence,
+          transactionSigner,
+          ledgerTransactionSigner,
+        } = await this.prepareTransaction();
+
+        const transfer: TransferTransactionUnsigned = {
+          fromAddress,
+          toAddress: transferRequest.toAddress,
+          amount: String(scaledBaseAmount),
+          memo: transferRequest.memo,
+          accountNumber,
+          accountSequence,
+          asset: currentAsset,
+        };
+
+        let signedTxHex: string = '';
+
+        if (transferRequest.walletType === LEDGER_WALLET_TYPE) {
+          signedTxHex = await ledgerTransactionSigner.signTransfer(
+            transfer,
+            transferRequest.decryptedPhrase,
+          );
+        } else {
+          signedTxHex = await transactionSigner.signTransfer(
+            transfer,
+            transferRequest.decryptedPhrase,
+          );
+        }
+
+        const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+
+        await Promise.all([
+          await this.fetchAndUpdateBalances(currentSession),
+          await this.fetchAndSaveTransfers(currentSession),
+        ]);
+
+        return broadCastResult;
+      }
+
+      default:
+        return {};
     }
-
-    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-
-    await Promise.all([
-      await this.fetchAndUpdateBalances(currentSession),
-      await this.fetchAndSaveTransfers(currentSession),
-    ]);
-
-    return broadCastResult;
   }
 
   public async sendDelegateTransaction(
@@ -480,6 +577,7 @@ class WalletService {
       this.syncBalancesData(currentSession),
       this.syncTransactionsData(currentSession),
       this.fetchAndSaveNFTs(currentSession),
+      this.fetchIBCAssets(currentSession),
     ]);
   }
 
@@ -560,30 +658,22 @@ class WalletService {
   public supportedConfigs(): WalletConfig[] {
     return [
       DefaultWalletConfigs.MainNetConfig,
-      DefaultWalletConfigs.TestNetCroeseid3,
+      DefaultWalletConfigs.TestNetCroeseid4Config,
       DefaultWalletConfigs.CustomDevNet,
     ];
   }
 
-  public async persistInitialAsset(walletId: string, network: Network) {
-    const defaultAsset: UserAsset = {
-      ...DefaultAsset(network),
-      walletId,
-    };
-
-    await this.storageService.saveAsset(defaultAsset);
-  }
-
   // Import or restore wallet and persist it on the db
-  public async restoreAndSaveWallet(importOptions: WalletImportOptions): Promise<Wallet> {
-    const importedWallet = WalletImporter.import(importOptions);
-    await this.persistWallet(importedWallet);
-    return importedWallet;
-  }
+  // public async restoreAndSaveWallet(importOptions: WalletImportOptions): Promise<Wallet> {
+  //   const importedWallet = new WalletImporter(importOptions).import();
+  //   await this.persistWallet(importedWallet.wallet);
+  //   await this.saveAssets(importedWallet.assets)
+  //   return importedWallet.wallet;
+  // }
 
   // eslint-disable-next-line class-methods-use-this
-  public async restoreWallet(importOptions: WalletImportOptions): Promise<Wallet> {
-    return WalletImporter.import(importOptions);
+  public async restoreWallet(importOptions: WalletImportOptions): Promise<WalletBuiltResult> {
+    return new WalletImporter(importOptions).import();
   }
 
   // Load all persisted wallets
@@ -618,7 +708,6 @@ class WalletService {
   // Save freshly created or imported wallet
   public async persistWallet(wallet: Wallet) {
     await this.storageService.saveWallet(wallet);
-    await this.persistInitialAsset(wallet.identifier, wallet.config.network);
   }
 
   public async deleteWallet(walletIdentifier: string) {
@@ -673,24 +762,110 @@ class WalletService {
 
     await Promise.all(
       assets.map(async asset => {
-        const baseDenomination = currentSession.wallet.config.network.coin.baseDenom;
-        try {
-          asset.balance = await nodeRpc.loadAccountBalance(
-            currentSession.wallet.address,
-            baseDenomination,
-          );
-          asset.stakedBalance = await nodeRpc.loadStakingBalance(
-            currentSession.wallet.address,
-            baseDenomination,
-          );
-        } catch (e) {
-          // eslint-disable-next-line no-console
-          console.log('BALANCE_FETCH_ERROR', { asset });
-        } finally {
-          await this.storageService.saveAsset(asset);
+        switch (asset.assetType) {
+          case UserAssetType.EVM:
+            if (!asset.config || !asset.address) {
+              // eslint-disable-next-line no-console
+              console.log('NO_ASSET_CONFIG_0R_ADDRESS_FOUND', {
+                config: asset.config,
+                address: asset.address,
+              });
+              asset.balance = '0';
+              await this.storageService.saveAsset(asset);
+              return;
+            }
+            try {
+              const cronosClient = new CronosClient(
+                asset.config?.nodeUrl,
+                asset.config?.indexingUrl,
+              );
+
+              asset.balance = await cronosClient.getNativeBalanceByAddress(asset.address);
+              // eslint-disable-next-line no-console
+              console.log(`${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`);
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
+            } finally {
+              await this.storageService.saveAsset(asset);
+            }
+            break;
+
+          case UserAssetType.TENDERMINT:
+          case UserAssetType.IBC:
+          case undefined:
+            // Handle case for legacy assets that got persisted without a assetType - undefined
+            try {
+              const baseDenomination =
+                asset.assetType !== UserAssetType.IBC
+                  ? currentSession.wallet.config.network.coin.baseDenom
+                  : `ibc/${asset.ibcDenomHash}`;
+              asset.balance = await nodeRpc.loadAccountBalance(
+                // Handling legacy wallets which had wallet.address
+                asset.address || currentSession.wallet.address,
+                baseDenomination,
+              );
+              asset.stakedBalance = await nodeRpc.loadStakingBalance(
+                // Handling legacy wallets which had wallet.address
+                asset.address || currentSession.wallet.address,
+                baseDenomination,
+              );
+              // eslint-disable-next-line no-console
+              console.log(
+                `${asset.symbol}: Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance} - ${asset.address}`,
+              );
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.log('BALANCE_FETCH_ERROR', { asset, e });
+            } finally {
+              await this.storageService.saveAsset(asset);
+            }
+
+            break;
+
+          default:
+            throw TypeError(`Unknown Asset type: ${asset}`);
         }
       }),
     );
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
+  public async fetchIBCAssets(currentSession: Session) {
+    // const currentSession: Session = await this.storageService.retrieveCurrentSession()
+    if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+      return Promise.resolve(null);
+    }
+    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    const ibcAssets: UserAsset[] = await nodeRpc.loadIBCAssets(currentSession);
+
+    const persistedAssets = await ibcAssets.map(async ibcAsset => {
+      const denomTrace = await nodeRpc.getIBCAssetTrace(ibcAsset.ibcDenomHash!);
+      const baseDenom = capitalizeFirstLetter(denomTrace.base_denom);
+
+      ibcAsset.denomTracePath = denomTrace.path;
+      ibcAsset.symbol = baseDenom;
+      ibcAsset.mainnetSymbol = baseDenom;
+      ibcAsset.name = baseDenom;
+      ibcAsset.walletId = currentSession.wallet.identifier;
+      await this.storageService.saveAsset(ibcAsset);
+      return ibcAsset;
+    });
+
+    // eslint-disable-next-line no-console
+    console.log('IBC_PERSISTED_ASSETS', persistedAssets);
+
+    return persistedAssets;
+  }
+
+  public async saveAssets(userAssets: UserAsset[]) {
+    // eslint-disable-next-line no-console
+    console.log('SAVING_ASSETS', { userAssets });
+    // eslint-disable-next-line no-restricted-syntax
+
+    await userAssets.map(async asset => {
+      await this.storageService.saveAsset(asset);
+    });
   }
 
   public async fetchAndUpdateTransactions(session: Session | null = null) {
@@ -712,21 +887,84 @@ class WalletService {
   }
 
   public async fetchAndSaveTransfers(currentSession: Session) {
-    try {
-      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-      const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
-        currentSession.wallet.config.network.coin.baseDenom,
-        currentSession.wallet.address,
-      );
+    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
 
-      await this.saveTransfers({
-        transactions: transferTransactions,
-        walletId: currentSession.wallet.identifier,
-      });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('FAILED_TO_LOAD_TRANSFERS', e);
-    }
+    await Promise.all(
+      assets.map(async currentAsset => {
+        const indexingUrl =
+          currentAsset?.config?.indexingUrl || currentSession.wallet.config.indexingUrl;
+
+        switch (currentAsset.assetType) {
+          case UserAssetType.TENDERMINT:
+          case UserAssetType.IBC:
+          case undefined:
+            try {
+              const chainIndexAPI = ChainIndexingAPI.init(indexingUrl);
+              const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
+                currentSession.wallet.config.network.coin.baseDenom,
+                currentSession.wallet.address,
+              );
+
+              await this.saveTransfers({
+                transactions: transferTransactions,
+                walletId: currentSession.wallet.identifier,
+                assetId: currentAsset.identifier,
+              });
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.error('FAILED_TO_LOAD_TRANSFERS', e);
+            }
+
+            break;
+          case UserAssetType.EVM:
+            try {
+              if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
+                return;
+              }
+
+              const cronosClient = new CronosClient(
+                currentAsset.config?.nodeUrl,
+                currentAsset.config?.indexingUrl,
+              );
+
+              const transactions = await cronosClient.getTxsByAddress(currentAsset.address);
+              const loadedTransactions = transactions.result.map(evmTx => {
+                const transactionTime = new Date(Number(evmTx.timeStamp) * 1000).toISOString();
+
+                const transferTx: TransferTransactionData = {
+                  amount: evmTx.value,
+                  assetSymbol: currentAsset.symbol,
+                  date: transactionTime,
+                  hash: evmTx.hash,
+                  memo: '',
+                  receiverAddress: evmTx.to,
+                  senderAddress: evmTx.from,
+                  status:
+                    evmTx.isError === '1' ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
+                };
+
+                return transferTx;
+              });
+
+              // eslint-disable-next-line no-console
+              console.log('Loaded transactions', transactions, loadedTransactions);
+
+              await this.saveTransfers({
+                transactions: loadedTransactions,
+                walletId: currentSession.wallet.identifier,
+                assetId: currentAsset?.identifier,
+              });
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.error(`FAILED_TO_LOAD_TRANSFERS - ${currentAsset.assetType}`, e);
+            }
+
+            break;
+          default:
+            break;
+        }
+      }),
+    );
   }
 
   public async fetchAndSaveNFTAccountTxs(currentSession: Session) {
@@ -839,14 +1077,30 @@ class WalletService {
       currentSession.wallet.identifier,
     );
 
-    return assets.map(data => {
-      const asset: UserAsset = { ...data };
-      return asset;
-    });
+    const userAssets = assets
+      .filter(asset => asset.assetType !== UserAssetType.IBC)
+      .map(data => {
+        const asset: UserAsset = { ...data };
+        return asset;
+      });
+
+    // https://github.com/louischatriot/nedb/issues/185
+    // NeDB does not support distinct queries, it needs to be done programmatically
+    return _.uniqBy(userAssets, 'symbol');
   }
 
   public async retrieveDefaultWalletAsset(currentSession: Session): Promise<UserAsset> {
-    return (await this.retrieveCurrentWalletAssets(currentSession))[0];
+    const allWalletAssets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
+    // eslint-disable-next-line no-console
+    console.log('ALL_WALLET_ASSETS : ', allWalletAssets);
+
+    for (let i = 0; i < allWalletAssets.length; i++) {
+      if (!allWalletAssets[i].isSecondaryAsset) {
+        return allWalletAssets[i];
+      }
+    }
+
+    return allWalletAssets[0];
   }
 
   public async loadAndSaveAssetPrices(session: Session | null = null) {
@@ -871,6 +1125,21 @@ class WalletService {
         await this.storageService.saveAssetMarketPrice(assetPrice);
       }),
     );
+  }
+
+  public async retrieveAllAssetsPrices(currency: string): Promise<AssetMarketPrice[]> {
+    const assetsPrices = [];
+    const prices = await this.storageService.retrieveAllAssetsPrices(currency);
+    prices.forEach(data => {
+      // eslint-disable-next-line no-underscore-dangle
+      assetsPrices[data._id] = {
+        price: data.price,
+        currency: data.currency,
+        assetSymbol: data.assetSymbol,
+        dailyChange: data.dailyChange,
+      };
+    });
+    return assetsPrices;
   }
 
   public async retrieveAssetPrice(
@@ -980,9 +1249,13 @@ class WalletService {
     });
   }
 
-  public async retrieveAllTransfers(walletId: string): Promise<TransferTransactionData[]> {
+  public async retrieveAllTransfers(
+    walletId: string,
+    currentAsset?: UserAsset,
+  ): Promise<TransferTransactionData[]> {
     const transactionList: TransferTransactionList = await this.storageService.retrieveAllTransferTransactions(
       walletId,
+      currentAsset?.identifier,
     );
 
     if (!transactionList) {
@@ -1148,6 +1421,49 @@ class WalletService {
       console.log('FAILED_LOADING NFT denom data', e);
 
       return null;
+    }
+  }
+
+  public async checkIfWalletNeedAssetCreation(session: Session) {
+    const { wallet } = session;
+    const existingStaticAssets = await this.storageService.fetchAssetByCreationType(
+      AssetCreationType.STATIC,
+      wallet.identifier,
+    );
+    const needAssetsCreation = existingStaticAssets.length < STATIC_ASSET_COUNT;
+    if (needAssetsCreation) {
+      // eslint-disable-next-line no-console
+      console.log('NEEDS_ASSETS_CREATIONS', {
+        assets: existingStaticAssets,
+        STATIC_ASSET_COUNT,
+        walletID: wallet.identifier,
+      });
+    }
+    return needAssetsCreation;
+  }
+
+  public async handleCurrentWalletAssetsMigration(phrase: string, session?: Session) {
+    // 1. Check if current wallet has all expected static assets
+    // 2. If static assets are missing, remove all existing non dynamic assets
+    // 3. Prompt user password and re-create static assets on the fly
+    // 3. Run sync all to synchronize all assets states
+
+    const currentSession = session || (await this.storageService.retrieveCurrentSession());
+    const { wallet } = currentSession;
+
+    if (await this.checkIfWalletNeedAssetCreation(currentSession)) {
+      await this.storageService.removeWalletAssets(wallet.identifier);
+
+      const walletOps = new WalletOps();
+      const assetGeneration = walletOps.generate(wallet.config, wallet.identifier, phrase);
+
+      await this.saveAssets(assetGeneration.initialAssets);
+
+      const activeAsset = assetGeneration.initialAssets[0];
+      const newSession = new Session(wallet, activeAsset);
+      await this.setCurrentSession(newSession);
+
+      await this.syncAll(newSession);
     }
   }
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useSetRecoilState, useRecoilValue } from 'recoil';
 import './wallet.less';
 import 'antd/dist/antd.css';
 import { Layout, Space, Spin, Table, Typography, Tag, AutoComplete } from 'antd';
@@ -8,8 +8,10 @@ import { useTranslation } from 'react-i18next';
 import {
   sessionState,
   walletAssetState,
+  walletAllAssetsState,
   walletListState,
   validatorListState,
+  navbarMenuSelectedKeyState,
   fetchingDBState,
   nftListState,
 } from '../../recoil/atom';
@@ -32,8 +34,10 @@ enum sortOrder {
 function WalletPage() {
   const [session, setSession] = useRecoilState<Session>(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const [nftList, setNftList] = useRecoilState(nftListState);
+  const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const fetchingDB = useRecoilValue(fetchingDBState);
   const walletList = useRecoilValue(walletListState);
   const [loading, setLoading] = useState(false);
@@ -69,8 +73,11 @@ function WalletPage() {
       case DefaultWalletConfigs.TestNetConfig.name:
         networkColor = 'error';
         break;
-      case DefaultWalletConfigs.TestNetCroeseid3.name:
+      case DefaultWalletConfigs.TestNetCroeseid3Config.name:
         networkColor = 'error';
+        break;
+      case DefaultWalletConfigs.TestNetCroeseid4Config.name:
+        networkColor = 'warning';
         break;
       default:
         networkColor = 'default';
@@ -85,15 +92,19 @@ function WalletPage() {
     );
   };
 
-  const walletSelect = async e => {
+  const onWalletSwitch = async e => {
     setLoading(true);
 
-    await walletService.setCurrentSession(new Session(walletList[e.key]));
+    await walletService.setCurrentSession(
+      new Session(walletList[e.key], undefined, session.currency),
+    );
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+    const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
     const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
     setSession(currentSession);
     setUserAsset(currentAsset);
+    setWalletAllAssets(allAssets);
     setNftList(currentNftList);
     await walletService.syncAll(currentSession);
     const currentValidatorList = await walletService.retrieveTopValidators(
@@ -125,9 +136,10 @@ function WalletPage() {
 
     if (!didMountRef.current) {
       didMountRef.current = true;
+      setNavbarMenuSelectedKey('/wallet');
       analyticsService.logPage('Wallet');
     }
-  }, [fetchingDB, userAsset, nftList, validatorList]);
+  }, [fetchingDB, userAsset, walletAllAssets, nftList, validatorList]);
 
   const columns = [
     {
@@ -234,7 +246,7 @@ function WalletPage() {
               <Space size="middle">
                 <a
                   onClick={() => {
-                    walletSelect(record);
+                    onWalletSwitch(record);
                   }}
                 >
                   {t('general.select')}

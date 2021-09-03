@@ -16,8 +16,7 @@ const wallet = new Wallet(
   NORMAL_WALLET_TYPE,
   0, // addressIndex default
 );
-const session = new Session(wallet, 'USD');
-const asset: UserAsset = {
+const defaultAsset: UserAsset = {
   identifier: '',
   symbol: 'CRO',
   mainnetSymbol: 'CRO',
@@ -29,6 +28,9 @@ const asset: UserAsset = {
   description: 'Default Asset',
   decimals: 1,
 };
+
+const session = new Session(wallet, defaultAsset, 'USD');
+
 const market: AssetMarketPrice = {
   assetSymbol: 'CRO',
   currency: 'USD',
@@ -51,9 +53,19 @@ const marketState = atom({
   default: market,
 });
 
+const allMarketState = atom({
+  key: 'allMarket',
+  default: [market],
+});
+
 const walletAssetState = atom({
   key: 'walletAsset',
-  default: asset,
+  default: defaultAsset,
+});
+
+const walletAllAssetsState = atom({
+  key: 'walletAllAssets',
+  default: [defaultAsset],
 });
 
 const walletListState = atom({
@@ -77,6 +89,16 @@ const nftListState = atom<NftModel[] | undefined>({
   default: undefined,
 });
 
+const isIbcVisibleState = atom<boolean>({
+  key: 'isIbcVisible',
+  default: false,
+});
+
+const navbarMenuSelectedKeyState = atom<string>({
+  key: 'navbarMenuSelectedKey',
+  default: '/home',
+});
+
 const hasShownWarningOnWalletTypeState = atom<boolean>({
   key: 'hasShownWarningOnWalletTypeState',
   default: false,
@@ -96,11 +118,15 @@ export {
   walletIdentifierState,
   sessionState,
   marketState,
+  allMarketState,
   walletAssetState,
+  walletAllAssetsState,
   walletListState,
   walletTempBackupState,
   validatorListState,
   nftListState,
+  isIbcVisibleState,
+  navbarMenuSelectedKeyState,
   hasShownWarningOnWalletTypeState,
   ledgerIsExpertModeState,
   fetchingDBState,

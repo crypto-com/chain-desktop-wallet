@@ -2,6 +2,7 @@ import 'mocha';
 import { expect } from 'chai';
 import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
 import { WalletCreateOptions, WalletCreator } from './WalletCreator';
+import { UserAssetType } from '../models/UserAsset';
 
 describe('Testing Wallet Creation', () => {
   it('Test creating a new wallet with testnet configuration', () => {
@@ -13,7 +14,7 @@ describe('Testing Wallet Creation', () => {
       config: testNetConfig,
       walletName: 'My-TestNet-Wallet',
     };
-    const testNetWallet = WalletCreator.create(createOptions);
+    const testNetWallet = new WalletCreator(createOptions).create().wallet;
 
     expect(testNetWallet.name).to.eq('My-TestNet-Wallet');
     expect(testNetWallet.config).to.eq(testNetConfig);
@@ -22,6 +23,21 @@ describe('Testing Wallet Creation', () => {
     expect(testNetWallet.address.startsWith('tcro')).to.eq(true);
     expect(testNetWallet.encryptedPhrase.length > 0).to.eq(true);
     expect(testNetWallet.identifier.length).to.eq(16);
+
+    const { assets } = new WalletCreator(createOptions).create();
+
+    expect(assets.length).to.eq(2);
+    expect(
+      assets
+        .filter(asset => asset.assetType === UserAssetType.TENDERMINT)[0]
+        .address?.startsWith('tcro'),
+    ).to.eq(true);
+
+    expect(
+      assets.filter(asset => asset.assetType === UserAssetType.EVM)[0].address?.startsWith('0x'),
+    ).to.eq(true);
+
+    expect(assets.filter(asset => asset.assetType === UserAssetType.EVM)[0].decimals).to.eq(18);
   });
 
   it('Test creating a new wallet with main-net configuration', () => {
@@ -33,7 +49,7 @@ describe('Testing Wallet Creation', () => {
       config: mainNetConfig,
       walletName: 'My-MainNet-Wallet',
     };
-    const mainNetWallet = WalletCreator.create(createOptions);
+    const mainNetWallet = new WalletCreator(createOptions).create().wallet;
 
     expect(mainNetWallet.name).to.eq('My-MainNet-Wallet');
     expect(mainNetWallet.config).to.eq(mainNetConfig);
@@ -83,7 +99,7 @@ describe('Testing Wallet Creation', () => {
       config: customConfig,
       walletName: 'My-Custom-Config-Wallet',
     };
-    const customWallet = WalletCreator.create(createOptions);
+    const customWallet = new WalletCreator(createOptions).create().wallet;
 
     expect(customWallet.address.startsWith('pcro')).to.eq(true);
     expect(customWallet.config).to.eq(customConfig);

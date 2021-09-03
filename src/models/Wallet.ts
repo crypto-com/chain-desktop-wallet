@@ -11,6 +11,7 @@ export class Wallet {
 
   public readonly name: string;
 
+  // Legacy field - Relevant only for single asset wallets created
   public address: string;
 
   public encryptedPhrase: string;
@@ -45,6 +46,7 @@ export class Wallet {
     this.hasBeenEncrypted = hasBeenEncrypted;
     this.walletType = walletType;
     this.addressIndex = addressIndex;
+    // this.assets = [];
   }
 }
 

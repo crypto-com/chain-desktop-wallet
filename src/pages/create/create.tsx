@@ -380,9 +380,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     };
 
     try {
-      const createdWallet = WalletCreator.create(createOptions);
-      setWalletTempBackupSeed(createdWallet);
-      setWallet(createdWallet);
+      const createdWallet = new WalletCreator(createOptions).create();
+      await walletService.saveAssets(createdWallet.assets);
+
+      setWalletTempBackupSeed(createdWallet.wallet);
+      setWallet(createdWallet.wallet);
       setCreateLoading(false);
       showModal();
     } catch (e) {

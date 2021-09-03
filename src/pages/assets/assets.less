@@ -1,0 +1,190 @@
+.assets-content {
+  position: relative;
+  padding: 24px;
+  .container {
+    // max-width: 500px;
+    text-align: center;
+
+    .ant-table-row {
+      cursor: pointer;
+      .asset-icon {
+        height: 22px;
+        margin-right: 10px;
+      }
+      .ant-avatar {
+        width: 22px;
+        height: 22px;
+        margin-right: 10px;
+        color: #1199fa;
+        font-size: 12px;
+        line-height: 22px;
+        background-color: #e4f4ff;
+      }
+    }
+
+    .ant-tabs-nav {
+      margin: 0 0 20px 0;
+    }
+
+    .asset-detail {
+      // max-width: 600px;
+      background: #fff;
+
+      > .ant-layout-content {
+        margin-top: 32px;
+      }
+
+      .detail-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: -24px;
+        .back-button {
+          position: relative;
+          // margin: 24px 0;
+          top: 0;
+        }
+        .anticon {
+          font-size: 20px;
+        }
+      }
+
+      .detail-container {
+        margin: 20px 0;
+        text-align: left;
+        .ant-layout {
+          margin: 30px 0;
+        }
+        .ant-layout,
+        .ant-layout-sider {
+          background: @white;
+        }
+        .ant-layout-sider-children {
+          display: flex;
+          align-items: center;
+          justify-self: center;
+        }
+        .ant-layout-content {
+          margin: 0 0 0 10px;
+        }
+        .asset-icon {
+          height: 68px;
+        }
+        .ant-avatar {
+          width: 68px;
+          height: 68px;
+          margin-right: 10px;
+          margin-bottom: 20px;
+          color: #1199fa;
+          font-size: 34px;
+          line-height: 68px;
+          background-color: #e4f4ff;
+        }
+        .balance {
+          font-size: 24px;
+        }
+        .value {
+          color: @azure;
+          font-size: 16px;
+        }
+      }
+
+      .tab-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 300px;
+        margin: auto;
+        margin-bottom: 20px;
+        > div {
+          margin: auto;
+        }
+        .tab {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 48px;
+          height: 48px;
+          margin: auto;
+          color: @font-color;
+          font-size: 22px;
+          text-align: center;
+          background: @white;
+          border-radius: 22px;
+          cursor: pointer;
+          &:hover {
+            background: #e4f4ff;
+          }
+          &.active {
+            color: @white;
+            background: @azure;
+          }
+        }
+      }
+
+      .title {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin: 16px 0;
+        font-size: 24px;
+        .asset-icon {
+          height: 24px;
+          margin-right: 10px;
+        }
+        .ant-avatar {
+          width: 24px;
+          height: 24px;
+          margin-right: 10px;
+          color: #1199fa;
+          font-size: 12px;
+          line-height: 24px;
+          background-color: #e4f4ff;
+        }
+      }
+
+      .description {
+        margin-bottom: 20px;
+        color: @font-color;
+      }
+
+      .name {
+        padding: 16px 0 8px 0;
+      }
+
+      .copy {
+        position: relative;
+        width: 100%;
+        margin: 0 0 24px 0;
+        padding: 16px;
+        font-size: 16px;
+        background: rgba(216, 216, 216, 0.2);
+        border-radius: 4px;
+        cursor: pointer;
+
+        .anticon {
+          position: absolute;
+          right: 16px;
+          color: @azure;
+          font-size: 24px;
+        }
+      }
+
+      .ledger {
+        padding: 0;
+
+        .ant-btn {
+          width: 100%;
+          margin: 24px 0;
+        }
+      }
+    }
+  }
+}
+
+.moreDropdown {
+  min-width: 200px;
+  li {
+    font-size: 16px;
+  }
+}
