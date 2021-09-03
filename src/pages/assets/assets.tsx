@@ -10,7 +10,6 @@ import { ArrowLeftOutlined, MoreOutlined } from '@ant-design/icons';
 import {
   sessionState,
   allMarketState,
-  // walletAssetState,
   walletAllAssetsState,
   navbarMenuSelectedKeyState,
   fetchingDBState,
@@ -32,8 +31,6 @@ import {
   TransactionStatus,
   TransferTransactionData,
 } from '../../models/Transaction';
-// import IconSend from '../../svg/IconSend';
-// import IconReceive from '../../svg/IconReceive';
 
 const { Sider, Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -84,8 +81,7 @@ const convertTransfers = (
 
 const AssetsPage = () => {
   const [session, setSession] = useRecoilState<Session>(sessionState);
-  // const userAsset = useRecoilValue(walletAssetState);
-  const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const allMarketData = useRecoilValue(allMarketState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setFetchingDB = useSetRecoilState(fetchingDBState);
@@ -97,12 +93,10 @@ const AssetsPage = () => {
   const [activeAssetTab, setActiveAssetTab] = useState('1');
   const [allTransfer, setAllTransfer] = useState<any>();
 
-  // const [defaultWalletAsset, setdefaultWalletAsset] = useState<UserAsset>();
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
 
   const [t] = useTranslation();
-  // const currentLocationPath = useLocation().pathname;
   const locationState: any = useLocation().state ?? {
     from: '',
     identifier: '',
@@ -110,8 +104,17 @@ const AssetsPage = () => {
 
   const syncTransfers = async asset => {
     const transfers = await walletService.retrieveAllTransfers(session.wallet.identifier, asset);
-
     setAllTransfer(convertTransfers(transfers, walletAllAssets, session, asset));
+  };
+
+  const syncAssetBalance = async asset => {
+    const allAssets = await walletService.retrieveCurrentWalletAssets(session);
+    setWalletAllAssets(allAssets);
+    allAssets.forEach(item => {
+      if (asset.identifier === item.identifier) {
+        setCurrentAsset(item);
+      }
+    });
   };
 
   useEffect(() => {
@@ -127,19 +130,8 @@ const AssetsPage = () => {
       }
     };
 
-    // const getDefaultAssetTab = _locationState => {
-    //   if (_locationState.from === '/home' && session.activeAsset) {
-    //     setActiveAssetTab('1');
-    //   } else if (currentLocationPath === '/send') {
-    //     setActiveAssetTab('2');
-    //   } else {
-    //     setActiveAssetTab('3');
-    //   }
-    // };
-
     if (!didMountRef.current) {
       checkDirectedFrom();
-      // getDefaultAssetTab(locationState);
       didMountRef.current = true;
       analyticsService.logPage('Assets');
     }
@@ -371,14 +363,9 @@ const AssetsPage = () => {
                       setActiveAssetTab(key);
                       if (key === '1') {
                         syncTransfers(currentAsset);
+                        syncAssetBalance(currentAsset);
                         setNavbarMenuSelectedKey('/assets');
                       }
-                      // if (key === '2') {
-                      //   setNavbarMenuSelectedKey('/send');
-                      // }
-                      // if (key === '3') {
-                      //   setNavbarMenuSelectedKey('/receive');
-                      // }
                     }}
                     centered
                     // renderTabBar={() => {
