@@ -117,6 +117,8 @@ const FormDelegationRequest = () => {
 
   const analyticsService = new AnalyticsService(currentSession);
 
+  const didMountRef = useRef(false);
+
   const [t] = useTranslation();
 
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
@@ -155,8 +157,18 @@ const FormDelegationRequest = () => {
       setValidatorTopList(validatorList);
     };
 
+    const syncAssetData = async () => {
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      setWalletAsset(currentWalletAsset);
+    };
+
+    if (!didMountRef.current) {
+      syncAssetData();
+      didMountRef.current = true;
+    }
+
     syncValidatorsData();
-  }, [fetchingDB, currentValidatorList]);
+  }, [fetchingDB, walletAsset, currentValidatorList]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
