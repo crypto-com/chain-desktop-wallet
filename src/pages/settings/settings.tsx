@@ -1,30 +1,37 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
 import {
+  Alert,
+  Avatar,
   Button,
+  Carousel,
+  Checkbox,
+  Divider,
   Form,
   Input,
-  Layout,
-  Tabs,
-  Alert,
-  Checkbox,
   InputNumber,
+  Layout,
   message,
-  Switch,
-  Divider,
-  Select,
-  Carousel,
   notification,
+  Select,
+  Switch,
+  Tabs,
 } from 'antd';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { CarouselRef } from 'antd/lib/carousel';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
-import { sessionState, walletListState } from '../../recoil/atom';
+import {
+  // marketState,
+  allMarketState,
+  sessionState,
+  walletAllAssetsState,
+  walletListState,
+} from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import {
@@ -34,18 +41,23 @@ import {
   SettingsDataUpdate,
 } from '../../models/Wallet';
 import { Session } from '../../models/Session';
+// import { UserAsset } from '../../models/UserAsset';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
 import {
   DEFAULT_LANGUAGE_CODE,
-  SUPPORTED_LANGUAGE,
   FIXED_DEFAULT_FEE,
   FIXED_DEFAULT_GAS_LIMIT,
+  SUPPORTED_LANGUAGE,
+  SUPPORTED_CURRENCY,
+  WalletConfig,
+  SupportedCurrency,
 } from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
+import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -58,14 +70,17 @@ const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
 
-const GeneralSettingsForm = () => {
+const GeneralSettingsForm = props => {
   const [session, setSession] = useRecoilState(sessionState);
+  const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [enabledGeneralSettings, setEnabledGeneralSettings] = useState<boolean>(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
 
   const [t] = useTranslation();
+
+  const { currentAssetIdentifier, setCurrentAssetIdentifier } = props;
 
   useEffect(() => {
     let unmounted = false;
@@ -113,8 +128,44 @@ const GeneralSettingsForm = () => {
     setUpdateLoading(false);
   }
 
+  const assetIcon = asset => {
+    const { icon_url, symbol } = asset;
+
+    return icon_url ? (
+      <img src={icon_url} alt="cronos" className="asset-icon" />
+    ) : (
+      <Avatar>{symbol[0].toUpperCase()}</Avatar>
+    );
+  };
+
+  const onSwitchAsset = value => {
+    setCurrentAssetIdentifier(value);
+    const selectedAsset = walletAllAssets.find(asset => asset.identifier === value);
+    setSession({
+      ...session,
+      activeAsset: selectedAsset,
+    });
+    walletService.setCurrentSession({
+      ...session,
+      activeAsset: selectedAsset,
+    });
+  };
+
   return (
     <>
+      <div className="title">{t('settings.form1.assetIdentifier.label')}</div>
+      <div className="description">{t('settings.form1.assetIdentifier.description')}</div>
+      <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
+        {walletAllAssets.map(asset => {
+          return (
+            <Option value={asset.identifier} key={asset.identifier}>
+              {assetIcon(asset)}
+              {`${asset.name} (${asset.symbol})`}
+            </Option>
+          );
+        })}
+      </Select>
+      <Divider />
       <Form.Item
         name="nodeUrl"
         label={t('settings.form1.nodeUrl.label')}
@@ -206,12 +257,16 @@ const GeneralSettingsForm = () => {
 
 function MetaInfoComponent() {
   const [session, setSession] = useRecoilState(sessionState);
+  // const setMarketData = useSetRecoilState(marketState);
+  const setAllMarketData = useSetRecoilState(allMarketState);
   const [updateLoading, setUpdateLoading] = useState(false);
   const { walletType } = session.wallet;
 
   const [defaultLanguageState, setDefaultLanguageState] = useState<string>(DEFAULT_LANGUAGE_CODE);
+  const [defaultCurrencyState, setDefaultCurrencyState] = useState<string>(session.currency);
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
+  const [supportedCurrencies, setSupportedCurrencies] = useState<SupportedCurrency[]>([]);
   const [t, i18n] = useTranslation();
 
   const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
@@ -279,13 +334,21 @@ function MetaInfoComponent() {
     let unmounted = false;
 
     const SyncConfig = async () => {
-      const defaultLanguage = await generalConfigService.getLanguage();
-      const defaultMemoDisabled = session.wallet.config.disableDefaultClientMemo;
-      const defaultGADisabled = session.wallet.config.analyticsDisabled;
+      const defaultLanguage = i18n.language ? i18n.language : DEFAULT_LANGUAGE_CODE;
+      const { currency } = session;
+      const { disableDefaultClientMemo, analyticsDisabled } = session.wallet.config;
+
       if (!unmounted) {
         setDefaultLanguageState(defaultLanguage);
-        setDefaultMemoStateDisabled(defaultMemoDisabled);
-        setDefaultGAStateDisabled(defaultGADisabled);
+        setDefaultCurrencyState(currency);
+        setDefaultMemoStateDisabled(disableDefaultClientMemo);
+        setDefaultGAStateDisabled(analyticsDisabled);
+
+        const currencies: SupportedCurrency[] = [];
+        SUPPORTED_CURRENCY.forEach((item: SupportedCurrency) => {
+          currencies.push(item);
+        });
+        setSupportedCurrencies(currencies);
       }
     };
 
@@ -298,6 +361,10 @@ function MetaInfoComponent() {
       unmounted = true;
     };
   }, [
+    defaultLanguageState,
+    setDefaultLanguageState,
+    defaultCurrencyState,
+    setDefaultCurrencyState,
     defaultMemoStateDisabled,
     setDefaultMemoStateDisabled,
     defaultGAStateDisabled,
@@ -308,6 +375,36 @@ function MetaInfoComponent() {
     setDefaultLanguageState(value!.toString());
     i18n.changeLanguage(value!.toString());
     generalConfigService.setLanguage(value!.toString());
+  };
+
+  const onSwitchCurrency = async value => {
+    if (session.currency === value.toString()) {
+      return;
+    }
+
+    setUpdateLoading(true);
+
+    const newSession = {
+      ...session,
+      currency: value.toString(),
+    };
+    await walletService.setCurrentSession(newSession);
+    setSession(newSession);
+    await walletService.loadAndSaveAssetPrices(newSession);
+
+    // const currentMarketData = await walletService.retrieveAssetPrice(
+    //   'CRO',
+    //   newSession.currency,
+    // );
+
+    // eslint-disable-next-line
+    const allMarketData = await walletService.retrieveAllAssetsPrices(newSession.currency);
+
+    setAllMarketData(allMarketData);
+    // setMarketData(currentMarketData);
+    setDefaultCurrencyState(value.toString());
+
+    setUpdateLoading(false);
   };
 
   const showPasswordInput = () => {
@@ -405,7 +502,26 @@ function MetaInfoComponent() {
             </div> */}
             <Select style={{ width: 240 }} onChange={onSwitchLanguage} value={defaultLanguageState}>
               {SUPPORTED_LANGUAGE.map(item => {
-                return <Option value={item.value}>{item.label}</Option>;
+                return (
+                  <Option value={item.value} key={item.value}>
+                    {item.label}
+                  </Option>
+                );
+              })}
+            </Select>
+          </div>
+          <Divider />
+          <div className="item">
+            <div className="title">{t('settings.currency.title')}</div>
+            {/* <div className="description">
+            </div> */}
+            <Select style={{ width: 240 }} onChange={onSwitchCurrency} value={defaultCurrencyState}>
+              {supportedCurrencies.map(item => {
+                return (
+                  <Option value={item.value} key={item.value}>
+                    {item.label}
+                  </Option>
+                );
               })}
             </Select>
           </div>
@@ -546,6 +662,18 @@ function MetaInfoComponent() {
   );
 }
 
+function getAssetConfigFromWalletConfig(walletConfig: WalletConfig): UserAssetConfig {
+  return {
+    chainId: walletConfig.network.chainId,
+    explorerUrl: walletConfig.explorerUrl,
+    fee: { gasLimit: walletConfig.fee.gasLimit, networkFee: walletConfig.fee.networkFee },
+    indexingUrl: walletConfig.indexingUrl,
+    isLedgerSupportDisabled: false,
+    isStakingDisabled: false,
+    nodeUrl: walletConfig.nodeUrl,
+  };
+}
+
 const FormSettings = () => {
   const [form] = Form.useForm();
   const [confirmClearForm] = Form.useForm();
@@ -553,9 +681,13 @@ const FormSettings = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
   const [isConfirmClearVisible, setIsConfirmClearVisible] = useState(false);
+  const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [session, setSession] = useRecoilState(sessionState);
-  const defaultSettings = session.wallet.config;
-  const didMountRef = useRef(false);
+  const walletAllAssets = useRecoilValue(walletAllAssetsState);
+
+  const defaultSettings: UserAssetConfig =
+    session.activeAsset?.config || getAssetConfigFromWalletConfig(session.wallet.config);
+
   const history = useHistory();
 
   const setWalletList = useSetRecoilState(walletListState);
@@ -566,25 +698,26 @@ const FormSettings = () => {
   let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
 
   useEffect(() => {
-    if (!didMountRef.current) {
-      didMountRef.current = true;
+    const selectedIdentifier = walletAllAssets.find(
+      asset => asset.identifier === session.activeAsset?.identifier,
+    )?.identifier;
+    setCurrentAssetIdentifier(selectedIdentifier || walletAllAssets[0].identifier);
 
-      if (defaultSettings.fee !== undefined) {
-        networkFee = defaultSettings.fee.networkFee;
-      }
-      if (defaultSettings.fee !== undefined) {
-        gasLimit = defaultSettings.fee.gasLimit;
-      }
-
-      form.setFieldsValue({
-        nodeUrl: defaultSettings.nodeUrl,
-        chainId: defaultSettings.network.chainId,
-        indexingUrl: defaultSettings.indexingUrl,
-        networkFee,
-        gasLimit,
-      });
+    if (defaultSettings.fee !== undefined) {
+      networkFee = defaultSettings.fee.networkFee;
     }
-  }, [form, defaultSettings]);
+    if (defaultSettings.fee !== undefined) {
+      gasLimit = defaultSettings.fee.gasLimit;
+    }
+
+    form.setFieldsValue({
+      nodeUrl: defaultSettings.nodeUrl,
+      chainId: defaultSettings.chainId,
+      indexingUrl: defaultSettings.indexingUrl,
+      networkFee,
+      gasLimit,
+    });
+  }, [form, defaultSettings, walletAllAssets, setSession]);
 
   const onFinish = async values => {
     const defaultGasLimit =
@@ -595,13 +728,14 @@ const FormSettings = () => {
     if (
       defaultSettings.nodeUrl === values.nodeUrl &&
       defaultSettings.indexingUrl === values.indexingUrl &&
-      defaultSettings.network.chainId === values.chainId &&
+      defaultSettings.chainId === values.chainId &&
       defaultGasLimit === values.gasLimit &&
       defaultNetworkFee === values.networkFee
     ) {
       // No value was updated, we stop here
       return;
     }
+
     setIsButtonLoading(true);
     const settingsDataUpdate: SettingsDataUpdate = {
       walletId: session.wallet.identifier,
@@ -612,11 +746,34 @@ const FormSettings = () => {
       gasLimit: String(values.gasLimit),
     };
 
-    await walletService.updateWalletNodeConfig(settingsDataUpdate);
+    // This wallet level settings update should only imply the primary asset.
+    if (!session.activeAsset?.isSecondaryAsset) {
+      await walletService.updateWalletNodeConfig(settingsDataUpdate);
+    }
+
     const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
-    const newSession = new Session(updatedWallet);
-    await walletService.setCurrentSession(newSession);
+
+    // Save updated active asset settings.
+    const previousAssetConfig = session.activeAsset?.config;
+    const newlyUpdatedAsset: UserAsset = {
+      ...session.activeAsset!,
+      config: {
+        ...previousAssetConfig!,
+        explorerUrl: settingsDataUpdate.indexingUrl!,
+        chainId: settingsDataUpdate.chainId!,
+        fee: { gasLimit: settingsDataUpdate.gasLimit!, networkFee: settingsDataUpdate.networkFee! },
+        indexingUrl: settingsDataUpdate.indexingUrl!,
+        nodeUrl: settingsDataUpdate.nodeUrl!,
+      },
+    };
+
+    await walletService.saveAssets([newlyUpdatedAsset]);
+    setCurrentAssetIdentifier(newlyUpdatedAsset.identifier);
+
+    const newSession = new Session(updatedWallet, newlyUpdatedAsset);
     setSession(newSession);
+
+    await walletService.setCurrentSession(newSession);
 
     const allNewUpdatedWallets = await walletService.retrieveAllWallets();
     setWalletList(allNewUpdatedWallets);
@@ -636,7 +793,7 @@ const FormSettings = () => {
   const onRestoreDefaults = () => {
     form.setFieldsValue({
       nodeUrl: defaultSettings.nodeUrl,
-      chainId: defaultSettings.network.chainId,
+      chainId: defaultSettings.chainId,
       indexingUrl: defaultSettings.indexingUrl,
       networkFee:
         defaultSettings.fee && defaultSettings.fee.networkFee ? defaultSettings.fee.networkFee : '',
@@ -674,7 +831,10 @@ const FormSettings = () => {
         <TabPane tab={t('settings.tab1')} key="1">
           <div className="site-layout-background settings-content">
             <div className="container">
-              <GeneralSettingsForm />
+              <GeneralSettingsForm
+                currentAssetIdentifier={currentAssetIdentifier}
+                setCurrentAssetIdentifier={setCurrentAssetIdentifier}
+              />
               <Form.Item {...tailLayout} className="button">
                 <Button type="primary" htmlType="submit" loading={isButtonLoading}>
                   {t('general.save')}

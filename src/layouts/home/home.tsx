@@ -1,7 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Alert, Button, Checkbox, Dropdown, Form, Input, Layout, Menu, Spin } from 'antd';
+import {
+  Alert,
+  Button,
+  Checkbox,
+  Dropdown,
+  Form,
+  Input,
+  Layout,
+  Menu,
+  notification,
+  Spin,
+} from 'antd';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import Icon, {
   CaretDownOutlined,
@@ -12,23 +23,28 @@ import Icon, {
   BankOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
 import {
   sessionState,
   walletAssetState,
+  walletAllAssetsState,
   walletListState,
   marketState,
+  allMarketState,
   validatorListState,
   fetchingDBState,
   nftListState,
+  isIbcVisibleState,
+  navbarMenuSelectedKeyState,
 } from '../../recoil/atom';
 import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
-import IconSend from '../../svg/IconSend';
-import IconReceive from '../../svg/IconReceive';
+// import IconSend from '../../svg/IconSend';
+// import IconReceive from '../../svg/IconReceive';
+import IconAssets from '../../svg/IconAssets';
 import IconStaking from '../../svg/IconStaking';
 import IconNft from '../../svg/IconNft';
 import IconWallet from '../../svg/IconWallet';
@@ -40,12 +56,26 @@ import packageJson from '../../../package.json';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { LedgerWalletMaximum } from '../../config/StaticConfig';
 import { generalConfigService } from '../../storage/GeneralConfigService';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import { secretStoreService } from '../../storage/SecretStoreService';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
 }
 
 const { Sider } = Layout;
+
+const allPaths = [
+  '/home',
+  '/staking',
+  // '/send',
+  // '/receive',
+  '/assets',
+  '/settings',
+  '/governance',
+  '/nft',
+  '/wallet',
+];
 
 function HomeLayout(props: HomeLayoutProps) {
   const history = useHistory();
@@ -54,11 +84,17 @@ function HomeLayout(props: HomeLayoutProps) {
   const [hasWallet, setHasWallet] = useState(true); // Default as true. useEffect will only re-render if result of hasWalletBeenCreated === false
   const [session, setSession] = useRecoilState(sessionState);
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const [walletList, setWalletList] = useRecoilState(walletListState);
   const [marketData, setMarketData] = useRecoilState(marketState);
+  const [allMarketData, setAllMarketData] = useRecoilState(allMarketState);
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const [nftList, setNftList] = useRecoilState(nftListState);
+  const [navbarMenuSelectedKey, setNavbarMenuSelectedKey] = useRecoilState(
+    navbarMenuSelectedKeyState,
+  );
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
+  const setIsIbcVisible = useSetRecoilState(isIbcVisibleState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
@@ -67,12 +103,22 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const didMountRef = useRef(false);
+  const currentLocationPath = useLocation().pathname;
 
   const [t] = useTranslation();
 
   async function fetchAndSetNewValidators(currentSession) {
     try {
       await walletService.fetchAndSaveValidators(currentSession);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Failed loading new wallet validators list', e);
+    }
+  }
+
+  async function fetchAndSaveIBCWalletAssets(fetchSession: Session) {
+    try {
+      await walletService.fetchIBCAssets(fetchSession);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Failed loading new wallet validators list', e);
@@ -112,8 +158,14 @@ function HomeLayout(props: HomeLayoutProps) {
     await walletService.setCurrentSession(new Session(allWalletsData[0]));
     const currentSession = await walletService.retrieveCurrentSession();
     const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+    const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
+    // const isIbcVisible = allAssets.length > 1;
+    const isIbcVisible = false;
+
     setSession(currentSession);
     setUserAsset(currentAsset);
+    setWalletAllAssets(allAssets);
+    setIsIbcVisible(isIbcVisible);
     await walletService.syncAll(currentSession);
 
     setIsButtonLoading(false);
@@ -139,29 +191,81 @@ function HomeLayout(props: HomeLayoutProps) {
     setIsConfirmationModalVisible(false);
   };
 
+  const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
+
+  const showPasswordInput = () => {
+    setInputPasswordVisible(true);
+  };
+
+  const checkNewlyAddedStaticAssets = (walletSession?: Session) => {
+    if (!walletSession || !walletSession.wallet) {
+      return;
+    }
+
+    setTimeout(async () => {
+      if (await walletService.checkIfWalletNeedAssetCreation(walletSession)) {
+        const newAssetAddedNotificationKey = 'newAssetAddedNotificationKey';
+
+        const createNewlyAddedAssets = (
+          <Button
+            type="primary"
+            size="small"
+            className="btn-restart"
+            onClick={() => {
+              showPasswordInput();
+              notification.close(newAssetAddedNotificationKey);
+            }}
+            style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+          >
+            Enable
+          </Button>
+        );
+
+        notification.info({
+          message: 'New Assets Available',
+          description: 'Do you want to enable the newly added assets ?',
+          duration: 15,
+          key: newAssetAddedNotificationKey,
+          placement: 'topRight',
+          btn: createNewlyAddedAssets,
+        });
+      }
+    }, 15_000);
+  };
+
   useEffect(() => {
     const fetchDB = async () => {
       setFetchingDB(true);
       const hasWalletBeenCreated = await walletService.hasWalletBeenCreated();
       const currentSession = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
       const allWalletsData = await walletService.retrieveAllWallets();
       const currentMarketData = await walletService.retrieveAssetPrice(
-        currentAsset.mainnetSymbol,
-        'usd',
+        currentAsset?.mainnetSymbol,
+        currentSession.currency,
+      );
+      const currentAllAssetsMarketData = await walletService.retrieveAllAssetsPrices(
+        currentSession.currency,
       );
 
+      const isIbcVisible = allAssets.length > 1;
+      // const isIbcVisible = false;
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
       setHasWallet(hasWalletBeenCreated);
       setSession(currentSession);
       setUserAsset(currentAsset);
+      setWalletAllAssets(allAssets);
+      setIsIbcVisible(isIbcVisible);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
+      setAllMarketData(currentAllAssetsMarketData);
 
       await Promise.all([
         await fetchAndSetNewValidators(currentSession),
         await fetchAndSetNewProposals(currentSession),
         await fetchAndSetNFTs(currentSession),
+        await fetchAndSaveIBCWalletAssets(currentSession),
       ]);
 
       const currentValidatorList = await walletService.retrieveTopValidators(
@@ -178,10 +282,17 @@ function HomeLayout(props: HomeLayoutProps) {
       setTimeout(() => {
         setIsAnnouncementVisible(!announcementShown);
       }, 2000);
+
+      checkNewlyAddedStaticAssets(currentSession);
     };
 
     if (!didMountRef.current) {
       fetchDB();
+
+      if (allPaths.includes(currentLocationPath)) {
+        setNavbarMenuSelectedKey(currentLocationPath);
+      }
+
       didMountRef.current = true;
     } else if (!hasWallet) {
       history.push('/welcome');
@@ -193,48 +304,63 @@ function HomeLayout(props: HomeLayoutProps) {
     setSession,
     userAsset,
     setUserAsset,
+    walletAllAssets,
+    setWalletAllAssets,
     walletList,
     setWalletList,
     marketData,
     setMarketData,
+    allMarketData,
+    setAllMarketData,
     validatorList,
     setValidatorList,
     nftList,
     setNftList,
   ]);
 
-  const HomeMenu = () => {
-    const locationPath = useLocation().pathname;
-    const paths = [
-      '/home',
-      '/staking',
-      '/send',
-      '/receive',
-      '/settings',
-      '/governance',
-      '/nft',
-      '/wallet',
-    ];
+  const onWalletDecryptFinishCreateFreshAssets = async (password: string) => {
+    setFetchingDB(true);
+    setInputPasswordVisible(false);
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      session.wallet.identifier,
+    );
 
-    let menuSelectedKey = locationPath;
-    if (!paths.includes(menuSelectedKey)) {
+    await walletService.handleCurrentWalletAssetsMigration(phraseDecrypted, session);
+    setFetchingDB(false);
+  };
+
+  const HomeMenu = () => {
+    let menuSelectedKey = currentLocationPath;
+    if (!allPaths.includes(menuSelectedKey)) {
       menuSelectedKey = '/home';
     }
 
     return (
-      <Menu theme="dark" mode="inline" defaultSelectedKeys={[menuSelectedKey]}>
+      <Menu
+        theme="dark"
+        mode="inline"
+        defaultSelectedKeys={[menuSelectedKey]}
+        selectedKeys={[navbarMenuSelectedKey]}
+        onClick={item => {
+          setNavbarMenuSelectedKey(item.key);
+        }}
+      >
         <Menu.Item key="/home" icon={<Icon component={IconHome} />}>
           <Link to="/home">{t('navbar.home')}</Link>
         </Menu.Item>
         <Menu.Item key="/staking" icon={<Icon component={IconStaking} />}>
           <Link to="/staking">{t('navbar.staking')}</Link>
         </Menu.Item>
-        <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
+        <Menu.Item key="/assets" icon={<Icon component={IconAssets} />}>
+          <Link to="/assets">{t('navbar.assets')}</Link>
+        </Menu.Item>
+        {/* <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">{t('navbar.send')}</Link>
         </Menu.Item>
         <Menu.Item key="/receive" icon={<Icon component={IconReceive} />}>
           <Link to="/receive">{t('navbar.receive')}</Link>
-        </Menu.Item>
+        </Menu.Item> */}
         <Menu.Item key="/governance" icon={<BankOutlined />}>
           <Link to="/governance">{t('navbar.governance')}</Link>
         </Menu.Item>
@@ -300,6 +426,28 @@ function HomeLayout(props: HomeLayoutProps) {
 
   return (
     <main className="home-layout">
+      <PasswordFormModal
+        description={t('general.passwordFormModal.description')}
+        okButtonText={t('general.passwordFormModal.okButton')}
+        onCancel={() => {
+          setInputPasswordVisible(false);
+        }}
+        onSuccess={onWalletDecryptFinishCreateFreshAssets}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          return {
+            valid: isValid,
+            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
+          };
+        }}
+        successText={t('general.passwordFormModal.success')}
+        title={t('general.passwordFormModal.title')}
+        visible={inputPasswordVisible}
+        successButtonText={t('general.continue')}
+        confirmPassword={false}
+        repeatValidation
+      />
+
       <Layout>
         <Sider className="home-sider">
           <div className="logo" />

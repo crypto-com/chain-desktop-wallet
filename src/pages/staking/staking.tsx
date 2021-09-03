@@ -1,21 +1,16 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
-import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs } from 'antd';
+import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs, Typography } from 'antd';
 import { OrderedListOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import Big from 'big.js';
 import numeral from 'numeral';
-import ModalPopup from '../../components/ModalPopup/ModalPopup';
-import { walletService } from '../../service/WalletService';
-import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
-import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { secretStoreService } from '../../storage/SecretStoreService';
+
 import {
-  marketState,
+  allMarketState,
   sessionState,
   walletAssetState,
   ledgerIsExpertModeState,
@@ -23,9 +18,18 @@ import {
   validatorListState,
 } from '../../recoil/atom';
 import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
-import { BroadCastResult, RewardTransaction, ValidatorModel } from '../../models/Transaction';
+import {
+  BroadCastResult,
+  RewardTransaction,
+  ValidatorModel,
+  StakingTransactionData,
+} from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import { FIXED_DEFAULT_FEE, TABLE_LOCALE } from '../../config/StaticConfig';
+import {
+  FIXED_DEFAULT_FEE,
+  CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+  SUPPORTED_CURRENCY,
+} from '../../config/StaticConfig';
 import {
   adjustedTransactionAmount,
   fromScientificNotation,
@@ -40,6 +44,16 @@ import {
   AnalyticsService,
   AnalyticsTxType,
 } from '../../service/analytics/AnalyticsService';
+import { secretStoreService } from '../../storage/SecretStoreService';
+import { walletService } from '../../service/WalletService';
+
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import { UndelegateFormComponent } from '../home/components/UndelegateFormComponent';
+import RedelegateFormComponent from '../home/components/RedelegateFormComponent';
+import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -52,11 +66,26 @@ const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
 
+const { Text } = Typography;
+
 interface RewardsTabularData {
   key: string;
   rewardAmount: string;
   rewardMarketPrice: string;
   validatorAddress: string;
+}
+
+enum StakingActionType {
+  UNDELEGATE = 'UNDELEGATE',
+  REDELEGATE = 'REDELEGATE',
+}
+
+interface StakingTabularData {
+  key: string;
+  stakedAmountWithSymbol: string;
+  stakedAmount: string;
+  validatorAddress: string;
+  delegatorAddress: string;
 }
 
 const FormDelegationRequest = () => {
@@ -77,24 +106,45 @@ const FormDelegationRequest = () => {
   const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
   const [showMemo, setShowMemo] = useState(false);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+
   const currentValidatorList = useRecoilValue(validatorListState);
   const currentSession = useRecoilValue(sessionState);
   const fetchingDB = useRecoilValue(fetchingDBState);
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
+  const [displayWarning, setDisplayWarning] = useState(true);
 
   const analyticsService = new AnalyticsService(currentSession);
+
+  const didMountRef = useRef(false);
 
   const [t] = useTranslation();
 
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
     if (validatorList) {
+      let willDisplayWarningColumn = false;
+      let displayedWarningColumn = false;
+
       return validatorList.map((validator, idx) => {
+        if (
+          new Big(validator.cumulativeSharesIncludePercentage!).gte(
+            CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+          ) &&
+          !displayedWarningColumn
+        ) {
+          displayedWarningColumn = true;
+          willDisplayWarningColumn = true;
+        }
+
         const validatorModel = {
           ...validator,
           key: `${idx}`,
+          displayWarningColumn: willDisplayWarningColumn,
         };
+
+        willDisplayWarningColumn = false;
+
         return validatorModel;
       });
     }
@@ -107,8 +157,18 @@ const FormDelegationRequest = () => {
       setValidatorTopList(validatorList);
     };
 
+    const syncAssetData = async () => {
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      setWalletAsset(currentWalletAsset);
+    };
+
+    if (!didMountRef.current) {
+      syncAssetData();
+      didMountRef.current = true;
+    }
+
     syncValidatorsData();
-  }, [fetchingDB, currentValidatorList]);
+  }, [fetchingDB, walletAsset, currentValidatorList]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -292,9 +352,27 @@ const FormDelegationRequest = () => {
       render: currentTokens => {
         return (
           <span>
-            {numeral(scaledAmount(currentTokens, 8)).format('0,0.00')}{' '}
+            {numeral(scaledAmount(currentTokens, 8)).format('0,0')}{' '}
             {currentSession.wallet.config.network.coin.croDenom.toUpperCase()}
           </span>
+        );
+      },
+    },
+    {
+      title: t('staking.validatorList.table.cumulativeShares'),
+      // dataIndex: 'cumulativeShares',
+      key: 'cumulativeShares',
+      // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
+      defaultSortOrder: 'descend' as any,
+      render: record => {
+        return (
+          <>
+            {/* <span>{record.cumulativeShares} %</span> */}
+            <ValidatorPowerPercentBar
+              percentExcludeCurrent={record.cumulativeSharesExcludePercentage} // light blue
+              percentIncludeCurrent={record.cumulativeSharesIncludePercentage} // primary blue
+            />
+          </>
         );
       },
     },
@@ -346,16 +424,49 @@ const FormDelegationRequest = () => {
           className="validator-modal"
           footer={[]}
           okText="Confirm"
-          width={1000}
+          width={1200}
         >
           <div className="title">{t('staking.validatorList.table.title')}</div>
           <div className="description">{t('staking.validatorList.table.description')}</div>
           <div className="item">
             <Table
-              locale={TABLE_LOCALE}
+              locale={{
+                triggerDesc: t('general.table.triggerDesc'),
+                triggerAsc: t('general.table.triggerAsc'),
+                cancelSort: t('general.table.cancelSort'),
+              }}
               dataSource={validatorTopList}
               columns={validatorColumns}
               pagination={{ showSizeChanger: false }}
+              onChange={(pagination, filters, sorter: any) => {
+                if (
+                  (sorter.order === 'descend' && sorter.field === 'currentTokens') ||
+                  sorter.order === undefined
+                ) {
+                  setDisplayWarning(true);
+                } else {
+                  setDisplayWarning(false);
+                }
+              }}
+              expandable={{
+                rowExpandable: record => record.displayWarningColumn! && displayWarning,
+                expandedRowRender: record =>
+                  record.displayWarningColumn &&
+                  displayWarning && (
+                    <div className="cumulative-stake33">
+                      {t('staking.validatorList.table.warningCumulative')}
+                    </div>
+                  ),
+                expandIconColumnIndex: -1,
+              }}
+              rowClassName={record => {
+                const greyBackground =
+                  new Big(record.cumulativeSharesIncludePercentage!).lte(
+                    CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+                  ) || record.displayWarningColumn;
+                return greyBackground ? 'grey-background' : '';
+              }}
+              defaultExpandAllRows
             />
           </div>
         </ModalPopup>
@@ -550,6 +661,404 @@ const FormDelegationRequest = () => {
   );
 };
 
+const FormDelegationOperations = () => {
+  // Undelegate action related states changes
+  const [form] = Form.useForm();
+  const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+  const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
+  const currentSession = useRecoilValue(sessionState);
+  const fetchingDB = useRecoilValue(fetchingDBState);
+
+  const [delegations, setDelegations] = useState<StakingTabularData[]>([]);
+  const [undelegateFormValues, setUndelegateFormValues] = useState({
+    validatorAddress: '',
+    undelegateAmount: '',
+  });
+  const [redelegateFormValues, setRedelegateFormValues] = useState({
+    validatorOriginAddress: '',
+    validatorDestinationAddress: '',
+    redelegateAmount: '',
+  });
+  const [delegationActionType, setDelegationActionType] = useState<StakingActionType>();
+
+  const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
+  const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
+  const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [confirmLoading, setConfirmLoading] = useState(false);
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
+  const [errorMessages, setErrorMessages] = useState([]);
+
+  const [t] = useTranslation();
+
+  useEffect(() => {
+    const syncStakingData = async () => {
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+
+      const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
+        currentSession.wallet.identifier,
+      );
+      const stakingTabularData = currentWalletAsset
+        ? convertDelegations(allDelegations, currentWalletAsset)
+        : [];
+      setDelegations(stakingTabularData);
+    };
+
+    syncStakingData();
+  }, [fetchingDB]);
+
+  const handleCancelConfirmationModal = () => {
+    setIsVisibleConfirmationModal(false);
+    setInputPasswordVisible(false);
+  };
+
+  const closeSuccessModal = () => {
+    setIsSuccessTransferModalVisible(false);
+    setInputPasswordVisible(false);
+  };
+
+  const closeErrorModal = () => {
+    setIsErrorTransferModalVisible(false);
+    setInputPasswordVisible(false);
+  };
+
+  const showConfirmationModal = () => {
+    setInputPasswordVisible(false);
+    setIsVisibleConfirmationModal(true);
+  };
+
+  const onWalletDecryptFinish = async (password: string) => {
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      currentSession.wallet.identifier,
+    );
+    setDecryptedPhrase(phraseDecrypted);
+    showConfirmationModal();
+  };
+
+  const showPasswordInput = () => {
+    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      showConfirmationModal();
+    } else {
+      setInputPasswordVisible(true);
+    }
+  };
+
+  const onConfirmDelegationAction = async () => {
+    const { walletType } = currentSession.wallet;
+
+    if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
+      return;
+    }
+    try {
+      setConfirmLoading(true);
+
+      let broadcastedTransaction: BroadCastResult | null = null;
+
+      if (delegationActionType === StakingActionType.UNDELEGATE) {
+        const undelegateAmount = form.getFieldValue('undelegateAmount');
+        broadcastedTransaction = await walletService.sendUnDelegateTransaction({
+          validatorAddress: undelegateFormValues.validatorAddress,
+          amount: undelegateAmount,
+          asset: userAsset,
+          memo: '',
+          decryptedPhrase,
+          walletType,
+        });
+      } else if (delegationActionType === StakingActionType.REDELEGATE) {
+        const redelegateAmount = form.getFieldValue('redelegateAmount');
+        const validatorDesAddress = form.getFieldValue('validatorDestinationAddress');
+        broadcastedTransaction = await walletService.sendReDelegateTransaction({
+          validatorSourceAddress: redelegateFormValues.validatorOriginAddress,
+          validatorDestinationAddress: validatorDesAddress,
+          amount: redelegateAmount,
+          asset: userAsset,
+          memo: '',
+          decryptedPhrase,
+          walletType,
+        });
+      } else {
+        return;
+      }
+
+      const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
+        currentSession.wallet.identifier,
+      );
+
+      const delegationTabularData = convertDelegations(allDelegations, userAsset);
+      setDelegations(delegationTabularData);
+
+      setBroadcastResult(broadcastedTransaction);
+
+      setIsVisibleConfirmationModal(false);
+      setConfirmLoading(false);
+      setIsSuccessTransferModalVisible(true);
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      setUserAsset(currentWalletAsset);
+      setInputPasswordVisible(false);
+
+      // Reset values
+      form.resetFields();
+
+      if (delegationActionType === StakingActionType.UNDELEGATE) {
+        setUndelegateFormValues({
+          validatorAddress: '',
+          undelegateAmount: '',
+        });
+      } else if (delegationActionType === StakingActionType.REDELEGATE) {
+        setRedelegateFormValues({
+          redelegateAmount: '',
+          validatorDestinationAddress: '',
+          validatorOriginAddress: '',
+        });
+      }
+    } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+      }
+
+      setErrorMessages(e.message.split(': '));
+      setIsVisibleConfirmationModal(false);
+      setConfirmLoading(false);
+      setInputPasswordVisible(false);
+      setIsErrorTransferModalVisible(true);
+    }
+  };
+
+  const onDelegationCellsClicked = e => {
+    const eventData = JSON.parse(e.currentTarget.dataset.id);
+    const { validatorAddress, stakedAmount, actionType } = eventData;
+    const newStakingAction: StakingActionType = StakingActionType[actionType];
+    setDelegationActionType(newStakingAction);
+
+    if (newStakingAction === StakingActionType.UNDELEGATE) {
+      setUndelegateFormValues({
+        validatorAddress,
+        undelegateAmount: stakedAmount,
+      });
+    } else if (newStakingAction === StakingActionType.REDELEGATE) {
+      setRedelegateFormValues({
+        redelegateAmount: stakedAmount,
+        validatorOriginAddress: validatorAddress,
+        validatorDestinationAddress: '',
+      });
+    }
+
+    showPasswordInput();
+  };
+
+  function convertDelegations(allDelegations: StakingTransactionData[], currentAsset: UserAsset) {
+    return allDelegations
+      .map(dlg => {
+        const stakedAmount = getUIDynamicAmount(dlg.stakedAmount, currentAsset);
+        const data: StakingTabularData = {
+          key: dlg.validatorAddress + dlg.stakedAmount,
+          delegatorAddress: dlg.delegatorAddress,
+          validatorAddress: dlg.validatorAddress,
+          stakedAmountWithSymbol: `${stakedAmount} ${currentAsset.symbol}`,
+          stakedAmount,
+        };
+        return data;
+      })
+      .filter(dlg => Number(dlg.stakedAmount) > 0);
+  }
+
+  const StakingColumns = [
+    {
+      title: t('home.transactions.table2.validatorAddress'),
+      dataIndex: 'validatorAddress',
+      key: 'validatorAddress',
+      render: text => (
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+        >
+          {middleEllipsis(text, 8)}
+        </a>
+      ),
+    },
+    {
+      title: t('home.transactions.table2.stakedAmountWithSymbol'),
+      dataIndex: 'stakedAmountWithSymbol',
+      key: 'stakedAmountWithSymbol',
+    },
+    {
+      title: t('home.transactions.table2.delegatorAddress'),
+      dataIndex: 'delegatorAddress',
+      key: 'delegatorAddress',
+      render: text => (
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
+        >
+          {middleEllipsis(text, 8)}
+        </a>
+      ),
+    },
+    {
+      title: t('home.transactions.table2.undelegateAction'),
+      dataIndex: 'undelegateAction',
+      key: 'undelegateAction',
+      render: (text, record: StakingTabularData) => {
+        const clickData = {
+          ...record,
+          actionType: StakingActionType.UNDELEGATE,
+        };
+        return (
+          <a data-id={JSON.stringify(clickData)} onClick={onDelegationCellsClicked}>
+            <Text type="danger">{t('home.transactions.table2.action1')}</Text>
+          </a>
+        );
+      },
+    },
+    {
+      title: t('home.transactions.table2.redelegateAction'),
+      dataIndex: 'redelegate',
+      key: 'redelegateAction',
+      render: (text, record: StakingTabularData) => {
+        const clickData = {
+          ...record,
+          actionType: StakingActionType.REDELEGATE,
+        };
+        return (
+          <a data-id={JSON.stringify(clickData)} onClick={onDelegationCellsClicked}>
+            <Text type="success">{t('home.transactions.table2.action2')}</Text>
+          </a>
+        );
+      },
+    },
+  ];
+
+  return (
+    <>
+      <Table
+        locale={{
+          triggerDesc: t('general.table.triggerDesc'),
+          triggerAsc: t('general.table.triggerAsc'),
+          cancelSort: t('general.table.cancelSort'),
+        }}
+        columns={StakingColumns}
+        dataSource={delegations}
+        rowKey={record => record.key}
+      />
+      <div>
+        <ModalPopup
+          isModalVisible={isConfirmationModalVisible}
+          handleCancel={handleCancelConfirmationModal}
+          handleOk={onConfirmDelegationAction}
+          confirmationLoading={confirmLoading}
+          footer={[
+            <Button
+              key="submit"
+              type="primary"
+              loading={confirmLoading}
+              onClick={onConfirmDelegationAction}
+            >
+              {t('general.confirm')}
+            </Button>,
+            <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
+              {t('general.cancel')}
+            </Button>,
+          ]}
+          okText={t('general.confirm')}
+        >
+          {delegationActionType === StakingActionType.UNDELEGATE ? (
+            <UndelegateFormComponent
+              currentSession={currentSession}
+              undelegateFormValues={undelegateFormValues}
+              form={form}
+            />
+          ) : (
+            <RedelegateFormComponent
+              currentSession={currentSession}
+              redelegateFormValues={redelegateFormValues}
+              walletAsset={userAsset}
+              form={form}
+            />
+          )}
+        </ModalPopup>
+        <PasswordFormModal
+          description={t('general.passwordFormModal.description')}
+          okButtonText={t('general.passwordFormModal.okButton')}
+          onCancel={() => {
+            setInputPasswordVisible(false);
+          }}
+          onSuccess={onWalletDecryptFinish}
+          onValidatePassword={async (password: string) => {
+            const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+            return {
+              valid: isValid,
+              errMsg: !isValid ? t('general.passwordFormModal.error') : '',
+            };
+          }}
+          successText={t('general.passwordFormModal.success')}
+          title={t('general.passwordFormModal.title')}
+          visible={inputPasswordVisible}
+          successButtonText={t('general.continue')}
+          confirmPassword={false}
+        />
+
+        <SuccessModalPopup
+          isModalVisible={isSuccessTransferModalVisible}
+          handleCancel={closeSuccessModal}
+          handleOk={closeSuccessModal}
+          title={t('general.successModalPopup.title')}
+          button={null}
+          footer={[
+            <Button key="submit" type="primary" onClick={closeSuccessModal}>
+              {t('general.ok')}
+            </Button>,
+          ]}
+        >
+          <>
+            {broadcastResult?.code !== undefined &&
+            broadcastResult?.code !== null &&
+            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+              <div className="description">
+                {t('general.successModalPopup.timeout.description')}
+              </div>
+            ) : (
+              <div className="description">
+                {delegationActionType === StakingActionType.UNDELEGATE
+                  ? t('general.successModalPopup.undelegation.description')
+                  : t('general.successModalPopup.redelegation.description')}
+              </div>
+            )}
+          </>
+        </SuccessModalPopup>
+        <ErrorModalPopup
+          isModalVisible={isErrorTransferModalVisible}
+          handleCancel={closeErrorModal}
+          handleOk={closeErrorModal}
+          title={t('general.errorModalPopup.title')}
+          footer={[]}
+        >
+          <>
+            <div className="description">
+              {delegationActionType === StakingActionType.UNDELEGATE
+                ? t('general.errorModalPopup.undelegation.description')
+                : t('general.errorModalPopup.redelegation.description')}
+              <br />
+              {errorMessages
+                .filter((item, idx) => {
+                  return errorMessages.indexOf(item) === idx;
+                })
+                .map((err, idx) => (
+                  <div key={idx}>- {err}</div>
+                ))}
+              {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
+            </div>
+          </>
+        </ErrorModalPopup>
+      </div>
+    </>
+  );
+};
+
 const FormWithdrawStakingReward = () => {
   const [withdrawValues, setWithdrawValues] = useState({
     validatorAddress: '',
@@ -565,8 +1074,10 @@ const FormWithdrawStakingReward = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
+  // const walletAllAssets = useRecoilValue(walletAllAssetsState);
+
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
-  const marketData = useRecoilValue(marketState);
+  const allMarketData = useRecoilValue(allMarketState);
   const currentSession = useRecoilValue(sessionState);
   const fetchingDB = useRecoilValue(fetchingDBState);
 
@@ -584,15 +1095,20 @@ const FormWithdrawStakingReward = () => {
       .filter(reward => Big(reward.amount).gte(Big(0)))
       .map(reward => {
         const rewardAmount = getUIDynamicAmount(reward.amount, currentAsset);
-        const marketPrice = marketData && marketData.price ? new Big(currentMarketPrice.price) : '';
+        const marketPrice =
+          currentMarketPrice && currentMarketPrice.price ? new Big(currentMarketPrice.price) : '';
         const rewardMarketPrice =
-          marketData && marketData.price ? new Big(rewardAmount).times(marketPrice).toFixed(2) : '';
+          currentMarketPrice && currentMarketPrice.price
+            ? new Big(rewardAmount).times(marketPrice).toFixed(2)
+            : '';
         const rewardData: RewardsTabularData = {
           key: `${reward.validatorAddress}${reward.amount}`,
           rewardAmount: `${rewardAmount} ${currentAsset.symbol}`,
           rewardMarketPrice:
             rewardMarketPrice !== ''
-              ? `${numeral(rewardMarketPrice).format('$0,0.00')} ${marketData?.currency}`
+              ? `${SUPPORTED_CURRENCY.get(currentMarketPrice?.currency)?.symbol}${numeral(
+                  rewardMarketPrice,
+                ).format('0,0.00')} ${currentMarketPrice?.currency}`
               : ``,
           validatorAddress: reward.validatorAddress,
         };
@@ -602,12 +1118,24 @@ const FormWithdrawStakingReward = () => {
 
   useEffect(() => {
     const syncRewardsData = async () => {
+      const currentMarketData = allMarketData[`${walletAsset?.symbol}-${currentSession?.currency}`];
+
       const allRewards: RewardTransaction[] = await walletService.retrieveAllRewards(
         currentSession.wallet.identifier,
       );
 
-      const rewardsTabularData = convertToTabularData(allRewards, walletAsset, marketData);
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      setWalletAsset(currentWalletAsset);
+
+      // Make sure the primary/default asset is the correct one
+      const primaryAsset =
+        walletAsset.identifier && walletAsset.name !== 'default'
+          ? walletAsset
+          : await walletService.retrieveDefaultWalletAsset(currentSession);
+
+      const rewardsTabularData = convertToTabularData(allRewards, primaryAsset, currentMarketData);
       setRewards(rewardsTabularData);
+      setWalletAsset(primaryAsset);
     };
 
     syncRewardsData();
@@ -653,8 +1181,6 @@ const FormWithdrawStakingReward = () => {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setIsSuccessTransferModalVisible(true);
-      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
-      setWalletAsset(currentWalletAsset);
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
         setLedgerIsExpertMode(detectConditionsError(e.toString()));
@@ -731,7 +1257,11 @@ const FormWithdrawStakingReward = () => {
   const StakingTable = () => {
     return (
       <Table
-        locale={TABLE_LOCALE}
+        locale={{
+          triggerDesc: t('general.table.triggerDesc'),
+          triggerAsc: t('general.table.triggerAsc'),
+          cancelSort: t('general.table.cancelSort'),
+        }}
         columns={rewardColumns}
         dataSource={rewards}
         onRow={record => {
@@ -888,6 +1418,14 @@ const StakingPage = () => {
               <div className="container">
                 <div className="description">{t('staking.description2')}</div>
                 <FormDelegationRequest />
+              </div>
+            </div>
+          </TabPane>
+          <TabPane tab={t('staking.tab3')} key="3">
+            <div className="site-layout-background stake-content">
+              <div className="container">
+                <div className="description">{t('staking.description3')}</div>
+                <FormDelegationOperations />
               </div>
             </div>
           </TabPane>

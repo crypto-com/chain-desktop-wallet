@@ -8,13 +8,14 @@ import numeral from 'numeral';
 import Big from 'big.js';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { validatorListState, fetchingDBState } from '../../../recoil/atom';
-import { TABLE_LOCALE } from '../../../config/StaticConfig';
 import { Session } from '../../../models/Session';
 import { UserAsset, scaledAmount } from '../../../models/UserAsset';
 import { ValidatorModel } from '../../../models/Transaction';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { middleEllipsis, ellipsis } from '../../../utils/utils';
+import { CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD } from '../../../config/StaticConfig';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
+import ValidatorPowerPercentBar from '../../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
 
 const { Search } = Input;
 
@@ -32,7 +33,7 @@ const RedelegateFormComponent = (props: {
   const fetchingDB = useRecoilValue(fetchingDBState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
   const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
-
+  const [displayWarning, setDisplayWarning] = useState(true);
   const [t] = useTranslation();
 
   const redelegatePeriod = props.currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
@@ -92,14 +93,34 @@ const RedelegateFormComponent = (props: {
       title: t('staking.validatorList.table.currentTokens'),
       dataIndex: 'currentTokens',
       key: 'currentTokens',
-      sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
+      sorter: (a, b) => {
+        return new Big(a.currentTokens).cmp(new Big(b.currentTokens));
+      },
       defaultSortOrder: 'descend' as any,
       render: currentTokens => {
         return (
           <span>
-            {numeral(scaledAmount(currentTokens, 8)).format('0,0.00')}{' '}
+            {numeral(scaledAmount(currentTokens, 8)).format('0,0')}{' '}
             {props.currentSession.wallet.config.network.coin.croDenom.toUpperCase()}
           </span>
+        );
+      },
+    },
+    {
+      title: t('staking.validatorList.table.cumulativeShares'),
+      // dataIndex: 'cumulativeShares',
+      key: 'cumulativeShares',
+      // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
+      defaultSortOrder: 'descend' as any,
+      render: record => {
+        return (
+          <>
+            {/* <span>{record.cumulativeShares} %</span> */}
+            <ValidatorPowerPercentBar
+              percentExcludeCurrent={record.cumulativeSharesExcludePercentage} // light blue
+              percentIncludeCurrent={record.cumulativeSharesIncludePercentage} // primary blue
+            />
+          </>
         );
       },
     },
@@ -107,7 +128,9 @@ const RedelegateFormComponent = (props: {
       title: t('staking.validatorList.table.currentCommissionRate'),
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
-      sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
+      sorter: (a, b) => {
+        return new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate));
+      },
       render: currentCommissionRate => (
         <span>{new Big(currentCommissionRate).times(100).toFixed(2)}%</span>
       ),
@@ -142,11 +165,28 @@ const RedelegateFormComponent = (props: {
 
   const processValidatorList = (validatorList: ValidatorModel[] | null) => {
     if (validatorList) {
+      let willDisplayWarningColumn = false;
+      let displayedWarningColumn = false;
+
       return validatorList.map((validator, idx) => {
+        if (
+          new Big(validator.cumulativeSharesIncludePercentage!).gte(
+            CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+          ) &&
+          !displayedWarningColumn
+        ) {
+          displayedWarningColumn = true;
+          willDisplayWarningColumn = true;
+        }
+
         const validatorModel = {
           ...validator,
           key: `${idx}`,
+          displayWarningColumn: willDisplayWarningColumn,
         };
+
+        willDisplayWarningColumn = false;
+
         return validatorModel;
       });
     }
@@ -172,16 +212,49 @@ const RedelegateFormComponent = (props: {
           className="validator-modal"
           footer={[]}
           okText="Confirm"
-          width={1000}
+          width={1200}
         >
           <div className="title">{t('staking.validatorList.table.title')}</div>
           <div className="description">{t('staking.validatorList.table.description')}</div>
           <div className="item">
             <Table
-              locale={TABLE_LOCALE}
+              locale={{
+                triggerDesc: t('general.table.triggerDesc'),
+                triggerAsc: t('general.table.triggerAsc'),
+                cancelSort: t('general.table.cancelSort'),
+              }}
               dataSource={validatorTopList}
               columns={validatorColumns}
               pagination={{ showSizeChanger: false }}
+              onChange={(pagination, filters, sorter: any) => {
+                if (
+                  (sorter.order === 'descend' && sorter.field === 'currentTokens') ||
+                  sorter.order === undefined
+                ) {
+                  setDisplayWarning(true);
+                } else {
+                  setDisplayWarning(false);
+                }
+              }}
+              expandable={{
+                rowExpandable: record => record.displayWarningColumn! && displayWarning,
+                expandedRowRender: record =>
+                  record.displayWarningColumn &&
+                  displayWarning && (
+                    <div className="cumulative-stake33">
+                      {t('staking.validatorList.table.warningCumulative')}
+                    </div>
+                  ),
+                expandIconColumnIndex: -1,
+              }}
+              rowClassName={record => {
+                const greyBackground =
+                  new Big(record.cumulativeSharesIncludePercentage!).lte(
+                    CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+                  ) || record.displayWarningColumn;
+                return greyBackground ? 'grey-background' : '';
+              }}
+              defaultExpandAllRows
             />
           </div>
         </ModalPopup>

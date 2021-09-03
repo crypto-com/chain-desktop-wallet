@@ -73,6 +73,7 @@ export interface RewardTransactionList {
 export interface TransferTransactionList {
   transactions: Array<TransferTransactionData>;
   walletId: string;
+  assetId?: string;
 }
 
 export interface NftList {
@@ -125,6 +126,9 @@ export interface ValidatorModel {
   readonly currentTokens: string;
   readonly currentShares: string;
   readonly pubKey: ValidatorPubKey;
+  displayWarningColumn?: boolean;
+  cumulativeSharesIncludePercentage?: string;
+  cumulativeSharesExcludePercentage?: string;
 }
 
 export interface ProposalModel extends Proposal {}

@@ -367,7 +367,7 @@ const GovernancePage = () => {
                   <div className="item">
                     {proposal?.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD ? (
                       <Card
-                        title="Cast your vote"
+                        title={t('governance.castVote')}
                         style={{
                           maxWidth: '500px',
                         }}
@@ -403,7 +403,7 @@ const GovernancePage = () => {
                     indicator={<LoadingOutlined />}
                     tip="Loading latest results"
                   >
-                    <Card title="Current results" style={{ padding: '4px' }}>
+                    <Card title={t('governance.result')} style={{ padding: '4px' }}>
                       <div className="vote-result-section">
                         Yes - {t('governance.voteOption.yes')}
                         <br />

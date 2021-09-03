@@ -6,6 +6,16 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.5.0] - 2021-07-03
+
+### Additions
+- Multi-Assets support added to the wallet
+- EVM building blocks and CRONOS testnet support
+- Multiple fiat currency conversion integration
+- Support for Croeseid Testnet v4  
+- Validator selection : UX update to reduce concentration of liquidity to  a few validators
+
+
 ## [v0.4.2] - 2021-08-03
 - QA fixes on missing translations strings
 - Fix sorting ordering for translated strings

@@ -5,8 +5,12 @@ import { Bytes } from '../../utils/ChainJsLib';
 import { NodePorts } from '../../config/StaticConfig';
 import {
   AllProposalResponse,
+  BalanceResponse,
   DelegationResult,
+  DenomTrace,
+  DenomTraceResponse,
   FinalTallyResult,
+  IBCBalanceResponse,
   LoadedTallyResponse,
   Proposal,
   RewardResponse,
@@ -22,6 +26,8 @@ import {
   TransactionStatus,
   ValidatorModel,
 } from '../../models/Transaction';
+import { Session } from '../../models/Session';
+import { AssetCreationType, UserAsset, UserAssetType } from '../../models/UserAsset';
 
 export interface INodeRpcService {
   loadAccountBalance(address: string, assetDenom: string): Promise<string>;
@@ -40,6 +46,10 @@ export interface INodeRpcService {
   loadStakingBalance(address: string, assetSymbol: string): Promise<string>;
 
   loadTopValidators(): Promise<ValidatorModel[]>;
+
+  loadIBCAssets(session: Session): Promise<UserAsset[]>;
+
+  getIBCAssetTrace(ibcHash: string): Promise<DenomTrace>;
 }
 
 // Load all 100 active validators
@@ -64,8 +74,11 @@ export class NodeRpcService implements INodeRpcService {
   }
 
   public async loadAccountBalance(address: string, assetDenom: string): Promise<string> {
-    const response = await this.tendermintClient.getBalance(address, assetDenom);
-    return response?.amount ?? '0';
+    const response = await this.cosmosClient.get<BalanceResponse>(
+      `/cosmos/bank/v1beta1/balances/${address}/${assetDenom}`,
+    );
+    const balanceData = response?.data;
+    return balanceData?.balance?.amount ?? '0';
   }
 
   public async loadSequenceNumber(address: string): Promise<number> {
@@ -246,12 +259,39 @@ export class NodeRpcService implements INodeRpcService {
       {},
     );
 
-    return validators
+    let topValidators = validators
       .filter(v => v.status === 'BOND_STATUS_BONDED')
       .filter(v => !v.jailed)
       .filter(v => !!activeValidators[v.pubKey.value])
       .sort((v1, v2) => Big(v2.currentShares).cmp(Big(v1.currentShares)))
       .slice(0, MAX_VALIDATOR_LOAD);
+
+    let totalShares = new Big(0);
+    topValidators.forEach(validator => {
+      totalShares = totalShares.add(validator.currentShares);
+    });
+
+    // Add cumulativeShares
+    let cumulativeShares = new Big(0);
+    topValidators = topValidators.map(validator => {
+      const validatorWithCumulativeShares = {
+        ...validator,
+        cumulativeShares: cumulativeShares.toString(),
+        cumulativeSharesExcludePercentage: cumulativeShares
+          .div(totalShares)
+          .times(100)
+          .toString(),
+        cumulativeSharesIncludePercentage: cumulativeShares
+          .add(new Big(validator.currentShares))
+          .div(totalShares)
+          .times(100)
+          .toString(),
+      };
+      cumulativeShares = cumulativeShares.add(new Big(validator.currentShares));
+      return validatorWithCumulativeShares;
+    });
+
+    return topValidators;
   }
 
   private async fetchLatestActiveValidators(): Promise<ValidatorPubKey[]> {
@@ -269,24 +309,84 @@ export class NodeRpcService implements INodeRpcService {
     const response = await this.cosmosClient.get<ValidatorListResponse>(url);
 
     return [
-      response.data.validators.map(validator => ({
-        status: validator.status,
-        jailed: validator.jailed,
-        validatorWebSite: validator.description.website,
-        maxCommissionRate: validator.commission.commission_rates.max_rate,
-        securityContact: validator.description.security_contact,
-        validatorName: validator.description.moniker,
-        currentTokens: validator.tokens,
-        currentShares: validator.delegator_shares,
-        currentCommissionRate: validator.commission.commission_rates.rate,
-        validatorAddress: validator.operator_address,
-        pubKey: {
-          type: validator.consensus_pubkey['@type'],
-          value: validator.consensus_pubkey.key,
-        },
-      })),
+      response.data.validators.map(validator => {
+        return {
+          status: validator.status,
+          jailed: validator.jailed,
+          validatorWebSite: validator.description.website,
+          maxCommissionRate: validator.commission.commission_rates.max_rate,
+          securityContact: validator.description.security_contact,
+          validatorName: validator.description.moniker,
+          currentTokens: validator.tokens,
+          currentShares: validator.delegator_shares,
+          currentCommissionRate: validator.commission.commission_rates.rate,
+          validatorAddress: validator.operator_address,
+          pubKey: {
+            type: validator.consensus_pubkey['@type'],
+            value: validator.consensus_pubkey.key,
+          },
+        };
+      }),
       response.data.pagination.next_key,
     ];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
+  async loadIBCAssets(session: Session): Promise<UserAsset[]> {
+    const ibcAssets: UserAsset[] = [];
+    let nextKey: string | null = null;
+    const { address } = session.wallet;
+
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const baseUrl = `/cosmos/bank/v1beta1/balances/${address}`;
+      const url =
+        nextKey !== null ? `${baseUrl}?pagination.key=${encodeURIComponent(nextKey)}` : baseUrl;
+
+      // eslint-disable-next-line no-await-in-loop
+      const assetBalanceResponse = await this.cosmosClient.get<IBCBalanceResponse>(url);
+      const loadedIbcAssets = assetBalanceResponse.data.balances
+        .filter(balance => balance.denom.startsWith('ibc/'))
+        .map(balance => {
+          const ibcDenom = balance.denom;
+          const ibcDenomHash = ibcDenom.split('/').pop();
+          const asset: UserAsset = {
+            balance: balance.amount,
+            decimals: 8,
+            description: '',
+            icon_url: '',
+            identifier: `${ibcDenom}__${session.wallet.identifier}`,
+            mainnetSymbol: ibcDenom,
+            name: ibcDenom,
+            stakedBalance: '0',
+            symbol: ibcDenom,
+            walletId: session.wallet.identifier,
+            ibcDenomHash,
+            assetType: UserAssetType.IBC,
+            assetCreationType: AssetCreationType.DYNAMIC,
+          };
+          return asset;
+        });
+
+      ibcAssets.push(...loadedIbcAssets);
+      const { pagination } = assetBalanceResponse.data;
+
+      if (pagination.next_key === null) {
+        break;
+      }
+      nextKey = pagination.next_key;
+    }
+
+    return ibcAssets;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
+  async getIBCAssetTrace(ibcHash: string): Promise<DenomTrace> {
+    const denomTraceResponse = await this.cosmosClient.get<DenomTraceResponse>(
+      `ibc/applications/transfer/v1beta1/denom_traces/${ibcHash}`,
+    );
+
+    return denomTraceResponse.data.denom_trace;
   }
 }
 

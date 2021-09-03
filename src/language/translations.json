@@ -21,7 +21,9 @@
         "review": "Review",
         "copy": "Copy",
         "close": "Close",
+        "retry": "Retry",
         "connect": "Connect",
+        "seeAll": "See All",
         "addressValidator": {
           "reason1": "Invalid",
           "reason2": "address provided"
@@ -336,6 +338,7 @@
         "staking": "Staking",
         "send": "Send",
         "receive": "Receive",
+        "assets": "Assets",
         "governance": "Governance",
         "nft": "My NFT",
         "settings": "Settings",
@@ -394,10 +397,20 @@
         },
         "nft": {
           "tab1": "My NFT",
+          "tab2": "NFT Transactions",
           "seeAll": "See All"
         },
+        "assetList": {
+          "table": {
+            "title": "Assets",
+            "name": "Asset",
+            "price": "Price",
+            "amount": "Balance",
+            "value": "Value"
+          }
+        },
         "transactions": {
-          "tab1": "Transactions",
+          "tab1": "Assets",
           "tab2": "Delegations",
           "tab3": "NFT Transactions",
           "table1": {
@@ -484,12 +497,33 @@
         },
         "button": "Verify address on Ledger"
       },
+      "assets": {
+        "title": "Assets",
+        "description": "Manage all your assets here.",
+        "tab1": "Transaction",
+        "tab2": "Send",
+        "tab3": "Receive",
+        "backToList": "Back to Asset List",
+        "assetList": {
+          "table": {
+            "name": "Asset",
+            "price": "Price",
+            "amount": "Balance",
+            "value": "Value"
+          }
+        },
+        "moreMenu": {
+          "nodeConfiguration": "Node Configuration"
+        }
+      },
       "staking": {
         "title": "Staking",
         "tab1": "Staking Rewards",
         "tab2": "Delegate Funds",
+        "tab3": "Delegation Management",
         "description1": "Withdraw rewards from delegated funds.\n",
         "description2": "Delegate funds to validator.",
+        "description3": "Manage your delegated funds.",
         "maxValidator": {
           "error": "Staking amount exceeds your available wallet balance"
         },
@@ -500,11 +534,13 @@
           "table": {
             "title": "Validator List",
             "description": "Please select one of the validator.",
+            "warningCumulative": "Cumulative stake above can halt the network: improve decentralization and delegate to validators below",
             "validatorName": "Name",
             "validatorWebsite": "Website",
             "validatorAddress": "Address",
             "currentTokens": "Voting Power",
             "currentCommissionRate": "Commission",
+            "cumulativeShares": "Cumulative Shares",
             "action": "Action"
           }
         },
@@ -561,6 +597,8 @@
         "backToList": "Back to Proposal List",
         "start": "Start",
         "end": "End",
+        "result": "Current results",
+        "castVote": "Cast your vote",
         "sendVote": "Send Vote",
         "modal1": {
           "title": "Confirm Vote Transaction",
@@ -606,7 +644,7 @@
             "error2": "and",
             "error3": "characters",
             "error4": "Expected only start with lowercase alphabetic",
-            "error5": "Expected only alphabetic characters or numbers"
+            "error5": "Expected only lowercase alphabetic characters or numbers"
           },
           "tokenId": {
             "label": "Token ID",
@@ -615,7 +653,7 @@
             "error2": "and",
             "error3": "characters",
             "error4": "Expected only start with lowercase alphabetic",
-            "error5": "Expected only alphabetic characters or numbers"
+            "error5": "Expected only lowercase alphabetic characters or numbers"
           },
           "drop": {
             "label": "Drop Name",
@@ -692,6 +730,10 @@
         "tab2": "General Configuration",
         "tab3": "Clear Storage",
         "form1": {
+          "assetIdentifier": {
+            "label": "Asset",
+            "description": "Node Configurations are customizable across different assets."
+          },
           "nodeUrl": {
             "label": "Node URL",
             "error1": "Please enter a valid Node URL"
@@ -709,6 +751,9 @@
           "gasLimit": {
             "label": "Gas Limit"
           },
+          "denomName": {
+            "label": "Base Denom"
+          },
           "checkbox1": {
             "description1": "Propagate the settings changes to all your ",
             "description2": "wallets"
@@ -720,7 +765,8 @@
           "success3": "wallets",
           "analytics1": "Analytics settings has been",
           "defaultMemo1": "Default client memo settings has been",
-          "generalSettings1": "General settings propagation has been"
+          "generalSettings1": "General settings propagation has been",
+          "currency1": "Currency has been switched to "
         },
         "notification": {
           "recover": {
@@ -730,6 +776,9 @@
         },
         "language": {
           "title": "Language"
+        },
+        "currency": {
+          "title": "Currency"
         },
         "memo": {
           "title": "Default Memo",
@@ -790,7 +839,9 @@
         "review": "檢查",
         "copy": "複製",
         "close": "關閉",
+        "retry": "重試",
         "connect": "連接",
+        "seeAll": "所有",
         "addressValidator": {
           "reason1": "無效的",
           "reason2": "地址"
@@ -1105,6 +1156,7 @@
         "staking": "抵押",
         "send": "發送",
         "receive": "接收",
+        "assets": "資金",
         "governance": "治理",
         "nft": "我的NFT",
         "settings": "設置",
@@ -1163,10 +1215,20 @@
         },
         "nft": {
           "tab1": "我的NFT",
+          "tab2": "NFT交易",
           "seeAll": "所有"
         },
+        "assetList": {
+          "table": {
+            "title": "資金",
+            "name": "資金",
+            "price": "價格",
+            "amount": "餘額",
+            "value": "市值"
+          }
+        },
         "transactions": {
-          "tab1": "交易",
+          "tab1": "資金",
           "tab2": "委託",
           "tab3": "NFT交易",
           "table1": {
@@ -1253,12 +1315,33 @@
         },
         "button": "驗證你的 Ledger 錢包"
       },
+      "assets": {
+        "title": "資金",
+        "description": "在這裡管理你的所有資金",
+        "tab1": "交易",
+        "tab2": "發送",
+        "tab3": "接收",
+        "backToList": "返回資金列表",
+        "assetList": {
+          "table": {
+            "name": "資金",
+            "price": "價格",
+            "amount": "餘額",
+            "value": "市值"
+          }
+        },
+        "moreMenu": {
+          "nodeConfiguration": "節點設定"
+        }
+      },
       "staking": {
         "title": "抵押",
         "tab1": "抵押獎勵",
         "tab2": "委託資金",
+        "tab3": "委託管理",
         "description1": "從委託資金提取獎勵。",
         "description2": "委託資金至驗證者。",
+        "description3": "管理你的已委託資金",
         "maxValidator": {
           "error": "抵押數目大於你的錢包餘額"
         },
@@ -1269,11 +1352,13 @@
           "table": {
             "title": "驗證者列表",
             "description": "請選擇其中一個驗證者。",
+            "warningCumulative": "讓上方的驗證者的累積委託增加將可能導敢網絡停頓：為改善網絡的去中心化，請委託到下方的驗證者",
             "validatorName": "名稱",
             "validatorWebsite": "網址",
             "validatorAddress": "地址",
-            "currentTokens": "投票能量",
+            "currentTokens": "投票權",
             "currentCommissionRate": "佣金",
+            "cumulativeShares": "累積委託",
             "action": "操作"
           }
         },
@@ -1330,6 +1415,8 @@
         "backToList": "返回",
         "start": "開始",
         "end": "結束",
+        "result": "當前結果",
+        "castVote": "投票",
         "sendVote": "發送投票",
         "modal1": {
           "title": "確認投票交易",
@@ -1461,6 +1548,10 @@
         "tab2": "一般設定",
         "tab3": "重置",
         "form1": {
+          "assetIdentifier": {
+            "label": "資金",
+            "description": "不同的資金有各自的節點設定"
+          },
           "nodeUrl": {
             "label": "節點 URL",
             "error1": "請輸入有效的節點 URL"
@@ -1477,6 +1568,9 @@
           },
           "gasLimit": {
             "label": "Gas 費用"
+          },
+          "denomName": {
+            "label": "基本面值"
           },
           "checkbox1": {
             "description1": "將設定更新至所有",
@@ -1499,6 +1593,9 @@
         },
         "language": {
           "title": "語言"
+        },
+        "currency": {
+          "title": "匯率"
         },
         "memo": {
           "title": "預設留言",
@@ -1559,7 +1656,9 @@
         "review": "检查",
         "copy": "复制",
         "close": "关闭",
+        "retry": "重试",
         "connect": "连接",
+        "seeAll": "所有",
         "addressValidator": {
           "reason1": "无效的",
           "reason2": "地址"
@@ -1874,6 +1973,7 @@
         "staking": "抵押",
         "send": "发送",
         "receive": "接收",
+        "assets": "资金",
         "governance": "治理",
         "nft": "我的NFT",
         "settings": "设置",
@@ -1932,10 +2032,20 @@
         },
         "nft": {
           "tab1": "我的NFT",
+          "tab2": "NFT交易",
           "seeAll": "所有"
         },
+        "assetList": {
+          "table": {
+            "title": "资金",
+            "name": "资金",
+            "price": "价格",
+            "amount": "余额",
+            "value": "市值"
+          }
+        },
         "transactions": {
-          "tab1": "交易",
+          "tab1": "资金",
           "tab2": "委托",
           "tab3": "NFT交易",
           "table1": {
@@ -2022,12 +2132,33 @@
         },
         "button": "验证你的 Ledger 钱包"
       },
+      "assets": {
+        "title": "资金",
+        "description": "在这里管理你的所有资金",
+        "tab1": "交易",
+        "tab2": "发送",
+        "tab3": "接收",
+        "backToList": "返回资金列表",
+        "assetList": {
+          "table": {
+            "name": "资金",
+            "price": "价格",
+            "amount": "余额",
+            "value": "市值"
+          }
+        },
+        "moreMenu": {
+          "nodeConfiguration": "节点配置"
+        }
+      },
       "staking": {
         "title": "抵押",
         "tab1": "抵押奖励",
         "tab2": "委托资金",
+        "tab3": "委托管理",
         "description1": "从委托资金提取奖励。",
         "description2": "委托资金至验证者。",
+        "description3": "管理你的已委托资金",
         "maxValidator": {
           "error": "抵押数目大于你的钱包余额"
         },
@@ -2038,11 +2169,13 @@
           "table": {
             "title": "验证者列表",
             "description": "请选择其中一个验证者。",
+            "warningCumulative": "让上方的验证者的累积委托增加将可能导敢网络停顿：为改善网络的去中心化，请委托到下方的验证者",
             "validatorName": "名称",
             "validatorWebsite": "网址",
             "validatorAddress": "地址",
             "currentTokens": "投票权",
             "currentCommissionRate": "佣金",
+            "cumulativeShares": "累积委托",
             "action": "操作"
           }
         },
@@ -2099,6 +2232,8 @@
         "backToList": "返回",
         "start": "开始",
         "end": "结束",
+        "result": "当前结果",
+        "castVote": "投票",
         "sendVote": "发送投票",
         "modal1": {
           "title": "确认投票交易",
@@ -2230,6 +2365,10 @@
         "tab2": "常规配置",
         "tab3": "重置",
         "form1": {
+          "assetIdentifier": {
+            "label": "资金",
+            "description": "不同的资金有各自的节点设定"
+          },
           "nodeUrl": {
             "label": "节点 URL",
             "error1": "请输入有效的节点 URL"
@@ -2246,6 +2385,9 @@
           },
           "gasLimit": {
             "label": "Gas 费用"
+          },
+          "denomName": {
+            "label": "基本面值"
           },
           "checkbox1": {
             "description1": "将设定更新至所有",
@@ -2268,6 +2410,9 @@
         },
         "language": {
           "title": "语言"
+        },
+        "currency": {
+          "title": "汇率"
         },
         "memo": {
           "title": "默认留言",
@@ -2449,21 +2594,34 @@
         "review": "리뷰",
         "copy": "복사",
         "close": "닫기",
+        "retry": "재시도",
         "connect": "연결",
+        "seeAll": "모두 보기",
         "addressValidator": {
           "reason1": "무효",
           "reason2": "주소 필요"
         },
         "validTransactionAmountValidator": {
-          "reason": "잘못된 송금 금액"
+          "reason": "잘못된 송금액"
         },
         "passwordForm": {
           "password": {
-            "label": "패스워드",
-            "placeholder": "패스워드 입력"
+            "label": "앱 패스워드",
+            "placeholder": "앱 패스워드 입력",
+            "error1": "패스워드의 최소 길이는 8글자이며, 숫자와 알파벳, 그리고 특수문자만 사용해야 합니다."
+          },
+          "passwordConfirm": {
+            "label": "앱 패스워드 확인",
+            "placeholder": "앱 패스워드 확인",
+            "error1": "앱 패스워드가 일치하지 않습니다"
           },
           "passwordStrength": {
-            "title": "패스워드 강도:"
+            "title": "패스워드 강도:",
+            "worst": "매우 나쁨",
+            "bad": "나쁨",
+            "weak": "약함",
+            "good": "좋음",
+            "strong": "매우 좋음"
           }
         },
         "passwordFormModal": {
@@ -2563,13 +2721,45 @@
           "ledgerExportMode": "레져 전문가 모드를 켜주세요"
         },
         "redelegateFormComponent": {
+          "title": "재위임 트랜잭션 확인",
           "description": "아래 정보를 확인해주세요",
-          "label1": "발신인 주소",
+          "label1": "송신인 주소",
+          "label2": "이전 검증인",
           "table": {
             "validatorDestinationAddress": {
-              "label": "검증인 주소",
+              "label": "새로운 검증인",
               "placeholder": "검증인 주소 입력"
+            },
+            "redelegateAmount": {
+              "label": "재위임 금액"
             }
+          },
+          "maxValidator": {
+            "error": "재위임 금액은 현재 위임된 금액보다 클수 없습니다"
+          },
+          "alert1": {
+            "message1": "모든",
+            "message2": "기간 및 자금은 한번만 재위임될 수 있습니다.언제나 하나의 계정은 유효 기간내에,  재위임 및 본딩 해제 기록을 최대 7개까지만 가질 수 있습니다.",
+            "message3": "기간"
+          }
+        },
+        "undelegateFormComponent": {
+          "title": "위임 취소 트랜잭션 확인",
+          "description": "아래 정보를 확인해주세요",
+          "label1": "송신인 주소",
+          "label2": "검증인으로부터 위임 취소",
+          "table": {
+            "undelegateAmount": {
+              "label": "위임 취소 금액"
+            }
+          },
+          "maxValidator": {
+            "error": "위임 취소 금액은 현재 위임된 금액보다 클 수 없습니다"
+          },
+          "alert1": {
+            "message1": "트랜잭션이 발송된 후 위임 취소가 완전히 완료되는 데 며칠이 소요됨을 양해바랍니다",
+            "message2": "일",
+            "message3": "그 때까지는 위임 취소된 금액을 사용할 수 없습니다."
           }
         },
         "table": {
@@ -2710,16 +2900,18 @@
         }
       },
       "backup": {
-        "title": "지원 니모닉",
-        "copyButton": "복구 문구가 복사되었습니다!",
+        "title": "니모닉 문구 백업",
+        "slogan": "니모닉 문구는 오직 한 번만 표시되므로 지금 24단어 문구를 백업하여 안전하게 보관하십시오지갑을 복원하고 액세스하려면 니모닉 문구가 필요합니다.",
+        "copyButton": "니모닉 문구가 복사되었습니다!",
         "checkbox": "니모닉 문구가 한 번만 표시되는 것을 이해합니다",
-        "button": "내 니모닉 문구를 백업했습니다"
+        "button": "나의 니모닉 문구를 백업했습니다"
       },
       "navbar": {
         "home": "홈화면",
         "staking": "스테이킹",
         "send": "전송",
         "receive": "수신",
+        "assets": "금액",
         "governance": "거버넌스",
         "nft": "나의 NFT",
         "settings": "설정",
@@ -2778,10 +2970,20 @@
         },
         "nft": {
           "tab1": "나의 NFT",
+          "tab2": "NFT 트랜잭션",
           "seeAll": "모두 보기"
         },
+        "assetList": {
+          "table": {
+            "title": "금액",
+            "name": "금액",
+            "price": "가격",
+            "amount": "금액",
+            "value": "시장 가치"
+          }
+        },
         "transactions": {
-          "tab1": "트랜잭션",
+          "tab1": "금액",
           "tab2": "위임",
           "tab3": "NFT 트랜잭션",
           "table1": {
@@ -2803,7 +3005,7 @@
           "table3": {
             "transactionHash": "트랜잭션 해쉬",
             "messageType": "종류",
-            "denomId": "화폐명칭 ID",
+            "denomId": "디놈 ID",
             "tokenId": "토큰 ID",
             "recipientAddress": "수신인",
             "time": "시간"
@@ -2836,20 +3038,20 @@
           },
           "amount": {
             "label": "보낼 금액",
-            "error1": "송금 금액이 사용 가능한 지갑 잔액을 초과합니다.",
-            "error2": "송금 금액이 최소 금액보다 적습니다."
+            "error1": "송금액이 사용 가능한 지갑 잔액을 초과합니다.",
+            "error2": "송금액이 최소 금액보다 적습니다."
           },
           "memo": {
             "label": "메모 (선택사항)"
           }
         },
         "modal1": {
-          "title": "거래 확인",
-          "description": "아래 정보를 검토하십시오.",
+          "title": "트랜잭션 확인",
+          "description": "아래 정보를 검토하세요.",
           "label1": "발신인 주소",
           "label2": "수신인 주소",
           "label3": "금액",
-          "label4": "거래 수수료",
+          "label4": "트랜잭션 수수료",
           "label5": "메모"
         }
       },
@@ -2868,10 +3070,28 @@
         },
         "button": "레져에서 주소를 확인합니다"
       },
+      "assets": {
+        "title": "금액",
+        "tab1": "트랜잭션",
+        "tab2": "송금",
+        "tab3": "수신",
+        "assetList": {
+          "table": {
+            "name": "금액",
+            "price": "가격",
+            "amount": "금액",
+            "value": "시장 가치"
+          }
+        },
+        "moreMenu": {
+          "nodeConfiguration": "노드 설정"
+        }
+      },
       "staking": {
         "title": "스테이킹",
         "tab1": "스테이킹 보상",
         "tab2": "금액 위임",
+        "tab3": "위임 관리",
         "description1": "위임된 금액에서 보상을 인출합니다",
         "description2": "검증인에게 금액을 위임합니다",
         "maxValidator": {
@@ -2889,6 +3109,7 @@
             "validatorAddress": "주소",
             "currentTokens": "투표 파워",
             "currentCommissionRate": "수수료율",
+            "cumulativeShares": "축적 투표",
             "action": "활동"
           }
         },
@@ -2913,7 +3134,7 @@
           }
         },
         "modal1": {
-          "title": "거래 확인",
+          "title": "트랜잭션 확인",
           "description": "아래 정보를 확인하세요",
           "label1": "송신인 주소",
           "label2": "검증인에게 위임하기",
@@ -2921,7 +3142,7 @@
           "label4": "메모"
         },
         "modal2": {
-          "title": "거래 확인",
+          "title": "트랜잭션 확인",
           "description": "아래 정보를 확인하세요",
           "label1": "송신인 주소",
           "label2": "검증인로부터 보상 인출하기",
@@ -2945,9 +3166,11 @@
         "backToList": "제안 리스트로",
         "start": "시작",
         "end": "종료",
+        "result": "현재 결과",
+        "castVote": "투표",
         "sendVote": "투표 전송",
         "modal1": {
-          "title": "투표 거래 확인",
+          "title": "투표 트랜잭션 확인",
           "description": "아래 정보를 확인해주세요",
           "label1": "송신인 주소",
           "label2": "제안에 투표",
@@ -2984,7 +3207,7 @@
         },
         "formMintNft": {
           "denomId": {
-            "label": "화폐명칭 ID",
+            "label": "디놈 ID",
             "placeholder": "예제",
             "error1": "예상 길이",
             "error2": "그리고",
@@ -3018,28 +3241,28 @@
         "modal1": {
           "title": "NFT 발행 확인",
           "description": "아래 정보를 검토하십시오.",
-          "label1": "화폐명칭 ID",
+          "label1": "디놈 ID",
           "label2": "토큰 ID",
           "label3": "이름 삭제",
           "label4": "설명 삭제",
-          "label5": "거래 수수료",
-          "notice1": "화폐명칭 ID가 다른 주소로 등록되었습니다.",
+          "label5": "트랜잭션 수수료",
+          "notice1": "디놈 ID가 다른 주소로 등록되었습니다.",
           "notice2": " 잔고가 부족합니다. 잔고를 다시 확인해 주세요.",
           "notice3": "네트워크 수수료",
           "notice4": "이 NFT는 Crypto.org 체인에서 발행됩니다."
         },
         "modal2": {
-          "title": "거래 확인",
+          "title": "트랜잭션 확인",
           "description": "아래 정보를 확인해주세요",
           "label1": "에게",
-          "label2": "화폐명칭 ID",
+          "label2": "디놈 ID",
           "label3": "토큰 ID",
-          "label4": "거래 수수료",
+          "label4": "트랜잭션 수수료",
           "notice1": "이 NFT는 Crypto.org 체인에서 발행됩니다.",
-          "button1": "거래 확인"
+          "button1": "트랜잭션 확인"
         },
         "modal3": {
-          "title": "NFT 거래",
+          "title": "NFT 트랜잭션",
           "description": "NFT를 전송하려면 아래 정보를 입력하세요.",
           "label1": "보내는 중",
           "form": {
@@ -3052,7 +3275,7 @@
         "nftCollection": {
           "table1": {
             "name": "이름 삭제",
-            "denomId": "화폐명칭 ID",
+            "denomId": "디놈 ID",
             "tokenId": "토큰 ID",
             "creator": "창작자",
             "viewAction": "활동",
@@ -3061,8 +3284,8 @@
         },
         "detailModal": {
           "subtitle": "삭제에 대해",
-          "label1": "화폐명칭 ID",
-          "label2": "화폐명칭 이름",
+          "label1": "디놈 ID",
+          "label2": "디놈 이름",
           "label3": "토큰 ID",
           "label4": "콘텐츠 URL",
           "button1": "NFT 전송",
@@ -3076,6 +3299,9 @@
         "tab2": "일반 설정",
         "tab3": "스토리지 삭제",
         "form1": {
+          "assetIdentifier": {
+            "label": "금액"
+          },
           "nodeUrl": {
             "label": "노드 URL",
             "error1": "유효한 노드 URL을 입력하세요."
@@ -3093,6 +3319,9 @@
           "gasLimit": {
             "label": "가스 리미트"
           },
+          "denomName": {
+            "label": "기본 단위"
+          },
           "checkbox1": {
             "description1": "설정 변경 사항을 모두 적용합니다",
             "description2": "지갑 리스트"
@@ -3108,12 +3337,15 @@
         },
         "notification": {
           "recover": {
-            "message": "복구 문구가 복사되었습니다!",
-            "description": "복구 문구가 클립보드에 성공적으로 복사되었습니다."
+            "message": "니모닉 문구가 복사되었습니다!",
+            "description": "니모닉 문구가 클립보드에 성공적으로 복사되었습니다."
           }
         },
         "language": {
           "title": "언어"
+        },
+        "currency": {
+          "title": "환율"
         },
         "memo": {
           "title": "디폴트 메모",
@@ -3124,13 +3356,13 @@
           "description": "분석을 위해 수집된 데이터는 새로운 기능에 대한 개발의 우선 순위를 지정하고 구현된 기능을 개선하는 데 사용됩니다."
         },
         "exportRecoveryPhrase": {
-          "title": "복구 문구 내보내기",
+          "title": "니모닉 문구 내보내기",
           "description": "이 작업을 수행하려면 앱 비밀번호를 입력해야 합니다.",
           "button": "내보내기",
           "modal1": {
-            "title": "복구 문구",
+            "title": "니모닉 문구",
             "description": "스와이프하면 모든 단어가 나옵니다.  순서에 맞게 적으세요",
-            "warning": "복구 문구는 누구와도 공유하지 마세요"
+            "warning": "니모닉 문구는 누구와도 공유하지 마세요"
           }
         },
         "clearStorage": {
@@ -3140,7 +3372,7 @@
             "title": "저장 공간 삭제 확인",
             "description1": "나중에 이 지갑을 복원할 수 있도록 삭제하기 전에 복구 니모닉 구문을 확인하는 것이 좋습니다.",
             "warning": "저장소를 지우시겠습니까? 지갑 니모닉 문구를 백업하지 않으면 영원히 자금을 잃을 수 있습니다.",
-            "disclaimer": "액세스 권한을 다시 얻을 수 있는 유일한 방법은 지갑 니모닉 문구를 복원하는 것임을 이해합니다.",
+            "disclaimer": "액세스 권한을 다시 얻을 수 있는 유일한 방법은 지갑 니모닉 문구로 복원하는 것임을 이해합니다.",
             "form1": {
               "clear": {
                 "label": "입력하세요",
@@ -3186,6 +3418,7 @@
         "discard": "Descartar",
         "ok": "Ok",
         "required": "Requerido",
+        "cannot0": "0 no es un valor valido",
         "validator": "Validador",
         "receiving": "Recibiendo",
         "available": "Disponible",
@@ -3194,9 +3427,27 @@
         "review": "Revisar",
         "copy": "Copiar",
         "close": "Cerrar",
+        "retry": "Reintentar",
         "connect": "Connectar",
+        "seeAll": "Ver todo",
         "addressValidator": {
           "reason1": "Invalido"
+        },
+        "validTransactionAmountValidator": {
+          "reason": "Valor de envio invalido"
+        },
+        "passwordForm": {
+          "password": {
+            "label": "Contraseña",
+            "placeholder": "Introduzca la contraseña"
+          },
+          "passwordConfirm": {
+            "label": "Confirmar contraseña",
+            "error1": "Las contraseñas no coinciden"
+          },
+          "passwordStrength": {
+            "title": "Seguridad de la contraseña"
+          }
         }
       }
     }
@@ -3209,7 +3460,7 @@
         "disabled": "Etkisizleştir",
         "confirm": "Onayla",
         "continue": "Devam et",
-        "cancel": "Iptal et",
+        "cancel": "İptal et",
         "save": "Kaydet",
         "discard": "Değişiklikleri yoksay",
         "ok": "Tamam",
@@ -3223,6 +3474,7 @@
         "review": "gözden geçir",
         "copy": "Kopyala",
         "close": "Kapat",
+        "retry": "Tekrar dene",
         "connect": "Bağlan",
         "addressValidator": {
           "reason1": "Geçersiz",
@@ -3271,17 +3523,72 @@
           }
         },
         "successModalPopup": {
-          "title": "İşlem başarılı!"
+          "title": "İşlem başarılı!",
+          "createWallet": {
+            "description": "Cüzdan Oluşturuldu!",
+            "button": "Cüzdan Oluştur"
+          },
+          "transfer": {
+            "description": "İşlem başarılı bir şekilde yayınlandı!"
+          }
         }
       }
     }
   },
   "viVN": {
-    "translation": {}
+    "translation": {
+      "language": "Ngôn ngữ",
+      "general": {
+        "enabled": "Kích hoạt",
+        "confirm": "Xác nhận",
+        "continue": "Tiếp tục",
+        "cancel": "Huỷ",
+        "save": "Lưu",
+        "discard": "Xoá thay đổi",
+        "ok": "Ok",
+        "required": "Bắt buộc",
+        "cannot0": "Phải khác 0",
+        "action": "Hành động",
+        "select": "Chọn",
+        "review": "Đánh giá",
+        "copy": "Sao chép",
+        "close": "Đóng",
+        "retry": "Thử lại",
+        "connect": "Kết nối",
+        "addressValidator": {
+          "reason1": "Không hợp lệ",
+          "reason2": "dã cung cấp địa chỉ"
+        },
+        "passwordForm": {
+          "password": {
+            "label": "Mật khẩu ứng dụng",
+            "placeholder": "Nhập mật khẩu ứng dụng"
+          }
+        }
+      }
+    }
   },
   "igNG": {
     "translation": {
-      "language": "igbo"
+      "language": "igbo",
+      "general": {
+        "cancel": "kagbuo",
+        "save": "dozie",
+        "discard": "tụfuo mgbanwe",
+        "ok": "OK",
+        "required": "ihe achọrọ",
+        "cannot0": "enweghị ike ịbụ 0",
+        "validator": "validator",
+        "receiving": "na-anata",
+        "close": "mmechie",
+        "connect": "jikọọ"
+      },
+      "home": {
+        "nft": {
+          "tab1": "NFT m",
+          "tab2": "NFT Transakshion"
+        }
+      }
     }
   },
   "arAE": {
@@ -3350,7 +3657,7 @@
         "enabled": "Aktiviert",
         "disabled": "Deaktiviert",
         "confirm": "Bestätigen",
-        "continue": "Fortsetzen",
+        "continue": "Fortfahren",
         "cancel": "Abbrechen",
         "save": "Speichern",
         "discard": "Änderungen verwerfen",
@@ -3365,6 +3672,7 @@
         "review": "Überprüfung",
         "copy": "Kopierien",
         "close": "Schließen",
+        "retry": "Wiederholen",
         "connect": "Verbinden",
         "addressValidator": {
           "reason1": "Ungültig",
@@ -3375,103 +3683,322 @@
         },
         "passwordForm": {
           "password": {
-            "placeholder": "Geben Sie Ihr Passwort ein"
+            "label": "Passwort",
+            "placeholder": "Geben Sie Ihr Passwort ein",
+            "error1": "Ihr Passwort muss mindestens 8 Zeichen lang sein und mindestens einen Buchstabe, eine Zahl und ein Sonderzeichen enthalten. "
+          },
+          "passwordConfirm": {
+            "label": "Bestätigen Sie Ihr Passwort",
+            "placeholder": "Bestätigen Sie Ihr Passwort",
+            "error1": "Passwortbestätigung und Passwort stimmen nicht überein"
+          },
+          "passwordStrength": {
+            "title": "Passwortstärke:",
+            "worst": "Schlechtest",
+            "bad": "Schlecht",
+            "weak": "Schwach",
+            "good": "Gut",
+            "strong": "Stark"
           }
         },
         "passwordFormModal": {
           "title": "Geben Sie Ihr Passwort ein",
-          "description": "Geben Sie Ihr Passwort ein, um die Wallet zu entschlüsseln",
-          "error": "Falsches Passwort. Bitte geben Sie Ihr Passwort erneut ein.",
+          "description": "Geben Sie Ihr Passwort zum Entschlüsseln Ihrer Wallet ein.",
+          "error": "Falsches Passwort. Bitte versuchen Sie nochmals.",
           "success": "Ihre Wallet wird erfolgreich entschlüsselt!",
           "okButton": "Ihre Wallet entschlüsseln",
           "createWallet": {
-            "description": "Geben Sie Ihr Passwort ein, um Ihre Wallet, die erstellt wird, zu verschlüsseln",
+            "description": "Geben Sie Ihr Passwort zum Verschlüsseln Ihrer zu erstellenden Wallet ein",
             "okButton": "Ihre Wallet verschlüsseln",
-            "success": "Ihre Wallet wurde erfolgreich erstellt und verschlüsselt!",
-            "successButton": "Hauptseite"
+            "success": "Ihre Wallet wird erfolgreich erstellt und verschlüsselt!",
+            "successButton": "Gehen Sie zu Startseite"
           },
           "restoreWallet": {
-            "description": "Geben Sie Ihr Passwort ein, um Ihre Wallet, die wiederhergestellt wird, zu verschlüsseln",
-            "okButton": "Verschlüsseln Ihre Wallet",
-            "success": "Ihre Wallet wurde erfolgreich wiedergestellt und verschlüsselt!",
-            "successButton": "Hauptseite"
+            "description": "Geben Sie Ihr Passwort zum Verschlüsseln Ihrer zu wiederhergestellenden Wallet ein",
+            "okButton": "Ihre Wallet verschlüsseln",
+            "success": "Ihre Wallet wird erfolgreich wiedergestellt und verschlüsselt!",
+            "successButton": "Gehen Sie zu Startseite"
           }
         },
         "successModalPopup": {
           "title": "Erflog!",
           "timeout": {
-            "description": "Die Transaktion hat ein Timeout. Sie wird im folgenden Block gesammelt"
+            "description": "Die Transaktion hat eine Zeitüberschreitung. Daher wird sie im folgenden Block gesammelt"
           },
           "nodeConnect": {
             "description": "Ihr Knoten ist angeschlossen!"
           },
           "createWallet": {
-            "description": "Ihre Wallet wurde erstellt!",
-            "button": "Erstellen Ihre Wallet"
+            "description": "Ihre Wallet wird erstellt!",
+            "button": "Ihre Wallet erstellen"
           },
           "transfer": {
-            "description": "Die Transaktion wurde erfolgreich übergetragen!"
+            "description": "Die Transaktion wird erfolgreich überwiesen!"
           },
           "staking": {
-            "description": "Die Staking Transaktion wurde erfolgreich übergetragen!"
+            "description": "Die Stakingstransaktion wird erfolgreich überwiesen!"
           },
           "reward": {
-            "description": "Ihre Belohnungsabhebung Transaktion wurde erfolgreich übergetragen!"
+            "description": "Ihre Abhebungstransaktion der Belohnung wird erfolgreich überwiesen!"
           },
           "undelegation": {
-            "description": "Ihre Undelegation Transaktion war erfolgreich"
+            "description": "Ihre Undelegationstransaktion war erfolgreich"
           },
           "redelegation": {
-            "description": "Ihre Redelegation Transaktion war erfolgreich"
+            "description": "Ihre Redelegationstransaktion war erfolgreich"
           },
           "vote": {
-            "description": "Ihre Stimme wurde erfolgreich übergetragen."
+            "description": "Ihre Stimme wird erfolgreich überwiesen."
           },
           "nftTransfer": {
-            "description": "Ihre NFT Transaktion wurde erfolgreich übergetragen!"
+            "description": "Ihre NFT-Transaktion wird erfolgreich überwiesen!"
           },
           "nftMint": {
-            "description": "Ihr NFT wurde erfolgreich geprägt!"
+            "description": "Ihr NFT wird erfolgreich geprägt!"
           }
         },
         "errorModalPopup": {
-          "title": "Ein Fehler ist aufgetreten!"
+          "title": "Ein Fehler ist aufgetreten!",
+          "nodeConnect": {
+            "description": "Verbindung zur bestimmten Knoten URL kann nicht herstellt werden. Bitte versuchen Sie nochmals."
+          },
+          "createWallet": {
+            "description": "Fehler beim Erstellen der Wallet wegen möglichen falschen Derivationspfads."
+          },
+          "restoreWallet": {
+            "description": "Ihre Eselsbrücke ist ungültig. Bitte überprüfen Sie nochmals."
+          },
+          "backup": {
+            "description": "Bitte versuchen Sie nochmals."
+          },
+          "transfer": {
+            "description": "Die Überweisungstransaktion ist fehlgeschlagen. Bitte versuchen Sie nochmals."
+          },
+          "staking": {
+            "description": "Die Stakingstransaktion ist fehlgeschlagen. Bitte versuchen Sie nochmals."
+          },
+          "reward": {
+            "description": "Die Abhebungstransaktion der Belohnung ist fehlgeschlagen. Bitte versuchen Sie nochmals."
+          },
+          "undelegation": {
+            "description": "Die Undelegationstransaktion ist fehlgeschlagen. Bitte versuchen Sie nochmals."
+          },
+          "redelegation": {
+            "description": "Die Redelegationstransaktion ist fehlgeschlagen. Bitte versuchen Sie nochmals."
+          },
+          "vote": {
+            "description": "Die Stimmetransaktion ist fehlgeschlagen. Bitte versuchen Sie nochmals."
+          },
+          "nftTransfer": {
+            "description": "Die NFT-Überweisungstransaktion ist fehlgeschlagen. Bitte versuchen Sie nochmals."
+          },
+          "nftMint": {
+            "description": "Die NFT-Prägenstransaktion ist fehlgeschlagen. Bitte versuchen Sie nochmals."
+          },
+          "ledgerExportMode": "Bitte stellen Sie sicher, dass Expertenmodus auf Ihrer Ledger aktiviert ist."
+        },
+        "redelegateFormComponent": {
+          "title": "Bestätigen Sie Ihre Redelegationstransaktion",
+          "description": "Bitte uberprüfen Sie die folgenden Information.",
+          "label1": "Absenderadresse",
+          "label2": "Vom Validator",
+          "table": {
+            "validatorDestinationAddress": {
+              "label": "An Validatorsadresse",
+              "placeholder": "Geben Sie die Validatorsadresse ein"
+            },
+            "redelegateAmount": {
+              "label": "Redelegiertenbetrag"
+            }
+          },
+          "maxValidator": {
+            "error": "Der Redelegiertenbetrag kann nicht größer als das Aktuelle sein"
+          },
+          "alert1": {
+            "message1": "Alle",
+            "message2": "Tage können Fonds einmal redelegiert werden. Ein Konto kann zu jeder Zeit höchstens 7 Unterlagen der Redelegation und Undelegation",
+            "message3": "Tage"
+          }
+        },
+        "undelegateFormComponent": {
+          "title": "Bestätigen Sie Ihre Undelegationstransaktion",
+          "description": "Bitte uberprüfen Sie die folgenden Information.",
+          "label1": "Absenderadresse",
+          "label2": "Vom Validator undelegieren",
+          "table": {
+            "undelegateAmount": {
+              "label": "Undelegiertenbetrag"
+            }
+          },
+          "maxValidator": {
+            "error": "Der Undelegiertenbetrag kann nicht größer als das Aktuelle sein"
+          },
+          "alert1": {
+            "message1": "Wir bitten um Verständnis, dass die Undelegation nach der Überweisung der Transaktion einige Tage dauert.",
+            "message2": "Tage",
+            "message3": ". Bis dahin können Sie die undelegierten Fonds nicht verwenden."
+          }
+        },
+        "table": {
+          "triggerDesc": "Klicken Sie hier um absteigend zu sotieren",
+          "triggerAsc": "Klicken Sie hier um aufsteigend zu sotieren",
+          "cancelSort": "Klicken Sie hier um das Sortieren abzubrechen"
         }
       },
       "welcome": {
+        "slogan": "Unsere Probenwallet unterstützt Walletmanagement und Überweisung.",
         "button": "Los geht's"
       },
       "signup": {
+        "title": "Passwort wird erfolgreich erstellt",
+        "slogan": "Passwort wird erfolgreich erstellt. Sie können eine neue Wallet erstellen oder Ihre Wallet wiederstellen.",
         "button1": "Wallet wiederstellen",
-        "button2": "Wallet erstellen"
+        "button2": "Wallet erstellen",
+        "passwordFormContainer": {
+          "title": "Passwort erstellen",
+          "description": "Bitte erstellen Sie Passwort vor dem Erstellen einer neuen Wallet.",
+          "okButton": "Passwort erstellen",
+          "success": "Passwort wird erfolgreich erstellt. Sie können eine neue Wallet erstellen oder Ihre Wallet wiederstellen."
+        }
       },
       "create": {
         "title1": "Wallet erstellen",
+        "title2": "Individuelle Konfigurationen",
+        "slogan1": "Geben Sie Einen Namen ein und wählen Sie ein Netzwerk für Ihre Wallet aus.",
+        "slogan2": "Füllen Sie folgende Informationen zur Verbindung zum individuellen Netzwerk aus.",
+        "formCustomConfig": {
+          "nodeUrl": {
+            "label": "Knoten URL",
+            "error1": "Bitte geben Sie eine gültige Knoten URL ein"
+          },
+          "indexingUrl": {
+            "label": "Kette Index URL",
+            "error1": "Bitte geben Sie eine gültige Kette Index URL ein"
+          },
+          "derivationPath": {
+            "label": "Derivationspfad",
+            "error1": "Bitte geben Sie einen gültigen Derivationspfad ein"
+          },
+          "validatorPrefix": {
+            "label": "Validatorspräfix"
+          },
+          "addressPrefix": {
+            "label": "Adressespräfix"
+          },
+          "chainId": {
+            "label": "Kette ID"
+          },
+          "baseDenom": {
+            "label": "Basisstückelung"
+          },
+          "croDenom": {
+            "label": "CRO Stückelung"
+          }
+        },
+        "notification": {
+          "ledger": {
+            "message1": "Ledger ist nicht auffindbar.",
+            "message2": "Keiner Expertenmodus",
+            "description1": "Bitte verbinden Sie Ihre Ledger",
+            "description2": "Bitte stellen Sie sicher, dass Expertenmodus auf Ihrer Ledger aktiviert ist."
+          }
+        },
+        "addressIndexValidator": {
+          "error": "Der Adresseindex soll zwischen 0 und X sein."
+        },
+        "formCreate": {
+          "name": {
+            "label": "Walletname"
+          },
+          "walletType": {
+            "label": "Walletart"
+          },
+          "addressIndex": {
+            "label": "Addresseindex"
+          },
+          "network": {
+            "label": "Netzwerk"
+          }
+        },
+        "ledgerModalPopup": {
+          "title1": "Erfolgreich!",
+          "title2": "Ihre Ledger verbinden"
+        }
+      },
+      "restore": {
+        "title1": "Wallet wiederstellen",
+        "title2": "Individuelle Konfigurationen",
         "formCustomConfig": {
           "nodeUrl": {
             "label": "Knoten URL"
           },
+          "derivationPath": {
+            "label": "Derivationspfad"
+          },
           "chainId": {
-            "label": "Chain ID"
+            "label": "Kette ID"
           }
         },
-        "addressIndexValidator": {
-          "error": "Walletsname"
-        },
-        "formCreate": {
+        "formRestore": {
           "name": {
-            "label": "Walletsart"
-          }
-        },
-        "ledgerModalPopup": {
-          "title1": "Erfolgreich!"
+            "label": "Walletname"
+          },
+          "mnemonic": {
+            "label": "Eselsbrücke",
+            "validatorError": "Bitte geben Sie eine gültige Eselbrücke ein"
+          },
+          "network": {
+            "label": "Netzwerk"
+          },
+          "button": "Wallet wiederstellen"
         }
       },
       "navbar": {
-        "home": "Hauptseite"
+        "home": "Startseite",
+        "staking": "Staking",
+        "send": "Absenden",
+        "receive": "Empfangen",
+        "governance": "Steuerung",
+        "nft": "Mein NFT",
+        "settings": "Einstellungen",
+        "wallet": {
+          "restore": "Wallet wiederstellen",
+          "create": "Wallet erstellen",
+          "delete": "Wallet löschen",
+          "modal": {
+            "title": "Bestätigen die Walletslöschung",
+            "description": "Bitte uberprüfen Sie die folgenden Information.",
+            "form1": {
+              "delete": {
+                "label": "Bitte geben Sie ein",
+                "error1": "Bitte geben Sie ein"
+              }
+            }
+          },
+          "successModal": {
+            "message1": "Walletadresse",
+            "message2": "wird gelöscht."
+          }
+        }
+      },
+      "wallet": {
+        "title": "Alle Wallets",
+        "table1": {
+          "name": "Name",
+          "address": "Adresse",
+          "walletType": "Walletsart",
+          "network": "Netzwerk"
+        }
       },
       "home": {
+        "nft": {
+          "tab1": "Mein NFT"
+        },
         "transactions": {
+          "table1": {
+            "amount": "Betrag",
+            "status": "Zeit"
+          },
           "table2": {
             "undelegateAction": "Undelegieren",
             "redelegateAction": "Redelegieren"
@@ -3488,6 +4015,23 @@
           "label3": "Betrag"
         }
       },
+      "receive": {
+        "title": "Empfangen"
+      },
+      "staking": {
+        "validatorList": {
+          "table": {
+            "validatorName": "Name",
+            "validatorAddress": "Adresse",
+            "action": "Aktion"
+          }
+        },
+        "formWithdralStakingReward": {
+          "table": {
+            "validatorName": "Name"
+          }
+        }
+      },
       "governance": {
         "modal1": {
           "label3": "Stimme"
@@ -3499,10 +4043,12 @@
         "tab2": "NFT prägen",
         "formMintNft": {
           "denomId": {
-            "placeholder": "z. B."
+            "placeholder": "z. B.",
+            "error2": "bis"
           },
           "tokenId": {
-            "placeholder": "z. B."
+            "placeholder": "z. B.",
+            "error2": "bis"
           },
           "drop": {
             "placeholder": "z. B."
@@ -3518,6 +4064,9 @@
       "settings": {
         "title": "Einstellungen",
         "form1": {
+          "chainId": {
+            "label": "Kette ID"
+          },
           "checkbox1": {
             "description2": "Wallets"
           }
