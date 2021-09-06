@@ -705,7 +705,10 @@ const FormMintNft = () => {
               type="primary"
               onClick={onMintNft}
               loading={confirmLoading}
-              disabled={isDenomIdIssued && !isDenomIdOwner}
+              disabled={
+                (isDenomIdIssued && !isDenomIdOwner) ||
+                new Big(multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1)).gt(walletAsset.balance)
+              }
             >
               {t('general.confirm')}
             </Button>,
@@ -808,7 +811,9 @@ const FormMintNft = () => {
                   {walletAsset.symbol}
                 </div>
               </div>
-              {multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1) > walletAsset.balance ? (
+              {new Big(multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1)).gt(
+                walletAsset.balance,
+              ) ? (
                 <div className="item notice">
                   <Layout>
                     <Sider width="20px">
@@ -1156,6 +1161,7 @@ const NftPage = () => {
     };
     fetchNftList();
     fetchNftTransfers();
+
     if (!didMountRef.current) {
       didMountRef.current = true;
       analyticsService.logPage('NFT');
@@ -1586,7 +1592,7 @@ const NftPage = () => {
                       key="submit"
                       type="primary"
                       htmlType="submit"
-                      disabled={networkFee > walletAsset.balance}
+                      disabled={new Big(networkFee).gt(walletAsset.balance)}
                       onClick={() => {
                         form.submit();
                       }}
@@ -1686,7 +1692,7 @@ const NftPage = () => {
                           <Input placeholder={t('nft.modal3.form.recipientAddress.placeholder')} />
                         </Form.Item>
                       </Form>
-                      {networkFee > walletAsset.balance ? (
+                      {new Big(networkFee).gt(walletAsset.balance) ? (
                         <div className="item notice">
                           <Layout>
                             <Sider width="20px">
