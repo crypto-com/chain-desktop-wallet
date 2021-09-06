@@ -714,7 +714,7 @@
           }
         },
         "detailModal": {
-          "subtitle": "About the Drop",
+          "subtitle": "Description",
           "label1": "Denom ID",
           "label2": "Denom Name",
           "label3": "Token ID",
