@@ -683,7 +683,7 @@ const FormSettings = () => {
   const [isConfirmClearVisible, setIsConfirmClearVisible] = useState(false);
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [session, setSession] = useRecoilState(sessionState);
-  const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
 
   const defaultSettings: UserAssetConfig =
     session.activeAsset?.config || getAssetConfigFromWalletConfig(session.wallet.config);
@@ -777,6 +777,9 @@ const FormSettings = () => {
 
     const allNewUpdatedWallets = await walletService.retrieveAllWallets();
     setWalletList(allNewUpdatedWallets);
+
+    const allAssets = await walletService.retrieveCurrentWalletAssets(newSession);
+    setWalletAllAssets(allAssets);
 
     setIsButtonLoading(false);
     message.success(
