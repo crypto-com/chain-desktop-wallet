@@ -32,10 +32,7 @@ jobs:
           yarn install --network-timeout 600000
 
       - name: Build App Binaries
-        uses: samuelmeuli/action-electron-builder@v1
-        with:
-          build_script_name: electron:pre-build
-
-          github_token: ${{ secrets.github_token }}
+        run: |
+          yarn electron:build
 
 
