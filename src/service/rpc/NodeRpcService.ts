@@ -7,6 +7,7 @@ import {
   AllProposalResponse,
   BalanceResponse,
   DelegationResult,
+  UnbondingDelegationResult,
   DenomTrace,
   DenomTraceResponse,
   FinalTallyResult,
@@ -23,6 +24,7 @@ import {
   RewardTransaction,
   StakingTransactionData,
   StakingTransactionList,
+  UnbondingDelegationData,
   TransactionStatus,
   ValidatorModel,
 } from '../../models/Transaction';
@@ -172,6 +174,34 @@ export class NodeRpcService implements INodeRpcService {
     });
 
     return rewardList;
+  }
+
+  public async fetchUnbondingDelegationBalance(address: string) {
+    const response = await this.cosmosClient.get<UnbondingDelegationResult>(
+      `/cosmos/staking/v1beta1/delegators/${address}/unbonding_delegations`,
+    );
+
+    const unbondingDelegationResponses = response.data.unbonding_responses;
+    let totalSum = 0;
+    const unbondingDelegationTransactionList: Array<UnbondingDelegationData> = [];
+
+    unbondingDelegationResponses.forEach(delegation => {
+      delegation.entries.forEach(entry => {
+        totalSum += Number(entry.balance);
+        unbondingDelegationTransactionList.push({
+          delegatorAddress: delegation.delegator_address,
+          completionTime: entry.completion_time,
+          unbondingAmount: entry.balance,
+          validatorAddress: delegation.validator_address,
+        });
+      });
+    });
+
+    return {
+      totalBalance: String(totalSum),
+      unbondingDelegations: unbondingDelegationTransactionList,
+      walletId: '',
+    };
   }
 
   public async loadStakingBalance(address: string, assetSymbol: string): Promise<string> {

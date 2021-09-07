@@ -280,6 +280,7 @@ const HomePage = () => {
 
   useEffect(() => {
     const syncAssetData = async () => {
+      await walletService.syncAll();
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
       const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);

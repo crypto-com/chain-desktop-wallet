@@ -699,6 +699,9 @@ const FormDelegationOperations = () => {
       const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
         currentSession.wallet.identifier,
       );
+
+      await walletService.retrieveAllUnbondingDelegations(currentSession.wallet.identifier);
+
       const stakingTabularData = currentWalletAsset
         ? convertDelegations(allDelegations, currentWalletAsset)
         : [];
@@ -1430,7 +1433,7 @@ const StakingPage = () => {
                   </Sider>
                   <Content>
                     <div className="view-unstaking">
-                      <a>View Unstaking Process</a>
+                      <a onClick={() => {}}>View Unstaking Process</a>
                     </div>
                   </Content>
                 </Layout>
