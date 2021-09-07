@@ -17,7 +17,14 @@ import {
   fetchingDBState,
   validatorListState,
 } from '../../recoil/atom';
-import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
+import {
+  AssetMarketPrice,
+  getAssetAmountInFiat,
+  getAssetBalancePrice,
+  scaledAmount,
+  scaledBalance,
+  UserAsset,
+} from '../../models/UserAsset';
 import {
   BroadCastResult,
   RewardTransaction,
@@ -118,6 +125,7 @@ const FormDelegationRequest = () => {
   const analyticsService = new AnalyticsService(currentSession);
 
   const didMountRef = useRef(false);
+  const allMarketData = useRecoilValue(allMarketState);
 
   const [t] = useTranslation();
 
@@ -407,6 +415,9 @@ const FormDelegationRequest = () => {
     setShowMemo(!showMemo);
   }
 
+  const assetMarketData = allMarketData[`${walletAsset.mainnetSymbol}-${currentSession.currency}`];
+  const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol;
+
   return (
     <Form
       {...layout}
@@ -518,7 +529,12 @@ const FormDelegationRequest = () => {
         <div className="available">
           <span>{t('general.available')}: </span>
           <div className="available-amount">
-            {scaledBalance(walletAsset)} {walletAsset.symbol}
+            {scaledBalance(walletAsset)} {walletAsset?.symbol}{' '}
+            {walletAsset
+              ? `(${localFiatSymbol}${numeral(
+                  getAssetBalancePrice(walletAsset, assetMarketData),
+                ).format('0,0.00')})`
+              : ''}{' '}
           </div>
         </div>
       </div>
@@ -573,7 +589,14 @@ const FormDelegationRequest = () => {
             </div>
             <div className="item">
               <div className="label">{t('staking.modal1.label3')}</div>
-              <div>{`${formValues?.amount} ${walletAsset.symbol}`}</div>
+              <div>
+                {`${formValues?.amount} ${walletAsset?.symbol}`}{' '}
+                {walletAsset
+                  ? `(${localFiatSymbol}${numeral(
+                      getAssetAmountInFiat(formValues?.amount, assetMarketData),
+                    ).format('0,0.00')})`
+                  : ''}
+              </div>
             </div>
             {formValues?.memo !== undefined &&
             formValues?.memo !== null &&
