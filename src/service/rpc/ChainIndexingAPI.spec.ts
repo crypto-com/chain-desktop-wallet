@@ -1,6 +1,5 @@
 import 'mocha';
 import chai, { expect } from 'chai';
-import axios from 'axios';
 import moxios from 'moxios';
 import { ChainIndexingAPI } from './ChainIndexingAPI';
 
