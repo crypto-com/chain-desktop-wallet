@@ -55,7 +55,7 @@ import { UndelegateFormComponent } from '../home/components/UndelegateFormCompon
 import RedelegateFormComponent from '../home/components/RedelegateFormComponent';
 import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
 
-const { Header, Content, Footer } = Layout;
+const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
 const { TabPane } = Tabs;
 const layout = {
@@ -1424,7 +1424,16 @@ const StakingPage = () => {
           <TabPane tab={t('staking.tab3')} key="3">
             <div className="site-layout-background stake-content">
               <div className="container">
-                <div className="description">{t('staking.description3')}</div>
+                <Layout>
+                  <Sider width="60%">
+                    <div className="description">{t('staking.description3')}</div>
+                  </Sider>
+                  <Content>
+                    <div className="view-unstaking">
+                      <a>View Unstaking Process</a>
+                    </div>
+                  </Content>
+                </Layout>
                 <FormDelegationOperations />
               </div>
             </div>
