@@ -56,7 +56,7 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
   const isTestnet = checkIfTestnet(network);
 
   const config: UserAssetConfig = {
-    explorerUrl: 'https://cronos-explorer.crypto.org/',
+    explorerUrl: 'https://cronos-explorer.crypto.org',
     chainId: isTestnet ? '338' : 'TO_BE_DECIDED',
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
     indexingUrl: isTestnet ? 'https://cronos-explorer.crypto.org/api' : 'TO_BE_DECIDED',
