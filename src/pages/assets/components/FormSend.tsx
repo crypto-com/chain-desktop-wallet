@@ -2,19 +2,25 @@ import React, { useEffect, useState, useRef } from 'react';
 import './FormSend.less';
 import 'antd/dist/antd.css';
 import { Button, Form, Input, InputNumber } from 'antd';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
+import numeral from 'numeral';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../../service/WalletService';
 import SuccessModalPopup from '../../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../../storage/SecretStoreService';
-import { scaledBalance, UserAsset } from '../../../models/UserAsset';
+import {
+  getAssetAmountInFiat,
+  getAssetBalancePrice,
+  scaledBalance,
+  UserAsset,
+} from '../../../models/UserAsset';
 import { Session } from '../../../models/Session';
-import { ledgerIsExpertModeState } from '../../../recoil/atom';
+import { allMarketState, ledgerIsExpertModeState } from '../../../recoil/atom';
 import { BroadCastResult } from '../../../models/Transaction';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import {
@@ -23,7 +29,7 @@ import {
   getCurrentMinAssetAmount,
   getNormalScaleAmount,
 } from '../../../utils/NumberUtils';
-import { FIXED_DEFAULT_FEE } from '../../../config/StaticConfig';
+import { FIXED_DEFAULT_FEE, SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 import {
   AnalyticsActions,
@@ -55,6 +61,7 @@ const FormSend: React.FC<FormSendProps> = props => {
   const [availableBalance, setAvailableBalance] = useState('--');
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const didMountRef = useRef(false);
+  const allMarketData = useRecoilValue(allMarketState);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { walletAsset, setWalletAsset, currentSession } = props;
@@ -192,6 +199,10 @@ const FormSend: React.FC<FormSendProps> = props => {
     setAvailableBalance(scaledBalance(walletAsset!));
   }, [walletAsset]);
 
+  const assetMarketData =
+    allMarketData[`${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`];
+  const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol;
+
   return (
     <Form
       {...layout}
@@ -242,7 +253,12 @@ const FormSend: React.FC<FormSendProps> = props => {
         <div className="available">
           <span>{t('general.available')}: </span>
           <div className="available-amount">
-            {availableBalance} {walletAsset?.symbol}
+            {availableBalance} {walletAsset?.symbol}{' '}
+            {walletAsset
+              ? `(${localFiatSymbol}${numeral(
+                  getAssetBalancePrice(walletAsset, assetMarketData),
+                ).format('0,0.00')})`
+              : ''}
           </div>
         </div>
       </div>
@@ -281,7 +297,8 @@ const FormSend: React.FC<FormSendProps> = props => {
             <div className="description">{t('send.modal1.description')}</div>
             <div className="item">
               <div className="label">{t('send.modal1.label1')}</div>
-              <div className="address">{`${currentSession.activeAsset?.address || currentSession.wallet.address }`}</div>
+              <div className="address">{`${currentSession.activeAsset?.address ||
+                currentSession.wallet.address}`}</div>
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label2')}</div>
@@ -289,7 +306,14 @@ const FormSend: React.FC<FormSendProps> = props => {
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label3')}</div>
-              <div>{`${formValues?.amount} ${walletAsset?.symbol}`}</div>
+              <div>
+                {`${formValues?.amount} ${walletAsset?.symbol}`}{' '}
+                {walletAsset
+                  ? `(${localFiatSymbol}${numeral(
+                      getAssetAmountInFiat(formValues?.amount, assetMarketData),
+                    ).format('0,0.00')})`
+                  : ''}
+              </div>
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label4')}</div>

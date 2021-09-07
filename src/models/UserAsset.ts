@@ -116,6 +116,15 @@ export const getAssetBalancePrice = (asset: UserAsset, marketPrice: AssetMarketP
   return bigAsset.times(bigMarketPrice).toFixed(2);
 };
 
+export const getAssetAmountInFiat = (amount: string, marketPrice: AssetMarketPrice) => {
+  if (!amount) {
+    return '';
+  }
+  const bigAsset = new Big(amount);
+  const bigMarketPrice = new Big(marketPrice.price);
+  return bigAsset.times(bigMarketPrice).toFixed(2);
+};
+
 export const getAssetStakingBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
   const bigAsset = new Big(scaledStakingBalance(asset));
   const bigMarketPrice = new Big(marketPrice.price);
