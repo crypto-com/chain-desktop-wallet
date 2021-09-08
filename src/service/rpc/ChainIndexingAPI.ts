@@ -222,7 +222,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
    */
   public async getTotalRewardsClaimedByAddress(address: string) {
     try {
-      let rewardMsgList = await this.getDelegatorRewardMessageList(address);
+      const rewardMsgList = await this.getDelegatorRewardMessageList(address);
 
       let totalClaims = new Big(0);
 
