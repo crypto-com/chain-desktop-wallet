@@ -24,6 +24,7 @@ import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
 import { UserAsset } from '../../models/UserAsset';
+import { accountMsgList } from './ChainIndexingModels';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(
@@ -327,7 +328,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
     let currentPage = 1;
     let totalPages = 1;
-    const finalMsgList = [];
+    const finalMsgList: accountMsgList[] = [];
 
     while (currentPage <= totalPages) {
 
