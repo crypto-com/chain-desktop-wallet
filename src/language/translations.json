@@ -509,7 +509,9 @@
             "name": "Asset",
             "price": "Price",
             "amount": "Balance",
-            "value": "Value"
+            "value": "Value",
+            "actionSend": "Send",
+            "actionReceive": "Receive"
           }
         },
         "moreMenu": {
@@ -1327,7 +1329,9 @@
             "name": "資金",
             "price": "價格",
             "amount": "餘額",
-            "value": "市值"
+            "value": "市值",
+            "actionSend": "發送",
+            "actionReceive": "接收"
           }
         },
         "moreMenu": {
@@ -2144,7 +2148,9 @@
             "name": "资金",
             "price": "价格",
             "amount": "余额",
-            "value": "市值"
+            "value": "市值",
+            "actionSend": "发送",
+            "actionReceive": "接收"
           }
         },
         "moreMenu": {
@@ -3080,7 +3086,9 @@
             "name": "금액",
             "price": "가격",
             "amount": "금액",
-            "value": "시장 가치"
+            "value": "시장 가치",
+            "actionSend": "전송",
+            "actionReceive": "수신"
           }
         },
         "moreMenu": {
@@ -3476,6 +3484,7 @@
         "close": "Kapat",
         "retry": "Tekrar dene",
         "connect": "Bağlan",
+        "seeAll": "Hepsini Gör",
         "addressValidator": {
           "reason1": "Geçersiz",
           "reason2": "Adres sağlandı"
@@ -3524,6 +3533,12 @@
         },
         "successModalPopup": {
           "title": "İşlem başarılı!",
+          "timeout": {
+            "description": "İşlem zaman aşımına ugradı ancak daha sonraki bloklarda yer alacak."
+          },
+          "nodeConnect": {
+            "description": "Node bağlandı!"
+          },
           "createWallet": {
             "description": "Cüzdan Oluşturuldu!",
             "button": "Cüzdan Oluştur"
@@ -3580,6 +3595,7 @@
         "cannot0": "enweghị ike ịbụ 0",
         "validator": "validator",
         "receiving": "na-anata",
+        "available": "di",
         "close": "mmechie",
         "connect": "jikọọ"
       },
@@ -4017,6 +4033,14 @@
       },
       "receive": {
         "title": "Empfangen"
+      },
+      "assets": {
+        "assetList": {
+          "table": {
+            "actionSend": "Absenden",
+            "actionReceive": "Empfangen"
+          }
+        }
       },
       "staking": {
         "validatorList": {

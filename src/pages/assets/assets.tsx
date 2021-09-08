@@ -231,6 +231,35 @@ const AssetsPage = () => {
         );
       },
     },
+    {
+      title: t('general.action'),
+      dataIndex: 'action',
+      key: 'action',
+      render: () => (
+        <>
+          <a
+            onClick={() => {
+              setTimeout(() => {
+                setActiveAssetTab('2');
+              }, 50);
+            }}
+          >
+            {t('assets.assetList.table.actionSend')}
+          </a>
+
+          <a
+            style={{ marginLeft: '20px' }}
+            onClick={() => {
+              setTimeout(() => {
+                setActiveAssetTab('3');
+              }, 50);
+            }}
+          >
+            {t('assets.assetList.table.actionReceive')}
+          </a>
+        </>
+      ),
+    },
   ];
 
   const TransactionColumns = [
@@ -420,6 +449,8 @@ const AssetsPage = () => {
                 onRow={selectedAsset => {
                   return {
                     onClick: async () => {
+                      setActiveAssetTab('1');
+                      // console.log(event)
                       setSession({
                         ...session,
                         activeAsset: selectedAsset,
