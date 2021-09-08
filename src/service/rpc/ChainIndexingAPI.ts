@@ -261,6 +261,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
     while (currentPage <= totalPages) {
 
+      // eslint-disable-next-line no-await-in-loop
       const delegatorRewardMessageList = await this.axiosClient.get<AccountMessagesListResponse>(
         `accounts/${address}/messages?order=height.desc&filter.msgType=MsgWithdrawDelegatorReward&page=${currentPage}`,
       );
