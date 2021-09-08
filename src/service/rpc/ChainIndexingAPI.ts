@@ -11,6 +11,7 @@ import {
   TransferListResponse,
   TransferResult,
   AccountMessagesListResponse,
+  accountMsgList
 } from './ChainIndexingModels';
 import {
   NftQueryParams,
@@ -22,7 +23,6 @@ import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
 import { UserAsset } from '../../models/UserAsset';
-import { accountMsgList } from './ChainIndexingModels';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(
