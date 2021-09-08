@@ -213,4 +213,16 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       };
     }
   }
+
+  /**
+   * Gets estimated CRO rewards for a useraddress
+   * @param userAddress 
+   * @param validatorAddress 
+   * @param futureDurationInSec
+   @returns {string} Estimated rewards in baseunit 
+   
+  public async getFutureEstimatedRewardsByAddress(userAddress?: string, validatorAddress: string, futureDurationInSec: number) {
+
+  }
+  */
 }
