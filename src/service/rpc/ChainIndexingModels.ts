@@ -148,9 +148,9 @@ export interface AccountMessagesListResponse {
 }
 
 export interface Pagination {
-  totalRecord: number;
-  totalPage: number;
-  currentPage: number;
+  total_record: number;
+  total_page: number;
+  current_page: number;
   limit: number;
 }
 
