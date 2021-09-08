@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import Big from 'big.js';
 import {
   NftAccountTransactionListResponse,
   NftDenomResponse,
@@ -9,6 +10,7 @@ import {
   TransferDataAmount,
   TransferListResponse,
   TransferResult,
+  AccountMessagesListResponse,
 } from './ChainIndexingModels';
 import {
   NftQueryParams,
@@ -215,6 +217,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   }
 
   /**
+<<<<<<< HEAD
    * Gets estimated CRO rewards for a useraddress
    * @param userAddress 
    * @param validatorAddress 
@@ -225,4 +228,55 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   }
   */
+=======
+   * Get total rewards for an active account on CRO (Cosmos SDK) chain
+   * @param address
+   */
+  public async getTotalRewardsClaimedByAddress(address: string) {
+    try {
+      const rewardMsgList = await this.getDelegatorRewardMessageList(address);
+
+      let totalClaims = new Big(0);
+
+      rewardMsgList.forEach(msg => {
+
+        // Only process this MSG type
+        if (msg.messageType === "MsgWithdrawDelegatorReward"){
+
+          // Check recipient and delegator
+          if(msg.data.delegatorAddress === msg.data.recipientAddress){
+            
+            // Process non-empty msg `amount` list
+            msg.data.amount.forEach(amount => {
+              totalClaims = totalClaims.add(new Big(amount.amount))
+            });
+          }
+        }
+      });
+
+      // TotalRewardsClaimed in string
+      return totalClaims.toString();
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_CALCULATING_TOTAL_REWARDS', e);
+      return '0';
+    }
+  }
+
+  private async getDelegatorRewardMessageList(address: string) {
+
+    // Note: handle `pagination`
+    const delegatorRewardMessageList = await this.axiosClient.get<AccountMessagesListResponse>(
+      `accounts/${address}/messages?order=height.desc&filter.msgType=MsgWithdrawDelegatorReward`,
+    );
+
+    // Check if returned list is empty
+    if (delegatorRewardMessageList.data.result.length < 1) {
+      return [];
+    }
+
+    // Process incoming list to sum total claimed rewards
+    return delegatorRewardMessageList.data.result;
+  }
+>>>>>>> ef02430c71736a0a56c105fc1dfdfcf9405ebe21
 }
