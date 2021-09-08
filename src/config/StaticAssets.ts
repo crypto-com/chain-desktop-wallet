@@ -2,7 +2,7 @@
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import { getRandomId } from '../crypto/RandomGen';
 import { AssetCreationType, UserAssetConfig, UserAssetType } from '../models/UserAsset';
-import { Network, WalletConfig } from './StaticConfig';
+import { Network, WalletConfig, DefaultWalletConfigs } from './StaticConfig';
 
 // This will be used later for asset recreation/migration
 export const STATIC_ASSET_COUNT = 2;
@@ -18,9 +18,29 @@ const checkIfTestnet = (network: Network) => {
 export const CRO_ASSET = (walletConfig: WalletConfig) => {
   const { network } = walletConfig;
   const assetSymbol = network.coin.croDenom.toString().toUpperCase();
+  const { chainId } = network;
+
+  let explorerUrl = {};
+  switch (chainId) {
+    case 'testnet-croeseid-2':
+      explorerUrl = DefaultWalletConfigs.TestNetConfig.explorerUrl;
+      break;
+
+    case 'testnet-croeseid-3':
+      explorerUrl = DefaultWalletConfigs.TestNetCroeseid3Config.explorerUrl;
+      break;
+
+    case 'testnet-croeseid-4':
+      explorerUrl = DefaultWalletConfigs.TestNetCroeseid4Config.explorerUrl;
+      break;
+
+    default:
+      explorerUrl = DefaultWalletConfigs.MainNetConfig.explorerUrl;
+  }
 
   const config: UserAssetConfig = {
-    explorerUrl: walletConfig.explorerUrl,
+    explorerUrl:
+      typeof walletConfig.explorerUrl === 'object' ? walletConfig.explorerUrl : explorerUrl,
     chainId: network.chainId,
     fee: { gasLimit: '300000', networkFee: '10000' },
     indexingUrl: walletConfig.indexingUrl,
