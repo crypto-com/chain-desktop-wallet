@@ -23,6 +23,7 @@ import {
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
+import { UserAsset } from '../../models/UserAsset';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(
@@ -142,6 +143,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   public async fetchAllTransferTransactions(
     baseAssetSymbol: string,
     address: string,
+    asset?: UserAsset,
   ): Promise<Array<TransferTransactionData>> {
     const transferListResponse = await this.axiosClient.get<TransferListResponse>(
       `/accounts/${address}/messages?order=height.desc&filter.msgType=MsgSend`,
@@ -170,7 +172,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
           const assetAmount = getTransferAmount(transfer);
           const transferData: TransferTransactionData = {
             amount: assetAmount?.amount ?? '0',
-            assetSymbol: 'TCRO', // Hardcoded for now
+            assetSymbol: asset?.symbol || baseAssetSymbol,
             date: transfer.blockTime,
             hash: transfer.transactionHash,
             memo: '',
