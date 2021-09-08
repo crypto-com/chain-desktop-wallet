@@ -326,16 +326,27 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   private async getDelegatorRewardMessageList(address: string) {
 
     // Note: handle `pagination`
-    const delegatorRewardMessageList = await this.axiosClient.get<AccountMessagesListResponse>(
-      `accounts/${address}/messages?order=height.desc&filter.msgType=MsgWithdrawDelegatorReward`,
-    );
+    let currentPage = 1, totalPages = 1;
+    let finalMsgList = [];
 
-    // Check if returned list is empty
-    if (delegatorRewardMessageList.data.result.length < 1) {
-      return [];
+    while (currentPage <= totalPages) {
+
+      const delegatorRewardMessageList = await this.axiosClient.get<AccountMessagesListResponse>(
+        `accounts/${address}/messages?order=height.desc&filter.msgType=MsgWithdrawDelegatorReward&page=${currentPage}`,
+      );
+
+      totalPages = delegatorRewardMessageList.data.pagination.total_page;
+      currentPage = currentPage + 1;
+
+      // Check if returned list is empty
+      if (delegatorRewardMessageList.data.result.length < 1) {
+        return finalMsgList;
+      }
+
+      // Process incoming list to sum total claimed rewards
+      finalMsgList.push(...delegatorRewardMessageList.data.result);
     }
 
-    // Process incoming list to sum total claimed rewards
-    return delegatorRewardMessageList.data.result;
+    return finalMsgList;
   }
 }
