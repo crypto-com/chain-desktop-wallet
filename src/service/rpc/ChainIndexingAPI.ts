@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import Big from 'big.js';
 import {
   NftAccountTransactionListResponse,
   NftDenomResponse,
@@ -9,6 +10,8 @@ import {
   TransferDataAmount,
   TransferListResponse,
   TransferResult,
+  AccountMessagesListResponse,
+  accountMsgList
 } from './ChainIndexingModels';
 import {
   NftQueryParams,
@@ -19,6 +22,7 @@ import {
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
+import { UserAsset } from '../../models/UserAsset';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(
@@ -138,6 +142,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   public async fetchAllTransferTransactions(
     baseAssetSymbol: string,
     address: string,
+    asset?: UserAsset,
   ): Promise<Array<TransferTransactionData>> {
     const transferListResponse = await this.axiosClient.get<TransferListResponse>(
       `/accounts/${address}/messages?order=height.desc&filter.msgType=MsgSend`,
@@ -166,7 +171,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
           const assetAmount = getTransferAmount(transfer);
           const transferData: TransferTransactionData = {
             amount: assetAmount?.amount ?? '0',
-            assetSymbol: baseAssetSymbol,
+            assetSymbol: asset?.symbol || baseAssetSymbol,
             date: transfer.blockTime,
             hash: transfer.transactionHash,
             memo: '',
@@ -212,5 +217,68 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
         result: null,
       };
     }
+  }
+
+  /**
+   * Get total rewards for an active account on CRO (Cosmos SDK) chain
+   * @param address
+   */
+  public async getTotalRewardsClaimedByAddress(address: string) {
+    try {
+      const rewardMsgList = await this.getDelegatorRewardMessageList(address);
+
+      let totalClaims = new Big(0);
+
+      rewardMsgList.forEach(msg => {
+
+        // Only process this MSG type
+        if (msg.messageType === "MsgWithdrawDelegatorReward") {
+
+          // Check recipient and delegator
+          if (msg.data.delegatorAddress === msg.data.recipientAddress) {
+
+            // Process non-empty msg `amount` list
+            msg.data.amount.forEach(amount => {
+              totalClaims = totalClaims.add(new Big(amount.amount))
+            });
+          }
+        }
+      });
+
+      // TotalRewardsClaimed in string
+      return totalClaims.toString();
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_CALCULATING_TOTAL_REWARDS', e);
+      return '0';
+    }
+  }
+
+  private async getDelegatorRewardMessageList(address: string) {
+
+    let currentPage = 1;
+    let totalPages = 1;
+    const finalMsgList: accountMsgList[] = [];
+
+    while (currentPage <= totalPages) {
+
+      // eslint-disable-next-line no-await-in-loop
+      const delegatorRewardMessageList = await this.axiosClient.get<AccountMessagesListResponse>(
+        `accounts/${address}/messages?order=height.desc&filter.msgType=MsgWithdrawDelegatorReward&page=${currentPage}`,
+      );
+
+      totalPages = delegatorRewardMessageList.data.pagination.total_page;
+      currentPage += 1;
+
+      // Check if returned list is empty
+      if (delegatorRewardMessageList.data.result.length < 1) {
+        return finalMsgList;
+      }
+
+      // Process incoming list to sum total claimed rewards
+      finalMsgList.push(...delegatorRewardMessageList.data.result);
+    }
+
+    return finalMsgList;
   }
 }
