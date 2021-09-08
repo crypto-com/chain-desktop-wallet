@@ -141,3 +141,46 @@ export interface NftDenomData {
 export interface NftDenomResponse {
   result: NftDenomData | null;
 }
+
+export interface AccountMessagesListResponse {
+  result: accountMsgList[];
+  pagination: Pagination;
+}
+
+export interface Pagination {
+  total_record: number;
+  total_page: number;
+  current_page: number;
+  limit: number;
+}
+
+export interface accountMsgList {
+  account: string;
+  blockHeight: number;
+  blockHash: string;
+  blockTime: Date;
+  transactionHash: string;
+  success: boolean;
+  messageIndex: number;
+  messageType: string;
+  data: onChainData;
+}
+
+export interface onChainData {
+  height: number;
+  msgName: string;
+  txHash: string;
+  version: number;
+  msgIndex: number;
+  delegatorAddress: string;
+  recipientAddress: string;
+  name: string;
+  uuid: string;
+  amount: Amount[];
+  validatorAddress: string;
+}
+
+export interface Amount {
+  denom: string;
+  amount: string;
+}
