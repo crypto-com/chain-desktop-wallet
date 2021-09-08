@@ -166,7 +166,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
           const assetAmount = getTransferAmount(transfer);
           const transferData: TransferTransactionData = {
             amount: assetAmount?.amount ?? '0',
-            assetSymbol: 'TCRO', // Hardcoded for now
+            assetSymbol: baseAssetSymbol,
             date: transfer.blockTime,
             hash: transfer.transactionHash,
             memo: '',
