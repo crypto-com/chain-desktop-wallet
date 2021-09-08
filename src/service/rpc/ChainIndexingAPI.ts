@@ -255,9 +255,9 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   private async getDelegatorRewardMessageList(address: string) {
 
-    // Note: handle `pagination`
-    let currentPage = 1, totalPages = 1;
-    let finalMsgList = [];
+    let currentPage = 1;
+    let totalPages = 1;
+    const finalMsgList = [];
 
     while (currentPage <= totalPages) {
 
@@ -267,7 +267,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       );
 
       totalPages = delegatorRewardMessageList.data.pagination.total_page;
-      currentPage = currentPage + 1;
+      currentPage += 1;
 
       // Check if returned list is empty
       if (delegatorRewardMessageList.data.result.length < 1) {
