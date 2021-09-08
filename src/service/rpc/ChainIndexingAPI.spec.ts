@@ -62,7 +62,7 @@ describe('Testing ChainIndexingApi', () => {
               "limit": 1
             }
           }
-        }); //mocked response 
+        });
       })
 
       request1.respondWith({
@@ -104,7 +104,7 @@ describe('Testing ChainIndexingApi', () => {
             "limit": 1
           }
         }
-      }); //mocked response 
+      });
 
     })
 
@@ -125,7 +125,7 @@ describe('Testing ChainIndexingApi', () => {
             "limit": 1
           }
         }
-      }); //mocked response 
+      });
     })
     expect(await nodeRpcService.getTotalRewardsClaimedByAddress('cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a')).to.equal('0');
   });
@@ -173,7 +173,7 @@ describe('Testing ChainIndexingApi', () => {
             "limit": 1
           }
         }
-      }); //mocked response 
+      });
 
       accountInfoReq.respondWith({
         status: 200,
@@ -266,7 +266,7 @@ describe('Testing ChainIndexingApi', () => {
             "limit": 1
           }
         }
-      }); //mocked response 
+      });
 
       accountInfoReq.respondWith({
         status: 200,
