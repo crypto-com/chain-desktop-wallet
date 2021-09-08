@@ -167,8 +167,8 @@ describe('Testing ChainIndexingApi', () => {
             }
           ],
           "pagination": {
-            "total_record": 312,
-            "total_page": 312,
+            "total_record": 1,
+            "total_page": 1,
             "current_page": 1,
             "limit": 1
           }
@@ -260,8 +260,8 @@ describe('Testing ChainIndexingApi', () => {
             }
           ],
           "pagination": {
-            "total_record": 312,
-            "total_page": 312,
+            "total_record": 1,
+            "total_page": 1,
             "current_page": 1,
             "limit": 1
           }
