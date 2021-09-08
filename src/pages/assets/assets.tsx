@@ -102,9 +102,7 @@ const AssetsPage = () => {
     identifier: '',
   };
 
-  const explorerUrl = (
-    session.activeAsset?.config?.explorerUrl || session.wallet.config.explorerUrl
-  ).replace(/\/$/, '');
+  const explorerUrl = session.activeAsset?.config?.explorerUrl || session.wallet.config.explorerUrl;
 
   const syncTransfers = async asset => {
     const transfers = await walletService.retrieveAllTransfers(session.wallet.identifier, asset);
@@ -241,7 +239,7 @@ const AssetsPage = () => {
       dataIndex: 'transactionHash',
       key: 'transactionHash',
       render: text => (
-        <a data-original={text} target="_blank" rel="noreferrer" href={`${explorerUrl}/tx/${text}`}>
+        <a data-original={text} target="_blank" rel="noreferrer" href={`${explorerUrl.tx}/${text}`}>
           {middleEllipsis(text, 12)}
         </a>
       ),
@@ -270,9 +268,7 @@ const AssetsPage = () => {
           data-original={text}
           target="_blank"
           rel="noreferrer"
-          href={`${explorerUrl}/${
-            explorerUrl.indexOf('cronos') !== -1 ? 'address' : 'account'
-          }/${text}`}
+          href={`${explorerUrl.address}/${text}`}
         >
           {middleEllipsis(text, 12)}
         </a>

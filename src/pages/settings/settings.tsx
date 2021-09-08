@@ -759,7 +759,7 @@ const FormSettings = () => {
       ...session.activeAsset!,
       config: {
         ...previousAssetConfig!,
-        explorerUrl: settingsDataUpdate.indexingUrl!,
+        // explorerUrl: settingsDataUpdate.indexingUrl!,
         chainId: settingsDataUpdate.chainId!,
         fee: { gasLimit: settingsDataUpdate.gasLimit!, networkFee: settingsDataUpdate.networkFee! },
         indexingUrl: settingsDataUpdate.indexingUrl!,

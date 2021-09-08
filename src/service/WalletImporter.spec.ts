@@ -67,7 +67,7 @@ describe('Testing WalletImporter', () => {
       enableGeneralSettings: false,
       fee: { gasLimit: '', networkFee: '' },
       indexingUrl: '',
-      explorerUrl: '',
+      explorerUrl: {},
       enabled: true,
       derivationPath: "44'/245'/0'/0/0",
       name: 'Pystaport-Custom-Network',

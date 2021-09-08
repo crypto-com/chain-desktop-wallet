@@ -1200,7 +1200,7 @@ const NftPage = () => {
             data-original={record.tokenMinter}
             target="_blank"
             rel="noreferrer"
-            href={`${currentSession.wallet.config.explorerUrl}/account/${record.tokenMinter}`}
+            href={`${currentSession.wallet.config.explorerUrl.address}/${record.tokenMinter}`}
           >
             {middleEllipsis(record.tokenMinter, 8)}
           </a>
@@ -1237,7 +1237,7 @@ const NftPage = () => {
           data-original={text}
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/tx/${text}`}
+          href={`${currentSession.wallet.config.explorerUrl.tx}/${text}`}
         >
           {middleEllipsis(text, 6)}
         </a>
@@ -1340,7 +1340,7 @@ const NftPage = () => {
             data-original={text}
             target="_blank"
             rel="noreferrer"
-            href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
+            href={`${currentSession.wallet.config.explorerUrl.address}/${text}`}
           >
             {middleEllipsis(text, 12)}
           </a>
@@ -1486,7 +1486,7 @@ const NftPage = () => {
                                 data-original={nft?.tokenMinter}
                                 target="_blank"
                                 rel="noreferrer"
-                                href={`${currentSession.wallet.config.explorerUrl}/account/${nft?.tokenMinter}`}
+                                href={`${currentSession.wallet.config.explorerUrl.address}/${nft?.tokenMinter}`}
                               >
                                 {nft?.tokenMinter}
                               </a>

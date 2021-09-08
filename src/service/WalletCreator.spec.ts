@@ -62,7 +62,7 @@ describe('Testing Wallet Creation', () => {
 
   it('Test creating wallet from custom configurations ', () => {
     const customConfig: WalletConfig = {
-      explorerUrl: '',
+      explorerUrl: {},
       indexingUrl: '',
       enabled: false,
       derivationPath: "44'/245'/0'/0/0",

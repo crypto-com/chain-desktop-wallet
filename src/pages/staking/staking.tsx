@@ -310,7 +310,7 @@ const FormDelegationRequest = () => {
           data-original={record.validatorAddress}
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${record.validatorAddress}`}
+          href={`${currentSession.wallet.config.explorerUrl.validator}/${record.validatorAddress}`}
         >
           {ellipsis(validatorName, 24)}
         </a>
@@ -345,7 +345,7 @@ const FormDelegationRequest = () => {
           title={validatorAddress}
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${validatorAddress}`}
+          href={`${currentSession.wallet.config.explorerUrl.validator}/${validatorAddress}`}
         >
           {middleEllipsis(validatorAddress, 10)}
         </a>
@@ -896,7 +896,7 @@ const FormDelegationOperations = () => {
         <a
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+          href={`${currentSession.wallet.config.explorerUrl.validator}/${text}`}
         >
           {middleEllipsis(text, 8)}
         </a>
@@ -916,7 +916,7 @@ const FormDelegationOperations = () => {
           data-original={text}
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
+          href={`${currentSession.wallet.config.explorerUrl.address}/${text}`}
         >
           {middleEllipsis(text, 8)}
         </a>
@@ -1241,7 +1241,7 @@ const FormWithdrawStakingReward = () => {
         <a
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+          href={`${currentSession.wallet.config.explorerUrl.validator}/${text}`}
         >
           {text}
         </a>

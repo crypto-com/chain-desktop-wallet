@@ -48,7 +48,7 @@ const RedelegateFormComponent = (props: {
           data-original={record.validatorAddress}
           target="_blank"
           rel="noreferrer"
-          href={`${props.currentSession.wallet.config.explorerUrl}/validator/${record.validatorAddress}`}
+          href={`${props.currentSession.wallet.config.explorerUrl.validator}/${record.validatorAddress}`}
         >
           {ellipsis(validatorName, 24)}
         </a>
@@ -83,7 +83,7 @@ const RedelegateFormComponent = (props: {
           title={validatorAddress}
           target="_blank"
           rel="noreferrer"
-          href={`${props.currentSession.wallet.config.explorerUrl}/validator/${validatorAddress}`}
+          href={`${props.currentSession.wallet.config.explorerUrl.validator}/${validatorAddress}`}
         >
           {middleEllipsis(validatorAddress, 10)}
         </a>

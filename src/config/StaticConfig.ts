@@ -60,7 +60,7 @@ SUPPORTED_CURRENCY.set('TRY', { value: 'TRY', label: 'TRY - ₺', symbol: '₺' 
 export type WalletConfig = {
   enabled: boolean;
   name: string;
-  explorerUrl: string;
+  explorerUrl: any;
   nodeUrl: string;
   indexingUrl: string;
   derivationPath: string;
@@ -135,7 +135,11 @@ const TestNetConfig: WalletConfig = {
   enabled: true,
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",
-  explorerUrl: 'https://crypto.org/explorer/croeseid',
+  explorerUrl: {
+    tx: 'https://crypto.org/explorer/croeseid/tx',
+    address: 'https://crypto.org/explorer/croeseid/account',
+    validator: 'https://crypto.org/explorer/croeseid/validator',
+  },
   indexingUrl: 'https://crypto.org/explorer/croeseid/api/v1/',
   nodeUrl: CroNetwork.Testnet.defaultNodeUrl,
   network: CroNetwork.Testnet,
@@ -152,7 +156,11 @@ const TestNetCroeseid3Config: WalletConfig = {
   enabled: true,
   name: 'TESTNET CROESEID 3',
   derivationPath: "m/44'/1'/0'/0/0",
-  explorerUrl: 'https://crypto.org/explorer/croeseid3',
+  explorerUrl: {
+    tx: 'https://crypto.org/explorer/croeseid3/tx',
+    address: 'https://crypto.org/explorer/croeseid3/account',
+    validator: 'https://crypto.org/explorer/croeseid3/validator',
+  },
   indexingUrl: 'https://crypto.org/explorer/croeseid3/api/v1/',
   nodeUrl: CroNetwork.TestnetCroeseid3.defaultNodeUrl,
   network: CroNetwork.TestnetCroeseid3,
@@ -186,7 +194,11 @@ const TestNetCroeseid4Config: WalletConfig = {
   enabled: true,
   name: 'TESTNET CROESEID 4',
   derivationPath: "m/44'/1'/0'/0/0",
-  explorerUrl: 'https://crypto.org/explorer/croeseid4',
+  explorerUrl: {
+    tx: 'https://crypto.org/explorer/croeseid4/tx',
+    address: 'https://crypto.org/explorer/croeseid4/account',
+    validator: 'https://crypto.org/explorer/croeseid4/validator',
+  },
   indexingUrl: 'https://crypto.org/explorer/croeseid4/api/v1/',
   nodeUrl: TestnetCroeseid4.defaultNodeUrl,
   network: TestnetCroeseid4,
@@ -208,7 +220,11 @@ const MainNetConfig: WalletConfig = {
   name: 'MAINNET',
   derivationPath: "m/44'/394'/0'/0/0",
   nodeUrl: CroNetwork.Mainnet.defaultNodeUrl,
-  explorerUrl: 'https://crypto.org/explorer',
+  explorerUrl: {
+    tx: 'https://crypto.org/explorer/tx',
+    address: 'https://crypto.org/explorer/account',
+    validator: 'https://crypto.org/explorer/validator',
+  },
   indexingUrl: 'https://crypto.org/explorer/api/v1/',
   network: CroNetwork.Mainnet,
   disableDefaultClientMemo: false,
@@ -239,7 +255,7 @@ export const CustomDevNet: WalletConfig = {
   },
   nodeUrl: '',
   indexingUrl: '',
-  explorerUrl: '',
+  explorerUrl: {},
   fee: {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
