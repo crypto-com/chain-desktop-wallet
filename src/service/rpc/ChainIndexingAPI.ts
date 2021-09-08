@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import Big from 'big.js';
 import {
   NftAccountTransactionListResponse,
   NftDenomResponse,
@@ -20,7 +21,6 @@ import {
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
-import Big from 'big.js';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(
