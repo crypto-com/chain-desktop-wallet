@@ -11,8 +11,9 @@ import {
   TransferListResponse,
   TransferResult,
   AccountMessagesListResponse,
+  accountMsgList,
   ValidatorListResponse,
-  AccountInfoResponse,
+  AccountInfoResponse
 } from './ChainIndexingModels';
 import {
   NftQueryParams,
@@ -24,7 +25,6 @@ import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
 import { UserAsset } from '../../models/UserAsset';
-import { accountMsgList } from './ChainIndexingModels';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(
@@ -274,7 +274,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       `validators?limit=1000000`,
     );
 
-    if (validatorList.data.pagination.totalPage > 1) {
+    if (validatorList.data.pagination.total_page > 1) {
       throw new Error("Validator list is very big. Aborting.");
     }
 
