@@ -129,4 +129,190 @@ describe('Testing ChainIndexingApi', () => {
     })
     expect(await nodeRpcService.getTotalRewardsClaimedByAddress('cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a')).to.equal('0');
   });
+  it('should return estimated rewards for a user account, , apy = 10%, period = 12 Months', async () => {
+    const nodeRpcService = ChainIndexingAPI.init('https://crypto.org/explorer/api/v1');
+    moxios.wait(() => {
+      const validatorListReq = moxios.requests.get("get", "validators?limit=1000000")
+      const accountInfoReq = moxios.requests.get("get", "accounts/cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a")
+
+      validatorListReq.respondWith({
+        status: 200, response: {
+          "result": [
+            {
+              "operatorAddress": "crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0",
+              "consensusNodeAddress": "crocnclcons1lyqp8arayle44enfjz5fgyw7axpyr6pd5gxzm8",
+              "initialDelegatorAddress": "cro1sluuqshjwrttwr553feqpq0550qd9w9z690yxn",
+              "tendermintPubkey": "/ThO1kb7WoIcNXkF6QFbeTRwn3dG/Lwcb41rJiE7ZUM=",
+              "tendermintAddress": "F90013F47D27F35AE66990A89411DEE98241E82D",
+              "status": "Bonded",
+              "jailed": false,
+              "joinedAtBlockHeight": 0,
+              "power": "17073471821",
+              "moniker": "Pegasus",
+              "identity": "A296556FF603197C",
+              "website": "https://crypto.org",
+              "securityContact": "chain-security@crypto.org",
+              "details": "Driving mass adoption of blockchain technology, powered by Bison Trails",
+              "commissionRate": "0.200000000000000000",
+              "commissionMaxRate": "0.200000000000000000",
+              "commissionMaxChangeRate": "0.100000000000000000",
+              "minSelfDelegation": "500000000000000",
+              "totalSignedBlock": 2270036,
+              "totalActiveBlock": 2270307,
+              "impreciseUpTime": "0.9998806329",
+              "votedGovProposal": 2,
+              "powerPercentage": "0.0481308173",
+              "cumulativePowerPercentage": "0.0481308173",
+              "apy": "0.1"
+            }
+          ],
+          "pagination": {
+            "total_record": 1,
+            "total_page": 1,
+            "current_page": 1,
+            "limit": 1
+          }
+        }
+      });
+
+      accountInfoReq.respondWith({
+        status: 200,
+        response: {
+          "result": {
+            "type": "/cosmos.auth.v1beta1.BaseAccount",
+            "name": "",
+            "address": "cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a",
+            "balance": [
+              {
+                "denom": "basecro",
+                "amount": "6955702643"
+              }
+            ],
+            "bondedBalance": [
+              {
+                "denom": "basecro",
+                "amount": "10000"
+              }
+            ],
+            "redelegatingBalance": [],
+            "unbondingBalance": [
+              {
+                "denom": "basecro",
+                "amount": "50000000000"
+              }
+            ],
+            "totalRewards": [
+              {
+                "denom": "basecro",
+                "amount": "8051847300.119276460727110816"
+              }
+            ],
+            "commissions": [],
+            "totalBalance": [
+              {
+                "denom": "basecro",
+                "amount": "12937080862919.119276460727110816"
+              }
+            ]
+          }
+        }
+      })
+    })
+
+    // 31536000/2 = 6 months, APY = 10%
+    expect(await nodeRpcService.getFutureEstimatedRewardsByValidatorAddress('crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0', 31536000 / 2, 'cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a')).to.equal('10500.000000000000000000');
+  });
+  it('should return estimated rewards for a user account, apy = 10%, period = 6 Months', async () => {
+    const nodeRpcService = ChainIndexingAPI.init('https://crypto.org/explorer/api/v1');
+    moxios.wait(() => {
+      const validatorListReq = moxios.requests.get("get", "validators?limit=1000000")
+      const accountInfoReq = moxios.requests.get("get", "accounts/cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a")
+
+      validatorListReq.respondWith({
+        status: 200, response: {
+          "result": [
+            {
+              "operatorAddress": "crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0",
+              "consensusNodeAddress": "crocnclcons1lyqp8arayle44enfjz5fgyw7axpyr6pd5gxzm8",
+              "initialDelegatorAddress": "cro1sluuqshjwrttwr553feqpq0550qd9w9z690yxn",
+              "tendermintPubkey": "/ThO1kb7WoIcNXkF6QFbeTRwn3dG/Lwcb41rJiE7ZUM=",
+              "tendermintAddress": "F90013F47D27F35AE66990A89411DEE98241E82D",
+              "status": "Bonded",
+              "jailed": false,
+              "joinedAtBlockHeight": 0,
+              "power": "17073471821",
+              "moniker": "Pegasus",
+              "identity": "A296556FF603197C",
+              "website": "https://crypto.org",
+              "securityContact": "chain-security@crypto.org",
+              "details": "Driving mass adoption of blockchain technology, powered by Bison Trails",
+              "commissionRate": "0.200000000000000000",
+              "commissionMaxRate": "0.200000000000000000",
+              "commissionMaxChangeRate": "0.100000000000000000",
+              "minSelfDelegation": "500000000000000",
+              "totalSignedBlock": 2270036,
+              "totalActiveBlock": 2270307,
+              "impreciseUpTime": "0.9998806329",
+              "votedGovProposal": 2,
+              "powerPercentage": "0.0481308173",
+              "cumulativePowerPercentage": "0.0481308173",
+              "apy": "0.1"
+            }
+          ],
+          "pagination": {
+            "total_record": 1,
+            "total_page": 1,
+            "current_page": 1,
+            "limit": 1
+          }
+        }
+      });
+
+      accountInfoReq.respondWith({
+        status: 200,
+        response: {
+          "result": {
+            "type": "/cosmos.auth.v1beta1.BaseAccount",
+            "name": "",
+            "address": "cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a",
+            "balance": [
+              {
+                "denom": "basecro",
+                "amount": "6955702643"
+              }
+            ],
+            "bondedBalance": [
+              {
+                "denom": "basecro",
+                "amount": "10000"
+              }
+            ],
+            "redelegatingBalance": [],
+            "unbondingBalance": [
+              {
+                "denom": "basecro",
+                "amount": "50000000000"
+              }
+            ],
+            "totalRewards": [
+              {
+                "denom": "basecro",
+                "amount": "8051847300.119276460727110816"
+              }
+            ],
+            "commissions": [],
+            "totalBalance": [
+              {
+                "denom": "basecro",
+                "amount": "12937080862919.119276460727110816"
+              }
+            ]
+          }
+        }
+      })
+    })
+
+    // 31536000/2 = 6 months, APY = 10%
+    expect(await nodeRpcService.getFutureEstimatedRewardsByValidatorAddress('crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0', 31536000 / 2, 'cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a')).to.equal('10500.000000000000000000');
+  });
 });
