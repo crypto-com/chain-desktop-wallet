@@ -11,7 +11,9 @@ import {
   TransferListResponse,
   TransferResult,
   AccountMessagesListResponse,
-  accountMsgList
+  accountMsgList,
+  ValidatorListResponse,
+  AccountInfoResponse
 } from './ChainIndexingModels';
 import {
   NftQueryParams,
@@ -220,6 +222,74 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   }
 
   /**
+   * Gets estimated CRO rewards for a useraddress
+   * @param userAddress 
+   * @param validatorAddress 
+   * @param futureDurationInSec
+   @returns {string} Estimated rewards in baseunit 
+  */
+  public async getFutureEstimatedRewardsByValidatorAddress(validatorAddress: string, durationInSeconds: number, userAddress: string) {
+
+    const [validatorInfo, bondedBalanceInString] = await Promise.all([this.getValidatorDetails(validatorAddress), this.getTotalBondedBalanceByUserAddress(userAddress)]);
+
+    if (!validatorInfo) {
+      throw new Error("Cannot fetch validator information.");
+    }
+
+    const apyRate = validatorInfo.apy; // already fetched as divided by 100
+
+    // 1 year = 31536000 sec
+    const timeInYrs = new Big(durationInSeconds).div(new Big('31536000'));
+
+    /**
+     Note: 
+     - Commission rate is not deducted
+     - Compound frequency not considered.
+     - Considering APY as simple interest rate.
+     - Current Formula: Final Balance = Principal * (1 + (rate/100) * timeInYrs)
+     */
+    const estimatedRewards = new Big(bondedBalanceInString).mul(new Big(1).add(new Big(apyRate).mul(timeInYrs)));
+    return estimatedRewards.toFixed(18);
+  }
+
+  private async getTotalBondedBalanceByUserAddress(userAddress: string) {
+    const accountInfo = await this.axiosClient.get<AccountInfoResponse>(
+      `accounts/${userAddress}`,
+    );
+
+    let totalBondedBalance = new Big(0);
+
+    // Calculate total bonded balance
+    accountInfo.data.result.bondedBalance.forEach(amount => {
+      totalBondedBalance = totalBondedBalance.add(amount.amount);
+    });
+
+    // Total bonded balance 
+    return totalBondedBalance.toString();
+  }
+
+  private async getValidatorDetails(validatorAddr: string) {
+
+    const validatorList = await this.axiosClient.get<ValidatorListResponse>(
+      `validators?limit=1000000`,
+    );
+
+    if (validatorList.data.pagination.total_page > 1) {
+      throw new Error("Validator list is very big. Aborting.");
+    }
+
+    // Check if returned list is empty
+    if (validatorList.data.result.length < 1) {
+      return undefined;
+    }
+
+    const listedValidatorInfo = validatorList.data.result.find((validatorInfo) => validatorInfo.operatorAddress === validatorAddr);
+
+    // Listed ValidatorInfo 
+    return listedValidatorInfo;
+  }
+
+  /** 
    * Get total rewards for an active account on CRO (Cosmos SDK) chain
    * @param address
    */
