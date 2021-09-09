@@ -90,7 +90,7 @@ const AssetsPage = () => {
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(session.activeAsset);
   const [currentAssetMarketData, setCurrentAssetMarketData] = useState<AssetMarketPrice>();
   const [isAssetVisible, setIsAssetVisible] = useState(false);
-  const [activeAssetTab, setActiveAssetTab] = useState('1');
+  const [activeAssetTab, setActiveAssetTab] = useState('transaction');
   const [allTransfer, setAllTransfer] = useState<any>();
 
   const didMountRef = useRef(false);
@@ -240,7 +240,7 @@ const AssetsPage = () => {
           <a
             onClick={() => {
               setTimeout(() => {
-                setActiveAssetTab('2');
+                setActiveAssetTab('send');
               }, 50);
             }}
           >
@@ -251,7 +251,7 @@ const AssetsPage = () => {
             style={{ marginLeft: '20px' }}
             onClick={() => {
               setTimeout(() => {
-                setActiveAssetTab('3');
+                setActiveAssetTab('receive');
               }, 50);
             }}
           >
@@ -385,7 +385,7 @@ const AssetsPage = () => {
                     activeKey={activeAssetTab}
                     onTabClick={key => {
                       setActiveAssetTab(key);
-                      if (key === '1') {
+                      if (key === 'transaction') {
                         syncTransfers(currentAsset);
                         syncAssetBalance(currentAsset);
                         setNavbarMenuSelectedKey('/assets');
@@ -418,24 +418,23 @@ const AssetsPage = () => {
                     //   );
                     // }}
                   >
-                    <TabPane tab={t('assets.tab1')} key="1">
-                      <Table
-                        columns={TransactionColumns}
-                        dataSource={allTransfer}
-                        className="transfer-table"
-                        rowKey={record => record.key}
-                      />
-                    </TabPane>
-                    <TabPane tab={t('assets.tab2')} key="2">
+                    <TabPane tab={t('assets.tab2')} key="send">
                       <FormSend
                         walletAsset={currentAsset}
                         setWalletAsset={setCurrentAsset}
                         currentSession={session}
                       />
                     </TabPane>
-
-                    <TabPane tab={t('assets.tab3')} key="3">
+                    <TabPane tab={t('assets.tab3')} key="receive">
                       <ReceiveDetail currentAsset={currentAsset} session={session} />
+                    </TabPane>
+                    <TabPane tab={t('assets.tab1')} key="transaction">
+                      <Table
+                        columns={TransactionColumns}
+                        dataSource={allTransfer}
+                        className="transfer-table"
+                        rowKey={record => record.key}
+                      />
                     </TabPane>
                   </Tabs>
                 </Content>
@@ -449,7 +448,7 @@ const AssetsPage = () => {
                 onRow={selectedAsset => {
                   return {
                     onClick: async () => {
-                      setActiveAssetTab('1');
+                      setActiveAssetTab('transaction');
                       // console.log(event)
                       setSession({
                         ...session,
