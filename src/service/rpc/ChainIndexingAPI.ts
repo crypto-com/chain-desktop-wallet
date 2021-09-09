@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
+import Big from 'big.js';
 import {
   NftAccountTransactionListResponse,
   NftDenomResponse,
@@ -9,6 +10,10 @@ import {
   TransferDataAmount,
   TransferListResponse,
   TransferResult,
+  AccountMessagesListResponse,
+  accountMsgList,
+  ValidatorListResponse,
+  AccountInfoResponse
 } from './ChainIndexingModels';
 import {
   NftQueryParams,
@@ -19,6 +24,7 @@ import {
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
+import { UserAsset } from '../../models/UserAsset';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(
@@ -138,6 +144,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   public async fetchAllTransferTransactions(
     baseAssetSymbol: string,
     address: string,
+    asset?: UserAsset,
   ): Promise<Array<TransferTransactionData>> {
     const transferListResponse = await this.axiosClient.get<TransferListResponse>(
       `/accounts/${address}/messages?order=height.desc&filter.msgType=MsgSend`,
@@ -166,7 +173,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
           const assetAmount = getTransferAmount(transfer);
           const transferData: TransferTransactionData = {
             amount: assetAmount?.amount ?? '0',
-            assetSymbol: baseAssetSymbol,
+            assetSymbol: asset?.symbol || baseAssetSymbol,
             date: transfer.blockTime,
             hash: transfer.transactionHash,
             memo: '',
@@ -212,5 +219,136 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
         result: null,
       };
     }
+  }
+
+  /**
+   * Gets estimated CRO rewards for a useraddress
+   * @param userAddress 
+   * @param validatorAddress 
+   * @param futureDurationInSec
+   @returns {string} Estimated rewards in baseunit 
+  */
+  public async getFutureEstimatedRewardsByValidatorAddress(validatorAddress: string, durationInSeconds: number, userAddress: string) {
+
+    const [validatorInfo, bondedBalanceInString] = await Promise.all([this.getValidatorDetails(validatorAddress), this.getTotalBondedBalanceByUserAddress(userAddress)]);
+
+    if (!validatorInfo) {
+      throw new Error("Cannot fetch validator information.");
+    }
+
+    const apyRate = validatorInfo.apy; // already fetched as divided by 100
+
+    // 1 year = 31536000 sec
+    const timeInYrs = new Big(durationInSeconds).div(new Big('31536000'));
+
+    /**
+     Note: 
+     - Commission rate is not deducted
+     - Compound frequency not considered.
+     - Considering APY as simple interest rate.
+     - Current Formula: Final Balance = Principal * (1 + (rate/100) * timeInYrs)
+     */
+    const estimatedRewards = new Big(bondedBalanceInString).mul(new Big(1).add(new Big(apyRate).mul(timeInYrs)));
+    return estimatedRewards.toFixed(18);
+  }
+
+  private async getTotalBondedBalanceByUserAddress(userAddress: string) {
+    const accountInfo = await this.axiosClient.get<AccountInfoResponse>(
+      `accounts/${userAddress}`,
+    );
+
+    let totalBondedBalance = new Big(0);
+
+    // Calculate total bonded balance
+    accountInfo.data.result.bondedBalance.forEach(amount => {
+      totalBondedBalance = totalBondedBalance.add(amount.amount);
+    });
+
+    // Total bonded balance 
+    return totalBondedBalance.toString();
+  }
+
+  private async getValidatorDetails(validatorAddr: string) {
+
+    const validatorList = await this.axiosClient.get<ValidatorListResponse>(
+      `validators?limit=1000000`,
+    );
+
+    if (validatorList.data.pagination.total_page > 1) {
+      throw new Error("Validator list is very big. Aborting.");
+    }
+
+    // Check if returned list is empty
+    if (validatorList.data.result.length < 1) {
+      return undefined;
+    }
+
+    const listedValidatorInfo = validatorList.data.result.find((validatorInfo) => validatorInfo.operatorAddress === validatorAddr);
+
+    // Listed ValidatorInfo 
+    return listedValidatorInfo;
+  }
+
+  /** 
+   * Get total rewards for an active account on CRO (Cosmos SDK) chain
+   * @param address
+   */
+  public async getTotalRewardsClaimedByAddress(address: string) {
+    try {
+      const rewardMsgList = await this.getDelegatorRewardMessageList(address);
+
+      let totalClaims = new Big(0);
+
+      rewardMsgList.forEach(msg => {
+
+        // Only process this MSG type
+        if (msg.messageType === "MsgWithdrawDelegatorReward") {
+
+          // Check recipient and delegator
+          if (msg.data.delegatorAddress === msg.data.recipientAddress) {
+
+            // Process non-empty msg `amount` list
+            msg.data.amount.forEach(amount => {
+              totalClaims = totalClaims.add(new Big(amount.amount))
+            });
+          }
+        }
+      });
+
+      // TotalRewardsClaimed in string
+      return totalClaims.toString();
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_CALCULATING_TOTAL_REWARDS', e);
+      return '0';
+    }
+  }
+
+  private async getDelegatorRewardMessageList(address: string) {
+
+    let currentPage = 1;
+    let totalPages = 1;
+    const finalMsgList: accountMsgList[] = [];
+
+    while (currentPage <= totalPages) {
+
+      // eslint-disable-next-line no-await-in-loop
+      const delegatorRewardMessageList = await this.axiosClient.get<AccountMessagesListResponse>(
+        `accounts/${address}/messages?order=height.desc&filter.msgType=MsgWithdrawDelegatorReward&page=${currentPage}`,
+      );
+
+      totalPages = delegatorRewardMessageList.data.pagination.total_page;
+      currentPage += 1;
+
+      // Check if returned list is empty
+      if (delegatorRewardMessageList.data.result.length < 1) {
+        return finalMsgList;
+      }
+
+      // Process incoming list to sum total claimed rewards
+      finalMsgList.push(...delegatorRewardMessageList.data.result);
+    }
+
+    return finalMsgList;
   }
 }
