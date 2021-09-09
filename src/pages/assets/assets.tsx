@@ -17,7 +17,7 @@ import {
 import { Session } from '../../models/Session';
 import { AssetMarketPrice, getAssetBalancePrice, UserAsset } from '../../models/UserAsset';
 import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
-
+import { renderExplorerUrl } from '../../config/StaticAssets';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 // import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
@@ -101,8 +101,6 @@ const AssetsPage = () => {
     from: '',
     identifier: '',
   };
-
-  const explorerUrl = session.activeAsset?.config?.explorerUrl || session.wallet.config.explorerUrl;
 
   const syncTransfers = async asset => {
     const transfers = await walletService.retrieveAllTransfers(session.wallet.identifier, asset);
@@ -268,7 +266,15 @@ const AssetsPage = () => {
       dataIndex: 'transactionHash',
       key: 'transactionHash',
       render: text => (
-        <a data-original={text} target="_blank" rel="noreferrer" href={`${explorerUrl.tx}/${text}`}>
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${renderExplorerUrl(
+            session.activeAsset?.config ?? session.wallet.config,
+            'tx',
+          )}/${text}`}
+        >
           {middleEllipsis(text, 12)}
         </a>
       ),
@@ -297,7 +303,10 @@ const AssetsPage = () => {
           data-original={text}
           target="_blank"
           rel="noreferrer"
-          href={`${explorerUrl.address}/${text}`}
+          href={`${renderExplorerUrl(
+            session.activeAsset?.config ?? session.wallet.config,
+            'address',
+          )}/${text}`}
         >
           {middleEllipsis(text, 12)}
         </a>

@@ -98,7 +98,8 @@ export function reconstructCustomConfig(formValues: CustomConfigFormValue): Wall
   return {
     derivationPath: formValues.derivationPath,
     enabled: true,
-    explorerUrl: {},
+    explorer: {},
+    explorerUrl: '',
     name: DefaultWalletConfigs.CustomDevNet.name,
     network: customNetwork,
     nodeUrl: formValues.nodeUrl,

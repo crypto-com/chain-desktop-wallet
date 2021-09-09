@@ -665,6 +665,7 @@ function MetaInfoComponent() {
 function getAssetConfigFromWalletConfig(walletConfig: WalletConfig): UserAssetConfig {
   return {
     chainId: walletConfig.network.chainId,
+    explorer: walletConfig.explorer,
     explorerUrl: walletConfig.explorerUrl,
     fee: { gasLimit: walletConfig.fee.gasLimit, networkFee: walletConfig.fee.networkFee },
     indexingUrl: walletConfig.indexingUrl,

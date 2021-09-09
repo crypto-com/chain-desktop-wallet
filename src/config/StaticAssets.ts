@@ -2,7 +2,7 @@
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import { getRandomId } from '../crypto/RandomGen';
 import { AssetCreationType, UserAssetConfig, UserAssetType } from '../models/UserAsset';
-import { Network, WalletConfig, DefaultWalletConfigs } from './StaticConfig';
+import { Network, WalletConfig } from './StaticConfig';
 
 // This will be used later for asset recreation/migration
 export const STATIC_ASSET_COUNT = 2;
@@ -14,33 +14,50 @@ const checkIfTestnet = (network: Network) => {
   );
 };
 
+export const renderExplorerUrl = (config: WalletConfig | UserAssetConfig, page: string) => {
+  const { explorer, explorerUrl } = config;
+  let url = '';
+
+  if (explorer) {
+    switch (page) {
+      case 'tx':
+        url = explorer.tx;
+        break;
+      case 'address':
+        url = explorer.address;
+        break;
+      case 'validator':
+        url = explorer.validator;
+        break;
+      default:
+        url = explorer.home;
+    }
+  } else {
+    switch (page) {
+      case 'tx':
+        url = `${explorerUrl}/tx`;
+        break;
+      case 'address':
+        url = `${explorerUrl}/${explorerUrl.indexOf('cronos') !== -1 ? 'address' : 'account'}`;
+        break;
+      case 'validator':
+        url = `${explorerUrl}/validator`;
+        break;
+      default:
+        url = `${explorerUrl}`;
+    }
+  }
+  return url;
+};
+
 // Every created wallet get initialized with a new CRO asset
 export const CRO_ASSET = (walletConfig: WalletConfig) => {
   const { network } = walletConfig;
   const assetSymbol = network.coin.croDenom.toString().toUpperCase();
-  const { chainId } = network;
-
-  let explorerUrl = {};
-  switch (chainId) {
-    case 'testnet-croeseid-2':
-      explorerUrl = DefaultWalletConfigs.TestNetConfig.explorerUrl;
-      break;
-
-    case 'testnet-croeseid-3':
-      explorerUrl = DefaultWalletConfigs.TestNetCroeseid3Config.explorerUrl;
-      break;
-
-    case 'testnet-croeseid-4':
-      explorerUrl = DefaultWalletConfigs.TestNetCroeseid4Config.explorerUrl;
-      break;
-
-    default:
-      explorerUrl = DefaultWalletConfigs.MainNetConfig.explorerUrl;
-  }
 
   const config: UserAssetConfig = {
-    explorerUrl:
-      typeof walletConfig.explorerUrl === 'object' ? walletConfig.explorerUrl : explorerUrl,
+    explorerUrl: walletConfig.explorerUrl,
+    explorer: walletConfig.explorer,
     chainId: network.chainId,
     fee: { gasLimit: '300000', networkFee: '10000' },
     indexingUrl: walletConfig.indexingUrl,
@@ -76,10 +93,11 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
   const isTestnet = checkIfTestnet(network);
 
   const config: UserAssetConfig = {
-    explorerUrl: {
+    explorer: {
       tx: 'https://cronos-explorer.crypto.org/tx',
       address: 'https://cronos-explorer.crypto.org/address',
     },
+    explorerUrl: 'https://cronos-explorer.crypto.org',
     chainId: isTestnet ? '338' : 'TO_BE_DECIDED',
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
     indexingUrl: isTestnet ? 'https://cronos-explorer.crypto.org/api' : 'TO_BE_DECIDED',

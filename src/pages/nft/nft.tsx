@@ -66,6 +66,7 @@ import {
   MAX_IMAGE_SIZE,
   MAX_VIDEO_SIZE,
 } from '../../config/StaticConfig';
+import { renderExplorerUrl } from '../../config/StaticAssets';
 
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
@@ -1200,7 +1201,9 @@ const NftPage = () => {
             data-original={record.tokenMinter}
             target="_blank"
             rel="noreferrer"
-            href={`${currentSession.wallet.config.explorerUrl.address}/${record.tokenMinter}`}
+            href={`${renderExplorerUrl(currentSession.wallet.config, 'address')}/${
+              record.tokenMinter
+            }`}
           >
             {middleEllipsis(record.tokenMinter, 8)}
           </a>
@@ -1237,7 +1240,7 @@ const NftPage = () => {
           data-original={text}
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl.tx}/${text}`}
+          href={`${renderExplorerUrl(currentSession.wallet.config, 'tx')}/${text}`}
         >
           {middleEllipsis(text, 6)}
         </a>
@@ -1340,7 +1343,7 @@ const NftPage = () => {
             data-original={text}
             target="_blank"
             rel="noreferrer"
-            href={`${currentSession.wallet.config.explorerUrl.address}/${text}`}
+            href={`${renderExplorerUrl(currentSession.wallet.config, 'address')}/${text}`}
           >
             {middleEllipsis(text, 12)}
           </a>
@@ -1486,7 +1489,10 @@ const NftPage = () => {
                                 data-original={nft?.tokenMinter}
                                 target="_blank"
                                 rel="noreferrer"
-                                href={`${currentSession.wallet.config.explorerUrl.address}/${nft?.tokenMinter}`}
+                                href={`${renderExplorerUrl(
+                                  currentSession.wallet.config,
+                                  'address',
+                                )}/${nft?.tokenMinter}`}
                               >
                                 {nft?.tokenMinter}
                               </a>
