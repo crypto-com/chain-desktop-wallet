@@ -52,6 +52,7 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
+import { SettingsDataUpdate } from '../../models/Wallet';
 import packageJson from '../../../package.json';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { LedgerWalletMaximum } from '../../config/StaticConfig';
@@ -233,6 +234,48 @@ function HomeLayout(props: HomeLayoutProps) {
     }, 15_000);
   };
 
+  const checkCorrectExplorerUrl = (walletSession?: Session) => {
+    if (!walletSession || !walletSession.wallet) {
+      return;
+    }
+
+    setTimeout(async () => {
+      if (!walletSession.wallet.config.explorer) {
+        const updateExplorerUrlNotificationKey = 'updateExplorerUrlNotificationKey';
+
+        const allWallets = await walletService.retrieveAllWallets();
+
+        allWallets.forEach(async wallet => {
+          const settingsDataUpdate: SettingsDataUpdate = {
+            walletId: wallet.identifier,
+            chainId: wallet.config.network.chainId,
+            nodeUrl: wallet.config.nodeUrl,
+            indexingUrl: wallet.config.indexingUrl,
+            networkFee: String(wallet.config.fee.networkFee),
+            gasLimit: String(wallet.config.fee.gasLimit),
+            explorer: {
+              index: `${wallet.config.explorerUrl}`,
+              tx: `${wallet.config.explorerUrl}/tx`,
+              address: `${wallet.config.explorerUrl}/${
+                wallet.config.explorerUrl.indexOf('cronos') !== -1 ? 'address' : 'account'
+              }`,
+              validator: `${wallet.config.explorerUrl}/validator`,
+            },
+          };
+          await walletService.updateWalletNodeConfig(settingsDataUpdate);
+        });
+
+        notification.info({
+          message: 'New config setting found',
+          description: 'Your Explorer URL config setting is updated!',
+          duration: 15,
+          key: updateExplorerUrlNotificationKey,
+          placement: 'topRight',
+        });
+      }
+    }, 5_000);
+  };
+
   useEffect(() => {
     const fetchDB = async () => {
       setFetchingDB(true);
@@ -284,6 +327,7 @@ function HomeLayout(props: HomeLayoutProps) {
       }, 2000);
 
       checkNewlyAddedStaticAssets(currentSession);
+      checkCorrectExplorerUrl(currentSession);
     };
 
     if (!didMountRef.current) {

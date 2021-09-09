@@ -57,6 +57,7 @@ export interface SettingsDataUpdate {
   indexingUrl?: string | undefined;
   gasLimit?: string | undefined;
   networkFee?: string | undefined;
+  explorer?: any | undefined;
 }
 
 export interface DisableDefaultMemoSettings {

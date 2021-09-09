@@ -153,6 +153,10 @@ export class StorageService {
       previousWallet.config.network.defaultNodeUrl = dataUpdate.nodeUrl;
     }
 
+    if (dataUpdate.explorer) {
+      previousWallet.config.explorer = dataUpdate.explorer;
+    }
+
     if (dataUpdate.indexingUrl) {
       previousWallet.config.indexingUrl = dataUpdate.indexingUrl;
     }
