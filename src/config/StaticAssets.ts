@@ -30,7 +30,7 @@ export const renderExplorerUrl = (config: WalletConfig | UserAssetConfig, page: 
         url = explorer.validator;
         break;
       default:
-        url = explorer.home;
+        url = explorer.index;
     }
   } else {
     switch (page) {

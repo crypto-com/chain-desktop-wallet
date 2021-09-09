@@ -137,6 +137,7 @@ const TestNetConfig: WalletConfig = {
   name: 'TESTNET',
   derivationPath: "m/44'/1'/0'/0/0",
   explorer: {
+    index: 'https://crypto.org/explorer/croeseid',
     tx: 'https://crypto.org/explorer/croeseid/tx',
     address: 'https://crypto.org/explorer/croeseid/account',
     validator: 'https://crypto.org/explorer/croeseid/validator',
@@ -159,6 +160,7 @@ const TestNetCroeseid3Config: WalletConfig = {
   name: 'TESTNET CROESEID 3',
   derivationPath: "m/44'/1'/0'/0/0",
   explorer: {
+    index: 'https://crypto.org/explorer/croeseid3',
     tx: 'https://crypto.org/explorer/croeseid3/tx',
     address: 'https://crypto.org/explorer/croeseid3/account',
     validator: 'https://crypto.org/explorer/croeseid3/validator',
@@ -198,6 +200,7 @@ const TestNetCroeseid4Config: WalletConfig = {
   name: 'TESTNET CROESEID 4',
   derivationPath: "m/44'/1'/0'/0/0",
   explorer: {
+    index: 'https://crypto.org/explorer/croeseid4',
     tx: 'https://crypto.org/explorer/croeseid4/tx',
     address: 'https://crypto.org/explorer/croeseid4/account',
     validator: 'https://crypto.org/explorer/croeseid4/validator',
@@ -225,6 +228,7 @@ const MainNetConfig: WalletConfig = {
   derivationPath: "m/44'/394'/0'/0/0",
   nodeUrl: CroNetwork.Mainnet.defaultNodeUrl,
   explorer: {
+    index: 'https://crypto.org/explorer',
     tx: 'https://crypto.org/explorer/tx',
     address: 'https://crypto.org/explorer/account',
     validator: 'https://crypto.org/explorer/validator',
