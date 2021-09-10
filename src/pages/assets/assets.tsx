@@ -17,7 +17,6 @@ import {
 import { Session } from '../../models/Session';
 import { AssetMarketPrice, getAssetBalancePrice, UserAsset } from '../../models/UserAsset';
 import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
-import { renderExplorerUrl } from '../../config/StaticAssets';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 // import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
@@ -25,7 +24,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import ReceiveDetail from './components/ReceiveDetail';
 import FormSend from './components/FormSend';
 import { walletService } from '../../service/WalletService';
-import { middleEllipsis } from '../../utils/utils';
+import { middleEllipsis, renderExplorerUrl } from '../../utils/utils';
 import {
   TransactionDirection,
   TransactionStatus,

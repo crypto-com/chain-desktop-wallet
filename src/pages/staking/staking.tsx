@@ -37,14 +37,13 @@ import {
   CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
   SUPPORTED_CURRENCY,
 } from '../../config/StaticConfig';
-import { renderExplorerUrl } from '../../config/StaticAssets';
 import {
   adjustedTransactionAmount,
   fromScientificNotation,
   getCurrentMinAssetAmount,
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
-import { middleEllipsis, ellipsis } from '../../utils/utils';
+import { middleEllipsis, ellipsis, renderExplorerUrl } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
 import {
   AnalyticsActions,

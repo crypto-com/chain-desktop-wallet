@@ -14,42 +14,6 @@ const checkIfTestnet = (network: Network) => {
   );
 };
 
-export const renderExplorerUrl = (config: WalletConfig | UserAssetConfig, page: string) => {
-  const { explorer, explorerUrl } = config;
-  let url = '';
-
-  if (explorer) {
-    switch (page) {
-      case 'tx':
-        url = explorer.tx;
-        break;
-      case 'address':
-        url = explorer.address;
-        break;
-      case 'validator':
-        url = explorer.validator;
-        break;
-      default:
-        url = explorer.index;
-    }
-  } else {
-    switch (page) {
-      case 'tx':
-        url = `${explorerUrl}/tx`;
-        break;
-      case 'address':
-        url = `${explorerUrl}/account`;
-        break;
-      case 'validator':
-        url = `${explorerUrl}/validator`;
-        break;
-      default:
-        url = `${explorerUrl}`;
-    }
-  }
-  return url;
-};
-
 // Every created wallet get initialized with a new CRO asset
 export const CRO_ASSET = (walletConfig: WalletConfig) => {
   const { network } = walletConfig;

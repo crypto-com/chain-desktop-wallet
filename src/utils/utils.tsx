@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { UserAssetConfig } from '../models/UserAsset';
+import { WalletConfig } from '../config/StaticConfig';
 
 export function isElectron() {
   // Renderer process
@@ -100,4 +102,40 @@ export const useWindowSize = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []); // Empty array ensures that effect is only run on mount
   return windowSize;
+};
+
+export const renderExplorerUrl = (config: WalletConfig | UserAssetConfig, page: string) => {
+  const { explorer, explorerUrl } = config;
+  let url = '';
+
+  if (explorer) {
+    switch (page) {
+      case 'tx':
+        url = explorer.tx;
+        break;
+      case 'address':
+        url = explorer.address;
+        break;
+      case 'validator':
+        url = explorer.validator;
+        break;
+      default:
+        url = explorer.index;
+    }
+  } else {
+    switch (page) {
+      case 'tx':
+        url = `${explorerUrl}/tx`;
+        break;
+      case 'address':
+        url = `${explorerUrl}/account`;
+        break;
+      case 'validator':
+        url = `${explorerUrl}/validator`;
+        break;
+      default:
+        url = `${explorerUrl}`;
+    }
+  }
+  return url;
 };

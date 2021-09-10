@@ -47,6 +47,7 @@ import {
   convertIpfsToHttp,
   sleep,
   useWindowSize,
+  renderExplorerUrl,
 } from '../../utils/utils';
 import { getUINormalScaleAmount } from '../../utils/NumberUtils';
 import {
@@ -66,7 +67,6 @@ import {
   MAX_IMAGE_SIZE,
   MAX_VIDEO_SIZE,
 } from '../../config/StaticConfig';
-import { renderExplorerUrl } from '../../config/StaticAssets';
 
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';

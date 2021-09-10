@@ -12,9 +12,8 @@ import { Session } from '../../../models/Session';
 import { UserAsset, scaledAmount } from '../../../models/UserAsset';
 import { ValidatorModel } from '../../../models/Transaction';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
-import { middleEllipsis, ellipsis } from '../../../utils/utils';
+import { middleEllipsis, ellipsis, renderExplorerUrl } from '../../../utils/utils';
 import { CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD } from '../../../config/StaticConfig';
-import { renderExplorerUrl } from '../../../config/StaticAssets';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 import ValidatorPowerPercentBar from '../../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
 
