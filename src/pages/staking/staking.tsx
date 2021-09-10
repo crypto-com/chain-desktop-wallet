@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
+import moment from 'moment';
 import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs, Typography } from 'antd';
 import { OrderedListOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -1484,7 +1485,7 @@ const StakingPage = () => {
         completionTime: dlg.completionTime,
         unbondingAmount,
         unbondingAmountWithSymbol: `${unbondingAmount} ${currentAsset.symbol}`,
-        remainingDay: '',
+        remainingDay: moment(dlg.completionTime).format('DD/MM/YYYY h:i:s'),
       };
       return data;
     });
@@ -1549,7 +1550,7 @@ const StakingPage = () => {
                       isModalVisible={isUnbondingDelegationModalVisible}
                       handleCancel={() => setIsUnbondingDelegationModalVisible(false)}
                       handleOk={() => setIsUnbondingDelegationModalVisible(false)}
-                      className="reward-modal"
+                      className="unbonding-modal"
                       footer={[]}
                       okText="OK"
                     >
