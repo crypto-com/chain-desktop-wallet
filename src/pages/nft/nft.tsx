@@ -47,7 +47,6 @@ import {
   convertIpfsToHttp,
   sleep,
   useWindowSize,
-  renderExplorerUrl,
 } from '../../utils/utils';
 import { getUINormalScaleAmount } from '../../utils/NumberUtils';
 import {
@@ -58,6 +57,7 @@ import {
   NftTransactionType,
   BroadCastResult,
 } from '../../models/Transaction';
+import { renderExplorerUrl } from '../../models/Explorer';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT,

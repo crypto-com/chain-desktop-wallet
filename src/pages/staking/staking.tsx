@@ -31,6 +31,7 @@ import {
   ValidatorModel,
   StakingTransactionData,
 } from '../../models/Transaction';
+import { renderExplorerUrl } from '../../models/Explorer';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   FIXED_DEFAULT_FEE,
@@ -43,7 +44,7 @@ import {
   getCurrentMinAssetAmount,
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
-import { middleEllipsis, ellipsis, renderExplorerUrl } from '../../utils/utils';
+import { middleEllipsis, ellipsis } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
 import {
   AnalyticsActions,

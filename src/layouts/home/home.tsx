@@ -254,7 +254,7 @@ function HomeLayout(props: HomeLayoutProps) {
             networkFee: String(wallet.config.fee.networkFee),
             gasLimit: String(wallet.config.fee.gasLimit),
             explorer: {
-              index: `${wallet.config.explorerUrl}`,
+              baseUrl: `${wallet.config.explorerUrl}`,
               tx: `${wallet.config.explorerUrl}/tx`,
               address: `${wallet.config.explorerUrl}/account`,
               validator: `${wallet.config.explorerUrl}/validator`,
