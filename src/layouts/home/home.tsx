@@ -256,9 +256,7 @@ function HomeLayout(props: HomeLayoutProps) {
             explorer: {
               index: `${wallet.config.explorerUrl}`,
               tx: `${wallet.config.explorerUrl}/tx`,
-              address: `${wallet.config.explorerUrl}/${
-                wallet.config.explorerUrl.indexOf('cronos') !== -1 ? 'address' : 'account'
-              }`,
+              address: `${wallet.config.explorerUrl}/account`,
               validator: `${wallet.config.explorerUrl}/validator`,
             },
           };

@@ -38,7 +38,7 @@ export const renderExplorerUrl = (config: WalletConfig | UserAssetConfig, page: 
         url = `${explorerUrl}/tx`;
         break;
       case 'address':
-        url = `${explorerUrl}/${explorerUrl.indexOf('cronos') !== -1 ? 'address' : 'account'}`;
+        url = `${explorerUrl}/account`;
         break;
       case 'validator':
         url = `${explorerUrl}/validator`;
