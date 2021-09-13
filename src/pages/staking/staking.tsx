@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
+import moment from 'moment';
 import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs, Typography } from 'antd';
 import { OrderedListOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -30,6 +31,7 @@ import {
   RewardTransaction,
   ValidatorModel,
   StakingTransactionData,
+  UnbondingDelegationData,
 } from '../../models/Transaction';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
@@ -62,7 +64,7 @@ import { UndelegateFormComponent } from '../home/components/UndelegateFormCompon
 import RedelegateFormComponent from '../home/components/RedelegateFormComponent';
 import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
 
-const { Header, Content, Footer } = Layout;
+const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
 const { TabPane } = Tabs;
 const layout = {
@@ -93,6 +95,16 @@ interface StakingTabularData {
   stakedAmount: string;
   validatorAddress: string;
   delegatorAddress: string;
+}
+
+interface UnbondingDelegationTabularData {
+  key: string;
+  delegatorAddress: string;
+  validatorAddress: string;
+  unbondingAmount: string;
+  unbondingAmountWithSymbol: string;
+  remainingTime: string;
+  completionTime: string;
 }
 
 const FormDelegationRequest = () => {
@@ -722,6 +734,7 @@ const FormDelegationOperations = () => {
       const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
         currentSession.wallet.identifier,
       );
+
       const stakingTabularData = currentWalletAsset
         ? convertDelegations(allDelegations, currentWalletAsset)
         : [];
@@ -1410,17 +1423,101 @@ const FormWithdrawStakingReward = () => {
 
 const StakingPage = () => {
   const currentSession = useRecoilValue(sessionState);
+  const userAsset = useRecoilValue(walletAssetState);
+  const fetchingDB = useRecoilValue(fetchingDBState);
+  const [isUnbondingDelegationModalVisible, setIsUnbondingDelegationModalVisible] = useState(false);
+  // eslint-disable-next-line
+  const [unbondingDelegations, setUnbondingDelegations] = useState<
+    UnbondingDelegationTabularData[]
+  >([]);
   const analyticsService = new AnalyticsService(currentSession);
   const didMountRef = useRef(false);
 
-  const [t] = useTranslation();
+  const [t, i18n] = useTranslation();
+
+  const undelegatePeriod = currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
+
+  const unbondingDelegationColumns = [
+    {
+      title: t('staking.modal3.table.validatorAddress'),
+      dataIndex: 'validatorAddress',
+      key: 'validatorAddress',
+      render: text => (
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+        >
+          {text}
+        </a>
+      ),
+    },
+    {
+      title: t('staking.modal3.table.unbondingAmount'),
+      dataIndex: 'unbondingAmount',
+      key: 'unbondingAmount',
+      render: text => {
+        return <>{text}</>;
+      },
+    },
+    {
+      title: t('staking.modal3.table.remainingTime'),
+      dataIndex: 'remainingTime',
+      key: 'remainingTime',
+      render: text => {
+        return <>{text}</>;
+      },
+    },
+    {
+      title: t('staking.modal3.table.completionTime'),
+      dataIndex: 'completionTime',
+      key: 'completionTime',
+      render: text => {
+        return <>{text}</>;
+      },
+    },
+  ];
+
+  const convertUnbondingDelegations = (
+    allUnbondingDelegations: UnbondingDelegationData[],
+    currentAsset: UserAsset,
+  ) => {
+    const currentLanguageLocale = i18n.language.replace(/([A-Z])/, '-$1').toLowerCase();
+
+    return allUnbondingDelegations.map(dlg => {
+      const unbondingAmount = getUIDynamicAmount(dlg.unbondingAmount, currentAsset);
+      const data: UnbondingDelegationTabularData = {
+        key: dlg.validatorAddress + dlg.unbondingAmount,
+        delegatorAddress: dlg.delegatorAddress,
+        validatorAddress: dlg.validatorAddress,
+        completionTime: new Date(dlg.completionTime).toString(),
+        unbondingAmount,
+        unbondingAmountWithSymbol: `${unbondingAmount} ${currentAsset.symbol}`,
+        remainingTime: moment(dlg.completionTime)
+          .locale(currentLanguageLocale)
+          .fromNow(true),
+      };
+      return data;
+    });
+    // .filter(dlg => Number(dlg.stakedAmount) > 0);
+  };
 
   useEffect(() => {
+    const syncUnbondingDelegationsData = async () => {
+      const allUnbonding = await walletService.retrieveAllUnbondingDelegations(
+        currentSession.wallet.identifier,
+      );
+      const unbondingDelegationTabularData = convertUnbondingDelegations(allUnbonding, userAsset);
+      setUnbondingDelegations(unbondingDelegationTabularData);
+    };
+
+    syncUnbondingDelegationsData();
+
     if (!didMountRef.current) {
       didMountRef.current = true;
       analyticsService.logPage('Staking');
     }
-  }, []);
+  }, [fetchingDB]);
 
   return (
     <Layout className="site-layout">
@@ -1447,7 +1544,46 @@ const StakingPage = () => {
           <TabPane tab={t('staking.tab3')} key="3">
             <div className="site-layout-background stake-content">
               <div className="container">
-                <div className="description">{t('staking.description3')}</div>
+                <Layout>
+                  <Sider width="60%">
+                    <div className="description">{t('staking.description3')}</div>
+                  </Sider>
+                  <Content>
+                    <div className="view-unstaking">
+                      <a
+                        onClick={() => {
+                          setIsUnbondingDelegationModalVisible(true);
+                        }}
+                      >
+                        {t('staking.modal3.button')}
+                      </a>
+                    </div>
+                    <ModalPopup
+                      isModalVisible={isUnbondingDelegationModalVisible}
+                      handleCancel={() => setIsUnbondingDelegationModalVisible(false)}
+                      handleOk={() => setIsUnbondingDelegationModalVisible(false)}
+                      className="unbonding-modal"
+                      footer={[]}
+                      okText="OK"
+                    >
+                      <>
+                        <div className="title">{t('staking.modal3.title')}</div>
+                        <div className="description">
+                          {t('staking.modal3.description', { unbondingPeriod: undelegatePeriod })}
+                        </div>
+                        <Table
+                          locale={{
+                            triggerDesc: t('general.table.triggerDesc'),
+                            triggerAsc: t('general.table.triggerAsc'),
+                            cancelSort: t('general.table.cancelSort'),
+                          }}
+                          columns={unbondingDelegationColumns}
+                          dataSource={unbondingDelegations}
+                        />
+                      </>
+                    </ModalPopup>
+                  </Content>
+                </Layout>
                 <FormDelegationOperations />
               </div>
             </div>

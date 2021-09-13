@@ -1,9 +1,19 @@
 .stake-content {
   padding: 24px;
   .container {
+    .ant-layout,
+    .ant-layout-sider {
+      background: @white;
+    }
+    .ant-layout-content {
+      margin: 0;
+    }
     .description {
       margin-bottom: 20px;
       color: @font-color;
+    }
+    .view-unstaking {
+      text-align: right;
     }
     .amount {
       .ant-form-item {
@@ -84,4 +94,8 @@
       display: none;
     }
   }
+}
+
+.unbonding-modal {
+  width: 1000px !important;
 }

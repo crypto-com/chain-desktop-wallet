@@ -38,6 +38,13 @@ export interface StakingTransactionData extends TransactionData {
   stakedAmount: string;
 }
 
+export interface UnbondingDelegationData {
+  delegatorAddress: string;
+  validatorAddress: string;
+  unbondingAmount: string;
+  completionTime: string;
+}
+
 export interface NftTransactionData {
   transactionHash: string;
   data: {
@@ -67,6 +74,12 @@ export interface StakingTransactionList {
 
 export interface RewardTransactionList {
   transactions: Array<RewardTransaction>;
+  walletId: string;
+}
+
+export interface UnbondingDelegationList {
+  delegations: Array<UnbondingDelegationData>;
+  totalBalance: string;
   walletId: string;
 }
 

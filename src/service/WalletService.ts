@@ -51,6 +51,8 @@ import {
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
+  UnbondingDelegationData,
+  UnbondingDelegationList,
   TransactionStatus,
   TransferTransactionData,
   TransferTransactionList,
@@ -321,6 +323,7 @@ class WalletService {
     await Promise.all([
       await this.fetchAndUpdateBalances(currentSession),
       await this.fetchAndSaveDelegations(nodeRpc, currentSession),
+      await this.fetchAndSaveUnbondingDelegations(nodeRpc, currentSession),
     ]);
 
     return broadCastResult;
@@ -879,6 +882,7 @@ class WalletService {
 
     await Promise.all([
       this.fetchAndSaveDelegations(nodeRpc, currentSession),
+      this.fetchAndSaveUnbondingDelegations(nodeRpc, currentSession),
       this.fetchAndSaveRewards(nodeRpc, currentSession),
       this.fetchAndSaveTransfers(currentSession),
       this.fetchAndSaveValidators(currentSession),
@@ -1027,6 +1031,22 @@ class WalletService {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_DELEGATIONS', e);
+    }
+  }
+
+  public async fetchAndSaveUnbondingDelegations(nodeRpc: NodeRpcService, currentSession: Session) {
+    try {
+      const unbondingDelegations = await nodeRpc.fetchUnbondingDelegationBalance(
+        currentSession.wallet.address,
+      );
+      await this.saveUnbondingDelegationsList({
+        totalBalance: unbondingDelegations.totalBalance,
+        delegations: unbondingDelegations.unbondingDelegations,
+        walletId: currentSession.wallet.identifier,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_UNBONDING_DELEGATIONS', e);
     }
   }
 
@@ -1218,6 +1238,10 @@ class WalletService {
     return this.storageService.saveRewardList(rewardTransactions);
   }
 
+  public async saveUnbondingDelegationsList(unbondingDelegations: UnbondingDelegationList) {
+    return this.storageService.saveUnbondingDelegations(unbondingDelegations);
+  }
+
   public async saveTransfers(rewardTransactions: TransferTransactionList) {
     return this.storageService.saveTransferTransactions(rewardTransactions);
   }
@@ -1247,6 +1271,23 @@ class WalletService {
     return rewardTransactionList.transactions.map(data => {
       const rewardTransaction: RewardTransaction = { ...data };
       return rewardTransaction;
+    });
+  }
+
+  public async retrieveAllUnbondingDelegations(
+    walletId: string,
+  ): Promise<UnbondingDelegationData[]> {
+    const unbondingDelegationList: UnbondingDelegationList = await this.storageService.retrieveAllUnbondingDelegations(
+      walletId,
+    );
+
+    if (!unbondingDelegationList) {
+      return [];
+    }
+
+    return unbondingDelegationList.delegations.map(data => {
+      const unbondingDelegation: UnbondingDelegationData = { ...data };
+      return unbondingDelegation;
     });
   }
 

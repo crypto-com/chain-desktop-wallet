@@ -24,6 +24,22 @@
         "retry": "Retry",
         "connect": "Connect",
         "seeAll": "See All",
+        "past": "ago",
+        "future": "in",
+        "years": "Years",
+        "year": "a Year",
+        "months": "Months",
+        "month": "a Month",
+        "weeks": "Weeks",
+        "week": "a Week",
+        "days": "Days",
+        "day": "a Day",
+        "hours": "Hours",
+        "hour": "an Hour",
+        "minutes": "Minutes",
+        "minute": "a minute",
+        "seconds": "Seconds",
+        "second": "a few seconds",
         "addressValidator": {
           "reason1": "Invalid",
           "reason2": "address provided"
@@ -509,7 +525,9 @@
             "name": "Asset",
             "price": "Price",
             "amount": "Balance",
-            "value": "Value"
+            "value": "Value",
+            "actionSend": "Send",
+            "actionReceive": "Receive"
           }
         },
         "moreMenu": {
@@ -578,6 +596,17 @@
           "label1": "Sender Address",
           "label2": "Withdraw Reward From Validator",
           "label3": "Rewards"
+        },
+        "modal3": {
+          "title": "Unbonding Delegation",
+          "description": "Your unstaked assets will be available to you after a {{ unbondingPeriod }} day unbonding period, as enforced by the Crypto.org Chain network.",
+          "button": "View Unbonding Delegation",
+          "table": {
+            "validatorAddress": "Validator Address",
+            "unbondingAmount": "Unbonding Amount",
+            "remainingTime": "Remaining Time ",
+            "completionTime": "Completion Time"
+          }
         }
       },
       "governance": {
@@ -842,6 +871,22 @@
         "retry": "重試",
         "connect": "連接",
         "seeAll": "所有",
+        "past": "以前",
+        "future": "未來",
+        "years": "年",
+        "year": "1年",
+        "months": "月",
+        "month": "1月",
+        "weeks": "星期",
+        "week": "1星期",
+        "days": "日",
+        "day": "1日",
+        "hours": "小時",
+        "hour": "1小時",
+        "minutes": "分鐘",
+        "minute": "1分鐘",
+        "seconds": "秒",
+        "second": "幾秒",
         "addressValidator": {
           "reason1": "無效的",
           "reason2": "地址"
@@ -1327,7 +1372,9 @@
             "name": "資金",
             "price": "價格",
             "amount": "餘額",
-            "value": "市值"
+            "value": "市值",
+            "actionSend": "發送",
+            "actionReceive": "接收"
           }
         },
         "moreMenu": {
@@ -1396,6 +1443,17 @@
           "label1": "發送人地址",
           "label2": "從驗證者提取獎勵",
           "label3": "獎勵"
+        },
+        "modal3": {
+          "title": "贖回中的委託",
+          "description": "根據 Crypto.org Chain 的規定，你的委託需要經過 {{ unbondingPeriod }} 日才可以完成贖回過程。",
+          "button": "查看贖回中的委託",
+          "table": {
+            "validatorAddress": "驗證者地址",
+            "unbondingAmount": "贖回委託",
+            "remainingTime": "尚餘時間",
+            "completionTime": "完成時間"
+          }
         }
       },
       "governance": {
@@ -1659,6 +1717,22 @@
         "retry": "重试",
         "connect": "连接",
         "seeAll": "所有",
+        "past": "以前",
+        "future": "未来",
+        "years": "年",
+        "year": "1年",
+        "months": "月",
+        "month": "1月",
+        "weeks": "星期",
+        "week": "1星期",
+        "days": "天",
+        "day": "1天",
+        "hours": "小時",
+        "hour": "1小時",
+        "minutes": "分钟",
+        "minute": "1分钟",
+        "seconds": "秒",
+        "second": "几秒",
         "addressValidator": {
           "reason1": "无效的",
           "reason2": "地址"
@@ -2144,7 +2218,9 @@
             "name": "资金",
             "price": "价格",
             "amount": "余额",
-            "value": "市值"
+            "value": "市值",
+            "actionSend": "发送",
+            "actionReceive": "接收"
           }
         },
         "moreMenu": {
@@ -2213,6 +2289,17 @@
           "label1": "发送人地址",
           "label2": "从验证者提取奖励",
           "label3": "奖励"
+        },
+        "modal3": {
+          "title": "赎回中的委托",
+          "description": "根据 Crypto.org Chain 的规定，你的委托需要经过 {{ unbondingPeriod }} 日才可以完成赎回过程。",
+          "button": "查看赎回中的委",
+          "table": {
+            "validatorAddress": "验证者地址",
+            "unbondingAmount": "赎回委托",
+            "remainingTime": "尚余时间",
+            "completionTime": "完成时间"
+          }
         }
       },
       "governance": {
@@ -2597,6 +2684,22 @@
         "retry": "재시도",
         "connect": "연결",
         "seeAll": "모두 보기",
+        "past": "전에",
+        "future": "미래",
+        "years": "년",
+        "year": "1년",
+        "months": "월",
+        "month": "1월",
+        "weeks": "주",
+        "week": "1주",
+        "days": "일",
+        "day": "1일",
+        "hours": "시간",
+        "hour": "1시간",
+        "minutes": "분",
+        "minute": "1분",
+        "seconds": "초",
+        "second": "초",
         "addressValidator": {
           "reason1": "무효",
           "reason2": "주소 필요"
@@ -3080,7 +3183,9 @@
             "name": "금액",
             "price": "가격",
             "amount": "금액",
-            "value": "시장 가치"
+            "value": "시장 가치",
+            "actionSend": "전송",
+            "actionReceive": "수신"
           }
         },
         "moreMenu": {
@@ -3476,6 +3581,7 @@
         "close": "Kapat",
         "retry": "Tekrar dene",
         "connect": "Bağlan",
+        "seeAll": "Hepsini Gör",
         "addressValidator": {
           "reason1": "Geçersiz",
           "reason2": "Adres sağlandı"
@@ -3524,6 +3630,12 @@
         },
         "successModalPopup": {
           "title": "İşlem başarılı!",
+          "timeout": {
+            "description": "İşlem zaman aşımına ugradı ancak daha sonraki bloklarda yer alacak."
+          },
+          "nodeConnect": {
+            "description": "Node bağlandı!"
+          },
           "createWallet": {
             "description": "Cüzdan Oluşturuldu!",
             "button": "Cüzdan Oluştur"
@@ -3580,6 +3692,7 @@
         "cannot0": "enweghị ike ịbụ 0",
         "validator": "validator",
         "receiving": "na-anata",
+        "available": "di",
         "close": "mmechie",
         "connect": "jikọọ"
       },
@@ -4017,6 +4130,14 @@
       },
       "receive": {
         "title": "Empfangen"
+      },
+      "assets": {
+        "assetList": {
+          "table": {
+            "actionSend": "Absenden",
+            "actionReceive": "Empfangen"
+          }
+        }
       },
       "staking": {
         "validatorList": {
