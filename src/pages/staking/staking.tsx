@@ -1424,6 +1424,7 @@ const FormWithdrawStakingReward = () => {
 const StakingPage = () => {
   const currentSession = useRecoilValue(sessionState);
   const userAsset = useRecoilValue(walletAssetState);
+  const fetchingDB = useRecoilValue(fetchingDBState);
   const [isUnbondingDelegationModalVisible, setIsUnbondingDelegationModalVisible] = useState(false);
   // eslint-disable-next-line
   const [unbondingDelegations, setUnbondingDelegations] = useState<
@@ -1506,12 +1507,13 @@ const StakingPage = () => {
       setUnbondingDelegations(unbondingDelegationTabularData);
     };
 
+    syncUnbondingDelegationsData();
+
     if (!didMountRef.current) {
       didMountRef.current = true;
-      syncUnbondingDelegationsData();
       analyticsService.logPage('Staking');
     }
-  }, []);
+  }, [fetchingDB]);
 
   return (
     <Layout className="site-layout">
