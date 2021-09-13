@@ -1458,15 +1458,15 @@ const StakingPage = () => {
       },
     },
     {
-      title: 'Days Remaining',
-      dataIndex: 'completionTime',
-      key: 'completionTime',
+      title: 'Time Remaining',
+      dataIndex: 'remainingDay',
+      key: 'remainingDay',
       render: text => {
         return <>{text}</>;
       },
     },
     {
-      title: 'Time',
+      title: 'Completion Time',
       dataIndex: 'completionTime',
       key: 'completionTime',
       render: text => {
@@ -1485,10 +1485,10 @@ const StakingPage = () => {
         key: dlg.validatorAddress + dlg.unbondingAmount,
         delegatorAddress: dlg.delegatorAddress,
         validatorAddress: dlg.validatorAddress,
-        completionTime: dlg.completionTime,
+        completionTime: new Date(dlg.completionTime).toString(),
         unbondingAmount,
         unbondingAmountWithSymbol: `${unbondingAmount} ${currentAsset.symbol}`,
-        remainingDay: moment(dlg.completionTime).format('DD/MM/YYYY h:i:s'),
+        remainingDay: moment(dlg.completionTime).fromNow(true),
       };
       return data;
     });
