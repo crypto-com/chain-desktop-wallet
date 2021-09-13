@@ -1433,7 +1433,7 @@ const StakingPage = () => {
   const analyticsService = new AnalyticsService(currentSession);
   const didMountRef = useRef(false);
 
-  const [t] = useTranslation();
+  const [t, i18n] = useTranslation();
 
   const undelegatePeriod = currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
 
@@ -1482,6 +1482,8 @@ const StakingPage = () => {
     allUnbondingDelegations: UnbondingDelegationData[],
     currentAsset: UserAsset,
   ) => {
+    const currentLanguageLocale = i18n.language.replace(/([A-Z])/, '-$1').toLowerCase();
+
     return allUnbondingDelegations.map(dlg => {
       const unbondingAmount = getUIDynamicAmount(dlg.unbondingAmount, currentAsset);
       const data: UnbondingDelegationTabularData = {
@@ -1491,7 +1493,9 @@ const StakingPage = () => {
         completionTime: new Date(dlg.completionTime).toString(),
         unbondingAmount,
         unbondingAmountWithSymbol: `${unbondingAmount} ${currentAsset.symbol}`,
-        remainingTime: moment(dlg.completionTime).fromNow(true),
+        remainingTime: moment(dlg.completionTime)
+          .locale(currentLanguageLocale)
+          .fromNow(true),
       };
       return data;
     });
