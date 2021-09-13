@@ -103,7 +103,7 @@ interface UnbondingDelegationTabularData {
   validatorAddress: string;
   unbondingAmount: string;
   unbondingAmountWithSymbol: string;
-  remainingDay: string;
+  remainingTime: string;
   completionTime: string;
 }
 
@@ -1434,9 +1434,11 @@ const StakingPage = () => {
 
   const [t] = useTranslation();
 
+  const undelegatePeriod = currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
+
   const unbondingDelegationColumns = [
     {
-      title: 'Validator Address',
+      title: t('staking.modal3.table.validatorAddress'),
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
       render: text => (
@@ -1450,7 +1452,7 @@ const StakingPage = () => {
       ),
     },
     {
-      title: 'Unbonding Amount',
+      title: t('staking.modal3.table.unbondingAmount'),
       dataIndex: 'unbondingAmount',
       key: 'unbondingAmount',
       render: text => {
@@ -1458,15 +1460,15 @@ const StakingPage = () => {
       },
     },
     {
-      title: 'Time Remaining',
-      dataIndex: 'remainingDay',
-      key: 'remainingDay',
+      title: t('staking.modal3.table.remainingTime'),
+      dataIndex: 'remainingTime',
+      key: 'remainingTime',
       render: text => {
         return <>{text}</>;
       },
     },
     {
-      title: 'Completion Time',
+      title: t('staking.modal3.table.completionTime'),
       dataIndex: 'completionTime',
       key: 'completionTime',
       render: text => {
@@ -1488,7 +1490,7 @@ const StakingPage = () => {
         completionTime: new Date(dlg.completionTime).toString(),
         unbondingAmount,
         unbondingAmountWithSymbol: `${unbondingAmount} ${currentAsset.symbol}`,
-        remainingDay: moment(dlg.completionTime).fromNow(true),
+        remainingTime: moment(dlg.completionTime).fromNow(true),
       };
       return data;
     });
@@ -1547,7 +1549,7 @@ const StakingPage = () => {
                           setIsUnbondingDelegationModalVisible(true);
                         }}
                       >
-                        View Unbonding Status
+                        {t('staking.modal3.button')}
                       </a>
                     </div>
                     <ModalPopup
@@ -1559,8 +1561,10 @@ const StakingPage = () => {
                       okText="OK"
                     >
                       <>
-                        <div className="title">Unbonding Delegation Status</div>
-                        {/* <div className="description">{t('staking.modal2.description')}</div> */}
+                        <div className="title">{t('staking.modal3.title')}</div>
+                        <div className="description">
+                          {t('staking.modal3.description', { unbondingPeriod: undelegatePeriod })}
+                        </div>
                         <Table
                           locale={{
                             triggerDesc: t('general.table.triggerDesc'),
