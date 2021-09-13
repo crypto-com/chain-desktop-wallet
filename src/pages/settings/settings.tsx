@@ -32,6 +32,7 @@ import {
   walletAllAssetsState,
   walletListState,
 } from '../../recoil/atom';
+import { setMomentLocale } from '../../language/I18n';
 import { walletService } from '../../service/WalletService';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import {
@@ -375,6 +376,7 @@ function MetaInfoComponent() {
     setDefaultLanguageState(value!.toString());
     i18n.changeLanguage(value!.toString());
     generalConfigService.setLanguage(value!.toString());
+    setMomentLocale();
   };
 
   const onSwitchCurrency = async value => {

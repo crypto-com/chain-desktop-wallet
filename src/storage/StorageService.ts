@@ -22,6 +22,7 @@ import {
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
+  UnbondingDelegationList,
   TransferTransactionList,
   ValidatorList,
 } from '../models/Transaction';
@@ -288,12 +289,27 @@ export class StorageService {
     return this.db.rewardStore.insert(rewardTransactions);
   }
 
+  public async saveUnbondingDelegations(unbondingDelegations: UnbondingDelegationList) {
+    if (unbondingDelegations.delegations.length === 0) {
+      return Promise.resolve();
+    }
+    await this.db.unbondingDelegationStore.remove(
+      { walletId: unbondingDelegations.walletId },
+      { multi: true },
+    );
+    return this.db.unbondingDelegationStore.insert(unbondingDelegations);
+  }
+
   public async retrieveAllStakingTransactions(walletId: string) {
     return this.db.stakingStore.findOne<StakingTransactionList>({ walletId });
   }
 
   public async retrieveAllRewards(walletId: string) {
     return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
+  }
+
+  public async retrieveAllUnbondingDelegations(walletId: string) {
+    return this.db.unbondingDelegationStore.findOne<UnbondingDelegationList>({ walletId });
   }
 
   public async saveTransferTransactions(transferTransactionList: TransferTransactionList) {
