@@ -42,6 +42,7 @@ export const CRO_ASSET = (walletConfig: WalletConfig) => {
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
     unbondingBalance: '0',
+    rewardsBalance: '0',
     decimals: 8,
     assetType: UserAssetType.TENDERMINT,
     isSecondaryAsset: false,
@@ -78,6 +79,7 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
     unbondingBalance: '0',
+    rewardsBalance: '0',
     decimals: 18,
     assetType: UserAssetType.EVM,
     isSecondaryAsset: true,

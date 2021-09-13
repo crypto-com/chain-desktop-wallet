@@ -15,7 +15,7 @@ chai.use(require('chai-as-promised'));
 
 /* eslint-disable @typescript-eslint/no-unused-vars,class-methods-use-this */
 class MockNodeRpcService implements INodeRpcService {
-  fetchStakingRewards(address: string, assetSymbol: string): Promise<RewardTransaction[]> {
+  fetchStakingRewardsBalance(address: string, assetSymbol: string): Promise<RewardTransaction[]> {
     throw new Error('Method not implemented.');
   }
 

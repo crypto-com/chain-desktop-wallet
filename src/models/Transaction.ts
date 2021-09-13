@@ -74,6 +74,7 @@ export interface StakingTransactionList {
 
 export interface RewardTransactionList {
   transactions: Array<RewardTransaction>;
+  totalBalance: string;
   walletId: string;
 }
 

@@ -202,6 +202,7 @@ describe('Testing Full Storage Service', () => {
       walletId: WALLET_ID,
       stakedBalance: '0',
       unbondingBalance: '0',
+      rewardsBalance: '0',
     };
 
     await mockWalletStore.saveAsset(asset);

@@ -817,9 +817,14 @@ class WalletService {
                 // Handling legacy wallets which had wallet.address
                 asset.address || currentSession.wallet.address,
               );
+              asset.rewardsBalance = await nodeRpc.loadStakingRewardsBalance(
+                // Handling legacy wallets which had wallet.address
+                asset.address || currentSession.wallet.address,
+                baseDenomination,
+              );
               // eslint-disable-next-line no-console
               console.log(
-                `${asset.symbol}: Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance} - Unbonding: ${asset.unbondingBalance}- ${asset.address}`,
+                `${asset.symbol}: Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance} - Unbonding: ${asset.unbondingBalance} - Rewards: ${asset.rewardsBalance} - ${asset.address}`,
               );
             } catch (e) {
               // eslint-disable-next-line no-console
@@ -1007,12 +1012,13 @@ class WalletService {
 
   public async fetchAndSaveRewards(nodeRpc: NodeRpcService, currentSession: Session) {
     try {
-      const rewards = await nodeRpc.fetchStakingRewards(
+      const rewards = await nodeRpc.fetchStakingRewardsBalance(
         currentSession.wallet.address,
         currentSession.wallet.config.network.coin.baseDenom,
       );
       await this.saveRewards({
-        transactions: rewards,
+        totalBalance: rewards.totalBalance,
+        transactions: rewards.transactions,
         walletId: currentSession.wallet.identifier,
       });
     } catch (e) {

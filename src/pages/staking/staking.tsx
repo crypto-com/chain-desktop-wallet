@@ -24,10 +24,12 @@ import {
   getAssetBalancePrice,
   getAssetStakingBalancePrice,
   getAssetUnbondingBalancePrice,
+  getAssetRewardsBalancePrice,
   scaledAmount,
   scaledBalance,
   scaledStakingBalance,
   scaledUnbondingBalance,
+  scaledRewardsBalance,
   UserAsset,
 } from '../../models/UserAsset';
 import {
@@ -1571,6 +1573,22 @@ const StakingPage = () => {
               {userAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
                     getAssetUnbondingBalancePrice(userAsset, marketData),
+                  ).format('0,0.00')} ${marketData?.currency}
+                  `
+                : ''}
+            </div>
+          </div>
+          <div className="balance">
+            <div className="title">TOTAL REWARDS</div>
+            {userAsset && (
+              <div className="quantity">
+                {numeral(scaledRewardsBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
+              </div>
+            )}
+            <div className="fiat">
+              {userAsset && marketData && marketData.price
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetRewardsBalancePrice(userAsset, marketData),
                   ).format('0,0.00')} ${marketData?.currency}
                   `
                 : ''}
