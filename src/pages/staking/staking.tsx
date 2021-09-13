@@ -1451,6 +1451,7 @@ const StakingPage = () => {
     },
     {
       title: 'Unbonding Amount',
+      dataIndex: 'unbondingAmount',
       key: 'unbondingAmount',
       render: text => {
         return <>{text}</>;
@@ -1458,6 +1459,7 @@ const StakingPage = () => {
     },
     {
       title: 'Days Remaining',
+      dataIndex: 'completionTime',
       key: 'completionTime',
       render: text => {
         return <>{text}</>;
@@ -1465,6 +1467,7 @@ const StakingPage = () => {
     },
     {
       title: 'Time',
+      dataIndex: 'completionTime',
       key: 'completionTime',
       render: text => {
         return <>{text}</>;
@@ -1497,7 +1500,8 @@ const StakingPage = () => {
       const allUnbonding = await walletService.retrieveAllUnbondingDelegations(
         currentSession.wallet.identifier,
       );
-      setUnbondingDelegations(convertUnbondingDelegations(allUnbonding, userAsset));
+      const unbondingDelegationTabularData = convertUnbondingDelegations(allUnbonding, userAsset);
+      setUnbondingDelegations(unbondingDelegationTabularData);
     };
 
     if (!didMountRef.current) {
