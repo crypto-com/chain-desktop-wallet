@@ -813,9 +813,13 @@ class WalletService {
                 asset.address || currentSession.wallet.address,
                 baseDenomination,
               );
+              asset.unbondingBalance = await nodeRpc.loadUnbondingBalance(
+                // Handling legacy wallets which had wallet.address
+                asset.address || currentSession.wallet.address,
+              );
               // eslint-disable-next-line no-console
               console.log(
-                `${asset.symbol}: Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance} - ${asset.address}`,
+                `${asset.symbol}: Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance} - Unbonding: ${asset.unbondingBalance}- ${asset.address}`,
               );
             } catch (e) {
               // eslint-disable-next-line no-console

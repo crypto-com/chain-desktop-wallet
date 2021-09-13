@@ -35,6 +35,8 @@ export interface UserAsset {
 
   stakedBalance: string;
 
+  unbondingBalance: string;
+
   walletId: string;
 
   icon_url: string;
@@ -102,6 +104,10 @@ export const scaledStakingBalance = (asset: UserAsset) => {
   return getUINormalScaleAmount(asset.stakedBalance, asset.decimals);
 };
 
+export const scaledUnbondingBalance = (asset: UserAsset) => {
+  return getUINormalScaleAmount(asset.unbondingBalance, asset.decimals);
+};
+
 export const getAssetPriceIdFrom = (assetSymbol: string, currency: string) => {
   return `${assetSymbol}-${currency}`.toUpperCase();
 };
@@ -127,6 +133,12 @@ export const getAssetAmountInFiat = (amount: string, marketPrice: AssetMarketPri
 
 export const getAssetStakingBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
   const bigAsset = new Big(scaledStakingBalance(asset));
+  const bigMarketPrice = new Big(marketPrice.price);
+  return bigAsset.times(bigMarketPrice).toFixed(2);
+};
+
+export const getAssetUnbondingBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
+  const bigAsset = new Big(scaledUnbondingBalance(asset));
   const bigMarketPrice = new Big(marketPrice.price);
   return bigAsset.times(bigMarketPrice).toFixed(2);
 };

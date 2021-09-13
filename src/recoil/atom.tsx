@@ -23,6 +23,7 @@ const defaultAsset: UserAsset = {
   name: 'default',
   balance: '0',
   stakedBalance: '0',
+  unbondingBalance: '0',
   walletId: '0',
   icon_url: '',
   description: 'Default Asset',

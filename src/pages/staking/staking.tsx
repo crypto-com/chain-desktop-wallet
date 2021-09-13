@@ -23,9 +23,11 @@ import {
   getAssetAmountInFiat,
   getAssetBalancePrice,
   getAssetStakingBalancePrice,
+  getAssetUnbondingBalancePrice,
   scaledAmount,
   scaledBalance,
   scaledStakingBalance,
+  scaledUnbondingBalance,
   UserAsset,
 } from '../../models/UserAsset';
 import {
@@ -1560,19 +1562,18 @@ const StakingPage = () => {
           </div>
           <div className="balance">
             <div className="title">UNBONDING CRO BALANCE</div>
-            {/* {userAsset && (
+            {userAsset && (
               <div className="quantity">
-                {numeral(scaledStakingBalance(userAsset)).format('0,0.0000')}{' '}
-                {userAsset?.symbol}
+                {numeral(scaledUnbondingBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
               </div>
-            )} */}
+            )}
             <div className="fiat">
-              {/* {defaultWalletAsset && marketData && marketData.price
+              {userAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetStakingBalancePrice(defaultWalletAsset, marketData),
+                    getAssetUnbondingBalancePrice(userAsset, marketData),
                   ).format('0,0.00')} ${marketData?.currency}
                   `
-                : ''} */}
+                : ''}
             </div>
           </div>
         </div>

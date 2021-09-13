@@ -209,6 +209,11 @@ export class NodeRpcService implements INodeRpcService {
     return delegationList.totalBalance;
   }
 
+  public async loadUnbondingBalance(address: string): Promise<string> {
+    const unbondingDelegationList = await this.fetchUnbondingDelegationBalance(address);
+    return unbondingDelegationList.totalBalance;
+  }
+
   // eslint-disable-next-line class-methods-use-this
   public async loadLatestTally(proposalID: string): Promise<FinalTallyResult | null> {
     try {
@@ -389,6 +394,7 @@ export class NodeRpcService implements INodeRpcService {
             mainnetSymbol: ibcDenom,
             name: ibcDenom,
             stakedBalance: '0',
+            unbondingBalance: '0',
             symbol: ibcDenom,
             walletId: session.wallet.identifier,
             ibcDenomHash,
