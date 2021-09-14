@@ -71,7 +71,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
   const assetAddress = (asset, _session) => {
     const { assetType, address } = asset;
     const { wallet } = _session;
-    // For Ledger
+    // TO-DO Missing CRONOS support for Ledger
     if (wallet.walletType === LEDGER_WALLET_TYPE) {
       return wallet.address;
     }
