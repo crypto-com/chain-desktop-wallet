@@ -2,8 +2,19 @@ import React, { useEffect, useState, useRef } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
 import moment from 'moment';
-import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs, Typography } from 'antd';
-import { OrderedListOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  InputNumber,
+  Layout,
+  Table,
+  Tabs,
+  Typography,
+  Tooltip,
+} from 'antd';
+import { OrderedListOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
@@ -1621,7 +1632,7 @@ const StakingPage = () => {
                   <div className="upper-container">
                     <div className="title">Rewards</div>
                     <div className="my-total-rewards balance">
-                      <div className="title">TOTAL REWARDS</div>
+                      <div className="title">MY TOTAL REWARDS</div>
                       {userAsset && (
                         <div className="quantity">
                           {numeral(scaledRewardsBalance(userAsset)).format('0,0.0000')}{' '}
@@ -1642,7 +1653,17 @@ const StakingPage = () => {
                     {userAsset && (
                       <>
                         <div className="balance">
-                          <div className="title">CLAIMED REWARDS</div>
+                          <div className="title">
+                            <span>CLAIMED REWARDS</span>
+                            <Tooltip
+                              placement="top"
+                              title="All staking rewards that have been withdrawn and deposited to your wallet"
+                            >
+                              <ExclamationCircleOutlined
+                                style={{ color: '#1199fa', marginLeft: '5px' }}
+                              />
+                            </Tooltip>
+                          </div>
                           {userAsset && (
                             <div className="quantity">
                               {numeral(scaledAmountByAsset(claimedRewards, userAsset)).format(
@@ -1664,7 +1685,17 @@ const StakingPage = () => {
                           </div>
                         </div>
                         <div className="balance">
-                          <div className="title">ESTIMATED REWARDS</div>
+                          <div className="title">
+                            <span>ESTIMATED REWARDS</span>
+                            <Tooltip
+                              placement="top"
+                              title="Total staking rewards accumulated from all your stakings"
+                            >
+                              <ExclamationCircleOutlined
+                                style={{ color: '#1199fa', marginLeft: '5px' }}
+                              />
+                            </Tooltip>
+                          </div>
                           {userAsset && (
                             <div className="quantity">
                               {numeral(scaledAmountByAsset(estimatedRewards, userAsset)).format(
@@ -1686,7 +1717,17 @@ const StakingPage = () => {
                           </div>
                         </div>
                         <div className="balance">
-                          <div className="title">ESTIMATED TOTAL APY</div>
+                          <div className="title">
+                            <span>ESTIMATED TOTAL APY</span>
+                            <Tooltip
+                              placement="top"
+                              title="A percentage rate reflecting the total staking rewards projected to be earned over an annual period, based on all your stakings"
+                            >
+                              <ExclamationCircleOutlined
+                                style={{ color: '#1199fa', marginLeft: '5px' }}
+                              />
+                            </Tooltip>
+                          </div>
                           <div className="quantity">{`${estimatedApy}%`}</div>
                         </div>
                       </>
