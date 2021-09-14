@@ -98,6 +98,10 @@ export const scaledAmount = (baseAmount: string, decimals: number) => {
   return getUINormalScaleAmount(baseAmount, decimals);
 };
 
+export const scaledAmountByAsset = (baseAmount: string, asset: UserAsset) => {
+  return getUINormalScaleAmount(baseAmount, asset.decimals);
+};
+
 export const scaledBalance = (asset: UserAsset) => {
   return getUINormalScaleAmount(asset.balance, asset.decimals);
 };

@@ -75,6 +75,9 @@ export interface StakingTransactionList {
 export interface RewardTransactionList {
   transactions: Array<RewardTransaction>;
   totalBalance: string;
+  claimedRewardsBalance?: string;
+  estimatedRewardsBalance?: string;
+  estimatedApy?: string;
   walletId: string;
 }
 
@@ -120,6 +123,13 @@ export interface RewardTransaction {
   delegatorAddress: string;
   validatorAddress: string;
   amount: string;
+}
+
+export interface RewardsBalances {
+  claimedRewardsBalance: string;
+  estimatedApy: string;
+  estimatedRewardsBalance: string;
+  totalBalance: string;
 }
 
 export interface BroadCastResult {

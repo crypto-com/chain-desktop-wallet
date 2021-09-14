@@ -13,7 +13,7 @@ import {
   AccountMessagesListResponse,
   accountMsgList,
   ValidatorListResponse,
-  AccountInfoResponse
+  AccountInfoResponse,
 } from './ChainIndexingModels';
 import {
   NftQueryParams,
@@ -228,12 +228,18 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
    * @param futureDurationInSec
    @returns {string} Estimated rewards in baseunit 
   */
-  public async getFutureEstimatedRewardsByValidatorAddress(validatorAddress: string, durationInSeconds: number, userAddress: string) {
-
-    const [validatorInfo, bondedBalanceInString] = await Promise.all([this.getValidatorDetails(validatorAddress), this.getTotalBondedBalanceByUserAddress(userAddress)]);
+  public async getFutureEstimatedRewardsByValidatorAddress(
+    validatorAddress: string,
+    durationInSeconds: number,
+    userAddress: string,
+  ) {
+    const [validatorInfo, bondedBalanceInString] = await Promise.all([
+      this.getValidatorDetails(validatorAddress),
+      this.getTotalBondedBalanceByUserAddress(userAddress),
+    ]);
 
     if (!validatorInfo) {
-      throw new Error("Cannot fetch validator information.");
+      throw new Error('Cannot fetch validator information.');
     }
 
     const apyRate = validatorInfo.apy; // already fetched as divided by 100
@@ -248,14 +254,17 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
      - Considering APY as simple interest rate.
      - Current Formula: Final Balance = Principal * (1 + (rate/100) * timeInYrs)
      */
-    const estimatedRewards = new Big(bondedBalanceInString).mul(new Big(1).add(new Big(apyRate).mul(timeInYrs)));
-    return estimatedRewards.toFixed(18);
+    const estimatedRewards = new Big(bondedBalanceInString).mul(
+      new Big(1).add(new Big(apyRate).mul(timeInYrs)),
+    );
+    return {
+      estimatedRewards: estimatedRewards.toFixed(18),
+      estimatedApy: apyRate,
+    };
   }
 
   private async getTotalBondedBalanceByUserAddress(userAddress: string) {
-    const accountInfo = await this.axiosClient.get<AccountInfoResponse>(
-      `accounts/${userAddress}`,
-    );
+    const accountInfo = await this.axiosClient.get<AccountInfoResponse>(`accounts/${userAddress}`);
 
     let totalBondedBalance = new Big(0);
 
@@ -264,18 +273,17 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       totalBondedBalance = totalBondedBalance.add(amount.amount);
     });
 
-    // Total bonded balance 
+    // Total bonded balance
     return totalBondedBalance.toString();
   }
 
   private async getValidatorDetails(validatorAddr: string) {
-
     const validatorList = await this.axiosClient.get<ValidatorListResponse>(
       `validators?limit=1000000`,
     );
 
     if (validatorList.data.pagination.total_page > 1) {
-      throw new Error("Validator list is very big. Aborting.");
+      throw new Error('Validator list is very big. Aborting.');
     }
 
     // Check if returned list is empty
@@ -283,13 +291,15 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       return undefined;
     }
 
-    const listedValidatorInfo = validatorList.data.result.find((validatorInfo) => validatorInfo.operatorAddress === validatorAddr);
+    const listedValidatorInfo = validatorList.data.result.find(
+      validatorInfo => validatorInfo.operatorAddress === validatorAddr,
+    );
 
-    // Listed ValidatorInfo 
+    // Listed ValidatorInfo
     return listedValidatorInfo;
   }
 
-  /** 
+  /**
    * Get total rewards for an active account on CRO (Cosmos SDK) chain
    * @param address
    */
@@ -300,16 +310,13 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       let totalClaims = new Big(0);
 
       rewardMsgList.forEach(msg => {
-
         // Only process this MSG type
-        if (msg.messageType === "MsgWithdrawDelegatorReward") {
-
+        if (msg.messageType === 'MsgWithdrawDelegatorReward') {
           // Check recipient and delegator
           if (msg.data.delegatorAddress === msg.data.recipientAddress) {
-
             // Process non-empty msg `amount` list
             msg.data.amount.forEach(amount => {
-              totalClaims = totalClaims.add(new Big(amount.amount))
+              totalClaims = totalClaims.add(new Big(amount.amount));
             });
           }
         }
@@ -325,13 +332,11 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   }
 
   private async getDelegatorRewardMessageList(address: string) {
-
     let currentPage = 1;
     let totalPages = 1;
     const finalMsgList: accountMsgList[] = [];
 
     while (currentPage <= totalPages) {
-
       // eslint-disable-next-line no-await-in-loop
       const delegatorRewardMessageList = await this.axiosClient.get<AccountMessagesListResponse>(
         `accounts/${address}/messages?order=height.desc&filter.msgType=MsgWithdrawDelegatorReward&page=${currentPage}`,

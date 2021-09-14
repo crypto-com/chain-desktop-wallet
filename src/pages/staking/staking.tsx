@@ -26,6 +26,7 @@ import {
   getAssetUnbondingBalancePrice,
   getAssetRewardsBalancePrice,
   scaledAmount,
+  scaledAmountByAsset,
   scaledBalance,
   scaledStakingBalance,
   scaledUnbondingBalance,
@@ -1438,6 +1439,10 @@ const StakingPage = () => {
   const [unbondingDelegations, setUnbondingDelegations] = useState<
     UnbondingDelegationTabularData[]
   >([]);
+  const [isRewardModalVisible, setIsRewardModalVisible] = useState(false);
+  const [claimedRewards, setClaimedRewards] = useState('0');
+  const [estimatedRewards, setEstimatedRewards] = useState('0');
+  const [estimatedApy, setEstimatedApy] = useState('0');
   const analyticsService = new AnalyticsService(currentSession);
   const didMountRef = useRef(false);
 
@@ -1515,8 +1520,13 @@ const StakingPage = () => {
       const allUnbonding = await walletService.retrieveAllUnbondingDelegations(
         currentSession.wallet.identifier,
       );
+      const rewards = await walletService.retrieveRewardsBalances(currentSession.wallet.identifier);
+
       const unbondingDelegationTabularData = convertUnbondingDelegations(allUnbonding, userAsset);
       setUnbondingDelegations(unbondingDelegationTabularData);
+      setClaimedRewards(rewards.claimedRewardsBalance);
+      setEstimatedRewards(rewards.estimatedRewardsBalance);
+      setEstimatedApy((Number(rewards.estimatedApy) * 100).toPrecision(4));
     };
 
     syncUnbondingDelegationsData();
@@ -1586,12 +1596,104 @@ const StakingPage = () => {
               </div>
             )}
             <div className="fiat">
-              {userAsset && marketData && marketData.price
+              {/* {userAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
                     getAssetRewardsBalancePrice(userAsset, marketData),
                   ).format('0,0.00')} ${marketData?.currency}
                   `
-                : ''}
+                : ''} */}
+              <a
+                onClick={() => {
+                  setIsRewardModalVisible(true);
+                }}
+              >
+                View more
+              </a>
+              <ModalPopup
+                isModalVisible={isRewardModalVisible}
+                handleCancel={() => setIsRewardModalVisible(false)}
+                handleOk={() => setIsRewardModalVisible(false)}
+                className="my-reward-modal"
+                footer={[]}
+                okText="OK"
+              >
+                <>
+                  <div className="upper-container">
+                    <div className="title">Rewards</div>
+                    <div className="my-total-rewards balance">
+                      <div className="title">TOTAL REWARDS</div>
+                      {userAsset && (
+                        <div className="quantity">
+                          {numeral(scaledRewardsBalance(userAsset)).format('0,0.0000')}{' '}
+                          {userAsset?.symbol}
+                        </div>
+                      )}
+                      <div className="fiat">
+                        {userAsset && marketData && marketData.price
+                          ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                              getAssetRewardsBalancePrice(userAsset, marketData),
+                            ).format('0,0.00')} ${marketData?.currency}
+                          `
+                          : ''}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="lower-container">
+                    {userAsset && (
+                      <>
+                        <div className="balance">
+                          <div className="title">CLAIMED REWARDS</div>
+                          {userAsset && (
+                            <div className="quantity">
+                              {numeral(scaledAmountByAsset(claimedRewards, userAsset)).format(
+                                '0,0.0000',
+                              )}{' '}
+                              {userAsset?.symbol}
+                            </div>
+                          )}
+                          <div className="fiat">
+                            {userAsset && marketData && marketData.price
+                              ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                                  getAssetAmountInFiat(
+                                    scaledAmountByAsset(claimedRewards, userAsset),
+                                    marketData,
+                                  ),
+                                ).format('0,0.00')} ${marketData?.currency}
+                          `
+                              : ''}
+                          </div>
+                        </div>
+                        <div className="balance">
+                          <div className="title">ESTIMATED REWARDS</div>
+                          {userAsset && (
+                            <div className="quantity">
+                              {numeral(scaledAmountByAsset(estimatedRewards, userAsset)).format(
+                                '0,0.0000',
+                              )}{' '}
+                              {userAsset?.symbol}
+                            </div>
+                          )}
+                          <div className="fiat">
+                            {userAsset && marketData && marketData.price
+                              ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                                  getAssetAmountInFiat(
+                                    scaledAmountByAsset(estimatedRewards, userAsset),
+                                    marketData,
+                                  ),
+                                ).format('0,0.00')} ${marketData?.currency}
+                          `
+                              : ''}
+                          </div>
+                        </div>
+                        <div className="balance">
+                          <div className="title">ESTIMATED TOTAL APY</div>
+                          <div className="quantity">{`${estimatedApy}%`}</div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </>
+              </ModalPopup>
             </div>
           </div>
         </div>
