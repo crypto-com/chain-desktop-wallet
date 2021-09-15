@@ -26,4 +26,31 @@ export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
   public async sign(message: Bytes): Promise<Bytes> {
     return this.provider.sign(message);
   }
+
+  // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-unused-vars
+  public async signEthTx(
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+    index: number,
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+    chainId: number,
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+    nonce: number,
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+    gasLimit: string,
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+    gasPrice: string,
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+    to: string,
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+    value: string,
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+    data: string,
+  ): Promise<string> {
+    return '';
+  }
+
+  // eslint-disable-next-line  class-methods-use-this, @typescript-eslint/no-unused-vars
+  public async getEthAddress(index: number): Promise<string> {
+    return '';
+  }
 }
