@@ -240,7 +240,7 @@ describe('Testing ChainIndexingApi', () => {
         'cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a',
       ),
     ).to.equal({
-      estimatedRewards: '10500.000000000000000000',
+      estimatedRewards: '500.000000000000000000',
       estimatedApy: '0.1',
     });
   });
@@ -346,7 +346,7 @@ describe('Testing ChainIndexingApi', () => {
         'cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a',
       ),
     ).to.equal({
-      estimatedRewards: '10500.000000000000000000',
+      estimatedRewards: '500.000000000000000000',
       estimatedApy: '0.1',
     });
   });
