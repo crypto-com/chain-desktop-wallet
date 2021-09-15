@@ -1618,7 +1618,7 @@ const StakingPage = () => {
                   setIsRewardModalVisible(true);
                 }}
               >
-                View more
+                {t('staking.button.viewMore')}
               </a>
               <ModalPopup
                 isModalVisible={isRewardModalVisible}
@@ -1630,9 +1630,9 @@ const StakingPage = () => {
               >
                 <>
                   <div className="upper-container">
-                    <div className="title">Rewards</div>
+                    <div className="title">{t('staking.modal4.title')}</div>
                     <div className="my-total-rewards balance">
-                      <div className="title">MY TOTAL REWARDS</div>
+                      <div className="title">{t('staking.modal4.label1')}</div>
                       {userAsset && (
                         <div className="quantity">
                           {numeral(scaledRewardsBalance(userAsset)).format('0,0.0000')}{' '}
@@ -1654,11 +1654,8 @@ const StakingPage = () => {
                       <>
                         <div className="balance">
                           <div className="title">
-                            <span>CLAIMED REWARDS</span>
-                            <Tooltip
-                              placement="top"
-                              title="All staking rewards that have been withdrawn and deposited to your wallet"
-                            >
+                            <span>{t('staking.modal4.label2')}</span>
+                            <Tooltip placement="top" title={t('staking.modal4.tooltip1')}>
                               <ExclamationCircleOutlined
                                 style={{ color: '#1199fa', marginLeft: '5px' }}
                               />
@@ -1686,11 +1683,8 @@ const StakingPage = () => {
                         </div>
                         <div className="balance">
                           <div className="title">
-                            <span>ESTIMATED REWARDS</span>
-                            <Tooltip
-                              placement="top"
-                              title="Total staking rewards accumulated from all your stakings"
-                            >
+                            <span>{t('staking.modal4.label3')}</span>
+                            <Tooltip placement="top" title={t('staking.modal4.tooltip2')}>
                               <ExclamationCircleOutlined
                                 style={{ color: '#1199fa', marginLeft: '5px' }}
                               />
@@ -1718,11 +1712,8 @@ const StakingPage = () => {
                         </div>
                         <div className="balance">
                           <div className="title">
-                            <span>ESTIMATED TOTAL APY</span>
-                            <Tooltip
-                              placement="top"
-                              title="A percentage rate reflecting the total staking rewards projected to be earned over an annual period, based on all your stakings"
-                            >
+                            <span>{t('staking.modal4.label4')}</span>
+                            <Tooltip placement="top" title={t('staking.modal4.tooltip3')}>
                               <ExclamationCircleOutlined
                                 style={{ color: '#1199fa', marginLeft: '5px' }}
                               />

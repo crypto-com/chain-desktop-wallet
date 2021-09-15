@@ -548,6 +548,9 @@
         "minValidator": {
           "error": "Staking amount is lower than minimum allowed of "
         },
+        "button": {
+          "viewMore": "View more"
+        },
         "validatorList": {
           "table": {
             "title": "Validator List",
@@ -607,6 +610,16 @@
             "remainingTime": "Remaining Time ",
             "completionTime": "Completion Time"
           }
+        },
+        "modal4": {
+          "title": "Rewards",
+          "label1": "MY TOTAL REWARDS",
+          "label2": "CLAIMED REWARDS",
+          "label3": "ESTIMATED ANNUAL REWARDS",
+          "label4": "ESTIMATED TOTAL APY",
+          "tooltip1": "All staking rewards that have been withdrawn and deposited to your wallet",
+          "tooltip2": "Total staking rewards accumulated from all your stakings",
+          "tooltip3": "A percentage rate reflecting the total staking rewards projected to be earned over an annual period, based on all your stakings"
         }
       },
       "governance": {
@@ -1395,6 +1408,9 @@
         "minValidator": {
           "error": "抵押數目少於"
         },
+        "button": {
+          "viewMore": "查看更多"
+        },
         "validatorList": {
           "table": {
             "title": "驗證者列表",
@@ -1454,6 +1470,16 @@
             "remainingTime": "尚餘時間",
             "completionTime": "完成時間"
           }
+        },
+        "modal4": {
+          "title": "獎勵",
+          "label1": "我的總獎勵",
+          "label2": "已領取獎勵",
+          "label3": "預計年獎勵",
+          "label4": "預計年收益率",
+          "tooltip1": "你所有已領取並存入到錢包的獎勵",
+          "tooltip2": "由你所有抵押資金所計算出的年抵押獎勵",
+          "tooltip3": "由你所有抵押資金所計算出的年收益率百分比"
         }
       },
       "governance": {
@@ -2241,6 +2267,9 @@
         "minValidator": {
           "error": "抵押数目少于"
         },
+        "button": {
+          "viewMore": "查看更多"
+        },
         "validatorList": {
           "table": {
             "title": "验证者列表",
@@ -2300,6 +2329,16 @@
             "remainingTime": "尚余时间",
             "completionTime": "完成时间"
           }
+        },
+        "modal4": {
+          "title": "奖励",
+          "label1": "我的总奖励",
+          "label2": "已领取奖励",
+          "label3": "预计年奖励",
+          "label4": "预计年收益率",
+          "tooltip1": "你所有已领取并存入到钱包的奖励",
+          "tooltip2": "由你所有抵押资金所计算出的年抵押奖励",
+          "tooltip3": "由你所有抵押资金所计算出的年收益率百分比"
         }
       },
       "governance": {
