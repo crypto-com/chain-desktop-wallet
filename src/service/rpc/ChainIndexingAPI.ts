@@ -228,21 +228,21 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
    * @param futureDurationInSec
    @returns {string} Estimated rewards in baseunit 
   */
-  public async getFutureEstimatedRewardsByValidatorAddress(
-    validatorAddress: string,
+  public async getFutureEstimatedRewardsByValidatorAddressList(
+    validatorAddressList: string[],
     durationInSeconds: number,
     userAddress: string,
   ) {
-    const [validatorInfo, bondedBalanceInString] = await Promise.all([
-      this.getValidatorDetails(validatorAddress),
+    const [validatorsAverageApy, bondedBalanceInString] = await Promise.all([
+      this.getValidatorsAverageApy(validatorAddressList),
       this.getTotalBondedBalanceByUserAddress(userAddress),
     ]);
 
-    if (!validatorInfo) {
+    if (!validatorsAverageApy) {
       throw new Error('Cannot fetch validator information.');
     }
 
-    const apyRate = validatorInfo.apy; // already fetched as divided by 100
+    const apyRate = validatorsAverageApy; // already fetched as divided by 100
 
     // 1 year = 31536000 sec
     const timeInYrs = new Big(durationInSeconds).div(new Big('31536000'));
@@ -252,11 +252,9 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
      - Commission rate is not deducted
      - Compound frequency not considered.
      - Considering APY as simple interest rate.
-     - Current Formula: Final Balance = Principal * (1 + (rate/100) * timeInYrs)
+     - Current Formula: Final Balance = Principal * ((rate/100) * timeInYrs)
      */
-    const estimatedRewards = new Big(bondedBalanceInString).mul(
-      new Big(1).add(new Big(apyRate).mul(timeInYrs)),
-    );
+    const estimatedRewards = new Big(bondedBalanceInString).mul(new Big(apyRate).mul(timeInYrs));
     return {
       estimatedRewards: estimatedRewards.toFixed(18),
       estimatedApy: apyRate,
@@ -265,7 +263,6 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   private async getTotalBondedBalanceByUserAddress(userAddress: string) {
     const accountInfo = await this.axiosClient.get<AccountInfoResponse>(`accounts/${userAddress}`);
-
     let totalBondedBalance = new Big(0);
 
     // Calculate total bonded balance
@@ -297,6 +294,33 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
     // Listed ValidatorInfo
     return listedValidatorInfo;
+  }
+
+  private async getValidatorsAverageApy(validatorAddrList: string[]) {
+    const validatorList = await this.axiosClient.get<ValidatorListResponse>(
+      `validators?limit=1000000`,
+    );
+
+    if (validatorList.data.pagination.total_page > 1) {
+      throw new Error('Validator list is very big. Aborting.');
+    }
+
+    // Check if returned list is empty
+    if (validatorList.data.result.length < 1) {
+      return undefined;
+    }
+
+    let apySum = new Big(0);
+    const listedValidatorInfo = validatorList.data.result.filter(validatorInfo =>
+      validatorAddrList.includes(validatorInfo.operatorAddress),
+    );
+
+    listedValidatorInfo.forEach(validatorInfo => {
+      apySum = apySum.add(new Big(validatorInfo.apy));
+    });
+
+    // Listed ValidatorInfo
+    return apySum.div(listedValidatorInfo.length).toString();
   }
 
   /**

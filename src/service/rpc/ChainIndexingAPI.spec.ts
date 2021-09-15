@@ -234,8 +234,8 @@ describe('Testing ChainIndexingApi', () => {
 
     // 31536000/2 = 6 months, APY = 10%
     expect(
-      await nodeRpcService.getFutureEstimatedRewardsByValidatorAddress(
-        'crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0',
+      await nodeRpcService.getFutureEstimatedRewardsByValidatorAddressList(
+        ['crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0'],
         31536000 / 2,
         'cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a',
       ),
@@ -340,8 +340,8 @@ describe('Testing ChainIndexingApi', () => {
 
     // 31536000/2 = 6 months, APY = 10%
     expect(
-      await nodeRpcService.getFutureEstimatedRewardsByValidatorAddress(
-        'crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0',
+      await nodeRpcService.getFutureEstimatedRewardsByValidatorAddressList(
+        ['crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0'],
         31536000 / 2,
         'cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a',
       ),

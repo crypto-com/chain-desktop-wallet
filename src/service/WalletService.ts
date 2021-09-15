@@ -1024,8 +1024,13 @@ class WalletService {
         // Handling legacy wallets which had wallet.address
         currentSession.wallet.address,
       );
-      const estimatedInfo = await chainIndexAPI.getFutureEstimatedRewardsByValidatorAddress(
-        'crocncl1u5ryf5jwc2jhd9xyvmasfqzacxp03v8dcj8xry',
+
+      // TO-DO
+      const estimatedInfo = await chainIndexAPI.getFutureEstimatedRewardsByValidatorAddressList(
+        [
+          'crocncl1u5ryf5jwc2jhd9xyvmasfqzacxp03v8dcj8xry',
+          'crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0',
+        ],
         31536000,
         currentSession.wallet.address,
       );
