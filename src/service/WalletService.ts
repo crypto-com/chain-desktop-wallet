@@ -1025,13 +1025,14 @@ class WalletService {
         currentSession.wallet.address,
       );
 
-      // TO-DO
+      const delegatedValidatorList = rewards.transactions.map(tx => {
+        return tx.validatorAddress;
+      });
+
       const estimatedInfo = await chainIndexAPI.getFutureEstimatedRewardsByValidatorAddressList(
-        [
-          'crocncl1u5ryf5jwc2jhd9xyvmasfqzacxp03v8dcj8xry',
-          'crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0',
-        ],
-        31536000,
+        delegatedValidatorList,
+        // 1 year = 60sec * 60 * 24 * 365 = 31536000 sec
+        60 * 60 * 24 * 365,
         currentSession.wallet.address,
       );
 

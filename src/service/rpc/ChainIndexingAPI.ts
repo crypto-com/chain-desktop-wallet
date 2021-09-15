@@ -244,8 +244,8 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
     const apyRate = validatorsAverageApy; // already fetched as divided by 100
 
-    // 1 year = 31536000 sec
-    const timeInYrs = new Big(durationInSeconds).div(new Big('31536000'));
+    // 1 year = 60sec * 60 * 24 * 365 = 31536000 sec
+    const timeInYrs = new Big(durationInSeconds).div(new Big(60 * 60 * 24 * 365));
 
     /**
      Note: 
