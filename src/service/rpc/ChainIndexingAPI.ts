@@ -21,7 +21,7 @@ import {
   TransferTransactionData,
   NftModel,
 } from '../../models/Transaction';
-import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import { DefaultWalletConfigs, SECONDS_OF_YEAR } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
 import { UserAsset } from '../../models/UserAsset';
@@ -244,8 +244,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
     const apyRate = validatorsAverageApy; // already fetched as divided by 100
 
-    // 1 year = 60sec * 60 * 24 * 365 = 31536000 sec
-    const timeInYrs = new Big(durationInSeconds).div(new Big(60 * 60 * 24 * 365));
+    const timeInYrs = new Big(durationInSeconds).div(new Big(SECONDS_OF_YEAR));
 
     /**
      Note: 

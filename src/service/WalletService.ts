@@ -17,6 +17,7 @@ import {
   DefaultWalletConfigs,
   NOT_KNOWN_YET_VALUE,
   WalletConfig,
+  SECONDS_OF_YEAR,
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
@@ -1031,8 +1032,7 @@ class WalletService {
 
       const estimatedInfo = await chainIndexAPI.getFutureEstimatedRewardsByValidatorAddressList(
         delegatedValidatorList,
-        // 1 year = 60sec * 60 * 24 * 365 = 31536000 sec
-        60 * 60 * 24 * 365,
+        SECONDS_OF_YEAR,
         currentSession.wallet.address,
       );
 

@@ -2,6 +2,7 @@ import 'mocha';
 import chai, { expect } from 'chai';
 import moxios from 'moxios';
 import { ChainIndexingAPI } from './ChainIndexingAPI';
+import { SECONDS_OF_YEAR } from '../../config/StaticConfig';
 
 chai.use(require('chai-as-promised'));
 
@@ -237,7 +238,7 @@ describe('Testing ChainIndexingApi', () => {
       JSON.stringify(
         await nodeRpcService.getFutureEstimatedRewardsByValidatorAddressList(
           ['crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0'],
-          31536000 / 2,
+          SECONDS_OF_YEAR / 2,
           'cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a',
         ),
       ),
@@ -347,7 +348,7 @@ describe('Testing ChainIndexingApi', () => {
       JSON.stringify(
         await nodeRpcService.getFutureEstimatedRewardsByValidatorAddressList(
           ['crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0'],
-          31536000 / 2,
+          SECONDS_OF_YEAR / 2,
           'cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a',
         ),
       ),
