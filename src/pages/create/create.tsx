@@ -21,6 +21,7 @@ import { secretStoreService } from '../../storage/SecretStoreService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup';
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
+import NoticeDisclaimer from '../../components/NoticeDisclaimer/NoticeDisclaimer';
 import IconLedger from '../../svg/IconLedger';
 import {
   createLedgerDevice,
@@ -490,37 +491,41 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       <Checkbox onChange={onCheckboxChange} checked={hwcheck}>
         {t('create.formCreate.checkbox1')}
       </Checkbox>
-      <Form.Item
-        name="walletType"
-        label={t('create.formCreate.walletType.label')}
-        hidden={props.isWalletSelectFieldDisable}
-      >
-        <Select
-          placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
-          disabled={props.isWalletSelectFieldDisable}
+      <div hidden={props.isWalletSelectFieldDisable}>
+        <Form.Item name="walletType" label={t('create.formCreate.walletType.label')}>
+          <Select
+            placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
+            disabled={props.isWalletSelectFieldDisable}
+          >
+            <Select.Option key="normal" value="normal">
+              Normal
+            </Select.Option>
+            <Select.Option key="ledger" value="ledger">
+              Ledger
+            </Select.Option>
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="addressIndex"
+          label={t('create.formCreate.addressIndex.label')}
+          rules={[
+            {
+              required: true,
+              message: `${t('create.formCreate.addressIndex.label')} ${t('general.required')}`,
+            },
+            addressIndexValidator,
+          ]}
         >
-          <Select.Option key="normal" value="normal">
-            Normal
-          </Select.Option>
-          <Select.Option key="ledger" value="ledger">
-            Ledger
-          </Select.Option>
-        </Select>
-      </Form.Item>
-      <Form.Item
-        name="addressIndex"
-        label={t('create.formCreate.addressIndex.label')}
-        rules={[
-          {
-            required: true,
-            message: `${t('create.formCreate.addressIndex.label')} ${t('general.required')}`,
-          },
-          addressIndexValidator,
-        ]}
-        hidden={props.isWalletSelectFieldDisable}
-      >
-        <Input placeholder="0" />
-      </Form.Item>
+          <Input placeholder="0" />
+        </Form.Item>
+        <Form.Item>
+          <NoticeDisclaimer>
+            Multiple addresses can be created with index being 0,1,2,3 and so on. Please note its
+            limited to 100 addresses without expert mode and over 100 addresses under expert mode.
+          </NoticeDisclaimer>
+        </Form.Item>
+      </div>
+
       <Form.Item
         name="network"
         label={t('create.formCreate.network.label')}

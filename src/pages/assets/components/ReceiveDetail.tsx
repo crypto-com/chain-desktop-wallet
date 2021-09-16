@@ -11,6 +11,7 @@ import './ReceiveDetail.less';
 import { Session } from '../../../models/Session';
 import { UserAsset, UserAssetType } from '../../../models/UserAsset';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../../service/LedgerService';
+import NoticeDisclaimer from '../../../components/NoticeDisclaimer/NoticeDisclaimer';
 
 interface ReceiveDetailProps {
   currentAsset: UserAsset | undefined;
@@ -101,6 +102,10 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
           <CopyOutlined />
         </div>
       </CopyToClipboard>
+      <NoticeDisclaimer>
+        Transfering CRO from any address that is not on Cronos may result in permanet loss of your
+        funds.
+      </NoticeDisclaimer>
       {isLedger && (
         <div className="ledger">
           <Button type="primary" onClick={clickCheckLedger}>

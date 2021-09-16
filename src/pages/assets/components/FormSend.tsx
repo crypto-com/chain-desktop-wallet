@@ -12,6 +12,7 @@ import { walletService } from '../../../service/WalletService';
 import SuccessModalPopup from '../../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
+import NoticeDisclaimer from '../../../components/NoticeDisclaimer/NoticeDisclaimer';
 import { secretStoreService } from '../../../storage/SecretStoreService';
 import {
   getAssetAmountInFiat,
@@ -265,7 +266,12 @@ const FormSend: React.FC<FormSendProps> = props => {
       <Form.Item name="memo" label={t('send.formSend.memo.label')}>
         <Input />
       </Form.Item>
-
+      <Form.Item>
+        <NoticeDisclaimer>
+          Transfering your CRO to any recipient address that is not on Crypto.org Chain may result
+          in permanet loss of your funds.
+        </NoticeDisclaimer>
+      </Form.Item>
       <Form.Item {...tailLayout}>
         <ModalPopup
           isModalVisible={isConfirmationModalVisible}
