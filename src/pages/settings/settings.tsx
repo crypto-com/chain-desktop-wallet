@@ -177,7 +177,7 @@ const GeneralSettingsForm = props => {
             message: `${t('settings.form1.nodeUrl.label')} ${t('general.required')}`,
           },
           {
-            pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
+            pattern: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)/,
             message: t('settings.form1.nodeUrl.error1'),
           },
         ]}
@@ -194,7 +194,7 @@ const GeneralSettingsForm = props => {
             message: `${t('settings.form1.indexingUrl.label')} ${t('general.required')}`,
           },
           {
-            pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
+            pattern: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)/,
             message: t('settings.form1.indexingUrl.error1'),
           },
         ]}
