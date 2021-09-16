@@ -234,15 +234,19 @@ describe('Testing ChainIndexingApi', () => {
 
     // 31536000/2 = 6 months, APY = 10%
     expect(
-      await nodeRpcService.getFutureEstimatedRewardsByValidatorAddressList(
-        ['crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0'],
-        31536000 / 2,
-        'cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a',
+      JSON.stringify(
+        await nodeRpcService.getFutureEstimatedRewardsByValidatorAddressList(
+          ['crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0'],
+          31536000 / 2,
+          'cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a',
+        ),
       ),
-    ).to.equal({
-      estimatedRewards: '500.000000000000000000',
-      estimatedApy: '0.1',
-    });
+    ).to.equal(
+      JSON.stringify({
+        estimatedRewards: '500.000000000000000000',
+        estimatedApy: '0.1',
+      }),
+    );
   });
   it('should return estimated rewards for a user account, apy = 10%, period = 6 Months', async () => {
     const nodeRpcService = ChainIndexingAPI.init('https://crypto.org/explorer/api/v1');
@@ -340,14 +344,18 @@ describe('Testing ChainIndexingApi', () => {
 
     // 31536000/2 = 6 months, APY = 10%
     expect(
-      await nodeRpcService.getFutureEstimatedRewardsByValidatorAddressList(
-        ['crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0'],
-        31536000 / 2,
-        'cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a',
+      JSON.stringify(
+        await nodeRpcService.getFutureEstimatedRewardsByValidatorAddressList(
+          ['crocncl1sluuqshjwrttwr553feqpq0550qd9w9zegvdy0'],
+          31536000 / 2,
+          'cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a',
+        ),
       ),
-    ).to.equal({
-      estimatedRewards: '500.000000000000000000',
-      estimatedApy: '0.1',
-    });
+    ).to.equal(
+      JSON.stringify({
+        estimatedRewards: '500.000000000000000000',
+        estimatedApy: '0.1',
+      }),
+    );
   });
 });
