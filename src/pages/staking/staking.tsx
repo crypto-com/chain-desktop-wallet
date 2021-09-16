@@ -51,6 +51,7 @@ import {
   StakingTransactionData,
   UnbondingDelegationData,
 } from '../../models/Transaction';
+import { renderExplorerUrl } from '../../models/Explorer';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   FIXED_DEFAULT_FEE,
@@ -340,7 +341,9 @@ const FormDelegationRequest = () => {
           data-original={record.validatorAddress}
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${record.validatorAddress}`}
+          href={`${renderExplorerUrl(currentSession.wallet.config, 'validator')}/${
+            record.validatorAddress
+          }`}
         >
           {ellipsis(validatorName, 24)}
         </a>
@@ -375,7 +378,10 @@ const FormDelegationRequest = () => {
           title={validatorAddress}
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${validatorAddress}`}
+          href={`${renderExplorerUrl(
+            currentSession.wallet.config,
+            'validator',
+          )}/${validatorAddress}`}
         >
           {middleEllipsis(validatorAddress, 10)}
         </a>
@@ -927,7 +933,7 @@ const FormDelegationOperations = () => {
         <a
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+          href={`${renderExplorerUrl(currentSession.wallet.config, 'validator')}/${text}`}
         >
           {middleEllipsis(text, 8)}
         </a>
@@ -947,7 +953,7 @@ const FormDelegationOperations = () => {
           data-original={text}
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
+          href={`${renderExplorerUrl(currentSession.wallet.config, 'address')}/${text}`}
         >
           {middleEllipsis(text, 8)}
         </a>
@@ -1272,7 +1278,7 @@ const FormWithdrawStakingReward = () => {
         <a
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+          href={`${renderExplorerUrl(currentSession.wallet.config, 'validator')}/${text}`}
         >
           {text}
         </a>

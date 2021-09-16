@@ -6,6 +6,7 @@ import { getUINormalScaleAmount } from '../utils/NumberUtils';
 export interface UserAssetConfig {
   nodeUrl: string;
   indexingUrl: string;
+  explorer: any;
   explorerUrl: string;
   chainId: string;
   fee: {

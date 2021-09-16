@@ -57,6 +57,7 @@ import {
   NftTransactionType,
   BroadCastResult,
 } from '../../models/Transaction';
+import { renderExplorerUrl } from '../../models/Explorer';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT,
@@ -1200,7 +1201,9 @@ const NftPage = () => {
             data-original={record.tokenMinter}
             target="_blank"
             rel="noreferrer"
-            href={`${currentSession.wallet.config.explorerUrl}/account/${record.tokenMinter}`}
+            href={`${renderExplorerUrl(currentSession.wallet.config, 'address')}/${
+              record.tokenMinter
+            }`}
           >
             {middleEllipsis(record.tokenMinter, 8)}
           </a>
@@ -1237,7 +1240,7 @@ const NftPage = () => {
           data-original={text}
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/tx/${text}`}
+          href={`${renderExplorerUrl(currentSession.wallet.config, 'tx')}/${text}`}
         >
           {middleEllipsis(text, 6)}
         </a>
@@ -1340,7 +1343,7 @@ const NftPage = () => {
             data-original={text}
             target="_blank"
             rel="noreferrer"
-            href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
+            href={`${renderExplorerUrl(currentSession.wallet.config, 'address')}/${text}`}
           >
             {middleEllipsis(text, 12)}
           </a>
@@ -1486,7 +1489,10 @@ const NftPage = () => {
                                 data-original={nft?.tokenMinter}
                                 target="_blank"
                                 rel="noreferrer"
-                                href={`${currentSession.wallet.config.explorerUrl}/account/${nft?.tokenMinter}`}
+                                href={`${renderExplorerUrl(
+                                  currentSession.wallet.config,
+                                  'address',
+                                )}/${nft?.tokenMinter}`}
                               >
                                 {nft?.tokenMinter}
                               </a>
