@@ -3117,15 +3117,15 @@
         },
         "assetList": {
           "table": {
-            "title": "금액",
-            "name": "금액",
+            "title": "타이틀",
+            "name": "이름",
             "price": "가격",
             "amount": "금액",
-            "value": "시장 가치"
+            "value": "가치"
           }
         },
         "transactions": {
-          "tab1": "금액",
+          "tab1": "애셋",
           "tab2": "위임",
           "tab3": "NFT 트랜잭션",
           "table1": {
@@ -3213,16 +3213,18 @@
         "button": "레져에서 주소를 확인합니다"
       },
       "assets": {
-        "title": "금액",
+        "title": "애셋",
+        "description": "여기에서 모든 애셋을 관리하세요",
         "tab1": "트랜잭션",
         "tab2": "송금",
         "tab3": "수신",
+        "backToList": "애셋 리스트로 돌아가기",
         "assetList": {
           "table": {
-            "name": "금액",
+            "name": "애셋",
             "price": "가격",
             "amount": "금액",
-            "value": "시장 가치",
+            "value": "가치",
             "actionSend": "전송",
             "actionReceive": "수신"
           }
@@ -3238,11 +3240,15 @@
         "tab3": "위임 관리",
         "description1": "위임된 금액에서 보상을 인출합니다",
         "description2": "검증인에게 금액을 위임합니다",
+        "description3": "위임된 자산을 관리하세요",
         "maxValidator": {
           "error": "스테이킹 금액이 사용 가능한 지갑 잔액을 초과합니다."
         },
         "minValidator": {
           "error": "스테이킹 금액이 최소 금액보다 낮습니다."
+        },
+        "button": {
+          "viewMore": "더 보기"
         },
         "validatorList": {
           "table": {
@@ -3291,6 +3297,27 @@
           "label1": "송신인 주소",
           "label2": "검증인로부터 보상 인출하기",
           "label3": "보상"
+        },
+        "modal3": {
+          "title": "위임 취소",
+          "description": "스테이킹 해제된 자산은 Crypto.org 체인 네트워크에 의해 시행되는 {{ unbondingPeriod }}일 후에 사용할 수 있습니다.",
+          "button": "위임 취소 보기",
+          "table": {
+            "validatorAddress": "검증인 주소",
+            "unbondingAmount": "취소 금액",
+            "remainingTime": "남은 시간",
+            "completionTime": "완료 시간"
+          }
+        },
+        "modal4": {
+          "title": "보상",
+          "label1": "나의 모든 보상",
+          "label2": "청구된 보상",
+          "label3": "예상되는 연간 보상",
+          "label4": "예상되는 총  APY",
+          "tooltip1": "인출 및 지갑에 입금된 모든 스테이킹 보상",
+          "tooltip2": "모든 스테이킹에서 누적된 총 스테이킹 보상",
+          "tooltip3": "모든 스테이킹을 기반으로 연간 획득할 것으로 예상되는 총 스테이킹 보상을 반영하는 백분율 "
         }
       },
       "governance": {
@@ -3444,7 +3471,8 @@
         "tab3": "스토리지 삭제",
         "form1": {
           "assetIdentifier": {
-            "label": "금액"
+            "label": "애셋",
+            "description": "노드 구성은 다양한 애셋에서 설정할 수 있습니다."
           },
           "nodeUrl": {
             "label": "노드 URL",
