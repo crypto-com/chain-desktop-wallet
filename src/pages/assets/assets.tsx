@@ -16,8 +16,8 @@ import {
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { AssetMarketPrice, getAssetBalancePrice, UserAsset } from '../../models/UserAsset';
+import { renderExplorerUrl } from '../../models/Explorer';
 import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
-
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 // import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
@@ -90,7 +90,7 @@ const AssetsPage = () => {
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(session.activeAsset);
   const [currentAssetMarketData, setCurrentAssetMarketData] = useState<AssetMarketPrice>();
   const [isAssetVisible, setIsAssetVisible] = useState(false);
-  const [activeAssetTab, setActiveAssetTab] = useState('1');
+  const [activeAssetTab, setActiveAssetTab] = useState('transaction');
   const [allTransfer, setAllTransfer] = useState<any>();
 
   const didMountRef = useRef(false);
@@ -229,6 +229,35 @@ const AssetsPage = () => {
         );
       },
     },
+    {
+      title: t('general.action'),
+      dataIndex: 'action',
+      key: 'action',
+      render: () => (
+        <>
+          <a
+            onClick={() => {
+              setTimeout(() => {
+                setActiveAssetTab('send');
+              }, 50);
+            }}
+          >
+            {t('assets.assetList.table.actionSend')}
+          </a>
+
+          <a
+            style={{ marginLeft: '20px' }}
+            onClick={() => {
+              setTimeout(() => {
+                setActiveAssetTab('receive');
+              }, 50);
+            }}
+          >
+            {t('assets.assetList.table.actionReceive')}
+          </a>
+        </>
+      ),
+    },
   ];
 
   const TransactionColumns = [
@@ -241,8 +270,10 @@ const AssetsPage = () => {
           data-original={text}
           target="_blank"
           rel="noreferrer"
-          href={`${session.activeAsset?.config?.explorerUrl ||
-            session.wallet.config.explorerUrl}/tx/${text}`}
+          href={`${renderExplorerUrl(
+            session.activeAsset?.config ?? session.wallet.config,
+            'tx',
+          )}/${text}`}
         >
           {middleEllipsis(text, 12)}
         </a>
@@ -272,8 +303,10 @@ const AssetsPage = () => {
           data-original={text}
           target="_blank"
           rel="noreferrer"
-          href={`${session.activeAsset?.config?.explorerUrl ||
-            session.wallet.config.explorerUrl}/tx/${text}`}
+          href={`${renderExplorerUrl(
+            session.activeAsset?.config ?? session.wallet.config,
+            'address',
+          )}/${text}`}
         >
           {middleEllipsis(text, 12)}
         </a>
@@ -361,7 +394,7 @@ const AssetsPage = () => {
                     activeKey={activeAssetTab}
                     onTabClick={key => {
                       setActiveAssetTab(key);
-                      if (key === '1') {
+                      if (key === 'transaction') {
                         syncTransfers(currentAsset);
                         syncAssetBalance(currentAsset);
                         setNavbarMenuSelectedKey('/assets');
@@ -394,24 +427,23 @@ const AssetsPage = () => {
                     //   );
                     // }}
                   >
-                    <TabPane tab={t('assets.tab1')} key="1">
-                      <Table
-                        columns={TransactionColumns}
-                        dataSource={allTransfer}
-                        className="transfer-table"
-                        rowKey={record => record.key}
-                      />
-                    </TabPane>
-                    <TabPane tab={t('assets.tab2')} key="2">
+                    <TabPane tab={t('assets.tab2')} key="send">
                       <FormSend
                         walletAsset={currentAsset}
                         setWalletAsset={setCurrentAsset}
                         currentSession={session}
                       />
                     </TabPane>
-
-                    <TabPane tab={t('assets.tab3')} key="3">
+                    <TabPane tab={t('assets.tab3')} key="receive">
                       <ReceiveDetail currentAsset={currentAsset} session={session} />
+                    </TabPane>
+                    <TabPane tab={t('assets.tab1')} key="transaction">
+                      <Table
+                        columns={TransactionColumns}
+                        dataSource={allTransfer}
+                        className="transfer-table"
+                        rowKey={record => record.key}
+                      />
                     </TabPane>
                   </Tabs>
                 </Content>
@@ -425,6 +457,8 @@ const AssetsPage = () => {
                 onRow={selectedAsset => {
                   return {
                     onClick: async () => {
+                      setActiveAssetTab('transaction');
+                      // console.log(event)
                       setSession({
                         ...session,
                         activeAsset: selectedAsset,
