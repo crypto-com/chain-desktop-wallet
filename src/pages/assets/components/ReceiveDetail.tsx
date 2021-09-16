@@ -70,9 +70,12 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
 
   const assetAddress = (asset, _session) => {
     const { assetType, address } = asset;
-    // For IBC assets
     const { wallet } = _session;
-
+    // TO-DO Missing CRONOS support for Ledger
+    if (wallet.walletType === LEDGER_WALLET_TYPE) {
+      return wallet.address;
+    }
+    // For Multi-Assets
     switch (assetType) {
       case UserAssetType.TENDERMINT:
         return address;
