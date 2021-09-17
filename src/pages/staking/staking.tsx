@@ -2,8 +2,19 @@ import React, { useEffect, useState, useRef } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
 import moment from 'moment';
-import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs, Typography } from 'antd';
-import { OrderedListOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  InputNumber,
+  Layout,
+  Table,
+  Tabs,
+  Typography,
+  Tooltip,
+} from 'antd';
+import { OrderedListOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
@@ -22,8 +33,15 @@ import {
   AssetMarketPrice,
   getAssetAmountInFiat,
   getAssetBalancePrice,
+  getAssetStakingBalancePrice,
+  getAssetUnbondingBalancePrice,
+  getAssetRewardsBalancePrice,
   scaledAmount,
+  scaledAmountByAsset,
   scaledBalance,
+  scaledStakingBalance,
+  scaledUnbondingBalance,
+  scaledRewardsBalance,
   UserAsset,
 } from '../../models/UserAsset';
 import {
@@ -1431,11 +1449,17 @@ const StakingPage = () => {
   const currentSession = useRecoilValue(sessionState);
   const userAsset = useRecoilValue(walletAssetState);
   const fetchingDB = useRecoilValue(fetchingDBState);
+  const allMarketData = useRecoilValue(allMarketState);
+  const [marketData, setMarketData] = useState<AssetMarketPrice>();
   const [isUnbondingDelegationModalVisible, setIsUnbondingDelegationModalVisible] = useState(false);
   // eslint-disable-next-line
   const [unbondingDelegations, setUnbondingDelegations] = useState<
     UnbondingDelegationTabularData[]
   >([]);
+  const [isRewardModalVisible, setIsRewardModalVisible] = useState(false);
+  const [claimedRewards, setClaimedRewards] = useState('0');
+  const [estimatedRewards, setEstimatedRewards] = useState('0');
+  const [estimatedApy, setEstimatedApy] = useState('0');
   const analyticsService = new AnalyticsService(currentSession);
   const didMountRef = useRef(false);
 
@@ -1513,11 +1537,18 @@ const StakingPage = () => {
       const allUnbonding = await walletService.retrieveAllUnbondingDelegations(
         currentSession.wallet.identifier,
       );
+      const rewards = await walletService.retrieveRewardsBalances(currentSession.wallet.identifier);
+
       const unbondingDelegationTabularData = convertUnbondingDelegations(allUnbonding, userAsset);
       setUnbondingDelegations(unbondingDelegationTabularData);
+      setClaimedRewards(rewards.claimedRewardsBalance);
+      setEstimatedRewards(rewards.estimatedRewardsBalance);
+      setEstimatedApy((Number(rewards.estimatedApy) * 100).toPrecision(4));
     };
 
     syncUnbondingDelegationsData();
+
+    setMarketData(allMarketData[`${userAsset?.mainnetSymbol}-${currentSession.currency}`]);
 
     if (!didMountRef.current) {
       didMountRef.current = true;
@@ -1530,6 +1561,180 @@ const StakingPage = () => {
       <Header className="site-layout-background">{t('staking.title')}</Header>
 
       <Content>
+        <div className="site-layout-background balance-container">
+          {/* <div className="balance">
+            <div className="title">TOTAL ASSET BALANCE</div>
+            <div className="quantity">
+              $
+              {numeral(
+                new Big(getAssetStakingBalancePrice(userAsset, marketData))
+                  .add(new Big(getAssetBalancePrice(userAsset, marketData)))
+                  .toFixed(4),
+              ).format('0,0.00')}{' '}
+              USD
+            </div>
+          </div> */}
+          <div className="balance">
+            <div className="title">STAKED CRO BALANCE</div>
+            {userAsset && (
+              <div className="quantity">
+                {numeral(scaledStakingBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
+              </div>
+            )}
+            <div className="fiat">
+              {userAsset && marketData && marketData.price
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetStakingBalancePrice(userAsset, marketData),
+                  ).format(`0,0.00`)} ${marketData?.currency}`
+                : ''}
+            </div>
+          </div>
+          <div className="balance">
+            <div className="title">UNBONDING CRO BALANCE</div>
+            {userAsset && (
+              <div className="quantity">
+                {numeral(scaledUnbondingBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
+              </div>
+            )}
+            <div className="fiat">
+              {userAsset && marketData && marketData.price
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetUnbondingBalancePrice(userAsset, marketData),
+                  ).format('0,0.00')} ${marketData?.currency}
+                  `
+                : ''}
+            </div>
+          </div>
+          <div className="balance">
+            <div className="title">TOTAL REWARDS</div>
+            {userAsset && (
+              <div className="quantity">
+                {numeral(scaledRewardsBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
+              </div>
+            )}
+            <div className="fiat">
+              {/* {userAsset && marketData && marketData.price
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetRewardsBalancePrice(userAsset, marketData),
+                  ).format('0,0.00')} ${marketData?.currency}
+                  `
+                : ''} */}
+              <a
+                onClick={() => {
+                  setIsRewardModalVisible(true);
+                }}
+              >
+                {t('staking.button.viewMore')}
+              </a>
+              <ModalPopup
+                isModalVisible={isRewardModalVisible}
+                handleCancel={() => setIsRewardModalVisible(false)}
+                handleOk={() => setIsRewardModalVisible(false)}
+                className="my-reward-modal"
+                footer={[]}
+                okText="OK"
+              >
+                <>
+                  <div className="upper-container">
+                    <div className="title">{t('staking.modal4.title')}</div>
+                    <div className="my-total-rewards balance">
+                      <div className="title">{t('staking.modal4.label1')}</div>
+                      {userAsset && (
+                        <div className="quantity">
+                          {numeral(scaledRewardsBalance(userAsset)).format('0,0.0000')}{' '}
+                          {userAsset?.symbol}
+                        </div>
+                      )}
+                      <div className="fiat">
+                        {userAsset && marketData && marketData.price
+                          ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                              getAssetRewardsBalancePrice(userAsset, marketData),
+                            ).format('0,0.00')} ${marketData?.currency}
+                          `
+                          : ''}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="lower-container">
+                    {userAsset && (
+                      <>
+                        <div className="balance">
+                          <div className="title">
+                            <span>{t('staking.modal4.label2')}</span>
+                            <Tooltip placement="top" title={t('staking.modal4.tooltip1')}>
+                              <ExclamationCircleOutlined
+                                style={{ color: '#1199fa', marginLeft: '5px' }}
+                              />
+                            </Tooltip>
+                          </div>
+                          {userAsset && (
+                            <div className="quantity">
+                              {numeral(scaledAmountByAsset(claimedRewards, userAsset)).format(
+                                '0,0.0000',
+                              )}{' '}
+                              {userAsset?.symbol}
+                            </div>
+                          )}
+                          <div className="fiat">
+                            {userAsset && marketData && marketData.price
+                              ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                                  getAssetAmountInFiat(
+                                    scaledAmountByAsset(claimedRewards, userAsset),
+                                    marketData,
+                                  ),
+                                ).format('0,0.00')} ${marketData?.currency}
+                          `
+                              : ''}
+                          </div>
+                        </div>
+                        <div className="balance">
+                          <div className="title">
+                            <span>{t('staking.modal4.label3')}</span>
+                            <Tooltip placement="top" title={t('staking.modal4.tooltip2')}>
+                              <ExclamationCircleOutlined
+                                style={{ color: '#1199fa', marginLeft: '5px' }}
+                              />
+                            </Tooltip>
+                          </div>
+                          {userAsset && (
+                            <div className="quantity">
+                              {numeral(scaledAmountByAsset(estimatedRewards, userAsset)).format(
+                                '0,0.0000',
+                              )}{' '}
+                              {userAsset?.symbol}
+                            </div>
+                          )}
+                          <div className="fiat">
+                            {userAsset && marketData && marketData.price
+                              ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                                  getAssetAmountInFiat(
+                                    scaledAmountByAsset(estimatedRewards, userAsset),
+                                    marketData,
+                                  ),
+                                ).format('0,0.00')} ${marketData?.currency}
+                          `
+                              : ''}
+                          </div>
+                        </div>
+                        <div className="balance">
+                          <div className="title">
+                            <span>{t('staking.modal4.label4')}</span>
+                            <Tooltip placement="top" title={t('staking.modal4.tooltip3')}>
+                              <ExclamationCircleOutlined
+                                style={{ color: '#1199fa', marginLeft: '5px' }}
+                              />
+                            </Tooltip>
+                          </div>
+                          <div className="quantity">{`${estimatedApy}%`}</div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </>
+              </ModalPopup>
+            </div>
+          </div>
+        </div>
         <Tabs defaultActiveKey="1">
           <TabPane tab={t('staking.tab1')} key="1">
             <div className="site-layout-background stake-content">
