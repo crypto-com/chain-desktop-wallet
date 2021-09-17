@@ -618,7 +618,7 @@
           "label2": "CLAIMED REWARDS",
           "label3": "ESTIMATED ANNUAL REWARDS",
           "label4": "ESTIMATED TOTAL APY",
-          "label5": "UNCLAIMED REWARDS",
+          "label5": "REWARD BALANCE",
           "tooltip1": "All staking rewards that have been withdrawn and deposited to your wallet",
           "tooltip2": "Total staking rewards accumulated from all your stakings",
           "tooltip3": "A percentage rate reflecting the total staking rewards projected to be earned over an annual period, based on all your stakings"
