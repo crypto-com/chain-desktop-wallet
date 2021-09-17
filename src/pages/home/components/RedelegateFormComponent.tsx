@@ -11,6 +11,7 @@ import { validatorListState, fetchingDBState } from '../../../recoil/atom';
 import { Session } from '../../../models/Session';
 import { UserAsset, scaledAmount } from '../../../models/UserAsset';
 import { ValidatorModel } from '../../../models/Transaction';
+import { renderExplorerUrl } from '../../../models/Explorer';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { middleEllipsis, ellipsis } from '../../../utils/utils';
 import { CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD } from '../../../config/StaticConfig';
@@ -48,7 +49,9 @@ const RedelegateFormComponent = (props: {
           data-original={record.validatorAddress}
           target="_blank"
           rel="noreferrer"
-          href={`${props.currentSession.wallet.config.explorerUrl}/validator/${record.validatorAddress}`}
+          href={`${renderExplorerUrl(props.currentSession.wallet.config, 'validator')}/${
+            record.validatorAddress
+          }`}
         >
           {ellipsis(validatorName, 24)}
         </a>
@@ -83,7 +86,10 @@ const RedelegateFormComponent = (props: {
           title={validatorAddress}
           target="_blank"
           rel="noreferrer"
-          href={`${props.currentSession.wallet.config.explorerUrl}/validator/${validatorAddress}`}
+          href={`${renderExplorerUrl(
+            props.currentSession.wallet.config,
+            'validator',
+          )}/${validatorAddress}`}
         >
           {middleEllipsis(validatorAddress, 10)}
         </a>

@@ -22,6 +22,7 @@ import {
 import {
   BroadCastResult,
   RewardTransaction,
+  RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
   UnbondingDelegationData,
@@ -43,7 +44,7 @@ export interface INodeRpcService {
 
   fetchDelegationBalance(address: string, assetSymbol: string): Promise<StakingTransactionList>;
 
-  fetchStakingRewards(address: string, assetSymbol: string): Promise<Array<RewardTransaction>>;
+  fetchStakingRewardsBalance(address: string, assetSymbol: string): Promise<RewardTransactionList>;
 
   loadStakingBalance(address: string, assetSymbol: string): Promise<string>;
 
@@ -150,19 +151,21 @@ export class NodeRpcService implements INodeRpcService {
     };
   }
 
-  public async fetchStakingRewards(
+  public async fetchStakingRewardsBalance(
     address: string,
     assetSymbol: string,
-  ): Promise<Array<RewardTransaction>> {
+  ): Promise<RewardTransactionList> {
     const response = await this.cosmosClient.get<RewardResponse>(
       `cosmos/distribution/v1beta1/delegators/${address}/rewards`,
     );
     const { rewards } = response.data;
     const rewardList: Array<RewardTransaction> = [];
+    let totalSum = 0;
     rewards.forEach(stakingReward => {
       let localRewardSum = 0;
       stakingReward.reward.forEach(rw => {
         if (rw.denom === assetSymbol) {
+          totalSum += Number(rw.amount);
           localRewardSum += Number(rw.amount);
         }
       });
@@ -173,7 +176,11 @@ export class NodeRpcService implements INodeRpcService {
       });
     });
 
-    return rewardList;
+    return {
+      totalBalance: String(totalSum),
+      transactions: rewardList,
+      walletId: '',
+    };
   }
 
   public async fetchUnbondingDelegationBalance(address: string) {
@@ -207,6 +214,16 @@ export class NodeRpcService implements INodeRpcService {
   public async loadStakingBalance(address: string, assetSymbol: string): Promise<string> {
     const delegationList = await this.fetchDelegationBalance(address, assetSymbol);
     return delegationList.totalBalance;
+  }
+
+  public async loadStakingRewardsBalance(address: string, assetSymbol: string): Promise<string> {
+    const rewardsList = await this.fetchStakingRewardsBalance(address, assetSymbol);
+    return rewardsList.totalBalance;
+  }
+
+  public async loadUnbondingBalance(address: string): Promise<string> {
+    const unbondingDelegationList = await this.fetchUnbondingDelegationBalance(address);
+    return unbondingDelegationList.totalBalance;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -389,6 +406,8 @@ export class NodeRpcService implements INodeRpcService {
             mainnetSymbol: ibcDenom,
             name: ibcDenom,
             stakedBalance: '0',
+            unbondingBalance: '0',
+            rewardsBalance: '0',
             symbol: ibcDenom,
             walletId: session.wallet.identifier,
             ibcDenomHash,
