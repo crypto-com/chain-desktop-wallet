@@ -115,8 +115,17 @@ export const scaledUnbondingBalance = (asset: UserAsset) => {
   return getUINormalScaleAmount(asset.unbondingBalance, asset.decimals);
 };
 
-export const scaledRewardsBalance = (asset: UserAsset) => {
+export const scaledRewardBalance = (asset: UserAsset) => {
   return getUINormalScaleAmount(asset.rewardsBalance, asset.decimals);
+};
+
+export const scaledTotalBalance = (asset: UserAsset) => {
+  const totalBalance = Big(asset.balance)
+    .add(asset.stakedBalance)
+    .add(asset.unbondingBalance)
+    .add(asset.rewardsBalance)
+    .toFixed(2);
+  return getUINormalScaleAmount(totalBalance, asset.decimals);
 };
 
 export const getAssetPriceIdFrom = (assetSymbol: string, currency: string) => {
@@ -129,6 +138,12 @@ export const getAssetPriceId = (assetPrice: AssetMarketPrice) => {
 
 export const getAssetBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
   const bigAsset = new Big(scaledBalance(asset));
+  const bigMarketPrice = new Big(marketPrice.price);
+  return bigAsset.times(bigMarketPrice).toFixed(2);
+};
+
+export const getAssetTotalBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
+  const bigAsset = new Big(scaledTotalBalance(asset));
   const bigMarketPrice = new Big(marketPrice.price);
   return bigAsset.times(bigMarketPrice).toFixed(2);
 };
@@ -155,7 +170,7 @@ export const getAssetUnbondingBalancePrice = (asset: UserAsset, marketPrice: Ass
 };
 
 export const getAssetRewardsBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
-  const bigAsset = new Big(scaledRewardsBalance(asset));
+  const bigAsset = new Big(scaledRewardBalance(asset));
   const bigMarketPrice = new Big(marketPrice.price);
   return bigAsset.times(bigMarketPrice).toFixed(2);
 };

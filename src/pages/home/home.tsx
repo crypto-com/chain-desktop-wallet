@@ -2,10 +2,11 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Button, Layout, notification, Table, Tabs, Card, List, Avatar } from 'antd';
-import { SyncOutlined } from '@ant-design/icons';
+import { Button, Layout, notification, Table, Tabs, Card, List, Avatar, Tooltip } from 'antd';
+import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
+import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -22,12 +23,18 @@ import { NOT_KNOWN_YET_VALUE, SUPPORTED_CURRENCY, WalletConfig } from '../../con
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
 import {
-  scaledBalance,
+  scaledAmount,
+  scaledAmountByAsset,
   scaledStakingBalance,
+  scaledTotalBalance,
+  getAssetAmountInFiat,
   getAssetBalancePrice,
   getAssetStakingBalancePrice,
+  getAssetRewardsBalancePrice,
+  getAssetTotalBalancePrice,
   UserAsset,
   AssetMarketPrice,
+  scaledRewardBalance,
 } from '../../models/UserAsset';
 
 import { NftModel, NftProcessedModel } from '../../models/Transaction';
@@ -38,6 +45,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 // import logoCro from '../../assets/AssetLogo/cro.png';
 import IconTick from '../../svg/IconTick';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -74,6 +82,11 @@ const HomePage = () => {
   );
 
   const [defaultWalletAsset, setdefaultWalletAsset] = useState<UserAsset>();
+
+  const [isRewardModalVisible, setIsRewardModalVisible] = useState(false);
+  const [claimedRewards, setClaimedRewards] = useState('0');
+  const [estimatedRewards, setEstimatedRewards] = useState('0');
+  const [estimatedApy, setEstimatedApy] = useState('0');
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -284,12 +297,17 @@ const HomePage = () => {
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
       const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
       const allNFTs: NftModel[] = await walletService.retrieveNFTs(sessionData.wallet.identifier);
+      const rewards = await walletService.retrieveRewardsBalances(currentSession.wallet.identifier);
 
       const currentNftList = processNftList(allNFTs);
       setProcessedNftList(currentNftList);
       setNFTList(allNFTs);
       setdefaultWalletAsset(currentAsset);
       setMarketData(allMarketData[`${currentAsset?.mainnetSymbol}-${sessionData.currency}`]);
+
+      setClaimedRewards(rewards.claimedRewardsBalance);
+      setEstimatedRewards(rewards.estimatedRewardsBalance);
+      setEstimatedApy((Number(rewards.estimatedApy) * 100).toPrecision(4));
 
       showWalletStateNotification(sessionData.wallet.config);
       setWalletAllAssets(allAssets);
@@ -333,17 +351,17 @@ const HomePage = () => {
             </div>
           </div> */}
           <div className="balance">
-            <div className="title">CRO BALANCE</div>
+            <div className="title">TOTAL CRO BALANCE</div>
             {defaultWalletAsset && (
               <div className="quantity">
-                {numeral(scaledBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
+                {numeral(scaledTotalBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
                 {defaultWalletAsset?.symbol}
               </div>
             )}
             <div className="fiat">
               {defaultWalletAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetBalancePrice(defaultWalletAsset, marketData),
+                    getAssetTotalBalancePrice(defaultWalletAsset, marketData),
                   ).format(`0,0.00`)} ${marketData?.currency}`
                 : ''}
             </div>
@@ -363,6 +381,180 @@ const HomePage = () => {
                   ).format('0,0.00')} ${marketData?.currency}
                   `
                 : ''}
+            </div>
+          </div>
+          <div className="balance">
+            <div className="title">TOTAL REWARDS</div>
+            {defaultWalletAsset && (
+              <div className="quantity">
+                {numeral(
+                  scaledAmount(
+                    new Big(defaultWalletAsset.rewardsBalance).add(claimedRewards).toFixed(2),
+                    defaultWalletAsset.decimals,
+                  ),
+                ).format('0,0.0000')}{' '}
+                {defaultWalletAsset?.symbol}
+              </div>
+            )}
+            <div className="fiat">
+              {/* {defaultWalletAsset && marketData && marketData.price
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetRewardsBalancePrice(defaultWalletAsset, marketData),
+                  ).format('0,0.00')} ${marketData?.currency}
+                  `
+                : ''} */}
+              <a
+                onClick={() => {
+                  setIsRewardModalVisible(true);
+                }}
+              >
+                {t('staking.button.viewMore')}
+              </a>
+              <ModalPopup
+                isModalVisible={isRewardModalVisible}
+                handleCancel={() => setIsRewardModalVisible(false)}
+                handleOk={() => setIsRewardModalVisible(false)}
+                className="my-reward-modal"
+                footer={[]}
+                okText="OK"
+              >
+                <>
+                  <div className="upper-container">
+                    <div className="title">{t('staking.modal4.title')}</div>
+                    <div className="my-total-rewards balance">
+                      <div className="title">{t('staking.modal4.label1')}</div>
+                      {defaultWalletAsset && (
+                        <div className="quantity">
+                          {numeral(
+                            scaledAmount(
+                              new Big(defaultWalletAsset.rewardsBalance)
+                                .add(claimedRewards)
+                                .toFixed(2),
+                              defaultWalletAsset.decimals,
+                            ),
+                          ).format('0,0.0000')}{' '}
+                          {defaultWalletAsset?.symbol}
+                        </div>
+                      )}
+                      <div className="fiat">
+                        {defaultWalletAsset && marketData && marketData.price
+                          ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                              getAssetAmountInFiat(
+                                scaledAmount(
+                                  new Big(defaultWalletAsset.rewardsBalance)
+                                    .add(claimedRewards)
+                                    .toFixed(2),
+                                  defaultWalletAsset.decimals,
+                                ),
+                                marketData,
+                              ),
+                            ).format('0,0.00')} ${marketData?.currency}
+                          `
+                          : ''}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="lower-container">
+                    {defaultWalletAsset && (
+                      <>
+                        <div className="balance">
+                          <div className="title">
+                            <span>{t('staking.modal4.label5')}</span>
+                            <Tooltip placement="top" title={t('staking.modal4.tooltip1')}>
+                              <ExclamationCircleOutlined
+                                style={{ color: '#1199fa', marginLeft: '5px' }}
+                              />
+                            </Tooltip>
+                          </div>
+                          {defaultWalletAsset && (
+                            <div className="quantity">
+                              {numeral(scaledRewardBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
+                              {defaultWalletAsset?.symbol}
+                            </div>
+                          )}
+                          <div className="fiat">
+                            {defaultWalletAsset && marketData && marketData.price
+                              ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                                  getAssetRewardsBalancePrice(defaultWalletAsset, marketData),
+                                ).format('0,0.00')} ${marketData?.currency}
+                          `
+                              : ''}
+                          </div>
+                        </div>
+                        <div className="balance">
+                          <div className="title">
+                            <span>{t('staking.modal4.label2')}</span>
+                            <Tooltip placement="top" title={t('staking.modal4.tooltip1')}>
+                              <ExclamationCircleOutlined
+                                style={{ color: '#1199fa', marginLeft: '5px' }}
+                              />
+                            </Tooltip>
+                          </div>
+                          {defaultWalletAsset && (
+                            <div className="quantity">
+                              {numeral(
+                                scaledAmountByAsset(claimedRewards, defaultWalletAsset),
+                              ).format('0,0.0000')}{' '}
+                              {defaultWalletAsset?.symbol}
+                            </div>
+                          )}
+                          <div className="fiat">
+                            {defaultWalletAsset && marketData && marketData.price
+                              ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                                  getAssetAmountInFiat(
+                                    scaledAmountByAsset(claimedRewards, defaultWalletAsset),
+                                    marketData,
+                                  ),
+                                ).format('0,0.00')} ${marketData?.currency}
+                          `
+                              : ''}
+                          </div>
+                        </div>
+                        <div className="balance">
+                          <div className="title">
+                            <span>{t('staking.modal4.label3')}</span>
+                            <Tooltip placement="top" title={t('staking.modal4.tooltip2')}>
+                              <ExclamationCircleOutlined
+                                style={{ color: '#1199fa', marginLeft: '5px' }}
+                              />
+                            </Tooltip>
+                          </div>
+                          {defaultWalletAsset && (
+                            <div className="quantity">
+                              {numeral(
+                                scaledAmountByAsset(estimatedRewards, defaultWalletAsset),
+                              ).format('0,0.0000')}{' '}
+                              {defaultWalletAsset?.symbol}
+                            </div>
+                          )}
+                          <div className="fiat">
+                            {defaultWalletAsset && marketData && marketData.price
+                              ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                                  getAssetAmountInFiat(
+                                    scaledAmountByAsset(estimatedRewards, defaultWalletAsset),
+                                    marketData,
+                                  ),
+                                ).format('0,0.00')} ${marketData?.currency}
+                          `
+                              : ''}
+                          </div>
+                        </div>
+                        <div className="balance">
+                          <div className="title">
+                            <span>{t('staking.modal4.label4')}</span>
+                            <Tooltip placement="top" title={t('staking.modal4.tooltip3')}>
+                              <ExclamationCircleOutlined
+                                style={{ color: '#1199fa', marginLeft: '5px' }}
+                              />
+                            </Tooltip>
+                          </div>
+                          <div className="quantity">{`${estimatedApy}%`}</div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </>
+              </ModalPopup>
             </div>
           </div>
         </div>
