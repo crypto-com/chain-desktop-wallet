@@ -203,7 +203,8 @@
             "message1": "Please do understand that undelegation takes a number of days to fully complete after the transaction has been broadcasted",
             "message2": "days",
             "message3": ". Until then, you are not able to use the undelegated funds yet."
-          }
+          },
+          "checkbox1": "I understand that my CRO in Crypto.org Chain staking is subject to a {{ unbondingPeriod }}-day unbonding period when I unstake, as enfored by the Crypto.org Chain network."
         },
         "table": {
           "triggerDesc": "Click to sort by descend",
@@ -548,6 +549,9 @@
         "minValidator": {
           "error": "Staking amount is lower than minimum allowed of "
         },
+        "button": {
+          "viewMore": "View more"
+        },
         "validatorList": {
           "table": {
             "title": "Validator List",
@@ -607,6 +611,16 @@
             "remainingTime": "Remaining Time ",
             "completionTime": "Completion Time"
           }
+        },
+        "modal4": {
+          "title": "Rewards",
+          "label1": "MY TOTAL REWARDS",
+          "label2": "CLAIMED REWARDS",
+          "label3": "ESTIMATED ANNUAL REWARDS",
+          "label4": "ESTIMATED TOTAL APY",
+          "tooltip1": "All staking rewards that have been withdrawn and deposited to your wallet",
+          "tooltip2": "Total staking rewards accumulated from all your stakings",
+          "tooltip3": "A percentage rate reflecting the total staking rewards projected to be earned over an annual period, based on all your stakings"
         }
       },
       "governance": {
@@ -1050,7 +1064,8 @@
             "message1": "請注意，在贖回委託交易成功廣播後，還需要等待一段時間才能正式完成",
             "message2": "日",
             "message3": "。在正式完成之前，你並不能使用贖回的委託資金。"
-          }
+          },
+          "checkbox1": "我明白根據 Crypto.org Chain 的協定，我在 Crypto.org Chain 上的 CRO 抵押將要經過 {{ unbondingPeriod }} 日才可以完成贖回過程。"
         },
         "table": {
           "triggerDesc": "按降序排序",
@@ -1395,6 +1410,9 @@
         "minValidator": {
           "error": "抵押數目少於"
         },
+        "button": {
+          "viewMore": "查看更多"
+        },
         "validatorList": {
           "table": {
             "title": "驗證者列表",
@@ -1454,6 +1472,16 @@
             "remainingTime": "尚餘時間",
             "completionTime": "完成時間"
           }
+        },
+        "modal4": {
+          "title": "獎勵",
+          "label1": "我的總獎勵",
+          "label2": "已領取獎勵",
+          "label3": "預計年獎勵",
+          "label4": "預計年收益率",
+          "tooltip1": "你所有已領取並存入到錢包的獎勵",
+          "tooltip2": "由你所有抵押資金所計算出的年抵押獎勵",
+          "tooltip3": "由你所有抵押資金所計算出的年收益率百分比"
         }
       },
       "governance": {
@@ -1896,7 +1924,8 @@
             "message1": "请注意，在赎回委托交易成功广播后，还需要等待一段时间才能正式完成",
             "message2": "日",
             "message3": "。在正式完成之前，你並不能使用赎回的委托资金。"
-          }
+          },
+          "checkbox1": "我明白根据 Crypto.org Chain的协定，我在 Crypto.org Chain 上的 CRO 抵押将要经过 {{ unbondingPeriod }} 日才可以完成赎回过程。"
         },
         "table": {
           "triggerDesc": "按降序排序",
@@ -2241,6 +2270,9 @@
         "minValidator": {
           "error": "抵押数目少于"
         },
+        "button": {
+          "viewMore": "查看更多"
+        },
         "validatorList": {
           "table": {
             "title": "验证者列表",
@@ -2300,6 +2332,16 @@
             "remainingTime": "尚余时间",
             "completionTime": "完成时间"
           }
+        },
+        "modal4": {
+          "title": "奖励",
+          "label1": "我的总奖励",
+          "label2": "已领取奖励",
+          "label3": "预计年奖励",
+          "label4": "预计年收益率",
+          "tooltip1": "你所有已领取并存入到钱包的奖励",
+          "tooltip2": "由你所有抵押资金所计算出的年抵押奖励",
+          "tooltip3": "由你所有抵押资金所计算出的年收益率百分比"
         }
       },
       "governance": {
@@ -3078,15 +3120,15 @@
         },
         "assetList": {
           "table": {
-            "title": "금액",
-            "name": "금액",
+            "title": "타이틀",
+            "name": "이름",
             "price": "가격",
             "amount": "금액",
-            "value": "시장 가치"
+            "value": "가치"
           }
         },
         "transactions": {
-          "tab1": "금액",
+          "tab1": "애셋",
           "tab2": "위임",
           "tab3": "NFT 트랜잭션",
           "table1": {
@@ -3174,16 +3216,18 @@
         "button": "레져에서 주소를 확인합니다"
       },
       "assets": {
-        "title": "금액",
+        "title": "애셋",
+        "description": "여기에서 모든 애셋을 관리하세요",
         "tab1": "트랜잭션",
         "tab2": "송금",
         "tab3": "수신",
+        "backToList": "애셋 리스트로 돌아가기",
         "assetList": {
           "table": {
-            "name": "금액",
+            "name": "애셋",
             "price": "가격",
             "amount": "금액",
-            "value": "시장 가치",
+            "value": "가치",
             "actionSend": "전송",
             "actionReceive": "수신"
           }
@@ -3199,11 +3243,15 @@
         "tab3": "위임 관리",
         "description1": "위임된 금액에서 보상을 인출합니다",
         "description2": "검증인에게 금액을 위임합니다",
+        "description3": "위임된 자산을 관리하세요",
         "maxValidator": {
           "error": "스테이킹 금액이 사용 가능한 지갑 잔액을 초과합니다."
         },
         "minValidator": {
           "error": "스테이킹 금액이 최소 금액보다 낮습니다."
+        },
+        "button": {
+          "viewMore": "더 보기"
         },
         "validatorList": {
           "table": {
@@ -3252,6 +3300,27 @@
           "label1": "송신인 주소",
           "label2": "검증인로부터 보상 인출하기",
           "label3": "보상"
+        },
+        "modal3": {
+          "title": "위임 취소",
+          "description": "스테이킹 해제된 자산은 Crypto.org 체인 네트워크에 의해 시행되는 {{ unbondingPeriod }}일 후에 사용할 수 있습니다.",
+          "button": "위임 취소 보기",
+          "table": {
+            "validatorAddress": "검증인 주소",
+            "unbondingAmount": "취소 금액",
+            "remainingTime": "남은 시간",
+            "completionTime": "완료 시간"
+          }
+        },
+        "modal4": {
+          "title": "보상",
+          "label1": "나의 모든 보상",
+          "label2": "청구된 보상",
+          "label3": "예상되는 연간 보상",
+          "label4": "예상되는 총  APY",
+          "tooltip1": "인출 및 지갑에 입금된 모든 스테이킹 보상",
+          "tooltip2": "모든 스테이킹에서 누적된 총 스테이킹 보상",
+          "tooltip3": "모든 스테이킹을 기반으로 연간 획득할 것으로 예상되는 총 스테이킹 보상을 반영하는 백분율 "
         }
       },
       "governance": {
@@ -3405,7 +3474,8 @@
         "tab3": "스토리지 삭제",
         "form1": {
           "assetIdentifier": {
-            "label": "금액"
+            "label": "애셋",
+            "description": "노드 구성은 다양한 애셋에서 설정할 수 있습니다."
           },
           "nodeUrl": {
             "label": "노드 URL",
@@ -3576,12 +3646,28 @@
         "available": "Mevcut",
         "action": "Aksiyon",
         "select": "Seç",
-        "review": "gözden geçir",
+        "review": "Gözden geçir",
         "copy": "Kopyala",
         "close": "Kapat",
         "retry": "Tekrar dene",
         "connect": "Bağlan",
         "seeAll": "Hepsini Gör",
+        "past": "Önce",
+        "future": "İçinde",
+        "years": "Yıl",
+        "year": "Bir yıl",
+        "months": "Ay",
+        "month": "Bir ay",
+        "weeks": "Hafta",
+        "week": "Bir hafta",
+        "days": "Gün",
+        "day": "Bir gün",
+        "hours": "Saat",
+        "hour": "Bir saat",
+        "minutes": "Dakika",
+        "minute": "Bir dakika",
+        "seconds": "Saniye",
+        "second": "Bir kaç saniye",
         "addressValidator": {
           "reason1": "Geçersiz",
           "reason2": "Adres sağlandı"

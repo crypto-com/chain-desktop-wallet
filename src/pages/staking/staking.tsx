@@ -709,6 +709,7 @@ const FormDelegationOperations = () => {
     validatorAddress: '',
     undelegateAmount: '',
   });
+  const [isUndelegateDisclaimerChecked, setIsUndelegateDisclaimerChecked] = useState(false);
   const [redelegateFormValues, setRedelegateFormValues] = useState({
     validatorOriginAddress: '',
     validatorDestinationAddress: '',
@@ -993,6 +994,10 @@ const FormDelegationOperations = () => {
               type="primary"
               loading={confirmLoading}
               onClick={onConfirmDelegationAction}
+              disabled={
+                delegationActionType === StakingActionType.UNDELEGATE &&
+                !isUndelegateDisclaimerChecked
+              }
             >
               {t('general.confirm')}
             </Button>,
@@ -1006,6 +1011,8 @@ const FormDelegationOperations = () => {
             <UndelegateFormComponent
               currentSession={currentSession}
               undelegateFormValues={undelegateFormValues}
+              isChecked={isUndelegateDisclaimerChecked}
+              setIsChecked={setIsUndelegateDisclaimerChecked}
               form={form}
             />
           ) : (
