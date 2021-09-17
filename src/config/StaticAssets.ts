@@ -21,6 +21,7 @@ export const CRO_ASSET = (walletConfig: WalletConfig) => {
 
   const config: UserAssetConfig = {
     explorerUrl: walletConfig.explorerUrl,
+    explorer: walletConfig.explorer,
     chainId: network.chainId,
     fee: { gasLimit: '300000', networkFee: '10000' },
     indexingUrl: walletConfig.indexingUrl,
@@ -41,6 +42,8 @@ export const CRO_ASSET = (walletConfig: WalletConfig) => {
     symbol: assetSymbol,
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
+    unbondingBalance: '0',
+    rewardsBalance: '0',
     decimals: 8,
     assetType: UserAssetType.TENDERMINT,
     isSecondaryAsset: false,
@@ -56,7 +59,11 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
   const isTestnet = checkIfTestnet(network);
 
   const config: UserAssetConfig = {
-    explorerUrl: 'https://cronos-explorer.crypto.org/',
+    explorer: {
+      tx: 'https://cronos-explorer.crypto.org/tx',
+      address: 'https://cronos-explorer.crypto.org/address',
+    },
+    explorerUrl: 'https://cronos-explorer.crypto.org',
     chainId: isTestnet ? '338' : 'TO_BE_DECIDED',
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
     indexingUrl: isTestnet ? 'https://cronos-explorer.crypto.org/api' : 'TO_BE_DECIDED',
@@ -76,6 +83,8 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
     symbol: 'CRONOS',
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
+    unbondingBalance: '0',
+    rewardsBalance: '0',
     decimals: 18,
     assetType: UserAssetType.EVM,
     isSecondaryAsset: true,

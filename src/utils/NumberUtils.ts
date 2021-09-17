@@ -11,14 +11,14 @@ export function fromScientificNotation(value) {
 
 // E.g : 1 CRO = 10^8 BASECRO
 // eslint-disable-next-line class-methods-use-this
-export function getBaseScaledAmount(amount: string, asset: UserAsset): string {
+export function getBaseScaledAmount(amount: string = '0', asset: UserAsset): string {
   const exp = Big(10).pow(asset.decimals);
   return Big(amount)
     .times(exp)
     .toFixed();
 }
 /// E.G : From 5000 BASETRCRO to 0.00005 TCRO
-export function getNormalScaleAmount(amount: string, asset: UserAsset): string {
+export function getNormalScaleAmount(amount: string = '0', asset: UserAsset): string {
   const exp = Big(10).pow(asset.decimals);
   return Big(amount)
     .div(exp)
@@ -27,7 +27,7 @@ export function getNormalScaleAmount(amount: string, asset: UserAsset): string {
 
 /// Get normal scale amount but fixed to 4 decimals
 export function getUINormalScaleAmount(
-  amount: string,
+  amount: string = '0',
   decimals: number,
   decimalPoint?: number,
 ): string {
@@ -39,7 +39,7 @@ export function getUINormalScaleAmount(
 }
 
 // For very small transactions amounts => do show up to max decimal numbers
-export function getUIDynamicAmount(amount: string, currentAsset: UserAsset) {
+export function getUIDynamicAmount(amount: string = '0', currentAsset: UserAsset) {
   let finalAmount = getUINormalScaleAmount(amount, currentAsset.decimals, 4);
   if (Big(finalAmount).lte(Big(1))) {
     finalAmount = getUINormalScaleAmount(amount, currentAsset.decimals, 8);
@@ -56,7 +56,7 @@ export const formatLargeNumber = (n): string => {
   return ``;
 };
 
-export function getUIVoteAmount(amount: string, asset: UserAsset) {
+export function getUIVoteAmount(amount: string = '0', asset: UserAsset) {
   const exp = Big(10).pow(asset.decimals);
   const voteAmount = Big(amount)
     .div(exp)
@@ -75,7 +75,7 @@ export function getCurrentMinAssetAmount(userAsset: UserAsset) {
 // When user selects option to send max amount,
 // transaction fee gets deduced to the sent amount for the transaction to be successful
 export function adjustedTransactionAmount(
-  formAmount: string,
+  formAmount: string = '0',
   walletAsset: UserAsset,
   fee: string,
 ): string {

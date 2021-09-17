@@ -17,6 +17,7 @@ import {
   DefaultWalletConfigs,
   NOT_KNOWN_YET_VALUE,
   WalletConfig,
+  SECONDS_OF_YEAR,
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
@@ -57,6 +58,7 @@ import {
   TransferTransactionData,
   TransferTransactionList,
   ValidatorModel,
+  RewardsBalances,
 } from '../models/Transaction';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
@@ -813,9 +815,18 @@ class WalletService {
                 asset.address || currentSession.wallet.address,
                 baseDenomination,
               );
+              asset.unbondingBalance = await nodeRpc.loadUnbondingBalance(
+                // Handling legacy wallets which had wallet.address
+                asset.address || currentSession.wallet.address,
+              );
+              asset.rewardsBalance = await nodeRpc.loadStakingRewardsBalance(
+                // Handling legacy wallets which had wallet.address
+                asset.address || currentSession.wallet.address,
+                baseDenomination,
+              );
               // eslint-disable-next-line no-console
               console.log(
-                `${asset.symbol}: Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance} - ${asset.address}`,
+                `${asset.symbol}: Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance} - Unbonding: ${asset.unbondingBalance} - Rewards: ${asset.rewardsBalance} - ${asset.address}`,
               );
             } catch (e) {
               // eslint-disable-next-line no-console
@@ -1003,12 +1014,34 @@ class WalletService {
 
   public async fetchAndSaveRewards(nodeRpc: NodeRpcService, currentSession: Session) {
     try {
-      const rewards = await nodeRpc.fetchStakingRewards(
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+
+      const rewards = await nodeRpc.fetchStakingRewardsBalance(
         currentSession.wallet.address,
         currentSession.wallet.config.network.coin.baseDenom,
       );
+
+      const claimedRewardsBalance = await chainIndexAPI.getTotalRewardsClaimedByAddress(
+        // Handling legacy wallets which had wallet.address
+        currentSession.wallet.address,
+      );
+
+      const delegatedValidatorList = rewards.transactions.map(tx => {
+        return tx.validatorAddress;
+      });
+
+      const estimatedInfo = await chainIndexAPI.getFutureEstimatedRewardsByValidatorAddressList(
+        delegatedValidatorList,
+        SECONDS_OF_YEAR,
+        currentSession.wallet.address,
+      );
+
       await this.saveRewards({
-        transactions: rewards,
+        totalBalance: rewards.totalBalance,
+        transactions: rewards.transactions,
+        claimedRewardsBalance,
+        estimatedRewardsBalance: estimatedInfo.estimatedRewards,
+        estimatedApy: estimatedInfo.estimatedApy,
         walletId: currentSession.wallet.identifier,
       });
     } catch (e) {
@@ -1272,6 +1305,26 @@ class WalletService {
       const rewardTransaction: RewardTransaction = { ...data };
       return rewardTransaction;
     });
+  }
+
+  public async retrieveRewardsBalances(walletId: string): Promise<RewardsBalances> {
+    const rewards: RewardTransactionList = await this.storageService.retrieveAllRewards(walletId);
+
+    if (!rewards) {
+      return {
+        claimedRewardsBalance: '0',
+        estimatedApy: '0',
+        estimatedRewardsBalance: '0',
+        totalBalance: '0',
+      };
+    }
+
+    return {
+      claimedRewardsBalance: rewards.claimedRewardsBalance!,
+      estimatedApy: rewards.estimatedApy!,
+      estimatedRewardsBalance: rewards.estimatedRewardsBalance!,
+      totalBalance: rewards.totalBalance,
+    };
   }
 
   public async retrieveAllUnbondingDelegations(

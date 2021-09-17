@@ -177,7 +177,7 @@ const GeneralSettingsForm = props => {
             message: `${t('settings.form1.nodeUrl.label')} ${t('general.required')}`,
           },
           {
-            pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
+            pattern: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)/,
             message: t('settings.form1.nodeUrl.error1'),
           },
         ]}
@@ -194,7 +194,7 @@ const GeneralSettingsForm = props => {
             message: `${t('settings.form1.indexingUrl.label')} ${t('general.required')}`,
           },
           {
-            pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
+            pattern: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)/,
             message: t('settings.form1.indexingUrl.error1'),
           },
         ]}
@@ -667,6 +667,7 @@ function MetaInfoComponent() {
 function getAssetConfigFromWalletConfig(walletConfig: WalletConfig): UserAssetConfig {
   return {
     chainId: walletConfig.network.chainId,
+    explorer: walletConfig.explorer,
     explorerUrl: walletConfig.explorerUrl,
     fee: { gasLimit: walletConfig.fee.gasLimit, networkFee: walletConfig.fee.networkFee },
     indexingUrl: walletConfig.indexingUrl,
@@ -685,7 +686,7 @@ const FormSettings = () => {
   const [isConfirmClearVisible, setIsConfirmClearVisible] = useState(false);
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [session, setSession] = useRecoilState(sessionState);
-  const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
 
   const defaultSettings: UserAssetConfig =
     session.activeAsset?.config || getAssetConfigFromWalletConfig(session.wallet.config);
@@ -746,6 +747,7 @@ const FormSettings = () => {
       indexingUrl: values.indexingUrl,
       networkFee: String(values.networkFee),
       gasLimit: String(values.gasLimit),
+      explorer: session.wallet.config.explorer,
     };
 
     // This wallet level settings update should only imply the primary asset.
@@ -761,7 +763,7 @@ const FormSettings = () => {
       ...session.activeAsset!,
       config: {
         ...previousAssetConfig!,
-        explorerUrl: settingsDataUpdate.indexingUrl!,
+        explorer: settingsDataUpdate.explorer!,
         chainId: settingsDataUpdate.chainId!,
         fee: { gasLimit: settingsDataUpdate.gasLimit!, networkFee: settingsDataUpdate.networkFee! },
         indexingUrl: settingsDataUpdate.indexingUrl!,
@@ -779,6 +781,9 @@ const FormSettings = () => {
 
     const allNewUpdatedWallets = await walletService.retrieveAllWallets();
     setWalletList(allNewUpdatedWallets);
+
+    const allAssets = await walletService.retrieveCurrentWalletAssets(newSession);
+    setWalletAllAssets(allAssets);
 
     setIsButtonLoading(false);
     message.success(
