@@ -1440,7 +1440,7 @@ const StakingPage = () => {
   const allMarketData = useRecoilValue(allMarketState);
   const [marketData, setMarketData] = useState<AssetMarketPrice>();
   const [isUnbondingDelegationModalVisible, setIsUnbondingDelegationModalVisible] = useState(false);
-  // eslint-disable-next-line
+  const [isUnbondingVisible, setIsUnbondingVisible] = useState(false);
   const [unbondingDelegations, setUnbondingDelegations] = useState<
     UnbondingDelegationTabularData[]
   >([]);
@@ -1524,6 +1524,8 @@ const StakingPage = () => {
 
       const unbondingDelegationTabularData = convertUnbondingDelegations(allUnbonding, userAsset);
       setUnbondingDelegations(unbondingDelegationTabularData);
+
+      setIsUnbondingVisible(unbondingDelegationTabularData.length > 0);
     };
 
     syncUnbondingDelegationsData();
@@ -1569,22 +1571,27 @@ const StakingPage = () => {
                 : ''}
             </div>
           </div>
-          <div className="balance">
-            <div className="title">{t('staking.balance.title2')}</div>
-            {userAsset && (
-              <div className="quantity">
-                {numeral(scaledUnbondingBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
+          {isUnbondingVisible ? (
+            <div className="balance">
+              <div className="title">{t('staking.balance.title2')}</div>
+              {userAsset && (
+                <div className="quantity">
+                  {numeral(scaledUnbondingBalance(userAsset)).format('0,0.0000')}{' '}
+                  {userAsset?.symbol}
+                </div>
+              )}
+              <div className="fiat">
+                {userAsset && marketData && marketData.price
+                  ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                      getAssetUnbondingBalancePrice(userAsset, marketData),
+                    ).format('0,0.00')} ${marketData?.currency}
+                `
+                  : ''}
               </div>
-            )}
-            <div className="fiat">
-              {userAsset && marketData && marketData.price
-                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetUnbondingBalancePrice(userAsset, marketData),
-                  ).format('0,0.00')} ${marketData?.currency}
-                  `
-                : ''}
             </div>
-          </div>
+          ) : (
+            <></>
+          )}
           <div className="balance">
             <div className="title">{t('staking.balance.title3')}</div>
             {userAsset && (
@@ -1626,41 +1633,45 @@ const StakingPage = () => {
                   <Sider width="60%">
                     <div className="description">{t('staking.description3')}</div>
                   </Sider>
-                  <Content>
-                    <div className="view-unstaking">
-                      <a
-                        onClick={() => {
-                          setIsUnbondingDelegationModalVisible(true);
-                        }}
-                      >
-                        {t('staking.modal3.button')}
-                      </a>
-                    </div>
-                    <ModalPopup
-                      isModalVisible={isUnbondingDelegationModalVisible}
-                      handleCancel={() => setIsUnbondingDelegationModalVisible(false)}
-                      handleOk={() => setIsUnbondingDelegationModalVisible(false)}
-                      className="unbonding-modal"
-                      footer={[]}
-                      okText="OK"
-                    >
-                      <>
-                        <div className="title">{t('staking.modal3.title')}</div>
-                        <div className="description">
-                          {t('staking.modal3.description', { unbondingPeriod: undelegatePeriod })}
-                        </div>
-                        <Table
-                          locale={{
-                            triggerDesc: t('general.table.triggerDesc'),
-                            triggerAsc: t('general.table.triggerAsc'),
-                            cancelSort: t('general.table.cancelSort'),
+                  {isUnbondingVisible ? (
+                    <Content>
+                      <div className="view-unstaking">
+                        <a
+                          onClick={() => {
+                            setIsUnbondingDelegationModalVisible(true);
                           }}
-                          columns={unbondingDelegationColumns}
-                          dataSource={unbondingDelegations}
-                        />
-                      </>
-                    </ModalPopup>
-                  </Content>
+                        >
+                          {t('staking.modal3.button')}
+                        </a>
+                      </div>
+                      <ModalPopup
+                        isModalVisible={isUnbondingDelegationModalVisible}
+                        handleCancel={() => setIsUnbondingDelegationModalVisible(false)}
+                        handleOk={() => setIsUnbondingDelegationModalVisible(false)}
+                        className="unbonding-modal"
+                        footer={[]}
+                        okText="OK"
+                      >
+                        <>
+                          <div className="title">{t('staking.modal3.title')}</div>
+                          <div className="description">
+                            {t('staking.modal3.description', { unbondingPeriod: undelegatePeriod })}
+                          </div>
+                          <Table
+                            locale={{
+                              triggerDesc: t('general.table.triggerDesc'),
+                              triggerAsc: t('general.table.triggerAsc'),
+                              cancelSort: t('general.table.cancelSort'),
+                            }}
+                            columns={unbondingDelegationColumns}
+                            dataSource={unbondingDelegations}
+                          />
+                        </>
+                      </ModalPopup>
+                    </Content>
+                  ) : (
+                    <></>
+                  )}
                 </Layout>
                 <FormDelegationOperations />
               </div>
