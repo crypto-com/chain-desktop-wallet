@@ -2,8 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Button, Layout, notification, Table, Tabs, Card, List, Avatar, Tooltip } from 'antd';
-import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
+import { Button, Layout, notification, Table, Tabs, Card, List, Avatar } from 'antd';
+import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
 import Big from 'big.js';
@@ -12,7 +12,6 @@ import { useTranslation } from 'react-i18next';
 import {
   hasShownWarningOnWalletTypeState,
   sessionState,
-  // marketState,
   allMarketState,
   walletAssetState,
   walletAllAssetsState,
@@ -25,20 +24,16 @@ import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
 import {
   scaledAmount,
-  scaledAmountByAsset,
   scaledStakingBalance,
   scaledTotalBalance,
-  getAssetAmountInFiat,
   getAssetBalancePrice,
   getAssetStakingBalancePrice,
-  getAssetRewardsBalancePrice,
   getAssetTotalBalancePrice,
   UserAsset,
   AssetMarketPrice,
-  scaledRewardBalance,
 } from '../../models/UserAsset';
 
-import { NftModel, NftProcessedModel } from '../../models/Transaction';
+import { NftModel, NftProcessedModel, RewardsBalances } from '../../models/Transaction';
 
 import { walletService } from '../../service/WalletService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
@@ -46,7 +41,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 // import logoCro from '../../assets/AssetLogo/cro.png';
 import IconTick from '../../svg/IconTick';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
-import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import RewardModalPopup from '../../components/RewardModalPopup/RewardModalPopup';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -69,7 +64,6 @@ const HomePage = () => {
   // const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setNFTList = useSetRecoilState(nftListState);
-  // const marketData = useRecoilValue(marketState);
   const allMarketData = useRecoilValue(allMarketState);
   const [marketData, setMarketData] = useState<AssetMarketPrice>();
 
@@ -86,9 +80,7 @@ const HomePage = () => {
   const [defaultWalletAsset, setdefaultWalletAsset] = useState<UserAsset>();
 
   const [isRewardModalVisible, setIsRewardModalVisible] = useState(false);
-  const [claimedRewards, setClaimedRewards] = useState('0');
-  const [estimatedRewards, setEstimatedRewards] = useState('0');
-  const [estimatedApy, setEstimatedApy] = useState('0');
+  const [rewards, setRewards] = useState<RewardsBalances>();
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -299,7 +291,9 @@ const HomePage = () => {
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
       const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
       const allNFTs: NftModel[] = await walletService.retrieveNFTs(sessionData.wallet.identifier);
-      const rewards = await walletService.retrieveRewardsBalances(currentSession.wallet.identifier);
+      const allRewards = await walletService.retrieveRewardsBalances(
+        currentSession.wallet.identifier,
+      );
 
       const currentNftList = processNftList(allNFTs);
       setProcessedNftList(currentNftList);
@@ -308,9 +302,7 @@ const HomePage = () => {
       setWalletAsset(currentAsset);
       setMarketData(allMarketData[`${currentAsset?.mainnetSymbol}-${sessionData.currency}`]);
 
-      setClaimedRewards(rewards.claimedRewardsBalance);
-      setEstimatedRewards(rewards.estimatedRewardsBalance);
-      setEstimatedApy((Number(rewards.estimatedApy) * 100).toPrecision(4));
+      setRewards(allRewards);
 
       showWalletStateNotification(sessionData.wallet.config);
       setWalletAllAssets(allAssets);
@@ -392,7 +384,9 @@ const HomePage = () => {
               <div className="quantity">
                 {numeral(
                   scaledAmount(
-                    new Big(defaultWalletAsset.rewardsBalance).add(claimedRewards).toFixed(2),
+                    new Big(defaultWalletAsset.rewardsBalance)
+                      .add(rewards?.claimedRewardsBalance ?? '0')
+                      .toFixed(2),
                     defaultWalletAsset.decimals,
                   ),
                 ).format('0,0.0000')}{' '}
@@ -400,12 +394,6 @@ const HomePage = () => {
               </div>
             )}
             <div className="fiat">
-              {/* {defaultWalletAsset && marketData && marketData.price
-                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetRewardsBalancePrice(defaultWalletAsset, marketData),
-                  ).format('0,0.00')} ${marketData?.currency}
-                  `
-                : ''} */}
               <a
                 onClick={() => {
                   setIsRewardModalVisible(true);
@@ -413,151 +401,14 @@ const HomePage = () => {
               >
                 {t('staking.button.viewMore')}
               </a>
-              <ModalPopup
-                isModalVisible={isRewardModalVisible}
-                handleCancel={() => setIsRewardModalVisible(false)}
+              <RewardModalPopup
                 handleOk={() => setIsRewardModalVisible(false)}
-                className="my-reward-modal"
-                footer={[]}
-                okText="OK"
-              >
-                <>
-                  <div className="upper-container">
-                    <div className="title">{t('staking.modal4.title')}</div>
-                    <div className="my-total-rewards balance">
-                      <div className="title">{t('staking.modal4.label1')}</div>
-                      {defaultWalletAsset && (
-                        <div className="quantity">
-                          {numeral(
-                            scaledAmount(
-                              new Big(defaultWalletAsset.rewardsBalance)
-                                .add(claimedRewards)
-                                .toFixed(2),
-                              defaultWalletAsset.decimals,
-                            ),
-                          ).format('0,0.0000')}{' '}
-                          {defaultWalletAsset?.symbol}
-                        </div>
-                      )}
-                      <div className="fiat">
-                        {defaultWalletAsset && marketData && marketData.price
-                          ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                              getAssetAmountInFiat(
-                                scaledAmount(
-                                  new Big(defaultWalletAsset.rewardsBalance)
-                                    .add(claimedRewards)
-                                    .toFixed(2),
-                                  defaultWalletAsset.decimals,
-                                ),
-                                marketData,
-                              ),
-                            ).format('0,0.00')} ${marketData?.currency}
-                          `
-                          : ''}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="lower-container">
-                    {defaultWalletAsset && (
-                      <>
-                        <div className="balance">
-                          <div className="title">
-                            <span>{t('staking.modal4.label5')}</span>
-                            <Tooltip placement="top" title={t('staking.modal4.tooltip1')}>
-                              <ExclamationCircleOutlined
-                                style={{ color: '#1199fa', marginLeft: '5px' }}
-                              />
-                            </Tooltip>
-                          </div>
-                          {defaultWalletAsset && (
-                            <div className="quantity">
-                              {numeral(scaledRewardBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
-                              {defaultWalletAsset?.symbol}
-                            </div>
-                          )}
-                          <div className="fiat">
-                            {defaultWalletAsset && marketData && marketData.price
-                              ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                                  getAssetRewardsBalancePrice(defaultWalletAsset, marketData),
-                                ).format('0,0.00')} ${marketData?.currency}
-                          `
-                              : ''}
-                          </div>
-                        </div>
-                        <div className="balance">
-                          <div className="title">
-                            <span>{t('staking.modal4.label2')}</span>
-                            <Tooltip placement="top" title={t('staking.modal4.tooltip1')}>
-                              <ExclamationCircleOutlined
-                                style={{ color: '#1199fa', marginLeft: '5px' }}
-                              />
-                            </Tooltip>
-                          </div>
-                          {defaultWalletAsset && (
-                            <div className="quantity">
-                              {numeral(
-                                scaledAmountByAsset(claimedRewards, defaultWalletAsset),
-                              ).format('0,0.0000')}{' '}
-                              {defaultWalletAsset?.symbol}
-                            </div>
-                          )}
-                          <div className="fiat">
-                            {defaultWalletAsset && marketData && marketData.price
-                              ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                                  getAssetAmountInFiat(
-                                    scaledAmountByAsset(claimedRewards, defaultWalletAsset),
-                                    marketData,
-                                  ),
-                                ).format('0,0.00')} ${marketData?.currency}
-                          `
-                              : ''}
-                          </div>
-                        </div>
-                        <div className="balance">
-                          <div className="title">
-                            <span>{t('staking.modal4.label3')}</span>
-                            <Tooltip placement="top" title={t('staking.modal4.tooltip2')}>
-                              <ExclamationCircleOutlined
-                                style={{ color: '#1199fa', marginLeft: '5px' }}
-                              />
-                            </Tooltip>
-                          </div>
-                          {defaultWalletAsset && (
-                            <div className="quantity">
-                              {numeral(
-                                scaledAmountByAsset(estimatedRewards, defaultWalletAsset),
-                              ).format('0,0.0000')}{' '}
-                              {defaultWalletAsset?.symbol}
-                            </div>
-                          )}
-                          <div className="fiat">
-                            {defaultWalletAsset && marketData && marketData.price
-                              ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                                  getAssetAmountInFiat(
-                                    scaledAmountByAsset(estimatedRewards, defaultWalletAsset),
-                                    marketData,
-                                  ),
-                                ).format('0,0.00')} ${marketData?.currency}
-                          `
-                              : ''}
-                          </div>
-                        </div>
-                        <div className="balance">
-                          <div className="title">
-                            <span>{t('staking.modal4.label4')}</span>
-                            <Tooltip placement="top" title={t('staking.modal4.tooltip3')}>
-                              <ExclamationCircleOutlined
-                                style={{ color: '#1199fa', marginLeft: '5px' }}
-                              />
-                            </Tooltip>
-                          </div>
-                          <div className="quantity">{`${estimatedApy}%`}</div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </>
-              </ModalPopup>
+                handleCancel={() => setIsRewardModalVisible(false)}
+                isModalVisible={isRewardModalVisible}
+                walletAsset={defaultWalletAsset}
+                marketData={marketData}
+                rewards={rewards}
+              />
             </div>
           </div>
         </div>
