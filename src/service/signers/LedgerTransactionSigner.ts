@@ -1,6 +1,7 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import sdk from '@crypto-org-chain/chain-jslib';
 import { CosmosMsg } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/msg/cosmosMsg';
+import Long from 'long';
 import { Big, Units } from '../../utils/ChainJsLib';
 import {
   FIXED_DEFAULT_FEE,
@@ -62,6 +63,34 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       fromAddress: transaction.fromAddress,
       toAddress: transaction.toAddress,
       amount: new cro.Coin(transaction.amount, Units.BASE),
+    });
+
+    return this.getSignedMessageTransaction(transaction, msgSend, rawTx);
+  }
+
+  public async signIBCTransfer(
+    transaction: TransferTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
+
+    const ibcAsset = transaction.asset;
+
+    const denomTracePath = ibcAsset?.denomTracePath;
+    const channelAndPort = denomTracePath?.split('/');
+    const channel = channelAndPort?.[0];
+    const port = channelAndPort?.[1];
+
+    const millisToNanoSecond = 1_000_000;
+    const timeout = (Date.now() + 60_000) * millisToNanoSecond;
+
+    const msgSend = new cro.ibc.MsgTransfer({
+      sender: transaction.fromAddress,
+      sourceChannel: channel || '',
+      sourcePort: port || '',
+      timeoutTimestampInNanoSeconds: Long.fromValue(timeout),
+      receiver: transaction.toAddress,
+      token: new cro.Coin(transaction.amount, Units.BASE),
     });
 
     return this.getSignedMessageTransaction(transaction, msgSend, rawTx);

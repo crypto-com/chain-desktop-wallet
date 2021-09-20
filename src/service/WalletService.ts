@@ -16,8 +16,8 @@ import {
   DEFAULT_CLIENT_MEMO,
   DefaultWalletConfigs,
   NOT_KNOWN_YET_VALUE,
-  WalletConfig,
   SECONDS_OF_YEAR,
+  WalletConfig,
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
@@ -48,17 +48,17 @@ import {
   NftTransferModel,
   ProposalModel,
   ProposalStatuses,
+  RewardsBalances,
   RewardTransaction,
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
-  UnbondingDelegationData,
-  UnbondingDelegationList,
   TransactionStatus,
   TransferTransactionData,
   TransferTransactionList,
+  UnbondingDelegationData,
+  UnbondingDelegationList,
   ValidatorModel,
-  RewardsBalances,
 } from '../models/Transaction';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
@@ -175,9 +175,6 @@ class WalletService {
         }
 
       case UserAssetType.IBC:
-        // TODO : IBC Message transfer implementation
-        return {};
-
       case UserAssetType.TENDERMINT:
       case undefined: {
         const {
@@ -201,15 +198,20 @@ class WalletService {
         let signedTxHex: string = '';
 
         if (transferRequest.walletType === LEDGER_WALLET_TYPE) {
-          signedTxHex = await ledgerTransactionSigner.signTransfer(
-            transfer,
-            transferRequest.decryptedPhrase,
-          );
+          signedTxHex =
+            currentAsset.assetType === UserAssetType.IBC
+              ? await ledgerTransactionSigner.signIBCTransfer(
+                  transfer,
+                  transferRequest.decryptedPhrase,
+                )
+              : await ledgerTransactionSigner.signTransfer(
+                  transfer,
+                  transferRequest.decryptedPhrase,
+                );
         } else {
-          signedTxHex = await transactionSigner.signTransfer(
-            transfer,
-            transferRequest.decryptedPhrase,
-          );
+          signedTxHex = UserAssetType.IBC
+            ? await transactionSigner.signIBCTransfer(transfer, transferRequest.decryptedPhrase)
+            : await transactionSigner.signTransfer(transfer, transferRequest.decryptedPhrase);
         }
 
         const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
