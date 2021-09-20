@@ -14,6 +14,7 @@ import {
   sessionState,
   // marketState,
   allMarketState,
+  walletAssetState,
   walletAllAssetsState,
   nftListState,
   navbarMenuSelectedKeyState,
@@ -63,6 +64,7 @@ const HomePage = () => {
   const [currentSession, setCurrentSession] = useRecoilState(sessionState);
   // const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   // const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
+  const setWalletAsset = useSetRecoilState(walletAssetState);
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   // const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
@@ -303,6 +305,7 @@ const HomePage = () => {
       setProcessedNftList(currentNftList);
       setNFTList(allNFTs);
       setdefaultWalletAsset(currentAsset);
+      setWalletAsset(currentAsset);
       setMarketData(allMarketData[`${currentAsset?.mainnetSymbol}-${sessionData.currency}`]);
 
       setClaimedRewards(rewards.claimedRewardsBalance);
