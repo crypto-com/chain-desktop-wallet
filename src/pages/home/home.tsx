@@ -354,7 +354,7 @@ const HomePage = () => {
             </div>
           </div> */}
           <div className="balance">
-            <div className="title">TOTAL CRO BALANCE</div>
+            <div className="title">{t('home.balance.title1')}</div>
             {defaultWalletAsset && (
               <div className="quantity">
                 {numeral(scaledTotalBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
@@ -370,7 +370,7 @@ const HomePage = () => {
             </div>
           </div>
           <div className="balance">
-            <div className="title">STAKED CRO BALANCE</div>
+            <div className="title">{t('home.balance.title2')}</div>
             {defaultWalletAsset && (
               <div className="quantity">
                 {numeral(scaledStakingBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
@@ -387,7 +387,7 @@ const HomePage = () => {
             </div>
           </div>
           <div className="balance">
-            <div className="title">TOTAL REWARDS</div>
+            <div className="title">{t('home.balance.title3')}</div>
             {defaultWalletAsset && (
               <div className="quantity">
                 {numeral(

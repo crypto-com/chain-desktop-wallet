@@ -1555,7 +1555,7 @@ const StakingPage = () => {
             </div>
           </div> */}
           <div className="balance">
-            <div className="title">STAKED CRO BALANCE</div>
+            <div className="title">{t('staking.balance.title1')}</div>
             {userAsset && (
               <div className="quantity">
                 {numeral(scaledStakingBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
@@ -1570,7 +1570,7 @@ const StakingPage = () => {
             </div>
           </div>
           <div className="balance">
-            <div className="title">UNBONDING CRO BALANCE</div>
+            <div className="title">{t('staking.balance.title2')}</div>
             {userAsset && (
               <div className="quantity">
                 {numeral(scaledUnbondingBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
@@ -1586,7 +1586,7 @@ const StakingPage = () => {
             </div>
           </div>
           <div className="balance">
-            <div className="title">REWARD BALANCE</div>
+            <div className="title">{t('staking.balance.title3')}</div>
             {userAsset && (
               <div className="quantity">
                 {numeral(scaledRewardBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}

@@ -410,7 +410,8 @@
         "title": "Welcome Back!",
         "balance": {
           "title1": "TOTAL BALANCE",
-          "title2": "STAKED BALANCE"
+          "title2": "STAKED BALANCE",
+          "title3": "TOTAL REWARDS"
         },
         "nft": {
           "tab1": "My NFT",
@@ -543,6 +544,11 @@
         "description1": "Withdraw rewards from delegated funds.\n",
         "description2": "Delegate funds to validator.",
         "description3": "Manage your delegated funds.",
+        "balance": {
+          "title1": "STAKED BALANCE",
+          "title2": "UNBONDING BALANCE",
+          "title3": "REWARD BALANCE"
+        },
         "maxValidator": {
           "error": "Staking amount exceeds your available wallet balance"
         },
@@ -1272,7 +1278,8 @@
         "title": "歡迎",
         "balance": {
           "title1": "總餘額",
-          "title2": "抵押餘額"
+          "title2": "抵押餘額",
+          "title3": "總獎勵"
         },
         "nft": {
           "tab1": "我的NFT",
@@ -1405,6 +1412,11 @@
         "description1": "從委託資金提取獎勵。",
         "description2": "委託資金至驗證者。",
         "description3": "管理你的已委託資金",
+        "balance": {
+          "title1": "抵押餘額",
+          "title2": "贖回中的餘額",
+          "title3": "獎勵餘額"
+        },
         "maxValidator": {
           "error": "抵押數目大於你的錢包餘額"
         },
@@ -2133,7 +2145,8 @@
         "title": "欢迎",
         "balance": {
           "title1": "总余额",
-          "title2": "抵押余额"
+          "title2": "抵押余额",
+          "title3": "总奖励"
         },
         "nft": {
           "tab1": "我的NFT",
@@ -2266,6 +2279,11 @@
         "description1": "从委托资金提取奖励。",
         "description2": "委托资金至验证者。",
         "description3": "管理你的已委托资金",
+        "balance": {
+          "title1": "抵押余额",
+          "title2": "赎回中的余额",
+          "title3": "奖励余额"
+        },
         "maxValidator": {
           "error": "抵押数目大于你的钱包余额"
         },
@@ -3114,7 +3132,8 @@
         "title": "다시 오신 것을 환영합니다!",
         "balance": {
           "title1": "전체 금액",
-          "title2": "스테이킹 금액"
+          "title2": "스테이킹 금액",
+          "title3": "전체 보상"
         },
         "nft": {
           "tab1": "나의 NFT",
@@ -3247,6 +3266,11 @@
         "description1": "위임된 금액에서 보상을 인출합니다",
         "description2": "검증인에게 금액을 위임합니다",
         "description3": "위임된 자산을 관리하세요",
+        "balance": {
+          "title1": "스테이킹 금액",
+          "title2": "취소 금액",
+          "title3": "보상 금액"
+        },
         "maxValidator": {
           "error": "스테이킹 금액이 사용 가능한 지갑 잔액을 초과합니다."
         },
