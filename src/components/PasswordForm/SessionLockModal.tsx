@@ -61,7 +61,7 @@ const SessionLockModal: React.FC<SessionLockModalProps> = props => {
       className="session-lock-modal"
       title={props.title}
       visible={props.visible}
-      mask={true}
+      mask
       maskStyle={{
         backdropFilter: 'blur(5px)'
       }}
