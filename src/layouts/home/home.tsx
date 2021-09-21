@@ -22,6 +22,7 @@ import Icon, {
   ReloadOutlined,
   BankOutlined,
   SettingOutlined,
+  LockFilled,
 } from '@ant-design/icons';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
@@ -59,6 +60,7 @@ import { LedgerWalletMaximum } from '../../config/StaticConfig';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
+import SessionLockModal from '../../components/PasswordForm/SessionLockModal';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -193,6 +195,7 @@ function HomeLayout(props: HomeLayoutProps) {
   };
 
   const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
+  const [isSessionLockModalVisible, setIsSessionLockModalVisible] = useState<boolean>(false);
 
   const showPasswordInput = () => {
     setInputPasswordVisible(true);
@@ -490,11 +493,46 @@ function HomeLayout(props: HomeLayoutProps) {
         repeatValidation
       />
 
+      <SessionLockModal
+        description={t('general.sessionLockModal.description')}
+        okButtonText={t('general.sessionLockModal.okButton')}
+        onCancel={() => {
+          setIsSessionLockModalVisible(false);
+        }}
+        onSuccess={(password) => {
+          setIsSessionLockModalVisible(false);
+          onWalletDecryptFinishCreateFreshAssets(password);
+        }}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          return {
+            valid: isValid,
+            errMsg: !isValid ? t('general.sessionLockModal.error') : '',
+          };
+        }}
+        successText={t('general.sessionLockModal.success')}
+        title={t('general.sessionLockModal.title')}
+        visible={isSessionLockModalVisible}
+        successButtonText={t('general.continue')}
+        confirmPassword={false}
+        repeatValidation
+      />
+
       <Layout>
         <Sider className="home-sider">
           <div className="logo" />
           <div className="version">SAMPLE WALLET v{buildVersion}</div>
           <HomeMenu />
+            <Button
+              className="bottom-icon"
+              type="ghost"
+              size="small"
+              icon={<LockFilled style={{ color: "black" }} />}
+              onClick={() =>
+                setIsSessionLockModalVisible(true)
+              }
+            > Lock </Button>
+
           <Dropdown
             overlay={<WalletMenu />}
             placement="topCenter"

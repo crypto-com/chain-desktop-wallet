@@ -1,51 +1,19 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import './PasswordFormModal.less';
+import './SessionLockModal.less';
 import Modal from 'antd/lib/modal/Modal';
 import { Button } from 'antd';
 import PasswordForm from './PasswordForm';
 import SuccessCheckmark from '../SuccessCheckmark/SuccessCheckmark';
 import ErrorXmark from '../ErrorXmark/ErrorXmark';
+import { PasswordFormModalProps } from './PasswordFormModal';
 
-export interface PasswordFormModalProps {
-  title: string;
-  description?: string;
-  // Control visibility of the component
-  visible: boolean;
-  // Control whether the form should confirm the password
-  confirmPassword?: boolean;
-
-  // Overwrite and display error message
-  errMsg?: string;
-
-  // Ok button text
-  okButtonText?: string;
-  // Text to show on password is validated
-  successText: string;
-  // Button text on password is validated
-  successButtonText?: string;
-
-  isButtonLoading?: boolean;
-
-  // Will ask for password again even after password was validated before
-  repeatValidation?: boolean;
-
-  // TODO: use secure-string
-  onValidatePassword: (
-    password: string,
-  ) => Promise<{
-    valid: boolean;
-    errMsg?: string;
-  }>;
-  // Callback on password is ok
-  onSuccess: (password: string) => void;
-  // Callback on cancel
-  onCancel: () => void;
+interface SessionLockModalProps extends PasswordFormModalProps {
 }
 
 type DisplayComponent = 'form' | 'result';
 
-const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
+const SessionLockModal: React.FC<SessionLockModalProps> = props => {
   const [appPassword, setAppPassword] = useState<string>();
   const [displayComponent, setDisplayComponent] = useState<DisplayComponent>('form');
   const [validationErrMsg, setValidatorErrMsg] = useState<string>();
@@ -87,11 +55,18 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
     setValidatorErrMsg('');
     setDisplayComponent('form');
   };
+
   return (
     <Modal
-      className="password-form-modal"
+      className="session-lock-modal"
       title={props.title}
       visible={props.visible}
+      mask={true}
+      maskStyle={{
+        backdropFilter: 'blur(5px)'
+      }}
+      keyboard={false}
+      maskClosable={false}
       confirmLoading={props.isButtonLoading}
       footer={
         displayComponent === 'result' && (
@@ -107,7 +82,6 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
           </div>
         )
       }
-      onCancel={props.onCancel}
     >
       {displayComponent === 'form' ? (
         <PasswordForm
@@ -122,22 +96,22 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
           </Button>
         </PasswordForm>
       ) : (
-        <div className="result">
-          {validationErrMsg ? (
-            <div>
-              <ErrorXmark />
-              <div className="result-message">{validationErrMsg}</div>
-            </div>
-          ) : (
-            <div>
-              <SuccessCheckmark />
-              <div className="result-message">{props.successText}</div>
-            </div>
-          )}
-        </div>
-      )}
+          <div className="result">
+            {validationErrMsg ? (
+              <div>
+                <ErrorXmark />
+                <div className="result-message">{validationErrMsg}</div>
+              </div>
+            ) : (
+                <div>
+                  <SuccessCheckmark />
+                  <div className="result-message">{props.successText}</div>
+                </div>
+              )}
+          </div>
+        )}
     </Modal>
   );
 };
 
-export default PasswordFormModal;
+export default SessionLockModal;

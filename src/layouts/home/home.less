@@ -94,9 +94,19 @@
         }
       }
     }
+    .bottom-icon {
+      position: absolute;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      height: fit-content;
+      border-radius: @border-radius;
+      margin-bottom: 80px;
+    }
     .ant-menu-item:hover {
       background: #e4f4ff;
     }
+  }
   }
   .ant-layout-sider.home-sider,
   .ant-menu {
@@ -130,7 +140,7 @@
       }
     }
   }
-}
+
 .ant-dropdown {
   ul.ant-menu-root {
     margin-bottom: 16px;

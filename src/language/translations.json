@@ -86,6 +86,13 @@
             "successButton": "Go to Home"
           }
         },
+        "sessionLockModal": {
+          "title": "Enter app password to unlock",
+          "description": "Enter app password to unlock",
+          "error": "The password provided is incorrect. Please try again",
+          "success": "Wallet unlocked successfully!",
+          "okButton": "Unlock wallet"
+        },
         "successModalPopup": {
           "title": "Success!",
           "timeout": {
