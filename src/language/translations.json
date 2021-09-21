@@ -203,7 +203,8 @@
             "message1": "Please do understand that undelegation takes a number of days to fully complete after the transaction has been broadcasted",
             "message2": "days",
             "message3": ". Until then, you are not able to use the undelegated funds yet."
-          }
+          },
+          "checkbox1": "I understand that my CRO in Crypto.org Chain staking is subject to a {{ unbondingPeriod }}-day unbonding period when I unstake, as enfored by the Crypto.org Chain network."
         },
         "table": {
           "triggerDesc": "Click to sort by descend",
@@ -409,7 +410,8 @@
         "title": "Welcome Back!",
         "balance": {
           "title1": "TOTAL BALANCE",
-          "title2": "STAKED BALANCE"
+          "title2": "STAKED BALANCE",
+          "title3": "TOTAL REWARDS"
         },
         "nft": {
           "tab1": "My NFT",
@@ -542,6 +544,11 @@
         "description1": "Withdraw rewards from delegated funds.\n",
         "description2": "Delegate funds to validator.",
         "description3": "Manage your delegated funds.",
+        "balance": {
+          "title1": "STAKED BALANCE",
+          "title2": "UNBONDING BALANCE",
+          "title3": "REWARD BALANCE"
+        },
         "maxValidator": {
           "error": "Staking amount exceeds your available wallet balance"
         },
@@ -617,6 +624,7 @@
           "label2": "CLAIMED REWARDS",
           "label3": "ESTIMATED ANNUAL REWARDS",
           "label4": "ESTIMATED TOTAL APY",
+          "label5": "REWARD BALANCE",
           "tooltip1": "All staking rewards that have been withdrawn and deposited to your wallet",
           "tooltip2": "Total staking rewards accumulated from all your stakings",
           "tooltip3": "A percentage rate reflecting the total staking rewards projected to be earned over an annual period, based on all your stakings"
@@ -1063,7 +1071,8 @@
             "message1": "請注意，在贖回委託交易成功廣播後，還需要等待一段時間才能正式完成",
             "message2": "日",
             "message3": "。在正式完成之前，你並不能使用贖回的委託資金。"
-          }
+          },
+          "checkbox1": "我明白根據 Crypto.org Chain 的協定，我在 Crypto.org Chain 上的 CRO 抵押將要經過 {{ unbondingPeriod }} 日才可以完成贖回過程。"
         },
         "table": {
           "triggerDesc": "按降序排序",
@@ -1269,7 +1278,8 @@
         "title": "歡迎",
         "balance": {
           "title1": "總餘額",
-          "title2": "抵押餘額"
+          "title2": "抵押餘額",
+          "title3": "總獎勵"
         },
         "nft": {
           "tab1": "我的NFT",
@@ -1402,6 +1412,11 @@
         "description1": "從委託資金提取獎勵。",
         "description2": "委託資金至驗證者。",
         "description3": "管理你的已委託資金",
+        "balance": {
+          "title1": "抵押餘額",
+          "title2": "贖回中的餘額",
+          "title3": "獎勵餘額"
+        },
         "maxValidator": {
           "error": "抵押數目大於你的錢包餘額"
         },
@@ -1477,6 +1492,7 @@
           "label2": "已領取獎勵",
           "label3": "預計年獎勵",
           "label4": "預計年收益率",
+          "label5": "未領取獎勵",
           "tooltip1": "你所有已領取並存入到錢包的獎勵",
           "tooltip2": "由你所有抵押資金所計算出的年抵押獎勵",
           "tooltip3": "由你所有抵押資金所計算出的年收益率百分比"
@@ -1922,7 +1938,8 @@
             "message1": "请注意，在赎回委托交易成功广播后，还需要等待一段时间才能正式完成",
             "message2": "日",
             "message3": "。在正式完成之前，你並不能使用赎回的委托资金。"
-          }
+          },
+          "checkbox1": "我明白根据 Crypto.org Chain的协定，我在 Crypto.org Chain 上的 CRO 抵押将要经过 {{ unbondingPeriod }} 日才可以完成赎回过程。"
         },
         "table": {
           "triggerDesc": "按降序排序",
@@ -2128,7 +2145,8 @@
         "title": "欢迎",
         "balance": {
           "title1": "总余额",
-          "title2": "抵押余额"
+          "title2": "抵押余额",
+          "title3": "总奖励"
         },
         "nft": {
           "tab1": "我的NFT",
@@ -2261,6 +2279,11 @@
         "description1": "从委托资金提取奖励。",
         "description2": "委托资金至验证者。",
         "description3": "管理你的已委托资金",
+        "balance": {
+          "title1": "抵押余额",
+          "title2": "赎回中的余额",
+          "title3": "奖励余额"
+        },
         "maxValidator": {
           "error": "抵押数目大于你的钱包余额"
         },
@@ -2336,6 +2359,7 @@
           "label2": "已领取奖励",
           "label3": "预计年奖励",
           "label4": "预计年收益率",
+          "label5": "未领取奖励",
           "tooltip1": "你所有已领取并存入到钱包的奖励",
           "tooltip2": "由你所有抵押资金所计算出的年抵押奖励",
           "tooltip3": "由你所有抵押资金所计算出的年收益率百分比"
@@ -3108,7 +3132,8 @@
         "title": "다시 오신 것을 환영합니다!",
         "balance": {
           "title1": "전체 금액",
-          "title2": "스테이킹 금액"
+          "title2": "스테이킹 금액",
+          "title3": "전체 보상"
         },
         "nft": {
           "tab1": "나의 NFT",
@@ -3241,6 +3266,11 @@
         "description1": "위임된 금액에서 보상을 인출합니다",
         "description2": "검증인에게 금액을 위임합니다",
         "description3": "위임된 자산을 관리하세요",
+        "balance": {
+          "title1": "스테이킹 금액",
+          "title2": "취소 금액",
+          "title3": "보상 금액"
+        },
         "maxValidator": {
           "error": "스테이킹 금액이 사용 가능한 지갑 잔액을 초과합니다."
         },
@@ -3315,6 +3345,7 @@
           "label2": "청구된 보상",
           "label3": "예상되는 연간 보상",
           "label4": "예상되는 총  APY",
+          "label5": "청구되지 보상",
           "tooltip1": "인출 및 지갑에 입금된 모든 스테이킹 보상",
           "tooltip2": "모든 스테이킹에서 누적된 총 스테이킹 보상",
           "tooltip3": "모든 스테이킹을 기반으로 연간 획득할 것으로 예상되는 총 스테이킹 보상을 반영하는 백분율 "
@@ -3643,12 +3674,28 @@
         "available": "Mevcut",
         "action": "Aksiyon",
         "select": "Seç",
-        "review": "gözden geçir",
+        "review": "Gözden geçir",
         "copy": "Kopyala",
         "close": "Kapat",
         "retry": "Tekrar dene",
         "connect": "Bağlan",
         "seeAll": "Hepsini Gör",
+        "past": "Önce",
+        "future": "İçinde",
+        "years": "Yıl",
+        "year": "Bir yıl",
+        "months": "Ay",
+        "month": "Bir ay",
+        "weeks": "Hafta",
+        "week": "Bir hafta",
+        "days": "Gün",
+        "day": "Bir gün",
+        "hours": "Saat",
+        "hour": "Bir saat",
+        "minutes": "Dakika",
+        "minute": "Bir dakika",
+        "seconds": "Saniye",
+        "second": "Bir kaç saniye",
         "addressValidator": {
           "reason1": "Geçersiz",
           "reason2": "Adres sağlandı"
@@ -3709,7 +3756,19 @@
           },
           "transfer": {
             "description": "İşlem başarılı bir şekilde yayınlandı!"
+          },
+          "vote": {
+            "description": "Oylaman başarılı bir şekilde yayınlandı!"
+          },
+          "nftTransfer": {
+            "description": "NFT işlemi başarılı bir şekilde yayınlandı!"
+          },
+          "nftMint": {
+            "description": "NFT başarılı bir şekilde oluşturuldu!"
           }
+        },
+        "errorModalPopup": {
+          "title": "Bir hata gerçekleşti!"
         }
       }
     }
