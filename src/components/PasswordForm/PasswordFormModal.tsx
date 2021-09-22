@@ -30,6 +30,14 @@ export interface PasswordFormModalProps {
   // Will ask for password again even after password was validated before
   repeatValidation?: boolean;
 
+  mask?: boolean;
+
+  maskStyle?: React.CSSProperties;
+
+  maskClosable?: boolean;
+
+  keyboard?: boolean;
+
   // TODO: use secure-string
   onValidatePassword: (
     password: string,
@@ -108,6 +116,10 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
         )
       }
       onCancel={props.onCancel}
+      mask={props.mask}
+      maskStyle={props.maskStyle}
+      keyboard={props.keyboard}
+      maskClosable={props.maskClosable}
     >
       {displayComponent === 'form' ? (
         <PasswordForm
