@@ -296,6 +296,7 @@ function HomeLayout(props: HomeLayoutProps) {
       const isIbcVisible = allAssets.length > 1;
       // const isIbcVisible = false;
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
+      const isAppLocked = await generalConfigService.getIfAppIsLockedByUser();
       setHasWallet(hasWalletBeenCreated);
       setSession(currentSession);
       setUserAsset(currentAsset);
@@ -304,6 +305,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
       setAllMarketData(currentAllAssetsMarketData);
+      setIsSessionLockModalVisible(isAppLocked);
 
       await Promise.all([
         await fetchAndSetNewValidators(currentSession),
@@ -361,6 +363,8 @@ function HomeLayout(props: HomeLayoutProps) {
     setValidatorList,
     nftList,
     setNftList,
+    isSessionLockModalVisible,
+    setIsSessionLockModalVisible
   ]);
 
   const onWalletDecryptFinishCreateFreshAssets = async (password: string) => {
@@ -496,11 +500,13 @@ function HomeLayout(props: HomeLayoutProps) {
       <SessionLockModal
         description={t('general.sessionLockModal.description')}
         okButtonText={t('general.sessionLockModal.okButton')}
-        onCancel={() => {
+        onCancel={async () => {
           setIsSessionLockModalVisible(false);
+          await generalConfigService.setIsAppLockedByUser(false);
         }}
-        onSuccess={(password) => {
+        onSuccess={async (password) => {
           setIsSessionLockModalVisible(false);
+          await generalConfigService.setIsAppLockedByUser(false);
           onWalletDecryptFinishCreateFreshAssets(password);
         }}
         onValidatePassword={async (password: string) => {
@@ -523,15 +529,17 @@ function HomeLayout(props: HomeLayoutProps) {
           <div className="logo" />
           <div className="version">SAMPLE WALLET v{buildVersion}</div>
           <HomeMenu />
-            <Button
-              className="bottom-icon"
-              type="ghost"
-              size="small"
-              icon={<LockFilled style={{ color: "black" }} />}
-              onClick={() =>
-                setIsSessionLockModalVisible(true)
-              }
-            > Lock </Button>
+          <Button
+            className="bottom-icon"
+            type="ghost"
+            size="small"
+            icon={<LockFilled style={{ color: "black" }} />}
+            onClick={async() => {
+              setIsSessionLockModalVisible(true)
+              await generalConfigService.setIsAppLockedByUser(true);
+            }
+            }
+          > Lock </Button>
 
           <Dropdown
             overlay={<WalletMenu />}

@@ -82,6 +82,39 @@ export class GeneralConfigService {
     }
     return savedConfig.hasEverShownAnalyticsPopup;
   }
+
+  public async setIsAppLockedByUser(isAppLockedByUser: boolean) {
+    const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
+      _id: this.GENERAL_CONFIG_ID,
+    });
+
+    // If config object is not yet created
+    if (!savedConfig) {
+      const newConfig: GeneralConfig = {
+        ...(savedConfig as GeneralConfig),
+        isAppLockedByUser: isAppLockedByUser,
+      };
+      return this.saveGeneralConfig(newConfig);
+    }
+    savedConfig.isAppLockedByUser = isAppLockedByUser;
+    return this.saveGeneralConfig(savedConfig);
+  }
+
+  public async getIfAppIsLockedByUser(): Promise<boolean> {
+    const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
+      _id: this.GENERAL_CONFIG_ID,
+    });
+    if (!savedConfig) {
+      const newConfig: GeneralConfig = {
+        ...(savedConfig as GeneralConfig),
+        hasEverShownAnalyticsPopup: false,
+        isAppLockedByUser: false,
+      };
+      await this.saveGeneralConfig(newConfig);
+      return false;
+    }
+    return savedConfig.isAppLockedByUser;
+  }
 }
 
 export const generalConfigService = new GeneralConfigService('general-config');
