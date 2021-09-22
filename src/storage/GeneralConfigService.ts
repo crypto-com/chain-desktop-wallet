@@ -92,7 +92,7 @@ export class GeneralConfigService {
     if (!savedConfig) {
       const newConfig: GeneralConfig = {
         ...(savedConfig as GeneralConfig),
-        isAppLockedByUser: isAppLockedByUser,
+        isAppLockedByUser,
       };
       return this.saveGeneralConfig(newConfig);
     }
