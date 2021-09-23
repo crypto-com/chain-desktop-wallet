@@ -961,6 +961,13 @@
             "successButton": "返回主頁"
           }
         },
+        "sessionLockModal": {
+          "title": "輸入密碼",
+          "description": "請輸入密碼以解鎖錢包",
+          "error": "密碼不正確，請重新輸入。",
+          "success": "錢包解鎖成功！",
+          "okButton": "解鎖錢包"
+        },
         "successModalPopup": {
           "title": "成功！",
           "timeout": {
@@ -1828,6 +1835,13 @@
             "successButton": "返回主页"
           }
         },
+        "sessionLockModal": {
+          "title": "输入密码",
+          "description": "请输入密码以解锁钱包",
+          "error": "密码不正确，请重新输入。",
+          "success": "钱包解锁成功！",
+          "okButton": "解锁钱包"
+        },
         "successModalPopup": {
           "title": "成功！",
           "timeout": {
@@ -2655,6 +2669,13 @@
             "successButton": "Menu principal"
           }
         },
+        "sessionLockModal": {
+          "title": "Choisissez un mot de passe pour l'application",
+          "description": "Saisissez le mot de passe du porte feuille",
+          "error": "Le mot de passe saisi est incorrect. Réessayer encore",
+          "success": "Portefeuille décryption réussi!",
+          "okButton": "Décrypter le portefeuille"
+        },
         "successModalPopup": {
           "title": "Réussite!",
           "nodeConnect": {
@@ -2815,6 +2836,13 @@
             "success": "지갑이 성공적으로 복원 및 암호화되었습니다",
             "successButton": "홈 화면"
           }
+        },
+        "sessionLockModal": {
+          "title": "패스워드 입력",
+          "description": "지갑 패스워드를 입력하세요",
+          "error": "패스워드가 틀립니다. 다시 확인해주세요",
+          "success": "지갑을 성공적으로 해독하였습니다",
+          "okButton": "지갑 해독"
         },
         "successModalPopup": {
           "title": "성공!",
@@ -3749,6 +3777,13 @@
             "successButton": "Ana menüye dön"
           }
         },
+        "sessionLockModal": {
+          "title": "Uygulama şifresini girin",
+          "description": "Cüzdanı açmak icin App şifresini girin",
+          "error": "Geçersiz şifre. Lütfen tekrar deneyiniz",
+          "success": "Cüzdan başarılı bir şekilde açıldı!",
+          "okButton": "Cüzdan şifresini çöz"
+        },
         "successModalPopup": {
           "title": "İşlem başarılı!",
           "timeout": {
@@ -3872,6 +3907,11 @@
             "successButton": "اذهب إلى الصفحة الرئيسية"
           }
         },
+        "sessionLockModal": {
+          "title": "أدخل كلمة مرور التطبيق",
+          "success": "تم فك تشفير المحفظة بنجاح!",
+          "okButton": "فك تشفير المحفظة"
+        },
         "successModalPopup": {
           "title": "نجاح!",
           "timeout": {
@@ -3965,6 +4005,13 @@
             "success": "Ihre Wallet wird erfolgreich wiedergestellt und verschlüsselt!",
             "successButton": "Gehen Sie zu Startseite"
           }
+        },
+        "sessionLockModal": {
+          "title": "Geben Sie Ihr Passwort ein",
+          "description": "Geben Sie Ihr Passwort zum Entschlüsseln Ihrer Wallet ein.",
+          "error": "Falsches Passwort. Bitte versuchen Sie nochmals.",
+          "success": "Ihre Wallet wird erfolgreich entschlüsselt!",
+          "okButton": "Ihre Wallet entschlüsseln"
         },
         "successModalPopup": {
           "title": "Erflog!",
