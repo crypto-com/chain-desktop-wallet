@@ -532,8 +532,8 @@ function HomeLayout(props: HomeLayoutProps) {
           <Button
             className="bottom-icon"
             type="ghost"
-            size="small"
-            icon={<LockFilled style={{ color: "black" }} />}
+            size="large"
+            icon={<LockFilled style={{ color: "#1199fa" }} />}
             onClick={async() => {
               setIsSessionLockModalVisible(true)
               await generalConfigService.setIsAppLockedByUser(true);
