@@ -38,6 +38,8 @@ export interface PasswordFormModalProps {
 
   keyboard?: boolean;
 
+  closable?: boolean;
+
   // TODO: use secure-string
   onValidatePassword: (
     password: string,
@@ -115,6 +117,7 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
           </div>
         )
       }
+      closable={props.closable}
       onCancel={props.onCancel}
       mask={props.mask}
       maskStyle={props.maskStyle}

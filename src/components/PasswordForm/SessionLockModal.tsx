@@ -13,6 +13,7 @@ const SessionLockModal = props => {
     maskStyle: {
       backdropFilter: 'blur(5px)',
     },
+    closable: false,
     keyboard: false,
     maskClosable: false,
   });
