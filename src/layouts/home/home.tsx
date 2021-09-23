@@ -519,7 +519,7 @@ function HomeLayout(props: HomeLayoutProps) {
         successText={t('general.sessionLockModal.success')}
         title={t('general.sessionLockModal.title')}
         visible={isSessionLockModalVisible}
-        successButtonText={'continue'}
+        successButtonText={t('general.continue')}
         confirmPassword={false}
         repeatValidation
       />
