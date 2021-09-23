@@ -1,7 +1,7 @@
 import PasswordFormModal from './PasswordFormModal';
 
 const SessionLockModal = props => {
-  const { title, visible, successText, onValidatePassword, onSuccess, onCancel, successButtonText } = props;
+  const { title, visible, successText, onValidatePassword, onSuccess, onCancel, successButtonText, repeatValidation } = props;
   return PasswordFormModal({
     title,
     visible,
@@ -9,6 +9,7 @@ const SessionLockModal = props => {
     successButtonText,
     onValidatePassword,
     onSuccess,
+    repeatValidation,
     onCancel,
     mask: true,
     maskStyle: {
