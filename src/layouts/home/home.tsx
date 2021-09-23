@@ -501,12 +501,12 @@ function HomeLayout(props: HomeLayoutProps) {
         description={t('general.sessionLockModal.description')}
         okButtonText={t('general.sessionLockModal.okButton')}
         onCancel={async () => {
-          setIsSessionLockModalVisible(false);
           await generalConfigService.setIsAppLockedByUser(false);
+          setIsSessionLockModalVisible(false);
         }}
         onSuccess={async (password) => {
-          setIsSessionLockModalVisible(false);
           await generalConfigService.setIsAppLockedByUser(false);
+          setIsSessionLockModalVisible(false);
           onWalletDecryptFinishCreateFreshAssets(password);
         }}
         onValidatePassword={async (password: string) => {
@@ -519,7 +519,7 @@ function HomeLayout(props: HomeLayoutProps) {
         successText={t('general.sessionLockModal.success')}
         title={t('general.sessionLockModal.title')}
         visible={isSessionLockModalVisible}
-        successButtonText={t('general.continue')}
+        successButtonText={'continue'}
         confirmPassword={false}
         repeatValidation
       />
