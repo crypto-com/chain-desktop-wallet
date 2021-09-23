@@ -27,7 +27,11 @@ import { EnableGeneralSettingsPropagation, SettingsDataUpdate } from '../../mode
 import { Session } from '../../models/Session';
 // import { UserAsset } from '../../models/UserAsset';
 
-import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
+import {
+  FIXED_DEFAULT_FEE,
+  FIXED_DEFAULT_GAS_LIMIT,
+  WalletConfig,
+} from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
 
@@ -40,6 +44,19 @@ const layout = {
 const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
+
+function getAssetConfigFromWalletConfig(walletConfig: WalletConfig): UserAssetConfig {
+  return {
+    chainId: walletConfig.network.chainId,
+    explorer: walletConfig.explorer,
+    explorerUrl: walletConfig.explorerUrl,
+    fee: { gasLimit: walletConfig.fee.gasLimit, networkFee: walletConfig.fee.networkFee },
+    indexingUrl: walletConfig.indexingUrl,
+    isLedgerSupportDisabled: false,
+    isStakingDisabled: false,
+    nodeUrl: walletConfig.nodeUrl,
+  };
+}
 
 const GeneralSettingsForm = props => {
   const [session, setSession] = useRecoilState(sessionState);
