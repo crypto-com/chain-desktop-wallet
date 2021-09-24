@@ -56,7 +56,7 @@ import { Session } from '../../models/Session';
 import { SettingsDataUpdate } from '../../models/Wallet';
 import packageJson from '../../../package.json';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
-import { LedgerWalletMaximum, MAX_INCORRECT_ATTEMPTS_ALLOWED } from '../../config/StaticConfig';
+import { LedgerWalletMaximum, MAX_INCORRECT_ATTEMPTS_ALLOWED, SHOW_WARNING_INCORRECT_ATTEMPTS } from '../../config/StaticConfig';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
@@ -525,6 +525,7 @@ function HomeLayout(props: HomeLayoutProps) {
             // Self-destruct or clear storage on `N` incorrect attempts
             latestIncorrectAttemptCount = await generalConfigService.getIncorrectUnlockAttemptsCount();
 
+            // Deleting local storage
             if (latestIncorrectAttemptCount >= MAX_INCORRECT_ATTEMPTS_ALLOWED) {
               indexedDB.deleteDatabase('NeDB');
               setTimeout(() => {
@@ -532,12 +533,15 @@ function HomeLayout(props: HomeLayoutProps) {
                 history.go(0);
               }, 3000);
             }
-            errorText = errorText
-              .replace('*N*', String(latestIncorrectAttemptCount))
-              .replace('#T#', String(MAX_INCORRECT_ATTEMPTS_ALLOWED))
+
+            // Show warning after `X` number of wrong attempts
+            if (latestIncorrectAttemptCount >= (MAX_INCORRECT_ATTEMPTS_ALLOWED - SHOW_WARNING_INCORRECT_ATTEMPTS)) {
+              errorText = t('general.sessionLockModal.errorSelfDestruct')
+                .replace('*N*', String(latestIncorrectAttemptCount))
+                .replace('#T#', String(MAX_INCORRECT_ATTEMPTS_ALLOWED - latestIncorrectAttemptCount))
+            }
+
           }
-
-
 
           return {
             valid: isValid,

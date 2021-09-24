@@ -21,6 +21,8 @@ export const SECONDS_OF_YEAR = 31536000;
 
 // Max Incorrect Attempts allowed
 export const MAX_INCORRECT_ATTEMPTS_ALLOWED = 10;
+export const SHOW_WARNING_INCORRECT_ATTEMPTS = 5;
+
 export const DEFAULT_LANGUAGE_CODE = 'enUS';
 export const SUPPORTED_LANGUAGE = [
   { value: 'enUS', label: 'English' },

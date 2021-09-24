@@ -89,7 +89,8 @@
         "sessionLockModal": {
           "title": "Enter app password to unlock",
           "description": "Enter app password to unlock",
-          "error": "Attempt #*N*. Wallet will self-destruct after #T# wrong attempts.",
+          "error": "The password provided is incorrect. Please try again",
+          "errorSelfDestruct": "Attempt #*N*. Wallet will self-destruct after #T# more wrong attempts.",
           "success": "Wallet unlocked successfully!",
           "okButton": "Unlock wallet"
         },
