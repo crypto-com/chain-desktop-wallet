@@ -144,6 +144,7 @@ export class GeneralConfigService {
       { $set: { incorrectUnlockAttempts : savedConfig.incorrectUnlockAttempts + 1} },
     );
   }
+
   public async resetIncorrectUnlockAttemptsCount() {
     const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
       _id: this.GENERAL_CONFIG_ID,
@@ -158,11 +159,13 @@ export class GeneralConfigService {
       await this.saveGeneralConfig(newConfig);
       return;
     }
-    return await this.db.generalConfigStore.update<GeneralConfig>(
+    await this.db.generalConfigStore.update<GeneralConfig>(
       { _id: this.GENERAL_CONFIG_ID },
       { $set: { incorrectUnlockAttempts : 0 } },
     );
+    return;
   }
+  
   public async getIncorrectUnlockAttemptsCount() {
     const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
       _id: this.GENERAL_CONFIG_ID,
