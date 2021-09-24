@@ -163,9 +163,8 @@ export class GeneralConfigService {
       { _id: this.GENERAL_CONFIG_ID },
       { $set: { incorrectUnlockAttempts : 0 } },
     );
-    return;
   }
-  
+
   public async getIncorrectUnlockAttemptsCount() {
     const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
       _id: this.GENERAL_CONFIG_ID,
