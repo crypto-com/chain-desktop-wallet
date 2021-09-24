@@ -128,6 +128,7 @@ export class GeneralConfigService {
     const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
       _id: this.GENERAL_CONFIG_ID,
     });
+    
     if (!savedConfig) {
       const newConfig: GeneralConfig = {
         ...(savedConfig as GeneralConfig),
@@ -135,13 +136,12 @@ export class GeneralConfigService {
         isAppLockedByUser: false,
         incorrectUnlockAttempts: 1
       };
-      return await this.saveGeneralConfig(newConfig);
+      await this.saveGeneralConfig(newConfig);
+      return 1;
     }
-    console.log('savedConfig', savedConfig)
     return await this.db.generalConfigStore.update<GeneralConfig>(
       { _id: this.GENERAL_CONFIG_ID },
       { $set: { incorrectUnlockAttempts : savedConfig.incorrectUnlockAttempts + 1} },
-      { upsert: true },
     );
   }
   public async resetIncorrectUnlockAttemptsCount() {

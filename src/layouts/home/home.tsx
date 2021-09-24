@@ -56,7 +56,7 @@ import { Session } from '../../models/Session';
 import { SettingsDataUpdate } from '../../models/Wallet';
 import packageJson from '../../../package.json';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
-import { LedgerWalletMaximum } from '../../config/StaticConfig';
+import { LedgerWalletMaximum, MAX_INCORRECT_ATTEMPTS_ALLOWED } from '../../config/StaticConfig';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
@@ -511,9 +511,37 @@ function HomeLayout(props: HomeLayoutProps) {
         }}
         onValidatePassword={async (password: string) => {
           const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          let latestIncorrectAttemptCount = 0;
+          let errorText = t('general.sessionLockModal.error');
+
+          if (isValid) {
+            // Reset Incorrect attempt counts to ZERO
+            await generalConfigService.resetIncorrectUnlockAttemptsCount();
+          } else {
+
+            // Increment incorrect Attempt counts by ONE
+            await generalConfigService.incrementIncorrectUnlockAttemptsCountByOne();
+
+            // Self-destruct or clear storage on `N` incorrect attempts
+            latestIncorrectAttemptCount = await generalConfigService.getIncorrectUnlockAttemptsCount();
+
+            if (latestIncorrectAttemptCount >= MAX_INCORRECT_ATTEMPTS_ALLOWED) {
+              indexedDB.deleteDatabase('NeDB');
+              setTimeout(() => {
+                history.replace('/');
+                history.go(0);
+              }, 3000);
+            }
+            errorText = errorText
+              .replace('*N*', String(latestIncorrectAttemptCount))
+              .replace('#T#', String(MAX_INCORRECT_ATTEMPTS_ALLOWED))
+          }
+
+
+
           return {
             valid: isValid,
-            errMsg: !isValid ? t('general.sessionLockModal.error') : '',
+            errMsg: !isValid ? errorText : '',
           };
         }}
         successText={t('general.sessionLockModal.success')}
