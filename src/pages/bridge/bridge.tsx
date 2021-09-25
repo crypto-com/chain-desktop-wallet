@@ -162,7 +162,7 @@ const GeneralSettingsForm = props => {
           <Step title="Bridge" />
         </Steps>
       </div>
-      <div className="row">
+      <div className="row ant-double-height">
         <Form.Item
           name="networkFee"
           label="From"
@@ -173,8 +173,13 @@ const GeneralSettingsForm = props => {
               message: `${t('settings.form1.networkFee.label')} ${t('general.required')}`,
             },
           ]}
+          style={{ textAlign: 'left' }}
         >
-          <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
+          <Select
+            style={{ width: '280px', textAlign: 'left' }}
+            onChange={onSwitchAsset}
+            value={currentAssetIdentifier}
+          >
             {walletAllAssets.map(asset => {
               return (
                 <Option value={asset.identifier} key={asset.identifier}>
@@ -195,8 +200,13 @@ const GeneralSettingsForm = props => {
               message: `${t('settings.form1.gasLimit.label')} ${t('general.required')}`,
             },
           ]}
+          style={{ textAlign: 'right' }}
         >
-          <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
+          <Select
+            style={{ width: '280px', textAlign: 'left' }}
+            onChange={onSwitchAsset}
+            value={currentAssetIdentifier}
+          >
             {walletAllAssets.map(asset => {
               return (
                 <Option value={asset.identifier} key={asset.identifier}>
@@ -219,8 +229,13 @@ const GeneralSettingsForm = props => {
               message: `${t('settings.form1.networkFee.label')} ${t('general.required')}`,
             },
           ]}
+          style={{ textAlign: 'left' }}
         >
-          <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
+          <Select
+            style={{ width: '280px', textAlign: 'left' }}
+            onChange={onSwitchAsset}
+            value={currentAssetIdentifier}
+          >
             {walletAllAssets.map(asset => {
               return (
                 <Option value={asset.identifier} key={asset.identifier}>
