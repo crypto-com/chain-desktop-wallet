@@ -76,6 +76,7 @@ const allPaths = [
   '/settings',
   '/governance',
   '/nft',
+  '/bridge',
   '/wallet',
 ];
 

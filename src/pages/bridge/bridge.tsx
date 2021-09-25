@@ -4,15 +4,17 @@ import 'antd/dist/antd.css';
 import {
   Avatar,
   Button,
-  Checkbox,
+  // Checkbox,
   Divider,
   Form,
-  Input,
+  // Input,
   InputNumber,
   Layout,
   message,
   Select,
+  Steps,
 } from 'antd';
+import Icon from '@ant-design/icons';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
@@ -23,7 +25,10 @@ import {
   walletListState,
 } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
-import { EnableGeneralSettingsPropagation, SettingsDataUpdate } from '../../models/Wallet';
+import {
+  //  EnableGeneralSettingsPropagation,
+  SettingsDataUpdate,
+} from '../../models/Wallet';
 import { Session } from '../../models/Session';
 // import { UserAsset } from '../../models/UserAsset';
 
@@ -34,9 +39,12 @@ import {
 } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
+import iconImgSvg from '../../assets/icon-cronos-blue.svg';
+import IconHexagon from '../../svg/IconHexagon';
 
 const { Content } = Layout;
 const { Option } = Select;
+const { Step } = Steps;
 const layout = {
   // labelCol: { span: 8 },
   // wrapperCol: { span: 16 },
@@ -44,6 +52,7 @@ const layout = {
 const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
+const customDot = () => <Icon component={IconHexagon} />;
 
 function getAssetConfigFromWalletConfig(walletConfig: WalletConfig): UserAssetConfig {
   return {
@@ -61,7 +70,7 @@ function getAssetConfigFromWalletConfig(walletConfig: WalletConfig): UserAssetCo
 const GeneralSettingsForm = props => {
   const [session, setSession] = useRecoilState(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
-  const [updateLoading, setUpdateLoading] = useState(false);
+  // const [updateLoading, setUpdateLoading] = useState(false);
   const [enabledGeneralSettings, setEnabledGeneralSettings] = useState<boolean>(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
@@ -91,30 +100,29 @@ const GeneralSettingsForm = props => {
     };
   }, [enabledGeneralSettings, setEnabledGeneralSettings]);
 
-  async function onEnableGeneralWalletConfig() {
-    setUpdateLoading(true);
-    const newState = !enabledGeneralSettings;
-    setEnabledGeneralSettings(newState);
+  // async function onEnableGeneralWalletConfig() {
+  //   setUpdateLoading(true);
+  //   const newState = !enabledGeneralSettings;
+  //   setEnabledGeneralSettings(newState);
 
-    const enableGeneralSettingsPropagation: EnableGeneralSettingsPropagation = {
-      networkName: session.wallet.config.name,
-      enabledGeneralSettings: newState,
-    };
+  //   const enableGeneralSettingsPropagation: EnableGeneralSettingsPropagation = {
+  //     networkName: session.wallet.config.name,
+  //     enabledGeneralSettings: newState,
+  //   };
 
-    await walletService.updateGeneralSettingsPropagation(enableGeneralSettingsPropagation);
+  //   await walletService.updateGeneralSettingsPropagation(enableGeneralSettingsPropagation);
 
-    const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
-    const newSession = new Session(updatedWallet);
-    await walletService.setCurrentSession(newSession);
+  //   const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
+  //   const newSession = new Session(updatedWallet);
+  //   await walletService.setCurrentSession(newSession);
 
-    setSession(newSession);
-    message.success(
-      `${t('settings.message.generalSettings1')} ${
-        newState ? t('general.enabled') : t('general.disabled')
-      }`,
-    );
-    setUpdateLoading(false);
-  }
+  //   setSession(newSession);
+  //   message.success(
+  //     `${t('settings.message.generalSettings1')} ${newState ? t('general.enabled') : t('general.disabled')
+  //     }`,
+  //   );
+  //   setUpdateLoading(false);
+  // }
 
   const assetIcon = asset => {
     const { icon_url, symbol } = asset;
@@ -141,71 +149,24 @@ const GeneralSettingsForm = props => {
 
   return (
     <>
-      <div className="title">{t('settings.form1.assetIdentifier.label')}</div>
-      <div className="description">{t('settings.form1.assetIdentifier.description')}</div>
-      <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
-        {walletAllAssets.map(asset => {
-          return (
-            <Option value={asset.identifier} key={asset.identifier}>
-              {assetIcon(asset)}
-              {`${asset.name} (${asset.symbol})`}
-            </Option>
-          );
-        })}
-      </Select>
+      <img src={iconImgSvg} alt="cronos" />
+      <div className="title">Cronos Bridge</div>
+      <div className="description">
+        The safe, fast and most secure way to transfer assets to and from Cronos.
+      </div>
       <Divider />
-      <Form.Item
-        name="nodeUrl"
-        label={t('settings.form1.nodeUrl.label')}
-        hasFeedback
-        rules={[
-          {
-            required: true,
-            message: `${t('settings.form1.nodeUrl.label')} ${t('general.required')}`,
-          },
-          {
-            pattern: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)/,
-            message: t('settings.form1.nodeUrl.error1'),
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
-      <Form.Item
-        name="indexingUrl"
-        label={t('settings.form1.indexingUrl.label')}
-        hasFeedback
-        rules={[
-          {
-            required: true,
-            message: `${t('settings.form1.indexingUrl.label')} ${t('general.required')}`,
-          },
-          {
-            pattern: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)/,
-            message: t('settings.form1.indexingUrl.error1'),
-          },
-        ]}
-      >
-        <Input placeholder={t('settings.form1.indexingUrl.label')} />
-      </Form.Item>
-      <Form.Item
-        name="chainId"
-        label={t('settings.form1.chainId.label')}
-        hasFeedback
-        rules={[
-          {
-            required: true,
-            message: `${t('settings.form1.chainId.label')} ${t('general.required')}`,
-          },
-        ]}
-      >
-        <Input />
-      </Form.Item>
+      <div className="progress-bar">
+        <Steps progressDot={customDot} current={0}>
+          <Step title="Details" />
+          <Step title="Confirm" />
+          <Step title="Bridge" />
+        </Steps>
+      </div>
       <div className="row">
         <Form.Item
           name="networkFee"
-          label={t('settings.form1.networkFee.label')}
-          hasFeedback
+          label="From"
+          // hasFeedback
           rules={[
             {
               required: true,
@@ -213,12 +174,21 @@ const GeneralSettingsForm = props => {
             },
           ]}
         >
-          <InputNumber precision={0} min={1} />
+          <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
+            {walletAllAssets.map(asset => {
+              return (
+                <Option value={asset.identifier} key={asset.identifier}>
+                  {assetIcon(asset)}
+                  {`${asset.name} (${asset.symbol})`}
+                </Option>
+              );
+            })}
+          </Select>
         </Form.Item>
         <Form.Item
           name="gasLimit"
-          label={t('settings.form1.gasLimit.label')}
-          hasFeedback
+          label="To"
+          // hasFeedback
           rules={[
             {
               required: true,
@@ -226,10 +196,56 @@ const GeneralSettingsForm = props => {
             },
           ]}
         >
-          <InputNumber precision={0} min={1} />
+          <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
+            {walletAllAssets.map(asset => {
+              return (
+                <Option value={asset.identifier} key={asset.identifier}>
+                  {assetIcon(asset)}
+                  {`${asset.name} (${asset.symbol})`}
+                </Option>
+              );
+            })}
+          </Select>
         </Form.Item>
       </div>
-      <div className="item">
+      <div className="row">
+        <Form.Item
+          name="networkFee"
+          // label="From"
+          // hasFeedback
+          rules={[
+            {
+              required: true,
+              message: `${t('settings.form1.networkFee.label')} ${t('general.required')}`,
+            },
+          ]}
+        >
+          <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
+            {walletAllAssets.map(asset => {
+              return (
+                <Option value={asset.identifier} key={asset.identifier}>
+                  {assetIcon(asset)}
+                  {`${asset.name} (${asset.symbol})`}
+                </Option>
+              );
+            })}
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="gasLimit"
+          // label="To"
+          // hasFeedback
+          rules={[
+            {
+              required: true,
+              message: `${t('settings.form1.gasLimit.label')} ${t('general.required')}`,
+            },
+          ]}
+        >
+          <InputNumber />
+        </Form.Item>
+      </div>
+      {/* <div className="item">
         <Checkbox
           checked={enabledGeneralSettings}
           onChange={onEnableGeneralWalletConfig}
@@ -238,7 +254,7 @@ const GeneralSettingsForm = props => {
           {t('settings.form1.checkbox1.description1')} {session.wallet.config.name}{' '}
           {t('settings.form1.checkbox1.description2')}
         </Checkbox>
-      </div>
+      </div> */}
     </>
   );
 };
@@ -357,17 +373,17 @@ const FormSettings = () => {
     );
   };
 
-  const onRestoreDefaults = () => {
-    form.setFieldsValue({
-      nodeUrl: defaultSettings.nodeUrl,
-      chainId: defaultSettings.chainId,
-      indexingUrl: defaultSettings.indexingUrl,
-      networkFee:
-        defaultSettings.fee && defaultSettings.fee.networkFee ? defaultSettings.fee.networkFee : '',
-      gasLimit:
-        defaultSettings.fee && defaultSettings.fee.gasLimit ? defaultSettings.fee.gasLimit : '',
-    });
-  };
+  // const onRestoreDefaults = () => {
+  //   form.setFieldsValue({
+  //     nodeUrl: defaultSettings.nodeUrl,
+  //     chainId: defaultSettings.chainId,
+  //     indexingUrl: defaultSettings.indexingUrl,
+  //     networkFee:
+  //       defaultSettings.fee && defaultSettings.fee.networkFee ? defaultSettings.fee.networkFee : '',
+  //     gasLimit:
+  //       defaultSettings.fee && defaultSettings.fee.gasLimit ? defaultSettings.fee.gasLimit : '',
+  //   });
+  // };
 
   return (
     <Form
@@ -390,11 +406,11 @@ const FormSettings = () => {
           /> */}
           <Form.Item {...tailLayout} className="button">
             <Button type="primary" htmlType="submit" loading={isButtonLoading}>
-              {t('general.save')}
+              Transfer Asset
             </Button>
-            <Button type="link" htmlType="button" onClick={onRestoreDefaults}>
+            {/* <Button type="link" htmlType="button" onClick={onRestoreDefaults}>
               {t('general.discard')}
-            </Button>
+            </Button> */}
           </Form.Item>
         </div>
       </div>
