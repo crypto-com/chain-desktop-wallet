@@ -1,3 +1,7 @@
+.bridge-layout > .ant-layout-content {
+  margin: 64px auto !important;
+}
+
 .bridge-content {
   width: 800px;
   margin: auto;
@@ -16,13 +20,9 @@
       margin-bottom: 20px;
       color: @font-color;
     }
-    // .amount {
-    // .ant-form-item {
-    //   margin: 0;
-    // }
     .available {
       position: relative;
-      margin: 5px 0 20px 0;
+      margin: 5px 0 0 0;
       text-align: left;
       span {
         color: @font-color;
@@ -96,12 +96,18 @@
           }
         }
       }
+      .ant-steps-item-title {
+        font-size: 14px;
+      }
       .ant-steps-item-process,
       .ant-steps-item-finish {
         .ant-steps-item-title {
           color: @azure;
         }
       }
+    }
+    .ant-form-item-explain-error {
+      text-align: left;
     }
   }
 }
