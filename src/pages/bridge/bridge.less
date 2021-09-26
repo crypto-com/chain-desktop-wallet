@@ -16,28 +16,44 @@
       margin-bottom: 20px;
       color: @font-color;
     }
-    .amount {
-      .ant-form-item {
-        margin: 0;
+    // .amount {
+    // .ant-form-item {
+    //   margin: 0;
+    // }
+    .available {
+      position: relative;
+      margin: 5px 0 20px 0;
+      text-align: left;
+      span {
+        color: @font-color;
       }
-      .available {
-        position: relative;
-        margin: 5px 0 20px 0;
-        span {
-          color: @font-color;
-        }
-        .available-amount {
-          position: absolute;
-          right: 0;
-          bottom: 0;
-        }
+      .available-amount {
+        position: absolute;
+        right: 0;
+        bottom: 0;
       }
     }
+    // }
     .ant-btn {
       width: 100%;
       // max-width: 190px;
       // margin: 24px 0 -24px 0;
       margin: 0;
+    }
+    .row-bridge {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .ant-form-item {
+        // display: inline-block;
+        width: 40%;
+      }
+      // .ant-form-item:first-of-type {
+      //   margin-right: 4%;
+      // }
+      .ant-form-item-label {
+        width: 100%;
+      }
     }
     .row {
       .ant-form-item {

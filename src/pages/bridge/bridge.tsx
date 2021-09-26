@@ -5,7 +5,6 @@ import {
   Avatar,
   Button,
   // Checkbox,
-  Divider,
   Form,
   // Input,
   InputNumber,
@@ -14,7 +13,7 @@ import {
   Select,
   Steps,
 } from 'antd';
-import Icon from '@ant-design/icons';
+import Icon, { SwapOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
@@ -154,7 +153,6 @@ const GeneralSettingsForm = props => {
       <div className="description">
         The safe, fast and most secure way to transfer assets to and from Cronos.
       </div>
-      <Divider />
       <div className="progress-bar">
         <Steps progressDot={customDot} current={0}>
           <Step title="Details" />
@@ -162,9 +160,9 @@ const GeneralSettingsForm = props => {
           <Step title="Bridge" />
         </Steps>
       </div>
-      <div className="row ant-double-height">
+      <div className="row-bridge ant-double-height">
         <Form.Item
-          name="networkFee"
+          name="bridgeFrom"
           label="From"
           // hasFeedback
           rules={[
@@ -176,7 +174,7 @@ const GeneralSettingsForm = props => {
           style={{ textAlign: 'left' }}
         >
           <Select
-            style={{ width: '280px', textAlign: 'left' }}
+            style={{ width: '300px', textAlign: 'left' }}
             onChange={onSwitchAsset}
             value={currentAssetIdentifier}
           >
@@ -190,8 +188,9 @@ const GeneralSettingsForm = props => {
             })}
           </Select>
         </Form.Item>
+        <SwapOutlined style={{ color: '#1199fa', fontSize: '40px' }} />
         <Form.Item
-          name="gasLimit"
+          name="bridgeTo"
           label="To"
           // hasFeedback
           rules={[
@@ -203,7 +202,7 @@ const GeneralSettingsForm = props => {
           style={{ textAlign: 'right' }}
         >
           <Select
-            style={{ width: '280px', textAlign: 'left' }}
+            style={{ width: '300px', textAlign: 'left' }}
             onChange={onSwitchAsset}
             value={currentAssetIdentifier}
           >
@@ -220,7 +219,7 @@ const GeneralSettingsForm = props => {
       </div>
       <div className="row">
         <Form.Item
-          name="networkFee"
+          name="asset"
           // label="From"
           // hasFeedback
           rules={[
@@ -232,9 +231,10 @@ const GeneralSettingsForm = props => {
           style={{ textAlign: 'left' }}
         >
           <Select
-            style={{ width: '280px', textAlign: 'left' }}
+            style={{ width: '300px', textAlign: 'left' }}
             onChange={onSwitchAsset}
             value={currentAssetIdentifier}
+            placeholder="Asset"
           >
             {walletAllAssets.map(asset => {
               return (
@@ -247,7 +247,7 @@ const GeneralSettingsForm = props => {
           </Select>
         </Form.Item>
         <Form.Item
-          name="gasLimit"
+          name="amount"
           // label="To"
           // hasFeedback
           rules={[
@@ -257,7 +257,14 @@ const GeneralSettingsForm = props => {
             },
           ]}
         >
-          <InputNumber />
+          <InputNumber placeholder="Amount" />
+          <div className="available">
+            <span>{t('general.available')}: </span>
+            <div className="available-amount">
+              {/* {availableBalance} {walletAsset?.symbol}{' '} */}
+              --
+            </div>
+          </div>
         </Form.Item>
       </div>
       {/* <div className="item">
