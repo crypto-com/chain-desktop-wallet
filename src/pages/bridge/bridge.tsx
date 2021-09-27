@@ -203,6 +203,23 @@ const CronosBridgeForm = props => {
           </div>
         </Form.Item>
       </div>
+      <div className="review-container">
+        <div className="flex-row">
+          <div>Fee: </div>
+          <div>10 CRO</div>
+        </div>
+        <div className="flex-row">
+          <div>You will receieve: </div>
+          <div>900 CRO</div>
+        </div>
+        <div className="flex-row">
+          <div>To Address: </div>
+          <div className="asset-icon">
+            {assetIcon(session.activeAsset)}
+            0x13ee...5339
+          </div>
+        </div>
+      </div>
     </>
   );
 };
