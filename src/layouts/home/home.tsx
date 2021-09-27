@@ -364,7 +364,7 @@ function HomeLayout(props: HomeLayoutProps) {
     nftList,
     setNftList,
     isSessionLockModalVisible,
-    setIsSessionLockModalVisible
+    setIsSessionLockModalVisible,
   ]);
 
   const onWalletDecryptFinishCreateFreshAssets = async (password: string) => {
@@ -504,7 +504,7 @@ function HomeLayout(props: HomeLayoutProps) {
           await generalConfigService.setIsAppLockedByUser(false);
           setIsSessionLockModalVisible(false);
         }}
-        onSuccess={async (password) => {
+        onSuccess={async password => {
           await generalConfigService.setIsAppLockedByUser(false);
           setIsSessionLockModalVisible(false);
           onWalletDecryptFinishCreateFreshAssets(password);
@@ -565,13 +565,15 @@ function HomeLayout(props: HomeLayoutProps) {
             className="bottom-icon"
             type="ghost"
             size="large"
-            icon={<LockFilled style={{ color: "#1199fa" }} />}
-            onClick={async() => {
-              setIsSessionLockModalVisible(true)
+            icon={<LockFilled style={{ color: '#1199fa' }} />}
+            onClick={async () => {
+              setIsSessionLockModalVisible(true);
               await generalConfigService.setIsAppLockedByUser(true);
-            }
-            }
-          > Lock </Button>
+            }}
+          >
+            {' '}
+            {t('navbar.lock')}{' '}
+          </Button>
 
           <Dropdown
             overlay={<WalletMenu />}

@@ -367,6 +367,7 @@
         "governance": "Governance",
         "nft": "My NFT",
         "settings": "Settings",
+        "lock": "Lock",
         "wallet": {
           "list": "Wallet List",
           "restore": "Restore Wallet",
@@ -1242,6 +1243,7 @@
         "governance": "治理",
         "nft": "我的NFT",
         "settings": "設置",
+        "lock": "鎖定",
         "wallet": {
           "list": "所有錢包",
           "restore": "復原錢包",
@@ -2116,6 +2118,7 @@
         "governance": "治理",
         "nft": "我的NFT",
         "settings": "设置",
+        "lock": "锁定",
         "wallet": {
           "list": "所有钱包",
           "restore": "复原钱包",
@@ -3117,6 +3120,7 @@
         "governance": "거버넌스",
         "nft": "나의 NFT",
         "settings": "설정",
+        "lock": "잠김",
         "wallet": {
           "list": "지갑 리스트",
           "restore": "지갑 가져오기",
