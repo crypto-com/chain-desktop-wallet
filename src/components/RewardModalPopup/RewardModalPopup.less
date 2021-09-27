@@ -1,0 +1,50 @@
+.my-reward-modal {
+  .ant-modal-content {
+    // display: inline-block;
+    .ant-modal-body {
+      padding: 0;
+
+      .balance {
+        color: @font-color-dark;
+        font-weight: 500;
+        text-align: left;
+
+        .title {
+          font-size: 12px;
+
+          span:not(.anticon) {
+            opacity: 0.5;
+          }
+        }
+
+        .quantity {
+          font-size: 24px;
+        }
+
+        .fiat {
+          color: @azure;
+        }
+      }
+
+      .upper-container {
+        padding: 32px;
+        background: rgba(196, 196, 196, 0.1);
+
+        .my-total-rewards {
+          text-align: center;
+        }
+      }
+
+      .lower-container {
+        display: grid;
+        grid-gap: 32px;
+        grid-template-columns: 1fr 1fr;
+        align-self: start;
+        padding: 42px 32px 32px 32px;
+        background: @white;
+        // grid-template-rows: 1fr 1fr;
+        // text-align: left;
+      }
+    }
+  }
+}

@@ -410,7 +410,8 @@
         "title": "Welcome Back!",
         "balance": {
           "title1": "TOTAL BALANCE",
-          "title2": "STAKED BALANCE"
+          "title2": "STAKED BALANCE",
+          "title3": "TOTAL REWARDS"
         },
         "nft": {
           "tab1": "My NFT",
@@ -543,6 +544,11 @@
         "description1": "Withdraw rewards from delegated funds.\n",
         "description2": "Delegate funds to validator.",
         "description3": "Manage your delegated funds.",
+        "balance": {
+          "title1": "STAKED BALANCE",
+          "title2": "UNBONDING BALANCE",
+          "title3": "REWARD BALANCE"
+        },
         "maxValidator": {
           "error": "Staking amount exceeds your available wallet balance"
         },
@@ -618,6 +624,7 @@
           "label2": "CLAIMED REWARDS",
           "label3": "ESTIMATED ANNUAL REWARDS",
           "label4": "ESTIMATED TOTAL APY",
+          "label5": "REWARD BALANCE",
           "tooltip1": "All staking rewards that have been withdrawn and deposited to your wallet",
           "tooltip2": "Total staking rewards accumulated from all your stakings",
           "tooltip3": "A percentage rate reflecting the total staking rewards projected to be earned over an annual period, based on all your stakings"
@@ -1271,7 +1278,8 @@
         "title": "歡迎",
         "balance": {
           "title1": "總餘額",
-          "title2": "抵押餘額"
+          "title2": "抵押餘額",
+          "title3": "總獎勵"
         },
         "nft": {
           "tab1": "我的NFT",
@@ -1404,6 +1412,11 @@
         "description1": "從委託資金提取獎勵。",
         "description2": "委託資金至驗證者。",
         "description3": "管理你的已委託資金",
+        "balance": {
+          "title1": "抵押餘額",
+          "title2": "贖回中的餘額",
+          "title3": "獎勵餘額"
+        },
         "maxValidator": {
           "error": "抵押數目大於你的錢包餘額"
         },
@@ -1479,6 +1492,7 @@
           "label2": "已領取獎勵",
           "label3": "預計年獎勵",
           "label4": "預計年收益率",
+          "label5": "未領取獎勵",
           "tooltip1": "你所有已領取並存入到錢包的獎勵",
           "tooltip2": "由你所有抵押資金所計算出的年抵押獎勵",
           "tooltip3": "由你所有抵押資金所計算出的年收益率百分比"
@@ -2131,7 +2145,8 @@
         "title": "欢迎",
         "balance": {
           "title1": "总余额",
-          "title2": "抵押余额"
+          "title2": "抵押余额",
+          "title3": "总奖励"
         },
         "nft": {
           "tab1": "我的NFT",
@@ -2264,6 +2279,11 @@
         "description1": "从委托资金提取奖励。",
         "description2": "委托资金至验证者。",
         "description3": "管理你的已委托资金",
+        "balance": {
+          "title1": "抵押余额",
+          "title2": "赎回中的余额",
+          "title3": "奖励余额"
+        },
         "maxValidator": {
           "error": "抵押数目大于你的钱包余额"
         },
@@ -2339,6 +2359,7 @@
           "label2": "已领取奖励",
           "label3": "预计年奖励",
           "label4": "预计年收益率",
+          "label5": "未领取奖励",
           "tooltip1": "你所有已领取并存入到钱包的奖励",
           "tooltip2": "由你所有抵押资金所计算出的年抵押奖励",
           "tooltip3": "由你所有抵押资金所计算出的年收益率百分比"
@@ -3111,7 +3132,8 @@
         "title": "다시 오신 것을 환영합니다!",
         "balance": {
           "title1": "전체 금액",
-          "title2": "스테이킹 금액"
+          "title2": "스테이킹 금액",
+          "title3": "전체 보상"
         },
         "nft": {
           "tab1": "나의 NFT",
@@ -3244,6 +3266,11 @@
         "description1": "위임된 금액에서 보상을 인출합니다",
         "description2": "검증인에게 금액을 위임합니다",
         "description3": "위임된 자산을 관리하세요",
+        "balance": {
+          "title1": "스테이킹 금액",
+          "title2": "취소 금액",
+          "title3": "보상 금액"
+        },
         "maxValidator": {
           "error": "스테이킹 금액이 사용 가능한 지갑 잔액을 초과합니다."
         },
@@ -3318,6 +3345,7 @@
           "label2": "청구된 보상",
           "label3": "예상되는 연간 보상",
           "label4": "예상되는 총  APY",
+          "label5": "청구되지 보상",
           "tooltip1": "인출 및 지갑에 입금된 모든 스테이킹 보상",
           "tooltip2": "모든 스테이킹에서 누적된 총 스테이킹 보상",
           "tooltip3": "모든 스테이킹을 기반으로 연간 획득할 것으로 예상되는 총 스테이킹 보상을 반영하는 백분율 "
@@ -3728,7 +3756,19 @@
           },
           "transfer": {
             "description": "İşlem başarılı bir şekilde yayınlandı!"
+          },
+          "vote": {
+            "description": "Oylaman başarılı bir şekilde yayınlandı!"
+          },
+          "nftTransfer": {
+            "description": "NFT işlemi başarılı bir şekilde yayınlandı!"
+          },
+          "nftMint": {
+            "description": "NFT başarılı bir şekilde oluşturuldu!"
           }
+        },
+        "errorModalPopup": {
+          "title": "Bir hata gerçekleşti!"
         }
       }
     }
