@@ -432,7 +432,7 @@ export class NodeRpcService implements INodeRpcService {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
   async getIBCAssetTrace(ibcHash: string): Promise<DenomTrace> {
     const denomTraceResponse = await this.cosmosClient.get<DenomTraceResponse>(
-      `ibc/applications/transfer/v1beta1/denom_traces/${ibcHash}`,
+      `ibc/apps/transfer/v1/denom_traces/${ibcHash}`,
     );
 
     return denomTraceResponse.data.denom_trace;

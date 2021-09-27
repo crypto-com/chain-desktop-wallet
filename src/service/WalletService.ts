@@ -858,7 +858,10 @@ class WalletService {
     const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
     const ibcAssets: UserAsset[] = await nodeRpc.loadIBCAssets(currentSession);
 
-    const persistedAssets = await ibcAssets.map(async ibcAsset => {
+    const persistedAssets: UserAsset[] = [];
+
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const ibcAsset of ibcAssets) {
       const denomTrace = await nodeRpc.getIBCAssetTrace(ibcAsset.ibcDenomHash!);
       const baseDenom = capitalizeFirstLetter(denomTrace.base_denom);
 
@@ -867,9 +870,11 @@ class WalletService {
       ibcAsset.mainnetSymbol = baseDenom;
       ibcAsset.name = baseDenom;
       ibcAsset.walletId = currentSession.wallet.identifier;
+
+      persistedAssets.push(ibcAsset);
+
       await this.storageService.saveAsset(ibcAsset);
-      return ibcAsset;
-    });
+    }
 
     // eslint-disable-next-line no-console
     console.log('IBC_PERSISTED_ASSETS', persistedAssets);
