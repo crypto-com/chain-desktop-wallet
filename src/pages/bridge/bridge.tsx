@@ -45,7 +45,7 @@ const customDot = () => <Icon component={IconHexagon} />;
 const CronosBridgeForm = props => {
   const [session, setSession] = useRecoilState(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
-  const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(session.activeAsset);
+  const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
   const [availableBalance, setAvailableBalance] = useState('--');
   // const [updateLoading, setUpdateLoading] = useState(false);
   const didMountRef = useRef(false);
@@ -206,24 +206,32 @@ const CronosBridgeForm = props => {
           name="amount"
           // label="To"
           // hasFeedback
+          validateFirst
           rules={[
             {
               required: true,
               message: `Amount ${t('general.required')}`,
+            },
+            {
+              pattern: /[^0]+/,
+              message: `${t('send.formSend.amount.label')} ${t('general.cannot0')}`,
             },
             customAmountValidator,
             customMaxValidator,
             customMinValidator,
           ]}
         >
-          <InputNumber placeholder="Amount" />
-          <div className="available">
-            <span>{t('general.available')}: </span>
-            <div className="available-amount">
-              {availableBalance} {currentAsset?.symbol}{' '}
-            </div>
-          </div>
+          <InputNumber placeholder="Amount" disabled={availableBalance === '--'} />
         </Form.Item>
+      </div>
+      <div className="row" style={{ marginTop: '-5px' }}>
+        <div className="ant-row ant-form-item"> </div>
+        <div className="available ant-row ant-form-item">
+          <span>{t('general.available')}: </span>
+          <div className="available-amount">
+            {availableBalance} {currentAsset?.symbol}{' '}
+          </div>
+        </div>
       </div>
       <div className="review-container">
         <div className="flex-row">
