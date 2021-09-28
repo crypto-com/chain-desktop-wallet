@@ -74,6 +74,15 @@ const CronosBridgeForm = props => {
     );
   };
 
+  const onSwitchBridge = () => {
+    setCurrentAsset(undefined);
+    setCurrentAssetIdentifier(undefined);
+    setAvailableBalance('--');
+    form.setFieldsValue({
+      asset: undefined,
+    });
+  };
+
   const onBridgeExchange = () => {
     const { bridgeFrom, bridgeTo } = form.getFieldsValue();
     form.setFieldsValue({
@@ -129,7 +138,6 @@ const CronosBridgeForm = props => {
         <Form.Item
           name="bridgeFrom"
           label="From"
-          // hasFeedback
           rules={[
             {
               required: true,
@@ -138,11 +146,7 @@ const CronosBridgeForm = props => {
           ]}
           style={{ textAlign: 'left' }}
         >
-          <Select
-            style={{ width: '300px', textAlign: 'left' }}
-            onChange={onSwitchBridge}
-            value={currentAssetIdentifier}
-          >
+          <Select style={{ width: '300px', textAlign: 'left' }} onChange={onSwitchBridge}>
             {SUPPORTED_BRIDGE.map(bridge => {
               return (
                 <Option value={bridge.value} key={bridge.value}>
@@ -160,20 +164,23 @@ const CronosBridgeForm = props => {
         <Form.Item
           name="bridgeTo"
           label="To"
-          // hasFeedback
           rules={[
             {
               required: true,
               message: `To ${t('general.required')}`,
             },
+            {
+              validator: (_, value) => {
+                if (form.getFieldValue('bridgeFrom') === value) {
+                  return Promise.reject(new Error('The two bridges cannot be the same'));
+                }
+                return Promise.resolve();
+              },
+            },
           ]}
           style={{ textAlign: 'right' }}
         >
-          <Select
-            style={{ width: '300px', textAlign: 'left' }}
-            onChange={onSwitchBridge}
-            value={currentAssetIdentifier}
-          >
+          <Select style={{ width: '300px', textAlign: 'left' }} onChange={onSwitchBridge}>
             {SUPPORTED_BRIDGE.map(bridge => {
               return (
                 <Option value={bridge.value} key={bridge.value}>
@@ -188,8 +195,6 @@ const CronosBridgeForm = props => {
       <div className="row">
         <Form.Item
           name="asset"
-          // label="From"
-          // hasFeedback
           rules={[
             {
               required: true,
@@ -216,8 +221,6 @@ const CronosBridgeForm = props => {
         </Form.Item>
         <Form.Item
           name="amount"
-          // label="To"
-          // hasFeedback
           validateFirst
           rules={[
             {
