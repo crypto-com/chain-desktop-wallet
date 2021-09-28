@@ -26,6 +26,7 @@ import { walletService } from '../../service/WalletService';
 import { UserAsset, scaledBalance } from '../../models/UserAsset';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import { fromScientificNotation, getCurrentMinAssetAmount } from '../../utils/NumberUtils';
+import { SUPPORTED_BRIDGE } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import iconImgSvg from '../../assets/icon-cronos-blue.svg';
 import IconHexagon from '../../svg/IconHexagon';
@@ -139,14 +140,14 @@ const CronosBridgeForm = props => {
         >
           <Select
             style={{ width: '300px', textAlign: 'left' }}
-            onChange={onSwitchAsset}
+            onChange={onSwitchBridge}
             value={currentAssetIdentifier}
           >
-            {walletAllAssets.map(asset => {
+            {SUPPORTED_BRIDGE.map(bridge => {
               return (
-                <Option value={asset.identifier} key={asset.identifier}>
-                  {assetIcon(asset)}
-                  {`${asset.name} (${asset.symbol})`}
+                <Option value={bridge.value} key={bridge.value}>
+                  <img src={bridge.icon} alt={bridge.value} className="asset-icon" />
+                  {`${bridge.label}`}
                 </Option>
               );
             })}
@@ -170,14 +171,14 @@ const CronosBridgeForm = props => {
         >
           <Select
             style={{ width: '300px', textAlign: 'left' }}
-            onChange={onSwitchAsset}
+            onChange={onSwitchBridge}
             value={currentAssetIdentifier}
           >
-            {walletAllAssets.map(asset => {
+            {SUPPORTED_BRIDGE.map(bridge => {
               return (
-                <Option value={asset.identifier} key={asset.identifier}>
-                  {assetIcon(asset)}
-                  {`${asset.name} (${asset.symbol})`}
+                <Option value={bridge.value} key={bridge.value}>
+                  <img src={bridge.icon} alt={bridge.value} className="asset-icon" />
+                  {`${bridge.label}`}
                 </Option>
               );
             })}
