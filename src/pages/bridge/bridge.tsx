@@ -23,8 +23,9 @@ import {
 } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 // import { Session } from '../../models/Session';
-// import { UserAsset } from '../../models/UserAsset';
-
+import { UserAsset, scaledBalance } from '../../models/UserAsset';
+import { TransactionUtils } from '../../utils/TransactionUtils';
+import { fromScientificNotation, getCurrentMinAssetAmount } from '../../utils/NumberUtils';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import iconImgSvg from '../../assets/icon-cronos-blue.svg';
 import IconHexagon from '../../svg/IconHexagon';
@@ -44,6 +45,8 @@ const customDot = () => <Icon component={IconHexagon} />;
 const CronosBridgeForm = props => {
   const [session, setSession] = useRecoilState(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(session.activeAsset);
+  const [availableBalance, setAvailableBalance] = useState('--');
   // const [updateLoading, setUpdateLoading] = useState(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
@@ -53,6 +56,7 @@ const CronosBridgeForm = props => {
   const { currentAssetIdentifier, setCurrentAssetIdentifier } = props;
 
   useEffect(() => {
+    // setAvailableBalance(scaledBalance(currentAsset!));
     if (!didMountRef.current) {
       didMountRef.current = true;
       analyticsService.logPage('Settings');
@@ -80,7 +84,23 @@ const CronosBridgeForm = props => {
       ...session,
       activeAsset: selectedAsset,
     });
+    setCurrentAsset(selectedAsset);
+    setAvailableBalance(scaledBalance(selectedAsset!));
   };
+
+  const currentMinAssetAmount = getCurrentMinAssetAmount(currentAsset!);
+  const maximumSendAmount = availableBalance;
+  const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
+  const customMaxValidator = TransactionUtils.maxValidator(
+    maximumSendAmount,
+    t('send.formSend.amount.error1'),
+  );
+  const customMinValidator = TransactionUtils.minValidator(
+    fromScientificNotation(currentMinAssetAmount),
+    `${t('send.formSend.amount.error2')} ${fromScientificNotation(currentMinAssetAmount)} ${
+      currentAsset?.symbol
+    }`,
+  );
 
   return (
     <>
@@ -191,14 +211,16 @@ const CronosBridgeForm = props => {
               required: true,
               message: `Amount ${t('general.required')}`,
             },
+            customAmountValidator,
+            customMaxValidator,
+            customMinValidator,
           ]}
         >
           <InputNumber placeholder="Amount" />
           <div className="available">
             <span>{t('general.available')}: </span>
             <div className="available-amount">
-              {/* {availableBalance} {walletAsset?.symbol}{' '} */}
-              --
+              {availableBalance} {currentAsset?.symbol}{' '}
             </div>
           </div>
         </Form.Item>
