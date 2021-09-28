@@ -13,6 +13,7 @@ import {
 } from 'antd';
 import Icon, { SwapOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -24,9 +25,14 @@ import {
 import { walletService } from '../../service/WalletService';
 // import { Session } from '../../models/Session';
 import { UserAsset, scaledBalance } from '../../models/UserAsset';
+import { middleEllipsis } from '../../utils/utils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import { fromScientificNotation, getCurrentMinAssetAmount } from '../../utils/NumberUtils';
-import { SUPPORTED_BRIDGE } from '../../config/StaticConfig';
+import {
+  fromScientificNotation,
+  getCurrentMinAssetAmount,
+  getNormalScaleAmount,
+} from '../../utils/NumberUtils';
+import { SUPPORTED_BRIDGE, FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import iconImgSvg from '../../assets/icon-cronos-blue.svg';
 import IconHexagon from '../../svg/IconHexagon';
@@ -44,23 +50,25 @@ const tailLayout = {
 const customDot = () => <Icon component={IconHexagon} />;
 
 const CronosBridgeForm = props => {
+  const { currentAssetIdentifier, setCurrentAssetIdentifier, form } = props;
+
   const [session, setSession] = useRecoilState(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
   const [availableBalance, setAvailableBalance] = useState('--');
+  const [amount, setAmount] = useState('0');
+  const [assetFieldDisabled, setAssetFieldDisabled] = useState(true);
   // const [updateLoading, setUpdateLoading] = useState(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
 
   const [t] = useTranslation();
 
-  const { currentAssetIdentifier, setCurrentAssetIdentifier, form } = props;
-
   useEffect(() => {
     // setAvailableBalance(scaledBalance(currentAsset!));
     if (!didMountRef.current) {
       didMountRef.current = true;
-      analyticsService.logPage('Settings');
+      analyticsService.logPage('Bridge');
     }
   }, []);
 
@@ -80,6 +88,7 @@ const CronosBridgeForm = props => {
     setAvailableBalance('--');
     form.setFieldsValue({
       asset: undefined,
+      amount: undefined,
     });
   };
 
@@ -146,7 +155,16 @@ const CronosBridgeForm = props => {
           ]}
           style={{ textAlign: 'left' }}
         >
-          <Select style={{ width: '300px', textAlign: 'left' }} onChange={onSwitchBridge}>
+          <Select
+            style={{ width: '300px', textAlign: 'left' }}
+            onChange={() => {
+              onSwitchBridge();
+              form.setFieldsValue({
+                bridgeTo: undefined,
+              });
+              setAssetFieldDisabled(true);
+            }}
+          >
             {SUPPORTED_BRIDGE.map(bridge => {
               return (
                 <Option value={bridge.value} key={bridge.value}>
@@ -172,8 +190,10 @@ const CronosBridgeForm = props => {
             {
               validator: (_, value) => {
                 if (form.getFieldValue('bridgeFrom') === value) {
+                  setAssetFieldDisabled(true);
                   return Promise.reject(new Error('The two bridges cannot be the same'));
                 }
+                setAssetFieldDisabled(false);
                 return Promise.resolve();
               },
             },
@@ -208,6 +228,7 @@ const CronosBridgeForm = props => {
             onChange={onSwitchAsset}
             value={currentAssetIdentifier}
             placeholder="Asset"
+            disabled={assetFieldDisabled}
           >
             {walletAllAssets.map(asset => {
               return (
@@ -236,10 +257,14 @@ const CronosBridgeForm = props => {
             customMinValidator,
           ]}
         >
-          <InputNumber placeholder="Amount" disabled={availableBalance === '--'} />
+          <InputNumber
+            placeholder="Amount"
+            disabled={assetFieldDisabled}
+            onChange={value => setAmount(value ? value.toString() : '0')}
+          />
         </Form.Item>
       </div>
-      <div className="row" style={{ marginTop: '-5px' }}>
+      <div className="row">
         <div className="ant-row ant-form-item"> </div>
         <div className="available ant-row ant-form-item">
           <span>{t('general.available')}: </span>
@@ -248,23 +273,34 @@ const CronosBridgeForm = props => {
           </div>
         </div>
       </div>
-      <div className="review-container">
-        <div className="flex-row">
-          <div>Fee: </div>
-          <div>10 CRO</div>
-        </div>
-        <div className="flex-row">
-          <div>You will receieve: </div>
-          <div>900 CRO</div>
-        </div>
-        <div className="flex-row">
-          <div>To Address: </div>
-          <div className="asset-icon">
-            {assetIcon(session.activeAsset)}
-            0x13ee...5339
+      {currentAsset && new Big(amount).gt(0) ? (
+        <div className="review-container">
+          <div className="flex-row">
+            <div>Fee: </div>
+            <div>
+              {getNormalScaleAmount(FIXED_DEFAULT_FEE, currentAsset!)} {currentAsset?.symbol}
+            </div>
+          </div>
+          <div className="flex-row">
+            <div>You will receieve: </div>
+            <div>
+              {new Big(amount)
+                .sub(getNormalScaleAmount(FIXED_DEFAULT_FEE, currentAsset!))
+                .toFixed(4)}{' '}
+              {currentAsset?.symbol}
+            </div>
+          </div>
+          <div className="flex-row">
+            <div>To Address: </div>
+            <div className="asset-icon">
+              {assetIcon(session.activeAsset)}
+              {middleEllipsis(session.wallet.address, 6)}
+            </div>
           </div>
         </div>
-      </div>
+      ) : (
+        <></>
+      )}
     </>
   );
 };
