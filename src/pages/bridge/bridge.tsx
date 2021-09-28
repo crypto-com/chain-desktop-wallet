@@ -53,7 +53,7 @@ const CronosBridgeForm = props => {
 
   const [t] = useTranslation();
 
-  const { currentAssetIdentifier, setCurrentAssetIdentifier } = props;
+  const { currentAssetIdentifier, setCurrentAssetIdentifier, form } = props;
 
   useEffect(() => {
     // setAvailableBalance(scaledBalance(currentAsset!));
@@ -71,6 +71,14 @@ const CronosBridgeForm = props => {
     ) : (
       <Avatar>{symbol[0].toUpperCase()}</Avatar>
     );
+  };
+
+  const onBridgeExchange = () => {
+    const { bridgeFrom, bridgeTo } = form.getFieldsValue();
+    form.setFieldsValue({
+      bridgeFrom: bridgeTo,
+      bridgeTo: bridgeFrom,
+    });
   };
 
   const onSwitchAsset = value => {
@@ -144,7 +152,10 @@ const CronosBridgeForm = props => {
             })}
           </Select>
         </Form.Item>
-        <SwapOutlined style={{ color: '#1199fa', fontSize: '40px' }} />
+        <SwapOutlined
+          style={{ color: '#1199fa', fontSize: '40px', cursor: 'pointer' }}
+          onClick={onBridgeExchange}
+        />
         <Form.Item
           name="bridgeTo"
           label="To"
@@ -282,6 +293,7 @@ const FormBridge = () => {
       <div className="site-layout-background bridge-content">
         <div className="container">
           <CronosBridgeForm
+            form={form}
             currentAssetIdentifier={currentAssetIdentifier}
             setCurrentAssetIdentifier={setCurrentAssetIdentifier}
           />
