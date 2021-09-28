@@ -131,18 +131,6 @@ const CronosBridgeForm = props => {
 
   return (
     <>
-      <img src={iconImgSvg} alt="cronos" />
-      <div className="title">Cronos Bridge</div>
-      <div className="description">
-        The safe, fast and most secure way to transfer assets to and from Cronos.
-      </div>
-      <div className="progress-bar">
-        <Steps progressDot={customDot} current={0}>
-          <Step title="Details" />
-          <Step title="Confirm" />
-          <Step title="Bridge" />
-        </Steps>
-      </div>
       <div className="row-bridge ant-double-height">
         <Form.Item
           name="bridgeFrom"
@@ -307,12 +295,23 @@ const CronosBridgeForm = props => {
 
 const FormBridge = () => {
   const [form] = Form.useForm();
+  const [session, setSession] = useRecoilState(sessionState);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
-  const [session, setSession] = useRecoilState(sessionState);
+  const [currentStep, setCurrentStep] = useState(0);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
+
+  const stepDetail = [
+    {
+      step: 0,
+      title: 'Cronos Bridge',
+      description: 'The safe, fast and most secure way to transfer assets to and from Cronos.',
+    },
+    { step: 1, title: 'Confirmation', description: '' },
+    { step: 2, title: 'Bridge Transaction', description: '' },
+  ];
 
   useEffect(() => {
     const selectedIdentifier = walletAllAssets.find(
@@ -321,6 +320,10 @@ const FormBridge = () => {
     setCurrentAssetIdentifier(selectedIdentifier || walletAllAssets[0].identifier);
   }, [form, walletAllAssets, setSession]);
 
+  const onFinish = () => {
+    setCurrentStep(1);
+  };
+
   return (
     <Form
       {...layout}
@@ -328,10 +331,20 @@ const FormBridge = () => {
       form={form}
       name="control-hooks"
       requiredMark="optional"
-      // onFinish={onFinish}
+      onFinish={onFinish}
     >
       <div className="site-layout-background bridge-content">
         <div className="container">
+          {currentStep === 0 ? <img src={iconImgSvg} alt="cronos" /> : <></>}
+          <div className="title">{stepDetail[currentStep].title}</div>
+          <div className="description">{stepDetail[currentStep].description}</div>
+          <div className="progress-bar">
+            <Steps progressDot={customDot} current={currentStep}>
+              <Step title="Details" />
+              <Step title="Confirm" />
+              <Step title="Bridge" />
+            </Steps>
+          </div>
           <CronosBridgeForm
             form={form}
             currentAssetIdentifier={currentAssetIdentifier}
