@@ -22,6 +22,7 @@ import Icon, {
   ReloadOutlined,
   BankOutlined,
   SettingOutlined,
+  LockFilled,
 } from '@ant-design/icons';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
@@ -59,6 +60,7 @@ import { LedgerWalletMaximum } from '../../config/StaticConfig';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
+import SessionLockModal from '../../components/PasswordForm/SessionLockModal';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -193,6 +195,7 @@ function HomeLayout(props: HomeLayoutProps) {
   };
 
   const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
+  const [isSessionLockModalVisible, setIsSessionLockModalVisible] = useState<boolean>(false);
 
   const showPasswordInput = () => {
     setInputPasswordVisible(true);
@@ -293,6 +296,7 @@ function HomeLayout(props: HomeLayoutProps) {
       const isIbcVisible = allAssets.length > 1;
       // const isIbcVisible = false;
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
+      const isAppLocked = await generalConfigService.getIfAppIsLockedByUser();
       setHasWallet(hasWalletBeenCreated);
       setSession(currentSession);
       setUserAsset(currentAsset);
@@ -301,6 +305,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
       setAllMarketData(currentAllAssetsMarketData);
+      setIsSessionLockModalVisible(isAppLocked);
 
       await Promise.all([
         await fetchAndSetNewValidators(currentSession),
@@ -358,6 +363,8 @@ function HomeLayout(props: HomeLayoutProps) {
     setValidatorList,
     nftList,
     setNftList,
+    isSessionLockModalVisible,
+    setIsSessionLockModalVisible,
   ]);
 
   const onWalletDecryptFinishCreateFreshAssets = async (password: string) => {
@@ -490,11 +497,52 @@ function HomeLayout(props: HomeLayoutProps) {
         repeatValidation
       />
 
+      <SessionLockModal
+        description={t('general.sessionLockModal.description')}
+        okButtonText={t('general.sessionLockModal.okButton')}
+        onCancel={async () => {
+          await generalConfigService.setIsAppLockedByUser(false);
+          setIsSessionLockModalVisible(false);
+        }}
+        onSuccess={async password => {
+          await generalConfigService.setIsAppLockedByUser(false);
+          setIsSessionLockModalVisible(false);
+          onWalletDecryptFinishCreateFreshAssets(password);
+        }}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          return {
+            valid: isValid,
+            errMsg: !isValid ? t('general.sessionLockModal.error') : '',
+          };
+        }}
+        successText={t('general.sessionLockModal.success')}
+        title={t('general.sessionLockModal.title')}
+        visible={isSessionLockModalVisible}
+        successButtonText={t('general.continue')}
+        confirmPassword={false}
+        repeatValidation
+      />
+
       <Layout>
         <Sider className="home-sider">
           <div className="logo" />
           <div className="version">SAMPLE WALLET v{buildVersion}</div>
           <HomeMenu />
+          <Button
+            className="bottom-icon"
+            type="ghost"
+            size="large"
+            icon={<LockFilled style={{ color: '#1199fa' }} />}
+            onClick={async () => {
+              setIsSessionLockModalVisible(true);
+              await generalConfigService.setIsAppLockedByUser(true);
+            }}
+          >
+            {' '}
+            {t('navbar.lock')}{' '}
+          </Button>
+
           <Dropdown
             overlay={<WalletMenu />}
             placement="topCenter"
