@@ -12,6 +12,8 @@ import {
   Steps,
   Divider,
   Checkbox,
+  List,
+  Card,
 } from 'antd';
 import Icon, { ArrowLeftOutlined, ArrowRightOutlined, SwapOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -42,6 +44,7 @@ import IconHexagon from '../../svg/IconHexagon';
 const { Content, Sider } = Layout;
 const { Option } = Select;
 const { Step } = Steps;
+// const { Meta } = Card;
 const layout = {
   // labelCol: { span: 8 },
   // wrapperCol: { span: 16 },
@@ -376,6 +379,20 @@ const CronosBridge = () => {
   const renderStepContent = (step: number) => {
     const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
     const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
+    const data = [
+      {
+        title: 'Title 1',
+      },
+      {
+        title: 'Title 2',
+      },
+      {
+        title: 'Title 3',
+      },
+      {
+        title: 'Title 4',
+      },
+    ];
 
     switch (step) {
       case 0:
@@ -478,6 +495,57 @@ const CronosBridge = () => {
                 Confirm
               </Button>
             </div>
+          </div>
+        );
+      case 2:
+        return (
+          <div className="bridge-container">
+            <List
+              grid={{ gutter: 3, column: 1 }}
+              dataSource={data}
+              renderItem={item => (
+                <List.Item>
+                  <Card>
+                    <List.Item.Meta
+                      avatar={
+                        <Icon
+                          component={() => {
+                            const number = '1';
+                            return (
+                              <>
+                                <IconHexagon
+                                  style={{
+                                    color: '#1199fa',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                  }}
+                                >
+                                  <span
+                                    style={{
+                                      color: '#FFF',
+                                      position: 'absolute',
+                                      left: '4px',
+                                      top: '2px',
+                                    }}
+                                  >
+                                    {number}
+                                  </span>
+                                </IconHexagon>
+                              </>
+                            );
+                          }}
+                          style={{ position: 'relative' }}
+                        />
+                      }
+                      title={`Deposit of ${item.title}`}
+                      description={`Transaction ID: ${item.title}`}
+                      style={{ textAlign: 'left' }}
+                    />
+                  </Card>
+                </List.Item>
+              )}
+            />
           </div>
         );
       default:
