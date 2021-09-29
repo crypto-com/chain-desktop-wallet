@@ -1,5 +1,5 @@
 import { UserAsset } from '../models/UserAsset';
-import { VoteOption } from '../models/Transaction';
+import { BridgeTransferDirection, VoteOption } from '../models/Transaction';
 
 export interface TransferRequest {
   toAddress: string;
@@ -80,6 +80,15 @@ export interface RedelegationRequest {
 
 export interface WithdrawStakingRewardRequest {
   validatorAddress: string;
+  decryptedPhrase: string;
+  walletType: string; // normal, ledger
+}
+
+//
+export interface BridgeTransferRequest {
+  bridgeTransferDirection: BridgeTransferDirection;
+  fromAddress: string;
+  amount: string;
   decryptedPhrase: string;
   walletType: string; // normal, ledger
 }

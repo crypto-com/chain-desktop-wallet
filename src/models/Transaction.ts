@@ -180,6 +180,7 @@ export interface NftProcessedModel extends Omit<NftModel, 'tokenData'> {
 }
 
 export interface NftTransferModel extends NftTransactionResponse {}
+
 // export interface NFTAccountTransactionModel extends NFTAccountTransactionResponse {}
 
 export interface NftAccountTransactionList {
@@ -202,4 +203,11 @@ export enum VoteOption {
   VOTE_OPTION_ABSTAIN = 2,
   VOTE_OPTION_NO = 3,
   VOTE_OPTION_NO_WITH_VETO = 4,
+}
+
+export enum BridgeTransferDirection {
+  CRONOS_TO_CRYPTO_ORG = 'CRONOS_TO_CRYPTO_ORG',
+  CRYPTO_ORG_TO_CRONOS = 'CRYPTO_ORG_TO_CRONOS',
+  ETH_TO_CRONOS = 'ETH_TO_CRONOS',
+  CRONOS_TO_ETH = 'CRONOS_TO_ETH',
 }
