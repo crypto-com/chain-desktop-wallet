@@ -112,9 +112,15 @@ const CronosBridgeForm = props => {
 
   const onBridgeExchange = () => {
     const { bridgeFrom, bridgeTo } = form.getFieldsValue();
+
+    setCurrentAsset(undefined);
+    setCurrentAssetIdentifier(undefined);
+    setAvailableBalance('--');
     form.setFieldsValue({
       bridgeFrom: bridgeTo,
       bridgeTo: bridgeFrom,
+      asset: undefined,
+      amount: undefined,
     });
   };
 
@@ -339,13 +345,12 @@ const CronosBridgeForm = props => {
 const CronosBridge = () => {
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({ amount: '0', bridgeFrom: '', bridgeTo: '' });
-  const [session, setSession] = useRecoilState(sessionState);
+  const session = useRecoilValue(sessionState);
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
   const [currentStep, setCurrentStep] = useState(0);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
+
   const stepDetail = [
     {
       step: 0,
@@ -388,96 +393,97 @@ const CronosBridge = () => {
         );
       case 1:
         return (
-          <>
-            <div className="confirmation-container">
-              <div className="block">
-                <div>Sending</div>
-                <div className="title">
-                  {amount} {currentAsset?.symbol}
+          <div className="confirmation-container">
+            <div className="item">
+              <div className="detail">
+                <div className="block">
+                  <div>Sending</div>
+                  <div className="title">
+                    {amount} {currentAsset?.symbol}
+                  </div>
                 </div>
-              </div>
 
-              <Divider />
-              <div className="block flex-row">
-                <Layout>
-                  <Sider width="50px">
-                    <img src={bridgeFromObj?.icon} alt={bridgeFromObj?.value} />
-                  </Sider>
-                  <Content>
-                    <div>From</div>
-                    <div style={{ fontWeight: 'bold' }}>{bridgeFromObj?.label}</div>
-                  </Content>
-                </Layout>
-                <ArrowRightOutlined style={{ fontSize: '24px', width: '50px' }} />
-                <Layout>
-                  <Sider width="50px">
-                    <img src={bridgeToObj?.icon} alt={bridgeToObj?.value} />
-                  </Sider>
-                  <Content>
-                    <div>To</div>
-                    <div style={{ fontWeight: 'bold' }}>{bridgeToObj?.label}</div>
-                  </Content>
-                </Layout>
-              </div>
-              <Divider />
-              <div className="block">
-                <div className="flex-row">
-                  <div>Fee: </div>
-                  <div>
-                    {getNormalScaleAmount(FIXED_DEFAULT_FEE, currentAsset!)} {currentAsset?.symbol}
+                <Divider />
+                <div className="block flex-row">
+                  <Layout>
+                    <Sider width="50px">
+                      <img src={bridgeFromObj?.icon} alt={bridgeFromObj?.value} />
+                    </Sider>
+                    <Content>
+                      <div>From</div>
+                      <div style={{ fontWeight: 'bold' }}>{bridgeFromObj?.label}</div>
+                    </Content>
+                  </Layout>
+                  <ArrowRightOutlined style={{ fontSize: '24px', width: '50px' }} />
+                  <Layout>
+                    <Sider width="50px">
+                      <img src={bridgeToObj?.icon} alt={bridgeToObj?.value} />
+                    </Sider>
+                    <Content>
+                      <div>To</div>
+                      <div style={{ fontWeight: 'bold' }}>{bridgeToObj?.label}</div>
+                    </Content>
+                  </Layout>
+                </div>
+                <Divider />
+                <div className="block">
+                  <div className="flex-row">
+                    <div>Fee: </div>
+                    <div>
+                      {getNormalScaleAmount(FIXED_DEFAULT_FEE, currentAsset!)}{' '}
+                      {currentAsset?.symbol}
+                    </div>
+                  </div>
+                  <div className="flex-row">
+                    <div>Destination: </div>
+                    <div className="asset-icon">
+                      {assetIcon(session.activeAsset)}
+                      {middleEllipsis(session.wallet.address, 6)}
+                    </div>
                   </div>
                 </div>
-                <div className="flex-row">
-                  <div>Destination: </div>
-                  <div className="asset-icon">
-                    {assetIcon(session.activeAsset)}
-                    {middleEllipsis(session.wallet.address, 6)}
+                <Divider />
+                <div className="block">
+                  <div>Receiving</div>
+                  <div className="title">
+                    ~
+                    {new Big(amount)
+                      .sub(getNormalScaleAmount(FIXED_DEFAULT_FEE, currentAsset!))
+                      .toFixed(4)}{' '}
+                    {currentAsset?.symbol}
                   </div>
-                </div>
-              </div>
-              <Divider />
-              <div className="block">
-                <div>Receiving</div>
-                <div className="title">
-                  ~
-                  {new Big(amount)
-                    .sub(getNormalScaleAmount(FIXED_DEFAULT_FEE, currentAsset!))
-                    .toFixed(4)}{' '}
-                  {currentAsset?.symbol}
                 </div>
               </div>
             </div>
-            <Checkbox
-              checked={!isButtonDisabled}
-              onChange={() => {
-                setIsButtonDisabled(!isButtonDisabled);
-              }}
-            >
-              By proceeding, I hereby acknowledge that I agree to the terms and conditions.
-            </Checkbox>
-            <Button
-              key="submit"
-              type="primary"
-              // loading={isButtonLoading}
-              onClick={() => setCurrentStep(2)}
-              // hidden={isConfirmClearVisible}
-              disabled={isButtonDisabled}
-            >
-              Confirm
-            </Button>
-          </>
+            <div className="item">
+              <Checkbox
+                checked={!isButtonDisabled}
+                onChange={() => {
+                  setIsButtonDisabled(!isButtonDisabled);
+                }}
+                className="disclaimer"
+              >
+                By proceeding, I hereby acknowledge that I agree to the terms and conditions.
+              </Checkbox>
+            </div>
+            <div className="item">
+              <Button
+                key="submit"
+                type="primary"
+                // loading={isButtonLoading}
+                onClick={() => setCurrentStep(2)}
+                // hidden={isConfirmClearVisible}
+                disabled={isButtonDisabled}
+              >
+                Confirm
+              </Button>
+            </div>
+          </div>
         );
       default:
         return <></>;
     }
   };
-
-  useEffect(() => {
-    const selectedIdentifier = walletAllAssets.find(
-      asset => asset.identifier === session.activeAsset?.identifier,
-    )?.identifier;
-    setCurrentAssetIdentifier(selectedIdentifier || walletAllAssets[0].identifier);
-  }, [walletAllAssets, setSession]);
 
   return (
     <>
@@ -485,6 +491,7 @@ const CronosBridge = () => {
         <div
           onClick={() => {
             setCurrentStep(currentStep - 1);
+            setIsButtonDisabled(true);
           }}
           style={{ textAlign: 'left', width: '50px', fontSize: '24px', cursor: 'pointer' }}
         >
