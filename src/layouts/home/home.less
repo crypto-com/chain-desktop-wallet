@@ -94,49 +94,62 @@
         }
       }
     }
+    .bottom-icon {
+      position: absolute;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      height: 40px;
+      justify-content: center;
+      width: calc(@sider-width - 2 * @sider-padding-lr);
+      border-radius: @border-radius;
+      margin: 0;
+      margin-bottom: 80px;
+    }
     .ant-menu-item:hover {
       background: #e4f4ff;
     }
   }
-  .ant-layout-sider.home-sider,
-  .ant-menu {
-    background: @background-color !important;
+}
+.ant-layout-sider.home-sider,
+.ant-menu {
+  background: @background-color !important;
+}
+.ant-layout-header {
+  height: auto;
+  margin: 36px 0 0 0;
+  padding-left: 36px !important;
+  font-size: 24px;
+  line-height: inherit;
+}
+.ant-layout-content {
+  margin: 16px 32px 0;
+  .site-layout-background {
+    background: @white;
+    border-radius: @border-radius;
+    box-shadow: 2px 0 12px 2px rgba(11, 20, 38, 0.05);
   }
-  .ant-layout-header {
-    height: auto;
-    margin: 36px 0 0 0;
-    padding-left: 36px !important;
-    font-size: 24px;
-    line-height: inherit;
+  &.center-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
   }
-  .ant-layout-content {
-    margin: 16px 32px 0;
-    .site-layout-background {
-      background: @white;
-      border-radius: @border-radius;
-      box-shadow: 2px 0 12px 2px rgba(11, 20, 38, 0.05);
-    }
-    &.center-layout {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0;
-    }
+}
+.home-page {
+  width: 100%;
+  height: 100vh;
+  margin-left: @sider-width;
+  > .ant-spin-nested-loading :not(.ant-spin-container) .ant-spin {
+    max-height: none !important;
   }
-  .home-page {
-    width: 100%;
-    height: 100vh;
-    margin-left: @sider-width;
-    > .ant-spin-nested-loading :not(.ant-spin-container) .ant-spin {
-      max-height: none !important;
-    }
-    &.loading {
-      .ant-spin {
-        height: 100vh !important;
-      }
+  &.loading {
+    .ant-spin {
+      height: 100vh !important;
     }
   }
 }
+
 .ant-dropdown {
   ul.ant-menu-root {
     margin-bottom: 16px;
