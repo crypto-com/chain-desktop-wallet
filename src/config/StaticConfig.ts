@@ -62,10 +62,15 @@ SUPPORTED_CURRENCY.set('CZK', { value: 'CZK', label: 'CZK - Kč', symbol: 'Kč' 
 SUPPORTED_CURRENCY.set('BRL', { value: 'BRL', label: 'BRL - R$', symbol: 'R$' });
 SUPPORTED_CURRENCY.set('TRY', { value: 'TRY', label: 'TRY - ₺', symbol: '₺' });
 
-export const SUPPORTED_BRIDGE = [
-  { value: 'cronos', label: 'Cronos Chain', icon: iconCronosSvg },
-  { value: 'cro', label: 'Crypto.org Chain', icon: iconCroSvg },
-];
+export interface SupportedBridge {
+  value: string;
+  label: string;
+  icon: string;
+}
+
+export const SUPPORTED_BRIDGE = new Map<string, SupportedBridge>();
+SUPPORTED_BRIDGE.set('cronos', { value: 'cronos', label: 'Cronos Chain', icon: iconCronosSvg });
+SUPPORTED_BRIDGE.set('cro', { value: 'cro', label: 'Crypto.org Chain', icon: iconCroSvg });
 
 export type WalletConfig = {
   enabled: boolean;

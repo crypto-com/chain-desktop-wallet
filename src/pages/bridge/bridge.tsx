@@ -10,8 +10,10 @@ import {
   Layout,
   Select,
   Steps,
+  Divider,
+  Checkbox,
 } from 'antd';
-import Icon, { SwapOutlined } from '@ant-design/icons';
+import Icon, { ArrowLeftOutlined, ArrowRightOutlined, SwapOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
@@ -32,12 +34,12 @@ import {
   getCurrentMinAssetAmount,
   getNormalScaleAmount,
 } from '../../utils/NumberUtils';
-import { SUPPORTED_BRIDGE, FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
+import { SUPPORTED_BRIDGE, SupportedBridge, FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import iconImgSvg from '../../assets/icon-cronos-blue.svg';
 import IconHexagon from '../../svg/IconHexagon';
 
-const { Content } = Layout;
+const { Content, Sider } = Layout;
 const { Option } = Select;
 const { Step } = Steps;
 const layout = {
@@ -50,14 +52,25 @@ const tailLayout = {
 const customDot = () => <Icon component={IconHexagon} />;
 
 const CronosBridgeForm = props => {
-  const { currentAssetIdentifier, setCurrentAssetIdentifier, form } = props;
+  const {
+    form,
+    setFormValues,
+    assetIcon,
+    currentAssetIdentifier,
+    currentAsset,
+    setCurrentAsset,
+    setCurrentAssetIdentifier,
+    setCurrentStep,
+  } = props;
 
   const [session, setSession] = useRecoilState(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
-  const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
   const [availableBalance, setAvailableBalance] = useState('--');
-  const [amount, setAmount] = useState('0');
+  const [sendingAmount, setSendingAmount] = useState('0');
   const [assetFieldDisabled, setAssetFieldDisabled] = useState(true);
+  const [supportedBridges, setSupportedBridges] = useState<SupportedBridge[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isButtonLoading, setIsButtonLoading] = useState(false);
   // const [updateLoading, setUpdateLoading] = useState(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
@@ -65,22 +78,27 @@ const CronosBridgeForm = props => {
   const [t] = useTranslation();
 
   useEffect(() => {
-    // setAvailableBalance(scaledBalance(currentAsset!));
+    const initFieldValues = () => {
+      const bridges: SupportedBridge[] = [];
+      SUPPORTED_BRIDGE.forEach((item: SupportedBridge) => {
+        bridges.push(item);
+      });
+      setSupportedBridges(bridges);
+
+      const { bridgeFrom, bridgeTo, amount } = form.getFieldsValue();
+      if (bridgeFrom && bridgeTo && amount) {
+        setAvailableBalance(scaledBalance(currentAsset!));
+        setAssetFieldDisabled(false);
+        setSendingAmount(amount);
+      }
+    };
+
     if (!didMountRef.current) {
       didMountRef.current = true;
+      initFieldValues();
       analyticsService.logPage('Bridge');
     }
   }, []);
-
-  const assetIcon = asset => {
-    const { icon_url, symbol } = asset;
-
-    return icon_url ? (
-      <img src={icon_url} alt="cronos" className="asset-icon" />
-    ) : (
-      <Avatar>{symbol[0].toUpperCase()}</Avatar>
-    );
-  };
 
   const onSwitchBridge = () => {
     setCurrentAsset(undefined);
@@ -129,8 +147,27 @@ const CronosBridgeForm = props => {
     }`,
   );
 
+  const onFinish = values => {
+    form.setFieldsValue({
+      bridgeFrom: values.bridgeFrom,
+      bridgeTo: values.bridgeTo,
+      amount: values.amount,
+    });
+    setFormValues({
+      ...form.getFieldsValue(),
+    });
+    setCurrentStep(1);
+  };
+
   return (
-    <>
+    <Form
+      {...layout}
+      layout="vertical"
+      form={form}
+      name="control-hooks"
+      requiredMark="optional"
+      onFinish={onFinish}
+    >
       <div className="row-bridge ant-double-height">
         <Form.Item
           name="bridgeFrom"
@@ -153,7 +190,7 @@ const CronosBridgeForm = props => {
               setAssetFieldDisabled(true);
             }}
           >
-            {SUPPORTED_BRIDGE.map(bridge => {
+            {supportedBridges.map(bridge => {
               return (
                 <Option value={bridge.value} key={bridge.value}>
                   <img src={bridge.icon} alt={bridge.value} className="asset-icon" />
@@ -189,7 +226,7 @@ const CronosBridgeForm = props => {
           style={{ textAlign: 'right' }}
         >
           <Select style={{ width: '300px', textAlign: 'left' }} onChange={onSwitchBridge}>
-            {SUPPORTED_BRIDGE.map(bridge => {
+            {supportedBridges.map(bridge => {
               return (
                 <Option value={bridge.value} key={bridge.value}>
                   <img src={bridge.icon} alt={bridge.value} className="asset-icon" />
@@ -248,7 +285,7 @@ const CronosBridgeForm = props => {
           <InputNumber
             placeholder="Amount"
             disabled={assetFieldDisabled}
-            onChange={value => setAmount(value ? value.toString() : '0')}
+            onChange={value => setSendingAmount(value ? value.toString() : '0')}
           />
         </Form.Item>
       </div>
@@ -261,7 +298,7 @@ const CronosBridgeForm = props => {
           </div>
         </div>
       </div>
-      {currentAsset && new Big(amount).gt(0) ? (
+      {currentAsset && new Big(sendingAmount).gt(0) ? (
         <div className="review-container">
           <div className="flex-row">
             <div>Fee: </div>
@@ -272,7 +309,7 @@ const CronosBridgeForm = props => {
           <div className="flex-row">
             <div>You will receieve: </div>
             <div>
-              {new Big(amount)
+              {new Big(sendingAmount)
                 .sub(getNormalScaleAmount(FIXED_DEFAULT_FEE, currentAsset!))
                 .toFixed(4)}{' '}
               {currentAsset?.symbol}
@@ -289,20 +326,26 @@ const CronosBridgeForm = props => {
       ) : (
         <></>
       )}
-    </>
+
+      <Form.Item {...tailLayout} className="button">
+        <Button type="primary" htmlType="submit" loading={isButtonLoading}>
+          Transfer Asset
+        </Button>
+      </Form.Item>
+    </Form>
   );
 };
 
-const FormBridge = () => {
+const CronosBridge = () => {
   const [form] = Form.useForm();
+  const [formValues, setFormValues] = useState({ amount: '0', bridgeFrom: '', bridgeTo: '' });
   const [session, setSession] = useRecoilState(sessionState);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
+  const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
   const [currentStep, setCurrentStep] = useState(0);
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
-
   const stepDetail = [
     {
       step: 0,
@@ -313,51 +356,156 @@ const FormBridge = () => {
     { step: 2, title: 'Bridge Transaction', description: '' },
   ];
 
+  const { amount, bridgeFrom, bridgeTo } = formValues;
+
+  const assetIcon = asset => {
+    const { icon_url, symbol } = asset;
+
+    return icon_url ? (
+      <img src={icon_url} alt="cronos" className="asset-icon" />
+    ) : (
+      <Avatar>{symbol[0].toUpperCase()}</Avatar>
+    );
+  };
+
+  const renderStepContent = (step: number) => {
+    const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
+    const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
+
+    switch (step) {
+      case 0:
+        return (
+          <CronosBridgeForm
+            form={form}
+            setFormValues={setFormValues}
+            assetIcon={assetIcon}
+            currentAsset={currentAsset}
+            setCurrentAsset={setCurrentAsset}
+            currentAssetIdentifier={currentAssetIdentifier}
+            setCurrentAssetIdentifier={setCurrentAssetIdentifier}
+            setCurrentStep={setCurrentStep}
+          />
+        );
+      case 1:
+        return (
+          <>
+            <div className="confirmation-container">
+              <div className="block">
+                <div>Sending</div>
+                <div className="title">
+                  {amount} {currentAsset?.symbol}
+                </div>
+              </div>
+
+              <Divider />
+              <div className="block flex-row">
+                <Layout>
+                  <Sider width="50px">
+                    <img src={bridgeFromObj?.icon} alt={bridgeFromObj?.value} />
+                  </Sider>
+                  <Content>
+                    <div>From</div>
+                    <div style={{ fontWeight: 'bold' }}>{bridgeFromObj?.label}</div>
+                  </Content>
+                </Layout>
+                <ArrowRightOutlined style={{ fontSize: '24px', width: '50px' }} />
+                <Layout>
+                  <Sider width="50px">
+                    <img src={bridgeToObj?.icon} alt={bridgeToObj?.value} />
+                  </Sider>
+                  <Content>
+                    <div>To</div>
+                    <div style={{ fontWeight: 'bold' }}>{bridgeToObj?.label}</div>
+                  </Content>
+                </Layout>
+              </div>
+              <Divider />
+              <div className="block">
+                <div className="flex-row">
+                  <div>Fee: </div>
+                  <div>
+                    {getNormalScaleAmount(FIXED_DEFAULT_FEE, currentAsset!)} {currentAsset?.symbol}
+                  </div>
+                </div>
+                <div className="flex-row">
+                  <div>Destination: </div>
+                  <div className="asset-icon">
+                    {assetIcon(session.activeAsset)}
+                    {middleEllipsis(session.wallet.address, 6)}
+                  </div>
+                </div>
+              </div>
+              <Divider />
+              <div className="block">
+                <div>Receiving</div>
+                <div className="title">
+                  ~
+                  {new Big(amount)
+                    .sub(getNormalScaleAmount(FIXED_DEFAULT_FEE, currentAsset!))
+                    .toFixed(4)}{' '}
+                  {currentAsset?.symbol}
+                </div>
+              </div>
+            </div>
+            <Checkbox
+              checked={!isButtonDisabled}
+              onChange={() => {
+                setIsButtonDisabled(!isButtonDisabled);
+              }}
+            >
+              By proceeding, I hereby acknowledge that I agree to the terms and conditions.
+            </Checkbox>
+            <Button
+              key="submit"
+              type="primary"
+              // loading={isButtonLoading}
+              onClick={() => setCurrentStep(2)}
+              // hidden={isConfirmClearVisible}
+              disabled={isButtonDisabled}
+            >
+              Confirm
+            </Button>
+          </>
+        );
+      default:
+        return <></>;
+    }
+  };
+
   useEffect(() => {
     const selectedIdentifier = walletAllAssets.find(
       asset => asset.identifier === session.activeAsset?.identifier,
     )?.identifier;
     setCurrentAssetIdentifier(selectedIdentifier || walletAllAssets[0].identifier);
-  }, [form, walletAllAssets, setSession]);
-
-  const onFinish = () => {
-    setCurrentStep(1);
-  };
+  }, [walletAllAssets, setSession]);
 
   return (
-    <Form
-      {...layout}
-      layout="vertical"
-      form={form}
-      name="control-hooks"
-      requiredMark="optional"
-      onFinish={onFinish}
-    >
-      <div className="site-layout-background bridge-content">
-        <div className="container">
-          {currentStep === 0 ? <img src={iconImgSvg} alt="cronos" /> : <></>}
-          <div className="title">{stepDetail[currentStep].title}</div>
-          <div className="description">{stepDetail[currentStep].description}</div>
-          <div className="progress-bar">
-            <Steps progressDot={customDot} current={currentStep}>
-              <Step title="Details" />
-              <Step title="Confirm" />
-              <Step title="Bridge" />
-            </Steps>
-          </div>
-          <CronosBridgeForm
-            form={form}
-            currentAssetIdentifier={currentAssetIdentifier}
-            setCurrentAssetIdentifier={setCurrentAssetIdentifier}
-          />
-          <Form.Item {...tailLayout} className="button">
-            <Button type="primary" htmlType="submit" loading={isButtonLoading}>
-              Transfer Asset
-            </Button>
-          </Form.Item>
+    <>
+      {currentStep !== 0 ? (
+        <div
+          onClick={() => {
+            setCurrentStep(currentStep - 1);
+          }}
+          style={{ textAlign: 'left', width: '50px', fontSize: '24px', cursor: 'pointer' }}
+        >
+          <ArrowLeftOutlined />
         </div>
+      ) : (
+        <></>
+      )}
+      {currentStep === 0 ? <img src={iconImgSvg} alt="cronos" /> : <></>}
+      <div className="title">{stepDetail[currentStep].title}</div>
+      <div className="description">{stepDetail[currentStep].description}</div>
+      <div className="progress-bar">
+        <Steps progressDot={customDot} current={currentStep}>
+          <Step title="Details" />
+          <Step title="Confirm" />
+          <Step title="Bridge" />
+        </Steps>
       </div>
-    </Form>
+
+      {renderStepContent(currentStep)}
+    </>
   );
 };
 
@@ -365,7 +513,11 @@ const BridgePage = () => {
   return (
     <Layout className="site-layout bridge-layout">
       <Content>
-        <FormBridge />
+        <div className="site-layout-background bridge-content">
+          <div className="container">
+            <CronosBridge />
+          </div>
+        </div>
       </Content>
     </Layout>
   );
