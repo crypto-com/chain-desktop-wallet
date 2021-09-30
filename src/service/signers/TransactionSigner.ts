@@ -18,6 +18,7 @@ import {
   NFTTransferUnsigned,
   NFTMintUnsigned,
   NFTDenomIssueUnsigned,
+  BridgeTransactionUnsigned,
 } from './TransactionSupported';
 
 export interface ITransactionSigner {
@@ -229,25 +230,18 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
   }
 
   public async signIBCTransfer(
-    transaction: TransferTransactionUnsigned,
+    transaction: BridgeTransactionUnsigned,
     phrase: string,
   ): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
-
-    const ibcAsset = transaction.asset;
-
-    const denomTracePath = ibcAsset?.denomTracePath;
-    const channelAndPort = denomTracePath?.split('/');
-    const channel = channelAndPort?.[0];
-    const port = channelAndPort?.[1];
 
     const millisToNanoSecond = 1_000_000;
     const timeout = (Date.now() + 60_000) * millisToNanoSecond;
 
     const msgSend = new cro.ibc.MsgTransfer({
       sender: transaction.fromAddress,
-      sourceChannel: channel || '',
-      sourcePort: port || '',
+      sourceChannel: transaction.channel || '',
+      sourcePort: transaction.port || '',
       timeoutTimestampInNanoSeconds: Long.fromValue(timeout),
       receiver: transaction.toAddress,
       token: new cro.Coin(transaction.amount, Units.BASE),
