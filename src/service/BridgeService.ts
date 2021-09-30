@@ -47,7 +47,7 @@ class BridgeService extends WalletBaseService {
           accountNumber,
           accountSequence,
           channel: bridgeChannel,
-          memo: `${bridgeTransferDirection}:desktop-wallet-client`,
+          memo: `bridge:desktop-wallet-client`,
           port: bridgePort,
         };
 
