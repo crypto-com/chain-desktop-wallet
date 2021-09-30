@@ -87,7 +87,9 @@ export interface WithdrawStakingRewardRequest {
 //
 export interface BridgeTransferRequest {
   bridgeTransferDirection: BridgeTransferDirection;
-  fromAddress: string;
+  tendermintAddress?: string;
+  evmAddress?: string;
+
   amount: string;
   decryptedPhrase: string;
   walletType: string; // normal, ledger

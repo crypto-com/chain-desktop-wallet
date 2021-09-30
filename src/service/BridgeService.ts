@@ -11,12 +11,18 @@ class BridgeService extends WalletBaseService {
 
     switch (bridgeTransferDirection) {
       case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS: {
-        // TODO : fill in proper values
+        // TODO : Persist these values on the db and make them configurable
         const bridgeChannel = 'channel-3';
         const bridgePort = 'transfer';
 
-        const recipientBech32Address = getBech32AddressFromEVMAddress(
-          bridgeTransferRequest.fromAddress,
+        if (!bridgeTransferRequest.tendermintAddress || !bridgeTransferRequest.evmAddress) {
+          throw new TypeError(
+            `The Bech32 address and EVM address are required for doing ${bridgeTransferDirection} transfer`,
+          );
+        }
+
+        const evmToBech32ConvertedRecipient = getBech32AddressFromEVMAddress(
+          bridgeTransferRequest.evmAddress,
           'eth',
         );
 
@@ -30,8 +36,8 @@ class BridgeService extends WalletBaseService {
 
         const bridgeTransaction: BridgeTransactionUnsigned = {
           amount: bridgeTransferRequest.amount,
-          fromAddress: bridgeTransferRequest.fromAddress,
-          toAddress: recipientBech32Address,
+          fromAddress: bridgeTransferRequest.tendermintAddress,
+          toAddress: evmToBech32ConvertedRecipient,
           accountNumber,
           accountSequence,
           channel: bridgeChannel,
