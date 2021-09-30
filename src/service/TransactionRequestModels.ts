@@ -87,7 +87,9 @@ export interface WithdrawStakingRewardRequest {
 //
 export interface BridgeTransferRequest {
   bridgeTransferDirection: BridgeTransferDirection;
-  fromAddress: string;
+  bech32Address?: string;
+  evmAddress?: string;
+
   amount: string;
   decryptedPhrase: string;
   walletType: string; // normal, ledger

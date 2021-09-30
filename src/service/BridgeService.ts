@@ -15,8 +15,14 @@ class BridgeService extends WalletBaseService {
         const bridgeChannel = 'channel-3';
         const bridgePort = 'transfer';
 
-        const recipientBech32Address = getBech32AddressFromEVMAddress(
-          bridgeTransferRequest.fromAddress,
+        if (!bridgeTransferRequest.bech32Address || !bridgeTransferRequest.evmAddress) {
+          throw new TypeError(
+            `The Bech32 address and EVM address are required for doing ${bridgeTransferDirection} transfer`,
+          );
+        }
+
+        const evmToBech32ConvertedRecipient = getBech32AddressFromEVMAddress(
+          bridgeTransferRequest.evmAddress,
           'eth',
         );
 
@@ -30,8 +36,8 @@ class BridgeService extends WalletBaseService {
 
         const bridgeTransaction: BridgeTransactionUnsigned = {
           amount: bridgeTransferRequest.amount,
-          fromAddress: bridgeTransferRequest.fromAddress,
-          toAddress: recipientBech32Address,
+          fromAddress: bridgeTransferRequest.bech32Address,
+          toAddress: evmToBech32ConvertedRecipient,
           accountNumber,
           accountSequence,
           channel: bridgeChannel,
