@@ -581,7 +581,7 @@ function HomeLayout(props: HomeLayoutProps) {
               });
               setTimeout(() => {
                 setIsSessionLockModalVisible(true);
-              }, 3 * 1000);
+              }, 2 * 1000);
               await generalConfigService.setIsAppLockedByUser(true);
             }}
           >
