@@ -22,6 +22,7 @@ import Icon, {
   ReloadOutlined,
   BankOutlined,
   SettingOutlined,
+  LockFilled,
 } from '@ant-design/icons';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
@@ -55,10 +56,11 @@ import { Session } from '../../models/Session';
 import { SettingsDataUpdate } from '../../models/Wallet';
 import packageJson from '../../../package.json';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
-import { LedgerWalletMaximum } from '../../config/StaticConfig';
+import { LedgerWalletMaximum, MAX_INCORRECT_ATTEMPTS_ALLOWED, SHOW_WARNING_INCORRECT_ATTEMPTS } from '../../config/StaticConfig';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
+import SessionLockModal from '../../components/PasswordForm/SessionLockModal';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -193,6 +195,7 @@ function HomeLayout(props: HomeLayoutProps) {
   };
 
   const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
+  const [isSessionLockModalVisible, setIsSessionLockModalVisible] = useState<boolean>(false);
 
   const showPasswordInput = () => {
     setInputPasswordVisible(true);
@@ -293,6 +296,7 @@ function HomeLayout(props: HomeLayoutProps) {
       const isIbcVisible = allAssets.length > 1;
       // const isIbcVisible = false;
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
+      const isAppLocked = await generalConfigService.getIfAppIsLockedByUser();
       setHasWallet(hasWalletBeenCreated);
       setSession(currentSession);
       setUserAsset(currentAsset);
@@ -301,6 +305,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);
       setAllMarketData(currentAllAssetsMarketData);
+      setIsSessionLockModalVisible(isAppLocked);
 
       await Promise.all([
         await fetchAndSetNewValidators(currentSession),
@@ -358,6 +363,8 @@ function HomeLayout(props: HomeLayoutProps) {
     setValidatorList,
     nftList,
     setNftList,
+    isSessionLockModalVisible,
+    setIsSessionLockModalVisible,
   ]);
 
   const onWalletDecryptFinishCreateFreshAssets = async (password: string) => {
@@ -490,11 +497,84 @@ function HomeLayout(props: HomeLayoutProps) {
         repeatValidation
       />
 
+      <SessionLockModal
+        description={t('general.sessionLockModal.description')}
+        okButtonText={t('general.sessionLockModal.okButton')}
+        onCancel={async () => {
+          await generalConfigService.setIsAppLockedByUser(false);
+          setIsSessionLockModalVisible(false);
+        }}
+        onSuccess={async password => {
+          await generalConfigService.setIsAppLockedByUser(false);
+          setIsSessionLockModalVisible(false);
+          onWalletDecryptFinishCreateFreshAssets(password);
+        }}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          let latestIncorrectAttemptCount = 0;
+          let errorText = t('general.sessionLockModal.error');
+
+          if (isValid) {
+            // Reset Incorrect attempt counts to ZERO
+            await generalConfigService.resetIncorrectUnlockAttemptsCount();
+          } else {
+
+            // Increment incorrect Attempt counts by ONE
+            await generalConfigService.incrementIncorrectUnlockAttemptsCountByOne();
+
+            // Self-destruct or clear storage on `N` incorrect attempts
+            latestIncorrectAttemptCount = await generalConfigService.getIncorrectUnlockAttemptsCount();
+
+            // Deleting local storage
+            if (latestIncorrectAttemptCount >= MAX_INCORRECT_ATTEMPTS_ALLOWED) {
+              indexedDB.deleteDatabase('NeDB');
+              setTimeout(() => {
+                history.replace('/');
+                history.go(0);
+              }, 3000);
+            }
+
+            // Show warning after `X` number of wrong attempts
+            if (latestIncorrectAttemptCount >= (MAX_INCORRECT_ATTEMPTS_ALLOWED - SHOW_WARNING_INCORRECT_ATTEMPTS)) {
+              errorText = t('general.sessionLockModal.errorSelfDestruct')
+                .replace('*N*', String(latestIncorrectAttemptCount))
+                .replace('#T#', String(MAX_INCORRECT_ATTEMPTS_ALLOWED - latestIncorrectAttemptCount))
+            }
+
+          }
+
+          return {
+            valid: isValid,
+            errMsg: !isValid ? errorText : '',
+          };
+        }}
+        successText={t('general.sessionLockModal.success')}
+        title={t('general.sessionLockModal.title')}
+        visible={isSessionLockModalVisible}
+        successButtonText={t('general.continue')}
+        confirmPassword={false}
+        repeatValidation
+      />
+
       <Layout>
         <Sider className="home-sider">
           <div className="logo" />
           <div className="version">SAMPLE WALLET v{buildVersion}</div>
           <HomeMenu />
+          <Button
+            className="bottom-icon"
+            type="ghost"
+            size="large"
+            icon={<LockFilled style={{ color: '#1199fa' }} />}
+            onClick={async () => {
+              setIsSessionLockModalVisible(true);
+              await generalConfigService.setIsAppLockedByUser(true);
+            }}
+          >
+            {' '}
+            {t('navbar.lock')}{' '}
+          </Button>
+
           <Dropdown
             overlay={<WalletMenu />}
             placement="topCenter"

@@ -7,7 +7,7 @@ import PasswordForm from './PasswordForm';
 import SuccessCheckmark from '../SuccessCheckmark/SuccessCheckmark';
 import ErrorXmark from '../ErrorXmark/ErrorXmark';
 
-interface PasswordFormModalProps {
+export interface PasswordFormModalProps {
   title: string;
   description?: string;
   // Control visibility of the component
@@ -29,6 +29,16 @@ interface PasswordFormModalProps {
 
   // Will ask for password again even after password was validated before
   repeatValidation?: boolean;
+
+  mask?: boolean;
+
+  maskStyle?: React.CSSProperties;
+
+  maskClosable?: boolean;
+
+  keyboard?: boolean;
+
+  closable?: boolean;
 
   // TODO: use secure-string
   onValidatePassword: (
@@ -107,7 +117,12 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
           </div>
         )
       }
+      closable={props.closable}
       onCancel={props.onCancel}
+      mask={props.mask}
+      maskStyle={props.maskStyle}
+      keyboard={props.keyboard}
+      maskClosable={props.maskClosable}
     >
       {displayComponent === 'form' ? (
         <PasswordForm
@@ -126,7 +141,16 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
           {validationErrMsg ? (
             <div>
               <ErrorXmark />
-              <div className="result-message">{validationErrMsg}</div>
+              <div className="result-message">{
+              validationErrMsg
+              .includes('*break*')?  
+              validationErrMsg
+              .split('*break*')
+              .map((err, idx) => {
+                return <div key={idx}> {err}</div>
+              })
+              : validationErrMsg
+              }</div>
             </div>
           ) : (
             <div>
