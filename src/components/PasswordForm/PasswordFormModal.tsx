@@ -141,7 +141,16 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
           {validationErrMsg ? (
             <div>
               <ErrorXmark />
-              <div className="result-message">{validationErrMsg}</div>
+              <div className="result-message">{
+              validationErrMsg
+              .includes('*break*')?  
+              validationErrMsg
+              .split('*break*')
+              .map((err, idx) => {
+                return <div key={idx}> {err}</div>
+              })
+              : validationErrMsg
+              }</div>
             </div>
           ) : (
             <div>
