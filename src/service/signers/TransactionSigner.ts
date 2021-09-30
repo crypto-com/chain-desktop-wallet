@@ -65,13 +65,6 @@ export class BaseTransactionSigner {
 }
 
 export class TransactionSigner extends BaseTransactionSigner implements ITransactionSigner {
-  public readonly config: WalletConfig;
-
-  constructor(config: WalletConfig) {
-    super(config);
-    this.config = config;
-  }
-
   public async signTransfer(
     transaction: TransferTransactionUnsigned,
     phrase: string,
