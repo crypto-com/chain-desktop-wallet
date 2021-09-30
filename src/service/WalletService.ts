@@ -2,7 +2,6 @@ import axios from 'axios';
 import _ from 'lodash';
 import { TransactionConfig } from 'web3-eth';
 import Web3 from 'web3';
-import { getBech32AddressFromEVMAddress } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import {
   DisableDefaultMemoSettings,
   DisableGASettings,
@@ -11,22 +10,17 @@ import {
   SettingsDataUpdate,
   Wallet,
 } from '../models/Wallet';
-import { StorageService } from '../storage/StorageService';
 import {
-  APP_DB_NAMESPACE,
   DEFAULT_CLIENT_MEMO,
   DefaultWalletConfigs,
   NOT_KNOWN_YET_VALUE,
-  WalletConfig,
   SECONDS_OF_YEAR,
+  WalletConfig,
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
-import { TransactionSigner } from './signers/TransactionSigner';
-import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
 import { Session } from '../models/Session';
 import {
-  BridgeTransactionUnsigned,
   DelegateTransactionUnsigned,
   NFTDenomIssueUnsigned,
   NFTMintUnsigned,
@@ -50,18 +44,17 @@ import {
   NftTransferModel,
   ProposalModel,
   ProposalStatuses,
+  RewardsBalances,
   RewardTransaction,
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
-  UnbondingDelegationData,
-  UnbondingDelegationList,
   TransactionStatus,
   TransferTransactionData,
   TransferTransactionList,
+  UnbondingDelegationData,
+  UnbondingDelegationList,
   ValidatorModel,
-  RewardsBalances,
-  BridgeTransferDirection,
 } from '../models/Transaction';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
@@ -85,90 +78,24 @@ import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { CronosClient } from './cronos/CronosClient';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
+import { bridgeService } from './BridgeService';
+import { WalletBaseService } from './WalletBaseService';
 
-class WalletService {
-  private readonly storageService: StorageService;
-
-  constructor() {
-    this.storageService = new StorageService(APP_DB_NAMESPACE);
-  }
-
+class WalletService extends WalletBaseService {
   public readonly BROADCAST_TIMEOUT_CODE = -32603;
 
   public async sendBridgeTransaction(bridgeTransferRequest: BridgeTransferRequest) {
     const currentSession = await this.storageService.retrieveCurrentSession();
-    const { bridgeTransferDirection } = bridgeTransferRequest;
+    const bridgeTransactionResult = await bridgeService.handleBridgeTransaction(
+      bridgeTransferRequest,
+    );
 
-    switch (bridgeTransferDirection) {
-      case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS: {
-        // TODO : fill in proper values
-        const bridgeChannel = 'channel-3';
-        const bridgePort = 'transfer';
+    await Promise.all([
+      await this.fetchAndUpdateBalances(currentSession),
+      await this.fetchAndSaveTransfers(currentSession),
+    ]);
 
-        const recipientBech32Address = getBech32AddressFromEVMAddress(
-          bridgeTransferRequest.fromAddress,
-          'eth',
-        );
-
-        const {
-          nodeRpc,
-          accountNumber,
-          accountSequence,
-          transactionSigner,
-          ledgerTransactionSigner,
-        } = await this.prepareTransaction();
-
-        const bridgeTransaction: BridgeTransactionUnsigned = {
-          amount: bridgeTransferRequest.amount,
-          fromAddress: bridgeTransferRequest.fromAddress,
-          toAddress: recipientBech32Address,
-          accountNumber,
-          accountSequence,
-          channel: bridgeChannel,
-          memo: `${bridgeTransferDirection}:desktop-wallet-client`,
-          port: bridgePort,
-        };
-
-        let signedTxHex: string = '';
-
-        if (bridgeTransferRequest.walletType === LEDGER_WALLET_TYPE) {
-          signedTxHex = await ledgerTransactionSigner.signIBCTransfer(
-            bridgeTransaction,
-            bridgeTransferRequest.decryptedPhrase,
-          );
-        } else {
-          signedTxHex = await transactionSigner.signIBCTransfer(
-            bridgeTransaction,
-            bridgeTransferRequest.decryptedPhrase,
-          );
-        }
-
-        const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-
-        await Promise.all([
-          await this.fetchAndUpdateBalances(currentSession),
-          await this.fetchAndSaveTransfers(currentSession),
-        ]);
-
-        return broadCastResult;
-      }
-
-      case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG:
-        throw new TypeError('Bridge  transfer direction not supported yet');
-
-        break;
-
-      case BridgeTransferDirection.ETH_TO_CRONOS:
-        throw new TypeError('Bridge  transfer direction not supported yet');
-
-        break;
-      case BridgeTransferDirection.CRONOS_TO_ETH:
-        throw new TypeError('Bridge  transfer direction not supported yet');
-
-        break;
-      default:
-        throw new TypeError('Unknown bridge  transfer direction');
-    }
+    return bridgeTransactionResult;
   }
 
   public async sendTransfer(transferRequest: TransferRequest): Promise<BroadCastResult> {
@@ -706,37 +633,6 @@ class WalletService {
       await this.fetchAndUpdateBalances(currentSession),
     ]);
     return broadCastResult;
-  }
-
-  public async prepareTransaction() {
-    const currentSession = await this.storageService.retrieveCurrentSession();
-    const currentWallet = currentSession.wallet;
-
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-
-    const accountNumber = await nodeRpc.fetchAccountNumber(currentSession.wallet.address);
-    const accountSequence = await nodeRpc.loadSequenceNumber(currentSession.wallet.address);
-
-    const transactionSigner = new TransactionSigner(currentWallet.config);
-
-    const signerProvider: ISignerProvider = createLedgerDevice();
-
-    const tmpWalletConfig = currentWallet.config;
-
-    const ledgerTransactionSigner = new LedgerTransactionSigner(
-      // currentWallet.config,
-      tmpWalletConfig,
-      signerProvider,
-      currentWallet.addressIndex,
-    );
-    return {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    };
   }
 
   // eslint-disable-next-line class-methods-use-this
