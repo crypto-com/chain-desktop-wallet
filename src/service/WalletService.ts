@@ -19,8 +19,6 @@ import {
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
-import { TransactionSigner } from './signers/TransactionSigner';
-import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
 import { Session } from '../models/Session';
 import {
   DelegateTransactionUnsigned,
@@ -635,37 +633,6 @@ class WalletService extends WalletBaseService {
       await this.fetchAndUpdateBalances(currentSession),
     ]);
     return broadCastResult;
-  }
-
-  public async prepareTransaction() {
-    const currentSession = await this.storageService.retrieveCurrentSession();
-    const currentWallet = currentSession.wallet;
-
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-
-    const accountNumber = await nodeRpc.fetchAccountNumber(currentSession.wallet.address);
-    const accountSequence = await nodeRpc.loadSequenceNumber(currentSession.wallet.address);
-
-    const transactionSigner = new TransactionSigner(currentWallet.config);
-
-    const signerProvider: ISignerProvider = createLedgerDevice();
-
-    const tmpWalletConfig = currentWallet.config;
-
-    const ledgerTransactionSigner = new LedgerTransactionSigner(
-      // currentWallet.config,
-      tmpWalletConfig,
-      signerProvider,
-      currentWallet.addressIndex,
-    );
-    return {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    };
   }
 
   // eslint-disable-next-line class-methods-use-this
