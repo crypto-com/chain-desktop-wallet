@@ -11,7 +11,7 @@ class BridgeService extends WalletBaseService {
 
     switch (bridgeTransferDirection) {
       case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS: {
-        // TODO : fill in proper values
+        // TODO : Persist these values on the db and make them configurable
         const bridgeChannel = 'channel-3';
         const bridgePort = 'transfer';
 
