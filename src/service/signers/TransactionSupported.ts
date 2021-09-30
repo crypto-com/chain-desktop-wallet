@@ -75,3 +75,19 @@ export interface CustomFeeRequest {
   fee: string;
   gasLimit: string;
 }
+
+export interface BridgeTransactionUnsigned {
+  fromAddress: string;
+  toAddress: string;
+  amount: string;
+
+  memo: string;
+  accountNumber: number;
+  accountSequence: number;
+  nonce?: number;
+  gasPrice?: number;
+  gasLimit?: number;
+
+  channel?: string;
+  port?: string;
+}

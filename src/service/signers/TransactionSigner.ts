@@ -1,5 +1,6 @@
 import sdk from '@crypto-org-chain/chain-jslib';
 import { CosmosMsg } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/msg/cosmosMsg';
+import Long from 'long';
 import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
 import {
   FIXED_DEFAULT_FEE,
@@ -30,22 +31,25 @@ export interface ITransactionSigner {
   ): Promise<string>;
 }
 
-export class TransactionSigner implements ITransactionSigner {
+export class BaseTransactionSigner {
   public readonly config: WalletConfig;
 
   constructor(config: WalletConfig) {
     this.config = config;
   }
 
-  public getTransactionInfo(phrase: string, transaction: TransactionUnsigned) {
-    const cro = sdk.CroSDK({ network: this.config.network });
+  public getTransactionInfo(_phrase: string, transaction: TransactionUnsigned) {
+    return this.getTransactionInfoData(_phrase, transaction.memo);
+  }
 
-    const importedHDKey = HDKey.fromMnemonic(phrase);
+  public getTransactionInfoData(_phrase: string, memo: string) {
+    const cro = sdk.CroSDK({ network: this.config.network });
+    const importedHDKey = HDKey.fromMnemonic(_phrase);
     const privateKey = importedHDKey.derivePrivKey(this.config.derivationPath);
     const keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
 
     const rawTx = new cro.RawTransaction();
-    rawTx.setMemo(transaction.memo);
+    rawTx.setMemo(memo);
 
     const networkFee =
       this.config.fee !== undefined ? this.config.fee.networkFee : FIXED_DEFAULT_FEE;
@@ -56,8 +60,16 @@ export class TransactionSigner implements ITransactionSigner {
 
     rawTx.setFee(fee);
     rawTx.setGasLimit(gasLimit);
+    return { cro, rawTx, keyPair };
+  }
+}
 
-    return { cro, keyPair, rawTx };
+export class TransactionSigner extends BaseTransactionSigner implements ITransactionSigner {
+  public readonly config: WalletConfig;
+
+  constructor(config: WalletConfig) {
+    super(config);
+    this.config = config;
   }
 
   public async signTransfer(
@@ -221,5 +233,33 @@ export class TransactionSigner implements ITransactionSigner {
       .setSignature(0, keyPair.sign(signableTx.toSignDoc(0)))
       .toSigned()
       .getHexEncoded();
+  }
+
+  public async signIBCTransfer(
+    transaction: TransferTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
+
+    const ibcAsset = transaction.asset;
+
+    const denomTracePath = ibcAsset?.denomTracePath;
+    const channelAndPort = denomTracePath?.split('/');
+    const channel = channelAndPort?.[0];
+    const port = channelAndPort?.[1];
+
+    const millisToNanoSecond = 1_000_000;
+    const timeout = (Date.now() + 60_000) * millisToNanoSecond;
+
+    const msgSend = new cro.ibc.MsgTransfer({
+      sender: transaction.fromAddress,
+      sourceChannel: channel || '',
+      sourcePort: port || '',
+      timeoutTimestampInNanoSeconds: Long.fromValue(timeout),
+      receiver: transaction.toAddress,
+      token: new cro.Coin(transaction.amount, Units.BASE),
+    });
+
+    return this.getSignedMessageTransaction(msgSend, transaction, keyPair, rawTx);
   }
 }
