@@ -3,4 +3,6 @@
 export interface GeneralConfig {
   hasEverShownAnalyticsPopup: boolean;
   languageCode: string;
+  isAppLockedByUser: boolean;
+  incorrectUnlockAttempts: number;
 }
