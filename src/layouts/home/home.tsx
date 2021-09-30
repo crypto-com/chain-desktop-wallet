@@ -573,7 +573,7 @@ function HomeLayout(props: HomeLayoutProps) {
             size="large"
             icon={<LockFilled style={{ color: '#1199fa' }} />}
             onClick={async () => {
-              notification.warning({
+              notification.info({
                 message: 'App Locked',
                 description: 'The app will be locked shortly',
                 duration: 3,
