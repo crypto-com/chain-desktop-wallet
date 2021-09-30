@@ -90,6 +90,8 @@ export interface BridgeTransferRequest {
   tendermintAddress?: string;
   evmAddress?: string;
 
+  originAsset: UserAsset;
+
   amount: string;
   decryptedPhrase: string;
   walletType: string; // normal, ledger

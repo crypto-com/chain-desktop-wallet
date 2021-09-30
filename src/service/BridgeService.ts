@@ -4,6 +4,7 @@ import { BridgeTransferDirection } from '../models/Transaction';
 import { BridgeTransactionUnsigned } from './signers/TransactionSupported';
 import { LEDGER_WALLET_TYPE } from './LedgerService';
 import { WalletBaseService } from './WalletBaseService';
+import { getBaseScaledAmount } from '../utils/NumberUtils';
 
 class BridgeService extends WalletBaseService {
   public async handleBridgeTransaction(bridgeTransferRequest: BridgeTransferRequest) {
@@ -34,8 +35,13 @@ class BridgeService extends WalletBaseService {
           ledgerTransactionSigner,
         } = await this.prepareTransaction();
 
+        const scaledBaseAmount = getBaseScaledAmount(
+          bridgeTransferRequest.amount,
+          bridgeTransferRequest.originAsset,
+        );
+
         const bridgeTransaction: BridgeTransactionUnsigned = {
-          amount: bridgeTransferRequest.amount,
+          amount: scaledBaseAmount,
           fromAddress: bridgeTransferRequest.tendermintAddress,
           toAddress: evmToBech32ConvertedRecipient,
           accountNumber,
