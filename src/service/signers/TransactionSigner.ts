@@ -45,9 +45,13 @@ export class BaseTransactionSigner {
 
   public getTransactionInfoData(_phrase: string, memo: string) {
     const cro = sdk.CroSDK({ network: this.config.network });
-    const importedHDKey = HDKey.fromMnemonic(_phrase);
-    const privateKey = importedHDKey.derivePrivKey(this.config.derivationPath);
-    const keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
+    let keyPair;
+    // For ledger based devices a mnemonic phrase is never passed in so we need to handle this only for normal wallets
+    if (_phrase) {
+      const importedHDKey = HDKey.fromMnemonic(_phrase);
+      const privateKey = importedHDKey.derivePrivKey(this.config.derivationPath);
+      keyPair = Secp256k1KeyPair.fromPrivKey(privateKey);
+    }
 
     const rawTx = new cro.RawTransaction();
     rawTx.setMemo(memo);
