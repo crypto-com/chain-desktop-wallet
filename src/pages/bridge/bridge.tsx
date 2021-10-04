@@ -15,6 +15,7 @@ import {
   List,
   Card,
   Spin,
+  Skeleton,
 } from 'antd';
 import Icon, {
   ArrowLeftOutlined,
@@ -34,7 +35,7 @@ import {
 } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 // import { Session } from '../../models/Session';
-import { UserAsset, scaledBalance } from '../../models/UserAsset';
+import { UserAsset, scaledBalance, UserAssetType } from '../../models/UserAsset';
 import { BridgeTransferDirection, BroadCastResult } from '../../models/Transaction';
 // eslint-disable-next-line
 import { renderExplorerUrl } from '../../models/Explorer';
@@ -72,6 +73,7 @@ const customDot = () => <Icon component={IconHexagon} />;
 const CronosBridgeForm = props => {
   const {
     form,
+    formValues,
     setFormValues,
     assetIcon,
     currentAssetIdentifier,
@@ -80,6 +82,8 @@ const CronosBridgeForm = props => {
     setCurrentAssetIdentifier,
     // setCurrentStep,
     showPasswordInput,
+    toAddress,
+    setToAddress,
   } = props;
 
   const [session, setSession] = useRecoilState(sessionState);
@@ -120,6 +124,9 @@ const CronosBridgeForm = props => {
   }, []);
 
   const onSwitchBridge = () => {
+    const { bridgeTo } = form.getFieldsValue();
+    const { tendermintAddress, evmAddress } = formValues;
+
     setCurrentAsset(undefined);
     setCurrentAssetIdentifier(undefined);
     setAvailableBalance('--');
@@ -127,6 +134,18 @@ const CronosBridgeForm = props => {
       asset: undefined,
       amount: undefined,
     });
+
+    switch (bridgeTo) {
+      case 'cro':
+        setToAddress(tendermintAddress);
+        break;
+      case 'cronos': {
+        setToAddress(evmAddress);
+        break;
+      }
+      default:
+        setToAddress(tendermintAddress);
+    }
   };
 
   const onBridgeExchange = () => {
@@ -173,13 +192,11 @@ const CronosBridgeForm = props => {
   );
 
   const onFinish = values => {
-    form.setFieldsValue({
+    setFormValues({
+      ...formValues,
       bridgeFrom: values.bridgeFrom,
       bridgeTo: values.bridgeTo,
       amount: values.amount,
-    });
-    setFormValues({
-      ...form.getFieldsValue(),
     });
     showPasswordInput();
   };
@@ -346,7 +363,7 @@ const CronosBridgeForm = props => {
             <div>To Address: </div>
             <div className="asset-icon">
               {assetIcon(session.activeAsset)}
-              {middleEllipsis(session.wallet.address, 6)}
+              {middleEllipsis(toAddress, 6)}
             </div>
           </div>
         </div>
@@ -364,14 +381,22 @@ const CronosBridgeForm = props => {
 };
 
 const CronosBridge = () => {
-  const [form] = Form.useForm();
-  const [formValues, setFormValues] = useState({ amount: '0', bridgeFrom: '', bridgeTo: '' });
   const session = useRecoilValue(sessionState);
+  const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  const [form] = Form.useForm();
+  const [formValues, setFormValues] = useState({
+    amount: '0',
+    bridgeFrom: '',
+    bridgeTo: '',
+    tendermintAddress: '',
+    evmAddress: '',
+  });
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
   const [currentStep, setCurrentStep] = useState(0);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
+  const [toAddress, setToAddress] = useState('');
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
@@ -386,8 +411,6 @@ const CronosBridge = () => {
     { step: 1, title: 'Confirmation', description: '' },
     { step: 2, title: 'Bridge Transaction', description: '' },
   ];
-
-  const { amount, bridgeFrom, bridgeTo } = formValues;
 
   const assetIcon = asset => {
     const { icon_url, symbol } = asset;
@@ -418,11 +441,13 @@ const CronosBridge = () => {
   };
 
   const onConfirmation = async () => {
+    const { amount, tendermintAddress, evmAddress } = formValues;
+
     setCurrentStep(2);
     const sendResult = await walletService.sendBridgeTransaction({
       bridgeTransferDirection: BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS,
-      tendermintAddress: session?.wallet.address!.toLowerCase(),
-      evmAddress: currentAsset?.address!.toLowerCase(),
+      tendermintAddress: tendermintAddress.toLowerCase(),
+      evmAddress: evmAddress.toLowerCase(),
       amount: amount.toString(),
       originAsset: currentAsset!,
       decryptedPhrase,
@@ -441,11 +466,38 @@ const CronosBridge = () => {
   };
 
   const renderStepContent = (step: number) => {
+    const { amount, bridgeFrom, bridgeTo } = formValues;
+
     const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
     const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
     const data = [
       {
-        txId: broadcastResult.transactionHash !== undefined ? broadcastResult.transactionHash : '',
+        title: `${amount} ${currentAsset?.symbol} is pending to transfer`,
+        description: `From ${bridgeFromObj?.label} to ${bridgeToObj?.label}`,
+        loading: false,
+      },
+      {
+        title: `Deposit of ${amount} ${currentAsset?.symbol} is completed`,
+        description:
+          broadcastResult.transactionHash !== undefined ? (
+            <>
+              Transaction ID:{' '}
+              <a
+                data-original={broadcastResult.transactionHash}
+                target="_blank"
+                rel="noreferrer"
+                href={`${renderExplorerUrl(
+                  session.activeAsset?.config ?? session.wallet.config,
+                  'tx',
+                )}/${broadcastResult.transactionHash}`}
+              >
+                {middleEllipsis(broadcastResult.transactionHash, 6)}
+              </a>
+            </>
+          ) : (
+            <Spin spinning indicator={<LoadingOutlined />} />
+          ),
+        loading: broadcastResult.transactionHash === undefined,
       },
     ];
 
@@ -455,6 +507,7 @@ const CronosBridge = () => {
           <>
             <CronosBridgeForm
               form={form}
+              formValues={formValues}
               setFormValues={setFormValues}
               assetIcon={assetIcon}
               currentAsset={currentAsset}
@@ -463,6 +516,8 @@ const CronosBridge = () => {
               setCurrentAssetIdentifier={setCurrentAssetIdentifier}
               setCurrentStep={setCurrentStep}
               showPasswordInput={showPasswordInput}
+              toAddress={toAddress}
+              setToAddress={setToAddress}
             />
             <PasswordFormModal
               description={t('general.passwordFormModal.description')}
@@ -532,7 +587,7 @@ const CronosBridge = () => {
                     <div>Destination: </div>
                     <div className="asset-icon">
                       {assetIcon(session.activeAsset)}
-                      {middleEllipsis(session.wallet.address, 6)}
+                      {middleEllipsis(toAddress, 6)}
                     </div>
                   </div>
                 </div>
@@ -583,70 +638,76 @@ const CronosBridge = () => {
               renderItem={(item, idx) => (
                 <List.Item>
                   <Card>
-                    <List.Item.Meta
-                      avatar={
-                        <Icon
-                          component={() => {
-                            return (
-                              <>
-                                <IconHexagon
-                                  style={{
-                                    color: '#1199fa',
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                  }}
-                                >
-                                  <span
+                    <Skeleton title={false} loading={item.loading} active>
+                      <List.Item.Meta
+                        avatar={
+                          <Icon
+                            component={() => {
+                              return (
+                                <>
+                                  <IconHexagon
                                     style={{
-                                      color: '#FFF',
-                                      position: 'absolute',
-                                      left: '4px',
-                                      top: '2px',
+                                      color: '#1199fa',
+                                      display: 'flex',
+                                      justifyContent: 'center',
+                                      alignItems: 'center',
                                     }}
                                   >
-                                    {idx + 1}
-                                  </span>
-                                </IconHexagon>
-                              </>
-                            );
-                          }}
-                          style={{ position: 'relative' }}
-                        />
-                      }
-                      title={`Deposit of ${amount} ${currentAsset?.symbol}`}
-                      description={
-                        <>
-                          Transaction ID:{' '}
-                          {item.txId !== '' ? (
-                            <a
-                              data-original={item.txId}
-                              target="_blank"
-                              rel="noreferrer"
-                              href={`${renderExplorerUrl(
-                                session.activeAsset?.config ?? session.wallet.config,
-                                'tx',
-                              )}/${item.txId}`}
-                            >
-                              {middleEllipsis(item.txId, 6)}
-                            </a>
-                          ) : (
-                            <Spin spinning indicator={<LoadingOutlined />} />
-                          )}
-                        </>
-                      }
-                      style={{ textAlign: 'left' }}
-                    />
+                                    <span
+                                      style={{
+                                        color: '#FFF',
+                                        position: 'absolute',
+                                        left: '4px',
+                                        top: '2px',
+                                      }}
+                                    >
+                                      {idx + 1}
+                                    </span>
+                                  </IconHexagon>
+                                </>
+                              );
+                            }}
+                            style={{ position: 'relative' }}
+                          />
+                        }
+                        title={item.title}
+                        description={item.description}
+                        style={{ textAlign: 'left' }}
+                      />
+                    </Skeleton>
                   </Card>
                 </List.Item>
               )}
             />
+            {broadcastResult.transactionHash !== undefined ? (
+              <Button
+                key="submit"
+                type="primary"
+                // loading={isButtonLoading}
+                // onClick={onConfirmation}
+                // hidden={isConfirmClearVisible}
+                // disabled={isButtonDisabled}
+              >
+                View Transaction
+              </Button>
+            ) : (
+              <></>
+            )}
           </div>
         );
       default:
         return <></>;
     }
   };
+
+  useEffect(() => {
+    const evmAsset = walletAllAssets.find(asset => asset.assetType === UserAssetType.EVM);
+    setFormValues({
+      ...formValues,
+      tendermintAddress: session.wallet.address,
+      evmAddress: evmAsset?.address !== undefined ? evmAsset?.address : '',
+    });
+  }, [walletAllAssets]);
 
   return (
     <>
