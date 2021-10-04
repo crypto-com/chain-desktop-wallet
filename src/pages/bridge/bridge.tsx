@@ -14,8 +14,14 @@ import {
   Checkbox,
   List,
   Card,
+  Spin,
 } from 'antd';
-import Icon, { ArrowLeftOutlined, ArrowRightOutlined, SwapOutlined } from '@ant-design/icons';
+import Icon, {
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+  LoadingOutlined,
+  SwapOutlined,
+} from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
@@ -29,10 +35,16 @@ import {
 import { walletService } from '../../service/WalletService';
 // import { Session } from '../../models/Session';
 import { UserAsset, scaledBalance } from '../../models/UserAsset';
+import { BridgeTransferDirection, BroadCastResult } from '../../models/Transaction';
+// eslint-disable-next-line
+import { renderExplorerUrl } from '../../models/Explorer';
 import { middleEllipsis } from '../../utils/utils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
+  // adjustedTransactionAmount,
   fromScientificNotation,
+  // eslint-disable-next-line
+  getBaseScaledAmount,
   getCurrentMinAssetAmount,
   getNormalScaleAmount,
 } from '../../utils/NumberUtils';
@@ -40,6 +52,9 @@ import { SUPPORTED_BRIDGE, SupportedBridge, FIXED_DEFAULT_FEE } from '../../conf
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import iconImgSvg from '../../assets/icon-cronos-blue.svg';
 import IconHexagon from '../../svg/IconHexagon';
+import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import { secretStoreService } from '../../storage/SecretStoreService';
 
 const { Content, Sider } = Layout;
 const { Option } = Select;
@@ -63,7 +78,8 @@ const CronosBridgeForm = props => {
     currentAsset,
     setCurrentAsset,
     setCurrentAssetIdentifier,
-    setCurrentStep,
+    // setCurrentStep,
+    showPasswordInput,
   } = props;
 
   const [session, setSession] = useRecoilState(sessionState);
@@ -165,7 +181,7 @@ const CronosBridgeForm = props => {
     setFormValues({
       ...form.getFieldsValue(),
     });
-    setCurrentStep(1);
+    showPasswordInput();
   };
 
   return (
@@ -175,7 +191,9 @@ const CronosBridgeForm = props => {
       form={form}
       name="control-hooks"
       requiredMark="optional"
-      onFinish={onFinish}
+      onFinish={value => {
+        onFinish(value);
+      }}
     >
       <div className="row-bridge ant-double-height">
         <Form.Item
@@ -352,7 +370,12 @@ const CronosBridge = () => {
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
   const [currentStep, setCurrentStep] = useState(0);
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
+  const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+  const [t] = useTranslation();
 
   const stepDetail = [
     {
@@ -376,37 +399,92 @@ const CronosBridge = () => {
     );
   };
 
+  const onWalletDecryptFinish = async (password: string) => {
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      session.wallet.identifier,
+    );
+    setDecryptedPhrase(phraseDecrypted);
+    setInputPasswordVisible(false);
+    setCurrentStep(1);
+  };
+
+  const showPasswordInput = () => {
+    if (decryptedPhrase || session.wallet.walletType === LEDGER_WALLET_TYPE) {
+      setCurrentStep(1);
+    } else {
+      setInputPasswordVisible(true);
+    }
+  };
+
+  const onConfirmation = async () => {
+    setCurrentStep(2);
+    const sendResult = await walletService.sendBridgeTransaction({
+      bridgeTransferDirection: BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS,
+      tendermintAddress: session?.wallet.address!.toLowerCase(),
+      evmAddress: currentAsset?.address!.toLowerCase(),
+      amount: amount.toString(),
+      originAsset: currentAsset!,
+      decryptedPhrase,
+      walletType: 'normal', // normal, ledger
+    });
+
+    // analyticsService.logTransactionEvent(
+    //   sendResult.transactionHash as string,
+    //   formValues.amount,
+    //   AnalyticsTxType.TransferTransaction,
+    //   AnalyticsActions.FundsTransfer,
+    //   AnalyticsCategory.Transfer,
+    // );
+
+    setBroadcastResult(sendResult);
+  };
+
   const renderStepContent = (step: number) => {
     const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
     const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
     const data = [
       {
-        title: 'Title 1',
-      },
-      {
-        title: 'Title 2',
-      },
-      {
-        title: 'Title 3',
-      },
-      {
-        title: 'Title 4',
+        txId: broadcastResult.transactionHash !== undefined ? broadcastResult.transactionHash : '',
       },
     ];
 
     switch (step) {
       case 0:
         return (
-          <CronosBridgeForm
-            form={form}
-            setFormValues={setFormValues}
-            assetIcon={assetIcon}
-            currentAsset={currentAsset}
-            setCurrentAsset={setCurrentAsset}
-            currentAssetIdentifier={currentAssetIdentifier}
-            setCurrentAssetIdentifier={setCurrentAssetIdentifier}
-            setCurrentStep={setCurrentStep}
-          />
+          <>
+            <CronosBridgeForm
+              form={form}
+              setFormValues={setFormValues}
+              assetIcon={assetIcon}
+              currentAsset={currentAsset}
+              setCurrentAsset={setCurrentAsset}
+              currentAssetIdentifier={currentAssetIdentifier}
+              setCurrentAssetIdentifier={setCurrentAssetIdentifier}
+              setCurrentStep={setCurrentStep}
+              showPasswordInput={showPasswordInput}
+            />
+            <PasswordFormModal
+              description={t('general.passwordFormModal.description')}
+              okButtonText={t('general.passwordFormModal.okButton')}
+              onCancel={() => {
+                setInputPasswordVisible(false);
+              }}
+              onSuccess={onWalletDecryptFinish}
+              onValidatePassword={async (password: string) => {
+                const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+                return {
+                  valid: isValid,
+                  errMsg: !isValid ? t('general.passwordFormModal.error') : '',
+                };
+              }}
+              successText={t('general.passwordFormModal.success')}
+              title={t('general.passwordFormModal.title')}
+              visible={inputPasswordVisible}
+              successButtonText={t('general.continue')}
+              confirmPassword={false}
+            />
+          </>
         );
       case 1:
         return (
@@ -419,7 +497,6 @@ const CronosBridge = () => {
                     {amount} {currentAsset?.symbol}
                   </div>
                 </div>
-
                 <Divider />
                 <div className="block flex-row">
                   <Layout>
@@ -488,7 +565,7 @@ const CronosBridge = () => {
                 key="submit"
                 type="primary"
                 // loading={isButtonLoading}
-                onClick={() => setCurrentStep(2)}
+                onClick={onConfirmation}
                 // hidden={isConfirmClearVisible}
                 disabled={isButtonDisabled}
               >
@@ -503,14 +580,13 @@ const CronosBridge = () => {
             <List
               grid={{ gutter: 3, column: 1 }}
               dataSource={data}
-              renderItem={item => (
+              renderItem={(item, idx) => (
                 <List.Item>
                   <Card>
                     <List.Item.Meta
                       avatar={
                         <Icon
                           component={() => {
-                            const number = '1';
                             return (
                               <>
                                 <IconHexagon
@@ -529,7 +605,7 @@ const CronosBridge = () => {
                                       top: '2px',
                                     }}
                                   >
-                                    {number}
+                                    {idx + 1}
                                   </span>
                                 </IconHexagon>
                               </>
@@ -538,8 +614,27 @@ const CronosBridge = () => {
                           style={{ position: 'relative' }}
                         />
                       }
-                      title={`Deposit of ${item.title}`}
-                      description={`Transaction ID: ${item.title}`}
+                      title={`Deposit of ${amount} ${currentAsset?.symbol}`}
+                      description={
+                        <>
+                          Transaction ID:{' '}
+                          {item.txId !== '' ? (
+                            <a
+                              data-original={item.txId}
+                              target="_blank"
+                              rel="noreferrer"
+                              href={`${renderExplorerUrl(
+                                session.activeAsset?.config ?? session.wallet.config,
+                                'tx',
+                              )}/${item.txId}`}
+                            >
+                              {middleEllipsis(item.txId, 6)}
+                            </a>
+                          ) : (
+                            <Spin spinning indicator={<LoadingOutlined />} />
+                          )}
+                        </>
+                      }
                       style={{ textAlign: 'left' }}
                     />
                   </Card>
@@ -555,7 +650,7 @@ const CronosBridge = () => {
 
   return (
     <>
-      {currentStep !== 0 ? (
+      {currentStep === 1 ? (
         <div
           onClick={() => {
             setCurrentStep(currentStep - 1);
