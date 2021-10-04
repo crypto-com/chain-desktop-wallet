@@ -14,13 +14,13 @@ import {
   Checkbox,
   List,
   Card,
-  Spin,
+  // Spin,
   Skeleton,
 } from 'antd';
 import Icon, {
   ArrowLeftOutlined,
   ArrowRightOutlined,
-  LoadingOutlined,
+  // LoadingOutlined,
   SwapOutlined,
 } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -69,6 +69,12 @@ const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
 const customDot = () => <Icon component={IconHexagon} />;
+
+interface listDataSource {
+  title: string;
+  description: React.ReactNode;
+  loading: boolean;
+}
 
 const CronosBridgeForm = props => {
   const {
@@ -137,10 +143,10 @@ const CronosBridgeForm = props => {
     });
 
     switch (bridgeTo) {
-      case 'cro':
+      case 'CRYPTO_ORG':
         setToAddress(tendermintAddress);
         break;
-      case 'cronos': {
+      case 'CRONOS': {
         setToAddress(evmAddress);
         break;
       }
@@ -201,6 +207,17 @@ const CronosBridgeForm = props => {
       amount: values.amount,
     });
     showPasswordInput();
+  };
+
+  const bridgeIcon = () => {
+    const { bridgeFrom } = form.getFieldsValue();
+    return (
+      <img
+        src={SUPPORTED_BRIDGE.get(bridgeFrom)?.icon}
+        alt={SUPPORTED_BRIDGE.get(bridgeFrom)?.value}
+        className="asset-icon"
+      />
+    );
   };
 
   return (
@@ -381,7 +398,7 @@ const CronosBridgeForm = props => {
           <div className="flex-row">
             <div>To Address: </div>
             <div className="asset-icon">
-              {assetIcon(session.activeAsset)}
+              {bridgeIcon()}
               {middleEllipsis(toAddress, 6)}
             </div>
           </div>
@@ -419,6 +436,8 @@ const CronosBridge = () => {
   const [bridgeTransferDirection, setBridgeTransferDirection] = useState<BridgeTransferDirection>(
     BridgeTransferDirection.NOT_SUPPORT,
   );
+  // eslint-disable-next-line
+  const [bridgeConfirmationList, setBridgeConfirmationList] = useState<listDataSource[]>([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
@@ -463,10 +482,33 @@ const CronosBridge = () => {
   };
 
   const onConfirmation = async () => {
-    const { amount, tendermintAddress, evmAddress } = formValues;
+    const { bridgeFrom, bridgeTo, amount, tendermintAddress, evmAddress } = formValues;
+
+    const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
+    const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
+
+    const listDataSource = [
+      {
+        title: `${amount} ${currentAsset?.symbol} is pending to transfer`,
+        description: (
+          <span>
+            From {bridgeFromObj?.label} to {bridgeToObj?.label}
+          </span>
+        ),
+        loading: false,
+      },
+    ];
+    setBridgeConfirmationList(
+      listDataSource.concat({
+        title: '',
+        description: <></>,
+        loading: true,
+      }),
+    );
 
     try {
       setCurrentStep(2);
+
       const sendResult = await walletService.sendBridgeTransaction({
         bridgeTransferDirection,
         tendermintAddress: tendermintAddress.toLowerCase(),
@@ -477,7 +519,34 @@ const CronosBridge = () => {
         walletType: 'normal', // normal, ledger
       });
       setBroadcastResult(sendResult);
+      listDataSource.push({
+        title: `Deposit of ${amount} ${currentAsset?.symbol} is completed`,
+        description: (
+          <>
+            Transaction ID:{' '}
+            <a
+              data-original={sendResult.transactionHash}
+              target="_blank"
+              rel="noreferrer"
+              href={`${renderExplorerUrl(
+                session.activeAsset?.config ?? session.wallet.config,
+                'tx',
+              )}/${sendResult.transactionHash}`}
+            >
+              {middleEllipsis(sendResult.transactionHash!, 6)}
+            </a>
+          </>
+        ),
+        loading: false,
+      });
+      setBridgeConfirmationList(listDataSource);
     } catch (e) {
+      listDataSource.push({
+        title: `Deposit of ${amount} ${currentAsset?.symbol} is failed`,
+        description: <>Failed in Bridge Transfer</>,
+        loading: false,
+      });
+      setBridgeConfirmationList(listDataSource);
       // eslint-disable-next-line no-console
       console.log('Failed in Bridge Transfer', e);
     }
@@ -496,36 +565,6 @@ const CronosBridge = () => {
 
     const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
     const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
-    const data = [
-      {
-        title: `${amount} ${currentAsset?.symbol} is pending to transfer`,
-        description: `From ${bridgeFromObj?.label} to ${bridgeToObj?.label}`,
-        loading: false,
-      },
-      {
-        title: `Deposit of ${amount} ${currentAsset?.symbol} is completed`,
-        description:
-          broadcastResult.transactionHash !== undefined ? (
-            <>
-              Transaction ID:{' '}
-              <a
-                data-original={broadcastResult.transactionHash}
-                target="_blank"
-                rel="noreferrer"
-                href={`${renderExplorerUrl(
-                  session.activeAsset?.config ?? session.wallet.config,
-                  'tx',
-                )}/${broadcastResult.transactionHash}`}
-              >
-                {middleEllipsis(broadcastResult.transactionHash, 6)}
-              </a>
-            </>
-          ) : (
-            <Spin spinning indicator={<LoadingOutlined />} />
-          ),
-        loading: broadcastResult.transactionHash === undefined,
-      },
-    ];
 
     switch (step) {
       case 0:
@@ -662,7 +701,7 @@ const CronosBridge = () => {
           <div className="bridge-container">
             <List
               grid={{ gutter: 3, column: 1 }}
-              dataSource={data}
+              dataSource={bridgeConfirmationList}
               renderItem={(item, idx) => (
                 <List.Item>
                   <Card>
