@@ -84,6 +84,7 @@ const CronosBridgeForm = props => {
     showPasswordInput,
     toAddress,
     setToAddress,
+    setBridgeTransferDirection,
   } = props;
 
   const [session, setSession] = useRecoilState(sessionState);
@@ -160,6 +161,7 @@ const CronosBridgeForm = props => {
       asset: undefined,
       amount: undefined,
     });
+    form.submit();
   };
 
   const onSwitchAsset = value => {
@@ -251,6 +253,7 @@ const CronosBridgeForm = props => {
         <Form.Item
           name="bridgeTo"
           label="To"
+          validateFirst
           rules={[
             {
               required: true,
@@ -264,6 +267,22 @@ const CronosBridgeForm = props => {
                 }
                 setAssetFieldDisabled(false);
                 return Promise.resolve();
+              },
+            },
+            {
+              validator: () => {
+                const { bridgeFrom, bridgeTo } = form.getFieldValue();
+
+                if (
+                  `${bridgeFrom}_TO_${bridgeTo}` === BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS
+                ) {
+                  setBridgeTransferDirection(BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS);
+                  setAssetFieldDisabled(false);
+                  return Promise.resolve();
+                }
+                setBridgeTransferDirection(BridgeTransferDirection.NOT_SUPPORT);
+                setAssetFieldDisabled(true);
+                return Promise.reject(new Error('The selected bridge transfer is not supported'));
               },
             },
           ]}
@@ -397,6 +416,9 @@ const CronosBridge = () => {
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [toAddress, setToAddress] = useState('');
+  const [bridgeTransferDirection, setBridgeTransferDirection] = useState<BridgeTransferDirection>(
+    BridgeTransferDirection.NOT_SUPPORT,
+  );
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
@@ -443,16 +465,22 @@ const CronosBridge = () => {
   const onConfirmation = async () => {
     const { amount, tendermintAddress, evmAddress } = formValues;
 
-    setCurrentStep(2);
-    const sendResult = await walletService.sendBridgeTransaction({
-      bridgeTransferDirection: BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS,
-      tendermintAddress: tendermintAddress.toLowerCase(),
-      evmAddress: evmAddress.toLowerCase(),
-      amount: amount.toString(),
-      originAsset: currentAsset!,
-      decryptedPhrase,
-      walletType: 'normal', // normal, ledger
-    });
+    try {
+      setCurrentStep(2);
+      const sendResult = await walletService.sendBridgeTransaction({
+        bridgeTransferDirection,
+        tendermintAddress: tendermintAddress.toLowerCase(),
+        evmAddress: evmAddress.toLowerCase(),
+        amount: amount.toString(),
+        originAsset: currentAsset!,
+        decryptedPhrase,
+        walletType: 'normal', // normal, ledger
+      });
+      setBroadcastResult(sendResult);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Failed in Bridge Transfer', e);
+    }
 
     // analyticsService.logTransactionEvent(
     //   sendResult.transactionHash as string,
@@ -461,8 +489,6 @@ const CronosBridge = () => {
     //   AnalyticsActions.FundsTransfer,
     //   AnalyticsCategory.Transfer,
     // );
-
-    setBroadcastResult(sendResult);
   };
 
   const renderStepContent = (step: number) => {
@@ -518,6 +544,8 @@ const CronosBridge = () => {
               showPasswordInput={showPasswordInput}
               toAddress={toAddress}
               setToAddress={setToAddress}
+              bridgeTransferDirection={bridgeTransferDirection}
+              setBridgeTransferDirection={setBridgeTransferDirection}
             />
             <PasswordFormModal
               description={t('general.passwordFormModal.description')}

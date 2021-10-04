@@ -73,8 +73,12 @@ export interface SupportedBridge {
 }
 
 export const SUPPORTED_BRIDGE = new Map<string, SupportedBridge>();
-SUPPORTED_BRIDGE.set('cronos', { value: 'cronos', label: 'Cronos Chain', icon: iconCronosSvg });
-SUPPORTED_BRIDGE.set('cro', { value: 'cro', label: 'Crypto.org Chain', icon: iconCroSvg });
+SUPPORTED_BRIDGE.set('CRONOS', { value: 'CRONOS', label: 'Cronos Chain', icon: iconCronosSvg });
+SUPPORTED_BRIDGE.set('CRYPTO_ORG', {
+  value: 'CRYPTO_ORG',
+  label: 'Crypto.org Chain',
+  icon: iconCroSvg,
+});
 
 export type WalletConfig = {
   enabled: boolean;

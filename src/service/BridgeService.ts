@@ -68,20 +68,16 @@ class BridgeService extends WalletBaseService {
       }
 
       case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG:
-        throw new TypeError('Bridge  transfer direction not supported yet');
-
+        throw new TypeError('Bridge transfer direction not supported yet');
         break;
-
       case BridgeTransferDirection.ETH_TO_CRONOS:
-        throw new TypeError('Bridge  transfer direction not supported yet');
-
+        throw new TypeError('Bridge transfer direction not supported yet');
         break;
       case BridgeTransferDirection.CRONOS_TO_ETH:
-        throw new TypeError('Bridge  transfer direction not supported yet');
-
+        throw new TypeError('Bridge transfer direction not supported yet');
         break;
       default:
-        throw new TypeError('Unknown bridge  transfer direction');
+        throw new TypeError('Unknown bridge transfer direction');
     }
   }
 }
