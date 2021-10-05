@@ -1,5 +1,4 @@
 import Web3 from 'web3';
-import { HttpProvider } from 'web3-core';
 import { TransactionConfig } from 'web3-eth';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import { TransactionSigner } from './signers/TransactionSigner';
@@ -60,13 +59,11 @@ export class WalletBaseService {
       originAsset.config?.indexingUrl,
     );
 
-    const web3 = new Web3(new HttpProvider(originAsset.config?.nodeUrl));
+    const web3 = new Web3(originAsset.config?.nodeUrl);
 
     const nonce = await cronosClient.getNextNonceByAddress(originAsset.address);
-    const loadedGasPrice = Number(
-      web3.utils.toWei(await cronosClient.getEstimatedGasPrice(), 'gwei'),
-    );
-    const gasLimit = Number(await cronosClient.estimateGas(txConfig));
+    const loadedGasPrice = web3.utils.toWei(await cronosClient.getEstimatedGasPrice(), 'gwei');
+    const gasLimit = await cronosClient.estimateGas(txConfig);
 
     // eslint-disable-next-line no-console
     console.log('EVM_TX', {

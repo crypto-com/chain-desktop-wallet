@@ -1,7 +1,6 @@
 import { getBech32AddressFromEVMAddress } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { AbiItem } from 'web3-utils';
 import Web3 from 'web3';
-import { HttpProvider } from 'web3-core';
 import { TransactionConfig } from 'web3-eth';
 import { BridgeTransferRequest } from '../TransactionRequestModels';
 import { BridgeTransferDirection, BroadCastResult } from '../../models/Transaction';
@@ -62,7 +61,7 @@ class BridgeService extends WalletBaseService {
     // TODO: Load contract address from Bridge configuration object
     const bridgeContractAddress = '0x3368dD21c4136747a6569f98C55f5ec0a2D984B3';
     const bridgeContractABI = BridgeABI as AbiItem[];
-    const web3 = new Web3(new HttpProvider(originAsset.config?.nodeUrl));
+    const web3 = new Web3(originAsset.config?.nodeUrl);
     const contract = new web3.eth.Contract(bridgeContractABI, bridgeContractAddress);
     const encodedABI = contract.methods
       .send_cro_to_crypto_org(bridgeTransferRequest.evmAddress)
