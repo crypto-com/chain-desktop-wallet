@@ -290,16 +290,25 @@ const CronosBridgeForm = props => {
               validator: () => {
                 const { bridgeFrom, bridgeTo } = form.getFieldValue();
 
-                if (
-                  `${bridgeFrom}_TO_${bridgeTo}` === BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS
-                ) {
-                  setBridgeTransferDirection(BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS);
-                  setAssetFieldDisabled(false);
-                  return Promise.resolve();
+                switch (`${bridgeFrom}_TO_${bridgeTo}`) {
+                  case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS: {
+                    setBridgeTransferDirection(BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS);
+                    setAssetFieldDisabled(false);
+                    return Promise.resolve();
+                  }
+                  case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG: {
+                    setBridgeTransferDirection(BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG);
+                    setAssetFieldDisabled(false);
+                    return Promise.resolve();
+                  }
+                  default: {
+                    setBridgeTransferDirection(BridgeTransferDirection.NOT_SUPPORT);
+                    setAssetFieldDisabled(true);
+                    return Promise.reject(
+                      new Error('The selected bridge transfer is not supported'),
+                    );
+                  }
                 }
-                setBridgeTransferDirection(BridgeTransferDirection.NOT_SUPPORT);
-                setAssetFieldDisabled(true);
-                return Promise.reject(new Error('The selected bridge transfer is not supported'));
               },
             },
           ]}
