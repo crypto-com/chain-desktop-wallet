@@ -16,6 +16,10 @@ import {
   Card,
   // Spin,
   Skeleton,
+  Tabs,
+  Table,
+  Typography,
+  Tag,
 } from 'antd';
 import Icon, {
   ArrowLeftOutlined,
@@ -36,7 +40,12 @@ import {
 import { walletService } from '../../service/WalletService';
 // import { Session } from '../../models/Session';
 import { UserAsset, scaledBalance, UserAssetType } from '../../models/UserAsset';
-import { BridgeTransferDirection, BroadCastResult } from '../../models/Transaction';
+import {
+  BridgeTransferDirection,
+  BroadCastResult,
+  TransactionDirection,
+  TransactionStatus,
+} from '../../models/Transaction';
 // eslint-disable-next-line
 import { renderExplorerUrl } from '../../models/Explorer';
 import { middleEllipsis } from '../../utils/utils';
@@ -60,6 +69,8 @@ import { secretStoreService } from '../../storage/SecretStoreService';
 const { Content, Sider } = Layout;
 const { Option } = Select;
 const { Step } = Steps;
+const { TabPane } = Tabs;
+const { Text } = Typography;
 // const { Meta } = Card;
 const layout = {
   // labelCol: { span: 8 },
@@ -104,6 +115,12 @@ const CronosBridgeForm = props => {
   // const [updateLoading, setUpdateLoading] = useState(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
+
+  const SUPPORTED_BRIDGES_ASSETS = ['CRO', 'CRONOS'];
+
+  const bridgeSupportedAssets = walletAllAssets.filter(asset => {
+    return SUPPORTED_BRIDGES_ASSETS.includes(asset.mainnetSymbol.toUpperCase());
+  });
 
   const [t] = useTranslation();
 
@@ -344,7 +361,7 @@ const CronosBridgeForm = props => {
             placeholder="Asset"
             disabled={assetFieldDisabled}
           >
-            {walletAllAssets.map(asset => {
+            {bridgeSupportedAssets.map(asset => {
               return (
                 <Option value={asset.identifier} key={asset.identifier}>
                   {assetIcon(asset)}
@@ -816,15 +833,156 @@ const CronosBridge = () => {
   );
 };
 
+const CronosHistory = () => {
+  const session = useRecoilValue(sessionState);
+
+  interface TransferTabularData {
+    key: string;
+    transactionHash: string;
+    recipientAddress: string;
+    amount: string;
+    time: string;
+    direction: TransactionDirection;
+    status: TransactionStatus;
+  }
+
+  const HistoryColumns = [
+    {
+      title: 'Transaction Hash',
+      dataIndex: 'transactionHash',
+      key: 'transactionHash',
+      render: text => (
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${renderExplorerUrl(
+            session.activeAsset?.config ?? session.wallet.config,
+            'tx',
+          )}/${text}`}
+        >
+          {middleEllipsis(text, 12)}
+        </a>
+      ),
+    },
+    {
+      title: 'Amount',
+      dataIndex: 'amount',
+      key: 'amount',
+      render: (text, record: TransferTabularData) => {
+        const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
+        const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+        return (
+          <Text type={color}>
+            {sign}
+            {text}
+          </Text>
+        );
+      },
+    },
+    {
+      title: 'From (Network)',
+      dataIndex: 'recipientAddress',
+      key: 'recipientAddress',
+      render: text => (
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${renderExplorerUrl(
+            session.activeAsset?.config ?? session.wallet.config,
+            'address',
+          )}/${text}`}
+        >
+          {middleEllipsis(text, 12)}
+        </a>
+      ),
+    },
+    {
+      title: 'To (Network)',
+      dataIndex: 'recipientAddress',
+      key: 'recipientAddress',
+      render: text => (
+        <a
+          data-original={text}
+          target="_blank"
+          rel="noreferrer"
+          href={`${renderExplorerUrl(
+            session.activeAsset?.config ?? session.wallet.config,
+            'address',
+          )}/${text}`}
+        >
+          {middleEllipsis(text, 12)}
+        </a>
+      ),
+    },
+    {
+      title: 'Time',
+      dataIndex: 'time',
+      key: 'time',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (text, record: TransferTabularData) => {
+        // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
+        // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+        let statusColor;
+        if (record.status === TransactionStatus.SUCCESS) {
+          statusColor = 'success';
+        } else if (record.status === TransactionStatus.FAILED) {
+          statusColor = 'error';
+        } else {
+          statusColor = 'processing';
+        }
+
+        return (
+          <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+            {record.status.toString()}
+          </Tag>
+        );
+      },
+    },
+  ];
+
+  // TO-DO
+  const allBridgeHistory = [];
+
+  useEffect(() => {}, []);
+
+  return (
+    <>
+      <Table
+        columns={HistoryColumns}
+        dataSource={allBridgeHistory}
+        className="transfer-table"
+        rowKey={record => record.key}
+      />
+    </>
+  );
+};
+
 const BridgePage = () => {
   return (
     <Layout className="site-layout bridge-layout">
       <Content>
-        <div className="site-layout-background bridge-content">
-          <div className="container">
-            <CronosBridge />
-          </div>
-        </div>
+        <Tabs defaultActiveKey="1">
+          <TabPane tab="Transfer" key="1">
+            <div className="site-layout-background bridge-content">
+              <div className="container">
+                <CronosBridge />
+              </div>
+            </div>
+          </TabPane>
+          <TabPane tab="History" key="2">
+            <div className="site-layout-background bridge-content">
+              <div className="container">
+                <CronosHistory />
+              </div>
+            </div>
+          </TabPane>
+        </Tabs>
       </Content>
     </Layout>
   );
