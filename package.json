@@ -68,6 +68,7 @@
     "web3": "1.5.0",
     "web3-core": "1.5.0",
     "web3-eth": "1.5.0",
+    "web3-utils": "^1.6.0",
     "zxcvbn": "4.4.2"
   },
   "scripts": {

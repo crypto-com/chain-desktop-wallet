@@ -1,0 +1,34 @@
+[
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "recipient",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "__CronosSendCroToIbc",
+    "type": "event"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "recipient",
+        "type": "string"
+      }
+    ],
+    "name": "send_cro_to_crypto_org",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  }
+]

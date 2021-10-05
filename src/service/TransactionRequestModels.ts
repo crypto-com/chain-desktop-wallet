@@ -87,8 +87,8 @@ export interface WithdrawStakingRewardRequest {
 //
 export interface BridgeTransferRequest {
   bridgeTransferDirection: BridgeTransferDirection;
-  tendermintAddress?: string;
-  evmAddress?: string;
+  tendermintAddress: string;
+  evmAddress: string;
 
   originAsset: UserAsset;
 
