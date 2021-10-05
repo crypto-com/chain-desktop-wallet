@@ -4,7 +4,7 @@ import Web3 from 'web3';
 import { HttpProvider } from 'web3-core';
 import { TransactionConfig } from 'web3-eth';
 import { BridgeTransferRequest } from '../TransactionRequestModels';
-import { BridgeTransferDirection } from '../../models/Transaction';
+import { BridgeTransferDirection, BroadCastResult } from '../../models/Transaction';
 import { BridgeTransactionUnsigned } from '../signers/TransactionSupported';
 import { LEDGER_WALLET_TYPE } from '../LedgerService';
 import { WalletBaseService } from '../WalletBaseService';
@@ -14,7 +14,9 @@ import { CronosClient } from '../cronos/CronosClient';
 import { evmTransactionSigner } from '../signers/EvmTransactionSigner';
 
 class BridgeService extends WalletBaseService {
-  public async handleBridgeTransaction(bridgeTransferRequest: BridgeTransferRequest) {
+  public async handleBridgeTransaction(
+    bridgeTransferRequest: BridgeTransferRequest,
+  ): Promise<BroadCastResult> {
     const { bridgeTransferDirection } = bridgeTransferRequest;
 
     switch (bridgeTransferDirection) {
@@ -95,7 +97,15 @@ class BridgeService extends WalletBaseService {
       bridgeTransferRequest.decryptedPhrase,
     );
 
-    return await cronosClient.broadcastRawTransactionHex(signedTransaction);
+    const broadcastedTransactionHash = await cronosClient.broadcastRawTransactionHex(
+      signedTransaction,
+    );
+
+    return {
+      transactionHash: broadcastedTransactionHash,
+      message: '',
+      code: 200,
+    };
   }
 
   private async handleCryptoOrgToCronosTransfer(bridgeTransferRequest: BridgeTransferRequest) {
