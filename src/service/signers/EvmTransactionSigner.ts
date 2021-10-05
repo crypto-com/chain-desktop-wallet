@@ -15,12 +15,15 @@ class EvmTransactionSigner implements ITransactionSigner {
     phrase: string,
   ): Promise<string> {
     const web3 = new Web3('');
-
     const transferAsset = transaction.asset;
+
+    const gasPriceBN = web3.utils.toBN(
+      transaction.gasPrice || transferAsset?.config?.fee?.networkFee!,
+    );
 
     const txParams = {
       nonce: web3.utils.toHex(transaction.nonce || 0),
-      gasPrice: web3.utils.toHex(transaction.gasPrice || transferAsset?.config?.fee?.networkFee!),
+      gasPrice: web3.utils.toHex(gasPriceBN),
       gasLimit: transaction.gasLimit || transferAsset?.config?.fee?.gasLimit,
       to: transaction.toAddress,
       value: web3.utils.toHex(transaction.amount),

@@ -6,7 +6,7 @@ export interface TransactionUnsigned {
   accountNumber: number;
   accountSequence: number;
   nonce?: number;
-  gasPrice?: number;
+  gasPrice?: string;
   gasLimit?: number;
   asset?: UserAsset;
 }
@@ -85,7 +85,7 @@ export interface BridgeTransactionUnsigned {
   accountNumber: number;
   accountSequence: number;
   nonce?: number;
-  gasPrice?: number;
+  gasPrice?: string;
   gasLimit?: number;
 
   channel?: string;
