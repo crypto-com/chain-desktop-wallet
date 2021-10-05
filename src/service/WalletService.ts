@@ -78,7 +78,7 @@ import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { CronosClient } from './cronos/CronosClient';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
-import { bridgeService } from './BridgeService';
+import { bridgeService } from './bridge/BridgeService';
 import { WalletBaseService } from './WalletBaseService';
 
 class WalletService extends WalletBaseService {
@@ -143,22 +143,11 @@ class WalletService extends WalletBaseService {
             value: web3.utils.toWei(transferRequest.amount, 'ether'),
           };
 
-          transfer.nonce = await cronosClient.getNextNonceByAddress(currentAsset.address);
+          const prepareTxInfo = await this.prepareEVMTransaction(currentAsset, txConfig);
 
-          const loadedGasPrice = web3.utils.toWei(
-            await cronosClient.getEstimatedGasPrice(),
-            'gwei',
-          );
-          transfer.gasPrice = Number(loadedGasPrice);
-
-          transfer.gasLimit = Number(await cronosClient.estimateGas(txConfig));
-
-          // eslint-disable-next-line no-console
-          console.log('EVM_TX', {
-            txNonce: transfer.nonce,
-            gasPrice: transfer.gasPrice,
-            gasLimit: transfer.gasLimit,
-          });
+          transfer.nonce = prepareTxInfo.nonce;
+          transfer.gasPrice = prepareTxInfo.loadedGasPrice;
+          transfer.gasLimit = prepareTxInfo.gasLimit;
 
           const signedTx = await evmTransactionSigner.signTransfer(
             transfer,

@@ -90,4 +90,7 @@ export interface BridgeTransactionUnsigned {
 
   channel?: string;
   port?: string;
+
+  data?: string;
+  originAsset?: UserAsset;
 }
