@@ -86,6 +86,7 @@ class BridgeService extends WalletBaseService {
       from: bridgeTransaction.fromAddress,
       to: bridgeTransaction.toAddress,
       value: web3.utils.toWei(bridgeTransferRequest.amount, 'ether'),
+      data: encodedABI,
     };
 
     const prepareTxInfo = await this.prepareEVMTransaction(originAsset, txConfig);
@@ -98,6 +99,12 @@ class BridgeService extends WalletBaseService {
       bridgeTransaction,
       bridgeTransferRequest.decryptedPhrase,
     );
+
+    // eslint-disable-next-line no-console
+    console.log(`${bridgeTransferRequest.originAsset.assetType} REQUEST & SIGNED-TX`, {
+      signedTransaction,
+      bridgeTransaction,
+    });
 
     const broadcastedTransactionHash = await cronosClient.broadcastRawTransactionHex(
       signedTransaction,

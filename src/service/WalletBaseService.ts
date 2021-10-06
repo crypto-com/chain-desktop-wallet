@@ -60,7 +60,12 @@ export class WalletBaseService {
 
     const nonce = await cronosClient.getNextNonceByAddress(originAsset.address);
     const loadedGasPrice = await cronosClient.getEstimatedGasPrice();
-    const gasLimit = await cronosClient.estimateGas(txConfig);
+    let gasLimit;
+    try {
+      gasLimit = await cronosClient.estimateGas(txConfig);
+    } catch (e) {
+      gasLimit = 21_000; // Default gasLimit
+    }
 
     // eslint-disable-next-line no-console
     console.log('EVM_TX', {
