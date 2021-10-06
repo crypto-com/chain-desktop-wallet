@@ -67,6 +67,9 @@ class BridgeService extends WalletBaseService {
       .send_cro_to_crypto_org(bridgeTransferRequest.evmAddress)
       .encodeABI();
 
+    // eslint-disable-next-line no-console
+    console.log('Encoded Contract ABI', encodedABI);
+
     const scaledBaseAmount = getBaseScaledAmount(bridgeTransferRequest.amount, originAsset);
 
     const bridgeTransaction: BridgeTransactionUnsigned = {
