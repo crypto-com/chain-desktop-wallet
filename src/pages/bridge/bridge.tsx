@@ -16,7 +16,7 @@ import {
   Card,
   // Spin,
   Skeleton,
-  Tabs,
+  // Tabs,
   Table,
   Typography,
   Tag,
@@ -62,6 +62,7 @@ import { SUPPORTED_BRIDGE, SupportedBridge, FIXED_DEFAULT_FEE } from '../../conf
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import iconImgSvg from '../../assets/icon-cronos-blue.svg';
 import IconHexagon from '../../svg/IconHexagon';
+import IconTransferHistory from '../../svg/IconTransferHistory';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
@@ -69,7 +70,7 @@ import { secretStoreService } from '../../storage/SecretStoreService';
 const { Content, Sider } = Layout;
 const { Option } = Select;
 const { Step } = Steps;
-const { TabPane } = Tabs;
+// const { TabPane } = Tabs;
 const { Text } = Typography;
 // const { Meta } = Card;
 const layout = {
@@ -833,6 +834,7 @@ const CronosBridge = () => {
   );
 };
 
+// eslint-disable-next-line
 const CronosHistory = () => {
   const session = useRecoilValue(sessionState);
 
@@ -967,7 +969,7 @@ const BridgePage = () => {
   return (
     <Layout className="site-layout bridge-layout">
       <Content>
-        <Tabs defaultActiveKey="1">
+        {/* <Tabs defaultActiveKey="1">
           <TabPane tab="Transfer" key="1">
             <div className="site-layout-background bridge-content">
               <div className="container">
@@ -982,7 +984,20 @@ const BridgePage = () => {
               </div>
             </div>
           </TabPane>
-        </Tabs>
+        </Tabs> */}
+        <div className="go-to-transfer-history">
+          <a>
+            <div>
+              <IconTransferHistory />
+              <span>View Transaction History</span>
+            </div>
+          </a>
+        </div>
+        <div className="site-layout-background bridge-content">
+          <div className="container">
+            <CronosBridge />
+          </div>
+        </div>
       </Content>
     </Layout>
   );
