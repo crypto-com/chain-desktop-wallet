@@ -511,6 +511,12 @@ function HomeLayout(props: HomeLayoutProps) {
         }}
         onSuccess={async password => {
           await generalConfigService.setIsAppLockedByUser(false);
+          notification.info({
+            message: 'App Unlocked',
+            description: 'The app is successfully unlocked.',
+            duration: 3,
+            placement: 'topRight',
+          });
           setIsSessionLockModalVisible(false);
           onWalletDecryptFinishCreateFreshAssets(password);
         }}
@@ -572,7 +578,15 @@ function HomeLayout(props: HomeLayoutProps) {
             size="large"
             icon={<LockFilled style={{ color: '#1199fa' }} />}
             onClick={async () => {
-              setIsSessionLockModalVisible(true);
+              notification.info({
+                message: 'App Locked',
+                description: 'The app will be locked shortly',
+                duration: 3,
+                placement: 'topRight',
+              });
+              setTimeout(() => {
+                setIsSessionLockModalVisible(true);
+              }, 2 * 1000);
               await generalConfigService.setIsAppLockedByUser(true);
             }}
           >
