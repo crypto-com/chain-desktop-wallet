@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useState } from 'react';
 import {
   BrowserRouter,
   HashRouter as ElectronRouter,
@@ -21,6 +21,9 @@ import SettingsPage from './settings/settings';
 import SignUpPage from './signup/signup';
 import HomeLayout from '../layouts/home/home';
 import AssetsPage from './assets/assets';
+import axios from 'axios';
+import { CLOUDFLARE_TRACE_URI, NOT_KNOWN_YET_VALUE, COUNTRY_CODES_TO_BLOCK } from '../config/StaticConfig';
+import BlockPage from './block/block';
 
 interface RouterProps {
   children: React.ReactNode;
@@ -35,12 +38,35 @@ const Router: React.FC<RouterProps> = props => {
   );
 };
 
+const getCurrentGeoLocationCountryCode = async () => {
+  const geoLocationPlainText = await axios.get(CLOUDFLARE_TRACE_URI)
+  const geoLocationJSON = geoLocationPlainText.data.trim().split('\n').reduce(function (obj, pair) {
+    pair = pair.split('=');
+    return obj[pair[0]] = pair[1], obj;
+  }, {});
+
+  if (geoLocationJSON.hasOwnProperty('loc')) {
+    return geoLocationJSON.loc;
+  } else {
+    return NOT_KNOWN_YET_VALUE;
+  }
+}
+
 function RouteHub() {
+  const [isCountryBlocked, setIsCountryBlocked] = useState(true);
+
   const routeIndex = {
     name: 'Welcome Page',
     key: 'welcome',
     path: '/',
     component: <WelcomePage />,
+  };
+
+  const blockPageRoute = {
+    name: 'Block Page',
+    key: 'block',
+    path: '/block',
+    component: <BlockPage />,
   };
 
   const routeItems = [
@@ -127,35 +153,50 @@ function RouteHub() {
     },
   ];
 
+  useLayoutEffect(()=> {
+    (async () => {
+      const currentCountryCode = await getCurrentGeoLocationCountryCode();
+  
+      // Todo: Fetch country codes dynamically
+      if (!COUNTRY_CODES_TO_BLOCK.includes(currentCountryCode)) {
+        setIsCountryBlocked(false);
+      }
+    })();
+  }, [isCountryBlocked, setIsCountryBlocked]);
+
   return (
-    <Router>
-      <Switch>
-        <Route exact path={routeIndex.path} key={routeIndex.key}>
-          {routeIndex.component}
-        </Route>
-        {routeItems.map(item => {
-          return (
-            <Route exact path={item.path} key={item.path}>
-              {item.component}
-            </Route>
-          );
-        })}
-        <HomeLayout>
-          <Switch>
-            {routeHomeLayoutItems.map(item => {
-              return (
-                <Route exact path={item.path} key={item.path}>
-                  {item.component}
-                </Route>
-              );
-            })}
-            <Route>
-              <Redirect to="/home" />
-            </Route>
-          </Switch>
-        </HomeLayout>
-      </Switch>
-    </Router>
+    isCountryBlocked ?
+      (<Router>
+        {blockPageRoute.component}
+      </Router>) :
+      <Router>
+        <Switch>
+          <Route exact path={routeIndex.path} key={routeIndex.key}>
+            {routeIndex.component}
+          </Route>
+          {routeItems.map(item => {
+            return (
+              <Route exact path={item.path} key={item.path}>
+                {item.component}
+              </Route>
+            );
+          })}
+          <HomeLayout>
+            <Switch>
+              {routeHomeLayoutItems.map(item => {
+                return (
+                  <Route exact path={item.path} key={item.path}>
+                    {item.component}
+                  </Route>
+                );
+              })}
+              <Route>
+                <Redirect to="/home" />
+              </Route>
+            </Switch>
+          </HomeLayout>
+        </Switch>
+      </Router>
   );
 }
 

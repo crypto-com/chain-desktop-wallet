@@ -1,0 +1,51 @@
+.block-page {
+  display: grid;
+  grid-template-areas:
+    ' header '
+    ' container '
+    '.';
+  grid-template-rows: 20vh 80vh;
+  grid-template-columns: auto;
+  background: @background-color;
+  > .header {
+    display: flex;
+    grid-area: header;
+    align-items: center;
+    justify-content: center;
+    margin: 40px 0;
+    .logo {
+      width: 240px;
+    }
+  }
+  > .container {
+    display: flex;
+    grid-area: container;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 20vh;
+    font-weight: 500;
+    text-align: center;
+    background: url('../../assets/bg-pattern.svg');
+    background-size: cover;
+    .title {
+      font-size: 40px;
+      font-family: @featured-font-family;
+    }
+    .slogan {
+      width: 50vw;
+      margin: auto;
+      color: @font-color-dark;
+      font-size: 24px;
+      opacity: 0.5;
+    }
+    .button-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 32px;
+      .ant-btn {
+        width: 184px;
+      }
+    }
+  }
+}
