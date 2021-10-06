@@ -41,7 +41,7 @@ const Router: React.FC<RouterProps> = props => {
 const getCurrentGeoLocationCountryCode = async () => {
   const geoLocationPlainText = await axios.get(CLOUDFLARE_TRACE_URI)
   const geoLocationJSON = geoLocationPlainText.data.trim().split('\n').reduce((obj, pair) =>{
-    let [key, value] = pair.split('=');
+    const [key, value] = pair.split('=');
     obj[key] = value;
     return obj;
   }, {});
