@@ -1,5 +1,6 @@
 import { UserAsset } from '../models/UserAsset';
-import { BridgeTransferDirection, VoteOption } from '../models/Transaction';
+import { VoteOption } from '../models/Transaction';
+import { BridgeTransferDirection } from './bridge/BridgeConfig';
 
 export interface TransferRequest {
   toAddress: string;

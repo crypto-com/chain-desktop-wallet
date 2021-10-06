@@ -2,8 +2,9 @@ import { getBech32AddressFromEVMAddress } from '@crypto-org-chain/chain-jslib/li
 import { AbiItem } from 'web3-utils';
 import Web3 from 'web3';
 import { TransactionConfig } from 'web3-eth';
+import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import { BridgeTransferRequest } from '../TransactionRequestModels';
-import { BridgeTransferDirection, BroadCastResult } from '../../models/Transaction';
+import { BroadCastResult } from '../../models/Transaction';
 import { BridgeTransactionUnsigned } from '../signers/TransactionSupported';
 import { LEDGER_WALLET_TYPE } from '../LedgerService';
 import { WalletBaseService } from '../WalletBaseService';
@@ -11,6 +12,15 @@ import { getBaseScaledAmount } from '../../utils/NumberUtils';
 import BridgeABI from './contracts/BridgeABI.json';
 import { CronosClient } from '../cronos/CronosClient';
 import { evmTransactionSigner } from '../signers/EvmTransactionSigner';
+import {
+  BridgeConfig,
+  BridgeNetworkConfigType,
+  BridgeTransferDirection,
+  DefaultMainnetBridgeConfigs,
+  DefaultTestnetBridgeConfigs,
+} from './BridgeConfig';
+import { Network } from '../../config/StaticConfig';
+import { Session } from '../../models/Session';
 
 class BridgeService extends WalletBaseService {
   public async handleBridgeTransaction(
@@ -58,10 +68,26 @@ class BridgeService extends WalletBaseService {
       originAsset.config?.indexingUrl,
     );
 
-    // TODO: Load contract address from Bridge configuration object
-    const bridgeContractAddress = '0x3368dD21c4136747a6569f98C55f5ec0a2D984B3';
-    const bridgeContractABI = BridgeABI as AbiItem[];
     const web3 = new Web3(originAsset.config?.nodeUrl);
+
+    const txConfig: TransactionConfig = {
+      from: bridgeTransferRequest.evmAddress,
+      to: bridgeTransferRequest.tendermintAddress,
+      value: web3.utils.toWei(bridgeTransferRequest.amount, 'ether'),
+    };
+
+    const prepareTxInfo = await this.prepareEVMTransaction(originAsset, txConfig);
+
+    const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
+      prepareTxInfo.currentSession,
+      bridgeTransferRequest,
+    );
+
+    // TODO: Load contract address from Bridge configuration object
+    const bridgeContractABI = BridgeABI as AbiItem[];
+    const bridgeContractAddress =
+      loadedBridgeConfig?.cronosBridgeContractAddress ||
+      defaultBridgeConfig.cronosBridgeContractAddress;
     const contract = new web3.eth.Contract(bridgeContractABI, bridgeContractAddress);
     const encodedABI = contract.methods
       .send_cro_to_crypto_org(bridgeTransferRequest.tendermintAddress)
@@ -81,15 +107,6 @@ class BridgeService extends WalletBaseService {
       accountNumber: 0,
       accountSequence: 0,
     };
-
-    const txConfig: TransactionConfig = {
-      from: bridgeTransaction.fromAddress,
-      to: bridgeTransaction.toAddress,
-      value: web3.utils.toWei(bridgeTransferRequest.amount, 'ether'),
-      data: encodedABI,
-    };
-
-    const prepareTxInfo = await this.prepareEVMTransaction(originAsset, txConfig);
 
     bridgeTransaction.nonce = prepareTxInfo.nonce;
     bridgeTransaction.gasPrice = prepareTxInfo.loadedGasPrice;
@@ -118,20 +135,11 @@ class BridgeService extends WalletBaseService {
   }
 
   private async handleCryptoOrgToCronosTransfer(bridgeTransferRequest: BridgeTransferRequest) {
-    // TODO : Persist these values on the db and make them configurable
-    const bridgeChannel = 'channel-129';
-    const bridgePort = 'transfer';
-
     if (!bridgeTransferRequest.tendermintAddress || !bridgeTransferRequest.evmAddress) {
       throw new TypeError(
         `The Bech32 address and EVM address are required for doing ${bridgeTransferRequest.bridgeTransferDirection} transfer`,
       );
     }
-
-    const evmToBech32ConvertedRecipient = getBech32AddressFromEVMAddress(
-      bridgeTransferRequest.evmAddress,
-      'eth',
-    );
 
     const {
       nodeRpc,
@@ -139,11 +147,21 @@ class BridgeService extends WalletBaseService {
       accountSequence,
       transactionSigner,
       ledgerTransactionSigner,
+      currentSession,
     } = await this.prepareTransaction();
 
     const scaledBaseAmount = getBaseScaledAmount(
       bridgeTransferRequest.amount,
       bridgeTransferRequest.originAsset,
+    );
+    const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
+      currentSession,
+      bridgeTransferRequest,
+    );
+
+    const evmToBech32ConvertedRecipient = getBech32AddressFromEVMAddress(
+      bridgeTransferRequest.evmAddress,
+      loadedBridgeConfig?.prefix || defaultBridgeConfig.prefix,
     );
 
     const bridgeTransaction: BridgeTransactionUnsigned = {
@@ -152,9 +170,9 @@ class BridgeService extends WalletBaseService {
       toAddress: evmToBech32ConvertedRecipient,
       accountNumber,
       accountSequence,
-      channel: bridgeChannel,
+      channel: loadedBridgeConfig?.bridgeChannel || defaultBridgeConfig.bridgeChannel,
+      port: loadedBridgeConfig?.bridgePort || defaultBridgeConfig.bridgePort,
       memo: `bridge:desktop-wallet-client`,
-      port: bridgePort,
     };
 
     let signedTxHex: string = '';
@@ -172,6 +190,61 @@ class BridgeService extends WalletBaseService {
     }
     return await nodeRpc.broadcastTransaction(signedTxHex);
   }
+
+  public async getCurrentBridgeConfig(
+    currentSession: Session,
+    bridgeTransferRequest: BridgeTransferRequest,
+  ) {
+    const isTestnet = this.checkIfTestnet(currentSession.wallet.config.network);
+    const bridgeNetworkConfigType = isTestnet
+      ? BridgeNetworkConfigType.TESTNET_BRIDGE
+      : BridgeNetworkConfigType.MAINNET_BRIDGE;
+    const defaultBridgeConfig: BridgeConfig = isTestnet
+      ? DefaultTestnetBridgeConfigs[bridgeTransferRequest.bridgeTransferDirection]
+      : DefaultMainnetBridgeConfigs[bridgeTransferRequest.bridgeTransferDirection];
+
+    const loadedBridgeConfig = await this.loadBridgeConfig(
+      bridgeTransferRequest.bridgeTransferDirection,
+      bridgeNetworkConfigType,
+    );
+    return { defaultBridgeConfig, loadedBridgeConfig };
+  }
+
+  public async loadBridgeConfig(
+    bridgeDirectionType: BridgeTransferDirection,
+    bridgeNetwork: BridgeNetworkConfigType,
+  ) {
+    const allConfigs = await this.storageService.fetchAllBridgeConfigs();
+    // eslint-disable-next-line no-console
+    console.log('ALL_BRIDGE_CONFIGS', allConfigs);
+
+    if (!allConfigs || allConfigs.length < 1) {
+      await this.storageService.saveBridgeConfigsList([
+        DefaultMainnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG,
+        DefaultMainnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS,
+
+        DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG,
+        DefaultTestnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS,
+      ]);
+    }
+
+    return this.storageService.findBridgeConfigByNetworkAndBridgeTransactionType(
+      bridgeDirectionType,
+      bridgeNetwork,
+    );
+  }
+
+  public async updateBridgeConfiguration(bridgeConfig: BridgeConfig) {
+    return this.storageService.saveBridgeConfig(bridgeConfig);
+  }
+
+  public checkIfTestnet = (network: Network) => {
+    return (
+      [CroNetwork.TestnetCroeseid3, CroNetwork.TestnetCroeseid4, CroNetwork.Testnet].includes(
+        network,
+      ) || network.defaultNodeUrl.includes('testnet')
+    );
+  };
 }
 
 export const bridgeService = new BridgeService();
