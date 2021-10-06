@@ -210,10 +210,22 @@ class BridgeService extends WalletBaseService {
     return { defaultBridgeConfig, loadedBridgeConfig };
   }
 
+  public async retrieveBridgeConfig(
+    bridgeDirectionType: BridgeTransferDirection,
+  ): Promise<BridgeConfig> {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    const isTestnet = this.checkIfTestnet(currentSession.wallet.config.network);
+    const bridgeNetworkConfigType = isTestnet
+      ? BridgeNetworkConfigType.TESTNET_BRIDGE
+      : BridgeNetworkConfigType.MAINNET_BRIDGE;
+
+    return this.loadBridgeConfig(bridgeDirectionType, bridgeNetworkConfigType);
+  }
+
   public async loadBridgeConfig(
     bridgeDirectionType: BridgeTransferDirection,
     bridgeNetwork: BridgeNetworkConfigType,
-  ) {
+  ): Promise<BridgeConfig> {
     const allConfigs = await this.storageService.fetchAllBridgeConfigs();
     // eslint-disable-next-line no-console
     console.log('ALL_BRIDGE_CONFIGS', allConfigs);
