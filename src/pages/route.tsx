@@ -6,6 +6,7 @@ import {
   Route,
   Redirect,
 } from 'react-router-dom';
+import axios from 'axios';
 import { isElectron } from '../utils/utils';
 
 import WelcomePage from './welcome/welcome';
@@ -21,7 +22,6 @@ import SettingsPage from './settings/settings';
 import SignUpPage from './signup/signup';
 import HomeLayout from '../layouts/home/home';
 import AssetsPage from './assets/assets';
-import axios from 'axios';
 import { CLOUDFLARE_TRACE_URI, NOT_KNOWN_YET_VALUE, COUNTRY_CODES_TO_BLOCK } from '../config/StaticConfig';
 import BlockPage from './block/block';
 
