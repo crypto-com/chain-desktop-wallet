@@ -64,7 +64,7 @@ class BridgeService extends WalletBaseService {
     const web3 = new Web3(originAsset.config?.nodeUrl);
     const contract = new web3.eth.Contract(bridgeContractABI, bridgeContractAddress);
     const encodedABI = contract.methods
-      .send_cro_to_crypto_org(bridgeTransferRequest.evmAddress)
+      .send_cro_to_crypto_org(bridgeTransferRequest.tendermintAddress)
       .encodeABI();
 
     // eslint-disable-next-line no-console
