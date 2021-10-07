@@ -7,6 +7,61 @@ export const NV_GRAPHQL_API_ENDPOINT = 'https://crypto.com/nft-api/graphql';
 export const IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT =
   'https://crypto.org/ipfs-middleware-server/uploads';
 export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';
+export const CLOUDFLARE_TRACE_URI = 'https://www.cloudflare.com/cdn-cgi/trace';
+
+// This constant value is used when actual values are not known yet
+// For instance :
+export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
+
+// Reference: Google Sheet : Foris Markets Table - 4 October 2021 
+export const COUNTRY_CODES_TO_BLOCK = [
+  // Afghanistan
+  'AF', 'AFG',
+  // Burma(Myanmar)
+  'MM', 'MMR',
+  // Burundi
+  'BI', 'BDI',
+  // Central African Republic
+  'CF', 'CAF',
+  // Congo, Dem. Rep.
+  'CD', 'COD',
+  // Cuba
+  'CU', 'CUB',
+  // Eritrea
+  'ER', 'ERI',
+  // Guinea-Bissau
+  'GW', 'GNB',
+  // Guinea, Republic of
+  'GN', 'GIN',
+  // Iran
+  'IR', 'IRN',
+  // Iraq
+  'IQ', 'IRQ',
+  // North Korea
+  'KP', 'PRK',
+  // Lebanon
+  'LB', 'LBN',
+  // Libya
+  'LY', 'LBY',
+  // Mali
+  'ML', 'MLI',
+  // Somalia
+  'SO', 'SOM',
+  // South Sudan
+  'SS', 'SSD',
+  // Sudan
+  'SD', 'SDN',
+  // Syria
+  'SY','SYR',
+  // Venezuela
+  'VE', 'VEN',
+  // Yemen
+  'YE', 'YEM',
+  // Zimbabwe
+  'ZW', 'ZWE',
+  // Unidentified Countries
+  NOT_KNOWN_YET_VALUE
+];
 
 export const NodePorts = {
   EVM: ':8545',
@@ -228,10 +283,6 @@ const TestNetCroeseid4Config: WalletConfig = {
     networkFee: FIXED_DEFAULT_FEE,
   },
 };
-
-// This constant value is used when actual values are not known yet
-// For instance :
-export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
 
 const MainNetConfig: WalletConfig = {
   enabled: true,
