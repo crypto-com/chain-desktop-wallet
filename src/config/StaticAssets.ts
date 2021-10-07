@@ -9,8 +9,9 @@ export const STATIC_ASSET_COUNT = 2;
 
 const checkIfTestnet = (network: Network) => {
   return (
-    [CroNetwork.TestnetCroeseid3, CroNetwork.Testnet].includes(network) ||
-    network.defaultNodeUrl.includes('testnet')
+    [CroNetwork.TestnetCroeseid3, CroNetwork.TestnetCroeseid4, CroNetwork.Testnet].includes(
+      network,
+    ) || network.defaultNodeUrl.includes('testnet')
   );
 };
 

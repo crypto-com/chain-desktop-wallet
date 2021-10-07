@@ -49,6 +49,8 @@ export class WalletBaseService {
 
   // eslint-disable-next-line class-methods-use-this
   public async prepareEVMTransaction(originAsset: UserAsset, txConfig: TransactionConfig) {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+
     if (!originAsset.config?.nodeUrl || !originAsset.address) {
       throw TypeError(`Missing asset config: ${originAsset.config}`);
     }
@@ -78,6 +80,7 @@ export class WalletBaseService {
       nonce,
       loadedGasPrice,
       gasLimit,
+      currentSession,
     };
   }
 }
