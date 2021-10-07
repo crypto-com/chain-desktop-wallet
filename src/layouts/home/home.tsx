@@ -56,7 +56,11 @@ import { Session } from '../../models/Session';
 import { SettingsDataUpdate } from '../../models/Wallet';
 import packageJson from '../../../package.json';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
-import { LedgerWalletMaximum, MAX_INCORRECT_ATTEMPTS_ALLOWED, SHOW_WARNING_INCORRECT_ATTEMPTS } from '../../config/StaticConfig';
+import {
+  LedgerWalletMaximum,
+  MAX_INCORRECT_ATTEMPTS_ALLOWED,
+  SHOW_WARNING_INCORRECT_ATTEMPTS,
+} from '../../config/StaticConfig';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
@@ -506,6 +510,12 @@ function HomeLayout(props: HomeLayoutProps) {
         }}
         onSuccess={async password => {
           await generalConfigService.setIsAppLockedByUser(false);
+          notification.info({
+            message: 'App Unlocked',
+            description: 'The app is successfully unlocked.',
+            duration: 3,
+            placement: 'topRight',
+          });
           setIsSessionLockModalVisible(false);
           onWalletDecryptFinishCreateFreshAssets(password);
         }}
@@ -518,7 +528,6 @@ function HomeLayout(props: HomeLayoutProps) {
             // Reset Incorrect attempt counts to ZERO
             await generalConfigService.resetIncorrectUnlockAttemptsCount();
           } else {
-
             // Increment incorrect Attempt counts by ONE
             await generalConfigService.incrementIncorrectUnlockAttemptsCountByOne();
 
@@ -535,12 +544,17 @@ function HomeLayout(props: HomeLayoutProps) {
             }
 
             // Show warning after `X` number of wrong attempts
-            if (latestIncorrectAttemptCount >= (MAX_INCORRECT_ATTEMPTS_ALLOWED - SHOW_WARNING_INCORRECT_ATTEMPTS)) {
+            if (
+              latestIncorrectAttemptCount >=
+              MAX_INCORRECT_ATTEMPTS_ALLOWED - SHOW_WARNING_INCORRECT_ATTEMPTS
+            ) {
               errorText = t('general.sessionLockModal.errorSelfDestruct')
                 .replace('*N*', String(latestIncorrectAttemptCount))
-                .replace('#T#', String(MAX_INCORRECT_ATTEMPTS_ALLOWED - latestIncorrectAttemptCount))
+                .replace(
+                  '#T#',
+                  String(MAX_INCORRECT_ATTEMPTS_ALLOWED - latestIncorrectAttemptCount),
+                );
             }
-
           }
 
           return {
@@ -567,7 +581,15 @@ function HomeLayout(props: HomeLayoutProps) {
             size="large"
             icon={<LockFilled style={{ color: '#1199fa' }} />}
             onClick={async () => {
-              setIsSessionLockModalVisible(true);
+              notification.info({
+                message: 'App Locked',
+                description: 'The app will be locked shortly',
+                duration: 3,
+                placement: 'topRight',
+              });
+              setTimeout(() => {
+                setIsSessionLockModalVisible(true);
+              }, 2 * 1000);
               await generalConfigService.setIsAppLockedByUser(true);
             }}
           >
