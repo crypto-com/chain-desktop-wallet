@@ -40,12 +40,7 @@ import {
 import { walletService } from '../../service/WalletService';
 // import { Session } from '../../models/Session';
 import { UserAsset, scaledBalance, UserAssetType } from '../../models/UserAsset';
-import {
-  BridgeTransferDirection,
-  BroadCastResult,
-  TransactionDirection,
-  TransactionStatus,
-} from '../../models/Transaction';
+import { BroadCastResult, TransactionDirection, TransactionStatus } from '../../models/Transaction';
 // eslint-disable-next-line
 import { renderExplorerUrl } from '../../models/Explorer';
 import { middleEllipsis } from '../../utils/utils';
@@ -64,6 +59,7 @@ import iconImgSvg from '../../assets/icon-cronos-blue.svg';
 import IconHexagon from '../../svg/IconHexagon';
 import IconTransferHistory from '../../svg/IconTransferHistory';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import { BridgeTransferDirection } from '../../service/bridge/BridgeConfig';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 
