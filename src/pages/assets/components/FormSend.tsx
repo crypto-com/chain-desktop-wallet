@@ -268,8 +268,10 @@ const FormSend: React.FC<FormSendProps> = props => {
       </Form.Item>
       <Form.Item>
         <NoticeDisclaimer>
-          Transfering your CRO to any recipient address that is not on Crypto.org Chain may result
-          in permanet loss of your funds.
+          {t('send.formSend.disclaimer', {
+            assetSymbol: walletAsset?.symbol,
+            assetName: walletAsset?.name,
+          })}
         </NoticeDisclaimer>
       </Form.Item>
       <Form.Item {...tailLayout}>

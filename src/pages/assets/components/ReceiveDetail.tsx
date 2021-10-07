@@ -106,8 +106,10 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
         </div>
       </CopyToClipboard>
       <NoticeDisclaimer>
-        Transfering CRO from any address that is not on Cronos may result in permanet loss of your
-        funds.
+        {t('receive.disclaimer', {
+          assetSymbol: currentAsset?.symbol,
+          assetName: currentAsset?.name,
+        })}
       </NoticeDisclaimer>
       {isLedger && (
         <div className="ledger">

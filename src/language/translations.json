@@ -497,7 +497,8 @@
           },
           "memo": {
             "label": "Memo (Optional)"
-          }
+          },
+          "disclaimer": "Transfering your {{assetSymbol}} to any recipient address that is not on {{assetName}} may result in permanet loss of your funds."
         },
         "modal1": {
           "title": "Confirm Transaction",
@@ -522,6 +523,7 @@
             "description": "Please connect with your Ledger device"
           }
         },
+        "disclaimer": "Transfering {{assetSymbol}} from any address that is not on {{assetName}} may result in permanet loss of your funds.",
         "button": "Verify address on Ledger"
       },
       "assets": {
@@ -1373,7 +1375,8 @@
           },
           "memo": {
             "label": "留言（可留空）"
-          }
+          },
+          "disclaimer": "將 {{assetSymbol}} 轉移到不支援 {{assetName}} 標準的地址可能會導致資金永久損失。"
         },
         "modal1": {
           "title": "確認交易",
@@ -1398,6 +1401,7 @@
             "description": "請連接你的 Ledger 硬體錢包 "
           }
         },
+        "disclaimer": "從 {{assetName}} 標準以外的任何地址發送 {{assetSymbol}} 可能會導致資金永久損失。",
         "button": "驗證你的 Ledger 錢包"
       },
       "assets": {
@@ -2248,7 +2252,8 @@
           },
           "memo": {
             "label": "留言（可选）"
-          }
+          },
+          "disclaimer": "将 {{assetSymbol}} 转移到不支持 {{assetName}} 标准的地址可能会导致资金永久损失。"
         },
         "modal1": {
           "title": "确认交易",
@@ -2273,6 +2278,7 @@
             "description": "请连接你的 Ledger 硬件钱包"
           }
         },
+        "disclaimer": "从 {{assetName}} 标准以外的任何地址发送 {{assetSymbol}} 可能会导致资金永久损失。",
         "button": "验证你的 Ledger 钱包"
       },
       "assets": {
