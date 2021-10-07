@@ -144,7 +144,7 @@ class WalletService extends WalletBaseService {
           transfer.gasLimit = prepareTxInfo.gasLimit;
 
           let signedTx = '';
-          if (currentSession.wallet.walletType === 'ledger') {
+          if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
             const device = createLedgerDevice();
 
             const gasLimitTx = web3.utils.toBN(transfer.gasLimit!);
