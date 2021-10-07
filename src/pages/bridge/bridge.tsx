@@ -25,6 +25,7 @@ import Icon, {
   ArrowLeftOutlined,
   ArrowRightOutlined,
   // LoadingOutlined,
+  SettingOutlined,
   SwapOutlined,
 } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -61,7 +62,9 @@ import IconTransferHistory from '../../svg/IconTransferHistory';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { BridgeTransferDirection } from '../../service/bridge/BridgeConfig';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { secretStoreService } from '../../storage/SecretStoreService';
+import { bridgeService } from '../../service/bridge/BridgeService';
 
 const { Content, Sider } = Layout;
 const { Option } = Select;
@@ -112,7 +115,10 @@ const CronosBridgeForm = props => {
     showPasswordInput,
     toAddress,
     setToAddress,
+    // bridgeTransferDirection,
     setBridgeTransferDirection,
+    // bridgeConfigs,
+    setBridgeConfigs,
   } = props;
 
   const [session, setSession] = useRecoilState(sessionState);
@@ -167,7 +173,7 @@ const CronosBridgeForm = props => {
     }
   }, []);
 
-  const onSwitchBridge = () => {
+  const onSwitchBridge = async () => {
     const { bridgeFrom, bridgeTo } = form.getFieldsValue();
 
     setCurrentAsset(undefined);
@@ -386,23 +392,38 @@ const CronosBridgeForm = props => {
               },
             },
             {
-              validator: () => {
+              validator: async () => {
                 const { bridgeFrom, bridgeTo } = form.getFieldValue();
 
                 switch (`${bridgeFrom}_TO_${bridgeTo}`) {
                   case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS: {
                     setBridgeTransferDirection(BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS);
                     setAssetFieldDisabled(false);
+
+                    const config = await bridgeService.retrieveBridgeConfig(
+                      BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS,
+                    );
+                    setBridgeConfigs(config);
                     return Promise.resolve();
                   }
                   case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG: {
                     setBridgeTransferDirection(BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG);
                     setAssetFieldDisabled(false);
+
+                    const config = await bridgeService.retrieveBridgeConfig(
+                      BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG,
+                    );
+                    setBridgeConfigs(config);
                     return Promise.resolve();
                   }
                   default: {
                     setBridgeTransferDirection(BridgeTransferDirection.NOT_SUPPORT);
                     setAssetFieldDisabled(true);
+
+                    const config = await bridgeService.retrieveBridgeConfig(
+                      BridgeTransferDirection.NOT_SUPPORT,
+                    );
+                    setBridgeConfigs(config);
                     return Promise.reject(
                       new Error('The selected bridge transfer is not supported'),
                     );
@@ -548,7 +569,17 @@ const CronosBridge = () => {
   // eslint-disable-next-line
   const [bridgeConfirmationList, setBridgeConfirmationList] = useState<listDataSource[]>([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [isBridgeSettingsFormVisible, setIsBridgeSettingsFormVisible] = useState(false);
+  // eslint-disable-next-line
+  const [confirmLoading, setConfirmLoading] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+  const [bridgeConfigs, setBridgeConfigs] = useState({
+    prefix: '',
+    cronosBridgeContractAddress: '',
+    bridgeChannel: '',
+    bridgePort: '',
+  });
 
   const [t] = useTranslation();
 
@@ -696,6 +727,8 @@ const CronosBridge = () => {
               setToAddress={setToAddress}
               bridgeTransferDirection={bridgeTransferDirection}
               setBridgeTransferDirection={setBridgeTransferDirection}
+              bridgeConfigs={bridgeConfigs}
+              setBridgeConfigs={setBridgeConfigs}
             />
             <PasswordFormModal
               description={t('general.passwordFormModal.description')}
@@ -877,6 +910,10 @@ const CronosBridge = () => {
     }
   };
 
+  const onBridgeConfigUpdate = () => {
+    setIsBridgeSettingsFormVisible(false);
+  };
+
   useEffect(() => {
     const evmAsset = walletAllAssets.find(asset => asset.assetType === UserAssetType.EVM);
     setFormValues({
@@ -901,7 +938,44 @@ const CronosBridge = () => {
       ) : (
         <></>
       )}
-      {currentStep === 0 ? <img src={iconImgSvg} alt="cronos" /> : <></>}
+      {currentStep === 0 ? (
+        <>
+          <div style={{ textAlign: 'right', fontSize: '20px' }}>
+            <a
+              onClick={() => {
+                setIsBridgeSettingsFormVisible(true);
+              }}
+            >
+              <SettingOutlined />
+            </a>
+            <ModalPopup
+              isModalVisible={isBridgeSettingsFormVisible}
+              handleCancel={() => {
+                setIsBridgeSettingsFormVisible(false);
+              }}
+              handleOk={() => {}}
+              footer={[
+                <Button
+                  key="submit"
+                  type="primary"
+                  loading={confirmLoading}
+                  onClick={onBridgeConfigUpdate}
+                >
+                  {t('general.save')}
+                </Button>,
+              ]}
+              okText={t('general.save')}
+            >
+              {JSON.stringify(bridgeConfigs)}
+            </ModalPopup>
+          </div>
+          <div>
+            <img src={iconImgSvg} alt="cronos" />
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
       <div className="title">{stepDetail[currentStep].title}</div>
       <div className="description">{stepDetail[currentStep].description}</div>
       <div className="progress-bar">
