@@ -9,6 +9,7 @@ export const IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT =
 export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';
 
 export const NodePorts = {
+  EVM: ':8545',
   Tendermint: ':26657',
   Cosmos: ':1317',
 };
@@ -86,6 +87,9 @@ export type WalletConfig = {
 
 export const FIXED_DEFAULT_FEE = String(10_000);
 export const FIXED_DEFAULT_GAS_LIMIT = String(300_000);
+
+export const EVM_MINIMUM_GAS_PRICE = String(42_000_000_000);
+export const EVM_MINIMUM_GAS_LIMIT = String(42_000);
 
 export const NFT_IMAGE_DENOM_SCHEMA = {
   title: 'Asset Metadata',
