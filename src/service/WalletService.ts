@@ -18,6 +18,8 @@ import {
   NOT_KNOWN_YET_VALUE,
   WalletConfig,
   SECONDS_OF_YEAR,
+  EVM_MINIMUM_GAS_PRICE,
+  EVM_MINIMUM_GAS_LIMIT,
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
@@ -100,16 +102,11 @@ class WalletService {
 
     const currentSession = await this.storageService.retrieveCurrentSession();
     const fromAddress = currentSession.wallet.address;
+    const walletAddressIndex = currentSession.wallet.addressIndex;
 
     switch (currentAsset.assetType) {
       case UserAssetType.EVM:
         try {
-          if (currentAsset?.config?.isLedgerSupportDisabled) {
-            throw TypeError(
-              `${LEDGER_WALLET_TYPE} not supported yet for ${transferRequest.walletType} assets`,
-            );
-          }
-
           if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
             throw TypeError(`Missing asset config: ${currentAsset.config}`);
           }
@@ -136,28 +133,50 @@ class WalletService {
             value: web3.utils.toWei(transferRequest.amount, 'ether'),
           };
 
-          transfer.nonce = await cronosClient.getNextNonceByAddress(currentAsset.address);
+          let txFromAddress: string = '';
+          if (txConfig.from) txFromAddress = txConfig.from.toString();
 
-          const loadedGasPrice = web3.utils.toWei(
-            await cronosClient.getEstimatedGasPrice(),
-            'gwei',
-          );
+          transfer.nonce = await cronosClient.getNextNonceByAddress(txFromAddress);
+
+          const loadedGasPrice = await cronosClient.getEstimatedGasPrice(); // in wei
           transfer.gasPrice = Number(loadedGasPrice);
-
           transfer.gasLimit = Number(await cronosClient.estimateGas(txConfig));
 
-          // eslint-disable-next-line no-console
-          console.log('EVM_TX', {
-            txNonce: transfer.nonce,
-            gasPrice: transfer.gasPrice,
-            gasLimit: transfer.gasLimit,
-          });
+          let signedTx = '';
+          if (currentSession.wallet.walletType === 'ledger') {
+            const device = createLedgerDevice();
 
-          const signedTx = await evmTransactionSigner.signTransfer(
-            transfer,
-            transferRequest.decryptedPhrase,
-          );
+            const { gasLimit } = transfer;
+            const { gasPrice } = transfer;
 
+            let gasLimitTx = web3.utils.toBN(gasLimit);
+            let gasPriceTx = web3.utils.toBN(gasPrice);
+            const gasLimitMinimum = web3.utils.toBN(EVM_MINIMUM_GAS_LIMIT);
+            const gasPriceMinimum = web3.utils.toBN(EVM_MINIMUM_GAS_PRICE);
+
+            if (gasLimitTx.lt(gasLimitMinimum)) {
+              gasLimitTx = gasLimitMinimum;
+            }
+            if (gasPriceTx.lt(gasPriceMinimum)) {
+              gasPriceTx = gasPriceMinimum;
+            }
+
+            signedTx = await device.signEthTx(
+              walletAddressIndex,
+              Number(transfer.asset?.config?.chainId), // chainid
+              transfer.nonce,
+              web3.utils.toHex(gasLimitTx) /* gas limit */,
+              web3.utils.toHex(gasPriceTx) /* gas price */,
+              transfer.toAddress,
+              web3.utils.toHex(transfer.amount),
+              `0x${Buffer.from(transfer.memo).toString('hex')}`,
+            );
+          } else {
+            signedTx = await evmTransactionSigner.signTransfer(
+              transfer,
+              transferRequest.decryptedPhrase,
+            );
+          }
           const result = await cronosClient.broadcastRawTransactionHex(signedTx);
 
           // eslint-disable-next-line no-console
@@ -1236,15 +1255,6 @@ class WalletService {
 
   public async encryptWalletAndSetSession(key: string, walletOriginal: Wallet): Promise<void> {
     const wallet = JSON.parse(JSON.stringify(walletOriginal));
-    const addressprefix = wallet.config.network.addressPrefix;
-
-    // fetch first address , ledger identifier
-    if (wallet.walletType === LEDGER_WALLET_TYPE) {
-      const device: ISignerProvider = createLedgerDevice();
-      const address = await device.getAddress(wallet.addressIndex, addressprefix, false);
-      wallet.address = address;
-    }
-
     const initialVector = await cryptographer.generateIV();
     const encryptionResult = await cryptographer.encrypt(
       wallet.encryptedPhrase,
