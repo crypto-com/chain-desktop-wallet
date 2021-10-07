@@ -58,7 +58,7 @@ import {
   getCurrentMinAssetAmount,
   getNormalScaleAmount,
 } from '../../utils/NumberUtils';
-import { SUPPORTED_BRIDGE, SupportedBridge, FIXED_DEFAULT_FEE } from '../../config/StaticConfig';
+import { SUPPORTED_BRIDGE, SupportedBridge } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import iconImgSvg from '../../assets/icon-cronos-blue.svg';
 import IconHexagon from '../../svg/IconHexagon';
@@ -82,6 +82,18 @@ const tailLayout = {
 };
 const customDot = () => <Icon component={IconHexagon} />;
 
+const bridgeIcon = bridge => {
+  return (
+    <img
+      src={SUPPORTED_BRIDGE.get(bridge)?.icon}
+      alt={SUPPORTED_BRIDGE.get(bridge)?.value}
+      className="asset-icon"
+    />
+  );
+};
+
+const cronosBridgeFee = '0';
+
 interface listDataSource {
   title: string;
   description: React.ReactNode;
@@ -97,6 +109,8 @@ const CronosBridgeForm = props => {
     currentAssetIdentifier,
     currentAsset,
     setCurrentAsset,
+    toAsset,
+    setToAsset,
     setCurrentAssetIdentifier,
     // setCurrentStep,
     showPasswordInput,
@@ -122,6 +136,15 @@ const CronosBridgeForm = props => {
   const bridgeSupportedAssets = walletAllAssets.filter(asset => {
     return SUPPORTED_BRIDGES_ASSETS.includes(asset.mainnetSymbol.toUpperCase());
   });
+
+  const croAsset = walletAllAssets.find(asset => {
+    return asset.mainnetSymbol.toUpperCase() === 'CRO' && asset.symbol.toUpperCase() === 'TCRO';
+  });
+  const cronosAsset = walletAllAssets.find(asset => {
+    return asset.mainnetSymbol.toUpperCase() === 'CRO' && asset.symbol.toUpperCase() === 'CRONOS';
+  });
+
+  const { tendermintAddress, evmAddress } = formValues;
 
   const [t] = useTranslation();
 
@@ -149,43 +172,116 @@ const CronosBridgeForm = props => {
   }, []);
 
   const onSwitchBridge = () => {
-    const { bridgeTo } = form.getFieldsValue();
-    const { tendermintAddress, evmAddress } = formValues;
-
-    setCurrentAsset(undefined);
-    setCurrentAssetIdentifier(undefined);
-    setAvailableBalance('--');
-    form.setFieldsValue({
-      asset: undefined,
-      amount: undefined,
-    });
-
-    switch (bridgeTo) {
-      case 'CRYPTO_ORG':
-        setToAddress(tendermintAddress);
-        break;
-      case 'CRONOS': {
-        setToAddress(evmAddress);
-        break;
-      }
-      default:
-        setToAddress(tendermintAddress);
-    }
-  };
-
-  const onBridgeExchange = () => {
     const { bridgeFrom, bridgeTo } = form.getFieldsValue();
 
     setCurrentAsset(undefined);
     setCurrentAssetIdentifier(undefined);
     setAvailableBalance('--');
     form.setFieldsValue({
-      bridgeFrom: bridgeTo,
-      bridgeTo: bridgeFrom,
       asset: undefined,
       amount: undefined,
     });
+
+    switch (bridgeFrom) {
+      case 'CRYPTO_ORG': {
+        setCurrentAsset(croAsset);
+        setCurrentAssetIdentifier(croAsset?.identifier);
+        setAvailableBalance(scaledBalance(croAsset!));
+        form.setFieldsValue({
+          asset: croAsset?.identifier,
+        });
+        break;
+      }
+      case 'CRONOS': {
+        setCurrentAsset(cronosAsset);
+        setCurrentAssetIdentifier(cronosAsset?.identifier);
+        setAvailableBalance(scaledBalance(cronosAsset!));
+        form.setFieldsValue({
+          asset: cronosAsset?.identifier,
+        });
+        break;
+      }
+      default:
+    }
+
+    switch (bridgeTo) {
+      case 'CRYPTO_ORG': {
+        setToAddress(tendermintAddress);
+        setToAsset(croAsset);
+        break;
+      }
+      case 'CRONOS': {
+        setToAddress(evmAddress);
+        setToAsset(cronosAsset);
+        break;
+      }
+      default: {
+        setToAddress(tendermintAddress);
+      }
+    }
+  };
+
+  const onBridgeExchange = () => {
+    const { bridgeFrom, bridgeTo } = form.getFieldsValue();
+
+    const newBridgeFrom = bridgeTo;
+    const newBridgeTo = bridgeFrom;
+
+    switch (newBridgeFrom) {
+      case 'CRYPTO_ORG': {
+        setCurrentAsset(croAsset);
+        setCurrentAssetIdentifier(croAsset?.identifier);
+        setAvailableBalance(scaledBalance(croAsset!));
+        form.setFieldsValue({
+          asset: croAsset?.identifier,
+        });
+        break;
+      }
+      case 'CRONOS': {
+        setCurrentAsset(cronosAsset);
+        setCurrentAssetIdentifier(cronosAsset?.identifier);
+        setAvailableBalance(scaledBalance(cronosAsset!));
+        form.setFieldsValue({
+          asset: cronosAsset?.identifier,
+        });
+        break;
+      }
+      default:
+    }
+
+    switch (newBridgeTo) {
+      case 'CRYPTO_ORG': {
+        setToAddress(tendermintAddress);
+        setToAsset(croAsset);
+        break;
+      }
+      case 'CRONOS': {
+        setToAddress(evmAddress);
+        setToAsset(cronosAsset);
+        break;
+      }
+      default: {
+        setToAddress(tendermintAddress);
+      }
+    }
+
+    form.setFieldsValue({
+      bridgeFrom: newBridgeFrom,
+      bridgeTo: newBridgeTo,
+      // asset: undefined,
+      // amount: undefined,
+    });
     form.submit();
+
+    // setCurrentAsset(undefined);
+    // setCurrentAssetIdentifier(undefined);
+    // setAvailableBalance('--');
+    // form.setFieldsValue({
+    //   bridgeFrom: bridgeTo,
+    //   bridgeTo: bridgeFrom,
+    //   asset: undefined,
+    //   amount: undefined,
+    // });
   };
 
   const onSwitchAsset = value => {
@@ -225,17 +321,6 @@ const CronosBridgeForm = props => {
       amount: values.amount,
     });
     showPasswordInput();
-  };
-
-  const bridgeIcon = () => {
-    const { bridgeFrom } = form.getFieldsValue();
-    return (
-      <img
-        src={SUPPORTED_BRIDGE.get(bridgeFrom)?.icon}
-        alt={SUPPORTED_BRIDGE.get(bridgeFrom)?.value}
-        className="asset-icon"
-      />
-    );
   };
 
   return (
@@ -410,22 +495,22 @@ const CronosBridgeForm = props => {
           <div className="flex-row">
             <div>Fee: </div>
             <div>
-              {getNormalScaleAmount(FIXED_DEFAULT_FEE, currentAsset!)} {currentAsset?.symbol}
+              {getNormalScaleAmount(cronosBridgeFee, currentAsset!)} {currentAsset?.symbol}
             </div>
           </div>
           <div className="flex-row">
             <div>You will receieve: </div>
             <div>
               {new Big(sendingAmount)
-                .sub(getNormalScaleAmount(FIXED_DEFAULT_FEE, currentAsset!))
+                .sub(getNormalScaleAmount(cronosBridgeFee, toAsset!))
                 .toFixed(4)}{' '}
-              {currentAsset?.symbol}
+              {toAsset?.symbol}
             </div>
           </div>
           <div className="flex-row">
             <div>To Address: </div>
             <div className="asset-icon">
-              {bridgeIcon()}
+              {bridgeIcon(form.getFieldValue('bridgeTo'))}
               {middleEllipsis(toAddress, 6)}
             </div>
           </div>
@@ -456,6 +541,7 @@ const CronosBridge = () => {
   });
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
+  const [toAsset, setToAsset] = useState<UserAsset | undefined>();
   const [currentStep, setCurrentStep] = useState(0);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
@@ -604,6 +690,8 @@ const CronosBridge = () => {
               assetIcon={assetIcon}
               currentAsset={currentAsset}
               setCurrentAsset={setCurrentAsset}
+              toAsset={toAsset}
+              setToAsset={setToAsset}
               currentAssetIdentifier={currentAssetIdentifier}
               setCurrentAssetIdentifier={setCurrentAssetIdentifier}
               setCurrentStep={setCurrentStep}
@@ -673,14 +761,13 @@ const CronosBridge = () => {
                   <div className="flex-row">
                     <div>Fee: </div>
                     <div>
-                      {getNormalScaleAmount(FIXED_DEFAULT_FEE, currentAsset!)}{' '}
-                      {currentAsset?.symbol}
+                      {getNormalScaleAmount(cronosBridgeFee, currentAsset!)} {currentAsset?.symbol}
                     </div>
                   </div>
                   <div className="flex-row">
                     <div>Destination: </div>
                     <div className="asset-icon">
-                      {assetIcon(session.activeAsset)}
+                      {bridgeIcon(form.getFieldValue('bridgeTo'))}
                       {middleEllipsis(toAddress, 6)}
                     </div>
                   </div>
@@ -691,9 +778,9 @@ const CronosBridge = () => {
                   <div className="title">
                     ~
                     {new Big(amount)
-                      .sub(getNormalScaleAmount(FIXED_DEFAULT_FEE, currentAsset!))
+                      .sub(getNormalScaleAmount(cronosBridgeFee, toAsset!))
                       .toFixed(4)}{' '}
-                    {currentAsset?.symbol}
+                    {toAsset?.symbol}
                   </div>
                 </div>
               </div>
