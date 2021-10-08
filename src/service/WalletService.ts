@@ -61,7 +61,6 @@ import {
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from './LedgerService';
-import { ISignerProvider } from './signers/SignerProvider';
 import {
   BridgeTransferRequest,
   DelegationRequest,
@@ -145,7 +144,7 @@ class WalletService extends WalletBaseService {
           transfer.nonce = prepareTxInfo.nonce;
           transfer.gasPrice = prepareTxInfo.loadedGasPrice;
           transfer.gasLimit = prepareTxInfo.gasLimit;
-          
+
           let signedTx = '';
           if (currentSession.wallet.walletType === 'ledger') {
             const device = createLedgerDevice();
@@ -153,7 +152,7 @@ class WalletService extends WalletBaseService {
             const { gasLimit } = transfer;
             const { gasPrice } = transfer;
 
-            let gasLimitTx = web3.utils.toBN(gasLimit);
+            let gasLimitTx = web3.utils.toBN(gasLimit!);
             let gasPriceTx = web3.utils.toBN(gasPrice);
             const gasLimitMinimum = web3.utils.toBN(EVM_MINIMUM_GAS_LIMIT);
             const gasPriceMinimum = web3.utils.toBN(EVM_MINIMUM_GAS_PRICE);
@@ -181,7 +180,7 @@ class WalletService extends WalletBaseService {
               transferRequest.decryptedPhrase,
             );
           }
-          
+
           const result = await cronosClient.broadcastRawTransactionHex(signedTx);
 
           // eslint-disable-next-line no-console
