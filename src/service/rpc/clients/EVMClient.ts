@@ -1,6 +1,7 @@
 import Web3 from 'web3';
 import { BlockTransactionObject, TransactionReceipt, TransactionConfig } from 'web3-eth';
 import { IEvmRpc } from '../interface/evm.rpcClient';
+import { NodePorts } from '../../../config/StaticConfig';
 
 class EVMClient implements IEvmRpc {
   private web3: Web3;
@@ -9,7 +10,10 @@ class EVMClient implements IEvmRpc {
     this.web3 = web3Instance;
   }
 
-  public static create(web3HttpProviderUrl: string): EVMClient {
+  public static create(web3HttpProviderUrlUser: string): EVMClient {
+    const words = web3HttpProviderUrlUser.split(':', 2);
+    const web3HttpProviderUrl = `${words[0]}:${words[1]}${NodePorts.EVM}`;
+
     if (!web3HttpProviderUrl.startsWith('https://') || !web3HttpProviderUrl.startsWith('http://')) {
       const web3 = new Web3(new Web3.providers.HttpProvider(web3HttpProviderUrl));
       return new EVMClient(web3);
@@ -61,12 +65,12 @@ class EVMClient implements IEvmRpc {
     return mayBeTxReceipt;
   }
 
-    // Fees
+  // Fees
   async getEstimatedGasPrice(): Promise<string> {
     const estimatedGasPrice = await this.web3.eth.getGasPrice();
     return estimatedGasPrice;
   }
-  
+
   async estimateGas(txConfig: TransactionConfig): Promise<number> {
     const estimatedGas = await this.web3.eth.estimateGas(txConfig);
     return estimatedGas;
@@ -99,7 +103,6 @@ class EVMClient implements IEvmRpc {
     if (!signedTxHex.startsWith('0x')) {
       signedTxHex = `0x${signedTxHex}`;
     }
-
     const broadcastTx = await this.web3.eth.sendSignedTransaction(signedTxHex);
 
     if (broadcastTx.status) {

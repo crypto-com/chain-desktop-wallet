@@ -16,6 +16,8 @@ import {
   NOT_KNOWN_YET_VALUE,
   SECONDS_OF_YEAR,
   WalletConfig,
+  EVM_MINIMUM_GAS_PRICE,
+  EVM_MINIMUM_GAS_LIMIT,
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
@@ -107,16 +109,11 @@ class WalletService extends WalletBaseService {
 
     const currentSession = await this.storageService.retrieveCurrentSession();
     const fromAddress = currentSession.wallet.address;
+    const walletAddressIndex = currentSession.wallet.addressIndex;
 
     switch (currentAsset.assetType) {
       case UserAssetType.EVM:
         try {
-          if (currentAsset?.config?.isLedgerSupportDisabled) {
-            throw TypeError(
-              `${LEDGER_WALLET_TYPE} not supported yet for ${transferRequest.walletType} assets`,
-            );
-          }
-
           if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
             throw TypeError(`Missing asset config: ${currentAsset.config}`);
           }
@@ -148,15 +145,43 @@ class WalletService extends WalletBaseService {
           transfer.nonce = prepareTxInfo.nonce;
           transfer.gasPrice = prepareTxInfo.loadedGasPrice;
           transfer.gasLimit = prepareTxInfo.gasLimit;
+          
+          let signedTx = '';
+          if (currentSession.wallet.walletType === 'ledger') {
+            const device = createLedgerDevice();
 
-          const signedTx = await evmTransactionSigner.signTransfer(
-            transfer,
-            transferRequest.decryptedPhrase,
-          );
+            const { gasLimit } = transfer;
+            const { gasPrice } = transfer;
 
-          // eslint-disable-next-line no-console
-          console.log(`${currentAsset.assetType} SIGNED-TX`, signedTx);
+            let gasLimitTx = web3.utils.toBN(gasLimit);
+            let gasPriceTx = web3.utils.toBN(gasPrice);
+            const gasLimitMinimum = web3.utils.toBN(EVM_MINIMUM_GAS_LIMIT);
+            const gasPriceMinimum = web3.utils.toBN(EVM_MINIMUM_GAS_PRICE);
 
+            if (gasLimitTx.lt(gasLimitMinimum)) {
+              gasLimitTx = gasLimitMinimum;
+            }
+            if (gasPriceTx.lt(gasPriceMinimum)) {
+              gasPriceTx = gasPriceMinimum;
+            }
+
+            signedTx = await device.signEthTx(
+              walletAddressIndex,
+              Number(transfer.asset?.config?.chainId), // chainid
+              transfer.nonce,
+              web3.utils.toHex(gasLimitTx) /* gas limit */,
+              web3.utils.toHex(gasPriceTx) /* gas price */,
+              transfer.toAddress,
+              web3.utils.toHex(transfer.amount),
+              `0x${Buffer.from(transfer.memo).toString('hex')}`,
+            );
+          } else {
+            signedTx = await evmTransactionSigner.signTransfer(
+              transfer,
+              transferRequest.decryptedPhrase,
+            );
+          }
+          
           const result = await cronosClient.broadcastRawTransactionHex(signedTx);
 
           // eslint-disable-next-line no-console
@@ -1204,15 +1229,6 @@ class WalletService extends WalletBaseService {
 
   public async encryptWalletAndSetSession(key: string, walletOriginal: Wallet): Promise<void> {
     const wallet = JSON.parse(JSON.stringify(walletOriginal));
-    const addressprefix = wallet.config.network.addressPrefix;
-
-    // fetch first address , ledger identifier
-    if (wallet.walletType === LEDGER_WALLET_TYPE) {
-      const device: ISignerProvider = createLedgerDevice();
-      const address = await device.getAddress(wallet.addressIndex, addressprefix, false);
-      wallet.address = address;
-    }
-
     const initialVector = await cryptographer.generateIV();
     const encryptionResult = await cryptographer.encrypt(
       wallet.encryptedPhrase,

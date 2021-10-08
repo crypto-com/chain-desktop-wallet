@@ -31,11 +31,11 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
   private isValidHTTPURL = (url: string): boolean => {
     if (url.startsWith('https://')) {
       return true;
-    } if (url.startsWith('http://')) {
+    }
+    if (url.startsWith('http://')) {
       return true;
-    } 
-      return false;
-    
+    }
+    return false;
   };
 
   getTxsByAddress = async (
