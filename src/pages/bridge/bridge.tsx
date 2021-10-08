@@ -978,7 +978,7 @@ const CronosBridge = () => {
               handleCancel={() => {
                 setIsBridgeSettingsFormVisible(false);
               }}
-              handleOk={() => {}}
+              handleOk={onBridgeConfigUpdate}
               footer={[
                 <Button
                   key="submit"
@@ -990,6 +990,7 @@ const CronosBridge = () => {
                 </Button>,
               ]}
               okText={t('general.save')}
+              forceRender
             >
               {/* {JSON.stringify(bridgeConfigs)} */}
               <Form
@@ -998,7 +999,7 @@ const CronosBridge = () => {
                 form={bridgeConfigForm}
                 name="control-hooks"
                 requiredMark="optional"
-                onFinish={() => {}}
+                // onFinish={onBridgeConfigUpdate}
               >
                 <Form.Item
                   name="prefix"
