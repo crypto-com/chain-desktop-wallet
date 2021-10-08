@@ -33,6 +33,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
+import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import {
   // marketState,
   sessionState,
@@ -591,6 +592,12 @@ const CronosBridge = () => {
 
   const [t] = useTranslation();
 
+  const customEvmAddressValidator = TransactionUtils.addressValidator(
+    session,
+    currentAsset!,
+    AddressType.USER,
+  );
+
   const stepDetail = [
     {
       step: 0,
@@ -1009,6 +1016,10 @@ const CronosBridge = () => {
                       required: true,
                       message: `Prefix ${t('general.required')}`,
                     },
+                    {
+                      pattern: /^[a-z]{3}$/,
+                      message: `Prefix can only be 3 lowercase letters`,
+                    },
                   ]}
                   style={{ textAlign: 'left' }}
                 >
@@ -1022,6 +1033,7 @@ const CronosBridge = () => {
                       required: true,
                       message: `Contract Address ${t('general.required')}`,
                     },
+                    customEvmAddressValidator,
                   ]}
                   style={{ textAlign: 'left' }}
                 >
