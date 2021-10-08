@@ -38,6 +38,8 @@ export class DatabaseManager {
   // This is for configuration that span across all wallets
   public readonly generalConfigStore: Datastore;
 
+  public readonly bridgeConfigStore: Datastore;
+
   constructor(namespace: string) {
     this.sessionStore = getStore(namespace, 'session');
     this.walletStore = getStore(namespace, 'wallets');
@@ -55,5 +57,6 @@ export class DatabaseManager {
     this.generalConfigStore = getStore(namespace, 'generalConfigStore');
     this.nftTransferHistoryStore = getStore(namespace, 'nftTransferHistoryStore');
     this.nftAccountTxStore = getStore(namespace, 'nftAccountTxStore');
+    this.bridgeConfigStore = getStore(namespace, 'bridgeConfigStore');
   }
 }
