@@ -708,11 +708,26 @@ const CronosBridge = () => {
         ),
         loading: false,
       });
+      listDataSource.push({
+        title: `Transfer Initiated`,
+        description: (
+          <>
+            Check your wallet for the funds. It may take up to an hour depending on network
+            congestion.
+          </>
+        ),
+        loading: false,
+      });
       setBridgeConfirmationList(listDataSource);
     } catch (e) {
       listDataSource.push({
         title: `Deposit of ${amount} ${currentAsset?.symbol} is failed`,
-        description: <>Failed in Bridge Transfer</>,
+        description: (
+          <>
+            Bridge Transfer Failed. Please ensure the Bridge Config Settings are correct and there
+            are enough funds in your wallet address.
+          </>
+        ),
         loading: false,
       });
       setBridgeConfirmationList(listDataSource);
