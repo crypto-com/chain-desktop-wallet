@@ -21,6 +21,7 @@ import {
   Typography,
   Tag,
   Input,
+  message,
 } from 'antd';
 import Icon, {
   ArrowLeftOutlined,
@@ -65,6 +66,8 @@ import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import {
   BridgeTransferDirection,
   BridgeNetworkConfigType,
+  DefaultTestnetBridgeConfigs,
+  DefaultMainnetBridgeConfigs,
 } from '../../service/bridge/BridgeConfig';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
@@ -949,8 +952,16 @@ const CronosBridge = () => {
     };
 
     bridgeService.updateBridgeConfiguration(updateConfig);
+    // setIsBridgeSettingsFormVisible(false);
+    message.success({
+      key: 'bridgeUpdate',
+      content: `Bridge Config successfully updated`,
+    });
+  };
 
-    setIsBridgeSettingsFormVisible(false);
+  const onBridgeConfigDefault = () => {
+    const defaultConfig = isTestnet ? DefaultTestnetBridgeConfigs : DefaultMainnetBridgeConfigs;
+    bridgeConfigForm.setFieldsValue(defaultConfig[bridgeTransferDirection]);
   };
 
   useEffect(() => {
@@ -1015,6 +1026,14 @@ const CronosBridge = () => {
                   onClick={onBridgeConfigUpdate}
                 >
                   {t('general.save')}
+                </Button>,
+                <Button
+                  key="back"
+                  type="link"
+                  loading={confirmLoading}
+                  onClick={onBridgeConfigDefault}
+                >
+                  {t('general.default')}
                 </Button>,
               ]}
               okText={t('general.save')}
