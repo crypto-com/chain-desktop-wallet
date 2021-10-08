@@ -62,7 +62,10 @@ import iconImgSvg from '../../assets/icon-cronos-blue.svg';
 import IconHexagon from '../../svg/IconHexagon';
 import IconTransferHistory from '../../svg/IconTransferHistory';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
-import { BridgeTransferDirection } from '../../service/bridge/BridgeConfig';
+import {
+  BridgeTransferDirection,
+  BridgeNetworkConfigType,
+} from '../../service/bridge/BridgeConfig';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { secretStoreService } from '../../storage/SecretStoreService';
@@ -137,6 +140,8 @@ const CronosBridgeForm = props => {
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
 
+  const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
+
   const SUPPORTED_BRIDGES_ASSETS = ['CRO', 'CRONOS'];
 
   const bridgeSupportedAssets = walletAllAssets.filter(asset => {
@@ -144,7 +149,10 @@ const CronosBridgeForm = props => {
   });
 
   const croAsset = walletAllAssets.find(asset => {
-    return asset.mainnetSymbol.toUpperCase() === 'CRO' && asset.symbol.toUpperCase() === 'TCRO';
+    return (
+      asset.mainnetSymbol.toUpperCase() === 'CRO' &&
+      asset.symbol.toUpperCase() === (isTestnet ? 'TCRO' : 'CRO')
+    );
   });
   const cronosAsset = walletAllAssets.find(asset => {
     return asset.mainnetSymbol.toUpperCase() === 'CRO' && asset.symbol.toUpperCase() === 'CRONOS';
@@ -592,6 +600,8 @@ const CronosBridge = () => {
 
   const [t] = useTranslation();
 
+  const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
+
   const customEvmAddressValidator = TransactionUtils.addressValidator(
     session,
     currentAsset!,
@@ -929,6 +939,17 @@ const CronosBridge = () => {
   };
 
   const onBridgeConfigUpdate = () => {
+    let updateConfig = bridgeConfigForm.getFieldsValue();
+    updateConfig = {
+      ...updateConfig,
+      bridgeDirectionType: bridgeTransferDirection,
+      bridgeNetworkConfigType: isTestnet
+        ? BridgeNetworkConfigType.TESTNET_BRIDGE
+        : BridgeNetworkConfigType.MAINNET_BRIDGE,
+    };
+
+    bridgeService.updateBridgeConfiguration(updateConfig);
+
     setIsBridgeSettingsFormVisible(false);
   };
 
