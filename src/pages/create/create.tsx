@@ -431,7 +431,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           }
         }
 
-        const ethAddresss = await device.getEthAddress(targetWallet.addressIndex);
+        const ethAddresss = await device.getEthAddress(targetWallet.addressIndex, true);
         const evmAsset = createdWallet.assets.filter(
           asset => asset.assetType === UserAssetType.EVM,
         )[0];
