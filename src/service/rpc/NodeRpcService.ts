@@ -69,7 +69,10 @@ export class NodeRpcService implements INodeRpcService {
   }
 
   public static async init(baseUrl: string) {
-    const client = await StargateClient.connect(baseUrl + NodePorts.Tendermint);
+    // take first 2 words
+    const words = baseUrl.split(':', 2);
+    const newClientUrl = `${words[0]}:${words[1]}${NodePorts.Tendermint}`;
+    const client = await StargateClient.connect(newClientUrl);
     const proxyClient = axios.create({
       baseURL: baseUrl + NodePorts.Cosmos,
     });

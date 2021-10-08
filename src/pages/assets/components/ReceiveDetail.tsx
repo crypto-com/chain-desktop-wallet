@@ -23,6 +23,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
   const [isLedger, setIsLedger] = useState(false);
 
   const [t] = useTranslation();
+  const isEVM = currentAsset?.assetType === UserAssetType.EVM;
 
   useEffect(() => {
     const { walletType } = session.wallet;
@@ -36,6 +37,12 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
       if (LEDGER_WALLET_TYPE === walletType) {
         const device = createLedgerDevice();
         await device.getAddress(addressIndex, addressprefix, true);
+
+        if (isEVM) {
+          await device.getEthAddress(addressIndex);
+        } else {
+          await device.getAddress(addressIndex, addressprefix, false);
+        }
       }
     } catch (e) {
       notification.error({
@@ -72,10 +79,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
   const assetAddress = (asset, _session) => {
     const { assetType, address } = asset;
     const { wallet } = _session;
-    // TO-DO Missing CRONOS support for Ledger
-    if (wallet.walletType === LEDGER_WALLET_TYPE) {
-      return wallet.address;
-    }
+
     // For Multi-Assets
     switch (assetType) {
       case UserAssetType.TENDERMINT:

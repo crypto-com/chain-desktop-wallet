@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { Button, Checkbox, Form, Input, notification, Select } from 'antd';
+import { Modal, Button, Checkbox, Form, Input, notification, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { useTranslation } from 'react-i18next';
 import { walletIdentifierState, walletTempBackupState, sessionState } from '../../recoil/atom';
@@ -23,6 +23,8 @@ import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
 import NoticeDisclaimer from '../../components/NoticeDisclaimer/NoticeDisclaimer';
 import IconLedger from '../../svg/IconLedger';
+import { UserAssetType } from '../../models/UserAsset';
+import { ISignerProvider } from '../../service/signers/SignerProvider';
 import {
   createLedgerDevice,
   detectConditionsError,
@@ -31,6 +33,7 @@ import {
 } from '../../service/LedgerService';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 
+let waitFlag = false;
 const layout = {
   // labelCol: { span: 8 },
   // wrapperCol: { span: 16 },
@@ -38,6 +41,10 @@ const layout = {
 const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
+
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 interface FormCustomConfigProps {
   setIsConnected: (arg: boolean) => void;
@@ -299,6 +306,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
 
 const FormCreate: React.FC<FormCreateProps> = props => {
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isEthModalVisible, setIsEthModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
@@ -307,6 +315,19 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const [hwcheck, setHwcheck] = useState(!props.isWalletSelectFieldDisable);
 
   const [t] = useTranslation();
+
+  // for eth ledger
+  const showEthModal = () => {
+    setIsEthModalVisible(true);
+  };
+  const handleEthOk = () => {
+    waitFlag = false;
+    setIsEthModalVisible(false);
+  };
+  const handleEthCancel = () => {
+    waitFlag = false;
+    setIsEthModalVisible(false);
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -382,6 +403,42 @@ const FormCreate: React.FC<FormCreateProps> = props => {
 
     try {
       const createdWallet = new WalletCreator(createOptions).create();
+
+      const targetWallet = createdWallet.wallet;
+      if (targetWallet.walletType === LEDGER_WALLET_TYPE) {
+        const device: ISignerProvider = createLedgerDevice();
+        // collect cro address
+
+        const croAddress = await device.getAddress(
+          targetWallet.addressIndex,
+          targetWallet.config.network.addressPrefix,
+          true,
+        );
+        const croAsset = createdWallet.assets.filter(
+          asset => asset.assetType === UserAssetType.TENDERMINT,
+        )[0];
+        croAsset.address = croAddress;
+
+        // override main address
+        targetWallet.address = croAddress;
+
+        waitFlag = true;
+        showEthModal();
+        for (let i = 0; i < 600; i++) {
+          // eslint-disable-next-line no-await-in-loop
+          await delay(100); // milli seconds
+          if (!waitFlag) {
+            break;
+          }
+        }
+
+        const ethAddresss = await device.getEthAddress(targetWallet.addressIndex);
+        const evmAsset = createdWallet.assets.filter(
+          asset => asset.assetType === UserAssetType.EVM,
+        )[0];
+        evmAsset.address = ethAddresss;
+      }
+
       await walletService.saveAssets(createdWallet.assets);
 
       setWalletTempBackupSeed(createdWallet.wallet);
@@ -584,6 +641,17 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             </div>
           </>
         </ErrorModalPopup>
+
+        <Modal
+          title="Open Eth Ledger App"
+          visible={isEthModalVisible}
+          onOk={handleEthOk}
+          onCancel={handleEthCancel}
+          className="success-popup"
+          cancelButtonProps={{ style: { display: 'none' } }}
+        >
+          <p>Need Eth Ledger App</p>
+        </Modal>
       </Form.Item>
     </Form>
   );

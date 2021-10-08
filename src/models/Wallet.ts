@@ -12,7 +12,7 @@ export class Wallet {
   public readonly name: string;
 
   // Legacy field - Relevant only for single asset wallets created
-  public address: string;
+  public address: string; // cosmos address
 
   public encryptedPhrase: string;
 
