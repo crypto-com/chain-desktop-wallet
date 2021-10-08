@@ -68,6 +68,7 @@ import {
   BridgeNetworkConfigType,
   DefaultTestnetBridgeConfigs,
   DefaultMainnetBridgeConfigs,
+  BridgeConfig,
 } from '../../service/bridge/BridgeConfig';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
@@ -130,6 +131,7 @@ const CronosBridgeForm = props => {
     setBridgeTransferDirection,
     // bridgeConfigs,
     setBridgeConfigs,
+    setBridgeConfigFields,
   } = props;
 
   const [session, setSession] = useRecoilState(sessionState);
@@ -420,6 +422,7 @@ const CronosBridgeForm = props => {
                     );
                     setBridgeConfigs(config);
                     bridgeConfigForm.setFieldsValue(config);
+                    setBridgeConfigFields(Object.keys(config));
                     return Promise.resolve();
                   }
                   case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG: {
@@ -431,6 +434,7 @@ const CronosBridgeForm = props => {
                     );
                     setBridgeConfigs(config);
                     bridgeConfigForm.setFieldsValue(config);
+                    setBridgeConfigFields(Object.keys(config));
                     return Promise.resolve();
                   }
                   default: {
@@ -594,16 +598,13 @@ const CronosBridge = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
-  const [bridgeConfigs, setBridgeConfigs] = useState({
-    prefix: '',
-    cronosBridgeContractAddress: '',
-    bridgeChannel: '',
-    bridgePort: '',
-  });
+  const [bridgeConfigs, setBridgeConfigs] = useState<BridgeConfig>();
+  const [bridgeConfigFields, setBridgeConfigFields] = useState<string[]>([]);
 
   const [t] = useTranslation();
 
   const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
+  const defaultConfig = isTestnet ? DefaultTestnetBridgeConfigs : DefaultMainnetBridgeConfigs;
 
   const customEvmAddressValidator = TransactionUtils.addressValidator(
     session,
@@ -760,6 +761,8 @@ const CronosBridge = () => {
               setBridgeTransferDirection={setBridgeTransferDirection}
               bridgeConfigs={bridgeConfigs}
               setBridgeConfigs={setBridgeConfigs}
+              bridgeConfigFields={bridgeConfigFields}
+              setBridgeConfigFields={setBridgeConfigFields}
             />
             <PasswordFormModal
               description={t('general.passwordFormModal.description')}
@@ -960,7 +963,7 @@ const CronosBridge = () => {
   };
 
   const onBridgeConfigDefault = () => {
-    const defaultConfig = isTestnet ? DefaultTestnetBridgeConfigs : DefaultMainnetBridgeConfigs;
+    // const defaultConfig = isTestnet ? DefaultTestnetBridgeConfigs : DefaultMainnetBridgeConfigs;
     bridgeConfigForm.setFieldsValue(defaultConfig[bridgeTransferDirection]);
   };
 
@@ -1057,54 +1060,68 @@ const CronosBridge = () => {
                       message: `Prefix ${t('general.required')}`,
                     },
                     {
-                      pattern: /^[a-z]{3}$/,
-                      message: `Prefix can only be 3 lowercase letters`,
+                      pattern: isTestnet ? /^[a-z]{4}$/ : /^[a-z]{3}$/,
+                      message: `Prefix can only be ${isTestnet ? '4' : '3'} lowercase letters`,
                     },
                   ]}
                   style={{ textAlign: 'left' }}
                 >
                   <Input />
                 </Form.Item>
-                <Form.Item
-                  name="cronosBridgeContractAddress"
-                  label="Cronos Bridge Contract Address"
-                  rules={[
-                    {
-                      required: true,
-                      message: `Contract Address ${t('general.required')}`,
-                    },
-                    customEvmAddressValidator,
-                  ]}
-                  style={{ textAlign: 'left' }}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  name="bridgeChannel"
-                  label="Bridge Channel"
-                  rules={[
-                    {
-                      required: true,
-                      message: `Bridge Channel ${t('general.required')}`,
-                    },
-                  ]}
-                  style={{ textAlign: 'left' }}
-                >
-                  <Input />
-                </Form.Item>
-                <Form.Item
-                  name="bridgePort"
-                  label="Bridge Port"
-                  rules={[
-                    {
-                      required: true,
-                      message: `Bridge Port ${t('general.required')}`,
-                    },
-                  ]}
-                  style={{ textAlign: 'left' }}
-                >
-                  <Input />
-                </Form.Item>
+
+                {bridgeConfigFields.includes('cronosBridgeContractAddress') &&
+                bridgeConfigs?.cronosBridgeContractAddress !== '' ? (
+                  <Form.Item
+                    name="cronosBridgeContractAddress"
+                    label="Cronos Bridge Contract Address"
+                    rules={[
+                      {
+                        required: true,
+                        message: `Contract Address ${t('general.required')}`,
+                      },
+                      customEvmAddressValidator,
+                    ]}
+                    style={{ textAlign: 'left' }}
+                  >
+                    <Input />
+                  </Form.Item>
+                ) : (
+                  <></>
+                )}
+                {bridgeConfigFields.includes('bridgeChannel') ? (
+                  <Form.Item
+                    name="bridgeChannel"
+                    label="Bridge Channel"
+                    rules={[
+                      {
+                        required: true,
+                        message: `Bridge Channel ${t('general.required')}`,
+                      },
+                    ]}
+                    style={{ textAlign: 'left' }}
+                  >
+                    <Input />
+                  </Form.Item>
+                ) : (
+                  <></>
+                )}
+                {bridgeConfigFields.includes('bridgePort') ? (
+                  <Form.Item
+                    name="bridgePort"
+                    label="Bridge Port"
+                    rules={[
+                      {
+                        required: true,
+                        message: `Bridge Port ${t('general.required')}`,
+                      },
+                    ]}
+                    style={{ textAlign: 'left' }}
+                  >
+                    <Input />
+                  </Form.Item>
+                ) : (
+                  <></>
+                )}
               </Form>
             </ModalPopup>
           </div>
