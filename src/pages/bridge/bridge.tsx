@@ -20,6 +20,7 @@ import {
   Table,
   Typography,
   Tag,
+  Input,
 } from 'antd';
 import Icon, {
   ArrowLeftOutlined,
@@ -104,6 +105,9 @@ const CronosBridgeForm = props => {
     form,
     formValues,
     setFormValues,
+    bridgeConfigForm,
+    isBridgeValid,
+    setIsBridgeValid,
     assetIcon,
     currentAssetIdentifier,
     currentAsset,
@@ -125,7 +129,6 @@ const CronosBridgeForm = props => {
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const [availableBalance, setAvailableBalance] = useState('--');
   const [sendingAmount, setSendingAmount] = useState('0');
-  const [assetFieldDisabled, setAssetFieldDisabled] = useState(true);
   const [supportedBridges, setSupportedBridges] = useState<SupportedBridge[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isButtonLoading, setIsButtonLoading] = useState(false);
@@ -161,7 +164,7 @@ const CronosBridgeForm = props => {
       const { bridgeFrom, bridgeTo, amount } = form.getFieldsValue();
       if (bridgeFrom && bridgeTo && amount) {
         setAvailableBalance(scaledBalance(currentAsset!));
-        setAssetFieldDisabled(false);
+        setIsBridgeValid(true);
         setSendingAmount(amount);
       }
     };
@@ -355,7 +358,7 @@ const CronosBridgeForm = props => {
               form.setFieldsValue({
                 bridgeTo: undefined,
               });
-              setAssetFieldDisabled(true);
+              setIsBridgeValid(false);
             }}
           >
             {supportedBridges.map(bridge => {
@@ -384,10 +387,10 @@ const CronosBridgeForm = props => {
             {
               validator: (_, value) => {
                 if (form.getFieldValue('bridgeFrom') === value) {
-                  setAssetFieldDisabled(true);
+                  setIsBridgeValid(false);
                   return Promise.reject(new Error('The two bridges cannot be the same'));
                 }
-                setAssetFieldDisabled(false);
+                setIsBridgeValid(true);
                 return Promise.resolve();
               },
             },
@@ -398,27 +401,29 @@ const CronosBridgeForm = props => {
                 switch (`${bridgeFrom}_TO_${bridgeTo}`) {
                   case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS: {
                     setBridgeTransferDirection(BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS);
-                    setAssetFieldDisabled(false);
+                    setIsBridgeValid(true);
 
                     const config = await bridgeService.retrieveBridgeConfig(
                       BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS,
                     );
                     setBridgeConfigs(config);
+                    bridgeConfigForm.setFieldsValue(config);
                     return Promise.resolve();
                   }
                   case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG: {
                     setBridgeTransferDirection(BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG);
-                    setAssetFieldDisabled(false);
+                    setIsBridgeValid(true);
 
                     const config = await bridgeService.retrieveBridgeConfig(
                       BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG,
                     );
                     setBridgeConfigs(config);
+                    bridgeConfigForm.setFieldsValue(config);
                     return Promise.resolve();
                   }
                   default: {
                     setBridgeTransferDirection(BridgeTransferDirection.NOT_SUPPORT);
-                    setAssetFieldDisabled(true);
+                    setIsBridgeValid(false);
 
                     const config = await bridgeService.retrieveBridgeConfig(
                       BridgeTransferDirection.NOT_SUPPORT,
@@ -462,7 +467,7 @@ const CronosBridgeForm = props => {
             onChange={onSwitchAsset}
             value={currentAssetIdentifier}
             placeholder="Asset"
-            disabled={assetFieldDisabled}
+            disabled={!isBridgeValid}
           >
             {bridgeSupportedAssets.map(asset => {
               return (
@@ -493,7 +498,7 @@ const CronosBridgeForm = props => {
         >
           <InputNumber
             placeholder="Amount"
-            disabled={assetFieldDisabled}
+            disabled={!isBridgeValid}
             onChange={value => setSendingAmount(value ? value.toString() : '0')}
           />
         </Form.Item>
@@ -556,6 +561,9 @@ const CronosBridge = () => {
     tendermintAddress: '',
     evmAddress: '',
   });
+  const [bridgeConfigForm] = Form.useForm();
+  const [isBridgeValid, setIsBridgeValid] = useState(false);
+
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
   const [toAsset, setToAsset] = useState<UserAsset | undefined>();
@@ -714,6 +722,9 @@ const CronosBridge = () => {
               form={form}
               formValues={formValues}
               setFormValues={setFormValues}
+              bridgeConfigForm={bridgeConfigForm}
+              isBridgeValid={isBridgeValid}
+              setIsBridgeValid={setIsBridgeValid}
               assetIcon={assetIcon}
               currentAsset={currentAsset}
               setCurrentAsset={setCurrentAsset}
@@ -940,14 +951,28 @@ const CronosBridge = () => {
       )}
       {currentStep === 0 ? (
         <>
-          <div style={{ textAlign: 'right', fontSize: '20px' }}>
-            <a
+          <div style={{ textAlign: 'right' }}>
+            {/* <a
               onClick={() => {
                 setIsBridgeSettingsFormVisible(true);
               }}
+              
             >
               <SettingOutlined />
-            </a>
+            </a> */}
+            <Button
+              icon={<SettingOutlined style={{ fontSize: '20px' }} />}
+              style={{
+                textAlign: 'right',
+                width: '20px',
+                border: 'none',
+                background: 'transparent',
+              }}
+              onClick={() => {
+                setIsBridgeSettingsFormVisible(true);
+              }}
+              disabled={!isBridgeValid}
+            />
             <ModalPopup
               isModalVisible={isBridgeSettingsFormVisible}
               handleCancel={() => {
@@ -966,7 +991,68 @@ const CronosBridge = () => {
               ]}
               okText={t('general.save')}
             >
-              {JSON.stringify(bridgeConfigs)}
+              {/* {JSON.stringify(bridgeConfigs)} */}
+              <Form
+                {...layout}
+                layout="vertical"
+                form={bridgeConfigForm}
+                name="control-hooks"
+                requiredMark="optional"
+                onFinish={() => {}}
+              >
+                <Form.Item
+                  name="prefix"
+                  label="Prefix"
+                  rules={[
+                    {
+                      required: true,
+                      message: `Prefix ${t('general.required')}`,
+                    },
+                  ]}
+                  style={{ textAlign: 'left' }}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  name="cronosBridgeContractAddress"
+                  label="Cronos Bridge Contract Address"
+                  rules={[
+                    {
+                      required: true,
+                      message: `Contract Address ${t('general.required')}`,
+                    },
+                  ]}
+                  style={{ textAlign: 'left' }}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  name="bridgeChannel"
+                  label="Bridge Channel"
+                  rules={[
+                    {
+                      required: true,
+                      message: `Bridge Channel ${t('general.required')}`,
+                    },
+                  ]}
+                  style={{ textAlign: 'left' }}
+                >
+                  <Input />
+                </Form.Item>
+                <Form.Item
+                  name="bridgePort"
+                  label="Bridge Port"
+                  rules={[
+                    {
+                      required: true,
+                      message: `Bridge Port ${t('general.required')}`,
+                    },
+                  ]}
+                  style={{ textAlign: 'left' }}
+                >
+                  <Input />
+                </Form.Item>
+              </Form>
             </ModalPopup>
           </div>
           <div>
