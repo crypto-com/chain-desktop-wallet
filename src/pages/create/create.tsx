@@ -576,10 +576,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           <Input placeholder="0" />
         </Form.Item>
         <Form.Item>
-          <NoticeDisclaimer>
-            Multiple addresses can be created with index being 0,1,2,3 and so on. Please note its
-            limited to 100 addresses without expert mode and over 100 addresses under expert mode.
-          </NoticeDisclaimer>
+          <NoticeDisclaimer>{t('create.formCreate.addressIndex.disclaimer')}</NoticeDisclaimer>
         </Form.Item>
       </div>
 
