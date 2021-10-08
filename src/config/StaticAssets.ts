@@ -69,7 +69,7 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
     indexingUrl: isTestnet ? 'https://cronos-explorer.crypto.org/api' : 'TO_BE_DECIDED',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
-    nodeUrl: 'https://cronos-testnet.crypto.org:8545/',
+    nodeUrl: 'https://cronos-testnet-3.crypto.org:8545/',
     memoSupportDisabled: true,
   };
 

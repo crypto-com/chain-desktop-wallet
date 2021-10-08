@@ -121,6 +121,7 @@ const FormSend: React.FC<FormSendProps> = props => {
     }
     try {
       setConfirmLoading(true);
+
       const sendResult = await walletService.sendTransfer({
         toAddress: formValues.recipientAddress,
         amount: formValues.amount,

@@ -221,7 +221,8 @@
       },
       "welcome": {
         "slogan": "Our Sample Chain Wallet supports wallet management and funds transfer.",
-        "button": "Get Started"
+        "button": "Get Started",
+        "block": "This product is currently unavailable in your country or region."
       },
       "signup": {
         "title": "App Password Created Successfully",
