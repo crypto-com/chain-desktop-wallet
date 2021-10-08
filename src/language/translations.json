@@ -90,7 +90,6 @@
           "title": "Enter app password to unlock",
           "description": "Enter app password to unlock",
           "error": "The password provided is incorrect. Please try again",
-          "errorSelfDestruct": "Attempt #*N*. *break* Wallet will self-destruct after #T# more wrong attempts.",
           "success": "Wallet unlocked successfully!",
           "okButton": "Unlock wallet"
         },
@@ -523,8 +522,8 @@
             "description": "Please connect with your Ledger device"
           }
         },
-        "disclaimer": "Transfering {{assetSymbol}} from any address that is not on {{assetName}} may result in permanet loss of your funds.",
-        "button": "Verify address on Ledger"
+        "button": "Verify address on Ledger",
+        "disclaimer": "Transfering {{assetSymbol}} from any address that is not on {{assetName}} may result in permanet loss of your funds."
       },
       "assets": {
         "title": "Assets",
@@ -1401,8 +1400,8 @@
             "description": "請連接你的 Ledger 硬體錢包 "
           }
         },
-        "disclaimer": "從 {{assetName}} 標準以外的任何地址發送 {{assetSymbol}} 可能會導致資金永久損失。",
-        "button": "驗證你的 Ledger 錢包"
+        "button": "驗證你的 Ledger 錢包",
+        "disclaimer": "從 {{assetName}} 標準以外的任何地址發送 {{assetSymbol}} 可能會導致資金永久損失。"
       },
       "assets": {
         "title": "資金",
@@ -2278,8 +2277,8 @@
             "description": "请连接你的 Ledger 硬件钱包"
           }
         },
-        "disclaimer": "从 {{assetName}} 标准以外的任何地址发送 {{assetSymbol}} 可能会导致资金永久损失。",
-        "button": "验证你的 Ledger 钱包"
+        "button": "验证你的 Ledger 钱包",
+        "disclaimer": "从 {{assetName}} 标准以外的任何地址发送 {{assetSymbol}} 可能会导致资金永久损失。"
       },
       "assets": {
         "title": "资金",
@@ -3256,7 +3255,8 @@
           },
           "memo": {
             "label": "메모 (선택사항)"
-          }
+          },
+          "disclaimer": "{{assetName}}에 없는 수신인으로 {{assetSymbol}}를 보내면, 자금을 영구적으로 잃을 수 있습니다."
         },
         "modal1": {
           "title": "트랜잭션 확인",
@@ -3281,7 +3281,8 @@
             "description": "레져를 연결하세요"
           }
         },
-        "button": "레져에서 주소를 확인합니다"
+        "button": "레져에서 주소를 확인합니다",
+        "disclaimer": "{{assetName}}에 없는 주소로 {{assetSymbol}}를 보내면, 자금을 영구적으로 잃을 수 있습니다."
       },
       "assets": {
         "title": "애셋",
