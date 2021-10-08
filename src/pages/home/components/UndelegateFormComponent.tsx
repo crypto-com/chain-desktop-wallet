@@ -1,5 +1,5 @@
 import { FormInstance } from 'antd/lib/form';
-import { Alert, Form, InputNumber, Checkbox } from 'antd';
+import { Form, InputNumber, Checkbox } from 'antd';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import { Session } from '../../../models/Session';
@@ -70,17 +70,6 @@ export const UndelegateFormComponent = (props: {
         <Checkbox checked={props.isChecked} onChange={() => props.setIsChecked(!props.isChecked)}>
           {t('general.undelegateFormComponent.checkbox1', { unbondingPeriod: undelegatePeriod })}
         </Checkbox>
-      </div>
-      <div>
-        <Alert
-          type="info"
-          message={`${t(
-            'general.undelegateFormComponent.alert1.message1',
-          )} (${undelegatePeriod} ${t('general.undelegateFormComponent.alert1.message2')}) ${t(
-            'general.undelegateFormComponent.alert1.message3',
-          )}`}
-          showIcon
-        />
       </div>
     </>
   );
