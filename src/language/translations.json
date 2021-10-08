@@ -90,6 +90,7 @@
           "title": "Enter app password to unlock",
           "description": "Enter app password to unlock",
           "error": "The password provided is incorrect. Please try again",
+          "errorSelfDestruct": "Attempt #*N*. *break* Wallet will self-destruct after #T# more wrong attempts.",
           "success": "Wallet unlocked successfully!",
           "okButton": "Unlock wallet"
         },
@@ -221,8 +222,7 @@
       },
       "welcome": {
         "slogan": "Our Sample Chain Wallet supports wallet management and funds transfer.",
-        "button": "Get Started",
-        "block": "This product is currently unavailable in your country or region."
+        "button": "Get Started"
       },
       "signup": {
         "title": "App Password Created Successfully",
@@ -969,6 +969,7 @@
           "title": "輸入密碼",
           "description": "請輸入密碼以解鎖錢包",
           "error": "密碼不正確，請重新輸入。",
+          "errorSelfDestruct": "第*N*次輸入密碼不正確。如再輸入#T#次錯誤密碼，這錢包將會在被重置",
           "success": "錢包解鎖成功！",
           "okButton": "解鎖錢包"
         },
@@ -1846,6 +1847,7 @@
           "title": "输入密码",
           "description": "请输入密码以解锁钱包",
           "error": "密码不正确，请重新输入。",
+          "errorSelfDestruct": "第*N*次输入密码不正确。如再输入#T#次错误密码，这钱包将会在被重置",
           "success": "钱包解锁成功！",
           "okButton": "解锁钱包"
         },
@@ -2851,6 +2853,7 @@
           "title": "패스워드 입력",
           "description": "지갑 패스워드를 입력하세요",
           "error": "패스워드가 틀립니다. 다시 확인해주세요",
+          "errorSelfDestruct": "#*N*을 시도합니다.  #T#번  잘못된 시도를 하면 지갑은 자동 소멸됩니다.",
           "success": "지갑을 성공적으로 해독하였습니다",
           "okButton": "지갑 해독"
         },
