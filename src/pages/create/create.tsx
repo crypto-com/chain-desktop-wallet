@@ -638,14 +638,14 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         </ErrorModalPopup>
 
         <Modal
-          title="Open Eth Ledger App"
+          title="Open your Ethereum App"
           visible={isEthModalVisible}
           onOk={handleEthOk}
           onCancel={handleEthCancel}
           className="success-popup"
           cancelButtonProps={{ style: { display: 'none' } }}
         >
-          <p>Need Eth Ledger App</p>
+          <p>You need your Ethereum App opened on your Ledger device to proceed.</p>
         </Modal>
       </Form.Item>
     </Form>

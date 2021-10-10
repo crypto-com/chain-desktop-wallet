@@ -52,16 +52,31 @@ import IconCronos from '../../svg/IconCronos';
 import IconWallet from '../../svg/IconWallet';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
 import { SettingsDataUpdate } from '../../models/Wallet';
 import packageJson from '../../../package.json';
-import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
-import { LedgerWalletMaximum, MAX_INCORRECT_ATTEMPTS_ALLOWED, SHOW_WARNING_INCORRECT_ATTEMPTS } from '../../config/StaticConfig';
+import {
+  // eslint-disable-next-line
+  createLedgerDevice,
+  detectConditionsError,
+  LEDGER_WALLET_TYPE,
+} from '../../service/LedgerService';
+import {
+  LedgerWalletMaximum,
+  MAX_INCORRECT_ATTEMPTS_ALLOWED,
+  SHOW_WARNING_INCORRECT_ATTEMPTS,
+} from '../../config/StaticConfig';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import SessionLockModal from '../../components/PasswordForm/SessionLockModal';
+import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup';
+import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
+import IconLedger from '../../svg/IconLedger';
+// eslint-disable-next-line
+import { ISignerProvider } from '../../service/signers/SignerProvider';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -107,6 +122,24 @@ function HomeLayout(props: HomeLayoutProps) {
 
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
+
+  const [ledgerTendermintAddress, setLedgerTendermintAddress] = useState('');
+  // eslint-disable-next-line
+  const [ledgerEvmAddress, setLedgerEvmAddress] = useState('');
+  const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
+  // eslint-disable-next-line
+  const [isLedgerEthAppConnected, setIsLedgerEthAppConnected] = useState(false);
+  // const [isLedgerWaitFlag, setIsLedgerWaitFlag] = useState(false);
+  const [isLedgerCroAppConnectModalVisible, setIsLedgerCroAppConnectModalVisible] = useState(false);
+  const [isLedgerEthAppConnectModalVisible, setIsLedgerEthAppConnectModalVisible] = useState(false);
+  const [
+    isLedgerCreateAssetSuccessModalVisible,
+    setIsLedgerCreateAssetSuccessModalVisible,
+  ] = useState(false);
+  const [isLedgerCreateAssetErrorModalVisible, setIsLedgerCreateAssetErrorModalVisible] = useState(
+    false,
+  );
+
   const didMountRef = useRef(false);
   const currentLocationPath = useLocation().pathname;
 
@@ -203,6 +236,123 @@ function HomeLayout(props: HomeLayoutProps) {
     setInputPasswordVisible(true);
   };
 
+  // const delay = (ms: number) => {
+  //   return new Promise(resolve => setTimeout(resolve, ms));
+  // }
+
+  const migrateLedgerAsset = async (
+    walletSession: Session,
+    tendermintAddress: string,
+    evmAddress: string,
+  ) => {
+    try {
+      await walletService.handleCurrentWalletAssetsMigration(
+        '',
+        walletSession,
+        tendermintAddress,
+        evmAddress,
+      );
+      setIsLedgerCreateAssetSuccessModalVisible(true);
+    } catch (e) {
+      setIsLedgerCreateAssetErrorModalVisible(true);
+    }
+  };
+
+  const checkIsLedgerCroAppConnected = async (walletSession: Session) => {
+    try {
+      const device: ISignerProvider = createLedgerDevice();
+
+      const tendermintAddress = await device.getAddress(
+        walletSession.wallet.addressIndex,
+        walletSession.wallet.config.network.addressPrefix,
+        false,
+      );
+
+      setLedgerTendermintAddress(tendermintAddress);
+      setIsLedgerCroAppConnected(true);
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+
+      setIsLedgerCroAppConnectModalVisible(false);
+      setIsLedgerCroAppConnected(false);
+      setIsLedgerEthAppConnectModalVisible(true);
+    } catch (e) {
+      let message = `${t('create.notification.ledger.message1')}`;
+      let description = `${t('create.notification.ledger.description1')}`;
+      if (walletSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+        if (detectConditionsError(e.toString())) {
+          message = `${t('create.notification.ledger.message2')}`;
+          description = `${t('create.notification.ledger.message2')}`;
+        }
+      }
+
+      setIsLedgerCroAppConnected(false);
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+      setIsLedgerCroAppConnectModalVisible(false);
+
+      notification.error({
+        message,
+        description,
+        placement: 'topRight',
+        duration: 20,
+      });
+    }
+  };
+
+  const checkIsLedgerEthAppConnected = async (walletSession: Session) => {
+    let hwok = false;
+    let evmAddress = '';
+    try {
+      const device: ISignerProvider = createLedgerDevice();
+
+      evmAddress = await device.getEthAddress(walletSession.wallet.addressIndex);
+      setLedgerEvmAddress(evmAddress);
+      setIsLedgerEthAppConnected(true);
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+
+      setIsLedgerEthAppConnectModalVisible(false);
+      setIsLedgerEthAppConnected(false);
+
+      hwok = true;
+    } catch (e) {
+      let message = `${t('create.notification.ledger.message1')}`;
+      let description = `${t('create.notification.ledger.description1')}`;
+      if (walletSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+        if (detectConditionsError(e.toString())) {
+          message = `${t('create.notification.ledger.message2')}`;
+          description = `${t('create.notification.ledger.message2')}`;
+        }
+      }
+
+      setIsLedgerEthAppConnected(false);
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+      setIsLedgerEthAppConnectModalVisible(false);
+
+      notification.error({
+        message,
+        description,
+        placement: 'topRight',
+        duration: 20,
+      });
+    }
+    await new Promise(resolve => {
+      setTimeout(resolve, 2000);
+    });
+    if (hwok) {
+      // proceed
+      migrateLedgerAsset(walletSession, ledgerTendermintAddress, evmAddress);
+    }
+  };
+
   const checkNewlyAddedStaticAssets = (walletSession?: Session) => {
     if (!walletSession || !walletSession.wallet) {
       return;
@@ -218,7 +368,11 @@ function HomeLayout(props: HomeLayoutProps) {
             size="small"
             className="btn-restart"
             onClick={() => {
-              showPasswordInput();
+              if (walletSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+                setIsLedgerCroAppConnectModalVisible(true);
+              } else {
+                showPasswordInput();
+              }
               notification.close(newAssetAddedNotificationKey);
             }}
             style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
@@ -236,7 +390,7 @@ function HomeLayout(props: HomeLayoutProps) {
           btn: createNewlyAddedAssets,
         });
       }
-    }, 15_000);
+    }, 1_000);
   };
 
   const checkCorrectExplorerUrl = (walletSession?: Session) => {
@@ -529,7 +683,6 @@ function HomeLayout(props: HomeLayoutProps) {
             // Reset Incorrect attempt counts to ZERO
             await generalConfigService.resetIncorrectUnlockAttemptsCount();
           } else {
-
             // Increment incorrect Attempt counts by ONE
             await generalConfigService.incrementIncorrectUnlockAttemptsCountByOne();
 
@@ -546,12 +699,17 @@ function HomeLayout(props: HomeLayoutProps) {
             }
 
             // Show warning after `X` number of wrong attempts
-            if (latestIncorrectAttemptCount >= (MAX_INCORRECT_ATTEMPTS_ALLOWED - SHOW_WARNING_INCORRECT_ATTEMPTS)) {
+            if (
+              latestIncorrectAttemptCount >=
+              MAX_INCORRECT_ATTEMPTS_ALLOWED - SHOW_WARNING_INCORRECT_ATTEMPTS
+            ) {
               errorText = t('general.sessionLockModal.errorSelfDestruct')
                 .replace('*N*', String(latestIncorrectAttemptCount))
-                .replace('#T#', String(MAX_INCORRECT_ATTEMPTS_ALLOWED - latestIncorrectAttemptCount))
+                .replace(
+                  '#T#',
+                  String(MAX_INCORRECT_ATTEMPTS_ALLOWED - latestIncorrectAttemptCount),
+                );
             }
-
           }
 
           return {
@@ -757,6 +915,154 @@ function HomeLayout(props: HomeLayoutProps) {
             <div className="description">{t('announcement.modal.description1')}</div>
           </>
         </ModalPopup>
+        <SuccessModalPopup
+          isModalVisible={isLedgerCreateAssetSuccessModalVisible}
+          handleCancel={() => {
+            setIsLedgerCreateAssetSuccessModalVisible(false);
+          }}
+          handleOk={() => {
+            setIsLedgerCreateAssetSuccessModalVisible(false);
+          }}
+          title={t('general.successModalPopup.title')}
+          // button={
+          //   <Button
+          //     type="primary"
+          //     htmlType="submit"
+          //     // disabled={props.isCreateDisable}
+          //     // loading={createLoading}
+          //   >
+          //     {t('general.successModalPopup.createWallet.button')}
+          //   </Button>
+          // }
+          button={null}
+          footer={[
+            <Button
+              key="submit"
+              type="primary"
+              onClick={() => {
+                setIsLedgerCreateAssetSuccessModalVisible(false);
+              }}
+            >
+              {t('general.continue')}
+            </Button>,
+          ]}
+        >
+          <>
+            <div className="description">
+              {t('general.successModalPopup.createWallet.description')}
+            </div>
+          </>
+        </SuccessModalPopup>
+        <ErrorModalPopup
+          isModalVisible={isLedgerCreateAssetErrorModalVisible}
+          handleCancel={() => {
+            setIsLedgerCreateAssetErrorModalVisible(false);
+            setIsLedgerCroAppConnectModalVisible(true);
+          }}
+          handleOk={() => {
+            setIsLedgerCreateAssetErrorModalVisible(false);
+            setIsLedgerCroAppConnectModalVisible(true);
+          }}
+          title={t('general.errorModalPopup.title')}
+          footer={[]}
+        >
+          <>
+            <div className="description">
+              {t('general.errorModalPopup.createWallet.description')}
+            </div>
+          </>
+        </ErrorModalPopup>
+
+        {/* <ModalPopup
+          title="Connect your Ledger"
+          isModalVisible={isLedgerEthAppConnectModalVisible}
+          handleOk={() => { 
+            setIsLedgerEthAppConnectModalVisible(false) 
+            setIsLedgerWaitFlag(false)
+          }}
+          handleCancel={() => { setIsLedgerEthAppConnectModalVisible(false) }}
+          className="success-popup"
+          style={{ textAlign: 'left' }}
+        // cancelButtonProps={{ style: { display: 'none' } }}
+        >
+          <p>You need your Ethereum App opened on your Ledger device to proceed.</p>
+        </ModalPopup> */}
+        <LedgerModalPopup
+          isModalVisible={isLedgerCroAppConnectModalVisible}
+          handleCancel={() => {
+            setIsLedgerCroAppConnectModalVisible(false);
+          }}
+          handleOk={() => {
+            setIsLedgerCroAppConnectModalVisible(false);
+          }}
+          title={
+            isLedgerCroAppConnected
+              ? t('create.ledgerModalPopup.title1')
+              : t('create.ledgerModalPopup.title2')
+          }
+          footer={[
+            isLedgerCroAppConnected ? (
+              <></>
+            ) : (
+              <Button
+                type="primary"
+                size="small"
+                className="btn-restart"
+                onClick={() => {
+                  checkIsLedgerCroAppConnected(session);
+                }}
+                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              >
+                Continue
+              </Button>
+            ),
+          ]}
+          image={isLedgerCroAppConnected ? <SuccessCheckmark /> : <IconLedger />}
+        >
+          <div className="description">
+            {isLedgerCroAppConnected
+              ? t('create.ledgerModalPopup.description1')
+              : t('create.ledgerModalPopup.description2')}
+          </div>
+        </LedgerModalPopup>
+        <LedgerModalPopup
+          isModalVisible={isLedgerEthAppConnectModalVisible}
+          handleCancel={() => {
+            setIsLedgerEthAppConnectModalVisible(false);
+          }}
+          handleOk={() => {
+            setIsLedgerEthAppConnectModalVisible(false);
+          }}
+          title={
+            isLedgerEthAppConnected
+              ? t('create.ledgerModalPopup.title1')
+              : t('create.ledgerModalPopup.title2')
+          }
+          footer={[
+            isLedgerEthAppConnected ? (
+              <></>
+            ) : (
+              <Button
+                type="primary"
+                size="small"
+                className="btn-restart"
+                onClick={() => {
+                  checkIsLedgerEthAppConnected(session);
+                }}
+                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              >
+                Continue
+              </Button>
+            ),
+          ]}
+          image={isLedgerEthAppConnected ? <SuccessCheckmark /> : <IconLedger />}
+        >
+          <div className="description">
+            {isLedgerEthAppConnected
+              ? t('create.ledgerModalPopup.description1')
+              : t('create.ledgerModalPopup.description2')}
+          </div>
+        </LedgerModalPopup>
       </Layout>
     </main>
   );

@@ -1520,11 +1520,16 @@ class WalletService extends WalletBaseService {
     return needAssetsCreation;
   }
 
-  public async handleCurrentWalletAssetsMigration(phrase: string, session?: Session) {
+  public async handleCurrentWalletAssetsMigration(
+    phrase: string,
+    session?: Session,
+    tendermintAddress?: string,
+    evmAddress?: string,
+  ) {
     // 1. Check if current wallet has all expected static assets
     // 2. If static assets are missing, remove all existing non dynamic assets
     // 3. Prompt user password and re-create static assets on the fly
-    // 3. Run sync all to synchronize all assets states
+    // 4. Run sync all to synchronize all assets states
 
     const currentSession = session || (await this.storageService.retrieveCurrentSession());
     const { wallet } = currentSession;
@@ -1534,6 +1539,21 @@ class WalletService extends WalletBaseService {
 
       const walletOps = new WalletOps();
       const assetGeneration = walletOps.generate(wallet.config, wallet.identifier, phrase);
+
+      if (currentSession?.wallet.walletType === LEDGER_WALLET_TYPE) {
+        if (tendermintAddress !== '' && evmAddress !== '') {
+          const tendermintAsset = assetGeneration.initialAssets.filter(
+            asset => asset.assetType === UserAssetType.TENDERMINT,
+          )[0];
+          tendermintAsset.address = tendermintAddress;
+          const evmAsset = assetGeneration.initialAssets.filter(
+            asset => asset.assetType === UserAssetType.EVM,
+          )[0];
+          evmAsset.address = evmAddress;
+        } else {
+          throw new Error('Fail to get Ledger addresses.');
+        }
+      }
 
       await this.saveAssets(assetGeneration.initialAssets);
 
