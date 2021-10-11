@@ -6,7 +6,7 @@ import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import { BridgeTransferRequest } from '../TransactionRequestModels';
 import { BroadCastResult } from '../../models/Transaction';
 import { BridgeTransactionUnsigned } from '../signers/TransactionSupported';
-import { LEDGER_WALLET_TYPE } from '../LedgerService';
+import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../LedgerService';
 import { WalletBaseService } from '../WalletBaseService';
 import { getBaseScaledAmount } from '../../utils/NumberUtils';
 import BridgeABI from './contracts/BridgeABI.json';
@@ -78,8 +78,9 @@ class BridgeService extends WalletBaseService {
 
     const prepareTxInfo = await this.prepareEVMTransaction(originAsset, txConfig);
 
+    const { currentSession } = prepareTxInfo;
     const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
-      prepareTxInfo.currentSession,
+      currentSession,
       bridgeTransferRequest,
     );
 
@@ -112,19 +113,39 @@ class BridgeService extends WalletBaseService {
     bridgeTransaction.gasPrice = prepareTxInfo.loadedGasPrice;
     bridgeTransaction.gasLimit = prepareTxInfo.gasLimit;
 
-    const signedTransaction = await evmTransactionSigner.signBridgeTransfer(
-      bridgeTransaction,
-      bridgeTransferRequest.decryptedPhrase,
-    );
+    let signedTransactionHex = '';
+    if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      const device = createLedgerDevice();
+      const walletAddressIndex = currentSession.wallet.addressIndex;
+
+      const gasLimitTx = web3.utils.toBN(bridgeTransaction.gasLimit!);
+      const gasPriceTx = web3.utils.toBN(bridgeTransaction.gasPrice);
+
+      signedTransactionHex = await device.signEthTx(
+        walletAddressIndex,
+        Number(originAsset?.config?.chainId), // chainid
+        bridgeTransaction.nonce,
+        web3.utils.toHex(gasLimitTx) /* gas limit */,
+        web3.utils.toHex(gasPriceTx) /* gas price */,
+        bridgeContractAddress,
+        web3.utils.toHex(bridgeTransaction.amount),
+        encodedABI,
+      );
+    } else {
+      signedTransactionHex = await evmTransactionSigner.signBridgeTransfer(
+        bridgeTransaction,
+        bridgeTransferRequest.decryptedPhrase,
+      );
+    }
 
     // eslint-disable-next-line no-console
     console.log(`${bridgeTransferRequest.originAsset.assetType} REQUEST & SIGNED-TX`, {
-      signedTransaction,
+      signedTransactionHex,
       bridgeTransaction,
     });
 
     const broadcastedTransactionHash = await cronosClient.broadcastRawTransactionHex(
-      signedTransaction,
+      signedTransactionHex,
     );
 
     return {

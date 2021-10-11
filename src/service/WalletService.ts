@@ -16,8 +16,6 @@ import {
   NOT_KNOWN_YET_VALUE,
   SECONDS_OF_YEAR,
   WalletConfig,
-  EVM_MINIMUM_GAS_PRICE,
-  EVM_MINIMUM_GAS_LIMIT,
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
@@ -146,23 +144,11 @@ class WalletService extends WalletBaseService {
           transfer.gasLimit = prepareTxInfo.gasLimit;
 
           let signedTx = '';
-          if (currentSession.wallet.walletType === 'ledger') {
+          if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
             const device = createLedgerDevice();
 
-            const { gasLimit } = transfer;
-            const { gasPrice } = transfer;
-
-            let gasLimitTx = web3.utils.toBN(gasLimit!);
-            let gasPriceTx = web3.utils.toBN(gasPrice);
-            const gasLimitMinimum = web3.utils.toBN(EVM_MINIMUM_GAS_LIMIT);
-            const gasPriceMinimum = web3.utils.toBN(EVM_MINIMUM_GAS_PRICE);
-
-            if (gasLimitTx.lt(gasLimitMinimum)) {
-              gasLimitTx = gasLimitMinimum;
-            }
-            if (gasPriceTx.lt(gasPriceMinimum)) {
-              gasPriceTx = gasPriceMinimum;
-            }
+            const gasLimitTx = web3.utils.toBN(transfer.gasLimit!);
+            const gasPriceTx = web3.utils.toBN(transfer.gasPrice);
 
             signedTx = await device.signEthTx(
               walletAddressIndex,
@@ -181,6 +167,8 @@ class WalletService extends WalletBaseService {
             );
           }
 
+          // eslint-disable-next-line no-console
+          console.log(`${currentAsset.assetType} SIGNED-TX`, signedTx);
           const result = await cronosClient.broadcastRawTransactionHex(signedTx);
 
           // eslint-disable-next-line no-console

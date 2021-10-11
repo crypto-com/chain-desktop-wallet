@@ -15,54 +15,76 @@ export const CLOUDFLARE_TRACE_URI = 'https://www.cloudflare.com/cdn-cgi/trace';
 // For instance :
 export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
 
-// Reference: Google Sheet : Foris Markets Table - 4 October 2021 
+// Reference: Google Sheet : Foris Markets Table - 4 October 2021
 export const COUNTRY_CODES_TO_BLOCK = [
   // Afghanistan
-  'AF', 'AFG',
+  'AF',
+  'AFG',
   // Burma(Myanmar)
-  'MM', 'MMR',
+  'MM',
+  'MMR',
   // Burundi
-  'BI', 'BDI',
+  'BI',
+  'BDI',
   // Central African Republic
-  'CF', 'CAF',
+  'CF',
+  'CAF',
   // Congo, Dem. Rep.
-  'CD', 'COD',
+  'CD',
+  'COD',
   // Cuba
-  'CU', 'CUB',
+  'CU',
+  'CUB',
   // Eritrea
-  'ER', 'ERI',
+  'ER',
+  'ERI',
   // Guinea-Bissau
-  'GW', 'GNB',
+  'GW',
+  'GNB',
   // Guinea, Republic of
-  'GN', 'GIN',
+  'GN',
+  'GIN',
   // Iran
-  'IR', 'IRN',
+  'IR',
+  'IRN',
   // Iraq
-  'IQ', 'IRQ',
+  'IQ',
+  'IRQ',
   // North Korea
-  'KP', 'PRK',
+  'KP',
+  'PRK',
   // Lebanon
-  'LB', 'LBN',
+  'LB',
+  'LBN',
   // Libya
-  'LY', 'LBY',
+  'LY',
+  'LBY',
   // Mali
-  'ML', 'MLI',
+  'ML',
+  'MLI',
   // Somalia
-  'SO', 'SOM',
+  'SO',
+  'SOM',
   // South Sudan
-  'SS', 'SSD',
+  'SS',
+  'SSD',
   // Sudan
-  'SD', 'SDN',
+  'SD',
+  'SDN',
   // Syria
-  'SY','SYR',
+  'SY',
+  'SYR',
   // Venezuela
-  'VE', 'VEN',
+  'VE',
+  'VEN',
   // Yemen
-  'YE', 'YEM',
+  'YE',
+  'YEM',
   // Zimbabwe
-  'ZW', 'ZWE',
+  'ZW',
+  'ZWE',
   // Unidentified Countries
-  NOT_KNOWN_YET_VALUE
+  NOT_KNOWN_YET_VALUE,
 ];
 
 export const NodePorts = {
