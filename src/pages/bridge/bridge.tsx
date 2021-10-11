@@ -97,10 +97,10 @@ const bridgeIcon = (bridgeValue: string | undefined) => {
 
   switch (bridgeValue) {
     case 'CRYPTO_ORG':
-      icon = iconCronosSvg;
+      icon = iconCroSvg;
       break;
     case 'CRONOS':
-      icon = iconCroSvg;
+      icon = iconCronosSvg;
       break;
     default:
       break;
