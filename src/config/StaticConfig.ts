@@ -15,6 +15,9 @@ export const CLOUDFLARE_TRACE_URI = 'https://www.cloudflare.com/cdn-cgi/trace';
 // For instance :
 export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
 
+// Todo: Replace with absolute github path to: app.moderation.json
+export const MODERATION_CONFIG_FILE = NOT_KNOWN_YET_VALUE;
+
 // Reference: Google Sheet : Foris Markets Table - 4 October 2021 
 export const COUNTRY_CODES_TO_BLOCK = [
   // Afghanistan
