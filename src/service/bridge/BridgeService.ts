@@ -53,12 +53,6 @@ class BridgeService extends WalletBaseService {
   private async handleCronosToCryptoOrgTransfer(bridgeTransferRequest: BridgeTransferRequest) {
     const { originAsset } = bridgeTransferRequest;
 
-    if (bridgeTransferRequest.walletType === LEDGER_WALLET_TYPE) {
-      throw TypeError(
-        `${LEDGER_WALLET_TYPE} not supported yet for ${bridgeTransferRequest.bridgeTransferDirection} transactions yet. Coming soon`,
-      );
-    }
-
     if (!originAsset.config?.nodeUrl || !originAsset.address) {
       throw TypeError(`Missing asset config: ${originAsset.config}`);
     }
@@ -93,9 +87,6 @@ class BridgeService extends WalletBaseService {
     const encodedABI = contract.methods
       .send_cro_to_crypto_org(bridgeTransferRequest.tendermintAddress)
       .encodeABI();
-
-    // eslint-disable-next-line no-console
-    console.log('Encoded Contract ABI', encodedABI);
 
     const scaledBaseAmount = getBaseScaledAmount(bridgeTransferRequest.amount, originAsset);
 
