@@ -59,7 +59,6 @@ import {
 } from '../../utils/NumberUtils';
 import { SUPPORTED_BRIDGE, SupportedBridge } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
-
 import iconCronosSvg from '../../assets/icon-cronos-blue.svg';
 import iconCroSvg from '../../assets/icon-cro.svg';
 import IconHexagon from '../../svg/IconHexagon';
@@ -387,7 +386,6 @@ const CronosBridgeForm = props => {
             {supportedBridges.map(bridge => {
               return (
                 <Option value={bridge.value} key={bridge.value}>
-                  {/* <img src={bridge.icon} alt={bridge.value} className="asset-icon" /> */}
                   {bridgeIcon(bridge.value)}
                   {`${bridge.label}`}
                 </Option>
@@ -469,7 +467,6 @@ const CronosBridgeForm = props => {
             {supportedBridges.map(bridge => {
               return (
                 <Option value={bridge.value} key={bridge.value}>
-                  {/* <img src={bridge.icon} alt={bridge.value} className="asset-icon" /> */}
                   {bridgeIcon(bridge.value)}
                   {`${bridge.label}`}
                 </Option>
