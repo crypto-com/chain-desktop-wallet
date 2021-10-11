@@ -16,6 +16,8 @@ import {
   NOT_KNOWN_YET_VALUE,
   SECONDS_OF_YEAR,
   WalletConfig,
+  EVM_MINIMUM_GAS_PRICE,
+  EVM_MINIMUM_GAS_LIMIT,
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
@@ -59,7 +61,6 @@ import {
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from './LedgerService';
-import { ISignerProvider } from './signers/SignerProvider';
 import {
   BridgeTransferRequest,
   DelegationRequest,
@@ -107,16 +108,11 @@ class WalletService extends WalletBaseService {
 
     const currentSession = await this.storageService.retrieveCurrentSession();
     const fromAddress = currentSession.wallet.address;
+    const walletAddressIndex = currentSession.wallet.addressIndex;
 
     switch (currentAsset.assetType) {
       case UserAssetType.EVM:
         try {
-          if (currentAsset?.config?.isLedgerSupportDisabled) {
-            throw TypeError(
-              `${LEDGER_WALLET_TYPE} not supported yet for ${transferRequest.walletType} assets`,
-            );
-          }
-
           if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
             throw TypeError(`Missing asset config: ${currentAsset.config}`);
           }
@@ -149,13 +145,41 @@ class WalletService extends WalletBaseService {
           transfer.gasPrice = prepareTxInfo.loadedGasPrice;
           transfer.gasLimit = prepareTxInfo.gasLimit;
 
-          const signedTx = await evmTransactionSigner.signTransfer(
-            transfer,
-            transferRequest.decryptedPhrase,
-          );
+          let signedTx = '';
+          if (currentSession.wallet.walletType === 'ledger') {
+            const device = createLedgerDevice();
 
-          // eslint-disable-next-line no-console
-          console.log(`${currentAsset.assetType} SIGNED-TX`, signedTx);
+            const { gasLimit } = transfer;
+            const { gasPrice } = transfer;
+
+            let gasLimitTx = web3.utils.toBN(gasLimit!);
+            let gasPriceTx = web3.utils.toBN(gasPrice);
+            const gasLimitMinimum = web3.utils.toBN(EVM_MINIMUM_GAS_LIMIT);
+            const gasPriceMinimum = web3.utils.toBN(EVM_MINIMUM_GAS_PRICE);
+
+            if (gasLimitTx.lt(gasLimitMinimum)) {
+              gasLimitTx = gasLimitMinimum;
+            }
+            if (gasPriceTx.lt(gasPriceMinimum)) {
+              gasPriceTx = gasPriceMinimum;
+            }
+
+            signedTx = await device.signEthTx(
+              walletAddressIndex,
+              Number(transfer.asset?.config?.chainId), // chainid
+              transfer.nonce,
+              web3.utils.toHex(gasLimitTx) /* gas limit */,
+              web3.utils.toHex(gasPriceTx) /* gas price */,
+              transfer.toAddress,
+              web3.utils.toHex(transfer.amount),
+              `0x${Buffer.from(transfer.memo).toString('hex')}`,
+            );
+          } else {
+            signedTx = await evmTransactionSigner.signTransfer(
+              transfer,
+              transferRequest.decryptedPhrase,
+            );
+          }
 
           const result = await cronosClient.broadcastRawTransactionHex(signedTx);
 
@@ -1094,6 +1118,20 @@ class WalletService extends WalletBaseService {
     }
   }
 
+  public async retrieveWalletAssets(walletIdentifier: string): Promise<UserAsset[]> {
+    const assets = await this.storageService.retrieveAssetsByWallet(walletIdentifier);
+    const userAssets = assets
+      .filter(asset => asset.assetType !== UserAssetType.IBC)
+      .map(data => {
+        const asset: UserAsset = { ...data };
+        return asset;
+      });
+
+    // https://github.com/louischatriot/nedb/issues/185
+    // NeDB does not support distinct queries, it needs to be done programmatically
+    return _.uniqBy(userAssets, 'symbol');
+  }
+
   public async retrieveCurrentWalletAssets(currentSession: Session): Promise<UserAsset[]> {
     const assets = await this.storageService.retrieveAssetsByWallet(
       currentSession.wallet.identifier,
@@ -1204,15 +1242,6 @@ class WalletService extends WalletBaseService {
 
   public async encryptWalletAndSetSession(key: string, walletOriginal: Wallet): Promise<void> {
     const wallet = JSON.parse(JSON.stringify(walletOriginal));
-    const addressprefix = wallet.config.network.addressPrefix;
-
-    // fetch first address , ledger identifier
-    if (wallet.walletType === LEDGER_WALLET_TYPE) {
-      const device: ISignerProvider = createLedgerDevice();
-      const address = await device.getAddress(wallet.addressIndex, addressprefix, false);
-      wallet.address = address;
-    }
-
     const initialVector = await cryptographer.generateIV();
     const encryptionResult = await cryptographer.encrypt(
       wallet.encryptedPhrase,
@@ -1505,11 +1534,16 @@ class WalletService extends WalletBaseService {
     return needAssetsCreation;
   }
 
-  public async handleCurrentWalletAssetsMigration(phrase: string, session?: Session) {
+  public async handleCurrentWalletAssetsMigration(
+    phrase: string,
+    session?: Session,
+    tendermintAddress?: string,
+    evmAddress?: string,
+  ) {
     // 1. Check if current wallet has all expected static assets
     // 2. If static assets are missing, remove all existing non dynamic assets
     // 3. Prompt user password and re-create static assets on the fly
-    // 3. Run sync all to synchronize all assets states
+    // 4. Run sync all to synchronize all assets states
 
     const currentSession = session || (await this.storageService.retrieveCurrentSession());
     const { wallet } = currentSession;
@@ -1519,6 +1553,27 @@ class WalletService extends WalletBaseService {
 
       const walletOps = new WalletOps();
       const assetGeneration = walletOps.generate(wallet.config, wallet.identifier, phrase);
+
+      if (currentSession?.wallet.walletType === LEDGER_WALLET_TYPE) {
+        if (tendermintAddress !== '' && evmAddress !== '') {
+          const tendermintAsset = assetGeneration.initialAssets.filter(
+            asset => asset.assetType === UserAssetType.TENDERMINT,
+          )[0];
+          tendermintAsset.address = tendermintAddress;
+          const evmAsset = assetGeneration.initialAssets.filter(
+            asset => asset.assetType === UserAssetType.EVM,
+          )[0];
+          evmAsset.address = evmAddress;
+        } else {
+          // eslint-disable-next-line no-console
+          console.log('FAILED_TO_GET_LEDGER_ADDRESSES', {
+            session: currentSession,
+            tendermintAddress,
+            evmAddress,
+          });
+          throw new Error('Failed to get Ledger addresses.');
+        }
+      }
 
       await this.saveAssets(assetGeneration.initialAssets);
 

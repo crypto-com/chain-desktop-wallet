@@ -8,7 +8,6 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
-
 import {
   hasShownWarningOnWalletTypeState,
   sessionState,
@@ -384,7 +383,7 @@ const HomePage = () => {
               <div className="quantity">
                 {numeral(
                   scaledAmount(
-                    new Big(defaultWalletAsset.rewardsBalance)
+                    new Big(defaultWalletAsset.rewardsBalance ?? '0')
                       .add(rewards?.claimedRewardsBalance ?? '0')
                       .toFixed(2),
                     defaultWalletAsset.decimals,

@@ -10,6 +10,7 @@
         "cancel": "Cancel",
         "save": "Save",
         "discard": "Discard Changes",
+        "default": "Default Settings",
         "ok": "Ok",
         "required": "is required",
         "cannot0": "cannot be 0",
@@ -222,7 +223,8 @@
       },
       "welcome": {
         "slogan": "Our Sample Chain Wallet supports wallet management and funds transfer.",
-        "button": "Get Started"
+        "button": "Get Started",
+        "block": "This product is currently unavailable in your country or region."
       },
       "signup": {
         "title": "App Password Created Successfully",
@@ -289,7 +291,8 @@
             "label": "Wallet Type"
           },
           "addressIndex": {
-            "label": "Address Index"
+            "label": "Address Index",
+            "disclaimer": "Multiple addresses can be created with index being 0,1,2,3 and so on. Please note its limited to 100 addresses without expert mode and over 100 addresses under expert mode."
           },
           "network": {
             "label": "Network"
@@ -497,7 +500,8 @@
           },
           "memo": {
             "label": "Memo (Optional)"
-          }
+          },
+          "disclaimer": "Transfering your {{assetSymbol}} to any recipient address that is not on {{assetName}} may result in permanet loss of your funds."
         },
         "modal1": {
           "title": "Confirm Transaction",
@@ -522,7 +526,8 @@
             "description": "Please connect with your Ledger device"
           }
         },
-        "button": "Verify address on Ledger"
+        "button": "Verify address on Ledger",
+        "disclaimer": "Transfering {{assetSymbol}} from any address that is not supporting {{assetName}} may result in permanet loss of your funds."
       },
       "assets": {
         "title": "Assets",
@@ -887,6 +892,7 @@
         "cancel": "取消",
         "save": "保存",
         "discard": "取消",
+        "default": "默認設定",
         "ok": "Ok",
         "required": "必須輸入",
         "cannot0": "不能為 0",
@@ -967,6 +973,7 @@
           "title": "輸入密碼",
           "description": "請輸入密碼以解鎖錢包",
           "error": "密碼不正確，請重新輸入。",
+          "errorSelfDestruct": "第*N*次輸入密碼不正確。如再輸入#T#次錯誤密碼，這錢包將會在被重置",
           "success": "錢包解鎖成功！",
           "okButton": "解鎖錢包"
         },
@@ -1098,7 +1105,8 @@
       },
       "welcome": {
         "slogan": "我們的樣本錢包支持錢包管理和資金轉賬。",
-        "button": "開始"
+        "button": "開始",
+        "block": "此產品暫時未能為您所在的國家或地區提供服務。"
       },
       "signup": {
         "title": "密碼創建成功",
@@ -1165,7 +1173,8 @@
             "label": "錢包種類"
           },
           "addressIndex": {
-            "label": "地址索引"
+            "label": "地址索引",
+            "disclaimer": "可以使用 0、1、2、3 作為索引名創建多個地址。請注意，在沒有開啟專家模式時，索引地址數量限制為 100 個，在專家模式下沒有限制。"
           },
           "network": {
             "label": "網絡"
@@ -1373,7 +1382,8 @@
           },
           "memo": {
             "label": "留言（可留空）"
-          }
+          },
+          "disclaimer": "將 {{assetSymbol}} 轉移到不支援 {{assetName}} 標準的地址可能會導致資金永久損失。"
         },
         "modal1": {
           "title": "確認交易",
@@ -1398,7 +1408,8 @@
             "description": "請連接你的 Ledger 硬體錢包 "
           }
         },
-        "button": "驗證你的 Ledger 錢包"
+        "button": "驗證你的 Ledger 錢包",
+        "disclaimer": "從不支援 {{assetName}} 標準的任何地址發送 {{assetSymbol}} 可能會導致資金永久損失。"
       },
       "assets": {
         "title": "資金",
@@ -1762,6 +1773,7 @@
         "cancel": "取消",
         "save": "保存",
         "discard": "取消",
+        "default": "默认配置",
         "ok": "好的",
         "required": "必须输入",
         "cannot0": "不能为 0",
@@ -1842,6 +1854,7 @@
           "title": "输入密码",
           "description": "请输入密码以解锁钱包",
           "error": "密码不正确，请重新输入。",
+          "errorSelfDestruct": "第*N*次输入密码不正确。如再输入#T#次错误密码，这钱包将会在被重置",
           "success": "钱包解锁成功！",
           "okButton": "解锁钱包"
         },
@@ -1973,7 +1986,8 @@
       },
       "welcome": {
         "slogan": "我们的样本钱包支持钱包管理和资金转账。",
-        "button": "开始"
+        "button": "开始",
+        "block": "此产品暂时未能为您所在的国家或地区提供服务。"
       },
       "signup": {
         "title": "密码创建成功",
@@ -2040,7 +2054,8 @@
             "label": "钱包种类"
           },
           "addressIndex": {
-            "label": "地址索引"
+            "label": "地址索引",
+            "disclaimer": "可以使用 0、1、2、3 作为索引名创建多个地址。请注意，在没有开启专家模式时，索引地址数量限制为 100 个，在专家模式下没有限制。"
           },
           "network": {
             "label": "网络"
@@ -2248,7 +2263,8 @@
           },
           "memo": {
             "label": "留言（可选）"
-          }
+          },
+          "disclaimer": "将 {{assetSymbol}} 转移到不支持 {{assetName}} 标准的地址可能会导致资金永久损失。"
         },
         "modal1": {
           "title": "确认交易",
@@ -2273,7 +2289,8 @@
             "description": "请连接你的 Ledger 硬件钱包"
           }
         },
-        "button": "验证你的 Ledger 钱包"
+        "button": "验证你的 Ledger 钱包",
+        "disclaimer": "从不支持 {{assetName}} 标准的任何地址发送 {{assetSymbol}} 可能会导致资金永久损失。"
       },
       "assets": {
         "title": "资金",
@@ -2765,6 +2782,7 @@
         "cancel": "취소",
         "save": "저장",
         "discard": "변경사항 버리기",
+        "default": "기본 설정",
         "ok": "확인",
         "required": "필수",
         "cannot0": "0이 될 수 없음",
@@ -2845,6 +2863,7 @@
           "title": "패스워드 입력",
           "description": "지갑 패스워드를 입력하세요",
           "error": "패스워드가 틀립니다. 다시 확인해주세요",
+          "errorSelfDestruct": "#*N*을 시도합니다.  #T#번  잘못된 시도를 하면 지갑은 자동 소멸됩니다.",
           "success": "지갑을 성공적으로 해독하였습니다",
           "okButton": "지갑 해독"
         },
@@ -2965,7 +2984,8 @@
             "message1": "트랜잭션이 발송된 후 위임 취소가 완전히 완료되는 데 며칠이 소요됨을 양해바랍니다",
             "message2": "일",
             "message3": "그 때까지는 위임 취소된 금액을 사용할 수 없습니다."
-          }
+          },
+          "checkbox1": "Crypto.org Chain 스테이킹에서, 내 CRO는 Crypto.org Chain 네트워크에서 규정한 대로, 스테이킹을 해제할 때는  {{ unbondingPeriod }}일의 위임 취소  기간이 적용되는 것을 이해합니다"
         },
         "table": {
           "triggerDesc": "내림차순으로 정렬",
@@ -3042,7 +3062,8 @@
             "label": "지갑 종류"
           },
           "addressIndex": {
-            "label": "주소 인덱스"
+            "label": "주소 인덱스",
+            "disclaimer": "인덱스를 0,1,2,3 등으로 설정하여, 여러개의 주소를 만들 수 있습니다. 레져의 전문가 모드가 꺼져있을 경우에,  100개 이하 주소로 제한되며, 전문가 모드가 켜져 있을 경우에는  100개 이상의 주소을 생성할 수 있습니다."
           },
           "network": {
             "label": "네트워크"
@@ -3250,7 +3271,8 @@
           },
           "memo": {
             "label": "메모 (선택사항)"
-          }
+          },
+          "disclaimer": "{{assetName}}에 없는 수신인으로 {{assetSymbol}}를 보내면, 자금을 영구적으로 잃을 수 있습니다."
         },
         "modal1": {
           "title": "트랜잭션 확인",
@@ -3275,7 +3297,8 @@
             "description": "레져를 연결하세요"
           }
         },
-        "button": "레져에서 주소를 확인합니다"
+        "button": "레져에서 주소를 확인합니다",
+        "disclaimer": "{{assetName}}에 없는 주소로 {{assetSymbol}}를 보내면, 자금을 영구적으로 잃을 수 있습니다."
       },
       "assets": {
         "title": "애셋",
@@ -3615,7 +3638,7 @@
             "title": "저장 공간 삭제 확인",
             "description1": "나중에 이 지갑을 복원할 수 있도록 삭제하기 전에 복구 니모닉 구문을 확인하는 것이 좋습니다.",
             "warning": "저장소를 지우시겠습니까? 지갑 니모닉 문구를 백업하지 않으면 영원히 자금을 잃을 수 있습니다.",
-            "disclaimer": "액세스 권한을 다시 얻을 수 있는 유일한 방법은 지갑 니모닉 문구로 복원하는 것임을 이해합니다.",
+            "disclaimer": "액세스 권한을 다시 얻을 수 있는 유일한 방법은 지갑 니모닉 문구로 복원하는",
             "form1": {
               "clear": {
                 "label": "입력하세요",

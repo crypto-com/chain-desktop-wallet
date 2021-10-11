@@ -6,7 +6,7 @@ module.exports = {
   },
   plugins: ['react-hooks'],
   rules: {
-    '@typescript-eslint/object-curly-spacing':"off",
+    '@typescript-eslint/object-curly-spacing': 'off',
     'jsx-a11y/accessible-emoji': 'off',
     'no-new-wrappers': 'off',
     'no-extra-boolean-cast': 'off',

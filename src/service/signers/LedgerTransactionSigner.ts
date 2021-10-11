@@ -171,16 +171,23 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       await this.signerProvider.getPubKey(this.addressIndex, false)
     ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
+    /* 
+    SIGN_MODE_UNSPECIFIED = 0,
+    SIGN_MODE_DIRECT = 1,
+    SIGN_MODE_TEXTUAL = 2,
+    SIGN_MODE_LEGACY_AMINO_JSON = 127,
+    */
     const signableTx = rawTx
       .appendMessage(message)
       .addSigner({
         publicKey: pubkey,
         accountNumber: new Big(transaction.accountNumber),
         accountSequence: new Big(transaction.accountSequence),
-        signMode: 0, //   LEGACY_AMINO_JSON = 0, DIRECT = 1,
+        signMode: 127, //   LEGACY_AMINO_JSON = 127, DIRECT = 1,
       })
       .toSignable();
 
+    // 0 : signer index
     const bytesMessage: Bytes = signableTx.toSignDocument(0);
     const signature = await this.signerProvider.sign(bytesMessage);
 

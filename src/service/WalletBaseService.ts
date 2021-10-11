@@ -49,6 +49,8 @@ export class WalletBaseService {
 
   // eslint-disable-next-line class-methods-use-this
   public async prepareEVMTransaction(originAsset: UserAsset, txConfig: TransactionConfig) {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+
     if (!originAsset.config?.nodeUrl || !originAsset.address) {
       throw TypeError(`Missing asset config: ${originAsset.config}`);
     }
@@ -60,7 +62,12 @@ export class WalletBaseService {
 
     const nonce = await cronosClient.getNextNonceByAddress(originAsset.address);
     const loadedGasPrice = await cronosClient.getEstimatedGasPrice();
-    const gasLimit = await cronosClient.estimateGas(txConfig);
+    let gasLimit;
+    try {
+      gasLimit = await cronosClient.estimateGas(txConfig);
+    } catch (e) {
+      gasLimit = 21_000; // Default gasLimit
+    }
 
     // eslint-disable-next-line no-console
     console.log('EVM_TX', {
@@ -73,6 +80,7 @@ export class WalletBaseService {
       nonce,
       loadedGasPrice,
       gasLimit,
+      currentSession,
     };
   }
 }

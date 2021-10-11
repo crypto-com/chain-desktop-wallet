@@ -4,11 +4,12 @@ import * as path from 'path';
 import { LedgerSigner } from '../../src/service/signers/LedgerSigner';
 import { ISignerProvider } from '../../src/service/signers/SignerProvider';
 import { LedgerTransactionSigner } from '../../src/service/signers/LedgerTransactionSigner';
-import {CustomDevNet} from '../../src/config/StaticConfig';
+import { CustomDevNet } from '../../src/config/StaticConfig';
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
-import {NodeRpcService} from "../../src/service/rpc/NodeRpcService";
-const { exec } = require("child_process");
-import chai from "chai";
+import { NodeRpcService } from '../../src/service/rpc/NodeRpcService';
+const { exec } = require('child_process');
+import chai from 'chai';
+import '../../typings';
 
 const SLEEP_MS = 30000;
 const APP_PATH = path.resolve(`./app/bin/app.elf`);
@@ -53,43 +54,48 @@ class LedgerSignerZemu extends LedgerSigner {
     if (this.app === null || this.app === undefined) {
       await this.sim.start(SIM_OPTIONS);
       this.app = new CosmosApp(this.sim.getTransport());
-      console.log("start zemu grpc server");
-      this.sim.startgrpcServer("localhost", "3002");
+      console.log('start zemu grpc server');
+      this.sim.startgrpcServer('localhost', '3002');
       await Zemu.default.sleep(SLEEP_MS);
     }
     // note: chain-maind need support zemu, so build it from `make build ledger=ZEMU` in chain-maind src
-    const cmd1 = "chain-maind init testnode --chain-id test -o";
-    const cmd2 = "chain-maind keys add validator1 --keyring-backend test";
-    const cmd3 = "chain-maind keys add hw  --ledger --keyring-backend test";
-    const cmd4 = "chain-maind add-genesis-account $(chain-maind keys show validator1 -a --keyring-backend test) 200000000cro";
-    const cmd5 = "chain-maind add-genesis-account $(chain-maind keys show hw -a --keyring-backend test) 100000000cro";
-    const cmd6 = "chain-maind gentx validator1 100000000cro --keyring-backend test  --chain-id test";
-    const cmd7 = "chain-maind collect-gentxs";
+    const cmd1 = 'chain-maind init testnode --chain-id test -o';
+    const cmd2 = 'chain-maind keys add validator1 --keyring-backend test';
+    const cmd3 = 'chain-maind keys add hw  --ledger --keyring-backend test';
+    const cmd4 =
+      'chain-maind add-genesis-account $(chain-maind keys show validator1 -a --keyring-backend test) 200000000cro';
+    const cmd5 =
+      'chain-maind add-genesis-account $(chain-maind keys show hw -a --keyring-backend test) 100000000cro';
+    const cmd6 =
+      'chain-maind gentx validator1 100000000cro --keyring-backend test  --chain-id test';
+    const cmd7 = 'chain-maind collect-gentxs';
     const commands = [cmd1, cmd2, cmd3, cmd4, cmd5, cmd6, cmd7];
     let i = 0;
     for (let cmd of commands) {
+      await Zemu.default.sleep(SLEEP_MS);
+      i += 1;
+      runCmd(cmd);
+      if (i === 3) {
         await Zemu.default.sleep(SLEEP_MS);
-        i += 1;
-        runCmd(cmd);
-        if (i === 3) {
-          await Zemu.default.sleep(SLEEP_MS);
-          console.log("right click");
-          await this.sim.clickRight();
-          console.log("right click");
-          await this.sim.clickRight();
-          console.log("right click");
-          await this.sim.clickRight();
-          console.log("double click");
-          await this.sim.clickBoth();
-        }
+        console.log('right click');
+        await this.sim.clickRight();
+        console.log('right click');
+        await this.sim.clickRight();
+        console.log('right click');
+        await this.sim.clickRight();
+        console.log('double click');
+        await this.sim.clickBoth();
+      }
     }
-    console.log("stop grpc server");
+    console.log('stop grpc server');
     this.sim.stopgrpcServer();
-    console.log("start chain-maind");
-    exec("sed -i.bak 's/cors_allowed_origins = \\[\\]/cors_allowed_origins = [\"*\"]/g' $HOME/.chain-maind/config/config.toml");
+    console.log('start chain-maind');
+    exec(
+      'sed -i.bak \'s/cors_allowed_origins = \\[\\]/cors_allowed_origins = ["*"]/g\' $HOME/.chain-maind/config/config.toml',
+    );
     await Zemu.default.sleep(SLEEP_MS);
-    exec("chain-maind start --home $HOME/.chain-maind&");
-    console.log("start chain-maind finished");
+    exec('chain-maind start --home $HOME/.chain-maind&');
+    console.log('start chain-maind finished');
   }
 
   async createTransport() {
@@ -102,9 +108,9 @@ class LedgerSignerZemu extends LedgerSigner {
 
   async closeTransport() {
     if (this.app === null || this.app === undefined) {
-      console.log("transport already closed");
+      console.log('transport already closed');
     } else {
-      console.log("close transport now");
+      console.log('close transport now');
       await this.sim.close();
       this.app = null;
     }
@@ -117,24 +123,24 @@ class LedgerSignerZemu extends LedgerSigner {
       throw new Error('Not signed in');
     }
 
-    console.log("message in sign function:", message);
+    console.log('message in sign function:', message);
 
     const signatureRequest = this.app.sign(this.path, message.toUint8Array());
     await Zemu.default.sleep(SLEEP_MS);
 
-    for (var i=0; i< this.click_times; i++) {
+    for (var i = 0; i < this.click_times; i++) {
       await Zemu.default.sleep(100);
-      console.log("right click");
+      console.log('right click');
       await this.sim.clickRight();
     }
-    console.log("click both");
+    console.log('click both');
     await this.sim.clickBoth();
     let response = await signatureRequest;
 
     if (response.error_message !== 'No errors') {
       throw new Error(`[${response.error_message}] ${response.error_message}`);
     }
-    console.log("sign response:", response);
+    console.log('sign response:', response);
 
     // Ledger has encoded the sig in ASN1 DER format, but we need a 64-byte buffer of <r,s>
     // DER-encoded signature from Ledger:
@@ -176,7 +182,6 @@ class LedgerSignerZemu extends LedgerSigner {
     await this.closeTransport();
     return bytes;
   }
-
 }
 
 export class LedgerWalletSignerProviderZemu implements ISignerProvider {
@@ -203,6 +208,25 @@ export class LedgerWalletSignerProviderZemu implements ISignerProvider {
     await this.provider.closeTransport();
     return result;
   }
+
+  // TODO: add zemu test
+  public async signEthTx(
+    _index: number,
+    _chainId: number,
+    _nonce: number,
+    _gasLimit: string,
+    _gasPrice: string,
+    _to: string,
+    _value: string,
+    _data: string,
+  ): Promise<string> {
+    return '';
+  }
+
+  // TODO: add zemu test
+  public async getEthAddress(_index: number): Promise<string> {
+    return '';
+  }
 }
 
 async function main() {
@@ -210,43 +234,39 @@ async function main() {
   await signerProvider.provider.initChain();
   await Zemu.default.sleep(SLEEP_MS);
   const walletConfig = CustomDevNet;
-  walletConfig.nodeUrl = "http://127.0.0.1";
-  const signer = new LedgerTransactionSigner(
-      walletConfig,
-      signerProvider,
-      0,
-  );
+  walletConfig.nodeUrl = 'http://127.0.0.1';
+  const signer = new LedgerTransactionSigner(walletConfig, signerProvider, 0);
   console.log(signer);
 
-  const phrase = "";
+  const phrase = '';
   signerProvider.provider.setClickTimes(7);
   const ledgerAddress = 'cro1tzhdkuc328cgh2hycyfddtdpqfwwu42yq3qgkr';
   const nodeRpc = await NodeRpcService.init(walletConfig.nodeUrl);
   await Zemu.default.sleep(SLEEP_MS);
-  const accountNumber =  await nodeRpc.fetchAccountNumber(ledgerAddress);
-  console.log("get account number ", accountNumber);
+  const accountNumber = await nodeRpc.fetchAccountNumber(ledgerAddress);
+  console.log('get account number ', accountNumber);
   const accountSequence = await nodeRpc.loadSequenceNumber(ledgerAddress);
-  console.log("get account sequence ", accountSequence);
+  console.log('get account sequence ', accountSequence);
   const signedTxHex = await signer.signTransfer(
-      {
-        accountNumber: accountNumber,
-        accountSequence: accountSequence,
-        amount: '100000000',
-        fromAddress: ledgerAddress,
-        memo: '',
-        toAddress: 'cro1sza72v70tm9l38h6uxhwgra5eg33xd4jr3ujl7',
-      },
-      phrase,
+    {
+      accountNumber: accountNumber,
+      accountSequence: accountSequence,
+      amount: '100000000',
+      fromAddress: ledgerAddress,
+      memo: '',
+      toAddress: 'cro1sza72v70tm9l38h6uxhwgra5eg33xd4jr3ujl7',
+    },
+    phrase,
   );
-  console.log("broadcast transaction");
+  console.log('broadcast transaction');
   console.log(signedTxHex);
   const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-  console.log("broadCast result:", broadCastResult);
-  await Zemu.default.sleep(SLEEP_MS*3);
-  console.log("get sender's balance")
-  const senderBalance = await nodeRpc.loadAccountBalance(ledgerAddress, "basecro");
+  console.log('broadCast result:', broadCastResult);
+  await Zemu.default.sleep(SLEEP_MS * 3);
+  console.log("get sender's balance");
+  const senderBalance = await nodeRpc.loadAccountBalance(ledgerAddress, 'basecro');
   console.log("sender's balance:", senderBalance);
-  chai.assert.notEqual(senderBalance,"10000000000000000");
+  chai.assert.notEqual(senderBalance, '10000000000000000');
 }
 
 function afterFinish() {
