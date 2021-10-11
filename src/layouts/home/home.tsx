@@ -137,6 +137,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isLedgerCreateAssetErrorModalVisible, setIsLedgerCreateAssetErrorModalVisible] = useState(
     false,
   );
+  const [isLedgerModalButtonLoading, setIsLedgerModalButtonLoading] = useState(false);
 
   const didMountRef = useRef(false);
   const currentLocationPath = useLocation().pathname;
@@ -273,6 +274,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
       setIsLedgerCroAppConnectModalVisible(false);
       setIsLedgerCroAppConnected(false);
+      setIsLedgerModalButtonLoading(false);
       setIsLedgerEthAppConnectModalVisible(true);
     } catch (e) {
       let message = `${t('create.notification.ledger.message1')}`;
@@ -284,11 +286,12 @@ function HomeLayout(props: HomeLayoutProps) {
         }
       }
 
-      setIsLedgerCroAppConnected(false);
       await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
+      setIsLedgerCroAppConnected(false);
       setIsLedgerCroAppConnectModalVisible(false);
+      setIsLedgerModalButtonLoading(false);
 
       notification.error({
         message,
@@ -313,8 +316,9 @@ function HomeLayout(props: HomeLayoutProps) {
         setTimeout(resolve, 2000);
       });
 
-      setIsLedgerEthAppConnectModalVisible(false);
       setIsLedgerEthAppConnected(false);
+      setIsLedgerEthAppConnectModalVisible(false);
+      setIsLedgerModalButtonLoading(false);
 
       hwok = true;
     } catch (e) {
@@ -332,6 +336,7 @@ function HomeLayout(props: HomeLayoutProps) {
         setTimeout(resolve, 2000);
       });
       setIsLedgerEthAppConnectModalVisible(false);
+      setIsLedgerModalButtonLoading(false);
 
       notification.error({
         message,
@@ -1065,7 +1070,9 @@ function HomeLayout(props: HomeLayoutProps) {
                 className="btn-restart"
                 onClick={() => {
                   checkIsLedgerCroAppConnected(session);
+                  setIsLedgerModalButtonLoading(true);
                 }}
+                loading={isLedgerModalButtonLoading}
                 // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 Continue
@@ -1103,7 +1110,9 @@ function HomeLayout(props: HomeLayoutProps) {
                 className="btn-restart"
                 onClick={() => {
                   checkIsLedgerEthAppConnected(session);
+                  setIsLedgerModalButtonLoading(true);
                 }}
+                loading={isLedgerModalButtonLoading}
                 // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 Continue
