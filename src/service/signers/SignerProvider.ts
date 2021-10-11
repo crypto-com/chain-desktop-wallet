@@ -17,5 +17,5 @@ export interface ISignerProvider {
     value: string,
     data: string,
   ): Promise<string>;
-  getEthAddress(index: number): Promise<string>;
+  getEthAddress(index: number, display: boolean): Promise<string>;
 }
