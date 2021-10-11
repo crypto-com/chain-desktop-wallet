@@ -620,6 +620,9 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/assets" icon={<Icon component={IconAssets} />}>
           <Link to="/assets">{t('navbar.assets')}</Link>
         </Menu.Item>
+        <Menu.Item key="/bridge" icon={<Icon component={IconCronos} />}>
+          <Link to="/bridge">Cronos Bridge</Link>
+        </Menu.Item>
         {/* <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">{t('navbar.send')}</Link>
         </Menu.Item>
@@ -631,9 +634,6 @@ function HomeLayout(props: HomeLayoutProps) {
         </Menu.Item>
         <Menu.Item key="/nft" icon={<Icon component={IconNft} />}>
           <Link to="/nft">{t('navbar.nft')}</Link>
-        </Menu.Item>
-        <Menu.Item key="/bridge" icon={<Icon component={IconCronos} />}>
-          <Link to="/bridge">Cronos Bridge</Link>
         </Menu.Item>
         <Menu.Item key="/settings" icon={<SettingOutlined />}>
           <Link to="/settings">{t('navbar.settings')}</Link>
@@ -1032,8 +1032,8 @@ function HomeLayout(props: HomeLayoutProps) {
           }}
           title={
             isLedgerCroAppConnected
-              ? t('home.ledgerModalPopup.croAsset.title1')
-              : t('home.ledgerModalPopup.croAsset.title2')
+              ? t('home.ledgerModalPopup.tendermintAsset.title1')
+              : t('home.ledgerModalPopup.tendermintAsset.title2')
           }
           footer={[
             isLedgerCroAppConnected ? (
@@ -1058,8 +1058,8 @@ function HomeLayout(props: HomeLayoutProps) {
         >
           <div className="description">
             {isLedgerCroAppConnected
-              ? t('home.ledgerModalPopup.croAsset.description1')
-              : t('home.ledgerModalPopup.croAsset.description2')}
+              ? t('home.ledgerModalPopup.tendermintAsset.description1')
+              : t('home.ledgerModalPopup.tendermintAsset.description2')}
           </div>
         </LedgerModalPopup>
         <LedgerModalPopup

@@ -59,7 +59,9 @@ import {
 } from '../../utils/NumberUtils';
 import { SUPPORTED_BRIDGE, SupportedBridge } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
-import iconImgSvg from '../../assets/icon-cronos-blue.svg';
+
+import iconCronosSvg from '../../assets/icon-cronos-blue.svg';
+import iconCroSvg from '../../assets/icon-cro.svg';
 import IconHexagon from '../../svg/IconHexagon';
 import IconTransferHistory from '../../svg/IconTransferHistory';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
@@ -90,14 +92,21 @@ const tailLayout = {
 };
 const customDot = () => <Icon component={IconHexagon} />;
 
-const bridgeIcon = bridge => {
-  return (
-    <img
-      src={SUPPORTED_BRIDGE.get(bridge)?.icon}
-      alt={SUPPORTED_BRIDGE.get(bridge)?.value}
-      className="asset-icon"
-    />
-  );
+const bridgeIcon = (bridgeValue: string | undefined) => {
+  let icon = iconCroSvg;
+
+  switch (bridgeValue) {
+    case 'CRYPTO_ORG':
+      icon = iconCronosSvg;
+      break;
+    case 'CRONOS':
+      icon = iconCroSvg;
+      break;
+    default:
+      break;
+  }
+
+  return <img src={icon} alt={bridgeValue} className="asset-icon" />;
 };
 
 const cronosBridgeFee = '0';
@@ -339,7 +348,6 @@ const CronosBridgeForm = props => {
       bridgeTo: values.bridgeTo,
       amount: values.amount,
     });
-    showPasswordInput();
   };
 
   return (
@@ -378,7 +386,8 @@ const CronosBridgeForm = props => {
             {supportedBridges.map(bridge => {
               return (
                 <Option value={bridge.value} key={bridge.value}>
-                  <img src={bridge.icon} alt={bridge.value} className="asset-icon" />
+                  {/* <img src={bridge.icon} alt={bridge.value} className="asset-icon" /> */}
+                  {bridgeIcon(bridge.value)}
                   {`${bridge.label}`}
                 </Option>
               );
@@ -459,7 +468,8 @@ const CronosBridgeForm = props => {
             {supportedBridges.map(bridge => {
               return (
                 <Option value={bridge.value} key={bridge.value}>
-                  <img src={bridge.icon} alt={bridge.value} className="asset-icon" />
+                  {/* <img src={bridge.icon} alt={bridge.value} className="asset-icon" /> */}
+                  {bridgeIcon(bridge.value)}
                   {`${bridge.label}`}
                 </Option>
               );
@@ -558,7 +568,14 @@ const CronosBridgeForm = props => {
       )}
 
       <Form.Item {...tailLayout} className="button">
-        <Button type="primary" htmlType="submit" loading={isButtonLoading}>
+        <Button
+          type="primary"
+          htmlType="submit"
+          loading={isButtonLoading}
+          onClick={() => {
+            showPasswordInput();
+          }}
+        >
           Transfer Asset
         </Button>
       </Form.Item>
@@ -814,8 +831,8 @@ const CronosBridge = () => {
                 <Divider />
                 <div className="block flex-row">
                   <Layout>
-                    <Sider width="50px">
-                      <img src={bridgeFromObj?.icon} alt={bridgeFromObj?.value} />
+                    <Sider width="50px" className="bridge-from">
+                      {bridgeIcon(bridgeFromObj?.value)}
                     </Sider>
                     <Content>
                       <div>From</div>
@@ -824,8 +841,8 @@ const CronosBridge = () => {
                   </Layout>
                   <ArrowRightOutlined style={{ fontSize: '24px', width: '50px' }} />
                   <Layout>
-                    <Sider width="50px">
-                      <img src={bridgeToObj?.icon} alt={bridgeToObj?.value} />
+                    <Sider width="50px" className="bridge-to">
+                      {bridgeIcon(bridgeToObj?.value)}
                     </Sider>
                     <Content>
                       <div>To</div>
@@ -1143,7 +1160,7 @@ const CronosBridge = () => {
             </ModalPopup>
           </div>
           <div>
-            <img src={iconImgSvg} alt="cronos" />
+            <img src={iconCronosSvg} alt="cronos" />
           </div>
         </>
       ) : (
@@ -1299,22 +1316,6 @@ const BridgePage = () => {
   return (
     <Layout className="site-layout bridge-layout">
       <Content>
-        {/* <Tabs defaultActiveKey="1">
-          <TabPane tab="Transfer" key="1">
-            <div className="site-layout-background bridge-content">
-              <div className="container">
-                <CronosBridge />
-              </div>
-            </div>
-          </TabPane>
-          <TabPane tab="History" key="2">
-            <div className="site-layout-background bridge-content">
-              <div className="container">
-                <CronosHistory />
-              </div>
-            </div>
-          </TabPane>
-        </Tabs> */}
         <div className="go-to-transfer-history">
           <a>
             <div>
