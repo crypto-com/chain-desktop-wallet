@@ -33,4 +33,4 @@ jobs:
         # The -a param for a whitelist of non-issues to ignore. E.g is the false positive submission on lodash
         # https://github.com/lodash/lodash/issues/5261
         run: |
-          yarn  audit-ci --high -a 1002475  1002627  1002477  1002522  100259
+          yarn  run-audit
