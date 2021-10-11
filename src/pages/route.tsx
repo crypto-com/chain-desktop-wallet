@@ -19,6 +19,7 @@ import StakingPage from './staking/staking';
 import GovernancePage from './governance/governance';
 import NftPage from './nft/nft';
 import SettingsPage from './settings/settings';
+import BridgePage from './bridge/bridge';
 import SignUpPage from './signup/signup';
 import HomeLayout from '../layouts/home/home';
 import AssetsPage from './assets/assets';
@@ -145,6 +146,12 @@ function RouteHub() {
       key: 'nft',
       path: '/nft',
       component: <NftPage />,
+    },
+    {
+      name: 'Bridge Page',
+      key: 'bridge',
+      path: '/bridge',
+      component: <BridgePage />,
     },
     {
       name: 'Settings Page',

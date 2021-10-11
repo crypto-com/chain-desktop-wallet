@@ -99,12 +99,12 @@
       bottom: 0;
       display: flex;
       align-items: center;
-      height: 40px;
       justify-content: center;
       width: calc(@sider-width - 2 * @sider-padding-lr);
-      border-radius: @border-radius;
+      height: 40px;
       margin: 0;
       margin-bottom: 80px;
+      border-radius: @border-radius;
     }
     .ant-menu-item:hover {
       background: #e4f4ff;
@@ -128,6 +128,12 @@
     background: @white;
     border-radius: @border-radius;
     box-shadow: 2px 0 12px 2px rgba(11, 20, 38, 0.05);
+  }
+  &.center-layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
   }
 }
 .home-page {

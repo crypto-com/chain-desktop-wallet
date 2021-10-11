@@ -18,6 +18,7 @@ export enum BridgeTransferDirection {
   CRYPTO_ORG_TO_CRONOS = 'CRYPTO_ORG_TO_CRONOS',
   ETH_TO_CRONOS = 'ETH_TO_CRONOS',
   CRONOS_TO_ETH = 'CRONOS_TO_ETH',
+  NOT_SUPPORT = 'NOT_SUPPORT',
 }
 
 export const DefaultTestnetBridgeConfigs = {

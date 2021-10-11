@@ -24,7 +24,8 @@ module.exports = {
     '@typescript-eslint/return-await': 'off',
     'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/*.spec.ts'] }],
     'react-hooks/rules-of-hooks': 'error',
-    'import/no-unresolved': 'off',
+    "import/no-unresolved": "off",
+    'no-return-await': 'off',
     'react-hooks/exhaustive-deps': [
       'off',
       {
