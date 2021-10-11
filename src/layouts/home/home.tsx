@@ -308,7 +308,7 @@ function HomeLayout(props: HomeLayoutProps) {
     try {
       const device: ISignerProvider = createLedgerDevice();
 
-      evmAddress = await device.getEthAddress(walletSession.wallet.addressIndex);
+      evmAddress = await device.getEthAddress(walletSession.wallet.addressIndex, false);
       setLedgerEvmAddress(evmAddress);
       setIsLedgerEthAppConnected(true);
 
