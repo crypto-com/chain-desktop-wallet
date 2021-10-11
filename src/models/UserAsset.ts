@@ -95,11 +95,11 @@ export interface AssetMarketPrice {
   dailyChange: string;
 }
 
-export const scaledAmount = (baseAmount: string, decimals: number) => {
+export const scaledAmount = (baseAmount: string = '0', decimals: number) => {
   return getUINormalScaleAmount(baseAmount, decimals);
 };
 
-export const scaledAmountByAsset = (baseAmount: string, asset: UserAsset) => {
+export const scaledAmountByAsset = (baseAmount: string = '0', asset: UserAsset) => {
   return getUINormalScaleAmount(baseAmount, asset.decimals);
 };
 
@@ -120,10 +120,10 @@ export const scaledRewardBalance = (asset: UserAsset) => {
 };
 
 export const scaledTotalBalance = (asset: UserAsset) => {
-  const totalBalance = Big(asset.balance)
-    .add(asset.stakedBalance)
-    .add(asset.unbondingBalance)
-    .add(asset.rewardsBalance)
+  const totalBalance = Big(asset.balance ?? '0')
+    .add(asset.stakedBalance ?? '0')
+    .add(asset.unbondingBalance ?? '0')
+    .add(asset.rewardsBalance ?? '0')
     .toFixed(2);
   return getUINormalScaleAmount(totalBalance, asset.decimals);
 };
