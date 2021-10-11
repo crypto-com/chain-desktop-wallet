@@ -378,20 +378,20 @@ function HomeLayout(props: HomeLayoutProps) {
             }}
             style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
           >
-            Enable
+            {t('home.createNewAsset.enable')}
           </Button>
         );
 
         notification.info({
-          message: 'New Assets Available',
-          description: 'Do you want to enable the newly added assets ?',
-          duration: 15,
+          message: t('home.createNewAsset.notification.message'),
+          description: t('home.createNewAsset.notification.description'),
+          duration: 60,
           key: newAssetAddedNotificationKey,
           placement: 'topRight',
           btn: createNewlyAddedAssets,
         });
       }
-    }, 15_000);
+    }, 1000);
   };
 
   const checkCorrectExplorerUrl = (walletSession?: Session) => {
@@ -984,16 +984,6 @@ function HomeLayout(props: HomeLayoutProps) {
             setIsLedgerCreateAssetSuccessModalVisible(false);
           }}
           title={t('general.successModalPopup.title')}
-          // button={
-          //   <Button
-          //     type="primary"
-          //     htmlType="submit"
-          //     // disabled={props.isCreateDisable}
-          //     // loading={createLoading}
-          //   >
-          //     {t('general.successModalPopup.createWallet.button')}
-          //   </Button>
-          // }
           button={null}
           footer={[
             <Button
@@ -1032,21 +1022,6 @@ function HomeLayout(props: HomeLayoutProps) {
             </div>
           </>
         </ErrorModalPopup>
-
-        {/* <ModalPopup
-          title="Connect your Ledger"
-          isModalVisible={isLedgerEthAppConnectModalVisible}
-          handleOk={() => { 
-            setIsLedgerEthAppConnectModalVisible(false) 
-            setIsLedgerWaitFlag(false)
-          }}
-          handleCancel={() => { setIsLedgerEthAppConnectModalVisible(false) }}
-          className="success-popup"
-          style={{ textAlign: 'left' }}
-        // cancelButtonProps={{ style: { display: 'none' } }}
-        >
-          <p>You need your Ethereum App opened on your Ledger device to proceed.</p>
-        </ModalPopup> */}
         <LedgerModalPopup
           isModalVisible={isLedgerCroAppConnectModalVisible}
           handleCancel={() => {
@@ -1057,8 +1032,8 @@ function HomeLayout(props: HomeLayoutProps) {
           }}
           title={
             isLedgerCroAppConnected
-              ? t('create.ledgerModalPopup.title1')
-              : t('create.ledgerModalPopup.title2')
+              ? t('home.ledgerModalPopup.croAsset.title1')
+              : t('home.ledgerModalPopup.croAsset.title2')
           }
           footer={[
             isLedgerCroAppConnected ? (
@@ -1075,7 +1050,7 @@ function HomeLayout(props: HomeLayoutProps) {
                 loading={isLedgerModalButtonLoading}
                 // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
-                Continue
+                {t('general.connect')}
               </Button>
             ),
           ]}
@@ -1083,8 +1058,8 @@ function HomeLayout(props: HomeLayoutProps) {
         >
           <div className="description">
             {isLedgerCroAppConnected
-              ? t('create.ledgerModalPopup.description1')
-              : t('create.ledgerModalPopup.description2')}
+              ? t('home.ledgerModalPopup.croAsset.description1')
+              : t('home.ledgerModalPopup.croAsset.description2')}
           </div>
         </LedgerModalPopup>
         <LedgerModalPopup
@@ -1097,8 +1072,8 @@ function HomeLayout(props: HomeLayoutProps) {
           }}
           title={
             isLedgerEthAppConnected
-              ? t('create.ledgerModalPopup.title1')
-              : t('create.ledgerModalPopup.title2')
+              ? t('home.ledgerModalPopup.evmAsset.title1')
+              : t('home.ledgerModalPopup.evmAsset.title2')
           }
           footer={[
             isLedgerEthAppConnected ? (
@@ -1115,7 +1090,7 @@ function HomeLayout(props: HomeLayoutProps) {
                 loading={isLedgerModalButtonLoading}
                 // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
-                Continue
+                {t('general.connect')}
               </Button>
             ),
           ]}
@@ -1123,8 +1098,8 @@ function HomeLayout(props: HomeLayoutProps) {
         >
           <div className="description">
             {isLedgerEthAppConnected
-              ? t('create.ledgerModalPopup.description1')
-              : t('create.ledgerModalPopup.description2')}
+              ? t('home.ledgerModalPopup.evmAsset.description1')
+              : t('home.ledgerModalPopup.evmAsset.description2')}
           </div>
         </LedgerModalPopup>
       </Layout>

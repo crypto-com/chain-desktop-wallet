@@ -223,7 +223,8 @@
       },
       "welcome": {
         "slogan": "Our Sample Chain Wallet supports wallet management and funds transfer.",
-        "button": "Get Started"
+        "button": "Get Started",
+        "block": "This product is currently unavailable in your country or region."
       },
       "signup": {
         "title": "App Password Created Successfully",
@@ -482,6 +483,27 @@
             "description": "Update downloaded successfully. It will be installed on restart.",
             "button": "Restart Now"
           }
+        },
+        "createNewAsset": {
+          "enable": "Enable",
+          "notification": {
+            "message": "New Assets Available",
+            "description": "Do you want to enable the newly added assets?"
+          }
+        },
+        "ledgerModalPopup": {
+          "tendermintAsset": {
+            "title1": "Success!",
+            "title2": "Connect your Ledger Device",
+            "description1": "Your Ledger device has been connected successfully.",
+            "description2": "Please confirm connection by opening Crypto.org App on your Ledger Device"
+          },
+          "evmAsset": {
+            "title1": "Success!",
+            "title2": "Connect your Ledger Device",
+            "description1": "Your Ledger device has been connected successfully.",
+            "description2": "Please confirm connection by opening Ethereum App on your Ledger Device"
+          }
         }
       },
       "send": {
@@ -676,6 +698,7 @@
         "description": "An overview of your NFT Collection on Crypto.org Chain.",
         "tab1": "NFT Collection",
         "tab2": "Mint NFT",
+        "tab3": "Receive NFT",
         "container": {
           "description": "Mint your NFT with Image or Video on Crypto.org chain."
         },
@@ -1364,6 +1387,27 @@
             "description": "成功下載更新，重啟程式以完成安裝。",
             "button": "現在重啟程式"
           }
+        },
+        "createNewAsset": {
+          "enable": "加入",
+          "notification": {
+            "message": "已新增可支援代幣",
+            "description": "你想加入新支援的代幣到錢包嗎？"
+          }
+        },
+        "ledgerModalPopup": {
+          "tendermintAsset": {
+            "title1": "成功！",
+            "title2": "連接你的Ledger 錢包",
+            "description1": "你的Ledger錢包已經成功連接。",
+            "description2": "請在Ledger錢包上打開 Crypto.org App 再確認連接"
+          },
+          "evmAsset": {
+            "title1": "成功！",
+            "title2": "連接你的Ledger 錢包",
+            "description1": "你的Ledger錢包已經成功連接。",
+            "description2": "請在Ledger錢包上打開 Ethereum App 再確認連接"
+          }
         }
       },
       "send": {
@@ -1558,6 +1602,7 @@
         "description": "你在 Crypto.org 鏈上收藏的 NFT 概覽",
         "tab1": "NFT 收藏",
         "tab2": "鑄造 NFT ",
+        "tab3": "接收 NFT",
         "container": {
           "description": "在 Crypto.org 鏈上以圖片或影片鑄造你的專屬 NFT "
         },
@@ -2245,6 +2290,27 @@
             "description": "成功下载更新，重启程序以完成安装。",
             "button": "现在重启程序"
           }
+        },
+        "createNewAsset": {
+          "enable": "加入",
+          "notification": {
+            "message": "已新增可支持代币",
+            "description": "你想加入新支持的代币到钱包吗？"
+          }
+        },
+        "ledgerModalPopup": {
+          "tendermintAsset": {
+            "title1": "成功！",
+            "title2": "连接你的Ledger 钱包",
+            "description1": "你的Ledger钱包已经成功连接。",
+            "description2": "请在Ledger钱包上打开 Crypto.org App 再确认连接"
+          },
+          "evmAsset": {
+            "title1": "成功！",
+            "title2": "连接你的Ledger 钱包",
+            "description1": "你的Ledger钱包已经成功连接。",
+            "description2": "请在Ledger钱包上打开 Ethereum App 再确认连接"
+          }
         }
       },
       "send": {
@@ -2439,6 +2505,7 @@
         "description": "你在 Crypto.org 链上收藏的 NFT 概览",
         "tab1": "NFT 收藏",
         "tab2": "铸造 NFT",
+        "tab3": "接收 NFT",
         "container": {
           "description": "在Crypto.org 链上以图片或视频铸造你的专属 NFT"
         },
@@ -3253,6 +3320,23 @@
             "description": "업데이트가 성공적으로 다운로드되었습니다. 다시 시작하면 설치됩니다.",
             "button": "지금 재시작합니다"
           }
+        },
+        "createNewAsset": {
+          "enable": "추가"
+        },
+        "ledgerModalPopup": {
+          "tendermintAsset": {
+            "title1": "성공!",
+            "title2": "레져를 연결해주세요",
+            "description1": "레져가 잘 연결되었습니다",
+            "description2": "레져 연결을 확인해주세요"
+          },
+          "evmAsset": {
+            "title1": "성공!",
+            "title2": "레져를 연결해주세요",
+            "description1": "레져가 잘 연결되었습니다",
+            "description2": "레져 연결을 확인해주세요"
+          }
         }
       },
       "send": {
@@ -3446,6 +3530,7 @@
         "description": "Crypto.org Chain의 NFT 컬렉션에 대한 개요",
         "tab1": "NFT 컬렉션",
         "tab2": "NFT 발행",
+        "tab3": "수신 NFT",
         "container": {
           "description": "Crypto.org 체인에서 이미지 또는 비디오로 NFT를 발행하세요"
         },
