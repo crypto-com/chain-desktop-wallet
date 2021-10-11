@@ -9,8 +9,9 @@ export const STATIC_ASSET_COUNT = 2;
 
 const checkIfTestnet = (network: Network) => {
   return (
-    [CroNetwork.TestnetCroeseid3, CroNetwork.Testnet].includes(network) ||
-    network.defaultNodeUrl.includes('testnet')
+    [CroNetwork.TestnetCroeseid3, CroNetwork.TestnetCroeseid4, CroNetwork.Testnet].includes(
+      network,
+    ) || network.defaultNodeUrl.includes('testnet')
   );
 };
 
@@ -38,7 +39,7 @@ export const CRO_ASSET = (walletConfig: WalletConfig) => {
     icon_url:
       'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c1248c15568a4017c20aa87/cro.png',
     identifier: getRandomId(),
-    name: 'Crypto.org Coin',
+    name: 'Crypto.org Chain',
     symbol: assetSymbol,
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
@@ -79,7 +80,7 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
     icon_url:
       'https://firebasestorage.googleapis.com/v0/b/chain-desktop-wallet.appspot.com/o/cronos_logo.png?alt=media&token=781c48a3-e89e-4dd4-87d3-d1a1b8e2e456',
     identifier: getRandomId(),
-    name: 'Cronos Coin',
+    name: 'Cronos Chain',
     symbol: 'CRONOS',
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',

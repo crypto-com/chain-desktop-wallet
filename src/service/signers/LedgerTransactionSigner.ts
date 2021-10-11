@@ -1,12 +1,8 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
-import sdk from '@crypto-org-chain/chain-jslib';
 import { CosmosMsg } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/msg/cosmosMsg';
+import Long from 'long';
 import { Big, Units } from '../../utils/ChainJsLib';
-import {
-  FIXED_DEFAULT_FEE,
-  FIXED_DEFAULT_GAS_LIMIT,
-  WalletConfig,
-} from '../../config/StaticConfig';
+import { WalletConfig } from '../../config/StaticConfig';
 import {
   TransactionUnsigned,
   DelegateTransactionUnsigned,
@@ -18,11 +14,12 @@ import {
   NFTTransferUnsigned,
   NFTMintUnsigned,
   NFTDenomIssueUnsigned,
+  BridgeTransactionUnsigned,
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
-import { ITransactionSigner } from './TransactionSigner';
+import { BaseTransactionSigner, ITransactionSigner } from './TransactionSigner';
 
-export class LedgerTransactionSigner implements ITransactionSigner {
+export class LedgerTransactionSigner extends BaseTransactionSigner implements ITransactionSigner {
   public readonly config: WalletConfig;
 
   public readonly signerProvider: ISignerProvider;
@@ -30,26 +27,10 @@ export class LedgerTransactionSigner implements ITransactionSigner {
   public readonly addressIndex: number;
 
   constructor(config: WalletConfig, signerProvider: ISignerProvider, addressIndex: number) {
+    super(config);
     this.config = config;
     this.signerProvider = signerProvider;
     this.addressIndex = addressIndex;
-  }
-
-  public getTransactionInfo(_phrase: string, transaction: TransactionUnsigned) {
-    const cro = sdk.CroSDK({ network: this.config.network });
-    const rawTx = new cro.RawTransaction();
-    rawTx.setMemo(transaction.memo);
-
-    const networkFee =
-      this.config.fee !== undefined ? this.config.fee.networkFee : FIXED_DEFAULT_FEE;
-    const gasLimit =
-      this.config.fee !== undefined ? this.config.fee.gasLimit : FIXED_DEFAULT_GAS_LIMIT;
-
-    const fee = new cro.Coin(networkFee, Units.BASE);
-
-    rawTx.setFee(fee);
-    rawTx.setGasLimit(gasLimit);
-    return { cro, rawTx };
   }
 
   public async signTransfer(
@@ -214,5 +195,26 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       .setSignature(0, signature)
       .toSigned()
       .getHexEncoded();
+  }
+
+  public async signIBCTransfer(
+    transaction: BridgeTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const { cro, rawTx } = this.getTransactionInfoData(phrase, transaction.memo);
+
+    const millisToNanoSecond = 1_000_000;
+    const timeout = (Date.now() + 60_000) * millisToNanoSecond;
+
+    const msgSend = new cro.ibc.MsgTransfer({
+      sender: transaction.fromAddress,
+      sourceChannel: transaction.channel || '',
+      sourcePort: transaction.port || '',
+      timeoutTimestampInNanoSeconds: Long.fromValue(timeout),
+      receiver: transaction.toAddress,
+      token: new cro.Coin(transaction.amount, Units.BASE),
+    });
+
+    return this.getSignedMessageTransaction(transaction, msgSend, rawTx);
   }
 }
