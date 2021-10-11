@@ -29,12 +29,8 @@ jobs:
           yarn install --network-timeout 600000
 
       - name: Audit dependencies
-        #  1 for INFO
-        #  2 for LOW
-        #  4 for MODERATE
-        #  8 for HIGH
-        #  16 for CRITICAL
-        # Only high and critical vulnerabilities should be accounted for
-        # https://github.com/yarnpkg/yarn/issues/7260
+        # Now using the audit tool from IBM which provides more advanced configurability
+        # The -a param for a whitelist of non-issues to ignore. E.g is the false positive submission on lodash
+        # https://github.com/lodash/lodash/issues/5261
         run: |
-          /bin/bash -c 'yarn audit --level high; [[ $? -ge 8 ]] && exit 1 || exit 0'
+          yarn  audit-ci --high -a 1002475  1002627  1002477  1002522  100259
