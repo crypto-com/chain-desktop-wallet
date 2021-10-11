@@ -697,10 +697,9 @@ const CronosBridge = () => {
               data-original={sendResult.transactionHash}
               target="_blank"
               rel="noreferrer"
-              href={`${renderExplorerUrl(
-                session.activeAsset?.config ?? session.wallet.config,
-                'tx',
-              )}/${sendResult.transactionHash}`}
+              href={`${renderExplorerUrl(currentAsset?.config ?? session.wallet.config, 'tx')}/${
+                sendResult.transactionHash
+              }`}
             >
               {middleEllipsis(sendResult.transactionHash!, 6)}
             </a>
@@ -939,15 +938,18 @@ const CronosBridge = () => {
               )}
             />
             {broadcastResult.transactionHash !== undefined ? (
-              <Button
-                key="submit"
-                type="primary"
-                // loading={isButtonLoading}
-                // onClick={onConfirmation}
-                // hidden={isConfirmClearVisible}
-                // disabled={isButtonDisabled}
-              >
-                View Transaction
+              <Button key="submit" type="primary">
+                <a
+                  data-original={broadcastResult.transactionHash}
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${renderExplorerUrl(
+                    currentAsset?.config ?? session.wallet.config,
+                    'tx',
+                  )}/${broadcastResult.transactionHash}`}
+                >
+                  View Transaction
+                </a>
               </Button>
             ) : (
               <></>
