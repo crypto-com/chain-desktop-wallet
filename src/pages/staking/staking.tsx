@@ -124,6 +124,7 @@ const FormDelegationRequest = () => {
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
@@ -441,6 +442,7 @@ const FormDelegationRequest = () => {
 
   const assetMarketData = allMarketData[`${walletAsset.mainnetSymbol}-${currentSession.currency}`];
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol;
+  const undelegatePeriod = currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
 
   return (
     <Form
@@ -589,6 +591,7 @@ const FormDelegationRequest = () => {
             <Button
               key="submit"
               type="primary"
+              disabled={!isChecked}
               loading={confirmLoading}
               onClick={onConfirmDelegation}
             >
@@ -632,6 +635,13 @@ const FormDelegationRequest = () => {
             ) : (
               <div />
             )}
+            <div className="item">
+              <Checkbox checked={isChecked} onChange={() => setIsChecked(!isChecked)}>
+                {t('general.undelegateFormComponent.checkbox1', {
+                  unbondingPeriod: undelegatePeriod,
+                })}
+              </Checkbox>
+            </div>
           </>
         </ModalPopup>
         <PasswordFormModal
@@ -721,6 +731,7 @@ const FormDelegationOperations = () => {
     validatorAddress: '',
     undelegateAmount: '',
   });
+  const [isUndelegateDisclaimerChecked, setIsUndelegateDisclaimerChecked] = useState(false);
   const [redelegateFormValues, setRedelegateFormValues] = useState({
     validatorOriginAddress: '',
     validatorDestinationAddress: '',
@@ -1005,6 +1016,10 @@ const FormDelegationOperations = () => {
               type="primary"
               loading={confirmLoading}
               onClick={onConfirmDelegationAction}
+              disabled={
+                delegationActionType === StakingActionType.UNDELEGATE &&
+                !isUndelegateDisclaimerChecked
+              }
             >
               {t('general.confirm')}
             </Button>,
@@ -1018,6 +1033,8 @@ const FormDelegationOperations = () => {
             <UndelegateFormComponent
               currentSession={currentSession}
               undelegateFormValues={undelegateFormValues}
+              isChecked={isUndelegateDisclaimerChecked}
+              setIsChecked={setIsUndelegateDisclaimerChecked}
               form={form}
             />
           ) : (
