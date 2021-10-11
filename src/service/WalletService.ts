@@ -1118,6 +1118,20 @@ class WalletService extends WalletBaseService {
     }
   }
 
+  public async retrieveWalletAssets(walletIdentifier: string): Promise<UserAsset[]> {
+    const assets = await this.storageService.retrieveAssetsByWallet(walletIdentifier);
+    const userAssets = assets
+      .filter(asset => asset.assetType !== UserAssetType.IBC)
+      .map(data => {
+        const asset: UserAsset = { ...data };
+        return asset;
+      });
+
+    // https://github.com/louischatriot/nedb/issues/185
+    // NeDB does not support distinct queries, it needs to be done programmatically
+    return _.uniqBy(userAssets, 'symbol');
+  }
+
   public async retrieveCurrentWalletAssets(currentSession: Session): Promise<UserAsset[]> {
     const assets = await this.storageService.retrieveAssetsByWallet(
       currentSession.wallet.identifier,
