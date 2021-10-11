@@ -1565,7 +1565,13 @@ class WalletService extends WalletBaseService {
           )[0];
           evmAsset.address = evmAddress;
         } else {
-          throw new Error('Fail to get Ledger addresses.');
+          // eslint-disable-next-line no-console
+          console.log('FAILED_TO_GET_LEDGER_ADDRESSES', {
+            session: currentSession,
+            tendermintAddress,
+            evmAddress,
+          });
+          throw new Error('Failed to get Ledger addresses.');
         }
       }
 

@@ -239,6 +239,7 @@ function HomeLayout(props: HomeLayoutProps) {
     tendermintAddress: string,
     evmAddress: string,
   ) => {
+    setFetchingDB(true);
     try {
       await walletService.handleCurrentWalletAssetsMigration(
         '',
@@ -250,6 +251,7 @@ function HomeLayout(props: HomeLayoutProps) {
     } catch (e) {
       setIsLedgerCreateAssetErrorModalVisible(true);
     }
+    setFetchingDB(false);
   };
 
   const checkIsLedgerCroAppConnected = async (walletSession: Session) => {
@@ -584,6 +586,7 @@ function HomeLayout(props: HomeLayoutProps) {
     );
 
     await walletService.handleCurrentWalletAssetsMigration(phraseDecrypted, session);
+
     setFetchingDB(false);
   };
 
