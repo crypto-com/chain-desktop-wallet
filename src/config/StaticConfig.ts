@@ -1,6 +1,4 @@
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
-import iconCronosSvg from '../assets/icon-cronos-blue.svg';
-import iconCroSvg from '../assets/icon-cro.svg';
 
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
@@ -15,54 +13,76 @@ export const CLOUDFLARE_TRACE_URI = 'https://www.cloudflare.com/cdn-cgi/trace';
 // For instance :
 export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
 
-// Reference: Google Sheet : Foris Markets Table - 4 October 2021 
+// Reference: Google Sheet : Foris Markets Table - 4 October 2021
 export const COUNTRY_CODES_TO_BLOCK = [
   // Afghanistan
-  'AF', 'AFG',
+  'AF',
+  'AFG',
   // Burma(Myanmar)
-  'MM', 'MMR',
+  'MM',
+  'MMR',
   // Burundi
-  'BI', 'BDI',
+  'BI',
+  'BDI',
   // Central African Republic
-  'CF', 'CAF',
+  'CF',
+  'CAF',
   // Congo, Dem. Rep.
-  'CD', 'COD',
+  'CD',
+  'COD',
   // Cuba
-  'CU', 'CUB',
+  'CU',
+  'CUB',
   // Eritrea
-  'ER', 'ERI',
+  'ER',
+  'ERI',
   // Guinea-Bissau
-  'GW', 'GNB',
+  'GW',
+  'GNB',
   // Guinea, Republic of
-  'GN', 'GIN',
+  'GN',
+  'GIN',
   // Iran
-  'IR', 'IRN',
+  'IR',
+  'IRN',
   // Iraq
-  'IQ', 'IRQ',
+  'IQ',
+  'IRQ',
   // North Korea
-  'KP', 'PRK',
+  'KP',
+  'PRK',
   // Lebanon
-  'LB', 'LBN',
+  'LB',
+  'LBN',
   // Libya
-  'LY', 'LBY',
+  'LY',
+  'LBY',
   // Mali
-  'ML', 'MLI',
+  'ML',
+  'MLI',
   // Somalia
-  'SO', 'SOM',
+  'SO',
+  'SOM',
   // South Sudan
-  'SS', 'SSD',
+  'SS',
+  'SSD',
   // Sudan
-  'SD', 'SDN',
+  'SD',
+  'SDN',
   // Syria
-  'SY','SYR',
+  'SY',
+  'SYR',
   // Venezuela
-  'VE', 'VEN',
+  'VE',
+  'VEN',
   // Yemen
-  'YE', 'YEM',
+  'YE',
+  'YEM',
   // Zimbabwe
-  'ZW', 'ZWE',
+  'ZW',
+  'ZWE',
   // Unidentified Countries
-  NOT_KNOWN_YET_VALUE
+  NOT_KNOWN_YET_VALUE,
 ];
 
 export const NodePorts = {
@@ -125,15 +145,13 @@ SUPPORTED_CURRENCY.set('TRY', { value: 'TRY', label: 'TRY - ₺', symbol: '₺' 
 export interface SupportedBridge {
   value: string;
   label: string;
-  icon: string;
 }
 
 export const SUPPORTED_BRIDGE = new Map<string, SupportedBridge>();
-SUPPORTED_BRIDGE.set('CRONOS', { value: 'CRONOS', label: 'Cronos Chain', icon: iconCronosSvg });
+SUPPORTED_BRIDGE.set('CRONOS', { value: 'CRONOS', label: 'Cronos Chain' });
 SUPPORTED_BRIDGE.set('CRYPTO_ORG', {
   value: 'CRYPTO_ORG',
   label: 'Crypto.org Chain',
-  icon: iconCroSvg,
 });
 
 export type WalletConfig = {
