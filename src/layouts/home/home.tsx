@@ -48,6 +48,7 @@ import IconHome from '../../svg/IconHome';
 import IconAssets from '../../svg/IconAssets';
 import IconStaking from '../../svg/IconStaking';
 import IconNft from '../../svg/IconNft';
+import IconCronos from '../../svg/IconCronos';
 import IconWallet from '../../svg/IconWallet';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -77,6 +78,7 @@ const allPaths = [
   '/settings',
   '/governance',
   '/nft',
+  '/bridge',
   '/wallet',
 ];
 
@@ -415,6 +417,9 @@ function HomeLayout(props: HomeLayoutProps) {
         </Menu.Item>
         <Menu.Item key="/nft" icon={<Icon component={IconNft} />}>
           <Link to="/nft">{t('navbar.nft')}</Link>
+        </Menu.Item>
+        <Menu.Item key="/bridge" icon={<Icon component={IconCronos} />}>
+          <Link to="/bridge">Cronos Bridge</Link>
         </Menu.Item>
         <Menu.Item key="/settings" icon={<SettingOutlined />}>
           <Link to="/settings">{t('navbar.settings')}</Link>

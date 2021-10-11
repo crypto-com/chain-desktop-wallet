@@ -27,6 +27,11 @@ import {
   ValidatorList,
 } from '../models/Transaction';
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../config/StaticConfig';
+import {
+  BridgeConfig,
+  BridgeNetworkConfigType,
+  BridgeTransferDirection,
+} from '../service/bridge/BridgeConfig';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -189,6 +194,35 @@ export class StorageService {
       { $set: asset },
       { upsert: true },
     );
+  }
+
+  public async saveBridgeConfig(bridgeConfig: BridgeConfig) {
+    const configID = `${bridgeConfig.bridgeNetworkConfigType}_${bridgeConfig.bridgeDirectionType}`;
+    return this.db.bridgeConfigStore.update<BridgeConfig>(
+      { _id: configID },
+      { $set: bridgeConfig },
+      { upsert: true },
+    );
+  }
+
+  public async saveBridgeConfigsList(bridgeConfigList: BridgeConfig[]) {
+    return bridgeConfigList.map(async bridgeConfig => {
+      await this.saveBridgeConfig(bridgeConfig);
+    });
+  }
+
+  public async findBridgeConfigByNetworkAndBridgeTransactionType(
+    bridgeDirectionType: BridgeTransferDirection,
+    bridgeNetworkConfigType: BridgeNetworkConfigType,
+  ) {
+    return this.db.bridgeConfigStore.findOne<BridgeConfig>({
+      bridgeNetworkConfigType,
+      bridgeDirectionType,
+    });
+  }
+
+  public async fetchAllBridgeConfigs() {
+    return this.db.bridgeConfigStore.find<BridgeConfig>({});
   }
 
   public async fetchAssetByCreationType(creationType: AssetCreationType, walletId) {

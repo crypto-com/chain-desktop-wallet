@@ -180,6 +180,7 @@ export interface NftProcessedModel extends Omit<NftModel, 'tokenData'> {
 }
 
 export interface NftTransferModel extends NftTransactionResponse {}
+
 // export interface NFTAccountTransactionModel extends NFTAccountTransactionResponse {}
 
 export interface NftAccountTransactionList {

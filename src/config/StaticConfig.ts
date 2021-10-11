@@ -1,4 +1,6 @@
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
+import iconCronosSvg from '../assets/icon-cronos-blue.svg';
+import iconCroSvg from '../assets/icon-cro.svg';
 
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
@@ -119,6 +121,20 @@ SUPPORTED_CURRENCY.set('HUF', { value: 'HUF', label: 'HUF - Ft', symbol: 'Ft' })
 SUPPORTED_CURRENCY.set('CZK', { value: 'CZK', label: 'CZK - Kč', symbol: 'Kč' });
 SUPPORTED_CURRENCY.set('BRL', { value: 'BRL', label: 'BRL - R$', symbol: 'R$' });
 SUPPORTED_CURRENCY.set('TRY', { value: 'TRY', label: 'TRY - ₺', symbol: '₺' });
+
+export interface SupportedBridge {
+  value: string;
+  label: string;
+  icon: string;
+}
+
+export const SUPPORTED_BRIDGE = new Map<string, SupportedBridge>();
+SUPPORTED_BRIDGE.set('CRONOS', { value: 'CRONOS', label: 'Cronos Chain', icon: iconCronosSvg });
+SUPPORTED_BRIDGE.set('CRYPTO_ORG', {
+  value: 'CRYPTO_ORG',
+  label: 'Crypto.org Chain',
+  icon: iconCroSvg,
+});
 
 export type WalletConfig = {
   enabled: boolean;
