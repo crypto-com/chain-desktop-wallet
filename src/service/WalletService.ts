@@ -10,21 +10,17 @@ import {
   SettingsDataUpdate,
   Wallet,
 } from '../models/Wallet';
-import { StorageService } from '../storage/StorageService';
 import {
-  APP_DB_NAMESPACE,
   DEFAULT_CLIENT_MEMO,
   DefaultWalletConfigs,
   NOT_KNOWN_YET_VALUE,
-  WalletConfig,
   SECONDS_OF_YEAR,
+  WalletConfig,
   EVM_MINIMUM_GAS_PRICE,
   EVM_MINIMUM_GAS_LIMIT,
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
-import { TransactionSigner } from './signers/TransactionSigner';
-import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
 import { Session } from '../models/Session';
 import {
   DelegateTransactionUnsigned,
@@ -50,23 +46,23 @@ import {
   NftTransferModel,
   ProposalModel,
   ProposalStatuses,
+  RewardsBalances,
   RewardTransaction,
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
-  UnbondingDelegationData,
-  UnbondingDelegationList,
   TransactionStatus,
   TransferTransactionData,
   TransferTransactionList,
+  UnbondingDelegationData,
+  UnbondingDelegationList,
   ValidatorModel,
-  RewardsBalances,
 } from '../models/Transaction';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from './LedgerService';
-import { ISignerProvider } from './signers/SignerProvider';
 import {
+  BridgeTransferRequest,
   DelegationRequest,
   NFTDenomIssueRequest,
   NFTMintRequest,
@@ -83,15 +79,25 @@ import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { CronosClient } from './cronos/CronosClient';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
+import { bridgeService } from './bridge/BridgeService';
+import { WalletBaseService } from './WalletBaseService';
 
-class WalletService {
-  private readonly storageService: StorageService;
-
-  constructor() {
-    this.storageService = new StorageService(APP_DB_NAMESPACE);
-  }
-
+class WalletService extends WalletBaseService {
   public readonly BROADCAST_TIMEOUT_CODE = -32603;
+
+  public async sendBridgeTransaction(bridgeTransferRequest: BridgeTransferRequest) {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    const bridgeTransactionResult = await bridgeService.handleBridgeTransaction(
+      bridgeTransferRequest,
+    );
+
+    await Promise.all([
+      await this.fetchAndUpdateBalances(currentSession),
+      await this.fetchAndSaveTransfers(currentSession),
+    ]);
+
+    return bridgeTransactionResult;
+  }
 
   public async sendTransfer(transferRequest: TransferRequest): Promise<BroadCastResult> {
     // eslint-disable-next-line no-console
@@ -133,14 +139,11 @@ class WalletService {
             value: web3.utils.toWei(transferRequest.amount, 'ether'),
           };
 
-          let txFromAddress: string = '';
-          if (txConfig.from) txFromAddress = txConfig.from.toString();
+          const prepareTxInfo = await this.prepareEVMTransaction(currentAsset, txConfig);
 
-          transfer.nonce = await cronosClient.getNextNonceByAddress(txFromAddress);
-
-          const loadedGasPrice = await cronosClient.getEstimatedGasPrice(); // in wei
-          transfer.gasPrice = Number(loadedGasPrice);
-          transfer.gasLimit = Number(await cronosClient.estimateGas(txConfig));
+          transfer.nonce = prepareTxInfo.nonce;
+          transfer.gasPrice = prepareTxInfo.loadedGasPrice;
+          transfer.gasLimit = prepareTxInfo.gasLimit;
 
           let signedTx = '';
           if (currentSession.wallet.walletType === 'ledger') {
@@ -149,7 +152,7 @@ class WalletService {
             const { gasLimit } = transfer;
             const { gasPrice } = transfer;
 
-            let gasLimitTx = web3.utils.toBN(gasLimit);
+            let gasLimitTx = web3.utils.toBN(gasLimit!);
             let gasPriceTx = web3.utils.toBN(gasPrice);
             const gasLimitMinimum = web3.utils.toBN(EVM_MINIMUM_GAS_LIMIT);
             const gasPriceMinimum = web3.utils.toBN(EVM_MINIMUM_GAS_PRICE);
@@ -177,6 +180,7 @@ class WalletService {
               transferRequest.decryptedPhrase,
             );
           }
+
           const result = await cronosClient.broadcastRawTransactionHex(signedTx);
 
           // eslint-disable-next-line no-console
@@ -645,37 +649,6 @@ class WalletService {
       await this.fetchAndUpdateBalances(currentSession),
     ]);
     return broadCastResult;
-  }
-
-  public async prepareTransaction() {
-    const currentSession = await this.storageService.retrieveCurrentSession();
-    const currentWallet = currentSession.wallet;
-
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-
-    const accountNumber = await nodeRpc.fetchAccountNumber(currentSession.wallet.address);
-    const accountSequence = await nodeRpc.loadSequenceNumber(currentSession.wallet.address);
-
-    const transactionSigner = new TransactionSigner(currentWallet.config);
-
-    const signerProvider: ISignerProvider = createLedgerDevice();
-
-    const tmpWalletConfig = currentWallet.config;
-
-    const ledgerTransactionSigner = new LedgerTransactionSigner(
-      // currentWallet.config,
-      tmpWalletConfig,
-      signerProvider,
-      currentWallet.addressIndex,
-    );
-    return {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    };
   }
 
   // eslint-disable-next-line class-methods-use-this

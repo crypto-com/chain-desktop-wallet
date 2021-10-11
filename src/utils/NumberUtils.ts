@@ -67,7 +67,7 @@ export function getUIVoteAmount(amount: string = '0', asset: UserAsset) {
 }
 
 export function getCurrentMinAssetAmount(userAsset: UserAsset) {
-  const exp = Big(10).pow(userAsset.decimals);
+  const exp = userAsset ? Big(10).pow(userAsset.decimals) : 1;
   return Big(1)
     .div(exp)
     .toNumber();
