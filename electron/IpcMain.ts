@@ -127,7 +127,7 @@ export class IpcMain {
     ipcMain.on('ethGetAddress', async (event: any, arg: any) => {
       let ret = {};
       try {
-        const address = await this.ethProvider.getAddress(arg.index);
+        const address = await this.ethProvider.getAddress(arg.index, arg.display);
         ret = {
           address,
           success: true,
@@ -140,7 +140,6 @@ export class IpcMain {
         };
         console.error('ethGetAddress error ' + e);
       }
-      console.log(`ethGetAddress ${JSON.stringify(ret)}`);
       event.returnValue = ret;
     });
   }

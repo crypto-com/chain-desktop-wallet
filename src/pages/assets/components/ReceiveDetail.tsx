@@ -36,12 +36,11 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
       const addressprefix = config.network.addressPrefix;
       if (LEDGER_WALLET_TYPE === walletType) {
         const device = createLedgerDevice();
-        await device.getAddress(addressIndex, addressprefix, true);
 
         if (isEVM) {
-          await device.getEthAddress(addressIndex);
+          await device.getEthAddress(addressIndex, true);
         } else {
-          await device.getAddress(addressIndex, addressprefix, false);
+          await device.getAddress(addressIndex, addressprefix, true);
         }
       }
     } catch (e) {

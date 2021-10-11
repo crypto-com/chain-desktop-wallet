@@ -116,9 +116,10 @@ export class IpcRender implements ISignerProvider {
 
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   // eslint-disable-next-line  class-methods-use-this
-  public async getEthAddress(index: number): Promise<string> {
+  public async getEthAddress(index: number, display: boolean): Promise<string> {
     const a = {
       index,
+      display,
     };
     const arg = electron.ipcRenderer.sendSync('ethGetAddress', a);
     if (!arg.success) {
