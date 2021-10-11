@@ -383,7 +383,7 @@ const HomePage = () => {
               <div className="quantity">
                 {numeral(
                   scaledAmount(
-                    new Big(defaultWalletAsset.rewardsBalance)
+                    new Big(defaultWalletAsset.rewardsBalance ?? '0')
                       .add(rewards?.claimedRewardsBalance ?? '0')
                       .toFixed(2),
                     defaultWalletAsset.decimals,
