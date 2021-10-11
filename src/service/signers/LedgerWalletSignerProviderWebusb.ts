@@ -50,7 +50,7 @@ export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
   }
 
   // eslint-disable-next-line  class-methods-use-this, @typescript-eslint/no-unused-vars
-  public async getEthAddress(index: number): Promise<string> {
+  public async getEthAddress(_index: number, _display: boolean): Promise<string> {
     return '';
   }
 }

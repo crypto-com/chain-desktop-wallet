@@ -172,9 +172,11 @@ function RouteHub() {
       const currentCountryCode = await getCurrentGeoLocationCountryCode();
 
       // Todo: Fetch country codes dynamically
-      if (!COUNTRY_CODES_TO_BLOCK.includes(currentCountryCode)) {
-        setIsCountryBlocked(false);
-      }
+      setTimeout(() => {
+        if (!COUNTRY_CODES_TO_BLOCK.includes(currentCountryCode)) {
+          setIsCountryBlocked(false);
+        }
+      }, 3000);
     })();
   }, [isCountryBlocked, setIsCountryBlocked]);
 

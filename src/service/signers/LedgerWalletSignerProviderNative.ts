@@ -56,8 +56,8 @@ export class LedgerWalletSignerProviderNative implements ISignerProvider {
 
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   // eslint-disable-next-line  class-methods-use-this
-  public async getEthAddress(index: number): Promise<string> {
-    const address = await this.ipcRender.getEthAddress(index);
+  public async getEthAddress(index: number, display: boolean): Promise<string> {
+    const address = await this.ipcRender.getEthAddress(index, display);
     return address;
   }
 }
