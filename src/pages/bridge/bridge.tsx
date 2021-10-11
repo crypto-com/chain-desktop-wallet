@@ -121,7 +121,7 @@ const CronosBridgeForm = props => {
   const {
     form,
     formValues,
-    setFormValues,
+    // setFormValues,
     bridgeConfigForm,
     isBridgeValid,
     setIsBridgeValid,
@@ -341,14 +341,14 @@ const CronosBridgeForm = props => {
     }`,
   );
 
-  const onFinish = values => {
-    setFormValues({
-      ...formValues,
-      bridgeFrom: values.bridgeFrom,
-      bridgeTo: values.bridgeTo,
-      amount: values.amount,
-    });
-  };
+  // const onFinish = values => {
+  //   setFormValues({
+  //     ...formValues,
+  //     bridgeFrom: values.bridgeFrom,
+  //     bridgeTo: values.bridgeTo,
+  //     amount: values.amount,
+  //   });
+  // };
 
   return (
     <Form
@@ -357,9 +357,10 @@ const CronosBridgeForm = props => {
       form={form}
       name="control-hooks"
       requiredMark="optional"
-      onFinish={value => {
-        onFinish(value);
-      }}
+      // onFinish={value => {
+      //   console.log(value)
+      //   onFinish(value);
+      // }}
     >
       <div className="row-bridge ant-double-height">
         <Form.Item
@@ -665,6 +666,13 @@ const CronosBridge = () => {
     } else {
       setInputPasswordVisible(true);
     }
+    setFormValues({
+      ...formValues,
+      ...form.getFieldsValue(),
+      // bridgeFrom: values.bridgeFrom,
+      // bridgeTo: values.bridgeTo,
+      // amount: values.amount,
+    });
   };
 
   const onConfirmation = async () => {
@@ -702,7 +710,7 @@ const CronosBridge = () => {
         amount: amount.toString(),
         originAsset: currentAsset!,
         decryptedPhrase,
-        walletType: 'normal', // normal, ledger
+        walletType: session.wallet.walletType, // normal, ledger
       });
       setBroadcastResult(sendResult);
       listDataSource.push({
