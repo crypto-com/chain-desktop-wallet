@@ -19,7 +19,7 @@
     "@ledgerhq/hw-transport-webhid": "5.48.0",
     "@ledgerhq/hw-transport-webusb": "5.48.0",
     "antd": "4.16.0",
-    "axios": "0.21.1",
+    "axios": "0.21.2",
     "bech32": "1.1.4",
     "bfj": "7.0.2",
     "big.js": "6.0.3",
@@ -41,7 +41,7 @@
     "lodash": "4.17.21",
     "long": "^4.0.0",
     "moment": "2.29.1",
-    "nedb-promises": "4.1.5",
+    "nedb-promises": "5.0.1",
     "node-localstorage": "2.1.6",
     "numeral": "2.0.6",
     "qrcode.react": "1.0.1",
@@ -73,6 +73,7 @@
     "zxcvbn": "4.4.2"
   },
   "scripts": {
+    "run-audit": "yarn audit-ci --high -a 1002475 1002627 1002477 1002522 1002590",
     "start": "node scripts/start.js",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 && yarn clean-builds && node scripts/build.js",
     "test": "node scripts/test.js --watchAll=false",
@@ -185,6 +186,7 @@
     "@typescript-eslint/eslint-plugin": "4.5.0",
     "@typescript-eslint/parser": "4.5.0",
     "@umijs/fabric": "2.3.1",
+    "audit-ci": "^5.0.0",
     "autoprefixer": "10.2.5",
     "axios-mock-adapter": "1.19.0",
     "babel-eslint": "10.1.0",
