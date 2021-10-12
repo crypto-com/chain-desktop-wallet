@@ -86,6 +86,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import IconTick from '../../svg/IconTick';
 import IconPlayer from '../../svg/IconPlayer';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
+import ReceiveDetail from '../assets/components/ReceiveDetail';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -910,6 +911,13 @@ const FormMintNft = () => {
       </ErrorModalPopup>
     </>
   );
+};
+
+const ReceiveTab = () => {
+  const currentSession = useRecoilValue(sessionState);
+  const walletAsset = useRecoilValue(walletAssetState);
+
+  return <ReceiveDetail currentAsset={walletAsset} session={currentSession} />;
 };
 
 const NftPage = () => {
@@ -1819,6 +1827,13 @@ const NftPage = () => {
               <div className="container">
                 <div className="description">{t('nft.container.description')}</div>
                 <FormMintNft />
+              </div>
+            </div>
+          </TabPane>
+          <TabPane tab={t('nft.tab3')} key="4">
+            <div className="site-layout-background nft-content">
+              <div className="container">
+                <ReceiveTab />
               </div>
             </div>
           </TabPane>

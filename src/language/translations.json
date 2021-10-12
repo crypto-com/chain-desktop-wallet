@@ -784,7 +784,8 @@
           "label4": "Content URL",
           "button1": "Transfer NFT",
           "button2": "View on Crypto.com NFT Marketplace"
-        }
+        },
+        "tab3": "Receive NFT"
       },
       "settings": {
         "title": "Settings",
@@ -1104,7 +1105,8 @@
       },
       "welcome": {
         "slogan": "我們的樣本錢包支持錢包管理和資金轉賬。",
-        "button": "開始"
+        "button": "開始",
+        "block": "此產品暫時未能為您所在的國家或地區提供服務。"
       },
       "signup": {
         "title": "密碼創建成功",
@@ -1665,7 +1667,8 @@
           "label4": "內容 URL ",
           "button1": "轉發 NFT ",
           "button2": "於 Crypto.com NFT Marketplace 上瀏覽"
-        }
+        },
+        "tab3": "接收 NFT"
       },
       "settings": {
         "title": "設定",
@@ -1984,7 +1987,8 @@
       },
       "welcome": {
         "slogan": "我们的样本钱包支持钱包管理和资金转账。",
-        "button": "开始"
+        "button": "开始",
+        "block": "此产品暂时未能为您所在的国家或地区提供服务。"
       },
       "signup": {
         "title": "密码创建成功",
@@ -2545,7 +2549,8 @@
           "label4": "内容 URL",
           "button1": "转发 NFT",
           "button2": "在 Crypto.com NFT Marketplace 上浏览"
-        }
+        },
+        "tab3": "接收 NFT"
       },
       "settings": {
         "title": "配置",
@@ -3552,7 +3557,8 @@
           "label4": "콘텐츠 URL",
           "button1": "NFT 전송",
           "button2": "크립토닷컴 NFT에서 보기"
-        }
+        },
+        "tab3": "수신 NFT"
       },
       "settings": {
         "title": "설정",
