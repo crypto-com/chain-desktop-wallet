@@ -199,7 +199,10 @@ function HomeLayout(props: HomeLayoutProps) {
     // const isIbcVisible = allAssets.length > 1;
     const isIbcVisible = false;
 
-    setSession(currentSession);
+    setSession({
+      ...currentSession,
+      activeAsset: currentAsset,
+    });
     setUserAsset(currentAsset);
     setWalletAllAssets(allAssets);
     setIsIbcVisible(isIbcVisible);
@@ -513,7 +516,10 @@ function HomeLayout(props: HomeLayoutProps) {
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
       const isAppLocked = await generalConfigService.getIfAppIsLockedByUser();
       setHasWallet(hasWalletBeenCreated);
-      setSession(currentSession);
+      setSession({
+        ...currentSession,
+        activeAsset: currentAsset,
+      });
       setUserAsset(currentAsset);
       setWalletAllAssets(allAssets);
       setIsIbcVisible(isIbcVisible);
@@ -545,7 +551,10 @@ function HomeLayout(props: HomeLayoutProps) {
       }, 2000);
 
       checkNewlyAddedStaticAssets(currentSession);
-      checkCorrectExplorerUrl(currentSession);
+      checkCorrectExplorerUrl({
+        ...currentSession,
+        activeAsset: currentAsset,
+      });
     };
 
     if (!didMountRef.current) {
