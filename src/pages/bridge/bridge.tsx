@@ -364,11 +364,11 @@ const CronosBridgeForm = props => {
       <div className="row-bridge ant-double-height">
         <Form.Item
           name="bridgeFrom"
-          label="From"
+          label={t('bridge.form.from')}
           rules={[
             {
               required: true,
-              message: `From ${t('general.required')}`,
+              message: `${t('bridge.form.from')} ${t('general.required')}`,
             },
           ]}
           style={{ textAlign: 'left' }}
@@ -399,18 +399,18 @@ const CronosBridgeForm = props => {
         />
         <Form.Item
           name="bridgeTo"
-          label="To"
+          label={t('bridge.form.to')}
           validateFirst
           rules={[
             {
               required: true,
-              message: `To ${t('general.required')}`,
+              message: `${t('bridge.form.to')} ${t('general.required')}`,
             },
             {
               validator: (_, value) => {
                 if (form.getFieldValue('bridgeFrom') === value) {
                   setIsBridgeValid(false);
-                  return Promise.reject(new Error('The two bridges cannot be the same'));
+                  return Promise.reject(new Error(t('bridge.form.errorSameChain')));
                 }
                 setIsBridgeValid(true);
                 return Promise.resolve();
@@ -453,9 +453,7 @@ const CronosBridgeForm = props => {
                       BridgeTransferDirection.NOT_SUPPORT,
                     );
                     setBridgeConfigs(config);
-                    return Promise.reject(
-                      new Error('The selected bridge transfer is not supported'),
-                    );
+                    return Promise.reject(new Error(t('bridge.form.errorBridgeNotSupported')));
                   }
                 }
               },
@@ -490,7 +488,7 @@ const CronosBridgeForm = props => {
             style={{ width: '300px', textAlign: 'left' }}
             onChange={onSwitchAsset}
             value={currentAssetIdentifier}
-            placeholder="Asset"
+            placeholder={t('assets.title')}
             disabled={!isBridgeValid}
           >
             {bridgeSupportedAssets.map(asset => {
@@ -509,7 +507,7 @@ const CronosBridgeForm = props => {
           rules={[
             {
               required: true,
-              message: `Amount ${t('general.required')}`,
+              message: `${t('bridge.form.amount')} ${t('general.required')}`,
             },
             {
               pattern: /[^0]+/,
@@ -521,7 +519,7 @@ const CronosBridgeForm = props => {
           ]}
         >
           <InputNumber
-            placeholder="Amount"
+            placeholder={t('bridge.form.amount')}
             disabled={!isBridgeValid}
             onChange={value => setSendingAmount(value ? value.toString() : '0')}
           />
@@ -539,13 +537,13 @@ const CronosBridgeForm = props => {
       {currentAsset && new Big(sendingAmount).gt(0) ? (
         <div className="review-container">
           <div className="flex-row">
-            <div>Fee: </div>
+            <div>{t('bridge.form.fee')}</div>
             <div>
               {getNormalScaleAmount(cronosBridgeFee, currentAsset!)} {currentAsset?.symbol}
             </div>
           </div>
           <div className="flex-row">
-            <div>You will receieve: </div>
+            <div>{t('bridge.form.willReceive')}</div>
             <div>
               {new Big(sendingAmount)
                 .sub(getNormalScaleAmount(cronosBridgeFee, toAsset!))
@@ -554,7 +552,7 @@ const CronosBridgeForm = props => {
             </div>
           </div>
           <div className="flex-row">
-            <div>To Address: </div>
+            <div>{t('bridge.form.toAddress')}</div>
             <div className="asset-icon">
               {bridgeIcon(form.getFieldValue('bridgeTo'))}
               {middleEllipsis(toAddress, 6)}
@@ -574,7 +572,7 @@ const CronosBridgeForm = props => {
             showPasswordInput();
           }}
         >
-          Transfer Asset
+          {t('bridge.form.transfer')}
         </Button>
       </Form.Item>
     </Form>
@@ -630,11 +628,11 @@ const CronosBridge = () => {
   const stepDetail = [
     {
       step: 0,
-      title: 'Cronos Bridge',
-      description: 'The safe, fast and most secure way to transfer assets to and from Cronos.',
+      title: t('bridge.step0.title'),
+      description: t('bridge.step0.description'),
     },
-    { step: 1, title: 'Confirmation', description: '' },
-    { step: 2, title: 'Bridge Transaction', description: '' },
+    { step: 1, title: t('bridge.step1.title'), description: '' },
+    { step: 2, title: t('bridge.step2.title'), description: '' },
   ];
 
   const assetIcon = asset => {
@@ -680,10 +678,14 @@ const CronosBridge = () => {
 
     const listDataSource = [
       {
-        title: `${amount} ${currentAsset?.symbol} is pending to transfer`,
+        title: t('bridge.pendingTransfer.title', {
+          amount,
+          symbol: currentAsset?.symbol,
+        }),
         description: (
           <span>
-            From {bridgeFromObj?.label} to {bridgeToObj?.label}
+            {t('bridge.form.from')} {bridgeFromObj?.label} {t('bridge.form.to')}{' '}
+            {bridgeToObj?.label}
           </span>
         ),
         loading: false,
@@ -711,10 +713,13 @@ const CronosBridge = () => {
       });
       setBroadcastResult(sendResult);
       listDataSource.push({
-        title: `Deposit of ${amount} ${currentAsset?.symbol} is completed`,
+        title: t('bridge.deposit.complete.title', {
+          amount,
+          symbol: currentAsset?.symbol,
+        }),
         description: (
           <>
-            Transaction ID:{' '}
+            {t('bridge.deposit.transactionID')}
             <a
               data-original={sendResult.transactionHash}
               target="_blank"
@@ -730,25 +735,18 @@ const CronosBridge = () => {
         loading: false,
       });
       listDataSource.push({
-        title: `Transfer Initiated`,
-        description: (
-          <>
-            Check your wallet for the funds. It may take up to an hour depending on network
-            congestion.
-          </>
-        ),
+        title: t('bridge.transferInitiated.title'),
+        description: <>{t('bridge.transferInitiated.description')}</>,
         loading: false,
       });
       setBridgeConfirmationList(listDataSource);
     } catch (e) {
       listDataSource.push({
-        title: `Deposit of ${amount} ${currentAsset?.symbol} is failed`,
-        description: (
-          <>
-            Bridge Transfer Failed. Please ensure the Bridge Config Settings are correct and there
-            are enough funds in your wallet address.
-          </>
-        ),
+        title: t('bridge.deposit.failed.title', {
+          amount,
+          symbol: currentAsset?.symbol,
+        }),
+        description: <>{t('bridge.deposit.failed.description')}</>,
         loading: false,
       });
       setBridgeConfirmationList(listDataSource);
@@ -828,7 +826,7 @@ const CronosBridge = () => {
             <div className="item">
               <div className="detail">
                 <div className="block">
-                  <div>Sending</div>
+                  <div>{t('nft.modal3.label1')}</div>
                   <div className="title">
                     {amount} {currentAsset?.symbol}
                   </div>
@@ -840,7 +838,7 @@ const CronosBridge = () => {
                       {bridgeIcon(bridgeFromObj?.value)}
                     </Sider>
                     <Content>
-                      <div>From</div>
+                      <div>{t('bridge.form.from')}</div>
                       <div style={{ fontWeight: 'bold' }}>{bridgeFromObj?.label}</div>
                     </Content>
                   </Layout>
@@ -850,7 +848,7 @@ const CronosBridge = () => {
                       {bridgeIcon(bridgeToObj?.value)}
                     </Sider>
                     <Content>
-                      <div>To</div>
+                      <div>{t('bridge.form.to')}</div>
                       <div style={{ fontWeight: 'bold' }}>{bridgeToObj?.label}</div>
                     </Content>
                   </Layout>
@@ -858,13 +856,13 @@ const CronosBridge = () => {
                 <Divider />
                 <div className="block">
                   <div className="flex-row">
-                    <div>Fee: </div>
+                    <div>{t('bridge.form.fee')}</div>
                     <div>
                       {getNormalScaleAmount(cronosBridgeFee, currentAsset!)} {currentAsset?.symbol}
                     </div>
                   </div>
                   <div className="flex-row">
-                    <div>Destination: </div>
+                    <div>{t('bridge.form.destination')}</div>
                     <div className="asset-icon">
                       {bridgeIcon(form.getFieldValue('bridgeTo'))}
                       {middleEllipsis(toAddress, 6)}
@@ -873,7 +871,7 @@ const CronosBridge = () => {
                 </div>
                 <Divider />
                 <div className="block">
-                  <div>Receiving</div>
+                  <div>{t('bridge.form.receiving')}</div>
                   <div className="title">
                     ~
                     {new Big(amount)
@@ -892,7 +890,7 @@ const CronosBridge = () => {
                 }}
                 className="disclaimer"
               >
-                By proceeding, I hereby acknowledge that I agree to the terms and conditions.
+                {t('bridge.form.disclaimer')}
               </Checkbox>
             </div>
             <div className="item">
@@ -904,7 +902,7 @@ const CronosBridge = () => {
                 // hidden={isConfirmClearVisible}
                 disabled={isButtonDisabled}
               >
-                Confirm
+                {t('general.confirm')}
               </Button>
             </div>
           </div>
@@ -970,7 +968,7 @@ const CronosBridge = () => {
                     'tx',
                   )}/${broadcastResult.transactionHash}`}
                 >
-                  View Transaction
+                  {t('bridge.action.viewTransaction')}
                 </a>
               </Button>
             ) : (
@@ -1092,15 +1090,17 @@ const CronosBridge = () => {
               >
                 <Form.Item
                   name="prefix"
-                  label="Prefix"
+                  label={t('bridge.config.prefix.title')}
                   rules={[
                     {
                       required: true,
-                      message: `Prefix ${t('general.required')}`,
+                      message: `${t('bridge.config.prefix.title')} ${t('general.required')}`,
                     },
                     {
                       pattern: isTestnet ? /^[a-z]{4}$/ : /^[a-z]{3}$/,
-                      message: `Prefix can only be ${isTestnet ? '4' : '3'} lowercase letters`,
+                      message: t('bridge.config.prefix.validation', {
+                        number: isTestnet ? '4' : '3',
+                      }),
                     },
                   ]}
                   style={{ textAlign: 'left' }}
@@ -1112,11 +1112,13 @@ const CronosBridge = () => {
                 bridgeConfigs?.cronosBridgeContractAddress !== '' ? (
                   <Form.Item
                     name="cronosBridgeContractAddress"
-                    label="Cronos Bridge Contract Address"
+                    label={t('bridge.config.address.title')}
                     rules={[
                       {
                         required: true,
-                        message: `Contract Address ${t('general.required')}`,
+                        message: `${t('bridge.config.address.validation')} ${t(
+                          'general.required',
+                        )}`,
                       },
                       customEvmAddressValidator,
                     ]}
@@ -1130,11 +1132,11 @@ const CronosBridge = () => {
                 {bridgeConfigFields.includes('bridgeChannel') ? (
                   <Form.Item
                     name="bridgeChannel"
-                    label="Bridge Channel"
+                    label={t('bridge.config.channel.title')}
                     rules={[
                       {
                         required: true,
-                        message: `Bridge Channel ${t('general.required')}`,
+                        message: `${t('bridge.config.channel.title')} ${t('general.required')}`,
                       },
                     ]}
                     style={{ textAlign: 'left' }}
@@ -1147,11 +1149,11 @@ const CronosBridge = () => {
                 {bridgeConfigFields.includes('bridgePort') ? (
                   <Form.Item
                     name="bridgePort"
-                    label="Bridge Port"
+                    label={t('bridge.config.port.title')}
                     rules={[
                       {
                         required: true,
-                        message: `Bridge Port ${t('general.required')}`,
+                        message: `${t('bridge.config.port.title')} ${t('general.required')}`,
                       },
                     ]}
                     style={{ textAlign: 'left' }}
@@ -1318,6 +1320,8 @@ const CronosHistory = () => {
 };
 
 const BridgePage = () => {
+  const [t] = useTranslation();
+
   return (
     <Layout className="site-layout bridge-layout">
       <Content>
@@ -1325,7 +1329,7 @@ const BridgePage = () => {
           <a>
             <div>
               <IconTransferHistory />
-              <span>View Transaction History</span>
+              <span>{t('bridge.action.viewTransactionHIstory')}</span>
             </div>
           </a>
         </div>

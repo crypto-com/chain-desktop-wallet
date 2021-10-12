@@ -375,6 +375,7 @@
         "send": "Send",
         "receive": "Receive",
         "assets": "Assets",
+        "bridge": "Cronos Bridge",
         "governance": "Governance",
         "nft": "My NFT",
         "settings": "Settings",
@@ -585,7 +586,61 @@
           "to": "To",
           "errorSameChain": "The two chains cannot be the same",
           "errorBridgeNotSupported": "The selected bridge transfer is not supported",
-          "amount": "Amount"
+          "amount": "Amount",
+          "willReceive": "You will receieve: ",
+          "fee": "Fee: ",
+          "destination": "Destination: ",
+          "toAddress": "To Address: ",
+          "transfer": "Transfer Asset",
+          "receiving": "Receiving",
+          "disclaimer": "By proceeding, I hereby acknowledge that I agree to the terms and conditions."
+        },
+        "step0": {
+          "title": "Cronos Bridge",
+          "description": "The safe, fast and most secure way to transfer assets to and from Cronos."
+        },
+        "step1": {
+          "title": "Confirmation"
+        },
+        "step2": {
+          "title": "Bridge Transaction"
+        },
+        "deposit": {
+          "complete": {
+            "title": "Deposit of {{amount}} {{symbol}} is completed"
+          },
+          "transactionID": "Transaction ID: ",
+          "failed": {
+            "title": "Deposit of {{amount}} {{symbol}} is failed",
+            "description": "Bridge Transfer Failed. Please ensure the Bridge Config Settings are correct and there are enough funds in your wallet address."
+          }
+        },
+        "transferInitiated": {
+          "title": "Transfer Initiated",
+          "description": "Check your wallet for the funds. It may take up to an hour depending on network congestion."
+        },
+        "action": {
+          "viewTransaction": "View Transaction",
+          "viewTransactionHIstory": "View Transaction History"
+        },
+        "config": {
+          "prefix": {
+            "title": "Prefix",
+            "validation": "Prefix can only be {{number}} lowercase letters"
+          },
+          "address": {
+            "title": "Cronos Bridge Contract Address",
+            "validation": "Contract Address"
+          },
+          "channel": {
+            "title": "Bridge Channel"
+          },
+          "port": {
+            "title": "Bridge Port"
+          }
+        },
+        "pendingTransfer": {
+          "title": "{{amount}} {{symbol}} is pending to transfer"
         }
       },
       "staking": {
@@ -1295,7 +1350,8 @@
         "staking": "抵押",
         "send": "發送",
         "receive": "接收",
-        "assets": "資金",
+        "assets": "資產",
+        "bridge": "Cronos 跨鏈橋",
         "governance": "治理",
         "nft": "我的NFT",
         "settings": "設置",
@@ -1318,7 +1374,7 @@
               }
             },
             "warning1": "你確定要刪除這個錢包？",
-            "warning2": "如果你沒有備份你的錢包助記詞，這將導致你的資金永遠丟失。",
+            "warning2": "如果你沒有備份你的錢包助記詞，這將導致你的資產永遠丟失。",
             "checkbox1": "我了解重新獲得訪問權限的唯一方法是復原錢包助記詞。",
             "checkbox2": "我了解重新獲得訪問權限的唯一方法是使用具有正確地址索引的相同Ledger錢包"
           },
@@ -1361,15 +1417,15 @@
         },
         "assetList": {
           "table": {
-            "title": "資金",
-            "name": "資金",
+            "title": "資產",
+            "name": "資產",
             "price": "價格",
             "amount": "餘額",
             "value": "市值"
           }
         },
         "transactions": {
-          "tab1": "資金",
+          "tab1": "資產",
           "tab2": "委託",
           "tab3": "NFT交易",
           "table1": {
@@ -1480,15 +1536,15 @@
         "disclaimer": "從不支援 {{assetName}} 標準的任何地址發送 {{assetSymbol}} 可能會導致資金永久損失。"
       },
       "assets": {
-        "title": "資金",
+        "title": "資產",
         "description": "在這裡管理你的所有資金",
         "tab1": "交易",
         "tab2": "發送",
         "tab3": "接收",
-        "backToList": "返回資金列表",
+        "backToList": "返回資產列表",
         "assetList": {
           "table": {
-            "name": "資金",
+            "name": "資產",
             "price": "價格",
             "amount": "餘額",
             "value": "市值",
@@ -1503,7 +1559,64 @@
       "bridge": {
         "form": {
           "from": "從",
-          "to": "至"
+          "to": "至",
+          "errorSameChain": "不能選擇同一條鏈",
+          "errorBridgeNotSupported": "不支持所選的跨鏈轉移方式",
+          "amount": "數目",
+          "willReceive": "你將會收到：",
+          "fee": "費用：",
+          "destination": "目標地址：",
+          "toAddress": "收款人地址：",
+          "transfer": "轉移資產",
+          "receiving": "將會收到",
+          "disclaimer": "我同意條款和條件。"
+        },
+        "step0": {
+          "title": "Cronos 跨鏈橋",
+          "description": "把跨鏈資產帶到 Cronos 上最安全快速且有保障的方法。"
+        },
+        "step1": {
+          "title": "確認"
+        },
+        "step2": {
+          "title": "跨鏈交易"
+        },
+        "deposit": {
+          "complete": {
+            "title": "已完成存入 {{amount}} {{symbol}}"
+          },
+          "transactionID": "交易 ID：",
+          "failed": {
+            "title": "存入 {{amount}} {{symbol}} 的交易失敗了",
+            "description": "跨鏈交易失敗了。請確認跨鏈配置正確並且錢包中有足夠的資金。"
+          }
+        },
+        "transferInitiated": {
+          "title": "交易已發起",
+          "description": "請查看錢包資產。在網絡擁堵的情況下，可能最多需要一個小時完成交易。"
+        },
+        "action": {
+          "viewTransaction": "查看交易",
+          "viewTransactionHIstory": "查看交易歷史"
+        },
+        "config": {
+          "prefix": {
+            "title": "前綴",
+            "validation": "前綴只能是 {{number}} 個小寫字母"
+          },
+          "address": {
+            "title": "Cronos 跨鏈橋合約地址",
+            "validation": "合約地址"
+          },
+          "channel": {
+            "title": "跨鏈橋頻道"
+          },
+          "port": {
+            "title": "跨鏈橋端口"
+          }
+        },
+        "pendingTransfer": {
+          "title": "{{amount}} {{symbol}} 正等待發送"
         }
       },
       "staking": {
@@ -1752,8 +1865,8 @@
         "tab3": "重置",
         "form1": {
           "assetIdentifier": {
-            "label": "資金",
-            "description": "不同的資金有各自的節點設定"
+            "label": "資產",
+            "description": "不同的資產有各自的節點設定"
           },
           "nodeUrl": {
             "label": "節點 URL",
@@ -1815,7 +1928,7 @@
           "modal1": {
             "title": "你的助記詞",
             "description": "請查閱所有的助記詞，並以正確的次序記錄下來。",
-            "warning": "請好好保管並不要分享你的助記詞以保障資金的安全。"
+            "warning": "請好好保管並不要分享你的助記詞以保障資產的安全。"
           }
         },
         "clearStorage": {
@@ -1824,7 +1937,7 @@
           "modal": {
             "title": "確認重置",
             "description1": "你或許需要確認你的所有錢包助記詞，以確保未來你能夠復原錢包的使用權。",
-            "warning": "你確定你要重置這個程式？如果你沒有備份好你所有錢包的助記詞，你將會永遠失去所有錢包內的資金。",
+            "warning": "你確定你要重置這個程式？如果你沒有備份好你所有錢包的助記詞，你將會永遠失去所有錢包內的資產。",
             "disclaimer": "我明白我只能夠透過錢包的助記詞來恢復錢包的使用權。",
             "form1": {
               "clear": {
@@ -2212,7 +2325,8 @@
         "staking": "抵押",
         "send": "发送",
         "receive": "接收",
-        "assets": "资金",
+        "assets": "资产",
+        "bridge": "Cronos 跨链桥",
         "governance": "治理",
         "nft": "我的NFT",
         "settings": "设置",
@@ -2235,7 +2349,7 @@
               }
             },
             "warning1": "你确定要删除这个钱包？",
-            "warning2": "如果你没有备份你的钱包助记词，这将导致你的资金永远丢失。",
+            "warning2": "如果你没有备份你的钱包助记词，这将导致你的资产永远丢失。",
             "checkbox1": "我了解重新获得访问权限的唯一方法是复原钱包助记词。",
             "checkbox2": "我了解重新获得访问权限的唯一方法是使用具有正确地址索引的相同Ledger钱包"
           },
@@ -2278,15 +2392,15 @@
         },
         "assetList": {
           "table": {
-            "title": "资金",
-            "name": "资金",
+            "title": "资产",
+            "name": "资产",
             "price": "价格",
             "amount": "余额",
             "value": "市值"
           }
         },
         "transactions": {
-          "tab1": "资金",
+          "tab1": "资产",
           "tab2": "委托",
           "tab3": "NFT交易",
           "table1": {
@@ -2397,15 +2511,15 @@
         "disclaimer": "从不支持 {{assetName}} 标准的任何地址发送 {{assetSymbol}} 可能会导致资金永久损失。"
       },
       "assets": {
-        "title": "资金",
-        "description": "在这里管理你的所有资金",
+        "title": "资产",
+        "description": "在这里管理你的所有资产",
         "tab1": "交易",
         "tab2": "发送",
         "tab3": "接收",
-        "backToList": "返回资金列表",
+        "backToList": "返回资产列表",
         "assetList": {
           "table": {
-            "name": "资金",
+            "name": "资产",
             "price": "价格",
             "amount": "余额",
             "value": "市值",
@@ -2420,7 +2534,64 @@
       "bridge": {
         "form": {
           "from": "从",
-          "to": "至"
+          "to": "至",
+          "errorSameChain": "不能选择同一条链",
+          "errorBridgeNotSupported": "不支持所选的跨链转移方式",
+          "amount": "数目",
+          "willReceive": "你将会收到：",
+          "fee": "费用：",
+          "destination": "目标地址：",
+          "toAddress": "收款人地址：",
+          "transfer": "转移资产",
+          "receiving": "将会收到",
+          "disclaimer": "我同意条款和条件。"
+        },
+        "step0": {
+          "title": "Cronos 跨链桥",
+          "description": "把跨链资产带到 Cronos 上最安全快速且有保障的方法。"
+        },
+        "step1": {
+          "title": "确认"
+        },
+        "step2": {
+          "title": "跨链交易"
+        },
+        "deposit": {
+          "complete": {
+            "title": "已完成存入 {{amount}} {{symbol}}"
+          },
+          "transactionID": "交易 ID：",
+          "failed": {
+            "title": "存入 {{amount}} {{symbol}} 的交易失败了",
+            "description": "跨链交易失败了。请确认跨链配置正确并且钱包中有足够的资金。"
+          }
+        },
+        "transferInitiated": {
+          "title": "交易已发起",
+          "description": "请查看钱包资产。在网络拥堵的情况下，可能最多需要一个小时完成交易。"
+        },
+        "action": {
+          "viewTransaction": "查看交易",
+          "viewTransactionHIstory": "查看交易历史"
+        },
+        "config": {
+          "prefix": {
+            "title": "前缀",
+            "validation": "前缀只能是 {{number}} 个小写字母"
+          },
+          "address": {
+            "title": "Cronos 跨链桥合约地址",
+            "validation": "合约地址"
+          },
+          "channel": {
+            "title": "跨链桥频道"
+          },
+          "port": {
+            "title": "跨链桥端口"
+          }
+        },
+        "pendingTransfer": {
+          "title": "{{amount}} {{symbol}} 正等待发送"
         }
       },
       "staking": {
@@ -2669,8 +2840,8 @@
         "tab3": "重置",
         "form1": {
           "assetIdentifier": {
-            "label": "资金",
-            "description": "不同的资金有各自的节点设定"
+            "label": "资产",
+            "description": "不同的资产有各自的节点设定"
           },
           "nodeUrl": {
             "label": "节点 URL",
@@ -2732,7 +2903,7 @@
           "modal1": {
             "title": "你的助记词",
             "description": "请查阅所有的助记词，并以正确的次序记录下来。",
-            "warning": "请好好保管并不要分享你的助记词以保障资金的安全。"
+            "warning": "请好好保管并不要分享你的助记词以保障资产的安全。"
           }
         },
         "clearStorage": {
@@ -2741,7 +2912,7 @@
           "modal": {
             "title": "确认重置",
             "description1": "你或许需要确认你的所有钱包助记词，以确保未来你能够复原钱包的使用权。",
-            "warning": "你确定你要重置这个程序？ 如果你没有备份好你所有钱包的助记词，你将会永远失去钱包内的所有资金。",
+            "warning": "你确定你要重置这个程序？ 如果你没有备份好你所有钱包的助记词，你将会永远失去钱包内的所有资产。",
             "disclaimer": "我明白我只能够通过钱包的助记词来恢复钱包的使用权。",
             "form1": {
               "clear": {
@@ -3106,7 +3277,8 @@
       },
       "welcome": {
         "slogan": "데스크탑 지갑으로 지갑 관리와 송금을 할 수 있습니다",
-        "button": "시작하기"
+        "button": "시작하기",
+        "block": "이 제품은 현재 사용자의 국가 또는 지역에서 사용할 수 없습니다"
       },
       "signup": {
         "title": "앱 패스워드가 잘 생성되었습니다",
@@ -3257,6 +3429,7 @@
         "send": "전송",
         "receive": "수신",
         "assets": "금액",
+        "bridge": "Cronos 브릿지",
         "governance": "거버넌스",
         "nft": "나의 NFT",
         "settings": "설정",
@@ -3455,6 +3628,69 @@
         },
         "moreMenu": {
           "nodeConfiguration": "노드 설정"
+        }
+      },
+      "bridge": {
+        "form": {
+          "from": "송신인",
+          "to": "수신인",
+          "errorSameChain": "이 두 체인은 동일한 체인입니다",
+          "errorBridgeNotSupported": "선택된 브릿지 전송은 지원하지 않습니다",
+          "amount": "금액",
+          "willReceive": "받을 금액",
+          "fee": "수수료",
+          "destination": "목적지",
+          "toAddress": "수신인 주소",
+          "transfer": "전송 자산",
+          "receiving": "수신 중",
+          "disclaimer": "계속 진행함으로써 이용 약관에 동의함을 인정합니다."
+        },
+        "step0": {
+          "title": "Cronos 브릿지",
+          "description": "Cronos에서 자산을 전송하는 가장 빠르고 안전한 방법입니다."
+        },
+        "step1": {
+          "title": "확인"
+        },
+        "step2": {
+          "title": "브릿지 트랙잭션"
+        },
+        "deposit": {
+          "complete": {
+            "title": "{{amount}} {{symbol}}  입금이 완료되었습니다"
+          },
+          "transactionID": "트랜잭션 ID:",
+          "failed": {
+            "title": "{{amount}} {{symbol}}  입금이 실패하였습니다",
+            "description": "브릿지 전송에 실패했습니다. 브릿지 설정이 정확하고 지갑 주소에 충분한 자금이 있는지 확인하세요."
+          }
+        },
+        "transferInitiated": {
+          "title": "트랜잭션 시작됨",
+          "description": "지갑에서 자금을 확인하십시오. 네트워크 상태에 따라 최대 1시간까지 소요될 수 있습니다."
+        },
+        "action": {
+          "viewTransaction": "트랜잭션 보기",
+          "viewTransactionHIstory": "트랜잭션 내역 보기"
+        },
+        "config": {
+          "prefix": {
+            "title": "프리픽스",
+            "validation": "프리픽스는 오직 {{number}} 과 소문자만 가능합니다"
+          },
+          "address": {
+            "title": "Cronos 브릿지 콘트랙 주소",
+            "validation": "콘트랙 주소"
+          },
+          "channel": {
+            "title": "브릿지 채널"
+          },
+          "port": {
+            "title": "브릿지 포트"
+          }
+        },
+        "pendingTransfer": {
+          "title": "{{amount}} {{symbol}}이 전송 대기 중입니다"
         }
       },
       "staking": {
