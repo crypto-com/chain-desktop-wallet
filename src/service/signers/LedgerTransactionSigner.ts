@@ -177,6 +177,13 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     SIGN_MODE_TEXTUAL = 2,
     SIGN_MODE_LEGACY_AMINO_JSON = 127,
     */
+
+    // eslint-disable-next-line no-console
+    console.log('SIGNED SEQ AND ACCOUNT NUMBER', {
+      accountNumber: transaction.accountNumber,
+      accountSequence: transaction.accountSequence,
+    });
+
     const signableTx = rawTx
       .appendMessage(message)
       .addSigner({
