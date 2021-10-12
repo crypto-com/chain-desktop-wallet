@@ -42,11 +42,6 @@ import {
 import { renderExplorerUrl } from '../../models/Explorer';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
-  FIXED_DEFAULT_FEE,
-  CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
-  SUPPORTED_CURRENCY,
-} from '../../config/StaticConfig';
-import {
   adjustedTransactionAmount,
   fromScientificNotation,
   getCurrentMinAssetAmount,
@@ -70,7 +65,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { UndelegateFormComponent } from '../home/components/UndelegateFormComponent';
 import RedelegateFormComponent from '../home/components/RedelegateFormComponent';
 import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
-import { MODERATION_CONFIG_FILE_URL, UNBLOCKING_PERIOD_IN_DAYS } from '../../config/StaticConfig';
+import { MODERATION_CONFIG_FILE_URL, UNBLOCKING_PERIOD_IN_DAYS, CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD, FIXED_DEFAULT_FEE, SUPPORTED_CURRENCY } from '../../config/StaticConfig';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
@@ -206,8 +201,8 @@ const FormDelegationRequest = () => {
 
     const moderationConfigHandler = async () => {
       const fetchModerationConfigData = await fetch(MODERATION_CONFIG_FILE_URL);
-      const moderationConfig = await fetchModerationConfigData.json();
-      setModerationConfig(moderationConfig);
+      const moderationConfigData = await fetchModerationConfigData.json();
+      setModerationConfig(moderationConfigData);
     }
 
     if (!didMountRef.current) {
