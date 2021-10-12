@@ -246,7 +246,12 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       sender: transaction.fromAddress,
       sourceChannel: transaction.channel || '',
       sourcePort: transaction.port || '',
-      timeoutTimestampInNanoSeconds: Long.fromValue(timeout),
+      timeoutTimestampInNanoSeconds: Long.fromString(String(timeout), true),
+      timeoutHeight: {
+        // TODO: These numbers are hard-coded for now but we shall make it more dynamic later
+        revisionNumber: Long.fromString('122', true),
+        revisionHeight: Long.fromString('1708515', true),
+      },
       receiver: transaction.toAddress,
       token: new cro.Coin(transaction.amount, Units.BASE),
     });
