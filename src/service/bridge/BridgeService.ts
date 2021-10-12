@@ -200,6 +200,10 @@ class BridgeService extends WalletBaseService {
         bridgeTransferRequest.decryptedPhrase,
       );
     }
+
+    // eslint-disable-next-line no-console
+    console.log('SIGNED_HEX_TX', signedTxHex);
+
     return await nodeRpc.broadcastTransaction(signedTxHex);
   }
 

@@ -23,12 +23,13 @@ import BridgePage from './bridge/bridge';
 import SignUpPage from './signup/signup';
 import HomeLayout from '../layouts/home/home';
 import AssetsPage from './assets/assets';
+import BlockPage from './block/block';
+
 import {
   CLOUDFLARE_TRACE_URI,
   NOT_KNOWN_YET_VALUE,
   COUNTRY_CODES_TO_BLOCK,
 } from '../config/StaticConfig';
-import BlockPage from './block/block';
 
 interface RouterProps {
   children: React.ReactNode;
