@@ -585,7 +585,61 @@
           "to": "To",
           "errorSameChain": "The two chains cannot be the same",
           "errorBridgeNotSupported": "The selected bridge transfer is not supported",
-          "amount": "Amount"
+          "amount": "Amount",
+          "willReceive": "You will receieve: ",
+          "fee": "Fee: ",
+          "destination": "Destination: ",
+          "toAddress": "To Address: ",
+          "transfer": "Transfer Asset",
+          "receiving": "Receiving",
+          "disclaimer": "By proceeding, I hereby acknowledge that I agree to the terms and conditions."
+        },
+        "step0": {
+          "title": "Cronos Bridge",
+          "description": "The safe, fast and most secure way to transfer assets to and from Cronos."
+        },
+        "step1": {
+          "title": "Confirmation"
+        },
+        "step2": {
+          "title": "Bridge Transaction"
+        },
+        "deposit": {
+          "complete": {
+            "title": "Deposit of {{amount}} {{symbol}} is completed"
+          },
+          "transactionID": "Transaction ID: ",
+          "failed": {
+            "title": "Deposit of {{amount}} {{symbol}} is failed",
+            "description": "Bridge Transfer Failed. Please ensure the Bridge Config Settings are correct and there are enough funds in your wallet address."
+          }
+        },
+        "transferInitiated": {
+          "title": "Transfer Initiated",
+          "description": "Check your wallet for the funds. It may take up to an hour depending on network congestion."
+        },
+        "action": {
+          "viewTransaction": "View Transaction",
+          "viewTransactionHIstory": "View Transaction History"
+        },
+        "config": {
+          "prefix": {
+            "title": "Prefix",
+            "validation": "Prefix can only be {{number}} lowercase letters"
+          },
+          "address": {
+            "title": "Cronos Bridge Contract Address",
+            "validation": "Contract Address"
+          },
+          "channel": {
+            "title": "Bridge Channel"
+          },
+          "port": {
+            "title": "Bridge Port"
+          }
+        },
+        "pendingTransfer": {
+          "title": "{{amount}} {{symbol}} is pending to transfer"
         }
       },
       "staking": {
@@ -1503,7 +1557,64 @@
       "bridge": {
         "form": {
           "from": "從",
-          "to": "至"
+          "to": "至",
+          "errorSameChain": "不能選擇同一條鏈",
+          "errorBridgeNotSupported": "不支持所選的跨鏈轉移方式",
+          "amount": "數目",
+          "willReceive": "你將會收到：",
+          "fee": "費用：",
+          "destination": "目標地址：",
+          "toAddress": "收款人地址：",
+          "transfer": "轉移資產",
+          "receiving": "將會收到",
+          "disclaimer": "我同意條款和條件。"
+        },
+        "step0": {
+          "title": "Cronos 跨鏈橋",
+          "description": "把跨鏈資產帶到 Cronos 上最安全快速且有保障的方法。"
+        },
+        "step1": {
+          "title": "確認"
+        },
+        "step2": {
+          "title": "跨鏈交易"
+        },
+        "deposit": {
+          "complete": {
+            "title": "已完成存入 {{amount}} {{symbol}}"
+          },
+          "transactionID": "交易 ID：",
+          "failed": {
+            "title": "存入 {{amount}} {{symbol}} 的交易失敗了",
+            "description": "跨鏈交易失敗了。請確認跨鏈配置正確並且錢包中有足夠的資金。"
+          }
+        },
+        "transferInitiated": {
+          "title": "交易已發起",
+          "description": "請查看錢包資產。在網絡擁堵的情況下，可能最多需要一個小時完成交易。"
+        },
+        "action": {
+          "viewTransaction": "查看交易",
+          "viewTransactionHIstory": "查看交易歷史"
+        },
+        "config": {
+          "prefix": {
+            "title": "前綴",
+            "validation": "前綴只能是 {{number}} 個小寫字母"
+          },
+          "address": {
+            "title": "Cronos 跨鏈橋合約地址",
+            "validation": "合約地址"
+          },
+          "channel": {
+            "title": "跨鏈橋頻道"
+          },
+          "port": {
+            "title": "跨鏈橋端口"
+          }
+        },
+        "pendingTransfer": {
+          "title": "{{amount}} {{symbol}} 正等待發送"
         }
       },
       "staking": {
@@ -2420,7 +2531,64 @@
       "bridge": {
         "form": {
           "from": "从",
-          "to": "至"
+          "to": "至",
+          "errorSameChain": "不能选择同一条链",
+          "errorBridgeNotSupported": "不支持所选的跨链转移方式",
+          "amount": "数目",
+          "willReceive": "你将会收到：",
+          "fee": "费用：",
+          "destination": "目标地址：",
+          "toAddress": "收款人地址：",
+          "transfer": "转移资产",
+          "receiving": "将会收到",
+          "disclaimer": "我同意条款和条件。"
+        },
+        "step0": {
+          "title": "Cronos 跨链桥",
+          "description": "把跨链资产带到 Cronos 上最安全快速且有保障的方法。"
+        },
+        "step1": {
+          "title": "确认"
+        },
+        "step2": {
+          "title": "跨链交易"
+        },
+        "deposit": {
+          "complete": {
+            "title": "已完成存入 {{amount}} {{symbol}}"
+          },
+          "transactionID": "交易 ID：",
+          "failed": {
+            "title": "存入 {{amount}} {{symbol}} 的交易失败了",
+            "description": "跨链交易失败了。请确认跨链配置正确并且钱包中有足够的资金。"
+          }
+        },
+        "transferInitiated": {
+          "title": "交易已发起",
+          "description": "请查看钱包资产。在网络拥堵的情况下，可能最多需要一个小时完成交易。"
+        },
+        "action": {
+          "viewTransaction": "查看交易",
+          "viewTransactionHIstory": "查看交易历史"
+        },
+        "config": {
+          "prefix": {
+            "title": "前缀",
+            "validation": "前缀只能是 {{number}} 个小写字母"
+          },
+          "address": {
+            "title": "Cronos 跨链桥合约地址",
+            "validation": "合约地址"
+          },
+          "channel": {
+            "title": "跨链桥频道"
+          },
+          "port": {
+            "title": "跨链桥端口"
+          }
+        },
+        "pendingTransfer": {
+          "title": "{{amount}} {{symbol}} 正等待发送"
         }
       },
       "staking": {
@@ -3106,7 +3274,8 @@
       },
       "welcome": {
         "slogan": "데스크탑 지갑으로 지갑 관리와 송금을 할 수 있습니다",
-        "button": "시작하기"
+        "button": "시작하기",
+        "block": "이 제품은 현재 사용자의 국가 또는 지역에서 사용할 수 없습니다"
       },
       "signup": {
         "title": "앱 패스워드가 잘 생성되었습니다",
@@ -3455,6 +3624,69 @@
         },
         "moreMenu": {
           "nodeConfiguration": "노드 설정"
+        }
+      },
+      "bridge": {
+        "form": {
+          "from": "송신인",
+          "to": "수신인",
+          "errorSameChain": "이 두 체인은 동일한 체인입니다",
+          "errorBridgeNotSupported": "선택된 브릿지 전송은 지원하지 않습니다",
+          "amount": "금액",
+          "willReceive": "받을 금액",
+          "fee": "수수료",
+          "destination": "목적지",
+          "toAddress": "수신인 주소",
+          "transfer": "전송 자산",
+          "receiving": "수신 중",
+          "disclaimer": "계속 진행함으로써 이용 약관에 동의함을 인정합니다."
+        },
+        "step0": {
+          "title": "Cronos 브릿지",
+          "description": "Cronos에서 자산을 전송하는 가장 빠르고 안전한 방법입니다."
+        },
+        "step1": {
+          "title": "확인"
+        },
+        "step2": {
+          "title": "브릿지 트랙잭션"
+        },
+        "deposit": {
+          "complete": {
+            "title": "{{amount}} {{symbol}}  입금이 완료되었습니다"
+          },
+          "transactionID": "트랜잭션 ID:",
+          "failed": {
+            "title": "{{amount}} {{symbol}}  입금이 실패하였습니다",
+            "description": "브릿지 전송에 실패했습니다. 브릿지 설정이 정확하고 지갑 주소에 충분한 자금이 있는지 확인하세요."
+          }
+        },
+        "transferInitiated": {
+          "title": "트랜잭션 시작됨",
+          "description": "지갑에서 자금을 확인하십시오. 네트워크 상태에 따라 최대 1시간까지 소요될 수 있습니다."
+        },
+        "action": {
+          "viewTransaction": "트랜잭션 보기",
+          "viewTransactionHIstory": "트랜잭션 내역 보기"
+        },
+        "config": {
+          "prefix": {
+            "title": "프리픽스",
+            "validation": "프리픽스는 오직 {{number}} 과 소문자만 가능합니다"
+          },
+          "address": {
+            "title": "Cronos 브릿지 콘트랙 주소",
+            "validation": "콘트랙 주소"
+          },
+          "channel": {
+            "title": "브릿지 채널"
+          },
+          "port": {
+            "title": "브릿지 포트"
+          }
+        },
+        "pendingTransfer": {
+          "title": "{{amount}} {{symbol}}이 전송 대기 중입니다"
         }
       },
       "staking": {
