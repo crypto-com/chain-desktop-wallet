@@ -1090,7 +1090,7 @@ const CronosBridge = () => {
               >
                 <Form.Item
                   name="prefix"
-                  label="Prefix"
+                  label={t('bridge.config.prefix.title')}
                   rules={[
                     {
                       required: true,
