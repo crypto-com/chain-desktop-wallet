@@ -35,6 +35,7 @@ export class WalletBaseService {
       address: currentSession.wallet.address,
       accountNumber,
       accountSequence,
+      chainId: currentSession.wallet.config.network.chainId,
     });
 
     const ledgerTransactionSigner = new LedgerTransactionSigner(
