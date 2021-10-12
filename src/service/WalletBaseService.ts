@@ -26,10 +26,16 @@ export class WalletBaseService {
     const accountSequence = await nodeRpc.loadSequenceNumber(currentSession.wallet.address);
 
     const transactionSigner = new TransactionSigner(currentWallet.config);
-
     const signerProvider: ISignerProvider = createLedgerDevice();
 
     const tmpWalletConfig = currentWallet.config;
+
+    // eslint-disable-next-line no-console
+    console.log('PREPARE_TX: ', {
+      address: currentSession.wallet.address,
+      accountNumber,
+      accountSequence,
+    });
 
     const ledgerTransactionSigner = new LedgerTransactionSigner(
       // currentWallet.config,
@@ -70,10 +76,12 @@ export class WalletBaseService {
     }
 
     // eslint-disable-next-line no-console
-    console.log('EVM_TX', {
+    console.log('PREPARE_TX', {
+      address: originAsset.address,
       txNonce: nonce,
       gasPrice: loadedGasPrice,
       gasLimit,
+      chainId: originAsset?.config?.chainId,
     });
 
     return {
