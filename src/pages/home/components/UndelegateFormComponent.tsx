@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import React from 'react';
 import { Session } from '../../../models/Session';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
+import { UNBLOCKING_PERIOD_IN_DAYS } from '../../../config/StaticConfig';
 
 export const UndelegateFormComponent = (props: {
   currentSession: Session;
@@ -19,7 +20,7 @@ export const UndelegateFormComponent = (props: {
     t('general.undelegateFormComponent.maxValidator.error'),
   );
 
-  const undelegatePeriod = props.currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
+  const undelegatePeriod = props.currentSession.wallet.config.name === 'MAINNET' ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
 
   return (
     <>

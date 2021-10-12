@@ -2,8 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
 import moment from 'moment';
-import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs, Typography } from 'antd';
-import { OrderedListOutlined } from '@ant-design/icons';
+import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs, Typography, Tooltip } from 'antd';
+import { OrderedListOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
@@ -70,6 +70,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { UndelegateFormComponent } from '../home/components/UndelegateFormComponent';
 import RedelegateFormComponent from '../home/components/RedelegateFormComponent';
 import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
+import { MODERATION_CONFIG_FILE_URL, UNBLOCKING_PERIOD_IN_DAYS } from '../../config/StaticConfig';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
@@ -102,6 +103,18 @@ interface StakingTabularData {
   stakedAmount: string;
   validatorAddress: string;
   delegatorAddress: string;
+}
+interface ModerationConfig {
+  config: Config;
+}
+
+interface Config {
+  validators: Validators;
+}
+
+interface Validators {
+  warning:    any[];
+  suspicious: string[];
 }
 
 interface UnbondingDelegationTabularData {
@@ -141,6 +154,7 @@ const FormDelegationRequest = () => {
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
   const [displayWarning, setDisplayWarning] = useState(true);
+  const [moderationConfig, setModerationConfig] = useState<ModerationConfig>(undefined);
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -190,12 +204,19 @@ const FormDelegationRequest = () => {
       setWalletAsset(currentWalletAsset);
     };
 
+    const moderationConfigHandler = async () => {
+      const fetchModerationConfigData = await fetch(MODERATION_CONFIG_FILE_URL);
+      const moderationConfig = await fetchModerationConfigData.json();
+      setModerationConfig(moderationConfig);
+    }
+
     if (!didMountRef.current) {
       syncAssetData();
       didMountRef.current = true;
     }
 
     syncValidatorsData();
+    moderationConfigHandler();
   }, [fetchingDB, walletAsset, currentValidatorList]);
 
   const showConfirmationModal = () => {
@@ -335,6 +356,16 @@ const FormDelegationRequest = () => {
           }`}
         >
           {ellipsis(validatorName, 24)}
+          {' '}
+          {
+            moderationConfig.config.validators.warning.concat(moderationConfig.config.validators.suspicious).includes(record.validatorAddress) ?
+              <Tooltip title={t('staking.validatorList.table.moderationText')}>
+                <span>
+                  <ExclamationCircleOutlined style={{ color: "red" }} />
+                </span>
+              </Tooltip> : ''
+          }
+
         </a>
       ),
     },
@@ -442,7 +473,7 @@ const FormDelegationRequest = () => {
 
   const assetMarketData = allMarketData[`${walletAsset.mainnetSymbol}-${currentSession.currency}`];
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol;
-  const undelegatePeriod = currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
+  const undelegatePeriod = currentSession.wallet.config.name === 'MAINNET' ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
 
   return (
     <Form
@@ -1466,7 +1497,7 @@ const StakingPage = () => {
 
   const [t, i18n] = useTranslation();
 
-  const undelegatePeriod = currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
+  const undelegatePeriod = currentSession.wallet.config.name === 'MAINNET' ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
 
   const unbondingDelegationColumns = [
     {
