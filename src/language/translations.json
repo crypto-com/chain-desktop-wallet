@@ -300,10 +300,18 @@
           "checkbox1": "Want to create with hardware wallet?"
         },
         "ledgerModalPopup": {
-          "title1": "Success!",
-          "title2": "Connect your Ledger Device",
-          "description1": "Your Ledger device has been connected successfully.",
-          "description2": "Please confirm connection on your Ledger Device"
+          "tendermintAddress": {
+            "title1": "Success!",
+            "title2": "Connect your Ledger Device",
+            "description1": "Your Ledger device has been connected successfully.",
+            "description2": "Please confirm connection by opening Crypto.org App on your Ledger Device"
+          },
+          "evmAddress": {
+            "title1": "Success!",
+            "title2": "Connect your Ledger Device",
+            "description1": "Your Ledger device has been connected successfully.",
+            "description2": "Please confirm connection by opening Ethereum App on your Ledger Device"
+          }
         }
       },
       "restore": {
@@ -569,6 +577,15 @@
         },
         "moreMenu": {
           "nodeConfiguration": "Node Configuration"
+        }
+      },
+      "bridge": {
+        "form": {
+          "from": "From",
+          "to": "To",
+          "errorSameChain": "The two chains cannot be the same",
+          "errorBridgeNotSupported": "The selected bridge transfer is not supported",
+          "amount": "Amount"
         }
       },
       "staking": {
@@ -1204,10 +1221,18 @@
           "checkbox1": "想要創建硬件錢包？"
         },
         "ledgerModalPopup": {
-          "title1": "成功！",
-          "title2": "連接你的Ledger 錢包",
-          "description1": "你的Ledger錢包已經成功連接。",
-          "description2": "請在Ledger錢包上確認連接"
+          "tendermintAddress": {
+            "title1": "成功！",
+            "title2": "連接你的Ledger 錢包",
+            "description1": "你的Ledger錢包已經成功連接。",
+            "description2": "請在Ledger錢包上打開 Crypto.org App 再確認連接"
+          },
+          "evmAddress": {
+            "title1": "成功！",
+            "title2": "連接你的Ledger 錢包",
+            "description1": "你的Ledger錢包已經成功連接。",
+            "description2": "請在Ledger錢包上打開 Ethereum App 再確認連接"
+          }
         }
       },
       "restore": {
@@ -1473,6 +1498,12 @@
         },
         "moreMenu": {
           "nodeConfiguration": "節點設定"
+        }
+      },
+      "bridge": {
+        "form": {
+          "from": "從",
+          "to": "至"
         }
       },
       "staking": {
@@ -2107,10 +2138,18 @@
           "checkbox1": "想要创建硬件钱包？"
         },
         "ledgerModalPopup": {
-          "title1": "成功！",
-          "title2": "连接你的Ledger 钱包",
-          "description1": "你的Ledger钱包已经成功连接。",
-          "description2": "请在Ledger钱包上确认连接"
+          "tendermintAddress": {
+            "title1": "成功！",
+            "title2": "连接你的Ledger 钱包",
+            "description1": "你的Ledger钱包已经成功连接。",
+            "description2": "请在Ledger钱包上打开 Crypto.org App 再确认连接"
+          },
+          "evmAddress": {
+            "title1": "成功！",
+            "title2": "连接你的Ledger 钱包",
+            "description1": "你的Ledger钱包已经成功连接。",
+            "description2": "请在Ledger钱包上打开 Ethereum App 再确认连接"
+          }
         }
       },
       "restore": {
@@ -2376,6 +2415,12 @@
         },
         "moreMenu": {
           "nodeConfiguration": "节点配置"
+        }
+      },
+      "bridge": {
+        "form": {
+          "from": "从",
+          "to": "至"
         }
       },
       "staking": {
@@ -3137,10 +3182,18 @@
           "checkbox1": "하드웨어 지갑을 만들까요?"
         },
         "ledgerModalPopup": {
-          "title1": "성공!",
-          "title2": "레져를 연결해주세요",
-          "description1": "레져가 잘 연결되었습니다",
-          "description2": "레져 연결을 확인해주세요"
+          "tendermintAddress": {
+            "title1": "성공!",
+            "title2": "레져를 연결해주세요",
+            "description1": "레져가 잘 연결되었습니다",
+            "description2": "레져 연결을 확인해주세요"
+          },
+          "evmAddress": {
+            "title1": "성공!",
+            "title2": "레져를 연결해주세요",
+            "description1": "레져가 잘 연결되었습니다",
+            "description2": "레져 연결을 확인해주세요"
+          }
         }
       },
       "restore": {
@@ -4326,8 +4379,10 @@
           }
         },
         "ledgerModalPopup": {
-          "title1": "Erfolgreich!",
-          "title2": "Ihre Ledger verbinden"
+          "tendermintAddress": {
+            "title1": "Erfolgreich!",
+            "title2": "Ihre Ledger verbinden"
+          }
         }
       },
       "restore": {
