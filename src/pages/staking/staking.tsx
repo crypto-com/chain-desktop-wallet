@@ -149,7 +149,7 @@ const FormDelegationRequest = () => {
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
   const [displayWarning, setDisplayWarning] = useState(true);
-  const [moderationConfig, setModerationConfig] = useState<ModerationConfig>(undefined);
+  const [moderationConfig, setModerationConfig] = useState<ModerationConfig>();
 
   const analyticsService = new AnalyticsService(currentSession);
 
