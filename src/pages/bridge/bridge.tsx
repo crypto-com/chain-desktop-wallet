@@ -151,8 +151,9 @@ const CronosBridgeForm = props => {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   // const [updateLoading, setUpdateLoading] = useState(false);
   const didMountRef = useRef(false);
-  const analyticsService = new AnalyticsService(session);
 
+  const analyticsService = new AnalyticsService(session);
+  const bridgeService = new BridgeService(walletService.storageService);
   const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
 
   const SUPPORTED_BRIDGES_ASSETS = ['CRO', 'CRONOS'];
@@ -419,7 +420,6 @@ const CronosBridgeForm = props => {
             {
               validator: async () => {
                 const { bridgeFrom, bridgeTo } = form.getFieldValue();
-                const bridgeService = new BridgeService(walletService.storageService);
 
                 switch (`${bridgeFrom}_TO_${bridgeTo}`) {
                   case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS: {
@@ -617,6 +617,7 @@ const CronosBridge = () => {
 
   const [t] = useTranslation();
 
+  const bridgeService = new BridgeService(walletService.storageService);
   const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
   const defaultConfig = isTestnet ? DefaultTestnetBridgeConfigs : DefaultMainnetBridgeConfigs;
 
