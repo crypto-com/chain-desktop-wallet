@@ -184,13 +184,7 @@ class WalletService {
             );
           }
 
-          // eslint-disable-next-line no-console
-          console.log(`${currentAsset.assetType} SIGNED-TX`, signedTx);
           const result = await cronosClient.broadcastRawTransactionHex(signedTx);
-
-          // eslint-disable-next-line no-console
-          console.log('BROADCAST_RESULT', result);
-
           return {
             transactionHash: result,
             message: '',
