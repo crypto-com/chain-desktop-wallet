@@ -93,4 +93,6 @@ export interface BridgeTransactionUnsigned extends TransactionUnsigned {
 
   data?: string;
   originAsset?: UserAsset;
+
+  latestBlockHeight?: number;
 }

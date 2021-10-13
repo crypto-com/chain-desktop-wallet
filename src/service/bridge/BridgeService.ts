@@ -173,6 +173,7 @@ export class BridgeService {
       transactionSigner,
       ledgerTransactionSigner,
       currentSession,
+      latestBlock,
     } = await this.transactionPrepareService.prepareTransaction();
 
     const scaledBaseAmount = getBaseScaledAmount(
@@ -198,6 +199,7 @@ export class BridgeService {
       channel: loadedBridgeConfig?.bridgeChannel || defaultBridgeConfig.bridgeChannel,
       port: loadedBridgeConfig?.bridgePort || defaultBridgeConfig.bridgePort,
       memo: `bridge:desktop-wallet-client`,
+      latestBlockHeight: latestBlock,
     };
 
     let signedTxHex: string = '';
