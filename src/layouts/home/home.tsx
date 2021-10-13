@@ -124,8 +124,6 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
 
   const [ledgerTendermintAddress, setLedgerTendermintAddress] = useState('');
-  // eslint-disable-next-line
-  const [ledgerEvmAddress, setLedgerEvmAddress] = useState('');
   const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
   const [isLedgerEthAppConnected, setIsLedgerEthAppConnected] = useState(false);
   const [isLedgerCroAppConnectModalVisible, setIsLedgerCroAppConnectModalVisible] = useState(false);
@@ -307,12 +305,11 @@ function HomeLayout(props: HomeLayoutProps) {
 
   const checkIsLedgerEthAppConnected = async (walletSession: Session) => {
     let hwok = false;
-    let evmAddress = '';
+    let ledgerEvmAddress = '';
     try {
       const device: ISignerProvider = createLedgerDevice();
 
-      evmAddress = await device.getEthAddress(walletSession.wallet.addressIndex, false);
-      setLedgerEvmAddress(evmAddress);
+      ledgerEvmAddress = await device.getEthAddress(walletSession.wallet.addressIndex, false);
       setIsLedgerEthAppConnected(true);
 
       await new Promise(resolve => {
@@ -353,7 +350,7 @@ function HomeLayout(props: HomeLayoutProps) {
     });
     if (hwok) {
       // proceed
-      migrateLedgerAsset(walletSession, ledgerTendermintAddress, evmAddress);
+      migrateLedgerAsset(walletSession, ledgerTendermintAddress, ledgerEvmAddress);
     }
   };
 
