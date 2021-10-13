@@ -5,31 +5,42 @@ import { ISignerProvider } from './signers/SignerProvider';
 import { createLedgerDevice } from './LedgerService';
 import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
 import { StorageService } from '../storage/StorageService';
-import { APP_DB_NAMESPACE } from '../config/StaticConfig';
 import { UserAsset } from '../models/UserAsset';
 import { CronosClient } from './cronos/CronosClient';
+import { PrepareEVMTransaction, TenderMintTransactionPrepared } from './Models';
 
-export class WalletBaseService {
+export class TransactionPrepareService {
   public readonly storageService: StorageService;
 
-  constructor() {
-    this.storageService = new StorageService(APP_DB_NAMESPACE);
+  constructor(storageService: StorageService) {
+    this.storageService = storageService;
   }
 
-  public async prepareTransaction() {
+  public async prepareTransaction(): Promise<TenderMintTransactionPrepared> {
     const currentSession = await this.storageService.retrieveCurrentSession();
     const currentWallet = currentSession.wallet;
 
     const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
 
-    const accountNumber = await nodeRpc.fetchAccountNumber(currentSession.wallet.address);
-    const accountSequence = await nodeRpc.loadSequenceNumber(currentSession.wallet.address);
+    const [accountNumber, accountSequence, latestBlock] = await Promise.all([
+      nodeRpc.fetchAccountNumber(currentSession.wallet.address),
+      nodeRpc.loadSequenceNumber(currentSession.wallet.address),
+      nodeRpc.loadLatestBlock(),
+    ]);
 
     const transactionSigner = new TransactionSigner(currentWallet.config);
-
     const signerProvider: ISignerProvider = createLedgerDevice();
 
     const tmpWalletConfig = currentWallet.config;
+
+    // eslint-disable-next-line no-console
+    console.log('PREPARE_TX: ', {
+      latestBlock,
+      address: currentSession.wallet.address,
+      accountNumber,
+      accountSequence,
+      chainId: currentSession.wallet.config.network.chainId,
+    });
 
     const ledgerTransactionSigner = new LedgerTransactionSigner(
       // currentWallet.config,
@@ -44,11 +55,15 @@ export class WalletBaseService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
+      latestBlock,
     };
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public async prepareEVMTransaction(originAsset: UserAsset, txConfig: TransactionConfig) {
+  public async prepareEVMTransaction(
+    originAsset: UserAsset,
+    txConfig: TransactionConfig,
+  ): Promise<PrepareEVMTransaction> {
     const currentSession = await this.storageService.retrieveCurrentSession();
 
     if (!originAsset.config?.nodeUrl || !originAsset.address) {
@@ -70,10 +85,12 @@ export class WalletBaseService {
     }
 
     // eslint-disable-next-line no-console
-    console.log('EVM_TX', {
+    console.log('PREPARE_TX', {
+      address: originAsset.address,
       txNonce: nonce,
       gasPrice: loadedGasPrice,
       gasLimit,
+      chainId: originAsset?.config?.chainId,
     });
 
     return {

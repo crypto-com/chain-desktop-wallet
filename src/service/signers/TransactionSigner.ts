@@ -246,7 +246,7 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       sender: transaction.fromAddress,
       sourceChannel: transaction.channel || '',
       sourcePort: transaction.port || '',
-      timeoutTimestampInNanoSeconds: Long.fromValue(timeout),
+      timeoutTimestampInNanoSeconds: Long.fromString(String(timeout), true),
       receiver: transaction.toAddress,
       token: new cro.Coin(transaction.amount, Units.BASE),
     });

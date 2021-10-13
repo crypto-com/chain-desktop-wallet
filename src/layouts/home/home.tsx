@@ -57,7 +57,11 @@ import { Session } from '../../models/Session';
 import { SettingsDataUpdate } from '../../models/Wallet';
 import packageJson from '../../../package.json';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
-import { LedgerWalletMaximum, MAX_INCORRECT_ATTEMPTS_ALLOWED, SHOW_WARNING_INCORRECT_ATTEMPTS } from '../../config/StaticConfig';
+import {
+  LedgerWalletMaximum,
+  MAX_INCORRECT_ATTEMPTS_ALLOWED,
+  SHOW_WARNING_INCORRECT_ATTEMPTS,
+} from '../../config/StaticConfig';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../storage/SecretStoreService';
@@ -529,7 +533,6 @@ function HomeLayout(props: HomeLayoutProps) {
             // Reset Incorrect attempt counts to ZERO
             await generalConfigService.resetIncorrectUnlockAttemptsCount();
           } else {
-
             // Increment incorrect Attempt counts by ONE
             await generalConfigService.incrementIncorrectUnlockAttemptsCountByOne();
 
@@ -546,12 +549,17 @@ function HomeLayout(props: HomeLayoutProps) {
             }
 
             // Show warning after `X` number of wrong attempts
-            if (latestIncorrectAttemptCount >= (MAX_INCORRECT_ATTEMPTS_ALLOWED - SHOW_WARNING_INCORRECT_ATTEMPTS)) {
+            if (
+              latestIncorrectAttemptCount >=
+              MAX_INCORRECT_ATTEMPTS_ALLOWED - SHOW_WARNING_INCORRECT_ATTEMPTS
+            ) {
               errorText = t('general.sessionLockModal.errorSelfDestruct')
                 .replace('*N*', String(latestIncorrectAttemptCount))
-                .replace('#T#', String(MAX_INCORRECT_ATTEMPTS_ALLOWED - latestIncorrectAttemptCount))
+                .replace(
+                  '#T#',
+                  String(MAX_INCORRECT_ATTEMPTS_ALLOWED - latestIncorrectAttemptCount),
+                );
             }
-
           }
 
           return {

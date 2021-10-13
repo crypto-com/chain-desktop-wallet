@@ -6,8 +6,7 @@ import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import { BridgeTransferRequest } from '../TransactionRequestModels';
 import { BroadCastResult } from '../../models/Transaction';
 import { BridgeTransactionUnsigned } from '../signers/TransactionSupported';
-import { LEDGER_WALLET_TYPE } from '../LedgerService';
-import { WalletBaseService } from '../WalletBaseService';
+import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../LedgerService';
 import { getBaseScaledAmount } from '../../utils/NumberUtils';
 import BridgeABI from './contracts/BridgeABI.json';
 import { CronosClient } from '../cronos/CronosClient';
@@ -21,8 +20,19 @@ import {
 } from './BridgeConfig';
 import { Network } from '../../config/StaticConfig';
 import { Session } from '../../models/Session';
+import { StorageService } from '../../storage/StorageService';
+import { TransactionPrepareService } from '../TransactionPrepareService';
 
-class BridgeService extends WalletBaseService {
+export class BridgeService {
+  public readonly storageService: StorageService;
+
+  public readonly transactionPrepareService: TransactionPrepareService;
+
+  constructor(storageService: StorageService) {
+    this.storageService = storageService;
+    this.transactionPrepareService = new TransactionPrepareService(this.storageService);
+  }
+
   public async handleBridgeTransaction(
     bridgeTransferRequest: BridgeTransferRequest,
   ): Promise<BroadCastResult> {
@@ -53,12 +63,6 @@ class BridgeService extends WalletBaseService {
   private async handleCronosToCryptoOrgTransfer(bridgeTransferRequest: BridgeTransferRequest) {
     const { originAsset } = bridgeTransferRequest;
 
-    if (bridgeTransferRequest.walletType === LEDGER_WALLET_TYPE) {
-      throw TypeError(
-        `${LEDGER_WALLET_TYPE} not supported yet for ${bridgeTransferRequest.bridgeTransferDirection} transactions yet. Coming soon`,
-      );
-    }
-
     if (!originAsset.config?.nodeUrl || !originAsset.address) {
       throw TypeError(`Missing asset config: ${originAsset.config}`);
     }
@@ -76,10 +80,14 @@ class BridgeService extends WalletBaseService {
       value: web3.utils.toWei(bridgeTransferRequest.amount, 'ether'),
     };
 
-    const prepareTxInfo = await this.prepareEVMTransaction(originAsset, txConfig);
+    const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
+      originAsset,
+      txConfig,
+    );
 
+    const { currentSession } = prepareTxInfo;
     const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
-      prepareTxInfo.currentSession,
+      currentSession,
       bridgeTransferRequest,
     );
 
@@ -92,9 +100,6 @@ class BridgeService extends WalletBaseService {
     const encodedABI = contract.methods
       .send_cro_to_crypto_org(bridgeTransferRequest.tendermintAddress)
       .encodeABI();
-
-    // eslint-disable-next-line no-console
-    console.log('Encoded Contract ABI', encodedABI);
 
     const scaledBaseAmount = getBaseScaledAmount(bridgeTransferRequest.amount, originAsset);
 
@@ -112,19 +117,39 @@ class BridgeService extends WalletBaseService {
     bridgeTransaction.gasPrice = prepareTxInfo.loadedGasPrice;
     bridgeTransaction.gasLimit = prepareTxInfo.gasLimit;
 
-    const signedTransaction = await evmTransactionSigner.signBridgeTransfer(
-      bridgeTransaction,
-      bridgeTransferRequest.decryptedPhrase,
-    );
+    let signedTransactionHex = '';
+    if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      const device = createLedgerDevice();
+      const walletAddressIndex = currentSession.wallet.addressIndex;
+
+      const gasLimitTx = web3.utils.toBN(bridgeTransaction.gasLimit!);
+      const gasPriceTx = web3.utils.toBN(bridgeTransaction.gasPrice);
+
+      signedTransactionHex = await device.signEthTx(
+        walletAddressIndex,
+        Number(originAsset?.config?.chainId), // chainid
+        bridgeTransaction.nonce,
+        web3.utils.toHex(gasLimitTx) /* gas limit */,
+        web3.utils.toHex(gasPriceTx) /* gas price */,
+        bridgeContractAddress,
+        web3.utils.toHex(bridgeTransaction.amount),
+        encodedABI,
+      );
+    } else {
+      signedTransactionHex = await evmTransactionSigner.signBridgeTransfer(
+        bridgeTransaction,
+        bridgeTransferRequest.decryptedPhrase,
+      );
+    }
 
     // eslint-disable-next-line no-console
     console.log(`${bridgeTransferRequest.originAsset.assetType} REQUEST & SIGNED-TX`, {
-      signedTransaction,
+      signedTransactionHex,
       bridgeTransaction,
     });
 
     const broadcastedTransactionHash = await cronosClient.broadcastRawTransactionHex(
-      signedTransaction,
+      signedTransactionHex,
     );
 
     return {
@@ -148,7 +173,8 @@ class BridgeService extends WalletBaseService {
       transactionSigner,
       ledgerTransactionSigner,
       currentSession,
-    } = await this.prepareTransaction();
+      latestBlock,
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const scaledBaseAmount = getBaseScaledAmount(
       bridgeTransferRequest.amount,
@@ -173,6 +199,7 @@ class BridgeService extends WalletBaseService {
       channel: loadedBridgeConfig?.bridgeChannel || defaultBridgeConfig.bridgeChannel,
       port: loadedBridgeConfig?.bridgePort || defaultBridgeConfig.bridgePort,
       memo: `bridge:desktop-wallet-client`,
+      latestBlockHeight: latestBlock,
     };
 
     let signedTxHex: string = '';
@@ -188,6 +215,7 @@ class BridgeService extends WalletBaseService {
         bridgeTransferRequest.decryptedPhrase,
       );
     }
+
     return await nodeRpc.broadcastTransaction(signedTxHex);
   }
 
@@ -258,5 +286,3 @@ class BridgeService extends WalletBaseService {
     );
   };
 }
-
-export const bridgeService = new BridgeService();
