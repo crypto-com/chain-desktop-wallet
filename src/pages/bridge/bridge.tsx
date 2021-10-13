@@ -606,6 +606,7 @@ const CronosBridge = () => {
   );
   // eslint-disable-next-line
   const [bridgeConfirmationList, setBridgeConfirmationList] = useState<listDataSource[]>([]);
+  const [bridgeTransferError, setBridgeTransferError] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [isBridgeSettingsFormVisible, setIsBridgeSettingsFormVisible] = useState(false);
   // eslint-disable-next-line
@@ -678,6 +679,19 @@ const CronosBridge = () => {
     const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
     const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
 
+    let app = 'Crypto.org App';
+
+    switch (bridgeFromObj?.value) {
+      case 'CRYPTO_ORG':
+        app = 'Crypto.org App';
+        break;
+      case 'CRONOS':
+        app = 'Ethereum App';
+        break;
+      default:
+        app = 'Crypto.org App';
+    }
+
     const listDataSource = [
       {
         title: t('bridge.pendingTransfer.title', {
@@ -685,10 +699,19 @@ const CronosBridge = () => {
           symbol: currentAsset?.symbol,
         }),
         description: (
-          <span>
-            {t('bridge.form.from')} {bridgeFromObj?.label} {t('bridge.form.to')}{' '}
-            {bridgeToObj?.label}
-          </span>
+          <>
+            <div>
+              <span>
+                {t('bridge.form.from')} {bridgeFromObj?.label} {t('bridge.form.to')}{' '}
+                {bridgeToObj?.label}
+              </span>
+            </div>
+            <div>
+              {t('bridge.pendingTransfer.ledger.description', {
+                app,
+              })}
+            </div>
+          </>
         ),
         loading: false,
       },
@@ -752,6 +775,7 @@ const CronosBridge = () => {
         loading: false,
       });
       setBridgeConfirmationList(listDataSource);
+      setBridgeTransferError(true);
       // eslint-disable-next-line no-console
       console.log('Failed in Bridge Transfer', e);
     }
@@ -1017,11 +1041,12 @@ const CronosBridge = () => {
 
   return (
     <>
-      {currentStep === 1 ? (
+      {currentStep === 1 || bridgeTransferError ? (
         <div
           onClick={() => {
             setCurrentStep(currentStep - 1);
             setIsButtonDisabled(true);
+            setBridgeTransferError(false);
           }}
           style={{ textAlign: 'left', width: '50px', fontSize: '24px', cursor: 'pointer' }}
         >

@@ -640,7 +640,10 @@
           }
         },
         "pendingTransfer": {
-          "title": "{{amount}} {{symbol}} is pending to transfer"
+          "title": "{{amount}} {{symbol}} is pending to transfer",
+          "ledger": {
+            "description": "Please open {{app}} in your Ledger device and sign your transaction."
+          }
         }
       },
       "staking": {
@@ -879,8 +882,7 @@
           "label4": "Content URL",
           "button1": "Transfer NFT",
           "button2": "View on Crypto.com NFT Marketplace"
-        },
-        "tab3": "Receive NFT"
+        }
       },
       "settings": {
         "title": "Settings",
@@ -1617,7 +1619,10 @@
           }
         },
         "pendingTransfer": {
-          "title": "{{amount}} {{symbol}} 正等待發送"
+          "title": "{{amount}} {{symbol}} 正等待發送",
+          "ledger": {
+            "description": "請在Ledger錢包上打開 {{app}} 以簽名交易"
+          }
         }
       },
       "staking": {
@@ -1856,8 +1861,7 @@
           "label4": "內容 URL ",
           "button1": "轉發 NFT ",
           "button2": "於 Crypto.com NFT Marketplace 上瀏覽"
-        },
-        "tab3": "接收 NFT"
+        }
       },
       "settings": {
         "title": "設定",
@@ -2593,7 +2597,10 @@
           }
         },
         "pendingTransfer": {
-          "title": "{{amount}} {{symbol}} 正等待发送"
+          "title": "{{amount}} {{symbol}} 正等待发送",
+          "ledger": {
+            "description": "请在Ledger钱包上打开 {{app}} 以签名交易"
+          }
         }
       },
       "staking": {
@@ -2832,8 +2839,7 @@
           "label4": "内容 URL",
           "button1": "转发 NFT",
           "button2": "在 Crypto.com NFT Marketplace 上浏览"
-        },
-        "tab3": "接收 NFT"
+        }
       },
       "settings": {
         "title": "配置",
@@ -3931,8 +3937,7 @@
           "label4": "콘텐츠 URL",
           "button1": "NFT 전송",
           "button2": "크립토닷컴 NFT에서 보기"
-        },
-        "tab3": "수신 NFT"
+        }
       },
       "settings": {
         "title": "설정",
