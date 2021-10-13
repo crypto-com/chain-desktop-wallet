@@ -58,7 +58,6 @@ import {
   getNormalScaleAmount,
 } from '../../utils/NumberUtils';
 import { SUPPORTED_BRIDGE, SupportedBridge } from '../../config/StaticConfig';
-import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import iconCronosSvg from '../../assets/icon-cronos-blue.svg';
 import iconCroSvg from '../../assets/icon-cro.svg';
 import IconHexagon from '../../svg/IconHexagon';
@@ -71,10 +70,16 @@ import {
   DefaultMainnetBridgeConfigs,
   BridgeConfig,
 } from '../../service/bridge/BridgeConfig';
+import { BridgeService } from '../../service/bridge/BridgeService';
+import {
+  AnalyticsActions,
+  AnalyticsCategory,
+  AnalyticsService,
+  AnalyticsTxType,
+} from '../../service/analytics/AnalyticsService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { secretStoreService } from '../../storage/SecretStoreService';
-import { BridgeService } from '../../service/bridge/BridgeService';
 
 const { Content, Sider } = Layout;
 const { Option } = Select;
@@ -165,11 +170,16 @@ const CronosBridgeForm = props => {
   const croAsset = walletAllAssets.find(asset => {
     return (
       asset.mainnetSymbol.toUpperCase() === 'CRO' &&
-      asset.symbol.toUpperCase() === (isTestnet ? 'TCRO' : 'CRO')
+      asset.symbol.toUpperCase() === (isTestnet ? 'TCRO' : 'CRO') &&
+      asset.assetType === UserAssetType.TENDERMINT
     );
   });
   const cronosAsset = walletAllAssets.find(asset => {
-    return asset.mainnetSymbol.toUpperCase() === 'CRO' && asset.symbol.toUpperCase() === 'CRONOS';
+    return (
+      asset.mainnetSymbol.toUpperCase() === 'CRO' &&
+      asset.symbol.toUpperCase() === 'CRONOS' &&
+      asset.assetType === UserAssetType.EVM
+    );
   });
 
   const { tendermintAddress, evmAddress } = formValues;
@@ -616,6 +626,8 @@ const CronosBridge = () => {
   const [bridgeConfigs, setBridgeConfigs] = useState<BridgeConfig>();
   const [bridgeConfigFields, setBridgeConfigFields] = useState<string[]>([]);
 
+  const analyticsService = new AnalyticsService(session);
+
   const [t] = useTranslation();
 
   const bridgeService = new BridgeService(walletService.storageService);
@@ -769,6 +781,14 @@ const CronosBridge = () => {
         loading: false,
       });
       setBridgeConfirmationList(listDataSource);
+
+      analyticsService.logTransactionEvent(
+        sendResult.transactionHash as string,
+        formValues.amount,
+        AnalyticsTxType.BridgeTransaction,
+        AnalyticsActions.BridgeTransfer,
+        AnalyticsCategory.Bridge,
+      );
     } catch (e) {
       if (session.wallet.walletType === LEDGER_WALLET_TYPE) {
         listDataSource.push({
@@ -793,14 +813,6 @@ const CronosBridge = () => {
       // eslint-disable-next-line no-console
       console.log('Failed in Bridge Transfer', e);
     }
-
-    // analyticsService.logTransactionEvent(
-    //   sendResult.transactionHash as string,
-    //   formValues.amount,
-    //   AnalyticsTxType.TransferTransaction,
-    //   AnalyticsActions.FundsTransfer,
-    //   AnalyticsCategory.Transfer,
-    // );
   };
 
   const renderStepContent = (step: number) => {
@@ -1040,7 +1052,6 @@ const CronosBridge = () => {
   };
 
   const onBridgeConfigDefault = () => {
-    // const defaultConfig = isTestnet ? DefaultTestnetBridgeConfigs : DefaultMainnetBridgeConfigs;
     bridgeConfigForm.setFieldsValue(defaultConfig[bridgeTransferDirection]);
   };
 
@@ -1072,14 +1083,6 @@ const CronosBridge = () => {
       {currentStep === 0 ? (
         <>
           <div style={{ textAlign: 'right' }}>
-            {/* <a
-              onClick={() => {
-                setIsBridgeSettingsFormVisible(true);
-              }}
-              
-            >
-              <SettingOutlined />
-            </a> */}
             <Button
               icon={<SettingOutlined style={{ fontSize: '20px' }} />}
               style={{
@@ -1120,7 +1123,6 @@ const CronosBridge = () => {
               okText={t('general.save')}
               forceRender
             >
-              {/* {JSON.stringify(bridgeConfigs)} */}
               <Form
                 {...layout}
                 layout="vertical"

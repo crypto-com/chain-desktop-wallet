@@ -66,16 +66,6 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
     }, 100);
   };
 
-  // const assetIcon = asset => {
-  //   const { icon_url, symbol } = asset;
-
-  //   return icon_url ? (
-  //     <img src={icon_url} alt="cronos" className="asset-icon" />
-  //   ) : (
-  //     <Avatar>{symbol[0].toUpperCase()}</Avatar>
-  //   );
-  // };
-
   const assetAddress = (asset, _session) => {
     const { assetType, address } = asset;
     const { wallet } = _session;
