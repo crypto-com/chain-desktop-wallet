@@ -10,6 +10,7 @@ export interface TenderMintTransactionPrepared {
   currentSession: Session;
   transactionSigner: TransactionSigner;
   ledgerTransactionSigner: LedgerTransactionSigner;
+  latestBlock?: number;
 }
 
 export interface PrepareEVMTransaction {
