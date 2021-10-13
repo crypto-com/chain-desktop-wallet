@@ -74,7 +74,7 @@ import {
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { secretStoreService } from '../../storage/SecretStoreService';
-import { bridgeService } from '../../service/bridge/BridgeService';
+import { BridgeService } from '../../service/bridge/BridgeService';
 
 const { Content, Sider } = Layout;
 const { Option } = Select;
@@ -419,6 +419,7 @@ const CronosBridgeForm = props => {
             {
               validator: async () => {
                 const { bridgeFrom, bridgeTo } = form.getFieldValue();
+                const bridgeService = new BridgeService(walletService.storageService);
 
                 switch (`${bridgeFrom}_TO_${bridgeTo}`) {
                   case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS: {

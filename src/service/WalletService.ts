@@ -11,6 +11,7 @@ import {
   Wallet,
 } from '../models/Wallet';
 import {
+  APP_DB_NAMESPACE,
   DEFAULT_CLIENT_MEMO,
   DefaultWalletConfigs,
   NOT_KNOWN_YET_VALUE,
@@ -77,14 +78,27 @@ import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { CronosClient } from './cronos/CronosClient';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
-import { bridgeService } from './bridge/BridgeService';
-import { WalletBaseService } from './WalletBaseService';
+import { BridgeService } from './bridge/BridgeService';
+import { StorageService } from '../storage/StorageService';
+import { TransactionPrepareService } from './TransactionPrepareService';
 
-class WalletService extends WalletBaseService {
+class WalletService {
   public readonly BROADCAST_TIMEOUT_CODE = -32603;
+
+  public readonly storageService: StorageService;
+
+  public readonly transactionPrepareService: TransactionPrepareService;
+
+  constructor() {
+    this.storageService = new StorageService(APP_DB_NAMESPACE);
+    this.transactionPrepareService = new TransactionPrepareService(this.storageService);
+  }
 
   public async sendBridgeTransaction(bridgeTransferRequest: BridgeTransferRequest) {
     const currentSession = await this.storageService.retrieveCurrentSession();
+
+    const bridgeService = new BridgeService(this.storageService);
+
     const bridgeTransactionResult = await bridgeService.handleBridgeTransaction(
       bridgeTransferRequest,
     );
@@ -137,7 +151,10 @@ class WalletService extends WalletBaseService {
             value: web3.utils.toWei(transferRequest.amount, 'ether'),
           };
 
-          const prepareTxInfo = await this.prepareEVMTransaction(currentAsset, txConfig);
+          const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
+            currentAsset,
+            txConfig,
+          );
 
           transfer.nonce = prepareTxInfo.nonce;
           transfer.gasPrice = prepareTxInfo.loadedGasPrice;
@@ -194,7 +211,7 @@ class WalletService extends WalletBaseService {
           accountSequence,
           transactionSigner,
           ledgerTransactionSigner,
-        } = await this.prepareTransaction();
+        } = await this.transactionPrepareService.prepareTransaction();
 
         const transfer: TransferTransactionUnsigned = {
           fromAddress,
@@ -245,7 +262,7 @@ class WalletService extends WalletBaseService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const delegationAmountScaled = getBaseScaledAmount(
       delegationRequest.amount,
@@ -298,7 +315,7 @@ class WalletService extends WalletBaseService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const undelegationAmountScaled = getBaseScaledAmount(
       undelegationRequest.amount,
@@ -352,7 +369,7 @@ class WalletService extends WalletBaseService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const redelegationAmountScaled = getBaseScaledAmount(
       redelegationRequest.amount,
@@ -402,7 +419,7 @@ class WalletService extends WalletBaseService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const voteTransactionUnsigned: VoteTransactionUnsigned = {
       option: voteRequest.voteOption,
@@ -440,7 +457,7 @@ class WalletService extends WalletBaseService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const memo = !nftTransferRequest.memo ? DEFAULT_CLIENT_MEMO : nftTransferRequest.memo;
 
@@ -488,7 +505,7 @@ class WalletService extends WalletBaseService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const memo = !nftMintRequest.memo ? DEFAULT_CLIENT_MEMO : nftMintRequest.memo;
 
@@ -541,7 +558,7 @@ class WalletService extends WalletBaseService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const memo = !nftDenomIssueRequest.memo ? DEFAULT_CLIENT_MEMO : nftDenomIssueRequest.memo;
 
@@ -607,7 +624,7 @@ class WalletService extends WalletBaseService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const withdrawStakingReward: WithdrawStakingRewardUnsigned = {
       delegatorAddress: currentSession.wallet.address,

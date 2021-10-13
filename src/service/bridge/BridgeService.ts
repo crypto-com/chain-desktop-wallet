@@ -7,7 +7,6 @@ import { BridgeTransferRequest } from '../TransactionRequestModels';
 import { BroadCastResult } from '../../models/Transaction';
 import { BridgeTransactionUnsigned } from '../signers/TransactionSupported';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../LedgerService';
-import { WalletBaseService } from '../WalletBaseService';
 import { getBaseScaledAmount } from '../../utils/NumberUtils';
 import BridgeABI from './contracts/BridgeABI.json';
 import { CronosClient } from '../cronos/CronosClient';
@@ -21,8 +20,19 @@ import {
 } from './BridgeConfig';
 import { Network } from '../../config/StaticConfig';
 import { Session } from '../../models/Session';
+import { StorageService } from '../../storage/StorageService';
+import { TransactionPrepareService } from '../TransactionPrepareService';
 
-class BridgeService extends WalletBaseService {
+export class BridgeService {
+  public readonly storageService: StorageService;
+
+  public readonly transactionPrepareService: TransactionPrepareService;
+
+  constructor(storageService: StorageService) {
+    this.storageService = storageService;
+    this.transactionPrepareService = new TransactionPrepareService(this.storageService);
+  }
+
   public async handleBridgeTransaction(
     bridgeTransferRequest: BridgeTransferRequest,
   ): Promise<BroadCastResult> {
@@ -70,7 +80,10 @@ class BridgeService extends WalletBaseService {
       value: web3.utils.toWei(bridgeTransferRequest.amount, 'ether'),
     };
 
-    const prepareTxInfo = await this.prepareEVMTransaction(originAsset, txConfig);
+    const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
+      originAsset,
+      txConfig,
+    );
 
     const { currentSession } = prepareTxInfo;
     const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
@@ -160,7 +173,7 @@ class BridgeService extends WalletBaseService {
       transactionSigner,
       ledgerTransactionSigner,
       currentSession,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const scaledBaseAmount = getBaseScaledAmount(
       bridgeTransferRequest.amount,
@@ -274,5 +287,3 @@ class BridgeService extends WalletBaseService {
     );
   };
 }
-
-export const bridgeService = new BridgeService();
