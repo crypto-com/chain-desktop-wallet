@@ -57,11 +57,15 @@ import {
   getCurrentMinAssetAmount,
   getNormalScaleAmount,
 } from '../../utils/NumberUtils';
-import { SUPPORTED_BRIDGE, SupportedBridge } from '../../config/StaticConfig';
+import {
+  SUPPORTED_BRIDGE,
+  SupportedBridge,
+  SUPPORTED_BRIDGES_ASSETS,
+} from '../../config/StaticConfig';
 import iconCronosSvg from '../../assets/icon-cronos-blue.svg';
 import iconCroSvg from '../../assets/icon-cro.svg';
 import IconHexagon from '../../svg/IconHexagon';
-import IconTransferHistory from '../../svg/IconTransferHistory';
+// import IconTransferHistory from '../../svg/IconTransferHistory';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import {
   BridgeTransferDirection,
@@ -152,6 +156,7 @@ const CronosBridgeForm = props => {
   const [availableBalance, setAvailableBalance] = useState('--');
   const [sendingAmount, setSendingAmount] = useState('0');
   const [supportedBridges, setSupportedBridges] = useState<SupportedBridge[]>([]);
+  const [bridgeSupportedAssets, setBridgeSupportedAssets] = useState<UserAsset[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   // const [updateLoading, setUpdateLoading] = useState(false);
@@ -160,12 +165,6 @@ const CronosBridgeForm = props => {
   const analyticsService = new AnalyticsService(session);
   const bridgeService = new BridgeService(walletService.storageService);
   const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
-
-  const SUPPORTED_BRIDGES_ASSETS = ['CRO', 'CRONOS'];
-
-  const bridgeSupportedAssets = walletAllAssets.filter(asset => {
-    return SUPPORTED_BRIDGES_ASSETS.includes(asset.mainnetSymbol.toUpperCase());
-  });
 
   const croAsset = walletAllAssets.find(asset => {
     return (
@@ -186,28 +185,14 @@ const CronosBridgeForm = props => {
 
   const [t] = useTranslation();
 
-  useEffect(() => {
-    const initFieldValues = () => {
-      const bridges: SupportedBridge[] = [];
-      SUPPORTED_BRIDGE.forEach((item: SupportedBridge) => {
-        bridges.push(item);
-      });
-      setSupportedBridges(bridges);
-
-      const { bridgeFrom, bridgeTo, amount } = form.getFieldsValue();
-      if (bridgeFrom && bridgeTo && amount) {
-        setAvailableBalance(scaledBalance(currentAsset!));
-        setIsBridgeValid(true);
-        setSendingAmount(amount);
-      }
-    };
-
-    if (!didMountRef.current) {
-      didMountRef.current = true;
-      initFieldValues();
-      analyticsService.logPage('Bridge');
-    }
-  }, []);
+  const getBridgeSupportedAssetList = (assetType: UserAssetType) => {
+    return walletAllAssets.filter(asset => {
+      return (
+        SUPPORTED_BRIDGES_ASSETS.includes(asset.mainnetSymbol.toUpperCase()) &&
+        asset.assetType === assetType
+      );
+    });
+  };
 
   const onSwitchBridge = async () => {
     const { bridgeFrom, bridgeTo } = form.getFieldsValue();
@@ -222,6 +207,7 @@ const CronosBridgeForm = props => {
 
     switch (bridgeFrom) {
       case 'CRYPTO_ORG': {
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.TENDERMINT));
         setCurrentAsset(croAsset);
         setCurrentAssetIdentifier(croAsset?.identifier);
         setAvailableBalance(scaledBalance(croAsset!));
@@ -231,6 +217,7 @@ const CronosBridgeForm = props => {
         break;
       }
       case 'CRONOS': {
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.EVM));
         setCurrentAsset(cronosAsset);
         setCurrentAssetIdentifier(cronosAsset?.identifier);
         setAvailableBalance(scaledBalance(cronosAsset!));
@@ -267,6 +254,7 @@ const CronosBridgeForm = props => {
 
     switch (newBridgeFrom) {
       case 'CRYPTO_ORG': {
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.TENDERMINT));
         setCurrentAsset(croAsset);
         setCurrentAssetIdentifier(croAsset?.identifier);
         setAvailableBalance(scaledBalance(croAsset!));
@@ -276,6 +264,7 @@ const CronosBridgeForm = props => {
         break;
       }
       case 'CRONOS': {
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.EVM));
         setCurrentAsset(cronosAsset);
         setCurrentAssetIdentifier(cronosAsset?.identifier);
         setAvailableBalance(scaledBalance(cronosAsset!));
@@ -310,16 +299,6 @@ const CronosBridgeForm = props => {
       // amount: undefined,
     });
     form.submit();
-
-    // setCurrentAsset(undefined);
-    // setCurrentAssetIdentifier(undefined);
-    // setAvailableBalance('--');
-    // form.setFieldsValue({
-    //   bridgeFrom: bridgeTo,
-    //   bridgeTo: bridgeFrom,
-    //   asset: undefined,
-    //   amount: undefined,
-    // });
   };
 
   const onSwitchAsset = value => {
@@ -351,14 +330,39 @@ const CronosBridgeForm = props => {
     }`,
   );
 
-  // const onFinish = values => {
-  //   setFormValues({
-  //     ...formValues,
-  //     bridgeFrom: values.bridgeFrom,
-  //     bridgeTo: values.bridgeTo,
-  //     amount: values.amount,
-  //   });
-  // };
+  useEffect(() => {
+    const initFieldValues = () => {
+      const bridges: SupportedBridge[] = [];
+      SUPPORTED_BRIDGE.forEach((item: SupportedBridge) => {
+        bridges.push(item);
+      });
+      setSupportedBridges(bridges);
+
+      const { bridgeFrom, bridgeTo, amount } = form.getFieldsValue();
+      if (bridgeFrom && bridgeTo && amount) {
+        setAvailableBalance(scaledBalance(currentAsset!));
+        setIsBridgeValid(true);
+        setSendingAmount(amount);
+        switch (bridgeFrom) {
+          case 'CRYPTO_ORG': {
+            setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.TENDERMINT));
+            break;
+          }
+          case 'CRONOS': {
+            setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.EVM));
+            break;
+          }
+          default:
+        }
+      }
+    };
+
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      initFieldValues();
+      analyticsService.logPage('Bridge');
+    }
+  }, []);
 
   return (
     <Form
@@ -701,7 +705,6 @@ const CronosBridge = () => {
         app = 'Ethereum App';
         break;
       default:
-        app = 'Crypto.org App';
     }
 
     const listDataSource = [
@@ -1363,19 +1366,19 @@ const CronosHistory = () => {
 };
 
 const BridgePage = () => {
-  const [t] = useTranslation();
+  // const [t] = useTranslation();
 
   return (
     <Layout className="site-layout bridge-layout">
       <Content>
-        <div className="go-to-transfer-history">
+        {/* <div className="go-to-transfer-history">
           <a>
             <div>
               <IconTransferHistory />
               <span>{t('bridge.action.viewTransactionHIstory')}</span>
             </div>
           </a>
-        </div>
+        </div> */}
         <div className="site-layout-background bridge-content">
           <div className="container">
             <CronosBridge />
