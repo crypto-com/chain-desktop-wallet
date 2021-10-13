@@ -706,11 +706,15 @@ const CronosBridge = () => {
                 {bridgeToObj?.label}
               </span>
             </div>
-            <div>
-              {t('bridge.pendingTransfer.ledger.description', {
-                app,
-              })}
-            </div>
+            {session.wallet.walletType === LEDGER_WALLET_TYPE ? (
+              <div>
+                {t('bridge.pendingTransfer.ledger.description', {
+                  app,
+                })}
+              </div>
+            ) : (
+              <></>
+            )}
           </>
         ),
         loading: false,
@@ -766,6 +770,16 @@ const CronosBridge = () => {
       });
       setBridgeConfirmationList(listDataSource);
     } catch (e) {
+      if (session.wallet.walletType === LEDGER_WALLET_TYPE) {
+        listDataSource.push({
+          title: t('bridge.ledgerSign.failed.title', {
+            amount,
+            symbol: currentAsset?.symbol,
+          }),
+          description: <></>,
+          loading: false,
+        });
+      }
       listDataSource.push({
         title: t('bridge.deposit.failed.title', {
           amount,

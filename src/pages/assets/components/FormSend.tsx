@@ -271,7 +271,7 @@ const FormSend: React.FC<FormSendProps> = props => {
         <NoticeDisclaimer>
           {t('send.formSend.disclaimer', {
             assetSymbol: walletAsset?.symbol,
-            assetName: walletAsset?.name,
+            assetName: TransactionUtils.getAssetSupportedBridge(walletAsset!)?.label,
           })}
         </NoticeDisclaimer>
       </Form.Item>

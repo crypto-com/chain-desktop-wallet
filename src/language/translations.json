@@ -644,6 +644,11 @@
           "ledger": {
             "description": "Please open {{app}} in your Ledger device and sign your transaction."
           }
+        },
+        "ledgerSign": {
+          "failed": {
+            "title": "Failed to broadcast a signed transaction on Ledger"
+          }
         }
       },
       "staking": {
@@ -1572,7 +1577,7 @@
           "toAddress": "收款人地址：",
           "transfer": "轉移資產",
           "receiving": "將會收到",
-          "disclaimer": "我同意條款和條件。"
+          "disclaimer": "我同意條款及細則。"
         },
         "step0": {
           "title": "Cronos 跨鏈橋",
@@ -1622,6 +1627,11 @@
           "title": "{{amount}} {{symbol}} 正等待發送",
           "ledger": {
             "description": "請在Ledger錢包上打開 {{app}} 以簽名交易"
+          }
+        },
+        "ledgerSign": {
+          "failed": {
+            "title": "未能成功廣播Ledger的簽名交易"
           }
         }
       },
@@ -2600,6 +2610,11 @@
           "title": "{{amount}} {{symbol}} 正等待发送",
           "ledger": {
             "description": "请在Ledger钱包上打开 {{app}} 以签名交易"
+          }
+        },
+        "ledgerSign": {
+          "failed": {
+            "title": "未能成功广播Ledger的签名交易"
           }
         }
       },
