@@ -53,6 +53,8 @@ export interface INodeRpcService {
   loadIBCAssets(session: Session): Promise<UserAsset[]>;
 
   getIBCAssetTrace(ibcHash: string): Promise<DenomTrace>;
+
+  loadLatestBlock(address: string): Promise<number>;
 }
 
 // Load all 100 active validators
@@ -89,6 +91,10 @@ export class NodeRpcService implements INodeRpcService {
 
   public async loadSequenceNumber(address: string): Promise<number> {
     return (await this.tendermintClient.getAccount(address))?.sequence ?? 0;
+  }
+
+  public async loadLatestBlock(): Promise<number> {
+    return (await this.tendermintClient.getHeight()) ?? 0;
   }
 
   public async fetchAccountNumber(address: string): Promise<number> {

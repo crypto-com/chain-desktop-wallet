@@ -18,6 +18,7 @@ import {
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
 import { BaseTransactionSigner, ITransactionSigner } from './TransactionSigner';
+import { isNumeric } from '../../utils/utils';
 
 export class LedgerTransactionSigner extends BaseTransactionSigner implements ITransactionSigner {
   public readonly config: WalletConfig;
@@ -177,6 +178,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     SIGN_MODE_TEXTUAL = 2,
     SIGN_MODE_LEGACY_AMINO_JSON = 127,
     */
+
     const signableTx = rawTx
       .appendMessage(message)
       .addSigner({
@@ -197,6 +199,10 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       .getHexEncoded();
   }
 
+  public StaticRevisionNumber = 122;
+
+  public StaticBigLatestHeight = 120_000_000;
+
   public async signIBCTransfer(
     transaction: BridgeTransactionUnsigned,
     phrase: string,
@@ -206,11 +212,26 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     const millisToNanoSecond = 1_000_000;
     const timeout = (Date.now() + 60_000) * millisToNanoSecond;
 
+    // For a chainID string like testnet-croeseid-4, revision number is 4
+    const revisionNumberFromChainID = transaction?.asset?.config?.chainId?.split('-').pop();
+    const revisionNumber = isNumeric(revisionNumberFromChainID)
+      ? revisionNumberFromChainID
+      : this.StaticRevisionNumber;
+
+    // Latest block plus arbitrary number of blocks on top
+    const revisionHeight = Big(transaction.latestBlockHeight || this.StaticBigLatestHeight).plus(
+      250,
+    );
+
     const msgSend = new cro.ibc.MsgTransfer({
       sender: transaction.fromAddress,
       sourceChannel: transaction.channel || '',
       sourcePort: transaction.port || '',
-      timeoutTimestampInNanoSeconds: Long.fromValue(timeout),
+      timeoutTimestampInNanoSeconds: Long.fromString(String(timeout), true),
+      timeoutHeight: {
+        revisionNumber: Long.fromString(String(revisionNumber), true),
+        revisionHeight: Long.fromString(revisionHeight.toFixed(), true),
+      },
       receiver: transaction.toAddress,
       token: new cro.Coin(transaction.amount, Units.BASE),
     });
