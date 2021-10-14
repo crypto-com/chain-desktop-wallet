@@ -55,10 +55,14 @@ async function saveToDisk(localDatas) {
   localDatas.forEach(locale => {
     const filePath = `./src/language/${locale.locale}.json`;
     const fileContent = JSON.stringify(locale.keys, null, 2);
+    fileContent.trim()
     fs.writeFileSync(filePath, fileContent);
   });
 }
 
+console.log('Fetching sheet...');
 const sheetData = await fetchSheet(SHEET_CSV_URL);
+console.log('Parsing sheet...');
 const parsedData = await parseSheetData(sheetData);
 await saveToDisk(parsedData);
+console.log('🍻 All set')
