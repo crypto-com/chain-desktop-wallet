@@ -101,3 +101,8 @@ export const useWindowSize = () => {
   }, []); // Empty array ensures that effect is only run on mount
   return windowSize;
 };
+
+export function isNumeric(n) {
+  // eslint-disable-next-line no-restricted-globals
+  return !isNaN(parseFloat(n)) && isFinite(n);
+}

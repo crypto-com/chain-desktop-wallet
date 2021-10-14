@@ -12,6 +12,7 @@ import { walletService } from '../../../service/WalletService';
 import SuccessModalPopup from '../../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
+import NoticeDisclaimer from '../../../components/NoticeDisclaimer/NoticeDisclaimer';
 import { secretStoreService } from '../../../storage/SecretStoreService';
 import {
   getAssetAmountInFiat,
@@ -266,7 +267,14 @@ const FormSend: React.FC<FormSendProps> = props => {
       <Form.Item name="memo" label={t('send.formSend.memo.label')}>
         <Input />
       </Form.Item>
-
+      <Form.Item>
+        <NoticeDisclaimer>
+          {t('send.formSend.disclaimer', {
+            assetSymbol: walletAsset?.symbol,
+            assetName: TransactionUtils.getAssetSupportedBridge(walletAsset!)?.label,
+          })}
+        </NoticeDisclaimer>
+      </Form.Item>
       <Form.Item {...tailLayout}>
         <ModalPopup
           isModalVisible={isConfirmationModalVisible}
@@ -319,9 +327,9 @@ const FormSend: React.FC<FormSendProps> = props => {
             <div className="item">
               <div className="label">{t('send.modal1.label4')}</div>
               <div>{`${getNormalScaleAmount(
-                currentSession.wallet.config.fee !== undefined &&
-                  currentSession.wallet.config.fee.networkFee !== undefined
-                  ? currentSession.wallet.config.fee.networkFee
+                walletAsset?.config?.fee !== undefined &&
+                  walletAsset?.config?.fee.networkFee !== undefined
+                  ? walletAsset?.config?.fee.networkFee
                   : FIXED_DEFAULT_FEE,
                 walletAsset!,
               )} ${walletAsset?.symbol}`}</div>

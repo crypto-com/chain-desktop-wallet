@@ -99,7 +99,7 @@ export const scaledAmount = (baseAmount: string = '0', decimals: number) => {
   return getUINormalScaleAmount(baseAmount, decimals);
 };
 
-export const scaledAmountByAsset = (baseAmount: string, asset: UserAsset) => {
+export const scaledAmountByAsset = (baseAmount: string = '0', asset: UserAsset) => {
   return getUINormalScaleAmount(baseAmount, asset.decimals);
 };
 
@@ -120,8 +120,8 @@ export const scaledRewardBalance = (asset: UserAsset) => {
 };
 
 export const scaledTotalBalance = (asset: UserAsset) => {
-  const totalBalance = Big(asset.balance)
-    .add(asset.stakedBalance)
+  const totalBalance = Big(asset.balance ?? '0')
+    .add(asset.stakedBalance ?? '0')
     .add(asset.unbondingBalance ?? '0')
     .add(asset.rewardsBalance ?? '0')
     .toFixed(2);

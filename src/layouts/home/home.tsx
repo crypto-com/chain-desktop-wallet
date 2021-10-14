@@ -124,8 +124,6 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
 
   const [ledgerTendermintAddress, setLedgerTendermintAddress] = useState('');
-  // eslint-disable-next-line
-  const [ledgerEvmAddress, setLedgerEvmAddress] = useState('');
   const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
   const [isLedgerEthAppConnected, setIsLedgerEthAppConnected] = useState(false);
   const [isLedgerCroAppConnectModalVisible, setIsLedgerCroAppConnectModalVisible] = useState(false);
@@ -137,6 +135,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isLedgerCreateAssetErrorModalVisible, setIsLedgerCreateAssetErrorModalVisible] = useState(
     false,
   );
+  const [isLedgerModalButtonLoading, setIsLedgerModalButtonLoading] = useState(false);
 
   const didMountRef = useRef(false);
   const currentLocationPath = useLocation().pathname;
@@ -198,7 +197,10 @@ function HomeLayout(props: HomeLayoutProps) {
     // const isIbcVisible = allAssets.length > 1;
     const isIbcVisible = false;
 
-    setSession(currentSession);
+    setSession({
+      ...currentSession,
+      activeAsset: currentAsset,
+    });
     setUserAsset(currentAsset);
     setWalletAllAssets(allAssets);
     setIsIbcVisible(isIbcVisible);
@@ -273,6 +275,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
       setIsLedgerCroAppConnectModalVisible(false);
       setIsLedgerCroAppConnected(false);
+      setIsLedgerModalButtonLoading(false);
       setIsLedgerEthAppConnectModalVisible(true);
     } catch (e) {
       let message = `${t('create.notification.ledger.message1')}`;
@@ -284,11 +287,12 @@ function HomeLayout(props: HomeLayoutProps) {
         }
       }
 
-      setIsLedgerCroAppConnected(false);
       await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
+      setIsLedgerCroAppConnected(false);
       setIsLedgerCroAppConnectModalVisible(false);
+      setIsLedgerModalButtonLoading(false);
 
       notification.error({
         message,
@@ -301,20 +305,20 @@ function HomeLayout(props: HomeLayoutProps) {
 
   const checkIsLedgerEthAppConnected = async (walletSession: Session) => {
     let hwok = false;
-    let evmAddress = '';
+    let ledgerEvmAddress = '';
     try {
       const device: ISignerProvider = createLedgerDevice();
 
-      evmAddress = await device.getEthAddress(walletSession.wallet.addressIndex);
-      setLedgerEvmAddress(evmAddress);
+      ledgerEvmAddress = await device.getEthAddress(walletSession.wallet.addressIndex, false);
       setIsLedgerEthAppConnected(true);
 
       await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
 
-      setIsLedgerEthAppConnectModalVisible(false);
       setIsLedgerEthAppConnected(false);
+      setIsLedgerEthAppConnectModalVisible(false);
+      setIsLedgerModalButtonLoading(false);
 
       hwok = true;
     } catch (e) {
@@ -332,6 +336,7 @@ function HomeLayout(props: HomeLayoutProps) {
         setTimeout(resolve, 2000);
       });
       setIsLedgerEthAppConnectModalVisible(false);
+      setIsLedgerModalButtonLoading(false);
 
       notification.error({
         message,
@@ -345,7 +350,7 @@ function HomeLayout(props: HomeLayoutProps) {
     });
     if (hwok) {
       // proceed
-      migrateLedgerAsset(walletSession, ledgerTendermintAddress, evmAddress);
+      migrateLedgerAsset(walletSession, ledgerTendermintAddress, ledgerEvmAddress);
     }
   };
 
@@ -373,20 +378,20 @@ function HomeLayout(props: HomeLayoutProps) {
             }}
             style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
           >
-            Enable
+            {t('home.createNewAsset.enable')}
           </Button>
         );
 
         notification.info({
-          message: 'New Assets Available',
-          description: 'Do you want to enable the newly added assets ?',
-          duration: 15,
+          message: t('home.createNewAsset.notification.message'),
+          description: t('home.createNewAsset.notification.description'),
+          duration: 60,
           key: newAssetAddedNotificationKey,
           placement: 'topRight',
           btn: createNewlyAddedAssets,
         });
       }
-    }, 15_000);
+    }, 1000);
   };
 
   const checkCorrectExplorerUrl = (walletSession?: Session) => {
@@ -399,82 +404,82 @@ function HomeLayout(props: HomeLayoutProps) {
         const updateExplorerUrlNotificationKey = 'updateExplorerUrlNotificationKey';
 
         // Update Active Asset in Current Wallet
-        const { wallet, activeAsset } = walletSession;
+        // const { wallet, activeAsset } = walletSession;
 
-        const newlyUpdatedAsset: UserAsset = {
-          ...activeAsset!,
-          config: {
-            ...activeAsset?.config!,
-            nodeUrl: activeAsset?.config?.nodeUrl ?? wallet.config.nodeUrl,
-            indexingUrl: activeAsset?.config?.indexingUrl ?? wallet.config.indexingUrl,
-            explorer: {
-              baseUrl: `${activeAsset?.config?.explorerUrl ?? wallet.config.explorerUrl}`,
-              tx: `${activeAsset?.config?.explorerUrl ?? wallet.config.explorerUrl}/tx`,
-              address: `${activeAsset?.config?.explorerUrl ?? wallet.config.explorerUrl}/account`,
-              validator: `${activeAsset?.config?.explorerUrl ??
-                wallet.config.explorerUrl}/validator`,
-            },
-            explorerUrl: activeAsset?.config?.explorerUrl ?? wallet.config.explorerUrl,
-            fee: {
-              gasLimit: String(activeAsset?.config?.fee.gasLimit ?? wallet.config.fee.gasLimit),
-              networkFee: String(
-                activeAsset?.config?.fee.networkFee ?? wallet.config.fee.networkFee,
-              ),
-            },
-            isLedgerSupportDisabled: activeAsset?.config?.isLedgerSupportDisabled!,
-            isStakingDisabled: activeAsset?.config?.isStakingDisabled!,
-          },
-        };
+        // const newlyUpdatedAsset: UserAsset = {
+        //   ...activeAsset!,
+        //   config: {
+        //     ...activeAsset?.config!,
+        //     nodeUrl: activeAsset?.config?.nodeUrl ?? wallet.config.nodeUrl,
+        //     indexingUrl: activeAsset?.config?.indexingUrl ?? wallet.config.indexingUrl,
+        //     explorer: {
+        //       baseUrl: `${activeAsset?.config?.explorerUrl ?? wallet.config.explorerUrl}`,
+        //       tx: `${activeAsset?.config?.explorerUrl ?? wallet.config.explorerUrl}/tx`,
+        //       address: `${activeAsset?.config?.explorerUrl ?? wallet.config.explorerUrl}/account`,
+        //       validator: `${activeAsset?.config?.explorerUrl ??
+        //         wallet.config.explorerUrl}/validator`,
+        //     },
+        //     explorerUrl: activeAsset?.config?.explorerUrl ?? wallet.config.explorerUrl,
+        //     fee: {
+        //       gasLimit: String(activeAsset?.config?.fee.gasLimit ?? wallet.config.fee.gasLimit),
+        //       networkFee: String(
+        //         activeAsset?.config?.fee.networkFee ?? wallet.config.fee.networkFee,
+        //       ),
+        //     },
+        //     isLedgerSupportDisabled: activeAsset?.config?.isLedgerSupportDisabled!,
+        //     isStakingDisabled: activeAsset?.config?.isStakingDisabled!,
+        //   },
+        // };
 
-        await walletService.saveAssets([newlyUpdatedAsset]);
+        // await walletService.saveAssets([newlyUpdatedAsset]);
 
         // Update All Assets in All Wallets
-        // const allWallets = await walletService.retrieveAllWallets();
-        // allWallets.forEach(async wallet => {
-        //   const settingsDataUpdate: SettingsDataUpdate = {
-        //     walletId: wallet.identifier,
-        //     chainId: wallet.config.network.chainId,
-        //     nodeUrl: wallet.config.nodeUrl,
-        //     indexingUrl: wallet.config.indexingUrl,
-        //     networkFee: String(wallet.config.fee.networkFee),
-        //     gasLimit: String(wallet.config.fee.gasLimit),
-        //     explorer: {
-        //       baseUrl: `${wallet.config.explorerUrl}`,
-        //       tx: `${wallet.config.explorerUrl}/tx`,
-        //       address: `${wallet.config.explorerUrl}/account`,
-        //       validator: `${wallet.config.explorerUrl}/validator`,
-        //     },
-        //   };
+        const allWallets = await walletService.retrieveAllWallets();
+        allWallets.forEach(async wallet => {
+          const settingsDataUpdate: SettingsDataUpdate = {
+            walletId: wallet.identifier,
+            chainId: wallet.config.network.chainId,
+            nodeUrl: wallet.config.nodeUrl,
+            indexingUrl: wallet.config.indexingUrl,
+            networkFee: String(wallet.config.fee.networkFee),
+            gasLimit: String(wallet.config.fee.gasLimit),
+            explorer: {
+              baseUrl: `${wallet.config.explorerUrl}`,
+              tx: `${wallet.config.explorerUrl}/tx`,
+              address: `${wallet.config.explorerUrl}/account`,
+              validator: `${wallet.config.explorerUrl}/validator`,
+            },
+          };
 
-        //   await walletService.updateWalletNodeConfig(settingsDataUpdate);
+          await walletService.updateWalletNodeConfig(settingsDataUpdate);
 
-        //   // Save updated active asset settings.
-        //   const allAssets = await walletService.retrieveWalletAssets(wallet.identifier);
-        //   allAssets.forEach(async asset => {
-        //     const newlyUpdatedAsset: UserAsset = {
-        //       ...asset,
-        //       config:  {
-        //         ...asset.config!,
-        //         nodeUrl: asset.config?.nodeUrl ?? wallet.config.nodeUrl,
-        //         indexingUrl: asset.config?.indexingUrl ?? wallet.config.indexingUrl,
-        //         explorer: {
-        //           baseUrl: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}`,
-        //           tx: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}/tx`,
-        //           address: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}/account`,
-        //           validator: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}/validator`,
-        //         },
-        //         explorerUrl: asset.config?.explorerUrl ?? wallet.config.explorerUrl,
-        //         fee: {
-        //           gasLimit: String(asset.config?.fee.gasLimit ?? wallet.config.fee.gasLimit),
-        //           networkFee: String(asset.config?.fee.networkFee ?? wallet.config.fee.networkFee),
-        //         },
-        //         isLedgerSupportDisabled: asset.config?.isLedgerSupportDisabled!,
-        //         isStakingDisabled: asset.config?.isStakingDisabled!
-        //       }
-        //     }
-        //     await walletService.saveAssets([newlyUpdatedAsset]);
-        //   })
-        // });
+          // Save updated active asset settings.
+          const allAssets = await walletService.retrieveWalletAssets(wallet.identifier);
+          allAssets.forEach(async asset => {
+            const newlyUpdatedAsset: UserAsset = {
+              ...asset,
+              config: {
+                ...asset.config!,
+                nodeUrl: asset.config?.nodeUrl ?? wallet.config.nodeUrl,
+                indexingUrl: asset.config?.indexingUrl ?? wallet.config.indexingUrl,
+                explorer: {
+                  baseUrl: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}`,
+                  tx: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}/tx`,
+                  address: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}/account`,
+                  validator: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}/validator`,
+                },
+                explorerUrl: asset.config?.explorerUrl ?? wallet.config.explorerUrl,
+                fee: {
+                  gasLimit: String(asset.config?.fee.gasLimit ?? wallet.config.fee.gasLimit),
+                  networkFee: String(asset.config?.fee.networkFee ?? wallet.config.fee.networkFee),
+                },
+                isLedgerSupportDisabled: asset.config?.isLedgerSupportDisabled!,
+                isStakingDisabled: asset.config?.isStakingDisabled!,
+              },
+            };
+            await walletService.saveAssets([newlyUpdatedAsset]);
+          });
+        });
 
         notification.info({
           message: 'New config setting found',
@@ -508,7 +513,10 @@ function HomeLayout(props: HomeLayoutProps) {
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
       const isAppLocked = await generalConfigService.getIfAppIsLockedByUser();
       setHasWallet(hasWalletBeenCreated);
-      setSession(currentSession);
+      setSession({
+        ...currentSession,
+        activeAsset: currentAsset,
+      });
       setUserAsset(currentAsset);
       setWalletAllAssets(allAssets);
       setIsIbcVisible(isIbcVisible);
@@ -540,7 +548,10 @@ function HomeLayout(props: HomeLayoutProps) {
       }, 2000);
 
       checkNewlyAddedStaticAssets(currentSession);
-      checkCorrectExplorerUrl(currentSession);
+      checkCorrectExplorerUrl({
+        ...currentSession,
+        activeAsset: currentAsset,
+      });
     };
 
     if (!didMountRef.current) {
@@ -615,6 +626,9 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/assets" icon={<Icon component={IconAssets} />}>
           <Link to="/assets">{t('navbar.assets')}</Link>
         </Menu.Item>
+        <Menu.Item key="/bridge" icon={<Icon component={IconCronos} />}>
+          <Link to="/bridge">{t('navbar.bridge')}</Link>
+        </Menu.Item>
         {/* <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">{t('navbar.send')}</Link>
         </Menu.Item>
@@ -626,9 +640,6 @@ function HomeLayout(props: HomeLayoutProps) {
         </Menu.Item>
         <Menu.Item key="/nft" icon={<Icon component={IconNft} />}>
           <Link to="/nft">{t('navbar.nft')}</Link>
-        </Menu.Item>
-        <Menu.Item key="/bridge" icon={<Icon component={IconCronos} />}>
-          <Link to="/bridge">Cronos Bridge</Link>
         </Menu.Item>
         <Menu.Item key="/settings" icon={<SettingOutlined />}>
           <Link to="/settings">{t('navbar.settings')}</Link>
@@ -979,16 +990,6 @@ function HomeLayout(props: HomeLayoutProps) {
             setIsLedgerCreateAssetSuccessModalVisible(false);
           }}
           title={t('general.successModalPopup.title')}
-          // button={
-          //   <Button
-          //     type="primary"
-          //     htmlType="submit"
-          //     // disabled={props.isCreateDisable}
-          //     // loading={createLoading}
-          //   >
-          //     {t('general.successModalPopup.createWallet.button')}
-          //   </Button>
-          // }
           button={null}
           footer={[
             <Button
@@ -1027,21 +1028,6 @@ function HomeLayout(props: HomeLayoutProps) {
             </div>
           </>
         </ErrorModalPopup>
-
-        {/* <ModalPopup
-          title="Connect your Ledger"
-          isModalVisible={isLedgerEthAppConnectModalVisible}
-          handleOk={() => { 
-            setIsLedgerEthAppConnectModalVisible(false) 
-            setIsLedgerWaitFlag(false)
-          }}
-          handleCancel={() => { setIsLedgerEthAppConnectModalVisible(false) }}
-          className="success-popup"
-          style={{ textAlign: 'left' }}
-        // cancelButtonProps={{ style: { display: 'none' } }}
-        >
-          <p>You need your Ethereum App opened on your Ledger device to proceed.</p>
-        </ModalPopup> */}
         <LedgerModalPopup
           isModalVisible={isLedgerCroAppConnectModalVisible}
           handleCancel={() => {
@@ -1052,8 +1038,8 @@ function HomeLayout(props: HomeLayoutProps) {
           }}
           title={
             isLedgerCroAppConnected
-              ? t('create.ledgerModalPopup.title1')
-              : t('create.ledgerModalPopup.title2')
+              ? t('home.ledgerModalPopup.tendermintAsset.title1')
+              : t('home.ledgerModalPopup.tendermintAsset.title2')
           }
           footer={[
             isLedgerCroAppConnected ? (
@@ -1065,10 +1051,12 @@ function HomeLayout(props: HomeLayoutProps) {
                 className="btn-restart"
                 onClick={() => {
                   checkIsLedgerCroAppConnected(session);
+                  setIsLedgerModalButtonLoading(true);
                 }}
+                loading={isLedgerModalButtonLoading}
                 // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
-                Continue
+                {t('general.connect')}
               </Button>
             ),
           ]}
@@ -1076,8 +1064,8 @@ function HomeLayout(props: HomeLayoutProps) {
         >
           <div className="description">
             {isLedgerCroAppConnected
-              ? t('create.ledgerModalPopup.description1')
-              : t('create.ledgerModalPopup.description2')}
+              ? t('home.ledgerModalPopup.tendermintAsset.description1')
+              : t('home.ledgerModalPopup.tendermintAsset.description2')}
           </div>
         </LedgerModalPopup>
         <LedgerModalPopup
@@ -1090,8 +1078,8 @@ function HomeLayout(props: HomeLayoutProps) {
           }}
           title={
             isLedgerEthAppConnected
-              ? t('create.ledgerModalPopup.title1')
-              : t('create.ledgerModalPopup.title2')
+              ? t('home.ledgerModalPopup.evmAsset.title1')
+              : t('home.ledgerModalPopup.evmAsset.title2')
           }
           footer={[
             isLedgerEthAppConnected ? (
@@ -1103,10 +1091,12 @@ function HomeLayout(props: HomeLayoutProps) {
                 className="btn-restart"
                 onClick={() => {
                   checkIsLedgerEthAppConnected(session);
+                  setIsLedgerModalButtonLoading(true);
                 }}
+                loading={isLedgerModalButtonLoading}
                 // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
-                Continue
+                {t('general.connect')}
               </Button>
             ),
           ]}
@@ -1114,8 +1104,8 @@ function HomeLayout(props: HomeLayoutProps) {
         >
           <div className="description">
             {isLedgerEthAppConnected
-              ? t('create.ledgerModalPopup.description1')
-              : t('create.ledgerModalPopup.description2')}
+              ? t('home.ledgerModalPopup.evmAsset.description1')
+              : t('home.ledgerModalPopup.evmAsset.description2')}
           </div>
         </LedgerModalPopup>
       </Layout>
