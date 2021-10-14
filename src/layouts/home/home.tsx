@@ -403,36 +403,6 @@ function HomeLayout(props: HomeLayoutProps) {
       if (!walletSession.activeAsset?.config?.explorer) {
         const updateExplorerUrlNotificationKey = 'updateExplorerUrlNotificationKey';
 
-        // Update Active Asset in Current Wallet
-        // const { wallet, activeAsset } = walletSession;
-
-        // const newlyUpdatedAsset: UserAsset = {
-        //   ...activeAsset!,
-        //   config: {
-        //     ...activeAsset?.config!,
-        //     nodeUrl: activeAsset?.config?.nodeUrl ?? wallet.config.nodeUrl,
-        //     indexingUrl: activeAsset?.config?.indexingUrl ?? wallet.config.indexingUrl,
-        //     explorer: {
-        //       baseUrl: `${activeAsset?.config?.explorerUrl ?? wallet.config.explorerUrl}`,
-        //       tx: `${activeAsset?.config?.explorerUrl ?? wallet.config.explorerUrl}/tx`,
-        //       address: `${activeAsset?.config?.explorerUrl ?? wallet.config.explorerUrl}/account`,
-        //       validator: `${activeAsset?.config?.explorerUrl ??
-        //         wallet.config.explorerUrl}/validator`,
-        //     },
-        //     explorerUrl: activeAsset?.config?.explorerUrl ?? wallet.config.explorerUrl,
-        //     fee: {
-        //       gasLimit: String(activeAsset?.config?.fee.gasLimit ?? wallet.config.fee.gasLimit),
-        //       networkFee: String(
-        //         activeAsset?.config?.fee.networkFee ?? wallet.config.fee.networkFee,
-        //       ),
-        //     },
-        //     isLedgerSupportDisabled: activeAsset?.config?.isLedgerSupportDisabled!,
-        //     isStakingDisabled: activeAsset?.config?.isStakingDisabled!,
-        //   },
-        // };
-
-        // await walletService.saveAssets([newlyUpdatedAsset]);
-
         // Update All Assets in All Wallets
         const allWallets = await walletService.retrieveAllWallets();
         allWallets.forEach(async wallet => {
