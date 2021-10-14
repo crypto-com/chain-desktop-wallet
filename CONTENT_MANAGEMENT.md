@@ -9,6 +9,8 @@ Always add the `en-US` content first and then the others, as by default the `en-
 ### Adding a new language
 Insert a new column with a proper Language Code following [ISO 639-1 & ISO 3166-2 Language Localisation Standard](http://www.lingoes.net/en/translator/langcode.htm).
 
+Also remember to import the generated language JSON file in `src/language/I18n.ts`.
+
 ### Adding new contents
 Insert a new row with a variable name properly describing the nature of the content:
 - e.g. `send.formSend.recipientAddress.label`
