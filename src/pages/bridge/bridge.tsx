@@ -43,10 +43,8 @@ import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   adjustedTransactionAmount,
   fromScientificNotation,
-  // eslint-disable-next-line
   getBaseScaledAmount,
   getCurrentMinAssetAmount,
-  // getNormalScaleAmount,
 } from '../../utils/NumberUtils';
 import {
   SUPPORTED_BRIDGE,
@@ -119,7 +117,6 @@ const CronosBridgeForm = props => {
   const {
     form,
     formValues,
-    // setFormValues,
     bridgeConfigForm,
     isBridgeValid,
     setIsBridgeValid,
@@ -130,13 +127,10 @@ const CronosBridgeForm = props => {
     toAsset,
     setToAsset,
     setCurrentAssetIdentifier,
-    // setCurrentStep,
     showPasswordInput,
     toAddress,
     setToAddress,
-    // bridgeTransferDirection,
     setBridgeTransferDirection,
-    // bridgeConfigs,
     setBridgeConfigs,
     setBridgeConfigFields,
   } = props;
@@ -149,7 +143,6 @@ const CronosBridgeForm = props => {
   const [bridgeSupportedAssets, setBridgeSupportedAssets] = useState<UserAsset[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isButtonLoading, setIsButtonLoading] = useState(false);
-  // const [updateLoading, setUpdateLoading] = useState(false);
   const didMountRef = useRef(false);
 
   const analyticsService = new AnalyticsService(session);
@@ -285,10 +278,8 @@ const CronosBridgeForm = props => {
     form.setFieldsValue({
       bridgeFrom: newBridgeFrom,
       bridgeTo: newBridgeTo,
-      // asset: undefined,
-      // amount: undefined,
     });
-    form.submit();
+    form.validateFields();
   };
 
   const onSwitchAsset = value => {
@@ -361,10 +352,9 @@ const CronosBridgeForm = props => {
       form={form}
       name="control-hooks"
       requiredMark="optional"
-      // onFinish={value => {
-      //   console.log(value)
-      //   onFinish(value);
-      // }}
+      onFinish={() => {
+        showPasswordInput();
+      }}
     >
       <div className="row-bridge ant-double-height">
         <Form.Item
@@ -560,14 +550,7 @@ const CronosBridgeForm = props => {
       )}
 
       <Form.Item {...tailLayout} className="button">
-        <Button
-          type="primary"
-          htmlType="submit"
-          loading={isButtonLoading}
-          onClick={() => {
-            showPasswordInput();
-          }}
-        >
+        <Button type="primary" htmlType="submit" loading={isButtonLoading}>
           {t('bridge.form.transfer')}
         </Button>
       </Form.Item>
@@ -668,7 +651,6 @@ const CronosBridge = () => {
       session.wallet.identifier,
     );
 
-    // TO-DO
     let transferRequest = {
       bridgeTransferDirection,
       tendermintAddress: tendermintAddress.toLowerCase(),
@@ -701,11 +683,11 @@ const CronosBridge = () => {
       ...formValues,
       ...form.getFieldsValue(),
     });
+
     if (decryptedPhrase || session.wallet.walletType === LEDGER_WALLET_TYPE) {
       const { tendermintAddress, evmAddress } = formValues;
       const amount = form.getFieldValue('amount');
 
-      // TO-DO
       let transferRequest = {
         bridgeTransferDirection,
         tendermintAddress: tendermintAddress.toLowerCase(),
@@ -1011,9 +993,7 @@ const CronosBridge = () => {
               <Button
                 key="submit"
                 type="primary"
-                // loading={isButtonLoading}
                 onClick={onConfirmation}
-                // hidden={isConfirmClearVisible}
                 disabled={isButtonDisabled}
               >
                 {t('general.confirm')}
@@ -1106,7 +1086,6 @@ const CronosBridge = () => {
     };
 
     bridgeService.updateBridgeConfiguration(updateConfig);
-    // setIsBridgeSettingsFormVisible(false);
     message.success({
       key: 'bridgeUpdate',
       content: `Bridge Config successfully updated`,
@@ -1159,29 +1138,13 @@ const CronosBridge = () => {
               disabled={!isBridgeValid}
             />
             <ModalPopup
+              className="bridge-config-modal"
               isModalVisible={isBridgeSettingsFormVisible}
               handleCancel={() => {
                 setIsBridgeSettingsFormVisible(false);
               }}
               handleOk={onBridgeConfigUpdate}
-              footer={[
-                <Button
-                  key="submit"
-                  type="primary"
-                  loading={confirmLoading}
-                  onClick={onBridgeConfigUpdate}
-                >
-                  {t('general.save')}
-                </Button>,
-                <Button
-                  key="back"
-                  type="link"
-                  loading={confirmLoading}
-                  onClick={onBridgeConfigDefault}
-                >
-                  {t('general.default')}
-                </Button>,
-              ]}
+              footer={[]}
               okText={t('general.save')}
               forceRender
             >
@@ -1191,7 +1154,7 @@ const CronosBridge = () => {
                 form={bridgeConfigForm}
                 name="control-hooks"
                 requiredMark="optional"
-                // onFinish={onBridgeConfigUpdate}
+                onFinish={onBridgeConfigUpdate}
               >
                 <Form.Item
                   name="prefix"
@@ -1286,6 +1249,19 @@ const CronosBridge = () => {
                 ) : (
                   <></>
                 )}
+                <Form.Item>
+                  <Button key="submit" type="primary" htmlType="submit" loading={confirmLoading}>
+                    {t('general.save')}
+                  </Button>
+                  <Button
+                    key="back"
+                    type="link"
+                    loading={confirmLoading}
+                    onClick={onBridgeConfigDefault}
+                  >
+                    {t('general.default')}
+                  </Button>
+                </Form.Item>
               </Form>
             </ModalPopup>
           </div>
