@@ -617,7 +617,7 @@
         },
         "transferInitiated": {
           "title": "Transfer Initiated",
-          "description": "Check your wallet for the funds. It may take up to an hour depending on network congestion."
+          "description": "Check your wallet for the funds. It may take up to a few minutes depending on network congestion."
         },
         "action": {
           "viewTransaction": "View Transaction",
