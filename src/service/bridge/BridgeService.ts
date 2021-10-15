@@ -23,7 +23,6 @@ import { Network } from '../../config/StaticConfig';
 import { Session } from '../../models/Session';
 import { StorageService } from '../../storage/StorageService';
 import { TransactionPrepareService } from '../TransactionPrepareService';
-import { UserAsset } from '../../models/UserAsset';
 
 export class BridgeService {
   public readonly storageService: StorageService;
@@ -280,11 +279,12 @@ export class BridgeService {
   public async getBridgeTransactionFee(
     currentSession: Session,
     bridgeTransferRequest: BridgeTransferRequest,
-    fromAsset: UserAsset,
   ) {
     const bridgeConfig = await this.getCurrentBridgeConfig(currentSession, bridgeTransferRequest);
     const { loadedBridgeConfig, defaultBridgeConfig } = bridgeConfig;
-    const exp = Big(10).pow(fromAsset.decimals);
+    const exp = Big(10).pow(bridgeTransferRequest?.originAsset.decimals);
+
+    console.log('getBridgeTransactionFee ASSET_FEE', bridgeTransferRequest?.originAsset);
 
     return Big(loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit)
       .mul(loadedBridgeConfig.defaultGasPrice || defaultBridgeConfig.defaultGasPrice)
