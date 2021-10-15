@@ -76,7 +76,7 @@ export interface CustomFeeRequest {
   gasLimit: string;
 }
 
-export interface BridgeTransactionUnsigned {
+export interface BridgeTransactionUnsigned extends TransactionUnsigned {
   fromAddress: string;
   toAddress: string;
   amount: string;
@@ -93,4 +93,6 @@ export interface BridgeTransactionUnsigned {
 
   data?: string;
   originAsset?: UserAsset;
+
+  latestBlockHeight?: number;
 }
