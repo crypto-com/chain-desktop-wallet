@@ -1611,7 +1611,7 @@
         },
         "transferInitiated": {
           "title": "交易已發起",
-          "description": "請查看錢包資產。在網絡擁堵的情況下，可能最多需要一個小時完成交易。"
+          "description": "請查看錢包資產。在網絡擁堵的情況下，可能最多需要數分鐘完成交易。"
         },
         "action": {
           "viewTransaction": "查看交易",
@@ -2604,7 +2604,7 @@
         },
         "transferInitiated": {
           "title": "交易已发起",
-          "description": "请查看钱包资产。在网络拥堵的情况下，可能最多需要一个小时完成交易。"
+          "description": "请查看钱包资产。在网络拥堵的情况下，可能最多需要数分钟完成交易。"
         },
         "action": {
           "viewTransaction": "查看交易",
@@ -3721,7 +3721,7 @@
         },
         "transferInitiated": {
           "title": "트랜잭션 시작됨",
-          "description": "지갑에서 자금을 확인하십시오. 네트워크 상태에 따라 최대 1시간까지 소요될 수 있습니다."
+          "description": "지갑에서 자금을 확인하십시오. 네트워크 상태에 따라 최대 몇분까지 소요될 수 있습니다."
         },
         "action": {
           "viewTransaction": "트랜잭션 보기",

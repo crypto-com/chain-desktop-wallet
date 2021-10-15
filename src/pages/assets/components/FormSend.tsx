@@ -326,7 +326,7 @@ const FormSend: React.FC<FormSendProps> = props => {
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label4')}</div>
-              <div>{`${getNormalScaleAmount(
+              <div>{`~${getNormalScaleAmount(
                 walletAsset?.config?.fee !== undefined &&
                   walletAsset?.config?.fee.networkFee !== undefined
                   ? walletAsset?.config?.fee.networkFee
