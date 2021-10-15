@@ -84,6 +84,7 @@ import {
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { secretStoreService } from '../../storage/SecretStoreService';
+import { BridgeTransferRequest } from '../../service/TransactionRequestModels';
 
 const { Content, Sider } = Layout;
 const { Option } = Select;
@@ -116,8 +117,6 @@ const bridgeIcon = (bridgeValue: string | undefined) => {
 
   return <img src={icon} alt={bridgeValue} className="asset-icon" />;
 };
-
-const cronosBridgeFee = '0';
 
 interface listDataSource {
   title: string;
@@ -552,18 +551,9 @@ const CronosBridgeForm = props => {
       {currentAsset && new Big(sendingAmount).gt(0) ? (
         <div className="review-container">
           <div className="flex-row">
-            <div>{t('bridge.form.fee')}</div>
-            <div>
-              {getNormalScaleAmount(cronosBridgeFee, currentAsset!)} {currentAsset?.symbol}
-            </div>
-          </div>
-          <div className="flex-row">
             <div>{t('bridge.form.willReceive')}</div>
             <div>
-              {new Big(sendingAmount)
-                .sub(getNormalScaleAmount(cronosBridgeFee, toAsset!))
-                .toFixed(4)}{' '}
-              {toAsset?.symbol}
+              {new Big(sendingAmount).toFixed(4)} {toAsset?.symbol}
             </div>
           </div>
           <div className="flex-row">
@@ -618,6 +608,15 @@ const CronosBridge = () => {
   const [bridgeTransferDirection, setBridgeTransferDirection] = useState<BridgeTransferDirection>(
     BridgeTransferDirection.NOT_SUPPORT,
   );
+  const [bridgeTransferRequest, setBridgeTransferRequest] = useState<BridgeTransferRequest>({
+    bridgeTransferDirection: BridgeTransferDirection.NOT_SUPPORT,
+    tendermintAddress: '',
+    evmAddress: '',
+    originAsset: currentAsset!,
+    amount: '0',
+    decryptedPhrase: '',
+    walletType: 'normal', // normal, ledger
+  });
   // eslint-disable-next-line
   const [bridgeConfirmationList, setBridgeConfirmationList] = useState<listDataSource[]>([]);
   const [bridgeTransferError, setBridgeTransferError] = useState(false);
@@ -629,6 +628,7 @@ const CronosBridge = () => {
 
   const [bridgeConfigs, setBridgeConfigs] = useState<BridgeConfig>();
   const [bridgeConfigFields, setBridgeConfigFields] = useState<string[]>([]);
+  const [bridgeFee, setBridgeFee] = useState('0');
 
   const analyticsService = new AnalyticsService(session);
 
@@ -665,32 +665,70 @@ const CronosBridge = () => {
   };
 
   const onWalletDecryptFinish = async (password: string) => {
+    const { amount, tendermintAddress, evmAddress } = formValues;
+
+    setFormValues({
+      ...formValues,
+      ...form.getFieldsValue(),
+    });
+
     const phraseDecrypted = await secretStoreService.decryptPhrase(
       password,
       session.wallet.identifier,
     );
     setDecryptedPhrase(phraseDecrypted);
     setInputPasswordVisible(false);
+
+    const transferRequest = {
+      bridgeTransferDirection,
+      tendermintAddress: tendermintAddress.toLowerCase(),
+      evmAddress: evmAddress.toLowerCase(),
+      amount: amount.toString(),
+      originAsset: currentAsset!,
+      decryptedPhrase,
+      walletType: session.wallet.walletType, // normal, ledger
+    };
+    const fee = await bridgeService.getBridgeTransactionFee(
+      session,
+      transferRequest,
+      currentAsset!,
+    );
+    setBridgeFee(fee);
+    setBridgeTransferRequest(transferRequest);
     setCurrentStep(1);
   };
 
-  const showPasswordInput = () => {
+  const showPasswordInput = async () => {
+    setFormValues({
+      ...formValues,
+      ...form.getFieldsValue(),
+    });
     if (decryptedPhrase || session.wallet.walletType === LEDGER_WALLET_TYPE) {
+      const { amount, tendermintAddress, evmAddress } = formValues;
+      const transferRequest = {
+        bridgeTransferDirection,
+        tendermintAddress: tendermintAddress.toLowerCase(),
+        evmAddress: evmAddress.toLowerCase(),
+        amount: amount.toString(),
+        originAsset: currentAsset!,
+        decryptedPhrase,
+        walletType: session.wallet.walletType, // normal, ledger
+      };
+      const fee = await bridgeService.getBridgeTransactionFee(
+        session,
+        transferRequest,
+        currentAsset!,
+      );
+      setBridgeFee(fee);
+      setBridgeTransferRequest(transferRequest);
       setCurrentStep(1);
     } else {
       setInputPasswordVisible(true);
     }
-    setFormValues({
-      ...formValues,
-      ...form.getFieldsValue(),
-      // bridgeFrom: values.bridgeFrom,
-      // bridgeTo: values.bridgeTo,
-      // amount: values.amount,
-    });
   };
 
   const onConfirmation = async () => {
-    const { bridgeFrom, bridgeTo, amount, tendermintAddress, evmAddress } = formValues;
+    const { bridgeFrom, bridgeTo, amount } = formValues;
 
     const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
     const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
@@ -746,15 +784,7 @@ const CronosBridge = () => {
     try {
       setCurrentStep(2);
 
-      const sendResult = await walletService.sendBridgeTransaction({
-        bridgeTransferDirection,
-        tendermintAddress: tendermintAddress.toLowerCase(),
-        evmAddress: evmAddress.toLowerCase(),
-        amount: amount.toString(),
-        originAsset: currentAsset!,
-        decryptedPhrase,
-        walletType: session.wallet.walletType, // normal, ledger
-      });
+      const sendResult = await walletService.sendBridgeTransaction(bridgeTransferRequest);
       setBroadcastResult(sendResult);
       listDataSource.push({
         title: t('bridge.deposit.complete.title', {
@@ -913,7 +943,7 @@ const CronosBridge = () => {
                   <div className="flex-row">
                     <div>{t('bridge.form.fee')}</div>
                     <div>
-                      {getNormalScaleAmount(cronosBridgeFee, currentAsset!)} {currentAsset?.symbol}
+                      ~{getNormalScaleAmount(bridgeFee, currentAsset!)} {currentAsset?.symbol}
                     </div>
                   </div>
                   <div className="flex-row">
@@ -928,10 +958,7 @@ const CronosBridge = () => {
                 <div className="block">
                   <div>{t('bridge.form.receiving')}</div>
                   <div className="title">
-                    ~
-                    {new Big(amount)
-                      .sub(getNormalScaleAmount(cronosBridgeFee, toAsset!))
-                      .toFixed(4)}{' '}
+                    ~{new Big(amount).sub(getNormalScaleAmount(bridgeFee, toAsset!)).toFixed(4)}{' '}
                     {toAsset?.symbol}
                   </div>
                 </div>
