@@ -353,7 +353,7 @@ const FormDelegationRequest = () => {
           {ellipsis(validatorName, 24)}
           {' '}
           {
-            moderationConfig.config?.validators?.warning?.concat(moderationConfig.config?.validators?.suspicious).includes(record.validatorAddress) ?
+            moderationConfig?.config?.validators?.warning?.concat(moderationConfig?.config?.validators?.suspicious).includes(record.validatorAddress) ?
               <Tooltip title={t('staking.validatorList.table.moderationText')}>
                 <span>
                   <ExclamationCircleOutlined style={{ color: "red" }} />
