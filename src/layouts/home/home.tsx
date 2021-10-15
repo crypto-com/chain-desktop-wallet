@@ -623,13 +623,13 @@ function HomeLayout(props: HomeLayoutProps) {
       <Menu>
         {walletList.length <= LedgerWalletMaximum ? (
           <>
-            <Menu.Item className="restore-wallet-item">
+            <Menu.Item className="restore-wallet-item" key="restore-wallet-item">
               <Link to="/restore">
                 <ReloadOutlined />
                 {t('navbar.wallet.restore')}
               </Link>
             </Menu.Item>
-            <Menu.Item className="create-wallet-item">
+            <Menu.Item className="create-wallet-item" key="create-wallet-item">
               <Link to="/create">
                 <PlusOutlined />
                 {t('navbar.wallet.create')}
@@ -643,6 +643,7 @@ function HomeLayout(props: HomeLayoutProps) {
           <>
             <Menu.Item
               className="delete-wallet-item"
+              key="delete-wallet-item"
               onClick={() => {
                 setDeleteWalletAddress(session.wallet.address);
                 setIsConfirmationModalVisible(true);
@@ -655,7 +656,7 @@ function HomeLayout(props: HomeLayoutProps) {
         ) : (
           ''
         )}
-        <Menu.Item>
+        <Menu.Item key="wallet-list-item">
           <Link to="/wallet">
             {/* <IconWallet /> */}
             <Icon component={IconWallet} />
