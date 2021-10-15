@@ -649,6 +649,16 @@
           "failed": {
             "title": "Failed to broadcast a signed transaction on Ledger"
           }
+        },
+        "transactionHistory": {
+          "table": {
+            "transactionHash": "Transaction Hash",
+            "amount": "Amount",
+            "fromAddress": "From (Network)",
+            "toAddress": "To (Network)",
+            "time": "Time",
+            "status": "Status"
+          }
         }
       },
       "staking": {
@@ -1633,6 +1643,16 @@
           "failed": {
             "title": "未能成功廣播Ledger的簽名交易"
           }
+        },
+        "transactionHistory": {
+          "table": {
+            "transactionHash": "交易哈希值",
+            "amount": "數量",
+            "fromAddress": "從（網絡）",
+            "toAddress": "到（網絡）",
+            "time": "時間",
+            "status": "狀態"
+          }
         }
       },
       "staking": {
@@ -2615,6 +2635,16 @@
         "ledgerSign": {
           "failed": {
             "title": "未能成功广播Ledger的签名交易"
+          }
+        },
+        "transactionHistory": {
+          "table": {
+            "transactionHash": "交易哈希值",
+            "amount": "数量",
+            "fromAddress": "从（网络）",
+            "toAddress": "到（网络）",
+            "time": "时间",
+            "status": "状态"
           }
         }
       },
@@ -3715,6 +3745,16 @@
         },
         "pendingTransfer": {
           "title": "{{amount}} {{symbol}}이 전송 대기 중입니다"
+        },
+        "transactionHistory": {
+          "table": {
+            "transactionHash": "트랜잭션 해쉬",
+            "amount": "금액",
+            "fromAddress": "송신인（네트워크）",
+            "toAddress": "수신인（네트워크）",
+            "time": "시간",
+            "status": "상태"
+          }
         }
       },
       "staking": {
