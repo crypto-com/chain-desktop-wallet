@@ -43,7 +43,7 @@ export const DefaultTestnetBridgeConfigs: {
     bridgePort: 'transfer',
     gasLimit: 300_000,
     prefix: 'tcrc',
-    defaultGasPrice: 10_000,
+    defaultGasPrice: 10,
   },
 };
 
@@ -65,6 +65,6 @@ export const DefaultMainnetBridgeConfigs = {
     bridgeChannel: 'channel-0',
     bridgePort: 'transfer',
     gasLimit: 300_000,
-    defaultGasPrice: 10_000,
+    defaultGasPrice: 10,
   },
 };
