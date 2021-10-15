@@ -284,10 +284,18 @@ export class BridgeService {
     const { loadedBridgeConfig, defaultBridgeConfig } = bridgeConfig;
     const exp = Big(10).pow(bridgeTransferRequest?.originAsset.decimals);
 
-    console.log('getBridgeTransactionFee ASSET_FEE', bridgeTransferRequest?.originAsset);
+    const gasLimit = loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit;
+    const gasPrice = loadedBridgeConfig.defaultGasPrice || defaultBridgeConfig.defaultGasPrice;
 
-    return Big(loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit)
-      .mul(loadedBridgeConfig.defaultGasPrice || defaultBridgeConfig.defaultGasPrice)
+    // eslint-disable-next-line no-console
+    console.log('getBridgeTransactionFee ASSET_FEE', {
+      asset: bridgeTransferRequest?.originAsset,
+      gasLimit,
+      gasPrice,
+    });
+
+    return Big(gasLimit)
+      .mul(gasPrice)
       .div(exp)
       .toFixed(4);
   }
