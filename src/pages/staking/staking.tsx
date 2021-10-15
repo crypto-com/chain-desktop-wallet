@@ -108,7 +108,7 @@ interface Config {
 }
 
 interface Validators {
-  warning:    any[];
+  warning:    string[];
   suspicious: string[];
 }
 
