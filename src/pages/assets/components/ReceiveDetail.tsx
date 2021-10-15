@@ -11,7 +11,6 @@ import './ReceiveDetail.less';
 import { Session } from '../../../models/Session';
 import { UserAsset, UserAssetType } from '../../../models/UserAsset';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../../service/LedgerService';
-import { TransactionUtils } from '../../../utils/TransactionUtils';
 import NoticeDisclaimer from '../../../components/NoticeDisclaimer/NoticeDisclaimer';
 
 interface ReceiveDetailProps {
@@ -102,7 +101,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
       <NoticeDisclaimer>
         {t('receive.disclaimer', {
           assetSymbol: currentAsset?.symbol,
-          assetName: TransactionUtils.getAssetSupportedBridge(currentAsset!)?.label,
+          assetName: currentAsset?.name,
         })}
       </NoticeDisclaimer>
       {isLedger && (

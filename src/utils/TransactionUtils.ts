@@ -1,10 +1,9 @@
 import Big from 'big.js';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { Session } from '../models/Session';
-import { UserAsset, UserAssetType } from '../models/UserAsset';
+import { UserAsset } from '../models/UserAsset';
 import i18n from '../language/I18n';
 import { AssetAddressValidator } from '../service/AssetAddressValidator';
-import { SUPPORTED_BRIDGE } from '../config/StaticConfig';
 
 export class TransactionUtils {
   public static addressValidator(
@@ -40,18 +39,6 @@ export class TransactionUtils {
         }
       },
     });
-  }
-
-  public static getAssetSupportedBridge(walletAsset: UserAsset) {
-    switch (walletAsset.assetType) {
-      case UserAssetType.TENDERMINT:
-      case UserAssetType.IBC:
-        return SUPPORTED_BRIDGE.get('CRYPTO_ORG');
-      case UserAssetType.EVM:
-        return SUPPORTED_BRIDGE.get('CRONOS');
-      default:
-        return SUPPORTED_BRIDGE.get('CRYPTO_ORG');
-    }
   }
 
   public static validTransactionAmountValidator() {
