@@ -3,6 +3,7 @@ import { AbiItem } from 'web3-utils';
 import Web3 from 'web3';
 import { TransactionConfig } from 'web3-eth';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
+import Big from 'big.js';
 import { BridgeTransferRequest } from '../TransactionRequestModels';
 import { BroadCastResult } from '../../models/Transaction';
 import { BridgeTransactionUnsigned } from '../signers/TransactionSupported';
@@ -22,6 +23,7 @@ import { Network } from '../../config/StaticConfig';
 import { Session } from '../../models/Session';
 import { StorageService } from '../../storage/StorageService';
 import { TransactionPrepareService } from '../TransactionPrepareService';
+import { UserAsset } from '../../models/UserAsset';
 
 export class BridgeService {
   public readonly storageService: StorageService;
@@ -273,6 +275,21 @@ export class BridgeService {
       bridgeDirectionType,
       bridgeNetwork,
     );
+  }
+
+  public async getBridgeTransactionFee(
+    currentSession: Session,
+    bridgeTransferRequest: BridgeTransferRequest,
+    fromAsset: UserAsset,
+  ) {
+    const bridgeConfig = await this.getCurrentBridgeConfig(currentSession, bridgeTransferRequest);
+    const { loadedBridgeConfig, defaultBridgeConfig } = bridgeConfig;
+    const exp = Big(10).pow(fromAsset.decimals);
+
+    return Big(loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit)
+      .mul(loadedBridgeConfig.defaultGasPrice || defaultBridgeConfig.defaultGasPrice)
+      .div(exp)
+      .toFixed(4);
   }
 
   public async updateBridgeConfiguration(bridgeConfig: BridgeConfig) {
