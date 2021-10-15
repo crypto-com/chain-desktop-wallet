@@ -61,10 +61,10 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
 
   const config: UserAssetConfig = {
     explorer: {
-      tx: 'https://cronos-explorer.crypto.org/tx',
-      address: 'https://cronos-explorer.crypto.org/address',
+      tx: 'https://cronos.crypto.org/explorer/tx',
+      address: 'https://cronos.crypto.org/explorer/address',
     },
-    explorerUrl: 'https://cronos-explorer.crypto.org',
+    explorerUrl: 'https://cronos.crypto.org/explorer',
     chainId: isTestnet ? '338' : 'TO_BE_DECIDED',
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
     indexingUrl: isTestnet ? 'https://cronos.crypto.org/explorer/api' : 'TO_BE_DECIDED',

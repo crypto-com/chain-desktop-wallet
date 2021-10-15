@@ -701,7 +701,9 @@ const CronosBridge = () => {
       ...form.getFieldsValue(),
     });
     if (decryptedPhrase || session.wallet.walletType === LEDGER_WALLET_TYPE) {
-      const { amount, tendermintAddress, evmAddress } = formValues;
+      const { tendermintAddress, evmAddress } = formValues;
+      const amount = form.getFieldValue('amount');
+
       const transferRequest = {
         bridgeTransferDirection,
         tendermintAddress: tendermintAddress.toLowerCase(),
