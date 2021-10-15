@@ -1238,6 +1238,8 @@ const CronosBridge = () => {
 const CronosHistory = () => {
   const session = useRecoilValue(sessionState);
 
+  const [t] = useTranslation();
+
   interface TransferTabularData {
     key: string;
     transactionHash: string;
@@ -1250,7 +1252,7 @@ const CronosHistory = () => {
 
   const HistoryColumns = [
     {
-      title: 'Transaction Hash',
+      title: t('bridge.transactionHistory.table.transactionHash'),
       dataIndex: 'transactionHash',
       key: 'transactionHash',
       render: text => (
@@ -1268,7 +1270,7 @@ const CronosHistory = () => {
       ),
     },
     {
-      title: 'Amount',
+      title: t('bridge.transactionHistory.table.amount'),
       dataIndex: 'amount',
       key: 'amount',
       render: (text, record: TransferTabularData) => {
@@ -1283,9 +1285,9 @@ const CronosHistory = () => {
       },
     },
     {
-      title: 'From (Network)',
-      dataIndex: 'recipientAddress',
-      key: 'recipientAddress',
+      title: t('bridge.transactionHistory.table.fromAddress'),
+      dataIndex: 'fromAddress',
+      key: 'fromAddress',
       render: text => (
         <a
           data-original={text}
@@ -1301,9 +1303,9 @@ const CronosHistory = () => {
       ),
     },
     {
-      title: 'To (Network)',
-      dataIndex: 'recipientAddress',
-      key: 'recipientAddress',
+      title: t('bridge.transactionHistory.table.toAddress'),
+      dataIndex: 'toAddress',
+      key: 'toAddress',
       render: text => (
         <a
           data-original={text}
@@ -1319,12 +1321,12 @@ const CronosHistory = () => {
       ),
     },
     {
-      title: 'Time',
+      title: t('bridge.transactionHistory.table.time'),
       dataIndex: 'time',
       key: 'time',
     },
     {
-      title: 'Status',
+      title: t('bridge.transactionHistory.table.status'),
       dataIndex: 'status',
       key: 'status',
       render: (text, record: TransferTabularData) => {
