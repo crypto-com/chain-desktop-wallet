@@ -67,7 +67,7 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
     explorerUrl: 'https://cronos-explorer.crypto.org',
     chainId: isTestnet ? '338' : 'TO_BE_DECIDED',
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
-    indexingUrl: isTestnet ? 'https://cronos-explorer.crypto.org/api' : 'TO_BE_DECIDED',
+    indexingUrl: isTestnet ? 'https://cronos.crypto.org/explorer/api' : 'TO_BE_DECIDED',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
     nodeUrl: 'https://cronos-testnet-3.crypto.org:8545/',

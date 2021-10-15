@@ -55,7 +55,7 @@ import {
   // eslint-disable-next-line
   getBaseScaledAmount,
   getCurrentMinAssetAmount,
-  getNormalScaleAmount,
+  // getNormalScaleAmount,
 } from '../../utils/NumberUtils';
 import {
   SUPPORTED_BRIDGE,
@@ -676,8 +676,6 @@ const CronosBridge = () => {
       password,
       session.wallet.identifier,
     );
-    setDecryptedPhrase(phraseDecrypted);
-    setInputPasswordVisible(false);
 
     const transferRequest = {
       bridgeTransferDirection,
@@ -685,14 +683,13 @@ const CronosBridge = () => {
       evmAddress: evmAddress.toLowerCase(),
       amount: amount.toString(),
       originAsset: currentAsset!,
-      decryptedPhrase,
+      decryptedPhrase: phraseDecrypted,
       walletType: session.wallet.walletType, // normal, ledger
     };
-    const fee = await bridgeService.getBridgeTransactionFee(
-      session,
-      transferRequest,
-      currentAsset!,
-    );
+    const fee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
+
+    setDecryptedPhrase(phraseDecrypted);
+    setInputPasswordVisible(false);
     setBridgeFee(fee);
     setBridgeTransferRequest(transferRequest);
     setCurrentStep(1);
@@ -714,11 +711,7 @@ const CronosBridge = () => {
         decryptedPhrase,
         walletType: session.wallet.walletType, // normal, ledger
       };
-      const fee = await bridgeService.getBridgeTransactionFee(
-        session,
-        transferRequest,
-        currentAsset!,
-      );
+      const fee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
       setBridgeFee(fee);
       setBridgeTransferRequest(transferRequest);
       setCurrentStep(1);
@@ -943,7 +936,7 @@ const CronosBridge = () => {
                   <div className="flex-row">
                     <div>{t('bridge.form.fee')}</div>
                     <div>
-                      ~{getNormalScaleAmount(bridgeFee, currentAsset!)} {currentAsset?.symbol}
+                      ~{bridgeFee} {currentAsset?.symbol}
                     </div>
                   </div>
                   <div className="flex-row">
@@ -958,7 +951,10 @@ const CronosBridge = () => {
                 <div className="block">
                   <div>{t('bridge.form.receiving')}</div>
                   <div className="title">
-                    ~{new Big(amount).sub(getNormalScaleAmount(bridgeFee, toAsset!)).toFixed(4)}{' '}
+                    ~
+                    {new Big(amount)
+                      // .sub(bridgeFee)
+                      .toFixed(4)}{' '}
                     {toAsset?.symbol}
                   </div>
                 </div>
@@ -1232,6 +1228,24 @@ const CronosBridge = () => {
                     style={{ textAlign: 'left' }}
                   >
                     <Input />
+                  </Form.Item>
+                ) : (
+                  <></>
+                )}
+                {bridgeConfigFields.includes('gasLimit') &&
+                form.getFieldValue('bridgeFrom') === 'CRONOS' ? (
+                  <Form.Item
+                    name="gasLimit"
+                    label="Gas Limit"
+                    rules={[
+                      {
+                        required: true,
+                        message: `${t('bridge.config.port.title')} ${t('general.required')}`,
+                      },
+                    ]}
+                    style={{ textAlign: 'left' }}
+                  >
+                    <InputNumber />
                   </Form.Item>
                 ) : (
                   <></>
