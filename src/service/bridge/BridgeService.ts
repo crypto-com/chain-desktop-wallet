@@ -122,7 +122,8 @@ export class BridgeService {
       const device = createLedgerDevice();
       const walletAddressIndex = currentSession.wallet.addressIndex;
 
-      const gasLimitTx = web3.utils.toBN(bridgeTransaction.gasLimit!);
+      // Use fixed hard-coded max GasLimit for bridge transactions ( Known contract and predictable consumption )
+      const gasLimitTx = 200_000;
       const gasPriceTx = web3.utils.toBN(bridgeTransaction.gasPrice);
 
       signedTransactionHex = await device.signEthTx(
