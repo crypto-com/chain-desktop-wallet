@@ -118,7 +118,7 @@ export class BridgeService {
 
     bridgeTransaction.nonce = prepareTxInfo.nonce;
     bridgeTransaction.gasPrice = prepareTxInfo.loadedGasPrice;
-    bridgeTransaction.gasLimit = prepareTxInfo.gasLimit;
+    bridgeTransaction.gasLimit = gasLimit;
 
     let signedTransactionHex = '';
     if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
