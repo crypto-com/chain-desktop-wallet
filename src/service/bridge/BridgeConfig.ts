@@ -29,7 +29,7 @@ export const DefaultTestnetBridgeConfigs: {
   CRONOS_TO_CRYPTO_ORG: {
     bridgeDirectionType: BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG,
     bridgeNetworkConfigType: BridgeNetworkConfigType.TESTNET_BRIDGE,
-    cronosBridgeContractAddress: '0x3368dD21c4136747a6569f98C55f5ec0a2D984B3',
+    cronosBridgeContractAddress: '0x44b8c54d95906D6b223dAE5E038cB8EF4ef45aE5',
     gasLimit: 30_000,
     // 5 Gwei
     defaultGasPrice: 5_000_000_000_000,

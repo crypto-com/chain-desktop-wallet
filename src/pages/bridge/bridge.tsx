@@ -5,7 +5,6 @@ import {
   Avatar,
   Button,
   Form,
-  // Input,
   InputNumber,
   Layout,
   Select,
@@ -14,9 +13,7 @@ import {
   Checkbox,
   List,
   Card,
-  // Spin,
   Skeleton,
-  // Tabs,
   Table,
   Typography,
   Tag,
@@ -26,7 +23,6 @@ import {
 import Icon, {
   ArrowLeftOutlined,
   ArrowRightOutlined,
-  // LoadingOutlined,
   SettingOutlined,
   SwapOutlined,
 } from '@ant-design/icons';
@@ -35,14 +31,9 @@ import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
-import {
-  // marketState,
-  sessionState,
-  walletAllAssetsState,
-  // walletListState,
-} from '../../recoil/atom';
+import { sessionState, walletAllAssetsState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
-// import { Session } from '../../models/Session';
+
 import { UserAsset, scaledBalance, UserAssetType } from '../../models/UserAsset';
 import { BroadCastResult, TransactionDirection, TransactionStatus } from '../../models/Transaction';
 // eslint-disable-next-line
@@ -50,7 +41,7 @@ import { renderExplorerUrl } from '../../models/Explorer';
 import { middleEllipsis } from '../../utils/utils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
-  // adjustedTransactionAmount,
+  adjustedTransactionAmount,
   fromScientificNotation,
   // eslint-disable-next-line
   getBaseScaledAmount,
@@ -677,7 +668,8 @@ const CronosBridge = () => {
       session.wallet.identifier,
     );
 
-    const transferRequest = {
+    // TO-DO
+    let transferRequest = {
       bridgeTransferDirection,
       tendermintAddress: tendermintAddress.toLowerCase(),
       evmAddress: evmAddress.toLowerCase(),
@@ -687,6 +679,15 @@ const CronosBridge = () => {
       walletType: session.wallet.walletType, // normal, ledger
     };
     const fee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
+
+    transferRequest = {
+      ...transferRequest,
+      amount: adjustedTransactionAmount(
+        amount,
+        currentAsset!,
+        getBaseScaledAmount(fee, currentAsset!),
+      ),
+    };
 
     setDecryptedPhrase(phraseDecrypted);
     setInputPasswordVisible(false);
@@ -704,7 +705,8 @@ const CronosBridge = () => {
       const { tendermintAddress, evmAddress } = formValues;
       const amount = form.getFieldValue('amount');
 
-      const transferRequest = {
+      // TO-DO
+      let transferRequest = {
         bridgeTransferDirection,
         tendermintAddress: tendermintAddress.toLowerCase(),
         evmAddress: evmAddress.toLowerCase(),
@@ -714,6 +716,16 @@ const CronosBridge = () => {
         walletType: session.wallet.walletType, // normal, ledger
       };
       const fee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
+
+      transferRequest = {
+        ...transferRequest,
+        amount: adjustedTransactionAmount(
+          amount,
+          currentAsset!,
+          getBaseScaledAmount(fee, currentAsset!),
+        ),
+      };
+
       setBridgeFee(fee);
       setBridgeTransferRequest(transferRequest);
       setCurrentStep(1);
@@ -743,7 +755,11 @@ const CronosBridge = () => {
     const listDataSource = [
       {
         title: t('bridge.pendingTransfer.title', {
-          amount,
+          amount: adjustedTransactionAmount(
+            amount,
+            currentAsset!,
+            getBaseScaledAmount(bridgeFee, currentAsset!),
+          ),
           symbol: currentAsset?.symbol,
         }),
         description: (
@@ -783,7 +799,11 @@ const CronosBridge = () => {
       setBroadcastResult(sendResult);
       listDataSource.push({
         title: t('bridge.deposit.complete.title', {
-          amount,
+          amount: adjustedTransactionAmount(
+            amount,
+            currentAsset!,
+            getBaseScaledAmount(bridgeFee, currentAsset!),
+          ),
           symbol: currentAsset?.symbol,
         }),
         description: (
@@ -812,7 +832,11 @@ const CronosBridge = () => {
 
       analyticsService.logTransactionEvent(
         sendResult.transactionHash as string,
-        formValues.amount,
+        adjustedTransactionAmount(
+          formValues.amount,
+          currentAsset!,
+          getBaseScaledAmount(bridgeFee, currentAsset!),
+        ),
         AnalyticsTxType.BridgeTransaction,
         AnalyticsActions.BridgeTransfer,
         AnalyticsCategory.Bridge,
@@ -821,7 +845,11 @@ const CronosBridge = () => {
       if (session.wallet.walletType === LEDGER_WALLET_TYPE) {
         listDataSource.push({
           title: t('bridge.ledgerSign.failed.title', {
-            amount,
+            amount: adjustedTransactionAmount(
+              amount,
+              currentAsset!,
+              getBaseScaledAmount(bridgeFee, currentAsset!),
+            ),
             symbol: currentAsset?.symbol,
           }),
           description: <></>,
@@ -830,7 +858,11 @@ const CronosBridge = () => {
       }
       listDataSource.push({
         title: t('bridge.deposit.failed.title', {
-          amount,
+          amount: adjustedTransactionAmount(
+            amount,
+            currentAsset!,
+            getBaseScaledAmount(bridgeFee, currentAsset!),
+          ),
           symbol: currentAsset?.symbol,
         }),
         description: <>{t('bridge.deposit.failed.description')}</>,
@@ -954,9 +986,11 @@ const CronosBridge = () => {
                   <div>{t('bridge.form.receiving')}</div>
                   <div className="title">
                     ~
-                    {new Big(amount)
-                      // .sub(bridgeFee)
-                      .toFixed(4)}{' '}
+                    {adjustedTransactionAmount(
+                      amount,
+                      currentAsset!,
+                      getBaseScaledAmount(bridgeFee, currentAsset!),
+                    )}{' '}
                     {toAsset?.symbol}
                   </div>
                 </div>
