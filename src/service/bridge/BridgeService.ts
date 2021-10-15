@@ -97,6 +97,8 @@ export class BridgeService {
     const bridgeContractAddress =
       loadedBridgeConfig?.cronosBridgeContractAddress ||
       defaultBridgeConfig.cronosBridgeContractAddress;
+    const gasLimit = loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit;
+
     const contract = new web3.eth.Contract(bridgeContractABI, bridgeContractAddress);
     const encodedABI = contract.methods
       .send_cro_to_crypto_org(bridgeTransferRequest.tendermintAddress)
@@ -124,14 +126,13 @@ export class BridgeService {
       const walletAddressIndex = currentSession.wallet.addressIndex;
 
       // Use fixed hard-coded max GasLimit for bridge transactions ( Known contract and predictable consumption )
-      const gasLimitTx = 200_000;
       const gasPriceTx = web3.utils.toBN(bridgeTransaction.gasPrice);
 
       signedTransactionHex = await device.signEthTx(
         walletAddressIndex,
         Number(originAsset?.config?.chainId), // chainid
         bridgeTransaction.nonce,
-        web3.utils.toHex(gasLimitTx) /* gas limit */,
+        web3.utils.toHex(gasLimit) /* gas limit */,
         web3.utils.toHex(gasPriceTx) /* gas price */,
         bridgeContractAddress,
         web3.utils.toHex(bridgeTransaction.amount),

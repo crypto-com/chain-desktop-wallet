@@ -30,7 +30,7 @@ export const DefaultTestnetBridgeConfigs: {
     bridgeDirectionType: BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG,
     bridgeNetworkConfigType: BridgeNetworkConfigType.TESTNET_BRIDGE,
     cronosBridgeContractAddress: '0x3368dD21c4136747a6569f98C55f5ec0a2D984B3',
-    gasLimit: 200_000,
+    gasLimit: 30_000,
     // 5 Gwei
     defaultGasPrice: 5_000_000_000_000,
     prefix: 'tcrc',
@@ -52,7 +52,7 @@ export const DefaultMainnetBridgeConfigs = {
     bridgeDirectionType: BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG,
     bridgeNetworkConfigType: BridgeNetworkConfigType.MAINNET_BRIDGE,
     cronosBridgeContractAddress: 'TO_BE_DECIDED',
-    gasLimit: 200_000,
+    gasLimit: 30_000,
     // 5 Gwei
     defaultGasPrice: 5_000_000_000_000,
     prefix: 'crc',
