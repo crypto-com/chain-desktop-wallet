@@ -6,13 +6,13 @@ import { Button, Layout, notification, Table, Tabs, Card, List, Avatar } from 'a
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
+import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
-
 import {
   hasShownWarningOnWalletTypeState,
   sessionState,
-  // marketState,
   allMarketState,
+  walletAssetState,
   walletAllAssetsState,
   nftListState,
   navbarMenuSelectedKeyState,
@@ -22,15 +22,17 @@ import { NOT_KNOWN_YET_VALUE, SUPPORTED_CURRENCY, WalletConfig } from '../../con
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
 import {
-  scaledBalance,
+  scaledAmount,
   scaledStakingBalance,
+  scaledTotalBalance,
   getAssetBalancePrice,
   getAssetStakingBalancePrice,
+  getAssetTotalBalancePrice,
   UserAsset,
   AssetMarketPrice,
 } from '../../models/UserAsset';
 
-import { NftModel, NftProcessedModel } from '../../models/Transaction';
+import { NftModel, NftProcessedModel, RewardsBalances } from '../../models/Transaction';
 
 import { walletService } from '../../service/WalletService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
@@ -38,6 +40,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 // import logoCro from '../../assets/AssetLogo/cro.png';
 import IconTick from '../../svg/IconTick';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
+import RewardModalPopup from '../../components/RewardModalPopup/RewardModalPopup';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -55,11 +58,11 @@ const HomePage = () => {
   const [currentSession, setCurrentSession] = useRecoilState(sessionState);
   // const [transfers, setTransfers] = useState<TransferTabularData[]>([]);
   // const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
+  const setWalletAsset = useSetRecoilState(walletAssetState);
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   // const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setNFTList = useSetRecoilState(nftListState);
-  // const marketData = useRecoilValue(marketState);
   const allMarketData = useRecoilValue(allMarketState);
   const [marketData, setMarketData] = useState<AssetMarketPrice>();
 
@@ -74,6 +77,9 @@ const HomePage = () => {
   );
 
   const [defaultWalletAsset, setdefaultWalletAsset] = useState<UserAsset>();
+
+  const [isRewardModalVisible, setIsRewardModalVisible] = useState(false);
+  const [rewards, setRewards] = useState<RewardsBalances>();
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -284,12 +290,18 @@ const HomePage = () => {
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
       const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
       const allNFTs: NftModel[] = await walletService.retrieveNFTs(sessionData.wallet.identifier);
+      const allRewards = await walletService.retrieveRewardsBalances(
+        currentSession.wallet.identifier,
+      );
 
       const currentNftList = processNftList(allNFTs);
       setProcessedNftList(currentNftList);
       setNFTList(allNFTs);
       setdefaultWalletAsset(currentAsset);
+      setWalletAsset(currentAsset);
       setMarketData(allMarketData[`${currentAsset?.mainnetSymbol}-${sessionData.currency}`]);
+
+      setRewards(allRewards);
 
       showWalletStateNotification(sessionData.wallet.config);
       setWalletAllAssets(allAssets);
@@ -333,23 +345,23 @@ const HomePage = () => {
             </div>
           </div> */}
           <div className="balance">
-            <div className="title">CRO BALANCE</div>
+            <div className="title">{t('home.balance.title1')}</div>
             {defaultWalletAsset && (
               <div className="quantity">
-                {numeral(scaledBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
+                {numeral(scaledTotalBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
                 {defaultWalletAsset?.symbol}
               </div>
             )}
             <div className="fiat">
               {defaultWalletAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetBalancePrice(defaultWalletAsset, marketData),
+                    getAssetTotalBalancePrice(defaultWalletAsset, marketData),
                   ).format(`0,0.00`)} ${marketData?.currency}`
                 : ''}
             </div>
           </div>
           <div className="balance">
-            <div className="title">STAKED CRO BALANCE</div>
+            <div className="title">{t('home.balance.title2')}</div>
             {defaultWalletAsset && (
               <div className="quantity">
                 {numeral(scaledStakingBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
@@ -363,6 +375,39 @@ const HomePage = () => {
                   ).format('0,0.00')} ${marketData?.currency}
                   `
                 : ''}
+            </div>
+          </div>
+          <div className="balance">
+            <div className="title">{t('home.balance.title3')}</div>
+            {defaultWalletAsset && (
+              <div className="quantity">
+                {numeral(
+                  scaledAmount(
+                    new Big(defaultWalletAsset.rewardsBalance ?? '0')
+                      .add(rewards?.claimedRewardsBalance ?? '0')
+                      .toFixed(2),
+                    defaultWalletAsset.decimals,
+                  ),
+                ).format('0,0.0000')}{' '}
+                {defaultWalletAsset?.symbol}
+              </div>
+            )}
+            <div className="fiat">
+              <a
+                onClick={() => {
+                  setIsRewardModalVisible(true);
+                }}
+              >
+                {t('staking.button.viewMore')}
+              </a>
+              <RewardModalPopup
+                handleOk={() => setIsRewardModalVisible(false)}
+                handleCancel={() => setIsRewardModalVisible(false)}
+                isModalVisible={isRewardModalVisible}
+                walletAsset={defaultWalletAsset}
+                marketData={marketData}
+                rewards={rewards}
+              />
             </div>
           </div>
         </div>

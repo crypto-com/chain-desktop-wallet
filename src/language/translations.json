@@ -10,6 +10,7 @@
         "cancel": "Cancel",
         "save": "Save",
         "discard": "Discard Changes",
+        "default": "Default Settings",
         "ok": "Ok",
         "required": "is required",
         "cannot0": "cannot be 0",
@@ -24,6 +25,22 @@
         "retry": "Retry",
         "connect": "Connect",
         "seeAll": "See All",
+        "past": "ago",
+        "future": "in",
+        "years": "Years",
+        "year": "a Year",
+        "months": "Months",
+        "month": "a Month",
+        "weeks": "Weeks",
+        "week": "a Week",
+        "days": "Days",
+        "day": "a Day",
+        "hours": "Hours",
+        "hour": "an Hour",
+        "minutes": "Minutes",
+        "minute": "a minute",
+        "seconds": "Seconds",
+        "second": "a few seconds",
         "addressValidator": {
           "reason1": "Invalid",
           "reason2": "address provided"
@@ -69,6 +86,14 @@
             "success": "Wallet restored and encrypted successfully!",
             "successButton": "Go to Home"
           }
+        },
+        "sessionLockModal": {
+          "title": "Enter app password to unlock",
+          "description": "Enter app password to unlock",
+          "error": "The password provided is incorrect. Please try again",
+          "errorSelfDestruct": "Attempt #*N*. *break* Wallet will self-destruct after #T# more wrong attempts.",
+          "success": "Wallet unlocked successfully!",
+          "okButton": "Unlock wallet"
         },
         "successModalPopup": {
           "title": "Success!",
@@ -187,7 +212,8 @@
             "message1": "Please do understand that undelegation takes a number of days to fully complete after the transaction has been broadcasted",
             "message2": "days",
             "message3": ". Until then, you are not able to use the undelegated funds yet."
-          }
+          },
+          "checkbox1": "I understand that my CRO in Crypto.org Chain staking is subject to a {{ unbondingPeriod }}-day unbonding period when I unstake, as enfored by the Crypto.org Chain network."
         },
         "table": {
           "triggerDesc": "Click to sort by descend",
@@ -197,7 +223,8 @@
       },
       "welcome": {
         "slogan": "Our Sample Chain Wallet supports wallet management and funds transfer.",
-        "button": "Get Started"
+        "button": "Get Started",
+        "block": "This product is currently unavailable in your country or region."
       },
       "signup": {
         "title": "App Password Created Successfully",
@@ -264,7 +291,8 @@
             "label": "Wallet Type"
           },
           "addressIndex": {
-            "label": "Address Index"
+            "label": "Address Index",
+            "disclaimer": "Multiple addresses can be created with index being 0,1,2,3 and so on. Please note its limited to 100 addresses without expert mode and over 100 addresses under expert mode."
           },
           "network": {
             "label": "Network"
@@ -272,10 +300,18 @@
           "checkbox1": "Want to create with hardware wallet?"
         },
         "ledgerModalPopup": {
-          "title1": "Success!",
-          "title2": "Connect your Ledger Device",
-          "description1": "Your Ledger device has been connected successfully.",
-          "description2": "Please confirm connection on your Ledger Device"
+          "tendermintAddress": {
+            "title1": "Success!",
+            "title2": "Connect your Ledger Device",
+            "description1": "Your Ledger device has been connected successfully.",
+            "description2": "Please confirm connection by opening Crypto.org App on your Ledger Device"
+          },
+          "evmAddress": {
+            "title1": "Success!",
+            "title2": "Connect your Ledger Device",
+            "description1": "Your Ledger device has been connected successfully.",
+            "description2": "Please confirm connection by opening Ethereum App on your Ledger Device"
+          }
         }
       },
       "restore": {
@@ -339,9 +375,11 @@
         "send": "Send",
         "receive": "Receive",
         "assets": "Assets",
+        "bridge": "Cronos Bridge",
         "governance": "Governance",
         "nft": "My NFT",
         "settings": "Settings",
+        "lock": "Lock",
         "wallet": {
           "list": "Wallet List",
           "restore": "Restore Wallet",
@@ -393,7 +431,8 @@
         "title": "Welcome Back!",
         "balance": {
           "title1": "TOTAL BALANCE",
-          "title2": "STAKED BALANCE"
+          "title2": "STAKED BALANCE",
+          "title3": "TOTAL REWARDS"
         },
         "nft": {
           "tab1": "My NFT",
@@ -453,6 +492,27 @@
             "description": "Update downloaded successfully. It will be installed on restart.",
             "button": "Restart Now"
           }
+        },
+        "createNewAsset": {
+          "enable": "Enable",
+          "notification": {
+            "message": "New Assets Available",
+            "description": "Do you want to enable the newly added assets?"
+          }
+        },
+        "ledgerModalPopup": {
+          "tendermintAsset": {
+            "title1": "Success!",
+            "title2": "Connect your Ledger Device",
+            "description1": "Your Ledger device has been connected successfully.",
+            "description2": "Please confirm connection by opening Crypto.org App on your Ledger Device"
+          },
+          "evmAsset": {
+            "title1": "Success!",
+            "title2": "Connect your Ledger Device",
+            "description1": "Your Ledger device has been connected successfully.",
+            "description2": "Please confirm connection by opening Ethereum App on your Ledger Device"
+          }
         }
       },
       "send": {
@@ -470,7 +530,8 @@
           },
           "memo": {
             "label": "Memo (Optional)"
-          }
+          },
+          "disclaimer": "Transfering your {{assetSymbol}} to any recipient address that is not on {{assetName}} may result in permanet loss of your funds."
         },
         "modal1": {
           "title": "Confirm Transaction",
@@ -495,7 +556,8 @@
             "description": "Please connect with your Ledger device"
           }
         },
-        "button": "Verify address on Ledger"
+        "button": "Verify address on Ledger",
+        "disclaimer": "Transfering {{assetSymbol}} from any address that is not supporting {{assetName}} may result in permanet loss of your funds."
       },
       "assets": {
         "title": "Assets",
@@ -509,11 +571,94 @@
             "name": "Asset",
             "price": "Price",
             "amount": "Balance",
-            "value": "Value"
+            "value": "Value",
+            "actionSend": "Send",
+            "actionReceive": "Receive"
           }
         },
         "moreMenu": {
           "nodeConfiguration": "Node Configuration"
+        }
+      },
+      "bridge": {
+        "form": {
+          "from": "From",
+          "to": "To",
+          "errorSameChain": "The two chains cannot be the same",
+          "errorBridgeNotSupported": "The selected bridge transfer is not supported",
+          "amount": "Amount",
+          "willReceive": "You will receieve: ",
+          "fee": "Fee: ",
+          "destination": "Destination: ",
+          "toAddress": "To Address: ",
+          "transfer": "Transfer Asset",
+          "receiving": "Receiving",
+          "disclaimer": "By proceeding, I hereby acknowledge that I agree to the terms and conditions."
+        },
+        "step0": {
+          "title": "Cronos Bridge",
+          "description": "The safe, fast and most secure way to transfer assets to and from Cronos."
+        },
+        "step1": {
+          "title": "Confirmation"
+        },
+        "step2": {
+          "title": "Bridge Transaction"
+        },
+        "deposit": {
+          "complete": {
+            "title": "Deposit of {{amount}} {{symbol}} is completed"
+          },
+          "transactionID": "Transaction ID: ",
+          "failed": {
+            "title": "Deposit of {{amount}} {{symbol}} is failed",
+            "description": "Bridge Transfer Failed. Please ensure the Bridge Config Settings are correct and there are enough funds in your wallet address."
+          }
+        },
+        "transferInitiated": {
+          "title": "Transfer Initiated",
+          "description": "Check your wallet for the funds. It may take up to a few minutes depending on network congestion."
+        },
+        "action": {
+          "viewTransaction": "View Transaction",
+          "viewTransactionHIstory": "View Transaction History"
+        },
+        "config": {
+          "prefix": {
+            "title": "Prefix",
+            "validation": "Prefix can only be {{number}} lowercase letters"
+          },
+          "address": {
+            "title": "Cronos Bridge Contract Address",
+            "validation": "Contract Address"
+          },
+          "channel": {
+            "title": "Bridge Channel"
+          },
+          "port": {
+            "title": "Bridge Port"
+          }
+        },
+        "pendingTransfer": {
+          "title": "{{amount}} {{symbol}} is pending to transfer",
+          "ledger": {
+            "description": "Please open {{app}} in your Ledger device and sign your transaction."
+          }
+        },
+        "ledgerSign": {
+          "failed": {
+            "title": "Failed to broadcast a signed transaction on Ledger"
+          }
+        },
+        "transactionHistory": {
+          "table": {
+            "transactionHash": "Transaction Hash",
+            "amount": "Amount",
+            "fromAddress": "From (Network)",
+            "toAddress": "To (Network)",
+            "time": "Time",
+            "status": "Status"
+          }
         }
       },
       "staking": {
@@ -524,11 +669,19 @@
         "description1": "Withdraw rewards from delegated funds.\n",
         "description2": "Delegate funds to validator.",
         "description3": "Manage your delegated funds.",
+        "balance": {
+          "title1": "STAKED BALANCE",
+          "title2": "UNBONDING BALANCE",
+          "title3": "REWARD BALANCE"
+        },
         "maxValidator": {
           "error": "Staking amount exceeds your available wallet balance"
         },
         "minValidator": {
           "error": "Staking amount is lower than minimum allowed of "
+        },
+        "button": {
+          "viewMore": "View more"
         },
         "validatorList": {
           "table": {
@@ -536,6 +689,7 @@
             "description": "Please select one of the validator.",
             "warningCumulative": "Cumulative stake above can halt the network: improve decentralization and delegate to validators below",
             "validatorName": "Name",
+            "moderationText": "Our community members have flagged this validator as a bad actor by changing its commission rate constantly, which could result in a severe loss of the delegator’s staking rewards. Please be careful and make sure you trust this validator before delegating to it.",
             "validatorWebsite": "Website",
             "validatorAddress": "Address",
             "currentTokens": "Voting Power",
@@ -578,6 +732,28 @@
           "label1": "Sender Address",
           "label2": "Withdraw Reward From Validator",
           "label3": "Rewards"
+        },
+        "modal3": {
+          "title": "Unbonding Delegation",
+          "description": "Your unstaked assets will be available to you after a {{ unbondingPeriod }} day unbonding period, as enforced by the Crypto.org Chain network.",
+          "button": "View Unbonding Delegation",
+          "table": {
+            "validatorAddress": "Validator Address",
+            "unbondingAmount": "Unbonding Amount",
+            "remainingTime": "Remaining Time ",
+            "completionTime": "Completion Time"
+          }
+        },
+        "modal4": {
+          "title": "Rewards",
+          "label1": "MY TOTAL REWARDS",
+          "label2": "CLAIMED REWARDS",
+          "label3": "ESTIMATED ANNUAL REWARDS",
+          "label4": "ESTIMATED TOTAL APY",
+          "label5": "REWARD BALANCE",
+          "tooltip1": "All staking rewards that have been withdrawn and deposited to your wallet",
+          "tooltip2": "Total staking rewards accumulated from all your stakings",
+          "tooltip3": "A percentage rate reflecting the total staking rewards projected to be earned over an annual period, based on all your stakings"
         }
       },
       "governance": {
@@ -613,6 +789,7 @@
         "description": "An overview of your NFT Collection on Crypto.org Chain.",
         "tab1": "NFT Collection",
         "tab2": "Mint NFT",
+        "tab3": "Receive NFT",
         "container": {
           "description": "Mint your NFT with Image or Video on Crypto.org chain."
         },
@@ -828,6 +1005,7 @@
         "cancel": "取消",
         "save": "保存",
         "discard": "取消",
+        "default": "默認設定",
         "ok": "Ok",
         "required": "必須輸入",
         "cannot0": "不能為 0",
@@ -842,6 +1020,22 @@
         "retry": "重試",
         "connect": "連接",
         "seeAll": "所有",
+        "past": "以前",
+        "future": "未來",
+        "years": "年",
+        "year": "1年",
+        "months": "月",
+        "month": "1月",
+        "weeks": "星期",
+        "week": "1星期",
+        "days": "日",
+        "day": "1日",
+        "hours": "小時",
+        "hour": "1小時",
+        "minutes": "分鐘",
+        "minute": "1分鐘",
+        "seconds": "秒",
+        "second": "幾秒",
         "addressValidator": {
           "reason1": "無效的",
           "reason2": "地址"
@@ -887,6 +1081,14 @@
             "success": "成功復原及加密錢包！",
             "successButton": "返回主頁"
           }
+        },
+        "sessionLockModal": {
+          "title": "輸入密碼",
+          "description": "請輸入密碼以解鎖錢包",
+          "error": "密碼不正確，請重新輸入。",
+          "errorSelfDestruct": "第*N*次輸入密碼不正確。如再輸入#T#次錯誤密碼，這錢包將會在被重置",
+          "success": "錢包解鎖成功！",
+          "okButton": "解鎖錢包"
         },
         "successModalPopup": {
           "title": "成功！",
@@ -1005,7 +1207,8 @@
             "message1": "請注意，在贖回委託交易成功廣播後，還需要等待一段時間才能正式完成",
             "message2": "日",
             "message3": "。在正式完成之前，你並不能使用贖回的委託資金。"
-          }
+          },
+          "checkbox1": "我明白根據 Crypto.org Chain 的協定，我在 Crypto.org Chain 上的 CRO 抵押將要經過 {{ unbondingPeriod }} 日才可以完成贖回過程。"
         },
         "table": {
           "triggerDesc": "按降序排序",
@@ -1015,7 +1218,8 @@
       },
       "welcome": {
         "slogan": "我們的樣本錢包支持錢包管理和資金轉賬。",
-        "button": "開始"
+        "button": "開始",
+        "block": "此產品暫時未能為您所在的國家或地區提供服務。"
       },
       "signup": {
         "title": "密碼創建成功",
@@ -1082,7 +1286,8 @@
             "label": "錢包種類"
           },
           "addressIndex": {
-            "label": "地址索引"
+            "label": "地址索引",
+            "disclaimer": "可以使用 0、1、2、3 作為索引名創建多個地址。請注意，在沒有開啟專家模式時，索引地址數量限制為 100 個，在專家模式下沒有限制。"
           },
           "network": {
             "label": "網絡"
@@ -1090,10 +1295,18 @@
           "checkbox1": "想要創建硬件錢包？"
         },
         "ledgerModalPopup": {
-          "title1": "成功！",
-          "title2": "連接你的Ledger 錢包",
-          "description1": "你的Ledger錢包已經成功連接。",
-          "description2": "請在Ledger錢包上確認連接"
+          "tendermintAddress": {
+            "title1": "成功！",
+            "title2": "連接你的Ledger 錢包",
+            "description1": "你的Ledger錢包已經成功連接。",
+            "description2": "請在Ledger錢包上打開 Crypto.org App 再確認連接"
+          },
+          "evmAddress": {
+            "title1": "成功！",
+            "title2": "連接你的Ledger 錢包",
+            "description1": "你的Ledger錢包已經成功連接。",
+            "description2": "請在Ledger錢包上打開 Ethereum App 再確認連接"
+          }
         }
       },
       "restore": {
@@ -1156,10 +1369,12 @@
         "staking": "抵押",
         "send": "發送",
         "receive": "接收",
-        "assets": "資金",
+        "assets": "資產",
+        "bridge": "Cronos 跨鏈橋",
         "governance": "治理",
         "nft": "我的NFT",
         "settings": "設置",
+        "lock": "鎖定",
         "wallet": {
           "list": "所有錢包",
           "restore": "復原錢包",
@@ -1178,7 +1393,7 @@
               }
             },
             "warning1": "你確定要刪除這個錢包？",
-            "warning2": "如果你沒有備份你的錢包助記詞，這將導致你的資金永遠丟失。",
+            "warning2": "如果你沒有備份你的錢包助記詞，這將導致你的資產永遠丟失。",
             "checkbox1": "我了解重新獲得訪問權限的唯一方法是復原錢包助記詞。",
             "checkbox2": "我了解重新獲得訪問權限的唯一方法是使用具有正確地址索引的相同Ledger錢包"
           },
@@ -1211,7 +1426,8 @@
         "title": "歡迎",
         "balance": {
           "title1": "總餘額",
-          "title2": "抵押餘額"
+          "title2": "抵押餘額",
+          "title3": "總獎勵"
         },
         "nft": {
           "tab1": "我的NFT",
@@ -1220,15 +1436,15 @@
         },
         "assetList": {
           "table": {
-            "title": "資金",
-            "name": "資金",
+            "title": "資產",
+            "name": "資產",
             "price": "價格",
             "amount": "餘額",
             "value": "市值"
           }
         },
         "transactions": {
-          "tab1": "資金",
+          "tab1": "資產",
           "tab2": "委託",
           "tab3": "NFT交易",
           "table1": {
@@ -1271,6 +1487,27 @@
             "description": "成功下載更新，重啟程式以完成安裝。",
             "button": "現在重啟程式"
           }
+        },
+        "createNewAsset": {
+          "enable": "加入",
+          "notification": {
+            "message": "已新增可支援代幣",
+            "description": "你想加入新支援的代幣到錢包嗎？"
+          }
+        },
+        "ledgerModalPopup": {
+          "tendermintAsset": {
+            "title1": "成功！",
+            "title2": "連接你的Ledger 錢包",
+            "description1": "你的Ledger錢包已經成功連接。",
+            "description2": "請在Ledger錢包上打開 Crypto.org App 再確認連接"
+          },
+          "evmAsset": {
+            "title1": "成功！",
+            "title2": "連接你的Ledger 錢包",
+            "description1": "你的Ledger錢包已經成功連接。",
+            "description2": "請在Ledger錢包上打開 Ethereum App 再確認連接"
+          }
         }
       },
       "send": {
@@ -1288,7 +1525,8 @@
           },
           "memo": {
             "label": "留言（可留空）"
-          }
+          },
+          "disclaimer": "將 {{assetSymbol}} 轉移到不支援 {{assetName}} 標準的地址可能會導致資金永久損失。"
         },
         "modal1": {
           "title": "確認交易",
@@ -1313,25 +1551,109 @@
             "description": "請連接你的 Ledger 硬體錢包 "
           }
         },
-        "button": "驗證你的 Ledger 錢包"
+        "button": "驗證你的 Ledger 錢包",
+        "disclaimer": "從不支援 {{assetName}} 標準的任何地址發送 {{assetSymbol}} 可能會導致資金永久損失。"
       },
       "assets": {
-        "title": "資金",
+        "title": "資產",
         "description": "在這裡管理你的所有資金",
         "tab1": "交易",
         "tab2": "發送",
         "tab3": "接收",
-        "backToList": "返回資金列表",
+        "backToList": "返回資產列表",
         "assetList": {
           "table": {
-            "name": "資金",
+            "name": "資產",
             "price": "價格",
             "amount": "餘額",
-            "value": "市值"
+            "value": "市值",
+            "actionSend": "發送",
+            "actionReceive": "接收"
           }
         },
         "moreMenu": {
           "nodeConfiguration": "節點設定"
+        }
+      },
+      "bridge": {
+        "form": {
+          "from": "從",
+          "to": "至",
+          "errorSameChain": "不能選擇同一條鏈",
+          "errorBridgeNotSupported": "不支持所選的跨鏈轉移方式",
+          "amount": "數目",
+          "willReceive": "你將會收到：",
+          "fee": "費用：",
+          "destination": "目標地址：",
+          "toAddress": "收款人地址：",
+          "transfer": "轉移資產",
+          "receiving": "將會收到",
+          "disclaimer": "我同意條款及細則。"
+        },
+        "step0": {
+          "title": "Cronos 跨鏈橋",
+          "description": "把跨鏈資產帶到 Cronos 上最安全快速且有保障的方法。"
+        },
+        "step1": {
+          "title": "確認"
+        },
+        "step2": {
+          "title": "跨鏈交易"
+        },
+        "deposit": {
+          "complete": {
+            "title": "已完成存入 {{amount}} {{symbol}}"
+          },
+          "transactionID": "交易 ID：",
+          "failed": {
+            "title": "存入 {{amount}} {{symbol}} 的交易失敗了",
+            "description": "跨鏈交易失敗了。請確認跨鏈配置正確並且錢包中有足夠的資金。"
+          }
+        },
+        "transferInitiated": {
+          "title": "交易已發起",
+          "description": "請查看錢包資產。在網絡擁堵的情況下，可能最多需要數分鐘完成交易。"
+        },
+        "action": {
+          "viewTransaction": "查看交易",
+          "viewTransactionHIstory": "查看交易歷史"
+        },
+        "config": {
+          "prefix": {
+            "title": "前綴",
+            "validation": "前綴只能是 {{number}} 個小寫字母"
+          },
+          "address": {
+            "title": "Cronos 跨鏈橋合約地址",
+            "validation": "合約地址"
+          },
+          "channel": {
+            "title": "跨鏈橋頻道"
+          },
+          "port": {
+            "title": "跨鏈橋端口"
+          }
+        },
+        "pendingTransfer": {
+          "title": "{{amount}} {{symbol}} 正等待發送",
+          "ledger": {
+            "description": "請在Ledger錢包上打開 {{app}} 以簽名交易"
+          }
+        },
+        "ledgerSign": {
+          "failed": {
+            "title": "未能成功廣播Ledger的簽名交易"
+          }
+        },
+        "transactionHistory": {
+          "table": {
+            "transactionHash": "交易哈希值",
+            "amount": "數量",
+            "fromAddress": "從（網絡）",
+            "toAddress": "到（網絡）",
+            "time": "時間",
+            "status": "狀態"
+          }
         }
       },
       "staking": {
@@ -1342,11 +1664,19 @@
         "description1": "從委託資金提取獎勵。",
         "description2": "委託資金至驗證者。",
         "description3": "管理你的已委託資金",
+        "balance": {
+          "title1": "抵押餘額",
+          "title2": "贖回中的餘額",
+          "title3": "獎勵餘額"
+        },
         "maxValidator": {
           "error": "抵押數目大於你的錢包餘額"
         },
         "minValidator": {
           "error": "抵押數目少於"
+        },
+        "button": {
+          "viewMore": "查看更多"
         },
         "validatorList": {
           "table": {
@@ -1396,6 +1726,28 @@
           "label1": "發送人地址",
           "label2": "從驗證者提取獎勵",
           "label3": "獎勵"
+        },
+        "modal3": {
+          "title": "贖回中的委託",
+          "description": "根據 Crypto.org Chain 的規定，你的委託需要經過 {{ unbondingPeriod }} 日才可以完成贖回過程。",
+          "button": "查看贖回中的委託",
+          "table": {
+            "validatorAddress": "驗證者地址",
+            "unbondingAmount": "贖回委託",
+            "remainingTime": "尚餘時間",
+            "completionTime": "完成時間"
+          }
+        },
+        "modal4": {
+          "title": "獎勵",
+          "label1": "我的總獎勵",
+          "label2": "已領取獎勵",
+          "label3": "預計年獎勵",
+          "label4": "預計年收益率",
+          "label5": "未領取獎勵",
+          "tooltip1": "你所有已領取並存入到錢包的獎勵",
+          "tooltip2": "由你所有抵押資金所計算出的年抵押獎勵",
+          "tooltip3": "由你所有抵押資金所計算出的年收益率百分比"
         }
       },
       "governance": {
@@ -1431,6 +1783,7 @@
         "description": "你在 Crypto.org 鏈上收藏的 NFT 概覽",
         "tab1": "NFT 收藏",
         "tab2": "鑄造 NFT ",
+        "tab3": "接收 NFT",
         "container": {
           "description": "在 Crypto.org 鏈上以圖片或影片鑄造你的專屬 NFT "
         },
@@ -1549,8 +1902,8 @@
         "tab3": "重置",
         "form1": {
           "assetIdentifier": {
-            "label": "資金",
-            "description": "不同的資金有各自的節點設定"
+            "label": "資產",
+            "description": "不同的資產有各自的節點設定"
           },
           "nodeUrl": {
             "label": "節點 URL",
@@ -1612,7 +1965,7 @@
           "modal1": {
             "title": "你的助記詞",
             "description": "請查閱所有的助記詞，並以正確的次序記錄下來。",
-            "warning": "請好好保管並不要分享你的助記詞以保障資金的安全。"
+            "warning": "請好好保管並不要分享你的助記詞以保障資產的安全。"
           }
         },
         "clearStorage": {
@@ -1621,7 +1974,7 @@
           "modal": {
             "title": "確認重置",
             "description1": "你或許需要確認你的所有錢包助記詞，以確保未來你能夠復原錢包的使用權。",
-            "warning": "你確定你要重置這個程式？如果你沒有備份好你所有錢包的助記詞，你將會永遠失去所有錢包內的資金。",
+            "warning": "你確定你要重置這個程式？如果你沒有備份好你所有錢包的助記詞，你將會永遠失去所有錢包內的資產。",
             "disclaimer": "我明白我只能夠透過錢包的助記詞來恢復錢包的使用權。",
             "form1": {
               "clear": {
@@ -1645,6 +1998,7 @@
         "cancel": "取消",
         "save": "保存",
         "discard": "取消",
+        "default": "默认配置",
         "ok": "好的",
         "required": "必须输入",
         "cannot0": "不能为 0",
@@ -1659,6 +2013,22 @@
         "retry": "重试",
         "connect": "连接",
         "seeAll": "所有",
+        "past": "以前",
+        "future": "未来",
+        "years": "年",
+        "year": "1年",
+        "months": "月",
+        "month": "1月",
+        "weeks": "星期",
+        "week": "1星期",
+        "days": "天",
+        "day": "1天",
+        "hours": "小時",
+        "hour": "1小時",
+        "minutes": "分钟",
+        "minute": "1分钟",
+        "seconds": "秒",
+        "second": "几秒",
         "addressValidator": {
           "reason1": "无效的",
           "reason2": "地址"
@@ -1704,6 +2074,14 @@
             "success": "成功复原及加密钱包！",
             "successButton": "返回主页"
           }
+        },
+        "sessionLockModal": {
+          "title": "输入密码",
+          "description": "请输入密码以解锁钱包",
+          "error": "密码不正确，请重新输入。",
+          "errorSelfDestruct": "第*N*次输入密码不正确。如再输入#T#次错误密码，这钱包将会在被重置",
+          "success": "钱包解锁成功！",
+          "okButton": "解锁钱包"
         },
         "successModalPopup": {
           "title": "成功！",
@@ -1822,7 +2200,8 @@
             "message1": "请注意，在赎回委托交易成功广播后，还需要等待一段时间才能正式完成",
             "message2": "日",
             "message3": "。在正式完成之前，你並不能使用赎回的委托资金。"
-          }
+          },
+          "checkbox1": "我明白根据 Crypto.org Chain的协定，我在 Crypto.org Chain 上的 CRO 抵押将要经过 {{ unbondingPeriod }} 日才可以完成赎回过程。"
         },
         "table": {
           "triggerDesc": "按降序排序",
@@ -1832,7 +2211,8 @@
       },
       "welcome": {
         "slogan": "我们的样本钱包支持钱包管理和资金转账。",
-        "button": "开始"
+        "button": "开始",
+        "block": "此产品暂时未能为您所在的国家或地区提供服务。"
       },
       "signup": {
         "title": "密码创建成功",
@@ -1899,7 +2279,8 @@
             "label": "钱包种类"
           },
           "addressIndex": {
-            "label": "地址索引"
+            "label": "地址索引",
+            "disclaimer": "可以使用 0、1、2、3 作为索引名创建多个地址。请注意，在没有开启专家模式时，索引地址数量限制为 100 个，在专家模式下没有限制。"
           },
           "network": {
             "label": "网络"
@@ -1907,10 +2288,18 @@
           "checkbox1": "想要创建硬件钱包？"
         },
         "ledgerModalPopup": {
-          "title1": "成功！",
-          "title2": "连接你的Ledger 钱包",
-          "description1": "你的Ledger钱包已经成功连接。",
-          "description2": "请在Ledger钱包上确认连接"
+          "tendermintAddress": {
+            "title1": "成功！",
+            "title2": "连接你的Ledger 钱包",
+            "description1": "你的Ledger钱包已经成功连接。",
+            "description2": "请在Ledger钱包上打开 Crypto.org App 再确认连接"
+          },
+          "evmAddress": {
+            "title1": "成功！",
+            "title2": "连接你的Ledger 钱包",
+            "description1": "你的Ledger钱包已经成功连接。",
+            "description2": "请在Ledger钱包上打开 Ethereum App 再确认连接"
+          }
         }
       },
       "restore": {
@@ -1973,10 +2362,12 @@
         "staking": "抵押",
         "send": "发送",
         "receive": "接收",
-        "assets": "资金",
+        "assets": "资产",
+        "bridge": "Cronos 跨链桥",
         "governance": "治理",
         "nft": "我的NFT",
         "settings": "设置",
+        "lock": "锁定",
         "wallet": {
           "list": "所有钱包",
           "restore": "复原钱包",
@@ -1995,7 +2386,7 @@
               }
             },
             "warning1": "你确定要删除这个钱包？",
-            "warning2": "如果你没有备份你的钱包助记词，这将导致你的资金永远丢失。",
+            "warning2": "如果你没有备份你的钱包助记词，这将导致你的资产永远丢失。",
             "checkbox1": "我了解重新获得访问权限的唯一方法是复原钱包助记词。",
             "checkbox2": "我了解重新获得访问权限的唯一方法是使用具有正确地址索引的相同Ledger钱包"
           },
@@ -2028,7 +2419,8 @@
         "title": "欢迎",
         "balance": {
           "title1": "总余额",
-          "title2": "抵押余额"
+          "title2": "抵押余额",
+          "title3": "总奖励"
         },
         "nft": {
           "tab1": "我的NFT",
@@ -2037,15 +2429,15 @@
         },
         "assetList": {
           "table": {
-            "title": "资金",
-            "name": "资金",
+            "title": "资产",
+            "name": "资产",
             "price": "价格",
             "amount": "余额",
             "value": "市值"
           }
         },
         "transactions": {
-          "tab1": "资金",
+          "tab1": "资产",
           "tab2": "委托",
           "tab3": "NFT交易",
           "table1": {
@@ -2088,6 +2480,27 @@
             "description": "成功下载更新，重启程序以完成安装。",
             "button": "现在重启程序"
           }
+        },
+        "createNewAsset": {
+          "enable": "加入",
+          "notification": {
+            "message": "已新增可支持代币",
+            "description": "你想加入新支持的代币到钱包吗？"
+          }
+        },
+        "ledgerModalPopup": {
+          "tendermintAsset": {
+            "title1": "成功！",
+            "title2": "连接你的Ledger 钱包",
+            "description1": "你的Ledger钱包已经成功连接。",
+            "description2": "请在Ledger钱包上打开 Crypto.org App 再确认连接"
+          },
+          "evmAsset": {
+            "title1": "成功！",
+            "title2": "连接你的Ledger 钱包",
+            "description1": "你的Ledger钱包已经成功连接。",
+            "description2": "请在Ledger钱包上打开 Ethereum App 再确认连接"
+          }
         }
       },
       "send": {
@@ -2105,7 +2518,8 @@
           },
           "memo": {
             "label": "留言（可选）"
-          }
+          },
+          "disclaimer": "将 {{assetSymbol}} 转移到不支持 {{assetName}} 标准的地址可能会导致资金永久损失。"
         },
         "modal1": {
           "title": "确认交易",
@@ -2130,25 +2544,109 @@
             "description": "请连接你的 Ledger 硬件钱包"
           }
         },
-        "button": "验证你的 Ledger 钱包"
+        "button": "验证你的 Ledger 钱包",
+        "disclaimer": "从不支持 {{assetName}} 标准的任何地址发送 {{assetSymbol}} 可能会导致资金永久损失。"
       },
       "assets": {
-        "title": "资金",
-        "description": "在这里管理你的所有资金",
+        "title": "资产",
+        "description": "在这里管理你的所有资产",
         "tab1": "交易",
         "tab2": "发送",
         "tab3": "接收",
-        "backToList": "返回资金列表",
+        "backToList": "返回资产列表",
         "assetList": {
           "table": {
-            "name": "资金",
+            "name": "资产",
             "price": "价格",
             "amount": "余额",
-            "value": "市值"
+            "value": "市值",
+            "actionSend": "发送",
+            "actionReceive": "接收"
           }
         },
         "moreMenu": {
           "nodeConfiguration": "节点配置"
+        }
+      },
+      "bridge": {
+        "form": {
+          "from": "从",
+          "to": "至",
+          "errorSameChain": "不能选择同一条链",
+          "errorBridgeNotSupported": "不支持所选的跨链转移方式",
+          "amount": "数目",
+          "willReceive": "你将会收到：",
+          "fee": "费用：",
+          "destination": "目标地址：",
+          "toAddress": "收款人地址：",
+          "transfer": "转移资产",
+          "receiving": "将会收到",
+          "disclaimer": "我同意条款和条件。"
+        },
+        "step0": {
+          "title": "Cronos 跨链桥",
+          "description": "把跨链资产带到 Cronos 上最安全快速且有保障的方法。"
+        },
+        "step1": {
+          "title": "确认"
+        },
+        "step2": {
+          "title": "跨链交易"
+        },
+        "deposit": {
+          "complete": {
+            "title": "已完成存入 {{amount}} {{symbol}}"
+          },
+          "transactionID": "交易 ID：",
+          "failed": {
+            "title": "存入 {{amount}} {{symbol}} 的交易失败了",
+            "description": "跨链交易失败了。请确认跨链配置正确并且钱包中有足够的资金。"
+          }
+        },
+        "transferInitiated": {
+          "title": "交易已发起",
+          "description": "请查看钱包资产。在网络拥堵的情况下，可能最多需要数分钟完成交易。"
+        },
+        "action": {
+          "viewTransaction": "查看交易",
+          "viewTransactionHIstory": "查看交易历史"
+        },
+        "config": {
+          "prefix": {
+            "title": "前缀",
+            "validation": "前缀只能是 {{number}} 个小写字母"
+          },
+          "address": {
+            "title": "Cronos 跨链桥合约地址",
+            "validation": "合约地址"
+          },
+          "channel": {
+            "title": "跨链桥频道"
+          },
+          "port": {
+            "title": "跨链桥端口"
+          }
+        },
+        "pendingTransfer": {
+          "title": "{{amount}} {{symbol}} 正等待发送",
+          "ledger": {
+            "description": "请在Ledger钱包上打开 {{app}} 以签名交易"
+          }
+        },
+        "ledgerSign": {
+          "failed": {
+            "title": "未能成功广播Ledger的签名交易"
+          }
+        },
+        "transactionHistory": {
+          "table": {
+            "transactionHash": "交易哈希值",
+            "amount": "数量",
+            "fromAddress": "从（网络）",
+            "toAddress": "到（网络）",
+            "time": "时间",
+            "status": "状态"
+          }
         }
       },
       "staking": {
@@ -2159,11 +2657,19 @@
         "description1": "从委托资金提取奖励。",
         "description2": "委托资金至验证者。",
         "description3": "管理你的已委托资金",
+        "balance": {
+          "title1": "抵押余额",
+          "title2": "赎回中的余额",
+          "title3": "奖励余额"
+        },
         "maxValidator": {
           "error": "抵押数目大于你的钱包余额"
         },
         "minValidator": {
           "error": "抵押数目少于"
+        },
+        "button": {
+          "viewMore": "查看更多"
         },
         "validatorList": {
           "table": {
@@ -2213,6 +2719,28 @@
           "label1": "发送人地址",
           "label2": "从验证者提取奖励",
           "label3": "奖励"
+        },
+        "modal3": {
+          "title": "赎回中的委托",
+          "description": "根据 Crypto.org Chain 的规定，你的委托需要经过 {{ unbondingPeriod }} 日才可以完成赎回过程。",
+          "button": "查看赎回中的委",
+          "table": {
+            "validatorAddress": "验证者地址",
+            "unbondingAmount": "赎回委托",
+            "remainingTime": "尚余时间",
+            "completionTime": "完成时间"
+          }
+        },
+        "modal4": {
+          "title": "奖励",
+          "label1": "我的总奖励",
+          "label2": "已领取奖励",
+          "label3": "预计年奖励",
+          "label4": "预计年收益率",
+          "label5": "未领取奖励",
+          "tooltip1": "你所有已领取并存入到钱包的奖励",
+          "tooltip2": "由你所有抵押资金所计算出的年抵押奖励",
+          "tooltip3": "由你所有抵押资金所计算出的年收益率百分比"
         }
       },
       "governance": {
@@ -2248,6 +2776,7 @@
         "description": "你在 Crypto.org 链上收藏的 NFT 概览",
         "tab1": "NFT 收藏",
         "tab2": "铸造 NFT",
+        "tab3": "接收 NFT",
         "container": {
           "description": "在Crypto.org 链上以图片或视频铸造你的专属 NFT"
         },
@@ -2366,8 +2895,8 @@
         "tab3": "重置",
         "form1": {
           "assetIdentifier": {
-            "label": "资金",
-            "description": "不同的资金有各自的节点设定"
+            "label": "资产",
+            "description": "不同的资产有各自的节点设定"
           },
           "nodeUrl": {
             "label": "节点 URL",
@@ -2429,7 +2958,7 @@
           "modal1": {
             "title": "你的助记词",
             "description": "请查阅所有的助记词，并以正确的次序记录下来。",
-            "warning": "请好好保管并不要分享你的助记词以保障资金的安全。"
+            "warning": "请好好保管并不要分享你的助记词以保障资产的安全。"
           }
         },
         "clearStorage": {
@@ -2438,7 +2967,7 @@
           "modal": {
             "title": "确认重置",
             "description1": "你或许需要确认你的所有钱包助记词，以确保未来你能够复原钱包的使用权。",
-            "warning": "你确定你要重置这个程序？ 如果你没有备份好你所有钱包的助记词，你将会永远失去钱包内的所有资金。",
+            "warning": "你确定你要重置这个程序？ 如果你没有备份好你所有钱包的助记词，你将会永远失去钱包内的所有资产。",
             "disclaimer": "我明白我只能够通过钱包的助记词来恢复钱包的使用权。",
             "form1": {
               "clear": {
@@ -2497,6 +3026,13 @@
             "success": "Le portefeuille a été crée et bien encrypté!",
             "successButton": "Menu principal"
           }
+        },
+        "sessionLockModal": {
+          "title": "Choisissez un mot de passe pour l'application",
+          "description": "Saisissez le mot de passe du porte feuille",
+          "error": "Le mot de passe saisi est incorrect. Réessayer encore",
+          "success": "Portefeuille décryption réussi!",
+          "okButton": "Décrypter le portefeuille"
         },
         "successModalPopup": {
           "title": "Réussite!",
@@ -2583,6 +3119,7 @@
         "cancel": "취소",
         "save": "저장",
         "discard": "변경사항 버리기",
+        "default": "기본 설정",
         "ok": "확인",
         "required": "필수",
         "cannot0": "0이 될 수 없음",
@@ -2597,6 +3134,22 @@
         "retry": "재시도",
         "connect": "연결",
         "seeAll": "모두 보기",
+        "past": "전에",
+        "future": "미래",
+        "years": "년",
+        "year": "1년",
+        "months": "월",
+        "month": "1월",
+        "weeks": "주",
+        "week": "1주",
+        "days": "일",
+        "day": "1일",
+        "hours": "시간",
+        "hour": "1시간",
+        "minutes": "분",
+        "minute": "1분",
+        "seconds": "초",
+        "second": "초",
         "addressValidator": {
           "reason1": "무효",
           "reason2": "주소 필요"
@@ -2642,6 +3195,14 @@
             "success": "지갑이 성공적으로 복원 및 암호화되었습니다",
             "successButton": "홈 화면"
           }
+        },
+        "sessionLockModal": {
+          "title": "패스워드 입력",
+          "description": "지갑 패스워드를 입력하세요",
+          "error": "패스워드가 틀립니다. 다시 확인해주세요",
+          "errorSelfDestruct": "#*N*을 시도합니다.  #T#번  잘못된 시도를 하면 지갑은 자동 소멸됩니다.",
+          "success": "지갑을 성공적으로 해독하였습니다",
+          "okButton": "지갑 해독"
         },
         "successModalPopup": {
           "title": "성공!",
@@ -2760,7 +3321,8 @@
             "message1": "트랜잭션이 발송된 후 위임 취소가 완전히 완료되는 데 며칠이 소요됨을 양해바랍니다",
             "message2": "일",
             "message3": "그 때까지는 위임 취소된 금액을 사용할 수 없습니다."
-          }
+          },
+          "checkbox1": "Crypto.org Chain 스테이킹에서, 내 CRO는 Crypto.org Chain 네트워크에서 규정한 대로, 스테이킹을 해제할 때는  {{ unbondingPeriod }}일의 위임 취소  기간이 적용되는 것을 이해합니다"
         },
         "table": {
           "triggerDesc": "내림차순으로 정렬",
@@ -2770,7 +3332,8 @@
       },
       "welcome": {
         "slogan": "데스크탑 지갑으로 지갑 관리와 송금을 할 수 있습니다",
-        "button": "시작하기"
+        "button": "시작하기",
+        "block": "이 제품은 현재 사용자의 국가 또는 지역에서 사용할 수 없습니다"
       },
       "signup": {
         "title": "앱 패스워드가 잘 생성되었습니다",
@@ -2837,7 +3400,8 @@
             "label": "지갑 종류"
           },
           "addressIndex": {
-            "label": "주소 인덱스"
+            "label": "주소 인덱스",
+            "disclaimer": "인덱스를 0,1,2,3 등으로 설정하여, 여러개의 주소를 만들 수 있습니다. 레져의 전문가 모드가 꺼져있을 경우에,  100개 이하 주소로 제한되며, 전문가 모드가 켜져 있을 경우에는  100개 이상의 주소을 생성할 수 있습니다."
           },
           "network": {
             "label": "네트워크"
@@ -2845,10 +3409,18 @@
           "checkbox1": "하드웨어 지갑을 만들까요?"
         },
         "ledgerModalPopup": {
-          "title1": "성공!",
-          "title2": "레져를 연결해주세요",
-          "description1": "레져가 잘 연결되었습니다",
-          "description2": "레져 연결을 확인해주세요"
+          "tendermintAddress": {
+            "title1": "성공!",
+            "title2": "레져를 연결해주세요",
+            "description1": "레져가 잘 연결되었습니다",
+            "description2": "레져 연결을 확인해주세요"
+          },
+          "evmAddress": {
+            "title1": "성공!",
+            "title2": "레져를 연결해주세요",
+            "description1": "레져가 잘 연결되었습니다",
+            "description2": "레져 연결을 확인해주세요"
+          }
         }
       },
       "restore": {
@@ -2912,9 +3484,11 @@
         "send": "전송",
         "receive": "수신",
         "assets": "금액",
+        "bridge": "Cronos 브릿지",
         "governance": "거버넌스",
         "nft": "나의 NFT",
         "settings": "설정",
+        "lock": "잠김",
         "wallet": {
           "list": "지갑 리스트",
           "restore": "지갑 가져오기",
@@ -2966,7 +3540,8 @@
         "title": "다시 오신 것을 환영합니다!",
         "balance": {
           "title1": "전체 금액",
-          "title2": "스테이킹 금액"
+          "title2": "스테이킹 금액",
+          "title3": "전체 보상"
         },
         "nft": {
           "tab1": "나의 NFT",
@@ -2975,15 +3550,15 @@
         },
         "assetList": {
           "table": {
-            "title": "금액",
-            "name": "금액",
+            "title": "타이틀",
+            "name": "이름",
             "price": "가격",
             "amount": "금액",
-            "value": "시장 가치"
+            "value": "가치"
           }
         },
         "transactions": {
-          "tab1": "금액",
+          "tab1": "애셋",
           "tab2": "위임",
           "tab3": "NFT 트랜잭션",
           "table1": {
@@ -3026,6 +3601,23 @@
             "description": "업데이트가 성공적으로 다운로드되었습니다. 다시 시작하면 설치됩니다.",
             "button": "지금 재시작합니다"
           }
+        },
+        "createNewAsset": {
+          "enable": "추가"
+        },
+        "ledgerModalPopup": {
+          "tendermintAsset": {
+            "title1": "성공!",
+            "title2": "레져를 연결해주세요",
+            "description1": "레져가 잘 연결되었습니다",
+            "description2": "레져 연결을 확인해주세요"
+          },
+          "evmAsset": {
+            "title1": "성공!",
+            "title2": "레져를 연결해주세요",
+            "description1": "레져가 잘 연결되었습니다",
+            "description2": "레져 연결을 확인해주세요"
+          }
         }
       },
       "send": {
@@ -3043,7 +3635,8 @@
           },
           "memo": {
             "label": "메모 (선택사항)"
-          }
+          },
+          "disclaimer": "{{assetName}}에 없는 수신인으로 {{assetSymbol}}를 보내면, 자금을 영구적으로 잃을 수 있습니다."
         },
         "modal1": {
           "title": "트랜잭션 확인",
@@ -3068,23 +3661,101 @@
             "description": "레져를 연결하세요"
           }
         },
-        "button": "레져에서 주소를 확인합니다"
+        "button": "레져에서 주소를 확인합니다",
+        "disclaimer": "{{assetName}}에 없는 주소로 {{assetSymbol}}를 보내면, 자금을 영구적으로 잃을 수 있습니다."
       },
       "assets": {
-        "title": "금액",
+        "title": "애셋",
+        "description": "여기에서 모든 애셋을 관리하세요",
         "tab1": "트랜잭션",
         "tab2": "송금",
         "tab3": "수신",
+        "backToList": "애셋 리스트로 돌아가기",
         "assetList": {
           "table": {
-            "name": "금액",
+            "name": "애셋",
             "price": "가격",
             "amount": "금액",
-            "value": "시장 가치"
+            "value": "가치",
+            "actionSend": "전송",
+            "actionReceive": "수신"
           }
         },
         "moreMenu": {
           "nodeConfiguration": "노드 설정"
+        }
+      },
+      "bridge": {
+        "form": {
+          "from": "송신인",
+          "to": "수신인",
+          "errorSameChain": "이 두 체인은 동일한 체인입니다",
+          "errorBridgeNotSupported": "선택된 브릿지 전송은 지원하지 않습니다",
+          "amount": "금액",
+          "willReceive": "받을 금액",
+          "fee": "수수료",
+          "destination": "목적지",
+          "toAddress": "수신인 주소",
+          "transfer": "전송 자산",
+          "receiving": "수신 중",
+          "disclaimer": "계속 진행함으로써 이용 약관에 동의함을 인정합니다."
+        },
+        "step0": {
+          "title": "Cronos 브릿지",
+          "description": "Cronos에서 자산을 전송하는 가장 빠르고 안전한 방법입니다."
+        },
+        "step1": {
+          "title": "확인"
+        },
+        "step2": {
+          "title": "브릿지 트랙잭션"
+        },
+        "deposit": {
+          "complete": {
+            "title": "{{amount}} {{symbol}}  입금이 완료되었습니다"
+          },
+          "transactionID": "트랜잭션 ID:",
+          "failed": {
+            "title": "{{amount}} {{symbol}}  입금이 실패하였습니다",
+            "description": "브릿지 전송에 실패했습니다. 브릿지 설정이 정확하고 지갑 주소에 충분한 자금이 있는지 확인하세요."
+          }
+        },
+        "transferInitiated": {
+          "title": "트랜잭션 시작됨",
+          "description": "지갑에서 자금을 확인하십시오. 네트워크 상태에 따라 최대 몇분까지 소요될 수 있습니다."
+        },
+        "action": {
+          "viewTransaction": "트랜잭션 보기",
+          "viewTransactionHIstory": "트랜잭션 내역 보기"
+        },
+        "config": {
+          "prefix": {
+            "title": "프리픽스",
+            "validation": "프리픽스는 오직 {{number}} 과 소문자만 가능합니다"
+          },
+          "address": {
+            "title": "Cronos 브릿지 콘트랙 주소",
+            "validation": "콘트랙 주소"
+          },
+          "channel": {
+            "title": "브릿지 채널"
+          },
+          "port": {
+            "title": "브릿지 포트"
+          }
+        },
+        "pendingTransfer": {
+          "title": "{{amount}} {{symbol}}이 전송 대기 중입니다"
+        },
+        "transactionHistory": {
+          "table": {
+            "transactionHash": "트랜잭션 해쉬",
+            "amount": "금액",
+            "fromAddress": "송신인（네트워크）",
+            "toAddress": "수신인（네트워크）",
+            "time": "시간",
+            "status": "상태"
+          }
         }
       },
       "staking": {
@@ -3094,11 +3765,20 @@
         "tab3": "위임 관리",
         "description1": "위임된 금액에서 보상을 인출합니다",
         "description2": "검증인에게 금액을 위임합니다",
+        "description3": "위임된 자산을 관리하세요",
+        "balance": {
+          "title1": "스테이킹 금액",
+          "title2": "취소 금액",
+          "title3": "보상 금액"
+        },
         "maxValidator": {
           "error": "스테이킹 금액이 사용 가능한 지갑 잔액을 초과합니다."
         },
         "minValidator": {
           "error": "스테이킹 금액이 최소 금액보다 낮습니다."
+        },
+        "button": {
+          "viewMore": "더 보기"
         },
         "validatorList": {
           "table": {
@@ -3147,6 +3827,28 @@
           "label1": "송신인 주소",
           "label2": "검증인로부터 보상 인출하기",
           "label3": "보상"
+        },
+        "modal3": {
+          "title": "위임 취소",
+          "description": "스테이킹 해제된 자산은 Crypto.org 체인 네트워크에 의해 시행되는 {{ unbondingPeriod }}일 후에 사용할 수 있습니다.",
+          "button": "위임 취소 보기",
+          "table": {
+            "validatorAddress": "검증인 주소",
+            "unbondingAmount": "취소 금액",
+            "remainingTime": "남은 시간",
+            "completionTime": "완료 시간"
+          }
+        },
+        "modal4": {
+          "title": "보상",
+          "label1": "나의 모든 보상",
+          "label2": "청구된 보상",
+          "label3": "예상되는 연간 보상",
+          "label4": "예상되는 총  APY",
+          "label5": "청구되지 보상",
+          "tooltip1": "인출 및 지갑에 입금된 모든 스테이킹 보상",
+          "tooltip2": "모든 스테이킹에서 누적된 총 스테이킹 보상",
+          "tooltip3": "모든 스테이킹을 기반으로 연간 획득할 것으로 예상되는 총 스테이킹 보상을 반영하는 백분율 "
         }
       },
       "governance": {
@@ -3182,6 +3884,7 @@
         "description": "Crypto.org Chain의 NFT 컬렉션에 대한 개요",
         "tab1": "NFT 컬렉션",
         "tab2": "NFT 발행",
+        "tab3": "수신 NFT",
         "container": {
           "description": "Crypto.org 체인에서 이미지 또는 비디오로 NFT를 발행하세요"
         },
@@ -3300,7 +4003,8 @@
         "tab3": "스토리지 삭제",
         "form1": {
           "assetIdentifier": {
-            "label": "금액"
+            "label": "애셋",
+            "description": "노드 구성은 다양한 애셋에서 설정할 수 있습니다."
           },
           "nodeUrl": {
             "label": "노드 URL",
@@ -3372,7 +4076,7 @@
             "title": "저장 공간 삭제 확인",
             "description1": "나중에 이 지갑을 복원할 수 있도록 삭제하기 전에 복구 니모닉 구문을 확인하는 것이 좋습니다.",
             "warning": "저장소를 지우시겠습니까? 지갑 니모닉 문구를 백업하지 않으면 영원히 자금을 잃을 수 있습니다.",
-            "disclaimer": "액세스 권한을 다시 얻을 수 있는 유일한 방법은 지갑 니모닉 문구로 복원하는 것임을 이해합니다.",
+            "disclaimer": "액세스 권한을 다시 얻을 수 있는 유일한 방법은 지갑 니모닉 문구로 복원하는",
             "form1": {
               "clear": {
                 "label": "입력하세요",
@@ -3471,11 +4175,28 @@
         "available": "Mevcut",
         "action": "Aksiyon",
         "select": "Seç",
-        "review": "gözden geçir",
+        "review": "Gözden geçir",
         "copy": "Kopyala",
         "close": "Kapat",
         "retry": "Tekrar dene",
         "connect": "Bağlan",
+        "seeAll": "Hepsini Gör",
+        "past": "Önce",
+        "future": "İçinde",
+        "years": "Yıl",
+        "year": "Bir yıl",
+        "months": "Ay",
+        "month": "Bir ay",
+        "weeks": "Hafta",
+        "week": "Bir hafta",
+        "days": "Gün",
+        "day": "Bir gün",
+        "hours": "Saat",
+        "hour": "Bir saat",
+        "minutes": "Dakika",
+        "minute": "Bir dakika",
+        "seconds": "Saniye",
+        "second": "Bir kaç saniye",
         "addressValidator": {
           "reason1": "Geçersiz",
           "reason2": "Adres sağlandı"
@@ -3522,15 +4243,40 @@
             "successButton": "Ana menüye dön"
           }
         },
+        "sessionLockModal": {
+          "title": "Uygulama şifresini girin",
+          "description": "Cüzdanı açmak icin App şifresini girin",
+          "error": "Geçersiz şifre. Lütfen tekrar deneyiniz",
+          "success": "Cüzdan başarılı bir şekilde açıldı!",
+          "okButton": "Cüzdan şifresini çöz"
+        },
         "successModalPopup": {
           "title": "İşlem başarılı!",
+          "timeout": {
+            "description": "İşlem zaman aşımına ugradı ancak daha sonraki bloklarda yer alacak."
+          },
+          "nodeConnect": {
+            "description": "Node bağlandı!"
+          },
           "createWallet": {
             "description": "Cüzdan Oluşturuldu!",
             "button": "Cüzdan Oluştur"
           },
           "transfer": {
             "description": "İşlem başarılı bir şekilde yayınlandı!"
+          },
+          "vote": {
+            "description": "Oylaman başarılı bir şekilde yayınlandı!"
+          },
+          "nftTransfer": {
+            "description": "NFT işlemi başarılı bir şekilde yayınlandı!"
+          },
+          "nftMint": {
+            "description": "NFT başarılı bir şekilde oluşturuldu!"
           }
+        },
+        "errorModalPopup": {
+          "title": "Bir hata gerçekleşti!"
         }
       }
     }
@@ -3580,6 +4326,7 @@
         "cannot0": "enweghị ike ịbụ 0",
         "validator": "validator",
         "receiving": "na-anata",
+        "available": "di",
         "close": "mmechie",
         "connect": "jikọọ"
       },
@@ -3625,6 +4372,11 @@
           "restoreWallet": {
             "successButton": "اذهب إلى الصفحة الرئيسية"
           }
+        },
+        "sessionLockModal": {
+          "title": "أدخل كلمة مرور التطبيق",
+          "success": "تم فك تشفير المحفظة بنجاح!",
+          "okButton": "فك تشفير المحفظة"
         },
         "successModalPopup": {
           "title": "نجاح!",
@@ -3719,6 +4471,13 @@
             "success": "Ihre Wallet wird erfolgreich wiedergestellt und verschlüsselt!",
             "successButton": "Gehen Sie zu Startseite"
           }
+        },
+        "sessionLockModal": {
+          "title": "Geben Sie Ihr Passwort ein",
+          "description": "Geben Sie Ihr Passwort zum Entschlüsseln Ihrer Wallet ein.",
+          "error": "Falsches Passwort. Bitte versuchen Sie nochmals.",
+          "success": "Ihre Wallet wird erfolgreich entschlüsselt!",
+          "okButton": "Ihre Wallet entschlüsseln"
         },
         "successModalPopup": {
           "title": "Erflog!",
@@ -3921,8 +4680,10 @@
           }
         },
         "ledgerModalPopup": {
-          "title1": "Erfolgreich!",
-          "title2": "Ihre Ledger verbinden"
+          "tendermintAddress": {
+            "title1": "Erfolgreich!",
+            "title2": "Ihre Ledger verbinden"
+          }
         }
       },
       "restore": {
@@ -4017,6 +4778,14 @@
       },
       "receive": {
         "title": "Empfangen"
+      },
+      "assets": {
+        "assetList": {
+          "table": {
+            "actionSend": "Absenden",
+            "actionReceive": "Empfangen"
+          }
+        }
       },
       "staking": {
         "validatorList": {

@@ -12,7 +12,7 @@ export class Wallet {
   public readonly name: string;
 
   // Legacy field - Relevant only for single asset wallets created
-  public address: string;
+  public address: string; // cosmos address
 
   public encryptedPhrase: string;
 
@@ -57,6 +57,7 @@ export interface SettingsDataUpdate {
   indexingUrl?: string | undefined;
   gasLimit?: string | undefined;
   networkFee?: string | undefined;
+  explorer?: any | undefined;
 }
 
 export interface DisableDefaultMemoSettings {
@@ -98,6 +99,7 @@ export function reconstructCustomConfig(formValues: CustomConfigFormValue): Wall
   return {
     derivationPath: formValues.derivationPath,
     enabled: true,
+    explorer: {},
     explorerUrl: '',
     name: DefaultWalletConfigs.CustomDevNet.name,
     network: customNetwork,

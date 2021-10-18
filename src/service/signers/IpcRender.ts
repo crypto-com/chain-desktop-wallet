@@ -52,4 +52,79 @@ export class IpcRender implements ISignerProvider {
 
     return Bytes.fromBuffer(Buffer.from(arg.signed));
   }
+
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line  class-methods-use-this
+  async ethSignSendTx(
+    url: string = 'http://127.0.0.1:8545',
+    index: number = 0,
+    chainId: number = 9000,
+    gasLimit: string = '0x5000',
+    gasPrice: string = '0x0400000000',
+    to: string,
+    value: string = '0x00',
+    data: string = '0x',
+  ): Promise<string> {
+    const a = {
+      url,
+      index,
+      chainId,
+      gasLimit,
+      gasPrice,
+      to,
+      value,
+      data,
+    };
+
+    const arg = electron.ipcRenderer.sendSync('ethSignSendTx', a);
+    if (!arg.success) {
+      throw new Error(`test fail: ${arg.error}`);
+    }
+    return arg.txhash;
+  }
+
+  // eth
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line  class-methods-use-this
+  public async signEthTx(
+    index: number,
+    chainId: number,
+    nonce: number,
+    gasLimit: string,
+    gasPrice: string,
+    to: string,
+    value: string,
+    data: string,
+  ): Promise<string> {
+    const a = {
+      index,
+      chainId,
+      nonce,
+      gasLimit,
+      gasPrice,
+
+      to,
+      value,
+      data,
+    };
+    const arg = electron.ipcRenderer.sendSync('ethSignTx', a);
+    if (!arg.success) {
+      throw new Error(`test fail: ${arg.error}`);
+    }
+    return arg.signedtx;
+  }
+
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line  class-methods-use-this
+  public async getEthAddress(index: number, display: boolean): Promise<string> {
+    const a = {
+      index,
+      display,
+    };
+    const arg = electron.ipcRenderer.sendSync('ethGetAddress', a);
+    if (!arg.success) {
+      throw new Error(`test fail: ${arg.error}`);
+    }
+    return arg.address;
+  }
 }

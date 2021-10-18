@@ -9,8 +9,9 @@ export const STATIC_ASSET_COUNT = 2;
 
 const checkIfTestnet = (network: Network) => {
   return (
-    [CroNetwork.TestnetCroeseid3, CroNetwork.Testnet].includes(network) ||
-    network.defaultNodeUrl.includes('testnet')
+    [CroNetwork.TestnetCroeseid3, CroNetwork.TestnetCroeseid4, CroNetwork.Testnet].includes(
+      network,
+    ) || network.defaultNodeUrl.includes('testnet')
   );
 };
 
@@ -21,6 +22,7 @@ export const CRO_ASSET = (walletConfig: WalletConfig) => {
 
   const config: UserAssetConfig = {
     explorerUrl: walletConfig.explorerUrl,
+    explorer: walletConfig.explorer,
     chainId: network.chainId,
     fee: { gasLimit: '300000', networkFee: '10000' },
     indexingUrl: walletConfig.indexingUrl,
@@ -37,10 +39,12 @@ export const CRO_ASSET = (walletConfig: WalletConfig) => {
     icon_url:
       'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c1248c15568a4017c20aa87/cro.png',
     identifier: getRandomId(),
-    name: 'Crypto.org Coin',
+    name: 'Crypto.org Chain',
     symbol: assetSymbol,
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
+    unbondingBalance: '0',
+    rewardsBalance: '0',
     decimals: 8,
     assetType: UserAssetType.TENDERMINT,
     isSecondaryAsset: false,
@@ -56,13 +60,17 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
   const isTestnet = checkIfTestnet(network);
 
   const config: UserAssetConfig = {
-    explorerUrl: 'https://cronos-explorer.crypto.org/',
+    explorer: {
+      tx: 'https://cronos.crypto.org/explorer/tx',
+      address: 'https://cronos.crypto.org/explorer/address',
+    },
+    explorerUrl: 'https://cronos.crypto.org/explorer',
     chainId: isTestnet ? '338' : 'TO_BE_DECIDED',
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
-    indexingUrl: isTestnet ? 'https://cronos-explorer.crypto.org/api' : 'TO_BE_DECIDED',
+    indexingUrl: isTestnet ? 'https://cronos.crypto.org/explorer/api' : 'TO_BE_DECIDED',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
-    nodeUrl: 'https://cronos-testnet.crypto.org:8545/',
+    nodeUrl: 'https://cronos-testnet-3.crypto.org:8545/',
     memoSupportDisabled: true,
   };
 
@@ -72,10 +80,12 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
     icon_url:
       'https://firebasestorage.googleapis.com/v0/b/chain-desktop-wallet.appspot.com/o/cronos_logo.png?alt=media&token=781c48a3-e89e-4dd4-87d3-d1a1b8e2e456',
     identifier: getRandomId(),
-    name: 'Cronos Coin',
+    name: 'Cronos Chain',
     symbol: 'CRONOS',
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
+    unbondingBalance: '0',
+    rewardsBalance: '0',
     decimals: 18,
     assetType: UserAssetType.EVM,
     isSecondaryAsset: true,

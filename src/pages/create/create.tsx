@@ -21,7 +21,10 @@ import { secretStoreService } from '../../storage/SecretStoreService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup';
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
+import NoticeDisclaimer from '../../components/NoticeDisclaimer/NoticeDisclaimer';
 import IconLedger from '../../svg/IconLedger';
+import { UserAssetType } from '../../models/UserAsset';
+import { ISignerProvider } from '../../service/signers/SignerProvider';
 import {
   createLedgerDevice,
   detectConditionsError,
@@ -30,6 +33,7 @@ import {
 } from '../../service/LedgerService';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 
+let waitFlag = false;
 const layout = {
   // labelCol: { span: 8 },
   // wrapperCol: { span: 16 },
@@ -37,6 +41,10 @@ const layout = {
 const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
+
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 interface FormCustomConfigProps {
   setIsConnected: (arg: boolean) => void;
@@ -55,8 +63,6 @@ interface FormCreateProps {
   setIsCreateDisable: (arg: boolean) => void;
   setIsNetworkSelectFieldDisable: (arg: boolean) => void;
   setIsWalletSelectFieldDisable: (arg: boolean) => void;
-  setLedgerConnected: (arg: boolean) => void;
-  setIsModalVisible: (arg: boolean) => void;
   networkConfig: any;
 }
 
@@ -299,6 +305,11 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
 const FormCreate: React.FC<FormCreateProps> = props => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+  const [isCroModalVisible, setIsCroModalVisible] = useState(false);
+  const [isEthModalVisible, setIsEthModalVisible] = useState(false);
+  // eslint-disable-next-line
+  const [isLedgerEthAppConnected, setIsLedgerEthAppConnected] = useState(false);
+  const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -306,6 +317,27 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const [hwcheck, setHwcheck] = useState(!props.isWalletSelectFieldDisable);
 
   const [t] = useTranslation();
+
+  // for eth ledger
+  const showEthModal = () => {
+    setIsEthModalVisible(true);
+  };
+  const handleEthOk = () => {
+    waitFlag = false;
+    setIsEthModalVisible(false);
+  };
+  const handleEthCancel = () => {
+    waitFlag = false;
+    setIsEthModalVisible(false);
+  };
+
+  const handleCroOk = () => {
+    setIsCroModalVisible(false);
+  };
+
+  const handleCroCancel = () => {
+    setIsCroModalVisible(false);
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -381,17 +413,58 @@ const FormCreate: React.FC<FormCreateProps> = props => {
 
     try {
       const createdWallet = new WalletCreator(createOptions).create();
+
+      const targetWallet = createdWallet.wallet;
+      if (targetWallet.walletType === LEDGER_WALLET_TYPE) {
+        const device: ISignerProvider = createLedgerDevice();
+        // collect cro address
+
+        const croAddress = await device.getAddress(
+          targetWallet.addressIndex,
+          targetWallet.config.network.addressPrefix,
+          false,
+        );
+        const croAsset = createdWallet.assets.filter(
+          asset => asset.assetType === UserAssetType.TENDERMINT,
+        )[0];
+        croAsset.address = croAddress;
+
+        // override main address
+        targetWallet.address = croAddress;
+
+        waitFlag = true;
+        showEthModal();
+        for (let i = 0; i < 600; i++) {
+          // eslint-disable-next-line no-await-in-loop
+          await delay(100); // milli seconds
+          if (!waitFlag) {
+            break;
+          }
+        }
+
+        const ethAddresss = await device.getEthAddress(targetWallet.addressIndex, false);
+        const evmAsset = createdWallet.assets.filter(
+          asset => asset.assetType === UserAssetType.EVM,
+        )[0];
+        evmAsset.address = ethAddresss;
+        setIsLedgerEthAppConnected(true);
+      }
+
       await walletService.saveAssets(createdWallet.assets);
 
       setWalletTempBackupSeed(createdWallet.wallet);
       setWallet(createdWallet.wallet);
       setCreateLoading(false);
+      setIsLedgerCroAppConnected(false);
+      setIsLedgerEthAppConnected(false);
       showModal();
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('issue on wallet create', e);
 
       setCreateLoading(false);
+      setIsLedgerCroAppConnected(false);
+      setIsLedgerEthAppConnected(false);
       showErrorModal();
       return;
     }
@@ -400,25 +473,30 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   };
 
   const onWalletCreateFinish = async () => {
-    const { walletType, addressIndex } = props.form.getFieldsValue();
+    const { walletType } = props.form.getFieldsValue();
 
     if (walletType === NORMAL_WALLET_TYPE) {
       onWalletCreateFinishCore();
       return;
     }
-    props.setIsModalVisible(true);
-    props.setLedgerConnected(false);
+    setIsCroModalVisible(true);
+    setIsLedgerCroAppConnected(false);
+  };
+
+  const checkIsLedgerCroAppConnected = async () => {
+    const { walletType, addressIndex } = props.form.getFieldsValue();
     let hwok = false;
+    setCreateLoading(true);
     try {
       const device = createLedgerDevice();
       // check ledger device ok
       await device.getPubKey(addressIndex, false);
-      props.setLedgerConnected(true);
+      setIsLedgerCroAppConnected(true);
 
       await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
-      props.setIsModalVisible(false);
+      setIsCroModalVisible(false);
 
       hwok = true;
     } catch (e) {
@@ -431,13 +509,13 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         }
       }
 
-      props.setLedgerConnected(false);
+      setIsLedgerCroAppConnected(false);
 
       await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
-      props.setIsModalVisible(false);
-
+      setIsCroModalVisible(false);
+      setCreateLoading(false);
       notification.error({
         message,
         description,
@@ -490,37 +568,38 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       <Checkbox onChange={onCheckboxChange} checked={hwcheck}>
         {t('create.formCreate.checkbox1')}
       </Checkbox>
-      <Form.Item
-        name="walletType"
-        label={t('create.formCreate.walletType.label')}
-        hidden={props.isWalletSelectFieldDisable}
-      >
-        <Select
-          placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
-          disabled={props.isWalletSelectFieldDisable}
+      <div hidden={props.isWalletSelectFieldDisable}>
+        <Form.Item name="walletType" label={t('create.formCreate.walletType.label')}>
+          <Select
+            placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
+            disabled={props.isWalletSelectFieldDisable}
+          >
+            <Select.Option key="normal" value="normal">
+              Normal
+            </Select.Option>
+            <Select.Option key="ledger" value="ledger">
+              Ledger
+            </Select.Option>
+          </Select>
+        </Form.Item>
+        <Form.Item
+          name="addressIndex"
+          label={t('create.formCreate.addressIndex.label')}
+          rules={[
+            {
+              required: true,
+              message: `${t('create.formCreate.addressIndex.label')} ${t('general.required')}`,
+            },
+            addressIndexValidator,
+          ]}
         >
-          <Select.Option key="normal" value="normal">
-            Normal
-          </Select.Option>
-          <Select.Option key="ledger" value="ledger">
-            Ledger
-          </Select.Option>
-        </Select>
-      </Form.Item>
-      <Form.Item
-        name="addressIndex"
-        label={t('create.formCreate.addressIndex.label')}
-        rules={[
-          {
-            required: true,
-            message: `${t('create.formCreate.addressIndex.label')} ${t('general.required')}`,
-          },
-          addressIndexValidator,
-        ]}
-        hidden={props.isWalletSelectFieldDisable}
-      >
-        <Input placeholder="0" />
-      </Form.Item>
+          <Input placeholder="0" />
+        </Form.Item>
+        <Form.Item>
+          <NoticeDisclaimer>{t('create.formCreate.addressIndex.disclaimer')}</NoticeDisclaimer>
+        </Form.Item>
+      </div>
+
       <Form.Item
         name="network"
         label={t('create.formCreate.network.label')}
@@ -579,6 +658,80 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             </div>
           </>
         </ErrorModalPopup>
+        <LedgerModalPopup
+          isModalVisible={isCroModalVisible}
+          handleCancel={handleCroCancel}
+          handleOk={handleCroOk}
+          title={
+            isLedgerCroAppConnected
+              ? t('create.ledgerModalPopup.tendermintAddress.title1')
+              : t('create.ledgerModalPopup.tendermintAddress.title2')
+          }
+          footer={[
+            isLedgerCroAppConnected ? (
+              <></>
+            ) : (
+              <Button
+                type="primary"
+                size="small"
+                className="btn-restart"
+                onClick={() => {
+                  checkIsLedgerCroAppConnected();
+                  // setIsLedgerModalButtonLoading(true);
+                }}
+                // loading={isLedgerModalButtonLoading}
+                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              >
+                {t('general.connect')}
+              </Button>
+            ),
+          ]}
+          image={isLedgerCroAppConnected ? <SuccessCheckmark /> : <IconLedger />}
+        >
+          <div className="description">
+            {isLedgerCroAppConnected
+              ? t('create.ledgerModalPopup.tendermintAddress.description1')
+              : t('create.ledgerModalPopup.tendermintAddress.description2')}
+          </div>
+        </LedgerModalPopup>
+        <LedgerModalPopup
+          isModalVisible={isEthModalVisible}
+          handleCancel={handleEthCancel}
+          handleOk={handleEthOk}
+          title={
+            isLedgerEthAppConnected
+              ? t('create.ledgerModalPopup.evmAddress.title1')
+              : t('create.ledgerModalPopup.evmAddress.title2')
+          }
+          footer={[
+            isLedgerEthAppConnected ? (
+              <></>
+            ) : (
+              <Button
+                type="primary"
+                size="small"
+                className="btn-restart"
+                onClick={() => {
+                  handleEthOk();
+                  // setIsEthModalVisible(false);
+                  // checkIsLedgerEthAppConnected();
+                  // setIsLedgerModalButtonLoading(true);
+                }}
+                // loading={isLedgerModalButtonLoading}
+                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              >
+                {t('general.connect')}
+              </Button>
+            ),
+          ]}
+          image={isLedgerEthAppConnected ? <SuccessCheckmark /> : <IconLedger />}
+        >
+          <div className="description">
+            {isLedgerEthAppConnected
+              ? t('create.ledgerModalPopup.evmAddress.description1')
+              : t('create.ledgerModalPopup.evmAddress.description2')}
+          </div>
+        </LedgerModalPopup>
       </Form.Item>
     </Form>
   );
@@ -598,22 +751,12 @@ const CreatePage = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [goHomeButtonLoading, setGoHomeButtonLoading] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [ledgerConnected, setLedgerConnected] = useState(false);
   const [walletTempBackupSeed] = useRecoilState(walletTempBackupState);
   const currentSession = useRecoilValue(sessionState);
 
   const analyticsService = new AnalyticsService(currentSession);
 
   const [t] = useTranslation();
-
-  const handleOk = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
-  };
 
   const onWalletBackupFinish = async (password: string) => {
     setGoHomeButtonLoading(true);
@@ -679,8 +822,6 @@ const CreatePage = () => {
               setIsConnected={setIsConnected}
               setIsCreateDisable={setIsCreateDisable}
               networkConfig={networkConfig}
-              setLedgerConnected={setLedgerConnected}
-              setIsModalVisible={setIsModalVisible}
             />
           ) : (
             <FormCustomConfig
@@ -713,25 +854,6 @@ const CreatePage = () => {
           />
         </div>
       </div>
-
-      <LedgerModalPopup
-        isModalVisible={isModalVisible}
-        handleCancel={handleCancel}
-        handleOk={handleOk}
-        title={
-          ledgerConnected
-            ? t('create.ledgerModalPopup.title1')
-            : t('create.ledgerModalPopup.title2')
-        }
-        footer={[]}
-        image={ledgerConnected ? <SuccessCheckmark /> : <IconLedger />}
-      >
-        <div className="description">
-          {ledgerConnected
-            ? t('create.ledgerModalPopup.description1')
-            : t('create.ledgerModalPopup.description2')}
-        </div>
-      </LedgerModalPopup>
     </main>
   );
 };

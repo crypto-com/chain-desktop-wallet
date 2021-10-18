@@ -2,6 +2,7 @@ import { ethers } from 'ethers';
 import Web3 from 'web3';
 import { ITransactionSigner } from './TransactionSigner';
 import {
+  BridgeTransactionUnsigned,
   DelegateTransactionUnsigned,
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
@@ -14,12 +15,15 @@ class EvmTransactionSigner implements ITransactionSigner {
     phrase: string,
   ): Promise<string> {
     const web3 = new Web3('');
-
     const transferAsset = transaction.asset;
+
+    const gasPriceBN = web3.utils.toBN(
+      transaction.gasPrice || transferAsset?.config?.fee?.networkFee!,
+    );
 
     const txParams = {
       nonce: web3.utils.toHex(transaction.nonce || 0),
-      gasPrice: web3.utils.toHex(transaction.gasPrice || transferAsset?.config?.fee?.networkFee!),
+      gasPrice: web3.utils.toHex(gasPriceBN),
       gasLimit: transaction.gasLimit || transferAsset?.config?.fee?.gasLimit,
       to: transaction.toAddress,
       value: web3.utils.toHex(transaction.amount),
@@ -27,6 +31,29 @@ class EvmTransactionSigner implements ITransactionSigner {
         transaction.memo && transaction.memo.length > 0
           ? web3.utils.utf8ToHex(transaction.memo)
           : '0x',
+      chainId: 338,
+    };
+
+    const signedTx = await ethers.Wallet.fromMnemonic(phrase).signTransaction(txParams);
+    return Promise.resolve(signedTx);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async signBridgeTransfer(
+    transaction: BridgeTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const web3 = new Web3('');
+
+    const transferAsset = transaction.originAsset;
+
+    const txParams = {
+      nonce: web3.utils.toHex(transaction.nonce || 0),
+      gasPrice: web3.utils.toHex(transaction.gasPrice || transferAsset?.config?.fee?.networkFee!),
+      gasLimit: transaction.gasLimit,
+      to: transaction.toAddress,
+      value: web3.utils.toHex(transaction.amount),
+      data: transaction.data,
       chainId: 338,
     };
 

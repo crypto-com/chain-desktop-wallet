@@ -1,12 +1,8 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
-import sdk from '@crypto-org-chain/chain-jslib';
 import { CosmosMsg } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/msg/cosmosMsg';
+import Long from 'long';
 import { Big, Units } from '../../utils/ChainJsLib';
-import {
-  FIXED_DEFAULT_FEE,
-  FIXED_DEFAULT_GAS_LIMIT,
-  WalletConfig,
-} from '../../config/StaticConfig';
+import { WalletConfig } from '../../config/StaticConfig';
 import {
   TransactionUnsigned,
   DelegateTransactionUnsigned,
@@ -18,11 +14,13 @@ import {
   NFTTransferUnsigned,
   NFTMintUnsigned,
   NFTDenomIssueUnsigned,
+  BridgeTransactionUnsigned,
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
-import { ITransactionSigner } from './TransactionSigner';
+import { BaseTransactionSigner, ITransactionSigner } from './TransactionSigner';
+import { isNumeric } from '../../utils/utils';
 
-export class LedgerTransactionSigner implements ITransactionSigner {
+export class LedgerTransactionSigner extends BaseTransactionSigner implements ITransactionSigner {
   public readonly config: WalletConfig;
 
   public readonly signerProvider: ISignerProvider;
@@ -30,26 +28,10 @@ export class LedgerTransactionSigner implements ITransactionSigner {
   public readonly addressIndex: number;
 
   constructor(config: WalletConfig, signerProvider: ISignerProvider, addressIndex: number) {
+    super(config);
     this.config = config;
     this.signerProvider = signerProvider;
     this.addressIndex = addressIndex;
-  }
-
-  public getTransactionInfo(_phrase: string, transaction: TransactionUnsigned) {
-    const cro = sdk.CroSDK({ network: this.config.network });
-    const rawTx = new cro.RawTransaction();
-    rawTx.setMemo(transaction.memo);
-
-    const networkFee =
-      this.config.fee !== undefined ? this.config.fee.networkFee : FIXED_DEFAULT_FEE;
-    const gasLimit =
-      this.config.fee !== undefined ? this.config.fee.gasLimit : FIXED_DEFAULT_GAS_LIMIT;
-
-    const fee = new cro.Coin(networkFee, Units.BASE);
-
-    rawTx.setFee(fee);
-    rawTx.setGasLimit(gasLimit);
-    return { cro, rawTx };
   }
 
   public async signTransfer(
@@ -190,16 +172,24 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       await this.signerProvider.getPubKey(this.addressIndex, false)
     ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
+    /* 
+    SIGN_MODE_UNSPECIFIED = 0,
+    SIGN_MODE_DIRECT = 1,
+    SIGN_MODE_TEXTUAL = 2,
+    SIGN_MODE_LEGACY_AMINO_JSON = 127,
+    */
+
     const signableTx = rawTx
       .appendMessage(message)
       .addSigner({
         publicKey: pubkey,
         accountNumber: new Big(transaction.accountNumber),
         accountSequence: new Big(transaction.accountSequence),
-        signMode: 0, //   LEGACY_AMINO_JSON = 0, DIRECT = 1,
+        signMode: 127, //   LEGACY_AMINO_JSON = 127, DIRECT = 1,
       })
       .toSignable();
 
+    // 0 : signer index
     const bytesMessage: Bytes = signableTx.toSignDocument(0);
     const signature = await this.signerProvider.sign(bytesMessage);
 
@@ -207,5 +197,45 @@ export class LedgerTransactionSigner implements ITransactionSigner {
       .setSignature(0, signature)
       .toSigned()
       .getHexEncoded();
+  }
+
+  public StaticRevisionNumber = 122;
+
+  public StaticBigLatestHeight = 120_000_000;
+
+  public async signIBCTransfer(
+    transaction: BridgeTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const { cro, rawTx } = this.getTransactionInfoData(phrase, transaction.memo);
+
+    const millisToNanoSecond = 1_000_000;
+    const timeout = (Date.now() + 60_000) * millisToNanoSecond;
+
+    // For a chainID string like testnet-croeseid-4, revision number is 4
+    const revisionNumberFromChainID = transaction?.asset?.config?.chainId?.split('-').pop();
+    const revisionNumber = isNumeric(revisionNumberFromChainID)
+      ? revisionNumberFromChainID
+      : this.StaticRevisionNumber;
+
+    // Latest block plus arbitrary number of blocks on top
+    const revisionHeight = Big(transaction.latestBlockHeight || this.StaticBigLatestHeight).plus(
+      250,
+    );
+
+    const msgSend = new cro.ibc.MsgTransfer({
+      sender: transaction.fromAddress,
+      sourceChannel: transaction.channel || '',
+      sourcePort: transaction.port || '',
+      timeoutTimestampInNanoSeconds: Long.fromValue(timeout),
+      timeoutHeight: {
+        revisionNumber: Long.fromString(String(revisionNumber), true),
+        revisionHeight: Long.fromString(revisionHeight.toFixed(), true),
+      },
+      receiver: transaction.toAddress,
+      token: new cro.Coin(transaction.amount, Units.BASE),
+    });
+
+    return this.getSignedMessageTransaction(transaction, msgSend, rawTx);
   }
 }

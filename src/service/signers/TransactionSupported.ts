@@ -6,7 +6,7 @@ export interface TransactionUnsigned {
   accountNumber: number;
   accountSequence: number;
   nonce?: number;
-  gasPrice?: number;
+  gasPrice?: string;
   gasLimit?: number;
   asset?: UserAsset;
 }
@@ -74,4 +74,25 @@ export interface RedelegateTransactionUnsigned extends TransactionUnsigned {
 export interface CustomFeeRequest {
   fee: string;
   gasLimit: string;
+}
+
+export interface BridgeTransactionUnsigned extends TransactionUnsigned {
+  fromAddress: string;
+  toAddress: string;
+  amount: string;
+
+  memo: string;
+  accountNumber: number;
+  accountSequence: number;
+  nonce?: number;
+  gasPrice?: string;
+  gasLimit?: number;
+
+  channel?: string;
+  port?: string;
+
+  data?: string;
+  originAsset?: UserAsset;
+
+  latestBlockHeight?: number;
 }

@@ -1,0 +1,222 @@
+.bridge-layout > .ant-layout-content {
+  margin: 64px auto !important;
+}
+
+.bridge-layout {
+  position: relative;
+  .go-to-transfer-history {
+    margin: 10px 0;
+    text-align: right;
+    a {
+      width: 200px;
+      span {
+        margin-left: 5px;
+      }
+      > div {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+      }
+    }
+  }
+}
+
+.bridge-content {
+  width: 800px;
+  margin: auto;
+  padding: 24px;
+  text-align: center;
+  .container {
+    // max-width: 500px;
+    .item {
+      margin-bottom: 20px;
+    }
+    .title {
+      margin-bottom: 20px;
+      font-size: 18px;
+    }
+    .description {
+      margin-bottom: 20px;
+      color: @font-color;
+    }
+    .available {
+      position: relative;
+      margin: 5px 0 10px 0;
+      text-align: left;
+      span {
+        color: @font-color;
+      }
+      .available-amount {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+      }
+    }
+    // }
+    .ant-btn {
+      width: 100%;
+      // max-width: 190px;
+      // margin: 24px 0 -24px 0;
+      margin: 0;
+    }
+    .row-bridge {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      .ant-form-item {
+        // display: inline-block;
+        width: 40%;
+      }
+      // .ant-form-item:first-of-type {
+      //   margin-right: 4%;
+      // }
+      .ant-form-item-label {
+        width: 100%;
+      }
+    }
+    .row {
+      .ant-form-item {
+        display: inline-block;
+        width: 48%;
+      }
+      .ant-form-item:first-of-type {
+        margin-right: 4%;
+      }
+      .ant-form-item-label {
+        width: 100%;
+      }
+    }
+    .ant-avatar {
+      width: 22px;
+      height: 22px;
+      margin-right: 10px;
+      color: #1199fa;
+      font-size: 12px;
+      line-height: 22px;
+      background-color: #e4f4ff;
+    }
+    .progress-bar {
+      width: 500px;
+      margin: 20px auto;
+      .ant-steps-item-process > .ant-steps-item-container > .ant-steps-item-icon .ant-steps-icon {
+        color: @azure !important;
+      }
+      .ant-steps-item-wait * {
+        color: rgba(0, 0, 0, 0.25) !important;
+      }
+      .ant-steps-item-icon {
+        height: 16px !important;
+        .ant-steps-icon {
+          top: -5px !important;
+          left: -3px;
+          .anticon {
+            font-size: 20px;
+            transform: scale(1.2);
+          }
+        }
+      }
+      .ant-steps-item-title {
+        font-size: 14px;
+      }
+      .ant-steps-item-process,
+      .ant-steps-item-finish {
+        .ant-steps-item-title {
+          color: @azure;
+        }
+      }
+    }
+    .ant-form-item-has-error .ant-input-number.ant-input-number-disabled {
+      background-color: #f5f5f5 !important;
+      border-color: #d9d9d9 !important;
+    }
+    .review-container {
+      margin: 10px 0 20px 0;
+      padding: 20px;
+      background-color: rgba(17, 153, 250, 0.1);
+      border-radius: @border-radius;
+      .asset-icon {
+        height: 22px;
+        > img {
+          margin-right: 10px;
+        }
+      }
+    }
+    .flex-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ant-form-item-explain-error {
+      text-align: left;
+    }
+
+    .confirmation-container {
+      width: 500px;
+      margin: auto;
+      .detail {
+        border: 1px solid #d9d9d9;
+        border-radius: @border-radius;
+        .block {
+          margin: 20px;
+          .title {
+            font-size: 24px;
+          }
+          .asset-icon {
+            height: 22px;
+            > img {
+              margin-right: 10px;
+            }
+          }
+          .bridge-from,
+          .bridge-to {
+            .asset-icon {
+              height: 40px;
+            }
+          }
+          .ant-layout,
+          .ant-layout-sider {
+            background: transparent !important;
+            .ant-layout-content,
+            .ant-layout-sider {
+              margin: 0;
+              margin-left: 10px;
+              text-align: left;
+            }
+          }
+        }
+      }
+      .disclaimer {
+        text-align: left;
+      }
+    }
+    .bridge-container {
+      width: 400px;
+      margin: auto;
+      .ant-list-item {
+        .ant-list-item-meta-description {
+          color: rgba(0, 0, 0, 0.85);
+        }
+        .ant-card-body {
+          padding: 16px;
+        }
+      }
+      .ant-spin.ant-spin-spinning {
+        left: 5px !important;
+      }
+    }
+  }
+}
+
+.bridge-config-modal {
+  .ant-btn:first-of-type {
+    width: 184px;
+    margin: 0 20px 0 0;
+  }
+  .ant-row:last-of-type {
+    margin: 0 !important;
+  }
+  .ant-modal-footer {
+    padding: 0;
+  }
+}

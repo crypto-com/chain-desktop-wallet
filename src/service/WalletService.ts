@@ -10,18 +10,16 @@ import {
   SettingsDataUpdate,
   Wallet,
 } from '../models/Wallet';
-import { StorageService } from '../storage/StorageService';
 import {
   APP_DB_NAMESPACE,
   DEFAULT_CLIENT_MEMO,
   DefaultWalletConfigs,
   NOT_KNOWN_YET_VALUE,
+  SECONDS_OF_YEAR,
   WalletConfig,
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
-import { TransactionSigner } from './signers/TransactionSigner';
-import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
 import { Session } from '../models/Session';
 import {
   DelegateTransactionUnsigned,
@@ -47,6 +45,7 @@ import {
   NftTransferModel,
   ProposalModel,
   ProposalStatuses,
+  RewardsBalances,
   RewardTransaction,
   RewardTransactionList,
   StakingTransactionData,
@@ -54,13 +53,15 @@ import {
   TransactionStatus,
   TransferTransactionData,
   TransferTransactionList,
+  UnbondingDelegationData,
+  UnbondingDelegationList,
   ValidatorModel,
 } from '../models/Transaction';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from './LedgerService';
-import { ISignerProvider } from './signers/SignerProvider';
 import {
+  BridgeTransferRequest,
   DelegationRequest,
   NFTDenomIssueRequest,
   NFTMintRequest,
@@ -77,15 +78,38 @@ import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { CronosClient } from './cronos/CronosClient';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
+import { BridgeService } from './bridge/BridgeService';
+import { StorageService } from '../storage/StorageService';
+import { TransactionPrepareService } from './TransactionPrepareService';
 
 class WalletService {
-  private readonly storageService: StorageService;
+  public readonly BROADCAST_TIMEOUT_CODE = -32603;
+
+  public readonly storageService: StorageService;
+
+  public readonly transactionPrepareService: TransactionPrepareService;
 
   constructor() {
     this.storageService = new StorageService(APP_DB_NAMESPACE);
+    this.transactionPrepareService = new TransactionPrepareService(this.storageService);
   }
 
-  public readonly BROADCAST_TIMEOUT_CODE = -32603;
+  public async sendBridgeTransaction(bridgeTransferRequest: BridgeTransferRequest) {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+
+    const bridgeService = new BridgeService(this.storageService);
+
+    const bridgeTransactionResult = await bridgeService.handleBridgeTransaction(
+      bridgeTransferRequest,
+    );
+
+    await Promise.all([
+      await this.fetchAndUpdateBalances(currentSession),
+      await this.fetchAndSaveTransfers(currentSession),
+    ]);
+
+    return bridgeTransactionResult;
+  }
 
   public async sendTransfer(transferRequest: TransferRequest): Promise<BroadCastResult> {
     // eslint-disable-next-line no-console
@@ -96,16 +120,11 @@ class WalletService {
 
     const currentSession = await this.storageService.retrieveCurrentSession();
     const fromAddress = currentSession.wallet.address;
+    const walletAddressIndex = currentSession.wallet.addressIndex;
 
     switch (currentAsset.assetType) {
       case UserAssetType.EVM:
         try {
-          if (currentAsset?.config?.isLedgerSupportDisabled) {
-            throw TypeError(
-              `${LEDGER_WALLET_TYPE} not supported yet for ${transferRequest.walletType} assets`,
-            );
-          }
-
           if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
             throw TypeError(`Missing asset config: ${currentAsset.config}`);
           }
@@ -132,33 +151,40 @@ class WalletService {
             value: web3.utils.toWei(transferRequest.amount, 'ether'),
           };
 
-          transfer.nonce = await cronosClient.getNextNonceByAddress(currentAsset.address);
-
-          const loadedGasPrice = web3.utils.toWei(
-            await cronosClient.getEstimatedGasPrice(),
-            'gwei',
+          const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
+            currentAsset,
+            txConfig,
           );
-          transfer.gasPrice = Number(loadedGasPrice);
 
-          transfer.gasLimit = Number(await cronosClient.estimateGas(txConfig));
+          transfer.nonce = prepareTxInfo.nonce;
+          transfer.gasPrice = prepareTxInfo.loadedGasPrice;
+          transfer.gasLimit = prepareTxInfo.gasLimit;
 
-          // eslint-disable-next-line no-console
-          console.log('EVM_TX', {
-            txNonce: transfer.nonce,
-            gasPrice: transfer.gasPrice,
-            gasLimit: transfer.gasLimit,
-          });
+          let signedTx = '';
+          if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+            const device = createLedgerDevice();
 
-          const signedTx = await evmTransactionSigner.signTransfer(
-            transfer,
-            transferRequest.decryptedPhrase,
-          );
+            const gasLimitTx = web3.utils.toBN(transfer.gasLimit!);
+            const gasPriceTx = web3.utils.toBN(transfer.gasPrice);
+
+            signedTx = await device.signEthTx(
+              walletAddressIndex,
+              Number(transfer.asset?.config?.chainId), // chainid
+              transfer.nonce,
+              web3.utils.toHex(gasLimitTx) /* gas limit */,
+              web3.utils.toHex(gasPriceTx) /* gas price */,
+              transfer.toAddress,
+              web3.utils.toHex(transfer.amount),
+              `0x${Buffer.from(transfer.memo).toString('hex')}`,
+            );
+          } else {
+            signedTx = await evmTransactionSigner.signTransfer(
+              transfer,
+              transferRequest.decryptedPhrase,
+            );
+          }
 
           const result = await cronosClient.broadcastRawTransactionHex(signedTx);
-
-          // eslint-disable-next-line no-console
-          console.log('BROADCAST_RESULT', result);
-
           return {
             transactionHash: result,
             message: '',
@@ -179,7 +205,7 @@ class WalletService {
           accountSequence,
           transactionSigner,
           ledgerTransactionSigner,
-        } = await this.prepareTransaction();
+        } = await this.transactionPrepareService.prepareTransaction();
 
         const transfer: TransferTransactionUnsigned = {
           fromAddress,
@@ -230,7 +256,7 @@ class WalletService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const delegationAmountScaled = getBaseScaledAmount(
       delegationRequest.amount,
@@ -283,7 +309,7 @@ class WalletService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const undelegationAmountScaled = getBaseScaledAmount(
       undelegationRequest.amount,
@@ -321,6 +347,7 @@ class WalletService {
     await Promise.all([
       await this.fetchAndUpdateBalances(currentSession),
       await this.fetchAndSaveDelegations(nodeRpc, currentSession),
+      await this.fetchAndSaveUnbondingDelegations(nodeRpc, currentSession),
     ]);
 
     return broadCastResult;
@@ -336,7 +363,7 @@ class WalletService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const redelegationAmountScaled = getBaseScaledAmount(
       redelegationRequest.amount,
@@ -386,7 +413,7 @@ class WalletService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const voteTransactionUnsigned: VoteTransactionUnsigned = {
       option: voteRequest.voteOption,
@@ -424,7 +451,7 @@ class WalletService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const memo = !nftTransferRequest.memo ? DEFAULT_CLIENT_MEMO : nftTransferRequest.memo;
 
@@ -472,7 +499,7 @@ class WalletService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const memo = !nftMintRequest.memo ? DEFAULT_CLIENT_MEMO : nftMintRequest.memo;
 
@@ -525,7 +552,7 @@ class WalletService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const memo = !nftDenomIssueRequest.memo ? DEFAULT_CLIENT_MEMO : nftDenomIssueRequest.memo;
 
@@ -591,7 +618,7 @@ class WalletService {
       currentSession,
       transactionSigner,
       ledgerTransactionSigner,
-    } = await this.prepareTransaction();
+    } = await this.transactionPrepareService.prepareTransaction();
 
     const withdrawStakingReward: WithdrawStakingRewardUnsigned = {
       delegatorAddress: currentSession.wallet.address,
@@ -621,37 +648,6 @@ class WalletService {
       await this.fetchAndUpdateBalances(currentSession),
     ]);
     return broadCastResult;
-  }
-
-  public async prepareTransaction() {
-    const currentSession = await this.storageService.retrieveCurrentSession();
-    const currentWallet = currentSession.wallet;
-
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-
-    const accountNumber = await nodeRpc.fetchAccountNumber(currentSession.wallet.address);
-    const accountSequence = await nodeRpc.loadSequenceNumber(currentSession.wallet.address);
-
-    const transactionSigner = new TransactionSigner(currentWallet.config);
-
-    const signerProvider: ISignerProvider = createLedgerDevice();
-
-    const tmpWalletConfig = currentWallet.config;
-
-    const ledgerTransactionSigner = new LedgerTransactionSigner(
-      // currentWallet.config,
-      tmpWalletConfig,
-      signerProvider,
-      currentWallet.addressIndex,
-    );
-    return {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    };
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -810,9 +806,18 @@ class WalletService {
                 asset.address || currentSession.wallet.address,
                 baseDenomination,
               );
+              asset.unbondingBalance = await nodeRpc.loadUnbondingBalance(
+                // Handling legacy wallets which had wallet.address
+                asset.address || currentSession.wallet.address,
+              );
+              asset.rewardsBalance = await nodeRpc.loadStakingRewardsBalance(
+                // Handling legacy wallets which had wallet.address
+                asset.address || currentSession.wallet.address,
+                baseDenomination,
+              );
               // eslint-disable-next-line no-console
               console.log(
-                `${asset.symbol}: Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance} - ${asset.address}`,
+                `${asset.symbol}: Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance} - Unbonding: ${asset.unbondingBalance} - Rewards: ${asset.rewardsBalance} - ${asset.address}`,
               );
             } catch (e) {
               // eslint-disable-next-line no-console
@@ -879,6 +884,7 @@ class WalletService {
 
     await Promise.all([
       this.fetchAndSaveDelegations(nodeRpc, currentSession),
+      this.fetchAndSaveUnbondingDelegations(nodeRpc, currentSession),
       this.fetchAndSaveRewards(nodeRpc, currentSession),
       this.fetchAndSaveTransfers(currentSession),
       this.fetchAndSaveValidators(currentSession),
@@ -902,7 +908,8 @@ class WalletService {
               const chainIndexAPI = ChainIndexingAPI.init(indexingUrl);
               const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
                 currentSession.wallet.config.network.coin.baseDenom,
-                currentSession.wallet.address,
+                currentAsset?.address || currentSession.wallet.address,
+                currentAsset,
               );
 
               await this.saveTransfers({
@@ -998,12 +1005,34 @@ class WalletService {
 
   public async fetchAndSaveRewards(nodeRpc: NodeRpcService, currentSession: Session) {
     try {
-      const rewards = await nodeRpc.fetchStakingRewards(
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+
+      const rewards = await nodeRpc.fetchStakingRewardsBalance(
         currentSession.wallet.address,
         currentSession.wallet.config.network.coin.baseDenom,
       );
+
+      const claimedRewardsBalance = await chainIndexAPI.getTotalRewardsClaimedByAddress(
+        // Handling legacy wallets which had wallet.address
+        currentSession.wallet.address,
+      );
+
+      const delegatedValidatorList = rewards.transactions.map(tx => {
+        return tx.validatorAddress;
+      });
+
+      const estimatedInfo = await chainIndexAPI.getFutureEstimatedRewardsByValidatorAddressList(
+        delegatedValidatorList,
+        SECONDS_OF_YEAR,
+        currentSession.wallet.address,
+      );
+
       await this.saveRewards({
-        transactions: rewards,
+        totalBalance: rewards.totalBalance,
+        transactions: rewards.transactions,
+        claimedRewardsBalance,
+        estimatedRewardsBalance: estimatedInfo.estimatedRewards,
+        estimatedApy: estimatedInfo.estimatedApy,
         walletId: currentSession.wallet.identifier,
       });
     } catch (e) {
@@ -1026,6 +1055,22 @@ class WalletService {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_DELEGATIONS', e);
+    }
+  }
+
+  public async fetchAndSaveUnbondingDelegations(nodeRpc: NodeRpcService, currentSession: Session) {
+    try {
+      const unbondingDelegations = await nodeRpc.fetchUnbondingDelegationBalance(
+        currentSession.wallet.address,
+      );
+      await this.saveUnbondingDelegationsList({
+        totalBalance: unbondingDelegations.totalBalance,
+        delegations: unbondingDelegations.unbondingDelegations,
+        walletId: currentSession.wallet.identifier,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_TO_LOAD_UNBONDING_DELEGATIONS', e);
     }
   }
 
@@ -1070,6 +1115,20 @@ class WalletService {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_SAVE_NFTS', e);
     }
+  }
+
+  public async retrieveWalletAssets(walletIdentifier: string): Promise<UserAsset[]> {
+    const assets = await this.storageService.retrieveAssetsByWallet(walletIdentifier);
+    const userAssets = assets
+      .filter(asset => asset.assetType !== UserAssetType.IBC)
+      .map(data => {
+        const asset: UserAsset = { ...data };
+        return asset;
+      });
+
+    // https://github.com/louischatriot/nedb/issues/185
+    // NeDB does not support distinct queries, it needs to be done programmatically
+    return _.uniqBy(userAssets, 'symbol');
   }
 
   public async retrieveCurrentWalletAssets(currentSession: Session): Promise<UserAsset[]> {
@@ -1182,15 +1241,6 @@ class WalletService {
 
   public async encryptWalletAndSetSession(key: string, walletOriginal: Wallet): Promise<void> {
     const wallet = JSON.parse(JSON.stringify(walletOriginal));
-    const addressprefix = wallet.config.network.addressPrefix;
-
-    // fetch first address , ledger identifier
-    if (wallet.walletType === LEDGER_WALLET_TYPE) {
-      const device: ISignerProvider = createLedgerDevice();
-      const address = await device.getAddress(wallet.addressIndex, addressprefix, false);
-      wallet.address = address;
-    }
-
     const initialVector = await cryptographer.generateIV();
     const encryptionResult = await cryptographer.encrypt(
       wallet.encryptedPhrase,
@@ -1215,6 +1265,10 @@ class WalletService {
 
   public async saveRewards(rewardTransactions: RewardTransactionList) {
     return this.storageService.saveRewardList(rewardTransactions);
+  }
+
+  public async saveUnbondingDelegationsList(unbondingDelegations: UnbondingDelegationList) {
+    return this.storageService.saveUnbondingDelegations(unbondingDelegations);
   }
 
   public async saveTransfers(rewardTransactions: TransferTransactionList) {
@@ -1246,6 +1300,43 @@ class WalletService {
     return rewardTransactionList.transactions.map(data => {
       const rewardTransaction: RewardTransaction = { ...data };
       return rewardTransaction;
+    });
+  }
+
+  public async retrieveRewardsBalances(walletId: string): Promise<RewardsBalances> {
+    const rewards: RewardTransactionList = await this.storageService.retrieveAllRewards(walletId);
+
+    if (!rewards) {
+      return {
+        claimedRewardsBalance: '0',
+        estimatedApy: '0',
+        estimatedRewardsBalance: '0',
+        totalBalance: '0',
+      };
+    }
+
+    return {
+      claimedRewardsBalance: rewards.claimedRewardsBalance!,
+      estimatedApy: rewards.estimatedApy!,
+      estimatedRewardsBalance: rewards.estimatedRewardsBalance!,
+      totalBalance: rewards.totalBalance,
+    };
+  }
+
+  public async retrieveAllUnbondingDelegations(
+    walletId: string,
+  ): Promise<UnbondingDelegationData[]> {
+    const unbondingDelegationList: UnbondingDelegationList = await this.storageService.retrieveAllUnbondingDelegations(
+      walletId,
+    );
+
+    if (!unbondingDelegationList) {
+      return [];
+    }
+
+    return unbondingDelegationList.delegations.map(data => {
+      const unbondingDelegation: UnbondingDelegationData = { ...data };
+      return unbondingDelegation;
     });
   }
 
@@ -1442,11 +1533,16 @@ class WalletService {
     return needAssetsCreation;
   }
 
-  public async handleCurrentWalletAssetsMigration(phrase: string, session?: Session) {
+  public async handleCurrentWalletAssetsMigration(
+    phrase: string,
+    session?: Session,
+    tendermintAddress?: string,
+    evmAddress?: string,
+  ) {
     // 1. Check if current wallet has all expected static assets
     // 2. If static assets are missing, remove all existing non dynamic assets
     // 3. Prompt user password and re-create static assets on the fly
-    // 3. Run sync all to synchronize all assets states
+    // 4. Run sync all to synchronize all assets states
 
     const currentSession = session || (await this.storageService.retrieveCurrentSession());
     const { wallet } = currentSession;
@@ -1456,6 +1552,23 @@ class WalletService {
 
       const walletOps = new WalletOps();
       const assetGeneration = walletOps.generate(wallet.config, wallet.identifier, phrase);
+
+      if (currentSession?.wallet.walletType === LEDGER_WALLET_TYPE) {
+        if (tendermintAddress !== '' && evmAddress !== '') {
+          const tendermintAsset = assetGeneration.initialAssets.filter(
+            asset => asset.assetType === UserAssetType.TENDERMINT,
+          )[0];
+          tendermintAsset.address = tendermintAddress;
+          const evmAsset = assetGeneration.initialAssets.filter(
+            asset => asset.assetType === UserAssetType.EVM,
+          )[0];
+          evmAsset.address = evmAddress;
+        } else {
+          // eslint-disable-next-line no-console
+          console.log('FAILED_TO_GET_LEDGER_ADDRESSES');
+          throw TypeError('Failed to get Ledger addresses.');
+        }
+      }
 
       await this.saveAssets(assetGeneration.initialAssets);
 

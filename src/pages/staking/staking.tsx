@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
-import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs, Typography } from 'antd';
-import { OrderedListOutlined } from '@ant-design/icons';
+import moment from 'moment';
+import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs, Typography, Tooltip } from 'antd';
+import { OrderedListOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
@@ -17,19 +18,29 @@ import {
   fetchingDBState,
   validatorListState,
 } from '../../recoil/atom';
-import { AssetMarketPrice, scaledAmount, scaledBalance, UserAsset } from '../../models/UserAsset';
+import {
+  AssetMarketPrice,
+  getAssetAmountInFiat,
+  getAssetBalancePrice,
+  getAssetStakingBalancePrice,
+  getAssetUnbondingBalancePrice,
+  getAssetRewardsBalancePrice,
+  scaledAmount,
+  scaledBalance,
+  scaledStakingBalance,
+  scaledUnbondingBalance,
+  scaledRewardBalance,
+  UserAsset,
+} from '../../models/UserAsset';
 import {
   BroadCastResult,
   RewardTransaction,
   ValidatorModel,
   StakingTransactionData,
+  UnbondingDelegationData,
 } from '../../models/Transaction';
+import { renderExplorerUrl } from '../../models/Explorer';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-import {
-  FIXED_DEFAULT_FEE,
-  CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
-  SUPPORTED_CURRENCY,
-} from '../../config/StaticConfig';
 import {
   adjustedTransactionAmount,
   fromScientificNotation,
@@ -54,8 +65,10 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { UndelegateFormComponent } from '../home/components/UndelegateFormComponent';
 import RedelegateFormComponent from '../home/components/RedelegateFormComponent';
 import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
+import { MODERATION_CONFIG_FILE_URL, UNBLOCKING_PERIOD_IN_DAYS, CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD, FIXED_DEFAULT_FEE, SUPPORTED_CURRENCY } from '../../config/StaticConfig';
+import { ModerationConfig } from '../../models/ModerationConfig';
 
-const { Header, Content, Footer } = Layout;
+const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
 const { TabPane } = Tabs;
 const layout = {
@@ -87,6 +100,15 @@ interface StakingTabularData {
   validatorAddress: string;
   delegatorAddress: string;
 }
+interface UnbondingDelegationTabularData {
+  key: string;
+  delegatorAddress: string;
+  validatorAddress: string;
+  unbondingAmount: string;
+  unbondingAmountWithSymbol: string;
+  remainingTime: string;
+  completionTime: string;
+}
 
 const FormDelegationRequest = () => {
   const [form] = Form.useForm();
@@ -98,6 +120,7 @@ const FormDelegationRequest = () => {
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
@@ -114,10 +137,12 @@ const FormDelegationRequest = () => {
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
   const [displayWarning, setDisplayWarning] = useState(true);
+  const [moderationConfig, setModerationConfig] = useState<ModerationConfig>();
 
   const analyticsService = new AnalyticsService(currentSession);
 
   const didMountRef = useRef(false);
+  const allMarketData = useRecoilValue(allMarketState);
 
   const [t] = useTranslation();
 
@@ -162,12 +187,24 @@ const FormDelegationRequest = () => {
       setWalletAsset(currentWalletAsset);
     };
 
+    const moderationConfigHandler = async () => {
+      try {
+        const fetchModerationConfigData = await fetch(MODERATION_CONFIG_FILE_URL);
+        const moderationConfigData = await fetchModerationConfigData.json();
+        setModerationConfig(moderationConfigData);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error occurred while fetching moderation config file', error);
+      }
+    }
+
     if (!didMountRef.current) {
       syncAssetData();
       didMountRef.current = true;
     }
 
     syncValidatorsData();
+    moderationConfigHandler();
   }, [fetchingDB, walletAsset, currentValidatorList]);
 
   const showConfirmationModal = () => {
@@ -302,9 +339,21 @@ const FormDelegationRequest = () => {
           data-original={record.validatorAddress}
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${record.validatorAddress}`}
+          href={`${renderExplorerUrl(currentSession.wallet.config, 'validator')}/${
+            record.validatorAddress
+          }`}
         >
           {ellipsis(validatorName, 24)}
+          {' '}
+          {
+            moderationConfig && moderationConfig?.config?.validators?.warning?.concat(moderationConfig?.config?.validators?.suspicious).includes(record.validatorAddress) ?
+              <Tooltip title={t('staking.validatorList.table.moderationText')}>
+                <span>
+                  <ExclamationCircleOutlined style={{ color: "red" }} />
+                </span>
+              </Tooltip> : ''
+          }
+
         </a>
       ),
     },
@@ -337,7 +386,10 @@ const FormDelegationRequest = () => {
           title={validatorAddress}
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${validatorAddress}`}
+          href={`${renderExplorerUrl(
+            currentSession.wallet.config,
+            'validator',
+          )}/${validatorAddress}`}
         >
           {middleEllipsis(validatorAddress, 10)}
         </a>
@@ -406,6 +458,10 @@ const FormDelegationRequest = () => {
   function onShowMemoChange() {
     setShowMemo(!showMemo);
   }
+
+  const assetMarketData = allMarketData[`${walletAsset.mainnetSymbol}-${currentSession.currency}`];
+  const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol;
+  const undelegatePeriod = currentSession.wallet.config.name === 'MAINNET' ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
 
   return (
     <Form
@@ -518,7 +574,12 @@ const FormDelegationRequest = () => {
         <div className="available">
           <span>{t('general.available')}: </span>
           <div className="available-amount">
-            {scaledBalance(walletAsset)} {walletAsset.symbol}
+            {scaledBalance(walletAsset)} {walletAsset?.symbol}{' '}
+            {walletAsset
+              ? `(${localFiatSymbol}${numeral(
+                  getAssetBalancePrice(walletAsset, assetMarketData),
+                ).format('0,0.00')})`
+              : ''}{' '}
           </div>
         </div>
       </div>
@@ -549,6 +610,7 @@ const FormDelegationRequest = () => {
             <Button
               key="submit"
               type="primary"
+              disabled={!isChecked}
               loading={confirmLoading}
               onClick={onConfirmDelegation}
             >
@@ -573,7 +635,14 @@ const FormDelegationRequest = () => {
             </div>
             <div className="item">
               <div className="label">{t('staking.modal1.label3')}</div>
-              <div>{`${formValues?.amount} ${walletAsset.symbol}`}</div>
+              <div>
+                {`${formValues?.amount} ${walletAsset?.symbol}`}{' '}
+                {walletAsset
+                  ? `(${localFiatSymbol}${numeral(
+                      getAssetAmountInFiat(formValues?.amount, assetMarketData),
+                    ).format('0,0.00')})`
+                  : ''}
+              </div>
             </div>
             {formValues?.memo !== undefined &&
             formValues?.memo !== null &&
@@ -585,6 +654,13 @@ const FormDelegationRequest = () => {
             ) : (
               <div />
             )}
+            <div className="item">
+              <Checkbox checked={isChecked} onChange={() => setIsChecked(!isChecked)}>
+                {t('general.undelegateFormComponent.checkbox1', {
+                  unbondingPeriod: undelegatePeriod,
+                })}
+              </Checkbox>
+            </div>
           </>
         </ModalPopup>
         <PasswordFormModal
@@ -674,6 +750,7 @@ const FormDelegationOperations = () => {
     validatorAddress: '',
     undelegateAmount: '',
   });
+  const [isUndelegateDisclaimerChecked, setIsUndelegateDisclaimerChecked] = useState(false);
   const [redelegateFormValues, setRedelegateFormValues] = useState({
     validatorOriginAddress: '',
     validatorDestinationAddress: '',
@@ -699,6 +776,7 @@ const FormDelegationOperations = () => {
       const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
         currentSession.wallet.identifier,
       );
+
       const stakingTabularData = currentWalletAsset
         ? convertDelegations(allDelegations, currentWalletAsset)
         : [];
@@ -873,7 +951,7 @@ const FormDelegationOperations = () => {
         <a
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+          href={`${renderExplorerUrl(currentSession.wallet.config, 'validator')}/${text}`}
         >
           {middleEllipsis(text, 8)}
         </a>
@@ -893,7 +971,7 @@ const FormDelegationOperations = () => {
           data-original={text}
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/account/${text}`}
+          href={`${renderExplorerUrl(currentSession.wallet.config, 'address')}/${text}`}
         >
           {middleEllipsis(text, 8)}
         </a>
@@ -957,6 +1035,10 @@ const FormDelegationOperations = () => {
               type="primary"
               loading={confirmLoading}
               onClick={onConfirmDelegationAction}
+              disabled={
+                delegationActionType === StakingActionType.UNDELEGATE &&
+                !isUndelegateDisclaimerChecked
+              }
             >
               {t('general.confirm')}
             </Button>,
@@ -970,6 +1052,8 @@ const FormDelegationOperations = () => {
             <UndelegateFormComponent
               currentSession={currentSession}
               undelegateFormValues={undelegateFormValues}
+              isChecked={isUndelegateDisclaimerChecked}
+              setIsChecked={setIsUndelegateDisclaimerChecked}
               form={form}
             />
           ) : (
@@ -1218,7 +1302,7 @@ const FormWithdrawStakingReward = () => {
         <a
           target="_blank"
           rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+          href={`${renderExplorerUrl(currentSession.wallet.config, 'validator')}/${text}`}
         >
           {text}
         </a>
@@ -1387,23 +1471,180 @@ const FormWithdrawStakingReward = () => {
 
 const StakingPage = () => {
   const currentSession = useRecoilValue(sessionState);
+  const userAsset = useRecoilValue(walletAssetState);
+  const fetchingDB = useRecoilValue(fetchingDBState);
+  const allMarketData = useRecoilValue(allMarketState);
+  const [marketData, setMarketData] = useState<AssetMarketPrice>();
+  const [isUnbondingDelegationModalVisible, setIsUnbondingDelegationModalVisible] = useState(false);
+  const [isUnbondingVisible, setIsUnbondingVisible] = useState(false);
+  const [unbondingDelegations, setUnbondingDelegations] = useState<
+    UnbondingDelegationTabularData[]
+  >([]);
   const analyticsService = new AnalyticsService(currentSession);
   const didMountRef = useRef(false);
 
-  const [t] = useTranslation();
+  const [t, i18n] = useTranslation();
+
+  const undelegatePeriod = currentSession.wallet.config.name === 'MAINNET' ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
+
+  const unbondingDelegationColumns = [
+    {
+      title: t('staking.modal3.table.validatorAddress'),
+      dataIndex: 'validatorAddress',
+      key: 'validatorAddress',
+      render: text => (
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+        >
+          {text}
+        </a>
+      ),
+    },
+    {
+      title: t('staking.modal3.table.unbondingAmount'),
+      dataIndex: 'unbondingAmount',
+      key: 'unbondingAmount',
+      render: text => {
+        return <>{text}</>;
+      },
+    },
+    {
+      title: t('staking.modal3.table.remainingTime'),
+      dataIndex: 'remainingTime',
+      key: 'remainingTime',
+      render: text => {
+        return <>{text}</>;
+      },
+    },
+    {
+      title: t('staking.modal3.table.completionTime'),
+      dataIndex: 'completionTime',
+      key: 'completionTime',
+      render: text => {
+        return <>{text}</>;
+      },
+    },
+  ];
+
+  const convertUnbondingDelegations = (
+    allUnbondingDelegations: UnbondingDelegationData[],
+    currentAsset: UserAsset,
+  ) => {
+    const currentLanguageLocale = i18n.language.replace(/([A-Z])/, '-$1').toLowerCase();
+
+    return allUnbondingDelegations.map(dlg => {
+      const unbondingAmount = getUIDynamicAmount(dlg.unbondingAmount, currentAsset);
+      const data: UnbondingDelegationTabularData = {
+        key: dlg.validatorAddress + dlg.unbondingAmount,
+        delegatorAddress: dlg.delegatorAddress,
+        validatorAddress: dlg.validatorAddress,
+        completionTime: new Date(dlg.completionTime).toString(),
+        unbondingAmount,
+        unbondingAmountWithSymbol: `${unbondingAmount} ${currentAsset.symbol}`,
+        remainingTime: moment(dlg.completionTime)
+          .locale(currentLanguageLocale)
+          .fromNow(true),
+      };
+      return data;
+    });
+    // .filter(dlg => Number(dlg.stakedAmount) > 0);
+  };
 
   useEffect(() => {
+    const syncUnbondingDelegationsData = async () => {
+      const allUnbonding = await walletService.retrieveAllUnbondingDelegations(
+        currentSession.wallet.identifier,
+      );
+
+      const unbondingDelegationTabularData = convertUnbondingDelegations(allUnbonding, userAsset);
+      setUnbondingDelegations(unbondingDelegationTabularData);
+
+      setIsUnbondingVisible(unbondingDelegationTabularData.length > 0);
+    };
+
+    syncUnbondingDelegationsData();
+
+    setMarketData(allMarketData[`${userAsset?.mainnetSymbol}-${currentSession.currency}`]);
+
     if (!didMountRef.current) {
       didMountRef.current = true;
       analyticsService.logPage('Staking');
     }
-  }, []);
+  }, [fetchingDB]);
 
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">{t('staking.title')}</Header>
 
       <Content>
+        <div className="site-layout-background balance-container">
+          {/* <div className="balance">
+            <div className="title">TOTAL ASSET BALANCE</div>
+            <div className="quantity">
+              $
+              {numeral(
+                new Big(getAssetStakingBalancePrice(userAsset, marketData))
+                  .add(new Big(getAssetBalancePrice(userAsset, marketData)))
+                  .toFixed(4),
+              ).format('0,0.00')}{' '}
+              USD
+            </div>
+          </div> */}
+          <div className="balance">
+            <div className="title">{t('staking.balance.title1')}</div>
+            {userAsset && (
+              <div className="quantity">
+                {numeral(scaledStakingBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
+              </div>
+            )}
+            <div className="fiat">
+              {userAsset && marketData && marketData.price
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetStakingBalancePrice(userAsset, marketData),
+                  ).format(`0,0.00`)} ${marketData?.currency}`
+                : ''}
+            </div>
+          </div>
+          {isUnbondingVisible ? (
+            <div className="balance">
+              <div className="title">{t('staking.balance.title2')}</div>
+              {userAsset && (
+                <div className="quantity">
+                  {numeral(scaledUnbondingBalance(userAsset)).format('0,0.0000')}{' '}
+                  {userAsset?.symbol}
+                </div>
+              )}
+              <div className="fiat">
+                {userAsset && marketData && marketData.price
+                  ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                      getAssetUnbondingBalancePrice(userAsset, marketData),
+                    ).format('0,0.00')} ${marketData?.currency}
+                `
+                  : ''}
+              </div>
+            </div>
+          ) : (
+            <></>
+          )}
+          <div className="balance">
+            <div className="title">{t('staking.balance.title3')}</div>
+            {userAsset && (
+              <div className="quantity">
+                {numeral(scaledRewardBalance(userAsset)).format('0,0.0000')} {userAsset?.symbol}
+              </div>
+            )}
+            <div className="fiat">
+              {userAsset && marketData && marketData.price
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetRewardsBalancePrice(userAsset, marketData),
+                  ).format('0,0.00')} ${marketData?.currency}
+                  `
+                : ''}
+            </div>
+          </div>
+        </div>
         <Tabs defaultActiveKey="1">
           <TabPane tab={t('staking.tab1')} key="1">
             <div className="site-layout-background stake-content">
@@ -1424,7 +1665,50 @@ const StakingPage = () => {
           <TabPane tab={t('staking.tab3')} key="3">
             <div className="site-layout-background stake-content">
               <div className="container">
-                <div className="description">{t('staking.description3')}</div>
+                <Layout>
+                  <Sider width="60%">
+                    <div className="description">{t('staking.description3')}</div>
+                  </Sider>
+                  {isUnbondingVisible ? (
+                    <Content>
+                      <div className="view-unstaking">
+                        <a
+                          onClick={() => {
+                            setIsUnbondingDelegationModalVisible(true);
+                          }}
+                        >
+                          {t('staking.modal3.button')}
+                        </a>
+                      </div>
+                      <ModalPopup
+                        isModalVisible={isUnbondingDelegationModalVisible}
+                        handleCancel={() => setIsUnbondingDelegationModalVisible(false)}
+                        handleOk={() => setIsUnbondingDelegationModalVisible(false)}
+                        className="unbonding-modal"
+                        footer={[]}
+                        okText="OK"
+                      >
+                        <>
+                          <div className="title">{t('staking.modal3.title')}</div>
+                          <div className="description">
+                            {t('staking.modal3.description', { unbondingPeriod: undelegatePeriod })}
+                          </div>
+                          <Table
+                            locale={{
+                              triggerDesc: t('general.table.triggerDesc'),
+                              triggerAsc: t('general.table.triggerAsc'),
+                              cancelSort: t('general.table.cancelSort'),
+                            }}
+                            columns={unbondingDelegationColumns}
+                            dataSource={unbondingDelegations}
+                          />
+                        </>
+                      </ModalPopup>
+                    </Content>
+                  ) : (
+                    <></>
+                  )}
+                </Layout>
                 <FormDelegationOperations />
               </div>
             </div>

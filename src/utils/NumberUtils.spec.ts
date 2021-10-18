@@ -24,6 +24,8 @@ describe('Testing Number utils', () => {
       symbol: 'BEST',
       walletId: '',
       stakedBalance: '0',
+      unbondingBalance: '0',
+      rewardsBalance: '0',
     };
 
     expect(getBaseScaledAmount('0.00000003', asset)).to.eq('3');
@@ -53,6 +55,8 @@ describe('Testing Number utils', () => {
       symbol: 'BEST',
       walletId: '',
       stakedBalance: '0',
+      unbondingBalance: '0',
+      rewardsBalance: '0',
     };
 
     expect(getUIDynamicAmount('499995000', asset)).to.eq('4.9999');
@@ -83,6 +87,8 @@ describe('Testing Number utils', () => {
       symbol: 'BEST',
       walletId: '',
       stakedBalance: '0',
+      unbondingBalance: '0',
+      rewardsBalance: '0',
     };
 
     const { networkFee } = DefaultWalletConfigs.TestNetConfig.fee;

@@ -26,6 +26,13 @@ export interface Delegation {
   shares: string;
 }
 
+export interface Undelegation {
+  balance: string;
+  completion_time: string;
+  creation_height: string;
+  initial_balance: string;
+}
+
 export interface Balance {
   denom: string;
   amount: string;
@@ -40,6 +47,12 @@ export interface DelegationResponse {
   balance: Balance;
 }
 
+export interface UnbondingDelegationResponse {
+  delegator_address: string;
+  validator_address: string;
+  entries: Undelegation[];
+}
+
 export interface Pagination {
   next_key: string | null;
   total: string;
@@ -47,6 +60,11 @@ export interface Pagination {
 
 export interface DelegationResult {
   delegation_responses: DelegationResponse[];
+  pagination: Pagination;
+}
+
+export interface UnbondingDelegationResult {
+  unbonding_responses: UnbondingDelegationResponse[];
   pagination: Pagination;
 }
 

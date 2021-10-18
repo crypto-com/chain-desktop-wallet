@@ -22,10 +22,16 @@ import {
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
+  UnbondingDelegationList,
   TransferTransactionList,
   ValidatorList,
 } from '../models/Transaction';
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../config/StaticConfig';
+import {
+  BridgeConfig,
+  BridgeNetworkConfigType,
+  BridgeTransferDirection,
+} from '../service/bridge/BridgeConfig';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -153,6 +159,10 @@ export class StorageService {
       previousWallet.config.network.defaultNodeUrl = dataUpdate.nodeUrl;
     }
 
+    if (dataUpdate.explorer) {
+      previousWallet.config.explorer = dataUpdate.explorer;
+    }
+
     if (dataUpdate.indexingUrl) {
       previousWallet.config.indexingUrl = dataUpdate.indexingUrl;
     }
@@ -184,6 +194,35 @@ export class StorageService {
       { $set: asset },
       { upsert: true },
     );
+  }
+
+  public async saveBridgeConfig(bridgeConfig: BridgeConfig) {
+    const configID = `${bridgeConfig.bridgeNetworkConfigType}_${bridgeConfig.bridgeDirectionType}`;
+    return this.db.bridgeConfigStore.update<BridgeConfig>(
+      { _id: configID },
+      { $set: bridgeConfig },
+      { upsert: true },
+    );
+  }
+
+  public async saveBridgeConfigsList(bridgeConfigList: BridgeConfig[]) {
+    return bridgeConfigList.map(async bridgeConfig => {
+      await this.saveBridgeConfig(bridgeConfig);
+    });
+  }
+
+  public async findBridgeConfigByNetworkAndBridgeTransactionType(
+    bridgeDirectionType: BridgeTransferDirection,
+    bridgeNetworkConfigType: BridgeNetworkConfigType,
+  ) {
+    return this.db.bridgeConfigStore.findOne<BridgeConfig>({
+      bridgeNetworkConfigType,
+      bridgeDirectionType,
+    });
+  }
+
+  public async fetchAllBridgeConfigs() {
+    return this.db.bridgeConfigStore.find<BridgeConfig>({});
   }
 
   public async fetchAssetByCreationType(creationType: AssetCreationType, walletId) {
@@ -284,12 +323,27 @@ export class StorageService {
     return this.db.rewardStore.insert(rewardTransactions);
   }
 
+  public async saveUnbondingDelegations(unbondingDelegations: UnbondingDelegationList) {
+    if (unbondingDelegations.delegations.length === 0) {
+      return Promise.resolve();
+    }
+    await this.db.unbondingDelegationStore.remove(
+      { walletId: unbondingDelegations.walletId },
+      { multi: true },
+    );
+    return this.db.unbondingDelegationStore.insert(unbondingDelegations);
+  }
+
   public async retrieveAllStakingTransactions(walletId: string) {
     return this.db.stakingStore.findOne<StakingTransactionList>({ walletId });
   }
 
   public async retrieveAllRewards(walletId: string) {
     return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
+  }
+
+  public async retrieveAllUnbondingDelegations(walletId: string) {
+    return this.db.unbondingDelegationStore.findOne<UnbondingDelegationList>({ walletId });
   }
 
   public async saveTransferTransactions(transferTransactionList: TransferTransactionList) {

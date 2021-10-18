@@ -1,11 +1,14 @@
-import {Bytes} from "@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes";
+import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 
 const { ipcMain } = require('electron');
 import { LedgerSignerNative } from './LedgerSignerNative';
+import { LedgerEthSigner } from './LedgerEthSigner';
 export class IpcMain {
   provider: LedgerSignerNative;
+  ethProvider: LedgerEthSigner;
   constructor() {
     this.provider = new LedgerSignerNative();
+    this.ethProvider = new LedgerEthSigner();
   }
   setup() {
     ipcMain.on('asynchronous-message', (event: any, arg: any) => {
@@ -61,6 +64,81 @@ export class IpcMain {
           error: e.toString(),
         };
         console.error('signMessage error ' + e);
+      }
+      event.returnValue = ret;
+    });
+    // arg: string
+    ipcMain.on('ethSignSendTx', async (event: any, arg: any) => {
+      let ret = {};
+      try {
+        const txhash = await this.ethProvider.signAndSendTx(
+          arg.url,
+          arg.index,
+          arg.chainId,
+          arg.gasLimit,
+          arg.gasPrice,
+          arg.to,
+          arg.value,
+          arg.data,
+        );
+        ret = {
+          txhash,
+          success: true,
+          label: 'ethSignSendTx reply',
+        };
+      } catch (e) {
+        ret = {
+          success: false,
+          error: e.toString(),
+        };
+        console.error('ethSignSendTx error ' + e);
+      }
+      event.returnValue = ret;
+    });
+
+    ipcMain.on('ethSignTx', async (event: any, arg: any) => {
+      let ret = {};
+      try {
+        const signedtx = await this.ethProvider.signTx(
+          arg.index,
+          arg.chainId,
+          arg.nonce,
+          arg.gasLimit,
+          arg.gasPrice,
+
+          arg.to,
+          arg.value,
+          arg.data,
+        );
+        ret = {
+          signedtx,
+          success: true,
+          label: 'ethSignTx reply',
+        };
+      } catch (e) {
+        ret = {
+          success: false,
+          error: e.toString(),
+        };
+        console.error('ethSignTx error ' + e);
+      }
+      event.returnValue = ret;
+    });
+    ipcMain.on('ethGetAddress', async (event: any, arg: any) => {
+      let ret = {};
+      try {
+        const address = await this.ethProvider.getAddress(arg.index, arg.display);
+        ret = {
+          address,
+          success: true,
+          label: 'ethGetAddress reply',
+        };
+      } catch (e) {
+        ret = {
+          success: false,
+          error: e.toString(),
+        };
+        console.error('ethGetAddress error ' + e);
       }
       event.returnValue = ret;
     });

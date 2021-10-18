@@ -1,13 +1,16 @@
 import { FormInstance } from 'antd/lib/form';
-import { Alert, Form, InputNumber } from 'antd';
+import { Form, InputNumber, Checkbox } from 'antd';
 import { useTranslation } from 'react-i18next';
 import React from 'react';
 import { Session } from '../../../models/Session';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
+import { UNBLOCKING_PERIOD_IN_DAYS } from '../../../config/StaticConfig';
 
 export const UndelegateFormComponent = (props: {
   currentSession: Session;
   undelegateFormValues: { validatorAddress: string; undelegateAmount: string };
+  isChecked: boolean;
+  setIsChecked;
   form: FormInstance;
 }) => {
   const [t] = useTranslation();
@@ -17,7 +20,7 @@ export const UndelegateFormComponent = (props: {
     t('general.undelegateFormComponent.maxValidator.error'),
   );
 
-  const undelegatePeriod = props.currentSession.wallet.config.name === 'MAINNET' ? '28' : '21';
+  const undelegatePeriod = props.currentSession.wallet.config.name === 'MAINNET' ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
 
   return (
     <>
@@ -64,16 +67,10 @@ export const UndelegateFormComponent = (props: {
           </Form.Item>
         </Form>
       </div>
-      <div>
-        <Alert
-          type="info"
-          message={`${t(
-            'general.undelegateFormComponent.alert1.message1',
-          )} (${undelegatePeriod} ${t('general.undelegateFormComponent.alert1.message2')}) ${t(
-            'general.undelegateFormComponent.alert1.message3',
-          )}`}
-          showIcon
-        />
+      <div className="item">
+        <Checkbox checked={props.isChecked} onChange={() => props.setIsChecked(!props.isChecked)}>
+          {t('general.undelegateFormComponent.checkbox1', { unbondingPeriod: undelegatePeriod })}
+        </Checkbox>
       </div>
     </>
   );

@@ -11,6 +11,7 @@ import './ReceiveDetail.less';
 import { Session } from '../../../models/Session';
 import { UserAsset, UserAssetType } from '../../../models/UserAsset';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../../service/LedgerService';
+import NoticeDisclaimer from '../../../components/NoticeDisclaimer/NoticeDisclaimer';
 
 interface ReceiveDetailProps {
   currentAsset: UserAsset | undefined;
@@ -22,6 +23,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
   const [isLedger, setIsLedger] = useState(false);
 
   const [t] = useTranslation();
+  const isEVM = currentAsset?.assetType === UserAssetType.EVM;
 
   useEffect(() => {
     const { walletType } = session.wallet;
@@ -34,7 +36,12 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
       const addressprefix = config.network.addressPrefix;
       if (LEDGER_WALLET_TYPE === walletType) {
         const device = createLedgerDevice();
-        await device.getAddress(addressIndex, addressprefix, true);
+
+        if (isEVM) {
+          await device.getEthAddress(addressIndex, true);
+        } else {
+          await device.getAddress(addressIndex, addressprefix, true);
+        }
       }
     } catch (e) {
       notification.error({
@@ -58,21 +65,11 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
     }, 100);
   };
 
-  // const assetIcon = asset => {
-  //   const { icon_url, symbol } = asset;
-
-  //   return icon_url ? (
-  //     <img src={icon_url} alt="cronos" className="asset-icon" />
-  //   ) : (
-  //     <Avatar>{symbol[0].toUpperCase()}</Avatar>
-  //   );
-  // };
-
   const assetAddress = (asset, _session) => {
     const { assetType, address } = asset;
-    // For IBC assets
     const { wallet } = _session;
 
+    // For Multi-Assets
     switch (assetType) {
       case UserAssetType.TENDERMINT:
         return address;
@@ -101,6 +98,12 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
           <CopyOutlined />
         </div>
       </CopyToClipboard>
+      <NoticeDisclaimer>
+        {t('receive.disclaimer', {
+          assetSymbol: currentAsset?.symbol,
+          assetName: currentAsset?.name,
+        })}
+      </NoticeDisclaimer>
       {isLedger && (
         <div className="ledger">
           <Button type="primary" onClick={clickCheckLedger}>

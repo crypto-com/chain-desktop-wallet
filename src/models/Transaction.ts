@@ -38,6 +38,13 @@ export interface StakingTransactionData extends TransactionData {
   stakedAmount: string;
 }
 
+export interface UnbondingDelegationData {
+  delegatorAddress: string;
+  validatorAddress: string;
+  unbondingAmount: string;
+  completionTime: string;
+}
+
 export interface NftTransactionData {
   transactionHash: string;
   data: {
@@ -67,6 +74,16 @@ export interface StakingTransactionList {
 
 export interface RewardTransactionList {
   transactions: Array<RewardTransaction>;
+  totalBalance: string;
+  claimedRewardsBalance?: string;
+  estimatedRewardsBalance?: string;
+  estimatedApy?: string;
+  walletId: string;
+}
+
+export interface UnbondingDelegationList {
+  delegations: Array<UnbondingDelegationData>;
+  totalBalance: string;
   walletId: string;
 }
 
@@ -106,6 +123,13 @@ export interface RewardTransaction {
   delegatorAddress: string;
   validatorAddress: string;
   amount: string;
+}
+
+export interface RewardsBalances {
+  claimedRewardsBalance: string;
+  estimatedApy: string;
+  estimatedRewardsBalance: string;
+  totalBalance: string;
 }
 
 export interface BroadCastResult {
@@ -156,6 +180,7 @@ export interface NftProcessedModel extends Omit<NftModel, 'tokenData'> {
 }
 
 export interface NftTransferModel extends NftTransactionResponse {}
+
 // export interface NFTAccountTransactionModel extends NFTAccountTransactionResponse {}
 
 export interface NftAccountTransactionList {

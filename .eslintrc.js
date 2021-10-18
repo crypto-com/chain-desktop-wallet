@@ -6,7 +6,7 @@ module.exports = {
   },
   plugins: ['react-hooks'],
   rules: {
-    '@typescript-eslint/object-curly-spacing':"off",
+    '@typescript-eslint/object-curly-spacing': 'off',
     'jsx-a11y/accessible-emoji': 'off',
     'no-new-wrappers': 'off',
     'no-extra-boolean-cast': 'off',
@@ -25,6 +25,7 @@ module.exports = {
     'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/*.spec.ts'] }],
     'react-hooks/rules-of-hooks': 'error',
     "import/no-unresolved": "off",
+    'no-return-await': 'off',
     'react-hooks/exhaustive-deps': [
       'off',
       {

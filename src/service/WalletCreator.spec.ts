@@ -62,6 +62,7 @@ describe('Testing Wallet Creation', () => {
 
   it('Test creating wallet from custom configurations ', () => {
     const customConfig: WalletConfig = {
+      explorer: {},
       explorerUrl: '',
       indexingUrl: '',
       enabled: false,

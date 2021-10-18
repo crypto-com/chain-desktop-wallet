@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useLayoutEffect, useState } from 'react';
 import {
   BrowserRouter,
   HashRouter as ElectronRouter,
@@ -6,6 +6,7 @@ import {
   Route,
   Redirect,
 } from 'react-router-dom';
+import axios from 'axios';
 import { isElectron } from '../utils/utils';
 
 import WelcomePage from './welcome/welcome';
@@ -18,9 +19,18 @@ import StakingPage from './staking/staking';
 import GovernancePage from './governance/governance';
 import NftPage from './nft/nft';
 import SettingsPage from './settings/settings';
+import BridgePage from './bridge/bridge';
 import SignUpPage from './signup/signup';
 import HomeLayout from '../layouts/home/home';
 import AssetsPage from './assets/assets';
+import BlockPage from './block/block';
+
+import {
+  CLOUDFLARE_TRACE_URI,
+  NOT_KNOWN_YET_VALUE,
+  COUNTRY_CODES_TO_BLOCK,
+  GEO_BLOCK_TIMEOUT,
+} from '../config/StaticConfig';
 
 interface RouterProps {
   children: React.ReactNode;
@@ -35,12 +45,40 @@ const Router: React.FC<RouterProps> = props => {
   );
 };
 
+const getCurrentGeoLocationCountryCode = async () => {
+  const geoLocationPlainText = await axios.get(CLOUDFLARE_TRACE_URI);
+  const geoLocationJSON = geoLocationPlainText.data
+    .trim()
+    .split('\n')
+    .reduce((obj, pair) => {
+      const [key, value] = pair.split('=');
+      obj[key] = value;
+      return obj;
+    }, {});
+
+  if (geoLocationJSON.hasOwnProperty('loc')) {
+    return geoLocationJSON.loc;
+  }
+  return NOT_KNOWN_YET_VALUE;
+};
+
 function RouteHub() {
+  const [isCountryBlocked, setIsCountryBlocked] = useState(true);
+  const [isBlockSloganVisible, setIsBlockSloganVisible] = useState(false);
+  const didMountRef = useRef(false);
+
   const routeIndex = {
     name: 'Welcome Page',
     key: 'welcome',
     path: '/',
     component: <WelcomePage />,
+  };
+
+  const blockPageRoute = {
+    name: 'Block Page',
+    key: 'block',
+    path: '/block',
+    component: <BlockPage />,
   };
 
   const routeItems = [
@@ -114,6 +152,12 @@ function RouteHub() {
       component: <NftPage />,
     },
     {
+      name: 'Bridge Page',
+      key: 'bridge',
+      path: '/bridge',
+      component: <BridgePage />,
+    },
+    {
       name: 'Settings Page',
       key: 'settings',
       path: '/settings',
@@ -127,7 +171,33 @@ function RouteHub() {
     },
   ];
 
-  return (
+  useLayoutEffect(() => {
+    const checkIsCountryBlocked = async () => {
+      const currentCountryCode = await getCurrentGeoLocationCountryCode();
+
+      // Todo: Fetch country codes dynamically
+      setTimeout(() => {
+        if (!COUNTRY_CODES_TO_BLOCK.includes(currentCountryCode)) {
+          setIsCountryBlocked(false);
+        }
+        setIsBlockSloganVisible(true);
+      }, GEO_BLOCK_TIMEOUT);
+    };
+
+    if (!didMountRef.current) {
+      checkIsCountryBlocked();
+      didMountRef.current = true;
+    }
+  }, [isCountryBlocked, setIsCountryBlocked]);
+
+  return isCountryBlocked ? (
+    <Router>
+      {React.cloneElement(blockPageRoute.component, {
+        isCountryBlocked,
+        isBlockSloganVisible,
+      })}
+    </Router>
+  ) : (
     <Router>
       <Switch>
         <Route exact path={routeIndex.path} key={routeIndex.key}>

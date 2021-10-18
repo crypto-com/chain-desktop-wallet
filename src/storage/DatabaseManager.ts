@@ -19,6 +19,8 @@ export class DatabaseManager {
 
   public readonly rewardStore: Datastore;
 
+  public readonly unbondingDelegationStore: Datastore;
+
   public readonly seedStore: Datastore;
 
   public readonly credentialStore: Datastore;
@@ -36,6 +38,8 @@ export class DatabaseManager {
   // This is for configuration that span across all wallets
   public readonly generalConfigStore: Datastore;
 
+  public readonly bridgeConfigStore: Datastore;
+
   constructor(namespace: string) {
     this.sessionStore = getStore(namespace, 'session');
     this.walletStore = getStore(namespace, 'wallets');
@@ -44,6 +48,7 @@ export class DatabaseManager {
     this.transferStore = getStore(namespace, 'transfers');
     this.stakingStore = getStore(namespace, 'staking');
     this.rewardStore = getStore(namespace, 'rewards');
+    this.unbondingDelegationStore = getStore(namespace, 'unbondingDelegations');
     this.credentialStore = getStore(namespace, 'credential');
     this.seedStore = getStore(namespace, 'seeds');
     this.validatorStore = getStore(namespace, 'validators');
@@ -52,5 +57,6 @@ export class DatabaseManager {
     this.generalConfigStore = getStore(namespace, 'generalConfigStore');
     this.nftTransferHistoryStore = getStore(namespace, 'nftTransferHistoryStore');
     this.nftAccountTxStore = getStore(namespace, 'nftAccountTxStore');
+    this.bridgeConfigStore = getStore(namespace, 'bridgeConfigStore');
   }
 }
