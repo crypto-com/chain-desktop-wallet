@@ -66,6 +66,7 @@ import { UndelegateFormComponent } from '../home/components/UndelegateFormCompon
 import RedelegateFormComponent from '../home/components/RedelegateFormComponent';
 import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
 import { MODERATION_CONFIG_FILE_URL, UNBLOCKING_PERIOD_IN_DAYS, CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD, FIXED_DEFAULT_FEE, SUPPORTED_CURRENCY } from '../../config/StaticConfig';
+import { ModerationConfig } from './models/staking';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
@@ -99,19 +100,6 @@ interface StakingTabularData {
   validatorAddress: string;
   delegatorAddress: string;
 }
-interface ModerationConfig {
-  config: Config;
-}
-
-interface Config {
-  validators: Validators;
-}
-
-interface Validators {
-  warning:    any[];
-  suspicious: string[];
-}
-
 interface UnbondingDelegationTabularData {
   key: string;
   delegatorAddress: string;
@@ -200,9 +188,14 @@ const FormDelegationRequest = () => {
     };
 
     const moderationConfigHandler = async () => {
-      const fetchModerationConfigData = await fetch(MODERATION_CONFIG_FILE_URL);
-      const moderationConfigData = await fetchModerationConfigData.json();
-      setModerationConfig(moderationConfigData);
+      try {
+        const fetchModerationConfigData = await fetch(MODERATION_CONFIG_FILE_URL);
+        const moderationConfigData = await fetchModerationConfigData.json();
+        setModerationConfig(moderationConfigData);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error occurred while fetching moderation config file', error);
+      }
     }
 
     if (!didMountRef.current) {
@@ -353,7 +346,7 @@ const FormDelegationRequest = () => {
           {ellipsis(validatorName, 24)}
           {' '}
           {
-            moderationConfig?.config?.validators?.warning?.concat(moderationConfig?.config?.validators?.suspicious).includes(record.validatorAddress) ?
+            moderationConfig && moderationConfig?.config?.validators?.warning?.concat(moderationConfig?.config?.validators?.suspicious).includes(record.validatorAddress) ?
               <Tooltip title={t('staking.validatorList.table.moderationText')}>
                 <span>
                   <ExclamationCircleOutlined style={{ color: "red" }} />
