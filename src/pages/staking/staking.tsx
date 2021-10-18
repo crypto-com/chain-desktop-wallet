@@ -66,7 +66,7 @@ import { UndelegateFormComponent } from '../home/components/UndelegateFormCompon
 import RedelegateFormComponent from '../home/components/RedelegateFormComponent';
 import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
 import { MODERATION_CONFIG_FILE_URL, UNBLOCKING_PERIOD_IN_DAYS, CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD, FIXED_DEFAULT_FEE, SUPPORTED_CURRENCY } from '../../config/StaticConfig';
-import { ModerationConfig } from './models/staking';
+import { ModerationConfig } from '../../models/ModerationConfig';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
