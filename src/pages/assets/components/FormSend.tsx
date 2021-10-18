@@ -326,10 +326,10 @@ const FormSend: React.FC<FormSendProps> = props => {
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label4')}</div>
-              <div>{`${getNormalScaleAmount(
-                currentSession.wallet.config.fee !== undefined &&
-                  currentSession.wallet.config.fee.networkFee !== undefined
-                  ? currentSession.wallet.config.fee.networkFee
+              <div>{`~${getNormalScaleAmount(
+                walletAsset?.config?.fee !== undefined &&
+                  walletAsset?.config?.fee.networkFee !== undefined
+                  ? walletAsset?.config?.fee.networkFee
                   : FIXED_DEFAULT_FEE,
                 walletAsset!,
               )} ${walletAsset?.symbol}`}</div>

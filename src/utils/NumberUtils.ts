@@ -89,5 +89,5 @@ export function adjustedTransactionAmount(
   if (amountAndFee.gt(availableBalance)) {
     return availableBalance.minus(fixedFee).toFixed();
   }
-  return formAmount;
+  return formAmount.toString();
 }

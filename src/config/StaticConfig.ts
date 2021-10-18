@@ -13,7 +13,21 @@ export const CLOUDFLARE_TRACE_URI = 'https://www.cloudflare.com/cdn-cgi/trace';
 // For instance :
 export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
 
-// Reference: Google Sheet : Foris Markets Table - 4 October 2021
+// Todo: Replace with github file path URL for `app.moderation.json`
+export const MODERATION_CONFIG_FILE_URL = NOT_KNOWN_YET_VALUE;
+
+export const UNBLOCKING_PERIOD_IN_DAYS = {
+  UNDELEGATION : {
+    MAINNET: '28',
+    OTHERS: '21'
+  },
+  REDELEGATION: {
+    MAINNET: '28',
+    OTHERS: '21'
+  }
+}
+
+// Reference: Google Sheet : Foris Markets Table - 4 October 2021 
 export const COUNTRY_CODES_TO_BLOCK = [
   // Afghanistan
   'AF',
@@ -85,6 +99,8 @@ export const COUNTRY_CODES_TO_BLOCK = [
   NOT_KNOWN_YET_VALUE,
 ];
 
+export const GEO_BLOCK_TIMEOUT = 3_000;
+
 export const NodePorts = {
   EVM: ':8545',
   Tendermint: ':26657',
@@ -153,6 +169,8 @@ SUPPORTED_BRIDGE.set('CRYPTO_ORG', {
   value: 'CRYPTO_ORG',
   label: 'Crypto.org Chain',
 });
+
+export const SUPPORTED_BRIDGES_ASSETS = ['CRO', 'CRONOS'];
 
 export type WalletConfig = {
   enabled: boolean;

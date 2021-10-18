@@ -47,17 +47,10 @@ class EvmTransactionSigner implements ITransactionSigner {
 
     const transferAsset = transaction.originAsset;
 
-    const computedGasLimit = transaction.gasLimit || transferAsset?.config?.fee?.gasLimit;
-    const minBridgeTxGasLimit = 200_000;
-    const maxBridgeTxGasLimit = 600_000;
-
     const txParams = {
       nonce: web3.utils.toHex(transaction.nonce || 0),
       gasPrice: web3.utils.toHex(transaction.gasPrice || transferAsset?.config?.fee?.networkFee!),
-      gasLimit: Math.min(
-        Math.max(Number(computedGasLimit), minBridgeTxGasLimit),
-        maxBridgeTxGasLimit,
-      ),
+      gasLimit: transaction.gasLimit,
       to: transaction.toAddress,
       value: web3.utils.toHex(transaction.amount),
       data: transaction.data,

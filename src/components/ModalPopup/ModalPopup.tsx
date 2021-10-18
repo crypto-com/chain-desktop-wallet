@@ -18,6 +18,7 @@ interface ModalPopupProps {
   okText?: string;
   closable?: boolean;
   width?: number;
+  forceRender?: boolean;
 }
 
 const ModalPopup: React.FC<ModalPopupProps> = props => {
@@ -36,6 +37,7 @@ const ModalPopup: React.FC<ModalPopupProps> = props => {
         style={props.style}
         className={props.className}
         width={props.width}
+        forceRender={props.forceRender}
       >
         {props.children}
       </Modal>

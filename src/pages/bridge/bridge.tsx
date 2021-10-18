@@ -5,7 +5,6 @@ import {
   Avatar,
   Button,
   Form,
-  // Input,
   InputNumber,
   Layout,
   Select,
@@ -14,17 +13,16 @@ import {
   Checkbox,
   List,
   Card,
-  // Spin,
   Skeleton,
-  // Tabs,
   Table,
   Typography,
   Tag,
+  Input,
+  message,
 } from 'antd';
 import Icon, {
   ArrowLeftOutlined,
   ArrowRightOutlined,
-  // LoadingOutlined,
   SettingOutlined,
   SwapOutlined,
 } from '@ant-design/icons';
@@ -32,40 +30,49 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
-import {
-  // marketState,
-  sessionState,
-  walletAllAssetsState,
-  // walletListState,
-} from '../../recoil/atom';
+import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
+import { sessionState, walletAllAssetsState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
-// import { Session } from '../../models/Session';
+
 import { UserAsset, scaledBalance, UserAssetType } from '../../models/UserAsset';
 import { BroadCastResult, TransactionDirection, TransactionStatus } from '../../models/Transaction';
-// eslint-disable-next-line
 import { renderExplorerUrl } from '../../models/Explorer';
 import { middleEllipsis } from '../../utils/utils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
-  // adjustedTransactionAmount,
+  adjustedTransactionAmount,
   fromScientificNotation,
-  // eslint-disable-next-line
   getBaseScaledAmount,
   getCurrentMinAssetAmount,
-  getNormalScaleAmount,
 } from '../../utils/NumberUtils';
-import { SUPPORTED_BRIDGE, SupportedBridge } from '../../config/StaticConfig';
-import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import {
+  SUPPORTED_BRIDGE,
+  SupportedBridge,
+  SUPPORTED_BRIDGES_ASSETS,
+} from '../../config/StaticConfig';
 import iconCronosSvg from '../../assets/icon-cronos-blue.svg';
 import iconCroSvg from '../../assets/icon-cro.svg';
 import IconHexagon from '../../svg/IconHexagon';
-import IconTransferHistory from '../../svg/IconTransferHistory';
+// import IconTransferHistory from '../../svg/IconTransferHistory';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
-import { BridgeTransferDirection } from '../../service/bridge/BridgeConfig';
+import {
+  BridgeTransferDirection,
+  BridgeNetworkConfigType,
+  DefaultTestnetBridgeConfigs,
+  DefaultMainnetBridgeConfigs,
+  BridgeConfig,
+} from '../../service/bridge/BridgeConfig';
+import { BridgeService } from '../../service/bridge/BridgeService';
+import {
+  AnalyticsActions,
+  AnalyticsCategory,
+  AnalyticsService,
+  AnalyticsTxType,
+} from '../../service/analytics/AnalyticsService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { secretStoreService } from '../../storage/SecretStoreService';
-import { BridgeService } from '../../service/bridge/BridgeService';
+import { BridgeTransferRequest } from '../../service/TransactionRequestModels';
 
 const { Content, Sider } = Layout;
 const { Option } = Select;
@@ -99,8 +106,6 @@ const bridgeIcon = (bridgeValue: string | undefined) => {
   return <img src={icon} alt={bridgeValue} className="asset-icon" />;
 };
 
-const cronosBridgeFee = '0';
-
 interface listDataSource {
   title: string;
   description: React.ReactNode;
@@ -111,7 +116,9 @@ const CronosBridgeForm = props => {
   const {
     form,
     formValues,
-    setFormValues,
+    bridgeConfigForm,
+    isBridgeValid,
+    setIsBridgeValid,
     assetIcon,
     currentAssetIdentifier,
     currentAsset,
@@ -119,67 +126,55 @@ const CronosBridgeForm = props => {
     toAsset,
     setToAsset,
     setCurrentAssetIdentifier,
-    // setCurrentStep,
     showPasswordInput,
     toAddress,
     setToAddress,
-    // bridgeTransferDirection,
     setBridgeTransferDirection,
-    // bridgeConfigs,
     setBridgeConfigs,
+    setBridgeConfigFields,
   } = props;
 
   const [session, setSession] = useRecoilState(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const [availableBalance, setAvailableBalance] = useState('--');
   const [sendingAmount, setSendingAmount] = useState('0');
-  const [assetFieldDisabled, setAssetFieldDisabled] = useState(true);
   const [supportedBridges, setSupportedBridges] = useState<SupportedBridge[]>([]);
+  const [bridgeSupportedAssets, setBridgeSupportedAssets] = useState<UserAsset[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isButtonLoading, setIsButtonLoading] = useState(false);
-  // const [updateLoading, setUpdateLoading] = useState(false);
   const didMountRef = useRef(false);
+
   const analyticsService = new AnalyticsService(session);
-
-  const SUPPORTED_BRIDGES_ASSETS = ['CRO', 'CRONOS'];
-
-  const bridgeSupportedAssets = walletAllAssets.filter(asset => {
-    return SUPPORTED_BRIDGES_ASSETS.includes(asset.mainnetSymbol.toUpperCase());
-  });
+  const bridgeService = new BridgeService(walletService.storageService);
+  const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
 
   const croAsset = walletAllAssets.find(asset => {
-    return asset.mainnetSymbol.toUpperCase() === 'CRO' && asset.symbol.toUpperCase() === 'TCRO';
+    return (
+      asset.mainnetSymbol.toUpperCase() === 'CRO' &&
+      asset.symbol.toUpperCase() === (isTestnet ? 'TCRO' : 'CRO') &&
+      asset.assetType === UserAssetType.TENDERMINT
+    );
   });
   const cronosAsset = walletAllAssets.find(asset => {
-    return asset.mainnetSymbol.toUpperCase() === 'CRO' && asset.symbol.toUpperCase() === 'CRONOS';
+    return (
+      asset.mainnetSymbol.toUpperCase() === 'CRO' &&
+      asset.symbol.toUpperCase() === 'CRONOS' &&
+      asset.assetType === UserAssetType.EVM
+    );
   });
 
   const { tendermintAddress, evmAddress } = formValues;
 
   const [t] = useTranslation();
 
-  useEffect(() => {
-    const initFieldValues = () => {
-      const bridges: SupportedBridge[] = [];
-      SUPPORTED_BRIDGE.forEach((item: SupportedBridge) => {
-        bridges.push(item);
-      });
-      setSupportedBridges(bridges);
-
-      const { bridgeFrom, bridgeTo, amount } = form.getFieldsValue();
-      if (bridgeFrom && bridgeTo && amount) {
-        setAvailableBalance(scaledBalance(currentAsset!));
-        setAssetFieldDisabled(false);
-        setSendingAmount(amount);
-      }
-    };
-
-    if (!didMountRef.current) {
-      didMountRef.current = true;
-      initFieldValues();
-      analyticsService.logPage('Bridge');
-    }
-  }, []);
+  const getBridgeSupportedAssetList = (assetType: UserAssetType) => {
+    return walletAllAssets.filter(asset => {
+      return (
+        SUPPORTED_BRIDGES_ASSETS.includes(asset.mainnetSymbol.toUpperCase()) &&
+        asset.assetType === assetType
+      );
+    });
+  };
 
   const onSwitchBridge = async () => {
     const { bridgeFrom, bridgeTo } = form.getFieldsValue();
@@ -194,6 +189,7 @@ const CronosBridgeForm = props => {
 
     switch (bridgeFrom) {
       case 'CRYPTO_ORG': {
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.TENDERMINT));
         setCurrentAsset(croAsset);
         setCurrentAssetIdentifier(croAsset?.identifier);
         setAvailableBalance(scaledBalance(croAsset!));
@@ -203,6 +199,7 @@ const CronosBridgeForm = props => {
         break;
       }
       case 'CRONOS': {
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.EVM));
         setCurrentAsset(cronosAsset);
         setCurrentAssetIdentifier(cronosAsset?.identifier);
         setAvailableBalance(scaledBalance(cronosAsset!));
@@ -239,6 +236,7 @@ const CronosBridgeForm = props => {
 
     switch (newBridgeFrom) {
       case 'CRYPTO_ORG': {
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.TENDERMINT));
         setCurrentAsset(croAsset);
         setCurrentAssetIdentifier(croAsset?.identifier);
         setAvailableBalance(scaledBalance(croAsset!));
@@ -248,6 +246,7 @@ const CronosBridgeForm = props => {
         break;
       }
       case 'CRONOS': {
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.EVM));
         setCurrentAsset(cronosAsset);
         setCurrentAssetIdentifier(cronosAsset?.identifier);
         setAvailableBalance(scaledBalance(cronosAsset!));
@@ -278,20 +277,8 @@ const CronosBridgeForm = props => {
     form.setFieldsValue({
       bridgeFrom: newBridgeFrom,
       bridgeTo: newBridgeTo,
-      // asset: undefined,
-      // amount: undefined,
     });
-    form.submit();
-
-    // setCurrentAsset(undefined);
-    // setCurrentAssetIdentifier(undefined);
-    // setAvailableBalance('--');
-    // form.setFieldsValue({
-    //   bridgeFrom: bridgeTo,
-    //   bridgeTo: bridgeFrom,
-    //   asset: undefined,
-    //   amount: undefined,
-    // });
+    form.validateFields();
   };
 
   const onSwitchAsset = value => {
@@ -323,15 +310,39 @@ const CronosBridgeForm = props => {
     }`,
   );
 
-  const onFinish = values => {
-    setFormValues({
-      ...formValues,
-      bridgeFrom: values.bridgeFrom,
-      bridgeTo: values.bridgeTo,
-      amount: values.amount,
-    });
-    showPasswordInput();
-  };
+  useEffect(() => {
+    const initFieldValues = () => {
+      const bridges: SupportedBridge[] = [];
+      SUPPORTED_BRIDGE.forEach((item: SupportedBridge) => {
+        bridges.push(item);
+      });
+      setSupportedBridges(bridges);
+
+      const { bridgeFrom, bridgeTo, amount } = form.getFieldsValue();
+      if (bridgeFrom && bridgeTo && amount) {
+        setAvailableBalance(scaledBalance(currentAsset!));
+        setIsBridgeValid(true);
+        setSendingAmount(amount);
+        switch (bridgeFrom) {
+          case 'CRYPTO_ORG': {
+            setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.TENDERMINT));
+            break;
+          }
+          case 'CRONOS': {
+            setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.EVM));
+            break;
+          }
+          default:
+        }
+      }
+    };
+
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      initFieldValues();
+      analyticsService.logPage('Bridge');
+    }
+  }, []);
 
   return (
     <Form
@@ -340,18 +351,18 @@ const CronosBridgeForm = props => {
       form={form}
       name="control-hooks"
       requiredMark="optional"
-      onFinish={value => {
-        onFinish(value);
+      onFinish={() => {
+        showPasswordInput();
       }}
     >
       <div className="row-bridge ant-double-height">
         <Form.Item
           name="bridgeFrom"
-          label="From"
+          label={t('bridge.form.from')}
           rules={[
             {
               required: true,
-              message: `From ${t('general.required')}`,
+              message: `${t('bridge.form.from')} ${t('general.required')}`,
             },
           ]}
           style={{ textAlign: 'left' }}
@@ -363,7 +374,7 @@ const CronosBridgeForm = props => {
               form.setFieldsValue({
                 bridgeTo: undefined,
               });
-              setAssetFieldDisabled(true);
+              setIsBridgeValid(false);
             }}
           >
             {supportedBridges.map(bridge => {
@@ -382,60 +393,61 @@ const CronosBridgeForm = props => {
         />
         <Form.Item
           name="bridgeTo"
-          label="To"
+          label={t('bridge.form.to')}
           validateFirst
           rules={[
             {
               required: true,
-              message: `To ${t('general.required')}`,
+              message: `${t('bridge.form.to')} ${t('general.required')}`,
             },
             {
               validator: (_, value) => {
                 if (form.getFieldValue('bridgeFrom') === value) {
-                  setAssetFieldDisabled(true);
-                  return Promise.reject(new Error('The two bridges cannot be the same'));
+                  setIsBridgeValid(false);
+                  return Promise.reject(new Error(t('bridge.form.errorSameChain')));
                 }
-                setAssetFieldDisabled(false);
+                setIsBridgeValid(true);
                 return Promise.resolve();
               },
             },
             {
               validator: async () => {
                 const { bridgeFrom, bridgeTo } = form.getFieldValue();
-                const bridgeService = new BridgeService(walletService.storageService);
 
                 switch (`${bridgeFrom}_TO_${bridgeTo}`) {
                   case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS: {
                     setBridgeTransferDirection(BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS);
-                    setAssetFieldDisabled(false);
+                    setIsBridgeValid(true);
 
                     const config = await bridgeService.retrieveBridgeConfig(
                       BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS,
                     );
                     setBridgeConfigs(config);
+                    bridgeConfigForm.setFieldsValue(config);
+                    setBridgeConfigFields(Object.keys(config));
                     return Promise.resolve();
                   }
                   case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG: {
                     setBridgeTransferDirection(BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG);
-                    setAssetFieldDisabled(false);
+                    setIsBridgeValid(true);
 
                     const config = await bridgeService.retrieveBridgeConfig(
                       BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG,
                     );
                     setBridgeConfigs(config);
+                    bridgeConfigForm.setFieldsValue(config);
+                    setBridgeConfigFields(Object.keys(config));
                     return Promise.resolve();
                   }
                   default: {
                     setBridgeTransferDirection(BridgeTransferDirection.NOT_SUPPORT);
-                    setAssetFieldDisabled(true);
+                    setIsBridgeValid(false);
 
                     const config = await bridgeService.retrieveBridgeConfig(
                       BridgeTransferDirection.NOT_SUPPORT,
                     );
                     setBridgeConfigs(config);
-                    return Promise.reject(
-                      new Error('The selected bridge transfer is not supported'),
-                    );
+                    return Promise.reject(new Error(t('bridge.form.errorBridgeNotSupported')));
                   }
                 }
               },
@@ -470,8 +482,8 @@ const CronosBridgeForm = props => {
             style={{ width: '300px', textAlign: 'left' }}
             onChange={onSwitchAsset}
             value={currentAssetIdentifier}
-            placeholder="Asset"
-            disabled={assetFieldDisabled}
+            placeholder={t('assets.title')}
+            disabled={!isBridgeValid}
           >
             {bridgeSupportedAssets.map(asset => {
               return (
@@ -489,7 +501,7 @@ const CronosBridgeForm = props => {
           rules={[
             {
               required: true,
-              message: `Amount ${t('general.required')}`,
+              message: `${t('bridge.form.amount')} ${t('general.required')}`,
             },
             {
               pattern: /[^0]+/,
@@ -501,8 +513,8 @@ const CronosBridgeForm = props => {
           ]}
         >
           <InputNumber
-            placeholder="Amount"
-            disabled={assetFieldDisabled}
+            placeholder={t('bridge.form.amount')}
+            disabled={!isBridgeValid}
             onChange={value => setSendingAmount(value ? value.toString() : '0')}
           />
         </Form.Item>
@@ -519,22 +531,13 @@ const CronosBridgeForm = props => {
       {currentAsset && new Big(sendingAmount).gt(0) ? (
         <div className="review-container">
           <div className="flex-row">
-            <div>Fee: </div>
+            <div>{t('bridge.form.willReceive')}</div>
             <div>
-              {getNormalScaleAmount(cronosBridgeFee, currentAsset!)} {currentAsset?.symbol}
+              {new Big(sendingAmount).toFixed(4)} {toAsset?.symbol}
             </div>
           </div>
           <div className="flex-row">
-            <div>You will receieve: </div>
-            <div>
-              {new Big(sendingAmount)
-                .sub(getNormalScaleAmount(cronosBridgeFee, toAsset!))
-                .toFixed(4)}{' '}
-              {toAsset?.symbol}
-            </div>
-          </div>
-          <div className="flex-row">
-            <div>To Address: </div>
+            <div>{t('bridge.form.toAddress')}</div>
             <div className="asset-icon">
               {bridgeIcon(form.getFieldValue('bridgeTo'))}
               {middleEllipsis(toAddress, 6)}
@@ -547,7 +550,7 @@ const CronosBridgeForm = props => {
 
       <Form.Item {...tailLayout} className="button">
         <Button type="primary" htmlType="submit" loading={isButtonLoading}>
-          Transfer Asset
+          {t('bridge.form.transfer')}
         </Button>
       </Form.Item>
     </Form>
@@ -565,6 +568,9 @@ const CronosBridge = () => {
     tendermintAddress: '',
     evmAddress: '',
   });
+  const [bridgeConfigForm] = Form.useForm();
+  const [isBridgeValid, setIsBridgeValid] = useState(false);
+
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
   const [toAsset, setToAsset] = useState<UserAsset | undefined>();
@@ -575,31 +581,49 @@ const CronosBridge = () => {
   const [bridgeTransferDirection, setBridgeTransferDirection] = useState<BridgeTransferDirection>(
     BridgeTransferDirection.NOT_SUPPORT,
   );
-  // eslint-disable-next-line
+  const [bridgeTransferRequest, setBridgeTransferRequest] = useState<BridgeTransferRequest>({
+    bridgeTransferDirection: BridgeTransferDirection.NOT_SUPPORT,
+    tendermintAddress: '',
+    evmAddress: '',
+    originAsset: currentAsset!,
+    amount: '0',
+    decryptedPhrase: '',
+    walletType: 'normal', // normal, ledger
+  });
   const [bridgeConfirmationList, setBridgeConfirmationList] = useState<listDataSource[]>([]);
+  const [bridgeTransferError, setBridgeTransferError] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [isBridgeSettingsFormVisible, setIsBridgeSettingsFormVisible] = useState(false);
   // eslint-disable-next-line
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
-  const [bridgeConfigs, setBridgeConfigs] = useState({
-    prefix: '',
-    cronosBridgeContractAddress: '',
-    bridgeChannel: '',
-    bridgePort: '',
-  });
+  const [bridgeConfigs, setBridgeConfigs] = useState<BridgeConfig>();
+  const [bridgeConfigFields, setBridgeConfigFields] = useState<string[]>([]);
+  const [bridgeFee, setBridgeFee] = useState('0');
+
+  const analyticsService = new AnalyticsService(session);
 
   const [t] = useTranslation();
+
+  const bridgeService = new BridgeService(walletService.storageService);
+  const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
+  const defaultConfig = isTestnet ? DefaultTestnetBridgeConfigs : DefaultMainnetBridgeConfigs;
+
+  const customEvmAddressValidator = TransactionUtils.addressValidator(
+    session,
+    currentAsset!,
+    AddressType.USER,
+  );
 
   const stepDetail = [
     {
       step: 0,
-      title: 'Cronos Bridge',
-      description: 'The safe, fast and most secure way to transfer assets to and from Cronos.',
+      title: t('bridge.step0.title'),
+      description: t('bridge.step0.description'),
     },
-    { step: 1, title: 'Confirmation', description: '' },
-    { step: 2, title: 'Bridge Transaction', description: '' },
+    { step: 1, title: t('bridge.step1.title'), description: '' },
+    { step: 2, title: t('bridge.step2.title'), description: '' },
   ];
 
   const assetIcon = asset => {
@@ -613,17 +637,77 @@ const CronosBridge = () => {
   };
 
   const onWalletDecryptFinish = async (password: string) => {
+    const { amount, tendermintAddress, evmAddress } = formValues;
+
+    setFormValues({
+      ...formValues,
+      ...form.getFieldsValue(),
+    });
+
     const phraseDecrypted = await secretStoreService.decryptPhrase(
       password,
       session.wallet.identifier,
     );
+
+    let transferRequest = {
+      bridgeTransferDirection,
+      tendermintAddress,
+      evmAddress,
+      amount: amount.toString(),
+      originAsset: currentAsset!,
+      decryptedPhrase: phraseDecrypted,
+      walletType: session.wallet.walletType, // normal, ledger
+    };
+    const fee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
+
+    transferRequest = {
+      ...transferRequest,
+      amount: adjustedTransactionAmount(
+        amount,
+        currentAsset!,
+        getBaseScaledAmount(fee, currentAsset!),
+      ),
+    };
+
     setDecryptedPhrase(phraseDecrypted);
     setInputPasswordVisible(false);
+    setBridgeFee(fee);
+    setBridgeTransferRequest(transferRequest);
     setCurrentStep(1);
   };
 
-  const showPasswordInput = () => {
+  const showPasswordInput = async () => {
+    setFormValues({
+      ...formValues,
+      ...form.getFieldsValue(),
+    });
+
     if (decryptedPhrase || session.wallet.walletType === LEDGER_WALLET_TYPE) {
+      const { tendermintAddress, evmAddress } = formValues;
+      const amount = form.getFieldValue('amount');
+
+      let transferRequest = {
+        bridgeTransferDirection,
+        tendermintAddress,
+        evmAddress,
+        amount: amount.toString(),
+        originAsset: currentAsset!,
+        decryptedPhrase,
+        walletType: session.wallet.walletType, // normal, ledger
+      };
+      const fee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
+
+      transferRequest = {
+        ...transferRequest,
+        amount: adjustedTransactionAmount(
+          amount,
+          currentAsset!,
+          getBaseScaledAmount(fee, currentAsset!),
+        ),
+      };
+
+      setBridgeFee(fee);
+      setBridgeTransferRequest(transferRequest);
       setCurrentStep(1);
     } else {
       setInputPasswordVisible(true);
@@ -631,18 +715,51 @@ const CronosBridge = () => {
   };
 
   const onConfirmation = async () => {
-    const { bridgeFrom, bridgeTo, amount, tendermintAddress, evmAddress } = formValues;
+    const { bridgeFrom, bridgeTo, amount } = formValues;
 
     const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
     const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
 
+    let app = 'Crypto.org App';
+
+    switch (bridgeFromObj?.value) {
+      case 'CRYPTO_ORG':
+        app = 'Crypto.org App';
+        break;
+      case 'CRONOS':
+        app = 'Ethereum App';
+        break;
+      default:
+    }
+
     const listDataSource = [
       {
-        title: `${amount} ${currentAsset?.symbol} is pending to transfer`,
+        title: t('bridge.pendingTransfer.title', {
+          amount: adjustedTransactionAmount(
+            amount,
+            currentAsset!,
+            getBaseScaledAmount(bridgeFee, currentAsset!),
+          ),
+          symbol: currentAsset?.symbol,
+        }),
         description: (
-          <span>
-            From {bridgeFromObj?.label} to {bridgeToObj?.label}
-          </span>
+          <>
+            <div>
+              <span>
+                {t('bridge.form.from')} {bridgeFromObj?.label} {t('bridge.form.to')}{' '}
+                {bridgeToObj?.label}
+              </span>
+            </div>
+            {session.wallet.walletType === LEDGER_WALLET_TYPE ? (
+              <div>
+                {t('bridge.pendingTransfer.ledger.description', {
+                  app,
+                })}
+              </div>
+            ) : (
+              <></>
+            )}
+          </>
         ),
         loading: false,
       },
@@ -658,29 +775,27 @@ const CronosBridge = () => {
     try {
       setCurrentStep(2);
 
-      const sendResult = await walletService.sendBridgeTransaction({
-        bridgeTransferDirection,
-        tendermintAddress: tendermintAddress.toLowerCase(),
-        evmAddress: evmAddress.toLowerCase(),
-        amount: amount.toString(),
-        originAsset: currentAsset!,
-        decryptedPhrase,
-        walletType: 'normal', // normal, ledger
-      });
+      const sendResult = await walletService.sendBridgeTransaction(bridgeTransferRequest);
       setBroadcastResult(sendResult);
       listDataSource.push({
-        title: `Deposit of ${amount} ${currentAsset?.symbol} is completed`,
+        title: t('bridge.deposit.complete.title', {
+          amount: adjustedTransactionAmount(
+            amount,
+            currentAsset!,
+            getBaseScaledAmount(bridgeFee, currentAsset!),
+          ),
+          symbol: currentAsset?.symbol,
+        }),
         description: (
           <>
-            Transaction ID:{' '}
+            {t('bridge.deposit.transactionID')}
             <a
               data-original={sendResult.transactionHash}
               target="_blank"
               rel="noreferrer"
-              href={`${renderExplorerUrl(
-                session.activeAsset?.config ?? session.wallet.config,
-                'tx',
-              )}/${sendResult.transactionHash}`}
+              href={`${renderExplorerUrl(currentAsset?.config ?? session.wallet.config, 'tx')}/${
+                sendResult.transactionHash
+              }`}
             >
               {middleEllipsis(sendResult.transactionHash!, 6)}
             </a>
@@ -688,25 +803,56 @@ const CronosBridge = () => {
         ),
         loading: false,
       });
-      setBridgeConfirmationList(listDataSource);
-    } catch (e) {
       listDataSource.push({
-        title: `Deposit of ${amount} ${currentAsset?.symbol} is failed`,
-        description: <>Failed in Bridge Transfer</>,
+        title: t('bridge.transferInitiated.title'),
+        description: <>{t('bridge.transferInitiated.description')}</>,
         loading: false,
       });
       setBridgeConfirmationList(listDataSource);
+
+      analyticsService.logTransactionEvent(
+        sendResult.transactionHash as string,
+        adjustedTransactionAmount(
+          formValues.amount,
+          currentAsset!,
+          getBaseScaledAmount(bridgeFee, currentAsset!),
+        ),
+        AnalyticsTxType.BridgeTransaction,
+        AnalyticsActions.BridgeTransfer,
+        AnalyticsCategory.Bridge,
+      );
+    } catch (e) {
+      if (session.wallet.walletType === LEDGER_WALLET_TYPE) {
+        listDataSource.push({
+          title: t('bridge.ledgerSign.failed.title', {
+            amount: adjustedTransactionAmount(
+              amount,
+              currentAsset!,
+              getBaseScaledAmount(bridgeFee, currentAsset!),
+            ),
+            symbol: currentAsset?.symbol,
+          }),
+          description: <></>,
+          loading: false,
+        });
+      }
+      listDataSource.push({
+        title: t('bridge.deposit.failed.title', {
+          amount: adjustedTransactionAmount(
+            amount,
+            currentAsset!,
+            getBaseScaledAmount(bridgeFee, currentAsset!),
+          ),
+          symbol: currentAsset?.symbol,
+        }),
+        description: <>{t('bridge.deposit.failed.description')}</>,
+        loading: false,
+      });
+      setBridgeConfirmationList(listDataSource);
+      setBridgeTransferError(true);
       // eslint-disable-next-line no-console
       console.log('Failed in Bridge Transfer', e);
     }
-
-    // analyticsService.logTransactionEvent(
-    //   sendResult.transactionHash as string,
-    //   formValues.amount,
-    //   AnalyticsTxType.TransferTransaction,
-    //   AnalyticsActions.FundsTransfer,
-    //   AnalyticsCategory.Transfer,
-    // );
   };
 
   const renderStepContent = (step: number) => {
@@ -723,6 +869,9 @@ const CronosBridge = () => {
               form={form}
               formValues={formValues}
               setFormValues={setFormValues}
+              bridgeConfigForm={bridgeConfigForm}
+              isBridgeValid={isBridgeValid}
+              setIsBridgeValid={setIsBridgeValid}
               assetIcon={assetIcon}
               currentAsset={currentAsset}
               setCurrentAsset={setCurrentAsset}
@@ -738,6 +887,8 @@ const CronosBridge = () => {
               setBridgeTransferDirection={setBridgeTransferDirection}
               bridgeConfigs={bridgeConfigs}
               setBridgeConfigs={setBridgeConfigs}
+              bridgeConfigFields={bridgeConfigFields}
+              setBridgeConfigFields={setBridgeConfigFields}
             />
             <PasswordFormModal
               description={t('general.passwordFormModal.description')}
@@ -767,7 +918,7 @@ const CronosBridge = () => {
             <div className="item">
               <div className="detail">
                 <div className="block">
-                  <div>Sending</div>
+                  <div>{t('nft.modal3.label1')}</div>
                   <div className="title">
                     {amount} {currentAsset?.symbol}
                   </div>
@@ -779,7 +930,7 @@ const CronosBridge = () => {
                       {bridgeIcon(bridgeFromObj?.value)}
                     </Sider>
                     <Content>
-                      <div>From</div>
+                      <div>{t('bridge.form.from')}</div>
                       <div style={{ fontWeight: 'bold' }}>{bridgeFromObj?.label}</div>
                     </Content>
                   </Layout>
@@ -789,7 +940,7 @@ const CronosBridge = () => {
                       {bridgeIcon(bridgeToObj?.value)}
                     </Sider>
                     <Content>
-                      <div>To</div>
+                      <div>{t('bridge.form.to')}</div>
                       <div style={{ fontWeight: 'bold' }}>{bridgeToObj?.label}</div>
                     </Content>
                   </Layout>
@@ -797,13 +948,13 @@ const CronosBridge = () => {
                 <Divider />
                 <div className="block">
                   <div className="flex-row">
-                    <div>Fee: </div>
+                    <div>{t('bridge.form.fee')}</div>
                     <div>
-                      {getNormalScaleAmount(cronosBridgeFee, currentAsset!)} {currentAsset?.symbol}
+                      ~{bridgeFee} {currentAsset?.symbol}
                     </div>
                   </div>
                   <div className="flex-row">
-                    <div>Destination: </div>
+                    <div>{t('bridge.form.destination')}</div>
                     <div className="asset-icon">
                       {bridgeIcon(form.getFieldValue('bridgeTo'))}
                       {middleEllipsis(toAddress, 6)}
@@ -812,12 +963,14 @@ const CronosBridge = () => {
                 </div>
                 <Divider />
                 <div className="block">
-                  <div>Receiving</div>
+                  <div>{t('bridge.form.receiving')}</div>
                   <div className="title">
                     ~
-                    {new Big(amount)
-                      .sub(getNormalScaleAmount(cronosBridgeFee, toAsset!))
-                      .toFixed(4)}{' '}
+                    {adjustedTransactionAmount(
+                      amount,
+                      currentAsset!,
+                      getBaseScaledAmount(bridgeFee, currentAsset!),
+                    )}{' '}
                     {toAsset?.symbol}
                   </div>
                 </div>
@@ -831,19 +984,17 @@ const CronosBridge = () => {
                 }}
                 className="disclaimer"
               >
-                By proceeding, I hereby acknowledge that I agree to the terms and conditions.
+                {t('bridge.form.disclaimer')}
               </Checkbox>
             </div>
             <div className="item">
               <Button
                 key="submit"
                 type="primary"
-                // loading={isButtonLoading}
                 onClick={onConfirmation}
-                // hidden={isConfirmClearVisible}
                 disabled={isButtonDisabled}
               >
-                Confirm
+                {t('general.confirm')}
               </Button>
             </div>
           </div>
@@ -899,15 +1050,18 @@ const CronosBridge = () => {
               )}
             />
             {broadcastResult.transactionHash !== undefined ? (
-              <Button
-                key="submit"
-                type="primary"
-                // loading={isButtonLoading}
-                // onClick={onConfirmation}
-                // hidden={isConfirmClearVisible}
-                // disabled={isButtonDisabled}
-              >
-                View Transaction
+              <Button key="submit" type="primary">
+                <a
+                  data-original={broadcastResult.transactionHash}
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${renderExplorerUrl(
+                    currentAsset?.config ?? session.wallet.config,
+                    'tx',
+                  )}/${broadcastResult.transactionHash}`}
+                >
+                  {t('bridge.action.viewTransaction')}
+                </a>
               </Button>
             ) : (
               <></>
@@ -920,7 +1074,24 @@ const CronosBridge = () => {
   };
 
   const onBridgeConfigUpdate = () => {
-    setIsBridgeSettingsFormVisible(false);
+    let updateConfig = bridgeConfigForm.getFieldsValue();
+    updateConfig = {
+      ...updateConfig,
+      bridgeDirectionType: bridgeTransferDirection,
+      bridgeNetworkConfigType: isTestnet
+        ? BridgeNetworkConfigType.TESTNET_BRIDGE
+        : BridgeNetworkConfigType.MAINNET_BRIDGE,
+    };
+
+    bridgeService.updateBridgeConfiguration(updateConfig);
+    message.success({
+      key: 'bridgeUpdate',
+      content: `Bridge Config successfully updated`,
+    });
+  };
+
+  const onBridgeConfigDefault = () => {
+    bridgeConfigForm.setFieldsValue(defaultConfig[bridgeTransferDirection]);
   };
 
   useEffect(() => {
@@ -934,11 +1105,12 @@ const CronosBridge = () => {
 
   return (
     <>
-      {currentStep === 1 ? (
+      {currentStep === 1 || bridgeTransferError ? (
         <div
           onClick={() => {
             setCurrentStep(currentStep - 1);
             setIsButtonDisabled(true);
+            setBridgeTransferError(false);
           }}
           style={{ textAlign: 'left', width: '50px', fontSize: '24px', cursor: 'pointer' }}
         >
@@ -949,33 +1121,146 @@ const CronosBridge = () => {
       )}
       {currentStep === 0 ? (
         <>
-          <div style={{ textAlign: 'right', fontSize: '20px' }}>
-            <a
+          <div style={{ textAlign: 'right' }}>
+            <Button
+              icon={<SettingOutlined style={{ fontSize: '20px' }} />}
+              style={{
+                textAlign: 'right',
+                width: '20px',
+                border: 'none',
+                background: 'transparent',
+              }}
               onClick={() => {
                 setIsBridgeSettingsFormVisible(true);
               }}
-            >
-              <SettingOutlined />
-            </a>
+              disabled={!isBridgeValid}
+            />
             <ModalPopup
+              className="bridge-config-modal"
               isModalVisible={isBridgeSettingsFormVisible}
               handleCancel={() => {
                 setIsBridgeSettingsFormVisible(false);
               }}
-              handleOk={() => {}}
-              footer={[
-                <Button
-                  key="submit"
-                  type="primary"
-                  loading={confirmLoading}
-                  onClick={onBridgeConfigUpdate}
-                >
-                  {t('general.save')}
-                </Button>,
-              ]}
+              handleOk={onBridgeConfigUpdate}
+              footer={[]}
               okText={t('general.save')}
+              forceRender
             >
-              {JSON.stringify(bridgeConfigs)}
+              <Form
+                {...layout}
+                layout="vertical"
+                form={bridgeConfigForm}
+                name="control-hooks"
+                requiredMark="optional"
+                onFinish={onBridgeConfigUpdate}
+              >
+                <Form.Item
+                  name="prefix"
+                  label={t('bridge.config.prefix.title')}
+                  rules={[
+                    {
+                      required: true,
+                      message: `${t('bridge.config.prefix.title')} ${t('general.required')}`,
+                    },
+                    {
+                      pattern: isTestnet ? /^[a-z]{4}$/ : /^[a-z]{3}$/,
+                      message: t('bridge.config.prefix.validation', {
+                        number: isTestnet ? '4' : '3',
+                      }),
+                    },
+                  ]}
+                  style={{ textAlign: 'left' }}
+                >
+                  <Input />
+                </Form.Item>
+
+                {bridgeConfigFields.includes('cronosBridgeContractAddress') &&
+                bridgeConfigs?.cronosBridgeContractAddress !== '' ? (
+                  <Form.Item
+                    name="cronosBridgeContractAddress"
+                    label={t('bridge.config.address.title')}
+                    rules={[
+                      {
+                        required: true,
+                        message: `${t('bridge.config.address.validation')} ${t(
+                          'general.required',
+                        )}`,
+                      },
+                      customEvmAddressValidator,
+                    ]}
+                    style={{ textAlign: 'left' }}
+                  >
+                    <Input />
+                  </Form.Item>
+                ) : (
+                  <></>
+                )}
+                {bridgeConfigFields.includes('bridgeChannel') ? (
+                  <Form.Item
+                    name="bridgeChannel"
+                    label={t('bridge.config.channel.title')}
+                    rules={[
+                      {
+                        required: true,
+                        message: `${t('bridge.config.channel.title')} ${t('general.required')}`,
+                      },
+                    ]}
+                    style={{ textAlign: 'left' }}
+                  >
+                    <Input />
+                  </Form.Item>
+                ) : (
+                  <></>
+                )}
+                {bridgeConfigFields.includes('bridgePort') ? (
+                  <Form.Item
+                    name="bridgePort"
+                    label={t('bridge.config.port.title')}
+                    rules={[
+                      {
+                        required: true,
+                        message: `${t('bridge.config.port.title')} ${t('general.required')}`,
+                      },
+                    ]}
+                    style={{ textAlign: 'left' }}
+                  >
+                    <Input />
+                  </Form.Item>
+                ) : (
+                  <></>
+                )}
+                {bridgeConfigFields.includes('gasLimit') &&
+                form.getFieldValue('bridgeFrom') === 'CRONOS' ? (
+                  <Form.Item
+                    name="gasLimit"
+                    label="Gas Limit"
+                    rules={[
+                      {
+                        required: true,
+                        message: `${t('bridge.config.port.title')} ${t('general.required')}`,
+                      },
+                    ]}
+                    style={{ textAlign: 'left' }}
+                  >
+                    <InputNumber />
+                  </Form.Item>
+                ) : (
+                  <></>
+                )}
+                <Form.Item>
+                  <Button key="submit" type="primary" htmlType="submit" loading={confirmLoading}>
+                    {t('general.save')}
+                  </Button>
+                  <Button
+                    key="back"
+                    type="link"
+                    loading={confirmLoading}
+                    onClick={onBridgeConfigDefault}
+                  >
+                    {t('general.default')}
+                  </Button>
+                </Form.Item>
+              </Form>
             </ModalPopup>
           </div>
           <div>
@@ -1004,6 +1289,8 @@ const CronosBridge = () => {
 const CronosHistory = () => {
   const session = useRecoilValue(sessionState);
 
+  const [t] = useTranslation();
+
   interface TransferTabularData {
     key: string;
     transactionHash: string;
@@ -1016,7 +1303,7 @@ const CronosHistory = () => {
 
   const HistoryColumns = [
     {
-      title: 'Transaction Hash',
+      title: t('bridge.transactionHistory.table.transactionHash'),
       dataIndex: 'transactionHash',
       key: 'transactionHash',
       render: text => (
@@ -1034,7 +1321,7 @@ const CronosHistory = () => {
       ),
     },
     {
-      title: 'Amount',
+      title: t('bridge.transactionHistory.table.amount'),
       dataIndex: 'amount',
       key: 'amount',
       render: (text, record: TransferTabularData) => {
@@ -1049,9 +1336,9 @@ const CronosHistory = () => {
       },
     },
     {
-      title: 'From (Network)',
-      dataIndex: 'recipientAddress',
-      key: 'recipientAddress',
+      title: t('bridge.transactionHistory.table.fromAddress'),
+      dataIndex: 'fromAddress',
+      key: 'fromAddress',
       render: text => (
         <a
           data-original={text}
@@ -1067,9 +1354,9 @@ const CronosHistory = () => {
       ),
     },
     {
-      title: 'To (Network)',
-      dataIndex: 'recipientAddress',
-      key: 'recipientAddress',
+      title: t('bridge.transactionHistory.table.toAddress'),
+      dataIndex: 'toAddress',
+      key: 'toAddress',
       render: text => (
         <a
           data-original={text}
@@ -1085,12 +1372,12 @@ const CronosHistory = () => {
       ),
     },
     {
-      title: 'Time',
+      title: t('bridge.transactionHistory.table.time'),
       dataIndex: 'time',
       key: 'time',
     },
     {
-      title: 'Status',
+      title: t('bridge.transactionHistory.table.status'),
       dataIndex: 'status',
       key: 'status',
       render: (text, record: TransferTabularData) => {
@@ -1132,33 +1419,19 @@ const CronosHistory = () => {
 };
 
 const BridgePage = () => {
+  // const [t] = useTranslation();
+
   return (
     <Layout className="site-layout bridge-layout">
       <Content>
-        {/* <Tabs defaultActiveKey="1">
-          <TabPane tab="Transfer" key="1">
-            <div className="site-layout-background bridge-content">
-              <div className="container">
-                <CronosBridge />
-              </div>
-            </div>
-          </TabPane>
-          <TabPane tab="History" key="2">
-            <div className="site-layout-background bridge-content">
-              <div className="container">
-                <CronosHistory />
-              </div>
-            </div>
-          </TabPane>
-        </Tabs> */}
-        <div className="go-to-transfer-history">
+        {/* <div className="go-to-transfer-history">
           <a>
             <div>
               <IconTransferHistory />
-              <span>View Transaction History</span>
+              <span>{t('bridge.action.viewTransactionHIstory')}</span>
             </div>
           </a>
-        </div>
+        </div> */}
         <div className="site-layout-background bridge-content">
           <div className="container">
             <CronosBridge />
