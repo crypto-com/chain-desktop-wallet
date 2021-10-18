@@ -36,7 +36,6 @@ import { walletService } from '../../service/WalletService';
 
 import { UserAsset, scaledBalance, UserAssetType } from '../../models/UserAsset';
 import { BroadCastResult, TransactionDirection, TransactionStatus } from '../../models/Transaction';
-// eslint-disable-next-line
 import { renderExplorerUrl } from '../../models/Explorer';
 import { middleEllipsis } from '../../utils/utils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
@@ -591,7 +590,6 @@ const CronosBridge = () => {
     decryptedPhrase: '',
     walletType: 'normal', // normal, ledger
   });
-  // eslint-disable-next-line
   const [bridgeConfirmationList, setBridgeConfirmationList] = useState<listDataSource[]>([]);
   const [bridgeTransferError, setBridgeTransferError] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
@@ -653,8 +651,8 @@ const CronosBridge = () => {
 
     let transferRequest = {
       bridgeTransferDirection,
-      tendermintAddress: tendermintAddress.toLowerCase(),
-      evmAddress: evmAddress.toLowerCase(),
+      tendermintAddress,
+      evmAddress,
       amount: amount.toString(),
       originAsset: currentAsset!,
       decryptedPhrase: phraseDecrypted,
@@ -690,8 +688,8 @@ const CronosBridge = () => {
 
       let transferRequest = {
         bridgeTransferDirection,
-        tendermintAddress: tendermintAddress.toLowerCase(),
-        evmAddress: evmAddress.toLowerCase(),
+        tendermintAddress,
+        evmAddress,
         amount: amount.toString(),
         originAsset: currentAsset!,
         decryptedPhrase,
