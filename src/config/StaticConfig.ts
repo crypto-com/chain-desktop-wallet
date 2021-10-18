@@ -85,6 +85,8 @@ export const COUNTRY_CODES_TO_BLOCK = [
   NOT_KNOWN_YET_VALUE,
 ];
 
+export const GEO_BLOCK_TIMEOUT = 3_000;
+
 export const NodePorts = {
   EVM: ':8545',
   Tendermint: ':26657',
@@ -153,6 +155,8 @@ SUPPORTED_BRIDGE.set('CRYPTO_ORG', {
   value: 'CRYPTO_ORG',
   label: 'Crypto.org Chain',
 });
+
+export const SUPPORTED_BRIDGES_ASSETS = ['CRO', 'CRONOS'];
 
 export type WalletConfig = {
   enabled: boolean;

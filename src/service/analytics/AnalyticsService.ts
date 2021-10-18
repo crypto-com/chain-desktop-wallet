@@ -11,6 +11,7 @@ export enum AnalyticsTxType {
   TransferTransaction = 'TransferTransaction',
   StakingTransaction = 'StakingTransaction',
   NftTransaction = 'NftTransaction',
+  BridgeTransaction = 'BridgeTransaction',
 }
 
 export enum AnalyticsActions {
@@ -19,6 +20,7 @@ export enum AnalyticsActions {
   NftTransfer = 'NftTransfer',
   NftIssue = 'NftIssue',
   NftMint = 'NftMint',
+  BridgeTransfer = 'BridgeTransfer',
 }
 
 export enum AnalyticsCategory {
@@ -27,6 +29,7 @@ export enum AnalyticsCategory {
   PageView = 'PageView',
   Voting = 'Voting',
   Nft = 'Nft',
+  Bridge = 'Bridge',
 }
 
 export class AnalyticsService {
