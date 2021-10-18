@@ -6,7 +6,15 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
-## [v0.5.0] - 2021-07-03
+## [v0.5.1] - 2021-10-18
+
+### Additions
+- Enhancements on the staking view and capabilities.
+- Add Ledger support for CRONOS.
+- Add initial Bridge functionality : Cronos <> Crypto.org.
+- Added disclaimer notices and warning on non-supported regions.
+
+## [v0.5.0] - 2021-09-03
 
 ### Additions
 - Multi-Assets support added to the wallet
