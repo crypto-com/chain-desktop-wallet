@@ -13,9 +13,8 @@ export const CLOUDFLARE_TRACE_URI = 'https://www.cloudflare.com/cdn-cgi/trace';
 // For instance :
 export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
 
-// Todo: Replace with github file path URL for `app.moderation.json`
 export const MODERATION_CONFIG_FILE_URL =
-  'https://raw.githubusercontent.com/crypto-com/chain-desktop-wallet/master/config/app.moderation.json';
+  'https://raw.githubusercontent.com/crypto-com/chain-desktop-wallet/dev/config/app.moderation.json';
 
 export const UNBLOCKING_PERIOD_IN_DAYS = {
   UNDELEGATION: {
