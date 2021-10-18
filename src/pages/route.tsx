@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useRef, useLayoutEffect, useState } from 'react';
 import {
   BrowserRouter,
   HashRouter as ElectronRouter,
@@ -29,6 +29,7 @@ import {
   CLOUDFLARE_TRACE_URI,
   NOT_KNOWN_YET_VALUE,
   COUNTRY_CODES_TO_BLOCK,
+  GEO_BLOCK_TIMEOUT,
 } from '../config/StaticConfig';
 
 interface RouterProps {
@@ -63,6 +64,8 @@ const getCurrentGeoLocationCountryCode = async () => {
 
 function RouteHub() {
   const [isCountryBlocked, setIsCountryBlocked] = useState(true);
+  const [isBlockSloganVisible, setIsBlockSloganVisible] = useState(false);
+  const didMountRef = useRef(false);
 
   const routeIndex = {
     name: 'Welcome Page',
@@ -169,7 +172,7 @@ function RouteHub() {
   ];
 
   useLayoutEffect(() => {
-    (async () => {
+    const checkIsCountryBlocked = async () => {
       const currentCountryCode = await getCurrentGeoLocationCountryCode();
 
       // Todo: Fetch country codes dynamically
@@ -177,12 +180,23 @@ function RouteHub() {
         if (!COUNTRY_CODES_TO_BLOCK.includes(currentCountryCode)) {
           setIsCountryBlocked(false);
         }
-      }, 3000);
-    })();
+        setIsBlockSloganVisible(true);
+      }, GEO_BLOCK_TIMEOUT);
+    };
+
+    if (!didMountRef.current) {
+      checkIsCountryBlocked();
+      didMountRef.current = true;
+    }
   }, [isCountryBlocked, setIsCountryBlocked]);
 
   return isCountryBlocked ? (
-    <Router>{blockPageRoute.component}</Router>
+    <Router>
+      {React.cloneElement(blockPageRoute.component, {
+        isCountryBlocked,
+        isBlockSloganVisible,
+      })}
+    </Router>
   ) : (
     <Router>
       <Switch>

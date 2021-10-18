@@ -3,6 +3,7 @@ import { AbiItem } from 'web3-utils';
 import Web3 from 'web3';
 import { TransactionConfig } from 'web3-eth';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
+import Big from 'big.js';
 import { BridgeTransferRequest } from '../TransactionRequestModels';
 import { BroadCastResult } from '../../models/Transaction';
 import { BridgeTransactionUnsigned } from '../signers/TransactionSupported';
@@ -96,6 +97,8 @@ export class BridgeService {
     const bridgeContractAddress =
       loadedBridgeConfig?.cronosBridgeContractAddress ||
       defaultBridgeConfig.cronosBridgeContractAddress;
+    const gasLimit = loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit;
+
     const contract = new web3.eth.Contract(bridgeContractABI, bridgeContractAddress);
     const encodedABI = contract.methods
       .send_cro_to_crypto_org(bridgeTransferRequest.tendermintAddress)
@@ -115,21 +118,21 @@ export class BridgeService {
 
     bridgeTransaction.nonce = prepareTxInfo.nonce;
     bridgeTransaction.gasPrice = prepareTxInfo.loadedGasPrice;
-    bridgeTransaction.gasLimit = prepareTxInfo.gasLimit;
+    bridgeTransaction.gasLimit = gasLimit;
 
     let signedTransactionHex = '';
     if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       const device = createLedgerDevice();
       const walletAddressIndex = currentSession.wallet.addressIndex;
 
-      const gasLimitTx = web3.utils.toBN(bridgeTransaction.gasLimit!);
+      // Use fixed hard-coded max GasLimit for bridge transactions ( Known contract and predictable consumption )
       const gasPriceTx = web3.utils.toBN(bridgeTransaction.gasPrice);
 
       signedTransactionHex = await device.signEthTx(
         walletAddressIndex,
         Number(originAsset?.config?.chainId), // chainid
         bridgeTransaction.nonce,
-        web3.utils.toHex(gasLimitTx) /* gas limit */,
+        web3.utils.toHex(gasLimit) /* gas limit */,
         web3.utils.toHex(gasPriceTx) /* gas price */,
         bridgeContractAddress,
         web3.utils.toHex(bridgeTransaction.amount),
@@ -272,6 +275,30 @@ export class BridgeService {
       bridgeDirectionType,
       bridgeNetwork,
     );
+  }
+
+  public async getBridgeTransactionFee(
+    currentSession: Session,
+    bridgeTransferRequest: BridgeTransferRequest,
+  ) {
+    const bridgeConfig = await this.getCurrentBridgeConfig(currentSession, bridgeTransferRequest);
+    const { loadedBridgeConfig, defaultBridgeConfig } = bridgeConfig;
+    const exp = Big(10).pow(bridgeTransferRequest?.originAsset.decimals);
+
+    const gasLimit = loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit;
+    const gasPrice = loadedBridgeConfig.defaultGasPrice || defaultBridgeConfig.defaultGasPrice;
+
+    // eslint-disable-next-line no-console
+    console.log('getBridgeTransactionFee ASSET_FEE', {
+      asset: bridgeTransferRequest?.originAsset,
+      gasLimit,
+      gasPrice,
+    });
+
+    return Big(gasLimit)
+      .mul(gasPrice)
+      .div(exp)
+      .toFixed(4);
   }
 
   public async updateBridgeConfiguration(bridgeConfig: BridgeConfig) {

@@ -1117,6 +1117,20 @@ class WalletService {
     }
   }
 
+  public async retrieveWalletAssets(walletIdentifier: string): Promise<UserAsset[]> {
+    const assets = await this.storageService.retrieveAssetsByWallet(walletIdentifier);
+    const userAssets = assets
+      .filter(asset => asset.assetType !== UserAssetType.IBC)
+      .map(data => {
+        const asset: UserAsset = { ...data };
+        return asset;
+      });
+
+    // https://github.com/louischatriot/nedb/issues/185
+    // NeDB does not support distinct queries, it needs to be done programmatically
+    return _.uniqBy(userAssets, 'symbol');
+  }
+
   public async retrieveCurrentWalletAssets(currentSession: Session): Promise<UserAsset[]> {
     const assets = await this.storageService.retrieveAssetsByWallet(
       currentSession.wallet.identifier,
@@ -1519,11 +1533,16 @@ class WalletService {
     return needAssetsCreation;
   }
 
-  public async handleCurrentWalletAssetsMigration(phrase: string, session?: Session) {
+  public async handleCurrentWalletAssetsMigration(
+    phrase: string,
+    session?: Session,
+    tendermintAddress?: string,
+    evmAddress?: string,
+  ) {
     // 1. Check if current wallet has all expected static assets
     // 2. If static assets are missing, remove all existing non dynamic assets
     // 3. Prompt user password and re-create static assets on the fly
-    // 3. Run sync all to synchronize all assets states
+    // 4. Run sync all to synchronize all assets states
 
     const currentSession = session || (await this.storageService.retrieveCurrentSession());
     const { wallet } = currentSession;
@@ -1533,6 +1552,23 @@ class WalletService {
 
       const walletOps = new WalletOps();
       const assetGeneration = walletOps.generate(wallet.config, wallet.identifier, phrase);
+
+      if (currentSession?.wallet.walletType === LEDGER_WALLET_TYPE) {
+        if (tendermintAddress !== '' && evmAddress !== '') {
+          const tendermintAsset = assetGeneration.initialAssets.filter(
+            asset => asset.assetType === UserAssetType.TENDERMINT,
+          )[0];
+          tendermintAsset.address = tendermintAddress;
+          const evmAsset = assetGeneration.initialAssets.filter(
+            asset => asset.assetType === UserAssetType.EVM,
+          )[0];
+          evmAsset.address = evmAddress;
+        } else {
+          // eslint-disable-next-line no-console
+          console.log('FAILED_TO_GET_LEDGER_ADDRESSES');
+          throw TypeError('Failed to get Ledger addresses.');
+        }
+      }
 
       await this.saveAssets(assetGeneration.initialAssets);
 
