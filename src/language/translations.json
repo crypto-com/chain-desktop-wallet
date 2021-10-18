@@ -689,7 +689,6 @@
             "description": "Please select one of the validator.",
             "warningCumulative": "Cumulative stake above can halt the network: improve decentralization and delegate to validators below",
             "validatorName": "Name",
-            "moderationText": "Our community members have flagged this validator as a bad actor by changing its commission rate constantly, which could result in a severe loss of the delegator’s staking rewards. Please be careful and make sure you trust this validator before delegating to it.",
             "validatorWebsite": "Website",
             "validatorAddress": "Address",
             "currentTokens": "Voting Power",
@@ -751,9 +750,10 @@
           "label3": "ESTIMATED ANNUAL REWARDS",
           "label4": "ESTIMATED TOTAL APY",
           "label5": "REWARD BALANCE",
-          "tooltip1": "All staking rewards that have been withdrawn and deposited to your wallet",
-          "tooltip2": "Total staking rewards accumulated from all your stakings",
-          "tooltip3": "A percentage rate reflecting the total staking rewards projected to be earned over an annual period, based on all your stakings"
+          "tooltip1": "Total staking rewards accumulated from all your stakings",
+          "tooltip2": "All staking rewards that have been withdrawn and deposited to your wallet",
+          "tooltip3": "The total staking rewards projected to be earned over an annual period, based on all your stakings",
+          "tooltip4": "A percentage rate reflecting the total staking rewards projected to be earned over an annual period, based on all your stakings"
         }
       },
       "governance": {
@@ -1745,9 +1745,10 @@
           "label3": "預計年獎勵",
           "label4": "預計年收益率",
           "label5": "未領取獎勵",
-          "tooltip1": "你所有已領取並存入到錢包的獎勵",
-          "tooltip2": "由你所有抵押資金所計算出的年抵押獎勵",
-          "tooltip3": "由你所有抵押資金所計算出的年收益率百分比"
+          "tooltip1": "由你所有抵押資金所計算出的年抵押獎勵",
+          "tooltip2": "你所有已領取並存入到錢包的獎勵",
+          "tooltip3": "由你所有抵押資金所計算出的年收益",
+          "tooltip4": "由你所有抵押資金所計算出的年收益率百分比"
         }
       },
       "governance": {
@@ -2738,9 +2739,10 @@
           "label3": "预计年奖励",
           "label4": "预计年收益率",
           "label5": "未领取奖励",
-          "tooltip1": "你所有已领取并存入到钱包的奖励",
-          "tooltip2": "由你所有抵押资金所计算出的年抵押奖励",
-          "tooltip3": "由你所有抵押资金所计算出的年收益率百分比"
+          "tooltip1": "由你所有抵押资金所计算出的年抵押奖励",
+          "tooltip2": "你所有已领取并存入到钱包的奖励",
+          "tooltip3": "由你所有抵押资金所计算出的年收益",
+          "tooltip4": "由你所有抵押资金所计算出的年收益率百分比"
         }
       },
       "governance": {
@@ -3846,9 +3848,10 @@
           "label3": "예상되는 연간 보상",
           "label4": "예상되는 총  APY",
           "label5": "청구되지 보상",
-          "tooltip1": "인출 및 지갑에 입금된 모든 스테이킹 보상",
-          "tooltip2": "모든 스테이킹에서 누적된 총 스테이킹 보상",
-          "tooltip3": "모든 스테이킹을 기반으로 연간 획득할 것으로 예상되는 총 스테이킹 보상을 반영하는 백분율 "
+          "tooltip1": "모든 스테이킹에서 누적된 총 스테이킹 보상",
+          "tooltip2": "인출 및 지갑에 입금된 모든 스테이킹 보상",
+          "tooltip3": "모든 스테이킹을 기반으로 연간 획득할 것으로 예상되는 총 스테이킹 보상을 반영하는",
+          "tooltip4": "모든 스테이킹을 기반으로 연간 획득할 것으로 예상되는 총 스테이킹 보상을 반영하는 백분율 "
         }
       },
       "governance": {
