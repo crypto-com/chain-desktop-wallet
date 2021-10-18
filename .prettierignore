@@ -2,4 +2,8 @@
 **/*.svg
 **/*.ejs
 **/*.html
+**/*.ts
+*.ts
+**/*.js
+*.tsx
 package.json

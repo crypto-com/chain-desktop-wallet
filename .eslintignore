@@ -3,3 +3,6 @@ dist
 build
 src/react-app-env.d.ts
 src/serviceWorker.ts
+*.ts
+*.tsx
+*.js
