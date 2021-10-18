@@ -1,0 +1,10 @@
+{
+    "config": {
+        "validators": {
+            "warning": [],
+            "suspicious": [
+                "crocncl1xxuf6tsfsqm2zd2ype656dyr73x4fsjgd6m9en"
+            ]
+        }
+    }
+}

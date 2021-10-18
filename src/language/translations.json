@@ -689,6 +689,7 @@
             "description": "Please select one of the validator.",
             "warningCumulative": "Cumulative stake above can halt the network: improve decentralization and delegate to validators below",
             "validatorName": "Name",
+            "moderationText": "Our community members have flagged this validator as a bad actor by changing its commission rate constantly, which could result in a severe loss of the delegator’s staking rewards. Please be careful and make sure you trust this validator before delegating to it.",
             "validatorWebsite": "Website",
             "validatorAddress": "Address",
             "currentTokens": "Voting Power",
