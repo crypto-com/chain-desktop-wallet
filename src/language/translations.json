@@ -222,7 +222,7 @@
         }
       },
       "welcome": {
-        "slogan": "Our Sample Chain Wallet supports wallet management and funds transfer.",
+        "slogan": "A public, open-source Destkop Wallet on Crypto.org Chain.",
         "button": "Get Started",
         "block": "This product is currently unavailable in your country or region."
       },
@@ -1226,7 +1226,7 @@
         }
       },
       "welcome": {
-        "slogan": "我們的樣本錢包支持錢包管理和資金轉賬。",
+        "slogan": "一個公開及開源的 Crypto.org Chain 錢包 ",
         "button": "開始",
         "block": "此產品暫時未能為您所在的國家或地區提供服務。"
       },
@@ -2229,7 +2229,7 @@
         }
       },
       "welcome": {
-        "slogan": "我们的样本钱包支持钱包管理和资金转账。",
+        "slogan": "一个公开及开源的 Crypto.org Chain 钱包 ",
         "button": "开始",
         "block": "此产品暂时未能为您所在的国家或地区提供服务。"
       },
