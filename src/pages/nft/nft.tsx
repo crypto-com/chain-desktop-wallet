@@ -917,7 +917,7 @@ const ReceiveTab = () => {
   const currentSession = useRecoilValue(sessionState);
   const walletAsset = useRecoilValue(walletAssetState);
 
-  return <ReceiveDetail currentAsset={walletAsset} session={currentSession} />;
+  return <ReceiveDetail currentAsset={walletAsset} session={currentSession} isNft />;
 };
 
 const NftPage = () => {
