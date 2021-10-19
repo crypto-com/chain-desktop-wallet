@@ -213,7 +213,7 @@
             "message2": "days",
             "message3": ". Until then, you are not able to use the undelegated funds yet."
           },
-          "checkbox1": "I understand that my CRO in Crypto.org Chain staking is subject to a {{ unbondingPeriod }}-day unbonding period when I unstake, as enfored by the Crypto.org Chain network."
+          "checkbox1": "I understand that my CRO in Crypto.org Chain staking is subject to a {{ unbondingPeriod }}-day unbonding period when I unstake, as enforced by the Crypto.org Chain network."
         },
         "table": {
           "triggerDesc": "Click to sort by descend",
@@ -292,7 +292,7 @@
           },
           "addressIndex": {
             "label": "Address Index",
-            "disclaimer": "Multiple addresses can be created with index being 0,1,2,3 and so on. Please note its limited to 100 addresses without expert mode and over 100 addresses under expert mode."
+            "disclaimer": "You can create an index of up to 100 addresses. Expert mode allows you to exceed 100."
           },
           "network": {
             "label": "Network"
@@ -867,6 +867,7 @@
           "label3": "Token ID",
           "label4": "Transaction Fee",
           "notice1": "This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address that is not compatible with the Crypto.org Chain NFT token standard will result in the permanent loss of your asset.",
+          "notice2": "Transferring an NFT that is minted on Desktop Wallet to Crypto.com/NFT may result in the permanent loss of your NFT.",
           "button1": "Confirm Transfer"
         },
         "modal3": {
@@ -1287,7 +1288,7 @@
           },
           "addressIndex": {
             "label": "地址索引",
-            "disclaimer": "可以使用 0、1、2、3 作為索引名創建多個地址。請注意，在沒有開啟專家模式時，索引地址數量限制為 100 個，在專家模式下沒有限制。"
+            "disclaimer": "可以創建至多 100 個地址。在專家模式下沒有限制。"
           },
           "network": {
             "label": "網絡"
@@ -1862,6 +1863,7 @@
           "label3": "代幣 ID",
           "label4": "交易費用",
           "notice1": "這為 Crypto.org 鏈上的 NFT，轉發此 NFT 到不支援 Crypto.org 代幣標準的地址將會造成你的 NFT 永久損失。",
+          "notice2": "將通過 Desktop Wallet 鑄造的 NFT 轉發到 Crypto.com/NFT 可能造成你的 NFT 永久損失。",
           "button1": "確定轉發"
         },
         "modal3": {
@@ -2281,7 +2283,7 @@
           },
           "addressIndex": {
             "label": "地址索引",
-            "disclaimer": "可以使用 0、1、2、3 作为索引名创建多个地址。请注意，在没有开启专家模式时，索引地址数量限制为 100 个，在专家模式下没有限制。"
+            "disclaimer": "可以创建至多 100 个地址。在专家模式下没有限制。"
           },
           "network": {
             "label": "网络"
@@ -2856,6 +2858,7 @@
           "label3": "代币 ID",
           "label4": "交易费用",
           "notice1": "这为 Crypto.org 链上的 NFT，转发此 NFT 到不支持 Crypto.org 代币标准的地址将会造成你的 NFT 永久损失。",
+          "notice2": "将通过 Desktop Wallet 铸造的 NFT 转发到 Crypto.com/NFT 可能造成你的 NFT 永久损失。",
           "button1": "确认转发"
         },
         "modal3": {
@@ -3403,7 +3406,7 @@
           },
           "addressIndex": {
             "label": "주소 인덱스",
-            "disclaimer": "인덱스를 0,1,2,3 등으로 설정하여, 여러개의 주소를 만들 수 있습니다. 레져의 전문가 모드가 꺼져있을 경우에,  100개 이하 주소로 제한되며, 전문가 모드가 켜져 있을 경우에는  100개 이상의 주소을 생성할 수 있습니다."
+            "disclaimer": "최대 100 개의 주소를 만들 수 있습니다. 전문가 모드에는 제한이 없습니다."
           },
           "network": {
             "label": "네트워크"
@@ -3965,6 +3968,7 @@
           "label3": "토큰 ID",
           "label4": "트랜잭션 수수료",
           "notice1": "이 NFT는 Crypto.org 체인에서 발행됩니다.",
+          "notice2": "데스크탑 지갑에 crypto.com/nft로 inted NFT를 전송하면 NFT의 영구적 인 손실이 발생할 수 있습니다.",
           "button1": "트랜잭션 확인"
         },
         "modal3": {

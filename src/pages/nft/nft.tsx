@@ -1653,6 +1653,14 @@ const NftPage = () => {
                           <Content>{t('nft.modal2.notice1')}</Content>
                         </Layout>
                       </div>
+                      <div className="item notice">
+                        <Layout>
+                          <Sider width="20px">
+                            <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                          </Sider>
+                          <Content>{t('nft.modal2.notice2')}</Content>
+                        </Layout>
+                      </div>
                       <div className="item">
                         <div className="label">{t('nft.modal2.label2')}</div>
                         <div>{`${formValues.denomId}`}</div>
@@ -1729,6 +1737,14 @@ const NftPage = () => {
                             <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
                           </Sider>
                           <Content>{t('nft.modal2.notice1')}</Content>
+                        </Layout>
+                      </div>
+                      <div className="item notice">
+                        <Layout>
+                          <Sider width="20px">
+                            <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                          </Sider>
+                          <Content>{t('nft.modal2.notice2')}</Content>
                         </Layout>
                       </div>
                     </>
