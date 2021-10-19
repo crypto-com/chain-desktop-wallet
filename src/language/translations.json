@@ -491,6 +491,11 @@
             "message": "Download Complete",
             "description": "Update downloaded successfully. It will be installed on restart.",
             "button": "Restart Now"
+          },
+          "cronosBridgeExit": {
+            "message": "Bridge Transfer is not completed",
+            "description": "Are you sure you want to leave?",
+            "button": "Leave"
           }
         },
         "createNewAsset": {
@@ -1490,6 +1495,11 @@
             "message": "下載完成",
             "description": "成功下載更新，重啟程式以完成安裝。",
             "button": "現在重啟程式"
+          },
+          "cronosBridgeExit": {
+            "message": "跨鏈交易尚未完成",
+            "description": "你確定想要離開嗎？",
+            "button": "離開"
           }
         },
         "createNewAsset": {
@@ -2488,6 +2498,11 @@
             "message": "下载完成",
             "description": "成功下载更新，重启程序以完成安装。",
             "button": "现在重启程序"
+          },
+          "cronosBridgeExit": {
+            "message": "跨链交易尚未完成",
+            "description": "你确定想要离开吗？",
+            "button": "离开"
           }
         },
         "createNewAsset": {

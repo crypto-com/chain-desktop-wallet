@@ -26,12 +26,12 @@ import Icon, {
   SettingOutlined,
   SwapOutlined,
 } from '@ant-design/icons';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
-import { sessionState, walletAllAssetsState } from '../../recoil/atom';
+import { isBridgeTransferingState, sessionState, walletAllAssetsState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 
 import { UserAsset, scaledBalance, UserAssetType } from '../../models/UserAsset';
@@ -596,6 +596,7 @@ const CronosBridgeForm = props => {
 
 const CronosBridge = () => {
   const session = useRecoilValue(sessionState);
+  const setIsBridgeTransfering = useSetRecoilState(isBridgeTransferingState);
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({
     amount: '0',
@@ -710,6 +711,7 @@ const CronosBridge = () => {
     setBridgeFee(fee);
     setBridgeTransferRequest(transferRequest);
     setCurrentStep(1);
+    setIsBridgeTransfering(true);
   };
 
   const showPasswordInput = async () => {
@@ -745,6 +747,7 @@ const CronosBridge = () => {
       setBridgeFee(fee);
       setBridgeTransferRequest(transferRequest);
       setCurrentStep(1);
+      setIsBridgeTransfering(true);
     } else {
       setInputPasswordVisible(true);
     }
@@ -889,6 +892,7 @@ const CronosBridge = () => {
       // eslint-disable-next-line no-console
       console.log('Failed in Bridge Transfer', e);
     }
+    setIsBridgeTransfering(false);
   };
 
   const renderStepContent = (step: number) => {
@@ -1135,6 +1139,9 @@ const CronosBridge = () => {
       {currentStep === 1 || bridgeTransferError ? (
         <div
           onClick={() => {
+            if (currentStep - 1 === 0) {
+              setIsBridgeTransfering(false);
+            }
             setCurrentStep(currentStep - 1);
             setIsButtonDisabled(true);
             setBridgeTransferError(false);
