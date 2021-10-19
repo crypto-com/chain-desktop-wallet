@@ -458,7 +458,6 @@ const AssetsPage = () => {
                   return {
                     onClick: async () => {
                       setActiveAssetTab('transaction');
-                      // console.log(event)
                       setSession({
                         ...session,
                         activeAsset: selectedAsset,
@@ -476,7 +475,11 @@ const AssetsPage = () => {
                     }, // click row
                   };
                 }}
-                // pagination={false}
+                locale={{
+                  triggerDesc: t('general.table.triggerDesc'),
+                  triggerAsc: t('general.table.triggerAsc'),
+                  cancelSort: t('general.table.cancelSort'),
+                }}
               />
             )}
           </div>
