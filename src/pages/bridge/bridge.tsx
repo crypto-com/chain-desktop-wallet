@@ -116,6 +116,7 @@ const CronosBridgeForm = props => {
   const {
     form,
     formValues,
+    setFormValues,
     bridgeConfigForm,
     isBridgeValid,
     setIsBridgeValid,
@@ -311,7 +312,7 @@ const CronosBridgeForm = props => {
   );
 
   useEffect(() => {
-    const initFieldValues = () => {
+    const initFieldValues = async () => {
       const bridges: SupportedBridge[] = [];
       SUPPORTED_BRIDGE.forEach((item: SupportedBridge) => {
         bridges.push(item);
@@ -334,6 +335,40 @@ const CronosBridgeForm = props => {
           }
           default:
         }
+      } else {
+        // Default bridgeFrom set to CRYPTO_ORG
+        const currentSession = await walletService.retrieveCurrentSession();
+        const assets = await walletService.retrieveCurrentWalletAssets(currentSession);
+        const cro = assets.find(asset => {
+          return (
+            asset.mainnetSymbol.toUpperCase() === 'CRO' &&
+            asset.symbol.toUpperCase() === (isTestnet ? 'TCRO' : 'CRO') &&
+            asset.assetType === UserAssetType.TENDERMINT
+          );
+        });
+        const cronos = assets.find(asset => {
+          return (
+            asset.mainnetSymbol.toUpperCase() === 'CRO' &&
+            asset.symbol.toUpperCase() === 'CRONOS' &&
+            asset.assetType === UserAssetType.EVM
+          );
+        });
+        setBridgeSupportedAssets([cro!]);
+        setCurrentAsset(cro);
+        setCurrentAssetIdentifier(cro?.identifier);
+        setToAddress(cronos?.address);
+        setToAsset(cronos);
+        setAvailableBalance(scaledBalance(cro!));
+
+        form.setFieldsValue({
+          asset: cro?.identifier,
+        });
+        setFormValues({
+          tendermintAddress: cro?.address,
+          evmAddress: cronos?.address,
+        });
+
+        setIsBridgeValid(true);
       }
     };
 
@@ -366,6 +401,7 @@ const CronosBridgeForm = props => {
             },
           ]}
           style={{ textAlign: 'left' }}
+          initialValue="CRYPTO_ORG"
         >
           <Select
             style={{ width: '300px', textAlign: 'left' }}
@@ -454,6 +490,7 @@ const CronosBridgeForm = props => {
             },
           ]}
           style={{ textAlign: 'right' }}
+          initialValue="CRONOS"
         >
           <Select style={{ width: '300px', textAlign: 'left' }} onChange={onSwitchBridge}>
             {supportedBridges.map(bridge => {
@@ -559,7 +596,6 @@ const CronosBridgeForm = props => {
 
 const CronosBridge = () => {
   const session = useRecoilValue(sessionState);
-  const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({
     amount: '0',
@@ -1093,15 +1129,6 @@ const CronosBridge = () => {
   const onBridgeConfigDefault = () => {
     bridgeConfigForm.setFieldsValue(defaultConfig[bridgeTransferDirection]);
   };
-
-  useEffect(() => {
-    const evmAsset = walletAllAssets.find(asset => asset.assetType === UserAssetType.EVM);
-    setFormValues({
-      ...formValues,
-      tendermintAddress: session.wallet.address,
-      evmAddress: evmAsset?.address !== undefined ? evmAsset?.address : '',
-    });
-  }, [walletAllAssets]);
 
   return (
     <>
