@@ -1565,12 +1565,22 @@ const StakingPage = () => {
     },
   ];
 
+  const formatRemainingTime = (completionTime: string) => {
+    const currentLanguageLocale = i18n.language.replace(/([A-Z])/, '-$1').toLowerCase();
+
+    const targetDate = moment(completionTime);
+
+    // monent treat days > 26 as "a month", show number of days instead
+    return moment
+      .duration(targetDate.diff(moment()))
+      .locale(currentLanguageLocale)
+      .humanize({ d: 31 });
+  };
+
   const convertUnbondingDelegations = (
     allUnbondingDelegations: UnbondingDelegationData[],
     currentAsset: UserAsset,
   ) => {
-    const currentLanguageLocale = i18n.language.replace(/([A-Z])/, '-$1').toLowerCase();
-
     return allUnbondingDelegations.map(dlg => {
       const unbondingAmount = getUIDynamicAmount(dlg.unbondingAmount, currentAsset);
       const data: UnbondingDelegationTabularData = {
@@ -1580,9 +1590,7 @@ const StakingPage = () => {
         completionTime: new Date(dlg.completionTime).toString(),
         unbondingAmount,
         unbondingAmountWithSymbol: `${unbondingAmount} ${currentAsset.symbol}`,
-        remainingTime: moment(dlg.completionTime)
-          .locale(currentLanguageLocale)
-          .fromNow(true),
+        remainingTime: formatRemainingTime(dlg.completionTime),
       };
       return data;
     });
