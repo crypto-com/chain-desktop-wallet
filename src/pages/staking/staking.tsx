@@ -2,7 +2,19 @@ import React, { useEffect, useState, useRef } from 'react';
 import './staking.less';
 import 'antd/dist/antd.css';
 import moment from 'moment';
-import { Button, Checkbox, Form, Input, InputNumber, Layout, Table, Tabs, Typography, Tooltip } from 'antd';
+import {
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  InputNumber,
+  Layout,
+  Table,
+  Tabs,
+  Typography,
+  Tooltip,
+  Alert,
+} from 'antd';
 import { OrderedListOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
@@ -65,8 +77,14 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { UndelegateFormComponent } from '../home/components/UndelegateFormComponent';
 import RedelegateFormComponent from '../home/components/RedelegateFormComponent';
 import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
-import { MODERATION_CONFIG_FILE_URL, UNBLOCKING_PERIOD_IN_DAYS, CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD, FIXED_DEFAULT_FEE, SUPPORTED_CURRENCY } from '../../config/StaticConfig';
-import { ModerationConfig } from '../../models/ModerationConfig';
+import {
+  MODERATION_CONFIG_FILE_URL,
+  UNBLOCKING_PERIOD_IN_DAYS,
+  CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+  FIXED_DEFAULT_FEE,
+  SUPPORTED_CURRENCY,
+} from '../../config/StaticConfig';
+import { isValidatorAddressSuspicious, ModerationConfig } from '../../models/ModerationConfig';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
@@ -196,7 +214,7 @@ const FormDelegationRequest = () => {
         // eslint-disable-next-line no-console
         console.error('Error occurred while fetching moderation config file', error);
       }
-    }
+    };
 
     if (!didMountRef.current) {
       syncAssetData();
@@ -334,7 +352,7 @@ const FormDelegationRequest = () => {
       title: t('staking.validatorList.table.validatorName'),
       dataIndex: 'validatorName',
       key: 'validatorName',
-      render: (validatorName, record) => (
+      render: (validatorName, record: ValidatorModel) => (
         <a
           data-original={record.validatorAddress}
           target="_blank"
@@ -343,17 +361,14 @@ const FormDelegationRequest = () => {
             record.validatorAddress
           }`}
         >
-          {ellipsis(validatorName, 24)}
-          {' '}
-          {
-            moderationConfig && moderationConfig?.config?.validators?.warning?.concat(moderationConfig?.config?.validators?.suspicious).includes(record.validatorAddress) ?
-              <Tooltip title={t('staking.validatorList.table.moderationText')}>
-                <span>
-                  <ExclamationCircleOutlined style={{ color: "red" }} />
-                </span>
-              </Tooltip> : ''
-          }
-
+          {ellipsis(validatorName, 24)}{' '}
+          {isValidatorAddressSuspicious(record.validatorAddress, moderationConfig) && (
+            <Tooltip title={t('staking.model1.warning')}>
+              <span>
+                <ExclamationCircleOutlined style={{ color: 'red' }} />
+              </span>
+            </Tooltip>
+          )}
         </a>
       ),
     },
@@ -461,7 +476,10 @@ const FormDelegationRequest = () => {
 
   const assetMarketData = allMarketData[`${walletAsset.mainnetSymbol}-${currentSession.currency}`];
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol;
-  const undelegatePeriod = currentSession.wallet.config.name === 'MAINNET' ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
+  const undelegatePeriod =
+    currentSession.wallet.config.name === 'MAINNET'
+      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET
+      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
 
   return (
     <Form
@@ -654,6 +672,22 @@ const FormDelegationRequest = () => {
             ) : (
               <div />
             )}
+            {isValidatorAddressSuspicious(formValues.validatorAddress, moderationConfig) && (
+              <Alert
+                message={
+                  <div className="alert-item">
+                    <Layout>
+                      <Sider width="20px">
+                        <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />
+                      </Sider>
+                      <Content>{t('staking.model1.warning')}</Content>
+                    </Layout>
+                  </div>
+                }
+                type="error"
+              />
+            )}
+
             <div className="item">
               <Checkbox checked={isChecked} onChange={() => setIsChecked(!isChecked)}>
                 {t('general.undelegateFormComponent.checkbox1', {
@@ -1485,7 +1519,10 @@ const StakingPage = () => {
 
   const [t, i18n] = useTranslation();
 
-  const undelegatePeriod = currentSession.wallet.config.name === 'MAINNET' ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
+  const undelegatePeriod =
+    currentSession.wallet.config.name === 'MAINNET'
+      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET
+      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
 
   const unbondingDelegationColumns = [
     {

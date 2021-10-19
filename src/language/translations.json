@@ -725,6 +725,9 @@
           "label3": "Amount",
           "label4": "Memo"
         },
+        "model1": {
+          "warning": "Our community members have flagged this validator as a bad actor by changing its commission rate constantly, which could result in a severe loss of the delegator’s staking rewards. Please be careful and make sure you trust this validator before delegating to it."
+        },
         "modal2": {
           "title": "Confirm Transaction",
           "description": "Please review the below information.",
@@ -1721,6 +1724,9 @@
           "label3": "數目",
           "label4": "留言"
         },
+        "model1": {
+          "warning": "因為此驗證者不斷變更佣金費率，我們的社區成員已經把其標記為不良行為者，這可能導致委託人的質押獎勵嚴重損失。在委託資金給它之前，請小心並確保你信任此驗證者。"
+        },
         "modal2": {
           "title": "確認交易",
           "description": "請檢查以下內容：",
@@ -2715,6 +2721,9 @@
           "label2": "委托至验证者",
           "label3": "数目",
           "label4": "留言"
+        },
+        "model1": {
+          "warning": "因为此验证者不断变更佣金费率，我们的社区成员已经把其标记为不良行为者，这可能导致委托人的质押奖励严重损失。在委托资金给它之前，请小心并确保你信任此验证者。"
         },
         "modal2": {
           "title": "确认交易",
@@ -3825,6 +3834,9 @@
           "label2": "검증인에게 위임하기",
           "label3": "금액",
           "label4": "메모"
+        },
+        "model1": {
+          "warning": "우리 지역 사회 회원은이 유효성 검사기를 끊임없이 변화 시킴으로써이 유효성 검사기를 끊임없이 변화시켜 위임자의 스테이크 리워드의 심각한 손실을 초래할 수 있습니다. 조심 하고이 유효성 검사기를 위임하기 전에 신뢰하십시오."
         },
         "modal2": {
           "title": "트랜잭션 확인",
