@@ -553,6 +553,8 @@ const CronosBridgeForm = props => {
             placeholder={t('bridge.form.amount')}
             disabled={!isBridgeValid}
             onChange={value => setSendingAmount(value ? value.toString() : '0')}
+            // stringMode
+            // type="number"
           />
         </Form.Item>
       </div>
@@ -674,7 +676,9 @@ const CronosBridge = () => {
   };
 
   const onWalletDecryptFinish = async (password: string) => {
-    const { amount, tendermintAddress, evmAddress } = formValues;
+    const { tendermintAddress, evmAddress } = formValues;
+    let { amount } = formValues;
+    amount = fromScientificNotation(amount).toString();
 
     setFormValues({
       ...formValues,
@@ -690,7 +694,7 @@ const CronosBridge = () => {
       bridgeTransferDirection,
       tendermintAddress,
       evmAddress,
-      amount: amount.toString(),
+      amount,
       originAsset: currentAsset!,
       decryptedPhrase: phraseDecrypted,
       walletType: session.wallet.walletType, // normal, ledger
@@ -722,13 +726,14 @@ const CronosBridge = () => {
 
     if (decryptedPhrase || session.wallet.walletType === LEDGER_WALLET_TYPE) {
       const { tendermintAddress, evmAddress } = formValues;
-      const amount = form.getFieldValue('amount');
+      let amount = form.getFieldValue('amount');
+      amount = fromScientificNotation(amount).toString();
 
       let transferRequest = {
         bridgeTransferDirection,
         tendermintAddress,
         evmAddress,
-        amount: amount.toString(),
+        amount,
         originAsset: currentAsset!,
         decryptedPhrase,
         walletType: session.wallet.walletType, // normal, ledger
