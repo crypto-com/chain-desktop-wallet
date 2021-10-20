@@ -536,7 +536,7 @@
           "memo": {
             "label": "Memo (Optional)"
           },
-          "disclaimer": "Transfering your {{assetSymbol}} to any recipient address that is not on {{assetName}} may result in permanet loss of your funds."
+          "disclaimer": "Transferring your {{assetSymbol}} to any recipient address that is not on {{assetName}} may result in permanent loss of your funds."
         },
         "modal1": {
           "title": "Confirm Transaction",
@@ -562,7 +562,7 @@
           }
         },
         "button": "Verify address on Ledger",
-        "disclaimer": "Transfering {{assetSymbol}} from any address that is not supporting {{assetName}} may result in permanet loss of your funds."
+        "disclaimer": "Transferring {{assetSymbol}} from any address that is not supporting {{assetName}} may result in permanent loss of your funds."
       },
       "assets": {
         "title": "Assets",
@@ -626,7 +626,7 @@
         },
         "action": {
           "viewTransaction": "View Transaction",
-          "viewTransactionHIstory": "View Transaction History"
+          "viewTransactionHistory": "View Transaction History"
         },
         "config": {
           "prefix": {
@@ -1630,7 +1630,7 @@
         },
         "action": {
           "viewTransaction": "查看交易",
-          "viewTransactionHIstory": "查看交易歷史"
+          "viewTransactionHistory": "查看交易歷史"
         },
         "config": {
           "prefix": {
@@ -2633,7 +2633,7 @@
         },
         "action": {
           "viewTransaction": "查看交易",
-          "viewTransactionHIstory": "查看交易历史"
+          "viewTransactionHistory": "查看交易历史"
         },
         "config": {
           "prefix": {
@@ -3360,7 +3360,7 @@
         }
       },
       "welcome": {
-        "slogan": "데스크탑 지갑으로 지갑 관리와 송금을 할 수 있습니다",
+        "slogan": "Crypto.org 체인의 오픈소스 데스크톱 왈렛",
         "button": "시작하기",
         "block": "이 제품은 현재 사용자의 국가 또는 지역에서 사용할 수 없습니다"
       },
@@ -3629,6 +3629,11 @@
             "message": "다운로드 완료",
             "description": "업데이트가 성공적으로 다운로드되었습니다. 다시 시작하면 설치됩니다.",
             "button": "지금 재시작합니다"
+          },
+          "cronosBridgeExit": {
+            "message": "브릿지 전송이 완료되지 않았습니다",
+            "description": "프로그램을 종료할까요?",
+            "button": "종료"
           }
         },
         "createNewAsset": {
@@ -3755,7 +3760,7 @@
         },
         "action": {
           "viewTransaction": "트랜잭션 보기",
-          "viewTransactionHIstory": "트랜잭션 내역 보기"
+          "viewTransactionHistory": "트랜잭션 내역 보기"
         },
         "config": {
           "prefix": {
@@ -3774,7 +3779,15 @@
           }
         },
         "pendingTransfer": {
-          "title": "{{amount}} {{symbol}}이 전송 대기 중입니다"
+          "title": "{{amount}} {{symbol}}이 전송 대기 중입니다",
+          "ledger": {
+            "description": "레져에서 {{app}}을 열고 거래에 서명하세요."
+          }
+        },
+        "ledgerSign": {
+          "failed": {
+            "title": "레져에서 서명된 트랜잭션을 전송하지 못했습니다."
+          }
         },
         "transactionHistory": {
           "table": {

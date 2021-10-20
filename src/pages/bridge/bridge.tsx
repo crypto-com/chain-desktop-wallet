@@ -1471,7 +1471,7 @@ const BridgePage = () => {
           <a>
             <div>
               <IconTransferHistory />
-              <span>{t('bridge.action.viewTransactionHIstory')}</span>
+              <span>{t('bridge.action.viewTransactionHistory')}</span>
             </div>
           </a>
         </div> */}
