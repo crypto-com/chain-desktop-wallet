@@ -170,7 +170,7 @@ SUPPORTED_BRIDGE.set('CRYPTO_ORG', {
   label: 'Crypto.org Chain',
 });
 
-export const SUPPORTED_BRIDGES_ASSETS = ['CRO', 'CRONOS'];
+export const SUPPORTED_BRIDGES_ASSETS = ['CRO'];
 
 export type WalletConfig = {
   enabled: boolean;
