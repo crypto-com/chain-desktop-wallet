@@ -1,5 +1,4 @@
 import axios from 'axios';
-import _ from 'lodash';
 import { TransactionConfig } from 'web3-eth';
 import Web3 from 'web3';
 import {
@@ -1122,16 +1121,12 @@ class WalletService {
       currentSession.wallet.identifier,
     );
 
-    const userAssets = assets
+    return assets
       .filter(asset => asset.assetType !== UserAssetType.IBC)
       .map(data => {
         const asset: UserAsset = { ...data };
         return asset;
       });
-
-    // https://github.com/louischatriot/nedb/issues/185
-    // NeDB does not support distinct queries, it needs to be done programmatically
-    return _.uniqBy(userAssets, 'symbol');
   }
 
   public async retrieveDefaultWalletAsset(currentSession: Session): Promise<UserAsset> {
