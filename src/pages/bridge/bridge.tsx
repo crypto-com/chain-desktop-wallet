@@ -553,8 +553,6 @@ const CronosBridgeForm = props => {
             placeholder={t('bridge.form.amount')}
             disabled={!isBridgeValid}
             onChange={value => setSendingAmount(value ? value.toString() : '0')}
-            // stringMode
-            // type="number"
           />
         </Form.Item>
       </div>
@@ -759,7 +757,9 @@ const CronosBridge = () => {
   };
 
   const onConfirmation = async () => {
-    const { bridgeFrom, bridgeTo, amount } = formValues;
+    const { bridgeFrom, bridgeTo } = formValues;
+    let { amount } = formValues;
+    amount = fromScientificNotation(amount);
 
     const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
     const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
@@ -856,10 +856,12 @@ const CronosBridge = () => {
 
       analyticsService.logTransactionEvent(
         sendResult.transactionHash as string,
-        adjustedTransactionAmount(
-          formValues.amount,
-          currentAsset!,
-          getBaseScaledAmount(bridgeFee, currentAsset!),
+        fromScientificNotation(
+          adjustedTransactionAmount(
+            formValues.amount,
+            currentAsset!,
+            getBaseScaledAmount(bridgeFee, currentAsset!),
+          ),
         ),
         AnalyticsTxType.BridgeTransaction,
         AnalyticsActions.BridgeTransfer,
@@ -965,7 +967,7 @@ const CronosBridge = () => {
                 <div className="block">
                   <div>{t('nft.modal3.label1')}</div>
                   <div className="title">
-                    {amount} {currentAsset?.symbol}
+                    {fromScientificNotation(amount)} {currentAsset?.symbol}
                   </div>
                 </div>
                 <Divider />
@@ -1011,10 +1013,12 @@ const CronosBridge = () => {
                   <div>{t('bridge.form.receiving')}</div>
                   <div className="title">
                     ~
-                    {adjustedTransactionAmount(
-                      amount,
-                      currentAsset!,
-                      getBaseScaledAmount(bridgeFee, currentAsset!),
+                    {fromScientificNotation(
+                      adjustedTransactionAmount(
+                        amount,
+                        currentAsset!,
+                        getBaseScaledAmount(bridgeFee, currentAsset!),
+                      ),
                     )}{' '}
                     {toAsset?.symbol}
                   </div>
