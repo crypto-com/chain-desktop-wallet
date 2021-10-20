@@ -1,9 +1,16 @@
 {
     "config": {
         "validators": {
-            "warning": [],
+            "warning": [
+                "crocncl1trfsgw4ys9ffcn5szj4pe0ehh5dyzudm4pk4ac",
+                "crocncl1mx63ad4phlsyw0tq0uxtmj69xjmz0uh4cveg6j",
+                "crocncl1vw734pvfacj90ltknw9ehtd6rz4a3k56y65y2m",
+                "crocncl1t322hc258gc7dm005xfq0tsjqp9egujuh5tsnu"
+            ],
             "suspicious": [
-                "crocncl1xxuf6tsfsqm2zd2ype656dyr73x4fsjgd6m9en"
+                "crocncl1xxuf6tsfsqm2zd2ype656dyr73x4fsjgd6m9en",
+                "crocncl1av95h6se2ptx0lsqkhwdy7u6eac2xusxrldl9d",
+                "crocncl1t3kju2j60k24kxgqx5q6vgm8ea6dn60jvgx972"
             ]
         }
     }
