@@ -39,7 +39,7 @@ export const DefaultTestnetBridgeConfigs: {
     bridgeDirectionType: BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS,
     bridgeNetworkConfigType: BridgeNetworkConfigType.TESTNET_BRIDGE,
     cronosBridgeContractAddress: '',
-    bridgeChannel: 'channel-129',
+    bridgeChannel: 'channel-131',
     bridgePort: 'transfer',
     gasLimit: 300_000,
     prefix: 'tcrc',
