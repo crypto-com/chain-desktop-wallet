@@ -160,6 +160,12 @@ class WalletService {
           transfer.gasPrice = prepareTxInfo.loadedGasPrice;
           transfer.gasLimit = prepareTxInfo.gasLimit;
 
+          const isMemoProvided = transferRequest.memo && transferRequest.memo.length > 0;
+          // If transaction is provided with memo, add a little bit more gas to it to be accepted. 10% more
+          transfer.gasLimit = isMemoProvided
+            ? Number(transfer.gasLimit) + Number(transfer.gasLimit) * (10 / 100)
+            : transfer.gasLimit;
+
           let signedTx = '';
           if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
             const device = createLedgerDevice();

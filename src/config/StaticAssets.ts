@@ -81,7 +81,7 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
       'https://firebasestorage.googleapis.com/v0/b/chain-desktop-wallet.appspot.com/o/cronos_logo.png?alt=media&token=781c48a3-e89e-4dd4-87d3-d1a1b8e2e456',
     identifier: getRandomId(),
     name: 'Cronos Chain',
-    symbol: 'CRONOS',
+    symbol: isTestnet ? 'TCRONOS' : 'CRONOS',
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
     unbondingBalance: '0',
