@@ -13,21 +13,21 @@ export const CLOUDFLARE_TRACE_URI = 'https://www.cloudflare.com/cdn-cgi/trace';
 // For instance :
 export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
 
-// Todo: Replace with github file path URL for `app.moderation.json`
-export const MODERATION_CONFIG_FILE_URL = NOT_KNOWN_YET_VALUE;
+export const MODERATION_CONFIG_FILE_URL =
+  'https://raw.githubusercontent.com/crypto-com/chain-desktop-wallet/dev/config/app.moderation.json';
 
 export const UNBLOCKING_PERIOD_IN_DAYS = {
-  UNDELEGATION : {
+  UNDELEGATION: {
     MAINNET: '28',
-    OTHERS: '21'
+    OTHERS: '21',
   },
   REDELEGATION: {
     MAINNET: '28',
-    OTHERS: '21'
-  }
-}
+    OTHERS: '21',
+  },
+};
 
-// Reference: Google Sheet : Foris Markets Table - 4 October 2021 
+// Reference: Google Sheet : Foris Markets Table - 4 October 2021
 export const COUNTRY_CODES_TO_BLOCK = [
   // Afghanistan
   'AF',
