@@ -443,6 +443,7 @@
           "table": {
             "title": "Assets",
             "name": "Asset",
+            "chainName": "Chain",
             "price": "Price",
             "amount": "Balance",
             "value": "Value"
@@ -574,6 +575,7 @@
         "assetList": {
           "table": {
             "name": "Asset",
+            "chainName": "Chain",
             "price": "Price",
             "amount": "Balance",
             "value": "Value",
@@ -1448,6 +1450,7 @@
           "table": {
             "title": "資產",
             "name": "資產",
+            "chainName": "鏈",
             "price": "價格",
             "amount": "餘額",
             "value": "市值"
@@ -1579,6 +1582,7 @@
         "assetList": {
           "table": {
             "name": "資產",
+            "chainName": "鏈",
             "price": "價格",
             "amount": "餘額",
             "value": "市值",
@@ -2452,6 +2456,7 @@
           "table": {
             "title": "资产",
             "name": "资产",
+            "chainName": "链",
             "price": "价格",
             "amount": "余额",
             "value": "市值"
@@ -2583,6 +2588,7 @@
         "assetList": {
           "table": {
             "name": "资产",
+            "chainName": "链",
             "price": "价格",
             "amount": "余额",
             "value": "市值",
@@ -3584,6 +3590,7 @@
           "table": {
             "title": "타이틀",
             "name": "이름",
+            "chainName": "체인",
             "price": "가격",
             "amount": "금액",
             "value": "가치"
@@ -3711,6 +3718,7 @@
         "assetList": {
           "table": {
             "name": "애셋",
+            "chainName": "체인",
             "price": "가격",
             "amount": "금액",
             "value": "가치",

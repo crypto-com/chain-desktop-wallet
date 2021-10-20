@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Button, Layout, notification, Table, Tabs, Card, List, Avatar } from 'antd';
+import { Button, Layout, notification, Table, Tabs, Card, List, Avatar, Tag } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
@@ -102,12 +102,29 @@ const HomePage = () => {
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: record => {
-        const { name, symbol } = record;
+        const { symbol } = record;
         return (
           <div className="name">
             {assetIcon(record)}
-            {name} ({symbol})
+            {symbol}
           </div>
+        );
+      },
+    },
+    {
+      title: t('home.assetList.table.chainName'),
+      // dataIndex: 'name',
+      key: 'chainName',
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      render: record => {
+        const { name } = record;
+        return (
+          <Tag
+            style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
+            color="processing"
+          >
+            {name}
+          </Tag>
         );
       },
     },
