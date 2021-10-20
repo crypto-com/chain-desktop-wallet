@@ -146,19 +146,18 @@ const CronosBridgeForm = props => {
 
   const analyticsService = new AnalyticsService(session);
   const bridgeService = new BridgeService(walletService.storageService);
-  const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
 
   const croAsset = walletAllAssets.find(asset => {
     return (
       asset.mainnetSymbol.toUpperCase() === 'CRO' &&
-      asset.symbol.toUpperCase() === (isTestnet ? 'TCRO' : 'CRO') &&
+      asset.name.includes('Crypto.org') &&
       asset.assetType === UserAssetType.TENDERMINT
     );
   });
   const cronosAsset = walletAllAssets.find(asset => {
     return (
       asset.mainnetSymbol.toUpperCase() === 'CRO' &&
-      asset.symbol.toUpperCase() === 'CRONOS' &&
+      asset.name.includes('Cronos') &&
       asset.assetType === UserAssetType.EVM
     );
   });
