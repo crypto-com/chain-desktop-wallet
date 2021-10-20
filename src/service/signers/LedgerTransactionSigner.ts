@@ -227,7 +227,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       sender: transaction.fromAddress,
       sourceChannel: transaction.channel || '',
       sourcePort: transaction.port || '',
-      timeoutTimestampInNanoSeconds: Long.fromString(String(timeout), true),
+      timeoutTimestampInNanoSeconds: Long.fromValue(timeout),
       timeoutHeight: {
         revisionNumber: Long.fromString(String(revisionNumber), true),
         revisionHeight: Long.fromString(revisionHeight.toFixed(), true),

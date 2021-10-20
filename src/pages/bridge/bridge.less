@@ -162,16 +162,16 @@
           .title {
             font-size: 24px;
           }
-          .bridge-from,
-          .bridge-to {
-            .asset-icon {
-              height: 40px;
-            }
-          }
           .asset-icon {
             height: 22px;
             > img {
               margin-right: 10px;
+            }
+          }
+          .bridge-from,
+          .bridge-to {
+            .asset-icon {
+              height: 40px;
             }
           }
           .ant-layout,
@@ -205,5 +205,18 @@
         left: 5px !important;
       }
     }
+  }
+}
+
+.bridge-config-modal {
+  .ant-btn:first-of-type {
+    width: 184px;
+    margin: 0 20px 0 0;
+  }
+  .ant-row:last-of-type {
+    margin: 0 !important;
+  }
+  .ant-modal-footer {
+    padding: 0;
   }
 }

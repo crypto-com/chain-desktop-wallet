@@ -1,6 +1,6 @@
 import { TxListAPIResponse, PendingTxListAPIResponse } from '../models/cronos.models';
 
-// Reference: https://cronos-explorer.crypto.org/api-docs
+// Reference: https://cronos.crypto.org/explorer/api-docs
 
 export interface txListRequestOptions extends txPendingListRequestOptions {
   sort?: 'desc' | 'asc' | undefined;
