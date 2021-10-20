@@ -642,7 +642,8 @@
           },
           "port": {
             "title": "Bridge Port"
-          }
+          },
+          "notification": "Bridge Config updated successfully"
         },
         "pendingTransfer": {
           "title": "{{amount}} {{symbol}} is pending to transfer",
@@ -1646,7 +1647,8 @@
           },
           "port": {
             "title": "跨鏈橋端口"
-          }
+          },
+          "notification": "成功更改跨鏈橋設定"
         },
         "pendingTransfer": {
           "title": "{{amount}} {{symbol}} 正等待發送",
@@ -2649,7 +2651,8 @@
           },
           "port": {
             "title": "跨链桥端口"
-          }
+          },
+          "notification": "成功更改跨链桥设定"
         },
         "pendingTransfer": {
           "title": "{{amount}} {{symbol}} 正等待发送",
@@ -3776,7 +3779,8 @@
           },
           "port": {
             "title": "브릿지 포트"
-          }
+          },
+          "notification": "브릿지 설정이 업데이트되었습니다."
         },
         "pendingTransfer": {
           "title": "{{amount}} {{symbol}}이 전송 대기 중입니다",

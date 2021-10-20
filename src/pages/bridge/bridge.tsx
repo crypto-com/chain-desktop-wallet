@@ -1135,7 +1135,7 @@ const CronosBridge = () => {
     bridgeService.updateBridgeConfiguration(updateConfig);
     message.success({
       key: 'bridgeUpdate',
-      content: `Bridge Config successfully updated`,
+      content: t('bridge.config.notification'),
     });
   };
 
