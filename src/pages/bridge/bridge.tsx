@@ -112,6 +112,26 @@ interface listDataSource {
   loading: boolean;
 }
 
+function getCryptoOrgAsset(walletAllAssets: UserAsset[]) {
+  return walletAllAssets.find(asset => {
+    return (
+      asset.mainnetSymbol.toUpperCase() === 'CRO' &&
+      asset.name.includes('Crypto.org') &&
+      asset.assetType === UserAssetType.TENDERMINT
+    );
+  });
+}
+
+function getCronosAsset(walletAllAssets: UserAsset[]) {
+  return walletAllAssets.find(asset => {
+    return (
+      asset.mainnetSymbol.toUpperCase() === 'CRO' &&
+      asset.name.includes('Cronos') &&
+      asset.assetType === UserAssetType.EVM
+    );
+  });
+}
+
 const CronosBridgeForm = props => {
   const {
     form,
@@ -148,20 +168,8 @@ const CronosBridgeForm = props => {
   const analyticsService = new AnalyticsService(session);
   const bridgeService = new BridgeService(walletService.storageService);
 
-  const croAsset = walletAllAssets.find(asset => {
-    return (
-      asset.mainnetSymbol.toUpperCase() === 'CRO' &&
-      asset.name.includes('Crypto.org') &&
-      asset.assetType === UserAssetType.TENDERMINT
-    );
-  });
-  const cronosAsset = walletAllAssets.find(asset => {
-    return (
-      asset.mainnetSymbol.toUpperCase() === 'CRO' &&
-      asset.name.includes('Cronos') &&
-      asset.assetType === UserAssetType.EVM
-    );
-  });
+  const croAsset = getCryptoOrgAsset(walletAllAssets);
+  const cronosAsset = getCronosAsset(walletAllAssets);
 
   const { tendermintAddress, evmAddress } = formValues;
 
@@ -338,20 +346,9 @@ const CronosBridgeForm = props => {
         // Default bridgeFrom set to CRYPTO_ORG
         const currentSession = await walletService.retrieveCurrentSession();
         const assets = await walletService.retrieveCurrentWalletAssets(currentSession);
-        const cro = assets.find(asset => {
-          return (
-            asset.mainnetSymbol.toUpperCase() === 'CRO' &&
-            asset.symbol.toUpperCase() === (isTestnet ? 'TCRO' : 'CRO') &&
-            asset.assetType === UserAssetType.TENDERMINT
-          );
-        });
-        const cronos = assets.find(asset => {
-          return (
-            asset.mainnetSymbol.toUpperCase() === 'CRO' &&
-            asset.symbol.toUpperCase() === 'CRONOS' &&
-            asset.assetType === UserAssetType.EVM
-          );
-        });
+        const cro = getCryptoOrgAsset(assets);
+        const cronos = getCronosAsset(assets);
+
         setBridgeSupportedAssets([cro!]);
         setCurrentAsset(cro);
         setCurrentAssetIdentifier(cro?.identifier);
