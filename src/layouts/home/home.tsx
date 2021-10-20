@@ -203,6 +203,7 @@ function HomeLayout(props: HomeLayoutProps) {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async function fetchAndSaveIBCWalletAssets(fetchSession: Session) {
     try {
       await walletService.fetchIBCAssets(fetchSession);
@@ -589,7 +590,7 @@ function HomeLayout(props: HomeLayoutProps) {
         await fetchAndSetNewValidators(currentSession),
         await fetchAndSetNewProposals(currentSession),
         await fetchAndSetNFTs(currentSession),
-        await fetchAndSaveIBCWalletAssets(currentSession),
+        // await fetchAndSaveIBCWalletAssets(currentSession),
       ]);
 
       const currentValidatorList = await walletService.retrieveTopValidators(
