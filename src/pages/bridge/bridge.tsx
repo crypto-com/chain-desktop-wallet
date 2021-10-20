@@ -348,6 +348,9 @@ const CronosBridgeForm = props => {
         const assets = await walletService.retrieveCurrentWalletAssets(currentSession);
         const cro = getCryptoOrgAsset(assets);
         const cronos = getCronosAsset(assets);
+        const config = await bridgeService.retrieveBridgeConfig(
+          BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS,
+        );
 
         setBridgeSupportedAssets([cro!]);
         setCurrentAsset(cro);
@@ -355,6 +358,9 @@ const CronosBridgeForm = props => {
         setToAddress(cronos?.address);
         setToAsset(cronos);
         setAvailableBalance(scaledBalance(cro!));
+        setBridgeConfigs(config);
+        bridgeConfigForm.setFieldsValue(config);
+        setBridgeConfigFields(Object.keys(config));
 
         form.setFieldsValue({
           asset: cro?.identifier,
