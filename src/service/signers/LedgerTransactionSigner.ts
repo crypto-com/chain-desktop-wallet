@@ -1,8 +1,13 @@
+import sdk from '@crypto-org-chain/chain-jslib';
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { CosmosMsg } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/msg/cosmosMsg';
 import Long from 'long';
-import { Big, Units } from '../../utils/ChainJsLib';
-import { WalletConfig } from '../../config/StaticConfig';
+import { Big, Units, Secp256k1KeyPair } from '../../utils/ChainJsLib';
+import {
+  FIXED_DEFAULT_FEE,
+  FIXED_DEFAULT_GAS_LIMIT,
+  WalletConfig,
+} from '../../config/StaticConfig';
 import {
   TransactionUnsigned,
   DelegateTransactionUnsigned,
@@ -32,6 +37,31 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     this.config = config;
     this.signerProvider = signerProvider;
     this.addressIndex = addressIndex;
+  }
+
+  public getTransactionInfo(_phrase: string, transaction: TransactionUnsigned) {
+    const cro = sdk.CroSDK({ network: this.config.network });
+
+    const rawTx = new cro.RawTransaction();
+    const dummyPrivateKey = Bytes.fromBuffer(Buffer.alloc(32, 1));
+    const keyPair = Secp256k1KeyPair.fromPrivKey(dummyPrivateKey);
+
+    let { memo } = transaction;
+    memo = memo.replace('&', '_');
+    memo = memo.replace('<', '_');
+    memo = memo.replace('>', '_');
+    rawTx.setMemo(memo);
+
+    const networkFee =
+      this.config.fee !== undefined ? this.config.fee.networkFee : FIXED_DEFAULT_FEE;
+    const gasLimit =
+      this.config.fee !== undefined ? this.config.fee.gasLimit : FIXED_DEFAULT_GAS_LIMIT;
+
+    const fee = new cro.Coin(networkFee, Units.BASE);
+
+    rawTx.setFee(fee);
+    rawTx.setGasLimit(gasLimit);
+    return { cro, rawTx, keyPair };
   }
 
   public async signTransfer(
