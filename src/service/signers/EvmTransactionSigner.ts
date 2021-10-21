@@ -21,6 +21,7 @@ class EvmTransactionSigner implements ITransactionSigner {
       transaction.gasPrice || transferAsset?.config?.fee?.networkFee!,
     );
 
+    const chainId = transaction?.asset?.config?.chainId || 338;
     const txParams = {
       nonce: web3.utils.toHex(transaction.nonce || 0),
       gasPrice: web3.utils.toHex(gasPriceBN),
@@ -31,7 +32,7 @@ class EvmTransactionSigner implements ITransactionSigner {
         transaction.memo && transaction.memo.length > 0
           ? web3.utils.utf8ToHex(transaction.memo)
           : '0x',
-      chainId: 338,
+      chainId: Number(chainId),
     };
 
     const signedTx = await ethers.Wallet.fromMnemonic(phrase).signTransaction(txParams);
@@ -46,6 +47,7 @@ class EvmTransactionSigner implements ITransactionSigner {
     const web3 = new Web3('');
 
     const transferAsset = transaction.originAsset;
+    const chainId = transaction?.asset?.config?.chainId || 338;
 
     const txParams = {
       nonce: web3.utils.toHex(transaction.nonce || 0),
@@ -54,7 +56,7 @@ class EvmTransactionSigner implements ITransactionSigner {
       to: transaction.toAddress,
       value: web3.utils.toHex(transaction.amount),
       data: transaction.data,
-      chainId: 338,
+      chainId: Number(chainId),
     };
 
     const signedTx = await ethers.Wallet.fromMnemonic(phrase).signTransaction(txParams);
