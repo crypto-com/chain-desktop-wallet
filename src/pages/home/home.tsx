@@ -388,15 +388,13 @@ const HomePage = () => {
           </div> */}
           <div className="balance">
             <div className="title">{t('home.balance.title1')}</div>
-            {defaultWalletAsset && (
-              <div className="quantity">
-                {defaultWalletAsset && marketData && marketData.price
-                  ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                      getAllAssetsTotalBalance(),
-                    ).format(`0,0.00`)} ${marketData?.currency}`
-                  : ''}
-              </div>
-            )}
+            <div className="quantity">
+              {defaultWalletAsset && marketData && marketData.price
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAllAssetsTotalBalance(),
+                  ).format(`0,0.00`)} ${marketData?.currency}`
+                : ''}
+            </div>
           </div>
           <div className="balance">
             <div className="title">{t('home.balance.title2')}</div>
