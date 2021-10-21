@@ -1,3 +1,5 @@
+/// Please use the gist below to understand what each model means
+/// https://gist.github.com/calvinaco/dac4a1f9929d73b9c77b4809c36c2c01
 export interface BridgeTransaction {
   bridgeType: string;
   sourceBlockHeight: number;
