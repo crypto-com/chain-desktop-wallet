@@ -24,7 +24,6 @@ import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
 import {
   scaledAmount,
   scaledStakingBalance,
-  scaledTotalBalance,
   getAssetBalancePrice,
   getAssetStakingBalancePrice,
   getAssetTotalBalancePrice,
@@ -313,6 +312,20 @@ const HomePage = () => {
     });
   }
 
+  function getAllAssetsTotalBalance() {
+    let totalBalance = Big('0');
+    walletAllAssets.forEach(asset => {
+      if (allMarketData[`${asset.mainnetSymbol}-${currentSession.currency}`]) {
+        const addingBalance = getAssetTotalBalancePrice(
+          asset,
+          allMarketData[`${asset.mainnetSymbol}-${currentSession.currency}`],
+        );
+        totalBalance = totalBalance.add(addingBalance);
+      }
+    });
+    return totalBalance.toFixed(2);
+  }
+
   useEffect(() => {
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
@@ -377,17 +390,13 @@ const HomePage = () => {
             <div className="title">{t('home.balance.title1')}</div>
             {defaultWalletAsset && (
               <div className="quantity">
-                {numeral(scaledTotalBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
-                {defaultWalletAsset?.symbol}
+                {defaultWalletAsset && marketData && marketData.price
+                  ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                      getAllAssetsTotalBalance(),
+                    ).format(`0,0.00`)} ${marketData?.currency}`
+                  : ''}
               </div>
             )}
-            <div className="fiat">
-              {defaultWalletAsset && marketData && marketData.price
-                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetTotalBalancePrice(defaultWalletAsset, marketData),
-                  ).format(`0,0.00`)} ${marketData?.currency}`
-                : ''}
-            </div>
           </div>
           <div className="balance">
             <div className="title">{t('home.balance.title2')}</div>
