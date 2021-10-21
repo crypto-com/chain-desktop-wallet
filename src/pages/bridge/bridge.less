@@ -78,14 +78,31 @@
       display: flex;
       justify-content: space-between;
       .ant-form-item {
-        // display: inline-block;
         width: 300px;
       }
-      // .ant-form-item:first-of-type {
-      //   margin-right: 4%;
-      // }
       .ant-form-item-label {
         width: 100%;
+      }
+    }
+
+    .row-amount-option {
+      height: 40px;
+      .ant-form-item {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        .ant-btn {
+          width: 23%;
+          height: 30px;
+          margin: 5px 0;
+          padding: 4px !important;
+          border: none;
+          border-radius: 25px;
+          box-shadow: 0 0 2px 0 #c2c2c2;
+          span {
+            font-size: 14px !important;
+          }
+        }
       }
     }
     .ant-avatar {

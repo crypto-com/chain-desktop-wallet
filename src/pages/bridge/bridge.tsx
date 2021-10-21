@@ -304,6 +304,13 @@ const CronosBridgeForm = props => {
     setAvailableBalance(scaledBalance(selectedAsset!));
   };
 
+  const onAmountOption = value => {
+    const optionAmount = Big(availableBalance).times(value);
+    form.setFieldsValue({
+      amount: Number(optionAmount.toNumber()),
+    });
+  };
+
   const currentMinAssetAmount = getCurrentMinAssetAmount(currentAsset!);
   const maximumSendAmount = availableBalance;
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
@@ -559,6 +566,39 @@ const CronosBridgeForm = props => {
             onChange={value => setSendingAmount(value ? value.toString() : '0')}
           />
         </Form.Item>
+      </div>
+      <div className="row row-amount-option">
+        <div className="ant-row ant-form-item"> </div>
+        <div className="ant-row ant-form-item">
+          <Button
+            onClick={() => {
+              onAmountOption(0.25);
+            }}
+          >
+            25%
+          </Button>
+          <Button
+            onClick={() => {
+              onAmountOption(0.5);
+            }}
+          >
+            50%
+          </Button>
+          <Button
+            onClick={() => {
+              onAmountOption(0.75);
+            }}
+          >
+            75%
+          </Button>
+          <Button
+            onClick={() => {
+              onAmountOption(1);
+            }}
+          >
+            ALL
+          </Button>
+        </div>
       </div>
       <div className="row">
         <div className="ant-row ant-form-item"> </div>
