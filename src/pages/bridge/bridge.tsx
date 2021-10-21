@@ -1201,26 +1201,30 @@ const CronosBridge = () => {
                 requiredMark="optional"
                 onFinish={onBridgeConfigUpdate}
               >
-                <Form.Item
-                  name="prefix"
-                  label={t('bridge.config.prefix.title')}
-                  rules={[
-                    {
-                      required: true,
-                      message: `${t('bridge.config.prefix.title')} ${t('general.required')}`,
-                    },
-                    {
-                      pattern: isTestnet ? /^[a-z]{4}$/ : /^[a-z]{3}$/,
-                      message: t('bridge.config.prefix.validation', {
-                        number: isTestnet ? '4' : '3',
-                      }),
-                    },
-                  ]}
-                  style={{ textAlign: 'left' }}
-                >
-                  <Input />
-                </Form.Item>
-
+                {bridgeConfigFields.includes('prefix') &&
+                bridgeTransferDirection !== BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG ? (
+                  <Form.Item
+                    name="prefix"
+                    label={t('bridge.config.prefix.title')}
+                    rules={[
+                      {
+                        required: true,
+                        message: `${t('bridge.config.prefix.title')} ${t('general.required')}`,
+                      },
+                      {
+                        pattern: isTestnet ? /^[a-z]{4}$/ : /^[a-z]{3}$/,
+                        message: t('bridge.config.prefix.validation', {
+                          number: isTestnet ? '4' : '3',
+                        }),
+                      },
+                    ]}
+                    style={{ textAlign: 'left' }}
+                  >
+                    <Input />
+                  </Form.Item>
+                ) : (
+                  <></>
+                )}
                 {bridgeConfigFields.includes('cronosBridgeContractAddress') &&
                 bridgeConfigs?.cronosBridgeContractAddress !== '' ? (
                   <Form.Item
