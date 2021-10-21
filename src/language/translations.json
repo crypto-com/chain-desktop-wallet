@@ -93,7 +93,11 @@
           "error": "The password provided is incorrect. Please try again",
           "errorSelfDestruct": "Attempt #*N*. *break* Wallet will self-destruct after #T# more wrong attempts.",
           "success": "Wallet unlocked successfully!",
-          "okButton": "Unlock wallet"
+          "okButton": "Unlock wallet",
+          "notification": {
+            "message": "App Locked",
+            "description": "The app will be locked shortly"
+          }
         },
         "successModalPopup": {
           "title": "Success!",
@@ -1100,7 +1104,11 @@
           "error": "密碼不正確，請重新輸入。",
           "errorSelfDestruct": "第*N*次輸入密碼不正確。如再輸入#T#次錯誤密碼，這錢包將會在被重置",
           "success": "錢包解鎖成功！",
-          "okButton": "解鎖錢包"
+          "okButton": "解鎖錢包",
+          "notification": {
+            "message": "準備鎖上錢包",
+            "description": "錢包即將被鎖上"
+          }
         },
         "successModalPopup": {
           "title": "成功！",
@@ -2106,7 +2114,11 @@
           "error": "密码不正确，请重新输入。",
           "errorSelfDestruct": "第*N*次输入密码不正确。如再输入#T#次错误密码，这钱包将会在被重置",
           "success": "钱包解锁成功！",
-          "okButton": "解锁钱包"
+          "okButton": "解锁钱包",
+          "notification": {
+            "message": "准备上锁钱包",
+            "description": "钱包即将被上锁"
+          }
         },
         "successModalPopup": {
           "title": "成功！",
@@ -3070,7 +3082,11 @@
           "description": "Saisissez le mot de passe du porte feuille",
           "error": "Le mot de passe saisi est incorrect. Réessayer encore",
           "success": "Portefeuille décryption réussi!",
-          "okButton": "Décrypter le portefeuille"
+          "okButton": "Décrypter le portefeuille",
+          "notification": {
+            "message": "앱 잠김",
+            "description": "앱이 곧 잠깁니다."
+          }
         },
         "successModalPopup": {
           "title": "Réussite!",

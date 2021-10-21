@@ -879,8 +879,8 @@ function HomeLayout(props: HomeLayoutProps) {
             icon={<LockFilled style={{ color: '#1199fa' }} />}
             onClick={async () => {
               notification.info({
-                message: 'App Locked',
-                description: 'The app will be locked shortly',
+                message: t('general.sessionLockModal.notification.message'),
+                description: t('general.sessionLockModal.notification.description'),
                 duration: 3,
                 placement: 'topRight',
               });
