@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import { TransactionConfig } from 'web3-eth';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 import Big from 'big.js';
+import axios from 'axios';
 import { BridgeTransferRequest } from '../TransactionRequestModels';
 import { BroadCastResult } from '../../models/Transaction';
 import { BridgeTransactionUnsigned } from '../signers/TransactionSupported';
@@ -23,6 +24,7 @@ import { Network } from '../../config/StaticConfig';
 import { Session } from '../../models/Session';
 import { StorageService } from '../../storage/StorageService';
 import { TransactionPrepareService } from '../TransactionPrepareService';
+import { BridgeTransaction, BridgeTransactionListResponse } from './contracts/BridgeModels';
 
 export class BridgeService {
   public readonly storageService: StorageService;
@@ -312,4 +314,52 @@ export class BridgeService {
       ) || network.defaultNodeUrl.includes('testnet')
     );
   };
+
+  public async fetchAndSaveBridgeTxs(evmAddress: string) {
+    try {
+      const currentSession = await this.storageService.retrieveCurrentSession();
+
+      const isTestnet = this.checkIfTestnet(currentSession.wallet.config.network);
+      const bridgeNetworkConfigType = isTestnet
+        ? BridgeNetworkConfigType.TESTNET_BRIDGE
+        : BridgeNetworkConfigType.MAINNET_BRIDGE;
+
+      const defaultBridgeDirection = BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS;
+      const loadedBridgeConfig = await this.loadBridgeConfig(
+        defaultBridgeDirection,
+        bridgeNetworkConfigType,
+      );
+
+      const defaultBridgeConfig: BridgeConfig = isTestnet
+        ? DefaultTestnetBridgeConfigs[defaultBridgeDirection]
+        : DefaultMainnetBridgeConfigs[defaultBridgeDirection];
+
+      const bridgeIndexingUrl =
+        loadedBridgeConfig?.bridgeIndexingUrl || defaultBridgeConfig?.bridgeIndexingUrl!;
+
+      const response = await axios.get<BridgeTransactionListResponse>(
+        `${bridgeIndexingUrl}/activities?cronosevmAddress=${evmAddress}`,
+      );
+      const loadedBridgeTransactions = response.data.result;
+
+      await this.storageService.saveBridgeTransactions({
+        transactions: loadedBridgeTransactions,
+        walletId: currentSession.wallet.identifier,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Failed to fetchAndSaveBridgeTxs');
+    }
+  }
+
+  public async retrieveCurrentWalletBridgeTransactions(): Promise<BridgeTransaction[]> {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    const savedTxs = await this.storageService.retrieveAllBridgeTransactions(
+      currentSession.wallet.identifier,
+    );
+    if (!savedTxs) {
+      return [];
+    }
+    return savedTxs.transactions;
+  }
 }
