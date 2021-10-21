@@ -24,12 +24,12 @@ import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
 import {
   scaledAmount,
   scaledStakingBalance,
-  scaledTotalBalance,
   getAssetBalancePrice,
   getAssetStakingBalancePrice,
   getAssetTotalBalancePrice,
   UserAsset,
   AssetMarketPrice,
+  UserAssetType,
 } from '../../models/UserAsset';
 
 import { NftModel, NftProcessedModel, RewardsBalances } from '../../models/Transaction';
@@ -39,6 +39,8 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 // import logoCro from '../../assets/AssetLogo/cro.png';
 import IconTick from '../../svg/IconTick';
+import iconCronosSvg from '../../assets/icon-cronos-blue.svg';
+import iconCroSvg from '../../assets/icon-cro.svg';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 import RewardModalPopup from '../../components/RewardModalPopup/RewardModalPopup';
 
@@ -87,6 +89,15 @@ const HomePage = () => {
 
   const assetIcon = asset => {
     const { icon_url, symbol } = asset;
+
+    if (asset.mainnetSymbol === 'CRO') {
+      if (asset.assetType === UserAssetType.TENDERMINT) {
+        return <img src={iconCroSvg} alt="cronos" className="asset-icon" />;
+      }
+      if (asset.assetType === UserAssetType.EVM) {
+        return <img src={iconCronosSvg} alt="cronos" className="asset-icon" />;
+      }
+    }
 
     return icon_url ? (
       <img src={icon_url} alt="cronos" className="asset-icon" />
@@ -301,6 +312,20 @@ const HomePage = () => {
     });
   }
 
+  function getAllAssetsTotalBalance() {
+    let totalBalance = Big('0');
+    walletAllAssets.forEach(asset => {
+      if (allMarketData[`${asset.mainnetSymbol}-${currentSession.currency}`]) {
+        const addingBalance = getAssetTotalBalancePrice(
+          asset,
+          allMarketData[`${asset.mainnetSymbol}-${currentSession.currency}`],
+        );
+        totalBalance = totalBalance.add(addingBalance);
+      }
+    });
+    return totalBalance.toFixed(2);
+  }
+
   useEffect(() => {
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
@@ -363,16 +388,10 @@ const HomePage = () => {
           </div> */}
           <div className="balance">
             <div className="title">{t('home.balance.title1')}</div>
-            {defaultWalletAsset && (
-              <div className="quantity">
-                {numeral(scaledTotalBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
-                {defaultWalletAsset?.symbol}
-              </div>
-            )}
-            <div className="fiat">
+            <div className="quantity">
               {defaultWalletAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetTotalBalancePrice(defaultWalletAsset, marketData),
+                    getAllAssetsTotalBalance(),
                   ).format(`0,0.00`)} ${marketData?.currency}`
                 : ''}
             </div>

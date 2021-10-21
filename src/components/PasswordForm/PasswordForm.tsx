@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Form, Input, Progress } from 'antd';
+import { Checkbox, Form, Input, Progress } from 'antd';
 import { useTranslation } from 'react-i18next';
 import './PasswordForm.less';
 
@@ -46,8 +46,13 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
         form={form}
         name="control-ref"
         onChange={() => {
-          // `score` ranges from 0-4
-          setStrength(zxcvbn(form.getFieldsValue().password).score);
+          const { password } = form.getFieldsValue();
+
+          if (password) {
+            // `score` ranges from 0-4
+            setStrength(zxcvbn(password).score);
+          }
+
           props.onChange();
         }}
         onFinish={onFormFinish}
@@ -120,6 +125,34 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
               ]}
             >
               <Input.Password placeholder={t('general.passwordForm.passwordConfirm.label')} />
+            </Form.Item>
+
+            <Form.Item
+              name="agreement"
+              valuePropName="checked"
+              rules={[
+                {
+                  validator: (_, value) =>
+                    value
+                      ? Promise.resolve()
+                      : Promise.reject(
+                          new Error(
+                            `${t('signup.passwordFormContainer.tAndC')} ${t('general.required')}`,
+                          ),
+                        ),
+                },
+              ]}
+            >
+              <Checkbox
+                style={{
+                  width: '100%',
+                }}
+              >
+                {t('signup.passwordFormContainer.agreeTermsLabel')}{' '}
+                <a href="https://crypto.org/desktopwallet/terms" target="_blank" rel="noreferrer">
+                  {t('signup.passwordFormContainer.tAndC')}
+                </a>
+              </Checkbox>
             </Form.Item>
           </>
         )}

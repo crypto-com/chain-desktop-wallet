@@ -304,6 +304,13 @@ const CronosBridgeForm = props => {
     setAvailableBalance(scaledBalance(selectedAsset!));
   };
 
+  const onAmountOption = value => {
+    const optionAmount = Big(availableBalance).times(value);
+    form.setFieldsValue({
+      amount: Number(optionAmount.toNumber()),
+    });
+  };
+
   const currentMinAssetAmount = getCurrentMinAssetAmount(currentAsset!);
   const maximumSendAmount = availableBalance;
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
@@ -560,6 +567,39 @@ const CronosBridgeForm = props => {
           />
         </Form.Item>
       </div>
+      <div className="row row-amount-option">
+        <div className="ant-row ant-form-item"> </div>
+        <div className="ant-row ant-form-item">
+          <Button
+            onClick={() => {
+              onAmountOption(0.25);
+            }}
+          >
+            25%
+          </Button>
+          <Button
+            onClick={() => {
+              onAmountOption(0.5);
+            }}
+          >
+            50%
+          </Button>
+          <Button
+            onClick={() => {
+              onAmountOption(0.75);
+            }}
+          >
+            75%
+          </Button>
+          <Button
+            onClick={() => {
+              onAmountOption(1);
+            }}
+          >
+            ALL
+          </Button>
+        </div>
+      </div>
       <div className="row">
         <div className="ant-row ant-form-item"> </div>
         <div className="available ant-row ant-form-item">
@@ -669,6 +709,15 @@ const CronosBridge = () => {
 
   const assetIcon = asset => {
     const { icon_url, symbol } = asset;
+
+    if (asset.mainnetSymbol === 'CRO') {
+      if (asset.assetType === UserAssetType.TENDERMINT) {
+        return <img src={iconCroSvg} alt="cronos" className="asset-icon" />;
+      }
+      if (asset.assetType === UserAssetType.EVM) {
+        return <img src={iconCronosSvg} alt="cronos" className="asset-icon" />;
+      }
+    }
 
     return icon_url ? (
       <img src={icon_url} alt="cronos" className="asset-icon" />
@@ -1201,26 +1250,30 @@ const CronosBridge = () => {
                 requiredMark="optional"
                 onFinish={onBridgeConfigUpdate}
               >
-                <Form.Item
-                  name="prefix"
-                  label={t('bridge.config.prefix.title')}
-                  rules={[
-                    {
-                      required: true,
-                      message: `${t('bridge.config.prefix.title')} ${t('general.required')}`,
-                    },
-                    {
-                      pattern: isTestnet ? /^[a-z]{4}$/ : /^[a-z]{3}$/,
-                      message: t('bridge.config.prefix.validation', {
-                        number: isTestnet ? '4' : '3',
-                      }),
-                    },
-                  ]}
-                  style={{ textAlign: 'left' }}
-                >
-                  <Input />
-                </Form.Item>
-
+                {bridgeConfigFields.includes('prefix') &&
+                bridgeTransferDirection !== BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG ? (
+                  <Form.Item
+                    name="prefix"
+                    label={t('bridge.config.prefix.title')}
+                    rules={[
+                      {
+                        required: true,
+                        message: `${t('bridge.config.prefix.title')} ${t('general.required')}`,
+                      },
+                      {
+                        pattern: isTestnet ? /^[a-z]{4}$/ : /^[a-z]{3}$/,
+                        message: t('bridge.config.prefix.validation', {
+                          number: isTestnet ? '4' : '3',
+                        }),
+                      },
+                    ]}
+                    style={{ textAlign: 'left' }}
+                  >
+                    <Input />
+                  </Form.Item>
+                ) : (
+                  <></>
+                )}
                 {bridgeConfigFields.includes('cronosBridgeContractAddress') &&
                 bridgeConfigs?.cronosBridgeContractAddress !== '' ? (
                   <Form.Item
