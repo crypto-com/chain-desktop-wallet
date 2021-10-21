@@ -86,54 +86,6 @@ interface HomeLayoutProps {
 
 const { Sider } = Layout;
 
-// const allPathsComponent = [
-//   {
-//     path: '/home',
-//     label: i18n.t('navbar.home'),
-//     icon: <Icon component={IconHome} />
-//   },
-//   {
-//     path: '/staking',
-//     label: i18n.t('navbar.staking'),
-//     icon: <Icon component={IconStaking} />
-//   },
-//   {
-//     path: '/assets',
-//     label: i18n.t('navbar.assets'),
-//     icon: <Icon component={IconAssets} />
-//   },
-//   {
-//     path: '/bridge',
-//     label: i18n.t('navbar.bridge'),
-//     icon: <Icon component={IconCronos} />
-//   },
-//   {
-//     path: '/bridge',
-//     label: i18n.t('navbar.bridge'),
-//     icon: <Icon component={IconCronos} />
-//   },
-//   {
-//     path: '/governance',
-//     label: i18n.t('navbar.governance'),
-//     icon: <BankOutlined />
-//   },
-//   {
-//     path: '/nft',
-//     label: i18n.t('navbar.nft'),
-//     icon: <Icon component={IconNft} />
-//   },
-//   {
-//     path: '/settings',
-//     label: i18n.t('navbar.settings'),
-//     icon: <SettingOutlined />
-//   },
-//   {
-//     path: '/wallet',
-//     label: i18n.t('navbar.wallet'),
-//     icon: <SettingOutlined />
-//   },
-// ]
-
 const allPaths = [
   '/home',
   '/staking',
@@ -205,6 +157,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async function fetchAndSaveIBCWalletAssets(fetchSession: Session) {
+    // lgtm [js/unused-local-variable]
     try {
       await walletService.fetchIBCAssets(fetchSession);
     } catch (e) {

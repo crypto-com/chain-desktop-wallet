@@ -116,7 +116,7 @@ function getCryptoOrgAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
     return (
       asset.mainnetSymbol.toUpperCase() === 'CRO' &&
-      asset.name.includes('Crypto.org') &&
+      asset.name.includes('Crypto.org') && // lgtm [js/incomplete-url-substring-sanitization]
       asset.assetType === UserAssetType.TENDERMINT
     );
   });
