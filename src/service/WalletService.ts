@@ -1,5 +1,4 @@
 import axios from 'axios';
-import _ from 'lodash';
 import { TransactionConfig } from 'web3-eth';
 import Web3 from 'web3';
 import {
@@ -159,6 +158,12 @@ class WalletService {
           transfer.nonce = prepareTxInfo.nonce;
           transfer.gasPrice = prepareTxInfo.loadedGasPrice;
           transfer.gasLimit = prepareTxInfo.gasLimit;
+
+          const isMemoProvided = transferRequest.memo && transferRequest.memo.length > 0;
+          // If transaction is provided with memo, add a little bit more gas to it to be accepted. 10% more
+          transfer.gasLimit = isMemoProvided
+            ? Number(transfer.gasLimit) + Number(transfer.gasLimit) * (10 / 100)
+            : transfer.gasLimit;
 
           let signedTx = '';
           if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
@@ -604,7 +609,7 @@ class WalletService {
       this.syncBalancesData(currentSession),
       this.syncTransactionsData(currentSession),
       this.fetchAndSaveNFTs(currentSession),
-      this.fetchIBCAssets(currentSession),
+      // this.fetchIBCAssets(currentSession),
     ]);
   }
 
@@ -1119,16 +1124,12 @@ class WalletService {
 
   public async retrieveWalletAssets(walletIdentifier: string): Promise<UserAsset[]> {
     const assets = await this.storageService.retrieveAssetsByWallet(walletIdentifier);
-    const userAssets = assets
+    return assets
       .filter(asset => asset.assetType !== UserAssetType.IBC)
       .map(data => {
         const asset: UserAsset = { ...data };
         return asset;
       });
-
-    // https://github.com/louischatriot/nedb/issues/185
-    // NeDB does not support distinct queries, it needs to be done programmatically
-    return _.uniqBy(userAssets, 'symbol');
   }
 
   public async retrieveCurrentWalletAssets(currentSession: Session): Promise<UserAsset[]> {
@@ -1136,16 +1137,12 @@ class WalletService {
       currentSession.wallet.identifier,
     );
 
-    const userAssets = assets
+    return assets
       .filter(asset => asset.assetType !== UserAssetType.IBC)
       .map(data => {
         const asset: UserAsset = { ...data };
         return asset;
       });
-
-    // https://github.com/louischatriot/nedb/issues/185
-    // NeDB does not support distinct queries, it needs to be done programmatically
-    return _.uniqBy(userAssets, 'symbol');
   }
 
   public async retrieveDefaultWalletAsset(currentSession: Session): Promise<UserAsset> {
