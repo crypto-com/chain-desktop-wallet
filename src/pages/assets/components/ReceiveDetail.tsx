@@ -85,10 +85,6 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
 
   return (
     <div className="receive-detail">
-      {/* <div className="title">
-        {assetIcon(currentAsset)}
-        {currentAsset?.name} ({currentAsset?.symbol})
-      </div> */}
       <div className="address">
         <QRCode value={assetAddress(currentAsset, session)} size={180} />
         <div className="name">{session.wallet.name}</div>
