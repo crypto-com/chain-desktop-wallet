@@ -29,6 +29,10 @@ export interface BridgeTransactionListResponse {
   result: BridgeTransaction[];
 }
 
+export interface BridgeTransactionStatusResponse {
+  result: BridgeTransaction;
+}
+
 export interface BridgeTransactionHistoryList {
   walletId: string;
   transactions: BridgeTransaction[];

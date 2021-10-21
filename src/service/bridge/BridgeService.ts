@@ -24,7 +24,11 @@ import { Network } from '../../config/StaticConfig';
 import { Session } from '../../models/Session';
 import { StorageService } from '../../storage/StorageService';
 import { TransactionPrepareService } from '../TransactionPrepareService';
-import { BridgeTransaction, BridgeTransactionListResponse } from './contracts/BridgeModels';
+import {
+  BridgeTransaction,
+  BridgeTransactionListResponse,
+  BridgeTransactionStatusResponse,
+} from './contracts/BridgeModels';
 
 export class BridgeService {
   public readonly storageService: StorageService;
@@ -91,7 +95,7 @@ export class BridgeService {
     const { currentSession } = prepareTxInfo;
     const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
       currentSession,
-      bridgeTransferRequest,
+      bridgeTransferRequest.bridgeTransferDirection,
     );
 
     // TODO: Load contract address from Bridge configuration object
@@ -187,7 +191,7 @@ export class BridgeService {
     );
     const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
       currentSession,
-      bridgeTransferRequest,
+      bridgeTransferRequest.bridgeTransferDirection,
     );
 
     const evmToBech32ConvertedRecipient = getBech32AddressFromEVMAddress(
@@ -226,18 +230,18 @@ export class BridgeService {
 
   public async getCurrentBridgeConfig(
     currentSession: Session,
-    bridgeTransferRequest: BridgeTransferRequest,
+    bridgeDirection: BridgeTransferDirection,
   ) {
     const isTestnet = this.checkIfTestnet(currentSession.wallet.config.network);
     const bridgeNetworkConfigType = isTestnet
       ? BridgeNetworkConfigType.TESTNET_BRIDGE
       : BridgeNetworkConfigType.MAINNET_BRIDGE;
     const defaultBridgeConfig: BridgeConfig = isTestnet
-      ? DefaultTestnetBridgeConfigs[bridgeTransferRequest.bridgeTransferDirection]
-      : DefaultMainnetBridgeConfigs[bridgeTransferRequest.bridgeTransferDirection];
+      ? DefaultTestnetBridgeConfigs[bridgeDirection]
+      : DefaultMainnetBridgeConfigs[bridgeDirection];
 
     const loadedBridgeConfig = await this.loadBridgeConfig(
-      bridgeTransferRequest.bridgeTransferDirection,
+      bridgeDirection,
       bridgeNetworkConfigType,
     );
     return { defaultBridgeConfig, loadedBridgeConfig };
@@ -283,7 +287,10 @@ export class BridgeService {
     currentSession: Session,
     bridgeTransferRequest: BridgeTransferRequest,
   ) {
-    const bridgeConfig = await this.getCurrentBridgeConfig(currentSession, bridgeTransferRequest);
+    const bridgeConfig = await this.getCurrentBridgeConfig(
+      currentSession,
+      bridgeTransferRequest.bridgeTransferDirection,
+    );
     const { loadedBridgeConfig, defaultBridgeConfig } = bridgeConfig;
     const exp = Big(10).pow(bridgeTransferRequest?.originAsset.decimals);
 
@@ -318,22 +325,12 @@ export class BridgeService {
   public async fetchAndSaveBridgeTxs(evmAddress: string) {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
-
-      const isTestnet = this.checkIfTestnet(currentSession.wallet.config.network);
-      const bridgeNetworkConfigType = isTestnet
-        ? BridgeNetworkConfigType.TESTNET_BRIDGE
-        : BridgeNetworkConfigType.MAINNET_BRIDGE;
-
       const defaultBridgeDirection = BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS;
-      const loadedBridgeConfig = await this.loadBridgeConfig(
+
+      const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
+        currentSession,
         defaultBridgeDirection,
-        bridgeNetworkConfigType,
       );
-
-      const defaultBridgeConfig: BridgeConfig = isTestnet
-        ? DefaultTestnetBridgeConfigs[defaultBridgeDirection]
-        : DefaultMainnetBridgeConfigs[defaultBridgeDirection];
-
       const bridgeIndexingUrl =
         loadedBridgeConfig?.bridgeIndexingUrl || defaultBridgeConfig?.bridgeIndexingUrl!;
 
@@ -341,6 +338,9 @@ export class BridgeService {
         `${bridgeIndexingUrl}/activities?cronosevmAddress=${evmAddress}`,
       );
       const loadedBridgeTransactions = response.data.result;
+
+      // eslint-disable-next-line no-console
+      console.log('Loaded bridge txs', loadedBridgeTransactions);
 
       await this.storageService.saveBridgeTransactions({
         transactions: loadedBridgeTransactions,
@@ -361,5 +361,30 @@ export class BridgeService {
       return [];
     }
     return savedTxs.transactions;
+  }
+
+  public async getBridgeTransactionByHash(
+    transactionHash: string,
+  ): Promise<BridgeTransaction | null> {
+    try {
+      const session = await this.storageService.retrieveCurrentSession();
+      const defaultBridgeDirection = BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS;
+
+      const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
+        session,
+        defaultBridgeDirection,
+      );
+      const bridgeIndexingUrl =
+        loadedBridgeConfig?.bridgeIndexingUrl || defaultBridgeConfig?.bridgeIndexingUrl!;
+
+      const response = await axios.get<BridgeTransactionStatusResponse>(
+        `${bridgeIndexingUrl}/txs/${transactionHash}`,
+      );
+      return response.data.result;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Failed to getBridgeTransactionByHash');
+      return null;
+    }
   }
 }
