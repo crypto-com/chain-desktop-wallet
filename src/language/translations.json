@@ -239,6 +239,8 @@
           "title": "Create App Password",
           "description": "Before creating a new wallet, please create your app password. It will be used to encrypt your wallet seeds.",
           "okButton": "Create App Password",
+          "agreeTermsLabel": "I agree to the",
+          "tAndC": "Terms & Conditions",
           "success": "You have successfully created your app password. You can proceed to restore or create a wallet."
         }
       },
@@ -1250,6 +1252,8 @@
           "title": "創建密碼",
           "description": "在創建新錢包之前，請先創建密碼。密碼會用來加密你的私鑰種子。",
           "okButton": "創建密碼",
+          "agreeTermsLabel": "我同意",
+          "tAndC": "條款及細則",
           "success": "你已經成功創建你的密碼。現在可以進一步復原錢包或者創建錢包。"
         }
       },
@@ -2260,6 +2264,8 @@
           "title": "创建密码",
           "description": "在创建新钱包之前，请先创建密码。 密码会用来加密你的私钥种子。",
           "okButton": "创建密码",
+          "agreeTermsLabel": "我同意",
+          "tAndC": "条款及细则",
           "success": "你已经成功创建你的密码。现在可以进一步复原钱包或者创建钱包。"
         }
       },
@@ -3398,6 +3404,8 @@
           "title": "앱 패스워드 만들기",
           "description": "지갑을 만들기 전에, 앱 패워드를 생성해주세요",
           "okButton": "앱 패스워드 만들기",
+          "agreeTermsLabel": "나는 동의 함",
+          "tAndC": "이용 약관",
           "success": "지갑 암호가 잘 생성되었습니다.  지갑 생성과 가져오기를 계속 할 수 있습니다"
         }
       },
