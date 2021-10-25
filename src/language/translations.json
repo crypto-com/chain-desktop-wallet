@@ -594,6 +594,18 @@
         }
       },
       "bridge": {
+        "transactionHistory": {
+          "title": "Bridge Transfer History",
+          "description": "Below is your transaction history of bridge transfers",
+          "table": {
+            "transactionHash": "Transaction Hash",
+            "amount": "Amount",
+            "fromAddress": "From (Network)",
+            "toAddress": "To (Network)",
+            "time": "Time",
+            "status": "Status"
+          }
+        },
         "form": {
           "from": "From",
           "to": "To",
@@ -663,16 +675,6 @@
         "ledgerSign": {
           "failed": {
             "title": "Failed to broadcast a signed transaction on Ledger"
-          }
-        },
-        "transactionHistory": {
-          "table": {
-            "transactionHash": "Transaction Hash",
-            "amount": "Amount",
-            "fromAddress": "From (Network)",
-            "toAddress": "To (Network)",
-            "time": "Time",
-            "status": "Status"
           }
         }
       },
@@ -1608,6 +1610,18 @@
         }
       },
       "bridge": {
+        "transactionHistory": {
+          "title": "跨鏈橋交易記錄",
+          "description": "以下是你的跨鏈橋交易記錄",
+          "table": {
+            "transactionHash": "交易哈希值",
+            "amount": "數量",
+            "fromAddress": "從（網絡）",
+            "toAddress": "到（網絡）",
+            "time": "時間",
+            "status": "狀態"
+          }
+        },
         "form": {
           "from": "從",
           "to": "至",
@@ -1677,16 +1691,6 @@
         "ledgerSign": {
           "failed": {
             "title": "未能成功廣播Ledger的簽名交易"
-          }
-        },
-        "transactionHistory": {
-          "table": {
-            "transactionHash": "交易哈希值",
-            "amount": "數量",
-            "fromAddress": "從（網絡）",
-            "toAddress": "到（網絡）",
-            "time": "時間",
-            "status": "狀態"
           }
         }
       },
@@ -2621,6 +2625,18 @@
         }
       },
       "bridge": {
+        "transactionHistory": {
+          "title": "跨链桥交易记录",
+          "description": "以下是你的跨链桥交易记录",
+          "table": {
+            "transactionHash": "交易哈希值",
+            "amount": "数量",
+            "fromAddress": "从（网络）",
+            "toAddress": "到（网络）",
+            "time": "时间",
+            "status": "状态"
+          }
+        },
         "form": {
           "from": "从",
           "to": "至",
@@ -2690,16 +2706,6 @@
         "ledgerSign": {
           "failed": {
             "title": "未能成功广播Ledger的签名交易"
-          }
-        },
-        "transactionHistory": {
-          "table": {
-            "transactionHash": "交易哈希值",
-            "amount": "数量",
-            "fromAddress": "从（网络）",
-            "toAddress": "到（网络）",
-            "time": "时间",
-            "status": "状态"
           }
         }
       },
@@ -3758,6 +3764,18 @@
         }
       },
       "bridge": {
+        "transactionHistory": {
+          "title": "브릿지 거래 기록",
+          "description": "이것들은 당신의 브릿지 거래 기록",
+          "table": {
+            "transactionHash": "트랜잭션 해쉬",
+            "amount": "금액",
+            "fromAddress": "송신인（네트워크）",
+            "toAddress": "수신인（네트워크）",
+            "time": "시간",
+            "status": "상태"
+          }
+        },
         "form": {
           "from": "송신인",
           "to": "수신인",
@@ -3827,16 +3845,6 @@
         "ledgerSign": {
           "failed": {
             "title": "레져에서 서명된 트랜잭션을 전송하지 못했습니다."
-          }
-        },
-        "transactionHistory": {
-          "table": {
-            "transactionHash": "트랜잭션 해쉬",
-            "amount": "금액",
-            "fromAddress": "송신인（네트워크）",
-            "toAddress": "수신인（네트워크）",
-            "time": "시간",
-            "status": "상태"
           }
         }
       },
