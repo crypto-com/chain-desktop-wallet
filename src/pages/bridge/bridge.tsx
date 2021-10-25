@@ -73,6 +73,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { BridgeTransferRequest } from '../../service/TransactionRequestModels';
+import IconTransferHistory from '../../svg/IconTransferHistory';
 
 const { Content, Sider } = Layout;
 const { Option } = Select;
@@ -1504,7 +1505,16 @@ const CronosHistory = () => {
   // TO-DO
   const allBridgeHistory = [];
 
-  useEffect(() => {}, []);
+  // const bridgeService = new BridgeService(walletService.storageService);
+
+  useEffect(() => {
+    const fetchBridgeHistory = async () => {
+      // await bridgeService.fetchAndSaveBridgeTxs('0x85e0280712AaBDD0884732141B048b3B6fdE405B');
+      // const transactionHistory = await bridgeService.retrieveCurrentWalletBridgeTransactions();
+      // console.log(transactionHistory)
+    };
+    fetchBridgeHistory();
+  }, []);
 
   return (
     <>
@@ -1519,24 +1529,46 @@ const CronosHistory = () => {
 };
 
 const BridgePage = () => {
-  // const [t] = useTranslation();
+  const [view, setView] = useState('cronos-bridge');
+
+  const [t] = useTranslation();
 
   return (
     <Layout className="site-layout bridge-layout">
       <Content>
-        {/* <div className="go-to-transfer-history">
-          <a>
-            <div>
-              <IconTransferHistory />
-              <span>{t('bridge.action.viewTransactionHistory')}</span>
+        {view === 'cronos-bridge' ? (
+          <>
+            <div className="go-to-transfer-history">
+              <a>
+                <div onClick={() => setView('history')}>
+                  <IconTransferHistory />
+                  <span>{t('bridge.action.viewTransactionHistory')}</span>
+                </div>
+              </a>
             </div>
-          </a>
-        </div> */}
-        <div className="site-layout-background bridge-content">
-          <div className="container">
-            <CronosBridge />
-          </div>
-        </div>
+            <div className="site-layout-background bridge-content">
+              <div className="container">
+                <CronosBridge />
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="go-to-transfer-history">
+              <a>
+                <div onClick={() => setView('cronos-bridge')}>
+                  <img src={iconCronosSvg} alt="cronos" style={{ height: '24px' }} />
+                  <span>{t('bridge.action.backToCronosBridge')}</span>
+                </div>
+              </a>
+            </div>
+            <div className="site-layout-background bridge-content">
+              <div className="container">
+                <CronosHistory />
+              </div>
+            </div>
+          </>
+        )}
       </Content>
     </Layout>
   );
