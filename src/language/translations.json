@@ -634,7 +634,8 @@
         },
         "action": {
           "viewTransaction": "View Transaction",
-          "viewTransactionHistory": "View Transaction History"
+          "viewTransactionHistory": "View Transaction History",
+          "backToCronosBridge": "Back to Cronos Bridge"
         },
         "config": {
           "prefix": {
@@ -1647,7 +1648,8 @@
         },
         "action": {
           "viewTransaction": "查看交易",
-          "viewTransactionHistory": "查看交易歷史"
+          "viewTransactionHistory": "查看交易歷史",
+          "backToCronosBridge": "返回Cronos 跨鏈橋"
         },
         "config": {
           "prefix": {
@@ -2659,7 +2661,8 @@
         },
         "action": {
           "viewTransaction": "查看交易",
-          "viewTransactionHistory": "查看交易历史"
+          "viewTransactionHistory": "查看交易历史",
+          "backToCronosBridge": "返回Cronos 跨链桥"
         },
         "config": {
           "prefix": {
@@ -3795,7 +3798,8 @@
         },
         "action": {
           "viewTransaction": "트랜잭션 보기",
-          "viewTransactionHistory": "트랜잭션 내역 보기"
+          "viewTransactionHistory": "트랜잭션 내역 보기",
+          "backToCronosBridge": "Cronos 브릿지 리스트로 돌아가기"
         },
         "config": {
           "prefix": {

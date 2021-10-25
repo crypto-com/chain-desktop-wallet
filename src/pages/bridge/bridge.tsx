@@ -15,7 +15,7 @@ import {
   Card,
   Skeleton,
   Table,
-  Typography,
+  // Typography,
   Tag,
   Input,
   message,
@@ -31,11 +31,12 @@ import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
+import { Header } from 'antd/lib/layout/layout';
 import { isBridgeTransferingState, sessionState, walletAllAssetsState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 
 import { UserAsset, scaledBalance, UserAssetType } from '../../models/UserAsset';
-import { BroadCastResult, TransactionDirection, TransactionStatus } from '../../models/Transaction';
+import { BroadCastResult, TransactionStatus } from '../../models/Transaction';
 import { renderExplorerUrl } from '../../models/Explorer';
 import { middleEllipsis } from '../../utils/utils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
@@ -74,12 +75,13 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { BridgeTransferRequest } from '../../service/TransactionRequestModels';
 import IconTransferHistory from '../../svg/IconTransferHistory';
+import { BridgeTransaction } from '../../service/bridge/contracts/BridgeModels';
 
 const { Content, Sider } = Layout;
 const { Option } = Select;
 const { Step } = Steps;
 // const { TabPane } = Tabs;
-const { Text } = Typography;
+// const { Text } = Typography;
 // const { Meta } = Card;
 const layout = {
   // labelCol: { span: 8 },
@@ -901,12 +903,25 @@ const CronosBridge = () => {
         ),
         loading: false,
       });
+
       listDataSource.push({
         title: t('bridge.transferInitiated.title'),
         description: <>{t('bridge.transferInitiated.description')}</>,
         loading: false,
       });
+
+      listDataSource.push({
+        title: '',
+        description: <></>,
+        loading: true,
+      });
+
       setBridgeConfirmationList(listDataSource);
+
+      // TO-DO
+      const result = await bridgeService.getBridgeTransactionByHash(sendResult.transactionHash!);
+      console.log(result?.destinationTransactionId);
+      console.log(result?.sourceTransactionId);
 
       analyticsService.logTransactionEvent(
         sendResult.transactionHash as string,
@@ -1389,24 +1404,87 @@ const CronosBridge = () => {
 // eslint-disable-next-line
 const CronosHistory = () => {
   const session = useRecoilValue(sessionState);
+  const [allBridgeHistory, setAllBridgeHistory] = useState<BridgeTransferTabularData[]>([]);
 
   const [t] = useTranslation();
 
-  interface TransferTabularData {
+  interface BridgeTransferTabularData {
     key: string;
     transactionHash: string;
+    sourceTransactionId: string;
+    destinationTransactionId: string;
     recipientAddress: string;
+    source: {
+      address: string;
+      chain: string;
+    };
+    destination: {
+      address: string;
+      chain: string;
+    };
     amount: string;
     time: string;
-    direction: TransactionDirection;
+    // direction: string;
     status: TransactionStatus;
   }
+
+  const convertBridgeTransfers = (allTransfers: BridgeTransaction[]) => {
+    const getStatus = (transfer: BridgeTransaction) => {
+      if (transfer.status) {
+        return TransactionStatus.SUCCESS;
+      }
+      return TransactionStatus.FAILED;
+    };
+    // const getType = (transfer: NftAccountTransactionData) => {
+    //   if (transfer.messageType === NftTransactionType.ISSUE_DENOM) {
+    //     return NftTransactionType.ISSUE_DENOM;
+    //     // eslint-disable-next-line no-else-return
+    //   } else if (transfer.messageType === NftTransactionType.MINT_NFT) {
+    //     return NftTransactionType.MINT_NFT;
+    //   } else if (transfer.messageType === NftTransactionType.EDIT_NFT) {
+    //     return NftTransactionType.EDIT_NFT;
+    //   } else if (transfer.messageType === NftTransactionType.BURN_NFT) {
+    //     return NftTransactionType.BURN_NFT;
+    //   }
+    //   return NftTransactionType.TRANSFER_NFT;
+    // };
+
+    return allTransfers.map(transfer => {
+      const data: BridgeTransferTabularData = {
+        key:
+          transfer.sourceTransactionId +
+          transfer.sourceAddress +
+          transfer.destinationTransactionId +
+          transfer.destinationAddress +
+          transfer.displayAmount +
+          transfer.displayDenom,
+        sourceTransactionId: transfer.sourceTransactionId,
+        destinationTransactionId: transfer.destinationTransactionId,
+        transactionHash: transfer.destinationTransactionId,
+        // messageType: getType(transfer),
+        recipientAddress: transfer.destinationAddress,
+        source: {
+          address: transfer.sourceAddress,
+          chain: transfer.sourceChain,
+        },
+        destination: {
+          address: transfer.destinationAddress,
+          chain: transfer.destinationChain,
+        },
+        amount: transfer.displayAmount,
+        time: new Date(transfer.updatedAt).toLocaleString(),
+        // direction: transfer.sourceChain,
+        status: getStatus(transfer),
+      };
+      return data;
+    });
+  };
 
   const HistoryColumns = [
     {
       title: t('bridge.transactionHistory.table.transactionHash'),
-      dataIndex: 'transactionHash',
-      key: 'transactionHash',
+      dataIndex: 'sourceTransactionId',
+      key: 'sourceTransactionId',
       render: text => (
         <a
           data-original={text}
@@ -1425,51 +1503,58 @@ const CronosHistory = () => {
       title: t('bridge.transactionHistory.table.amount'),
       dataIndex: 'amount',
       key: 'amount',
-      render: (text, record: TransferTabularData) => {
-        const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
-        const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
-        return (
-          <Text type={color}>
-            {sign}
-            {text}
-          </Text>
-        );
+      render: text => {
+        // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
+        // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+        // return (
+        //   <Text type={color}>
+        //     {sign}
+        //     {text}
+        //   </Text>
+        // );
+        return <>{text}</>;
       },
     },
     {
       title: t('bridge.transactionHistory.table.fromAddress'),
-      dataIndex: 'fromAddress',
-      key: 'fromAddress',
-      render: text => (
-        <a
-          data-original={text}
-          target="_blank"
-          rel="noreferrer"
-          href={`${renderExplorerUrl(
-            session.activeAsset?.config ?? session.wallet.config,
-            'address',
-          )}/${text}`}
-        >
-          {middleEllipsis(text, 12)}
-        </a>
+      dataIndex: 'source',
+      key: 'source',
+      render: source => (
+        <>
+          <a
+            data-original={source.address}
+            target="_blank"
+            rel="noreferrer"
+            href={`${renderExplorerUrl(
+              session.activeAsset?.config ?? session.wallet.config,
+              'address',
+            )}/${source.address}`}
+          >
+            {middleEllipsis(source.address, 12)}
+          </a>{' '}
+          ({source.chain})
+        </>
       ),
     },
     {
       title: t('bridge.transactionHistory.table.toAddress'),
-      dataIndex: 'toAddress',
-      key: 'toAddress',
-      render: text => (
-        <a
-          data-original={text}
-          target="_blank"
-          rel="noreferrer"
-          href={`${renderExplorerUrl(
-            session.activeAsset?.config ?? session.wallet.config,
-            'address',
-          )}/${text}`}
-        >
-          {middleEllipsis(text, 12)}
-        </a>
+      dataIndex: 'destination',
+      key: 'destination',
+      render: destination => (
+        <>
+          <a
+            data-original={destination.address}
+            target="_blank"
+            rel="noreferrer"
+            href={`${renderExplorerUrl(
+              session.activeAsset?.config ?? session.wallet.config,
+              'address',
+            )}/${destination.address}`}
+          >
+            {middleEllipsis(destination.address, 12)}
+          </a>{' '}
+          ({destination.chain})
+        </>
       ),
     },
     {
@@ -1481,7 +1566,7 @@ const CronosHistory = () => {
       title: t('bridge.transactionHistory.table.status'),
       dataIndex: 'status',
       key: 'status',
-      render: (text, record: TransferTabularData) => {
+      render: (text, record: BridgeTransferTabularData) => {
         // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
         // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
         let statusColor;
@@ -1502,16 +1587,16 @@ const CronosHistory = () => {
     },
   ];
 
-  // TO-DO
-  const allBridgeHistory = [];
-
-  // const bridgeService = new BridgeService(walletService.storageService);
+  const bridgeService = new BridgeService(walletService.storageService);
 
   useEffect(() => {
     const fetchBridgeHistory = async () => {
       // await bridgeService.fetchAndSaveBridgeTxs('0x85e0280712AaBDD0884732141B048b3B6fdE405B');
-      // const transactionHistory = await bridgeService.retrieveCurrentWalletBridgeTransactions();
-      // console.log(transactionHistory)
+      const transactionHistory = await bridgeService.retrieveCurrentWalletBridgeTransactions();
+      console.log('transactionHistory', transactionHistory);
+      const processedHistory = convertBridgeTransfers(transactionHistory);
+
+      setAllBridgeHistory(processedHistory);
     };
     fetchBridgeHistory();
   }, []);
@@ -1534,27 +1619,28 @@ const BridgePage = () => {
   const [t] = useTranslation();
 
   return (
-    <Layout className="site-layout bridge-layout">
-      <Content>
-        {view === 'cronos-bridge' ? (
-          <>
-            <div className="go-to-transfer-history">
-              <a>
-                <div onClick={() => setView('history')}>
-                  <IconTransferHistory />
-                  <span>{t('bridge.action.viewTransactionHistory')}</span>
-                </div>
-              </a>
-            </div>
-            <div className="site-layout-background bridge-content">
-              <div className="container">
-                <CronosBridge />
+    <Layout className={`site-layout ${view === 'cronos-bridge' ? 'bridge-layout' : ''}`}>
+      {view === 'cronos-bridge' ? (
+        <Content>
+          <div className="go-to-transfer-history">
+            <a>
+              <div onClick={() => setView('history')}>
+                <IconTransferHistory />
+                <span>{t('bridge.action.viewTransactionHistory')}</span>
               </div>
+            </a>
+          </div>
+          <div className="site-layout-background bridge-content">
+            <div className="container">
+              <CronosBridge />
             </div>
-          </>
-        ) : (
-          <>
-            <div className="go-to-transfer-history">
+          </div>
+        </Content>
+      ) : (
+        <>
+          <Header className="site-layout-background">
+            {t('assets.title')}
+            <div className="go-to-cronos-bridge">
               <a>
                 <div onClick={() => setView('cronos-bridge')}>
                   <img src={iconCronosSvg} alt="cronos" style={{ height: '24px' }} />
@@ -1562,14 +1648,25 @@ const BridgePage = () => {
                 </div>
               </a>
             </div>
-            <div className="site-layout-background bridge-content">
+          </Header>
+          <div className="header-description">{t('assets.description')}</div>
+          <Content>
+            {/* <div className="go-to-cronos-bridge">
+              <a>
+                <div onClick={() => setView('cronos-bridge')}>
+                  <img src={iconCronosSvg} alt="cronos" style={{ height: '24px' }} />
+                  <span>{t('bridge.action.backToCronosBridge')}</span>
+                </div>
+              </a>
+            </div> */}
+            <div className="site-layout-background bridge-transfer-history-content">
               <div className="container">
                 <CronosHistory />
               </div>
             </div>
-          </>
-        )}
-      </Content>
+          </Content>
+        </>
+      )}
     </Layout>
   );
 };
