@@ -6,7 +6,12 @@ import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
 import { sessionState, walletAllAssetsState } from '../../../recoil/atom';
-import { bech32ToEVMAddress, middleEllipsis } from '../../../utils/utils';
+import {
+  bech32ToEVMAddress,
+  middleEllipsis,
+  getCronosAsset,
+  getAssetBySymbolAndChain,
+} from '../../../utils/utils';
 
 import { walletService } from '../../../service/WalletService';
 import { BridgeService } from '../../../service/bridge/BridgeService';
@@ -14,24 +19,7 @@ import {
   BridgeTransaction,
   BridgeTransactionStatus,
 } from '../../../service/bridge/contracts/BridgeModels';
-import { UserAsset, UserAssetType } from '../../../models/UserAsset';
 import { renderExplorerUrl } from '../../../models/Explorer';
-
-function getCronosAsset(walletAllAssets: UserAsset[]) {
-  return walletAllAssets.find(asset => {
-    return (
-      asset.mainnetSymbol.toUpperCase() === 'CRO' &&
-      asset.name.includes('Cronos') &&
-      asset.assetType === UserAssetType.EVM
-    );
-  });
-}
-
-function getAssetBySymbolAndChain(walletAllAssets: UserAsset[], symbol: string, chainName: string) {
-  return walletAllAssets.find(asset => {
-    return asset.symbol.toUpperCase() === symbol && asset.name.indexOf(chainName) !== -1;
-  });
-}
 
 const CronosHistory = () => {
   const session = useRecoilValue(sessionState);

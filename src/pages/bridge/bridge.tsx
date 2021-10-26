@@ -35,7 +35,7 @@ import { walletService } from '../../service/WalletService';
 import { UserAsset, scaledBalance, UserAssetType } from '../../models/UserAsset';
 import { BroadCastResult } from '../../models/Transaction';
 import { renderExplorerUrl } from '../../models/Explorer';
-import { middleEllipsis } from '../../utils/utils';
+import { middleEllipsis, getCryptoOrgAsset, getCronosAsset } from '../../utils/utils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   adjustedTransactionAmount,
@@ -110,26 +110,6 @@ interface listDataSource {
   title: string;
   description: React.ReactNode;
   loading: boolean;
-}
-
-function getCryptoOrgAsset(walletAllAssets: UserAsset[]) {
-  return walletAllAssets.find(asset => {
-    return (
-      asset.mainnetSymbol.toUpperCase() === 'CRO' &&
-      asset.name.includes('Crypto.org') && // lgtm [js/incomplete-url-substring-sanitization]
-      asset.assetType === UserAssetType.TENDERMINT
-    );
-  });
-}
-
-function getCronosAsset(walletAllAssets: UserAsset[]) {
-  return walletAllAssets.find(asset => {
-    return (
-      asset.mainnetSymbol.toUpperCase() === 'CRO' &&
-      asset.name.includes('Cronos') &&
-      asset.assetType === UserAssetType.EVM
-    );
-  });
 }
 
 const CronosBridgeForm = props => {
@@ -537,7 +517,7 @@ const CronosBridgeForm = props => {
               return (
                 <Option value={asset.identifier} key={asset.identifier}>
                   {assetIcon(asset)}
-                  {`${asset.name} (${asset.symbol})`}
+                  {`${asset.symbol}`}
                 </Option>
               );
             })}
