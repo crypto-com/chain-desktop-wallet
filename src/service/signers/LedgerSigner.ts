@@ -1,5 +1,5 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
-import bech32 from 'bech32';
+import { bech32 } from 'bech32';
 
 export class LedgerSigner {
   app: any;
