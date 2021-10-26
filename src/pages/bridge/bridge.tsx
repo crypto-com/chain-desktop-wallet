@@ -815,6 +815,9 @@ const CronosBridge = () => {
   const onConfirmation = async () => {
     const { bridgeFrom, bridgeTo } = formValues;
     let { amount } = formValues;
+    let isBridgeTransferSuccess = false;
+    let sendResult;
+    let destinationResult;
     amount = fromScientificNotation(amount);
 
     const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
@@ -875,7 +878,7 @@ const CronosBridge = () => {
     try {
       setCurrentStep(2);
 
-      const sendResult = await walletService.sendBridgeTransaction(bridgeTransferRequest);
+      sendResult = await walletService.sendBridgeTransaction(bridgeTransferRequest);
       setBroadcastResult(sendResult);
       listDataSource.push({
         title: t('bridge.deposit.complete.title', {
@@ -904,24 +907,15 @@ const CronosBridge = () => {
         loading: false,
       });
 
-      listDataSource.push({
-        title: t('bridge.transferInitiated.title'),
-        description: <>{t('bridge.transferInitiated.description')}</>,
-        loading: false,
-      });
+      setBridgeConfirmationList(
+        listDataSource.concat({
+          title: '',
+          description: <></>,
+          loading: true,
+        }),
+      );
 
-      listDataSource.push({
-        title: '',
-        description: <></>,
-        loading: true,
-      });
-
-      setBridgeConfirmationList(listDataSource);
-
-      // TO-DO
-      const result = await bridgeService.getBridgeTransactionByHash(sendResult.transactionHash!);
-      console.log(result?.destinationTransactionId);
-      console.log(result?.sourceTransactionId);
+      isBridgeTransferSuccess = true;
 
       analyticsService.logTransactionEvent(
         sendResult.transactionHash as string,
@@ -967,6 +961,52 @@ const CronosBridge = () => {
       setBridgeTransferError(true);
       // eslint-disable-next-line no-console
       console.log('Failed in Bridge Transfer', e);
+    }
+
+    if (isBridgeTransferSuccess) {
+      try {
+        setTimeout(async () => {
+          destinationResult = await bridgeService.getBridgeTransactionByHash(
+            sendResult.transactionHash!,
+          );
+          if (!destinationResult.destinationTransactionId) {
+            listDataSource.push({
+              title: t('bridge.transferInitiated.title'),
+              description: <>{t('bridge.transferInitiated.description')}</>,
+              loading: false,
+            });
+          } else {
+            listDataSource.push({
+              title: 'Transfer Completed',
+              description: (
+                <>
+                  {t('bridge.deposit.transactionID')}
+                  <a
+                    data-original={destinationResult?.destinationTransactionId}
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`${renderExplorerUrl(
+                      currentAsset?.config ?? session.wallet.config,
+                      'tx',
+                    )}/${destinationResult?.destinationTransactionId}`}
+                  >
+                    {middleEllipsis(destinationResult?.destinationTransactionId!, 6)}
+                  </a>
+                </>
+              ),
+              loading: false,
+            });
+          }
+          setBridgeConfirmationList(listDataSource);
+        }, 15_000);
+      } catch (e) {
+        listDataSource.push({
+          title: t('bridge.transferInitiated.title'),
+          description: <>{t('bridge.transferInitiated.description')}</>,
+          loading: false,
+        });
+        setBridgeConfirmationList(listDataSource);
+      }
     }
     setIsBridgeTransfering(false);
   };
@@ -1345,23 +1385,19 @@ const CronosBridge = () => {
                 ) : (
                   <></>
                 )}
-                {form.getFieldValue('bridgeFrom') === 'CRONOS' ? (
-                  <Form.Item
-                    name="bridgeIndexingUrl"
-                    label="Bridge Indexing"
-                    rules={[
-                      {
-                        required: true,
-                        message: `${t('bridge.config.port.title')} ${t('general.required')}`,
-                      },
-                    ]}
-                    style={{ textAlign: 'left' }}
-                  >
-                    <Input />
-                  </Form.Item>
-                ) : (
-                  <></>
-                )}
+                <Form.Item
+                  name="bridgeIndexingUrl"
+                  label="Bridge Indexing"
+                  rules={[
+                    {
+                      required: true,
+                      message: `${t('bridge.config.port.title')} ${t('general.required')}`,
+                    },
+                  ]}
+                  style={{ textAlign: 'left' }}
+                >
+                  <Input />
+                </Form.Item>
                 {bridgeConfigFields.includes('gasLimit') &&
                 form.getFieldValue('bridgeFrom') === 'CRONOS' ? (
                   <Form.Item
@@ -1517,7 +1553,6 @@ const CronosHistory = () => {
       key: 'source',
       render: source => (
         <>
-          Address:{' '}
           <a
             data-original={source.address}
             target="_blank"
@@ -1530,7 +1565,6 @@ const CronosHistory = () => {
             {middleEllipsis(source.address, 6)}
           </a>
           <br />
-          Tx Hash:{' '}
           <a
             data-original={source.transactionId}
             target="_blank"
@@ -1552,7 +1586,6 @@ const CronosHistory = () => {
       key: 'destination',
       render: destination => (
         <>
-          Address:{' '}
           <a
             data-original={destination.address}
             target="_blank"
@@ -1565,7 +1598,6 @@ const CronosHistory = () => {
             {middleEllipsis(destination.address, 6)}
           </a>
           <br />
-          Tx Hash:{' '}
           <a
             data-original={destination.transactionId}
             target="_blank"
@@ -1637,7 +1669,6 @@ const CronosHistory = () => {
     const fetchBridgeHistory = async () => {
       // await bridgeService.fetchAndSaveBridgeTxs('0x85e0280712AaBDD0884732141B048b3B6fdE405B');
       const transactionHistory = await bridgeService.retrieveCurrentWalletBridgeTransactions();
-      console.log(transactionHistory);
       const processedHistory = convertBridgeTransfers(transactionHistory);
 
       setAllBridgeHistory(processedHistory);
