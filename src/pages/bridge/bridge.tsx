@@ -1469,10 +1469,6 @@ const CronosHistory = () => {
 
   interface BridgeTransferTabularData {
     key: string;
-    transactionHash: string;
-    // sourceTransactionId: string;
-    // destinationTransactionId: string;
-    recipientAddress: string;
     source: {
       address: string;
       transactionId: string;
@@ -1486,7 +1482,6 @@ const CronosHistory = () => {
     amount: string;
     symbol: string;
     time: string;
-    // direction: string;
     status: BridgeTransactionStatus;
   }
 
@@ -1556,11 +1551,6 @@ const CronosHistory = () => {
           transfer.destinationAddress +
           transfer.displayAmount +
           transfer.displayDenom,
-        // sourceTransactionId: transfer.sourceTransactionId,
-        // destinationTransactionId: transfer.destinationTransactionId,
-        transactionHash: transfer.destinationTransactionId,
-        // messageType: getType(transfer),
-        recipientAddress: transfer.destinationAddress,
         source: {
           address:
             transfer.sourceAddress.indexOf(isTestnet ? 'tcrc' : 'crc') === 0
