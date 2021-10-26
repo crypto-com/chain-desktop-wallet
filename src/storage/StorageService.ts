@@ -32,6 +32,7 @@ import {
   BridgeNetworkConfigType,
   BridgeTransferDirection,
 } from '../service/bridge/BridgeConfig';
+import { BridgeTransactionHistoryList } from '../service/bridge/contracts/BridgeModels';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -434,5 +435,20 @@ export class StorageService {
 
   public async retrieveNFTTransferHistory(walletId: string, nftQuery: NftQueryParams) {
     return this.db.nftTransferHistoryStore.findOne<NftTransactionHistory>({ walletId, nftQuery });
+  }
+
+  public async saveBridgeTransactions(bridgeTransactions: BridgeTransactionHistoryList) {
+    if (!bridgeTransactions) {
+      return Promise.resolve();
+    }
+    await this.db.bridgeTransactionStore.remove(
+      { walletId: bridgeTransactions.walletId },
+      { multi: true },
+    );
+    return this.db.bridgeTransactionStore.insert<BridgeTransactionHistoryList>(bridgeTransactions);
+  }
+
+  public async retrieveAllBridgeTransactions(walletId: string) {
+    return this.db.bridgeTransactionStore.findOne<BridgeTransactionHistoryList>({ walletId });
   }
 }
