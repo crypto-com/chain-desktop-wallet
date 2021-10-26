@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import './CronosBridgeForm.less';
 import { Button, Form, InputNumber, Select } from 'antd';
 import { SwapOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
