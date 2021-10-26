@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import { bech32 } from 'bech32';
+import { ethers } from 'ethers';
 
 export function isElectron() {
   // Renderer process
@@ -105,4 +107,10 @@ export const useWindowSize = () => {
 export function isNumeric(n) {
   // eslint-disable-next-line no-restricted-globals
   return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+export function bech32ToEVMAddress(bech32Address: string) {
+  const decodedFromWords = bech32.fromWords(bech32.decode(bech32Address).words);
+  const originalEVMAddress = Buffer.from(new Uint8Array(decodedFromWords)).toString('hex');
+  return ethers.utils.getAddress(originalEVMAddress);
 }
