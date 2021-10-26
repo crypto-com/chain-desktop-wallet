@@ -720,15 +720,6 @@ const CronosBridge = props => {
   const assetIcon = asset => {
     const { icon_url, symbol } = asset;
 
-    if (asset.mainnetSymbol === 'CRO') {
-      if (asset.assetType === UserAssetType.TENDERMINT) {
-        return <img src={iconCroSvg} alt="cronos" className="asset-icon" />;
-      }
-      if (asset.assetType === UserAssetType.EVM) {
-        return <img src={iconCronosSvg} alt="cronos" className="asset-icon" />;
-      }
-    }
-
     return icon_url ? (
       <img src={icon_url} alt="cronos" className="asset-icon" />
     ) : (
