@@ -3,7 +3,57 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import moment from 'moment';
 
-import translations from './translations.json';
+import translationENUS from './en-US.json';
+import translationZHHK from './zh-HK.json';
+import translationZHCN from './zh-CN.json';
+import translationFRFR from './fr-FR.json';
+import translationKOKR from './ko-KR.json';
+import translationITIT from './it-IT.json';
+import translationESES from './es-ES.json';
+import translationTRTR from './tr-TR.json';
+import translationVIVN from './vi-VN.json';
+import translationIGNG from './ig-NG.json';
+import translationARAE from './ar-AE.json';
+import translationDEDE from './de-DE.json';
+
+const resources = {
+  enUS: {
+    translation: translationENUS,
+  },
+  zhHK: {
+    translation: translationZHHK,
+  },
+  zhCN: {
+    translation: translationZHCN,
+  },
+  frFR: {
+    translation: translationFRFR,
+  },
+  koKR: {
+    translation: translationKOKR,
+  },
+  itIT: {
+    translation: translationITIT,
+  },
+  esES: {
+    translation: translationESES,
+  },
+  trTR: {
+    translation: translationTRTR,
+  },
+  viVN: {
+    translation: translationVIVN,
+  },
+  igNG: {
+    translation: translationIGNG,
+  },
+  arAE: {
+    translation: translationARAE,
+  },
+  deDE: {
+    translation: translationDEDE,
+  },
+};
 
 const languageDetector = new LanguageDetector(async () => {
   return i18n.language;
@@ -52,7 +102,7 @@ i18n
     interpolation: {
       escapeValue: false, // not needed for react as it escapes by default
     },
-    resources: translations,
+    resources,
   });
 
 setMomentLocale();

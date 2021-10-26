@@ -1,5 +1,5 @@
 # Instructions on Multi-Language Content Management
-All the language contents are managed inside the Google Spreadsheet [Desktop Wallet Language](https://docs.google.com/spreadsheets/d/1QTqPb97jr6zOD7krA4pAXHYx51CiSkJYq7m71OYcLok/edit#gid=0), with an Apps Script [`csvToJson.gs`](https://script.google.com/home/projects/1X1WCMV0tbQsXvlkV70Kw_3gvF85zSxeqkUnTuDhul_EcdWG9ZU4_Z6ow/edit) (a sample is also kept in [`./src/language/csvToJson.gs`](./src/language/csvToJson.gs)) for exporting the Multi-Language content as JSON. 
+All the language contents are managed inside the Google Spreadsheet [Desktop Wallet Language](https://docs.google.com/spreadsheets/d/1QTqPb97jr6zOD7krA4pAXHYx51CiSkJYq7m71OYcLok/edit#gid=0).
 
 If you need the access, please contact: [matthew.to@crypto.com](mailto:matthew.to@crypto.com) or [eddy.wanny@crypto.com](mailto:eddy.wanny@crypto.com)
 
@@ -29,7 +29,11 @@ export function MyComponent() {
 ```
 
 ### Procedure
-Whenever you've modified any contents inside the [Spreadsheet](https://docs.google.com/spreadsheets/d/1QTqPb97jr6zOD7krA4pAXHYx51CiSkJYq7m71OYcLok/edit#gid=0), you will need to do the following steps properly in order to take effective:
-1. Choose `Desktop Wallet` Sheet
-2. In the Navbar Menu, choose `Export JSON` => `Export JSON for this sheet`
-3. Copy the generated JSON and paste it inside [`translations.json`](./translation.json)
+Whenever you've modified any contents inside the [Spreadsheet](https://docs.google.com/spreadsheets/d/1QTqPb97jr6zOD7krA4pAXHYx51CiSkJYq7m71OYcLok/edit#gid=0), you will need to do the following step properly in order to take effective:
+
+```sh
+yarn generate-i18n
+```
+
+### i18n VSCode Extension
+Reading code with raw i18n keys are hard, install [i18n Ally](https://marketplace.visualstudio.com/items?itemName=Lokalise.i18n-ally) VSCode extension for better reading experience.

@@ -1,0 +1,17 @@
+{
+  "language": "हिंदी",
+  "general.enabled": "सक्षम ",
+  "general.disabled": "असक्षम   ",
+  "general.confirm": "पुष्टि करें ",
+  "general.continue": "जारी रखें",
+  "general.cancel": "रद्द करें ",
+  "general.save": "बचाये ",
+  "general.discard": "परिवर्तन त्यागें",
+  "general.ok": "ठीके ",
+  "general.required": "आवश्यक है",
+  "general.cannot0": "0 नहीं हो सकता ",
+  "general.receiving": "प्राप्त",
+  "general.available": "उपलब्ध",
+  "general.action": "कार्य",
+  "general.select": "चुनाव करें "
+}
