@@ -61,13 +61,21 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
 
   const config: UserAssetConfig = {
     explorer: {
-      tx: 'https://cronos.crypto.org/explorer/tx',
-      address: 'https://cronos.crypto.org/explorer/address',
+      tx: isTestnet
+        ? 'https://cronos.crypto.org/explorer/testnet3/tx'
+        : 'https://cronos.crypto.org/explorer/tx',
+      address: isTestnet
+        ? 'https://cronos.crypto.org/explorer/testnet3/address'
+        : 'https://cronos.crypto.org/explorer/tx',
     },
-    explorerUrl: 'https://cronos.crypto.org/explorer',
+    explorerUrl: isTestnet
+      ? 'https://cronos.crypto.org/explorer/testnet3'
+      : 'https://cronos.crypto.org/explorer',
     chainId: isTestnet ? '338' : 'TO_BE_DECIDED',
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
-    indexingUrl: isTestnet ? 'https://cronos.crypto.org/explorer/api' : 'TO_BE_DECIDED',
+    indexingUrl: isTestnet
+      ? 'https://cronos.crypto.org/explorer/testnet3/api'
+      : 'https://cronos.crypto.org/explorer/api',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
     nodeUrl: 'https://cronos-testnet-3.crypto.org:8545/',

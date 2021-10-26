@@ -135,6 +135,12 @@ function getCronosAsset(walletAllAssets: UserAsset[]) {
   });
 }
 
+function getAssetBySymbolAndChain(walletAllAssets: UserAsset[], symbol: string, chainName: string) {
+  return walletAllAssets.find(asset => {
+    return asset.symbol.toUpperCase() === symbol && asset.name.indexOf(chainName) !== -1;
+  });
+}
+
 const CronosBridgeForm = props => {
   const {
     form,
@@ -1556,83 +1562,99 @@ const CronosHistory = () => {
   const HistoryColumns = [
     {
       title: t('bridge.transactionHistory.table.fromAddress'),
-      dataIndex: 'source',
+      // dataIndex: 'source',
       key: 'source',
-      render: source => (
-        <>
-          <a
-            data-original={source.address}
-            target="_blank"
-            rel="noreferrer"
-            href={`${renderExplorerUrl(
-              session.activeAsset?.config ?? session.wallet.config,
-              'address',
-            )}/${source.address}`}
-          >
-            {middleEllipsis(source.address, 6)}
-          </a>
-          <br />
-          <a
-            data-original={source.transactionId}
-            target="_blank"
-            rel="noreferrer"
-            href={`${renderExplorerUrl(
-              session.activeAsset?.config ?? session.wallet.config,
-              'tx',
-            )}/${source.transactionId}`}
-          >
-            {middleEllipsis(source.transactionId, 6)}
-          </a>
-          <br />({source.chain.replace('-', ' ')})
-        </>
-      ),
+      render: record => {
+        const { source, symbol } = record;
+
+        return (
+          <>
+            <a
+              data-original={source.address}
+              target="_blank"
+              rel="noreferrer"
+              href={`${renderExplorerUrl(
+                getAssetBySymbolAndChain(
+                  walletAllAssets,
+                  symbol,
+                  source.chain.split(/[^A-Za-z]/)[0],
+                )?.config ?? session.wallet.config,
+                'address',
+              )}/${source.address}`}
+            >
+              {middleEllipsis(source.address, 6)}
+            </a>
+            <br />
+            <a
+              data-original={source.transactionId}
+              target="_blank"
+              rel="noreferrer"
+              href={`${renderExplorerUrl(
+                getAssetBySymbolAndChain(
+                  walletAllAssets,
+                  symbol,
+                  source.chain.split(/[^A-Za-z]/)[0],
+                )?.config ?? session.wallet.config,
+                'tx',
+              )}/${source.transactionId}`}
+            >
+              {middleEllipsis(source.transactionId, 6)}
+            </a>
+            <br />({source.chain.replace('-', ' ')})
+          </>
+        );
+      },
     },
     {
       title: t('bridge.transactionHistory.table.toAddress'),
-      dataIndex: 'destination',
+      // dataIndex: 'destination',
       key: 'destination',
-      render: destination => (
-        <>
-          <a
-            data-original={destination.address}
-            target="_blank"
-            rel="noreferrer"
-            href={`${renderExplorerUrl(
-              session.activeAsset?.config ?? session.wallet.config,
-              'address',
-            )}/${destination.address}`}
-          >
-            {middleEllipsis(destination.address, 6)}
-          </a>
-          <br />
-          <a
-            data-original={destination.transactionId}
-            target="_blank"
-            rel="noreferrer"
-            href={`${renderExplorerUrl(
-              session.activeAsset?.config ?? session.wallet.config,
-              'tx',
-            )}/${destination.transactionId}`}
-          >
-            {middleEllipsis(destination.transactionId, 6)}
-          </a>
-          <br />({destination.chain.replace('-', ' ')})
-        </>
-      ),
+      render: record => {
+        const { destination, symbol } = record;
+
+        return (
+          <>
+            <a
+              data-original={destination.address}
+              target="_blank"
+              rel="noreferrer"
+              href={`${renderExplorerUrl(
+                getAssetBySymbolAndChain(
+                  walletAllAssets,
+                  symbol,
+                  destination.chain.split(/[^A-Za-z]/)[0],
+                )?.config ?? session.wallet.config,
+                'address',
+              )}/${destination.address}`}
+            >
+              {middleEllipsis(destination.address, 6)}
+            </a>
+            <br />
+            <a
+              data-original={destination.transactionId}
+              target="_blank"
+              rel="noreferrer"
+              href={`${renderExplorerUrl(
+                getAssetBySymbolAndChain(
+                  walletAllAssets,
+                  symbol,
+                  destination.chain.split(/[^A-Za-z]/)[0],
+                )?.config ?? session.wallet.config,
+                'tx',
+              )}/${destination.transactionId}`}
+            >
+              {middleEllipsis(destination.transactionId, 6)}
+            </a>
+            <br />({destination.chain.replace('-', ' ')})
+          </>
+        );
+      },
     },
     {
       title: t('bridge.transactionHistory.table.amount'),
       // dataIndex: 'amount',
       key: 'amount',
       render: record => {
-        // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
-        // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
-        // return (
-        //   <Text type={color}>
-        //     {sign}
-        //     {text}
-        //   </Text>
-        // );
         return (
           <>
             {Big(record.amount).toFixed(4)} {record.symbol}
@@ -1672,7 +1694,9 @@ const CronosHistory = () => {
 
   useEffect(() => {
     const fetchBridgeHistory = async () => {
-      // await bridgeService.fetchAndSaveBridgeTxs('0x85e0280712AaBDD0884732141B048b3B6fdE405B');
+      if (cronosAsset) {
+        await bridgeService.fetchAndSaveBridgeTxs(cronosAsset?.address!);
+      }
       const transactionHistory = await bridgeService.retrieveCurrentWalletBridgeTransactions();
       const processedHistory = convertBridgeTransfers(transactionHistory);
 
