@@ -6,6 +6,22 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.5.2] - 2021-10-27
+
+### Additions
+- Add 25%, 50%, 75%, ALL option in Bridge Transfer
+- Total Balance includes all assets in fiat amount
+- Add avoid quitting mechanism during Bridge Transfer
+- Add potential scammer validator warnings
+
+### Bug fixes
+- Fixed various layout issues on Asset, Bridge & Staking Page
+- Fixed App Crash issue when config settings updated
+- Fixed failure bridge transactions for transferring amount's decimal > 4
+- Fixed CRONOS transaction with memo failure
+- Fixed bridge config not updated successfully
+- Enforce strict http/https protocol in indexing URL settings
+
 ## [v0.5.1] - 2021-10-18
 
 ### Additions
