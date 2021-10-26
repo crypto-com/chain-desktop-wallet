@@ -143,7 +143,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
             message: `${t('create.formCustomConfig.nodeUrl.label')} ${t('general.required')}`,
           },
           {
-            pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
+            type: 'url',
             message: t('create.formCustomConfig.nodeUrl.error1'),
           },
         ]}
@@ -161,7 +161,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
             message: `${t('create.formCustomConfig.indexingUrl.label')} ${t('general.required')}`,
           },
           {
-            pattern: /(https?:\/\/)?[\w\-~]+(\.[\w\-~]+)+(\/[\w\-~]*)*(#[\w-]*)?(\?.*)?/,
+            type: 'url',
             message: t('create.formCustomConfig.indexingUrl.error1'),
           },
         ]}
