@@ -38,7 +38,7 @@ import { walletService } from '../../service/WalletService';
 import { UserAsset, scaledBalance, UserAssetType } from '../../models/UserAsset';
 import { BroadCastResult, TransactionStatus } from '../../models/Transaction';
 import { renderExplorerUrl } from '../../models/Explorer';
-import { middleEllipsis } from '../../utils/utils';
+import { middleEllipsis, bech32ToEVMAddress } from '../../utils/utils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   adjustedTransactionAmount,
@@ -1465,6 +1465,8 @@ const CronosHistory = () => {
   // eslint-disable-next-line
   const cronosAsset = getCronosAsset(walletAllAssets);
 
+  const bridgeService = new BridgeService(walletService.storageService);
+
   interface BridgeTransferTabularData {
     key: string;
     transactionHash: string;
@@ -1509,6 +1511,8 @@ const CronosHistory = () => {
     //   return NftTransactionType.TRANSFER_NFT;
     // };
 
+    const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
+
     return allTransfers.map(transfer => {
       const data: BridgeTransferTabularData = {
         key:
@@ -1524,12 +1528,18 @@ const CronosHistory = () => {
         // messageType: getType(transfer),
         recipientAddress: transfer.destinationAddress,
         source: {
-          address: transfer.sourceAddress,
+          address:
+            transfer.sourceAddress.indexOf(isTestnet ? 'tcrc' : 'crc') === 0
+              ? bech32ToEVMAddress(transfer.sourceAddress)
+              : transfer.sourceAddress,
           transactionId: transfer.sourceTransactionId,
           chain: transfer.sourceChain,
         },
         destination: {
-          address: transfer.destinationAddress,
+          address:
+            transfer.destinationAddress.indexOf(isTestnet ? 'tcrc' : 'crc') === 0
+              ? bech32ToEVMAddress(transfer.destinationAddress)
+              : transfer.destinationAddress,
           transactionId: transfer.destinationTransactionId,
           chain: transfer.destinationChain,
         },
@@ -1659,8 +1669,6 @@ const CronosHistory = () => {
       },
     },
   ];
-
-  const bridgeService = new BridgeService(walletService.storageService);
 
   useEffect(() => {
     const fetchBridgeHistory = async () => {
