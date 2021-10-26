@@ -641,7 +641,9 @@ const CronosBridgeForm = props => {
   );
 };
 
-const CronosBridge = () => {
+const CronosBridge = props => {
+  const { setView, currentStep, setCurrentStep } = props;
+
   const session = useRecoilValue(sessionState);
   const setIsBridgeTransfering = useSetRecoilState(isBridgeTransferingState);
   const [form] = Form.useForm();
@@ -658,7 +660,6 @@ const CronosBridge = () => {
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
   const [toAsset, setToAsset] = useState<UserAsset | undefined>();
-  const [currentStep, setCurrentStep] = useState(0);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [toAddress, setToAddress] = useState('');
@@ -1210,13 +1211,9 @@ const CronosBridge = () => {
             {broadcastResult.transactionHash !== undefined ? (
               <Button key="submit" type="primary">
                 <a
-                  data-original={broadcastResult.transactionHash}
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`${renderExplorerUrl(
-                    currentAsset?.config ?? session.wallet.config,
-                    'tx',
-                  )}/${broadcastResult.transactionHash}`}
+                  onClick={() => {
+                    setView('bridge-transfer-history-layout');
+                  }}
                 >
                   {t('bridge.action.viewTransaction')}
                 </a>
@@ -1690,6 +1687,7 @@ const CronosHistory = () => {
 
 const BridgePage = () => {
   const [view, setView] = useState('cronos-bridge');
+  const [currentStep, setCurrentStep] = useState(0);
 
   const [t] = useTranslation();
 
@@ -1701,17 +1699,25 @@ const BridgePage = () => {
     >
       {view === 'cronos-bridge' ? (
         <Content>
-          <div className="go-to-transfer-history">
-            <a>
-              <div onClick={() => setView('history')}>
-                <IconTransferHistory />
-                <span>{t('bridge.action.viewTransactionHistory')}</span>
-              </div>
-            </a>
-          </div>
+          {currentStep === 0 ? (
+            <div className="go-to-transfer-history">
+              <a>
+                <div onClick={() => setView('history')}>
+                  <IconTransferHistory />
+                  <span>{t('bridge.action.viewTransactionHistory')}</span>
+                </div>
+              </a>
+            </div>
+          ) : (
+            <></>
+          )}
           <div className="site-layout-background bridge-content">
             <div className="container">
-              <CronosBridge />
+              <CronosBridge
+                setView={setView}
+                currentStep={currentStep}
+                setCurrentStep={setCurrentStep}
+              />
             </div>
           </div>
         </Content>
