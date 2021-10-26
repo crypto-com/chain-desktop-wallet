@@ -36,7 +36,7 @@ import { isBridgeTransferingState, sessionState, walletAllAssetsState } from '..
 import { walletService } from '../../service/WalletService';
 
 import { UserAsset, scaledBalance, UserAssetType } from '../../models/UserAsset';
-import { BroadCastResult, TransactionStatus } from '../../models/Transaction';
+import { BroadCastResult } from '../../models/Transaction';
 import { renderExplorerUrl } from '../../models/Explorer';
 import { middleEllipsis, bech32ToEVMAddress } from '../../utils/utils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
@@ -75,7 +75,10 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { BridgeTransferRequest } from '../../service/TransactionRequestModels';
 import IconTransferHistory from '../../svg/IconTransferHistory';
-import { BridgeTransaction } from '../../service/bridge/contracts/BridgeModels';
+import {
+  BridgeTransaction,
+  BridgeTransactionStatus,
+} from '../../service/bridge/contracts/BridgeModels';
 
 const { Content, Sider } = Layout;
 const { Option } = Select;
@@ -1484,29 +1487,63 @@ const CronosHistory = () => {
     symbol: string;
     time: string;
     // direction: string;
-    status: TransactionStatus;
+    status: BridgeTransactionStatus;
   }
+
+  const processStatusTag = (status: BridgeTransactionStatus) => {
+    let statusColor;
+    let statusMessage;
+    switch (status) {
+      case BridgeTransactionStatus.PENDING:
+        statusColor = 'processing';
+        statusMessage = 'PENDING';
+        break;
+      case BridgeTransactionStatus.FAILED:
+        statusColor = 'error';
+        statusMessage = 'FAILED';
+        break;
+      case BridgeTransactionStatus.CANCELLED:
+        statusColor = 'default';
+        statusMessage = 'CANCELLED';
+        break;
+      case BridgeTransactionStatus.CONFIRMED:
+        statusColor = 'success';
+        statusMessage = 'CONFIRMED';
+        break;
+      case BridgeTransactionStatus.REJECTED:
+        statusColor = 'error';
+        statusMessage = 'REJECTED';
+        break;
+      default:
+        statusColor = 'default';
+        statusMessage = '';
+    }
+    return (
+      <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+        {statusMessage}
+      </Tag>
+    );
+  };
 
   const convertBridgeTransfers = (allTransfers: BridgeTransaction[]) => {
     const getStatus = (transfer: BridgeTransaction) => {
-      if (transfer.status) {
-        return TransactionStatus.SUCCESS;
+      const { status } = transfer;
+
+      switch (status) {
+        case BridgeTransactionStatus.PENDING:
+          return BridgeTransactionStatus.PENDING;
+        case BridgeTransactionStatus.FAILED:
+          return BridgeTransactionStatus.FAILED;
+        case BridgeTransactionStatus.CANCELLED:
+          return BridgeTransactionStatus.CANCELLED;
+        case BridgeTransactionStatus.CONFIRMED:
+          return BridgeTransactionStatus.CONFIRMED;
+        case BridgeTransactionStatus.REJECTED:
+          return BridgeTransactionStatus.REJECTED;
+        default:
+          return BridgeTransactionStatus.PENDING;
       }
-      return TransactionStatus.FAILED;
     };
-    // const getType = (transfer: NftAccountTransactionData) => {
-    //   if (transfer.messageType === NftTransactionType.ISSUE_DENOM) {
-    //     return NftTransactionType.ISSUE_DENOM;
-    //     // eslint-disable-next-line no-else-return
-    //   } else if (transfer.messageType === NftTransactionType.MINT_NFT) {
-    //     return NftTransactionType.MINT_NFT;
-    //   } else if (transfer.messageType === NftTransactionType.EDIT_NFT) {
-    //     return NftTransactionType.EDIT_NFT;
-    //   } else if (transfer.messageType === NftTransactionType.BURN_NFT) {
-    //     return NftTransactionType.BURN_NFT;
-    //   }
-    //   return NftTransactionType.TRANSFER_NFT;
-    // };
 
     const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
 
@@ -1662,23 +1699,10 @@ const CronosHistory = () => {
       title: t('bridge.transactionHistory.table.status'),
       dataIndex: 'status',
       key: 'status',
-      render: (text, record: BridgeTransferTabularData) => {
+      render: text => {
         // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
         // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
-        let statusColor;
-        if (record.status === TransactionStatus.SUCCESS) {
-          statusColor = 'success';
-        } else if (record.status === TransactionStatus.FAILED) {
-          statusColor = 'error';
-        } else {
-          statusColor = 'processing';
-        }
-
-        return (
-          <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
-            {record.status.toString()}
-          </Tag>
-        );
+        return processStatusTag(text);
       },
     },
   ];
