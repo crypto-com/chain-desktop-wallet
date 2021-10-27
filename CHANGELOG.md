@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
-## [v0.5.2] - 2021-10-27
+## [v0.5.2] - 2021-10-28
 
 ### Additions
 - Add 25%, 50%, 75%, ALL option in Bridge Transfer
