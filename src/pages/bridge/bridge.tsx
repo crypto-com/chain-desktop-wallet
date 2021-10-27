@@ -426,7 +426,7 @@ const CronosBridge = props => {
             destinationResult = await bridgeService.getBridgeTransactionByHash(
               sendResult.transactionHash!,
             );
-            if (!destinationResult.destinationTransactionId ?? !destinationResult) {
+            if (!destinationResult || !destinationResult.destinationTransactionId) {
               callFailedCounts++;
               if (callFailedCounts >= callMaxCount) {
                 clearInterval(myInterval);
