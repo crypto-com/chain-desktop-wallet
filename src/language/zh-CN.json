@@ -365,7 +365,7 @@
   "bridge.pendingTransfer.ledger.description": "请在Ledger钱包上打开 {{app}} 以签名交易",
   "bridge.ledgerSign.failed.title": "未能成功广播Ledger的签名交易",
   "bridge.transactionHistory.title": "跨链桥交易记录",
-  "bridge.transactionHistory.description": "以下是你的跨链桥交易记录",
+  "bridge.transactionHistory.description": "以下是你最近的跨链桥交易记录",
   "bridge.transactionHistory.table.transactionHash": "交易哈希值",
   "bridge.transactionHistory.table.amount": "数量",
   "bridge.transactionHistory.table.fromAddress": "从（网络）",

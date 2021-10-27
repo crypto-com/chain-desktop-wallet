@@ -365,7 +365,7 @@
   "bridge.pendingTransfer.ledger.description": "Please open {{app}} in your Ledger device and sign your transaction.",
   "bridge.ledgerSign.failed.title": "Failed to broadcast a signed transaction on Ledger",
   "bridge.transactionHistory.title": "Bridge Transfer History",
-  "bridge.transactionHistory.description": "Below is your transaction history of bridge transfers",
+  "bridge.transactionHistory.description": "Below is your latest transaction history of bridge transfers",
   "bridge.transactionHistory.table.transactionHash": "Transaction Hash",
   "bridge.transactionHistory.table.amount": "Amount",
   "bridge.transactionHistory.table.fromAddress": "From (Network)",

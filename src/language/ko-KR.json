@@ -361,7 +361,7 @@
   "bridge.pendingTransfer.ledger.description": "레져에서 {{app}}을 열고 거래에 서명하세요.",
   "bridge.ledgerSign.failed.title": "레져에서 서명된 트랜잭션을 전송하지 못했습니다.",
   "bridge.transactionHistory.title": "브릿지 거래 기록",
-  "bridge.transactionHistory.description": "이것들은 당신의 브릿지 거래 기록",
+  "bridge.transactionHistory.description": "이것은 귀하의 최신 브리지 거래 기록입니다.",
   "bridge.transactionHistory.table.transactionHash": "트랜잭션 해쉬",
   "bridge.transactionHistory.table.amount": "금액",
   "bridge.transactionHistory.table.fromAddress": "송신인（네트워크）",
