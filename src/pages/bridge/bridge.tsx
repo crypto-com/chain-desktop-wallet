@@ -340,7 +340,7 @@ const CronosBridge = props => {
         }),
         description: (
           <>
-            {t('bridge.deposit.transactionID')}
+            {t('bridge.deposit.transactionID')}:
             <a
               data-original={sendResult.transactionHash}
               target="_blank"
@@ -414,44 +414,60 @@ const CronosBridge = props => {
 
     if (isBridgeTransferSuccess) {
       try {
+        const maxCallCount = 3;
+        let failedCounts = 0;
+
+        // let getDestinationTransactionId = false;
+
         setTimeout(async () => {
-          destinationResult = await bridgeService.getBridgeTransactionByHash(
-            sendResult.transactionHash!,
-          );
-          if (!destinationResult.destinationTransactionId) {
-            listDataSource.push({
-              title: t('bridge.transferInitiated.title'),
-              description: <>{t('bridge.transferInitiated.description')}</>,
-              loading: false,
-            });
-          } else {
-            listDataSource.push({
-              title: t('bridge.transferCompleted.title'),
-              description: (
-                <>
-                  {t('bridge.deposit.transactionID')}
-                  {destinationResult?.chain.indexOf('Cronos') !== -1 ? (
-                    middleEllipsis(destinationResult?.destinationTransactionId!, 6)
-                  ) : (
-                    <a
-                      data-original={destinationResult?.destinationTransactionId}
-                      target="_blank"
-                      rel="noreferrer"
-                      href={`${renderExplorerUrl(
-                        currentAsset?.config ?? session.wallet.config,
-                        'tx',
-                      )}/${destinationResult?.destinationTransactionId}`}
-                    >
-                      {middleEllipsis(destinationResult?.destinationTransactionId!, 6)}
-                    </a>
-                  )}
-                </>
-              ),
-              loading: false,
-            });
-          }
-          setBridgeConfirmationList(listDataSource);
-        }, 15_000);
+          const myInterval = setInterval(async () => {
+            destinationResult = await bridgeService.getBridgeTransactionByHash(
+              sendResult.transactionHash!,
+            );
+            if (!destinationResult.destinationTransactionId ?? !destinationResult) {
+              failedCounts++;
+              if (failedCounts >= maxCallCount) {
+                clearInterval(myInterval);
+                listDataSource.push({
+                  title: t('bridge.transferInitiated.title'),
+                  description: <>{t('bridge.transferInitiated.description')}</>,
+                  loading: false,
+                });
+                setBridgeConfirmationList(listDataSource);
+                // eslint-disable-next-line no-console
+                console.log('Failed in getting response from Bridge Transaction API for 3 times');
+              }
+            } else {
+              clearInterval(myInterval);
+              // getDestinationTransactionId = true;
+              listDataSource.push({
+                title: t('bridge.transferCompleted.title'),
+                description: (
+                  <>
+                    {t('bridge.deposit.transactionID')}:
+                    {destinationResult?.destinationChain.indexOf('Cronos') !== -1 ? (
+                      middleEllipsis(destinationResult?.destinationTransactionId!, 6)
+                    ) : (
+                      <a
+                        data-original={destinationResult?.destinationTransactionId}
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`${renderExplorerUrl(
+                          currentAsset?.config ?? session.wallet.config,
+                          'tx',
+                        )}/${destinationResult?.destinationTransactionId}`}
+                      >
+                        {middleEllipsis(destinationResult?.destinationTransactionId!, 6)}
+                      </a>
+                    )}
+                  </>
+                ),
+                loading: false,
+              });
+              setBridgeConfirmationList(listDataSource);
+            }
+          }, 8_000);
+        }, 6_000);
       } catch (e) {
         listDataSource.push({
           title: t('bridge.transferInitiated.title'),
