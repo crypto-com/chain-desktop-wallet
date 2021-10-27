@@ -17,7 +17,7 @@ import {
   message,
 } from 'antd';
 import Icon, { ArrowLeftOutlined, ArrowRightOutlined, SettingOutlined } from '@ant-design/icons';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import { useTranslation } from 'react-i18next';
 
@@ -103,7 +103,7 @@ const CronosBridge = props => {
 
   const session = useRecoilValue(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
-  const setIsBridgeTransfering = useSetRecoilState(isBridgeTransferingState);
+  const [isBridgeTransfering, setIsBridgeTransfering] = useRecoilState(isBridgeTransferingState);
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({
     amount: '0',
@@ -409,6 +409,7 @@ const CronosBridge = props => {
       });
       setBridgeConfirmationList(listDataSource);
       setBridgeTransferError(true);
+      setIsBridgeTransfering(false);
       // eslint-disable-next-line no-console
       console.log('Failed in Bridge Transfer', e);
     }
@@ -435,8 +436,11 @@ const CronosBridge = props => {
                   loading: false,
                 });
                 setBridgeConfirmationList(listDataSource);
+                setIsBridgeTransfering(false);
                 // eslint-disable-next-line no-console
-                console.log('Failed in getting response from Bridge Transaction API for 3 times');
+                console.log(
+                  `Failed in getting response from Bridge Transaction API for ${maxCallCount} times`,
+                );
               }
             } else {
               clearInterval(myInterval);
@@ -470,6 +474,7 @@ const CronosBridge = props => {
                 loading: false,
               });
               setBridgeConfirmationList(listDataSource);
+              setIsBridgeTransfering(false);
             }
           }, 8_000);
         }, 6_000);
@@ -480,9 +485,9 @@ const CronosBridge = props => {
           loading: false,
         });
         setBridgeConfirmationList(listDataSource);
+        setIsBridgeTransfering(false);
       }
     }
-    setIsBridgeTransfering(false);
   };
 
   const renderStepContent = (step: number) => {
@@ -681,7 +686,7 @@ const CronosBridge = props => {
                 </List.Item>
               )}
             />
-            {broadcastResult.transactionHash !== undefined ? (
+            {broadcastResult.transactionHash !== undefined && !isBridgeTransfering ? (
               <Button key="submit" type="primary">
                 <a
                   onClick={() => {
