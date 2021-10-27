@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './CronosHistory.less';
 import { useRecoilValue } from 'recoil';
-import { Table, Tag } from 'antd';
+import { Table, Tag, Tooltip } from 'antd';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
@@ -170,22 +170,31 @@ const CronosHistory = () => {
               {middleEllipsis(source.address, 6)}
             </a>
             <br />
-            <a
-              data-original={source.transactionId}
-              target="_blank"
-              rel="noreferrer"
-              href={`${renderExplorerUrl(
-                getAssetBySymbolAndChain(
-                  walletAllAssets,
-                  symbol,
-                  source.chain.split(/[^A-Za-z]/)[0],
-                )?.config ?? session.wallet.config,
-                'tx',
-              )}/${source.transactionId}`}
+            <Tooltip
+              placement="right"
+              title={
+                <>
+                  TxID:{' '}
+                  <a
+                    data-original={source.transactionId}
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`${renderExplorerUrl(
+                      getAssetBySymbolAndChain(
+                        walletAllAssets,
+                        symbol,
+                        source.chain.split(/[^A-Za-z]/)[0],
+                      )?.config ?? session.wallet.config,
+                      'tx',
+                    )}/${source.transactionId}`}
+                  >
+                    {middleEllipsis(source.transactionId, 6)}
+                  </a>
+                </>
+              }
             >
-              {middleEllipsis(source.transactionId, 6)}
-            </a>
-            <br />({source.chain.replace('-', ' ')})
+              ({source.chain.replace('-', ' ')})
+            </Tooltip>
           </>
         );
       },
@@ -215,22 +224,31 @@ const CronosHistory = () => {
               {middleEllipsis(destination.address, 6)}
             </a>
             <br />
-            <a
-              data-original={destination.transactionId}
-              target="_blank"
-              rel="noreferrer"
-              href={`${renderExplorerUrl(
-                getAssetBySymbolAndChain(
-                  walletAllAssets,
-                  symbol,
-                  destination.chain.split(/[^A-Za-z]/)[0],
-                )?.config ?? session.wallet.config,
-                'tx',
-              )}/${destination.transactionId}`}
+            <Tooltip
+              placement="right"
+              title={
+                <>
+                  TxID:{' '}
+                  <a
+                    data-original={destination.transactionId}
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`${renderExplorerUrl(
+                      getAssetBySymbolAndChain(
+                        walletAllAssets,
+                        symbol,
+                        destination.chain.split(/[^A-Za-z]/)[0],
+                      )?.config ?? session.wallet.config,
+                      'tx',
+                    )}/${destination.transactionId}`}
+                  >
+                    {middleEllipsis(destination.transactionId, 6)}
+                  </a>
+                </>
+              }
             >
-              {middleEllipsis(destination.transactionId, 6)}
-            </a>
-            <br />({destination.chain.replace('-', ' ')})
+              ({destination.chain.replace('-', ' ')})
+            </Tooltip>
           </>
         );
       },
