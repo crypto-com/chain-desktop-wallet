@@ -341,7 +341,7 @@ const CronosBridge = props => {
         }),
         description: (
           <>
-            {t('bridge.deposit.transactionID')}:
+            {t('bridge.deposit.transactionID')}:{' '}
             <a
               data-original={sendResult.transactionHash}
               target="_blank"
@@ -445,7 +445,7 @@ const CronosBridge = props => {
                 title: t('bridge.transferCompleted.title'),
                 description: (
                   <>
-                    {t('bridge.deposit.transactionID')}:
+                    {t('bridge.deposit.transactionID')}:{' '}
                     {destinationResult?.destinationChain.indexOf('Cronos') !== -1 ? (
                       middleEllipsis(destinationResult?.destinationTransactionId!, 6)
                     ) : (
@@ -860,11 +860,17 @@ const CronosBridge = props => {
                 form.getFieldValue('bridgeFrom') === 'CRONOS' ? (
                   <Form.Item
                     name="bridgeIndexingUrl"
-                    label="Bridge Indexing"
+                    label={t('bridge.config.bridgeIndexingUrl.title')}
                     rules={[
                       {
                         required: true,
-                        message: `${t('bridge.config.port.title')} ${t('general.required')}`,
+                        message: `${t('bridge.config.bridgeIndexingUrl.title')} ${t(
+                          'general.required',
+                        )}`,
+                      },
+                      {
+                        type: 'url',
+                        message: t('bridge.config.bridgeIndexingUrl.error1'),
                       },
                     ]}
                     style={{ textAlign: 'left' }}
@@ -878,11 +884,11 @@ const CronosBridge = props => {
                 form.getFieldValue('bridgeFrom') === 'CRONOS' ? (
                   <Form.Item
                     name="gasLimit"
-                    label="Gas Limit"
+                    label={t('bridge.config.gasLimit.title')}
                     rules={[
                       {
                         required: true,
-                        message: `${t('bridge.config.port.title')} ${t('general.required')}`,
+                        message: `${t('bridge.config.gasLimit.title')} ${t('general.required')}`,
                       },
                     ]}
                     style={{ textAlign: 'left' }}
