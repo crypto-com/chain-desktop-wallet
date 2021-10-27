@@ -15,12 +15,7 @@ import {
   fetchingDBState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
-import {
-  AssetMarketPrice,
-  getAssetBalancePrice,
-  UserAsset,
-  UserAssetType,
-} from '../../models/UserAsset';
+import { AssetMarketPrice, getAssetBalancePrice, UserAsset } from '../../models/UserAsset';
 import { renderExplorerUrl } from '../../models/Explorer';
 import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
@@ -36,8 +31,6 @@ import {
   TransactionStatus,
   TransferTransactionData,
 } from '../../models/Transaction';
-import iconCronosSvg from '../../assets/icon-cronos-blue.svg';
-import iconCroSvg from '../../assets/icon-cro.svg';
 
 const { Sider, Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -145,19 +138,10 @@ const AssetsPage = () => {
   });
 
   const assetIcon = asset => {
-    const { icon_url, symbol } = asset;
-
-    if (asset.mainnetSymbol === 'CRO') {
-      if (asset.assetType === UserAssetType.TENDERMINT) {
-        return <img src={iconCroSvg} alt="cronos" className="asset-icon" />;
-      }
-      if (asset.assetType === UserAssetType.EVM) {
-        return <img src={iconCronosSvg} alt="cronos" className="asset-icon" />;
-      }
-    }
+    const { name, icon_url, symbol } = asset;
 
     return icon_url ? (
-      <img src={icon_url} alt="cronos" className="asset-icon" />
+      <img src={icon_url} alt={name} className="asset-icon" />
     ) : (
       <Avatar>{symbol[0].toUpperCase()}</Avatar>
     );
