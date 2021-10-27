@@ -23,13 +23,13 @@ import { useTranslation } from 'react-i18next';
 
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { Footer, Header } from 'antd/lib/layout/layout';
-import { isBridgeTransferingState, sessionState } from '../../recoil/atom';
+import { isBridgeTransferingState, sessionState, walletAllAssetsState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 
 import { UserAsset } from '../../models/UserAsset';
 import { BroadCastResult } from '../../models/Transaction';
 import { renderExplorerUrl } from '../../models/Explorer';
-import { middleEllipsis } from '../../utils/utils';
+import { getAssetBySymbolAndChain, middleEllipsis } from '../../utils/utils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   adjustedTransactionAmount,
@@ -102,6 +102,7 @@ const CronosBridge = props => {
   const { setView, currentStep, setCurrentStep } = props;
 
   const session = useRecoilValue(sessionState);
+  const walletAllAssets = useRecoilValue(walletAllAssetsState);
   const setIsBridgeTransfering = useSetRecoilState(isBridgeTransferingState);
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({
@@ -453,7 +454,11 @@ const CronosBridge = props => {
                         target="_blank"
                         rel="noreferrer"
                         href={`${renderExplorerUrl(
-                          currentAsset?.config ?? session.wallet.config,
+                          getAssetBySymbolAndChain(
+                            walletAllAssets,
+                            destinationResult?.displayDenom,
+                            destinationResult?.destinationChain.split(/[^A-Za-z]/)[0],
+                          )?.config ?? session.wallet.config,
                           'tx',
                         )}/${destinationResult?.destinationTransactionId}`}
                       >
