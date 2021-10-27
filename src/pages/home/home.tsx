@@ -85,10 +85,10 @@ const HomePage = () => {
   const [t] = useTranslation();
 
   const assetIcon = asset => {
-    const { icon_url, symbol } = asset;
+    const { name, icon_url, symbol } = asset;
 
     return icon_url ? (
-      <img src={icon_url} alt="cronos" className="asset-icon" />
+      <img src={icon_url} alt={name} className="asset-icon" />
     ) : (
       <Avatar>{symbol[0].toUpperCase()}</Avatar>
     );

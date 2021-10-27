@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './CronosHistory.less';
+import './BridgeTransactionHistory.less';
 import { useRecoilValue } from 'recoil';
 import { Table, Tag, Tooltip } from 'antd';
 import Big from 'big.js';
@@ -21,7 +21,7 @@ import {
 } from '../../../service/bridge/contracts/BridgeModels';
 import { renderExplorerUrl } from '../../../models/Explorer';
 
-const CronosHistory = () => {
+const BridgeTransactionHistory = () => {
   const session = useRecoilValue(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
 
@@ -311,4 +311,4 @@ const CronosHistory = () => {
   );
 };
 
-export default CronosHistory;
+export default BridgeTransactionHistory;

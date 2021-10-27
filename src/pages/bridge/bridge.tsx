@@ -58,7 +58,7 @@ import {
 } from '../../service/analytics/AnalyticsService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
-import CronosHistory from './components/CronosHistory';
+import BridgeTransactionHistory from './components/BridgeTransactionHistory';
 import CronosBridgeForm from './components/CronosBridgeForm';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { BridgeTransferRequest } from '../../service/TransactionRequestModels';
@@ -169,10 +169,10 @@ const CronosBridge = props => {
   ];
 
   const assetIcon = asset => {
-    const { icon_url, symbol } = asset;
+    const { name, icon_url, symbol } = asset;
 
     return icon_url ? (
-      <img src={icon_url} alt="cronos" className="asset-icon" />
+      <img src={icon_url} alt={name} className="asset-icon" />
     ) : (
       <Avatar>{symbol[0].toUpperCase()}</Avatar>
     );
@@ -962,7 +962,7 @@ const BridgePage = () => {
           <Content>
             <div className="site-layout-background bridge-transfer-history-content">
               <div className="container">
-                <CronosHistory />
+                <BridgeTransactionHistory />
               </div>
             </div>
           </Content>
