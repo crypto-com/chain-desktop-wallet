@@ -17,7 +17,11 @@ import {
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
-import { LEDGER_WALLET_TYPE, NORMAL_WALLET_TYPE } from '../../service/LedgerService';
+import {
+  LEDGER_WALLET_TYPE,
+  NORMAL_WALLET_TYPE,
+  NORMAL_WALLET_LABEL,
+} from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import IconLedger from '../../svg/IconLedger';
@@ -180,8 +184,14 @@ function WalletPage() {
           title:
             session?.wallet.walletType && session?.wallet.walletType.length > 2 ? (
               <>
-                {session?.wallet.walletType.charAt(0).toUpperCase() +
-                  session?.wallet.walletType.slice(1)}{' '}
+                {session?.wallet.walletType === NORMAL_WALLET_TYPE ? (
+                  <>{`${NORMAL_WALLET_LABEL} `}</>
+                ) : (
+                  <>
+                    {session?.wallet.walletType.charAt(0).toUpperCase() +
+                      session?.wallet.walletType.slice(1)}{' '}
+                  </>
+                )}
                 {session?.wallet.walletType === LEDGER_WALLET_TYPE ? (
                   <Icon component={IconLedger} />
                 ) : (
@@ -198,7 +208,11 @@ function WalletPage() {
           render: walletType =>
             walletType && walletType.length > 2 ? (
               <>
-                {walletType.charAt(0).toUpperCase() + walletType.slice(1)}{' '}
+                {walletType === NORMAL_WALLET_TYPE ? (
+                  <>{`${NORMAL_WALLET_LABEL} `}</>
+                ) : (
+                  <>{walletType.charAt(0).toUpperCase() + walletType.slice(1)} </>
+                )}
                 {walletType === LEDGER_WALLET_TYPE ? (
                   <Icon component={IconLedger} />
                 ) : (
