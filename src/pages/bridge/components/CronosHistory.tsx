@@ -174,7 +174,7 @@ const CronosHistory = () => {
               placement="right"
               title={
                 <>
-                  Tx Hash:{' '}
+                  {t('bridge.transactionHistory.table.transactionHash')}{' '}
                   <a
                     data-original={source.transactionId}
                     target="_blank"
@@ -228,22 +228,26 @@ const CronosHistory = () => {
               placement="right"
               title={
                 <>
-                  Tx Hash:{' '}
-                  <a
-                    data-original={destination.transactionId}
-                    target="_blank"
-                    rel="noreferrer"
-                    href={`${renderExplorerUrl(
-                      getAssetBySymbolAndChain(
-                        walletAllAssets,
-                        symbol,
-                        destination.chain.split(/[^A-Za-z]/)[0],
-                      )?.config ?? session.wallet.config,
-                      'tx',
-                    )}/${destination.transactionId}`}
-                  >
-                    {middleEllipsis(destination.transactionId, 6)}
-                  </a>
+                  {t('bridge.transactionHistory.table.transactionHash')}{' '}
+                  {destination.chain.indexOf('Cronos') !== -1 ? (
+                    middleEllipsis(destination.transactionId, 6)
+                  ) : (
+                    <a
+                      data-original={destination.transactionId}
+                      target="_blank"
+                      rel="noreferrer"
+                      href={`${renderExplorerUrl(
+                        getAssetBySymbolAndChain(
+                          walletAllAssets,
+                          symbol,
+                          destination.chain.split(/[^A-Za-z]/)[0],
+                        )?.config ?? session.wallet.config,
+                        'tx',
+                      )}/${destination.transactionId}`}
+                    >
+                      {middleEllipsis(destination.transactionId, 6)}
+                    </a>
+                  )}
                 </>
               }
             >

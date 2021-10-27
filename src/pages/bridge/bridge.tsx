@@ -426,21 +426,25 @@ const CronosBridge = props => {
             });
           } else {
             listDataSource.push({
-              title: 'Transfer Completed',
+              title: t('bridge.transferCompleted.title'),
               description: (
                 <>
                   {t('bridge.deposit.transactionID')}
-                  <a
-                    data-original={destinationResult?.destinationTransactionId}
-                    target="_blank"
-                    rel="noreferrer"
-                    href={`${renderExplorerUrl(
-                      currentAsset?.config ?? session.wallet.config,
-                      'tx',
-                    )}/${destinationResult?.destinationTransactionId}`}
-                  >
-                    {middleEllipsis(destinationResult?.destinationTransactionId!, 6)}
-                  </a>
+                  {destinationResult?.chain.indexOf('Cronos') !== -1 ? (
+                    middleEllipsis(destinationResult?.destinationTransactionId!, 6)
+                  ) : (
+                    <a
+                      data-original={destinationResult?.destinationTransactionId}
+                      target="_blank"
+                      rel="noreferrer"
+                      href={`${renderExplorerUrl(
+                        currentAsset?.config ?? session.wallet.config,
+                        'tx',
+                      )}/${destinationResult?.destinationTransactionId}`}
+                    >
+                      {middleEllipsis(destinationResult?.destinationTransactionId!, 6)}
+                    </a>
+                  )}
                 </>
               ),
               loading: false,
