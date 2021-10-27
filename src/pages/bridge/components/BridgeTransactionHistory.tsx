@@ -49,7 +49,7 @@ const BridgeTransactionHistory = () => {
     amount: string;
     symbol: string;
     time: string;
-    status: BridgeTransactionStatus;
+    status: string;
   }
 
   const processStatusTag = (status: BridgeTransactionStatus) => {
@@ -88,25 +88,6 @@ const BridgeTransactionHistory = () => {
   };
 
   const convertBridgeTransfers = (allTransfers: BridgeTransaction[]) => {
-    const getStatus = (transfer: BridgeTransaction) => {
-      const { status } = transfer;
-
-      switch (status) {
-        case BridgeTransactionStatus.PENDING:
-          return BridgeTransactionStatus.PENDING;
-        case BridgeTransactionStatus.FAILED:
-          return BridgeTransactionStatus.FAILED;
-        case BridgeTransactionStatus.CANCELLED:
-          return BridgeTransactionStatus.CANCELLED;
-        case BridgeTransactionStatus.CONFIRMED:
-          return BridgeTransactionStatus.CONFIRMED;
-        case BridgeTransactionStatus.REJECTED:
-          return BridgeTransactionStatus.REJECTED;
-        default:
-          return BridgeTransactionStatus.PENDING;
-      }
-    };
-
     const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
 
     return allTransfers.map(transfer => {
@@ -138,7 +119,7 @@ const BridgeTransactionHistory = () => {
         symbol: transfer.displayDenom,
         time: new Date(transfer.updatedAt).toLocaleString(),
         // direction: transfer.sourceChain,
-        status: getStatus(transfer),
+        status: transfer.status,
       };
       return data;
     });
