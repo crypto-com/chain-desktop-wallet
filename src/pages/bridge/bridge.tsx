@@ -416,10 +416,10 @@ const CronosBridge = props => {
 
     if (isBridgeTransferSuccess) {
       try {
-        const maxCallCount = 3;
-        let failedCounts = 0;
-
-        // let getDestinationTransactionId = false;
+        const callMaxCount = 3;
+        const callTimeout = 6_000;
+        const callInterval = 8_000;
+        let callFailedCounts = 0;
 
         setTimeout(async () => {
           const myInterval = setInterval(async () => {
@@ -427,8 +427,8 @@ const CronosBridge = props => {
               sendResult.transactionHash!,
             );
             if (!destinationResult.destinationTransactionId ?? !destinationResult) {
-              failedCounts++;
-              if (failedCounts >= maxCallCount) {
+              callFailedCounts++;
+              if (callFailedCounts >= callMaxCount) {
                 clearInterval(myInterval);
                 listDataSource.push({
                   title: t('bridge.transferInitiated.title'),
@@ -439,12 +439,11 @@ const CronosBridge = props => {
                 setIsBridgeTransfering(false);
                 // eslint-disable-next-line no-console
                 console.log(
-                  `Failed in getting response from Bridge Transaction API for ${maxCallCount} times`,
+                  `Failed in getting response from Bridge Transaction API for ${callMaxCount} times`,
                 );
               }
             } else {
               clearInterval(myInterval);
-              // getDestinationTransactionId = true;
               listDataSource.push({
                 title: t('bridge.transferCompleted.title'),
                 description: (
@@ -476,8 +475,8 @@ const CronosBridge = props => {
               setBridgeConfirmationList(listDataSource);
               setIsBridgeTransfering(false);
             }
-          }, 8_000);
-        }, 6_000);
+          }, callInterval);
+        }, callTimeout);
       } catch (e) {
         listDataSource.push({
           title: t('bridge.transferInitiated.title'),
