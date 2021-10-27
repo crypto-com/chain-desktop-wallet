@@ -174,7 +174,7 @@ const CronosHistory = () => {
               placement="right"
               title={
                 <>
-                  TxID:{' '}
+                  Tx Hash:{' '}
                   <a
                     data-original={source.transactionId}
                     target="_blank"
@@ -228,7 +228,7 @@ const CronosHistory = () => {
               placement="right"
               title={
                 <>
-                  TxID:{' '}
+                  Tx Hash:{' '}
                   <a
                     data-original={destination.transactionId}
                     target="_blank"
