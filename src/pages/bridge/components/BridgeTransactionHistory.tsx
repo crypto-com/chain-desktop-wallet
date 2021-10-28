@@ -118,7 +118,6 @@ const BridgeTransactionHistory = () => {
         amount: transfer.displayAmount,
         symbol: transfer.displayDenom,
         time: new Date(transfer.updatedAt).toLocaleString(),
-        // direction: transfer.sourceChain,
         status: transfer.status,
       };
       return data;
@@ -130,7 +129,7 @@ const BridgeTransactionHistory = () => {
       title: t('bridge.transactionHistory.table.fromAddress'),
       // dataIndex: 'source',
       key: 'source',
-      render: record => {
+      render: (record: BridgeTransferTabularData) => {
         const { source, symbol } = record;
 
         return (
@@ -184,8 +183,8 @@ const BridgeTransactionHistory = () => {
       title: t('bridge.transactionHistory.table.toAddress'),
       // dataIndex: 'destination',
       key: 'destination',
-      render: record => {
-        const { destination, symbol } = record;
+      render: (record: BridgeTransferTabularData) => {
+        const { destination, symbol, status } = record;
 
         return (
           <>
@@ -205,35 +204,39 @@ const BridgeTransactionHistory = () => {
               {middleEllipsis(destination.address, 6)}
             </a>
             <br />
-            <Tooltip
-              placement="right"
-              title={
-                <>
-                  {t('bridge.transactionHistory.table.transactionHash')}{' '}
-                  {destination.chain.indexOf('Cronos') !== -1 ? (
-                    middleEllipsis(destination.transactionId, 6)
-                  ) : (
-                    <a
-                      data-original={destination.transactionId}
-                      target="_blank"
-                      rel="noreferrer"
-                      href={`${renderExplorerUrl(
-                        getAssetBySymbolAndChain(
-                          walletAllAssets,
-                          symbol,
-                          destination.chain.split(/[^A-Za-z]/)[0],
-                        )?.config ?? session.wallet.config,
-                        'tx',
-                      )}/${destination.transactionId}`}
-                    >
-                      {middleEllipsis(destination.transactionId, 6)}
-                    </a>
-                  )}
-                </>
-              }
-            >
-              ({destination.chain.replace('-', ' ')})
-            </Tooltip>
+            {status === BridgeTransactionStatus.CONFIRMED ? (
+              <Tooltip
+                placement="right"
+                title={
+                  <>
+                    {t('bridge.transactionHistory.table.transactionHash')}{' '}
+                    {destination.chain.indexOf('Cronos') !== -1 ? (
+                      middleEllipsis(destination.transactionId, 6)
+                    ) : (
+                      <a
+                        data-original={destination.transactionId}
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`${renderExplorerUrl(
+                          getAssetBySymbolAndChain(
+                            walletAllAssets,
+                            symbol,
+                            destination.chain.split(/[^A-Za-z]/)[0],
+                          )?.config ?? session.wallet.config,
+                          'tx',
+                        )}/${destination.transactionId}`}
+                      >
+                        {middleEllipsis(destination.transactionId, 6)}
+                      </a>
+                    )}
+                  </>
+                }
+              >
+                ({destination.chain.replace('-', ' ')})
+              </Tooltip>
+            ) : (
+              <>({destination.chain.replace('-', ' ')})</>
+            )}
           </>
         );
       },
@@ -242,7 +245,7 @@ const BridgeTransactionHistory = () => {
       title: t('bridge.transactionHistory.table.amount'),
       // dataIndex: 'amount',
       key: 'amount',
-      render: record => {
+      render: (record: BridgeTransferTabularData) => {
         return (
           <>
             {Big(record.amount).toFixed(4)} {record.symbol}
@@ -259,10 +262,8 @@ const BridgeTransactionHistory = () => {
       title: t('bridge.transactionHistory.table.status'),
       dataIndex: 'status',
       key: 'status',
-      render: text => {
-        // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
-        // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
-        return processStatusTag(text);
+      render: (status: BridgeTransactionStatus) => {
+        return processStatusTag(status);
       },
     },
   ];
