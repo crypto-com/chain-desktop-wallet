@@ -1,3 +1,5 @@
+import Web3 from 'web3';
+import { TransactionConfig } from 'web3-eth';
 import { DelegateTransactionUnsigned, TransferTransactionUnsigned, UndelegateTransactionUnsigned, RedelegateTransactionUnsigned, VoteTransactionUnsigned, NFTTransferUnsigned, WithdrawStakingRewardUnsigned, NFTDenomIssueUnsigned, NFTMintUnsigned } from './signers/TransactionSupported';
 import { BroadCastResult } from '../models/Transaction';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
@@ -6,8 +8,6 @@ import { DEFAULT_CLIENT_MEMO } from '../config/StaticConfig';
 import { TransferRequest, DelegationRequest, UndelegationRequest, RedelegationRequest, VoteRequest, NFTTransferRequest, WithdrawStakingRewardRequest, BridgeTransferRequest, NFTDenomIssueRequest, NFTMintRequest } from './TransactionRequestModels';
 import { StorageService } from '../storage/StorageService';
 import { CronosClient } from './cronos/CronosClient';
-import Web3 from 'web3';
-import { TransactionConfig } from 'web3-eth';
 import { TransactionPrepareService } from './TransactionPrepareService';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
