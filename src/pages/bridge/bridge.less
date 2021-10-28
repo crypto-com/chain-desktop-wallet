@@ -153,6 +153,11 @@
               margin: 0;
               margin-left: 10px;
               text-align: left;
+              .ant-layout-sider-children {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              }
             }
           }
         }
@@ -180,6 +185,49 @@
 }
 
 .bridge-config-modal {
+  .block {
+    margin: 20px;
+    .title {
+      font-size: 24px;
+    }
+    .asset-icon {
+      width: auto;
+      height: 22px;
+      > img {
+        margin-right: 10px;
+      }
+    }
+    .bridge-from,
+    .bridge-to {
+      .asset-icon {
+        height: 40px;
+      }
+    }
+    .ant-layout,
+    .ant-layout-sider {
+      background: transparent !important;
+      .ant-layout-content,
+      .ant-layout-sider {
+        margin: 0;
+        margin-left: 10px;
+        text-align: left;
+        .ant-layout-sider-children {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
+    .ant-layout-content {
+      display: flex;
+      align-items: center;
+    }
+  }
+  .flex-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
   .ant-btn:first-of-type {
     width: 184px;
     margin: 0 20px 0 0;

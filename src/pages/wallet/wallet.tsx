@@ -180,8 +180,14 @@ function WalletPage() {
           title:
             session?.wallet.walletType && session?.wallet.walletType.length > 2 ? (
               <>
-                {session?.wallet.walletType.charAt(0).toUpperCase() +
-                  session?.wallet.walletType.slice(1)}{' '}
+                {session?.wallet.walletType === NORMAL_WALLET_TYPE ? (
+                  <>{`${t('general.walletType.normal')} `}</>
+                ) : (
+                  <>
+                    {session?.wallet.walletType.charAt(0).toUpperCase() +
+                      session?.wallet.walletType.slice(1)}{' '}
+                  </>
+                )}
                 {session?.wallet.walletType === LEDGER_WALLET_TYPE ? (
                   <Icon component={IconLedger} />
                 ) : (
@@ -198,7 +204,11 @@ function WalletPage() {
           render: walletType =>
             walletType && walletType.length > 2 ? (
               <>
-                {walletType.charAt(0).toUpperCase() + walletType.slice(1)}{' '}
+                {walletType === NORMAL_WALLET_TYPE ? (
+                  <>{`${t('general.walletType.normal')} `}</>
+                ) : (
+                  <>{walletType.charAt(0).toUpperCase() + walletType.slice(1)} </>
+                )}
                 {walletType === LEDGER_WALLET_TYPE ? (
                   <Icon component={IconLedger} />
                 ) : (
