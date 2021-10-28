@@ -22,6 +22,8 @@
   "general.retry": "Retry",
   "general.connect": "Connect",
   "general.seeAll": "See All",
+  "general.walletType.normal": "Standard",
+  "general.walletType.ledger": "Ledger",
   "general.past": "ago",
   "general.future": "in",
   "general.years": "Years",
