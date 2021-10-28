@@ -232,6 +232,11 @@ const FormSend: React.FC<FormSendProps> = props => {
         className="address-input"
       >
         <AddressBookInput
+          onChange={value => {
+            form.setFieldsValue({
+              recipientAddress: value,
+            });
+          }}
           currentSession={currentSession}
           asset={walletAsset!}
           placeholder={t('send.formSend.recipientAddress.placeholder')}

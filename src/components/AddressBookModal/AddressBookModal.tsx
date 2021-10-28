@@ -43,7 +43,11 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
   const addressBookExistsValidator = async (rule, address: string) => {
     const isExist = await addressBookService.isAddressBookContactExisit(walletId, asset, address);
 
-    return !isExist;
+    if (isExist) {
+      return Promise.reject(new Error());
+    }
+
+    return Promise.resolve();
   };
 
   return (
@@ -115,38 +119,13 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
 
 interface IAddressBookModalProps {
   onClose: () => void;
+  onSelect: (contact: AddressBookContact) => void;
   asset: UserAsset;
   currentSession: Session;
 }
 
-const AddressBookTableColumns = [
-  {
-    title: 'Address',
-    key: 'address',
-    render: (contact: AddressBookContact) => (
-      <div>
-        <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{contact.label}</div>
-        <div style={{ color: '#777777' }}>{contact.address}</div>
-      </div>
-    ),
-  },
-  {
-    title: 'Action',
-    key: 'action',
-    render: (contact: AddressBookContact) => (
-      <div style={{ display: 'flex' }}>
-        <Space size="middle">
-          <a>Edit</a>
-          <a>Delete</a>
-          <a>Select</a>
-        </Space>
-      </div>
-    ),
-  },
-];
-
 const AddressBookModal = (props: IAddressBookModalProps) => {
-  const { onClose, asset: userAsset, currentSession } = props;
+  const { onClose, asset: userAsset, currentSession, onSelect } = props;
 
   const [isAddModalShowing, setIsAddModalShowing] = useState(false);
   const [contacts, setContacts] = useState<AddressBookContact[]>([]);
@@ -171,6 +150,38 @@ const AddressBookModal = (props: IAddressBookModalProps) => {
   useEffect(() => {
     fetchContacts();
   }, [fetchContacts]);
+
+  const AddressBookTableColumns = [
+    {
+      title: 'Address',
+      key: 'address',
+      render: (contact: AddressBookContact) => (
+        <div>
+          <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{contact.label}</div>
+          <div style={{ color: '#777777' }}>{contact.address}</div>
+        </div>
+      ),
+    },
+    {
+      title: 'Action',
+      key: 'action',
+      render: (contact: AddressBookContact) => (
+        <div style={{ display: 'flex' }}>
+          <Space size="middle">
+            <a>Edit</a>
+            <a onClick={() => {}}>Delete</a>
+            <a
+              onClick={() => {
+                onSelect(contact);
+              }}
+            >
+              Select
+            </a>
+          </Space>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <>
