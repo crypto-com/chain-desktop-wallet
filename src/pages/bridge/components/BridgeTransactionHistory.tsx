@@ -118,7 +118,6 @@ const BridgeTransactionHistory = () => {
         amount: transfer.displayAmount,
         symbol: transfer.displayDenom,
         time: new Date(transfer.updatedAt).toLocaleString(),
-        // direction: transfer.sourceChain,
         status: transfer.status,
       };
       return data;
@@ -130,7 +129,7 @@ const BridgeTransactionHistory = () => {
       title: t('bridge.transactionHistory.table.fromAddress'),
       // dataIndex: 'source',
       key: 'source',
-      render: record => {
+      render: (record: BridgeTransferTabularData) => {
         const { source, symbol } = record;
 
         return (
@@ -184,7 +183,7 @@ const BridgeTransactionHistory = () => {
       title: t('bridge.transactionHistory.table.toAddress'),
       // dataIndex: 'destination',
       key: 'destination',
-      render: record => {
+      render: (record: BridgeTransferTabularData) => {
         const { destination, symbol, status } = record;
 
         return (
@@ -246,7 +245,7 @@ const BridgeTransactionHistory = () => {
       title: t('bridge.transactionHistory.table.amount'),
       // dataIndex: 'amount',
       key: 'amount',
-      render: record => {
+      render: (record: BridgeTransferTabularData) => {
         return (
           <>
             {Big(record.amount).toFixed(4)} {record.symbol}
@@ -263,10 +262,8 @@ const BridgeTransactionHistory = () => {
       title: t('bridge.transactionHistory.table.status'),
       dataIndex: 'status',
       key: 'status',
-      render: text => {
-        // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
-        // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
-        return processStatusTag(text);
+      render: (status: BridgeTransactionStatus) => {
+        return processStatusTag(status);
       },
     },
   ];
