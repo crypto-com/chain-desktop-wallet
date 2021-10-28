@@ -3,7 +3,7 @@ import { NodeRpcService } from './rpc/NodeRpcService';
 import { SECONDS_OF_YEAR, NOT_KNOWN_YET_VALUE } from '../config/StaticConfig';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { CronosClient } from './cronos/CronosClient';
-import { TransferTransactionData, TransactionStatus, NftQueryParams, NftTransferModel, ValidatorModel, UnbondingDelegationList, RewardTransactionList, StakingTransactionList, TransferTransactionList, NftAccountTransactionList, NftAccountTransactionData, NftModel, ProposalStatuses, ProposalModel } from '../models/Transaction';
+import { TransferTransactionData, TransactionStatus, NftQueryParams, NftTransferModel, ValidatorModel, UnbondingDelegationList, RewardTransactionList, StakingTransactionList, TransferTransactionList, NftModel, ProposalStatuses, ProposalModel } from '../models/Transaction';
 import { Session } from '../models/Session';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { croMarketPriceApi } from './rpc/MarketApi';
@@ -46,6 +46,7 @@ export class TransactionHistoryService {
             console.error('FAILED_TO_LOAD_VALIDATORS', e);
         }
     }
+
     private async getLatestTopValidators(): Promise<ValidatorModel[]> {
         try {
             const currentSession = await this.storageService.retrieveCurrentSession();
@@ -60,6 +61,7 @@ export class TransactionHistoryService {
             return [];
         }
     }
+
     public async fetchAndSaveUnbondingDelegations(nodeRpc: NodeRpcService, currentSession: Session) {
         try {
             const unbondingDelegations = await nodeRpc.fetchUnbondingDelegationBalance(
@@ -79,6 +81,7 @@ export class TransactionHistoryService {
     public async saveUnbondingDelegationsList(unbondingDelegations: UnbondingDelegationList) {
         return this.storageService.saveUnbondingDelegations(unbondingDelegations);
     }
+
     public async fetchAndSaveRewards(nodeRpc: NodeRpcService, currentSession: Session) {
         try {
             const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
@@ -137,9 +140,11 @@ export class TransactionHistoryService {
             console.error('FAILED_TO_LOAD_DELEGATIONS', e);
         }
     }
+
     public async saveDelegationsList(stakingTransactions: StakingTransactionList) {
         return this.storageService.saveStakingTransactions(stakingTransactions);
     }
+
     public async retrieveCurrentWalletAssets(currentSession: Session): Promise<UserAsset[]> {
         const assets = await this.storageService.retrieveAssetsByWallet(
             currentSession.wallet.identifier,
@@ -152,6 +157,7 @@ export class TransactionHistoryService {
                 return asset;
             });
     }
+
     public async fetchAndSaveTransfers(currentSession: Session) {
         const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
 
@@ -237,6 +243,7 @@ export class TransactionHistoryService {
     public async saveTransfers(rewardTransactions: TransferTransactionList) {
         return this.storageService.saveTransferTransactions(rewardTransactions);
     }
+
     public async fetchAndSaveNFTAccountTxs(currentSession: Session) {
         try {
             const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
@@ -253,6 +260,7 @@ export class TransactionHistoryService {
             console.error('FAILED_TO_LOAD_SAVE_NFT_ACCOUNT_TXs', e);
         }
     }
+
     public async fetchAndSaveNFTs(currentSession: Session) {
         try {
             const nfts = await this.loadAllCurrentAccountNFTs();
@@ -373,6 +381,7 @@ export class TransactionHistoryService {
             return [];
         }
     }
+    
     public async fetchAndUpdateBalances(session: Session | null = null) {
         const currentSession =
             session == null ? await this.storageService.retrieveCurrentSession() : session;

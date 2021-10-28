@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { TransactionConfig } from 'web3-eth';
-import Web3 from 'web3';
 import {
   DisableDefaultMemoSettings,
   DisableGASettings,
@@ -11,45 +9,27 @@ import {
 } from '../models/Wallet';
 import {
   APP_DB_NAMESPACE,
-  DEFAULT_CLIENT_MEMO,
   DefaultWalletConfigs,
   NOT_KNOWN_YET_VALUE,
-  SECONDS_OF_YEAR,
   WalletConfig,
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import { Session } from '../models/Session';
-import {
-  DelegateTransactionUnsigned,
-  NFTDenomIssueUnsigned,
-  NFTMintUnsigned,
-  NFTTransferUnsigned,
-  RedelegateTransactionUnsigned,
-  TransferTransactionUnsigned,
-  UndelegateTransactionUnsigned,
-  VoteTransactionUnsigned,
-  WithdrawStakingRewardUnsigned,
-} from './signers/TransactionSupported';
 import { cryptographer } from '../crypto/Cryptographer';
 import { secretStoreService } from '../storage/SecretStoreService';
 import { AssetCreationType, AssetMarketPrice, UserAsset, UserAssetType } from '../models/UserAsset';
-import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
   NftAccountTransactionData,
   NftDenomModel,
   NftModel,
-  NftQueryParams,
-  NftTransferModel,
   ProposalModel,
-  ProposalStatuses,
   RewardsBalances,
   RewardTransaction,
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
-  TransactionStatus,
   TransferTransactionData,
   TransferTransactionList,
   UnbondingDelegationData,
@@ -57,8 +37,7 @@ import {
   ValidatorModel,
 } from '../models/Transaction';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
-import { getBaseScaledAmount } from '../utils/NumberUtils';
-import { createLedgerDevice, LEDGER_WALLET_TYPE } from './LedgerService';
+import { LEDGER_WALLET_TYPE } from './LedgerService';
 import {
   BridgeTransferRequest,
   DelegationRequest,
@@ -72,12 +51,9 @@ import {
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
-import { capitalizeFirstLetter, sleep } from '../utils/utils';
+import { capitalizeFirstLetter } from '../utils/utils';
 import { WalletBuiltResult, WalletOps } from './WalletOps';
-import { CronosClient } from './cronos/CronosClient';
-import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
-import { BridgeService } from './bridge/BridgeService';
 import { StorageService } from '../storage/StorageService';
 import { TransactionPrepareService } from './TransactionPrepareService';
 import { TransactionHistoryService } from "./TransactionHistoryService";
@@ -600,20 +576,6 @@ class WalletService {
     return nftSet.nfts;
   }
 
-  private async getLatestTopValidators(): Promise<ValidatorModel[]> {
-    try {
-      const currentSession = await this.storageService.retrieveCurrentSession();
-      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
-        return Promise.resolve([]);
-      }
-      const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-      return nodeRpc.loadTopValidators();
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log('FAILED_LOADING TOP VALIDATORS', e);
-      return [];
-    }
-  }
 
   public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {
     const currentSession = await this.storageService.retrieveCurrentSession();

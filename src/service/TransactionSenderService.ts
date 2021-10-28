@@ -2,7 +2,7 @@ import { DelegateTransactionUnsigned, TransferTransactionUnsigned, UndelegateTra
 import { BroadCastResult } from '../models/Transaction';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
 import { UserAssetType } from '../models/UserAsset';
-import { DEFAULT_CLIENT_MEMO, APP_DB_NAMESPACE } from '../config/StaticConfig';
+import { DEFAULT_CLIENT_MEMO } from '../config/StaticConfig';
 import { TransferRequest, DelegationRequest, UndelegationRequest, RedelegationRequest, VoteRequest, NFTTransferRequest, WithdrawStakingRewardRequest, BridgeTransferRequest, NFTDenomIssueRequest, NFTMintRequest } from './TransactionRequestModels';
 import { StorageService } from '../storage/StorageService';
 import { CronosClient } from './cronos/CronosClient';
@@ -11,7 +11,6 @@ import { TransactionConfig } from 'web3-eth';
 import { TransactionPrepareService } from './TransactionPrepareService';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
-import { Session } from '../models/Session';
 import { TransactionHistoryService } from './TransactionHistoryService';
 import { sleep } from '../utils/utils';
 import { BridgeService } from './bridge/BridgeService';
@@ -476,9 +475,9 @@ export class TransactionSenderService {
     }
 
 
-    /**************************
-     *  NFT RELATED FUNCTIONS *
-     **************************/
+    /* _______________________
+        NFT RELATED FUNCTIONS  
+     _________________________ */
 
     public async sendMintNFT(nftMintRequest: NFTMintRequest): Promise<BroadCastResult> {
         const {
