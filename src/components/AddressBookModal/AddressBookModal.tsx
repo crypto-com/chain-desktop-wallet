@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Modal, Space, Table } from 'antd';
+import { Button, message, Modal, Space, Table } from 'antd';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import _ from 'lodash';
 import { AddressBookContact } from '../../models/AddressBook';
@@ -62,7 +62,19 @@ const AddressBookModal = (props: IAddressBookModalProps) => {
         <div style={{ display: 'flex' }}>
           <Space size="middle">
             <a>Edit</a>
-            <a onClick={() => {}}>Delete</a>
+            <a
+              onClick={async () => {
+                const success = await addressBookService.removeAddressBookContact(contact.id);
+                if (success) {
+                  await fetchContacts();
+                  message.success('Remove Success');
+                } else {
+                  message.error('Remove failed');
+                }
+              }}
+            >
+              Remove
+            </a>
             <a
               onClick={() => {
                 onSelect(contact);
