@@ -727,6 +727,35 @@ const CronosBridge = props => {
     bridgeConfigForm.setFieldsValue(defaultConfig[bridgeTransferDirection]);
   };
 
+  const renderConfigBridgeDirection = () => {
+    const { bridgeFrom, bridgeTo } = form.getFieldsValue();
+
+    const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
+    const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
+
+    return (
+      <div className="block flex-row">
+        <Layout>
+          <Sider width="50px" className="bridge-from">
+            {bridgeIcon(bridgeFromObj?.value)}
+          </Sider>
+          <Content>
+            <div style={{ fontWeight: 'bold' }}>{bridgeFromObj?.label}</div>
+          </Content>
+        </Layout>
+        <ArrowRightOutlined style={{ fontSize: '24px', width: '50px' }} />
+        <Layout>
+          <Sider width="50px" className="bridge-to">
+            {bridgeIcon(bridgeToObj?.value)}
+          </Sider>
+          <Content>
+            <div style={{ fontWeight: 'bold' }}>{bridgeToObj?.label}</div>
+          </Content>
+        </Layout>
+      </div>
+    );
+  };
+
   return (
     <>
       {currentStep === 1 || bridgeTransferError ? (
@@ -773,6 +802,7 @@ const CronosBridge = props => {
               okText={t('general.save')}
               forceRender
             >
+              {renderConfigBridgeDirection()}
               <Form
                 {...layout}
                 layout="vertical"
