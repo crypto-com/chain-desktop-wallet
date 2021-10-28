@@ -31,10 +31,12 @@ export function isElectron() {
 }
 
 export function middleEllipsis(str: string, len: number) {
+  str = str ?? '';
   return `${str.substr(0, len)}...${str.substr(str.length - len, str.length)}`;
 }
 
 export function ellipsis(str: string, len: number) {
+  str = str ?? '';
   return str.length <= len ? `${str}` : `${str.substr(0, len)}...`;
 }
 

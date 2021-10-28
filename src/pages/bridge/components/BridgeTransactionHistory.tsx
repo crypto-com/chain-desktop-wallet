@@ -185,7 +185,7 @@ const BridgeTransactionHistory = () => {
       // dataIndex: 'destination',
       key: 'destination',
       render: record => {
-        const { destination, symbol } = record;
+        const { destination, symbol, status } = record;
 
         return (
           <>
@@ -205,35 +205,39 @@ const BridgeTransactionHistory = () => {
               {middleEllipsis(destination.address, 6)}
             </a>
             <br />
-            <Tooltip
-              placement="right"
-              title={
-                <>
-                  {t('bridge.transactionHistory.table.transactionHash')}{' '}
-                  {destination.chain.indexOf('Cronos') !== -1 ? (
-                    middleEllipsis(destination.transactionId, 6)
-                  ) : (
-                    <a
-                      data-original={destination.transactionId}
-                      target="_blank"
-                      rel="noreferrer"
-                      href={`${renderExplorerUrl(
-                        getAssetBySymbolAndChain(
-                          walletAllAssets,
-                          symbol,
-                          destination.chain.split(/[^A-Za-z]/)[0],
-                        )?.config ?? session.wallet.config,
-                        'tx',
-                      )}/${destination.transactionId}`}
-                    >
-                      {middleEllipsis(destination.transactionId, 6)}
-                    </a>
-                  )}
-                </>
-              }
-            >
-              ({destination.chain.replace('-', ' ')})
-            </Tooltip>
+            {status === BridgeTransactionStatus.CONFIRMED ? (
+              <Tooltip
+                placement="right"
+                title={
+                  <>
+                    {t('bridge.transactionHistory.table.transactionHash')}{' '}
+                    {destination.chain.indexOf('Cronos') !== -1 ? (
+                      middleEllipsis(destination.transactionId, 6)
+                    ) : (
+                      <a
+                        data-original={destination.transactionId}
+                        target="_blank"
+                        rel="noreferrer"
+                        href={`${renderExplorerUrl(
+                          getAssetBySymbolAndChain(
+                            walletAllAssets,
+                            symbol,
+                            destination.chain.split(/[^A-Za-z]/)[0],
+                          )?.config ?? session.wallet.config,
+                          'tx',
+                        )}/${destination.transactionId}`}
+                      >
+                        {middleEllipsis(destination.transactionId, 6)}
+                      </a>
+                    )}
+                  </>
+                }
+              >
+                ({destination.chain.replace('-', ' ')})
+              </Tooltip>
+            ) : (
+              <>({destination.chain.replace('-', ' ')})</>
+            )}
           </>
         );
       },
