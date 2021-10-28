@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { bech32 } from 'bech32';
 import { ethers } from 'ethers';
+import { UserAsset, UserAssetType } from '../models/UserAsset';
 
 export function isElectron() {
   // Renderer process
@@ -113,4 +114,34 @@ export function bech32ToEVMAddress(bech32Address: string) {
   const decodedFromWords = bech32.fromWords(bech32.decode(bech32Address).words);
   const originalEVMAddress = Buffer.from(new Uint8Array(decodedFromWords)).toString('hex');
   return ethers.utils.getAddress(originalEVMAddress);
+}
+
+export function getCryptoOrgAsset(walletAllAssets: UserAsset[]) {
+  return walletAllAssets.find(asset => {
+    return (
+      asset.mainnetSymbol.toUpperCase() === 'CRO' &&
+      asset.name.includes('Crypto.org') && // lgtm [js/incomplete-url-substring-sanitization]
+      asset.assetType === UserAssetType.TENDERMINT
+    );
+  });
+}
+
+export function getCronosAsset(walletAllAssets: UserAsset[]) {
+  return walletAllAssets.find(asset => {
+    return (
+      asset.mainnetSymbol.toUpperCase() === 'CRO' &&
+      asset.name.includes('Cronos') &&
+      asset.assetType === UserAssetType.EVM
+    );
+  });
+}
+
+export function getAssetBySymbolAndChain(
+  walletAllAssets: UserAsset[],
+  symbol: string,
+  chainName: string,
+) {
+  return walletAllAssets.find(asset => {
+    return asset.symbol.toUpperCase() === symbol && asset.name.indexOf(chainName) !== -1;
+  });
 }
