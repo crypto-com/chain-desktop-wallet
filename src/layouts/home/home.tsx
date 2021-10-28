@@ -39,6 +39,7 @@ import {
   nftListState,
   isIbcVisibleState,
   navbarMenuSelectedKeyState,
+  isBridgeTransferingState,
 } from '../../recoil/atom';
 import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
@@ -77,6 +78,7 @@ import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark
 import IconLedger from '../../svg/IconLedger';
 import { ISignerProvider } from '../../service/signers/SignerProvider';
 import { UserAsset } from '../../models/UserAsset';
+// import i18n from '../../language/I18n';
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -113,6 +115,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [navbarMenuSelectedKey, setNavbarMenuSelectedKey] = useRecoilState(
     navbarMenuSelectedKeyState,
   );
+  const [isBridgeTransfering, setIsBridgeTransfering] = useRecoilState(isBridgeTransferingState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const setIsIbcVisible = useSetRecoilState(isIbcVisibleState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -122,6 +125,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(false);
   const [isButtonLoading, setIsButtonLoading] = useState(false);
+  const [menuToBeSelectedKey, setMenuToBeSelectedKey] = useState('');
 
   const [ledgerTendermintAddress, setLedgerTendermintAddress] = useState('');
   const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
@@ -151,7 +155,9 @@ function HomeLayout(props: HomeLayoutProps) {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async function fetchAndSaveIBCWalletAssets(fetchSession: Session) {
+    // lgtm [js/unused-local-variable]
     try {
       await walletService.fetchIBCAssets(fetchSession);
     } catch (e) {
@@ -462,6 +468,44 @@ function HomeLayout(props: HomeLayoutProps) {
     }, 5_000);
   };
 
+  const conditionalLink = (to: string, label: string) => {
+    const conditionalLinkNotificationKey = 'conditionalLinkNotificationKey';
+
+    const conditionalLinkBtn = (
+      <Button
+        type="primary"
+        size="small"
+        className="btn-exit"
+        onClick={() => {
+          notification.close(conditionalLinkNotificationKey);
+          setIsBridgeTransfering(false);
+          setNavbarMenuSelectedKey(to);
+          history.push(to);
+        }}
+        style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+      >
+        {t('home.notification.cronosBridgeExit.button')}
+      </Button>
+    );
+
+    return isBridgeTransfering ? (
+      <a
+        onClick={() => {
+          notification.info({
+            key: conditionalLinkNotificationKey,
+            message: t('home.notification.cronosBridgeExit.message'),
+            description: t('home.notification.cronosBridgeExit.description'),
+            btn: conditionalLinkBtn,
+          });
+        }}
+      >
+        {label}
+      </a>
+    ) : (
+      <Link to={to}>{label}</Link>
+    );
+  };
+
   useEffect(() => {
     const fetchDB = async () => {
       setFetchingDB(true);
@@ -499,7 +543,7 @@ function HomeLayout(props: HomeLayoutProps) {
         await fetchAndSetNewValidators(currentSession),
         await fetchAndSetNewProposals(currentSession),
         await fetchAndSetNFTs(currentSession),
-        await fetchAndSaveIBCWalletAssets(currentSession),
+        // await fetchAndSaveIBCWalletAssets(currentSession),
       ]);
 
       const currentValidatorList = await walletService.retrieveTopValidators(
@@ -556,6 +600,9 @@ function HomeLayout(props: HomeLayoutProps) {
     setNftList,
     isSessionLockModalVisible,
     setIsSessionLockModalVisible,
+    isBridgeTransfering,
+    menuToBeSelectedKey,
+    setMenuToBeSelectedKey,
   ]);
 
   const onWalletDecryptFinishCreateFreshAssets = async (password: string) => {
@@ -584,17 +631,23 @@ function HomeLayout(props: HomeLayoutProps) {
         defaultSelectedKeys={[menuSelectedKey]}
         selectedKeys={[navbarMenuSelectedKey]}
         onClick={item => {
-          setNavbarMenuSelectedKey(item.key);
+          setMenuToBeSelectedKey(item.key);
+          if (!isBridgeTransfering) {
+            setNavbarMenuSelectedKey(item.key);
+          }
         }}
       >
         <Menu.Item key="/home" icon={<Icon component={IconHome} />}>
-          <Link to="/home">{t('navbar.home')}</Link>
+          {conditionalLink('/home', t('navbar.home'))}
+          {/* <Link to="/home">{t('navbar.home')}</Link> */}
         </Menu.Item>
         <Menu.Item key="/staking" icon={<Icon component={IconStaking} />}>
-          <Link to="/staking">{t('navbar.staking')}</Link>
+          {conditionalLink('/staking', t('navbar.staking'))}
+          {/* <Link to="/staking">{t('navbar.staking')}</Link> */}
         </Menu.Item>
         <Menu.Item key="/assets" icon={<Icon component={IconAssets} />}>
-          <Link to="/assets">{t('navbar.assets')}</Link>
+          {conditionalLink('/assets', t('navbar.assets'))}
+          {/* <Link to="/assets">{t('navbar.assets')}</Link> */}
         </Menu.Item>
         <Menu.Item key="/bridge" icon={<Icon component={IconCronos} />}>
           <Link to="/bridge">{t('navbar.bridge')}</Link>
@@ -606,13 +659,16 @@ function HomeLayout(props: HomeLayoutProps) {
           <Link to="/receive">{t('navbar.receive')}</Link>
         </Menu.Item> */}
         <Menu.Item key="/governance" icon={<BankOutlined />}>
-          <Link to="/governance">{t('navbar.governance')}</Link>
+          {conditionalLink('/governance', t('navbar.governance'))}
+          {/* <Link to="/governance">{t('navbar.governance')}</Link> */}
         </Menu.Item>
         <Menu.Item key="/nft" icon={<Icon component={IconNft} />}>
-          <Link to="/nft">{t('navbar.nft')}</Link>
+          {conditionalLink('/nft', t('navbar.nft'))}
+          {/* <Link to="/nft">{t('navbar.nft')}</Link> */}
         </Menu.Item>
         <Menu.Item key="/settings" icon={<SettingOutlined />}>
-          <Link to="/settings">{t('navbar.settings')}</Link>
+          {conditionalLink('/settings', t('navbar.settings'))}
+          {/* <Link to="/nft">{t('navbar.nft')}</Link> */}
         </Menu.Item>
       </Menu>
     );
@@ -623,17 +679,19 @@ function HomeLayout(props: HomeLayoutProps) {
       <Menu>
         {walletList.length <= LedgerWalletMaximum ? (
           <>
-            <Menu.Item className="restore-wallet-item" key="restore-wallet-item">
-              <Link to="/restore">
-                <ReloadOutlined />
-                {t('navbar.wallet.restore')}
-              </Link>
+            <Menu.Item
+              className="restore-wallet-item"
+              key="restore-wallet-item"
+              icon={<ReloadOutlined style={{ color: '#1199fa' }} />}
+            >
+              {conditionalLink('/restore', t('navbar.wallet.restore'))}
             </Menu.Item>
-            <Menu.Item className="create-wallet-item" key="create-wallet-item">
-              <Link to="/create">
-                <PlusOutlined />
-                {t('navbar.wallet.create')}
-              </Link>
+            <Menu.Item
+              className="create-wallet-item"
+              key="create-wallet-item"
+              icon={<PlusOutlined style={{ color: '#1199fa' }} />}
+            >
+              {conditionalLink('/create', t('navbar.wallet.create'))}
             </Menu.Item>
           </>
         ) : (
@@ -644,24 +702,24 @@ function HomeLayout(props: HomeLayoutProps) {
             <Menu.Item
               className="delete-wallet-item"
               key="delete-wallet-item"
+              icon={<DeleteOutlined style={{ color: '#f27474' }} />}
               onClick={() => {
                 setDeleteWalletAddress(session.wallet.address);
                 setIsConfirmationModalVisible(true);
               }}
             >
-              <DeleteOutlined />
+              {/* <DeleteOutlined /> */}
               {t('navbar.wallet.delete')}
             </Menu.Item>
           </>
         ) : (
           ''
         )}
-        <Menu.Item key="wallet-list-item">
-          <Link to="/wallet">
-            {/* <IconWallet /> */}
-            <Icon component={IconWallet} />
-            {t('navbar.wallet.list')}
-          </Link>
+        <Menu.Item
+          key="wallet-list-item"
+          icon={<Icon component={IconWallet} style={{ color: '#1199fa' }} />}
+        >
+          {conditionalLink('/wallet', t('navbar.wallet.list'))}
         </Menu.Item>
       </Menu>
     );
@@ -774,8 +832,8 @@ function HomeLayout(props: HomeLayoutProps) {
             icon={<LockFilled style={{ color: '#1199fa' }} />}
             onClick={async () => {
               notification.info({
-                message: 'App Locked',
-                description: 'The app will be locked shortly',
+                message: t('general.sessionLockModal.notification.message'),
+                description: t('general.sessionLockModal.notification.description'),
                 duration: 3,
                 placement: 'topRight',
               });
@@ -788,7 +846,6 @@ function HomeLayout(props: HomeLayoutProps) {
             {' '}
             {t('navbar.lock')}{' '}
           </Button>
-
           <Dropdown
             overlay={<WalletMenu />}
             placement="topCenter"

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Button, Layout, notification, Table, Tabs, Card, List, Avatar } from 'antd';
+import { Button, Layout, notification, Table, Tabs, Card, List, Avatar, Tag } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
@@ -24,7 +24,6 @@ import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
 import {
   scaledAmount,
   scaledStakingBalance,
-  scaledTotalBalance,
   getAssetBalancePrice,
   getAssetStakingBalancePrice,
   getAssetTotalBalancePrice,
@@ -86,10 +85,10 @@ const HomePage = () => {
   const [t] = useTranslation();
 
   const assetIcon = asset => {
-    const { icon_url, symbol } = asset;
+    const { name, icon_url, symbol } = asset;
 
     return icon_url ? (
-      <img src={icon_url} alt="cronos" className="asset-icon" />
+      <img src={icon_url} alt={name} className="asset-icon" />
     ) : (
       <Avatar>{symbol[0].toUpperCase()}</Avatar>
     );
@@ -102,12 +101,29 @@ const HomePage = () => {
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: record => {
-        const { name, symbol } = record;
+        const { symbol } = record;
         return (
           <div className="name">
             {assetIcon(record)}
-            {name} ({symbol})
+            {symbol}
           </div>
+        );
+      },
+    },
+    {
+      title: t('home.assetList.table.chainName'),
+      // dataIndex: 'name',
+      key: 'chainName',
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      render: record => {
+        const { name } = record;
+        return (
+          <Tag
+            style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
+            color="processing"
+          >
+            {name}
+          </Tag>
         );
       },
     },
@@ -284,6 +300,20 @@ const HomePage = () => {
     });
   }
 
+  function getAllAssetsTotalBalance() {
+    let totalBalance = Big('0');
+    walletAllAssets.forEach(asset => {
+      if (allMarketData[`${asset.mainnetSymbol}-${currentSession.currency}`]) {
+        const addingBalance = getAssetTotalBalancePrice(
+          asset,
+          allMarketData[`${asset.mainnetSymbol}-${currentSession.currency}`],
+        );
+        totalBalance = totalBalance.add(addingBalance);
+      }
+    });
+    return totalBalance.toFixed(2);
+  }
+
   useEffect(() => {
     const syncAssetData = async () => {
       const sessionData = await walletService.retrieveCurrentSession();
@@ -346,16 +376,10 @@ const HomePage = () => {
           </div> */}
           <div className="balance">
             <div className="title">{t('home.balance.title1')}</div>
-            {defaultWalletAsset && (
-              <div className="quantity">
-                {numeral(scaledTotalBalance(defaultWalletAsset)).format('0,0.0000')}{' '}
-                {defaultWalletAsset?.symbol}
-              </div>
-            )}
-            <div className="fiat">
+            <div className="quantity">
               {defaultWalletAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetTotalBalancePrice(defaultWalletAsset, marketData),
+                    getAllAssetsTotalBalance(),
                   ).format(`0,0.00`)} ${marketData?.currency}`
                 : ''}
             </div>

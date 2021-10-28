@@ -1,0 +1,23 @@
+{
+  "language": "Ngôn ngữ",
+  "general.enabled": "Kích hoạt",
+  "general.confirm": "Xác nhận",
+  "general.continue": "Tiếp tục",
+  "general.cancel": "Huỷ",
+  "general.save": "Lưu",
+  "general.discard": "Xoá thay đổi",
+  "general.ok": "Ok",
+  "general.required": "Bắt buộc",
+  "general.cannot0": "Phải khác 0",
+  "general.action": "Hành động",
+  "general.select": "Chọn",
+  "general.review": "Đánh giá",
+  "general.copy": "Sao chép",
+  "general.close": "Đóng",
+  "general.retry": "Thử lại",
+  "general.connect": "Kết nối",
+  "general.addressValidator.reason1": "Không hợp lệ",
+  "general.addressValidator.reason2": "dã cung cấp địa chỉ",
+  "general.passwordForm.password.label": "Mật khẩu ứng dụng",
+  "general.passwordForm.password.placeholder": "Nhập mật khẩu ứng dụng"
+}

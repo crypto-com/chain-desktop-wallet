@@ -26,7 +26,6 @@ import { CarouselRef } from 'antd/lib/carousel';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import {
-  // marketState,
   allMarketState,
   sessionState,
   walletAllAssetsState,
@@ -41,8 +40,6 @@ import {
   EnableGeneralSettingsPropagation,
   SettingsDataUpdate,
 } from '../../models/Wallet';
-import { Session } from '../../models/Session';
-// import { UserAsset } from '../../models/UserAsset';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
@@ -117,10 +114,13 @@ const GeneralSettingsForm = props => {
     await walletService.updateGeneralSettingsPropagation(enableGeneralSettingsPropagation);
 
     const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
-    const newSession = new Session(updatedWallet);
+    const newSession = {
+      ...session,
+      wallet: updatedWallet,
+    };
     await walletService.setCurrentSession(newSession);
-
     setSession(newSession);
+
     message.success(
       `${t('settings.message.generalSettings1')} ${
         newState ? t('general.enabled') : t('general.disabled')
@@ -130,10 +130,10 @@ const GeneralSettingsForm = props => {
   }
 
   const assetIcon = asset => {
-    const { icon_url, symbol } = asset;
+    const { name, icon_url, symbol } = asset;
 
     return icon_url ? (
-      <img src={icon_url} alt="cronos" className="asset-icon" />
+      <img src={icon_url} alt={name} className="asset-icon" />
     ) : (
       <Avatar>{symbol[0].toUpperCase()}</Avatar>
     );
@@ -177,7 +177,7 @@ const GeneralSettingsForm = props => {
             message: `${t('settings.form1.nodeUrl.label')} ${t('general.required')}`,
           },
           {
-            pattern: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)/,
+            type: 'url',
             message: t('settings.form1.nodeUrl.error1'),
           },
         ]}
@@ -194,7 +194,7 @@ const GeneralSettingsForm = props => {
             message: `${t('settings.form1.indexingUrl.label')} ${t('general.required')}`,
           },
           {
-            pattern: /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_.~#?&//=]*)/,
+            type: 'url',
             message: t('settings.form1.indexingUrl.error1'),
           },
         ]}
@@ -392,6 +392,7 @@ function MetaInfoComponent() {
     };
     await walletService.setCurrentSession(newSession);
     setSession(newSession);
+
     await walletService.loadAndSaveAssetPrices(newSession);
 
     // const currentMarketData = await walletService.retrieveAssetPrice(
@@ -438,10 +439,13 @@ function MetaInfoComponent() {
     await walletService.updateDefaultMemoDisabledSettings(disableMemoSettingsUpdate);
 
     const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
-    const newSession = new Session(updatedWallet);
+    const newSession = {
+      ...session,
+      wallet: updatedWallet,
+    };
     await walletService.setCurrentSession(newSession);
-
     setSession(newSession);
+
     setUpdateLoading(false);
     message.success(
       `${t('settings.message.defaultMemo1')} ${
@@ -464,10 +468,13 @@ function MetaInfoComponent() {
     await walletService.updateGADisabledSettings(disableGASettingsUpdate);
 
     const updatedWallet = await walletService.findWalletByIdentifier(session.wallet.identifier);
-    const newSession = new Session(updatedWallet);
+    const newSession = {
+      ...session,
+      wallet: updatedWallet,
+    };
     await walletService.setCurrentSession(newSession);
-
     setSession(newSession);
+
     setUpdateLoading(false);
     message.success(
       `${t('settings.message.analytics1')} ${
@@ -774,7 +781,11 @@ const FormSettings = () => {
     await walletService.saveAssets([newlyUpdatedAsset]);
     setCurrentAssetIdentifier(newlyUpdatedAsset.identifier);
 
-    const newSession = new Session(updatedWallet, newlyUpdatedAsset);
+    const newSession = {
+      ...session,
+      wallet: updatedWallet,
+      activeAsset: newlyUpdatedAsset,
+    };
     setSession(newSession);
 
     await walletService.setCurrentSession(newSession);

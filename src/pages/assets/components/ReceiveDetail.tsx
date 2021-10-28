@@ -16,10 +16,11 @@ import NoticeDisclaimer from '../../../components/NoticeDisclaimer/NoticeDisclai
 interface ReceiveDetailProps {
   currentAsset: UserAsset | undefined;
   session: Session;
+  isNft?: boolean;
 }
 
 const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
-  const { currentAsset, session } = props;
+  const { currentAsset, session, isNft } = props;
   const [isLedger, setIsLedger] = useState(false);
 
   const [t] = useTranslation();
@@ -84,10 +85,6 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
 
   return (
     <div className="receive-detail">
-      {/* <div className="title">
-        {assetIcon(currentAsset)}
-        {currentAsset?.name} ({currentAsset?.symbol})
-      </div> */}
       <div className="address">
         <QRCode value={assetAddress(currentAsset, session)} size={180} />
         <div className="name">{session.wallet.name}</div>
@@ -100,7 +97,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
       </CopyToClipboard>
       <NoticeDisclaimer>
         {t('receive.disclaimer', {
-          assetSymbol: currentAsset?.symbol,
+          assetSymbol: isNft ? 'NFT' : currentAsset?.symbol,
           assetName: currentAsset?.name,
         })}
       </NoticeDisclaimer>

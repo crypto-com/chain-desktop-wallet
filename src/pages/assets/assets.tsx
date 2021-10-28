@@ -138,10 +138,10 @@ const AssetsPage = () => {
   });
 
   const assetIcon = asset => {
-    const { icon_url, symbol } = asset;
+    const { name, icon_url, symbol } = asset;
 
     return icon_url ? (
-      <img src={icon_url} alt="cronos" className="asset-icon" />
+      <img src={icon_url} alt={name} className="asset-icon" />
     ) : (
       <Avatar>{symbol[0].toUpperCase()}</Avatar>
     );
@@ -169,13 +169,31 @@ const AssetsPage = () => {
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: record => {
-        const { name, symbol } = record;
+        const { symbol } = record;
 
         return (
           <div className="name">
             {assetIcon(record)}
-            {name} ({symbol})
+            {symbol}
           </div>
+        );
+      },
+    },
+    {
+      title: t('assets.assetList.table.chainName'),
+      // dataIndex: 'name',
+      key: 'chainName',
+      sorter: (a, b) => a.name.localeCompare(b.name),
+      render: record => {
+        const { name } = record;
+
+        return (
+          <Tag
+            style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
+            color="processing"
+          >
+            {name}
+          </Tag>
         );
       },
     },
@@ -375,6 +393,12 @@ const AssetsPage = () => {
                         <div className="balance">
                           {getUIDynamicAmount(currentAsset!.balance, currentAsset!)}{' '}
                           {currentAsset?.symbol}
+                          <Tag
+                            style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
+                            color="processing"
+                          >
+                            {currentAsset?.name}
+                          </Tag>
                         </div>
                         <div className="value">
                           {currentAssetMarketData &&
@@ -458,7 +482,6 @@ const AssetsPage = () => {
                   return {
                     onClick: async () => {
                       setActiveAssetTab('transaction');
-                      // console.log(event)
                       setSession({
                         ...session,
                         activeAsset: selectedAsset,
@@ -476,7 +499,11 @@ const AssetsPage = () => {
                     }, // click row
                   };
                 }}
-                // pagination={false}
+                locale={{
+                  triggerDesc: t('general.table.triggerDesc'),
+                  triggerAsc: t('general.table.triggerAsc'),
+                  cancelSort: t('general.table.cancelSort'),
+                }}
               />
             )}
           </div>

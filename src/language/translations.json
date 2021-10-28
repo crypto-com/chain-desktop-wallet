@@ -93,7 +93,11 @@
           "error": "The password provided is incorrect. Please try again",
           "errorSelfDestruct": "Attempt #*N*. *break* Wallet will self-destruct after #T# more wrong attempts.",
           "success": "Wallet unlocked successfully!",
-          "okButton": "Unlock wallet"
+          "okButton": "Unlock wallet",
+          "notification": {
+            "message": "App Locked",
+            "description": "The app will be locked shortly"
+          }
         },
         "successModalPopup": {
           "title": "Success!",
@@ -213,7 +217,7 @@
             "message2": "days",
             "message3": ". Until then, you are not able to use the undelegated funds yet."
           },
-          "checkbox1": "I understand that my CRO in Crypto.org Chain staking is subject to a {{ unbondingPeriod }}-day unbonding period when I unstake, as enfored by the Crypto.org Chain network."
+          "checkbox1": "I understand that my CRO in Crypto.org Chain staking is subject to a {{ unbondingPeriod }}-day unbonding period when I unstake, as enforced by the Crypto.org Chain network."
         },
         "table": {
           "triggerDesc": "Click to sort by descend",
@@ -222,7 +226,7 @@
         }
       },
       "welcome": {
-        "slogan": "Our Sample Chain Wallet supports wallet management and funds transfer.",
+        "slogan": "A public, open-source Destkop Wallet on Crypto.org Chain.",
         "button": "Get Started",
         "block": "This product is currently unavailable in your country or region."
       },
@@ -235,6 +239,8 @@
           "title": "Create App Password",
           "description": "Before creating a new wallet, please create your app password. It will be used to encrypt your wallet seeds.",
           "okButton": "Create App Password",
+          "agreeTermsLabel": "I agree to the",
+          "tAndC": "Terms & Conditions",
           "success": "You have successfully created your app password. You can proceed to restore or create a wallet."
         }
       },
@@ -292,7 +298,7 @@
           },
           "addressIndex": {
             "label": "Address Index",
-            "disclaimer": "Multiple addresses can be created with index being 0,1,2,3 and so on. Please note its limited to 100 addresses without expert mode and over 100 addresses under expert mode."
+            "disclaimer": "You can create an index of up to 100 addresses. Expert mode allows you to exceed 100."
           },
           "network": {
             "label": "Network"
@@ -443,6 +449,7 @@
           "table": {
             "title": "Assets",
             "name": "Asset",
+            "chainName": "Chain",
             "price": "Price",
             "amount": "Balance",
             "value": "Value"
@@ -491,6 +498,11 @@
             "message": "Download Complete",
             "description": "Update downloaded successfully. It will be installed on restart.",
             "button": "Restart Now"
+          },
+          "cronosBridgeExit": {
+            "message": "Bridge Transfer is not completed",
+            "description": "Are you sure you want to leave?",
+            "button": "Leave"
           }
         },
         "createNewAsset": {
@@ -531,7 +543,7 @@
           "memo": {
             "label": "Memo (Optional)"
           },
-          "disclaimer": "Transfering your {{assetSymbol}} to any recipient address that is not on {{assetName}} may result in permanet loss of your funds."
+          "disclaimer": "Transferring your {{assetSymbol}} to any recipient address that is not on {{assetName}} may result in permanent loss of your funds."
         },
         "modal1": {
           "title": "Confirm Transaction",
@@ -557,7 +569,7 @@
           }
         },
         "button": "Verify address on Ledger",
-        "disclaimer": "Transfering {{assetSymbol}} from any address that is not supporting {{assetName}} may result in permanet loss of your funds."
+        "disclaimer": "Transferring {{assetSymbol}} from any address that is not supporting {{assetName}} may result in permanent loss of your funds."
       },
       "assets": {
         "title": "Assets",
@@ -569,6 +581,7 @@
         "assetList": {
           "table": {
             "name": "Asset",
+            "chainName": "Chain",
             "price": "Price",
             "amount": "Balance",
             "value": "Value",
@@ -581,6 +594,18 @@
         }
       },
       "bridge": {
+        "transactionHistory": {
+          "title": "Bridge Transfer History",
+          "description": "Below is your transaction history of bridge transfers",
+          "table": {
+            "transactionHash": "Transaction Hash",
+            "amount": "Amount",
+            "fromAddress": "From (Network)",
+            "toAddress": "To (Network)",
+            "time": "Time",
+            "status": "Status"
+          }
+        },
         "form": {
           "from": "From",
           "to": "To",
@@ -621,7 +646,8 @@
         },
         "action": {
           "viewTransaction": "View Transaction",
-          "viewTransactionHIstory": "View Transaction History"
+          "viewTransactionHistory": "View Transaction History",
+          "backToCronosBridge": "Back to Cronos Bridge"
         },
         "config": {
           "prefix": {
@@ -637,7 +663,8 @@
           },
           "port": {
             "title": "Bridge Port"
-          }
+          },
+          "notification": "Bridge Config updated successfully"
         },
         "pendingTransfer": {
           "title": "{{amount}} {{symbol}} is pending to transfer",
@@ -648,16 +675,6 @@
         "ledgerSign": {
           "failed": {
             "title": "Failed to broadcast a signed transaction on Ledger"
-          }
-        },
-        "transactionHistory": {
-          "table": {
-            "transactionHash": "Transaction Hash",
-            "amount": "Amount",
-            "fromAddress": "From (Network)",
-            "toAddress": "To (Network)",
-            "time": "Time",
-            "status": "Status"
           }
         }
       },
@@ -689,7 +706,6 @@
             "description": "Please select one of the validator.",
             "warningCumulative": "Cumulative stake above can halt the network: improve decentralization and delegate to validators below",
             "validatorName": "Name",
-            "moderationText": "Our community members have flagged this validator as a bad actor by changing its commission rate constantly, which could result in a severe loss of the delegator’s staking rewards. Please be careful and make sure you trust this validator before delegating to it.",
             "validatorWebsite": "Website",
             "validatorAddress": "Address",
             "currentTokens": "Voting Power",
@@ -726,6 +742,9 @@
           "label3": "Amount",
           "label4": "Memo"
         },
+        "model1": {
+          "warning": "Our community members have flagged this validator as a bad actor by changing its commission rate constantly, which could result in a severe loss of the delegator’s staking rewards. Please be careful and make sure you trust this validator before delegating to it."
+        },
         "modal2": {
           "title": "Confirm Transaction",
           "description": "Please review the below information.",
@@ -751,9 +770,10 @@
           "label3": "ESTIMATED ANNUAL REWARDS",
           "label4": "ESTIMATED TOTAL APY",
           "label5": "REWARD BALANCE",
-          "tooltip1": "All staking rewards that have been withdrawn and deposited to your wallet",
-          "tooltip2": "Total staking rewards accumulated from all your stakings",
-          "tooltip3": "A percentage rate reflecting the total staking rewards projected to be earned over an annual period, based on all your stakings"
+          "tooltip1": "Total staking rewards accumulated from all your stakings",
+          "tooltip2": "All staking rewards that have been withdrawn and deposited to your wallet",
+          "tooltip3": "The total staking rewards projected to be earned over an annual period, based on all your stakings",
+          "tooltip4": "A percentage rate reflecting the total staking rewards projected to be earned over an annual period, based on all your stakings"
         }
       },
       "governance": {
@@ -867,6 +887,7 @@
           "label3": "Token ID",
           "label4": "Transaction Fee",
           "notice1": "This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address that is not compatible with the Crypto.org Chain NFT token standard will result in the permanent loss of your asset.",
+          "notice2": "Transferring an NFT that is minted on Desktop Wallet to Crypto.com/NFT may result in the permanent loss of your NFT.",
           "button1": "Confirm Transfer"
         },
         "modal3": {
@@ -1088,7 +1109,11 @@
           "error": "密碼不正確，請重新輸入。",
           "errorSelfDestruct": "第*N*次輸入密碼不正確。如再輸入#T#次錯誤密碼，這錢包將會在被重置",
           "success": "錢包解鎖成功！",
-          "okButton": "解鎖錢包"
+          "okButton": "解鎖錢包",
+          "notification": {
+            "message": "準備鎖上錢包",
+            "description": "錢包即將被鎖上"
+          }
         },
         "successModalPopup": {
           "title": "成功！",
@@ -1217,7 +1242,7 @@
         }
       },
       "welcome": {
-        "slogan": "我們的樣本錢包支持錢包管理和資金轉賬。",
+        "slogan": "一個公開及開源的 Crypto.org Chain 錢包 ",
         "button": "開始",
         "block": "此產品暫時未能為您所在的國家或地區提供服務。"
       },
@@ -1230,6 +1255,8 @@
           "title": "創建密碼",
           "description": "在創建新錢包之前，請先創建密碼。密碼會用來加密你的私鑰種子。",
           "okButton": "創建密碼",
+          "agreeTermsLabel": "我同意",
+          "tAndC": "條款及細則",
           "success": "你已經成功創建你的密碼。現在可以進一步復原錢包或者創建錢包。"
         }
       },
@@ -1287,7 +1314,7 @@
           },
           "addressIndex": {
             "label": "地址索引",
-            "disclaimer": "可以使用 0、1、2、3 作為索引名創建多個地址。請注意，在沒有開啟專家模式時，索引地址數量限制為 100 個，在專家模式下沒有限制。"
+            "disclaimer": "可以創建至多 100 個地址。在專家模式下沒有限制。"
           },
           "network": {
             "label": "網絡"
@@ -1438,6 +1465,7 @@
           "table": {
             "title": "資產",
             "name": "資產",
+            "chainName": "鏈",
             "price": "價格",
             "amount": "餘額",
             "value": "市值"
@@ -1486,6 +1514,11 @@
             "message": "下載完成",
             "description": "成功下載更新，重啟程式以完成安裝。",
             "button": "現在重啟程式"
+          },
+          "cronosBridgeExit": {
+            "message": "跨鏈交易尚未完成",
+            "description": "你確定想要離開嗎？",
+            "button": "離開"
           }
         },
         "createNewAsset": {
@@ -1564,6 +1597,7 @@
         "assetList": {
           "table": {
             "name": "資產",
+            "chainName": "鏈",
             "price": "價格",
             "amount": "餘額",
             "value": "市值",
@@ -1576,6 +1610,18 @@
         }
       },
       "bridge": {
+        "transactionHistory": {
+          "title": "跨鏈橋交易記錄",
+          "description": "以下是你的跨鏈橋交易記錄",
+          "table": {
+            "transactionHash": "交易哈希值",
+            "amount": "數量",
+            "fromAddress": "從（網絡）",
+            "toAddress": "到（網絡）",
+            "time": "時間",
+            "status": "狀態"
+          }
+        },
         "form": {
           "from": "從",
           "to": "至",
@@ -1616,7 +1662,8 @@
         },
         "action": {
           "viewTransaction": "查看交易",
-          "viewTransactionHIstory": "查看交易歷史"
+          "viewTransactionHistory": "查看交易歷史",
+          "backToCronosBridge": "返回Cronos 跨鏈橋"
         },
         "config": {
           "prefix": {
@@ -1632,7 +1679,8 @@
           },
           "port": {
             "title": "跨鏈橋端口"
-          }
+          },
+          "notification": "成功更改跨鏈橋設定"
         },
         "pendingTransfer": {
           "title": "{{amount}} {{symbol}} 正等待發送",
@@ -1643,16 +1691,6 @@
         "ledgerSign": {
           "failed": {
             "title": "未能成功廣播Ledger的簽名交易"
-          }
-        },
-        "transactionHistory": {
-          "table": {
-            "transactionHash": "交易哈希值",
-            "amount": "數量",
-            "fromAddress": "從（網絡）",
-            "toAddress": "到（網絡）",
-            "time": "時間",
-            "status": "狀態"
           }
         }
       },
@@ -1720,6 +1758,9 @@
           "label3": "數目",
           "label4": "留言"
         },
+        "model1": {
+          "warning": "因為此驗證者不斷變更佣金費率，我們的社區成員已經把其標記為不良行為者，這可能導致委託人的質押獎勵嚴重損失。在委託資金給它之前，請小心並確保你信任此驗證者。"
+        },
         "modal2": {
           "title": "確認交易",
           "description": "請檢查以下內容：",
@@ -1745,9 +1786,10 @@
           "label3": "預計年獎勵",
           "label4": "預計年收益率",
           "label5": "未領取獎勵",
-          "tooltip1": "你所有已領取並存入到錢包的獎勵",
-          "tooltip2": "由你所有抵押資金所計算出的年抵押獎勵",
-          "tooltip3": "由你所有抵押資金所計算出的年收益率百分比"
+          "tooltip1": "由你所有抵押資金所計算出的年抵押獎勵",
+          "tooltip2": "你所有已領取並存入到錢包的獎勵",
+          "tooltip3": "由你所有抵押資金所計算出的年收益",
+          "tooltip4": "由你所有抵押資金所計算出的年收益率百分比"
         }
       },
       "governance": {
@@ -1861,6 +1903,7 @@
           "label3": "代幣 ID",
           "label4": "交易費用",
           "notice1": "這為 Crypto.org 鏈上的 NFT，轉發此 NFT 到不支援 Crypto.org 代幣標準的地址將會造成你的 NFT 永久損失。",
+          "notice2": "將通過 Desktop Wallet 鑄造的 NFT 轉發到 Crypto.com/NFT 可能造成你的 NFT 永久損失。",
           "button1": "確定轉發"
         },
         "modal3": {
@@ -2081,7 +2124,11 @@
           "error": "密码不正确，请重新输入。",
           "errorSelfDestruct": "第*N*次输入密码不正确。如再输入#T#次错误密码，这钱包将会在被重置",
           "success": "钱包解锁成功！",
-          "okButton": "解锁钱包"
+          "okButton": "解锁钱包",
+          "notification": {
+            "message": "准备上锁钱包",
+            "description": "钱包即将被上锁"
+          }
         },
         "successModalPopup": {
           "title": "成功！",
@@ -2210,7 +2257,7 @@
         }
       },
       "welcome": {
-        "slogan": "我们的样本钱包支持钱包管理和资金转账。",
+        "slogan": "一个公开及开源的 Crypto.org Chain 钱包 ",
         "button": "开始",
         "block": "此产品暂时未能为您所在的国家或地区提供服务。"
       },
@@ -2223,6 +2270,8 @@
           "title": "创建密码",
           "description": "在创建新钱包之前，请先创建密码。 密码会用来加密你的私钥种子。",
           "okButton": "创建密码",
+          "agreeTermsLabel": "我同意",
+          "tAndC": "条款及细则",
           "success": "你已经成功创建你的密码。现在可以进一步复原钱包或者创建钱包。"
         }
       },
@@ -2280,7 +2329,7 @@
           },
           "addressIndex": {
             "label": "地址索引",
-            "disclaimer": "可以使用 0、1、2、3 作为索引名创建多个地址。请注意，在没有开启专家模式时，索引地址数量限制为 100 个，在专家模式下没有限制。"
+            "disclaimer": "可以创建至多 100 个地址。在专家模式下没有限制。"
           },
           "network": {
             "label": "网络"
@@ -2431,6 +2480,7 @@
           "table": {
             "title": "资产",
             "name": "资产",
+            "chainName": "链",
             "price": "价格",
             "amount": "余额",
             "value": "市值"
@@ -2479,6 +2529,11 @@
             "message": "下载完成",
             "description": "成功下载更新，重启程序以完成安装。",
             "button": "现在重启程序"
+          },
+          "cronosBridgeExit": {
+            "message": "跨链交易尚未完成",
+            "description": "你确定想要离开吗？",
+            "button": "离开"
           }
         },
         "createNewAsset": {
@@ -2557,6 +2612,7 @@
         "assetList": {
           "table": {
             "name": "资产",
+            "chainName": "链",
             "price": "价格",
             "amount": "余额",
             "value": "市值",
@@ -2569,6 +2625,18 @@
         }
       },
       "bridge": {
+        "transactionHistory": {
+          "title": "跨链桥交易记录",
+          "description": "以下是你的跨链桥交易记录",
+          "table": {
+            "transactionHash": "交易哈希值",
+            "amount": "数量",
+            "fromAddress": "从（网络）",
+            "toAddress": "到（网络）",
+            "time": "时间",
+            "status": "状态"
+          }
+        },
         "form": {
           "from": "从",
           "to": "至",
@@ -2609,7 +2677,8 @@
         },
         "action": {
           "viewTransaction": "查看交易",
-          "viewTransactionHIstory": "查看交易历史"
+          "viewTransactionHistory": "查看交易历史",
+          "backToCronosBridge": "返回Cronos 跨链桥"
         },
         "config": {
           "prefix": {
@@ -2625,7 +2694,8 @@
           },
           "port": {
             "title": "跨链桥端口"
-          }
+          },
+          "notification": "成功更改跨链桥设定"
         },
         "pendingTransfer": {
           "title": "{{amount}} {{symbol}} 正等待发送",
@@ -2636,16 +2706,6 @@
         "ledgerSign": {
           "failed": {
             "title": "未能成功广播Ledger的签名交易"
-          }
-        },
-        "transactionHistory": {
-          "table": {
-            "transactionHash": "交易哈希值",
-            "amount": "数量",
-            "fromAddress": "从（网络）",
-            "toAddress": "到（网络）",
-            "time": "时间",
-            "status": "状态"
           }
         }
       },
@@ -2713,6 +2773,9 @@
           "label3": "数目",
           "label4": "留言"
         },
+        "model1": {
+          "warning": "因为此验证者不断变更佣金费率，我们的社区成员已经把其标记为不良行为者，这可能导致委托人的质押奖励严重损失。在委托资金给它之前，请小心并确保你信任此验证者。"
+        },
         "modal2": {
           "title": "确认交易",
           "description": "请检查以下内容：",
@@ -2738,9 +2801,10 @@
           "label3": "预计年奖励",
           "label4": "预计年收益率",
           "label5": "未领取奖励",
-          "tooltip1": "你所有已领取并存入到钱包的奖励",
-          "tooltip2": "由你所有抵押资金所计算出的年抵押奖励",
-          "tooltip3": "由你所有抵押资金所计算出的年收益率百分比"
+          "tooltip1": "由你所有抵押资金所计算出的年抵押奖励",
+          "tooltip2": "你所有已领取并存入到钱包的奖励",
+          "tooltip3": "由你所有抵押资金所计算出的年收益",
+          "tooltip4": "由你所有抵押资金所计算出的年收益率百分比"
         }
       },
       "governance": {
@@ -2854,6 +2918,7 @@
           "label3": "代币 ID",
           "label4": "交易费用",
           "notice1": "这为 Crypto.org 链上的 NFT，转发此 NFT 到不支持 Crypto.org 代币标准的地址将会造成你的 NFT 永久损失。",
+          "notice2": "将通过 Desktop Wallet 铸造的 NFT 转发到 Crypto.com/NFT 可能造成你的 NFT 永久损失。",
           "button1": "确认转发"
         },
         "modal3": {
@@ -3032,7 +3097,11 @@
           "description": "Saisissez le mot de passe du porte feuille",
           "error": "Le mot de passe saisi est incorrect. Réessayer encore",
           "success": "Portefeuille décryption réussi!",
-          "okButton": "Décrypter le portefeuille"
+          "okButton": "Décrypter le portefeuille",
+          "notification": {
+            "message": "앱 잠김",
+            "description": "앱이 곧 잠깁니다."
+          }
         },
         "successModalPopup": {
           "title": "Réussite!",
@@ -3331,7 +3400,7 @@
         }
       },
       "welcome": {
-        "slogan": "데스크탑 지갑으로 지갑 관리와 송금을 할 수 있습니다",
+        "slogan": "Crypto.org 체인의 오픈소스 데스크톱 왈렛",
         "button": "시작하기",
         "block": "이 제품은 현재 사용자의 국가 또는 지역에서 사용할 수 없습니다"
       },
@@ -3344,6 +3413,8 @@
           "title": "앱 패스워드 만들기",
           "description": "지갑을 만들기 전에, 앱 패워드를 생성해주세요",
           "okButton": "앱 패스워드 만들기",
+          "agreeTermsLabel": "나는 동의 함",
+          "tAndC": "이용 약관",
           "success": "지갑 암호가 잘 생성되었습니다.  지갑 생성과 가져오기를 계속 할 수 있습니다"
         }
       },
@@ -3401,7 +3472,7 @@
           },
           "addressIndex": {
             "label": "주소 인덱스",
-            "disclaimer": "인덱스를 0,1,2,3 등으로 설정하여, 여러개의 주소를 만들 수 있습니다. 레져의 전문가 모드가 꺼져있을 경우에,  100개 이하 주소로 제한되며, 전문가 모드가 켜져 있을 경우에는  100개 이상의 주소을 생성할 수 있습니다."
+            "disclaimer": "최대 100 개의 주소를 만들 수 있습니다. 전문가 모드에는 제한이 없습니다."
           },
           "network": {
             "label": "네트워크"
@@ -3552,6 +3623,7 @@
           "table": {
             "title": "타이틀",
             "name": "이름",
+            "chainName": "체인",
             "price": "가격",
             "amount": "금액",
             "value": "가치"
@@ -3600,6 +3672,11 @@
             "message": "다운로드 완료",
             "description": "업데이트가 성공적으로 다운로드되었습니다. 다시 시작하면 설치됩니다.",
             "button": "지금 재시작합니다"
+          },
+          "cronosBridgeExit": {
+            "message": "브릿지 전송이 완료되지 않았습니다",
+            "description": "프로그램을 종료할까요?",
+            "button": "종료"
           }
         },
         "createNewAsset": {
@@ -3674,6 +3751,7 @@
         "assetList": {
           "table": {
             "name": "애셋",
+            "chainName": "체인",
             "price": "가격",
             "amount": "금액",
             "value": "가치",
@@ -3686,6 +3764,18 @@
         }
       },
       "bridge": {
+        "transactionHistory": {
+          "title": "브릿지 거래 기록",
+          "description": "이것들은 당신의 브릿지 거래 기록",
+          "table": {
+            "transactionHash": "트랜잭션 해쉬",
+            "amount": "금액",
+            "fromAddress": "송신인（네트워크）",
+            "toAddress": "수신인（네트워크）",
+            "time": "시간",
+            "status": "상태"
+          }
+        },
         "form": {
           "from": "송신인",
           "to": "수신인",
@@ -3726,7 +3816,8 @@
         },
         "action": {
           "viewTransaction": "트랜잭션 보기",
-          "viewTransactionHIstory": "트랜잭션 내역 보기"
+          "viewTransactionHistory": "트랜잭션 내역 보기",
+          "backToCronosBridge": "Cronos 브릿지 리스트로 돌아가기"
         },
         "config": {
           "prefix": {
@@ -3742,19 +3833,18 @@
           },
           "port": {
             "title": "브릿지 포트"
-          }
+          },
+          "notification": "브릿지 설정이 업데이트되었습니다."
         },
         "pendingTransfer": {
-          "title": "{{amount}} {{symbol}}이 전송 대기 중입니다"
+          "title": "{{amount}} {{symbol}}이 전송 대기 중입니다",
+          "ledger": {
+            "description": "레져에서 {{app}}을 열고 거래에 서명하세요."
+          }
         },
-        "transactionHistory": {
-          "table": {
-            "transactionHash": "트랜잭션 해쉬",
-            "amount": "금액",
-            "fromAddress": "송신인（네트워크）",
-            "toAddress": "수신인（네트워크）",
-            "time": "시간",
-            "status": "상태"
+        "ledgerSign": {
+          "failed": {
+            "title": "레져에서 서명된 트랜잭션을 전송하지 못했습니다."
           }
         }
       },
@@ -3821,6 +3911,9 @@
           "label3": "금액",
           "label4": "메모"
         },
+        "model1": {
+          "warning": "우리 지역 사회 회원은이 유효성 검사기를 끊임없이 변화 시킴으로써이 유효성 검사기를 끊임없이 변화시켜 위임자의 스테이크 리워드의 심각한 손실을 초래할 수 있습니다. 조심 하고이 유효성 검사기를 위임하기 전에 신뢰하십시오."
+        },
         "modal2": {
           "title": "트랜잭션 확인",
           "description": "아래 정보를 확인하세요",
@@ -3846,9 +3939,10 @@
           "label3": "예상되는 연간 보상",
           "label4": "예상되는 총  APY",
           "label5": "청구되지 보상",
-          "tooltip1": "인출 및 지갑에 입금된 모든 스테이킹 보상",
-          "tooltip2": "모든 스테이킹에서 누적된 총 스테이킹 보상",
-          "tooltip3": "모든 스테이킹을 기반으로 연간 획득할 것으로 예상되는 총 스테이킹 보상을 반영하는 백분율 "
+          "tooltip1": "모든 스테이킹에서 누적된 총 스테이킹 보상",
+          "tooltip2": "인출 및 지갑에 입금된 모든 스테이킹 보상",
+          "tooltip3": "모든 스테이킹을 기반으로 연간 획득할 것으로 예상되는 총 스테이킹 보상을 반영하는",
+          "tooltip4": "모든 스테이킹을 기반으로 연간 획득할 것으로 예상되는 총 스테이킹 보상을 반영하는 백분율 "
         }
       },
       "governance": {
@@ -3962,6 +4056,7 @@
           "label3": "토큰 ID",
           "label4": "트랜잭션 수수료",
           "notice1": "이 NFT는 Crypto.org 체인에서 발행됩니다.",
+          "notice2": "데스크탑 지갑에 crypto.com/nft로 inted NFT를 전송하면 NFT의 영구적 인 손실이 발생할 수 있습니다.",
           "button1": "트랜잭션 확인"
         },
         "modal3": {

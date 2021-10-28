@@ -12,6 +12,7 @@ export interface BridgeConfig {
   cronosBridgeContractAddress: string;
   bridgeChannel?: string;
   bridgePort?: string;
+  bridgeIndexingUrl?: string;
 }
 
 export enum BridgeTransferDirection {
@@ -21,6 +22,8 @@ export enum BridgeTransferDirection {
   CRONOS_TO_ETH = 'CRONOS_TO_ETH',
   NOT_SUPPORT = 'NOT_SUPPORT',
 }
+
+const DefaultBridgeIndexingUrl = 'https://cronos.crypto.org/indexing/api/v1/bridges';
 
 export const DefaultTestnetBridgeConfigs: {
   CRYPTO_ORG_TO_CRONOS: BridgeConfig;
@@ -34,16 +37,18 @@ export const DefaultTestnetBridgeConfigs: {
     // 5 Gwei
     defaultGasPrice: 5_000_000_000_000,
     prefix: 'tcrc',
+    bridgeIndexingUrl: DefaultBridgeIndexingUrl,
   },
   CRYPTO_ORG_TO_CRONOS: {
     bridgeDirectionType: BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS,
     bridgeNetworkConfigType: BridgeNetworkConfigType.TESTNET_BRIDGE,
     cronosBridgeContractAddress: '',
-    bridgeChannel: 'channel-129',
+    bridgeChannel: 'channel-131',
     bridgePort: 'transfer',
     gasLimit: 300_000,
     prefix: 'tcrc',
     defaultGasPrice: 10,
+    bridgeIndexingUrl: DefaultBridgeIndexingUrl,
   },
 };
 
@@ -56,6 +61,7 @@ export const DefaultMainnetBridgeConfigs = {
     // 5 Gwei
     defaultGasPrice: 5_000_000_000_000,
     prefix: 'crc',
+    bridgeIndexingUrl: DefaultBridgeIndexingUrl,
   },
   CRYPTO_ORG_TO_CRONOS: {
     bridgeDirectionType: BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS,
@@ -66,5 +72,6 @@ export const DefaultMainnetBridgeConfigs = {
     bridgePort: 'transfer',
     gasLimit: 300_000,
     defaultGasPrice: 10,
+    bridgeIndexingUrl: DefaultBridgeIndexingUrl,
   },
 };

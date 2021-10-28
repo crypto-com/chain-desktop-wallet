@@ -1,0 +1,16 @@
+{
+  "language": "igbo",
+  "general.cancel": "kagbuo",
+  "general.save": "dozie",
+  "general.discard": "tụfuo mgbanwe",
+  "general.ok": "OK",
+  "general.required": "ihe achọrọ",
+  "general.cannot0": "enweghị ike ịbụ 0",
+  "general.validator": "validator",
+  "general.receiving": "na-anata",
+  "general.available": "di",
+  "general.close": "mmechie",
+  "general.connect": "jikọọ",
+  "home.nft.tab1": "NFT m",
+  "home.nft.tab2": "NFT Transakshion"
+}

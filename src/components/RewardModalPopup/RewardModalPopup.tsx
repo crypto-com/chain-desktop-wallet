@@ -119,7 +119,7 @@ const RewardModalPopup: React.FC<RewardModalPopupProps> = props => {
               <div className="balance">
                 <div className="title">
                   <span>{t('staking.modal4.label2')}</span>
-                  <Tooltip placement="top" title={t('staking.modal4.tooltip1')}>
+                  <Tooltip placement="top" title={t('staking.modal4.tooltip2')}>
                     <ExclamationCircleOutlined style={{ color: '#1199fa', marginLeft: '5px' }} />
                   </Tooltip>
                 </div>
@@ -144,7 +144,7 @@ const RewardModalPopup: React.FC<RewardModalPopupProps> = props => {
               <div className="balance">
                 <div className="title">
                   <span>{t('staking.modal4.label3')}</span>
-                  <Tooltip placement="top" title={t('staking.modal4.tooltip2')}>
+                  <Tooltip placement="top" title={t('staking.modal4.tooltip3')}>
                     <ExclamationCircleOutlined style={{ color: '#1199fa', marginLeft: '5px' }} />
                   </Tooltip>
                 </div>
@@ -169,7 +169,7 @@ const RewardModalPopup: React.FC<RewardModalPopupProps> = props => {
               <div className="balance">
                 <div className="title">
                   <span>{t('staking.modal4.label4')}</span>
-                  <Tooltip placement="top" title={t('staking.modal4.tooltip3')}>
+                  <Tooltip placement="top" title={t('staking.modal4.tooltip4')}>
                     <ExclamationCircleOutlined style={{ color: '#1199fa', marginLeft: '5px' }} />
                   </Tooltip>
                 </div>
