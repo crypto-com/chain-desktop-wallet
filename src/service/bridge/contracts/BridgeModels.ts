@@ -39,3 +39,11 @@ export interface BridgeTransactionHistoryList {
   walletId: string;
   transactions: BridgeTransaction[];
 }
+
+export enum BridgeTransactionStatus {
+  PENDING = 'Pending',
+  FAILED = 'FailedOnChain',
+  CANCELLED = 'Cancelled',
+  CONFIRMED = 'CounterpartyConfirmed',
+  REJECTED = 'CounterpartyRejected',
+}
