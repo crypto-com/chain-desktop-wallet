@@ -335,7 +335,7 @@ export class BridgeService {
         loadedBridgeConfig?.bridgeIndexingUrl || defaultBridgeConfig?.bridgeIndexingUrl!;
 
       const response = await axios.get<BridgeTransactionListResponse>(
-        `${bridgeIndexingUrl}/activities?cronosevmAddress=${evmAddress}`,
+        `${bridgeIndexingUrl}/activities?cronosevmAddress=${evmAddress}&order=sourceBlockTime.desc`,
       );
       const loadedBridgeTransactions = response.data.result;
 
