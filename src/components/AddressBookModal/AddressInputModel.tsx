@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, Form, Input, message, Modal, Space, Table } from 'antd';
-import { useState, useMemo, useCallback, useEffect } from 'react';
+import { Button, Form, Input, message, Modal } from 'antd';
+import { useMemo } from 'react';
 import _ from 'lodash';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { AddressBookContact } from '../../models/AddressBook';
@@ -11,7 +10,9 @@ import { AddressBookService } from '../../service/AddressBookService';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 
 interface IAddressInputModalProps {
-  onAdd: { (contact: AddressBookContact): void };
+  onSave: { (contact: AddressBookContact): void };
+  // Edit mode
+  contact?: AddressBookContact;
   onCancel: { (): void };
   currentSession: Session;
   walletId: string;
@@ -25,7 +26,15 @@ const FormKeys = {
 };
 
 const AddressInputModal = (props: IAddressInputModalProps) => {
-  const { onAdd, onCancel, userAsset, walletId, currentSession, addressBookService } = props;
+  const {
+    onSave,
+    onCancel,
+    userAsset,
+    walletId,
+    currentSession,
+    addressBookService,
+    contact,
+  } = props;
 
   const [form] = Form.useForm();
 
@@ -39,7 +48,15 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
     AddressType.USER,
   );
 
+  const isEditing = !!contact;
+
+  const title = isEditing ? 'Edit Address' : 'Add Address';
+
   const addressBookExistsValidator = async (rule, address: string) => {
+    if (isEditing && contact && contact.address === address) {
+      return Promise.resolve();
+    }
+
     const isExist = await addressBookService.isAddressBookContactExisit(walletId, asset, address);
 
     if (isExist) {
@@ -50,7 +67,7 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
   };
 
   return (
-    <Modal title="Add Address" visible closable onCancel={onCancel} footer={null}>
+    <Modal title={title} visible closable onCancel={onCancel} footer={null}>
       <Form
         form={form}
         layout="vertical"
@@ -62,26 +79,40 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
           if (_.isEmpty(label) || _.isEmpty(address)) {
             return;
           }
+          if (isEditing && contact) {
+            const success = await addressBookService.editAddressBookContact(
+              contact.id,
+              label,
+              address,
+            );
+            if (!success) {
+              message.error('Update failed');
+            }
 
-          const contact = await addressBookService.addAddressBookContact({
-            walletId,
-            asset,
-            label,
-            address,
-          });
+            message.success('Update success');
+            onSave(contact);
+          } else {
+            const contactCreated = await addressBookService.addAddressBookContact({
+              walletId,
+              asset,
+              label,
+              address,
+            });
 
-          if (!contact) {
-            message.error('Save failed');
-            return;
+            if (!contactCreated) {
+              message.error('Save failed');
+              return;
+            }
+
+            onSave(contactCreated);
           }
-
-          onAdd(contact);
         }}
       >
         <Form.Item
           name={FormKeys.label}
           label="Label"
           hasFeedback
+          initialValue={contact?.label}
           validateFirst
           rules={[
             {
@@ -96,6 +127,7 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
         <Form.Item
           name={FormKeys.address}
           label="Address"
+          initialValue={contact?.address}
           hasFeedback
           validateFirst
           rules={[
@@ -108,7 +140,7 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">
-            Add
+            {isEditing ? 'Update' : 'Add'}
           </Button>
         </Form.Item>
       </Form>

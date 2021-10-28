@@ -21,6 +21,7 @@ const AddressBookModal = (props: IAddressBookModalProps) => {
   const { onClose, asset: userAsset, currentSession, onSelect } = props;
 
   const [isAddModalShowing, setIsAddModalShowing] = useState(false);
+  const [currentEditContact, setCurrentEditContact] = useState<AddressBookContact>();
   const [contacts, setContacts] = useState<AddressBookContact[]>([]);
 
   const walletId = useMemo(() => {
@@ -61,7 +62,14 @@ const AddressBookModal = (props: IAddressBookModalProps) => {
       render: (contact: AddressBookContact) => (
         <div style={{ display: 'flex' }}>
           <Space size="middle">
-            <a>Edit</a>
+            <a
+              onClick={async () => {
+                setCurrentEditContact(contact);
+                setIsAddModalShowing(true);
+              }}
+            >
+              Edit
+            </a>
             <a
               onClick={async () => {
                 const success = await addressBookService.removeAddressBookContact(contact.id);
@@ -96,10 +104,14 @@ const AddressBookModal = (props: IAddressBookModalProps) => {
           walletId={walletId}
           addressBookService={addressBookService}
           userAsset={userAsset}
-          onAdd={() => {
+          contact={currentEditContact}
+          onSave={() => {
+            setCurrentEditContact(undefined);
+            setIsAddModalShowing(false);
             fetchContacts();
           }}
           onCancel={() => {
+            setCurrentEditContact(undefined);
             setIsAddModalShowing(false);
           }}
         />

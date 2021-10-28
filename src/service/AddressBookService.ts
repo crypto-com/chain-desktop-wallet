@@ -62,10 +62,7 @@ export class AddressBookService {
     let success = false;
 
     try {
-      await this.storageService.updateAddressBookContact(_id, {
-        label,
-        address,
-      });
+      await this.storageService.updateAddressBookContact(_id, label, address);
       success = true;
     } catch (error) {
       // no-op

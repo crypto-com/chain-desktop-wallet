@@ -478,11 +478,14 @@ export class StorageService {
     });
   }
 
-  public async updateAddressBookContact(_id: string, contact: Partial<AddressBookContactModel>) {
+  public async updateAddressBookContact(_id: string, label: string, address: string) {
     return this.db.addressBookStore.update(
       { _id },
       {
-        ...contact,
+        $set: {
+          label,
+          address,
+        },
       },
     );
   }
