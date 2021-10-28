@@ -22,6 +22,8 @@
   "general.retry": "재시도",
   "general.connect": "연결",
   "general.seeAll": "모두 보기",
+  "general.walletType.normal": "기준",
+  "general.walletType.ledger": "Ledger",
   "general.past": "전에",
   "general.future": "미래",
   "general.years": "년",

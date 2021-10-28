@@ -575,10 +575,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             disabled={props.isWalletSelectFieldDisable}
           >
             <Select.Option key="normal" value="normal">
-              Normal
+              {t('general.walletType.normal')}
             </Select.Option>
             <Select.Option key="ledger" value="ledger">
-              Ledger
+              {t('general.walletType.ledger')}
             </Select.Option>
           </Select>
         </Form.Item>
