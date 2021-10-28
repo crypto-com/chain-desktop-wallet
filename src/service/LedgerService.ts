@@ -7,7 +7,6 @@ import { LedgerWalletSignerProviderWebusb } from './signers/LedgerWalletSignerPr
 export const useWebusbForLedger = false;
 export const LEDGER_WALLET_TYPE = 'ledger';
 export const NORMAL_WALLET_TYPE = 'normal';
-export const NORMAL_WALLET_LABEL = 'Standard';
 export function createLedgerDevice(): ISignerProvider {
   let signerProvider: ISignerProvider;
   if (useWebusbForLedger) {

@@ -29,7 +29,6 @@ import {
   createLedgerDevice,
   detectConditionsError,
   LEDGER_WALLET_TYPE,
-  NORMAL_WALLET_LABEL,
   NORMAL_WALLET_TYPE,
 } from '../../service/LedgerService';
 import { TransactionUtils } from '../../utils/TransactionUtils';
@@ -576,10 +575,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             disabled={props.isWalletSelectFieldDisable}
           >
             <Select.Option key="normal" value="normal">
-              {NORMAL_WALLET_LABEL}
+              {t('general.walletType.normal')}
             </Select.Option>
             <Select.Option key="ledger" value="ledger">
-              Ledger
+              {t('general.walletType.ledger')}
             </Select.Option>
           </Select>
         </Form.Item>

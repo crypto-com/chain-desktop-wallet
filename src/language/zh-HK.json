@@ -22,6 +22,8 @@
   "general.retry": "重試",
   "general.connect": "連接",
   "general.seeAll": "所有",
+  "general.walletType.normal": "標準",
+  "general.walletType.ledger": "Ledger",
   "general.past": "以前",
   "general.future": "未來",
   "general.years": "年",

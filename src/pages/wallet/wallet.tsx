@@ -17,11 +17,7 @@ import {
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
-import {
-  LEDGER_WALLET_TYPE,
-  NORMAL_WALLET_TYPE,
-  NORMAL_WALLET_LABEL,
-} from '../../service/LedgerService';
+import { LEDGER_WALLET_TYPE, NORMAL_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import IconLedger from '../../svg/IconLedger';
@@ -185,7 +181,7 @@ function WalletPage() {
             session?.wallet.walletType && session?.wallet.walletType.length > 2 ? (
               <>
                 {session?.wallet.walletType === NORMAL_WALLET_TYPE ? (
-                  <>{`${NORMAL_WALLET_LABEL} `}</>
+                  <>{`${t('general.walletType.normal')} `}</>
                 ) : (
                   <>
                     {session?.wallet.walletType.charAt(0).toUpperCase() +
@@ -209,7 +205,7 @@ function WalletPage() {
             walletType && walletType.length > 2 ? (
               <>
                 {walletType === NORMAL_WALLET_TYPE ? (
-                  <>{`${NORMAL_WALLET_LABEL} `}</>
+                  <>{`${t('general.walletType.normal')} `}</>
                 ) : (
                   <>{walletType.charAt(0).toUpperCase() + walletType.slice(1)} </>
                 )}
