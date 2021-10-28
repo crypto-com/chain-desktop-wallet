@@ -33,6 +33,7 @@ import {
   BridgeTransferDirection,
 } from '../service/bridge/BridgeConfig';
 import { BridgeTransactionHistoryList } from '../service/bridge/contracts/BridgeModels';
+import { AddressBookContactModel } from '../models/AddressBook';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -450,5 +451,43 @@ export class StorageService {
 
   public async retrieveAllBridgeTransactions(walletId: string) {
     return this.db.bridgeTransactionStore.findOne<BridgeTransactionHistoryList>({ walletId });
+  }
+
+  // MARK: address book
+
+  public async retrieveAddressBookContacts(walletId: string, asset: string) {
+    return this.db.addressBookStore
+      .find<AddressBookContactModel>({
+        walletId,
+        asset,
+      })
+      .exec();
+  }
+
+  public async queryAddreeBookContact(walletId: string, asset: string, address: string) {
+    return this.db.addressBookStore.findOne<AddressBookContactModel>({
+      walletId,
+      asset,
+      address,
+    });
+  }
+
+  public async insertAddressBookContact(contact: AddressBookContactModel) {
+    return this.db.addressBookStore.insert({
+      ...contact,
+    });
+  }
+
+  public async updateAddressBookContact(_id: string, contact: Partial<AddressBookContactModel>) {
+    return this.db.addressBookStore.update(
+      { _id },
+      {
+        ...contact,
+      },
+    );
+  }
+
+  public async removeAddressBookContact(_id: string) {
+    return this.db.addressBookStore.remove({ _id }, {});
   }
 }

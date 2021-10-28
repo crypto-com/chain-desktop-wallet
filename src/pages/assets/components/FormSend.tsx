@@ -39,6 +39,7 @@ import {
   AnalyticsService,
   AnalyticsTxType,
 } from '../../../service/analytics/AnalyticsService';
+import AddressBookInput from '../../../components/AddressBookInput/AddressBookInput';
 
 const layout = {};
 const tailLayout = {};
@@ -228,8 +229,13 @@ const FormSend: React.FC<FormSendProps> = props => {
           },
           customAddressValidator,
         ]}
+        className="address-input"
       >
-        <Input placeholder={t('send.formSend.recipientAddress.placeholder')} />
+        <AddressBookInput
+          currentSession={currentSession}
+          asset={walletAsset!}
+          placeholder={t('send.formSend.recipientAddress.placeholder')}
+        />
       </Form.Item>
       <div className="amount">
         <Form.Item
