@@ -32,6 +32,9 @@ import {
   NORMAL_WALLET_TYPE,
 } from '../../service/LedgerService';
 import { TransactionUtils } from '../../utils/TransactionUtils';
+// import IconCroSvg from '../../assets/icon-cro.svg';
+import IconCro from '../../svg/IconCro';
+import IconEth from '../../svg/IconEth';
 
 let waitFlag = false;
 const layout = {
@@ -689,9 +692,17 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           image={isLedgerCroAppConnected ? <SuccessCheckmark /> : <IconLedger />}
         >
           <div className="description">
-            {isLedgerCroAppConnected
-              ? t('create.ledgerModalPopup.tendermintAddress.description1')
-              : t('create.ledgerModalPopup.tendermintAddress.description2')}
+            {isLedgerCroAppConnected ? (
+              t('create.ledgerModalPopup.tendermintAddress.description1')
+            ) : (
+              <>
+                {t('create.ledgerModalPopup.tendermintAddress.description3')}
+                <div className="ledger-app-icon">
+                  <IconCro style={{ color: '#fff' }} />
+                </div>
+                Crypto.org App
+              </>
+            )}
           </div>
         </LedgerModalPopup>
         <LedgerModalPopup
@@ -727,9 +738,17 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           image={isLedgerEthAppConnected ? <SuccessCheckmark /> : <IconLedger />}
         >
           <div className="description">
-            {isLedgerEthAppConnected
-              ? t('create.ledgerModalPopup.evmAddress.description1')
-              : t('create.ledgerModalPopup.evmAddress.description2')}
+            {isLedgerEthAppConnected ? (
+              t('create.ledgerModalPopup.evmAddress.description1')
+            ) : (
+              <>
+                {t('create.ledgerModalPopup.tendermintAddress.description3')}
+                <div className="ledger-app-icon">
+                  <IconEth style={{ color: '#fff' }} />
+                </div>
+                Ethereum App
+              </>
+            )}
           </div>
         </LedgerModalPopup>
       </Form.Item>
