@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import './FormSend.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Input, InputNumber } from 'antd';
+import { Button, Checkbox, Form, Input, InputNumber } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
@@ -238,9 +238,11 @@ const FormSend: React.FC<FormSendProps> = props => {
             });
           }}
           currentSession={currentSession}
-          asset={walletAsset!}
-          placeholder={t('send.formSend.recipientAddress.placeholder')}
+          userAsset={walletAsset!}
         />
+      </Form.Item>
+      <Form.Item name="saveToAddressList">
+        <Checkbox>Add this to my address list</Checkbox>
       </Form.Item>
       <div className="amount">
         <Form.Item
