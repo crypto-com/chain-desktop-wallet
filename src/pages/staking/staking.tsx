@@ -77,6 +77,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { UndelegateFormComponent } from '../home/components/UndelegateFormComponent';
 import RedelegateFormComponent from '../home/components/RedelegateFormComponent';
 import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
+import RowAmountOption from '../../components/RowAmountOption/RowAmountOption';
 import {
   MODERATION_CONFIG_FILE_URL,
   UNBLOCKING_PERIOD_IN_DAYS,
@@ -600,6 +601,7 @@ const FormDelegationRequest = () => {
               : ''}{' '}
           </div>
         </div>
+        <RowAmountOption form={form} walletAsset={walletAsset} />
       </div>
       <Checkbox onChange={onShowMemoChange} checked={showMemo}>
         {t('staking.formDelegation.checkbox1')}
