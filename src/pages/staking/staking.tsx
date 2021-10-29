@@ -601,7 +601,7 @@ const FormDelegationRequest = () => {
               : ''}{' '}
           </div>
         </div>
-        <RowAmountOption form={form} walletAsset={walletAsset} />
+        <RowAmountOption form={form} walletAsset={walletAsset} style={{ marginBottom: '10px' }} />
       </div>
       <Checkbox onChange={onShowMemoChange} checked={showMemo}>
         {t('staking.formDelegation.checkbox1')}
