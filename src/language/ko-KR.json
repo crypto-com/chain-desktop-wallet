@@ -395,6 +395,8 @@
   "staking.validatorList.table.currentTokens": "투표 파워",
   "staking.validatorList.table.currentCommissionRate": "수수료율",
   "staking.validatorList.table.cumulativeShares": "축적 투표",
+  "staking.validatorList.table.validatorUptime": "정상 가동 시간",
+  "staking.validatorList.table.validatorApy": "APY",
   "staking.validatorList.table.action": "활동",
   "staking.formWithdralStakingReward.table.validatorName": "이름",
   "staking.formWithdralStakingReward.table.rewardAmount": "보상 금액",

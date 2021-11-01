@@ -400,6 +400,8 @@
   "staking.validatorList.table.currentTokens": "投票權",
   "staking.validatorList.table.currentCommissionRate": "佣金",
   "staking.validatorList.table.cumulativeShares": "累積委託",
+  "staking.validatorList.table.validatorUptime": "正常上線時間",
+  "staking.validatorList.table.validatorApy": "年收益率",
   "staking.validatorList.table.action": "操作",
   "staking.formWithdralStakingReward.table.validatorName": "名稱",
   "staking.formWithdralStakingReward.table.rewardAmount": "獎勵數目",

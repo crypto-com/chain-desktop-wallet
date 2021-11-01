@@ -400,6 +400,8 @@
   "staking.validatorList.table.currentTokens": "Voting Power",
   "staking.validatorList.table.currentCommissionRate": "Commission",
   "staking.validatorList.table.cumulativeShares": "Cumulative Shares",
+  "staking.validatorList.table.validatorUptime": "Uptime",
+  "staking.validatorList.table.validatorApy": "APY",
   "staking.validatorList.table.action": "Action",
   "staking.formWithdralStakingReward.table.validatorName": "Name",
   "staking.formWithdralStakingReward.table.rewardAmount": "Reward Amount",
