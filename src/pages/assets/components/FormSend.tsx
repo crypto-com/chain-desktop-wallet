@@ -13,6 +13,7 @@ import SuccessModalPopup from '../../../components/SuccessModalPopup/SuccessModa
 import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
 import NoticeDisclaimer from '../../../components/NoticeDisclaimer/NoticeDisclaimer';
+import RowAmountOption from '../../../components/RowAmountOption/RowAmountOption';
 import { secretStoreService } from '../../../storage/SecretStoreService';
 import {
   getAssetAmountInFiat,
@@ -264,6 +265,7 @@ const FormSend: React.FC<FormSendProps> = props => {
           </div>
         </div>
       </div>
+      <RowAmountOption walletAsset={walletAsset!} form={form} />
       <Form.Item name="memo" label={t('send.formSend.memo.label')}>
         <Input />
       </Form.Item>
