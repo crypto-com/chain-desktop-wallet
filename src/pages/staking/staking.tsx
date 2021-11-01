@@ -85,6 +85,7 @@ import {
   SUPPORTED_CURRENCY,
 } from '../../config/StaticConfig';
 import { isValidatorAddressSuspicious, ModerationConfig } from '../../models/ModerationConfig';
+import { ChainIndexingAPI } from '../../service/rpc/ChainIndexingAPI';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
@@ -164,39 +165,43 @@ const FormDelegationRequest = () => {
 
   const [t] = useTranslation();
 
-  const processValidatorList = (validatorList: ValidatorModel[] | null) => {
+  const processValidatorList = async (validatorList: ValidatorModel[] | null) => {
     if (validatorList) {
       let willDisplayWarningColumn = false;
       let displayedWarningColumn = false;
+      const apiClient = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      
+        return await Promise.all(validatorList.map(async (validator, idx) => {
+          if (
+            new Big(validator.cumulativeSharesIncludePercentage!).gte(
+              CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+            ) &&
+            !displayedWarningColumn
+          ) {
+            displayedWarningColumn = true;
+            willDisplayWarningColumn = true;
+          }
+          const [validatorApyRaw, validatorUptime] = await Promise.all([apiClient.getValidatorsAverageApy([validator.validatorAddress]), apiClient.getValidatorUptimeByAddress(validator.validatorAddress)]);
 
-      return validatorList.map((validator, idx) => {
-        if (
-          new Big(validator.cumulativeSharesIncludePercentage!).gte(
-            CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
-          ) &&
-          !displayedWarningColumn
-        ) {
-          displayedWarningColumn = true;
-          willDisplayWarningColumn = true;
-        }
+          const validatorModel = {
+            ...validator,
+            apy: validatorApyRaw ? new Big(validatorApyRaw).toString() : '0',
+            uptime: validatorUptime ? new Big(validatorUptime).toString() : '0',
+            key: `${idx}`,
+            displayWarningColumn: willDisplayWarningColumn,
+          };
 
-        const validatorModel = {
-          ...validator,
-          key: `${idx}`,
-          displayWarningColumn: willDisplayWarningColumn,
-        };
-
-        willDisplayWarningColumn = false;
-
-        return validatorModel;
-      });
+          willDisplayWarningColumn = false;
+          
+          return validatorModel;
+        }));
     }
     return [];
   };
 
   useEffect(() => {
     const syncValidatorsData = async () => {
-      const validatorList = processValidatorList(currentValidatorList);
+      const validatorList = await processValidatorList(currentValidatorList);
       setValidatorTopList(validatorList);
     };
 
@@ -373,25 +378,6 @@ const FormDelegationRequest = () => {
       ),
     },
     {
-      title: t('staking.validatorList.table.validatorWebsite'),
-      dataIndex: 'validatorWebSite',
-      key: 'validatorWebSite',
-      render: validatorWebSite => {
-        return validatorWebSite === '' ? (
-          'n.a.'
-        ) : (
-          <a
-            data-original={validatorWebSite}
-            target="_blank"
-            rel="noreferrer"
-            href={`${validatorWebSite}`}
-          >
-            {ellipsis(validatorWebSite, 24)}
-          </a>
-        );
-      },
-    },
-    {
       title: t('staking.validatorList.table.validatorAddress'),
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
@@ -406,7 +392,7 @@ const FormDelegationRequest = () => {
             'validator',
           )}/${validatorAddress}`}
         >
-          {middleEllipsis(validatorAddress, 10)}
+          {middleEllipsis(validatorAddress, 6)}
         </a>
       ),
     },
@@ -451,6 +437,20 @@ const FormDelegationRequest = () => {
       render: currentCommissionRate => (
         <span>{new Big(currentCommissionRate).times(100).toFixed(2)}%</span>
       ),
+    },
+    {
+      title: t('staking.validatorList.table.validatorApy'),
+      key: 'apy',
+      render: record => {
+      return (<span>{new Big(record.apy).toFixed(2)}%</span>)
+      },
+    },
+    {
+      title: t('staking.validatorList.table.validatorUptime'),
+      key: 'uptime',
+      render: record => {
+      return (<span>{new Big(record.uptime).times(100).toFixed(2)}%</span>)
+      },
     },
     {
       title: t('general.action'),
