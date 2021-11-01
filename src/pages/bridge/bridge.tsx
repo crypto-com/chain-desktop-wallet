@@ -890,29 +890,29 @@ const CronosBridge = props => {
                 ) : (
                   <></>
                 )}
-                {form.getFieldValue('bridgeFrom') === 'CRONOS' ? (
-                  <Form.Item
-                    name="bridgeIndexingUrl"
-                    label={t('bridge.config.bridgeIndexingUrl.title')}
-                    rules={[
-                      {
-                        required: true,
-                        message: `${t('bridge.config.bridgeIndexingUrl.title')} ${t(
-                          'general.required',
-                        )}`,
-                      },
-                      {
-                        type: 'url',
-                        message: t('bridge.config.bridgeIndexingUrl.error1'),
-                      },
-                    ]}
-                    style={{ textAlign: 'left' }}
-                  >
-                    <Input />
-                  </Form.Item>
-                ) : (
+                {/* {form.getFieldValue('bridgeFrom') === 'CRONOS' ? ( */}
+                <Form.Item
+                  name="bridgeIndexingUrl"
+                  label={t('bridge.config.bridgeIndexingUrl.title')}
+                  rules={[
+                    {
+                      required: true,
+                      message: `${t('bridge.config.bridgeIndexingUrl.title')} ${t(
+                        'general.required',
+                      )}`,
+                    },
+                    {
+                      type: 'url',
+                      message: t('bridge.config.bridgeIndexingUrl.error1'),
+                    },
+                  ]}
+                  style={{ textAlign: 'left' }}
+                >
+                  <Input />
+                </Form.Item>
+                {/* ) : (
                   <></>
-                )}
+                )} */}
                 {bridgeConfigFields.includes('gasLimit') &&
                 form.getFieldValue('bridgeFrom') === 'CRONOS' ? (
                   <Form.Item
