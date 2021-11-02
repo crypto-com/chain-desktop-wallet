@@ -171,8 +171,9 @@ const FormDelegationRequest = () => {
       let willDisplayWarningColumn = false;
       let displayedWarningColumn = false;
       const apiClient = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-      
-        return await Promise.all(validatorList.map(async (validator, idx) => {
+
+      return await Promise.all(
+        validatorList.map(async (validator, idx) => {
           if (
             new Big(validator.cumulativeSharesIncludePercentage!).gte(
               CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
@@ -182,7 +183,10 @@ const FormDelegationRequest = () => {
             displayedWarningColumn = true;
             willDisplayWarningColumn = true;
           }
-          const [validatorApyRaw, validatorUptime] = await Promise.all([apiClient.getValidatorsAverageApy([validator.validatorAddress]), apiClient.getValidatorUptimeByAddress(validator.validatorAddress)]);
+          const [validatorApyRaw, validatorUptime] = await Promise.all([
+            apiClient.getValidatorsAverageApy([validator.validatorAddress]),
+            apiClient.getValidatorUptimeByAddress(validator.validatorAddress),
+          ]);
 
           const validatorModel = {
             ...validator,
@@ -193,9 +197,10 @@ const FormDelegationRequest = () => {
           };
 
           willDisplayWarningColumn = false;
-          
+
           return validatorModel;
-        }));
+        }),
+      );
     }
     return [];
   };
@@ -442,15 +447,17 @@ const FormDelegationRequest = () => {
     {
       title: t('staking.validatorList.table.validatorApy'),
       key: 'apy',
+      sorter: (a, b) => new Big(a.apy).cmp(new Big(b.apy)),
       render: record => {
-      return (<span>{new Big(record.apy).toFixed(2)}%</span>)
+        return <span>{new Big(record.apy).times(100).toFixed(2)}%</span>;
       },
     },
     {
       title: t('staking.validatorList.table.validatorUptime'),
       key: 'uptime',
+      sorter: (a, b) => new Big(a.uptime).cmp(new Big(b.uptime)),
       render: record => {
-      return (<span>{new Big(record.uptime).times(100).toFixed(2)}%</span>)
+        return <span>{new Big(record.uptime).times(100).toFixed(2)}%</span>;
       },
     },
     {
