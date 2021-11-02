@@ -1,13 +1,17 @@
 import * as React from 'react';
-import { Button, Form, Input, message, Modal } from 'antd';
-import { useMemo } from 'react';
+import { Button, Form, Input, message, Modal, Select } from 'antd';
+import { useMemo, useState } from 'react';
 import _ from 'lodash';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
+import { useRecoilValue } from 'recoil';
 import { AddressBookContact } from '../../models/AddressBook';
-import { UserAsset } from '../../models/UserAsset';
+import { UserAsset, UserAssetType } from '../../models/UserAsset';
 import { Session } from '../../models/Session';
 import { AddressBookService } from '../../service/AddressBookService';
 import { TransactionUtils } from '../../utils/TransactionUtils';
+import { walletAllAssetsState } from '../../recoil/atom';
+
+const { Option } = Select;
 
 interface IAddressInputModalProps {
   onSave: { (contact: AddressBookContact): void };
@@ -21,9 +25,22 @@ interface IAddressInputModalProps {
 }
 
 const FormKeys = {
+  network: 'network',
+  asset: 'asset',
   label: 'label',
   address: 'address',
 };
+
+interface AddressBookNetwork {
+  value: string;
+  label: string;
+  networkType: UserAssetType;
+}
+
+const SupportedNetworks: AddressBookNetwork[] = [
+  { value: 'CRONOS', label: 'Cronos Chain', networkType: UserAssetType.EVM },
+  { value: 'CRYPTO_ORG', label: 'Crypto.org Chain', networkType: UserAssetType.TENDERMINT },
+];
 
 const AddressInputModal = (props: IAddressInputModalProps) => {
   const {
@@ -38,6 +55,10 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
 
   const [form] = Form.useForm();
 
+  const [selectedNetworkValue, setSelectedNetworkValue] = useState<string>('');
+
+  const allAssets = useRecoilValue(walletAllAssetsState);
+
   const chainName = userAsset.name;
   const assetSymbol = userAsset.symbol;
 
@@ -50,6 +71,14 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
   const isEditing = !!contact;
 
   const title = isEditing ? 'Edit Address' : 'Add Address';
+
+  const assets = useMemo(() => {
+    const network = SupportedNetworks.find(n => n.value === selectedNetworkValue);
+    if (!network) {
+      return [];
+    }
+    return allAssets.filter(asset => asset.assetType === network.networkType);
+  }, [selectedNetworkValue, allAssets]);
 
   const addressBookExistsValidator = async (rule, address: string) => {
     if (isEditing && contact && contact.address === address) {
@@ -113,9 +142,36 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
           }
         }}
       >
+        <Form.Item name={FormKeys.network} label="Network">
+          <Select
+            value={selectedNetworkValue}
+            onSelect={v => {
+              setSelectedNetworkValue(v);
+            }}
+          >
+            {SupportedNetworks.map(network => {
+              return (
+                <Option key={network.value} value={network.value}>
+                  {network.label}
+                </Option>
+              );
+            })}
+          </Select>
+        </Form.Item>
+        <Form.Item name={FormKeys.asset} label="Asset">
+          <Select onSelect={v => {}}>
+            {assets.map(asset => {
+              return (
+                <Option key={asset.symbol} value={asset.symbol}>
+                  {asset.symbol}
+                </Option>
+              );
+            })}
+          </Select>
+        </Form.Item>
         <Form.Item
           name={FormKeys.label}
-          label="Label"
+          label="Address Name"
           hasFeedback
           initialValue={contact?.label}
           validateFirst
@@ -123,11 +179,11 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
             {
               required: true,
               type: 'string',
-              message: 'Label is required',
+              message: 'Address name is required',
             },
           ]}
         >
-          <Input placeholder="Label" autoFocus />
+          <Input placeholder="Enter address name" />
         </Form.Item>
         <Form.Item
           name={FormKeys.address}
@@ -141,11 +197,11 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
             { validator: addressBookExistsValidator, message: 'Address already exists' },
           ]}
         >
-          <Input placeholder="Address" />
+          <Input placeholder="Enter address" />
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">
-            {isEditing ? 'Update' : 'Add'}
+            {isEditing ? 'Update' : 'Add Address'}
           </Button>
         </Form.Item>
       </Form>

@@ -56,6 +56,7 @@ import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
+import AddressBookTab from './tabs/addressBook/AddressBookTab';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -867,7 +868,10 @@ const FormSettings = () => {
         <TabPane tab={t('settings.tab2')} key="2">
           <MetaInfoComponent />
         </TabPane>
-        <TabPane tab={t('settings.tab3')} key="3">
+        <TabPane tab="Address Book" key="3">
+          <AddressBookTab />
+        </TabPane>
+        <TabPane tab={t('settings.tab3')} key="4">
           <div className="site-layout-background settings-content">
             <div className="container">
               <div className="description">{t('settings.clearStorage.description')}</div>

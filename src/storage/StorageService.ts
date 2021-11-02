@@ -455,6 +455,10 @@ export class StorageService {
 
   // MARK: address book
 
+  public async retrieveAllAddressBookContacts(walletId: string) {
+    return this.db.addressBookStore.find<AddressBookContactModel>({ walletId });
+  }
+
   public async retrieveAddressBookContacts(
     walletId: string,
     chainName: string,

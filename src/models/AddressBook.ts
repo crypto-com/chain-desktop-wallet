@@ -1,5 +1,7 @@
 export interface AddressBookContact {
   id: string;
+  chainName: string;
+  assetSymbol: string;
   label: string;
   address: string;
 }

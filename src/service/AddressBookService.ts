@@ -8,7 +8,26 @@ export class AddressBookService {
     this.storageService = storageService;
   }
 
-  // eslint-disable
+  public async retrieveAllAddressBookContacts(walletId: string) {
+    let contacts: AddressBookContact[] = [];
+
+    try {
+      const documents = await this.storageService.retrieveAllAddressBookContacts(walletId);
+      contacts = documents.map(doc => ({
+        /* eslint no-underscore-dangle: 0 */
+        id: doc._id,
+        chainName: doc.chainName,
+        assetSymbol: doc.assetSymbol,
+        label: doc.label,
+        address: doc.address,
+      }));
+    } catch (error) {
+      // no-op
+    }
+
+    return contacts;
+  }
+
   public async retrieveAddressBookContacts(
     walletId: string,
     chainName: string,
@@ -25,6 +44,8 @@ export class AddressBookService {
       contacts = documents.map(doc => ({
         /* eslint no-underscore-dangle: 0 */
         id: doc._id,
+        chainName: doc.chainName,
+        assetSymbol: doc.assetSymbol,
         label: doc.label,
         address: doc.address,
       }));
@@ -53,6 +74,8 @@ export class AddressBookService {
       if (c) {
         contact = {
           id: c._id,
+          chainName: c.chainName,
+          assetSymbol: c.assetSymbol,
           label: c.label,
           address: c.address,
         };
@@ -107,6 +130,8 @@ export class AddressBookService {
       const saved = await this.storageService.insertAddressBookContact(contactModel);
       contact = {
         id: saved._id,
+        chainName: saved.chainName,
+        assetSymbol: saved.assetSymbol,
         label: saved.label,
         address: saved.address,
       };
