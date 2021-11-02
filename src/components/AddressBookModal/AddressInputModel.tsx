@@ -38,9 +38,8 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
 
   const [form] = Form.useForm();
 
-  const asset = useMemo(() => {
-    return userAsset.name;
-  }, [userAsset]);
+  const chainName = userAsset.name;
+  const assetSymbol = userAsset.symbol;
 
   const customAddressValidator = TransactionUtils.addressValidator(
     currentSession,
@@ -57,7 +56,12 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
       return Promise.resolve();
     }
 
-    const isExist = await addressBookService.retriveAddressBookContact(walletId, asset, address);
+    const isExist = await addressBookService.retriveAddressBookContact(
+      walletId,
+      chainName,
+      assetSymbol,
+      address,
+    );
 
     if (isExist) {
       return Promise.reject(new Error());
@@ -94,7 +98,8 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
           } else {
             const contactCreated = await addressBookService.addAddressBookContact({
               walletId,
-              asset,
+              chainName,
+              assetSymbol,
               label,
               address,
             });

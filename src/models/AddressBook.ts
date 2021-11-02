@@ -7,7 +7,8 @@ export interface AddressBookContact {
 // for persistence
 export interface AddressBookContactModel {
   walletId: string;
-  asset: string;
+  chainName: string;
+  assetSymbol: string;
   label: string;
   address: string;
 }

@@ -27,16 +27,21 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
 
   const walletId = currentSession.wallet.identifier;
 
-  const asset = userAsset.name;
+  const chainName = userAsset.name;
+  const assetSymbol = userAsset.symbol;
 
   const addressBookService = useMemo(() => {
     return new AddressBookService(walletService.storageService);
   }, [walletService]);
 
   const fetchContacts = useCallback(async () => {
-    const fetchedContacts = await addressBookService.retrieveAddressBookContacts(walletId, asset);
+    const fetchedContacts = await addressBookService.retrieveAddressBookContacts(
+      walletId,
+      chainName,
+      assetSymbol,
+    );
     setContacts([...fetchedContacts]);
-  }, [walletId, asset]);
+  }, [walletId, chainName, assetSymbol, addressBookService]);
 
   useEffect(() => {
     fetchContacts();
@@ -75,9 +80,11 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
         onChange={v => {
           setValue(v);
 
-          addressBookService.retriveAddressBookContact(walletId, asset, v).then(contact => {
-            onChange(v, contact);
-          });
+          addressBookService
+            .retriveAddressBookContact(walletId, chainName, assetSymbol, v)
+            .then(contact => {
+              onChange(v, contact);
+            });
         }}
       >
         {contacts.map(contact => {

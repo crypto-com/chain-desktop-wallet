@@ -455,23 +455,38 @@ export class StorageService {
 
   // MARK: address book
 
-  public async retrieveAddressBookContacts(walletId: string, asset: string) {
+  public async retrieveAddressBookContacts(
+    walletId: string,
+    chainName: string,
+    assetSymbol: string,
+  ) {
     return this.db.addressBookStore
       .find<AddressBookContactModel>({
         walletId,
-        asset,
+        chainName,
+        assetSymbol,
       })
       .exec();
   }
 
-  public async queryAddressBookContactCount(walletId: string, asset: string) {
-    return this.db.addressBookStore.count({ walletId, asset });
+  public async queryAddressBookContactCount(
+    walletId: string,
+    chainName: string,
+    assetSymbol: string,
+  ) {
+    return this.db.addressBookStore.count({ walletId, assetSymbol, chainName });
   }
 
-  public async queryAddreeBookContact(walletId: string, asset: string, address: string) {
+  public async queryAddreeBookContact(
+    walletId: string,
+    chainName: string,
+    assetSymbol: string,
+    address: string,
+  ) {
     return this.db.addressBookStore.findOne<AddressBookContactModel>({
       walletId,
-      asset,
+      chainName,
+      assetSymbol,
       address,
     });
   }

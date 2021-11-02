@@ -9,11 +9,19 @@ export class AddressBookService {
   }
 
   // eslint-disable
-  public async retrieveAddressBookContacts(walletId: string, asset: string) {
+  public async retrieveAddressBookContacts(
+    walletId: string,
+    chainName: string,
+    assetSymbol: string,
+  ) {
     let contacts: AddressBookContact[] = [];
 
     try {
-      const documents = await this.storageService.retrieveAddressBookContacts(walletId, asset);
+      const documents = await this.storageService.retrieveAddressBookContacts(
+        walletId,
+        chainName,
+        assetSymbol,
+      );
       contacts = documents.map(doc => ({
         /* eslint no-underscore-dangle: 0 */
         id: doc._id,
@@ -27,11 +35,21 @@ export class AddressBookService {
     return contacts;
   }
 
-  public async retriveAddressBookContact(walletId: string, asset: string, address: string) {
+  public async retriveAddressBookContact(
+    walletId: string,
+    chainName: string,
+    assetSymbol: string,
+    address: string,
+  ) {
     let contact: AddressBookContact | undefined;
 
     try {
-      const c = await this.storageService.queryAddreeBookContact(walletId, asset, address);
+      const c = await this.storageService.queryAddreeBookContact(
+        walletId,
+        chainName,
+        assetSymbol,
+        address,
+      );
       if (c) {
         contact = {
           id: c._id,
@@ -46,9 +64,14 @@ export class AddressBookService {
     return contact;
   }
 
-  public async autoAddAdressBookContact(walletId: string, asset: string, address: string) {
+  public async autoAddAdressBookContact(
+    walletId: string,
+    chainName: string,
+    assetSymbol: string,
+    address: string,
+  ) {
     // check if exists
-    const isExist = await this.retriveAddressBookContact(walletId, asset, address);
+    const isExist = await this.retriveAddressBookContact(walletId, chainName, assetSymbol, address);
 
     if (isExist) {
       return undefined;
@@ -57,7 +80,11 @@ export class AddressBookService {
     // auto generate label
     let count = 0;
     try {
-      count = await this.storageService.queryAddressBookContactCount(walletId, asset);
+      count = await this.storageService.queryAddressBookContactCount(
+        walletId,
+        chainName,
+        assetSymbol,
+      );
     } catch (error) {
       // no-op
     }
@@ -67,7 +94,8 @@ export class AddressBookService {
 
     return await this.addAddressBookContact({
       walletId,
-      asset,
+      chainName,
+      assetSymbol,
       label,
       address,
     });

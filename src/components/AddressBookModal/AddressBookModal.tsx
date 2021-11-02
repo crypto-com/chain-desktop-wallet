@@ -24,22 +24,23 @@ const AddressBookModal = (props: IAddressBookModalProps) => {
   const [currentEditContact, setCurrentEditContact] = useState<AddressBookContact>();
   const [contacts, setContacts] = useState<AddressBookContact[]>([]);
 
-  const walletId = useMemo(() => {
-    return currentSession.wallet.identifier;
-  }, [currentSession]);
+  const walletId = currentSession.wallet.identifier;
 
-  const asset = useMemo(() => {
-    return userAsset.name;
-  }, [userAsset]);
+  const chainName = userAsset.name;
+  const assetSymbol = userAsset.symbol;
 
   const addressBookService = useMemo(() => {
     return new AddressBookService(walletService.storageService);
   }, [walletService]);
 
   const fetchContacts = useCallback(async () => {
-    const fetchedContacts = await addressBookService.retrieveAddressBookContacts(walletId, asset);
+    const fetchedContacts = await addressBookService.retrieveAddressBookContacts(
+      walletId,
+      chainName,
+      assetSymbol,
+    );
     setContacts([...fetchedContacts]);
-  }, [walletId, asset]);
+  }, [walletId, chainName, assetSymbol, addressBookService]);
 
   useEffect(() => {
     fetchContacts();

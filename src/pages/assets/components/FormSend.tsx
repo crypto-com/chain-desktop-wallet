@@ -130,7 +130,7 @@ const FormSend: React.FC<FormSendProps> = props => {
   const onConfirmTransfer = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
     const { walletType } = currentSession.wallet;
-    if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
+    if ((!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) || !walletAsset) {
       return;
     }
 
@@ -138,7 +138,12 @@ const FormSend: React.FC<FormSendProps> = props => {
     const walletId = currentSession.wallet.identifier;
 
     if (!currentAddressBookContact && formValues.autoSaveToAddressList) {
-      await addressBookService.autoAddAdressBookContact(walletId, walletAsset!.name, toAddress);
+      await addressBookService.autoAddAdressBookContact(
+        walletId,
+        walletAsset.name,
+        walletAsset.symbol,
+        toAddress,
+      );
     }
 
     try {
@@ -147,7 +152,7 @@ const FormSend: React.FC<FormSendProps> = props => {
       const sendResult = await walletService.sendTransfer({
         toAddress: formValues.recipientAddress,
         amount: formValues.amount,
-        asset: walletAsset!,
+        asset: walletAsset,
         memo,
         decryptedPhrase,
         walletType,
