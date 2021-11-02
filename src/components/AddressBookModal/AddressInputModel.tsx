@@ -57,7 +57,7 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
       return Promise.resolve();
     }
 
-    const isExist = await addressBookService.isAddressBookContactExisit(walletId, asset, address);
+    const isExist = await addressBookService.retriveAddressBookContact(walletId, asset, address);
 
     if (isExist) {
       return Promise.reject(new Error());

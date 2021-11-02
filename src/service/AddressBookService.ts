@@ -27,19 +27,50 @@ export class AddressBookService {
     return contacts;
   }
 
-  public async isAddressBookContactExisit(walletId: string, asset: string, address: string) {
-    let isExist = false;
+  public async retriveAddressBookContact(walletId: string, asset: string, address: string) {
+    let contact: AddressBookContact | undefined;
 
     try {
-      const contact = await this.storageService.queryAddreeBookContact(walletId, asset, address);
-      if (contact) {
-        isExist = true;
+      const c = await this.storageService.queryAddreeBookContact(walletId, asset, address);
+      if (c) {
+        contact = {
+          id: c._id,
+          label: c.label,
+          address: c.address,
+        };
       }
     } catch (error) {
       // no-op
     }
 
-    return isExist;
+    return contact;
+  }
+
+  public async autoAddAdressBookContact(walletId: string, asset: string, address: string) {
+    // check if exists
+    const isExist = await this.retriveAddressBookContact(walletId, asset, address);
+
+    if (isExist) {
+      return undefined;
+    }
+
+    // auto generate label
+    let count = 0;
+    try {
+      count = await this.storageService.queryAddressBookContactCount(walletId, asset);
+    } catch (error) {
+      // no-op
+    }
+
+    // TODO: i18n
+    const label = `Address ${count + 1}`;
+
+    return await this.addAddressBookContact({
+      walletId,
+      asset,
+      label,
+      address,
+    });
   }
 
   public async addAddressBookContact(contactModel: AddressBookContactModel) {

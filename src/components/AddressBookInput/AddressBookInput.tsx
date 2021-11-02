@@ -14,7 +14,7 @@ const { Option } = Select;
 interface IAddressBookInputProps {
   userAsset: UserAsset;
   currentSession: Session;
-  onChange: (value) => void;
+  onChange: (value: string, addressBookContact?: AddressBookContact) => void;
 }
 
 const AddressBookInput = (props: IAddressBookInputProps) => {
@@ -46,6 +46,7 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <AutoComplete
         showSearch
+        allowClear
         dropdownRender={menu => (
           <div>
             {menu}
@@ -73,9 +74,11 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
         }
         onChange={v => {
           setValue(v);
-          onChange(v);
+
+          addressBookService.retriveAddressBookContact(walletId, asset, v).then(contact => {
+            onChange(v, contact);
+          });
         }}
-        onSearch={() => {}}
       >
         {contacts.map(contact => {
           return (
@@ -90,7 +93,7 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
         <AddressBookModal
           onSelect={contact => {
             setValue(contact.address);
-            onChange(contact.address);
+            onChange(contact.address, contact);
             setIsModalVisible(false);
           }}
           currentSession={currentSession}

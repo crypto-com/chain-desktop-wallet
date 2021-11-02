@@ -464,6 +464,10 @@ export class StorageService {
       .exec();
   }
 
+  public async queryAddressBookContactCount(walletId: string, asset: string) {
+    return this.db.addressBookStore.count({ walletId, asset });
+  }
+
   public async queryAddreeBookContact(walletId: string, asset: string, address: string) {
     return this.db.addressBookStore.findOne<AddressBookContactModel>({
       walletId,
