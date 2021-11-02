@@ -21,6 +21,7 @@ import { BridgeTransferDirection } from '../../../service/bridge/BridgeConfig';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import iconCronosSvg from '../../../assets/icon-cronos-blue.svg';
 import iconCroSvg from '../../../assets/icon-cro.svg';
+import RowAmountOption from '../../../components/RowAmountOption/RowAmountOption';
 
 const { Option } = Select;
 const tailLayout = {
@@ -218,13 +219,6 @@ const CronosBridgeForm = props => {
     });
     setCurrentAsset(selectedAsset);
     setAvailableBalance(scaledBalance(selectedAsset!));
-  };
-
-  const onAmountOption = value => {
-    const optionAmount = Big(availableBalance).times(value);
-    form.setFieldsValue({
-      amount: Number(optionAmount.toNumber()),
-    });
   };
 
   const currentMinAssetAmount = getCurrentMinAssetAmount(currentAsset!);
@@ -483,38 +477,11 @@ const CronosBridgeForm = props => {
           />
         </Form.Item>
       </div>
-      <div className="row row-amount-option">
-        <div className="ant-row ant-form-item"> </div>
-        <div className="ant-row ant-form-item">
-          <Button
-            onClick={() => {
-              onAmountOption(0.25);
-            }}
-          >
-            25%
-          </Button>
-          <Button
-            onClick={() => {
-              onAmountOption(0.5);
-            }}
-          >
-            50%
-          </Button>
-          <Button
-            onClick={() => {
-              onAmountOption(0.75);
-            }}
-          >
-            75%
-          </Button>
-          <Button
-            onClick={() => {
-              onAmountOption(1);
-            }}
-          >
-            ALL
-          </Button>
+      <div className="row">
+        <div className="ant-row ant-form-item" style={{ marginBottom: '8px' }}>
+          {' '}
         </div>
+        <RowAmountOption form={form} walletAsset={currentAsset} style={{ marginBottom: '8px' }} />
       </div>
       <div className="row">
         <div className="ant-row ant-form-item"> </div>

@@ -890,8 +890,7 @@ const CronosBridge = props => {
                 ) : (
                   <></>
                 )}
-                {bridgeConfigFields.includes('bridgeIndexingUrl') &&
-                form.getFieldValue('bridgeFrom') === 'CRONOS' ? (
+                {form.getFieldValue('bridgeFrom') === 'CRONOS' ? (
                   <Form.Item
                     name="bridgeIndexingUrl"
                     label={t('bridge.config.bridgeIndexingUrl.title')}
