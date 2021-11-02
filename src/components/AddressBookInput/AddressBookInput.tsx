@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Select, AutoComplete, Divider } from 'antd';
+import { Select, AutoComplete, Divider, Tag, Input } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import AddressBookModal from '../AddressBookModal/AddressBookModal';
 import { UserAsset } from '../../models/UserAsset';
@@ -10,6 +10,7 @@ import { walletService } from '../../service/WalletService';
 import { AddressBookContact } from '../../models/AddressBook';
 
 const { Option } = Select;
+const { TextArea } = Input;
 
 interface IAddressBookInputProps {
   userAsset: UserAsset;
@@ -34,6 +35,8 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
     return new AddressBookService(walletService.storageService);
   }, [walletService]);
 
+  const [currentContact, setCurrentContact] = useState<AddressBookContact>();
+
   const fetchContacts = useCallback(async () => {
     const fetchedContacts = await addressBookService.retrieveAddressBookContacts(
       walletId,
@@ -46,6 +49,8 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
   useEffect(() => {
     fetchContacts();
   }, [fetchContacts]);
+
+  const readonly = !!currentContact;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -74,6 +79,24 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
         showArrow={false}
         value={value}
         autoFocus
+        options={contacts.map(contact => {
+          return {
+            key: `${contact.label}${contact.address}`,
+            value: contact.address,
+            label: (
+              <>
+                <div>{contact.label}</div>
+                <div style={{ color: '#626973', fontSize: '12px' }}>{contact.address}</div>
+              </>
+            ),
+          };
+        })}
+        onSelect={(v: string) => {
+          const selectedContact = contacts.find(contact => contact.address === v);
+          setCurrentContact(selectedContact);
+          setValue(v);
+          onChange(v, selectedContact);
+        }}
         filterOption={(inputValue, option) =>
           (option?.key as string)?.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1
         }
@@ -84,23 +107,37 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
             .retriveAddressBookContact(walletId, chainName, assetSymbol, v)
             .then(contact => {
               onChange(v, contact);
+              setCurrentContact(contact);
             });
         }}
       >
-        {contacts.map(contact => {
-          return (
-            <Option key={`${contact.label}${contact.address}`} value={contact.address}>
-              <div>{contact.label}</div>
-              <div style={{ color: '#626973', fontSize: '12px' }}>{contact.address}</div>
-            </Option>
-          );
-        })}
+        {currentContact ? (
+          <Select
+            mode="tags"
+            size="large"
+            value={[currentContact?.address]}
+            dropdownStyle={{
+              display: 'none',
+            }}
+            tagRender={p => {
+              return (
+                <>
+                  <div style={{ float: 'left' }}>{currentContact.label}</div>
+                  <div style={{ color: '#626973', fontSize: '12px' }}>{currentContact.address}</div>
+                </>
+              );
+            }}
+          />
+        ) : (
+          <Input />
+        )}
       </AutoComplete>
       {isModalVisible && (
         <AddressBookModal
           onSelect={contact => {
             setValue(contact.address);
             onChange(contact.address, contact);
+            setCurrentContact(contact);
             setIsModalVisible(false);
           }}
           currentSession={currentSession}

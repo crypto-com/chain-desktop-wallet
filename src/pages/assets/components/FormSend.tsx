@@ -267,9 +267,7 @@ const FormSend: React.FC<FormSendProps> = props => {
           userAsset={walletAsset!}
         />
       </Form.Item>
-      {currentAddressBookContact ? (
-        <div className="address-name-label ">{`Address Name: ${currentAddressBookContact.label}`}</div>
-      ) : (
+      {!currentAddressBookContact && (
         <Form.Item
           className="add-to-address-list-checkbox"
           name="autoSaveToAddressList"
@@ -361,7 +359,12 @@ const FormSend: React.FC<FormSendProps> = props => {
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label2')}</div>
-              <div className="address">{`${formValues?.recipientAddress}`}</div>
+              <div className="address">
+                {currentAddressBookContact && (
+                  <div style={{ fontWeight: 'bold' }}>{currentAddressBookContact.label}</div>
+                )}
+                {`${formValues?.recipientAddress}`}
+              </div>
               {formValues.autoSaveToAddressList && (
                 <div>This address will be added to your address list</div>
               )}
