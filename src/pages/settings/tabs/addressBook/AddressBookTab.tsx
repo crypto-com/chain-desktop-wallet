@@ -8,7 +8,7 @@ import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { AddressBookService } from '../../../../service/AddressBookService';
 import { walletService } from '../../../../service/WalletService';
-import { AddressBookContact, getNetworkLabelWithValue } from '../../../../models/AddressBook';
+import { AddressBookContact } from '../../../../models/AddressBook';
 import { Session } from '../../../../models/Session';
 import { sessionState } from '../../../../recoil/atom';
 import AddAddressModal from '../../../../components/AddressBookModal/AddAddressModal';
@@ -51,15 +51,12 @@ const AddressBookTab = (props: IAddressBookTabProps) => {
       title: 'Network',
       key: 'network',
       render: (contact: AddressBookContact) => {
-        // label is't stored in db, cause label will change, use key instead
-        const networkLabel = getNetworkLabelWithValue(contact.chainName);
-
         return (
           <Tag
             style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
             color="processing"
           >
-            {networkLabel}
+            {contact.chainName}
           </Tag>
         );
       },

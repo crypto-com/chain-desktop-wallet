@@ -353,7 +353,10 @@ export class StorageService {
       return Promise.resolve();
     }
     await this.db.transferStore.remove(
-      { walletId: transferTransactionList.walletId, assetId: transferTransactionList.assetId },
+      {
+        walletId: transferTransactionList.walletId,
+        assetId: transferTransactionList.assetId,
+      },
       { multi: true },
     );
     return this.db.transferStore.insert<TransferTransactionList>(transferTransactionList);
@@ -435,7 +438,10 @@ export class StorageService {
   }
 
   public async retrieveNFTTransferHistory(walletId: string, nftQuery: NftQueryParams) {
-    return this.db.nftTransferHistoryStore.findOne<NftTransactionHistory>({ walletId, nftQuery });
+    return this.db.nftTransferHistoryStore.findOne<NftTransactionHistory>({
+      walletId,
+      nftQuery,
+    });
   }
 
   public async saveBridgeTransactions(bridgeTransactions: BridgeTransactionHistoryList) {
@@ -450,7 +456,9 @@ export class StorageService {
   }
 
   public async retrieveAllBridgeTransactions(walletId: string) {
-    return this.db.bridgeTransactionStore.findOne<BridgeTransactionHistoryList>({ walletId });
+    return this.db.bridgeTransactionStore.findOne<BridgeTransactionHistoryList>({
+      walletId,
+    });
   }
 
   // MARK: address book
@@ -501,11 +509,19 @@ export class StorageService {
     });
   }
 
-  public async updateAddressBookContact(_id: string, label: string, address: string) {
+  public async updateAddressBookContact(
+    _id: string,
+    chainName: string,
+    assetSymbol: string,
+    label: string,
+    address: string,
+  ) {
     return this.db.addressBookStore.update(
       { _id },
       {
         $set: {
+          chainName,
+          assetSymbol,
           label,
           address,
         },

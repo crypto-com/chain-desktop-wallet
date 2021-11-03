@@ -18,33 +18,19 @@ export interface AddressBookContactModel {
 }
 
 interface AddressBookNetwork {
-  value: string;
   label: string;
   networkType: UserAssetType;
 }
 
-const SupportedNetworksMap = new Map<string, AddressBookNetwork>();
+const SupportedNetworks: AddressBookNetwork[] = [
+  {
+    label: 'Cronos Chain',
+    networkType: UserAssetType.EVM,
+  },
+  {
+    label: 'Crypto.org Chain',
+    networkType: UserAssetType.TENDERMINT,
+  },
+];
 
-SupportedNetworksMap.set('CRONOS', {
-  value: 'CRONOS',
-  label: 'Cronos Chain',
-  networkType: UserAssetType.EVM,
-});
-SupportedNetworksMap.set('CRYPTO_ORG', {
-  value: 'CRYPTO_ORG',
-  label: 'Crypto.org Chain',
-  networkType: UserAssetType.TENDERMINT,
-});
-
-const SupportedNetworks = Array.from(SupportedNetworksMap.values());
-
-const getNetworkLabelWithValue = (value: string) => {
-  const network = SupportedNetworksMap.get(value);
-  if (!network) {
-    return 'unknown';
-  }
-
-  return network.label;
-};
-
-export { SupportedNetworks, getNetworkLabelWithValue };
+export { SupportedNetworks };

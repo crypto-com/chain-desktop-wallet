@@ -61,7 +61,7 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
   const title = isEditing ? 'Edit Address' : 'Add Address';
 
   const allAssetsFromNetwork = (networkValue: string) => {
-    const network = SupportedNetworks.find(n => n.value === networkValue);
+    const network = SupportedNetworks.find(n => n.label === networkValue);
     if (!network) {
       return [];
     }
@@ -100,13 +100,20 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
         onFinish={async () => {
           const label: string = form.getFieldValue(FormKeys.label);
           const address: string = form.getFieldValue(FormKeys.address);
+          const network: string = form.getFieldValue(FormKeys.network);
+          const assetSymbol: string = form.getFieldValue(FormKeys.asset);
 
-          if (_.isEmpty(label) || _.isEmpty(address)) {
+          const validateFiles = [label, address, network, assetSymbol];
+
+          if (_.compact(validateFiles).length !== validateFiles.length) {
             return;
           }
+
           if (isEditing && contact) {
             const success = await addressBookService.editAddressBookContact(
               contact.id,
+              network,
+              assetSymbol,
               label,
               address,
             );
@@ -118,8 +125,8 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
           } else {
             const contactCreated = await addressBookService.addAddressBookContact({
               walletId,
-              chainName: form.getFieldValue(FormKeys.network),
-              assetSymbol: form.getFieldValue(FormKeys.asset),
+              chainName: network,
+              assetSymbol,
               label,
               address,
             });
@@ -162,7 +169,7 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
           >
             {SupportedNetworks.map(network => {
               return (
-                <Option key={network.value} value={network.value}>
+                <Option key={network.label} value={network.label}>
                   {network.label}
                 </Option>
               );

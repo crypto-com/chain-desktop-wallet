@@ -147,11 +147,23 @@ export class AddressBookService {
     return contact;
   }
 
-  public async editAddressBookContact(_id: string, label: string, address: string) {
+  public async editAddressBookContact(
+    _id: string,
+    chainName: string,
+    assetSymbol: string,
+    label: string,
+    address: string,
+  ) {
     let success = false;
 
     try {
-      await this.storageService.updateAddressBookContact(_id, label, address);
+      await this.storageService.updateAddressBookContact(
+        _id,
+        chainName,
+        assetSymbol,
+        label,
+        address,
+      );
       success = true;
     } catch (error) {
       // no-op
