@@ -368,11 +368,11 @@ export class BridgeService {
   ): Promise<BridgeTransaction | null> {
     try {
       const session = await this.storageService.retrieveCurrentSession();
-      const defaultBridgeDirection = BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS;
+      const bridgeIndexingUrlDirection = BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG;
 
       const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
         session,
-        defaultBridgeDirection,
+        bridgeIndexingUrlDirection,
       );
       const bridgeIndexingUrl =
         loadedBridgeConfig?.bridgeIndexingUrl || defaultBridgeConfig?.bridgeIndexingUrl!;
