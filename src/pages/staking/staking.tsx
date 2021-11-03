@@ -1411,51 +1411,7 @@ const StakingPage = () => {
     // .filter(dlg => Number(dlg.stakedAmount) > 0);
   };
 
-  // const processValidatorList = async (validatorList: ValidatorModel[] | null) => {
-  //   if (validatorList) {
-  //     let willDisplayWarningColumn = false;
-  //     let displayedWarningColumn = false;
-  //     const apiClient = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-
-  //     return await Promise.all(
-  //       validatorList.map(async (validator, idx) => {
-  //         if (
-  //           new Big(validator.cumulativeSharesIncludePercentage!).gte(
-  //             CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
-  //           ) &&
-  //           !displayedWarningColumn
-  //         ) {
-  //           displayedWarningColumn = true;
-  //           willDisplayWarningColumn = true;
-  //         }
-  //         const [validatorApyRaw, validatorUptime] = await Promise.all([
-  //           apiClient.getValidatorsAverageApy([validator.validatorAddress]),
-  //           apiClient.getValidatorUptimeByAddress(validator.validatorAddress),
-  //         ]);
-
-  //         const validatorModel = {
-  //           ...validator,
-  //           apy: validatorApyRaw ? new Big(validatorApyRaw).toString() : '0',
-  //           uptime: validatorUptime ? new Big(validatorUptime).toString() : '0',
-  //           key: `${idx}`,
-  //           displayWarningColumn: willDisplayWarningColumn,
-  //         };
-
-  //         willDisplayWarningColumn = false;
-
-  //         return validatorModel;
-  //       }),
-  //     );
-  //   }
-  //   return [];
-  // };
-
   useEffect(() => {
-    // const syncValidatorsData = async () => {
-    //   const validatorList = await processValidatorList(currentValidatorList);
-    //   setValidatorTopList(validatorList);
-    // };
-
     const syncUnbondingDelegationsData = async () => {
       const allUnbonding = await walletService.retrieveAllUnbondingDelegations(
         currentSession.wallet.identifier,

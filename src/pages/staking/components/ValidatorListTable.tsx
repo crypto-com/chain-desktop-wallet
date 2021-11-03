@@ -13,6 +13,7 @@ import { Session } from '../../../models/Session';
 import { scaledAmount } from '../../../models/UserAsset';
 import { isValidatorAddressSuspicious, ModerationConfig } from '../../../models/ModerationConfig';
 import ValidatorPowerPercentBar from '../../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
+import { ChainIndexingAPI } from '../../../service/rpc/ChainIndexingAPI';
 
 const ValidatorListTable = (props: {
   currentSession: Session;
@@ -161,28 +162,37 @@ const ValidatorListTable = (props: {
     if (validatorList) {
       let willDisplayWarningColumn = false;
       let displayedWarningColumn = false;
+      const apiClient = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
 
-      return validatorList.map((validator, idx) => {
-        if (
-          new Big(validator.cumulativeSharesIncludePercentage!).gte(
-            CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
-          ) &&
-          !displayedWarningColumn
-        ) {
-          displayedWarningColumn = true;
-          willDisplayWarningColumn = true;
-        }
+      return await Promise.all(
+        validatorList.map(async (validator, idx) => {
+          if (
+            new Big(validator.cumulativeSharesIncludePercentage!).gte(
+              CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+            ) &&
+            !displayedWarningColumn
+          ) {
+            displayedWarningColumn = true;
+            willDisplayWarningColumn = true;
+          }
+          const [validatorApyRaw, validatorUptime] = await Promise.all([
+            apiClient.getValidatorsAverageApy([validator.validatorAddress]),
+            apiClient.getValidatorUptimeByAddress(validator.validatorAddress),
+          ]);
 
-        const validatorModel = {
-          ...validator,
-          key: `${idx}`,
-          displayWarningColumn: willDisplayWarningColumn,
-        };
+          const validatorModel = {
+            ...validator,
+            apy: validatorApyRaw ? new Big(validatorApyRaw).toString() : '0',
+            uptime: validatorUptime ? new Big(validatorUptime).toString() : '0',
+            key: `${idx}`,
+            displayWarningColumn: willDisplayWarningColumn,
+          };
 
-        willDisplayWarningColumn = false;
+          willDisplayWarningColumn = false;
 
-        return validatorModel;
-      });
+          return validatorModel;
+        }),
+      );
     }
     return [];
   };

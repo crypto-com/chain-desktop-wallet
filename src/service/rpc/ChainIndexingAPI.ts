@@ -296,24 +296,6 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     return listedValidatorInfo;
   }
 
-  public async getValidatorsDetail(validatorAddrList: string[]) {
-    const validatorList = await this.axiosClient.get<ValidatorListResponse>(
-      `validators?limit=1000000`,
-    );
-
-    if (validatorList.data.pagination.total_page > 1) {
-      throw new Error('Validator list is very big. Aborting.');
-    }
-
-    // Check if returned list is empty
-    if (validatorList.data.result.length < 1) {
-      return [];
-    }
-    return validatorList.data.result.filter(validatorInfo =>
-      validatorAddrList.includes(validatorInfo.operatorAddress),
-    );
-  }
-
   public async getValidatorsAverageApy(validatorAddrList: string[]) {
     const validatorList = await this.axiosClient.get<ValidatorListResponse>(
       `validators?limit=1000000`,
