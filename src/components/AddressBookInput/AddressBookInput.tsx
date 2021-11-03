@@ -1,16 +1,14 @@
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Select, AutoComplete, Divider, Tag, Input } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
-import AddressBookModal from '../AddressBookModal/AddressBookModal';
+import { useRecoilState } from 'recoil';
+import { useHistory } from 'react-router-dom';
 import { UserAsset } from '../../models/UserAsset';
 import { Session } from '../../models/Session';
 import { AddressBookService } from '../../service/AddressBookService';
 import { walletService } from '../../service/WalletService';
 import { AddressBookContact } from '../../models/AddressBook';
-
-const { Option } = Select;
-const { TextArea } = Input;
+import { navbarMenuSelectedKeyState } from '../../recoil/atom';
 
 interface IAddressBookInputProps {
   userAsset: UserAsset;
@@ -21,7 +19,8 @@ interface IAddressBookInputProps {
 const AddressBookInput = (props: IAddressBookInputProps) => {
   const { userAsset, currentSession, onChange } = props;
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [navbarSelectedKey, setNavbarSelectedKey] = useRecoilState(navbarMenuSelectedKeyState);
+  const history = useHistory();
 
   const [value, setValue] = useState<string>();
   const [contacts, setContacts] = useState<AddressBookContact[]>([]);
@@ -50,8 +49,6 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
     fetchContacts();
   }, [fetchContacts]);
 
-  const readonly = !!currentContact;
-
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <AutoComplete
@@ -69,7 +66,8 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
                 cursor: 'pointer',
               }}
               onClick={() => {
-                setIsModalVisible(true);
+                setNavbarSelectedKey('/settings');
+                history.push('/settings/addressBook');
               }}
             >
               Manage Addresses
@@ -132,19 +130,6 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
           <Input />
         )}
       </AutoComplete>
-      {isModalVisible && (
-        <AddressBookModal
-          onSelect={contact => {
-            setValue(contact.address);
-            onChange(contact.address, contact);
-            setCurrentContact(contact);
-            setIsModalVisible(false);
-          }}
-          currentSession={currentSession}
-          asset={userAsset}
-          onClose={() => setIsModalVisible(false)}
-        />
-      )}
     </div>
   );
 };
