@@ -1419,7 +1419,25 @@ class WalletService {
         return Promise.resolve([]);
       }
       const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-      return nodeRpc.loadTopValidators();
+      const topValidators = await nodeRpc.loadTopValidators();
+      const topValidatorsAddressList = topValidators.map(validator => {
+        return validator.validatorAddress;
+      });
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      const validatorList = await chainIndexAPI.getValidatorsDetail(topValidatorsAddressList);
+
+      const topValidatorsInfo = topValidators.map(validator => {
+        const matchValidator = validatorList.find(val => {
+          return val.operatorAddress === validator.validatorAddress;
+        });
+
+        return {
+          ...validator,
+          apy: matchValidator?.apy,
+          uptime: matchValidator?.impreciseUpTime,
+        };
+      });
+      return topValidatorsInfo;
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING TOP VALIDATORS', e);
