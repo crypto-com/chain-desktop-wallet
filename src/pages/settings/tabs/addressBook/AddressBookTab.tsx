@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { Button, message, Space, Table, Tag } from 'antd';
+import { Button, message, Modal, Space, Table, Tag } from 'antd';
 import '../../settings.less';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { PlusOutlined } from '@ant-design/icons';
+import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { AddressBookService } from '../../../../service/AddressBookService';
 import { walletService } from '../../../../service/WalletService';
@@ -12,6 +12,8 @@ import { AddressBookContact, getNetworkLabelWithValue } from '../../../../models
 import { Session } from '../../../../models/Session';
 import { sessionState } from '../../../../recoil/atom';
 import AddAddressModal from '../../../../components/AddressBookModal/AddAddressModal';
+import './AddressBookTab.less';
+import ConfirmModal from '../../../../components/ConfirmModal.tsx/ConfirmModal';
 
 interface IAddressBookTabProps {}
 
@@ -20,6 +22,7 @@ const AddressBookTab = (props: IAddressBookTabProps) => {
   const [contacts, setContacts] = useState<AddressBookContact[]>([]);
 
   const [isAddModalShowing, setIsAddModalShowing] = useState(false);
+  const [currentDeleteContact, setCurrentDeleteContact] = useState<AddressBookContact>();
   const [currentEditContact, setCurrentEditContact] = useState<AddressBookContact>();
 
   const session = useRecoilValue<Session>(sessionState);
@@ -87,13 +90,7 @@ const AddressBookTab = (props: IAddressBookTabProps) => {
             </a>
             <a
               onClick={async () => {
-                const success = await addressBookService.removeAddressBookContact(contact.id);
-                if (success) {
-                  await fetchContacts();
-                  message.success('Remove Success');
-                } else {
-                  message.error('Remove failed');
-                }
+                setCurrentDeleteContact(contact);
               }}
             >
               Remove
@@ -111,6 +108,44 @@ const AddressBookTab = (props: IAddressBookTabProps) => {
         padding: '10px',
       }}
     >
+      {currentDeleteContact && (
+        <ConfirmModal
+          visible
+          onCancel={() => {
+            setCurrentDeleteContact(undefined);
+          }}
+          onConfirm={async () => {
+            setCurrentDeleteContact(undefined);
+            const success = await addressBookService.removeAddressBookContact(
+              currentDeleteContact.id,
+            );
+            if (success) {
+              message.success('Address has been removed');
+              await fetchContacts();
+            } else {
+              message.error('Remove address failed');
+            }
+          }}
+          confirmText="Remove"
+        >
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              paddingTop: '20px',
+            }}
+          >
+            <InfoCircleOutlined style={{ color: '#f27474', fontSize: '70px' }} />
+            <div style={{ fontSize: '24px', fontWeight: 500, marginTop: '15px' }}>
+              Remove Address
+            </div>
+            <div style={{ fontSize: '14px', color: '#0B142688' }}>
+              Are you sure you want to remove?
+            </div>
+          </div>
+        </ConfirmModal>
+      )}
       {isAddModalShowing && (
         <AddAddressModal
           addressBookService={addressBookService}

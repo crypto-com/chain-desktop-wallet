@@ -111,10 +111,9 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
               address,
             );
             if (!success) {
-              message.error('Update failed');
+              message.error('Update address failed');
             }
-
-            message.success('Update success');
+            message.success('Address has been updated');
             onSave(contact);
           } else {
             const contactCreated = await addressBookService.addAddressBookContact({
@@ -126,10 +125,11 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
             });
 
             if (!contactCreated) {
-              message.error('Save failed');
+              message.error('Add address failed');
               return;
             }
 
+            message.success('Address has been added.');
             onSave(contactCreated);
           }
         }}
