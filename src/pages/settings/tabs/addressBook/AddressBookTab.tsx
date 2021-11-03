@@ -102,7 +102,6 @@ const AddressBookTab = (props: IAddressBookTabProps) => {
           }}
           walletId={walletId}
           currentSession={session}
-          userAsset={session.activeAsset!}
         />
       )}
       {!_.isEmpty(contacts) && (

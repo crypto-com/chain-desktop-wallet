@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button, Form, Input, message, Modal, Select } from 'antd';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import _ from 'lodash';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { useRecoilValue } from 'recoil';
@@ -20,7 +20,7 @@ interface IAddressInputModalProps {
   onCancel: { (): void };
   currentSession: Session;
   walletId: string;
-  userAsset: UserAsset;
+  // userAsset: UserAsset;
   addressBookService: AddressBookService;
 }
 
@@ -46,7 +46,7 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
   const {
     onSave,
     onCancel,
-    userAsset,
+    // userAsset,
     walletId,
     currentSession,
     addressBookService,
@@ -56,28 +56,31 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
   const [form] = Form.useForm();
 
   const [selectedNetworkValue, setSelectedNetworkValue] = useState<string>('');
+  const [selectedAsset, setSelectedAsset] = useState<UserAsset>();
 
   const allAssets = useRecoilValue(walletAllAssetsState);
 
-  const chainName = userAsset.name;
-  const assetSymbol = userAsset.symbol;
-
-  const customAddressValidator = TransactionUtils.addressValidator(
-    currentSession,
-    userAsset,
-    AddressType.USER,
-  );
+  const customAddressValidator = useMemo(() => {
+    if (!selectedAsset) {
+      return null;
+    }
+    return TransactionUtils.addressValidator(currentSession, selectedAsset, AddressType.USER);
+  }, [selectedAsset]);
 
   const isEditing = !!contact;
 
   const title = isEditing ? 'Edit Address' : 'Add Address';
 
-  const assets = useMemo(() => {
-    const network = SupportedNetworks.find(n => n.value === selectedNetworkValue);
+  const allAssetsFromNetwork = (networkValue: string) => {
+    const network = SupportedNetworks.find(n => n.value === networkValue);
     if (!network) {
       return [];
     }
     return allAssets.filter(asset => asset.assetType === network.networkType);
+  };
+
+  const assets = useMemo(() => {
+    return allAssetsFromNetwork(selectedNetworkValue);
   }, [selectedNetworkValue, allAssets]);
 
   const addressBookExistsValidator = async (rule, address: string) => {
@@ -87,8 +90,8 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
 
     const isExist = await addressBookService.retriveAddressBookContact(
       walletId,
-      chainName,
-      assetSymbol,
+      form.getFieldValue(FormKeys.network),
+      form.getFieldValue(FormKeys.asset),
       address,
     );
 
@@ -127,8 +130,8 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
           } else {
             const contactCreated = await addressBookService.addAddressBookContact({
               walletId,
-              chainName,
-              assetSymbol,
+              chainName: form.getFieldValue(FormKeys.network),
+              assetSymbol: form.getFieldValue(FormKeys.asset),
               label,
               address,
             });
@@ -142,11 +145,29 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
           }
         }}
       >
-        <Form.Item name={FormKeys.network} label="Network">
+        <Form.Item
+          name={FormKeys.network}
+          label="Network"
+          rules={[
+            {
+              required: true,
+              message: 'Network is required',
+            },
+          ]}
+        >
           <Select
             value={selectedNetworkValue}
             onSelect={v => {
               setSelectedNetworkValue(v);
+              // auto select first asset
+              const assetList = allAssetsFromNetwork(v);
+              if (!_.isEmpty(assetList)) {
+                setSelectedAsset(assetList[0]);
+                const asset = assetList[0].symbol;
+                form.setFieldsValue({
+                  asset,
+                });
+              }
             }}
           >
             {SupportedNetworks.map(network => {
@@ -158,8 +179,17 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
             })}
           </Select>
         </Form.Item>
-        <Form.Item name={FormKeys.asset} label="Asset">
-          <Select onSelect={v => {}}>
+        <Form.Item
+          name={FormKeys.asset}
+          label="Asset"
+          rules={[
+            {
+              required: true,
+              message: 'Asset is required',
+            },
+          ]}
+        >
+          <Select>
             {assets.map(asset => {
               return (
                 <Option key={asset.symbol} value={asset.symbol}>
@@ -189,13 +219,14 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
           name={FormKeys.address}
           label="Address"
           initialValue={contact?.address}
+          dependencies={[FormKeys.asset, FormKeys.network]}
           hasFeedback
           validateFirst
-          rules={[
+          rules={_.compact([
             { required: true, message: 'Address is required' },
             customAddressValidator,
             { validator: addressBookExistsValidator, message: 'Address already exists' },
-          ]}
+          ])}
         >
           <Input placeholder="Enter address" />
         </Form.Item>

@@ -104,7 +104,6 @@ const AddressBookModal = (props: IAddressBookModalProps) => {
           currentSession={currentSession}
           walletId={walletId}
           addressBookService={addressBookService}
-          userAsset={userAsset}
           contact={currentEditContact}
           onSave={() => {
             setCurrentEditContact(undefined);
