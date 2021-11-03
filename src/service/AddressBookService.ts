@@ -56,7 +56,7 @@ export class AddressBookService {
     return contacts;
   }
 
-  public async retriveAddressBookContact(
+  public async retrieveAddressBookContact(
     walletId: string,
     chainName: string,
     assetSymbol: string,
@@ -65,7 +65,7 @@ export class AddressBookService {
     let contact: AddressBookContact | undefined;
 
     try {
-      const c = await this.storageService.queryAddreeBookContact(
+      const c = await this.storageService.queryAddressBookContact(
         walletId,
         chainName,
         assetSymbol,
@@ -87,14 +87,19 @@ export class AddressBookService {
     return contact;
   }
 
-  public async autoAddAdressBookContact(
+  public async autoAddAddressBookContact(
     walletId: string,
     chainName: string,
     assetSymbol: string,
     address: string,
   ) {
     // check if exists
-    const isExist = await this.retriveAddressBookContact(walletId, chainName, assetSymbol, address);
+    const isExist = await this.retrieveAddressBookContact(
+      walletId,
+      chainName,
+      assetSymbol,
+      address,
+    );
 
     if (isExist) {
       return undefined;

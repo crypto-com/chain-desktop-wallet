@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import _ from 'lodash';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { useRecoilValue } from 'recoil';
-import { AddressBookContact } from '../../models/AddressBook';
+import { AddressBookContact, SupportedNetworks } from '../../models/AddressBook';
 import { UserAsset, UserAssetType } from '../../models/UserAsset';
 import { Session } from '../../models/Session';
 import { AddressBookService } from '../../service/AddressBookService';
@@ -13,7 +13,7 @@ import { walletAllAssetsState } from '../../recoil/atom';
 
 const { Option } = Select;
 
-interface IAddressInputModalProps {
+interface IAddAddressModalProps {
   onSave: { (contact: AddressBookContact): void };
   // Edit mode
   contact?: AddressBookContact;
@@ -31,18 +31,7 @@ const FormKeys = {
   address: 'address',
 };
 
-interface AddressBookNetwork {
-  value: string;
-  label: string;
-  networkType: UserAssetType;
-}
-
-const SupportedNetworks: AddressBookNetwork[] = [
-  { value: 'CRONOS', label: 'Cronos Chain', networkType: UserAssetType.EVM },
-  { value: 'CRYPTO_ORG', label: 'Crypto.org Chain', networkType: UserAssetType.TENDERMINT },
-];
-
-const AddressInputModal = (props: IAddressInputModalProps) => {
+const AddAddressModal = (props: IAddAddressModalProps) => {
   const {
     onSave,
     onCancel,
@@ -88,7 +77,7 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
       return Promise.resolve();
     }
 
-    const isExist = await addressBookService.retriveAddressBookContact(
+    const isExist = await addressBookService.retrieveAddressBookContact(
       walletId,
       form.getFieldValue(FormKeys.network),
       form.getFieldValue(FormKeys.asset),
@@ -148,6 +137,7 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
         <Form.Item
           name={FormKeys.network}
           label="Network"
+          initialValue={contact?.chainName}
           rules={[
             {
               required: true,
@@ -182,6 +172,7 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
         <Form.Item
           name={FormKeys.asset}
           label="Asset"
+          initialValue={contact?.assetSymbol}
           rules={[
             {
               required: true,
@@ -240,4 +231,4 @@ const AddressInputModal = (props: IAddressInputModalProps) => {
   );
 };
 
-export default AddressInputModal;
+export default AddAddressModal;

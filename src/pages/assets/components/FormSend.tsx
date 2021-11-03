@@ -138,7 +138,7 @@ const FormSend: React.FC<FormSendProps> = props => {
     const walletId = currentSession.wallet.identifier;
 
     if (!currentAddressBookContact && formValues.autoSaveToAddressList) {
-      await addressBookService.autoAddAdressBookContact(
+      await addressBookService.autoAddAddressBookContact(
         walletId,
         walletAsset.name,
         walletAsset.symbol,

@@ -481,7 +481,7 @@ export class StorageService {
     return this.db.addressBookStore.count({ walletId, assetSymbol, chainName });
   }
 
-  public async queryAddreeBookContact(
+  public async queryAddressBookContact(
     walletId: string,
     chainName: string,
     assetSymbol: string,

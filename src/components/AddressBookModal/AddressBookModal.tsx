@@ -8,7 +8,7 @@ import { UserAsset } from '../../models/UserAsset';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
 import { AddressBookService } from '../../service/AddressBookService';
-import AddressInputModal from './AddressInputModel';
+import AddAddressModal from './AddAddressModal';
 
 interface IAddressBookModalProps {
   onClose: () => void;
@@ -100,7 +100,7 @@ const AddressBookModal = (props: IAddressBookModalProps) => {
   return (
     <>
       {isAddModalShowing && (
-        <AddressInputModal
+        <AddAddressModal
           currentSession={currentSession}
           walletId={walletId}
           addressBookService={addressBookService}

@@ -104,7 +104,7 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
           setValue(v);
 
           addressBookService
-            .retriveAddressBookContact(walletId, chainName, assetSymbol, v)
+            .retrieveAddressBookContact(walletId, chainName, assetSymbol, v)
             .then(contact => {
               onChange(v, contact);
               setCurrentContact(contact);

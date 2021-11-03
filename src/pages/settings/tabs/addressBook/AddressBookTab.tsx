@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, message, Space, Table } from 'antd';
+import { Button, message, Space, Table, Tag } from 'antd';
 import '../../settings.less';
 import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -8,11 +8,10 @@ import { PlusOutlined } from '@ant-design/icons';
 import _ from 'lodash';
 import { AddressBookService } from '../../../../service/AddressBookService';
 import { walletService } from '../../../../service/WalletService';
-import { AddressBookContact } from '../../../../models/AddressBook';
+import { AddressBookContact, getNetworkLabelWithValue } from '../../../../models/AddressBook';
 import { Session } from '../../../../models/Session';
 import { sessionState } from '../../../../recoil/atom';
-import AddressBookInput from '../../../../components/AddressBookInput/AddressBookInput';
-import AddressInputModal from '../../../../components/AddressBookModal/AddressInputModel';
+import AddAddressModal from '../../../../components/AddressBookModal/AddAddressModal';
 
 interface IAddressBookTabProps {}
 
@@ -40,6 +39,28 @@ const AddressBookTab = (props: IAddressBookTabProps) => {
   }, [fetchContacts]);
 
   const AddressBookTableColumns = [
+    {
+      title: 'Asset',
+      key: 'asset',
+      render: (contact: AddressBookContact) => <div>{contact.assetSymbol}</div>,
+    },
+    {
+      title: 'Network',
+      key: 'network',
+      render: (contact: AddressBookContact) => {
+        // label is't stored in db, cause label will change, use key instead
+        const networkLabel = getNetworkLabelWithValue(contact.chainName);
+
+        return (
+          <Tag
+            style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
+            color="processing"
+          >
+            {networkLabel}
+          </Tag>
+        );
+      },
+    },
     {
       title: 'Address',
       key: 'address',
@@ -91,12 +112,16 @@ const AddressBookTab = (props: IAddressBookTabProps) => {
       }}
     >
       {isAddModalShowing && (
-        <AddressInputModal
+        <AddAddressModal
           addressBookService={addressBookService}
+          contact={currentEditContact}
           onCancel={() => {
+            setCurrentEditContact(undefined);
             setIsAddModalShowing(false);
+            fetchContacts();
           }}
           onSave={() => {
+            setCurrentEditContact(undefined);
             setIsAddModalShowing(false);
             fetchContacts();
           }}
