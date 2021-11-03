@@ -1,7 +1,6 @@
 import Web3 from 'web3';
 import { BlockTransactionObject, TransactionReceipt, TransactionConfig } from 'web3-eth';
 import { IEvmRpc } from '../interface/evm.rpcClient';
-import { NodePorts } from '../../../config/StaticConfig';
 
 class EVMClient implements IEvmRpc {
   private web3: Web3;
@@ -12,7 +11,7 @@ class EVMClient implements IEvmRpc {
 
   public static create(web3HttpProviderUrlUser: string): EVMClient {
     const words = web3HttpProviderUrlUser.split(':', 2);
-    const web3HttpProviderUrl = `${words[0]}:${words[1]}${NodePorts.EVM}`;
+    const web3HttpProviderUrl = `${words[0]}:${words[1]}`;
 
     if (!web3HttpProviderUrl.startsWith('https://') || !web3HttpProviderUrl.startsWith('http://')) {
       const web3 = new Web3(new Web3.providers.HttpProvider(web3HttpProviderUrl));
