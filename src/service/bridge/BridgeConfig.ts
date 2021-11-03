@@ -23,8 +23,8 @@ export enum BridgeTransferDirection {
   NOT_SUPPORT = 'NOT_SUPPORT',
 }
 
-const DefaultBridgeIndexingUrl = 'https://cronos.crypto.org/indexing/api/v1/bridges';
-
+const DefaultTestnetBridgeIndexingUrl =
+  'https://cronos.crypto.org/testnet3/indexing/api/v1/bridges';
 export const DefaultTestnetBridgeConfigs: {
   CRYPTO_ORG_TO_CRONOS: BridgeConfig;
   CRONOS_TO_CRYPTO_ORG: BridgeConfig;
@@ -37,7 +37,7 @@ export const DefaultTestnetBridgeConfigs: {
     // 5 Gwei
     defaultGasPrice: 5_000_000_000_000,
     prefix: 'tcrc',
-    bridgeIndexingUrl: DefaultBridgeIndexingUrl,
+    bridgeIndexingUrl: DefaultTestnetBridgeIndexingUrl,
   },
   CRYPTO_ORG_TO_CRONOS: {
     bridgeDirectionType: BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS,
@@ -48,10 +48,11 @@ export const DefaultTestnetBridgeConfigs: {
     gasLimit: 300_000,
     prefix: 'tcrc',
     defaultGasPrice: 10,
-    bridgeIndexingUrl: DefaultBridgeIndexingUrl,
+    bridgeIndexingUrl: DefaultTestnetBridgeIndexingUrl,
   },
 };
 
+const DefaultBridgeIndexingUrl = 'https://cronos.crypto.org/indexing/api/v1/bridges';
 export const DefaultMainnetBridgeConfigs = {
   CRONOS_TO_CRYPTO_ORG: {
     bridgeDirectionType: BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG,
