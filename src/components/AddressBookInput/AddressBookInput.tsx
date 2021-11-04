@@ -19,7 +19,7 @@ interface IAddressBookInputProps {
 const AddressBookInput = (props: IAddressBookInputProps) => {
   const { userAsset, currentSession, onChange } = props;
 
-  const [navbarSelectedKey, setNavbarSelectedKey] = useRecoilState(navbarMenuSelectedKeyState);
+  const [_, setNavbarSelectedKey] = useRecoilState(navbarMenuSelectedKeyState);
   const history = useHistory();
 
   const [value, setValue] = useState<string>();
@@ -53,6 +53,7 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <AutoComplete
         showSearch
+        inputValue={value}
         allowClear
         dropdownRender={menu => (
           <div>
@@ -111,9 +112,24 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
       >
         {currentContact ? (
           <Select
-            mode="tags"
+            mode="multiple"
             size="large"
-            value={[currentContact?.address]}
+            defaultValue={[currentContact.address]}
+            value={[currentContact.address]}
+            options={[{ value: currentContact.address }]}
+            onInputKeyDown={e => {
+              if (e.key === 'Tab') {
+                return;
+              }
+
+              e.preventDefault();
+              e.stopPropagation();
+              if (e.key === 'Backspace') {
+                setCurrentContact(undefined);
+                setValue('');
+                onChange('', undefined);
+              }
+            }}
             dropdownStyle={{
               display: 'none',
             }}

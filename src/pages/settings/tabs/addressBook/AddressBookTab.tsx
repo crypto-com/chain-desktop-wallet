@@ -12,7 +12,6 @@ import { AddressBookContact } from '../../../../models/AddressBook';
 import { Session } from '../../../../models/Session';
 import { sessionState } from '../../../../recoil/atom';
 import AddAddressModal from '../../../../components/AddressBookModal/AddAddressModal';
-import './AddressBookTab.less';
 import ConfirmModal from '../../../../components/ConfirmModal.tsx/ConfirmModal';
 
 interface IAddressBookTabProps {}
