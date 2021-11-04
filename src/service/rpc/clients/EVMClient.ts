@@ -10,11 +10,11 @@ class EVMClient implements IEvmRpc {
   }
 
   public static create(web3HttpProviderUrlUser: string): EVMClient {
-    const words = web3HttpProviderUrlUser.split(':', 2);
-    const web3HttpProviderUrl = `${words[0]}:${words[1]}`;
-
-    if (!web3HttpProviderUrl.startsWith('https://') || !web3HttpProviderUrl.startsWith('http://')) {
-      const web3 = new Web3(new Web3.providers.HttpProvider(web3HttpProviderUrl));
+    if (
+      !web3HttpProviderUrlUser.startsWith('https://') ||
+      !web3HttpProviderUrlUser.startsWith('http://')
+    ) {
+      const web3 = new Web3(new Web3.providers.HttpProvider(web3HttpProviderUrlUser));
       return new EVMClient(web3);
     }
     throw new Error('Please provide a valid HTTP Web3 Provider.');
