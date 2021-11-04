@@ -1,7 +1,6 @@
 import * as React from 'react';
-import { Button, message, Modal, Space, Table, Tag } from 'antd';
+import { Button, message, Space, Table, Tag } from 'antd';
 import '../../settings.less';
-import { useTranslation } from 'react-i18next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
@@ -14,10 +13,7 @@ import { sessionState } from '../../../../recoil/atom';
 import AddAddressModal from '../../../../components/AddressBookModal/AddAddressModal';
 import ConfirmModal from '../../../../components/ConfirmModal.tsx/ConfirmModal';
 
-interface IAddressBookTabProps {}
-
-const AddressBookTab = (props: IAddressBookTabProps) => {
-  const [t] = useTranslation();
+const AddressBookTab = () => {
   const [contacts, setContacts] = useState<AddressBookContact[]>([]);
 
   const [isAddModalShowing, setIsAddModalShowing] = useState(false);

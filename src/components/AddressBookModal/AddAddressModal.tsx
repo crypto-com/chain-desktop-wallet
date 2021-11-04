@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { Button, Form, Input, message, Modal, Select } from 'antd';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import _ from 'lodash';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { useRecoilValue } from 'recoil';
 import { AddressBookContact, SupportedNetworks } from '../../models/AddressBook';
-import { UserAsset, UserAssetType } from '../../models/UserAsset';
+import { UserAsset } from '../../models/UserAsset';
 import { Session } from '../../models/Session';
 import { AddressBookService } from '../../service/AddressBookService';
 import { TransactionUtils } from '../../utils/TransactionUtils';

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Select, AutoComplete, Divider, Tag, Input } from 'antd';
+import { Select, AutoComplete, Divider, Input } from 'antd';
 import { useRecoilState } from 'recoil';
 import { useHistory } from 'react-router-dom';
 import { UserAsset } from '../../models/UserAsset';
@@ -19,7 +19,7 @@ interface IAddressBookInputProps {
 const AddressBookInput = (props: IAddressBookInputProps) => {
   const { userAsset, currentSession, onChange } = props;
 
-  const [_, setNavbarSelectedKey] = useRecoilState(navbarMenuSelectedKeyState);
+  const [, setNavbarSelectedKey] = useRecoilState(navbarMenuSelectedKeyState);
   const history = useHistory();
 
   const [value, setValue] = useState<string>();
@@ -118,6 +118,7 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
             value={[currentContact.address]}
             options={[{ value: currentContact.address }]}
             onInputKeyDown={e => {
+              // prevent the default behavior of the select input if there is a contact selected
               if (e.key === 'Tab') {
                 return;
               }
@@ -133,7 +134,7 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
             dropdownStyle={{
               display: 'none',
             }}
-            tagRender={p => {
+            tagRender={() => {
               return (
                 <>
                   <div style={{ float: 'left' }}>{currentContact.label}</div>
