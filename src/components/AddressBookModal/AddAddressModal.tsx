@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import _ from 'lodash';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { useRecoilValue } from 'recoil';
+import { useTranslation } from 'react-i18next';
 import { AddressBookContact, SupportedNetworks } from '../../models/AddressBook';
 import { UserAsset } from '../../models/UserAsset';
 import { Session } from '../../models/Session';
@@ -43,6 +44,7 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
   } = props;
 
   const [form] = Form.useForm();
+  const [t] = useTranslation();
 
   const [selectedNetworkValue, setSelectedNetworkValue] = useState<string>('');
   const [selectedAsset, setSelectedAsset] = useState<UserAsset>();
@@ -58,7 +60,9 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
 
   const isEditing = !!contact;
 
-  const title = isEditing ? 'Edit Address' : 'Add Address';
+  const title = isEditing
+    ? t('settings.addressBook.editAddress')
+    : t('settings.addressBook.addAddress');
 
   const allAssetsFromNetwork = (networkValue: string) => {
     const network = SupportedNetworks.find(n => n.label === networkValue);
@@ -118,9 +122,9 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
               address,
             );
             if (!success) {
-              message.error('Update address failed');
+              message.error(t('settings.addressBook.message.updateFailed'));
             }
-            message.success('Address has been updated');
+            message.success(t('settings.addressBook.message.addressUpdated'));
             onSave(contact);
           } else {
             const contactCreated = await addressBookService.addAddressBookContact({
@@ -132,23 +136,23 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
             });
 
             if (!contactCreated) {
-              message.error('Add address failed');
+              message.error(t('settings.addressBook.message.addFailed'));
               return;
             }
 
-            message.success('Address has been added.');
+            message.success(t('settings.addressBook.message.addressAdded'));
             onSave(contactCreated);
           }
         }}
       >
         <Form.Item
           name={FormKeys.network}
-          label="Network"
+          label={t('create.formCreate.network.label')}
           initialValue={contact?.chainName}
           rules={[
             {
               required: true,
-              message: 'Network is required',
+              message: `${t('create.formCreate.network.label')} ${t('general.required')}`,
             },
           ]}
         >
@@ -178,12 +182,12 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
         </Form.Item>
         <Form.Item
           name={FormKeys.asset}
-          label="Asset"
+          label={t('navbar.assets')}
           initialValue={contact?.assetSymbol}
           rules={[
             {
               required: true,
-              message: 'Asset is required',
+              message: `${t('navbar.assets')} ${t('general.required')}`,
             },
           ]}
         >
@@ -199,7 +203,7 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
         </Form.Item>
         <Form.Item
           name={FormKeys.label}
-          label="Address Name"
+          label={t('settings.addressBook.form.addressName')}
           hasFeedback
           initialValue={contact?.label}
           validateFirst
@@ -207,30 +211,35 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
             {
               required: true,
               type: 'string',
-              message: 'Address name is required',
+              message: `${t('settings.addressBook.form.addressName')} ${t('general.required')}`,
             },
           ]}
         >
-          <Input placeholder="Enter address name" />
+          <Input placeholder={t('settings.addressBook.form.enterAddressName')} />
         </Form.Item>
         <Form.Item
           name={FormKeys.address}
-          label="Address"
+          label={t('wallet.table1.address')}
           initialValue={contact?.address}
           dependencies={[FormKeys.asset, FormKeys.network]}
           hasFeedback
           validateFirst
           rules={_.compact([
-            { required: true, message: 'Address is required' },
+            { required: true, message: `${t('wallet.table1.address')} ${t('general.required')}` },
             customAddressValidator,
-            { validator: addressBookExistsValidator, message: 'Address already exists' },
+            {
+              validator: addressBookExistsValidator,
+              message: t('settings.addressBook.form.alreadExists'),
+            },
           ])}
         >
-          <Input placeholder="Enter address" />
+          <Input placeholder={t('settings.addressBook.form.enterAddress')} />
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit">
-            {isEditing ? 'Update' : 'Add Address'}
+            {isEditing
+              ? t('settings.addressBook.form.update')
+              : t('settings.addressBook.addAddress')}
           </Button>
         </Form.Item>
       </Form>

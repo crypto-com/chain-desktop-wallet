@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Select, AutoComplete, Divider, Input } from 'antd';
 import { useRecoilState } from 'recoil';
 import { useHistory } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { UserAsset } from '../../models/UserAsset';
 import { Session } from '../../models/Session';
 import { AddressBookService } from '../../service/AddressBookService';
@@ -21,6 +22,7 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
 
   const [, setNavbarSelectedKey] = useRecoilState(navbarMenuSelectedKeyState);
   const history = useHistory();
+  const [t] = useTranslation();
 
   const [value, setValue] = useState<string>();
   const [contacts, setContacts] = useState<AddressBookContact[]>([]);
@@ -70,7 +72,7 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
                 history.push('/settings/addressBook');
               }}
             >
-              Manage Addresses
+              {t('settings.addressBook.manageAddress')}
             </a>
           </div>
         )}

@@ -1,3 +1,4 @@
+import i18n from '../language/I18n';
 import { AddressBookContact, AddressBookContactModel } from '../models/AddressBook';
 import { StorageService } from '../storage/StorageService';
 
@@ -117,8 +118,7 @@ export class AddressBookService {
       // no-op
     }
 
-    // TODO: i18n
-    const label = `Address ${count + 1}`;
+    const label = `${i18n.t('settings.addressBook.address')} ${count + 1}`;
 
     return await this.addAddressBookContact({
       walletId,

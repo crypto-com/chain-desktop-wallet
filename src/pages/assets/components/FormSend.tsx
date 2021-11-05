@@ -274,7 +274,9 @@ const FormSend: React.FC<FormSendProps> = props => {
           valuePropName="checked"
           initialValue
         >
-          <Checkbox style={{ float: 'left' }}>Add this to my address list</Checkbox>
+          <Checkbox style={{ float: 'left' }}>
+            {t('settings.addressBook.addToAddressList')}
+          </Checkbox>
         </Form.Item>
       )}
       <div className="amount">
@@ -366,7 +368,7 @@ const FormSend: React.FC<FormSendProps> = props => {
                 {`${formValues?.recipientAddress}`}
               </div>
               {formValues.autoSaveToAddressList && (
-                <div>This address will be added to your address list</div>
+                <div>{t('settings.addressBook.willAddToAddressList')}</div>
               )}
             </div>
             <div className="item">

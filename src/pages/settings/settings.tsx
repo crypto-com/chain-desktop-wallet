@@ -879,7 +879,7 @@ const FormSettings = () => {
                 <TabPane tab={t('settings.tab2')} key="2">
                   <MetaInfoComponent />
                 </TabPane>
-                <TabPane tab="Address Book" key="addressBook">
+                <TabPane tab={t('settings.addressBook.title')} key="addressBook">
                   <AddressBookTab />
                 </TabPane>
                 <TabPane tab={t('settings.tab3')} key="4">
