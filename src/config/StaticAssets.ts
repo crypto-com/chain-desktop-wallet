@@ -69,7 +69,7 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
         : 'https://cronos.crypto.org/explorer/tx',
       address: isTestnet
         ? 'https://cronos.crypto.org/explorer/testnet3/address'
-        : 'https://cronos.crypto.org/explorer/tx',
+        : 'https://cronos.crypto.org/explorer/address',
     },
     explorerUrl: isTestnet
       ? 'https://cronos.crypto.org/explorer/testnet3'
