@@ -347,6 +347,7 @@
   "bridge.step0.title": "Cronos Bridge",
   "bridge.step0.description": "The safest, fastest, and most secure way to transfer assets to and from Cronos.",
   "bridge.step1.title": "Confirmation",
+  "bridge.step1.notice1": "Please make sure you have sufficient balance for Bridge Transaction Fee. ",
   "bridge.step2.title": "Bridge Transaction",
   "bridge.deposit.complete.title": "Deposit of {{amount}} {{symbol}} is completed",
   "bridge.deposit.transactionID": "Transaction Hash",
