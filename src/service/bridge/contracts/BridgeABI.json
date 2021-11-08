@@ -1,34 +1,40 @@
 [
   {
-    "anonymous": false,
+    "type": "event",
+    "name": "__CronosSendCroToIbc",
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "string",
-        "name": "recipient",
-        "type": "string"
+        "type": "address",
+        "name": "sender",
+        "internalType": "address",
+        "indexed": false
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
+        "type": "string",
+        "name": "recipient",
+        "internalType": "string",
+        "indexed": false
+      },
+      {
+        "type": "uint256",
         "name": "amount",
-        "type": "uint256"
+        "internalType": "uint256",
+        "indexed": false
       }
     ],
-    "name": "__CronosSendCroToIbc",
-    "type": "event"
+    "anonymous": false
   },
   {
+    "type": "function",
+    "stateMutability": "payable",
+    "outputs": [],
+    "name": "send_cro_to_crypto_org",
     "inputs": [
       {
-        "internalType": "string",
+        "type": "string",
         "name": "recipient",
-        "type": "string"
+        "internalType": "string"
       }
-    ],
-    "name": "send_cro_to_crypto_org",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
+    ]
   }
 ]
