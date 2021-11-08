@@ -69,7 +69,7 @@ export const DefaultMainnetBridgeConfigs = {
     bridgeNetworkConfigType: BridgeNetworkConfigType.MAINNET_BRIDGE,
     cronosBridgeContractAddress: '',
     prefix: 'crc',
-    bridgeChannel: 'channel-0',
+    bridgeChannel: 'channel-44',
     bridgePort: 'transfer',
     gasLimit: 300_000,
     defaultGasPrice: 10,
