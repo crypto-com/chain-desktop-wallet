@@ -19,11 +19,11 @@ export const MODERATION_CONFIG_FILE_URL =
 export const UNBLOCKING_PERIOD_IN_DAYS = {
   UNDELEGATION: {
     MAINNET: '28',
-    OTHERS: '21',
+    OTHERS: '28',
   },
   REDELEGATION: {
     MAINNET: '28',
-    OTHERS: '21',
+    OTHERS: '28',
   },
 };
 
