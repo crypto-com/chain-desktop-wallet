@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 
 ### Additions
 - Add APY & Uptime fields in Validator List
+- Increase Password complexity requirement to "Good"
+- Update default mainnet Bridge Transfer config
 
 ### Bug fixes
 - Fixed transfer failure for big amount (e.g. > 100M CRO)
