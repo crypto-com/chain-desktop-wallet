@@ -1523,10 +1523,10 @@
   resolved "https://registry.npmjs.org/@cosmjs/utils/-/utils-0.25.6.tgz"
   integrity sha512-ofOYiuxVKNo238vCPPlaDzqPXy2AQ/5/nashBo5rvPZJkxt9LciGfUEQWPCOb1BIJDNx2Dzu0z4XCf/dwzl0Dg==
 
-"@crypto-org-chain/chain-jslib@1.0.2":
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/@crypto-org-chain/chain-jslib/-/chain-jslib-1.0.2.tgz#710e8c8b629422510d90e60ee12f570a7dfcb6bf"
-  integrity sha512-4zZd89tIfn7KSdMVUWST2AUpuya1ZTVEfcesX8ipRh88N9UDI9BuweDidAzD4He49P5hVwUv3vbDhsD4LmLnkQ==
+"@crypto-org-chain/chain-jslib@1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@crypto-org-chain/chain-jslib/-/chain-jslib-1.0.3.tgz#65cfab9e371d49e2cca023c398f44a5019bc8f14"
+  integrity sha512-SDWv2dj3A0FeYoQu1P13vFnCF/QZxAVi3Z5Y8lnkXHqLrfG7cgZwPplEMfa3Kb7PdvqqsTBg3wOQuFqXA1yEaA==
   dependencies:
     "@cosmjs/amino" "0.25.0-alpha.2"
     "@cosmjs/encoding" "0.23.1"
