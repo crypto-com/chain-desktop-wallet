@@ -46,6 +46,7 @@
   "general.passwordForm.password.label": "密碼",
   "general.passwordForm.password.placeholder": "輸入密碼",
   "general.passwordForm.password.error1": "密碼需要至少8個字母，並包括英文字母、數字及特殊符號各一。",
+  "general.passwordForm.password.error2": "請將密碼強度提升至「良好」或更高",
   "general.passwordForm.passwordConfirm.label": "確認密碼",
   "general.passwordForm.passwordConfirm.placeholder": "確認密碼",
   "general.passwordForm.passwordConfirm.error1": "密碼不對應",
