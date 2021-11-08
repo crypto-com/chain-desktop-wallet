@@ -6,6 +6,18 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.5.3] - 2021-11-08
+
+### Additions
+- Increase Password complexity requirement to "Good"
+- Update default mainnet Bridge Transfer config
+
+### Bug fixes
+- Fixed transfer failure for big amount (e.g. > 100M CRO)
+- Fixed missing default memo in asset transfer
+- Fixed generate-i18n command failure
+- Update Testnet unbonding days change to 28 Days
+
 ## [v0.5.2] - 2021-10-28
 
 ### Additions
