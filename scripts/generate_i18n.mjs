@@ -60,9 +60,13 @@ async function saveToDisk(localDatas) {
   });
 }
 
-console.log('Fetching sheet...');
-const sheetData = await fetchSheet(SHEET_CSV_URL);
-console.log('Parsing sheet...');
-const parsedData = await parseSheetData(sheetData);
-await saveToDisk(parsedData);
-console.log('🍻 All set')
+async function main() {
+  console.log('Fetching sheet...');
+  const sheetData = await fetchSheet(SHEET_CSV_URL);
+  console.log('Parsing sheet...');
+  const parsedData = await parseSheetData(sheetData);
+  await saveToDisk(parsedData);
+  console.log('🍻 All set')
+}
+
+main();

@@ -16,9 +16,14 @@ import {
   Input,
   message,
 } from 'antd';
-import Icon, { ArrowLeftOutlined, ArrowRightOutlined, SettingOutlined } from '@ant-design/icons';
+import Icon, {
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+  ExclamationCircleOutlined,
+  SettingOutlined,
+} from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
-
+import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
@@ -609,6 +614,24 @@ const CronosBridge = props => {
                     )}{' '}
                     {toAsset?.symbol}
                   </div>
+                  {Big(
+                    fromScientificNotation(
+                      adjustedTransactionAmount(
+                        amount,
+                        currentAsset!,
+                        getBaseScaledAmount(bridgeFee, currentAsset!),
+                      ),
+                    ),
+                  ).gt(0) ? (
+                    <></>
+                  ) : (
+                    <Layout>
+                      <Sider width="20px">
+                        <ExclamationCircleOutlined style={{ color: '#f27474' }} />
+                      </Sider>
+                      <Content>{t('bridge.step1.notice1')}</Content>
+                    </Layout>
+                  )}
                 </div>
               </div>
             </div>
@@ -628,7 +651,18 @@ const CronosBridge = props => {
                 key="submit"
                 type="primary"
                 onClick={onConfirmation}
-                disabled={isButtonDisabled}
+                disabled={
+                  isButtonDisabled ||
+                  !Big(
+                    fromScientificNotation(
+                      adjustedTransactionAmount(
+                        amount,
+                        currentAsset!,
+                        getBaseScaledAmount(bridgeFee, currentAsset!),
+                      ),
+                    ),
+                  ).gt(0)
+                }
               >
                 {t('general.confirm')}
               </Button>
@@ -890,30 +924,29 @@ const CronosBridge = props => {
                 ) : (
                   <></>
                 )}
-                {bridgeConfigFields.includes('bridgeIndexingUrl') &&
-                form.getFieldValue('bridgeFrom') === 'CRONOS' ? (
-                  <Form.Item
-                    name="bridgeIndexingUrl"
-                    label={t('bridge.config.bridgeIndexingUrl.title')}
-                    rules={[
-                      {
-                        required: true,
-                        message: `${t('bridge.config.bridgeIndexingUrl.title')} ${t(
-                          'general.required',
-                        )}`,
-                      },
-                      {
-                        type: 'url',
-                        message: t('bridge.config.bridgeIndexingUrl.error1'),
-                      },
-                    ]}
-                    style={{ textAlign: 'left' }}
-                  >
-                    <Input />
-                  </Form.Item>
-                ) : (
+                {/* {form.getFieldValue('bridgeFrom') === 'CRONOS' ? ( */}
+                <Form.Item
+                  name="bridgeIndexingUrl"
+                  label={t('bridge.config.bridgeIndexingUrl.title')}
+                  rules={[
+                    {
+                      required: true,
+                      message: `${t('bridge.config.bridgeIndexingUrl.title')} ${t(
+                        'general.required',
+                      )}`,
+                    },
+                    {
+                      type: 'url',
+                      message: t('bridge.config.bridgeIndexingUrl.error1'),
+                    },
+                  ]}
+                  style={{ textAlign: 'left' }}
+                >
+                  <Input />
+                </Form.Item>
+                {/* ) : (
                   <></>
-                )}
+                )} */}
                 {bridgeConfigFields.includes('gasLimit') &&
                 form.getFieldValue('bridgeFrom') === 'CRONOS' ? (
                   <Form.Item

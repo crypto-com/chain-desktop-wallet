@@ -467,6 +467,11 @@ const AssetsPage = () => {
                         dataSource={allTransfer}
                         className="transfer-table"
                         rowKey={record => record.key}
+                        locale={{
+                          triggerDesc: t('general.table.triggerDesc'),
+                          triggerAsc: t('general.table.triggerAsc'),
+                          cancelSort: t('general.table.cancelSort'),
+                        }}
                       />
                     </TabPane>
                   </Tabs>
