@@ -347,6 +347,7 @@
   "bridge.step0.title": "Cronos 跨链桥",
   "bridge.step0.description": "把跨链资产带到 Cronos 上最安全最快速且最有保障的方法。",
   "bridge.step1.title": "确认",
+  "bridge.step1.notice1": "请确保你有足够资金支付跨链交易费用",
   "bridge.step2.title": "跨链交易",
   "bridge.deposit.complete.title": "已完成存入 {{amount}} {{symbol}}",
   "bridge.deposit.transactionID": "交易哈希值",
