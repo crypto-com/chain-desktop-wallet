@@ -9,7 +9,6 @@ All notable changes to this project will be documented in this file.
 ## [v0.5.3] - 2021-11-08
 
 ### Additions
-- Add APY & Uptime fields in Validator List
 - Increase Password complexity requirement to "Good"
 - Update default mainnet Bridge Transfer config
 
