@@ -98,7 +98,6 @@ export class BridgeService {
       bridgeTransferRequest.bridgeTransferDirection,
     );
 
-    // TODO: Load contract address from Bridge configuration object
     const bridgeContractABI = BridgeABI as AbiItem[];
     const bridgeContractAddress =
       loadedBridgeConfig?.cronosBridgeContractAddress ||
@@ -113,6 +112,8 @@ export class BridgeService {
     const scaledBaseAmount = getBaseScaledAmount(bridgeTransferRequest.amount, originAsset);
 
     const bridgeTransaction: BridgeTransactionUnsigned = {
+      originAsset,
+      asset: originAsset,
       amount: scaledBaseAmount,
       fromAddress: bridgeTransferRequest.evmAddress,
       toAddress: bridgeContractAddress,
@@ -126,6 +127,8 @@ export class BridgeService {
     bridgeTransaction.gasPrice = prepareTxInfo.loadedGasPrice;
     bridgeTransaction.gasLimit = gasLimit;
 
+    const chainId = Number(originAsset?.config?.chainId);
+
     let signedTransactionHex = '';
     if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       const device = createLedgerDevice();
@@ -136,7 +139,7 @@ export class BridgeService {
 
       signedTransactionHex = await device.signEthTx(
         walletAddressIndex,
-        Number(originAsset?.config?.chainId), // chainid
+        chainId, // chainid
         bridgeTransaction.nonce,
         web3.utils.toHex(gasLimit) /* gas limit */,
         web3.utils.toHex(gasPriceTx) /* gas price */,
@@ -153,6 +156,7 @@ export class BridgeService {
 
     // eslint-disable-next-line no-console
     console.log(`${bridgeTransferRequest.originAsset.assetType} REQUEST & SIGNED-TX`, {
+      chainId,
       signedTransactionHex,
       bridgeTransaction,
     });
