@@ -1398,7 +1398,7 @@ const StakingPage = () => {
     return allUnbondingDelegations.map(dlg => {
       const unbondingAmount = getUIDynamicAmount(dlg.unbondingAmount, currentAsset);
       const data: UnbondingDelegationTabularData = {
-        key: dlg.validatorAddress + dlg.unbondingAmount,
+        key: `${dlg.validatorAddress}_${dlg.unbondingAmount}_${dlg.completionTime}`,
         delegatorAddress: dlg.delegatorAddress,
         validatorAddress: dlg.validatorAddress,
         completionTime: new Date(dlg.completionTime).toString(),

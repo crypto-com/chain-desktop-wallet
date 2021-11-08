@@ -761,8 +761,8 @@ function HomeLayout(props: HomeLayoutProps) {
         onSuccess={async password => {
           await generalConfigService.setIsAppLockedByUser(false);
           notification.info({
-            message: 'App Unlocked',
-            description: 'The app is successfully unlocked.',
+            message: t('general.sessionLockModal.notification.message2'),
+            description: t('general.sessionLockModal.notification.description2'),
             duration: 3,
             placement: 'topRight',
           });
@@ -832,8 +832,8 @@ function HomeLayout(props: HomeLayoutProps) {
             icon={<LockFilled style={{ color: '#1199fa' }} />}
             onClick={async () => {
               notification.info({
-                message: t('general.sessionLockModal.notification.message'),
-                description: t('general.sessionLockModal.notification.description'),
+                message: t('general.sessionLockModal.notification.message1'),
+                description: t('general.sessionLockModal.notification.description1'),
                 duration: 3,
                 placement: 'topRight',
               });
