@@ -20,6 +20,7 @@ import {
   getAssetBalancePrice,
   scaledBalance,
   UserAsset,
+  UserAssetType,
 } from '../../../models/UserAsset';
 import { Session } from '../../../models/Session';
 import { allMarketState, ledgerIsExpertModeState } from '../../../recoil/atom';
@@ -92,15 +93,24 @@ const FormSend: React.FC<FormSendProps> = props => {
     }
   }, []);
 
+  const getTransactionFee = (asset: UserAsset) => {
+    const { assetType, config } = asset;
+
+    if (config !== undefined) {
+      const { fee } = config;
+      if (assetType === UserAssetType.TENDERMINT) {
+        return fee.networkFee ?? FIXED_DEFAULT_FEE;
+      }
+    }
+    return FIXED_DEFAULT_FEE;
+  };
+
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
     const transferInputAmount = adjustedTransactionAmount(
       form.getFieldValue('amount'),
       walletAsset!,
-      currentSession.wallet.config.fee !== undefined &&
-        currentSession.wallet.config.fee.networkFee !== undefined
-        ? currentSession.wallet.config.fee.networkFee
-        : FIXED_DEFAULT_FEE,
+      getTransactionFee(walletAsset!),
     );
     setFormValues({
       ...form.getFieldsValue(),
@@ -382,16 +392,16 @@ const FormSend: React.FC<FormSendProps> = props => {
                   : ''}
               </div>
             </div>
-            <div className="item">
-              <div className="label">{t('send.modal1.label4')}</div>
-              <div>{`~${getNormalScaleAmount(
-                walletAsset?.config?.fee !== undefined &&
-                  walletAsset?.config?.fee.networkFee !== undefined
-                  ? walletAsset?.config?.fee.networkFee
-                  : FIXED_DEFAULT_FEE,
-                walletAsset!,
-              )} ${walletAsset?.symbol}`}</div>
-            </div>
+            {walletAsset?.assetType !== UserAssetType.EVM ? (
+              <div className="item">
+                <div className="label">{t('send.modal1.label4')}</div>
+                <div>{`~${getNormalScaleAmount(getTransactionFee(walletAsset!), walletAsset!)} ${
+                  walletAsset?.symbol
+                }`}</div>
+              </div>
+            ) : (
+              <></>
+            )}
             <div className="item">
               <div className="label">{t('send.modal1.label5')}</div>
               {formValues?.memo !== undefined &&

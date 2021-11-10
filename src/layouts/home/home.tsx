@@ -79,6 +79,8 @@ import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark
 import IconLedger from '../../svg/IconLedger';
 import { ISignerProvider } from '../../service/signers/SignerProvider';
 import { UserAsset } from '../../models/UserAsset';
+import IconCro from '../../svg/IconCro';
+import IconEth from '../../svg/IconEth';
 // import i18n from '../../language/I18n';
 
 interface HomeLayoutProps {
@@ -392,7 +394,7 @@ function HomeLayout(props: HomeLayoutProps) {
         notification.info({
           message: t('home.createNewAsset.notification.message'),
           description: t('home.createNewAsset.notification.description'),
-          duration: 60,
+          duration: 120,
           key: newAssetAddedNotificationKey,
           placement: 'topRight',
           btn: createNewlyAddedAssets,
@@ -762,8 +764,8 @@ function HomeLayout(props: HomeLayoutProps) {
         onSuccess={async password => {
           await generalConfigService.setIsAppLockedByUser(false);
           notification.info({
-            message: 'App Unlocked',
-            description: 'The app is successfully unlocked.',
+            message: t('general.sessionLockModal.notification.message2'),
+            description: t('general.sessionLockModal.notification.description2'),
             duration: 3,
             placement: 'topRight',
           });
@@ -833,8 +835,8 @@ function HomeLayout(props: HomeLayoutProps) {
             icon={<LockFilled style={{ color: '#1199fa' }} />}
             onClick={async () => {
               notification.info({
-                message: t('general.sessionLockModal.notification.message'),
-                description: t('general.sessionLockModal.notification.description'),
+                message: t('general.sessionLockModal.notification.message1'),
+                description: t('general.sessionLockModal.notification.description1'),
                 duration: 3,
                 placement: 'topRight',
               });
@@ -1092,9 +1094,17 @@ function HomeLayout(props: HomeLayoutProps) {
           image={isLedgerCroAppConnected ? <SuccessCheckmark /> : <IconLedger />}
         >
           <div className="description">
-            {isLedgerCroAppConnected
-              ? t('home.ledgerModalPopup.tendermintAsset.description1')
-              : t('home.ledgerModalPopup.tendermintAsset.description2')}
+            {isLedgerCroAppConnected ? (
+              t('create.ledgerModalPopup.tendermintAddress.description1')
+            ) : (
+              <>
+                {t('create.ledgerModalPopup.tendermintAddress.description3')}
+                <div className="ledger-app-icon">
+                  <IconCro style={{ color: '#fff' }} />
+                </div>
+                Crypto.org App
+              </>
+            )}
           </div>
         </LedgerModalPopup>
         <LedgerModalPopup
@@ -1132,9 +1142,17 @@ function HomeLayout(props: HomeLayoutProps) {
           image={isLedgerEthAppConnected ? <SuccessCheckmark /> : <IconLedger />}
         >
           <div className="description">
-            {isLedgerEthAppConnected
-              ? t('home.ledgerModalPopup.evmAsset.description1')
-              : t('home.ledgerModalPopup.evmAsset.description2')}
+            {isLedgerEthAppConnected ? (
+              t('create.ledgerModalPopup.evmAddress.description1')
+            ) : (
+              <>
+                {t('create.ledgerModalPopup.tendermintAddress.description3')}
+                <div className="ledger-app-icon">
+                  <IconEth style={{ color: '#fff' }} />
+                </div>
+                Ethereum App
+              </>
+            )}
           </div>
         </LedgerModalPopup>
       </Layout>
