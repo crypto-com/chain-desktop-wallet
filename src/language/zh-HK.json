@@ -348,7 +348,7 @@
   "bridge.step0.title": "Cronos 跨鏈橋",
   "bridge.step0.description": "把跨鏈資產帶到 Cronos 上最安全最快速且最有保障的方法。",
   "bridge.step0.message": "請重新啟動錢包並加入新支援的Cronos代幣以使用 Cronos 跨鏈橋",
-  "bridge.step1.title": "Loading...",
+  "bridge.step1.title": "確認",
   "bridge.step1.notice1": "請確保你有足夠資金支付跨鏈交易費用",
   "bridge.step2.title": "跨鏈交易",
   "bridge.deposit.complete.title": "已完成存入 {{amount}} {{symbol}}",
