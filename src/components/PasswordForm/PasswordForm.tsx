@@ -60,18 +60,34 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
         <Form.Item
           name="password"
           label={t('general.passwordForm.password.label')}
-          rules={[
-            {
-              required: true,
-              message: `${t('general.passwordForm.password.label')} ${t('general.required')}`,
-            },
+          rules={
             props.shouldValidate
-              ? {
-                  pattern: /^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
-                  message: t('general.passwordForm.password.error1'),
-                }
-              : {},
-          ]}
+              ? [
+                  {
+                    required: true,
+                    message: `${t('general.passwordForm.password.label')} ${t('general.required')}`,
+                  },
+                  {
+                    pattern: /^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
+                    message: t('general.passwordForm.password.error1'),
+                  },
+                  () => ({
+                    validator() {
+                      if (strength < 3) {
+                        return Promise.reject(new Error(t('general.passwordForm.password.error2')));
+                      }
+                      return Promise.resolve();
+                    },
+                  }),
+                ]
+              : [
+                  {
+                    required: true,
+                    message: `${t('general.passwordForm.password.label')} ${t('general.required')}`,
+                  },
+                ]
+          }
+          validateFirst
         >
           <Input.Password placeholder={t('general.passwordForm.password.placeholder')} />
         </Form.Item>

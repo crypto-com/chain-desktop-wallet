@@ -6,6 +6,39 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.5.4] - 2021-11-09
+
+### Bug fixes
+- Fixed Cronos Bridge page crashes when Cronos asset is not enabled yet. 
+
+## [v0.5.3] - 2021-11-08
+
+### Additions
+- Increase Password complexity requirement to "Good"
+- Update default mainnet Bridge Transfer config
+
+### Bug fixes
+- Fixed transfer failure for big amount (e.g. > 100M CRO)
+- Fixed missing default memo in asset transfer
+- Fixed generate-i18n command failure
+- Update Testnet unbonding days change to 28 Days
+
+## [v0.5.2] - 2021-10-28
+
+### Additions
+- Add 25%, 50%, 75%, ALL option in Bridge Transfer
+- Total Balance includes all assets in fiat amount
+- Add avoid quitting mechanism during Bridge Transfer
+- Add potential scammer validator warnings
+
+### Bug fixes
+- Fixed various layout issues on Asset, Bridge & Staking Page
+- Fixed App Crash issue when config settings updated
+- Fixed failure bridge transactions for transferring amount's decimal > 4
+- Fixed CRONOS transaction with memo failure
+- Fixed bridge config not updated successfully
+- Enforce strict http/https protocol in indexing URL settings
+
 ## [v0.5.1] - 2021-10-18
 
 ### Additions
