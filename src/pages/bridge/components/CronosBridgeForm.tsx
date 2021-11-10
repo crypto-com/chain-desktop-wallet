@@ -481,7 +481,12 @@ const CronosBridgeForm = props => {
         <div className="ant-row ant-form-item" style={{ marginBottom: '8px' }}>
           {' '}
         </div>
-        <RowAmountOption form={form} walletAsset={currentAsset} style={{ marginBottom: '8px' }} />
+        <RowAmountOption
+          form={form}
+          walletAsset={currentAsset}
+          setSendingAmount={setSendingAmount}
+          style={{ marginBottom: '8px' }}
+        />
       </div>
       <div className="row">
         <div className="ant-row ant-form-item"> </div>
