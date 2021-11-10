@@ -21,10 +21,10 @@ import {
   TransferTransactionData,
   NftModel,
 } from '../../models/Transaction';
-import { DefaultWalletConfigs, SECONDS_OF_YEAR } from '../../config/StaticConfig';
+import { DefaultWalletConfigs, SECONDS_OF_YEAR, SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
-import { UserAsset } from '../../models/UserAsset';
+import { UserAsset, UserAssetType } from '../../models/UserAsset';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(
@@ -375,6 +375,44 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
       // Process incoming list to sum total claimed rewards
       finalMsgList.push(...delegatorRewardMessageList.data.result);
+    }
+
+    return finalMsgList;
+  }
+
+  /**
+   * 
+   * @param userAddress Supports only Crypto.org USER addresses
+   * @param optionalMsgTypeName {Optional} Cosmos MsgType Name
+   */
+  public async getMessagesByAccountAddress(userAddress: string, optionalMsgTypeName?: string) {
+    let currentPage = 1;
+    let totalPages = 1;
+
+    let queryURL = `accounts/${userAddress}/messages?order=height.desc&filter.msgType=MsgWithdrawDelegatorReward&page=${currentPage}`;
+
+    const finalMsgList: accountMsgList[] = [];
+
+    if (optionalMsgTypeName && SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING.includes(optionalMsgTypeName)) {
+      queryURL = `accounts/${userAddress}/messages?order=height.desc&filter.msgType=${optionalMsgTypeName}&page=${currentPage}`;
+    }
+
+    while (currentPage <= totalPages) {
+      // eslint-disable-next-line no-await-in-loop
+      const messageList = await this.axiosClient.get<AccountMessagesListResponse>(
+        queryURL
+      );
+
+      totalPages = messageList.data.pagination.total_page;
+      currentPage += 1;
+
+      // Check if returned list is empty
+      if (messageList.data.result.length < 1) {
+        return finalMsgList;
+      }
+
+      // Process incoming list to sum total claimed rewards
+      finalMsgList.push(...messageList.data.result);
     }
 
     return finalMsgList;
