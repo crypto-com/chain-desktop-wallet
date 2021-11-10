@@ -38,6 +38,9 @@ export class TransactionSenderService {
         const currentSession = await this.storageService.retrieveCurrentSession();
         const fromAddress = currentSession.wallet.address;
         const walletAddressIndex = currentSession.wallet.addressIndex;
+        if (!transferRequest.memo && !currentSession.wallet.config.disableDefaultClientMemo) {
+            transferRequest.memo = DEFAULT_CLIENT_MEMO;
+        }
 
         switch (currentAsset.assetType) {
             case UserAssetType.EVM:
