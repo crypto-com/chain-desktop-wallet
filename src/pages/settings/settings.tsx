@@ -56,7 +56,7 @@ import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
-import AddressBookTab from './tabs/addressBook/AddressBookTab';
+import AddressBookTab from './tabs/AddressBook/AddressBook';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
