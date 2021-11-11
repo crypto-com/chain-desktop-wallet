@@ -167,17 +167,6 @@ const FormDelegationRequest = props => {
       setWalletAsset(currentWalletAsset);
     };
 
-    // const moderationConfigHandler = async () => {
-    //   try {
-    //     const fetchModerationConfigData = await fetch(MODERATION_CONFIG_FILE_URL);
-    //     const moderationConfigData = await fetchModerationConfigData.json();
-    //     setModerationConfig(moderationConfigData);
-    //   } catch (error) {
-    //     // eslint-disable-next-line no-console
-    //     console.error('Error occurred while fetching moderation config file', error);
-    //   }
-    // };
-
     if (!didMountRef.current) {
       syncAssetData();
       didMountRef.current = true;
