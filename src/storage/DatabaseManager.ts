@@ -44,6 +44,8 @@ export class DatabaseManager {
   
   public readonly commonTransactionStore: Datastore;
 
+  public readonly addressBookStore: Datastore;
+
   constructor(namespace: string) {
     this.sessionStore = getStore(namespace, 'session');
     this.walletStore = getStore(namespace, 'wallets');
@@ -64,5 +66,6 @@ export class DatabaseManager {
     this.bridgeConfigStore = getStore(namespace, 'bridgeConfigStore');
     this.bridgeTransactionStore = getStore(namespace, 'bridgeTransactionStore');
     this.commonTransactionStore = getStore(namespace, 'commonTransactionStore');
+    this.addressBookStore = getStore(namespace, 'addressBook');
   }
 }

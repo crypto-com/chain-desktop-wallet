@@ -76,6 +76,8 @@
   "general.sessionLockModal.errorSelfDestruct": "#*N*을 시도합니다.  #T#번  잘못된 시도를 하면 지갑은 자동 소멸됩니다.",
   "general.sessionLockModal.success": "지갑을 성공적으로 해독하였습니다",
   "general.sessionLockModal.okButton": "지갑 해독",
+  "general.sessionLockModal.notification.message1": "앱 잠김",
+  "general.sessionLockModal.notification.description1": "앱이 곧 잠깁니다.",
   "general.sessionLockModal.notification.message2": "지갑 해독",
   "general.sessionLockModal.notification.description2": "지갑 해독 성공",
   "general.successModalPopup.title": "성공!",
