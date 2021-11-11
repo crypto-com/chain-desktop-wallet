@@ -12,9 +12,9 @@ import { AddressBookContact } from '../../../../models/AddressBook';
 import { Session } from '../../../../models/Session';
 import { sessionState } from '../../../../recoil/atom';
 import AddAddressModal from '../../../../components/AddressBookModal/AddAddressModal';
-import ConfirmModal from '../../../../components/ConfirmModal.tsx/ConfirmModal';
+import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal';
 
-const AddressBookTab = () => {
+const AddressBook = () => {
   const [contacts, setContacts] = useState<AddressBookContact[]>([]);
 
   const [isAddModalShowing, setIsAddModalShowing] = useState(false);
@@ -177,4 +177,4 @@ const AddressBookTab = () => {
   );
 };
 
-export default AddressBookTab;
+export default AddressBook;
