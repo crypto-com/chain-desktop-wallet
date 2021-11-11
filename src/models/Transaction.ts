@@ -5,6 +5,8 @@ import {
   NftTransactionResponse,
   NftDenomData,
 } from '../service/rpc/ChainIndexingModels';
+import { UserAssetType } from './UserAsset';
+import { BridgeTransaction } from '../service/bridge/contracts/BridgeModels';
 
 export enum TransactionStatus {
   SUCCESS = 'SUCCESS',
@@ -64,7 +66,24 @@ export enum NftTransactionType {
   TRANSFER_NFT = 'MsgTransferNFT',
 }
 
-export interface NftAccountTransactionData extends NftAccountTransactionResponse {}
+export interface NftAccountTransactionData extends NftAccountTransactionResponse { }
+
+export interface BaseCommonTransaction {
+  walletId: string;
+  assetId?: string;
+  customParams?: { [key: string]: string } // Note: We can dedicate a storage table for `customParams` like totalBalance, totalRewards, estimatedApy etc.
+}
+
+export interface TransactionByType {
+  txType: string; // staking, transfer, nft, ibc
+  txList:
+  Array<StakingTransactionData> |
+  Array<RewardTransaction> |
+  Array<TransferTransactionData> |
+  Array<NftTransactionData> |
+  Array<UnbondingDelegationData> 
+}
+
 
 export interface StakingTransactionList {
   transactions: Array<StakingTransactionData>;
