@@ -532,7 +532,7 @@ const CronosBridgeForm = props => {
           <Form.Item name="isCustomToAddress">
             <Checkbox
               checked={!isToAddressDisabled}
-              onChange={() => {
+              onChange={e => {
                 const values = form.getFieldsValue();
                 form.setFieldsValue({
                   ...values,
@@ -545,16 +545,22 @@ const CronosBridgeForm = props => {
                 //   isChecked: true
                 // })
                 setIsToAddressDisabled(!isToAddressDisabled);
-                if (isToAddressDisabled) {
+                if (e.target.value) {
                   const { bridgeTo } = values;
 
                   switch (bridgeTo) {
                     case 'CRYPTO_ORG': {
                       setToAddress(croAsset?.address);
+                      form.setFieldsValue({
+                        toAddress: croAsset?.address,
+                      });
                       break;
                     }
                     case 'CRONOS': {
                       setToAddress(cronosAsset?.address);
+                      form.setFieldsValue({
+                        toAddress: cronosAsset?.address,
+                      });
                       break;
                     }
                     default:

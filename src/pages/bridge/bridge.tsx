@@ -117,6 +117,7 @@ const CronosBridge = props => {
     bridgeTo: '',
     tendermintAddress: '',
     evmAddress: '',
+    toAddress: '',
     isCustomToAddress: false,
   });
   const [bridgeConfigForm] = Form.useForm();
@@ -127,7 +128,7 @@ const CronosBridge = props => {
   const [toAsset, setToAsset] = useState<UserAsset | undefined>();
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
-  const [toAddress, setToAddress] = useState('');
+  const [toDestinationAddress, setToDestinationAddress] = useState('');
   const [bridgeTransferDirection, setBridgeTransferDirection] = useState<BridgeTransferDirection>(
     BridgeTransferDirection.NOT_SUPPORT,
   );
@@ -135,6 +136,8 @@ const CronosBridge = props => {
     bridgeTransferDirection: BridgeTransferDirection.NOT_SUPPORT,
     tendermintAddress: '',
     evmAddress: '',
+    toAddress: '',
+    isCustomToAddress: false,
     originAsset: currentAsset!,
     amount: '0',
     decryptedPhrase: '',
@@ -189,7 +192,7 @@ const CronosBridge = props => {
   };
 
   const onWalletDecryptFinish = async (password: string) => {
-    const { tendermintAddress, evmAddress } = formValues;
+    const { tendermintAddress, evmAddress, toAddress, isCustomToAddress } = formValues;
     let { amount } = formValues;
     amount = fromScientificNotation(amount).toString();
 
@@ -207,6 +210,8 @@ const CronosBridge = props => {
       bridgeTransferDirection,
       tendermintAddress,
       evmAddress,
+      toAddress,
+      isCustomToAddress,
       amount,
       originAsset: currentAsset!,
       decryptedPhrase: phraseDecrypted,
@@ -238,7 +243,7 @@ const CronosBridge = props => {
     });
 
     if (decryptedPhrase || session.wallet.walletType === LEDGER_WALLET_TYPE) {
-      const { tendermintAddress, evmAddress } = formValues;
+      const { tendermintAddress, evmAddress, toAddress, isCustomToAddress } = formValues;
       // const { isCustomToAddress } = form.getFieldsValue();
       let amount = form.getFieldValue('amount');
       amount = fromScientificNotation(amount).toString();
@@ -247,6 +252,8 @@ const CronosBridge = props => {
         bridgeTransferDirection,
         tendermintAddress,
         evmAddress,
+        toAddress,
+        isCustomToAddress,
         amount,
         originAsset: currentAsset!,
         decryptedPhrase,
@@ -337,7 +344,6 @@ const CronosBridge = props => {
 
     try {
       setCurrentStep(2);
-
       sendResult = await walletService.sendBridgeTransaction(bridgeTransferRequest);
       setBroadcastResult(sendResult);
       listDataSource.push({
@@ -544,8 +550,8 @@ const CronosBridge = props => {
               setCurrentAssetIdentifier={setCurrentAssetIdentifier}
               setCurrentStep={setCurrentStep}
               showPasswordInput={showPasswordInput}
-              toAddress={toAddress}
-              setToAddress={setToAddress}
+              toAddress={toDestinationAddress}
+              setToAddress={setToDestinationAddress}
               bridgeTransferDirection={bridgeTransferDirection}
               setBridgeTransferDirection={setBridgeTransferDirection}
               bridgeConfigs={bridgeConfigs}
@@ -620,7 +626,7 @@ const CronosBridge = props => {
                     <div>{t('bridge.form.destination')}</div>
                     <div className="asset-icon">
                       {bridgeIcon(form.getFieldValue('bridgeTo'))}
-                      {middleEllipsis(toAddress, 6)}
+                      {middleEllipsis(toDestinationAddress, 6)}
                     </div>
                   </div>
                 </div>
