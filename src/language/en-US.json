@@ -333,7 +333,7 @@
   "assets.assetList.table.actionSend": "Send",
   "assets.assetList.table.actionReceive": "Receive",
   "assets.moreMenu.nodeConfiguration": "Node Configuration",
-  "bridge.form.from": "From",
+  "bridge.form.from": "I want to send funds to a custom destination address.",
   "bridge.form.to": "To",
   "bridge.form.errorSameChain": "The two chains cannot be the same",
   "bridge.form.errorBridgeNotSupported": "The selected bridge transfer is not supported",

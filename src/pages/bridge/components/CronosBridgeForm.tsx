@@ -563,7 +563,7 @@ const CronosBridgeForm = props => {
               }}
               className="disclaimer"
             >
-              I want to send funds to another destination address.
+              {t('bridge.form.customAddress.message')}
             </Checkbox>
           </Form.Item>
         </div>
