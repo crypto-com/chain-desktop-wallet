@@ -236,7 +236,7 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
           <Input placeholder={t('settings.addressBook.form.enterAddress')} />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" style={{ marginLeft: '0' }}>
             {isEditing
               ? t('settings.addressBook.form.update')
               : t('settings.addressBook.addAddress')}
