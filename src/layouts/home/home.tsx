@@ -40,6 +40,7 @@ import {
   isIbcVisibleState,
   navbarMenuSelectedKeyState,
   isBridgeTransferingState,
+  NavbarMenuKey,
 } from '../../recoil/atom';
 import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
@@ -88,7 +89,7 @@ interface HomeLayoutProps {
 
 const { Sider } = Layout;
 
-const allPaths = [
+const allPaths: NavbarMenuKey[] = [
   '/home',
   '/staking',
   // '/send',
@@ -470,7 +471,7 @@ function HomeLayout(props: HomeLayoutProps) {
     }, 5_000);
   };
 
-  const conditionalLink = (to: string, label: string) => {
+  const conditionalLink = (to: NavbarMenuKey, label: string) => {
     const conditionalLinkNotificationKey = 'conditionalLinkNotificationKey';
 
     const conditionalLinkBtn = (
@@ -573,8 +574,8 @@ function HomeLayout(props: HomeLayoutProps) {
     if (!didMountRef.current) {
       fetchDB();
 
-      if (allPaths.includes(currentLocationPath)) {
-        setNavbarMenuSelectedKey(currentLocationPath);
+      if (allPaths.includes(currentLocationPath as NavbarMenuKey)) {
+        setNavbarMenuSelectedKey(currentLocationPath as NavbarMenuKey);
       }
 
       didMountRef.current = true;
@@ -622,7 +623,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   const HomeMenu = () => {
     let menuSelectedKey = currentLocationPath;
-    if (!allPaths.includes(menuSelectedKey)) {
+    if (!allPaths.includes(menuSelectedKey as NavbarMenuKey)) {
       menuSelectedKey = '/home';
     }
 
@@ -635,7 +636,7 @@ function HomeLayout(props: HomeLayoutProps) {
         onClick={item => {
           setMenuToBeSelectedKey(item.key);
           if (!isBridgeTransfering) {
-            setNavbarMenuSelectedKey(item.key);
+            setNavbarMenuSelectedKey(item.key as NavbarMenuKey);
           }
         }}
       >
