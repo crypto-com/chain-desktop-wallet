@@ -68,22 +68,26 @@ export enum NftTransactionType {
 
 export interface NftAccountTransactionData extends NftAccountTransactionResponse { }
 
+export interface CommonAttributesByWallet {
+  customParams?: { [key: string]: string } // Note: We WILL dedicate a storage for `customParams` like totalBalance, totalRewards, estimatedApy etc.
+  walletId: string;
+  assetId?: string;
+  assetType: UserAssetType;
+}
+
 export interface BaseCommonTransaction {
   walletId: string;
   assetId?: string;
-  customParams?: { [key: string]: string } // Note: We can dedicate a storage table for `customParams` like totalBalance, totalRewards, estimatedApy etc.
+  assetType: UserAssetType;
 }
 
-export interface TransactionByType {
-  txType: string; // staking, transfer, nft, ibc
-  txList:
-  Array<StakingTransactionData> |
-  Array<RewardTransaction> |
-  Array<TransferTransactionData> |
-  Array<NftTransactionData> |
-  Array<UnbondingDelegationData> 
+export interface CommonTransaction extends BaseCommonTransaction {
+  walletId: string;
+  assetId?: string;
+  txType: string;
+  messageTypeName?: string;
+  txData: StakingTransactionData | RewardTransaction |TransferTransactionData | NftTransactionData | BridgeTransaction
 }
-
 
 export interface StakingTransactionList {
   transactions: Array<StakingTransactionData>;
