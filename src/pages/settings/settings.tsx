@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Route, useHistory, Switch as RouterSwitch } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
 import {
@@ -56,6 +56,7 @@ import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
+import AddressBookTab from './tabs/addressBook/AddressBookTab';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -837,142 +838,166 @@ const FormSettings = () => {
   };
 
   return (
-    <Form
-      {...layout}
-      layout="vertical"
-      form={form}
-      name="control-hooks"
-      requiredMark="optional"
-      onFinish={onFinish}
-    >
-      <Tabs defaultActiveKey="1">
-        <TabPane tab={t('settings.tab1')} key="1">
-          <div className="site-layout-background settings-content">
-            <div className="container">
-              <GeneralSettingsForm
-                currentAssetIdentifier={currentAssetIdentifier}
-                setCurrentAssetIdentifier={setCurrentAssetIdentifier}
-              />
-              <Form.Item {...tailLayout} className="button">
-                <Button type="primary" htmlType="submit" loading={isButtonLoading}>
-                  {t('general.save')}
-                </Button>
-                <Button type="link" htmlType="button" onClick={onRestoreDefaults}>
-                  {t('general.discard')}
-                </Button>
-              </Form.Item>
-            </div>
-          </div>
-        </TabPane>
-        <TabPane tab={t('settings.tab2')} key="2">
-          <MetaInfoComponent />
-        </TabPane>
-        <TabPane tab={t('settings.tab3')} key="3">
-          <div className="site-layout-background settings-content">
-            <div className="container">
-              <div className="description">{t('settings.clearStorage.description')}</div>
-              <Button
-                type="primary"
-                loading={isButtonLoading}
-                onClick={() => setIsConfirmationModalVisible(true)}
-                danger
+    <Route
+      path="/settings/:tab?"
+      render={({ match }) => {
+        return (
+          <RouterSwitch>
+            <Form
+              {...layout}
+              layout="vertical"
+              form={form}
+              name="control-hooks"
+              requiredMark="optional"
+              onFinish={onFinish}
+            >
+              <Tabs
+                // defaultActiveKey={match.params.tab}
+                activeKey={match.params.tab}
+                onChange={key => {
+                  history.push(`/settings/${key}`);
+                }}
               >
-                {t('settings.clearStorage.button1')}
-              </Button>
-            </div>
-          </div>
-          <ModalPopup
-            isModalVisible={isConfirmationModalVisible}
-            handleCancel={handleCancelConfirmationModal}
-            handleOk={onConfirmClear}
-            confirmationLoading={isButtonLoading}
-            closable={!isButtonLoading}
-            footer={[
-              <Button
-                key="submit"
-                type="primary"
-                loading={isButtonLoading}
-                onClick={() => setIsConfirmClearVisible(true)}
-                hidden={isConfirmClearVisible}
-                disabled={isButtonDisabled}
-                danger
-              >
-                {t('general.confirm')}
-              </Button>,
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={isButtonLoading}
-                hidden={!isConfirmClearVisible}
-                onClick={confirmClearForm.submit}
-                danger
-              >
-                {t('settings.clearStorage.button1')}
-              </Button>,
-
-              <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
-                {t('general.cancel')}
-              </Button>,
-            ]}
-            okText="Confirm"
-          >
-            <>
-              <div className="title">{t('settings.clearStorage.modal.title')}</div>
-
-              {!isConfirmClearVisible ? (
-                <>
-                  <div className="description">{t('settings.clearStorage.modal.description1')}</div>
-                  <div className="item">
-                    <Alert
-                      type="warning"
-                      message={t('settings.clearStorage.modal.warning')}
-                      showIcon
-                    />
+                <TabPane tab={t('settings.tab1')} key="1">
+                  <div className="site-layout-background settings-content">
+                    <div className="container">
+                      <GeneralSettingsForm
+                        currentAssetIdentifier={currentAssetIdentifier}
+                        setCurrentAssetIdentifier={setCurrentAssetIdentifier}
+                      />
+                      <Form.Item {...tailLayout} className="button">
+                        <Button type="primary" htmlType="submit" loading={isButtonLoading}>
+                          {t('general.save')}
+                        </Button>
+                        <Button type="link" htmlType="button" onClick={onRestoreDefaults}>
+                          {t('general.discard')}
+                        </Button>
+                      </Form.Item>
+                    </div>
                   </div>
-                  <div className="item">
-                    <Checkbox
-                      checked={!isButtonDisabled}
-                      onChange={() => setIsButtonDisabled(!isButtonDisabled)}
-                    >
-                      {t('settings.clearStorage.modal.disclaimer')}
-                    </Checkbox>
+                </TabPane>
+                <TabPane tab={t('settings.tab2')} key="2">
+                  <MetaInfoComponent />
+                </TabPane>
+                <TabPane tab={t('settings.addressBook.title')} key="addressBook">
+                  <AddressBookTab />
+                </TabPane>
+                <TabPane tab={t('settings.tab3')} key="4">
+                  <div className="site-layout-background settings-content">
+                    <div className="container">
+                      <div className="description">{t('settings.clearStorage.description')}</div>
+                      <Button
+                        type="primary"
+                        loading={isButtonLoading}
+                        onClick={() => setIsConfirmationModalVisible(true)}
+                        danger
+                      >
+                        {t('settings.clearStorage.button1')}
+                      </Button>
+                    </div>
                   </div>
-                </>
-              ) : (
-                <div className="item">
-                  <Form
-                    {...layout}
-                    layout="vertical"
-                    form={confirmClearForm}
-                    name="control-hooks"
-                    requiredMark="optional"
-                    onFinish={onConfirmClear}
+                  <ModalPopup
+                    isModalVisible={isConfirmationModalVisible}
+                    handleCancel={handleCancelConfirmationModal}
+                    handleOk={onConfirmClear}
+                    confirmationLoading={isButtonLoading}
+                    closable={!isButtonLoading}
+                    footer={[
+                      <Button
+                        key="submit"
+                        type="primary"
+                        loading={isButtonLoading}
+                        onClick={() => setIsConfirmClearVisible(true)}
+                        hidden={isConfirmClearVisible}
+                        disabled={isButtonDisabled}
+                        danger
+                      >
+                        {t('general.confirm')}
+                      </Button>,
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        loading={isButtonLoading}
+                        hidden={!isConfirmClearVisible}
+                        onClick={confirmClearForm.submit}
+                        danger
+                      >
+                        {t('settings.clearStorage.button1')}
+                      </Button>,
+
+                      <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
+                        {t('general.cancel')}
+                      </Button>,
+                    ]}
+                    okText="Confirm"
                   >
-                    <Form.Item
-                      name="clear"
-                      label={`${t('settings.clearStorage.modal.form1.clear.label')} CLEAR`}
-                      hasFeedback
-                      rules={[
-                        {
-                          required: true,
-                          message: `${t('settings.clearStorage.modal.form1.clear.error1')} CLEAR`,
-                        },
-                        {
-                          pattern: /^CLEAR$/,
-                          message: `${t('settings.clearStorage.modal.form1.clear.error1')} CLEAR`,
-                        },
-                      ]}
-                    >
-                      <Input />
-                    </Form.Item>
-                  </Form>
-                </div>
-              )}
-            </>
-          </ModalPopup>
-        </TabPane>
-      </Tabs>
-    </Form>
+                    <>
+                      <div className="title">{t('settings.clearStorage.modal.title')}</div>
+
+                      {!isConfirmClearVisible ? (
+                        <>
+                          <div className="description">
+                            {t('settings.clearStorage.modal.description1')}
+                          </div>
+                          <div className="item">
+                            <Alert
+                              type="warning"
+                              message={t('settings.clearStorage.modal.warning')}
+                              showIcon
+                            />
+                          </div>
+                          <div className="item">
+                            <Checkbox
+                              checked={!isButtonDisabled}
+                              onChange={() => setIsButtonDisabled(!isButtonDisabled)}
+                            >
+                              {t('settings.clearStorage.modal.disclaimer')}
+                            </Checkbox>
+                          </div>
+                        </>
+                      ) : (
+                        <div className="item">
+                          <Form
+                            {...layout}
+                            layout="vertical"
+                            form={confirmClearForm}
+                            name="control-hooks"
+                            requiredMark="optional"
+                            onFinish={onConfirmClear}
+                          >
+                            <Form.Item
+                              name="clear"
+                              label={`${t('settings.clearStorage.modal.form1.clear.label')} CLEAR`}
+                              hasFeedback
+                              rules={[
+                                {
+                                  required: true,
+                                  message: `${t(
+                                    'settings.clearStorage.modal.form1.clear.error1',
+                                  )} CLEAR`,
+                                },
+                                {
+                                  pattern: /^CLEAR$/,
+                                  message: `${t(
+                                    'settings.clearStorage.modal.form1.clear.error1',
+                                  )} CLEAR`,
+                                },
+                              ]}
+                            >
+                              <Input />
+                            </Form.Item>
+                          </Form>
+                        </div>
+                      )}
+                    </>
+                  </ModalPopup>
+                </TabPane>
+              </Tabs>
+            </Form>
+          </RouterSwitch>
+        );
+      }}
+    />
   );
 };
 

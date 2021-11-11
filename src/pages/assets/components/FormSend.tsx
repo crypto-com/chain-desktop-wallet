@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import './FormSend.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Input, InputNumber } from 'antd';
+import { Button, Checkbox, Form, Input, InputNumber } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
@@ -40,6 +40,9 @@ import {
   AnalyticsService,
   AnalyticsTxType,
 } from '../../../service/analytics/AnalyticsService';
+import AddressBookInput from '../../../components/AddressBookInput/AddressBookInput';
+import { AddressBookService } from '../../../service/AddressBookService';
+import { AddressBookContact } from '../../../models/AddressBook';
 
 const layout = {};
 const tailLayout = {};
@@ -52,7 +55,12 @@ interface FormSendProps {
 
 const FormSend: React.FC<FormSendProps> = props => {
   const [form] = Form.useForm();
-  const [formValues, setFormValues] = useState({ recipientAddress: '', amount: '', memo: '' });
+  const [formValues, setFormValues] = useState({
+    recipientAddress: '',
+    amount: '',
+    memo: '',
+    autoSaveToAddressList: true,
+  });
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -65,6 +73,11 @@ const FormSend: React.FC<FormSendProps> = props => {
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const didMountRef = useRef(false);
   const allMarketData = useRecoilValue(allMarketState);
+  const [currentAddressBookContact, setCurrentAddressBookContact] = useState<AddressBookContact>();
+
+  const addressBookService = useMemo(() => {
+    return new AddressBookService(walletService.storageService);
+  }, [walletService]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { walletAsset, setWalletAsset, currentSession } = props;
@@ -127,16 +140,29 @@ const FormSend: React.FC<FormSendProps> = props => {
   const onConfirmTransfer = async () => {
     const memo = formValues.memo !== null && formValues.memo !== undefined ? formValues.memo : '';
     const { walletType } = currentSession.wallet;
-    if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
+    if ((!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) || !walletAsset) {
       return;
     }
+
+    const toAddress = formValues.recipientAddress;
+    const walletId = currentSession.wallet.identifier;
+
+    if (!currentAddressBookContact && formValues.autoSaveToAddressList) {
+      await addressBookService.autoAddAddressBookContact(
+        walletId,
+        walletAsset.name,
+        walletAsset.symbol,
+        toAddress,
+      );
+    }
+
     try {
       setConfirmLoading(true);
 
       const sendResult = await walletService.sendTransfer({
         toAddress: formValues.recipientAddress,
         amount: formValues.amount,
-        asset: walletAsset!,
+        asset: walletAsset,
         memo,
         decryptedPhrase,
         walletType,
@@ -238,9 +264,31 @@ const FormSend: React.FC<FormSendProps> = props => {
           },
           customAddressValidator,
         ]}
+        className="address-input"
       >
-        <Input placeholder={t('send.formSend.recipientAddress.placeholder')} />
+        <AddressBookInput
+          onChange={(value, contact) => {
+            form.setFieldsValue({
+              recipientAddress: value,
+            });
+            setCurrentAddressBookContact(contact);
+          }}
+          currentSession={currentSession}
+          userAsset={walletAsset!}
+        />
       </Form.Item>
+      {!currentAddressBookContact && (
+        <Form.Item
+          className="add-to-address-list-checkbox"
+          name="autoSaveToAddressList"
+          valuePropName="checked"
+          initialValue
+        >
+          <Checkbox style={{ float: 'left' }}>
+            {t('settings.addressBook.addToAddressList')}
+          </Checkbox>
+        </Form.Item>
+      )}
       <div className="amount">
         <Form.Item
           name="amount"
@@ -323,7 +371,15 @@ const FormSend: React.FC<FormSendProps> = props => {
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label2')}</div>
-              <div className="address">{`${formValues?.recipientAddress}`}</div>
+              <div className="address">
+                {currentAddressBookContact && (
+                  <div style={{ fontWeight: 'bold' }}>{currentAddressBookContact.label}</div>
+                )}
+                {`${formValues?.recipientAddress}`}
+              </div>
+              {formValues.autoSaveToAddressList && (
+                <div>{t('settings.addressBook.willAddToAddressList')}</div>
+              )}
             </div>
             <div className="item">
               <div className="label">{t('send.modal1.label3')}</div>
