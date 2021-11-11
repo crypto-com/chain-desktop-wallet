@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import './bridge.less';
 import 'antd/dist/antd.css';
 import {
@@ -151,6 +152,8 @@ const CronosBridge = props => {
   const [bridgeFee, setBridgeFee] = useState('0');
 
   const analyticsService = new AnalyticsService(session);
+
+  const history = useHistory();
 
   const [t] = useTranslation();
 
@@ -499,6 +502,25 @@ const CronosBridge = props => {
 
     const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
     const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
+
+    if (walletAllAssets.length < 2) {
+      return (
+        <div>
+          <div className="item">{t('bridge.step0.message')}</div>
+          <Button
+            type="primary"
+            onClick={() => {
+              history.go(0);
+            }}
+            style={{
+              width: '200px',
+            }}
+          >
+            {t('general.restart')}
+          </Button>
+        </div>
+      );
+    }
 
     switch (step) {
       case 0:

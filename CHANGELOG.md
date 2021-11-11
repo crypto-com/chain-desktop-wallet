@@ -6,6 +6,11 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.5.4] - 2021-11-09
+
+### Bug fixes
+- Fixed Cronos Bridge page crashes when Cronos asset is not enabled yet. 
+
 ## [v0.5.3] - 2021-11-08
 
 ### Additions
