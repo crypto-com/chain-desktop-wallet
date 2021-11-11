@@ -117,6 +117,7 @@ const CronosBridge = props => {
     bridgeTo: '',
     tendermintAddress: '',
     evmAddress: '',
+    isCustomToAddress: false,
   });
   const [bridgeConfigForm] = Form.useForm();
   const [isBridgeValid, setIsBridgeValid] = useState(false);
@@ -238,6 +239,7 @@ const CronosBridge = props => {
 
     if (decryptedPhrase || session.wallet.walletType === LEDGER_WALLET_TYPE) {
       const { tendermintAddress, evmAddress } = formValues;
+      // const { isCustomToAddress } = form.getFieldsValue();
       let amount = form.getFieldValue('amount');
       amount = fromScientificNotation(amount).toString();
 

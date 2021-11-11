@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './CronosBridgeForm.less';
-import { Button, Form, InputNumber, Select } from 'antd';
+import { Button, Checkbox, Form, Input, InputNumber, Select } from 'antd';
 import { SwapOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
+import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { sessionState, walletAllAssetsState } from '../../../recoil/atom';
 import { scaledBalance, UserAsset, UserAssetType } from '../../../models/UserAsset';
 import { middleEllipsis, getCryptoOrgAsset, getCronosAsset } from '../../../utils/utils';
@@ -80,6 +81,7 @@ const CronosBridgeForm = props => {
   const [bridgeSupportedAssets, setBridgeSupportedAssets] = useState<UserAsset[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isButtonLoading, setIsButtonLoading] = useState(false);
+  const [isToAddressDisabled, setIsToAddressDisabled] = useState(true);
   const didMountRef = useRef(false);
 
   const analyticsService = new AnalyticsService(session);
@@ -91,6 +93,12 @@ const CronosBridgeForm = props => {
   const { tendermintAddress, evmAddress } = formValues;
 
   const [t] = useTranslation();
+
+  const customAddressValidator = TransactionUtils.addressValidator(
+    session,
+    toAsset,
+    AddressType.USER,
+  );
 
   const getBridgeSupportedAssetList = (assetType: UserAssetType) => {
     return walletAllAssets.filter(asset => {
@@ -104,13 +112,12 @@ const CronosBridgeForm = props => {
   const onSwitchBridge = async () => {
     const { bridgeFrom, bridgeTo } = form.getFieldsValue();
 
+    let destinationAddress = '';
+
     setCurrentAsset(undefined);
     setCurrentAssetIdentifier(undefined);
     setAvailableBalance('--');
-    form.setFieldsValue({
-      asset: undefined,
-      amount: undefined,
-    });
+    setIsToAddressDisabled(true);
 
     switch (bridgeFrom) {
       case 'CRYPTO_ORG': {
@@ -138,19 +145,29 @@ const CronosBridgeForm = props => {
 
     switch (bridgeTo) {
       case 'CRYPTO_ORG': {
+        destinationAddress = tendermintAddress;
         setToAddress(tendermintAddress);
         setToAsset(croAsset);
         break;
       }
       case 'CRONOS': {
+        destinationAddress = evmAddress;
         setToAddress(evmAddress);
         setToAsset(cronosAsset);
         break;
       }
       default: {
+        destinationAddress = tendermintAddress;
         setToAddress(tendermintAddress);
       }
     }
+
+    form.setFieldsValue({
+      asset: undefined,
+      amount: undefined,
+      toAddress: destinationAddress,
+      isCustomToAddress: false,
+    });
   };
 
   const onBridgeExchange = () => {
@@ -158,6 +175,8 @@ const CronosBridgeForm = props => {
 
     const newBridgeFrom = bridgeTo;
     const newBridgeTo = bridgeFrom;
+
+    let destinationAddress = '';
 
     switch (newBridgeFrom) {
       case 'CRYPTO_ORG': {
@@ -185,23 +204,30 @@ const CronosBridgeForm = props => {
 
     switch (newBridgeTo) {
       case 'CRYPTO_ORG': {
+        destinationAddress = tendermintAddress;
         setToAddress(tendermintAddress);
         setToAsset(croAsset);
         break;
       }
       case 'CRONOS': {
+        destinationAddress = evmAddress;
         setToAddress(evmAddress);
         setToAsset(cronosAsset);
         break;
       }
       default: {
+        destinationAddress = tendermintAddress;
         setToAddress(tendermintAddress);
       }
     }
 
+    setIsToAddressDisabled(true);
+
     form.setFieldsValue({
       bridgeFrom: newBridgeFrom,
       bridgeTo: newBridgeTo,
+      toAddress: destinationAddress,
+      isCustomToAddress: false,
     });
     form.validateFields();
   };
@@ -243,8 +269,11 @@ const CronosBridgeForm = props => {
       });
       setSupportedBridges(bridges);
 
-      const { bridgeFrom, bridgeTo, amount } = form.getFieldsValue();
+      const { bridgeFrom, bridgeTo, amount, isCustomToAddress } = form.getFieldsValue();
       if (bridgeFrom && bridgeTo && amount) {
+        if (isCustomToAddress) {
+          setIsToAddressDisabled(false);
+        }
         setAvailableBalance(scaledBalance(currentAsset!));
         setIsBridgeValid(true);
         setSendingAmount(amount);
@@ -283,6 +312,7 @@ const CronosBridgeForm = props => {
 
         form.setFieldsValue({
           asset: cro?.identifier,
+          toAddress: cronos?.address,
         });
         setFormValues({
           tendermintAddress: cro?.address,
@@ -497,6 +527,73 @@ const CronosBridgeForm = props => {
           </div>
         </div>
       </div>
+      <div className="row">
+        <div className="ant-row ant-form-item">
+          <Form.Item name="isCustomToAddress">
+            <Checkbox
+              checked={!isToAddressDisabled}
+              onChange={() => {
+                const values = form.getFieldsValue();
+                form.setFieldsValue({
+                  ...values,
+                  isCustomToAddress: isToAddressDisabled,
+                });
+                // setFormValues({
+                //   isCustomToAddress: !isToAddressDisabled
+                // })
+                // form.setFieldsValue({
+                //   isChecked: true
+                // })
+                setIsToAddressDisabled(!isToAddressDisabled);
+                if (isToAddressDisabled) {
+                  const { bridgeTo } = values;
+
+                  switch (bridgeTo) {
+                    case 'CRYPTO_ORG': {
+                      setToAddress(croAsset?.address);
+                      break;
+                    }
+                    case 'CRONOS': {
+                      setToAddress(cronosAsset?.address);
+                      break;
+                    }
+                    default:
+                  }
+                }
+              }}
+              className="disclaimer"
+            >
+              I want to send funds to another destination address.
+            </Checkbox>
+          </Form.Item>
+        </div>
+        <div className="ant-row ant-form-item">
+          <Form.Item
+            name="toAddress"
+            // label="Destination Address"
+            hasFeedback
+            validateFirst
+            rules={[
+              {
+                required: true,
+                message: `${t('send.formSend.recipientAddress.label')} ${t('general.required')}`,
+              },
+              customAddressValidator,
+            ]}
+            initialValue={toAddress}
+          >
+            <Input
+              placeholder={t('send.formSend.recipientAddress.placeholder')}
+              disabled={isToAddressDisabled}
+              value={toAddress}
+              onChange={event => {
+                setToAddress(event.target.value);
+              }}
+            />
+          </Form.Item>
+        </div>
+      </div>
+
       {currentAsset && new Big(sendingAmount).gt(0) ? (
         <div className="review-container">
           <div className="flex-row">
