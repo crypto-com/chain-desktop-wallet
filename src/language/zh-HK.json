@@ -608,6 +608,6 @@
   "settings.addressBook.removeAddress": "刪除地址",
   "settings.addressBook.removeConfirm": "確定要刪除此地址嗎？",
   "settings.addressBook.addNewAddress": "添加新地址",
-  "settings.addressBook.title": "地址本",
+  "settings.addressBook.title": "地址簿",
   "settings.addressBook.address": "地址"
 }

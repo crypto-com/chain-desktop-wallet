@@ -536,16 +536,10 @@ const CronosBridgeForm = props => {
                 const values = form.getFieldsValue();
                 form.setFieldsValue({
                   ...values,
-                  isCustomToAddress: isToAddressDisabled,
+                  isCustomToAddress: e.target.checked,
                 });
-                // setFormValues({
-                //   isCustomToAddress: !isToAddressDisabled
-                // })
-                // form.setFieldsValue({
-                //   isChecked: true
-                // })
                 setIsToAddressDisabled(!isToAddressDisabled);
-                if (e.target.value) {
+                if (!e.target.checked) {
                   const { bridgeTo } = values;
 
                   switch (bridgeTo) {
