@@ -81,12 +81,36 @@ export interface BaseCommonTransaction {
   assetType: UserAssetType;
 }
 
-export interface CommonTransaction extends BaseCommonTransaction {
-  walletId: string;
-  assetId?: string;
-  txType: string;
+export type CommonTransactionRecord = StakingTransactionRecord | RewardTransactionRecord | TransferTransactionRecord | NftTransactionRecord | IBCTransactionRecord;
+
+export interface StakingTransactionRecord extends BaseCommonTransaction{
+  txType: "staking";
   messageTypeName?: string;
-  txData: StakingTransactionData | RewardTransaction |TransferTransactionData | NftTransactionData | BridgeTransaction
+  txData: StakingTransactionData
+}
+
+export interface RewardTransactionRecord extends BaseCommonTransaction{
+  txType: "reward";
+  messageTypeName?: string;
+  txData: RewardTransaction
+}
+
+export interface TransferTransactionRecord extends BaseCommonTransaction{
+  txType: "transfer";
+  messageTypeName?: string;
+  txData: TransferTransactionData
+}
+
+export interface NftTransactionRecord extends BaseCommonTransaction{
+  txType: "nft";
+  messageTypeName?: string;
+  txData: NftTransactionData
+}
+
+export interface IBCTransactionRecord extends BaseCommonTransaction{
+  txType: "ibc";
+  messageTypeName?: string;
+  txData: BridgeTransaction
 }
 
 export interface StakingTransactionList {

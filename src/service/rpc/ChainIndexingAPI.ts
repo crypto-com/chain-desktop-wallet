@@ -381,7 +381,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   }
 
   /**
-   * 
+   * TODO: Under construction
    * @param userAddress Supports only Crypto.org USER addresses
    * @param optionalMsgTypeName {Optional} Cosmos MsgType Name
    */
@@ -389,22 +389,28 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     let currentPage = 1;
     let totalPages = 1;
 
-    let queryURL = `accounts/${userAddress}/messages?order=height.desc&filter.msgType=MsgWithdrawDelegatorReward&page=${currentPage}`;
+    const queryURL = `accounts/${userAddress}/messages`;
+
+    const isMsgTypeSupported = (optionalMsgTypeName && SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING.includes(optionalMsgTypeName)) ?? false;
 
     const finalMsgList: accountMsgList[] = [];
 
-    if (optionalMsgTypeName && SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING.includes(optionalMsgTypeName)) {
-      queryURL = `accounts/${userAddress}/messages?order=height.desc&filter.msgType=${optionalMsgTypeName}&page=${currentPage}`;
-    }
+    let requestParams = {
+      page: currentPage,
+      order: "height.desc",
+      "filter.msgType": (isMsgTypeSupported) ? optionalMsgTypeName : undefined
+    };
 
     while (currentPage <= totalPages) {
       // eslint-disable-next-line no-await-in-loop
       const messageList = await this.axiosClient.get<AccountMessagesListResponse>(
-        queryURL
-      );
+        queryURL, {
+        params: requestParams
+      });
 
       totalPages = messageList.data.pagination.total_page;
       currentPage += 1;
+      requestParams.page = currentPage; //update current page
 
       // Check if returned list is empty
       if (messageList.data.result.length < 1) {

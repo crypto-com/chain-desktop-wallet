@@ -25,6 +25,7 @@ import {
   UnbondingDelegationList,
   TransferTransactionList,
   ValidatorList,
+  CommonTransactionRecord,
 } from '../models/Transaction';
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../config/StaticConfig';
 import {
@@ -450,5 +451,15 @@ export class StorageService {
 
   public async retrieveAllBridgeTransactions(walletId: string) {
     return this.db.bridgeTransactionStore.findOne<BridgeTransactionHistoryList>({ walletId });
+  }
+
+  /**
+   * TODO: Incomplete
+   * record {CommonTransactionRecord}   */
+  public async saveCommonTransactionRecords(records: CommonTransactionRecord[]) {
+    if (records.length === 0) {
+      return Promise.resolve();
+    }
+    return this.db.commonTransactionStore.insert<CommonTransactionRecord[]>(records);
   }
 }
