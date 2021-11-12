@@ -112,8 +112,6 @@ const CronosBridgeForm = props => {
   const onSwitchBridge = async () => {
     const { bridgeFrom, bridgeTo } = form.getFieldsValue();
 
-    let destinationAddress = '';
-
     setCurrentAsset(undefined);
     setCurrentAssetIdentifier(undefined);
     setAvailableBalance('--');
@@ -145,19 +143,25 @@ const CronosBridgeForm = props => {
 
     switch (bridgeTo) {
       case 'CRYPTO_ORG': {
-        destinationAddress = tendermintAddress;
+        form.setFieldsValue({
+          toAddress: tendermintAddress,
+        });
         setToAddress(tendermintAddress);
         setToAsset(croAsset);
         break;
       }
       case 'CRONOS': {
-        destinationAddress = evmAddress;
+        form.setFieldsValue({
+          toAddress: evmAddress,
+        });
         setToAddress(evmAddress);
         setToAsset(cronosAsset);
         break;
       }
       default: {
-        destinationAddress = tendermintAddress;
+        form.setFieldsValue({
+          toAddress: tendermintAddress,
+        });
         setToAddress(tendermintAddress);
       }
     }
@@ -165,7 +169,6 @@ const CronosBridgeForm = props => {
     form.setFieldsValue({
       asset: undefined,
       amount: undefined,
-      toAddress: destinationAddress,
       isCustomToAddress: false,
     });
   };
@@ -175,8 +178,6 @@ const CronosBridgeForm = props => {
 
     const newBridgeFrom = bridgeTo;
     const newBridgeTo = bridgeFrom;
-
-    let destinationAddress = '';
 
     switch (newBridgeFrom) {
       case 'CRYPTO_ORG': {
@@ -204,19 +205,25 @@ const CronosBridgeForm = props => {
 
     switch (newBridgeTo) {
       case 'CRYPTO_ORG': {
-        destinationAddress = tendermintAddress;
+        form.setFieldsValue({
+          toAddress: tendermintAddress,
+        });
         setToAddress(tendermintAddress);
         setToAsset(croAsset);
         break;
       }
       case 'CRONOS': {
-        destinationAddress = evmAddress;
+        form.setFieldsValue({
+          toAddress: evmAddress,
+        });
         setToAddress(evmAddress);
         setToAsset(cronosAsset);
         break;
       }
       default: {
-        destinationAddress = tendermintAddress;
+        form.setFieldsValue({
+          toAddress: tendermintAddress,
+        });
         setToAddress(tendermintAddress);
       }
     }
@@ -226,7 +233,6 @@ const CronosBridgeForm = props => {
     form.setFieldsValue({
       bridgeFrom: newBridgeFrom,
       bridgeTo: newBridgeTo,
-      toAddress: destinationAddress,
       isCustomToAddress: false,
     });
     form.validateFields();
