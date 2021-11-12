@@ -24,10 +24,7 @@ import {
   NftAccountTransactionData,
   NftDenomModel,
   NftModel,
-  NftQueryParams,
-  NftTransferModel,
   ProposalModel,
-  ProposalStatuses,
   RewardsBalances,
   RewardTransaction,
   RewardTransactionList,
@@ -59,7 +56,7 @@ import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
 import { StorageService } from '../storage/StorageService';
 import { TransactionPrepareService } from './TransactionPrepareService';
-import { TransactionHistoryService } from "./TransactionHistoryService";
+import { TransactionHistoryService } from './TransactionHistoryService';
 import { TransactionSenderService } from './TransactionSenderService';
 
 class WalletService {
@@ -77,7 +74,11 @@ class WalletService {
     this.storageService = new StorageService(APP_DB_NAMESPACE);
     this.transactionPrepareService = new TransactionPrepareService(this.storageService);
     this.txHistoryManager = new TransactionHistoryService(this.storageService);
-    this.txSenderManager = new TransactionSenderService(this.storageService, this.transactionPrepareService, this.txHistoryManager);
+    this.txSenderManager = new TransactionSenderService(
+      this.storageService,
+      this.transactionPrepareService,
+      this.txHistoryManager,
+    );
   }
 
   public async sendBridgeTransaction(bridgeTransferRequest: BridgeTransferRequest) {
@@ -111,7 +112,6 @@ class WalletService {
   ): Promise<BroadCastResult> {
     return await this.txSenderManager.sendStakingRewardWithdrawalTx(rewardWithdrawRequest);
   }
-
 
   public async sendVote(voteRequest: VoteRequest): Promise<BroadCastResult> {
     return await this.txSenderManager.sendVote(voteRequest);
@@ -311,7 +311,6 @@ class WalletService {
   public async fetchAndSaveProposals(currentSession: Session) {
     await this.txHistoryManager.fetchAndSaveProposals(currentSession);
   }
-
 
   public async retrieveWalletAssets(walletIdentifier: string): Promise<UserAsset[]> {
     const assets = await this.storageService.retrieveAssetsByWallet(walletIdentifier);
@@ -577,106 +576,6 @@ class WalletService {
       return [];
     }
     return nftSet.nfts;
-  }
-
-  private async getLatestTopValidators(): Promise<ValidatorModel[]> {
-    try {
-      const currentSession = await this.storageService.retrieveCurrentSession();
-      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
-        return Promise.resolve([]);
-      }
-      const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-      const topValidators = await nodeRpc.loadTopValidators();
-      const topValidatorsAddressList = topValidators.map(validator => {
-        return validator.validatorAddress;
-      });
-      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-      const validatorList = await chainIndexAPI.getValidatorsDetail(topValidatorsAddressList);
-
-      const topValidatorsInfo = topValidators.map(validator => {
-        const matchValidator = validatorList.find(val => {
-          return val.operatorAddress === validator.validatorAddress;
-        });
-
-        return {
-          ...validator,
-          apy: matchValidator?.apy,
-          uptime: matchValidator?.impreciseUpTime,
-        };
-      });
-      return topValidatorsInfo;
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log('FAILED_LOADING TOP VALIDATORS', e);
-      return [];
-    }
-  }
-
-  private async getLatestProposals(): Promise<ProposalModel[]> {
-    try {
-      const currentSession = await this.storageService.retrieveCurrentSession();
-      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
-        return Promise.resolve([]);
-      }
-      const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-      return nodeRpc.loadProposals([
-        ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD,
-        ProposalStatuses.PROPOSAL_STATUS_PASSED,
-        ProposalStatuses.PROPOSAL_STATUS_FAILED,
-        ProposalStatuses.PROPOSAL_STATUS_REJECTED,
-      ]);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log('FAILED_LOADING PROPOSALS', e);
-      return [];
-    }
-  }
-
-  private async loadAllCurrentAccountNFTs(): Promise<NftModel[] | null> {
-    try {
-      const currentSession = await this.storageService.retrieveCurrentSession();
-      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
-        return Promise.resolve([]);
-      }
-      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-      const nftList = await chainIndexAPI.getAccountNFTList(currentSession.wallet.address);
-      return await chainIndexAPI.getNftListMarketplaceData(nftList);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log('FAILED_LOADING NFTs', e);
-      return null;
-    }
-  }
-
-  public async loadNFTTransferHistory(nftQuery: NftQueryParams): Promise<NftTransferModel[]> {
-    const currentSession = await this.storageService.retrieveCurrentSession();
-    if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
-      return Promise.resolve([]);
-    }
-
-    try {
-      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-      const nftTransferTransactions = await chainIndexAPI.getNFTTransferHistory(nftQuery);
-
-      await this.storageService.saveNFTTransferHistory({
-        transfers: nftTransferTransactions,
-        walletId: currentSession.wallet.identifier,
-        nftQuery,
-      });
-
-      return nftTransferTransactions;
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log('FAILED_LOADING NFT Transfer history, returning DB data', e);
-      const localTransferHistory = await this.storageService.retrieveNFTTransferHistory(
-        currentSession.wallet.identifier,
-        nftQuery,
-      );
-      if (!localTransferHistory) {
-        return [];
-      }
-      return localTransferHistory.transfers;
-    }
   }
 
   public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {
