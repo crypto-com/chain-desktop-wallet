@@ -342,6 +342,7 @@
   "bridge.form.fee": "Fee: ",
   "bridge.form.destination": "Destination: ",
   "bridge.form.toAddress": "To Address: ",
+  "bridge.form.customAddress.message": "I want to send funds to a custom destination address.",
   "bridge.form.transfer": "Transfer Asset",
   "bridge.form.receiving": "Receiving",
   "bridge.form.disclaimer": "By proceeding, I hereby acknowledge that I agree to the terms and conditions.",
