@@ -1,5 +1,5 @@
 import { isBroadcastTxFailure, StargateClient } from '@cosmjs/stargate';
-import axios, { AxiosInstance, AxiosResponse } from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { Big } from 'big.js';
 import { Bytes } from '../../utils/ChainJsLib';
 import { NodePorts } from '../../config/StaticConfig';
@@ -142,7 +142,9 @@ export class NodeRpcService implements INodeRpcService {
     const delegationTransactionListFinal: Array<StakingTransactionData> = [];
 
     while (true) {
+
       // Fetch paginated data
+      // eslint-disable-next-line no-await-in-loop
       const [paginatedDelegationResponse, nextKey] = await this.fetchDelegationsByAddressPaginated(paginationKey, address);
       // process data above
       const delegationTransactionListLoop: Array<StakingTransactionData> = [];
@@ -196,7 +198,7 @@ export class NodeRpcService implements INodeRpcService {
     const url =
       paginationKey === null ? baseUrl : `${baseUrl}?pagination.key=${encodeURIComponent(paginationKey)}`;
 
-    let response; //: AxiosResponse<DelegationResult | ErrorRpcResponse>;
+    let response;
     try {
       response = await this.cosmosClient.get<DelegationResult | ErrorRpcResponse>(
         url,
@@ -204,17 +206,19 @@ export class NodeRpcService implements INodeRpcService {
     } catch (error) {
       response = error.response;
     } finally {
-      if (response.status != 200) {
+      if (response.status !== 200) {
 
         // eslint-disable-next-line no-console
         console.log(`[NodeRpcService.fetchDelegationsByAddressPaginated] | HTTP Code: ${response.status} | Response: ${JSON.stringify(response.data)}`);
 
         // This is a special case API error response, hence needed manual checking for `code`
         if ((response.data as ErrorRpcResponse).code === 5) {
+          // eslint-disable-next-line no-unsafe-finally
           return [[], null];
         }
 
         // If `code` in error response is not `5`, throw a general error.
+        // eslint-disable-next-line no-unsafe-finally
         throw new Error(`[NodeRpcService.fetchDelegationsByAddressPaginated] | HTTP Code: ${response.status} | Response: ${JSON.stringify(response.data)}`);
       }
     }
@@ -277,6 +281,8 @@ export class NodeRpcService implements INodeRpcService {
     let totalSumFinal = 0;
 
     while (true) {
+
+      // eslint-disable-next-line no-await-in-loop
       const response = await this.fetchUnbondingDelegationsPaginated(paginationKey, address);
 
       const [unbondingDelegationResponsesPaginated, nextPaginationKey] = response;
