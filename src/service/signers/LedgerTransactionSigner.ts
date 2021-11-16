@@ -4,6 +4,7 @@ import { CosmosMsg } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/ms
 import Long from 'long';
 import { Big, Units, Secp256k1KeyPair } from '../../utils/ChainJsLib';
 import {
+  DEFAULT_IBC_TRANSFER_TIMEOUT,
   FIXED_DEFAULT_FEE,
   FIXED_DEFAULT_GAS_LIMIT,
   WalletConfig,
@@ -240,7 +241,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     const { cro, rawTx } = this.getTransactionInfoData(phrase, transaction.memo);
 
     const millisToNanoSecond = 1_000_000;
-    const timeout = (Date.now() + 60_000) * millisToNanoSecond;
+    const timeout = (Date.now() + DEFAULT_IBC_TRANSFER_TIMEOUT) * millisToNanoSecond;
 
     // For a chainID string like testnet-croeseid-4, revision number is 4
     const revisionNumberFromChainID = transaction?.asset?.config?.chainId?.split('-').pop();

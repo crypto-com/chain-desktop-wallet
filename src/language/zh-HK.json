@@ -374,6 +374,7 @@
   "bridge.transferInitiated.description": "請查看錢包資產。在網絡擁堵的情況下，可能最多需要數分鐘完成交易。",
   "bridge.pendingTransfer.title": "{{amount}} {{symbol}} 正等待發送",
   "bridge.pendingTransfer.ledger.description": "請在Ledger錢包上打開 {{app}} 以簽名交易",
+  "bridge.pendingTransferTimeout.description": "在網絡擁堵的情況下，可能最多需要數分鐘完成交易。",
   "bridge.ledgerSign.failed.title": "未能成功廣播Ledger的簽名交易",
   "bridge.transactionHistory.title": "跨鏈橋交易記錄",
   "bridge.transactionHistory.description": "以下是你最近的跨鏈橋交易記錄",

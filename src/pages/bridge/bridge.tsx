@@ -16,11 +16,13 @@ import {
   Skeleton,
   Input,
   message,
+  Spin,
 } from 'antd';
 import Icon, {
   ArrowLeftOutlined,
   ArrowRightOutlined,
   ExclamationCircleOutlined,
+  LoadingOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -337,8 +339,13 @@ const CronosBridge = props => {
     setBridgeConfirmationList(
       listDataSource.concat({
         title: '',
-        description: <></>,
-        loading: true,
+        description: (
+          <>
+            {t('bridge.pendingTransferTimeout.description')}
+            <Spin indicator={<LoadingOutlined style={{ fontSize: 12 }} spin />} />
+          </>
+        ),
+        loading: false,
       }),
     );
 
