@@ -142,6 +142,7 @@ export class NodeRpcService implements INodeRpcService {
     let totalSumFinal = 0;
     const delegationTransactionListFinal: Array<StakingTransactionData> = [];
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
 
       // Fetch paginated data
@@ -281,6 +282,7 @@ export class NodeRpcService implements INodeRpcService {
     let paginationKey: PaginationNextKey = null;
     let totalSumFinal = 0;
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
 
       // eslint-disable-next-line no-await-in-loop
