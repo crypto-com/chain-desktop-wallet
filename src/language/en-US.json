@@ -374,6 +374,7 @@
   "bridge.transferInitiated.description": "Check your wallet for the funds. It may take up to a few minutes depending on network congestion.",
   "bridge.pendingTransfer.title": "{{amount}} {{symbol}} is pending to transfer",
   "bridge.pendingTransfer.ledger.description": "Please open {{app}} in your Ledger device and sign your transaction.",
+  "bridge.pendingTransferTimeout.description": "It may take up to a few minutes depending on network congestion.",
   "bridge.ledgerSign.failed.title": "Failed to broadcast a signed transaction on Ledger",
   "bridge.transactionHistory.title": "Bridge Transfer History",
   "bridge.transactionHistory.description": "Below is your latest transaction history of bridge transfers",
