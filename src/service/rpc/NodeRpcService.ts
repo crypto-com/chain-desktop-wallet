@@ -84,12 +84,17 @@ export class NodeRpcService implements INodeRpcService {
   }
 
   public async loadAccountBalance(address: string, assetDenom: string): Promise<string> {
-
-    const response = await this.cosmosClient.get<BalanceResponse>(
-      `/cosmos/bank/v1beta1/balances/${address}/${assetDenom}`,
-    );
-    const balanceData = response?.data;
-    return balanceData?.balance?.amount ?? '0';
+    try {
+      const response = await this.cosmosClient.get<BalanceResponse>(
+        `/cosmos/bank/v1beta1/balances/${address}/${assetDenom}`,
+      );
+      const balanceData = response?.data;
+      return balanceData?.balance?.amount ?? '0';
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.log(`[${NodeRpcService.name}-loadAccountBalance] [Error] Unable to fetch data.`, error.response || error);
+      return '0';
+    }
   }
 
   public async loadSequenceNumber(address: string): Promise<number> {
