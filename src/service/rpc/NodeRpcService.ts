@@ -19,6 +19,8 @@ import {
   ValidatorPubKey,
   ValidatorSetResponse,
   ErrorRpcResponse,
+  UnbondingDelegationResponse,
+  DelegationResponse,
 } from './NodeRpcModels';
 import {
   BroadCastResult,
@@ -32,7 +34,6 @@ import {
 } from '../../models/Transaction';
 import { Session } from '../../models/Session';
 import { AssetCreationType, UserAsset, UserAssetType } from '../../models/UserAsset';
-import { UnbondingDelegationResponse, DelegationResponse } from './NodeRpcModels';
 
 export interface INodeRpcService {
   loadAccountBalance(address: string, assetDenom: string): Promise<string>;
@@ -276,7 +277,7 @@ export class NodeRpcService implements INodeRpcService {
 
   public async fetchUnbondingDelegationBalance(address: string) {
 
-    let unbondingDelegationDataList: UnbondingDelegationData[] = [];
+    const unbondingDelegationDataList: UnbondingDelegationData[] = [];
     let paginationKey: PaginationNextKey = null;
     let totalSumFinal = 0;
 
