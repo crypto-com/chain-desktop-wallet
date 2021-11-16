@@ -68,6 +68,12 @@ export interface UnbondingDelegationResult {
   pagination: Pagination;
 }
 
+export interface ErrorRpcResponse {
+  code: number,
+  message: string,
+  details: any[]
+};
+
 // Transfers models
 export interface TransferData {
   name: string;
