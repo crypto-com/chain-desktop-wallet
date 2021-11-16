@@ -91,7 +91,7 @@ export class NodeRpcService implements INodeRpcService {
       );
       const balanceData = response?.data;
       return balanceData?.balance?.amount ?? '0';
-    } catch (error) {
+    } catch (error: any) {
       // eslint-disable-next-line no-console
       console.log(`[${NodeRpcService.name}-loadAccountBalance] [Error] Unable to fetch data.`, error.response || error);
       return '0';
