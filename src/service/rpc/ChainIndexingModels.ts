@@ -190,6 +190,10 @@ export interface ValidatorListResponse {
     pagination: Pagination;
 }
 
+export interface ValidatorResponse {
+    result:     ValidatorInfo;
+}
+
 export interface ValidatorInfo {
     operatorAddress:           string;
     consensusNodeAddress:      string;

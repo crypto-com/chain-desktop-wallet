@@ -342,6 +342,7 @@
   "bridge.form.fee": "費用：",
   "bridge.form.destination": "目標地址：",
   "bridge.form.toAddress": "收款人地址：",
+  "bridge.form.customAddress.message": "我想轉移至另一自定收款人地址",
   "bridge.form.transfer": "轉移資產",
   "bridge.form.receiving": "將會收到",
   "bridge.form.disclaimer": "我同意條款及細則。",
@@ -373,6 +374,7 @@
   "bridge.transferInitiated.description": "請查看錢包資產。在網絡擁堵的情況下，可能最多需要數分鐘完成交易。",
   "bridge.pendingTransfer.title": "{{amount}} {{symbol}} 正等待發送",
   "bridge.pendingTransfer.ledger.description": "請在Ledger錢包上打開 {{app}} 以簽名交易",
+  "bridge.pendingTransferTimeout.description": "在網絡擁堵的情況下，可能最多需要數分鐘完成交易。",
   "bridge.ledgerSign.failed.title": "未能成功廣播Ledger的簽名交易",
   "bridge.transactionHistory.title": "跨鏈橋交易記錄",
   "bridge.transactionHistory.description": "以下是你最近的跨鏈橋交易記錄",
@@ -607,6 +609,6 @@
   "settings.addressBook.removeAddress": "刪除地址",
   "settings.addressBook.removeConfirm": "確定要刪除此地址嗎？",
   "settings.addressBook.addNewAddress": "添加新地址",
-  "settings.addressBook.title": "地址本",
+  "settings.addressBook.title": "地址簿",
   "settings.addressBook.address": "地址"
 }

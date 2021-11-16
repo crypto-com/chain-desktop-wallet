@@ -14,6 +14,7 @@ import {
   accountMsgList,
   ValidatorListResponse,
   AccountInfoResponse,
+  ValidatorResponse,
 } from './ChainIndexingModels';
 import {
   NftQueryParams,
@@ -295,7 +296,25 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     return listedValidatorInfo;
   }
 
-  private async getValidatorsAverageApy(validatorAddrList: string[]) {
+  public async getValidatorsDetail(validatorAddrList: string[]) {
+    const validatorList = await this.axiosClient.get<ValidatorListResponse>(
+      `validators?limit=1000000`,
+    );
+
+    if (validatorList.data.pagination.total_page > 1) {
+      throw new Error('Validator list is very big. Aborting.');
+    }
+
+    // Check if returned list is empty
+    if (validatorList.data.result.length < 1) {
+      return [];
+    }
+    return validatorList.data.result.filter(validatorInfo =>
+      validatorAddrList.includes(validatorInfo.operatorAddress),
+    );
+  }
+
+  public async getValidatorsAverageApy(validatorAddrList: string[]) {
     const validatorList = await this.axiosClient.get<ValidatorListResponse>(
       `validators?limit=1000000`,
     );
@@ -320,6 +339,23 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
     // Listed ValidatorInfo
     return apySum.div(listedValidatorInfo.length || 1).toString();
+  }
+
+  // NOTE: getting validator by address doesn't have `apy` property
+  public async getValidatorUptimeByAddress(validatorAddr: string) {
+    const validatorInfo = await this.axiosClient.get<ValidatorResponse>(
+      `validators/${validatorAddr}`,
+    );
+
+    if (!validatorInfo.data.result) {
+      throw new Error('Validator details not found.');
+    }
+
+    if (validatorInfo.data.result && !validatorInfo.data.result.impreciseUpTime) {
+      return '0';
+    }
+
+    return validatorInfo.data.result.impreciseUpTime;
   }
 
   /**
