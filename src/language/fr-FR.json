@@ -36,6 +36,8 @@
   "general.sessionLockModal.error": "Le mot de passe saisi est incorrect. Réessayer encore",
   "general.sessionLockModal.success": "Portefeuille décryption réussi!",
   "general.sessionLockModal.okButton": "Décrypter le portefeuille",
+  "general.sessionLockModal.notification.message1": "앱 잠김",
+  "general.sessionLockModal.notification.description1": "앱이 곧 잠깁니다.",
   "general.successModalPopup.title": "Réussite!",
   "general.successModalPopup.nodeConnect.description": "Votre node est connecté!",
   "general.successModalPopup.createWallet.button": "Créer un portefeuille",

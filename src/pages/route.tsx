@@ -214,7 +214,7 @@ function RouteHub() {
           <Switch>
             {routeHomeLayoutItems.map(item => {
               return (
-                <Route path={item.path} key={item.path}>
+                <Route exact path={item.path} key={item.path}>
                   {item.component}
                 </Route>
               );

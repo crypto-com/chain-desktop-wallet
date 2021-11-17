@@ -33,7 +33,6 @@ import {
   BridgeTransferDirection,
 } from '../service/bridge/BridgeConfig';
 import { BridgeTransactionHistoryList } from '../service/bridge/contracts/BridgeModels';
-import { AddressBookContactModel } from '../models/AddressBook';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -353,10 +352,7 @@ export class StorageService {
       return Promise.resolve();
     }
     await this.db.transferStore.remove(
-      {
-        walletId: transferTransactionList.walletId,
-        assetId: transferTransactionList.assetId,
-      },
+      { walletId: transferTransactionList.walletId, assetId: transferTransactionList.assetId },
       { multi: true },
     );
     return this.db.transferStore.insert<TransferTransactionList>(transferTransactionList);
@@ -438,10 +434,7 @@ export class StorageService {
   }
 
   public async retrieveNFTTransferHistory(walletId: string, nftQuery: NftQueryParams) {
-    return this.db.nftTransferHistoryStore.findOne<NftTransactionHistory>({
-      walletId,
-      nftQuery,
-    });
+    return this.db.nftTransferHistoryStore.findOne<NftTransactionHistory>({ walletId, nftQuery });
   }
 
   public async saveBridgeTransactions(bridgeTransactions: BridgeTransactionHistoryList) {
@@ -456,80 +449,6 @@ export class StorageService {
   }
 
   public async retrieveAllBridgeTransactions(walletId: string) {
-    return this.db.bridgeTransactionStore.findOne<BridgeTransactionHistoryList>({
-      walletId,
-    });
-  }
-
-  // MARK: address book
-
-  public async retrieveAllAddressBookContacts(walletId: string) {
-    return this.db.addressBookStore.find<AddressBookContactModel>({ walletId });
-  }
-
-  public async retrieveAddressBookContacts(
-    walletId: string,
-    chainName: string,
-    assetSymbol: string,
-  ) {
-    return this.db.addressBookStore
-      .find<AddressBookContactModel>({
-        walletId,
-        chainName,
-        assetSymbol,
-      })
-      .exec();
-  }
-
-  public async queryAddressBookContactCount(
-    walletId: string,
-    chainName: string,
-    assetSymbol: string,
-  ) {
-    return this.db.addressBookStore.count({ walletId, assetSymbol, chainName });
-  }
-
-  public async queryAddressBookContact(
-    walletId: string,
-    chainName: string,
-    assetSymbol: string,
-    address: string,
-  ) {
-    return this.db.addressBookStore.findOne<AddressBookContactModel>({
-      walletId,
-      chainName,
-      assetSymbol,
-      address,
-    });
-  }
-
-  public async insertAddressBookContact(contact: AddressBookContactModel) {
-    return this.db.addressBookStore.insert({
-      ...contact,
-    });
-  }
-
-  public async updateAddressBookContact(
-    _id: string,
-    chainName: string,
-    assetSymbol: string,
-    label: string,
-    address: string,
-  ) {
-    return this.db.addressBookStore.update(
-      { _id },
-      {
-        $set: {
-          chainName,
-          assetSymbol,
-          label,
-          address,
-        },
-      },
-    );
-  }
-
-  public async removeAddressBookContact(_id: string) {
-    return this.db.addressBookStore.remove({ _id }, {});
+    return this.db.bridgeTransactionStore.findOne<BridgeTransactionHistoryList>({ walletId });
   }
 }

@@ -3,7 +3,6 @@ import { CosmosMsg } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/ms
 import Long from 'long';
 import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
 import {
-  DEFAULT_IBC_TRANSFER_TIMEOUT,
   FIXED_DEFAULT_FEE,
   FIXED_DEFAULT_GAS_LIMIT,
   WalletConfig,
@@ -241,7 +240,7 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction);
 
     const millisToNanoSecond = 1_000_000;
-    const timeout = (Date.now() + DEFAULT_IBC_TRANSFER_TIMEOUT) * millisToNanoSecond;
+    const timeout = (Date.now() + 60_000) * millisToNanoSecond;
 
     const msgSend = new cro.ibc.MsgTransfer({
       sender: transaction.fromAddress,

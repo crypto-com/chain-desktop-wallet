@@ -16,13 +16,11 @@ import {
   Skeleton,
   Input,
   message,
-  Spin,
 } from 'antd';
 import Icon, {
   ArrowLeftOutlined,
   ArrowRightOutlined,
   ExclamationCircleOutlined,
-  LoadingOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -119,8 +117,6 @@ const CronosBridge = props => {
     bridgeTo: '',
     tendermintAddress: '',
     evmAddress: '',
-    toAddress: '',
-    isCustomToAddress: false,
   });
   const [bridgeConfigForm] = Form.useForm();
   const [isBridgeValid, setIsBridgeValid] = useState(false);
@@ -130,7 +126,7 @@ const CronosBridge = props => {
   const [toAsset, setToAsset] = useState<UserAsset | undefined>();
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
-  const [toDestinationAddress, setToDestinationAddress] = useState('');
+  const [toAddress, setToAddress] = useState('');
   const [bridgeTransferDirection, setBridgeTransferDirection] = useState<BridgeTransferDirection>(
     BridgeTransferDirection.NOT_SUPPORT,
   );
@@ -138,8 +134,6 @@ const CronosBridge = props => {
     bridgeTransferDirection: BridgeTransferDirection.NOT_SUPPORT,
     tendermintAddress: '',
     evmAddress: '',
-    toAddress: '',
-    isCustomToAddress: false,
     originAsset: currentAsset!,
     amount: '0',
     decryptedPhrase: '',
@@ -194,7 +188,7 @@ const CronosBridge = props => {
   };
 
   const onWalletDecryptFinish = async (password: string) => {
-    const { tendermintAddress, evmAddress, toAddress, isCustomToAddress } = formValues;
+    const { tendermintAddress, evmAddress } = formValues;
     let { amount } = formValues;
     amount = fromScientificNotation(amount).toString();
 
@@ -212,8 +206,6 @@ const CronosBridge = props => {
       bridgeTransferDirection,
       tendermintAddress,
       evmAddress,
-      toAddress,
-      isCustomToAddress,
       amount,
       originAsset: currentAsset!,
       decryptedPhrase: phraseDecrypted,
@@ -245,8 +237,7 @@ const CronosBridge = props => {
     });
 
     if (decryptedPhrase || session.wallet.walletType === LEDGER_WALLET_TYPE) {
-      const { tendermintAddress, evmAddress, toAddress, isCustomToAddress } = formValues;
-      // const { isCustomToAddress } = form.getFieldsValue();
+      const { tendermintAddress, evmAddress } = formValues;
       let amount = form.getFieldValue('amount');
       amount = fromScientificNotation(amount).toString();
 
@@ -254,8 +245,6 @@ const CronosBridge = props => {
         bridgeTransferDirection,
         tendermintAddress,
         evmAddress,
-        toAddress,
-        isCustomToAddress,
         amount,
         originAsset: currentAsset!,
         decryptedPhrase,
@@ -339,18 +328,14 @@ const CronosBridge = props => {
     setBridgeConfirmationList(
       listDataSource.concat({
         title: '',
-        description: (
-          <>
-            {t('bridge.pendingTransferTimeout.description')}
-            <Spin indicator={<LoadingOutlined style={{ fontSize: 12 }} spin />} />
-          </>
-        ),
-        loading: false,
+        description: <></>,
+        loading: true,
       }),
     );
 
     try {
       setCurrentStep(2);
+
       sendResult = await walletService.sendBridgeTransaction(bridgeTransferRequest);
       setBroadcastResult(sendResult);
       listDataSource.push({
@@ -557,8 +542,8 @@ const CronosBridge = props => {
               setCurrentAssetIdentifier={setCurrentAssetIdentifier}
               setCurrentStep={setCurrentStep}
               showPasswordInput={showPasswordInput}
-              toAddress={toDestinationAddress}
-              setToAddress={setToDestinationAddress}
+              toAddress={toAddress}
+              setToAddress={setToAddress}
               bridgeTransferDirection={bridgeTransferDirection}
               setBridgeTransferDirection={setBridgeTransferDirection}
               bridgeConfigs={bridgeConfigs}
@@ -633,7 +618,7 @@ const CronosBridge = props => {
                     <div>{t('bridge.form.destination')}</div>
                     <div className="asset-icon">
                       {bridgeIcon(form.getFieldValue('bridgeTo'))}
-                      {middleEllipsis(toDestinationAddress, 6)}
+                      {middleEllipsis(toAddress, 6)}
                     </div>
                   </div>
                 </div>

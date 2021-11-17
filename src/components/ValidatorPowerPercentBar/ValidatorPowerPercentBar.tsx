@@ -17,7 +17,7 @@ const ValidatorPowerPercentBar: React.FC<ValidatorPowerPercentBarProps> = props 
         <span style={{ display: 'inline-block', marginRight: '8px' }}>{sub}%</span>
         <Progress
           percent={percentIncludeCurrent}
-          success={{ percent: percentExcludeCurrent }}
+          successPercent={percentExcludeCurrent}
           showInfo={false}
           className="validator-power-percent-bar"
         />

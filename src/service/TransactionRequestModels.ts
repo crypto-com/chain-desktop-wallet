@@ -90,8 +90,7 @@ export interface BridgeTransferRequest {
   bridgeTransferDirection: BridgeTransferDirection;
   tendermintAddress: string;
   evmAddress: string;
-  toAddress: string;
-  isCustomToAddress: boolean;
+
   originAsset: UserAsset;
 
   amount: string;

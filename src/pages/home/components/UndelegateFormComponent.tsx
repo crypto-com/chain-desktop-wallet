@@ -20,10 +20,7 @@ export const UndelegateFormComponent = (props: {
     t('general.undelegateFormComponent.maxValidator.error'),
   );
 
-  const undelegatePeriod =
-    props.currentSession.wallet.config.name === 'MAINNET'
-      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET
-      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
+  const undelegatePeriod = props.currentSession.wallet.config.name === 'MAINNET' ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
 
   return (
     <>

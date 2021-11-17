@@ -40,7 +40,6 @@ import {
   isIbcVisibleState,
   navbarMenuSelectedKeyState,
   isBridgeTransferingState,
-  NavbarMenuKey,
 } from '../../recoil/atom';
 import { ellipsis } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
@@ -89,7 +88,7 @@ interface HomeLayoutProps {
 
 const { Sider } = Layout;
 
-const allPaths: NavbarMenuKey[] = [
+const allPaths = [
   '/home',
   '/staking',
   // '/send',
@@ -471,7 +470,7 @@ function HomeLayout(props: HomeLayoutProps) {
     }, 5_000);
   };
 
-  const conditionalLink = (to: NavbarMenuKey, label: string) => {
+  const conditionalLink = (to: string, label: string) => {
     const conditionalLinkNotificationKey = 'conditionalLinkNotificationKey';
 
     const conditionalLinkBtn = (
@@ -574,8 +573,8 @@ function HomeLayout(props: HomeLayoutProps) {
     if (!didMountRef.current) {
       fetchDB();
 
-      if (allPaths.includes(currentLocationPath as NavbarMenuKey)) {
-        setNavbarMenuSelectedKey(currentLocationPath as NavbarMenuKey);
+      if (allPaths.includes(currentLocationPath)) {
+        setNavbarMenuSelectedKey(currentLocationPath);
       }
 
       didMountRef.current = true;
@@ -623,7 +622,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   const HomeMenu = () => {
     let menuSelectedKey = currentLocationPath;
-    if (!allPaths.includes(menuSelectedKey as NavbarMenuKey)) {
+    if (!allPaths.includes(menuSelectedKey)) {
       menuSelectedKey = '/home';
     }
 
@@ -636,7 +635,7 @@ function HomeLayout(props: HomeLayoutProps) {
         onClick={item => {
           setMenuToBeSelectedKey(item.key);
           if (!isBridgeTransfering) {
-            setNavbarMenuSelectedKey(item.key as NavbarMenuKey);
+            setNavbarMenuSelectedKey(item.key);
           }
         }}
       >
@@ -826,7 +825,7 @@ function HomeLayout(props: HomeLayoutProps) {
       <Layout>
         <Sider className="home-sider">
           <div className="logo" />
-          <div className="version">CHAIN DESKTOP WALLET v{buildVersion}</div>
+          <div className="version">SAMPLE WALLET v{buildVersion}</div>
           <HomeMenu />
           <Button
             className="bottom-icon"

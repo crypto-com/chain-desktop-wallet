@@ -17,10 +17,8 @@ const nockHeaders = {
 
 /* eslint-enable @typescript-eslint/no-unused-vars,class-methods-use-this */
 
-const TestNetRPCURL = 'https://cronos-testnet-3.crypto.org:8545/';
-
 describe('Testing EVMClient', () => {
-  const nockScope = nock(TestNetRPCURL)
+  const nockScope = nock('https://cronos-testnet-3.crypto.org:8545')
     .defaultReplyHeaders(nockHeaders)
     .filteringPath(() => {
       return '/';
@@ -33,7 +31,7 @@ describe('Testing EVMClient', () => {
       jsonrpc: '2.0',
       result: '',
     });
-    const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
+    const evmRpcClient: IEvmRpc = EVMClient.create('https://cronos-testnet-3.crypto.org:8545');
 
     const isNodeSyncing: boolean = await evmRpcClient.isNodeSyncing();
     expect(isNodeSyncing).to.not.be.true;
@@ -57,7 +55,7 @@ describe('Testing EVMClient', () => {
       jsonrpc: '2.0',
       result: '0x1',
     });
-    const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
+    const evmRpcClient: IEvmRpc = EVMClient.create('https://cronos-testnet-3.crypto.org:8545');
     const nonce = await evmRpcClient.getNextNonceByAddress(
       '0x0000000000000000000000000000000000000007',
     );
@@ -78,7 +76,7 @@ describe('Testing EVMClient', () => {
       jsonrpc: '2.0',
       result: '0x0234c8a3397aab58',
     });
-    const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
+    const evmRpcClient: IEvmRpc = EVMClient.create('https://cronos-testnet-3.crypto.org:8545');
     const nativeBalance = await evmRpcClient.getNativeBalanceByAddress(
       '0x0000000000000000000000000000000000000007',
     );
@@ -99,7 +97,7 @@ describe('Testing EVMClient', () => {
       jsonrpc: '2.0',
       result: '0xfa',
     });
-    const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
+    const evmRpcClient: IEvmRpc = EVMClient.create('https://cronos-testnet-3.crypto.org:8545');
     const nativeBalance = await evmRpcClient.getChainId();
     expect(nativeBalance).to.eq(250);
   });
@@ -120,7 +118,7 @@ describe('Testing EVMClient', () => {
         logs: [],
       },
     });
-    const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
+    const evmRpcClient: IEvmRpc = EVMClient.create('https://cronos-testnet-3.crypto.org:8545');
     const txReceipt = await evmRpcClient.getTransactionReceiptByHash('hash');
     expect(txReceipt).to.deep.eq({
       blockHash: '0xef95f2f1ed3ca60b048b4bf67cde2195961e0bba6f70bcbea9a2c4e133e34b46',
@@ -140,7 +138,7 @@ describe('Testing EVMClient', () => {
       jsonrpc: '2.0',
       result: '0x1234',
     });
-    const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
+    const evmRpcClient: IEvmRpc = EVMClient.create('https://cronos-testnet-3.crypto.org:8545');
     const latestBlockHeight = await evmRpcClient.getLatestBlockHeight();
     expect(latestBlockHeight).to.eq(4660);
   });
@@ -168,7 +166,7 @@ describe('Testing EVMClient', () => {
       },
     });
 
-    const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
+    const evmRpcClient: IEvmRpc = EVMClient.create('https://cronos-testnet-3.crypto.org:8545');
     const broadcastedTxHash = await evmRpcClient.broadcastRawTransactionHex(
       '0xf889808609184e72a00082271094000000000000000000000000000000000000000080a47f74657374320000000000000000000000000000000000000000000000000000006000571ca08a8bbf888cfa37bbf0bb965423625641fc956967b81d12e23709cead01446075a01ce999b56a8a88504be365442ea61239198e23d1fce7d00fcfc5cd3b44b7215f',
     );
@@ -206,7 +204,7 @@ describe('Testing EVMClient', () => {
         },
       });
 
-    const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
+    const evmRpcClient: IEvmRpc = EVMClient.create('https://cronos-testnet-3.crypto.org:8545');
     const blockByHash = await evmRpcClient.getBlockByHash(
       '0xef95f2f1ed3ca60b048b4bf67cde2195961e0bba6f70bcbea9a2c4e133e34b46',
     );
@@ -244,7 +242,7 @@ describe('Testing EVMClient', () => {
       jsonrpc: '2.0',
       result: '0x1234fbdc',
     });
-    const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
+    const evmRpcClient: IEvmRpc = EVMClient.create('https://cronos-testnet-3.crypto.org:8545');
     const estimatedGasPrice = await evmRpcClient.getEstimatedGasPrice();
     expect(estimatedGasPrice).to.eq('305462236');
   });
@@ -259,7 +257,7 @@ describe('Testing EVMClient', () => {
       to: '0x11f4d0A3c12e86B4b5F39B213F7E19D048276DAe',
       value: '0x12341234',
     };
-    const evmRpcClient: IEvmRpc = EVMClient.create(TestNetRPCURL);
+    const evmRpcClient: IEvmRpc = EVMClient.create('https://cronos-testnet-3.crypto.org:8545');
     const estimatedGas = await evmRpcClient.estimateGas(txConfig);
     expect(estimatedGas).to.eq(74575);
   });

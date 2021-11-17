@@ -4,23 +4,19 @@ import Big from 'big.js';
 import { Button, FormInstance } from 'antd';
 import { scaledBalance, UserAsset } from '../../models/UserAsset';
 
-interface RowAmountOptionProps {
+interface ValidatorPowerPercentBarProps {
   form: FormInstance;
   walletAsset: UserAsset;
-  setSendingAmount?: (value: string) => void;
   style?;
 }
-const RowAmountOption: React.FC<RowAmountOptionProps> = props => {
-  const { form, walletAsset, setSendingAmount, style } = props;
+const RowAmountOption: React.FC<ValidatorPowerPercentBarProps> = props => {
+  const { form, walletAsset, style } = props;
 
   const onAmountOption = value => {
     const optionAmount = Big(scaledBalance(walletAsset)).times(value);
     form.setFieldsValue({
       amount: Number(optionAmount.toNumber()),
     });
-    if (setSendingAmount) {
-      setSendingAmount(optionAmount.toString());
-    }
   };
 
   return (
