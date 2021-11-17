@@ -1,6 +1,4 @@
 import axios from 'axios';
-import { TransactionConfig } from 'web3-eth';
-import Web3 from 'web3';
 import {
   DisableDefaultMemoSettings,
   DisableGASettings,
@@ -11,45 +9,27 @@ import {
 } from '../models/Wallet';
 import {
   APP_DB_NAMESPACE,
-  DEFAULT_CLIENT_MEMO,
   DefaultWalletConfigs,
   NOT_KNOWN_YET_VALUE,
-  SECONDS_OF_YEAR,
   WalletConfig,
 } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import { Session } from '../models/Session';
-import {
-  DelegateTransactionUnsigned,
-  NFTDenomIssueUnsigned,
-  NFTMintUnsigned,
-  NFTTransferUnsigned,
-  RedelegateTransactionUnsigned,
-  TransferTransactionUnsigned,
-  UndelegateTransactionUnsigned,
-  VoteTransactionUnsigned,
-  WithdrawStakingRewardUnsigned,
-} from './signers/TransactionSupported';
 import { cryptographer } from '../crypto/Cryptographer';
 import { secretStoreService } from '../storage/SecretStoreService';
 import { AssetCreationType, AssetMarketPrice, UserAsset, UserAssetType } from '../models/UserAsset';
-import { croMarketPriceApi } from './rpc/MarketApi';
 import {
   BroadCastResult,
   NftAccountTransactionData,
   NftDenomModel,
   NftModel,
-  NftQueryParams,
-  NftTransferModel,
   ProposalModel,
-  ProposalStatuses,
   RewardsBalances,
   RewardTransaction,
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
-  TransactionStatus,
   TransferTransactionData,
   TransferTransactionList,
   UnbondingDelegationData,
@@ -57,8 +37,7 @@ import {
   ValidatorModel,
 } from '../models/Transaction';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
-import { getBaseScaledAmount } from '../utils/NumberUtils';
-import { createLedgerDevice, LEDGER_WALLET_TYPE } from './LedgerService';
+import { LEDGER_WALLET_TYPE } from './LedgerService';
 import {
   BridgeTransferRequest,
   DelegationRequest,
@@ -72,14 +51,13 @@ import {
   WithdrawStakingRewardRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
-import { capitalizeFirstLetter, sleep } from '../utils/utils';
+import { capitalizeFirstLetter } from '../utils/utils';
 import { WalletBuiltResult, WalletOps } from './WalletOps';
-import { CronosClient } from './cronos/CronosClient';
-import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
-import { BridgeService } from './bridge/BridgeService';
 import { StorageService } from '../storage/StorageService';
 import { TransactionPrepareService } from './TransactionPrepareService';
+import { TransactionHistoryService } from './TransactionHistoryService';
+import { TransactionSenderService } from './TransactionSenderService';
 
 class WalletService {
   public readonly BROADCAST_TIMEOUT_CODE = -32603;
@@ -88,512 +66,73 @@ class WalletService {
 
   public readonly transactionPrepareService: TransactionPrepareService;
 
+  private readonly txHistoryManager: TransactionHistoryService;
+
+  private readonly txSenderManager: TransactionSenderService;
+
   constructor() {
     this.storageService = new StorageService(APP_DB_NAMESPACE);
     this.transactionPrepareService = new TransactionPrepareService(this.storageService);
+    this.txHistoryManager = new TransactionHistoryService(this.storageService);
+    this.txSenderManager = new TransactionSenderService(
+      this.storageService,
+      this.transactionPrepareService,
+      this.txHistoryManager,
+    );
   }
 
   public async sendBridgeTransaction(bridgeTransferRequest: BridgeTransferRequest) {
-    const currentSession = await this.storageService.retrieveCurrentSession();
-
-    const bridgeService = new BridgeService(this.storageService);
-
-    const bridgeTransactionResult = await bridgeService.handleBridgeTransaction(
-      bridgeTransferRequest,
-    );
-
-    await Promise.all([
-      await this.fetchAndUpdateBalances(currentSession),
-      await this.fetchAndSaveTransfers(currentSession),
-    ]);
-
-    return bridgeTransactionResult;
+    return await this.txSenderManager.sendBridgeTransaction(bridgeTransferRequest);
   }
 
   public async sendTransfer(transferRequest: TransferRequest): Promise<BroadCastResult> {
-    // eslint-disable-next-line no-console
-    console.log('TRANSFER_ASSET', transferRequest.asset);
-
-    const currentAsset = transferRequest.asset;
-    const scaledBaseAmount = getBaseScaledAmount(transferRequest.amount, currentAsset);
-
-    const currentSession = await this.storageService.retrieveCurrentSession();
-    const fromAddress = currentSession.wallet.address;
-    const walletAddressIndex = currentSession.wallet.addressIndex;
-    if (!transferRequest.memo && !currentSession.wallet.config.disableDefaultClientMemo) {
-      transferRequest.memo = DEFAULT_CLIENT_MEMO;
-    }
-
-    switch (currentAsset.assetType) {
-      case UserAssetType.EVM:
-        try {
-          if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
-            throw TypeError(`Missing asset config: ${currentAsset.config}`);
-          }
-
-          const cronosClient = new CronosClient(
-            currentAsset.config?.nodeUrl,
-            currentAsset.config?.indexingUrl,
-          );
-
-          const transfer: TransferTransactionUnsigned = {
-            fromAddress,
-            toAddress: transferRequest.toAddress,
-            amount: String(scaledBaseAmount),
-            memo: transferRequest.memo,
-            accountNumber: 0,
-            accountSequence: 0,
-            asset: currentAsset,
-          };
-
-          const web3 = new Web3('');
-          const txConfig: TransactionConfig = {
-            from: currentAsset.address,
-            to: transferRequest.toAddress,
-            value: web3.utils.toWei(transferRequest.amount, 'ether'),
-          };
-
-          const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
-            currentAsset,
-            txConfig,
-          );
-
-          transfer.nonce = prepareTxInfo.nonce;
-          transfer.gasPrice = prepareTxInfo.loadedGasPrice;
-          transfer.gasLimit = prepareTxInfo.gasLimit;
-
-          const isMemoProvided = transferRequest.memo && transferRequest.memo.length > 0;
-          // If transaction is provided with memo, add a little bit more gas to it to be accepted. 10% more
-          transfer.gasLimit = isMemoProvided
-            ? Number(transfer.gasLimit) + Number(transfer.gasLimit) * (10 / 100)
-            : transfer.gasLimit;
-
-          let signedTx = '';
-          if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-            const device = createLedgerDevice();
-
-            const gasLimitTx = web3.utils.toBN(transfer.gasLimit!);
-            const gasPriceTx = web3.utils.toBN(transfer.gasPrice);
-
-            signedTx = await device.signEthTx(
-              walletAddressIndex,
-              Number(transfer.asset?.config?.chainId), // chainid
-              transfer.nonce,
-              web3.utils.toHex(gasLimitTx) /* gas limit */,
-              web3.utils.toHex(gasPriceTx) /* gas price */,
-              transfer.toAddress,
-              web3.utils.toHex(transfer.amount),
-              `0x${Buffer.from(transfer.memo).toString('hex')}`,
-            );
-          } else {
-            signedTx = await evmTransactionSigner.signTransfer(
-              transfer,
-              transferRequest.decryptedPhrase,
-            );
-          }
-
-          const result = await cronosClient.broadcastRawTransactionHex(signedTx);
-          return {
-            transactionHash: result,
-            message: '',
-            code: 200,
-          };
-        } catch (e) {
-          // eslint-disable-next-line no-console
-          console.log(`ERROR_TRANSFERRING - ${currentAsset.assetType}`, e);
-          throw TypeError(e);
-        }
-
-      case UserAssetType.TENDERMINT:
-      case UserAssetType.IBC:
-      case undefined: {
-        const {
-          nodeRpc,
-          accountNumber,
-          accountSequence,
-          transactionSigner,
-          ledgerTransactionSigner,
-        } = await this.transactionPrepareService.prepareTransaction();
-
-        const transfer: TransferTransactionUnsigned = {
-          fromAddress,
-          toAddress: transferRequest.toAddress,
-          amount: String(scaledBaseAmount),
-          memo: transferRequest.memo,
-          accountNumber,
-          accountSequence,
-          asset: currentAsset,
-        };
-
-        let signedTxHex: string = '';
-
-        if (transferRequest.walletType === LEDGER_WALLET_TYPE) {
-          signedTxHex = await ledgerTransactionSigner.signTransfer(
-            transfer,
-            transferRequest.decryptedPhrase,
-          );
-        } else {
-          signedTxHex = await transactionSigner.signTransfer(
-            transfer,
-            transferRequest.decryptedPhrase,
-          );
-        }
-
-        const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-
-        await Promise.all([
-          await this.fetchAndUpdateBalances(currentSession),
-          await this.fetchAndSaveTransfers(currentSession),
-        ]);
-
-        return broadCastResult;
-      }
-
-      default:
-        return {};
-    }
+    return await this.txSenderManager.sendTransfer(transferRequest);
   }
 
   public async sendDelegateTransaction(
     delegationRequest: DelegationRequest,
   ): Promise<BroadCastResult> {
-    const {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    } = await this.transactionPrepareService.prepareTransaction();
-
-    const delegationAmountScaled = getBaseScaledAmount(
-      delegationRequest.amount,
-      delegationRequest.asset,
-    );
-
-    let { memo } = delegationRequest;
-    if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
-      memo = DEFAULT_CLIENT_MEMO;
-    }
-
-    const delegateTransaction: DelegateTransactionUnsigned = {
-      delegatorAddress: currentSession.wallet.address,
-      validatorAddress: delegationRequest.validatorAddress,
-      amount: String(delegationAmountScaled),
-      memo,
-      accountNumber,
-      accountSequence,
-    };
-
-    let signedTxHex: string;
-    if (delegationRequest.walletType === LEDGER_WALLET_TYPE) {
-      signedTxHex = await ledgerTransactionSigner.signDelegateTx(
-        delegateTransaction,
-        delegationRequest.decryptedPhrase,
-      );
-    } else {
-      signedTxHex = await transactionSigner.signDelegateTx(
-        delegateTransaction,
-        delegationRequest.decryptedPhrase,
-      );
-    }
-
-    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await Promise.all([
-      await this.fetchAndUpdateBalances(currentSession),
-      await this.fetchAndSaveDelegations(nodeRpc, currentSession),
-    ]);
-
-    return broadCastResult;
+    return await this.txSenderManager.sendDelegateTransaction(delegationRequest);
   }
 
   public async sendUnDelegateTransaction(
     undelegationRequest: UndelegationRequest,
   ): Promise<BroadCastResult> {
-    const {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    } = await this.transactionPrepareService.prepareTransaction();
-
-    const undelegationAmountScaled = getBaseScaledAmount(
-      undelegationRequest.amount,
-      undelegationRequest.asset,
-    );
-
-    let { memo } = undelegationRequest;
-    if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
-      memo = DEFAULT_CLIENT_MEMO;
-    }
-
-    const undelegateTransaction: UndelegateTransactionUnsigned = {
-      delegatorAddress: currentSession.wallet.address,
-      validatorAddress: undelegationRequest.validatorAddress,
-      amount: undelegationAmountScaled,
-      memo,
-      accountNumber,
-      accountSequence,
-    };
-
-    let signedTxHex: string;
-    if (undelegationRequest.walletType === LEDGER_WALLET_TYPE) {
-      signedTxHex = await ledgerTransactionSigner.signUndelegateTx(
-        undelegateTransaction,
-        undelegationRequest.decryptedPhrase,
-      );
-    } else {
-      signedTxHex = await transactionSigner.signUndelegateTx(
-        undelegateTransaction,
-        undelegationRequest.decryptedPhrase,
-      );
-    }
-
-    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await Promise.all([
-      await this.fetchAndUpdateBalances(currentSession),
-      await this.fetchAndSaveDelegations(nodeRpc, currentSession),
-      await this.fetchAndSaveUnbondingDelegations(nodeRpc, currentSession),
-    ]);
-
-    return broadCastResult;
+    return await this.txSenderManager.sendUnDelegateTransaction(undelegationRequest);
   }
 
   public async sendReDelegateTransaction(
     redelegationRequest: RedelegationRequest,
   ): Promise<BroadCastResult> {
-    const {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    } = await this.transactionPrepareService.prepareTransaction();
+    return await this.txSenderManager.sendReDelegateTransaction(redelegationRequest);
+  }
 
-    const redelegationAmountScaled = getBaseScaledAmount(
-      redelegationRequest.amount,
-      redelegationRequest.asset,
-    );
-    let { memo } = redelegationRequest;
-    if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
-      memo = DEFAULT_CLIENT_MEMO;
-    }
-
-    const redelegateTransactionUnsigned: RedelegateTransactionUnsigned = {
-      delegatorAddress: currentSession.wallet.address,
-      sourceValidatorAddress: redelegationRequest.validatorSourceAddress,
-      destinationValidatorAddress: redelegationRequest.validatorDestinationAddress,
-      amount: redelegationAmountScaled,
-      memo,
-      accountNumber,
-      accountSequence,
-    };
-
-    let signedTxHex: string;
-    if (redelegationRequest.walletType === LEDGER_WALLET_TYPE) {
-      signedTxHex = await ledgerTransactionSigner.signRedelegateTx(
-        redelegateTransactionUnsigned,
-        redelegationRequest.decryptedPhrase,
-      );
-    } else {
-      signedTxHex = await transactionSigner.signRedelegateTx(
-        redelegateTransactionUnsigned,
-        redelegationRequest.decryptedPhrase,
-      );
-    }
-
-    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await Promise.all([
-      await this.fetchAndUpdateBalances(currentSession),
-      await this.fetchAndSaveDelegations(nodeRpc, currentSession),
-    ]);
-    return broadCastResult;
+  public async sendStakingRewardWithdrawalTx(
+    rewardWithdrawRequest: WithdrawStakingRewardRequest,
+  ): Promise<BroadCastResult> {
+    return await this.txSenderManager.sendStakingRewardWithdrawalTx(rewardWithdrawRequest);
   }
 
   public async sendVote(voteRequest: VoteRequest): Promise<BroadCastResult> {
-    const {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    } = await this.transactionPrepareService.prepareTransaction();
-
-    const voteTransactionUnsigned: VoteTransactionUnsigned = {
-      option: voteRequest.voteOption,
-      voter: currentSession.wallet.address,
-      proposalID: voteRequest.proposalID,
-      memo: voteRequest.memo,
-      accountNumber,
-      accountSequence,
-    };
-
-    let signedTxHex: string = '';
-
-    if (voteRequest.walletType === LEDGER_WALLET_TYPE) {
-      signedTxHex = await ledgerTransactionSigner.signVoteTransaction(
-        voteTransactionUnsigned,
-        voteRequest.decryptedPhrase,
-      );
-    } else {
-      signedTxHex = await transactionSigner.signVoteTransaction(
-        voteTransactionUnsigned,
-        voteRequest.decryptedPhrase,
-      );
-    }
-
-    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.fetchAndSaveProposals(currentSession);
-    return broadCastResult;
+    return await this.txSenderManager.sendVote(voteRequest);
   }
 
   public async sendNFT(nftTransferRequest: NFTTransferRequest): Promise<BroadCastResult> {
-    const {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    } = await this.transactionPrepareService.prepareTransaction();
-
-    const memo = !nftTransferRequest.memo ? DEFAULT_CLIENT_MEMO : nftTransferRequest.memo;
-
-    const nftTransferUnsigned: NFTTransferUnsigned = {
-      tokenId: nftTransferRequest.tokenId,
-      denomId: nftTransferRequest.denomId,
-      sender: nftTransferRequest.sender,
-      recipient: nftTransferRequest.recipient,
-
-      memo,
-      accountNumber,
-      accountSequence,
-    };
-
-    let signedTxHex: string = '';
-
-    if (nftTransferRequest.walletType === LEDGER_WALLET_TYPE) {
-      signedTxHex = await ledgerTransactionSigner.signNFTTransfer(
-        nftTransferUnsigned,
-        nftTransferRequest.decryptedPhrase,
-      );
-    } else {
-      signedTxHex = await transactionSigner.signNFTTransfer(
-        nftTransferUnsigned,
-        nftTransferRequest.decryptedPhrase,
-      );
-    }
-
-    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-
-    // It takes a few seconds for the indexing service to sync latest NFT state
-    await sleep(7_000);
-    await Promise.all([
-      this.fetchAndSaveNFTs(currentSession),
-      this.fetchAndSaveNFTAccountTxs(currentSession),
-    ]);
-    return broadCastResult;
+    return await this.txSenderManager.sendNFT(nftTransferRequest);
   }
 
   public async broadcastMintNFT(nftMintRequest: NFTMintRequest): Promise<BroadCastResult> {
-    const {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    } = await this.transactionPrepareService.prepareTransaction();
-
-    const memo = !nftMintRequest.memo ? DEFAULT_CLIENT_MEMO : nftMintRequest.memo;
-
-    const nftMintUnsigned: NFTMintUnsigned = {
-      data: nftMintRequest.data,
-      name: nftMintRequest.name,
-      uri: nftMintRequest.uri,
-      tokenId: nftMintRequest.tokenId,
-      denomId: nftMintRequest.denomId,
-      sender: nftMintRequest.sender,
-      recipient: nftMintRequest.recipient,
-
-      memo,
-      accountNumber,
-      accountSequence,
-    };
-
-    let signedTxHex: string = '';
-
-    if (nftMintRequest.walletType === LEDGER_WALLET_TYPE) {
-      signedTxHex = await ledgerTransactionSigner.signNFTMint(
-        nftMintUnsigned,
-        nftMintRequest.decryptedPhrase,
-      );
-    } else {
-      signedTxHex = await transactionSigner.signNFTMint(
-        nftMintUnsigned,
-        nftMintRequest.decryptedPhrase,
-      );
-    }
-
-    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-
-    // It takes a few seconds for the indexing service to sync latest NFT state
-    await sleep(5_000);
-    await Promise.all([
-      this.fetchAndSaveNFTs(currentSession),
-      this.fetchAndSaveNFTAccountTxs(currentSession),
-    ]);
-    return broadCastResult;
+    return await this.txSenderManager.sendMintNFT(nftMintRequest);
   }
 
   public async broadcastNFTDenomIssueTx(
     nftDenomIssueRequest: NFTDenomIssueRequest,
   ): Promise<BroadCastResult> {
-    const {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    } = await this.transactionPrepareService.prepareTransaction();
+    return await this.txSenderManager.sendNFTDenomIssueTx(nftDenomIssueRequest);
+  }
 
-    const memo = !nftDenomIssueRequest.memo ? DEFAULT_CLIENT_MEMO : nftDenomIssueRequest.memo;
-
-    const nftDenomIssueUnsigned: NFTDenomIssueUnsigned = {
-      ...nftDenomIssueRequest,
-      memo,
-      accountNumber,
-      accountSequence,
-    };
-
-    let signedTxHex: string = '';
-
-    if (nftDenomIssueRequest.walletType === LEDGER_WALLET_TYPE) {
-      signedTxHex = await ledgerTransactionSigner.signNFTDenomIssue(
-        nftDenomIssueUnsigned,
-        nftDenomIssueRequest.decryptedPhrase,
-      );
-    } else {
-      signedTxHex = await transactionSigner.signNFTDenomIssue(
-        nftDenomIssueUnsigned,
-        nftDenomIssueRequest.decryptedPhrase,
-      );
-    }
-
-    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-
-    // It takes a few seconds for the indexing service to sync latest NFT state
-    await sleep(5_000);
-    await Promise.all([
-      this.fetchAndSaveNFTs(currentSession),
-      this.fetchAndSaveNFTAccountTxs(currentSession),
-    ]);
-    return broadCastResult;
+  public async loadAndSaveAssetPrices(session: Session | null = null) {
+    return await this.txHistoryManager.loadAndSaveAssetPrices(session);
   }
 
   public async syncAll(session: Session | null = null) {
@@ -614,48 +153,6 @@ class WalletService {
       this.fetchAndSaveNFTs(currentSession),
       // this.fetchIBCAssets(currentSession),
     ]);
-  }
-
-  public async sendStakingRewardWithdrawalTx(
-    rewardWithdrawRequest: WithdrawStakingRewardRequest,
-  ): Promise<BroadCastResult> {
-    const {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    } = await this.transactionPrepareService.prepareTransaction();
-
-    const withdrawStakingReward: WithdrawStakingRewardUnsigned = {
-      delegatorAddress: currentSession.wallet.address,
-      validatorAddress: rewardWithdrawRequest.validatorAddress,
-      memo: DEFAULT_CLIENT_MEMO,
-      accountNumber,
-      accountSequence,
-    };
-
-    let signedTxHex: string;
-
-    if (rewardWithdrawRequest.walletType === LEDGER_WALLET_TYPE) {
-      signedTxHex = await ledgerTransactionSigner.signWithdrawStakingRewardTx(
-        withdrawStakingReward,
-        rewardWithdrawRequest.decryptedPhrase,
-      );
-    } else {
-      signedTxHex = await transactionSigner.signWithdrawStakingRewardTx(
-        withdrawStakingReward,
-        rewardWithdrawRequest.decryptedPhrase,
-      );
-    }
-
-    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await Promise.all([
-      await this.fetchAndSaveRewards(nodeRpc, currentSession),
-      await this.fetchAndUpdateBalances(currentSession),
-    ]);
-    return broadCastResult;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -749,100 +246,6 @@ class WalletService {
     return await this.storageService.setSession(session);
   }
 
-  public async fetchAndUpdateBalances(session: Session | null = null) {
-    const currentSession =
-      session == null ? await this.storageService.retrieveCurrentSession() : session;
-    if (!currentSession) {
-      return;
-    }
-
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-
-    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
-
-    if (!assets || assets.length === 0) {
-      return;
-    }
-
-    await Promise.all(
-      assets.map(async asset => {
-        switch (asset.assetType) {
-          case UserAssetType.EVM:
-            if (!asset.config || !asset.address) {
-              // eslint-disable-next-line no-console
-              console.log('NO_ASSET_CONFIG_0R_ADDRESS_FOUND', {
-                config: asset.config,
-                address: asset.address,
-              });
-              asset.balance = '0';
-              await this.storageService.saveAsset(asset);
-              return;
-            }
-            try {
-              const cronosClient = new CronosClient(
-                asset.config?.nodeUrl,
-                asset.config?.indexingUrl,
-              );
-
-              asset.balance = await cronosClient.getNativeBalanceByAddress(asset.address);
-              // eslint-disable-next-line no-console
-              console.log(`${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`);
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
-            } finally {
-              await this.storageService.saveAsset(asset);
-            }
-            break;
-
-          case UserAssetType.TENDERMINT:
-          case UserAssetType.IBC:
-          case undefined:
-            // Handle case for legacy assets that got persisted without a assetType - undefined
-            try {
-              const baseDenomination =
-                asset.assetType !== UserAssetType.IBC
-                  ? currentSession.wallet.config.network.coin.baseDenom
-                  : `ibc/${asset.ibcDenomHash}`;
-              asset.balance = await nodeRpc.loadAccountBalance(
-                // Handling legacy wallets which had wallet.address
-                asset.address || currentSession.wallet.address,
-                baseDenomination,
-              );
-              asset.stakedBalance = await nodeRpc.loadStakingBalance(
-                // Handling legacy wallets which had wallet.address
-                asset.address || currentSession.wallet.address,
-                baseDenomination,
-              );
-              asset.unbondingBalance = await nodeRpc.loadUnbondingBalance(
-                // Handling legacy wallets which had wallet.address
-                asset.address || currentSession.wallet.address,
-              );
-              asset.rewardsBalance = await nodeRpc.loadStakingRewardsBalance(
-                // Handling legacy wallets which had wallet.address
-                asset.address || currentSession.wallet.address,
-                baseDenomination,
-              );
-              // eslint-disable-next-line no-console
-              console.log(
-                `${asset.symbol}: Loaded balances: ${asset.balance} - Staking: ${asset.stakedBalance} - Unbonding: ${asset.unbondingBalance} - Rewards: ${asset.rewardsBalance} - ${asset.address}`,
-              );
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.log('BALANCE_FETCH_ERROR', { asset, e });
-            } finally {
-              await this.storageService.saveAsset(asset);
-            }
-
-            break;
-
-          default:
-            throw TypeError(`Unknown Asset type: ${asset}`);
-        }
-      }),
-    );
-  }
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
   public async fetchIBCAssets(currentSession: Session) {
     // const currentSession: Session = await this.storageService.retrieveCurrentSession()
@@ -881,124 +284,6 @@ class WalletService {
     });
   }
 
-  public async fetchAndUpdateTransactions(session: Session | null = null) {
-    const currentSession: Session =
-      session == null ? await this.storageService.retrieveCurrentSession() : session;
-    if (!currentSession) {
-      return;
-    }
-
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-
-    await Promise.all([
-      this.fetchAndSaveDelegations(nodeRpc, currentSession),
-      this.fetchAndSaveUnbondingDelegations(nodeRpc, currentSession),
-      this.fetchAndSaveRewards(nodeRpc, currentSession),
-      this.fetchAndSaveTransfers(currentSession),
-      this.fetchAndSaveValidators(currentSession),
-      this.fetchAndSaveNFTAccountTxs(currentSession),
-    ]);
-  }
-
-  public async fetchAndSaveTransfers(currentSession: Session) {
-    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
-
-    await Promise.all(
-      assets.map(async currentAsset => {
-        const indexingUrl =
-          currentAsset?.config?.indexingUrl || currentSession.wallet.config.indexingUrl;
-
-        switch (currentAsset.assetType) {
-          case UserAssetType.TENDERMINT:
-          case UserAssetType.IBC:
-          case undefined:
-            try {
-              const chainIndexAPI = ChainIndexingAPI.init(indexingUrl);
-              const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
-                currentSession.wallet.config.network.coin.baseDenom,
-                currentAsset?.address || currentSession.wallet.address,
-                currentAsset,
-              );
-
-              await this.saveTransfers({
-                transactions: transferTransactions,
-                walletId: currentSession.wallet.identifier,
-                assetId: currentAsset.identifier,
-              });
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.error('FAILED_TO_LOAD_TRANSFERS', e);
-            }
-
-            break;
-          case UserAssetType.EVM:
-            try {
-              if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
-                return;
-              }
-
-              const cronosClient = new CronosClient(
-                currentAsset.config?.nodeUrl,
-                currentAsset.config?.indexingUrl,
-              );
-
-              const transactions = await cronosClient.getTxsByAddress(currentAsset.address);
-              const loadedTransactions = transactions.result.map(evmTx => {
-                const transactionTime = new Date(Number(evmTx.timeStamp) * 1000).toISOString();
-
-                const transferTx: TransferTransactionData = {
-                  amount: evmTx.value,
-                  assetSymbol: currentAsset.symbol,
-                  date: transactionTime,
-                  hash: evmTx.hash,
-                  memo: '',
-                  receiverAddress: evmTx.to,
-                  senderAddress: evmTx.from,
-                  status:
-                    evmTx.isError === '1' ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
-                };
-
-                return transferTx;
-              });
-
-              // eslint-disable-next-line no-console
-              console.log('Loaded transactions', transactions, loadedTransactions);
-
-              await this.saveTransfers({
-                transactions: loadedTransactions,
-                walletId: currentSession.wallet.identifier,
-                assetId: currentAsset?.identifier,
-              });
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.error(`FAILED_TO_LOAD_TRANSFERS - ${currentAsset.assetType}`, e);
-            }
-
-            break;
-          default:
-            break;
-        }
-      }),
-    );
-  }
-
-  public async fetchAndSaveNFTAccountTxs(currentSession: Session) {
-    try {
-      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-      const nftAccountTransactionList = await chainIndexAPI.fetchAllAccountNFTsTransactions(
-        currentSession.wallet.address,
-      );
-
-      await this.storageService.saveNFTAccountTransactions({
-        transactions: nftAccountTransactionList.result,
-        walletId: currentSession.wallet.identifier,
-      });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('FAILED_TO_LOAD_SAVE_NFT_ACCOUNT_TXs', e);
-    }
-  }
-
   public async getAllNFTAccountTxs(
     currentSession: Session,
   ): Promise<Array<NftAccountTransactionData>> {
@@ -1011,118 +296,20 @@ class WalletService {
     return nftAccountTxs.transactions;
   }
 
-  public async fetchAndSaveRewards(nodeRpc: NodeRpcService, currentSession: Session) {
-    try {
-      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-
-      const rewards = await nodeRpc.fetchStakingRewardsBalance(
-        currentSession.wallet.address,
-        currentSession.wallet.config.network.coin.baseDenom,
-      );
-
-      const claimedRewardsBalance = await chainIndexAPI.getTotalRewardsClaimedByAddress(
-        // Handling legacy wallets which had wallet.address
-        currentSession.wallet.address,
-      );
-
-      const delegatedValidatorList = rewards.transactions.map(tx => {
-        return tx.validatorAddress;
-      });
-
-      const estimatedInfo = await chainIndexAPI.getFutureEstimatedRewardsByValidatorAddressList(
-        delegatedValidatorList,
-        SECONDS_OF_YEAR,
-        currentSession.wallet.address,
-      );
-
-      await this.saveRewards({
-        totalBalance: rewards.totalBalance,
-        transactions: rewards.transactions,
-        claimedRewardsBalance,
-        estimatedRewardsBalance: estimatedInfo.estimatedRewards,
-        estimatedApy: estimatedInfo.estimatedApy,
-        walletId: currentSession.wallet.identifier,
-      });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('FAILED_TO_LOAD_REWARDS', e);
-    }
-  }
-
-  public async fetchAndSaveDelegations(nodeRpc: NodeRpcService, currentSession: Session) {
-    try {
-      const delegations = await nodeRpc.fetchDelegationBalance(
-        currentSession.wallet.address,
-        currentSession.wallet.config.network.coin.baseDenom,
-      );
-      await this.saveDelegationsList({
-        totalBalance: delegations.totalBalance,
-        transactions: delegations.transactions,
-        walletId: currentSession.wallet.identifier,
-      });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('FAILED_TO_LOAD_DELEGATIONS', e);
-    }
-  }
-
-  public async fetchAndSaveUnbondingDelegations(nodeRpc: NodeRpcService, currentSession: Session) {
-    try {
-      const unbondingDelegations = await nodeRpc.fetchUnbondingDelegationBalance(
-        currentSession.wallet.address,
-      );
-      await this.saveUnbondingDelegationsList({
-        totalBalance: unbondingDelegations.totalBalance,
-        delegations: unbondingDelegations.unbondingDelegations,
-        walletId: currentSession.wallet.identifier,
-      });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('FAILED_TO_LOAD_UNBONDING_DELEGATIONS', e);
-    }
-  }
-
   public async fetchAndSaveValidators(currentSession: Session) {
-    try {
-      const validators = await this.getLatestTopValidators();
-      await this.storageService.saveValidators({
-        chainId: currentSession.wallet.config.network.chainId,
-        validators,
-      });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('FAILED_TO_LOAD_VALIDATORS', e);
-    }
-  }
-
-  public async fetchAndSaveProposals(currentSession: Session) {
-    try {
-      const proposals = await this.getLatestProposals();
-      await this.storageService.saveProposals({
-        chainId: currentSession.wallet.config.network.chainId,
-        proposals,
-      });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('FAILED_TO_LOAD_SAVE_PROPOSALS', e);
-    }
+    await this.txHistoryManager.fetchAndSaveValidators(currentSession);
   }
 
   public async fetchAndSaveNFTs(currentSession: Session) {
-    try {
-      const nfts = await this.loadAllCurrentAccountNFTs();
-      if (nfts === null) {
-        return;
-      }
+    await this.txHistoryManager.fetchAndSaveNFTs(currentSession);
+  }
 
-      await this.storageService.saveNFTs({
-        walletId: currentSession.wallet.identifier,
-        nfts,
-      });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('FAILED_TO_LOAD_SAVE_NFTS', e);
-    }
+  public async fetchAndSaveNFTAccountTxs(currentSession: Session) {
+    await this.txHistoryManager.fetchAndSaveNFTAccountTxs(currentSession);
+  }
+
+  public async fetchAndSaveProposals(currentSession: Session) {
+    await this.txHistoryManager.fetchAndSaveProposals(currentSession);
   }
 
   public async retrieveWalletAssets(walletIdentifier: string): Promise<UserAsset[]> {
@@ -1162,30 +349,6 @@ class WalletService {
     return allWalletAssets[0];
   }
 
-  public async loadAndSaveAssetPrices(session: Session | null = null) {
-    const currentSession =
-      session == null ? await this.storageService.retrieveCurrentSession() : session;
-    if (!currentSession) {
-      return;
-    }
-
-    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
-
-    if (!assets || assets.length === 0) {
-      return;
-    }
-
-    await Promise.all(
-      assets.map(async (asset: UserAsset) => {
-        const assetPrice = await croMarketPriceApi.getAssetPrice(
-          asset.mainnetSymbol,
-          currentSession.currency,
-        );
-        await this.storageService.saveAssetMarketPrice(assetPrice);
-      }),
-    );
-  }
-
   public async retrieveAllAssetsPrices(currency: string): Promise<AssetMarketPrice[]> {
     const assetsPrices = [];
     const prices = await this.storageService.retrieveAllAssetsPrices(currency);
@@ -1218,8 +381,8 @@ class WalletService {
     }
     try {
       return await Promise.all([
-        await this.fetchAndUpdateBalances(session),
-        await this.loadAndSaveAssetPrices(session),
+        await this.txHistoryManager.fetchAndUpdateBalances(session),
+        await this.txHistoryManager.loadAndSaveAssetPrices(session),
       ]);
       // eslint-disable-next-line no-empty
     } catch (e) {
@@ -1231,7 +394,7 @@ class WalletService {
 
   public async syncTransactionsData(session: Session | null = null): Promise<void> {
     try {
-      return await this.fetchAndUpdateTransactions(session);
+      return await this.txHistoryManager.fetchAndUpdateTransactions(session);
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('SYNC_ERROR', e);
@@ -1413,88 +576,6 @@ class WalletService {
       return [];
     }
     return nftSet.nfts;
-  }
-
-  private async getLatestTopValidators(): Promise<ValidatorModel[]> {
-    try {
-      const currentSession = await this.storageService.retrieveCurrentSession();
-      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
-        return Promise.resolve([]);
-      }
-      const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-      return nodeRpc.loadTopValidators();
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log('FAILED_LOADING TOP VALIDATORS', e);
-      return [];
-    }
-  }
-
-  private async getLatestProposals(): Promise<ProposalModel[]> {
-    try {
-      const currentSession = await this.storageService.retrieveCurrentSession();
-      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
-        return Promise.resolve([]);
-      }
-      const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-      return nodeRpc.loadProposals([
-        ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD,
-        ProposalStatuses.PROPOSAL_STATUS_PASSED,
-        ProposalStatuses.PROPOSAL_STATUS_FAILED,
-        ProposalStatuses.PROPOSAL_STATUS_REJECTED,
-      ]);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log('FAILED_LOADING PROPOSALS', e);
-      return [];
-    }
-  }
-
-  private async loadAllCurrentAccountNFTs(): Promise<NftModel[] | null> {
-    try {
-      const currentSession = await this.storageService.retrieveCurrentSession();
-      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
-        return Promise.resolve([]);
-      }
-      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-      const nftList = await chainIndexAPI.getAccountNFTList(currentSession.wallet.address);
-      return await chainIndexAPI.getNftListMarketplaceData(nftList);
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log('FAILED_LOADING NFTs', e);
-      return null;
-    }
-  }
-
-  public async loadNFTTransferHistory(nftQuery: NftQueryParams): Promise<NftTransferModel[]> {
-    const currentSession = await this.storageService.retrieveCurrentSession();
-    if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
-      return Promise.resolve([]);
-    }
-
-    try {
-      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-      const nftTransferTransactions = await chainIndexAPI.getNFTTransferHistory(nftQuery);
-
-      await this.storageService.saveNFTTransferHistory({
-        transfers: nftTransferTransactions,
-        walletId: currentSession.wallet.identifier,
-        nftQuery,
-      });
-
-      return nftTransferTransactions;
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log('FAILED_LOADING NFT Transfer history, returning DB data', e);
-      const localTransferHistory = await this.storageService.retrieveNFTTransferHistory(
-        currentSession.wallet.identifier,
-        nftQuery,
-      );
-      if (!localTransferHistory) {
-        return [];
-      }
-      return localTransferHistory.transfers;
-    }
   }
 
   public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {

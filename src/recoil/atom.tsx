@@ -16,6 +16,19 @@ const wallet = new Wallet(
   NORMAL_WALLET_TYPE,
   0, // addressIndex default
 );
+
+export type NavbarMenuKey =
+  | '/home'
+  | '/staking'
+  | '/assets'
+  | '/settings'
+  | '/governance'
+  | '/nft'
+  | '/bridge'
+  | '/wallet'
+  | '/restore'
+  | '/create';
+
 const defaultAsset: UserAsset = {
   identifier: '',
   symbol: 'CRO',
@@ -96,7 +109,7 @@ const isIbcVisibleState = atom<boolean>({
   default: false,
 });
 
-const navbarMenuSelectedKeyState = atom<string>({
+const navbarMenuSelectedKeyState = atom<NavbarMenuKey>({
   key: 'navbarMenuSelectedKey',
   default: '/home',
 });

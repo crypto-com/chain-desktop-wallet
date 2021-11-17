@@ -6,10 +6,22 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.5.5] - 2021-11-17
+
+### Additions
+- Address Book feature
+- Add APY & Uptime field in Validator List
+- Add Custom Destination Address field for Cronos Bridge
+
+### Bug fixes
+- Lengthen Cronos Bridge IBC Transfer timeout from 60 seconds to 10 minutes
+- Fixed incorrect delegation list fetching when no active delegations
+- Fixed typo & UI
+
 ## [v0.5.4] - 2021-11-09
 
 ### Bug fixes
-- Fixed Cronos Bridge page crashes when Cronos asset is not enabled yet. 
+- Fixed Cronos Bridge page crashes when Cronos asset is not enabled yet
 
 ## [v0.5.3] - 2021-11-08
 
@@ -46,6 +58,7 @@ All notable changes to this project will be documented in this file.
 - Add Ledger support for CRONOS.
 - Add initial Bridge functionality : Cronos <> Crypto.org.
 - Added disclaimer notices and warning on non-supported regions.
+- One-click lock screen support.
 
 ## [v0.5.0] - 2021-09-03
 
