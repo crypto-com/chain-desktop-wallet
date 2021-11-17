@@ -69,10 +69,10 @@ export interface UnbondingDelegationResult {
 }
 
 export interface ErrorRpcResponse {
-  code: number,
-  message: string,
-  details: any[]
-};
+  code: number;
+  message: string;
+  details: any[];
+}
 
 // Transfers models
 export interface TransferData {

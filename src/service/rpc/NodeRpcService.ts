@@ -91,9 +91,12 @@ export class NodeRpcService implements INodeRpcService {
       );
       const balanceData = response?.data;
       return balanceData?.balance?.amount ?? '0';
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
-      console.log(`[${NodeRpcService.name}-loadAccountBalance] [Error] Unable to fetch data.`, error.response || error);
+      console.log(
+        `[${NodeRpcService.name}-loadAccountBalance] [Error] Unable to fetch data.`,
+        error.response || error,
+      );
       return '0';
     }
   }
@@ -137,17 +140,18 @@ export class NodeRpcService implements INodeRpcService {
     address: string,
     assetSymbol: string,
   ): Promise<StakingTransactionList> {
-
     let paginationKey: PaginationNextKey = null;
     let totalSumFinal = 0;
     const delegationTransactionListFinal: Array<StakingTransactionData> = [];
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-
       // Fetch paginated data
       // eslint-disable-next-line no-await-in-loop
-      const [paginatedDelegationResponse, nextKey] = await this.fetchDelegationsByAddressPaginated(paginationKey, address);
+      const [paginatedDelegationResponse, nextKey] = await this.fetchDelegationsByAddressPaginated(
+        paginationKey,
+        address,
+      );
       // process data above
       const delegationTransactionListLoop: Array<StakingTransactionData> = [];
       let totalSumLoop = 0;
@@ -198,20 +202,23 @@ export class NodeRpcService implements INodeRpcService {
   ): Promise<[DelegationResponse[], PaginationNextKey]> {
     const baseUrl = `/cosmos/staking/v1beta1/delegations/${address}`;
     const url =
-      paginationKey === null ? baseUrl : `${baseUrl}?pagination.key=${encodeURIComponent(paginationKey)}`;
+      paginationKey === null
+        ? baseUrl
+        : `${baseUrl}?pagination.key=${encodeURIComponent(paginationKey)}`;
 
     let response;
     try {
-      response = await this.cosmosClient.get<DelegationResult | ErrorRpcResponse>(
-        url,
-      );
-    } catch (error: any) {
+      response = await this.cosmosClient.get<DelegationResult | ErrorRpcResponse>(url);
+    } catch (error) {
       response = error.response;
     } finally {
       if (response.status !== 200) {
-
         // eslint-disable-next-line no-console
-        console.log(`[NodeRpcService.fetchDelegationsByAddressPaginated] | HTTP Code: ${response.status} | Response: ${JSON.stringify(response.data)}`);
+        console.log(
+          `[NodeRpcService.fetchDelegationsByAddressPaginated] | HTTP Code: ${
+            response.status
+          } | Response: ${JSON.stringify(response.data)}`,
+        );
 
         // This is a special case API error response, hence needed manual checking for `code`
         if ((response.data as ErrorRpcResponse).code === 5) {
@@ -221,30 +228,36 @@ export class NodeRpcService implements INodeRpcService {
 
         // If `code` in error response is not `5`, throw a general error.
         // eslint-disable-next-line no-unsafe-finally
-        throw new Error(`[NodeRpcService.fetchDelegationsByAddressPaginated] | HTTP Code: ${response.status} | Response: ${JSON.stringify(response.data)}`);
+        throw new Error(
+          `[NodeRpcService.fetchDelegationsByAddressPaginated] | HTTP Code: ${
+            response.status
+          } | Response: ${JSON.stringify(response.data)}`,
+        );
       }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { delegation_responses, pagination } = response.data as DelegationResult;
     return [delegation_responses, pagination.next_key];
-
   }
 
   public async fetchStakingRewardsBalance(
     address: string,
     assetSymbol: string,
   ): Promise<RewardTransactionList> {
-
     let response;
 
     try {
       response = await this.cosmosClient.get<RewardResponse>(
         `cosmos/distribution/v1beta1/delegators/${address}/rewards`,
       );
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
-      console.log(`[NodeRpcService.fetchStakingRewardsBalance] | HTTP Code: ${error.response.status} | Response: ${JSON.stringify(error.response.data)}`);
+      console.log(
+        `[NodeRpcService.fetchStakingRewardsBalance] | HTTP Code: ${
+          error.response.status
+        } | Response: ${JSON.stringify(error.response.data)}`,
+      );
       return {
         totalBalance: String(0),
         transactions: [],
@@ -277,14 +290,12 @@ export class NodeRpcService implements INodeRpcService {
   }
 
   public async fetchUnbondingDelegationBalance(address: string) {
-
     const unbondingDelegationDataList: UnbondingDelegationData[] = [];
     let paginationKey: PaginationNextKey = null;
     let totalSumFinal = 0;
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
-
       // eslint-disable-next-line no-await-in-loop
       const response = await this.fetchUnbondingDelegationsPaginated(paginationKey, address);
 
@@ -331,14 +342,20 @@ export class NodeRpcService implements INodeRpcService {
   ): Promise<[UnbondingDelegationResponse[], PaginationNextKey]> {
     const baseUrl = `/cosmos/staking/v1beta1/delegators/${address}/unbonding_delegations`;
     const url =
-      paginationKey === null ? baseUrl : `${baseUrl}?pagination.key=${encodeURIComponent(paginationKey)}`;
+      paginationKey === null
+        ? baseUrl
+        : `${baseUrl}?pagination.key=${encodeURIComponent(paginationKey)}`;
 
     let response;
     try {
       response = await this.cosmosClient.get<UnbondingDelegationResult>(url);
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
-      console.log(`[NodeRpcService.fetchUnbondingDelegationsPaginated] | HTTP Code: ${error.response.status} | Response: ${JSON.stringify(error.response.data)}`);
+      console.log(
+        `[NodeRpcService.fetchUnbondingDelegationsPaginated] | HTTP Code: ${
+          error.response.status
+        } | Response: ${JSON.stringify(error.response.data)}`,
+      );
 
       return [[], null];
     }
@@ -346,7 +363,6 @@ export class NodeRpcService implements INodeRpcService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { unbonding_responses, pagination } = response.data as UnbondingDelegationResult;
     return [unbonding_responses, pagination.next_key];
-
   }
 
   public async loadStakingBalance(address: string, assetSymbol: string): Promise<string> {
@@ -569,16 +585,18 @@ export class NodeRpcService implements INodeRpcService {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
   async getIBCAssetTrace(ibcHash: string): Promise<DenomTrace> {
-
     try {
       const denomTraceResponse = await this.cosmosClient.get<DenomTraceResponse>(
         `ibc/applications/transfer/v1beta1/denom_traces/${ibcHash}`,
       );
 
       return denomTraceResponse.data.denom_trace;
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
-      console.log(`[${NodeRpcService.name}-getIBCAssetTrace] [Error] Unable to fetch data.`, error.response || error);
+      console.log(
+        `[${NodeRpcService.name}-getIBCAssetTrace] [Error] Unable to fetch data.`,
+        error.response || error,
+      );
       throw new Error(`[${NodeRpcService.name}-getIBCAssetTrace] [Error] Unable to fetch data.`);
     }
   }
