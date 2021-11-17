@@ -40,6 +40,36 @@ class EvmTransactionSigner implements ITransactionSigner {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  public async signTokenTransfer(
+    transaction: TransferTransactionUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const web3 = new Web3('');
+    const transferAsset = transaction.asset;
+
+    const gasPriceBN = web3.utils.toBN(
+      transaction.gasPrice || transferAsset?.config?.fee?.networkFee!,
+    );
+
+    const chainId = transaction?.asset?.config?.chainId || 338;
+    const txParams = {
+      nonce: web3.utils.toHex(transaction.nonce || 0),
+      gasPrice: web3.utils.toHex(gasPriceBN),
+      gasLimit: transaction.gasLimit || transferAsset?.config?.fee?.gasLimit,
+      to: transaction.toAddress,
+      value: 0,
+      data:
+        transaction.memo && transaction.memo.length > 0
+          ? web3.utils.utf8ToHex(transaction.memo)
+          : '0x',
+      chainId: Number(chainId),
+    };
+
+    const signedTx = await ethers.Wallet.fromMnemonic(phrase).signTransaction(txParams);
+    return Promise.resolve(signedTx);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   public async signBridgeTransfer(
     transaction: BridgeTransactionUnsigned,
     phrase: string,
