@@ -1,6 +1,6 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "Crypto.com Chain Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.org <chain@crypto.org>",
@@ -73,7 +73,7 @@
     "zxcvbn": "4.4.2"
   },
   "scripts": {
-    "run-audit": "yarn audit-ci --high -a 1002475 1002627 1002477 1002522 1002590",
+    "run-audit": "yarn audit-ci --high -a 1002475 1002627 1002477 1002522 1002590 1005059",
     "start": "node scripts/start.js",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 && yarn clean-builds && node scripts/build.js",
     "test": "node scripts/test.js --watchAll=false",
@@ -256,7 +256,7 @@
     "terser-webpack-plugin": "4.2.3",
     "wait-on": "5.2.1",
     "webpack": "4.44.2",
-    "webpack-dev-server": "3.11.0",
+    "webpack-dev-server": "3.11.2",
     "webpack-manifest-plugin": "2.2.0",
     "workbox-webpack-plugin": "5.1.4"
   },
@@ -329,6 +329,7 @@
     "css-what": "5.0.1",
     "trim-newlines": "3.0.1",
     "normalize-url": "5.3.1",
-    "tar": "6.1.9"
+    "tar": "6.1.9",
+    "glob-parent": "5.1.2"
   }
 }

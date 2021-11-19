@@ -85,7 +85,15 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
             value: contact.address,
             label: (
               <>
-                <div>{contact.label}</div>
+                <div
+                  style={{
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
+                  {contact.label}
+                </div>
                 <div style={{ color: '#626973', fontSize: '12px' }}>{contact.address}</div>
               </>
             ),
@@ -137,10 +145,28 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
             }}
             tagRender={() => {
               return (
-                <>
-                  <div style={{ float: 'left' }}>{currentContact.label}</div>
+                <div
+                  style={{
+                    maxWidth: '420px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden',
+                    alignItems: 'flex-start',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '100%',
+                      textAlign: 'left',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {currentContact.label}
+                  </div>
                   <div style={{ color: '#626973', fontSize: '12px' }}>{currentContact.address}</div>
-                </>
+                </div>
               );
             }}
           />

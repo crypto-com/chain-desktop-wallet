@@ -18,14 +18,22 @@ const ConfirmModal = (props: IConfirmModalProps) => {
     <Modal
       visible={visible}
       onCancel={onCancel}
-      footer={[
-        <Button type="primary" onClick={onConfirm}>
-          {confirmText}
-        </Button>,
-        <Button type="link" onClick={onCancel}>
-          {t('general.cancel')}
-        </Button>,
-      ]}
+      footer={
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Button type="primary" onClick={onConfirm}>
+            {confirmText}
+          </Button>
+          <Button type="link" onClick={onCancel}>
+            {t('general.cancel')}
+          </Button>
+        </div>
+      }
     >
       {children}
     </Modal>
