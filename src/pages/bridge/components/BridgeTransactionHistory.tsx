@@ -10,6 +10,7 @@ import {
   bech32ToEVMAddress,
   middleEllipsis,
   getCronosAsset,
+  getCryptoOrgAsset,
   getAssetBySymbolAndChain,
 } from '../../../utils/utils';
 
@@ -31,6 +32,7 @@ const BridgeTransactionHistory = () => {
 
   // eslint-disable-next-line
   const cronosAsset = getCronosAsset(walletAllAssets);
+  const cryptoOrgAsset = getCryptoOrgAsset(walletAllAssets);
 
   const bridgeService = new BridgeService(walletService.storageService);
 
@@ -271,7 +273,7 @@ const BridgeTransactionHistory = () => {
   useEffect(() => {
     const fetchBridgeHistory = async () => {
       if (cronosAsset) {
-        await bridgeService.fetchAndSaveBridgeTxs(cronosAsset?.address!);
+        await bridgeService.fetchAndSaveBridgeTxs(cronosAsset?.address!, cryptoOrgAsset?.address!);
       }
       const transactionHistory = await bridgeService.retrieveCurrentWalletBridgeTransactions();
       const processedHistory = convertBridgeTransfers(transactionHistory);
