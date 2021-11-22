@@ -11,6 +11,7 @@ import { Session } from '../../models/Session';
 import { AddressBookService } from '../../service/AddressBookService';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import { walletAllAssetsState } from '../../recoil/atom';
+import { getChainName } from '../../utils/utils';
 
 const { Option } = Select;
 
@@ -186,7 +187,7 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
             {SupportedNetworks.map(network => {
               return (
                 <Option key={network.label} value={network.label}>
-                  {network.label}
+                  {getChainName(network.label, currentSession.wallet.config)}
                 </Option>
               );
             })}

@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { bech32 } from 'bech32';
 import { ethers } from 'ethers';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
+import { checkIfTestnet } from '../config/StaticAssets';
+import { WalletConfig } from '../config/StaticConfig';
 
 export function isElectron() {
   // Renderer process
@@ -146,4 +148,18 @@ export function getAssetBySymbolAndChain(
   return walletAllAssets.find(asset => {
     return asset.symbol.toUpperCase() === symbol && asset.name.indexOf(chainName) !== -1;
   });
+}
+
+// Temporary measure
+export function getChainName(name: string | undefined, config: WalletConfig) {
+  const isTestnet = checkIfTestnet(config.network);
+
+  if (name) {
+    name = name.indexOf('Chain') === -1 ? `${name} Chain` : name;
+    return isTestnet
+      ? name.replace('Chain', 'Testnet')
+      : name.replace('Cronos Chain', 'Cronos Beta');
+  }
+
+  return '';
 }

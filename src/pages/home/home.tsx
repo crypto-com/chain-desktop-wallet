@@ -20,7 +20,7 @@ import {
 } from '../../recoil/atom';
 import { NOT_KNOWN_YET_VALUE, SUPPORTED_CURRENCY, WalletConfig } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
-import { middleEllipsis, isJson, ellipsis } from '../../utils/utils';
+import { middleEllipsis, isJson, ellipsis, getChainName } from '../../utils/utils';
 import {
   scaledAmount,
   scaledStakingBalance,
@@ -117,12 +117,13 @@ const HomePage = () => {
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: record => {
         const { name } = record;
+
         return (
           <Tag
             style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
             color="processing"
           >
-            {name}
+            {getChainName(name, currentSession.wallet.config)}
           </Tag>
         );
       },
