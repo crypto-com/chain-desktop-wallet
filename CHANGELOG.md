@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.5.6] - 2021-11-22
+
+### Bug fixes
+- Added missing bridge history records for custom destination addresses
+- Fixed validator list auto-filling in redelegate form
+
 ## [v0.5.5] - 2021-11-17
 
 ### Additions
