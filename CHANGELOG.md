@@ -6,7 +6,11 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
-## [v0.5.6] - 2021-11-22
+## [v0.5.6] - 2021-11-23
+
+### Additions
+- Align on Chain namings
+- Support on CRC20 data
 
 ### Bug fixes
 - Added missing bridge history records for custom destination addresses
