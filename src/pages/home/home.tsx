@@ -479,6 +479,11 @@ const HomePage = () => {
                     }, // click row
                   };
                 }}
+                locale={{
+                  triggerDesc: t('general.table.triggerDesc'),
+                  triggerAsc: t('general.table.triggerAsc'),
+                  cancelSort: t('general.table.cancelSort'),
+                }}
               />
               <Link
                 to="/assets"
