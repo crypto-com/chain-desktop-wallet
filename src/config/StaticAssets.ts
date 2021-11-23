@@ -1,7 +1,7 @@
 // Every created wallet get initialized with a new CRO asset
 import { getRandomId } from '../crypto/RandomGen';
 import { AssetCreationType, UserAssetConfig, UserAssetType } from '../models/UserAsset';
-import { WalletConfig } from './StaticConfig';
+import { WalletConfig, SupportedChainName } from './StaticConfig';
 import { checkIfTestnet } from '../utils/utils';
 import iconCronosSvg from '../assets/icon-cronos-blue.svg';
 import iconCroSvg from '../assets/icon-cro.svg';
@@ -34,7 +34,7 @@ export const CRO_ASSET = (walletConfig: WalletConfig) => {
       // 'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c1248c15568a4017c20aa87/cro.png',
       iconCroSvg,
     identifier: getRandomId(),
-    name: 'Crypto.org Chain',
+    name: SupportedChainName.CRYPTO_ORG,
     symbol: assetSymbol,
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
@@ -86,7 +86,7 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
       // 'https://firebasestorage.googleapis.com/v0/b/chain-desktop-wallet.appspot.com/o/cronos_logo.png?alt=media&token=781c48a3-e89e-4dd4-87d3-d1a1b8e2e456',
       iconCronosSvg,
     identifier: getRandomId(),
-    name: 'Cronos Chain',
+    name: SupportedChainName.CRONOS,
     symbol: isTestnet ? 'TCRO' : 'CRO',
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',

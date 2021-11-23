@@ -3,7 +3,7 @@ import { bech32 } from 'bech32';
 import { ethers } from 'ethers';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
-import { Network, WalletConfig } from '../config/StaticConfig';
+import { Network, WalletConfig, SupportedChainName } from '../config/StaticConfig';
 
 export function isElectron() {
   // Renderer process
@@ -159,15 +159,25 @@ export function checkIfTestnet(network: Network) {
 }
 
 // Temporary measure
-export function getChainName(name: string | undefined, config: WalletConfig) {
+export function getChainName(name: string | undefined = '', config: WalletConfig) {
   const isTestnet = checkIfTestnet(config.network);
 
-  if (name) {
-    name = name.indexOf('Chain') === -1 ? `${name} Chain` : name;
-    return isTestnet
-      ? name.replace('Chain', 'Testnet')
-      : name.replace('Cronos Chain', 'Cronos Beta');
-  }
+  name = name.indexOf('Chain') === -1 ? `${name} Chain` : name;
 
-  return '';
+  if (isTestnet) {
+    switch (name) {
+      case SupportedChainName.CRONOS:
+      case SupportedChainName.CRYPTO_ORG:
+        return name.replace('Chain', 'Testnet');
+      default:
+        return name;
+    }
+  } else {
+    switch (name) {
+      case SupportedChainName.CRONOS:
+        return name.replace('Chain', 'Beta');
+      default:
+        return name;
+    }
+  }
 }
