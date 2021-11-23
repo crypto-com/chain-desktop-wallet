@@ -25,7 +25,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import ReceiveDetail from './components/ReceiveDetail';
 import FormSend from './components/FormSend';
 import { walletService } from '../../service/WalletService';
-import { middleEllipsis } from '../../utils/utils';
+import { getChainName, middleEllipsis } from '../../utils/utils';
 import {
   TransactionDirection,
   TransactionStatus,
@@ -192,7 +192,7 @@ const AssetsPage = () => {
             style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
             color="processing"
           >
-            {name}
+            {getChainName(name, session.wallet.config)}
           </Tag>
         );
       },
@@ -397,7 +397,7 @@ const AssetsPage = () => {
                             style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
                             color="processing"
                           >
-                            {currentAsset?.name}
+                            {getChainName(currentAsset?.name, session.wallet.config)}
                           </Tag>
                         </div>
                         <div className="value">

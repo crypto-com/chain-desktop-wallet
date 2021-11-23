@@ -13,6 +13,7 @@ import { Session } from '../../../../models/Session';
 import { sessionState } from '../../../../recoil/atom';
 import AddAddressModal from '../../../../components/AddressBookModal/AddAddressModal';
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal';
+import { getChainName } from '../../../../utils/utils';
 
 const AddressBook = () => {
   const [contacts, setContacts] = useState<AddressBookContact[]>([]);
@@ -53,7 +54,7 @@ const AddressBook = () => {
             style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
             color="processing"
           >
-            {contact.chainName}
+            {getChainName(contact.chainName, session.wallet.config)}
           </Tag>
         );
       },
