@@ -37,7 +37,7 @@ import { walletService } from '../../service/WalletService';
 import { UserAsset } from '../../models/UserAsset';
 import { BroadCastResult } from '../../models/Transaction';
 import { renderExplorerUrl } from '../../models/Explorer';
-import { getAssetBySymbolAndChain, middleEllipsis } from '../../utils/utils';
+import { getAssetBySymbolAndChain, getChainName, middleEllipsis } from '../../utils/utils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   adjustedTransactionAmount,
@@ -318,8 +318,8 @@ const CronosBridge = props => {
           <>
             <div>
               <span>
-                {t('bridge.form.from')} {bridgeFromObj?.label} {t('bridge.form.to')}{' '}
-                {bridgeToObj?.label}
+                {t('bridge.form.from')} {getChainName(bridgeFromObj?.label, session.wallet.config)}{' '}
+                {t('bridge.form.to')} {getChainName(bridgeToObj?.label, session.wallet.config)}
               </span>
             </div>
             {session.wallet.walletType === LEDGER_WALLET_TYPE ? (
@@ -607,7 +607,9 @@ const CronosBridge = props => {
                     </Sider>
                     <Content>
                       <div>{t('bridge.form.from')}</div>
-                      <div style={{ fontWeight: 'bold' }}>{bridgeFromObj?.label}</div>
+                      <div style={{ fontWeight: 'bold' }}>
+                        {getChainName(bridgeFromObj?.label, session.wallet.config)}
+                      </div>
                     </Content>
                   </Layout>
                   <ArrowRightOutlined style={{ fontSize: '24px', width: '50px' }} />
@@ -617,7 +619,9 @@ const CronosBridge = props => {
                     </Sider>
                     <Content>
                       <div>{t('bridge.form.to')}</div>
-                      <div style={{ fontWeight: 'bold' }}>{bridgeToObj?.label}</div>
+                      <div style={{ fontWeight: 'bold' }}>
+                        {getChainName(bridgeToObj?.label, session.wallet.config)}
+                      </div>
                     </Content>
                   </Layout>
                 </div>
@@ -811,7 +815,9 @@ const CronosBridge = props => {
             {bridgeIcon(bridgeFromObj?.value)}
           </Sider>
           <Content>
-            <div style={{ fontWeight: 'bold' }}>{bridgeFromObj?.label}</div>
+            <div style={{ fontWeight: 'bold' }}>
+              {getChainName(bridgeFromObj?.label, session.wallet.config)}
+            </div>
           </Content>
         </Layout>
         <ArrowRightOutlined style={{ fontSize: '24px', width: '50px' }} />
@@ -820,7 +826,9 @@ const CronosBridge = props => {
             {bridgeIcon(bridgeToObj?.value)}
           </Sider>
           <Content>
-            <div style={{ fontWeight: 'bold' }}>{bridgeToObj?.label}</div>
+            <div style={{ fontWeight: 'bold' }}>
+              {getChainName(bridgeToObj?.label, session.wallet.config)}
+            </div>
           </Content>
         </Layout>
       </div>

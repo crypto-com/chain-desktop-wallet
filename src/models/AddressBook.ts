@@ -1,4 +1,5 @@
 import { UserAssetType } from './UserAsset';
+import { SupportedChainName } from '../config/StaticConfig';
 
 export interface AddressBookContact {
   id: string;
@@ -24,11 +25,11 @@ interface AddressBookNetwork {
 
 const SupportedNetworks: AddressBookNetwork[] = [
   {
-    label: 'Cronos Chain',
+    label: SupportedChainName.CRONOS,
     networkType: UserAssetType.EVM,
   },
   {
-    label: 'Crypto.org Chain',
+    label: SupportedChainName.CRYPTO_ORG,
     networkType: UserAssetType.TENDERMINT,
   },
 ];
