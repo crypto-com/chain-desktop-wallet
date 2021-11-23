@@ -12,6 +12,7 @@ import {
   getCronosAsset,
   getCryptoOrgAsset,
   getAssetBySymbolAndChain,
+  getChainName,
 } from '../../../utils/utils';
 
 import { walletService } from '../../../service/WalletService';
@@ -175,7 +176,7 @@ const BridgeTransactionHistory = () => {
                 </>
               }
             >
-              ({source.chain.replace('-', ' ')})
+              ({getChainName(source.chain.replace('-', ' '), session.wallet.config)})
             </Tooltip>
           </>
         );
@@ -234,10 +235,10 @@ const BridgeTransactionHistory = () => {
                   </>
                 }
               >
-                ({destination.chain.replace('-', ' ')})
+                ({getChainName(destination.chain.replace('-', ' '), session.wallet.config)})
               </Tooltip>
             ) : (
-              <>({destination.chain.replace('-', ' ')})</>
+              <>({getChainName(destination.chain.replace('-', ' '), session.wallet.config)})</>
             )}
           </>
         );
