@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { bech32 } from 'bech32';
 import { ethers } from 'ethers';
+import { CroNetwork } from '@crypto-org-chain/chain-jslib';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
-import { checkIfTestnet } from '../config/StaticAssets';
-import { WalletConfig } from '../config/StaticConfig';
+import { Network, WalletConfig } from '../config/StaticConfig';
 
 export function isElectron() {
   // Renderer process
@@ -148,6 +148,14 @@ export function getAssetBySymbolAndChain(
   return walletAllAssets.find(asset => {
     return asset.symbol.toUpperCase() === symbol && asset.name.indexOf(chainName) !== -1;
   });
+}
+
+export function checkIfTestnet(network: Network) {
+  return (
+    [CroNetwork.TestnetCroeseid3, CroNetwork.TestnetCroeseid4, CroNetwork.Testnet].includes(
+      network,
+    ) || network.defaultNodeUrl.includes('testnet')
+  );
 }
 
 // Temporary measure
