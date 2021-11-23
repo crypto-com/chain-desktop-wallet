@@ -147,6 +147,7 @@ const ValidatorListTable = (props: {
             if (form) {
               form.setFieldsValue({
                 validatorAddress: record.validatorAddress,
+                validatorDestinationAddress: record.validatorAddress,
               });
             }
           }}
