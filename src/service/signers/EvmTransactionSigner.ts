@@ -4,6 +4,7 @@ import { ITransactionSigner } from './TransactionSigner';
 import {
   BridgeTransactionUnsigned,
   DelegateTransactionUnsigned,
+  EVMContractCallUnsigned,
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
 } from './TransactionSupported';
@@ -37,6 +38,28 @@ class EvmTransactionSigner implements ITransactionSigner {
 
     const signedTx = await ethers.Wallet.fromMnemonic(phrase).signTransaction(txParams);
     return Promise.resolve(signedTx);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async signTransaction(
+    transaction: EVMContractCallUnsigned,
+    phrase: string,
+  ): Promise<string> {
+    const txParams: ethers.providers.TransactionRequest = {
+      nonce: transaction.nonce,
+      gasPrice: transaction.gasPrice,
+      gasLimit: transaction.gasLimit,
+      to: transaction.contractAddress,
+      data: transaction.data,
+      type: 0,
+      value: '0x0',
+    };
+
+    const provider = new ethers.providers.JsonRpcProvider('https://evm-cronos.crypto.org');
+    const wallet = ethers.Wallet.fromMnemonic(phrase).connect(provider);
+
+    const signedTx = await wallet.sendTransaction(txParams);
+    return Promise.resolve(signedTx.hash);
   }
 
   // eslint-disable-next-line class-methods-use-this

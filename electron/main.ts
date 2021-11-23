@@ -71,6 +71,7 @@ function createWindow() {
     minWidth: 1280,
     minHeight: 702,
     webPreferences: {
+      webviewTag: true,
       nodeIntegration: true,
       devTools: isDev,
       enableRemoteModule: true,
