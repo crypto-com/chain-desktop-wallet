@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Additions
 - Align on Chain namings
-- Support on CRC20 data
+- CRC20 data support
 
 ### Bug fixes
 - Added missing bridge history records for custom destination addresses
