@@ -5,7 +5,7 @@ import { WebviewTag } from 'electron';
 import { useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import Web3 from 'web3';
-import { ProviderPreloadScriptPath, useIPCProvider } from './useIPCProvider';
+import { ProviderPreloadScriptPath, useIPCProvider, useRefCallback } from './useIPCProvider';
 import { sessionState, walletAllAssetsState } from '../../../../recoil/atom';
 import { getCronosAsset } from '../../../../utils/utils';
 import PasswordFormModal from '../../../../components/PasswordForm/PasswordFormModal';
@@ -24,56 +24,41 @@ const DappBrowser = () => {
     errorCallback: Function;
   }>();
 
-  const signMessage = (
-    data: string,
-    addPrefix: boolean,
-    successHandler: { (data: string): void },
-    errorHandler: { (reason: string): void },
-  ) => {
-    // TODO: use privateKey to sign data
-    console.log(data, addPrefix, successHandler, errorHandler);
-    return data;
-  };
+  const onRequestAddress = useRefCallback((onSuccess: (address: string) => void) => {
+    onSuccess(cronosAsset?.address!);
+  });
 
   useIPCProvider({
     webview: webviewRef.current,
-    onRequestAddress: async successHandler => {
-      // const modal = Modal.confirm({
-      //   title: 'Requesting Address',
-      //   content: 'Approve or not?',
-      //   onOk: () => {
-      successHandler(cronosAsset?.address!);
-      // modal.destroy();
-      //   },
-      //   onCancel: () => {
-      //     errorHandler('Canceled');
-      //     modal.destroy();
-      //   },
-      // });
+    onRequestAddress: (onSuccess, onError) => {
+      onRequestAddress.current(onSuccess, onError);
     },
-    onSignMessage: async (event, successHandler, errorHandler) => {
-      signMessage(event.object.data, false, successHandler, errorHandler);
+    onRequestSignMessage: async (event, successCallback, errorCallback) => {
+      setInputPasswordVisible(true);
+      setConfirmPasswordCallback({ successCallback, errorCallback });
     },
-    onSignPersonalMessage: async (event, successHandler, errorHandler) => {
-      signMessage(event.object.data, true, successHandler, errorHandler);
+    onRequestSignPersonalMessage: async (event, successCallback, errorCallback) => {
+      setInputPasswordVisible(true);
+      setConfirmPasswordCallback({ successCallback, errorCallback });
     },
-    onSignTypedMessage: async (event, successHandler, errorHandler) => {
-      signMessage(event.object.data, true, successHandler, errorHandler);
+    onRequestSignTypedMessage: async (event, successCallback, errorCallback) => {
+      setInputPasswordVisible(true);
+      setConfirmPasswordCallback({ successCallback, errorCallback });
     },
-    onEcRecover: async (event, successHandler, errorHandler) => {
+    onRequestEcRecover: async (event, successCallback, errorCallback) => {
       new Web3('').eth.personal
         .ecRecover(event.object.message, event.object.signature)
-        .then(errorHandler, successHandler);
+        .then(errorCallback, successCallback);
     },
     onRequestSendTransaction: async (event, successCallback, errorCallback) => {
       // prompt for password
       setInputPasswordVisible(true);
       setConfirmPasswordCallback({ successCallback, errorCallback });
     },
-    onAddEthereumChain: async () => {
+    onRequestAddEthereumChain: async () => {
       // no-op, cause we only support cronos for now
     },
-    onWatchAsset: async () => {
+    onRequestWatchAsset: async () => {
       // no-op for now
     },
   });
@@ -120,6 +105,8 @@ const DappBrowser = () => {
           height: '600px',
         }}
         src="https://vvs.finance"
+        // src="https://cronaswap.org/"
+        // src="https://metamask.github.io/test-dapp/"
         title="VVS Finance"
       />
     </div>

@@ -490,3 +490,11 @@ window.desktopWallet = {
     ipcRenderer.sendToHost('dapp', arg);
   },
 };
+
+// const providerConfig = {
+//   chainId: 25,
+//   rpcUrl: 'https://evm-cronos.crypto.org',
+//   isDebug: true,
+// };
+// window.ethereum = new window.desktopWallet.Provider(providerConfig);
+// window.web3 = new window.desktopWallet.Web3(window.ethereum);

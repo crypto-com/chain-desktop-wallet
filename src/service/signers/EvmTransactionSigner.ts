@@ -41,9 +41,10 @@ class EvmTransactionSigner implements ITransactionSigner {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public async signTransaction(
+  public async sendContractCallTransaction(
     transaction: EVMContractCallUnsigned,
     phrase: string,
+    jsonRpcUrl: string,
   ): Promise<string> {
     const txParams: ethers.providers.TransactionRequest = {
       nonce: transaction.nonce,
@@ -55,7 +56,7 @@ class EvmTransactionSigner implements ITransactionSigner {
       value: '0x0',
     };
 
-    const provider = new ethers.providers.JsonRpcProvider('https://evm-cronos.crypto.org');
+    const provider = new ethers.providers.JsonRpcProvider(jsonRpcUrl);
     const wallet = ethers.Wallet.fromMnemonic(phrase).connect(provider);
 
     const signedTx = await wallet.sendTransaction(txParams);

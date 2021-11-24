@@ -1,7 +1,11 @@
 import { WebviewTag } from 'electron';
+
 import { useCallback, useEffect, useRef } from 'react';
 import { TransactionConfig } from 'web3-eth';
 import { useRecoilValue } from 'recoil';
+import Web3 from 'web3';
+import { ethers } from 'ethers';
+import path from 'path';
 import { TransactionPrepareService } from '../../../../service/TransactionPrepareService';
 import { walletService } from '../../../../service/WalletService';
 import { ChainConfig } from './config';
@@ -11,58 +15,63 @@ import { EVMContractCallUnsigned } from '../../../../service/signers/Transaction
 import { walletAllAssetsState } from '../../../../recoil/atom';
 import { getCronosAsset } from '../../../../utils/utils';
 
-export const ProviderPreloadScriptPath =
-  'file:///Users/xinyu/Developer/cro/chain-desktop-wallet/src/pages/settings/tabs/DappBrowser/preload.js';
+const { remote } = window.require('electron');
+
+// TODO: make it work under production
+export const ProviderPreloadScriptPath = `file://${path.join(
+  remote.app.getAppPath(),
+  'src/pages/settings/tabs/DappBrowser/preload.js',
+)}`;
 
 type WebView = WebviewTag & HTMLWebViewElement;
 
-type ErrorHandler = (reason: string) => void;
+export type ErrorHandler = (reason: string) => void;
 
 interface IUseIPCProviderProps {
   webview: WebView | null;
-  onRequestAddress: (onSuccess: (address: string) => void, onError: ErrorHandler) => Promise<void>;
+  onRequestAddress: (onSuccess: (address: string) => void, onError: ErrorHandler) => void;
   onRequestSendTransaction: (
     event: DappBrowserIPC.SendTransactionEvent,
     onSuccess: (passphrase: string) => void,
     onError: ErrorHandler,
   ) => Promise<void>;
-  onSignMessage: (
+  onRequestSignMessage: (
     event: DappBrowserIPC.SignMessageEvent,
-    onSuccess: (signedMessage: string) => void,
+    onSuccess: (passphrase: string) => void,
     onError: ErrorHandler,
   ) => Promise<void>;
-  onSignPersonalMessage: (
+  onRequestSignPersonalMessage: (
     event: DappBrowserIPC.SignPersonalMessageEvent,
-    onSuccess: (signedMessage: string) => void,
+    onSuccess: (passphrase: string) => void,
     onError: ErrorHandler,
   ) => Promise<void>;
-  onSignTypedMessage: (
+  onRequestSignTypedMessage: (
     event: DappBrowserIPC.SignTypedMessageEvent,
-    onSuccess: (signedMessage: string) => void,
+    onSuccess: (passphrase: string) => void,
     onError: ErrorHandler,
   ) => Promise<void>;
-  onEcRecover: (
+  onRequestEcRecover: (
     event: DappBrowserIPC.EcrecoverEvent,
     onSuccess: (address: string) => void,
     onError: ErrorHandler,
   ) => Promise<void>;
-  onWatchAsset: (
+  onRequestWatchAsset: (
     event: DappBrowserIPC.WatchAssetEvent,
     onSuccess: () => void,
     onError: ErrorHandler,
   ) => Promise<void>;
-  onAddEthereumChain: (
+  onRequestAddEthereumChain: (
     event: DappBrowserIPC.AddEthereumChainEvent,
     onSuccess: () => void,
     onError: ErrorHandler,
   ) => Promise<void>;
 }
 
-const useRefCallback = (fn: Function) => {
+export function useRefCallback(fn: Function) {
   const fnRef = useRef(fn);
   fnRef.current = fn;
   return fnRef;
-};
+}
 
 export const useIPCProvider = (props: IUseIPCProviderProps) => {
   const { webview } = props;
@@ -85,9 +94,6 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   );
 
   const injectDomReadyScript = useCallback(() => {
-    if (!webview) {
-      return;
-    }
     executeJavScript(
       `
             var config = {
@@ -150,11 +156,31 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         gasPrice: event.object.gasPrice,
         nonce: prepareTxInfo.nonce,
       };
-      const result = await evmTransactionSigner.signTransaction(txConfig, passphrase);
+      const result = await evmTransactionSigner.sendContractCallTransaction(
+        txConfig,
+        passphrase,
+        ChainConfig.rpcUrl,
+      );
 
       sendResponse(event.id, result);
     },
   );
+
+  const handleSignMessage = useRefCallback(
+    async (eventId: number, data: string, passphrase: string, addPrefix: boolean) => {
+      const wallet = ethers.Wallet.fromMnemonic(passphrase);
+      if (addPrefix) {
+        const result = await wallet.signMessage(data);
+        sendResponse(eventId, result);
+      } else {
+        // deprecated
+      }
+    },
+  );
+
+  // const handleSignTypedMessage = useRefCallback(
+  //   async (event: DappBrowserIPC.SignTypedMessageEvent, passphrase: string) => {},
+  // );
 
   const listenIPCMessages = () => {
     if (!webview) {
@@ -197,16 +223,75 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           );
           break;
         case 'signMessage':
+          props.onRequestSignMessage(
+            event,
+            passphrase => {
+              handleSignMessage.current(event.id, event.object.data, passphrase, false);
+            },
+            reason => {
+              sendError(event.id, reason);
+            },
+          );
           break;
         case 'signPersonalMessage':
+          props.onRequestSignPersonalMessage(
+            event,
+            passphrase => {
+              handleSignMessage.current(event.id, event.object.data, passphrase, true);
+            },
+            reason => {
+              sendError(event.id, reason);
+            },
+          );
           break;
         case 'signTypedMessage':
+          props.onRequestSignTypedMessage(
+            event,
+            () => {
+              // handleSignTypedMessage.current(event, passphrase);
+            },
+            reason => {
+              sendError(event.id, reason);
+            },
+          );
           break;
         case 'ecRecover':
+          props.onRequestEcRecover(
+            event,
+            () => {
+              new Web3('').eth.personal
+                .ecRecover(event.object.message, event.object.signature)
+                .then(
+                  result => {
+                    sendResponse(event.id, result);
+                  },
+                  reason => {
+                    sendError(event.id, reason);
+                  },
+                );
+            },
+            reason => {
+              sendError(event.id, reason);
+            },
+          );
           break;
         case 'watchAsset':
+          props.onRequestWatchAsset(
+            event,
+            () => {},
+            reason => {
+              sendError(event.id, reason);
+            },
+          );
           break;
         case 'addEthereumChain':
+          props.onRequestAddEthereumChain(
+            event,
+            () => {},
+            reason => {
+              sendError(event.id, reason);
+            },
+          );
           break;
         default:
           break;
@@ -214,21 +299,21 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     });
   };
 
-  const setupIPC = () => {
+  const setupIPC = useCallback(() => {
     if (!webview) {
       return;
     }
 
     listenIPCMessages();
 
-    webview.addEventListener('dom-ready', () => {
+    webview.addEventListener('did-finish-load', () => {
       // TODO: remove later
       injectDomReadyScript();
       webview.openDevTools();
     });
-  };
+  }, [webview]);
 
   useEffect(() => {
     setupIPC();
-  }, [webview]);
+  }, [setupIPC]);
 };
