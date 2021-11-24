@@ -8,7 +8,12 @@ import { useTranslation } from 'react-i18next';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { sessionState, walletAllAssetsState } from '../../../recoil/atom';
 import { scaledBalance, UserAsset, UserAssetType } from '../../../models/UserAsset';
-import { middleEllipsis, getCryptoOrgAsset, getCronosAsset } from '../../../utils/utils';
+import {
+  middleEllipsis,
+  getCryptoOrgAsset,
+  getCronosAsset,
+  getChainName,
+} from '../../../utils/utils';
 import { fromScientificNotation, getCurrentMinAssetAmount } from '../../../utils/NumberUtils';
 import {
   SUPPORTED_BRIDGE,
@@ -374,7 +379,7 @@ const CronosBridgeForm = props => {
               return (
                 <Option value={bridge.value} key={bridge.value}>
                   {bridgeIcon(bridge.value)}
-                  {`${bridge.label}`}
+                  {`${getChainName(bridge.label, session.wallet.config)}`}
                 </Option>
               );
             })}
@@ -454,7 +459,7 @@ const CronosBridgeForm = props => {
               return (
                 <Option value={bridge.value} key={bridge.value}>
                   {bridgeIcon(bridge.value)}
-                  {`${bridge.label}`}
+                  {`${getChainName(bridge.label, session.wallet.config)}`}
                 </Option>
               );
             })}

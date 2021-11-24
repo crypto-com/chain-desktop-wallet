@@ -328,7 +328,7 @@ export class BridgeService {
     );
   };
 
-  public async fetchAndSaveBridgeTxs(evmAddress: string) {
+  public async fetchAndSaveBridgeTxs(evmAddress: string, tendermintAddress: string) {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
       const defaultBridgeDirection = BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS;
@@ -341,7 +341,7 @@ export class BridgeService {
         loadedBridgeConfig?.bridgeIndexingUrl || defaultBridgeConfig?.bridgeIndexingUrl!;
 
       const response = await axios.get<BridgeTransactionListResponse>(
-        `${bridgeIndexingUrl}/activities?cronosevmAddress=${evmAddress}&order=sourceBlockTime.desc`,
+        `${bridgeIndexingUrl}/activities?cronosevmAddress=${evmAddress}&cryptoorgchainAddress=${tendermintAddress}&order=sourceBlockTime.desc`,
       );
       const loadedBridgeTransactions = response.data.result;
 
