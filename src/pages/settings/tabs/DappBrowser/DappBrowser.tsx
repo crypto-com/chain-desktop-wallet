@@ -31,6 +31,7 @@ const DappBrowser = () => {
   useIPCProvider({
     webview: webviewRef.current,
     onRequestAddress: (onSuccess, onError) => {
+      // TODO: !! cronosAsset may not be ready
       onRequestAddress.current(onSuccess, onError);
     },
     onRequestSignMessage: async (event, successCallback, errorCallback) => {

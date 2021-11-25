@@ -103,7 +103,6 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             };
             window.ethereum = new window.desktopWallet.Provider(config);
             window.web3 = new window.desktopWallet.Web3(window.ethereum);
-            console.log(window.ethereum);
         `,
     );
   }, [webview]);

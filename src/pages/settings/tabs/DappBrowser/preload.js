@@ -491,6 +491,8 @@ window.desktopWallet = {
   },
 };
 
+localStorage.setItem('connectorIdv2', 'Metamask');
+
 // const providerConfig = {
 //   chainId: 25,
 //   rpcUrl: 'https://evm-cronos.crypto.org',
