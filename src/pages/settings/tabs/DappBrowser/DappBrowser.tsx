@@ -34,6 +34,11 @@ const DappBrowser = () => {
       // TODO: !! cronosAsset may not be ready
       onRequestAddress.current(onSuccess, onError);
     },
+    onRequestTokenApproval: (request, successCallback, errorCallback) => {
+      console.log(request);
+      setInputPasswordVisible(true);
+      setConfirmPasswordCallback({ successCallback, errorCallback });
+    },
     onRequestSignMessage: async (event, successCallback, errorCallback) => {
       setInputPasswordVisible(true);
       setConfirmPasswordCallback({ successCallback, errorCallback });

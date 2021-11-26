@@ -1,6 +1,6 @@
 import { WebviewTag } from 'electron';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { TransactionConfig } from 'web3-eth';
 import { useRecoilValue } from 'recoil';
 import Web3 from 'web3';
@@ -14,6 +14,7 @@ import { evmTransactionSigner } from '../../../../service/signers/EvmTransaction
 import { EVMContractCallUnsigned } from '../../../../service/signers/TransactionSupported';
 import { walletAllAssetsState } from '../../../../recoil/atom';
 import { getCronosAsset } from '../../../../utils/utils';
+import { TokenApprovalRequestData, TransactionDataParser } from './TransactionDataParser';
 
 const { remote } = window.require('electron');
 
@@ -30,6 +31,11 @@ export type ErrorHandler = (reason: string) => void;
 interface IUseIPCProviderProps {
   webview: WebView | null;
   onRequestAddress: (onSuccess: (address: string) => void, onError: ErrorHandler) => void;
+  onRequestTokenApproval: (
+    event: TokenApprovalRequestData,
+    onSuccess: (amount: string) => void,
+    onError: ErrorHandler,
+  ) => void;
   onRequestSendTransaction: (
     event: DappBrowserIPC.SendTransactionEvent,
     onSuccess: (passphrase: string) => void,
@@ -79,6 +85,12 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   const transactionPrepareService = new TransactionPrepareService(walletService.storageService);
   const allAssets = useRecoilValue(walletAllAssetsState);
   const cronosAsset = getCronosAsset(allAssets);
+  const transactionDataParser = useMemo(() => {
+    return new TransactionDataParser(
+      'https://evm-cronos.crypto.org',
+      'https://cronos.crypto.org/explorer/api',
+    );
+  }, []);
 
   const executeJavScript = useCallback(
     (script: string) => {
@@ -93,19 +105,19 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     [webview],
   );
 
-  const injectDomReadyScript = useCallback(() => {
-    executeJavScript(
-      `
-            var config = {
-                chainId: ${ChainConfig.chainId},
-                rpcUrl: "${ChainConfig.rpcUrl}",
-                isDebug: true
-            };
-            window.ethereum = new window.desktopWallet.Provider(config);
-            window.web3 = new window.desktopWallet.Web3(window.ethereum);
-        `,
-    );
-  }, [webview]);
+  // const injectDomReadyScript = useCallback(() => {
+  //   executeJavScript(
+  //     `
+  //           var config = {
+  //               chainId: ${ChainConfig.chainId},
+  //               rpcUrl: "${ChainConfig.rpcUrl}",
+  //               isDebug: true
+  //           };
+  //           window.ethereum = new window.desktopWallet.Provider(config);
+  //           window.web3 = new window.desktopWallet.Web3(window.ethereum);
+  //       `,
+  //   );
+  // }, [webview]);
 
   const sendError = (id: number, error: string) => {
     executeJavScript(`
@@ -211,15 +223,35 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           );
           break;
         case 'signTransaction':
-          props.onRequestSendTransaction(
-            event,
-            passphrase => {
-              handleSendTransaction.current(event, passphrase);
-            },
-            reason => {
-              sendError(event.id, reason);
-            },
-          );
+          // parse transaction data
+
+          if (event.object.data.startsWith('0x095ea7b3')) {
+            const response = await transactionDataParser.parseTokenApprovalData(
+              event.object.to,
+              event.object.data,
+            );
+            props.onRequestTokenApproval(
+              response,
+              amount => {
+                // TODO: deal with amount
+                console.log(amount);
+              },
+              reason => {
+                sendError(event.id, reason);
+              },
+            );
+          } else {
+            props.onRequestSendTransaction(
+              event,
+              passphrase => {
+                handleSendTransaction.current(event, passphrase);
+              },
+              reason => {
+                sendError(event.id, reason);
+              },
+            );
+          }
+
           break;
         case 'signMessage':
           props.onRequestSignMessage(
@@ -306,9 +338,11 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     listenIPCMessages();
 
     webview.addEventListener('did-finish-load', () => {
+      // injectDomReadyScript();
       // TODO: remove later
-      injectDomReadyScript();
-      webview.openDevTools();
+      if (process.env.NODE_ENV === 'development') {
+        webview.openDevTools();
+      }
     });
   }, [webview]);
 

@@ -277,6 +277,8 @@ class Web3Provider extends EventEmitter {
       });
       this.wrapResults.set(payload.id, wrapResult);
 
+      console.log(payload);
+
       switch (payload.method) {
         case 'eth_accounts':
           return this.sendResponse(payload.id, this.eth_accounts());
@@ -493,10 +495,10 @@ window.desktopWallet = {
 
 localStorage.setItem('connectorIdv2', 'Metamask');
 
-// const providerConfig = {
-//   chainId: 25,
-//   rpcUrl: 'https://evm-cronos.crypto.org',
-//   isDebug: true,
-// };
-// window.ethereum = new window.desktopWallet.Provider(providerConfig);
-// window.web3 = new window.desktopWallet.Web3(window.ethereum);
+const providerConfig = {
+  chainId: 25,
+  rpcUrl: 'https://evm-cronos.crypto.org',
+  isDebug: true,
+};
+window.ethereum = new window.desktopWallet.Provider(providerConfig);
+window.web3 = new window.desktopWallet.Web3(window.ethereum);
