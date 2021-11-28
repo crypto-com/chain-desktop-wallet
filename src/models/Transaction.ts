@@ -71,26 +71,29 @@ export interface NftAccountTransactionData extends NftAccountTransactionResponse
 /**
  * COMMON ATTRIBUTES MODELS
  */
+
+export type CommonAttributesRecord = NftAttributesRecord | StakingAttributesRecord | RewardAttributesRecord;
+
 export interface CommonAttributesByWalletBase {
   customParams?: { [key: string]: any } // Note: We WILL dedicate a storage for `customParams` like totalBalance, totalRewards, estimatedApy etc.
   walletId: string;
 }
 
-export interface NftAttributes extends CommonAttributesByWalletBase {
+export interface NftAttributesRecord extends CommonAttributesByWalletBase {
   type: 'nft',
   customParams: {
     nftQuery?: NftQueryParams
   }
 }
 
-export interface stakingAttributes extends CommonAttributesByWalletBase {
+export interface StakingAttributesRecord extends CommonAttributesByWalletBase {
   type: 'staking',
   customParams: {
     totalBalance?: string
   }
 }
 
-export interface rewardAttributes extends CommonAttributesByWalletBase {
+export interface RewardAttributesRecord extends CommonAttributesByWalletBase {
   type: 'reward',
   customParams: {
     totalBalance: string;
@@ -104,6 +107,8 @@ export interface rewardAttributes extends CommonAttributesByWalletBase {
  * COMMON TRANSACTION MODELS
  */
 
+export type CommonTransactionRecord = StakingTransactionRecord | RewardTransactionRecord | TransferTransactionRecord | NftAccountTransactionRecord | IBCTransactionRecord | NftTransferRecord;
+
 export interface BaseCommonTransaction {
   walletId: string;
   assetId?: string;
@@ -111,7 +116,6 @@ export interface BaseCommonTransaction {
   txHash?: string;
 }
 
-export type CommonTransactionRecord = StakingTransactionRecord | RewardTransactionRecord | TransferTransactionRecord | NftAccountTransactionRecord | IBCTransactionRecord | NftTransferRecord;
 
 export interface StakingTransactionRecord extends BaseCommonTransaction {
   txType: "staking";

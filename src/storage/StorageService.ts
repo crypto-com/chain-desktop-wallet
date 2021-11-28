@@ -29,7 +29,7 @@ import {
   CommonTransactionRecord,
   NftAccountTransactionRecord,
   NftTransferRecord,
-  RewardTransactionRecord, TransferTransactionRecord, IBCTransactionRecord, StakingTransactionRecord
+  RewardTransactionRecord, TransferTransactionRecord, IBCTransactionRecord, StakingTransactionRecord, CommonAttributesRecord
 } from '../models/Transaction';
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../config/StaticConfig';
 import {
@@ -40,6 +40,7 @@ import {
 import { BridgeTransactionHistoryList } from '../service/bridge/contracts/BridgeModels';
 import { AddressBookContactModel } from '../models/AddressBook';
 import { generalConfigService } from './GeneralConfigService';
+import { NftAttributesRecord, StakingAttributesRecord, RewardAttributesRecord } from '../models/Transaction';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -342,8 +343,19 @@ export class StorageService {
       }
     });
 
+    const stakingAttributeRecord: StakingAttributesRecord = {
+      type: "staking",
+      walletId: stakingTransactions.walletId,
+      customParams: {
+        totalBalance: stakingTransactions.totalBalance
+      }
+    }
+
     // await this.updateCommonAttributes()
     await this.insertCommonTransactionRecords(stakingTxRecords);
+
+    // Insert to common Attributes store
+    await this.updateCommonAttributes(stakingAttributeRecord);
 
     // @deprecated
     /**
@@ -362,7 +374,22 @@ export class StorageService {
         txData: tx,
       }
     });
+
+    const rewardAttributeRecord: RewardAttributesRecord = {
+      walletId: rewardTransactions.walletId,
+      type: 'reward',
+      customParams: {
+        totalBalance: rewardTransactions.totalBalance,
+        claimedRewardsBalance: rewardTransactions.claimedRewardsBalance,
+        estimatedApy: rewardTransactions.estimatedApy,
+        estimatedRewardsBalance: rewardTransactions.estimatedRewardsBalance,
+      }
+    }
+    // Insert to common transactoin store
     await this.insertCommonTransactionRecords(rewardTxRecords);
+
+    // Insert to common Attributes store
+    await this.updateCommonAttributes(rewardAttributeRecord);
 
     // @deprecated
     /**
@@ -388,9 +415,15 @@ export class StorageService {
       txType: 'staking'
     })
 
+    const stakingCustomParams = await this.db.commonAttributeStore.findOne<StakingAttributesRecord>({
+      walletId: walletId,
+      type: 'staking'
+    });
+
     return {
       transactions: stakingTxRecord.map(tx => tx.txData),
       walletId,
+      totalBalance: stakingCustomParams.customParams.totalBalance || '0'
     } as StakingTransactionList;
 
     // return this.db.stakingStore.findOne<StakingTransactionList>({ walletId });
@@ -402,9 +435,18 @@ export class StorageService {
       txType: 'reward',
     });
 
+    const rewardCustomParams = await this.db.commonAttributeStore.findOne<RewardAttributesRecord>({
+      walletId: walletId,
+      type: 'reward'
+    });
+
     return {
       transactions: rewardTxs.map(tx => tx.txData),
-      walletId
+      walletId,
+      totalBalance: rewardCustomParams.customParams.totalBalance,
+      claimedRewardsBalance: rewardCustomParams.customParams.claimedRewardsBalance,
+      estimatedApy: rewardCustomParams.customParams.estimatedApy,
+      estimatedRewardsBalance: rewardCustomParams.customParams.estimatedRewardsBalance,
     } as RewardTransactionList
 
     // return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
@@ -498,7 +540,7 @@ export class StorageService {
       transactions: nftAccountTxRecords.map(record => record.txData),
       walletId,
     } as NftAccountTransactionList;
-    
+
     // @deprecated
     // return this.db.nftAccountTxStore.findOne<NftAccountTransactionList>({ walletId });
   }
@@ -574,9 +616,15 @@ export class StorageService {
       txType: 'nftTransfer'
     });
 
+    let nftQueryParam = await this.db.commonAttributeStore.findOne<NftAttributesRecord>({
+      type: 'nft',
+      walletId
+    });
+
     return {
       transfers: nftTxRecords.map(record => record.txData),
       walletId,
+      nftQuery: nftQueryParam.customParams
     } as NftTransactionHistory;
 
     // @deprecated   
@@ -615,8 +663,8 @@ export class StorageService {
   public async retrieveAllBridgeTransactions(walletId: string) {
     let bridgeTxs = await this.db.commonTransactionStore.find<IBCTransactionRecord>({
       walletId,
-      txType: 'ibc',
-    });
+      txType: "ibc",
+    } as IBCTransactionRecord);
 
     return {
       transactions: bridgeTxs.map(tx => tx.txData),
@@ -730,13 +778,19 @@ export class StorageService {
     // return this.db.commonTransactionStore.insert<CommonTransactionRecord[]>(records);
   }
 
-  public async updateCommonAttributes(records: CommonTransactionRecord[]) {
-    if (records.length === 0) {
-      return Promise.resolve();
-    }
-
-
-
-    // return this.db.commonTransactionStore.insert<CommonTransactionRecord[]>(records);
+  /**
+   * This function `upserts` the attributes to the database
+   * @param attributeRecord 
+   */
+  public async updateCommonAttributes(attributeRecord: CommonAttributesRecord) {
+    await this.db.commonAttributeStore.update<CommonAttributesRecord>({
+      walletId: attributeRecord.walletId,
+      type: attributeRecord.type
+    }, {
+      $set: attributeRecord
+    }, {
+      upsert: true,
+      returnUpdatedDocs: true
+    });
   }
 }
