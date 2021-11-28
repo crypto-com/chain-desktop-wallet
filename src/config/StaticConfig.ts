@@ -204,16 +204,21 @@ SUPPORTED_CURRENCY.set('CZK', { value: 'CZK', label: 'CZK - Kč', symbol: 'Kč' 
 SUPPORTED_CURRENCY.set('BRL', { value: 'BRL', label: 'BRL - R$', symbol: 'R$' });
 SUPPORTED_CURRENCY.set('TRY', { value: 'TRY', label: 'TRY - ₺', symbol: '₺' });
 
+export enum SupportedChainName {
+  CRYPTO_ORG = 'Crypto.org Chain',
+  CRONOS = 'Cronos Chain',
+}
+
 export interface SupportedBridge {
   value: string;
   label: string;
 }
 
 export const SUPPORTED_BRIDGE = new Map<string, SupportedBridge>();
-SUPPORTED_BRIDGE.set('CRONOS', { value: 'CRONOS', label: 'Cronos Chain' });
+SUPPORTED_BRIDGE.set('CRONOS', { value: 'CRONOS', label: SupportedChainName.CRONOS });
 SUPPORTED_BRIDGE.set('CRYPTO_ORG', {
   value: 'CRYPTO_ORG',
-  label: 'Crypto.org Chain',
+  label: SupportedChainName.CRYPTO_ORG,
 });
 
 export const SUPPORTED_BRIDGES_ASSETS = ['CRO'];
@@ -240,6 +245,7 @@ export type WalletConfig = {
 
 export const FIXED_DEFAULT_FEE = String(10_000);
 export const FIXED_DEFAULT_GAS_LIMIT = String(300_000);
+export const DEFAULT_IBC_TRANSFER_TIMEOUT = 600_000;
 
 export const EVM_MINIMUM_GAS_PRICE = String(42_000_000_000);
 export const EVM_MINIMUM_GAS_LIMIT = String(42_000);

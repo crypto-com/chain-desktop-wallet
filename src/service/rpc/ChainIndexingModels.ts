@@ -186,55 +186,59 @@ export interface Amount {
 }
 
 export interface ValidatorListResponse {
-    result:     ValidatorInfo[];
-    pagination: Pagination;
+  result: ValidatorInfo[];
+  pagination: Pagination;
+}
+
+export interface ValidatorResponse {
+  result: ValidatorInfo;
 }
 
 export interface ValidatorInfo {
-    operatorAddress:           string;
-    consensusNodeAddress:      string;
-    initialDelegatorAddress:   string;
-    tendermintPubkey:          string;
-    tendermintAddress:         string;
-    status:                    ValidatorStatus;
-    jailed:                    boolean;
-    joinedAtBlockHeight:       number;
-    power:                     string;
-    moniker:                   string;
-    identity:                  string;
-    website:                   string;
-    securityContact:           string;
-    details:                   string;
-    commissionRate:            string;
-    commissionMaxRate:         string;
-    commissionMaxChangeRate:   string;
-    minSelfDelegation:         string;
-    totalSignedBlock:          number;
-    totalActiveBlock:          number;
-    impreciseUpTime:           string;
-    votedGovProposal:          number;
-    powerPercentage:           string;
-    cumulativePowerPercentage: string;
-    apy:                       string;
+  operatorAddress: string;
+  consensusNodeAddress: string;
+  initialDelegatorAddress: string;
+  tendermintPubkey: string;
+  tendermintAddress: string;
+  status: ValidatorStatus;
+  jailed: boolean;
+  joinedAtBlockHeight: number;
+  power: string;
+  moniker: string;
+  identity: string;
+  website: string;
+  securityContact: string;
+  details: string;
+  commissionRate: string;
+  commissionMaxRate: string;
+  commissionMaxChangeRate: string;
+  minSelfDelegation: string;
+  totalSignedBlock: number;
+  totalActiveBlock: number;
+  impreciseUpTime: string;
+  votedGovProposal: number;
+  powerPercentage: string;
+  cumulativePowerPercentage: string;
+  apy: string;
 }
 
 export enum ValidatorStatus {
-    Bonded = "Bonded",
+  Bonded = 'Bonded',
 }
 
 export interface AccountInfoResponse {
-    result: AccountInfo;
+  result: AccountInfo;
 }
 
 export interface AccountInfo {
-    type:                string;
-    name:                string;
-    address:             string;
-    balance:             Amount[];
-    bondedBalance:       Amount[];
-    redelegatingBalance: any[];
-    unbondingBalance:    Amount[];
-    totalRewards:        Amount[];
-    commissions:         any[];
-    totalBalance:        Amount[];
+  type: string;
+  name: string;
+  address: string;
+  balance: Amount[];
+  bondedBalance: Amount[];
+  redelegatingBalance: any[];
+  unbondingBalance: Amount[];
+  totalRewards: Amount[];
+  commissions: any[];
+  totalBalance: Amount[];
 }

@@ -56,7 +56,8 @@ import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
-import AddressBookTab from './tabs/addressBook/AddressBookTab';
+import AddressBook from './tabs/AddressBook/AddressBook';
+import { getChainName } from '../../utils/utils';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -162,7 +163,7 @@ const GeneralSettingsForm = props => {
           return (
             <Option value={asset.identifier} key={asset.identifier}>
               {assetIcon(asset)}
-              {`${asset.name} (${asset.symbol})`}
+              {`${getChainName(asset.name, session.wallet.config)} (${asset.symbol})`}
             </Option>
           );
         })}
@@ -880,7 +881,7 @@ const FormSettings = () => {
                   <MetaInfoComponent />
                 </TabPane>
                 <TabPane tab={t('settings.addressBook.title')} key="addressBook">
-                  <AddressBookTab />
+                  <AddressBook />
                 </TabPane>
                 <TabPane tab={t('settings.tab3')} key="4">
                   <div className="site-layout-background settings-content">

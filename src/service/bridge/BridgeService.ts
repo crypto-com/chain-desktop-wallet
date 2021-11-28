@@ -68,7 +68,9 @@ export class BridgeService {
   }
 
   private async handleCronosToCryptoOrgTransfer(bridgeTransferRequest: BridgeTransferRequest) {
-    const { originAsset } = bridgeTransferRequest;
+    const { originAsset, isCustomToAddress, toAddress, tendermintAddress } = bridgeTransferRequest;
+
+    const recipientAddress = isCustomToAddress ? toAddress : tendermintAddress;
 
     if (!originAsset.config?.nodeUrl || !originAsset.address) {
       throw TypeError(`Missing asset config: ${originAsset.config}`);
@@ -83,7 +85,7 @@ export class BridgeService {
 
     const txConfig: TransactionConfig = {
       from: bridgeTransferRequest.evmAddress,
-      to: bridgeTransferRequest.tendermintAddress,
+      to: recipientAddress,
       value: web3.utils.toWei(bridgeTransferRequest.amount, 'ether'),
     };
 
@@ -105,9 +107,7 @@ export class BridgeService {
     const gasLimit = loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit;
 
     const contract = new web3.eth.Contract(bridgeContractABI, bridgeContractAddress);
-    const encodedABI = contract.methods
-      .send_cro_to_crypto_org(bridgeTransferRequest.tendermintAddress)
-      .encodeABI();
+    const encodedABI = contract.methods.send_cro_to_crypto_org(recipientAddress).encodeABI();
 
     const scaledBaseAmount = getBaseScaledAmount(bridgeTransferRequest.amount, originAsset);
 
@@ -199,7 +199,9 @@ export class BridgeService {
     );
 
     const evmToBech32ConvertedRecipient = getBech32AddressFromEVMAddress(
-      bridgeTransferRequest.evmAddress,
+      bridgeTransferRequest.isCustomToAddress
+        ? bridgeTransferRequest.toAddress
+        : bridgeTransferRequest.evmAddress,
       loadedBridgeConfig?.prefix || defaultBridgeConfig.prefix,
     );
 
@@ -326,7 +328,7 @@ export class BridgeService {
     );
   };
 
-  public async fetchAndSaveBridgeTxs(evmAddress: string) {
+  public async fetchAndSaveBridgeTxs(evmAddress: string, tendermintAddress: string) {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
       const defaultBridgeDirection = BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS;
@@ -339,7 +341,7 @@ export class BridgeService {
         loadedBridgeConfig?.bridgeIndexingUrl || defaultBridgeConfig?.bridgeIndexingUrl!;
 
       const response = await axios.get<BridgeTransactionListResponse>(
-        `${bridgeIndexingUrl}/activities?cronosevmAddress=${evmAddress}&order=sourceBlockTime.desc`,
+        `${bridgeIndexingUrl}/activities?cronosevmAddress=${evmAddress}&cryptoorgchainAddress=${tendermintAddress}&order=sourceBlockTime.desc`,
       );
       const loadedBridgeTransactions = response.data.result;
 

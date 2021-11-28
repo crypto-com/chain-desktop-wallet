@@ -12,7 +12,6 @@ import {
   Table,
   Tabs,
   Typography,
-  Tooltip,
   Alert,
 } from 'antd';
 import { OrderedListOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
@@ -37,7 +36,6 @@ import {
   getAssetStakingBalancePrice,
   getAssetUnbondingBalancePrice,
   getAssetRewardsBalancePrice,
-  scaledAmount,
   scaledBalance,
   scaledStakingBalance,
   scaledUnbondingBalance,
@@ -47,7 +45,6 @@ import {
 import {
   BroadCastResult,
   RewardTransaction,
-  ValidatorModel,
   StakingTransactionData,
   UnbondingDelegationData,
 } from '../../models/Transaction';
@@ -59,7 +56,7 @@ import {
   getCurrentMinAssetAmount,
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
-import { middleEllipsis, ellipsis } from '../../utils/utils';
+import { middleEllipsis } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
 import {
   AnalyticsActions,
@@ -74,14 +71,14 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { UndelegateFormComponent } from '../home/components/UndelegateFormComponent';
-import RedelegateFormComponent from '../home/components/RedelegateFormComponent';
-import ValidatorPowerPercentBar from '../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
+import { UndelegateFormComponent } from './components/UndelegateFormComponent';
+import RedelegateFormComponent from './components/RedelegateFormComponent';
 import RowAmountOption from '../../components/RowAmountOption/RowAmountOption';
+import ValidatorListTable from './components/ValidatorListTable';
+
 import {
   MODERATION_CONFIG_FILE_URL,
   UNBLOCKING_PERIOD_IN_DAYS,
-  CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
   FIXED_DEFAULT_FEE,
   SUPPORTED_CURRENCY,
 } from '../../config/StaticConfig';
@@ -129,7 +126,8 @@ interface UnbondingDelegationTabularData {
   completionTime: string;
 }
 
-const FormDelegationRequest = () => {
+const FormDelegationRequest = props => {
+  const { moderationConfig } = props;
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({
     validatorAddress: '',
@@ -154,9 +152,7 @@ const FormDelegationRequest = () => {
   const fetchingDB = useRecoilValue(fetchingDBState);
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
-  const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
-  const [displayWarning, setDisplayWarning] = useState(true);
-  const [moderationConfig, setModerationConfig] = useState<ModerationConfig>();
+  // const [moderationConfig, setModerationConfig] = useState<ModerationConfig>();
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -165,56 +161,10 @@ const FormDelegationRequest = () => {
 
   const [t] = useTranslation();
 
-  const processValidatorList = (validatorList: ValidatorModel[] | null) => {
-    if (validatorList) {
-      let willDisplayWarningColumn = false;
-      let displayedWarningColumn = false;
-
-      return validatorList.map((validator, idx) => {
-        if (
-          new Big(validator.cumulativeSharesIncludePercentage!).gte(
-            CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
-          ) &&
-          !displayedWarningColumn
-        ) {
-          displayedWarningColumn = true;
-          willDisplayWarningColumn = true;
-        }
-
-        const validatorModel = {
-          ...validator,
-          key: `${idx}`,
-          displayWarningColumn: willDisplayWarningColumn,
-        };
-
-        willDisplayWarningColumn = false;
-
-        return validatorModel;
-      });
-    }
-    return [];
-  };
-
   useEffect(() => {
-    const syncValidatorsData = async () => {
-      const validatorList = processValidatorList(currentValidatorList);
-      setValidatorTopList(validatorList);
-    };
-
     const syncAssetData = async () => {
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setWalletAsset(currentWalletAsset);
-    };
-
-    const moderationConfigHandler = async () => {
-      try {
-        const fetchModerationConfigData = await fetch(MODERATION_CONFIG_FILE_URL);
-        const moderationConfigData = await fetchModerationConfigData.json();
-        setModerationConfig(moderationConfigData);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error occurred while fetching moderation config file', error);
-      }
     };
 
     if (!didMountRef.current) {
@@ -222,9 +172,8 @@ const FormDelegationRequest = () => {
       didMountRef.current = true;
     }
 
-    syncValidatorsData();
-    moderationConfigHandler();
-  }, [fetchingDB, walletAsset, currentValidatorList]);
+    // moderationConfigHandler();
+  }, [fetchingDB, walletAsset]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -348,129 +297,6 @@ const FormDelegationRequest = () => {
     }`,
   );
 
-  const validatorColumns = [
-    {
-      title: t('staking.validatorList.table.validatorName'),
-      dataIndex: 'validatorName',
-      key: 'validatorName',
-      render: (validatorName, record: ValidatorModel) => (
-        <a
-          data-original={record.validatorAddress}
-          target="_blank"
-          rel="noreferrer"
-          href={`${renderExplorerUrl(currentSession.wallet.config, 'validator')}/${
-            record.validatorAddress
-          }`}
-        >
-          {ellipsis(validatorName, 24)}{' '}
-          {isValidatorAddressSuspicious(record.validatorAddress, moderationConfig) && (
-            <Tooltip title={t('staking.model1.warning')}>
-              <span>
-                <ExclamationCircleOutlined style={{ color: 'red' }} />
-              </span>
-            </Tooltip>
-          )}
-        </a>
-      ),
-    },
-    {
-      title: t('staking.validatorList.table.validatorWebsite'),
-      dataIndex: 'validatorWebSite',
-      key: 'validatorWebSite',
-      render: validatorWebSite => {
-        return validatorWebSite === '' ? (
-          'n.a.'
-        ) : (
-          <a
-            data-original={validatorWebSite}
-            target="_blank"
-            rel="noreferrer"
-            href={`${validatorWebSite}`}
-          >
-            {ellipsis(validatorWebSite, 24)}
-          </a>
-        );
-      },
-    },
-    {
-      title: t('staking.validatorList.table.validatorAddress'),
-      dataIndex: 'validatorAddress',
-      key: 'validatorAddress',
-      render: validatorAddress => (
-        <a
-          data-original={validatorAddress}
-          title={validatorAddress}
-          target="_blank"
-          rel="noreferrer"
-          href={`${renderExplorerUrl(
-            currentSession.wallet.config,
-            'validator',
-          )}/${validatorAddress}`}
-        >
-          {middleEllipsis(validatorAddress, 10)}
-        </a>
-      ),
-    },
-    {
-      title: t('staking.validatorList.table.currentTokens'),
-      dataIndex: 'currentTokens',
-      key: 'currentTokens',
-      sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
-      defaultSortOrder: 'descend' as any,
-      render: currentTokens => {
-        return (
-          <span>
-            {numeral(scaledAmount(currentTokens, 8)).format('0,0')}{' '}
-            {currentSession.wallet.config.network.coin.croDenom.toUpperCase()}
-          </span>
-        );
-      },
-    },
-    {
-      title: t('staking.validatorList.table.cumulativeShares'),
-      // dataIndex: 'cumulativeShares',
-      key: 'cumulativeShares',
-      // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
-      defaultSortOrder: 'descend' as any,
-      render: record => {
-        return (
-          <>
-            {/* <span>{record.cumulativeShares} %</span> */}
-            <ValidatorPowerPercentBar
-              percentExcludeCurrent={record.cumulativeSharesExcludePercentage} // light blue
-              percentIncludeCurrent={record.cumulativeSharesIncludePercentage} // primary blue
-            />
-          </>
-        );
-      },
-    },
-    {
-      title: t('staking.validatorList.table.currentCommissionRate'),
-      dataIndex: 'currentCommissionRate',
-      key: 'currentCommissionRate',
-      sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
-      render: currentCommissionRate => (
-        <span>{new Big(currentCommissionRate).times(100).toFixed(2)}%</span>
-      ),
-    },
-    {
-      title: t('general.action'),
-      key: 'action',
-      render: record => (
-        <a
-          onClick={() => {
-            setIsValidatorListVisible(false);
-            form.setFieldsValue({
-              validatorAddress: record.validatorAddress,
-            });
-          }}
-        >
-          {t('general.select')}
-        </a>
-      ),
-    },
-  ];
-
   function onShowMemoChange() {
     setShowMemo(!showMemo);
   }
@@ -504,44 +330,13 @@ const FormDelegationRequest = () => {
           <div className="title">{t('staking.validatorList.table.title')}</div>
           <div className="description">{t('staking.validatorList.table.description')}</div>
           <div className="item">
-            <Table
-              locale={{
-                triggerDesc: t('general.table.triggerDesc'),
-                triggerAsc: t('general.table.triggerAsc'),
-                cancelSort: t('general.table.cancelSort'),
-              }}
-              dataSource={validatorTopList}
-              columns={validatorColumns}
-              pagination={{ showSizeChanger: false }}
-              onChange={(pagination, filters, sorter: any) => {
-                if (
-                  (sorter.order === 'descend' && sorter.field === 'currentTokens') ||
-                  sorter.order === undefined
-                ) {
-                  setDisplayWarning(true);
-                } else {
-                  setDisplayWarning(false);
-                }
-              }}
-              expandable={{
-                rowExpandable: record => record.displayWarningColumn! && displayWarning,
-                expandedRowRender: record =>
-                  record.displayWarningColumn &&
-                  displayWarning && (
-                    <div className="cumulative-stake33">
-                      {t('staking.validatorList.table.warningCumulative')}
-                    </div>
-                  ),
-                expandIconColumnIndex: -1,
-              }}
-              rowClassName={record => {
-                const greyBackground =
-                  new Big(record.cumulativeSharesIncludePercentage!).lte(
-                    CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
-                  ) || record.displayWarningColumn;
-                return greyBackground ? 'grey-background' : '';
-              }}
-              defaultExpandAllRows
+            <ValidatorListTable
+              currentSession={currentSession}
+              // validatorTopList={validatorTopList}
+              currentValidatorList={currentValidatorList}
+              moderationConfig={moderationConfig}
+              setIsValidatorListVisible={setIsValidatorListVisible}
+              form={form}
             />
           </div>
         </ModalPopup>
@@ -773,7 +568,8 @@ const FormDelegationRequest = () => {
   );
 };
 
-const FormDelegationOperations = () => {
+const FormDelegationOperations = props => {
+  const { moderationConfig } = props;
   // Undelegate action related states changes
   const [form] = Form.useForm();
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
@@ -1096,6 +892,7 @@ const FormDelegationOperations = () => {
             <RedelegateFormComponent
               currentSession={currentSession}
               redelegateFormValues={redelegateFormValues}
+              moderationConfig={moderationConfig}
               walletAsset={userAsset}
               form={form}
             />
@@ -1508,14 +1305,18 @@ const FormWithdrawStakingReward = () => {
 const StakingPage = () => {
   const currentSession = useRecoilValue(sessionState);
   const userAsset = useRecoilValue(walletAssetState);
+  const currentValidatorList = useRecoilValue(validatorListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
   const allMarketData = useRecoilValue(allMarketState);
+  // const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
   const [marketData, setMarketData] = useState<AssetMarketPrice>();
+
   const [isUnbondingDelegationModalVisible, setIsUnbondingDelegationModalVisible] = useState(false);
   const [isUnbondingVisible, setIsUnbondingVisible] = useState(false);
   const [unbondingDelegations, setUnbondingDelegations] = useState<
     UnbondingDelegationTabularData[]
   >([]);
+  const [moderationConfig, setModerationConfig] = useState<ModerationConfig>();
   const analyticsService = new AnalyticsService(currentSession);
   const didMountRef = useRef(false);
 
@@ -1611,15 +1412,28 @@ const StakingPage = () => {
       setIsUnbondingVisible(unbondingDelegationTabularData.length > 0);
     };
 
+    const moderationConfigHandler = async () => {
+      try {
+        const fetchModerationConfigData = await fetch(MODERATION_CONFIG_FILE_URL);
+        const moderationConfigData = await fetchModerationConfigData.json();
+        setModerationConfig(moderationConfigData);
+      } catch (error) {
+        // eslint-disable-next-line no-console
+        console.error('Error occurred while fetching moderation config file', error);
+      }
+    };
+
     syncUnbondingDelegationsData();
 
     setMarketData(allMarketData[`${userAsset?.mainnetSymbol}-${currentSession.currency}`]);
 
     if (!didMountRef.current) {
       didMountRef.current = true;
+      // syncValidatorsData();
+      moderationConfigHandler();
       analyticsService.logPage('Staking');
     }
-  }, [fetchingDB]);
+  }, [fetchingDB, currentValidatorList]);
 
   return (
     <Layout className="site-layout">
@@ -1705,7 +1519,7 @@ const StakingPage = () => {
             <div className="site-layout-background stake-content">
               <div className="container">
                 <div className="description">{t('staking.description2')}</div>
-                <FormDelegationRequest />
+                <FormDelegationRequest moderationConfig={moderationConfig} />
               </div>
             </div>
           </TabPane>
@@ -1756,7 +1570,7 @@ const StakingPage = () => {
                     <></>
                   )}
                 </Layout>
-                <FormDelegationOperations />
+                <FormDelegationOperations moderationConfig={moderationConfig} />
               </div>
             </div>
           </TabPane>

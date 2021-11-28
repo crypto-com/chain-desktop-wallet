@@ -16,11 +16,13 @@ import {
   Skeleton,
   Input,
   message,
+  Spin,
 } from 'antd';
 import Icon, {
   ArrowLeftOutlined,
   ArrowRightOutlined,
   ExclamationCircleOutlined,
+  LoadingOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -35,7 +37,7 @@ import { walletService } from '../../service/WalletService';
 import { UserAsset } from '../../models/UserAsset';
 import { BroadCastResult } from '../../models/Transaction';
 import { renderExplorerUrl } from '../../models/Explorer';
-import { getAssetBySymbolAndChain, middleEllipsis } from '../../utils/utils';
+import { getAssetBySymbolAndChain, getChainName, middleEllipsis } from '../../utils/utils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   adjustedTransactionAmount,
@@ -117,6 +119,8 @@ const CronosBridge = props => {
     bridgeTo: '',
     tendermintAddress: '',
     evmAddress: '',
+    toAddress: '',
+    isCustomToAddress: false,
   });
   const [bridgeConfigForm] = Form.useForm();
   const [isBridgeValid, setIsBridgeValid] = useState(false);
@@ -126,7 +130,7 @@ const CronosBridge = props => {
   const [toAsset, setToAsset] = useState<UserAsset | undefined>();
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
-  const [toAddress, setToAddress] = useState('');
+  const [toDestinationAddress, setToDestinationAddress] = useState('');
   const [bridgeTransferDirection, setBridgeTransferDirection] = useState<BridgeTransferDirection>(
     BridgeTransferDirection.NOT_SUPPORT,
   );
@@ -134,6 +138,8 @@ const CronosBridge = props => {
     bridgeTransferDirection: BridgeTransferDirection.NOT_SUPPORT,
     tendermintAddress: '',
     evmAddress: '',
+    toAddress: '',
+    isCustomToAddress: false,
     originAsset: currentAsset!,
     amount: '0',
     decryptedPhrase: '',
@@ -188,7 +194,7 @@ const CronosBridge = props => {
   };
 
   const onWalletDecryptFinish = async (password: string) => {
-    const { tendermintAddress, evmAddress } = formValues;
+    const { tendermintAddress, evmAddress, toAddress, isCustomToAddress } = formValues;
     let { amount } = formValues;
     amount = fromScientificNotation(amount).toString();
 
@@ -206,6 +212,8 @@ const CronosBridge = props => {
       bridgeTransferDirection,
       tendermintAddress,
       evmAddress,
+      toAddress,
+      isCustomToAddress,
       amount,
       originAsset: currentAsset!,
       decryptedPhrase: phraseDecrypted,
@@ -237,7 +245,8 @@ const CronosBridge = props => {
     });
 
     if (decryptedPhrase || session.wallet.walletType === LEDGER_WALLET_TYPE) {
-      const { tendermintAddress, evmAddress } = formValues;
+      const { tendermintAddress, evmAddress, toAddress, isCustomToAddress } = formValues;
+      // const { isCustomToAddress } = form.getFieldsValue();
       let amount = form.getFieldValue('amount');
       amount = fromScientificNotation(amount).toString();
 
@@ -245,6 +254,8 @@ const CronosBridge = props => {
         bridgeTransferDirection,
         tendermintAddress,
         evmAddress,
+        toAddress,
+        isCustomToAddress,
         amount,
         originAsset: currentAsset!,
         decryptedPhrase,
@@ -307,8 +318,8 @@ const CronosBridge = props => {
           <>
             <div>
               <span>
-                {t('bridge.form.from')} {bridgeFromObj?.label} {t('bridge.form.to')}{' '}
-                {bridgeToObj?.label}
+                {t('bridge.form.from')} {getChainName(bridgeFromObj?.label, session.wallet.config)}{' '}
+                {t('bridge.form.to')} {getChainName(bridgeToObj?.label, session.wallet.config)}
               </span>
             </div>
             {session.wallet.walletType === LEDGER_WALLET_TYPE ? (
@@ -328,14 +339,18 @@ const CronosBridge = props => {
     setBridgeConfirmationList(
       listDataSource.concat({
         title: '',
-        description: <></>,
-        loading: true,
+        description: (
+          <>
+            {t('bridge.pendingTransferTimeout.description')}
+            <Spin indicator={<LoadingOutlined style={{ fontSize: 12 }} spin />} />
+          </>
+        ),
+        loading: false,
       }),
     );
 
     try {
       setCurrentStep(2);
-
       sendResult = await walletService.sendBridgeTransaction(bridgeTransferRequest);
       setBroadcastResult(sendResult);
       listDataSource.push({
@@ -542,8 +557,8 @@ const CronosBridge = props => {
               setCurrentAssetIdentifier={setCurrentAssetIdentifier}
               setCurrentStep={setCurrentStep}
               showPasswordInput={showPasswordInput}
-              toAddress={toAddress}
-              setToAddress={setToAddress}
+              toAddress={toDestinationAddress}
+              setToAddress={setToDestinationAddress}
               bridgeTransferDirection={bridgeTransferDirection}
               setBridgeTransferDirection={setBridgeTransferDirection}
               bridgeConfigs={bridgeConfigs}
@@ -592,7 +607,9 @@ const CronosBridge = props => {
                     </Sider>
                     <Content>
                       <div>{t('bridge.form.from')}</div>
-                      <div style={{ fontWeight: 'bold' }}>{bridgeFromObj?.label}</div>
+                      <div style={{ fontWeight: 'bold' }}>
+                        {getChainName(bridgeFromObj?.label, session.wallet.config)}
+                      </div>
                     </Content>
                   </Layout>
                   <ArrowRightOutlined style={{ fontSize: '24px', width: '50px' }} />
@@ -602,7 +619,9 @@ const CronosBridge = props => {
                     </Sider>
                     <Content>
                       <div>{t('bridge.form.to')}</div>
-                      <div style={{ fontWeight: 'bold' }}>{bridgeToObj?.label}</div>
+                      <div style={{ fontWeight: 'bold' }}>
+                        {getChainName(bridgeToObj?.label, session.wallet.config)}
+                      </div>
                     </Content>
                   </Layout>
                 </div>
@@ -618,7 +637,7 @@ const CronosBridge = props => {
                     <div>{t('bridge.form.destination')}</div>
                     <div className="asset-icon">
                       {bridgeIcon(form.getFieldValue('bridgeTo'))}
-                      {middleEllipsis(toAddress, 6)}
+                      {middleEllipsis(toDestinationAddress, 6)}
                     </div>
                   </div>
                 </div>
@@ -796,7 +815,9 @@ const CronosBridge = props => {
             {bridgeIcon(bridgeFromObj?.value)}
           </Sider>
           <Content>
-            <div style={{ fontWeight: 'bold' }}>{bridgeFromObj?.label}</div>
+            <div style={{ fontWeight: 'bold' }}>
+              {getChainName(bridgeFromObj?.label, session.wallet.config)}
+            </div>
           </Content>
         </Layout>
         <ArrowRightOutlined style={{ fontSize: '24px', width: '50px' }} />
@@ -805,7 +826,9 @@ const CronosBridge = props => {
             {bridgeIcon(bridgeToObj?.value)}
           </Sider>
           <Content>
-            <div style={{ fontWeight: 'bold' }}>{bridgeToObj?.label}</div>
+            <div style={{ fontWeight: 'bold' }}>
+              {getChainName(bridgeToObj?.label, session.wallet.config)}
+            </div>
           </Content>
         </Layout>
       </div>

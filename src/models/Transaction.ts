@@ -234,6 +234,8 @@ export interface ValidatorModel {
   readonly currentShares: string;
   readonly pubKey: ValidatorPubKey;
   displayWarningColumn?: boolean;
+  apy?: string;
+  uptime?: string;
   cumulativeSharesIncludePercentage?: string;
   cumulativeSharesExcludePercentage?: string;
 }

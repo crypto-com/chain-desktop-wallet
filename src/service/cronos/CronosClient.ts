@@ -4,12 +4,19 @@ import { EVMClient } from '../rpc/clients/EVMClient';
 import {
   ICronosChainIndexAPI,
   txListRequestOptions,
-  txPendingListRequestOptions,
+  queryPaginationOptions,
+  tokenTransfersRequestOptions,
 } from '../rpc/interface/cronos.chainIndex';
 import {
   TxListAPIResponse,
   txListByAccountRequestParams,
   PendingTxListAPIResponse,
+  ContractDataResponse,
+  tokenContractDataRequestParams,
+  TokenTransferEventLogsResponse,
+  tokenTransfersRequestParams,
+  tokensOwnedByAddressRequestParams,
+  TokensOwnedByAddressResponse,
 } from '../rpc/models/cronos.models';
 
 /**
@@ -63,7 +70,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
   getPendingTxsByAddress = async (
     address: string,
-    options?: txPendingListRequestOptions,
+    options?: queryPaginationOptions,
   ): Promise<PendingTxListAPIResponse> => {
     const requestParams: txListByAccountRequestParams = {
       module: 'account',
@@ -83,4 +90,66 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
     }
     return txListResponse.data;
   };
+
+  async getTokenTransfersByAddress(
+    address: string,
+    options?: tokenTransfersRequestOptions,
+  ): Promise<TokenTransferEventLogsResponse> {
+
+    const requestParams: tokenTransfersRequestParams = {
+      module: 'account',
+      action: 'tokentx',
+      address,
+      ...options,
+    };
+
+    const txListResponse: AxiosResponse<TokenTransferEventLogsResponse> = await axios({
+      baseURL: this.cronosExplorerAPIBaseURL,
+      url: '/api',
+      params: requestParams,
+    });
+
+    if (txListResponse.status !== 200) {
+      throw new Error('Could not fetch token transfers from Cronos Chain Index API.');
+    }
+    return txListResponse.data;
+  }
+
+  async getTokensOwnedByAddress(address: string): Promise<TokensOwnedByAddressResponse> {
+    const requestParams: tokensOwnedByAddressRequestParams = {
+      module: 'account',
+      action: 'tokenlist',
+      address,
+    };
+
+    const txListResponse: AxiosResponse<TokensOwnedByAddressResponse> = await axios({
+      baseURL: this.cronosExplorerAPIBaseURL,
+      url: '/api',
+      params: requestParams,
+    });
+
+    if (txListResponse.status !== 200) {
+      throw new Error('Could not fetch token owned by user address from Cronos Chain Index API.');
+    }
+    return txListResponse.data;
+  }
+
+  async getContractDataByAddress(contractAddress: string): Promise<ContractDataResponse> {
+    const requestParams: tokenContractDataRequestParams = {
+      module: 'token',
+      action: 'getToken',
+      contractaddress: contractAddress,
+    };
+
+    const txListResponse: AxiosResponse<ContractDataResponse> = await axios({
+      baseURL: this.cronosExplorerAPIBaseURL,
+      url: '/api',
+      params: requestParams,
+    });
+
+    if (txListResponse.status !== 200) {
+      throw new Error('Could not fetch token owned by user address from Cronos Chain Index API.');
+    }
+    return txListResponse.data;
+  }
 }

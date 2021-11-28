@@ -11,6 +11,7 @@ import { Session } from '../../models/Session';
 import { AddressBookService } from '../../service/AddressBookService';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import { walletAllAssetsState } from '../../recoil/atom';
+import { getChainName } from '../../utils/utils';
 
 const { Option } = Select;
 
@@ -48,21 +49,9 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
 
   const [selectedNetworkValue, setSelectedNetworkValue] = useState<string>('');
   const [selectedAsset, setSelectedAsset] = useState<UserAsset>();
-
   const allAssets = useRecoilValue(walletAllAssetsState);
 
-  const customAddressValidator = useMemo(() => {
-    if (!selectedAsset) {
-      return null;
-    }
-    return TransactionUtils.addressValidator(currentSession, selectedAsset, AddressType.USER);
-  }, [selectedAsset]);
-
   const isEditing = !!contact;
-
-  const title = isEditing
-    ? t('settings.addressBook.editAddress')
-    : t('settings.addressBook.addAddress');
 
   const allAssetsFromNetwork = (networkValue: string) => {
     const network = SupportedNetworks.find(n => n.label === networkValue);
@@ -71,6 +60,30 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
     }
     return allAssets.filter(asset => asset.assetType === network.networkType);
   };
+
+  React.useEffect(() => {
+    if (!isEditing || !contact) {
+      return;
+    }
+    const network = contact.chainName;
+    setSelectedNetworkValue(network);
+    const assetList = allAssetsFromNetwork(network);
+    const asset = assetList?.find(a => a.symbol === contact?.assetSymbol);
+    if (asset) {
+      setSelectedAsset(asset);
+    }
+  }, [isEditing]);
+
+  const customAddressValidator = useMemo(() => {
+    if (!selectedAsset) {
+      return null;
+    }
+    return TransactionUtils.addressValidator(currentSession, selectedAsset, AddressType.USER);
+  }, [selectedAsset]);
+
+  const title = isEditing
+    ? t('settings.addressBook.editAddress')
+    : t('settings.addressBook.addAddress');
 
   const assets = useMemo(() => {
     return allAssetsFromNetwork(selectedNetworkValue);
@@ -174,7 +187,7 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
             {SupportedNetworks.map(network => {
               return (
                 <Option key={network.label} value={network.label}>
-                  {network.label}
+                  {getChainName(network.label, currentSession.wallet.config)}
                 </Option>
               );
             })}
@@ -182,12 +195,12 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
         </Form.Item>
         <Form.Item
           name={FormKeys.asset}
-          label={t('navbar.assets')}
+          label={t('settings.form1.assetIdentifier.label')}
           initialValue={contact?.assetSymbol}
           rules={[
             {
               required: true,
-              message: `${t('navbar.assets')} ${t('general.required')}`,
+              message: `${t('settings.form1.assetIdentifier.label')} ${t('general.required')}`,
             },
           ]}
         >
@@ -236,7 +249,7 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
           <Input placeholder={t('settings.addressBook.form.enterAddress')} />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" style={{ marginLeft: '0' }}>
             {isEditing
               ? t('settings.addressBook.form.update')
               : t('settings.addressBook.addAddress')}

@@ -56,7 +56,7 @@ import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
 import { StorageService } from '../storage/StorageService';
 import { TransactionPrepareService } from './TransactionPrepareService';
-import { TransactionHistoryService } from "./TransactionHistoryService";
+import { TransactionHistoryService } from './TransactionHistoryService';
 import { TransactionSenderService } from './TransactionSenderService';
 
 class WalletService {
@@ -74,7 +74,11 @@ class WalletService {
     this.storageService = new StorageService(APP_DB_NAMESPACE);
     this.transactionPrepareService = new TransactionPrepareService(this.storageService);
     this.txHistoryManager = new TransactionHistoryService(this.storageService);
-    this.txSenderManager = new TransactionSenderService(this.storageService, this.transactionPrepareService, this.txHistoryManager);
+    this.txSenderManager = new TransactionSenderService(
+      this.storageService,
+      this.transactionPrepareService,
+      this.txHistoryManager,
+    );
   }
 
   public async sendBridgeTransaction(bridgeTransferRequest: BridgeTransferRequest) {
@@ -108,7 +112,6 @@ class WalletService {
   ): Promise<BroadCastResult> {
     return await this.txSenderManager.sendStakingRewardWithdrawalTx(rewardWithdrawRequest);
   }
-
 
   public async sendVote(voteRequest: VoteRequest): Promise<BroadCastResult> {
     return await this.txSenderManager.sendVote(voteRequest);
@@ -308,7 +311,6 @@ class WalletService {
   public async fetchAndSaveProposals(currentSession: Session) {
     await this.txHistoryManager.fetchAndSaveProposals(currentSession);
   }
-
 
   public async retrieveWalletAssets(walletIdentifier: string): Promise<UserAsset[]> {
     const assets = await this.storageService.retrieveAssetsByWallet(walletIdentifier);
@@ -575,7 +577,6 @@ class WalletService {
     }
     return nftSet.nfts;
   }
-
 
   public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {
     const currentSession = await this.storageService.retrieveCurrentSession();
