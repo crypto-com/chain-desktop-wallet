@@ -50,6 +50,10 @@ export class StorageService {
     //migrateTransactionHistory()
   }
 
+  /**
+   * (optional) This function can be used to migrate current data to new structures 
+   * OR we can just use hard reset and resave data
+   */
   private async migrateTransactionHistory() {
     const isTxHistoryMigrated = await generalConfigService.isTxHistoryMigrated();
     if (!isTxHistoryMigrated) {

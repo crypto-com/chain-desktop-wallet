@@ -183,7 +183,7 @@ export class GeneralConfigService {
   }
 
   public async isTxHistoryMigrated() {
-    const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
+    /*const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
       _id: this.GENERAL_CONFIG_ID,
     });
     if (!savedConfig) {
@@ -197,11 +197,12 @@ export class GeneralConfigService {
       await this.saveGeneralConfig(newConfig);
       return false;
     }
-    return savedConfig.isTxHistoryMigrated;
+    return savedConfig.isTxHistoryMigrated;*/
+    return false;
   }
 
   public async setTxHistoryMigrated(isMigrated: boolean) {
-    const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
+    /*const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
       _id: this.GENERAL_CONFIG_ID,
     });
     if (!savedConfig) {
@@ -218,7 +219,7 @@ export class GeneralConfigService {
     await this.db.generalConfigStore.update<GeneralConfig>(
       { _id: this.GENERAL_CONFIG_ID },
       { $set: { isTxHistoryMigrated: isMigrated } },
-    );
+    ); */
   }
 
 }
