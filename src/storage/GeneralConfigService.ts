@@ -128,7 +128,7 @@ export class GeneralConfigService {
     const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
       _id: this.GENERAL_CONFIG_ID,
     });
-    
+
     if (!savedConfig) {
       const newConfig: GeneralConfig = {
         ...(savedConfig as GeneralConfig),
@@ -141,7 +141,7 @@ export class GeneralConfigService {
     }
     return await this.db.generalConfigStore.update<GeneralConfig>(
       { _id: this.GENERAL_CONFIG_ID },
-      { $set: { incorrectUnlockAttempts : savedConfig.incorrectUnlockAttempts + 1} },
+      { $set: { incorrectUnlockAttempts: savedConfig.incorrectUnlockAttempts + 1 } },
     );
   }
 
@@ -161,7 +161,7 @@ export class GeneralConfigService {
     }
     await this.db.generalConfigStore.update<GeneralConfig>(
       { _id: this.GENERAL_CONFIG_ID },
-      { $set: { incorrectUnlockAttempts : 0 } },
+      { $set: { incorrectUnlockAttempts: 0 } },
     );
   }
 
@@ -181,6 +181,46 @@ export class GeneralConfigService {
     }
     return savedConfig.incorrectUnlockAttempts;
   }
+
+  public async isTxHistoryMigrated() {
+    const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
+      _id: this.GENERAL_CONFIG_ID,
+    });
+    if (!savedConfig) {
+      const newConfig: GeneralConfig = {
+        ...(savedConfig as GeneralConfig),
+        hasEverShownAnalyticsPopup: false,
+        isAppLockedByUser: false,
+        incorrectUnlockAttempts: 0,
+        isTxHistoryMigrated: false
+      };
+      await this.saveGeneralConfig(newConfig);
+      return false;
+    }
+    return savedConfig.isTxHistoryMigrated;
+  }
+
+  public async setTxHistoryMigrated(isMigrated: boolean) {
+    const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
+      _id: this.GENERAL_CONFIG_ID,
+    });
+    if (!savedConfig) {
+      const newConfig: GeneralConfig = {
+        ...(savedConfig as GeneralConfig),
+        hasEverShownAnalyticsPopup: false,
+        isAppLockedByUser: false,
+        incorrectUnlockAttempts: 0,
+        isTxHistoryMigrated: false
+      };
+      await this.saveGeneralConfig(newConfig);
+      return false;
+    }
+    await this.db.generalConfigStore.update<GeneralConfig>(
+      { _id: this.GENERAL_CONFIG_ID },
+      { $set: { isTxHistoryMigrated: isMigrated } },
+    );
+  }
+
 }
 
 export const generalConfigService = new GeneralConfigService('general-config');

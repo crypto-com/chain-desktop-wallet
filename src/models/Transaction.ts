@@ -68,46 +68,82 @@ export enum NftTransactionType {
 
 export interface NftAccountTransactionData extends NftAccountTransactionResponse { }
 
-export interface CommonAttributesByWallet {
-  customParams?: { [key: string]: string } // Note: We WILL dedicate a storage for `customParams` like totalBalance, totalRewards, estimatedApy etc.
+/**
+ * COMMON ATTRIBUTES MODELS
+ */
+export interface CommonAttributesByWalletBase {
+  customParams?: { [key: string]: any } // Note: We WILL dedicate a storage for `customParams` like totalBalance, totalRewards, estimatedApy etc.
   walletId: string;
-  assetId?: string;
-  assetType: UserAssetType;
 }
+
+export interface NftAttributes extends CommonAttributesByWalletBase {
+  type: 'nft',
+  customParams: {
+    nftQuery?: NftQueryParams
+  }
+}
+
+export interface stakingAttributes extends CommonAttributesByWalletBase {
+  type: 'staking',
+  customParams: {
+    totalBalance?: string
+  }
+}
+
+export interface rewardAttributes extends CommonAttributesByWalletBase {
+  type: 'reward',
+  customParams: {
+    totalBalance: string;
+    claimedRewardsBalance?: string;
+    estimatedRewardsBalance?: string;
+    estimatedApy?: string;
+  }
+}
+
+/**
+ * COMMON TRANSACTION MODELS
+ */
 
 export interface BaseCommonTransaction {
   walletId: string;
   assetId?: string;
-  assetType: UserAssetType;
+  assetType?: UserAssetType;
+  txHash?: string;
 }
 
-export type CommonTransactionRecord = StakingTransactionRecord | RewardTransactionRecord | TransferTransactionRecord | NftTransactionRecord | IBCTransactionRecord;
+export type CommonTransactionRecord = StakingTransactionRecord | RewardTransactionRecord | TransferTransactionRecord | NftAccountTransactionRecord | IBCTransactionRecord | NftTransferRecord;
 
-export interface StakingTransactionRecord extends BaseCommonTransaction{
+export interface StakingTransactionRecord extends BaseCommonTransaction {
   txType: "staking";
   messageTypeName?: string;
   txData: StakingTransactionData
 }
 
-export interface RewardTransactionRecord extends BaseCommonTransaction{
+export interface RewardTransactionRecord extends BaseCommonTransaction {
   txType: "reward";
   messageTypeName?: string;
   txData: RewardTransaction
 }
 
-export interface TransferTransactionRecord extends BaseCommonTransaction{
+export interface TransferTransactionRecord extends BaseCommonTransaction {
   txType: "transfer";
   messageTypeName?: string;
   txData: TransferTransactionData
 }
 
-export interface NftTransactionRecord extends BaseCommonTransaction{
-  txType: "nft";
+export interface NftAccountTransactionRecord extends BaseCommonTransaction {
+  txType: "nftAccount";
   messageTypeName?: string;
-  txData: NftTransactionData
+  txData: NftAccountTransactionData
 }
 
-export interface IBCTransactionRecord extends BaseCommonTransaction{
+export interface NftTransferRecord extends BaseCommonTransaction {
+  txType: "nftTransfer";
+  messageTypeName?: string;
+  txData: NftTransferModel
+}
+
+export interface IBCTransactionRecord extends BaseCommonTransaction {
   txType: "ibc";
   messageTypeName?: string;
   txData: BridgeTransaction
@@ -202,7 +238,7 @@ export interface ValidatorModel {
   cumulativeSharesExcludePercentage?: string;
 }
 
-export interface ProposalModel extends Proposal {}
+export interface ProposalModel extends Proposal { }
 
 export interface NftTokenData {
   name?: string;
@@ -220,13 +256,13 @@ export interface NftModel extends NftResponse {
   marketplaceLink: string;
 }
 
-export interface NftDenomModel extends NftDenomData {}
+export interface NftDenomModel extends NftDenomData { }
 
 export interface NftProcessedModel extends Omit<NftModel, 'tokenData'> {
   tokenData: NftTokenData;
 }
 
-export interface NftTransferModel extends NftTransactionResponse {}
+export interface NftTransferModel extends NftTransactionResponse { }
 
 // export interface NFTAccountTransactionModel extends NFTAccountTransactionResponse {}
 

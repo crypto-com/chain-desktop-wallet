@@ -5,4 +5,5 @@ export interface GeneralConfig {
   languageCode: string;
   isAppLockedByUser: boolean;
   incorrectUnlockAttempts: number;
+  isTxHistoryMigrated: boolean;
 }

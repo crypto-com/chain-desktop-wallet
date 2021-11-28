@@ -12,6 +12,7 @@ import {
   getAssetPriceId,
   getAssetPriceIdFrom,
   UserAsset,
+  UserAssetType,
 } from '../models/UserAsset';
 import {
   NftAccountTransactionList,
@@ -26,6 +27,9 @@ import {
   TransferTransactionList,
   ValidatorList,
   CommonTransactionRecord,
+  NftAccountTransactionRecord,
+  NftTransferRecord,
+  RewardTransactionRecord, TransferTransactionRecord, IBCTransactionRecord, StakingTransactionRecord
 } from '../models/Transaction';
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../config/StaticConfig';
 import {
@@ -35,12 +39,23 @@ import {
 } from '../service/bridge/BridgeConfig';
 import { BridgeTransactionHistoryList } from '../service/bridge/contracts/BridgeModels';
 import { AddressBookContactModel } from '../models/AddressBook';
+import { generalConfigService } from './GeneralConfigService';
 
 export class StorageService {
   private readonly db: DatabaseManager;
 
   constructor(namespace: string) {
     this.db = new DatabaseManager(namespace);
+    //migrateTransactionHistory()
+  }
+
+  private async migrateTransactionHistory() {
+    const isTxHistoryMigrated = await generalConfigService.isTxHistoryMigrated();
+    if (!isTxHistoryMigrated) {
+      // Call the migration logic
+    } else {
+      // Don't do anything
+    }
   }
 
   public async saveWallet(wallet: Wallet) {
@@ -302,28 +317,58 @@ export class StorageService {
   //   });
   // }
 
+  /**
+   * @deprecated Not in use anywhere, safe marking
+   * @param stakingTransaction {StakingTransactionData}
+   */
   public async saveStakingTransaction(stakingTransaction: StakingTransactionData) {
-    return this.db.stakingStore.update<StakingTransactionData>(
-      { hash: stakingTransaction.hash },
-      { $set: stakingTransaction },
-      { upsert: true },
-    );
+    // return this.db.stakingStore.update<StakingTransactionData>(
+    //   { hash: stakingTransaction.hash },
+    //   { $set: stakingTransaction },
+    //   { upsert: true },
+    // );
   }
 
   public async saveStakingTransactions(stakingTransactions: StakingTransactionList) {
     if (stakingTransactions.transactions.length === 0) {
       return Promise.resolve();
     }
-    await this.db.stakingStore.remove({ walletId: stakingTransactions.walletId }, { multi: true });
-    return this.db.stakingStore.insert(stakingTransactions);
+    const stakingTxRecords: StakingTransactionRecord[] = stakingTransactions.transactions.map(tx => {
+      return {
+        txType: 'staking',
+        walletId: stakingTransactions.walletId,
+        txData: tx,
+        txHash: tx.hash
+      }
+    });
+
+    // await this.updateCommonAttributes()
+    await this.insertCommonTransactionRecords(stakingTxRecords);
+
+    // @deprecated
+    /**
+     * await this.db.stakingStore.remove({ walletId: stakingTransactions.walletId }, { multi: true });
+    return this.db.stakingStore.insert(stakingTransactions); */
   }
 
   public async saveRewardList(rewardTransactions: RewardTransactionList) {
     if (rewardTransactions.transactions.length === 0) {
       return Promise.resolve();
     }
+    const rewardTxRecords: RewardTransactionRecord[] = rewardTransactions.transactions.map(tx => {
+      return {
+        walletId: rewardTransactions.walletId,
+        txType: "reward",
+        txData: tx,
+      }
+    });
+    await this.insertCommonTransactionRecords(rewardTxRecords);
+
+    // @deprecated
+    /**
+     *
     await this.db.rewardStore.remove({ walletId: rewardTransactions.walletId }, { multi: true });
-    return this.db.rewardStore.insert(rewardTransactions);
+    return this.db.rewardStore.insert(rewardTransactions); */
   }
 
   public async saveUnbondingDelegations(unbondingDelegations: UnbondingDelegationList) {
@@ -338,11 +383,31 @@ export class StorageService {
   }
 
   public async retrieveAllStakingTransactions(walletId: string) {
-    return this.db.stakingStore.findOne<StakingTransactionList>({ walletId });
+    let stakingTxRecord = await this.db.commonTransactionStore.find<StakingTransactionRecord>({
+      walletId: walletId,
+      txType: 'staking'
+    })
+
+    return {
+      transactions: stakingTxRecord.map(tx => tx.txData),
+      walletId,
+    } as StakingTransactionList;
+
+    // return this.db.stakingStore.findOne<StakingTransactionList>({ walletId });
   }
 
   public async retrieveAllRewards(walletId: string) {
-    return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
+    let rewardTxs = await this.db.commonTransactionStore.find<RewardTransactionRecord>({
+      walletId,
+      txType: 'reward',
+    });
+
+    return {
+      transactions: rewardTxs.map(tx => tx.txData),
+      walletId
+    } as RewardTransactionList
+
+    // return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
   }
 
   public async retrieveAllUnbondingDelegations(walletId: string) {
@@ -353,38 +418,89 @@ export class StorageService {
     if (transferTransactionList.transactions.length === 0) {
       return Promise.resolve();
     }
-    await this.db.transferStore.remove(
+    // Save into new transaction store
+    const transferTxRecords: TransferTransactionRecord[] = transferTransactionList.transactions.map(tx => {
+      return {
+        walletId: transferTransactionList.walletId,
+        txType: "transfer",
+        txData: tx,
+        txHash: tx.hash,
+        assetId: transferTransactionList.assetId
+      }
+    });
+    await this.insertCommonTransactionRecords(transferTxRecords);
+
+    // @deprecated
+    /**
+     *await this.db.transferStore.remove(
       {
         walletId: transferTransactionList.walletId,
         assetId: transferTransactionList.assetId,
       },
       { multi: true },
     );
-    return this.db.transferStore.insert<TransferTransactionList>(transferTransactionList);
+    return this.db.transferStore.insert<TransferTransactionList>(transferTransactionList); */
   }
 
   public async retrieveAllTransferTransactions(walletId: string, assetID?: string) {
-    return this.db.transferStore.findOne<TransferTransactionList>({
+    let transferRecords = await this.db.commonTransactionStore.find<TransferTransactionRecord>({
       walletId,
+      txType: 'transfer',
       assetId: assetID,
     });
+
+    return {
+      transactions: transferRecords.map(record => record.txData),
+      walletId,
+      assetId: assetID
+    } as TransferTransactionList;
+
+    // Todo: Deprecated
+    // return this.db.transferStore.findOne<TransferTransactionList>({
+    //   walletId,
+    //   assetId: assetID,
+    // });
   }
 
   public async saveNFTAccountTransactions(nftAccountTransactionList: NftAccountTransactionList) {
     if (nftAccountTransactionList.transactions.length === 0) {
       return Promise.resolve();
     }
-    await this.db.nftAccountTxStore.remove(
+    // Save into new transaction store
+    const nftAccountTxRecords: NftAccountTransactionRecord[] = nftAccountTransactionList.transactions.map(tx => {
+      return {
+        walletId: nftAccountTransactionList.walletId,
+        txType: "nftAccount",
+        txData: tx,
+        txHash: tx.transactionHash,
+      }
+    });
+    await this.insertCommonTransactionRecords(nftAccountTxRecords);
+
+    // @deprecated
+    /**
+     *await this.db.nftAccountTxStore.remove(
       { walletId: nftAccountTransactionList.walletId },
       { multi: true },
     );
-    return this.db.nftAccountTxStore.insert<NftAccountTransactionList>(nftAccountTransactionList);
+    return this.db.nftAccountTxStore.insert<NftAccountTransactionList>(nftAccountTransactionList); */
   }
 
   public async retrieveAllNFTAccountTransactions(
     walletId: string,
   ): Promise<NftAccountTransactionList> {
-    return this.db.nftAccountTxStore.findOne<NftAccountTransactionList>({ walletId });
+    let nftAccountTxRecords = await this.db.commonTransactionStore.find<NftAccountTransactionRecord>({
+      walletId,
+      txType: 'nftAccount'
+    });
+
+    return {
+      transactions: nftAccountTxRecords.map(record => record.txData),
+      walletId,
+    } as NftAccountTransactionList;
+    
+    // @deprecated
+    // return this.db.nftAccountTxStore.findOne<NftAccountTransactionList>({ walletId });
   }
 
   public async saveValidators(validatorList: ValidatorList) {
@@ -427,7 +543,21 @@ export class StorageService {
     if (!nftTransactionHistory || nftTransactionHistory.transfers.length === 0) {
       return Promise.resolve();
     }
-    await this.db.nftTransferHistoryStore.remove(
+    // Save into new transaction store
+    const nftTxRecords: NftTransferRecord[] = nftTransactionHistory.transfers.map(tx => {
+      return {
+        walletId: nftTransactionHistory.walletId,
+        txType: "nftTransfer",
+        txData: tx,
+        txHash: tx.transactionHash,
+        messageTypeName: tx.messageType
+      }
+    });
+    await this.insertCommonTransactionRecords(nftTxRecords);
+
+    // @deprecated
+    /**
+     *await this.db.nftTransferHistoryStore.remove(
       {
         walletId: nftTransactionHistory.walletId,
         nftQuery: nftTransactionHistory.nftQuery,
@@ -435,31 +565,67 @@ export class StorageService {
       { multi: true },
     );
 
-    return this.db.nftTransferHistoryStore.insert<NftTransactionHistory>(nftTransactionHistory);
+    return this.db.nftTransferHistoryStore.insert<NftTransactionHistory>(nftTransactionHistory); */
   }
 
   public async retrieveNFTTransferHistory(walletId: string, nftQuery: NftQueryParams) {
-    return this.db.nftTransferHistoryStore.findOne<NftTransactionHistory>({
+    let nftTxRecords = await this.db.commonTransactionStore.find<NftTransferRecord>({
       walletId,
-      nftQuery,
+      txType: 'nftTransfer'
     });
+
+    return {
+      transfers: nftTxRecords.map(record => record.txData),
+      walletId,
+    } as NftTransactionHistory;
+
+    // @deprecated   
+    // return this.db.nftTransferHistoryStore.findOne<NftTransactionHistory>({
+    //   walletId,
+    //   nftQuery,
+    // });
   }
 
   public async saveBridgeTransactions(bridgeTransactions: BridgeTransactionHistoryList) {
     if (!bridgeTransactions) {
       return Promise.resolve();
     }
+
+    // Save into new transaction store
+    const ibcTxRecords: IBCTransactionRecord[] = bridgeTransactions.transactions.map(tx => {
+      return {
+        walletId: bridgeTransactions.walletId,
+        txType: "ibc",
+        txData: tx,
+        txHash: tx.sourceTransactionId,
+      }
+    });
+    await this.insertCommonTransactionRecords(ibcTxRecords);
+
+    // @deprecated
+    /**
+     *
     await this.db.bridgeTransactionStore.remove(
       { walletId: bridgeTransactions.walletId },
       { multi: true },
     );
-    return this.db.bridgeTransactionStore.insert<BridgeTransactionHistoryList>(bridgeTransactions);
+    return this.db.bridgeTransactionStore.insert<BridgeTransactionHistoryList>(bridgeTransactions); */
   }
 
   public async retrieveAllBridgeTransactions(walletId: string) {
-    return this.db.bridgeTransactionStore.findOne<BridgeTransactionHistoryList>({
+    let bridgeTxs = await this.db.commonTransactionStore.find<IBCTransactionRecord>({
       walletId,
+      txType: 'ibc',
     });
+
+    return {
+      transactions: bridgeTxs.map(tx => tx.txData),
+      walletId
+    } as BridgeTransactionHistoryList;
+
+    // return this.db.bridgeTransactionStore.findOne<BridgeTransactionHistoryList>({
+    // walletId,
+    // });
   }
 
   // MARK: address book
@@ -535,12 +701,42 @@ export class StorageService {
   }
 
   /**
-   * TODO: Incomplete
    * record {CommonTransactionRecord}   */
-  public async saveCommonTransactionRecords(records: CommonTransactionRecord[]) {
+  public async insertCommonTransactionRecord(record: CommonTransactionRecord) {
+    return await this.insertCommonTransactionRecords([record]);
+  }
+
+  public async insertCommonTransactionRecords(records: CommonTransactionRecord[]) {
     if (records.length === 0) {
       return Promise.resolve();
     }
-    return this.db.commonTransactionStore.insert<CommonTransactionRecord[]>(records);
+
+    records.forEach(async record => {
+
+      console.log(`[insertCommonTransactionRecords] Upserting record, txHash : ${record.txHash}`)
+      await this.db.commonTransactionStore.update<CommonTransactionRecord>({
+        txHash: record.txHash,
+        walletId: record.walletId,
+        txType: record.txType
+      }, {
+        $set: record
+      }, {
+        multi: true,
+        upsert: true,
+        returnUpdatedDocs: true
+      })
+    });
+
+    // return this.db.commonTransactionStore.insert<CommonTransactionRecord[]>(records);
+  }
+
+  public async updateCommonAttributes(records: CommonTransactionRecord[]) {
+    if (records.length === 0) {
+      return Promise.resolve();
+    }
+
+
+
+    // return this.db.commonTransactionStore.insert<CommonTransactionRecord[]>(records);
   }
 }
