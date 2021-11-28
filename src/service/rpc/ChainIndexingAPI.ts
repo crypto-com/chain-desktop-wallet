@@ -22,10 +22,14 @@ import {
   TransferTransactionData,
   NftModel,
 } from '../../models/Transaction';
-import { DefaultWalletConfigs, SECONDS_OF_YEAR, SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING } from '../../config/StaticConfig';
+import {
+  DefaultWalletConfigs,
+  SECONDS_OF_YEAR,
+  SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING,
+} from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
-import { UserAsset, UserAssetType } from '../../models/UserAsset';
+import { UserAsset } from '../../models/UserAsset';
 
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(
@@ -427,26 +431,28 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
     const queryURL = `accounts/${userAddress}/messages`;
 
-    const isMsgTypeSupported = (optionalMsgTypeName && SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING.includes(optionalMsgTypeName)) ?? false;
+    const isMsgTypeSupported =
+      (optionalMsgTypeName &&
+        SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING.includes(optionalMsgTypeName)) ??
+      false;
 
     const finalMsgList: accountMsgList[] = [];
 
-    let requestParams = {
+    const requestParams = {
       page: currentPage,
-      order: "height.desc",
-      "filter.msgType": (isMsgTypeSupported) ? optionalMsgTypeName : undefined
+      order: 'height.desc',
+      'filter.msgType': isMsgTypeSupported ? optionalMsgTypeName : undefined,
     };
 
     while (currentPage <= totalPages) {
       // eslint-disable-next-line no-await-in-loop
-      const messageList = await this.axiosClient.get<AccountMessagesListResponse>(
-        queryURL, {
-        params: requestParams
+      const messageList = await this.axiosClient.get<AccountMessagesListResponse>(queryURL, {
+        params: requestParams,
       });
 
       totalPages = messageList.data.pagination.total_page;
       currentPage += 1;
-      requestParams.page = currentPage; //update current page
+      requestParams.page = currentPage; // update current page
 
       // Check if returned list is empty
       if (messageList.data.result.length < 1) {
