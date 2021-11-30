@@ -57,7 +57,6 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
 import AddressBook from './tabs/AddressBook/AddressBook';
-import DappBrowser from './tabs/DappBrowser/DappBrowser';
 import { getChainName } from '../../utils/utils';
 
 const { Header, Content, Footer } = Layout;
@@ -860,9 +859,6 @@ const FormSettings = () => {
                   history.push(`/settings/${key}`);
                 }}
               >
-                <TabPane tab="Browser" key="browser">
-                  <DappBrowser />
-                </TabPane>
                 <TabPane tab={t('settings.tab1')} key="1">
                   <div className="site-layout-background settings-content">
                     <div className="container">

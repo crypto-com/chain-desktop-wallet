@@ -1,3 +1,9 @@
+export interface Dapp {
+  name: string;
+  description: string;
+  url: string;
+}
+
 export namespace DappBrowserIPC {
   export const ChannelName = 'dapp';
 

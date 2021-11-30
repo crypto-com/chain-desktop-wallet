@@ -655,6 +655,9 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/bridge" icon={<Icon component={IconCronos} />}>
           <Link to="/bridge">{t('navbar.bridge')}</Link>
         </Menu.Item>
+        <Menu.Item key="/dapp" icon={<Icon component={IconCronos} />}>
+          <Link to="/dapp">DApp Browser</Link>
+        </Menu.Item>
         {/* <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">{t('navbar.send')}</Link>
         </Menu.Item>

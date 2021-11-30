@@ -5,13 +5,20 @@ import { WebviewTag } from 'electron';
 import { useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import Web3 from 'web3';
-import { ProviderPreloadScriptPath, useIPCProvider, useRefCallback } from './useIPCProvider';
-import { sessionState, walletAllAssetsState } from '../../../../recoil/atom';
-import { getCronosAsset } from '../../../../utils/utils';
-import PasswordFormModal from '../../../../components/PasswordForm/PasswordFormModal';
-import { secretStoreService } from '../../../../storage/SecretStoreService';
+import { useIPCProvider, useRefCallback } from './useIPCProvider';
+import { sessionState, walletAllAssetsState } from '../../../recoil/atom';
+import { getCronosAsset } from '../../../utils/utils';
+import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
+import { secretStoreService } from '../../../storage/SecretStoreService';
+import { Dapp } from '../types';
+import { ProviderPreloadScriptPath } from './config';
 
-const DappBrowser = () => {
+interface DappBrowserProps {
+  dapp: Dapp;
+}
+
+const DappBrowser = (props: DappBrowserProps) => {
+  const { dapp } = props;
   const webviewRef = useRef<WebviewTag & HTMLWebViewElement>(null);
   const [t] = useTranslation();
   const allAssets = useRecoilValue(walletAllAssetsState);
@@ -108,12 +115,10 @@ const DappBrowser = () => {
         ref={webviewRef}
         style={{
           width: '100%',
-          height: '600px',
+          height: '800px',
         }}
-        src="https://vvs.finance"
-        // src="https://cronaswap.org/"
-        // src="https://metamask.github.io/test-dapp/"
-        title="VVS Finance"
+        src={dapp.url}
+        title={dapp.name}
       />
     </div>
   );

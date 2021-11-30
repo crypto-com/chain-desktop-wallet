@@ -5,24 +5,15 @@ import { TransactionConfig } from 'web3-eth';
 import { useRecoilValue } from 'recoil';
 import Web3 from 'web3';
 import { ethers } from 'ethers';
-import path from 'path';
-import { TransactionPrepareService } from '../../../../service/TransactionPrepareService';
-import { walletService } from '../../../../service/WalletService';
+import { TransactionPrepareService } from '../../../service/TransactionPrepareService';
+import { walletService } from '../../../service/WalletService';
 import { ChainConfig } from './config';
-import { DappBrowserIPC } from './types';
-import { evmTransactionSigner } from '../../../../service/signers/EvmTransactionSigner';
-import { EVMContractCallUnsigned } from '../../../../service/signers/TransactionSupported';
-import { walletAllAssetsState } from '../../../../recoil/atom';
-import { getCronosAsset } from '../../../../utils/utils';
+import { DappBrowserIPC } from '../types';
+import { evmTransactionSigner } from '../../../service/signers/EvmTransactionSigner';
+import { EVMContractCallUnsigned } from '../../../service/signers/TransactionSupported';
+import { walletAllAssetsState } from '../../../recoil/atom';
+import { getCronosAsset } from '../../../utils/utils';
 import { TokenApprovalRequestData, TransactionDataParser } from './TransactionDataParser';
-
-const { remote } = window.require('electron');
-
-// TODO: make it work under production
-export const ProviderPreloadScriptPath = `file://${path.join(
-  remote.app.getAppPath(),
-  'src/pages/settings/tabs/DappBrowser/preload.js',
-)}`;
 
 type WebView = WebviewTag & HTMLWebViewElement;
 
@@ -86,10 +77,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   const allAssets = useRecoilValue(walletAllAssetsState);
   const cronosAsset = getCronosAsset(allAssets);
   const transactionDataParser = useMemo(() => {
-    return new TransactionDataParser(
-      'https://evm-cronos.crypto.org',
-      'https://cronos.crypto.org/explorer/api',
-    );
+    return new TransactionDataParser(ChainConfig.RpcUrl, ChainConfig.ExplorerAPIUrl);
   }, []);
 
   const executeJavScript = useCallback(
@@ -170,7 +158,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       const result = await evmTransactionSigner.sendContractCallTransaction(
         txConfig,
         passphrase,
-        ChainConfig.rpcUrl,
+        ChainConfig.RpcUrl,
       );
 
       sendResponse(event.id, result);

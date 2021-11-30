@@ -1,5 +1,5 @@
-import { CronosClient } from '../../../../service/cronos/CronosClient';
-import { ContractData } from '../../../../service/rpc/models/cronos.models';
+import { CronosClient } from '../../../service/cronos/CronosClient';
+import { ContractData } from '../../../service/rpc/models/cronos.models';
 
 export interface TokenApprovalRequestData {
   amount: string;
