@@ -199,7 +199,7 @@ export type WalletConfig = {
 
 export const FIXED_DEFAULT_FEE = String(10_000);
 export const FIXED_DEFAULT_GAS_LIMIT = String(300_000);
-export const DEFAULT_IBC_TRANSFER_TIMEOUT = 600_000;
+export const DEFAULT_IBC_TRANSFER_TIMEOUT = 3_600_000;
 
 export const EVM_MINIMUM_GAS_PRICE = String(42_000_000_000);
 export const EVM_MINIMUM_GAS_LIMIT = String(42_000);
