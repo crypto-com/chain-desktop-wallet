@@ -23,7 +23,7 @@ interface IUseIPCProviderProps {
   webview: WebView | null;
   onRequestAddress: (onSuccess: (address: string) => void, onError: ErrorHandler) => void;
   onRequestTokenApproval: (
-    event: TokenApprovalRequestData,
+    event: { request: TokenApprovalRequestData; gas: number; gasPrice: string },
     onSuccess: (amount: string) => void,
     onError: ErrorHandler,
   ) => void;
@@ -219,7 +219,11 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
               event.object.data,
             );
             props.onRequestTokenApproval(
-              response,
+              {
+                request: response,
+                gas: event.object.gas,
+                gasPrice: event.object.gasPrice,
+              },
               amount => {
                 // TODO: deal with amount
                 console.log(amount);

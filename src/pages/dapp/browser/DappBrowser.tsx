@@ -41,8 +41,8 @@ const DappBrowser = (props: DappBrowserProps) => {
       // TODO: !! cronosAsset may not be ready
       onRequestAddress.current(onSuccess, onError);
     },
-    onRequestTokenApproval: (request, successCallback, errorCallback) => {
-      console.log(request);
+    onRequestTokenApproval: (data, successCallback, errorCallback) => {
+      console.log(data);
       setInputPasswordVisible(true);
       setConfirmPasswordCallback({ successCallback, errorCallback });
     },
