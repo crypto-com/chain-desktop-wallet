@@ -158,16 +158,21 @@ SUPPORTED_CURRENCY.set('CZK', { value: 'CZK', label: 'CZK - Kč', symbol: 'Kč' 
 SUPPORTED_CURRENCY.set('BRL', { value: 'BRL', label: 'BRL - R$', symbol: 'R$' });
 SUPPORTED_CURRENCY.set('TRY', { value: 'TRY', label: 'TRY - ₺', symbol: '₺' });
 
+export enum SupportedChainName {
+  CRYPTO_ORG = 'Crypto.org Chain',
+  CRONOS = 'Cronos Chain',
+}
+
 export interface SupportedBridge {
   value: string;
   label: string;
 }
 
 export const SUPPORTED_BRIDGE = new Map<string, SupportedBridge>();
-SUPPORTED_BRIDGE.set('CRONOS', { value: 'CRONOS', label: 'Cronos Chain' });
+SUPPORTED_BRIDGE.set('CRONOS', { value: 'CRONOS', label: SupportedChainName.CRONOS });
 SUPPORTED_BRIDGE.set('CRYPTO_ORG', {
   value: 'CRYPTO_ORG',
-  label: 'Crypto.org Chain',
+  label: SupportedChainName.CRYPTO_ORG,
 });
 
 export const SUPPORTED_BRIDGES_ASSETS = ['CRO'];

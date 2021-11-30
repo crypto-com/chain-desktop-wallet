@@ -57,6 +57,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
 import AddressBook from './tabs/AddressBook/AddressBook';
+import { getChainName } from '../../utils/utils';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -162,7 +163,7 @@ const GeneralSettingsForm = props => {
           return (
             <Option value={asset.identifier} key={asset.identifier}>
               {assetIcon(asset)}
-              {`${asset.name} (${asset.symbol})`}
+              {`${getChainName(asset.name, session.wallet.config)} (${asset.symbol})`}
             </Option>
           );
         })}

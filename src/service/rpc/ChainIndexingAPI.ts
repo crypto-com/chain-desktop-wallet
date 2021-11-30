@@ -338,7 +338,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     });
 
     // Listed ValidatorInfo
-    return apySum.div(listedValidatorInfo.length).toString();
+    return apySum.div(listedValidatorInfo.length || 1).toString();
   }
 
   // NOTE: getting validator by address doesn't have `apy` property

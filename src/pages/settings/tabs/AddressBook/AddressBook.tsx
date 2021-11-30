@@ -13,6 +13,7 @@ import { Session } from '../../../../models/Session';
 import { sessionState } from '../../../../recoil/atom';
 import AddAddressModal from '../../../../components/AddressBookModal/AddAddressModal';
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal';
+import { getChainName } from '../../../../utils/utils';
 
 const AddressBook = () => {
   const [contacts, setContacts] = useState<AddressBookContact[]>([]);
@@ -41,32 +42,50 @@ const AddressBook = () => {
   const AddressBookTableColumns = [
     {
       key: 'asset',
+      width: '70px',
       render: (contact: AddressBookContact) => <div>{contact.assetSymbol}</div>,
     },
     {
       key: 'network',
+      width: '180px',
       render: (contact: AddressBookContact) => {
         return (
           <Tag
             style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
             color="processing"
           >
-            {contact.chainName}
+            {getChainName(contact.chainName, session.wallet.config)}
           </Tag>
         );
       },
     },
     {
       key: 'address',
+      ellipsis: true,
       render: (contact: AddressBookContact) => (
-        <div>
-          <div style={{ fontWeight: 'bold', fontSize: '14px' }}>{contact.label}</div>
+        <div
+          style={{
+            overflow: 'hidden',
+          }}
+        >
+          <div
+            style={{
+              fontWeight: 'bold',
+              fontSize: '14px',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+              overflow: 'hidden',
+            }}
+          >
+            {contact.label}
+          </div>
           <div style={{ color: '#777777' }}>{contact.address}</div>
         </div>
       ),
     },
     {
       key: 'action',
+      width: '150px',
       render: (contact: AddressBookContact) => (
         <div style={{ display: 'flex' }}>
           <Space size="middle">
