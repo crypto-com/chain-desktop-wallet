@@ -51,6 +51,7 @@ import IconAssets from '../../svg/IconAssets';
 import IconStaking from '../../svg/IconStaking';
 import IconNft from '../../svg/IconNft';
 import IconCronos from '../../svg/IconCronos';
+import IconDApp from '../../svg/IconDApp';
 import IconWallet from '../../svg/IconWallet';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -655,7 +656,7 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/bridge" icon={<Icon component={IconCronos} />}>
           <Link to="/bridge">{t('navbar.bridge')}</Link>
         </Menu.Item>
-        <Menu.Item key="/dapp" icon={<Icon component={IconCronos} />}>
+        <Menu.Item key="/dapp" icon={<Icon component={IconDApp} />}>
           <Link to="/dapp">DApp Browser</Link>
         </Menu.Item>
         {/* <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
