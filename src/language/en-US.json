@@ -338,7 +338,7 @@
   "bridge.form.errorSameChain": "The two chains cannot be the same",
   "bridge.form.errorBridgeNotSupported": "The selected bridge transfer is not supported",
   "bridge.form.amount": "Amount",
-  "bridge.form.willReceive": "You will receieve: ",
+  "bridge.form.willReceive": "You will receive: ",
   "bridge.form.fee": "Fee: ",
   "bridge.form.destination": "Destination: ",
   "bridge.form.toAddress": "To Address: ",
