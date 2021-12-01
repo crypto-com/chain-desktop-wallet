@@ -25,6 +25,7 @@ export type NavbarMenuKey =
   | '/governance'
   | '/nft'
   | '/bridge'
+  | '/dapp'
   | '/wallet'
   | '/restore'
   | '/create';

@@ -159,6 +159,12 @@ function RouteHub() {
       component: <BridgePage />,
     },
     {
+      name: 'Dapp Page',
+      key: 'dapp',
+      path: '/dapp',
+      component: <DappPage />,
+    },
+    {
       name: 'Settings Page',
       key: 'settings',
       path: '/settings',
@@ -169,12 +175,6 @@ function RouteHub() {
       key: 'wallet',
       path: '/wallet',
       component: <WalletPage />,
-    },
-    {
-      name: 'Dapp Page',
-      key: 'dapp',
-      path: '/dapp',
-      component: <DappPage />,
     },
   ];
 
