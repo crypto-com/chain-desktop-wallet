@@ -1,5 +1,7 @@
 export interface Dapp {
   name: string;
+  logo: string;
+  alt: string;
   description: string;
   url: string;
 }

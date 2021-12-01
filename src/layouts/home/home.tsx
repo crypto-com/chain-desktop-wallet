@@ -96,10 +96,11 @@ const allPaths: NavbarMenuKey[] = [
   // '/send',
   // '/receive',
   '/assets',
-  '/settings',
+  '/bridge',
+  '/dapp',
   '/governance',
   '/nft',
-  '/bridge',
+  '/settings',
   '/wallet',
 ];
 
@@ -657,7 +658,7 @@ function HomeLayout(props: HomeLayoutProps) {
           <Link to="/bridge">{t('navbar.bridge')}</Link>
         </Menu.Item>
         <Menu.Item key="/dapp" icon={<Icon component={IconDApp} />}>
-          <Link to="/dapp">DApp Browser</Link>
+          {conditionalLink('/dapp', t('navbar.dapp'))}
         </Menu.Item>
         {/* <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">{t('navbar.send')}</Link>
