@@ -65,7 +65,7 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
     <div style={{ display: 'flex', flexDirection: 'column' }}>
       <AutoComplete
         showSearch
-        allowClear={!isDefaultInput}
+        allowClear
         disabled={disabled}
         dropdownRender={menu => (
           <div>
