@@ -21,6 +21,7 @@ export class AddressBookService {
         assetSymbol: doc.assetSymbol,
         label: doc.label,
         address: doc.address,
+        memo: doc.memo,
       }));
     } catch (error) {
       // no-op
@@ -49,6 +50,7 @@ export class AddressBookService {
         assetSymbol: doc.assetSymbol,
         label: doc.label,
         address: doc.address,
+        memo: doc.memo,
       }));
     } catch (error) {
       // no-op
@@ -79,6 +81,7 @@ export class AddressBookService {
           assetSymbol: c.assetSymbol,
           label: c.label,
           address: c.address,
+          memo: c.memo,
         };
       }
     } catch (error) {
@@ -93,6 +96,7 @@ export class AddressBookService {
     chainName: string,
     assetSymbol: string,
     address: string,
+    memo: string,
   ) {
     // check if exists
     const isExist = await this.retrieveAddressBookContact(
@@ -126,6 +130,7 @@ export class AddressBookService {
       assetSymbol,
       label,
       address,
+      memo,
     });
   }
 
@@ -139,6 +144,7 @@ export class AddressBookService {
         assetSymbol: saved.assetSymbol,
         label: saved.label,
         address: saved.address,
+        memo: saved.memo,
       };
     } catch (error) {
       // no-op
@@ -153,6 +159,7 @@ export class AddressBookService {
     assetSymbol: string,
     label: string,
     address: string,
+    memo: string,
   ) {
     let success = false;
 
@@ -163,6 +170,7 @@ export class AddressBookService {
         assetSymbol,
         label,
         address,
+        memo,
       );
       success = true;
     } catch (error) {

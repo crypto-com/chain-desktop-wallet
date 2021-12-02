@@ -31,6 +31,7 @@ const FormKeys = {
   asset: 'asset',
   label: 'label',
   address: 'address',
+  memo: 'memo',
 };
 
 const AddAddressModal = (props: IAddAddressModalProps) => {
@@ -119,6 +120,7 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
           const address: string = form.getFieldValue(FormKeys.address);
           const network: string = form.getFieldValue(FormKeys.network);
           const assetSymbol: string = form.getFieldValue(FormKeys.asset);
+          const memo: string = form.getFieldValue(FormKeys.memo);
 
           const validateFiles = [label, address, network, assetSymbol];
 
@@ -133,6 +135,7 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
               assetSymbol,
               label,
               address,
+              memo,
             );
             if (!success) {
               message.error(t('settings.addressBook.message.updateFailed'));
@@ -146,6 +149,7 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
               assetSymbol,
               label,
               address,
+              memo,
             });
 
             if (!contactCreated) {
@@ -247,6 +251,14 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
           ])}
         >
           <Input placeholder={t('settings.addressBook.form.enterAddress')} />
+        </Form.Item>
+        <Form.Item
+          name={FormKeys.memo}
+          label={t('send.modal1.label5')}
+          initialValue={contact?.memo}
+          hasFeedback
+        >
+          <Input />
         </Form.Item>
         <Form.Item>
           <Button type="primary" htmlType="submit" style={{ marginLeft: '0' }}>
