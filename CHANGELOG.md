@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file.
 
 *Released*
 
+## [v0.5.7] - 2021-12-02
+
+### Bug fixes
+- Fix missing custom destination address support for Ledger wallets on Cronos Bridge.
+- Extend IBC Transfer timeout to 1 hour
+
 ## [v0.5.6] - 2021-11-23
 
 ### Additions
