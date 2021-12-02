@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './CronosBridgeForm.less';
 import { Button, Checkbox, Form, InputNumber, Select } from 'antd';
 import { SwapOutlined } from '@ant-design/icons';
@@ -29,8 +29,6 @@ import iconCronosSvg from '../../../assets/icon-cronos-blue.svg';
 import iconCroSvg from '../../../assets/icon-cro.svg';
 import RowAmountOption from '../../../components/RowAmountOption/RowAmountOption';
 import AddressBookInput from '../../../components/AddressBookInput/AddressBookInput';
-import { AddressBookContact } from '../../../models/AddressBook';
-import { AddressBookService } from '../../../service/AddressBookService';
 
 const { Option } = Select;
 const tailLayout = {
@@ -90,7 +88,6 @@ const CronosBridgeForm = props => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [isToAddressDisabled, setIsToAddressDisabled] = useState(true);
-  const [currentAddressBookContact, setCurrentAddressBookContact] = useState<AddressBookContact>();
   const didMountRef = useRef(false);
 
   const analyticsService = new AnalyticsService(session);
@@ -102,10 +99,6 @@ const CronosBridgeForm = props => {
   const { tendermintAddress, evmAddress } = formValues;
 
   const [t] = useTranslation();
-
-  const addressBookService = useMemo(() => {
-    return new AddressBookService(walletService.storageService);
-  }, [walletService]);
 
   const customAddressValidator = TransactionUtils.addressValidator(
     session,
@@ -264,15 +257,6 @@ const CronosBridgeForm = props => {
     });
     setCurrentAsset(selectedAsset);
     setAvailableBalance(scaledBalance(selectedAsset!));
-
-    if (!currentAddressBookContact) {
-      await addressBookService.autoAddAddressBookContact(
-        session.wallet.identifier,
-        toAsset.name,
-        toAsset.symbol,
-        toAddress,
-      );
-    }
   };
 
   const currentMinAssetAmount = getCurrentMinAssetAmount(currentAsset!);
@@ -619,12 +603,11 @@ const CronosBridgeForm = props => {
             {toAsset && (
               <AddressBookInput
                 disabled={isToAddressDisabled}
-                onChange={(value, contact) => {
+                onChange={value => {
                   form.setFieldsValue({
                     toAddress: value,
                   });
                   setToAddress(value);
-                  setCurrentAddressBookContact(contact);
                 }}
                 initialValue={toAddress}
                 isDefaultInput
