@@ -153,6 +153,7 @@ const FormSend: React.FC<FormSendProps> = props => {
         walletAsset.name,
         walletAsset.symbol,
         toAddress,
+        memo,
       );
     }
 
@@ -270,6 +271,9 @@ const FormSend: React.FC<FormSendProps> = props => {
           onChange={(value, contact) => {
             form.setFieldsValue({
               recipientAddress: value,
+            });
+            form.setFieldsValue({
+              memo: contact?.memo,
             });
             setCurrentAddressBookContact(contact);
           }}

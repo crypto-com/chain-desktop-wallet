@@ -7,6 +7,7 @@ export interface AddressBookContact {
   assetSymbol: string;
   label: string;
   address: string;
+  memo: string;
 }
 
 // for persistence
@@ -16,6 +17,7 @@ export interface AddressBookContactModel {
   assetSymbol: string;
   label: string;
   address: string;
+  memo: string;
 }
 
 interface AddressBookNetwork {
