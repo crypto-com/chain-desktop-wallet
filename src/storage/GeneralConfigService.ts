@@ -30,7 +30,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         languageCode,
         incorrectUnlockAttempts: 0,
-        isAppLockedByUser: false
+        isAppLockedByUser: false,
       };
       return this.saveGeneralConfig(newConfig);
     }
@@ -47,7 +47,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         incorrectUnlockAttempts: 0,
-        isAppLockedByUser: false
+        isAppLockedByUser: false,
       };
       await this.saveGeneralConfig(newConfig);
       return DEFAULT_LANGUAGE_CODE;
@@ -81,7 +81,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       await this.saveGeneralConfig(newConfig);
       return false;
@@ -99,7 +99,7 @@ export class GeneralConfigService {
       const newConfig: GeneralConfig = {
         ...(savedConfig as GeneralConfig),
         isAppLockedByUser,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       return this.saveGeneralConfig(newConfig);
     }
@@ -116,7 +116,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       await this.saveGeneralConfig(newConfig);
       return false;
@@ -134,7 +134,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 1
+        incorrectUnlockAttempts: 1,
       };
       await this.saveGeneralConfig(newConfig);
       return 1;
@@ -154,7 +154,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       await this.saveGeneralConfig(newConfig);
       return;
@@ -174,7 +174,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       await this.saveGeneralConfig(newConfig);
       return 0;
@@ -182,46 +182,47 @@ export class GeneralConfigService {
     return savedConfig.incorrectUnlockAttempts;
   }
 
+  // eslint-disable-next-line
   public async isTxHistoryMigrated() {
-    /*const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
-      _id: this.GENERAL_CONFIG_ID,
-    });
-    if (!savedConfig) {
-      const newConfig: GeneralConfig = {
-        ...(savedConfig as GeneralConfig),
-        hasEverShownAnalyticsPopup: false,
-        isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0,
-        isTxHistoryMigrated: false
-      };
-      await this.saveGeneralConfig(newConfig);
-      return false;
-    }
-    return savedConfig.isTxHistoryMigrated;*/
+    // const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
+    //   _id: this.GENERAL_CONFIG_ID,
+    // });
+    // if (!savedConfig) {
+    //   const newConfig: GeneralConfig = {
+    //     ...(savedConfig as GeneralConfig),
+    //     hasEverShownAnalyticsPopup: false,
+    //     isAppLockedByUser: false,
+    //     incorrectUnlockAttempts: 0,
+    //     isTxHistoryMigrated: false
+    //   };
+    //   await this.saveGeneralConfig(newConfig);
+    //   return false;
+    // }
+    // return savedConfig.isTxHistoryMigrated;
     return false;
   }
 
+  // eslint-disable-next-line
   public async setTxHistoryMigrated(isMigrated: boolean) {
-    /*const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
-      _id: this.GENERAL_CONFIG_ID,
-    });
-    if (!savedConfig) {
-      const newConfig: GeneralConfig = {
-        ...(savedConfig as GeneralConfig),
-        hasEverShownAnalyticsPopup: false,
-        isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0,
-        isTxHistoryMigrated: false
-      };
-      await this.saveGeneralConfig(newConfig);
-      return false;
-    }
-    await this.db.generalConfigStore.update<GeneralConfig>(
-      { _id: this.GENERAL_CONFIG_ID },
-      { $set: { isTxHistoryMigrated: isMigrated } },
-    ); */
+    // const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
+    //   _id: this.GENERAL_CONFIG_ID,
+    // });
+    // if (!savedConfig) {
+    //   const newConfig: GeneralConfig = {
+    //     ...(savedConfig as GeneralConfig),
+    //     hasEverShownAnalyticsPopup: false,
+    //     isAppLockedByUser: false,
+    //     incorrectUnlockAttempts: 0,
+    //     isTxHistoryMigrated: false
+    //   };
+    //   await this.saveGeneralConfig(newConfig);
+    //   return false;
+    // }
+    // await this.db.generalConfigStore.update<GeneralConfig>(
+    //   { _id: this.GENERAL_CONFIG_ID },
+    //   { $set: { isTxHistoryMigrated: isMigrated } },
+    // );
   }
-
 }
 
 export const generalConfigService = new GeneralConfigService('general-config');

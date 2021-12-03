@@ -56,7 +56,7 @@ import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
 import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
-import AddressBook from './tabs/addressBook/AddressBook';
+import AddressBook from './tabs/AddressBook/AddressBook';
 import { getChainName } from '../../utils/utils';
 
 const { Header, Content, Footer } = Layout;
