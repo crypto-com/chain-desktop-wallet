@@ -789,6 +789,7 @@ export class StorageService {
     }
 
     records.forEach(async record => {
+      // eslint-disable-next-line no-console
       console.log(`[insertCommonTransactionRecords] Upserting record, txHash : ${record.txHash}`);
       await this.db.commonTransactionStore.update<CommonTransactionRecord>(
         {
