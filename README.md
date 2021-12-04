@@ -20,6 +20,9 @@ Please refer to the [Instructions on Multi-Language Content Management](./CONTEN
 [Apache 2.0](./LICENSE)
 
 ## Manual Build for Development
+
+### For M1 Chip Macs
+
 ### Installation
 
 ```
