@@ -515,6 +515,7 @@ export class StorageService {
     assetSymbol: string,
     label: string,
     address: string,
+    memo: string,
   ) {
     return this.db.addressBookStore.update(
       { _id },
@@ -524,6 +525,7 @@ export class StorageService {
           assetSymbol,
           label,
           address,
+          memo,
         },
       },
     );

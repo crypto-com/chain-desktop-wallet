@@ -245,8 +245,8 @@ const CronosBridge = props => {
     });
 
     if (decryptedPhrase || session.wallet.walletType === LEDGER_WALLET_TYPE) {
-      const { tendermintAddress, evmAddress, toAddress, isCustomToAddress } = formValues;
-      // const { isCustomToAddress } = form.getFieldsValue();
+      const { tendermintAddress, evmAddress } = formValues;
+      const { toAddress, isCustomToAddress } = form.getFieldsValue();
       let amount = form.getFieldValue('amount');
       amount = fromScientificNotation(amount).toString();
 

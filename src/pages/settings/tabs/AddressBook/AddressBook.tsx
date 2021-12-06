@@ -80,6 +80,7 @@ const AddressBook = () => {
             {contact.label}
           </div>
           <div style={{ color: '#777777' }}>{contact.address}</div>
+          <div style={{ color: '#777777' }}>{contact.memo?.length > 0 ? contact.memo : '--'}</div>
         </div>
       ),
     },

@@ -15,16 +15,26 @@ interface IAddressBookInputProps {
   userAsset: UserAsset;
   currentSession: Session;
   onChange: (value: string, addressBookContact?: AddressBookContact) => void;
+  disabled?: boolean;
+  initialValue?: string;
+  isDefaultInput?: boolean;
 }
 
 const AddressBookInput = (props: IAddressBookInputProps) => {
-  const { userAsset, currentSession, onChange } = props;
+  const {
+    userAsset,
+    currentSession,
+    onChange,
+    initialValue,
+    disabled = false,
+    isDefaultInput = false,
+  } = props;
 
   const [, setNavbarSelectedKey] = useRecoilState(navbarMenuSelectedKeyState);
   const history = useHistory();
   const [t] = useTranslation();
 
-  const [value, setValue] = useState<string>();
+  const [value, setValue] = useState<string>(initialValue ?? '');
   const [contacts, setContacts] = useState<AddressBookContact[]>([]);
 
   const walletId = currentSession.wallet.identifier;
@@ -56,6 +66,7 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
       <AutoComplete
         showSearch
         allowClear
+        disabled={disabled}
         dropdownRender={menu => (
           <div>
             {menu}
@@ -77,7 +88,7 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
           </div>
         )}
         showArrow={false}
-        value={value}
+        value={initialValue ?? value}
         autoFocus
         options={contacts.map(contact => {
           return {
@@ -119,7 +130,7 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
             });
         }}
       >
-        {currentContact ? (
+        {currentContact && !isDefaultInput ? (
           <Select
             mode="multiple"
             size="large"
@@ -171,7 +182,7 @@ const AddressBookInput = (props: IAddressBookInputProps) => {
             }}
           />
         ) : (
-          <Input />
+          <Input disabled={disabled} value={initialValue ?? value} />
         )}
       </AutoComplete>
     </div>
