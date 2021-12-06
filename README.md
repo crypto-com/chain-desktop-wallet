@@ -22,7 +22,7 @@ Please refer to the [Instructions on Multi-Language Content Management](./CONTEN
 ## Manual Build for Development
 
 ### For M1 Chip Macs 💻
-At this moment, the project could only be compiled with `node` in `x64`. 
+At this moment, the project could only be compiled with `node` in `x64` binary version. 
 
 Please check the installed binary version of your `node`:
 
