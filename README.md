@@ -22,6 +22,18 @@ Please refer to the [Instructions on Multi-Language Content Management](./CONTEN
 ## Manual Build for Development
 
 ### For M1 Chip Macs
+At this moment, the project could only be compiled with `node` in `x64`. 
+Please check the installed binary version of your `node` 
+```
+node -p process.arch
+x64
+```
+
+If `arm64` is returned, please use Rosetta to open your favourite Shell
+```
+arch -x86_64 /bin/bash
+```
+Reinstall `node` v14 or v15 under Rosetta. It will install `node` in `x64` version by default. 
 
 ### Installation
 
