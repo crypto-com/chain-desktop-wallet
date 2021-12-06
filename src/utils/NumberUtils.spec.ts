@@ -1,5 +1,7 @@
 import 'mocha';
 import { expect } from 'chai';
+import * as fc from 'fast-check';
+import { Big } from 'big.js';
 import {
   adjustedTransactionAmount,
   fromScientificNotation,
@@ -96,4 +98,56 @@ describe('Testing Number utils', () => {
     expect(adjustedTransactionAmount('0.245', asset, networkFee)).to.eq('0.2449');
     expect(adjustedTransactionAmount('0.1223', asset, networkFee)).to.eq('0.1223');
   });
+});
+
+test('should adjust transaction correctly', () => {
+  fc.assert(
+    fc.property(
+      fc.integer({ min: 4, max: 16 }),
+      fc.bigInt(BigInt('0'), BigInt('100000000000000000000000000000000')),
+      fc.bigInt(BigInt('0'), BigInt('100000000000000000000000000000000')),
+
+      (decimals, formamount, balance) => {
+        const { networkFee } = DefaultWalletConfigs.TestNetConfig.fee;
+        const asset: UserAsset = {
+          decimals: decimals,
+          mainnetSymbol: '',
+          balance: balance.toString(),
+          description: 'The best asset',
+          icon_url: 'some url',
+          identifier: 'cbd4bab2cbfd2b3',
+          name: 'Best Asset',
+          symbol: 'BEST',
+          walletId: '',
+          stakedBalance: '0',
+          unbondingBalance: '0',
+          rewardsBalance: '0',
+        };
+
+        const adjustedAmount = adjustedTransactionAmount(formamount.toString(), asset, networkFee);
+        expect(Big(adjustedAmount).gte(Big('0'))).to.eq(true);
+        expect(Big(adjustedAmount).lte(Big(formamount.toString()))).to.eq(true);
+        return true;
+      },
+    ),
+    { verbose: true },
+  );
+});
+
+test('should scale amount correctly', () => {
+  fc.assert(
+    fc.property(
+      fc.integer({ min: 4, max: 16 }),
+      fc.bigInt(BigInt('1'), BigInt('100000000000000000000000000000000')),
+      (decimals, baseAmount) => {
+        const decimalAmount = getUINormalScaleAmount(baseAmount.toString(), decimals, decimals);
+        const restoredBaseAmount = Big(10)
+          .pow(decimals)
+          .mul(Big(decimalAmount));
+        expect(restoredBaseAmount.toFixed()).to.eq(Big(baseAmount.toString()).toFixed());
+        return true;
+      },
+    ),
+    { verbose: true },
+  );
 });
