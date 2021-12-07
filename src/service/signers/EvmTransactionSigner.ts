@@ -65,12 +65,10 @@ class EvmTransactionSigner implements ITransactionSigner {
     const gasPriceBN = web3.utils.toBN(
       transaction.gasPrice || transferAsset?.config?.fee?.networkFee!,
     );
-
-    const contractABI = TokenContractABI.abi as AbiItem[];
-    const contract = new web3.eth.Contract(contractABI, transferAsset.contractAddress);
-    const encodedTokenTransfer = contract.methods
-      .transfer(transaction.toAddress, transaction.amount)
-      .encodeABI();
+    const encodedTokenTransfer = this.encodeTokenTransferABI(
+      transferAsset.contractAddress,
+      transaction,
+    );
 
     const chainId = transaction?.asset?.config?.chainId || 338;
     const txParams = {
@@ -85,6 +83,17 @@ class EvmTransactionSigner implements ITransactionSigner {
 
     const signedTx = await ethers.Wallet.fromMnemonic(phrase).signTransaction(txParams);
     return Promise.resolve(signedTx);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public encodeTokenTransferABI(
+    tokenContractAddress: string,
+    transaction: TransferTransactionUnsigned,
+  ) {
+    const web3 = new Web3('');
+    const contractABI = TokenContractABI.abi as AbiItem[];
+    const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
+    return contract.methods.transfer(transaction.toAddress, transaction.amount).encodeABI();
   }
 
   // eslint-disable-next-line class-methods-use-this

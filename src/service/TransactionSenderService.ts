@@ -147,6 +147,97 @@ export class TransactionSenderService {
           throw TypeError(e);
         }
 
+      case UserAssetType.CRC_20_TOKEN:
+        try {
+          if (
+            !currentAsset.address ||
+            !currentAsset.config?.nodeUrl ||
+            !currentAsset.contractAddress
+          ) {
+            throw TypeError(`Missing asset config: ${currentAsset.config}`);
+          }
+
+          const cronosClient = new CronosClient(
+            currentAsset.config?.nodeUrl,
+            currentAsset.config?.indexingUrl,
+          );
+
+          const transfer: TransferTransactionUnsigned = {
+            fromAddress,
+            toAddress: transferRequest.toAddress,
+            amount: String(scaledBaseAmount),
+            memo: transferRequest.memo,
+            accountNumber: 0,
+            accountSequence: 0,
+            asset: currentAsset,
+          };
+
+          const encodedABITokenTransfer = evmTransactionSigner.encodeTokenTransferABI(
+            currentAsset.contractAddress,
+            transfer,
+          );
+
+          const web3 = new Web3('');
+          const txConfig: TransactionConfig = {
+            from: currentAsset.address,
+            to: currentAsset.contractAddress,
+            value: web3.utils.toWei(transferRequest.amount, 'ether'),
+            data: encodedABITokenTransfer,
+          };
+
+          const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
+            currentAsset,
+            txConfig,
+          );
+
+          const staticTokenTransferGasLimit = 130_000;
+
+          transfer.nonce = prepareTxInfo.nonce;
+          transfer.gasPrice = prepareTxInfo.loadedGasPrice;
+          transfer.gasLimit = staticTokenTransferGasLimit;
+
+          // eslint-disable-next-line no-console
+          console.log('TX_DATA', { gasLimit: transfer.gasLimit });
+
+          let signedTx = '';
+          if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+            const device = createLedgerDevice();
+
+            const gasLimitTx = web3.utils.toBN(transfer.gasLimit!);
+            const gasPriceTx = web3.utils.toBN(transfer.gasPrice);
+
+            signedTx = await device.signEthTx(
+              walletAddressIndex,
+              Number(transfer.asset?.config?.chainId), // chainid
+              transfer.nonce,
+              web3.utils.toHex(gasLimitTx) /* gas limit */,
+              web3.utils.toHex(gasPriceTx) /* gas price */,
+              currentAsset.contractAddress,
+              '0',
+              encodedABITokenTransfer,
+            );
+          } else {
+            signedTx = await evmTransactionSigner.signTokenTransfer(
+              transfer,
+              transferRequest.decryptedPhrase,
+            );
+          }
+
+          const result = await cronosClient.broadcastRawTransactionHex(signedTx);
+          return {
+            transactionHash: result,
+            message: '',
+            code: 200,
+          };
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.log(
+            `ERROR_TRANSFERRING_TOKEN - ${currentAsset.assetType} ${currentAsset.symbol}`,
+            e,
+          );
+          throw TypeError(e);
+        }
+
       case UserAssetType.TENDERMINT:
       case UserAssetType.IBC:
       case undefined: {
