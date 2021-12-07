@@ -465,6 +465,9 @@ export class TransactionHistoryService {
       return [];
     }
 
+    // eslint-disable-next-line no-console
+    console.log('CRC_20_PERSISTED_TOKEN : Start fetching tokens CRC20');
+
     const cronosClient = new CronosClient(evmAsset.config?.nodeUrl, evmAsset.config?.indexingUrl);
 
     const tokensListResponse = await cronosClient.getTokensOwnedByAddress(address);
@@ -490,6 +493,12 @@ export class TransactionHistoryService {
         config: evmAsset.config,
       };
 
+      // eslint-disable-next-line no-console
+      console.log(`CRC_20_PERSISTED_TOKEN ${token.symbol}:`, {
+        address,
+        balance: token.balance,
+      });
+
       await this.storageService.saveAsset(newCRC20Token);
       return newCRC20Token;
     });
@@ -504,7 +513,7 @@ export class TransactionHistoryService {
     return newlyLoadedTokens;
   }
 
-  public async fetchAndPersistTokens(session: Session | null = null) {
+  public async fechTokensAndPersistBalances(session: Session | null = null) {
     const currentSession =
       session == null ? await this.storageService.retrieveCurrentSession() : session;
     if (!currentSession) {
@@ -545,6 +554,9 @@ export class TransactionHistoryService {
     if (!assets || assets.length === 0) {
       return;
     }
+
+    // After updating main coin assets balances - We fetch and update tokens balances after
+    await this.fechTokensAndPersistBalances(session);
 
     await Promise.all(
       assets.map(async asset => {

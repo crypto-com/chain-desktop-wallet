@@ -337,6 +337,9 @@ const HomePage = () => {
       showWalletStateNotification(sessionData.wallet.config);
       setWalletAllAssets(allAssets);
       setHasShownNotLiveWallet(true);
+
+      // Fetch again balances data
+      walletService.syncBalancesData(sessionData);
     };
 
     syncAssetData();
