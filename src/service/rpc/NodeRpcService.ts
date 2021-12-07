@@ -5,7 +5,7 @@ import { Bytes } from '../../utils/ChainJsLib';
 import { NodePorts } from '../../config/StaticConfig';
 import {
   AllProposalResponse,
-  BalanceResponse,
+  BalancesResponse,
   DelegationResult,
   UnbondingDelegationResult,
   DenomTrace,
@@ -86,12 +86,14 @@ export class NodeRpcService implements INodeRpcService {
 
   public async loadAccountBalance(address: string, assetDenom: string): Promise<string> {
     try {
-      const response = await this.cosmosClient.get<BalanceResponse>(
-        `/cosmos/bank/v1beta1/balances/${address}/${assetDenom}`,
+      const response = await this.cosmosClient.get<BalancesResponse>(
+        `/cosmos/bank/v1beta1/balances/${address}`,
       );
       const balanceData = response?.data;
-      return balanceData?.balance?.amount ?? '0';
-    } catch (error: any) {
+      const balance = balanceData.balances.find(b => b.denom === assetDenom);
+
+      return balance?.amount ?? '0';
+    } catch (error) {
       // eslint-disable-next-line no-console
       console.log(
         `[${NodeRpcService.name}-loadAccountBalance] [Error] Unable to fetch data.`,
@@ -209,7 +211,7 @@ export class NodeRpcService implements INodeRpcService {
     let response;
     try {
       response = await this.cosmosClient.get<DelegationResult | ErrorRpcResponse>(url);
-    } catch (error: any) {
+    } catch (error) {
       response = error.response;
     } finally {
       if (response.status !== 200) {
@@ -251,7 +253,7 @@ export class NodeRpcService implements INodeRpcService {
       response = await this.cosmosClient.get<RewardResponse>(
         `cosmos/distribution/v1beta1/delegators/${address}/rewards`,
       );
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
       console.log(
         `[NodeRpcService.fetchStakingRewardsBalance] | HTTP Code: ${
@@ -349,7 +351,7 @@ export class NodeRpcService implements INodeRpcService {
     let response;
     try {
       response = await this.cosmosClient.get<UnbondingDelegationResult>(url);
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
       console.log(
         `[NodeRpcService.fetchUnbondingDelegationsPaginated] | HTTP Code: ${
@@ -591,7 +593,7 @@ export class NodeRpcService implements INodeRpcService {
       );
 
       return denomTraceResponse.data.denom_trace;
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
       console.log(
         `[${NodeRpcService.name}-getIBCAssetTrace] [Error] Unable to fetch data.`,

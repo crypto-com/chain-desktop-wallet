@@ -38,8 +38,8 @@ export interface Balance {
   amount: string;
 }
 
-export interface BalanceResponse {
-  balance: Balance;
+export interface BalancesResponse {
+  balances: Balance[];
 }
 
 export interface DelegationResponse {
