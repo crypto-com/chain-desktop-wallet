@@ -1,21 +1,21 @@
 import { StorageService } from '../storage/StorageService';
 import { NodeRpcService } from './rpc/NodeRpcService';
-import { SECONDS_OF_YEAR, NOT_KNOWN_YET_VALUE } from '../config/StaticConfig';
+import { NOT_KNOWN_YET_VALUE, SECONDS_OF_YEAR } from '../config/StaticConfig';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { CronosClient } from './cronos/CronosClient';
 import {
-  TransferTransactionData,
-  TransactionStatus,
+  NftModel,
   NftQueryParams,
   NftTransferModel,
-  ValidatorModel,
-  UnbondingDelegationList,
+  ProposalModel,
+  ProposalStatuses,
   RewardTransactionList,
   StakingTransactionList,
+  TransactionStatus,
+  TransferTransactionData,
   TransferTransactionList,
-  NftModel,
-  ProposalStatuses,
-  ProposalModel,
+  UnbondingDelegationList,
+  ValidatorModel,
 } from '../models/Transaction';
 import { Session } from '../models/Session';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
@@ -411,6 +411,77 @@ export class TransactionHistoryService {
       console.log('FAILED_LOADING PROPOSALS', e);
       return [];
     }
+  }
+
+  private async fetchCurrentWalletCRC20Tokens(evmAsset: UserAsset) {
+    const { address } = evmAsset;
+
+    if (!address || !evmAsset.config?.nodeUrl) {
+      return [];
+    }
+
+    const cronosClient = new CronosClient(evmAsset.config?.nodeUrl, evmAsset.config?.indexingUrl);
+
+    const tokensListResponse = await cronosClient.getTokensOwnedByAddress(address);
+
+    const newlyLoadedTokens = await tokensListResponse.result.map(async token => {
+      const newCRC20Token: UserAsset = {
+        balance: token.balance,
+        decimals: Number(token.decimals),
+        contractAddress: token.contractAddress,
+        description: `${token.name} (${token.symbol})`,
+        icon_url: '',
+        identifier: `${token.name}_(${token.symbol})_${evmAsset.walletId}`,
+        mainnetSymbol: evmAsset.mainnetSymbol,
+        name: evmAsset.name,
+        rewardsBalance: '',
+        stakedBalance: '',
+        symbol: token.symbol,
+        unbondingBalance: '',
+        walletId: evmAsset.walletId,
+        isSecondaryAsset: true,
+        assetType: UserAssetType.CRC_20_TOKEN,
+      };
+
+      await this.storageService.saveAsset(newCRC20Token);
+      return newCRC20Token;
+    });
+
+    // eslint-disable-next-line no-console
+    console.log('CRC_20_PERSISTED_TOKENS', {
+      address,
+      size: newlyLoadedTokens.length,
+      newlyLoadedTokens,
+    });
+
+    return newlyLoadedTokens;
+  }
+
+  public async fetchAndPersistTokens(session: Session | null = null) {
+    const currentSession =
+      session == null ? await this.storageService.retrieveCurrentSession() : session;
+    if (!currentSession) {
+      return;
+    }
+    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
+
+    if (!assets || assets.length === 0) {
+      return;
+    }
+
+    await Promise.all(
+      assets.map(async asset => {
+        switch (asset.assetType) {
+          case UserAssetType.TENDERMINT:
+            break;
+          case UserAssetType.EVM:
+            await this.fetchCurrentWalletCRC20Tokens(asset);
+            break;
+          default:
+            throw TypeError('Not supported yet');
+        }
+      }),
+    );
   }
 
   public async fetchAndUpdateBalances(session: Session | null = null) {

@@ -129,10 +129,10 @@ export const scaledRewardBalance = (asset: UserAsset) => {
 };
 
 export const scaledTotalBalance = (asset: UserAsset) => {
-  const totalBalance = Big(asset.balance ?? '0')
-    .add(asset.stakedBalance ?? '0')
-    .add(asset.unbondingBalance ?? '0')
-    .add(asset.rewardsBalance ?? '0')
+  const totalBalance = Big(asset.balance || '0')
+    .add(asset.stakedBalance || '0')
+    .add(asset.unbondingBalance || '0')
+    .add(asset.rewardsBalance || '0')
     .toFixed(2);
   return getUINormalScaleAmount(totalBalance, asset.decimals);
 };

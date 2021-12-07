@@ -383,6 +383,7 @@ class WalletService {
       return await Promise.all([
         await this.txHistoryManager.fetchAndUpdateBalances(session),
         await this.txHistoryManager.loadAndSaveAssetPrices(session),
+        await this.txHistoryManager.fetchAndPersistTokens(session),
       ]);
       // eslint-disable-next-line no-empty
     } catch (e) {

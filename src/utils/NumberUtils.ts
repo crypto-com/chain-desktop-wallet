@@ -34,7 +34,7 @@ export function getUINormalScaleAmount(
 ): string {
   const exp = Big(10).pow(decimals);
   const dp = decimalPoint || 4;
-  return Big(amount)
+  return Big(amount || '0')
     .div(exp)
     .toFixed(dp);
 }
