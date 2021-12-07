@@ -612,7 +612,7 @@
           "errorSameChain": "The two chains cannot be the same",
           "errorBridgeNotSupported": "The selected bridge transfer is not supported",
           "amount": "Amount",
-          "willReceive": "You will receieve: ",
+          "willReceive": "You will receive: ",
           "fee": "Fee: ",
           "destination": "Destination: ",
           "toAddress": "To Address: ",
