@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file.
 - Update dependencies to stable versions
 
 ### Bug fixes
-- Update on balance retrieval endpoint for Crypto.org Mainnet upgrade
+- Update deprecated balance retrieval endpoint for Crypto.org Mainnet upgrade
 
 ## [v0.5.7] - 2021-12-02
 
