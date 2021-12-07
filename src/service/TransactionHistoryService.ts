@@ -264,6 +264,51 @@ export class TransactionHistoryService {
             }
 
             break;
+          case UserAssetType.CRC_20_TOKEN:
+            {
+              if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
+                return;
+              }
+
+              const cronosClient = new CronosClient(
+                currentAsset.config?.nodeUrl,
+                currentAsset.config?.indexingUrl,
+              );
+
+              const transactionsResponse = await cronosClient.getTokenTransfersByAddress(
+                currentAsset.address,
+                { contractaddress: currentAsset.contractAddress },
+              );
+              const loadedTransactions = transactionsResponse.result.map(crc20TokenTx => {
+                const transactionTime = new Date(
+                  Number(crc20TokenTx.timeStamp) * 1000,
+                ).toISOString();
+
+                const transferTx: TransferTransactionData = {
+                  amount: crc20TokenTx.value,
+                  assetSymbol: currentAsset.symbol,
+                  date: transactionTime,
+                  hash: crc20TokenTx.hash,
+                  memo: '',
+                  receiverAddress: crc20TokenTx.to,
+                  senderAddress: crc20TokenTx.from,
+                  status: TransactionStatus.SUCCESS,
+                };
+
+                return transferTx;
+              });
+
+              // eslint-disable-next-line no-console
+              console.log(`LOADED_TXS ${currentAsset.symbol}: `, loadedTransactions);
+
+              await this.saveTransfers({
+                transactions: loadedTransactions,
+                walletId: currentSession.wallet.identifier,
+                assetId: currentAsset?.identifier,
+              });
+            }
+            break;
+
           default:
             break;
         }
@@ -441,6 +486,8 @@ export class TransactionHistoryService {
         walletId: evmAsset.walletId,
         isSecondaryAsset: true,
         assetType: UserAssetType.CRC_20_TOKEN,
+        address: evmAsset.address,
+        config: evmAsset.config,
       };
 
       await this.storageService.saveAsset(newCRC20Token);

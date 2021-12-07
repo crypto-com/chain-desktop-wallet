@@ -1,4 +1,10 @@
-import { TxListAPIResponse, PendingTxListAPIResponse, TokenTransferEventLogsResponse, TokensOwnedByAddressResponse, ContractDataResponse } from '../models/cronos.models';
+import {
+  TxListAPIResponse,
+  PendingTxListAPIResponse,
+  TokenTransferEventLogsResponse,
+  TokensOwnedByAddressResponse,
+  ContractDataResponse,
+} from '../models/cronos.models';
 
 // Reference: https://cronos.crypto.org/explorer/api-docs
 
@@ -35,7 +41,7 @@ export interface ICronosChainIndexAPI {
   ): Promise<PendingTxListAPIResponse>;
 
   // - Token transfers event logs by address
-  //?module=account&action=tokentx&address={addressHash}
+  // ?module=account&action=tokentx&address={addressHash}
   getTokenTransfersByAddress(
     address: string,
     options?: tokenTransfersRequestOptions,
