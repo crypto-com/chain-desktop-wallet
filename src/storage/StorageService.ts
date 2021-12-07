@@ -447,10 +447,10 @@ export class StorageService {
     return {
       transactions: rewardTxs.map(tx => tx.txData),
       walletId,
-      totalBalance: rewardCustomParams.customParams.totalBalance,
-      claimedRewardsBalance: rewardCustomParams.customParams.claimedRewardsBalance,
-      estimatedApy: rewardCustomParams.customParams.estimatedApy,
-      estimatedRewardsBalance: rewardCustomParams.customParams.estimatedRewardsBalance,
+      totalBalance: rewardCustomParams.customParams.totalBalance || '0',
+      claimedRewardsBalance: rewardCustomParams.customParams.claimedRewardsBalance || '0',
+      estimatedApy: rewardCustomParams.customParams.estimatedApy || '0',
+      estimatedRewardsBalance: rewardCustomParams.customParams.estimatedRewardsBalance || '0',
     } as RewardTransactionList
 
     // return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
