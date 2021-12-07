@@ -140,8 +140,9 @@ app.on('activate', async () => {
 
 });
 
-app.on('ready',  async function()  {
-  createWindow()
+app.on('ready', async function() {
+  app.allowRendererProcessReuse = false
+  createWindow();
 
   await new Promise(resolve => setTimeout(resolve, 20_000));
   autoUpdater.checkForUpdatesAndNotify();
