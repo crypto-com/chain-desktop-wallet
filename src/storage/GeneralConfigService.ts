@@ -30,7 +30,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         languageCode,
         incorrectUnlockAttempts: 0,
-        isAppLockedByUser: false
+        isAppLockedByUser: false,
       };
       return this.saveGeneralConfig(newConfig);
     }
@@ -47,7 +47,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         incorrectUnlockAttempts: 0,
-        isAppLockedByUser: false
+        isAppLockedByUser: false,
       };
       await this.saveGeneralConfig(newConfig);
       return DEFAULT_LANGUAGE_CODE;
@@ -81,7 +81,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       await this.saveGeneralConfig(newConfig);
       return false;
@@ -99,7 +99,7 @@ export class GeneralConfigService {
       const newConfig: GeneralConfig = {
         ...(savedConfig as GeneralConfig),
         isAppLockedByUser,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       return this.saveGeneralConfig(newConfig);
     }
@@ -116,7 +116,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       await this.saveGeneralConfig(newConfig);
       return false;
@@ -134,7 +134,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 1
+        incorrectUnlockAttempts: 1,
       };
       await this.saveGeneralConfig(newConfig);
       return 1;
@@ -154,7 +154,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       await this.saveGeneralConfig(newConfig);
       return;
@@ -174,7 +174,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       await this.saveGeneralConfig(newConfig);
       return 0;
