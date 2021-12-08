@@ -15,6 +15,8 @@ import { walletAllAssetsState } from '../../../recoil/atom';
 import { getCronosAsset } from '../../../utils/utils';
 import { TokenApprovalRequestData, TransactionDataParser } from './TransactionDataParser';
 
+const { shell } = window.require('electron');
+
 type WebView = WebviewTag & HTMLWebViewElement;
 
 export type ErrorHandler = (reason: string) => void;
@@ -328,6 +330,11 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     }
 
     listenIPCMessages();
+
+    webview.addEventListener('new-window', e => {
+      e.preventDefault();
+      shell.openExternal(e.url);
+    });
 
     webview.addEventListener('did-finish-load', () => {
       // injectDomReadyScript();
