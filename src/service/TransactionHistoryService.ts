@@ -477,7 +477,7 @@ export class TransactionHistoryService {
         description: `${token.name} (${token.symbol})`,
         icon_url: '',
         identifier: `${token.name}_(${token.symbol})_${evmAsset.walletId}`,
-        mainnetSymbol: evmAsset.mainnetSymbol,
+        mainnetSymbol: token.symbol,
         name: evmAsset.name,
         rewardsBalance: '',
         stakedBalance: '',
