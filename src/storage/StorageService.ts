@@ -758,6 +758,8 @@ export class StorageService {
     }
 
     const upsertRequests = records.map(async record => {
+      
+      // eslint-disable-next-line no-console
       console.log(`[insertCommonTransactionRecords] Upserting record, txHash : ${record.txHash} | TxType: ${record.txType}`)
       return this.db.commonTransactionStore.update<CommonTransactionRecord>({
         txHash: record.txHash,
