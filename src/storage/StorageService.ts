@@ -47,20 +47,6 @@ export class StorageService {
 
   constructor(namespace: string) {
     this.db = new DatabaseManager(namespace);
-    //migrateTransactionHistory()
-  }
-
-  /**
-   * (optional) This function can be used to migrate current data to new structures 
-   * OR we can just use hard reset and resave data
-   */
-  private async migrateTransactionHistory() {
-    const isTxHistoryMigrated = await generalConfigService.isTxHistoryMigrated();
-    if (!isTxHistoryMigrated) {
-      // Call the migration logic
-    } else {
-      // Don't do anything
-    }
   }
 
   public async saveWallet(wallet: Wallet) {
@@ -303,25 +289,6 @@ export class StorageService {
     return this.db.sessionStore.findOne<Session>({ _id: Session.SESSION_ID });
   }
 
-  // public async saveTransferTransaction(
-  //   transferTransaction: TransferTransactionData,
-  //   walletId: string,
-  // ) {
-  //   const currentTransfers = await this.retrieveAllTransferTransactions(walletId);
-  //   let transactions: Array<TransferTransactionData> = [];
-  //   if (currentTransfers) {
-  //     currentTransfers.transactions.push(transferTransaction);
-  //     transactions = currentTransfers.transactions;
-  //   } else {
-  //     transactions.push(transferTransaction);
-  //   }
-  //
-  //   return this.saveTransferTransactions({
-  //     transactions,
-  //     walletId,
-  //   });
-  // }
-
   /**
    * @deprecated Not in use anywhere, safe marking
    * @param stakingTransaction {StakingTransactionData}
@@ -447,10 +414,10 @@ export class StorageService {
     return {
       transactions: rewardTxs.map(tx => tx.txData),
       walletId,
-      totalBalance: rewardCustomParams.customParams.totalBalance || '0',
-      claimedRewardsBalance: rewardCustomParams.customParams.claimedRewardsBalance || '0',
-      estimatedApy: rewardCustomParams.customParams.estimatedApy || '0',
-      estimatedRewardsBalance: rewardCustomParams.customParams.estimatedRewardsBalance || '0',
+      totalBalance: (rewardCustomParams && rewardCustomParams.customParams) ? rewardCustomParams.customParams.totalBalance : '0',
+      claimedRewardsBalance: (rewardCustomParams && rewardCustomParams.customParams) ? rewardCustomParams.customParams.claimedRewardsBalance : '0',
+      estimatedApy: (rewardCustomParams && rewardCustomParams.customParams) ? rewardCustomParams.customParams.estimatedApy : '0',
+      estimatedRewardsBalance: (rewardCustomParams && rewardCustomParams.customParams) ? rewardCustomParams.customParams.estimatedRewardsBalance : '0',
     } as RewardTransactionList
 
     // return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
@@ -628,7 +595,7 @@ export class StorageService {
     return {
       transfers: nftTxRecords.map(record => record.txData),
       walletId,
-      nftQuery: nftQueryParam.customParams
+      nftQuery: nftQueryParam.customParams.nftQuery
     } as NftTransactionHistory;
 
     // @deprecated   
@@ -765,10 +732,9 @@ export class StorageService {
       return Promise.resolve();
     }
 
-    records.forEach(async record => {
-
-      console.log(`[insertCommonTransactionRecords] Upserting record, txHash : ${record.txHash}`)
-      await this.db.commonTransactionStore.update<CommonTransactionRecord>({
+    const upsertRequests = records.map(async record => {
+      console.log(`[insertCommonTransactionRecords] Upserting record, txHash : ${record.txHash} | TxType: ${record.txType}`)
+      return this.db.commonTransactionStore.update<CommonTransactionRecord>({
         txHash: record.txHash,
         walletId: record.walletId,
         txType: record.txType
@@ -781,7 +747,9 @@ export class StorageService {
       })
     });
 
-    // return this.db.commonTransactionStore.insert<CommonTransactionRecord[]>(records);
+    // Batching requests (Max. time profiled for updates: 0.8 Seconds)
+    await Promise.allSettled([...upsertRequests]);
+
   }
 
   /**
