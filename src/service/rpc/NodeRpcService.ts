@@ -5,7 +5,7 @@ import { Bytes } from '../../utils/ChainJsLib';
 import { NodePorts } from '../../config/StaticConfig';
 import {
   AllProposalResponse,
-  BalanceResponse,
+  BalancesResponse,
   DelegationResult,
   UnbondingDelegationResult,
   DenomTrace,
@@ -86,11 +86,13 @@ export class NodeRpcService implements INodeRpcService {
 
   public async loadAccountBalance(address: string, assetDenom: string): Promise<string> {
     try {
-      const response = await this.cosmosClient.get<BalanceResponse>(
-        `/cosmos/bank/v1beta1/balances/${address}/${assetDenom}`,
+      const response = await this.cosmosClient.get<BalancesResponse>(
+        `/cosmos/bank/v1beta1/balances/${address}`,
       );
       const balanceData = response?.data;
-      return balanceData?.balance?.amount ?? '0';
+      const balance = balanceData.balances.find(b => b.denom === assetDenom);
+
+      return balance?.amount ?? '0';
     } catch (error: any) {
       // eslint-disable-next-line no-console
       console.log(
