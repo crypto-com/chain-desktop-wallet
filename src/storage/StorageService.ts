@@ -426,10 +426,10 @@ export class StorageService {
     return {
       transactions: rewardTxs.map(tx => tx.txData),
       walletId,
-      totalBalance: (rewardCustomParams && rewardCustomParams.customParams) ? rewardCustomParams.customParams.totalBalance : '0',
-      claimedRewardsBalance: (rewardCustomParams && rewardCustomParams.customParams) ? rewardCustomParams.customParams.claimedRewardsBalance : '0',
-      estimatedApy: (rewardCustomParams && rewardCustomParams.customParams) ? rewardCustomParams.customParams.estimatedApy : '0',
-      estimatedRewardsBalance: (rewardCustomParams && rewardCustomParams.customParams) ? rewardCustomParams.customParams.estimatedRewardsBalance : '0',
+      totalBalance: rewardCustomParams?.customParams?.totalBalance || '0',
+      claimedRewardsBalance: rewardCustomParams?.customParams?.claimedRewardsBalance || '0',
+      estimatedApy: rewardCustomParams?.customParams?.estimatedApy || '0',
+      estimatedRewardsBalance: rewardCustomParams?.customParams?.estimatedRewardsBalance || '0',
     } as RewardTransactionList
 
     // return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
@@ -758,9 +758,6 @@ export class StorageService {
     }
 
     const upsertRequests = records.map(async record => {
-      
-      // eslint-disable-next-line no-console
-      console.log(`[insertCommonTransactionRecords] Upserting record, txHash : ${record.txHash} | TxType: ${record.txType}`)
       return this.db.commonTransactionStore.update<CommonTransactionRecord>({
         txHash: record.txHash,
         walletId: record.walletId,
