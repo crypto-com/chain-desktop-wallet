@@ -120,6 +120,12 @@
       "./public/*",
       "./public/**/*"
     ],
+    "extraResources": [
+      {
+        "from": "src/pages/dapp/browser/preload.js",
+        "to": "scripts/preload.js"
+      }
+    ],
     "afterSign": "electron-builder-notarize",
     "mac": {
       "hardenedRuntime": true,

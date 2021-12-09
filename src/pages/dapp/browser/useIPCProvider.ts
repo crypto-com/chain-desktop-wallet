@@ -226,9 +226,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
                 gas: event.object.gas,
                 gasPrice: event.object.gasPrice,
               },
-              amount => {
+              () => {
                 // TODO: deal with amount
-                console.log(amount);
               },
               reason => {
                 sendError(event.id, reason);
@@ -338,7 +337,6 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
 
     webview.addEventListener('did-finish-load', () => {
       // injectDomReadyScript();
-      // TODO: remove later
       if (process.env.NODE_ENV === 'development') {
         webview.openDevTools();
       }

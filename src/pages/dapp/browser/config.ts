@@ -10,8 +10,7 @@ export class ChainConfig {
   static ExplorerAPIUrl = 'https://cronos.crypto.org/explorer/api';
 }
 
-// TODO: make it work under production
-export const ProviderPreloadScriptPath = `file://${path.join(
-  remote.app.getAppPath(),
-  'src/pages/dapp/browser/preload.js',
-)}`;
+export const ProviderPreloadScriptPath =
+  process.env.NODE_ENV === 'development'
+    ? `file://${path.join(remote.app.getAppPath(), 'src/pages/dapp/browser/preload.js')}`
+    : `file://${path.join(remote.app.getAppPath(), '../scripts/preload.js')}`;

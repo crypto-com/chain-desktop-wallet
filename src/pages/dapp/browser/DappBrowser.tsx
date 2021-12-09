@@ -42,7 +42,6 @@ const DappBrowser = (props: DappBrowserProps) => {
       onRequestAddress.current(onSuccess, onError);
     },
     onRequestTokenApproval: (data, successCallback, errorCallback) => {
-      console.log(data);
       setInputPasswordVisible(true);
       setConfirmPasswordCallback({ successCallback, errorCallback });
     },
