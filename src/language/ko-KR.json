@@ -341,6 +341,7 @@
   "bridge.form.fee": "수수료",
   "bridge.form.destination": "목적지",
   "bridge.form.toAddress": "수신인 주소",
+  "bridge.form.toAddressLabel": "수신인 주소",
   "bridge.form.customAddress.message": "지정된 주소로 송금하고 싶습니다",
   "bridge.form.transfer": "전송 자산",
   "bridge.form.receiving": "수신 중",

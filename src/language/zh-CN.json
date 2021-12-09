@@ -343,6 +343,7 @@
   "bridge.form.fee": "费用：",
   "bridge.form.destination": "目标地址：",
   "bridge.form.toAddress": "收款人地址：",
+  "bridge.form.toAddressLabel": "收款人地址",
   "bridge.form.customAddress.message": "我想转移至另一自定收款人地址",
   "bridge.form.transfer": "转移资产",
   "bridge.form.receiving": "将会收到",

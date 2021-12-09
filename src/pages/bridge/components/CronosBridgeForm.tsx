@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './CronosBridgeForm.less';
-import { Button, Checkbox, Form, Input, InputNumber, Select } from 'antd';
+import { Button, Checkbox, Form, InputNumber, Select } from 'antd';
 import { SwapOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import Big from 'big.js';
@@ -28,6 +28,7 @@ import { TransactionUtils } from '../../../utils/TransactionUtils';
 import iconCronosSvg from '../../../assets/icon-cronos-blue.svg';
 import iconCroSvg from '../../../assets/icon-cro.svg';
 import RowAmountOption from '../../../components/RowAmountOption/RowAmountOption';
+import AddressBookInput from '../../../components/AddressBookInput/AddressBookInput';
 
 const { Option } = Select;
 const tailLayout = {
@@ -243,7 +244,7 @@ const CronosBridgeForm = props => {
     form.validateFields();
   };
 
-  const onSwitchAsset = value => {
+  const onSwitchAsset = async value => {
     setCurrentAssetIdentifier(value);
     const selectedAsset = walletAllAssets.find(asset => asset.identifier === value);
     setSession({
@@ -570,6 +571,12 @@ const CronosBridgeForm = props => {
                     }
                     default:
                   }
+                } else {
+                  setToAddress('');
+                  form.setFieldsValue({
+                    toAddress: '',
+                  });
+                  form.submit();
                 }
               }}
               className="disclaimer"
@@ -587,20 +594,27 @@ const CronosBridgeForm = props => {
             rules={[
               {
                 required: true,
-                message: `${t('send.formSend.recipientAddress.label')} ${t('general.required')}`,
+                message: `${t('bridge.form.toAddressLabel')} ${t('general.required')}`,
               },
               customAddressValidator,
             ]}
             initialValue={toAddress}
           >
-            <Input
-              placeholder={t('send.formSend.recipientAddress.placeholder')}
-              disabled={isToAddressDisabled}
-              value={toAddress}
-              onChange={event => {
-                setToAddress(event.target.value);
-              }}
-            />
+            {toAsset && (
+              <AddressBookInput
+                disabled={isToAddressDisabled}
+                onChange={value => {
+                  form.setFieldsValue({
+                    toAddress: value,
+                  });
+                  setToAddress(value);
+                }}
+                initialValue={toAddress}
+                isDefaultInput
+                currentSession={session}
+                userAsset={toAsset}
+              />
+            )}
           </Form.Item>
         </div>
       </div>

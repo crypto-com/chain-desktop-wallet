@@ -3,7 +3,7 @@
 
 # PR Checklist:
 
-- [ ] Have you read the [CONTRIBUTING.md](https://github.com/crypto-com/chain-desktip-wallet/blob/master/CONTRIBUTING.md)?
+- [ ] Have you read the [CONTRIBUTING.md](https://github.com/crypto-com/chain-desktop-wallet/blob/master/CONTRIBUTING.md)?
 - [ ] Does your PR follow the [C4 patch requirements](https://rfc.zeromq.org/spec:42/C4/#23-patch-requirements)?
 - [ ] Have you rebased your work on top of the latest master? 
 - [ ] Have you checked your code compiles? (`yarn build`)
