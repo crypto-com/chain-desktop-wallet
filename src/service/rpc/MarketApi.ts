@@ -12,11 +12,17 @@ export class CroMarketApi implements IMarketApi {
 
   private readonly coinbaseRateBaseUrl: string;
 
+  private tokenSlugMap: undefined | null | CryptoComSlugResponse[] = null;
+
   constructor() {
     this.axiosClient = axios.create({
       baseURL: MARKET_API_BASE_URL,
     });
     this.coinbaseRateBaseUrl = COINBASE_TICKER_API_BASE_URL;
+
+    this.loadTokenSlugMap().then(slugMap => {
+      this.tokenSlugMap = slugMap;
+    });
   }
 
   public async getAssetPrice(assetSymbol: string, currency: string): Promise<AssetMarketPrice> {
@@ -57,16 +63,9 @@ export class CroMarketApi implements IMarketApi {
   }
 
   public async getTokenPriceFromCryptoCom(cryptoSymbol: string, fiatCurrency: string) {
-    const allTokensSlugMap: AxiosResponse<CryptoComSlugResponse[]> = await axios({
-      baseURL: CRYPTO_COM_PRICE_API_BASE_URL.V2,
-      url: '/all-tokens',
-    });
+    const allTokensSlugMap: CryptoComSlugResponse[] = await this.loadTokenSlugMap();
 
-    if (allTokensSlugMap.status !== 200) {
-      throw Error('Could not fetch Token Slug list.');
-    }
-
-    const tokenSlugInfo = allTokensSlugMap.data.find(tokenSlug => tokenSlug.symbol === cryptoSymbol);
+    const tokenSlugInfo = allTokensSlugMap.find(tokenSlug => tokenSlug.symbol === cryptoSymbol);
 
     if (!tokenSlugInfo?.slug) {
       throw Error(`Couldn't find a valid slug name for ${cryptoSymbol}`);
@@ -89,6 +88,23 @@ export class CroMarketApi implements IMarketApi {
     const tokenPriceInFiat = Number(tokenPriceInUSD.data.usd_price) * Number(usdToFiatRate);
 
     return String(tokenPriceInFiat);
+  }
+
+  private async loadTokenSlugMap() {
+
+    if (!this.tokenSlugMap || this.tokenSlugMap.length === 0) {
+      const allTokensSlugMap: AxiosResponse<CryptoComSlugResponse[]> = await axios({
+        baseURL: CRYPTO_COM_PRICE_API_BASE_URL.V2,
+        url: '/all-tokens',
+      });
+
+      if (allTokensSlugMap.status !== 200 || allTokensSlugMap.data.length < 1) {
+        throw Error('Could not fetch Token Slug list.');
+      }
+
+      this.tokenSlugMap = allTokensSlugMap.data;
+    }
+    return this.tokenSlugMap;
   }
 
   private async getFiatToFiatRate(fromFiatSymbol: string, toFiatSymbol: string) {
