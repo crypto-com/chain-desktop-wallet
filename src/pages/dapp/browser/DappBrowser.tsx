@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useRef, useState } from 'react';
 import { WebviewTag } from 'electron';
-// import { Modal } from 'antd';
 import { useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import Web3 from 'web3';
@@ -9,6 +8,7 @@ import { useIPCProvider, useRefCallback } from './useIPCProvider';
 import { sessionState, walletAllAssetsState } from '../../../recoil/atom';
 import { getCronosAsset } from '../../../utils/utils';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
+import RequestConfirmation from '../components/RequestConfirmation/RequestConfirmation';
 import { secretStoreService } from '../../../storage/SecretStoreService';
 import { Dapp } from '../types';
 import { ProviderPreloadScriptPath } from './config';
@@ -24,6 +24,9 @@ const DappBrowser = (props: DappBrowserProps) => {
   const allAssets = useRecoilValue(walletAllAssetsState);
   const cronosAsset = getCronosAsset(allAssets);
 
+  const [txEvent, setTxEvent] = useState<any>();
+  const [requestConfirmationVisible, setRequestConfirmationVisible] = useState(false);
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const currentSession = useRecoilValue(sessionState);
   const [confirmPasswordCallback, setConfirmPasswordCallback] = useState<{
@@ -63,8 +66,13 @@ const DappBrowser = (props: DappBrowserProps) => {
         .then(errorCallback, successCallback);
     },
     onRequestSendTransaction: async (event, successCallback, errorCallback) => {
+      setTxEvent(event);
       // prompt for password
-      setInputPasswordVisible(true);
+      if (!decryptedPhrase) {
+        setInputPasswordVisible(true);
+      } else {
+        setRequestConfirmationVisible(true);
+      }
       setConfirmPasswordCallback({ successCallback, errorCallback });
     },
     onRequestAddEthereumChain: async () => {
@@ -76,7 +84,7 @@ const DappBrowser = (props: DappBrowserProps) => {
   });
 
   return (
-    <div className="site-layout-background settings-content">
+    <div className="site-layout-background dapp-content">
       {inputPasswordVisible && (
         <PasswordFormModal
           description={t('general.passwordFormModal.description')}
@@ -91,9 +99,9 @@ const DappBrowser = (props: DappBrowserProps) => {
               password,
               currentSession.wallet.identifier,
             );
+            setDecryptedPhrase(phraseDecrypted);
             setInputPasswordVisible(false);
-            confirmPasswordCallback?.successCallback(phraseDecrypted);
-            setConfirmPasswordCallback(undefined);
+            setRequestConfirmationVisible(true);
           }}
           onValidatePassword={async (password: string) => {
             const isValid = await secretStoreService.checkIfPasswordIsValid(password);
@@ -109,13 +117,27 @@ const DappBrowser = (props: DappBrowserProps) => {
           confirmPassword={false}
         />
       )}
+      <RequestConfirmation
+        event={txEvent}
+        asset={cronosAsset}
+        wallet={currentSession.wallet}
+        visible={requestConfirmationVisible}
+        dapp={dapp}
+        decryptedPhrase={decryptedPhrase}
+        confirmTxCallback={confirmPasswordCallback}
+        setConfirmTxCallback={setConfirmPasswordCallback}
+        onClose={() => {
+          setRequestConfirmationVisible(false);
+          confirmPasswordCallback?.errorCallback('Canceled');
+        }}
+      />
       <webview
         preload={ProviderPreloadScriptPath}
         ref={webviewRef}
         useragent="Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1"
         style={{
           width: '100%',
-          height: '800px',
+          height: '100vh',
         }}
         src={dapp.url}
         title={dapp.name}

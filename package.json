@@ -23,6 +23,7 @@
     "bech32": "2.0.0",
     "bfj": "7.0.2",
     "big.js": "6.0.3",
+    "bignumber.js": "9.0.1",
     "camelcase": "6.2.0",
     "copyfiles": "2.4.1",
     "cross-env": "7.0.3",

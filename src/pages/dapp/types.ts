@@ -33,6 +33,7 @@ export namespace DappBrowserIPC {
       from: string;
       to: string;
       data: string;
+      value?: string;
     };
   }
 
