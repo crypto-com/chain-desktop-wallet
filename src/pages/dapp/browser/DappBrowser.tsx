@@ -126,6 +126,7 @@ const DappBrowser = (props: DappBrowserProps) => {
         decryptedPhrase={decryptedPhrase}
         confirmTxCallback={confirmPasswordCallback}
         setConfirmTxCallback={setConfirmPasswordCallback}
+        setRequestConfirmationVisible={setRequestConfirmationVisible}
         onClose={() => {
           setRequestConfirmationVisible(false);
           confirmPasswordCallback?.errorCallback('Canceled');

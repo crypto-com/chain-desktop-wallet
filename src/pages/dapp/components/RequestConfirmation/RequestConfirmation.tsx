@@ -27,6 +27,7 @@ interface RequestConfirmationProps {
   setConfirmTxCallback: Dispatch<
     SetStateAction<{ successCallback: Function; errorCallback: Function } | undefined>
   >;
+  setRequestConfirmationVisible: Dispatch<SetStateAction<boolean>>;
   onClose: (e: any) => void;
 }
 
@@ -40,6 +41,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     decryptedPhrase,
     confirmTxCallback,
     setConfirmTxCallback,
+    setRequestConfirmationVisible,
     onClose,
   } = props;
 
@@ -92,6 +94,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
               onClick={() => {
                 confirmTxCallback?.successCallback(decryptedPhrase);
                 setConfirmTxCallback(undefined);
+                setRequestConfirmationVisible(false);
               }}
             >
               Confirm
