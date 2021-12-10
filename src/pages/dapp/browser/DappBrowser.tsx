@@ -12,7 +12,6 @@ import RequestConfirmation from '../components/RequestConfirmation/RequestConfir
 import { secretStoreService } from '../../../storage/SecretStoreService';
 import { Dapp, DappBrowserIPC } from '../types';
 import { ProviderPreloadScriptPath } from './config';
-import packageJson from '../../../../package.json';
 
 interface DappBrowserProps {
   dapp: Dapp;
@@ -34,8 +33,6 @@ const DappBrowser = (props: DappBrowserProps) => {
     successCallback: Function;
     errorCallback: Function;
   }>();
-
-  const buildVersion = packageJson.version;
 
   const onRequestAddress = useRefCallback((onSuccess: (address: string) => void) => {
     onSuccess(cronosAsset?.address!);
@@ -148,7 +145,7 @@ const DappBrowser = (props: DappBrowserProps) => {
       <webview
         preload={ProviderPreloadScriptPath}
         ref={webviewRef}
-        useragent={`ChainDesktopWallet/${buildVersion}`}
+        useragent="Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1"
         style={{
           width: '100%',
           height: '100vh',
