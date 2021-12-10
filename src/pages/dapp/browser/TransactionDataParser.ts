@@ -6,6 +6,10 @@ export interface TokenApprovalRequestData {
   tokenData: ContractData;
 }
 
+export function instanceOfTokenApprovalRequestData(data: any): data is TokenApprovalRequestData {
+  return 'amount' in data;
+}
+
 class TransactionDataParser {
   private client: CronosClient;
 

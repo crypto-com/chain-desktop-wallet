@@ -91,6 +91,18 @@ export namespace DappBrowserIPC {
     };
   }
 
+  export function instanceOfSendTransactionEvent(data: any): data is SendTransactionEvent {
+    return 'name' in data;
+  }
+
+  export function instanceOfSignMessageEvent(data: any): data is SignMessageEvent {
+    return 'name' in data;
+  }
+
+  export function instanceOfSignPersonalMessageEvent(data: any): data is SignPersonalMessageEvent {
+    return 'name' in data;
+  }
+
   export type Event =
     | SendTransactionEvent
     | RequestAccountsEvent

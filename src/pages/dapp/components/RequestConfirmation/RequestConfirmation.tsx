@@ -1,4 +1,9 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, {
+  Dispatch,
+  SetStateAction,
+  // eslint-disable-next-line
+  useState,
+} from 'react';
 import { Button, Drawer, Layout } from 'antd';
 import BigNumber from 'bignumber.js';
 import './RequestConfirmation.less';
@@ -8,6 +13,7 @@ import { Wallet } from '../../../../models/Wallet';
 import { Dapp, DappBrowserIPC } from '../../types';
 
 import { middleEllipsis } from '../../../../utils/utils';
+import { TokenApprovalRequestData } from '../../browser/TransactionDataParser';
 
 const { Content, Footer } = Layout;
 
@@ -21,7 +27,8 @@ function hexToUtf8(s: string) {
 }
 
 interface RequestConfirmationProps {
-  event: DappBrowserIPC.SendTransactionEvent | DappBrowserIPC.SignPersonalMessageEvent;
+  event: DappBrowserIPC.Event;
+  data: { request: TokenApprovalRequestData; gas: number; gasPrice: string };
   asset: UserAsset | undefined;
   wallet: Wallet;
   visible: boolean;
@@ -43,6 +50,7 @@ interface RequestConfirmationProps {
 const RequestConfirmation = (props: RequestConfirmationProps) => {
   const {
     event,
+    data,
     asset,
     wallet,
     visible,
@@ -54,45 +62,85 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     onClose,
   } = props;
 
-  let viewToRender: JSX.Element | undefined;
+  const [isContractAddressReview, setIsContractAddressReview] = useState(false);
 
-  if (event.name === 'signTransaction') {
-    const networkFee = event ? new BigNumber(event.object?.gas).times(event.object?.gasPrice) : 0;
-    const total = event ? new BigNumber(event.object?.value ?? '0').plus(networkFee) : 0;
-    viewToRender = (
+  const eventViewToRender = (_event: DappBrowserIPC.Event) => {
+    if (DappBrowserIPC.instanceOfSendTransactionEvent(_event)) {
+      const networkFee = _event
+        ? new BigNumber(_event.object?.gas).times(_event.object?.gasPrice)
+        : 0;
+      const total = _event ? new BigNumber(_event.object?.value ?? '0').plus(networkFee) : 0;
+      return (
+        <>
+          <div className="row">
+            <div className="title">Estimated Network Fee</div>
+            <div>{`${scaledAmount(networkFee.toString(), asset?.decimals ?? 1)} ${
+              asset?.symbol
+            }`}</div>
+          </div>
+          <div className="row">
+            <div className="title">Total</div>
+            <div>{`${scaledAmount(total.toString(), asset?.decimals ?? 1)} ${asset?.symbol}`}</div>
+          </div>
+        </>
+      );
+    }
+    if (DappBrowserIPC.instanceOfSignPersonalMessageEvent(_event)) {
+      return (
+        <>
+          <div className="row">
+            <div className="title">Message: </div>
+          </div>
+          <pre
+            style={{
+              whiteSpace: 'pre-wrap',
+            }}
+          >
+            {hexToUtf8(_event.object.data)}
+          </pre>
+        </>
+      );
+    }
+    // TODO: Handle other events
+    return <></>;
+  };
+
+  const dataViewToRender = (_data: {
+    request: TokenApprovalRequestData;
+    gas: number;
+    gasPrice: string;
+  }) => {
+    const fee = new BigNumber(_data.gas).times(_data.gasPrice).toString();
+    const networkFee = fee;
+    const total = fee;
+    // eslint-disable-next-line
+    const tokenData = JSON.stringify(_data.request.tokenData);
+    const { contractAddress } = _data.request.tokenData;
+    return (
       <>
         <div className="row">
           <div className="title">Estimated Network Fee</div>
-          <div className="title">{`${scaledAmount(networkFee.toString(), asset?.decimals ?? 1)} ${
+          <div>{`${scaledAmount(networkFee.toString(), asset?.decimals ?? 1)} ${
             asset?.symbol
           }`}</div>
         </div>
         <div className="row">
           <div className="title">Total</div>
-          <div className="title">{`${scaledAmount(total.toString(), asset?.decimals ?? 1)} ${
-            asset?.symbol
-          }`}</div>
+          <div>{`${scaledAmount(total.toString(), asset?.decimals ?? 1)} ${asset?.symbol}`}</div>
         </div>
-      </>
-    );
-  } else if (event.name === 'signPersonalMessage') {
-    viewToRender = (
-      <>
         <div className="row">
-          <div className="title">Message: </div>
+          <div className="title">Contract Address</div>
+          <a onClick={() => setIsContractAddressReview(!isContractAddressReview)}>
+            {isContractAddressReview ? 'Hide' : 'Review'}
+          </a>
         </div>
-        <pre
-          style={{
-            whiteSpace: 'pre-wrap',
-          }}
-        >
-          {hexToUtf8(event.object.data)}
-        </pre>
+        <div
+          className="contract-address"
+          hidden={!isContractAddressReview}
+        >{`${contractAddress}`}</div>
       </>
     );
-  } else {
-    // TODO: Handle other events
-  }
+  };
 
   return (
     <Drawer visible={visible} className="request-confirmation" onClose={onClose}>
@@ -116,7 +164,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
               )} ${asset?.symbol}`}</div>
             </div>
           </div>
-          {viewToRender}
+          {event && eventViewToRender(event)}
+          {data && dataViewToRender(data)}
         </Content>
         <Footer>
           <div className="row">

@@ -12,6 +12,8 @@ import RequestConfirmation from '../components/RequestConfirmation/RequestConfir
 import { secretStoreService } from '../../../storage/SecretStoreService';
 import { Dapp, DappBrowserIPC } from '../types';
 import { ProviderPreloadScriptPath } from './config';
+// import packageJson from '../../../../package.json';
+import { TokenApprovalRequestData } from './TransactionDataParser';
 
 interface DappBrowserProps {
   dapp: Dapp;
@@ -24,6 +26,7 @@ const DappBrowser = (props: DappBrowserProps) => {
   const allAssets = useRecoilValue(walletAllAssetsState);
   const cronosAsset = getCronosAsset(allAssets);
 
+  const [txData, setTxData] = useState<any>();
   const [txEvent, setTxEvent] = useState<any>();
   const [requestConfirmationVisible, setRequestConfirmationVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
@@ -37,6 +40,27 @@ const DappBrowser = (props: DappBrowserProps) => {
   const onRequestAddress = useRefCallback((onSuccess: (address: string) => void) => {
     onSuccess(cronosAsset?.address!);
   });
+
+  const onRequestTokenApproval = useRefCallback(
+    (
+      data: {
+        request: TokenApprovalRequestData;
+        gas: number;
+        gasPrice: string;
+      },
+      successCallback: (passphrase: string) => void,
+      errorCallback: (message: string) => void,
+    ) => {
+      setTxData(data);
+      // prompt for password
+      if (!decryptedPhrase) {
+        setInputPasswordVisible(true);
+      } else {
+        setRequestConfirmationVisible(true);
+      }
+      setConfirmPasswordCallback({ successCallback, errorCallback });
+    },
+  );
 
   const onRequestSendTransaction = useRefCallback(
     (
@@ -79,8 +103,7 @@ const DappBrowser = (props: DappBrowserProps) => {
       onRequestAddress.current(onSuccess, onError);
     },
     onRequestTokenApproval: (data, successCallback, errorCallback) => {
-      setInputPasswordVisible(true);
-      setConfirmPasswordCallback({ successCallback, errorCallback });
+      onRequestTokenApproval.current(data, successCallback, errorCallback);
     },
     onRequestSignMessage: async (event, successCallback, errorCallback) => {
       setInputPasswordVisible(true);
@@ -143,9 +166,10 @@ const DappBrowser = (props: DappBrowserProps) => {
           confirmPassword={false}
         />
       )}
-      {txEvent && requestConfirmationVisible && (
+      {(txEvent || txData) && requestConfirmationVisible && (
         <RequestConfirmation
           event={txEvent}
+          data={txData}
           asset={cronosAsset}
           wallet={currentSession.wallet}
           visible={requestConfirmationVisible}
@@ -156,6 +180,8 @@ const DappBrowser = (props: DappBrowserProps) => {
           setRequestConfirmationVisible={setRequestConfirmationVisible}
           onClose={() => {
             setRequestConfirmationVisible(false);
+            setTxData(undefined);
+            setTxEvent(undefined);
             confirmPasswordCallback?.errorCallback('Canceled');
           }}
         />
