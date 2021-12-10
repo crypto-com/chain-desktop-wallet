@@ -7,8 +7,9 @@ import { scaledAmount, UserAsset } from '../../../../models/UserAsset';
 import { Wallet } from '../../../../models/Wallet';
 import { Dapp, DappBrowserIPC } from '../../types';
 
-import { middleEllipsis } from '../../../../utils/utils';
+import { middleEllipsis, getAssetBySymbolAndChain } from '../../../../utils/utils';
 import { TokenApprovalRequestData } from '../../browser/TransactionDataParser';
+import { SupportedChainName } from '../../../../config/StaticConfig';
 
 const { Content, Footer } = Layout;
 
@@ -24,7 +25,8 @@ function hexToUtf8(s: string) {
 interface RequestConfirmationProps {
   event: DappBrowserIPC.Event;
   data: { request: TokenApprovalRequestData; gas: number; gasPrice: string };
-  asset: UserAsset | undefined;
+  cronosAsset: UserAsset | undefined;
+  allAssets: UserAsset[];
   wallet: Wallet;
   visible: boolean;
   dapp?: Dapp;
@@ -46,7 +48,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
   const {
     event,
     data,
-    asset,
+    cronosAsset,
+    allAssets,
     wallet,
     visible,
     dapp,
@@ -59,6 +62,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
 
   const [message, setMessage] = useState('');
   const [subMessage, setSubMessage] = useState('');
+  const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(cronosAsset);
   const [isContractAddressReview, setIsContractAddressReview] = useState(false);
 
   const eventViewToRender = (_event: DappBrowserIPC.Event) => {
@@ -71,13 +75,15 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
         <>
           <div className="row">
             <div className="title">Estimated Network Fee</div>
-            <div>{`${scaledAmount(networkFee.toString(), asset?.decimals ?? 1)} ${
-              asset?.symbol
+            <div>{`${scaledAmount(networkFee.toString(), cronosAsset?.decimals ?? 1)} ${
+              cronosAsset?.symbol
             }`}</div>
           </div>
           <div className="row">
             <div className="title">Total</div>
-            <div>{`${scaledAmount(total.toString(), asset?.decimals ?? 1)} ${asset?.symbol}`}</div>
+            <div>{`${scaledAmount(total.toString(), cronosAsset?.decimals ?? 1)} ${
+              cronosAsset?.symbol
+            }`}</div>
           </div>
         </>
       );
@@ -116,13 +122,15 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       <>
         <div className="row">
           <div className="title">Estimated Network Fee</div>
-          <div>{`${scaledAmount(networkFee.toString(), asset?.decimals ?? 1)} ${
-            asset?.symbol
+          <div>{`${scaledAmount(networkFee.toString(), cronosAsset?.decimals ?? 1)} ${
+            cronosAsset?.symbol
           }`}</div>
         </div>
         <div className="row">
           <div className="title">Total</div>
-          <div>{`${scaledAmount(total.toString(), asset?.decimals ?? 1)} ${asset?.symbol}`}</div>
+          <div>{`${scaledAmount(total.toString(), cronosAsset?.decimals ?? 1)} ${
+            cronosAsset?.symbol
+          }`}</div>
         </div>
         <div className="row">
           <div className="title">Contract Address</div>
@@ -147,6 +155,12 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     if (data) {
       setMessage(`Allow ${dapp?.name} to access your ${data.request.tokenData.symbol}?`);
       setSubMessage(`${dapp?.url}`);
+      const asset = getAssetBySymbolAndChain(
+        allAssets,
+        data.request.tokenData.symbol,
+        SupportedChainName.CRONOS,
+      );
+      setCurrentAsset(asset ?? cronosAsset);
     }
   }, [event, data]);
 
@@ -164,14 +178,14 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
           <div className="wallet-detail">
             <div className="row">
               <div className="name">{wallet.name}</div>
-              <div className="s-title">{`${asset?.symbol} Balance`}</div>
+              <div className="s-title">{`${currentAsset?.symbol} Balance`}</div>
             </div>
             <div className="row">
-              <div className="address">{middleEllipsis(asset?.address ?? '', 6)}</div>
+              <div className="address">{middleEllipsis(currentAsset?.address ?? '', 6)}</div>
               <div className="balance">{`${scaledAmount(
-                asset?.balance ?? '0',
-                asset?.decimals ?? 1,
-              )} ${asset?.symbol}`}</div>
+                currentAsset?.balance ?? '0',
+                currentAsset?.decimals ?? 1,
+              )} ${currentAsset?.symbol}`}</div>
             </div>
           </div>
           {event && eventViewToRender(event)}

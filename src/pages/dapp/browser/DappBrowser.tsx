@@ -170,7 +170,8 @@ const DappBrowser = (props: DappBrowserProps) => {
         <RequestConfirmation
           event={txEvent}
           data={txData}
-          asset={cronosAsset}
+          cronosAsset={cronosAsset}
+          allAssets={allAssets}
           wallet={currentSession.wallet}
           visible={requestConfirmationVisible}
           dapp={dapp}
