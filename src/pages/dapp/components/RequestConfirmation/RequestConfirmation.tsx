@@ -1,9 +1,4 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  // eslint-disable-next-line
-  useState,
-} from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Button, Drawer, Layout } from 'antd';
 import BigNumber from 'bignumber.js';
 import './RequestConfirmation.less';
@@ -62,6 +57,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     onClose,
   } = props;
 
+  const [message, setMessage] = useState('');
+  const [subMessage, setSubMessage] = useState('');
   const [isContractAddressReview, setIsContractAddressReview] = useState(false);
 
   const eventViewToRender = (_event: DappBrowserIPC.Event) => {
@@ -113,9 +110,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     const fee = new BigNumber(_data.gas).times(_data.gasPrice).toString();
     const networkFee = fee;
     const total = fee;
-    // eslint-disable-next-line
-    const tokenData = JSON.stringify(_data.request.tokenData);
     const { contractAddress } = _data.request.tokenData;
+
     return (
       <>
         <div className="row">
@@ -142,6 +138,18 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     );
   };
 
+  useEffect(() => {
+    // if(event) {
+    //   if(DappBrowserIPC.instanceOfSendTransactionEvent(event)){
+    //     setMessage(``);
+    //   }
+    // }
+    if (data) {
+      setMessage(`Allow ${dapp?.name} to access your ${data.request.tokenData.symbol}?`);
+      setSubMessage(`${dapp?.url}`);
+    }
+  }, [event, data]);
+
   return (
     <Drawer visible={visible} className="request-confirmation" onClose={onClose}>
       <Layout>
@@ -151,6 +159,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
               <img src={dapp.logo} alt={dapp.alt} />
             </div>
           )}
+          {message && <div className="message">{message}</div>}
+          {subMessage && <div className="sub-message">{subMessage}</div>}
           <div className="wallet-detail">
             <div className="row">
               <div className="name">{wallet.name}</div>
