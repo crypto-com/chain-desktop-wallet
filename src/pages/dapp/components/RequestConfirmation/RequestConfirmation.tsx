@@ -11,8 +11,17 @@ import { middleEllipsis } from '../../../../utils/utils';
 
 const { Content, Footer } = Layout;
 
+function hexToUtf8(s: string) {
+  return decodeURIComponent(
+    s
+      .replace('0x', '')
+      .replace(/\s+/g, '') // remove spaces
+      .replace(/[0-9a-f]{2}/g, '%$&'), // add '%' before each 2 characters
+  );
+}
+
 interface RequestConfirmationProps {
-  event: DappBrowserIPC.SendTransactionEvent;
+  event: DappBrowserIPC.SendTransactionEvent | DappBrowserIPC.SignPersonalMessageEvent;
   asset: UserAsset | undefined;
   wallet: Wallet;
   visible: boolean;
@@ -45,8 +54,45 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     onClose,
   } = props;
 
-  const networkFee = event ? new BigNumber(event.object?.gas).times(event.object?.gasPrice) : 0;
-  const total = event ? new BigNumber(event.object?.value ?? '0').plus(networkFee) : 0;
+  let viewToRender: JSX.Element | undefined;
+
+  if (event.name === 'signTransaction') {
+    const networkFee = event ? new BigNumber(event.object?.gas).times(event.object?.gasPrice) : 0;
+    const total = event ? new BigNumber(event.object?.value ?? '0').plus(networkFee) : 0;
+    viewToRender = (
+      <>
+        <div className="row">
+          <div className="title">Estimated Network Fee</div>
+          <div className="title">{`${scaledAmount(networkFee.toString(), asset?.decimals ?? 1)} ${
+            asset?.symbol
+          }`}</div>
+        </div>
+        <div className="row">
+          <div className="title">Total</div>
+          <div className="title">{`${scaledAmount(total.toString(), asset?.decimals ?? 1)} ${
+            asset?.symbol
+          }`}</div>
+        </div>
+      </>
+    );
+  } else if (event.name === 'signPersonalMessage') {
+    viewToRender = (
+      <>
+        <div className="row">
+          <div className="title">Message: </div>
+        </div>
+        <pre
+          style={{
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {hexToUtf8(event.object.data)}
+        </pre>
+      </>
+    );
+  } else {
+    // TODO: Handle other events
+  }
 
   return (
     <Drawer visible={visible} className="request-confirmation" onClose={onClose}>
@@ -70,18 +116,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
               )} ${asset?.symbol}`}</div>
             </div>
           </div>
-          <div className="row">
-            <div className="title">Estimated Network Fee</div>
-            <div className="title">{`${scaledAmount(networkFee.toString(), asset?.decimals ?? 1)} ${
-              asset?.symbol
-            }`}</div>
-          </div>
-          <div className="row">
-            <div className="title">Total</div>
-            <div className="title">{`${scaledAmount(total.toString(), asset?.decimals ?? 1)} ${
-              asset?.symbol
-            }`}</div>
-          </div>
+          {viewToRender}
         </Content>
         <Footer>
           <div className="row">

@@ -32,6 +32,13 @@ const DappList: Dapp[] = [
   //   description: '',
   //   url: 'https://app.beefy.finance/#/cronos',
   // },
+  // {
+  //   name: 'Debank',
+  //   logo: logoVvs,
+  //   alt: '',
+  //   description: '',
+  //   url: 'https://debank.com',
+  // },
 ];
 
 const DappPage = () => {

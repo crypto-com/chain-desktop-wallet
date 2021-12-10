@@ -171,7 +171,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     async (eventId: number, data: string, passphrase: string, addPrefix: boolean) => {
       const wallet = ethers.Wallet.fromMnemonic(passphrase);
       if (addPrefix) {
-        const result = await wallet.signMessage(data);
+        const result = await wallet.signMessage(ethers.utils.arrayify(data));
         sendResponse(eventId, result);
       } else {
         // deprecated

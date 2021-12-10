@@ -55,6 +55,23 @@ const DappBrowser = (props: DappBrowserProps) => {
     },
   );
 
+  const onRequestSignPersonalMessage = useRefCallback(
+    (
+      event: DappBrowserIPC.SignPersonalMessageEvent,
+      successCallback: (signature: string) => void,
+      errorCallback: (message: string) => void,
+    ) => {
+      setTxEvent(event);
+      // prompt for password
+      if (!decryptedPhrase) {
+        setInputPasswordVisible(true);
+      } else {
+        setRequestConfirmationVisible(true);
+      }
+      setConfirmPasswordCallback({ successCallback, errorCallback });
+    },
+  );
+
   useIPCProvider({
     webview: webviewRef.current,
     onRequestAddress: (onSuccess, onError) => {
@@ -70,8 +87,7 @@ const DappBrowser = (props: DappBrowserProps) => {
       setConfirmPasswordCallback({ successCallback, errorCallback });
     },
     onRequestSignPersonalMessage: async (event, successCallback, errorCallback) => {
-      setInputPasswordVisible(true);
-      setConfirmPasswordCallback({ successCallback, errorCallback });
+      onRequestSignPersonalMessage.current(event, successCallback, errorCallback);
     },
     onRequestSignTypedMessage: async (event, successCallback, errorCallback) => {
       setInputPasswordVisible(true);
@@ -127,24 +143,27 @@ const DappBrowser = (props: DappBrowserProps) => {
           confirmPassword={false}
         />
       )}
-      <RequestConfirmation
-        event={txEvent}
-        asset={cronosAsset}
-        wallet={currentSession.wallet}
-        visible={requestConfirmationVisible}
-        dapp={dapp}
-        decryptedPhrase={decryptedPhrase}
-        confirmTxCallback={confirmPasswordCallback}
-        setConfirmTxCallback={setConfirmPasswordCallback}
-        setRequestConfirmationVisible={setRequestConfirmationVisible}
-        onClose={() => {
-          setRequestConfirmationVisible(false);
-          confirmPasswordCallback?.errorCallback('Canceled');
-        }}
-      />
+      {txEvent && requestConfirmationVisible && (
+        <RequestConfirmation
+          event={txEvent}
+          asset={cronosAsset}
+          wallet={currentSession.wallet}
+          visible={requestConfirmationVisible}
+          dapp={dapp}
+          decryptedPhrase={decryptedPhrase}
+          confirmTxCallback={confirmPasswordCallback}
+          setConfirmTxCallback={setConfirmPasswordCallback}
+          setRequestConfirmationVisible={setRequestConfirmationVisible}
+          onClose={() => {
+            setRequestConfirmationVisible(false);
+            confirmPasswordCallback?.errorCallback('Canceled');
+          }}
+        />
+      )}
       <webview
         preload={ProviderPreloadScriptPath}
         ref={webviewRef}
+        // useragent is required for some dapps to auto connect, eg. cronoschimps
         useragent="Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1"
         style={{
           width: '100%',
