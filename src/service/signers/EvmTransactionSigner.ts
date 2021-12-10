@@ -12,6 +12,8 @@ import {
 } from './TransactionSupported';
 import { UserAssetType } from '../../models/UserAsset';
 
+const DEFAULT_CHAIN_ID = 338;
+
 class EvmTransactionSigner implements ITransactionSigner {
   // eslint-disable-next-line class-methods-use-this
   public async signTransfer(
@@ -25,7 +27,7 @@ class EvmTransactionSigner implements ITransactionSigner {
       transaction.gasPrice || transferAsset?.config?.fee?.networkFee!,
     );
 
-    const chainId = transaction?.asset?.config?.chainId || 338;
+    const chainId = transaction?.asset?.config?.chainId || DEFAULT_CHAIN_ID;
     const txParams = {
       nonce: web3.utils.toHex(transaction.nonce || 0),
       gasPrice: web3.utils.toHex(gasPriceBN),
@@ -70,7 +72,7 @@ class EvmTransactionSigner implements ITransactionSigner {
       transaction,
     );
 
-    const chainId = transaction?.asset?.config?.chainId || 338;
+    const chainId = transaction?.asset?.config?.chainId || DEFAULT_CHAIN_ID;
     const txParams = {
       nonce: web3.utils.toHex(transaction.nonce || 0),
       gasPrice: web3.utils.toHex(gasPriceBN),

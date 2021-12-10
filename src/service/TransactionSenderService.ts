@@ -181,7 +181,7 @@ export class TransactionSenderService {
           const txConfig: TransactionConfig = {
             from: currentAsset.address,
             to: currentAsset.contractAddress,
-            value: web3.utils.toWei(transferRequest.amount, 'ether'),
+            value: 0,
             data: encodedABITokenTransfer,
           };
 

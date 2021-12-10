@@ -458,14 +458,17 @@ export class TransactionHistoryService {
     }
   }
 
-  private async fetchCurrentWalletCRC20Tokens(evmAsset: UserAsset) {
-    const { address } = evmAsset;
+  private async fetchCurrentWalletCRC20Tokens(croEvmAsset: UserAsset) {
+    const { address } = croEvmAsset;
 
-    if (!address || !evmAsset.config?.nodeUrl) {
+    if (!address || !croEvmAsset.config?.nodeUrl) {
       return [];
     }
 
-    const cronosClient = new CronosClient(evmAsset.config?.nodeUrl, evmAsset.config?.indexingUrl);
+    const cronosClient = new CronosClient(
+      croEvmAsset.config?.nodeUrl,
+      croEvmAsset.config?.indexingUrl,
+    );
 
     const tokensListResponse = await cronosClient.getTokensOwnedByAddress(address);
 
@@ -476,18 +479,18 @@ export class TransactionHistoryService {
         contractAddress: token.contractAddress,
         description: `${token.name} (${token.symbol})`,
         icon_url: '',
-        identifier: `${token.name}_(${token.symbol})_${evmAsset.walletId}`,
+        identifier: `${token.name}_(${token.symbol})_${croEvmAsset.walletId}`,
         mainnetSymbol: token.symbol,
-        name: evmAsset.name,
+        name: croEvmAsset.name,
         rewardsBalance: '',
         stakedBalance: '',
         symbol: token.symbol,
         unbondingBalance: '',
-        walletId: evmAsset.walletId,
+        walletId: croEvmAsset.walletId,
         isSecondaryAsset: true,
         assetType: UserAssetType.CRC_20_TOKEN,
-        address: evmAsset.address,
-        config: evmAsset.config,
+        address: croEvmAsset.address,
+        config: croEvmAsset.config,
       };
 
       // eslint-disable-next-line no-console
@@ -510,7 +513,7 @@ export class TransactionHistoryService {
     return newlyLoadedTokens;
   }
 
-  public async fechTokensAndPersistBalances(session: Session | null = null) {
+  public async fetchTokensAndPersistBalances(session: Session | null = null) {
     const currentSession =
       session == null ? await this.storageService.retrieveCurrentSession() : session;
     if (!currentSession) {
@@ -553,7 +556,12 @@ export class TransactionHistoryService {
     }
 
     // Fetch and update tokens balances
-    await this.fechTokensAndPersistBalances(session);
+    try {
+      await this.fetchTokensAndPersistBalances(session);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Error while trying to fetch tokens balances', e);
+    }
 
     await Promise.all(
       assets.map(async asset => {
