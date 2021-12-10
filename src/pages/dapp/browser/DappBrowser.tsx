@@ -10,7 +10,7 @@ import { getCronosAsset } from '../../../utils/utils';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
 import RequestConfirmation from '../components/RequestConfirmation/RequestConfirmation';
 import { secretStoreService } from '../../../storage/SecretStoreService';
-import { Dapp } from '../types';
+import { Dapp, DappBrowserIPC } from '../types';
 import { ProviderPreloadScriptPath } from './config';
 
 interface DappBrowserProps {
@@ -37,6 +37,23 @@ const DappBrowser = (props: DappBrowserProps) => {
   const onRequestAddress = useRefCallback((onSuccess: (address: string) => void) => {
     onSuccess(cronosAsset?.address!);
   });
+
+  const onRequestSendTransaction = useRefCallback(
+    (
+      event: DappBrowserIPC.SendTransactionEvent,
+      successCallback: (passphrase: string) => void,
+      errorCallback: (message: string) => void,
+    ) => {
+      setTxEvent(event);
+      // prompt for password
+      if (!decryptedPhrase) {
+        setInputPasswordVisible(true);
+      } else {
+        setRequestConfirmationVisible(true);
+      }
+      setConfirmPasswordCallback({ successCallback, errorCallback });
+    },
+  );
 
   useIPCProvider({
     webview: webviewRef.current,
@@ -66,14 +83,7 @@ const DappBrowser = (props: DappBrowserProps) => {
         .then(errorCallback, successCallback);
     },
     onRequestSendTransaction: async (event, successCallback, errorCallback) => {
-      setTxEvent(event);
-      // prompt for password
-      if (!decryptedPhrase) {
-        setInputPasswordVisible(true);
-      } else {
-        setRequestConfirmationVisible(true);
-      }
-      setConfirmPasswordCallback({ successCallback, errorCallback });
+      onRequestSendTransaction.current(event, successCallback, errorCallback);
     },
     onRequestAddEthereumChain: async () => {
       // no-op, cause we only support cronos for now
