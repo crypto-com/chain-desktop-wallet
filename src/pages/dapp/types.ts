@@ -95,11 +95,31 @@ export namespace DappBrowserIPC {
     return 'name' in data;
   }
 
-  export function instanceOfSignMessageEvent(data: any): data is SignMessageEvent {
+  export function instanceOfRequestAccountsEvent(data: any): data is RequestAccountsEvent {
     return 'name' in data;
   }
 
   export function instanceOfSignPersonalMessageEvent(data: any): data is SignPersonalMessageEvent {
+    return 'name' in data;
+  }
+
+  export function instanceOfSignMessageEvent(data: any): data is SignMessageEvent {
+    return 'name' in data;
+  }
+
+  export function instanceOfSignTypedMessageEvent(data: any): data is SignTypedMessageEvent {
+    return 'name' in data;
+  }
+
+  export function instanceOfEcrecoverEvent(data: any): data is EcrecoverEvent {
+    return 'name' in data;
+  }
+
+  export function instanceOfWatchAssetEvent(data: any): data is WatchAssetEvent {
+    return 'name' in data;
+  }
+
+  export function instanceOfAddEthereumChainEvent(data: any): data is AddEthereumChainEvent {
     return 'name' in data;
   }
 

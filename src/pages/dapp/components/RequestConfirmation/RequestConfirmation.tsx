@@ -175,6 +175,34 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
         setMessage(`${scaledAmount(total, currentAsset?.decimals ?? 1)} ${currentAsset?.symbol}`);
         setSubMessage(`≈${totalValue}`);
       }
+      if (DappBrowserIPC.instanceOfRequestAccountsEvent(event)) {
+        setMessage('Requesting Accounts');
+        setSubMessage('');
+      }
+      if (DappBrowserIPC.instanceOfSignPersonalMessageEvent(event)) {
+        setMessage('Sign Personal Message');
+        setSubMessage('');
+      }
+      if (DappBrowserIPC.instanceOfSignMessageEvent(event)) {
+        setMessage('Sign Message');
+        setSubMessage('');
+      }
+      if (DappBrowserIPC.instanceOfSignTypedMessageEvent(event)) {
+        setMessage('Sign Typed Message');
+        setSubMessage('');
+      }
+      if (DappBrowserIPC.instanceOfEcrecoverEvent(event)) {
+        setMessage('EcRecover');
+        setSubMessage('');
+      }
+      if (DappBrowserIPC.instanceOfWatchAssetEvent(event)) {
+        setMessage('Watch Asset');
+        setSubMessage('');
+      }
+      if (DappBrowserIPC.instanceOfAddEthereumChainEvent(event)) {
+        setMessage('Add Ethereum Chain');
+        setSubMessage('');
+      }
     }
     if (data) {
       setMessage(`Allow ${dapp?.name} to access your ${data.request.tokenData.symbol}?`);
