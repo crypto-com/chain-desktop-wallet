@@ -5,7 +5,7 @@ import { useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import Web3 from 'web3';
 import { useIPCProvider, useRefCallback } from './useIPCProvider';
-import { sessionState, walletAllAssetsState } from '../../../recoil/atom';
+import { allMarketState, sessionState, walletAllAssetsState } from '../../../recoil/atom';
 import { getCronosAsset } from '../../../utils/utils';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
 import RequestConfirmation from '../components/RequestConfirmation/RequestConfirmation';
@@ -24,6 +24,7 @@ const DappBrowser = (props: DappBrowserProps) => {
   const webviewRef = useRef<WebviewTag & HTMLWebViewElement>(null);
   const [t] = useTranslation();
   const allAssets = useRecoilValue(walletAllAssetsState);
+  const allMarketData = useRecoilValue(allMarketState);
   const cronosAsset = getCronosAsset(allAssets);
 
   const [txData, setTxData] = useState<any>();
@@ -171,7 +172,9 @@ const DappBrowser = (props: DappBrowserProps) => {
           event={txEvent}
           data={txData}
           cronosAsset={cronosAsset}
+          allMarketData={allMarketData}
           allAssets={allAssets}
+          currentSession={currentSession}
           wallet={currentSession.wallet}
           visible={requestConfirmationVisible}
           dapp={dapp}

@@ -1,15 +1,22 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Button, Drawer, Layout } from 'antd';
 import BigNumber from 'bignumber.js';
+import numeral from 'numeral';
 import './RequestConfirmation.less';
 
-import { scaledAmount, UserAsset } from '../../../../models/UserAsset';
+import {
+  AssetMarketPrice,
+  getAssetBalancePrice,
+  scaledAmount,
+  UserAsset,
+} from '../../../../models/UserAsset';
 import { Wallet } from '../../../../models/Wallet';
 import { Dapp, DappBrowserIPC } from '../../types';
 
 import { middleEllipsis, getAssetBySymbolAndChain } from '../../../../utils/utils';
 import { TokenApprovalRequestData } from '../../browser/TransactionDataParser';
-import { SupportedChainName } from '../../../../config/StaticConfig';
+import { SupportedChainName, SUPPORTED_CURRENCY } from '../../../../config/StaticConfig';
+import { Session } from '../../../../models/Session';
 
 const { Content, Footer } = Layout;
 
@@ -26,7 +33,9 @@ interface RequestConfirmationProps {
   event: DappBrowserIPC.Event;
   data: { request: TokenApprovalRequestData; gas: number; gasPrice: string };
   cronosAsset: UserAsset | undefined;
+  allMarketData: AssetMarketPrice[];
   allAssets: UserAsset[];
+  currentSession: Session;
   wallet: Wallet;
   visible: boolean;
   dapp?: Dapp;
@@ -49,7 +58,9 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     event,
     data,
     cronosAsset,
+    allMarketData,
     allAssets,
+    currentSession,
     wallet,
     visible,
     dapp,
@@ -147,11 +158,24 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
   };
 
   useEffect(() => {
-    // if(event) {
-    //   if(DappBrowserIPC.instanceOfSendTransactionEvent(event)){
-    //     setMessage(``);
-    //   }
-    // }
+    if (event) {
+      if (DappBrowserIPC.instanceOfSendTransactionEvent(event)) {
+        const assetMarketData =
+          allMarketData[`${currentAsset?.mainnetSymbol}-${currentSession.currency}`];
+        const total = new BigNumber(event.object?.value ?? '0').toString();
+        const totalValue =
+          assetMarketData &&
+          assetMarketData.price &&
+          currentAsset?.mainnetSymbol === assetMarketData.assetSymbol
+            ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
+                getAssetBalancePrice(currentAsset!, assetMarketData),
+              ).format('0,0.00')} ${assetMarketData?.currency}`
+            : `${SUPPORTED_CURRENCY.get(currentSession.currency)?.symbol}--`;
+
+        setMessage(`${scaledAmount(total, currentAsset?.decimals ?? 1)} ${currentAsset?.symbol}`);
+        setSubMessage(`≈${totalValue}`);
+      }
+    }
     if (data) {
       setMessage(`Allow ${dapp?.name} to access your ${data.request.tokenData.symbol}?`);
       setSubMessage(`${dapp?.url}`);
