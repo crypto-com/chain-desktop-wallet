@@ -636,7 +636,7 @@ export class TransactionHistoryService {
             break;
 
           default:
-            throw TypeError(`Unknown Asset type: ${asset}`);
+            break;
         }
       }),
     );
