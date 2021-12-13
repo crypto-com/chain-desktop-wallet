@@ -39,7 +39,7 @@ import {
   nftListState,
   isIbcVisibleState,
   navbarMenuSelectedKeyState,
-  isBridgeTransferingState,
+  pageLockState,
   NavbarMenuKey,
 } from '../../recoil/atom';
 import { ellipsis } from '../../utils/utils';
@@ -120,7 +120,7 @@ function HomeLayout(props: HomeLayoutProps) {
   const [navbarMenuSelectedKey, setNavbarMenuSelectedKey] = useRecoilState(
     navbarMenuSelectedKeyState,
   );
-  const [isBridgeTransfering, setIsBridgeTransfering] = useRecoilState(isBridgeTransferingState);
+  const [pageLock, setPageLock] = useRecoilState(pageLockState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const setIsIbcVisible = useSetRecoilState(isIbcVisibleState);
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
@@ -476,39 +476,74 @@ function HomeLayout(props: HomeLayoutProps) {
   const conditionalLink = (to: NavbarMenuKey, label: string) => {
     const conditionalLinkNotificationKey = 'conditionalLinkNotificationKey';
 
-    const conditionalLinkBtn = (
-      <Button
-        type="primary"
-        size="small"
-        className="btn-exit"
-        onClick={() => {
-          notification.close(conditionalLinkNotificationKey);
-          setIsBridgeTransfering(false);
-          setNavbarMenuSelectedKey(to);
-          history.push(to);
-        }}
-        style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
-      >
-        {t('home.notification.cronosBridgeExit.button')}
-      </Button>
-    );
+    const renderConditionalLinkBtn = () => {
+      switch (pageLock) {
+        case 'bridge':
+          return (
+            <a
+              onClick={() => {
+                notification.info({
+                  key: conditionalLinkNotificationKey,
+                  message: t('home.notification.cronosBridgeExit.message'),
+                  description: t('home.notification.cronosBridgeExit.description'),
+                  btn: (
+                    <Button
+                      type="primary"
+                      size="small"
+                      className="btn-exit"
+                      onClick={() => {
+                        notification.close(conditionalLinkNotificationKey);
+                        setPageLock('');
+                        setNavbarMenuSelectedKey(to);
+                        history.push(to);
+                      }}
+                      style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+                    >
+                      {t('home.notification.cronosBridgeExit.button')}
+                    </Button>
+                  ),
+                });
+              }}
+            >
+              {label}
+            </a>
+          );
+        case 'dapp':
+          return (
+            <a
+              onClick={() => {
+                notification.info({
+                  key: conditionalLinkNotificationKey,
+                  message: 'You are about to leave the DApp Browser',
+                  description: 'Are you sure you want to leave?',
+                  btn: (
+                    <Button
+                      type="primary"
+                      size="small"
+                      className="btn-exit"
+                      onClick={() => {
+                        notification.close(conditionalLinkNotificationKey);
+                        setPageLock('');
+                        setNavbarMenuSelectedKey(to);
+                        history.push(to);
+                      }}
+                      style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+                    >
+                      Leave
+                    </Button>
+                  ),
+                });
+              }}
+            >
+              {label}
+            </a>
+          );
+        default:
+          return <Link to={to}>{label}</Link>;
+      }
+    };
 
-    return isBridgeTransfering ? (
-      <a
-        onClick={() => {
-          notification.info({
-            key: conditionalLinkNotificationKey,
-            message: t('home.notification.cronosBridgeExit.message'),
-            description: t('home.notification.cronosBridgeExit.description'),
-            btn: conditionalLinkBtn,
-          });
-        }}
-      >
-        {label}
-      </a>
-    ) : (
-      <Link to={to}>{label}</Link>
-    );
+    return renderConditionalLinkBtn();
   };
 
   useEffect(() => {
@@ -605,7 +640,7 @@ function HomeLayout(props: HomeLayoutProps) {
     setNftList,
     isSessionLockModalVisible,
     setIsSessionLockModalVisible,
-    isBridgeTransfering,
+    pageLock,
     menuToBeSelectedKey,
     setMenuToBeSelectedKey,
   ]);
@@ -637,7 +672,7 @@ function HomeLayout(props: HomeLayoutProps) {
         selectedKeys={[navbarMenuSelectedKey]}
         onClick={item => {
           setMenuToBeSelectedKey(item.key);
-          if (!isBridgeTransfering) {
+          if (!pageLock) {
             setNavbarMenuSelectedKey(item.key as NavbarMenuKey);
           }
         }}

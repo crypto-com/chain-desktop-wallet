@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layout } from 'antd';
+import { useSetRecoilState } from 'recoil';
 import './dapp.less';
 import DappBrowser from './browser/DappBrowser';
 import { Dapp } from './types';
 import BorderlessCard from './components/BorderlessCard/BorderlessCard';
 import logoVvs from './assets/vvs.svg';
+import { pageLockState } from '../../recoil/atom';
 
 const { Header, Content } = Layout;
 
@@ -42,8 +44,17 @@ const DappList: Dapp[] = [
 ];
 
 const DappPage = () => {
+  const setPageLock = useSetRecoilState(pageLockState);
   const [selectedDapp, setSelectedDapp] = useState<Dapp>();
   const [t] = useTranslation();
+
+  useEffect(() => {
+    if (selectedDapp) {
+      setPageLock('dapp');
+    } else {
+      setPageLock('');
+    }
+  }, [selectedDapp]);
 
   return selectedDapp ? (
     <DappBrowser dapp={selectedDapp} />
