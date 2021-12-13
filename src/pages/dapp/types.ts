@@ -1,9 +1,16 @@
+import { ContractData } from '../../service/rpc/models/cronos.models';
+
 export interface Dapp {
   name: string;
   logo: string;
   alt: string;
   description: string;
   url: string;
+}
+
+export interface TokenApprovalRequestData {
+  amount: string;
+  tokenData: ContractData;
 }
 
 export namespace DappBrowserIPC {
@@ -17,7 +24,8 @@ export namespace DappBrowserIPC {
     | 'ecRecover'
     | 'requestAccounts'
     | 'watchAsset'
-    | 'addEthereumChain';
+    | 'addEthereumChain'
+    | 'tokenApproval';
 
   interface BaseEvent {
     id: number;
@@ -34,6 +42,16 @@ export namespace DappBrowserIPC {
       to: string;
       data: string;
       value?: string;
+    };
+  }
+
+  export interface TokenApprovalEvent extends BaseEvent {
+    name: 'tokenApproval';
+    object: {
+      amount: string;
+      tokenData: ContractData;
+      gas: number;
+      gasPrice: string;
     };
   }
 
@@ -91,38 +109,6 @@ export namespace DappBrowserIPC {
     };
   }
 
-  export function instanceOfSendTransactionEvent(data: any): data is SendTransactionEvent {
-    return 'name' in data;
-  }
-
-  export function instanceOfRequestAccountsEvent(data: any): data is RequestAccountsEvent {
-    return 'name' in data;
-  }
-
-  export function instanceOfSignPersonalMessageEvent(data: any): data is SignPersonalMessageEvent {
-    return 'name' in data;
-  }
-
-  export function instanceOfSignMessageEvent(data: any): data is SignMessageEvent {
-    return 'name' in data;
-  }
-
-  export function instanceOfSignTypedMessageEvent(data: any): data is SignTypedMessageEvent {
-    return 'name' in data;
-  }
-
-  export function instanceOfEcrecoverEvent(data: any): data is EcrecoverEvent {
-    return 'name' in data;
-  }
-
-  export function instanceOfWatchAssetEvent(data: any): data is WatchAssetEvent {
-    return 'name' in data;
-  }
-
-  export function instanceOfAddEthereumChainEvent(data: any): data is AddEthereumChainEvent {
-    return 'name' in data;
-  }
-
   export type Event =
     | SendTransactionEvent
     | RequestAccountsEvent
@@ -131,5 +117,6 @@ export namespace DappBrowserIPC {
     | SignTypedMessageEvent
     | EcrecoverEvent
     | WatchAssetEvent
-    | AddEthereumChainEvent;
+    | AddEthereumChainEvent
+    | TokenApprovalEvent;
 }

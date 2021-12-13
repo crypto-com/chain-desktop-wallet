@@ -1,10 +1,5 @@
 import { CronosClient } from '../../../service/cronos/CronosClient';
-import { ContractData } from '../../../service/rpc/models/cronos.models';
-
-export interface TokenApprovalRequestData {
-  amount: string;
-  tokenData: ContractData;
-}
+import { TokenApprovalRequestData } from '../types';
 
 export function instanceOfTokenApprovalRequestData(data: any): data is TokenApprovalRequestData {
   return 'amount' in data;

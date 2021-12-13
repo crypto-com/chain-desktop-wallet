@@ -13,7 +13,7 @@ import { evmTransactionSigner } from '../../../service/signers/EvmTransactionSig
 import { EVMContractCallUnsigned } from '../../../service/signers/TransactionSupported';
 import { walletAllAssetsState } from '../../../recoil/atom';
 import { getCronosAsset } from '../../../utils/utils';
-import { TokenApprovalRequestData, TransactionDataParser } from './TransactionDataParser';
+import { TransactionDataParser } from './TransactionDataParser';
 
 const { shell } = window.require('electron');
 
@@ -25,7 +25,7 @@ interface IUseIPCProviderProps {
   webview: WebView | null;
   onRequestAddress: (onSuccess: (address: string) => void, onError: ErrorHandler) => void;
   onRequestTokenApproval: (
-    event: { request: TokenApprovalRequestData; gas: number; gasPrice: string },
+    event: DappBrowserIPC.TokenApprovalEvent,
     onSuccess: (amount: string) => void,
     onError: ErrorHandler,
   ) => void;
@@ -222,9 +222,14 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             );
             props.onRequestTokenApproval(
               {
-                request: response,
-                gas: event.object.gas,
-                gasPrice: event.object.gasPrice,
+                name: 'tokenApproval',
+                id: event.id,
+                object: {
+                  tokenData: response.tokenData,
+                  amount: response.amount,
+                  gas: event.object.gas,
+                  gasPrice: event.object.gasPrice,
+                },
               },
               () => {
                 // TODO: deal with amount

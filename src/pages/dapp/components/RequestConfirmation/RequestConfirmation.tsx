@@ -14,7 +14,6 @@ import { Wallet } from '../../../../models/Wallet';
 import { Dapp, DappBrowserIPC } from '../../types';
 
 import { middleEllipsis, getAssetBySymbolAndChain } from '../../../../utils/utils';
-import { TokenApprovalRequestData } from '../../browser/TransactionDataParser';
 import { SupportedChainName, SUPPORTED_CURRENCY } from '../../../../config/StaticConfig';
 import { Session } from '../../../../models/Session';
 
@@ -31,7 +30,6 @@ function hexToUtf8(s: string) {
 
 interface RequestConfirmationProps {
   event: DappBrowserIPC.Event;
-  data: { request: TokenApprovalRequestData; gas: number; gasPrice: string };
   cronosAsset: UserAsset | undefined;
   allMarketData: AssetMarketPrice[];
   allAssets: UserAsset[];
@@ -56,7 +54,6 @@ interface RequestConfirmationProps {
 const RequestConfirmation = (props: RequestConfirmationProps) => {
   const {
     event,
-    data,
     cronosAsset,
     allMarketData,
     allAssets,
@@ -77,7 +74,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
   const [isContractAddressReview, setIsContractAddressReview] = useState(false);
 
   const eventViewToRender = (_event: DappBrowserIPC.Event) => {
-    if (DappBrowserIPC.instanceOfSendTransactionEvent(_event)) {
+    if (_event.name === 'signTransaction') {
       const networkFee = _event
         ? new BigNumber(_event.object?.gas).times(_event.object?.gasPrice)
         : 0;
@@ -99,7 +96,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
         </>
       );
     }
-    if (DappBrowserIPC.instanceOfSignPersonalMessageEvent(_event)) {
+    if (_event.name === 'signPersonalMessage') {
       return (
         <>
           <div className="row">
@@ -115,106 +112,84 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
         </>
       );
     }
+
+    if (_event.name === 'tokenApproval') {
+      const fee = new BigNumber(_event.object.gas).times(_event.object.gasPrice).toString();
+      const networkFee = fee;
+      const total = fee;
+      const { contractAddress } = _event.object.tokenData;
+
+      return (
+        <>
+          <div className="row">
+            <div className="title">Estimated Network Fee</div>
+            <div>{`${scaledAmount(networkFee.toString(), cronosAsset?.decimals ?? 1)} ${
+              cronosAsset?.symbol
+            }`}</div>
+          </div>
+          <div className="row">
+            <div className="title">Total</div>
+            <div>{`${scaledAmount(total.toString(), cronosAsset?.decimals ?? 1)} ${
+              cronosAsset?.symbol
+            }`}</div>
+          </div>
+          <div className="row">
+            <div className="title">Contract Address</div>
+            <a onClick={() => setIsContractAddressReview(!isContractAddressReview)}>
+              {isContractAddressReview ? 'Hide' : 'Review'}
+            </a>
+          </div>
+          <div
+            className="contract-address"
+            hidden={!isContractAddressReview}
+          >{`${contractAddress}`}</div>
+        </>
+      );
+    }
+
     // TODO: Handle other events
     return <></>;
   };
 
-  const dataViewToRender = (_data: {
-    request: TokenApprovalRequestData;
-    gas: number;
-    gasPrice: string;
-  }) => {
-    const fee = new BigNumber(_data.gas).times(_data.gasPrice).toString();
-    const networkFee = fee;
-    const total = fee;
-    const { contractAddress } = _data.request.tokenData;
-
-    return (
-      <>
-        <div className="row">
-          <div className="title">Estimated Network Fee</div>
-          <div>{`${scaledAmount(networkFee.toString(), cronosAsset?.decimals ?? 1)} ${
-            cronosAsset?.symbol
-          }`}</div>
-        </div>
-        <div className="row">
-          <div className="title">Total</div>
-          <div>{`${scaledAmount(total.toString(), cronosAsset?.decimals ?? 1)} ${
-            cronosAsset?.symbol
-          }`}</div>
-        </div>
-        <div className="row">
-          <div className="title">Contract Address</div>
-          <a onClick={() => setIsContractAddressReview(!isContractAddressReview)}>
-            {isContractAddressReview ? 'Hide' : 'Review'}
-          </a>
-        </div>
-        <div
-          className="contract-address"
-          hidden={!isContractAddressReview}
-        >{`${contractAddress}`}</div>
-      </>
-    );
-  };
-
   useEffect(() => {
-    if (event) {
-      if (DappBrowserIPC.instanceOfSendTransactionEvent(event)) {
-        const assetMarketData =
-          allMarketData[`${currentAsset?.mainnetSymbol}-${currentSession.currency}`];
-        const total = new BigNumber(event.object?.value ?? '0').toString();
-        const totalValue =
-          assetMarketData &&
-          assetMarketData.price &&
-          currentAsset?.mainnetSymbol === assetMarketData.assetSymbol
-            ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
-                getAssetBalancePrice(currentAsset!, assetMarketData),
-              ).format('0,0.00')} ${assetMarketData?.currency}`
-            : `${SUPPORTED_CURRENCY.get(currentSession.currency)?.symbol}--`;
-
-        setMessage(`${scaledAmount(total, currentAsset?.decimals ?? 1)} ${currentAsset?.symbol}`);
-        setSubMessage(`≈${totalValue}`);
-      }
-      if (DappBrowserIPC.instanceOfRequestAccountsEvent(event)) {
-        setMessage('Requesting Accounts');
-        setSubMessage('');
-      }
-      if (DappBrowserIPC.instanceOfSignPersonalMessageEvent(event)) {
-        setMessage('Sign Personal Message');
-        setSubMessage('');
-      }
-      if (DappBrowserIPC.instanceOfSignMessageEvent(event)) {
-        setMessage('Sign Message');
-        setSubMessage('');
-      }
-      if (DappBrowserIPC.instanceOfSignTypedMessageEvent(event)) {
-        setMessage('Sign Typed Message');
-        setSubMessage('');
-      }
-      if (DappBrowserIPC.instanceOfEcrecoverEvent(event)) {
-        setMessage('EcRecover');
-        setSubMessage('');
-      }
-      if (DappBrowserIPC.instanceOfWatchAssetEvent(event)) {
-        setMessage('Watch Asset');
-        setSubMessage('');
-      }
-      if (DappBrowserIPC.instanceOfAddEthereumChainEvent(event)) {
-        setMessage('Add Ethereum Chain');
-        setSubMessage('');
-      }
+    if (!event) {
+      return;
     }
-    if (data) {
-      setMessage(`Allow ${dapp?.name} to access your ${data.request.tokenData.symbol}?`);
+    if (event.name === 'signTransaction') {
+      const assetMarketData =
+        allMarketData[`${currentAsset?.mainnetSymbol}-${currentSession.currency}`];
+      const total = new BigNumber(event.object?.value ?? '0').toString();
+      const totalValue =
+        assetMarketData &&
+        assetMarketData.price &&
+        currentAsset?.mainnetSymbol === assetMarketData.assetSymbol
+          ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
+              getAssetBalancePrice(currentAsset!, assetMarketData),
+            ).format('0,0.00')} ${assetMarketData?.currency}`
+          : `${SUPPORTED_CURRENCY.get(currentSession.currency)?.symbol}--`;
+
+      setSubMessage(`${scaledAmount(total, currentAsset?.decimals ?? 1)} ${currentAsset?.symbol}`);
+      setSubMessage(`≈${totalValue}`);
+    }
+    setSubMessage('');
+
+    if (event.name === 'requestAccounts') {
+      setMessage('Requesting Accounts');
+    } else if (event.name === 'signPersonalMessage') {
+      setMessage('Sign Personal Message');
+    } else if (event.name === 'signTypedMessage' || event.name === 'signMessage') {
+      setMessage('Sign Message');
+    } else if (event.name === 'tokenApproval') {
+      setMessage(`Allow ${dapp?.name} to access your ${event.object.tokenData.symbol}?`);
       setSubMessage(`${dapp?.url}`);
       const asset = getAssetBySymbolAndChain(
         allAssets,
-        data.request.tokenData.symbol,
+        event.object.tokenData.symbol,
         SupportedChainName.CRONOS,
       );
       setCurrentAsset(asset ?? cronosAsset);
     }
-  }, [event, data]);
+  }, [event]);
 
   return (
     <Drawer visible={visible} className="request-confirmation" onClose={onClose}>
@@ -241,7 +216,6 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
             </div>
           </div>
           {event && eventViewToRender(event)}
-          {data && dataViewToRender(data)}
         </Content>
         <Footer>
           <div className="row">
