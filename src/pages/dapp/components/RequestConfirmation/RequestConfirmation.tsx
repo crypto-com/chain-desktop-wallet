@@ -229,7 +229,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
         <Footer>
           <div className="row">
             <Button type="link" htmlType="button" onClick={onClose}>
-              {t('general.confirm')}
+              {t('general.reject')}
             </Button>
             <Button
               type="primary"
