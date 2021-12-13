@@ -270,7 +270,7 @@ export class StorageService {
   }
 
   public async retrieveAllAssetsPrices(currency: string) {
-    return this.db.marketPriceStore.find<AssetMarketPrice>({ _id: new RegExp(currency) });
+    return this.db.marketPriceStore.find<AssetMarketPrice>({ currency });
   }
 
   public async retrieveAssetPrice(assetSymbol: string, currency: string) {
