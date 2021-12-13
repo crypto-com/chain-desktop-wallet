@@ -99,6 +99,59 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
         </>
       );
     }
+    if (_event.name === 'signMessage') {
+      return (
+        <>
+          <div className="row">
+            <div className="title">{t('dapp.requestConfirmation.message.title')}: </div>
+          </div>
+          <pre
+            style={{
+              whiteSpace: 'pre-wrap',
+              padding: '12px',
+              backgroundColor: '#f2fbff',
+              borderRadius: '8px',
+              maxHeight: '240px',
+              overflowY: 'scroll',
+            }}
+          >
+            {_event.object.data}
+          </pre>
+        </>
+      );
+    }
+
+    if (_event.name === 'signTypedMessage') {
+      let displayMessage = '';
+      const parsedRaw = JSON.parse(_event.object.raw);
+
+      if (parsedRaw.message) {
+        Object.keys(parsedRaw.message).forEach(key => {
+          displayMessage = displayMessage.concat(`${key}: \n${parsedRaw.message[key]}\n\n`);
+        });
+      }
+
+      return (
+        <>
+          <div className="row">
+            <div className="title">{t('dapp.requestConfirmation.message.title')}</div>
+          </div>
+          <pre
+            style={{
+              whiteSpace: 'pre-wrap',
+              padding: '12px',
+              backgroundColor: '#f2fbff',
+              borderRadius: '8px',
+              maxHeight: '240px',
+              overflowY: 'scroll',
+            }}
+          >
+            {displayMessage}
+          </pre>
+        </>
+      );
+    }
+
     if (_event.name === 'signPersonalMessage') {
       return (
         <>
@@ -108,6 +161,11 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
           <pre
             style={{
               whiteSpace: 'pre-wrap',
+              padding: '12px',
+              backgroundColor: '#f2fbff',
+              borderRadius: '8px',
+              maxHeight: '240px',
+              overflowY: 'scroll',
             }}
           >
             {hexToUtf8(_event.object.data)}
@@ -184,7 +242,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       setMessage(t('dapp.requetConfirmation.signMessage.message'));
     } else if (event.name === 'tokenApproval') {
       setMessage(
-        t('bridge.pendingTransfer.title', {
+        t('dapp.requetConfirmation.tokenApproval.message', {
           name: dapp?.name,
           symbol: event.object.tokenData.symbol,
         }),

@@ -30,6 +30,8 @@ const DappBrowser = (props: DappBrowserProps) => {
     | DappBrowserIPC.SendTransactionEvent
     | DappBrowserIPC.TokenApprovalEvent
     | DappBrowserIPC.SignPersonalMessageEvent
+    | DappBrowserIPC.SignTypedMessageEvent
+    | DappBrowserIPC.SignMessageEvent
   >();
   const [requestConfirmationVisible, setRequestConfirmationVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
@@ -78,6 +80,40 @@ const DappBrowser = (props: DappBrowserProps) => {
     },
   );
 
+  const onRequestSignMessage = useRefCallback(
+    (
+      event: DappBrowserIPC.SignMessageEvent,
+      successCallback: (signature: string) => void,
+      errorCallback: (message: string) => void,
+    ) => {
+      setTxEvent(event);
+      // prompt for password
+      if (!decryptedPhrase) {
+        setInputPasswordVisible(true);
+      } else {
+        setRequestConfirmationVisible(true);
+      }
+      setConfirmPasswordCallback({ successCallback, errorCallback });
+    },
+  );
+
+  const onRequestSignTypedMessage = useRefCallback(
+    (
+      event: DappBrowserIPC.SignTypedMessageEvent,
+      successCallback: (signature: string) => void,
+      errorCallback: (message: string) => void,
+    ) => {
+      setTxEvent(event);
+      // prompt for password
+      if (!decryptedPhrase) {
+        setInputPasswordVisible(true);
+      } else {
+        setRequestConfirmationVisible(true);
+      }
+      setConfirmPasswordCallback({ successCallback, errorCallback });
+    },
+  );
+
   const onRequestSignPersonalMessage = useRefCallback(
     (
       event: DappBrowserIPC.SignPersonalMessageEvent,
@@ -105,15 +141,13 @@ const DappBrowser = (props: DappBrowserProps) => {
       onRequestTokenApproval.current(event, successCallback, errorCallback);
     },
     onRequestSignMessage: async (event, successCallback, errorCallback) => {
-      setInputPasswordVisible(true);
-      setConfirmPasswordCallback({ successCallback, errorCallback });
+      onRequestSignMessage.current(event, successCallback, errorCallback);
     },
     onRequestSignPersonalMessage: async (event, successCallback, errorCallback) => {
       onRequestSignPersonalMessage.current(event, successCallback, errorCallback);
     },
     onRequestSignTypedMessage: async (event, successCallback, errorCallback) => {
-      setInputPasswordVisible(true);
-      setConfirmPasswordCallback({ successCallback, errorCallback });
+      onRequestSignTypedMessage.current(event, successCallback, errorCallback);
     },
     onRequestEcRecover: async (event, successCallback, errorCallback) => {
       new Web3('').eth.personal

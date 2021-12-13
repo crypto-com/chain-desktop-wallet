@@ -77,8 +77,8 @@ export namespace DappBrowserIPC {
   export interface SignTypedMessageEvent extends BaseEvent {
     name: 'signTypedMessage';
     object: {
-      data: string;
       raw: string;
+      data?: string;
     };
   }
 
