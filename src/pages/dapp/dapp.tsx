@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Layout } from 'antd';
 import { useSetRecoilState } from 'recoil';
 import './dapp.less';
+import { pageLockState } from '../../recoil/atom';
 import DappBrowser from './browser/DappBrowser';
 import { Dapp } from './types';
 import BorderlessCard from './components/BorderlessCard/BorderlessCard';
 import logoVvs from './assets/vvs.svg';
-import { pageLockState } from '../../recoil/atom';
 
 const { Header, Content } = Layout;
 

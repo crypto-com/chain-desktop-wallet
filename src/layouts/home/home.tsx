@@ -514,8 +514,8 @@ function HomeLayout(props: HomeLayoutProps) {
               onClick={() => {
                 notification.info({
                   key: conditionalLinkNotificationKey,
-                  message: 'You are about to leave the DApp Browser',
-                  description: 'Are you sure you want to leave?',
+                  message: t('home.notification.dappBrowserExit.message'),
+                  description: t('home.notification.dappBrowserExit.description'),
                   btn: (
                     <Button
                       type="primary"
@@ -529,7 +529,7 @@ function HomeLayout(props: HomeLayoutProps) {
                       }}
                       style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
                     >
-                      Leave
+                      {t('home.notification.dappBrowserExit.button')}
                     </Button>
                   ),
                 });

@@ -2,6 +2,7 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { Button, Drawer, Layout } from 'antd';
 import BigNumber from 'bignumber.js';
 import numeral from 'numeral';
+import { useTranslation } from 'react-i18next';
 import './RequestConfirmation.less';
 
 import {
@@ -73,6 +74,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(cronosAsset);
   const [isContractAddressReview, setIsContractAddressReview] = useState(false);
 
+  const [t] = useTranslation();
+
   const eventViewToRender = (_event: DappBrowserIPC.Event) => {
     if (_event.name === 'signTransaction') {
       const networkFee = _event
@@ -82,13 +85,13 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       return (
         <>
           <div className="row">
-            <div className="title">Estimated Network Fee</div>
+            <div className="title">{t('dapp.requestConfirmation.networkFee.title')}</div>
             <div>{`${scaledAmount(networkFee.toString(), cronosAsset?.decimals ?? 1)} ${
               cronosAsset?.symbol
             }`}</div>
           </div>
           <div className="row">
-            <div className="title">Total</div>
+            <div className="title">{t('dapp.requestConfirmation.total.title')}</div>
             <div>{`${scaledAmount(total.toString(), cronosAsset?.decimals ?? 1)} ${
               cronosAsset?.symbol
             }`}</div>
@@ -100,7 +103,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       return (
         <>
           <div className="row">
-            <div className="title">Message: </div>
+            <div className="title">{t('dapp.requestConfirmation.message.title')}: </div>
           </div>
           <pre
             style={{
@@ -122,21 +125,21 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       return (
         <>
           <div className="row">
-            <div className="title">Estimated Network Fee</div>
+            <div className="title">{t('dapp.requestConfirmation.networkFee.title')}</div>
             <div>{`${scaledAmount(networkFee.toString(), cronosAsset?.decimals ?? 1)} ${
               cronosAsset?.symbol
             }`}</div>
           </div>
           <div className="row">
-            <div className="title">Total</div>
+            <div className="title">{t('dapp.requestConfirmation.total.title')}</div>
             <div>{`${scaledAmount(total.toString(), cronosAsset?.decimals ?? 1)} ${
               cronosAsset?.symbol
             }`}</div>
           </div>
           <div className="row">
-            <div className="title">Contract Address</div>
+            <div className="title">{t('dapp.requestConfirmation.contractAddress.title')}</div>
             <a onClick={() => setIsContractAddressReview(!isContractAddressReview)}>
-              {isContractAddressReview ? 'Hide' : 'Review'}
+              {isContractAddressReview ? t('general.hide') : t('general.review')}
             </a>
           </div>
           <div
@@ -174,13 +177,19 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     setSubMessage('');
 
     if (event.name === 'requestAccounts') {
-      setMessage('Requesting Accounts');
+      setMessage(t('dapp.requetConfirmation.requestAccounts.message'));
     } else if (event.name === 'signPersonalMessage') {
-      setMessage('Sign Personal Message');
+      setMessage(t('dapp.requetConfirmation.signPersonalMessage.message'));
     } else if (event.name === 'signTypedMessage' || event.name === 'signMessage') {
-      setMessage('Sign Message');
+      setMessage(t('dapp.requetConfirmation.signMessage.message'));
     } else if (event.name === 'tokenApproval') {
-      setMessage(`Allow ${dapp?.name} to access your ${event.object.tokenData.symbol}?`);
+      setMessage(
+        t('bridge.pendingTransfer.title', {
+          name: dapp?.name,
+          symbol: event.object.tokenData.symbol,
+        }),
+      );
+
       setSubMessage(`${dapp?.url}`);
       const asset = getAssetBySymbolAndChain(
         allAssets,
@@ -205,7 +214,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
           <div className="wallet-detail">
             <div className="row">
               <div className="name">{wallet.name}</div>
-              <div className="s-title">{`${currentAsset?.symbol} Balance`}</div>
+              <div className="s-title">{`${currentAsset?.symbol} ${t('general.balance')}`}</div>
             </div>
             <div className="row">
               <div className="address">{middleEllipsis(currentAsset?.address ?? '', 6)}</div>
@@ -220,7 +229,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
         <Footer>
           <div className="row">
             <Button type="link" htmlType="button" onClick={onClose}>
-              Reject
+              {t('general.confirm')}
             </Button>
             <Button
               type="primary"
@@ -231,7 +240,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
                 setRequestConfirmationVisible(false);
               }}
             >
-              Confirm
+              {t('general.confirm')}
             </Button>
           </div>
         </Footer>
