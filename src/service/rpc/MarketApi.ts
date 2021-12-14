@@ -43,7 +43,7 @@ export class CroMarketApi implements IMarketApi {
     };
   }
 
-  private async getCryptoToFiatRateFromCoinbase(cryptoSymbol: string, fiatCurrency: string) {
+  public async getCryptoToFiatRateFromCoinbase(cryptoSymbol: string, fiatCurrency: string) {
     const fiatRateResp: AxiosResponse<CoinbaseResponse> = await axios({
       baseURL: this.coinbaseRateBaseUrl,
       url: '/exchange-rates',
