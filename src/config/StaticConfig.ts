@@ -3,6 +3,10 @@ import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
 export const COINBASE_TICKER_API_BASE_URL = 'https://api.coinbase.com/v2/';
+export const CRYPTO_COM_PRICE_API_BASE_URL = {
+  V1: 'https://price-api.crypto.com/price/v1/',
+  V2: 'https://price-api.crypto.com/price/v2/',
+};
 export const NV_GRAPHQL_API_ENDPOINT = 'https://crypto.com/nft-api/graphql';
 export const IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT =
   'https://crypto.org/ipfs-middleware-server/uploads';
