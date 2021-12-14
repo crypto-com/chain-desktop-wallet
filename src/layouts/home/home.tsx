@@ -42,7 +42,7 @@ import {
   pageLockState,
   NavbarMenuKey,
 } from '../../recoil/atom';
-import { ellipsis } from '../../utils/utils';
+import { ellipsis, checkIfTestnet } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 // import IconSend from '../../svg/IconSend';
@@ -679,22 +679,22 @@ function HomeLayout(props: HomeLayoutProps) {
       >
         <Menu.Item key="/home" icon={<Icon component={IconHome} />}>
           {conditionalLink('/home', t('navbar.home'))}
-          {/* <Link to="/home">{t('navbar.home')}</Link> */}
         </Menu.Item>
         <Menu.Item key="/staking" icon={<Icon component={IconStaking} />}>
           {conditionalLink('/staking', t('navbar.staking'))}
-          {/* <Link to="/staking">{t('navbar.staking')}</Link> */}
         </Menu.Item>
         <Menu.Item key="/assets" icon={<Icon component={IconAssets} />}>
           {conditionalLink('/assets', t('navbar.assets'))}
-          {/* <Link to="/assets">{t('navbar.assets')}</Link> */}
         </Menu.Item>
         <Menu.Item key="/bridge" icon={<Icon component={IconCronos} />}>
           <Link to="/bridge">{t('navbar.bridge')}</Link>
         </Menu.Item>
-        <Menu.Item key="/dapp" icon={<Icon component={IconDApp} />}>
-          {conditionalLink('/dapp', t('navbar.dapp'))}
-        </Menu.Item>
+        {!checkIfTestnet(session.wallet.config.network) &&
+          session.wallet.walletType !== LEDGER_WALLET_TYPE && (
+            <Menu.Item key="/dapp" icon={<Icon component={IconDApp} />}>
+              {conditionalLink('/dapp', t('navbar.dapp'))}
+            </Menu.Item>
+          )}
         {/* <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">{t('navbar.send')}</Link>
         </Menu.Item>
@@ -703,15 +703,12 @@ function HomeLayout(props: HomeLayoutProps) {
         </Menu.Item> */}
         <Menu.Item key="/governance" icon={<BankOutlined />}>
           {conditionalLink('/governance', t('navbar.governance'))}
-          {/* <Link to="/governance">{t('navbar.governance')}</Link> */}
         </Menu.Item>
         <Menu.Item key="/nft" icon={<Icon component={IconNft} />}>
           {conditionalLink('/nft', t('navbar.nft'))}
-          {/* <Link to="/nft">{t('navbar.nft')}</Link> */}
         </Menu.Item>
         <Menu.Item key="/settings" icon={<SettingOutlined />}>
           {conditionalLink('/settings', t('navbar.settings'))}
-          {/* <Link to="/nft">{t('navbar.nft')}</Link> */}
         </Menu.Item>
       </Menu>
     );
