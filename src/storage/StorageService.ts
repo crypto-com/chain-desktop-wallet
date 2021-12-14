@@ -198,6 +198,13 @@ export class StorageService {
     );
   }
 
+  public async removeAssets(assets: UserAsset[]) {
+    return this.db.assetStore.remove(
+      { _id: { $in: assets.map(asset => asset.identifier) } },
+      { multi: true },
+    );
+  }
+
   public async saveBridgeConfig(bridgeConfig: BridgeConfig) {
     const configID = `${bridgeConfig.bridgeNetworkConfigType}_${bridgeConfig.bridgeDirectionType}`;
     return this.db.bridgeConfigStore.update<BridgeConfig>(

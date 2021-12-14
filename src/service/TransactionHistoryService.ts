@@ -525,6 +525,10 @@ export class TransactionHistoryService {
       return;
     }
 
+    // Remove existing CRC20 tokens & refetch balances for all assets
+    const CRC20TokenList = assets.filter(asset => asset.assetType === UserAssetType.CRC_20_TOKEN);
+    await this.storageService.removeAssets(CRC20TokenList);
+
     await Promise.all(
       assets.map(async asset => {
         switch (asset.assetType) {
