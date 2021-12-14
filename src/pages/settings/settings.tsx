@@ -56,7 +56,7 @@ import {
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
-import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
+import { UserAsset, UserAssetConfig, UserAssetType } from '../../models/UserAsset';
 import AddressBook from './tabs/AddressBook/AddressBook';
 import { getChainName } from '../../utils/utils';
 
@@ -718,9 +718,11 @@ const FormSettings = () => {
   let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
 
   useEffect(() => {
-    const selectedIdentifier = walletAllAssets.find(
-      asset => asset.identifier === session.activeAsset?.identifier,
-    )?.identifier;
+    const selectedIdentifier = walletAllAssets
+      .filter(asset => {
+        return asset.assetType !== UserAssetType.CRC_20_TOKEN;
+      })
+      .find(asset => asset.identifier === session.activeAsset?.identifier)?.identifier;
     setCurrentAssetIdentifier(selectedIdentifier || walletAllAssets[0].identifier);
 
     if (defaultSettings.fee !== undefined) {
