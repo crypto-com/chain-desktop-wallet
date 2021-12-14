@@ -486,6 +486,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   key: conditionalLinkNotificationKey,
                   message: t('home.notification.cronosBridgeExit.message'),
                   description: t('home.notification.cronosBridgeExit.description'),
+                  duration: 10,
                   btn: (
                     <Button
                       type="primary"
@@ -516,6 +517,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   key: conditionalLinkNotificationKey,
                   message: t('home.notification.dappBrowserExit.message'),
                   description: t('home.notification.dappBrowserExit.description'),
+                  duration: 10,
                   btn: (
                     <Button
                       type="primary"
@@ -687,7 +689,7 @@ function HomeLayout(props: HomeLayoutProps) {
           {conditionalLink('/assets', t('navbar.assets'))}
         </Menu.Item>
         <Menu.Item key="/bridge" icon={<Icon component={IconCronos} />}>
-          <Link to="/bridge">{t('navbar.bridge')}</Link>
+          {conditionalLink('/bridge', t('navbar.bridge'))}
         </Menu.Item>
         {!checkIfTestnet(session.wallet.config.network) &&
           session.wallet.walletType !== LEDGER_WALLET_TYPE && (

@@ -17,6 +17,7 @@ import {
   Input,
   message,
   Spin,
+  notification,
 } from 'antd';
 import Icon, {
   ArrowLeftOutlined,
@@ -852,6 +853,7 @@ const CronosBridge = props => {
           onClick={() => {
             if (currentStep - 1 === 0) {
               setIsBridgeTransfering(false);
+              notification.close('conditionalLinkNotificationKey');
             }
             setCurrentStep(currentStep - 1);
             setIsButtonDisabled(true);
