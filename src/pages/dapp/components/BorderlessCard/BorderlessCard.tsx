@@ -19,7 +19,7 @@ const BorderlessCard: React.FC<BorderlessCardProps> = props => (
       height: '100%',
     }}
     style={Object.assign({}, props.style, {
-      margin: props.marginOverwrite && props.marginOverwrite,
+      margin: props.marginOverwrite,
     })}
     className="card"
     onClick={props.onClick}

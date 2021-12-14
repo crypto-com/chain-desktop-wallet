@@ -442,7 +442,6 @@ class Web3Provider extends EventEmitter {
   }
 
   eth_signTypedData(payload, useV4) {
-    const message = JSON.parse(payload.params[1]);
     this.postMessage('signTypedMessage', payload.id, {
       raw: payload.params[1],
     });
