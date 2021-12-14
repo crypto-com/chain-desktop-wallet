@@ -155,7 +155,7 @@ const CronosBridge = props => {
 
   const [bridgeConfigs, setBridgeConfigs] = useState<BridgeConfig>();
   const [bridgeConfigFields, setBridgeConfigFields] = useState<string[]>([]);
-  const [bridgeFee, setBridgeFee] = useState('0');
+  const [networkFee, setNetworkFee] = useState('0');
 
   const analyticsService = new AnalyticsService(session);
 
@@ -219,20 +219,20 @@ const CronosBridge = props => {
       decryptedPhrase: phraseDecrypted,
       walletType: session.wallet.walletType, // normal, ledger
     };
-    const fee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
+    const txFee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
 
     transferRequest = {
       ...transferRequest,
       amount: adjustedTransactionAmount(
         amount,
         currentAsset!,
-        getBaseScaledAmount(fee, currentAsset!),
+        getBaseScaledAmount(txFee, currentAsset!),
       ),
     };
 
     setDecryptedPhrase(phraseDecrypted);
     setInputPasswordVisible(false);
-    setBridgeFee(fee);
+    setNetworkFee(txFee);
     setBridgeTransferRequest(transferRequest);
     setCurrentStep(1);
     setIsBridgeTransfering(true);
@@ -261,18 +261,18 @@ const CronosBridge = props => {
         decryptedPhrase,
         walletType: session.wallet.walletType, // normal, ledger
       };
-      const fee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
+      const txFee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
 
       transferRequest = {
         ...transferRequest,
         amount: adjustedTransactionAmount(
           amount,
           currentAsset!,
-          getBaseScaledAmount(fee, currentAsset!),
+          getBaseScaledAmount(txFee, currentAsset!),
         ),
       };
 
-      setBridgeFee(fee);
+      setNetworkFee(txFee);
       setBridgeTransferRequest(transferRequest);
       setCurrentStep(1);
       setIsBridgeTransfering(true);
@@ -310,7 +310,7 @@ const CronosBridge = props => {
           amount: adjustedTransactionAmount(
             amount,
             currentAsset!,
-            getBaseScaledAmount(bridgeFee, currentAsset!),
+            getBaseScaledAmount(networkFee, currentAsset!),
           ),
           symbol: currentAsset?.symbol,
         }),
@@ -358,7 +358,7 @@ const CronosBridge = props => {
           amount: adjustedTransactionAmount(
             amount,
             currentAsset!,
-            getBaseScaledAmount(bridgeFee, currentAsset!),
+            getBaseScaledAmount(networkFee, currentAsset!),
           ),
           symbol: currentAsset?.symbol,
         }),
@@ -396,7 +396,7 @@ const CronosBridge = props => {
           adjustedTransactionAmount(
             formValues.amount,
             currentAsset!,
-            getBaseScaledAmount(bridgeFee, currentAsset!),
+            getBaseScaledAmount(networkFee, currentAsset!),
           ),
         ),
         AnalyticsTxType.BridgeTransaction,
@@ -410,7 +410,7 @@ const CronosBridge = props => {
             amount: adjustedTransactionAmount(
               amount,
               currentAsset!,
-              getBaseScaledAmount(bridgeFee, currentAsset!),
+              getBaseScaledAmount(networkFee, currentAsset!),
             ),
             symbol: currentAsset?.symbol,
           }),
@@ -423,7 +423,7 @@ const CronosBridge = props => {
           amount: adjustedTransactionAmount(
             amount,
             currentAsset!,
-            getBaseScaledAmount(bridgeFee, currentAsset!),
+            getBaseScaledAmount(networkFee, currentAsset!),
           ),
           symbol: currentAsset?.symbol,
         }),
@@ -628,9 +628,19 @@ const CronosBridge = props => {
                 <Divider />
                 <div className="block">
                   <div className="flex-row">
-                    <div>{t('bridge.form.fee')}</div>
+                    <div>{t('bridge.form.networkFee')}</div>
                     <div>
-                      ~{bridgeFee} {currentAsset?.symbol}
+                      ~{networkFee} {currentAsset?.symbol}
+                    </div>
+                  </div>
+                  <div className="flex-row">
+                    <div>{t('bridge.form.bridgeFee')}</div>
+                    <div
+                      style={{
+                        color: '#20bca4',
+                      }}
+                    >
+                      {t('general.waived')}
                     </div>
                   </div>
                   <div className="flex-row">
@@ -650,7 +660,7 @@ const CronosBridge = props => {
                       adjustedTransactionAmount(
                         amount,
                         currentAsset!,
-                        getBaseScaledAmount(bridgeFee, currentAsset!),
+                        getBaseScaledAmount(networkFee, currentAsset!),
                       ),
                     )}{' '}
                     {toAsset?.symbol}
@@ -660,7 +670,7 @@ const CronosBridge = props => {
                       adjustedTransactionAmount(
                         amount,
                         currentAsset!,
-                        getBaseScaledAmount(bridgeFee, currentAsset!),
+                        getBaseScaledAmount(networkFee, currentAsset!),
                       ),
                     ),
                   ).gt(0) ? (
@@ -699,7 +709,7 @@ const CronosBridge = props => {
                       adjustedTransactionAmount(
                         amount,
                         currentAsset!,
-                        getBaseScaledAmount(bridgeFee, currentAsset!),
+                        getBaseScaledAmount(networkFee, currentAsset!),
                       ),
                     ),
                   ).gt(0)
