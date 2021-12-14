@@ -535,7 +535,7 @@ class Web3Provider extends EventEmitter {
     console.log(`<== ${id} sendError ${error}`);
     const callback = this.callbacks.get(id);
     if (callback) {
-      callback(error instanceof Error ? error : new Error(error), null);
+      callback(error instanceof Error ? error : new ProviderRpcError(4001, error), null);
       this.callbacks.delete(id);
     }
   }
