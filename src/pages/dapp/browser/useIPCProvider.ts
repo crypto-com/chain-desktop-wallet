@@ -5,6 +5,7 @@ import { TransactionConfig } from 'web3-eth';
 import { useRecoilValue } from 'recoil';
 import Web3 from 'web3';
 import { ethers } from 'ethers';
+import { signTypedData_v4 } from 'eth-sig-util';
 import { TransactionPrepareService } from '../../../service/TransactionPrepareService';
 import { walletService } from '../../../service/WalletService';
 import { ChainConfig } from './config';
@@ -179,9 +180,14 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     },
   );
 
-  // const handleSignTypedMessage = useRefCallback(
-  //   async (event: DappBrowserIPC.SignTypedMessageEvent, passphrase: string) => {},
-  // );
+  const handleSignTypedMessage = useRefCallback(
+    async (event: DappBrowserIPC.SignTypedMessageEvent, passphrase: string) => {
+      const wallet = ethers.Wallet.fromMnemonic(passphrase);
+      const bufferedKey = Buffer.from(wallet.privateKey.replace(/^(0x)/, ''), 'hex');
+      const sig = signTypedData_v4(bufferedKey, { data: JSON.parse(event.object.raw) });
+      sendResponse(event.id, sig);
+    },
+  );
 
   const listenIPCMessages = () => {
     if (!webview) {
@@ -276,8 +282,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'signTypedMessage':
           props.onRequestSignTypedMessage(
             event,
-            () => {
-              // handleSignTypedMessage.current(event, passphrase);
+            passphrase => {
+              handleSignTypedMessage.current(event, passphrase);
             },
             reason => {
               sendError(event.id, reason);
