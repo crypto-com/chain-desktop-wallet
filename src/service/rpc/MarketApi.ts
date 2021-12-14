@@ -34,7 +34,19 @@ export class CroMarketApi implements IMarketApi {
   }
 
   public async getAssetPrice(assetSymbol: string, currency: string): Promise<AssetMarketPrice> {
-    const fiatPrice = await this.getTokenPriceFromCryptoCom(assetSymbol, currency);
+    let fiatPrice = '';
+
+    try {
+      fiatPrice = await this.getTokenPriceFromCryptoCom(assetSymbol, currency);
+    } catch (e) {
+      return {
+        assetSymbol,
+        currency,
+        dailyChange: '',
+        price: '',
+      };
+    }
+
     return {
       assetSymbol,
       currency,

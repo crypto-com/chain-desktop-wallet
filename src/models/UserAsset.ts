@@ -146,6 +146,9 @@ export const getAssetPriceId = (assetPrice: AssetMarketPrice) => {
 };
 
 export const getAssetBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
+  if (!marketPrice.price) {
+    return '--';
+  }
   const bigAsset = new Big(scaledBalance(asset));
   const bigMarketPrice = new Big(marketPrice.price);
   return bigAsset.times(bigMarketPrice).toFixed(2);
@@ -153,7 +156,7 @@ export const getAssetBalancePrice = (asset: UserAsset, marketPrice: AssetMarketP
 
 export const getAssetTotalBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
   const bigAsset = new Big(scaledTotalBalance(asset));
-  const bigMarketPrice = new Big(marketPrice.price);
+  const bigMarketPrice = new Big(marketPrice.price ? marketPrice.price : '0');
   return bigAsset.times(bigMarketPrice).toFixed(2);
 };
 
