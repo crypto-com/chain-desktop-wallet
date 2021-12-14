@@ -12,7 +12,6 @@ import {
   getAssetPriceId,
   getAssetPriceIdFrom,
   UserAsset,
-  UserAssetType,
 } from '../models/UserAsset';
 import {
   NftAccountTransactionList,
@@ -240,16 +239,6 @@ export class StorageService {
       assetCreationType: creationType,
       walletId,
     });
-  }
-
-  public async removeAssets(address: string, assetType: UserAssetType) {
-    return this.db.assetStore.remove(
-      {
-        address,
-        assetType,
-      },
-      { multi: true },
-    );
   }
 
   public async removeWalletAssets(walletId: string) {

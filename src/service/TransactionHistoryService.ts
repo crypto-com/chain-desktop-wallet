@@ -472,8 +472,6 @@ export class TransactionHistoryService {
 
     const tokensListResponse = await cronosClient.getTokensOwnedByAddress(address);
 
-    await this.storageService.removeAssets(address, UserAssetType.CRC_20_TOKEN);
-
     const newlyLoadedTokens = await tokensListResponse.result.map(async token => {
       const newCRC20Token: UserAsset = {
         balance: token.balance,
