@@ -12,22 +12,13 @@ import {
   UserAsset,
 } from '../../../../models/UserAsset';
 import { Wallet } from '../../../../models/Wallet';
+import { Session } from '../../../../models/Session';
+import { SupportedChainName, SUPPORTED_CURRENCY } from '../../../../config/StaticConfig';
 import { Dapp, DappBrowserIPC } from '../../types';
 
-import { middleEllipsis, getAssetBySymbolAndChain } from '../../../../utils/utils';
-import { SupportedChainName, SUPPORTED_CURRENCY } from '../../../../config/StaticConfig';
-import { Session } from '../../../../models/Session';
+import { middleEllipsis, hexToUtf8, getAssetBySymbolAndChain } from '../../../../utils/utils';
 
 const { Content, Footer } = Layout;
-
-function hexToUtf8(s: string) {
-  return decodeURIComponent(
-    s
-      .replace('0x', '')
-      .replace(/\s+/g, '') // remove spaces
-      .replace(/[0-9a-f]{2}/g, '%$&'), // add '%' before each 2 characters
-  );
-}
 
 interface RequestConfirmationProps {
   event: DappBrowserIPC.Event;
@@ -105,18 +96,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
           <div className="row">
             <div className="title">{t('dapp.requestConfirmation.message.title')}: </div>
           </div>
-          <pre
-            style={{
-              whiteSpace: 'pre-wrap',
-              padding: '12px',
-              backgroundColor: '#f2fbff',
-              borderRadius: '8px',
-              maxHeight: '240px',
-              overflowY: 'scroll',
-            }}
-          >
-            {_event.object.data}
-          </pre>
+          <pre className="signing-message">{_event.object.data}</pre>
         </>
       );
     }
@@ -136,18 +116,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
           <div className="row">
             <div className="title">{t('dapp.requestConfirmation.message.title')}</div>
           </div>
-          <pre
-            style={{
-              whiteSpace: 'pre-wrap',
-              padding: '12px',
-              backgroundColor: '#f2fbff',
-              borderRadius: '8px',
-              maxHeight: '240px',
-              overflowY: 'scroll',
-            }}
-          >
-            {displayMessage}
-          </pre>
+          <pre className="signing-message">{displayMessage}</pre>
         </>
       );
     }
@@ -158,18 +127,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
           <div className="row">
             <div className="title">{t('dapp.requestConfirmation.message.title')}: </div>
           </div>
-          <pre
-            style={{
-              whiteSpace: 'pre-wrap',
-              padding: '12px',
-              backgroundColor: '#f2fbff',
-              borderRadius: '8px',
-              maxHeight: '240px',
-              overflowY: 'scroll',
-            }}
-          >
-            {hexToUtf8(_event.object.data)}
-          </pre>
+          <pre className="signing-message">{hexToUtf8(_event.object.data)}</pre>
         </>
       );
     }

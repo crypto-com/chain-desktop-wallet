@@ -114,6 +114,15 @@ export function isNumeric(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+export function hexToUtf8(s: string) {
+  return decodeURIComponent(
+    s
+      .replace('0x', '')
+      .replace(/\s+/g, '') // remove spaces
+      .replace(/[0-9a-f]{2}/g, '%$&'), // add '%' before each 2 characters
+  );
+}
+
 export function bech32ToEVMAddress(bech32Address: string) {
   const decodedFromWords = bech32.fromWords(bech32.decode(bech32Address).words);
   const originalEVMAddress = Buffer.from(new Uint8Array(decodedFromWords)).toString('hex');
