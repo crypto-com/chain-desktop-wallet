@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Route, useHistory, Switch as RouterSwitch } from 'react-router-dom';
 import './settings.less';
 import 'antd/dist/antd.css';
@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { CarouselRef } from 'antd/lib/carousel';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
+import _ from 'lodash';
 import {
   allMarketState,
   sessionState,
@@ -55,7 +56,7 @@ import {
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
-import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
+import { UserAsset, UserAssetConfig, UserAssetType } from '../../models/UserAsset';
 import AddressBook from './tabs/AddressBook/AddressBook';
 import { getChainName } from '../../utils/utils';
 
@@ -81,6 +82,13 @@ const GeneralSettingsForm = props => {
   const [t] = useTranslation();
 
   const { currentAssetIdentifier, setCurrentAssetIdentifier } = props;
+
+  // only configure native assets
+  const configurableAssets = useMemo(() => {
+    return walletAllAssets.filter(asset => {
+      return _.size(asset.contractAddress) < 1;
+    });
+  }, [walletAllAssets]);
 
   useEffect(() => {
     let unmounted = false;
@@ -143,7 +151,7 @@ const GeneralSettingsForm = props => {
 
   const onSwitchAsset = value => {
     setCurrentAssetIdentifier(value);
-    const selectedAsset = walletAllAssets.find(asset => asset.identifier === value);
+    const selectedAsset = configurableAssets.find(asset => asset.identifier === value);
     setSession({
       ...session,
       activeAsset: selectedAsset,
@@ -159,7 +167,7 @@ const GeneralSettingsForm = props => {
       <div className="title">{t('settings.form1.assetIdentifier.label')}</div>
       <div className="description">{t('settings.form1.assetIdentifier.description')}</div>
       <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
-        {walletAllAssets.map(asset => {
+        {configurableAssets.map(asset => {
           return (
             <Option value={asset.identifier} key={asset.identifier}>
               {assetIcon(asset)}
@@ -710,9 +718,11 @@ const FormSettings = () => {
   let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
 
   useEffect(() => {
-    const selectedIdentifier = walletAllAssets.find(
-      asset => asset.identifier === session.activeAsset?.identifier,
-    )?.identifier;
+    const selectedIdentifier = walletAllAssets
+      .filter(asset => {
+        return asset.assetType !== UserAssetType.CRC_20_TOKEN;
+      })
+      .find(asset => asset.identifier === session.activeAsset?.identifier)?.identifier;
     setCurrentAssetIdentifier(selectedIdentifier || walletAllAssets[0].identifier);
 
     if (defaultSettings.fee !== undefined) {

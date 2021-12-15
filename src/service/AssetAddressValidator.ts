@@ -32,6 +32,7 @@ export class AssetAddressValidator {
         return addressValidator.isValid();
       }
       case UserAssetType.EVM:
+      case UserAssetType.CRC_20_TOKEN:
         return ethers.utils.isAddress(this.address);
       default:
         throw new TypeError(`Unknown asset type: ${this.assetType}`);

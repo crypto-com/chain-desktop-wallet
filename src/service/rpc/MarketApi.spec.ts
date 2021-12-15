@@ -3,7 +3,13 @@ import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
 import { expect } from 'chai';
 import { croMarketPriceApi } from './MarketApi';
-import { allTokensSlug, croToFiatRateStub, ethToFiatRateStub, usdToFiatConversionRate, vvsFinancePrice } from './test/mock.marketapi';
+import {
+  allTokensSlug,
+  croToFiatRateStub,
+  ethToFiatRateStub,
+  usdToFiatConversionRate,
+  vvsFinancePrice,
+} from './test/mock.marketapi';
 
 describe('MarketApi', () => {
   let axiosMock: MockAdapter;
@@ -15,54 +21,39 @@ describe('MarketApi', () => {
   afterEach(() => {
     axiosMock.reset();
   });
-  it('should return the `ETH` fiat rate ', async () => {
+  it('should return the `ETH` fiat rate from coinbase', async () => {
     axiosMock
       .onGet('/exchange-rates', {
         params: {
-          currency: 'ETH'
+          currency: 'ETH',
         },
       })
       .replyOnce(200, ethToFiatRateStub);
 
-    const ethToFiatRate = await croMarketPriceApi.getAssetPrice('ETH', 'SGD');
-    expect(ethToFiatRate.assetSymbol).to.equal('ETH');
-    expect(ethToFiatRate.currency).to.equal('SGD');
-    expect(ethToFiatRate.dailyChange).to.deep.equal('');
-    expect(ethToFiatRate.price).to.deep.equal('4604.13319145');
-
+    const ethToFiatPrice = await croMarketPriceApi.getCryptoToFiatRateFromCoinbase('ETH', 'SGD');
+    expect(ethToFiatPrice).to.deep.equal('4604.13319145');
   });
-  it('should return the `CRO` fiat rate ', async () => {
+  it('should return the `CRO` fiat rate from coinbase', async () => {
     axiosMock
       .onGet('/exchange-rates', {
         params: {
-          currency: 'CRO'
+          currency: 'CRO',
         },
       })
       .replyOnce(200, croToFiatRateStub);
 
-    const croToFiatRate = await croMarketPriceApi.getAssetPrice('CRO', 'SGD');
-    expect(croToFiatRate.assetSymbol).to.equal('CRO');
-    expect(croToFiatRate.currency).to.equal('SGD');
-    expect(croToFiatRate.dailyChange).to.deep.equal('');
-    expect(croToFiatRate.price).to.deep.equal('4604.13319145');
-
+    const croToFiatRate = await croMarketPriceApi.getCryptoToFiatRateFromCoinbase('CRO', 'SGD');
+    expect(croToFiatRate).to.deep.equal('4604.13319145');
   });
-  it('should throw on legacy `CRO` and `USD` rate ', async () => {
 
-    axiosMock
-      .onGet()
-      .replyOnce(200, croToFiatRateStub);
+  it('should throw on legacy `CRO` and `USD` rate from coinbase', async () => {
+    axiosMock.onGet().replyOnce(200, croToFiatRateStub);
 
-    const croToFiatRate = await croMarketPriceApi.getAssetPrice('CRO', 'USD');
-    expect(croToFiatRate.assetSymbol).to.equal('CRO');
-    expect(croToFiatRate.currency).to.equal('USD');
-    expect(croToFiatRate.dailyChange).to.eq('');
-    expect(croToFiatRate.price).to.eq('3427.505');
-
+    const croToFiatRate = await croMarketPriceApi.getCryptoToFiatRateFromCoinbase('CRO', 'USD');
+    expect(croToFiatRate).to.eq('3427.505');
   });
 
   it('should return token price from Crypto.com Price API', async () => {
-
     axiosMock
       .onGet('/all-tokens')
       .replyOnce(200, allTokensSlug)
@@ -78,7 +69,7 @@ describe('MarketApi', () => {
     axiosMock
       .onGet('/exchange-rates', {
         params: {
-          currency: 'USD'
+          currency: 'USD',
         },
       })
       .replyOnce(200, usdToFiatConversionRate);
@@ -88,6 +79,5 @@ describe('MarketApi', () => {
 
     const vvsTokenPriceUSD = await croMarketPriceApi.getTokenPriceFromCryptoCom('VVS', 'USD');
     expect(vvsTokenPriceUSD).to.equals('0.000442751368');
-  })
-
+  });
 });

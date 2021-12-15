@@ -349,17 +349,12 @@ class WalletService {
     return allWalletAssets[0];
   }
 
-  public async retrieveAllAssetsPrices(currency: string): Promise<AssetMarketPrice[]> {
-    const assetsPrices = [];
+  public async retrieveAllAssetsPrices(currency: string): Promise<Map<string, AssetMarketPrice>> {
+    const assetsPrices = new Map<string, AssetMarketPrice>();
     const prices = await this.storageService.retrieveAllAssetsPrices(currency);
     prices.forEach(data => {
       // eslint-disable-next-line no-underscore-dangle
-      assetsPrices[data._id] = {
-        price: data.price,
-        currency: data.currency,
-        assetSymbol: data.assetSymbol,
-        dailyChange: data.dailyChange,
-      };
+      assetsPrices.set(data._id, data);
     });
     return assetsPrices;
   }

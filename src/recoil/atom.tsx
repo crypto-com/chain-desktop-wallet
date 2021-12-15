@@ -73,7 +73,7 @@ const marketState = atom({
 
 const allMarketState = atom({
   key: 'allMarket',
-  default: [market],
+  default: new Map<string, AssetMarketPrice>(),
 });
 
 const walletAssetState = atom({
