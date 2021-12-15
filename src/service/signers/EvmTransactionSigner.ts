@@ -7,6 +7,7 @@ import TokenContractABI from './abi/TokenContractABI.json';
 import {
   BridgeTransactionUnsigned,
   DelegateTransactionUnsigned,
+  EVMContractCallUnsigned,
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
 } from './TransactionSupported';
@@ -46,6 +47,28 @@ class EvmTransactionSigner implements ITransactionSigner {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  public async sendContractCallTransaction(
+    transaction: EVMContractCallUnsigned,
+    phrase: string,
+    jsonRpcUrl: string,
+  ): Promise<string> {
+    const txParams: ethers.providers.TransactionRequest = {
+      nonce: transaction.nonce,
+      gasPrice: transaction.gasPrice,
+      gasLimit: transaction.gasLimit,
+      to: transaction.contractAddress,
+      data: transaction.data,
+      type: 0,
+      value: '0x0',
+    };
+
+    const provider = new ethers.providers.JsonRpcProvider(jsonRpcUrl);
+    const wallet = ethers.Wallet.fromMnemonic(phrase).connect(provider);
+
+    const signedTx = await wallet.sendTransaction(txParams);
+    return Promise.resolve(signedTx.hash);
+  }
+
   public async signTokenTransfer(
     transaction: TransferTransactionUnsigned,
     phrase: string,

@@ -95,7 +95,6 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
     address: string,
     options?: tokenTransfersRequestOptions,
   ): Promise<TokenTransferEventLogsResponse> {
-
     const requestParams: tokenTransfersRequestParams = {
       module: 'account',
       action: 'tokentx',

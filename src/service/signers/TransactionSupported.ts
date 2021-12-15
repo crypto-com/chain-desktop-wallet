@@ -96,3 +96,12 @@ export interface BridgeTransactionUnsigned extends TransactionUnsigned {
 
   latestBlockHeight?: number;
 }
+
+export interface EVMContractCallUnsigned {
+  from: string;
+  contractAddress: string;
+  data: string;
+  nonce?: number;
+  gasPrice: string;
+  gasLimit: string;
+}

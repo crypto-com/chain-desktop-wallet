@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import './bridge.less';
 import 'antd/dist/antd.css';
@@ -17,6 +17,7 @@ import {
   Input,
   message,
   Spin,
+  notification,
 } from 'antd';
 import Icon, {
   ArrowLeftOutlined,
@@ -25,13 +26,13 @@ import Icon, {
   LoadingOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { Footer, Header } from 'antd/lib/layout/layout';
-import { isBridgeTransferingState, sessionState, walletAllAssetsState } from '../../recoil/atom';
+import { pageLockState, sessionState, walletAllAssetsState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 
 import { UserAsset } from '../../models/UserAsset';
@@ -111,7 +112,8 @@ const CronosBridge = props => {
 
   const session = useRecoilValue(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
-  const [isBridgeTransfering, setIsBridgeTransfering] = useRecoilState(isBridgeTransferingState);
+
+  const setPageLock = useSetRecoilState(pageLockState);
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({
     amount: '0',
@@ -124,6 +126,7 @@ const CronosBridge = props => {
   });
   const [bridgeConfigForm] = Form.useForm();
   const [isBridgeValid, setIsBridgeValid] = useState(false);
+  const [isBridgeTransfering, setIsBridgeTransfering] = useState(false);
 
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
@@ -845,6 +848,14 @@ const CronosBridge = props => {
     );
   };
 
+  useEffect(() => {
+    if (isBridgeTransfering) {
+      setPageLock('bridge');
+    } else {
+      setPageLock('');
+    }
+  }, [isBridgeTransfering]);
+
   return (
     <>
       {currentStep === 1 || bridgeTransferError ? (
@@ -852,6 +863,7 @@ const CronosBridge = props => {
           onClick={() => {
             if (currentStep - 1 === 0) {
               setIsBridgeTransfering(false);
+              notification.close('conditionalLinkNotificationKey');
             }
             setCurrentStep(currentStep - 1);
             setIsButtonDisabled(true);
