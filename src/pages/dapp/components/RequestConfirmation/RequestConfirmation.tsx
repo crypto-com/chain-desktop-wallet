@@ -7,7 +7,7 @@ import './RequestConfirmation.less';
 
 import {
   AssetMarketPrice,
-  getAssetBalancePrice,
+  getAssetAmountInFiat,
   scaledAmount,
   UserAsset,
 } from '../../../../models/UserAsset';
@@ -171,27 +171,31 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
   };
 
   useEffect(() => {
+    setMessage('');
+    setSubMessage('');
     if (!event) {
       return;
     }
     if (event.name === 'signTransaction') {
-      const assetMarketData =
-        allMarketData[`${currentAsset?.mainnetSymbol}-${currentSession.currency}`];
-      const total = new BigNumber(event.object?.value ?? '0').toString();
+      const assetMarketData = allMarketData.get(
+        `${currentAsset?.mainnetSymbol}-${currentSession.currency}`,
+      );
+      const totalScaledAmount = scaledAmount(
+        new BigNumber(event.object?.value ?? '0').toString(),
+        currentAsset?.decimals ?? 1,
+      );
       const totalValue =
         assetMarketData &&
         assetMarketData.price &&
         currentAsset?.mainnetSymbol === assetMarketData.assetSymbol
           ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
-              getAssetBalancePrice(currentAsset!, assetMarketData),
+              getAssetAmountInFiat(totalScaledAmount, assetMarketData),
             ).format('0,0.00')} ${assetMarketData?.currency}`
           : `${SUPPORTED_CURRENCY.get(currentSession.currency)?.symbol}--`;
 
-      setSubMessage(`${scaledAmount(total, currentAsset?.decimals ?? 1)} ${currentAsset?.symbol}`);
+      setMessage(`${totalScaledAmount} ${currentAsset?.symbol}`);
       setSubMessage(`≈${totalValue}`);
     }
-    setSubMessage('');
-
     if (event.name === 'requestAccounts') {
       setMessage(t('dapp.requetConfirmation.requestAccounts.message'));
     } else if (event.name === 'signPersonalMessage') {
