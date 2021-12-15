@@ -1,21 +1,21 @@
 import { StorageService } from '../storage/StorageService';
 import { NodeRpcService } from './rpc/NodeRpcService';
-import { SECONDS_OF_YEAR, NOT_KNOWN_YET_VALUE } from '../config/StaticConfig';
+import { NOT_KNOWN_YET_VALUE, SECONDS_OF_YEAR } from '../config/StaticConfig';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { CronosClient } from './cronos/CronosClient';
 import {
-  TransferTransactionData,
-  TransactionStatus,
+  NftModel,
   NftQueryParams,
   NftTransferModel,
-  ValidatorModel,
-  UnbondingDelegationList,
+  ProposalModel,
+  ProposalStatuses,
   RewardTransactionList,
   StakingTransactionList,
+  TransactionStatus,
+  TransferTransactionData,
   TransferTransactionList,
-  NftModel,
-  ProposalStatuses,
-  ProposalModel,
+  UnbondingDelegationList,
+  ValidatorModel,
 } from '../models/Transaction';
 import { Session } from '../models/Session';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
@@ -264,6 +264,51 @@ export class TransactionHistoryService {
             }
 
             break;
+          case UserAssetType.CRC_20_TOKEN:
+            {
+              if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
+                return;
+              }
+
+              const cronosClient = new CronosClient(
+                currentAsset.config?.nodeUrl,
+                currentAsset.config?.indexingUrl,
+              );
+
+              const transactionsResponse = await cronosClient.getTokenTransfersByAddress(
+                currentAsset.address,
+                { contractaddress: currentAsset.contractAddress },
+              );
+              const loadedTransactions = transactionsResponse.result.map(crc20TokenTx => {
+                const transactionTime = new Date(
+                  Number(crc20TokenTx.timeStamp) * 1000,
+                ).toISOString();
+
+                const transferTx: TransferTransactionData = {
+                  amount: crc20TokenTx.value,
+                  assetSymbol: currentAsset.symbol,
+                  date: transactionTime,
+                  hash: crc20TokenTx.hash,
+                  memo: '',
+                  receiverAddress: crc20TokenTx.to,
+                  senderAddress: crc20TokenTx.from,
+                  status: TransactionStatus.SUCCESS,
+                };
+
+                return transferTx;
+              });
+
+              // eslint-disable-next-line no-console
+              console.log(`LOADED_TXS ${currentAsset.symbol}: `, loadedTransactions);
+
+              await this.saveTransfers({
+                transactions: loadedTransactions,
+                walletId: currentSession.wallet.identifier,
+                assetId: currentAsset?.identifier,
+              });
+            }
+            break;
+
           default:
             break;
         }
@@ -413,6 +458,92 @@ export class TransactionHistoryService {
     }
   }
 
+  private async fetchCurrentWalletCRC20Tokens(croEvmAsset: UserAsset) {
+    const { address } = croEvmAsset;
+
+    if (!address || !croEvmAsset.config?.nodeUrl) {
+      return [];
+    }
+
+    const cronosClient = new CronosClient(
+      croEvmAsset.config?.nodeUrl,
+      croEvmAsset.config?.indexingUrl,
+    );
+
+    const tokensListResponse = await cronosClient.getTokensOwnedByAddress(address);
+
+    const newlyLoadedTokens = await tokensListResponse.result.map(async token => {
+      const newCRC20Token: UserAsset = {
+        balance: token.balance,
+        decimals: Number(token.decimals),
+        contractAddress: token.contractAddress,
+        description: `${token.name} (${token.symbol})`,
+        icon_url: '',
+        identifier: `${token.name}_(${token.symbol})_${croEvmAsset.walletId}`,
+        mainnetSymbol: token.symbol,
+        name: croEvmAsset.name,
+        rewardsBalance: '',
+        stakedBalance: '',
+        symbol: token.symbol,
+        unbondingBalance: '',
+        walletId: croEvmAsset.walletId,
+        isSecondaryAsset: true,
+        assetType: UserAssetType.CRC_20_TOKEN,
+        address: croEvmAsset.address,
+        config: croEvmAsset.config,
+      };
+
+      // eslint-disable-next-line no-console
+      console.log(`CRC_20_PERSISTED_TOKEN ${token.symbol}:`, {
+        address,
+        balance: token.balance,
+      });
+
+      await this.storageService.saveAsset(newCRC20Token);
+      return newCRC20Token;
+    });
+
+    // eslint-disable-next-line no-console
+    console.log('CRC_20_PERSISTED_TOKENS', {
+      address,
+      size: newlyLoadedTokens.length,
+      newlyLoadedTokens,
+    });
+
+    return newlyLoadedTokens;
+  }
+
+  public async fetchTokensAndPersistBalances(session: Session | null = null) {
+    const currentSession =
+      session == null ? await this.storageService.retrieveCurrentSession() : session;
+    if (!currentSession) {
+      return;
+    }
+    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
+
+    if (!assets || assets.length === 0) {
+      return;
+    }
+
+    // Remove existing CRC20 tokens & refetch balances for all assets
+    const CRC20TokenList = assets.filter(asset => asset.assetType === UserAssetType.CRC_20_TOKEN);
+    await this.storageService.removeAssets(CRC20TokenList);
+
+    await Promise.all(
+      assets.map(async asset => {
+        switch (asset.assetType) {
+          case UserAssetType.TENDERMINT:
+            break;
+          case UserAssetType.EVM:
+            await this.fetchCurrentWalletCRC20Tokens(asset);
+            break;
+          default:
+            throw TypeError('Not supported yet');
+        }
+      }),
+    );
+  }
+
   public async fetchAndUpdateBalances(session: Session | null = null) {
     const currentSession =
       session == null ? await this.storageService.retrieveCurrentSession() : session;
@@ -426,6 +557,14 @@ export class TransactionHistoryService {
 
     if (!assets || assets.length === 0) {
       return;
+    }
+
+    // Fetch and update tokens balances
+    try {
+      await this.fetchTokensAndPersistBalances(session);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('Error while trying to fetch tokens balances', e);
     }
 
     await Promise.all(
@@ -501,7 +640,7 @@ export class TransactionHistoryService {
             break;
 
           default:
-            throw TypeError(`Unknown Asset type: ${asset}`);
+            break;
         }
       }),
     );

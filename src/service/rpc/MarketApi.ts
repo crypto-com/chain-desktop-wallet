@@ -1,7 +1,15 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { AssetMarketPrice } from '../../models/UserAsset';
-import { MARKET_API_BASE_URL, COINBASE_TICKER_API_BASE_URL, CRYPTO_COM_PRICE_API_BASE_URL } from '../../config/StaticConfig';
-import { CoinbaseResponse, CryptoComSlugResponse, CryptoTokenPriceAPIResponse } from './models/marketApi.models';
+import {
+  MARKET_API_BASE_URL,
+  COINBASE_TICKER_API_BASE_URL,
+  CRYPTO_COM_PRICE_API_BASE_URL,
+} from '../../config/StaticConfig';
+import {
+  CoinbaseResponse,
+  CryptoComSlugResponse,
+  CryptoTokenPriceAPIResponse,
+} from './models/marketApi.models';
 
 export interface IMarketApi {
   getAssetPrice(assetSymbol: string, currency: string): Promise<AssetMarketPrice>;
@@ -26,8 +34,19 @@ export class CroMarketApi implements IMarketApi {
   }
 
   public async getAssetPrice(assetSymbol: string, currency: string): Promise<AssetMarketPrice> {
+    let fiatPrice = '';
 
-    const fiatPrice = await this.getCryptoToFiatRateFromCoinbase(assetSymbol, currency);
+    try {
+      fiatPrice = await this.getTokenPriceFromCryptoCom(assetSymbol, currency);
+    } catch (e) {
+      return {
+        assetSymbol,
+        currency,
+        dailyChange: '',
+        price: '',
+      };
+    }
+
     return {
       assetSymbol,
       currency,
@@ -36,7 +55,7 @@ export class CroMarketApi implements IMarketApi {
     };
   }
 
-  private async getCryptoToFiatRateFromCoinbase(cryptoSymbol: string, fiatCurrency: string) {
+  public async getCryptoToFiatRateFromCoinbase(cryptoSymbol: string, fiatCurrency: string) {
     const fiatRateResp: AxiosResponse<CoinbaseResponse> = await axios({
       baseURL: this.coinbaseRateBaseUrl,
       url: '/exchange-rates',
@@ -91,7 +110,6 @@ export class CroMarketApi implements IMarketApi {
   }
 
   private async loadTokenSlugMap() {
-
     if (!this.tokenSlugMap || this.tokenSlugMap.length === 0) {
       const allTokensSlugMap: AxiosResponse<CryptoComSlugResponse[]> = await axios({
         baseURL: CRYPTO_COM_PRICE_API_BASE_URL.V2,
