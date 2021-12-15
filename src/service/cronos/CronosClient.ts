@@ -153,7 +153,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
     return txListResponse.data;
   }
 
-  getTokenIconUrlBySymbol(symbol: string): string {
+  static getTokenIconUrlBySymbol(symbol: string): string {
     return CRC20_TOKEN_ICON_URL[symbol.toUpperCase()] || '';
   }
 }

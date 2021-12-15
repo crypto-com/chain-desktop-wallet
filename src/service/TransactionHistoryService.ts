@@ -478,7 +478,7 @@ export class TransactionHistoryService {
         decimals: Number(token.decimals),
         contractAddress: token.contractAddress,
         description: `${token.name} (${token.symbol})`,
-        icon_url: cronosClient.getTokenIconUrlBySymbol(token.symbol),
+        icon_url: CronosClient.getTokenIconUrlBySymbol(token.symbol),
         identifier: `${token.name}_(${token.symbol})_${croEvmAsset.walletId}`,
         mainnetSymbol: token.symbol,
         name: croEvmAsset.name,
