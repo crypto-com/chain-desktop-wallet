@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import axios, { AxiosResponse } from 'axios';
 import { EVMClient } from '../rpc/clients/EVMClient';
+import { CRC20_TOKEN_ICON_URL } from '../../config/StaticConfig';
 import {
   ICronosChainIndexAPI,
   txListRequestOptions,
@@ -150,5 +151,9 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
       throw new Error('Could not fetch token owned by user address from Cronos Chain Index API.');
     }
     return txListResponse.data;
+  }
+
+  static getTokenIconUrlBySymbol(symbol: string): string {
+    return CRC20_TOKEN_ICON_URL[symbol.toUpperCase()] || '';
   }
 }
