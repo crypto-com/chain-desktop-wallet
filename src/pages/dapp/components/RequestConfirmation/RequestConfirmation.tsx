@@ -23,7 +23,7 @@ const { Content, Footer } = Layout;
 interface RequestConfirmationProps {
   event: DappBrowserIPC.Event;
   cronosAsset: UserAsset | undefined;
-  allMarketData: AssetMarketPrice[];
+  allMarketData: Map<string, AssetMarketPrice>;
   allAssets: UserAsset[];
   currentSession: Session;
   wallet: Wallet;
