@@ -12,7 +12,7 @@ import RequestConfirmation from '../components/RequestConfirmation/RequestConfir
 import { secretStoreService } from '../../../storage/SecretStoreService';
 import { Dapp, DappBrowserIPC } from '../types';
 import { ProviderPreloadScriptPath } from './config';
-// import packageJson from '../../../../package.json';
+import packageJson from '../../../../package.json';
 
 interface DappBrowserProps {
   dapp: Dapp;
@@ -224,7 +224,7 @@ const DappBrowser = (props: DappBrowserProps) => {
         preload={ProviderPreloadScriptPath}
         ref={webviewRef}
         // useragent is required for some dapps to auto connect, eg. cronoschimps
-        useragent="Mozilla/5.0 (iPhone; CPU iPhone OS 13_5_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.1.1 Mobile/15E148 Safari/604.1"
+        useragent={`Mozilla/5.0 (Linux; Android 8.0.0; Desktop Wallet Build/${packageJson.version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.84 Mobile Safari/537.36`}
         style={{
           width: '100%',
           height: '100vh',
