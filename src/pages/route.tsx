@@ -24,6 +24,7 @@ import SignUpPage from './signup/signup';
 import HomeLayout from '../layouts/home/home';
 import AssetsPage from './assets/assets';
 import BlockPage from './block/block';
+import DappPage from './dapp/dapp';
 
 import {
   CLOUDFLARE_TRACE_URI,
@@ -156,6 +157,12 @@ function RouteHub() {
       key: 'bridge',
       path: '/bridge',
       component: <BridgePage />,
+    },
+    {
+      name: 'Dapp Page',
+      key: 'dapp',
+      path: '/dapp',
+      component: <DappPage />,
     },
     {
       name: 'Settings Page',

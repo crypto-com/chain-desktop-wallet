@@ -4,7 +4,7 @@ import './home.less';
 import 'antd/dist/antd.css';
 import { Button, Layout, notification, Table, Tabs, Card, List, Avatar, Tag } from 'antd';
 import { SyncOutlined } from '@ant-design/icons';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
@@ -62,7 +62,7 @@ const HomePage = () => {
   // const isIbcVisible = useRecoilValue(isIbcVisibleState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setNFTList = useSetRecoilState(nftListState);
-  const allMarketData = useRecoilValue(allMarketState);
+  const [allMarketData, setAllMarketData] = useRecoilState(allMarketState);
   const [marketData, setMarketData] = useState<AssetMarketPrice>();
 
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
@@ -75,7 +75,7 @@ const HomePage = () => {
     hasShownWarningOnWalletTypeState,
   );
 
-  const [defaultWalletAsset, setdefaultWalletAsset] = useState<UserAsset>();
+  const [defaultWalletAsset, setDefaultWalletAsset] = useState<UserAsset>();
 
   const [isRewardModalVisible, setIsRewardModalVisible] = useState(false);
   const [rewards, setRewards] = useState<RewardsBalances>();
@@ -133,7 +133,9 @@ const HomePage = () => {
       // dataIndex: 'price',
       key: 'price',
       render: record => {
-        const assetMarketData = allMarketData[`${record.mainnetSymbol}-${currentSession.currency}`];
+        const assetMarketData = allMarketData.get(
+          `${record.mainnetSymbol}-${currentSession.currency}`,
+        );
         return (
           <>
             {assetMarketData &&
@@ -164,7 +166,9 @@ const HomePage = () => {
       // dataIndex: 'value',
       key: 'value',
       render: record => {
-        const assetMarketData = allMarketData[`${record.mainnetSymbol}-${currentSession.currency}`];
+        const assetMarketData = allMarketData.get(
+          `${record.mainnetSymbol}-${currentSession.currency}`,
+        );
         return (
           <>
             {assetMarketData &&
@@ -250,6 +254,10 @@ const HomePage = () => {
     setHasShownNotLiveWallet(true);
 
     await walletService.fetchAndSaveNFTs(sessionData);
+
+    const allPrices = await walletService.retrieveAllAssetsPrices(sessionData.currency);
+    setAllMarketData(allPrices);
+
     setFetchingDB(false);
   };
 
@@ -304,11 +312,9 @@ const HomePage = () => {
   function getAllAssetsTotalBalance() {
     let totalBalance = Big('0');
     walletAllAssets.forEach(asset => {
-      if (allMarketData[`${asset.mainnetSymbol}-${currentSession.currency}`]) {
-        const addingBalance = getAssetTotalBalancePrice(
-          asset,
-          allMarketData[`${asset.mainnetSymbol}-${currentSession.currency}`],
-        );
+      const priceData = allMarketData.get(`${asset.mainnetSymbol}-${currentSession.currency}`);
+      if (priceData) {
+        const addingBalance = getAssetTotalBalancePrice(asset, priceData);
         totalBalance = totalBalance.add(addingBalance);
       }
     });
@@ -328,15 +334,21 @@ const HomePage = () => {
       const currentNftList = processNftList(allNFTs);
       setProcessedNftList(currentNftList);
       setNFTList(allNFTs);
-      setdefaultWalletAsset(currentAsset);
+      setDefaultWalletAsset(currentAsset);
       setWalletAsset(currentAsset);
-      setMarketData(allMarketData[`${currentAsset?.mainnetSymbol}-${sessionData.currency}`]);
+      setMarketData(allMarketData.get(`${currentAsset?.mainnetSymbol}-${sessionData.currency}`));
 
       setRewards(allRewards);
 
       showWalletStateNotification(sessionData.wallet.config);
       setWalletAllAssets(allAssets);
       setHasShownNotLiveWallet(true);
+
+      // Fetch again balances data
+      await walletService.syncBalancesData(sessionData);
+
+      const marketPrices = await walletService.retrieveAllAssetsPrices(sessionData.currency);
+      setAllMarketData(marketPrices);
     };
 
     syncAssetData();
@@ -408,8 +420,8 @@ const HomePage = () => {
               <div className="quantity">
                 {numeral(
                   scaledAmount(
-                    new Big(defaultWalletAsset.rewardsBalance ?? '0')
-                      .add(rewards?.claimedRewardsBalance ?? '0')
+                    new Big(defaultWalletAsset?.rewardsBalance || '0')
+                      .add(rewards?.claimedRewardsBalance || '0')
                       .toFixed(2),
                     defaultWalletAsset.decimals,
                   ),

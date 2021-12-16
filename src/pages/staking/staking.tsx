@@ -301,8 +301,10 @@ const FormDelegationRequest = props => {
     setShowMemo(!showMemo);
   }
 
-  const assetMarketData = allMarketData[`${walletAsset.mainnetSymbol}-${currentSession.currency}`];
-  const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol;
+  const assetMarketData = allMarketData.get(
+    `${walletAsset.mainnetSymbol}-${currentSession.currency}`,
+  );
+  const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol;
   const undelegatePeriod =
     currentSession.wallet.config.name === 'MAINNET'
       ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET
@@ -389,7 +391,7 @@ const FormDelegationRequest = props => {
           <span>{t('general.available')}: </span>
           <div className="available-amount">
             {scaledBalance(walletAsset)} {walletAsset?.symbol}{' '}
-            {walletAsset
+            {walletAsset && assetMarketData
               ? `(${localFiatSymbol}${numeral(
                   getAssetBalancePrice(walletAsset, assetMarketData),
                 ).format('0,0.00')})`
@@ -452,7 +454,7 @@ const FormDelegationRequest = props => {
               <div className="label">{t('staking.modal1.label3')}</div>
               <div>
                 {`${formValues?.amount} ${walletAsset?.symbol}`}{' '}
-                {walletAsset
+                {walletAsset && assetMarketData
                   ? `(${localFiatSymbol}${numeral(
                       getAssetAmountInFiat(formValues?.amount, assetMarketData),
                     ).format('0,0.00')})`
@@ -1035,7 +1037,9 @@ const FormWithdrawStakingReward = () => {
 
   useEffect(() => {
     const syncRewardsData = async () => {
-      const currentMarketData = allMarketData[`${walletAsset?.symbol}-${currentSession?.currency}`];
+      const currentMarketData = allMarketData.get(
+        `${walletAsset?.symbol}-${currentSession?.currency}`,
+      );
 
       const allRewards: RewardTransaction[] = await walletService.retrieveAllRewards(
         currentSession.wallet.identifier,
@@ -1050,8 +1054,15 @@ const FormWithdrawStakingReward = () => {
           ? walletAsset
           : await walletService.retrieveDefaultWalletAsset(currentSession);
 
-      const rewardsTabularData = convertToTabularData(allRewards, primaryAsset, currentMarketData);
-      setRewards(rewardsTabularData);
+      if (currentMarketData) {
+        const rewardsTabularData = convertToTabularData(
+          allRewards,
+          primaryAsset,
+          currentMarketData,
+        );
+        setRewards(rewardsTabularData);
+      }
+
       setWalletAsset(primaryAsset);
     };
 
@@ -1425,7 +1436,7 @@ const StakingPage = () => {
 
     syncUnbondingDelegationsData();
 
-    setMarketData(allMarketData[`${userAsset?.mainnetSymbol}-${currentSession.currency}`]);
+    setMarketData(allMarketData.get(`${userAsset?.mainnetSymbol}-${currentSession.currency}`));
 
     if (!didMountRef.current) {
       didMountRef.current = true;

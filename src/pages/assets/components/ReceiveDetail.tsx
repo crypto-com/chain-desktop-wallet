@@ -24,7 +24,9 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
   const [isLedger, setIsLedger] = useState(false);
 
   const [t] = useTranslation();
-  const isEVM = currentAsset?.assetType === UserAssetType.EVM;
+  const isEVM =
+    currentAsset?.assetType === UserAssetType.EVM ||
+    currentAsset?.assetType === UserAssetType.CRC_20_TOKEN;
 
   useEffect(() => {
     const { walletType } = session.wallet;
@@ -75,6 +77,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
       case UserAssetType.TENDERMINT:
         return address;
       case UserAssetType.EVM:
+      case UserAssetType.CRC_20_TOKEN:
         return address;
       case UserAssetType.IBC:
         return wallet.address;

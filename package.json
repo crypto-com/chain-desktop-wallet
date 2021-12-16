@@ -1,6 +1,6 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.5.8",
+  "version": "0.6.0",
   "description": "Crypto.com Chain Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.org <chain@crypto.org>",
@@ -23,6 +23,7 @@
     "bech32": "2.0.0",
     "bfj": "7.0.2",
     "big.js": "6.0.3",
+    "bignumber.js": "9.0.1",
     "camelcase": "6.2.0",
     "copyfiles": "2.4.1",
     "cross-env": "7.0.3",
@@ -32,14 +33,16 @@
     "electron-log": "4.3.5",
     "electron-reload": "1.5.0",
     "electron-updater": "4.3.9",
+    "eth-sig-util": "3.0.1",
     "ethereumjs-tx": "2.1.2",
     "ethers": "5.4.4",
     "i18next": "20.3.2",
     "i18next-browser-languagedetector": "6.1.2",
+    "isutf8": "4.0.0",
     "ledger-cosmos-js": "2.1.8",
     "less-vars-to-js": "1.3.0",
     "lodash": "4.17.21",
-    "long": "^4.0.0",
+    "long": "4.0.0",
     "moment": "2.29.1",
     "nedb-promises": "5.0.1",
     "node-localstorage": "2.1.6",
@@ -69,7 +72,7 @@
     "web3": "1.5.0",
     "web3-core": "1.5.0",
     "web3-eth": "1.5.0",
-    "web3-utils": "^1.6.0",
+    "web3-utils": "1.6.0",
     "zxcvbn": "4.4.2"
   },
   "scripts": {
@@ -117,6 +120,12 @@
       "./dist/**/*",
       "./public/*",
       "./public/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "src/pages/dapp/browser/preload.js",
+        "to": "scripts/preload.js"
+      }
     ],
     "afterSign": "electron-builder-notarize",
     "mac": {

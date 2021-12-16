@@ -65,6 +65,10 @@ export interface UserAsset {
   // This field is used to differentiate default asset and secondary assets,
   // The original default asset have false or undefined on this field
   isSecondaryAsset?: boolean;
+
+  // CRC20/ERC20 assets should have a contract address persisted along side them.
+  // This will be used later for all actions interacting with the token like tokens transfers, etc, ...
+  contractAddress?: string;
 }
 
 export enum UserAssetType {
@@ -75,6 +79,11 @@ export enum UserAssetType {
 
   // For EVM based assets like CRONOS
   EVM = 'EVM',
+
+  // A token on the Cro EVM chain
+  CRC_20_TOKEN = 'CRC_20_TOKEN',
+
+  ERC_20_TOKEN = 'ERC_20_TOKEN',
 }
 
 export enum AssetCreationType {
@@ -120,10 +129,10 @@ export const scaledRewardBalance = (asset: UserAsset) => {
 };
 
 export const scaledTotalBalance = (asset: UserAsset) => {
-  const totalBalance = Big(asset.balance ?? '0')
-    .add(asset.stakedBalance ?? '0')
-    .add(asset.unbondingBalance ?? '0')
-    .add(asset.rewardsBalance ?? '0')
+  const totalBalance = Big(asset.balance || '0')
+    .add(asset.stakedBalance || '0')
+    .add(asset.unbondingBalance || '0')
+    .add(asset.rewardsBalance || '0')
     .toFixed(2);
   return getUINormalScaleAmount(totalBalance, asset.decimals);
 };
@@ -137,6 +146,9 @@ export const getAssetPriceId = (assetPrice: AssetMarketPrice) => {
 };
 
 export const getAssetBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
+  if (!marketPrice.price) {
+    return '--';
+  }
   const bigAsset = new Big(scaledBalance(asset));
   const bigMarketPrice = new Big(marketPrice.price);
   return bigAsset.times(bigMarketPrice).toFixed(2);
@@ -144,7 +156,7 @@ export const getAssetBalancePrice = (asset: UserAsset, marketPrice: AssetMarketP
 
 export const getAssetTotalBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
   const bigAsset = new Big(scaledTotalBalance(asset));
-  const bigMarketPrice = new Big(marketPrice.price);
+  const bigMarketPrice = new Big(marketPrice.price ? marketPrice.price : '0');
   return bigAsset.times(bigMarketPrice).toFixed(2);
 };
 
