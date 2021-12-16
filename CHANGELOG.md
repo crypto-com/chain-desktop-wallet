@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.6.0] - 2021-12-15
+
+### Additions
+- Add CRC20 Tokens support
+- Add In App Browser support
+
 ## [v0.5.8] - 2021-12-07
 
 ### Additions
