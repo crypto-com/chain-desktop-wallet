@@ -156,6 +156,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         data: event.object.data,
         gasLimit: String(event.object.gas),
         gasPrice: event.object.gasPrice,
+        value: event.object.value,
         nonce: prepareTxInfo.nonce,
       };
       const result = await evmTransactionSigner.sendContractCallTransaction(

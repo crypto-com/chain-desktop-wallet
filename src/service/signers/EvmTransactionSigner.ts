@@ -58,8 +58,7 @@ class EvmTransactionSigner implements ITransactionSigner {
       gasLimit: transaction.gasLimit,
       to: transaction.contractAddress,
       data: transaction.data,
-      type: 0,
-      value: '0x0',
+      value: transaction.value ?? '0x0',
     };
 
     const provider = new ethers.providers.JsonRpcProvider(jsonRpcUrl);
