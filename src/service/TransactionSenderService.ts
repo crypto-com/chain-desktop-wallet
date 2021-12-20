@@ -13,7 +13,7 @@ import {
 } from './signers/TransactionSupported';
 import { BroadCastResult } from '../models/Transaction';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
-import { UserAssetType } from '../models/UserAsset';
+import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { DEFAULT_CLIENT_MEMO } from '../config/StaticConfig';
 import {
   TransferRequest,
@@ -33,8 +33,9 @@ import { TransactionPrepareService } from './TransactionPrepareService';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
 import { TransactionHistoryService } from './TransactionHistoryService';
-import { sleep } from '../utils/utils';
+import { getCronosAsset, sleep } from '../utils/utils';
 import { BridgeService } from './bridge/BridgeService';
+import { walletService } from './WalletService';
 
 export class TransactionSenderService {
   public readonly storageService: StorageService;
@@ -150,16 +151,26 @@ export class TransactionSenderService {
       case UserAssetType.CRC_20_TOKEN:
         try {
           // all CRC20 tokens shares the same chainConfig based on CRONOS native asset CRO's config
-          // const allAssets = await walletService.retrieveWalletAssets(currentSession.wallet.address);
-          // const chainConfig = getCronosAsset(allAssets)?.config;
+          // we can't simply update all CRC20 tokens' config to CRONOS native asset CRO's config while update node config in settings
+          // because we can't take control with the future asset received in future, so we have to change it here in the very end, a little bit hacky
+          const allAssets = await walletService.retrieveWalletAssets(
+            currentSession.wallet.identifier,
+          );
+          const chainConfig = getCronosAsset(allAssets)?.config;
 
-          if (!currentAsset.address || !currentAsset.config || !currentAsset.contractAddress) {
-            throw TypeError(`Missing asset config: ${currentAsset.config}`);
+          // currentAsset's config is not changeable, use a new instance instead
+          const transferAsset: UserAsset = {
+            ...currentAsset,
+            config: chainConfig,
+          };
+
+          if (!transferAsset.address || !transferAsset.config || !transferAsset.contractAddress) {
+            throw TypeError(`Missing asset config: ${transferAsset.config}`);
           }
 
           const cronosClient = new CronosClient(
-            currentAsset.config?.nodeUrl,
-            currentAsset.config?.indexingUrl,
+            transferAsset.config?.nodeUrl,
+            transferAsset.config?.indexingUrl,
           );
 
           const transfer: TransferTransactionUnsigned = {
@@ -169,24 +180,24 @@ export class TransactionSenderService {
             memo: transferRequest.memo,
             accountNumber: 0,
             accountSequence: 0,
-            asset: currentAsset,
+            asset: transferAsset,
           };
 
           const encodedABITokenTransfer = evmTransactionSigner.encodeTokenTransferABI(
-            currentAsset.contractAddress,
+            transferAsset.contractAddress,
             transfer,
           );
 
           const web3 = new Web3('');
           const txConfig: TransactionConfig = {
-            from: currentAsset.address,
-            to: currentAsset.contractAddress,
+            from: transferAsset.address,
+            to: transferAsset.contractAddress,
             value: 0,
             data: encodedABITokenTransfer,
           };
 
           const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
-            currentAsset,
+            transferAsset,
             txConfig,
           );
 
@@ -212,7 +223,7 @@ export class TransactionSenderService {
               transfer.nonce,
               web3.utils.toHex(gasLimitTx) /* gas limit */,
               web3.utils.toHex(gasPriceTx) /* gas price */,
-              currentAsset.contractAddress,
+              transferAsset.contractAddress,
               '0',
               encodedABITokenTransfer,
             );
