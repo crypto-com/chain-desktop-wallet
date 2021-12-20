@@ -373,6 +373,15 @@ export class StorageService {
         estimatedRewardsBalance: rewardTransactions.estimatedRewardsBalance,
       },
     };
+
+    // Remove previous `reward` records before insertion
+    await this.db.commonTransactionStore.remove({
+      walletId: rewardTransactions.walletId,
+      txType: 'reward',
+    }, {
+      multi: true
+    });
+
     // Insert to common transactoin store
     await this.insertCommonTransactionRecords(rewardTxRecords);
 
