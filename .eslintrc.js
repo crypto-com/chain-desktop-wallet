@@ -5,6 +5,9 @@ module.exports = {
     REACT_APP_ENV: true,
   },
   plugins: ['react-hooks'],
+  settings: {
+    'import/core-modules': ["electron"],
+  },
   rules: {
     '@typescript-eslint/object-curly-spacing': 'off',
     'jsx-a11y/accessible-emoji': 'off',

@@ -1,0 +1,90 @@
+.request-confirmation {
+  // width: calc(100vw - @sider-width) !important;
+  .ant-layout {
+    height: 100%;
+    background: #fff;
+    .ant-layout-content {
+      margin: 0;
+      .logo {
+        margin: 40px 0;
+        text-align: center;
+      }
+
+      .message {
+        font-weight: 700;
+        font-size: 20px;
+        text-align: center;
+      }
+
+      .sub-message {
+        margin-bottom: 40px;
+        color: @font-color;
+        font-size: 14px;
+        text-align: center;
+        text-decoration: underline;
+      }
+
+      .wallet-detail {
+        margin: 40px 0;
+        padding: 12px;
+        background-color: #f2fbff;
+        border-radius: 8px;
+
+        .row {
+          margin: 0;
+        }
+
+        .name,
+        .balance {
+          font-weight: 500;
+        }
+
+        .s-title {
+          color: @font-color;
+          font-size: 10px;
+        }
+
+        .address {
+          font-size: 10px;
+        }
+      }
+
+      .signing-message {
+        max-height: 240px;
+        padding: 12px;
+        overflow-y: scroll;
+        white-space: pre-wrap;
+        background-color: #f2fbff;
+        border-radius: 8px;
+      }
+
+      .contract-address {
+        color: @font-color;
+        font-size: 12px;
+      }
+    }
+    .ant-layout-footer {
+      padding: 0;
+      background: #fff;
+    }
+  }
+
+  .ant-drawer-content-wrapper {
+    width: 378px !important;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 12px 0;
+    color: @font-color-dark;
+    font-weight: 400;
+  }
+
+  .ant-btn {
+    width: 100%;
+    max-width: 150px;
+    margin: 24px 0 -24px 0;
+  }
+}
