@@ -33,9 +33,8 @@ import { TransactionPrepareService } from './TransactionPrepareService';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
 import { TransactionHistoryService } from './TransactionHistoryService';
-import { getCronosAsset, sleep } from '../utils/utils';
+import { sleep } from '../utils/utils';
 import { BridgeService } from './bridge/BridgeService';
-import { walletService } from './WalletService';
 
 export class TransactionSenderService {
   public readonly storageService: StorageService;
@@ -151,9 +150,8 @@ export class TransactionSenderService {
       case UserAssetType.CRC_20_TOKEN:
         try {
           // all CRC20 tokens shares the same chainConfig based on CRONOS native asset CRO's config
-          const allAssets = await walletService.retrieveWalletAssets(currentSession.wallet.address);
-          const chainConfig = getCronosAsset(allAssets)?.config;
-          currentAsset.config = chainConfig;
+          // const allAssets = await walletService.retrieveWalletAssets(currentSession.wallet.address);
+          // const chainConfig = getCronosAsset(allAssets)?.config;
 
           if (!currentAsset.address || !currentAsset.config || !currentAsset.contractAddress) {
             throw TypeError(`Missing asset config: ${currentAsset.config}`);
