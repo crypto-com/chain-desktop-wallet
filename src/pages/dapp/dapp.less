@@ -1,0 +1,43 @@
+.dapps {
+  margin: 32px 0;
+
+  h3 {
+    font-weight: 600;
+    font-size: 28px;
+  }
+
+  .cards {
+    display: grid;
+    grid-gap: 32px;
+    grid-template-columns: repeat(auto-fill, minmax(312px, 1fr));
+
+    .card {
+      padding: 24px;
+      cursor: pointer;
+
+      .logo {
+        width: 64px;
+        text-align: center;
+
+        img {
+          height: 64px;
+        }
+      }
+
+      .text {
+        margin-top: 36px;
+        color: #0b1426;
+
+        h4 {
+          font-weight: 600;
+          font-size: 20px;
+        }
+
+        p {
+          margin: 0;
+          opacity: 0.5;
+        }
+      }
+    }
+  }
+}

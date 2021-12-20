@@ -123,7 +123,7 @@ const AssetsPage = () => {
         syncTransfers(session.activeAsset);
         setCurrentAsset(session.activeAsset);
         setCurrentAssetMarketData(
-          allMarketData[`${session.activeAsset.mainnetSymbol}-${session.currency}`],
+          allMarketData.get(`${session.activeAsset.mainnetSymbol}-${session.currency}`),
         );
         setIsAssetVisible(true);
         setFetchingDB(false);
@@ -202,7 +202,7 @@ const AssetsPage = () => {
       // dataIndex: 'price',
       key: 'price',
       render: record => {
-        const assetMarketData = allMarketData[`${record.mainnetSymbol}-${session.currency}`];
+        const assetMarketData = allMarketData.get(`${record.mainnetSymbol}-${session.currency}`);
         return (
           <>
             {assetMarketData &&
@@ -233,7 +233,7 @@ const AssetsPage = () => {
       // dataIndex: 'value',
       key: 'value',
       render: record => {
-        const assetMarketData = allMarketData[`${record.mainnetSymbol}-${session.currency}`];
+        const assetMarketData = allMarketData.get(`${record.mainnetSymbol}-${session.currency}`);
         return (
           <>
             {assetMarketData &&
@@ -498,7 +498,7 @@ const AssetsPage = () => {
                       syncTransfers(selectedAsset);
                       setCurrentAsset(selectedAsset);
                       setCurrentAssetMarketData(
-                        allMarketData[`${selectedAsset.mainnetSymbol}-${session.currency}`],
+                        allMarketData.get(`${selectedAsset.mainnetSymbol}-${session.currency}`),
                       );
                       setIsAssetVisible(true);
                     }, // click row

@@ -1,18 +1,18 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { AssetMarketPrice } from '../../models/UserAsset';
-import { MARKET_API_BASE_URL, COINBASE_TICKER_API_BASE_URL } from '../../config/StaticConfig';
+import {
+  MARKET_API_BASE_URL,
+  COINBASE_TICKER_API_BASE_URL,
+  CRYPTO_COM_PRICE_API_BASE_URL,
+} from '../../config/StaticConfig';
+import {
+  CoinbaseResponse,
+  CryptoComSlugResponse,
+  CryptoTokenPriceAPIResponse,
+} from './models/marketApi.models';
 
 export interface IMarketApi {
   getAssetPrice(assetSymbol: string, currency: string): Promise<AssetMarketPrice>;
-}
-
-export interface cryptoToFiatRateResp {
-  data: Data;
-}
-
-export interface Data {
-  currency: string;
-  rates: { [key: string]: string };
 }
 
 export class CroMarketApi implements IMarketApi {
@@ -20,16 +20,33 @@ export class CroMarketApi implements IMarketApi {
 
   private readonly coinbaseRateBaseUrl: string;
 
+  private tokenSlugMap: undefined | null | CryptoComSlugResponse[] = null;
+
   constructor() {
     this.axiosClient = axios.create({
       baseURL: MARKET_API_BASE_URL,
     });
     this.coinbaseRateBaseUrl = COINBASE_TICKER_API_BASE_URL;
+
+    this.loadTokenSlugMap().then(slugMap => {
+      this.tokenSlugMap = slugMap;
+    });
   }
 
   public async getAssetPrice(assetSymbol: string, currency: string): Promise<AssetMarketPrice> {
+    let fiatPrice = '';
 
-    const fiatPrice = await this.getCryptoToFiatRateFromCoinbase(assetSymbol, currency);
+    try {
+      fiatPrice = await this.getTokenPriceFromCryptoCom(assetSymbol, currency);
+    } catch (e) {
+      return {
+        assetSymbol,
+        currency,
+        dailyChange: '',
+        price: '',
+      };
+    }
+
     return {
       assetSymbol,
       currency,
@@ -38,8 +55,8 @@ export class CroMarketApi implements IMarketApi {
     };
   }
 
-  private async getCryptoToFiatRateFromCoinbase(cryptoSymbol: string, fiatCurrency: string) {
-    const fiatRateResp: AxiosResponse<cryptoToFiatRateResp> = await axios({
+  public async getCryptoToFiatRateFromCoinbase(cryptoSymbol: string, fiatCurrency: string) {
+    const fiatRateResp: AxiosResponse<CoinbaseResponse> = await axios({
       baseURL: this.coinbaseRateBaseUrl,
       url: '/exchange-rates',
       params: {
@@ -62,6 +79,54 @@ export class CroMarketApi implements IMarketApi {
 
     // throw if no price found
     throw TypeError('Could not find requested market price info from Coinbase');
+  }
+
+  public async getTokenPriceFromCryptoCom(cryptoSymbol: string, fiatCurrency: string) {
+    const allTokensSlugMap: CryptoComSlugResponse[] = await this.loadTokenSlugMap();
+
+    const tokenSlugInfo = allTokensSlugMap.find(tokenSlug => tokenSlug.symbol === cryptoSymbol);
+
+    if (!tokenSlugInfo?.slug) {
+      throw Error(`Couldn't find a valid slug name for ${cryptoSymbol}`);
+    }
+
+    const tokenPriceInUSD: AxiosResponse<CryptoTokenPriceAPIResponse> = await axios({
+      baseURL: CRYPTO_COM_PRICE_API_BASE_URL.V1,
+      url: `/tokens/${tokenSlugInfo?.slug}`,
+    });
+
+    if (tokenPriceInUSD.status !== 200) {
+      throw Error('Could not fetch token price.');
+    }
+
+    let usdToFiatRate = '1';
+    if (fiatCurrency !== 'USD') {
+      usdToFiatRate = await this.getFiatToFiatRate('USD', fiatCurrency);
+    }
+
+    const tokenPriceInFiat = Number(tokenPriceInUSD.data.usd_price) * Number(usdToFiatRate);
+
+    return String(tokenPriceInFiat);
+  }
+
+  private async loadTokenSlugMap() {
+    if (!this.tokenSlugMap || this.tokenSlugMap.length === 0) {
+      const allTokensSlugMap: AxiosResponse<CryptoComSlugResponse[]> = await axios({
+        baseURL: CRYPTO_COM_PRICE_API_BASE_URL.V2,
+        url: '/all-tokens',
+      });
+
+      if (allTokensSlugMap.status !== 200 || allTokensSlugMap.data.length < 1) {
+        throw Error('Could not fetch Token Slug list.');
+      }
+
+      this.tokenSlugMap = allTokensSlugMap.data;
+    }
+    return this.tokenSlugMap;
+  }
+
+  private async getFiatToFiatRate(fromFiatSymbol: string, toFiatSymbol: string) {
+    return await this.getCryptoToFiatRateFromCoinbase(fromFiatSymbol, toFiatSymbol);
   }
 }
 

@@ -25,9 +25,12 @@ export type NavbarMenuKey =
   | '/governance'
   | '/nft'
   | '/bridge'
+  | '/dapp'
   | '/wallet'
   | '/restore'
   | '/create';
+
+export type lockPageType = '' | 'bridge' | 'dapp';
 
 const defaultAsset: UserAsset = {
   identifier: '',
@@ -70,7 +73,7 @@ const marketState = atom({
 
 const allMarketState = atom({
   key: 'allMarket',
-  default: [market],
+  default: new Map<string, AssetMarketPrice>(),
 });
 
 const walletAssetState = atom({
@@ -129,6 +132,11 @@ const isBridgeTransferingState = atom<boolean>({
   default: false,
 });
 
+const pageLockState = atom<lockPageType>({
+  key: 'pageLock',
+  default: '',
+});
+
 const fetchingDBState = atom<boolean>({
   key: 'fetchingDB',
   default: false,
@@ -150,5 +158,6 @@ export {
   hasShownWarningOnWalletTypeState,
   ledgerIsExpertModeState,
   isBridgeTransferingState,
+  pageLockState,
   fetchingDBState,
 };

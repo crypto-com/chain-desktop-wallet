@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import './bridge.less';
 import 'antd/dist/antd.css';
@@ -17,6 +17,7 @@ import {
   Input,
   message,
   Spin,
+  notification,
 } from 'antd';
 import Icon, {
   ArrowLeftOutlined,
@@ -25,13 +26,13 @@ import Icon, {
   LoadingOutlined,
   SettingOutlined,
 } from '@ant-design/icons';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { Footer, Header } from 'antd/lib/layout/layout';
-import { isBridgeTransferingState, sessionState, walletAllAssetsState } from '../../recoil/atom';
+import { pageLockState, sessionState, walletAllAssetsState } from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 
 import { UserAsset } from '../../models/UserAsset';
@@ -111,7 +112,8 @@ const CronosBridge = props => {
 
   const session = useRecoilValue(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
-  const [isBridgeTransfering, setIsBridgeTransfering] = useRecoilState(isBridgeTransferingState);
+
+  const setPageLock = useSetRecoilState(pageLockState);
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({
     amount: '0',
@@ -124,6 +126,7 @@ const CronosBridge = props => {
   });
   const [bridgeConfigForm] = Form.useForm();
   const [isBridgeValid, setIsBridgeValid] = useState(false);
+  const [isBridgeTransfering, setIsBridgeTransfering] = useState(false);
 
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
@@ -155,7 +158,7 @@ const CronosBridge = props => {
 
   const [bridgeConfigs, setBridgeConfigs] = useState<BridgeConfig>();
   const [bridgeConfigFields, setBridgeConfigFields] = useState<string[]>([]);
-  const [bridgeFee, setBridgeFee] = useState('0');
+  const [networkFee, setNetworkFee] = useState('0');
 
   const analyticsService = new AnalyticsService(session);
 
@@ -219,20 +222,20 @@ const CronosBridge = props => {
       decryptedPhrase: phraseDecrypted,
       walletType: session.wallet.walletType, // normal, ledger
     };
-    const fee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
+    const txFee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
 
     transferRequest = {
       ...transferRequest,
       amount: adjustedTransactionAmount(
         amount,
         currentAsset!,
-        getBaseScaledAmount(fee, currentAsset!),
+        getBaseScaledAmount(txFee, currentAsset!),
       ),
     };
 
     setDecryptedPhrase(phraseDecrypted);
     setInputPasswordVisible(false);
-    setBridgeFee(fee);
+    setNetworkFee(txFee);
     setBridgeTransferRequest(transferRequest);
     setCurrentStep(1);
     setIsBridgeTransfering(true);
@@ -261,18 +264,18 @@ const CronosBridge = props => {
         decryptedPhrase,
         walletType: session.wallet.walletType, // normal, ledger
       };
-      const fee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
+      const txFee = await bridgeService.getBridgeTransactionFee(session, transferRequest);
 
       transferRequest = {
         ...transferRequest,
         amount: adjustedTransactionAmount(
           amount,
           currentAsset!,
-          getBaseScaledAmount(fee, currentAsset!),
+          getBaseScaledAmount(txFee, currentAsset!),
         ),
       };
 
-      setBridgeFee(fee);
+      setNetworkFee(txFee);
       setBridgeTransferRequest(transferRequest);
       setCurrentStep(1);
       setIsBridgeTransfering(true);
@@ -310,7 +313,7 @@ const CronosBridge = props => {
           amount: adjustedTransactionAmount(
             amount,
             currentAsset!,
-            getBaseScaledAmount(bridgeFee, currentAsset!),
+            getBaseScaledAmount(networkFee, currentAsset!),
           ),
           symbol: currentAsset?.symbol,
         }),
@@ -358,7 +361,7 @@ const CronosBridge = props => {
           amount: adjustedTransactionAmount(
             amount,
             currentAsset!,
-            getBaseScaledAmount(bridgeFee, currentAsset!),
+            getBaseScaledAmount(networkFee, currentAsset!),
           ),
           symbol: currentAsset?.symbol,
         }),
@@ -396,7 +399,7 @@ const CronosBridge = props => {
           adjustedTransactionAmount(
             formValues.amount,
             currentAsset!,
-            getBaseScaledAmount(bridgeFee, currentAsset!),
+            getBaseScaledAmount(networkFee, currentAsset!),
           ),
         ),
         AnalyticsTxType.BridgeTransaction,
@@ -410,7 +413,7 @@ const CronosBridge = props => {
             amount: adjustedTransactionAmount(
               amount,
               currentAsset!,
-              getBaseScaledAmount(bridgeFee, currentAsset!),
+              getBaseScaledAmount(networkFee, currentAsset!),
             ),
             symbol: currentAsset?.symbol,
           }),
@@ -423,7 +426,7 @@ const CronosBridge = props => {
           amount: adjustedTransactionAmount(
             amount,
             currentAsset!,
-            getBaseScaledAmount(bridgeFee, currentAsset!),
+            getBaseScaledAmount(networkFee, currentAsset!),
           ),
           symbol: currentAsset?.symbol,
         }),
@@ -628,9 +631,19 @@ const CronosBridge = props => {
                 <Divider />
                 <div className="block">
                   <div className="flex-row">
-                    <div>{t('bridge.form.fee')}</div>
+                    <div>{t('bridge.form.networkFee')}</div>
                     <div>
-                      ~{bridgeFee} {currentAsset?.symbol}
+                      ~{networkFee} {currentAsset?.symbol}
+                    </div>
+                  </div>
+                  <div className="flex-row">
+                    <div>{t('bridge.form.bridgeFee')}</div>
+                    <div
+                      style={{
+                        color: '#20bca4',
+                      }}
+                    >
+                      {t('general.waived')}
                     </div>
                   </div>
                   <div className="flex-row">
@@ -650,7 +663,7 @@ const CronosBridge = props => {
                       adjustedTransactionAmount(
                         amount,
                         currentAsset!,
-                        getBaseScaledAmount(bridgeFee, currentAsset!),
+                        getBaseScaledAmount(networkFee, currentAsset!),
                       ),
                     )}{' '}
                     {toAsset?.symbol}
@@ -660,7 +673,7 @@ const CronosBridge = props => {
                       adjustedTransactionAmount(
                         amount,
                         currentAsset!,
-                        getBaseScaledAmount(bridgeFee, currentAsset!),
+                        getBaseScaledAmount(networkFee, currentAsset!),
                       ),
                     ),
                   ).gt(0) ? (
@@ -699,7 +712,7 @@ const CronosBridge = props => {
                       adjustedTransactionAmount(
                         amount,
                         currentAsset!,
-                        getBaseScaledAmount(bridgeFee, currentAsset!),
+                        getBaseScaledAmount(networkFee, currentAsset!),
                       ),
                     ),
                   ).gt(0)
@@ -835,6 +848,14 @@ const CronosBridge = props => {
     );
   };
 
+  useEffect(() => {
+    if (isBridgeTransfering) {
+      setPageLock('bridge');
+    } else {
+      setPageLock('');
+    }
+  }, [isBridgeTransfering]);
+
   return (
     <>
       {currentStep === 1 || bridgeTransferError ? (
@@ -842,6 +863,7 @@ const CronosBridge = props => {
           onClick={() => {
             if (currentStep - 1 === 0) {
               setIsBridgeTransfering(false);
+              notification.close('conditionalLinkNotificationKey');
             }
             setCurrentStep(currentStep - 1);
             setIsButtonDisabled(true);

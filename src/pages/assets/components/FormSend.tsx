@@ -239,9 +239,10 @@ const FormSend: React.FC<FormSendProps> = props => {
     setAvailableBalance(scaledBalance(walletAsset!));
   }, [walletAsset]);
 
-  const assetMarketData =
-    allMarketData[`${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`];
-  const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol;
+  const assetMarketData = allMarketData.get(
+    `${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
+  );
+  const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
 
   return (
     <Form
@@ -319,7 +320,7 @@ const FormSend: React.FC<FormSendProps> = props => {
           <span>{t('general.available')}: </span>
           <div className="available-amount">
             {availableBalance} {walletAsset?.symbol}{' '}
-            {walletAsset
+            {walletAsset && localFiatSymbol && assetMarketData
               ? `(${localFiatSymbol}${numeral(
                   getAssetBalancePrice(walletAsset, assetMarketData),
                 ).format('0,0.00')})`
@@ -389,7 +390,7 @@ const FormSend: React.FC<FormSendProps> = props => {
               <div className="label">{t('send.modal1.label3')}</div>
               <div>
                 {`${formValues?.amount} ${walletAsset?.symbol}`}{' '}
-                {walletAsset
+                {walletAsset && localFiatSymbol && assetMarketData
                   ? `(${localFiatSymbol}${numeral(
                       getAssetAmountInFiat(formValues?.amount, assetMarketData),
                     ).format('0,0.00')})`
