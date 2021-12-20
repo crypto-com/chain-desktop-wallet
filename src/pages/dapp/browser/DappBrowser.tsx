@@ -209,11 +209,11 @@ const DappBrowser = (props: DappBrowserProps) => {
           wallet={currentSession.wallet}
           visible={requestConfirmationVisible}
           dapp={dapp}
-          decryptedPhrase={decryptedPhrase}
-          confirmTxCallback={confirmPasswordCallback}
-          setConfirmTxCallback={setConfirmPasswordCallback}
-          setRequestConfirmationVisible={setRequestConfirmationVisible}
-          onClose={() => {
+          onConfirm={() => {
+            setRequestConfirmationVisible(false);
+            confirmPasswordCallback?.successCallback(decryptedPhrase);
+          }}
+          onCancel={() => {
             setRequestConfirmationVisible(false);
             setTxEvent(undefined);
             confirmPasswordCallback?.errorCallback('Canceled');

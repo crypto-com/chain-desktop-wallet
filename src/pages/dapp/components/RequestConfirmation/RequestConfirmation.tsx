@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Drawer, Layout } from 'antd';
 import BigNumber from 'bignumber.js';
 import numeral from 'numeral';
@@ -29,18 +29,8 @@ interface RequestConfirmationProps {
   wallet: Wallet;
   visible: boolean;
   dapp?: Dapp;
-  decryptedPhrase: string;
-  confirmTxCallback:
-    | {
-        successCallback: Function;
-        errorCallback: Function;
-      }
-    | undefined;
-  setConfirmTxCallback: Dispatch<
-    SetStateAction<{ successCallback: Function; errorCallback: Function } | undefined>
-  >;
-  setRequestConfirmationVisible: Dispatch<SetStateAction<boolean>>;
-  onClose: (e: any) => void;
+  onConfirm: () => void;
+  onCancel: () => void;
 }
 
 const RequestConfirmation = (props: RequestConfirmationProps) => {
@@ -53,11 +43,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     wallet,
     visible,
     dapp,
-    decryptedPhrase,
-    confirmTxCallback,
-    setConfirmTxCallback,
-    setRequestConfirmationVisible,
-    onClose,
+    onConfirm,
+    onCancel,
   } = props;
 
   const [message, setMessage] = useState('');
@@ -221,7 +208,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
   }, [event]);
 
   return (
-    <Drawer visible={visible} className="request-confirmation" onClose={onClose}>
+    <Drawer visible={visible} className="request-confirmation" onClose={onCancel}>
       <Layout>
         <Content>
           {dapp && (
@@ -248,18 +235,10 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
         </Content>
         <Footer>
           <div className="row">
-            <Button type="link" htmlType="button" onClick={onClose}>
+            <Button type="link" htmlType="button" onClick={onCancel}>
               {t('general.reject')}
             </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              onClick={() => {
-                confirmTxCallback?.successCallback(decryptedPhrase);
-                setConfirmTxCallback(undefined);
-                setRequestConfirmationVisible(false);
-              }}
-            >
+            <Button type="primary" htmlType="submit" onClick={onConfirm}>
               {t('general.confirm')}
             </Button>
           </div>

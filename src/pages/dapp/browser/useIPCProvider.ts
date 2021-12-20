@@ -27,7 +27,7 @@ interface IUseIPCProviderProps {
   onRequestAddress: (onSuccess: (address: string) => void, onError: ErrorHandler) => void;
   onRequestTokenApproval: (
     event: DappBrowserIPC.TokenApprovalEvent,
-    onSuccess: (amount: string) => void,
+    onSuccess: (passphrase: string) => void,
     onError: ErrorHandler,
   ) => void;
   onRequestSendTransaction: (
@@ -138,6 +138,42 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     sendResponses(id, [address]);
   });
 
+  const handleTokenApproval = useRefCallback(
+    async (event: DappBrowserIPC.TokenApprovalEvent, passphrase: string) => {
+      const prepareTXConfig: TransactionConfig = {
+        from: event.object.from,
+        to: event.object.to,
+      };
+
+      const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
+        cronosAsset!,
+        prepareTXConfig,
+      );
+
+      const data = evmTransactionSigner.encodeTokenApprovalABI(
+        event.object.tokenData.contractAddress,
+        event.object.spender,
+        ethers.constants.MaxUint256,
+      );
+
+      const txConfig: EVMContractCallUnsigned = {
+        from: event.object.from,
+        contractAddress: event.object.to,
+        data,
+        gasLimit: String(event.object.gas),
+        gasPrice: event.object.gasPrice,
+        nonce: prepareTxInfo.nonce,
+      };
+      const result = await evmTransactionSigner.sendContractCallTransaction(
+        txConfig,
+        passphrase,
+        ChainConfig.RpcUrl,
+      );
+
+      sendResponse(event.id, result);
+    },
+  );
+
   const handleSendTransaction = useRefCallback(
     async (event: DappBrowserIPC.SendTransactionEvent, passphrase: string) => {
       const prepareTXConfig: TransactionConfig = {
@@ -227,19 +263,23 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
               event.object.to,
               event.object.data,
             );
-            props.onRequestTokenApproval(
-              {
-                name: 'tokenApproval',
-                id: event.id,
-                object: {
-                  tokenData: response.tokenData,
-                  amount: response.amount,
-                  gas: event.object.gas,
-                  gasPrice: event.object.gasPrice,
-                },
+            const approvalEvent: DappBrowserIPC.TokenApprovalEvent = {
+              name: 'tokenApproval',
+              id: event.id,
+              object: {
+                tokenData: response.tokenData,
+                amount: response.amount,
+                gas: event.object.gas,
+                gasPrice: event.object.gasPrice,
+                from: event.object.from,
+                spender: response.spender,
+                to: event.object.to,
               },
-              () => {
-                // TODO: deal with amount
+            };
+            props.onRequestTokenApproval(
+              approvalEvent,
+              passphrase => {
+                handleTokenApproval.current(approvalEvent, passphrase);
               },
               reason => {
                 sendError(event.id, reason);
