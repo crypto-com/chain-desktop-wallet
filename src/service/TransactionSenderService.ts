@@ -224,7 +224,7 @@ export class TransactionSenderService {
               web3.utils.toHex(gasLimitTx) /* gas limit */,
               web3.utils.toHex(gasPriceTx) /* gas price */,
               transferAsset.contractAddress,
-              '0',
+              '0x0',
               encodedABITokenTransfer,
             );
           } else {
