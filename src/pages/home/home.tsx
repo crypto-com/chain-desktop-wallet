@@ -289,7 +289,7 @@ const HomePage = () => {
           size="small"
           className="btn-restart"
           onClick={() => {
-            ipcRenderer.send('restart_app');
+            ipcRenderer.send('auto_updater_restart_app');
             notification.close(newVersionNotificationKey);
           }}
           style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}

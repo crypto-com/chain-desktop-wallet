@@ -102,6 +102,7 @@ export interface EVMContractCallUnsigned {
   contractAddress: string;
   data: string;
   nonce?: number;
+  value?: string;
   gasPrice: string;
   gasLimit: string;
 }

@@ -11,6 +11,10 @@ export class ChainConfig {
 }
 
 export const ProviderPreloadScriptPath =
+  // Replace backslash on Windows to forwardslash
   process.env.NODE_ENV === 'development'
-    ? `file://${path.join(remote.app.getAppPath(), 'src/pages/dapp/browser/preload.js')}`
-    : `file://${path.join(remote.app.getAppPath(), '../scripts/preload.js')}`;
+    ? `file://${path.join(
+        remote.app.getAppPath().replace(/\\/g, '/'),
+        'src/pages/dapp/browser/preload.js',
+      )}`
+    : `file://${path.join(remote.app.getAppPath().replace(/\\/g, '/'), '../scripts/preload.js')}`;
