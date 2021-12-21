@@ -10,6 +10,7 @@ export interface Dapp {
 
 export interface TokenApprovalRequestData {
   amount: string;
+  spender: string;
   tokenData: ContractData;
 }
 
@@ -48,10 +49,13 @@ export namespace DappBrowserIPC {
   export interface TokenApprovalEvent extends BaseEvent {
     name: 'tokenApproval';
     object: {
+      spender: string;
       amount: string;
       tokenData: ContractData;
       gas: number;
       gasPrice: string;
+      from: string;
+      to: string;
     };
   }
 

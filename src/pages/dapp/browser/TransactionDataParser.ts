@@ -17,9 +17,11 @@ class TransactionDataParser {
     data: string,
   ): Promise<TokenApprovalRequestData> => {
     const amount = data.slice(74, data.length);
+    const spender = `0x${data.slice(34, 74)}`;
     const response = await this.client.getContractDataByAddress(tokenAddress);
     return {
       amount,
+      spender,
       tokenData: response.result,
     };
   };
