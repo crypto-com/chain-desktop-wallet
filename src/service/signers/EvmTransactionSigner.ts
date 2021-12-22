@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { BigNumberish, ethers } from 'ethers';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
 import { ITransactionSigner } from './TransactionSigner';
@@ -58,8 +58,7 @@ class EvmTransactionSigner implements ITransactionSigner {
       gasLimit: transaction.gasLimit,
       to: transaction.contractAddress,
       data: transaction.data,
-      type: 0,
-      value: '0x0',
+      value: transaction.value ?? '0x0',
     };
 
     const provider = new ethers.providers.JsonRpcProvider(jsonRpcUrl);
@@ -119,6 +118,18 @@ class EvmTransactionSigner implements ITransactionSigner {
     const contractABI = TokenContractABI.abi as AbiItem[];
     const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
     return contract.methods.transfer(transaction.toAddress, transaction.amount).encodeABI();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public encodeTokenApprovalABI(
+    tokenContractAddress: string,
+    spender: string,
+    amount: BigNumberish,
+  ) {
+    const web3 = new Web3('');
+    const contractABI = TokenContractABI.abi as AbiItem[];
+    const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
+    return contract.methods.approve(spender, amount).encodeABI() as string;
   }
 
   // eslint-disable-next-line class-methods-use-this
