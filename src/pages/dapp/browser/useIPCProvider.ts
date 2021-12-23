@@ -164,13 +164,17 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         gasPrice: event.object.gasPrice,
         nonce: prepareTxInfo.nonce,
       };
-      const result = await evmTransactionSigner.sendContractCallTransaction(
-        txConfig,
-        passphrase,
-        ChainConfig.RpcUrl,
-      );
+      try {
+        const result = await evmTransactionSigner.sendContractCallTransaction(
+          txConfig,
+          passphrase,
+          ChainConfig.RpcUrl,
+        );
 
-      sendResponse(event.id, result);
+        sendResponse(event.id, result);
+      } catch (error) {
+        sendError(event.id, 'Transaction failed');
+      }
     },
   );
 
@@ -195,13 +199,17 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         value: event.object.value,
         nonce: prepareTxInfo.nonce,
       };
-      const result = await evmTransactionSigner.sendContractCallTransaction(
-        txConfig,
-        passphrase,
-        ChainConfig.RpcUrl,
-      );
 
-      sendResponse(event.id, result);
+      try {
+        const result = await evmTransactionSigner.sendContractCallTransaction(
+          txConfig,
+          passphrase,
+          ChainConfig.RpcUrl,
+        );
+        sendResponse(event.id, result);
+      } catch (error) {
+        sendError(event.id, 'Transaction failed');
+      }
     },
   );
 
