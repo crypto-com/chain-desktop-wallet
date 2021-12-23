@@ -5,6 +5,7 @@ import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import './RequestConfirmation.less';
 
+import { useRecoilState } from 'recoil';
 import {
   AssetMarketPrice,
   getAssetAmountInFiat,
@@ -17,6 +18,8 @@ import { SupportedChainName, SUPPORTED_CURRENCY } from '../../../../config/Stati
 import { Dapp, DappBrowserIPC } from '../../types';
 
 import { middleEllipsis, hexToUtf8, getAssetBySymbolAndChain } from '../../../../utils/utils';
+import { walletService } from '../../../../service/WalletService';
+import { walletAllAssetsState } from '../../../../recoil/atom';
 
 const { Content, Footer } = Layout;
 
@@ -24,7 +27,6 @@ interface RequestConfirmationProps {
   event: DappBrowserIPC.Event;
   cronosAsset: UserAsset | undefined;
   allMarketData: Map<string, AssetMarketPrice>;
-  allAssets: UserAsset[];
   currentSession: Session;
   wallet: Wallet;
   visible: boolean;
@@ -38,7 +40,6 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     event,
     cronosAsset,
     allMarketData,
-    allAssets,
     currentSession,
     wallet,
     visible,
@@ -52,7 +53,19 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(cronosAsset);
   const [isContractAddressReview, setIsContractAddressReview] = useState(false);
 
+  const [allAssets, setAllAssets] = useRecoilState(walletAllAssetsState);
+
   const [t] = useTranslation();
+
+  useEffect(() => {
+    const fetch = async () => {
+      const sessionData = await walletService.retrieveCurrentSession();
+      await walletService.syncBalancesData(sessionData);
+      const assets = await walletService.retrieveCurrentWalletAssets(sessionData);
+      setAllAssets(assets);
+    };
+    fetch();
+  }, []);
 
   const eventViewToRender = (_event: DappBrowserIPC.Event) => {
     if (_event.name === 'signTransaction') {
@@ -205,7 +218,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       );
       setCurrentAsset(asset ?? cronosAsset);
     }
-  }, [event]);
+  }, [event, allAssets]);
 
   return (
     <Drawer visible={visible} className="request-confirmation" onClose={onCancel}>

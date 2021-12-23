@@ -4,6 +4,7 @@ import { WebviewTag } from 'electron';
 import { useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import Web3 from 'web3';
+import { setTimeout } from 'timers';
 import { useIPCProvider, useRefCallback } from './useIPCProvider';
 import { allMarketState, sessionState, walletAllAssetsState } from '../../../recoil/atom';
 import { getCronosAsset } from '../../../utils/utils';
@@ -13,6 +14,7 @@ import { secretStoreService } from '../../../storage/SecretStoreService';
 import { Dapp, DappBrowserIPC } from '../types';
 import { ProviderPreloadScriptPath } from './config';
 import packageJson from '../../../../package.json';
+import { walletService } from '../../../service/WalletService';
 
 interface DappBrowserProps {
   dapp: Dapp;
@@ -131,6 +133,13 @@ const DappBrowser = (props: DappBrowserProps) => {
     },
   );
 
+  const onFinishTransaction = useRefCallback(async () => {
+    setTimeout(async () => {
+      const sessionData = await walletService.retrieveCurrentSession();
+      await walletService.syncBalancesData(sessionData);
+    }, 7000);
+  });
+
   useIPCProvider({
     webview: webviewRef.current,
     onRequestAddress: (onSuccess, onError) => {
@@ -162,6 +171,9 @@ const DappBrowser = (props: DappBrowserProps) => {
     },
     onRequestWatchAsset: async () => {
       // no-op for now
+    },
+    onFinishTransaction: () => {
+      onFinishTransaction.current();
     },
   });
 
@@ -204,7 +216,6 @@ const DappBrowser = (props: DappBrowserProps) => {
           event={txEvent}
           cronosAsset={cronosAsset}
           allMarketData={allMarketData}
-          allAssets={allAssets}
           currentSession={currentSession}
           wallet={currentSession.wallet}
           visible={requestConfirmationVisible}
