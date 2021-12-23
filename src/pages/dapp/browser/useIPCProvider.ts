@@ -65,6 +65,7 @@ interface IUseIPCProviderProps {
     onSuccess: () => void,
     onError: ErrorHandler,
   ) => Promise<void>;
+  onFinishTransaction: () => void;
 }
 
 export function useRefCallback(fn: Function) {
@@ -74,7 +75,7 @@ export function useRefCallback(fn: Function) {
 }
 
 export const useIPCProvider = (props: IUseIPCProviderProps) => {
-  const { webview } = props;
+  const { webview, onFinishTransaction } = props;
 
   const transactionPrepareService = new TransactionPrepareService(walletService.storageService);
   const allAssets = useRecoilValue(walletAllAssetsState);
@@ -164,13 +165,19 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         gasPrice: event.object.gasPrice,
         nonce: prepareTxInfo.nonce,
       };
-      const result = await evmTransactionSigner.sendContractCallTransaction(
-        txConfig,
-        passphrase,
-        ChainConfig.RpcUrl,
-      );
+      try {
+        const result = await evmTransactionSigner.sendContractCallTransaction(
+          txConfig,
+          passphrase,
+          ChainConfig.RpcUrl,
+        );
 
-      sendResponse(event.id, result);
+        sendResponse(event.id, result);
+      } catch (error) {
+        sendError(event.id, 'Transaction failed');
+      }
+
+      onFinishTransaction();
     },
   );
 
@@ -195,13 +202,19 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         value: event.object.value,
         nonce: prepareTxInfo.nonce,
       };
-      const result = await evmTransactionSigner.sendContractCallTransaction(
-        txConfig,
-        passphrase,
-        ChainConfig.RpcUrl,
-      );
 
-      sendResponse(event.id, result);
+      try {
+        const result = await evmTransactionSigner.sendContractCallTransaction(
+          txConfig,
+          passphrase,
+          ChainConfig.RpcUrl,
+        );
+        sendResponse(event.id, result);
+      } catch (error) {
+        sendError(event.id, 'Transaction failed');
+      }
+
+      onFinishTransaction();
     },
   );
 
