@@ -397,7 +397,7 @@ const FormSend: React.FC<FormSendProps> = props => {
                   : ''}
               </div>
             </div>
-            {walletAsset?.assetType !== UserAssetType.EVM ? (
+            {walletAsset?.assetType === UserAssetType.TENDERMINT ? (
               <div className="item">
                 <div className="label">{t('send.modal1.label4')}</div>
                 <div>{`~${getNormalScaleAmount(getTransactionFee(walletAsset!), walletAsset!)} ${
