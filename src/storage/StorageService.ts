@@ -46,7 +46,7 @@ import {
 import { BridgeTransactionHistoryList } from '../service/bridge/contracts/BridgeModels';
 import { AddressBookContactModel } from '../models/AddressBook';
 // import { generalConfigService } from './GeneralConfigService';
-
+import _ from "lodash";
 export class StorageService {
   private readonly db: DatabaseManager;
 
@@ -422,7 +422,7 @@ export class StorageService {
     return {
       transactions: stakingTxRecord.map(tx => tx.txData),
       walletId,
-      totalBalance: stakingCustomParams.customParams.totalBalance || '0',
+      totalBalance: stakingCustomParams?.customParams?.totalBalance || '0',
     } as StakingTransactionList;
 
     // return this.db.stakingStore.findOne<StakingTransactionList>({ walletId });
@@ -493,9 +493,13 @@ export class StorageService {
       txType: 'transfer',
       assetId: assetID,
     });
+    
+    // Sort the txdata list by `date` in descending 
+    const txDataList = _.orderBy(
+      transferRecords.map(record => record.txData), 'date', "desc");
 
     return {
-      transactions: transferRecords.map(record => record.txData),
+      transactions: txDataList,
       walletId,
       assetId: assetID,
     } as TransferTransactionList;
