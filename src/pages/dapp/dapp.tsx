@@ -20,6 +20,14 @@ const DappList: Dapp[] = [
       'Your gateway to the decentralized finance movement. Take control of your finances and earn sparkly VVS rewards.',
     url: 'https://vvs.finance',
   },
+  {
+    name: 'Tectonic',
+    logo: logoVvs,
+    alt: 'tectonic-logo',
+    description:
+      'Tectonic is a cross-chain money market for earning passive yield and accessing instant backed loans.',
+    url: 'https://app.tectonic.finance/',
+  },
   // {
   //   name: 'Cronos Chimp Club',
   //   logo: logoVvs,
