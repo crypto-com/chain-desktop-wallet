@@ -1,3 +1,4 @@
+import _ from "lodash";
 import {
   DisableDefaultMemoSettings,
   DisableGASettings,
@@ -46,7 +47,6 @@ import {
 import { BridgeTransactionHistoryList } from '../service/bridge/contracts/BridgeModels';
 import { AddressBookContactModel } from '../models/AddressBook';
 // import { generalConfigService } from './GeneralConfigService';
-import _ from "lodash";
 
 export class StorageService {
   private readonly db: DatabaseManager;
