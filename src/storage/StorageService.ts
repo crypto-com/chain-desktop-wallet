@@ -47,6 +47,7 @@ import { BridgeTransactionHistoryList } from '../service/bridge/contracts/Bridge
 import { AddressBookContactModel } from '../models/AddressBook';
 // import { generalConfigService } from './GeneralConfigService';
 import _ from "lodash";
+
 export class StorageService {
   private readonly db: DatabaseManager;
 
