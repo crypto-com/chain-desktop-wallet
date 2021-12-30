@@ -8,6 +8,7 @@ import DappBrowser from './browser/DappBrowser';
 import { Dapp } from './types';
 import BorderlessCard from './components/BorderlessCard/BorderlessCard';
 import logoVvs from './assets/vvs.svg';
+import logoTectonic from './assets/tectonic.svg';
 
 const { Header, Content } = Layout;
 
@@ -22,7 +23,7 @@ const DappList: Dapp[] = [
   },
   {
     name: 'Tectonic',
-    logo: logoVvs,
+    logo: logoTectonic,
     alt: 'tectonic-logo',
     description:
       'Tectonic is a cross-chain money market for earning passive yield and accessing instant backed loans.',
