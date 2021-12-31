@@ -454,9 +454,9 @@ export type Network = {
 };
 
 // https://cronos.crypto.org/explorer/tokens
-// TODO: FIXME
+// FIXME:
 // don't know why all response from tokenlist returns lowercased contract address
-// it's definitely not correct to do this
+// it's definitely not correct to use lowercased contract address here
 export const CRC20_MAINNET_WHITELIST_TOKENS: Set<string> = new Set([
   // wbtc
   '0x062e66477faf219f25d27dced647bf57c3107d52',
