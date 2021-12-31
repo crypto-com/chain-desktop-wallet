@@ -3,7 +3,12 @@ import { bech32 } from 'bech32';
 import { ethers } from 'ethers';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
-import { Network, WalletConfig, SupportedChainName } from '../config/StaticConfig';
+import {
+  Network,
+  WalletConfig,
+  SupportedChainName,
+  CRC20_MAINNET_WHITELIST_TOKENS,
+} from '../config/StaticConfig';
 
 export function isElectron() {
   // Renderer process
@@ -189,4 +194,17 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
         return name;
     }
   }
+}
+
+export function isAssetWhitelisted(asset: UserAsset, config: WalletConfig) {
+  const isTestnet = checkIfTestnet(config.network);
+  if (isTestnet || asset.assetType !== UserAssetType.CRC_20_TOKEN) {
+    return true;
+  }
+
+  if (!asset.contractAddress) {
+    return true;
+  }
+
+  return CRC20_MAINNET_WHITELIST_TOKENS.has(asset.contractAddress.toLowerCase());
 }
