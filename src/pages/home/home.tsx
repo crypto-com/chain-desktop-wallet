@@ -2,9 +2,9 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Button, Layout, notification, Table, Tabs, Card, List, Avatar, Tag } from 'antd';
-import { SyncOutlined } from '@ant-design/icons';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { Button, Layout, notification, Table, Tabs, Card, List, Avatar, Tag, Tooltip } from 'antd';
+import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,13 @@ import {
 } from '../../recoil/atom';
 import { NOT_KNOWN_YET_VALUE, SUPPORTED_CURRENCY, WalletConfig } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
-import { middleEllipsis, isJson, ellipsis, getChainName } from '../../utils/utils';
+import {
+  middleEllipsis,
+  isJson,
+  ellipsis,
+  getChainName,
+  isAssetWhitelisted,
+} from '../../utils/utils';
 import {
   scaledAmount,
   scaledStakingBalance,
@@ -40,6 +46,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import IconTick from '../../svg/IconTick';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 import RewardModalPopup from '../../components/RewardModalPopup/RewardModalPopup';
+import { Session } from '../../models/Session';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -70,6 +77,7 @@ const HomePage = () => {
   const history = useHistory();
 
   const [processedNftList, setProcessedNftList] = useState<NftProcessedModel[]>([]);
+  const session = useRecoilValue<Session>(sessionState);
 
   const [hasShownNotLiveWallet, setHasShownNotLiveWallet] = useRecoilState(
     hasShownWarningOnWalletTypeState,
@@ -106,6 +114,11 @@ const HomePage = () => {
           <div className="name">
             {assetIcon(record)}
             {symbol}
+            {!isAssetWhitelisted(record, session.wallet.config) && (
+              <Tooltip title={t('assets.whitelist.warning')}>
+                <ExclamationCircleOutlined style={{ color: '#ff4d4f', marginLeft: '6px' }} />
+              </Tooltip>
+            )}
           </div>
         );
       },
