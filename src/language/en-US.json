@@ -341,6 +341,7 @@
   "assets.assetList.table.actionSend": "Send",
   "assets.assetList.table.actionReceive": "Receive",
   "assets.moreMenu.nodeConfiguration": "Node Configuration",
+  "assets.whitelist.warning": "The contract address of this token is not whitelisted. Please use at your own risk.",
   "bridge.form.from": "From",
   "bridge.form.to": "To",
   "bridge.form.errorSameChain": "The two chains cannot be the same",
