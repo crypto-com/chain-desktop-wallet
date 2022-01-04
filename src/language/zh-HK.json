@@ -289,7 +289,7 @@
   "home.notification.cronosBridgeExit.message": "跨鏈交易尚未完成",
   "home.notification.cronosBridgeExit.description": "你確定想要離開嗎？",
   "home.notification.cronosBridgeExit.button": "離開",
-  "home.notification.dappBrowserExit.message": "你即將會離開 DApp 瀏覽器",
+  "home.notification.dappBrowserExit.message": "你即將會離開 DApp",
   "home.notification.dappBrowserExit.description": "你確定想要離開嗎？",
   "home.notification.dappBrowserExit.button": "離開",
   "home.createNewAsset.enable": "加入",

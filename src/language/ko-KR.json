@@ -289,7 +289,7 @@
   "home.notification.cronosBridgeExit.message": "브릿지 전송이 완료되지 않았습니다",
   "home.notification.cronosBridgeExit.description": "프로그램을 종료할까요?",
   "home.notification.cronosBridgeExit.button": "종료",
-  "home.notification.dappBrowserExit.message": "DApp 브라우저를 종료하려고 합니다.",
+  "home.notification.dappBrowserExit.message": "DApp 를 종료하려고 합니다.",
   "home.notification.dappBrowserExit.description": "프로그램을 종료할까요?",
   "home.notification.dappBrowserExit.button": "종료",
   "home.createNewAsset.enable": "추가",
