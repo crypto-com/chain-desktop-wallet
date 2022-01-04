@@ -3,12 +3,8 @@ import { bech32 } from 'bech32';
 import { ethers } from 'ethers';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
-import {
-  Network,
-  WalletConfig,
-  SupportedChainName,
-  CRC20_MAINNET_WHITELIST_TOKENS,
-} from '../config/StaticConfig';
+import { Network, WalletConfig, SupportedChainName } from '../config/StaticConfig';
+import { CRC20MainnetTokenInfos } from '../config/CRC20Tokens';
 
 export function isElectron() {
   // Renderer process
@@ -196,15 +192,20 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
   }
 }
 
-export function isAssetWhitelisted(asset: UserAsset, config: WalletConfig) {
+export function isCRC20AssetWhitelisted(
+  symbol: string,
+  contractAddress: string,
+  config: WalletConfig,
+) {
   const isTestnet = checkIfTestnet(config.network);
-  if (isTestnet || asset.assetType !== UserAssetType.CRC_20_TOKEN) {
+  if (isTestnet) {
     return true;
   }
 
-  if (!asset.contractAddress) {
-    return true;
+  const tokenInfo = CRC20MainnetTokenInfos.get(symbol.toUpperCase());
+  if (!tokenInfo) {
+    return false;
   }
 
-  return CRC20_MAINNET_WHITELIST_TOKENS.has(asset.contractAddress.toLowerCase());
+  return tokenInfo.isWhitelist && contractAddress.toLowerCase() === tokenInfo.address.toLowerCase();
 }

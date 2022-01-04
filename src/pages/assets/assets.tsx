@@ -5,7 +5,7 @@ import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import './assets.less';
 import 'antd/dist/antd.css';
-import { Layout, Table, Avatar, Tabs, Tag, Typography, Dropdown, Menu, Tooltip } from 'antd';
+import { Layout, Table, Avatar, Tabs, Tag, Typography, Dropdown, Menu, Tooltip, Alert } from 'antd';
 import { ArrowLeftOutlined, ExclamationCircleOutlined, MoreOutlined } from '@ant-design/icons';
 import {
   sessionState,
@@ -25,7 +25,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import ReceiveDetail from './components/ReceiveDetail';
 import FormSend from './components/FormSend';
 import { walletService } from '../../service/WalletService';
-import { getChainName, isAssetWhitelisted, middleEllipsis } from '../../utils/utils';
+import { getChainName, middleEllipsis } from '../../utils/utils';
 import {
   TransactionDirection,
   TransactionStatus,
@@ -175,7 +175,7 @@ const AssetsPage = () => {
           <div className="name">
             {assetIcon(record)}
             {symbol}
-            {!isAssetWhitelisted(record, session.wallet.config) && (
+            {record.isWhitelisted === false && (
               <Tooltip title={t('assets.whitelist.warning')}>
                 <ExclamationCircleOutlined style={{ color: '#ff4d4f', marginLeft: '6px' }} />
               </Tooltip>
@@ -418,6 +418,14 @@ const AssetsPage = () => {
                         </div>
                       </Content>
                     </Layout>
+                    {currentAsset?.isWhitelisted === false && (
+                      <Alert
+                        message={t('assets.whitelist.warning')}
+                        type="error"
+                        showIcon
+                        icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
+                      />
+                    )}
                   </div>
                   <Tabs
                     activeKey={activeAssetTab}
