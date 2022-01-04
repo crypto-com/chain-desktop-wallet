@@ -42,7 +42,7 @@ import {
   pageLockState,
   NavbarMenuKey,
 } from '../../recoil/atom';
-import { ellipsis, checkIfTestnet } from '../../utils/utils';
+import { ellipsis, checkIfTestnet, getCronosAsset } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 // import IconSend from '../../svg/IconSend';
@@ -79,7 +79,7 @@ import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
 import IconLedger from '../../svg/IconLedger';
 import { ISignerProvider } from '../../service/signers/SignerProvider';
-import { UserAsset } from '../../models/UserAsset';
+import { UserAsset, UserAssetType } from '../../models/UserAsset';
 import IconCro from '../../svg/IconCro';
 import IconEth from '../../svg/IconEth';
 // import i18n from '../../language/I18n';
@@ -405,13 +405,19 @@ function HomeLayout(props: HomeLayoutProps) {
     }, 1000);
   };
 
-  const checkCorrectExplorerUrl = (walletSession?: Session) => {
+  const checkCorrectExplorerUrl = async (walletSession?: Session) => {
     if (!walletSession || !walletSession.wallet) {
       return;
     }
 
+    const assets = await walletService.retrieveWalletAssets(walletSession.wallet.identifier);
+    const cronosAsset = getCronosAsset(assets);
+
     setTimeout(async () => {
-      if (!walletSession.activeAsset?.config?.explorer) {
+      if (
+        !walletSession.activeAsset?.config?.explorer ||
+        cronosAsset?.config?.explorerUrl.indexOf('cronos.crypto.org') !== -1
+      ) {
         const updateExplorerUrlNotificationKey = 'updateExplorerUrlNotificationKey';
 
         // Update All Assets in All Wallets
@@ -437,19 +443,35 @@ function HomeLayout(props: HomeLayoutProps) {
           // Save updated active asset settings.
           const allAssets = await walletService.retrieveWalletAssets(wallet.identifier);
           allAssets.forEach(async asset => {
+            let nodeUrl = `${asset.config?.nodeUrl ?? wallet.config.nodeUrl}`;
+            let indexingUrl = `${asset.config?.indexingUrl ?? wallet.config.indexingUrl}`;
+            let explorerUrl = `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}`;
+            if (
+              asset.assetType === UserAssetType.EVM ||
+              asset.assetType === UserAssetType.CRC_20_TOKEN
+            ) {
+              nodeUrl = nodeUrl.replace('cronos.crypto.org', 'cronos.org');
+              indexingUrl = indexingUrl.replace('cronos.crypto.org', 'cronos.org');
+              explorerUrl = explorerUrl.replace('cronos.crypto.org', 'cronos.org');
+            }
             const newlyUpdatedAsset: UserAsset = {
               ...asset,
               config: {
                 ...asset.config!,
-                nodeUrl: asset.config?.nodeUrl ?? wallet.config.nodeUrl,
-                indexingUrl: asset.config?.indexingUrl ?? wallet.config.indexingUrl,
+                nodeUrl,
+                indexingUrl,
                 explorer: {
-                  baseUrl: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}`,
-                  tx: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}/tx`,
-                  address: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}/account`,
-                  validator: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}/validator`,
+                  baseUrl: `${explorerUrl}`,
+                  tx: `${explorerUrl}/tx`,
+                  address: `${explorerUrl}/${
+                    asset.assetType === UserAssetType.TENDERMINT ||
+                    asset.assetType === UserAssetType.IBC
+                      ? 'account'
+                      : 'address'
+                  }`,
+                  validator: `${explorerUrl}/validator`,
                 },
-                explorerUrl: asset.config?.explorerUrl ?? wallet.config.explorerUrl,
+                explorerUrl,
                 fee: {
                   gasLimit: String(asset.config?.fee.gasLimit ?? wallet.config.fee.gasLimit),
                   networkFee: String(asset.config?.fee.networkFee ?? wallet.config.fee.networkFee),

@@ -56,26 +56,20 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
 
   const config: UserAssetConfig = {
     explorer: {
-      tx: isTestnet
-        ? 'https://cronos.crypto.org/explorer/testnet3/tx'
-        : 'https://cronos.crypto.org/explorer/tx',
+      tx: isTestnet ? 'https://cronos.org/explorer/testnet3/tx' : 'https://cronos.org/explorer/tx',
       address: isTestnet
-        ? 'https://cronos.crypto.org/explorer/testnet3/address'
-        : 'https://cronos.crypto.org/explorer/address',
+        ? 'https://cronos.org/explorer/testnet3/address'
+        : 'https://cronos.org/explorer/address',
     },
-    explorerUrl: isTestnet
-      ? 'https://cronos.crypto.org/explorer/testnet3'
-      : 'https://cronos.crypto.org/explorer',
+    explorerUrl: isTestnet ? 'https://cronos.org/explorer/testnet3' : 'https://cronos.org/explorer',
     chainId: isTestnet ? '338' : '25',
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
     indexingUrl: isTestnet
-      ? 'https://cronos.crypto.org/explorer/testnet3/api'
-      : 'https://cronos.crypto.org/explorer/api',
+      ? 'https://cronos.org/explorer/testnet3/api'
+      : 'https://cronos.org/explorer/api',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
-    nodeUrl: isTestnet
-      ? 'https://cronos-testnet-3.crypto.org:8545/'
-      : 'https://evm-cronos.crypto.org',
+    nodeUrl: isTestnet ? 'https://cronos-testnet-3.crypto.org:8545/' : 'https://evm-cronos.org',
     memoSupportDisabled: true,
   };
 

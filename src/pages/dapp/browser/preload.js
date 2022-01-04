@@ -551,7 +551,7 @@ localStorage.setItem('connectorIdv2', 'Metamask');
 
 const providerConfig = {
   chainId: 25,
-  rpcUrl: 'https://evm-cronos.crypto.org',
+  rpcUrl: 'https://evm-cronos.org',
   isDebug: true,
 };
 window.ethereum = new window.desktopWallet.Provider(providerConfig);
