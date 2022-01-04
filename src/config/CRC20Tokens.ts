@@ -112,7 +112,8 @@ export const CRC20MainnetTokenInfos: Map<string, CRC20TokenInfo> = new Map([
     'TONIC',
     {
       address: '0xdd73dea10abc2bff99c60882ec5b2b81bb1dc5b2',
-      iconURL: '',
+      iconURL:
+        'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/61c14a1bd7bd1900c6dfa2a6/Color-TONIC_4.png',
       isWhitelist: true,
     },
   ],
@@ -120,7 +121,8 @@ export const CRC20MainnetTokenInfos: Map<string, CRC20TokenInfo> = new Map([
     'LINK',
     {
       address: '0xbc6f24649ccd67ec42342accdceccb2efa27c9d9',
-      iconURL: '',
+      iconURL:
+        'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c12488b5568a4017c20a9c1/chainlink.png',
       isWhitelist: true,
     },
   ],
@@ -128,14 +130,15 @@ export const CRC20MainnetTokenInfos: Map<string, CRC20TokenInfo> = new Map([
     'ENJ',
     {
       address: '0x0a92ea8a197919acb9bc26660ed0d43d01ed26b7',
-      iconURL: '',
+      iconURL:
+        'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c1248a35568a4017c20aa1a/enjin-coin.png',
       isWhitelist: true,
     },
   ],
   [
     'SWAPP',
     {
-      address: '',
+      address: '0x245a551ee0f55005e510b239c917fa34b41b3461',
       iconURL:
         'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/610b8b87d07aba00c6590f3b/SWAPP_cronos_4.png',
       isWhitelist: false,
@@ -144,7 +147,7 @@ export const CRC20MainnetTokenInfos: Map<string, CRC20TokenInfo> = new Map([
   [
     'CRONA',
     {
-      address: '',
+      address: '0xadbd1231fb360047525bedf962581f3eee7b49fe',
       iconURL:
         'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/619de338a4396a00c5b30250/CRONA_4.png',
       isWhitelist: false,
@@ -153,7 +156,7 @@ export const CRC20MainnetTokenInfos: Map<string, CRC20TokenInfo> = new Map([
   [
     'ELK',
     {
-      address: '',
+      address: '0xe1c110e1b1b4a1ded0caf3e42bfbdbb7b5d7ce1c',
       iconURL:
         'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/619de4423363e600c5f22dbc/ELK_4.png',
       isWhitelist: false,
@@ -162,7 +165,7 @@ export const CRC20MainnetTokenInfos: Map<string, CRC20TokenInfo> = new Map([
   [
     'SMOL',
     {
-      address: '',
+      address: '0x2ad63da83d6ff5da9e716dcae844d4f157405bdd',
       iconURL:
         'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/61a4da089a45a100c53b189f/SMOL_4.png',
       isWhitelist: false,
