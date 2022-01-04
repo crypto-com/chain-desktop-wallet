@@ -538,7 +538,7 @@ export class TransactionHistoryService {
             await this.fetchCurrentWalletCRC20Tokens(asset);
             break;
           default:
-            throw TypeError('Not supported yet');
+            break;
         }
       }),
     );
@@ -589,7 +589,9 @@ export class TransactionHistoryService {
 
               asset.balance = await cronosClient.getNativeBalanceByAddress(asset.address);
               // eslint-disable-next-line no-console
-              console.log(`${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`);
+              console.log(
+                `${asset.name} ${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`,
+              );
             } catch (e) {
               // eslint-disable-next-line no-console
               console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });

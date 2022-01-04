@@ -5,9 +5,10 @@ import { WalletConfig, SupportedChainName } from './StaticConfig';
 import { checkIfTestnet } from '../utils/utils';
 import iconCronosSvg from '../assets/icon-cronos-blue.svg';
 import iconCroSvg from '../assets/icon-cro.svg';
+import iconETHSvg from '../assets/icon-eth.svg';
 
 // This will be used later for asset recreation/migration
-export const STATIC_ASSET_COUNT = 2;
+export const STATIC_ASSET_COUNT = 3;
 
 // Every created wallet get initialized with a new CRO asset
 export const CRO_ASSET = (walletConfig: WalletConfig) => {
@@ -89,6 +90,57 @@ export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
     name: SupportedChainName.CRONOS,
     symbol: isTestnet ? 'TCRO' : 'CRO',
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
+    stakedBalance: '0',
+    unbondingBalance: '0',
+    rewardsBalance: '0',
+    decimals: 18,
+    assetType: UserAssetType.EVM,
+    isSecondaryAsset: true,
+    assetCreationType: AssetCreationType.STATIC,
+    config,
+  };
+};
+
+export const ETH_ASSET = (walletConfig: WalletConfig) => {
+  const { network } = walletConfig;
+
+  const isTestnet = checkIfTestnet(network);
+
+  const config: UserAssetConfig = {
+    explorer: {
+      tx: isTestnet
+        ? 'https://cronos.crypto.org/explorer/testnet3/tx'
+        : 'https://cronos.crypto.org/explorer/tx',
+      address: isTestnet
+        ? 'https://cronos.crypto.org/explorer/testnet3/address'
+        : 'https://cronos.crypto.org/explorer/address',
+    },
+    explorerUrl: isTestnet
+      ? 'https://cronos.crypto.org/explorer/testnet3'
+      : 'https://cronos.crypto.org/explorer',
+
+    chainId: isTestnet ? '3' : '1',
+
+    fee: { gasLimit: `50000`, networkFee: `20000000000` },
+    indexingUrl: isTestnet
+      ? 'https://cronos.crypto.org/explorer/testnet3/api'
+      : 'https://cronos.crypto.org/explorer/api',
+    isLedgerSupportDisabled: false,
+    isStakingDisabled: false,
+    nodeUrl: isTestnet
+      ? 'https://ropsten.infura.io/v3/8baf8ee1539c497ab4773d983c7367bf'
+      : 'https://mainnet.infura.io/v3/8baf8ee1539c497ab4773d983c7367bf',
+    memoSupportDisabled: true,
+  };
+
+  return {
+    balance: '0',
+    description: '',
+    icon_url: iconETHSvg,
+    identifier: getRandomId(),
+    name: SupportedChainName.ETHEREUM,
+    symbol: 'ETH',
+    mainnetSymbol: 'ETH', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
     unbondingBalance: '0',
     rewardsBalance: '0',
