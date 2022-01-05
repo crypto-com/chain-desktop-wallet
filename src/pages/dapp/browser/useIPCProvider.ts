@@ -192,7 +192,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       prepareTXConfig,
     );
 
-    return `0x${prepareTxInfo.loadedGasPrice}`;
+    return Web3.utils.toHex(prepareTxInfo.loadedGasPrice);
   };
 
   const handleSendTransaction = useRefCallback(
