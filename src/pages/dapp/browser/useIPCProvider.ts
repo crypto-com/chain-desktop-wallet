@@ -181,6 +181,20 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     },
   );
 
+  const getGasPrice = async (event: DappBrowserIPC.SendTransactionEvent) => {
+    const prepareTXConfig: TransactionConfig = {
+      from: event.object.from,
+      to: event.object.to,
+    };
+
+    const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
+      cronosAsset!,
+      prepareTXConfig,
+    );
+
+    return Web3.utils.toHex(prepareTxInfo.loadedGasPrice);
+  };
+
   const handleSendTransaction = useRefCallback(
     async (event: DappBrowserIPC.SendTransactionEvent, passphrase: string) => {
       const prepareTXConfig: TransactionConfig = {
@@ -270,6 +284,11 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           break;
         case 'signTransaction':
           // parse transaction data
+
+          // gasPrice maybe missing (eg. Tectonic)
+          if (!event.object?.gasPrice) {
+            event.object.gasPrice = await getGasPrice(event);
+          }
 
           if (event.object.data.startsWith('0x095ea7b3')) {
             const response = await transactionDataParser.parseTokenApprovalData(
