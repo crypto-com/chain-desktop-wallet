@@ -341,6 +341,7 @@
   "assets.assetList.table.actionSend": "發送",
   "assets.assetList.table.actionReceive": "接收",
   "assets.moreMenu.nodeConfiguration": "節點設定",
+  "assets.whitelist.warning": "此代幣對應的合約地址不在白名單內。請自行承擔使用風險。",
   "bridge.form.from": "從",
   "bridge.form.to": "至",
   "bridge.form.errorSameChain": "不能選擇同一條鏈",
