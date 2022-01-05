@@ -15,6 +15,7 @@ import CreatePage from './create/create';
 import BackupPage from './backup/backup';
 import HomePage from './home/home';
 import WalletPage from './wallet/wallet';
+import RefreshPage from './refresh/refresh';
 import StakingPage from './staking/staking';
 import GovernancePage from './governance/governance';
 import NftPage from './nft/nft';
@@ -176,6 +177,12 @@ function RouteHub() {
       path: '/wallet',
       component: <WalletPage />,
     },
+    {
+      name: 'Refresh Page',
+      key: 'refresh',
+      path: '/refresh',
+      component: <RefreshPage />,
+    },
   ];
 
   useLayoutEffect(() => {
@@ -221,7 +228,7 @@ function RouteHub() {
           <Switch>
             {routeHomeLayoutItems.map(item => {
               return (
-                <Route path={item.path} key={item.path}>
+                <Route path={item.path} key={item.key}>
                   {item.component}
                 </Route>
               );
