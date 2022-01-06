@@ -20,6 +20,7 @@ import {
 import { Session } from '../models/Session';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { croMarketPriceApi } from './rpc/MarketApi';
+import { isCRC20AssetWhitelisted } from '../utils/utils';
 
 export class TransactionHistoryService {
   private storageService: StorageService;
@@ -458,7 +459,7 @@ export class TransactionHistoryService {
     }
   }
 
-  private async fetchCurrentWalletCRC20Tokens(croEvmAsset: UserAsset) {
+  private async fetchCurrentWalletCRC20Tokens(croEvmAsset: UserAsset, session: Session) {
     const { address } = croEvmAsset;
 
     if (!address || !croEvmAsset.config?.nodeUrl) {
@@ -491,6 +492,11 @@ export class TransactionHistoryService {
         assetType: UserAssetType.CRC_20_TOKEN,
         address: croEvmAsset.address,
         config: croEvmAsset.config,
+        isWhitelisted: isCRC20AssetWhitelisted(
+          token.symbol,
+          token.contractAddress,
+          session.wallet.config,
+        ),
       };
 
       // eslint-disable-next-line no-console
@@ -535,7 +541,7 @@ export class TransactionHistoryService {
           case UserAssetType.TENDERMINT:
             break;
           case UserAssetType.EVM:
-            await this.fetchCurrentWalletCRC20Tokens(asset);
+            await this.fetchCurrentWalletCRC20Tokens(asset, currentSession);
             break;
           default:
             break;

@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { bech32 } from 'bech32';
 import { ethers } from 'ethers';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib';
+import Web3 from 'web3';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { Network, WalletConfig, SupportedChainName } from '../config/StaticConfig';
+import { CRC20MainnetTokenInfos } from '../config/CRC20Tokens';
 
 export function isElectron() {
   // Renderer process
@@ -190,4 +192,26 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
         return name;
     }
   }
+}
+
+export function isCRC20AssetWhitelisted(
+  symbol: string,
+  contractAddress: string,
+  config: WalletConfig,
+) {
+  const isTestnet = checkIfTestnet(config.network);
+  if (isTestnet) {
+    return true;
+  }
+
+  const tokenInfo = CRC20MainnetTokenInfos.get(symbol.toUpperCase());
+  if (!tokenInfo) {
+    return false;
+  }
+
+  return tokenInfo.isWhitelisted && isAddressEqual(contractAddress, tokenInfo.address);
+}
+
+export function isAddressEqual(lhs: string, rhs: string) {
+  return Web3.utils.toChecksumAddress(lhs) === Web3.utils.toChecksumAddress(rhs);
 }
