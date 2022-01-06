@@ -5,14 +5,32 @@ import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import './assets.less';
 import 'antd/dist/antd.css';
-import { Layout, Table, Avatar, Tabs, Tag, Typography, Dropdown, Menu, Tooltip, Alert } from 'antd';
-import { ArrowLeftOutlined, ExclamationCircleOutlined, MoreOutlined } from '@ant-design/icons';
+import {
+  Layout,
+  Table,
+  Avatar,
+  Tabs,
+  Tag,
+  Typography,
+  Dropdown,
+  Menu,
+  Tooltip,
+  Alert,
+  Spin,
+} from 'antd';
+import {
+  ArrowLeftOutlined,
+  ExclamationCircleOutlined,
+  MoreOutlined,
+  LoadingOutlined,
+} from '@ant-design/icons';
 import {
   sessionState,
   allMarketState,
   walletAllAssetsState,
   navbarMenuSelectedKeyState,
   fetchingDBState,
+  fetchingComponentState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { AssetMarketPrice, getAssetBalancePrice, UserAsset } from '../../models/UserAsset';
@@ -85,6 +103,7 @@ const AssetsPage = () => {
   const allMarketData = useRecoilValue(allMarketState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setFetchingDB = useSetRecoilState(fetchingDBState);
+  const [fetchingComoponent, setFetchingComponent] = useRecoilState(fetchingComponentState);
 
   // const [isLedger, setIsLedger] = useState(false);
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(session.activeAsset);
@@ -103,8 +122,11 @@ const AssetsPage = () => {
   };
 
   const syncTransfers = async asset => {
-    const transfers = await walletService.retrieveAllTransfers(session.wallet.identifier, asset);
+    setFetchingComponent(true);
+    const transfers = await walletService.syncTransferTransactionsDataByAsset(session, asset);
     setAllTransfer(convertTransfers(transfers, walletAllAssets, session, asset));
+    // const transfers = await walletService.retrieveAllTransfers(session.wallet.identifier, asset);
+    setFetchingComponent(false);
   };
 
   const syncAssetBalance = async asset => {
@@ -484,6 +506,12 @@ const AssetsPage = () => {
                           triggerDesc: t('general.table.triggerDesc'),
                           triggerAsc: t('general.table.triggerAsc'),
                           cancelSort: t('general.table.cancelSort'),
+                        }}
+                        loading={{
+                          indicator: (
+                            <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />
+                          ),
+                          spinning: fetchingComoponent,
                         }}
                       />
                     </TabPane>

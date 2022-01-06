@@ -397,6 +397,19 @@ class WalletService {
     }
   }
 
+  public async syncTransferTransactionsDataByAsset(
+    session: Session,
+    asset: UserAsset,
+  ): Promise<TransferTransactionData[]> {
+    try {
+      return await this.txHistoryManager.fetchAndSaveTransfersByAsset(session, asset);
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('SYNC_ERROR', e);
+      return Promise.resolve([]);
+    }
+  }
+
   public async encryptWalletAndSetSession(key: string, walletOriginal: Wallet): Promise<void> {
     const wallet = JSON.parse(JSON.stringify(walletOriginal));
     const initialVector = await cryptographer.generateIV();
@@ -429,8 +442,8 @@ class WalletService {
     return this.storageService.saveUnbondingDelegations(unbondingDelegations);
   }
 
-  public async saveTransfers(rewardTransactions: TransferTransactionList) {
-    return this.storageService.saveTransferTransactions(rewardTransactions);
+  public async saveTransfers(transferTransactions: TransferTransactionList) {
+    return this.storageService.saveTransferTransactions(transferTransactions);
   }
 
   public async retrieveAllDelegations(walletId: string): Promise<StakingTransactionData[]> {

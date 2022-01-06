@@ -42,7 +42,7 @@ export class TransactionHistoryService {
       this.fetchAndSaveDelegations(nodeRpc, currentSession),
       this.fetchAndSaveUnbondingDelegations(nodeRpc, currentSession),
       this.fetchAndSaveRewards(nodeRpc, currentSession),
-      this.fetchAndSaveTransfers(currentSession),
+      // this.fetchAndSaveTransfers(currentSession),
       this.fetchAndSaveValidators(currentSession),
       this.fetchAndSaveNFTAccountTxs(currentSession),
     ]);
@@ -210,7 +210,7 @@ export class TransactionHistoryService {
                 currentAsset,
               );
 
-              await this.saveTransfers({
+              this.saveTransfers({
                 transactions: transferTransactions,
                 walletId: currentSession.wallet.identifier,
                 assetId: currentAsset.identifier,
@@ -254,7 +254,7 @@ export class TransactionHistoryService {
               // eslint-disable-next-line no-console
               console.log('Loaded transactions', transactions, loadedTransactions);
 
-              await this.saveTransfers({
+              this.saveTransfers({
                 transactions: loadedTransactions,
                 walletId: currentSession.wallet.identifier,
                 assetId: currentAsset?.identifier,
@@ -302,7 +302,7 @@ export class TransactionHistoryService {
               // eslint-disable-next-line no-console
               console.log(`LOADED_TXS ${currentAsset.symbol}: `, loadedTransactions);
 
-              await this.saveTransfers({
+              this.saveTransfers({
                 transactions: loadedTransactions,
                 walletId: currentSession.wallet.identifier,
                 assetId: currentAsset?.identifier,
@@ -317,8 +317,138 @@ export class TransactionHistoryService {
     );
   }
 
-  public async saveTransfers(rewardTransactions: TransferTransactionList) {
-    return this.storageService.saveTransferTransactions(rewardTransactions);
+  // eslint-disable-next-line class-methods-use-this
+  public async fetchAndSaveTransfersByAsset(
+    currentSession: Session,
+    currentAsset: UserAsset,
+  ): Promise<TransferTransactionData[]> {
+    const indexingUrl =
+      currentAsset?.config?.indexingUrl || currentSession.wallet.config.indexingUrl;
+
+    switch (currentAsset.assetType) {
+      case UserAssetType.TENDERMINT:
+      case UserAssetType.IBC:
+      case undefined:
+        try {
+          const chainIndexAPI = ChainIndexingAPI.init(indexingUrl);
+          const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
+            currentSession.wallet.config.network.coin.baseDenom,
+            currentAsset?.address || currentSession.wallet.address,
+            currentAsset,
+          );
+
+          // this.saveTransfers({
+          //   transactions: transferTransactions,
+          //   walletId: currentSession.wallet.identifier,
+          //   assetId: currentAsset.identifier,
+          // });
+
+          return transferTransactions;
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error('FAILED_TO_LOAD_TRANSFERS', e);
+        }
+
+        break;
+      case UserAssetType.EVM:
+        try {
+          if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
+            return [];
+          }
+
+          const cronosClient = new CronosClient(
+            currentAsset.config?.nodeUrl,
+            currentAsset.config?.indexingUrl,
+          );
+
+          const transactions = await cronosClient.getTxsByAddress(currentAsset.address);
+          const loadedTransactions = transactions.result.map(evmTx => {
+            const transactionTime = new Date(Number(evmTx.timeStamp) * 1000).toISOString();
+
+            const transferTx: TransferTransactionData = {
+              amount: evmTx.value,
+              assetSymbol: currentAsset.symbol,
+              date: transactionTime,
+              hash: evmTx.hash,
+              memo: '',
+              receiverAddress: evmTx.to,
+              senderAddress: evmTx.from,
+              status: evmTx.isError === '1' ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
+            };
+
+            return transferTx;
+          });
+
+          // eslint-disable-next-line no-console
+          console.log('Loaded transactions', transactions, loadedTransactions);
+
+          // this.saveTransfers({
+          //   transactions: loadedTransactions,
+          //   walletId: currentSession.wallet.identifier,
+          //   assetId: currentAsset?.identifier,
+          // });
+
+          return loadedTransactions;
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error(`FAILED_TO_LOAD_TRANSFERS - ${currentAsset.assetType}`, e);
+        }
+
+        break;
+      case UserAssetType.CRC_20_TOKEN:
+        {
+          if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
+            return [];
+          }
+
+          const cronosClient = new CronosClient(
+            currentAsset.config?.nodeUrl,
+            currentAsset.config?.indexingUrl,
+          );
+
+          const transactionsResponse = await cronosClient.getTokenTransfersByAddress(
+            currentAsset.address,
+            { contractaddress: currentAsset.contractAddress },
+          );
+          const loadedTransactions = transactionsResponse.result.map(crc20TokenTx => {
+            const transactionTime = new Date(Number(crc20TokenTx.timeStamp) * 1000).toISOString();
+
+            const transferTx: TransferTransactionData = {
+              amount: crc20TokenTx.value,
+              assetSymbol: currentAsset.symbol,
+              date: transactionTime,
+              hash: crc20TokenTx.hash,
+              memo: '',
+              receiverAddress: crc20TokenTx.to,
+              senderAddress: crc20TokenTx.from,
+              status: TransactionStatus.SUCCESS,
+            };
+
+            return transferTx;
+          });
+
+          // eslint-disable-next-line no-console
+          console.log(`LOADED_TXS ${currentAsset.symbol}: `, loadedTransactions);
+
+          // this.saveTransfers({
+          //   transactions: loadedTransactions,
+          //   walletId: currentSession.wallet.identifier,
+          //   assetId: currentAsset?.identifier,
+          // });
+
+          return loadedTransactions;
+        }
+        break;
+
+      default:
+        break;
+    }
+
+    return [];
+  }
+
+  public async saveTransfers(transferTransactions: TransferTransactionList) {
+    return this.storageService.saveTransferTransactions(transferTransactions);
   }
 
   public async fetchAndSaveNFTAccountTxs(currentSession: Session) {
