@@ -1,6 +1,4 @@
-import { WebviewTag } from 'electron';
-
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { TransactionConfig } from 'web3-eth';
 import { useRecoilValue } from 'recoil';
 import Web3 from 'web3';
@@ -15,12 +13,10 @@ import { EVMContractCallUnsigned } from '../../../service/signers/TransactionSup
 import { walletAllAssetsState } from '../../../recoil/atom';
 import { getCronosAsset } from '../../../utils/utils';
 import { TransactionDataParser } from './TransactionDataParser';
+import { ErrorHandler, WebView } from './types';
+import { useRefCallback } from './useRefCallback';
 
 const { shell } = window.require('electron');
-
-type WebView = WebviewTag & HTMLWebViewElement;
-
-export type ErrorHandler = (reason: string) => void;
 
 interface IUseIPCProviderProps {
   webview: WebView | null;
@@ -66,12 +62,6 @@ interface IUseIPCProviderProps {
     onError: ErrorHandler,
   ) => Promise<void>;
   onFinishTransaction: () => void;
-}
-
-export function useRefCallback(fn: Function) {
-  const fnRef = useRef(fn);
-  fnRef.current = fn;
-  return fnRef;
 }
 
 export const useIPCProvider = (props: IUseIPCProviderProps) => {

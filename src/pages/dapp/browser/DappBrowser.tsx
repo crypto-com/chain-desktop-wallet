@@ -1,11 +1,11 @@
 import * as React from 'react';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { WebviewTag } from 'electron';
 import { useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import Web3 from 'web3';
 import { setTimeout } from 'timers';
-import { useIPCProvider, useRefCallback } from './useIPCProvider';
+import { useIPCProvider } from './useIPCProvider';
 import { allMarketState, sessionState, walletAllAssetsState } from '../../../recoil/atom';
 import { getCronosAsset } from '../../../utils/utils';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
@@ -15,13 +15,18 @@ import { Dapp, DappBrowserIPC } from '../types';
 import { ProviderPreloadScriptPath } from './config';
 import packageJson from '../../../../package.json';
 import { walletService } from '../../../service/WalletService';
+import { useRefCallback } from './useRefCallback';
+import { useWebInfoProvider } from './useWebInfoProvider';
 
+// use **only** one of the following
+// priority: dapp > dappURL
 interface DappBrowserProps {
-  dapp: Dapp;
+  dapp?: Dapp;
+  dappURL?: string;
 }
 
 const DappBrowser = (props: DappBrowserProps) => {
-  const { dapp } = props;
+  const { dapp, dappURL } = props;
   const webviewRef = useRef<WebviewTag & HTMLWebViewElement>(null);
   const [t] = useTranslation();
   const allAssets = useRecoilValue(walletAllAssetsState);
@@ -47,6 +52,24 @@ const DappBrowser = (props: DappBrowserProps) => {
   const onRequestAddress = useRefCallback((onSuccess: (address: string) => void) => {
     onSuccess(cronosAsset?.address!);
   });
+
+  const { title: providedTitle, faviconURL: providedFaviconURL } = useWebInfoProvider({
+    webview: webviewRef.current,
+  });
+
+  const pageDapp = useMemo(() => {
+    const pageURL = dapp ? dapp.url : dappURL!;
+    const pageTitle = dapp ? dapp.name : providedTitle;
+    const pageFavicon = dapp ? dapp.logo : providedFaviconURL;
+    const app: Dapp = dapp ?? {
+      name: pageTitle,
+      logo: pageFavicon,
+      alt: pageTitle,
+      url: pageURL,
+      description: '',
+    };
+    return app;
+  }, [dapp, providedTitle, providedFaviconURL, dappURL]);
 
   const onRequestTokenApproval = useRefCallback(
     (
@@ -219,7 +242,7 @@ const DappBrowser = (props: DappBrowserProps) => {
           currentSession={currentSession}
           wallet={currentSession.wallet}
           visible={requestConfirmationVisible}
-          dapp={dapp}
+          dapp={pageDapp}
           onConfirm={() => {
             setRequestConfirmationVisible(false);
             confirmPasswordCallback?.successCallback(decryptedPhrase);
@@ -240,8 +263,8 @@ const DappBrowser = (props: DappBrowserProps) => {
           width: '100%',
           height: '100vh',
         }}
-        src={dapp.url}
-        title={dapp.name}
+        src={pageDapp.url}
+        title={pageDapp.name}
       />
     </div>
   );
