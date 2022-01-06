@@ -545,7 +545,7 @@ export class StorageService {
 
   /// ----- dapp browser bookmarks ------
   public async saveBrowserBookmark(model: BrowserBookmark) {
-    return this.db.dappBrowserBookmarksStore.insert<BrowserBookmark>({
+    return this.db.dappBrowserBookmarksStore.insert({
       url: model.url,
       title: model.title,
       faviconURL: model.faviconURL,
