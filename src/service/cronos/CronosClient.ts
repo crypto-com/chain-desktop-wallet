@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import axios, { AxiosResponse } from 'axios';
+import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 import { EVMClient } from '../rpc/clients/EVMClient';
-import { CRC20_TOKEN_ICON_URL } from '../../config/StaticConfig';
 import {
   ICronosChainIndexAPI,
   txListRequestOptions,
@@ -154,6 +154,8 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
   }
 
   static getTokenIconUrlBySymbol(symbol: string): string {
-    return CRC20_TOKEN_ICON_URL[symbol.toUpperCase()] || '';
+    const tokenInfo = CRC20MainnetTokenInfos.get(symbol.toUpperCase());
+
+    return tokenInfo?.iconURL ?? '';
   }
 }
