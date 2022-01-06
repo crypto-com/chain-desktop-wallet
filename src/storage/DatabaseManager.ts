@@ -44,6 +44,8 @@ export class DatabaseManager {
 
   public readonly addressBookStore: Datastore;
 
+  public readonly dappBrowserBookmarksStore: Datastore;
+
   constructor(namespace: string) {
     this.sessionStore = getStore(namespace, 'session');
     this.walletStore = getStore(namespace, 'wallets');
@@ -64,5 +66,6 @@ export class DatabaseManager {
     this.bridgeConfigStore = getStore(namespace, 'bridgeConfigStore');
     this.bridgeTransactionStore = getStore(namespace, 'bridgeTransactionStore');
     this.addressBookStore = getStore(namespace, 'addressBook');
+    this.dappBrowserBookmarksStore = getStore(namespace, 'dappBrowserBookmarksStore');
   }
 }
