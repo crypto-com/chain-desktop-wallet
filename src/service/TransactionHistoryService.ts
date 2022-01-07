@@ -1,7 +1,11 @@
 import Big from 'big.js';
 import { StorageService } from '../storage/StorageService';
 import { NodeRpcService } from './rpc/NodeRpcService';
-import { NOT_KNOWN_YET_VALUE, SECONDS_OF_YEAR } from '../config/StaticConfig';
+import {
+  NOT_KNOWN_YET_VALUE,
+  SECONDS_OF_YEAR,
+  VALIDATOR_UPTIME_THRESHOLD,
+} from '../config/StaticConfig';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { CronosClient } from './cronos/CronosClient';
 import {
@@ -94,13 +98,22 @@ export class TransactionHistoryService {
         .sort((v1, v2) => {
           const v1Uptime = Big(v1.uptime ?? '0');
           const v2Uptime = Big(v2.uptime ?? '0');
-          if (v1Uptime.cmp('0.999') >= 0 && v2Uptime.cmp('0.999') < 0) {
+          if (
+            v1Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) >= 0 &&
+            v2Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) < 0
+          ) {
             return -1;
           }
-          if (v1Uptime.cmp('0.999') < 0 && v2Uptime.cmp('0.999') >= 0) {
+          if (
+            v1Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) < 0 &&
+            v2Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) >= 0
+          ) {
             return 1;
           }
-          if (v1Uptime.cmp('0.999') < 0 && v2Uptime.cmp('0.999') < 0) {
+          if (
+            v1Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) < 0 &&
+            v2Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) < 0
+          ) {
             return v2Uptime.cmp(v1Uptime);
           }
           return 0;
