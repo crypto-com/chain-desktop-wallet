@@ -602,7 +602,7 @@
   "settings.exportRecoveryPhrase.modal1.title": "Your Recovery Phrases",
   "settings.exportRecoveryPhrase.modal1.description": "Swipe to reveal all words. Write them down in the right order.",
   "settings.exportRecoveryPhrase.modal1.warning": "Protect your funds and do not share your recovery phrase with anyone.",
-  "settings.clearStorage.description": "Once you clear the storage, you will lose access to all you wallets. The only way to regain wallet access is by restoring wallet mnemonic phrase.",
+  "settings.clearStorage.description": "Once you clear the storage, you will lose access to all your wallets. The only way to regain wallet access is by restoring wallet mnemonic phrase.",
   "settings.clearStorage.button1": "Clear Storage",
   "settings.clearStorage.modal.title": "Confirm Clear Storage",
   "settings.clearStorage.modal.description1": "You may wish to verify your recovery mnemonic phrase before deletion to ensure that you can restore this wallet in the future.",
