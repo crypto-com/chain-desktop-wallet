@@ -57,6 +57,12 @@ const DappBrowser = (props: DappBrowserProps) => {
     webview: webviewRef.current,
   });
 
+  const { state: webviewState } = useWebviewStatusInfo({ webview: webviewRef.current });
+
+  useEffect(() => {
+    onStateChange?.(webviewState);
+  }, [webviewState]);
+
   const pageDapp = useMemo(() => {
     const pageURL = dapp ? dapp.url : dappURL!;
     const pageTitle = dapp ? dapp.name : providedTitle;
