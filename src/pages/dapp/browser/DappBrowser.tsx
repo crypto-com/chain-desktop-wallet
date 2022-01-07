@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useMemo, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { WebviewTag } from 'electron';
 import { useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
@@ -17,21 +17,41 @@ import packageJson from '../../../../package.json';
 import { walletService } from '../../../service/WalletService';
 import { useRefCallback } from './useRefCallback';
 import { useWebInfoProvider } from './useWebInfoProvider';
+import { useWebviewStatusInfo, WebviewState } from './useWebviewStatusInfo';
 
 // use **only** one of the following
 // priority: dapp > dappURL
 interface DappBrowserProps {
   dapp?: Dapp;
   dappURL?: string;
+  onStateChange?: (state: WebviewState) => void;
 }
 
-const DappBrowser = (props: DappBrowserProps) => {
-  const { dapp, dappURL } = props;
+export interface DappBrowserRef {
+  goBack: () => void;
+  goForward: () => void;
+  reload: () => void;
+}
+
+const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBrowserProps, ref) => {
+  const { dapp, dappURL, onStateChange } = props;
   const webviewRef = useRef<WebviewTag & HTMLWebViewElement>(null);
   const [t] = useTranslation();
   const allAssets = useRecoilValue(walletAllAssetsState);
   const allMarketData = useRecoilValue(allMarketState);
   const cronosAsset = getCronosAsset(allAssets);
+
+  useImperativeHandle(ref, () => ({
+    goBack: () => {
+      webviewRef.current?.goBack();
+    },
+    goForward: () => {
+      webviewRef.current?.goForward();
+    },
+    reload: () => {
+      webviewRef.current?.reload();
+    },
+  }));
 
   const [txEvent, setTxEvent] = useState<
     | DappBrowserIPC.SendTransactionEvent
@@ -274,6 +294,6 @@ const DappBrowser = (props: DappBrowserProps) => {
       />
     </div>
   );
-};
+});
 
 export default DappBrowser;

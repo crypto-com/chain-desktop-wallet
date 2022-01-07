@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layout } from 'antd';
 import { useSetRecoilState } from 'recoil';
 import './dapp.less';
 import { pageLockState } from '../../recoil/atom';
-import DappBrowser from './browser/DappBrowser';
+import DappBrowser, { DappBrowserRef } from './browser/DappBrowser';
 import { Dapp } from './types';
 import BorderlessCard from './components/BorderlessCard/BorderlessCard';
 import logoVvs from './assets/vvs.svg';
@@ -56,6 +56,7 @@ const DappPage = () => {
   const setPageLock = useSetRecoilState(pageLockState);
   const [selectedDapp, setSelectedDapp] = useState<Dapp>();
   const [t] = useTranslation();
+  const browserRef = useRef<DappBrowserRef>(null);
 
   useEffect(() => {
     if (selectedDapp) {
@@ -66,7 +67,14 @@ const DappPage = () => {
   }, [selectedDapp]);
 
   return selectedDapp ? (
-    <DappBrowser dapp={selectedDapp} />
+    <DappBrowser
+      dapp={selectedDapp}
+      ref={browserRef}
+      onStateChange={state => {
+        // eslint-disable-next-line no-console
+        console.log('DappBrowser state change', state);
+      }}
+    />
   ) : (
     <Layout className="site-layout">
       <Header className="site-layout-background">{t('dapp.title')}</Header>
