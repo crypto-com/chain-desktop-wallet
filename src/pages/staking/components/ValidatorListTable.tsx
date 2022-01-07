@@ -81,8 +81,8 @@ const ValidatorListTable = (props: {
       title: t('staking.validatorList.table.currentTokens'),
       dataIndex: 'currentTokens',
       key: 'currentTokens',
-      sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
-      defaultSortOrder: 'descend' as any,
+      // sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
+      // defaultSortOrder: 'descend' as any,
       render: currentTokens => {
         return (
           <span>
@@ -97,7 +97,7 @@ const ValidatorListTable = (props: {
       // dataIndex: 'cumulativeShares',
       key: 'cumulativeShares',
       // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
-      defaultSortOrder: 'descend' as any,
+      // defaultSortOrder: 'descend' as any,
       render: record => {
         return (
           <>
@@ -114,7 +114,7 @@ const ValidatorListTable = (props: {
       title: t('staking.validatorList.table.currentCommissionRate'),
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
-      sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
+      // sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
       render: currentCommissionRate => (
         <span>{new Big(currentCommissionRate).times(100).toFixed(2)}%</span>
       ),
@@ -122,7 +122,7 @@ const ValidatorListTable = (props: {
     {
       title: t('staking.validatorList.table.validatorApy'),
       key: 'apy',
-      sorter: (a, b) => new Big(a.apy).cmp(new Big(b.apy)),
+      // sorter: (a, b) => new Big(a.apy).cmp(new Big(b.apy)),
       render: record => {
         return <span>{new Big(record.apy).times(100).toFixed(2)}%</span>;
       },
@@ -130,7 +130,7 @@ const ValidatorListTable = (props: {
     {
       title: t('staking.validatorList.table.validatorUptime'),
       key: 'uptime',
-      sorter: (a, b) => new Big(a.uptime).cmp(new Big(b.uptime)),
+      // sorter: (a, b) => new Big(a.uptime).cmp(new Big(b.uptime)),
       render: record => {
         return <span>{new Big(record.uptime).times(100).toFixed(2)}%</span>;
       },

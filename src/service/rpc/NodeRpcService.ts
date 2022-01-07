@@ -93,7 +93,7 @@ export class NodeRpcService implements INodeRpcService {
       const balance = balanceData.balances.find(b => b.denom === assetDenom);
 
       return balance?.amount ?? '0';
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
       console.log(
         `[${NodeRpcService.name}-loadAccountBalance] [Error] Unable to fetch data.`,
@@ -211,7 +211,7 @@ export class NodeRpcService implements INodeRpcService {
     let response;
     try {
       response = await this.cosmosClient.get<DelegationResult | ErrorRpcResponse>(url);
-    } catch (error: any) {
+    } catch (error) {
       response = error.response;
     } finally {
       if (response.status !== 200) {
@@ -253,7 +253,7 @@ export class NodeRpcService implements INodeRpcService {
       response = await this.cosmosClient.get<RewardResponse>(
         `cosmos/distribution/v1beta1/delegators/${address}/rewards`,
       );
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
       console.log(
         `[NodeRpcService.fetchStakingRewardsBalance] | HTTP Code: ${
@@ -351,7 +351,7 @@ export class NodeRpcService implements INodeRpcService {
     let response;
     try {
       response = await this.cosmosClient.get<UnbondingDelegationResult>(url);
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
       console.log(
         `[NodeRpcService.fetchUnbondingDelegationsPaginated] | HTTP Code: ${
@@ -466,7 +466,9 @@ export class NodeRpcService implements INodeRpcService {
       .filter(v => v.status === 'BOND_STATUS_BONDED')
       .filter(v => !v.jailed)
       .filter(v => !!activeValidators[v.pubKey.value])
-      .sort((v1, v2) => Big(v2.currentShares).cmp(Big(v1.currentShares)))
+      // Sort by Lowest voting power, and then Lowest commission
+      .sort((v1, v2) => Big(v1.currentCommissionRate).cmp(Big(v2.currentCommissionRate)))
+      .sort((v1, v2) => Big(v1.currentShares).cmp(Big(v2.currentShares)))
       .slice(0, MAX_VALIDATOR_LOAD);
 
     let totalShares = new Big(0);
@@ -593,7 +595,7 @@ export class NodeRpcService implements INodeRpcService {
       );
 
       return denomTraceResponse.data.denom_trace;
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
       console.log(
         `[${NodeRpcService.name}-getIBCAssetTrace] [Error] Unable to fetch data.`,
