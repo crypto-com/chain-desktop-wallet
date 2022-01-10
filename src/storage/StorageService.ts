@@ -333,13 +333,14 @@ export class StorageService {
   }
 
   public async saveUnbondingDelegations(unbondingDelegations: UnbondingDelegationList) {
-    if (unbondingDelegations.delegations.length === 0) {
-      return Promise.resolve();
-    }
+    // Remove previous `unbonding` records before insertion
     await this.db.unbondingDelegationStore.remove(
       { walletId: unbondingDelegations.walletId },
       { multi: true },
     );
+    if (unbondingDelegations.delegations.length === 0) {
+      return Promise.resolve();
+    }
     return this.db.unbondingDelegationStore.insert(unbondingDelegations);
   }
 

@@ -1395,20 +1395,21 @@ const StakingPage = () => {
     allUnbondingDelegations: UnbondingDelegationData[],
     currentAsset: UserAsset,
   ) => {
-    return allUnbondingDelegations.map(dlg => {
-      const unbondingAmount = getUIDynamicAmount(dlg.unbondingAmount, currentAsset);
-      const data: UnbondingDelegationTabularData = {
-        key: `${dlg.validatorAddress}_${dlg.unbondingAmount}_${dlg.completionTime}`,
-        delegatorAddress: dlg.delegatorAddress,
-        validatorAddress: dlg.validatorAddress,
-        completionTime: new Date(dlg.completionTime).toString(),
-        unbondingAmount,
-        unbondingAmountWithSymbol: `${unbondingAmount} ${currentAsset.symbol}`,
-        remainingTime: formatRemainingTime(dlg.completionTime),
-      };
-      return data;
-    });
-    // .filter(dlg => Number(dlg.stakedAmount) > 0);
+    return allUnbondingDelegations
+      .map(dlg => {
+        const unbondingAmount = getUIDynamicAmount(dlg.unbondingAmount, currentAsset);
+        const data: UnbondingDelegationTabularData = {
+          key: `${dlg.validatorAddress}_${dlg.unbondingAmount}_${dlg.completionTime}`,
+          delegatorAddress: dlg.delegatorAddress,
+          validatorAddress: dlg.validatorAddress,
+          completionTime: new Date(dlg.completionTime).toString(),
+          unbondingAmount,
+          unbondingAmountWithSymbol: `${unbondingAmount} ${currentAsset.symbol}`,
+          remainingTime: formatRemainingTime(dlg.completionTime),
+        };
+        return data;
+      })
+      .filter(dlg => moment(dlg.completionTime).diff(moment()) < 0);
   };
 
   useEffect(() => {
