@@ -227,7 +227,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   });
 
   return (
-    <div className="site-layout-background dapp-content">
+    <div className="dapp-content">
       {inputPasswordVisible && (
         <PasswordFormModal
           description={t('general.passwordFormModal.description')}
@@ -287,7 +287,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
         useragent={`Mozilla/5.0 (Linux; Android 8.0.0; Desktop Wallet Build/${packageJson.version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.84 Mobile Safari/537.36`}
         style={{
           width: '100%',
-          height: '100vh',
+          height: 'calc(100vh - 48px)',
         }}
         src={pageDapp.url}
         title={pageDapp.name}

@@ -9,6 +9,7 @@ import { Dapp } from './types';
 import BorderlessCard from './components/BorderlessCard/BorderlessCard';
 import logoVvs from './assets/vvs.svg';
 import logoTectonic from './assets/tectonic.svg';
+import AddressBar from './components/AddressBar/AddressBar';
 
 const { Header, Content } = Layout;
 
@@ -66,43 +67,48 @@ const DappPage = () => {
     }
   }, [selectedDapp]);
 
-  return selectedDapp ? (
-    <DappBrowser
-      dapp={selectedDapp}
-      ref={browserRef}
-      onStateChange={state => {
-        // eslint-disable-next-line no-console
-        console.log('DappBrowser state change', state);
-      }}
-    />
-  ) : (
+  return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">{t('dapp.title')}</Header>
-      <div className="header-description">{t('dapp.description')}</div>
-      <Content>
-        <div className="dapps">
-          <div className="cards">
-            {DappList.map((dapp, idx) => {
-              return (
-                <BorderlessCard
-                  key={`partner-${idx}`}
-                  onClick={() => {
-                    setSelectedDapp(dapp);
-                  }}
-                >
-                  <div className="logo">
-                    <img src={dapp.logo} alt={dapp.alt} />
-                  </div>
-                  <div className="text">
-                    <h3>{dapp.name}</h3>
-                    <p>{dapp.description}</p>
-                  </div>
-                </BorderlessCard>
-              );
-            })}
-          </div>
-        </div>
-      </Content>
+      <AddressBar isBackButtonDisabled={false} />
+      {selectedDapp ? (
+        <DappBrowser
+          dapp={selectedDapp}
+          ref={browserRef}
+          onStateChange={state => {
+            // eslint-disable-next-line no-console
+            console.log('DappBrowser state change', state);
+          }}
+        />
+      ) : (
+        <>
+          <Header className="site-layout-background">{t('dapp.title')}</Header>
+          <div className="header-description">{t('dapp.description')}</div>
+          <Content>
+            <div className="dapps">
+              <div className="cards">
+                {DappList.map((dapp, idx) => {
+                  return (
+                    <BorderlessCard
+                      key={`partner-${idx}`}
+                      onClick={() => {
+                        setSelectedDapp(dapp);
+                      }}
+                    >
+                      <div className="logo">
+                        <img src={dapp.logo} alt={dapp.alt} />
+                      </div>
+                      <div className="text">
+                        <h3>{dapp.name}</h3>
+                        <p>{dapp.description}</p>
+                      </div>
+                    </BorderlessCard>
+                  );
+                })}
+              </div>
+            </div>
+          </Content>
+        </>
+      )}
     </Layout>
   );
 };
