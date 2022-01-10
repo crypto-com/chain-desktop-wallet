@@ -33,7 +33,7 @@ import { TransactionPrepareService } from './TransactionPrepareService';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
 import { TransactionHistoryService } from './TransactionHistoryService';
-import { getCronosAsset, sleep } from '../utils/utils';
+import { getCronosEvmAsset, sleep } from '../utils/utils';
 import { BridgeService } from './bridge/BridgeService';
 import { walletService } from './WalletService';
 
@@ -156,7 +156,7 @@ export class TransactionSenderService {
           const allAssets = await walletService.retrieveWalletAssets(
             currentSession.wallet.identifier,
           );
-          const chainConfig = getCronosAsset(allAssets)?.config;
+          const chainConfig = getCronosEvmAsset(allAssets)?.config;
 
           // currentAsset's config is not changeable, use a new instance instead
           const transferAsset: UserAsset = {

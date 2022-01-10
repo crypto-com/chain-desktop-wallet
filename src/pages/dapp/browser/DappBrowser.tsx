@@ -7,7 +7,7 @@ import Web3 from 'web3';
 import { setTimeout } from 'timers';
 import { useIPCProvider, useRefCallback } from './useIPCProvider';
 import { allMarketState, sessionState, walletAllAssetsState } from '../../../recoil/atom';
-import { getCronosAsset } from '../../../utils/utils';
+import { getCronosEvmAsset } from '../../../utils/utils';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
 import RequestConfirmation from '../components/RequestConfirmation/RequestConfirmation';
 import { secretStoreService } from '../../../storage/SecretStoreService';
@@ -26,7 +26,7 @@ const DappBrowser = (props: DappBrowserProps) => {
   const [t] = useTranslation();
   const allAssets = useRecoilValue(walletAllAssetsState);
   const allMarketData = useRecoilValue(allMarketState);
-  const cronosAsset = getCronosAsset(allAssets);
+  const cronosAsset = getCronosEvmAsset(allAssets);
 
   const [txEvent, setTxEvent] = useState<
     | DappBrowserIPC.SendTransactionEvent

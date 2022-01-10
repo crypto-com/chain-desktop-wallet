@@ -42,7 +42,7 @@ import {
   pageLockState,
   NavbarMenuKey,
 } from '../../recoil/atom';
-import { ellipsis, checkIfTestnet, getCronosAsset } from '../../utils/utils';
+import { ellipsis, checkIfTestnet, getCronosEvmAsset } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 // import IconSend from '../../svg/IconSend';
@@ -411,7 +411,7 @@ function HomeLayout(props: HomeLayoutProps) {
     }
 
     const assets = await walletService.retrieveWalletAssets(walletSession.wallet.identifier);
-    const cronosAsset = getCronosAsset(assets);
+    const cronosAsset = getCronosEvmAsset(assets);
 
     setTimeout(async () => {
       if (
@@ -456,6 +456,7 @@ function HomeLayout(props: HomeLayoutProps) {
             }
             const newlyUpdatedAsset: UserAsset = {
               ...asset,
+              description: asset.description.replace('Crypto.org Coin', 'Cronos'),
               config: {
                 ...asset.config!,
                 nodeUrl,

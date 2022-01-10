@@ -10,8 +10,8 @@ import { sessionState, walletAllAssetsState } from '../../../recoil/atom';
 import { scaledBalance, UserAsset, UserAssetType } from '../../../models/UserAsset';
 import {
   middleEllipsis,
-  getCryptoOrgAsset,
-  getCronosAsset,
+  getCronosTendermintAsset,
+  getCronosEvmAsset,
   getChainName,
 } from '../../../utils/utils';
 import { fromScientificNotation, getCurrentMinAssetAmount } from '../../../utils/NumberUtils';
@@ -93,8 +93,8 @@ const CronosBridgeForm = props => {
   const analyticsService = new AnalyticsService(session);
   const bridgeService = new BridgeService(walletService.storageService);
 
-  const croAsset = getCryptoOrgAsset(walletAllAssets);
-  const cronosAsset = getCronosAsset(walletAllAssets);
+  const croAsset = getCronosTendermintAsset(walletAllAssets);
+  const cronosAsset = getCronosEvmAsset(walletAllAssets);
 
   const { tendermintAddress, evmAddress } = formValues;
 
@@ -306,8 +306,8 @@ const CronosBridgeForm = props => {
 
         const currentSession = await walletService.retrieveCurrentSession();
         const assets = await walletService.retrieveCurrentWalletAssets(currentSession);
-        const cro = getCryptoOrgAsset(assets);
-        const cronos = getCronosAsset(assets);
+        const cro = getCronosTendermintAsset(assets);
+        const cronos = getCronosEvmAsset(assets);
         const config = await bridgeService.retrieveBridgeConfig(defaultBridgeTransferDirection);
 
         setBridgeSupportedAssets([cro!]);

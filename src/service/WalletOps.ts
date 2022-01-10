@@ -1,7 +1,7 @@
 import { WalletConfig } from '../config/StaticConfig';
 import { AddressGenerator } from './AddressGenerator';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
-import { CRO_ASSET, CRONOS_ASSET } from '../config/StaticAssets';
+import { CRONOS_TENDERMINT_ASSET, CRONOS_EVM_ASSET } from '../config/StaticAssets';
 import { HDKey } from '../utils/ChainJsLib';
 import { Wallet } from '../models/Wallet';
 
@@ -11,12 +11,12 @@ export class WalletOps {
     const addressGenerator = new AddressGenerator(phrase, config);
     const assets: UserAsset[] = [
       {
-        ...CRO_ASSET(config),
+        ...CRONOS_TENDERMINT_ASSET(config),
         walletId: walletIdentifier,
         address: addressGenerator.getAddress(UserAssetType.TENDERMINT),
       },
       {
-        ...CRONOS_ASSET(config),
+        ...CRONOS_EVM_ASSET(config),
         walletId: walletIdentifier,
         address: addressGenerator.getAddress(UserAssetType.EVM),
       },
