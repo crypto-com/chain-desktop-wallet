@@ -26,6 +26,7 @@ export interface TransactionData {
   date: string;
   status: TransactionStatus;
   assetSymbol: string;
+  msgTypeName?: MsgTypeName;
 }
 
 export interface TransferTransactionData extends TransactionData {
@@ -293,3 +294,49 @@ export enum VoteOption {
   VOTE_OPTION_NO = 3,
   VOTE_OPTION_NO_WITH_VETO = 4,
 }
+
+// https://raw.githubusercontent.com/crypto-com/chain-indexing/4c79a3dba2911e738af1d2b2d639f4744c15f58b/usecase/parser/register.go
+export type MsgTypeName =
+  'MsgSend' |
+  'MsgMultiSend' |
+  'MsgSetWithdrawAddress' |
+  'MsgWithdrawDelegatorReward' |
+  'MsgWithdrawValidatorCommission' |
+  'MsgFundCommunityPool' |
+  'MsgSubmitProposal' |
+  'MsgVote' |
+  'MsgDeposit' |
+  'MsgDelegate' |
+  'MsgUndelegate' |
+  'MsgBeginRedelegate' |
+  'MsgCreateValidator' |
+  'MsgEditValidator' |
+  'MsgUnjail' |
+  'MsgIssueDenom' |
+  'MsgMintNFT' |
+  'MsgTransferNFT' |
+  'MsgEditNFT' |
+  'MsgBurnNFT' |
+  'MsgCreateClient' |
+  'MsgUpdateClient' |
+  'MsgConnectionOpenInit' |
+  'MsgConnectionOpenTry' |
+  'MsgConnectionOpenAck' |
+  'MsgConnectionOpenConfirm' |
+  'MsgChannelOpenInit' |
+  'MsgChannelOpenTry' |
+  'MsgChannelOpenAck' |
+  'MsgChannelOpenConfirm' |
+  'MsgRecvPacket' |
+  'MsgAcknowledgement' |
+  'MsgTimeout' |
+  'MsgTimeoutOnClose' |
+  'MsgChannelCloseInit' |
+  'MsgChannelCloseConfirm' |
+  'MsgTransfer' |
+  'MsgGrant' |
+  'MsgRevoke' |
+  'MsgExec' |
+  'MsgGrantAllowance' |
+  'MsgRevokeAllowance' |
+  'MsgCreateVestingAccount';

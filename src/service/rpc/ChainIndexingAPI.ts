@@ -21,11 +21,11 @@ import {
   TransactionStatus,
   TransferTransactionData,
   NftModel,
+  MsgTypeName,
 } from '../../models/Transaction';
 import {
   DefaultWalletConfigs,
   SECONDS_OF_YEAR,
-  SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING,
 } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
@@ -185,6 +185,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
             receiverAddress: transfer.data.toAddress,
             senderAddress: transfer.data.fromAddress,
             status: getStatus(transfer),
+            msgTypeName: 'MsgSend'
           };
 
           return transferData;
@@ -423,25 +424,22 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   /**
    * TODO: Under construction
    * @param userAddress Supports only Crypto.org USER addresses
-   * @param optionalMsgTypeName {Optional} Cosmos MsgType Name
+   * @param optionalMsgTypeNameList {Optional} Cosmos MsgType Name
    */
-  public async getMessagesByAccountAddress(userAddress: string, optionalMsgTypeName?: string) {
+  public async getMessagesByAccountAddress(userAddress: string, optionalMsgTypeNameList?: MsgTypeName[]) {
     let currentPage = 1;
     let totalPages = 1;
 
     const queryURL = `accounts/${userAddress}/messages`;
 
-    const isMsgTypeSupported =
-      (optionalMsgTypeName &&
-        SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING.includes(optionalMsgTypeName)) ??
-      false;
-
     const finalMsgList: accountMsgList[] = [];
+
+    const mayBeMsgTypeList = optionalMsgTypeNameList && optionalMsgTypeNameList.length > 0 ? optionalMsgTypeNameList.join(",") : undefined
 
     const requestParams = {
       page: currentPage,
       order: 'height.desc',
-      'filter.msgType': isMsgTypeSupported ? optionalMsgTypeName : undefined,
+      'filter.msgType': mayBeMsgTypeList,
     };
 
     while (currentPage <= totalPages) {

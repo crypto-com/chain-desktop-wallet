@@ -20,52 +20,6 @@ export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
 export const MODERATION_CONFIG_FILE_URL =
   'https://raw.githubusercontent.com/crypto-com/chain-desktop-wallet/dev/config/app.moderation.json';
 
-// https://raw.githubusercontent.com/crypto-com/chain-indexing/4c79a3dba2911e738af1d2b2d639f4744c15f58b/usecase/parser/register.go
-export const SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING = [
-  'MsgSend',
-  'MsgMultiSend',
-  'MsgSetWithdrawAddress',
-  'MsgWithdrawDelegatorReward',
-  'MsgWithdrawValidatorCommission',
-  'MsgFundCommunityPool',
-  'MsgSubmitProposal',
-  'MsgVote',
-  'MsgDeposit',
-  'MsgDelegate',
-  'MsgUndelegate',
-  'MsgBeginRedelegate',
-  'MsgCreateValidator',
-  'MsgEditValidator',
-  'MsgUnjail',
-  'MsgIssueDenom',
-  'MsgMintNFT',
-  'MsgTransferNFT',
-  'MsgEditNFT',
-  'MsgBurnNFT',
-  'MsgCreateClient',
-  'MsgUpdateClient',
-  'MsgConnectionOpenInit',
-  'MsgConnectionOpenTry',
-  'MsgConnectionOpenAck',
-  'MsgConnectionOpenConfirm',
-  'MsgChannelOpenInit',
-  'MsgChannelOpenTry',
-  'MsgChannelOpenAck',
-  'MsgChannelOpenConfirm',
-  'MsgRecvPacket',
-  'MsgAcknowledgement',
-  'MsgTimeout',
-  'MsgTimeoutOnClose',
-  'MsgChannelCloseInit',
-  'MsgChannelCloseConfirm',
-  'MsgTransfer',
-  'MsgGrant',
-  'MsgRevoke',
-  'MsgExec',
-  'MsgGrantAllowance',
-  'MsgRevokeAllowance',
-  'MsgCreateVestingAccount',
-];
 
 export const UNBLOCKING_PERIOD_IN_DAYS = {
   UNDELEGATION: {
