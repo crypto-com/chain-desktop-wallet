@@ -425,23 +425,30 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
    * @param userAddress Supports only Crypto.org USER addresses
    * @param optionalMsgTypeName {Optional} Cosmos MsgType Name
    */
-  public async getMessagesByAccountAddress(userAddress: string, optionalMsgTypeName?: string) {
+  public async getMessagesByAccountAddress(userAddress: string, optionalMsgTypeName?: string[]) {
     let currentPage = 1;
     let totalPages = 1;
 
     const queryURL = `accounts/${userAddress}/messages`;
 
-    const isMsgTypeSupported =
-      (optionalMsgTypeName &&
-        SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING.includes(optionalMsgTypeName)) ??
-      false;
+    // const isMsgTypeSupported =
+    //   (optionalMsgTypeName &&
+    //     SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING.includes(optionalMsgTypeName)) ??
+    //   false;
+
+    const optionalMsgTypeNameQuery = optionalMsgTypeName?.filter(msgTypeName => {
+      return SUPPORTED_MSGTYPE_NAMES_CHAIN_INDEXING.includes(msgTypeName);
+    });
 
     const finalMsgList: accountMsgList[] = [];
 
     const requestParams = {
       page: currentPage,
       order: 'height.desc',
-      'filter.msgType': isMsgTypeSupported ? optionalMsgTypeName : undefined,
+      // 'filter.msgType': isMsgTypeSupported ? optionalMsgTypeName : undefined,
+      'filter.msgType': optionalMsgTypeNameQuery?.length
+        ? optionalMsgTypeNameQuery.join(',')
+        : undefined,
     };
 
     while (currentPage <= totalPages) {
