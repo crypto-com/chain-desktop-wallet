@@ -12,7 +12,7 @@
     "@ant-design/icons": "4.6.2",
     "@babel/helper-builder-react-jsx": "7.12.13",
     "@babel/helper-builder-react-jsx-experimental": "7.12.11",
-    "@cosmjs/stargate": "0.24.1",
+    "@cosmjs/stargate": "0.27.0",
     "@crypto-org-chain/chain-jslib": "1.0.3",
     "@ledgerhq/hw-app-eth": "^6.6.0",
     "@ledgerhq/hw-transport-node-hid": "^6.6.0",
