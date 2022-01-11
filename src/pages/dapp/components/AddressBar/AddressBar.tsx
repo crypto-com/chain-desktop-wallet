@@ -6,18 +6,34 @@ import {
 } from '@ant-design/icons';
 import { Button, Input } from 'antd';
 import * as React from 'react';
-import { useState } from 'react';
 import './style.less';
 
-interface IAddressBarProps {
+interface IButtonStates {
   isBackButtonDisabled: boolean;
+
+  isForwardButtonDisabled: boolean;
+
+  isRefreshButtonDisabled: boolean;
+
+  isBookmarkButtonDisabled: boolean;
+  isBookmarkButtonHighlighted: boolean;
+}
+
+interface IAddressBarProps {
+  buttonStates: IButtonStates;
+  buttonCallbacks: {
+    onBackButtonClick: () => void;
+    onForwardButtonClick: () => void;
+    onRefreshButtonClick: () => void;
+    onBookmarkButtonClick: () => void;
+  };
+  value: string;
+  onInputChange: (value: string) => void;
   onSearch: (value: string) => void;
 }
 
 const AddressBar = (props: IAddressBarProps) => {
-  const { isBackButtonDisabled, onSearch } = props;
-
-  const [value, setValue] = useState('');
+  const { buttonStates, value, onSearch, onInputChange, buttonCallbacks } = props;
 
   return (
     <div className="address-bar">
@@ -25,14 +41,27 @@ const AddressBar = (props: IAddressBarProps) => {
         type="link"
         className="button"
         icon={<ArrowLeftOutlined />}
-        disabled={isBackButtonDisabled}
+        disabled={buttonStates.isBackButtonDisabled}
+        onClick={buttonCallbacks.onBackButtonClick}
       />
-      <Button type="link" className="button" icon={<ArrowRightOutlined />} />
-      <Button type="link" className="button" icon={<ReloadOutlined />} />
+      <Button
+        type="link"
+        className="button"
+        icon={<ArrowRightOutlined />}
+        disabled={buttonStates.isForwardButtonDisabled}
+        onClick={buttonCallbacks.onForwardButtonClick}
+      />
+      <Button
+        type="link"
+        className="button"
+        icon={<ReloadOutlined />}
+        disabled={buttonStates.isRefreshButtonDisabled}
+        onClick={buttonCallbacks.onRefreshButtonClick}
+      />
       <Input
         value={value}
         onChange={e => {
-          setValue(e.target.value);
+          onInputChange(e.target.value);
         }}
         className="input"
         onKeyDown={e => {
@@ -41,7 +70,13 @@ const AddressBar = (props: IAddressBarProps) => {
           }
         }}
       />
-      <Button type="link" className="button" icon={<StarOutlined />} />
+      <Button
+        type="link"
+        className="button"
+        icon={<StarOutlined />}
+        disabled={buttonStates.isBookmarkButtonDisabled}
+        onClick={buttonCallbacks.onBookmarkButtonClick}
+      />
     </div>
   );
 };

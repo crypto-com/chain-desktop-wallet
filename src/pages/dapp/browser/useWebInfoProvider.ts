@@ -10,6 +10,7 @@ export const useWebInfoProvider = (props: IWebInfoProviderProps) => {
 
   const [title, setTitle] = useState('');
   const [faviconURL, setFaviconURL] = useState('');
+  const [url, setURL] = useState('');
 
   const setupEvents = useCallback(() => {
     if (!webview) {
@@ -25,11 +26,19 @@ export const useWebInfoProvider = (props: IWebInfoProviderProps) => {
         setFaviconURL(e.favicons[0]);
       }
     });
+
+    webview.addEventListener('load-commit', e => {
+      if (!e.url) {
+        setURL(e.url);
+      } else {
+        setURL(webview.getURL());
+      }
+    });
   }, [webview]);
 
   useEffect(() => {
     setupEvents();
   }, [setupEvents]);
 
-  return { title, faviconURL };
+  return { title, faviconURL, url };
 };

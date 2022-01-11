@@ -12,6 +12,7 @@ import logoTectonic from './assets/tectonic.svg';
 import AddressBar from './components/AddressBar/AddressBar';
 import SavedTab from './components/Tabs/SavedTab';
 import { isValidURL } from '../../utils/utils';
+import { IWebviewNavigationState, WebviewState } from './browser/useWebviewStatusInfo';
 
 const { Header, Content } = Layout;
 const { TabPane } = Tabs;
@@ -76,11 +77,39 @@ const DappPage = () => {
   }, [selectedDapp]);
 
   const shouldShowBrowser = selectedDapp || selectedURL?.length > 0;
+  const [addressBarValue, setAddressBarValue] = useState('');
+
+  const [webviewState, setWebviewState] = useState<WebviewState>();
+  const [webviewNavigationState, setWebviewNavigationState] = useState<IWebviewNavigationState>();
+
+  useEffect(() => {
+    console.log('webviewState', webviewState);
+  }, [webviewState]);
 
   return (
     <Layout className="site-layout">
       <AddressBar
-        isBackButtonDisabled={false}
+        value={addressBarValue}
+        onInputChange={value => setAddressBarValue(value)}
+        buttonStates={{
+          isBackButtonDisabled: webviewNavigationState?.canGoBack === false,
+          isForwardButtonDisabled: webviewNavigationState?.canGoForward === false,
+          isRefreshButtonDisabled: webviewNavigationState?.canRefresh === false,
+          isBookmarkButtonDisabled: false,
+          isBookmarkButtonHighlighted: false,
+        }}
+        buttonCallbacks={{
+          onBackButtonClick: () => {
+            browserRef.current?.goBack();
+          },
+          onForwardButtonClick: () => {
+            browserRef.current?.goForward();
+          },
+          onRefreshButtonClick: () => {
+            browserRef.current?.reload();
+          },
+          onBookmarkButtonClick: () => {},
+        }}
         onSearch={value => {
           setSelectedDapp(undefined);
           // detect whether it's a domain
@@ -98,9 +127,12 @@ const DappPage = () => {
           dapp={selectedDapp}
           dappURL={selectedURL}
           ref={browserRef}
-          onStateChange={state => {
-            // eslint-disable-next-line no-console
-            console.log('DappBrowser state change', state);
+          onStateChange={(state, navState) => {
+            setWebviewState(state);
+            setWebviewNavigationState(navState);
+          }}
+          onURLChanged={url => {
+            setAddressBarValue(url);
           }}
         />
       ) : (

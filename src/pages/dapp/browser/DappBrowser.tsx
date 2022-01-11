@@ -17,14 +17,19 @@ import packageJson from '../../../../package.json';
 import { walletService } from '../../../service/WalletService';
 import { useRefCallback } from './useRefCallback';
 import { useWebInfoProvider } from './useWebInfoProvider';
-import { useWebviewStatusInfo, WebviewState } from './useWebviewStatusInfo';
+import {
+  IWebviewNavigationState,
+  useWebviewStatusInfo,
+  WebviewState,
+} from './useWebviewStatusInfo';
 
 // use **only** one of the following
 // priority: dapp > dappURL
 interface DappBrowserProps {
   dapp?: Dapp;
   dappURL?: string;
-  onStateChange?: (state: WebviewState) => void;
+  onStateChange?: (state: WebviewState, navigationState: IWebviewNavigationState) => void;
+  onURLChanged?: (url: string) => void;
 }
 
 export interface DappBrowserRef {
@@ -34,7 +39,7 @@ export interface DappBrowserRef {
 }
 
 const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBrowserProps, ref) => {
-  const { dapp, dappURL, onStateChange } = props;
+  const { dapp, dappURL, onStateChange, onURLChanged } = props;
   const webviewRef = useRef<WebviewTag & HTMLWebViewElement>(null);
   const [t] = useTranslation();
   const allAssets = useRecoilValue(walletAllAssetsState);
@@ -73,15 +78,25 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     onSuccess(cronosAsset?.address!);
   });
 
-  const { title: providedTitle, faviconURL: providedFaviconURL } = useWebInfoProvider({
+  const {
+    title: providedTitle,
+    faviconURL: providedFaviconURL,
+    url: providedURL,
+  } = useWebInfoProvider({
     webview: webviewRef.current,
   });
 
-  const { state: webviewState } = useWebviewStatusInfo({ webview: webviewRef.current });
+  const { state: webviewState, navigationState } = useWebviewStatusInfo({
+    webview: webviewRef.current,
+  });
 
   useEffect(() => {
-    onStateChange?.(webviewState);
-  }, [webviewState]);
+    onURLChanged?.(providedURL);
+  }, [providedURL]);
+
+  useEffect(() => {
+    onStateChange?.(webviewState, navigationState);
+  }, [webviewState, navigationState]);
 
   const pageDapp = useMemo(() => {
     const pageURL = dapp ? dapp.url : addHTTPsPrefixIfNeeded(dappURL!);

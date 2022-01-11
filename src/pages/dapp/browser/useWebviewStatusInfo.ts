@@ -6,10 +6,21 @@ export interface IWebviewStatusInfoProps {
 }
 export type WebviewState = 'idle' | 'loading' | 'loaded' | 'error';
 
+export interface IWebviewNavigationState {
+  canGoBack: boolean;
+  canGoForward: boolean;
+  canRefresh: boolean;
+}
+
 export const useWebviewStatusInfo = (props: IWebviewStatusInfoProps) => {
   const { webview } = props;
 
   const [state, setState] = useState<WebviewState>('idle');
+  const [navigationState, setNavigationState] = useState<IWebviewNavigationState>({
+    canGoBack: false,
+    canGoForward: false,
+    canRefresh: false,
+  });
 
   const setupEvents = useCallback(() => {
     if (!webview) {
@@ -18,14 +29,29 @@ export const useWebviewStatusInfo = (props: IWebviewStatusInfoProps) => {
 
     webview.addEventListener('did-start-loading', () => {
       setState('loading');
+      setNavigationState({
+        canGoBack: webview.canGoBack(),
+        canGoForward: webview.canGoForward(),
+        canRefresh: false,
+      });
     });
 
     webview.addEventListener('did-finish-load', () => {
       setState('loaded');
+      setNavigationState({
+        canGoBack: webview.canGoBack(),
+        canGoForward: webview.canGoForward(),
+        canRefresh: true,
+      });
     });
 
     webview.addEventListener('did-fail-load', () => {
       setState('error');
+      setNavigationState({
+        canGoBack: webview.canGoBack(),
+        canGoForward: webview.canGoForward(),
+        canRefresh: true,
+      });
     });
   }, [webview]);
 
@@ -33,5 +59,5 @@ export const useWebviewStatusInfo = (props: IWebviewStatusInfoProps) => {
     setupEvents();
   }, [setupEvents]);
 
-  return { state };
+  return { state, navigationState };
 };
