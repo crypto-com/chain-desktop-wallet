@@ -16,8 +16,6 @@ import { TransactionDataParser } from './TransactionDataParser';
 import { ErrorHandler, WebView } from './types';
 import { useRefCallback } from './useRefCallback';
 
-const { shell } = window.require('electron');
-
 interface IUseIPCProviderProps {
   webview: WebView | null;
   onRequestAddress: (onSuccess: (address: string) => void, onError: ErrorHandler) => void;
@@ -406,7 +404,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
 
     webview.addEventListener('new-window', e => {
       e.preventDefault();
-      shell.openExternal(e.url);
+      webview.loadURL(e.url);
     });
 
     webview.addEventListener('did-finish-load', () => {

@@ -11,6 +11,7 @@ import logoVvs from './assets/vvs.svg';
 import logoTectonic from './assets/tectonic.svg';
 import AddressBar from './components/AddressBar/AddressBar';
 import SavedTab from './components/Tabs/SavedTab';
+import { isValidURL } from '../../utils/utils';
 
 const { Header, Content } = Layout;
 const { TabPane } = Tabs;
@@ -60,6 +61,7 @@ const TabKey = { popular: 'popular', saved: 'saved' };
 const DappPage = () => {
   const setPageLock = useSetRecoilState(pageLockState);
   const [selectedDapp, setSelectedDapp] = useState<Dapp>();
+  const [selectedURL, setSelectedURL] = useState('');
   const [t] = useTranslation();
   const browserRef = useRef<DappBrowserRef>(null);
 
@@ -73,12 +75,28 @@ const DappPage = () => {
     }
   }, [selectedDapp]);
 
+  const shouldShowBrowser = selectedDapp || selectedURL?.length > 0;
+
   return (
     <Layout className="site-layout">
-      <AddressBar isBackButtonDisabled={false} />
-      {selectedDapp ? (
+      <AddressBar
+        isBackButtonDisabled={false}
+        onSearch={value => {
+          setSelectedDapp(undefined);
+          // detect whether it's a domain
+          if (isValidURL(value)) {
+            // jump to website
+            setSelectedURL(value);
+          } else {
+            // google search
+            setSelectedURL(`http://www.google.com/search?q=${value}`);
+          }
+        }}
+      />
+      {shouldShowBrowser ? (
         <DappBrowser
           dapp={selectedDapp}
+          dappURL={selectedURL}
           ref={browserRef}
           onStateChange={state => {
             // eslint-disable-next-line no-console

@@ -7,7 +7,7 @@ import Web3 from 'web3';
 import { setTimeout } from 'timers';
 import { useIPCProvider } from './useIPCProvider';
 import { allMarketState, sessionState, walletAllAssetsState } from '../../../recoil/atom';
-import { getCronosAsset } from '../../../utils/utils';
+import { addHTTPsPrefixIfNeeded, getCronosAsset } from '../../../utils/utils';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
 import RequestConfirmation from '../components/RequestConfirmation/RequestConfirmation';
 import { secretStoreService } from '../../../storage/SecretStoreService';
@@ -84,7 +84,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   }, [webviewState]);
 
   const pageDapp = useMemo(() => {
-    const pageURL = dapp ? dapp.url : dappURL!;
+    const pageURL = dapp ? dapp.url : addHTTPsPrefixIfNeeded(dappURL!);
     const pageTitle = dapp ? dapp.name : providedTitle;
     const pageFavicon = dapp ? dapp.logo : providedFaviconURL;
     const app: Dapp = dapp ?? {
