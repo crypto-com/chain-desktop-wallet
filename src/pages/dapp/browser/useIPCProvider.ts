@@ -27,7 +27,7 @@ interface IUseIPCProviderProps {
   onRequestAddress: (onSuccess: (address: string) => void, onError: ErrorHandler) => void;
   onRequestTokenApproval: (
     event: DappBrowserIPC.TokenApprovalEvent,
-    onSuccess: (amount: string) => void,
+    onSuccess: (passphrase: string) => void,
     onError: ErrorHandler,
   ) => void;
   onRequestSendTransaction: (
@@ -65,6 +65,7 @@ interface IUseIPCProviderProps {
     onSuccess: () => void,
     onError: ErrorHandler,
   ) => Promise<void>;
+  onFinishTransaction: () => void;
 }
 
 export function useRefCallback(fn: Function) {
@@ -74,7 +75,7 @@ export function useRefCallback(fn: Function) {
 }
 
 export const useIPCProvider = (props: IUseIPCProviderProps) => {
-  const { webview } = props;
+  const { webview, onFinishTransaction } = props;
 
   const transactionPrepareService = new TransactionPrepareService(walletService.storageService);
   const allAssets = useRecoilValue(walletAllAssetsState);
@@ -138,6 +139,62 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     sendResponses(id, [address]);
   });
 
+  const handleTokenApproval = useRefCallback(
+    async (event: DappBrowserIPC.TokenApprovalEvent, passphrase: string) => {
+      const prepareTXConfig: TransactionConfig = {
+        from: event.object.from,
+        to: event.object.to,
+      };
+
+      const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
+        cronosAsset!,
+        prepareTXConfig,
+      );
+
+      const data = evmTransactionSigner.encodeTokenApprovalABI(
+        event.object.tokenData.contractAddress,
+        event.object.spender,
+        ethers.constants.MaxUint256,
+      );
+
+      const txConfig: EVMContractCallUnsigned = {
+        from: event.object.from,
+        contractAddress: event.object.to,
+        data,
+        gasLimit: String(event.object.gas),
+        gasPrice: event.object.gasPrice,
+        nonce: prepareTxInfo.nonce,
+      };
+      try {
+        const result = await evmTransactionSigner.sendContractCallTransaction(
+          txConfig,
+          passphrase,
+          ChainConfig.RpcUrl,
+        );
+
+        sendResponse(event.id, result);
+      } catch (error) {
+        sendError(event.id, 'Transaction failed');
+      }
+
+      onFinishTransaction();
+    },
+  );
+
+  const getGasPrice = async (event: DappBrowserIPC.SendTransactionEvent) => {
+    const prepareTXConfig: TransactionConfig = {
+      from: event.object.from,
+      to: event.object.to,
+    };
+
+    const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
+      cronosAsset!,
+      prepareTXConfig,
+    );
+
+    return Web3.utils.toHex(prepareTxInfo.loadedGasPrice);
+  };
+
   const handleSendTransaction = useRefCallback(
     async (event: DappBrowserIPC.SendTransactionEvent, passphrase: string) => {
       const prepareTXConfig: TransactionConfig = {
@@ -156,15 +213,22 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         data: event.object.data,
         gasLimit: String(event.object.gas),
         gasPrice: event.object.gasPrice,
+        value: event.object.value,
         nonce: prepareTxInfo.nonce,
       };
-      const result = await evmTransactionSigner.sendContractCallTransaction(
-        txConfig,
-        passphrase,
-        ChainConfig.RpcUrl,
-      );
 
-      sendResponse(event.id, result);
+      try {
+        const result = await evmTransactionSigner.sendContractCallTransaction(
+          txConfig,
+          passphrase,
+          ChainConfig.RpcUrl,
+        );
+        sendResponse(event.id, result);
+      } catch (error) {
+        sendError(event.id, 'Transaction failed');
+      }
+
+      onFinishTransaction();
     },
   );
 
@@ -221,24 +285,33 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'signTransaction':
           // parse transaction data
 
+          // gasPrice maybe missing (eg. Tectonic)
+          if (!event.object?.gasPrice) {
+            event.object.gasPrice = await getGasPrice(event);
+          }
+
           if (event.object.data.startsWith('0x095ea7b3')) {
             const response = await transactionDataParser.parseTokenApprovalData(
               event.object.to,
               event.object.data,
             );
-            props.onRequestTokenApproval(
-              {
-                name: 'tokenApproval',
-                id: event.id,
-                object: {
-                  tokenData: response.tokenData,
-                  amount: response.amount,
-                  gas: event.object.gas,
-                  gasPrice: event.object.gasPrice,
-                },
+            const approvalEvent: DappBrowserIPC.TokenApprovalEvent = {
+              name: 'tokenApproval',
+              id: event.id,
+              object: {
+                tokenData: response.tokenData,
+                amount: response.amount,
+                gas: event.object.gas,
+                gasPrice: event.object.gasPrice,
+                from: event.object.from,
+                spender: response.spender,
+                to: event.object.to,
               },
-              () => {
-                // TODO: deal with amount
+            };
+            props.onRequestTokenApproval(
+              approvalEvent,
+              passphrase => {
+                handleTokenApproval.current(approvalEvent, passphrase);
               },
               reason => {
                 sendError(event.id, reason);

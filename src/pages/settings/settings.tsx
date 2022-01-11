@@ -60,6 +60,8 @@ import { UserAsset, UserAssetConfig, UserAssetType } from '../../models/UserAsse
 import AddressBook from './tabs/AddressBook/AddressBook';
 import { getChainName } from '../../utils/utils';
 
+const { ipcRenderer } = window.require('electron');
+
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -841,11 +843,12 @@ const FormSettings = () => {
 
   const onConfirmClear = () => {
     setIsButtonLoading(true);
-    indexedDB.deleteDatabase('NeDB');
-    setTimeout(() => {
-      history.replace('/');
-      history.go(0);
-    }, 2000);
+    const deleteDBRequest = indexedDB.deleteDatabase('NeDB');
+    deleteDBRequest.onsuccess = () => {
+      setTimeout(() => {
+        ipcRenderer.send('restart_app');
+      }, 2000);
+    };
   };
 
   return (

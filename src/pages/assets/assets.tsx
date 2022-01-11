@@ -5,8 +5,8 @@ import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import './assets.less';
 import 'antd/dist/antd.css';
-import { Layout, Table, Avatar, Tabs, Tag, Typography, Dropdown, Menu } from 'antd';
-import { ArrowLeftOutlined, MoreOutlined } from '@ant-design/icons';
+import { Layout, Table, Avatar, Tabs, Tag, Typography, Dropdown, Menu, Tooltip, Alert } from 'antd';
+import { ArrowLeftOutlined, ExclamationCircleOutlined, MoreOutlined } from '@ant-design/icons';
 import {
   sessionState,
   allMarketState,
@@ -168,13 +168,18 @@ const AssetsPage = () => {
       // dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
-      render: record => {
+      render: (record: UserAsset) => {
         const { symbol } = record;
 
         return (
           <div className="name">
             {assetIcon(record)}
             {symbol}
+            {record.isWhitelisted === false && (
+              <Tooltip title={t('assets.whitelist.warning')}>
+                <ExclamationCircleOutlined style={{ color: '#ff4d4f', marginLeft: '6px' }} />
+              </Tooltip>
+            )}
           </div>
         );
       },
@@ -413,6 +418,14 @@ const AssetsPage = () => {
                         </div>
                       </Content>
                     </Layout>
+                    {currentAsset?.isWhitelisted === false && (
+                      <Alert
+                        message={t('assets.whitelist.warning')}
+                        type="error"
+                        showIcon
+                        icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
+                      />
+                    )}
                   </div>
                   <Tabs
                     activeKey={activeAssetTab}

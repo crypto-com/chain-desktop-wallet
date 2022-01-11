@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.6.3] - 2021-12-23
+### Bug fixes
+- Hide misleading transaction fee on CRC20 tokens
+
+## [v0.6.2] - 2021-12-23
+### Bug fixes
+- Fix irresponsive transactions when insufficient balance for fee on DApp Browser
+- Fix balance not updated after transactions are made on DApp Browser
+
+## [v0.6.1] - 2021-12-21
+### Bug fixes
+- Sync Cronos settings on all CRC20 tokens
+- Fix clear storage failure
+- Fix DApp Browser support on Windows
+- Fix TokenApproval & SendTransaction issue on DApp Browser
+
+## [v0.6.0] - 2021-12-15
+
+### Additions
+- Add CRC20 Tokens support
+- Add DApp Browser support on VVS Finance
+
 ## [v0.5.8] - 2021-12-07
 
 ### Additions

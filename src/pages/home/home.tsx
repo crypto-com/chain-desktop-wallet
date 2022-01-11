@@ -2,8 +2,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Button, Layout, notification, Table, Tabs, Card, List, Avatar, Tag } from 'antd';
-import { SyncOutlined } from '@ant-design/icons';
+import { Button, Layout, notification, Table, Tabs, Card, List, Avatar, Tag, Tooltip } from 'antd';
+import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
 import Big from 'big.js';
@@ -100,12 +100,17 @@ const HomePage = () => {
       // dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
-      render: record => {
+      render: (record: UserAsset) => {
         const { symbol } = record;
         return (
           <div className="name">
             {assetIcon(record)}
             {symbol}
+            {record.isWhitelisted === false && (
+              <Tooltip title={t('assets.whitelist.warning')}>
+                <ExclamationCircleOutlined style={{ color: '#ff4d4f', marginLeft: '6px' }} />
+              </Tooltip>
+            )}
           </div>
         );
       },
@@ -289,7 +294,7 @@ const HomePage = () => {
           size="small"
           className="btn-restart"
           onClick={() => {
-            ipcRenderer.send('restart_app');
+            ipcRenderer.send('auto_updater_restart_app');
             notification.close(newVersionNotificationKey);
           }}
           style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}

@@ -1,10 +1,11 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Drawer, Layout } from 'antd';
 import BigNumber from 'bignumber.js';
 import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import './RequestConfirmation.less';
 
+import { useRecoilState } from 'recoil';
 import {
   AssetMarketPrice,
   getAssetAmountInFiat,
@@ -17,6 +18,8 @@ import { SupportedChainName, SUPPORTED_CURRENCY } from '../../../../config/Stati
 import { Dapp, DappBrowserIPC } from '../../types';
 
 import { middleEllipsis, hexToUtf8, getAssetBySymbolAndChain } from '../../../../utils/utils';
+import { walletService } from '../../../../service/WalletService';
+import { walletAllAssetsState } from '../../../../recoil/atom';
 
 const { Content, Footer } = Layout;
 
@@ -24,23 +27,12 @@ interface RequestConfirmationProps {
   event: DappBrowserIPC.Event;
   cronosAsset: UserAsset | undefined;
   allMarketData: Map<string, AssetMarketPrice>;
-  allAssets: UserAsset[];
   currentSession: Session;
   wallet: Wallet;
   visible: boolean;
   dapp?: Dapp;
-  decryptedPhrase: string;
-  confirmTxCallback:
-    | {
-        successCallback: Function;
-        errorCallback: Function;
-      }
-    | undefined;
-  setConfirmTxCallback: Dispatch<
-    SetStateAction<{ successCallback: Function; errorCallback: Function } | undefined>
-  >;
-  setRequestConfirmationVisible: Dispatch<SetStateAction<boolean>>;
-  onClose: (e: any) => void;
+  onConfirm: () => void;
+  onCancel: () => void;
 }
 
 const RequestConfirmation = (props: RequestConfirmationProps) => {
@@ -48,16 +40,12 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     event,
     cronosAsset,
     allMarketData,
-    allAssets,
     currentSession,
     wallet,
     visible,
     dapp,
-    decryptedPhrase,
-    confirmTxCallback,
-    setConfirmTxCallback,
-    setRequestConfirmationVisible,
-    onClose,
+    onConfirm,
+    onCancel,
   } = props;
 
   const [message, setMessage] = useState('');
@@ -65,7 +53,19 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(cronosAsset);
   const [isContractAddressReview, setIsContractAddressReview] = useState(false);
 
+  const [allAssets, setAllAssets] = useRecoilState(walletAllAssetsState);
+
   const [t] = useTranslation();
+
+  useEffect(() => {
+    const fetch = async () => {
+      const sessionData = await walletService.retrieveCurrentSession();
+      await walletService.syncBalancesData(sessionData);
+      const assets = await walletService.retrieveCurrentWalletAssets(sessionData);
+      setAllAssets(assets);
+    };
+    fetch();
+  }, []);
 
   const eventViewToRender = (_event: DappBrowserIPC.Event) => {
     if (_event.name === 'signTransaction') {
@@ -218,10 +218,10 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       );
       setCurrentAsset(asset ?? cronosAsset);
     }
-  }, [event]);
+  }, [event, allAssets]);
 
   return (
-    <Drawer visible={visible} className="request-confirmation" onClose={onClose}>
+    <Drawer visible={visible} className="request-confirmation" onClose={onCancel}>
       <Layout>
         <Content>
           {dapp && (
@@ -248,18 +248,10 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
         </Content>
         <Footer>
           <div className="row">
-            <Button type="link" htmlType="button" onClick={onClose}>
+            <Button type="link" htmlType="button" onClick={onCancel}>
               {t('general.reject')}
             </Button>
-            <Button
-              type="primary"
-              htmlType="submit"
-              onClick={() => {
-                confirmTxCallback?.successCallback(decryptedPhrase);
-                setConfirmTxCallback(undefined);
-                setRequestConfirmationVisible(false);
-              }}
-            >
+            <Button type="primary" htmlType="submit" onClick={onConfirm}>
               {t('general.confirm')}
             </Button>
           </div>

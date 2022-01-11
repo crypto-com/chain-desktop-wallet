@@ -69,6 +69,8 @@ export interface UserAsset {
   // CRC20/ERC20 assets should have a contract address persisted along side them.
   // This will be used later for all actions interacting with the token like tokens transfers, etc, ...
   contractAddress?: string;
+
+  isWhitelisted?: boolean;
 }
 
 export enum UserAssetType {

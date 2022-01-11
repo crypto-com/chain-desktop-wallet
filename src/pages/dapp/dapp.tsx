@@ -8,6 +8,7 @@ import DappBrowser from './browser/DappBrowser';
 import { Dapp } from './types';
 import BorderlessCard from './components/BorderlessCard/BorderlessCard';
 import logoVvs from './assets/vvs.svg';
+import logoTectonic from './assets/tectonic.svg';
 
 const { Header, Content } = Layout;
 
@@ -19,6 +20,14 @@ const DappList: Dapp[] = [
     description:
       'Your gateway to the decentralized finance movement. Take control of your finances and earn sparkly VVS rewards.',
     url: 'https://vvs.finance',
+  },
+  {
+    name: 'Tectonic',
+    logo: logoTectonic,
+    alt: 'tectonic-logo',
+    description:
+      'Tectonic is a cross-chain money market for earning passive yield and accessing instant backed loans.',
+    url: 'https://app.tectonic.finance/',
   },
   // {
   //   name: 'Cronos Chimp Club',
