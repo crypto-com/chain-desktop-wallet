@@ -466,7 +466,9 @@ export class NodeRpcService implements INodeRpcService {
       .filter(v => v.status === 'BOND_STATUS_BONDED')
       .filter(v => !v.jailed)
       .filter(v => !!activeValidators[v.pubKey.value])
-      .sort((v1, v2) => Big(v2.currentShares).cmp(Big(v1.currentShares)))
+      // Sort by Lowest voting power, and then Lowest commission
+      .sort((v1, v2) => Big(v1.currentCommissionRate).cmp(Big(v2.currentCommissionRate)))
+      .sort((v1, v2) => Big(v1.currentShares).cmp(Big(v2.currentShares)))
       .slice(0, MAX_VALIDATOR_LOAD);
 
     let totalShares = new Big(0);

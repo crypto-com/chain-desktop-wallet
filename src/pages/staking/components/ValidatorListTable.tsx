@@ -5,7 +5,10 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { FormInstance, Table, Tooltip } from 'antd';
 import numeral from 'numeral';
 
-import { CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD } from '../../../config/StaticConfig';
+import {
+  VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+  VALIDATOR_UPTIME_THRESHOLD,
+} from '../../../config/StaticConfig';
 import { ellipsis, middleEllipsis } from '../../../utils/utils';
 import { renderExplorerUrl } from '../../../models/Explorer';
 import { ValidatorModel } from '../../../models/Transaction';
@@ -81,8 +84,8 @@ const ValidatorListTable = (props: {
       title: t('staking.validatorList.table.currentTokens'),
       dataIndex: 'currentTokens',
       key: 'currentTokens',
-      sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
-      defaultSortOrder: 'descend' as any,
+      // sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
+      // defaultSortOrder: 'descend' as any,
       render: currentTokens => {
         return (
           <span>
@@ -97,7 +100,7 @@ const ValidatorListTable = (props: {
       // dataIndex: 'cumulativeShares',
       key: 'cumulativeShares',
       // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
-      defaultSortOrder: 'descend' as any,
+      // defaultSortOrder: 'descend' as any,
       render: record => {
         return (
           <>
@@ -114,7 +117,7 @@ const ValidatorListTable = (props: {
       title: t('staking.validatorList.table.currentCommissionRate'),
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
-      sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
+      // sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
       render: currentCommissionRate => (
         <span>{new Big(currentCommissionRate).times(100).toFixed(2)}%</span>
       ),
@@ -122,7 +125,7 @@ const ValidatorListTable = (props: {
     {
       title: t('staking.validatorList.table.validatorApy'),
       key: 'apy',
-      sorter: (a, b) => new Big(a.apy).cmp(new Big(b.apy)),
+      // sorter: (a, b) => new Big(a.apy).cmp(new Big(b.apy)),
       render: record => {
         return <span>{new Big(record.apy).times(100).toFixed(2)}%</span>;
       },
@@ -130,7 +133,7 @@ const ValidatorListTable = (props: {
     {
       title: t('staking.validatorList.table.validatorUptime'),
       key: 'uptime',
-      sorter: (a, b) => new Big(a.uptime).cmp(new Big(b.uptime)),
+      // sorter: (a, b) => new Big(a.uptime).cmp(new Big(b.uptime)),
       render: record => {
         return <span>{new Big(record.uptime).times(100).toFixed(2)}%</span>;
       },
@@ -166,7 +169,7 @@ const ValidatorListTable = (props: {
       return validatorList.map((validator, idx) => {
         if (
           new Big(validator.cumulativeSharesIncludePercentage!).gte(
-            CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+            VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
           ) &&
           !displayedWarningColumn
         ) {
@@ -230,9 +233,12 @@ const ValidatorListTable = (props: {
       }}
       rowClassName={record => {
         const greyBackground =
-          new Big(record.cumulativeSharesIncludePercentage!).lte(
-            CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
-          ) || record.displayWarningColumn;
+          Big(record.uptime ?? '0').lt(VALIDATOR_UPTIME_THRESHOLD) ||
+          isValidatorAddressSuspicious(record.validatorAddress, moderationConfig);
+        // new Big(record.cumulativeSharesIncludePercentage!).lte(
+        //   VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+        // )
+        // || record.displayWarningColumn;
         return greyBackground ? 'grey-background' : '';
       }}
       defaultExpandAllRows
