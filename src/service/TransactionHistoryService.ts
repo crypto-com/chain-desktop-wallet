@@ -359,6 +359,8 @@ export class TransactionHistoryService {
     const indexingUrl =
       currentAsset?.config?.indexingUrl || currentSession.wallet.config.indexingUrl;
 
+    const defaultTxType = 'transfer';
+
     switch (currentAsset.assetType) {
       case UserAssetType.TENDERMINT:
       case UserAssetType.IBC:
@@ -409,10 +411,11 @@ export class TransactionHistoryService {
               assetId: currentAsset.identifier,
               assetType: currentAsset.assetType,
               txHash: evmTx.hash,
-              txType: "transfer",
-              // messageTypeName: "transfer",
+              txType: defaultTxType,
               txData: transferTx,
-            }
+              // TODO: add messageTypeName
+              // messageTypeName: 'transfer',
+            };
 
             return transferTxRecord;
           });
@@ -461,10 +464,11 @@ export class TransactionHistoryService {
               assetId: currentAsset.identifier,
               assetType: currentAsset.assetType,
               txHash: crc20TokenTx.hash,
-              txType: "transfer",
-              // messageTypeName: "transfer",
+              txType: defaultTxType,
               txData: transferTx,
-            }
+              // TODO: add messageTypeName
+              // messageTypeName: 'transfer',
+            };
 
             return transferTxRecord;
           });
