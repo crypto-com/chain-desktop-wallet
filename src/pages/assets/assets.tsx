@@ -49,6 +49,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 // import logoCro from '../../assets/AssetLogo/cro.png';
 import ReceiveDetail from './components/ReceiveDetail';
 import TransactionDetail from './components/TransactionDetail';
+import TagMsgType from './components/TagMsgType';
 import FormSend from './components/FormSend';
 import { walletService } from '../../service/WalletService';
 import { getChainName, middleEllipsis } from '../../utils/utils';
@@ -355,11 +356,7 @@ const AssetsPage = () => {
             dataIndex: 'msgTypeName',
             key: 'msgTypeName',
             render: text => {
-              return (
-                <Tag style={{ border: 'none', padding: '5px 14px' }} color="blue">
-                  {text}
-                </Tag>
-              );
+              return <TagMsgType msgTypeName={text} />;
             },
           },
         ]
