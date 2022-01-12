@@ -48,6 +48,7 @@ import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 // import logoCro from '../../assets/AssetLogo/cro.png';
 import ReceiveDetail from './components/ReceiveDetail';
+import TransactionDetail from './components/TransactionDetail';
 import FormSend from './components/FormSend';
 import { walletService } from '../../service/WalletService';
 import { getChainName, middleEllipsis } from '../../utils/utils';
@@ -57,7 +58,7 @@ const { Sider, Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
-interface TransactionTabularData {
+export interface TransactionTabularData {
   key: string;
   assetType: UserAssetType;
   transactionHash: string;
@@ -441,243 +442,6 @@ const AssetsPage = () => {
     },
   ];
 
-  const renderTransactionDetail = (record: TransactionTabularData) => {
-    if (record.assetType !== UserAssetType.TENDERMINT) {
-      return (
-        <div className="transaction-detail">
-          <div className="row">
-            <div className="field">From: </div>
-            <div className="value">
-              <a
-                data-original={record.senderAddress}
-                target="_blank"
-                rel="noreferrer"
-                href={`${renderExplorerUrl(
-                  session.activeAsset?.config ?? session.wallet.config,
-                  'address',
-                )}/${record.senderAddress}`}
-              >
-                {record.senderAddress}
-              </a>
-            </div>
-          </div>
-          <div className="row">
-            <div className="field">To: </div>
-            <div className="value">
-              <a
-                data-original={record.recipientAddress}
-                target="_blank"
-                rel="noreferrer"
-                href={`${renderExplorerUrl(
-                  session.activeAsset?.config ?? session.wallet.config,
-                  'address',
-                )}/${record.recipientAddress}`}
-              >
-                {record.recipientAddress}
-              </a>
-            </div>
-          </div>
-          <div className="row">
-            <div className="field">Amount: </div>
-            <div className="value">{record.amount}</div>
-          </div>
-        </div>
-      );
-    }
-    switch (record.msgTypeName) {
-      case 'MsgSend':
-        return (
-          <div className="transaction-detail">
-            <div className="row">
-              <div className="field">From: </div>
-              <div className="value">
-                <a
-                  data-original={record.senderAddress}
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`${renderExplorerUrl(
-                    session.activeAsset?.config ?? session.wallet.config,
-                    'address',
-                  )}/${record.senderAddress}`}
-                >
-                  {record.senderAddress}
-                </a>
-              </div>
-            </div>
-            <div className="row">
-              <div className="field">To: </div>
-              <div className="value">
-                <a
-                  data-original={record.recipientAddress}
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`${renderExplorerUrl(
-                    session.activeAsset?.config ?? session.wallet.config,
-                    'address',
-                  )}/${record.recipientAddress}`}
-                >
-                  {record.recipientAddress}
-                </a>
-              </div>
-            </div>
-            <div className="row">
-              <div className="field">Amount: </div>
-              <div className="value">{record.amount}</div>
-            </div>
-          </div>
-        );
-      case 'MsgWithdrawDelegatorReward':
-        return (
-          <div className="transaction-detail">
-            <div className="row">
-              <div className="field">Validator: </div>
-              <div className="value">
-                <a
-                  data-original={record.validatorAddress}
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`${renderExplorerUrl(
-                    session.activeAsset?.config ?? session.wallet.config,
-                    'validator',
-                  )}/${record.validatorAddress}`}
-                >
-                  {record.validatorAddress}
-                </a>
-              </div>
-            </div>
-            <div className="row">
-              <div className="field">Delegator: </div>
-              <div className="value">
-                <a
-                  data-original={record.delegatorAddress}
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`${renderExplorerUrl(
-                    session.activeAsset?.config ?? session.wallet.config,
-                    'address',
-                  )}/${record.delegatorAddress}`}
-                >
-                  {record.delegatorAddress}
-                </a>
-              </div>
-            </div>
-            <div className="row">
-              <div className="field">Recipient: </div>
-              <div className="value">
-                <a
-                  data-original={record.recipientAddress}
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`${renderExplorerUrl(
-                    session.activeAsset?.config ?? session.wallet.config,
-                    'address',
-                  )}/${record.recipientAddress}`}
-                >
-                  {record.recipientAddress}
-                </a>
-              </div>
-            </div>
-            <div className="row">
-              <div className="field">Amount: </div>
-              <div className="value">{record.amount}</div>
-            </div>
-          </div>
-        );
-      case 'MsgDelegate':
-        return (
-          <div className="transaction-detail">
-            <div className="row">
-              <div className="field">Validator: </div>
-              <div className="value">
-                <a
-                  data-original={record.validatorAddress}
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`${renderExplorerUrl(
-                    session.activeAsset?.config ?? session.wallet.config,
-                    'validator',
-                  )}/${record.validatorAddress}`}
-                >
-                  {record.validatorAddress}
-                </a>
-              </div>
-            </div>
-            <div className="row">
-              <div className="field">Delegator: </div>
-              <div className="value">
-                <a
-                  data-original={record.delegatorAddress}
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`${renderExplorerUrl(
-                    session.activeAsset?.config ?? session.wallet.config,
-                    'address',
-                  )}/${record.delegatorAddress}`}
-                >
-                  {record.delegatorAddress}
-                </a>
-              </div>
-            </div>
-            <div className="row">
-              <div className="field">Amount: </div>
-              <div className="value">{record.amount}</div>
-            </div>
-            <div className="row">
-              <div className="field">Auto Claimed Rewards: </div>
-              <div className="value">{record.autoClaimedRewards}</div>
-            </div>
-          </div>
-        );
-      case 'MsgUndelegate':
-        return (
-          <div className="transaction-detail">
-            <div className="row">
-              <div className="field">Validator: </div>
-              <div className="value">
-                <a
-                  data-original={record.validatorAddress}
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`${renderExplorerUrl(
-                    session.activeAsset?.config ?? session.wallet.config,
-                    'validator',
-                  )}/${record.validatorAddress}`}
-                >
-                  {record.validatorAddress}
-                </a>
-              </div>
-            </div>
-            <div className="row">
-              <div className="field">Delegator: </div>
-              <div className="value">
-                <a
-                  data-original={record.delegatorAddress}
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`${renderExplorerUrl(
-                    session.activeAsset?.config ?? session.wallet.config,
-                    'address',
-                  )}/${record.delegatorAddress}`}
-                >
-                  {record.delegatorAddress}
-                </a>
-              </div>
-            </div>
-            <div className="row">
-              <div className="field">Amount: </div>
-              <div className="value">{record.amount}</div>
-            </div>
-            <div className="row">
-              <div className="field">Auto Claimed Rewards: </div>
-              <div className="value">{record.autoClaimedRewards}</div>
-            </div>
-          </div>
-        );
-      default:
-        return <></>;
-    }
-  };
-
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">{t('assets.title')}</Header>
@@ -805,7 +569,9 @@ const AssetsPage = () => {
                           spinning: fetchingComoponent,
                         }}
                         expandable={{
-                          expandedRowRender: record => renderTransactionDetail(record),
+                          expandedRowRender: record => (
+                            <TransactionDetail transaction={record} session={session} />
+                          ),
                         }}
                       />
                     </TabPane>
