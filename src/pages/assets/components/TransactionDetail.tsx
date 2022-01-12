@@ -1,5 +1,5 @@
 import React from 'react';
-// import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import 'antd/dist/antd.css';
 import './TransactionDetail.less';
 import { Session } from '../../../models/Session';
@@ -15,14 +15,14 @@ interface ReceiveDetailProps {
 const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
   const { transaction, session } = props;
 
-  //   const [t] = useTranslation();
+  const [t] = useTranslation();
 
   const renderDetail = (record: TransactionTabularData) => {
     if (record.assetType !== UserAssetType.TENDERMINT) {
       return (
         <>
           <div className="row">
-            <div className="field">From: </div>
+            <div className="field">{t('home.transactions.table1.fromAddress')}: </div>
             <div className="value">
               <a
                 data-original={record.senderAddress}
@@ -38,7 +38,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
             </div>
           </div>
           <div className="row">
-            <div className="field">To: </div>
+            <div className="field">{t('home.transactions.table1.toAddress')}: </div>
             <div className="value">
               <a
                 data-original={record.recipientAddress}
@@ -54,7 +54,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
             </div>
           </div>
           <div className="row">
-            <div className="field">Amount: </div>
+            <div className="field">{t('home.transactions.table1.amount')}: </div>
             <div className="value">{record.amount}</div>
           </div>
         </>
@@ -65,7 +65,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
         return (
           <>
             <div className="row">
-              <div className="field">From: </div>
+              <div className="field">{t('home.transactions.table1.fromAddress')}: </div>
               <div className="value">
                 <a
                   data-original={record.senderAddress}
@@ -81,7 +81,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
               </div>
             </div>
             <div className="row">
-              <div className="field">To: </div>
+              <div className="field">{t('home.transactions.table1.toAddress')}: </div>
               <div className="value">
                 <a
                   data-original={record.recipientAddress}
@@ -97,7 +97,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
               </div>
             </div>
             <div className="row">
-              <div className="field">Amount: </div>
+              <div className="field">{t('home.transactions.table1.amount')}: </div>
               <div className="value">{record.amount}</div>
             </div>
           </>
@@ -106,7 +106,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
         return (
           <>
             <div className="row">
-              <div className="field">Validator: </div>
+              <div className="field">{t('home.transactions.table1.validatorAddress')}: </div>
               <div className="value">
                 <a
                   data-original={record.validatorAddress}
@@ -122,7 +122,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
               </div>
             </div>
             <div className="row">
-              <div className="field">Delegator: </div>
+              <div className="field">{t('home.transactions.table1.delegatorAddress')}: </div>
               <div className="value">
                 <a
                   data-original={record.delegatorAddress}
@@ -138,7 +138,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
               </div>
             </div>
             <div className="row">
-              <div className="field">Recipient: </div>
+              <div className="field">{t('home.transactions.table1.recipientAddress')}: </div>
               <div className="value">
                 <a
                   data-original={record.recipientAddress}
@@ -154,7 +154,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
               </div>
             </div>
             <div className="row">
-              <div className="field">Amount: </div>
+              <div className="field">{t('home.transactions.table1.amount')}: </div>
               <div className="value">{record.amount}</div>
             </div>
           </>
@@ -163,7 +163,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
         return (
           <>
             <div className="row">
-              <div className="field">Validator: </div>
+              <div className="field">{t('home.transactions.table1.validatorAddress')}: </div>
               <div className="value">
                 <a
                   data-original={record.validatorAddress}
@@ -179,7 +179,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
               </div>
             </div>
             <div className="row">
-              <div className="field">Delegator: </div>
+              <div className="field">{t('home.transactions.table1.delegatorAddress')}: </div>
               <div className="value">
                 <a
                   data-original={record.delegatorAddress}
@@ -195,11 +195,11 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
               </div>
             </div>
             <div className="row">
-              <div className="field">Amount: </div>
+              <div className="field">{t('home.transactions.table1.amount')}: </div>
               <div className="value">{record.amount}</div>
             </div>
             <div className="row">
-              <div className="field">Auto Claimed Rewards: </div>
+              <div className="field">{t('home.transactions.table1.autoClaimedRewards')}: </div>
               <div className="value">{record.autoClaimedRewards}</div>
             </div>
           </>
@@ -208,7 +208,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
         return (
           <>
             <div className="row">
-              <div className="field">Validator: </div>
+              <div className="field">{t('home.transactions.table1.validatorAddress')}: </div>
               <div className="value">
                 <a
                   data-original={record.validatorAddress}
@@ -224,7 +224,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
               </div>
             </div>
             <div className="row">
-              <div className="field">Delegator: </div>
+              <div className="field">{t('home.transactions.table1.delegatorAddress')}: </div>
               <div className="value">
                 <a
                   data-original={record.delegatorAddress}
@@ -240,11 +240,11 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
               </div>
             </div>
             <div className="row">
-              <div className="field">Amount: </div>
+              <div className="field">{t('home.transactions.table1.amount')}: </div>
               <div className="value">{record.amount}</div>
             </div>
             <div className="row">
-              <div className="field">Auto Claimed Rewards: </div>
+              <div className="field">{t('home.transactions.table1.autoClaimedRewards')}: </div>
               <div className="value">{record.autoClaimedRewards}</div>
             </div>
           </>

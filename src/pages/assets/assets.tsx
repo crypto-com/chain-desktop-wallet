@@ -352,7 +352,7 @@ const AssetsPage = () => {
     currentAsset?.assetType === UserAssetType.IBC
       ? [
           {
-            title: 'Type',
+            title: t('home.transactions.table1.msgTypeName'),
             dataIndex: 'msgTypeName',
             key: 'msgTypeName',
             render: text => {

@@ -12,24 +12,24 @@ const TagMsgType: React.FC<TagMsgTypeProps> = props => {
   const { msgTypeName } = props;
 
   let text = msgTypeName.toString();
-  let color = 'blue';
+  let color = 'processing';
 
   switch (msgTypeName) {
     case 'MsgSend':
       text = 'Send';
-      color = 'blue';
+      color = 'processing';
       break;
     case 'MsgWithdrawDelegatorReward':
       text = 'Withdraw Reward';
-      color = 'green';
+      color = 'success';
       break;
     case 'MsgDelegate':
       text = 'Delegate';
-      color = 'gold';
+      color = 'warning';
       break;
     case 'MsgUndelegate':
       text = 'Undelegate';
-      color = 'gold';
+      color = 'warning';
       break;
     default:
       break;
