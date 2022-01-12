@@ -1,4 +1,4 @@
-import { isBroadcastTxFailure, StargateClient } from '@cosmjs/stargate';
+import { StargateClient, isDeliverTxFailure } from '@cosmjs/stargate';
 import axios, { AxiosInstance } from 'axios';
 import { Big } from 'big.js';
 import { Bytes } from '../../utils/ChainJsLib';
@@ -120,7 +120,7 @@ export class NodeRpcService implements INodeRpcService {
     try {
       const signedBytes = Bytes.fromHexString(signedTxHex).toUint8Array();
       const broadcastResponse = await this.tendermintClient.broadcastTx(signedBytes);
-      if (isBroadcastTxFailure(broadcastResponse)) {
+      if (isDeliverTxFailure(broadcastResponse)) {
         // noinspection ExceptionCaughtLocallyJS
         throw new TypeError(`${broadcastResponse.rawLog}`);
       }
