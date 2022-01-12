@@ -26,7 +26,6 @@ export interface TransactionData {
   date: string;
   status: TransactionStatus;
   assetSymbol: string;
-  msgTypeName?: MsgTypeName;
 }
 
 export interface TransferTransactionData extends TransactionData {
@@ -39,6 +38,7 @@ export interface StakingTransactionData extends TransactionData {
   delegatorAddress: string;
   validatorAddress: string;
   stakedAmount: string;
+  autoClaimedRewards?: string;
 }
 
 export interface UnbondingDelegationData {
@@ -46,6 +46,13 @@ export interface UnbondingDelegationData {
   validatorAddress: string;
   unbondingAmount: string;
   completionTime: string;
+}
+
+export interface RewardTransactionData {
+  receiverAddress?: string;
+  delegatorAddress: string;
+  validatorAddress: string;
+  amount: string;
 }
 
 export interface NftTransactionData {
@@ -117,17 +124,16 @@ export interface BaseCommonTransaction {
   txHash?: string;
 }
 
-
 export interface StakingTransactionRecord extends BaseCommonTransaction {
   txType: "staking";
   messageTypeName?: string;
-  txData: StakingTransactionData
+  txData: StakingTransactionData | UnbondingDelegationData;
 }
 
 export interface RewardTransactionRecord extends BaseCommonTransaction {
   txType: "reward";
   messageTypeName?: string;
-  txData: RewardTransaction
+  txData: RewardTransactionData
 }
 
 export interface TransferTransactionRecord extends BaseCommonTransaction {
@@ -161,7 +167,7 @@ export interface StakingTransactionList {
 }
 
 export interface RewardTransactionList {
-  transactions: Array<RewardTransaction>;
+  transactions: Array<RewardTransactionData>;
   totalBalance: string;
   claimedRewardsBalance?: string;
   estimatedRewardsBalance?: string;
@@ -205,12 +211,6 @@ export interface ValidatorList {
 export interface ProposalList {
   proposals: Array<ProposalModel>;
   chainId: string;
-}
-
-export interface RewardTransaction {
-  delegatorAddress: string;
-  validatorAddress: string;
-  amount: string;
 }
 
 export interface RewardsBalances {

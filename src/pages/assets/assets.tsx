@@ -63,11 +63,12 @@ export interface TransactionTabularData {
   key: string;
   assetType: UserAssetType;
   transactionHash: string;
-  amount: string;
   time: string;
   msgTypeName: string;
   direction: TransactionDirection;
   status: TransactionStatus;
+  amount?: string;
+  stakedAmount?: string;
   senderAddress?: string;
   recipientAddress?: string;
   validatorAddress?: string;
@@ -75,8 +76,8 @@ export interface TransactionTabularData {
   autoClaimedRewards?: string;
 }
 
-const convertTransfers = (
-  allTransfers: any[],
+const convertTransactions = (
+  allTransactions: any[],
   allAssets: UserAsset[],
   sessionData: Session,
   asset: UserAsset,
@@ -96,24 +97,25 @@ const convertTransfers = (
     return TransactionDirection.SELF;
   }
 
-  return allTransfers.map(transfer => {
-    const transferAmount = getUIDynamicAmount(transfer.amount, asset);
-    const autoClaimedRewards = getUIDynamicAmount(transfer.autoClaimedRewards, asset);
+  return allTransactions.map(transaction => {
+
+    const { txData } = transaction;
 
     const data: TransactionTabularData = {
-      key: transfer.hash + transfer.receiverAddress + transfer.amount,
+      key: txData.hash + txData.receiverAddress + txData.amount,
       assetType: asset.assetType ?? UserAssetType.TENDERMINT,
-      senderAddress: transfer.senderAddress,
-      recipientAddress: transfer.receiverAddress,
-      validatorAddress: transfer.validatorAddress,
-      delegatorAddress: transfer.delegatorAddress,
-      transactionHash: transfer.hash,
-      time: `${moment(new Date(transfer.date)).format('YYYY-MM-DD, HH:mm:ss Z')}`,
-      amount: `${transferAmount} ${transfer.assetSymbol}`,
-      autoClaimedRewards: `${autoClaimedRewards} ${transfer.assetSymbol}`,
-      msgTypeName: transfer.msgTypeName ?? '',
-      direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
-      status: transfer.status,
+      senderAddress: txData.senderAddress,
+      recipientAddress: txData.receiverAddress,
+      validatorAddress: txData.validatorAddress,
+      delegatorAddress: txData.delegatorAddress,
+      transactionHash: txData.hash,
+      time: `${moment(new Date(txData.date)).format('YYYY-MM-DD, HH:mm:ss Z')}`,
+      amount: `${getUIDynamicAmount(txData.amount, asset)} ${txData.assetSymbol}`,
+      stakedAmount: `${getUIDynamicAmount(txData.stakedAmount, asset)} ${txData.assetSymbol}`,
+      autoClaimedRewards: `${getUIDynamicAmount(txData.autoClaimedRewards, asset)} ${txData.assetSymbol}`,
+      msgTypeName: transaction.messageTypeName,
+      direction: getDirection(txData.senderAddress, txData.receiverAddress),
+      status: txData.status,
     };
     return data;
   });
@@ -132,7 +134,7 @@ const AssetsPage = () => {
   const [currentAssetMarketData, setCurrentAssetMarketData] = useState<AssetMarketPrice>();
   const [isAssetVisible, setIsAssetVisible] = useState(false);
   const [activeAssetTab, setActiveAssetTab] = useState('transaction');
-  const [allTransfer, setAllTransfer] = useState<any>();
+  const [allTransactions, setAllTransactions] = useState<any>();
 
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
@@ -143,10 +145,10 @@ const AssetsPage = () => {
     identifier: '',
   };
 
-  const syncTransfers = async asset => {
+  const syncTransactions = async asset => {
     setFetchingComponent(true);
-    const transfers = await walletService.syncTransferTransactionsDataByAsset(session, asset);
-    setAllTransfer(convertTransfers(transfers, walletAllAssets, session, asset));
+    const transactions = await walletService.syncTransactionRecordsByAsset(session, asset);
+    setAllTransactions(convertTransactions(transactions, walletAllAssets, session, asset));
     setFetchingComponent(false);
   };
 
@@ -163,7 +165,7 @@ const AssetsPage = () => {
   useEffect(() => {
     const checkDirectedFrom = async () => {
       if (locationState.from === '/home' && session.activeAsset) {
-        syncTransfers(session.activeAsset);
+        syncTransactions(session.activeAsset);
         setCurrentAsset(session.activeAsset);
         setCurrentAssetMarketData(
           allMarketData.get(`${session.activeAsset.mainnetSymbol}-${session.currency}`),
@@ -360,9 +362,9 @@ const AssetsPage = () => {
       : []),
     {
       title: t('home.transactions.table1.amount'),
-      dataIndex: 'amount',
+      // dataIndex: 'amount',
       key: 'amount',
-      render: (text, record: TransactionTabularData) => {
+      render: (record: TransactionTabularData) => {
         let color: BaseType = 'secondary';
         let sign = '';
         switch (record.direction) {
@@ -380,6 +382,9 @@ const AssetsPage = () => {
           default:
             break;
         }
+        const text = record.msgTypeName === 'MsgDelegate' || record.msgTypeName === 'MsgUndelegate' 
+        ? record.stakedAmount 
+        : record.amount;
         return (
           <Text type={color}>
             {sign}
@@ -483,7 +488,7 @@ const AssetsPage = () => {
                     onTabClick={key => {
                       setActiveAssetTab(key);
                       if (key === 'transaction') {
-                        syncTransfers(currentAsset);
+                        syncTransactions(currentAsset);
                         syncAssetBalance(currentAsset);
                         setNavbarMenuSelectedKey('/assets');
                       }
@@ -528,7 +533,7 @@ const AssetsPage = () => {
                     <TabPane tab={t('assets.tab1')} key="transaction">
                       <Table
                         columns={TransactionColumns}
-                        dataSource={allTransfer}
+                        dataSource={allTransactions}
                         className="transaction-table"
                         rowKey={record => record.key}
                         locale={{
@@ -570,7 +575,7 @@ const AssetsPage = () => {
                         ...session,
                         activeAsset: selectedAsset,
                       });
-                      syncTransfers(selectedAsset);
+                      syncTransactions(selectedAsset);
                       setCurrentAsset(selectedAsset);
                       setCurrentAssetMarketData(
                         allMarketData.get(`${selectedAsset.mainnetSymbol}-${session.currency}`),

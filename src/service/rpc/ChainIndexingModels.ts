@@ -144,8 +144,8 @@ export interface NftDenomResponse {
   result: NftDenomData | null;
 }
 
-export interface AccountMessagesListResponse {
-  result: accountMsgList[];
+export interface AccountMessageListResponse {
+  result: AccountMessage[];
   pagination: Pagination;
 }
 
@@ -156,7 +156,7 @@ export interface Pagination {
   limit: number;
 }
 
-export interface accountMsgList {
+export interface AccountMessage {
   account: string;
   blockHeight: number;
   blockHash: string;

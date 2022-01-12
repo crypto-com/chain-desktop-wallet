@@ -196,7 +196,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
             </div>
             <div className="row">
               <div className="field">{t('home.transactions.table1.amount')}: </div>
-              <div className="value">{record.amount}</div>
+              <div className="value">{record.stakedAmount}</div>
             </div>
             <div className="row">
               <div className="field">{t('home.transactions.table1.autoClaimedRewards')}: </div>
@@ -241,7 +241,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
             </div>
             <div className="row">
               <div className="field">{t('home.transactions.table1.amount')}: </div>
-              <div className="value">{record.amount}</div>
+              <div className="value">{record.stakedAmount}</div>
             </div>
             <div className="row">
               <div className="field">{t('home.transactions.table1.autoClaimedRewards')}: </div>

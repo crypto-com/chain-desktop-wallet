@@ -9,6 +9,7 @@ import {
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { CronosClient } from './cronos/CronosClient';
 import {
+  CommonTransactionRecord,
   NftModel,
   NftQueryParams,
   NftTransferModel,
@@ -19,6 +20,7 @@ import {
   TransactionStatus,
   TransferTransactionData,
   TransferTransactionList,
+  TransferTransactionRecord,
   UnbondingDelegationList,
   ValidatorModel,
 } from '../models/Transaction';
@@ -353,7 +355,7 @@ export class TransactionHistoryService {
   public async fetchAndSaveTransfersByAsset(
     currentSession: Session,
     currentAsset: UserAsset,
-  ): Promise<TransferTransactionData[]> {
+  ): Promise<CommonTransactionRecord[]> {
     const indexingUrl =
       currentAsset?.config?.indexingUrl || currentSession.wallet.config.indexingUrl;
 
@@ -364,11 +366,11 @@ export class TransactionHistoryService {
         try {
           const chainIndexAPI = ChainIndexingAPI.init(indexingUrl);
           const transferTransactions = await chainIndexAPI.fetchAssetDetailTransactions(
+            currentSession.wallet.identifier,
             currentSession.wallet.config.network.coin.baseDenom,
             currentAsset?.address || currentSession.wallet.address,
             currentAsset,
           );
-
           return transferTransactions;
         } catch (e) {
           // eslint-disable-next-line no-console
@@ -402,7 +404,17 @@ export class TransactionHistoryService {
               status: evmTx.isError === '1' ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
             };
 
-            return transferTx;
+            const transferTxRecord: TransferTransactionRecord = {
+              walletId: currentSession.wallet.identifier,
+              assetId: currentAsset.identifier,
+              assetType: currentAsset.assetType,
+              txHash: evmTx.hash,
+              txType: "transfer",
+              // messageTypeName: "transfer",
+              txData: transferTx,
+            }
+
+            return transferTxRecord;
           });
 
           // eslint-disable-next-line no-console
@@ -444,7 +456,17 @@ export class TransactionHistoryService {
               status: TransactionStatus.SUCCESS,
             };
 
-            return transferTx;
+            const transferTxRecord: TransferTransactionRecord = {
+              walletId: currentSession.wallet.identifier,
+              assetId: currentAsset.identifier,
+              assetType: currentAsset.assetType,
+              txHash: crc20TokenTx.hash,
+              txType: "transfer",
+              // messageTypeName: "transfer",
+              txData: transferTx,
+            }
+
+            return transferTxRecord;
           });
 
           // eslint-disable-next-line no-console

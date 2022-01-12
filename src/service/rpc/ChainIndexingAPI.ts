@@ -11,8 +11,8 @@ import {
   TransferDataAmount,
   TransferListResponse,
   TransferResult,
-  AccountMessagesListResponse,
-  accountMsgList,
+  AccountMessageListResponse,
+  AccountMessage,
   ValidatorListResponse,
   AccountInfoResponse,
   ValidatorResponse,
@@ -24,6 +24,11 @@ import {
   NftModel,
   MsgTypeName,
   TransactionData,
+  BaseCommonTransaction,
+  TransferTransactionRecord,
+  StakingTransactionRecord,
+  RewardTransactionRecord,
+  CommonTransactionRecord,
 } from '../../models/Transaction';
 import {
   DefaultWalletConfigs,
@@ -202,7 +207,6 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
             memo: '',
             receiverAddress: transfer.data.toAddress,
             senderAddress: transfer.data.fromAddress,
-            msgTypeName: 'MsgSend',
             status: getStatus(transfer),
           };
           return transferData;
@@ -215,10 +219,11 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   }
 
   public async fetchAssetDetailTransactions(
+    walletId: string,
     baseAssetSymbol: string,
     address: string,
-    asset?: UserAsset,
-  ): Promise<Array<any>> {
+    asset: UserAsset,
+  ): Promise<CommonTransactionRecord[]> {
 
     const msgType: MsgTypeName[] = [
       'MsgSend',
@@ -229,7 +234,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
     const transactionListResponse = await this.getMessagesByAccountAddress(address, msgType);
 
-    function getStatus(transfer: accountMsgList) {
+    function getStatus(transfer: AccountMessage) {
       if (transfer.success) {
         return TransactionStatus.SUCCESS;
       }
@@ -239,7 +244,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     function getTransactionAmount(tx): TransferDataAmount | null {
       if (tx.data.hasOwnProperty('amount')) {
         if(isArray(tx.data.amount)) {
-          return tx.data.amount.filter(amount => amount?.denom === baseAssetSymbol)[0]
+          return tx.data.amount.filter(amount => amount?.denom === baseAssetSymbol)[0];
         }
         if( tx.data.amount?.denom === baseAssetSymbol ) {
           return tx.data.amount;
@@ -264,21 +269,17 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       return transactionListResponse
       .filter(tx => {
         const transferAmount = getTransactionAmount(tx);
-        return transferAmount !== undefined && transferAmount !== null;
+        return transferAmount !== undefined && transferAmount !== null && msgType.includes(tx.data.msgName);
       })
       .map(tx => {
         const assetAmount = getTransactionAmount(tx);
         const autoClaimedRewardsAmount = getAutoClaimedRewardsAmount(tx);
-        const transferData: TransferTransactionData = {
-          amount: assetAmount?.amount ?? '0',
-          assetSymbol: asset?.symbol || baseAssetSymbol,
-          date: tx.blockTime,
-          hash: tx.transactionHash,
-          memo: '',
-          receiverAddress:'',
-          senderAddress: '',
-          msgTypeName: tx.data.msgName,
-          status: getStatus(tx),
+
+        const commonTransaction: BaseCommonTransaction = {
+          walletId,
+          assetId: asset.identifier,
+          assetType: asset.assetType,
+          txHash: tx.transactionHash,
         };
 
         const transactionData: TransactionData = {
@@ -286,49 +287,53 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
           date: tx.blockTime,
           hash: tx.transactionHash,
           memo: '',
-          msgTypeName: tx.data.msgName,
           status: getStatus(tx),
+        };
+
+        if(tx.data.msgName === 'MsgWithdrawDelegatorReward'){
+          const rewardTransactionRecord: RewardTransactionRecord = {
+            ...commonTransaction,
+            txType: 'reward',
+            messageTypeName: tx.data.msgName,
+            txData: {
+              ...transactionData,
+              receiverAddress: tx.data?.recipientAddress ?? '',
+              delegatorAddress: tx.data?.delegatorAddress ?? '',
+              validatorAddress: tx.data?.validatorAddress ?? '',
+              amount: assetAmount?.amount ?? '0',
+            }
+          };
+          return rewardTransactionRecord;
         }
 
-        if(tx.data.msgName === 'MsgSend') {
-          return {
+        if(tx.data.msgName === 'MsgDelegate' || tx.data.msgName === 'MsgUndelegate'){
+          const stakingTransactionRecord: StakingTransactionRecord = {
+            ...commonTransaction,
+            txType: 'staking',
+            messageTypeName: tx.data.msgName,
+            txData: {
+              ...transactionData,
+              delegatorAddress: tx.data?.delegatorAddress ?? '',
+              validatorAddress: tx.data?.validatorAddress ?? '',
+              stakedAmount: assetAmount?.amount ?? '0',
+              autoClaimedRewards: autoClaimedRewardsAmount?.amount ?? '0',
+            }
+          };
+          return stakingTransactionRecord;
+        }
+
+        const transferTransactionRecord: TransferTransactionRecord = {
+          ...commonTransaction,
+          txType: 'transfer',
+          messageTypeName: tx.data.msgName,
+          txData: {
             ...transactionData,
             receiverAddress: tx.data?.toAddress ?? '',
             senderAddress: tx.data?.fromAddress ?? '',
             amount: assetAmount?.amount ?? '0',
           }
         }
-
-        if(tx.data.msgName === 'MsgWithdrawDelegatorReward'){
-          return {
-            ...transactionData,
-            receiverAddress: tx.data?.recipientAddress ?? '',
-            delegatorAddress: tx.data?.delegatorAddress ?? '',
-            validatorAddress: tx.data?.validatorAddress ?? '',
-            amount: assetAmount?.amount ?? '0',
-          }
-        }
-
-        if(tx.data.msgName === 'MsgDelegate'){
-          return {
-            ...transactionData,
-            delegatorAddress: tx.data?.delegatorAddress ?? '',
-            validatorAddress: tx.data?.validatorAddress ?? '',
-            amount: assetAmount?.amount ?? '0',
-            autoClaimedRewards: autoClaimedRewardsAmount?.amount ?? '0',
-          }
-        }
-
-        if(tx.data.msgName === 'MsgUndelegate'){
-          return {
-            ...transactionData,
-            delegatorAddress: tx.data?.delegatorAddress ?? '',
-            validatorAddress: tx.data?.validatorAddress ?? '',
-            amount: assetAmount?.amount ?? '0',
-            autoClaimedRewards: autoClaimedRewardsAmount?.amount ?? '0',
-          }
-        }
-        return transferData;
+        return transferTransactionRecord;
       })
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -538,11 +543,11 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   private async getDelegatorRewardMessageList(address: string) {
     let currentPage = 1;
     let totalPages = 1;
-    const finalMsgList: accountMsgList[] = [];
+    const finalMsgList: AccountMessage[] = [];
 
     while (currentPage <= totalPages) {
       // eslint-disable-next-line no-await-in-loop
-      const delegatorRewardMessageList = await this.axiosClient.get<AccountMessagesListResponse>(
+      const delegatorRewardMessageList = await this.axiosClient.get<AccountMessageListResponse>(
         `accounts/${address}/messages?order=height.desc&filter.msgType=MsgWithdrawDelegatorReward&page=${currentPage}`,
       );
 
@@ -572,7 +577,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
     const queryURL = `accounts/${userAddress}/messages`;
 
-    const finalMsgList: accountMsgList[] = [];
+    const finalMsgList: AccountMessage[] = [];
 
     const mayBeMsgTypeList = optionalMsgTypeNameList && optionalMsgTypeNameList.length > 0 ? optionalMsgTypeNameList.join(",") : undefined
 
@@ -584,7 +589,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
     while (currentPage <= totalPages) {
       // eslint-disable-next-line no-await-in-loop
-      const messageList = await this.axiosClient.get<AccountMessagesListResponse>(queryURL, {
+      const messageList = await this.axiosClient.get<AccountMessageListResponse>(queryURL, {
         params: requestParams,
       });
 

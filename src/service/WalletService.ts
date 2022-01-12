@@ -21,12 +21,13 @@ import { secretStoreService } from '../storage/SecretStoreService';
 import { AssetCreationType, AssetMarketPrice, UserAsset, UserAssetType } from '../models/UserAsset';
 import {
   BroadCastResult,
+  CommonTransactionRecord,
   NftAccountTransactionData,
   NftDenomModel,
   NftModel,
   ProposalModel,
   RewardsBalances,
-  RewardTransaction,
+  RewardTransactionData,
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
@@ -397,10 +398,10 @@ class WalletService {
     }
   }
 
-  public async syncTransferTransactionsDataByAsset(
+  public async syncTransactionRecordsByAsset(
     session: Session,
     asset: UserAsset,
-  ): Promise<TransferTransactionData[]> {
+  ): Promise<CommonTransactionRecord[]> {
     try {
       return await this.txHistoryManager.fetchAndSaveTransfersByAsset(session, asset);
     } catch (e) {
@@ -459,7 +460,7 @@ class WalletService {
     });
   }
 
-  public async retrieveAllRewards(walletId: string): Promise<RewardTransaction[]> {
+  public async retrieveAllRewards(walletId: string): Promise<RewardTransactionData[]> {
     const rewardTransactionList: RewardTransactionList = await this.storageService.retrieveAllRewards(
       walletId,
     );
@@ -469,7 +470,7 @@ class WalletService {
     }
 
     return rewardTransactionList.transactions.map(data => {
-      const rewardTransaction: RewardTransaction = { ...data };
+      const rewardTransaction: RewardTransactionData = { ...data };
       return rewardTransaction;
     });
   }
