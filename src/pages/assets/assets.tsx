@@ -109,7 +109,6 @@ const convertTransfers = (
       delegatorAddress: transfer.delegatorAddress,
       transactionHash: transfer.hash,
       time: `${moment(new Date(transfer.date)).format('YYYY-MM-DD, HH:mm:ss Z')}`,
-      // time: new Date(transfer.date).toString(),
       amount: `${transferAmount} ${transfer.assetSymbol}`,
       autoClaimedRewards: `${autoClaimedRewards} ${transfer.assetSymbol}`,
       msgTypeName: transfer.msgTypeName ?? '',
@@ -147,9 +146,7 @@ const AssetsPage = () => {
   const syncTransfers = async asset => {
     setFetchingComponent(true);
     const transfers = await walletService.syncTransferTransactionsDataByAsset(session, asset);
-    // console.log('transfers',transfers)
     setAllTransfer(convertTransfers(transfers, walletAllAssets, session, asset));
-    // const transfers = await walletService.retrieveAllTransfers(session.wallet.identifier, asset);
     setFetchingComponent(false);
   };
 
@@ -391,24 +388,6 @@ const AssetsPage = () => {
         );
       },
     },
-    // {
-    //   title: t('home.transactions.table1.recipientAddress'),
-    //   dataIndex: 'recipientAddress',
-    //   key: 'recipientAddress',
-    //   render: text => (
-    //     <a
-    //       data-original={text}
-    //       target="_blank"
-    //       rel="noreferrer"
-    //       href={`${renderExplorerUrl(
-    //         session.activeAsset?.config ?? session.wallet.config,
-    //         'address',
-    //       )}/${text}`}
-    //     >
-    //       {middleEllipsis(text, 12)}
-    //     </a>
-    //   ),
-    // },
     {
       title: t('home.transactions.table1.time'),
       dataIndex: 'time',
@@ -419,8 +398,6 @@ const AssetsPage = () => {
       dataIndex: 'status',
       key: 'status',
       render: (text, record: TransactionTabularData) => {
-        // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
-        // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
         let statusColor;
         if (record.status === TransactionStatus.SUCCESS) {
           statusColor = 'success';

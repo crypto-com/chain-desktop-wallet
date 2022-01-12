@@ -337,12 +337,6 @@ export class TransactionHistoryService {
             currentAsset,
           );
 
-          // this.saveTransfers({
-          //   transactions: transferTransactions,
-          //   walletId: currentSession.wallet.identifier,
-          //   assetId: currentAsset.identifier,
-          // });
-
           return transferTransactions;
         } catch (e) {
           // eslint-disable-next-line no-console
@@ -381,12 +375,6 @@ export class TransactionHistoryService {
 
           // eslint-disable-next-line no-console
           console.log('Loaded transactions', transactions, loadedTransactions);
-
-          // this.saveTransfers({
-          //   transactions: loadedTransactions,
-          //   walletId: currentSession.wallet.identifier,
-          //   assetId: currentAsset?.identifier,
-          // });
 
           return loadedTransactions;
         } catch (e) {
@@ -429,12 +417,6 @@ export class TransactionHistoryService {
 
           // eslint-disable-next-line no-console
           console.log(`LOADED_TXS ${currentAsset.symbol}: `, loadedTransactions);
-
-          // this.saveTransfers({
-          //   transactions: loadedTransactions,
-          //   walletId: currentSession.wallet.identifier,
-          //   assetId: currentAsset?.identifier,
-          // });
 
           return loadedTransactions;
         }
