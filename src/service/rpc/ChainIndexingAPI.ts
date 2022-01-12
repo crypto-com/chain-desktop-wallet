@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import Big from 'big.js';
+import { isArray } from 'lodash';
 import {
   NftAccountTransactionListResponse,
   NftDenomResponse,
@@ -22,6 +23,7 @@ import {
   TransferTransactionData,
   NftModel,
   MsgTypeName,
+  TransactionData,
 } from '../../models/Transaction';
 import {
   DefaultWalletConfigs,
@@ -151,8 +153,16 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     address: string,
     asset?: UserAsset,
   ): Promise<Array<TransferTransactionData>> {
+
+    const msgType = [
+      'MsgSend',
+      'MsgWithdrawDelegatorReward',
+      'MsgDelegate',
+      'MsgUndelegate',
+    ]
+
     const transferListResponse = await this.axiosClient.get<TransferListResponse>(
-      `/accounts/${address}/messages?order=height.desc&filter.msgType=MsgSend`,
+      `/accounts/${address}/messages?order=height.desc&filter.msgType=${msgType.join(',')}&limit=1000`,
     );
 
     function getStatus(transfer: TransferResult) {
@@ -165,7 +175,15 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     const { data } = transferListResponse;
 
     function getTransferAmount(transfer): TransferDataAmount | null {
-      return transfer.data.amount.filter(amount => amount.denom === baseAssetSymbol)[0];
+      if (transfer.data.hasOwnProperty('amount')) {
+        if(isArray(transfer.data.amount)) {
+          return transfer.data.amount.filter(amount => amount?.denom === baseAssetSymbol)[0]
+        }
+        if( transfer.data.amount?.denom === baseAssetSymbol ) {
+          return transfer.data.amount;
+        }
+      }
+      return null;
     }
 
     try {
@@ -184,15 +202,137 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
             memo: '',
             receiverAddress: transfer.data.toAddress,
             senderAddress: transfer.data.fromAddress,
+            msgTypeName: 'MsgSend',
             status: getStatus(transfer),
-            msgTypeName: 'MsgSend'
           };
-
           return transferData;
         });
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING_TRANSFERS', { data, baseAssetSymbol, address });
+      return [];
+    }
+  }
+
+  public async fetchAssetDetailTransactions(
+    baseAssetSymbol: string,
+    address: string,
+    asset?: UserAsset,
+  ): Promise<Array<any>> {
+
+    const msgType: MsgTypeName[] = [
+      'MsgSend',
+      'MsgWithdrawDelegatorReward',
+      'MsgDelegate',
+      'MsgUndelegate',
+    ];
+
+    const transactionListResponse = await this.getMessagesByAccountAddress(address, msgType);
+
+    function getStatus(transfer: accountMsgList) {
+      if (transfer.success) {
+        return TransactionStatus.SUCCESS;
+      }
+      return TransactionStatus.FAILED;
+    }
+
+    function getTransactionAmount(tx): TransferDataAmount | null {
+      if (tx.data.hasOwnProperty('amount')) {
+        if(isArray(tx.data.amount)) {
+          return tx.data.amount.filter(amount => amount?.denom === baseAssetSymbol)[0]
+        }
+        if( tx.data.amount?.denom === baseAssetSymbol ) {
+          return tx.data.amount;
+        }
+      }
+      return null;
+    }
+
+    function getAutoClaimedRewardsAmount(tx): TransferDataAmount | null {
+      if (tx.data.hasOwnProperty('autoClaimedRewards')) {
+        if(isArray(tx.data.autoClaimedRewards)) {
+          return tx.data.autoClaimedRewards.filter(amount => amount?.denom === baseAssetSymbol)[0]
+        }
+        if( tx.data.autoClaimedRewards?.denom === baseAssetSymbol ) {
+          return tx.data.autoClaimedRewards;
+        }
+      }
+      return null;
+    }
+
+    try {
+      return transactionListResponse
+      .filter(tx => {
+        const transferAmount = getTransactionAmount(tx);
+        return transferAmount !== undefined && transferAmount !== null;
+      })
+      .map(tx => {
+        const assetAmount = getTransactionAmount(tx);
+        const autoClaimedRewardsAmount = getAutoClaimedRewardsAmount(tx);
+        const transferData: TransferTransactionData = {
+          amount: assetAmount?.amount ?? '0',
+          assetSymbol: asset?.symbol || baseAssetSymbol,
+          date: tx.blockTime,
+          hash: tx.transactionHash,
+          memo: '',
+          receiverAddress:'',
+          senderAddress: '',
+          msgTypeName: tx.data.msgName,
+          status: getStatus(tx),
+        };
+
+        const transactionData: TransactionData = {
+          assetSymbol: asset?.symbol || baseAssetSymbol,
+          date: tx.blockTime,
+          hash: tx.transactionHash,
+          memo: '',
+          msgTypeName: tx.data.msgName,
+          status: getStatus(tx),
+        }
+
+        if(tx.data.msgName === 'MsgSend') {
+          return {
+            ...transactionData,
+            receiverAddress: tx.data?.toAddress ?? '',
+            senderAddress: tx.data?.fromAddress ?? '',
+            amount: assetAmount?.amount ?? '0',
+          }
+        }
+
+        if(tx.data.msgName === 'MsgWithdrawDelegatorReward'){
+          return {
+            ...transactionData,
+            receiverAddress: tx.data?.recipientAddress ?? '',
+            delegatorAddress: tx.data?.delegatorAddress ?? '',
+            validatorAddress: tx.data?.validatorAddress ?? '',
+            amount: assetAmount?.amount ?? '0',
+          }
+        }
+
+        if(tx.data.msgName === 'MsgDelegate'){
+          return {
+            ...transactionData,
+            delegatorAddress: tx.data?.delegatorAddress ?? '',
+            validatorAddress: tx.data?.validatorAddress ?? '',
+            amount: assetAmount?.amount ?? '0',
+            autoClaimedRewards: autoClaimedRewardsAmount?.amount ?? '0',
+          }
+        }
+
+        if(tx.data.msgName === 'MsgUndelegate'){
+          return {
+            ...transactionData,
+            delegatorAddress: tx.data?.delegatorAddress ?? '',
+            validatorAddress: tx.data?.validatorAddress ?? '',
+            amount: assetAmount?.amount ?? '0',
+            autoClaimedRewards: autoClaimedRewardsAmount?.amount ?? '0',
+          }
+        }
+        return transferData;
+      })
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING_TRANSACTIONS', { transactionListResponse, baseAssetSymbol, address });
       return [];
     }
   }

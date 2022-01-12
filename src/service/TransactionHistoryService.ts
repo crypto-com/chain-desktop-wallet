@@ -331,7 +331,7 @@ export class TransactionHistoryService {
       case undefined:
         try {
           const chainIndexAPI = ChainIndexingAPI.init(indexingUrl);
-          const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
+          const transferTransactions = await chainIndexAPI.fetchAssetDetailTransactions(
             currentSession.wallet.config.network.coin.baseDenom,
             currentAsset?.address || currentSession.wallet.address,
             currentAsset,
