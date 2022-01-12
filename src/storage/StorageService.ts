@@ -34,7 +34,6 @@ import {
 } from '../service/bridge/BridgeConfig';
 import { BridgeTransactionHistoryList } from '../service/bridge/contracts/BridgeModels';
 import { AddressBookContactModel } from '../models/AddressBook';
-import { BrowserBookmark, SavedBrowserBookmark } from '../models/DappBrowser';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -541,22 +540,5 @@ export class StorageService {
 
   public async removeAddressBookContact(_id: string) {
     return this.db.addressBookStore.remove({ _id }, {});
-  }
-
-  /// ----- dapp browser bookmarks ------
-  public async saveBrowserBookmark(model: BrowserBookmark) {
-    return this.db.dappBrowserBookmarksStore.insert({
-      url: model.url,
-      title: model.title,
-      faviconURL: model.faviconURL,
-    });
-  }
-
-  public async removeBrowserBookmark(id: string) {
-    return this.db.dappBrowserBookmarksStore.remove({ _id: id }, {});
-  }
-
-  public async retrieveAllBrowserBookmarks() {
-    return this.db.dappBrowserBookmarksStore.find<SavedBrowserBookmark>({}).exec();
   }
 }

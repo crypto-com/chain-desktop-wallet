@@ -1,10 +1,9 @@
 import { StarOutlined } from '@ant-design/icons';
+import { Card } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import * as React from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { SavedBrowserBookmark } from '../../../../models/DappBrowser';
-import { DappBrowserService } from '../../../../service/DappBrowserService';
-import { walletService } from '../../../../service/WalletService';
+import { IconBookmarkFilled } from '../../../../svg/IconBookmark';
+import { useBookmark } from '../../hooks/useBookmark';
 
 interface ISavedTabProps {
   onClick: () => void;
@@ -38,23 +37,85 @@ const EmptyState = () => {
 const SavedTab = (props: ISavedTabProps) => {
   const { onClick } = props;
 
-  const [bookmarks, setBookmarks] = useState<SavedBrowserBookmark[]>([]);
+  const { list: bookmarks, remove } = useBookmark();
 
-  const browserService = useMemo(() => {
-    return new DappBrowserService(walletService.storageService);
-  }, [walletService]);
-
-  const fetchBrowserBookmarks = useCallback(async () => {
-    const savedBookmarks = await browserService.retrieveBookmarks();
-    setBookmarks([...savedBookmarks]);
-  }, [browserService]);
-
-  useEffect(() => {}, [fetchBrowserBookmarks]);
+  const BookmarkList = () => {
+    return (
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(312px, 1fr))',
+          gridGap: '32px',
+        }}
+      >
+        {bookmarks.map(bookmark => {
+          return (
+            <Card
+              key={bookmark.url}
+              bodyStyle={{
+                display: 'flex',
+                flexDirection: 'row',
+                padding: '16px',
+                alignItems: 'center',
+              }}
+            >
+              <img
+                src={bookmark.faviconURL}
+                style={{
+                  borderRadius: '16px',
+                  width: '32px',
+                  height: '32px',
+                  marginRight: '20px',
+                }}
+                alt="favicon"
+              />
+              <div
+                style={{
+                  minWidth: '10px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                <div
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    fontWeight: 600,
+                    fontSize: '16px',
+                  }}
+                >
+                  {bookmark.title}
+                </div>
+                <div
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    fontSize: '12px',
+                    color: '#1199FA',
+                  }}
+                >
+                  {bookmark.url}
+                </div>
+              </div>
+              <div
+                style={{
+                  marginLeft: 'auto',
+                  cursor: 'pointer',
+                }}
+                onClick={() => {
+                  remove(bookmark.url);
+                }}
+              >
+                <IconBookmarkFilled width={30} height={30} />
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
-    <Content onClick={onClick}>
-      {bookmarks.length < 1 ? <EmptyState /> : <div>Bookmarks</div>}
-    </Content>
+    <Content onClick={onClick}>{bookmarks.length < 1 ? <EmptyState /> : <BookmarkList />}</Content>
   );
 };
 

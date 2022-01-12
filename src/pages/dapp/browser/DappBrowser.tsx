@@ -32,10 +32,17 @@ interface DappBrowserProps {
   onURLChanged?: (url: string) => void;
 }
 
+interface WebInfo {
+  title?: string;
+  faviconURL?: string;
+  webviewURL?: string;
+}
+
 export interface DappBrowserRef {
   goBack: () => void;
   goForward: () => void;
   reload: () => void;
+  getCurrentWebStatus: () => WebInfo;
 }
 
 const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBrowserProps, ref) => {
@@ -46,6 +53,14 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   const allMarketData = useRecoilValue(allMarketState);
   const cronosAsset = getCronosAsset(allAssets);
 
+  const {
+    title: providedTitle,
+    faviconURL: providedFaviconURL,
+    url: providedURL,
+  } = useWebInfoProvider({
+    webview: webviewRef.current,
+  });
+
   useImperativeHandle(ref, () => ({
     goBack: () => {
       webviewRef.current?.goBack();
@@ -55,6 +70,13 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     },
     reload: () => {
       webviewRef.current?.reload();
+    },
+    getCurrentWebStatus: () => {
+      return {
+        title: webviewRef.current?.getTitle(),
+        faviconURL: providedFaviconURL,
+        webviewURL: webviewRef.current?.getURL(),
+      };
     },
   }));
 
@@ -76,14 +98,6 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
 
   const onRequestAddress = useRefCallback((onSuccess: (address: string) => void) => {
     onSuccess(cronosAsset?.address!);
-  });
-
-  const {
-    title: providedTitle,
-    faviconURL: providedFaviconURL,
-    url: providedURL,
-  } = useWebInfoProvider({
-    webview: webviewRef.current,
   });
 
   const { state: webviewState, navigationState } = useWebviewStatusInfo({

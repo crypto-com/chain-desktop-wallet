@@ -19,7 +19,7 @@ export const useWebviewStatusInfo = (props: IWebviewStatusInfoProps) => {
   const [navigationState, setNavigationState] = useState<IWebviewNavigationState>({
     canGoBack: false,
     canGoForward: false,
-    canRefresh: false,
+    canRefresh: true,
   });
 
   const setupEvents = useCallback(() => {
@@ -32,7 +32,7 @@ export const useWebviewStatusInfo = (props: IWebviewStatusInfoProps) => {
       setNavigationState({
         canGoBack: webview.canGoBack(),
         canGoForward: webview.canGoForward(),
-        canRefresh: false,
+        canRefresh: true,
       });
     });
 

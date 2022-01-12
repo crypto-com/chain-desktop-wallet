@@ -1,8 +1,5 @@
-export interface SavedBrowserBookmark {
-  id: string;
+export interface Bookmark {
   url: string;
   title: string;
-  faviconURL: string;
+  faviconURL?: string;
 }
-
-export type BrowserBookmark = Omit<SavedBrowserBookmark, 'id'>;

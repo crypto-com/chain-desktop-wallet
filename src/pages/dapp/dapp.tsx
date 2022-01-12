@@ -13,6 +13,7 @@ import AddressBar from './components/AddressBar/AddressBar';
 import SavedTab from './components/Tabs/SavedTab';
 import { isValidURL } from '../../utils/utils';
 import { IWebviewNavigationState, WebviewState } from './browser/useWebviewStatusInfo';
+import { useBookmark } from './hooks/useBookmark';
 
 const { Header, Content } = Layout;
 const { TabPane } = Tabs;
@@ -82,8 +83,10 @@ const DappPage = () => {
   const [webviewState, setWebviewState] = useState<WebviewState>();
   const [webviewNavigationState, setWebviewNavigationState] = useState<IWebviewNavigationState>();
 
+  const { add: addBookmark } = useBookmark();
+
   useEffect(() => {
-    console.log('webviewState', webviewState);
+    console.log('webviewStasadte', webviewState);
   }, [webviewState]);
 
   return (
@@ -108,7 +111,18 @@ const DappPage = () => {
           onRefreshButtonClick: () => {
             browserRef.current?.reload();
           },
-          onBookmarkButtonClick: () => {},
+          onBookmarkButtonClick: () => {
+            const bookMarkInfo = browserRef.current?.getCurrentWebStatus();
+            if (!bookMarkInfo?.title || !bookMarkInfo.webviewURL) {
+              return;
+            }
+
+            addBookmark({
+              url: bookMarkInfo.webviewURL,
+              title: bookMarkInfo?.title,
+              faviconURL: bookMarkInfo.faviconURL,
+            });
+          },
         }}
         onSearch={value => {
           setSelectedDapp(undefined);
