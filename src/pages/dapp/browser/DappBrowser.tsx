@@ -42,7 +42,7 @@ export interface DappBrowserRef {
   goBack: () => void;
   goForward: () => void;
   reload: () => void;
-  getCurrentWebStatus: () => WebInfo;
+  getCurrentWebStatus: () => WebInfo | undefined;
 }
 
 const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBrowserProps, ref) => {
@@ -57,6 +57,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     title: providedTitle,
     faviconURL: providedFaviconURL,
     url: providedURL,
+    isDOMReady,
   } = useWebInfoProvider({
     webview: webviewRef.current,
   });
@@ -72,6 +73,10 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
       webviewRef.current?.reload();
     },
     getCurrentWebStatus: () => {
+      if (!isDOMReady) {
+        return undefined;
+      }
+
       return {
         title: webviewRef.current?.getTitle(),
         faviconURL: providedFaviconURL,

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layout, Tabs } from 'antd';
 import { useSetRecoilState } from 'recoil';
@@ -12,7 +12,7 @@ import logoTectonic from './assets/tectonic.svg';
 import AddressBar from './components/AddressBar/AddressBar';
 import SavedTab from './components/Tabs/SavedTab';
 import { isValidURL } from '../../utils/utils';
-import { IWebviewNavigationState, WebviewState } from './browser/useWebviewStatusInfo';
+import { IWebviewNavigationState } from './browser/useWebviewStatusInfo';
 import { useBookmark } from './hooks/useBookmark';
 
 const { Header, Content } = Layout;
@@ -80,14 +80,31 @@ const DappPage = () => {
   const shouldShowBrowser = selectedDapp || selectedURL?.length > 0;
   const [addressBarValue, setAddressBarValue] = useState('');
 
-  const [webviewState, setWebviewState] = useState<WebviewState>();
   const [webviewNavigationState, setWebviewNavigationState] = useState<IWebviewNavigationState>();
 
-  const { add: addBookmark } = useBookmark();
+  const {
+    list: bookmarkList,
+    add: addBookmark,
+    validate: validateBookmark,
+    remove: removeBookmark,
+  } = useBookmark();
+  const [bookmarkButtonHighlighted, setBookmarkButtonHighlighted] = useState(false);
+
+  const updateBookmarkButtonBeHighlighted = useCallback(() => {
+    const url = browserRef.current?.getCurrentWebStatus()?.webviewURL;
+    if (!url) {
+      setBookmarkButtonHighlighted(false);
+      return;
+    }
+    const should = bookmarkList.some(
+      bookmark => new URL(bookmark.url).origin === new URL(url).origin,
+    );
+    setBookmarkButtonHighlighted(should);
+  }, [bookmarkList, browserRef.current]);
 
   useEffect(() => {
-    console.log('webviewStasadte', webviewState);
-  }, [webviewState]);
+    updateBookmarkButtonBeHighlighted();
+  }, [updateBookmarkButtonBeHighlighted]);
 
   return (
     <Layout className="site-layout">
@@ -99,7 +116,7 @@ const DappPage = () => {
           isForwardButtonDisabled: webviewNavigationState?.canGoForward === false,
           isRefreshButtonDisabled: webviewNavigationState?.canRefresh === false,
           isBookmarkButtonDisabled: false,
-          isBookmarkButtonHighlighted: false,
+          isBookmarkButtonHighlighted: bookmarkButtonHighlighted,
         }}
         buttonCallbacks={{
           onBackButtonClick: () => {
@@ -117,8 +134,15 @@ const DappPage = () => {
               return;
             }
 
+            const url = new URL(bookMarkInfo.webviewURL).origin;
+
+            if (!validateBookmark(url)) {
+              removeBookmark(url);
+              return;
+            }
+
             addBookmark({
-              url: bookMarkInfo.webviewURL,
+              url,
               title: bookMarkInfo?.title,
               faviconURL: bookMarkInfo.faviconURL,
             });
@@ -141,12 +165,12 @@ const DappPage = () => {
           dapp={selectedDapp}
           dappURL={selectedURL}
           ref={browserRef}
-          onStateChange={(state, navState) => {
-            setWebviewState(state);
+          onStateChange={(_, navState) => {
             setWebviewNavigationState(navState);
           }}
           onURLChanged={url => {
             setAddressBarValue(url);
+            updateBookmarkButtonBeHighlighted();
           }}
         />
       ) : (
@@ -185,7 +209,12 @@ const DappPage = () => {
                 </div>
               </TabPane>
               <TabPane tab="Saved" key={TabKey.saved}>
-                <SavedTab onClick={() => {}} />
+                <SavedTab
+                  onClick={bookmark => {
+                    setSelectedDapp(undefined);
+                    setSelectedURL(bookmark.url);
+                  }}
+                />
               </TabPane>
             </Tabs>
           </Content>

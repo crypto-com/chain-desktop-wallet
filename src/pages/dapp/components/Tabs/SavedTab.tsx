@@ -2,11 +2,12 @@ import { StarOutlined } from '@ant-design/icons';
 import { Card } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import * as React from 'react';
+import { Bookmark } from '../../../../models/DappBrowser';
 import { IconBookmarkFilled } from '../../../../svg/IconBookmark';
 import { useBookmark } from '../../hooks/useBookmark';
 
 interface ISavedTabProps {
-  onClick: () => void;
+  onClick: (bookmark: Bookmark) => void;
 }
 
 const EmptyState = () => {
@@ -51,8 +52,12 @@ const SavedTab = (props: ISavedTabProps) => {
         {bookmarks.map(bookmark => {
           return (
             <Card
+              onClick={() => {
+                onClick(bookmark);
+              }}
               key={bookmark.url}
               bodyStyle={{
+                cursor: 'pointer',
                 display: 'flex',
                 flexDirection: 'row',
                 padding: '16px',
@@ -101,7 +106,8 @@ const SavedTab = (props: ISavedTabProps) => {
                   marginLeft: 'auto',
                   cursor: 'pointer',
                 }}
-                onClick={() => {
+                onClick={e => {
+                  e.stopPropagation();
                   remove(bookmark.url);
                 }}
               >
@@ -115,7 +121,13 @@ const SavedTab = (props: ISavedTabProps) => {
   };
 
   return (
-    <Content onClick={onClick}>{bookmarks.length < 1 ? <EmptyState /> : <BookmarkList />}</Content>
+    <Content
+      style={{
+        marginBottom: '20px',
+      }}
+    >
+      {bookmarks.length < 1 ? <EmptyState /> : <BookmarkList />}
+    </Content>
   );
 };
 

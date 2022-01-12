@@ -11,6 +11,7 @@ export const useWebInfoProvider = (props: IWebInfoProviderProps) => {
   const [title, setTitle] = useState('');
   const [faviconURL, setFaviconURL] = useState('');
   const [url, setURL] = useState('');
+  const [isDOMReady, setIsDOMReady] = useState(false);
 
   const setupEvents = useCallback(() => {
     if (!webview) {
@@ -19,6 +20,10 @@ export const useWebInfoProvider = (props: IWebInfoProviderProps) => {
 
     webview.addEventListener('page-title-updated', () => {
       setTitle(webview.getTitle());
+    });
+
+    webview.addEventListener('dom-ready', () => {
+      setIsDOMReady(true);
     });
 
     webview.addEventListener('page-favicon-updated', e => {
@@ -40,5 +45,5 @@ export const useWebInfoProvider = (props: IWebInfoProviderProps) => {
     setupEvents();
   }, [setupEvents]);
 
-  return { title, faviconURL, url };
+  return { title, faviconURL, url, isDOMReady };
 };

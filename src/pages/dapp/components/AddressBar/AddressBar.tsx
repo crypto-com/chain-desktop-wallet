@@ -1,11 +1,7 @@
-import {
-  ArrowLeftOutlined,
-  ArrowRightOutlined,
-  ReloadOutlined,
-  StarOutlined,
-} from '@ant-design/icons';
+import { ArrowLeftOutlined, ArrowRightOutlined, ReloadOutlined } from '@ant-design/icons';
 import { Button, Input } from 'antd';
 import * as React from 'react';
+import { IconBookmarkFilled, IconBookmarkNormal } from '../../../../svg/IconBookmark';
 import './style.less';
 
 interface IButtonStates {
@@ -73,7 +69,18 @@ const AddressBar = (props: IAddressBarProps) => {
       <Button
         type="link"
         className="button"
-        icon={<StarOutlined />}
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+        icon={
+          buttonStates.isBookmarkButtonHighlighted ? (
+            <IconBookmarkFilled width="20" height="20" />
+          ) : (
+            <IconBookmarkNormal width="20" height="20" fill="none" stroke="rgb(93, 102, 123)" />
+          )
+        }
         disabled={buttonStates.isBookmarkButtonDisabled}
         onClick={buttonCallbacks.onBookmarkButtonClick}
       />

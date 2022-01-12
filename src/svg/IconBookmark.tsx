@@ -5,7 +5,7 @@ function IconBookmarkFilled(props: any) {
 }
 
 function IconBookmarkNormal(props) {
-  return <Icon attributes={{ ...props }} stroke="#C9CFDD" />;
+  return <Icon attributes={{ ...props }} stroke={props.stroke ? props.stroke : '#C9CFDD'} />;
 }
 
 function Icon(props: { attributes: any; stroke: string }) {
