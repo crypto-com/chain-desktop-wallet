@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import moment from 'moment';
 import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import './assets.less';
 import 'antd/dist/antd.css';
+import { BaseType } from 'antd/lib/typography/Base';
 import {
   Layout,
   Table,
@@ -33,7 +35,12 @@ import {
   fetchingComponentState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
-import { AssetMarketPrice, getAssetBalancePrice, UserAsset } from '../../models/UserAsset';
+import {
+  AssetMarketPrice,
+  getAssetBalancePrice,
+  UserAsset,
+  UserAssetType,
+} from '../../models/UserAsset';
 import { renderExplorerUrl } from '../../models/Explorer';
 import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
@@ -44,52 +51,66 @@ import ReceiveDetail from './components/ReceiveDetail';
 import FormSend from './components/FormSend';
 import { walletService } from '../../service/WalletService';
 import { getChainName, middleEllipsis } from '../../utils/utils';
-import {
-  TransactionDirection,
-  TransactionStatus,
-  TransferTransactionData,
-} from '../../models/Transaction';
+import { TransactionDirection, TransactionStatus } from '../../models/Transaction';
 
 const { Sider, Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
-interface TransferTabularData {
+interface TransactionTabularData {
   key: string;
+  assetType: UserAssetType;
   transactionHash: string;
-  recipientAddress: string;
   amount: string;
   time: string;
+  msgTypeName: string;
   direction: TransactionDirection;
   status: TransactionStatus;
+  senderAddress?: string;
+  recipientAddress?: string;
+  validatorAddress?: string;
+  delegatorAddress?: string;
+  autoClaimedRewards?: string;
 }
 
 const convertTransfers = (
-  allTransfers: TransferTransactionData[],
+  allTransfers: any[],
   allAssets: UserAsset[],
   sessionData: Session,
   asset: UserAsset,
 ) => {
   const address = asset.address?.toLowerCase() || sessionData.wallet.address.toLowerCase();
-  function getDirection(from: string, to: string): TransactionDirection {
+  function getDirection(from: string = '', to: string = ''): TransactionDirection {
     if (address === from.toLowerCase() && address === to.toLowerCase()) {
       return TransactionDirection.SELF;
+    }
+    if (address === to.toLowerCase()) {
+      return TransactionDirection.INCOMING;
     }
     if (address === from.toLowerCase()) {
       return TransactionDirection.OUTGOING;
     }
-    return TransactionDirection.INCOMING;
+
+    return TransactionDirection.SELF;
   }
 
   return allTransfers.map(transfer => {
     const transferAmount = getUIDynamicAmount(transfer.amount, asset);
+    const autoClaimedRewards = getUIDynamicAmount(transfer.autoClaimedRewards, asset);
 
-    const data: TransferTabularData = {
+    const data: TransactionTabularData = {
       key: transfer.hash + transfer.receiverAddress + transfer.amount,
+      assetType: asset.assetType ?? UserAssetType.TENDERMINT,
+      senderAddress: transfer.senderAddress,
       recipientAddress: transfer.receiverAddress,
+      validatorAddress: transfer.validatorAddress,
+      delegatorAddress: transfer.delegatorAddress,
       transactionHash: transfer.hash,
-      time: new Date(transfer.date).toString(),
+      time: `${moment(new Date(transfer.date)).format('YYYY-MM-DD, HH:mm:ss Z')}`,
+      // time: new Date(transfer.date).toString(),
       amount: `${transferAmount} ${transfer.assetSymbol}`,
+      autoClaimedRewards: `${autoClaimedRewards} ${transfer.assetSymbol}`,
+      msgTypeName: transfer.msgTypeName ?? '',
       direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
       status: transfer.status,
     };
@@ -124,6 +145,7 @@ const AssetsPage = () => {
   const syncTransfers = async asset => {
     setFetchingComponent(true);
     const transfers = await walletService.syncTransferTransactionsDataByAsset(session, asset);
+    // console.log('transfers',transfers)
     setAllTransfer(convertTransfers(transfers, walletAllAssets, session, asset));
     // const transfers = await walletService.retrieveAllTransfers(session.wallet.identifier, asset);
     setFetchingComponent(false);
@@ -320,17 +342,49 @@ const AssetsPage = () => {
             'tx',
           )}/${text}`}
         >
-          {middleEllipsis(text, 12)}
+          {middleEllipsis(text, 6)}
         </a>
       ),
     },
+    ...(currentAsset?.assetType === UserAssetType.TENDERMINT ||
+    currentAsset?.assetType === UserAssetType.IBC
+      ? [
+          {
+            title: 'Type',
+            dataIndex: 'msgTypeName',
+            key: 'msgTypeName',
+            render: text => {
+              return (
+                <Tag style={{ border: 'none', padding: '5px 14px' }} color="blue">
+                  {text}
+                </Tag>
+              );
+            },
+          },
+        ]
+      : []),
     {
       title: t('home.transactions.table1.amount'),
       dataIndex: 'amount',
       key: 'amount',
-      render: (text, record: TransferTabularData) => {
-        const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
-        const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+      render: (text, record: TransactionTabularData) => {
+        let color: BaseType = 'secondary';
+        let sign = '';
+        switch (record.direction) {
+          case TransactionDirection.OUTGOING:
+            color = 'danger';
+            sign = '-';
+            break;
+          case TransactionDirection.INCOMING:
+            color = 'success';
+            sign = '+';
+            break;
+          case TransactionDirection.SELF:
+            color = 'secondary';
+            break;
+          default:
+            break;
+        }
         return (
           <Text type={color}>
             {sign}
@@ -339,24 +393,24 @@ const AssetsPage = () => {
         );
       },
     },
-    {
-      title: t('home.transactions.table1.recipientAddress'),
-      dataIndex: 'recipientAddress',
-      key: 'recipientAddress',
-      render: text => (
-        <a
-          data-original={text}
-          target="_blank"
-          rel="noreferrer"
-          href={`${renderExplorerUrl(
-            session.activeAsset?.config ?? session.wallet.config,
-            'address',
-          )}/${text}`}
-        >
-          {middleEllipsis(text, 12)}
-        </a>
-      ),
-    },
+    // {
+    //   title: t('home.transactions.table1.recipientAddress'),
+    //   dataIndex: 'recipientAddress',
+    //   key: 'recipientAddress',
+    //   render: text => (
+    //     <a
+    //       data-original={text}
+    //       target="_blank"
+    //       rel="noreferrer"
+    //       href={`${renderExplorerUrl(
+    //         session.activeAsset?.config ?? session.wallet.config,
+    //         'address',
+    //       )}/${text}`}
+    //     >
+    //       {middleEllipsis(text, 12)}
+    //     </a>
+    //   ),
+    // },
     {
       title: t('home.transactions.table1.time'),
       dataIndex: 'time',
@@ -366,7 +420,7 @@ const AssetsPage = () => {
       title: t('home.transactions.table1.status'),
       dataIndex: 'status',
       key: 'status',
-      render: (text, record: TransferTabularData) => {
+      render: (text, record: TransactionTabularData) => {
         // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
         // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
         let statusColor;
@@ -386,6 +440,243 @@ const AssetsPage = () => {
       },
     },
   ];
+
+  const renderTransactionDetail = (record: TransactionTabularData) => {
+    if (record.assetType !== UserAssetType.TENDERMINT) {
+      return (
+        <div className="transaction-detail">
+          <div className="row">
+            <div className="field">From: </div>
+            <div className="value">
+              <a
+                data-original={record.senderAddress}
+                target="_blank"
+                rel="noreferrer"
+                href={`${renderExplorerUrl(
+                  session.activeAsset?.config ?? session.wallet.config,
+                  'address',
+                )}/${record.senderAddress}`}
+              >
+                {record.senderAddress}
+              </a>
+            </div>
+          </div>
+          <div className="row">
+            <div className="field">To: </div>
+            <div className="value">
+              <a
+                data-original={record.recipientAddress}
+                target="_blank"
+                rel="noreferrer"
+                href={`${renderExplorerUrl(
+                  session.activeAsset?.config ?? session.wallet.config,
+                  'address',
+                )}/${record.recipientAddress}`}
+              >
+                {record.recipientAddress}
+              </a>
+            </div>
+          </div>
+          <div className="row">
+            <div className="field">Amount: </div>
+            <div className="value">{record.amount}</div>
+          </div>
+        </div>
+      );
+    }
+    switch (record.msgTypeName) {
+      case 'MsgSend':
+        return (
+          <div className="transaction-detail">
+            <div className="row">
+              <div className="field">From: </div>
+              <div className="value">
+                <a
+                  data-original={record.senderAddress}
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${renderExplorerUrl(
+                    session.activeAsset?.config ?? session.wallet.config,
+                    'address',
+                  )}/${record.senderAddress}`}
+                >
+                  {record.senderAddress}
+                </a>
+              </div>
+            </div>
+            <div className="row">
+              <div className="field">To: </div>
+              <div className="value">
+                <a
+                  data-original={record.recipientAddress}
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${renderExplorerUrl(
+                    session.activeAsset?.config ?? session.wallet.config,
+                    'address',
+                  )}/${record.recipientAddress}`}
+                >
+                  {record.recipientAddress}
+                </a>
+              </div>
+            </div>
+            <div className="row">
+              <div className="field">Amount: </div>
+              <div className="value">{record.amount}</div>
+            </div>
+          </div>
+        );
+      case 'MsgWithdrawDelegatorReward':
+        return (
+          <div className="transaction-detail">
+            <div className="row">
+              <div className="field">Validator: </div>
+              <div className="value">
+                <a
+                  data-original={record.validatorAddress}
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${renderExplorerUrl(
+                    session.activeAsset?.config ?? session.wallet.config,
+                    'validator',
+                  )}/${record.validatorAddress}`}
+                >
+                  {record.validatorAddress}
+                </a>
+              </div>
+            </div>
+            <div className="row">
+              <div className="field">Delegator: </div>
+              <div className="value">
+                <a
+                  data-original={record.delegatorAddress}
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${renderExplorerUrl(
+                    session.activeAsset?.config ?? session.wallet.config,
+                    'address',
+                  )}/${record.delegatorAddress}`}
+                >
+                  {record.delegatorAddress}
+                </a>
+              </div>
+            </div>
+            <div className="row">
+              <div className="field">Recipient: </div>
+              <div className="value">
+                <a
+                  data-original={record.recipientAddress}
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${renderExplorerUrl(
+                    session.activeAsset?.config ?? session.wallet.config,
+                    'address',
+                  )}/${record.recipientAddress}`}
+                >
+                  {record.recipientAddress}
+                </a>
+              </div>
+            </div>
+            <div className="row">
+              <div className="field">Amount: </div>
+              <div className="value">{record.amount}</div>
+            </div>
+          </div>
+        );
+      case 'MsgDelegate':
+        return (
+          <div className="transaction-detail">
+            <div className="row">
+              <div className="field">Validator: </div>
+              <div className="value">
+                <a
+                  data-original={record.validatorAddress}
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${renderExplorerUrl(
+                    session.activeAsset?.config ?? session.wallet.config,
+                    'validator',
+                  )}/${record.validatorAddress}`}
+                >
+                  {record.validatorAddress}
+                </a>
+              </div>
+            </div>
+            <div className="row">
+              <div className="field">Delegator: </div>
+              <div className="value">
+                <a
+                  data-original={record.delegatorAddress}
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${renderExplorerUrl(
+                    session.activeAsset?.config ?? session.wallet.config,
+                    'address',
+                  )}/${record.delegatorAddress}`}
+                >
+                  {record.delegatorAddress}
+                </a>
+              </div>
+            </div>
+            <div className="row">
+              <div className="field">Amount: </div>
+              <div className="value">{record.amount}</div>
+            </div>
+            <div className="row">
+              <div className="field">Auto Claimed Rewards: </div>
+              <div className="value">{record.autoClaimedRewards}</div>
+            </div>
+          </div>
+        );
+      case 'MsgUndelegate':
+        return (
+          <div className="transaction-detail">
+            <div className="row">
+              <div className="field">Validator: </div>
+              <div className="value">
+                <a
+                  data-original={record.validatorAddress}
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${renderExplorerUrl(
+                    session.activeAsset?.config ?? session.wallet.config,
+                    'validator',
+                  )}/${record.validatorAddress}`}
+                >
+                  {record.validatorAddress}
+                </a>
+              </div>
+            </div>
+            <div className="row">
+              <div className="field">Delegator: </div>
+              <div className="value">
+                <a
+                  data-original={record.delegatorAddress}
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${renderExplorerUrl(
+                    session.activeAsset?.config ?? session.wallet.config,
+                    'address',
+                  )}/${record.delegatorAddress}`}
+                >
+                  {record.delegatorAddress}
+                </a>
+              </div>
+            </div>
+            <div className="row">
+              <div className="field">Amount: </div>
+              <div className="value">{record.amount}</div>
+            </div>
+            <div className="row">
+              <div className="field">Auto Claimed Rewards: </div>
+              <div className="value">{record.autoClaimedRewards}</div>
+            </div>
+          </div>
+        );
+      default:
+        return <></>;
+    }
+  };
 
   return (
     <Layout className="site-layout">
@@ -500,7 +791,7 @@ const AssetsPage = () => {
                       <Table
                         columns={TransactionColumns}
                         dataSource={allTransfer}
-                        className="transfer-table"
+                        className="transaction-table"
                         rowKey={record => record.key}
                         locale={{
                           triggerDesc: t('general.table.triggerDesc'),
@@ -512,6 +803,9 @@ const AssetsPage = () => {
                             <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />
                           ),
                           spinning: fetchingComoponent,
+                        }}
+                        expandable={{
+                          expandedRowRender: record => renderTransactionDetail(record),
                         }}
                       />
                     </TabPane>
