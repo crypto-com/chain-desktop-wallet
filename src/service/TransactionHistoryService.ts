@@ -1,6 +1,11 @@
+import Big from 'big.js';
 import { StorageService } from '../storage/StorageService';
 import { NodeRpcService } from './rpc/NodeRpcService';
-import { NOT_KNOWN_YET_VALUE, SECONDS_OF_YEAR } from '../config/StaticConfig';
+import {
+  NOT_KNOWN_YET_VALUE,
+  SECONDS_OF_YEAR,
+  VALIDATOR_UPTIME_THRESHOLD,
+} from '../config/StaticConfig';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { CronosClient } from './cronos/CronosClient';
 import {
@@ -51,6 +56,7 @@ export class TransactionHistoryService {
   public async fetchAndSaveValidators(currentSession: Session) {
     try {
       const validators = await this.getLatestTopValidators();
+
       await this.storageService.saveValidators({
         chainId: currentSession.wallet.config.network.chainId,
         validators,
@@ -75,17 +81,43 @@ export class TransactionHistoryService {
       const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
       const validatorList = await chainIndexAPI.getValidatorsDetail(topValidatorsAddressList);
 
-      const topValidatorsInfo = topValidators.map(validator => {
-        const matchValidator = validatorList.find(val => {
-          return val.operatorAddress === validator.validatorAddress;
-        });
+      const topValidatorsInfo = topValidators
+        .map(validator => {
+          const matchValidator = validatorList.find(val => {
+            return val.operatorAddress === validator.validatorAddress;
+          });
 
-        return {
-          ...validator,
-          apy: matchValidator?.apy,
-          uptime: matchValidator?.impreciseUpTime,
-        };
-      });
+          return {
+            ...validator,
+            apy: matchValidator?.apy,
+            uptime: matchValidator?.impreciseUpTime,
+          };
+        })
+        // Group validators by uptime >= 99.9% & uptime < 99.9%
+        // For Group uptime < 99.9%, sort by Highest uptime %
+        .sort((v1, v2) => {
+          const v1Uptime = Big(v1.uptime ?? '0');
+          const v2Uptime = Big(v2.uptime ?? '0');
+          if (
+            v1Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) >= 0 &&
+            v2Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) < 0
+          ) {
+            return -1;
+          }
+          if (
+            v1Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) < 0 &&
+            v2Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) >= 0
+          ) {
+            return 1;
+          }
+          if (
+            v1Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) < 0 &&
+            v2Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) < 0
+          ) {
+            return v2Uptime.cmp(v1Uptime);
+          }
+          return 0;
+        });
       return topValidatorsInfo;
     } catch (e) {
       // eslint-disable-next-line no-console
