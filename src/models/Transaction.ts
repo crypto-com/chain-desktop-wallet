@@ -5,6 +5,8 @@ import {
   NftTransactionResponse,
   NftDenomData,
 } from '../service/rpc/ChainIndexingModels';
+import { UserAssetType } from './UserAsset';
+import { BridgeTransaction } from '../service/bridge/contracts/BridgeModels';
 
 export enum TransactionStatus {
   SUCCESS = 'SUCCESS',
@@ -36,6 +38,7 @@ export interface StakingTransactionData extends TransactionData {
   delegatorAddress: string;
   validatorAddress: string;
   stakedAmount: string;
+  autoClaimedRewards?: string;
 }
 
 export interface UnbondingDelegationData {
@@ -43,6 +46,13 @@ export interface UnbondingDelegationData {
   validatorAddress: string;
   unbondingAmount: string;
   completionTime: string;
+}
+
+export interface RewardTransactionData {
+  receiverAddress?: string;
+  delegatorAddress: string;
+  validatorAddress: string;
+  amount: string;
 }
 
 export interface NftTransactionData {
@@ -64,7 +74,91 @@ export enum NftTransactionType {
   TRANSFER_NFT = 'MsgTransferNFT',
 }
 
-export interface NftAccountTransactionData extends NftAccountTransactionResponse {}
+export interface NftAccountTransactionData extends NftAccountTransactionResponse { }
+
+/**
+ * COMMON ATTRIBUTES MODELS
+ */
+
+export type CommonAttributesRecord = NftAttributesRecord | StakingAttributesRecord | RewardAttributesRecord;
+
+export interface CommonAttributesByWalletBase {
+  customParams?: { [key: string]: any } // Note: We WILL dedicate a storage for `customParams` like totalBalance, totalRewards, estimatedApy etc.
+  walletId: string;
+}
+
+export interface NftAttributesRecord extends CommonAttributesByWalletBase {
+  type: 'nft',
+  customParams: {
+    nftQuery?: NftQueryParams
+  }
+}
+
+export interface StakingAttributesRecord extends CommonAttributesByWalletBase {
+  type: 'staking',
+  customParams: {
+    totalBalance?: string
+  }
+}
+
+export interface RewardAttributesRecord extends CommonAttributesByWalletBase {
+  type: 'reward',
+  customParams: {
+    totalBalance: string;
+    claimedRewardsBalance?: string;
+    estimatedRewardsBalance?: string;
+    estimatedApy?: string;
+  }
+}
+
+/**
+ * COMMON TRANSACTION MODELS
+ */
+
+export type CommonTransactionRecord = StakingTransactionRecord | RewardTransactionRecord | TransferTransactionRecord | NftAccountTransactionRecord | IBCTransactionRecord | NftTransferRecord;
+
+export interface BaseCommonTransaction {
+  walletId: string;
+  assetId?: string;
+  assetType?: UserAssetType;
+  txHash?: string;
+}
+
+export interface StakingTransactionRecord extends BaseCommonTransaction {
+  txType: "staking";
+  messageTypeName?: string;
+  txData: StakingTransactionData | UnbondingDelegationData;
+}
+
+export interface RewardTransactionRecord extends BaseCommonTransaction {
+  txType: "reward";
+  messageTypeName?: string;
+  txData: RewardTransactionData
+}
+
+export interface TransferTransactionRecord extends BaseCommonTransaction {
+  txType: "transfer";
+  messageTypeName?: string;
+  txData: TransferTransactionData
+}
+
+export interface NftAccountTransactionRecord extends BaseCommonTransaction {
+  txType: "nftAccount";
+  messageTypeName?: string;
+  txData: NftAccountTransactionData
+}
+
+export interface NftTransferRecord extends BaseCommonTransaction {
+  txType: "nftTransfer";
+  messageTypeName?: string;
+  txData: NftTransferModel
+}
+
+export interface IBCTransactionRecord extends BaseCommonTransaction {
+  txType: "ibc";
+  messageTypeName?: string;
+  txData: BridgeTransaction
+}
 
 export interface StakingTransactionList {
   transactions: Array<StakingTransactionData>;
@@ -73,7 +167,7 @@ export interface StakingTransactionList {
 }
 
 export interface RewardTransactionList {
-  transactions: Array<RewardTransaction>;
+  transactions: Array<RewardTransactionData>;
   totalBalance: string;
   claimedRewardsBalance?: string;
   estimatedRewardsBalance?: string;
@@ -119,12 +213,6 @@ export interface ProposalList {
   chainId: string;
 }
 
-export interface RewardTransaction {
-  delegatorAddress: string;
-  validatorAddress: string;
-  amount: string;
-}
-
 export interface RewardsBalances {
   claimedRewardsBalance: string;
   estimatedApy: string;
@@ -157,7 +245,7 @@ export interface ValidatorModel {
   cumulativeSharesExcludePercentage?: string;
 }
 
-export interface ProposalModel extends Proposal {}
+export interface ProposalModel extends Proposal { }
 
 export interface NftTokenData {
   name?: string;
@@ -175,13 +263,13 @@ export interface NftModel extends NftResponse {
   marketplaceLink: string;
 }
 
-export interface NftDenomModel extends NftDenomData {}
+export interface NftDenomModel extends NftDenomData { }
 
 export interface NftProcessedModel extends Omit<NftModel, 'tokenData'> {
   tokenData: NftTokenData;
 }
 
-export interface NftTransferModel extends NftTransactionResponse {}
+export interface NftTransferModel extends NftTransactionResponse { }
 
 // export interface NFTAccountTransactionModel extends NFTAccountTransactionResponse {}
 
@@ -206,3 +294,49 @@ export enum VoteOption {
   VOTE_OPTION_NO = 3,
   VOTE_OPTION_NO_WITH_VETO = 4,
 }
+
+// https://raw.githubusercontent.com/crypto-com/chain-indexing/4c79a3dba2911e738af1d2b2d639f4744c15f58b/usecase/parser/register.go
+export type MsgTypeName =
+  'MsgSend' |
+  'MsgMultiSend' |
+  'MsgSetWithdrawAddress' |
+  'MsgWithdrawDelegatorReward' |
+  'MsgWithdrawValidatorCommission' |
+  'MsgFundCommunityPool' |
+  'MsgSubmitProposal' |
+  'MsgVote' |
+  'MsgDeposit' |
+  'MsgDelegate' |
+  'MsgUndelegate' |
+  'MsgBeginRedelegate' |
+  'MsgCreateValidator' |
+  'MsgEditValidator' |
+  'MsgUnjail' |
+  'MsgIssueDenom' |
+  'MsgMintNFT' |
+  'MsgTransferNFT' |
+  'MsgEditNFT' |
+  'MsgBurnNFT' |
+  'MsgCreateClient' |
+  'MsgUpdateClient' |
+  'MsgConnectionOpenInit' |
+  'MsgConnectionOpenTry' |
+  'MsgConnectionOpenAck' |
+  'MsgConnectionOpenConfirm' |
+  'MsgChannelOpenInit' |
+  'MsgChannelOpenTry' |
+  'MsgChannelOpenAck' |
+  'MsgChannelOpenConfirm' |
+  'MsgRecvPacket' |
+  'MsgAcknowledgement' |
+  'MsgTimeout' |
+  'MsgTimeoutOnClose' |
+  'MsgChannelCloseInit' |
+  'MsgChannelCloseConfirm' |
+  'MsgTransfer' |
+  'MsgGrant' |
+  'MsgRevoke' |
+  'MsgExec' |
+  'MsgGrantAllowance' |
+  'MsgRevokeAllowance' |
+  'MsgCreateVestingAccount';

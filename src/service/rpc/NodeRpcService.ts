@@ -24,7 +24,7 @@ import {
 } from './NodeRpcModels';
 import {
   BroadCastResult,
-  RewardTransaction,
+  RewardTransactionData,
   RewardTransactionList,
   StakingTransactionData,
   StakingTransactionList,
@@ -267,7 +267,7 @@ export class NodeRpcService implements INodeRpcService {
       };
     }
     const { rewards } = response.data;
-    const rewardList: Array<RewardTransaction> = [];
+    const rewardList: Array<RewardTransactionData> = [];
     let totalSum = 0;
     rewards.forEach(stakingReward => {
       let localRewardSum = 0;

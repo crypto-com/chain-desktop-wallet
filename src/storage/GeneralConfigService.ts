@@ -30,7 +30,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         languageCode,
         incorrectUnlockAttempts: 0,
-        isAppLockedByUser: false
+        isAppLockedByUser: false,
       };
       return this.saveGeneralConfig(newConfig);
     }
@@ -47,7 +47,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         incorrectUnlockAttempts: 0,
-        isAppLockedByUser: false
+        isAppLockedByUser: false,
       };
       await this.saveGeneralConfig(newConfig);
       return DEFAULT_LANGUAGE_CODE;
@@ -81,7 +81,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       await this.saveGeneralConfig(newConfig);
       return false;
@@ -99,7 +99,7 @@ export class GeneralConfigService {
       const newConfig: GeneralConfig = {
         ...(savedConfig as GeneralConfig),
         isAppLockedByUser,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       return this.saveGeneralConfig(newConfig);
     }
@@ -116,7 +116,7 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       await this.saveGeneralConfig(newConfig);
       return false;
@@ -128,20 +128,20 @@ export class GeneralConfigService {
     const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
       _id: this.GENERAL_CONFIG_ID,
     });
-    
+
     if (!savedConfig) {
       const newConfig: GeneralConfig = {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 1
+        incorrectUnlockAttempts: 1,
       };
       await this.saveGeneralConfig(newConfig);
       return 1;
     }
     return await this.db.generalConfigStore.update<GeneralConfig>(
       { _id: this.GENERAL_CONFIG_ID },
-      { $set: { incorrectUnlockAttempts : savedConfig.incorrectUnlockAttempts + 1} },
+      { $set: { incorrectUnlockAttempts: savedConfig.incorrectUnlockAttempts + 1 } },
     );
   }
 
@@ -154,14 +154,14 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       await this.saveGeneralConfig(newConfig);
       return;
     }
     await this.db.generalConfigStore.update<GeneralConfig>(
       { _id: this.GENERAL_CONFIG_ID },
-      { $set: { incorrectUnlockAttempts : 0 } },
+      { $set: { incorrectUnlockAttempts: 0 } },
     );
   }
 
@@ -174,13 +174,14 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
-        incorrectUnlockAttempts: 0
+        incorrectUnlockAttempts: 0,
       };
       await this.saveGeneralConfig(newConfig);
       return 0;
     }
     return savedConfig.incorrectUnlockAttempts;
   }
+
 }
 
 export const generalConfigService = new GeneralConfigService('general-config');

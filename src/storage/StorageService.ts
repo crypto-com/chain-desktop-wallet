@@ -1,3 +1,4 @@
+import _ from "lodash";
 import {
   DisableDefaultMemoSettings,
   DisableGASettings,
@@ -25,6 +26,17 @@ import {
   UnbondingDelegationList,
   TransferTransactionList,
   ValidatorList,
+  CommonTransactionRecord,
+  NftAccountTransactionRecord,
+  NftTransferRecord,
+  RewardTransactionRecord,
+  TransferTransactionRecord,
+  IBCTransactionRecord,
+  StakingTransactionRecord,
+  CommonAttributesRecord,
+  NftAttributesRecord,
+  StakingAttributesRecord,
+  RewardAttributesRecord,
 } from '../models/Transaction';
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../config/StaticConfig';
 import {
@@ -34,6 +46,7 @@ import {
 } from '../service/bridge/BridgeConfig';
 import { BridgeTransactionHistoryList } from '../service/bridge/contracts/BridgeModels';
 import { AddressBookContactModel } from '../models/AddressBook';
+// import { generalConfigService } from './GeneralConfigService';
 
 export class StorageService {
   private readonly db: DatabaseManager;
@@ -289,47 +302,98 @@ export class StorageService {
     return this.db.sessionStore.findOne<Session>({ _id: Session.SESSION_ID });
   }
 
-  // public async saveTransferTransaction(
-  //   transferTransaction: TransferTransactionData,
-  //   walletId: string,
-  // ) {
-  //   const currentTransfers = await this.retrieveAllTransferTransactions(walletId);
-  //   let transactions: Array<TransferTransactionData> = [];
-  //   if (currentTransfers) {
-  //     currentTransfers.transactions.push(transferTransaction);
-  //     transactions = currentTransfers.transactions;
-  //   } else {
-  //     transactions.push(transferTransaction);
-  //   }
-  //
-  //   return this.saveTransferTransactions({
-  //     transactions,
-  //     walletId,
-  //   });
-  // }
-
+  /**
+   * @deprecated Not in use anywhere, safe marking
+   * @param stakingTransaction {StakingTransactionData}
+   */
+  // eslint-disable-next-line
   public async saveStakingTransaction(stakingTransaction: StakingTransactionData) {
-    return this.db.stakingStore.update<StakingTransactionData>(
-      { hash: stakingTransaction.hash },
-      { $set: stakingTransaction },
-      { upsert: true },
-    );
+    // return this.db.stakingStore.update<StakingTransactionData>(
+    //   { hash: stakingTransaction.hash },
+    //   { $set: stakingTransaction },
+    //   { upsert: true },
+    // );
   }
 
+  // eslint-disable-next-line consistent-return
   public async saveStakingTransactions(stakingTransactions: StakingTransactionList) {
     if (stakingTransactions.transactions.length === 0) {
       return Promise.resolve();
     }
-    await this.db.stakingStore.remove({ walletId: stakingTransactions.walletId }, { multi: true });
-    return this.db.stakingStore.insert(stakingTransactions);
+    const stakingTxRecords: StakingTransactionRecord[] = stakingTransactions.transactions.map(
+      tx => {
+        return {
+          txType: 'staking',
+          walletId: stakingTransactions.walletId,
+          txData: tx,
+          txHash: tx.hash,
+        };
+      },
+    );
+
+    const stakingAttributeRecord: StakingAttributesRecord = {
+      type: 'staking',
+      walletId: stakingTransactions.walletId,
+      customParams: {
+        totalBalance: stakingTransactions.totalBalance,
+      },
+    };
+
+    // await this.updateCommonAttributes()
+    await this.insertCommonTransactionRecords(stakingTxRecords);
+
+    // Insert to common Attributes store
+    await this.updateCommonAttributes(stakingAttributeRecord);
+
+    // @deprecated
+    /**
+     * await this.db.stakingStore.remove({ walletId: stakingTransactions.walletId }, { multi: true });
+    return this.db.stakingStore.insert(stakingTransactions); */
   }
 
+  // eslint-disable-next-line consistent-return
   public async saveRewardList(rewardTransactions: RewardTransactionList) {
     if (rewardTransactions.transactions.length === 0) {
       return Promise.resolve();
     }
+    const rewardTxRecords: RewardTransactionRecord[] = rewardTransactions.transactions.map(tx => {
+      return {
+        walletId: rewardTransactions.walletId,
+        txType: 'reward',
+        txData: tx,
+      };
+    });
+
+    const rewardAttributeRecord: RewardAttributesRecord = {
+      walletId: rewardTransactions.walletId,
+      type: 'reward',
+      customParams: {
+        totalBalance: rewardTransactions.totalBalance,
+        claimedRewardsBalance: rewardTransactions.claimedRewardsBalance,
+        estimatedApy: rewardTransactions.estimatedApy,
+        estimatedRewardsBalance: rewardTransactions.estimatedRewardsBalance,
+      },
+    };
+
+    // Remove previous `reward` records before insertion
+    await this.db.commonTransactionStore.remove({
+      walletId: rewardTransactions.walletId,
+      txType: 'reward',
+    }, {
+      multi: true
+    });
+
+    // Insert to common transactoin store
+    await this.insertCommonTransactionRecords(rewardTxRecords);
+
+    // Insert to common Attributes store
+    await this.updateCommonAttributes(rewardAttributeRecord);
+
+    // @deprecated
+    /**
+     *
     await this.db.rewardStore.remove({ walletId: rewardTransactions.walletId }, { multi: true });
-    return this.db.rewardStore.insert(rewardTransactions);
+    return this.db.rewardStore.insert(rewardTransactions); */
   }
 
   public async saveUnbondingDelegations(unbondingDelegations: UnbondingDelegationList) {
@@ -345,53 +409,154 @@ export class StorageService {
   }
 
   public async retrieveAllStakingTransactions(walletId: string) {
-    return this.db.stakingStore.findOne<StakingTransactionList>({ walletId });
+    const stakingTxRecord = await this.db.commonTransactionStore.find<StakingTransactionRecord>({
+      walletId,
+      txType: 'staking',
+    });
+
+    const stakingCustomParams = await this.db.commonAttributeStore.findOne<StakingAttributesRecord>(
+      {
+        walletId,
+        type: 'staking',
+      },
+    );
+
+    return {
+      transactions: stakingTxRecord.map(tx => tx.txData),
+      walletId,
+      totalBalance: stakingCustomParams?.customParams?.totalBalance || '0',
+    } as StakingTransactionList;
+
+    // return this.db.stakingStore.findOne<StakingTransactionList>({ walletId });
   }
 
   public async retrieveAllRewards(walletId: string) {
-    return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
+    const rewardTxs = await this.db.commonTransactionStore.find<RewardTransactionRecord>({
+      walletId,
+      txType: 'reward',
+    });
+
+    const rewardCustomParams = await this.db.commonAttributeStore.findOne<RewardAttributesRecord>({
+      walletId,
+      type: 'reward',
+    });
+
+    return {
+      transactions: rewardTxs.map(tx => tx.txData),
+      walletId,
+      totalBalance: rewardCustomParams?.customParams?.totalBalance || '0',
+      claimedRewardsBalance: rewardCustomParams?.customParams?.claimedRewardsBalance || '0',
+      estimatedApy: rewardCustomParams?.customParams?.estimatedApy || '0',
+      estimatedRewardsBalance: rewardCustomParams?.customParams?.estimatedRewardsBalance || '0',
+    } as RewardTransactionList
+
+    // return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
   }
 
   public async retrieveAllUnbondingDelegations(walletId: string) {
     return this.db.unbondingDelegationStore.findOne<UnbondingDelegationList>({ walletId });
   }
 
+  // eslint-disable-next-line
   public async saveTransferTransactions(transferTransactionList: TransferTransactionList) {
     if (transferTransactionList.transactions.length === 0) {
       return Promise.resolve();
     }
-    await this.db.transferStore.remove(
+    // Save into new transaction store
+    const transferTxRecords: TransferTransactionRecord[] = transferTransactionList.transactions.map(
+      tx => {
+        return {
+          walletId: transferTransactionList.walletId,
+          txType: 'transfer',
+          txData: tx,
+          txHash: tx.hash,
+          assetId: transferTransactionList.assetId,
+        };
+      },
+    );
+    await this.insertCommonTransactionRecords(transferTxRecords);
+
+    // @deprecated
+    /**
+     *await this.db.transferStore.remove(
       {
         walletId: transferTransactionList.walletId,
         assetId: transferTransactionList.assetId,
       },
       { multi: true },
     );
-    return this.db.transferStore.insert<TransferTransactionList>(transferTransactionList);
+    return this.db.transferStore.insert<TransferTransactionList>(transferTransactionList); */
   }
 
+  // eslint-disable-next-line
   public async retrieveAllTransferTransactions(walletId: string, assetID?: string) {
-    return this.db.transferStore.findOne<TransferTransactionList>({
+    const transferRecords = await this.db.commonTransactionStore.find<TransferTransactionRecord>({
       walletId,
+      txType: 'transfer',
       assetId: assetID,
     });
+    
+    // Sort the txdata list by `date` in descending 
+    const txDataList = _.orderBy(
+      transferRecords.map(record => record.txData), 'date', "desc");
+
+    return {
+      transactions: txDataList,
+      walletId,
+      assetId: assetID,
+    } as TransferTransactionList;
+
+    // Todo: Deprecated
+    // return this.db.transferStore.findOne<TransferTransactionList>({
+    //   walletId,
+    //   assetId: assetID,
+    // });
   }
 
+  // eslint-disable-next-line
   public async saveNFTAccountTransactions(nftAccountTransactionList: NftAccountTransactionList) {
     if (nftAccountTransactionList.transactions.length === 0) {
       return Promise.resolve();
     }
-    await this.db.nftAccountTxStore.remove(
+    // Save into new transaction store
+    const nftAccountTxRecords: NftAccountTransactionRecord[] = nftAccountTransactionList.transactions.map(
+      tx => {
+        return {
+          walletId: nftAccountTransactionList.walletId,
+          txType: 'nftAccount',
+          txData: tx,
+          txHash: tx.transactionHash,
+        };
+      },
+    );
+    await this.insertCommonTransactionRecords(nftAccountTxRecords);
+
+    // @deprecated
+    /**
+     *await this.db.nftAccountTxStore.remove(
       { walletId: nftAccountTransactionList.walletId },
       { multi: true },
     );
-    return this.db.nftAccountTxStore.insert<NftAccountTransactionList>(nftAccountTransactionList);
+    return this.db.nftAccountTxStore.insert<NftAccountTransactionList>(nftAccountTransactionList); */
   }
 
   public async retrieveAllNFTAccountTransactions(
     walletId: string,
   ): Promise<NftAccountTransactionList> {
-    return this.db.nftAccountTxStore.findOne<NftAccountTransactionList>({ walletId });
+    const nftAccountTxRecords = await this.db.commonTransactionStore.find<
+      NftAccountTransactionRecord
+    >({
+      walletId,
+      txType: 'nftAccount',
+    });
+
+    return {
+      transactions: nftAccountTxRecords.map(record => record.txData),
+      walletId,
+    } as NftAccountTransactionList;
+
+    // @deprecated
+    // return this.db.nftAccountTxStore.findOne<NftAccountTransactionList>({ walletId });
   }
 
   public async saveValidators(validatorList: ValidatorList) {
@@ -430,11 +595,26 @@ export class StorageService {
     return this.db.nftStore.findOne<NftList>({ walletId });
   }
 
+  // eslint-disable-next-line
   public async saveNFTTransferHistory(nftTransactionHistory: NftTransactionHistory) {
     if (!nftTransactionHistory || nftTransactionHistory.transfers.length === 0) {
       return Promise.resolve();
     }
-    await this.db.nftTransferHistoryStore.remove(
+    // Save into new transaction store
+    const nftTxRecords: NftTransferRecord[] = nftTransactionHistory.transfers.map(tx => {
+      return {
+        walletId: nftTransactionHistory.walletId,
+        txType: 'nftTransfer',
+        txData: tx,
+        txHash: tx.transactionHash,
+        messageTypeName: tx.messageType,
+      };
+    });
+    await this.insertCommonTransactionRecords(nftTxRecords);
+
+    // @deprecated
+    /**
+     *await this.db.nftTransferHistoryStore.remove(
       {
         walletId: nftTransactionHistory.walletId,
         nftQuery: nftTransactionHistory.nftQuery,
@@ -442,31 +622,75 @@ export class StorageService {
       { multi: true },
     );
 
-    return this.db.nftTransferHistoryStore.insert<NftTransactionHistory>(nftTransactionHistory);
+    return this.db.nftTransferHistoryStore.insert<NftTransactionHistory>(nftTransactionHistory); */
   }
 
+  // eslint-disable-next-line
   public async retrieveNFTTransferHistory(walletId: string, nftQuery: NftQueryParams) {
-    return this.db.nftTransferHistoryStore.findOne<NftTransactionHistory>({
+    const nftTxRecords = await this.db.commonTransactionStore.find<NftTransferRecord>({
       walletId,
-      nftQuery,
+      txType: 'nftTransfer',
     });
+
+    const nftQueryParam = await this.db.commonAttributeStore.findOne<NftAttributesRecord>({
+      type: 'nft',
+      walletId,
+    });
+
+    return {
+      transfers: nftTxRecords.map(record => record.txData),
+      walletId,
+      nftQuery: nftQueryParam.customParams.nftQuery
+    } as NftTransactionHistory;
+
+    // @deprecated
+    // return this.db.nftTransferHistoryStore.findOne<NftTransactionHistory>({
+    //   walletId,
+    //   nftQuery,
+    // });
   }
 
+  // eslint-disable-next-line
   public async saveBridgeTransactions(bridgeTransactions: BridgeTransactionHistoryList) {
     if (!bridgeTransactions) {
       return Promise.resolve();
     }
+
+    // Save into new transaction store
+    const ibcTxRecords: IBCTransactionRecord[] = bridgeTransactions.transactions.map(tx => {
+      return {
+        walletId: bridgeTransactions.walletId,
+        txType: 'ibc',
+        txData: tx,
+        txHash: tx.sourceTransactionId,
+      };
+    });
+    await this.insertCommonTransactionRecords(ibcTxRecords);
+
+    // @deprecated
+    /**
+     *
     await this.db.bridgeTransactionStore.remove(
       { walletId: bridgeTransactions.walletId },
       { multi: true },
     );
-    return this.db.bridgeTransactionStore.insert<BridgeTransactionHistoryList>(bridgeTransactions);
+    return this.db.bridgeTransactionStore.insert<BridgeTransactionHistoryList>(bridgeTransactions); */
   }
 
   public async retrieveAllBridgeTransactions(walletId: string) {
-    return this.db.bridgeTransactionStore.findOne<BridgeTransactionHistoryList>({
+    const bridgeTxs = await this.db.commonTransactionStore.find<IBCTransactionRecord>({
       walletId,
-    });
+      txType: 'ibc',
+    } as IBCTransactionRecord);
+
+    return {
+      transactions: bridgeTxs.map(tx => tx.txData),
+      walletId,
+    } as BridgeTransactionHistoryList;
+
+    // return this.db.bridgeTransactionStore.findOne<BridgeTransactionHistoryList>({
+    // walletId,
+    // });
   }
 
   // MARK: address book
@@ -541,5 +765,56 @@ export class StorageService {
 
   public async removeAddressBookContact(_id: string) {
     return this.db.addressBookStore.remove({ _id }, {});
+  }
+
+  /**
+   * record {CommonTransactionRecord}   */
+  public async insertCommonTransactionRecord(record: CommonTransactionRecord) {
+    return await this.insertCommonTransactionRecords([record]);
+  }
+
+  // eslint-disable-next-line
+  public async insertCommonTransactionRecords(records: CommonTransactionRecord[]) {
+    if (records.length === 0) {
+      return Promise.resolve();
+    }
+
+    const upsertRequests = records.map(async record => {
+      return this.db.commonTransactionStore.update<CommonTransactionRecord>({
+        txHash: record.txHash,
+        walletId: record.walletId,
+        txType: record.txType
+      }, {
+        $set: record
+      }, {
+        multi: true,
+        upsert: true,
+        returnUpdatedDocs: true
+      })
+    });
+
+    // Batching requests (Max. time profiled for updates: 0.8 Seconds)
+    await Promise.allSettled([...upsertRequests]);
+
+  }
+
+  /**
+   * This function `upserts` the attributes to the database
+   * @param attributeRecord
+   */
+  public async updateCommonAttributes(attributeRecord: CommonAttributesRecord) {
+    await this.db.commonAttributeStore.update<CommonAttributesRecord>(
+      {
+        walletId: attributeRecord.walletId,
+        type: attributeRecord.type,
+      },
+      {
+        $set: attributeRecord,
+      },
+      {
+        upsert: true,
+        returnUpdatedDocs: true,
+      },
+    );
   }
 }

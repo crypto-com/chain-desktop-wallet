@@ -20,6 +20,7 @@ export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
 export const MODERATION_CONFIG_FILE_URL =
   'https://raw.githubusercontent.com/crypto-com/chain-desktop-wallet/dev/config/app.moderation.json';
 
+
 export const UNBLOCKING_PERIOD_IN_DAYS = {
   UNDELEGATION: {
     MAINNET: '28',
