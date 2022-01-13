@@ -1,10 +1,17 @@
-import { ArrowLeftOutlined, ArrowRightOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Button, Input } from 'antd';
+import {
+  ArrowLeftOutlined,
+  ArrowRightOutlined,
+  LoadingOutlined,
+  ReloadOutlined,
+} from '@ant-design/icons';
+import { Button, Input, Spin } from 'antd';
 import * as React from 'react';
 import { IconBookmarkFilled, IconBookmarkNormal } from '../../../../svg/IconBookmark';
 import './style.less';
 
 interface IButtonStates {
+  isLoading: boolean;
+
   isBackButtonDisabled: boolean;
 
   isForwardButtonDisabled: boolean;
@@ -35,27 +42,29 @@ const AddressBar = (props: IAddressBarProps) => {
     <div className="address-bar">
       <Button
         type="link"
-        className="button"
         icon={<ArrowLeftOutlined />}
         disabled={buttonStates.isBackButtonDisabled}
         onClick={buttonCallbacks.onBackButtonClick}
       />
       <Button
         type="link"
-        className="button"
         icon={<ArrowRightOutlined />}
         disabled={buttonStates.isForwardButtonDisabled}
         onClick={buttonCallbacks.onForwardButtonClick}
       />
-      <Button
-        type="link"
-        className="button"
-        icon={<ReloadOutlined />}
-        disabled={buttonStates.isRefreshButtonDisabled}
-        onClick={buttonCallbacks.onRefreshButtonClick}
-      />
+      {buttonStates.isLoading ? (
+        <Spin className="spin" indicator={<LoadingOutlined style={{ fontSize: 16 }} spin />} />
+      ) : (
+        <Button
+          type="link"
+          icon={<ReloadOutlined />}
+          disabled={buttonStates.isRefreshButtonDisabled}
+          onClick={buttonCallbacks.onRefreshButtonClick}
+        />
+      )}
       <Input
         value={value}
+        placeholder="Search DApps or type URL"
         onChange={e => {
           onInputChange(e.target.value);
         }}
@@ -68,7 +77,7 @@ const AddressBar = (props: IAddressBarProps) => {
       />
       <Button
         type="link"
-        className="button"
+        className="bookmark-button"
         style={{
           display: 'flex',
           justifyContent: 'center',
