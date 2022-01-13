@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 - Add Tectonic Support
 - Add CRC20 token whitelisting
 - Add Message Type in transaction list of Crypto.org chain asset
-- Revamp on Transaction History Records data types
+- Revamp Transaction History Records data types
 - Adjust Validator list ordering to better promote validators with Up Time >99.9% yet low Voting Power
 - Update App Icon
 
