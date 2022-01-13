@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.6.4] - 2022-01-13
+### Additions
+- Add Tectonic Support
+- Add CRC20 token whitelisting
+- Add Message Type in transaction list of Crypto.org chain asset
+- Revamp on Transaction History Records data types
+- Adjust Validator list ordering to better promote validators with Up Time >99.9% yet low Voting Power
+- Update App Icon
+
+### Bug fixes
+- Fix showing of finished unbonding delegation
+- Fix missing of vesting account support
+
 ## [v0.6.3] - 2021-12-23
 ### Bug fixes
 - Hide misleading transaction fee on CRC20 tokens
