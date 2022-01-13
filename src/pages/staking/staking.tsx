@@ -1409,7 +1409,8 @@ const StakingPage = () => {
         };
         return data;
       })
-      .filter(dlg => moment(dlg.completionTime).diff(moment()) < 0);
+      // ONLY DISPLAY ``ACTIVE Unbonding Delegations``
+      .filter(dlg => moment().diff(moment(dlg.completionTime)) < 0);
   };
 
   useEffect(() => {
