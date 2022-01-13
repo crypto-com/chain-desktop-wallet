@@ -7,8 +7,8 @@ All notable changes to this project will be documented in this file.
 *Released*
 ## [v0.6.4] - 2022-01-13
 ### Additions
-- Add Tectonic Support
-- Add CRC20 token whitelisting
+- Tectonic Support
+- CRC20 token whitelisting
 - Add Message Type in transaction list of Crypto.org chain asset
 - Revamp Transaction History Records data types
 - Adjust Validator list ordering to better promote validators with Up Time >99.9% yet low Voting Power
