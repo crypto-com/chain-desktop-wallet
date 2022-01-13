@@ -1,3 +1,5 @@
+import { MsgTypeName } from "../../models/Transaction";
+
 export interface TransferData {
   version: number;
   msgIndex: number;
@@ -5,7 +7,7 @@ export interface TransferData {
   amount: TransferDataAmount[];
   height: number;
   txHash: string;
-  msgName: string;
+  msgName: MsgTypeName;
   toAddress: string;
   name: string;
   uuid: string;
@@ -142,8 +144,8 @@ export interface NftDenomResponse {
   result: NftDenomData | null;
 }
 
-export interface AccountMessagesListResponse {
-  result: accountMsgList[];
+export interface AccountMessageListResponse {
+  result: AccountMessage[];
   pagination: Pagination;
 }
 
@@ -154,11 +156,11 @@ export interface Pagination {
   limit: number;
 }
 
-export interface accountMsgList {
+export interface AccountMessage {
   account: string;
   blockHeight: number;
   blockHash: string;
-  blockTime: Date;
+  blockTime: string;
   transactionHash: string;
   success: boolean;
   messageIndex: number;
@@ -168,16 +170,19 @@ export interface accountMsgList {
 
 export interface onChainData {
   height: number;
-  msgName: string;
+  msgName: MsgTypeName;
   txHash: string;
   version: number;
   msgIndex: number;
-  delegatorAddress: string;
-  recipientAddress: string;
   name: string;
   uuid: string;
   amount: Amount[];
-  validatorAddress: string;
+  autoClaimedRewards?: string;
+  toAddress?: string;
+  fromAddress?: string;
+  delegatorAddress?: string;
+  recipientAddress?: string;
+  validatorAddress?: string;
 }
 
 export interface Amount {

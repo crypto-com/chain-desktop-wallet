@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import Big from 'big.js';
+import { isArray } from 'lodash';
 import {
   NftAccountTransactionListResponse,
   NftDenomResponse,
@@ -10,8 +11,8 @@ import {
   TransferDataAmount,
   TransferListResponse,
   TransferResult,
-  AccountMessagesListResponse,
-  accountMsgList,
+  AccountMessageListResponse,
+  AccountMessage,
   ValidatorListResponse,
   AccountInfoResponse,
   ValidatorResponse,
@@ -21,8 +22,18 @@ import {
   TransactionStatus,
   TransferTransactionData,
   NftModel,
+  MsgTypeName,
+  TransactionData,
+  BaseCommonTransaction,
+  TransferTransactionRecord,
+  StakingTransactionRecord,
+  RewardTransactionRecord,
+  CommonTransactionRecord,
 } from '../../models/Transaction';
-import { DefaultWalletConfigs, SECONDS_OF_YEAR } from '../../config/StaticConfig';
+import {
+  DefaultWalletConfigs,
+  SECONDS_OF_YEAR,
+} from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
 import { UserAsset } from '../../models/UserAsset';
@@ -147,8 +158,16 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     address: string,
     asset?: UserAsset,
   ): Promise<Array<TransferTransactionData>> {
+
+    const msgType = [
+      'MsgSend',
+      'MsgWithdrawDelegatorReward',
+      'MsgDelegate',
+      'MsgUndelegate',
+    ]
+
     const transferListResponse = await this.axiosClient.get<TransferListResponse>(
-      `/accounts/${address}/messages?order=height.desc&filter.msgType=MsgSend`,
+      `/accounts/${address}/messages?order=height.desc&filter.msgType=${msgType.join(',')}&limit=1000`,
     );
 
     function getStatus(transfer: TransferResult) {
@@ -161,7 +180,15 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     const { data } = transferListResponse;
 
     function getTransferAmount(transfer): TransferDataAmount | null {
-      return transfer.data.amount.filter(amount => amount.denom === baseAssetSymbol)[0];
+      if (transfer.data.hasOwnProperty('amount')) {
+        if(isArray(transfer.data.amount)) {
+          return transfer.data.amount.filter(amount => amount?.denom === baseAssetSymbol)[0]
+        }
+        if( transfer.data.amount?.denom === baseAssetSymbol ) {
+          return transfer.data.amount;
+        }
+      }
+      return null;
     }
 
     try {
@@ -182,12 +209,135 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
             senderAddress: transfer.data.fromAddress,
             status: getStatus(transfer),
           };
-
           return transferData;
         });
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING_TRANSFERS', { data, baseAssetSymbol, address });
+      return [];
+    }
+  }
+
+  public async fetchAssetDetailTransactions(
+    walletId: string,
+    baseAssetSymbol: string,
+    address: string,
+    asset: UserAsset,
+  ): Promise<CommonTransactionRecord[]> {
+
+    const msgType: MsgTypeName[] = [
+      'MsgSend',
+      'MsgWithdrawDelegatorReward',
+      'MsgDelegate',
+      'MsgUndelegate',
+    ];
+
+    const transactionListResponse = await this.getMessagesByAccountAddress(address, msgType);
+
+    function getStatus(transfer: AccountMessage) {
+      if (transfer.success) {
+        return TransactionStatus.SUCCESS;
+      }
+      return TransactionStatus.FAILED;
+    }
+
+    function getTransactionAmount(tx): TransferDataAmount | null {
+      if (tx.data.hasOwnProperty('amount')) {
+        if(isArray(tx.data.amount)) {
+          return tx.data.amount.filter(amount => amount?.denom === baseAssetSymbol)[0];
+        }
+        if( tx.data.amount?.denom === baseAssetSymbol ) {
+          return tx.data.amount;
+        }
+      }
+      return null;
+    }
+
+    function getAutoClaimedRewardsAmount(tx): TransferDataAmount | null {
+      if (tx.data.hasOwnProperty('autoClaimedRewards')) {
+        if(isArray(tx.data.autoClaimedRewards)) {
+          return tx.data.autoClaimedRewards.filter(amount => amount?.denom === baseAssetSymbol)[0]
+        }
+        if( tx.data.autoClaimedRewards?.denom === baseAssetSymbol ) {
+          return tx.data.autoClaimedRewards;
+        }
+      }
+      return null;
+    }
+
+    try {
+      return transactionListResponse
+      .filter(tx => {
+        const transferAmount = getTransactionAmount(tx);
+        return transferAmount !== undefined && transferAmount !== null && msgType.includes(tx.data.msgName);
+      })
+      .map(tx => {
+        const assetAmount = getTransactionAmount(tx);
+        const autoClaimedRewardsAmount = getAutoClaimedRewardsAmount(tx);
+
+        const commonTransaction: BaseCommonTransaction = {
+          walletId,
+          assetId: asset.identifier,
+          assetType: asset.assetType,
+          txHash: tx.transactionHash,
+        };
+
+        const transactionData: TransactionData = {
+          assetSymbol: asset?.symbol || baseAssetSymbol,
+          date: tx.blockTime,
+          hash: tx.transactionHash,
+          memo: '',
+          status: getStatus(tx),
+        };
+
+        if(tx.data.msgName === 'MsgWithdrawDelegatorReward'){
+          const rewardTransactionRecord: RewardTransactionRecord = {
+            ...commonTransaction,
+            txType: 'reward',
+            messageTypeName: tx.data.msgName,
+            txData: {
+              ...transactionData,
+              receiverAddress: tx.data?.recipientAddress ?? '',
+              delegatorAddress: tx.data?.delegatorAddress ?? '',
+              validatorAddress: tx.data?.validatorAddress ?? '',
+              amount: assetAmount?.amount ?? '0',
+            }
+          };
+          return rewardTransactionRecord;
+        }
+
+        if(tx.data.msgName === 'MsgDelegate' || tx.data.msgName === 'MsgUndelegate'){
+          const stakingTransactionRecord: StakingTransactionRecord = {
+            ...commonTransaction,
+            txType: 'staking',
+            messageTypeName: tx.data.msgName,
+            txData: {
+              ...transactionData,
+              delegatorAddress: tx.data?.delegatorAddress ?? '',
+              validatorAddress: tx.data?.validatorAddress ?? '',
+              stakedAmount: assetAmount?.amount ?? '0',
+              autoClaimedRewards: autoClaimedRewardsAmount?.amount ?? '0',
+            }
+          };
+          return stakingTransactionRecord;
+        }
+
+        const transferTransactionRecord: TransferTransactionRecord = {
+          ...commonTransaction,
+          txType: 'transfer',
+          messageTypeName: tx.data.msgName,
+          txData: {
+            ...transactionData,
+            receiverAddress: tx.data?.toAddress ?? '',
+            senderAddress: tx.data?.fromAddress ?? '',
+            amount: assetAmount?.amount ?? '0',
+          }
+        }
+        return transferTransactionRecord;
+      })
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING_TRANSACTIONS', { transactionListResponse, baseAssetSymbol, address });
       return [];
     }
   }
@@ -393,11 +543,11 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   private async getDelegatorRewardMessageList(address: string) {
     let currentPage = 1;
     let totalPages = 1;
-    const finalMsgList: accountMsgList[] = [];
+    const finalMsgList: AccountMessage[] = [];
 
     while (currentPage <= totalPages) {
       // eslint-disable-next-line no-await-in-loop
-      const delegatorRewardMessageList = await this.axiosClient.get<AccountMessagesListResponse>(
+      const delegatorRewardMessageList = await this.axiosClient.get<AccountMessageListResponse>(
         `accounts/${address}/messages?order=height.desc&filter.msgType=MsgWithdrawDelegatorReward&page=${currentPage}`,
       );
 
@@ -411,6 +561,49 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
       // Process incoming list to sum total claimed rewards
       finalMsgList.push(...delegatorRewardMessageList.data.result);
+    }
+
+    return finalMsgList;
+  }
+
+  /**
+   * TODO: Under construction
+   * @param userAddress Supports only Crypto.org USER addresses
+   * @param optionalMsgTypeNameList {Optional} Cosmos MsgType Name
+   */
+  public async getMessagesByAccountAddress(userAddress: string, optionalMsgTypeNameList?: MsgTypeName[]) {
+    let currentPage = 1;
+    let totalPages = 1;
+
+    const queryURL = `accounts/${userAddress}/messages`;
+
+    const finalMsgList: AccountMessage[] = [];
+
+    const mayBeMsgTypeList = optionalMsgTypeNameList && optionalMsgTypeNameList.length > 0 ? optionalMsgTypeNameList.join(",") : undefined
+
+    const requestParams = {
+      page: currentPage,
+      order: 'height.desc',
+      'filter.msgType': mayBeMsgTypeList,
+    };
+
+    while (currentPage <= totalPages) {
+      // eslint-disable-next-line no-await-in-loop
+      const messageList = await this.axiosClient.get<AccountMessageListResponse>(queryURL, {
+        params: requestParams,
+      });
+
+      totalPages = messageList.data.pagination.total_page;
+      currentPage += 1;
+      requestParams.page = currentPage; // update current page
+
+      // Check if returned list is empty
+      if (messageList.data.result.length < 1) {
+        return finalMsgList;
+      }
+
+      // Process incoming list to sum total claimed rewards
+      finalMsgList.push(...messageList.data.result);
     }
 
     return finalMsgList;

@@ -519,7 +519,19 @@ function HomeLayout(props: HomeLayoutProps) {
                         notification.close(conditionalLinkNotificationKey);
                         setPageLock('');
                         setNavbarMenuSelectedKey(to);
-                        history.push(to);
+                        if (to === '/bridge') {
+                          setTimeout(() => {
+                            history.push(to);
+                          }, 100);
+                          history.push({
+                            pathname: '/refresh',
+                            state: {
+                              from: to,
+                            },
+                          });
+                        } else {
+                          history.push(to);
+                        }
                       }}
                       style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
                     >
@@ -550,7 +562,19 @@ function HomeLayout(props: HomeLayoutProps) {
                         notification.close(conditionalLinkNotificationKey);
                         setPageLock('');
                         setNavbarMenuSelectedKey(to);
-                        history.push(to);
+                        if (to === '/dapp') {
+                          setTimeout(() => {
+                            history.push(to);
+                          }, 100);
+                          history.push({
+                            pathname: '/refresh',
+                            state: {
+                              from: to,
+                            },
+                          });
+                        } else {
+                          history.push(to);
+                        }
                       }}
                       style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
                     >

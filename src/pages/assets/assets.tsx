@@ -1,21 +1,46 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import moment from 'moment';
 import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import './assets.less';
 import 'antd/dist/antd.css';
-import { Layout, Table, Avatar, Tabs, Tag, Typography, Dropdown, Menu } from 'antd';
-import { ArrowLeftOutlined, MoreOutlined } from '@ant-design/icons';
+import { BaseType } from 'antd/lib/typography/Base';
+import {
+  Layout,
+  Table,
+  Avatar,
+  Tabs,
+  Tag,
+  Typography,
+  Dropdown,
+  Menu,
+  Tooltip,
+  Alert,
+  Spin,
+} from 'antd';
+import {
+  ArrowLeftOutlined,
+  ExclamationCircleOutlined,
+  MoreOutlined,
+  LoadingOutlined,
+} from '@ant-design/icons';
 import {
   sessionState,
   allMarketState,
   walletAllAssetsState,
   navbarMenuSelectedKeyState,
   fetchingDBState,
+  fetchingComponentState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
-import { AssetMarketPrice, getAssetBalancePrice, UserAsset } from '../../models/UserAsset';
+import {
+  AssetMarketPrice,
+  getAssetBalancePrice,
+  UserAsset,
+  UserAssetType,
+} from '../../models/UserAsset';
 import { renderExplorerUrl } from '../../models/Explorer';
 import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
@@ -23,57 +48,74 @@ import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 // import logoCro from '../../assets/AssetLogo/cro.png';
 import ReceiveDetail from './components/ReceiveDetail';
+import TransactionDetail from './components/TransactionDetail';
+import TagMsgType from './components/TagMsgType';
 import FormSend from './components/FormSend';
 import { walletService } from '../../service/WalletService';
 import { getChainName, middleEllipsis } from '../../utils/utils';
-import {
-  TransactionDirection,
-  TransactionStatus,
-  TransferTransactionData,
-} from '../../models/Transaction';
+import { TransactionDirection, TransactionStatus } from '../../models/Transaction';
 
 const { Sider, Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const { Text } = Typography;
 
-interface TransferTabularData {
+export interface TransactionTabularData {
   key: string;
+  assetType: UserAssetType;
   transactionHash: string;
-  recipientAddress: string;
-  amount: string;
   time: string;
+  msgTypeName: string;
   direction: TransactionDirection;
   status: TransactionStatus;
+  amount?: string;
+  stakedAmount?: string;
+  senderAddress?: string;
+  recipientAddress?: string;
+  validatorAddress?: string;
+  delegatorAddress?: string;
+  autoClaimedRewards?: string;
 }
 
-const convertTransfers = (
-  allTransfers: TransferTransactionData[],
+const convertTransactions = (
+  allTransactions: any[],
   allAssets: UserAsset[],
   sessionData: Session,
   asset: UserAsset,
 ) => {
   const address = asset.address?.toLowerCase() || sessionData.wallet.address.toLowerCase();
-  function getDirection(from: string, to: string): TransactionDirection {
+  function getDirection(from: string = '', to: string = ''): TransactionDirection {
     if (address === from.toLowerCase() && address === to.toLowerCase()) {
       return TransactionDirection.SELF;
+    }
+    if (address === to.toLowerCase()) {
+      return TransactionDirection.INCOMING;
     }
     if (address === from.toLowerCase()) {
       return TransactionDirection.OUTGOING;
     }
-    return TransactionDirection.INCOMING;
+
+    return TransactionDirection.SELF;
   }
 
-  return allTransfers.map(transfer => {
-    const transferAmount = getUIDynamicAmount(transfer.amount, asset);
+  return allTransactions.map(transaction => {
 
-    const data: TransferTabularData = {
-      key: transfer.hash + transfer.receiverAddress + transfer.amount,
-      recipientAddress: transfer.receiverAddress,
-      transactionHash: transfer.hash,
-      time: new Date(transfer.date).toString(),
-      amount: `${transferAmount} ${transfer.assetSymbol}`,
-      direction: getDirection(transfer.senderAddress, transfer.receiverAddress),
-      status: transfer.status,
+    const { txData } = transaction;
+
+    const data: TransactionTabularData = {
+      key: txData.hash + txData.receiverAddress + txData.amount,
+      assetType: asset.assetType ?? UserAssetType.TENDERMINT,
+      senderAddress: txData.senderAddress,
+      recipientAddress: txData.receiverAddress,
+      validatorAddress: txData.validatorAddress,
+      delegatorAddress: txData.delegatorAddress,
+      transactionHash: txData.hash,
+      time: `${moment(new Date(txData.date)).format('YYYY-MM-DD, HH:mm:ss Z')}`,
+      amount: `${getUIDynamicAmount(txData.amount, asset)} ${txData.assetSymbol}`,
+      stakedAmount: `${getUIDynamicAmount(txData.stakedAmount, asset)} ${txData.assetSymbol}`,
+      autoClaimedRewards: `${getUIDynamicAmount(txData.autoClaimedRewards, asset)} ${txData.assetSymbol}`,
+      msgTypeName: transaction.messageTypeName,
+      direction: getDirection(txData.senderAddress, txData.receiverAddress),
+      status: txData.status,
     };
     return data;
   });
@@ -85,13 +127,14 @@ const AssetsPage = () => {
   const allMarketData = useRecoilValue(allMarketState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setFetchingDB = useSetRecoilState(fetchingDBState);
+  const [fetchingComoponent, setFetchingComponent] = useRecoilState(fetchingComponentState);
 
   // const [isLedger, setIsLedger] = useState(false);
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(session.activeAsset);
   const [currentAssetMarketData, setCurrentAssetMarketData] = useState<AssetMarketPrice>();
   const [isAssetVisible, setIsAssetVisible] = useState(false);
   const [activeAssetTab, setActiveAssetTab] = useState('transaction');
-  const [allTransfer, setAllTransfer] = useState<any>();
+  const [allTransactions, setAllTransactions] = useState<any>();
 
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
@@ -102,9 +145,11 @@ const AssetsPage = () => {
     identifier: '',
   };
 
-  const syncTransfers = async asset => {
-    const transfers = await walletService.retrieveAllTransfers(session.wallet.identifier, asset);
-    setAllTransfer(convertTransfers(transfers, walletAllAssets, session, asset));
+  const syncTransactions = async asset => {
+    setFetchingComponent(true);
+    const transactions = await walletService.syncTransactionRecordsByAsset(session, asset);
+    setAllTransactions(convertTransactions(transactions, walletAllAssets, session, asset));
+    setFetchingComponent(false);
   };
 
   const syncAssetBalance = async asset => {
@@ -120,7 +165,7 @@ const AssetsPage = () => {
   useEffect(() => {
     const checkDirectedFrom = async () => {
       if (locationState.from === '/home' && session.activeAsset) {
-        syncTransfers(session.activeAsset);
+        syncTransactions(session.activeAsset);
         setCurrentAsset(session.activeAsset);
         setCurrentAssetMarketData(
           allMarketData.get(`${session.activeAsset.mainnetSymbol}-${session.currency}`),
@@ -168,13 +213,18 @@ const AssetsPage = () => {
       // dataIndex: 'name',
       key: 'name',
       sorter: (a, b) => a.name.localeCompare(b.name),
-      render: record => {
+      render: (record: UserAsset) => {
         const { symbol } = record;
 
         return (
           <div className="name">
             {assetIcon(record)}
             {symbol}
+            {record.isWhitelisted === false && (
+              <Tooltip title={t('assets.whitelist.warning')}>
+                <ExclamationCircleOutlined style={{ color: '#ff4d4f', marginLeft: '6px' }} />
+              </Tooltip>
+            )}
           </div>
         );
       },
@@ -293,17 +343,48 @@ const AssetsPage = () => {
             'tx',
           )}/${text}`}
         >
-          {middleEllipsis(text, 12)}
+          {middleEllipsis(text, 6)}
         </a>
       ),
     },
+    ...(currentAsset?.assetType === UserAssetType.TENDERMINT ||
+    currentAsset?.assetType === UserAssetType.IBC
+      ? [
+          {
+            title: t('home.transactions.table1.msgTypeName'),
+            dataIndex: 'msgTypeName',
+            key: 'msgTypeName',
+            render: text => {
+              return <TagMsgType msgTypeName={text} />;
+            },
+          },
+        ]
+      : []),
     {
       title: t('home.transactions.table1.amount'),
-      dataIndex: 'amount',
+      // dataIndex: 'amount',
       key: 'amount',
-      render: (text, record: TransferTabularData) => {
-        const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
-        const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+      render: (record: TransactionTabularData) => {
+        let color: BaseType = 'secondary';
+        let sign = '';
+        switch (record.direction) {
+          case TransactionDirection.OUTGOING:
+            color = 'danger';
+            sign = '-';
+            break;
+          case TransactionDirection.INCOMING:
+            color = 'success';
+            sign = '+';
+            break;
+          case TransactionDirection.SELF:
+            color = 'secondary';
+            break;
+          default:
+            break;
+        }
+        const text = record.msgTypeName === 'MsgDelegate' || record.msgTypeName === 'MsgUndelegate' 
+        ? record.stakedAmount 
+        : record.amount;
         return (
           <Text type={color}>
             {sign}
@@ -311,24 +392,6 @@ const AssetsPage = () => {
           </Text>
         );
       },
-    },
-    {
-      title: t('home.transactions.table1.recipientAddress'),
-      dataIndex: 'recipientAddress',
-      key: 'recipientAddress',
-      render: text => (
-        <a
-          data-original={text}
-          target="_blank"
-          rel="noreferrer"
-          href={`${renderExplorerUrl(
-            session.activeAsset?.config ?? session.wallet.config,
-            'address',
-          )}/${text}`}
-        >
-          {middleEllipsis(text, 12)}
-        </a>
-      ),
     },
     {
       title: t('home.transactions.table1.time'),
@@ -339,9 +402,7 @@ const AssetsPage = () => {
       title: t('home.transactions.table1.status'),
       dataIndex: 'status',
       key: 'status',
-      render: (text, record: TransferTabularData) => {
-        // const color = record.direction === TransactionDirection.OUTGOING ? 'danger' : 'success';
-        // const sign = record.direction === TransactionDirection.OUTGOING ? '-' : '+';
+      render: (text, record: TransactionTabularData) => {
         let statusColor;
         if (record.status === TransactionStatus.SUCCESS) {
           statusColor = 'success';
@@ -413,13 +474,21 @@ const AssetsPage = () => {
                         </div>
                       </Content>
                     </Layout>
+                    {currentAsset?.isWhitelisted === false && (
+                      <Alert
+                        message={t('assets.whitelist.warning')}
+                        type="error"
+                        showIcon
+                        icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
+                      />
+                    )}
                   </div>
                   <Tabs
                     activeKey={activeAssetTab}
                     onTabClick={key => {
                       setActiveAssetTab(key);
                       if (key === 'transaction') {
-                        syncTransfers(currentAsset);
+                        syncTransactions(currentAsset);
                         syncAssetBalance(currentAsset);
                         setNavbarMenuSelectedKey('/assets');
                       }
@@ -464,13 +533,24 @@ const AssetsPage = () => {
                     <TabPane tab={t('assets.tab1')} key="transaction">
                       <Table
                         columns={TransactionColumns}
-                        dataSource={allTransfer}
-                        className="transfer-table"
+                        dataSource={allTransactions}
+                        className="transaction-table"
                         rowKey={record => record.key}
                         locale={{
                           triggerDesc: t('general.table.triggerDesc'),
                           triggerAsc: t('general.table.triggerAsc'),
                           cancelSort: t('general.table.cancelSort'),
+                        }}
+                        loading={{
+                          indicator: (
+                            <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />
+                          ),
+                          spinning: fetchingComoponent,
+                        }}
+                        expandable={{
+                          expandedRowRender: record => (
+                            <TransactionDetail transaction={record} session={session} />
+                          ),
                         }}
                       />
                     </TabPane>
@@ -495,7 +575,7 @@ const AssetsPage = () => {
                         ...session,
                         activeAsset: selectedAsset,
                       });
-                      syncTransfers(selectedAsset);
+                      syncTransactions(selectedAsset);
                       setCurrentAsset(selectedAsset);
                       setCurrentAssetMarketData(
                         allMarketData.get(`${selectedAsset.mainnetSymbol}-${session.currency}`),

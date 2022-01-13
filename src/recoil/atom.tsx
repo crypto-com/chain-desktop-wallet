@@ -142,6 +142,11 @@ const fetchingDBState = atom<boolean>({
   default: false,
 });
 
+const fetchingComponentState = atom<boolean>({
+  key: 'fetchingComponent',
+  default: false,
+});
+
 export {
   walletIdentifierState,
   sessionState,
@@ -160,4 +165,5 @@ export {
   isBridgeTransferingState,
   pageLockState,
   fetchingDBState,
+  fetchingComponentState,
 };
