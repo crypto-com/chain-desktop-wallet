@@ -36,7 +36,7 @@ export const useWebviewStatusInfo = (props: IWebviewStatusInfoProps) => {
       });
     });
 
-    webview.addEventListener('did-finish-load', () => {
+    webview.addEventListener('did-stop-loading', () => {
       setState('loaded');
       setNavigationState({
         canGoBack: webview.canGoBack(),
