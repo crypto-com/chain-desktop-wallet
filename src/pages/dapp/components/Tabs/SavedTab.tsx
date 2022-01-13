@@ -68,7 +68,7 @@ const SavedTab = (props: ISavedTabProps) => {
                 src={bookmark.faviconURL}
                 style={{
                   borderRadius: '16px',
-                  width: '32px',
+                  minWidth: '32px',
                   height: '32px',
                   marginRight: '20px',
                 }}
