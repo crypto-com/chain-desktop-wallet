@@ -12,7 +12,7 @@ import logoTectonic from './assets/tectonic.svg';
 import AddressBar from './components/AddressBar/AddressBar';
 import SavedTab from './components/Tabs/SavedTab';
 import { isValidURL } from '../../utils/utils';
-import { IWebviewNavigationState } from './browser/useWebviewStatusInfo';
+import { IWebviewNavigationState, WebviewState } from './browser/useWebviewStatusInfo';
 import { useBookmark } from './hooks/useBookmark';
 
 const { Header, Content } = Layout;
@@ -70,17 +70,18 @@ const DappPage = () => {
   const [selectedTabKey, setSelectedTabKey] = useState<string>(TabKey.popular);
 
   useEffect(() => {
-    if (selectedDapp) {
+    if (selectedDapp || selectedURL) {
       setPageLock('dapp');
     } else {
       setPageLock('');
     }
-  }, [selectedDapp]);
+  }, [selectedDapp, selectedURL]);
 
   const shouldShowBrowser = selectedDapp || selectedURL?.length > 0;
   const [addressBarValue, setAddressBarValue] = useState('');
 
   const [webviewNavigationState, setWebviewNavigationState] = useState<IWebviewNavigationState>();
+  const [webviewState, setWebviewState] = useState<WebviewState>();
 
   const {
     list: bookmarkList,
@@ -112,6 +113,7 @@ const DappPage = () => {
         value={addressBarValue}
         onInputChange={value => setAddressBarValue(value)}
         buttonStates={{
+          isLoading: webviewState === 'loading',
           isBackButtonDisabled: webviewNavigationState?.canGoBack === false,
           isForwardButtonDisabled: webviewNavigationState?.canGoForward === false,
           isRefreshButtonDisabled: webviewNavigationState?.canRefresh === false,
@@ -165,10 +167,14 @@ const DappPage = () => {
           dapp={selectedDapp}
           dappURL={selectedURL}
           ref={browserRef}
-          onStateChange={(_, navState) => {
+          onStateChange={(state, navState) => {
+            setWebviewState(state);
             setWebviewNavigationState(navState);
           }}
           onURLChanged={url => {
+            if (!url || url.length < 1) {
+              return;
+            }
             setAddressBarValue(url);
             updateBookmarkButtonBeHighlighted();
           }}
