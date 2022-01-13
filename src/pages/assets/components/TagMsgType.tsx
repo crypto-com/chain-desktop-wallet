@@ -11,7 +11,7 @@ interface TagMsgTypeProps {
 const TagMsgType: React.FC<TagMsgTypeProps> = props => {
   const { msgTypeName } = props;
 
-  let text = msgTypeName.toString();
+  let text = msgTypeName ? msgTypeName.toString() : '';
   let color = 'processing';
 
   switch (msgTypeName) {
