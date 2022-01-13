@@ -288,7 +288,7 @@ export class TransactionSenderService {
 
         await Promise.all([
           await this.txHistoryManager.fetchAndUpdateBalances(currentSession),
-          await this.txHistoryManager.fetchAndSaveTransfers(currentSession),
+          // await this.txHistoryManager.fetchAndSaveTransfers(currentSession),
         ]);
 
         return broadCastResult;
@@ -597,7 +597,7 @@ export class TransactionSenderService {
 
     await Promise.all([
       await this.txHistoryManager.fetchAndUpdateBalances(currentSession),
-      await this.txHistoryManager.fetchAndSaveTransfers(currentSession),
+      // await this.txHistoryManager.fetchAndSaveTransfers(currentSession),
     ]);
 
     return bridgeTransactionResult;
