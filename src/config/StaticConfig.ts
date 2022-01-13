@@ -20,6 +20,7 @@ export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
 export const MODERATION_CONFIG_FILE_URL =
   'https://raw.githubusercontent.com/crypto-com/chain-desktop-wallet/dev/config/app.moderation.json';
 
+
 export const UNBLOCKING_PERIOD_IN_DAYS = {
   UNDELEGATION: {
     MAINNET: '28',
@@ -112,7 +113,9 @@ export const NodePorts = {
 };
 // maximum in ledger: 2147483647
 export const LedgerWalletMaximum = 2147483647;
-export const CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD = 33.3;
+
+export const VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD = 33.3;
+export const VALIDATOR_UPTIME_THRESHOLD = 0.999;
 
 // 1 year = 60sec * 60 * 24 * 365 = 31536000 sec
 export const SECONDS_OF_YEAR = 31536000;

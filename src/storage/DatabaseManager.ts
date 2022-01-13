@@ -13,11 +13,11 @@ export class DatabaseManager {
 
   public readonly marketPriceStore: Datastore;
 
-  public readonly transferStore: Datastore;
+  // public readonly transferStore: Datastore;
 
-  public readonly stakingStore: Datastore;
+  // public readonly stakingStore: Datastore;
 
-  public readonly rewardStore: Datastore;
+  // public readonly rewardStore: Datastore;
 
   public readonly unbondingDelegationStore: Datastore;
 
@@ -31,16 +31,20 @@ export class DatabaseManager {
 
   public readonly nftStore: Datastore;
 
-  public readonly nftTransferHistoryStore: Datastore;
+  // public readonly nftTransferHistoryStore: Datastore;
 
-  public readonly nftAccountTxStore: Datastore;
+  // public readonly nftAccountTxStore: Datastore;
 
   // This is for configuration that span across all wallets
   public readonly generalConfigStore: Datastore;
 
   public readonly bridgeConfigStore: Datastore;
 
-  public readonly bridgeTransactionStore: Datastore;
+  // public readonly bridgeTransactionStore: Datastore;
+  
+  public readonly commonTransactionStore: Datastore;
+
+  public readonly commonAttributeStore: Datastore;
 
   public readonly addressBookStore: Datastore;
 
@@ -51,9 +55,16 @@ export class DatabaseManager {
     this.walletStore = getStore(namespace, 'wallets');
     this.assetStore = getStore(namespace, 'assets');
     this.marketPriceStore = getStore(namespace, 'markets-prices');
-    this.transferStore = getStore(namespace, 'transfers');
-    this.stakingStore = getStore(namespace, 'staking');
-    this.rewardStore = getStore(namespace, 'rewards');
+    
+    // @deprecated
+    // this.transferStore = getStore(namespace, 'transfers');
+    
+    // @deprecated
+    // this.stakingStore = getStore(namespace, 'staking');
+    
+    // @deprecated
+    // this.rewardStore = getStore(namespace, 'rewards');
+    
     this.unbondingDelegationStore = getStore(namespace, 'unbondingDelegations');
     this.credentialStore = getStore(namespace, 'credential');
     this.seedStore = getStore(namespace, 'seeds');
@@ -61,10 +72,18 @@ export class DatabaseManager {
     this.proposalStore = getStore(namespace, 'proposals');
     this.nftStore = getStore(namespace, 'nftStore');
     this.generalConfigStore = getStore(namespace, 'generalConfigStore');
-    this.nftTransferHistoryStore = getStore(namespace, 'nftTransferHistoryStore');
-    this.nftAccountTxStore = getStore(namespace, 'nftAccountTxStore');
+    // @deprecated
+    // this.nftTransferHistoryStore = getStore(namespace, 'nftTransferHistoryStore');
+   
+    // @deprecated
+    // this.nftAccountTxStore = getStore(namespace, 'nftAccountTxStore');
     this.bridgeConfigStore = getStore(namespace, 'bridgeConfigStore');
-    this.bridgeTransactionStore = getStore(namespace, 'bridgeTransactionStore');
+   
+    // @deprecated
+    // this.bridgeTransactionStore = getStore(namespace, 'bridgeTransactionStore');
+    
+    this.commonTransactionStore = getStore(namespace, 'commonTransactionStore');
+    this.commonAttributeStore = getStore(namespace, 'commonAttributeStore');
     this.addressBookStore = getStore(namespace, 'addressBook');
     this.dappBrowserBookmarksStore = getStore(namespace, 'dappBrowserBookmarksStore');
   }
