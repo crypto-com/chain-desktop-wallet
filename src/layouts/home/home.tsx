@@ -465,7 +465,7 @@ function HomeLayout(props: HomeLayoutProps) {
             ) {
               nodeUrl = nodeUrl.replace('cronos.crypto.org', 'cronos.org');
               indexingUrl = indexingUrl.replace('cronos.crypto.org', 'cronos.org');
-              explorerUrl = explorerUrl.replace('cronos.crypto.org', 'cronos.org');
+              explorerUrl = explorerUrl.replace('cronos.crypto.org', 'cronoscan.com');
             }
             const newlyUpdatedAsset: UserAsset = {
               ...asset,
