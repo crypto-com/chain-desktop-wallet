@@ -14,6 +14,8 @@ import SavedTab from './components/Tabs/SavedTab';
 import { isValidURL } from '../../utils/utils';
 import { IWebviewNavigationState, WebviewState } from './browser/useWebviewStatusInfo';
 import { useBookmark } from './hooks/useBookmark';
+import { useShowDisclaimer } from './hooks/useShowDisclaimer';
+import { DisclaimerModal } from './components/DisclaimerModal/DisclaimerModal';
 
 const { Header, Content } = Layout;
 const { TabPane } = Tabs;
@@ -83,6 +85,9 @@ const DappPage = () => {
   const [webviewNavigationState, setWebviewNavigationState] = useState<IWebviewNavigationState>();
   const [webviewState, setWebviewState] = useState<WebviewState>();
 
+  const { shouldShowDisclaimer, setDisableDisclaimer } = useShowDisclaimer();
+  const [selectedShowDisclaimerURL, setSelectedShowDisclaimerURL] = useState('');
+
   const {
     list: bookmarkList,
     add: addBookmark,
@@ -109,6 +114,21 @@ const DappPage = () => {
 
   return (
     <Layout className="site-layout">
+      {selectedShowDisclaimerURL && (
+        <DisclaimerModal
+          url={selectedShowDisclaimerURL}
+          onCancel={() => {
+            setSelectedShowDisclaimerURL('');
+          }}
+          onConfirm={(checked, url) => {
+            if (checked) {
+              setDisableDisclaimer(url);
+            }
+            setSelectedURL(url);
+            setSelectedShowDisclaimerURL('');
+          }}
+        />
+      )}
       <AddressBar
         value={addressBarValue}
         onInputChange={value => setAddressBarValue(value)}
@@ -198,6 +218,11 @@ const DappPage = () => {
                         <BorderlessCard
                           key={`partner-${idx}`}
                           onClick={() => {
+                            if (shouldShowDisclaimer(dapp.url)) {
+                              setSelectedShowDisclaimerURL(dapp.url);
+                              return;
+                            }
+
                             setSelectedDapp(dapp);
                           }}
                         >
@@ -217,6 +242,11 @@ const DappPage = () => {
               <TabPane tab="Saved" key={TabKey.saved}>
                 <SavedTab
                   onClick={bookmark => {
+                    if (shouldShowDisclaimer(bookmark.url)) {
+                      setSelectedShowDisclaimerURL(bookmark.url);
+                      return;
+                    }
+
                     setSelectedDapp(undefined);
                     setSelectedURL(bookmark.url);
                   }}

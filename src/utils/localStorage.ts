@@ -2,10 +2,12 @@ import { Bookmark } from '../models/DappBrowser';
 
 export enum SettingsKey {
   DappBookmarks = 'dapp_book_marks',
+  DappDisclaimerDisabledList = 'dapp_disclaimer_disabled_list',
 }
 
 export const DefaultSettings = {
   [SettingsKey.DappBookmarks]: [] as Bookmark[],
+  [SettingsKey.DappDisclaimerDisabledList]: [] as string[],
 };
 
 export const getLocalSetting = <T>(key: SettingsKey): T => {
