@@ -82,6 +82,11 @@ import { ISignerProvider } from '../../service/signers/SignerProvider';
 import { UserAsset, UserAssetType } from '../../models/UserAsset';
 import IconCro from '../../svg/IconCro';
 import IconEth from '../../svg/IconEth';
+import { BridgeService } from '../../service/bridge/BridgeService';
+import {
+  DefaultMainnetBridgeConfigs,
+  DefaultTestnetBridgeConfigs,
+} from '../../service/bridge/BridgeConfig';
 // import i18n from '../../language/I18n';
 
 interface HomeLayoutProps {
@@ -419,6 +424,14 @@ function HomeLayout(props: HomeLayoutProps) {
         cronosAsset?.config?.explorerUrl.indexOf('cronos.crypto.org') !== -1
       ) {
         const updateExplorerUrlNotificationKey = 'updateExplorerUrlNotificationKey';
+
+        // Update to Default Bridge Configs
+        const bridgeService = new BridgeService(walletService.storageService);
+
+        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
 
         // Update All Assets in All Wallets
         const allWallets = await walletService.retrieveAllWallets();
