@@ -1008,7 +1008,7 @@ const FormWithdrawStakingReward = () => {
   const convertToTabularData = (
     allRewards: RewardTransactionData[],
     currentAsset: UserAsset,
-    currentMarketPrice: AssetMarketPrice,
+    currentMarketPrice: AssetMarketPrice | undefined,
   ) => {
     return allRewards
       .filter(reward => Big(reward.amount).gte(Big(0)))
@@ -1024,7 +1024,7 @@ const FormWithdrawStakingReward = () => {
           key: `${reward.validatorAddress}${reward.amount}`,
           rewardAmount: `${rewardAmount} ${currentAsset.symbol}`,
           rewardMarketPrice:
-            rewardMarketPrice !== ''
+            rewardMarketPrice !== '' && currentMarketPrice
               ? `${SUPPORTED_CURRENCY.get(currentMarketPrice?.currency)?.symbol}${numeral(
                   rewardMarketPrice,
                 ).format('0,0.00')} ${currentMarketPrice?.currency}`
@@ -1038,7 +1038,7 @@ const FormWithdrawStakingReward = () => {
   useEffect(() => {
     const syncRewardsData = async () => {
       const currentMarketData = allMarketData.get(
-        `${walletAsset?.symbol}-${currentSession?.currency}`,
+        `${walletAsset?.mainnetSymbol}-${currentSession?.currency}`,
       );
 
       const allRewards: RewardTransactionData[] = await walletService.retrieveAllRewards(
@@ -1054,14 +1054,8 @@ const FormWithdrawStakingReward = () => {
           ? walletAsset
           : await walletService.retrieveDefaultWalletAsset(currentSession);
 
-      if (currentMarketData) {
-        const rewardsTabularData = convertToTabularData(
-          allRewards,
-          primaryAsset,
-          currentMarketData,
-        );
-        setRewards(rewardsTabularData);
-      }
+      const rewardsTabularData = convertToTabularData(allRewards, primaryAsset, currentMarketData);
+      setRewards(rewardsTabularData);
 
       setWalletAsset(primaryAsset);
     };
@@ -1395,21 +1389,24 @@ const StakingPage = () => {
     allUnbondingDelegations: UnbondingDelegationData[],
     currentAsset: UserAsset,
   ) => {
-    return allUnbondingDelegations
-      .map(dlg => {
-        const unbondingAmount = getUIDynamicAmount(dlg.unbondingAmount, currentAsset);
-        const data: UnbondingDelegationTabularData = {
-          key: `${dlg.validatorAddress}_${dlg.unbondingAmount}_${dlg.completionTime}`,
-          delegatorAddress: dlg.delegatorAddress,
-          validatorAddress: dlg.validatorAddress,
-          completionTime: new Date(dlg.completionTime).toString(),
-          unbondingAmount,
-          unbondingAmountWithSymbol: `${unbondingAmount} ${currentAsset.symbol}`,
-          remainingTime: formatRemainingTime(dlg.completionTime),
-        };
-        return data;
-      })
-      .filter(dlg => moment(dlg.completionTime).diff(moment()) < 0);
+    return (
+      allUnbondingDelegations
+        .map(dlg => {
+          const unbondingAmount = getUIDynamicAmount(dlg.unbondingAmount, currentAsset);
+          const data: UnbondingDelegationTabularData = {
+            key: `${dlg.validatorAddress}_${dlg.unbondingAmount}_${dlg.completionTime}`,
+            delegatorAddress: dlg.delegatorAddress,
+            validatorAddress: dlg.validatorAddress,
+            completionTime: new Date(dlg.completionTime).toString(),
+            unbondingAmount,
+            unbondingAmountWithSymbol: `${unbondingAmount} ${currentAsset.symbol}`,
+            remainingTime: formatRemainingTime(dlg.completionTime),
+          };
+          return data;
+        })
+        // ONLY DISPLAY ``ACTIVE Unbonding Delegations``
+        .filter(dlg => moment().diff(moment(dlg.completionTime)) < 0)
+    );
   };
 
   useEffect(() => {
