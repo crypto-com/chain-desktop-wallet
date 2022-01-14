@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons';
 import { Button, Input, Spin } from 'antd';
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { IconBookmarkFilled, IconBookmarkNormal } from '../../../../svg/IconBookmark';
 import './style.less';
 
@@ -37,6 +38,7 @@ interface IAddressBarProps {
 
 const AddressBar = (props: IAddressBarProps) => {
   const { buttonStates, value, onSearch, onInputChange, buttonCallbacks } = props;
+  const [t] = useTranslation();
 
   return (
     <div className="address-bar">
@@ -64,7 +66,7 @@ const AddressBar = (props: IAddressBarProps) => {
       )}
       <Input
         value={value}
-        placeholder="Search DApps or type URL"
+        placeholder={t('dapp.addressbar.placeholder')}
         onChange={e => {
           onInputChange(e.target.value);
         }}

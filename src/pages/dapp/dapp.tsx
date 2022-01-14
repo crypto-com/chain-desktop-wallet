@@ -210,7 +210,7 @@ const DappPage = () => {
                 setSelectedTabKey(value);
               }}
             >
-              <TabPane tab="Popular" key={TabKey.popular}>
+              <TabPane tab={t('dapp.tab.popular.title')} key={TabKey.popular}>
                 <div className="dapps">
                   <div className="cards">
                     {DappList.map((dapp, idx) => {
@@ -239,7 +239,7 @@ const DappPage = () => {
                   </div>
                 </div>
               </TabPane>
-              <TabPane tab="Saved" key={TabKey.saved}>
+              <TabPane tab={t('dapp.tab.saved.title')} key={TabKey.saved}>
                 <SavedTab
                   onClick={bookmark => {
                     if (shouldShowDisclaimer(bookmark.url)) {

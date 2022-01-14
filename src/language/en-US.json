@@ -417,6 +417,8 @@
   "dapp.disclaimer.content1": "You are responsible for your use of any DApps. DApps are controlled solely by their respective project providers. Please check the receiving addresses or contract addresses before you transfer any assets.",
   "dapp.disclaimer.content2": "We are not responsible for the accuracy, completeness, or usefulness of such DApps. Accordingly, we neither endorse, recommend, nor give any opinion, advice or whatsoever on such DApps. are not responsible or liable for any losses incurred during your use of DApps.",
   "dapp.disclaimer.checkbox.label": "Don't show this message again.",
+  "dapp.tab.popular.title": "Popular",
+  "dapp.tab.saved.title": "Saved",
   "dapp.saved.empty.label": "You don't have any saved DApps yet",
   "staking.title": "Staking",
   "staking.tab1": "Staking Rewards",
