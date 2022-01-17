@@ -28,6 +28,7 @@ import { Session } from '../models/Session';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import { isCRC20AssetWhitelisted } from '../utils/utils';
+import { SupportedCRCTokenStandard } from './rpc/interface/cronos.chainIndex';
 
 export class TransactionHistoryService {
   private storageService: StorageService;
@@ -643,41 +644,43 @@ export class TransactionHistoryService {
 
     const tokensListResponse = await cronosClient.getTokensOwnedByAddress(address);
 
-    const newlyLoadedTokens = await tokensListResponse.result.map(async token => {
-      const newCRC20Token: UserAsset = {
-        balance: token.balance,
-        decimals: Number(token.decimals),
-        contractAddress: token.contractAddress,
-        description: `${token.name} (${token.symbol})`,
-        icon_url: CronosClient.getTokenIconUrlBySymbol(token.symbol),
-        identifier: `${token.name}_(${token.symbol})_${croEvmAsset.walletId}`,
-        mainnetSymbol: token.symbol,
-        name: croEvmAsset.name,
-        rewardsBalance: '',
-        stakedBalance: '',
-        symbol: token.symbol,
-        unbondingBalance: '',
-        walletId: croEvmAsset.walletId,
-        isSecondaryAsset: true,
-        assetType: UserAssetType.CRC_20_TOKEN,
-        address: croEvmAsset.address,
-        config: croEvmAsset.config,
-        isWhitelisted: isCRC20AssetWhitelisted(
-          token.symbol,
-          token.contractAddress,
-          session.wallet.config,
-        ),
-      };
+    const newlyLoadedTokens = await tokensListResponse.result
+      .filter(token => token.type === SupportedCRCTokenStandard.CRC_20_TOKEN)
+      .map(async token => {
+        const newCRC20Token: UserAsset = {
+          balance: token.balance,
+          decimals: Number(token.decimals),
+          contractAddress: token.contractAddress,
+          description: `${token.name} (${token.symbol})`,
+          icon_url: CronosClient.getTokenIconUrlBySymbol(token.symbol),
+          identifier: `${token.name}_(${token.symbol})_${croEvmAsset.walletId}`,
+          mainnetSymbol: token.symbol,
+          name: croEvmAsset.name,
+          rewardsBalance: '',
+          stakedBalance: '',
+          symbol: token.symbol,
+          unbondingBalance: '',
+          walletId: croEvmAsset.walletId,
+          isSecondaryAsset: true,
+          assetType: UserAssetType.CRC_20_TOKEN,
+          address: croEvmAsset.address,
+          config: croEvmAsset.config,
+          isWhitelisted: isCRC20AssetWhitelisted(
+            token.symbol,
+            token.contractAddress,
+            session.wallet.config,
+          ),
+        };
 
-      // eslint-disable-next-line no-console
-      console.log(`CRC_20_PERSISTED_TOKEN ${token.symbol}:`, {
-        address,
-        balance: token.balance,
+        // eslint-disable-next-line no-console
+        console.log(`CRC_20_PERSISTED_TOKEN ${token.symbol}:`, {
+          address,
+          balance: token.balance,
+        });
+
+        await this.storageService.saveAsset(newCRC20Token);
+        return newCRC20Token;
       });
-
-      await this.storageService.saveAsset(newCRC20Token);
-      return newCRC20Token;
-    });
 
     // eslint-disable-next-line no-console
     console.log('CRC_20_PERSISTED_TOKENS', {
