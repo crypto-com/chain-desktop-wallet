@@ -566,6 +566,7 @@ export class TransactionHistoryService {
     );
   }
 
+  // Todo: Is this supposed to be called from somewhere?
   public async loadNFTTransferHistory(nftQuery: NftQueryParams): Promise<NftTransferModel[]> {
     const currentSession = await this.storageService.retrieveCurrentSession();
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
