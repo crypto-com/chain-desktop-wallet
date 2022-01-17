@@ -87,6 +87,7 @@ import {
   DefaultMainnetBridgeConfigs,
   DefaultTestnetBridgeConfigs,
 } from '../../service/bridge/BridgeConfig';
+import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
 // import i18n from '../../language/I18n';
 
 interface HomeLayoutProps {
@@ -421,13 +422,15 @@ function HomeLayout(props: HomeLayoutProps) {
     setTimeout(async () => {
       if (
         !walletSession.activeAsset?.config?.explorer ||
-        cronosAsset?.config?.explorerUrl.indexOf('cronos.crypto.org') !== -1
+        // Check if explorerUrl has been updated to cronos.org.
+        cronosAsset?.config?.explorerUrl.indexOf('cronos.org') === -1
       ) {
         const updateExplorerUrlNotificationKey = 'updateExplorerUrlNotificationKey';
 
+        const isTestnet = checkIfTestnet(walletSession.wallet.config.network);
+
         // Update to Default Bridge Configs
         const bridgeService = new BridgeService(walletService.storageService);
-
         bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
         bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
         bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
@@ -463,9 +466,9 @@ function HomeLayout(props: HomeLayoutProps) {
               asset.assetType === UserAssetType.EVM ||
               asset.assetType === UserAssetType.CRC_20_TOKEN
             ) {
-              nodeUrl = nodeUrl.replace('cronos.crypto.org', 'cronos.org');
-              indexingUrl = indexingUrl.replace('cronos.crypto.org', 'cronos.org');
-              explorerUrl = explorerUrl.replace('cronos.crypto.org', 'cronoscan.com');
+              nodeUrl = isTestnet ? TestNetEvmConfig.nodeUrl : MainNetEvmConfig.nodeUrl;
+              indexingUrl = isTestnet ? TestNetEvmConfig.indexingUrl : MainNetEvmConfig.indexingUrl;
+              explorerUrl = isTestnet ? TestNetEvmConfig.explorerUrl : MainNetEvmConfig.explorerUrl;
             }
             const newlyUpdatedAsset: UserAsset = {
               ...asset,

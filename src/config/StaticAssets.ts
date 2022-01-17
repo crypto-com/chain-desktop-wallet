@@ -9,6 +9,42 @@ import iconCroSvg from '../assets/icon-cro.svg';
 // This will be used later for asset recreation/migration
 export const STATIC_ASSET_COUNT = 2;
 
+// Update Explorer Url - https://cronoscan.com
+export const MAINNET_EVM_EXPLORER_URL = 'https://cronoscan.com';
+// There's no testnet explorer on cronoscan.com. Use cronos.org/explorer instead.
+export const TESTNET_EVM_EXPLORER_URL = 'https://cronos.org/explorer/testnet3';
+
+export const TestNetEvmConfig: UserAssetConfig = {
+  explorer: {
+    tx: `${TESTNET_EVM_EXPLORER_URL}/tx`,
+    address: `${TESTNET_EVM_EXPLORER_URL}/address`,
+  },
+  explorerUrl: TESTNET_EVM_EXPLORER_URL,
+  chainId: '338',
+  fee: { gasLimit: `50000`, networkFee: `20000000000` },
+  indexingUrl: 'https://cronos.org/explorer/testnet3/api',
+  isLedgerSupportDisabled: false,
+  isStakingDisabled: false,
+  nodeUrl: 'https://evm-t3.cronos.org:8545/',
+  memoSupportDisabled: true,
+};
+
+export const MainNetEvmConfig: UserAssetConfig = {
+  explorer: {
+    tx: `${MAINNET_EVM_EXPLORER_URL}/tx`,
+    address: `${MAINNET_EVM_EXPLORER_URL}/address`,
+  },
+  explorerUrl: MAINNET_EVM_EXPLORER_URL,
+  chainId: '25',
+  fee: { gasLimit: `50000`, networkFee: `20000000000` },
+  // indexingUrl sticks with https://cronos.org/explorer for now
+  indexingUrl: 'https://cronos.org/explorer/api',
+  isLedgerSupportDisabled: false,
+  isStakingDisabled: false,
+  nodeUrl: 'https://evm.cronos.org',
+  memoSupportDisabled: true,
+};
+
 // Every created wallet get initialized with a new CRO asset
 export const CRONOS_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
   const { network } = walletConfig;
@@ -54,24 +90,7 @@ export const CRONOS_EVM_ASSET = (walletConfig: WalletConfig) => {
 
   const isTestnet = checkIfTestnet(network);
 
-  const config: UserAssetConfig = {
-    explorer: {
-      tx: isTestnet ? 'https://cronos.org/explorer/testnet3/tx' : 'https://cronos.org/explorer/tx',
-      address: isTestnet
-        ? 'https://cronos.org/explorer/testnet3/address'
-        : 'https://cronos.org/explorer/address',
-    },
-    explorerUrl: isTestnet ? 'https://cronos.org/explorer/testnet3' : 'https://cronos.org/explorer',
-    chainId: isTestnet ? '338' : '25',
-    fee: { gasLimit: `50000`, networkFee: `20000000000` },
-    indexingUrl: isTestnet
-      ? 'https://cronos.org/explorer/testnet3/api'
-      : 'https://cronos.org/explorer/api',
-    isLedgerSupportDisabled: false,
-    isStakingDisabled: false,
-    nodeUrl: isTestnet ? 'https://cronos-testnet-3.crypto.org:8545/' : 'https://evm-cronos.org',
-    memoSupportDisabled: true,
-  };
+  const config: UserAssetConfig = isTestnet ? TestNetEvmConfig : MainNetEvmConfig;
 
   return {
     balance: '0',
