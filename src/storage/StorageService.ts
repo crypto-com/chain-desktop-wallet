@@ -549,9 +549,13 @@ export class StorageService {
       walletId,
       txType: 'nftAccount',
     });
+    
+    // Sort the txdata list by `blockTime` in descending 
+    const txDataList = _.orderBy(
+      nftAccountTxRecords.map(record => record.txData), 'blockTime', "desc");
 
     return {
-      transactions: nftAccountTxRecords.map(record => record.txData),
+      transactions: txDataList,
       walletId,
     } as NftAccountTransactionList;
 
@@ -683,8 +687,12 @@ export class StorageService {
       txType: 'ibc',
     } as IBCTransactionRecord);
 
+    // Sort the txdata list by `blockTime` in descending 
+    const txDataList = _.orderBy(
+      bridgeTxs.map(record => record.txData), 'sourceBlockTime', "desc");
+
     return {
-      transactions: bridgeTxs.map(tx => tx.txData),
+      transactions: txDataList,
       walletId,
     } as BridgeTransactionHistoryList;
 
