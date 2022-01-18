@@ -347,7 +347,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   ): Promise<NftAccountTransactionListResponse> {
     try {
       const nftTxsListResponse = await this.axiosClient.get<NftAccountTransactionListResponse>(
-        `accounts/${address}/messages?order=height.desc&filter.msgType=MsgTransferNFT,MsgMintNFT,MsgIssueDenom`,
+        `accounts/${address}/messages?order=height.desc&filter.msgType=MsgTransferNFT,MsgMintNFT,MsgIssueDenom,MsgEditNFT`,
       );
       return nftTxsListResponse.data;
     } catch (e) {
