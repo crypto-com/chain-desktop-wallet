@@ -302,7 +302,10 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
           currentSession={currentSession}
           wallet={currentSession.wallet}
           visible={requestConfirmationVisible}
-          dapp={pageDapp}
+          dapp={{
+            ...pageDapp,
+            url: providedURL,
+          }}
           onConfirm={() => {
             setRequestConfirmationVisible(false);
             confirmPasswordCallback?.successCallback(decryptedPhrase);
