@@ -180,7 +180,10 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       prepareTXConfig,
     );
 
-    return Web3.utils.toHex(prepareTxInfo.loadedGasPrice);
+    return {
+      gasLimit: prepareTxInfo.gasLimit,
+      gasPrice: Web3.utils.toHex(prepareTxInfo.loadedGasPrice),
+    };
   };
 
   const handleSendTransaction = useRefCallback(
@@ -274,8 +277,10 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           // parse transaction data
 
           // gasPrice maybe missing (eg. Tectonic)
-          if (!event.object?.gasPrice) {
-            event.object.gasPrice = await getGasPrice(event);
+          if (!event.object?.gasPrice || !event.object.gas) {
+            const gasObject = await getGasPrice(event);
+            event.object.gasPrice = event.object?.gasPrice ?? gasObject.gasPrice;
+            event.object.gas = event.object?.gas ?? gasObject.gasLimit;
           }
 
           if (event.object.data.startsWith('0x095ea7b3')) {
