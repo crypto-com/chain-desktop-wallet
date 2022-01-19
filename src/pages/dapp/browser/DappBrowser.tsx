@@ -22,6 +22,7 @@ import {
   useWebviewStatusInfo,
   WebviewState,
 } from './useWebviewStatusInfo';
+import { LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 
 // use **only** one of the following
 // priority: dapp > dappURL
@@ -131,6 +132,8 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     return app;
   }, [dapp, providedTitle, providedFaviconURL, dappURL]);
 
+  const isLedgerWallet = currentSession.wallet.walletType === LEDGER_WALLET_TYPE;
+
   const onRequestTokenApproval = useRefCallback(
     (
       event: DappBrowserIPC.TokenApprovalEvent,
@@ -139,7 +142,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     ) => {
       setTxEvent(event);
       // prompt for password
-      if (!decryptedPhrase) {
+      if (!decryptedPhrase && !isLedgerWallet) {
         setInputPasswordVisible(true);
       } else {
         setRequestConfirmationVisible(true);
@@ -156,7 +159,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     ) => {
       setTxEvent(event);
       // prompt for password
-      if (!decryptedPhrase) {
+      if (!decryptedPhrase && !isLedgerWallet) {
         setInputPasswordVisible(true);
       } else {
         setRequestConfirmationVisible(true);

@@ -155,6 +155,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       };
       try {
         const result = await evmTransactionSigner.sendContractCallTransaction(
+          cronosAsset!,
           txConfig,
           passphrase,
           ChainConfig.RpcUrl,
@@ -210,6 +211,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
 
       try {
         const result = await evmTransactionSigner.sendContractCallTransaction(
+          cronosAsset!,
           txConfig,
           passphrase,
           ChainConfig.RpcUrl,
