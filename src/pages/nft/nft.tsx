@@ -126,13 +126,9 @@ const convertNftTransfers = (allTransfers: NftAccountTransactionData[]) => {
     return NftTransactionType.TRANSFER_NFT;
   };
 
-  return allTransfers.map(transfer => {
+  return allTransfers.map((transfer, idx) => {
     const data: NftTransferTabularData = {
-      key:
-        transfer.transactionHash +
-        transfer.data.recipient +
-        transfer.data.denomId +
-        transfer.data.tokenId,
+      key: `${idx}-${transfer.transactionHash}-${transfer.data.recipient}-${transfer.data.denomId}-${transfer.data.tokenId}`,
       transactionHash: transfer.transactionHash,
       messageType: getType(transfer),
       denomId: transfer.data.denomId,

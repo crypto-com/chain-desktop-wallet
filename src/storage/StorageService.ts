@@ -375,7 +375,7 @@ export class StorageService {
       },
     };
 
-    // Remove previous `reward` records before insertion
+// Remove previous `reward` records before insertion
     await this.db.commonTransactionStore.remove({
       walletId: rewardTransactions.walletId,
       txType: 'reward',
@@ -495,7 +495,7 @@ export class StorageService {
       txType: 'transfer',
       assetId: assetID,
     });
-    
+
     // Sort the txdata list by `date` in descending 
     const txDataList = _.orderBy(
       transferRecords.map(record => record.txData), 'date', "desc");
@@ -549,9 +549,13 @@ export class StorageService {
       walletId,
       txType: 'nftAccount',
     });
+    
+    // Sort the txdata list by `blockTime` in descending 
+    const txDataList = _.orderBy(
+      nftAccountTxRecords.map(record => record.txData), 'blockTime', "desc");
 
     return {
-      transactions: nftAccountTxRecords.map(record => record.txData),
+      transactions: txDataList,
       walletId,
     } as NftAccountTransactionList;
 
@@ -683,8 +687,12 @@ export class StorageService {
       txType: 'ibc',
     } as IBCTransactionRecord);
 
+    // Sort the txdata list by `blockTime` in descending 
+    const txDataList = _.orderBy(
+      bridgeTxs.map(record => record.txData), 'sourceBlockTime', "desc");
+
     return {
-      transactions: bridgeTxs.map(tx => tx.txData),
+      transactions: txDataList,
       walletId,
     } as BridgeTransactionHistoryList;
 
@@ -779,23 +787,19 @@ export class StorageService {
       return Promise.resolve();
     }
 
-    const upsertRequests = records.map(async record => {
-      return this.db.commonTransactionStore.update<CommonTransactionRecord>({
+    const removeQueries = records.map(async record => {
+      return this.db.commonTransactionStore.remove({
         txHash: record.txHash,
         walletId: record.walletId,
         txType: record.txType
-      }, {
-        $set: record
-      }, {
-        multi: true,
-        upsert: true,
-        returnUpdatedDocs: true
-      })
+      }, {});
     });
 
-    // Batching requests (Max. time profiled for updates: 0.8 Seconds)
-    await Promise.allSettled([...upsertRequests]);
+    // Removing documents (Profiled time: 37ms)
+    await Promise.allSettled([...removeQueries]);
 
+    // inserting documents(Profile time: 35ms)
+    await this.db.commonTransactionStore.insert<CommonTransactionRecord[]>(records);
   }
 
   /**
