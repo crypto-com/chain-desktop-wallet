@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { WebviewTag } from 'electron';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import Web3 from 'web3';
 import { setTimeout } from 'timers';
@@ -10,6 +10,7 @@ import { allMarketState, sessionState, walletAllAssetsState } from '../../../rec
 import { addHTTPsPrefixIfNeeded, getCronosAsset } from '../../../utils/utils';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
 import RequestConfirmation from '../components/RequestConfirmation/RequestConfirmation';
+import { UserAsset } from '../../../models/UserAsset';
 import { secretStoreService } from '../../../storage/SecretStoreService';
 import { Dapp, DappBrowserIPC } from '../types';
 import { ProviderPreloadScriptPath } from './config';
@@ -50,9 +51,9 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   const { dapp, dappURL, onStateChange, onURLChanged } = props;
   const webviewRef = useRef<WebviewTag & HTMLWebViewElement>(null);
   const [t] = useTranslation();
-  const allAssets = useRecoilValue(walletAllAssetsState);
+  const [allAssets, setAllAssets] = useRecoilState(walletAllAssetsState);
   const allMarketData = useRecoilValue(allMarketState);
-  const cronosAsset = getCronosAsset(allAssets);
+  const [cronosAsset, setCronosAsset] = useState<UserAsset | undefined>(getCronosAsset(allAssets));
 
   const {
     title: providedTitle,
@@ -223,6 +224,9 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     setTimeout(async () => {
       const sessionData = await walletService.retrieveCurrentSession();
       await walletService.syncBalancesData(sessionData);
+      const assets = await walletService.retrieveCurrentWalletAssets(sessionData);
+      setAllAssets(assets);
+      setCronosAsset(getCronosAsset(assets));
     }, 7000);
   });
 
