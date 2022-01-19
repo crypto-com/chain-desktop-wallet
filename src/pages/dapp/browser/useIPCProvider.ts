@@ -149,7 +149,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         from: event.object.from,
         contractAddress: event.object.to,
         data,
-        gasLimit: String(event.object.gas),
+        gasLimit: ethers.utils.hexValue(event.object.gas),
         gasPrice: event.object.gasPrice,
         nonce: prepareTxInfo.nonce,
       };
@@ -174,6 +174,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     const prepareTXConfig: TransactionConfig = {
       from: event.object.from,
       to: event.object.to,
+      data: event.object.data,
+      value: event.object.value,
     };
 
     const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
@@ -203,7 +205,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         from: event.object.from,
         contractAddress: event.object.to,
         data: event.object.data,
-        gasLimit: String(event.object.gas),
+        gasLimit: ethers.utils.hexValue(event.object.gas),
         gasPrice: event.object.gasPrice,
         value: event.object.value,
         nonce: prepareTxInfo.nonce,
