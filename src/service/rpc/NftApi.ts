@@ -1,5 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 import { NV_GRAPHQL_API_ENDPOINT } from '../../config/StaticConfig';
+import { ExternalNftMetadataResponse } from './models/nftApi.models';
 
 export interface MintByCDCRequest {
   denomId: String;
@@ -8,6 +9,7 @@ export interface MintByCDCRequest {
 
 export interface INftApi {
   getNftListMarketplaceData(payload: MintByCDCRequest[]): Promise<any>;
+  getExternalNftMetadataByIdentifier(denomId: string): Promise<ExternalNftMetadataResponse | []>;
 }
 
 export class NftApi implements INftApi {
@@ -43,6 +45,43 @@ export class NftApi implements INftApi {
     }
 
     return result.data.data.isMintedByCDC;
+  }
+
+  /**
+   * Fetch wrapped NFT metadata by a unique `identifier`
+   * @param {string} denomId This is the unique identifier for the wrapped external NFT.
+   */
+  public async getExternalNftMetadataByIdentifier(denomId: string): Promise<ExternalNftMetadataResponse | []> {
+    const result = await this.axiosClient.post<ExternalNftMetadataResponse>('', {
+      operationName: 'ExternalNftMetadata',
+      variables: {
+        denomId,
+      },
+      query: ` query ExternalNftMetadata($denomId: ID!) {
+          externalNftMetadata(denomId: $denomId) {
+            translatable # Boolean!
+            metadata {
+              name # String!
+              description # String!
+              image # String!
+              mimeType # String!
+              dropId # String
+              animationUrl # String
+              animationMimeType # String
+              isCurated # Boolean
+              collectionId # String
+              attributes # [AssetAttribute]
+            }
+          }
+        }
+      `,
+    });
+
+    if (result.status !== 200 || result.data.errors) {
+      return [];
+    }
+
+    return result.data;
   }
 }
 
