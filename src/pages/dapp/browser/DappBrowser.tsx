@@ -24,6 +24,7 @@ import {
   WebviewState,
 } from './useWebviewStatusInfo';
 import { LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
+import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
 
 // use **only** one of the following
 // priority: dapp > dappURL
@@ -54,6 +55,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   const [allAssets, setAllAssets] = useRecoilState(walletAllAssetsState);
   const allMarketData = useRecoilValue(allMarketState);
   const [cronosAsset, setCronosAsset] = useState<UserAsset | undefined>(getCronosAsset(allAssets));
+  const [txFailedMessage, setTxFailedMessage] = useState('');
 
   const {
     title: providedTitle,
@@ -220,7 +222,13 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     },
   );
 
-  const onFinishTransaction = useRefCallback(async () => {
+  const onFinishTransaction = useRefCallback(async (error: string) => {
+    if (error?.length > 0) {
+      // show error
+      setTxFailedMessage(error);
+      return;
+    }
+
     setTimeout(async () => {
       const sessionData = await walletService.retrieveCurrentSession();
       await walletService.syncBalancesData(sessionData);
@@ -262,13 +270,34 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     onRequestWatchAsset: async () => {
       // no-op for now
     },
-    onFinishTransaction: () => {
-      onFinishTransaction.current();
+    onFinishTransaction: (error?: string) => {
+      onFinishTransaction.current(error);
     },
   });
 
   return (
     <div className="dapp-content">
+      {txFailedMessage.length > 0 && (
+        <ErrorModalPopup
+          isModalVisible
+          handleCancel={() => {
+            setTxFailedMessage('');
+          }}
+          handleOk={() => {
+            setTxFailedMessage('');
+          }}
+          title={t('general.errorModalPopup.title')}
+          footer={[]}
+        >
+          <>
+            <div className="description">
+              {t('general.errorModalPopup.transfer.description')}
+              <br />
+              <div>{txFailedMessage}</div>
+            </div>
+          </>
+        </ErrorModalPopup>
+      )}
       {inputPasswordVisible && (
         <PasswordFormModal
           description={t('general.passwordFormModal.description')}

@@ -59,7 +59,7 @@ interface IUseIPCProviderProps {
     onSuccess: () => void,
     onError: ErrorHandler,
   ) => Promise<void>;
-  onFinishTransaction: () => void;
+  onFinishTransaction: (error?: string) => void;
 }
 
 export const useIPCProvider = (props: IUseIPCProviderProps) => {
@@ -219,11 +219,11 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           ChainConfig.RpcUrl,
         );
         sendResponse(event.id, result);
+        onFinishTransaction();
       } catch (error) {
-        sendError(event.id, 'Transaction failed');
+        sendError(event.id, (error as any) as string);
+        onFinishTransaction((error as any).toString());
       }
-
-      onFinishTransaction();
     },
   );
 

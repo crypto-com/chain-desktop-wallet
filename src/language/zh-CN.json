@@ -421,6 +421,7 @@
   "dapp.tab.popular.title": "热门",
   "dapp.tab.saved.title": "已保存",
   "dapp.saved.empty.label": "你还没有任何保存 DApp",
+  "dapp.errorModal.title": "交易失败。 请稍后再试。",
   "staking.title": "抵押",
   "staking.tab1": "抵押奖励",
   "staking.tab2": "委托资金",

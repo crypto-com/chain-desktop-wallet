@@ -421,6 +421,7 @@
   "dapp.tab.popular.title": "Popular",
   "dapp.tab.saved.title": "Saved",
   "dapp.saved.empty.label": "You don't have any saved DApps yet",
+  "dapp.errorModal.title": "Transaction failed. Please try again later.",
   "staking.title": "Staking",
   "staking.tab1": "Staking Rewards",
   "staking.tab2": "Delegate Funds",

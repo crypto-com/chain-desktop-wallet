@@ -419,6 +419,7 @@
   "dapp.tab.popular.title": "인기있는",
   "dapp.tab.saved.title": "저장",
   "dapp.saved.empty.label": "아직 저장된 듀크가 없습니다",
+  "dapp.errorModal.title": "거래 실패. 나중에 다시 시도 해주십시오.",
   "staking.title": "스테이킹",
   "staking.tab1": "스테이킹 보상",
   "staking.tab2": "금액 위임",
