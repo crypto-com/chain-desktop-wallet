@@ -23,7 +23,12 @@ import {
   UserAssetType,
 } from '../../../models/UserAsset';
 import { Session } from '../../../models/Session';
-import { allMarketState, ledgerIsExpertModeState } from '../../../recoil/atom';
+import {
+  allMarketState,
+  LedgerConnectedApp,
+  ledgerIsConnectedState,
+  ledgerIsExpertModeState,
+} from '../../../recoil/atom';
 import { BroadCastResult } from '../../../models/Transaction';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import {
@@ -71,6 +76,8 @@ const FormSend: React.FC<FormSendProps> = props => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [availableBalance, setAvailableBalance] = useState('--');
+  const ledgerConnectedApp = useRecoilValue(ledgerIsConnectedState);
+  const [ledgerIsConnected, setLedgerIsConnected] = useState(false);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const didMountRef = useRef(false);
   const allMarketData = useRecoilValue(allMarketState);
@@ -88,11 +95,29 @@ const FormSend: React.FC<FormSendProps> = props => {
   const [t] = useTranslation();
 
   useEffect(() => {
+    const checkIsLedgerConnected = () => {
+      if (
+        walletAsset?.assetType === UserAssetType.TENDERMINT ||
+        walletAsset?.assetType === UserAssetType.IBC
+      ) {
+        setLedgerIsConnected(ledgerConnectedApp === LedgerConnectedApp.CRYPTO_ORG);
+      } else if (
+        walletAsset?.assetType === UserAssetType.EVM ||
+        walletAsset?.assetType === UserAssetType.CRC_20_TOKEN ||
+        walletAsset?.assetType === UserAssetType.ERC_20_TOKEN
+      ) {
+        setLedgerIsConnected(ledgerConnectedApp === LedgerConnectedApp.ETHEREUM);
+      } else {
+        setLedgerIsConnected(false);
+      }
+    };
+
+    checkIsLedgerConnected();
     if (!didMountRef.current) {
       didMountRef.current = true;
       analyticsService.logPage('Send');
     }
-  }, []);
+  }, [ledgerConnectedApp]);
 
   const getTransactionFee = (asset: UserAsset) => {
     const { assetType, config } = asset;
@@ -123,7 +148,9 @@ const FormSend: React.FC<FormSendProps> = props => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-      ledgerNotification(currentSession.wallet, walletAsset?.assetType!);
+      if (!ledgerIsConnected) {
+        ledgerNotification(currentSession.wallet, walletAsset?.assetType!);
+      }
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
@@ -360,6 +387,9 @@ const FormSend: React.FC<FormSendProps> = props => {
               type="primary"
               loading={confirmLoading}
               onClick={onConfirmTransfer}
+              disabled={
+                !ledgerIsConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
+              }
             >
               {t('general.confirm')}
             </Button>,

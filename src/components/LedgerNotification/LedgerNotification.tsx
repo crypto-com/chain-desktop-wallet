@@ -1,6 +1,8 @@
 import React from 'react';
 import { Button, notification } from 'antd';
+import { setRecoil } from 'recoil-nexus';
 import i18n from '../../language/I18n';
+import { LedgerConnectedApp, ledgerIsConnectedState } from '../../recoil/atom';
 import { Wallet } from '../../models/Wallet';
 import IconEth from '../../svg/IconEth';
 import IconCro from '../../svg/IconCro';
@@ -14,15 +16,17 @@ export function ledgerNotification(wallet: Wallet, assetType: UserAssetType) {
       const addressprefix = config.network.addressPrefix;
       if (LEDGER_WALLET_TYPE === walletType) {
         const device = createLedgerDevice();
+        if (assetType === UserAssetType.TENDERMINT || assetType === UserAssetType.IBC) {
+          await device.getAddress(addressIndex, addressprefix, true);
+          setRecoil(ledgerIsConnectedState, LedgerConnectedApp.CRYPTO_ORG);
+        }
         if (
           assetType === UserAssetType.EVM ||
           assetType === UserAssetType.CRC_20_TOKEN ||
           assetType === UserAssetType.ERC_20_TOKEN
         ) {
           await device.getEthAddress(addressIndex, true);
-        }
-        if (assetType === UserAssetType.TENDERMINT || assetType === UserAssetType.IBC) {
-          await device.getAddress(addressIndex, addressprefix, true);
+          setRecoil(ledgerIsConnectedState, LedgerConnectedApp.ETHEREUM);
         }
         notification.close('LedgerNotification');
       }
@@ -33,6 +37,7 @@ export function ledgerNotification(wallet: Wallet, assetType: UserAssetType) {
         placement: 'topRight',
         duration: 3,
       });
+      setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
     }
   };
 

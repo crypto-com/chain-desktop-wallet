@@ -47,6 +47,12 @@ const defaultAsset: UserAsset = {
   decimals: 1,
 };
 
+export enum LedgerConnectedApp {
+  CRYPTO_ORG = 'Crypto.org',
+  ETHEREUM = 'Ethereum',
+  NOT_CONNECTED = '',
+}
+
 const session = new Session(wallet, defaultAsset, 'USD');
 
 const market: AssetMarketPrice = {
@@ -127,9 +133,9 @@ const ledgerIsExpertModeState = atom<boolean>({
   default: false,
 });
 
-const ledgerIsConnectedState = atom<boolean>({
+const ledgerIsConnectedState = atom<LedgerConnectedApp>({
   key: 'ledgerIsConnected',
-  default: false,
+  default: LedgerConnectedApp.NOT_CONNECTED,
 });
 
 const isBridgeTransferingState = atom<boolean>({

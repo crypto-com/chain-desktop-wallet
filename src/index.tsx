@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { RecoilRoot } from 'recoil';
+import RecoilNexus from 'recoil-nexus';
 import * as serviceWorker from './serviceWorker';
 import RouteHub from './pages/route';
 import './index.less';
@@ -9,6 +10,7 @@ import './language/I18n';
 
 ReactDOM.render(
   <RecoilRoot>
+    <RecoilNexus />
     <RouteHub />
   </RecoilRoot>,
   document.getElementById('root'),
