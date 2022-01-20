@@ -87,6 +87,8 @@ import IconTick from '../../svg/IconTick';
 import IconPlayer from '../../svg/IconPlayer';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 import ReceiveDetail from '../assets/components/ReceiveDetail';
+import { croNftApi } from '../../service/rpc/NftApi';
+import { ExternalNftMetadataResponse } from '../../service/rpc/models/nftApi.models';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -359,6 +361,7 @@ const FormMintNft = () => {
       animation_url: isVideo(fileType) ? videoUrl : undefined,
       mimeType: fileType,
     };
+      
     try {
       setConfirmLoading(true);
 
@@ -941,7 +944,8 @@ const NftPage = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   const [nft, setNft] = useState<NftProcessedModel | undefined>();
-  const [processedNftList, setProcessedNftList] = useState<NftProcessedModel[]>([]);
+  // Todo: remove this
+  const [processedNftList, setProcessedNftList] = useState<Promise<NftProcessedModel>[]>([]);
   const [nftView, setNftView] = useState('grid');
   const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
 
@@ -991,23 +995,66 @@ const NftPage = () => {
     setIsErrorModalVisible(false);
   };
 
-  const processNftList = (currentList: NftModel[] | undefined) => {
+  const processNftList = async (currentList: NftModel[] | undefined) => {
     if (currentList) {
-      return currentList.map(item => {
+      return currentList.map(async item => {
         const denomSchema = isJson(item.denomSchema)
           ? JSON.parse(item.denomSchema)
           : item.denomSchema;
-        const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
+
+        let tokenData: any = item.tokenData;
+
+        if (isJson(item.tokenData)) {
+          tokenData = await extractTokenMetadata(item.tokenData)
+        }
         const nftModel: NftProcessedModel = {
           ...item,
           denomSchema,
-          tokenData,
+          tokenData: tokenData,
         };
         return nftModel;
       });
     }
     return [];
   };
+
+  async function extractTokenMetadata(tokenDataString: string){
+    const parsedTokenData = JSON.parse(tokenDataString);
+
+    // ETH Wrapped or External issued NFT
+    if (parsedTokenData.isExternal) {
+      let externalMetadata = await croNftApi.getExternalNftMetadataByIdentifier(parsedTokenData.identifier);
+
+      // On errors
+      if (externalMetadata === []) {
+        console.log(`[extractTokenMetadata], Unable to extract External token metadata.`)
+        return parsedTokenData;
+      }
+
+      externalMetadata = externalMetadata as ExternalNftMetadataResponse;
+
+      // On external metadata being `non-translatable`
+      if (!externalMetadata.data.externalNftMetadata.translatable) {
+        console.log(`[extractTokenMetadata], External metadata is untranslatable.`)
+        return parsedTokenData;
+      }
+
+      // Transform `translatable` external nft metadata
+      if (externalMetadata.data.externalNftMetadata.translatable && externalMetadata.data.externalNftMetadata.metadata) {
+        const { metadata } = externalMetadata.data.externalNftMetadata;
+        return {
+          description: metadata?.description || '',
+          drop: metadata?.dropId || null,
+          image: metadata?.image || undefined,
+          mimeType: metadata?.mimeType || '',
+          name: metadata?.name || ''
+        };
+      }
+    }
+
+    // Crypto.org chain NFT Issued NFT
+    return parsedTokenData;
+  }
 
   const customAddressValidator = TransactionUtils.addressValidator(
     currentSession,
@@ -1120,7 +1167,7 @@ const NftPage = () => {
 
       const latestLoadedNFTs = await walletService.retrieveNFTs(currentSession.wallet.identifier);
       setNftList(latestLoadedNFTs);
-      const processedNFTsLists = processNftList(latestLoadedNFTs);
+      const processedNFTsLists = await processNftList(latestLoadedNFTs);
       setProcessedNftList(processedNFTsLists);
 
       setBroadcastResult(sendResult);
@@ -1154,7 +1201,7 @@ const NftPage = () => {
 
   useEffect(() => {
     const fetchNftList = async () => {
-      const currentNftList = processNftList(nftList);
+      const currentNftList = await processNftList(nftList);
       setProcessedNftList(currentNftList);
     };
     const fetchNftTransfers = async () => {
@@ -1393,6 +1440,7 @@ const NftPage = () => {
                     xxl: 5,
                   }}
                   dataSource={processedNftList}
+                  // TODO: Failing here for promise stuff
                   renderItem={item => (
                     <List.Item>
                       <Card

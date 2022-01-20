@@ -18,7 +18,8 @@ export interface Metadata {
     collectionId: string;
     attributes: Attribute[];
     dropId: string;
-    image: string;
+    image?: string;
+    video?: string;
     mimeType: string;
 }
 
