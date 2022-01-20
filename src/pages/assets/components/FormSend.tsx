@@ -41,6 +41,7 @@ import {
   AnalyticsTxType,
 } from '../../../service/analytics/AnalyticsService';
 import AddressBookInput from '../../../components/AddressBookInput/AddressBookInput';
+import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
 import { AddressBookService } from '../../../service/AddressBookService';
 import { AddressBookContact } from '../../../models/AddressBook';
 
@@ -122,6 +123,7 @@ const FormSend: React.FC<FormSendProps> = props => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      ledgerNotification(currentSession.wallet, walletAsset?.assetType!);
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);

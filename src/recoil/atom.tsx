@@ -127,6 +127,11 @@ const ledgerIsExpertModeState = atom<boolean>({
   default: false,
 });
 
+const ledgerIsConnectedState = atom<boolean>({
+  key: 'ledgerIsConnected',
+  default: false,
+});
+
 const isBridgeTransferingState = atom<boolean>({
   key: 'bridgeTransfering',
   default: false,
@@ -162,6 +167,7 @@ export {
   navbarMenuSelectedKeyState,
   hasShownWarningOnWalletTypeState,
   ledgerIsExpertModeState,
+  ledgerIsConnectedState,
   isBridgeTransferingState,
   pageLockState,
   fetchingDBState,
