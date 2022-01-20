@@ -157,7 +157,7 @@ const DappPage = () => {
           key: 'LedgerNotification',
           message: t('create.ledgerModalPopup.evmAddress.title2'),
           description: <div>{t('create.ledgerModalPopup.evmAddress.description2')}</div>,
-          duration: 1000,
+          duration: 60,
           placement: 'topRight',
           className: 'notification-ledger',
           icon: (
