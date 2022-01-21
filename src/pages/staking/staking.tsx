@@ -1069,7 +1069,7 @@ const FormWithdrawStakingReward = () => {
     };
 
     syncRewardsData();
-  }, [fetchingDB]);
+  }, [fetchingDB, confirmLoading]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -1083,10 +1083,10 @@ const FormWithdrawStakingReward = () => {
 
   const showPasswordInput = (action: string) => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-      if (action === 'withdraw') {
-        showConfirmationModal();
-      } else {
+      if (action === 'restake') {
         showConfirmationRestakeModal();
+      } else {
+        showConfirmationModal();
       }
     } else {
       setInputPasswordVisible(true);
@@ -1099,10 +1099,10 @@ const FormWithdrawStakingReward = () => {
       currentSession.wallet.identifier,
     );
     setDecryptedPhrase(phraseDecrypted);
-    if (rewardAction === 'withdraw') {
-      showConfirmationModal();
-    } else {
+    if (rewardAction === 'restake') {
       showConfirmationRestakeModal();
+    } else {
+      showConfirmationModal();
     }
   };
 
@@ -1652,7 +1652,6 @@ const StakingPage = () => {
 
     if (!didMountRef.current) {
       didMountRef.current = true;
-      // syncValidatorsData();
       moderationConfigHandler();
       analyticsService.logPage('Staking');
     }
@@ -1664,18 +1663,6 @@ const StakingPage = () => {
 
       <Content>
         <div className="site-layout-background balance-container">
-          {/* <div className="balance">
-            <div className="title">TOTAL ASSET BALANCE</div>
-            <div className="quantity">
-              $
-              {numeral(
-                new Big(getAssetStakingBalancePrice(userAsset, marketData))
-                  .add(new Big(getAssetBalancePrice(userAsset, marketData)))
-                  .toFixed(4),
-              ).format('0,0.00')}{' '}
-              USD
-            </div>
-          </div> */}
           <div className="balance">
             <div className="title">{t('staking.balance.title1')}</div>
             {userAsset && (
