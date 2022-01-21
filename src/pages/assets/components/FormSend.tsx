@@ -23,12 +23,7 @@ import {
   UserAssetType,
 } from '../../../models/UserAsset';
 import { Session } from '../../../models/Session';
-import {
-  allMarketState,
-  LedgerConnectedApp,
-  ledgerIsConnectedState,
-  ledgerIsExpertModeState,
-} from '../../../recoil/atom';
+import { allMarketState, ledgerIsExpertModeState } from '../../../recoil/atom';
 import { BroadCastResult } from '../../../models/Transaction';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import {
@@ -49,6 +44,7 @@ import AddressBookInput from '../../../components/AddressBookInput/AddressBookIn
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
 import { AddressBookService } from '../../../service/AddressBookService';
 import { AddressBookContact } from '../../../models/AddressBook';
+import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 
 const layout = {};
 const tailLayout = {};
@@ -76,8 +72,7 @@ const FormSend: React.FC<FormSendProps> = props => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [availableBalance, setAvailableBalance] = useState('--');
-  const ledgerConnectedApp = useRecoilValue(ledgerIsConnectedState);
-  const [ledgerIsConnected, setLedgerIsConnected] = useState(false);
+
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const didMountRef = useRef(false);
   const allMarketData = useRecoilValue(allMarketState);
@@ -94,30 +89,14 @@ const FormSend: React.FC<FormSendProps> = props => {
 
   const [t] = useTranslation();
 
-  useEffect(() => {
-    const checkIsLedgerConnected = () => {
-      if (
-        walletAsset?.assetType === UserAssetType.TENDERMINT ||
-        walletAsset?.assetType === UserAssetType.IBC
-      ) {
-        setLedgerIsConnected(ledgerConnectedApp === LedgerConnectedApp.CRYPTO_ORG);
-      } else if (
-        walletAsset?.assetType === UserAssetType.EVM ||
-        walletAsset?.assetType === UserAssetType.CRC_20_TOKEN ||
-        walletAsset?.assetType === UserAssetType.ERC_20_TOKEN
-      ) {
-        setLedgerIsConnected(ledgerConnectedApp === LedgerConnectedApp.ETHEREUM);
-      } else {
-        setLedgerIsConnected(false);
-      }
-    };
+  const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
 
-    checkIsLedgerConnected();
+  useEffect(() => {
     if (!didMountRef.current) {
       didMountRef.current = true;
       analyticsService.logPage('Send');
     }
-  }, [ledgerConnectedApp]);
+  }, []);
 
   const getTransactionFee = (asset: UserAsset) => {
     const { assetType, config } = asset;
@@ -148,7 +127,7 @@ const FormSend: React.FC<FormSendProps> = props => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-      if (!ledgerIsConnected) {
+      if (!isLedgerConnected) {
         ledgerNotification(currentSession.wallet, walletAsset?.assetType!);
       }
       showConfirmationModal();
@@ -218,10 +197,10 @@ const FormSend: React.FC<FormSendProps> = props => {
       form.resetFields();
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
-      setErrorMessages(e.message.split(': '));
+      setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -388,7 +367,7 @@ const FormSend: React.FC<FormSendProps> = props => {
               loading={confirmLoading}
               onClick={onConfirmTransfer}
               disabled={
-                !ledgerIsConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
+                !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
               }
             >
               {t('general.confirm')}
