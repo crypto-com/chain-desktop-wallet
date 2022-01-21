@@ -52,12 +52,13 @@ export class NftApi implements INftApi {
    * @param {string} denomId This is the unique identifier for the wrapped external NFT.
    */
   public async getExternalNftMetadataByIdentifier(denomId: string): Promise<ExternalNftMetadataResponse | []> {
-    const result = await this.axiosClient.post<ExternalNftMetadataResponse>('', {
-      operationName: 'ExternalNftMetadata',
-      variables: {
-        denomId,
-      },
-      query: ` query ExternalNftMetadata($denomId: ID!) {
+    try {
+      const result = await this.axiosClient.post<ExternalNftMetadataResponse>('', {
+        operationName: 'ExternalNftMetadata',
+        variables: {
+          denomId,
+        },
+        query: ` query ExternalNftMetadata($denomId: ID!) {
           externalNftMetadata(denomId: $denomId) {
             translatable # Boolean!
             metadata {
@@ -75,13 +76,18 @@ export class NftApi implements INftApi {
           }
         }
       `,
-    });
+      });
 
-    if (result.status !== 200 || result.data.errors) {
+      if (result.status !== 200 || result.data.errors) {
+        return [];
+      }
+      return result.data;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(`[getExternalNftMetadataByIdentifier] Querying external nft metadata failed.`, error)
       return [];
     }
 
-    return result.data;
   }
 }
 

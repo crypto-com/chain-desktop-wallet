@@ -89,6 +89,7 @@ import nftThumbnail from '../../assets/nft-thumbnail.png';
 import ReceiveDetail from '../assets/components/ReceiveDetail';
 import { croNftApi } from '../../service/rpc/NftApi';
 import { ExternalNftMetadataResponse } from '../../service/rpc/models/nftApi.models';
+import { Promise } from "bluebird";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -242,11 +243,11 @@ const FormMintNft = () => {
       }
       // Hide the error before uploading anything
       if (isBeforeUpload) {
-        return Promise.reject();
+        return Promise.reject({});
       }
       // Hide the error when uploading or upload video in progress
       if (isUploading || (files.length === 1 && isVideo(fileType))) {
-        return Promise.reject();
+        return Promise.reject({});
       }
       return Promise.reject(new Error(t('nft.fileUploadValidator.error2')));
     },
@@ -361,7 +362,6 @@ const FormMintNft = () => {
       animation_url: isVideo(fileType) ? videoUrl : undefined,
       mimeType: fileType,
     };
-      
     try {
       setConfirmLoading(true);
 
@@ -944,8 +944,7 @@ const NftPage = () => {
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   const [nft, setNft] = useState<NftProcessedModel | undefined>();
-  // Todo: remove this
-  const [processedNftList, setProcessedNftList] = useState<Promise<NftProcessedModel>[]>([]);
+  const [processedNftList, setProcessedNftList] = useState<NftProcessedModel[]>([]);
   const [nftView, setNftView] = useState('grid');
   const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
 
@@ -997,20 +996,15 @@ const NftPage = () => {
 
   const processNftList = async (currentList: NftModel[] | undefined) => {
     if (currentList) {
-      return currentList.map(async item => {
+      return await Promise.map(currentList, async item => {
         const denomSchema = isJson(item.denomSchema)
           ? JSON.parse(item.denomSchema)
           : item.denomSchema;
-
-        let tokenData: any = item.tokenData;
-
-        if (isJson(item.tokenData)) {
-          tokenData = await extractTokenMetadata(item.tokenData)
-        }
-        const nftModel: NftProcessedModel = {
+        const tokenData = isJson(item.tokenData) ? await extractTokenMetadata(item.tokenData) : item.tokenData;
+        const nftModel = {
           ...item,
           denomSchema,
-          tokenData: tokenData,
+          tokenData,
         };
         return nftModel;
       });
@@ -1018,7 +1012,7 @@ const NftPage = () => {
     return [];
   };
 
-  async function extractTokenMetadata(tokenDataString: string){
+  async function extractTokenMetadata(tokenDataString: string) {
     const parsedTokenData = JSON.parse(tokenDataString);
 
     // ETH Wrapped or External issued NFT
@@ -1026,15 +1020,18 @@ const NftPage = () => {
       let externalMetadata = await croNftApi.getExternalNftMetadataByIdentifier(parsedTokenData.identifier);
 
       // On errors
-      if (externalMetadata === []) {
+      if (Array.isArray(externalMetadata) && !externalMetadata.length) {
+        // eslint-disable-next-line no-console
         console.log(`[extractTokenMetadata], Unable to extract External token metadata.`)
         return parsedTokenData;
       }
-
+      
+      // Type casting for leveraging type support
       externalMetadata = externalMetadata as ExternalNftMetadataResponse;
 
       // On external metadata being `non-translatable`
       if (!externalMetadata.data.externalNftMetadata.translatable) {
+        // eslint-disable-next-line no-console 
         console.log(`[extractTokenMetadata], External metadata is untranslatable.`)
         return parsedTokenData;
       }
@@ -1440,7 +1437,6 @@ const NftPage = () => {
                     xxl: 5,
                   }}
                   dataSource={processedNftList}
-                  // TODO: Failing here for promise stuff
                   renderItem={item => (
                     <List.Item>
                       <Card
