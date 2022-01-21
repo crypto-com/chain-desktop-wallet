@@ -979,6 +979,8 @@ const FormDelegationOperations = props => {
 };
 
 const FormWithdrawStakingReward = () => {
+  type RewardActionType = 'withdraw' | 'restake';
+
   const [withdrawValues, setWithdrawValues] = useState({
     validatorAddress: '',
     rewardAmount: '',
@@ -997,7 +999,7 @@ const FormWithdrawStakingReward = () => {
   const [errorMessages, setErrorMessages] = useState([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
-  const [rewardAction, setRewardAction] = useState('withdraw');
+  const [rewardAction, setRewardAction] = useState<RewardActionType>('withdraw');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   // const walletAllAssets = useRecoilValue(walletAllAssetsState);
 
@@ -1160,7 +1162,7 @@ const FormWithdrawStakingReward = () => {
 
         if (!isNumeric(restakeRewardAmount)) {
           setSuccessRestakeRewardModalMessage(
-            'Your withdraw reward transaction was successful, but failed to restake the reward. Please try again later.',
+            t('general.successModalPopup.restakeReward.description3'),
           );
         } else {
           const restakeRewardResult = await walletService.sendDelegateTransaction({
@@ -1175,7 +1177,9 @@ const FormWithdrawStakingReward = () => {
           if (restakeRewardResult.transactionHash) {
             // Both Reward withdraw & restake transaction was successfully broadcasted
             setBroadcastResult(restakeRewardResult);
-            setSuccessRestakeRewardModalMessage('Your restake reward transaction was successful!');
+            setSuccessRestakeRewardModalMessage(
+              t('general.successModalPopup.restakeReward.description1'),
+            );
           } else if (
             rewardWithdrawResult?.code !== undefined &&
             rewardWithdrawResult?.code !== null &&
@@ -1184,13 +1188,13 @@ const FormWithdrawStakingReward = () => {
             // Restake transaction timed out
             setBroadcastResult(restakeRewardResult);
             setSuccessRestakeRewardModalMessage(
-              'Your withdraw reward transaction was successful. The restaking reward transaction timed out but it will be included in the subsequent blocks.',
+              t('general.successModalPopup.restakeReward.description2'),
             );
           } else {
             // Restake transaction broadcast failed
             setBroadcastResult(restakeRewardResult);
             setSuccessRestakeRewardModalMessage(
-              'Your withdraw reward transaction was successful, but failed to restake the reward. Please try again later.',
+              t('general.successModalPopup.restakeReward.description3'),
             );
           }
           setIsConfirmationRestakeModalVisible(false);
@@ -1205,7 +1209,7 @@ const FormWithdrawStakingReward = () => {
         // Reward withdraw transaction timed out
         setBroadcastResult(rewardWithdrawResult);
         setSuccessRestakeRewardModalMessage(
-          'The withdraw reward transaction timed out but it will be included in the subsequent blocks. Please try restake your rewards again later.',
+          t('general.successModalPopup.restakeReward.description4'),
         );
         setIsConfirmationRestakeModalVisible(false);
         setConfirmLoading(false);
@@ -1274,7 +1278,7 @@ const FormWithdrawStakingReward = () => {
       },
     },
     {
-      title: 'Withdraw',
+      title: t('staking.formWithdralStakingReward.table.withdraw'),
       dataIndex: 'withdrawAction',
       key: 'withdrawAction',
       render: () => (
@@ -1293,7 +1297,7 @@ const FormWithdrawStakingReward = () => {
       ),
     },
     {
-      title: 'Restake',
+      title: t('staking.formWithdralStakingReward.table.restake'),
       dataIndex: 'restakeAction',
       key: 'restakeAction',
       render: () => (
@@ -1306,7 +1310,7 @@ const FormWithdrawStakingReward = () => {
               }, 200);
             }}
           >
-            <Text type="success">Restake Reward</Text>
+            <Text type="success">{t('staking.formWithdralStakingReward.table.action2')}</Text>
           </a>
         </>
       ),
@@ -1397,18 +1401,18 @@ const FormWithdrawStakingReward = () => {
         okText={t('general.confirm')}
       >
         <>
-          <div className="title">Confirm Restake</div>
-          <div className="description">{t('staking.modal2.description')}</div>
+          <div className="title">{t('staking.modal5.title')}</div>
+          <div className="description">{t('staking.modal5.description')}</div>
           <div className="item">
-            <div className="label">{t('staking.modal2.label1')}</div>
+            <div className="label">{t('staking.modal5.label1')}</div>
             <div className="address">{`${currentSession.wallet.address}`}</div>
           </div>
           <div className="item">
-            <div className="label">{t('staking.modal2.label2')}</div>
+            <div className="label">{t('staking.modal5.label2')}</div>
             <div className="address">{`${withdrawValues?.validatorAddress}`}</div>
           </div>
           <div className="item">
-            <div className="label">{t('staking.modal2.label3')}</div>
+            <div className="label">{t('staking.modal5.label3')}</div>
             <div>{`${withdrawValues.rewardAmount}`}</div>
             <div className="fiat">{`${withdrawValues.rewardMarketPrice}`}</div>
           </div>
