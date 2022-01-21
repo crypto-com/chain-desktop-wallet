@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { FormInstance, Table, Tooltip } from 'antd';
+import { AutoComplete, FormInstance, Table, Tooltip } from 'antd';
 import numeral from 'numeral';
+
+import './ValidatorListTable.less';
 
 import {
   VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
@@ -191,6 +193,17 @@ const ValidatorListTable = (props: {
     return [];
   };
 
+  const onSearch = value => {
+    const newWalletList = currentValidatorList.filter(validator => {
+      return (
+        validator.validatorName.toLowerCase().indexOf(value.toLowerCase()) !== -1 ||
+        validator.validatorAddress.toLowerCase().indexOf(value.toLowerCase()) !== -1 ||
+        value === ''
+      );
+    });
+    setValidatorTopList(newWalletList);
+  };
+
   useEffect(() => {
     const syncValidatorsData = async () => {
       const validatorList = await processValidatorList(currentValidatorList);
@@ -201,48 +214,55 @@ const ValidatorListTable = (props: {
   }, currentValidatorList);
 
   return (
-    <Table
-      locale={{
-        triggerDesc: t('general.table.triggerDesc'),
-        triggerAsc: t('general.table.triggerAsc'),
-        cancelSort: t('general.table.cancelSort'),
-      }}
-      dataSource={validatorTopList}
-      columns={validatorColumns}
-      pagination={{ showSizeChanger: false }}
-      onChange={(pagination, filters, sorter: any) => {
-        if (
-          (sorter.order === 'descend' && sorter.field === 'currentTokens') ||
-          sorter.order === undefined
-        ) {
-          setDisplayWarning(true);
-        } else {
-          setDisplayWarning(false);
-        }
-      }}
-      expandable={{
-        rowExpandable: record => record.displayWarningColumn! && displayWarning,
-        expandedRowRender: record =>
-          record.displayWarningColumn &&
-          displayWarning && (
-            <div className="cumulative-stake33">
-              {t('staking.validatorList.table.warningCumulative')}
-            </div>
-          ),
-        expandIconColumnIndex: -1,
-      }}
-      rowClassName={record => {
-        const greyBackground =
-          Big(record.uptime ?? '0').lt(VALIDATOR_UPTIME_THRESHOLD) ||
-          isValidatorAddressSuspicious(record.validatorAddress, moderationConfig);
-        // new Big(record.cumulativeSharesIncludePercentage!).lte(
-        //   VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
-        // )
-        // || record.displayWarningColumn;
-        return greyBackground ? 'grey-background' : '';
-      }}
-      defaultExpandAllRows
-    />
+    <div className="validator-list">
+      <AutoComplete
+        style={{ width: 400 }}
+        onSearch={onSearch}
+        placeholder={t('wallet.search.placeholder')}
+      />
+      <Table
+        locale={{
+          triggerDesc: t('general.table.triggerDesc'),
+          triggerAsc: t('general.table.triggerAsc'),
+          cancelSort: t('general.table.cancelSort'),
+        }}
+        dataSource={validatorTopList}
+        columns={validatorColumns}
+        pagination={{ showSizeChanger: false }}
+        onChange={(pagination, filters, sorter: any) => {
+          if (
+            (sorter.order === 'descend' && sorter.field === 'currentTokens') ||
+            sorter.order === undefined
+          ) {
+            setDisplayWarning(true);
+          } else {
+            setDisplayWarning(false);
+          }
+        }}
+        expandable={{
+          rowExpandable: record => record.displayWarningColumn! && displayWarning,
+          expandedRowRender: record =>
+            record.displayWarningColumn &&
+            displayWarning && (
+              <div className="cumulative-stake33">
+                {t('staking.validatorList.table.warningCumulative')}
+              </div>
+            ),
+          expandIconColumnIndex: -1,
+        }}
+        rowClassName={record => {
+          const greyBackground =
+            Big(record.uptime ?? '0').lt(VALIDATOR_UPTIME_THRESHOLD) ||
+            isValidatorAddressSuspicious(record.validatorAddress, moderationConfig);
+          // new Big(record.cumulativeSharesIncludePercentage!).lte(
+          //   VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+          // )
+          // || record.displayWarningColumn;
+          return greyBackground ? 'grey-background' : '';
+        }}
+        defaultExpandAllRows
+      />
+    </div>
   );
 };
 
