@@ -1155,7 +1155,7 @@ const FormWithdrawStakingReward = () => {
       });
 
       if (rewardWithdrawResult.transactionHash) {
-        // Reward withdraw transaction was successfully broadcasted
+        // Success - Reward withdraw transaction was successfully broadcasted
 
         // withdrawValues.rewardAmount = '0.1 CRO'
         const restakeRewardAmount = withdrawValues.rewardAmount.split(' ')[0];
@@ -1175,7 +1175,7 @@ const FormWithdrawStakingReward = () => {
           });
 
           if (restakeRewardResult.transactionHash) {
-            // Both Reward withdraw & restake transaction was successfully broadcasted
+            // Success - Both Reward withdraw & restake transactions were successfully broadcasted
             setBroadcastResult(restakeRewardResult);
             setSuccessRestakeRewardModalMessage(
               t('general.successModalPopup.restakeReward.description1'),
@@ -1185,13 +1185,13 @@ const FormWithdrawStakingReward = () => {
             rewardWithdrawResult?.code !== null &&
             rewardWithdrawResult.code === walletService.BROADCAST_TIMEOUT_CODE
           ) {
-            // Restake transaction timed out
+            // Timed Out - Restake transaction
             setBroadcastResult(restakeRewardResult);
             setSuccessRestakeRewardModalMessage(
               t('general.successModalPopup.restakeReward.description2'),
             );
           } else {
-            // Restake transaction broadcast failed
+            // Failed - Restake transaction
             setBroadcastResult(restakeRewardResult);
             setSuccessRestakeRewardModalMessage(
               t('general.successModalPopup.restakeReward.description3'),
@@ -1206,7 +1206,7 @@ const FormWithdrawStakingReward = () => {
         rewardWithdrawResult?.code !== null &&
         rewardWithdrawResult.code === walletService.BROADCAST_TIMEOUT_CODE
       ) {
-        // Reward withdraw transaction timed out
+        // Timed Out - Reward withdraw transaction
         setBroadcastResult(rewardWithdrawResult);
         setSuccessRestakeRewardModalMessage(
           t('general.successModalPopup.restakeReward.description4'),
@@ -1215,6 +1215,7 @@ const FormWithdrawStakingReward = () => {
         setConfirmLoading(false);
         setIsSuccessRestakeRewardModalVisible(true);
       } else {
+        // Failed - Reward withdraw transaction
         throw new Error(t('general.errorModalPopup.reward.description'));
       }
     } catch (e) {
@@ -1458,7 +1459,6 @@ const FormWithdrawStakingReward = () => {
           ) : (
             <div className="description">{t('general.successModalPopup.reward.description')}</div>
           )}
-          {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
         </>
       </SuccessModalPopup>
       <SuccessModalPopup
@@ -1484,14 +1484,6 @@ const FormWithdrawStakingReward = () => {
         ]}
       >
         <>
-          {/* {broadcastResult?.code !== undefined &&
-            broadcastResult?.code !== null &&
-            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">The transaction timed out but it will be included in the subsequent blocks</div>
-          ) : (
-            <div className="description">Your rewards restake transaction was broadcasted successfully!</div>
-          )} */}
-          {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
           <div className="description">{successRestakeRewardModalMessage}</div>
         </>
       </SuccessModalPopup>
