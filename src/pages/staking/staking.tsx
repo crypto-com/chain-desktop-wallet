@@ -56,7 +56,7 @@ import {
   getCurrentMinAssetAmount,
   getUIDynamicAmount,
 } from '../../utils/NumberUtils';
-import { middleEllipsis } from '../../utils/utils';
+import { isNumeric, middleEllipsis } from '../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
 import {
   AnalyticsActions,
@@ -979,19 +979,27 @@ const FormDelegationOperations = props => {
 };
 
 const FormWithdrawStakingReward = () => {
+  type RewardActionType = 'withdraw' | 'restake';
+
   const [withdrawValues, setWithdrawValues] = useState({
     validatorAddress: '',
     rewardAmount: '',
     rewardMarketPrice: '',
   });
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
+  const [isConfirmationRestakeModalVisible, setIsConfirmationRestakeModalVisible] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
+  const [isSuccessRestakeRewardModalVisible, setIsSuccessRestakeRewardModalVisible] = useState(
+    false,
+  );
+  const [successRestakeRewardModalMessage, setSuccessRestakeRewardModalMessage] = useState('');
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [errorMessages, setErrorMessages] = useState([]);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [rewardAction, setRewardAction] = useState<RewardActionType>('withdraw');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   // const walletAllAssets = useRecoilValue(walletAllAssetsState);
 
@@ -1061,16 +1069,25 @@ const FormWithdrawStakingReward = () => {
     };
 
     syncRewardsData();
-  }, [fetchingDB]);
+  }, [fetchingDB, confirmLoading]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
     setIsVisibleConfirmationModal(true);
   };
 
-  const showPasswordInput = () => {
+  const showConfirmationRestakeModal = () => {
+    setInputPasswordVisible(false);
+    setIsConfirmationRestakeModalVisible(true);
+  };
+
+  const showPasswordInput = (action: string) => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-      showConfirmationModal();
+      if (action === 'restake') {
+        showConfirmationRestakeModal();
+      } else {
+        showConfirmationModal();
+      }
     } else {
       setInputPasswordVisible(true);
     }
@@ -1082,7 +1099,11 @@ const FormWithdrawStakingReward = () => {
       currentSession.wallet.identifier,
     );
     setDecryptedPhrase(phraseDecrypted);
-    showConfirmationModal();
+    if (rewardAction === 'restake') {
+      showConfirmationRestakeModal();
+    } else {
+      showConfirmationModal();
+    }
   };
 
   const onConfirmTransfer = async () => {
@@ -1118,8 +1139,107 @@ const FormWithdrawStakingReward = () => {
     }
   };
 
+  const onConfirmRestakeReward = async () => {
+    const { walletType } = currentSession.wallet;
+    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
+      setIsVisibleConfirmationModal(false);
+      return;
+    }
+    try {
+      setConfirmLoading(true);
+
+      const rewardWithdrawResult = await walletService.sendStakingRewardWithdrawalTx({
+        validatorAddress: withdrawValues.validatorAddress,
+        decryptedPhrase,
+        walletType,
+      });
+
+      if (rewardWithdrawResult.transactionHash) {
+        // Success - Reward withdraw transaction was successfully broadcasted
+
+        // withdrawValues.rewardAmount = '0.1 CRO'
+        const restakeRewardAmount = withdrawValues.rewardAmount.split(' ')[0];
+
+        if (!isNumeric(restakeRewardAmount)) {
+          setSuccessRestakeRewardModalMessage(
+            t('general.successModalPopup.restakeReward.description3'),
+          );
+        } else {
+          const restakeRewardResult = await walletService.sendDelegateTransaction({
+            validatorAddress: withdrawValues.validatorAddress,
+            amount: restakeRewardAmount,
+            asset: walletAsset,
+            memo: '',
+            decryptedPhrase,
+            walletType,
+          });
+
+          if (restakeRewardResult.transactionHash) {
+            // Success - Both Reward withdraw & restake transactions were successfully broadcasted
+            setBroadcastResult(restakeRewardResult);
+            setSuccessRestakeRewardModalMessage(
+              t('general.successModalPopup.restakeReward.description1'),
+            );
+          } else if (
+            rewardWithdrawResult?.code !== undefined &&
+            rewardWithdrawResult?.code !== null &&
+            rewardWithdrawResult.code === walletService.BROADCAST_TIMEOUT_CODE
+          ) {
+            // Timed Out - Restake transaction
+            setBroadcastResult(restakeRewardResult);
+            setSuccessRestakeRewardModalMessage(
+              t('general.successModalPopup.restakeReward.description2'),
+            );
+          } else {
+            // Failed - Restake transaction
+            setBroadcastResult(restakeRewardResult);
+            setSuccessRestakeRewardModalMessage(
+              t('general.successModalPopup.restakeReward.description3'),
+            );
+          }
+          setIsConfirmationRestakeModalVisible(false);
+          setConfirmLoading(false);
+          setIsSuccessRestakeRewardModalVisible(true);
+        }
+      } else if (
+        rewardWithdrawResult?.code !== undefined &&
+        rewardWithdrawResult?.code !== null &&
+        rewardWithdrawResult.code === walletService.BROADCAST_TIMEOUT_CODE
+      ) {
+        // Timed Out - Reward withdraw transaction
+        setBroadcastResult(rewardWithdrawResult);
+        setSuccessRestakeRewardModalMessage(
+          t('general.successModalPopup.restakeReward.description4'),
+        );
+        setIsConfirmationRestakeModalVisible(false);
+        setConfirmLoading(false);
+        setIsSuccessRestakeRewardModalVisible(true);
+      } else {
+        // Failed - Reward withdraw transaction
+        throw new Error(t('general.errorModalPopup.reward.description'));
+      }
+    } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+      }
+
+      setErrorMessages(e.message.split(': '));
+      setIsConfirmationRestakeModalVisible(false);
+      setConfirmLoading(false);
+      setInputPasswordVisible(false);
+      setIsErrorTransferModalVisible(true);
+      // eslint-disable-next-line no-console
+      console.log('Error occurred while transfer', e);
+    }
+  };
+
   const handleCancelConfirmationModal = () => {
     setIsVisibleConfirmationModal(false);
+    setInputPasswordVisible(false);
+  };
+
+  const handleCancelConfirmationRestakeModal = () => {
+    setIsConfirmationRestakeModalVisible(false);
     setInputPasswordVisible(false);
   };
 
@@ -1159,19 +1279,41 @@ const FormWithdrawStakingReward = () => {
       },
     },
     {
-      title: t('general.action'),
+      title: t('staking.formWithdralStakingReward.table.withdraw'),
       dataIndex: 'withdrawAction',
       key: 'withdrawAction',
       render: () => (
-        <a
-          onClick={() => {
-            setTimeout(() => {
-              showPasswordInput();
-            }, 200);
-          }}
-        >
-          {t('staking.formWithdralStakingReward.table.action1')}
-        </a>
+        <>
+          <a
+            onClick={() => {
+              setRewardAction('withdraw');
+              setTimeout(() => {
+                showPasswordInput('withdraw');
+              }, 200);
+            }}
+          >
+            {t('staking.formWithdralStakingReward.table.action1')}
+          </a>
+        </>
+      ),
+    },
+    {
+      title: t('staking.formWithdralStakingReward.table.restake'),
+      dataIndex: 'restakeAction',
+      key: 'restakeAction',
+      render: () => (
+        <>
+          <a
+            onClick={() => {
+              setRewardAction('restake');
+              setTimeout(() => {
+                showPasswordInput('restake');
+              }, 200);
+            }}
+          >
+            <Text type="success">{t('staking.formWithdralStakingReward.table.action2')}</Text>
+          </a>
+        </>
       ),
     },
   ];
@@ -1238,13 +1380,52 @@ const FormWithdrawStakingReward = () => {
           </div>
         </>
       </ModalPopup>
+      <ModalPopup
+        isModalVisible={isConfirmationRestakeModalVisible}
+        handleCancel={handleCancelConfirmationRestakeModal}
+        handleOk={onConfirmRestakeReward}
+        confirmationLoading={confirmLoading}
+        className="reward-modal"
+        footer={[
+          <Button
+            key="submit"
+            type="primary"
+            loading={confirmLoading}
+            onClick={onConfirmRestakeReward}
+          >
+            {t('general.confirm')}
+          </Button>,
+          <Button key="back" type="link" onClick={handleCancelConfirmationRestakeModal}>
+            {t('general.cancel')}
+          </Button>,
+        ]}
+        okText={t('general.confirm')}
+      >
+        <>
+          <div className="title">{t('staking.modal5.title')}</div>
+          <div className="description">{t('staking.modal5.description')}</div>
+          <div className="item">
+            <div className="label">{t('staking.modal5.label1')}</div>
+            <div className="address">{`${currentSession.wallet.address}`}</div>
+          </div>
+          <div className="item">
+            <div className="label">{t('staking.modal5.label2')}</div>
+            <div className="address">{`${withdrawValues?.validatorAddress}`}</div>
+          </div>
+          <div className="item">
+            <div className="label">{t('staking.modal5.label3')}</div>
+            <div>{`${withdrawValues.rewardAmount}`}</div>
+            <div className="fiat">{`${withdrawValues.rewardMarketPrice}`}</div>
+          </div>
+        </>
+      </ModalPopup>
       <PasswordFormModal
         description={t('general.passwordFormModal.description')}
         okButtonText={t('general.passwordFormModal.okButton')}
         onCancel={() => {
           setInputPasswordVisible(false);
         }}
-        onSuccess={onWalletDecryptFinish}
+        onSuccess={password => onWalletDecryptFinish(password)}
         onValidatePassword={async (password: string) => {
           const isValid = await secretStoreService.checkIfPasswordIsValid(password);
           return {
@@ -1278,7 +1459,32 @@ const FormWithdrawStakingReward = () => {
           ) : (
             <div className="description">{t('general.successModalPopup.reward.description')}</div>
           )}
-          {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
+        </>
+      </SuccessModalPopup>
+      <SuccessModalPopup
+        isModalVisible={isSuccessRestakeRewardModalVisible}
+        handleCancel={() => {
+          setIsSuccessRestakeRewardModalVisible(false);
+        }}
+        handleOk={() => {
+          setIsSuccessRestakeRewardModalVisible(false);
+        }}
+        title={t('general.successModalPopup.title')}
+        button={null}
+        footer={[
+          <Button
+            key="submit"
+            type="primary"
+            onClick={() => {
+              setIsSuccessRestakeRewardModalVisible(false);
+            }}
+          >
+            {t('general.ok')}
+          </Button>,
+        ]}
+      >
+        <>
+          <div className="description">{successRestakeRewardModalMessage}</div>
         </>
       </SuccessModalPopup>
       <ErrorModalPopup
@@ -1438,7 +1644,6 @@ const StakingPage = () => {
 
     if (!didMountRef.current) {
       didMountRef.current = true;
-      // syncValidatorsData();
       moderationConfigHandler();
       analyticsService.logPage('Staking');
     }
@@ -1450,18 +1655,6 @@ const StakingPage = () => {
 
       <Content>
         <div className="site-layout-background balance-container">
-          {/* <div className="balance">
-            <div className="title">TOTAL ASSET BALANCE</div>
-            <div className="quantity">
-              $
-              {numeral(
-                new Big(getAssetStakingBalancePrice(userAsset, marketData))
-                  .add(new Big(getAssetBalancePrice(userAsset, marketData)))
-                  .toFixed(4),
-              ).format('0,0.00')}{' '}
-              USD
-            </div>
-          </div> */}
           <div className="balance">
             <div className="title">{t('staking.balance.title1')}</div>
             {userAsset && (
