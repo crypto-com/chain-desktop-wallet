@@ -29,6 +29,9 @@ import iconCronosSvg from '../../../assets/icon-cronos-blue.svg';
 import iconCroSvg from '../../../assets/icon-cro.svg';
 import RowAmountOption from '../../../components/RowAmountOption/RowAmountOption';
 import AddressBookInput from '../../../components/AddressBookInput/AddressBookInput';
+import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
+import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
+import { LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 
 const { Option } = Select;
 const tailLayout = {
@@ -95,6 +98,8 @@ const CronosBridgeForm = props => {
 
   const croAsset = getCryptoOrgAsset(walletAllAssets);
   const cronosAsset = getCronosAsset(walletAllAssets);
+
+  const { isLedgerConnected } = useLedgerStatus({ asset: currentAsset });
 
   const { tendermintAddress, evmAddress } = formValues;
 
@@ -350,6 +355,10 @@ const CronosBridgeForm = props => {
       name="control-hooks"
       requiredMark="optional"
       onFinish={() => {
+        if (session.wallet.walletType === LEDGER_WALLET_TYPE && !isLedgerConnected) {
+          ledgerNotification(session.wallet, currentAsset?.assetType!);
+          return;
+        }
         showPasswordInput();
       }}
     >

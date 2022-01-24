@@ -1020,6 +1020,7 @@ const FormWithdrawStakingReward = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
+  const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
 
   const [t] = useTranslation();
 
@@ -1088,6 +1089,9 @@ const FormWithdrawStakingReward = () => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (!isLedgerConnected) {
+        ledgerNotification(currentSession.wallet, walletAsset?.assetType!);
+      }
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
@@ -1229,7 +1233,13 @@ const FormWithdrawStakingReward = () => {
         confirmationLoading={confirmLoading}
         className="reward-modal"
         footer={[
-          <Button key="submit" type="primary" loading={confirmLoading} onClick={onConfirmTransfer}>
+          <Button
+            key="submit"
+            type="primary"
+            loading={confirmLoading}
+            disabled={!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE}
+            onClick={onConfirmTransfer}
+          >
             {t('general.confirm')}
           </Button>,
           <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
