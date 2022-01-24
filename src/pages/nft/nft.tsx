@@ -87,6 +87,8 @@ import IconTick from '../../svg/IconTick';
 import IconPlayer from '../../svg/IconPlayer';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 import ReceiveDetail from '../assets/components/ReceiveDetail';
+import { useLedgerStatus } from '../../hooks/useLedgerStatus';
+import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -206,6 +208,7 @@ const FormMintNft = () => {
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [errorMessages, setErrorMessages] = useState([]);
+  const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -277,6 +280,9 @@ const FormMintNft = () => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (!isLedgerConnected) {
+        ledgerNotification(currentSession.wallet, walletAsset?.assetType!);
+      }
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
@@ -705,7 +711,10 @@ const FormMintNft = () => {
               loading={confirmLoading}
               disabled={
                 (isDenomIdIssued && !isDenomIdOwner) ||
-                new Big(multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1)).gt(walletAsset.balance)
+                new Big(multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1)).gt(
+                  walletAsset.balance,
+                ) ||
+                (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE)
               }
             >
               {t('general.confirm')}
@@ -951,6 +960,7 @@ const NftPage = () => {
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [errorMessages, setErrorMessages] = useState([]);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
 
   const didMountRef = useRef(false);
 
@@ -1075,6 +1085,9 @@ const NftPage = () => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (!isLedgerConnected) {
+        ledgerNotification(currentSession.wallet, walletAsset?.assetType!);
+      }
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
@@ -1593,6 +1606,10 @@ const NftPage = () => {
                       key="submit"
                       type="primary"
                       onClick={onConfirmTransfer}
+                      disabled={
+                        !isLedgerConnected &&
+                        currentSession.wallet.walletType === LEDGER_WALLET_TYPE
+                      }
                       loading={confirmLoading}
                     >
                       {t('nft.modal2.button1')}
@@ -1602,7 +1619,11 @@ const NftPage = () => {
                       key="submit"
                       type="primary"
                       htmlType="submit"
-                      disabled={new Big(networkFee).gt(walletAsset.balance)}
+                      disabled={
+                        new Big(networkFee).gt(walletAsset.balance) ||
+                        (!isLedgerConnected &&
+                          currentSession.wallet.walletType === LEDGER_WALLET_TYPE)
+                      }
                       onClick={() => {
                         form.submit();
                       }}
