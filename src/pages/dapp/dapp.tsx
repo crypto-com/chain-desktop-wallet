@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Layout, notification, Tabs } from 'antd';
+import { Layout, Tabs } from 'antd';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import './dapp.less';
 import { sessionState, pageLockState } from '../../recoil/atom';
@@ -16,9 +16,11 @@ import { IWebviewNavigationState, WebviewState } from './browser/useWebviewStatu
 import { useBookmark } from './hooks/useBookmark';
 import { useShowDisclaimer } from './hooks/useShowDisclaimer';
 import { DisclaimerModal } from './components/DisclaimerModal/DisclaimerModal';
-import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
-import IconEth from '../../svg/IconEth';
+import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import { useLedgerStatus } from '../../hooks/useLedgerStatus';
+import { useCronosAsset } from '../../hooks/useCronosAsset';
+import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 
 const { Header, Content } = Layout;
 const { TabPane } = Tabs;
@@ -103,6 +105,9 @@ const DappPage = () => {
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(currentSession);
 
+  const cronosAsset = useCronosAsset();
+  const { isLedgerConnected } = useLedgerStatus({ asset: cronosAsset });
+
   const updateBookmarkButtonBeHighlighted = useCallback(() => {
     const url = browserRef.current?.getCurrentWebStatus()?.webviewURL;
     if (!url) {
@@ -115,62 +120,21 @@ const DappPage = () => {
     setBookmarkButtonHighlighted(should);
   }, [bookmarkList, browserRef.current]);
 
-  const clickCheckLedger = async () => {
-    try {
-      const { addressIndex, walletType } = currentSession.wallet;
-      if (LEDGER_WALLET_TYPE === walletType) {
-        const device = createLedgerDevice();
-        await device.getEthAddress(addressIndex, true);
-        notification.close('LedgerNotification');
-      }
-    } catch (e) {
-      notification.error({
-        message: t('receive.notification.ledgerConnect.message'),
-        description: t('receive.notification.ledgerConnect.description'),
-        placement: 'topRight',
-        duration: 3,
-      });
-    }
-  };
-
-  const checkLedgerBtn = (
-    <Button
-      type="primary"
-      size="small"
-      className="btn-restart"
-      onClick={() => {
-        clickCheckLedger();
-      }}
-      style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
-    >
-      {t('general.connect')}
-    </Button>
-  );
-
   useEffect(() => {
     updateBookmarkButtonBeHighlighted();
 
     if (!didMountRef.current) {
       didMountRef.current = true;
-      if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-        notification.open({
-          key: 'LedgerNotification',
-          message: t('create.ledgerModalPopup.evmAddress.title2'),
-          description: <div>{t('create.ledgerModalPopup.evmAddress.description2')}</div>,
-          duration: 60,
-          placement: 'topRight',
-          className: 'notification-ledger',
-          icon: (
-            <div className="ledger-app-icon">
-              <IconEth style={{ color: '#fff' }} />
-            </div>
-          ),
-          btn: checkLedgerBtn,
-        });
-      }
+
       analyticsService.logPage('DApps');
     }
   }, [updateBookmarkButtonBeHighlighted]);
+
+  useEffect(() => {
+    if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE && isLedgerConnected === false) {
+      ledgerNotification(currentSession.wallet, cronosAsset?.assetType!);
+    }
+  }, [currentSession, isLedgerConnected, cronosAsset]);
 
   return (
     <Layout className="site-layout">
