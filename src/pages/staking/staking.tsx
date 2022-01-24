@@ -1104,6 +1104,7 @@ const FormWithdrawStakingReward = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected) {
         ledgerNotification(currentSession.wallet, walletAsset?.assetType!);
+        return;
       }
       if (action === 'restake') {
         showConfirmationRestakeModal();
@@ -1242,10 +1243,10 @@ const FormWithdrawStakingReward = () => {
       }
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
-      setErrorMessages(e.message.split(': '));
+      setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsConfirmationRestakeModalVisible(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
