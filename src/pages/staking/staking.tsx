@@ -83,6 +83,9 @@ import {
   SUPPORTED_CURRENCY,
 } from '../../config/StaticConfig';
 import { isValidatorAddressSuspicious, ModerationConfig } from '../../models/ModerationConfig';
+import { useLedgerStatus } from '../../hooks/useLedgerStatus';
+import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
+import { useDefaultWalletAsset } from '../../hooks/useDefaultWalletAsset';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
@@ -159,6 +162,8 @@ const FormDelegationRequest = props => {
   const didMountRef = useRef(false);
   const allMarketData = useRecoilValue(allMarketState);
 
+  const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
+
   const [t] = useTranslation();
 
   useEffect(() => {
@@ -200,6 +205,9 @@ const FormDelegationRequest = props => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (!isLedgerConnected) {
+        ledgerNotification(currentSession.wallet, walletAsset?.assetType!);
+      }
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
@@ -252,10 +260,10 @@ const FormDelegationRequest = props => {
       form.resetFields();
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
-      setErrorMessages(e.message.split(': '));
+      setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -427,7 +435,10 @@ const FormDelegationRequest = props => {
             <Button
               key="submit"
               type="primary"
-              disabled={!isChecked}
+              disabled={
+                !isChecked ||
+                (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE)
+              }
               loading={confirmLoading}
               onClick={onConfirmDelegation}
             >
@@ -601,6 +612,9 @@ const FormDelegationOperations = props => {
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [errorMessages, setErrorMessages] = useState([]);
 
+  const { defaultAsset } = useDefaultWalletAsset();
+  const { isLedgerConnected } = useLedgerStatus({ asset: defaultAsset });
+
   const [t] = useTranslation();
 
   useEffect(() => {
@@ -651,6 +665,9 @@ const FormDelegationOperations = props => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (!isLedgerConnected) {
+        ledgerNotification(currentSession.wallet, defaultAsset?.assetType!);
+      }
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
@@ -727,10 +744,10 @@ const FormDelegationOperations = props => {
       }
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
-      setErrorMessages(e.message.split(': '));
+      setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -870,8 +887,9 @@ const FormDelegationOperations = props => {
               loading={confirmLoading}
               onClick={onConfirmDelegationAction}
               disabled={
-                delegationActionType === StakingActionType.UNDELEGATE &&
-                !isUndelegateDisclaimerChecked
+                (delegationActionType === StakingActionType.UNDELEGATE &&
+                  !isUndelegateDisclaimerChecked) ||
+                (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE)
               }
             >
               {t('general.confirm')}
@@ -1105,10 +1123,10 @@ const FormWithdrawStakingReward = () => {
       setIsSuccessTransferModalVisible(true);
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
-      setErrorMessages(e.message.split(': '));
+      setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
