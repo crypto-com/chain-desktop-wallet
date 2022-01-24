@@ -11,7 +11,7 @@ export const useLedgerStatus = (props: Props) => {
   const { asset } = props;
 
   const ledgerConnectedApp = useRecoilValue(ledgerIsConnectedState);
-  const [isLedgerConnected, setIsLedgerConnected] = useState(false);
+  const [isLedgerConnected, setIsLedgerConnected] = useState<boolean>();
 
   useEffect(() => {
     const checkIsLedgerConnected = () => {
