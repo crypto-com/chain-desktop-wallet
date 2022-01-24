@@ -31,6 +31,8 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import { useLedgerStatus } from '../../hooks/useLedgerStatus';
+import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -81,6 +83,8 @@ const GovernancePage = () => {
   const didMountRef = useRef(false);
   const [isLoadingTally, setIsLoadingTally] = useState(false);
 
+  const { isLedgerConnected } = useLedgerStatus({ asset: userAsset });
+
   const analyticsService = new AnalyticsService(currentSession);
 
   const [t] = useTranslation();
@@ -105,6 +109,9 @@ const GovernancePage = () => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (!isLedgerConnected) {
+        ledgerNotification(currentSession.wallet, userAsset?.assetType!);
+      }
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
@@ -233,7 +240,7 @@ const GovernancePage = () => {
       setInputPasswordVisible(false);
       setIsSuccessModalVisible(true);
     } catch (e) {
-      setErrorMessages(e.message.split(': '));
+      setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       // setInputPasswordVisible(false);
@@ -748,7 +755,13 @@ const GovernancePage = () => {
         handleCancel={handleCancelConfirmationModal}
         handleOk={() => {}}
         footer={[
-          <Button key="submit" type="primary" loading={confirmLoading} onClick={onConfirm}>
+          <Button
+            key="submit"
+            type="primary"
+            loading={confirmLoading}
+            disabled={!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE}
+            onClick={onConfirm}
+          >
             {t('general.confirm')}
           </Button>,
           <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
