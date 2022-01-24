@@ -715,12 +715,11 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/bridge" icon={<Icon component={IconCronos} />}>
           {conditionalLink('/bridge', t('navbar.bridge'))}
         </Menu.Item>
-        {!checkIfTestnet(session.wallet.config.network) &&
-          session.wallet.walletType !== LEDGER_WALLET_TYPE && (
-            <Menu.Item key="/dapp" icon={<Icon component={IconDApp} />}>
-              {conditionalLink('/dapp', t('navbar.dapp'))}
-            </Menu.Item>
-          )}
+        {!checkIfTestnet(session.wallet.config.network) && (
+          <Menu.Item key="/dapp" icon={<Icon component={IconDApp} />}>
+            {conditionalLink('/dapp', t('navbar.dapp'))}
+          </Menu.Item>
+        )}
         {/* <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
           <Link to="/send">{t('navbar.send')}</Link>
         </Menu.Item>
