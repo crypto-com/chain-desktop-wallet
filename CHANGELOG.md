@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.6.5] - 2022-01-19
+### Bug fixes
+- NFT transaction list sorted by time
+- Bridge transaction list sorted by time
+- Repeated records in NFT transaction list when switching page
+- Incorrect Explorer URL after settings update on Cronos Assets
+
+## [v0.6.4] - 2022-01-13
+### Additions
+- Tectonic Support
+- CRC20 token whitelisting
+- Message Type support in transaction history for `Crypto.org chain` asset
+- Revamp Transaction History Records data types
+- Adjust Validator list ordering to better promote validators with Up Time >99.9% yet low Voting Power
+- Updated App Icon
+
+### Bug fixes
+- Fix showing of finished unbonding delegation
+- Fix missing of vesting account support
+
 ## [v0.6.3] - 2021-12-23
 ### Bug fixes
 - Hide misleading transaction fee on CRC20 tokens

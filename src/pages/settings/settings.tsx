@@ -768,7 +768,6 @@ const FormSettings = () => {
       indexingUrl: values.indexingUrl,
       networkFee: String(values.networkFee),
       gasLimit: String(values.gasLimit),
-      explorer: session.wallet.config.explorer,
     };
 
     // This wallet level settings update should only imply the primary asset.
@@ -784,7 +783,6 @@ const FormSettings = () => {
       ...session.activeAsset!,
       config: {
         ...previousAssetConfig!,
-        explorer: settingsDataUpdate.explorer!,
         chainId: settingsDataUpdate.chainId!,
         fee: { gasLimit: settingsDataUpdate.gasLimit!, networkFee: settingsDataUpdate.networkFee! },
         indexingUrl: settingsDataUpdate.indexingUrl!,

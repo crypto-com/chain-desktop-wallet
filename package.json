@@ -1,6 +1,6 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.6.3",
+  "version": "0.6.5",
   "description": "Crypto.com Chain Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.org <chain@crypto.org>",
@@ -12,7 +12,7 @@
     "@ant-design/icons": "4.6.2",
     "@babel/helper-builder-react-jsx": "7.12.13",
     "@babel/helper-builder-react-jsx-experimental": "7.12.11",
-    "@cosmjs/stargate": "0.24.1",
+    "@cosmjs/stargate": "0.27.0",
     "@crypto-org-chain/chain-jslib": "1.0.3",
     "@ledgerhq/hw-app-eth": "^6.6.0",
     "@ledgerhq/hw-transport-node-hid": "^6.6.0",
@@ -340,6 +340,7 @@
     "normalize-url": "5.3.1",
     "tar": "6.1.9",
     "glob-parent": "6.0.2",
-    "json-schema": "0.4.0"
+    "json-schema": "0.4.0",
+    "follow-redirects": "1.14.7"
   }
 }

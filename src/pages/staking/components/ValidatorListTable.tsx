@@ -2,10 +2,15 @@ import React, { useEffect, useState } from 'react';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { FormInstance, Table, Tooltip } from 'antd';
+import { AutoComplete, FormInstance, Table, Tooltip } from 'antd';
 import numeral from 'numeral';
 
-import { CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD } from '../../../config/StaticConfig';
+import './ValidatorListTable.less';
+
+import {
+  VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+  VALIDATOR_UPTIME_THRESHOLD,
+} from '../../../config/StaticConfig';
 import { ellipsis, middleEllipsis } from '../../../utils/utils';
 import { renderExplorerUrl } from '../../../models/Explorer';
 import { ValidatorModel } from '../../../models/Transaction';
@@ -81,8 +86,8 @@ const ValidatorListTable = (props: {
       title: t('staking.validatorList.table.currentTokens'),
       dataIndex: 'currentTokens',
       key: 'currentTokens',
-      sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
-      defaultSortOrder: 'descend' as any,
+      // sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
+      // defaultSortOrder: 'descend' as any,
       render: currentTokens => {
         return (
           <span>
@@ -97,7 +102,7 @@ const ValidatorListTable = (props: {
       // dataIndex: 'cumulativeShares',
       key: 'cumulativeShares',
       // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
-      defaultSortOrder: 'descend' as any,
+      // defaultSortOrder: 'descend' as any,
       render: record => {
         return (
           <>
@@ -114,7 +119,7 @@ const ValidatorListTable = (props: {
       title: t('staking.validatorList.table.currentCommissionRate'),
       dataIndex: 'currentCommissionRate',
       key: 'currentCommissionRate',
-      sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
+      // sorter: (a, b) => new Big(a.currentCommissionRate).cmp(new Big(b.currentCommissionRate)),
       render: currentCommissionRate => (
         <span>{new Big(currentCommissionRate).times(100).toFixed(2)}%</span>
       ),
@@ -122,7 +127,7 @@ const ValidatorListTable = (props: {
     {
       title: t('staking.validatorList.table.validatorApy'),
       key: 'apy',
-      sorter: (a, b) => new Big(a.apy).cmp(new Big(b.apy)),
+      // sorter: (a, b) => new Big(a.apy).cmp(new Big(b.apy)),
       render: record => {
         return <span>{new Big(record.apy).times(100).toFixed(2)}%</span>;
       },
@@ -130,7 +135,7 @@ const ValidatorListTable = (props: {
     {
       title: t('staking.validatorList.table.validatorUptime'),
       key: 'uptime',
-      sorter: (a, b) => new Big(a.uptime).cmp(new Big(b.uptime)),
+      // sorter: (a, b) => new Big(a.uptime).cmp(new Big(b.uptime)),
       render: record => {
         return <span>{new Big(record.uptime).times(100).toFixed(2)}%</span>;
       },
@@ -166,7 +171,7 @@ const ValidatorListTable = (props: {
       return validatorList.map((validator, idx) => {
         if (
           new Big(validator.cumulativeSharesIncludePercentage!).gte(
-            CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+            VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
           ) &&
           !displayedWarningColumn
         ) {
@@ -188,6 +193,17 @@ const ValidatorListTable = (props: {
     return [];
   };
 
+  const onSearch = value => {
+    const newWalletList = currentValidatorList.filter(validator => {
+      return (
+        validator.validatorName.toLowerCase().indexOf(value.toLowerCase()) !== -1 ||
+        validator.validatorAddress.toLowerCase().indexOf(value.toLowerCase()) !== -1 ||
+        value === ''
+      );
+    });
+    setValidatorTopList(newWalletList);
+  };
+
   useEffect(() => {
     const syncValidatorsData = async () => {
       const validatorList = await processValidatorList(currentValidatorList);
@@ -198,45 +214,55 @@ const ValidatorListTable = (props: {
   }, currentValidatorList);
 
   return (
-    <Table
-      locale={{
-        triggerDesc: t('general.table.triggerDesc'),
-        triggerAsc: t('general.table.triggerAsc'),
-        cancelSort: t('general.table.cancelSort'),
-      }}
-      dataSource={validatorTopList}
-      columns={validatorColumns}
-      pagination={{ showSizeChanger: false }}
-      onChange={(pagination, filters, sorter: any) => {
-        if (
-          (sorter.order === 'descend' && sorter.field === 'currentTokens') ||
-          sorter.order === undefined
-        ) {
-          setDisplayWarning(true);
-        } else {
-          setDisplayWarning(false);
-        }
-      }}
-      expandable={{
-        rowExpandable: record => record.displayWarningColumn! && displayWarning,
-        expandedRowRender: record =>
-          record.displayWarningColumn &&
-          displayWarning && (
-            <div className="cumulative-stake33">
-              {t('staking.validatorList.table.warningCumulative')}
-            </div>
-          ),
-        expandIconColumnIndex: -1,
-      }}
-      rowClassName={record => {
-        const greyBackground =
-          new Big(record.cumulativeSharesIncludePercentage!).lte(
-            CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
-          ) || record.displayWarningColumn;
-        return greyBackground ? 'grey-background' : '';
-      }}
-      defaultExpandAllRows
-    />
+    <div className="validator-list">
+      <AutoComplete
+        style={{ width: 400 }}
+        onSearch={onSearch}
+        placeholder={t('wallet.search.placeholder')}
+      />
+      <Table
+        locale={{
+          triggerDesc: t('general.table.triggerDesc'),
+          triggerAsc: t('general.table.triggerAsc'),
+          cancelSort: t('general.table.cancelSort'),
+        }}
+        dataSource={validatorTopList}
+        columns={validatorColumns}
+        pagination={{ showSizeChanger: false }}
+        onChange={(pagination, filters, sorter: any) => {
+          if (
+            (sorter.order === 'descend' && sorter.field === 'currentTokens') ||
+            sorter.order === undefined
+          ) {
+            setDisplayWarning(true);
+          } else {
+            setDisplayWarning(false);
+          }
+        }}
+        expandable={{
+          rowExpandable: record => record.displayWarningColumn! && displayWarning,
+          expandedRowRender: record =>
+            record.displayWarningColumn &&
+            displayWarning && (
+              <div className="cumulative-stake33">
+                {t('staking.validatorList.table.warningCumulative')}
+              </div>
+            ),
+          expandIconColumnIndex: -1,
+        }}
+        rowClassName={record => {
+          const greyBackground =
+            Big(record.uptime ?? '0').lt(VALIDATOR_UPTIME_THRESHOLD) ||
+            isValidatorAddressSuspicious(record.validatorAddress, moderationConfig);
+          // new Big(record.cumulativeSharesIncludePercentage!).lte(
+          //   VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
+          // )
+          // || record.displayWarningColumn;
+          return greyBackground ? 'grey-background' : '';
+        }}
+        defaultExpandAllRows
+      />
+    </div>
   );
 };
 
