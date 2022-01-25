@@ -29,6 +29,7 @@ export function ledgerNotification(wallet: Wallet, assetType: UserAssetType) {
           setRecoil(ledgerIsConnectedState, LedgerConnectedApp.ETHEREUM);
         }
         notification.close('LedgerNotification');
+        notification.close('LedgerErrorNotification');
       }
     } catch (e) {
       notification.error({
@@ -48,6 +49,7 @@ export function ledgerNotification(wallet: Wallet, assetType: UserAssetType) {
         ),
         placement: 'topRight',
         duration: 3,
+        key: 'LedgerErrorNotification',
       });
       setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
     }
