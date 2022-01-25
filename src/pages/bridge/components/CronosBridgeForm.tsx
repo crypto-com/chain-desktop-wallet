@@ -80,6 +80,7 @@ const CronosBridgeForm = props => {
     setBridgeTransferDirection,
     setBridgeConfigs,
     setBridgeConfigFields,
+    onBridgeExchangeCallback,
   } = props;
 
   const [session, setSession] = useRecoilState(sessionState);
@@ -184,7 +185,7 @@ const CronosBridgeForm = props => {
     });
   };
 
-  const onBridgeExchange = () => {
+  const onBridgeExchange = (callback: Function) => {
     const { bridgeFrom, bridgeTo } = form.getFieldsValue();
 
     const newBridgeFrom = bridgeTo;
@@ -247,6 +248,8 @@ const CronosBridgeForm = props => {
       isCustomToAddress: false,
     });
     form.validateFields();
+
+    callback();
   };
 
   const onSwitchAsset = async value => {
@@ -397,7 +400,7 @@ const CronosBridgeForm = props => {
         </Form.Item>
         <SwapOutlined
           style={{ color: '#1199fa', fontSize: '40px', cursor: 'pointer' }}
-          onClick={onBridgeExchange}
+          onClick={() => onBridgeExchange(onBridgeExchangeCallback)}
         />
         <Form.Item
           name="bridgeTo"

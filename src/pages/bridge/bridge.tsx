@@ -27,12 +27,19 @@ import Icon, {
   SettingOutlined,
 } from '@ant-design/icons';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { setRecoil } from 'recoil-nexus';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { Footer, Header } from 'antd/lib/layout/layout';
-import { pageLockState, sessionState, walletAllAssetsState } from '../../recoil/atom';
+import {
+  LedgerConnectedApp,
+  ledgerIsConnectedState,
+  pageLockState,
+  sessionState,
+  walletAllAssetsState,
+} from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 
 import { UserAsset } from '../../models/UserAsset';
@@ -533,6 +540,10 @@ const CronosBridge = props => {
     const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
     const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
 
+    const onBridgeExchangeCallback = () => {
+      setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
+    };
+
     if (walletAllAssets.length < 2) {
       return (
         <div>
@@ -580,6 +591,7 @@ const CronosBridge = props => {
               setBridgeConfigs={setBridgeConfigs}
               bridgeConfigFields={bridgeConfigFields}
               setBridgeConfigFields={setBridgeConfigFields}
+              onBridgeExchangeCallback={onBridgeExchangeCallback}
             />
             <PasswordFormModal
               description={t('general.passwordFormModal.description')}
