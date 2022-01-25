@@ -249,6 +249,7 @@
   "wallet.table1.address": "地址",
   "wallet.table1.walletType": "錢包種類",
   "wallet.table1.network": "網絡",
+  "wallet.table1.addressIndex": "索引",
   "announcement.modal.title": "數據分析已添加",
   "announcement.modal.description1": "您可以通過啟用數據分析來幫助改進 Crypto.org 鏈錢包。收集的數據將幫助開發團隊優先考慮新功能並改進現有功能。\n\n您可以隨時返回到 “設定” 內的 “基本設定” 以禁用數據分析",
   "home.title": "歡迎",

@@ -249,6 +249,7 @@
   "wallet.table1.address": "Address",
   "wallet.table1.walletType": "Wallet Type",
   "wallet.table1.network": "Network",
+  "wallet.table1.addressIndex": "Index",
   "announcement.modal.title": "Data analytics was added",
   "announcement.modal.description1": "You can help improve Crypto.org Chain Wallet by having Data Analytics enabled. The data collected will help the development team prioritize new features and improve existing functionalities.\n\nYou can always come back to disable Data Analytics anytime under General Configuration in Settings. ",
   "home.title": "Welcome Back!",

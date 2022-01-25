@@ -174,6 +174,17 @@ function WalletPage() {
       render: text => <Text type="success">{text}</Text>,
     },
     {
+      title: t('wallet.table1.addressIndex'),
+      dataIndex: 'addressIndex',
+      key: 'addressIndex',
+      children: [
+        {
+          title: session?.wallet.addressIndex,
+          dataIndex: 'addressIndex',
+        },
+      ],
+    },
+    {
       title: t('wallet.table1.walletType'),
       dataIndex: 'walletType',
       key: 'walletType',
