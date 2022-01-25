@@ -109,22 +109,22 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
   const config: UserAssetConfig = {
     explorer: {
       tx: isTestnet
-        ? 'https://cronos.crypto.org/explorer/testnet3/tx'
-        : 'https://cronos.crypto.org/explorer/tx',
+        ? 'https://ropsten.etherscan.io/tx'
+        : 'https://etherscan.io/tx',
       address: isTestnet
-        ? 'https://cronos.crypto.org/explorer/testnet3/address'
-        : 'https://cronos.crypto.org/explorer/address',
+        ? 'https://ropsten.etherscan.io/address'
+        : 'https://etherscan.io/address',
     },
     explorerUrl: isTestnet
-      ? 'https://cronos.crypto.org/explorer/testnet3'
-      : 'https://cronos.crypto.org/explorer',
+      ? 'https://ropsten.etherscan.io'
+      : 'https://etherscan.io',
 
     chainId: isTestnet ? '3' : '1',
 
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
     indexingUrl: isTestnet
-      ? 'https://cronos.crypto.org/explorer/testnet3/api'
-      : 'https://cronos.crypto.org/explorer/api',
+      ? 'https://api.blockchair.com/ethereum/testnet/dashboards'
+      : 'https://api.blockchair.com/ethereum/dashboards',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
     nodeUrl: isTestnet
