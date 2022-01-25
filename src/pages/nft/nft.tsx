@@ -1619,11 +1619,7 @@ const NftPage = () => {
                       key="submit"
                       type="primary"
                       htmlType="submit"
-                      disabled={
-                        new Big(networkFee).gt(walletAsset.balance) ||
-                        (!isLedgerConnected &&
-                          currentSession.wallet.walletType === LEDGER_WALLET_TYPE)
-                      }
+                      disabled={new Big(networkFee).gt(walletAsset.balance)}
                       onClick={() => {
                         form.submit();
                       }}
