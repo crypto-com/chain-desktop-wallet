@@ -97,7 +97,7 @@ export class NodeRpcService implements INodeRpcService {
       // eslint-disable-next-line no-console
       console.log(
         `[${NodeRpcService.name}-loadAccountBalance] [Error] Unable to fetch data.`,
-        error.response || error,
+        ((error as unknown) as any).response || error,
       );
       return '0';
     }
@@ -212,7 +212,7 @@ export class NodeRpcService implements INodeRpcService {
     try {
       response = await this.cosmosClient.get<DelegationResult | ErrorRpcResponse>(url);
     } catch (error) {
-      response = error.response;
+      response = ((error as unknown) as any).response;
     } finally {
       if (response.status !== 200) {
         // eslint-disable-next-line no-console
@@ -257,8 +257,8 @@ export class NodeRpcService implements INodeRpcService {
       // eslint-disable-next-line no-console
       console.log(
         `[NodeRpcService.fetchStakingRewardsBalance] | HTTP Code: ${
-          error.response.status
-        } | Response: ${JSON.stringify(error.response.data)}`,
+          ((error as unknown) as any).response.status
+        } | Response: ${JSON.stringify(((error as unknown) as any).response.data)}`,
       );
       return {
         totalBalance: String(0),
@@ -355,8 +355,8 @@ export class NodeRpcService implements INodeRpcService {
       // eslint-disable-next-line no-console
       console.log(
         `[NodeRpcService.fetchUnbondingDelegationsPaginated] | HTTP Code: ${
-          error.response.status
-        } | Response: ${JSON.stringify(error.response.data)}`,
+          ((error as unknown) as any).response.status
+        } | Response: ${JSON.stringify(((error as unknown) as any).response.data)}`,
       );
 
       return [[], null];
@@ -599,7 +599,7 @@ export class NodeRpcService implements INodeRpcService {
       // eslint-disable-next-line no-console
       console.log(
         `[${NodeRpcService.name}-getIBCAssetTrace] [Error] Unable to fetch data.`,
-        error.response || error,
+        ((error as unknown) as any).response || error,
       );
       throw new Error(`[${NodeRpcService.name}-getIBCAssetTrace] [Error] Unable to fetch data.`);
     }
