@@ -138,7 +138,7 @@
   "general.undelegateFormComponent.alert1.message3": ". Until then, you are not able to use the undelegated funds yet.",
   "general.undelegateFormComponent.checkbox1": "I understand that my CRO in Crypto.org Chain staking is subject to a {{ unbondingPeriod }}-day unbonding period when I unstake, as enforced by the Crypto.org Chain network.",
   "general.ledgerNotification.error.addressMismatch.title": "Wallet address mismatch",
-  "general.ledgerNotification.error.addressMismatch.description": "Your wallet address doesn't match with the stored address on Ledger device. Please check and use the correct Ledger device with the same address.",
+  "general.ledgerNotification.error.addressMismatch.description": "Your wallet address doesn't match with the stored address on the Ledger device. Please check and use the correct Ledger device with the same address.",
   "general.table.triggerDesc": "Click to sort by descend",
   "general.table.triggerAsc": "Click to sort by ascend",
   "general.table.cancelSort": "Click to cancel sort",

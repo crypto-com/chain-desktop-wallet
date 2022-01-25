@@ -137,6 +137,8 @@
   "general.undelegateFormComponent.alert1.message2": "일",
   "general.undelegateFormComponent.alert1.message3": "그 때까지는 위임 취소된 금액을 사용할 수 없습니다.",
   "general.undelegateFormComponent.checkbox1": "Crypto.org Chain 스테이킹에서, 내 CRO는 Crypto.org Chain 네트워크에서 규정한 대로, 스테이킹을 해제할 때는  {{ unbondingPeriod }}일의 위임 취소  기간이 적용되는 것을 이해합니다",
+  "general.ledgerNotification.error.addressMismatch.title": "지갑 주소 불일치",
+  "general.ledgerNotification.error.addressMismatch.description": "지갑 주소가 레져 주소와 일치하지 않습니다. 해당 주소와 동일한 레져인지 확인해주세요.",
   "general.table.triggerDesc": "내림차순으로 정렬",
   "general.table.triggerAsc": "오름차순 정렬",
   "general.table.cancelSort": "정렬 취소",
