@@ -206,7 +206,7 @@ const FormDelegationRequest = props => {
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected) {
-        ledgerNotification(currentSession.wallet, walletAsset?.assetType!);
+        ledgerNotification(currentSession.wallet, walletAsset!);
       }
       showConfirmationModal();
     } else {
@@ -679,7 +679,7 @@ const FormDelegationOperations = props => {
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected) {
-        ledgerNotification(currentSession.wallet, defaultAsset?.assetType!);
+        ledgerNotification(currentSession.wallet, defaultAsset!);
       }
       showConfirmationModal();
     } else {
@@ -1129,7 +1129,7 @@ const FormWithdrawStakingReward = () => {
   const showPasswordInput = (action: string) => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected) {
-        ledgerNotification(currentSession.wallet, walletAsset?.assetType!);
+        ledgerNotification(currentSession.wallet, walletAsset!);
         return;
       }
       if (action === 'restake') {

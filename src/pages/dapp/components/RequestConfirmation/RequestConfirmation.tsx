@@ -63,7 +63,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
 
   useEffect(() => {
     if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE && isLedgerConnected === false) {
-      ledgerNotification(currentSession.wallet, cronosAsset?.assetType!);
+      ledgerNotification(currentSession.wallet, cronosAsset!);
     }
   }, [isLedgerConnected, currentSession, cronosAsset]);
 

@@ -137,6 +137,8 @@
   "general.undelegateFormComponent.alert1.message2": "日",
   "general.undelegateFormComponent.alert1.message3": "。在正式完成之前，你並不能使用赎回的委托资金。",
   "general.undelegateFormComponent.checkbox1": "我明白根据 Crypto.org Chain的协定，我在 Crypto.org Chain 上的 CRO 抵押将要经过 {{ unbondingPeriod }} 日才可以完成赎回过程。",
+  "general.ledgerNotification.error.addressMismatch.title": "银包地址不相符",
+  "general.ledgerNotification.error.addressMismatch.description": "你银包的地址与Ledger内保存的地址并不相符，请检查并使用地址相符的Ledger。",
   "general.table.triggerDesc": "按降序排序",
   "general.table.triggerAsc": "按升序排序",
   "general.table.cancelSort": "取消排序",

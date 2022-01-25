@@ -80,10 +80,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
       </NoticeDisclaimer>
       {isLedger && (
         <div className="ledger">
-          <Button
-            type="primary"
-            onClick={() => ledgerNotification(session.wallet, currentAsset?.assetType!)}
-          >
+          <Button type="primary" onClick={() => ledgerNotification(session.wallet, currentAsset!)}>
             {t('receive.button')}
           </Button>
         </div>

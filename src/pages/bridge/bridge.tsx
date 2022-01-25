@@ -540,7 +540,7 @@ const CronosBridge = props => {
     const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
     const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
 
-    const onBridgeExchangeCallback = () => {
+    const onSwitchBridgeCallback = () => {
       setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
     };
 
@@ -591,7 +591,7 @@ const CronosBridge = props => {
               setBridgeConfigs={setBridgeConfigs}
               bridgeConfigFields={bridgeConfigFields}
               setBridgeConfigFields={setBridgeConfigFields}
-              onBridgeExchangeCallback={onBridgeExchangeCallback}
+              onSwitchBridgeCallback={onSwitchBridgeCallback}
             />
             <PasswordFormModal
               description={t('general.passwordFormModal.description')}

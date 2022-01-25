@@ -7,9 +7,15 @@ import { Wallet } from '../../models/Wallet';
 import IconEth from '../../svg/IconEth';
 import IconCro from '../../svg/IconCro';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
-import { UserAssetType } from '../../models/UserAsset';
+import { UserAsset, UserAssetType } from '../../models/UserAsset';
 
-export function ledgerNotification(wallet: Wallet, assetType: UserAssetType) {
+export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
+  const { assetType } = asset;
+
+  const LedgerNotificationKey = 'LedgerNotification';
+  const LedgerSuccessNotificationKey = 'LedgerSuccessNotification';
+  const LedgerErrorNotificationKey = 'LedgerErrorNotification';
+
   const clickCheckLedger = async () => {
     try {
       const { addressIndex, config, walletType } = wallet;
@@ -17,19 +23,55 @@ export function ledgerNotification(wallet: Wallet, assetType: UserAssetType) {
       if (LEDGER_WALLET_TYPE === walletType) {
         const device = createLedgerDevice();
         if (assetType === UserAssetType.TENDERMINT || assetType === UserAssetType.IBC) {
-          await device.getAddress(addressIndex, addressprefix, true);
-          setRecoil(ledgerIsConnectedState, LedgerConnectedApp.CRYPTO_ORG);
+          const ledgerAddress = await device.getAddress(addressIndex, addressprefix, true);
+
+          if (ledgerAddress === wallet.address) {
+            setRecoil(ledgerIsConnectedState, LedgerConnectedApp.CRYPTO_ORG);
+            notification.close(LedgerNotificationKey);
+            notification.close(LedgerErrorNotificationKey);
+            notification.success({
+              message: i18n.t('home.ledgerModalPopup.tendermintAsset.title1'),
+              description: i18n.t('home.ledgerModalPopup.tendermintAsset.description1'),
+              placement: 'topRight',
+              duration: 2,
+              key: LedgerSuccessNotificationKey,
+            });
+          } else {
+            notification.error({
+              message: i18n.t('general.ledgerNotification.error.addressMismatch.title'),
+              description: i18n.t('general.ledgerNotification.error.addressMismatch.description'),
+              duration: 10,
+              key: LedgerErrorNotificationKey,
+            });
+          }
         }
         if (
           assetType === UserAssetType.EVM ||
           assetType === UserAssetType.CRC_20_TOKEN ||
           assetType === UserAssetType.ERC_20_TOKEN
         ) {
-          await device.getEthAddress(addressIndex, true);
-          setRecoil(ledgerIsConnectedState, LedgerConnectedApp.ETHEREUM);
+          const ledgerAddress = await device.getEthAddress(addressIndex, true);
+
+          if (ledgerAddress === asset.address) {
+            setRecoil(ledgerIsConnectedState, LedgerConnectedApp.ETHEREUM);
+            notification.close(LedgerNotificationKey);
+            notification.close(LedgerErrorNotificationKey);
+            notification.success({
+              message: i18n.t('home.ledgerModalPopup.tendermintAsset.title1'),
+              description: i18n.t('home.ledgerModalPopup.tendermintAsset.description1'),
+              placement: 'topRight',
+              duration: 2,
+              key: LedgerSuccessNotificationKey,
+            });
+          } else {
+            notification.error({
+              message: i18n.t('general.ledgerNotification.error.addressMismatch.title'),
+              description: i18n.t('general.ledgerNotification.error.addressMismatch.description'),
+              duration: 10,
+              key: LedgerErrorNotificationKey,
+            });
+          }
         }
-        notification.close('LedgerNotification');
-        notification.close('LedgerErrorNotification');
       }
     } catch (e) {
       notification.error({
@@ -48,8 +90,8 @@ export function ledgerNotification(wallet: Wallet, assetType: UserAssetType) {
           </>
         ),
         placement: 'topRight',
-        duration: 3,
-        key: 'LedgerErrorNotification',
+        duration: 10,
+        key: LedgerErrorNotificationKey,
       });
       setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
     }
@@ -74,7 +116,7 @@ export function ledgerNotification(wallet: Wallet, assetType: UserAssetType) {
     case UserAssetType.CRC_20_TOKEN:
     case UserAssetType.ERC_20_TOKEN:
       notification.open({
-        key: 'LedgerNotification',
+        key: LedgerNotificationKey,
         message: i18n.t('create.ledgerModalPopup.evmAddress.title2'),
         description: <div>{i18n.t('create.ledgerModalPopup.evmAddress.description2')}</div>,
         duration: 60,
@@ -91,7 +133,7 @@ export function ledgerNotification(wallet: Wallet, assetType: UserAssetType) {
     case UserAssetType.TENDERMINT:
     case UserAssetType.IBC:
       notification.open({
-        key: 'LedgerNotification',
+        key: LedgerNotificationKey,
         message: i18n.t('create.ledgerModalPopup.tendermintAddress.title2'),
         description: <div>{i18n.t('create.ledgerModalPopup.tendermintAddress.description2')}</div>,
         duration: 60,

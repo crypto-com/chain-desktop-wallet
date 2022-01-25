@@ -111,7 +111,7 @@ const GovernancePage = () => {
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected) {
-        ledgerNotification(currentSession.wallet, userAsset?.assetType!);
+        ledgerNotification(currentSession.wallet, userAsset!);
       }
       showConfirmationModal();
     } else {

@@ -80,7 +80,7 @@ const CronosBridgeForm = props => {
     setBridgeTransferDirection,
     setBridgeConfigs,
     setBridgeConfigFields,
-    onBridgeExchangeCallback,
+    onSwitchBridgeCallback,
   } = props;
 
   const [session, setSession] = useRecoilState(sessionState);
@@ -183,9 +183,11 @@ const CronosBridgeForm = props => {
       amount: undefined,
       isCustomToAddress: false,
     });
+
+    onSwitchBridgeCallback();
   };
 
-  const onBridgeExchange = (callback: Function) => {
+  const onBridgeExchange = () => {
     const { bridgeFrom, bridgeTo } = form.getFieldsValue();
 
     const newBridgeFrom = bridgeTo;
@@ -249,7 +251,7 @@ const CronosBridgeForm = props => {
     });
     form.validateFields();
 
-    callback();
+    onSwitchBridgeCallback();
   };
 
   const onSwitchAsset = async value => {
@@ -359,7 +361,7 @@ const CronosBridgeForm = props => {
       requiredMark="optional"
       onFinish={() => {
         if (session.wallet.walletType === LEDGER_WALLET_TYPE && !isLedgerConnected) {
-          ledgerNotification(session.wallet, currentAsset?.assetType!);
+          ledgerNotification(session.wallet, currentAsset!);
           return;
         }
         showPasswordInput();
@@ -400,7 +402,7 @@ const CronosBridgeForm = props => {
         </Form.Item>
         <SwapOutlined
           style={{ color: '#1199fa', fontSize: '40px', cursor: 'pointer' }}
-          onClick={() => onBridgeExchange(onBridgeExchangeCallback)}
+          onClick={onBridgeExchange}
         />
         <Form.Item
           name="bridgeTo"

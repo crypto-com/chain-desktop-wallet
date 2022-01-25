@@ -281,7 +281,7 @@ const FormMintNft = () => {
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected) {
-        ledgerNotification(currentSession.wallet, walletAsset?.assetType!);
+        ledgerNotification(currentSession.wallet, walletAsset!);
       }
       showConfirmationModal();
     } else {
@@ -1086,7 +1086,7 @@ const NftPage = () => {
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected) {
-        ledgerNotification(currentSession.wallet, walletAsset?.assetType!);
+        ledgerNotification(currentSession.wallet, walletAsset!);
       }
       showConfirmationModal();
     } else {
