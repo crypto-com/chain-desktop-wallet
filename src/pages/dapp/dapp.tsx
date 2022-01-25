@@ -16,11 +16,7 @@ import { IWebviewNavigationState, WebviewState } from './browser/useWebviewStatu
 import { useBookmark } from './hooks/useBookmark';
 import { useShowDisclaimer } from './hooks/useShowDisclaimer';
 import { DisclaimerModal } from './components/DisclaimerModal/DisclaimerModal';
-import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
-import { useLedgerStatus } from '../../hooks/useLedgerStatus';
-import { useCronosAsset } from '../../hooks/useCronosAsset';
-import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 
 const { Header, Content } = Layout;
 const { TabPane } = Tabs;
@@ -105,9 +101,6 @@ const DappPage = () => {
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(currentSession);
 
-  const cronosAsset = useCronosAsset();
-  const { isLedgerConnected } = useLedgerStatus({ asset: cronosAsset });
-
   const updateBookmarkButtonBeHighlighted = useCallback(() => {
     const url = browserRef.current?.getCurrentWebStatus()?.webviewURL;
     if (!url) {
@@ -129,12 +122,6 @@ const DappPage = () => {
       analyticsService.logPage('DApps');
     }
   }, [updateBookmarkButtonBeHighlighted]);
-
-  useEffect(() => {
-    if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE && isLedgerConnected === false) {
-      ledgerNotification(currentSession.wallet, cronosAsset?.assetType!);
-    }
-  }, [currentSession, isLedgerConnected, cronosAsset]);
 
   return (
     <Layout className="site-layout">
