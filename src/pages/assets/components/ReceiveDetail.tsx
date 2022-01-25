@@ -49,7 +49,19 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
     } catch (e) {
       notification.error({
         message: t('receive.notification.ledgerConnect.message'),
-        description: t('receive.notification.ledgerConnect.description'),
+        description: (
+          <>
+            {t('receive.notification.ledgerConnect.description')}
+            <br />-{' '}
+            <a
+              href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t('general.errorModalPopup.ledgerTroubleshoot')}
+            </a>
+          </>
+        ),
         placement: 'topRight',
         duration: 3,
       });

@@ -115,6 +115,7 @@
   "general.errorModalPopup.nftTransfer.description": "NFT 轉發交易失敗。請稍後再試。",
   "general.errorModalPopup.nftMint.description": "NFT 鑄造交易失敗。請稍後再試。",
   "general.errorModalPopup.ledgerExportMode": "請確保你的Ledger錢包已經開啟專家模式。",
+  "general.errorModalPopup.ledgerTroubleshoot": "Ledger 連接疑難排解",
   "general.redelegateFormComponent.title": "確認重新委託交易",
   "general.redelegateFormComponent.description": "請檢查以下內容",
   "general.redelegateFormComponent.label1": "發送人地址",

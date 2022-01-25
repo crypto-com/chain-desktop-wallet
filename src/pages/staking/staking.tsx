@@ -573,6 +573,19 @@ const FormDelegationRequest = props => {
                   <div key={idx}>- {err}</div>
                 ))}
               {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
+              {currentSession.wallet.walletType === LEDGER_WALLET_TYPE ? (
+                <>
+                  <a
+                    href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {t('general.errorModalPopup.ledgerTroubleshoot')}
+                  </a>
+                </>
+              ) : (
+                <></>
+              )}
             </div>
           </>
         </ErrorModalPopup>
@@ -988,6 +1001,19 @@ const FormDelegationOperations = props => {
                   <div key={idx}>- {err}</div>
                 ))}
               {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
+              {currentSession.wallet.walletType === LEDGER_WALLET_TYPE ? (
+                <>
+                  <a
+                    href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {t('general.errorModalPopup.ledgerTroubleshoot')}
+                  </a>
+                </>
+              ) : (
+                <></>
+              )}
             </div>
           </>
         </ErrorModalPopup>
@@ -1535,6 +1561,19 @@ const FormWithdrawStakingReward = () => {
                 <div key={idx}>- {err}</div>
               ))}
             {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
+            {currentSession.wallet.walletType === LEDGER_WALLET_TYPE ? (
+              <>
+                <a
+                  href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {t('general.errorModalPopup.ledgerTroubleshoot')}
+                </a>
+              </>
+            ) : (
+              <></>
+            )}
           </div>
         </>
       </ErrorModalPopup>

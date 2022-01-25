@@ -33,7 +33,19 @@ export function ledgerNotification(wallet: Wallet, assetType: UserAssetType) {
     } catch (e) {
       notification.error({
         message: i18n.t('receive.notification.ledgerConnect.message'),
-        description: i18n.t('receive.notification.ledgerConnect.description'),
+        description: (
+          <>
+            {i18n.t('receive.notification.ledgerConnect.description')}
+            <br /> -{' '}
+            <a
+              href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {i18n.t('general.errorModalPopup.ledgerTroubleshoot')}
+            </a>
+          </>
+        ),
         placement: 'topRight',
         duration: 3,
       });

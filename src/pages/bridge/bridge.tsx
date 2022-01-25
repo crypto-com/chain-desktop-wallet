@@ -409,15 +409,27 @@ const CronosBridge = props => {
     } catch (e) {
       if (session.wallet.walletType === LEDGER_WALLET_TYPE) {
         listDataSource.push({
-          title: t('bridge.ledgerSign.failed.title', {
-            amount: adjustedTransactionAmount(
-              amount,
-              currentAsset!,
-              getBaseScaledAmount(networkFee, currentAsset!),
-            ),
-            symbol: currentAsset?.symbol,
-          }),
-          description: <></>,
+          title: '',
+          description: (
+            <>
+              {t('bridge.ledgerSign.failed.title', {
+                amount: adjustedTransactionAmount(
+                  amount,
+                  currentAsset!,
+                  getBaseScaledAmount(networkFee, currentAsset!),
+                ),
+                symbol: currentAsset?.symbol,
+              })}
+              <br />-{' '}
+              <a
+                href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('general.errorModalPopup.ledgerTroubleshoot')}
+              </a>
+            </>
+          ),
           loading: false,
         });
       }

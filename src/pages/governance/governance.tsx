@@ -11,9 +11,9 @@ import {
   ArrowLeftOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
-import { sessionState, walletAssetState } from '../../recoil/atom';
+import { ledgerIsExpertModeState, sessionState, walletAssetState } from '../../recoil/atom';
 
 import { getUIVoteAmount } from '../../utils/NumberUtils';
 import {
@@ -28,7 +28,7 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
@@ -75,6 +75,7 @@ const GovernancePage = () => {
       rate: '',
     },
   };
+  const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [proposalFigures, setProposalFigures] = useState(initialFiguresStates);
   const [proposalList, setProposalList] = useState<ProposalModel[]>();
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
@@ -240,6 +241,9 @@ const GovernancePage = () => {
       setInputPasswordVisible(false);
       setIsSuccessModalVisible(true);
     } catch (e) {
+      if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
+      }
       setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
@@ -828,6 +832,7 @@ const GovernancePage = () => {
               .map((err, idx) => (
                 <div key={idx}>- {err}</div>
               ))}
+            {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
           </div>
         </>
       </ErrorModalPopup>

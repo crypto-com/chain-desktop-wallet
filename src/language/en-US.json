@@ -115,6 +115,7 @@
   "general.errorModalPopup.nftTransfer.description": "The NFT transfer transaction failed. Please try again later.",
   "general.errorModalPopup.nftMint.description": "The NFT minting transaction failed. Please try again later.",
   "general.errorModalPopup.ledgerExportMode": "Please ensure that your have enabled Expert mode on your Ledger device.",
+  "general.errorModalPopup.ledgerTroubleshoot": "Ledger Connection Troubleshoot",
   "general.redelegateFormComponent.title": "Confirm Redelegate Transaction",
   "general.redelegateFormComponent.description": "Please review the below information.",
   "general.redelegateFormComponent.label1": "Sender Address",
