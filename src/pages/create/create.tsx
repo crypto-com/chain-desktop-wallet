@@ -504,11 +504,35 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       hwok = true;
     } catch (e) {
       let message = `${t('create.notification.ledger.message1')}`;
-      let description = `${t('create.notification.ledger.description1')}`;
+      let description = (
+        <>
+          {t('create.notification.ledger.description1')}
+          <br /> -{' '}
+          <a
+            href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t('general.errorModalPopup.ledgerTroubleshoot')}
+          </a>
+        </>
+      );
       if (walletType === LEDGER_WALLET_TYPE) {
-        if (detectConditionsError(e.toString())) {
+        if (detectConditionsError(((e as unknown) as any).toString())) {
           message = `${t('create.notification.ledger.message2')}`;
-          description = `${t('create.notification.ledger.message2')}`;
+          description = (
+            <>
+              {t('create.notification.ledger.description2')}
+              <br /> -{' '}
+              <a
+                href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('general.errorModalPopup.ledgerTroubleshoot')}
+              </a>
+            </>
+          );
         }
       }
 
@@ -659,6 +683,20 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             <div className="description">
               {t('general.errorModalPopup.createWallet.description')}
             </div>
+            {props.form.getFieldValue('walletType') === LEDGER_WALLET_TYPE ? (
+              <>
+                <br />-{' '}
+                <a
+                  href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {t('general.errorModalPopup.ledgerTroubleshoot')}
+                </a>
+              </>
+            ) : (
+              <></>
+            )}
           </>
         </ErrorModalPopup>
         <LedgerModalPopup
