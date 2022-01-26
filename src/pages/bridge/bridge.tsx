@@ -27,12 +27,19 @@ import Icon, {
   SettingOutlined,
 } from '@ant-design/icons';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { setRecoil } from 'recoil-nexus';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { Footer, Header } from 'antd/lib/layout/layout';
-import { pageLockState, sessionState, walletAllAssetsState } from '../../recoil/atom';
+import {
+  LedgerConnectedApp,
+  ledgerIsConnectedState,
+  pageLockState,
+  sessionState,
+  walletAllAssetsState,
+} from '../../recoil/atom';
 import { walletService } from '../../service/WalletService';
 
 import { UserAsset } from '../../models/UserAsset';
@@ -409,15 +416,27 @@ const CronosBridge = props => {
     } catch (e) {
       if (session.wallet.walletType === LEDGER_WALLET_TYPE) {
         listDataSource.push({
-          title: t('bridge.ledgerSign.failed.title', {
-            amount: adjustedTransactionAmount(
-              amount,
-              currentAsset!,
-              getBaseScaledAmount(networkFee, currentAsset!),
-            ),
-            symbol: currentAsset?.symbol,
-          }),
-          description: <></>,
+          title: '',
+          description: (
+            <>
+              {t('bridge.ledgerSign.failed.title', {
+                amount: adjustedTransactionAmount(
+                  amount,
+                  currentAsset!,
+                  getBaseScaledAmount(networkFee, currentAsset!),
+                ),
+                symbol: currentAsset?.symbol,
+              })}
+              <br />-{' '}
+              <a
+                href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('general.errorModalPopup.ledgerTroubleshoot')}
+              </a>
+            </>
+          ),
           loading: false,
         });
       }
@@ -521,6 +540,10 @@ const CronosBridge = props => {
     const bridgeFromObj = SUPPORTED_BRIDGE.get(bridgeFrom);
     const bridgeToObj = SUPPORTED_BRIDGE.get(bridgeTo);
 
+    const onSwitchBridgeCallback = () => {
+      setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
+    };
+
     if (walletAllAssets.length < 2) {
       return (
         <div>
@@ -568,6 +591,7 @@ const CronosBridge = props => {
               setBridgeConfigs={setBridgeConfigs}
               bridgeConfigFields={bridgeConfigFields}
               setBridgeConfigFields={setBridgeConfigFields}
+              onSwitchBridgeCallback={onSwitchBridgeCallback}
             />
             <PasswordFormModal
               description={t('general.passwordFormModal.description')}

@@ -5,12 +5,24 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.6.6] - 2022-01-26
+### Additions
+- Full DApp Browser Support on Cronos
+- Ledger Support in DApp Browser
+- UX flow improvement on Ledger Support
+- Restake rewards button
+- Search function in Validator List
+
+### Bug fixes
+- Add loading spin in Staking table list
+
 ## [v0.6.5] - 2022-01-19
 ### Bug fixes
 - NFT transaction list sorted by time
 - Bridge transaction list sorted by time
 - Repeated records in NFT transaction list when switching page
 - Incorrect Explorer URL after settings update on Cronos Assets
+- Remove CRC721 token from Assets List
 
 ## [v0.6.4] - 2022-01-13
 ### Additions

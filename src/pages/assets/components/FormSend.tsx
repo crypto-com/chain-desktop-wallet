@@ -41,8 +41,10 @@ import {
   AnalyticsTxType,
 } from '../../../service/analytics/AnalyticsService';
 import AddressBookInput from '../../../components/AddressBookInput/AddressBookInput';
+import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
 import { AddressBookService } from '../../../service/AddressBookService';
 import { AddressBookContact } from '../../../models/AddressBook';
+import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 
 const layout = {};
 const tailLayout = {};
@@ -70,6 +72,7 @@ const FormSend: React.FC<FormSendProps> = props => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [availableBalance, setAvailableBalance] = useState('--');
+
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const didMountRef = useRef(false);
   const allMarketData = useRecoilValue(allMarketState);
@@ -85,6 +88,8 @@ const FormSend: React.FC<FormSendProps> = props => {
   const analyticsService = new AnalyticsService(currentSession);
 
   const [t] = useTranslation();
+
+  const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
 
   useEffect(() => {
     if (!didMountRef.current) {
@@ -122,6 +127,9 @@ const FormSend: React.FC<FormSendProps> = props => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (!isLedgerConnected) {
+        ledgerNotification(currentSession.wallet, walletAsset!);
+      }
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
@@ -189,10 +197,10 @@ const FormSend: React.FC<FormSendProps> = props => {
       form.resetFields();
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
-      setErrorMessages(e.message.split(': '));
+      setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -358,6 +366,9 @@ const FormSend: React.FC<FormSendProps> = props => {
               type="primary"
               loading={confirmLoading}
               onClick={onConfirmTransfer}
+              disabled={
+                !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
+              }
             >
               {t('general.confirm')}
             </Button>,
