@@ -21,6 +21,9 @@ import { Dapp, DappBrowserIPC } from '../../types';
 import { middleEllipsis, hexToUtf8, getAssetBySymbolAndChain } from '../../../../utils/utils';
 import { walletService } from '../../../../service/WalletService';
 import { walletAllAssetsState } from '../../../../recoil/atom';
+import { useLedgerStatus } from '../../../../hooks/useLedgerStatus';
+import { LEDGER_WALLET_TYPE } from '../../../../service/LedgerService';
+import { ledgerNotification } from '../../../../components/LedgerNotification/LedgerNotification';
 
 const { Content, Footer } = Layout;
 
@@ -55,6 +58,14 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
   const [isContractAddressReview, setIsContractAddressReview] = useState(false);
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(false);
   const [allAssets, setAllAssets] = useRecoilState(walletAllAssetsState);
+
+  const { isLedgerConnected } = useLedgerStatus({ asset: cronosAsset });
+
+  useEffect(() => {
+    if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE && isLedgerConnected === false) {
+      ledgerNotification(currentSession.wallet, cronosAsset!);
+    }
+  }, [isLedgerConnected, currentSession, cronosAsset]);
 
   const [t] = useTranslation();
 
@@ -267,7 +278,10 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
               type="primary"
               htmlType="submit"
               onClick={onConfirm}
-              disabled={isConfirmDisabled}
+              disabled={
+                isConfirmDisabled ||
+                (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE)
+              }
             >
               {t('general.confirm')}
             </Button>
