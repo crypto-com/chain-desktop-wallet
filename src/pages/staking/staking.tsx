@@ -13,8 +13,9 @@ import {
   Tabs,
   Typography,
   Alert,
+  Spin,
 } from 'antd';
-import { OrderedListOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { OrderedListOutlined, ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
@@ -620,6 +621,7 @@ const FormDelegationOperations = props => {
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [isDelegationsLoading, setIsDelegationsLoading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
@@ -632,6 +634,7 @@ const FormDelegationOperations = props => {
 
   useEffect(() => {
     const syncStakingData = async () => {
+      setIsDelegationsLoading(true);
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
 
       const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
@@ -642,6 +645,7 @@ const FormDelegationOperations = props => {
         ? convertDelegations(allDelegations, currentWalletAsset)
         : [];
       setDelegations(stakingTabularData);
+      setIsDelegationsLoading(false);
     };
 
     syncStakingData();
@@ -885,6 +889,10 @@ const FormDelegationOperations = props => {
         }}
         columns={StakingColumns}
         dataSource={delegations}
+        loading={{
+          indicator: <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />,
+          spinning: isDelegationsLoading,
+        }}
         rowKey={record => record.key}
       />
       <div>
@@ -1037,6 +1045,7 @@ const FormWithdrawStakingReward = () => {
     false,
   );
   const [successRestakeRewardModalMessage, setSuccessRestakeRewardModalMessage] = useState('');
+  const [isRewardsLoading, setIsRewardsLoading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
@@ -1090,6 +1099,7 @@ const FormWithdrawStakingReward = () => {
 
   useEffect(() => {
     const syncRewardsData = async () => {
+      setIsRewardsLoading(true);
       const currentMarketData = allMarketData.get(
         `${walletAsset?.mainnetSymbol}-${currentSession?.currency}`,
       );
@@ -1109,7 +1119,7 @@ const FormWithdrawStakingReward = () => {
 
       const rewardsTabularData = convertToTabularData(allRewards, primaryAsset, currentMarketData);
       setRewards(rewardsTabularData);
-
+      setIsRewardsLoading(false);
       setWalletAsset(primaryAsset);
     };
 
@@ -1376,6 +1386,10 @@ const FormWithdrawStakingReward = () => {
           cancelSort: t('general.table.cancelSort'),
         }}
         columns={rewardColumns}
+        loading={{
+          indicator: <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />,
+          spinning: isRewardsLoading,
+        }}
         dataSource={rewards}
         onRow={record => {
           return {
