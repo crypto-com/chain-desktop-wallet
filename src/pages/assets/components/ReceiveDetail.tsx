@@ -10,8 +10,9 @@ import { CopyOutlined } from '@ant-design/icons';
 import './ReceiveDetail.less';
 import { Session } from '../../../models/Session';
 import { UserAsset, UserAssetType } from '../../../models/UserAsset';
-import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../../service/LedgerService';
+import { LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 import NoticeDisclaimer from '../../../components/NoticeDisclaimer/NoticeDisclaimer';
+import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
 
 interface ReceiveDetailProps {
   currentAsset: UserAsset | undefined;
@@ -24,37 +25,10 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
   const [isLedger, setIsLedger] = useState(false);
 
   const [t] = useTranslation();
-  const isEVM =
-    currentAsset?.assetType === UserAssetType.EVM ||
-    currentAsset?.assetType === UserAssetType.CRC_20_TOKEN;
-
   useEffect(() => {
     const { walletType } = session.wallet;
     setIsLedger(LEDGER_WALLET_TYPE === walletType);
   });
-
-  const clickCheckLedger = async () => {
-    try {
-      const { addressIndex, walletType, config } = session.wallet;
-      const addressprefix = config.network.addressPrefix;
-      if (LEDGER_WALLET_TYPE === walletType) {
-        const device = createLedgerDevice();
-
-        if (isEVM) {
-          await device.getEthAddress(addressIndex, true);
-        } else {
-          await device.getAddress(addressIndex, addressprefix, true);
-        }
-      }
-    } catch (e) {
-      notification.error({
-        message: t('receive.notification.ledgerConnect.message'),
-        description: t('receive.notification.ledgerConnect.description'),
-        placement: 'topRight',
-        duration: 3,
-      });
-    }
-  };
 
   const onCopyClick = () => {
     setTimeout(() => {
@@ -106,7 +80,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
       </NoticeDisclaimer>
       {isLedger && (
         <div className="ledger">
-          <Button type="primary" onClick={clickCheckLedger}>
+          <Button type="primary" onClick={() => ledgerNotification(session.wallet, currentAsset!)}>
             {t('receive.button')}
           </Button>
         </div>

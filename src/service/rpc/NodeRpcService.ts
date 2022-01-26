@@ -93,11 +93,11 @@ export class NodeRpcService implements INodeRpcService {
       const balance = balanceData.balances.find(b => b.denom === assetDenom);
 
       return balance?.amount ?? '0';
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
       console.log(
         `[${NodeRpcService.name}-loadAccountBalance] [Error] Unable to fetch data.`,
-        error.response || error,
+        ((error as unknown) as any).response || error,
       );
       return '0';
     }
@@ -128,7 +128,7 @@ export class NodeRpcService implements INodeRpcService {
         transactionHash: broadcastResponse.transactionHash,
       };
     } catch (e) {
-      if (e.toString().includes(TIME_OUT_ERROR)) {
+      if (((e as unknown) as any).toString().includes(TIME_OUT_ERROR)) {
         return {
           code: -32603,
           message: TIME_OUT_ERROR,
@@ -211,8 +211,8 @@ export class NodeRpcService implements INodeRpcService {
     let response;
     try {
       response = await this.cosmosClient.get<DelegationResult | ErrorRpcResponse>(url);
-    } catch (error: any) {
-      response = error.response;
+    } catch (error) {
+      response = ((error as unknown) as any).response;
     } finally {
       if (response.status !== 200) {
         // eslint-disable-next-line no-console
@@ -253,12 +253,12 @@ export class NodeRpcService implements INodeRpcService {
       response = await this.cosmosClient.get<RewardResponse>(
         `cosmos/distribution/v1beta1/delegators/${address}/rewards`,
       );
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
       console.log(
         `[NodeRpcService.fetchStakingRewardsBalance] | HTTP Code: ${
-          error.response.status
-        } | Response: ${JSON.stringify(error.response.data)}`,
+          ((error as unknown) as any).response.status
+        } | Response: ${JSON.stringify(((error as unknown) as any).response.data)}`,
       );
       return {
         totalBalance: String(0),
@@ -351,12 +351,12 @@ export class NodeRpcService implements INodeRpcService {
     let response;
     try {
       response = await this.cosmosClient.get<UnbondingDelegationResult>(url);
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
       console.log(
         `[NodeRpcService.fetchUnbondingDelegationsPaginated] | HTTP Code: ${
-          error.response.status
-        } | Response: ${JSON.stringify(error.response.data)}`,
+          ((error as unknown) as any).response.status
+        } | Response: ${JSON.stringify(((error as unknown) as any).response.data)}`,
       );
 
       return [[], null];
@@ -595,11 +595,11 @@ export class NodeRpcService implements INodeRpcService {
       );
 
       return denomTraceResponse.data.denom_trace;
-    } catch (error: any) {
+    } catch (error) {
       // eslint-disable-next-line no-console
       console.log(
         `[${NodeRpcService.name}-getIBCAssetTrace] [Error] Unable to fetch data.`,
-        error.response || error,
+        ((error as unknown) as any).response || error,
       );
       throw new Error(`[${NodeRpcService.name}-getIBCAssetTrace] [Error] Unable to fetch data.`);
     }

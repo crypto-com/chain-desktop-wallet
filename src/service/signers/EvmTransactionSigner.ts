@@ -11,7 +11,10 @@ import {
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
 } from './TransactionSupported';
-import { UserAssetType } from '../../models/UserAsset';
+import { UserAsset, UserAssetType } from '../../models/UserAsset';
+import { walletService } from '../WalletService';
+import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../LedgerService';
+import { CronosClient } from '../cronos/CronosClient';
 
 const DEFAULT_CHAIN_ID = 338;
 
@@ -48,10 +51,39 @@ class EvmTransactionSigner implements ITransactionSigner {
 
   // eslint-disable-next-line class-methods-use-this
   public async sendContractCallTransaction(
+    asset: UserAsset,
     transaction: EVMContractCallUnsigned,
     phrase: string,
     jsonRpcUrl: string,
   ): Promise<string> {
+    if (!asset.address || !asset.config?.nodeUrl) {
+      throw TypeError(`Missing asset config: ${asset.config}`);
+    }
+
+    const currentSession = await walletService.retrieveCurrentSession();
+
+    if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      const device = createLedgerDevice();
+
+      const walletAddressIndex = currentSession.wallet.addressIndex;
+
+      const signedTx = await device.signEthTx(
+        walletAddressIndex,
+        Number(asset?.config?.chainId), // chainid
+        transaction.nonce,
+        transaction.gasLimit,
+        transaction.gasPrice,
+        transaction.contractAddress,
+        transaction.value ?? '0x0',
+        transaction.data,
+      );
+      const cronosClient = new CronosClient(asset.config?.nodeUrl, asset.config?.indexingUrl);
+
+      const result = await cronosClient.broadcastRawTransactionHex(signedTx);
+
+      return Promise.resolve(result);
+    }
+
     const txParams: ethers.providers.TransactionRequest = {
       nonce: transaction.nonce,
       gasPrice: transaction.gasPrice,

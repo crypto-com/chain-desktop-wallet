@@ -1,6 +1,4 @@
-import { WebviewTag } from 'electron';
-
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { TransactionConfig } from 'web3-eth';
 import { useRecoilValue } from 'recoil';
 import Web3 from 'web3';
@@ -15,12 +13,8 @@ import { EVMContractCallUnsigned } from '../../../service/signers/TransactionSup
 import { walletAllAssetsState } from '../../../recoil/atom';
 import { getCronosAsset } from '../../../utils/utils';
 import { TransactionDataParser } from './TransactionDataParser';
-
-const { shell } = window.require('electron');
-
-type WebView = WebviewTag & HTMLWebViewElement;
-
-export type ErrorHandler = (reason: string) => void;
+import { ErrorHandler, WebView } from './types';
+import { useRefCallback } from './useRefCallback';
 
 interface IUseIPCProviderProps {
   webview: WebView | null;
@@ -65,13 +59,7 @@ interface IUseIPCProviderProps {
     onSuccess: () => void,
     onError: ErrorHandler,
   ) => Promise<void>;
-  onFinishTransaction: () => void;
-}
-
-export function useRefCallback(fn: Function) {
-  const fnRef = useRef(fn);
-  fnRef.current = fn;
-  return fnRef;
+  onFinishTransaction: (error?: string) => void;
 }
 
 export const useIPCProvider = (props: IUseIPCProviderProps) => {
@@ -161,12 +149,13 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         from: event.object.from,
         contractAddress: event.object.to,
         data,
-        gasLimit: String(event.object.gas),
+        gasLimit: ethers.utils.hexValue(event.object.gas),
         gasPrice: event.object.gasPrice,
         nonce: prepareTxInfo.nonce,
       };
       try {
         const result = await evmTransactionSigner.sendContractCallTransaction(
+          cronosAsset!,
           txConfig,
           passphrase,
           ChainConfig.RpcUrl,
@@ -185,6 +174,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     const prepareTXConfig: TransactionConfig = {
       from: event.object.from,
       to: event.object.to,
+      data: event.object.data,
+      value: event.object.value,
     };
 
     const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
@@ -192,7 +183,10 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       prepareTXConfig,
     );
 
-    return Web3.utils.toHex(prepareTxInfo.loadedGasPrice);
+    return {
+      gasLimit: prepareTxInfo.gasLimit,
+      gasPrice: Web3.utils.toHex(prepareTxInfo.loadedGasPrice),
+    };
   };
 
   const handleSendTransaction = useRefCallback(
@@ -211,7 +205,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         from: event.object.from,
         contractAddress: event.object.to,
         data: event.object.data,
-        gasLimit: String(event.object.gas),
+        gasLimit: ethers.utils.hexValue(event.object.gas),
         gasPrice: event.object.gasPrice,
         value: event.object.value,
         nonce: prepareTxInfo.nonce,
@@ -219,16 +213,17 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
 
       try {
         const result = await evmTransactionSigner.sendContractCallTransaction(
+          cronosAsset!,
           txConfig,
           passphrase,
           ChainConfig.RpcUrl,
         );
         sendResponse(event.id, result);
+        onFinishTransaction();
       } catch (error) {
-        sendError(event.id, 'Transaction failed');
+        sendError(event.id, (error as any) as string);
+        onFinishTransaction((error as any).toString());
       }
-
-      onFinishTransaction();
     },
   );
 
@@ -286,8 +281,10 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           // parse transaction data
 
           // gasPrice maybe missing (eg. Tectonic)
-          if (!event.object?.gasPrice) {
-            event.object.gasPrice = await getGasPrice(event);
+          if (!event.object?.gasPrice || !event.object.gas) {
+            const gasObject = await getGasPrice(event);
+            event.object.gasPrice = event.object?.gasPrice ?? gasObject.gasPrice;
+            event.object.gas = event.object?.gas ?? gasObject.gasLimit;
           }
 
           if (event.object.data.startsWith('0x095ea7b3')) {
@@ -416,7 +413,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
 
     webview.addEventListener('new-window', e => {
       e.preventDefault();
-      shell.openExternal(e.url);
+      webview.loadURL(e.url);
     });
 
     webview.addEventListener('did-finish-load', () => {

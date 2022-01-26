@@ -48,6 +48,8 @@ export class DatabaseManager {
 
   public readonly addressBookStore: Datastore;
 
+  public readonly dappBrowserBookmarksStore: Datastore;
+
   constructor(namespace: string) {
     this.sessionStore = getStore(namespace, 'session');
     this.walletStore = getStore(namespace, 'wallets');
@@ -83,5 +85,6 @@ export class DatabaseManager {
     this.commonTransactionStore = getStore(namespace, 'commonTransactionStore');
     this.commonAttributeStore = getStore(namespace, 'commonAttributeStore');
     this.addressBookStore = getStore(namespace, 'addressBook');
+    this.dappBrowserBookmarksStore = getStore(namespace, 'dappBrowserBookmarksStore');
   }
 }
