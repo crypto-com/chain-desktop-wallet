@@ -5,8 +5,8 @@
  */
 
 export interface txQueryBaseParams {
-  limit?: number;
-  offset?: number;
+  limit?: number | 10000; // max: 10000 ; default: 100
+  offset?: number | 0; // max: 1000000 ; default: 0
   state: "latest";
 }
 

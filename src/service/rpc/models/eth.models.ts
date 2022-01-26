@@ -10,7 +10,7 @@ export interface TxDataFailureResponse {
 }
 
 export interface TxDataSuccessResponse {
-    data: Data;
+    data: AddressTxDetails;
     context: SuccessContext;
 }
 
@@ -61,7 +61,7 @@ export interface Cache {
     time: null;
 }
 
-export interface Data {
+export interface AddressTxDetails {
     [key: string]: AddressData;
 }
 

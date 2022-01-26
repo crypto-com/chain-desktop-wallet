@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 import { EVMClient } from '../rpc/clients/EVMClient';
 import { IEthChainIndexAPI, txQueryBaseParams } from '../rpc/interface/eth.chainIndex';
-import { BlockchairTxQueryResponse, TxDataSuccessResponse } from '../rpc/models/eth.models';
+import { AddressTxDetails, BlockchairTxQueryResponse, TxData, TxDataSuccessResponse } from '../rpc/models/eth.models';
 import {
   ICronosChainIndexAPI,
   txListRequestOptions,
@@ -53,20 +53,51 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
     address: string,
     options?: txQueryBaseParams,
   ) => {
-    const requestParams = {
-      ...options,
-    };
 
+    // Pagination params
+    let offset = options?.offset || 0;
+    const limit = options?.limit || 10000;
+
+    // Result
+    let finalList: Array<TxData> = [];
+
+    while (true) {
+      const txDataList = await this._getTxsByAddressPaginated(address, {
+        limit,
+        offset,
+        state: "latest",
+      });
+
+      // Append TxData list to the final response array
+      finalList.push(...txDataList);
+
+      // Increment pagination params
+      offset += 1;
+
+      if (txDataList.length < 1) {
+        break;
+      }
+    }
+
+    return finalList;
+  };
+
+  private _getTxsByAddressPaginated = async (address: string, options?: txQueryBaseParams) => {
     const txListResponse: AxiosResponse<BlockchairTxQueryResponse> = await axios({
       baseURL: this.indexingServiceBaseUrl,
       url: `/address/${address}`,
-      params: requestParams,
+      params: { ...options },
     });
 
     if (txListResponse.status !== 200) {
-      throw new Error('Could not fetch transaction list from Blockchair Indexing API.');
+      return [];
     }
-    return txListResponse.data as TxDataSuccessResponse;
+
+    if (!txListResponse.data.data) {
+      return [];
+    }
+
+    return txListResponse.data.data[address.toLowerCase()].calls as TxData[];
   };
 
   getTxByHash(txHash: string): Promise<any> {
