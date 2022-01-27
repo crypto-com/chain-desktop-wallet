@@ -4,7 +4,7 @@ export interface ExternalNftMetadataResponse {
 }
 
 export interface Data {
-    externalNftMetadata: ExternalNftMetadata;
+    translatedNft: ExternalNftMetadata;
 }
 
 export interface ExternalNftMetadata {

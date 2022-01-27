@@ -1010,7 +1010,7 @@ const NftPage = () => {
         const denomSchema = isJson(item.denomSchema)
           ? JSON.parse(item.denomSchema)
           : item.denomSchema;
-        const tokenData = isJson(item.tokenData) ? await extractTokenMetadata(item.tokenData) : item.tokenData;
+        const tokenData = isJson(item.tokenData) ? await extractTokenMetadata(item.tokenData, item.denomId) : item.tokenData;
         const nftModel = {
           ...item,
           denomSchema,
@@ -1022,12 +1022,12 @@ const NftPage = () => {
     return [];
   };
 
-  async function extractTokenMetadata(tokenDataString: string) {
+  async function extractTokenMetadata(tokenDataString: string, denomId: string) {
     const parsedTokenData = JSON.parse(tokenDataString);
 
     // ETH Wrapped or External issued NFT
     if (parsedTokenData.isExternal) {
-      let externalMetadata = await croNftApi.getExternalNftMetadataByIdentifier(parsedTokenData.identifier);
+      let externalMetadata = await croNftApi.getExternalNftMetadataByIdentifier(denomId);
 
       // On errors
       if (Array.isArray(externalMetadata) && !externalMetadata.length) {
@@ -1040,15 +1040,15 @@ const NftPage = () => {
       externalMetadata = externalMetadata as ExternalNftMetadataResponse;
 
       // On external metadata being `non-translatable`
-      if (!externalMetadata.data.externalNftMetadata.translatable) {
+      if (!externalMetadata.data.translatedNft.translatable) {
         // eslint-disable-next-line no-console 
         console.log(`[extractTokenMetadata], External metadata is untranslatable.`)
         return parsedTokenData;
       }
 
       // Transform `translatable` external nft metadata
-      if (externalMetadata.data.externalNftMetadata.translatable && externalMetadata.data.externalNftMetadata.metadata) {
-        const { metadata } = externalMetadata.data.externalNftMetadata;
+      if (externalMetadata.data.translatedNft.translatable && externalMetadata.data.translatedNft.metadata) {
+        const { metadata } = externalMetadata.data.translatedNft;
         return {
           description: metadata?.description || '',
           drop: metadata?.dropId || null,

@@ -54,28 +54,29 @@ export class NftApi implements INftApi {
   public async getExternalNftMetadataByIdentifier(denomId: string): Promise<ExternalNftMetadataResponse | []> {
     try {
       const result = await this.axiosClient.post<ExternalNftMetadataResponse>('', {
-        operationName: 'ExternalNftMetadata',
+        operationName: 'TranslatedNft',
         variables: {
           denomId,
         },
-        query: ` query ExternalNftMetadata($denomId: ID!) {
-          externalNftMetadata(denomId: $denomId) {
-            translatable # Boolean!
-            metadata {
-              name # String!
-              description # String!
-              image # String!
-              mimeType # String!
-              dropId # String
-              animationUrl # String
-              animationMimeType # String
-              isCurated # Boolean
-              collectionId # String
-              attributes # [AssetAttribute]
-            }
-          }
-        }
-      `,
+        query: ` query TranslatedNft($denomId: String!) {
+                    translatedNft(denomId: $denomId) {
+                      translatable # Boolean!
+                      metadata {
+                        name # String!
+                        description # String!
+                        image # String!
+                        mimeType # String!
+                        dropId # String
+                        animationUrl # String
+                        animationMimeType # String
+                        collectionId # String
+                        attributes { # [AssetAttribute]
+                          traitType
+                          value
+                        }
+                      }
+                    }
+                  }`,
       });
 
       if (result.status !== 200 || result.data.errors) {
