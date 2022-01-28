@@ -206,7 +206,7 @@ const FormDelegationRequest = props => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-      if (!isLedgerConnected) {
+      if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, walletAsset!);
       }
       showConfirmationModal();
@@ -682,7 +682,7 @@ const FormDelegationOperations = props => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-      if (!isLedgerConnected) {
+      if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, defaultAsset!);
       }
       showConfirmationModal();
@@ -796,10 +796,10 @@ const FormDelegationOperations = props => {
 
   function convertDelegations(allDelegations: StakingTransactionData[], currentAsset: UserAsset) {
     return allDelegations
-      .map(dlg => {
+      .map((dlg, idx) => {
         const stakedAmount = getUIDynamicAmount(dlg.stakedAmount, currentAsset);
         const data: StakingTabularData = {
-          key: dlg.validatorAddress + dlg.stakedAmount,
+          key: `${idx}_${dlg.validatorAddress}_${dlg.stakedAmount}`,
           delegatorAddress: dlg.delegatorAddress,
           validatorAddress: dlg.validatorAddress,
           stakedAmountWithSymbol: `${stakedAmount} ${currentAsset.symbol}`,
@@ -1074,7 +1074,7 @@ const FormWithdrawStakingReward = () => {
   ) => {
     return allRewards
       .filter(reward => Big(reward.amount).gte(Big(0)))
-      .map(reward => {
+      .map((reward, idx) => {
         const rewardAmount = getUIDynamicAmount(reward.amount, currentAsset);
         const marketPrice =
           currentMarketPrice && currentMarketPrice.price ? new Big(currentMarketPrice.price) : '';
@@ -1083,7 +1083,7 @@ const FormWithdrawStakingReward = () => {
             ? new Big(rewardAmount).times(marketPrice).toFixed(2)
             : '';
         const rewardData: RewardsTabularData = {
-          key: `${reward.validatorAddress}${reward.amount}`,
+          key: `${idx}_${reward.validatorAddress}${reward.amount}`,
           rewardAmount: `${rewardAmount} ${currentAsset.symbol}`,
           rewardMarketPrice:
             rewardMarketPrice !== '' && currentMarketPrice
@@ -1138,7 +1138,7 @@ const FormWithdrawStakingReward = () => {
 
   const showPasswordInput = (action: string) => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-      if (!isLedgerConnected) {
+      if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, walletAsset!);
         return;
       }
@@ -1679,10 +1679,10 @@ const StakingPage = () => {
   ) => {
     return (
       allUnbondingDelegations
-        .map(dlg => {
+        .map((dlg, idx) => {
           const unbondingAmount = getUIDynamicAmount(dlg.unbondingAmount, currentAsset);
           const data: UnbondingDelegationTabularData = {
-            key: `${dlg.validatorAddress}_${dlg.unbondingAmount}_${dlg.completionTime}`,
+            key: `${idx}_${dlg.validatorAddress}_${dlg.unbondingAmount}_${dlg.completionTime}`,
             delegatorAddress: dlg.delegatorAddress,
             validatorAddress: dlg.validatorAddress,
             completionTime: new Date(dlg.completionTime).toString(),

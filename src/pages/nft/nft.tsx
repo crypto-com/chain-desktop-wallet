@@ -130,7 +130,7 @@ const convertNftTransfers = (allTransfers: NftAccountTransactionData[]) => {
 
   return allTransfers.map((transfer, idx) => {
     const data: NftTransferTabularData = {
-      key: `${idx}-${transfer.transactionHash}-${transfer.data.recipient}-${transfer.data.denomId}-${transfer.data.tokenId}`,
+      key: `${idx}_${transfer.transactionHash}_${transfer.data.recipient}_${transfer.data.denomId}_${transfer.data.tokenId}`,
       transactionHash: transfer.transactionHash,
       messageType: getType(transfer),
       denomId: transfer.data.denomId,
@@ -280,7 +280,7 @@ const FormMintNft = () => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-      if (!isLedgerConnected) {
+      if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, walletAsset!);
       }
       showConfirmationModal();
@@ -1085,7 +1085,7 @@ const NftPage = () => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-      if (!isLedgerConnected) {
+      if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, walletAsset!);
       }
       showConfirmationModal();
