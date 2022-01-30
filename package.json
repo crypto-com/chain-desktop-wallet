@@ -1,6 +1,6 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.6.6",
+  "version": "0.6.7",
   "description": "Crypto.com Chain Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.org <chain@crypto.org>",
@@ -342,6 +342,7 @@
     "tar": "6.1.9",
     "glob-parent": "6.0.2",
     "json-schema": "0.4.0",
-    "follow-redirects": "1.14.7"
+    "follow-redirects": "1.14.7",
+    "simple-get": "4.0.1"
   }
 }

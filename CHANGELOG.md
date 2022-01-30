@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.6.7] - 2022-01-28
+### Bug fixes
+- Incorrect delegation items
+- Missing address index on Standard Wallets
+- Remove unwanted Ledger notification popup on Standard Wallets
+
 ## [v0.6.6] - 2022-01-26
 ### Additions
 - Full DApp Browser Support on Cronos

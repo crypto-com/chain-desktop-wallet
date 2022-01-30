@@ -179,7 +179,7 @@ function WalletPage() {
       key: 'addressIndex',
       children: [
         {
-          title: session?.wallet.addressIndex,
+          title: session?.wallet.addressIndex.toString(),
           dataIndex: 'addressIndex',
         },
       ],
