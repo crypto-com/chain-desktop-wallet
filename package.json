@@ -342,6 +342,7 @@
     "tar": "6.1.9",
     "glob-parent": "6.0.2",
     "json-schema": "0.4.0",
-    "follow-redirects": "1.14.7"
+    "follow-redirects": "1.14.7",
+    "simple-get": "4.0.1"
   }
 }
