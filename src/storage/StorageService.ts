@@ -339,7 +339,14 @@ export class StorageService {
       },
     };
 
-    // await this.updateCommonAttributes()
+    // Manually remove `staking` records first
+    await this.db.commonTransactionStore.remove({
+      walletId: stakingTransactions.walletId,
+      txType: 'staking'
+    }, { 
+      multi: true
+    });
+
     await this.insertCommonTransactionRecords(stakingTxRecords);
 
     // Insert to common Attributes store
@@ -420,7 +427,7 @@ export class StorageService {
         type: 'staking',
       },
     );
-
+    
     return {
       transactions: stakingTxRecord.map(tx => tx.txData),
       walletId,
