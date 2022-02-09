@@ -246,11 +246,11 @@ const FormMintNft = () => {
       }
       // Hide the error before uploading anything
       if (isBeforeUpload) {
-        return Promise.reject();
+        return Promise.reject(new Error(' '));
       }
       // Hide the error when uploading or upload video in progress
       if (isUploading || (files.length === 1 && isVideo(fileType))) {
-        return Promise.reject();
+        return Promise.reject(new Error(' '));
       }
       return Promise.reject(new Error(t('nft.fileUploadValidator.error2')));
     },
