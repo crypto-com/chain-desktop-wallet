@@ -1429,6 +1429,19 @@ const NftPage = () => {
     },
   ];
 
+  const NftAttributeTableColumns = [
+    {
+      title: t('nft.detailModal.traitType'),
+      dataIndex: 'traitType',
+      key: 'traitType',
+    },
+    {
+      title: t('nft.detailModal.value'),
+      dataIndex: 'value',
+      key: 'value',
+    },
+  ];
+
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">{t('nft.title')}</Header>
@@ -1577,6 +1590,22 @@ const NftPage = () => {
                           {nft?.tokenData.description ? nft?.tokenData.description : 'n.a.'}
                         </div>
                       </div>
+                      {nft?.tokenData.attributes ? (
+                        <div className="item">
+                          <div className="subtitle">{t('nft.detailModal.attributes')}</div>
+                          <div className="attribute">
+                            <Table
+                              className="nft-attribute-table"
+                              dataSource={nft.tokenData.attributes}
+                              columns={NftAttributeTableColumns}
+                              pagination={false}
+                              size="small"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        ''
+                      )}
                       <div className="item">
                         <div className="table-row">
                           <div>{t('nft.detailModal.label1')}</div>

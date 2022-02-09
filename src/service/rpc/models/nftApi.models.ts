@@ -25,6 +25,6 @@ export interface Metadata {
 }
 
 export interface Attribute {
-  trait_type: string;
+  traitType: string;
   value: string;
 }

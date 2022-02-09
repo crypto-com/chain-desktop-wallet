@@ -5,6 +5,7 @@ import {
   NftTransactionResponse,
   NftDenomData,
 } from '../service/rpc/ChainIndexingModels';
+import { Attribute } from '../service/rpc/models/nftApi.models';
 import { UserAssetType } from './UserAsset';
 import { BridgeTransaction } from '../service/bridge/contracts/BridgeModels';
 
@@ -74,48 +75,57 @@ export enum NftTransactionType {
   TRANSFER_NFT = 'MsgTransferNFT',
 }
 
-export interface NftAccountTransactionData extends NftAccountTransactionResponse { }
+export interface NftAccountTransactionData extends NftAccountTransactionResponse {}
 
 /**
  * COMMON ATTRIBUTES MODELS
  */
 
-export type CommonAttributesRecord = NftAttributesRecord | StakingAttributesRecord | RewardAttributesRecord;
+export type CommonAttributesRecord =
+  | NftAttributesRecord
+  | StakingAttributesRecord
+  | RewardAttributesRecord;
 
 export interface CommonAttributesByWalletBase {
-  customParams?: { [key: string]: any } // Note: We WILL dedicate a storage for `customParams` like totalBalance, totalRewards, estimatedApy etc.
+  customParams?: { [key: string]: any }; // Note: We WILL dedicate a storage for `customParams` like totalBalance, totalRewards, estimatedApy etc.
   walletId: string;
 }
 
 export interface NftAttributesRecord extends CommonAttributesByWalletBase {
-  type: 'nft',
+  type: 'nft';
   customParams: {
-    nftQuery?: NftQueryParams
-  }
+    nftQuery?: NftQueryParams;
+  };
 }
 
 export interface StakingAttributesRecord extends CommonAttributesByWalletBase {
-  type: 'staking',
+  type: 'staking';
   customParams: {
-    totalBalance?: string
-  }
+    totalBalance?: string;
+  };
 }
 
 export interface RewardAttributesRecord extends CommonAttributesByWalletBase {
-  type: 'reward',
+  type: 'reward';
   customParams: {
     totalBalance: string;
     claimedRewardsBalance?: string;
     estimatedRewardsBalance?: string;
     estimatedApy?: string;
-  }
+  };
 }
 
 /**
  * COMMON TRANSACTION MODELS
  */
 
-export type CommonTransactionRecord = StakingTransactionRecord | RewardTransactionRecord | TransferTransactionRecord | NftAccountTransactionRecord | IBCTransactionRecord | NftTransferRecord;
+export type CommonTransactionRecord =
+  | StakingTransactionRecord
+  | RewardTransactionRecord
+  | TransferTransactionRecord
+  | NftAccountTransactionRecord
+  | IBCTransactionRecord
+  | NftTransferRecord;
 
 export interface BaseCommonTransaction {
   walletId: string;
@@ -125,39 +135,39 @@ export interface BaseCommonTransaction {
 }
 
 export interface StakingTransactionRecord extends BaseCommonTransaction {
-  txType: "staking";
+  txType: 'staking';
   messageTypeName?: string;
   txData: StakingTransactionData | UnbondingDelegationData;
 }
 
 export interface RewardTransactionRecord extends BaseCommonTransaction {
-  txType: "reward";
+  txType: 'reward';
   messageTypeName?: string;
-  txData: RewardTransactionData
+  txData: RewardTransactionData;
 }
 
 export interface TransferTransactionRecord extends BaseCommonTransaction {
-  txType: "transfer";
+  txType: 'transfer';
   messageTypeName?: string;
-  txData: TransferTransactionData
+  txData: TransferTransactionData;
 }
 
 export interface NftAccountTransactionRecord extends BaseCommonTransaction {
-  txType: "nftAccount";
+  txType: 'nftAccount';
   messageTypeName?: string;
-  txData: NftAccountTransactionData
+  txData: NftAccountTransactionData;
 }
 
 export interface NftTransferRecord extends BaseCommonTransaction {
-  txType: "nftTransfer";
+  txType: 'nftTransfer';
   messageTypeName?: string;
-  txData: NftTransferModel
+  txData: NftTransferModel;
 }
 
 export interface IBCTransactionRecord extends BaseCommonTransaction {
-  txType: "ibc";
+  txType: 'ibc';
   messageTypeName?: string;
-  txData: BridgeTransaction
+  txData: BridgeTransaction;
 }
 
 export interface StakingTransactionList {
@@ -245,7 +255,7 @@ export interface ValidatorModel {
   cumulativeSharesExcludePercentage?: string;
 }
 
-export interface ProposalModel extends Proposal { }
+export interface ProposalModel extends Proposal {}
 
 export interface NftTokenData {
   name?: string;
@@ -256,6 +266,7 @@ export interface NftTokenData {
   animation_url?: string;
   animationUrl?: string;
   animationMimeType?: string;
+  attributes?: Attribute[];
 }
 
 export interface NftModel extends NftResponse {
@@ -263,13 +274,13 @@ export interface NftModel extends NftResponse {
   marketplaceLink: string;
 }
 
-export interface NftDenomModel extends NftDenomData { }
+export interface NftDenomModel extends NftDenomData {}
 
 export interface NftProcessedModel extends Omit<NftModel, 'tokenData'> {
   tokenData: NftTokenData;
 }
 
-export interface NftTransferModel extends NftTransactionResponse { }
+export interface NftTransferModel extends NftTransactionResponse {}
 
 // export interface NFTAccountTransactionModel extends NFTAccountTransactionResponse {}
 
@@ -297,46 +308,46 @@ export enum VoteOption {
 
 // https://raw.githubusercontent.com/crypto-com/chain-indexing/4c79a3dba2911e738af1d2b2d639f4744c15f58b/usecase/parser/register.go
 export type MsgTypeName =
-  'MsgSend' |
-  'MsgMultiSend' |
-  'MsgSetWithdrawAddress' |
-  'MsgWithdrawDelegatorReward' |
-  'MsgWithdrawValidatorCommission' |
-  'MsgFundCommunityPool' |
-  'MsgSubmitProposal' |
-  'MsgVote' |
-  'MsgDeposit' |
-  'MsgDelegate' |
-  'MsgUndelegate' |
-  'MsgBeginRedelegate' |
-  'MsgCreateValidator' |
-  'MsgEditValidator' |
-  'MsgUnjail' |
-  'MsgIssueDenom' |
-  'MsgMintNFT' |
-  'MsgTransferNFT' |
-  'MsgEditNFT' |
-  'MsgBurnNFT' |
-  'MsgCreateClient' |
-  'MsgUpdateClient' |
-  'MsgConnectionOpenInit' |
-  'MsgConnectionOpenTry' |
-  'MsgConnectionOpenAck' |
-  'MsgConnectionOpenConfirm' |
-  'MsgChannelOpenInit' |
-  'MsgChannelOpenTry' |
-  'MsgChannelOpenAck' |
-  'MsgChannelOpenConfirm' |
-  'MsgRecvPacket' |
-  'MsgAcknowledgement' |
-  'MsgTimeout' |
-  'MsgTimeoutOnClose' |
-  'MsgChannelCloseInit' |
-  'MsgChannelCloseConfirm' |
-  'MsgTransfer' |
-  'MsgGrant' |
-  'MsgRevoke' |
-  'MsgExec' |
-  'MsgGrantAllowance' |
-  'MsgRevokeAllowance' |
-  'MsgCreateVestingAccount';
+  | 'MsgSend'
+  | 'MsgMultiSend'
+  | 'MsgSetWithdrawAddress'
+  | 'MsgWithdrawDelegatorReward'
+  | 'MsgWithdrawValidatorCommission'
+  | 'MsgFundCommunityPool'
+  | 'MsgSubmitProposal'
+  | 'MsgVote'
+  | 'MsgDeposit'
+  | 'MsgDelegate'
+  | 'MsgUndelegate'
+  | 'MsgBeginRedelegate'
+  | 'MsgCreateValidator'
+  | 'MsgEditValidator'
+  | 'MsgUnjail'
+  | 'MsgIssueDenom'
+  | 'MsgMintNFT'
+  | 'MsgTransferNFT'
+  | 'MsgEditNFT'
+  | 'MsgBurnNFT'
+  | 'MsgCreateClient'
+  | 'MsgUpdateClient'
+  | 'MsgConnectionOpenInit'
+  | 'MsgConnectionOpenTry'
+  | 'MsgConnectionOpenAck'
+  | 'MsgConnectionOpenConfirm'
+  | 'MsgChannelOpenInit'
+  | 'MsgChannelOpenTry'
+  | 'MsgChannelOpenAck'
+  | 'MsgChannelOpenConfirm'
+  | 'MsgRecvPacket'
+  | 'MsgAcknowledgement'
+  | 'MsgTimeout'
+  | 'MsgTimeoutOnClose'
+  | 'MsgChannelCloseInit'
+  | 'MsgChannelCloseConfirm'
+  | 'MsgTransfer'
+  | 'MsgGrant'
+  | 'MsgRevoke'
+  | 'MsgExec'
+  | 'MsgGrantAllowance'
+  | 'MsgRevokeAllowance'
+  | 'MsgCreateVestingAccount';
