@@ -20,7 +20,6 @@ export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
 export const MODERATION_CONFIG_FILE_URL =
   'https://raw.githubusercontent.com/crypto-com/chain-desktop-wallet/dev/config/app.moderation.json';
 
-
 export const UNBLOCKING_PERIOD_IN_DAYS = {
   UNDELEGATION: {
     MAINNET: '28',
@@ -257,6 +256,24 @@ export const NFT_VIDEO_DENOM_SCHEMA = {
     mimeType: {
       type: 'string',
       description: 'Describes the type of represented NFT media',
+    },
+  },
+};
+export const NFT_WRAPPED_ETH_DENOM_SCHEMA = {
+  title: 'Asset Metadata',
+  type: 'Object',
+  properties: {
+    isExternal: {
+      type: 'boolean',
+      description: 'Describes whether the NFT is external or internal to the Crypto.org chain',
+    },
+    network: {
+      type: 'string',
+      description: 'Identifies the original network of the NFT',
+    },
+    identifier: {
+      type: 'string',
+      description: 'An identifier with the format: {contact_address}/{tokenID}',
     },
   },
 };

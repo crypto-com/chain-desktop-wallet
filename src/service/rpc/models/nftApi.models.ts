@@ -1,29 +1,30 @@
 export interface ExternalNftMetadataResponse {
-    data: Data;
-    errors?: any;
+  data: Data;
+  errors?: any;
 }
 
 export interface Data {
-    translatedNft: ExternalNftMetadata;
+  translatedNft: ExternalNftMetadata;
 }
 
 export interface ExternalNftMetadata {
-    translatable: boolean;
-    metadata?: Metadata;
+  translatable: boolean;
+  metadata?: Metadata;
 }
 
 export interface Metadata {
-    description: string;
-    name: string;
-    collectionId: string;
-    attributes: Attribute[];
-    dropId: string;
-    image?: string;
-    video?: string;
-    mimeType: string;
+  description: string;
+  name: string;
+  collectionId: string;
+  attributes: Attribute[];
+  dropId: string;
+  image?: string;
+  animationUrl?: string;
+  mimeType?: string;
+  animationMimeType?: string;
 }
 
 export interface Attribute {
-    trait_type: string;
-    value: string;
+  trait_type: string;
+  value: string;
 }

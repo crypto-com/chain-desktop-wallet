@@ -31,6 +31,7 @@ import { useRecoilValue, useRecoilState, useSetRecoilState } from 'recoil';
 import ReactPlayer from 'react-player';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import axios from 'axios';
+import { Promise } from 'bluebird';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -89,7 +90,6 @@ import nftThumbnail from '../../assets/nft-thumbnail.png';
 import ReceiveDetail from '../assets/components/ReceiveDetail';
 import { croNftApi } from '../../service/rpc/NftApi';
 import { ExternalNftMetadataResponse } from '../../service/rpc/models/nftApi.models';
-import { Promise } from "bluebird";
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 
@@ -246,11 +246,11 @@ const FormMintNft = () => {
       }
       // Hide the error before uploading anything
       if (isBeforeUpload) {
-        return Promise.reject({});
+        return Promise.reject();
       }
       // Hide the error when uploading or upload video in progress
       if (isUploading || (files.length === 1 && isVideo(fileType))) {
-        return Promise.reject({});
+        return Promise.reject();
       }
       return Promise.reject(new Error(t('nft.fileUploadValidator.error2')));
     },
@@ -1010,7 +1010,9 @@ const NftPage = () => {
         const denomSchema = isJson(item.denomSchema)
           ? JSON.parse(item.denomSchema)
           : item.denomSchema;
-        const tokenData = isJson(item.tokenData) ? await extractTokenMetadata(item.tokenData, item.denomId) : item.tokenData;
+        const tokenData = isJson(item.tokenData)
+          ? await extractTokenMetadata(item.tokenData, item.denomId)
+          : item.tokenData;
         const nftModel = {
           ...item,
           denomSchema,
@@ -1032,29 +1034,36 @@ const NftPage = () => {
       // On errors
       if (Array.isArray(externalMetadata) && !externalMetadata.length) {
         // eslint-disable-next-line no-console
-        console.log(`[extractTokenMetadata], Unable to extract External token metadata.`)
+        console.log(`[extractTokenMetadata], Unable to extract External token metadata.`);
         return parsedTokenData;
       }
-      
+
       // Type casting for leveraging type support
       externalMetadata = externalMetadata as ExternalNftMetadataResponse;
 
       // On external metadata being `non-translatable`
       if (!externalMetadata.data.translatedNft.translatable) {
-        // eslint-disable-next-line no-console 
-        console.log(`[extractTokenMetadata], External metadata is untranslatable.`)
+        // eslint-disable-next-line no-console
+        console.log(`[extractTokenMetadata], External metadata is untranslatable.`);
         return parsedTokenData;
       }
 
       // Transform `translatable` external nft metadata
-      if (externalMetadata.data.translatedNft.translatable && externalMetadata.data.translatedNft.metadata) {
+      if (
+        externalMetadata.data.translatedNft.translatable &&
+        externalMetadata.data.translatedNft.metadata
+      ) {
         const { metadata } = externalMetadata.data.translatedNft;
         return {
           description: metadata?.description || '',
           drop: metadata?.dropId || null,
           image: metadata?.image || undefined,
           mimeType: metadata?.mimeType || '',
-          name: metadata?.name || ''
+          animationUrl: metadata?.animationUrl || '',
+          animationMimeType: metadata?.animationMimeType || '',
+          name: metadata?.name || '',
+          collectionId: metadata?.collectionId || '',
+          attributes: metadata?.attributes || [],
         };
       }
     }
