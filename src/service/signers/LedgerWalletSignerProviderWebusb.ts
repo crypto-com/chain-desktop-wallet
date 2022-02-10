@@ -53,4 +53,14 @@ export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
   public async getEthAddress(_index: number, _display: boolean): Promise<string> {
     return '';
   }
+
+  // eslint-disable-next-line  class-methods-use-this, @typescript-eslint/no-unused-vars
+  public async signPersonalMessage(index: number, message: string): Promise<string> {
+    throw new Error('not implemented');
+  }
+
+  // eslint-disable-next-line  class-methods-use-this, @typescript-eslint/no-unused-vars
+  public async signTypedDataV4(index: number, typedData: string): Promise<string> {
+    throw new Error('not implemented');
+  }
 }
