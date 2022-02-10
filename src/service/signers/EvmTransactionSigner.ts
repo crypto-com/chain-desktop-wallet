@@ -1,6 +1,7 @@
 import { BigNumberish, ethers } from 'ethers';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
+import { signTypedData_v4 } from 'eth-sig-util';
 import { ITransactionSigner } from './TransactionSigner';
 import TokenContractABI from './abi/TokenContractABI.json';
 
@@ -98,6 +99,37 @@ class EvmTransactionSigner implements ITransactionSigner {
 
     const signedTx = await wallet.sendTransaction(txParams);
     return Promise.resolve(signedTx.hash);
+  }
+
+  static async signPersonalMessage(message: string, passphrase = ''): Promise<string> {
+    const currentSession = await walletService.retrieveCurrentSession();
+
+    if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      const device = createLedgerDevice();
+
+      const walletAddressIndex = currentSession.wallet.addressIndex;
+
+      return await device.signPersonalMessage(walletAddressIndex, message);
+    }
+
+    const wallet = ethers.Wallet.fromMnemonic(passphrase);
+    return await wallet.signMessage(ethers.utils.arrayify(message));
+  }
+
+  // ERC712 sign
+  static async signTypedDataV4(message: string, passphrase = ''): Promise<string> {
+    const currentSession = await walletService.retrieveCurrentSession();
+
+    if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      const device = createLedgerDevice();
+
+      const walletAddressIndex = currentSession.wallet.addressIndex;
+
+      return await device.signTypedDataV4(walletAddressIndex, message);
+    }
+    const wallet = ethers.Wallet.fromMnemonic(passphrase);
+    const bufferedKey = Buffer.from(wallet.privateKey.replace(/^(0x)/, ''), 'hex');
+    return signTypedData_v4(bufferedKey, { data: JSON.parse(message) });
   }
 
   public async signTokenTransfer(
@@ -199,4 +231,5 @@ class EvmTransactionSigner implements ITransactionSigner {
   }
 }
 
+export { EvmTransactionSigner };
 export const evmTransactionSigner = new EvmTransactionSigner();
