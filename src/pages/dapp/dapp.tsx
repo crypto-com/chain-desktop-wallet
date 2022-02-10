@@ -68,6 +68,7 @@ const DappPage = () => {
   const currentSession = useRecoilValue(sessionState);
   const [selectedDapp, setSelectedDapp] = useState<Dapp>();
   const [selectedURL, setSelectedURL] = useState('');
+  const [selectedDomain, setSelectedDomain] = useState('');
   const [t] = useTranslation();
   const browserRef = useRef<DappBrowserRef>(null);
 
@@ -206,6 +207,13 @@ const DappPage = () => {
             if (!url || url.length < 1) {
               return;
             }
+
+            const domain = new URL(url).hostname;
+            if (selectedDomain !== domain) {
+              analyticsService.logBrowserDomain(domain);
+              setSelectedDomain(domain ?? '');
+            }
+
             setAddressBarValue(url);
             updateBookmarkButtonBeHighlighted();
           }}
