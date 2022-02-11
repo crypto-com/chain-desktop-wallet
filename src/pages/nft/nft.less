@@ -156,6 +156,22 @@
         margin: 0;
       }
     }
+    .nft-attribute-table {
+      width: 100%;
+      padding: 4px;
+      background-color: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      .ant-table {
+        border-radius: 4px;
+        .ant-table-thead .ant-table-cell::before {
+          background-color: transparent;
+        }
+        .ant-table-tbody > tr > td {
+          color: @font-color;
+          border-bottom: none;
+        }
+      }
+    }
     .table-row {
       display: grid;
       grid-template-columns: 50% 50%;
