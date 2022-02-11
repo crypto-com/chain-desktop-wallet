@@ -41,25 +41,7 @@ import {
   walletAssetState,
   ledgerIsExpertModeState,
 } from '../../recoil/atom';
-import {
-  ellipsis,
-  middleEllipsis,
-  isJson,
-  convertIpfsToHttp,
-  sleep,
-  useWindowSize,
-} from '../../utils/utils';
-import { getUINormalScaleAmount } from '../../utils/NumberUtils';
-import {
-  NftModel,
-  NftProcessedModel,
-  TransactionStatus,
-  NftAccountTransactionData,
-  NftTransactionType,
-  BroadCastResult,
-} from '../../models/Transaction';
-import { renderExplorerUrl } from '../../models/Explorer';
-import { TransactionUtils } from '../../utils/TransactionUtils';
+
 import {
   IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT,
   FIXED_DEFAULT_FEE,
@@ -69,8 +51,27 @@ import {
   MAX_VIDEO_SIZE,
 } from '../../config/StaticConfig';
 
+import {
+  ellipsis,
+  middleEllipsis,
+  convertIpfsToHttp,
+  sleep,
+  useWindowSize,
+} from '../../utils/utils';
+import { getUINormalScaleAmount } from '../../utils/NumberUtils';
+import { TransactionUtils } from '../../utils/TransactionUtils';
+import { NftUtils } from '../../utils/NftUtils';
+
+import {
+  NftProcessedModel,
+  TransactionStatus,
+  NftAccountTransactionData,
+  NftTransactionType,
+  BroadCastResult,
+} from '../../models/Transaction';
+import { renderExplorerUrl } from '../../models/Explorer';
+
 import { walletService } from '../../service/WalletService';
-import { secretStoreService } from '../../storage/SecretStoreService';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import {
   AnalyticsActions,
@@ -78,6 +79,7 @@ import {
   AnalyticsService,
   AnalyticsTxType,
 } from '../../service/analytics/AnalyticsService';
+import { secretStoreService } from '../../storage/SecretStoreService';
 
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -88,8 +90,6 @@ import IconTick from '../../svg/IconTick';
 import IconPlayer from '../../svg/IconPlayer';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 import ReceiveDetail from '../assets/components/ReceiveDetail';
-import { croNftApi } from '../../service/rpc/NftApi';
-import { ExternalNftMetadataResponse } from '../../service/rpc/models/nftApi.models';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 
@@ -1004,74 +1004,6 @@ const NftPage = () => {
     setIsErrorModalVisible(false);
   };
 
-  const processNftList = async (currentList: NftModel[] | undefined) => {
-    if (currentList) {
-      return await Promise.map(currentList, async item => {
-        const denomSchema = isJson(item.denomSchema)
-          ? JSON.parse(item.denomSchema)
-          : item.denomSchema;
-        const tokenData = isJson(item.tokenData)
-          ? await extractTokenMetadata(item.tokenData, item.denomId)
-          : item.tokenData;
-        const nftModel = {
-          ...item,
-          denomSchema,
-          tokenData,
-        };
-        return nftModel;
-      });
-    }
-    return [];
-  };
-
-  async function extractTokenMetadata(tokenDataString: string, denomId: string) {
-    const parsedTokenData = JSON.parse(tokenDataString);
-
-    // ETH Wrapped or External issued NFT
-    if (parsedTokenData.isExternal) {
-      let externalMetadata = await croNftApi.getExternalNftMetadataByIdentifier(denomId);
-
-      // On errors
-      if (Array.isArray(externalMetadata) && !externalMetadata.length) {
-        // eslint-disable-next-line no-console
-        console.log(`[extractTokenMetadata], Unable to extract External token metadata.`);
-        return parsedTokenData;
-      }
-
-      // Type casting for leveraging type support
-      externalMetadata = externalMetadata as ExternalNftMetadataResponse;
-
-      // On external metadata being `non-translatable`
-      if (!externalMetadata.data.translatedNft.translatable) {
-        // eslint-disable-next-line no-console
-        console.log(`[extractTokenMetadata], External metadata is untranslatable.`);
-        return parsedTokenData;
-      }
-
-      // Transform `translatable` external nft metadata
-      if (
-        externalMetadata.data.translatedNft.translatable &&
-        externalMetadata.data.translatedNft.metadata
-      ) {
-        const { metadata } = externalMetadata.data.translatedNft;
-        return {
-          description: metadata?.description || '',
-          drop: metadata?.dropId || null,
-          image: metadata?.image || undefined,
-          mimeType: metadata?.mimeType || '',
-          animationUrl: metadata?.animationUrl || '',
-          animationMimeType: metadata?.animationMimeType || '',
-          name: metadata?.name || '',
-          collectionId: metadata?.collectionId || '',
-          attributes: metadata?.attributes || [],
-        };
-      }
-    }
-
-    // Crypto.org chain NFT Issued NFT
-    return parsedTokenData;
-  }
-
   const customAddressValidator = TransactionUtils.addressValidator(
     currentSession,
     walletAsset,
@@ -1186,7 +1118,7 @@ const NftPage = () => {
 
       const latestLoadedNFTs = await walletService.retrieveNFTs(currentSession.wallet.identifier);
       setNftList(latestLoadedNFTs);
-      const processedNFTsLists = await processNftList(latestLoadedNFTs);
+      const processedNFTsLists = await NftUtils.processNftList(latestLoadedNFTs);
       setProcessedNftList(processedNFTsLists);
 
       setBroadcastResult(sendResult);
@@ -1220,7 +1152,7 @@ const NftPage = () => {
 
   useEffect(() => {
     const fetchNftList = async () => {
-      const currentNftList = await processNftList(nftList);
+      const currentNftList = await NftUtils.processNftList(nftList);
       setProcessedNftList(currentNftList);
     };
     const fetchNftTransfers = async () => {
