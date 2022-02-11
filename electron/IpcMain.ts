@@ -142,5 +142,44 @@ export class IpcMain {
       }
       event.returnValue = ret;
     });
+    ipcMain.on('ethSignPersonalMessage', async (event: any, arg: any) => {
+      let ret = {};
+      console.log('ethSignPersonalMessage, ', arg.message, ' . ', arg.index);
+
+      try {
+        const sig = await this.ethProvider.signPersonalMessage(arg.message, arg.index);
+        ret = {
+          sig,
+          success: true,
+          label: 'ethSignPersonalMessage reply',
+        };
+      } catch (e) {
+        ret = {
+          success: false,
+          error: e.toString(),
+        };
+        console.error('ethSignPersonalMessage error ', e);
+      }
+
+      event.returnValue = ret;
+    });
+    ipcMain.on('ethSignTypedDataV4', async (event: any, arg: any) => {
+      let ret = {};
+      try {
+        const sig = await this.ethProvider.signTypedDataV4(arg.typedData, arg.index);
+        ret = {
+          sig,
+          success: true,
+          label: 'ethSignTypedDataV4 reply',
+        };
+      } catch (e) {
+        ret = {
+          success: false,
+          error: e.toString(),
+        };
+        console.error('ethSignTypedDataV4 error ' + e);
+      }
+      event.returnValue = ret;
+    });
   }
 }
