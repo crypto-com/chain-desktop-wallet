@@ -362,7 +362,7 @@ const FormMintNft = () => {
     }
     const data = {
       name: formValues.drop,
-      drop: formValues.drop,
+      dropId: formValues.drop,
       description: formValues.description,
       image: imageUrl,
       animation_url: isVideo(fileType) ? videoUrl : undefined,
