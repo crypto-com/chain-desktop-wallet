@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.6.8] - 2022-02-11
+### Additions
+- Wrapped ETH NFT support on Crypto.org chain
+- Add NFT attributes display support
+### Bug fixes
+- Missing Ledger sign methods support
+- Fix potential app crash in Wallet Page
+- Align NFT minting metadata
+
 ## [v0.6.7] - 2022-01-28
 ### Bug fixes
 - Incorrect delegation items

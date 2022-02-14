@@ -179,7 +179,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     ) => {
       setTxEvent(event);
       // prompt for password
-      if (!decryptedPhrase) {
+      if (!decryptedPhrase && !isLedgerWallet) {
         setInputPasswordVisible(true);
       } else {
         setRequestConfirmationVisible(true);
@@ -196,7 +196,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     ) => {
       setTxEvent(event);
       // prompt for password
-      if (!decryptedPhrase) {
+      if (!decryptedPhrase && !isLedgerWallet) {
         setInputPasswordVisible(true);
       } else {
         setRequestConfirmationVisible(true);
@@ -213,7 +213,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     ) => {
       setTxEvent(event);
       // prompt for password
-      if (!decryptedPhrase) {
+      if (!decryptedPhrase && !isLedgerWallet) {
         setInputPasswordVisible(true);
       } else {
         setRequestConfirmationVisible(true);
