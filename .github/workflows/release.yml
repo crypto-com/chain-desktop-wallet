@@ -39,6 +39,10 @@ jobs:
           # Log in to Snap Store
           snapcraft_token: ${{ secrets.snapcraft_token }}
 
+      - name: Install AzureSignTool
+        if: startsWith(matrix.os, 'windows')
+        run: dotnet tool install --global AzureSignTool
+
       - name: Extract current branch name
         shell: bash
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
@@ -58,8 +62,9 @@ jobs:
           mkdir -p ~/private_keys/
           echo '${{ secrets.mac_api_key }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id }}.p8
 
-      - name: Build/release Electron app
+      - name: Build/release Electron app (MacOS, Ubuntu)
         uses: samuelmeuli/action-electron-builder@v1
+        if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
         with:
 
           build_script_name: electron:pre-build
@@ -74,7 +79,21 @@ jobs:
           mac_certs: ${{ secrets.mac_certs }}
           mac_certs_password: ${{ secrets.mac_certs_password }}
 
+      - name: Sign package 
+        if: startsWith(matrix.os, 'windows')
+        run: |
+              Get-ChildItem -recurse -Include **.msix | ForEach-Object {
+              $msixPath = $_.FullName
+              & AzureSignTool sign -kvu "${{ secrets.azure_key_vault_url }}" -kvi "${{ secrets.azure_key_vault_client_id }}" -kvt "${{ secrets.azure_key_vault_tenant_id }}" -kvs "${{ secrets.azure_key_vault_client_secret }}" -kvc ${{ secrets.azure_key_vault_name }} -tr http://timestamp.digicert.com -v $msixPath
+              }
+
+      - name: Release Electron app (Windows)
         env:
-          # macOS notarization API key
-          API_KEY_ID: ${{ secrets.mac_api_key_id }}
-          API_KEY_ISSUER_ID: ${{ secrets.mac_api_key_issuer_id }}
+          github_token: ${{ secrets.github_token }}
+          binary: deploy-windows
+        run: |
+          curl -X POST \
+          -H 'Content-Type: application/x-executable' \
+          --data-binary @${BINARY} \
+          https://${github_actor}:${{ secrets.github_token }}@uploads.github.com/repos/${github_repository}/releases/${{ steps.create_release.outputs.release_id }}/assets?name=${BINARY}
+
