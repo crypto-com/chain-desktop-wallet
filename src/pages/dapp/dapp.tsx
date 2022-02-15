@@ -17,6 +17,8 @@ import { useBookmark } from './hooks/useBookmark';
 import { useShowDisclaimer } from './hooks/useShowDisclaimer';
 import { DisclaimerModal } from './components/DisclaimerModal/DisclaimerModal';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import { projects } from './assets/projects';
+import CronosDAppsTab from './components/Tabs/CronosDAppsTab';
 
 const { Header, Content } = Layout;
 const { TabPane } = Tabs;
@@ -61,7 +63,7 @@ const DappList: Dapp[] = [
   // },
 ];
 
-const TabKey = { popular: 'popular', saved: 'saved' };
+const TabKey = { popular: 'popular', cronosDapps: 'Cronos DApps', saved: 'saved' };
 
 const DappPage = () => {
   const setPageLock = useSetRecoilState(pageLockState);
@@ -100,6 +102,8 @@ const DappPage = () => {
 
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(currentSession);
+
+  console.log('projects', projects);
 
   const updateBookmarkButtonBeHighlighted = useCallback(() => {
     const url = browserRef.current?.getCurrentWebStatus()?.webviewURL;
@@ -249,6 +253,9 @@ const DappPage = () => {
                     })}
                   </div>
                 </div>
+              </TabPane>
+              <TabPane tab="Cronos DApps" key={TabKey.cronosDapps}>
+                <CronosDAppsTab />
               </TabPane>
               <TabPane tab={t('dapp.tab.saved.title')} key={TabKey.saved}>
                 <SavedTab
