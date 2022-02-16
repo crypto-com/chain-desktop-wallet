@@ -40,6 +40,7 @@ jobs:
           snapcraft_token: ${{ secrets.snapcraft_token }}
 
       - name: Install AzureSignTool
+        # Only install Azure Sign Tool on Windows
         if: startsWith(matrix.os, 'windows')
         run: dotnet tool install --global AzureSignTool
 
@@ -51,8 +52,8 @@ jobs:
       - name: Get name & version from package.json
         shell: bash
         run: | 
-          echo "##[set-output name=version;]$(node -p -e '`v${require("./package.json").version}`')"
-          echo "##[set-output name=name;]$(node -p -e '`v${require("./package.json").name}`')"
+          echo "##[set-output name=name;]$(node -p -e '`${require("./package.json").name}`')"
+          echo "##[set-output name=version;]$(node -p -e '`${require("./package.json").version}`')"
         id: package_json
 
       - name: Log release reference
@@ -95,6 +96,8 @@ jobs:
 
       - name: Sign package (Windows)
         if: startsWith(matrix.os, 'windows')
+        # Instead of pointing to a specific .exe, uses a PowerShell script which iterates through all the files stored in dist folder. 
+        # If the file has the .exe extension, then it will use the AzureSignTool command to sign it.
         run: |
               cd dist; Get-ChildItem -recurse -Include **.exe | ForEach-Object {
               $exePath = $_.FullName
@@ -109,8 +112,8 @@ jobs:
           npx rimraf "dist/.icon-ico"
           mv dist/temp/* dist
           npx rimraf "dist/temp"
-          mv dist/temp/*.exe dist/temp/${{ steps.package_json.outputs.name }}-${{ steps.package_json.outputs.version }}.exe
-          mv dist/temp/*.blockmap dist/temp/${{ steps.package_json.outputs.name }}-${{ steps.package_json.outputs.version }}.exe.blockmap
+          mv dist/*.exe dist/${{ steps.package_json.outputs.name }}-${{ steps.package_json.outputs.version }}.exe
+          mv dist/*.blockmap dist/${{ steps.package_json.outputs.name }}-${{ steps.package_json.outputs.version }}.exe.blockmap
 
       - name: Upload artifacts (Windows)
         uses: actions/upload-artifact@v2
@@ -124,7 +127,7 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         with:
           draft: true
-          tag_name: ${{ steps.package_json.outputs.version }}
+          tag_name: v${{ steps.package_json.outputs.version }}
           files: "dist/**"
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
