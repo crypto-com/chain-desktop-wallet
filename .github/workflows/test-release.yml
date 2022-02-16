@@ -112,8 +112,8 @@ jobs:
           npx rimraf "dist/.icon-ico"
           mv dist/temp/* dist
           npx rimraf "dist/temp"
-          mv dist/*.exe dist/${{ steps.package_json.outputs.name }}-${{ steps.package_json.outputs.version }}.exe
-          mv dist/*.blockmap dist/${{ steps.package_json.outputs.name }}-${{ steps.package_json.outputs.version }}.exe.blockmap
+          mv dist/*.exe dist/${{ steps.package_json.outputs.name }}-setup-${{ steps.package_json.outputs.version }}.exe
+          mv dist/*.blockmap dist/${{ steps.package_json.outputs.name }}-setup-${{ steps.package_json.outputs.version }}.exe.blockmap
 
       - name: Upload artifacts (Windows)
         uses: actions/upload-artifact@v2
