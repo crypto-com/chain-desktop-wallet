@@ -87,20 +87,19 @@ jobs:
       - name: Sign package (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
-              Get-ChildItem -recurse -Include ./dist/**.exe | ForEach-Object {
+              cd dist; Get-ChildItem -recurse -Include **.exe | ForEach-Object {
               $exePath = $_.FullName
-              & AzureSignTool sign -kvu "${{ secrets.azure_key_vault_url }}" -kvi "${{ secrets.azure_key_vault_client_id }}" -kvt "${{ secrets.azure_key_vault_tenant_id }}" -kvs "${{ secrets.azure_key_vault_client_secret }}" -kvc ${{ secrets.azure_key_vault_name }} -tr http://timestamp.digicert.com -v $exePath
-              }
+              & AzureSignTool sign -kvu "${{ secrets.azure_key_vault_url }}" -kvi "${{ secrets.azure_key_vault_client_id }}" -kvt "${{ secrets.azure_key_vault_tenant_id }}" -kvs "${{ secrets.azure_key_vault_client_secret }}" -kvc "${{ secrets.azure_key_vault_name }}" -tr http://timestamp.digicert.com -v $exePath
+              }; cd ..
 
       - name: Cleanup artifacts (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
-          mkdir dist/temp
-          mv dist/*.exe ./dist/temp
-          mv dist/*.blockmap ./dist/temp
-          mv dist/latest.yml ./dist/temp
+          mkdir dist/temp; Move-Item -Path dist/*.exe, dist/*.blockmap, dist/latest.yml - Destination dist/temp
           npx rimraf "dist/!(temp)"
           npx rimraf "dist/.icon-ico"
+          mv dist/temp/* dist
+          npx rimraf "dist/temp"
 
       - name: Upload artifacts (Windows)
         uses: actions/upload-artifact@v2
@@ -113,6 +112,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(matrix.os, 'windows')
         with:
+          draft: true
           tag_name: ${{ github.ref }}
           files: "dist/**"
         env:
