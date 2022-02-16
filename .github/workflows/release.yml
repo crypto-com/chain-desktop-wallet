@@ -40,6 +40,7 @@ jobs:
           snapcraft_token: ${{ secrets.snapcraft_token }}
 
       - name: Install AzureSignTool
+        # Only install Azure Sign Tool on Windows
         if: startsWith(matrix.os, 'windows')
         run: dotnet tool install --global AzureSignTool
 
@@ -48,11 +49,20 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
 
+      - name: Get name & version from package.json
+        shell: bash
+        run: | 
+          echo "##[set-output name=name;]$(node -p -e '`${require("./package.json").name}`')"
+          echo "##[set-output name=version;]$(node -p -e '`${require("./package.json").version}`')"
+        id: package_json
+
       - name: Log release reference
         run: |
           echo "********* START RELEASE REF **********"
           echo ${{ github.ref }}
-          echo ${{ steps.extract_branch.outputs.branch }}
+          echo branch: ${{ steps.extract_branch.outputs.branch }}
+          echo name: ${{ steps.package_json.outputs.name }}
+          echo version: ${{ steps.package_json.outputs.version }}
           echo "********* END RELEASE REF ************"
 
       - name: Prepare for app notarization (MacOS)
@@ -79,21 +89,45 @@ jobs:
           mac_certs: ${{ secrets.mac_certs }}
           mac_certs_password: ${{ secrets.mac_certs_password }}
 
-      - name: Sign package 
+      - name: Build Electron app (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
-              Get-ChildItem -recurse -Include **.msix | ForEach-Object {
-              $msixPath = $_.FullName
-              & AzureSignTool sign -kvu "${{ secrets.azure_key_vault_url }}" -kvi "${{ secrets.azure_key_vault_client_id }}" -kvt "${{ secrets.azure_key_vault_tenant_id }}" -kvs "${{ secrets.azure_key_vault_client_secret }}" -kvc ${{ secrets.azure_key_vault_name }} -tr http://timestamp.digicert.com -v $msixPath
-              }
+          yarn run electron:build
+
+      - name: Sign built binary (Windows)
+        if: startsWith(matrix.os, 'windows')
+        # Instead of pointing to a specific .exe, uses a PowerShell script which iterates through all the files stored in dist folder. 
+        # If the file has the .exe extension, then it will use the AzureSignTool command to sign it.
+        run: |
+              cd dist; Get-ChildItem -recurse -Include **.exe | ForEach-Object {
+              $exePath = $_.FullName
+              & AzureSignTool sign -kvu "${{ secrets.azure_key_vault_url }}" -kvi "${{ secrets.azure_key_vault_client_id }}" -kvt "${{ secrets.azure_key_vault_tenant_id }}" -kvs "${{ secrets.azure_key_vault_client_secret }}" -kvc "${{ secrets.azure_key_vault_name }}" -tr http://timestamp.digicert.com -v $exePath
+              }; cd ..
+
+      - name: Cleanup artifacts (Windows)
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          mkdir dist/temp; Move-Item -Path dist/*.exe, dist/*.blockmap, dist/latest.yml -Destination dist/temp
+          npx rimraf "dist/!(temp)"
+          npx rimraf "dist/.icon-ico"
+          mv dist/temp/* dist
+          npx rimraf "dist/temp"
+          mv dist/*.exe dist/${{ steps.package_json.outputs.name }}-setup-${{ steps.package_json.outputs.version }}.exe
+          mv dist/*.blockmap dist/${{ steps.package_json.outputs.name }}-setup-${{ steps.package_json.outputs.version }}.exe.blockmap
+
+      - name: Upload artifacts (Windows)
+        uses: actions/upload-artifact@v2
+        if: startsWith(matrix.os, 'windows')
+        with:
+          name: ${{ matrix.os }}
+          path: dist
 
       - name: Release Electron app (Windows)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(matrix.os, 'windows')
+        with:
+          draft: true
+          tag_name: v${{ steps.package_json.outputs.version }}
+          files: "dist/**"
         env:
-          github_token: ${{ secrets.github_token }}
-          binary: deploy-windows
-        run: |
-          curl -X POST \
-          -H 'Content-Type: application/x-executable' \
-          --data-binary @${BINARY} \
-          https://${github_actor}:${{ secrets.github_token }}@uploads.github.com/repos/${github_repository}/releases/${{ steps.create_release.outputs.release_id }}/assets?name=${BINARY}
-
+          GITHUB_TOKEN: ${{ secrets.github_token }}
