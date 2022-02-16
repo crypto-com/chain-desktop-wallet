@@ -27,6 +27,18 @@ jobs:
         with:
           node-version: 12
 
+      - name: Get version from package.json
+        if: startsWith(matrix.os, 'windows')
+        run: | 
+          PACKAGE_VERSION=`node -e "console.log(require('./package.json').version);"`
+          echo package_version=$PACKAGE_VERSION >> $GITHUB_ENV
+          echo $PACKAGE_VERSION
+      
+      - name: Test package.json environement variable
+        if: startsWith(matrix.os, 'windows')
+        run: | 
+          echo ${{ env.package_version }}
+
       - name: Install deps with big timeout
         run: |
           yarn install --network-timeout 600000
