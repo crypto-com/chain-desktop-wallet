@@ -95,7 +95,12 @@ jobs:
       - name: Cleanup artifacts (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
-          npx rimraf "dist/!(*.{exe,blockmap,yml})"
+          mkdir dist/temp
+          mv dist/*.exe ./dist/temp
+          mv dist/*.blockmap ./dist/temp
+          mv dist/latest.yml ./dist/temp
+          npx rimraf "dist/!(temp)"
+          npx rimraf "dist/.icon-ico"
 
       - name: Upload artifacts (Windows)
         uses: actions/upload-artifact@v2
@@ -108,6 +113,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: startsWith(matrix.os, 'windows')
         with:
+          tag_name: ${{ github.ref }}
           files: "dist/**"
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
