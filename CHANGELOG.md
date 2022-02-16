@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.6.9] - 2022-02-16
+### Bug fixes
+- Ledger connectivity on Windows
 ## [v0.6.8] - 2022-02-11
 ### Additions
 - Wrapped ETH NFT support on Crypto.org chain
