@@ -90,10 +90,8 @@ jobs:
       - name: Release Electron app (Windows)
         env:
           github_token: ${{ secrets.github_token }}
-          binary: deploy-windows
         run: |
           curl -X POST \
           -H 'Content-Type: application/x-executable' \
-          --data-binary @${binary} \
-          https://${github_actor}:${{ secrets.github_token }}@uploads.github.com/repos/${github_repository}/releases/${{ steps.create_release.outputs.release_id }}/assets?name=${binary}
+          https://${github_actor}:${{ secrets.github_token }}@uploads.github.com/repos/${github_repository}/releases/${{ steps.create_release.outputs.release_id }}/assets
 
