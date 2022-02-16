@@ -110,7 +110,9 @@ jobs:
 
       - name: Get version from package.json
         if: startsWith(matrix.os, 'windows')
-        run: node -p -e '`PACKAGE_VERSION=${require(\"./package.json\").version}`' >> $GITHUB_ENV
+        run: | 
+          PACKAGE_VERSION=`node -e "console.log(require('./package.json').version);"`
+          echo package_version=$PACKAGE_VERSION >> $GITHUB_ENV
         
       - name: package-version-to-git-tag
         if: startsWith(matrix.os, 'windows')
