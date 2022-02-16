@@ -79,19 +79,35 @@ jobs:
           mac_certs: ${{ secrets.mac_certs }}
           mac_certs_password: ${{ secrets.mac_certs_password }}
 
-      - name: Sign package 
+      - name: Build Electron app (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
-              Get-ChildItem -recurse -Include **.msix | ForEach-Object {
-              $msixPath = $_.FullName
-              & AzureSignTool sign -kvu "${{ secrets.azure_key_vault_url }}" -kvi "${{ secrets.azure_key_vault_client_id }}" -kvt "${{ secrets.azure_key_vault_tenant_id }}" -kvs "${{ secrets.azure_key_vault_client_secret }}" -kvc ${{ secrets.azure_key_vault_name }} -tr http://timestamp.digicert.com -v $msixPath
+          yarn run electron:build
+
+      - name: Sign package (Windows)
+        if: startsWith(matrix.os, 'windows')
+        run: |
+              Get-ChildItem -recurse -Include ./dist/**.exe | ForEach-Object {
+              $exePath = $_.FullName
+              & AzureSignTool sign -kvu "${{ secrets.azure_key_vault_url }}" -kvi "${{ secrets.azure_key_vault_client_id }}" -kvt "${{ secrets.azure_key_vault_tenant_id }}" -kvs "${{ secrets.azure_key_vault_client_secret }}" -kvc ${{ secrets.azure_key_vault_name }} -tr http://timestamp.digicert.com -v $exePath
               }
 
-      - name: Release Electron app (Windows)
-        env:
-          github_token: ${{ secrets.github_token }}
+      - name: Cleanup artifacts (Windows)
+        if: startsWith(matrix.os, 'windows')
         run: |
-          curl -X POST \
-          -H 'Content-Type: application/x-executable' \
-          https://${github_actor}:${{ secrets.github_token }}@uploads.github.com/repos/${github_repository}/releases/${{ steps.create_release.outputs.release_id }}/assets
+          npx rimraf "dist_electron/!(*.exe|*.blockmap|*.yml)"
 
+      - name: Upload artifacts (Windows)
+        uses: actions/upload-artifact@v2
+        if: startsWith(matrix.os, 'windows')
+        with:
+          name: ${{ matrix.os }}
+          path: dist
+
+      - name: Release (Windows)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(matrix.os, 'windows')
+        with:
+          files: "dist/**"
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
