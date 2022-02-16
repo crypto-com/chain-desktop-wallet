@@ -52,7 +52,7 @@ jobs:
         shell: bash
         run: echo "##[set-output name=version;]$(node -p -e '`${require("./package.json").version}`')"
         id: package_version
-        
+
       - name: Log release reference
         run: |
           echo "********* START RELEASE REF **********"
@@ -113,15 +113,6 @@ jobs:
         with:
           name: ${{ matrix.os }}
           path: dist
-
-      - name: Push version tag to GitHub if not existed
-        uses: pkgdeps/git-tag-action@v2
-        with:
-          github_token: ${{ secrets.github_token }}
-          github_repo: ${{ github.repository }}
-          version: ${{ steps.package_version.outputs.version }}
-          git_commit_sha: ${{ github.sha }}
-          git_tag_prefix: "v"
 
       - name: Release Electron app (Windows)
         uses: softprops/action-gh-release@v1
