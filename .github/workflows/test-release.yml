@@ -110,13 +110,13 @@ jobs:
 
       - name: Get version from package.json
         if: startsWith(matrix.os, 'windows')
-        run: node -p -e '`PACKAGE_VERSION=${require("./package.json").version}`' >> $GITHUB_ENV
+        run: node -p -e '`PACKAGE_VERSION=${require(\"./package.json\").version}`' >> $GITHUB_ENV
         
       - name: package-version-to-git-tag
         if: startsWith(matrix.os, 'windows')
         uses: pkgdeps/git-tag-action@v2
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.github_token }}
           github_repo: ${{ github.repository }}
           version: ${{ env.PACKAGE_VERSION }}
           git_commit_sha: ${{ github.sha }}
