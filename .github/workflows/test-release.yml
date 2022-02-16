@@ -29,7 +29,7 @@ jobs:
 
       - name: Get version from package.json
         shell: bash
-        run: echo "##[set-output name=version;]$(node -p -e '`package_version=${require("./package.json").version}`')"
+        run: echo "##[set-output name=version;]$(node -p -e '`${require("./package.json").version}`')"
         id: extract_version
 
       - name: Get package version
@@ -123,8 +123,8 @@ jobs:
       - name: Get version from package.json
         if: startsWith(matrix.os, 'windows')
         shell: bash
-        run: echo "##[set-output name=version;]$(node -p -e '`package_version=${require("./package.json").version}`')"
-        id: extract_version
+        run: echo "##[set-output name=version;]$(node -p -e '`${require("./package.json").version}`')"
+        id: package_version
 
       - name: package-version-to-git-tag
         if: startsWith(matrix.os, 'windows')
@@ -132,6 +132,6 @@ jobs:
         with:
           github_token: ${{ secrets.github_token }}
           github_repo: ${{ github.repository }}
-          version: ${{ steps.extract_version.outputs.version }}
+          version: ${{ steps.package_version.outputs.version }}
           git_commit_sha: ${{ github.sha }}
           git_tag_prefix: "v"
