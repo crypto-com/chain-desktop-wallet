@@ -95,7 +95,7 @@ jobs:
       - name: Cleanup artifacts (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
-          npx rimraf "dist_electron/!(*.exe|*.blockmap|*.yml)"
+          npx rimraf "dist/!(*.{exe,blockmap,yml})"
 
       - name: Upload artifacts (Windows)
         uses: actions/upload-artifact@v2
