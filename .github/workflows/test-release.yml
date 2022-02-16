@@ -48,17 +48,20 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
 
-      - name: Get version from package.json
+      - name: Get name & version from package.json
         shell: bash
-        run: echo "##[set-output name=version;]$(node -p -e '`${require("./package.json").version}`')"
-        id: package_version
+        run: | 
+          echo "##[set-output name=version;]$(node -p -e '`v${require("./package.json").version}`')"
+          echo "##[set-output name=name;]$(node -p -e '`v${require("./package.json").name}`')"
+        id: package_json
 
       - name: Log release reference
         run: |
           echo "********* START RELEASE REF **********"
           echo ${{ github.ref }}
-          echo ${{ steps.extract_branch.outputs.branch }}
-          echo ${{ steps.package_version.outputs.version }}
+          echo branch: ${{ steps.extract_branch.outputs.branch }}
+          echo name: ${{ steps.package_json.outputs.name }}
+          echo version: ${{ steps.package_json.outputs.version }}
           echo "********* END RELEASE REF ************"
 
       - name: Prepare for app notarization (MacOS)
@@ -106,6 +109,8 @@ jobs:
           npx rimraf "dist/.icon-ico"
           mv dist/temp/* dist
           npx rimraf "dist/temp"
+          mv dist/temp/*.exe dist/temp/${{ steps.package_json.outputs.name }}-${{ steps.package_json.outputs.version }}.exe
+          mv dist/temp/*.blockmap dist/temp/${{ steps.package_json.outputs.name }}-${{ steps.package_json.outputs.version }}.exe.blockmap
 
       - name: Upload artifacts (Windows)
         uses: actions/upload-artifact@v2
@@ -119,7 +124,7 @@ jobs:
         if: startsWith(matrix.os, 'windows')
         with:
           draft: true
-          tag_name: ${{ steps.package_version.outputs.version }}
+          tag_name: ${{ steps.package_json.outputs.version }}
           files: "dist/**"
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
