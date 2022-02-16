@@ -94,6 +94,6 @@ jobs:
         run: |
           curl -X POST \
           -H 'Content-Type: application/x-executable' \
-          --data-binary @${BINARY} \
-          https://${github_actor}:${{ secrets.github_token }}@uploads.github.com/repos/${github_repository}/releases/${{ steps.create_release.outputs.release_id }}/assets?name=${BINARY}
+          --data-binary @${binary} \
+          https://${github_actor}:${{ secrets.github_token }}@uploads.github.com/repos/${github_repository}/releases/${{ steps.create_release.outputs.release_id }}/assets?name=${binary}
 
