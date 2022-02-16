@@ -95,7 +95,7 @@ jobs:
       - name: Cleanup artifacts (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
-          mkdir dist/temp; Move-Item -Path dist/*.exe, dist/*.blockmap, dist/latest.yml - Destination dist/temp
+          mkdir dist/temp; Move-Item -Path dist/*.exe, dist/*.blockmap, dist/latest.yml -Destination dist/temp
           npx rimraf "dist/!(temp)"
           npx rimraf "dist/.icon-ico"
           mv dist/temp/* dist
@@ -108,23 +108,16 @@ jobs:
           name: ${{ matrix.os }}
           path: dist
 
-      - uses: actions/checkout@v2
-      - name: Set output
-        id: vars
-        run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
-      - name: Check output
-        env:
-          RELEASE_VERSION: ${{ steps.vars.outputs.tag }}
-        run: |
-          echo $RELEASE_VERSION
-          echo ${{ steps.vars.outputs.tag }}
-
-      - name: Release (Windows)
-        uses: softprops/action-gh-release@v1
+      - name: Get version from package.json
         if: startsWith(matrix.os, 'windows')
+        run: node -p -e '`PACKAGE_VERSION=${require("./package.json").version}`' >> $GITHUB_ENV
+        
+      - name: package-version-to-git-tag
+        if: startsWith(matrix.os, 'windows')
+        uses: pkgdeps/git-tag-action@v2
         with:
-          draft: true
-          tag_name: ${{ github.ref }}
-          files: "dist/**"
-        env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_repo: ${{ github.repository }}
+          version: ${{ env.PACKAGE_VERSION }}
+          git_commit_sha: ${{ github.sha }}
+          git_tag_prefix: "v"
