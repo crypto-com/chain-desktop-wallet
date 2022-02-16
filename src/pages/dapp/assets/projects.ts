@@ -112,7 +112,7 @@ export const projects: CronosProject[] = [
   },
   {
     id: 7,
-    name: 'Multichain (Previously AnySwap)',
+    name: 'Multichain',
     category: ['Bridge'],
     description:
       'Anyswap is a fully decentralized cross chain swap protocol, based on Fusion DCRM technology, with automated pricing and liquidity system. Anyswap enables swaps between any coins on any blockchain which uses ECDSA or EdDSA as signature algorithm, including BTC, ETH, USDT, XRP, LTC, FSN, etc.',
