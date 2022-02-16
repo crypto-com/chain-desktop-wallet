@@ -26,14 +26,19 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12
-
+          
       - name: Get version from package.json
-        if: startsWith(matrix.os, 'windows')
-        run: | 
-          node -p -e '`package_version=${require(\"./package.json\").version}`' | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          node -p -e '`package_version=${require(\"./package.json\").version}`'
-          echo ${{ env.package_version }}
-      
+        shell: bash
+        run: echo "##[set-output name=version;]$(node -p -e '`package_version=${require(\"./package.json\").version}`')"
+        id: extract_version
+
+      - name: Get package version
+        run: |
+          echo "********* START RELEASE VERSION **********"
+          echo ${{ github.ref }}
+          echo ${{ steps.extract_version.outputs.version }}
+          echo "********* END RELEASE VERSION ************"
+
       - name: Test package.json environement variable
         if: startsWith(matrix.os, 'windows')
         run: | 
