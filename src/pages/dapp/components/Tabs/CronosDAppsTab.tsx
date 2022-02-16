@@ -1,4 +1,4 @@
-import { Button, Card, Checkbox, Dropdown, Menu, Table, Tag } from 'antd';
+import { Card, Select, Table, Tag } from 'antd';
 import * as React from 'react';
 import { useMemo, useState } from 'react';
 import { categories, projects, CronosProject, CategoryType } from '../../assets/projects';
@@ -7,16 +7,78 @@ const columns = [
   {
     title: 'Name',
     key: 'name',
-    render: (project: CronosProject) => <div>{project.name}</div>,
+    render: (project: CronosProject, _, index) => {
+      return (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '10% 20% 70%',
+            alignItems: 'center',
+          }}
+        >
+          <span
+            style={{
+              color: '#626973',
+            }}
+          >
+            {index + 1}
+          </span>
+          <img
+            style={{
+              width: '24px',
+              height: '24px',
+              display: 'inline',
+              marginLeft: '16px',
+              marginRight: '16px',
+              borderRadius: '12px',
+            }}
+            src={`/dapp_logos/${project.logo}`}
+            alt="project logo"
+          />
+          <span
+            style={{
+              color: '#1199FA',
+            }}
+          >
+            {project.name}
+          </span>
+        </div>
+      );
+    },
   },
-
+  {
+    title: 'TVL (Total Value Locked)',
+    key: 'tvl',
+    render: (project: CronosProject) => {
+      console.log(project);
+      return 'N/A';
+    },
+  },
+  {
+    title: '1D Change',
+    key: '1d_change',
+    render: (project: CronosProject) => {
+      console.log(project);
+      return 'N/A';
+    },
+  },
+  {
+    title: '7D Change',
+    key: '7d_change',
+    render: (project: CronosProject) => {
+      console.log(project);
+      return 'N/A';
+    },
+  },
   {
     title: 'Category',
     key: 'category',
     render: (project: CronosProject) => (
       <div>
         {project.category.map(c => (
-          <Tag>{c}</Tag>
+          <Tag color="blue" style={{ borderRadius: '4px', color: '#1199FA' }}>
+            {c}
+          </Tag>
         ))}
       </div>
     ),
@@ -37,54 +99,43 @@ const CronosDAppsTab = () => {
     return map;
   }, [projects]);
 
-  // dropdown categories
-  const dropdown = () => (
-    <Menu>
-      {categories
-        .filter(cat => {
-          return categoriesNumbersMap.get(cat);
-        })
-        .map((data, idx) => (
-          <Menu.Item /* className={styles.label} */ key={idx}>
-            <Checkbox
-              key={data}
-              value={data}
-              onChange={e => {
-                if (e.target.checked) {
-                  setSelectedCategories([...selectedCategories, data]);
-                } else {
-                  setSelectedCategories([...selectedCategories.filter(c => c !== data)]);
-                }
-              }}
-            >
-              {data} ({categoriesNumbersMap.get(data)})
-            </Checkbox>
-          </Menu.Item>
-        ))}
-    </Menu>
-  );
-
   return (
     <Card>
-      <Dropdown
-        // overlayClassName={styles.navDropdown}
-        placement="bottomCenter"
-        overlay={dropdown}
-        // visible={visible}
-        // onVisibleChange={handleVisibleChange}
-      >
-        <Button
-          className="ant-dropdown-link"
-          // onChange={filterChange}
-          onClick={e => e.preventDefault()}
-        >
-          {/* <span className={styles.inputFilter}>
-            By Category
-            <img alt="arrow" src={arrow} className={styles.search} />
-          </span> */}
-          hi
-        </Button>
-      </Dropdown>
+      <Select
+        mode="multiple"
+        showSearch={false}
+        style={{ minWidth: '180px' }}
+        showArrow
+        placeholder="Select Categories"
+        onChange={e => {
+          setSelectedCategories([...e]);
+        }}
+        value={selectedCategories}
+        tagRender={props => {
+          const { label, closable, onClose } = props;
+          const onPreventMouseDown = event => {
+            event.preventDefault();
+            event.stopPropagation();
+          };
+          return (
+            <Tag
+              color="blue"
+              onMouseDown={onPreventMouseDown}
+              closable={closable}
+              onClose={onClose}
+              style={{ marginRight: 3, borderRadius: '4px', color: '#1199FA' }}
+            >
+              {label}
+            </Tag>
+          );
+        }}
+        options={categories.map(c => {
+          return {
+            label: `${c} (${categoriesNumbersMap.get(c)})`,
+            value: c,
+          };
+        })}
+      />
       <Table
         dataSource={
           selectedCategories.length === 0
