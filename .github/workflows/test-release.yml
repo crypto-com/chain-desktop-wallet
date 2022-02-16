@@ -27,18 +27,6 @@ jobs:
         with:
           node-version: 12
 
-      - name: Get version from package.json
-        shell: bash
-        run: echo "##[set-output name=version;]$(node -p -e '`${require("./package.json").version}`')"
-        id: extract_version
-
-      - name: Get package version
-        run: |
-          echo "********* START RELEASE VERSION **********"
-          echo ${{ github.ref }}
-          echo ${{ steps.extract_version.outputs.version }}
-          echo "********* END RELEASE VERSION ************"
-
       - name: Install deps with big timeout
         run: |
           yarn install --network-timeout 600000
@@ -60,11 +48,17 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
         id: extract_branch
 
+      - name: Get version from package.json
+        shell: bash
+        run: echo "##[set-output name=version;]$(node -p -e '`${require("./package.json").version}`')"
+        id: package_version
+        
       - name: Log release reference
         run: |
           echo "********* START RELEASE REF **********"
           echo ${{ github.ref }}
           echo ${{ steps.extract_branch.outputs.branch }}
+          echo ${{ steps.package_version.outputs.version }}
           echo "********* END RELEASE REF ************"
 
       - name: Prepare for app notarization (MacOS)
@@ -120,14 +114,7 @@ jobs:
           name: ${{ matrix.os }}
           path: dist
 
-      - name: Get version from package.json
-        if: startsWith(matrix.os, 'windows')
-        shell: bash
-        run: echo "##[set-output name=version;]$(node -p -e '`${require("./package.json").version}`')"
-        id: package_version
-
-      - name: package-version-to-git-tag
-        if: startsWith(matrix.os, 'windows')
+      - name: Push version tag to GitHub if not existed
         uses: pkgdeps/git-tag-action@v2
         with:
           github_token: ${{ secrets.github_token }}
@@ -135,3 +122,13 @@ jobs:
           version: ${{ steps.package_version.outputs.version }}
           git_commit_sha: ${{ github.sha }}
           git_tag_prefix: "v"
+
+      - name: Release Electron app (Windows)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(matrix.os, 'windows')
+        with:
+          draft: true
+          tag_name: ${{ steps.package_version.outputs.version }}
+          files: "dist/**"
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
