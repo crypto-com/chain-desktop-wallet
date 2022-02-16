@@ -215,7 +215,7 @@
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
     "electron": "11.5.0",
-    "electron-builder": "22.10.5",
+    "electron-builder": "22.14.13",
     "electron-builder-notarize": "1.2.0",
     "eslint": "7.23.0",
     "eslint-config-react-app": "6.0.0",
