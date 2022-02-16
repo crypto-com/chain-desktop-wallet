@@ -26,10 +26,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 12
-          
+
       - name: Get version from package.json
         shell: bash
-        run: echo "##[set-output name=version;]$(node -p -e '`package_version=${require(\"./package.json\").version}`')"
+        run: echo "##[set-output name=version;]$(node -p -e '`package_version=${require("./package.json").version}`')"
         id: extract_version
 
       - name: Get package version
@@ -38,11 +38,6 @@ jobs:
           echo ${{ github.ref }}
           echo ${{ steps.extract_version.outputs.version }}
           echo "********* END RELEASE VERSION ************"
-
-      - name: Test package.json environement variable
-        if: startsWith(matrix.os, 'windows')
-        run: | 
-          echo ${{ env.package_version }}
 
       - name: Install deps with big timeout
         run: |
@@ -127,15 +122,16 @@ jobs:
 
       - name: Get version from package.json
         if: startsWith(matrix.os, 'windows')
-        run: | 
-          node -p -e '`package_version=${require(\"./package.json\").version}`' | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-        
+        shell: bash
+        run: echo "##[set-output name=version;]$(node -p -e '`package_version=${require("./package.json").version}`')"
+        id: extract_version
+
       - name: package-version-to-git-tag
         if: startsWith(matrix.os, 'windows')
         uses: pkgdeps/git-tag-action@v2
         with:
           github_token: ${{ secrets.github_token }}
           github_repo: ${{ github.repository }}
-          version: ${{ env.package_version }}
+          version: ${{ steps.extract_version.outputs.version }}
           git_commit_sha: ${{ github.sha }}
           git_tag_prefix: "v"
