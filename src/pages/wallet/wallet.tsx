@@ -14,6 +14,8 @@ import {
   navbarMenuSelectedKeyState,
   fetchingDBState,
   nftListState,
+  ledgerIsConnectedState,
+  LedgerConnectedApp,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
@@ -38,6 +40,7 @@ function WalletPage() {
   const [validatorList, setValidatorList] = useRecoilState(validatorListState);
   const [nftList, setNftList] = useRecoilState(nftListState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
+  const setLedgerIsConnected = useSetRecoilState(ledgerIsConnectedState);
   const fetchingDB = useRecoilValue(fetchingDBState);
   const walletList = useRecoilValue(walletListState);
   const [loading, setLoading] = useState(false);
@@ -111,7 +114,7 @@ function WalletPage() {
       currentSession.wallet.config.network.chainId,
     );
     setValidatorList(currentValidatorList);
-
+    setLedgerIsConnected(LedgerConnectedApp.NOT_CONNECTED);
     setLoading(false);
   };
 
@@ -169,6 +172,17 @@ function WalletPage() {
         },
       ],
       render: text => <Text type="success">{text}</Text>,
+    },
+    {
+      title: t('wallet.table1.addressIndex'),
+      dataIndex: 'addressIndex',
+      key: 'addressIndex',
+      children: [
+        {
+          title: session?.wallet.addressIndex ? session?.wallet.addressIndex.toString() : '0',
+          dataIndex: 'addressIndex',
+        },
+      ],
     },
     {
       title: t('wallet.table1.walletType'),

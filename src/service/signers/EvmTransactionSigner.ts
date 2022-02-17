@@ -1,6 +1,7 @@
 import { BigNumberish, ethers } from 'ethers';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
+import { signTypedData_v4 } from 'eth-sig-util';
 import { ITransactionSigner } from './TransactionSigner';
 import TokenContractABI from './abi/TokenContractABI.json';
 
@@ -11,7 +12,10 @@ import {
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
 } from './TransactionSupported';
-import { UserAssetType } from '../../models/UserAsset';
+import { UserAsset, UserAssetType } from '../../models/UserAsset';
+import { walletService } from '../WalletService';
+import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../LedgerService';
+import { CronosClient } from '../cronos/CronosClient';
 
 const DEFAULT_CHAIN_ID = 338;
 
@@ -48,10 +52,39 @@ class EvmTransactionSigner implements ITransactionSigner {
 
   // eslint-disable-next-line class-methods-use-this
   public async sendContractCallTransaction(
+    asset: UserAsset,
     transaction: EVMContractCallUnsigned,
     phrase: string,
     jsonRpcUrl: string,
   ): Promise<string> {
+    if (!asset.address || !asset.config?.nodeUrl) {
+      throw TypeError(`Missing asset config: ${asset.config}`);
+    }
+
+    const currentSession = await walletService.retrieveCurrentSession();
+
+    if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      const device = createLedgerDevice();
+
+      const walletAddressIndex = currentSession.wallet.addressIndex;
+
+      const signedTx = await device.signEthTx(
+        walletAddressIndex,
+        Number(asset?.config?.chainId), // chainid
+        transaction.nonce,
+        transaction.gasLimit,
+        transaction.gasPrice,
+        transaction.contractAddress,
+        transaction.value ?? '0x0',
+        transaction.data,
+      );
+      const cronosClient = new CronosClient(asset.config?.nodeUrl, asset.config?.indexingUrl);
+
+      const result = await cronosClient.broadcastRawTransactionHex(signedTx);
+
+      return Promise.resolve(result);
+    }
+
     const txParams: ethers.providers.TransactionRequest = {
       nonce: transaction.nonce,
       gasPrice: transaction.gasPrice,
@@ -66,6 +99,37 @@ class EvmTransactionSigner implements ITransactionSigner {
 
     const signedTx = await wallet.sendTransaction(txParams);
     return Promise.resolve(signedTx.hash);
+  }
+
+  static async signPersonalMessage(message: string, passphrase = ''): Promise<string> {
+    const currentSession = await walletService.retrieveCurrentSession();
+
+    if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      const device = createLedgerDevice();
+
+      const walletAddressIndex = currentSession.wallet.addressIndex;
+
+      return await device.signPersonalMessage(walletAddressIndex, message);
+    }
+
+    const wallet = ethers.Wallet.fromMnemonic(passphrase);
+    return await wallet.signMessage(ethers.utils.arrayify(message));
+  }
+
+  // ERC712 sign
+  static async signTypedDataV4(message: string, passphrase = ''): Promise<string> {
+    const currentSession = await walletService.retrieveCurrentSession();
+
+    if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      const device = createLedgerDevice();
+
+      const walletAddressIndex = currentSession.wallet.addressIndex;
+
+      return await device.signTypedDataV4(walletAddressIndex, message);
+    }
+    const wallet = ethers.Wallet.fromMnemonic(passphrase);
+    const bufferedKey = Buffer.from(wallet.privateKey.replace(/^(0x)/, ''), 'hex');
+    return signTypedData_v4(bufferedKey, { data: JSON.parse(message) });
   }
 
   public async signTokenTransfer(
@@ -167,4 +231,5 @@ class EvmTransactionSigner implements ITransactionSigner {
   }
 }
 
+export { EvmTransactionSigner };
 export const evmTransactionSigner = new EvmTransactionSigner();

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Drawer, Layout } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 import BigNumber from 'bignumber.js';
 import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +21,9 @@ import { Dapp, DappBrowserIPC } from '../../types';
 import { middleEllipsis, hexToUtf8, getAssetBySymbolAndChain } from '../../../../utils/utils';
 import { walletService } from '../../../../service/WalletService';
 import { walletAllAssetsState } from '../../../../recoil/atom';
+import { useLedgerStatus } from '../../../../hooks/useLedgerStatus';
+import { LEDGER_WALLET_TYPE } from '../../../../service/LedgerService';
+import { ledgerNotification } from '../../../../components/LedgerNotification/LedgerNotification';
 
 const { Content, Footer } = Layout;
 
@@ -52,8 +56,16 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
   const [subMessage, setSubMessage] = useState('');
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(cronosAsset);
   const [isContractAddressReview, setIsContractAddressReview] = useState(false);
-
+  const [isConfirmDisabled, setIsConfirmDisabled] = useState(false);
   const [allAssets, setAllAssets] = useRecoilState(walletAllAssetsState);
+
+  const { isLedgerConnected } = useLedgerStatus({ asset: cronosAsset });
+
+  useEffect(() => {
+    if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE && isLedgerConnected === false) {
+      ledgerNotification(currentSession.wallet, cronosAsset!);
+    }
+  }, [isLedgerConnected, currentSession, cronosAsset]);
 
   const [t] = useTranslation();
 
@@ -67,12 +79,16 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     fetch();
   }, []);
 
-  const eventViewToRender = (_event: DappBrowserIPC.Event) => {
-    if (_event.name === 'signTransaction') {
-      const networkFee = _event
-        ? new BigNumber(_event.object?.gas).times(_event.object?.gasPrice)
-        : 0;
-      const total = _event ? new BigNumber(_event.object?.value ?? '0').plus(networkFee) : 0;
+  const EventView = () => {
+    setIsConfirmDisabled(false);
+
+    if (event.name === 'signTransaction') {
+      const networkFee = event ? new BigNumber(event.object?.gas).times(event.object?.gasPrice) : 0;
+      const total = event ? new BigNumber(event.object?.value ?? '0').plus(networkFee) : 0;
+
+      const isDisabled = new BigNumber(cronosAsset?.balance ?? '0').isLessThan(total);
+      setIsConfirmDisabled(isDisabled);
+
       return (
         <>
           <div className="row">
@@ -90,20 +106,20 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
         </>
       );
     }
-    if (_event.name === 'signMessage') {
+    if (event.name === 'signMessage') {
       return (
         <>
           <div className="row">
             <div className="title">{t('dapp.requestConfirmation.message.title')}: </div>
           </div>
-          <pre className="signing-message">{_event.object.data}</pre>
+          <pre className="signing-message">{event.object.data}</pre>
         </>
       );
     }
 
-    if (_event.name === 'signTypedMessage') {
+    if (event.name === 'signTypedMessage') {
       let displayMessage = '';
-      const parsedRaw = JSON.parse(_event.object.raw);
+      const parsedRaw = JSON.parse(event.object.raw);
 
       if (parsedRaw.message) {
         Object.keys(parsedRaw.message).forEach(key => {
@@ -121,22 +137,25 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       );
     }
 
-    if (_event.name === 'signPersonalMessage') {
+    if (event.name === 'signPersonalMessage') {
       return (
         <>
           <div className="row">
             <div className="title">{t('dapp.requestConfirmation.message.title')}: </div>
           </div>
-          <pre className="signing-message">{hexToUtf8(_event.object.data)}</pre>
+          <pre className="signing-message">{hexToUtf8(event.object.data)}</pre>
         </>
       );
     }
 
-    if (_event.name === 'tokenApproval') {
-      const fee = new BigNumber(_event.object.gas).times(_event.object.gasPrice).toString();
+    if (event.name === 'tokenApproval') {
+      const fee = new BigNumber(event.object.gas).times(event.object.gasPrice).toString();
       const networkFee = fee;
       const total = fee;
-      const { contractAddress } = _event.object.tokenData;
+      const { contractAddress } = event.object.tokenData;
+
+      const isDisabled = new BigNumber(cronosAsset?.balance ?? '0').isLessThan(total);
+      setIsConfirmDisabled(isDisabled);
 
       return (
         <>
@@ -197,14 +216,14 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       setSubMessage(`≈${totalValue}`);
     }
     if (event.name === 'requestAccounts') {
-      setMessage(t('dapp.requetConfirmation.requestAccounts.message'));
+      setMessage(t('dapp.requestConfirmation.requestAccounts.message'));
     } else if (event.name === 'signPersonalMessage') {
-      setMessage(t('dapp.requetConfirmation.signPersonalMessage.message'));
+      setMessage(t('dapp.requestConfirmation.signPersonalMessage.message'));
     } else if (event.name === 'signTypedMessage' || event.name === 'signMessage') {
-      setMessage(t('dapp.requetConfirmation.signMessage.message'));
+      setMessage(t('dapp.requestConfirmation.signMessage.message'));
     } else if (event.name === 'tokenApproval') {
       setMessage(
-        t('dapp.requetConfirmation.tokenApproval.message', {
+        t('dapp.requestConfirmation.tokenApproval.message', {
           name: dapp?.name,
           symbol: event.object.tokenData.symbol,
         }),
@@ -244,14 +263,26 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
               )} ${currentAsset?.symbol}`}</div>
             </div>
           </div>
-          {event && eventViewToRender(event)}
+          {event && <EventView />}
         </Content>
         <Footer>
+          <div style={{ color: '#ff4d4f' }} hidden={!isConfirmDisabled}>
+            <ExclamationCircleOutlined style={{ marginRight: '6px' }} />
+            <span>{t('dapp.requestConfirmation.error.insufficientBalance')}</span>
+          </div>
           <div className="row">
             <Button type="link" htmlType="button" onClick={onCancel}>
               {t('general.reject')}
             </Button>
-            <Button type="primary" htmlType="submit" onClick={onConfirm}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              onClick={onConfirm}
+              disabled={
+                isConfirmDisabled ||
+                (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE)
+              }
+            >
               {t('general.confirm')}
             </Button>
           </div>

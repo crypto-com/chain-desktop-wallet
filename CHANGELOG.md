@@ -5,6 +5,43 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.6.9] - 2022-02-16
+### Bug fixes
+- Ledger connectivity on Windows
+## [v0.6.8] - 2022-02-11
+### Additions
+- Wrapped ETH NFT support on Crypto.org chain
+- Add NFT attributes display support
+### Bug fixes
+- Missing Ledger sign methods support
+- Fix potential app crash in Wallet Page
+- Align NFT minting metadata
+
+## [v0.6.7] - 2022-01-28
+### Bug fixes
+- Incorrect delegation items
+- Missing address index on Standard Wallets
+- Remove unwanted Ledger notification popup on Standard Wallets
+
+## [v0.6.6] - 2022-01-26
+### Additions
+- Full DApp Browser Support on Cronos
+- Ledger Support in DApp Browser
+- UX flow improvement on Ledger Support
+- Restake rewards button
+- Search function in Validator List
+
+### Bug fixes
+- Add loading spin in Staking table list
+
+## [v0.6.5] - 2022-01-19
+### Bug fixes
+- NFT transaction list sorted by time
+- Bridge transaction list sorted by time
+- Repeated records in NFT transaction list when switching page
+- Incorrect Explorer URL after settings update on Cronos Assets
+- Remove CRC721 token from Assets List
+
 ## [v0.6.4] - 2022-01-13
 ### Additions
 - Tectonic Support

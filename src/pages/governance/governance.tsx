@@ -11,9 +11,9 @@ import {
   ArrowLeftOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
-import { sessionState, walletAssetState } from '../../recoil/atom';
+import { ledgerIsExpertModeState, sessionState, walletAssetState } from '../../recoil/atom';
 
 import { getUIVoteAmount } from '../../utils/NumberUtils';
 import {
@@ -28,9 +28,11 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
+import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import { useLedgerStatus } from '../../hooks/useLedgerStatus';
+import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -73,6 +75,7 @@ const GovernancePage = () => {
       rate: '',
     },
   };
+  const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [proposalFigures, setProposalFigures] = useState(initialFiguresStates);
   const [proposalList, setProposalList] = useState<ProposalModel[]>();
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
@@ -80,6 +83,8 @@ const GovernancePage = () => {
   const userAsset = useRecoilValue(walletAssetState);
   const didMountRef = useRef(false);
   const [isLoadingTally, setIsLoadingTally] = useState(false);
+
+  const { isLedgerConnected } = useLedgerStatus({ asset: userAsset });
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -105,6 +110,9 @@ const GovernancePage = () => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+        ledgerNotification(currentSession.wallet, userAsset!);
+      }
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
@@ -233,7 +241,10 @@ const GovernancePage = () => {
       setInputPasswordVisible(false);
       setIsSuccessModalVisible(true);
     } catch (e) {
-      setErrorMessages(e.message.split(': '));
+      if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
+      }
+      setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       // setInputPasswordVisible(false);
@@ -748,7 +759,13 @@ const GovernancePage = () => {
         handleCancel={handleCancelConfirmationModal}
         handleOk={() => {}}
         footer={[
-          <Button key="submit" type="primary" loading={confirmLoading} onClick={onConfirm}>
+          <Button
+            key="submit"
+            type="primary"
+            loading={confirmLoading}
+            disabled={!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE}
+            onClick={onConfirm}
+          >
             {t('general.confirm')}
           </Button>,
           <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
@@ -815,6 +832,7 @@ const GovernancePage = () => {
               .map((err, idx) => (
                 <div key={idx}>- {err}</div>
               ))}
+            {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
           </div>
         </>
       </ErrorModalPopup>

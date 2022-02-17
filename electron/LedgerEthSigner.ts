@@ -1,11 +1,15 @@
+/* eslint-disable prefer-template */
 import TransportHID from '@ledgerhq/hw-transport-node-hid';
 import Eth from '@ledgerhq/hw-app-eth';
 import { ethers } from 'ethers';
 import Web3 from 'web3';
+import { TypedDataUtils } from 'eth-sig-util';
 
 export class LedgerEthSigner {
-  public app: any;
+  public app: Eth | undefined;
+
   public transport: TransportHID | null;
+
   constructor() {
     this.transport = null;
   }
@@ -22,7 +26,7 @@ export class LedgerEthSigner {
     if (this.transport != null) {
       this.transport.close();
       this.transport = null;
-      this.app = null;
+      this.app = undefined;
     }
   }
 
@@ -30,7 +34,7 @@ export class LedgerEthSigner {
     try {
       const path: string = `44'/60'/0'/0/${index}`;
       await this.createTransport();
-      const retAddress = await this.app.getAddress(path, display, false);
+      const retAddress = await this.app!.getAddress(path, display, false);
       return retAddress.address;
     } finally {
       await this.closeTransport();
@@ -81,7 +85,7 @@ export class LedgerEthSigner {
     };
 
     const unsignedTx = ethers.utils.serializeTransaction(baseTx).substring(2);
-    const sig = await this.app.signTransaction(path, unsignedTx);
+    const sig = await this.app!.signTransaction(path, unsignedTx);
     // to prevent possible padding issue
     const sigR = LedgerEthSigner.padZeroString(sig.r, 32);
     const sigS = LedgerEthSigner.padZeroString(sig.s, 32);
@@ -138,7 +142,7 @@ export class LedgerEthSigner {
       await this.createTransport();
       const path: string = `44'/60'/0'/0/${index}`;
       const web3 = new Web3(url);
-      const from_addr = (await this.app.getAddress(path)).address;
+      const from_addr = (await this.app!.getAddress(path)).address;
       const nonce = await web3.eth.getTransactionCount(from_addr);
       const signedTx = await this.doSignTx(
         path,
@@ -153,6 +157,50 @@ export class LedgerEthSigner {
       const txHash = (await web3.eth.sendSignedTransaction(signedTx)).transactionHash;
 
       return txHash;
+    } finally {
+      await this.closeTransport();
+    }
+  }
+
+  async signPersonalMessage(msg: string, index = 0) {
+    try {
+      await this.createTransport();
+      const path: string = `44'/60'/0'/0/${index}`;
+      const sig = await this.app!.signPersonalMessage(path, Buffer.from(msg).toString('hex'));
+      return LedgerEthSigner.getHexlifySignature(sig);
+    } finally {
+      await this.closeTransport();
+    }
+  }
+
+  static getHexlifySignature(sig: { v: number; r: string; s: string }) {
+    const v = sig.v - 27;
+    let vStr = v.toString(16);
+    if (vStr.length < 2) {
+      vStr = '0' + v;
+    }
+
+    return '0x' + sig.r + sig.s + vStr;
+  }
+
+  async signTypedDataV4(typedData: any, index = 0) {
+    try {
+      await this.createTransport();
+      const path: string = `44'/60'/0'/0/${index}`;
+
+      const data = JSON.parse(typedData);
+
+      const domainSeparator = TypedDataUtils.hashStruct('EIP712Domain', data.domain, data.types);
+
+      const hashedMessage = TypedDataUtils.hashStruct(data.primaryType, data.message, data.types);
+
+      const sig = await this.app!.signEIP712HashedMessage(
+        path,
+        ethers.utils.hexlify(domainSeparator),
+        ethers.utils.hexlify(hashedMessage),
+      );
+
+      return LedgerEthSigner.getHexlifySignature(sig);
     } finally {
       await this.closeTransport();
     }

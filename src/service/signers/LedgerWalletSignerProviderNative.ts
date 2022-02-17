@@ -60,4 +60,14 @@ export class LedgerWalletSignerProviderNative implements ISignerProvider {
     const address = await this.ipcRender.getEthAddress(index, display);
     return address;
   }
+
+  public async signTypedDataV4(index: number, typedData: string): Promise<string> {
+    const signature = await this.ipcRender.signTypedDataV4(index, typedData);
+    return signature;
+  }
+
+  public async signPersonalMessage(index: number, message: string): Promise<string> {
+    const signature = await this.ipcRender.signPersonalMessage(index, message);
+    return signature;
+  }
 }

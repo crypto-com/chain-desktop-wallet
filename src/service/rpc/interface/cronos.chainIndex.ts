@@ -59,3 +59,8 @@ export interface ICronosChainIndexAPI {
   // - Internal Transactions
   // - Multi-balance by Address
 }
+
+export enum SupportedCRCTokenStandard {
+  CRC_20_TOKEN = 'ERC-20',
+  CRC_721_TOKEN = 'ERC-721',
+}

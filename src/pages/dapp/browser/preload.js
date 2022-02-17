@@ -547,7 +547,9 @@ window.desktopWallet = {
   },
 };
 
-localStorage.setItem('connectorIdv2', 'Metamask');
+try {
+  localStorage.setItem('connectorIdv2', 'Metamask');
+} catch (_) {}
 
 const providerConfig = {
   chainId: 25,

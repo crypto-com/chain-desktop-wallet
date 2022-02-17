@@ -31,6 +31,7 @@ import { useRecoilValue, useRecoilState, useSetRecoilState } from 'recoil';
 import ReactPlayer from 'react-player';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import axios from 'axios';
+import { Promise } from 'bluebird';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -40,25 +41,7 @@ import {
   walletAssetState,
   ledgerIsExpertModeState,
 } from '../../recoil/atom';
-import {
-  ellipsis,
-  middleEllipsis,
-  isJson,
-  convertIpfsToHttp,
-  sleep,
-  useWindowSize,
-} from '../../utils/utils';
-import { getUINormalScaleAmount } from '../../utils/NumberUtils';
-import {
-  NftModel,
-  NftProcessedModel,
-  TransactionStatus,
-  NftAccountTransactionData,
-  NftTransactionType,
-  BroadCastResult,
-} from '../../models/Transaction';
-import { renderExplorerUrl } from '../../models/Explorer';
-import { TransactionUtils } from '../../utils/TransactionUtils';
+
 import {
   IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT,
   FIXED_DEFAULT_FEE,
@@ -68,8 +51,27 @@ import {
   MAX_VIDEO_SIZE,
 } from '../../config/StaticConfig';
 
+import {
+  ellipsis,
+  middleEllipsis,
+  convertIpfsToHttp,
+  sleep,
+  useWindowSize,
+} from '../../utils/utils';
+import { getUINormalScaleAmount } from '../../utils/NumberUtils';
+import { TransactionUtils } from '../../utils/TransactionUtils';
+import { NftUtils } from '../../utils/NftUtils';
+
+import {
+  NftProcessedModel,
+  TransactionStatus,
+  NftAccountTransactionData,
+  NftTransactionType,
+  BroadCastResult,
+} from '../../models/Transaction';
+import { renderExplorerUrl } from '../../models/Explorer';
+
 import { walletService } from '../../service/WalletService';
-import { secretStoreService } from '../../storage/SecretStoreService';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import {
   AnalyticsActions,
@@ -77,6 +79,7 @@ import {
   AnalyticsService,
   AnalyticsTxType,
 } from '../../service/analytics/AnalyticsService';
+import { secretStoreService } from '../../storage/SecretStoreService';
 
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
@@ -87,6 +90,8 @@ import IconTick from '../../svg/IconTick';
 import IconPlayer from '../../svg/IconPlayer';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 import ReceiveDetail from '../assets/components/ReceiveDetail';
+import { useLedgerStatus } from '../../hooks/useLedgerStatus';
+import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -126,13 +131,9 @@ const convertNftTransfers = (allTransfers: NftAccountTransactionData[]) => {
     return NftTransactionType.TRANSFER_NFT;
   };
 
-  return allTransfers.map(transfer => {
+  return allTransfers.map((transfer, idx) => {
     const data: NftTransferTabularData = {
-      key:
-        transfer.transactionHash +
-        transfer.data.recipient +
-        transfer.data.denomId +
-        transfer.data.tokenId,
+      key: `${idx}_${transfer.transactionHash}_${transfer.data.recipient}_${transfer.data.denomId}_${transfer.data.tokenId}`,
       transactionHash: transfer.transactionHash,
       messageType: getType(transfer),
       denomId: transfer.data.denomId,
@@ -210,6 +211,7 @@ const FormMintNft = () => {
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [errorMessages, setErrorMessages] = useState([]);
+  const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -244,11 +246,11 @@ const FormMintNft = () => {
       }
       // Hide the error before uploading anything
       if (isBeforeUpload) {
-        return Promise.reject();
+        return Promise.reject(new Error(' '));
       }
       // Hide the error when uploading or upload video in progress
       if (isUploading || (files.length === 1 && isVideo(fileType))) {
-        return Promise.reject();
+        return Promise.reject(new Error(' '));
       }
       return Promise.reject(new Error(t('nft.fileUploadValidator.error2')));
     },
@@ -281,6 +283,9 @@ const FormMintNft = () => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+        ledgerNotification(currentSession.wallet, walletAsset!);
+      }
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
@@ -357,7 +362,7 @@ const FormMintNft = () => {
     }
     const data = {
       name: formValues.drop,
-      drop: formValues.drop,
+      dropId: formValues.drop,
       description: formValues.description,
       image: imageUrl,
       animation_url: isVideo(fileType) ? videoUrl : undefined,
@@ -709,7 +714,10 @@ const FormMintNft = () => {
               loading={confirmLoading}
               disabled={
                 (isDenomIdIssued && !isDenomIdOwner) ||
-                new Big(multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1)).gt(walletAsset.balance)
+                new Big(multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1)).gt(
+                  walletAsset.balance,
+                ) ||
+                (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE)
               }
             >
               {t('general.confirm')}
@@ -955,6 +963,7 @@ const NftPage = () => {
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [errorMessages, setErrorMessages] = useState([]);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
 
   const didMountRef = useRef(false);
 
@@ -993,24 +1002,6 @@ const NftPage = () => {
 
   const closeErrorModal = () => {
     setIsErrorModalVisible(false);
-  };
-
-  const processNftList = (currentList: NftModel[] | undefined) => {
-    if (currentList) {
-      return currentList.map(item => {
-        const denomSchema = isJson(item.denomSchema)
-          ? JSON.parse(item.denomSchema)
-          : item.denomSchema;
-        const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
-        const nftModel: NftProcessedModel = {
-          ...item,
-          denomSchema,
-          tokenData,
-        };
-        return nftModel;
-      });
-    }
-    return [];
   };
 
   const customAddressValidator = TransactionUtils.addressValidator(
@@ -1079,6 +1070,9 @@ const NftPage = () => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+        ledgerNotification(currentSession.wallet, walletAsset!);
+      }
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
@@ -1124,7 +1118,7 @@ const NftPage = () => {
 
       const latestLoadedNFTs = await walletService.retrieveNFTs(currentSession.wallet.identifier);
       setNftList(latestLoadedNFTs);
-      const processedNFTsLists = processNftList(latestLoadedNFTs);
+      const processedNFTsLists = await NftUtils.processNftList(latestLoadedNFTs);
       setProcessedNftList(processedNFTsLists);
 
       setBroadcastResult(sendResult);
@@ -1158,7 +1152,7 @@ const NftPage = () => {
 
   useEffect(() => {
     const fetchNftList = async () => {
-      const currentNftList = processNftList(nftList);
+      const currentNftList = await NftUtils.processNftList(nftList);
       setProcessedNftList(currentNftList);
     };
     const fetchNftTransfers = async () => {
@@ -1367,6 +1361,19 @@ const NftPage = () => {
     },
   ];
 
+  const NftAttributeTableColumns = [
+    {
+      title: t('nft.detailModal.traitType'),
+      dataIndex: 'traitType',
+      key: 'traitType',
+    },
+    {
+      title: t('nft.detailModal.value'),
+      dataIndex: 'value',
+      key: 'value',
+    },
+  ];
+
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">{t('nft.title')}</Header>
@@ -1515,6 +1522,22 @@ const NftPage = () => {
                           {nft?.tokenData.description ? nft?.tokenData.description : 'n.a.'}
                         </div>
                       </div>
+                      {nft?.tokenData.attributes ? (
+                        <div className="item">
+                          <div className="subtitle">{t('nft.detailModal.attributes')}</div>
+                          <div className="attribute">
+                            <Table
+                              className="nft-attribute-table"
+                              dataSource={nft.tokenData.attributes}
+                              columns={NftAttributeTableColumns}
+                              pagination={false}
+                              size="small"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        ''
+                      )}
                       <div className="item">
                         <div className="table-row">
                           <div>{t('nft.detailModal.label1')}</div>
@@ -1597,6 +1620,10 @@ const NftPage = () => {
                       key="submit"
                       type="primary"
                       onClick={onConfirmTransfer}
+                      disabled={
+                        !isLedgerConnected &&
+                        currentSession.wallet.walletType === LEDGER_WALLET_TYPE
+                      }
                       loading={confirmLoading}
                     >
                       {t('nft.modal2.button1')}

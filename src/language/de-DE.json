@@ -170,6 +170,7 @@
   "wallet.table1.address": "Adresse",
   "wallet.table1.walletType": "Walletsart",
   "wallet.table1.network": "Netzwerk",
+  "wallet.table1.addressIndex": "Addresseindex",
   "home.nft.tab1": "Mein NFT",
   "home.transactions.table1.amount": "Betrag",
   "home.transactions.table1.status": "Zeit",
