@@ -252,7 +252,11 @@ const DappPage = () => {
                 </div>
               </TabPane>
               <TabPane tab="Cronos DApps" key={TabKey.cronosDapps}>
-                <CronosDAppsTab />
+                <CronosDAppsTab
+                  onClickDapp={dapp => {
+                    setSelectedURL(dapp.link);
+                  }}
+                />
               </TabPane>
               <TabPane tab={t('dapp.tab.saved.title')} key={TabKey.saved}>
                 <SavedTab

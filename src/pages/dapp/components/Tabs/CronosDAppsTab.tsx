@@ -25,7 +25,13 @@ const PercentageLabel = (props: { value: number | undefined }) => {
   );
 };
 
-const CronosDAppsTab = () => {
+interface ICronosDappsTabProps {
+  onClickDapp: (dapp: CronosProject) => void;
+}
+
+const CronosDAppsTab = (props: ICronosDappsTabProps) => {
+  const { onClickDapp } = props;
+
   const [selectedCategories, setSelectedCategories] = useState<CategoryType[]>([]);
 
   const [fetchedProtocols, setFetchedProtocols] = useState<Protocol[]>([]);
@@ -68,6 +74,7 @@ const CronosDAppsTab = () => {
             style={{
               display: 'grid',
               gridTemplateColumns: '10% 20% 70%',
+              gap: '16px',
               alignItems: 'center',
             }}
           >
@@ -83,8 +90,6 @@ const CronosDAppsTab = () => {
                 width: '24px',
                 height: '24px',
                 display: 'inline',
-                marginLeft: '16px',
-                marginRight: '16px',
                 borderRadius: '12px',
               }}
               src={`/dapp_logos/${project.logo}`}
@@ -160,18 +165,46 @@ const CronosDAppsTab = () => {
         return aValue - bValue;
       },
     },
+
     {
       title: 'Category',
       key: 'category',
       render: (project: CronosProject) => (
         <div>
           {project.category.map(c => (
-            <Tag color="blue" style={{ borderRadius: '4px', color: '#1199FA' }}>
+            <Tag color="blue" key={c} style={{ borderRadius: '4px', color: '#1199FA' }}>
               {c}
             </Tag>
           ))}
         </div>
       ),
+    },
+    {
+      title: <Tooltip title="Audits are not a guarantee of security.">Audit</Tooltip>,
+      key: 'audit',
+      render: (project: CronosProject) => {
+        const links = protocolsMap.get(project.name.toLowerCase())?.audit_links;
+
+        if (!links || links?.length < 1) {
+          return 'N';
+        }
+
+        const link = links[0];
+
+        return (
+          <Tooltip title={link}>
+            <a
+              target="__blank"
+              href={link}
+              onClick={e => {
+                e.stopPropagation();
+              }}
+            >
+              Y
+            </a>
+          </Tooltip>
+        );
+      },
     },
   ];
 
@@ -187,8 +220,8 @@ const CronosDAppsTab = () => {
           setSelectedCategories([...e]);
         }}
         value={selectedCategories}
-        tagRender={props => {
-          const { label, closable, onClose } = props;
+        tagRender={prop => {
+          const { label, closable, onClose } = prop;
           const onPreventMouseDown = event => {
             event.preventDefault();
             event.stopPropagation();
@@ -208,6 +241,7 @@ const CronosDAppsTab = () => {
         options={categories.map(c => {
           return {
             label: `${c} (${categoriesNumbersMap.get(c)})`,
+            key: c,
             value: c,
           };
         })}
@@ -220,7 +254,15 @@ const CronosDAppsTab = () => {
                 return project.category.some(c => selectedCategories.includes(c));
               })
         }
+        rowKey="id"
         columns={columns}
+        onRow={(record: CronosProject) => {
+          return {
+            onClick: () => {
+              onClickDapp(record);
+            },
+          };
+        }}
       />
     </Card>
   );

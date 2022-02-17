@@ -17,7 +17,6 @@ export interface Protocol {
   chains: string[];
   module: string;
   twitter?: string;
-  audit_links: any;
   oracles?: string[];
   language?: string;
   slug: string;
@@ -33,11 +32,11 @@ export interface Protocol {
   forkedFrom: any;
   listedAt?: number;
   audit?: string;
-  audits_link?: string[];
+  audit_links?: string[];
 }
 
 const Config = {
-  host: 'https://api.llama.fi/',
+  host: 'https://api.llama.fi',
 };
 
 export function fetchProtocols(): Promise<Protocol[]> {
