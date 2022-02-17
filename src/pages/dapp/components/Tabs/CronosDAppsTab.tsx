@@ -2,6 +2,7 @@ import { Card, Select, Table, Tag, Tooltip } from 'antd';
 import { SortOrder } from 'antd/lib/table/interface';
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { fetchProtocols, Protocol } from '../../../../service/defiLlama';
 import { convertToInternationalCurrencySystem } from '../../../../utils/currency';
 import { categories, projects, CronosProject, CategoryType } from '../../assets/projects';
@@ -36,6 +37,8 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
 
   const [fetchedProtocols, setFetchedProtocols] = useState<Protocol[]>([]);
 
+  const [t] = useTranslation();
+
   useEffect(() => {
     fetchProtocols()
       .then(protocols => {
@@ -66,7 +69,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
 
   const columns = [
     {
-      title: 'Name',
+      title: t('dapp.cronosDApps.table.title.name'),
       key: 'name',
       render: (project: CronosProject, _, index) => {
         return (
@@ -107,7 +110,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       },
     },
     {
-      title: 'TVL (Total Value Locked)',
+      title: t('dapp.cronosDApps.table.title.tvl'),
       key: 'tvl',
       sortDirections: ['descend', 'ascend'] as SortOrder[],
       render: (project: CronosProject) => {
@@ -127,7 +130,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       },
     },
     {
-      title: '1D Change',
+      title: t('dapp.cronosDApps.table.title.1d'),
       key: '1d_change',
       render: (project: CronosProject) => {
         const change = protocolsMap.get(project.name.toLowerCase())?.change_1d;
@@ -147,7 +150,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       },
     },
     {
-      title: '7D Change',
+      title: t('dapp.cronosDApps.table.title.7d'),
       key: '7d_change',
       render: (project: CronosProject) => {
         const change = protocolsMap.get(project.name.toLowerCase())?.change_7d;
@@ -167,7 +170,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
     },
 
     {
-      title: 'Category',
+      title: t('dapp.cronosDApps.table.title.category'),
       key: 'category',
       render: (project: CronosProject) => (
         <div>
@@ -180,13 +183,17 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       ),
     },
     {
-      title: <Tooltip title="Audits are not a guarantee of security.">Audit</Tooltip>,
+      title: (
+        <Tooltip title={t('dapp.cronosDApps.table.title.audit.tooltip')}>
+          {t('dapp.cronosDApps.table.title.audit')}
+        </Tooltip>
+      ),
       key: 'audit',
       render: (project: CronosProject) => {
         const links = protocolsMap.get(project.name.toLowerCase())?.audit_links;
 
         if (!links || links?.length < 1) {
-          return 'N';
+          return t('dapp.cronosDApps.table.title.audit.no');
         }
 
         const link = links[0];
@@ -200,7 +207,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
                 e.stopPropagation();
               }}
             >
-              Y
+              {t('dapp.cronosDApps.table.title.audit.yes')}
             </a>
           </Tooltip>
         );
@@ -215,7 +222,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
         showSearch={false}
         style={{ minWidth: '180px' }}
         showArrow
-        placeholder="Select Categories"
+        placeholder={t('dapp.cronosDApps.table.title.category.select')}
         onChange={e => {
           setSelectedCategories([...e]);
         }}
