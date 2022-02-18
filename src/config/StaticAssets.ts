@@ -25,7 +25,7 @@ export const TestNetEvmConfig: UserAssetConfig = {
   indexingUrl: 'https://cronos.org/explorer/testnet3/api',
   isLedgerSupportDisabled: false,
   isStakingDisabled: false,
-  nodeUrl: 'https://evm-t3.cronos.org:8545/',
+  nodeUrl: 'https://evm-t3.cronos.org/',
   memoSupportDisabled: true,
 };
 
