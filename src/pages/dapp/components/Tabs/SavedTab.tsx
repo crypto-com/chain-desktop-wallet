@@ -60,30 +60,33 @@ const SavedTab = (props: ISavedTabProps) => {
                 cursor: 'pointer',
                 display: 'flex',
                 flexDirection: 'row',
-                padding: '16px',
+                padding: '26px 16px',
                 alignItems: 'center',
+                height: '100%',
               }}
             >
-              <img
-                src={bookmark.faviconURL}
-                style={{
-                  borderRadius: '16px',
-                  minWidth: '32px',
-                  height: '32px',
-                  marginRight: '20px',
-                }}
-                alt="favicon"
-              />
               <div
                 style={{
-                  minWidth: '10px',
-                  whiteSpace: 'nowrap',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '100%',
                 }}
               >
+                <img
+                  src={bookmark.faviconURL}
+                  style={{
+                    borderRadius: '24px',
+                    width: '48px',
+                    height: '48px',
+                  }}
+                  alt="favicon"
+                />
                 <div
                   style={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
+                    wordBreak: 'break-all',
+                    marginTop: '16px',
                     fontWeight: 600,
                     fontSize: '16px',
                   }}
@@ -96,6 +99,8 @@ const SavedTab = (props: ISavedTabProps) => {
                     textOverflow: 'ellipsis',
                     fontSize: '12px',
                     color: '#1199FA',
+                    justifySelf: 'flex-end',
+                    marginTop: 'auto',
                   }}
                 >
                   {bookmark.url}
@@ -105,6 +110,9 @@ const SavedTab = (props: ISavedTabProps) => {
                 style={{
                   marginLeft: 'auto',
                   cursor: 'pointer',
+                  width: '40px',
+                  flexWrap: 'nowrap',
+                  alignSelf: 'flex-start',
                 }}
                 onClick={e => {
                   e.stopPropagation();

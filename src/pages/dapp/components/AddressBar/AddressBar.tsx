@@ -1,6 +1,7 @@
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
+  CloseOutlined,
   LoadingOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
@@ -21,6 +22,8 @@ interface IButtonStates {
 
   isBookmarkButtonDisabled: boolean;
   isBookmarkButtonHighlighted: boolean;
+
+  isExitButtonDisabled: boolean;
 }
 
 interface IAddressBarProps {
@@ -30,6 +33,7 @@ interface IAddressBarProps {
     onForwardButtonClick: () => void;
     onRefreshButtonClick: () => void;
     onBookmarkButtonClick: () => void;
+    onExitButtonClick: () => void;
   };
   value: string;
   onInputChange: (value: string) => void;
@@ -94,6 +98,12 @@ const AddressBar = (props: IAddressBarProps) => {
         }
         disabled={buttonStates.isBookmarkButtonDisabled}
         onClick={buttonCallbacks.onBookmarkButtonClick}
+      />
+      <Button
+        type="link"
+        icon={<CloseOutlined />}
+        disabled={buttonStates.isExitButtonDisabled}
+        onClick={buttonCallbacks.onExitButtonClick}
       />
     </div>
   );
