@@ -1,30 +1,13 @@
+import React, { useEffect, useMemo, useState } from 'react';
 import { Card, Select, Table, Tag, Tooltip } from 'antd';
 import { SortOrder } from 'antd/lib/table/interface';
-import * as React from 'react';
-import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchProtocols, Protocol } from '../../../../service/defiLlama';
+import IconTick from '../../../../svg/IconTick';
 import { convertToInternationalCurrencySystem } from '../../../../utils/currency';
 import { categories, projects, CronosProject, CategoryType } from '../../assets/projects';
-
-const PercentageLabel = (props: { value: number | undefined }) => {
-  const { value } = props;
-
-  if (!value) {
-    return <span>-</span>;
-  }
-
-  const color = value < 0 ? '#D9475A' : '#20BCA4';
-
-  const signedText = value < 0 ? '-' : '+';
-
-  return (
-    <span style={{ color }}>
-      {signedText}
-      {Math.abs(value).toFixed(2)}%
-    </span>
-  );
-};
+import { PercentageLabel } from '../PercentageLabel';
+import './style.less';
 
 interface ICronosDappsTabProps {
   onClickDapp: (dapp: CronosProject) => void;
@@ -193,7 +176,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
         const links = protocolsMap.get(project.name.toLowerCase())?.audit_links;
 
         if (!links || links?.length < 1) {
-          return t('dapp.cronosDApps.table.title.audit.no');
+          return '-';
         }
 
         const link = links[0];
@@ -207,7 +190,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
                 e.stopPropagation();
               }}
             >
-              {t('dapp.cronosDApps.table.title.audit.yes')}
+              <IconTick />
             </a>
           </Tooltip>
         );
@@ -262,6 +245,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
               })
         }
         rowKey="id"
+        rowClassName="dapps-table-row"
         columns={columns}
         onRow={(record: CronosProject) => {
           return {
