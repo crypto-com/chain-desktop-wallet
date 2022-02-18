@@ -79,7 +79,7 @@
     "zxcvbn": "4.4.2"
   },
   "scripts": {
-    "run-audit": "yarn audit-ci --high -a 1002475 1002627 1002477 1002522 1002590 1005059",
+    "run-audit": "yarn audit-ci --high -a 1005059",
     "start": "node scripts/start.js",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 && yarn clean-builds && node scripts/build.js",
     "test": "node scripts/test.js --watchAll=false",
