@@ -442,16 +442,17 @@ function HomeLayout(props: HomeLayoutProps) {
 
     const assets = await walletService.retrieveWalletAssets(walletSession.wallet.identifier);
     const cronosAsset = getCronosEvmAsset(assets);
+    const checkDefaultExplorerUrl = checkIfTestnet(walletSession.wallet.config.network)
+      ? TestNetEvmConfig.explorerUrl
+      : MainNetEvmConfig.explorerUrl;
 
     setTimeout(async () => {
       if (
         !walletSession.activeAsset?.config?.explorer ||
-        // Check if explorerUrl has been updated to cronos.org.
-        cronosAsset?.config?.explorerUrl.indexOf('cronos.org') === -1
+        // Check if explorerUrl has been updated with latest default
+        cronosAsset?.config?.explorerUrl !== checkDefaultExplorerUrl
       ) {
         const updateExplorerUrlNotificationKey = 'updateExplorerUrlNotificationKey';
-
-        const isTestnet = checkIfTestnet(walletSession.wallet.config.network);
 
         // Update to Default Bridge Configs
         const bridgeService = new BridgeService(walletService.storageService);
@@ -463,6 +464,8 @@ function HomeLayout(props: HomeLayoutProps) {
         // Update All Assets in All Wallets
         const allWallets = await walletService.retrieveAllWallets();
         allWallets.forEach(async wallet => {
+          const isTestnet = checkIfTestnet(wallet.config.network);
+
           const settingsDataUpdate: SettingsDataUpdate = {
             walletId: wallet.identifier,
             chainId: wallet.config.network.chainId,
@@ -504,12 +507,11 @@ function HomeLayout(props: HomeLayoutProps) {
                 explorer: {
                   baseUrl: `${explorerUrl}`,
                   tx: `${explorerUrl}/tx`,
-                  address: `${explorerUrl}/${
-                    asset.assetType === UserAssetType.TENDERMINT ||
-                    asset.assetType === UserAssetType.IBC
+                  address: `${explorerUrl}/${asset.assetType === UserAssetType.TENDERMINT ||
+                      asset.assetType === UserAssetType.IBC
                       ? 'account'
                       : 'address'
-                  }`,
+                    }`,
                   validator: `${explorerUrl}/validator`,
                 },
                 explorerUrl,
@@ -1041,11 +1043,10 @@ function HomeLayout(props: HomeLayoutProps) {
                 <div className="item">
                   <Alert
                     type="warning"
-                    message={`${t('navbar.wallet.modal.warning1')} ${
-                      session.wallet.walletType !== LEDGER_WALLET_TYPE
+                    message={`${t('navbar.wallet.modal.warning1')} ${session.wallet.walletType !== LEDGER_WALLET_TYPE
                         ? t('navbar.wallet.modal.warning2')
                         : ''
-                    }`}
+                      }`}
                     showIcon
                   />
                 </div>
@@ -1129,7 +1130,7 @@ function HomeLayout(props: HomeLayoutProps) {
             setIsAnnouncementVisible(false);
             generalConfigService.setHasShownAnalyticsPopup(true);
           }}
-          handleOk={() => {}}
+          handleOk={() => { }}
           footer={[]}
         >
           <>
@@ -1210,7 +1211,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   setIsLedgerModalButtonLoading(true);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>
@@ -1258,7 +1259,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   setIsLedgerModalButtonLoading(true);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>
