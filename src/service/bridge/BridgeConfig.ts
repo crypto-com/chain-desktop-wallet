@@ -23,8 +23,7 @@ export enum BridgeTransferDirection {
   NOT_SUPPORT = 'NOT_SUPPORT',
 }
 
-const DefaultTestnetBridgeIndexingUrl =
-  'https://cronos.crypto.org/testnet3/indexing/api/v1/bridges';
+const DefaultTestnetBridgeIndexingUrl = 'https://cronos.org/testnet3/indexing/api/v1/bridges';
 export const DefaultTestnetBridgeConfigs: {
   CRYPTO_ORG_TO_CRONOS: BridgeConfig;
   CRONOS_TO_CRYPTO_ORG: BridgeConfig;
@@ -52,7 +51,7 @@ export const DefaultTestnetBridgeConfigs: {
   },
 };
 
-const DefaultBridgeIndexingUrl = 'https://cronos.crypto.org/indexing/api/v1/bridges';
+const DefaultBridgeIndexingUrl = 'https://cronos.org/indexing/api/v1/bridges';
 export const DefaultMainnetBridgeConfigs = {
   CRONOS_TO_CRYPTO_ORG: {
     bridgeDirectionType: BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG,

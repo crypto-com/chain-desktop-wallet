@@ -1,14 +1,14 @@
 import { useMemo } from 'react';
 import { useRecoilValue } from 'recoil';
 import { walletAllAssetsState } from '../recoil/atom';
-import { getCronosAsset } from '../utils/utils';
+import { getCronosEvmAsset } from '../utils/utils';
 
-export const useCronosAsset = () => {
+export const useCronosEvmAsset = () => {
   const allAssets = useRecoilValue(walletAllAssetsState);
 
-  const cronosAsset = useMemo(() => {
-    return getCronosAsset(allAssets);
+  const cronosEvmAsset = useMemo(() => {
+    return getCronosEvmAsset(allAssets);
   }, [allAssets]);
 
-  return cronosAsset;
+  return cronosEvmAsset;
 };

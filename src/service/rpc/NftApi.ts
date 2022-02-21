@@ -51,7 +51,9 @@ export class NftApi implements INftApi {
    * Fetch wrapped NFT metadata by a unique `identifier`
    * @param {string} denomId This is the unique identifier for the wrapped external NFT.
    */
-  public async getExternalNftMetadataByIdentifier(denomId: string): Promise<ExternalNftMetadataResponse | []> {
+  public async getExternalNftMetadataByIdentifier(
+    denomId: string,
+  ): Promise<ExternalNftMetadataResponse | []> {
     try {
       const result = await this.axiosClient.post<ExternalNftMetadataResponse>('', {
         operationName: 'TranslatedNft',
@@ -85,10 +87,12 @@ export class NftApi implements INftApi {
       return result.data;
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error(`[getExternalNftMetadataByIdentifier] Querying external nft metadata failed.`, error)
+      console.error(
+        `[getExternalNftMetadataByIdentifier] Querying external nft metadata failed.`,
+        error,
+      );
       return [];
     }
-
   }
 }
 

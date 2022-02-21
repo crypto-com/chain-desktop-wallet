@@ -374,7 +374,11 @@ const GovernancePage = () => {
                     </div>
                   </div>
 
-                  <div className="description">{proposal?.content.description}</div>
+                  <div className="description">
+                    {proposal?.content.description.split('\\n').map((p, i) => (
+                      <p key={i}>{p}</p>
+                    ))}
+                  </div>
                   <div className="item">
                     {proposal?.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD ? (
                       <Card
