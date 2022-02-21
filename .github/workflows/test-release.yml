@@ -89,6 +89,11 @@ jobs:
           mac_certs: ${{ secrets.mac_certs }}
           mac_certs_password: ${{ secrets.mac_certs_password }}
 
+        env:
+          # macOS notarization API key
+          API_KEY_ID: ${{ secrets.mac_api_key_id }}
+          API_KEY_ISSUER_ID: ${{ secrets.mac_api_key_issuer_id }}
+          
       - name: Build Electron app (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
