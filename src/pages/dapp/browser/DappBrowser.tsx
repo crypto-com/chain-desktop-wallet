@@ -7,7 +7,7 @@ import Web3 from 'web3';
 import { setTimeout } from 'timers';
 import { useIPCProvider } from './useIPCProvider';
 import { allMarketState, sessionState, walletAllAssetsState } from '../../../recoil/atom';
-import { addHTTPsPrefixIfNeeded, getCronosAsset } from '../../../utils/utils';
+import { addHTTPsPrefixIfNeeded, getCronosEvmAsset } from '../../../utils/utils';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
 import RequestConfirmation from '../components/RequestConfirmation/RequestConfirmation';
 import { UserAsset } from '../../../models/UserAsset';
@@ -54,7 +54,9 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   const [t] = useTranslation();
   const [allAssets, setAllAssets] = useRecoilState(walletAllAssetsState);
   const allMarketData = useRecoilValue(allMarketState);
-  const [cronosAsset, setCronosAsset] = useState<UserAsset | undefined>(getCronosAsset(allAssets));
+  const [cronosAsset, setCronosAsset] = useState<UserAsset | undefined>(
+    getCronosEvmAsset(allAssets),
+  );
   const [txFailedMessage, setTxFailedMessage] = useState('');
 
   const {
@@ -179,7 +181,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     ) => {
       setTxEvent(event);
       // prompt for password
-      if (!decryptedPhrase) {
+      if (!decryptedPhrase && !isLedgerWallet) {
         setInputPasswordVisible(true);
       } else {
         setRequestConfirmationVisible(true);
@@ -196,7 +198,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     ) => {
       setTxEvent(event);
       // prompt for password
-      if (!decryptedPhrase) {
+      if (!decryptedPhrase && !isLedgerWallet) {
         setInputPasswordVisible(true);
       } else {
         setRequestConfirmationVisible(true);
@@ -213,7 +215,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     ) => {
       setTxEvent(event);
       // prompt for password
-      if (!decryptedPhrase) {
+      if (!decryptedPhrase && !isLedgerWallet) {
         setInputPasswordVisible(true);
       } else {
         setRequestConfirmationVisible(true);
@@ -234,7 +236,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
       await walletService.syncBalancesData(sessionData);
       const assets = await walletService.retrieveCurrentWalletAssets(sessionData);
       setAllAssets(assets);
-      setCronosAsset(getCronosAsset(assets));
+      setCronosAsset(getCronosEvmAsset(assets));
     }, 7000);
   });
 

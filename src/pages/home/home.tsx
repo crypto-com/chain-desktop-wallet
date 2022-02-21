@@ -20,7 +20,8 @@ import {
 } from '../../recoil/atom';
 import { NOT_KNOWN_YET_VALUE, SUPPORTED_CURRENCY, WalletConfig } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
-import { middleEllipsis, isJson, ellipsis, getChainName } from '../../utils/utils';
+import { NftUtils } from '../../utils/NftUtils';
+import { middleEllipsis, ellipsis, getChainName } from '../../utils/utils';
 import {
   scaledAmount,
   scaledStakingBalance,
@@ -229,24 +230,6 @@ const HomePage = () => {
     }, 200);
   };
 
-  const processNftList = (currentList: NftModel[] | undefined) => {
-    if (currentList) {
-      return currentList.slice(0, maxNftPreview).map(item => {
-        const denomSchema = isJson(item.denomSchema)
-          ? JSON.parse(item.denomSchema)
-          : item.denomSchema;
-        const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
-        const nftModel: NftProcessedModel = {
-          ...item,
-          denomSchema,
-          tokenData,
-        };
-        return nftModel;
-      });
-    }
-    return [];
-  };
-
   const onSyncAndRefreshBtnCall = async () => {
     setFetchingDB(true);
 
@@ -336,7 +319,7 @@ const HomePage = () => {
         currentSession.wallet.identifier,
       );
 
-      const currentNftList = processNftList(allNFTs);
+      const currentNftList = await NftUtils.processNftList(allNFTs, maxNftPreview);
       setProcessedNftList(currentNftList);
       setNFTList(allNFTs);
       setDefaultWalletAsset(currentAsset);

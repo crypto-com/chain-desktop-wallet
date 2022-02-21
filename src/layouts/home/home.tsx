@@ -42,7 +42,7 @@ import {
   pageLockState,
   NavbarMenuKey,
 } from '../../recoil/atom';
-import { ellipsis, checkIfTestnet } from '../../utils/utils';
+import { ellipsis, checkIfTestnet, getCronosEvmAsset } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 // import IconSend from '../../svg/IconSend';
@@ -79,9 +79,15 @@ import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
 import IconLedger from '../../svg/IconLedger';
 import { ISignerProvider } from '../../service/signers/SignerProvider';
-import { UserAsset } from '../../models/UserAsset';
+import { UserAsset, UserAssetType } from '../../models/UserAsset';
 import IconCro from '../../svg/IconCro';
 import IconEth from '../../svg/IconEth';
+import { BridgeService } from '../../service/bridge/BridgeService';
+import {
+  DefaultMainnetBridgeConfigs,
+  DefaultTestnetBridgeConfigs,
+} from '../../service/bridge/BridgeConfig';
+import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
 // import i18n from '../../language/I18n';
 
 interface HomeLayoutProps {
@@ -429,18 +435,37 @@ function HomeLayout(props: HomeLayoutProps) {
     }, 1000);
   };
 
-  const checkCorrectExplorerUrl = (walletSession?: Session) => {
+  const checkCorrectExplorerUrl = async (walletSession?: Session) => {
     if (!walletSession || !walletSession.wallet) {
       return;
     }
 
+    const assets = await walletService.retrieveWalletAssets(walletSession.wallet.identifier);
+    const cronosAsset = getCronosEvmAsset(assets);
+    const checkDefaultExplorerUrl = checkIfTestnet(walletSession.wallet.config.network)
+      ? TestNetEvmConfig.explorerUrl
+      : MainNetEvmConfig.explorerUrl;
+
     setTimeout(async () => {
-      if (!walletSession.activeAsset?.config?.explorer) {
+      if (
+        !walletSession.activeAsset?.config?.explorer ||
+        // Check if explorerUrl has been updated with latest default
+        cronosAsset?.config?.explorerUrl !== checkDefaultExplorerUrl
+      ) {
         const updateExplorerUrlNotificationKey = 'updateExplorerUrlNotificationKey';
+
+        // Update to Default Bridge Configs
+        const bridgeService = new BridgeService(walletService.storageService);
+        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
 
         // Update All Assets in All Wallets
         const allWallets = await walletService.retrieveAllWallets();
         allWallets.forEach(async wallet => {
+          const isTestnet = checkIfTestnet(wallet.config.network);
+
           const settingsDataUpdate: SettingsDataUpdate = {
             walletId: wallet.identifier,
             chainId: wallet.config.network.chainId,
@@ -461,19 +486,35 @@ function HomeLayout(props: HomeLayoutProps) {
           // Save updated active asset settings.
           const allAssets = await walletService.retrieveWalletAssets(wallet.identifier);
           allAssets.forEach(async asset => {
+            let nodeUrl = `${asset.config?.nodeUrl ?? wallet.config.nodeUrl}`;
+            let indexingUrl = `${asset.config?.indexingUrl ?? wallet.config.indexingUrl}`;
+            let explorerUrl = `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}`;
+            if (
+              asset.assetType === UserAssetType.EVM ||
+              asset.assetType === UserAssetType.CRC_20_TOKEN
+            ) {
+              nodeUrl = isTestnet ? TestNetEvmConfig.nodeUrl : MainNetEvmConfig.nodeUrl;
+              indexingUrl = isTestnet ? TestNetEvmConfig.indexingUrl : MainNetEvmConfig.indexingUrl;
+              explorerUrl = isTestnet ? TestNetEvmConfig.explorerUrl : MainNetEvmConfig.explorerUrl;
+            }
             const newlyUpdatedAsset: UserAsset = {
               ...asset,
+              description: asset.description.replace('Crypto.org Coin', 'Cronos'),
               config: {
                 ...asset.config!,
-                nodeUrl: asset.config?.nodeUrl ?? wallet.config.nodeUrl,
-                indexingUrl: asset.config?.indexingUrl ?? wallet.config.indexingUrl,
+                nodeUrl,
+                indexingUrl,
                 explorer: {
-                  baseUrl: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}`,
-                  tx: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}/tx`,
-                  address: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}/account`,
-                  validator: `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}/validator`,
+                  baseUrl: `${explorerUrl}`,
+                  tx: `${explorerUrl}/tx`,
+                  address: `${explorerUrl}/${asset.assetType === UserAssetType.TENDERMINT ||
+                      asset.assetType === UserAssetType.IBC
+                      ? 'account'
+                      : 'address'
+                    }`,
+                  validator: `${explorerUrl}/validator`,
                 },
-                explorerUrl: asset.config?.explorerUrl ?? wallet.config.explorerUrl,
+                explorerUrl,
                 fee: {
                   gasLimit: String(asset.config?.fee.gasLimit ?? wallet.config.fee.gasLimit),
                   networkFee: String(asset.config?.fee.networkFee ?? wallet.config.fee.networkFee),
@@ -1002,11 +1043,10 @@ function HomeLayout(props: HomeLayoutProps) {
                 <div className="item">
                   <Alert
                     type="warning"
-                    message={`${t('navbar.wallet.modal.warning1')} ${
-                      session.wallet.walletType !== LEDGER_WALLET_TYPE
+                    message={`${t('navbar.wallet.modal.warning1')} ${session.wallet.walletType !== LEDGER_WALLET_TYPE
                         ? t('navbar.wallet.modal.warning2')
                         : ''
-                    }`}
+                      }`}
                     showIcon
                   />
                 </div>
@@ -1090,7 +1130,7 @@ function HomeLayout(props: HomeLayoutProps) {
             setIsAnnouncementVisible(false);
             generalConfigService.setHasShownAnalyticsPopup(true);
           }}
-          handleOk={() => {}}
+          handleOk={() => { }}
           footer={[]}
         >
           <>
@@ -1171,7 +1211,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   setIsLedgerModalButtonLoading(true);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>
@@ -1219,7 +1259,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   setIsLedgerModalButtonLoading(true);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>

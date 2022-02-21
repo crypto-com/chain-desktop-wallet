@@ -86,7 +86,6 @@ import {
 import { isValidatorAddressSuspicious, ModerationConfig } from '../../models/ModerationConfig';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
-import { useDefaultWalletAsset } from '../../hooks/useDefaultWalletAsset';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
@@ -627,8 +626,7 @@ const FormDelegationOperations = props => {
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [errorMessages, setErrorMessages] = useState([]);
 
-  const { defaultAsset } = useDefaultWalletAsset();
-  const { isLedgerConnected } = useLedgerStatus({ asset: defaultAsset });
+  const { isLedgerConnected } = useLedgerStatus({ asset: userAsset });
 
   const [t] = useTranslation();
 
@@ -683,7 +681,7 @@ const FormDelegationOperations = props => {
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-        ledgerNotification(currentSession.wallet, defaultAsset!);
+        ledgerNotification(currentSession.wallet, userAsset!);
       }
       showConfirmationModal();
     } else {

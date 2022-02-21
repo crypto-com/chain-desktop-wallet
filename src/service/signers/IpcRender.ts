@@ -1,4 +1,5 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
+import { hexToString } from 'web3-utils';
 import { ISignerProvider } from './SignerProvider';
 
 let electron: any;
@@ -126,5 +127,29 @@ export class IpcRender implements ISignerProvider {
       throw new Error(`test fail: ${arg.error}`);
     }
     return arg.address;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async signPersonalMessage(index: number, hexMessage: string): Promise<string> {
+    const message = hexToString(hexMessage);
+    const ret = electron.ipcRenderer.sendSync('ethSignPersonalMessage', {
+      message,
+      index,
+    });
+    if (!ret.success) {
+      throw new Error(`signPersonalMessage failed: ${ret.error}`);
+    }
+
+    return ret.sig;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async signTypedDataV4(index: number, typedData: string): Promise<string> {
+    const ret = electron.ipcRenderer.sendSync('ethSignTypedDataV4', { index, typedData });
+    if (!ret.success) {
+      throw new Error(`signTypedDataV4 failed: ${ret.error}`);
+    }
+
+    return ret.sig;
   }
 }

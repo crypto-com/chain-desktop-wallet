@@ -3,15 +3,17 @@ import { TransactionConfig } from 'web3-eth';
 import { useRecoilValue } from 'recoil';
 import Web3 from 'web3';
 import { ethers } from 'ethers';
-import { signTypedData_v4 } from 'eth-sig-util';
 import { TransactionPrepareService } from '../../../service/TransactionPrepareService';
 import { walletService } from '../../../service/WalletService';
 import { ChainConfig } from './config';
 import { DappBrowserIPC } from '../types';
-import { evmTransactionSigner } from '../../../service/signers/EvmTransactionSigner';
+import {
+  evmTransactionSigner,
+  EvmTransactionSigner,
+} from '../../../service/signers/EvmTransactionSigner';
 import { EVMContractCallUnsigned } from '../../../service/signers/TransactionSupported';
 import { walletAllAssetsState } from '../../../recoil/atom';
-import { getCronosAsset } from '../../../utils/utils';
+import { getCronosEvmAsset } from '../../../utils/utils';
 import { TransactionDataParser } from './TransactionDataParser';
 import { ErrorHandler, WebView } from './types';
 import { useRefCallback } from './useRefCallback';
@@ -67,7 +69,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
 
   const transactionPrepareService = new TransactionPrepareService(walletService.storageService);
   const allAssets = useRecoilValue(walletAllAssetsState);
-  const cronosAsset = getCronosAsset(allAssets);
+  const cronosAsset = getCronosEvmAsset(allAssets);
   const transactionDataParser = useMemo(() => {
     return new TransactionDataParser(ChainConfig.RpcUrl, ChainConfig.ExplorerAPIUrl);
   }, []);
@@ -228,23 +230,24 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   );
 
   const handleSignMessage = useRefCallback(
-    async (eventId: number, data: string, passphrase: string, addPrefix: boolean) => {
-      const wallet = ethers.Wallet.fromMnemonic(passphrase);
-      if (addPrefix) {
-        const result = await wallet.signMessage(ethers.utils.arrayify(data));
-        sendResponse(eventId, result);
-      } else {
-        // deprecated
+    async (eventId: number, data: string, passphrase: string) => {
+      try {
+        const sig = await EvmTransactionSigner.signPersonalMessage(data, passphrase);
+        sendResponse(eventId, sig);
+      } catch (error) {
+        sendError(eventId, (error as any) as string);
       }
     },
   );
 
   const handleSignTypedMessage = useRefCallback(
     async (event: DappBrowserIPC.SignTypedMessageEvent, passphrase: string) => {
-      const wallet = ethers.Wallet.fromMnemonic(passphrase);
-      const bufferedKey = Buffer.from(wallet.privateKey.replace(/^(0x)/, ''), 'hex');
-      const sig = signTypedData_v4(bufferedKey, { data: JSON.parse(event.object.raw) });
-      sendResponse(event.id, sig);
+      try {
+        const sig = await EvmTransactionSigner.signTypedDataV4(event.object.raw, passphrase);
+        sendResponse(event.id, sig);
+      } catch (error) {
+        sendError(event.id, (error as any) as string);
+      }
     },
   );
 
@@ -330,8 +333,9 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'signMessage':
           props.onRequestSignMessage(
             event,
-            passphrase => {
-              handleSignMessage.current(event.id, event.object.data, passphrase, false);
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            _ => {
+              sendError(event.id, 'Not implemented');
             },
             reason => {
               sendError(event.id, reason);
@@ -342,7 +346,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           props.onRequestSignPersonalMessage(
             event,
             passphrase => {
-              handleSignMessage.current(event.id, event.object.data, passphrase, true);
+              handleSignMessage.current(event.id, event.object.data, passphrase);
             },
             reason => {
               sendError(event.id, reason);
