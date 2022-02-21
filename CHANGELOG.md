@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.7.0] - 2022-02-21
+### Additions
+- DApps Ranking
+- Cronos Rebranding
+### Bug fixes
+- UI bug on Redelegate & Undelegate funds
 ## [v0.6.9] - 2022-02-16
 ### Bug fixes
 - Ledger connectivity on Windows
