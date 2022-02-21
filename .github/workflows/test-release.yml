@@ -83,9 +83,6 @@ jobs:
           # (No need to define this secret in the repo settings)
           github_token: ${{ secrets.github_token }}
 
-          # When a push is done to fix/release-deployment, the action builds binaries for all OS and they are then released directly
-          release: ${{ steps.extract_branch.outputs.branch == 'fix/release-deployment' }}
-
           mac_certs: ${{ secrets.mac_certs }}
           mac_certs_password: ${{ secrets.mac_certs_password }}
 
@@ -93,7 +90,7 @@ jobs:
           # macOS notarization API key
           API_KEY_ID: ${{ secrets.mac_api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.mac_api_key_issuer_id }}
-          
+
       - name: Build Electron app (Windows)
         if: startsWith(matrix.os, 'windows')
         run: |
