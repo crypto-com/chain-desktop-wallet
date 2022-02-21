@@ -41,7 +41,7 @@ export class DatabaseManager {
   public readonly bridgeConfigStore: Datastore;
 
   // public readonly bridgeTransactionStore: Datastore;
-  
+
   public readonly commonTransactionStore: Datastore;
 
   public readonly commonAttributeStore: Datastore;
@@ -55,16 +55,16 @@ export class DatabaseManager {
     this.walletStore = getStore(namespace, 'wallets');
     this.assetStore = getStore(namespace, 'assets');
     this.marketPriceStore = getStore(namespace, 'markets-prices');
-    
+
     // @deprecated
     // this.transferStore = getStore(namespace, 'transfers');
-    
+
     // @deprecated
     // this.stakingStore = getStore(namespace, 'staking');
-    
+
     // @deprecated
     // this.rewardStore = getStore(namespace, 'rewards');
-    
+
     this.unbondingDelegationStore = getStore(namespace, 'unbondingDelegations');
     this.credentialStore = getStore(namespace, 'credential');
     this.seedStore = getStore(namespace, 'seeds');
@@ -74,14 +74,14 @@ export class DatabaseManager {
     this.generalConfigStore = getStore(namespace, 'generalConfigStore');
     // @deprecated
     // this.nftTransferHistoryStore = getStore(namespace, 'nftTransferHistoryStore');
-   
+
     // @deprecated
     // this.nftAccountTxStore = getStore(namespace, 'nftAccountTxStore');
     this.bridgeConfigStore = getStore(namespace, 'bridgeConfigStore');
-   
+
     // @deprecated
     // this.bridgeTransactionStore = getStore(namespace, 'bridgeTransactionStore');
-    
+
     this.commonTransactionStore = getStore(namespace, 'commonTransactionStore');
     this.commonAttributeStore = getStore(namespace, 'commonAttributeStore');
     this.addressBookStore = getStore(namespace, 'addressBook');

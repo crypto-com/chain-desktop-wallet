@@ -131,7 +131,7 @@ export function bech32ToEVMAddress(bech32Address: string) {
   return ethers.utils.getAddress(originalEVMAddress);
 }
 
-export function getCryptoOrgAsset(walletAllAssets: UserAsset[]) {
+export function getCronosTendermintAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
     return (
       asset.mainnetSymbol.toUpperCase() === 'CRO' &&
@@ -141,7 +141,7 @@ export function getCryptoOrgAsset(walletAllAssets: UserAsset[]) {
   });
 }
 
-export function getCronosAsset(walletAllAssets: UserAsset[]) {
+export function getCronosEvmAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
     return (
       asset.mainnetSymbol.toUpperCase() === 'CRO' &&

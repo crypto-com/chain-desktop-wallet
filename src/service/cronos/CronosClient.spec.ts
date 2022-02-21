@@ -82,7 +82,7 @@ describe('CronosClient', () => {
       });
 
     const cronosClient = new CronosClient(
-      'https://cronos-testnet-3.crypto.org:8545/',
+      'https://evm-t3.cronos.org:8545/',
       'https://cronos-chainindex.com',
     );
 
@@ -157,7 +157,8 @@ describe('CronosClient', () => {
       });
 
     const cronosClient = new CronosClient(
-      'https://cronos-testnet-3.crypto.org:8545/',
+      // 'https://cronos-testnet-3.crypto.org:8545/',
+      'https://evm-t3.cronos.org:8545/',
       'https://cronos-chainindex.com',
     );
     const txPendingListRespone = await cronosClient.getPendingTxsByAddress(

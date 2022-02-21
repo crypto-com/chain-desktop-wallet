@@ -13,7 +13,7 @@ import {
 } from '../../../service/signers/EvmTransactionSigner';
 import { EVMContractCallUnsigned } from '../../../service/signers/TransactionSupported';
 import { walletAllAssetsState } from '../../../recoil/atom';
-import { getCronosAsset } from '../../../utils/utils';
+import { getCronosEvmAsset } from '../../../utils/utils';
 import { TransactionDataParser } from './TransactionDataParser';
 import { ErrorHandler, WebView } from './types';
 import { useRefCallback } from './useRefCallback';
@@ -69,7 +69,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
 
   const transactionPrepareService = new TransactionPrepareService(walletService.storageService);
   const allAssets = useRecoilValue(walletAllAssetsState);
-  const cronosAsset = getCronosAsset(allAssets);
+  const cronosAsset = getCronosEvmAsset(allAssets);
   const transactionDataParser = useMemo(() => {
     return new TransactionDataParser(ChainConfig.RpcUrl, ChainConfig.ExplorerAPIUrl);
   }, []);
