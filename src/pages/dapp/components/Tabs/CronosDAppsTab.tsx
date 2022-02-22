@@ -78,7 +78,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
                 display: 'inline',
                 borderRadius: '12px',
               }}
-              src={`/dapp_logos/${project.logo}`}
+              src={`./dapp_logos/${project.logo}`}
               alt="project logo"
             />
             <span
