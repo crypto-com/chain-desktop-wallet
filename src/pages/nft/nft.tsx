@@ -1364,8 +1364,11 @@ const NftPage = () => {
   const NftAttributeTableColumns = [
     {
       title: t('nft.detailModal.traitType'),
-      dataIndex: 'traitType',
+      // dataIndex: 'traitType',
       key: 'traitType',
+      render: record => {
+        return record.trait_type || record.traitType;
+      },
     },
     {
       title: t('nft.detailModal.value'),

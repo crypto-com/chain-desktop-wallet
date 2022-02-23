@@ -5,7 +5,7 @@ const { remote } = window.require('electron');
 export class ChainConfig {
   static ChainId = 0x19;
 
-  static RpcUrl = 'https://evm-cronos.org';
+  static RpcUrl = 'https://evm.cronos.org';
 
   static ExplorerAPIUrl = 'https://cronos.org/explorer/api';
 }
