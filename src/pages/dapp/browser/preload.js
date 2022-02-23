@@ -553,7 +553,7 @@ try {
 
 const providerConfig = {
   chainId: 25,
-  rpcUrl: 'https://evm-cronos.org',
+  rpcUrl: 'https://evm.cronos.org',
   isDebug: true,
 };
 window.ethereum = new window.desktopWallet.Provider(providerConfig);
