@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.7.1] - 2022-02-23
+### Additions
+- DApps Analytics
+### Bug fixes
+- DApps Ranking pictures not loaded
+- Incorrect Rpc URL
+- Security fix on dyld loading
 ## [v0.7.0] - 2022-02-21
 ### Additions
 - DApps Ranking
