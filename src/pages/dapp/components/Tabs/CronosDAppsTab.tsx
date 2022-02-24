@@ -109,6 +109,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       title: t('dapp.cronosDApps.table.title.tvl'),
       key: 'tvl',
       sortDirections: ['descend', 'ascend'] as SortOrder[],
+      sortOrder: 'descend' as SortOrder,
       render: (project: CronosProject) => {
         const tvl = protocolsMap.get(project.name.toLowerCase())?.tvl ?? 0;
 
@@ -212,7 +213,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
   ];
 
   return (
-    <Card>
+    <Card style={{ margin: '30px 0' }}>
       <Select
         mode="multiple"
         showSearch={false}
