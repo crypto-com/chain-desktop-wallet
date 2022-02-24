@@ -130,6 +130,11 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       title: t('dapp.cronosDApps.table.title.1d'),
       key: '1d_change',
       render: (project: CronosProject) => {
+        const tvl = protocolsMap.get(project.name.toLowerCase())?.tvl ?? 0;
+        if (tvl === 0) {
+          return <span>-</span>;
+        }
+
         const change = protocolsMap.get(project.name.toLowerCase())?.change_1d;
 
         return <PercentageLabel value={change} />;
@@ -150,6 +155,10 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       title: t('dapp.cronosDApps.table.title.7d'),
       key: '7d_change',
       render: (project: CronosProject) => {
+        const tvl = protocolsMap.get(project.name.toLowerCase())?.tvl ?? 0;
+        if (tvl === 0) {
+          return <span>-</span>;
+        }
         const change = protocolsMap.get(project.name.toLowerCase())?.change_7d;
         return <PercentageLabel value={change} />;
       },
