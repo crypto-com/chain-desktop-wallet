@@ -1525,10 +1525,10 @@ const NftPage = () => {
                           {nft?.tokenData.description ? nft?.tokenData.description : 'n.a.'}
                         </div>
                       </div>
-                      {nft?.tokenData.attributes ? (
-                        <div className="item">
-                          <div className="subtitle">{t('nft.detailModal.attributes')}</div>
-                          <div className="attribute">
+                      <div className="item">
+                        <div className="subtitle">{t('nft.detailModal.attributes')}</div>
+                        <div className="attribute">
+                          {nft?.tokenData.attributes ? (
                             <Table
                               className="nft-attribute-table"
                               dataSource={nft.tokenData.attributes}
@@ -1536,11 +1536,12 @@ const NftPage = () => {
                               pagination={false}
                               size="small"
                             />
-                          </div>
+                          ) : (
+                            <div className="description">n.a.</div>
+                          )}
                         </div>
-                      ) : (
-                        ''
-                      )}
+                      </div>
+
                       <div className="item">
                         <div className="table-row">
                           <div>{t('nft.detailModal.label1')}</div>
