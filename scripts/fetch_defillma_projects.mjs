@@ -33,7 +33,6 @@ const protocols = (await fetchProtocols()).filter(p => {
 })
 
 const projects = []
-const categories = new Set()
 
 const categoriesMapping = {
   'Dexes': 'DEX',
