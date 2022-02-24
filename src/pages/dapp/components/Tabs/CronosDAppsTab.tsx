@@ -109,7 +109,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       title: t('dapp.cronosDApps.table.title.tvl'),
       key: 'tvl',
       sortDirections: ['descend', 'ascend'] as SortOrder[],
-      sortOrder: 'descend' as SortOrder,
+      defaultSortOrder: 'descend' as SortOrder,
       render: (project: CronosProject) => {
         const tvl = protocolsMap.get(project.name.toLowerCase())?.tvl ?? 0;
 
