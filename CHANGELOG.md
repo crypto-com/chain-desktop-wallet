@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.7.2] - 2022-02-24
+### Additions
+- DApp list fetch from api.llama.fi
+- DApp List Sort by TVL in default
+### Bug fixes
+- Remove non-DApp projects in DApp List
 ## [v0.7.1] - 2022-02-23
 ### Additions
 - DApps Analytics
