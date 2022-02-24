@@ -20,6 +20,8 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
 
   const [fetchedProtocols, setFetchedProtocols] = useState<Protocol[]>([]);
 
+  const [sortedProjects, setSortedProjects] = useState<CronosProject[]>(projects);
+
   const [t] = useTranslation();
 
   useEffect(() => {
@@ -38,6 +40,17 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
 
     return map;
   }, [fetchedProtocols]);
+
+  useEffect(() => {
+    sortedProjects.sort((a, b) => {
+      const aTvl = protocolsMap.get(a.name.toLowerCase())?.tvl ?? 0;
+      const bTvl = protocolsMap.get(b.name.toLowerCase())?.tvl ?? 0;
+
+      return bTvl - aTvl;
+    });
+
+    setSortedProjects([...sortedProjects]);
+  }, [protocolsMap]);
 
   const categoriesNumbersMap = useMemo(() => {
     const map = new Map<CategoryType, number>();
@@ -239,13 +252,14 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       <Table
         dataSource={
           selectedCategories.length === 0
-            ? projects
-            : projects.filter(project => {
+            ? sortedProjects
+            : sortedProjects.filter(project => {
                 return project.category.some(c => selectedCategories.includes(c));
               })
         }
         rowKey="id"
         rowClassName="dapps-table-row"
+        pagination={false}
         columns={columns}
         onRow={(record: CronosProject) => {
           return {
