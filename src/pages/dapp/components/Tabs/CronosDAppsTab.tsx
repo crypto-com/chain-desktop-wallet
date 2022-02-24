@@ -20,6 +20,8 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
 
   const [fetchedProtocols, setFetchedProtocols] = useState<Protocol[]>([]);
 
+  const [sortedProjects, setSortedProjects] = useState<CronosProject[]>(projects);
+
   const [t] = useTranslation();
 
   useEffect(() => {
@@ -38,6 +40,17 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
 
     return map;
   }, [fetchedProtocols]);
+
+  useEffect(() => {
+    sortedProjects.sort((a, b) => {
+      const aTvl = protocolsMap.get(a.name.toLowerCase())?.tvl ?? 0;
+      const bTvl = protocolsMap.get(b.name.toLowerCase())?.tvl ?? 0;
+
+      return bTvl - aTvl;
+    });
+
+    setSortedProjects([...sortedProjects]);
+  }, [protocolsMap]);
 
   const categoriesNumbersMap = useMemo(() => {
     const map = new Map<CategoryType, number>();
@@ -96,6 +109,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       title: t('dapp.cronosDApps.table.title.tvl'),
       key: 'tvl',
       sortDirections: ['descend', 'ascend'] as SortOrder[],
+      defaultSortOrder: 'descend' as SortOrder,
       render: (project: CronosProject) => {
         const tvl = protocolsMap.get(project.name.toLowerCase())?.tvl ?? 0;
 
@@ -116,6 +130,11 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       title: t('dapp.cronosDApps.table.title.1d'),
       key: '1d_change',
       render: (project: CronosProject) => {
+        const tvl = protocolsMap.get(project.name.toLowerCase())?.tvl ?? 0;
+        if (tvl === 0) {
+          return <span>-</span>;
+        }
+
         const change = protocolsMap.get(project.name.toLowerCase())?.change_1d;
 
         return <PercentageLabel value={change} />;
@@ -136,6 +155,10 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       title: t('dapp.cronosDApps.table.title.7d'),
       key: '7d_change',
       render: (project: CronosProject) => {
+        const tvl = protocolsMap.get(project.name.toLowerCase())?.tvl ?? 0;
+        if (tvl === 0) {
+          return <span>-</span>;
+        }
         const change = protocolsMap.get(project.name.toLowerCase())?.change_7d;
         return <PercentageLabel value={change} />;
       },
@@ -199,7 +222,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
   ];
 
   return (
-    <Card>
+    <Card style={{ margin: '30px 0' }}>
       <Select
         mode="multiple"
         showSearch={false}
@@ -239,13 +262,14 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       <Table
         dataSource={
           selectedCategories.length === 0
-            ? projects
-            : projects.filter(project => {
+            ? sortedProjects
+            : sortedProjects.filter(project => {
                 return project.category.some(c => selectedCategories.includes(c));
               })
         }
         rowKey="id"
         rowClassName="dapps-table-row"
+        pagination={false}
         columns={columns}
         onRow={(record: CronosProject) => {
           return {
