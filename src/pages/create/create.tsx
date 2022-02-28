@@ -32,7 +32,6 @@ import {
   NORMAL_WALLET_TYPE,
 } from '../../service/LedgerService';
 import { TransactionUtils } from '../../utils/TransactionUtils';
-// import IconCroSvg from '../../assets/icon-cro.svg';
 import IconCro from '../../svg/IconCro';
 import IconEth from '../../svg/IconEth';
 

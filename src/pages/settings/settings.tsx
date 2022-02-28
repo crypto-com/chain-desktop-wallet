@@ -4,7 +4,6 @@ import './settings.less';
 import 'antd/dist/antd.css';
 import {
   Alert,
-  Avatar,
   Button,
   Carousel,
   Checkbox,
@@ -59,6 +58,7 @@ import { generalConfigService } from '../../storage/GeneralConfigService';
 import { UserAsset, UserAssetConfig, UserAssetType } from '../../models/UserAsset';
 import AddressBook from './tabs/AddressBook/AddressBook';
 import { getChainName } from '../../utils/utils';
+import { AssetIcon } from '../../components/AssetIcon';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -141,16 +141,6 @@ const GeneralSettingsForm = props => {
     setUpdateLoading(false);
   }
 
-  const assetIcon = asset => {
-    const { name, icon_url, symbol } = asset;
-
-    return icon_url ? (
-      <img src={icon_url} alt={name} className="asset-icon" />
-    ) : (
-      <Avatar>{symbol[0].toUpperCase()}</Avatar>
-    );
-  };
-
   const onSwitchAsset = value => {
     setCurrentAssetIdentifier(value);
     const selectedAsset = configurableAssets.find(asset => asset.identifier === value);
@@ -172,7 +162,7 @@ const GeneralSettingsForm = props => {
         {configurableAssets.map(asset => {
           return (
             <Option value={asset.identifier} key={asset.identifier}>
-              {assetIcon(asset)}
+              <AssetIcon asset={asset} />
               {`${getChainName(asset.name, session.wallet.config)} (${asset.symbol})`}
             </Option>
           );

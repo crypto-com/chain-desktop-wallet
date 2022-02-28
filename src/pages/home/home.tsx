@@ -41,6 +41,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import IconTick from '../../svg/IconTick';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 import RewardModalPopup from '../../components/RewardModalPopup/RewardModalPopup';
+import { AssetIcon } from '../../components/AssetIcon';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -85,16 +86,6 @@ const HomePage = () => {
 
   const [t] = useTranslation();
 
-  const assetIcon = asset => {
-    const { name, icon_url, symbol } = asset;
-
-    return icon_url ? (
-      <img src={icon_url} alt={name} className="asset-icon" />
-    ) : (
-      <Avatar>{symbol[0].toUpperCase()}</Avatar>
-    );
-  };
-
   const AssetColumns = [
     {
       title: t('home.assetList.table.name'),
@@ -105,7 +96,7 @@ const HomePage = () => {
         const { symbol } = record;
         return (
           <div className="name">
-            {assetIcon(record)}
+            <AssetIcon asset={record} />
             {symbol}
             {record.isWhitelisted === false && (
               <Tooltip title={t('assets.whitelist.warning')}>
