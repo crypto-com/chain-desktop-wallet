@@ -4,13 +4,13 @@ import * as path from 'path';
 
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import { IpcMain } from './IpcMain';
-import {autoUpdater} from "electron-updater";
+import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import Big from "big.js";
 
 
 
-const { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } = require('./UsageAnalytics');
+import { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } from './UsageAnalytics';
 
 (global as any).actionEvent = actionEvent;
 (global as any).transactionEvent = transactionEvent;
@@ -97,7 +97,7 @@ function createWindow() {
   win.on('closed', () => (win = null));
 
   // Open default browser when direct to external
-  win.webContents.on('new-window', function(e, url) {
+  win.webContents.on('new-window', function (e, url) {
     e.preventDefault();
     require('electron').shell.openExternal(url);
   });
@@ -140,7 +140,7 @@ app.on('activate', async () => {
 
 });
 
-app.on('ready', async function() {
+app.on('ready', async function () {
   app.allowRendererProcessReuse = false
   createWindow();
 
