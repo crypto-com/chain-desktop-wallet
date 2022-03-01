@@ -8,6 +8,25 @@
   "homepage": ".",
   "main": "build/electron/main.js",
   "private": true,
+  "scripts": {
+    "run-audit": "yarn audit-ci --high -a 1005059",
+    "start": "node scripts/start.js",
+    "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 && yarn clean-builds && node scripts/build.js",
+    "test": "node scripts/test.js --watchAll=false",
+    "postinstall": "electron-builder install-app-deps",
+    "vite:dev": "cross-env NODE_ENV=development && node scripts/watch.vite.mjs",
+    "electron:dev": "export NODE_ENV=development && yarn electron:devcore",
+    "electron:devcore": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
+    "electron:windev": "concurrently \"SET NODE_ENV=none && SET BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
+    "electron:pre-build": "yarn build && yarn copy-macos-manifest && tsc -p electron",
+    "copy-macos-manifest": "copyfiles entitlements* ./build/",
+    "clean-builds": "rimraf build && rimraf dist",
+    "electron:build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 && yarn clean-builds && yarn build && yarn copy-macos-manifest && tsc -p electron && electron-builder --publish=never",
+    "lint-staged": "lint-staged",
+    "lint:js": "eslint --cache --fix --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
+    "prettier": "prettier --write '/src/**/*.{js,jsx,tsx,ts,less,md,json}'",
+    "generate-i18n": "node scripts/generate_i18n.mjs"
+  },
   "dependencies": {
     "@ant-design/icons": "4.6.2",
     "@babel/helper-builder-react-jsx": "7.12.13",
@@ -77,98 +96,6 @@
     "web3-eth": "1.5.0",
     "web3-utils": "1.6.0",
     "zxcvbn": "4.4.2"
-  },
-  "scripts": {
-    "run-audit": "yarn audit-ci --high -a 1005059",
-    "start": "node scripts/start.js",
-    "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 && yarn clean-builds && node scripts/build.js",
-    "test": "node scripts/test.js --watchAll=false",
-    "postinstall": "electron-builder install-app-deps",
-    "dev:vite": "cross-env NODE_ENV=development && node scripts/watch.vite.mjs",
-    "electron:dev": "export NODE_ENV=development && yarn electron:devcore",
-    "electron:devcore": "concurrently \"BROWSER=none yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
-    "electron:windev": "concurrently \"SET NODE_ENV=none && SET BROWSER=none && yarn start\" \"wait-on http://localhost:3000 && tsc -p electron -w\" \"wait-on http://localhost:3000 && tsc -p electron && electron .\"",
-    "electron:pre-build": "yarn build && yarn copy-macos-manifest && tsc -p electron",
-    "copy-macos-manifest": "copyfiles entitlements* ./build/",
-    "clean-builds": "rimraf build && rimraf dist",
-    "electron:build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 && yarn clean-builds && yarn build && yarn copy-macos-manifest && tsc -p electron && electron-builder --publish=never",
-    "lint-staged": "lint-staged",
-    "lint:js": "eslint --cache --fix --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
-    "prettier": "prettier --write '/src/**/*.{js,jsx,tsx,ts,less,md,json}'",
-    "generate-i18n": "node scripts/generate_i18n.mjs"
-  },
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn lint-staged"
-    }
-  },
-  "lint-staged": {
-    "src/**/*.{js,jsx,tsx,ts,less,md,json}": [
-      "prettier --write"
-    ],
-    "src/**/*.less": [
-      "stylelint --fix less",
-      "stylelint --fix --syntax less",
-      "stylelint --syntax less"
-    ],
-    "src/**/*.{js,jsx,ts,tsx}": "yarn lint:js"
-  },
-  "build": {
-    "productName": "Crypto.org Chain Desktop Wallet (Beta)",
-    "appId": "chain.crypto.org.chain-desktop-wallet",
-    "files": [
-      "./build/**/*",
-      "./dist/**/*",
-      "./public/*",
-      "./public/**/*"
-    ],
-    "extraResources": [
-      {
-        "from": "src/pages/dapp/browser/preload.js",
-        "to": "scripts/preload.js"
-      }
-    ],
-    "afterSign": "electron-builder-notarize",
-    "mac": {
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "./build/entitlements.mac.plist",
-      "entitlementsInherit": "./build/entitlements.mac.plist",
-      "target": [
-        "dmg",
-        "zip",
-        "pkg"
-      ],
-      "category": "public.app-category.utilities",
-      "darkModeSupport": true
-    },
-    "linux": {
-      "category": "Utility"
-    },
-    "dmg": {
-      "icon": false
-    },
-    "directories": {
-      "buildResources": "build"
-    }
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
   },
   "devDependencies": {
     "@babel/core": "7.12.3",
@@ -275,6 +202,79 @@
     "webpack-dev-server": "3.11.2",
     "webpack-manifest-plugin": "2.2.0",
     "workbox-webpack-plugin": "5.1.4"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,tsx,ts,less,md,json}": [
+      "prettier --write"
+    ],
+    "src/**/*.less": [
+      "stylelint --fix less",
+      "stylelint --fix --syntax less",
+      "stylelint --syntax less"
+    ],
+    "src/**/*.{js,jsx,ts,tsx}": "yarn lint:js"
+  },
+  "build": {
+    "productName": "Crypto.org Chain Desktop Wallet (Beta)",
+    "appId": "chain.crypto.org.chain-desktop-wallet",
+    "files": [
+      "./build/**/*",
+      "./dist/**/*",
+      "./public/*",
+      "./public/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "src/pages/dapp/browser/preload.js",
+        "to": "scripts/preload.js"
+      }
+    ],
+    "afterSign": "electron-builder-notarize",
+    "mac": {
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false,
+      "entitlements": "./build/entitlements.mac.plist",
+      "entitlementsInherit": "./build/entitlements.mac.plist",
+      "target": [
+        "dmg",
+        "zip",
+        "pkg"
+      ],
+      "category": "public.app-category.utilities",
+      "darkModeSupport": true
+    },
+    "linux": {
+      "category": "Utility"
+    },
+    "dmg": {
+      "icon": false
+    },
+    "directories": {
+      "buildResources": "build"
+    }
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "jest": {
     "roots": [
