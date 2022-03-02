@@ -7,19 +7,7 @@ import { useTranslation } from 'react-i18next';
 import './assets.less';
 import 'antd/dist/antd.css';
 import { BaseType } from 'antd/lib/typography/Base';
-import {
-  Layout,
-  Table,
-  Avatar,
-  Tabs,
-  Tag,
-  Typography,
-  Dropdown,
-  Menu,
-  Tooltip,
-  Alert,
-  Spin,
-} from 'antd';
+import { Layout, Table, Tabs, Tag, Typography, Dropdown, Menu, Tooltip, Alert, Spin } from 'antd';
 import {
   ArrowLeftOutlined,
   ExclamationCircleOutlined,
@@ -54,6 +42,7 @@ import FormSend from './components/FormSend';
 import { walletService } from '../../service/WalletService';
 import { getChainName, middleEllipsis } from '../../utils/utils';
 import { TransactionDirection, TransactionStatus } from '../../models/Transaction';
+import { AssetIcon } from '../../components/AssetIcon';
 
 const { Sider, Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -98,7 +87,6 @@ const convertTransactions = (
   }
 
   return allTransactions.map(transaction => {
-
     const { txData } = transaction;
 
     const data: TransactionTabularData = {
@@ -112,7 +100,9 @@ const convertTransactions = (
       time: `${moment(new Date(txData.date)).format('YYYY-MM-DD, HH:mm:ss Z')}`,
       amount: `${getUIDynamicAmount(txData.amount, asset)} ${txData.assetSymbol}`,
       stakedAmount: `${getUIDynamicAmount(txData.stakedAmount, asset)} ${txData.assetSymbol}`,
-      autoClaimedRewards: `${getUIDynamicAmount(txData.autoClaimedRewards, asset)} ${txData.assetSymbol}`,
+      autoClaimedRewards: `${getUIDynamicAmount(txData.autoClaimedRewards, asset)} ${
+        txData.assetSymbol
+      }`,
       msgTypeName: transaction.messageTypeName,
       direction: getDirection(txData.senderAddress, txData.receiverAddress),
       status: txData.status,
@@ -182,16 +172,6 @@ const AssetsPage = () => {
     }
   });
 
-  const assetIcon = asset => {
-    const { name, icon_url, symbol } = asset;
-
-    return icon_url ? (
-      <img src={icon_url} alt={name} className="asset-icon" />
-    ) : (
-      <Avatar>{symbol[0].toUpperCase()}</Avatar>
-    );
-  };
-
   const moreMenu = (
     <Menu className="moreDropdown">
       <Menu.Item key="node-configuration">
@@ -218,7 +198,7 @@ const AssetsPage = () => {
 
         return (
           <div className="name">
-            {assetIcon(record)}
+            <AssetIcon asset={record} />
             {symbol}
             {record.isWhitelisted === false && (
               <Tooltip title={t('assets.whitelist.warning')}>
@@ -382,9 +362,10 @@ const AssetsPage = () => {
           default:
             break;
         }
-        const text = record.msgTypeName === 'MsgDelegate' || record.msgTypeName === 'MsgUndelegate' 
-        ? record.stakedAmount 
-        : record.amount;
+        const text =
+          record.msgTypeName === 'MsgDelegate' || record.msgTypeName === 'MsgUndelegate'
+            ? record.stakedAmount
+            : record.amount;
         return (
           <Text type={color}>
             {sign}
@@ -449,7 +430,9 @@ const AssetsPage = () => {
                   </div>
                   <div className="detail-container">
                     <Layout>
-                      <Sider width="80px">{assetIcon(currentAsset)}</Sider>
+                      <Sider width="80px">
+                        {currentAsset && <AssetIcon asset={currentAsset} />}
+                      </Sider>
                       <Content>
                         <div className="balance">
                           {getUIDynamicAmount(currentAsset!.balance, currentAsset!)}{' '}

@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 import './bridge.less';
 import 'antd/dist/antd.css';
 import {
-  Avatar,
   Button,
   Form,
   InputNumber,
@@ -53,8 +52,6 @@ import {
   getBaseScaledAmount,
 } from '../../utils/NumberUtils';
 import { SUPPORTED_BRIDGE } from '../../config/StaticConfig';
-import iconCronosSvg from '../../assets/icon-cronos-blue.svg';
-import iconCroSvg from '../../assets/icon-cro.svg';
 import IconHexagon from '../../svg/IconHexagon';
 // import IconTransferHistory from '../../svg/IconTransferHistory';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
@@ -79,6 +76,7 @@ import CronosBridgeForm from './components/CronosBridgeForm';
 import { secretStoreService } from '../../storage/SecretStoreService';
 import { BridgeTransferRequest } from '../../service/TransactionRequestModels';
 import IconTransferHistory from '../../svg/IconTransferHistory';
+import { BridgeIcon, ICON_CRO_EVM } from '../../components/AssetIcon';
 
 const { Content, Sider } = Layout;
 const { Step } = Steps;
@@ -90,23 +88,6 @@ const layout = {
   // wrapperCol: { span: 16 },
 };
 const customDot = () => <Icon component={IconHexagon} />;
-
-const bridgeIcon = (bridgeValue: string | undefined) => {
-  let icon = iconCroSvg;
-
-  switch (bridgeValue) {
-    case 'CRYPTO_ORG':
-      icon = iconCroSvg;
-      break;
-    case 'CRONOS':
-      icon = iconCronosSvg;
-      break;
-    default:
-      break;
-  }
-
-  return <img src={icon} alt={bridgeValue} className="asset-icon" />;
-};
 
 interface listDataSource {
   title: string;
@@ -192,16 +173,6 @@ const CronosBridge = props => {
     { step: 1, title: t('bridge.step1.title'), description: '' },
     { step: 2, title: t('bridge.step2.title'), description: '' },
   ];
-
-  const assetIcon = asset => {
-    const { name, icon_url, symbol } = asset;
-
-    return icon_url ? (
-      <img src={icon_url} alt={name} className="asset-icon" />
-    ) : (
-      <Avatar>{symbol[0].toUpperCase()}</Avatar>
-    );
-  };
 
   const onWalletDecryptFinish = async (password: string) => {
     const { tendermintAddress, evmAddress, toAddress, isCustomToAddress } = formValues;
@@ -574,7 +545,6 @@ const CronosBridge = props => {
               bridgeConfigForm={bridgeConfigForm}
               isBridgeValid={isBridgeValid}
               setIsBridgeValid={setIsBridgeValid}
-              assetIcon={assetIcon}
               currentAsset={currentAsset}
               setCurrentAsset={setCurrentAsset}
               toAsset={toAsset}
@@ -630,7 +600,7 @@ const CronosBridge = props => {
                 <div className="block flex-row">
                   <Layout>
                     <Sider width="50px" className="bridge-from">
-                      {bridgeIcon(bridgeFromObj?.value)}
+                      <BridgeIcon bridgeValue={bridgeFromObj?.value} />
                     </Sider>
                     <Content>
                       <div>{t('bridge.form.from')}</div>
@@ -642,7 +612,7 @@ const CronosBridge = props => {
                   <ArrowRightOutlined style={{ fontSize: '24px', width: '50px' }} />
                   <Layout>
                     <Sider width="50px" className="bridge-to">
-                      {bridgeIcon(bridgeToObj?.value)}
+                      <BridgeIcon bridgeValue={bridgeToObj?.value} />
                     </Sider>
                     <Content>
                       <div>{t('bridge.form.to')}</div>
@@ -673,7 +643,7 @@ const CronosBridge = props => {
                   <div className="flex-row">
                     <div>{t('bridge.form.destination')}</div>
                     <div className="asset-icon">
-                      {bridgeIcon(form.getFieldValue('bridgeTo'))}
+                      <BridgeIcon bridgeValue={form.getFieldValue('bridgeTo')} />
                       {middleEllipsis(toDestinationAddress, 6)}
                     </div>
                   </div>
@@ -849,7 +819,7 @@ const CronosBridge = props => {
       <div className="block flex-row">
         <Layout>
           <Sider width="50px" className="bridge-from">
-            {bridgeIcon(bridgeFromObj?.value)}
+            <BridgeIcon bridgeValue={bridgeFromObj?.value} />
           </Sider>
           <Content>
             <div style={{ fontWeight: 'bold' }}>
@@ -860,7 +830,7 @@ const CronosBridge = props => {
         <ArrowRightOutlined style={{ fontSize: '24px', width: '50px' }} />
         <Layout>
           <Sider width="50px" className="bridge-to">
-            {bridgeIcon(bridgeToObj?.value)}
+            <BridgeIcon bridgeValue={bridgeToObj?.value} />
           </Sider>
           <Content>
             <div style={{ fontWeight: 'bold' }}>
@@ -1073,7 +1043,7 @@ const CronosBridge = props => {
             </ModalPopup>
           </div>
           <div>
-            <img src={iconCronosSvg} alt="cronos" />
+            <img src={ICON_CRO_EVM} alt="cronos" />
           </div>
         </>
       ) : (
@@ -1137,7 +1107,7 @@ const BridgePage = () => {
             <div className="go-to-cronos-bridge">
               <a>
                 <div onClick={() => setView('cronos-bridge')}>
-                  <img src={iconCronosSvg} alt="cronos" style={{ height: '24px' }} />
+                  <img src={ICON_CRO_EVM} alt="cronos" style={{ height: '24px' }} />
                   <span>{t('bridge.action.backToCronosBridge')}</span>
                 </div>
               </a>

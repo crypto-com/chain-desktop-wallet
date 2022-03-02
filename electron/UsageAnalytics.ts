@@ -1,11 +1,11 @@
-import {JSONStorage} from "node-localstorage";
-import {app} from "electron";
+import { JSONStorage } from "node-localstorage";
+import { app } from "electron";
 import ua from "universal-analytics";
 import { v4 as uuidv4 } from 'uuid';
 
 // Public UA codes
-const DEV_UA_CODE =  'UA-197149286-1'
-const PROD_UA_CODE =  'UA-99317940-17'
+const DEV_UA_CODE = 'UA-197149286-1'
+const PROD_UA_CODE = 'UA-99317940-17'
 
 function getGAnalyticsCode() {
     const isDev = process.env.NODE_ENV === 'development';
@@ -36,7 +36,7 @@ function actionEvent(category: any, action: any, label: any, value: any) {
             el: label,
             ev: value,
         }).send();
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function transactionEvent(transactionId: string, value: string, transactionType: string) {
@@ -49,13 +49,13 @@ function transactionEvent(transactionId: string, value: string, transactionType:
             transactionType)
             .item(value, 1)
             .send();
-    } catch (e) {}
+    } catch (e) { }
 }
 
 function pageView(pageName: string) {
     try {
         agent.pageview(pageName).send()
-    } catch (e) {}
+    } catch (e) { }
 }
 
-module.exports = { getUACode, getGAnalyticsCode, actionEvent, transactionEvent, pageView };
+export { getUACode, getGAnalyticsCode, actionEvent, transactionEvent, pageView };
