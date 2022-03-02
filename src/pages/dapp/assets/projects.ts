@@ -443,6 +443,14 @@ const unListedProjects: CronosProject[] = [
     link: 'https://bushicro.io/',
     twitter: '',
   },
+  {
+    name: 'Liquidus',
+    category: ['Yield Optimiser'],
+    logo: 'liquidus.png',
+    description: '',
+    link: 'https://farm.liquidus.finance/',
+    twitter: '',
+  },
 ];
 
 const NFTProjects: CronosProject[] = [
@@ -503,7 +511,7 @@ const NFTProjects: CronosProject[] = [
     category: ['NFT'],
     description:
       'The first NFT marketplace on Cronos. Create, buy, sell, trade and enjoy the #CroFam NFT community.',
-    logo: 'sxSZj7kw_400x400.png',
+    logo: 'ebisus-bay.png',
     link: 'https://app.ebisusbay.com/',
     twitter: 'https://twitter.com/EbisusBay',
   },
