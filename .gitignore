@@ -25,10 +25,10 @@ yarn-debug.log*
 yarn-error.log*
 
 .idea
-.vscode
 .eslintcache
 package-lock.json
 
 tinker/
 data/
 /debug.log
+
