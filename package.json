@@ -38,6 +38,7 @@
     "@ledgerhq/hw-transport-webhid": "5.48.0",
     "@ledgerhq/hw-transport-webusb": "5.48.0",
     "@types/bluebird": "3.5.36",
+    "ansi-html": "0.0.8",
     "antd": "4.16.0",
     "axios": "0.21.2",
     "bech32": "2.0.0",
@@ -349,6 +350,7 @@
     "glob-parent": "6.0.2",
     "json-schema": "0.4.0",
     "follow-redirects": "1.14.7",
-    "simple-get": "4.0.1"
+    "simple-get": "4.0.1",
+    "ansi-html": "https://registry.yarnpkg.com/ansi-html-community/-/ansi-html-community-0.0.8.tgz"
   }
 }
