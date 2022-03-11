@@ -1,26 +1,28 @@
 export type CategoryType =
   | 'DEX'
-  | 'NFT'
   | 'Farm'
   | 'Launchpad'
   | 'Lending'
   | 'Metaverse'
-  | 'Yield Optimiser'
+  | 'NFT'
   | 'Reserve Currency'
   | 'Stablecoin'
-  | 'Yield'
-  | 'Staking';
+  | 'Staking'
+  | 'Yield Optimiser'
+  | 'Yield';
 
 export const categories: CategoryType[] = [
   'DEX',
-  'NFT',
   'Farm',
   'Launchpad',
   'Lending',
   'Metaverse',
-  'Yield Optimiser',
+  'NFT',
   'Reserve Currency',
   'Stablecoin',
+  'Staking',
+  'Yield Optimiser',
+  'Yield',
 ];
 
 export interface CronosProject {
