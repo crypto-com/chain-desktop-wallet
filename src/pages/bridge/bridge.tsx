@@ -9,7 +9,7 @@ import {
   Layout,
   Steps,
   Divider,
-  Checkbox,
+  // Checkbox,
   List,
   Card,
   Skeleton,
@@ -142,7 +142,7 @@ const CronosBridge = props => {
   const [isBridgeSettingsFormVisible, setIsBridgeSettingsFormVisible] = useState(false);
   // eslint-disable-next-line
   const [confirmLoading, setConfirmLoading] = useState(false);
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  // const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
   const [bridgeConfigs, setBridgeConfigs] = useState<BridgeConfig>();
   const [bridgeConfigFields, setBridgeConfigFields] = useState<string[]>([]);
@@ -683,7 +683,7 @@ const CronosBridge = props => {
                 </div>
               </div>
             </div>
-            <div className="item">
+            {/* <div className="item">
               <Checkbox
                 checked={!isButtonDisabled}
                 onChange={() => {
@@ -693,14 +693,14 @@ const CronosBridge = props => {
               >
                 {t('bridge.form.disclaimer')}
               </Checkbox>
-            </div>
+            </div> */}
             <div className="item">
               <Button
                 key="submit"
                 type="primary"
                 onClick={onConfirmation}
                 disabled={
-                  isButtonDisabled ||
+                  // isButtonDisabled ||
                   !Big(
                     fromScientificNotation(
                       adjustedTransactionAmount(
@@ -860,7 +860,7 @@ const CronosBridge = props => {
               notification.close('conditionalLinkNotificationKey');
             }
             setCurrentStep(currentStep - 1);
-            setIsButtonDisabled(true);
+            // setIsButtonDisabled(true);
             setBridgeTransferError(false);
           }}
           style={{ textAlign: 'left', width: '50px', fontSize: '24px', cursor: 'pointer' }}
