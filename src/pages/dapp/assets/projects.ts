@@ -453,6 +453,22 @@ const unListedProjects: CronosProject[] = [
     link: 'https://farm.liquidus.finance/',
     twitter: '',
   },
+  {
+    name: 'CroSkull',
+    category: ['NFT'],
+    logo: 'croskull.png',
+    description: '',
+    link: 'https://app.croskull.com/#/',
+    twitter: '',
+  },
+  {
+    name: 'LootPad',
+    category: ['NFT'],
+    logo: 'lootpad.png',
+    description: '',
+    link: 'https://lootpad.io/',
+    twitter: '',
+  },
 ];
 
 const NFTProjects: CronosProject[] = [
