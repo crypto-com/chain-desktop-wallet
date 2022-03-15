@@ -234,6 +234,8 @@ class Web3Provider extends EventEmitter {
     this.chainId = config.chainId;
     this.rpc = new RPCServer(config.rpcUrl);
     this.isDebug = !!config.isDebug;
+    // this.emitConnect(config.chainId);
+    this.emit('chainChanged', config.chainId);
   }
 
   request(payload) {
@@ -365,6 +367,8 @@ class Web3Provider extends EventEmitter {
           return this.wallet_watchAsset(payload);
         case 'wallet_addEthereumChain':
           return this.wallet_addEthereumChain(payload);
+        case ' wallet_switchEthereumChain':
+          return this.wallet_switchEthereumChain(payload);
         case 'eth_newFilter':
         case 'eth_newBlockFilter':
         case 'eth_newPendingTransactionFilter':
@@ -409,7 +413,7 @@ class Web3Provider extends EventEmitter {
   }
 
   eth_chainId() {
-    return `0x${this.chainId.toString(16)}`;
+    return this.chainId;
   }
 
   eth_sign(payload) {
@@ -467,6 +471,10 @@ class Web3Provider extends EventEmitter {
 
   wallet_addEthereumChain(payload) {
     this.postMessage('addEthereumChain', payload.id, payload.params[0]);
+  }
+
+  wallet_switchEthereumChain(payload) {
+    this.postMessage('switchEthereumChain', payload.id, payload.params[0]);
   }
 
   /**
@@ -547,12 +555,12 @@ window.desktopWallet = {
   },
 };
 
-try {
-  localStorage.setItem('connectorIdv2', 'Metamask');
-} catch (_) {}
+// try {
+//   localStorage.setItem('connectorIdv2', 'Metamask');
+// } catch (_) {}
 
 const providerConfig = {
-  chainId: 25,
+  chainId: "0x19",
   rpcUrl: 'https://evm.cronos.org',
   isDebug: true,
 };

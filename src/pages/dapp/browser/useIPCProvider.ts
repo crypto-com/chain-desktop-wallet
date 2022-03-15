@@ -17,6 +17,8 @@ import { getCronosEvmAsset } from '../../../utils/utils';
 import { TransactionDataParser } from './TransactionDataParser';
 import { ErrorHandler, WebView } from './types';
 import { useRefCallback } from './useRefCallback';
+import { useChainConfigs } from './useChainConfigs';
+import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
 
 interface IUseIPCProviderProps {
   webview: WebView | null;
@@ -74,9 +76,13 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     return new TransactionDataParser(ChainConfig.RpcUrl, ChainConfig.ExplorerAPIUrl);
   }, []);
 
+  const asset = useCronosEvmAsset()
+
+  const { list: chainConfigs, add: addChainConfig, setSelectedChain, selectedChain } = useChainConfigs();
+
   const executeJavScript = useCallback(
-    (script: string) => {
-      webview?.executeJavaScript(
+    async (script: string) => {
+      await webview?.executeJavaScript(
         `
         (function() {
             ${script}
@@ -87,19 +93,26 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     [webview],
   );
 
-  // const injectDomReadyScript = useCallback(() => {
-  //   executeJavScript(
-  //     `
-  //           var config = {
-  //               chainId: ${ChainConfig.chainId},
-  //               rpcUrl: "${ChainConfig.rpcUrl}",
-  //               isDebug: true
-  //           };
-  //           window.ethereum = new window.desktopWallet.Provider(config);
-  //           window.web3 = new window.desktopWallet.Web3(window.ethereum);
-  //       `,
-  //   );
-  // }, [webview]);
+  const injectDomReadyScript = useCallback((chainConfig?: DappBrowserIPC.EthereumChainConfig) => {
+    // TODO: choose selected chain
+
+    if (!chainConfig) {
+      // eslint-disable-next-line prefer-destructuring
+      chainConfig = chainConfigs[0];
+    }
+
+    executeJavScript(
+      `
+            var config = {
+                address: '${asset?.address}',
+                chainId: '${chainConfig.chainId}',
+                rpcUrl: "${chainConfig.rpcUrls[0]}",
+                isDebug: true
+            };
+            window.ethereum.setConfig(config);
+        `,
+    );
+  }, [webview, chainConfigs, asset]);
 
   const sendError = (id: number, error: string) => {
     executeJavScript(`
@@ -107,11 +120,24 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     `);
   };
 
-  const sendResponse = (id: number, response: string) => {
-    executeJavScript(`
-        window.ethereum.sendResponse(${id}, "${response}")
-    `);
+  const sendResponse = (id: number, response?: string) => {
+    if (response) {
+      executeJavScript(`
+          window.ethereum.sendResponse(${id}, "${response}")
+      `);
+    } else {
+      executeJavScript(`
+          window.ethereum.sendResponse(${id})
+      `);
+    }
   };
+
+  useEffect(() => {
+
+    injectDomReadyScript(selectedChain)
+
+  }, [selectedChain]);
+
 
   const sendResponses = (id: number, responses: string[]) => {
     const script = responses.map(r => `'${r}'`).join(',');
@@ -387,7 +413,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'watchAsset':
           props.onRequestWatchAsset(
             event,
-            () => {},
+            () => { },
             reason => {
               sendError(event.id, reason);
             },
@@ -396,11 +422,43 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'addEthereumChain':
           props.onRequestAddEthereumChain(
             event,
-            () => {},
+            async () => {
+
+              let config = chainConfigs.find(c => c.chainId === event.object.chainId)
+              if (!config) {
+                config = {
+                  chainId: event.object.chainId,
+                  rpcUrls: event.object.rpcUrls,
+                  'blockExplorerUrls': event.object.blockExplorerUrls,
+                  'chainName': event.object.chainName,
+                  'nativeCurrency': event.object.nativeCurrency,
+                }
+                addChainConfig(config)
+              }
+
+              await injectDomReadyScript(config)
+              setSelectedChain(config)
+
+
+              sendResponse(event.id);
+            },
             reason => {
               sendError(event.id, reason);
             },
           );
+          break;
+        case 'switchEthereumChain': {
+
+          const chainConfig = chainConfigs.find(cc => cc.chainId === event.object.chainId)
+
+          if (!chainConfig) {
+            break;
+          }
+
+          injectDomReadyScript(chainConfig)
+
+          sendResponse(event.id, "");
+        }
           break;
         default:
           break;
@@ -421,12 +479,12 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     });
 
     webview.addEventListener('did-finish-load', () => {
-      // injectDomReadyScript();
+      injectDomReadyScript(selectedChain);
       if (process.env.NODE_ENV === 'development') {
         webview.openDevTools();
       }
     });
-  }, [webview]);
+  }, [webview, selectedChain]);
 
   useEffect(() => {
     setupIPC();
