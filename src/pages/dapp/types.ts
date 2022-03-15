@@ -26,6 +26,7 @@ export namespace DappBrowserIPC {
     | 'requestAccounts'
     | 'watchAsset'
     | 'addEthereumChain'
+    | 'switchEthereumChain'
     | 'tokenApproval';
 
   interface BaseEvent {
@@ -104,13 +105,30 @@ export namespace DappBrowserIPC {
     };
   }
 
+  export interface NativeCurrency {
+    decimals: number;
+    name: string;
+    symbol: string;
+  }
+
+  export interface EthereumChainConfig {
+    chainId: string;
+    chainName: string;
+    rpcUrls: string[];
+    nativeCurrency: NativeCurrency;
+    blockExplorerUrls: string[]
+  }
+
   export interface AddEthereumChainEvent extends BaseEvent {
     name: 'addEthereumChain';
+    object: EthereumChainConfig;
+  }
+
+  export interface SwitchEthereumChainEvent extends BaseEvent {
+    name: 'switchEthereumChain';
     object: {
-      chainId: number;
-      name: string;
-      rpcUrls: string[];
-    };
+      chainId: string;
+    }
   }
 
   export type Event =
@@ -122,5 +140,6 @@ export namespace DappBrowserIPC {
     | EcrecoverEvent
     | WatchAssetEvent
     | AddEthereumChainEvent
+    | SwitchEthereumChainEvent
     | TokenApprovalEvent;
 }
