@@ -1,57 +1,42 @@
-import { useMemo } from "react";
-import { MainNetEvmConfig, TestNetEvmConfig } from "../../../config/StaticAssets";
+import { atom, useRecoilState } from "recoil";
+import { getLocalSetting, setLocalSetting, SettingsKey } from "../../../utils/localStorage";
 import { DappBrowserIPC } from "../types";
 
-const useChainConfigs = () => {
 
-  const chainConfigs = useMemo(() => {
+const dappChainConfigs = atom({
+  key: 'dapp_chain_configs',
+  default: getLocalSetting<DappBrowserIPC.EthereumChainConfig[]>(SettingsKey.DappChainConfigs),
+});
 
-    const defaultChainConfigs: DappBrowserIPC.EthereumChainConfig[] = [];
+const dappSelectedChain = atom({
+  key: 'dapp_selected_chain',
+  default: getLocalSetting<DappBrowserIPC.EthereumChainConfig>(SettingsKey.DappSelectedChain),
+})
 
-    defaultChainConfigs.push({
-      chainId: MainNetEvmConfig.chainId,
-      chainName: "Cronos Mainnet",
-      blockExplorerUrls: [MainNetEvmConfig.explorerUrl],
-      rpcUrls: [MainNetEvmConfig.nodeUrl],
-      nativeCurrency: {
-        decimals: 18,
-        name: "Cronos",
-        symbol: "CRO"
-      }
-    })
+export const useChainConfigs = () => {
+  const [list, setList] = useRecoilState(dappChainConfigs);
 
-    defaultChainConfigs.push({
-      chainId: TestNetEvmConfig.chainId,
-      chainName: "Cronos Testnet",
-      blockExplorerUrls: [TestNetEvmConfig.explorerUrl],
-      rpcUrls: [TestNetEvmConfig.nodeUrl],
-      nativeCurrency: {
-        decimals: 18,
-        name: "Cronos test coin",
-        symbol: "TCRO"
-      }
-    })
+  const [selectedChain, setSelectedChain] = useRecoilState(dappSelectedChain);
 
-    defaultChainConfigs.push({
-      chainId: "0x1",
-      chainName: "Ethereum Mainnet",
-      blockExplorerUrls: ["https://etherscan.io/"],
-      rpcUrls: ["https://cloudflare-eth.com/"],
-      nativeCurrency: {
-        decimals: 18,
-        name: "Ethereum",
-        symbol: "ETH"
-      }
-    })
+  const validate = (chainId: string) => {
+    return !list.some(item => item.chainId === chainId);
+  };
 
-    return defaultChainConfigs;
-  }, [])
+  const updateList = (lst: DappBrowserIPC.EthereumChainConfig[]) => {
+    setList(lst);
+    setLocalSetting(SettingsKey.DappChainConfigs, lst);
+  };
 
+  const add = (config: DappBrowserIPC.EthereumChainConfig) => {
+    if (!validate(config.chainId)) {
+      return;
+    }
+    updateList([...list, config]);
+  };
 
-  return {
-    chainConfigs
-  }
+  const remove = (chainId: string) => {
+    updateList(list.filter(item => item.chainId !== chainId));
+  };
 
-}
-
-export { useChainConfigs };
+  return { list, add, remove, validate, selectedChain, setSelectedChain };
+};
