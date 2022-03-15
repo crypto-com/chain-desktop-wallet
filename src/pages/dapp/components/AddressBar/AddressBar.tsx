@@ -1,3 +1,4 @@
+import * as React from 'react';
 import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
@@ -6,9 +7,9 @@ import {
   ReloadOutlined,
 } from '@ant-design/icons';
 import { Button, Input, Spin } from 'antd';
-import * as React from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconBookmarkFilled, IconBookmarkNormal } from '../../../../svg/IconBookmark';
+import ChainSelect from '../ChainSelect';
 import './style.less';
 
 interface IButtonStates {
@@ -81,6 +82,7 @@ const AddressBar = (props: IAddressBarProps) => {
           }
         }}
       />
+      <ChainSelect />
       <Button
         type="link"
         className="bookmark-button"
