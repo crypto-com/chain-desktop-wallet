@@ -2,9 +2,9 @@ import { MainNetEvmConfig, TestNetEvmConfig } from '../config/StaticAssets';
 import { Bookmark } from '../models/DappBrowser';
 
 
-const DefaultChainConfigs = [
+export const DAppDefaultChainConfigs = [
   {
-    chainId: MainNetEvmConfig.chainId,
+    chainId: "0x19",
     chainName: "Cronos Mainnet",
     blockExplorerUrls: [MainNetEvmConfig.explorerUrl],
     rpcUrls: [MainNetEvmConfig.nodeUrl],
@@ -15,7 +15,7 @@ const DefaultChainConfigs = [
     }
   },
   {
-    chainId: TestNetEvmConfig.chainId,
+    chainId: "0x152",
     chainName: "Cronos Testnet",
     blockExplorerUrls: [TestNetEvmConfig.explorerUrl],
     rpcUrls: [TestNetEvmConfig.nodeUrl],
@@ -49,8 +49,8 @@ export enum SettingsKey {
 export const DefaultSettings = {
   [SettingsKey.DappBookmarks]: [] as Bookmark[],
   [SettingsKey.DappDisclaimerDisabledList]: [] as string[],
-  [SettingsKey.DappChainConfigs]: DefaultChainConfigs,
-  [SettingsKey.DappSelectedChain]: DefaultChainConfigs[0],
+  [SettingsKey.DappChainConfigs]: DAppDefaultChainConfigs,
+  [SettingsKey.DappSelectedChain]: DAppDefaultChainConfigs[0],
 };
 
 export const getLocalSetting = <T>(key: SettingsKey): T => {
