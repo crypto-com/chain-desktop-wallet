@@ -59,7 +59,17 @@ interface IUseIPCProviderProps {
     onError: ErrorHandler,
   ) => Promise<void>;
   onRequestAddEthereumChain: (
-    event: DappBrowserIPC.AddEthereumChainEvent,
+    event: {
+      chainConfig: DappBrowserIPC.EthereumChainConfig;
+    },
+    onSuccess: () => void,
+    onError: ErrorHandler,
+  ) => Promise<void>;
+  onRequestSwitchEthereumChain: (
+    event: {
+      prev: DappBrowserIPC.EthereumChainConfig;
+      next: DappBrowserIPC.EthereumChainConfig;
+    },
     onSuccess: () => void,
     onError: ErrorHandler,
   ) => Promise<void>;
@@ -277,12 +287,13 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     },
   );
 
-  const listenIPCMessages = () => {
+  useEffect(() => {
+
     if (!webview) {
       return;
     }
 
-    webview.addEventListener('ipc-message', async e => {
+    const ipcMessageHandler = async (e: Electron.IpcMessageEvent) => {
       const { channel, args } = e;
 
       if (channel !== DappBrowserIPC.ChannelName) {
@@ -419,26 +430,46 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             },
           );
           break;
-        case 'addEthereumChain':
-          props.onRequestAddEthereumChain(
-            event,
+        case 'addEthereumChain': {
+
+          const foundConfig = chainConfigs.find(c => c.chainId === event.object.chainId)
+
+          if (foundConfig && selectedChain.chainId === event.object.chainId) {
+            return;
+          }
+
+          if (foundConfig && selectedChain.chainId !== event.object.chainId) {
+            props.onRequestSwitchEthereumChain({
+              prev: selectedChain, next: foundConfig
+            }, () => {
+              setSelectedChain(foundConfig)
+              injectDomReadyScript(foundConfig)
+            }, () => {
+              // no-op
+            })
+            return;
+          }
+
+          const config = {
+            chainId: event.object.chainId,
+            rpcUrls: event.object.rpcUrls,
+            'blockExplorerUrls': event.object.blockExplorerUrls,
+            'chainName': event.object.chainName,
+            'nativeCurrency': event.object.nativeCurrency,
+          }
+
+          props.onRequestAddEthereumChain({ chainConfig: config },
             async () => {
+              addChainConfig(config);
 
-              let config = chainConfigs.find(c => c.chainId === event.object.chainId)
-              if (!config) {
-                config = {
-                  chainId: event.object.chainId,
-                  rpcUrls: event.object.rpcUrls,
-                  'blockExplorerUrls': event.object.blockExplorerUrls,
-                  'chainName': event.object.chainName,
-                  'nativeCurrency': event.object.nativeCurrency,
-                }
-                addChainConfig(config)
-              }
-
-              await injectDomReadyScript(config)
-              setSelectedChain(config)
-
+              props.onRequestSwitchEthereumChain({
+                prev: selectedChain, next: config
+              }, () => {
+                setSelectedChain(config)
+                injectDomReadyScript(config)
+              }, () => {
+                // no-op
+              })
 
               sendResponse(event.id);
             },
@@ -446,32 +477,41 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
               sendError(event.id, reason);
             },
           );
+        }
           break;
         case 'switchEthereumChain': {
 
-          const chainConfig = chainConfigs.find(cc => cc.chainId === event.object.chainId)
-
-          if (!chainConfig) {
-            break;
+          const foundConfig = chainConfigs.find(c => c.chainId === event.object.chainId)
+          if (foundConfig && selectedChain.chainId !== event.object.chainId) {
+            props.onRequestSwitchEthereumChain({
+              prev: selectedChain, next: foundConfig
+            }, () => {
+              setSelectedChain(foundConfig)
+              injectDomReadyScript(foundConfig)
+            }, () => {
+              // no-op
+            })
           }
 
-          injectDomReadyScript(chainConfig)
-
-          sendResponse(event.id, "");
         }
           break;
         default:
           break;
       }
-    });
-  };
+    }
+
+    webview.addEventListener('ipc-message', ipcMessageHandler);
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      webview.removeEventListener('ipc-message', ipcMessageHandler)
+    };
+  }, [chainConfigs, webview, selectedChain]);
 
   const setupIPC = useCallback(() => {
     if (!webview) {
       return;
     }
-
-    listenIPCMessages();
 
     webview.addEventListener('new-window', e => {
       e.preventDefault();
