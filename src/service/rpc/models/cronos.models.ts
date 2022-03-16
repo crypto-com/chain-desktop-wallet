@@ -42,6 +42,12 @@ export interface tokensOwnedByAddressRequestParams extends ApiRequestParamsBase 
   address: string;
 }
 
+export interface nftsOwnedByAddressRequestParams extends ApiRequestParamsBase {
+  module: 'token';
+  action: 'getToken';
+  contractaddress: string;
+}
+
 export interface tokenContractDataRequestParams extends ApiRequestParamsBase {
   module: 'token';
   action: 'getToken';

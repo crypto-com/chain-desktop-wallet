@@ -18,6 +18,7 @@ import {
   tokenTransfersRequestParams,
   tokensOwnedByAddressRequestParams,
   TokensOwnedByAddressResponse,
+  nftsOwnedByAddressRequestParams,
 } from '../rpc/models/cronos.models';
 
 /**
@@ -120,6 +121,25 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
       module: 'account',
       action: 'tokenlist',
       address,
+    };
+
+    const txListResponse: AxiosResponse<TokensOwnedByAddressResponse> = await axios({
+      baseURL: this.cronosExplorerAPIBaseURL,
+      url: '/api',
+      params: requestParams,
+    });
+
+    if (txListResponse.status !== 200) {
+      throw new Error('Could not fetch token owned by user address from Cronos Chain Index API.');
+    }
+    return txListResponse.data;
+  }
+
+  async getNftOwnedByAddress(address: string): Promise<TokensOwnedByAddressResponse> {
+    const requestParams: nftsOwnedByAddressRequestParams = {
+      module: 'token',
+      action: 'getToken',
+      contractaddress: address,
     };
 
     const txListResponse: AxiosResponse<TokensOwnedByAddressResponse> = await axios({

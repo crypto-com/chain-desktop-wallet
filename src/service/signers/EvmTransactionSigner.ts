@@ -101,6 +101,23 @@ class EvmTransactionSigner implements ITransactionSigner {
     return Promise.resolve(signedTx.hash);
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  public async sendCall(
+    asset: UserAsset,
+    payload: ethers.providers.TransactionRequest,
+    jsonRpcUrl: string,
+  ): Promise<string> {
+    if (!asset.address || !asset.config?.nodeUrl) {
+      throw TypeError(`Missing asset config: ${asset.config}`);
+    }
+
+    const provider = new ethers.providers.JsonRpcProvider(jsonRpcUrl);
+
+    const response = await provider.call(payload)
+
+    return Promise.resolve(response);
+  }
+
   static async signPersonalMessage(message: string, passphrase = ''): Promise<string> {
     const currentSession = await walletService.retrieveCurrentSession();
 
