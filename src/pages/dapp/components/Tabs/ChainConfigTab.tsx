@@ -1,24 +1,39 @@
 import * as React from 'react';
-import { Button, Divider, Form, Input, List, Space, Table, Tag } from 'antd';
+import { Button, Divider, Form, Input, InputNumber, List, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
-import _ from 'lodash';
 import { useTranslation } from 'react-i18next';
 import { ethers } from 'ethers';
 import { useForm } from 'antd/lib/form/Form';
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal';
 import { useChainConfigs } from '../../browser/useChainConfigs';
 import { DappBrowserIPC } from '../../types';
-import { DAppDefaultChainConfigs } from '../../../../utils/localStorage';
+import { DAppDefaultChainConfigs, isChainDefaultConfig } from '../../../../utils/localStorage';
+import { isHexEqual } from '../../../../utils/utils';
 
 type ChainConfig = DappBrowserIPC.EthereumChainConfig;
+
+const FormKeys = {
+  chainId: 'chainId',
+  chainName: 'chainName',
+  rpcURL: 'rpcURL',
+  explorerURL: 'explorerURL',
+  symbol: 'symbol',
+};
+
+interface FormData {
+  chainId: number;
+  chainName: string;
+  rpcURL: string;
+  explorerURL: string;
+  symbol: string;
+}
 
 const ChainConfigTab = () => {
   const {
     selectedChain,
-    setSelectedChain,
     list: chainConfigs,
-    add: addChainConfig,
+    updateList: updateChainConfigs,
     remove: removeChainConfig,
     validate,
   } = useChainConfigs();
@@ -72,6 +87,7 @@ const ChainConfigTab = () => {
             setDeletingConfig(undefined);
             removeChainConfig(deletingConfig.chainId);
             setEditingChainConfig(DAppDefaultChainConfigs[0]);
+            message.success('Remove success');
           }}
           confirmText={t('settings.addressBook.remove')}
         >
@@ -121,7 +137,9 @@ const ChainConfigTab = () => {
                       style={{
                         fontSize: '16px',
                         cursor: 'pointer',
-                        color: editingChainConfig.chainId === item.chainId ? '#000000' : '#AAAAAA',
+                        color: isHexEqual(editingChainConfig.chainId, item.chainId)
+                          ? '#000000'
+                          : '#AAAAAA',
                       }}
                     >
                       {item.chainName}
@@ -132,11 +150,40 @@ const ChainConfigTab = () => {
             );
           }}
         />
-        <Form layout="vertical" form={form} style={{ width: '40%' }}>
+        <Form<FormData>
+          layout="vertical"
+          form={form}
+          style={{ width: '40%' }}
+          onFinish={fieldsValue => {
+            const wantedChainConfig: ChainConfig = {
+              chainId: ethers.BigNumber.from(fieldsValue.chainId).toHexString(),
+              chainName: fieldsValue.chainName,
+              rpcUrls: [fieldsValue.rpcURL],
+              blockExplorerUrls: [fieldsValue.explorerURL],
+              nativeCurrency: {
+                symbol: fieldsValue.symbol,
+                name: fieldsValue.symbol,
+                decimals: 18,
+              },
+            };
+
+            const index = chainConfigs.findIndex(config =>
+              isHexEqual(config.chainId, editingChainConfig.chainId),
+            );
+
+            const newChainConfigs = [...chainConfigs];
+
+            newChainConfigs.splice(index, 1, wantedChainConfig);
+
+            updateChainConfigs([...newChainConfigs]);
+            setEditingChainConfig(wantedChainConfig);
+            message.success('Save success');
+          }}
+        >
           <Form.Item
             label="Chain Name"
             initialValue={editingChainConfig.chainName}
-            name="chain_name"
+            name={FormKeys.chainName}
             hasFeedback
             validateFirst
             rules={[
@@ -147,28 +194,57 @@ const ChainConfigTab = () => {
               },
             ]}
           >
-            <Input />
+            <Input disabled={isChainDefaultConfig(editingChainConfig.chainId)} />
           </Form.Item>
           <Form.Item
             label="Chain ID"
-            initialValue={ethers.BigNumber.from(editingChainConfig.chainId).toString()}
-            name="chain_id"
+            initialValue={ethers.BigNumber.from(editingChainConfig.chainId).toNumber()}
+            name={FormKeys.chainId}
+            hasFeedback
+            validateFirst
+            rules={[
+              {
+                validator: (r, v: number) => {
+                  if (v === parseInt(editingChainConfig.chainId, 16)) {
+                    return Promise.resolve();
+                  }
+
+                  if (!validate(ethers.BigNumber.from(v).toHexString())) {
+                    return Promise.reject();
+                  }
+
+                  return Promise.resolve();
+                },
+                message: `chain id exists`,
+              },
+              {
+                required: true,
+                type: 'number',
+              },
+            ]}
+          >
+            <InputNumber disabled={isChainDefaultConfig(editingChainConfig.chainId)} />
+          </Form.Item>
+          <Form.Item
+            label="Currency Symbol"
+            initialValue={editingChainConfig.nativeCurrency.symbol}
+            name={FormKeys.symbol}
             hasFeedback
             validateFirst
             rules={[
               {
                 required: true,
-                type: 'number',
-                message: `chain id ${t('general.required')}`,
+                type: 'string',
+                message: `Symbol ${t('general.required')}`,
               },
             ]}
           >
-            <Input />
+            <Input disabled={isChainDefaultConfig(editingChainConfig.chainId)} />
           </Form.Item>
           <Form.Item
             label="RPC URL"
             initialValue={editingChainConfig.rpcUrls[0]}
-            name="rpc_url"
+            name={FormKeys.rpcURL}
             hasFeedback
             validateFirst
             rules={[
@@ -184,7 +260,7 @@ const ChainConfigTab = () => {
           <Form.Item
             label="Block Explorer URL"
             initialValue={editingChainConfig.blockExplorerUrls[0]}
-            name="explorer_url"
+            name={FormKeys.explorerURL}
             hasFeedback
             validateFirst
             rules={[
@@ -197,27 +273,39 @@ const ChainConfigTab = () => {
           >
             <Input />
           </Form.Item>
+
           <Form.Item label=" ">
-            <Button
-              type="primary"
-              danger
-              style={{ color: 'red', borderColor: 'red' }}
-              onClick={() => {
-                setDeletingConfig(editingChainConfig);
-              }}
-            >
-              Remove
-            </Button>
-            <Button
-              type="primary"
-              danger
-              onClick={() => {
-                form.resetFields();
-              }}
-            >
-              Reset
-            </Button>
-            <Button type="primary">Save</Button>
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <Button
+                type="primary"
+                danger
+                disabled={
+                  isChainDefaultConfig(editingChainConfig.chainId) ||
+                  isHexEqual(selectedChain.chainId, editingChainConfig.chainId)
+                }
+                style={{ color: 'red', borderColor: 'red' }}
+                onClick={() => {
+                  setDeletingConfig(editingChainConfig);
+                }}
+              >
+                Remove
+              </Button>
+              <div>
+                <Button
+                  type="primary"
+                  danger
+                  onClick={() => {
+                    form.resetFields();
+                    message.success('Reset success');
+                  }}
+                >
+                  Reset
+                </Button>
+                <Button type="primary" htmlType="submit">
+                  Save
+                </Button>
+              </div>
+            </div>
           </Form.Item>
         </Form>
       </div>
