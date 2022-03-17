@@ -1,13 +1,12 @@
 import { Select } from 'antd';
 import * as React from 'react';
+import { isHexEqual } from '../../../../utils/utils';
 import { useChainConfigs } from '../../browser/useChainConfigs';
 import './index.css';
 
 const { Option } = Select;
 
-interface IChainSelectProps {}
-
-const ChainSelect = (props: IChainSelectProps) => {
+const ChainSelect = () => {
   const { list: chainConfigs, selectedChain, setSelectedChain } = useChainConfigs();
 
   return (
@@ -21,7 +20,7 @@ const ChainSelect = (props: IChainSelectProps) => {
       <Select
         value={selectedChain.chainId}
         onChange={(chainId: string) => {
-          const config = chainConfigs.find(chainConfig => chainConfig.chainId === chainId);
+          const config = chainConfigs.find(chainConfig => isHexEqual(chainConfig.chainId, chainId));
           if (config) {
             setSelectedChain(config);
           }

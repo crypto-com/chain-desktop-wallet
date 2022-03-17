@@ -1,6 +1,11 @@
 import { MainNetEvmConfig, TestNetEvmConfig } from '../config/StaticAssets';
 import { Bookmark } from '../models/DappBrowser';
 
+export const DefaultChainConfigIds = ["0x19", "0x152", "0x01"].map(id => parseInt(id, 16));
+
+export const isChainDefaultConfig = (chainId: string) => {
+  return DefaultChainConfigIds.includes(parseInt(chainId, 16));
+}
 
 export const DAppDefaultChainConfigs = [
   {
@@ -12,7 +17,7 @@ export const DAppDefaultChainConfigs = [
       decimals: 18,
       name: "Cronos",
       symbol: "CRO"
-    }
+    },
   },
   {
     chainId: "0x152",
@@ -26,10 +31,10 @@ export const DAppDefaultChainConfigs = [
     }
   },
   {
-    chainId: "0x1",
+    chainId: "0x01",
     chainName: "Ethereum Mainnet",
     blockExplorerUrls: ["https://etherscan.io/"],
-    rpcUrls: ["https://cloudflare-eth.com/"],
+    rpcUrls: ["https://api.mycryptoapi.com/eth"],
     nativeCurrency: {
       decimals: 18,
       name: "Ethereum",

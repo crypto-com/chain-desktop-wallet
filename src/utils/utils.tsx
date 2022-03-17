@@ -233,3 +233,7 @@ export function addHTTPsPrefixIfNeeded(str: string) {
 
   return `https://${str}`;
 }
+
+export function isHexEqual(lhs: string, rhs: string) {
+  return Web3.utils.toHex(lhs) === Web3.utils.toHex(rhs);
+}

@@ -1,5 +1,6 @@
 import { atom, useRecoilState } from "recoil";
 import { getLocalSetting, setLocalSetting, SettingsKey } from "../../../utils/localStorage";
+import { isHexEqual } from "../../../utils/utils";
 import { DappBrowserIPC } from "../types";
 
 
@@ -19,7 +20,7 @@ export const useChainConfigs = () => {
   const [selectedChain, setSelectedChain] = useRecoilState(dappSelectedChain);
 
   const validate = (chainId: string) => {
-    return !list.some(item => item.chainId === chainId);
+    return !list.some(item => isHexEqual(item.chainId, chainId));
   };
 
   const updateList = (lst: DappBrowserIPC.EthereumChainConfig[]) => {
@@ -38,5 +39,5 @@ export const useChainConfigs = () => {
     updateList(list.filter(item => item.chainId !== chainId));
   };
 
-  return { list, add, remove, validate, selectedChain, setSelectedChain };
+  return { list, updateList, add, remove, validate, selectedChain, setSelectedChain };
 };

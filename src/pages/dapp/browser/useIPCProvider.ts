@@ -13,7 +13,7 @@ import {
 } from '../../../service/signers/EvmTransactionSigner';
 import { EVMContractCallUnsigned } from '../../../service/signers/TransactionSupported';
 import { walletAllAssetsState } from '../../../recoil/atom';
-import { getCronosEvmAsset } from '../../../utils/utils';
+import { getCronosEvmAsset, isHexEqual } from '../../../utils/utils';
 import { TransactionDataParser } from './TransactionDataParser';
 import { ErrorHandler, WebView } from './types';
 import { useRefCallback } from './useRefCallback';
@@ -432,9 +432,9 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           break;
         case 'addEthereumChain': {
 
-          const foundConfig = chainConfigs.find(c => c.chainId === event.object.chainId)
+          const foundConfig = chainConfigs.find(c => isHexEqual(c.chainId, event.object.chainId))
 
-          if (foundConfig && selectedChain.chainId === event.object.chainId) {
+          if (foundConfig && isHexEqual(selectedChain.chainId, event.object.chainId)) {
             return;
           }
 
@@ -481,7 +481,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           break;
         case 'switchEthereumChain': {
 
-          const foundConfig = chainConfigs.find(c => c.chainId === event.object.chainId)
+          const foundConfig = chainConfigs.find(c => isHexEqual(c.chainId, event.object.chainId))
           if (foundConfig && selectedChain.chainId !== event.object.chainId) {
             props.onRequestSwitchEthereumChain({
               prev: selectedChain, next: foundConfig
