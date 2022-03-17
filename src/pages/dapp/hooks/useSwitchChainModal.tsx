@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
-import { Modal } from 'antd';
+import { Modal, Tag } from 'antd';
 import { ethers } from 'ethers';
 import { DappBrowserIPC } from '../types';
 
@@ -46,23 +46,12 @@ export const useSwitchChainModal = () => {
             Wants to Switch Network
           </div>
           <div style={{ margin: 'auto', textAlign: 'left', marginTop: '30px' }}>
-            {[
-              {
-                title: 'Network Name',
-                value: props.config.chainName,
-              },
-              {
-                title: 'Network ID',
-                value: ethers.BigNumber.from(props.config.chainId).toString(),
-              },
-            ].map(({ title, value }) => {
-              return (
-                <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '10px' }}>
-                  <div style={{ fontWeight: 'bold', fontSize: '15px' }}>{title}</div>
-                  <div>{value}</div>
-                </div>
-              );
-            })}
+            <Tag
+              color="blue"
+              style={{ padding: '10px', fontSize: '15px', borderRadius: '4px', color: '#1199FA' }}
+            >
+              {props.config.chainName}
+            </Tag>
           </div>
         </div>
       ),
