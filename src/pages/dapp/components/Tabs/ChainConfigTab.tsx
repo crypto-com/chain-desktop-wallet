@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button, Divider, Form, Input, InputNumber, List, message } from 'antd';
+import { Button, Form, Input, InputNumber, List, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { InfoCircleOutlined, PlusOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
@@ -55,28 +55,11 @@ const ChainConfigTab = () => {
     <div
       className="site-layout-background settings-content"
       style={{
-        padding: '6px',
+        padding: '50px 20px',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
-      <Button
-        icon={<PlusOutlined />}
-        style={{
-          boxShadow: 'none',
-          justifySelf: 'flex-end',
-          alignSelf: 'flex-end',
-          border: 'none',
-        }}
-        onClick={() => {}}
-      >
-        Add New Chain
-      </Button>
-      <Divider
-        style={{
-          margin: '4px',
-        }}
-      />
       {deletingConfig && (
         <ConfirmModal
           visible
@@ -111,45 +94,65 @@ const ChainConfigTab = () => {
       )}
       <div
         style={{
-          padding: '0 40px',
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'center',
           paddingTop: '10px',
         }}
       >
-        <List
-          split={false}
+        <div
           style={{
+            display: 'flex',
+            flexDirection: 'column',
             width: '30%',
+            alignItems: 'start',
           }}
-          dataSource={chainConfigs}
-          rowKey={record => record.chainId}
-          renderItem={item => {
-            return (
-              <List.Item key={item.chainId}>
-                <List.Item.Meta
-                  title={
-                    <div
-                      onClick={() => {
-                        setEditingChainConfig(item);
-                      }}
-                      style={{
-                        fontSize: '16px',
-                        cursor: 'pointer',
-                        color: isHexEqual(editingChainConfig.chainId, item.chainId)
-                          ? '#000000'
-                          : '#AAAAAA',
-                      }}
-                    >
-                      {item.chainName}
-                    </div>
-                  }
-                />
-              </List.Item>
-            );
-          }}
-        />
+        >
+          <List
+            split={false}
+            style={{
+              width: '100%',
+            }}
+            dataSource={chainConfigs}
+            rowKey={record => record.chainId}
+            renderItem={item => {
+              return (
+                <List.Item key={item.chainId}>
+                  <List.Item.Meta
+                    title={
+                      <div
+                        onClick={() => {
+                          setEditingChainConfig(item);
+                        }}
+                        style={{
+                          fontSize: '16px',
+                          cursor: 'pointer',
+                          color: isHexEqual(editingChainConfig.chainId, item.chainId)
+                            ? '#000000'
+                            : '#AAAAAA',
+                        }}
+                      >
+                        {item.chainName}
+                      </div>
+                    }
+                  />
+                </List.Item>
+              );
+            }}
+          />
+          <Button
+            icon={<PlusOutlined />}
+            style={{
+              boxShadow: 'none',
+              border: 'none',
+              margin: 0,
+              padding: 0,
+            }}
+            onClick={() => {}}
+          >
+            Add New Chain
+          </Button>
+        </div>
         <Form<FormData>
           layout="vertical"
           form={form}
