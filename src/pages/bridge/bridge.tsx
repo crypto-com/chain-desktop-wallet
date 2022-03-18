@@ -44,7 +44,12 @@ import { walletService } from '../../service/WalletService';
 import { UserAsset } from '../../models/UserAsset';
 import { BroadCastResult } from '../../models/Transaction';
 import { renderExplorerUrl } from '../../models/Explorer';
-import { getAssetBySymbolAndChain, getChainName, middleEllipsis } from '../../utils/utils';
+import {
+  getAssetBySymbolAndChain,
+  getChainName,
+  getCronosTendermintAsset,
+  middleEllipsis,
+} from '../../utils/utils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import {
   adjustedTransactionAmount,
@@ -100,6 +105,7 @@ const CronosBridge = props => {
 
   const session = useRecoilValue(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
+  const croAsset = getCronosTendermintAsset(walletAllAssets);
 
   const setPageLock = useSetRecoilState(pageLockState);
   const [form] = Form.useForm();
@@ -117,7 +123,7 @@ const CronosBridge = props => {
   const [isBridgeTransfering, setIsBridgeTransfering] = useState(false);
 
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
-  const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>();
+  const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(croAsset);
   const [toAsset, setToAsset] = useState<UserAsset | undefined>();
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
