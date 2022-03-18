@@ -143,3 +143,23 @@ export namespace DappBrowserIPC {
     | SwitchEthereumChainEvent
     | TokenApprovalEvent;
 }
+
+
+export type ChainConfig = DappBrowserIPC.EthereumChainConfig;
+
+export const ChainConfigFormKeys = {
+  chainId: 'chainId',
+  chainName: 'chainName',
+  rpcURL: 'rpcURL',
+  explorerURL: 'explorerURL',
+  symbol: 'symbol',
+};
+
+export interface ChainConfigFormData {
+  chainId: number;
+  chainName: string;
+  rpcURL: string;
+  explorerURL: string;
+  symbol: string;
+}
+

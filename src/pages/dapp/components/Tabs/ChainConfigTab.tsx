@@ -7,27 +7,10 @@ import { ethers } from 'ethers';
 import { useForm } from 'antd/lib/form/Form';
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal';
 import { useChainConfigs } from '../../browser/useChainConfigs';
-import { DappBrowserIPC } from '../../types';
 import { DAppDefaultChainConfigs, isChainDefaultConfig } from '../../../../utils/localStorage';
 import { isHexEqual } from '../../../../utils/utils';
-
-type ChainConfig = DappBrowserIPC.EthereumChainConfig;
-
-const FormKeys = {
-  chainId: 'chainId',
-  chainName: 'chainName',
-  rpcURL: 'rpcURL',
-  explorerURL: 'explorerURL',
-  symbol: 'symbol',
-};
-
-interface FormData {
-  chainId: number;
-  chainName: string;
-  rpcURL: string;
-  explorerURL: string;
-  symbol: string;
-}
+import { ChainConfig, ChainConfigFormData, ChainConfigFormKeys } from '../../types';
+import { useAddChainConfigModal } from '../../hooks/useAddChainConfigModal';
 
 const ChainConfigTab = () => {
   const {
@@ -46,6 +29,8 @@ const ChainConfigTab = () => {
     DAppDefaultChainConfigs[0],
   );
   const [deletingConfig, setDeletingConfig] = useState<ChainConfig>();
+
+  const { showWithConfig: showAddChainConfigModal } = useAddChainConfigModal();
 
   useEffect(() => {
     form.resetFields();
@@ -148,12 +133,14 @@ const ChainConfigTab = () => {
               margin: 0,
               padding: 0,
             }}
-            onClick={() => {}}
+            onClick={() => {
+              showAddChainConfigModal();
+            }}
           >
             Add New Chain
           </Button>
         </div>
-        <Form<FormData>
+        <Form<ChainConfigFormData>
           layout="vertical"
           form={form}
           style={{ width: '40%' }}
@@ -186,7 +173,7 @@ const ChainConfigTab = () => {
           <Form.Item
             label="Chain Name"
             initialValue={editingChainConfig.chainName}
-            name={FormKeys.chainName}
+            name={ChainConfigFormKeys.chainName}
             hasFeedback
             validateFirst
             rules={[
@@ -202,7 +189,7 @@ const ChainConfigTab = () => {
           <Form.Item
             label="Chain ID"
             initialValue={ethers.BigNumber.from(editingChainConfig.chainId).toNumber()}
-            name={FormKeys.chainId}
+            name={ChainConfigFormKeys.chainId}
             hasFeedback
             validateFirst
             rules={[
@@ -231,7 +218,7 @@ const ChainConfigTab = () => {
           <Form.Item
             label="Currency Symbol"
             initialValue={editingChainConfig.nativeCurrency.symbol}
-            name={FormKeys.symbol}
+            name={ChainConfigFormKeys.symbol}
             hasFeedback
             validateFirst
             rules={[
@@ -247,7 +234,7 @@ const ChainConfigTab = () => {
           <Form.Item
             label="RPC URL"
             initialValue={editingChainConfig.rpcUrls[0]}
-            name={FormKeys.rpcURL}
+            name={ChainConfigFormKeys.rpcURL}
             hasFeedback
             validateFirst
             rules={[
@@ -263,7 +250,7 @@ const ChainConfigTab = () => {
           <Form.Item
             label="Block Explorer URL"
             initialValue={editingChainConfig.blockExplorerUrls[0]}
-            name={FormKeys.explorerURL}
+            name={ChainConfigFormKeys.explorerURL}
             hasFeedback
             validateFirst
             rules={[
