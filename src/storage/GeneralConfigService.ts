@@ -1,5 +1,5 @@
 import { DatabaseManager } from './DatabaseManager';
-import { GeneralConfig } from '../config/GeneralConfig';
+import { AutoUpdateConfig, GeneralConfig } from '../config/GeneralConfig';
 import { DEFAULT_LANGUAGE_CODE } from '../config/StaticConfig';
 
 export class GeneralConfigService {
@@ -31,6 +31,9 @@ export class GeneralConfigService {
         languageCode,
         incorrectUnlockAttempts: 0,
         isAppLockedByUser: false,
+        autoUpdate: {
+          disabled: false,
+        },
       };
       return this.saveGeneralConfig(newConfig);
     }
@@ -48,6 +51,9 @@ export class GeneralConfigService {
         hasEverShownAnalyticsPopup: false,
         incorrectUnlockAttempts: 0,
         isAppLockedByUser: false,
+        autoUpdate: {
+          disabled: false,
+        },
       };
       await this.saveGeneralConfig(newConfig);
       return DEFAULT_LANGUAGE_CODE;
@@ -82,11 +88,62 @@ export class GeneralConfigService {
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
         incorrectUnlockAttempts: 0,
+        autoUpdate: {
+          disabled: false,
+        },
       };
       await this.saveGeneralConfig(newConfig);
       return false;
     }
     return savedConfig.hasEverShownAnalyticsPopup;
+  }
+
+  public async checkIfAutoUpdateDisabled(): Promise<AutoUpdateConfig> {
+    const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
+      _id: this.GENERAL_CONFIG_ID,
+    });
+    if (!savedConfig) {
+      const newConfig: GeneralConfig = {
+        ...(savedConfig as GeneralConfig),
+        hasEverShownAnalyticsPopup: false,
+        isAppLockedByUser: false,
+        incorrectUnlockAttempts: 0,
+        autoUpdate: {
+          disabled: false,
+        },
+      };
+      await this.saveGeneralConfig(newConfig);
+      return {
+        disabled: false,
+      };
+    }
+    return savedConfig.autoUpdate;
+  }
+
+  public async setIsAutoUpdateDisable(isAutoUpdateDisable: boolean) {
+    const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
+      _id: this.GENERAL_CONFIG_ID,
+    });
+
+    // If config object is not yet created
+    if (!savedConfig) {
+      const newConfig: GeneralConfig = {
+        ...(savedConfig as GeneralConfig),
+        isAppLockedByUser: false,
+        incorrectUnlockAttempts: 0,
+        autoUpdate: {
+          disabled: false,
+        },
+      };
+      return this.saveGeneralConfig(newConfig);
+    }
+    savedConfig.autoUpdate = isAutoUpdateDisable
+      ? {
+          disabled: true,
+          expire: new Date().setDate(Date.now() + 30),
+        }
+      : { disabled: false };
+    return this.saveGeneralConfig(savedConfig);
   }
 
   public async setIsAppLockedByUser(isAppLockedByUser: boolean) {
@@ -100,6 +157,9 @@ export class GeneralConfigService {
         ...(savedConfig as GeneralConfig),
         isAppLockedByUser,
         incorrectUnlockAttempts: 0,
+        autoUpdate: {
+          disabled: false,
+        },
       };
       return this.saveGeneralConfig(newConfig);
     }
@@ -117,6 +177,9 @@ export class GeneralConfigService {
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
         incorrectUnlockAttempts: 0,
+        autoUpdate: {
+          disabled: false,
+        },
       };
       await this.saveGeneralConfig(newConfig);
       return false;
@@ -135,6 +198,9 @@ export class GeneralConfigService {
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
         incorrectUnlockAttempts: 1,
+        autoUpdate: {
+          disabled: false,
+        },
       };
       await this.saveGeneralConfig(newConfig);
       return 1;
@@ -155,6 +221,9 @@ export class GeneralConfigService {
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
         incorrectUnlockAttempts: 0,
+        autoUpdate: {
+          disabled: false,
+        },
       };
       await this.saveGeneralConfig(newConfig);
       return;
@@ -175,13 +244,15 @@ export class GeneralConfigService {
         hasEverShownAnalyticsPopup: false,
         isAppLockedByUser: false,
         incorrectUnlockAttempts: 0,
+        autoUpdate: {
+          disabled: false,
+        },
       };
       await this.saveGeneralConfig(newConfig);
       return 0;
     }
     return savedConfig.incorrectUnlockAttempts;
   }
-
 }
 
 export const generalConfigService = new GeneralConfigService('general-config');
