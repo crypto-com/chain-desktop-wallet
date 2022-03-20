@@ -507,11 +507,12 @@ function HomeLayout(props: HomeLayoutProps) {
                 explorer: {
                   baseUrl: `${explorerUrl}`,
                   tx: `${explorerUrl}/tx`,
-                  address: `${explorerUrl}/${asset.assetType === UserAssetType.TENDERMINT ||
-                      asset.assetType === UserAssetType.IBC
+                  address: `${explorerUrl}/${
+                    asset.assetType === UserAssetType.TENDERMINT ||
+                    asset.assetType === UserAssetType.IBC
                       ? 'account'
                       : 'address'
-                    }`,
+                  }`,
                   validator: `${explorerUrl}/validator`,
                 },
                 explorerUrl,
@@ -657,6 +658,15 @@ function HomeLayout(props: HomeLayoutProps) {
       // const isIbcVisible = false;
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
       const isAppLocked = await generalConfigService.getIfAppIsLockedByUser();
+      const isAutoUpdateDisabled = await generalConfigService.checkIfAutoUpdateDisabled();
+
+      // Enable Auto Update if expired
+      if (isAutoUpdateDisabled.disabled && isAutoUpdateDisabled.expire) {
+        if (isAutoUpdateDisabled.expire < Date.now()) {
+          generalConfigService.setIsAutoUpdateDisable(false);
+        }
+      }
+
       setHasWallet(hasWalletBeenCreated);
       setSession({
         ...currentSession,
@@ -1043,10 +1053,11 @@ function HomeLayout(props: HomeLayoutProps) {
                 <div className="item">
                   <Alert
                     type="warning"
-                    message={`${t('navbar.wallet.modal.warning1')} ${session.wallet.walletType !== LEDGER_WALLET_TYPE
+                    message={`${t('navbar.wallet.modal.warning1')} ${
+                      session.wallet.walletType !== LEDGER_WALLET_TYPE
                         ? t('navbar.wallet.modal.warning2')
                         : ''
-                      }`}
+                    }`}
                     showIcon
                   />
                 </div>
@@ -1130,7 +1141,7 @@ function HomeLayout(props: HomeLayoutProps) {
             setIsAnnouncementVisible(false);
             generalConfigService.setHasShownAnalyticsPopup(true);
           }}
-          handleOk={() => { }}
+          handleOk={() => {}}
           footer={[]}
         >
           <>
@@ -1211,7 +1222,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   setIsLedgerModalButtonLoading(true);
                 }}
                 loading={isLedgerModalButtonLoading}
-              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>
@@ -1259,7 +1270,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   setIsLedgerModalButtonLoading(true);
                 }}
                 loading={isLedgerModalButtonLoading}
-              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>

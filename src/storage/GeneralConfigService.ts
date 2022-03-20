@@ -140,7 +140,7 @@ export class GeneralConfigService {
     savedConfig.autoUpdate = isAutoUpdateDisable
       ? {
           disabled: true,
-          expire: new Date().setDate(Date.now() + 30),
+          expire: new Date().setDate(new Date().getDate() + 30),
         }
       : { disabled: false };
     return this.saveGeneralConfig(savedConfig);

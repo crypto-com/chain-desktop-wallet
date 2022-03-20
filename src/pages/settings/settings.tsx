@@ -270,6 +270,9 @@ function MetaInfoComponent() {
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
   const [defaultAutoUpdateDisabled, setDefaultAutoUpdateDisabled] = useState<boolean>(false);
+  const [defaultAutoUpdateExpireDate, setDefaultAutoUpdateExpireDate] = useState<
+    number | undefined
+  >();
   const [supportedCurrencies, setSupportedCurrencies] = useState<SupportedCurrency[]>([]);
   const [t, i18n] = useTranslation();
 
@@ -350,6 +353,11 @@ function MetaInfoComponent() {
         setDefaultMemoStateDisabled(disableDefaultClientMemo);
         setDefaultGAStateDisabled(analyticsDisabled);
         setDefaultAutoUpdateDisabled(autoUpdateDisabled ? autoUpdateDisabled.disabled : false);
+        if (autoUpdateDisabled) {
+          const { disabled, expire } = autoUpdateDisabled;
+          setDefaultAutoUpdateDisabled(disabled);
+          setDefaultAutoUpdateExpireDate(expire);
+        }
 
         const currencies: SupportedCurrency[] = [];
         SUPPORTED_CURRENCY.forEach((item: SupportedCurrency) => {
@@ -583,6 +591,13 @@ function MetaInfoComponent() {
           <div className="item">
             <div className="title">Auto Update</div>
             <div className="description">TBC</div>
+            {defaultAutoUpdateExpireDate ? (
+              <div className="description">
+                Expire: {new Date(defaultAutoUpdateExpireDate).toLocaleString()}
+              </div>
+            ) : (
+              <></>
+            )}
             <Switch
               checked={!defaultAutoUpdateDisabled}
               onChange={onAllowAutoUpdateChange}
