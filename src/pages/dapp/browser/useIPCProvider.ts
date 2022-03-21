@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import { TransactionConfig } from 'web3-eth';
-import { useRecoilValue } from 'recoil';
 import Web3 from 'web3';
 import { ethers } from 'ethers';
-import { TransactionPrepareService } from '../../../service/TransactionPrepareService';
-import { walletService } from '../../../service/WalletService';
 import { ChainConfig } from './config';
 import { DappBrowserIPC } from '../types';
 import {
@@ -12,8 +8,7 @@ import {
   EvmTransactionSigner,
 } from '../../../service/signers/EvmTransactionSigner';
 import { EVMContractCallUnsigned } from '../../../service/signers/TransactionSupported';
-import { walletAllAssetsState } from '../../../recoil/atom';
-import { getCronosEvmAsset, isHexEqual } from '../../../utils/utils';
+import { isHexEqual } from '../../../utils/utils';
 import { TransactionDataParser } from './TransactionDataParser';
 import { ErrorHandler, WebView } from './types';
 import { useRefCallback } from './useRefCallback';
@@ -79,9 +74,6 @@ interface IUseIPCProviderProps {
 export const useIPCProvider = (props: IUseIPCProviderProps) => {
   const { webview, onFinishTransaction } = props;
 
-  const transactionPrepareService = new TransactionPrepareService(walletService.storageService);
-  const allAssets = useRecoilValue(walletAllAssetsState);
-  const cronosAsset = getCronosEvmAsset(allAssets);
   const transactionDataParser = useMemo(() => {
     return new TransactionDataParser(ChainConfig.RpcUrl, ChainConfig.ExplorerAPIUrl);
   }, []);
@@ -167,15 +159,9 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
 
   const handleTokenApproval = useRefCallback(
     async (event: DappBrowserIPC.TokenApprovalEvent, passphrase: string) => {
-      const prepareTXConfig: TransactionConfig = {
-        from: event.object.from,
-        to: event.object.to,
-      };
 
-      const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
-        cronosAsset!,
-        prepareTXConfig,
-      );
+      const provider = new ethers.providers.JsonRpcProvider(selectedChain.rpcUrls[0])
+      const nonce = await provider.getTransactionCount(event.object.from)
 
       const data = evmTransactionSigner.encodeTokenApprovalABI(
         event.object.tokenData.contractAddress,
@@ -189,15 +175,16 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         data,
         gasLimit: ethers.utils.hexValue(event.object.gas),
         gasPrice: event.object.gasPrice,
-        nonce: prepareTxInfo.nonce,
+        nonce
       };
       try {
-        const result = await evmTransactionSigner.sendContractCallTransaction(
-          cronosAsset!,
-          txConfig,
-          passphrase,
-          ChainConfig.RpcUrl,
-        );
+        const result = await evmTransactionSigner.sendContractCallTransaction({
+          chainId: parseInt(selectedChain.chainId, 16),
+          rpcURL: selectedChain.rpcUrls[0],
+          indexingURL: selectedChain.blockExplorerUrls[0],
+          transaction: txConfig,
+          phrase: passphrase
+        });
 
         sendResponse(event.id, result);
       } catch (error) {
@@ -208,36 +195,50 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     },
   );
 
-  const getGasPrice = async (event: DappBrowserIPC.SendTransactionEvent) => {
-    const prepareTXConfig: TransactionConfig = {
-      from: event.object.from,
-      to: event.object.to,
-      data: event.object.data,
-      value: event.object.value,
-    };
+  const getEstimateGas = async (chainConfig: DappBrowserIPC.EthereumChainConfig, tx: {
+    to: string,
+    from: string,
+    value: ethers.BigNumber,
+    data: string,
+  }) => {
+    const provider = new ethers.providers.JsonRpcProvider(chainConfig.rpcUrls[0])
+    const gas = await provider.estimateGas({
+      chainId: parseInt(chainConfig.chainId, 16),
+      from: tx.from,
+      to: tx.to,
+      value: tx.value,
+      data: tx.data,
+    })
 
-    const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
-      cronosAsset!,
-      prepareTXConfig,
-    );
+    return gas;
+  }
+
+  const getGasPrice = async (chainConfig: DappBrowserIPC.EthereumChainConfig, tx: {
+    to: string,
+    from: string,
+    value: ethers.BigNumber,
+    data: string
+  }) => {
+
+    const provider = new ethers.providers.JsonRpcProvider(chainConfig.rpcUrls[0])
+    const fee = await provider.getFeeData();
+    const gasLimit = await getEstimateGas(chainConfig, tx)
 
     return {
-      gasLimit: prepareTxInfo.gasLimit,
-      gasPrice: Web3.utils.toHex(prepareTxInfo.loadedGasPrice),
+      maxFeePerGas: fee.maxFeePerGas,
+      maxPriorityFeePerGas: fee.maxFeePerGas,
+      gasPrice: fee.gasPrice,
+      gasLimit,
     };
   };
 
+
   const handleSendTransaction = useRefCallback(
     async (event: DappBrowserIPC.SendTransactionEvent, passphrase: string) => {
-      const prepareTXConfig: TransactionConfig = {
-        from: event.object.from,
-        to: event.object.to,
-      };
 
-      const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
-        cronosAsset!,
-        prepareTXConfig,
-      );
+      const provider = new ethers.providers.JsonRpcProvider(selectedChain.rpcUrls[0])
+      const nonce = await provider.getTransactionCount(event.object.from)
+
 
       const txConfig: EVMContractCallUnsigned = {
         from: event.object.from,
@@ -246,15 +247,18 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         gasLimit: ethers.utils.hexValue(event.object.gas),
         gasPrice: event.object.gasPrice,
         value: event.object.value,
-        nonce: prepareTxInfo.nonce,
+        nonce
       };
 
       try {
         const result = await evmTransactionSigner.sendContractCallTransaction(
-          cronosAsset!,
-          txConfig,
-          passphrase,
-          ChainConfig.RpcUrl,
+          {
+            chainId: parseInt(selectedChain.chainId, 16),
+            rpcURL: selectedChain.rpcUrls[0],
+            indexingURL: selectedChain.blockExplorerUrls[0],
+            transaction: txConfig,
+            phrase: passphrase,
+          }
         );
         sendResponse(event.id, result);
         onFinishTransaction();
@@ -317,18 +321,24 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             },
           );
           break;
-        case 'signTransaction':
+        case 'signTransaction': {
           // parse transaction data
 
           // gasPrice maybe missing (eg. Tectonic)
-          if (!event.object?.gasPrice || !event.object.gas) {
-            const gasObject = await getGasPrice(event);
-            event.object.gasPrice = event.object?.gasPrice ?? gasObject.gasPrice;
-            event.object.gas = event.object?.gas ?? gasObject.gasLimit;
-          }
+          const gasObject = await getGasPrice(selectedChain, {
+            from: event.object.from,
+            to: event.object.to,
+            data: event.object.data,
+            value: ethers.BigNumber.from(event.object.value ? event.object.value : 0),
+          });
+
+          // TODO: support EIP 1559 tx
+          event.object.gasPrice = event.object?.gasPrice ?? gasObject.gasPrice;
+          event.object.gas = event.object?.gas ?? gasObject.gasLimit;
 
           if (event.object.data.startsWith('0x095ea7b3')) {
             const response = await transactionDataParser.parseTokenApprovalData(
+              selectedChain,
               event.object.to,
               event.object.data,
             );
@@ -365,7 +375,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
               },
             );
           }
-
+        }
           break;
         case 'signMessage':
           props.onRequestSignMessage(

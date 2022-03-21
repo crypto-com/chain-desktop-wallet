@@ -12,7 +12,7 @@ import {
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
 } from './TransactionSupported';
-import { UserAsset, UserAssetType } from '../../models/UserAsset';
+import { UserAssetType } from '../../models/UserAsset';
 import { walletService } from '../WalletService';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../LedgerService';
 import { CronosClient } from '../cronos/CronosClient';
@@ -51,15 +51,15 @@ class EvmTransactionSigner implements ITransactionSigner {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public async sendContractCallTransaction(
-    asset: UserAsset,
+  public async sendContractCallTransaction(props: {
+    chainId: number,
+    rpcURL: string,
+    indexingURL: string,
     transaction: EVMContractCallUnsigned,
     phrase: string,
-    jsonRpcUrl: string,
-  ): Promise<string> {
-    if (!asset.address || !asset.config?.nodeUrl) {
-      throw TypeError(`Missing asset config: ${asset.config}`);
-    }
+  }): Promise<string> {
+
+    const { chainId, rpcURL, indexingURL, transaction, phrase } = props;
 
     const currentSession = await walletService.retrieveCurrentSession();
 
@@ -70,7 +70,7 @@ class EvmTransactionSigner implements ITransactionSigner {
 
       const signedTx = await device.signEthTx(
         walletAddressIndex,
-        Number(asset?.config?.chainId), // chainid
+        chainId,
         transaction.nonce,
         transaction.gasLimit,
         transaction.gasPrice,
@@ -78,7 +78,7 @@ class EvmTransactionSigner implements ITransactionSigner {
         transaction.value ?? '0x0',
         transaction.data,
       );
-      const cronosClient = new CronosClient(asset.config?.nodeUrl, asset.config?.indexingUrl);
+      const cronosClient = new CronosClient(rpcURL, indexingURL);
 
       const result = await cronosClient.broadcastRawTransactionHex(signedTx);
 
@@ -86,15 +86,17 @@ class EvmTransactionSigner implements ITransactionSigner {
     }
 
     const txParams: ethers.providers.TransactionRequest = {
+      chainId,
       nonce: transaction.nonce,
       gasPrice: transaction.gasPrice,
       gasLimit: transaction.gasLimit,
       to: transaction.contractAddress,
+      from: transaction.from,
       data: transaction.data,
       value: transaction.value ?? '0x0',
     };
 
-    const provider = new ethers.providers.JsonRpcProvider(jsonRpcUrl);
+    const provider = new ethers.providers.JsonRpcProvider(rpcURL);
     const wallet = ethers.Wallet.fromMnemonic(phrase).connect(provider);
 
     const signedTx = await wallet.sendTransaction(txParams);
