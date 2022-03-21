@@ -460,7 +460,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
 
           props.onRequestAddEthereumChain({ chainConfig: config },
             async () => {
-              addChainConfig(config);
+              addChainConfig(config)
 
               props.onRequestSwitchEthereumChain({
                 prev: selectedChain, next: config

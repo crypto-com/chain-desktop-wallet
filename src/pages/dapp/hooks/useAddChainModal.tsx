@@ -45,7 +45,7 @@ export const useAddChainModal = () => {
           <div style={{ fontSize: '20px', textAlign: 'center', marginTop: '12px' }}>
             Wants to Add A Network
           </div>
-          <div style={{ width: '200px', margin: 'auto', textAlign: 'left', marginTop: '30px' }}>
+          <div style={{ width: '', margin: 'auto', textAlign: 'left', marginTop: '30px' }}>
             {[
               {
                 title: 'Network Name',
@@ -61,11 +61,11 @@ export const useAddChainModal = () => {
               },
               {
                 title: 'RPC URL',
-                value: props.config.rpcUrls.join(', '),
+                value: props.config.rpcUrls[0],
               },
               {
                 title: 'Explorer URL',
-                value: props.config.blockExplorerUrls.join(', '),
+                value: props.config.blockExplorerUrls[0],
               },
             ].map(({ title, value }) => {
               return (

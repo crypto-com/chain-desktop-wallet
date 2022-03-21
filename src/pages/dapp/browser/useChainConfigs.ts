@@ -30,9 +30,10 @@ export const useChainConfigs = () => {
 
   const add = (config: DappBrowserIPC.EthereumChainConfig) => {
     if (!validate(config.chainId)) {
-      return;
+      return false;
     }
     updateList([...list, config]);
+    return true;
   };
 
   const remove = (chainId: string) => {

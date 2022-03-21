@@ -25,7 +25,6 @@ import {
 import { LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
 import { useAddChainModal } from '../hooks/useAddChainModal';
-import { DAppDefaultChainConfigs } from '../../../utils/localStorage';
 import { useSwitchChainModal } from '../hooks/useSwitchChainModal';
 
 // use **only** one of the following
