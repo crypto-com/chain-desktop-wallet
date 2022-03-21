@@ -7,10 +7,10 @@ import { ethers } from 'ethers';
 import { useForm } from 'antd/lib/form/Form';
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal';
 import { useChainConfigs } from '../../browser/useChainConfigs';
-import { DAppDefaultChainConfigs, isChainDefaultConfig } from '../../../../utils/localStorage';
 import { isHexEqual } from '../../../../utils/utils';
 import { ChainConfig, ChainConfigFormData, ChainConfigFormKeys } from '../../types';
 import { useAddChainConfigModal } from '../../hooks/useAddChainConfigModal';
+import { DAppDefaultChainConfigs, isChainDefaultConfig } from '../../../../config/DAppChainConfig';
 
 const ChainConfigTab = () => {
   const {
