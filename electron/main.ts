@@ -7,8 +7,7 @@ import { IpcMain } from './IpcMain';
 import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import Big from "big.js";
-
-
+import { generalConfigService } from '../src/storage/GeneralConfigService';
 
 import { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } from './UsageAnalytics';
 
@@ -145,7 +144,10 @@ app.on('ready', async function () {
   createWindow();
 
   await new Promise(resolve => setTimeout(resolve, 20_000));
-  autoUpdater.checkForUpdatesAndNotify();
+  const isAutoUpdateDisabled = await generalConfigService.checkIfAutoUpdateDisabled();
+  if(!isAutoUpdateDisabled) {
+    autoUpdater.checkForUpdatesAndNotify();
+  }
 });
 
 ipcMain.on('app_version', (event) => {
