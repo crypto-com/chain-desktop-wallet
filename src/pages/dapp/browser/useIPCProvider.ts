@@ -96,7 +96,6 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   );
 
   const injectDomReadyScript = useCallback((chainConfig?: DappBrowserIPC.EthereumChainConfig) => {
-    // TODO: choose selected chain
 
     if (!chainConfig) {
       // eslint-disable-next-line prefer-destructuring

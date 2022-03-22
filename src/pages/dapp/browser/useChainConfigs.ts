@@ -17,7 +17,12 @@ const dappSelectedChain = atom({
 export const useChainConfigs = () => {
   const [list, setList] = useRecoilState(dappChainConfigs);
 
-  const [selectedChain, setSelectedChain] = useRecoilState(dappSelectedChain);
+  const [selectedChain, setSelectedChainState] = useRecoilState(dappSelectedChain);
+
+  const setSelectedChain = (chainConfig: DappBrowserIPC.EthereumChainConfig) => {
+    setSelectedChainState(chainConfig);
+    setLocalSetting(SettingsKey.DappSelectedChain, chainConfig);
+  }
 
   const validate = (chainId: string) => {
     return !list.some(item => isHexEqual(item.chainId, chainId));
