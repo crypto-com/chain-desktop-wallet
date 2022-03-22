@@ -7,7 +7,6 @@ import { IpcMain } from './IpcMain';
 import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import Big from "big.js";
-import { generalConfigService } from '../src/storage/GeneralConfigService';
 
 import { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } from './UsageAnalytics';
 
@@ -17,6 +16,8 @@ import { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView }
 (global as any).getUACode = getUACode;
 (global as any).getGAnalyticsCode = getGAnalyticsCode;
 
+const Store = require('electron-store');
+const store = new Store();
 
 let win: BrowserWindow | null = null;
 let ipcmain: IpcMain | null = null;
@@ -144,10 +145,15 @@ app.on('ready', async function () {
   createWindow();
 
   await new Promise(resolve => setTimeout(resolve, 20_000));
-  const isAutoUpdateDisabled = await generalConfigService.checkIfAutoUpdateDisabled();
+
+  const isAutoUpdateDisabled = store.get('isAutoUpdateDisabled');
   if(!isAutoUpdateDisabled) {
     autoUpdater.checkForUpdatesAndNotify();
   }
+});
+
+ipcMain.on('set_is_auto_update_disabled', (event, arg) => {
+  store.set('isAutoUpdateDisabled', arg);
 });
 
 ipcMain.on('app_version', (event) => {

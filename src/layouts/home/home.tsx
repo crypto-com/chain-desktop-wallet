@@ -88,7 +88,10 @@ import {
   DefaultTestnetBridgeConfigs,
 } from '../../service/bridge/BridgeConfig';
 import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
+
 // import i18n from '../../language/I18n';
+
+const { ipcRenderer } = window.require('electron');
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -655,17 +658,24 @@ function HomeLayout(props: HomeLayoutProps) {
       );
 
       const isIbcVisible = allAssets.length > 1;
-      // const isIbcVisible = false;
+
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
       const isAppLocked = await generalConfigService.getIfAppIsLockedByUser();
-      const isAutoUpdateDisabled = await generalConfigService.checkIfAutoUpdateDisabled();
 
+      let isAutoUpdateDisabled = await generalConfigService.checkIfAutoUpdateDisabled();
       // Enable Auto Update if expired
       if (isAutoUpdateDisabled.disabled && isAutoUpdateDisabled.expire) {
         if (isAutoUpdateDisabled.expire < Date.now()) {
+          isAutoUpdateDisabled = {
+            disabled: false,
+            expire: undefined,
+          };
           generalConfigService.setIsAutoUpdateDisable(false);
+          ipcRenderer.send('set_is_auto_update_disabled', false);
         }
       }
+      // Pass latest settings to main.ts main process
+      ipcRenderer.send('set_is_auto_update_disabled', isAutoUpdateDisabled.disabled);
 
       setHasWallet(hasWalletBeenCreated);
       setSession({

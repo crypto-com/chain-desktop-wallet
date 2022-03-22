@@ -504,8 +504,11 @@ function MetaInfoComponent() {
 
     const newState = !defaultAutoUpdateDisabled;
     setDefaultAutoUpdateDisabled(newState);
+    setDefaultAutoUpdateExpireDate(Date.now());
 
     await generalConfigService.setIsAutoUpdateDisable(newState);
+
+    ipcRenderer.send('set_is_auto_update_disabled', newState);
 
     setUpdateLoading(false);
     message.success(
@@ -589,11 +592,12 @@ function MetaInfoComponent() {
             {defaultGAStateDisabled ? t('general.disabled') : t('general.enabled')}
           </div>
           <div className="item">
-            <div className="title">Auto Update</div>
-            <div className="description">TBC</div>
-            {defaultAutoUpdateExpireDate ? (
+            <div className="title">{t('settings.autoUpdate.title')}</div>
+            <div className="description">{t('settings.autoUpdate.description')}</div>
+            {defaultAutoUpdateDisabled && defaultAutoUpdateExpireDate ? (
               <div className="description">
-                Expire: {new Date(defaultAutoUpdateExpireDate).toLocaleString()}
+                {t('settings.autoUpdate.expire')}:{' '}
+                {new Date(defaultAutoUpdateExpireDate).toLocaleString()}
               </div>
             ) : (
               <></>
