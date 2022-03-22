@@ -102,7 +102,7 @@ export class GeneralConfigService {
     const savedConfig = await this.db.generalConfigStore.findOne<GeneralConfig>({
       _id: this.GENERAL_CONFIG_ID,
     });
-    if (!savedConfig) {
+    if (!savedConfig || !savedConfig.autoUpdate) {
       const newConfig: GeneralConfig = {
         ...(savedConfig as GeneralConfig),
         hasEverShownAnalyticsPopup: false,

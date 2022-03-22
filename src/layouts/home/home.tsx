@@ -664,7 +664,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
       let isAutoUpdateDisabled = await generalConfigService.checkIfAutoUpdateDisabled();
       // Enable Auto Update if expired
-      if (isAutoUpdateDisabled.disabled && isAutoUpdateDisabled.expire) {
+      if (isAutoUpdateDisabled.disabled && isAutoUpdateDisabled?.expire) {
         if (isAutoUpdateDisabled.expire < Date.now()) {
           isAutoUpdateDisabled = {
             disabled: false,

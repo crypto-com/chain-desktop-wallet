@@ -7,6 +7,7 @@ import { IpcMain } from './IpcMain';
 import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import Big from "big.js";
+import Store from "electron-store";
 
 import { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } from './UsageAnalytics';
 
@@ -16,12 +17,11 @@ import { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView }
 (global as any).getUACode = getUACode;
 (global as any).getGAnalyticsCode = getGAnalyticsCode;
 
-const Store = require('electron-store');
-const store = new Store();
 
 let win: BrowserWindow | null = null;
 let ipcmain: IpcMain | null = null;
 const isDev = process.env.NODE_ENV === 'development'; // change true, in developing mode
+const store = new Store();
 
 // Updater log setup
 log.transports.file.level = "debug"
