@@ -193,6 +193,20 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
   }
 }
 
+export function getAssetTypeName(assetType: UserAssetType | undefined) {
+  switch (assetType) {
+    case UserAssetType.TENDERMINT:
+    case UserAssetType.EVM:
+      return 'Cronos';
+    case UserAssetType.CRC_20_TOKEN:
+      return 'CRC20';
+    case UserAssetType.ERC_20_TOKEN:
+      return 'ERC20';
+    default:
+      return 'n.a.';
+  }
+}
+
 export function isCRC20AssetWhitelisted(
   symbol: string,
   contractAddress: string,
