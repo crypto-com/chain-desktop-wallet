@@ -1,7 +1,6 @@
 import { ethers } from 'ethers';
-import { ERC20__factory } from '../../../contracts';
+import { ERC20__factory, IERC20__factory } from '../../../contracts';
 import { EVMChainConfig } from '../../../models/Chain';
-import { CronosClient } from '../../../service/cronos/CronosClient';
 import { TokenApprovalRequestData } from '../types';
 
 export function instanceOfTokenApprovalRequestData(data: any): data is TokenApprovalRequestData {
@@ -9,30 +8,27 @@ export function instanceOfTokenApprovalRequestData(data: any): data is TokenAppr
 }
 
 class TransactionDataParser {
-  private client: CronosClient;
 
-  constructor(rpcEndPoint: string, explorerAPIEndPoint: string) {
-    this.client = new CronosClient(rpcEndPoint, explorerAPIEndPoint);
-  }
-
-  parseTokenApprovalData = async (
+  static parseTokenApprovalData = async (
     chainConfig: EVMChainConfig,
     tokenAddress: string,
     data: string,
   ): Promise<TokenApprovalRequestData> => {
-    const amount = data.slice(74, data.length);
-    const spender = `0x${data.slice(34, 74)}`;
+
+    const IERC20 = IERC20__factory.createInterface();
+    const parsedData = IERC20.decodeFunctionData(IERC20.functions['approve(address,uint256)'].name, data)
 
     const provider = new ethers.providers.JsonRpcProvider(chainConfig.rpcUrls[0]);
     const contract = ERC20__factory.connect(tokenAddress, provider);
-
-    const symbol = await contract.symbol()
-    const decimals = await contract.decimals()
-    const totalSupply = await contract.totalSupply()
+    const [symbol, decimals, totalSupply] = await Promise.all([
+      contract.symbol(),
+      contract.decimals(),
+      contract.totalSupply(),
+    ])
 
     return {
-      amount,
-      spender,
+      amount: parsedData.amount,
+      spender: parsedData.spender,
       tokenData: {
         contractAddress: tokenAddress,
         symbol,

@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect } from 'react';
 import Web3 from 'web3';
 import { ethers } from 'ethers';
-import { ChainConfig } from './config';
 import { DappBrowserIPC } from '../types';
 import {
   evmTransactionSigner,
@@ -15,6 +14,7 @@ import { useRefCallback } from './useRefCallback';
 import { useChainConfigs } from './useChainConfigs';
 import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
 import { EVMChainConfig } from '../../../models/Chain';
+import { ERC20__factory } from '../../../contracts';
 
 interface IUseIPCProviderProps {
   webview: WebView | null;
@@ -74,11 +74,6 @@ interface IUseIPCProviderProps {
 
 export const useIPCProvider = (props: IUseIPCProviderProps) => {
   const { webview, onFinishTransaction } = props;
-
-  const transactionDataParser = useMemo(() => {
-    return new TransactionDataParser(ChainConfig.RpcUrl, ChainConfig.ExplorerAPIUrl);
-  }, []);
-
   const asset = useCronosEvmAsset()
 
   const { list: chainConfigs, add: addChainConfig, setSelectedChain, selectedChain } = useChainConfigs();
@@ -336,8 +331,11 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           event.object.gasPrice = event.object?.gasPrice ?? gasObject.gasPrice;
           event.object.gas = event.object?.gas ?? gasObject.gasLimit;
 
-          if (event.object.data.startsWith('0x095ea7b3')) {
-            const response = await transactionDataParser.parseTokenApprovalData(
+          const IERC20 = ERC20__factory.createInterface();
+          const txDescription = IERC20.parseTransaction({ data: event.object.data, value: event.object.value })
+
+          if (txDescription.name === IERC20.functions['approve(address,uint256)'].name) {
+            const response = await TransactionDataParser.parseTokenApprovalData(
               selectedChain,
               event.object.to,
               event.object.data,
