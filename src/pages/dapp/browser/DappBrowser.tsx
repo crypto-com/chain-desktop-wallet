@@ -26,6 +26,7 @@ import { LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
 import { useAddChainModal } from '../hooks/useAddChainModal';
 import { useSwitchChainModal } from '../hooks/useSwitchChainModal';
+import { EVMChainConfig } from '../../../models/Chain';
 
 // use **only** one of the following
 // priority: dapp > dappURL
@@ -233,7 +234,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
 
   const onRequestAddEthereumChain = useRefCallback(
     (
-      event: { chainConfig: DappBrowserIPC.EthereumChainConfig },
+      event: { chainConfig: EVMChainConfig },
       successCallback: () => void,
       errorCallback: (message: string) => void,
     ) => {
@@ -255,7 +256,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
 
   const onRequestSwitchEthereumChain = useRefCallback(
     (
-      event: { prev: DappBrowserIPC.EthereumChainConfig; next: DappBrowserIPC.EthereumChainConfig },
+      event: { prev: EVMChainConfig; next: EVMChainConfig },
       successCallback: () => void,
       errorCallback: (message: string) => void,
     ) => {

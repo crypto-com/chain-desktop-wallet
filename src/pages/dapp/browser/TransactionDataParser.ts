@@ -1,7 +1,8 @@
 import { ethers } from 'ethers';
 import { ERC20__factory } from '../../../contracts';
+import { EVMChainConfig } from '../../../models/Chain';
 import { CronosClient } from '../../../service/cronos/CronosClient';
-import { DappBrowserIPC, TokenApprovalRequestData } from '../types';
+import { TokenApprovalRequestData } from '../types';
 
 export function instanceOfTokenApprovalRequestData(data: any): data is TokenApprovalRequestData {
   return 'amount' in data;
@@ -15,7 +16,7 @@ class TransactionDataParser {
   }
 
   parseTokenApprovalData = async (
-    chainConfig: DappBrowserIPC.EthereumChainConfig,
+    chainConfig: EVMChainConfig,
     tokenAddress: string,
     data: string,
   ): Promise<TokenApprovalRequestData> => {

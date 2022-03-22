@@ -1,17 +1,17 @@
 import { atom, useRecoilState } from "recoil";
+import { EVMChainConfig } from "../../../models/Chain";
 import { getLocalSetting, setLocalSetting, SettingsKey } from "../../../utils/localStorage";
 import { isHexEqual } from "../../../utils/utils";
-import { DappBrowserIPC } from "../types";
 
 
 const dappChainConfigs = atom({
   key: 'dapp_chain_configs',
-  default: getLocalSetting<DappBrowserIPC.EthereumChainConfig[]>(SettingsKey.DappChainConfigs),
+  default: getLocalSetting<EVMChainConfig[]>(SettingsKey.DappChainConfigs),
 });
 
 const dappSelectedChain = atom({
   key: 'dapp_selected_chain',
-  default: getLocalSetting<DappBrowserIPC.EthereumChainConfig>(SettingsKey.DappSelectedChain),
+  default: getLocalSetting<EVMChainConfig>(SettingsKey.DappSelectedChain),
 })
 
 export const useChainConfigs = () => {
@@ -19,7 +19,7 @@ export const useChainConfigs = () => {
 
   const [selectedChain, setSelectedChainState] = useRecoilState(dappSelectedChain);
 
-  const setSelectedChain = (chainConfig: DappBrowserIPC.EthereumChainConfig) => {
+  const setSelectedChain = (chainConfig: EVMChainConfig) => {
     setSelectedChainState(chainConfig);
     setLocalSetting(SettingsKey.DappSelectedChain, chainConfig);
   }
@@ -28,12 +28,12 @@ export const useChainConfigs = () => {
     return !list.some(item => isHexEqual(item.chainId, chainId));
   };
 
-  const updateList = (lst: DappBrowserIPC.EthereumChainConfig[]) => {
+  const updateList = (lst: EVMChainConfig[]) => {
     setList(lst);
     setLocalSetting(SettingsKey.DappChainConfigs, lst);
   };
 
-  const add = (config: DappBrowserIPC.EthereumChainConfig) => {
+  const add = (config: EVMChainConfig) => {
     if (!validate(config.chainId)) {
       return false;
     }

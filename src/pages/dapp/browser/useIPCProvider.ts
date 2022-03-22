@@ -14,6 +14,7 @@ import { ErrorHandler, WebView } from './types';
 import { useRefCallback } from './useRefCallback';
 import { useChainConfigs } from './useChainConfigs';
 import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
+import { EVMChainConfig } from '../../../models/Chain';
 
 interface IUseIPCProviderProps {
   webview: WebView | null;
@@ -55,15 +56,15 @@ interface IUseIPCProviderProps {
   ) => Promise<void>;
   onRequestAddEthereumChain: (
     event: {
-      chainConfig: DappBrowserIPC.EthereumChainConfig;
+      chainConfig: EVMChainConfig;
     },
     onSuccess: () => void,
     onError: ErrorHandler,
   ) => Promise<void>;
   onRequestSwitchEthereumChain: (
     event: {
-      prev: DappBrowserIPC.EthereumChainConfig;
-      next: DappBrowserIPC.EthereumChainConfig;
+      prev: EVMChainConfig;
+      next: EVMChainConfig;
     },
     onSuccess: () => void,
     onError: ErrorHandler,
@@ -95,7 +96,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     [webview],
   );
 
-  const injectDomReadyScript = useCallback((chainConfig?: DappBrowserIPC.EthereumChainConfig) => {
+  const injectDomReadyScript = useCallback((chainConfig?: EVMChainConfig) => {
 
     if (!chainConfig) {
       // eslint-disable-next-line prefer-destructuring
@@ -194,7 +195,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     },
   );
 
-  const getEstimateGas = async (chainConfig: DappBrowserIPC.EthereumChainConfig, tx: {
+  const getEstimateGas = async (chainConfig: EVMChainConfig, tx: {
     to: string,
     from: string,
     value: ethers.BigNumber,
@@ -212,7 +213,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     return gas;
   }
 
-  const getGasPrice = async (chainConfig: DappBrowserIPC.EthereumChainConfig, tx: {
+  const getGasPrice = async (chainConfig: EVMChainConfig, tx: {
     to: string,
     from: string,
     value: ethers.BigNumber,

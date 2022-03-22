@@ -1,3 +1,4 @@
+import { EVMChainConfig } from '../../models/Chain';
 import { ContractData } from '../../service/rpc/models/cronos.models';
 
 export interface Dapp {
@@ -105,23 +106,9 @@ export namespace DappBrowserIPC {
     };
   }
 
-  export interface NativeCurrency {
-    decimals: number;
-    name: string;
-    symbol: string;
-  }
-
-  export interface EthereumChainConfig {
-    chainId: string;
-    chainName: string;
-    rpcUrls: string[];
-    nativeCurrency: NativeCurrency;
-    blockExplorerUrls: string[]
-  }
-
   export interface AddEthereumChainEvent extends BaseEvent {
     name: 'addEthereumChain';
-    object: EthereumChainConfig;
+    object: EVMChainConfig;
   }
 
   export interface SwitchEthereumChainEvent extends BaseEvent {
@@ -143,9 +130,6 @@ export namespace DappBrowserIPC {
     | SwitchEthereumChainEvent
     | TokenApprovalEvent;
 }
-
-
-export type ChainConfig = DappBrowserIPC.EthereumChainConfig;
 
 export const ChainConfigFormKeys = {
   chainId: 'chainId',

@@ -1,8 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { Modal, Tag } from 'antd';
-import { ethers } from 'ethers';
-import { DappBrowserIPC } from '../types';
+import { EVMChainConfig } from '../../../models/Chain';
 
 export const useSwitchChainModal = () => {
   const [m, setM] = useState({
@@ -14,7 +13,7 @@ export const useSwitchChainModal = () => {
   function showWithConfig(props: {
     dappURL: string;
     faviconURL: string;
-    config: DappBrowserIPC.EthereumChainConfig;
+    config: EVMChainConfig;
     onCancel: () => void;
     onApprove: () => void;
   }) {
