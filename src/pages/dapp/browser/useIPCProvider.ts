@@ -14,7 +14,6 @@ import { useRefCallback } from './useRefCallback';
 import { useChainConfigs } from './useChainConfigs';
 import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
 import { EVMChainConfig } from '../../../models/Chain';
-import { ERC20__factory } from '../../../contracts';
 import { getGasPrice } from '../../../service/evm/gas';
 import { getNonce } from '../../../service/evm/nonce';
 
@@ -286,11 +285,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
 
           event.object.chainConfig = selectedChain;
 
-          const IERC20 = ERC20__factory.createInterface();
-          const txDescription = IERC20.parseTransaction({ data: event.object.data, value: event.object.value })
-
-          // decode txData
-          if (txDescription.name === IERC20.functions['approve(address,uint256)'].name) {
+          if (event.object.data.startsWith('0x095ea7b3')) {
             const parsedData = await TransactionDataParser.parseTokenApprovalData(
               selectedChain,
               event.object.to,

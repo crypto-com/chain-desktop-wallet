@@ -91,9 +91,15 @@ class EvmTransactionSigner implements ITransactionSigner {
 
     const txParams: ethers.providers.TransactionRequest = {
       chainId,
-      value: transaction.value ?? '0x0',
+      data: transaction.data,
+      from: transaction.from,
+      gasLimit: transaction.gasLimit,
+      gasPrice: transaction.gasPrice,
+      // maxFeePerGas: transaction.maxFeePerGas,
+      // maxPriorityFeePerGas: transaction.maxPriorityFeePerGas,
+      nonce: transaction.nonce,
       to: transaction.contractAddress,
-      ...transaction,
+      value: transaction.value ?? '0x0',
     };
 
     const provider = new ethers.providers.JsonRpcProvider(rpcURL);
