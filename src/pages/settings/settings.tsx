@@ -270,7 +270,7 @@ function MetaInfoComponent() {
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
   const [defaultAutoUpdateDisabled, setDefaultAutoUpdateDisabled] = useState<boolean>(false);
-  const [defaultAutoUpdateExpireDate, setDefaultAutoUpdateExpireDate] = useState<
+  const [defaultAutoUpdateExpireTime, setDefaultAutoUpdateExpireTime] = useState<
     number | undefined
   >();
   const [supportedCurrencies, setSupportedCurrencies] = useState<SupportedCurrency[]>([]);
@@ -345,19 +345,15 @@ function MetaInfoComponent() {
       const { currency } = session;
       const { disableDefaultClientMemo, analyticsDisabled } = session.wallet.config;
 
-      const autoUpdateDisabled = await generalConfigService.checkIfAutoUpdateDisabled();
+      const autoUpdateExpireTime = await ipcRenderer.invoke('get_auto_update_expire_time');
 
       if (!unmounted) {
         setDefaultLanguageState(defaultLanguage);
         setDefaultCurrencyState(currency);
         setDefaultMemoStateDisabled(disableDefaultClientMemo);
         setDefaultGAStateDisabled(analyticsDisabled);
-        setDefaultAutoUpdateDisabled(autoUpdateDisabled ? autoUpdateDisabled.disabled : false);
-        if (autoUpdateDisabled) {
-          const { disabled, expire } = autoUpdateDisabled;
-          setDefaultAutoUpdateDisabled(disabled);
-          setDefaultAutoUpdateExpireDate(expire);
-        }
+        setDefaultAutoUpdateDisabled(autoUpdateExpireTime > 0);
+        setDefaultAutoUpdateExpireTime(autoUpdateExpireTime);
 
         const currencies: SupportedCurrency[] = [];
         SUPPORTED_CURRENCY.forEach((item: SupportedCurrency) => {
@@ -504,11 +500,11 @@ function MetaInfoComponent() {
 
     const newState = !defaultAutoUpdateDisabled;
     setDefaultAutoUpdateDisabled(newState);
-    setDefaultAutoUpdateExpireDate(Date.now());
 
-    await generalConfigService.setIsAutoUpdateDisable(newState);
+    const expireTime = newState ? new Date().setDate(new Date().getDate() + 30) : 0;
+    setDefaultAutoUpdateExpireTime(expireTime);
 
-    ipcRenderer.send('set_is_auto_update_disabled', newState);
+    ipcRenderer.send('set_auto_update_expire_time', expireTime);
 
     setUpdateLoading(false);
     message.success(
@@ -594,10 +590,10 @@ function MetaInfoComponent() {
           <div className="item">
             <div className="title">{t('settings.autoUpdate.title')}</div>
             <div className="description">{t('settings.autoUpdate.description')}</div>
-            {defaultAutoUpdateDisabled && defaultAutoUpdateExpireDate ? (
+            {defaultAutoUpdateDisabled && defaultAutoUpdateExpireTime ? (
               <div className="description">
                 {t('settings.autoUpdate.expire')}:{' '}
-                {new Date(defaultAutoUpdateExpireDate).toLocaleString()}
+                {new Date(defaultAutoUpdateExpireTime).toLocaleString()}
               </div>
             ) : (
               <></>

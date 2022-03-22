@@ -662,20 +662,12 @@ function HomeLayout(props: HomeLayoutProps) {
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
       const isAppLocked = await generalConfigService.getIfAppIsLockedByUser();
 
-      let isAutoUpdateDisabled = await generalConfigService.checkIfAutoUpdateDisabled();
+      // let isAutoUpdateDisabled = await generalConfigService.checkIfAutoUpdateDisabled();
+      const autoUpdateExpireTime = await ipcRenderer.invoke('get_auto_update_expire_time');
       // Enable Auto Update if expired
-      if (isAutoUpdateDisabled.disabled && isAutoUpdateDisabled?.expire) {
-        if (isAutoUpdateDisabled.expire < Date.now()) {
-          isAutoUpdateDisabled = {
-            disabled: false,
-            expire: undefined,
-          };
-          generalConfigService.setIsAutoUpdateDisable(false);
-          ipcRenderer.send('set_is_auto_update_disabled', false);
-        }
+      if (autoUpdateExpireTime < Date.now()) {
+        ipcRenderer.send('set_auto_update_expire_time', 0);
       }
-      // Pass latest settings to main.ts main process
-      ipcRenderer.send('set_is_auto_update_disabled', isAutoUpdateDisabled.disabled);
 
       setHasWallet(hasWalletBeenCreated);
       setSession({

@@ -146,14 +146,18 @@ app.on('ready', async function () {
 
   await new Promise(resolve => setTimeout(resolve, 20_000));
 
-  const isAutoUpdateDisabled = store.get('isAutoUpdateDisabled');
-  if(!isAutoUpdateDisabled) {
+  const autoUpdateExpireTime = store.get('autoUpdateExpireTime');
+  if(!autoUpdateExpireTime) {
     autoUpdater.checkForUpdatesAndNotify();
   }
 });
 
-ipcMain.on('set_is_auto_update_disabled', (event, arg) => {
-  store.set('isAutoUpdateDisabled', arg);
+ipcMain.handle('get_auto_update_expire_time', (event) => {
+  return store.get('autoUpdateExpireTime');
+});
+
+ipcMain.on('set_auto_update_expire_time', (event, arg) => {
+  store.set('autoUpdateExpireTime', arg);
 });
 
 ipcMain.on('app_version', (event) => {
