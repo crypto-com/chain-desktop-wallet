@@ -16,6 +16,9 @@ import { UserAssetType } from '../../models/UserAsset';
 import { walletService } from '../WalletService';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../LedgerService';
 import { CronosClient } from '../cronos/CronosClient';
+import { EVMChainConfig } from '../../models/Chain';
+import { parseChainId } from '../evm/chainId';
+import { IERC20__factory } from '../../contracts';
 
 const DEFAULT_CHAIN_ID = 338;
 
@@ -52,14 +55,15 @@ class EvmTransactionSigner implements ITransactionSigner {
 
   // eslint-disable-next-line class-methods-use-this
   public async sendContractCallTransaction(props: {
-    chainId: number,
-    rpcURL: string,
-    indexingURL: string,
+    chainConfig: EVMChainConfig,
     transaction: EVMContractCallUnsigned,
     phrase: string,
   }): Promise<string> {
 
-    const { chainId, rpcURL, indexingURL, transaction, phrase } = props;
+    const { chainConfig, transaction, phrase } = props;
+
+    const chainId = parseChainId(chainConfig);
+    const rpcURL = chainConfig.rpcUrls[0];
 
     const currentSession = await walletService.retrieveCurrentSession();
 
@@ -78,7 +82,7 @@ class EvmTransactionSigner implements ITransactionSigner {
         transaction.value ?? '0x0',
         transaction.data,
       );
-      const cronosClient = new CronosClient(rpcURL, indexingURL);
+      const cronosClient = new CronosClient(rpcURL, "");
 
       const result = await cronosClient.broadcastRawTransactionHex(signedTx);
 
@@ -87,13 +91,9 @@ class EvmTransactionSigner implements ITransactionSigner {
 
     const txParams: ethers.providers.TransactionRequest = {
       chainId,
-      nonce: transaction.nonce,
-      gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit,
-      to: transaction.contractAddress,
-      from: transaction.from,
-      data: transaction.data,
       value: transaction.value ?? '0x0',
+      to: transaction.contractAddress,
+      ...transaction,
     };
 
     const provider = new ethers.providers.JsonRpcProvider(rpcURL);
@@ -188,14 +188,12 @@ class EvmTransactionSigner implements ITransactionSigner {
 
   // eslint-disable-next-line class-methods-use-this
   public encodeTokenApprovalABI(
-    tokenContractAddress: string,
     spender: string,
     amount: BigNumberish,
   ) {
-    const web3 = new Web3('');
-    const contractABI = TokenContractABI.abi as AbiItem[];
-    const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
-    return contract.methods.approve(spender, amount).encodeABI() as string;
+
+    const IERC20 = IERC20__factory.createInterface()
+    return IERC20.encodeFunctionData('approve', [spender, amount])
   }
 
   // eslint-disable-next-line class-methods-use-this

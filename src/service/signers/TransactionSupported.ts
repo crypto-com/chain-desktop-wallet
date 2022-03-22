@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { VoteOption } from '../../models/Transaction';
 import { UserAsset } from '../../models/UserAsset';
 
@@ -105,4 +106,6 @@ export interface EVMContractCallUnsigned {
   value?: string;
   gasPrice: string;
   gasLimit: string;
+  maxFeePerGas?: ethers.BigNumber;
+  maxPriorityFeePerGas?: ethers.BigNumber;
 }

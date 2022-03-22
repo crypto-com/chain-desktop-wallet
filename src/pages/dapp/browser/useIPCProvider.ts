@@ -15,6 +15,8 @@ import { useChainConfigs } from './useChainConfigs';
 import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
 import { EVMChainConfig } from '../../../models/Chain';
 import { ERC20__factory } from '../../../contracts';
+import { getGasPrice } from '../../../service/evm/gas';
+import { getNonce } from '../../../service/evm/nonce';
 
 interface IUseIPCProviderProps {
   webview: WebView | null;
@@ -155,29 +157,23 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   const handleTokenApproval = useRefCallback(
     async (event: DappBrowserIPC.TokenApprovalEvent, passphrase: string) => {
 
-      const provider = new ethers.providers.JsonRpcProvider(selectedChain.rpcUrls[0])
-      const nonce = await provider.getTransactionCount(event.object.from)
-
       const data = evmTransactionSigner.encodeTokenApprovalABI(
-        event.object.tokenData.contractAddress,
         event.object.spender,
         ethers.constants.MaxUint256,
       );
 
-      const txConfig: EVMContractCallUnsigned = {
+      const transaction: EVMContractCallUnsigned = {
         from: event.object.from,
         contractAddress: event.object.to,
         data,
         gasLimit: ethers.utils.hexValue(event.object.gas),
         gasPrice: event.object.gasPrice,
-        nonce
+        nonce: await getNonce(event.object.from, event.object.chainConfig),
       };
       try {
         const result = await evmTransactionSigner.sendContractCallTransaction({
-          chainId: parseInt(selectedChain.chainId, 16),
-          rpcURL: selectedChain.rpcUrls[0],
-          indexingURL: selectedChain.blockExplorerUrls[0],
-          transaction: txConfig,
+          chainConfig: event.object.chainConfig,
+          transaction,
           phrase: passphrase
         });
 
@@ -190,68 +186,26 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     },
   );
 
-  const getEstimateGas = async (chainConfig: EVMChainConfig, tx: {
-    to: string,
-    from: string,
-    value: ethers.BigNumber,
-    data: string,
-  }) => {
-    const provider = new ethers.providers.JsonRpcProvider(chainConfig.rpcUrls[0])
-    const gas = await provider.estimateGas({
-      chainId: parseInt(chainConfig.chainId, 16),
-      from: tx.from,
-      to: tx.to,
-      value: tx.value,
-      data: tx.data,
-    })
-
-    return gas;
-  }
-
-  const getGasPrice = async (chainConfig: EVMChainConfig, tx: {
-    to: string,
-    from: string,
-    value: ethers.BigNumber,
-    data: string
-  }) => {
-
-    const provider = new ethers.providers.JsonRpcProvider(chainConfig.rpcUrls[0])
-    const fee = await provider.getFeeData();
-    const gasLimit = await getEstimateGas(chainConfig, tx)
-
-    return {
-      maxFeePerGas: fee.maxFeePerGas,
-      maxPriorityFeePerGas: fee.maxFeePerGas,
-      gasPrice: fee.gasPrice,
-      gasLimit,
-    };
-  };
-
-
   const handleSendTransaction = useRefCallback(
     async (event: DappBrowserIPC.SendTransactionEvent, passphrase: string) => {
 
-      const provider = new ethers.providers.JsonRpcProvider(selectedChain.rpcUrls[0])
-      const nonce = await provider.getTransactionCount(event.object.from)
-
-
-      const txConfig: EVMContractCallUnsigned = {
-        from: event.object.from,
+      const transaction: EVMContractCallUnsigned = {
         contractAddress: event.object.to,
         data: event.object.data,
+        from: event.object.from,
         gasLimit: ethers.utils.hexValue(event.object.gas),
         gasPrice: event.object.gasPrice,
+        maxFeePerGas: event.object.maxFeePerGas ?? undefined,
+        maxPriorityFeePerGas: event.object.maxPriorityFeePerGas ?? undefined,
+        nonce: await getNonce(event.object.from, event.object.chainConfig),
         value: event.object.value,
-        nonce
       };
 
       try {
         const result = await evmTransactionSigner.sendContractCallTransaction(
           {
-            chainId: parseInt(selectedChain.chainId, 16),
-            rpcURL: selectedChain.rpcUrls[0],
-            indexingURL: selectedChain.blockExplorerUrls[0],
-            transaction: txConfig,
+            chainConfig: event.object.chainConfig,
+            transaction,
             phrase: passphrase,
           }
         );
@@ -317,9 +271,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           );
           break;
         case 'signTransaction': {
-          // parse transaction data
-
-          // gasPrice maybe missing (eg. Tectonic)
+          // fill in gasData
           const gasObject = await getGasPrice(selectedChain, {
             from: event.object.from,
             to: event.object.to,
@@ -327,15 +279,19 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             value: ethers.BigNumber.from(event.object.value ? event.object.value : 0),
           });
 
-          // TODO: support EIP 1559 tx
           event.object.gasPrice = event.object?.gasPrice ?? gasObject.gasPrice;
           event.object.gas = event.object?.gas ?? gasObject.gasLimit;
+          event.object.maxFeePerGas = gasObject.maxFeePerGas;
+          event.object.maxPriorityFeePerGas = gasObject.maxPriorityFeePerGas;
+
+          event.object.chainConfig = selectedChain;
 
           const IERC20 = ERC20__factory.createInterface();
           const txDescription = IERC20.parseTransaction({ data: event.object.data, value: event.object.value })
 
+          // decode txData
           if (txDescription.name === IERC20.functions['approve(address,uint256)'].name) {
-            const response = await TransactionDataParser.parseTokenApprovalData(
+            const parsedData = await TransactionDataParser.parseTokenApprovalData(
               selectedChain,
               event.object.to,
               event.object.data,
@@ -344,13 +300,10 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
               name: 'tokenApproval',
               id: event.id,
               object: {
-                tokenData: response.tokenData,
-                amount: response.amount,
-                gas: event.object.gas,
-                gasPrice: event.object.gasPrice,
-                from: event.object.from,
-                spender: response.spender,
-                to: event.object.to,
+                tokenData: parsedData.tokenData,
+                amount: parsedData.amount,
+                spender: parsedData.spender,
+                ...event.object,
               },
             };
             props.onRequestTokenApproval(
