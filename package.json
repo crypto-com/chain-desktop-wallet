@@ -353,6 +353,7 @@
     "follow-redirects": "1.14.7",
     "simple-get": "4.0.1",
     "minimist": "1.2.6",
+    "node-forge": "1.3.0",
     "ansi-html": "https://registry.yarnpkg.com/ansi-html-community/-/ansi-html-community-0.0.8.tgz"
   }
 }
