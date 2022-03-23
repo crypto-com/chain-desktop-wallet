@@ -82,7 +82,7 @@ class EvmTransactionSigner implements ITransactionSigner {
         transaction.value ?? '0x0',
         transaction.data,
       );
-      const cronosClient = new CronosClient(rpcURL, "");
+      const cronosClient = new CronosClient(rpcURL, chainConfig.rpcUrls[0]);
 
       const result = await cronosClient.broadcastRawTransactionHex(signedTx);
 

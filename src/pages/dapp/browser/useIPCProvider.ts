@@ -193,7 +193,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         data: event.object.data,
         from: event.object.from,
         gasLimit: ethers.utils.hexValue(event.object.gas),
-        gasPrice: event.object.gasPrice,
+        gasPrice: ethers.utils.hexValue(event.object.gasPrice),
         maxFeePerGas: event.object.maxFeePerGas ?? undefined,
         maxPriorityFeePerGas: event.object.maxPriorityFeePerGas ?? undefined,
         nonce: await getNonce(event.object.from, event.object.chainConfig),

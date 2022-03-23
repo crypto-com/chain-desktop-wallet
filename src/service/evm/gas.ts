@@ -26,14 +26,25 @@ export const getGasPrice = async (chainConfig: EVMChainConfig, tx: {
   data: string
 }) => {
 
-  const provider = new ethers.providers.JsonRpcProvider(chainConfig.rpcUrls[0])
-  const fee = await provider.getFeeData();
-  const gasLimit = await getEstimateGas(chainConfig, tx)
+  try {
+    const provider = new ethers.providers.JsonRpcProvider(chainConfig.rpcUrls[0])
+    const fee = await provider.getFeeData();
+    const gasLimit = await getEstimateGas(chainConfig, tx)
 
-  return {
-    maxFeePerGas: fee.maxFeePerGas,
-    maxPriorityFeePerGas: fee.maxFeePerGas,
-    gasPrice: fee.gasPrice,
-    gasLimit,
-  };
+    return {
+      maxFeePerGas: fee.maxFeePerGas,
+      maxPriorityFeePerGas: fee.maxFeePerGas,
+      gasPrice: fee.gasPrice,
+      gasLimit,
+    };
+
+  } catch (error) {
+    return {
+      maxFeePerGas: null,
+      maxPriorityFeePerGas: null,
+      gasPrice: null,
+      gasLimit: 21000,
+    }
+  }
+
 };
