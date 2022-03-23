@@ -26,7 +26,8 @@ export namespace DappBrowserIPC {
     | 'requestAccounts'
     | 'watchAsset'
     | 'addEthereumChain'
-    | 'tokenApproval';
+    | 'tokenApproval'
+    | 'openLinkInDefaultBrowser';
 
   interface BaseEvent {
     id: number;
@@ -112,6 +113,12 @@ export namespace DappBrowserIPC {
       rpcUrls: string[];
     };
   }
+  export interface OpenLinkInDefaultBrowserEvent extends BaseEvent {
+    name: 'openLinkInDefaultBrowser';
+    object: {
+      url: string;
+    }
+  }
 
   export type Event =
     | SendTransactionEvent
@@ -122,5 +129,6 @@ export namespace DappBrowserIPC {
     | EcrecoverEvent
     | WatchAssetEvent
     | AddEthereumChainEvent
-    | TokenApprovalEvent;
+    | TokenApprovalEvent
+    | OpenLinkInDefaultBrowserEvent;
 }
