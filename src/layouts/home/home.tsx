@@ -88,7 +88,10 @@ import {
   DefaultTestnetBridgeConfigs,
 } from '../../service/bridge/BridgeConfig';
 import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
+
 // import i18n from '../../language/I18n';
+
+const { ipcRenderer } = window.require('electron');
 
 interface HomeLayoutProps {
   children?: React.ReactNode;
@@ -507,11 +510,12 @@ function HomeLayout(props: HomeLayoutProps) {
                 explorer: {
                   baseUrl: `${explorerUrl}`,
                   tx: `${explorerUrl}/tx`,
-                  address: `${explorerUrl}/${asset.assetType === UserAssetType.TENDERMINT ||
-                      asset.assetType === UserAssetType.IBC
+                  address: `${explorerUrl}/${
+                    asset.assetType === UserAssetType.TENDERMINT ||
+                    asset.assetType === UserAssetType.IBC
                       ? 'account'
                       : 'address'
-                    }`,
+                  }`,
                   validator: `${explorerUrl}/validator`,
                 },
                 explorerUrl,
@@ -654,9 +658,17 @@ function HomeLayout(props: HomeLayoutProps) {
       );
 
       const isIbcVisible = allAssets.length > 1;
-      // const isIbcVisible = false;
+
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
       const isAppLocked = await generalConfigService.getIfAppIsLockedByUser();
+
+      // let isAutoUpdateDisabled = await generalConfigService.checkIfAutoUpdateDisabled();
+      const autoUpdateExpireTime = await ipcRenderer.invoke('get_auto_update_expire_time');
+      // Enable Auto Update if expired
+      if (autoUpdateExpireTime < Date.now()) {
+        ipcRenderer.send('set_auto_update_expire_time', 0);
+      }
+
       setHasWallet(hasWalletBeenCreated);
       setSession({
         ...currentSession,
@@ -1043,10 +1055,11 @@ function HomeLayout(props: HomeLayoutProps) {
                 <div className="item">
                   <Alert
                     type="warning"
-                    message={`${t('navbar.wallet.modal.warning1')} ${session.wallet.walletType !== LEDGER_WALLET_TYPE
+                    message={`${t('navbar.wallet.modal.warning1')} ${
+                      session.wallet.walletType !== LEDGER_WALLET_TYPE
                         ? t('navbar.wallet.modal.warning2')
                         : ''
-                      }`}
+                    }`}
                     showIcon
                   />
                 </div>
@@ -1130,7 +1143,7 @@ function HomeLayout(props: HomeLayoutProps) {
             setIsAnnouncementVisible(false);
             generalConfigService.setHasShownAnalyticsPopup(true);
           }}
-          handleOk={() => { }}
+          handleOk={() => {}}
           footer={[]}
         >
           <>
@@ -1211,7 +1224,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   setIsLedgerModalButtonLoading(true);
                 }}
                 loading={isLedgerModalButtonLoading}
-              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>
@@ -1259,7 +1272,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   setIsLedgerModalButtonLoading(true);
                 }}
                 loading={isLedgerModalButtonLoading}
-              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>

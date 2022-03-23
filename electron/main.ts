@@ -7,8 +7,7 @@ import { IpcMain } from './IpcMain';
 import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import Big from "big.js";
-
-
+import Store from "electron-store";
 
 import { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } from './UsageAnalytics';
 
@@ -22,6 +21,7 @@ import { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView }
 let win: BrowserWindow | null = null;
 let ipcmain: IpcMain | null = null;
 const isDev = process.env.NODE_ENV === 'development'; // change true, in developing mode
+const store = new Store();
 
 // Updater log setup
 log.transports.file.level = "debug"
@@ -145,7 +145,19 @@ app.on('ready', async function () {
   createWindow();
 
   await new Promise(resolve => setTimeout(resolve, 20_000));
-  autoUpdater.checkForUpdatesAndNotify();
+
+  const autoUpdateExpireTime = store.get('autoUpdateExpireTime');
+  if(!autoUpdateExpireTime) {
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+});
+
+ipcMain.handle('get_auto_update_expire_time', (event) => {
+  return store.get('autoUpdateExpireTime');
+});
+
+ipcMain.on('set_auto_update_expire_time', (event, arg) => {
+  store.set('autoUpdateExpireTime', arg);
 });
 
 ipcMain.on('app_version', (event) => {
