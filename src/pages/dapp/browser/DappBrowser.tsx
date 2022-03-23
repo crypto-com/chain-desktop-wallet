@@ -4,7 +4,6 @@ import { WebviewTag } from 'electron';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import Web3 from 'web3';
-import { setTimeout } from 'timers';
 import { useIPCProvider } from './useIPCProvider';
 import { allMarketState, sessionState, walletAllAssetsState } from '../../../recoil/atom';
 import { addHTTPsPrefixIfNeeded, getCronosEvmAsset } from '../../../utils/utils';
