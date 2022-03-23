@@ -387,7 +387,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'watchAsset':
           props.onRequestWatchAsset(
             event,
-            () => {},
+            () => { },
             reason => {
               sendError(event.id, reason);
             },
@@ -396,11 +396,17 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'addEthereumChain':
           props.onRequestAddEthereumChain(
             event,
-            () => {},
+            () => { },
             reason => {
               sendError(event.id, reason);
             },
           );
+          break;
+        case 'openLinkInDefaultBrowser': {
+          const { url } = event.object;
+          const { shell } = window.require('electron');
+          shell.openExternal(url);
+        }
           break;
         default:
           break;
