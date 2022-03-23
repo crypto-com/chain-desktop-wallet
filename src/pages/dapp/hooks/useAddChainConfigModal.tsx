@@ -3,8 +3,9 @@ import { useState } from 'react';
 import { Form, Input, InputNumber, message, Modal } from 'antd';
 import { ethers } from 'ethers';
 import { useTranslation } from 'react-i18next';
-import { ChainConfig, ChainConfigFormData, ChainConfigFormKeys } from '../types';
+import { ChainConfigFormData, ChainConfigFormKeys } from '../types';
 import { useChainConfigs } from '../browser/useChainConfigs';
+import { EVMChainConfig } from '../../../models/Chain';
 
 export const useAddChainConfigModal = () => {
   const [m, setM] = useState({
@@ -32,7 +33,7 @@ export const useAddChainConfigModal = () => {
             layout="vertical"
             form={form}
             onFinish={fieldsValue => {
-              const wantedChainConfig: ChainConfig = {
+              const wantedChainConfig: EVMChainConfig = {
                 chainId: ethers.BigNumber.from(fieldsValue.chainId).toHexString(),
                 chainName: fieldsValue.chainName,
                 rpcUrls: [fieldsValue.rpcURL],

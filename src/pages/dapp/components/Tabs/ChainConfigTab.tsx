@@ -8,9 +8,10 @@ import { useForm } from 'antd/lib/form/Form';
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal';
 import { useChainConfigs } from '../../browser/useChainConfigs';
 import { isHexEqual } from '../../../../utils/utils';
-import { ChainConfig, ChainConfigFormData, ChainConfigFormKeys } from '../../types';
+import { ChainConfigFormData, ChainConfigFormKeys } from '../../types';
 import { useAddChainConfigModal } from '../../hooks/useAddChainConfigModal';
 import { DAppDefaultChainConfigs, isChainDefaultConfig } from '../../../../config/DAppChainConfig';
+import { EVMChainConfig } from '../../../../models/Chain';
 
 const ChainConfigTab = () => {
   const {
@@ -25,10 +26,10 @@ const ChainConfigTab = () => {
 
   const [t] = useTranslation();
 
-  const [editingChainConfig, setEditingChainConfig] = useState<ChainConfig>(
+  const [editingChainConfig, setEditingChainConfig] = useState<EVMChainConfig>(
     DAppDefaultChainConfigs[0],
   );
-  const [deletingConfig, setDeletingConfig] = useState<ChainConfig>();
+  const [deletingConfig, setDeletingConfig] = useState<EVMChainConfig>();
 
   const { showWithConfig: showAddChainConfigModal } = useAddChainConfigModal();
 
@@ -145,7 +146,7 @@ const ChainConfigTab = () => {
           form={form}
           style={{ width: '40%' }}
           onFinish={fieldsValue => {
-            const wantedChainConfig: ChainConfig = {
+            const wantedChainConfig: EVMChainConfig = {
               chainId: ethers.BigNumber.from(fieldsValue.chainId).toHexString(),
               chainName: fieldsValue.chainName,
               rpcUrls: [fieldsValue.rpcURL],

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Drawer, Layout } from 'antd';
+import { Button, Drawer, Layout, Spin } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import numeral from 'numeral';
 import { useTranslation } from 'react-i18next';
 import './RequestConfirmation.less';
 
 import { useRecoilState } from 'recoil';
+import { ethers } from 'ethers';
 import {
   AssetMarketPrice,
   getAssetAmountInFiat,
@@ -25,7 +26,6 @@ import { LEDGER_WALLET_TYPE } from '../../../../service/LedgerService';
 import { ledgerNotification } from '../../../../components/LedgerNotification/LedgerNotification';
 import { useChainConfigs } from '../../browser/useChainConfigs';
 import { useBalance } from '../../hooks/useBalance';
-import { ethers } from 'ethers';
 
 const { BigNumber } = ethers;
 
@@ -92,7 +92,13 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     setIsConfirmDisabled(false);
 
     if (event.name === 'signTransaction') {
-      const networkFee = event ? BigNumber.from(event.object?.gas).mul(event.object?.gasPrice) : 0;
+      let networkFee: ethers.BigNumberish;
+      if (event.object.gasPrice) {
+        networkFee = event ? BigNumber.from(event.object?.gas).mul(event.object?.gasPrice) : 0;
+      } else {
+        networkFee = event.object.maxFeePerGas?.mul(event.object.gas) ?? 0;
+      }
+
       const total = event ? BigNumber.from(event.object?.value ?? '0').add(networkFee) : 0;
 
       const isDisabled = (balance ?? BigNumber.from('0')).lt(total);
@@ -264,10 +270,18 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
             </div>
             <div className="row">
               <div className="address">{middleEllipsis(cronosAsset?.address ?? '', 6)}</div>
-              <div className="balance">{`${scaledAmount(
-                balance?.toString(),
-                selectedChain.nativeCurrency.decimals,
-              )} ${selectedChain.nativeCurrency.symbol}`}</div>
+              {isFetchingBalance ? (
+                <Spin
+                  style={{
+                    marginLeft: '60px',
+                  }}
+                />
+              ) : (
+                <div className="balance">{`${scaledAmount(
+                  balance?.toString(),
+                  selectedChain.nativeCurrency.decimals,
+                )} ${selectedChain.nativeCurrency.symbol}`}</div>
+              )}
             </div>
           </div>
           {event && <EventView />}

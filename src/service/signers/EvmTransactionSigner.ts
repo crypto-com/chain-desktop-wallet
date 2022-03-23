@@ -89,23 +89,27 @@ class EvmTransactionSigner implements ITransactionSigner {
       return Promise.resolve(result);
     }
 
-    const txParams: ethers.providers.TransactionRequest = {
+    const txRequest: ethers.providers.TransactionRequest = {
       chainId,
       data: transaction.data,
       from: transaction.from,
       gasLimit: transaction.gasLimit,
-      gasPrice: transaction.gasPrice,
-      // maxFeePerGas: transaction.maxFeePerGas,
-      // maxPriorityFeePerGas: transaction.maxPriorityFeePerGas,
       nonce: transaction.nonce,
       to: transaction.contractAddress,
       value: transaction.value ?? '0x0',
-    };
+    }
+    if (transaction.maxFeePerGas && transaction.maxPriorityFeePerGas) {
+      txRequest.maxFeePerGas = transaction.maxFeePerGas;
+      txRequest.maxPriorityFeePerGas = transaction.maxPriorityFeePerGas;
+      txRequest.type = 2;
+    } else {
+      txRequest.gasPrice = transaction.gasPrice;
+    }
 
     const provider = new ethers.providers.JsonRpcProvider(rpcURL);
     const wallet = ethers.Wallet.fromMnemonic(phrase).connect(provider);
 
-    const signedTx = await wallet.sendTransaction(txParams);
+    const signedTx = await wallet.sendTransaction(txRequest);
     return Promise.resolve(signedTx.hash);
   }
 
