@@ -22,6 +22,7 @@ export namespace DappBrowserIPC {
   export type EventName =
     | 'addEthereumChain'
     | 'ecRecover'
+    | 'openLinkInDefaultBrowser'
     | 'requestAccounts'
     | 'signMessage'
     | 'signPersonalMessage'
@@ -124,6 +125,12 @@ export namespace DappBrowserIPC {
       chainId: string;
     }
   }
+  export interface OpenLinkInDefaultBrowserEvent extends BaseEvent {
+    name: 'openLinkInDefaultBrowser';
+    object: {
+      url: string;
+    }
+  }
 
   export type Event =
     | SendTransactionEvent
@@ -135,6 +142,7 @@ export namespace DappBrowserIPC {
     | WatchAssetEvent
     | AddEthereumChainEvent
     | SwitchEthereumChainEvent
+    | OpenLinkInDefaultBrowserEvent
     | TokenApprovalEvent;
 }
 
