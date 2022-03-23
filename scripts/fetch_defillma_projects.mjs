@@ -36,7 +36,6 @@ const projects = []
 
 const categoriesMapping = {
   'Dexes': 'DEX',
-  'Yield Aggregator': 'Yield Optimiser',
   'Lending': 'Lending',
   'Yield': 'Yield',
   'Algo-Stables': 'Stablecoin',
