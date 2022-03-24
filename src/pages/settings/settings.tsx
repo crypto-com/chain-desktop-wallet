@@ -273,6 +273,7 @@ function MetaInfoComponent() {
   const [defaultAutoUpdateExpireTime, setDefaultAutoUpdateExpireTime] = useState<
     number | undefined
   >();
+  const [autoUpdateDisableDuration, setAutoUpdateDisableDuration] = useState<number>(14);
   const [supportedCurrencies, setSupportedCurrencies] = useState<SupportedCurrency[]>([]);
   const [t, i18n] = useTranslation();
 
@@ -391,6 +392,10 @@ function MetaInfoComponent() {
     setMomentLocale();
   };
 
+  const onSwitchAutoUpdateDuration = value => {
+    setAutoUpdateDisableDuration(value);
+  };
+
   const onSwitchCurrency = async value => {
     if (session.currency === value.toString()) {
       return;
@@ -501,7 +506,9 @@ function MetaInfoComponent() {
     const newState = !defaultAutoUpdateDisabled;
     setDefaultAutoUpdateDisabled(newState);
 
-    const expireTime = newState ? new Date().setDate(new Date().getDate() + 30) : 0;
+    const expireTime = newState
+      ? new Date().setDate(new Date().getDate() + autoUpdateDisableDuration)
+      : 0;
     setDefaultAutoUpdateExpireTime(expireTime);
 
     ipcRenderer.send('set_auto_update_expire_time', expireTime);
@@ -603,7 +610,24 @@ function MetaInfoComponent() {
               onChange={onAllowAutoUpdateChange}
               disabled={updateLoading}
             />{' '}
-            {defaultAutoUpdateDisabled ? t('general.disabled') : t('general.enabled')}
+            {defaultAutoUpdateDisabled ? t('general.disabled') : t('general.enabled')}{' '}
+            {!defaultAutoUpdateDisabled || !defaultAutoUpdateExpireTime ? (
+              <Select
+                className="auto-update-duration"
+                onChange={onSwitchAutoUpdateDuration}
+                value={autoUpdateDisableDuration}
+              >
+                {[14, 30].map(duration => {
+                  return (
+                    <Option value={duration} key={duration}>
+                      {t('settings.autoUpdate.duration', { duration })}
+                    </Option>
+                  );
+                })}
+              </Select>
+            ) : (
+              <></>
+            )}
           </div>
           {walletType !== LEDGER_WALLET_TYPE ? (
             <>
