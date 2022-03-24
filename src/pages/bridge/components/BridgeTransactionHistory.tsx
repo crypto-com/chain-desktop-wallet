@@ -93,9 +93,10 @@ const BridgeTransactionHistory = () => {
   const convertBridgeTransfers = (allTransfers: BridgeTransaction[]) => {
     const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
 
-    return allTransfers.map(transfer => {
+    return allTransfers.map((transfer, idx) => {
       const data: BridgeTransferTabularData = {
         key:
+          idx.toString() +
           transfer.sourceTransactionId +
           transfer.sourceAddress +
           transfer.destinationTransactionId +

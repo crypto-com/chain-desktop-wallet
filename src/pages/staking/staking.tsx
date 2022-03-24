@@ -1337,12 +1337,16 @@ const FormWithdrawStakingReward = () => {
     },
     {
       title: t('staking.formWithdralStakingReward.table.withdraw'),
-      dataIndex: 'withdrawAction',
       key: 'withdrawAction',
-      render: () => (
+      render: record => (
         <>
           <a
             onClick={() => {
+              setWithdrawValues({
+                validatorAddress: record.validatorAddress,
+                rewardAmount: record.rewardAmount,
+                rewardMarketPrice: record.rewardMarketPrice,
+              });
               setRewardAction('withdraw');
               setTimeout(() => {
                 showPasswordInput('withdraw');
@@ -1356,12 +1360,16 @@ const FormWithdrawStakingReward = () => {
     },
     {
       title: t('staking.formWithdralStakingReward.table.restake'),
-      dataIndex: 'restakeAction',
       key: 'restakeAction',
-      render: () => (
+      render: record => (
         <>
           <a
             onClick={() => {
+              setWithdrawValues({
+                validatorAddress: record.validatorAddress,
+                rewardAmount: record.rewardAmount,
+                rewardMarketPrice: record.rewardMarketPrice,
+              });
               setRewardAction('restake');
               setTimeout(() => {
                 showPasswordInput('restake');
@@ -1389,17 +1397,6 @@ const FormWithdrawStakingReward = () => {
           spinning: isRewardsLoading,
         }}
         dataSource={rewards}
-        onRow={record => {
-          return {
-            onClick: () => {
-              setWithdrawValues({
-                validatorAddress: record.validatorAddress,
-                rewardAmount: record.rewardAmount,
-                rewardMarketPrice: record.rewardMarketPrice,
-              });
-            },
-          };
-        }}
       />
     );
   };
