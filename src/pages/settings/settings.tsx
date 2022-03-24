@@ -51,6 +51,7 @@ import {
   SUPPORTED_CURRENCY,
   WalletConfig,
   SupportedCurrency,
+  AUTO_UPDATE_DISABLE_DURATIONS,
 } from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
@@ -617,7 +618,7 @@ function MetaInfoComponent() {
                 onChange={onSwitchAutoUpdateDuration}
                 value={autoUpdateDisableDuration}
               >
-                {[14, 30].map(duration => {
+                {AUTO_UPDATE_DISABLE_DURATIONS.map(duration => {
                   return (
                     <Option value={duration} key={duration}>
                       {t('settings.autoUpdate.duration', { duration })}
