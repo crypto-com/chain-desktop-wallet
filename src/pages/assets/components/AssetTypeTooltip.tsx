@@ -26,7 +26,7 @@ const AssetTypeTooltip: React.FC<AssetTypeTooltipProps> = props => {
         <>
           {t('assets.assetTypeTooltip.nativeToken', {
             chainName: getChainName(currentAsset?.name, currentSession.wallet.config),
-            nativeToken: currentAsset.symbol,
+            nativeToken: 'CRO',
             assetType: 'Cronos',
           })}
           <br />
@@ -45,7 +45,7 @@ const AssetTypeTooltip: React.FC<AssetTypeTooltipProps> = props => {
         <>
           {t('assets.assetTypeTooltip.crc20', {
             chainName: getChainName(currentAsset?.name, currentSession.wallet.config),
-            nativeToken: currentAsset.symbol,
+            nativeToken: 'CRO',
             assetType: 'CRC20',
           })}
           <br />
@@ -64,7 +64,7 @@ const AssetTypeTooltip: React.FC<AssetTypeTooltipProps> = props => {
         <>
           {t('assets.assetTypeTooltip.crc20', {
             chainName: getChainName(currentAsset?.name, currentSession.wallet.config),
-            nativeToken: currentAsset.symbol,
+            nativeToken: 'ETH',
             assetType: 'ERC20',
           })}
           <br />
