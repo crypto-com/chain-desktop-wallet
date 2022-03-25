@@ -281,6 +281,8 @@ export const NFT_WRAPPED_ETH_DENOM_SCHEMA = {
 export const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 export const MAX_VIDEO_SIZE = 20 * 1024 * 1024;
 
+export const AUTO_UPDATE_DISABLE_DURATIONS = [14, 30];
+
 const TestNetConfig: WalletConfig = {
   enabled: true,
   name: 'TESTNET',

@@ -10,6 +10,7 @@ import {
   CryptoComSlugResponse,
   CryptoTokenPriceAPIResponse,
 } from './models/marketApi.models';
+import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 
 export interface IMarketApi {
   getAssetPrice(assetSymbol: string, currency: string): Promise<AssetMarketPrice>;
@@ -82,6 +83,7 @@ export class CroMarketApi implements IMarketApi {
   }
 
   public async getTokenPriceFromCryptoCom(cryptoSymbol: string, fiatCurrency: string) {
+    const whitelistedCRC20Tokens: string[] = Array.from( CRC20MainnetTokenInfos.keys() );
     const allTokensSlugMap: CryptoComSlugResponse[] = await this.loadTokenSlugMap();
 
     const tokenSlugInfo = allTokensSlugMap.filter(tokenSlug => tokenSlug.symbol === cryptoSymbol);
@@ -102,9 +104,9 @@ export class CroMarketApi implements IMarketApi {
       }),
     );
 
-    // Filter Cronos token price only
+    // Filter Cronos / whitelisted token price only
     const tokenPriceInUSD = tokenPriceResponses.find(token =>
-      token.data.tags.includes('cronos-ecosystem'),
+      token.data.tags.includes('cronos-ecosystem') || whitelistedCRC20Tokens.includes(token.data.symbol)
     );
 
     if (!tokenPriceInUSD) {

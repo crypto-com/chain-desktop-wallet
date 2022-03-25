@@ -152,7 +152,7 @@ export const getAssetBalancePrice = (asset: UserAsset, marketPrice: AssetMarketP
     return '--';
   }
   const bigAsset = new Big(scaledBalance(asset));
-  const bigMarketPrice = new Big(marketPrice.price);
+  const bigMarketPrice = new Big(marketPrice.price ? marketPrice.price : '0');
   return bigAsset.times(bigMarketPrice).toFixed(2);
 };
 
@@ -167,24 +167,24 @@ export const getAssetAmountInFiat = (amount: string, marketPrice: AssetMarketPri
     return '';
   }
   const bigAsset = new Big(amount);
-  const bigMarketPrice = new Big(marketPrice.price);
+  const bigMarketPrice = new Big(marketPrice.price ? marketPrice.price : '0');
   return bigAsset.times(bigMarketPrice).toFixed(2);
 };
 
 export const getAssetStakingBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
   const bigAsset = new Big(scaledStakingBalance(asset));
-  const bigMarketPrice = new Big(marketPrice.price);
+  const bigMarketPrice = new Big(marketPrice.price ? marketPrice.price : '0');
   return bigAsset.times(bigMarketPrice).toFixed(2);
 };
 
 export const getAssetUnbondingBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
   const bigAsset = new Big(scaledUnbondingBalance(asset));
-  const bigMarketPrice = new Big(marketPrice.price);
+  const bigMarketPrice = new Big(marketPrice.price ? marketPrice.price : '0');
   return bigAsset.times(bigMarketPrice).toFixed(2);
 };
 
 export const getAssetRewardsBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
   const bigAsset = new Big(scaledRewardBalance(asset));
-  const bigMarketPrice = new Big(marketPrice.price);
+  const bigMarketPrice = new Big(marketPrice.price ? marketPrice.price : '0');
   return bigAsset.times(bigMarketPrice).toFixed(2);
 };

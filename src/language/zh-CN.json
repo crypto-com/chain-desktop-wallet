@@ -650,6 +650,7 @@
   "settings.autoUpdate.title": "自动更新",
   "settings.autoUpdate.description": "开启后程序将会保持更新至最新版本。",
   "settings.autoUpdate.expire": "到期",
+  "settings.autoUpdate.duration": "关闭 {{ duration }} 天",
   "settings.exportRecoveryPhrase.title": "导出助记词",
   "settings.exportRecoveryPhrase.description": "需要输入你的密码来进行此操作。",
   "settings.exportRecoveryPhrase.button": "导出",

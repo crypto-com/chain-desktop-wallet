@@ -650,6 +650,7 @@
   "settings.autoUpdate.title": "Auto Update",
   "settings.autoUpdate.description": "Once enabled, the program will keep updated to the latest version.",
   "settings.autoUpdate.expire": "Expire",
+  "settings.autoUpdate.duration": "Disable for {{ duration }} Days",
   "settings.exportRecoveryPhrase.title": "Export your Recovery Phrase",
   "settings.exportRecoveryPhrase.description": "You are required to enter your App Password for this action.",
   "settings.exportRecoveryPhrase.button": "Export",
