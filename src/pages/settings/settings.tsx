@@ -56,9 +56,9 @@ import {
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
-import { UserAsset, UserAssetConfig, UserAssetType } from '../../models/UserAsset';
+import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
 import AddressBook from './tabs/AddressBook/AddressBook';
-import { getChainName } from '../../utils/utils';
+import { getChainName, getCronosTendermintAsset } from '../../utils/utils';
 import { AssetIcon } from '../../components/AssetIcon';
 
 const { ipcRenderer } = window.require('electron');
@@ -765,9 +765,9 @@ const FormSettings = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
   const [isConfirmClearVisible, setIsConfirmClearVisible] = useState(false);
-  const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [session, setSession] = useRecoilState(sessionState);
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
+  const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
 
   const defaultSettings: UserAssetConfig =
     session.activeAsset?.config || getAssetConfigFromWalletConfig(session.wallet.config);
@@ -782,12 +782,7 @@ const FormSettings = () => {
   let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
 
   useEffect(() => {
-    const selectedIdentifier = walletAllAssets
-      .filter(asset => {
-        return asset.assetType !== UserAssetType.CRC_20_TOKEN;
-      })
-      .find(asset => asset.identifier === session.activeAsset?.identifier)?.identifier;
-    setCurrentAssetIdentifier(selectedIdentifier || walletAllAssets[0].identifier);
+    const croAsset = getCronosTendermintAsset(walletAllAssets);
 
     if (defaultSettings.fee !== undefined) {
       networkFee = defaultSettings.fee.networkFee;
@@ -803,6 +798,9 @@ const FormSettings = () => {
       networkFee,
       gasLimit,
     });
+    if (!currentAssetIdentifier && croAsset) {
+      setCurrentAssetIdentifier(croAsset?.identifier);
+    }
   }, [form, defaultSettings, walletAllAssets, setSession]);
 
   const onFinish = async values => {
