@@ -426,7 +426,7 @@ const unListedProjects: CronosProject[] = [
     category: ['Yield Aggregator'],
     logo: 'single-finance-logo.png',
     description: '',
-    link: 'https://app.singlefinance.io/prelaunch-vault/stake',
+    link: 'https://app.singlefinance.io/single-click',
     twitter: '',
   },
   {

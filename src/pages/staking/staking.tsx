@@ -465,7 +465,7 @@ const FormDelegationRequest = props => {
               <div className="label">{t('staking.modal1.label3')}</div>
               <div>
                 {`${formValues?.amount} ${walletAsset?.symbol}`}{' '}
-                {walletAsset && assetMarketData
+                {walletAsset && assetMarketData && assetMarketData.price
                   ? `(${localFiatSymbol}${numeral(
                       getAssetAmountInFiat(formValues?.amount, assetMarketData),
                     ).format('0,0.00')})`
