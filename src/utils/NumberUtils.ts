@@ -76,18 +76,20 @@ export function getCurrentMinAssetAmount(userAsset: UserAsset) {
 // When user selects option to send max amount,
 // transaction fee gets deduced to the sent amount for the transaction to be successful
 export function adjustedTransactionAmount(
-  formAmount: string = '0',
+  formAmount: string = '0' /* decimal unit */,
   walletAsset: UserAsset,
   fee: string,
 ): string {
   // Handle case for existing users
   const currentFee = fee ?? FIXED_DEFAULT_FEE;
-  // const availableBalance = Big('10000000000000000000000000');
   const availableBalance = Big(scaledBalance(walletAsset));
   const fixedFee = getNormalScaleAmount(currentFee, walletAsset);
   const amountAndFee = Big(formAmount).add(fixedFee);
   if (amountAndFee.gt(availableBalance)) {
-    return availableBalance.minus(fixedFee).toFixed();
+    if (availableBalance.gte(fixedFee)) {
+      return availableBalance.minus(fixedFee).toFixed();
+    }
+    return '0';
   }
   return formAmount.toString();
 }
