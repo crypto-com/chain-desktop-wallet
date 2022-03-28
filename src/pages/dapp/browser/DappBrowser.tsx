@@ -4,6 +4,7 @@ import { WebviewTag } from 'electron';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import Web3 from 'web3';
+import packageJson from '../../../../package.json';
 import { useIPCProvider } from './useIPCProvider';
 import { allMarketState, sessionState, walletAllAssetsState } from '../../../recoil/atom';
 import { addHTTPsPrefixIfNeeded, getCronosEvmAsset } from '../../../utils/utils';
@@ -412,6 +413,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
       <webview
         preload={ProviderPreloadScriptPath}
         ref={webviewRef}
+        useragent={`Mozilla/5.0 (Macintosh; Intel Mac OS X 12_3_0) AppleWebKit/537.36 (KHTML, like Gecko) Desktop Wallet/${packageJson.version} Chrome/87.0.4280.141 Electron/11.5.0 Safari/537.36`}
         style={{
           width: '100%',
           height: 'calc(100vh - 48px)',
