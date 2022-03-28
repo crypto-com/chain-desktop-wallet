@@ -56,7 +56,7 @@ const ChainConfigTab = () => {
             setDeletingConfig(undefined);
             removeChainConfig(deletingConfig.chainId);
             setEditingChainConfig(DAppDefaultChainConfigs[0]);
-            message.success('Remove success');
+            message.success(t('dapp.chainConfig.message.remove.success'));
           }}
           confirmText={t('settings.addressBook.remove')}
         >
@@ -70,7 +70,7 @@ const ChainConfigTab = () => {
           >
             <InfoCircleOutlined style={{ color: '#f27474', fontSize: '70px' }} />
             <div style={{ fontSize: '24px', fontWeight: 500, marginTop: '15px' }}>
-              Remove Chain Config
+              {t('dapp.chainConfig.message.remove')}
             </div>
             <div style={{ fontSize: '14px', color: '#0B142688' }}>
               {t('settings.addressBook.removeConfirm')}
@@ -138,7 +138,7 @@ const ChainConfigTab = () => {
               showAddChainConfigModal();
             }}
           >
-            Add New Chain
+            {t('dapp.chainConfig.addNewChain')}
           </Button>
         </div>
         <Form<ChainConfigFormData>
@@ -168,11 +168,11 @@ const ChainConfigTab = () => {
 
             updateChainConfigs([...newChainConfigs]);
             setEditingChainConfig(wantedChainConfig);
-            message.success('Save success');
+            message.success(t('dapp.chainConfig.saveSuccessfully'));
           }}
         >
           <Form.Item
-            label="Chain Name"
+            label={t('dapp.chainConfig.chainName')}
             initialValue={editingChainConfig.chainName}
             name={ChainConfigFormKeys.chainName}
             hasFeedback
@@ -181,14 +181,14 @@ const ChainConfigTab = () => {
               {
                 required: true,
                 type: 'string',
-                message: `chain Name ${t('general.required')}`,
+                message: `${t('dapp.chainConfig.chainName')} ${t('general.required')}`,
               },
             ]}
           >
             <Input disabled={isChainDefaultConfig(editingChainConfig.chainId)} />
           </Form.Item>
           <Form.Item
-            label="Chain ID"
+            label={t('dapp.chainConfig.chainID')}
             initialValue={ethers.BigNumber.from(editingChainConfig.chainId).toNumber()}
             name={ChainConfigFormKeys.chainId}
             hasFeedback
@@ -206,7 +206,7 @@ const ChainConfigTab = () => {
 
                   return Promise.resolve();
                 },
-                message: `chain id exists`,
+                message: `${t('dapp.chainConfig.chainID')} ${t('dapp.chainConfig.exists')}`,
               },
               {
                 required: true,
@@ -217,7 +217,7 @@ const ChainConfigTab = () => {
             <InputNumber disabled={isChainDefaultConfig(editingChainConfig.chainId)} />
           </Form.Item>
           <Form.Item
-            label="Currency Symbol"
+            label={t('dapp.chainConfig.currencySymbol')}
             initialValue={editingChainConfig.nativeCurrency.symbol}
             name={ChainConfigFormKeys.symbol}
             hasFeedback
@@ -226,7 +226,7 @@ const ChainConfigTab = () => {
               {
                 required: true,
                 type: 'string',
-                message: `Symbol ${t('general.required')}`,
+                message: `${t('dapp.chainConfig.currencySymbol')} ${t('general.required')}`,
               },
             ]}
           >
@@ -249,7 +249,7 @@ const ChainConfigTab = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            label="Block Explorer URL"
+            label={t('dapp.chainConfig.blockExplorer')}
             initialValue={editingChainConfig.blockExplorerUrls[0]}
             name={ChainConfigFormKeys.explorerURL}
             hasFeedback
@@ -258,7 +258,7 @@ const ChainConfigTab = () => {
               {
                 required: true,
                 type: 'url',
-                message: `Explorer URL ${t('general.required')}`,
+                message: `${t('dapp.chainConfig.blockExplorer')} ${t('general.required')}`,
               },
             ]}
           >
@@ -279,7 +279,7 @@ const ChainConfigTab = () => {
                   setDeletingConfig(editingChainConfig);
                 }}
               >
-                Remove
+                {t('settings.addressBook.remove')}
               </Button>
               <div>
                 <Button
@@ -287,13 +287,13 @@ const ChainConfigTab = () => {
                   danger
                   onClick={() => {
                     form.resetFields();
-                    message.success('Reset success');
+                    message.success(t('dapp.chainConfig.resetSuccessfully'));
                   }}
                 >
-                  Reset
+                  {t('dapp.chainConfig.reset')}
                 </Button>
                 <Button type="primary" htmlType="submit">
-                  Save
+                  {t('general.save')}
                 </Button>
               </div>
             </div>

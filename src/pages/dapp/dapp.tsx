@@ -280,7 +280,7 @@ const DappPage = () => {
                 }}
               />
             </TabPane>
-            <TabPane tab="Chain Config" key={TabKey.chainConfig}>
+            <TabPane tab={t('dapp.chainConfig')} key={TabKey.chainConfig}>
               <ChainConfigTab />
             </TabPane>
           </Tabs>

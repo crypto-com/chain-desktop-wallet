@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { Modal } from 'antd';
 import { ethers } from 'ethers';
+import { useTranslation } from 'react-i18next';
 import { EVMChainConfig } from '../../../models/Chain';
 
 export const useAddChainModal = () => {
@@ -10,6 +11,7 @@ export const useAddChainModal = () => {
   });
 
   const [isShowing, setIsShowing] = useState(false);
+  const [t] = useTranslation();
 
   function showWithConfig(props: {
     dappURL: string;
@@ -27,8 +29,8 @@ export const useAddChainModal = () => {
       visible: true,
       onCancel: props.onCancel,
       onOk: props.onApprove,
-      okText: 'Approve',
-      cancelText: 'Cancel',
+      okText: t('Approve'),
+      cancelText: t('general.cancel'),
       okCancel: true,
       content: (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -43,20 +45,20 @@ export const useAddChainModal = () => {
             <span>{props.dappURL}</span>
           </div>
           <div style={{ fontSize: '20px', textAlign: 'center', marginTop: '12px' }}>
-            Wants to Add A Network
+            {t('Wants to Add A Network')}
           </div>
           <div style={{ width: '', margin: 'auto', textAlign: 'left', marginTop: '30px' }}>
             {[
               {
-                title: 'Network Name',
+                title: t('dapp.chainConfig.chainName'),
                 value: props.config.chainName,
               },
               {
-                title: 'Network ID',
+                title: t('dapp.chainConfig.chainID'),
                 value: ethers.BigNumber.from(props.config.chainId).toString(),
               },
               {
-                title: 'Currency',
+                title: t('dapp.chainConfig.currencySymbol'),
                 value: props.config.nativeCurrency.symbol,
               },
               {
@@ -64,7 +66,7 @@ export const useAddChainModal = () => {
                 value: props.config.rpcUrls[0],
               },
               {
-                title: 'Explorer URL',
+                title: t('dapp.chainConfig.blockExplorer'),
                 value: props.config.blockExplorerUrls[0],
               },
             ].map(({ title, value }) => {

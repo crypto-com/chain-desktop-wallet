@@ -46,12 +46,12 @@ export const useAddChainConfigModal = () => {
               };
 
               addChainConfig(wantedChainConfig);
-              message.success('Add success');
+              message.success(t('dapp.chainConfig.saveSuccessfully'));
               dismiss();
             }}
           >
             <Form.Item
-              label="Chain Name"
+              label={t('dapp.chainConfig.chainName')}
               name={ChainConfigFormKeys.chainName}
               hasFeedback
               validateFirst
@@ -59,14 +59,14 @@ export const useAddChainConfigModal = () => {
                 {
                   required: true,
                   type: 'string',
-                  message: `chain Name ${t('general.required')}`,
+                  message: `${t('dapp.chainConfig.chainName')} ${t('general.required')}`,
                 },
               ]}
             >
               <Input />
             </Form.Item>
             <Form.Item
-              label="Chain ID"
+              label={t('dapp.chainConfig.chainID')}
               name={ChainConfigFormKeys.chainId}
               hasFeedback
               validateFirst
@@ -79,7 +79,7 @@ export const useAddChainConfigModal = () => {
 
                     return Promise.resolve();
                   },
-                  message: `chain id exists`,
+                  message: `${t('dapp.chainConfig.chainID')} ${t('dapp.chainConfig.exists')}`,
                 },
                 {
                   required: true,
@@ -90,7 +90,7 @@ export const useAddChainConfigModal = () => {
               <InputNumber />
             </Form.Item>
             <Form.Item
-              label="Currency Symbol"
+              label={t('dapp.chainConfig.currencySymbol')}
               name={ChainConfigFormKeys.symbol}
               hasFeedback
               validateFirst
@@ -98,7 +98,7 @@ export const useAddChainConfigModal = () => {
                 {
                   required: true,
                   type: 'string',
-                  message: `Symbol ${t('general.required')}`,
+                  message: `${t('dapp.chainConfig.currencySymbol')} ${t('general.required')}`,
                 },
               ]}
             >
@@ -120,7 +120,7 @@ export const useAddChainConfigModal = () => {
               <Input />
             </Form.Item>
             <Form.Item
-              label="Block Explorer URL"
+              label={t('dapp.chainConfig.blockExplorer')}
               name={ChainConfigFormKeys.explorerURL}
               hasFeedback
               validateFirst
@@ -128,7 +128,7 @@ export const useAddChainConfigModal = () => {
                 {
                   required: true,
                   type: 'url',
-                  message: `Explorer URL ${t('general.required')}`,
+                  message: `${t('dapp.chainConfig.blockExplorer')} ${t('general.required')}`,
                 },
               ]}
             >

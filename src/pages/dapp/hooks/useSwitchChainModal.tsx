@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 import { Modal, Tag } from 'antd';
+import { useTranslation } from 'react-i18next';
 import { EVMChainConfig } from '../../../models/Chain';
 
 export const useSwitchChainModal = () => {
@@ -9,6 +10,7 @@ export const useSwitchChainModal = () => {
   });
 
   const [isShowing, setIsShowing] = useState(false);
+  const [t] = useTranslation();
 
   function showWithConfig(props: {
     dappURL: string;
@@ -26,8 +28,8 @@ export const useSwitchChainModal = () => {
       visible: true,
       onCancel: props.onCancel,
       onOk: props.onApprove,
-      okText: 'Approve',
-      cancelText: 'Cancel',
+      okText: t('Approve'),
+      cancelText: t('general.cancel'),
       okCancel: true,
       content: (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -42,7 +44,7 @@ export const useSwitchChainModal = () => {
             <span>{props.dappURL}</span>
           </div>
           <div style={{ fontSize: '20px', textAlign: 'center', marginTop: '12px' }}>
-            Wants to Switch Network
+            {t('Wants to Switch Network')}
           </div>
           <div style={{ margin: 'auto', textAlign: 'left', marginTop: '30px' }}>
             <Tag

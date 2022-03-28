@@ -234,7 +234,6 @@ class Web3Provider extends EventEmitter {
     this.chainId = config.chainId;
     this.rpc = new RPCServer(config.rpcUrl);
     this.isDebug = !!config.isDebug;
-    // this.emitConnect(config.chainId);
     this.emit('chainChanged', config.chainId);
   }
 
@@ -554,10 +553,6 @@ window.desktopWallet = {
     ipcRenderer.sendToHost('dapp', arg);
   },
 };
-
-// try {
-//   localStorage.setItem('connectorIdv2', 'Metamask');
-// } catch (_) {}
 
 const providerConfig = {
   chainId: "0x19",
