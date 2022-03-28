@@ -38,7 +38,7 @@ const DappList: Dapp[] = [
     alt: 'tectonic-logo',
     description:
       'Tectonic is a cross-chain money market for earning passive yield and accessing instant backed loans.',
-    url: 'https://app.tectonic.finance/',
+    url: 'https://tectonic.finance/',
   },
 ];
 

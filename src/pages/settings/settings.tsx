@@ -51,13 +51,14 @@ import {
   SUPPORTED_CURRENCY,
   WalletConfig,
   SupportedCurrency,
+  AUTO_UPDATE_DISABLE_DURATIONS,
 } from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
-import { UserAsset, UserAssetConfig, UserAssetType } from '../../models/UserAsset';
+import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
 import AddressBook from './tabs/AddressBook/AddressBook';
-import { getChainName } from '../../utils/utils';
+import { getChainName, getCronosTendermintAsset } from '../../utils/utils';
 import { AssetIcon } from '../../components/AssetIcon';
 
 const { ipcRenderer } = window.require('electron');
@@ -273,6 +274,7 @@ function MetaInfoComponent() {
   const [defaultAutoUpdateExpireTime, setDefaultAutoUpdateExpireTime] = useState<
     number | undefined
   >();
+  const [autoUpdateDisableDuration, setAutoUpdateDisableDuration] = useState<number>(14);
   const [supportedCurrencies, setSupportedCurrencies] = useState<SupportedCurrency[]>([]);
   const [t, i18n] = useTranslation();
 
@@ -391,6 +393,10 @@ function MetaInfoComponent() {
     setMomentLocale();
   };
 
+  const onSwitchAutoUpdateDuration = value => {
+    setAutoUpdateDisableDuration(value);
+  };
+
   const onSwitchCurrency = async value => {
     if (session.currency === value.toString()) {
       return;
@@ -501,7 +507,9 @@ function MetaInfoComponent() {
     const newState = !defaultAutoUpdateDisabled;
     setDefaultAutoUpdateDisabled(newState);
 
-    const expireTime = newState ? new Date().setDate(new Date().getDate() + 30) : 0;
+    const expireTime = newState
+      ? new Date().setDate(new Date().getDate() + autoUpdateDisableDuration)
+      : 0;
     setDefaultAutoUpdateExpireTime(expireTime);
 
     ipcRenderer.send('set_auto_update_expire_time', expireTime);
@@ -603,7 +611,24 @@ function MetaInfoComponent() {
               onChange={onAllowAutoUpdateChange}
               disabled={updateLoading}
             />{' '}
-            {defaultAutoUpdateDisabled ? t('general.disabled') : t('general.enabled')}
+            {defaultAutoUpdateDisabled ? t('general.disabled') : t('general.enabled')}{' '}
+            {!defaultAutoUpdateDisabled || !defaultAutoUpdateExpireTime ? (
+              <Select
+                className="auto-update-duration"
+                onChange={onSwitchAutoUpdateDuration}
+                value={autoUpdateDisableDuration}
+              >
+                {AUTO_UPDATE_DISABLE_DURATIONS.map(duration => {
+                  return (
+                    <Option value={duration} key={duration}>
+                      {t('settings.autoUpdate.duration', { duration })}
+                    </Option>
+                  );
+                })}
+              </Select>
+            ) : (
+              <></>
+            )}
           </div>
           {walletType !== LEDGER_WALLET_TYPE ? (
             <>
@@ -740,9 +765,9 @@ const FormSettings = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
   const [isConfirmClearVisible, setIsConfirmClearVisible] = useState(false);
-  const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [session, setSession] = useRecoilState(sessionState);
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
+  const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
 
   const defaultSettings: UserAssetConfig =
     session.activeAsset?.config || getAssetConfigFromWalletConfig(session.wallet.config);
@@ -757,12 +782,7 @@ const FormSettings = () => {
   let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
 
   useEffect(() => {
-    const selectedIdentifier = walletAllAssets
-      .filter(asset => {
-        return asset.assetType !== UserAssetType.CRC_20_TOKEN;
-      })
-      .find(asset => asset.identifier === session.activeAsset?.identifier)?.identifier;
-    setCurrentAssetIdentifier(selectedIdentifier || walletAllAssets[0].identifier);
+    const croAsset = getCronosTendermintAsset(walletAllAssets);
 
     if (defaultSettings.fee !== undefined) {
       networkFee = defaultSettings.fee.networkFee;
@@ -778,6 +798,9 @@ const FormSettings = () => {
       networkFee,
       gasLimit,
     });
+    if (!currentAssetIdentifier && croAsset) {
+      setCurrentAssetIdentifier(croAsset?.identifier);
+    }
   }, [form, defaultSettings, walletAllAssets, setSession]);
 
   const onFinish = async values => {

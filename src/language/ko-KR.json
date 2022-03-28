@@ -647,6 +647,7 @@
   "settings.autoUpdate.title": "자동 업데이트",
   "settings.autoUpdate.description": "일단 활성화되면, 계속 최신 버젼으로 업데이트됩니다",
   "settings.autoUpdate.expire": "만료",
+  "settings.autoUpdate.duration": "꺼짐 {{ duration }} 일",
   "settings.exportRecoveryPhrase.title": "니모닉 문구 내보내기",
   "settings.exportRecoveryPhrase.description": "이 작업을 수행하려면 앱 비밀번호를 입력해야 합니다.",
   "settings.exportRecoveryPhrase.button": "내보내기",

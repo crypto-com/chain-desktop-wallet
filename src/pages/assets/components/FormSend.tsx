@@ -401,7 +401,7 @@ const FormSend: React.FC<FormSendProps> = props => {
               <div className="label">{t('send.modal1.label3')}</div>
               <div>
                 {`${formValues?.amount} ${walletAsset?.symbol}`}{' '}
-                {walletAsset && localFiatSymbol && assetMarketData
+                {walletAsset && localFiatSymbol && assetMarketData && assetMarketData.price
                   ? `(${localFiatSymbol}${numeral(
                       getAssetAmountInFiat(formValues?.amount, assetMarketData),
                     ).format('0,0.00')})`
