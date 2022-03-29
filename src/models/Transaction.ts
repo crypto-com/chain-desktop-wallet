@@ -1,7 +1,7 @@
 import { Proposal, ValidatorPubKey } from '../service/rpc/NodeRpcModels';
 import {
   NftAccountTransactionResponse,
-  NftResponse,
+  CryptoOrgNftResponse,
   NftTransactionResponse,
   NftDenomData,
 } from '../service/rpc/ChainIndexingModels';
@@ -272,7 +272,7 @@ export interface NftTokenData {
   seller_fee_basis_points?: number;
 }
 
-export interface NftModel extends NftResponse {
+export interface NftModel extends CryptoOrgNftResponse {
   isMintedByCDC: boolean;
   marketplaceLink: string;
 }

@@ -5,7 +5,7 @@ import {
   NftAccountTransactionListResponse,
   NftDenomResponse,
   NftListResponse,
-  NftResponse,
+  CryptoOrgNftResponse,
   NftTransactionListResponse,
   NftTransactionResponse,
   TransferDataAmount,
@@ -58,7 +58,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     return new ChainIndexingAPI(axiosClient);
   }
 
-  public async getAccountNFTList(account: string): Promise<NftResponse[]> {
+  public async getAccountNFTList(account: string): Promise<CryptoOrgNftResponse[]> {
     let paginationPage = 1;
     const nftsListRequest = await this.axiosClient.get<NftListResponse>(
       `/nfts/accounts/${account}/tokens?page=${paginationPage}`,
@@ -78,14 +78,22 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       const pageNftsListResponse: NftListResponse = pageNftsListRequest.data;
 
       pagination = pageNftsListResponse.pagination;
+      console.log('pageNftsListResponse.result', pageNftsListResponse.result);
       nftLists.push(...pageNftsListResponse.result);
     }
+    console.log('nftsListResponse.result', nftsListResponse.result);
 
-    return nftLists;
+    const cryptoOrgNftList = nftLists.map(nft => {
+      return {
+        ...nft,
+      };
+    });
+
+    return cryptoOrgNftList;
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public async getNftListMarketplaceData(nftLists: NftResponse[]): Promise<NftModel[]> {
+  public async getNftListMarketplaceData(nftLists: CryptoOrgNftResponse[]): Promise<NftModel[]> {
     const nftListMap: NftModel[] = [];
     const payload: MintByCDCRequest[] = nftLists.map(item => {
       nftListMap[`${item.denomId}-${item.tokenId}`] = {
