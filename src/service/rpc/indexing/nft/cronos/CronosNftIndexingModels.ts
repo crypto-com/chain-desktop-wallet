@@ -51,3 +51,32 @@ export interface nftAssetsResponse {
   data: nftAssetsResponseData;
   message?: string;
 }
+
+export interface nftTxsResponse {
+  code: number;
+  data: nftTxsResponseData;
+  message?: string;
+}
+
+export interface nftTxsResponseData {
+  limit: number;
+  offset: number;
+  address: string;
+  nft_txs: nftTxsResponseTxModel[];
+}
+
+export interface nftTxsResponseTxModel {
+  tx_hash: string; // "0xae55f817726bdff73cb75fa3869cab77183a86622db7b4f80e1bf1b4e2e123bd",
+  block_id: number; // 1060601,
+  time: number; // 1642394400;
+  token_address: string; // "0x562f021423d75a1636db5be1c4d99bc005ccebfe"
+  type: string; // "erc721";
+  event_type: string; // "Transfer";
+  event_detail: {
+    from: string; // "0x610aa200bec7564a38287328b39c844a2f822442";
+    to: string; // "0x85e0280712aabdd0884732141b048b3b6fde405b";
+    token_id: string; // "2241"
+  };
+  token_name: string; // "CronosChimp";
+  token_symbol: string; // "CHIMP"
+}
