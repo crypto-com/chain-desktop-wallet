@@ -6,11 +6,11 @@ import { croNftApi } from '../service/rpc/NftApi';
 import { ExternalNftMetadataResponse } from '../service/rpc/models/nftApi.models';
 
 export class NftUtils {
-  public static async extractTokenMetadata(tokenDataString: string, denomId: string) {
+  public static async extractTokenMetadata(tokenDataString: string, denomId?: string) {
     const parsedTokenData = JSON.parse(tokenDataString);
 
     // ETH Wrapped or External issued NFT
-    if (parsedTokenData.isExternal) {
+    if (parsedTokenData.isExternal && denomId) {
       let externalMetadata = await croNftApi.getExternalNftMetadataByIdentifier(denomId);
 
       // On errors

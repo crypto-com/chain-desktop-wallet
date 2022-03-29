@@ -267,6 +267,9 @@ export interface NftTokenData {
   animationUrl?: string;
   animationMimeType?: string;
   attributes?: Attribute[];
+  external_url?: string;
+  fee_recipient?: string;
+  seller_fee_basis_points?: number;
 }
 
 export interface NftModel extends NftResponse {
