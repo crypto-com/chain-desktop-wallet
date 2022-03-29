@@ -43,6 +43,7 @@ import { walletService } from '../../service/WalletService';
 import { getChainName, middleEllipsis } from '../../utils/utils';
 import { TransactionDirection, TransactionStatus } from '../../models/Transaction';
 import { AssetIcon } from '../../components/AssetIcon';
+import AssetTypeTooltip from './components/AssetTypeTooltip';
 
 const { Sider, Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -457,6 +458,8 @@ const AssetsPage = () => {
                         </div>
                       </Content>
                     </Layout>
+                    <AssetTypeTooltip currentAsset={currentAsset} currentSession={session} />
+
                     {currentAsset?.isWhitelisted === false && (
                       <Alert
                         message={t('assets.whitelist.warning')}

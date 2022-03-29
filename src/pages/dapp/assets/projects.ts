@@ -1,26 +1,28 @@
 export type CategoryType =
   | 'DEX'
-  | 'NFT'
   | 'Farm'
   | 'Launchpad'
   | 'Lending'
   | 'Metaverse'
-  | 'Yield Optimiser'
+  | 'NFT'
   | 'Reserve Currency'
   | 'Stablecoin'
-  | 'Yield'
-  | 'Staking';
+  | 'Staking'
+  | 'Yield Aggregator'
+  | 'Yield';
 
 export const categories: CategoryType[] = [
   'DEX',
-  'NFT',
   'Farm',
   'Launchpad',
   'Lending',
   'Metaverse',
-  'Yield Optimiser',
+  'NFT',
   'Reserve Currency',
   'Stablecoin',
+  'Staking',
+  'Yield Aggregator',
+  'Yield',
 ];
 
 export interface CronosProject {
@@ -44,7 +46,7 @@ const defillamaProjects: CronosProject[] = [
   },
   {
     name: 'Beefy Finance',
-    category: ['Yield Optimiser'],
+    category: ['Yield Aggregator'],
     description:
       'Beefy Finance is a Decentralized, Multi-Chain Yield Optimizer platform that allows its users to earn compound interest on their crypto holdings. Through a set of investment strategies secured and enforced by smart contracts, Beefy Finance automatically maximizes the user rewards from various liquidity pools (LPs),‌ ‌automated market making (AMM) projects,‌ ‌and‌ ‌other yield‌ farming ‌opportunities in the DeFi ecosystem.',
     logo: 'beefy-finance.png',
@@ -70,7 +72,7 @@ const defillamaProjects: CronosProject[] = [
   },
   {
     name: 'Autofarm',
-    category: ['Yield Optimiser'],
+    category: ['Yield Aggregator'],
     description:
       'The Autofarm ecosystem is a one-stop DeFi suite for all users. Autofarm aggregate yield opportunities using vaults and best swap rates using a DEX aggregator (AutoSwap). In addition, other products such as AutoAnalytics, AutoTrade & AutoPortfolio are set to go live later in 2021. The platform is currently live on BSC, HECO, Polygon, Avalanche, Fantom & Moonriver, with more chains to be introduced soon.',
     logo: 'autofarm.png',
@@ -106,7 +108,7 @@ const defillamaProjects: CronosProject[] = [
   },
   {
     name: 'Pickle',
-    category: ['Yield Optimiser'],
+    category: ['Yield Aggregator'],
     description:
       'Pickle Finance is a yield aggregator, auto-compounding users LP positions saving them time and money. The governance token PICKLE can be staked as DILL, to earn a share of the protocols revenues and boost users farm APY',
     logo: 'pickle.svg',
@@ -392,7 +394,7 @@ const defillamaProjects: CronosProject[] = [
   },
   {
     name: 'MetaCrono',
-    category: ['Yield Optimiser'],
+    category: ['Yield Aggregator'],
     description: 'MetaCrono is a new yield farming & yield aggregator protocol powered by Cronos.',
     logo: 'metacrono.png',
     link: 'https://www.metacrono.finance/',
@@ -421,10 +423,10 @@ const defillamaProjects: CronosProject[] = [
 const unListedProjects: CronosProject[] = [
   {
     name: 'Single Finance',
-    category: ['Yield Optimiser'],
+    category: ['Yield Aggregator'],
     logo: 'single-finance-logo.png',
     description: '',
-    link: 'https://app.singlefinance.io/prelaunch-vault/stake',
+    link: 'https://app.singlefinance.io/single-click',
     twitter: '',
   },
   {
@@ -441,6 +443,30 @@ const unListedProjects: CronosProject[] = [
     logo: 'bushicro-logo.png',
     description: '',
     link: 'https://bushicro.io/',
+    twitter: '',
+  },
+  {
+    name: 'Liquidus',
+    category: ['Yield Aggregator'],
+    logo: 'liquidus.png',
+    description: '',
+    link: 'https://farm.liquidus.finance/',
+    twitter: '',
+  },
+  {
+    name: 'CroSkull',
+    category: ['NFT'],
+    logo: 'croskull.png',
+    description: '',
+    link: 'https://app.croskull.com/#/',
+    twitter: '',
+  },
+  {
+    name: 'LootPad',
+    category: ['NFT'],
+    logo: 'lootpad.png',
+    description: '',
+    link: 'https://lootpad.io/',
     twitter: '',
   },
 ];
@@ -503,7 +529,7 @@ const NFTProjects: CronosProject[] = [
     category: ['NFT'],
     description:
       'The first NFT marketplace on Cronos. Create, buy, sell, trade and enjoy the #CroFam NFT community.',
-    logo: 'sxSZj7kw_400x400.png',
+    logo: 'ebisus-bay.png',
     link: 'https://app.ebisusbay.com/',
     twitter: 'https://twitter.com/EbisusBay',
   },

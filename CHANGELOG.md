@@ -5,10 +5,28 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.7.4] - 2022-03-25
+### Additions
+- Duration selection for Auto Update disable
+### Bug fixes
+- Some CRC20 token price don't show properly
+- App crash when sending tokens with market price not available
+- Unable to withdraw Staking Rewards when validators > 10
+- Dead DApp list urls
+- Incorrect token settings during first time setup
+## [v0.7.3] - 2022-03-22
+### Additions
+- Tooltip for different Asset Types
+- Opt-in Auto Update
+- Update DApp list 
+### Bug fixes
+- Incorrect market price for some CRC20 tokens
+- Confirmation loop with Ledger in Bridge Transfer
+- Missing category filter in DApp List
 ## [v0.7.2] - 2022-02-24
 ### Additions
-- DApp list fetch from api.llama.fi
-- DApp List Sort by TVL in default
+- DApp List fetch from api.llama.fi
+- DApp List sorted by TVL in default
 ### Bug fixes
 - Remove non-DApp projects in DApp List
 ## [v0.7.1] - 2022-02-23
