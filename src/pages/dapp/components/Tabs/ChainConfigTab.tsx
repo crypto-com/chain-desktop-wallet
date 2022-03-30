@@ -267,20 +267,6 @@ const ChainConfigTab = () => {
 
           <Form.Item label=" ">
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Button
-                type="primary"
-                danger
-                disabled={
-                  isChainDefaultConfig(editingChainConfig.chainId) ||
-                  isHexEqual(selectedChain.chainId, editingChainConfig.chainId)
-                }
-                style={{ color: 'red', borderColor: 'red' }}
-                onClick={() => {
-                  setDeletingConfig(editingChainConfig);
-                }}
-              >
-                {t('settings.addressBook.remove')}
-              </Button>
               <div>
                 <Button
                   type="primary"
@@ -296,6 +282,19 @@ const ChainConfigTab = () => {
                   {t('general.save')}
                 </Button>
               </div>
+              {
+                !(isChainDefaultConfig(editingChainConfig.chainId) || isHexEqual(selectedChain.chainId, editingChainConfig.chainId))
+                && <Button
+                  type="primary"
+                  danger
+                  style={{ color: 'red', borderColor: 'red' }}
+                  onClick={() => {
+                    setDeletingConfig(editingChainConfig);
+                  }}
+                >
+                  {t('settings.addressBook.remove')}
+                </Button>
+              }
             </div>
           </Form.Item>
         </Form>
