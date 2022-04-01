@@ -243,7 +243,7 @@ const HomePage = () => {
     if (isCronosNftModel(_nft)) {
       const { model } = _nft;
       if (model.name) {
-        return ellipsis(model.name, length);
+        return ellipsis(`${model.name} - #${model.token_id}`, length);
       }
       return ellipsis(`${model.token_address} - #${model.token_id}`, length);
     }
@@ -356,12 +356,17 @@ const HomePage = () => {
         currentSession.wallet.identifier,
       );
 
-      const cryptoOrgNFTs: NftList | undefined = allNFTs.find(nftList => {
-        return nftList.type === 'CRYPTO_ORG';
-      });
+      // const cryptoOrgNFTs: NftList | undefined = allNFTs.find(nftList => {
+      //   return nftList.type === 'CRYPTO_ORG';
+      // });
+      // const currentNftList = await NftUtils.processNftList(cryptoOrgNFTs?.nfts, maxNftPreview);
+      // setProcessedNftList(currentNftList);
+      console.log('allNFTs', allNFTs);
 
-      const currentNftList = await NftUtils.processNftList(cryptoOrgNFTs?.nfts, maxNftPreview);
-      setProcessedNftList(currentNftList);
+      const allNftList = await NftUtils.groupAllNftList(allNFTs, maxNftPreview);
+      console.log('allNftList', allNftList);
+      setProcessedNftList(allNftList);
+
       setNFTList(allNFTs);
       setDefaultWalletAsset(currentAsset);
       setWalletAsset(currentAsset);
@@ -574,6 +579,35 @@ const HomePage = () => {
                                 />
                                 {middleEllipsis(model.tokenMinter, 6)}{' '}
                                 {model.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
+                              </>
+                            }
+                          />
+                        </Card>
+                      </List.Item>
+                    );
+                  }
+                  if (isCronosNftModel(item)) {
+                    const { model } = item;
+                    return (
+                      <List.Item>
+                        <Card
+                          style={{ width: 170 }}
+                          cover={renderPreview(item)}
+                          hoverable
+                          className="nft"
+                        >
+                          <Meta
+                            title={renderNftTitle(item)}
+                            description={
+                              <>
+                                <Avatar
+                                  style={{
+                                    background:
+                                      'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                    verticalAlign: 'middle',
+                                  }}
+                                />
+                                {middleEllipsis(model.token_address, 6)}{' '}
                               </>
                             }
                           />

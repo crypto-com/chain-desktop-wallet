@@ -1,7 +1,13 @@
 import { Promise } from 'bluebird';
 
 import { isJson } from './utils';
-import { CommonNftModel, CryptoOrgNftModel, isCryptoOrgNftModel } from '../models/Transaction';
+import {
+  CommonNftModel,
+  CryptoOrgNftModel,
+  isCronosNftModel,
+  isCryptoOrgNftModel,
+  NftList,
+} from '../models/Transaction';
 import { croNftApi } from '../service/rpc/NftApi';
 import { ExternalNftMetadataResponse } from '../service/rpc/models/nftApi.models';
 
@@ -82,5 +88,33 @@ export class NftUtils {
       });
     }
     return [];
+  };
+
+  public static groupAllNftList = async (lists: NftList[] | undefined, maxTotal: number = 0) => {
+    const fullNftList: CommonNftModel[] = [];
+
+    await lists?.forEach(list => {
+      list.nfts.forEach(async nft => {
+        if (isCryptoOrgNftModel(nft)) {
+          const { model } = nft;
+
+          const denomSchema = isJson(model.denomSchema) ? JSON.parse(model.denomSchema) : null;
+          const tokenData = isJson(model.tokenData)
+            ? await NftUtils.extractTokenMetadata(model.tokenData, model.denomId)
+            : null;
+
+          fullNftList.push({
+            ...nft,
+            denomSchema,
+            tokenData,
+          });
+        }
+        if (isCronosNftModel(nft)) {
+          fullNftList.push(nft);
+        }
+      });
+    });
+
+    return fullNftList.slice(0, maxTotal);
   };
 }
