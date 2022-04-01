@@ -3,7 +3,7 @@ import { DefaultWalletConfigs } from '../config/StaticConfig';
 import { Session } from '../models/Session';
 import { Wallet } from '../models/Wallet';
 import { UserAsset, AssetMarketPrice } from '../models/UserAsset';
-import { ValidatorModel, NftModel } from '../models/Transaction';
+import { ValidatorModel, NftList } from '../models/Transaction';
 import { NORMAL_WALLET_TYPE } from '../service/LedgerService';
 
 const wallet = new Wallet(
@@ -108,7 +108,7 @@ const validatorListState = atom<ValidatorModel[] | null>({
   default: null,
 });
 
-const nftListState = atom<NftModel[] | undefined>({
+const nftListState = atom<NftList[] | undefined>({
   key: 'nftList',
   default: undefined,
 });

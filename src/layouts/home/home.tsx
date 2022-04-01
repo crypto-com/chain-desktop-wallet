@@ -692,10 +692,10 @@ function HomeLayout(props: HomeLayoutProps) {
       const currentValidatorList = await walletService.retrieveTopValidators(
         currentSession.wallet.config.network.chainId,
       );
-      const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
+      const currentNftLists = await walletService.retrieveNFTs(currentSession.wallet.identifier);
 
       setValidatorList(currentValidatorList);
-      setNftList(currentNftList);
+      setNftList(currentNftLists);
 
       setFetchingDB(false);
 

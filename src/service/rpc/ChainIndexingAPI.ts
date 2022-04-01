@@ -21,7 +21,6 @@ import {
   NftQueryParams,
   TransactionStatus,
   TransferTransactionData,
-  NftModel,
   MsgTypeName,
   TransactionData,
   BaseCommonTransaction,
@@ -29,6 +28,7 @@ import {
   StakingTransactionRecord,
   RewardTransactionRecord,
   CommonTransactionRecord,
+  CryptoOrgNftModelData,
 } from '../../models/Transaction';
 import { DefaultWalletConfigs, SECONDS_OF_YEAR } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
@@ -78,23 +78,19 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       const pageNftsListResponse: NftListResponse = pageNftsListRequest.data;
 
       pagination = pageNftsListResponse.pagination;
-      console.log('pageNftsListResponse.result', pageNftsListResponse.result);
+      // console.log('pageNftsListResponse.result', pageNftsListResponse.result);
       nftLists.push(...pageNftsListResponse.result);
     }
-    console.log('nftsListResponse.result', nftsListResponse.result);
+    // console.log('nftsListResponse.result', nftsListResponse.result);
 
-    const cryptoOrgNftList = nftLists.map(nft => {
-      return {
-        ...nft,
-      };
-    });
-
-    return cryptoOrgNftList;
+    return nftLists;
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public async getNftListMarketplaceData(nftLists: CryptoOrgNftResponse[]): Promise<NftModel[]> {
-    const nftListMap: NftModel[] = [];
+  public async getNftListMarketplaceData(
+    nftLists: CryptoOrgNftResponse[],
+  ): Promise<CryptoOrgNftModelData[]> {
+    const nftListMap: CryptoOrgNftModelData[] = [];
     const payload: MintByCDCRequest[] = nftLists.map(item => {
       nftListMap[`${item.denomId}-${item.tokenId}`] = {
         ...item,

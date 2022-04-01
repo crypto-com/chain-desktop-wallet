@@ -1,7 +1,7 @@
 import { Promise } from 'bluebird';
 
 import { isJson } from './utils';
-import { NftModel } from '../models/Transaction';
+import { CommonNftModel, CryptoOrgNftModel, isCryptoOrgNftModel } from '../models/Transaction';
 import { croNftApi } from '../service/rpc/NftApi';
 import { ExternalNftMetadataResponse } from '../service/rpc/models/nftApi.models';
 
@@ -55,23 +55,30 @@ export class NftUtils {
   }
 
   public static processNftList = async (
-    currentList: NftModel[] | undefined,
+    currentList: CommonNftModel[] | undefined,
     maxTotal: number = currentList?.length ?? 0,
   ) => {
     if (currentList) {
-      return await Promise.map(currentList.slice(0, maxTotal), async item => {
-        const denomSchema = isJson(item.denomSchema)
-          ? JSON.parse(item.denomSchema)
-          : item.denomSchema;
-        const tokenData = isJson(item.tokenData)
-          ? await NftUtils.extractTokenMetadata(item.tokenData, item.denomId)
-          : item.tokenData;
-        const nftModel = {
-          ...item,
-          denomSchema,
-          tokenData,
-        };
-        return nftModel;
+      // const cryptoOrgNftList: CryptoOrgNftModel[] = currentList.filter(nft => {
+      //   return nft.type === NftType.CRYPTO_ORG;
+      // })
+      return await Promise.map(currentList.slice(0, maxTotal), async nft => {
+        // console.log('nft', nft)
+        if (isCryptoOrgNftModel(nft)) {
+          const { model } = nft;
+
+          const denomSchema = isJson(model.denomSchema) ? JSON.parse(model.denomSchema) : null;
+          const tokenData = isJson(model.tokenData)
+            ? await NftUtils.extractTokenMetadata(model.tokenData, model.denomId)
+            : null;
+          const nftModel: CryptoOrgNftModel = {
+            ...nft,
+            denomSchema,
+            tokenData,
+          };
+          return nftModel;
+        }
+        return nft;
       });
     }
     return [];

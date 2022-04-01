@@ -12,6 +12,7 @@ import {
   AssetMarketPrice,
   getAssetPriceId,
   getAssetPriceIdFrom,
+  NftType,
   UserAsset,
 } from '../models/UserAsset';
 import {
@@ -606,6 +607,55 @@ export class StorageService {
     return this.db.proposalStore.findOne<ProposalList>({ chainId });
   }
 
+  // eslint-disable-next-line
+  public async insertCommonNfts(nftList: NftList) {
+    if (nftList.nfts.length === 0) {
+      return Promise.resolve();
+    }
+
+    const removeQuery = this.db.nftStore.remove(
+      {
+        walletId: nftList.walletId,
+        type: nftList.type,
+      },
+      { multi: true },
+    );
+
+    // Removing documents (Profiled time: 37ms)
+    await Promise.allSettled([removeQuery]);
+
+    // inserting documents(Profile time: 35ms)
+    await this.db.nftStore.insert<NftList>(nftList);
+  }
+
+  // eslint-disable-next-line
+  public async saveCryptoOrgNFTs(nftList: NftList) {
+    if (nftList.type !== NftType.CRYPTO_ORG) {
+      return Promise.resolve();
+    }
+    if (nftList.nfts.length === 0) {
+      return await await this.db.nftStore.remove(
+        { walletId: nftList.walletId, type: NftType.CRYPTO_ORG },
+        { multi: true },
+      );
+    }
+    await this.insertCommonNfts(nftList);
+  }
+
+  // eslint-disable-next-line
+  public async saveCronosCRC721NFTs(nftList: NftList) {
+    if (nftList.type !== NftType.CRC_721_TOKEN) {
+      return Promise.resolve();
+    }
+    if (nftList.nfts.length === 0) {
+      return await await this.db.nftStore.remove(
+        { walletId: nftList.walletId, type: NftType.CRC_721_TOKEN },
+        { multi: true },
+      );
+    }
+    await this.insertCommonNfts(nftList);
+  }
+
   public async saveNFTs(nftList: NftList) {
     if (!nftList) {
       return Promise.resolve();
@@ -615,7 +665,15 @@ export class StorageService {
   }
 
   public async retrieveAllNfts(walletId: string) {
-    return this.db.nftStore.findOne<NftList>({ walletId });
+    return this.db.nftStore.find<NftList>({ walletId });
+  }
+
+  public async retrieveCryptoOrgNfts(walletId: string) {
+    return this.db.nftStore.findOne<NftList>({ walletId, type: NftType.CRYPTO_ORG });
+  }
+
+  public async retrieveCronosNfts(walletId: string) {
+    return this.db.nftStore.findOne<NftList>({ walletId, type: NftType.CRC_721_TOKEN });
   }
 
   // eslint-disable-next-line

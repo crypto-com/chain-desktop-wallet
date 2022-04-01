@@ -24,7 +24,7 @@ import {
   CommonTransactionRecord,
   NftAccountTransactionData,
   NftDenomModel,
-  NftModel,
+  NftList,
   ProposalModel,
   RewardsBalances,
   RewardTransactionData,
@@ -579,12 +579,20 @@ class WalletService {
     return proposalSet.proposals;
   }
 
-  public async retrieveNFTs(walletID: string): Promise<NftModel[]> {
-    const nftSet = await this.storageService.retrieveAllNfts(walletID);
-    if (!nftSet) {
+  public async retrieveNFTs(walletID: string): Promise<NftList[]> {
+    const nftSets = await this.storageService.retrieveAllNfts(walletID);
+    if (!nftSets) {
       return [];
     }
-    return nftSet.nfts;
+    return nftSets;
+  }
+
+  public async retrieveCryptoOrgNFTs(walletID: string): Promise<NftList> {
+    const nftSet = await this.storageService.retrieveCryptoOrgNfts(walletID);
+    // if (!nftSet) {
+    //   return [];
+    // }
+    return nftSet;
   }
 
   public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {

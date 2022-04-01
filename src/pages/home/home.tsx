@@ -32,7 +32,13 @@ import {
   AssetMarketPrice,
 } from '../../models/UserAsset';
 
-import { NftModel, NftProcessedModel, RewardsBalances } from '../../models/Transaction';
+import {
+  CommonNftModel,
+  isCronosNftModel,
+  isCryptoOrgNftModel,
+  NftList,
+  RewardsBalances,
+} from '../../models/Transaction';
 
 import { walletService } from '../../service/WalletService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
@@ -71,7 +77,7 @@ const HomePage = () => {
   const didMountRef = useRef(false);
   const history = useHistory();
 
-  const [processedNftList, setProcessedNftList] = useState<NftProcessedModel[]>([]);
+  const [processedNftList, setProcessedNftList] = useState<CommonNftModel[]>([]);
 
   const [hasShownNotLiveWallet, setHasShownNotLiveWallet] = useRecoilState(
     hasShownWarningOnWalletTypeState,
@@ -181,11 +187,38 @@ const HomePage = () => {
     },
   ];
 
-  const renderPreview = (_nft: NftProcessedModel) => {
+  const renderPreview = (_nft: CommonNftModel) => {
+    // const { type } = _nft;
+    if (isCryptoOrgNftModel(_nft)) {
+      const { model, tokenData } = _nft;
+      return (
+        <img
+          alt={model.denomName}
+          src={tokenData?.image ? tokenData.image : nftThumbnail}
+          onError={e => {
+            (e.target as HTMLImageElement).src = nftThumbnail;
+          }}
+        />
+      );
+    }
+
+    if (isCronosNftModel(_nft)) {
+      const { model } = _nft;
+      return (
+        <img
+          alt={`${model.token_address}-${model.token_id}`}
+          src={model.image_url ? model.image_url : nftThumbnail}
+          onError={e => {
+            (e.target as HTMLImageElement).src = nftThumbnail;
+          }}
+        />
+      );
+    }
+
     return (
       <img
-        alt={_nft?.denomName}
-        src={_nft?.tokenData.image ? _nft?.tokenData.image : nftThumbnail}
+        alt="default-nft-thumbnail"
+        src={nftThumbnail}
         onError={e => {
           (e.target as HTMLImageElement).src = nftThumbnail;
         }}
@@ -193,16 +226,28 @@ const HomePage = () => {
     );
   };
 
-  const renderNftTitle = (_nft: NftProcessedModel | undefined, length: number = 999) => {
-    if (_nft?.tokenData && _nft?.tokenData.name) {
-      return ellipsis(_nft?.tokenData.name, length);
+  const renderNftTitle = (_nft: CommonNftModel, length: number = 999) => {
+    if (isCryptoOrgNftModel(_nft)) {
+      const { model, tokenData } = _nft;
+
+      if (tokenData && tokenData.name) {
+        return ellipsis(tokenData.name, length);
+      }
+      if (tokenData && tokenData.drop) {
+        return ellipsis(tokenData.drop, length);
+      }
+      if (_nft) {
+        return ellipsis(`${model.denomId} - #${model.tokenId}`, length);
+      }
     }
-    if (_nft?.tokenData && _nft?.tokenData.drop) {
-      return ellipsis(_nft?.tokenData.drop, length);
+    if (isCronosNftModel(_nft)) {
+      const { model } = _nft;
+      if (model.name) {
+        return ellipsis(model.name, length);
+      }
+      return ellipsis(`${model.token_address} - #${model.token_id}`, length);
     }
-    if (_nft) {
-      return ellipsis(`${_nft?.denomId} - #${_nft?.tokenId}`, length);
-    }
+
     return 'n.a.';
   };
 
@@ -305,12 +350,17 @@ const HomePage = () => {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
       const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
-      const allNFTs: NftModel[] = await walletService.retrieveNFTs(sessionData.wallet.identifier);
+      const allNFTs: NftList[] = await walletService.retrieveNFTs(sessionData.wallet.identifier);
+      // const allCryptoOrgNfts: NftList = await walletService.retrieveCryptoOrgNFTs(sessionData.wallet.identifier);
       const allRewards = await walletService.retrieveRewardsBalances(
         currentSession.wallet.identifier,
       );
 
-      const currentNftList = await NftUtils.processNftList(allNFTs, maxNftPreview);
+      const cryptoOrgNFTs: NftList | undefined = allNFTs.find(nftList => {
+        return nftList.type === 'CRYPTO_ORG';
+      });
+
+      const currentNftList = await NftUtils.processNftList(cryptoOrgNFTs?.nfts, maxNftPreview);
       setProcessedNftList(currentNftList);
       setNFTList(allNFTs);
       setDefaultWalletAsset(currentAsset);
@@ -500,33 +550,40 @@ const HomePage = () => {
                   xxl: 5,
                 }}
                 dataSource={processedNftList}
-                renderItem={item => (
-                  <List.Item>
-                    <Card
-                      style={{ width: 170 }}
-                      cover={renderPreview(item)}
-                      hoverable
-                      className="nft"
-                    >
-                      <Meta
-                        title={renderNftTitle(item)}
-                        description={
-                          <>
-                            <Avatar
-                              style={{
-                                background:
-                                  'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
-                                verticalAlign: 'middle',
-                              }}
-                            />
-                            {middleEllipsis(item?.tokenMinter, 6)}{' '}
-                            {item?.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
-                          </>
-                        }
-                      />
-                    </Card>
-                  </List.Item>
-                )}
+                renderItem={item => {
+                  if (isCryptoOrgNftModel(item)) {
+                    const { model } = item;
+                    return (
+                      <List.Item>
+                        <Card
+                          style={{ width: 170 }}
+                          cover={renderPreview(item)}
+                          hoverable
+                          className="nft"
+                        >
+                          <Meta
+                            title={renderNftTitle(item)}
+                            description={
+                              <>
+                                <Avatar
+                                  style={{
+                                    background:
+                                      'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                    verticalAlign: 'middle',
+                                  }}
+                                />
+                                {middleEllipsis(model.tokenMinter, 6)}{' '}
+                                {model.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
+                              </>
+                            }
+                          />
+                        </Card>
+                      </List.Item>
+                    );
+                  }
+
+                  return <></>;
+                }}
                 pagination={false}
               />
               <Link
