@@ -1,6 +1,6 @@
 import { Promise } from 'bluebird';
 
-import { isJson } from './utils';
+import { ellipsis, isJson } from './utils';
 import {
   CommonNftModel,
   CryptoOrgNftModel,
@@ -60,6 +60,33 @@ export class NftUtils {
     return parsedTokenData;
   }
 
+  public static renderNftTitle = (_nft: CommonNftModel | undefined, length: number = 999) => {
+    if (_nft) {
+      if (isCryptoOrgNftModel(_nft)) {
+        const { model, tokenData } = _nft;
+
+        if (tokenData && tokenData.name) {
+          return ellipsis(tokenData.name, length);
+        }
+        if (tokenData && tokenData.drop) {
+          return ellipsis(tokenData.drop, length);
+        }
+        if (_nft) {
+          return ellipsis(`${model.denomId} - #${model.tokenId}`, length);
+        }
+      }
+      if (isCronosNftModel(_nft)) {
+        const { model } = _nft;
+        if (model.name) {
+          return ellipsis(`${model.name} - #${model.token_id}`, length);
+        }
+        return ellipsis(`${model.token_address} - #${model.token_id}`, length);
+      }
+    }
+
+    return 'n.a.';
+  };
+
   public static processNftList = async (
     currentList: CommonNftModel[] | undefined,
     maxTotal: number = currentList?.length ?? 0,
@@ -115,6 +142,6 @@ export class NftUtils {
       });
     });
 
-    return fullNftList.slice(0, maxTotal);
+    return fullNftList.slice(0, maxTotal !== 0 ? maxTotal : fullNftList.length);
   };
 }

@@ -28,7 +28,7 @@ export interface nftAssetsResponseAssetModel {
     rarity?: string;
     occurrence?: string;
     count?: number;
-  };
+  }[];
   listed_market?: {
     price?: string;
     market_name?: string;

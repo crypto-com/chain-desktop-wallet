@@ -68,9 +68,12 @@ import {
   NftTransactionType,
   BroadCastResult,
   CryptoOrgNftModel,
+  // eslint-disable-next-line
   NftList,
   CommonNftModel,
   isCryptoOrgNftModel,
+  isCronosNftModel,
+  CronosCRC721NftModel,
 } from '../../models/Transaction';
 import { renderExplorerUrl } from '../../models/Explorer';
 
@@ -95,6 +98,7 @@ import nftThumbnail from '../../assets/nft-thumbnail.png';
 import ReceiveDetail from '../assets/components/ReceiveDetail';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
+import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -955,7 +959,7 @@ const NftPage = () => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
-  const [nft, setNft] = useState<CryptoOrgNftModel | undefined>();
+  const [nft, setNft] = useState<CryptoOrgNftModel | CronosCRC721NftModel | undefined>();
   const [processedNftList, setProcessedNftList] = useState<CommonNftModel[]>([]);
   const [nftView, setNftView] = useState('grid');
   const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
@@ -973,6 +977,8 @@ const NftPage = () => {
   const analyticsService = new AnalyticsService(currentSession);
 
   const [t] = useTranslation();
+
+  const cronosEvmAsset = useCronosEvmAsset();
 
   const nftViewOptions = [
     { label: <MenuOutlined />, value: 'list' },
@@ -1013,62 +1019,63 @@ const NftPage = () => {
     AddressType.USER,
   );
 
-  const renderPreview = (_nft: CryptoOrgNftModel | undefined, showThumbnail: boolean = true) => {
-    if (_nft === undefined) {
-      return (
-        <img
-          alt="default-thumbnail"
-          src={nftThumbnail}
-          onError={e => {
-            (e.target as HTMLImageElement).src = nftThumbnail;
-          }}
-        />
-      );
+  const renderPreview = (_nft: CommonNftModel | undefined, showThumbnail: boolean = true) => {
+    if (_nft !== undefined) {
+      if (isCryptoOrgNftModel(_nft)) {
+        const { model, tokenData } = _nft;
+        if (
+          !showThumbnail &&
+          (supportedVideo(tokenData?.mimeType) || supportedVideo(tokenData?.animationMimeType))
+        ) {
+          return (
+            <ReactPlayer
+              url={videoUrl}
+              config={{
+                file: {
+                  attributes: {
+                    controlsList: 'nodownload',
+                  },
+                },
+              }}
+              controls
+              playing={isVideoPlaying}
+            />
+          );
+        }
+        return (
+          <img
+            alt={model.denomName}
+            src={tokenData?.image ? tokenData.image : nftThumbnail}
+            onError={e => {
+              (e.target as HTMLImageElement).src = nftThumbnail;
+            }}
+          />
+        );
+      }
+
+      if (isCronosNftModel(_nft)) {
+        const { model } = _nft;
+        return (
+          <img
+            alt={`${model.token_address}-${model.token_id}`}
+            src={model.image_url ? model.image_url : nftThumbnail}
+            onError={e => {
+              (e.target as HTMLImageElement).src = nftThumbnail;
+            }}
+          />
+        );
+      }
     }
 
-    const { model, tokenData } = _nft;
-    if (
-      !showThumbnail &&
-      (supportedVideo(tokenData?.mimeType) || supportedVideo(tokenData?.animationMimeType))
-    ) {
-      return (
-        <ReactPlayer
-          url={videoUrl}
-          config={{
-            file: {
-              attributes: {
-                controlsList: 'nodownload',
-              },
-            },
-          }}
-          controls
-          playing={isVideoPlaying}
-        />
-      );
-    }
     return (
       <img
-        alt={model.denomName}
-        src={tokenData?.image ? tokenData.image : nftThumbnail}
+        alt="default-nft-thumbnail"
+        src={nftThumbnail}
         onError={e => {
           (e.target as HTMLImageElement).src = nftThumbnail;
         }}
       />
     );
-  };
-
-  const renderNftTitle = (_nft: CryptoOrgNftModel | undefined, length: number = 999) => {
-    if (_nft === undefined) {
-      return 'n.a.';
-    }
-    const { model, tokenData } = _nft;
-    if (tokenData && tokenData.name) {
-      return ellipsis(tokenData.name, length);
-    }
-    if (tokenData && tokenData.drop) {
-      return ellipsis(tokenData.drop, length);
-    }
-    return ellipsis(`${model.denomId} - #${model.tokenId}`, length);
   };
 
   const showConfirmationModal = () => {
@@ -1133,12 +1140,14 @@ const NftPage = () => {
       );
 
       const latestLoadedNFTs = await walletService.retrieveNFTs(currentSession.wallet.identifier);
-      const cryptoOrgNFTs: NftList | undefined = latestLoadedNFTs.find(list => {
-        return list.type === 'CRYPTO_ORG';
-      });
+      // const cryptoOrgNFTs: NftList | undefined = latestLoadedNFTs.find(list => {
+      //   return list.type === 'CRYPTO_ORG';
+      // });
       setNftList(latestLoadedNFTs);
-      const processedNFTsLists = await NftUtils.processNftList(cryptoOrgNFTs?.nfts);
+      // const processedNFTsLists = await NftUtils.processNftList(cryptoOrgNFTs?.nfts);
+      const processedNFTsLists = await NftUtils.groupAllNftList(latestLoadedNFTs);
       setProcessedNftList(processedNFTsLists);
+      console.log('processedNFTsLists', processedNFTsLists);
 
       setBroadcastResult(sendResult);
 
@@ -1171,10 +1180,11 @@ const NftPage = () => {
 
   useEffect(() => {
     const fetchNftList = async () => {
-      const cryptoOrgNFTs = nftList?.find(list => {
-        return list.type === 'CRYPTO_ORG';
-      });
-      const currentNftList = await NftUtils.processNftList(cryptoOrgNFTs?.nfts);
+      // const cryptoOrgNFTs = nftList?.find(list => {
+      //   return list.type === 'CRYPTO_ORG';
+      // });
+      // const currentNftList = await NftUtils.processNftList(cryptoOrgNFTs?.nfts);
+      const currentNftList = await NftUtils.groupAllNftList(nftList);
       setProcessedNftList(currentNftList);
     };
     const fetchNftTransfers = async () => {
@@ -1457,7 +1467,7 @@ const NftPage = () => {
                             className="nft"
                           >
                             <Meta
-                              title={renderNftTitle(item, 20)}
+                              title={NftUtils.renderNftTitle(item, 20)}
                               description={
                                 <>
                                   <Avatar
@@ -1473,6 +1483,40 @@ const NftPage = () => {
                                   ) : (
                                     ''
                                   )}
+                                </>
+                              }
+                            />
+                          </Card>
+                        </List.Item>
+                      );
+                    }
+                    if (isCronosNftModel(item)) {
+                      const { model } = item;
+                      return (
+                        <List.Item>
+                          <Card
+                            style={{ width: 200 }}
+                            cover={<>{renderPreview(item)}</>}
+                            hoverable
+                            onClick={() => {
+                              setNft(item);
+                              setVideoUrl('');
+                              setIsNftModalVisible(true);
+                            }}
+                            className="nft"
+                          >
+                            <Meta
+                              title={NftUtils.renderNftTitle(item, 20)}
+                              description={
+                                <>
+                                  <Avatar
+                                    style={{
+                                      background:
+                                        'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                      verticalAlign: 'middle',
+                                    }}
+                                  />
+                                  {middleEllipsis(model.token_address, 6)}{' '}
                                 </>
                               }
                             />
@@ -1520,126 +1564,246 @@ const NftPage = () => {
                     <div className="nft-image">{renderPreview(nft, false)}</div>
                   </Content>
                   <Sider width="50%">
-                    <>
-                      <div className="title">{renderNftTitle(nft)}</div>
-                      <div className="item">
-                        <Meta
-                          description={
-                            <>
-                              <Avatar
-                                style={{
-                                  background:
-                                    'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
-                                  verticalAlign: 'middle',
-                                }}
+                    {isCryptoOrgNftModel(nft) && (
+                      <>
+                        <div className="title">{NftUtils.renderNftTitle(nft)}</div>
+                        <div className="item">
+                          <Meta
+                            description={
+                              <>
+                                <Avatar
+                                  style={{
+                                    background:
+                                      'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                    verticalAlign: 'middle',
+                                  }}
+                                />
+                                <>
+                                  <a
+                                    data-original={nft?.model.tokenMinter}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    href={`${renderExplorerUrl(
+                                      currentSession.wallet.config,
+                                      'address',
+                                    )}/${nft?.model.tokenMinter}`}
+                                  >
+                                    {nft?.model.tokenMinter}
+                                  </a>
+                                  {nft?.model.isMintedByCDC ? (
+                                    <IconTick style={{ height: '12px' }} />
+                                  ) : (
+                                    ''
+                                  )}
+                                </>
+                              </>
+                            }
+                          />
+                        </div>
+                        <div className="item">
+                          <div className="subtitle">{t('nft.detailModal.subtitle')}</div>
+                          <div className="description">
+                            {nft?.tokenData?.description ? nft?.tokenData.description : 'n.a.'}
+                          </div>
+                        </div>
+                        <div className="item">
+                          <div className="subtitle">{t('nft.detailModal.attributes')}</div>
+                          <div className="attribute">
+                            {nft?.tokenData?.attributes ? (
+                              <Table
+                                className="nft-attribute-table"
+                                dataSource={nft.tokenData.attributes}
+                                columns={NftAttributeTableColumns}
+                                pagination={false}
+                                size="small"
                               />
+                            ) : (
+                              <div className="description">n.a.</div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="item">
+                          <div className="table-row">
+                            <div>{t('nft.detailModal.label1')}</div>
+                            <div>{nft?.model.denomId}</div>
+                          </div>
+                          <div className="table-row">
+                            <div>{t('nft.detailModal.label2')}</div>
+                            <div>{nft?.model.denomName}</div>
+                          </div>
+                          <div className="table-row">
+                            <div>{t('nft.detailModal.label3')}</div>
+                            <div>{nft?.model.tokenId}</div>
+                          </div>
+                          {nft?.tokenData?.mimeType ? (
+                            <div className="table-row">
+                              <div>{t('nft.detailModal.label4')}</div>
                               <a
-                                data-original={nft?.model.tokenMinter}
+                                data-original={nft?.model.denomId}
                                 target="_blank"
                                 rel="noreferrer"
-                                href={`${renderExplorerUrl(
-                                  currentSession.wallet.config,
-                                  'address',
-                                )}/${nft?.model.tokenMinter}`}
+                                href={
+                                  supportedVideo(nft?.tokenData.mimeType) ||
+                                  supportedVideo(nft?.tokenData.animationMimeType)
+                                    ? nft?.tokenData.animation_url || nft?.tokenData.animationUrl
+                                    : nft?.tokenData.image
+                                }
                               >
-                                {nft?.model.tokenMinter}
-                              </a>
-                              {nft?.model.isMintedByCDC ? (
-                                <IconTick style={{ height: '12px' }} />
-                              ) : (
-                                ''
-                              )}
-                            </>
-                          }
-                        />
-                      </div>
-                      <div className="item">
-                        <div className="subtitle">{t('nft.detailModal.subtitle')}</div>
-                        <div className="description">
-                          {nft?.tokenData?.description ? nft?.tokenData.description : 'n.a.'}
-                        </div>
-                      </div>
-                      <div className="item">
-                        <div className="subtitle">{t('nft.detailModal.attributes')}</div>
-                        <div className="attribute">
-                          {nft?.tokenData?.attributes ? (
-                            <Table
-                              className="nft-attribute-table"
-                              dataSource={nft.tokenData.attributes}
-                              columns={NftAttributeTableColumns}
-                              pagination={false}
-                              size="small"
-                            />
-                          ) : (
-                            <div className="description">n.a.</div>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="item">
-                        <div className="table-row">
-                          <div>{t('nft.detailModal.label1')}</div>
-                          <div>{nft?.model.denomId}</div>
-                        </div>
-                        <div className="table-row">
-                          <div>{t('nft.detailModal.label2')}</div>
-                          <div>{nft?.model.denomName}</div>
-                        </div>
-                        <div className="table-row">
-                          <div>{t('nft.detailModal.label3')}</div>
-                          <div>{nft?.model.tokenId}</div>
-                        </div>
-                        {nft?.tokenData?.mimeType ? (
-                          <div className="table-row">
-                            <div>{t('nft.detailModal.label4')}</div>
-                            <a
-                              data-original={nft?.model.denomId}
-                              target="_blank"
-                              rel="noreferrer"
-                              href={
-                                supportedVideo(nft?.tokenData.mimeType) ||
+                                {supportedVideo(nft?.tokenData.mimeType) ||
                                 supportedVideo(nft?.tokenData.animationMimeType)
                                   ? nft?.tokenData.animation_url || nft?.tokenData.animationUrl
-                                  : nft?.tokenData.image
-                              }
-                            >
-                              {supportedVideo(nft?.tokenData.mimeType) ||
-                              supportedVideo(nft?.tokenData.animationMimeType)
-                                ? nft?.tokenData.animation_url || nft?.tokenData.animationUrl
-                                : nft?.tokenData.image}
-                            </a>
-                          </div>
-                        ) : (
-                          ''
-                        )}
-                      </div>
-                      <div className="item">
-                        <Button
-                          key="submit"
-                          type="primary"
-                          onClick={() => {
-                            setIsNftTransferModalVisible(true);
-                            setIsNftModalVisible(false);
-                          }}
-                        >
-                          {t('nft.detailModal.button1')}
-                        </Button>
-                      </div>
-                      <div className="item goto-marketplace">
-                        {nft?.model.marketplaceLink !== '' ? (
-                          <a
-                            data-original={nft?.model.denomName}
-                            target="_blank"
-                            rel="noreferrer"
-                            href={nft?.model.marketplaceLink}
+                                  : nft?.tokenData.image}
+                              </a>
+                            </div>
+                          ) : (
+                            ''
+                          )}
+                        </div>
+                        <div className="item">
+                          <Button
+                            key="submit"
+                            type="primary"
+                            onClick={() => {
+                              setIsNftTransferModalVisible(true);
+                              setIsNftModalVisible(false);
+                            }}
                           >
-                            {t('nft.detailModal.button2')}
-                          </a>
-                        ) : (
-                          ''
-                        )}
-                      </div>
-                    </>
+                            {t('nft.detailModal.button1')}
+                          </Button>
+                        </div>
+                        <div className="item goto-marketplace">
+                          {nft?.model.marketplaceLink !== '' ? (
+                            <a
+                              data-original={nft?.model.denomName}
+                              target="_blank"
+                              rel="noreferrer"
+                              href={nft?.model.marketplaceLink}
+                            >
+                              {t('nft.detailModal.button2')}
+                            </a>
+                          ) : (
+                            ''
+                          )}
+                        </div>
+                      </>
+                    )}
+                    {isCronosNftModel(nft) && (
+                      <>
+                        <div className="title">{NftUtils.renderNftTitle(nft)}</div>
+                        <div className="item">
+                          <Meta
+                            description={
+                              <>
+                                <Avatar
+                                  style={{
+                                    background:
+                                      'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                    verticalAlign: 'middle',
+                                  }}
+                                />
+                                <>
+                                  <a
+                                    data-original={nft?.model.token_address}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    href={`${renderExplorerUrl(
+                                      cronosEvmAsset?.config,
+                                      'address',
+                                    )}/${nft?.model.token_address}`}
+                                  >
+                                    {nft?.model.token_address}
+                                  </a>
+                                </>
+                              </>
+                            }
+                          />
+                        </div>
+                        {/* <div className="item">
+                          <div className="subtitle">{t('nft.detailModal.subtitle')}</div>
+                        </div> */}
+                        <div className="item">
+                          <div className="subtitle">{t('nft.detailModal.attributes')}</div>
+                          <div className="attribute">
+                            {nft?.model.attributes ? (
+                              <Table
+                                className="nft-attribute-table"
+                                dataSource={nft.model.attributes}
+                                columns={NftAttributeTableColumns}
+                                pagination={false}
+                                size="small"
+                              />
+                            ) : (
+                              <div className="description">n.a.</div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="item">
+                          {/* <div className="table-row">
+                            <div>{t('nft.detailModal.label1')}</div>
+                            <div>{nft?.model.denomId}</div>
+                          </div> */}
+                          <div className="table-row">
+                            <div>{t('nft.detailModal.label5')}</div>
+                            <div>{nft?.model.name}</div>
+                          </div>
+                          <div className="table-row">
+                            <div>{t('nft.detailModal.label3')}</div>
+                            <div>{nft?.model.token_id}</div>
+                          </div>
+                          {/* {nft?.tokenData?.mimeType ? (
+                            <div className="table-row">
+                              <div>{t('nft.detailModal.label4')}</div>
+                              <a
+                                data-original={nft?.model.denomId}
+                                target="_blank"
+                                rel="noreferrer"
+                                href={
+                                  supportedVideo(nft?.tokenData.mimeType) ||
+                                  supportedVideo(nft?.tokenData.animationMimeType)
+                                    ? nft?.tokenData.animation_url || nft?.tokenData.animationUrl
+                                    : nft?.tokenData.image
+                                }
+                              >
+                                {supportedVideo(nft?.tokenData.mimeType) ||
+                                supportedVideo(nft?.tokenData.animationMimeType)
+                                  ? nft?.tokenData.animation_url || nft?.tokenData.animationUrl
+                                  : nft?.tokenData.image}
+                              </a>
+                            </div>
+                          ) : (
+                            ''
+                          )} */}
+                        </div>
+                        {/* <div className="item">
+                          <Button
+                            key="submit"
+                            type="primary"
+                            onClick={() => {
+                              setIsNftTransferModalVisible(true);
+                              setIsNftModalVisible(false);
+                            }}
+                          >
+                            {t('nft.detailModal.button1')}
+                          </Button>
+                        </div> */}
+                        {/* <div className="item goto-marketplace">
+                          {nft?.model.marketplaceLink !== '' ? (
+                            <a
+                              data-original={nft?.model.denomName}
+                              target="_blank"
+                              rel="noreferrer"
+                              href={nft?.model.marketplaceLink}
+                            >
+                              {t('nft.detailModal.button2')}
+                            </a>
+                          ) : (
+                            ''
+                          )}
+                        </div> */}
+                      </>
+                    )}
                   </Sider>
                 </Layout>
               </ModalPopup>
@@ -1751,7 +1915,7 @@ const NftPage = () => {
                       </div>
                       <div className="item">
                         <div className="label">{t('nft.modal3.label1')}</div>
-                        <div className="address">{renderNftTitle(nft)}</div>
+                        <div className="address">{NftUtils.renderNftTitle(nft)}</div>
                       </div>
                       <Form
                         {...layout}

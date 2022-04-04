@@ -301,13 +301,17 @@ export interface CronosCRC721NftModel extends BaseNftModel {
   model: CronosCRC721NftModelData;
 }
 
-export function isCryptoOrgNftModel(checkObj: CommonNftModel): checkObj is CryptoOrgNftModel {
+export function isCryptoOrgNftModel(
+  checkObj: CommonNftModel | undefined,
+): checkObj is CryptoOrgNftModel {
   const optionalUser = checkObj as CryptoOrgNftModel;
   // need to be sufficient to identify your case
   return isObject(optionalUser) && optionalUser.type === NftType.CRYPTO_ORG;
 }
 
-export function isCronosNftModel(checkObj: CommonNftModel): checkObj is CronosCRC721NftModel {
+export function isCronosNftModel(
+  checkObj: CommonNftModel | undefined,
+): checkObj is CronosCRC721NftModel {
   const optionalUser = checkObj as CronosCRC721NftModel;
   // need to be sufficient to identify your case
   return isObject(optionalUser) && optionalUser.type === NftType.CRC_721_TOKEN;
