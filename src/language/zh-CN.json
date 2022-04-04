@@ -606,7 +606,7 @@
   "nft.modal2.label2": "系列 ID",
   "nft.modal2.label3": "代币 ID",
   "nft.modal2.label4": "交易费用",
-  "nft.modal2.notice1": "这为 Crypto.org 链上的 NFT，转发此 NFT 到不支持 Crypto.org 代币标准的地址将会造成你的 NFT 永久损失。",
+  "nft.modal2.notice1": "这为 {{chainName}} 链上的 NFT，转发此 NFT 到不支持 {{chainName}} 代币标准的地址将会造成你的 NFT 永久损失。",
   "nft.modal2.notice2": "将通过 Desktop Wallet 铸造的 NFT 转发到 Crypto.com/NFT 可能造成你的 NFT 永久损失。",
   "nft.modal2.button1": "确认转发",
   "nft.modal3.title": "转发 NFT",

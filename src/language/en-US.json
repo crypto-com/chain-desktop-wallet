@@ -606,7 +606,7 @@
   "nft.modal2.label2": "Denom ID",
   "nft.modal2.label3": "Token ID",
   "nft.modal2.label4": "Transaction Fee",
-  "nft.modal2.notice1": "This NFT is on the Crypto.org Chain. Transferring the NFT to a recipient address that is not compatible with the Crypto.org Chain NFT token standard will result in the permanent loss of your asset.",
+  "nft.modal2.notice1": "This NFT is on the {{chainName}} Chain. Transferring the NFT to a recipient address that is not compatible with the {{chainName}} Chain NFT token standard will result in the permanent loss of your asset.",
   "nft.modal2.notice2": "Transferring an NFT that is minted on Desktop Wallet to Crypto.com/NFT may result in the permanent loss of your NFT.",
   "nft.modal2.button1": "Confirm Transfer",
   "nft.modal3.title": "Transfer NFT",

@@ -57,6 +57,7 @@ import {
   convertIpfsToHttp,
   sleep,
   useWindowSize,
+  getChainName,
 } from '../../utils/utils';
 import { getUINormalScaleAmount } from '../../utils/NumberUtils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
@@ -98,7 +99,7 @@ import nftThumbnail from '../../assets/nft-thumbnail.png';
 import ReceiveDetail from '../assets/components/ReceiveDetail';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
-import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
+import { useCronosEvmAsset, useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -978,6 +979,7 @@ const NftPage = () => {
 
   const [t] = useTranslation();
 
+  const cronosTendermintAsset = useCronosTendermintAsset();
   const cronosEvmAsset = useCronosEvmAsset();
 
   const nftViewOptions = [
@@ -1463,6 +1465,7 @@ const NftPage = () => {
                               setVideoUrl(tokenData?.animation_url || tokenData?.animationUrl);
                               setIsVideoPlaying(true);
                               setIsNftModalVisible(true);
+                              setWalletAsset(cronosTendermintAsset!);
                             }}
                             className="nft"
                           >
@@ -1502,6 +1505,7 @@ const NftPage = () => {
                               setNft(item);
                               setVideoUrl('');
                               setIsNftModalVisible(true);
+                              setWalletAsset(cronosEvmAsset!);
                             }}
                             className="nft"
                           >
@@ -1776,7 +1780,7 @@ const NftPage = () => {
                             ''
                           )} */}
                         </div>
-                        {/* <div className="item">
+                        <div className="item">
                           <Button
                             key="submit"
                             type="primary"
@@ -1787,7 +1791,7 @@ const NftPage = () => {
                           >
                             {t('nft.detailModal.button1')}
                           </Button>
-                        </div> */}
+                        </div>
                         {/* <div className="item goto-marketplace">
                           {nft?.model.marketplaceLink !== '' ? (
                             <a
@@ -1879,7 +1883,14 @@ const NftPage = () => {
                           <Sider width="20px">
                             <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
                           </Sider>
-                          <Content>{t('nft.modal2.notice1')}</Content>
+                          <Content>
+                            {t('nft.modal2.notice1', {
+                              chainName: getChainName(
+                                walletAsset?.name,
+                                currentSession.wallet.config,
+                              ),
+                            })}
+                          </Content>
                         </Layout>
                       </div>
                       <div className="item notice">
@@ -1965,7 +1976,14 @@ const NftPage = () => {
                           <Sider width="20px">
                             <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
                           </Sider>
-                          <Content>{t('nft.modal2.notice1')}</Content>
+                          <Content>
+                            {t('nft.modal2.notice1', {
+                              chainName: getChainName(
+                                walletAsset?.name,
+                                currentSession.wallet.config,
+                              ),
+                            })}
+                          </Content>
                         </Layout>
                       </div>
                       <div className="item notice">
