@@ -1,8 +1,7 @@
 import { WalletConfig } from '../config/StaticConfig';
 import { AddressGenerator } from './AddressGenerator';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
-import { ETH_ASSET } from '../config/StaticAssets';
-import { CRONOS_TENDERMINT_ASSET, CRONOS_EVM_ASSET } from '../config/StaticAssets';
+import { CRONOS_TENDERMINT_ASSET, CRONOS_EVM_ASSET, ETH_ASSET } from '../config/StaticAssets';
 import { HDKey } from '../utils/ChainJsLib';
 import { Wallet } from '../models/Wallet';
 
