@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars no-underscore-dangle no-await-in-loop no-constant-condition class-methods-use-this*/
+/* eslint-disable @typescript-eslint/no-unused-vars*/
 import axios, { AxiosResponse } from 'axios';
 import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 import { EVMClient } from '../rpc/clients/EVMClient';
@@ -62,7 +62,7 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
     let finalList: TransactionData[] = [];
 
     while (true) {
-
+      // eslint-disable-next-line
       const txDataList = await this._getTxsByAddressPaginated(address, {
         pageSize: limit,
         page: currentPage,
@@ -101,9 +101,11 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
     return txListResponse.data.data as TransactionData[];
   };
 
+  // eslint-disable-next-line
   getTxByHash(txHash: string): Promise<any> {
     throw new Error('Method not implemented.');
   }
+  // eslint-disable-next-line
   getInternalTxsByAddress(address: string, options?: any) {
     throw new Error('Method not implemented.');
   }
