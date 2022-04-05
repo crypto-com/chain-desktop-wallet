@@ -1,13 +1,12 @@
 /**
- * Blockchair Dashboard Freemium API
- * @link https://blockchair.com/api/docs#link_302
- * @dev 1440 Req/ip/day allowed
+ * CDC Ethereum Indexing service API
+ * @link https://cql.3ona.co/ethereum/testnet/api/docs/?apikey=anonymous
+ * @dev 
  */
 
 export interface txQueryBaseParams {
-  limit?: number | 10000; // max: 10000 ; default: 100
-  offset?: number | 0; // max: 1000000 ; default: 0
-  state: "latest";
+  pageSize?: number | 10000; // max: 10000 ; default: 100
+  page?: number | 0; // max: 1000000 ; default: 0
 }
 
 export interface IEthChainIndexAPI {

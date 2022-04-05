@@ -17,12 +17,12 @@ describe('EthClient', () => {
   });
   it('should return transaction list from blockchain chainIndexAPI ', async () => {
     axiosMock
-      .onGet('/address/0xA976A66BfcBd5d71E6d0B7A0A3A9AA8EAa1b377a', {
-        params: { limit: 5, offset: 1, state: 'latest' },
+      .onGet('/address/0xA976A66BfcBd5d71E6d0B7A0A3A9AA8EAa1b377a/transaction-history', {
+        params: { pageSize: 5, page: 0 },
       })
       .replyOnce(200, txListStubSuccessful)
-      .onGet('/address/0xA976A66BfcBd5d71E6d0B7A0A3A9AA8EAa1b377a', {
-        params: { limit: 5, offset: 2, state: 'latest' },
+      .onGet('/address/0xA976A66BfcBd5d71E6d0B7A0A3A9AA8EAa1b377a/transaction-history', {
+        params: { pageSize: 5, page: 1 },
       })
       .replyOnce(200, txListStubEmpty);
 
@@ -33,15 +33,11 @@ describe('EthClient', () => {
 
     const txDataList = await ethClientApi.getTxsByAddress(
       '0xA976A66BfcBd5d71E6d0B7A0A3A9AA8EAa1b377a',
-      {
-        state: 'latest',
-        limit: 5,
-        offset: 1,
-      },
+      { pageSize: 5, page: 0 },
     );
 
-    expect(txDataList).to.have.length(5);
-    expect(txDataList[0].transaction_hash).to.equal("0x1dd8de0c72b24e27b36d8a931414574ce3bf18b2d62c850fcf06d935143359a9");
-    expect(txDataList[1].transaction_hash).to.equal("0xe4a8ba34c02991fe4f70598613e9798d78a88b343d41aa6e34a1f33d2d735ebb");
+    expect(txDataList).to.have.length(3);
+    expect(txDataList[0].transaction_hash).to.equal("0xf52854006893ba8c0575d7f5306a4648e084ae608fb81559a9f4cf82e6b674e9");
+    expect(txDataList[1].transaction_hash).to.equal("0x12083dc618d64018911a30775e5ad8e95110666ffbcd51afe22f6ee3f4f31fba");
   });
 });

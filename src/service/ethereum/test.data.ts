@@ -59,121 +59,71 @@ export const successfulCallData = [
 export const emptyCallsData = [];
 
 export const txListStubSuccessful = {
-    "data": {
-        "0xa976a66bfcbd5d71e6d0b7a0a3a9aa8eaa1b377a": {
-            "address": {
-                "type": "account",
-                "contract_code_hex": null,
-                "contract_created": null,
-                "contract_destroyed": null,
-                "balance": "1759674903173246059",
-                "balance_usd": 4318.207018709339,
-                "received_approximate": "5231187000000000000",
-                "received_usd": 19647.0299,
-                "spent_approximate": "2925965000000000000",
-                "spent_usd": 10207.5973,
-                "fees_approximate": "545547096826753941",
-                "fees_usd": 1338.7616479182,
-                "receiving_call_count": 19,
-                "spending_call_count": 55,
-                "call_count": 76,
-                "transaction_count": 72,
-                "first_seen_receiving": "2021-05-12 16:49:32",
-                "last_seen_receiving": "2022-01-09 05:48:00",
-                "first_seen_spending": "2021-05-12 18:55:22",
-                "last_seen_spending": "2022-01-25 06:47:48",
-                "nonce": null
-            },
-            "calls": successfulCallData
+    "data": [
+        {
+            "transaction_hash": "0xf52854006893ba8c0575d7f5306a4648e084ae608fb81559a9f4cf82e6b674e9",
+            "signer": ["0xadb2b42f6bd96f5c65920b9ac88619dce4166f94"],
+            "from": ["0xadb2b42f6bd96f5c65920b9ac88619dce4166f94"],
+            "to": "0x01fb1eab628fd4389b2f0cbb63f4bb66c1a966e2",
+            "amount": "123123123123123",
+            "decimal": 18,
+            "token_addr": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "token_name": "USDT",
+            "token_symbol": "Tether",
+            "type": "transfer",
+            "failed": false,
+            "fail_reason": null,
+            "timestamp": "1646803996",
+            "block": 123123,
+            "transaction_index": 0,
+            "log_index": 0,
+            "gas_price": 100,
+            "gas_used": 52380
+        },
+        {
+            "transaction_hash": "0x12083dc618d64018911a30775e5ad8e95110666ffbcd51afe22f6ee3f4f31fba",
+            "signer": ["0xadb2b42f6bd96f5c65920b9ac88619dce4166f94"],
+            "from": ["0xadb2b42f6bd96f5c65920b9ac88619dce4166f94"],
+            "to": "0x01fb1eab628fd4389b2f0cbb63f4bb66c1a966e2",
+            "amount": "123123",
+            "decimal": 18,
+            "token_addr": "ETH",
+            "token_name": "ETH",
+            "token_symbol": "Ethereum",
+            "type": "transfer",
+            "failed": false,
+            "fail_reason": null,
+            "timestamp": "1646803997",
+            "block": 123123,
+            "transaction_index": 0,
+            "log_index": 0,
+            "gas_price": 100,
+            "gas_used": 52380
+        },
+        {
+            "transaction_hash": "0xf52854006893ba8c0575d7f5306a4648e084ae608fb81559a9f4cf82e6b674e9",
+            "signer": ["0xadb2b42f6bd96f5c65920b9ac88619dce4166f94"],
+            "from": ["0xadb2b42f6bd96f5c65920b9ac88619dce4166f94"],
+            "to": "0x01fb1eab628fd4389b2f0cbb63f4bb66c1a966e2",
+            "amount": "123123",
+            "decimal": 18,
+            "token_addr": "ETH",
+            "token_name": "ETH",
+            "token_symbol": "Ethereum",
+            "type": "transfer",
+            "failed": false,
+            "fail_reason": null,
+            "timestamp": "1646803998",
+            "block": 123123,
+            "transaction_index": 0,
+            "log_index": 0,
+            "gas_price": 100,
+            "gas_used": 52380
         }
-    },
-    "context": {
-        "code": 200,
-        "source": "D",
-        "limit": "5,5",
-        "offset": "1,1",
-        "results": 1,
-        "state": 14074856,
-        "state_layer_2": 14074856,
-        "market_price_usd": 2453.98,
-        "cache": {
-            "live": true,
-            "duration": 180,
-            "since": "2022-01-25 12:51:29",
-            "until": "2022-01-25 12:54:29",
-            "time": null
-        },
-        "api": {
-            "version": "2.0.95-ie",
-            "last_major_update": "2021-07-19 00:00:00",
-            "next_major_update": null,
-            "documentation": "https://blockchair.com/api/docs",
-            "notice": ":)"
-        },
-        "servers": "API4,ETH3,ETH3",
-        "time": 1.7783517837524414,
-        "render_time": 0.0027332305908203125,
-        "full_time": 1.7810850143432617,
-        "request_cost": 1
-    }
+    ]
 };
 
 export const txListStubEmpty = {
-    "data": {
-        "0xa976a66bfcbd5d71e6d0b7a0a3a9aa8eaa1b377a": {
-            "address": {
-                "type": "account",
-                "contract_code_hex": null,
-                "contract_created": null,
-                "contract_destroyed": null,
-                "balance": "1759674903173246059",
-                "balance_usd": 4318.207018709339,
-                "received_approximate": "5231187000000000000",
-                "received_usd": 19647.0299,
-                "spent_approximate": "2925965000000000000",
-                "spent_usd": 10207.5973,
-                "fees_approximate": "545547096826753941",
-                "fees_usd": 1338.7616479182,
-                "receiving_call_count": 19,
-                "spending_call_count": 55,
-                "call_count": 76,
-                "transaction_count": 72,
-                "first_seen_receiving": "2021-05-12 16:49:32",
-                "last_seen_receiving": "2022-01-09 05:48:00",
-                "first_seen_spending": "2021-05-12 18:55:22",
-                "last_seen_spending": "2022-01-25 06:47:48",
-                "nonce": null
-            },
-            "calls": emptyCallsData
-        }
-    },
-    "context": {
-        "code": 200,
-        "source": "D",
-        "limit": "5,5",
-        "offset": "2,2",
-        "results": 1,
-        "state": 14074856,
-        "state_layer_2": 14074856,
-        "market_price_usd": 2453.98,
-        "cache": {
-            "live": true,
-            "duration": 180,
-            "since": "2022-01-25 12:51:29",
-            "until": "2022-01-25 12:54:29",
-            "time": null
-        },
-        "api": {
-            "version": "2.0.95-ie",
-            "last_major_update": "2021-07-19 00:00:00",
-            "next_major_update": null,
-            "documentation": "https://blockchair.com/api/docs",
-            "notice": ":)"
-        },
-        "servers": "API4,ETH3,ETH3",
-        "time": 1.7783517837524414,
-        "render_time": 0.0027332305908203125,
-        "full_time": 1.7810850143432617,
-        "request_cost": 1
-    }
+    "data": [
+    ]
 };

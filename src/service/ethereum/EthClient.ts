@@ -3,7 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 import { EVMClient } from '../rpc/clients/EVMClient';
 import { IEthChainIndexAPI, txQueryBaseParams } from '../rpc/interface/eth.chainIndex';
-import { AddressTxDetails, BlockchairTxQueryResponse, TxData, TxDataSuccessResponse } from '../rpc/models/eth.models';
+import { TransactionData, TransactionsByAddressResponse } from '../rpc/models/eth.models';
 import {
   ICronosChainIndexAPI,
   txListRequestOptions,
@@ -24,18 +24,18 @@ import {
 
 /**
  * name: EthClient
- * Uses: Blockchair open APIs
+ * Uses: Crypto.com Chain Indexing APIs
  * purpose: This client is used to consume data from an indexing service.
  */
 export class EthClient extends EVMClient implements IEthChainIndexAPI {
-  private indexingServiceBaseUrl: string;
+  private indexingBaseUrl: string;
 
   constructor(web3ProviderURL: string, indexingUrl: string) {
     super(EVMClient.create(web3ProviderURL).getWeb3());
     if (this.isValidHTTPURL(indexingUrl)) {
-      this.indexingServiceBaseUrl = indexingUrl;
+      this.indexingBaseUrl = indexingUrl;
     } else {
-      throw new Error('Invalid `explorerAPIBaseURL` provided.');
+      throw new Error('Invalid `indexingUrl` provided.');
     }
   }
 
@@ -55,26 +55,26 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
   ) => {
 
     // Pagination params
-    let offset = options?.offset || 0;
-    const limit = options?.limit || 10000;
+    let currentPage = options?.page || 0;
+    const limit = options?.pageSize || 1000;
 
     // Result
-    let finalList: Array<TxData> = [];
+    let finalList: TransactionData[] = [];
 
     while (true) {
       const txDataList = await this._getTxsByAddressPaginated(address, {
-        limit,
-        offset,
-        state: "latest",
+        pageSize: limit,
+        page: currentPage,
       });
 
       // Append TxData list to the final response array
       finalList.push(...txDataList);
 
       // Increment pagination params
-      offset += 1;
+      currentPage += 1;
 
       if (txDataList.length < 1) {
+        // If the list is empty
         break;
       }
     }
@@ -83,9 +83,9 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
   };
 
   private _getTxsByAddressPaginated = async (address: string, options?: txQueryBaseParams) => {
-    const txListResponse: AxiosResponse<BlockchairTxQueryResponse> = await axios({
-      baseURL: this.indexingServiceBaseUrl,
-      url: `/address/${address}`,
+    const txListResponse: AxiosResponse<TransactionsByAddressResponse> = await axios({
+      baseURL: this.indexingBaseUrl,
+      url: `/address/${address}/transaction-history`,
       params: { ...options },
     });
 
@@ -97,7 +97,7 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
       return [];
     }
 
-    return txListResponse.data.data[address.toLowerCase()].calls as TxData[];
+    return txListResponse.data.data as TransactionData[];
   };
 
   getTxByHash(txHash: string): Promise<any> {
