@@ -3,8 +3,6 @@ import { getRandomId } from '../crypto/RandomGen';
 import { AssetCreationType, UserAssetConfig, UserAssetType } from '../models/UserAsset';
 import { WalletConfig, SupportedChainName } from './StaticConfig';
 import { checkIfTestnet } from '../utils/utils';
-import iconCronosSvg from '../assets/icon-cronos-blue.svg';
-import iconCroSvg from '../assets/icon-cro.svg';
 import iconETHSvg from '../assets/icon-eth.svg';
 import { ICON_CRO_EVM, ICON_CRO_TENDERMINT } from '../components/AssetIcon';
 

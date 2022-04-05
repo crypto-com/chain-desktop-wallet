@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars no-underscore-dangle no-await-in-loop no-constant-condition class-methods-use-this*/
 import axios, { AxiosResponse } from 'axios';
 import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 import { EVMClient } from '../rpc/clients/EVMClient';
@@ -62,6 +62,7 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
     let finalList: TransactionData[] = [];
 
     while (true) {
+
       const txDataList = await this._getTxsByAddressPaginated(address, {
         pageSize: limit,
         page: currentPage,
