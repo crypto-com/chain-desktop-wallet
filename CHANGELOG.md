@@ -5,12 +5,79 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.7.4] - 2022-03-25
+### Additions
+- Duration selection for Auto Update disable
+### Bug fixes
+- Some CRC20 token price don't show properly
+- App crash when sending tokens with market price not available
+- Unable to withdraw Staking Rewards when validators > 10
+- Dead DApp list urls
+- Incorrect token settings during first time setup
+## [v0.7.3] - 2022-03-22
+### Additions
+- Tooltip for different Asset Types
+- Opt-in Auto Update
+- Update DApp list 
+### Bug fixes
+- Incorrect market price for some CRC20 tokens
+- Confirmation loop with Ledger in Bridge Transfer
+- Missing category filter in DApp List
+## [v0.7.2] - 2022-02-24
+### Additions
+- DApp List fetch from api.llama.fi
+- DApp List sorted by TVL in default
+### Bug fixes
+- Remove non-DApp projects in DApp List
+## [v0.7.1] - 2022-02-23
+### Additions
+- DApps Analytics
+### Bug fixes
+- DApps Ranking pictures not loaded
+- Incorrect Rpc URL
+- Security fix on dyld loading
+## [v0.7.0] - 2022-02-21
+### Additions
+- DApps Ranking
+- Cronos Rebranding
+### Bug fixes
+- UI bug on Redelegate & Undelegate funds
+## [v0.6.9] - 2022-02-16
+### Bug fixes
+- Ledger connectivity on Windows
+## [v0.6.8] - 2022-02-11
+### Additions
+- Wrapped ETH NFT support on Crypto.org chain
+- Add NFT attributes display support
+### Bug fixes
+- Missing Ledger sign methods support
+- Fix potential app crash in Wallet Page
+- Align NFT minting metadata
+
+## [v0.6.7] - 2022-01-28
+### Bug fixes
+- Incorrect delegation items
+- Missing address index on Standard Wallets
+- Remove unwanted Ledger notification popup on Standard Wallets
+
+## [v0.6.6] - 2022-01-26
+### Additions
+- Full DApp Browser Support on Cronos
+- Ledger Support in DApp Browser
+- UX flow improvement on Ledger Support
+- Restake rewards button
+- Search function in Validator List
+
+### Bug fixes
+- Add loading spin in Staking table list
+
 ## [v0.6.5] - 2022-01-19
 ### Bug fixes
 - NFT transaction list sorted by time
 - Bridge transaction list sorted by time
 - Repeated records in NFT transaction list when switching page
 - Incorrect Explorer URL after settings update on Cronos Assets
+- Remove CRC721 token from Assets List
 
 ## [v0.6.4] - 2022-01-13
 ### Additions

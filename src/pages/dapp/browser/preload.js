@@ -547,11 +547,13 @@ window.desktopWallet = {
   },
 };
 
-localStorage.setItem('connectorIdv2', 'Metamask');
+try {
+  localStorage.setItem('connectorIdv2', 'Metamask');
+} catch (_) {}
 
 const providerConfig = {
   chainId: 25,
-  rpcUrl: 'https://evm-cronos.crypto.org',
+  rpcUrl: 'https://evm.cronos.org',
   isDebug: true,
 };
 window.ethereum = new window.desktopWallet.Provider(providerConfig);

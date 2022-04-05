@@ -131,7 +131,7 @@ export function bech32ToEVMAddress(bech32Address: string) {
   return ethers.utils.getAddress(originalEVMAddress);
 }
 
-export function getCryptoOrgAsset(walletAllAssets: UserAsset[]) {
+export function getCronosTendermintAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
     return (
       asset.mainnetSymbol.toUpperCase() === 'CRO' &&
@@ -141,7 +141,7 @@ export function getCryptoOrgAsset(walletAllAssets: UserAsset[]) {
   });
 }
 
-export function getCronosAsset(walletAllAssets: UserAsset[]) {
+export function getCronosEvmAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
     return (
       asset.mainnetSymbol.toUpperCase() === 'CRO' &&
@@ -194,6 +194,20 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
   }
 }
 
+export function getAssetTypeName(assetType: UserAssetType | undefined) {
+  switch (assetType) {
+    case UserAssetType.TENDERMINT:
+    case UserAssetType.EVM:
+      return 'Cronos';
+    case UserAssetType.CRC_20_TOKEN:
+      return 'CRC20';
+    case UserAssetType.ERC_20_TOKEN:
+      return 'ERC20';
+    default:
+      return 'n.a.';
+  }
+}
+
 export function isCRC20AssetWhitelisted(
   symbol: string,
   contractAddress: string,
@@ -214,4 +228,23 @@ export function isCRC20AssetWhitelisted(
 
 export function isAddressEqual(lhs: string, rhs: string) {
   return Web3.utils.toChecksumAddress(lhs) === Web3.utils.toChecksumAddress(rhs);
+}
+
+export function isValidURL(str: string) {
+  const regex = new RegExp(
+    '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?', // lgtm [js/redos]
+  );
+
+  const withoutPrefixRegex = new RegExp(
+    '^([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?', // lgtm [js/redos]
+  );
+  return regex.test(str) || withoutPrefixRegex.test(str);
+}
+
+export function addHTTPsPrefixIfNeeded(str: string) {
+  if (str.startsWith('http://') || str.startsWith('https://')) {
+    return str;
+  }
+
+  return `https://${str}`;
 }

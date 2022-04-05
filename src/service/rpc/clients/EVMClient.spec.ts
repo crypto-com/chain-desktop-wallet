@@ -17,7 +17,7 @@ const nockHeaders = {
 
 /* eslint-enable @typescript-eslint/no-unused-vars,class-methods-use-this */
 
-const TestNetRPCURL = 'https://cronos-testnet-3.crypto.org:8545/';
+const TestNetRPCURL = 'https://evm-t3.cronos.org:8545/';
 
 describe('Testing EVMClient', () => {
   const nockScope = nock(TestNetRPCURL)

@@ -13,8 +13,9 @@ import {
   Tabs,
   Typography,
   Alert,
+  Spin,
 } from 'antd';
-import { OrderedListOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { OrderedListOutlined, ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
@@ -83,6 +84,8 @@ import {
   SUPPORTED_CURRENCY,
 } from '../../config/StaticConfig';
 import { isValidatorAddressSuspicious, ModerationConfig } from '../../models/ModerationConfig';
+import { useLedgerStatus } from '../../hooks/useLedgerStatus';
+import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
@@ -159,6 +162,8 @@ const FormDelegationRequest = props => {
   const didMountRef = useRef(false);
   const allMarketData = useRecoilValue(allMarketState);
 
+  const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
+
   const [t] = useTranslation();
 
   useEffect(() => {
@@ -200,6 +205,9 @@ const FormDelegationRequest = props => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+        ledgerNotification(currentSession.wallet, walletAsset!);
+      }
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
@@ -252,10 +260,10 @@ const FormDelegationRequest = props => {
       form.resetFields();
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
-      setErrorMessages(e.message.split(': '));
+      setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -427,7 +435,10 @@ const FormDelegationRequest = props => {
             <Button
               key="submit"
               type="primary"
-              disabled={!isChecked}
+              disabled={
+                !isChecked ||
+                (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE)
+              }
               loading={confirmLoading}
               onClick={onConfirmDelegation}
             >
@@ -454,7 +465,7 @@ const FormDelegationRequest = props => {
               <div className="label">{t('staking.modal1.label3')}</div>
               <div>
                 {`${formValues?.amount} ${walletAsset?.symbol}`}{' '}
-                {walletAsset && assetMarketData
+                {walletAsset && assetMarketData && assetMarketData.price
                   ? `(${localFiatSymbol}${numeral(
                       getAssetAmountInFiat(formValues?.amount, assetMarketData),
                     ).format('0,0.00')})`
@@ -562,6 +573,19 @@ const FormDelegationRequest = props => {
                   <div key={idx}>- {err}</div>
                 ))}
               {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
+              {currentSession.wallet.walletType === LEDGER_WALLET_TYPE ? (
+                <>
+                  <a
+                    href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {t('general.errorModalPopup.ledgerTroubleshoot')}
+                  </a>
+                </>
+              ) : (
+                <></>
+              )}
             </div>
           </>
         </ErrorModalPopup>
@@ -596,15 +620,19 @@ const FormDelegationOperations = props => {
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
+  const [isDelegationsLoading, setIsDelegationsLoading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [errorMessages, setErrorMessages] = useState([]);
 
+  const { isLedgerConnected } = useLedgerStatus({ asset: userAsset });
+
   const [t] = useTranslation();
 
   useEffect(() => {
     const syncStakingData = async () => {
+      setIsDelegationsLoading(true);
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
 
       const allDelegations: StakingTransactionData[] = await walletService.retrieveAllDelegations(
@@ -615,6 +643,7 @@ const FormDelegationOperations = props => {
         ? convertDelegations(allDelegations, currentWalletAsset)
         : [];
       setDelegations(stakingTabularData);
+      setIsDelegationsLoading(false);
     };
 
     syncStakingData();
@@ -651,6 +680,9 @@ const FormDelegationOperations = props => {
 
   const showPasswordInput = () => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+        ledgerNotification(currentSession.wallet, userAsset!);
+      }
       showConfirmationModal();
     } else {
       setInputPasswordVisible(true);
@@ -727,10 +759,10 @@ const FormDelegationOperations = props => {
       }
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
-      setErrorMessages(e.message.split(': '));
+      setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -762,10 +794,10 @@ const FormDelegationOperations = props => {
 
   function convertDelegations(allDelegations: StakingTransactionData[], currentAsset: UserAsset) {
     return allDelegations
-      .map(dlg => {
+      .map((dlg, idx) => {
         const stakedAmount = getUIDynamicAmount(dlg.stakedAmount, currentAsset);
         const data: StakingTabularData = {
-          key: dlg.validatorAddress + dlg.stakedAmount,
+          key: `${idx}_${dlg.validatorAddress}_${dlg.stakedAmount}`,
           delegatorAddress: dlg.delegatorAddress,
           validatorAddress: dlg.validatorAddress,
           stakedAmountWithSymbol: `${stakedAmount} ${currentAsset.symbol}`,
@@ -855,6 +887,10 @@ const FormDelegationOperations = props => {
         }}
         columns={StakingColumns}
         dataSource={delegations}
+        loading={{
+          indicator: <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />,
+          spinning: isDelegationsLoading,
+        }}
         rowKey={record => record.key}
       />
       <div>
@@ -870,8 +906,9 @@ const FormDelegationOperations = props => {
               loading={confirmLoading}
               onClick={onConfirmDelegationAction}
               disabled={
-                delegationActionType === StakingActionType.UNDELEGATE &&
-                !isUndelegateDisclaimerChecked
+                (delegationActionType === StakingActionType.UNDELEGATE &&
+                  !isUndelegateDisclaimerChecked) ||
+                (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE)
               }
             >
               {t('general.confirm')}
@@ -970,6 +1007,19 @@ const FormDelegationOperations = props => {
                   <div key={idx}>- {err}</div>
                 ))}
               {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
+              {currentSession.wallet.walletType === LEDGER_WALLET_TYPE ? (
+                <>
+                  <a
+                    href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {t('general.errorModalPopup.ledgerTroubleshoot')}
+                  </a>
+                </>
+              ) : (
+                <></>
+              )}
             </div>
           </>
         </ErrorModalPopup>
@@ -993,6 +1043,7 @@ const FormWithdrawStakingReward = () => {
     false,
   );
   const [successRestakeRewardModalMessage, setSuccessRestakeRewardModalMessage] = useState('');
+  const [isRewardsLoading, setIsRewardsLoading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [isErrorTransferModalVisible, setIsErrorTransferModalVisible] = useState(false);
@@ -1010,6 +1061,7 @@ const FormWithdrawStakingReward = () => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
+  const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
 
   const [t] = useTranslation();
 
@@ -1020,7 +1072,7 @@ const FormWithdrawStakingReward = () => {
   ) => {
     return allRewards
       .filter(reward => Big(reward.amount).gte(Big(0)))
-      .map(reward => {
+      .map((reward, idx) => {
         const rewardAmount = getUIDynamicAmount(reward.amount, currentAsset);
         const marketPrice =
           currentMarketPrice && currentMarketPrice.price ? new Big(currentMarketPrice.price) : '';
@@ -1029,7 +1081,7 @@ const FormWithdrawStakingReward = () => {
             ? new Big(rewardAmount).times(marketPrice).toFixed(2)
             : '';
         const rewardData: RewardsTabularData = {
-          key: `${reward.validatorAddress}${reward.amount}`,
+          key: `${idx}_${reward.validatorAddress}${reward.amount}`,
           rewardAmount: `${rewardAmount} ${currentAsset.symbol}`,
           rewardMarketPrice:
             rewardMarketPrice !== '' && currentMarketPrice
@@ -1045,6 +1097,7 @@ const FormWithdrawStakingReward = () => {
 
   useEffect(() => {
     const syncRewardsData = async () => {
+      setIsRewardsLoading(true);
       const currentMarketData = allMarketData.get(
         `${walletAsset?.mainnetSymbol}-${currentSession?.currency}`,
       );
@@ -1064,7 +1117,7 @@ const FormWithdrawStakingReward = () => {
 
       const rewardsTabularData = convertToTabularData(allRewards, primaryAsset, currentMarketData);
       setRewards(rewardsTabularData);
-
+      setIsRewardsLoading(false);
       setWalletAsset(primaryAsset);
     };
 
@@ -1083,6 +1136,10 @@ const FormWithdrawStakingReward = () => {
 
   const showPasswordInput = (action: string) => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+        ledgerNotification(currentSession.wallet, walletAsset!);
+        return;
+      }
       if (action === 'restake') {
         showConfirmationRestakeModal();
       } else {
@@ -1126,10 +1183,10 @@ const FormWithdrawStakingReward = () => {
       setIsSuccessTransferModalVisible(true);
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
-      setErrorMessages(e.message.split(': '));
+      setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -1220,10 +1277,10 @@ const FormWithdrawStakingReward = () => {
       }
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
-      setErrorMessages(e.message.split(': '));
+      setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsConfirmationRestakeModalVisible(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -1280,12 +1337,16 @@ const FormWithdrawStakingReward = () => {
     },
     {
       title: t('staking.formWithdralStakingReward.table.withdraw'),
-      dataIndex: 'withdrawAction',
       key: 'withdrawAction',
-      render: () => (
+      render: record => (
         <>
           <a
             onClick={() => {
+              setWithdrawValues({
+                validatorAddress: record.validatorAddress,
+                rewardAmount: record.rewardAmount,
+                rewardMarketPrice: record.rewardMarketPrice,
+              });
               setRewardAction('withdraw');
               setTimeout(() => {
                 showPasswordInput('withdraw');
@@ -1299,12 +1360,16 @@ const FormWithdrawStakingReward = () => {
     },
     {
       title: t('staking.formWithdralStakingReward.table.restake'),
-      dataIndex: 'restakeAction',
       key: 'restakeAction',
-      render: () => (
+      render: record => (
         <>
           <a
             onClick={() => {
+              setWithdrawValues({
+                validatorAddress: record.validatorAddress,
+                rewardAmount: record.rewardAmount,
+                rewardMarketPrice: record.rewardMarketPrice,
+              });
               setRewardAction('restake');
               setTimeout(() => {
                 showPasswordInput('restake');
@@ -1327,18 +1392,11 @@ const FormWithdrawStakingReward = () => {
           cancelSort: t('general.table.cancelSort'),
         }}
         columns={rewardColumns}
-        dataSource={rewards}
-        onRow={record => {
-          return {
-            onClick: () => {
-              setWithdrawValues({
-                validatorAddress: record.validatorAddress,
-                rewardAmount: record.rewardAmount,
-                rewardMarketPrice: record.rewardMarketPrice,
-              });
-            },
-          };
+        loading={{
+          indicator: <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />,
+          spinning: isRewardsLoading,
         }}
+        dataSource={rewards}
       />
     );
   };
@@ -1353,7 +1411,13 @@ const FormWithdrawStakingReward = () => {
         confirmationLoading={confirmLoading}
         className="reward-modal"
         footer={[
-          <Button key="submit" type="primary" loading={confirmLoading} onClick={onConfirmTransfer}>
+          <Button
+            key="submit"
+            type="primary"
+            loading={confirmLoading}
+            disabled={!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE}
+            onClick={onConfirmTransfer}
+          >
             {t('general.confirm')}
           </Button>,
           <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
@@ -1506,6 +1570,19 @@ const FormWithdrawStakingReward = () => {
                 <div key={idx}>- {err}</div>
               ))}
             {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
+            {currentSession.wallet.walletType === LEDGER_WALLET_TYPE ? (
+              <>
+                <a
+                  href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {t('general.errorModalPopup.ledgerTroubleshoot')}
+                </a>
+              </>
+            ) : (
+              <></>
+            )}
           </div>
         </>
       </ErrorModalPopup>
@@ -1597,10 +1674,10 @@ const StakingPage = () => {
   ) => {
     return (
       allUnbondingDelegations
-        .map(dlg => {
+        .map((dlg, idx) => {
           const unbondingAmount = getUIDynamicAmount(dlg.unbondingAmount, currentAsset);
           const data: UnbondingDelegationTabularData = {
-            key: `${dlg.validatorAddress}_${dlg.unbondingAmount}_${dlg.completionTime}`,
+            key: `${idx}_${dlg.validatorAddress}_${dlg.unbondingAmount}_${dlg.completionTime}`,
             delegatorAddress: dlg.delegatorAddress,
             validatorAddress: dlg.validatorAddress,
             completionTime: new Date(dlg.completionTime).toString(),

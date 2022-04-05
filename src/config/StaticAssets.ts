@@ -6,12 +6,49 @@ import { checkIfTestnet } from '../utils/utils';
 import iconCronosSvg from '../assets/icon-cronos-blue.svg';
 import iconCroSvg from '../assets/icon-cro.svg';
 import iconETHSvg from '../assets/icon-eth.svg';
+import { ICON_CRO_EVM, ICON_CRO_TENDERMINT } from '../components/AssetIcon';
 
 // This will be used later for asset recreation/migration
 export const STATIC_ASSET_COUNT = 3;
 
+// Update Explorer Url - https://cronoscan.com
+export const MAINNET_EVM_EXPLORER_URL = 'https://cronoscan.com';
+// There's no testnet explorer on cronoscan.com. Use cronos.org/explorer instead.
+export const TESTNET_EVM_EXPLORER_URL = 'https://cronos.org/explorer/testnet3';
+
+export const TestNetEvmConfig: UserAssetConfig = {
+  explorer: {
+    tx: `${TESTNET_EVM_EXPLORER_URL}/tx`,
+    address: `${TESTNET_EVM_EXPLORER_URL}/address`,
+  },
+  explorerUrl: TESTNET_EVM_EXPLORER_URL,
+  chainId: '338',
+  fee: { gasLimit: `50000`, networkFee: `20000000000` },
+  indexingUrl: 'https://cronos.org/explorer/testnet3/api',
+  isLedgerSupportDisabled: false,
+  isStakingDisabled: false,
+  nodeUrl: 'https://evm-t3.cronos.org/',
+  memoSupportDisabled: true,
+};
+
+export const MainNetEvmConfig: UserAssetConfig = {
+  explorer: {
+    tx: `${MAINNET_EVM_EXPLORER_URL}/tx`,
+    address: `${MAINNET_EVM_EXPLORER_URL}/address`,
+  },
+  explorerUrl: MAINNET_EVM_EXPLORER_URL,
+  chainId: '25',
+  fee: { gasLimit: `50000`, networkFee: `20000000000` },
+  // indexingUrl sticks with https://cronos.org/explorer for now
+  indexingUrl: 'https://cronos.org/explorer/api',
+  isLedgerSupportDisabled: false,
+  isStakingDisabled: false,
+  nodeUrl: 'https://evm.cronos.org',
+  memoSupportDisabled: true,
+};
+
 // Every created wallet get initialized with a new CRO asset
-export const CRO_ASSET = (walletConfig: WalletConfig) => {
+export const CRONOS_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
   const { network } = walletConfig;
   const assetSymbol = network.coin.croDenom.toString().toUpperCase();
 
@@ -30,10 +67,8 @@ export const CRO_ASSET = (walletConfig: WalletConfig) => {
   return {
     balance: '0',
     description:
-      'Crypto.org Coin (CRO) is the native token of the Crypto.org Chain. The Crypto.org Chain was created to build a network of cryptocurrency projects, and develop merchants’ ability to accept crypto as a form of payment. The Crypto.org Chain is a high performing native blockchain solution, which will make the transaction flows between crypto users and merchants accepting crypto seamless, cost-efficient and secure.\\r\\n\\r\\nBusinesses can use Crypto.org pay Checkout and/or Invoice to enable customers to complete checkout and pay for goods and services with cryptocurrencies using the Crypto.org Wallet App. Businesses receive all their payments instantly in CRO or stable coins, or in fiat.',
-    icon_url:
-      // 'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c1248c15568a4017c20aa87/cro.png',
-      iconCroSvg,
+      'Cronos (CRO) is the native token of the Crypto.org Chain. The Crypto.org Chain was created to build a network of cryptocurrency projects, and develop merchants’ ability to accept crypto as a form of payment. The Crypto.org Chain is a high performing native blockchain solution, which will make the transaction flows between crypto users and merchants accepting crypto seamless, cost-efficient and secure.\\r\\n\\r\\nBusinesses can use Crypto.org pay Checkout and/or Invoice to enable customers to complete checkout and pay for goods and services with cryptocurrencies using the Crypto.org Wallet App. Businesses receive all their payments instantly in CRO or stable coins, or in fiat.',
+    icon_url: ICON_CRO_TENDERMINT,
     identifier: getRandomId(),
     name: SupportedChainName.CRYPTO_ORG,
     symbol: assetSymbol,
@@ -50,42 +85,17 @@ export const CRO_ASSET = (walletConfig: WalletConfig) => {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const CRONOS_ASSET = (walletConfig: WalletConfig) => {
+export const CRONOS_EVM_ASSET = (walletConfig: WalletConfig) => {
   const { network } = walletConfig;
 
   const isTestnet = checkIfTestnet(network);
 
-  const config: UserAssetConfig = {
-    explorer: {
-      tx: isTestnet
-        ? 'https://cronos.crypto.org/explorer/testnet3/tx'
-        : 'https://cronos.crypto.org/explorer/tx',
-      address: isTestnet
-        ? 'https://cronos.crypto.org/explorer/testnet3/address'
-        : 'https://cronos.crypto.org/explorer/address',
-    },
-    explorerUrl: isTestnet
-      ? 'https://cronos.crypto.org/explorer/testnet3'
-      : 'https://cronos.crypto.org/explorer',
-    chainId: isTestnet ? '338' : '25',
-    fee: { gasLimit: `50000`, networkFee: `20000000000` },
-    indexingUrl: isTestnet
-      ? 'https://cronos.crypto.org/explorer/testnet3/api'
-      : 'https://cronos.crypto.org/explorer/api',
-    isLedgerSupportDisabled: false,
-    isStakingDisabled: false,
-    nodeUrl: isTestnet
-      ? 'https://cronos-testnet-3.crypto.org:8545/'
-      : 'https://evm-cronos.crypto.org',
-    memoSupportDisabled: true,
-  };
+  const config: UserAssetConfig = isTestnet ? TestNetEvmConfig : MainNetEvmConfig;
 
   return {
     balance: '0',
     description: '',
-    icon_url:
-      // 'https://firebasestorage.googleapis.com/v0/b/chain-desktop-wallet.appspot.com/o/cronos_logo.png?alt=media&token=781c48a3-e89e-4dd4-87d3-d1a1b8e2e456',
-      iconCronosSvg,
+    icon_url: ICON_CRO_EVM,
     identifier: getRandomId(),
     name: SupportedChainName.CRONOS,
     symbol: isTestnet ? 'TCRO' : 'CRO',

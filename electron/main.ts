@@ -4,13 +4,12 @@ import * as path from 'path';
 
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import { IpcMain } from './IpcMain';
-import {autoUpdater} from "electron-updater";
+import { autoUpdater } from "electron-updater";
 import log from "electron-log";
 import Big from "big.js";
+import Store from "electron-store";
 
-
-
-const { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } = require('./UsageAnalytics');
+import { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } from './UsageAnalytics';
 
 (global as any).actionEvent = actionEvent;
 (global as any).transactionEvent = transactionEvent;
@@ -22,6 +21,7 @@ const { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } 
 let win: BrowserWindow | null = null;
 let ipcmain: IpcMain | null = null;
 const isDev = process.env.NODE_ENV === 'development'; // change true, in developing mode
+const store = new Store();
 
 // Updater log setup
 log.transports.file.level = "debug"
@@ -97,7 +97,7 @@ function createWindow() {
   win.on('closed', () => (win = null));
 
   // Open default browser when direct to external
-  win.webContents.on('new-window', function(e, url) {
+  win.webContents.on('new-window', function (e, url) {
     e.preventDefault();
     require('electron').shell.openExternal(url);
   });
@@ -140,12 +140,24 @@ app.on('activate', async () => {
 
 });
 
-app.on('ready', async function() {
+app.on('ready', async function () {
   app.allowRendererProcessReuse = false
   createWindow();
 
   await new Promise(resolve => setTimeout(resolve, 20_000));
-  autoUpdater.checkForUpdatesAndNotify();
+
+  const autoUpdateExpireTime = store.get('autoUpdateExpireTime');
+  if(!autoUpdateExpireTime) {
+    autoUpdater.checkForUpdatesAndNotify();
+  }
+});
+
+ipcMain.handle('get_auto_update_expire_time', (event) => {
+  return store.get('autoUpdateExpireTime');
+});
+
+ipcMain.on('set_auto_update_expire_time', (event, arg) => {
+  store.set('autoUpdateExpireTime', arg);
 });
 
 ipcMain.on('app_version', (event) => {

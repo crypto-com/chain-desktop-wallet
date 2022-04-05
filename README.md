@@ -26,13 +26,13 @@ At this moment, the project could only be compiled with `node` in `x64` binary v
 
 Please check the installed binary version of your `node`:
 
-```
+```sh
 node -p process.arch
 x64
 ```
 If `arm64` is returned, open your favourite Shell in Rosetta
 
-```
+```sh
 arch -x86_64 /bin/bash
 ```
 
@@ -40,7 +40,7 @@ Reinstall `node` 14 or 15 under Rosetta. The reinstalled `node` will be in `x64`
 
 ### Installation
 
-```
+```sh
 yarn install
 ```
 Installs all the needed dependencies
@@ -49,12 +49,12 @@ Installs all the needed dependencies
 
 #### Web Target 🌐
 
-```
+```sh
 yarn start
 ```
 The command above runs the app as a normal web app in development, deployed at http://localhost:3000/
 
-```
+```sh
 yarn build
 ```
 Builds an optimized web distributable output for the repository.
@@ -64,8 +64,12 @@ The final output build should be ready to be deployed like any normal react web 
 
 #### Electron Target 💻
 
-```
+```sh
+# Use webpack
 yarn electron:dev
+
+# Or use Vite(faster)
+yarn vite:dev
 ```
 Runs the Electron app in the development mode.
 
@@ -73,7 +77,7 @@ The Electron app will reload if you make edits in the electron directory.
 You will also see any lint errors in the console.
 
 
-```
+```sh
 yarn electron:build
 ```
 Builds the Electron app package for production to the dist folder.

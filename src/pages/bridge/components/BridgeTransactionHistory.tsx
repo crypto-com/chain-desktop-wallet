@@ -9,8 +9,8 @@ import { sessionState, walletAllAssetsState } from '../../../recoil/atom';
 import {
   bech32ToEVMAddress,
   middleEllipsis,
-  getCronosAsset,
-  getCryptoOrgAsset,
+  getCronosEvmAsset,
+  getCronosTendermintAsset,
   getAssetBySymbolAndChain,
   getChainName,
 } from '../../../utils/utils';
@@ -32,8 +32,8 @@ const BridgeTransactionHistory = () => {
   const [t] = useTranslation();
 
   // eslint-disable-next-line
-  const cronosAsset = getCronosAsset(walletAllAssets);
-  const cryptoOrgAsset = getCryptoOrgAsset(walletAllAssets);
+  const cronosAsset = getCronosEvmAsset(walletAllAssets);
+  const cryptoOrgAsset = getCronosTendermintAsset(walletAllAssets);
 
   const bridgeService = new BridgeService(walletService.storageService);
 
@@ -93,9 +93,10 @@ const BridgeTransactionHistory = () => {
   const convertBridgeTransfers = (allTransfers: BridgeTransaction[]) => {
     const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
 
-    return allTransfers.map(transfer => {
+    return allTransfers.map((transfer, idx) => {
       const data: BridgeTransferTabularData = {
         key:
+          idx.toString() +
           transfer.sourceTransactionId +
           transfer.sourceAddress +
           transfer.destinationTransactionId +

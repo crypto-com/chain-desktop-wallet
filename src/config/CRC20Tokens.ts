@@ -5,7 +5,7 @@ export interface CRC20TokenInfo {
   iconURL: string;
 }
 
-// https://cronos.crypto.org/explorer/tokens
+// https://cronos.org/explorer/tokens
 // case doesn't matter, will change to checksum before comparison
 export const CRC20MainnetTokenInfos: Map<string, CRC20TokenInfo> = new Map([
   [

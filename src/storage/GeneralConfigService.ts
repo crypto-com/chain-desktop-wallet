@@ -181,7 +181,6 @@ export class GeneralConfigService {
     }
     return savedConfig.incorrectUnlockAttempts;
   }
-
 }
 
 export const generalConfigService = new GeneralConfigService('general-config');

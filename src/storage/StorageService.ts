@@ -1,4 +1,4 @@
-import _ from "lodash";
+import _ from 'lodash';
 import {
   DisableDefaultMemoSettings,
   DisableGASettings,
@@ -339,7 +339,17 @@ export class StorageService {
       },
     };
 
-    // await this.updateCommonAttributes()
+    // Manually remove `staking` records first
+    await this.db.commonTransactionStore.remove(
+      {
+        walletId: stakingTransactions.walletId,
+        txType: 'staking',
+      },
+      {
+        multi: true,
+      },
+    );
+
     await this.insertCommonTransactionRecords(stakingTxRecords);
 
     // Insert to common Attributes store
@@ -375,13 +385,16 @@ export class StorageService {
       },
     };
 
-// Remove previous `reward` records before insertion
-    await this.db.commonTransactionStore.remove({
-      walletId: rewardTransactions.walletId,
-      txType: 'reward',
-    }, {
-      multi: true
-    });
+    // Remove previous `reward` records before insertion
+    await this.db.commonTransactionStore.remove(
+      {
+        walletId: rewardTransactions.walletId,
+        txType: 'reward',
+      },
+      {
+        multi: true,
+      },
+    );
 
     // Insert to common transactoin store
     await this.insertCommonTransactionRecords(rewardTxRecords);
@@ -448,7 +461,7 @@ export class StorageService {
       claimedRewardsBalance: rewardCustomParams?.customParams?.claimedRewardsBalance || '0',
       estimatedApy: rewardCustomParams?.customParams?.estimatedApy || '0',
       estimatedRewardsBalance: rewardCustomParams?.customParams?.estimatedRewardsBalance || '0',
-    } as RewardTransactionList
+    } as RewardTransactionList;
 
     // return this.db.rewardStore.findOne<RewardTransactionList>({ walletId });
   }
@@ -496,9 +509,12 @@ export class StorageService {
       assetId: assetID,
     });
 
-    // Sort the txdata list by `date` in descending 
+    // Sort the txdata list by `date` in descending
     const txDataList = _.orderBy(
-      transferRecords.map(record => record.txData), 'date', "desc");
+      transferRecords.map(record => record.txData),
+      'date',
+      'desc',
+    );
 
     return {
       transactions: txDataList,
@@ -549,10 +565,13 @@ export class StorageService {
       walletId,
       txType: 'nftAccount',
     });
-    
-    // Sort the txdata list by `blockTime` in descending 
+
+    // Sort the txdata list by `blockTime` in descending
     const txDataList = _.orderBy(
-      nftAccountTxRecords.map(record => record.txData), 'blockTime', "desc");
+      nftAccountTxRecords.map(record => record.txData),
+      'blockTime',
+      'desc',
+    );
 
     return {
       transactions: txDataList,
@@ -644,7 +663,7 @@ export class StorageService {
     return {
       transfers: nftTxRecords.map(record => record.txData),
       walletId,
-      nftQuery: nftQueryParam.customParams.nftQuery
+      nftQuery: nftQueryParam.customParams.nftQuery,
     } as NftTransactionHistory;
 
     // @deprecated
@@ -687,9 +706,12 @@ export class StorageService {
       txType: 'ibc',
     } as IBCTransactionRecord);
 
-    // Sort the txdata list by `blockTime` in descending 
+    // Sort the txdata list by `blockTime` in descending
     const txDataList = _.orderBy(
-      bridgeTxs.map(record => record.txData), 'sourceBlockTime', "desc");
+      bridgeTxs.map(record => record.txData),
+      'sourceBlockTime',
+      'desc',
+    );
 
     return {
       transactions: txDataList,
@@ -788,11 +810,14 @@ export class StorageService {
     }
 
     const removeQueries = records.map(async record => {
-      return this.db.commonTransactionStore.remove({
-        txHash: record.txHash,
-        walletId: record.walletId,
-        txType: record.txType
-      }, {});
+      return this.db.commonTransactionStore.remove(
+        {
+          txHash: record.txHash,
+          walletId: record.walletId,
+          txType: record.txType,
+        },
+        {},
+      );
     });
 
     // Removing documents (Profiled time: 37ms)

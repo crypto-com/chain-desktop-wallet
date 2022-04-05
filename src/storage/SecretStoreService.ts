@@ -12,7 +12,7 @@ export class SecretStoreService {
   }
 
   public async savePassword(credential: EncryptedCredential) {
-    return this.db.credentialStore.update<EncryptedCredential>(
+    await this.db.credentialStore.update<EncryptedCredential>(
       { _id: this.CREDENTIAL_STORED_ID },
       { $set: credential },
       { upsert: true },

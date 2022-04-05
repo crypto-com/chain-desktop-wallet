@@ -30,6 +30,7 @@ export enum AnalyticsCategory {
   Voting = 'Voting',
   Nft = 'Nft',
   Bridge = 'Bridge',
+  DApp = 'Browsing',
 }
 
 export class AnalyticsService {
@@ -64,6 +65,21 @@ export class AnalyticsService {
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('Error logging event', e);
+    }
+  }
+
+  public logBrowserDomain(domain: string) {
+    try {
+      if (this.currentSession.wallet.config.analyticsDisabled) {
+        // DONT RECORD WHEN ANALYTICS IS DISABLED
+        return;
+      }
+
+      if (domain) {
+        actionEvent('DAppBrowser', AnalyticsCategory.DApp, domain, 0);
+      }
+    } catch (e) {
+      // Ignore
     }
   }
 

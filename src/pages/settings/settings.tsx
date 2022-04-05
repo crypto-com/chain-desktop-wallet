@@ -4,7 +4,6 @@ import './settings.less';
 import 'antd/dist/antd.css';
 import {
   Alert,
-  Avatar,
   Button,
   Carousel,
   Checkbox,
@@ -52,13 +51,15 @@ import {
   SUPPORTED_CURRENCY,
   WalletConfig,
   SupportedCurrency,
+  AUTO_UPDATE_DISABLE_DURATIONS,
 } from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { generalConfigService } from '../../storage/GeneralConfigService';
-import { UserAsset, UserAssetConfig, UserAssetType } from '../../models/UserAsset';
+import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
 import AddressBook from './tabs/AddressBook/AddressBook';
-import { getChainName } from '../../utils/utils';
+import { getChainName, getCronosTendermintAsset } from '../../utils/utils';
+import { AssetIcon } from '../../components/AssetIcon';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -141,16 +142,6 @@ const GeneralSettingsForm = props => {
     setUpdateLoading(false);
   }
 
-  const assetIcon = asset => {
-    const { name, icon_url, symbol } = asset;
-
-    return icon_url ? (
-      <img src={icon_url} alt={name} className="asset-icon" />
-    ) : (
-      <Avatar>{symbol[0].toUpperCase()}</Avatar>
-    );
-  };
-
   const onSwitchAsset = value => {
     setCurrentAssetIdentifier(value);
     const selectedAsset = configurableAssets.find(asset => asset.identifier === value);
@@ -172,7 +163,7 @@ const GeneralSettingsForm = props => {
         {configurableAssets.map(asset => {
           return (
             <Option value={asset.identifier} key={asset.identifier}>
-              {assetIcon(asset)}
+              <AssetIcon asset={asset} />
               {`${getChainName(asset.name, session.wallet.config)} (${asset.symbol})`}
             </Option>
           );
@@ -279,6 +270,11 @@ function MetaInfoComponent() {
   const [defaultCurrencyState, setDefaultCurrencyState] = useState<string>(session.currency);
   const [defaultMemoStateDisabled, setDefaultMemoStateDisabled] = useState<boolean>(false);
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
+  const [defaultAutoUpdateDisabled, setDefaultAutoUpdateDisabled] = useState<boolean>(false);
+  const [defaultAutoUpdateExpireTime, setDefaultAutoUpdateExpireTime] = useState<
+    number | undefined
+  >();
+  const [autoUpdateDisableDuration, setAutoUpdateDisableDuration] = useState<number>(14);
   const [supportedCurrencies, setSupportedCurrencies] = useState<SupportedCurrency[]>([]);
   const [t, i18n] = useTranslation();
 
@@ -351,11 +347,15 @@ function MetaInfoComponent() {
       const { currency } = session;
       const { disableDefaultClientMemo, analyticsDisabled } = session.wallet.config;
 
+      const autoUpdateExpireTime = await ipcRenderer.invoke('get_auto_update_expire_time');
+
       if (!unmounted) {
         setDefaultLanguageState(defaultLanguage);
         setDefaultCurrencyState(currency);
         setDefaultMemoStateDisabled(disableDefaultClientMemo);
         setDefaultGAStateDisabled(analyticsDisabled);
+        setDefaultAutoUpdateDisabled(autoUpdateExpireTime > 0);
+        setDefaultAutoUpdateExpireTime(autoUpdateExpireTime);
 
         const currencies: SupportedCurrency[] = [];
         SUPPORTED_CURRENCY.forEach((item: SupportedCurrency) => {
@@ -382,6 +382,8 @@ function MetaInfoComponent() {
     setDefaultMemoStateDisabled,
     defaultGAStateDisabled,
     setDefaultGAStateDisabled,
+    defaultAutoUpdateDisabled,
+    setDefaultAutoUpdateDisabled,
   ]);
 
   const onSwitchLanguage = value => {
@@ -389,6 +391,10 @@ function MetaInfoComponent() {
     i18n.changeLanguage(value!.toString());
     generalConfigService.setLanguage(value!.toString());
     setMomentLocale();
+  };
+
+  const onSwitchAutoUpdateDuration = value => {
+    setAutoUpdateDisableDuration(value);
   };
 
   const onSwitchCurrency = async value => {
@@ -495,6 +501,27 @@ function MetaInfoComponent() {
     );
   }
 
+  async function onAllowAutoUpdateChange() {
+    setUpdateLoading(true);
+
+    const newState = !defaultAutoUpdateDisabled;
+    setDefaultAutoUpdateDisabled(newState);
+
+    const expireTime = newState
+      ? new Date().setDate(new Date().getDate() + autoUpdateDisableDuration)
+      : 0;
+    setDefaultAutoUpdateExpireTime(expireTime);
+
+    ipcRenderer.send('set_auto_update_expire_time', expireTime);
+
+    setUpdateLoading(false);
+    message.success(
+      `${t('settings.message.autoUpdate1')} ${
+        newState ? t('general.disabled') : t('general.enabled')
+      }`,
+    );
+  }
+
   const onCopyClick = () => {
     setTimeout(() => {
       notification.success({
@@ -567,6 +594,41 @@ function MetaInfoComponent() {
               disabled={updateLoading}
             />{' '}
             {defaultGAStateDisabled ? t('general.disabled') : t('general.enabled')}
+          </div>
+          <div className="item">
+            <div className="title">{t('settings.autoUpdate.title')}</div>
+            <div className="description">{t('settings.autoUpdate.description')}</div>
+            {defaultAutoUpdateDisabled && defaultAutoUpdateExpireTime ? (
+              <div className="description">
+                {t('settings.autoUpdate.expire')}:{' '}
+                {new Date(defaultAutoUpdateExpireTime).toLocaleString()}
+              </div>
+            ) : (
+              <></>
+            )}
+            <Switch
+              checked={!defaultAutoUpdateDisabled}
+              onChange={onAllowAutoUpdateChange}
+              disabled={updateLoading}
+            />{' '}
+            {defaultAutoUpdateDisabled ? t('general.disabled') : t('general.enabled')}{' '}
+            {!defaultAutoUpdateDisabled || !defaultAutoUpdateExpireTime ? (
+              <Select
+                className="auto-update-duration"
+                onChange={onSwitchAutoUpdateDuration}
+                value={autoUpdateDisableDuration}
+              >
+                {AUTO_UPDATE_DISABLE_DURATIONS.map(duration => {
+                  return (
+                    <Option value={duration} key={duration}>
+                      {t('settings.autoUpdate.duration', { duration })}
+                    </Option>
+                  );
+                })}
+              </Select>
+            ) : (
+              <></>
+            )}
           </div>
           {walletType !== LEDGER_WALLET_TYPE ? (
             <>
@@ -703,9 +765,9 @@ const FormSettings = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
   const [isConfirmClearVisible, setIsConfirmClearVisible] = useState(false);
-  const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [session, setSession] = useRecoilState(sessionState);
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
+  const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
 
   const defaultSettings: UserAssetConfig =
     session.activeAsset?.config || getAssetConfigFromWalletConfig(session.wallet.config);
@@ -720,12 +782,7 @@ const FormSettings = () => {
   let gasLimit = FIXED_DEFAULT_GAS_LIMIT;
 
   useEffect(() => {
-    const selectedIdentifier = walletAllAssets
-      .filter(asset => {
-        return asset.assetType !== UserAssetType.CRC_20_TOKEN;
-      })
-      .find(asset => asset.identifier === session.activeAsset?.identifier)?.identifier;
-    setCurrentAssetIdentifier(selectedIdentifier || walletAllAssets[0].identifier);
+    const croAsset = getCronosTendermintAsset(walletAllAssets);
 
     if (defaultSettings.fee !== undefined) {
       networkFee = defaultSettings.fee.networkFee;
@@ -741,6 +798,9 @@ const FormSettings = () => {
       networkFee,
       gasLimit,
     });
+    if (!currentAssetIdentifier && croAsset) {
+      setCurrentAssetIdentifier(croAsset?.identifier);
+    }
   }, [form, defaultSettings, walletAllAssets, setSession]);
 
   const onFinish = async values => {

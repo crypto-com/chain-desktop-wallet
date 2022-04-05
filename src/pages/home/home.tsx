@@ -20,7 +20,8 @@ import {
 } from '../../recoil/atom';
 import { NOT_KNOWN_YET_VALUE, SUPPORTED_CURRENCY, WalletConfig } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
-import { middleEllipsis, isJson, ellipsis, getChainName } from '../../utils/utils';
+import { NftUtils } from '../../utils/NftUtils';
+import { middleEllipsis, ellipsis, getChainName } from '../../utils/utils';
 import {
   scaledAmount,
   scaledStakingBalance,
@@ -40,6 +41,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import IconTick from '../../svg/IconTick';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 import RewardModalPopup from '../../components/RewardModalPopup/RewardModalPopup';
+import { AssetIcon } from '../../components/AssetIcon';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -84,16 +86,6 @@ const HomePage = () => {
 
   const [t] = useTranslation();
 
-  const assetIcon = asset => {
-    const { name, icon_url, symbol } = asset;
-
-    return icon_url ? (
-      <img src={icon_url} alt={name} className="asset-icon" />
-    ) : (
-      <Avatar>{symbol[0].toUpperCase()}</Avatar>
-    );
-  };
-
   const AssetColumns = [
     {
       title: t('home.assetList.table.name'),
@@ -104,7 +96,7 @@ const HomePage = () => {
         const { symbol } = record;
         return (
           <div className="name">
-            {assetIcon(record)}
+            <AssetIcon asset={record} />
             {symbol}
             {record.isWhitelisted === false && (
               <Tooltip title={t('assets.whitelist.warning')}>
@@ -229,24 +221,6 @@ const HomePage = () => {
     }, 200);
   };
 
-  const processNftList = (currentList: NftModel[] | undefined) => {
-    if (currentList) {
-      return currentList.slice(0, maxNftPreview).map(item => {
-        const denomSchema = isJson(item.denomSchema)
-          ? JSON.parse(item.denomSchema)
-          : item.denomSchema;
-        const tokenData = isJson(item.tokenData) ? JSON.parse(item.tokenData) : item.tokenData;
-        const nftModel: NftProcessedModel = {
-          ...item,
-          denomSchema,
-          tokenData,
-        };
-        return nftModel;
-      });
-    }
-    return [];
-  };
-
   const onSyncAndRefreshBtnCall = async () => {
     setFetchingDB(true);
 
@@ -336,7 +310,7 @@ const HomePage = () => {
         currentSession.wallet.identifier,
       );
 
-      const currentNftList = processNftList(allNFTs);
+      const currentNftList = await NftUtils.processNftList(allNFTs, maxNftPreview);
       setProcessedNftList(currentNftList);
       setNFTList(allNFTs);
       setDefaultWalletAsset(currentAsset);

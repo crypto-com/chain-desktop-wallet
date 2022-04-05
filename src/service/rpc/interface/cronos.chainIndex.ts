@@ -6,7 +6,7 @@ import {
   ContractDataResponse,
 } from '../models/cronos.models';
 
-// Reference: https://cronos.crypto.org/explorer/api-docs
+// Reference: https://cronos.org/explorer/api-docs
 
 export interface txListRequestOptions extends queryPaginationOptions {
   sort?: 'desc' | 'asc' | undefined;

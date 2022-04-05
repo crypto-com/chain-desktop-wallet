@@ -5,9 +5,9 @@ const { remote } = window.require('electron');
 export class ChainConfig {
   static ChainId = 0x19;
 
-  static RpcUrl = 'https://evm-cronos.crypto.org';
+  static RpcUrl = 'https://evm.cronos.org';
 
-  static ExplorerAPIUrl = 'https://cronos.crypto.org/explorer/api';
+  static ExplorerAPIUrl = 'https://cronos.org/explorer/api';
 }
 
 export const ProviderPreloadScriptPath =
