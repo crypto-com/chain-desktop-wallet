@@ -7,6 +7,7 @@ import {
   Tabs,
   List,
   Avatar,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Radio,
   Table,
   Button,
@@ -988,6 +989,7 @@ const NftPage = () => {
 
   const [nft, setNft] = useState<CryptoOrgNftModel | CronosCRC721NftModel | undefined>();
   const [processedNftList, setProcessedNftList] = useState<CommonNftModel[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [nftView, setNftView] = useState('grid');
   const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
 
@@ -1008,6 +1010,7 @@ const NftPage = () => {
   const cronosTendermintAsset = useCronosTendermintAsset();
   const cronosEvmAsset = useCronosEvmAsset();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const nftViewOptions = [
     { label: <MenuOutlined />, value: 'list' },
     { label: <AppstoreOutlined />, value: 'grid' },
@@ -1445,16 +1448,16 @@ const NftPage = () => {
         <Tabs defaultActiveKey="1">
           <TabPane tab={t('nft.tab1')} key="1">
             <div className="site-layout-background nft-content">
-              <div className="view-selection">
+              {/* <div className="view-selection">
                 <Radio.Group
                   options={nftViewOptions}
                   defaultValue="grid"
-                  onChange={e => {
+                  onChange={(e) => {
                     setNftView(e.target.value);
                   }}
                   optionType="button"
                 />
-              </div>
+              </div> */}
               {nftView === 'grid' ? (
                 <List
                   grid={{
@@ -1766,9 +1769,6 @@ const NftPage = () => {
                             }
                           />
                         </div>
-                        {/* <div className="item">
-                          <div className="subtitle">{t('nft.detailModal.subtitle')}</div>
-                        </div> */}
                         <div className="item">
                           <div className="subtitle">{t('nft.detailModal.attributes')}</div>
                           <div className="attribute">
