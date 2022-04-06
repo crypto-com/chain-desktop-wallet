@@ -1598,6 +1598,16 @@ const NftPage = () => {
                       <>
                         <div className="title">{NftUtils.renderNftTitle(nft)}</div>
                         <div className="item">
+                          <div className="description">
+                            <Tag style={{ border: 'none', padding: '5px 14px' }} color="processing">
+                              {getChainName(
+                                cronosTendermintAsset?.name,
+                                currentSession.wallet.config,
+                              )}
+                            </Tag>
+                          </div>
+                        </div>
+                        <div className="item">
                           <Meta
                             description={
                               <>
@@ -1721,6 +1731,13 @@ const NftPage = () => {
                     {isCronosNftModel(nft) && (
                       <>
                         <div className="title">{NftUtils.renderNftTitle(nft)}</div>
+                        <div className="item">
+                          <div className="description">
+                            <Tag style={{ border: 'none', padding: '5px 14px' }} color="processing">
+                              {getChainName(cronosEvmAsset?.name, currentSession.wallet.config)}
+                            </Tag>
+                          </div>
+                        </div>
                         <div className="item">
                           <Meta
                             description={
