@@ -18,6 +18,7 @@ import {
   Tag,
   message,
   notification,
+  Select,
 } from 'antd';
 import Big from 'big.js';
 import Icon, {
@@ -100,6 +101,7 @@ import ReceiveDetail from '../assets/components/ReceiveDetail';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 import { useCronosEvmAsset, useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
+import { UserAsset } from '../../models/UserAsset';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -931,9 +933,33 @@ const FormMintNft = () => {
 
 const ReceiveTab = () => {
   const currentSession = useRecoilValue(sessionState);
-  const walletAsset = useRecoilValue(walletAssetState);
+  const cronosTendermintAsset = useCronosTendermintAsset();
+  const cronosEvmAsset = useCronosEvmAsset();
+  const [currentAsset, setCurrentAsset] = useState(cronosTendermintAsset);
+  const selectableAssets = [cronosTendermintAsset, cronosEvmAsset];
 
-  return <ReceiveDetail currentAsset={walletAsset} session={currentSession} isNft />;
+  return (
+    <>
+      <Select
+        style={{ minWidth: '180px' }}
+        showArrow
+        onChange={value => {
+          const selectedAsset: UserAsset | undefined =
+            selectableAssets.find(asset => asset?.identifier === value) ?? cronosTendermintAsset;
+          setCurrentAsset(selectedAsset);
+        }}
+        options={selectableAssets.map(a => {
+          return {
+            label: a?.name ?? '',
+            key: a?.identifier ?? '',
+            value: a?.identifier ?? '',
+          };
+        })}
+        value={currentAsset?.identifier}
+      />
+      <ReceiveDetail currentAsset={currentAsset} session={currentSession} isNft />
+    </>
+  );
 };
 
 const NftPage = () => {
