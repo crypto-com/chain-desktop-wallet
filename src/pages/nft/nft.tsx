@@ -102,6 +102,9 @@ import ReceiveDetail from '../assets/components/ReceiveDetail';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 import { useCronosEvmAsset, useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
+// import { ChainConfig } from '../dapp/browser/config';
+// import { ethers } from 'ethers';
+// import { CRC721__factory } from '../../contracts';
 import { UserAsset } from '../../models/UserAsset';
 
 const { Header, Content, Footer, Sider } = Layout;
@@ -1151,6 +1154,30 @@ const NftPage = () => {
     }
     try {
       setConfirmLoading(true);
+
+      if (isCronosNftModel(nft)) {
+        // const provider = new ethers.providers.JsonRpcProvider(ChainConfig.RpcUrl);
+        // const CRC721Contract = CRC721__factory.connect(nft?.model.token_address, provider);
+        // CRC721Contract.transferFrom(
+        //   formValues.senderAddress,
+        //   formValues.recipientAddress,
+        //   nft?.model.token_id,
+        // );
+        const resultString = await walletService.sendCronosNFT({
+          tokenId: formValues.tokenId,
+          denomId: formValues.denomId,
+          sender: formValues.senderAddress,
+          recipient: formValues.recipientAddress,
+          memo,
+          decryptedPhrase,
+          asset: walletAsset,
+          walletType,
+        });
+        console.log('hihi cronos', resultString);
+        return;
+      }
+
+      // Crypto.org
       const sendResult = await walletService.sendNFT({
         tokenId: formValues.tokenId,
         denomId: formValues.denomId,

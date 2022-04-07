@@ -10,6 +10,8 @@ import {
   WithdrawStakingRewardUnsigned,
   NFTDenomIssueUnsigned,
   NFTMintUnsigned,
+  // EVMNFTTransferUnsigned,
+  EVMContractCallUnsigned,
 } from './signers/TransactionSupported';
 import { BroadCastResult } from '../models/Transaction';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
@@ -36,6 +38,7 @@ import { TransactionHistoryService } from './TransactionHistoryService';
 import { getCronosEvmAsset, sleep } from '../utils/utils';
 import { BridgeService } from './bridge/BridgeService';
 import { walletService } from './WalletService';
+import { ChainConfig } from '../pages/dapp/browser/config';
 
 export class TransactionSenderService {
   public readonly storageService: StorageService;
@@ -496,7 +499,141 @@ export class TransactionSenderService {
     return broadCastResult;
   }
 
+  public async sendCronosNFT(cronosNFTRequest: NFTTransferRequest): Promise<string> {
+    // const currentSession = await this.storageService.retrieveCurrentSession();
+    // const walletAddressIndex = currentSession.wallet.addressIndex;
+    const { sender, recipient, tokenId, asset, decryptedPhrase } = cronosNFTRequest;
+
+    const prepareTXConfig: TransactionConfig = {
+      from: sender,
+      to: recipient, // contract address?
+    };
+
+    const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
+      asset!,
+      prepareTXConfig,
+    );
+
+    console.log('prepareTxInfo', prepareTxInfo);
+
+    const encodedABITokenTransferData = evmTransactionSigner.encodeNFTTransferABI(
+      // '0x562f021423d75a1636db5be1c4d99bc005ccebfe',
+      '0xd55FF2ac117FB52C424036006e3597A5CE411eAa',
+      {
+        tokenId,
+        sender,
+        recipient,
+        nonce: prepareTxInfo.nonce,
+        gasPrice: prepareTxInfo.loadedGasPrice,
+        gasLimit: prepareTxInfo.gasLimit,
+      },
+    );
+
+    console.log('encodedABITokenTransferData', encodedABITokenTransferData);
+
+    const txConfig: EVMContractCallUnsigned = {
+      from: sender,
+      contractAddress: '0xd55FF2ac117FB52C424036006e3597A5CE411eAa',
+      data: encodedABITokenTransferData,
+      nonce: prepareTxInfo.nonce,
+      gasPrice: prepareTxInfo.loadedGasPrice,
+      gasLimit: prepareTxInfo.gasLimit.toString(),
+    };
+
+    console.log('txConfig', txConfig);
+
+    try {
+      const result = await evmTransactionSigner.sendContractCallTransaction(
+        asset!,
+        txConfig,
+        decryptedPhrase,
+        ChainConfig.RpcUrl,
+      );
+
+      console.log('result', result);
+      return result;
+    } catch (error) {
+      console.log('result', 'failed');
+      return '';
+    }
+
+    // const encodedABITokenTransfer = evmTransactionSigner.encodeNFTTransferABI(
+    //   '0x562f021423d75a1636db5be1c4d99bc005ccebfe',
+    //   {
+    //     tokenId: '7191',
+    //     sender: '0x85e0280712AaBDD0884732141B048b3B6fdE405B',
+    //     recipient: '0x85e0280712AaBDD0884732141B048b3B6fdE405B',
+    //     // nonce?: number;
+    //     // gasPrice?: string;
+    //     // gasLimit?: number;
+    //   },
+    // );
+
+    // const txConfig: TransactionConfig = {
+    //   // from: transferAsset.address,
+    //   // to: transferAsset.contractAddress,
+    //   from: '0x85e0280712AaBDD0884732141B048b3B6fdE405B',
+    //   to: '0x85e0280712AaBDD0884732141B048b3B6fdE405B',
+    //   value: 0,
+    //   data: encodedABITokenTransfer,
+    // };
+
+    // const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
+    //   asset,
+    //   txConfig,
+    // );
+
+    // const transfer: EVMNFTTransferUnsigned = {
+    //   tokenId: cronosNFTRequest.tokenId,
+    //   recipient: cronosNFTRequest.recipient,
+    //   sender: currentSession.wallet.address,
+    //   // accountNumber,
+    //   // accountSequence,
+    // };
+
+    // let signedTxHex: string = '';
+    // transfer.nonce = prepareTxInfo.nonce;
+    // transfer.gasPrice = prepareTxInfo.loadedGasPrice;
+    // transfer.gasLimit = prepareTxInfo.gasLimit;
+
+    // // If transaction is provided with memo, add a little bit more gas to it to be accepted. 10% more
+    // transfer.gasLimit = transfer.gasLimit;
+
+    // let signedTx = '';
+
+    // if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+    // const device = createLedgerDevice();
+
+    // const web3 = new Web3('');
+    // const gasLimitTx = web3.utils.toBN(transfer.gasLimit!);
+    // const gasPriceTx = web3.utils.toBN(transfer.gasPrice);
+
+    // signedTx = await device.signEthTx(
+    //   walletAddressIndex,
+    //   Number(asset?.config?.chainId), // chainid
+    //   transfer.nonce,
+    //   web3.utils.toHex(gasLimitTx) /* gas limit */,
+    //   web3.utils.toHex(gasPriceTx) /* gas price */,
+    //   transfer.recipient,
+    //   web3.utils.toHex(transfer.amount),
+    //   `0x${Buffer.from('').toString('hex')}`,
+    // );
+    // } else {
+    //   signedTx = await evmTransactionSigner.sendContractCallTransaction(
+    //     transfer,
+    //     transferRequest.decryptedPhrase,
+    //   );
+    // }
+
+    // const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    // await this.txHistoryManager.fetchAndSaveCronosNFTs(currentSession);
+    // return broadCastResult;
+  }
+
   public async sendNFT(nftTransferRequest: NFTTransferRequest): Promise<BroadCastResult> {
+    // switch (currentAsset.assetType) {
+
+    // }
     const {
       nodeRpc,
       accountNumber,

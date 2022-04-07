@@ -106,3 +106,12 @@ export interface EVMContractCallUnsigned {
   gasPrice: string;
   gasLimit: string;
 }
+
+export interface EVMNFTTransferUnsigned {
+  tokenId: string;
+  sender: string;
+  recipient: string;
+  nonce?: number;
+  gasPrice?: string;
+  gasLimit?: number;
+}
