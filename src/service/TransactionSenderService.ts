@@ -1,5 +1,6 @@
 import Web3 from 'web3';
 import { TransactionConfig } from 'web3-eth';
+import { ethers } from 'ethers';
 import {
   DelegateTransactionUnsigned,
   TransferTransactionUnsigned,
@@ -15,7 +16,7 @@ import {
 } from './signers/TransactionSupported';
 import { BroadCastResult } from '../models/Transaction';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
-import { UserAsset, UserAssetType } from '../models/UserAsset';
+import { NftType, UserAsset, UserAssetType } from '../models/UserAsset';
 import { DEFAULT_CLIENT_MEMO } from '../config/StaticConfig';
 import {
   TransferRequest,
@@ -38,7 +39,6 @@ import { TransactionHistoryService } from './TransactionHistoryService';
 import { getCronosEvmAsset, sleep } from '../utils/utils';
 import { BridgeService } from './bridge/BridgeService';
 import { walletService } from './WalletService';
-import { ChainConfig } from '../pages/dapp/browser/config';
 
 export class TransactionSenderService {
   public readonly storageService: StorageService;
@@ -499,180 +499,129 @@ export class TransactionSenderService {
     return broadCastResult;
   }
 
-  public async sendCronosNFT(cronosNFTRequest: NFTTransferRequest): Promise<string> {
-    // const currentSession = await this.storageService.retrieveCurrentSession();
-    // const walletAddressIndex = currentSession.wallet.addressIndex;
-    const { sender, recipient, tokenId, asset, decryptedPhrase } = cronosNFTRequest;
-
-    const prepareTXConfig: TransactionConfig = {
-      from: sender,
-      to: recipient, // contract address?
-    };
-
-    const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
-      asset!,
-      prepareTXConfig,
-    );
-
-    console.log('prepareTxInfo', prepareTxInfo);
-
-    const encodedABITokenTransferData = evmTransactionSigner.encodeNFTTransferABI(
-      // '0x562f021423d75a1636db5be1c4d99bc005ccebfe',
-      '0xd55FF2ac117FB52C424036006e3597A5CE411eAa',
-      {
-        tokenId,
-        sender,
-        recipient,
-        nonce: prepareTxInfo.nonce,
-        gasPrice: prepareTxInfo.loadedGasPrice,
-        gasLimit: prepareTxInfo.gasLimit,
-      },
-    );
-
-    console.log('encodedABITokenTransferData', encodedABITokenTransferData);
-
-    const txConfig: EVMContractCallUnsigned = {
-      from: sender,
-      contractAddress: '0xd55FF2ac117FB52C424036006e3597A5CE411eAa',
-      data: encodedABITokenTransferData,
-      nonce: prepareTxInfo.nonce,
-      gasPrice: prepareTxInfo.loadedGasPrice,
-      gasLimit: prepareTxInfo.gasLimit.toString(),
-    };
-
-    console.log('txConfig', txConfig);
-
-    try {
-      const result = await evmTransactionSigner.sendContractCallTransaction(
-        asset!,
-        txConfig,
-        decryptedPhrase,
-        ChainConfig.RpcUrl,
-      );
-
-      console.log('result', result);
-      return result;
-    } catch (error) {
-      console.log('result', 'failed');
-      return '';
-    }
-
-    // const encodedABITokenTransfer = evmTransactionSigner.encodeNFTTransferABI(
-    //   '0x562f021423d75a1636db5be1c4d99bc005ccebfe',
-    //   {
-    //     tokenId: '7191',
-    //     sender: '0x85e0280712AaBDD0884732141B048b3B6fdE405B',
-    //     recipient: '0x85e0280712AaBDD0884732141B048b3B6fdE405B',
-    //     // nonce?: number;
-    //     // gasPrice?: string;
-    //     // gasLimit?: number;
-    //   },
-    // );
-
-    // const txConfig: TransactionConfig = {
-    //   // from: transferAsset.address,
-    //   // to: transferAsset.contractAddress,
-    //   from: '0x85e0280712AaBDD0884732141B048b3B6fdE405B',
-    //   to: '0x85e0280712AaBDD0884732141B048b3B6fdE405B',
-    //   value: 0,
-    //   data: encodedABITokenTransfer,
-    // };
-
-    // const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
-    //   asset,
-    //   txConfig,
-    // );
-
-    // const transfer: EVMNFTTransferUnsigned = {
-    //   tokenId: cronosNFTRequest.tokenId,
-    //   recipient: cronosNFTRequest.recipient,
-    //   sender: currentSession.wallet.address,
-    //   // accountNumber,
-    //   // accountSequence,
-    // };
-
-    // let signedTxHex: string = '';
-    // transfer.nonce = prepareTxInfo.nonce;
-    // transfer.gasPrice = prepareTxInfo.loadedGasPrice;
-    // transfer.gasLimit = prepareTxInfo.gasLimit;
-
-    // // If transaction is provided with memo, add a little bit more gas to it to be accepted. 10% more
-    // transfer.gasLimit = transfer.gasLimit;
-
-    // let signedTx = '';
-
-    // if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-    // const device = createLedgerDevice();
-
-    // const web3 = new Web3('');
-    // const gasLimitTx = web3.utils.toBN(transfer.gasLimit!);
-    // const gasPriceTx = web3.utils.toBN(transfer.gasPrice);
-
-    // signedTx = await device.signEthTx(
-    //   walletAddressIndex,
-    //   Number(asset?.config?.chainId), // chainid
-    //   transfer.nonce,
-    //   web3.utils.toHex(gasLimitTx) /* gas limit */,
-    //   web3.utils.toHex(gasPriceTx) /* gas price */,
-    //   transfer.recipient,
-    //   web3.utils.toHex(transfer.amount),
-    //   `0x${Buffer.from('').toString('hex')}`,
-    // );
-    // } else {
-    //   signedTx = await evmTransactionSigner.sendContractCallTransaction(
-    //     transfer,
-    //     transferRequest.decryptedPhrase,
-    //   );
-    // }
-
-    // const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    // await this.txHistoryManager.fetchAndSaveCronosNFTs(currentSession);
-    // return broadCastResult;
-  }
-
   public async sendNFT(nftTransferRequest: NFTTransferRequest): Promise<BroadCastResult> {
-    // switch (currentAsset.assetType) {
-
-    // }
-    const {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    } = await this.transactionPrepareService.prepareTransaction();
-
-    const memo = !nftTransferRequest.memo ? DEFAULT_CLIENT_MEMO : nftTransferRequest.memo;
-
-    const nftTransferUnsigned: NFTTransferUnsigned = {
-      tokenId: nftTransferRequest.tokenId,
-      denomId: nftTransferRequest.denomId,
-      sender: nftTransferRequest.sender,
-      recipient: nftTransferRequest.recipient,
-
-      memo,
-      accountNumber,
-      accountSequence,
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    let broadCastResult: BroadCastResult = {
+      transactionHash: '',
+      message: 'Broadcast failed',
+      code: -32603,
     };
 
-    let signedTxHex: string = '';
+    switch (nftTransferRequest.nftType) {
+      case NftType.CRYPTO_ORG: {
+        const {
+          nodeRpc,
+          accountNumber,
+          accountSequence,
+          // currentSession,
+          transactionSigner,
+          ledgerTransactionSigner,
+        } = await this.transactionPrepareService.prepareTransaction();
 
-    if (nftTransferRequest.walletType === LEDGER_WALLET_TYPE) {
-      signedTxHex = await ledgerTransactionSigner.signNFTTransfer(
-        nftTransferUnsigned,
-        nftTransferRequest.decryptedPhrase,
-      );
-    } else {
-      signedTxHex = await transactionSigner.signNFTTransfer(
-        nftTransferUnsigned,
-        nftTransferRequest.decryptedPhrase,
-      );
+        const memo = !nftTransferRequest.memo ? DEFAULT_CLIENT_MEMO : nftTransferRequest.memo;
+
+        const nftTransferUnsigned: NFTTransferUnsigned = {
+          tokenId: nftTransferRequest.tokenId,
+          denomId: nftTransferRequest.denomId,
+          sender: nftTransferRequest.sender,
+          recipient: nftTransferRequest.recipient,
+
+          memo,
+          accountNumber,
+          accountSequence,
+        };
+
+        let signedTxHex: string = '';
+
+        if (nftTransferRequest.walletType === LEDGER_WALLET_TYPE) {
+          signedTxHex = await ledgerTransactionSigner.signNFTTransfer(
+            nftTransferUnsigned,
+            nftTransferRequest.decryptedPhrase,
+          );
+        } else {
+          signedTxHex = await transactionSigner.signNFTTransfer(
+            nftTransferUnsigned,
+            nftTransferRequest.decryptedPhrase,
+          );
+        }
+
+        broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+
+        // It takes a few seconds for the indexing service to sync latest NFT state
+        break;
+      }
+      case NftType.CRC_721_TOKEN: {
+        const {
+          sender,
+          recipient,
+          tokenId,
+          tokenContractAddress,
+          asset,
+          decryptedPhrase,
+        } = nftTransferRequest;
+
+        if (!asset.config?.nodeUrl) {
+          throw TypeError(`Missing asset config: ${asset.config}`);
+        }
+
+        const encodedABITokenTransferData = evmTransactionSigner.encodeNFTTransferABI(
+          tokenContractAddress,
+          {
+            tokenId,
+            sender,
+            recipient,
+            // nonce: prepareTxInfo.nonce,
+            // gasPrice: ethers.utils.hexValue(BigInt(prepareTxInfo.loadedGasPrice)),
+            // gasLimit: ethers.utils.hexValue(50_000),
+          },
+        );
+
+        const prepareTXConfig: TransactionConfig = {
+          from: sender,
+          to: recipient,
+          data: encodedABITokenTransferData,
+        };
+
+        const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
+          asset!,
+          prepareTXConfig,
+        );
+
+        const txConfig: EVMContractCallUnsigned = {
+          from: sender,
+          contractAddress: tokenContractAddress,
+          data: encodedABITokenTransferData,
+          nonce: prepareTxInfo.nonce,
+          gasPrice: ethers.utils.hexValue(BigInt(prepareTxInfo.loadedGasPrice)),
+          gasLimit: ethers.utils.hexValue(prepareTxInfo.gasLimit),
+        };
+
+        try {
+          const result = await evmTransactionSigner.sendContractCallTransaction(
+            asset!,
+            txConfig,
+            decryptedPhrase,
+            asset.config?.nodeUrl,
+          );
+
+          broadCastResult = {
+            transactionHash: result,
+            message: '',
+            code: 200,
+          };
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.log(
+            `ERROR_TRANSFERRING_NFT - ${nftTransferRequest.tokenContractAddress}_${nftTransferRequest.tokenId}`,
+            error,
+          );
+          throw error;
+        }
+        break;
+      }
+      default:
     }
 
-    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-
-    // It takes a few seconds for the indexing service to sync latest NFT state
     await sleep(7_000);
     await Promise.all([
       this.txHistoryManager.fetchAndSaveNFTs(currentSession),

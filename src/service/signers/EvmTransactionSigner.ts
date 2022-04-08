@@ -220,42 +220,10 @@ class EvmTransactionSigner implements ITransactionSigner {
     const web3 = new Web3('');
     const contractABI = CRC721TokenContractABI.abi as AbiItem[];
     const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
-    console.log('contract', contract);
-    console.log('contract.methods', contract.methods);
     return contract.methods
-      .transferFrom(transaction.sender, transaction.recipient, transaction.tokenId)
+      .safeTransferFrom(transaction.sender, transaction.recipient, transaction.tokenId)
       .encodeABI() as string;
   }
-
-  // eslint-disable-next-line class-methods-use-this
-  // public async signNFTCRC721Transfer(
-  //   transaction: EVMNFTTransferUnsigned,
-  //   phrase: string,
-  // ): Promise<string> {
-  //   const web3 = new Web3('');
-  //   const transferAsset = transaction.asset;
-
-  //   const gasPriceBN = web3.utils.toBN(
-  //     transaction.gasPrice || transferAsset?.config?.fee?.networkFee!,
-  //   );
-
-  //   const chainId = transaction?.asset?.config?.chainId || DEFAULT_CHAIN_ID;
-  //   const txParams = {
-  //     nonce: web3.utils.toHex(transaction.nonce || 0),
-  //     gasPrice: web3.utils.toHex(gasPriceBN),
-  //     gasLimit: transaction.gasLimit || transferAsset?.config?.fee?.gasLimit,
-  //     to: transaction.toAddress,
-  //     value: web3.utils.toHex(transaction.amount),
-  //     // data:
-  //     //   transaction.memo && transaction.memo.length > 0
-  //     //     ? web3.utils.utf8ToHex(transaction.memo)
-  //     //     : '0x',
-  //     chainId: Number(chainId),
-  //   };
-
-  //   const signedTx = await ethers.Wallet.fromMnemonic(phrase).signTransaction(txParams);
-  //   return Promise.resolve(signedTx);
-  // }
 
   // eslint-disable-next-line class-methods-use-this
   public async signBridgeTransfer(

@@ -113,5 +113,5 @@ export interface EVMNFTTransferUnsigned {
   recipient: string;
   nonce?: number;
   gasPrice?: string;
-  gasLimit?: number;
+  gasLimit?: string;
 }

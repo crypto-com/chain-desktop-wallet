@@ -102,6 +102,7 @@ import { useCronosEvmAsset, useCronosTendermintAsset } from '../../hooks/useCron
 // import { CRC721__factory } from '../../contracts';
 import NFTTransactionsTab from './tabs/transactions';
 import ChainSelect from './components/ChainSelect';
+import { NftType } from '../../models/UserAsset';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -901,9 +902,11 @@ const NftPage = () => {
   const [form] = Form.useForm();
   const [formValues, setFormValues] = useState({
     tokenId: '',
+    tokenContractAddress: '',
     denomId: '',
     senderAddress: '',
     recipientAddress: '',
+    nftType: NftType.CRYPTO_ORG,
     amount: '',
     memo: '',
   });
@@ -1046,13 +1049,27 @@ const NftPage = () => {
     setInputPasswordVisible(false);
     setIsNftTransferConfirmVisible(true);
     setIsNftTransferModalVisible(true);
-    setFormValues({
-      ...form.getFieldsValue(true),
-      // Replace scientific notation to plain string values
-      // denomId: nft?.denomId,
-      // tokenId: nft?.tokenId,
-      senderAddress: currentSession.wallet.address,
-    });
+    if (isCryptoOrgNftModel(nft)) {
+      const { model } = nft;
+      setFormValues({
+        ...form.getFieldsValue(true),
+        denomId: model.denomId,
+        tokenId: model.tokenId,
+        senderAddress: currentSession.wallet.address,
+        tokenContractAddress: '',
+        nftType: NftType.CRYPTO_ORG,
+      });
+    }
+    if (isCronosNftModel(nft)) {
+      const { model } = nft;
+      setFormValues({
+        ...form.getFieldsValue(true),
+        tokenId: model.token_id,
+        tokenContractAddress: model.token_address,
+        senderAddress: cronosEvmAsset?.address,
+        nftType: NftType.CRC_721_TOKEN,
+      });
+    }
   };
 
   const showPasswordInput = () => {
@@ -1085,31 +1102,9 @@ const NftPage = () => {
     try {
       setConfirmLoading(true);
 
-      if (isCronosNftModel(nft)) {
-        // const provider = new ethers.providers.JsonRpcProvider(ChainConfig.RpcUrl);
-        // const CRC721Contract = CRC721__factory.connect(nft?.model.token_address, provider);
-        // CRC721Contract.transferFrom(
-        //   formValues.senderAddress,
-        //   formValues.recipientAddress,
-        //   nft?.model.token_id,
-        // );
-        const resultString = await walletService.sendCronosNFT({
-          tokenId: formValues.tokenId,
-          denomId: formValues.denomId,
-          sender: formValues.senderAddress,
-          recipient: formValues.recipientAddress,
-          memo,
-          decryptedPhrase,
-          asset: walletAsset,
-          walletType,
-        });
-        console.log('hihi cronos', resultString);
-        return;
-      }
-
-      // Crypto.org
       const sendResult = await walletService.sendNFT({
         tokenId: formValues.tokenId,
+        tokenContractAddress: formValues.tokenContractAddress,
         denomId: formValues.denomId,
         sender: formValues.senderAddress,
         recipient: formValues.recipientAddress,
@@ -1117,6 +1112,7 @@ const NftPage = () => {
         decryptedPhrase,
         asset: walletAsset,
         walletType,
+        nftType: formValues.nftType,
       });
 
       analyticsService.logTransactionEvent(
@@ -1128,14 +1124,9 @@ const NftPage = () => {
       );
 
       const latestLoadedNFTs = await walletService.retrieveNFTs(currentSession.wallet.identifier);
-      // const cryptoOrgNFTs: NftList | undefined = latestLoadedNFTs.find(list => {
-      //   return list.type === 'CRYPTO_ORG';
-      // });
       setNftList(latestLoadedNFTs);
-      // const processedNFTsLists = await NftUtils.processNftList(cryptoOrgNFTs?.nfts);
       const processedNFTsLists = await NftUtils.groupAllNftList(latestLoadedNFTs);
       setProcessedNftList(processedNFTsLists);
-      console.log('processedNFTsLists', processedNFTsLists);
 
       setBroadcastResult(sendResult);
 

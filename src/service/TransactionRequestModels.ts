@@ -1,4 +1,4 @@
-import { UserAsset } from '../models/UserAsset';
+import { NftType, UserAsset } from '../models/UserAsset';
 import { VoteOption } from '../models/Transaction';
 import { BridgeTransferDirection } from './bridge/BridgeConfig';
 
@@ -22,14 +22,15 @@ export interface VoteRequest {
 
 export interface NFTTransferRequest {
   tokenId: string;
+  tokenContractAddress: string;
   denomId: string;
   sender: string;
   recipient: string;
-
   memo: string;
   decryptedPhrase: string;
   asset: UserAsset;
   walletType: string; // normal, ledger
+  nftType: NftType;
 }
 
 export interface NFTMintRequest {

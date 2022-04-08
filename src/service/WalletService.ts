@@ -122,10 +122,6 @@ class WalletService {
     return await this.txSenderManager.sendNFT(nftTransferRequest);
   }
 
-  public async sendCronosNFT(nftTransferRequest: NFTTransferRequest): Promise<string> {
-    return await this.txSenderManager.sendCronosNFT(nftTransferRequest);
-  }
-
   public async broadcastMintNFT(nftMintRequest: NFTMintRequest): Promise<BroadCastResult> {
     return await this.txSenderManager.sendMintNFT(nftMintRequest);
   }
@@ -589,14 +585,6 @@ class WalletService {
       return [];
     }
     return nftSets;
-  }
-
-  public async retrieveCryptoOrgNFTs(walletID: string): Promise<NftList> {
-    const nftSet = await this.storageService.retrieveCryptoOrgNfts(walletID);
-    // if (!nftSet) {
-    //   return [];
-    // }
-    return nftSet;
   }
 
   public async retrieveCronosNFTTxs() {
