@@ -4594,18 +4594,19 @@ atomically@^1.7.0:
   resolved "https://registry.yarnpkg.com/atomically/-/atomically-1.7.0.tgz#c07a0458432ea6dbc9a3506fffa424b48bccaafe"
   integrity sha512-Xcz9l0z7y9yQ9rdDaxlmaI4uJHf/T8g9hOEzJcsEqX2SjCj4J20uK7+ldkDHMbpJDK76wF7xEIgxc/vSlsfw5w==
 
-audit-ci@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/audit-ci/-/audit-ci-5.0.0.tgz#6d2ceccd71496ad95a1476eb94bf1092ef4b9934"
-  integrity sha512-Idd4fl5okNa/3JaivI/UU5TBg6CU7EhMBS/G+UwgkaqwsviPbcOD8jFdNFZq9QqyBHFLn8uy5tt7gn4Orug7Tw==
+audit-ci@^6.1.2:
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/audit-ci/-/audit-ci-6.1.2.tgz#b3d1beef263f3e090cbf2f7ee828e779c56965d6"
+  integrity sha512-WNhCpShNp5QE1wbfHgaY2QsjFb1SA7n/97tFY69LW7JN0VTQntH1SJQnIODrSAJQdbsf1yA9BOXKBAE2omeOgw==
   dependencies:
     JSONStream "^1.3.5"
     cross-spawn "^7.0.3"
+    escape-string-regexp "^4.0.0"
     event-stream "4.0.1"
     jju "^1.4.0"
     readline-transform "1.0.0"
     semver "^7.0.0"
-    yargs "^16.0.0"
+    yargs "^17.0.0"
 
 autoprefixer@10.2.5:
   version "10.2.5"
@@ -19250,7 +19251,7 @@ yargs@^15.4.1:
     y18n "^4.0.0"
     yargs-parser "^18.1.2"
 
-yargs@^16.0.0, yargs@^16.1.0:
+yargs@^16.1.0:
   version "16.2.0"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-16.2.0.tgz"
   integrity sha512-D1mvvtDG0L5ft/jGWkLpG1+m0eQxOfaBvTNELraWj22wSVUMWxZUvYgJYcKh6jGGIkJFhH4IZPQhR4TKpc8mBw==
@@ -19263,10 +19264,10 @@ yargs@^16.0.0, yargs@^16.1.0:
     y18n "^5.0.5"
     yargs-parser "^20.2.2"
 
-yargs@^17.0.1:
-  version "17.3.1"
-  resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.3.1.tgz#da56b28f32e2fd45aefb402ed9c26f42be4c07b9"
-  integrity sha512-WUANQeVgjLbNsEmGk20f+nlHgOqzRFpiGWVaBrYGYIGANIIu3lWjoyi0fNlFmJkvfhCZ6BXINe7/W2O2bV4iaA==
+yargs@^17.0.0, yargs@^17.0.1:
+  version "17.4.0"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.4.0.tgz#9fc9efc96bd3aa2c1240446af28499f0e7593d00"
+  integrity sha512-WJudfrk81yWFSOkZYpAZx4Nt7V4xp7S/uJkX0CnxovMCt1wCE8LNftPpNuF9X/u9gN5nsD7ycYtRcDf2pL3UiA==
   dependencies:
     cliui "^7.0.2"
     escalade "^3.1.1"

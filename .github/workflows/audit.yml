@@ -24,13 +24,12 @@ jobs:
         run: |
           sudo apt-get install -y libusb-1.0-0-dev libudev-dev
 
-      - name: Install deps with big timeout
-        run: |
-          yarn install --network-timeout 600000
-
       - name: Audit dependencies
-        # Now using the audit tool from IBM which provides more advanced configurability
-        # The -a param for a whitelist of non-issues to ignore. E.g is the false positive submission on lodash
+        # Now using the audit tool from IBM which provides more advanced configurability.
+        # The `allowlist` property in .audit-ci.jsonc supports allowlisting advisories.
+        # E.g is the false positive submission on lodash:
         # https://github.com/lodash/lodash/issues/5261
+        # Installing dependencies is not required for auditing.
         run: |
-          yarn  run-audit
+          yarn dlx audit-ci@^6 --config .audit-ci.jsonc
+

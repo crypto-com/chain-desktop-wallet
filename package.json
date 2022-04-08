@@ -9,7 +9,7 @@
   "main": "build/electron/main.js",
   "private": true,
   "scripts": {
-    "run-audit": "yarn audit-ci --high -a 1005059",
+    "run-audit": "yarn audit-ci --config ./.audit-ci.jsonc",
     "start": "node scripts/start.js",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 && yarn clean-builds && node scripts/build.js",
     "test": "node scripts/test.js --watchAll=false",
@@ -131,7 +131,7 @@
     "@typescript-eslint/parser": "4.5.0",
     "@umijs/fabric": "2.3.1",
     "@vitejs/plugin-react": "^1.2.0",
-    "audit-ci": "^5.0.0",
+    "audit-ci": "^6.1.2",
     "autoprefixer": "10.2.5",
     "axios-mock-adapter": "1.19.0",
     "babel-eslint": "10.1.0",
