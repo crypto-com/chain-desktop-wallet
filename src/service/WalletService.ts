@@ -599,6 +599,10 @@ class WalletService {
     return nftSet;
   }
 
+  public async retrieveCronosNFTTxs() {
+    return this.txHistoryManager.fetchCRC712TokenTxs();
+  }
+
   public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {
     const currentSession = await this.storageService.retrieveCurrentSession();
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {

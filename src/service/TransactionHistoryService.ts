@@ -811,6 +811,22 @@ export class TransactionHistoryService {
   //   }, 10000);
   // }
 
+  public async fetchCRC712TokenTxs() {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
+    const croEvmAsset: UserAsset | undefined = getCronosEvmAsset(assets);
+
+    if (!croEvmAsset || !croEvmAsset.config?.nodeUrl || !croEvmAsset.address) {
+      return [];
+    }
+
+    const { address } = croEvmAsset;
+
+    const cronosNftIndexingClient = CronosNftIndexingAPI.init();
+
+    return cronosNftIndexingClient.getNftTxsList(address);
+  }
+
   private async fetchCurrentWalletCRC721Tokens(): Promise<CronosCRC721NftModel[] | null> {
     const currentSession = await this.storageService.retrieveCurrentSession();
     const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);

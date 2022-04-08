@@ -3,15 +3,15 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRecoilValue } from 'recoil';
-import { renderExplorerUrl } from '../../../models/Explorer';
+import { renderExplorerUrl } from '../../../../models/Explorer';
 import {
   NftAccountTransactionData,
   NftTransactionType,
   TransactionStatus,
-} from '../../../models/Transaction';
-import { sessionState } from '../../../recoil/atom';
-import { walletService } from '../../../service/WalletService';
-import { ellipsis, middleEllipsis } from '../../../utils/utils';
+} from '../../../../models/Transaction';
+import { sessionState } from '../../../../recoil/atom';
+import { walletService } from '../../../../service/WalletService';
+import { ellipsis, middleEllipsis } from '../../../../utils/utils';
 
 interface NftTransferTabularData {
   key: string;
@@ -60,10 +60,10 @@ const convertNftTransfers = (allTransfers: NftAccountTransactionData[]) => {
   });
 };
 
-const NFTTransactionsTab = () => {
-  const [t] = useTranslation();
+const CryptoOrgNFTTransactionList = () => {
   const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
   const currentSession = useRecoilValue(sessionState);
+  const [t] = useTranslation();
 
   useEffect(() => {
     const fetchNftTransfers = async () => {
@@ -207,19 +207,17 @@ const NFTTransactionsTab = () => {
   ];
 
   return (
-    <div>
-      <Table
-        locale={{
-          triggerDesc: t('general.table.triggerDesc'),
-          triggerAsc: t('general.table.triggerAsc'),
-          cancelSort: t('general.table.cancelSort'),
-        }}
-        columns={NftTransactionColumns}
-        dataSource={nftTransfers}
-        rowKey={record => record.key}
-      />
-    </div>
+    <Table
+      locale={{
+        triggerDesc: t('general.table.triggerDesc'),
+        triggerAsc: t('general.table.triggerAsc'),
+        cancelSort: t('general.table.cancelSort'),
+      }}
+      columns={NftTransactionColumns}
+      dataSource={nftTransfers}
+      rowKey={record => record.key}
+    />
   );
 };
 
-export default NFTTransactionsTab;
+export { CryptoOrgNFTTransactionList };

@@ -19,7 +19,6 @@ import {
   Tag,
   message,
   notification,
-  Select,
 } from 'antd';
 import Big from 'big.js';
 import Icon, {
@@ -101,8 +100,8 @@ import { useCronosEvmAsset, useCronosTendermintAsset } from '../../hooks/useCron
 // import { ChainConfig } from '../dapp/browser/config';
 // import { ethers } from 'ethers';
 // import { CRC721__factory } from '../../contracts';
-import { UserAsset } from '../../models/UserAsset';
-import NFTTransactionsTab from './tabs/Transactions';
+import NFTTransactionsTab from './tabs/transactions';
+import ChainSelect from './components/ChainSelect';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -888,29 +887,11 @@ const FormMintNft = () => {
 const ReceiveTab = () => {
   const currentSession = useRecoilValue(sessionState);
   const cronosTendermintAsset = useCronosTendermintAsset();
-  const cronosEvmAsset = useCronosEvmAsset();
   const [currentAsset, setCurrentAsset] = useState(cronosTendermintAsset);
-  const selectableAssets = [cronosTendermintAsset, cronosEvmAsset];
 
   return (
     <>
-      <Select
-        style={{ minWidth: '180px' }}
-        showArrow
-        onChange={value => {
-          const selectedAsset: UserAsset | undefined =
-            selectableAssets.find(asset => asset?.identifier === value) ?? cronosTendermintAsset;
-          setCurrentAsset(selectedAsset);
-        }}
-        options={selectableAssets.map(a => {
-          return {
-            label: a?.name ?? '',
-            key: a?.identifier ?? '',
-            value: a?.identifier ?? '',
-          };
-        })}
-        value={currentAsset?.identifier}
-      />
+      <ChainSelect onChangeAsset={asset => setCurrentAsset(asset)} />
       <ReceiveDetail currentAsset={currentAsset} session={currentSession} isNft />
     </>
   );
