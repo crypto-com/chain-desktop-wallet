@@ -1464,6 +1464,7 @@ const NftPage = () => {
                                 columns={NftAttributeTableColumns}
                                 pagination={false}
                                 size="small"
+                                rowKey={record => `${record.traitType}-${record.value}`}
                               />
                             ) : (
                               <div className="description">n.a.</div>
@@ -1584,6 +1585,7 @@ const NftPage = () => {
                                 columns={NftAttributeTableColumns}
                                 pagination={false}
                                 size="small"
+                                rowKey={record => `${record.trait_type}-${record.value}`}
                               />
                             ) : (
                               <div className="description">n.a.</div>
