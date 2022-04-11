@@ -4,7 +4,7 @@ import { useCronosEvmAsset, useCronosTendermintAsset } from '../../../hooks/useC
 import { UserAsset } from '../../../models/UserAsset';
 
 interface IChainSelectProps {
-  onChangeAsset: (UserAsset) => void;
+  onChangeAsset: (asset: UserAsset | undefined) => void;
 }
 
 const ChainSelect = (props: IChainSelectProps) => {

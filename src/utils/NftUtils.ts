@@ -71,15 +71,15 @@ export class NftUtils {
         if (tokenData && tokenData.drop) {
           return ellipsis(tokenData.drop, length);
         }
-        if (_nft) {
-          return ellipsis(`${model.denomId} - #${model.tokenId}`, length);
-        }
+
+        return ellipsis(`${model.denomId} - #${model.tokenId}`, length);
       }
       if (isCronosNftModel(_nft)) {
         const { model } = _nft;
         if (model.name) {
           return ellipsis(`${model.name} - #${model.token_id}`, length);
         }
+
         return ellipsis(`${model.token_address} - #${model.token_id}`, length);
       }
     }
@@ -92,11 +92,7 @@ export class NftUtils {
     maxTotal: number = currentList?.length ?? 0,
   ) => {
     if (currentList) {
-      // const cryptoOrgNftList: CryptoOrgNftModel[] = currentList.filter(nft => {
-      //   return nft.type === NftType.CRYPTO_ORG;
-      // })
       return await Promise.map(currentList.slice(0, maxTotal), async nft => {
-        // console.log('nft', nft)
         if (isCryptoOrgNftModel(nft)) {
           const { model } = nft;
 

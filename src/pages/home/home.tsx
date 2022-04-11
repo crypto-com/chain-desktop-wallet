@@ -30,8 +30,6 @@ import {
   getAssetTotalBalancePrice,
   UserAsset,
   AssetMarketPrice,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  NftType,
 } from '../../models/UserAsset';
 
 import {
