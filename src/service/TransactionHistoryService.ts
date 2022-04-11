@@ -34,7 +34,7 @@ import { Session } from '../models/Session';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import { CronosNftIndexingAPI } from './rpc/indexing/nft/cronos/CronosNftIndexingAPI';
-import { getCronosEvmAsset, isCRC20AssetWhitelisted } from '../utils/utils';
+import { checkIfTestnet, getCronosEvmAsset, isCRC20AssetWhitelisted } from '../utils/utils';
 import { SupportedCRCTokenStandard } from './rpc/interface/cronos.chainIndex';
 // import { ChainConfig } from '../pages/dapp/browser/config';
 // import { CRC721__factory } from '../contracts';
@@ -553,12 +553,10 @@ export class TransactionHistoryService {
 
   private async loadAllCurrentAccountCryptoOrgNFTs(): Promise<CryptoOrgNftModel[] | null> {
     try {
-      // const nftList = [];
       const currentSession = await this.storageService.retrieveCurrentSession();
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
         return Promise.resolve([]);
       }
-      // Crypto.org Chain NFTs
       const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
       const cryptoOrgNftListResponse = await chainIndexAPI.getAccountNFTList(
         currentSession.wallet.address,
@@ -566,15 +564,6 @@ export class TransactionHistoryService {
       const cryptoOrgNftListMarketplaceResponse: CryptoOrgNftModelData[] = await chainIndexAPI.getNftListMarketplaceData(
         cryptoOrgNftListResponse,
       );
-
-      // const cryptoOrgNftListWithMarketplaceData = await chainIndexAPI.getNftListMarketplaceData(cryptoOrgNftList);
-
-      // Cronos Chain NFTs
-      // const cronosNftList = await this.fetchCurrentWalletCRC721Tokens(currentSession);
-      // console.log('cronosNftList', cronosNftList);
-
-      // const nftList = [...cryptoOrgNftList, ...cronosNftList];
-      // const nftLists =
 
       const cryptoOrgNFTList: CryptoOrgNftModel[] = cryptoOrgNftListMarketplaceResponse.map(nft => {
         return {
@@ -831,8 +820,9 @@ export class TransactionHistoryService {
     const currentSession = await this.storageService.retrieveCurrentSession();
     const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
     const croEvmAsset: UserAsset | undefined = getCronosEvmAsset(assets);
+    const isTestnet = checkIfTestnet(currentSession.wallet.config.network);
 
-    if (!croEvmAsset || !croEvmAsset.config?.nodeUrl || !croEvmAsset.address) {
+    if (!croEvmAsset || !croEvmAsset.config?.nodeUrl || !croEvmAsset.address || isTestnet) {
       return [];
     }
 
