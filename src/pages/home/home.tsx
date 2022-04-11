@@ -21,7 +21,7 @@ import {
 import { NOT_KNOWN_YET_VALUE, SUPPORTED_CURRENCY, WalletConfig } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 import { NftUtils } from '../../utils/NftUtils';
-import { middleEllipsis, ellipsis, getChainName } from '../../utils/utils';
+import { middleEllipsis, getChainName } from '../../utils/utils';
 import {
   scaledAmount,
   scaledStakingBalance,
@@ -45,9 +45,9 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 
 // import logoCro from '../../assets/AssetLogo/cro.png';
 import IconTick from '../../svg/IconTick';
-import nftThumbnail from '../../assets/nft-thumbnail.png';
 import RewardModalPopup from '../../components/RewardModalPopup/RewardModalPopup';
 import { AssetIcon } from '../../components/AssetIcon';
+import NftPreview from '../nft/components/NftPreview';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -186,70 +186,6 @@ const HomePage = () => {
       },
     },
   ];
-
-  const renderPreview = (_nft: CommonNftModel) => {
-    // const { type } = _nft;
-    if (isCryptoOrgNftModel(_nft)) {
-      const { model, tokenData } = _nft;
-      return (
-        <img
-          alt={model.denomName}
-          src={tokenData?.image ? tokenData.image : nftThumbnail}
-          onError={e => {
-            (e.target as HTMLImageElement).src = nftThumbnail;
-          }}
-        />
-      );
-    }
-
-    if (isCronosNftModel(_nft)) {
-      const { model } = _nft;
-      return (
-        <img
-          alt={`${model.token_address}-${model.token_id}`}
-          src={model.image_url ? model.image_url : nftThumbnail}
-          onError={e => {
-            (e.target as HTMLImageElement).src = nftThumbnail;
-          }}
-        />
-      );
-    }
-
-    return (
-      <img
-        alt="default-nft-thumbnail"
-        src={nftThumbnail}
-        onError={e => {
-          (e.target as HTMLImageElement).src = nftThumbnail;
-        }}
-      />
-    );
-  };
-
-  const renderNftTitle = (_nft: CommonNftModel, length: number = 999) => {
-    if (isCryptoOrgNftModel(_nft)) {
-      const { model, tokenData } = _nft;
-
-      if (tokenData && tokenData.name) {
-        return ellipsis(tokenData.name, length);
-      }
-      if (tokenData && tokenData.drop) {
-        return ellipsis(tokenData.drop, length);
-      }
-      if (_nft) {
-        return ellipsis(`${model.denomId} - #${model.tokenId}`, length);
-      }
-    }
-    if (isCronosNftModel(_nft)) {
-      const { model } = _nft;
-      if (model.name) {
-        return ellipsis(`${model.name} - #${model.token_id}`, length);
-      }
-      return ellipsis(`${model.token_address} - #${model.token_id}`, length);
-    }
-
-    return 'n.a.';
-  };
 
   const showWalletStateNotification = (config: WalletConfig) => {
     setTimeout(async () => {
@@ -589,12 +525,12 @@ const HomePage = () => {
                       <List.Item>
                         <Card
                           style={{ width: 170 }}
-                          cover={renderPreview(item)}
+                          cover={<NftPreview nft={item} />}
                           hoverable
                           className="nft"
                         >
                           <Meta
-                            title={renderNftTitle(item)}
+                            title={NftUtils.renderNftTitle(item)}
                             description={
                               <>
                                 <Avatar
@@ -619,12 +555,12 @@ const HomePage = () => {
                       <List.Item>
                         <Card
                           style={{ width: 170 }}
-                          cover={renderPreview(item)}
+                          cover={<NftPreview nft={item} />}
                           hoverable
                           className="nft"
                         >
                           <Meta
-                            title={renderNftTitle(item)}
+                            title={NftUtils.renderNftTitle(item)}
                             description={
                               <>
                                 <Avatar
