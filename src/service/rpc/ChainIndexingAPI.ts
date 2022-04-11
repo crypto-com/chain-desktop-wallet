@@ -78,10 +78,8 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       const pageNftsListResponse: NftListResponse = pageNftsListRequest.data;
 
       pagination = pageNftsListResponse.pagination;
-      // console.log('pageNftsListResponse.result', pageNftsListResponse.result);
       nftLists.push(...pageNftsListResponse.result);
     }
-    // console.log('nftsListResponse.result', nftsListResponse.result);
 
     return nftLists;
   }

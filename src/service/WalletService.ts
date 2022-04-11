@@ -588,7 +588,7 @@ class WalletService {
   }
 
   public async retrieveCronosNFTTxs() {
-    return this.txHistoryManager.fetchCRC712TokenTxs();
+    return this.txHistoryManager.fetchCRC721TokenTxs();
   }
 
   public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {

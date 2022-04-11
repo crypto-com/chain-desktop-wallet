@@ -11,7 +11,6 @@ import {
   WithdrawStakingRewardUnsigned,
   NFTDenomIssueUnsigned,
   NFTMintUnsigned,
-  // EVMNFTTransferUnsigned,
   EVMContractCallUnsigned,
 } from './signers/TransactionSupported';
 import { BroadCastResult } from '../models/Transaction';

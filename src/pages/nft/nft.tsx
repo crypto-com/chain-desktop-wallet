@@ -1098,10 +1098,6 @@ const NftPage = () => {
 
   useEffect(() => {
     const fetchNftList = async () => {
-      // const cryptoOrgNFTs = nftList?.find(list => {
-      //   return list.type === 'CRYPTO_ORG';
-      // });
-      // const currentNftList = await NftUtils.processNftList(cryptoOrgNFTs?.nfts);
       const currentNftList = await NftUtils.groupAllNftList(nftList);
       setProcessedNftList(currentNftList);
     };

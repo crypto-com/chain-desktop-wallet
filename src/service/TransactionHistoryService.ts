@@ -540,11 +540,6 @@ export class TransactionHistoryService {
           nfts: cronosCRC721NFTs,
         });
       }
-
-      // await this.storageService.saveNFTs({
-      //   walletId: currentSession.wallet.identifier,
-      //   nfts,
-      // });
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_SAVE_NFTS', e);
@@ -732,75 +727,7 @@ export class TransactionHistoryService {
     return newlyLoadedTokens;
   }
 
-  // eslint-disable-next-line
-  // private async fetchCurrentWalletCRC721Tokens(session: Session) {
-  //   const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(session);
-  //   const croEvmAsset: UserAsset | undefined = getCronosEvmAsset(assets);
-
-  //   if (!croEvmAsset || !croEvmAsset.config?.nodeUrl || !croEvmAsset.address) {
-  //     return [];
-  //   }
-
-  //   const { address } = croEvmAsset;
-
-  //   const cronosClient = new CronosClient(
-  //     croEvmAsset.config?.nodeUrl,
-  //     croEvmAsset.config?.indexingUrl,
-  //   );
-
-  //   const tokensListResponse = await cronosClient.getTokensOwnedByAddress(address);
-
-  //   // Get CRC721 token balances
-  //   const nftTokens = tokensListResponse.result.filter(
-  //     token => token.type === SupportedCRCTokenStandard.CRC_721_TOKEN,
-  //   );
-
-  //   const nftRequests: { tokenId: string; contractAddress: string }[] = [];
-  //   const provider = new ethers.providers.JsonRpcProvider(ChainConfig.RpcUrl);
-
-  //   // Get Token IDs
-  //   nftTokens.forEach(async token => {
-  //     const CRC721Contract = CRC721__factory.connect(token.contractAddress, provider);
-  //     const tokenIndexes: number[] = [];
-  //     for (let tokenIndex = 0; tokenIndex < parseInt(token.balance, 10); tokenIndex++) {
-  //       tokenIndexes.push(tokenIndex);
-  //     }
-  //     tokenIndexes.forEach(async tokenIndex => {
-  //       const hexTokenId = await CRC721Contract.tokenOfOwnerByIndex(address, tokenIndex);
-  //       nftRequests.push({
-  //         tokenId: ethers.utils.formatUnits(hexTokenId, 0),
-  //         contractAddress: token.contractAddress,
-  //       });
-  //     });
-  //   });
-  //   // console.log('nftRequests', nftRequests);
-
-  //   setTimeout(() => {
-  //     const nftTokensUri = nftRequests.map(async (request, idx) => {
-  //       const CRC721Contract = CRC721__factory.connect(request.contractAddress, provider);
-
-  //       const result: string = await CRC721Contract.tokenURI(request.tokenId);
-
-  //       console.log(`result #${idx}`, request.tokenId, result);
-
-  //       return result;
-  //     });
-
-  //     const nftTokenList: NftTokenData[] = [];
-
-  //     nftTokensUri.forEach(async uri => {
-  //       const tokenMetadata = await axios.get(await uri);
-  //       // const parsedata = NftUtils.extractTokenMetadata(tokenMetadata.data);
-  //       console.log('tokenMetadata', tokenMetadata);
-  //       console.log('tokenMetadata.data', tokenMetadata.data);
-  //       nftTokenList.push(tokenMetadata.data);
-  //     });
-
-  //     return nftTokenList;
-  //   }, 10000);
-  // }
-
-  public async fetchCRC712TokenTxs() {
+  public async fetchCRC721TokenTxs() {
     const currentSession = await this.storageService.retrieveCurrentSession();
     const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
     const croEvmAsset: UserAsset | undefined = getCronosEvmAsset(assets);
@@ -868,7 +795,6 @@ export class TransactionHistoryService {
             break;
           case UserAssetType.EVM:
             await this.fetchCurrentWalletCRC20Tokens(asset, currentSession);
-            // await this.fetchCurrentWalletCRC721Tokens(currentSession);
             break;
           default:
             throw TypeError('Not supported yet');
