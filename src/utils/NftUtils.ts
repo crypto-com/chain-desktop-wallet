@@ -87,6 +87,19 @@ export class NftUtils {
     return 'n.a.';
   };
 
+  public static supportedVideo = (mimeType: string | undefined) => {
+    switch (mimeType) {
+      case 'video/mp4':
+        // case 'video/webm':
+        // case 'video/ogg':
+        // case 'audio/ogg':
+        // case 'audio/mpeg':
+        return true;
+      default:
+        return false;
+    }
+  };
+
   public static processNftList = async (
     currentList: CommonNftModel[] | undefined,
     maxTotal: number = currentList?.length ?? 0,
@@ -116,27 +129,35 @@ export class NftUtils {
   public static groupAllNftList = async (lists: NftList[] | undefined, maxTotal: number = 0) => {
     const fullNftList: CommonNftModel[] = [];
 
-    await lists?.forEach(list => {
-      list.nfts.forEach(async nft => {
-        if (isCryptoOrgNftModel(nft)) {
-          const { model } = nft;
+    if (lists?.length === 0) {
+      return [];
+    }
 
-          const denomSchema = isJson(model.denomSchema) ? JSON.parse(model.denomSchema) : null;
-          const tokenData = isJson(model.tokenData)
-            ? await NftUtils.extractTokenMetadata(model.tokenData, model.denomId)
-            : null;
+    await Promise.all(
+      lists!.map(async list => {
+        await Promise.all(
+          list.nfts.map(async nft => {
+            if (isCryptoOrgNftModel(nft)) {
+              const { model } = nft;
 
-          fullNftList.push({
-            ...nft,
-            denomSchema,
-            tokenData,
-          });
-        }
-        if (isCronosNftModel(nft)) {
-          fullNftList.push(nft);
-        }
-      });
-    });
+              const denomSchema = isJson(model.denomSchema) ? JSON.parse(model.denomSchema) : null;
+              const tokenData = isJson(model.tokenData)
+                ? await NftUtils.extractTokenMetadata(model.tokenData, model.denomId)
+                : null;
+
+              fullNftList.push({
+                ...nft,
+                denomSchema,
+                tokenData,
+              });
+            }
+            if (isCronosNftModel(nft)) {
+              fullNftList.push(nft);
+            }
+          }),
+        );
+      }),
+    );
 
     return fullNftList.slice(0, maxTotal !== 0 ? maxTotal : fullNftList.length);
   };

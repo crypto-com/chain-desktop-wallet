@@ -102,6 +102,7 @@ import { useCronosEvmAsset, useCronosTendermintAsset } from '../../hooks/useCron
 import NFTTransactionsTab from './tabs/transactions';
 import ChainSelect from './components/ChainSelect';
 import { NftType } from '../../models/UserAsset';
+import NftPreview from './components/NftPreview';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -983,65 +984,6 @@ const NftPage = () => {
     AddressType.USER,
   );
 
-  const renderPreview = (_nft: CommonNftModel | undefined, showThumbnail: boolean = true) => {
-    if (_nft !== undefined) {
-      if (isCryptoOrgNftModel(_nft)) {
-        const { model, tokenData } = _nft;
-        if (
-          !showThumbnail &&
-          (supportedVideo(tokenData?.mimeType) || supportedVideo(tokenData?.animationMimeType))
-        ) {
-          return (
-            <ReactPlayer
-              url={videoUrl}
-              config={{
-                file: {
-                  attributes: {
-                    controlsList: 'nodownload',
-                  },
-                },
-              }}
-              controls
-              playing={isVideoPlaying}
-            />
-          );
-        }
-        return (
-          <img
-            alt={model.denomName}
-            src={tokenData?.image ? tokenData.image : nftThumbnail}
-            onError={e => {
-              (e.target as HTMLImageElement).src = nftThumbnail;
-            }}
-          />
-        );
-      }
-
-      if (isCronosNftModel(_nft)) {
-        const { model } = _nft;
-        return (
-          <img
-            alt={`${model.token_address}-${model.token_id}`}
-            src={model.image_url ? model.image_url : nftThumbnail}
-            onError={e => {
-              (e.target as HTMLImageElement).src = nftThumbnail;
-            }}
-          />
-        );
-      }
-    }
-
-    return (
-      <img
-        alt="default-nft-thumbnail"
-        src={nftThumbnail}
-        onError={e => {
-          (e.target as HTMLImageElement).src = nftThumbnail;
-        }}
-      />
-    );
-  };
-
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
     setIsNftTransferConfirmVisible(true);
@@ -1288,7 +1230,11 @@ const NftPage = () => {
                           style={{ width: 200 }}
                           cover={
                             <>
-                              {renderPreview(item)}
+                              <NftPreview
+                                nft={item}
+                                videoUrl={videoUrl}
+                                isVideoPlaying={isVideoPlaying}
+                              />
                               {supportedVideo(tokenData?.mimeType) ||
                               supportedVideo(tokenData?.animationMimeType) ? (
                                 <Icon component={IconPlayer} />
@@ -1333,7 +1279,13 @@ const NftPage = () => {
                       <List.Item>
                         <Card
                           style={{ width: 200 }}
-                          cover={<>{renderPreview(item)}</>}
+                          cover={
+                            <NftPreview
+                              nft={item}
+                              videoUrl={videoUrl}
+                              isVideoPlaying={isVideoPlaying}
+                            />
+                          }
                           hoverable
                           onClick={() => {
                             setNft(item);
@@ -1399,7 +1351,14 @@ const NftPage = () => {
               >
                 <Layout className="nft-detail">
                   <Content>
-                    <div className="nft-image">{renderPreview(nft, false)}</div>
+                    <div className="nft-image">
+                      <NftPreview
+                        nft={nft}
+                        showThumbnail={false}
+                        videoUrl={videoUrl}
+                        isVideoPlaying={isVideoPlaying}
+                      />
+                    </div>
                   </Content>
                   <Sider width="50%">
                     {isCryptoOrgNftModel(nft) && (
@@ -1722,7 +1681,13 @@ const NftPage = () => {
                       <div className="title">{t('nft.modal2.title')}</div>
                       <div className="description">{t('nft.modal2.description')}</div>
                       <div className="item">
-                        <div className="nft-image">{renderPreview(nft)}</div>
+                        <div className="nft-image">
+                          <NftPreview
+                            nft={nft}
+                            videoUrl={videoUrl}
+                            isVideoPlaying={isVideoPlaying}
+                          />
+                        </div>
                       </div>
                       <div className="item">
                         <div className="label">{t('nft.modal2.label1')}</div>
@@ -1772,7 +1737,13 @@ const NftPage = () => {
                       <div className="title">{t('nft.modal3.title')}</div>
                       <div className="description">{t('nft.modal3.description')}</div>
                       <div className="item">
-                        <div className="nft-image">{renderPreview(nft)}</div>
+                        <div className="nft-image">
+                          <NftPreview
+                            nft={nft}
+                            videoUrl={videoUrl}
+                            isVideoPlaying={isVideoPlaying}
+                          />
+                        </div>
                       </div>
                       <div className="item">
                         <div className="label">{t('nft.modal3.label1')}</div>
