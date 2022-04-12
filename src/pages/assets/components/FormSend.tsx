@@ -45,6 +45,8 @@ import { ledgerNotification } from '../../../components/LedgerNotification/Ledge
 import { AddressBookService } from '../../../service/AddressBookService';
 import { AddressBookContact } from '../../../models/AddressBook';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
+import GasStep from '../../../components/GasStep';
+import { useCROGasStep } from '../../../hooks/useCROGasStep';
 
 const layout = {};
 const tailLayout = {};
@@ -73,6 +75,7 @@ const FormSend: React.FC<FormSendProps> = props => {
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [availableBalance, setAvailableBalance] = useState('--');
 
+
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const didMountRef = useRef(false);
   const allMarketData = useRecoilValue(allMarketState);
@@ -84,6 +87,8 @@ const FormSend: React.FC<FormSendProps> = props => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { walletAsset, setWalletAsset, currentSession } = props;
+
+  const { gasStep, gasFee, gasLimit } = useCROGasStep(walletAsset)
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -175,6 +180,8 @@ const FormSend: React.FC<FormSendProps> = props => {
         memo,
         decryptedPhrase,
         walletType,
+        gasFee,
+        gasLimit: Number(gasLimit)
       });
 
       analyticsService.logTransactionEvent(
@@ -238,8 +245,7 @@ const FormSend: React.FC<FormSendProps> = props => {
   );
   const customMinValidator = TransactionUtils.minValidator(
     fromScientificNotation(currentMinAssetAmount),
-    `${t('send.formSend.amount.error2')} ${fromScientificNotation(currentMinAssetAmount)} ${
-      walletAsset?.symbol
+    `${t('send.formSend.amount.error2')} ${fromScientificNotation(currentMinAssetAmount)} ${walletAsset?.symbol
     }`,
   );
 
@@ -330,8 +336,8 @@ const FormSend: React.FC<FormSendProps> = props => {
             {availableBalance} {walletAsset?.symbol}{' '}
             {walletAsset && localFiatSymbol && assetMarketData
               ? `(${localFiatSymbol}${numeral(
-                  getAssetBalancePrice(walletAsset, assetMarketData),
-                ).format('0,0.00')})`
+                getAssetBalancePrice(walletAsset, assetMarketData),
+              ).format('0,0.00')})`
               : ''}
           </div>
         </div>
@@ -403,17 +409,17 @@ const FormSend: React.FC<FormSendProps> = props => {
                 {`${formValues?.amount} ${walletAsset?.symbol}`}{' '}
                 {walletAsset && localFiatSymbol && assetMarketData && assetMarketData.price
                   ? `(${localFiatSymbol}${numeral(
-                      getAssetAmountInFiat(formValues?.amount, assetMarketData),
-                    ).format('0,0.00')})`
+                    getAssetAmountInFiat(formValues?.amount, assetMarketData),
+                  ).format('0,0.00')})`
                   : ''}
               </div>
             </div>
             {walletAsset?.assetType === UserAssetType.TENDERMINT ? (
               <div className="item">
                 <div className="label">{t('send.modal1.label4')}</div>
-                <div>{`~${getNormalScaleAmount(getTransactionFee(walletAsset!), walletAsset!)} ${
-                  walletAsset?.symbol
-                }`}</div>
+                <GasStep asset={walletAsset} />
+                <div>{`~${getNormalScaleAmount(getTransactionFee(walletAsset!), walletAsset!)} ${walletAsset?.symbol
+                  }`}</div>
               </div>
             ) : (
               <></>
@@ -421,8 +427,8 @@ const FormSend: React.FC<FormSendProps> = props => {
             <div className="item">
               <div className="label">{t('send.modal1.label5')}</div>
               {formValues?.memo !== undefined &&
-              formValues?.memo !== null &&
-              formValues.memo !== '' ? (
+                formValues?.memo !== null &&
+                formValues.memo !== '' ? (
                 <div>{`${formValues?.memo}`}</div>
               ) : (
                 <div>--</div>
@@ -466,8 +472,8 @@ const FormSend: React.FC<FormSendProps> = props => {
         >
           <>
             {broadcastResult?.code !== undefined &&
-            broadcastResult?.code !== null &&
-            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+              broadcastResult?.code !== null &&
+              broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
               <div className="description">
                 {t('general.successModalPopup.timeout.description')}
               </div>

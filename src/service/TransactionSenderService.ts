@@ -276,6 +276,8 @@ export class TransactionSenderService {
           signedTxHex = await ledgerTransactionSigner.signTransfer(
             transfer,
             transferRequest.decryptedPhrase,
+            transferRequest.gasFee,
+            transferRequest.gasLimit
           );
         } else {
           signedTxHex = await transactionSigner.signTransfer(
@@ -337,6 +339,8 @@ export class TransactionSenderService {
       signedTxHex = await ledgerTransactionSigner.signDelegateTx(
         delegateTransaction,
         delegationRequest.decryptedPhrase,
+        delegationRequest.gasFee,
+        delegationRequest.gasLimit
       );
     } else {
       signedTxHex = await transactionSigner.signDelegateTx(
@@ -392,6 +396,8 @@ export class TransactionSenderService {
       signedTxHex = await ledgerTransactionSigner.signUndelegateTx(
         undelegateTransaction,
         undelegationRequest.decryptedPhrase,
+        undelegationRequest.gasFee,
+        undelegationRequest.gasLimit
       );
     } else {
       signedTxHex = await transactionSigner.signUndelegateTx(
@@ -448,6 +454,8 @@ export class TransactionSenderService {
       signedTxHex = await ledgerTransactionSigner.signRedelegateTx(
         redelegateTransactionUnsigned,
         redelegationRequest.decryptedPhrase,
+        redelegationRequest.gasFee,
+        redelegationRequest.gasLimit
       );
     } else {
       signedTxHex = await transactionSigner.signRedelegateTx(
@@ -491,6 +499,8 @@ export class TransactionSenderService {
       signedTxHex = await ledgerTransactionSigner.signVoteTransaction(
         voteTransactionUnsigned,
         voteRequest.decryptedPhrase,
+        voteRequest.gasFee,
+        voteRequest.gasLimit
       );
     } else {
       signedTxHex = await transactionSigner.signVoteTransaction(
@@ -535,6 +545,8 @@ export class TransactionSenderService {
       signedTxHex = await ledgerTransactionSigner.signNFTTransfer(
         nftTransferUnsigned,
         nftTransferRequest.decryptedPhrase,
+        nftTransferRequest.gasFee,
+        nftTransferRequest.gasLimit
       );
     } else {
       signedTxHex = await transactionSigner.signNFTTransfer(
@@ -582,6 +594,8 @@ export class TransactionSenderService {
       signedTxHex = await ledgerTransactionSigner.signWithdrawStakingRewardTx(
         withdrawStakingReward,
         rewardWithdrawRequest.decryptedPhrase,
+        rewardWithdrawRequest.gasFee,
+        rewardWithdrawRequest.gasLimit
       );
     } else {
       signedTxHex = await transactionSigner.signWithdrawStakingRewardTx(
@@ -653,6 +667,8 @@ export class TransactionSenderService {
       signedTxHex = await ledgerTransactionSigner.signNFTMint(
         nftMintUnsigned,
         nftMintRequest.decryptedPhrase,
+        nftMintRequest.gasFee,
+        nftMintRequest.gasLimit
       );
     } else {
       signedTxHex = await transactionSigner.signNFTMint(
@@ -701,6 +717,8 @@ export class TransactionSenderService {
       signedTxHex = await ledgerTransactionSigner.signNFTDenomIssue(
         nftDenomIssueUnsigned,
         nftDenomIssueRequest.decryptedPhrase,
+        nftDenomIssueRequest.gasFee,
+        nftDenomIssueRequest.gasLimit
       );
     } else {
       signedTxHex = await transactionSigner.signNFTDenomIssue(
