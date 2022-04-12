@@ -9,6 +9,8 @@ export interface TransferRequest {
   decryptedPhrase: string;
   asset: UserAsset;
   walletType: string; // normal, ledger
+  gasFee: string;
+  gasLimit: number;
 }
 
 export interface VoteRequest {
@@ -18,6 +20,8 @@ export interface VoteRequest {
   decryptedPhrase: string;
   asset: UserAsset;
   walletType: string; // normal, ledger
+  gasFee: string;
+  gasLimit: number;
 }
 
 export interface NFTTransferRequest {
@@ -30,6 +34,8 @@ export interface NFTTransferRequest {
   decryptedPhrase: string;
   asset: UserAsset;
   walletType: string; // normal, ledger
+  gasFee: string;
+  gasLimit: number;
 }
 
 export interface NFTMintRequest {
@@ -45,6 +51,8 @@ export interface NFTMintRequest {
   decryptedPhrase: string;
   asset: UserAsset;
   walletType: string; // normal, ledger
+  gasFee: string;
+  gasLimit: number;
 }
 
 export interface NFTDenomIssueRequest {
@@ -57,6 +65,8 @@ export interface NFTDenomIssueRequest {
   decryptedPhrase: string;
   asset: UserAsset;
   walletType: string; // normal, ledger
+  gasFee: string;
+  gasLimit: number;
 }
 
 export interface DelegationRequest {
@@ -66,9 +76,11 @@ export interface DelegationRequest {
   asset: UserAsset;
   decryptedPhrase: string;
   walletType: string; // normal, ledger
+  gasFee: string;
+  gasLimit: number;
 }
 
-export interface UndelegationRequest extends DelegationRequest {}
+export interface UndelegationRequest extends DelegationRequest { }
 export interface RedelegationRequest {
   validatorSourceAddress: string;
   validatorDestinationAddress: string;
@@ -77,12 +89,16 @@ export interface RedelegationRequest {
   asset: UserAsset;
   decryptedPhrase: string;
   walletType: string; // normal, ledger
+  gasFee: string;
+  gasLimit: number;
 }
 
 export interface WithdrawStakingRewardRequest {
   validatorAddress: string;
   decryptedPhrase: string;
   walletType: string; // normal, ledger
+  gasFee: string;
+  gasLimit: number;
 }
 
 //
@@ -97,4 +113,6 @@ export interface BridgeTransferRequest {
   amount: string;
   decryptedPhrase: string;
   walletType: string; // normal, ledger
+  gasFee: string;
+  gasLimit: number;
 }

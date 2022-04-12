@@ -281,6 +281,8 @@ export class TransactionSenderService {
           signedTxHex = await transactionSigner.signTransfer(
             transfer,
             transferRequest.decryptedPhrase,
+            transferRequest.gasFee,
+            transferRequest.gasLimit
           );
         }
 
@@ -340,6 +342,8 @@ export class TransactionSenderService {
       signedTxHex = await transactionSigner.signDelegateTx(
         delegateTransaction,
         delegationRequest.decryptedPhrase,
+        delegationRequest.gasFee,
+        delegationRequest.gasLimit
       );
     }
 
@@ -393,6 +397,8 @@ export class TransactionSenderService {
       signedTxHex = await transactionSigner.signUndelegateTx(
         undelegateTransaction,
         undelegationRequest.decryptedPhrase,
+        undelegationRequest.gasFee,
+        undelegationRequest.gasLimit
       );
     }
 
@@ -447,6 +453,8 @@ export class TransactionSenderService {
       signedTxHex = await transactionSigner.signRedelegateTx(
         redelegateTransactionUnsigned,
         redelegationRequest.decryptedPhrase,
+        redelegationRequest.gasFee,
+        redelegationRequest.gasLimit
       );
     }
 
@@ -488,6 +496,8 @@ export class TransactionSenderService {
       signedTxHex = await transactionSigner.signVoteTransaction(
         voteTransactionUnsigned,
         voteRequest.decryptedPhrase,
+        voteRequest.gasFee,
+        voteRequest.gasLimit
       );
     }
 
@@ -530,6 +540,8 @@ export class TransactionSenderService {
       signedTxHex = await transactionSigner.signNFTTransfer(
         nftTransferUnsigned,
         nftTransferRequest.decryptedPhrase,
+        nftTransferRequest.gasFee,
+        nftTransferRequest.gasLimit
       );
     }
 
@@ -575,6 +587,8 @@ export class TransactionSenderService {
       signedTxHex = await transactionSigner.signWithdrawStakingRewardTx(
         withdrawStakingReward,
         rewardWithdrawRequest.decryptedPhrase,
+        rewardWithdrawRequest.gasFee,
+        rewardWithdrawRequest.gasLimit
       );
     }
 
@@ -644,6 +658,8 @@ export class TransactionSenderService {
       signedTxHex = await transactionSigner.signNFTMint(
         nftMintUnsigned,
         nftMintRequest.decryptedPhrase,
+        nftMintRequest.gasFee,
+        nftMintRequest.gasLimit
       );
     }
 
@@ -690,6 +706,8 @@ export class TransactionSenderService {
       signedTxHex = await transactionSigner.signNFTDenomIssue(
         nftDenomIssueUnsigned,
         nftDenomIssueRequest.decryptedPhrase,
+        nftDenomIssueRequest.gasFee,
+        nftDenomIssueRequest.gasLimit
       );
     }
 
