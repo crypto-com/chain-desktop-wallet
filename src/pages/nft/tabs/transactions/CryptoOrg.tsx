@@ -176,9 +176,26 @@ const CryptoOrgNFTTransactionList = () => {
     },
     {
       title: t('home.transactions.table3.tokenId'),
-      dataIndex: 'tokenId',
+      // dataIndex: 'tokenId',
       key: 'tokenId',
-      render: text => <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>,
+      render: record => {
+        const { tokenId, denomId } = record;
+        return tokenId ? (
+          <a
+            data-original={tokenId}
+            target="_blank"
+            rel="noreferrer"
+            href={`${renderExplorerUrl(
+              currentSession.wallet.config,
+              'nft',
+            )}/nfts/tokens/${denomId}/${tokenId}`}
+          >
+            {ellipsis(tokenId, 12)}
+          </a>
+        ) : (
+          <div data-original={tokenId}>n.a.</div>
+        );
+      },
     },
     {
       title: t('home.transactions.table3.recipientAddress'),

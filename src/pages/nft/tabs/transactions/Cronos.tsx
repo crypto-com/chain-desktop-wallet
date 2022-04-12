@@ -3,10 +3,8 @@ import { ColumnsType } from 'antd/lib/table';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useRecoilValue } from 'recoil';
 import { useCronosEvmAsset } from '../../../../hooks/useCronosEvmAsset';
 import { renderExplorerUrl } from '../../../../models/Explorer';
-import { sessionState } from '../../../../recoil/atom';
 import { nftTxsResponseTxModel } from '../../../../service/rpc/indexing/nft/cronos/CronosNftIndexingModels';
 import { walletService } from '../../../../service/WalletService';
 import { ellipsis, middleEllipsis } from '../../../../utils/utils';
@@ -14,7 +12,6 @@ import { ellipsis, middleEllipsis } from '../../../../utils/utils';
 const CronosNFTTransactionList = () => {
   const [nftTransfers, setNftTransfers] = useState<nftTxsResponseTxModel[]>([]);
   const [t] = useTranslation();
-  const currentSession = useRecoilValue(sessionState);
   const cronosAsset = useCronosEvmAsset();
 
   useEffect(() => {
@@ -44,8 +41,27 @@ const CronosNFTTransactionList = () => {
       },
     },
     {
-      title: t('Token Name'),
-      key: 'tokenId',
+      title: t('home.transactions.table3.tokenContractAddress'),
+      key: 'tokenContractAddress',
+      render: (tx: nftTxsResponseTxModel) => {
+        const text = tx.token_address;
+        return text ? (
+          <a
+            data-original={text}
+            target="_blank"
+            rel="noreferrer"
+            href={`${renderExplorerUrl(cronosAsset?.config, 'address')}/${text}`}
+          >
+            {middleEllipsis(text, 6)}
+          </a>
+        ) : (
+          <div data-original={text}>n.a.</div>
+        );
+      },
+    },
+    {
+      title: t('home.transactions.table3.tokenName'),
+      key: 'tokenName',
       render: (tx: nftTxsResponseTxModel) => {
         const text = tx.token_name;
         return <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>;
@@ -69,7 +85,7 @@ const CronosNFTTransactionList = () => {
             data-original={text}
             target="_blank"
             rel="noreferrer"
-            href={`${renderExplorerUrl(currentSession.wallet.config, 'address')}/${text}`}
+            href={`${renderExplorerUrl(cronosAsset?.config, 'address')}/${text}`}
           >
             {middleEllipsis(text, 12)}
           </a>

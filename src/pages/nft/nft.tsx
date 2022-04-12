@@ -1437,7 +1437,19 @@ const NftPage = () => {
                           </div>
                           <div className="table-row">
                             <div>{t('nft.detailModal.label3')}</div>
-                            <div>{nft?.model.tokenId}</div>
+                            <div>
+                              <a
+                                data-original={nft?.model.tokenId}
+                                target="_blank"
+                                rel="noreferrer"
+                                href={`${renderExplorerUrl(
+                                  currentSession.wallet.config,
+                                  'nft',
+                                )}/nfts/tokens/${nft?.model.denomId}/${nft?.model.tokenId}`}
+                              >
+                                {nft?.model.tokenId}
+                              </a>
+                            </div>
                           </div>
                           {nft?.tokenData?.mimeType ? (
                             <div className="table-row">
