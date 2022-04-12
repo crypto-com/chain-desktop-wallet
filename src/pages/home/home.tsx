@@ -286,42 +286,6 @@ const HomePage = () => {
         currentSession.wallet.identifier,
       );
 
-      // Push Testnet deployed NFT for testing
-      // allNFTs.push({
-      //   nfts: [
-      //     {
-      //       model: {
-      //         token_address: '0xd55FF2ac117FB52C424036006e3597A5CE411eAa',
-      //         token_id: '1', // 7191
-      //         token_uri: 'https://ipfs.io/QmPczVESmbJUtsoinVMh135A4J5Zy2yD2z1JzDXjngGZcT/i0.json', // "https://arweave.net/z3ieHRy4RjFwWGExaRS3BRw0f3HrWAHnUQqhPmPhOII/7191.json",
-      //         image_url: 'https://ipfs.io/QmVQCBtZTBPpVw5ncwUERcPrqbxEW1CeADSXCN7GJxNFTo/i0.png', // "https://arweave.net/KOnXn6F7zRoLrJYu-SIrY9wJZATcQG2fYnXwG5xMBQA/7191.png",
-      //         owner: '0x725745D62d5E22636354a842e53340a180137E86', // "0x85e0280712aabdd0884732141b048b3b6fde405b",
-      //         approval: '0x0000000000000000000000000000000000000000', // "0x0000000000000000000000000000000000000000",
-      //         type: 'erc721', // "erc721",
-      //         name: 'TestNFT', // "CronosChimp",
-      //         symbol: 'TEST', // "CHIMP",
-      //         balance: '', // "",
-      //         total_score: '0',
-      //         rank: 0,
-      //         collection: {
-      //           name: 'CronosChimp', // "CronosChimp",
-      //           description: '', // "",
-      //           image_url: 'https://app.ebisusbay.com/collection/cronos-chimp-club', // "https://app.ebisusbay.com/collection/cronos-chimp-club",
-      //           slug: '0x562f021423d75a1636db5be1c4d99bc005ccebfe', // "0x562f021423d75a1636db5be1c4d99bc005ccebfe"
-      //         },
-      //         uri_detail: {
-      //           name: 'Chimp #7191', // "Chimp #7191",
-      //           image: 'https://ipfs.io/QmVQCBtZTBPpVw5ncwUERcPrqbxEW1CeADSXCN7GJxNFTo/i0.png', // "https://arweave.net/KOnXn6F7zRoLrJYu-SIrY9wJZATcQG2fYnXwG5xMBQA/7191.png"
-      //         },
-      //       },
-      //       type: NftType.CRC_721_TOKEN,
-      //       walletId: '1b278ae50db2c2f9',
-      //     },
-      //   ],
-      //   type: NftType.CRC_721_TOKEN,
-      //   walletId: '1b278ae50db2c2f9',
-      // });
-
       const allNftList = await NftUtils.groupAllNftList(allNFTs, maxNftPreview);
       setProcessedNftList(allNftList);
 
