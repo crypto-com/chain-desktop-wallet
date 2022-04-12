@@ -14,7 +14,8 @@ export class CronosNftIndexingAPI {
   }
 
   public static init() {
-    const defaultIndexingUrl = 'https://asta-ncw-blockchain-api.3ona.co/quantra/v1/nft';
+    const defaultIndexingUrl =
+      'https://cronos.org/ncw-quandra-api-middleware-server/quantra/v1/nft';
     const axiosClient = axios.create({
       baseURL: defaultIndexingUrl,
     });

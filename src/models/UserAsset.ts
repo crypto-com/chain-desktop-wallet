@@ -88,12 +88,6 @@ export enum UserAssetType {
   ERC_20_TOKEN = 'ERC_20_TOKEN',
 }
 
-export enum NftType {
-  CRYPTO_ORG = 'CRYPTO_ORG',
-
-  CRC_721_TOKEN = 'CRC_721_TOKEN',
-}
-
 export enum AssetCreationType {
   // Assets that are created statically on wallets creation
   STATIC = 'STATIC',

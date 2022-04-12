@@ -12,12 +12,11 @@ import {
   AssetMarketPrice,
   getAssetPriceId,
   getAssetPriceIdFrom,
-  NftType,
   UserAsset,
 } from '../models/UserAsset';
+import { NftList, NftType } from '../models/Nft';
 import {
   NftAccountTransactionList,
-  NftList,
   NftQueryParams,
   NftTransactionHistory,
   ProposalList,

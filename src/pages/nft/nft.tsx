@@ -62,17 +62,16 @@ import { getUINormalScaleAmount } from '../../utils/NumberUtils';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import { NftUtils } from '../../utils/NftUtils';
 
+import { BroadCastResult } from '../../models/Transaction';
+import { renderExplorerUrl } from '../../models/Explorer';
 import {
-  BroadCastResult,
+  NftType,
   CryptoOrgNftModel,
-  // eslint-disable-next-line
-  NftList,
   CommonNftModel,
   isCryptoOrgNftModel,
   isCronosNftModel,
   CronosCRC721NftModel,
-} from '../../models/Transaction';
-import { renderExplorerUrl } from '../../models/Explorer';
+} from '../../models/Nft';
 
 import { walletService } from '../../service/WalletService';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
@@ -88,21 +87,18 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import ReceiveDetail from '../assets/components/ReceiveDetail';
+import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
+import ChainSelect from './components/ChainSelect';
+import NftPreview from './components/NftPreview';
+import NFTTransactionsTab from './tabs/transactions';
 
 import IconTick from '../../svg/IconTick';
 import IconPlayer from '../../svg/IconPlayer';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
-import ReceiveDetail from '../assets/components/ReceiveDetail';
+
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
-import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 import { useCronosEvmAsset, useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
-// import { ChainConfig } from '../dapp/browser/config';
-// import { ethers } from 'ethers';
-// import { CRC721__factory } from '../../contracts';
-import NFTTransactionsTab from './tabs/transactions';
-import ChainSelect from './components/ChainSelect';
-import { NftType } from '../../models/UserAsset';
-import NftPreview from './components/NftPreview';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;

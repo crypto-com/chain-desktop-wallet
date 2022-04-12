@@ -32,13 +32,8 @@ import {
   AssetMarketPrice,
 } from '../../models/UserAsset';
 
-import {
-  CommonNftModel,
-  isCronosNftModel,
-  isCryptoOrgNftModel,
-  NftList,
-  RewardsBalances,
-} from '../../models/Transaction';
+import { RewardsBalances } from '../../models/Transaction';
+import { CommonNftModel, isCronosNftModel, isCryptoOrgNftModel, NftList } from '../../models/Nft';
 
 import { walletService } from '../../service/WalletService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';

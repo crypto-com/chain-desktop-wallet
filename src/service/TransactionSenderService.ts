@@ -14,8 +14,9 @@ import {
   EVMContractCallUnsigned,
 } from './signers/TransactionSupported';
 import { BroadCastResult } from '../models/Transaction';
+import { UserAsset, UserAssetType } from '../models/UserAsset';
+import { NftType } from '../models/Nft';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
-import { NftType, UserAsset, UserAssetType } from '../models/UserAsset';
 import { DEFAULT_CLIENT_MEMO } from '../config/StaticConfig';
 import {
   TransferRequest,

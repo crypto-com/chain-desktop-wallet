@@ -7,7 +7,7 @@ import {
   isCronosNftModel,
   isCryptoOrgNftModel,
   NftList,
-} from '../models/Transaction';
+} from '../models/Nft';
 import { croNftApi } from '../service/rpc/NftApi';
 import { ExternalNftMetadataResponse } from '../service/rpc/models/nftApi.models';
 

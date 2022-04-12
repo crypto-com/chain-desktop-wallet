@@ -23,8 +23,6 @@ import {
   BroadCastResult,
   CommonTransactionRecord,
   NftAccountTransactionData,
-  NftDenomModel,
-  NftList,
   ProposalModel,
   RewardsBalances,
   RewardTransactionData,
@@ -37,6 +35,7 @@ import {
   UnbondingDelegationList,
   ValidatorModel,
 } from '../models/Transaction';
+import { NftDenomModel, NftList } from '../models/Nft';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { LEDGER_WALLET_TYPE } from './LedgerService';
 import {

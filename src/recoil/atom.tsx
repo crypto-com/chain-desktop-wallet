@@ -3,7 +3,8 @@ import { DefaultWalletConfigs } from '../config/StaticConfig';
 import { Session } from '../models/Session';
 import { Wallet } from '../models/Wallet';
 import { UserAsset, AssetMarketPrice } from '../models/UserAsset';
-import { ValidatorModel, NftList } from '../models/Transaction';
+import { ValidatorModel } from '../models/Transaction';
+import { NftList } from '../models/Nft';
 import { NORMAL_WALLET_TYPE } from '../service/LedgerService';
 
 const wallet = new Wallet(

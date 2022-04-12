@@ -1,14 +1,10 @@
 import { Proposal, ValidatorPubKey } from '../service/rpc/NodeRpcModels';
 import {
   NftAccountTransactionResponse,
-  CryptoOrgNftResponse,
   NftTransactionResponse,
-  NftDenomData,
 } from '../service/rpc/ChainIndexingModels';
-import { Attribute } from '../service/rpc/models/nftApi.models';
-import { NftType, UserAssetType } from './UserAsset';
+import { UserAssetType } from './UserAsset';
 import { BridgeTransaction } from '../service/bridge/contracts/BridgeModels';
-import { nftAssetsResponseAssetModel } from '../service/rpc/indexing/nft/cronos/CronosNftIndexingModels';
 
 export enum TransactionStatus {
   SUCCESS = 'SUCCESS',
@@ -198,12 +194,6 @@ export interface TransferTransactionList {
   assetId?: string;
 }
 
-export interface NftList {
-  nfts: Array<CommonNftModel>;
-  type: NftType;
-  walletId: string;
-}
-
 export interface NftQueryParams {
   tokenId: string;
   denomId: string;
@@ -259,77 +249,7 @@ export interface ValidatorModel {
 
 export interface ProposalModel extends Proposal {}
 
-export interface CryptoOrgNftTokenData {
-  name: string;
-  drop: string;
-  description: string;
-  image?: string;
-  mimeType?: string;
-  animation_url?: string;
-  animationUrl?: string;
-  animationMimeType?: string;
-  attributes?: Attribute[];
-  // external_url?: string;
-  // fee_recipient?: string;
-  // seller_fee_basis_points?: number;
-}
-
-export interface CryptoOrgNftModelData extends CryptoOrgNftResponse {
-  isMintedByCDC: boolean;
-  marketplaceLink: string;
-}
-
-export interface CronosCRC721NftModelData extends nftAssetsResponseAssetModel {}
-
-export interface BaseNftModel {
-  walletId: string;
-  // nftId: string;
-  type: NftType;
-}
-
-export type CommonNftModel = CryptoOrgNftModel | CronosCRC721NftModel;
-
-export interface CryptoOrgNftModel extends BaseNftModel {
-  type: NftType.CRYPTO_ORG;
-  model: CryptoOrgNftModelData;
-  tokenData?: CryptoOrgNftTokenData;
-  denomSchema?: any;
-}
-
-export interface CronosCRC721NftModel extends BaseNftModel {
-  type: NftType.CRC_721_TOKEN;
-  model: CronosCRC721NftModelData;
-}
-
-export function isCryptoOrgNftModel(
-  checkObj: CommonNftModel | undefined,
-): checkObj is CryptoOrgNftModel {
-  const optionalUser = checkObj as CryptoOrgNftModel;
-  // need to be sufficient to identify your case
-  return isObject(optionalUser) && optionalUser.type === NftType.CRYPTO_ORG;
-}
-
-export function isCronosNftModel(
-  checkObj: CommonNftModel | undefined,
-): checkObj is CronosCRC721NftModel {
-  const optionalUser = checkObj as CronosCRC721NftModel;
-  // need to be sufficient to identify your case
-  return isObject(optionalUser) && optionalUser.type === NftType.CRC_721_TOKEN;
-}
-
-function isObject(obj: any) {
-  return obj !== null && typeof obj === 'object';
-}
-
-export interface NftDenomModel extends NftDenomData {}
-
-// export interface NftProcessedModel extends Omit<CryptoOrgNftModel, 'tokenData'> {
-//   tokenData: CryptoOrgNftTokenData;
-// }
-
 export interface NftTransferModel extends NftTransactionResponse {}
-
-// export interface NFTAccountTransactionModel extends NFTAccountTransactionResponse {}
 
 export interface NftAccountTransactionList {
   transactions: Array<NftAccountTransactionData>;

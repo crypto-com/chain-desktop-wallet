@@ -28,8 +28,8 @@ import {
   StakingTransactionRecord,
   RewardTransactionRecord,
   CommonTransactionRecord,
-  CryptoOrgNftModelData,
 } from '../../models/Transaction';
+import { CryptoOrgNftModelData } from '../../models/Nft';
 import { DefaultWalletConfigs, SECONDS_OF_YEAR } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';

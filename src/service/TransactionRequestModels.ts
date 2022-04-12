@@ -1,5 +1,6 @@
-import { NftType, UserAsset } from '../models/UserAsset';
+import { UserAsset } from '../models/UserAsset';
 import { VoteOption } from '../models/Transaction';
+import { NftType } from '../models/Nft';
 import { BridgeTransferDirection } from './bridge/BridgeConfig';
 
 export interface TransferRequest {

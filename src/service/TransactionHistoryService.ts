@@ -8,15 +8,18 @@ import {
   SECONDS_OF_YEAR,
   VALIDATOR_UPTIME_THRESHOLD,
 } from '../config/StaticConfig';
-import { NftType, UserAsset, UserAssetType } from '../models/UserAsset';
-import { CronosClient } from './cronos/CronosClient';
+import { UserAsset, UserAssetType } from '../models/UserAsset';
 import {
-  CommonTransactionRecord,
+  NftType,
   CronosCRC721NftModelData,
   CronosCRC721NftModel,
   CryptoOrgNftModel,
+  CryptoOrgNftModelData,
+} from '../models/Nft';
+import { CronosClient } from './cronos/CronosClient';
+import {
+  CommonTransactionRecord,
   NftQueryParams,
-  // NftTokenData,
   NftTransferModel,
   ProposalModel,
   ProposalStatuses,
@@ -28,7 +31,6 @@ import {
   TransferTransactionRecord,
   UnbondingDelegationList,
   ValidatorModel,
-  CryptoOrgNftModelData,
 } from '../models/Transaction';
 import { Session } from '../models/Session';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
@@ -36,9 +38,6 @@ import { croMarketPriceApi } from './rpc/MarketApi';
 import { CronosNftIndexingAPI } from './rpc/indexing/nft/cronos/CronosNftIndexingAPI';
 import { checkIfTestnet, getCronosEvmAsset, isCRC20AssetWhitelisted } from '../utils/utils';
 import { SupportedCRCTokenStandard } from './rpc/interface/cronos.chainIndex';
-// import { ChainConfig } from '../pages/dapp/browser/config';
-// import { CRC721__factory } from '../contracts';
-// import { NftUtils } from '../utils/NftUtils';
 
 export class TransactionHistoryService {
   private storageService: StorageService;

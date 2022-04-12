@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactPlayer from 'react-player';
-import { CommonNftModel, isCronosNftModel, isCryptoOrgNftModel } from '../../../models/Transaction';
+import { CommonNftModel, isCronosNftModel, isCryptoOrgNftModel } from '../../../models/Nft';
 import { NftUtils } from '../../../utils/NftUtils';
 import nftThumbnail from '../../../assets/nft-thumbnail.png';
 
