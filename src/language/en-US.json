@@ -290,6 +290,8 @@
   "home.transactions.table3.messageType": "Type",
   "home.transactions.table3.denomId": "Denom ID",
   "home.transactions.table3.tokenId": "Token ID",
+  "home.transactions.table3.tokenName": "Name",
+  "home.transactions.table3.tokenContractAddress": "Contract Address",
   "home.transactions.table3.recipientAddress": "Recipient",
   "home.transactions.table3.time": "Time",
   "home.notification.walletInfo.message": "Wallet Info",

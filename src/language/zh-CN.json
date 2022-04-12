@@ -290,6 +290,8 @@
   "home.transactions.table3.messageType": "类别",
   "home.transactions.table3.denomId": "系列 ID",
   "home.transactions.table3.tokenId": "代币ID",
+  "home.transactions.table3.tokenName": "名称",
+  "home.transactions.table3.tokenContractAddress": "合约地址",
   "home.transactions.table3.recipientAddress": "收款人",
   "home.transactions.table3.time": "时间",
   "home.notification.walletInfo.message": "钱包资料",

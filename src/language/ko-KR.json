@@ -290,6 +290,8 @@
   "home.transactions.table3.messageType": "종류",
   "home.transactions.table3.denomId": "디놈 ID",
   "home.transactions.table3.tokenId": "토큰 ID",
+  "home.transactions.table3.tokenName": "이름",
+  "home.transactions.table3.tokenContractAddress": "콘트랙 주소",
   "home.transactions.table3.recipientAddress": "수신인",
   "home.transactions.table3.time": "시간",
   "home.notification.walletInfo.message": "지갑 정보",
