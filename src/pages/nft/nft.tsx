@@ -1712,21 +1712,31 @@ const NftPage = () => {
                           <Content>{t('nft.modal2.notice2')}</Content>
                         </Layout>
                       </div>
-                      <div className="item">
-                        <div className="label">{t('nft.modal2.label2')}</div>
-                        <div>{`${formValues.denomId}`}</div>
-                      </div>
+                      {formValues.nftType === NftType.CRYPTO_ORG && (
+                        <div className="item">
+                          <div className="label">{t('nft.modal2.label2')}</div>
+                          <div>{`${formValues.denomId}`}</div>
+                        </div>
+                      )}
+                      {formValues.nftType === NftType.CRC_721_TOKEN && (
+                        <div className="item">
+                          <div className="label">{t('nft.modal2.label5')}</div>
+                          <div>{`${formValues.tokenContractAddress}`}</div>
+                        </div>
+                      )}
                       <div className="item">
                         <div className="label">{t('nft.modal2.label3')}</div>
                         <div>{`${formValues.tokenId}`}</div>
                       </div>
-                      <div className="item">
-                        <div className="label">{t('nft.modal2.label4')}</div>
-                        <div>
-                          {getUINormalScaleAmount(networkFee, walletAsset.decimals)}{' '}
-                          {walletAsset.symbol}
+                      {formValues.nftType === NftType.CRYPTO_ORG && (
+                        <div className="item">
+                          <div className="label">{t('nft.modal2.label4')}</div>
+                          <div>
+                            {getUINormalScaleAmount(networkFee, walletAsset.decimals)}{' '}
+                            {walletAsset.symbol}
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </>
                   ) : (
                     <>

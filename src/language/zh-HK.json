@@ -606,6 +606,7 @@
   "nft.modal2.label2": "系列 ID",
   "nft.modal2.label3": "代幣 ID",
   "nft.modal2.label4": "交易費用",
+  "nft.modal2.label5": "合約地址",
   "nft.modal2.notice1": "這為 {{chainName}} 鏈上的 NFT，轉發此 NFT 到不支援 {{chainName}} 代幣標準的地址將會造成你的 NFT 永久損失。",
   "nft.modal2.notice2": "將通過 Desktop Wallet 鑄造的 NFT 轉發到 Crypto.com/NFT 可能造成你的 NFT 永久損失。",
   "nft.modal2.button1": "確定轉發",

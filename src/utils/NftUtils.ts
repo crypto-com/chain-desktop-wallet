@@ -173,8 +173,6 @@ export class NftUtils {
       rgba(${byteAddress[10]}, ${byteAddress[11]}, ${byteAddress[12]}, 1)
     )`;
 
-    console.log(gradient);
-
     return gradient;
   };
 }
