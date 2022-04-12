@@ -1251,8 +1251,9 @@ const NftPage = () => {
                               <>
                                 <Avatar
                                   style={{
-                                    background:
-                                      'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                    background: NftUtils.generateLinearGradientByAddress(
+                                      model.tokenMinter,
+                                    ),
                                     verticalAlign: 'middle',
                                   }}
                                 />
@@ -1293,8 +1294,9 @@ const NftPage = () => {
                               <>
                                 <Avatar
                                   style={{
-                                    background:
-                                      'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                    background: NftUtils.generateLinearGradientByAddress(
+                                      model.token_address,
+                                    ),
                                     verticalAlign: 'middle',
                                   }}
                                 />
@@ -1372,8 +1374,9 @@ const NftPage = () => {
                               <>
                                 <Avatar
                                   style={{
-                                    background:
-                                      'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                    background: NftUtils.generateLinearGradientByAddress(
+                                      nft.model.tokenMinter,
+                                    ),
                                     verticalAlign: 'middle',
                                   }}
                                 />
@@ -1504,8 +1507,9 @@ const NftPage = () => {
                               <>
                                 <Avatar
                                   style={{
-                                    background:
-                                      'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                    background: NftUtils.generateLinearGradientByAddress(
+                                      nft.model.token_address,
+                                    ),
                                     verticalAlign: 'middle',
                                   }}
                                 />

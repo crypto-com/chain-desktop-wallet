@@ -1,5 +1,5 @@
 import { Promise } from 'bluebird';
-
+import Web3 from 'web3';
 import { ellipsis, isJson } from './utils';
 import {
   CommonNftModel,
@@ -160,5 +160,21 @@ export class NftUtils {
     );
 
     return fullNftList.slice(0, maxTotal !== 0 ? maxTotal : fullNftList.length);
+  };
+
+  public static generateLinearGradientByAddress = (address: string) => {
+    const hexAddress = Web3.utils.asciiToHex(address);
+    const byteAddress = Web3.utils.hexToBytes(hexAddress).map(b => b * 2);
+
+    const gradient = `linear-gradient(${byteAddress[0]}deg,
+      rgba(${byteAddress[1]}, ${byteAddress[2]}, ${byteAddress[3]}, 1),  
+      rgba(${byteAddress[4]}, ${byteAddress[5]}, ${byteAddress[6]}, 1),  
+      rgba(${byteAddress[7]}, ${byteAddress[2]}, ${byteAddress[9]}, 1),
+      rgba(${byteAddress[10]}, ${byteAddress[11]}, ${byteAddress[12]}, 1)
+    )`;
+
+    console.log(gradient);
+
+    return gradient;
   };
 }
