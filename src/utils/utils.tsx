@@ -194,11 +194,15 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
   }
 }
 
-export function getAssetTypeName(assetType: UserAssetType | undefined) {
+export function getAssetTypeName(assetType: UserAssetType | undefined, assetSymbol?: string) {
   switch (assetType) {
     case UserAssetType.TENDERMINT:
-    case UserAssetType.EVM:
+    case UserAssetType.EVM: {
+      if (assetSymbol && assetSymbol === 'ETH') {
+        return 'Ethereum';
+      }
       return 'Cronos';
+    }
     case UserAssetType.CRC_20_TOKEN:
       return 'CRC20';
     case UserAssetType.ERC_20_TOKEN:
