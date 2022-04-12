@@ -570,9 +570,16 @@ export class TransactionSenderService {
             tokenId,
             sender,
             recipient,
-            // nonce: prepareTxInfo.nonce,
-            // gasPrice: ethers.utils.hexValue(BigInt(prepareTxInfo.loadedGasPrice)),
-            // gasLimit: ethers.utils.hexValue(50_000),
+          },
+        );
+
+        const estimatedGasLimit = await evmTransactionSigner.getNFTSafeTransferFromEstimatedGas(
+          asset,
+          tokenContractAddress,
+          {
+            tokenId,
+            sender,
+            recipient,
           },
         );
 
@@ -583,7 +590,7 @@ export class TransactionSenderService {
         };
 
         const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
-          asset!,
+          asset,
           prepareTXConfig,
         );
 
@@ -593,7 +600,7 @@ export class TransactionSenderService {
           data: encodedABITokenTransferData,
           nonce: prepareTxInfo.nonce,
           gasPrice: ethers.utils.hexValue(BigInt(prepareTxInfo.loadedGasPrice)),
-          gasLimit: ethers.utils.hexValue(prepareTxInfo.gasLimit),
+          gasLimit: ethers.utils.hexValue(estimatedGasLimit),
         };
 
         try {

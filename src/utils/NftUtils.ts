@@ -129,12 +129,12 @@ export class NftUtils {
   public static groupAllNftList = async (lists: NftList[] | undefined, maxTotal: number = 0) => {
     const fullNftList: CommonNftModel[] = [];
 
-    if (lists?.length === 0) {
+    if (!lists || lists?.length === 0) {
       return [];
     }
 
     await Promise.all(
-      lists!.map(async list => {
+      lists.map(async list => {
         await Promise.all(
           list.nfts.map(async nft => {
             if (isCryptoOrgNftModel(nft)) {

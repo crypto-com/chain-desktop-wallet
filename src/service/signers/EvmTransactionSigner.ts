@@ -226,6 +226,23 @@ class EvmTransactionSigner implements ITransactionSigner {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  public getNFTSafeTransferFromEstimatedGas(
+    asset: UserAsset,
+    tokenContractAddress: string,
+    transaction: EVMNFTTransferUnsigned,
+  ) {
+    if (!asset.config?.nodeUrl) {
+      throw new TypeError('Missing config Node URL');
+    }
+    const web3 = new Web3(asset.config.nodeUrl);
+    const contractABI = CRC721TokenContractABI.abi as AbiItem[];
+    const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
+    return contract.methods
+      .safeTransferFrom(transaction.sender, transaction.recipient, transaction.tokenId)
+      .estimateGas();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   public async signBridgeTransfer(
     transaction: BridgeTransactionUnsigned,
     phrase: string,
