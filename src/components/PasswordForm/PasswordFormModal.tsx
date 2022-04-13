@@ -202,7 +202,7 @@ const PasswordFormModal: React.FC<PasswordFormModalProps> = props => {
 
 const usePasswordModal = () => {
 
-  const [m, setM] = useState({
+  const [modalRef, setModalRef] = useState({
     destroy: () => { },
   })
 
@@ -223,7 +223,7 @@ const usePasswordModal = () => {
     if (isShowing) {
       return
     }
-    const mm = Modal.info({
+    const modal = Modal.info({
       className: 'password-form-modal',
       visible: isShowing,
       icon: null,
@@ -231,7 +231,7 @@ const usePasswordModal = () => {
       width: 520,
       title: t('general.passwordFormModal.title'),
       onCancel: () => {
-        mm.destroy()
+        modal.destroy()
         setIsShowing(false)
         props.onCancel?.();
       },
@@ -244,7 +244,7 @@ const usePasswordModal = () => {
           props.onSuccess(password);
           setPassphrase(password);
           setIsShowing(false)
-          mm.destroy()
+          modal.destroy()
         }}
         successText={t('general.passwordFormModal.success')}
         successButtonText={t('general.continue')}
@@ -259,12 +259,12 @@ const usePasswordModal = () => {
       />,
     })
     setIsShowing(true)
-    setM(mm)
+    setModalRef(modal)
   }
 
   function dismiss() {
     setIsShowing(false)
-    m.destroy()
+    modalRef.destroy()
   }
 
   return {
