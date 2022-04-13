@@ -469,6 +469,38 @@ const unListedProjects: CronosProject[] = [
     link: 'https://lootpad.io/',
     twitter: '',
   },
+  {
+    name: 'METF Finance',
+    category: ['NFT'],
+    logo: 'metf-finance.png',
+    description: '',
+    link: 'https://metf.finance/#/dashboard',
+    twitter: '',
+  },
+  {
+    name: 'BankSwap',
+    category: ['DEX'],
+    logo: 'bankswap.png',
+    description: '',
+    link: 'https://bankswap.crobank.net/swap',
+    twitter: '',
+  },
+  {
+    name: 'CronosBay',
+    category: ['NFT'],
+    link: 'https://www.cronosbay.com/',
+    logo: 'cronosbay.png',
+    description: '',
+    twitter: ''
+  },
+  {
+    name: 'Cougar Exchange',
+    category: ['DEX'],
+    link: 'https://cgx.finance/',
+    logo: 'cougar-exchange.png',
+    description: '',
+    twitter: ''
+  }
 ];
 
 const NFTProjects: CronosProject[] = [
