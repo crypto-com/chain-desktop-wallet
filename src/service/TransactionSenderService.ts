@@ -501,11 +501,6 @@ export class TransactionSenderService {
 
   public async sendNFT(nftTransferRequest: NFTTransferRequest): Promise<BroadCastResult> {
     const currentSession = await this.storageService.retrieveCurrentSession();
-    let broadCastResult: BroadCastResult = {
-      transactionHash: '',
-      message: 'Broadcast failed',
-      code: -32603,
-    };
 
     switch (nftTransferRequest.nftType) {
       case NftType.CRYPTO_ORG: {
@@ -513,7 +508,6 @@ export class TransactionSenderService {
           nodeRpc,
           accountNumber,
           accountSequence,
-          // currentSession,
           transactionSigner,
           ledgerTransactionSigner,
         } = await this.transactionPrepareService.prepareTransaction();
@@ -544,11 +538,16 @@ export class TransactionSenderService {
             nftTransferRequest.decryptedPhrase,
           );
         }
-
-        broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-
         // It takes a few seconds for the indexing service to sync latest NFT state
-        break;
+        await sleep(7_000);
+        await Promise.all([
+          this.txHistoryManager.fetchAndSaveNFTs(currentSession),
+          this.txHistoryManager.fetchAndSaveNFTAccountTxs(currentSession),
+        ]);
+
+        const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+
+        return broadCastResult;
       }
       case NftType.CRC_721_TOKEN: {
         const {
@@ -611,11 +610,19 @@ export class TransactionSenderService {
             asset.config?.nodeUrl,
           );
 
-          broadCastResult = {
+          await sleep(7_000);
+          await Promise.all([
+            this.txHistoryManager.fetchAndSaveNFTs(currentSession),
+            this.txHistoryManager.fetchAndSaveNFTAccountTxs(currentSession),
+          ]);
+
+          const broadCastResult = {
             transactionHash: result,
             message: '',
             code: 200,
           };
+
+          return broadCastResult;
         } catch (error) {
           // eslint-disable-next-line no-console
           console.log(
@@ -624,17 +631,10 @@ export class TransactionSenderService {
           );
           throw error;
         }
-        break;
       }
       default:
+        throw TypeError('NFT Type Not supported yet');
     }
-
-    await sleep(7_000);
-    await Promise.all([
-      this.txHistoryManager.fetchAndSaveNFTs(currentSession),
-      this.txHistoryManager.fetchAndSaveNFTAccountTxs(currentSession),
-    ]);
-    return broadCastResult;
   }
 
   public async sendStakingRewardWithdrawalTx(
