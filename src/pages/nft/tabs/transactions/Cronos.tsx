@@ -5,12 +5,12 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCronosEvmAsset } from '../../../../hooks/useCronosEvmAsset';
 import { renderExplorerUrl } from '../../../../models/Explorer';
-import { nftTxsResponseTxModel } from '../../../../service/rpc/indexing/nft/cronos/CronosNftIndexingModels';
+import { NftTxsResponseTxModel } from '../../../../service/rpc/indexing/nft/cronos/CronosNftIndexingModels';
 import { walletService } from '../../../../service/WalletService';
 import { ellipsis, middleEllipsis } from '../../../../utils/utils';
 
 const CronosNFTTransactionList = () => {
-  const [nftTransfers, setNftTransfers] = useState<nftTxsResponseTxModel[]>([]);
+  const [nftTransfers, setNftTransfers] = useState<NftTxsResponseTxModel[]>([]);
   const [t] = useTranslation();
   const cronosAsset = useCronosEvmAsset();
 
@@ -23,10 +23,10 @@ const CronosNFTTransactionList = () => {
     fetchNftTransfers();
   }, []);
 
-  const NftTransactionColumns: ColumnsType<nftTxsResponseTxModel> = [
+  const NftTransactionColumns: ColumnsType<NftTxsResponseTxModel> = [
     {
       title: t('home.transactions.table3.transactionHash'),
-      render: (tx: nftTxsResponseTxModel) => {
+      render: (tx: NftTxsResponseTxModel) => {
         const text = tx.tx_hash;
         return (
           <a
@@ -43,7 +43,7 @@ const CronosNFTTransactionList = () => {
     {
       title: t('home.transactions.table3.tokenContractAddress'),
       key: 'tokenContractAddress',
-      render: (tx: nftTxsResponseTxModel) => {
+      render: (tx: NftTxsResponseTxModel) => {
         const text = tx.token_address;
         return text ? (
           <a
@@ -62,7 +62,7 @@ const CronosNFTTransactionList = () => {
     {
       title: t('home.transactions.table3.tokenName'),
       key: 'tokenName',
-      render: (tx: nftTxsResponseTxModel) => {
+      render: (tx: NftTxsResponseTxModel) => {
         const text = tx.token_name;
         return <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>;
       },
@@ -70,14 +70,14 @@ const CronosNFTTransactionList = () => {
     {
       title: t('home.transactions.table3.tokenId'),
       key: 'tokenId',
-      render: (tx: nftTxsResponseTxModel) => {
+      render: (tx: NftTxsResponseTxModel) => {
         const text = tx.event_detail.token_id;
         return <div data-original={text}>{text ? ellipsis(text, 12) : 'n.a.'}</div>;
       },
     },
     {
       title: t('home.transactions.table3.recipientAddress'),
-      render: (tx: nftTxsResponseTxModel) => {
+      render: (tx: NftTxsResponseTxModel) => {
         const text = tx.event_detail.to;
 
         return text ? (
@@ -104,7 +104,7 @@ const CronosNFTTransactionList = () => {
   ];
 
   return (
-    <Table<nftTxsResponseTxModel>
+    <Table<NftTxsResponseTxModel>
       locale={{
         triggerDesc: t('general.table.triggerDesc'),
         triggerAsc: t('general.table.triggerAsc'),

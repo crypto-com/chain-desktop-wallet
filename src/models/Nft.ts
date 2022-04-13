@@ -1,5 +1,5 @@
 import { CryptoOrgNftResponse, NftDenomData } from '../service/rpc/ChainIndexingModels';
-import { nftAssetsResponseAssetModel } from '../service/rpc/indexing/nft/cronos/CronosNftIndexingModels';
+import { NftAssetsResponseAssetModel } from '../service/rpc/indexing/nft/cronos/CronosNftIndexingModels';
 import { Attribute } from '../service/rpc/models/nftApi.models';
 
 export enum NftType {
@@ -14,7 +14,7 @@ export interface NftList {
   walletId: string;
 }
 
-export interface CronosCRC721NftModelData extends nftAssetsResponseAssetModel {}
+export interface CronosCRC721NftModelData extends NftAssetsResponseAssetModel {}
 
 export interface BaseNftModel {
   walletId: string;

@@ -1,10 +1,11 @@
 import axios, { AxiosInstance } from 'axios';
 import {
-  nftAssetsResponse,
-  nftAssetsResponseAssetModel,
-  nftTxsResponse,
-  nftTxsResponseTxModel,
+  NftAssetsResponse,
+  NftAssetsResponseAssetModel,
+  NftTxsResponse,
+  NftTxsResponseTxModel,
 } from './CronosNftIndexingModels';
+import { NCW_NFT_MIDDLEWARE_SERVER_ENDPOINT } from '../../../../../config/StaticConfig';
 
 export class CronosNftIndexingAPI {
   private readonly axiosClient: AxiosInstance;
@@ -14,8 +15,7 @@ export class CronosNftIndexingAPI {
   }
 
   public static init() {
-    const defaultIndexingUrl =
-      'https://cronos.org/ncw-quandra-api-middleware-server/quantra/v1/nft';
+    const defaultIndexingUrl = NCW_NFT_MIDDLEWARE_SERVER_ENDPOINT;
     const axiosClient = axios.create({
       baseURL: defaultIndexingUrl,
     });
@@ -23,12 +23,12 @@ export class CronosNftIndexingAPI {
   }
 
   public async getNftList(address: string) {
-    const nftList: nftAssetsResponseAssetModel[] = [];
+    const nftList: NftAssetsResponseAssetModel[] = [];
     let paginationPage = 1;
-    const nftAssetsRequest = await this.axiosClient.get<nftAssetsResponse>(
+    const nftAssetsRequest = await this.axiosClient.get<NftAssetsResponse>(
       `/assets/${address}?chain=cronos&limit=10&offset=0`,
     );
-    const response: nftAssetsResponse = nftAssetsRequest.data;
+    const response: NftAssetsResponse = nftAssetsRequest.data;
 
     if (response.code !== 0) {
       return [];
@@ -36,11 +36,11 @@ export class CronosNftIndexingAPI {
 
     nftList.push(...response.data.nft_assets);
 
-    let assetsResponse: nftAssetsResponse = response;
+    let assetsResponse: NftAssetsResponse = response;
 
     while (assetsResponse.data.nft_assets.length >= 10) {
       // eslint-disable-next-line no-await-in-loop
-      const pageNftsListRequest = await this.axiosClient.get<nftAssetsResponse>(
+      const pageNftsListRequest = await this.axiosClient.get<NftAssetsResponse>(
         `/assets/${address}?chain=cronos&limit=10&offset=${paginationPage * 10}`,
       );
       assetsResponse = pageNftsListRequest.data;
@@ -54,12 +54,12 @@ export class CronosNftIndexingAPI {
   }
 
   public async getNftTxsList(address: string) {
-    const nftTxsList: nftTxsResponseTxModel[] = [];
+    const nftTxsList: NftTxsResponseTxModel[] = [];
     let paginationPage = 1;
-    const nftTxsRequest = await this.axiosClient.get<nftTxsResponse>(
+    const nftTxsRequest = await this.axiosClient.get<NftTxsResponse>(
       `/txs/${address}?chain=cronos&limit=10&offset=0`,
     );
-    const response: nftTxsResponse = nftTxsRequest.data;
+    const response: NftTxsResponse = nftTxsRequest.data;
 
     if (response.code !== 0) {
       return [];
@@ -67,11 +67,11 @@ export class CronosNftIndexingAPI {
 
     nftTxsList.push(...response.data.nft_txs);
 
-    let txsResponse: nftTxsResponse = response;
+    let txsResponse: NftTxsResponse = response;
 
     while (txsResponse.data.nft_txs.length >= 10) {
       // eslint-disable-next-line no-await-in-loop
-      const pageNftsListRequest = await this.axiosClient.get<nftTxsResponse>(
+      const pageNftsListRequest = await this.axiosClient.get<NftTxsResponse>(
         `/txs/${address}?chain=cronos&limit=10&offset=${paginationPage * 10}`,
       );
       txsResponse = pageNftsListRequest.data;

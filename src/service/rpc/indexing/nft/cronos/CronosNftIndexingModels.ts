@@ -1,4 +1,4 @@
-export interface nftAssetsResponseAssetModel {
+export interface NftAssetsResponseAssetModel {
   token_address: string;
   token_id: string; // 7191
   token_uri: string; // "https://arweave.net/z3ieHRy4RjFwWGExaRS3BRw0f3HrWAHnUQqhPmPhOII/7191.json",
@@ -39,33 +39,33 @@ export interface nftAssetsResponseAssetModel {
   }[];
 }
 
-export interface nftAssetsResponseData {
+export interface NftAssetsResponseData {
   limit: number;
   offset: number;
   address: string;
-  nft_assets: nftAssetsResponseAssetModel[];
+  nft_assets: NftAssetsResponseAssetModel[];
 }
 
-export interface nftAssetsResponse {
+export interface NftAssetsResponse {
   code: number;
-  data: nftAssetsResponseData;
+  data: NftAssetsResponseData;
   message?: string;
 }
 
-export interface nftTxsResponse {
+export interface NftTxsResponse {
   code: number;
-  data: nftTxsResponseData;
+  data: NftTxsResponseData;
   message?: string;
 }
 
-export interface nftTxsResponseData {
+export interface NftTxsResponseData {
   limit: number;
   offset: number;
   address: string;
-  nft_txs: nftTxsResponseTxModel[];
+  nft_txs: NftTxsResponseTxModel[];
 }
 
-export interface nftTxsResponseTxModel {
+export interface NftTxsResponseTxModel {
   tx_hash: string; // "0xae55f817726bdff73cb75fa3869cab77183a86622db7b4f80e1bf1b4e2e123bd",
   block_id: number; // 1060601,
   time: number; // 1642394400;
