@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './PasswordFormModal.less';
-import Modal from 'antd/lib/modal/Modal';
-import { Button } from 'antd';
+import { Button, Modal } from 'antd';
 import PasswordForm from './PasswordForm';
 import SuccessCheckmark from '../SuccessCheckmark/SuccessCheckmark';
 import ErrorXmark from '../ErrorXmark/ErrorXmark';
+import { secretStoreService } from '../../storage/SecretStoreService';
 
 export interface PasswordFormModalProps {
   title: string;
