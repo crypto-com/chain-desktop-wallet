@@ -339,6 +339,7 @@
   "resolutions": {
     "@umijs/fabric/stylelint-config-rational-order/stylelint": "13.9.0",
     "@umijs/fabric/stylelint-config-rational-order/stylelint/meow/yargs-parser": "20.2.4",
+    "async": "3.2.2",
     "immer": "9.0.6",
     "xmldom": "0.5.0",
     "is-svg": "4.2.2",
