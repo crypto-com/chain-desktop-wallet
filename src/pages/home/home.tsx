@@ -2,8 +2,20 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import './home.less';
 import 'antd/dist/antd.css';
-import { Button, Layout, notification, Table, Tabs, Card, List, Avatar, Tag, Tooltip } from 'antd';
-import { ExclamationCircleOutlined, SyncOutlined } from '@ant-design/icons';
+import {
+  Button,
+  Layout,
+  notification,
+  Table,
+  Tabs,
+  Card,
+  List,
+  Avatar,
+  Tag,
+  Tooltip,
+  Spin,
+} from 'antd';
+import { ExclamationCircleOutlined, LoadingOutlined, SyncOutlined } from '@ant-design/icons';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
 import Big from 'big.js';
@@ -82,6 +94,8 @@ const HomePage = () => {
 
   const [isRewardModalVisible, setIsRewardModalVisible] = useState(false);
   const [rewards, setRewards] = useState<RewardsBalances>();
+
+  const [assetsLoading, setAssetsLoading] = useState(false);
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -278,6 +292,8 @@ const HomePage = () => {
 
   useEffect(() => {
     const syncAssetData = async () => {
+      setAssetsLoading(true);
+
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
       const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
@@ -305,6 +321,8 @@ const HomePage = () => {
 
       const marketPrices = await walletService.retrieveAllAssetsPrices(sessionData.currency);
       setAllMarketData(marketPrices);
+
+      setAssetsLoading(false);
     };
 
     syncAssetData();
@@ -466,89 +484,100 @@ const HomePage = () => {
         <Tabs>
           <TabPane tab={t('home.nft.tab1')} key="1">
             <div className="site-layout-background nft-container">
-              <List
-                grid={{
-                  gutter: 16,
-                  xs: 1,
-                  sm: 2,
-                  md: 4,
-                  lg: 5,
-                  xl: 5,
-                  xxl: 5,
-                }}
-                dataSource={processedNftList}
-                renderItem={item => {
-                  if (isCryptoOrgNftModel(item)) {
-                    const { model } = item;
-                    return (
-                      <List.Item>
-                        <Card
-                          style={{ width: 170 }}
-                          cover={<NftPreview nft={item} />}
-                          hoverable
-                          className="nft"
-                        >
-                          <Meta
-                            title={NftUtils.renderNftTitle(item)}
-                            description={
-                              <>
-                                <Avatar
-                                  style={{
-                                    background:
-                                      'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
-                                    verticalAlign: 'middle',
-                                  }}
-                                />
-                                {middleEllipsis(model.tokenMinter, 6)}{' '}
-                                {model.isMintedByCDC ? <IconTick style={{ height: '12px' }} /> : ''}
-                              </>
-                            }
-                          />
-                        </Card>
-                      </List.Item>
-                    );
-                  }
-                  if (isCronosNftModel(item)) {
-                    const { model } = item;
-                    return (
-                      <List.Item>
-                        <Card
-                          style={{ width: 170 }}
-                          cover={<NftPreview nft={item} />}
-                          hoverable
-                          className="nft"
-                        >
-                          <Meta
-                            title={NftUtils.renderNftTitle(item)}
-                            description={
-                              <>
-                                <Avatar
-                                  style={{
-                                    background:
-                                      'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
-                                    verticalAlign: 'middle',
-                                  }}
-                                />
-                                {middleEllipsis(model.token_address, 6)}{' '}
-                              </>
-                            }
-                          />
-                        </Card>
-                      </List.Item>
-                    );
-                  }
-
-                  return <></>;
-                }}
-                pagination={false}
-              />
-              <Link
-                to="/nft"
-                style={{ textAlign: 'right' }}
-                onClick={() => setNavbarMenuSelectedKey('/nft')}
+              <Spin
+                spinning={assetsLoading}
+                indicator={<LoadingOutlined style={{ fontSize: 36 }} />}
               >
-                {t('general.seeAll')}
-              </Link>
+                <div className="container">
+                  <List
+                    grid={{
+                      gutter: 16,
+                      xs: 1,
+                      sm: 2,
+                      md: 4,
+                      lg: 5,
+                      xl: 5,
+                      xxl: 5,
+                    }}
+                    dataSource={processedNftList}
+                    renderItem={item => {
+                      if (isCryptoOrgNftModel(item)) {
+                        const { model } = item;
+                        return (
+                          <List.Item>
+                            <Card
+                              style={{ width: 170 }}
+                              cover={<NftPreview nft={item} />}
+                              hoverable
+                              className="nft"
+                            >
+                              <Meta
+                                title={NftUtils.renderNftTitle(item)}
+                                description={
+                                  <>
+                                    <Avatar
+                                      style={{
+                                        background:
+                                          'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                        verticalAlign: 'middle',
+                                      }}
+                                    />
+                                    {middleEllipsis(model.tokenMinter, 6)}{' '}
+                                    {model.isMintedByCDC ? (
+                                      <IconTick style={{ height: '12px' }} />
+                                    ) : (
+                                      ''
+                                    )}
+                                  </>
+                                }
+                              />
+                            </Card>
+                          </List.Item>
+                        );
+                      }
+                      if (isCronosNftModel(item)) {
+                        const { model } = item;
+                        return (
+                          <List.Item>
+                            <Card
+                              style={{ width: 170 }}
+                              cover={<NftPreview nft={item} />}
+                              hoverable
+                              className="nft"
+                            >
+                              <Meta
+                                title={NftUtils.renderNftTitle(item)}
+                                description={
+                                  <>
+                                    <Avatar
+                                      style={{
+                                        background:
+                                          'linear-gradient(210.7deg, #1199FA -1.45%, #93D2FD 17.77%, #C1CDFE 35.71%, #EEC9FF 51.45%, #D4A9EA 67.2%, #41B0FF 85.98%)',
+                                        verticalAlign: 'middle',
+                                      }}
+                                    />
+                                    {middleEllipsis(model.token_address, 6)}{' '}
+                                  </>
+                                }
+                              />
+                            </Card>
+                          </List.Item>
+                        );
+                      }
+
+                      return <></>;
+                    }}
+                    pagination={false}
+                  />
+                  <Link
+                    to="/nft"
+                    style={{ position: 'absolute', bottom: '0', right: '0' }}
+                    onClick={() => setNavbarMenuSelectedKey('/nft')}
+                  >
+                    {t('general.seeAll')}
+                  </Link>
+                </div>
+              </Spin>
             </div>
           </TabPane>
         </Tabs>
