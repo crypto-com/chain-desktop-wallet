@@ -1,11 +1,8 @@
 import { Proposal, ValidatorPubKey } from '../service/rpc/NodeRpcModels';
 import {
   NftAccountTransactionResponse,
-  NftResponse,
   NftTransactionResponse,
-  NftDenomData,
 } from '../service/rpc/ChainIndexingModels';
-import { Attribute } from '../service/rpc/models/nftApi.models';
 import { UserAssetType } from './UserAsset';
 import { BridgeTransaction } from '../service/bridge/contracts/BridgeModels';
 
@@ -197,11 +194,6 @@ export interface TransferTransactionList {
   assetId?: string;
 }
 
-export interface NftList {
-  nfts: Array<NftModel>;
-  walletId: string;
-}
-
 export interface NftQueryParams {
   tokenId: string;
   denomId: string;
@@ -257,32 +249,7 @@ export interface ValidatorModel {
 
 export interface ProposalModel extends Proposal {}
 
-export interface NftTokenData {
-  name?: string;
-  drop?: string;
-  description?: string;
-  image?: string;
-  mimeType?: string;
-  animation_url?: string;
-  animationUrl?: string;
-  animationMimeType?: string;
-  attributes?: Attribute[];
-}
-
-export interface NftModel extends NftResponse {
-  isMintedByCDC: boolean;
-  marketplaceLink: string;
-}
-
-export interface NftDenomModel extends NftDenomData {}
-
-export interface NftProcessedModel extends Omit<NftModel, 'tokenData'> {
-  tokenData: NftTokenData;
-}
-
 export interface NftTransferModel extends NftTransactionResponse {}
-
-// export interface NFTAccountTransactionModel extends NFTAccountTransactionResponse {}
 
 export interface NftAccountTransactionList {
   transactions: Array<NftAccountTransactionData>;

@@ -14,6 +14,7 @@ import { sessionState } from '../../../../recoil/atom';
 import AddAddressModal from '../../../../components/AddressBookModal/AddAddressModal';
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal';
 import { getChainName } from '../../../../utils/utils';
+import { usePasswordModal } from '../../../../components/PasswordForm/PasswordFormModal';
 
 const AddressBook = () => {
   const [contacts, setContacts] = useState<AddressBookContact[]>([]);
@@ -25,6 +26,7 @@ const AddressBook = () => {
   const session = useRecoilValue<Session>(sessionState);
   const walletId = session.wallet.identifier;
   const [t] = useTranslation();
+  const { show: showPasswordModal } = usePasswordModal();
 
   const addressBookService = useMemo(() => {
     return new AddressBookService(walletService.storageService);
@@ -92,15 +94,23 @@ const AddressBook = () => {
           <Space size="middle">
             <a
               onClick={async () => {
-                setCurrentEditContact(contact);
-                setIsAddModalShowing(true);
+                showPasswordModal({
+                  onSuccess: () => {
+                    setCurrentEditContact(contact);
+                    setIsAddModalShowing(true);
+                  }
+                })
               }}
             >
               {t('settings.addressBook.edit')}
             </a>
             <a
               onClick={async () => {
-                setCurrentDeleteContact(contact);
+                showPasswordModal({
+                  onSuccess: () => {
+                    setCurrentDeleteContact(contact);
+                  }
+                })
               }}
             >
               {t('settings.addressBook.remove')}
@@ -188,7 +198,11 @@ const AddressBook = () => {
         icon={<PlusOutlined />}
         style={{ boxShadow: 'none', border: 'none', padding: '10 0 0 0', margin: '0' }}
         onClick={() => {
-          setIsAddModalShowing(true);
+          showPasswordModal({
+            onSuccess: () => {
+              setIsAddModalShowing(true);
+            }
+          })
         }}
       >
         {t('settings.addressBook.addNewAddress')}
