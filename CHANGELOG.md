@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 ### Additions
 - Cronos NFT support
 - Password protection on Address Book
+- Restart & purge local storage automatically after 10 incorrect password attempts
 
 ## [v0.7.4] - 2022-03-25
 ### Additions
