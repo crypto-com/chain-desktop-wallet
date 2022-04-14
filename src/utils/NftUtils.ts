@@ -126,7 +126,7 @@ export class NftUtils {
     return [];
   };
 
-  public static groupAllNftList = async (lists: NftList[] | undefined, maxTotal: number = 0) => {
+  public static groupAllNftList = async (lists: NftList | undefined, maxTotal: number = 0) => {
     const fullNftList: CommonNftModel[] = [];
 
     if (!lists || lists?.length === 0) {
@@ -134,9 +134,7 @@ export class NftUtils {
     }
 
     await Promise.all(
-      lists.map(async list => {
-        await Promise.all(
-          list.nfts.map(async nft => {
+          lists.map(async nft => {
             if (isCryptoOrgNftModel(nft)) {
               const { model } = nft;
 
@@ -154,8 +152,6 @@ export class NftUtils {
             if (isCronosNftModel(nft)) {
               fullNftList.push(nft);
             }
-          }),
-        );
       }),
     );
 

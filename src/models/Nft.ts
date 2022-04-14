@@ -8,11 +8,7 @@ export enum NftType {
   CRC_721_TOKEN = 'CRC_721_TOKEN',
 }
 
-export interface NftList {
-  nfts: Array<CommonNftModel>;
-  type: NftType;
-  walletId: string;
-}
+export type NftList = CommonNftModel[];
 
 export interface CronosCRC721NftModelData extends NftAssetsResponseAssetModel {}
 

@@ -109,7 +109,7 @@ const validatorListState = atom<ValidatorModel[] | null>({
   default: null,
 });
 
-const nftListState = atom<NftList[] | undefined>({
+const nftListState = atom<NftList | undefined>({
   key: 'nftList',
   default: undefined,
 });

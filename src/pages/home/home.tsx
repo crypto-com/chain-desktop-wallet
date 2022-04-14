@@ -281,7 +281,7 @@ const HomePage = () => {
       const sessionData = await walletService.retrieveCurrentSession();
       const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
       const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
-      const allNFTs: NftList[] = await walletService.retrieveNFTs(sessionData.wallet.identifier);
+      const allNFTs: NftList = await walletService.retrieveNFTs(sessionData.wallet.identifier);
       const allRewards = await walletService.retrieveRewardsBalances(
         currentSession.wallet.identifier,
       );

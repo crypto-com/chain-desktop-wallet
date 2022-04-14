@@ -35,7 +35,7 @@ import {
   UnbondingDelegationList,
   ValidatorModel,
 } from '../models/Transaction';
-import { NftDenomModel, NftList } from '../models/Nft';
+import { CommonNftModel, NftDenomModel } from '../models/Nft';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { LEDGER_WALLET_TYPE } from './LedgerService';
 import {
@@ -578,7 +578,7 @@ class WalletService {
     return proposalSet.proposals;
   }
 
-  public async retrieveNFTs(walletID: string): Promise<NftList[]> {
+  public async retrieveNFTs(walletID: string): Promise<CommonNftModel[]> {
     const nftSets = await this.storageService.retrieveAllNfts(walletID);
     if (!nftSets) {
       return [];

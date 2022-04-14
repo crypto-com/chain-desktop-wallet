@@ -525,19 +525,17 @@ export class TransactionHistoryService {
       const cronosCRC721NFTs = await this.fetchCurrentWalletCRC721Tokens();
 
       if (cryptoOrgNFTs !== null) {
-        await this.storageService.saveCryptoOrgNFTs({
-          walletId: currentSession.wallet.identifier,
-          type: NftType.CRYPTO_ORG,
-          nfts: cryptoOrgNFTs,
-        });
+        await this.storageService.saveCryptoOrgNFTs(
+          currentSession.wallet.identifier,
+          cryptoOrgNFTs,
+        );
       }
 
       if (cronosCRC721NFTs !== null) {
-        await this.storageService.saveCronosCRC721NFTs({
-          walletId: currentSession.wallet.identifier,
-          type: NftType.CRC_721_TOKEN,
-          nfts: cronosCRC721NFTs,
-        });
+        await this.storageService.saveCronosCRC721NFTs(
+          currentSession.wallet.identifier,
+          cronosCRC721NFTs,
+        );
       }
     } catch (e) {
       // eslint-disable-next-line no-console
