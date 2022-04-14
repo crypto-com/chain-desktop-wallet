@@ -928,11 +928,12 @@ function HomeLayout(props: HomeLayoutProps) {
 
             // Deleting local storage
             if (latestIncorrectAttemptCount >= MAX_INCORRECT_ATTEMPTS_ALLOWED) {
-              indexedDB.deleteDatabase('NeDB');
-              setTimeout(() => {
-                history.replace('/');
-                history.go(0);
-              }, 3000);
+              const deleteDBRequest = indexedDB.deleteDatabase('NeDB');
+              deleteDBRequest.onsuccess = () => {
+                setTimeout(() => {
+                  ipcRenderer.send('restart_app');
+                }, 3000);
+              };
             }
 
             // Show warning after `X` number of wrong attempts
