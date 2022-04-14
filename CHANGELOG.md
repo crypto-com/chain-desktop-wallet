@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+
+## [v0.7.5] - 2022-04-14
+### Additions
+- Cronos NFT support
+- Password protection on Address Book
+
 ## [v0.7.4] - 2022-03-25
 ### Additions
 - Duration selection for Auto Update disable
