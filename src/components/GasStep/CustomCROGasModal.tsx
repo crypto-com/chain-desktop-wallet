@@ -3,15 +3,22 @@ import { Button, Form, InputNumber, Modal } from "antd";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import "./style.less";
-import { getRecoil } from 'recoil-nexus';
+import { getRecoil, setRecoil } from 'recoil-nexus';
 import numeral from 'numeral';
-import { allMarketState, sessionState } from '../../recoil/atom';
-import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT, SUPPORTED_CURRENCY } from '../../config/StaticConfig';
+import { allMarketState, sessionState, walletAllAssetsState, walletListState } from '../../recoil/atom';
+import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
 import { getAssetAmountInFiat, UserAsset } from '../../models/UserAsset';
 import { getNormalScaleAmount } from "../../utils/NumberUtils"
+import { walletService } from '../../service/WalletService';
 
-const ModalBody = (props: { asset: UserAsset, onSuccess: () => void, onCancel: () => void }) => {
-  const { asset, onSuccess, onCancel } = props;
+const ModalBody = (props: {
+  asset: UserAsset,
+  gasFee: string,
+  gasLimit: string,
+  onSuccess: (gasLimit: number, networkFee: number) => void,
+  onCancel: () => void
+}) => {
+  const { asset, gasFee, gasLimit, onSuccess, onCancel } = props;
   const [t] = useTranslation();
 
   const [form] = Form.useForm();
@@ -20,7 +27,6 @@ const ModalBody = (props: { asset: UserAsset, onSuccess: () => void, onCancel: (
   const allMarketData = getRecoil(allMarketState);
 
   const [readableNetworkFee, setReadableNetworkFee] = useState('');
-
 
   const assetMarketData = allMarketData.get(
     `${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
@@ -51,17 +57,14 @@ const ModalBody = (props: { asset: UserAsset, onSuccess: () => void, onCancel: (
       return;
     }
 
-    const networkFee = asset.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE;
-    const gasLimit = asset.config?.fee?.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT;
-
-    setNetworkFee(Number(networkFee));
+    setNetworkFee(Number(gasFee));
 
     form.setFieldsValue({
-      networkFee,
+      networkFee: gasFee,
       gasLimit
     })
 
-  }, [asset]);
+  }, [asset, gasFee, gasLimit]);
 
   return <div>
     <div style={{
@@ -77,6 +80,50 @@ const ModalBody = (props: { asset: UserAsset, onSuccess: () => void, onCancel: (
         setNetworkFee(networkFee);
       }
 
+    }}
+      onFinish={async (values) => {
+
+        if (!asset.config) {
+          return;
+        }
+
+        const { gasLimit: newGasLimit, networkFee: newNetworkFee }: { gasLimit: number, networkFee: number } = values;
+
+        if (
+          gasLimit === newGasLimit.toString() &&
+          gasFee === newNetworkFee.toString()
+        ) {
+          return;
+        }
+
+        const updatedWallet = await walletService.findWalletByIdentifier(currentSession.wallet.identifier);
+
+        const newlyUpdatedAsset: UserAsset = {
+          ...currentSession.activeAsset!,
+          config: {
+            ...asset.config,
+            fee: { gasLimit: newGasLimit.toString(), networkFee: newNetworkFee.toString() },
+          },
+        };
+
+        await walletService.saveAssets([newlyUpdatedAsset]);
+
+        const newSession = {
+          ...currentSession,
+          wallet: updatedWallet,
+          activeAsset: newlyUpdatedAsset,
+        };
+        setRecoil(sessionState, newSession)
+
+        await walletService.setCurrentSession(newSession);
+
+        const allNewUpdatedWallets = await walletService.retrieveAllWallets();
+        setRecoil(walletListState, [...allNewUpdatedWallets])
+
+        const allAssets = await walletService.retrieveCurrentWalletAssets(newSession);
+        setRecoil(walletAllAssetsState, [...allAssets])
+
+        onSuccess(newGasLimit, newNetworkFee);
     }}>
       <Form.Item
         name="networkFee"
@@ -130,12 +177,11 @@ const ModalBody = (props: { asset: UserAsset, onSuccess: () => void, onCancel: (
   </div>
 }
 
-const useCustomCROGasModal = (asset: UserAsset) => {
+const useCustomCROGasModal = (asset: UserAsset, gasFee: string, gasLimit: string) => {
 
   let modalRef;
 
   const [isShowing, setIsShowing] = useState(false)
-
 
 
   function dismiss() {
@@ -145,7 +191,7 @@ const useCustomCROGasModal = (asset: UserAsset) => {
 
   function show(props: {
     onCancel?: () => void,
-    onSuccess: () => void,
+    onSuccess: (gasLimit: number, gasFee: number) => void,
   }) {
 
     if (isShowing) {
@@ -171,7 +217,7 @@ const useCustomCROGasModal = (asset: UserAsset) => {
       style: {
         padding: "20px 20px 0 20px"
       },
-      content: <ModalBody asset={asset} onSuccess={props.onSuccess} onCancel={() => {
+      content: <ModalBody asset={asset} gasFee={gasFee} gasLimit={gasLimit} onSuccess={props.onSuccess} onCancel={() => {
         dismiss();
         props.onCancel?.()
       }} />

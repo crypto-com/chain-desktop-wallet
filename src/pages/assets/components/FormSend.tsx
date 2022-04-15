@@ -344,7 +344,9 @@ const FormSend: React.FC<FormSendProps> = props => {
         </div>
       </div>
       <RowAmountOption walletAsset={walletAsset!} form={form} />
-      <GasStepSelect asset={walletAsset!} />
+      <GasStepSelect asset={walletAsset!} onChange={() => {
+
+      }} />
       <Form.Item name="memo" label={t('send.formSend.memo.label')}>
         <Input />
       </Form.Item>

@@ -1,18 +1,40 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Form, Radio, Select, Tooltip } from 'antd';
+import { Form, Tooltip } from 'antd';
 import * as React from 'react';
-import { getGasFee, useCROGasStep } from '../../hooks/useCROGasStep';
+import { useEffect, useState } from 'react';
+import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
 import { UserAsset, UserAssetType } from '../../models/UserAsset';
+import { getNormalScaleAmount } from '../../utils/NumberUtils';
 import { useCustomCROGasModal } from './CustomCROGasModal';
 
 interface IGasStepProps {
   asset: UserAsset;
+  onChange?: () => void;
 }
 
 const GasStepSelect = (props: IGasStepProps) => {
-  const { asset } = props;
+  const { asset, onChange } = props;
 
-  const { show } = useCustomCROGasModal(asset);
+  const [networkFee, setNetworkFee] = useState(asset.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE);
+  const [gasLimit, setGasLimit] = useState(asset.config?.fee?.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT);
+
+  const { show, dismiss } = useCustomCROGasModal(asset, networkFee, gasLimit);
+
+  const [readableGasFee, setReadableGasFee] = useState('')
+
+  const updateFee = (newNetworkFee: string) => {
+
+    const amount = getNormalScaleAmount(newNetworkFee, asset)
+
+    setReadableGasFee(`${amount} ${asset.symbol}`);
+  }
+
+  useEffect(() => {
+    if (!asset) {
+      return;
+    }
+    updateFee(asset.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE);
+  }, [asset]);
 
   if (asset.assetType === UserAssetType.TENDERMINT || asset.assetType === UserAssetType.IBC) {
     return <Form.Item label={
@@ -45,16 +67,23 @@ const GasStepSelect = (props: IGasStepProps) => {
           <p style={{
             marginBottom: "0px",
             color: "#7B849B"
-          }}>Estimated time: TODO</p>
+          }}>Estimated time: 6s</p>
         </div>
         <p style={{
           marginBottom: "0px"
-        }}>0.0123CRO</p>
+        }}>{readableGasFee}</p>
       </div>
       <a style={{ float: "right", marginTop: "4px" }} onClick={() => {
         show({
           onCancel: () => { },
-          onSuccess: () => { }
+          onSuccess: (newGasLimit, newGasFee) => {
+            onChange?.()
+            dismiss();
+
+            setGasLimit(newGasLimit.toString())
+            setNetworkFee(newGasFee.toString())
+            updateFee(newGasFee.toString());
+          }
         })
       }}>Custom Options</a>
     </Form.Item>
