@@ -1,5 +1,6 @@
 import Web3 from 'web3';
 import { TransactionConfig } from 'web3-eth';
+import { ethers } from 'ethers';
 import {
   DelegateTransactionUnsigned,
   TransferTransactionUnsigned,
@@ -10,10 +11,12 @@ import {
   WithdrawStakingRewardUnsigned,
   NFTDenomIssueUnsigned,
   NFTMintUnsigned,
+  EVMContractCallUnsigned,
 } from './signers/TransactionSupported';
 import { BroadCastResult } from '../models/Transaction';
-import { getBaseScaledAmount } from '../utils/NumberUtils';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
+import { NftType } from '../models/Nft';
+import { getBaseScaledAmount } from '../utils/NumberUtils';
 import { DEFAULT_CLIENT_MEMO } from '../config/StaticConfig';
 import {
   TransferRequest,
@@ -517,55 +520,146 @@ export class TransactionSenderService {
   }
 
   public async sendNFT(nftTransferRequest: NFTTransferRequest): Promise<BroadCastResult> {
-    const {
-      nodeRpc,
-      accountNumber,
-      accountSequence,
-      currentSession,
-      transactionSigner,
-      ledgerTransactionSigner,
-    } = await this.transactionPrepareService.prepareTransaction();
+    const currentSession = await this.storageService.retrieveCurrentSession();
 
-    const memo = !nftTransferRequest.memo ? DEFAULT_CLIENT_MEMO : nftTransferRequest.memo;
+    switch (nftTransferRequest.nftType) {
+      case NftType.CRYPTO_ORG: {
+        const {
+          nodeRpc,
+          accountNumber,
+          accountSequence,
+          transactionSigner,
+          ledgerTransactionSigner,
+        } = await this.transactionPrepareService.prepareTransaction();
 
-    const nftTransferUnsigned: NFTTransferUnsigned = {
-      tokenId: nftTransferRequest.tokenId,
-      denomId: nftTransferRequest.denomId,
-      sender: nftTransferRequest.sender,
-      recipient: nftTransferRequest.recipient,
+        const memo = !nftTransferRequest.memo ? DEFAULT_CLIENT_MEMO : nftTransferRequest.memo;
 
-      memo,
-      accountNumber,
-      accountSequence,
-    };
+        const nftTransferUnsigned: NFTTransferUnsigned = {
+          tokenId: nftTransferRequest.tokenId,
+          denomId: nftTransferRequest.denomId,
+          sender: nftTransferRequest.sender,
+          recipient: nftTransferRequest.recipient,
 
-    let signedTxHex: string = '';
+          memo,
+          accountNumber,
+          accountSequence,
+        };
 
-    if (nftTransferRequest.walletType === LEDGER_WALLET_TYPE) {
-      signedTxHex = await ledgerTransactionSigner.signNFTTransfer(
-        nftTransferUnsigned,
-        nftTransferRequest.decryptedPhrase,
-        nftTransferRequest.gasFee,
-        nftTransferRequest.gasLimit
-      );
-    } else {
-      signedTxHex = await transactionSigner.signNFTTransfer(
-        nftTransferUnsigned,
-        nftTransferRequest.decryptedPhrase,
-        nftTransferRequest.gasFee,
-        nftTransferRequest.gasLimit
-      );
+        let signedTxHex = '';
+
+        if (nftTransferRequest.walletType === LEDGER_WALLET_TYPE) {
+          signedTxHex = await ledgerTransactionSigner.signNFTTransfer(
+            nftTransferUnsigned,
+            nftTransferRequest.decryptedPhrase,
+            nftTransferRequest.gasFee,
+            nftTransferRequest.gasLimit
+          );
+        } else {
+          signedTxHex = await transactionSigner.signNFTTransfer(
+            nftTransferUnsigned,
+            nftTransferRequest.decryptedPhrase,
+            nftTransferRequest.gasFee,
+            nftTransferRequest.gasLimit
+          );
+        }
+
+        // It takes a few seconds for the indexing service to sync latest NFT state
+        await sleep(7_000);
+        await Promise.all([
+          this.txHistoryManager.fetchAndSaveNFTs(currentSession),
+          this.txHistoryManager.fetchAndSaveNFTAccountTxs(currentSession),
+        ]);
+
+        const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+
+        return broadCastResult;
+      }
+      case NftType.CRC_721_TOKEN: {
+        const {
+          sender,
+          recipient,
+          tokenId,
+          tokenContractAddress,
+          asset,
+          decryptedPhrase,
+        } = nftTransferRequest;
+
+        if (!asset.config?.nodeUrl) {
+          throw TypeError(`Missing asset config: ${asset.config}`);
+        }
+
+        const encodedABITokenTransferData = evmTransactionSigner.encodeNFTTransferABI(
+          tokenContractAddress,
+          {
+            tokenId,
+            sender,
+            recipient,
+          },
+        );
+
+        const estimatedGasLimit = await evmTransactionSigner.getNFTSafeTransferFromEstimatedGas(
+          asset,
+          tokenContractAddress,
+          {
+            tokenId,
+            sender,
+            recipient,
+          },
+        );
+
+        const prepareTXConfig: TransactionConfig = {
+          from: sender,
+          to: recipient,
+          data: encodedABITokenTransferData,
+        };
+
+        const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
+          asset,
+          prepareTXConfig,
+        );
+
+        const txConfig: EVMContractCallUnsigned = {
+          from: sender,
+          contractAddress: tokenContractAddress,
+          data: encodedABITokenTransferData,
+          nonce: prepareTxInfo.nonce,
+          gasPrice: ethers.utils.hexValue(BigInt(prepareTxInfo.loadedGasPrice)),
+          gasLimit: ethers.utils.hexValue(estimatedGasLimit),
+        };
+
+        try {
+          const result = await evmTransactionSigner.sendContractCallTransaction(
+            asset!,
+            txConfig,
+            decryptedPhrase,
+            asset.config?.nodeUrl,
+          );
+
+          await sleep(7_000);
+          await Promise.all([
+            this.txHistoryManager.fetchAndSaveNFTs(currentSession),
+            this.txHistoryManager.fetchAndSaveNFTAccountTxs(currentSession),
+          ]);
+
+          const broadCastResult = {
+            transactionHash: result,
+            message: '',
+            code: 200,
+          };
+
+          return broadCastResult;
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.log(
+            `ERROR_TRANSFERRING_NFT - ${nftTransferRequest.tokenContractAddress}_${nftTransferRequest.tokenId}`,
+            error,
+          );
+          throw error;
+        }
+      }
+      default:
+        throw TypeError('NFT Type Not supported yet');
     }
-
-    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-
-    // It takes a few seconds for the indexing service to sync latest NFT state
-    await sleep(7_000);
-    await Promise.all([
-      this.txHistoryManager.fetchAndSaveNFTs(currentSession),
-      this.txHistoryManager.fetchAndSaveNFTAccountTxs(currentSession),
-    ]);
-    return broadCastResult;
   }
 
   public async sendStakingRewardWithdrawalTx(

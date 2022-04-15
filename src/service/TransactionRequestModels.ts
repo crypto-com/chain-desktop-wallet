@@ -1,5 +1,6 @@
 import { UserAsset } from '../models/UserAsset';
 import { VoteOption } from '../models/Transaction';
+import { NftType } from '../models/Nft';
 import { BridgeTransferDirection } from './bridge/BridgeConfig';
 
 export interface TransferRequest {
@@ -26,16 +27,17 @@ export interface VoteRequest {
 
 export interface NFTTransferRequest {
   tokenId: string;
+  tokenContractAddress: string;
   denomId: string;
   sender: string;
   recipient: string;
-
   memo: string;
   decryptedPhrase: string;
   asset: UserAsset;
   walletType: string; // normal, ledger
   gasFee: string;
   gasLimit: number;
+  nftType: NftType;
 }
 
 export interface NFTMintRequest {
