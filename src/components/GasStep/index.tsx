@@ -12,7 +12,7 @@ interface IGasStepProps {
 const GasStepSelect = (props: IGasStepProps) => {
   const { asset } = props;
 
-  const { show } = useCustomCROGasModal();
+  const { show } = useCustomCROGasModal(asset);
 
   if (asset.assetType === UserAssetType.TENDERMINT || asset.assetType === UserAssetType.IBC) {
     return <Form.Item label={

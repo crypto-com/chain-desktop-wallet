@@ -47,6 +47,7 @@ import { AddressBookContact } from '../../../models/AddressBook';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import GasStep from '../../../components/GasStep';
 import { useCROGasStep } from '../../../hooks/useCROGasStep';
+import GasStepSelect from '../../../components/GasStep';
 
 const layout = {};
 const tailLayout = {};
@@ -343,6 +344,7 @@ const FormSend: React.FC<FormSendProps> = props => {
         </div>
       </div>
       <RowAmountOption walletAsset={walletAsset!} form={form} />
+      <GasStepSelect asset={walletAsset!} />
       <Form.Item name="memo" label={t('send.formSend.memo.label')}>
         <Input />
       </Form.Item>
