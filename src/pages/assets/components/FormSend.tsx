@@ -33,7 +33,7 @@ import {
   getCurrentMinAssetAmount,
   getNormalScaleAmount,
 } from '../../../utils/NumberUtils';
-import { FIXED_DEFAULT_FEE, SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
+import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT, SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 import {
   AnalyticsActions,
@@ -46,7 +46,6 @@ import { ledgerNotification } from '../../../components/LedgerNotification/Ledge
 import { AddressBookService } from '../../../service/AddressBookService';
 import { AddressBookContact } from '../../../models/AddressBook';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
-import { useCROGasStep } from '../../../hooks/useCROGasStep';
 import GasStepSelect from '../../../components/GasStep';
 
 const layout = {};
@@ -88,8 +87,6 @@ const FormSend: React.FC<FormSendProps> = props => {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { walletAsset, setWalletAsset, currentSession } = props;
-
-  const { gasStep, gasFee, gasLimit } = useCROGasStep(walletAsset)
 
   const analyticsService = new AnalyticsService(currentSession);
 
@@ -181,8 +178,8 @@ const FormSend: React.FC<FormSendProps> = props => {
         memo,
         decryptedPhrase,
         walletType,
-        gasFee,
-        gasLimit: Number(gasLimit)
+        gasFee: walletAsset.config?.fee.networkFee ?? FIXED_DEFAULT_FEE,
+        gasLimit: Number(walletAsset.config?.fee.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT),
       });
 
       analyticsService.logTransactionEvent(
@@ -345,9 +342,7 @@ const FormSend: React.FC<FormSendProps> = props => {
       </div>
       <RowAmountOption walletAsset={walletAsset!} form={form} />
       <GasStepSelect asset={walletAsset!} onChange={(newGasLimit, newNetworkFee) => {
-
         const newAsset = _.cloneDeep(walletAsset);
-
         if (newAsset?.config?.fee) {
           newAsset.config.fee = {
             gasLimit: newGasLimit.toString(),
