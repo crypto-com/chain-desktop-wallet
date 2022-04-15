@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import numeral from 'numeral';
+import _ from 'lodash';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../../service/WalletService';
 import SuccessModalPopup from '../../../components/SuccessModalPopup/SuccessModalPopup';
@@ -45,7 +46,6 @@ import { ledgerNotification } from '../../../components/LedgerNotification/Ledge
 import { AddressBookService } from '../../../service/AddressBookService';
 import { AddressBookContact } from '../../../models/AddressBook';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
-import GasStep from '../../../components/GasStep';
 import { useCROGasStep } from '../../../hooks/useCROGasStep';
 import GasStepSelect from '../../../components/GasStep';
 
@@ -344,8 +344,17 @@ const FormSend: React.FC<FormSendProps> = props => {
         </div>
       </div>
       <RowAmountOption walletAsset={walletAsset!} form={form} />
-      <GasStepSelect asset={walletAsset!} onChange={() => {
+      <GasStepSelect asset={walletAsset!} onChange={(newGasLimit, newNetworkFee) => {
 
+        const newAsset = _.cloneDeep(walletAsset);
+
+        if (newAsset?.config?.fee) {
+          newAsset.config.fee = {
+            gasLimit: newGasLimit.toString(),
+            networkFee: newNetworkFee.toString(),
+          }
+          setWalletAsset(newAsset)
+        }
       }} />
       <Form.Item name="memo" label={t('send.formSend.memo.label')}>
         <Input />
@@ -421,7 +430,7 @@ const FormSend: React.FC<FormSendProps> = props => {
             {walletAsset?.assetType === UserAssetType.TENDERMINT ? (
               <div className="item">
                 <div className="label">{t('send.modal1.label4')}</div>
-                <GasStep asset={walletAsset} />
+                {/* <GasStep asset={walletAsset} /> */}
                 <div>{`~${getNormalScaleAmount(getTransactionFee(walletAsset!), walletAsset!)} ${walletAsset?.symbol
                   }`}</div>
               </div>

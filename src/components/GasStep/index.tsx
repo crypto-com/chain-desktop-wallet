@@ -9,7 +9,7 @@ import { useCustomCROGasModal } from './CustomCROGasModal';
 
 interface IGasStepProps {
   asset: UserAsset;
-  onChange?: () => void;
+  onChange?: (gasLimit: number, networkFee: number) => void;
 }
 
 const GasStepSelect = (props: IGasStepProps) => {
@@ -77,7 +77,7 @@ const GasStepSelect = (props: IGasStepProps) => {
         show({
           onCancel: () => { },
           onSuccess: (newGasLimit, newGasFee) => {
-            onChange?.()
+            onChange?.(newGasLimit, newGasFee);
             dismiss();
 
             setGasLimit(newGasLimit.toString())
