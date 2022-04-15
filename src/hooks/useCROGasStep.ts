@@ -19,7 +19,7 @@ const GasPriceStep = {
 
 export const getGasFee = (gasStep: CROGasStep, asset: UserAsset) => {
   const gasPrice = GasPriceStep[gasStep]
-  const gasFeeInNumber = gasPrice * Number(asset.config.fee.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT)
+  const gasFeeInNumber = gasPrice * Number(asset.config?.fee.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT)
   return gasFeeInNumber.toString()
 }
 export const getGasFeeInCRO = (gasStep: CROGasStep, asset: UserAsset) => {
@@ -40,7 +40,7 @@ export const useCROGasStep = (asset: UserAsset) => {
   }, [gasStep, asset, getGasFee])
 
   const gasLimit = useMemo(() => {
-    return asset.config.fee.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT;
+    return asset.config?.fee.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT;
   }, [asset])
 
   return { gasStep, gasFee, gasLimit, updateGasStep };
