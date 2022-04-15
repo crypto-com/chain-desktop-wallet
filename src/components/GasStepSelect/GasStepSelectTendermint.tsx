@@ -1,0 +1,91 @@
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Form, Tooltip } from 'antd';
+import * as React from 'react';
+import { useEffect, useState } from 'react';
+import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
+import { UserAsset } from '../../models/UserAsset';
+import { getNormalScaleAmount } from '../../utils/NumberUtils';
+import { useCustomGasModalTendermint } from './CustomGasModalTendermint';
+
+
+const GasStepSelectTendermint = (props: {
+  asset: UserAsset,
+  onChange?: (gasLimit: number, networkFee: number) => void,
+}) => {
+
+  const { asset, onChange } = props;
+
+  const [networkFee, setNetworkFee] = useState(asset.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE);
+  const [gasLimit, setGasLimit] = useState(asset.config?.fee?.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT);
+
+  const { show, dismiss } = useCustomGasModalTendermint(asset, networkFee, gasLimit);
+
+  const [readableGasFee, setReadableGasFee] = useState('')
+
+  const updateFee = (newNetworkFee: string) => {
+
+    const amount = getNormalScaleAmount(newNetworkFee, asset)
+
+    setReadableGasFee(`${amount} ${asset.symbol}`);
+  }
+
+  useEffect(() => {
+    if (!asset) {
+      return;
+    }
+    updateFee(asset.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE);
+  }, [asset]);
+
+  return <Form.Item label={
+    <div style={{
+      display: 'flex',
+      alignItems: 'center',
+    }}>
+      <div style={{ marginRight: 4 }}>
+        Confirmation Speed
+      </div>
+      <Tooltip title="Sending crypto on blockchain requires confirmation by the token network. When applicable, the higher the network fees, the more likely your transaction will be confirmed in a shorter period of time.">
+        <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+      </Tooltip>
+    </div>}>
+    <div style={{
+      display: "flex",
+      background: "#F7F7F7",
+      justifyContent: "space-between",
+      alignItems: "center",
+      padding: "14px",
+    }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: "column",
+        alignItems: 'flex-start',
+      }}>
+        <p style={{
+          marginBottom: "0px",
+        }}>Standard</p>
+        <p style={{
+          marginBottom: "0px",
+          color: "#7B849B"
+        }}>Estimated time: 6s</p>
+      </div>
+      <p style={{
+        marginBottom: "0px"
+      }}>{readableGasFee}</p>
+    </div>
+    <a style={{ float: "right", marginTop: "4px" }} onClick={() => {
+      show({
+        onCancel: () => { },
+        onSuccess: (newGasLimit, newGasFee) => {
+          onChange?.(newGasLimit, newGasFee);
+          dismiss();
+
+          setGasLimit(newGasLimit.toString())
+          setNetworkFee(newGasFee.toString())
+          updateFee(newGasFee.toString());
+        }
+      })
+    }}>Custom Options</a>
+  </Form.Item>
+}
+
+export default GasStepSelectTendermint;

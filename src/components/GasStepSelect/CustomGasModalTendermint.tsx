@@ -73,7 +73,7 @@ const ModalBody = (props: {
     }}>Custom Gas</div>
     <Form layout="vertical" form={form} onValuesChange={(v) => {
 
-      const networkFee = v?.networkFee;
+      const networkFee = v?.networkFee ?? gasFee;
       if (!networkFee) {
         setReadableNetworkFee("-");
       } else {
@@ -124,7 +124,7 @@ const ModalBody = (props: {
         setRecoil(walletAllAssetsState, [...allAssets])
 
         onSuccess(newGasLimit, newNetworkFee);
-    }}>
+      }}>
       <Form.Item
         name="networkFee"
         label={t('settings.form1.networkFee.label')}
@@ -177,7 +177,7 @@ const ModalBody = (props: {
   </div>
 }
 
-const useCustomCROGasModal = (asset: UserAsset, gasFee: string, gasLimit: string) => {
+const useCustomGasModalTendermint = (asset: UserAsset, gasFee: string, gasLimit: string) => {
 
   let modalRef;
 
@@ -233,4 +233,4 @@ const useCustomCROGasModal = (asset: UserAsset, gasFee: string, gasLimit: string
   }
 }
 
-export { useCustomCROGasModal }
+export { useCustomGasModalTendermint }
