@@ -556,20 +556,21 @@ export class TransactionSenderService {
         };
 
         let signedTxHex = '';
+        const { networkFee, gasLimit } = await getCronosTendermintFeeConfig()
 
         if (nftTransferRequest.walletType === LEDGER_WALLET_TYPE) {
           signedTxHex = await ledgerTransactionSigner.signNFTTransfer(
             nftTransferUnsigned,
             nftTransferRequest.decryptedPhrase,
-            nftTransferRequest.gasFee,
-            nftTransferRequest.gasLimit
+            networkFee,
+            gasLimit
           );
         } else {
           signedTxHex = await transactionSigner.signNFTTransfer(
             nftTransferUnsigned,
             nftTransferRequest.decryptedPhrase,
-            nftTransferRequest.gasFee,
-            nftTransferRequest.gasLimit
+            networkFee,
+            gasLimit
           );
         }
 
@@ -768,20 +769,22 @@ export class TransactionSenderService {
     };
 
     let signedTxHex: string = '';
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig()
+
 
     if (nftMintRequest.walletType === LEDGER_WALLET_TYPE) {
       signedTxHex = await ledgerTransactionSigner.signNFTMint(
         nftMintUnsigned,
         nftMintRequest.decryptedPhrase,
-        nftMintRequest.gasFee,
-        nftMintRequest.gasLimit
+        networkFee,
+        gasLimit
       );
     } else {
       signedTxHex = await transactionSigner.signNFTMint(
         nftMintUnsigned,
         nftMintRequest.decryptedPhrase,
-        nftMintRequest.gasFee,
-        nftMintRequest.gasLimit
+        networkFee,
+        gasLimit
       );
     }
 
@@ -818,20 +821,21 @@ export class TransactionSenderService {
     };
 
     let signedTxHex: string = '';
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig()
 
     if (nftDenomIssueRequest.walletType === LEDGER_WALLET_TYPE) {
       signedTxHex = await ledgerTransactionSigner.signNFTDenomIssue(
         nftDenomIssueUnsigned,
         nftDenomIssueRequest.decryptedPhrase,
-        nftDenomIssueRequest.gasFee,
-        nftDenomIssueRequest.gasLimit
+        networkFee,
+        gasLimit,
       );
     } else {
       signedTxHex = await transactionSigner.signNFTDenomIssue(
         nftDenomIssueUnsigned,
         nftDenomIssueRequest.decryptedPhrase,
-        nftDenomIssueRequest.gasFee,
-        nftDenomIssueRequest.gasLimit
+        networkFee,
+        gasLimit
       );
     }
 

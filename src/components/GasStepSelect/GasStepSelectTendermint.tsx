@@ -73,6 +73,7 @@ const GasStepSelectTendermint = (props: {
     <div style={{
       display: 'flex',
       alignItems: 'center',
+      marginTop: '10px'
     }}>
       <div style={{ marginRight: 4 }}>
         Confirmation Speed

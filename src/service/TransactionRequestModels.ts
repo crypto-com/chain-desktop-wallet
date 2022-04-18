@@ -31,8 +31,6 @@ export interface NFTTransferRequest {
   decryptedPhrase: string;
   asset: UserAsset;
   walletType: string; // normal, ledger
-  gasFee: string;
-  gasLimit: number;
   nftType: NftType;
 }
 
@@ -49,8 +47,6 @@ export interface NFTMintRequest {
   decryptedPhrase: string;
   asset: UserAsset;
   walletType: string; // normal, ledger
-  gasFee: string;
-  gasLimit: number;
 }
 
 export interface NFTDenomIssueRequest {
@@ -63,8 +59,6 @@ export interface NFTDenomIssueRequest {
   decryptedPhrase: string;
   asset: UserAsset;
   walletType: string; // normal, ledger
-  gasFee: string;
-  gasLimit: number;
 }
 
 export interface DelegationRequest {
