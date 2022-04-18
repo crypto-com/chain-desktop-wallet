@@ -341,16 +341,7 @@ const FormSend: React.FC<FormSendProps> = props => {
         </div>
       </div>
       <RowAmountOption walletAsset={walletAsset!} form={form} />
-      <GasStepSelect asset={walletAsset!} onChange={(newGasLimit, newNetworkFee) => {
-        const newAsset = _.cloneDeep(walletAsset);
-        if (newAsset?.config?.fee) {
-          newAsset.config.fee = {
-            gasLimit: newGasLimit.toString(),
-            networkFee: newNetworkFee.toString(),
-          }
-          setWalletAsset(newAsset)
-        }
-      }} />
+      <GasStepSelect asset={walletAsset!} onChange={() => { }} />
       <Form.Item name="memo" label={t('send.formSend.memo.label')}>
         <Input />
       </Form.Item>

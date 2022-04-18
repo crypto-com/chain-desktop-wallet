@@ -3,30 +3,31 @@ import { Form, Tooltip } from 'antd';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
-import { UserAsset } from '../../models/UserAsset';
+import { useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
 import { getNormalScaleAmount } from '../../utils/NumberUtils';
 import { useCustomGasModalTendermint } from './CustomGasModalTendermint';
 
 
 const GasStepSelectTendermint = (props: {
-  asset: UserAsset,
   onChange?: (gasLimit: number, networkFee: number) => void,
 }) => {
 
-  const { asset, onChange } = props;
+  const { onChange } = props;
 
-  const [networkFee, setNetworkFee] = useState(asset.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE);
-  const [gasLimit, setGasLimit] = useState(asset.config?.fee?.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT);
+  const asset = useCronosTendermintAsset()
 
-  const { show, dismiss } = useCustomGasModalTendermint(asset, networkFee, gasLimit);
+  const [networkFee, setNetworkFee] = useState(asset!.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE);
+  const [gasLimit, setGasLimit] = useState(asset!.config?.fee?.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT);
+
+  const { show, dismiss } = useCustomGasModalTendermint(asset!, networkFee, gasLimit);
 
   const [readableGasFee, setReadableGasFee] = useState('')
 
   const updateFee = (newNetworkFee: string) => {
 
-    const amount = getNormalScaleAmount(newNetworkFee, asset)
+    const amount = getNormalScaleAmount(newNetworkFee, asset!)
 
-    setReadableGasFee(`${amount} ${asset.symbol}`);
+    setReadableGasFee(`${amount} ${asset!.symbol}`);
   }
 
   useEffect(() => {

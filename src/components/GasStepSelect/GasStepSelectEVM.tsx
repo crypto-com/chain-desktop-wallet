@@ -4,22 +4,21 @@ import { ethers } from 'ethers';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
-import { UserAsset } from '../../models/UserAsset';
+import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
 import { getNormalScaleAmount } from '../../utils/NumberUtils';
 import { useCustomGasModalEVM } from './CustomGasModalEVM';
 
 
 const GasStepSelectEVM = (props: {
-  asset: UserAsset,
   onChange?: (gasLimit: number, gasPrice: number) => void,
 }) => {
 
-  const { asset, onChange } = props;
+  const asset = useCronosEvmAsset();
 
-  const [gasPrice, setGasPrice] = useState(asset.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE);
-  const [gasLimit, setGasLimit] = useState(asset.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT);
+  const [gasPrice, setGasPrice] = useState(asset?.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE);
+  const [gasLimit, setGasLimit] = useState(asset?.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT);
 
-  const { show, dismiss } = useCustomGasModalEVM(asset, gasPrice, gasLimit);
+  const { show, dismiss } = useCustomGasModalEVM(asset!, gasPrice, gasLimit);
 
   const [readableGasFee, setReadableGasFee] = useState('')
 
@@ -28,9 +27,9 @@ const GasStepSelectEVM = (props: {
 
     const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(ethers.BigNumber.from(newGasPrice))
 
-    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset)
+    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset!)
 
-    setReadableGasFee(`${amount} ${asset.symbol}`);
+    setReadableGasFee(`${amount} ${asset!.symbol}`);
   }
 
   useEffect(() => {
@@ -80,7 +79,7 @@ const GasStepSelectEVM = (props: {
       show({
         onCancel: () => { },
         onSuccess: (newGasLimit, newGasFee) => {
-          onChange?.(newGasLimit, newGasFee);
+          props.onChange?.(newGasLimit, newGasFee);
           dismiss();
 
           setGasLimit(newGasLimit.toString())

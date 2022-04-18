@@ -13,11 +13,11 @@ const GasStepSelect = (props: IGasStepProps) => {
 
 
   if (asset.assetType === UserAssetType.TENDERMINT || asset.assetType === UserAssetType.IBC) {
-    return <GasStepSelectTendermint asset={asset} onChange={onChange} />
+    return <GasStepSelectTendermint onChange={onChange} />
   }
 
   if (asset.assetType === UserAssetType.EVM || asset.assetType === UserAssetType.CRC_20_TOKEN) {
-    return <GasStepSelectEVM asset={asset} onChange={onChange} />
+    return <GasStepSelectEVM onChange={onChange} />
   }
 
   // const { gasStep, updateGasStep } = useCROGasStep(asset)
