@@ -19,8 +19,6 @@ export interface VoteRequest {
   decryptedPhrase: string;
   asset: UserAsset;
   walletType: string; // normal, ledger
-  gasFee: string;
-  gasLimit: number;
 }
 
 export interface NFTTransferRequest {

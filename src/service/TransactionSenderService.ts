@@ -506,20 +506,21 @@ export class TransactionSenderService {
     };
 
     let signedTxHex: string = '';
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig()
 
     if (voteRequest.walletType === LEDGER_WALLET_TYPE) {
       signedTxHex = await ledgerTransactionSigner.signVoteTransaction(
         voteTransactionUnsigned,
         voteRequest.decryptedPhrase,
-        voteRequest.gasFee,
-        voteRequest.gasLimit
+        networkFee,
+        gasLimit
       );
     } else {
       signedTxHex = await transactionSigner.signVoteTransaction(
         voteTransactionUnsigned,
         voteRequest.decryptedPhrase,
-        voteRequest.gasFee,
-        voteRequest.gasLimit
+        networkFee,
+        gasLimit
       );
     }
 
