@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import numeral from 'numeral';
-import _ from 'lodash';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 import { walletService } from '../../../service/WalletService';
 import SuccessModalPopup from '../../../components/SuccessModalPopup/SuccessModalPopup';
@@ -31,9 +30,8 @@ import {
   adjustedTransactionAmount,
   fromScientificNotation,
   getCurrentMinAssetAmount,
-  getNormalScaleAmount,
 } from '../../../utils/NumberUtils';
-import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT, SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
+import { FIXED_DEFAULT_FEE, SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 import {
   AnalyticsActions,
@@ -179,8 +177,6 @@ const FormSend: React.FC<FormSendProps> = props => {
         memo,
         decryptedPhrase,
         walletType,
-        gasFee: walletAsset.config?.fee.networkFee ?? FIXED_DEFAULT_FEE,
-        gasLimit: Number(walletAsset.config?.fee.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT),
       });
 
       analyticsService.logTransactionEvent(

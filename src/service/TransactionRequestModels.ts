@@ -10,8 +10,6 @@ export interface TransferRequest {
   decryptedPhrase: string;
   asset: UserAsset;
   walletType: string; // normal, ledger
-  gasFee: string;
-  gasLimit: number;
 }
 
 export interface VoteRequest {
@@ -78,8 +76,6 @@ export interface DelegationRequest {
   asset: UserAsset;
   decryptedPhrase: string;
   walletType: string; // normal, ledger
-  gasFee: string;
-  gasLimit: number;
 }
 
 export interface UndelegationRequest extends DelegationRequest { }
@@ -91,16 +87,12 @@ export interface RedelegationRequest {
   asset: UserAsset;
   decryptedPhrase: string;
   walletType: string; // normal, ledger
-  gasFee: string;
-  gasLimit: number;
 }
 
 export interface WithdrawStakingRewardRequest {
   validatorAddress: string;
   decryptedPhrase: string;
   walletType: string; // normal, ledger
-  gasFee: string;
-  gasLimit: number;
 }
 
 //
