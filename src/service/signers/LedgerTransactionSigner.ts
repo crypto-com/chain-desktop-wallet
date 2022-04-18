@@ -24,7 +24,8 @@ import {
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
 import { BaseTransactionSigner, ITransactionSigner } from './TransactionSigner';
-import { isNumeric } from '../../utils/utils';
+import { getCronosTendermintAsset, isNumeric } from '../../utils/utils';
+import { walletService } from '../WalletService';
 
 export class LedgerTransactionSigner extends BaseTransactionSigner implements ITransactionSigner {
   public readonly config: WalletConfig;

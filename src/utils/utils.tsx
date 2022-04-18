@@ -3,9 +3,12 @@ import { bech32 } from 'bech32';
 import { ethers } from 'ethers';
 import { CroNetwork } from '@crypto-org-chain/chain-jslib';
 import Web3 from 'web3';
+import { getRecoil } from 'recoil-nexus';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
-import { Network, WalletConfig, SupportedChainName } from '../config/StaticConfig';
+import { Network, WalletConfig, SupportedChainName, FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../config/StaticConfig';
 import { CRC20MainnetTokenInfos } from '../config/CRC20Tokens';
+import { walletService } from '../service/WalletService';
+import { sessionState } from '../recoil/atom';
 
 export function isElectron() {
   // Renderer process
@@ -246,4 +249,17 @@ export function addHTTPsPrefixIfNeeded(str: string) {
   }
 
   return `https://${str}`;
+}
+
+export async function getCronosTendermintFeeConfig() {
+  const currentSession = getRecoil(sessionState);
+  const allAssets = await walletService.retrieveWalletAssets(
+    currentSession.wallet.identifier,
+  );
+  const chainConfig = getCronosTendermintAsset(allAssets)?.config;
+
+  return {
+    networkFee: chainConfig?.fee.networkFee ?? FIXED_DEFAULT_FEE,
+    gasLimit: Number(chainConfig?.fee.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT)
+  }
 }

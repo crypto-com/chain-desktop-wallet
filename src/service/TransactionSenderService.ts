@@ -36,7 +36,7 @@ import { TransactionPrepareService } from './TransactionPrepareService';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
 import { TransactionHistoryService } from './TransactionHistoryService';
-import { getCronosEvmAsset, sleep } from '../utils/utils';
+import { getCronosEvmAsset, getCronosTendermintFeeConfig, sleep } from '../utils/utils';
 import { BridgeService } from './bridge/BridgeService';
 import { walletService } from './WalletService';
 
@@ -255,6 +255,9 @@ export class TransactionSenderService {
       case UserAssetType.TENDERMINT:
       case UserAssetType.IBC:
       case undefined: {
+
+        const { networkFee, gasLimit } = await getCronosTendermintFeeConfig()
+
         const {
           nodeRpc,
           accountNumber,
@@ -270,7 +273,7 @@ export class TransactionSenderService {
           memo: transferRequest.memo,
           accountNumber,
           accountSequence,
-          asset: currentAsset,
+          asset: transferRequest.asset,
         };
 
         let signedTxHex: string = '';
@@ -279,15 +282,15 @@ export class TransactionSenderService {
           signedTxHex = await ledgerTransactionSigner.signTransfer(
             transfer,
             transferRequest.decryptedPhrase,
-            transferRequest.gasFee,
-            transferRequest.gasLimit
+            networkFee,
+            gasLimit
           );
         } else {
           signedTxHex = await transactionSigner.signTransfer(
             transfer,
             transferRequest.decryptedPhrase,
-            transferRequest.gasFee,
-            transferRequest.gasLimit
+            networkFee,
+            gasLimit
           );
         }
 

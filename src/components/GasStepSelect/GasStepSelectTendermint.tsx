@@ -8,6 +8,38 @@ import { getNormalScaleAmount } from '../../utils/NumberUtils';
 import { useCustomGasModalTendermint } from './CustomGasModalTendermint';
 
 
+export const GasInfoTendermint = () => {
+
+  const asset = useCronosTendermintAsset()
+  const [readableGasFee, setReadableGasFee] = useState('')
+
+  const updateFee = (newNetworkFee: string) => {
+
+    const amount = getNormalScaleAmount(newNetworkFee, asset!)
+
+    setReadableGasFee(`${amount} ${asset!.symbol}`);
+  }
+
+  useEffect(() => {
+    if (!asset) {
+      return;
+    }
+    updateFee(asset.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE);
+  }, [asset]);
+
+  return <>
+    <div className="item">
+      <div className="label">Estimated Network Fee</div>
+      <div>{readableGasFee}</div>
+    </div>
+    <div className='item'>
+
+      <div className="label">Estimated Time</div>
+      <div>6s</div>
+    </div>
+  </>
+}
+
 const GasStepSelectTendermint = (props: {
   onChange?: (gasLimit: number, networkFee: number) => void,
 }) => {

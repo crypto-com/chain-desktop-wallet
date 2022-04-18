@@ -133,7 +133,7 @@ const ModalBody = (props: {
       }}>
       <Form.Item
         name="gasPrice"
-        label="Gas Price"
+        label="Gas Price(WEI)"
         hasFeedback
         rules={[
           {

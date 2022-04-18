@@ -47,6 +47,7 @@ import { AddressBookService } from '../../../service/AddressBookService';
 import { AddressBookContact } from '../../../models/AddressBook';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import GasStepSelect from '../../../components/GasStepSelect';
+import GasInfo from '../../../components/GasStepSelect/GasInfo';
 
 const layout = {};
 const tailLayout = {};
@@ -413,16 +414,7 @@ const FormSend: React.FC<FormSendProps> = props => {
                   : ''}
               </div>
             </div>
-            {walletAsset?.assetType === UserAssetType.TENDERMINT ? (
-              <div className="item">
-                <div className="label">{t('send.modal1.label4')}</div>
-                {/* <GasStep asset={walletAsset} /> */}
-                <div>{`~${getNormalScaleAmount(getTransactionFee(walletAsset!), walletAsset!)} ${walletAsset?.symbol
-                  }`}</div>
-              </div>
-            ) : (
-              <></>
-            )}
+            <GasInfo asset={walletAsset!} />
             <div className="item">
               <div className="label">{t('send.modal1.label5')}</div>
               {formValues?.memo !== undefined &&
