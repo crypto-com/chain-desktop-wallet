@@ -11,6 +11,8 @@ import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
 import { getAssetAmountInFiat, UserAsset } from '../../models/UserAsset';
 import { getNormalScaleAmount } from "../../utils/NumberUtils"
 import { walletService } from '../../service/WalletService';
+import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
+import { Session } from '../../models/Session';
 
 const ModalBody = (props: {
   asset: UserAsset,
@@ -23,6 +25,8 @@ const ModalBody = (props: {
   const [t] = useTranslation();
 
   const [form] = Form.useForm();
+
+  const cronosEVMAsset = useCronosEvmAsset()
 
   const currentSession = getRecoil(sessionState);
   const allMarketData = getRecoil(allMarketState);
@@ -71,6 +75,10 @@ const ModalBody = (props: {
 
   }, [asset, gasPrice, gasLimit]);
 
+  if (!cronosEVMAsset) {
+    return <React.Fragment />
+  }
+
   return <div>
     <div style={{
       fontSize: "24px",
@@ -104,29 +112,28 @@ const ModalBody = (props: {
 
         const updatedWallet = await walletService.findWalletByIdentifier(currentSession.wallet.identifier);
 
-        const newlyUpdatedAsset: UserAsset = {
-          ...currentSession.activeAsset!,
+        const newlyUpdatedAsset = {
+          ...cronosEVMAsset,
           config: {
-            ...asset.config,
+            ...cronosEVMAsset.config,
             fee: { gasLimit: newGasLimit.toString(), networkFee: newGasPrice.toString() },
           },
         };
 
-        await walletService.saveAssets([newlyUpdatedAsset]);
+        await walletService.saveAssets([newlyUpdatedAsset as UserAsset]);
 
         const newSession = {
           ...currentSession,
           wallet: updatedWallet,
-          activeAsset: newlyUpdatedAsset,
         };
-        setRecoil(sessionState, newSession)
+        setRecoil(sessionState, newSession as Session)
 
-        await walletService.setCurrentSession(newSession);
+        await walletService.setCurrentSession(newSession as Session);
 
         const allNewUpdatedWallets = await walletService.retrieveAllWallets();
         setRecoil(walletListState, [...allNewUpdatedWallets])
 
-        const allAssets = await walletService.retrieveCurrentWalletAssets(newSession);
+        const allAssets = await walletService.retrieveCurrentWalletAssets(newSession as Session);
         setRecoil(walletAllAssetsState, [...allAssets])
 
         onSuccess(newGasLimit, newGasPrice);
