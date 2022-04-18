@@ -2,11 +2,48 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Form, Tooltip } from 'antd';
 import { ethers } from 'ethers';
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
 import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
 import { getNormalScaleAmount } from '../../utils/NumberUtils';
 import { useCustomGasModalEVM } from './CustomGasModalEVM';
+
+export const GasInfoEVM = () => {
+
+  const asset = useCronosEvmAsset()
+
+  const gasPrice = useMemo(() => asset?.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE, [asset]);
+  const gasLimit = useMemo(() => asset?.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT, [asset]);
+  const [readableGasFee, setReadableGasFee] = useState('')
+
+  const updateFee = (newGasPrice: string, newGasLimit: string) => {
+
+    const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(ethers.BigNumber.from(newGasPrice))
+
+    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset!)
+
+    setReadableGasFee(`${amount} ${asset!.symbol}`);
+  }
+
+  useEffect(() => {
+    if (!asset) {
+      return;
+    }
+    updateFee(gasPrice, gasLimit);
+  }, [gasPrice, gasLimit]);
+
+  return <>
+    <div className="item">
+      <div className="label">Estimated Network Fee</div>
+      <div>{readableGasFee}</div>
+    </div>
+    <div className='item'>
+
+      <div className="label">Estimated Time</div>
+      <div>6s</div>
+    </div>
+  </>
+}
 
 
 const GasStepSelectEVM = (props: {
