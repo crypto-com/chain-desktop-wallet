@@ -1,4 +1,6 @@
 import Big from 'big.js';
+// import { ethers } from 'ethers';
+// import axios from 'axios';
 import { StorageService } from '../storage/StorageService';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import {
@@ -7,10 +9,16 @@ import {
   VALIDATOR_UPTIME_THRESHOLD,
 } from '../config/StaticConfig';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
+import {
+  NftType,
+  CronosCRC721NftModelData,
+  CronosCRC721NftModel,
+  CryptoOrgNftModel,
+  CryptoOrgNftModelData,
+} from '../models/Nft';
 import { CronosClient } from './cronos/CronosClient';
 import {
   CommonTransactionRecord,
-  NftModel,
   NftQueryParams,
   NftTransferModel,
   ProposalModel,
@@ -27,7 +35,8 @@ import {
 import { Session } from '../models/Session';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { croMarketPriceApi } from './rpc/MarketApi';
-import { isCRC20AssetWhitelisted } from '../utils/utils';
+import { CronosNftIndexingAPI } from './rpc/indexing/nft/cronos/CronosNftIndexingAPI';
+import { checkIfTestnet, getCronosEvmAsset, isCRC20AssetWhitelisted } from '../utils/utils';
 import { SupportedCRCTokenStandard } from './rpc/interface/cronos.chainIndex';
 
 export class TransactionHistoryService {
@@ -511,30 +520,52 @@ export class TransactionHistoryService {
 
   public async fetchAndSaveNFTs(currentSession: Session) {
     try {
-      const nfts = await this.loadAllCurrentAccountNFTs();
-      if (nfts === null) {
-        return;
+      const cryptoOrgNFTs = await this.loadAllCurrentAccountCryptoOrgNFTs();
+
+      const cronosCRC721NFTs = await this.fetchCurrentWalletCRC721Tokens();
+
+      if (cryptoOrgNFTs !== null) {
+        await this.storageService.saveCryptoOrgNFTs(
+          currentSession.wallet.identifier,
+          cryptoOrgNFTs,
+        );
       }
 
-      await this.storageService.saveNFTs({
-        walletId: currentSession.wallet.identifier,
-        nfts,
-      });
+      if (cronosCRC721NFTs !== null) {
+        await this.storageService.saveCronosCRC721NFTs(
+          currentSession.wallet.identifier,
+          cronosCRC721NFTs,
+        );
+      }
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_SAVE_NFTS', e);
     }
   }
 
-  private async loadAllCurrentAccountNFTs(): Promise<NftModel[] | null> {
+  private async loadAllCurrentAccountCryptoOrgNFTs(): Promise<CryptoOrgNftModel[] | null> {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
         return Promise.resolve([]);
       }
       const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-      const nftList = await chainIndexAPI.getAccountNFTList(currentSession.wallet.address);
-      return await chainIndexAPI.getNftListMarketplaceData(nftList);
+      const cryptoOrgNftListResponse = await chainIndexAPI.getAccountNFTList(
+        currentSession.wallet.address,
+      );
+      const cryptoOrgNftListMarketplaceResponse: CryptoOrgNftModelData[] = await chainIndexAPI.getNftListMarketplaceData(
+        cryptoOrgNftListResponse,
+      );
+
+      const cryptoOrgNFTList: CryptoOrgNftModel[] = cryptoOrgNftListMarketplaceResponse.map(nft => {
+        return {
+          walletId: currentSession.wallet.identifier,
+          type: NftType.CRYPTO_ORG,
+          model: nft,
+        };
+      });
+
+      return cryptoOrgNFTList;
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING NFTs', e);
@@ -691,6 +722,51 @@ export class TransactionHistoryService {
     });
 
     return newlyLoadedTokens;
+  }
+
+  public async fetchCRC721TokenTxs() {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
+    const croEvmAsset: UserAsset | undefined = getCronosEvmAsset(assets);
+
+    if (!croEvmAsset || !croEvmAsset.config?.nodeUrl || !croEvmAsset.address) {
+      return [];
+    }
+
+    const { address } = croEvmAsset;
+
+    const cronosNftIndexingClient = CronosNftIndexingAPI.init();
+
+    return cronosNftIndexingClient.getNftTxsList(address);
+  }
+
+  private async fetchCurrentWalletCRC721Tokens(): Promise<CronosCRC721NftModel[] | null> {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
+    const croEvmAsset: UserAsset | undefined = getCronosEvmAsset(assets);
+    const isTestnet = checkIfTestnet(currentSession.wallet.config.network);
+
+    if (!croEvmAsset || !croEvmAsset.config?.nodeUrl || !croEvmAsset.address || isTestnet) {
+      return [];
+    }
+
+    const { address } = croEvmAsset;
+
+    const cronosNftIndexingClient = CronosNftIndexingAPI.init();
+
+    const nftListResponse: CronosCRC721NftModelData[] = await cronosNftIndexingClient.getNftList(
+      address,
+    );
+
+    const nftList: CronosCRC721NftModel[] = nftListResponse.map(nft => {
+      return {
+        walletId: currentSession.wallet.identifier,
+        type: NftType.CRC_721_TOKEN,
+        model: nft,
+      };
+    });
+
+    return nftList;
   }
 
   public async fetchTokensAndPersistBalances(session: Session | null = null) {

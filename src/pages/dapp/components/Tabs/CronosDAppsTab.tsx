@@ -267,7 +267,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
                 return project.category.some(c => selectedCategories.includes(c));
               })
         }
-        rowKey="id"
+        rowKey="name"
         rowClassName="dapps-table-row"
         pagination={false}
         columns={columns}

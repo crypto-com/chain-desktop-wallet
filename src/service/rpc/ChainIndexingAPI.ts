@@ -5,7 +5,7 @@ import {
   NftAccountTransactionListResponse,
   NftDenomResponse,
   NftListResponse,
-  NftResponse,
+  CryptoOrgNftResponse,
   NftTransactionListResponse,
   NftTransactionResponse,
   TransferDataAmount,
@@ -21,7 +21,6 @@ import {
   NftQueryParams,
   TransactionStatus,
   TransferTransactionData,
-  NftModel,
   MsgTypeName,
   TransactionData,
   BaseCommonTransaction,
@@ -30,6 +29,7 @@ import {
   RewardTransactionRecord,
   CommonTransactionRecord,
 } from '../../models/Transaction';
+import { CryptoOrgNftModelData } from '../../models/Nft';
 import { DefaultWalletConfigs, SECONDS_OF_YEAR } from '../../config/StaticConfig';
 import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
@@ -58,7 +58,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     return new ChainIndexingAPI(axiosClient);
   }
 
-  public async getAccountNFTList(account: string): Promise<NftResponse[]> {
+  public async getAccountNFTList(account: string): Promise<CryptoOrgNftResponse[]> {
     let paginationPage = 1;
     const nftsListRequest = await this.axiosClient.get<NftListResponse>(
       `/nfts/accounts/${account}/tokens?page=${paginationPage}`,
@@ -85,8 +85,10 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public async getNftListMarketplaceData(nftLists: NftResponse[]): Promise<NftModel[]> {
-    const nftListMap: NftModel[] = [];
+  public async getNftListMarketplaceData(
+    nftLists: CryptoOrgNftResponse[],
+  ): Promise<CryptoOrgNftModelData[]> {
+    const nftListMap: CryptoOrgNftModelData[] = [];
     const payload: MintByCDCRequest[] = nftLists.map(item => {
       nftListMap[`${item.denomId}-${item.tokenId}`] = {
         ...item,

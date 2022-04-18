@@ -4,11 +4,13 @@ import { AbiItem } from 'web3-utils';
 import { signTypedData_v4 } from 'eth-sig-util';
 import { ITransactionSigner } from './TransactionSigner';
 import TokenContractABI from './abi/TokenContractABI.json';
+import CRC721TokenContractABI from '../../contracts/CRC721.json';
 
 import {
   BridgeTransactionUnsigned,
   DelegateTransactionUnsigned,
   EVMContractCallUnsigned,
+  EVMNFTTransferUnsigned,
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
 } from './TransactionSupported';
@@ -99,6 +101,23 @@ class EvmTransactionSigner implements ITransactionSigner {
 
     const signedTx = await wallet.sendTransaction(txParams);
     return Promise.resolve(signedTx.hash);
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public async sendCall(
+    asset: UserAsset,
+    payload: ethers.providers.TransactionRequest,
+    jsonRpcUrl: string,
+  ): Promise<string> {
+    if (!asset.address || !asset.config?.nodeUrl) {
+      throw TypeError(`Missing asset config: ${asset.config}`);
+    }
+
+    const provider = new ethers.providers.JsonRpcProvider(jsonRpcUrl);
+
+    const response = await provider.call(payload);
+
+    return Promise.resolve(response);
   }
 
   static async signPersonalMessage(message: string, passphrase = ''): Promise<string> {
@@ -194,6 +213,33 @@ class EvmTransactionSigner implements ITransactionSigner {
     const contractABI = TokenContractABI.abi as AbiItem[];
     const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
     return contract.methods.approve(spender, amount).encodeABI() as string;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public encodeNFTTransferABI(tokenContractAddress: string, transaction: EVMNFTTransferUnsigned) {
+    const web3 = new Web3('');
+    const contractABI = CRC721TokenContractABI.abi as AbiItem[];
+    const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
+    return contract.methods
+      .safeTransferFrom(transaction.sender, transaction.recipient, transaction.tokenId)
+      .encodeABI() as string;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public getNFTSafeTransferFromEstimatedGas(
+    asset: UserAsset,
+    tokenContractAddress: string,
+    transaction: EVMNFTTransferUnsigned,
+  ) {
+    if (!asset.config?.nodeUrl) {
+      throw new TypeError('Missing config Node URL');
+    }
+    const web3 = new Web3(asset.config.nodeUrl);
+    const contractABI = CRC721TokenContractABI.abi as AbiItem[];
+    const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
+    return contract.methods
+      .safeTransferFrom(transaction.sender, transaction.recipient, transaction.tokenId)
+      .estimateGas();
   }
 
   // eslint-disable-next-line class-methods-use-this
