@@ -29,6 +29,7 @@ import {
   BridgeTransactionListResponse,
   BridgeTransactionStatusResponse,
 } from './contracts/BridgeModels';
+import { getCronosTendermintFeeConfig } from '../../utils/utils';
 
 export class BridgeService {
   public readonly storageService: StorageService;
@@ -218,16 +219,21 @@ export class BridgeService {
     };
 
     let signedTxHex: string = '';
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig()
 
     if (bridgeTransferRequest.walletType === LEDGER_WALLET_TYPE) {
       signedTxHex = await ledgerTransactionSigner.signIBCTransfer(
         bridgeTransaction,
         bridgeTransferRequest.decryptedPhrase,
+        networkFee,
+        gasLimit
       );
     } else {
       signedTxHex = await transactionSigner.signIBCTransfer(
         bridgeTransaction,
         bridgeTransferRequest.decryptedPhrase,
+        networkFee,
+        gasLimit
       );
     }
 

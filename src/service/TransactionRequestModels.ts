@@ -99,6 +99,4 @@ export interface BridgeTransferRequest {
   amount: string;
   decryptedPhrase: string;
   walletType: string; // normal, ledger
-  gasFee: string;
-  gasLimit: number;
 }

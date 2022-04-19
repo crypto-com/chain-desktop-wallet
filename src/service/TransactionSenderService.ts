@@ -148,7 +148,7 @@ export class TransactionSenderService {
         } catch (e) {
           // eslint-disable-next-line no-console
           console.log(`ERROR_TRANSFERRING - ${currentAsset.assetType}`, e);
-          throw TypeError(e);
+          throw TypeError(e as any);
         }
 
       case UserAssetType.CRC_20_TOKEN:
@@ -249,7 +249,7 @@ export class TransactionSenderService {
             `ERROR_TRANSFERRING_TOKEN - ${currentAsset.assetType} ${currentAsset.symbol}`,
             e,
           );
-          throw TypeError(e);
+          throw TypeError(e as any);
         }
 
       case UserAssetType.TENDERMINT:
