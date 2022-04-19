@@ -40,6 +40,31 @@ export const GasInfoTendermint = () => {
   </>
 }
 
+const GasStep = (props: { isUsingCustomFee: boolean }) => {
+  if (props.isUsingCustomFee) {
+    return <>
+      <p style={{
+        marginBottom: "0px",
+      }}>Custom</p>
+      <p style={{
+        marginBottom: "0px",
+        color: "#7B849B"
+      }}>Estimated time: ~1~24 hours</p>
+    </>
+  }
+
+  return <>
+    <p style={{
+      marginBottom: "0px",
+    }}>Standard</p>
+    <p style={{
+      marginBottom: "0px",
+      color: "#7B849B"
+    }}>Estimated time: 6s</p>
+  </>
+}
+
+
 const GasStepSelectTendermint = (props: {
   onChange?: (gasLimit: number, networkFee: number) => void,
 }) => {
@@ -51,12 +76,13 @@ const GasStepSelectTendermint = (props: {
   const [networkFee, setNetworkFee] = useState(asset!.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE);
   const [gasLimit, setGasLimit] = useState(asset!.config?.fee?.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT);
 
+  const [isUsingCustomFee, setIsUsingCustomFee] = useState(false);
   const { show, dismiss } = useCustomGasModalTendermint(asset!, networkFee, gasLimit);
 
   const [readableGasFee, setReadableGasFee] = useState('')
 
   const updateFee = (newNetworkFee: string) => {
-
+    setIsUsingCustomFee(newNetworkFee !== FIXED_DEFAULT_FEE);
     const amount = getNormalScaleAmount(newNetworkFee, asset!)
 
     setReadableGasFee(`${amount} ${asset!.symbol}`);
@@ -94,13 +120,7 @@ const GasStepSelectTendermint = (props: {
         flexDirection: "column",
         alignItems: 'flex-start',
       }}>
-        <p style={{
-          marginBottom: "0px",
-        }}>Standard</p>
-        <p style={{
-          marginBottom: "0px",
-          color: "#7B849B"
-        }}>Estimated time: 6s</p>
+        <GasStep isUsingCustomFee={isUsingCustomFee} />
       </div>
       <p style={{
         marginBottom: "0px"

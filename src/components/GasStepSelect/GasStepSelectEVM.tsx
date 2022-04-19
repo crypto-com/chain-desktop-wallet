@@ -45,6 +45,31 @@ export const GasInfoEVM = () => {
   </>
 }
 
+const GasStep = (props: { isUsingCustomFee: boolean }) => {
+  if (props.isUsingCustomFee) {
+    return <>
+      <p style={{
+        marginBottom: "0px",
+      }}>Custom</p>
+      <p style={{
+        marginBottom: "0px",
+        color: "#7B849B"
+      }}>Estimated time: ~1~24 hours</p>
+    </>
+  }
+
+  return <>
+    <p style={{
+      marginBottom: "0px",
+    }}>Standard</p>
+    <p style={{
+      marginBottom: "0px",
+      color: "#7B849B"
+    }}>Estimated time: 6s</p>
+  </>
+}
+
+
 
 const GasStepSelectEVM = (props: {
   onChange?: (gasLimit: number, gasPrice: number) => void,
@@ -54,6 +79,7 @@ const GasStepSelectEVM = (props: {
 
   const [gasPrice, setGasPrice] = useState(asset?.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE);
   const [gasLimit, setGasLimit] = useState(asset?.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT);
+  const [isUsingCustomGas, setIsUsingCustomGas] = useState(false)
 
   const { show, dismiss } = useCustomGasModalEVM(asset!, gasPrice, gasLimit);
 
@@ -61,6 +87,9 @@ const GasStepSelectEVM = (props: {
 
   const updateFee = (newGasPrice: string, newGasLimit: string) => {
 
+    if (newGasPrice !== EVM_MINIMUM_GAS_PRICE || newGasLimit !== EVM_MINIMUM_GAS_LIMIT) {
+      setIsUsingCustomGas(true)
+    }
 
     const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(ethers.BigNumber.from(newGasPrice))
 
@@ -100,13 +129,7 @@ const GasStepSelectEVM = (props: {
         flexDirection: "column",
         alignItems: 'flex-start',
       }}>
-        <p style={{
-          marginBottom: "0px",
-        }}>Standard</p>
-        <p style={{
-          marginBottom: "0px",
-          color: "#7B849B"
-        }}>Estimated time: 6s</p>
+        <GasStep isUsingCustomFee={isUsingCustomGas} />
       </div>
       <p style={{
         marginBottom: "0px"
