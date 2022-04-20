@@ -87,6 +87,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     [webview],
   );
 
+  // Prevent potential Phishing Attack
   const injectDomReadyScript = useCallback(() => {
     executeJavScript(`
     window.onbeforeunload = function() {
