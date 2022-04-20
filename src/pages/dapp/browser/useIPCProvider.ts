@@ -87,19 +87,24 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     [webview],
   );
 
-  // const injectDomReadyScript = useCallback(() => {
-  //   executeJavScript(
-  //     `
-  //           var config = {
-  //               chainId: ${ChainConfig.chainId},
-  //               rpcUrl: "${ChainConfig.rpcUrl}",
-  //               isDebug: true
-  //           };
-  //           window.ethereum = new window.desktopWallet.Provider(config);
-  //           window.web3 = new window.desktopWallet.Web3(window.ethereum);
-  //       `,
-  //   );
-  // }, [webview]);
+  const injectDomReadyScript = useCallback(() => {
+    executeJavScript(`
+    window.onbeforeunload = function() {
+      return;
+    }
+    `);
+    // executeJavScript(
+    //   `
+    //         var config = {
+    //             chainId: ${ChainConfig.chainId},
+    //             rpcUrl: "${ChainConfig.rpcUrl}",
+    //             isDebug: true
+    //         };
+    //         window.ethereum = new window.desktopWallet.Provider(config);
+    //         window.web3 = new window.desktopWallet.Web3(window.ethereum);
+    //     `,
+    // );
+  }, [webview]);
 
   const sendError = (id: number, error: string) => {
     executeJavScript(`
@@ -427,7 +432,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     });
 
     webview.addEventListener('did-finish-load', () => {
-      // injectDomReadyScript();
+      injectDomReadyScript();
       if (process.env.NODE_ENV === 'development') {
         webview.openDevTools();
       }
