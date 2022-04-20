@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.7.6] - 2022-04-20
+### Bug fixes
+- Measures on preventing potential Phishing Attack on DApp Browser
+## [v0.7.5] - 2022-04-14
+### Additions
+- Cronos NFT support
+- Password protection on Address Book
+### Bug fixes
+- Restart & purge local storage automatically after 10 incorrect password attempts
 ## [v0.7.4] - 2022-03-25
 ### Additions
 - Duration selection for Auto Update disable

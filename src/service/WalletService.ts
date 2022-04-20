@@ -23,8 +23,6 @@ import {
   BroadCastResult,
   CommonTransactionRecord,
   NftAccountTransactionData,
-  NftDenomModel,
-  NftModel,
   ProposalModel,
   RewardsBalances,
   RewardTransactionData,
@@ -37,6 +35,7 @@ import {
   UnbondingDelegationList,
   ValidatorModel,
 } from '../models/Transaction';
+import { CommonNftModel, NftDenomModel } from '../models/Nft';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { LEDGER_WALLET_TYPE } from './LedgerService';
 import {
@@ -579,12 +578,16 @@ class WalletService {
     return proposalSet.proposals;
   }
 
-  public async retrieveNFTs(walletID: string): Promise<NftModel[]> {
-    const nftSet = await this.storageService.retrieveAllNfts(walletID);
-    if (!nftSet) {
+  public async retrieveNFTs(walletID: string): Promise<CommonNftModel[]> {
+    const nftSets = await this.storageService.retrieveAllNfts(walletID);
+    if (!nftSets) {
       return [];
     }
-    return nftSet.nfts;
+    return nftSets;
+  }
+
+  public async retrieveCronosNFTTxs() {
+    return this.txHistoryManager.fetchCRC721TokenTxs();
   }
 
   public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {
