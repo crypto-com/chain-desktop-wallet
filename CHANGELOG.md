@@ -5,7 +5,9 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
-
+## [v0.7.6] - 2022-04-20
+### Bug fixes
+- Measures on preventing potential Phishing Attack on DApp Browser
 ## [v0.7.5] - 2022-04-14
 ### Additions
 - Cronos NFT support
