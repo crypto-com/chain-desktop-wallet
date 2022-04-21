@@ -100,7 +100,7 @@ import nftThumbnail from '../../assets/nft-thumbnail.png';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { useCronosEvmAsset, useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
 import GasStepSelectTendermint, { GasInfoTendermint } from '../../components/GasStepSelect/GasStepSelectTendermint';
-import { GasInfoEVM } from '../../components/GasStepSelect/GasStepSelectEVM';
+import GasStepSelectEVM, { GasInfoEVM } from '../../components/GasStepSelect/GasStepSelectEVM';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -1804,9 +1804,16 @@ const NftPage = () => {
                         >
                           <Input placeholder={t('nft.modal3.form.recipientAddress.placeholder')} />
                         </Form.Item>
-                          <GasStepSelectTendermint onChange={(_, fee) => {
-                            setNetworkFee(fee.toString())
-                          }} />
+                          {isCryptoOrgNftModel(nft) && (
+                            <GasStepSelectTendermint onChange={(_, fee) => {
+                              setNetworkFee(fee.toString())
+                            }} />
+                          )}
+                          {isCronosNftModel(nft) && (
+                            <GasStepSelectEVM onChange={(_, fee) => {
+                              setNetworkFee(fee.toString())
+                            }} />
+                          )}
                       </Form>
                       {new Big(networkFee).gt(walletAsset.balance) ? (
                         <div className="item notice">
