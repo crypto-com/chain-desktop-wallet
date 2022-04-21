@@ -83,7 +83,7 @@ export class CroMarketApi implements IMarketApi {
   }
 
   public async getTokenPriceFromCryptoCom(cryptoSymbol: string, fiatCurrency: string) {
-    const whitelistedCRC20Tokens: string[] = Array.from( CRC20MainnetTokenInfos.keys() );
+    const whitelistedCRC20Tokens: string[] = Array.from(CRC20MainnetTokenInfos.keys());
     const allTokensSlugMap: CryptoComSlugResponse[] = await this.loadTokenSlugMap();
 
     const tokenSlugInfo = allTokensSlugMap.filter(tokenSlug => tokenSlug.symbol === cryptoSymbol);
@@ -105,9 +105,13 @@ export class CroMarketApi implements IMarketApi {
     );
 
     // Filter Cronos / whitelisted token price only
-    const tokenPriceInUSD = tokenPriceResponses.find(token =>
-      token.data.tags.includes('cronos-ecosystem') || whitelistedCRC20Tokens.includes(token.data.symbol)
-    );
+    const tokenPriceInUSD = tokenPriceResponses.find(token => {
+      token.data.tags = token.data.tags ?? []; // tags could be null
+      return (
+        whitelistedCRC20Tokens.includes(token.data.symbol) ||
+        token.data.tags.includes('cronos-ecosystem')
+      );
+    });
 
     if (!tokenPriceInUSD) {
       throw Error(`Couldn't find a valid slug name for ${cryptoSymbol}`);
