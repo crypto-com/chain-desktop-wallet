@@ -588,10 +588,7 @@ export class TransactionHistoryService {
 
     await Promise.all(
       assets.map(async (asset: UserAsset) => {
-        const assetPrice = await croMarketPriceApi.getAssetPrice(
-          asset.mainnetSymbol,
-          currentSession.currency,
-        );
+        const assetPrice = await croMarketPriceApi.getAssetPrice(asset, currentSession.currency);
         await this.storageService.saveAssetMarketPrice(assetPrice);
       }),
     );
