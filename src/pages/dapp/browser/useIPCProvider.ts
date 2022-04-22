@@ -140,7 +140,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   });
 
   const handleTokenApproval = useRefCallback(
-    async (event: DappBrowserIPC.TokenApprovalEvent, passphrase: string) => {
+    async (event: DappBrowserIPC.TokenApprovalEvent, passphrase: string, _gasPrice: BigNumber, _gasLimit: BigNumber) => {
       const prepareTXConfig: TransactionConfig = {
         from: event.object.from,
         to: event.object.to,
@@ -161,8 +161,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         from: event.object.from,
         contractAddress: event.object.to,
         data,
-        gasLimit: ethers.utils.hexValue(event.object.gas),
-        gasPrice: event.object.gasPrice,
+        gasLimit: _gasLimit.toString(),
+        gasPrice: _gasPrice.toString(),
         nonce: prepareTxInfo.nonce,
       };
       try {
@@ -202,7 +202,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   };
 
   const handleSendTransaction = useRefCallback(
-    async (event: DappBrowserIPC.SendTransactionEvent, passphrase: string) => {
+    async (event: DappBrowserIPC.SendTransactionEvent, passphrase: string, _gasPrice: BigNumber, _gasLimit: BigNumber) => {
       const prepareTXConfig: TransactionConfig = {
         from: event.object.from,
         to: event.object.to,
@@ -217,8 +217,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         from: event.object.from,
         contractAddress: event.object.to,
         data: event.object.data,
-        gasLimit: ethers.utils.hexValue(event.object.gas),
-        gasPrice: event.object.gasPrice,
+        gasLimit: _gasLimit.toString(),
+        gasPrice: _gasPrice.toString(),
         value: event.object.value,
         nonce: prepareTxInfo.nonce,
       };
@@ -321,7 +321,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             props.onRequestTokenApproval(
               approvalEvent,
               info => {
-                handleTokenApproval.current(approvalEvent, info.decryptedPhrase);
+                handleTokenApproval.current(approvalEvent, info.decryptedPhrase, info.gasPrice, info.gasLimit);
               },
               reason => {
                 sendError(event.id, reason);
@@ -331,7 +331,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             props.onRequestSendTransaction(
               event,
               info => {
-                handleSendTransaction.current(event, info.decryptedPhrase);
+                handleSendTransaction.current(event, info.decryptedPhrase, info.gasPrice, info.gasLimit);
               },
               reason => {
                 sendError(event.id, reason);
