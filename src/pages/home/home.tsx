@@ -146,7 +146,7 @@ const HomePage = () => {
       key: 'price',
       render: record => {
         const assetMarketData = allMarketData.get(
-          `${record.mainnetSymbol}-${currentSession.currency}`,
+          `${record.assetType}-${record.mainnetSymbol}-${currentSession.currency}`,
         );
         return (
           <>
@@ -179,7 +179,7 @@ const HomePage = () => {
       key: 'value',
       render: record => {
         const assetMarketData = allMarketData.get(
-          `${record.mainnetSymbol}-${currentSession.currency}`,
+          `${record.assetType}-${record.mainnetSymbol}-${currentSession.currency}`,
         );
         return (
           <>
@@ -281,7 +281,9 @@ const HomePage = () => {
   function getAllAssetsTotalBalance() {
     let totalBalance = Big('0');
     walletAllAssets.forEach(asset => {
-      const priceData = allMarketData.get(`${asset.mainnetSymbol}-${currentSession.currency}`);
+      const priceData = allMarketData.get(
+        `${asset.assetType}-${asset.mainnetSymbol}-${currentSession.currency}`,
+      );
       if (priceData) {
         const addingBalance = getAssetTotalBalancePrice(asset, priceData);
         totalBalance = totalBalance.add(addingBalance);
@@ -308,7 +310,11 @@ const HomePage = () => {
       setNFTList(allNFTs);
       setDefaultWalletAsset(currentAsset);
       setWalletAsset(currentAsset);
-      setMarketData(allMarketData.get(`${currentAsset?.mainnetSymbol}-${sessionData.currency}`));
+      setMarketData(
+        allMarketData.get(
+          `${currentAsset.assetType}-${currentAsset?.mainnetSymbol}-${sessionData.currency}`,
+        ),
+      );
 
       setRewards(allRewards);
 

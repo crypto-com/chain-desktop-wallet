@@ -310,7 +310,7 @@ const FormDelegationRequest = props => {
   }
 
   const assetMarketData = allMarketData.get(
-    `${walletAsset.mainnetSymbol}-${currentSession.currency}`,
+    `${walletAsset.assetType}-${walletAsset.mainnetSymbol}-${currentSession.currency}`,
   );
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol;
   const undelegatePeriod =
@@ -1099,7 +1099,7 @@ const FormWithdrawStakingReward = () => {
     const syncRewardsData = async () => {
       setIsRewardsLoading(true);
       const currentMarketData = allMarketData.get(
-        `${walletAsset?.mainnetSymbol}-${currentSession?.currency}`,
+        `${walletAsset?.assetType}-${walletAsset?.mainnetSymbol}-${currentSession?.currency}`,
       );
 
       const allRewards: RewardTransactionData[] = await walletService.retrieveAllRewards(
@@ -1717,7 +1717,11 @@ const StakingPage = () => {
 
     syncUnbondingDelegationsData();
 
-    setMarketData(allMarketData.get(`${userAsset?.mainnetSymbol}-${currentSession.currency}`));
+    setMarketData(
+      allMarketData.get(
+        `${userAsset?.assetType}-${userAsset?.mainnetSymbol}-${currentSession.currency}`,
+      ),
+    );
 
     if (!didMountRef.current) {
       didMountRef.current = true;

@@ -197,7 +197,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     }
     if (event.name === 'signTransaction') {
       const assetMarketData = allMarketData.get(
-        `${currentAsset?.mainnetSymbol}-${currentSession.currency}`,
+        `${currentAsset?.assetType}-${currentAsset?.mainnetSymbol}-${currentSession.currency}`,
       );
       const totalScaledAmount = scaledAmount(
         new BigNumber(event.object?.value ?? '0').toString(),

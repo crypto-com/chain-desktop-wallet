@@ -360,10 +360,11 @@ class WalletService {
   }
 
   public async retrieveAssetPrice(
+    assetType: UserAssetType | undefined,
     assetSymbol: string,
     currency: string = 'USD',
   ): Promise<AssetMarketPrice> {
-    const price = await this.storageService.retrieveAssetPrice(assetSymbol, currency);
+    const price = await this.storageService.retrieveAssetPrice(assetType, assetSymbol, currency);
     return {
       ...price,
     };

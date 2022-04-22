@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars*/
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios, { AxiosResponse } from 'axios';
 import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 import { EVMClient } from '../rpc/clients/EVMClient';
@@ -49,17 +49,13 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
     return false;
   };
 
-  getTxsByAddress = async (
-    address: string,
-    options?: txQueryBaseParams,
-  ) => {
-
+  getTxsByAddress = async (address: string, options?: txQueryBaseParams) => {
     // Pagination params
     let currentPage = options?.page || 0;
     const limit = options?.pageSize || 1000;
 
     // Result
-    let finalList: TransactionData[] = [];
+    const finalList: TransactionData[] = [];
 
     while (true) {
       // eslint-disable-next-line

@@ -141,12 +141,16 @@ export const scaledTotalBalance = (asset: UserAsset) => {
   return getUINormalScaleAmount(totalBalance, asset.decimals);
 };
 
-export const getAssetPriceIdFrom = (assetSymbol: string, currency: string) => {
-  return `${assetSymbol}-${currency}`.toUpperCase();
+export const getAssetPriceIdFrom = (
+  assetType: UserAssetType | undefined,
+  assetSymbol: string,
+  currency: string,
+) => {
+  return `${assetType}-${assetSymbol}-${currency}`.toUpperCase();
 };
 
 export const getAssetPriceId = (assetPrice: AssetMarketPrice) => {
-  return getAssetPriceIdFrom(assetPrice.assetSymbol, assetPrice.currency);
+  return getAssetPriceIdFrom(assetPrice.assetType, assetPrice.assetSymbol, assetPrice.currency);
 };
 
 export const getAssetBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
