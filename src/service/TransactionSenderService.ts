@@ -39,6 +39,7 @@ import { TransactionHistoryService } from './TransactionHistoryService';
 import { getCronosEvmAsset, sleep } from '../utils/utils';
 import { BridgeService } from './bridge/BridgeService';
 import { walletService } from './WalletService';
+import { EVMClient } from './rpc/clients/EVMClient';
 
 export class TransactionSenderService {
   public readonly storageService: StorageService;
@@ -78,9 +79,8 @@ export class TransactionSenderService {
             throw TypeError(`Missing asset config: ${currentAsset.config}`);
           }
 
-          const cronosClient = new CronosClient(
+          const evmClient = EVMClient.create(
             currentAsset.config?.nodeUrl,
-            currentAsset.config?.indexingUrl,
           );
 
           const transfer: TransferTransactionUnsigned = {
@@ -139,7 +139,7 @@ export class TransactionSenderService {
             );
           }
 
-          const result = await cronosClient.broadcastRawTransactionHex(signedTx);
+          const result = await evmClient.broadcastRawTransactionHex(signedTx);
           return {
             transactionHash: result,
             message: '',

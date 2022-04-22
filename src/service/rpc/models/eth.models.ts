@@ -1,5 +1,5 @@
 /**
- * Blockchair API Response Models
+ * Crypto.com Indexing API Response Models
  */
 
 export interface TransactionsByAddressResponse {
