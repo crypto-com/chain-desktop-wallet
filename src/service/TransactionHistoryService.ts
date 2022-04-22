@@ -236,7 +236,7 @@ export class TransactionHistoryService {
       });
   }
 
-
+  // eslint-disable-next-line class-methods-use-this
   public async fetchEVMTransferTxs(currentAsset: UserAsset, walletIdentifier: string) {
     if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
       return [];
@@ -254,10 +254,9 @@ export class TransactionHistoryService {
       // const txList = await ethClient.getTxsByAddress(currentAsset.address);
       const txList = await ethClient.getTxsByAddress('0xdac17f958d2ee523a2206206994597c13d831ec7');
 
-      console.log('ETH',txList);
+      console.log('ETH', txList);
 
       const loadedTxList = txList.map(tx => {
-
         const transferTx: TransferTransactionData = {
           amount: tx.amount,
           assetSymbol: currentAsset.symbol,
@@ -306,8 +305,7 @@ export class TransactionHistoryService {
         memo: '',
         receiverAddress: evmTx.to,
         senderAddress: evmTx.from,
-        status:
-          evmTx.isError === '1' ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
+        status: evmTx.isError === '1' ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
       };
 
       const transferTxRecord: TransferTransactionRecord = {
@@ -361,7 +359,10 @@ export class TransactionHistoryService {
             return [];
           }
 
-          const loadedTransactions = await this.fetchEVMTransferTxs(currentAsset, currentSession.wallet.identifier);
+          const loadedTransactions = await this.fetchEVMTransferTxs(
+            currentAsset,
+            currentSession.wallet.identifier,
+          );
 
           // eslint-disable-next-line no-console
           console.log('Loaded transactions', loadedTransactions);
@@ -721,7 +722,7 @@ export class TransactionHistoryService {
           case UserAssetType.TENDERMINT:
             break;
           case UserAssetType.EVM:
-            if (asset.name.includes('CRO')) {
+            if (asset.name.includes('Cronos')) {
               await this.fetchCurrentWalletCRC20Tokens(asset, currentSession);
             }
             break;
@@ -770,9 +771,7 @@ export class TransactionHistoryService {
               return;
             }
             try {
-              const evmClient = EVMClient.create(
-                asset.config?.nodeUrl,
-              );
+              const evmClient = EVMClient.create(asset.config?.nodeUrl);
 
               asset.balance = await evmClient.getNativeBalanceByAddress(asset.address);
               // eslint-disable-next-line no-console
