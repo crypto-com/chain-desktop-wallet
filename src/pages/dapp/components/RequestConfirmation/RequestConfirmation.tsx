@@ -59,8 +59,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
   const [isContractAddressReview, setIsContractAddressReview] = useState(false);
   const [isConfirmDisabled, setIsConfirmDisabled] = useState(false);
   const [allAssets, setAllAssets] = useRecoilState(walletAllAssetsState);
-  const [gasPrice, setGasPrice] = useState(new BigNumber((event.object as any)?.gas ?? 0));
-  const [gasLimit, setGasLimit] = useState(new BigNumber((event.object as any)?.gasPrice ?? 0));
+  const [gasPrice, setGasPrice] = useState(new BigNumber((event.object as any)?.gasPrice ?? 0));
+  const [gasLimit, setGasLimit] = useState(new BigNumber((event.object as any)?.gas ?? 0));
 
   const { isLedgerConnected } = useLedgerStatus({ asset: cronosAsset });
 
