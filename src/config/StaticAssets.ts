@@ -14,6 +14,9 @@ export const MAINNET_EVM_EXPLORER_URL = 'https://cronoscan.com';
 // There's no testnet explorer on cronoscan.com. Use cronos.org/explorer instead.
 export const TESTNET_EVM_EXPLORER_URL = 'https://cronos.org/explorer/testnet3';
 
+export const MAINNET_ETHEREUM_EXPLORER_URL = 'https://etherscan.io';
+export const ROPSTEN_ETHEREUM_EXPLORER_URL = 'https://ropsten.etherscan.io';
+
 export const TestNetEvmConfig: UserAssetConfig = {
   explorer: {
     tx: `${TESTNET_EVM_EXPLORER_URL}/tx`,
@@ -116,25 +119,25 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
 
   const config: UserAssetConfig = {
     explorer: {
-      tx: isTestnet
-        ? 'https://ropsten.etherscan.io/tx'
-        : 'https://etherscan.io/tx',
+      tx: isTestnet ? `${ROPSTEN_ETHEREUM_EXPLORER_URL}/tx` : `${MAINNET_ETHEREUM_EXPLORER_URL}/tx`,
       address: isTestnet
-        ? 'https://ropsten.etherscan.io/address'
-        : 'https://etherscan.io/address',
+        ? `${ROPSTEN_ETHEREUM_EXPLORER_URL}/address`
+        : `${MAINNET_ETHEREUM_EXPLORER_URL}/address`,
     },
     explorerUrl: isTestnet
-      ? 'https://ropsten.etherscan.io'
-      : 'https://etherscan.io',
+      ? `${ROPSTEN_ETHEREUM_EXPLORER_URL}`
+      : `${MAINNET_ETHEREUM_EXPLORER_URL}`,
 
     chainId: isTestnet ? '3' : '1',
 
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
+    // TODO: Change this to the production indexing url
     indexingUrl: isTestnet
       ? 'https://api.blockchair.com/ethereum/testnet/dashboards'
       : 'https://api.blockchair.com/ethereum/dashboards',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
+    // TODO: Change this to the production node url
     nodeUrl: isTestnet
       ? 'https://ropsten.infura.io/v3/8baf8ee1539c497ab4773d983c7367bf'
       : 'https://mainnet.infura.io/v3/8baf8ee1539c497ab4773d983c7367bf',

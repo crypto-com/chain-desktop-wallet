@@ -104,6 +104,8 @@ export interface AssetMarketPrice {
   assetSymbol: string;
 
   dailyChange: string;
+
+  assetType?: UserAssetType;
 }
 
 export const scaledAmount = (baseAmount: string = '0', decimals: number) => {
