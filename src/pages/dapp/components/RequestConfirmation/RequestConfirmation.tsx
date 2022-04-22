@@ -36,7 +36,7 @@ interface RequestConfirmationProps {
   wallet: Wallet;
   visible: boolean;
   dapp?: Dapp;
-  onConfirm: () => void;
+  onConfirm: (info: { gasPrice: BigNumber, gasLimit: BigNumber }) => void;
   onCancel: () => void;
 }
 
@@ -275,7 +275,12 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
             <Button
               type="primary"
               htmlType="submit"
-              onClick={onConfirm}
+              onClick={() => {
+                onConfirm({
+                  gasLimit,
+                  gasPrice
+                })
+              }}
               disabled={
                 isConfirmDisabled ||
                 (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE)
