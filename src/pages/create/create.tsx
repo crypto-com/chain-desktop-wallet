@@ -445,10 +445,16 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         }
 
         const ethAddresss = await device.getEthAddress(targetWallet.addressIndex, false);
-        const evmAsset = createdWallet.assets.filter(
-          asset => asset.assetType === UserAssetType.EVM,
-        )[0];
-        evmAsset.address = ethAddresss;
+        // const evmAsset = createdWallet.assets.filter(
+        //   asset => asset.assetType === UserAssetType.EVM,
+        // )[0];
+        // evmAsset.address = ethAddresss;
+        createdWallet.assets
+          .filter(asset => asset.assetType === UserAssetType.EVM)
+          .forEach(asset => {
+            asset.address = ethAddresss;
+          });
+
         setIsLedgerEthAppConnected(true);
       }
 
