@@ -51,7 +51,7 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
 
   getTxsByAddress = async (address: string, options?: txQueryBaseParams) => {
     // Pagination params
-    let currentPage = options?.page || 0;
+    let currentPage = options?.page || 1;
     const limit = options?.pageSize || 1000;
 
     // Result
