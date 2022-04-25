@@ -700,6 +700,69 @@ export class TransactionHistoryService {
     return nftList;
   }
 
+  private async fetchCurrentWalletERC20Tokens(croEvmAsset: UserAsset, session: Session) {
+    const { address } = croEvmAsset;
+
+    if (!address || !croEvmAsset.config?.nodeUrl) {
+      return [];
+    }
+
+    const ethClient = new EthClient(croEvmAsset.config?.nodeUrl, croEvmAsset.config?.indexingUrl);
+
+    // const tokensListResponse = await ethClient.getTokensOwnedByAddress(address);
+    const tokensListResponse = await ethClient.getBalanceByAddress(address, {
+      token: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+    });
+    console.log('tokensListResponse', tokensListResponse);
+    const newlyLoadedTokens = await tokensListResponse
+      // .filter(token => token.type === SupportedCRCTokenStandard.CRC_20_TOKEN)
+      .filter(token => token.balance > 0)
+      .map(async token => {
+        const newCRC20Token: UserAsset = {
+          balance: token.balance.toString(),
+          decimals: token.decimals,
+          contractAddress: token.token_addr,
+          description: `${token.token_name} (${token.token_symbol})`,
+          icon_url: CronosClient.getTokenIconUrlBySymbol(token.token_symbol),
+          identifier: `${token.token_name}_(${token.token_symbol})_${croEvmAsset.walletId}`,
+          mainnetSymbol: token.token_symbol,
+          name: croEvmAsset.name,
+          rewardsBalance: '',
+          stakedBalance: '',
+          symbol: token.token_symbol,
+          unbondingBalance: '',
+          walletId: croEvmAsset.walletId,
+          isSecondaryAsset: true,
+          assetType: UserAssetType.CRC_20_TOKEN,
+          address: croEvmAsset.address,
+          config: croEvmAsset.config,
+          isWhitelisted: isCRC20AssetWhitelisted(
+            token.token_symbol,
+            token.token_addr,
+            session.wallet.config,
+          ),
+        };
+
+        // eslint-disable-next-line no-console
+        console.log(`ERC_20_PERSISTED_TOKEN ${token.token_symbol}:`, {
+          address,
+          balance: token.balance,
+        });
+
+        await this.storageService.saveAsset(newCRC20Token);
+        return newCRC20Token;
+      });
+
+    // eslint-disable-next-line no-console
+    console.log('ERC_20_PERSISTED_TOKENS', {
+      address,
+      size: newlyLoadedTokens.length,
+      newlyLoadedTokens,
+    });
+
+    return newlyLoadedTokens;
+  }
+
   public async fetchTokensAndPersistBalances(session: Session | null = null) {
     const currentSession =
       session == null ? await this.storageService.retrieveCurrentSession() : session;
@@ -724,6 +787,9 @@ export class TransactionHistoryService {
           case UserAssetType.EVM:
             if (asset.name.includes('Cronos')) {
               await this.fetchCurrentWalletCRC20Tokens(asset, currentSession);
+            }
+            if (asset.name.includes('Ethereum')) {
+              await this.fetchCurrentWalletERC20Tokens(asset, currentSession);
             }
             break;
           default:

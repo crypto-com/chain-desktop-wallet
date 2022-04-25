@@ -1,7 +1,7 @@
 /**
  * CDC Ethereum Indexing service API
  * @link https://cql.3ona.co/ethereum/testnet/api/docs/?apikey=anonymous
- * @dev 
+ * @dev
  */
 
 export interface txQueryBaseParams {
@@ -9,8 +9,11 @@ export interface txQueryBaseParams {
   page?: number | 0; // max: 1000000 ; default: 0
 }
 
-export interface IEthChainIndexAPI {
+export interface balanceQueryBaseParams {
+  token: string;
+}
 
+export interface IEthChainIndexAPI {
   // List all transactions for an address
   getTxsByAddress(address: string, options?: txQueryBaseParams): Promise<any>;
 

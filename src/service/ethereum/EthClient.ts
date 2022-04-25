@@ -2,8 +2,16 @@
 import axios, { AxiosResponse } from 'axios';
 import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 import { EVMClient } from '../rpc/clients/EVMClient';
-import { IEthChainIndexAPI, txQueryBaseParams } from '../rpc/interface/eth.chainIndex';
-import { TransactionData, TransactionsByAddressResponse } from '../rpc/models/eth.models';
+import {
+  balanceQueryBaseParams,
+  IEthChainIndexAPI,
+  txQueryBaseParams,
+} from '../rpc/interface/eth.chainIndex';
+import {
+  BalancesByAddressResponse,
+  TransactionData,
+  TransactionsByAddressResponse,
+} from '../rpc/models/eth.models';
 import {
   ICronosChainIndexAPI,
   txListRequestOptions,
@@ -47,6 +55,24 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
       return true;
     }
     return false;
+  };
+
+  getBalanceByAddress = async (address: string, options?: balanceQueryBaseParams) => {
+    const balanceResponse: AxiosResponse<BalancesByAddressResponse> = await axios({
+      baseURL: this.indexingBaseUrl,
+      url: `/address/${address}/balance`,
+      params: { ...options },
+    });
+
+    if (balanceResponse.status !== 200) {
+      return [];
+    }
+
+    if (!balanceResponse.data.data) {
+      return [];
+    }
+
+    return balanceResponse.data.data.assets;
   };
 
   getTxsByAddress = async (address: string, options?: txQueryBaseParams) => {
