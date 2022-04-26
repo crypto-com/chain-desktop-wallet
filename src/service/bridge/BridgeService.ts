@@ -29,7 +29,7 @@ import {
   BridgeTransactionListResponse,
   BridgeTransactionStatusResponse,
 } from './contracts/BridgeModels';
-import { getCronosTendermintFeeConfig } from '../../utils/utils';
+import { getCronosTendermintFeeConfig } from '../Gas';
 
 export class BridgeService {
   public readonly storageService: StorageService;

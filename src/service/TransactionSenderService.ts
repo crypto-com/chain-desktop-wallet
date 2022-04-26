@@ -36,9 +36,10 @@ import { TransactionPrepareService } from './TransactionPrepareService';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
 import { TransactionHistoryService } from './TransactionHistoryService';
-import { getCronosEvmAsset, getCronosTendermintFeeConfig, sleep } from '../utils/utils';
+import { getCronosEvmAsset, sleep } from '../utils/utils';
 import { BridgeService } from './bridge/BridgeService';
 import { walletService } from './WalletService';
+import { getCronosTendermintFeeConfig } from './Gas';
 
 export class TransactionSenderService {
   public readonly storageService: StorageService;
