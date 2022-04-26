@@ -7,7 +7,7 @@ import { getRecoil, setRecoil } from 'recoil-nexus';
 import numeral from 'numeral';
 import { ethers } from 'ethers';
 import { allMarketState, sessionState, walletAllAssetsState, walletListState } from '../../recoil/atom';
-import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
+import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE, SUPPORTED_CURRENCY } from '../../config/StaticConfig';
 import { getAssetAmountInFiat, UserAsset } from '../../models/UserAsset';
 import { getNormalScaleAmount } from "../../utils/NumberUtils"
 import { walletService } from '../../service/WalletService';
@@ -15,13 +15,12 @@ import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
 import { Session } from '../../models/Session';
 
 const ModalBody = (props: {
-  asset: UserAsset,
   gasPrice: string,
   gasLimit: string,
   onSuccess: (gasLimit: number, gasPrice: number) => void,
   onCancel: () => void
 }) => {
-  const { asset, gasPrice, gasLimit, onSuccess, onCancel } = props;
+  const { gasPrice, gasLimit, onSuccess, onCancel } = props;
   const [t] = useTranslation();
 
   const [form] = Form.useForm();
@@ -34,20 +33,26 @@ const ModalBody = (props: {
   const [readableNetworkFee, setReadableNetworkFee] = useState('');
 
   const assetMarketData = allMarketData.get(
-    `${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
+    `${cronosEVMAsset?.mainnetSymbol}-${currentSession.currency}`,
   );
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
-
+  const [isUsingCustomGas, setIsUsingCustomGas] = useState(false)
 
   const setNetworkFee = (newGasPrice: string, newGasLimit: string) => {
+    if (!cronosEVMAsset) {
+      return
+    }
 
+    if (newGasPrice !== EVM_MINIMUM_GAS_PRICE || newGasLimit !== EVM_MINIMUM_GAS_LIMIT) {
+      setIsUsingCustomGas(true)
+    }
 
     const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(ethers.BigNumber.from(newGasPrice))
 
-    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset)
+    const amount = getNormalScaleAmount(amountBigNumber.toString(), cronosEVMAsset)
 
-    if (!(asset && localFiatSymbol && assetMarketData && assetMarketData.price)) {
-      setReadableNetworkFee(`${amount} ${asset.symbol}`);
+    if (!(cronosEVMAsset && localFiatSymbol && assetMarketData && assetMarketData.price)) {
+      setReadableNetworkFee(`${amount} ${cronosEVMAsset.symbol}`);
       return;
     }
     const price = numeral(
@@ -55,14 +60,14 @@ const ModalBody = (props: {
     ).format('0,0.00')
 
     if (price === "0.00") {
-      setReadableNetworkFee(`${amount} ${asset.symbol} (<${localFiatSymbol}0.01)`)
+      setReadableNetworkFee(`${amount} ${cronosEVMAsset.symbol} (<${localFiatSymbol}0.01)`)
     } else {
-      setReadableNetworkFee(`${amount} ${asset.symbol} (~${localFiatSymbol}${price})`)
+      setReadableNetworkFee(`${amount} ${cronosEVMAsset.symbol} (~${localFiatSymbol}${price})`)
     }
   }
 
   useEffect(() => {
-    if (!asset) {
+    if (!cronosEVMAsset) {
       return;
     }
 
@@ -73,7 +78,7 @@ const ModalBody = (props: {
       gasLimit
     })
 
-  }, [asset, gasPrice, gasLimit]);
+  }, [cronosEVMAsset, gasPrice, gasLimit]);
 
   if (!cronosEVMAsset) {
     return <React.Fragment />
@@ -97,7 +102,7 @@ const ModalBody = (props: {
     }}
       onFinish={async (values) => {
 
-        if (!asset.config) {
+        if (!cronosEVMAsset.config) {
           return;
         }
 
@@ -172,7 +177,7 @@ const ModalBody = (props: {
         marginTop: "20px"
       }}>
         <div style={{ color: "#7B849B" }}>Estimate Time</div>
-        <div>6 s</div>
+        <div>{isUsingCustomGas ? "~1~24 hours" : "6s"}</div>
       </div>
       <Form.Item style={{
         marginTop: "20px"
@@ -228,7 +233,7 @@ const useCustomGasModalEVM = (asset: UserAsset, gasFee: string, gasLimit: string
       style: {
         padding: "20px 20px 0 20px"
       },
-      content: <ModalBody asset={asset} gasPrice={gasFee} gasLimit={gasLimit} onSuccess={props.onSuccess} onCancel={() => {
+      content: <ModalBody gasPrice={gasFee} gasLimit={gasLimit} onSuccess={props.onSuccess} onCancel={() => {
         dismiss();
         props.onCancel?.()
       }} />
