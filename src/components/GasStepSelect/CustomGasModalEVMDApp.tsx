@@ -11,6 +11,7 @@ import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
 import { getAssetAmountInFiat, UserAsset } from '../../models/UserAsset';
 import { getNormalScaleAmount } from "../../utils/NumberUtils"
 import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
+import { useAnalytics } from '../../hooks/useAnalytics';
 
 const ModalBody = (props: {
   asset: UserAsset,
@@ -25,7 +26,7 @@ const ModalBody = (props: {
   const [form] = Form.useForm();
 
   const cronosEVMAsset = useCronosEvmAsset()
-
+  const { analyticsService } = useAnalytics();
   const currentSession = getRecoil(sessionState);
   const allMarketData = getRecoil(allMarketState);
 
@@ -109,6 +110,7 @@ const ModalBody = (props: {
         }
 
         onSuccess(new BigNumber(newGasLimit), new BigNumber(newGasPrice));
+        analyticsService.logCustomizeGas(cronosEVMAsset.assetType ?? "")
       }}>
       <Form.Item
         name="gasPrice"

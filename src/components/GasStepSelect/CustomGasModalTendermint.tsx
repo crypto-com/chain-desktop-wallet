@@ -12,6 +12,7 @@ import { getNormalScaleAmount } from "../../utils/NumberUtils"
 import { walletService } from '../../service/WalletService';
 import { useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
 import { Session } from '../../models/Session';
+import { useAnalytics } from '../../hooks/useAnalytics';
 
 const ModalBody = (props: {
   asset: UserAsset,
@@ -36,7 +37,7 @@ const ModalBody = (props: {
     `${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
   );
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
-
+  const { analyticsService } = useAnalytics();
 
   const setNetworkFee = (fee: number) => {
     const amount = getNormalScaleAmount(fee.toString(), asset)
@@ -131,6 +132,7 @@ const ModalBody = (props: {
         setRecoil(walletAllAssetsState, [...allAssets])
 
         onSuccess(newGasLimit, newNetworkFee);
+        analyticsService.logCustomizeGas(asset.assetType ?? "")
       }}>
       <Form.Item
         name="networkFee"

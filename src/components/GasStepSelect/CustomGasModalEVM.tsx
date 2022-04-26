@@ -13,6 +13,7 @@ import { getNormalScaleAmount } from "../../utils/NumberUtils"
 import { walletService } from '../../service/WalletService';
 import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
 import { Session } from '../../models/Session';
+import { useAnalytics } from '../../hooks/useAnalytics';
 
 const ModalBody = (props: {
   gasPrice: string,
@@ -29,6 +30,7 @@ const ModalBody = (props: {
 
   const currentSession = getRecoil(sessionState);
   const allMarketData = getRecoil(allMarketState);
+  const { analyticsService } = useAnalytics();
 
   const [readableNetworkFee, setReadableNetworkFee] = useState('');
 
@@ -142,6 +144,8 @@ const ModalBody = (props: {
         setRecoil(walletAllAssetsState, [...allAssets])
 
         onSuccess(newGasLimit, newGasPrice);
+
+        analyticsService.logCustomizeGas(cronosEVMAsset.assetType ?? "")
       }}>
       <Form.Item
         name="gasPrice"
