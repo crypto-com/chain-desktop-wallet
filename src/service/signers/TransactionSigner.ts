@@ -4,8 +4,6 @@ import Long from 'long';
 import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
 import {
   DEFAULT_IBC_TRANSFER_TIMEOUT,
-  FIXED_DEFAULT_FEE,
-  FIXED_DEFAULT_GAS_LIMIT,
   WalletConfig,
 } from '../../config/StaticConfig';
 import {

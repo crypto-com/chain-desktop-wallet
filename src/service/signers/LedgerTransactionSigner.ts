@@ -5,8 +5,6 @@ import Long from 'long';
 import { Big, Units, Secp256k1KeyPair } from '../../utils/ChainJsLib';
 import {
   DEFAULT_IBC_TRANSFER_TIMEOUT,
-  FIXED_DEFAULT_FEE,
-  FIXED_DEFAULT_GAS_LIMIT,
   WalletConfig,
 } from '../../config/StaticConfig';
 import {
@@ -24,8 +22,7 @@ import {
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
 import { BaseTransactionSigner, ITransactionSigner } from './TransactionSigner';
-import { getCronosTendermintAsset, isNumeric } from '../../utils/utils';
-import { walletService } from '../WalletService';
+import { isNumeric } from '../../utils/utils';
 
 export class LedgerTransactionSigner extends BaseTransactionSigner implements ITransactionSigner {
   public readonly config: WalletConfig;
