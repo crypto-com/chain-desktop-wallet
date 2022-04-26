@@ -57,6 +57,28 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
     return false;
   };
 
+  getETHBalanceByAddress = async (address: string): Promise<string> => {
+    const balanceResponse: AxiosResponse<BalancesByAddressResponse> = await axios({
+      baseURL: this.indexingBaseUrl,
+      url: `/address/${address}/balance`,
+      params: { ...{ token: '0xdac17f958d2ee523a2206206994597c13d831ec7' } },
+    });
+
+    if (balanceResponse.status !== 200) {
+      return '0';
+    }
+
+    if (!balanceResponse.data.data) {
+      return '0';
+    }
+
+    const ethBalance = balanceResponse.data.data.assets
+      .find(asset => asset.token_addr === 'ETH')
+      ?.balance.toString();
+
+    return ethBalance ?? '0';
+  };
+
   getBalanceByAddress = async (address: string, options?: balanceQueryBaseParams) => {
     const balanceResponse: AxiosResponse<BalancesByAddressResponse> = await axios({
       baseURL: this.indexingBaseUrl,

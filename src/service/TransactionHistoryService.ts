@@ -700,42 +700,41 @@ export class TransactionHistoryService {
     return nftList;
   }
 
-  private async fetchCurrentWalletERC20Tokens(croEvmAsset: UserAsset, session: Session) {
-    const { address } = croEvmAsset;
+  private async fetchCurrentWalletERC20Tokens(ethEvmAsset: UserAsset, session: Session) {
+    const { address } = ethEvmAsset;
 
-    if (!address || !croEvmAsset.config?.nodeUrl) {
+    if (!address || !ethEvmAsset.config?.nodeUrl) {
       return [];
     }
 
-    const ethClient = new EthClient(croEvmAsset.config?.nodeUrl, croEvmAsset.config?.indexingUrl);
+    const ethClient = new EthClient(ethEvmAsset.config?.nodeUrl, ethEvmAsset.config?.indexingUrl);
 
     // const tokensListResponse = await ethClient.getTokensOwnedByAddress(address);
     const tokensListResponse = await ethClient.getBalanceByAddress(address, {
       token: '0xdac17f958d2ee523a2206206994597c13d831ec7',
     });
-    console.log('tokensListResponse', tokensListResponse);
     const newlyLoadedTokens = await tokensListResponse
       // .filter(token => token.type === SupportedCRCTokenStandard.CRC_20_TOKEN)
-      .filter(token => token.balance > 0)
+      .filter(token => token.balance > 0 && token.token_addr !== 'ETH')
       .map(async token => {
-        const newCRC20Token: UserAsset = {
+        const newERC20Token: UserAsset = {
           balance: token.balance.toString(),
           decimals: token.decimals,
           contractAddress: token.token_addr,
           description: `${token.token_name} (${token.token_symbol})`,
           icon_url: CronosClient.getTokenIconUrlBySymbol(token.token_symbol),
-          identifier: `${token.token_name}_(${token.token_symbol})_${croEvmAsset.walletId}`,
+          identifier: `${token.token_name}_(${token.token_symbol})_${ethEvmAsset.walletId}`,
           mainnetSymbol: token.token_symbol,
-          name: croEvmAsset.name,
+          name: ethEvmAsset.name,
           rewardsBalance: '',
           stakedBalance: '',
           symbol: token.token_symbol,
           unbondingBalance: '',
-          walletId: croEvmAsset.walletId,
+          walletId: ethEvmAsset.walletId,
           isSecondaryAsset: true,
-          assetType: UserAssetType.CRC_20_TOKEN,
-          address: croEvmAsset.address,
-          config: croEvmAsset.config,
+          assetType: UserAssetType.ERC_20_TOKEN,
+          address: ethEvmAsset.address,
+          config: ethEvmAsset.config,
           isWhitelisted: isCRC20AssetWhitelisted(
             token.token_symbol,
             token.token_addr,
@@ -749,8 +748,8 @@ export class TransactionHistoryService {
           balance: token.balance,
         });
 
-        await this.storageService.saveAsset(newCRC20Token);
-        return newCRC20Token;
+        await this.storageService.saveAsset(newERC20Token);
+        return newERC20Token;
       });
 
     // eslint-disable-next-line no-console
@@ -775,9 +774,13 @@ export class TransactionHistoryService {
       return;
     }
 
-    // Remove existing CRC20 tokens & refetch balances for all assets
-    const CRC20TokenList = assets.filter(asset => asset.assetType === UserAssetType.CRC_20_TOKEN);
-    await this.storageService.removeAssets(CRC20TokenList);
+    // Remove existing non-native tokens & refetch balances for all assets
+    const nonNativeTokenList = assets.filter(
+      asset =>
+        asset.assetType === UserAssetType.CRC_20_TOKEN ||
+        asset.assetType === UserAssetType.ERC_20_TOKEN,
+    );
+    await this.storageService.removeAssets(nonNativeTokenList);
 
     await Promise.all(
       assets.map(async asset => {
@@ -836,19 +839,38 @@ export class TransactionHistoryService {
               await this.storageService.saveAsset(asset);
               return;
             }
-            try {
-              const evmClient = EVMClient.create(asset.config?.nodeUrl);
+            if (asset.name.includes('Cronos')) {
+              try {
+                const evmClient = EVMClient.create(asset.config?.nodeUrl);
 
-              asset.balance = await evmClient.getNativeBalanceByAddress(asset.address);
-              // eslint-disable-next-line no-console
-              console.log(
-                `${asset.name} ${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`,
-              );
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
-            } finally {
-              await this.storageService.saveAsset(asset);
+                asset.balance = await evmClient.getNativeBalanceByAddress(asset.address);
+                // eslint-disable-next-line no-console
+                console.log(
+                  `${asset.name} ${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`,
+                );
+              } catch (e) {
+                // eslint-disable-next-line no-console
+                console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
+              } finally {
+                await this.storageService.saveAsset(asset);
+              }
+            }
+            if (asset.name.includes('Ethereum')) {
+              try {
+                const ethClient = new EthClient(asset.config?.nodeUrl, asset.config?.indexingUrl);
+                const tokensListResponse = await ethClient.getETHBalanceByAddress(asset.address);
+
+                asset.balance = tokensListResponse;
+                // eslint-disable-next-line no-console
+                console.log(
+                  `${asset.name} ${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`,
+                );
+              } catch (e) {
+                // eslint-disable-next-line no-console
+                console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
+              } finally {
+                await this.storageService.saveAsset(asset);
+              }
             }
             break;
 
