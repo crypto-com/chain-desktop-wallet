@@ -57,11 +57,6 @@ export class BaseTransactionSigner {
     const rawTx = new cro.RawTransaction();
     rawTx.setMemo(memo);
 
-    // const networkFee =
-    //   this.config.fee !== undefined ? this.config.fee.networkFee : FIXED_DEFAULT_FEE;
-    // const gasLimit =
-    //   this.config.fee !== undefined ? this.config.fee.gasLimit : FIXED_DEFAULT_GAS_LIMIT;
-
     const fee = new cro.Coin(gasFee, Units.BASE);
 
     rawTx.setFee(fee);
