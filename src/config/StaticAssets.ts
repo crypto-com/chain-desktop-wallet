@@ -16,6 +16,7 @@ export const TESTNET_EVM_EXPLORER_URL = 'https://cronos.org/explorer/testnet3';
 
 export const MAINNET_ETHEREUM_EXPLORER_URL = 'https://etherscan.io';
 export const ROPSTEN_ETHEREUM_EXPLORER_URL = 'https://ropsten.etherscan.io';
+export const RINKEBY_ETHEREUM_EXPLORER_URL = 'https://rinkeby.etherscan.io';
 
 export const TestNetEvmConfig: UserAssetConfig = {
   explorer: {
@@ -119,16 +120,16 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
 
   const config: UserAssetConfig = {
     explorer: {
-      tx: isTestnet ? `${ROPSTEN_ETHEREUM_EXPLORER_URL}/tx` : `${MAINNET_ETHEREUM_EXPLORER_URL}/tx`,
+      tx: isTestnet ? `${RINKEBY_ETHEREUM_EXPLORER_URL}/tx` : `${MAINNET_ETHEREUM_EXPLORER_URL}/tx`,
       address: isTestnet
-        ? `${ROPSTEN_ETHEREUM_EXPLORER_URL}/address`
+        ? `${RINKEBY_ETHEREUM_EXPLORER_URL}/address`
         : `${MAINNET_ETHEREUM_EXPLORER_URL}/address`,
     },
     explorerUrl: isTestnet
-      ? `${ROPSTEN_ETHEREUM_EXPLORER_URL}`
+      ? `${RINKEBY_ETHEREUM_EXPLORER_URL}`
       : `${MAINNET_ETHEREUM_EXPLORER_URL}`,
 
-    chainId: isTestnet ? '3' : '1',
+    chainId: isTestnet ? '4' : '1',
 
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
     // TODO: Change this to the production indexing url
@@ -139,7 +140,7 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
     isStakingDisabled: false,
     // TODO: Change this to the production node url
     nodeUrl: isTestnet
-      ? 'https://ropsten.infura.io/v3/8baf8ee1539c497ab4773d983c7367bf'
+      ? 'https://cql.3ona.co/ethereum/rinkeby/rpc?apikey=anonymous'
       : 'https://mainnet.infura.io/v3/8baf8ee1539c497ab4773d983c7367bf',
     memoSupportDisabled: true,
   };

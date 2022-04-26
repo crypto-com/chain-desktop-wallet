@@ -839,39 +839,39 @@ export class TransactionHistoryService {
               await this.storageService.saveAsset(asset);
               return;
             }
-            if (asset.name.includes('Cronos')) {
-              try {
-                const evmClient = EVMClient.create(asset.config?.nodeUrl);
+            // if (asset.name.includes('Cronos')) {
+            try {
+              const evmClient = EVMClient.create(asset.config?.nodeUrl);
 
-                asset.balance = await evmClient.getNativeBalanceByAddress(asset.address);
-                // eslint-disable-next-line no-console
-                console.log(
-                  `${asset.name} ${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`,
-                );
-              } catch (e) {
-                // eslint-disable-next-line no-console
-                console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
-              } finally {
-                await this.storageService.saveAsset(asset);
-              }
+              asset.balance = await evmClient.getNativeBalanceByAddress(asset.address);
+              // eslint-disable-next-line no-console
+              console.log(
+                `${asset.name} ${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`,
+              );
+            } catch (e) {
+              // eslint-disable-next-line no-console
+              console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
+            } finally {
+              await this.storageService.saveAsset(asset);
             }
-            if (asset.name.includes('Ethereum')) {
-              try {
-                const ethClient = new EthClient(asset.config?.nodeUrl, asset.config?.indexingUrl);
-                const tokensListResponse = await ethClient.getETHBalanceByAddress(asset.address);
+            // }
+            // if (asset.name.includes('Ethereum')) {
+            //   try {
+            //     const ethClient = new EthClient(asset.config?.nodeUrl, asset.config?.indexingUrl);
+            //     const tokensListResponse = await ethClient.getETHBalanceByAddress(asset.address);
 
-                asset.balance = tokensListResponse;
-                // eslint-disable-next-line no-console
-                console.log(
-                  `${asset.name} ${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`,
-                );
-              } catch (e) {
-                // eslint-disable-next-line no-console
-                console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
-              } finally {
-                await this.storageService.saveAsset(asset);
-              }
-            }
+            //     asset.balance = tokensListResponse;
+            //     // eslint-disable-next-line no-console
+            //     console.log(
+            //       `${asset.name} ${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`,
+            //     );
+            //   } catch (e) {
+            //     // eslint-disable-next-line no-console
+            //     console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
+            //   } finally {
+            //     await this.storageService.saveAsset(asset);
+            //   }
+            // }
             break;
 
           case UserAssetType.TENDERMINT:

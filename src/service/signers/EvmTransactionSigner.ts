@@ -94,6 +94,7 @@ class EvmTransactionSigner implements ITransactionSigner {
       to: transaction.contractAddress,
       data: transaction.data,
       value: transaction.value ?? '0x0',
+      chainId: Number(asset?.config?.chainId),
     };
 
     const provider = new ethers.providers.JsonRpcProvider(jsonRpcUrl);

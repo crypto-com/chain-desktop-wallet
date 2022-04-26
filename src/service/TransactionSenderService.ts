@@ -79,12 +79,10 @@ export class TransactionSenderService {
             throw TypeError(`Missing asset config: ${currentAsset.config}`);
           }
 
-          const evmClient = EVMClient.create(
-            currentAsset.config?.nodeUrl,
-          );
+          const evmClient = EVMClient.create(currentAsset.config?.nodeUrl);
 
           const transfer: TransferTransactionUnsigned = {
-            fromAddress,
+            fromAddress: currentAsset.address,
             toAddress: transferRequest.toAddress,
             amount: String(scaledBaseAmount),
             memo: transferRequest.memo,
