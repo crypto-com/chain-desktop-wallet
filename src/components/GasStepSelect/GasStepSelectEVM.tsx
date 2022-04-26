@@ -3,6 +3,7 @@ import { Form, Tooltip } from 'antd';
 import { ethers } from 'ethers';
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
 import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
 import { getNormalScaleAmount } from '../../utils/NumberUtils';
@@ -12,6 +13,7 @@ export const GasInfoEVM = () => {
 
   const asset = useCronosEvmAsset()
 
+  const [t] = useTranslation();
   const gasPrice = useMemo(() => asset?.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE, [asset]);
   const gasLimit = useMemo(() => asset?.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT, [asset]);
   const [readableGasFee, setReadableGasFee] = useState('')
@@ -34,38 +36,40 @@ export const GasInfoEVM = () => {
 
   return <>
     <div className="item">
-      <div className="label">Estimated Network Fee</div>
+      <div className="label">{t('estimated-network-fee')}</div>
       <div>{readableGasFee}</div>
     </div>
     <div className='item'>
 
-      <div className="label">Estimated Time</div>
+      <div className="label">{t('estimated-time')}</div>
       <div>6s</div>
     </div>
   </>
 }
 
 const GasStep = (props: { isUsingCustomFee: boolean }) => {
+
+  const [t] = useTranslation();
   if (props.isUsingCustomFee) {
     return <>
       <p style={{
         marginBottom: "0px",
-      }}>Custom</p>
+      }}>{t('custom')}</p>
       <p style={{
         marginBottom: "0px",
         color: "#7B849B"
-      }}>Estimated time: ~1~24 hours</p>
+      }}>{`${t('estimated-time')}: 1~24 ${t('general.hours').toLowerCase()}`}</p>
     </>
   }
 
   return <>
     <p style={{
       marginBottom: "0px",
-    }}>Standard</p>
+    }}>{t('general.walletType.normal')}</p>
     <p style={{
       marginBottom: "0px",
       color: "#7B849B"
-    }}>Estimated time: 6s</p>
+    }}>{`${t('estimated-time')}: 6s`}</p>
   </>
 }
 
@@ -77,6 +81,7 @@ const GasStepSelectEVM = (props: {
 
   const asset = useCronosEvmAsset();
 
+  const [t] = useTranslation();
   const [gasPrice, setGasPrice] = useState(asset?.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE);
   const [gasLimit, setGasLimit] = useState(asset?.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT);
   const [isUsingCustomGas, setIsUsingCustomGas] = useState(false)
@@ -111,9 +116,9 @@ const GasStepSelectEVM = (props: {
       alignItems: 'center',
     }}>
       <div style={{ marginRight: 4 }}>
-        Confirmation Speed
+        {t('confirmation-speed')}
       </div>
-      <Tooltip title="Sending crypto on blockchain requires confirmation by the token network. When applicable, the higher the network fees, the more likely your transaction will be confirmed in a shorter period of time.">
+      <Tooltip title={t('sending-crypto-on-blockchain-requires-confirmation')}>
         <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
       </Tooltip>
     </div>}>
@@ -147,7 +152,7 @@ const GasStepSelectEVM = (props: {
           updateFee(newGasFee.toString(), newGasLimit.toString());
         }
       })
-    }}>Custom Options</a>
+    }}>{t('custom-options')}</a>
   </Form.Item>
 }
 

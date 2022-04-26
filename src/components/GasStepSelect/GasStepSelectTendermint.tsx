@@ -2,6 +2,7 @@ import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Form, Tooltip } from 'antd';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
 import { useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
 import { getNormalScaleAmount } from '../../utils/NumberUtils';
@@ -12,6 +13,7 @@ export const GasInfoTendermint = () => {
 
   const asset = useCronosTendermintAsset()
   const [readableGasFee, setReadableGasFee] = useState('')
+  const [t] = useTranslation();
 
   const updateFee = (newNetworkFee: string) => {
 
@@ -29,38 +31,40 @@ export const GasInfoTendermint = () => {
 
   return <>
     <div className="item">
-      <div className="label">Estimated Network Fee</div>
+      <div className="label">{t('estimated-network-fee')}</div>
       <div>{readableGasFee}</div>
     </div>
     <div className='item'>
 
-      <div className="label">Estimated Time</div>
+      <div className="label">{t('estimated-time')}</div>
       <div>6s</div>
     </div>
   </>
 }
 
 const GasStep = (props: { isUsingCustomFee: boolean }) => {
+
+  const [t] = useTranslation();
   if (props.isUsingCustomFee) {
     return <>
       <p style={{
         marginBottom: "0px",
-      }}>Custom</p>
+      }}>{t('custom')}</p>
       <p style={{
         marginBottom: "0px",
         color: "#7B849B"
-      }}>Estimated time: ~1~24 hours</p>
+      }}>{`${t('estimated-time')}: 1~24 ${t('general.hours').toLowerCase()}`}</p>
     </>
   }
 
   return <>
     <p style={{
       marginBottom: "0px",
-    }}>Standard</p>
+    }}>{t('general.walletType.normal')}</p>
     <p style={{
       marginBottom: "0px",
       color: "#7B849B"
-    }}>Estimated time: 6s</p>
+    }}>{`${t('estimated-time')}: 6s`}</p>
   </>
 }
 
@@ -71,6 +75,7 @@ const GasStepSelectTendermint = (props: {
 
   const { onChange } = props;
 
+  const [t] = useTranslation();
   const asset = useCronosTendermintAsset()
 
   const [networkFee, setNetworkFee] = useState(asset!.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE);
@@ -102,9 +107,9 @@ const GasStepSelectTendermint = (props: {
       marginTop: '10px'
     }}>
       <div style={{ marginRight: 4 }}>
-        Confirmation Speed
+        {t('confirmation-speed')}
       </div>
-      <Tooltip title="Sending crypto on blockchain requires confirmation by the token network. When applicable, the higher the network fees, the more likely your transaction will be confirmed in a shorter period of time.">
+      <Tooltip title={t('sending-crypto-on-blockchain-requires-confirmation')}>
         <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
       </Tooltip>
     </div>}>
@@ -138,7 +143,7 @@ const GasStepSelectTendermint = (props: {
           updateFee(newGasFee.toString());
         }
       })
-    }}>Custom Options</a>
+    }}>{t('custom-options')}</a>
   </Form.Item>
 }
 

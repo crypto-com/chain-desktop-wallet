@@ -3,32 +3,35 @@ import { Form, Tooltip } from 'antd';
 import BigNumber from 'bignumber.js';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
 import { UserAsset } from '../../models/UserAsset';
 import { getNormalScaleAmount } from '../../utils/NumberUtils';
 import { useCustomGasModalEVMDApp } from './CustomGasModalEVMDApp';
 
 const GasStep = (props: { isUsingCustomFee: boolean }) => {
+
+  const [t] = useTranslation();
   if (props.isUsingCustomFee) {
     return <>
       <p style={{
         marginBottom: "0px",
-      }}>Custom</p>
+      }}>{t('custom')}</p>
       <p style={{
         marginBottom: "0px",
         color: "#7B849B"
-      }}>Estimated time: ~1~24 hours</p>
+      }}>{`${t('estimated-time')}: 1~24 ${t('general.hours').toLowerCase()}`}</p>
     </>
   }
 
   return <>
     <p style={{
       marginBottom: "0px",
-    }}>Standard</p>
+    }}>{t('general.walletType.normal')}</p>
     <p style={{
       marginBottom: "0px",
       color: "#7B849B"
-    }}>Estimated time: 6s</p>
+    }}>{`${t('estimated-time')}: 6s`}</p>
   </>
 }
 
@@ -41,6 +44,7 @@ const GasStepSelectEVMDApp = (props: {
 
   const { asset } = props;
 
+  const [t] = useTranslation();
   const [gasPrice, setGasPrice] = useState(props.gasPrice);
   const [gasLimit, setGasLimit] = useState(props.gasLimit);
   const [isUsingCustomGas, setIsUsingCustomGas] = useState(false)
@@ -73,9 +77,9 @@ const GasStepSelectEVMDApp = (props: {
       alignItems: 'center',
     }}>
       <div style={{ marginRight: 4 }}>
-        Confirmation Speed
+        {t('confirmation-speed')}
       </div>
-      <Tooltip title="Sending crypto on blockchain requires confirmation by the token network. When applicable, the higher the network fees, the more likely your transaction will be confirmed in a shorter period of time.">
+      <Tooltip title={t('sending-crypto-on-blockchain-requires-confirmation')}>
         <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
       </Tooltip>
     </div>}>
@@ -112,7 +116,7 @@ const GasStepSelectEVMDApp = (props: {
           updateFee(newGasPrice, newGasLimit);
         }
       })
-    }}>Custom Options</a>
+    }}>{t('custom-options')}</a>
   </Form.Item>
 }
 

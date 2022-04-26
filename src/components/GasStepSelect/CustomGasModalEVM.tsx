@@ -88,7 +88,7 @@ const ModalBody = (props: {
     <div style={{
       fontSize: "24px",
       marginBottom: "30px"
-    }}>Custom Gas</div>
+    }}>{t('custom-gas')}</div>
     <Form layout="vertical" form={form} onValuesChange={(v) => {
 
       const newGasPrice = v?.gasPrice ?? gasPrice;
@@ -145,7 +145,7 @@ const ModalBody = (props: {
       }}>
       <Form.Item
         name="gasPrice"
-        label="Gas Price(WEI)"
+        label={`${t('gas-price')}(WEI)`}
         hasFeedback
         rules={[
           {
@@ -170,14 +170,14 @@ const ModalBody = (props: {
         <InputNumber precision={0} min={1} />
       </Form.Item>
       <div>
-        <div style={{ color: "#7B849B" }}>Estimate Network Fee</div>
+        <div style={{ color: "#7B849B" }}>{t('estimate-network-fee')}</div>
         <div>{readableNetworkFee}</div>
       </div>
       <div style={{
         marginTop: "20px"
       }}>
-        <div style={{ color: "#7B849B" }}>Estimate Time</div>
-        <div>{isUsingCustomGas ? "~1~24 hours" : "6s"}</div>
+        <div style={{ color: "#7B849B" }}>{t('estimate-time')}</div>
+        <div>{isUsingCustomGas ? `~1~24 ${t('general.hours').toLowerCase()}` : "6s"}</div>
       </div>
       <Form.Item style={{
         marginTop: "20px"
@@ -231,7 +231,7 @@ const useCustomGasModalEVM = (asset: UserAsset, gasFee: string, gasLimit: string
         hidden: true
       },
       style: {
-        padding: "20px 20px 0 20px"
+        padding: '20px 20px 0 20px'
       },
       content: <ModalBody gasPrice={gasFee} gasLimit={gasLimit} onSuccess={props.onSuccess} onCancel={() => {
         dismiss();

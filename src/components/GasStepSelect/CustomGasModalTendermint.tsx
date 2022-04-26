@@ -78,7 +78,7 @@ const ModalBody = (props: {
     <div style={{
       fontSize: "24px",
       marginBottom: "30px"
-    }}>Custom Gas</div>
+    }}>{t('custom-gas')}</div>
     <Form layout="vertical" form={form} onValuesChange={(v) => {
 
       const networkFee = v?.networkFee ?? gasFee;
@@ -134,7 +134,7 @@ const ModalBody = (props: {
       }}>
       <Form.Item
         name="networkFee"
-        label={t('settings.form1.networkFee.label')}
+        label={`${t('settings.form1.networkFee.label')}(baseCRO)`}
         hasFeedback
         rules={[
           {
@@ -161,14 +161,14 @@ const ModalBody = (props: {
         <InputNumber precision={0} min={1} />
       </Form.Item>
       <div>
-        <div style={{ color: "#7B849B" }}>Estimate Network Fee</div>
+        <div style={{ color: "#7B849B" }}>{t('estimate-network-fee')}</div>
         <div>{readableNetworkFee}</div>
       </div>
       <div style={{
         marginTop: "20px"
       }}>
-        <div style={{ color: "#7B849B" }}>Estimate Time</div>
-        <div>6 s</div>
+        <div style={{ color: "#7B849B" }}>{t('estimate-time')}</div>
+        <div>6s</div>
       </div>
       <Form.Item style={{
         marginTop: "20px"
@@ -222,7 +222,7 @@ const useCustomGasModalTendermint = (asset: UserAsset, gasFee: string, gasLimit:
         hidden: true
       },
       style: {
-        padding: "20px 20px 0 20px"
+        padding: '20px 20px 0 20px'
       },
       content: <ModalBody asset={asset} gasFee={gasFee} gasLimit={gasLimit} onSuccess={props.onSuccess} onCancel={() => {
         dismiss();
