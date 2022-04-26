@@ -5,6 +5,8 @@ import { useTranslation } from "react-i18next";
 import "./style.less";
 import { getRecoil, setRecoil } from 'recoil-nexus';
 import numeral from 'numeral';
+import { ethers } from 'ethers';
+import { ValidateStatus } from 'antd/lib/form/FormItem';
 import { allMarketState, sessionState, walletAllAssetsState, walletListState } from '../../recoil/atom';
 import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
 import { getAssetAmountInFiat, UserAsset } from '../../models/UserAsset';
@@ -27,7 +29,7 @@ const ModalBody = (props: {
   const [form] = Form.useForm();
 
   const croTendermintAsset = useCronosTendermintAsset()
-
+  const [validateStatus, setValidateStatus] = useState<ValidateStatus>('');
   const currentSession = getRecoil(sessionState);
   const allMarketData = getRecoil(allMarketState);
 
@@ -41,6 +43,12 @@ const ModalBody = (props: {
 
   const setNetworkFee = (fee: number) => {
     const amount = getNormalScaleAmount(fee.toString(), asset)
+
+    if (ethers.BigNumber.from(asset.balance).lte(fee)) {
+      setValidateStatus('error')
+    } else {
+      setValidateStatus('');
+    }
 
     if (!(asset && localFiatSymbol && assetMarketData && assetMarketData.price)) {
       setReadableNetworkFee(`${amount} ${asset.symbol}`);
@@ -138,6 +146,8 @@ const ModalBody = (props: {
         name="networkFee"
         label={`${t('settings.form1.networkFee.label')}(baseCRO)`}
         hasFeedback
+        validateStatus={validateStatus}
+        help={validateStatus ? t('dapp.requestConfirmation.error.insufficientBalance') : ""}
         rules={[
           {
             required: true,
@@ -153,6 +163,8 @@ const ModalBody = (props: {
         name="gasLimit"
         label={t('settings.form1.gasLimit.label')}
         hasFeedback
+        validateStatus={validateStatus}
+        help={validateStatus ? t('dapp.requestConfirmation.error.insufficientBalance') : ""}
         rules={[
           {
             required: true,
@@ -175,7 +187,7 @@ const ModalBody = (props: {
       <Form.Item style={{
         marginTop: "20px"
       }}>
-        <Button type="primary" htmlType="submit" style={{ margin: "0 10px 0 0", width: "200px" }}>
+        <Button type="primary" htmlType="submit" style={{ margin: "0 10px 0 0", width: "200px" }} disabled={!!validateStatus}>
           {t('general.save')}
         </Button>
         <Button type="link" htmlType="button" onClick={() => { onCancel() }}>
