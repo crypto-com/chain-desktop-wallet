@@ -6,6 +6,7 @@ import "./style.less";
 import { getRecoil, setRecoil } from 'recoil-nexus';
 import numeral from 'numeral';
 import { ethers } from 'ethers';
+import { ValidateStatus } from 'antd/lib/form/FormItem';
 import { allMarketState, sessionState, walletAllAssetsState, walletListState } from '../../recoil/atom';
 import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE, SUPPORTED_CURRENCY } from '../../config/StaticConfig';
 import { getAssetAmountInFiat, UserAsset } from '../../models/UserAsset';
@@ -31,6 +32,7 @@ const ModalBody = (props: {
   const currentSession = getRecoil(sessionState);
   const allMarketData = getRecoil(allMarketState);
   const { analyticsService } = useAnalytics();
+  const [validateStatus, setValidateStatus] = useState<ValidateStatus>('');
 
   const [readableNetworkFee, setReadableNetworkFee] = useState('');
 
@@ -49,7 +51,13 @@ const ModalBody = (props: {
       setIsUsingCustomGas(true)
     }
 
-    const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(ethers.BigNumber.from(newGasPrice))
+    const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(newGasPrice)
+
+    if (ethers.BigNumber.from(cronosEVMAsset.balance).lte(amountBigNumber)) {
+      setValidateStatus('error')
+    } else {
+      setValidateStatus('');
+    }
 
     const amount = getNormalScaleAmount(amountBigNumber.toString(), cronosEVMAsset)
 
@@ -98,7 +106,7 @@ const ModalBody = (props: {
       if (!gasPrice || !gasLimit) {
         setReadableNetworkFee("-");
       } else {
-        setNetworkFee(newGasPrice, newGasLimit);
+        setNetworkFee(newGasPrice.toString(), newGasLimit.toString());
       }
 
     }}
@@ -151,6 +159,8 @@ const ModalBody = (props: {
         name="gasPrice"
         label={`${t('gas-price')}(WEI)`}
         hasFeedback
+        validateStatus={validateStatus}
+        help={validateStatus ? t('dapp.requestConfirmation.error.insufficientBalance') : ""}
         rules={[
           {
             required: true,
@@ -164,6 +174,8 @@ const ModalBody = (props: {
         name="gasLimit"
         label={t('settings.form1.gasLimit.label')}
         hasFeedback
+        validateStatus={validateStatus}
+        help={validateStatus ? t('dapp.requestConfirmation.error.insufficientBalance') : ""}
         rules={[
           {
             required: true,
@@ -186,7 +198,7 @@ const ModalBody = (props: {
       <Form.Item style={{
         marginTop: "20px"
       }}>
-        <Button type="primary" htmlType="submit" style={{ margin: "0 10px 0 0", width: "200px" }}>
+        <Button type="primary" htmlType="submit" style={{ margin: "0 10px 0 0", width: "200px" }} disabled={!!validateStatus} >
           {t('general.save')}
         </Button>
         <Button type="link" htmlType="button" onClick={() => { onCancel() }}>
