@@ -6,6 +6,7 @@ import "./style.less";
 import { getRecoil } from 'recoil-nexus';
 import numeral from 'numeral';
 import BigNumber from 'bignumber.js';
+import { ValidateStatus } from 'antd/lib/form/FormItem';
 import { allMarketState, sessionState } from '../../recoil/atom';
 import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
 import { getAssetAmountInFiat, UserAsset } from '../../models/UserAsset';
@@ -29,7 +30,7 @@ const ModalBody = (props: {
   const { analyticsService } = useAnalytics();
   const currentSession = getRecoil(sessionState);
   const allMarketData = getRecoil(allMarketState);
-
+  const [validateStatus, setValidateStatus] = useState<ValidateStatus>('');
   const [readableNetworkFee, setReadableNetworkFee] = useState('');
 
   const assetMarketData = allMarketData.get(
@@ -40,10 +41,19 @@ const ModalBody = (props: {
 
   const setNetworkFee = (newGasPrice: BigNumber, newGasLimit: BigNumber) => {
 
+    if (!cronosEVMAsset) {
+      return;
+    }
 
     const amountBigNumber = newGasLimit.times(newGasPrice)
 
     const amount = getNormalScaleAmount(amountBigNumber.toString(), asset)
+
+    if (new BigNumber(cronosEVMAsset.balance).lte(amountBigNumber)) {
+      setValidateStatus('error')
+    } else {
+      setValidateStatus('');
+    }
 
     if (!(asset && localFiatSymbol && assetMarketData && assetMarketData.price)) {
       setReadableNetworkFee(`${amount} ${asset.symbol}`);
@@ -116,6 +126,8 @@ const ModalBody = (props: {
         name="gasPrice"
         label={`${t('gas-price')}(WEI)`}
         hasFeedback
+        validateStatus={validateStatus}
+        help={validateStatus ? t('dapp.requestConfirmation.error.insufficientBalance') : ""}
         rules={[
           {
             required: true,
@@ -129,6 +141,8 @@ const ModalBody = (props: {
         name="gasLimit"
         label={t('settings.form1.gasLimit.label')}
         hasFeedback
+        validateStatus={validateStatus}
+        help={validateStatus ? t('dapp.requestConfirmation.error.insufficientBalance') : ""}
         rules={[
           {
             required: true,
@@ -151,7 +165,7 @@ const ModalBody = (props: {
       <Form.Item style={{
         marginTop: "20px"
       }}>
-        <Button type="primary" htmlType="submit" style={{ margin: "0 10px 0 0", width: "200px" }}>
+        <Button type="primary" htmlType="submit" style={{ margin: "0 10px 0 0", width: "200px" }} disabled={!!validateStatus}>
           {t('general.save')}
         </Button>
         <Button type="link" htmlType="button" onClick={() => { onCancel() }}>
