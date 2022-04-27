@@ -93,6 +93,27 @@ const GeneralSettingsForm = props => {
     });
   }, [walletAllAssets]);
 
+  const onSwitchAsset = value => {
+    setCurrentAssetIdentifier(value);
+    const selectedAsset = configurableAssets.find(asset => asset.identifier === value);
+    setSession({
+      ...session,
+      activeAsset: selectedAsset,
+    });
+    walletService.setCurrentSession({
+      ...session,
+      activeAsset: selectedAsset,
+    });
+  };
+
+  useEffect(() => {
+
+    if (session.activeAsset?.identifier && session.activeAsset?.identifier !== currentAssetIdentifier) {
+      onSwitchAsset(session.activeAsset?.identifier)
+    }
+
+  }, [session])
+
   useEffect(() => {
     let unmounted = false;
 
@@ -141,19 +162,6 @@ const GeneralSettingsForm = props => {
     );
     setUpdateLoading(false);
   }
-
-  const onSwitchAsset = value => {
-    setCurrentAssetIdentifier(value);
-    const selectedAsset = configurableAssets.find(asset => asset.identifier === value);
-    setSession({
-      ...session,
-      activeAsset: selectedAsset,
-    });
-    walletService.setCurrentSession({
-      ...session,
-      activeAsset: selectedAsset,
-    });
-  };
 
   return (
     <>

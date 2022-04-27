@@ -129,6 +129,7 @@ const ModalBody = (props: {
         const newSession = {
           ...currentSession,
           wallet: updatedWallet,
+          activeAsset: newlyUpdatedAsset,
         };
         setRecoil(sessionState, newSession as Session)
 
