@@ -161,8 +161,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         from: event.object.from,
         contractAddress: event.object.to,
         data,
-        gasLimit: _gasLimit.toString(),
-        gasPrice: _gasPrice.toString(),
+        gasLimit: `0x${_gasLimit.toString(16)}`,
+        gasPrice: `0x${_gasPrice.toString(16)}`,
         nonce: prepareTxInfo.nonce,
       };
       try {
@@ -217,8 +217,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         from: event.object.from,
         contractAddress: event.object.to,
         data: event.object.data,
-        gasLimit: _gasLimit.toString(),
-        gasPrice: _gasPrice.toString(),
+        gasLimit: `0x${_gasLimit.toString(16)}`,
+        gasPrice: `0x${_gasPrice.toString(16)}`,
         value: event.object.value,
         nonce: prepareTxInfo.nonce,
       };
