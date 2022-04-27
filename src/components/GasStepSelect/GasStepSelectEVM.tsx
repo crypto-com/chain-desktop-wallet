@@ -118,8 +118,10 @@ const GasStepSelectEVM = (props: {
       <div style={{ marginRight: 4 }}>
         {t('confirmation-speed')}
       </div>
-      <Tooltip title={t('sending-crypto-on-blockchain-requires-confirmation')}>
-        <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+      <Tooltip
+        style={{ cursor: "pointer" }}
+        title={t('sending-crypto-on-blockchain-requires-confirmation')}>
+        <ExclamationCircleOutlined style={{ color: '#1199fa', cursor: "pointer" }} />
       </Tooltip>
     </div>}>
     <div style={{
