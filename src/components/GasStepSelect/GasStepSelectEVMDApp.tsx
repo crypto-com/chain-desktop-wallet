@@ -16,11 +16,11 @@ const GasStep = (props: { isUsingCustomFee: boolean }) => {
     return <>
       <p style={{
         marginBottom: "0px",
-      }}>{t('custom')}</p>
+      }}>Custom</p>
       <p style={{
         marginBottom: "0px",
         color: "#7B849B"
-      }}>{`${t('estimated-time')}: 1~24 ${t('general.hours').toLowerCase()}`}</p>
+      }}>{`${t('estimate-time')}: 1~24 ${t('general.hours').toLowerCase()}`}</p>
     </>
   }
 
@@ -31,7 +31,7 @@ const GasStep = (props: { isUsingCustomFee: boolean }) => {
     <p style={{
       marginBottom: "0px",
       color: "#7B849B"
-    }}>{`${t('estimated-time')}: 6s`}</p>
+    }}>{`${t('estimate-time')}: 6s`}</p>
   </>
 }
 

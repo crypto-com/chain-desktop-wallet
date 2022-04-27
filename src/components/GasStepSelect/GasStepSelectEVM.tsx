@@ -36,12 +36,12 @@ export const GasInfoEVM = () => {
 
   return <>
     <div className="item">
-      <div className="label">{t('estimated-network-fee')}</div>
+      <div className="label">{t('estimate-network-fee')}</div>
       <div>{readableGasFee}</div>
     </div>
     <div className='item'>
 
-      <div className="label">{t('estimated-time')}</div>
+      <div className="label">{t('estimate-time')}</div>
       <div>6s</div>
     </div>
   </>
@@ -58,7 +58,7 @@ const GasStep = (props: { isUsingCustomFee: boolean }) => {
       <p style={{
         marginBottom: "0px",
         color: "#7B849B"
-      }}>{`${t('estimated-time')}: 1~24 ${t('general.hours').toLowerCase()}`}</p>
+      }}>{`${t('estimate-time')}: 1~24 ${t('general.hours').toLowerCase()}`}</p>
     </>
   }
 
@@ -69,7 +69,7 @@ const GasStep = (props: { isUsingCustomFee: boolean }) => {
     <p style={{
       marginBottom: "0px",
       color: "#7B849B"
-    }}>{`${t('estimated-time')}: 6s`}</p>
+    }}>{`${t('estimate-time')}: 6s`}</p>
   </>
 }
 
