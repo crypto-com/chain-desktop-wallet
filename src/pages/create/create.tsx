@@ -34,6 +34,8 @@ import {
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import IconCro from '../../svg/IconCro';
 import IconEth from '../../svg/IconEth';
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import LedgerAddressIndexBalanceTable from './components/LedgerAddressIndexBalanceTable';
 
 let waitFlag = false;
 const layout = {
@@ -309,6 +311,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [isCroModalVisible, setIsCroModalVisible] = useState(false);
   const [isEthModalVisible, setIsEthModalVisible] = useState(false);
+  const [isHWModeSelected, setIsHWModeSelected] = useState(false);
+
   // eslint-disable-next-line
   const [isLedgerEthAppConnected, setIsLedgerEthAppConnected] = useState(false);
   const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
@@ -574,7 +578,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       onChange={onChange}
       initialValues={{
         walletType: 'normal',
-        addressIndex: '0',
+        addressIndex: 'm',
         network: 'MAINNET',
       }}
     >
@@ -594,7 +598,36 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       <Checkbox onChange={onCheckboxChange} checked={hwcheck}>
         {t('create.formCreate.checkbox1')}
       </Checkbox>
+      <>
+        <ModalPopup
+          isModalVisible={isHWModeSelected}
+          handleCancel={() => setIsHWModeSelected(false)}
+          handleOk={() => setIsHWModeSelected(false)}
+          className=""
+          footer={[]}
+          okText="Confirm"
+          width={1200}
+        >
+          <div className="title">{'Ledger Wallet Accounts'}</div>
+          <div className="description">{t('Please select one of the derived address.')}</div>
+          <div className="item">
+            <LedgerAddressIndexBalanceTable
+              addressIndexBalanceList={
+                /** @TODO: DUMMY DATA */
+                [{
+                publicAddress: 'somePublicAddress',
+                derivationPath: `m/44'/0'`,
+                balance: 1000
+              }]}
+              setisHWModeSelected={setIsHWModeSelected}
+              assetType={/* Replace user asset type*/ UserAssetType.EVM}
+              form={props.form}
+            />
+          </div>
+        </ModalPopup>
+      </>
       <div hidden={props.isWalletSelectFieldDisable}>
+        {/* wallet type and ledger specific code starts here */}
         <Form.Item name="walletType" label={t('create.formCreate.walletType.label')}>
           <Select
             placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
@@ -608,21 +641,28 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             </Select.Option>
           </Select>
         </Form.Item>
+        <Form.Item name="assetType" label={'Asset Type'}>
+          <Select
+            placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
+            disabled={props.isWalletSelectFieldDisable}
+            onSelect={(e) => {
+              //TODO: Set Assetype to ${e} for dyanmic addresses (tendermint or evm)
+              setIsHWModeSelected(true);
+            }}
+          >
+            <Select.Option key="tendermint" value="tendermint">
+              {'TENDERMINT'}
+            </Select.Option>
+            <Select.Option key="evm" value="evm">
+              {'EVM'}
+            </Select.Option>
+          </Select>
+        </Form.Item>
         <Form.Item
           name="addressIndex"
           label={t('create.formCreate.addressIndex.label')}
-          rules={[
-            {
-              required: true,
-              message: `${t('create.formCreate.addressIndex.label')} ${t('general.required')}`,
-            },
-            addressIndexValidator,
-          ]}
         >
-          <Input placeholder="0" />
-        </Form.Item>
-        <Form.Item>
-          <NoticeDisclaimer>{t('create.formCreate.addressIndex.disclaimer')}</NoticeDisclaimer>
+          <Input placeholder="Your derivation path here" />
         </Form.Item>
       </div>
 
