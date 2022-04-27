@@ -25,6 +25,7 @@ const ModalBody = (props: {
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { asset, gasFee, gasLimit, onSuccess, onCancel } = props;
+
   const [t] = useTranslation();
 
   const [form] = Form.useForm();
