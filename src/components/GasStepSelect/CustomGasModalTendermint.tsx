@@ -110,6 +110,7 @@ const ModalBody = (props: {
           gasLimit === newGasLimit.toString() &&
           gasFee === newNetworkFee.toString()
         ) {
+          onSuccess(newGasLimit, newNetworkFee);
           return;
         }
 

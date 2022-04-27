@@ -116,6 +116,7 @@ const ModalBody = (props: {
           gasLimit.toString() === newGasLimit.toString() &&
           gasPrice.toString() === newGasPrice.toString()
         ) {
+          onSuccess(new BigNumber(newGasLimit), new BigNumber(newGasPrice));
           return;
         }
 
