@@ -8,7 +8,7 @@ import numeral from 'numeral';
 import { ethers } from 'ethers';
 import { ValidateStatus } from 'antd/lib/form/FormItem';
 import { allMarketState, sessionState, walletAllAssetsState, walletListState } from '../../recoil/atom';
-import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
+import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT, SUPPORTED_CURRENCY } from '../../config/StaticConfig';
 import { getAssetAmountInFiat, UserAsset } from '../../models/UserAsset';
 import { getNormalScaleAmount } from "../../utils/NumberUtils"
 import { walletService } from '../../service/WalletService';
@@ -23,6 +23,7 @@ const ModalBody = (props: {
   onSuccess: (gasLimit: number, networkFee: number) => void,
   onCancel: () => void
 }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { asset, gasFee, gasLimit, onSuccess, onCancel } = props;
   const [t] = useTranslation();
 
@@ -192,9 +193,13 @@ const ModalBody = (props: {
         <Button type="primary" htmlType="submit" style={{ margin: "0 10px 0 0", width: "200px" }} disabled={!!validateStatus}>
           {t('general.save')}
         </Button>
-        <Button type="link" htmlType="button" onClick={() => { onCancel() }}>
-          {t('general.cancel')}
-        </Button>
+        <Button danger type="link" htmlType='button' onClick={() => {
+          form.setFieldsValue({
+            networkFee: FIXED_DEFAULT_FEE,
+            gasLimit: FIXED_DEFAULT_GAS_LIMIT
+          })
+          setNetworkFee(Number(FIXED_DEFAULT_FEE))
+        }}>{t("general.default")}</Button>
       </Form.Item>
     </Form>
   </div>

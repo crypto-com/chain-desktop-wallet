@@ -22,6 +22,7 @@ const ModalBody = (props: {
   onSuccess: (gasLimit: number, gasPrice: number) => void,
   onCancel: () => void
 }) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { gasPrice, gasLimit, onSuccess, onCancel } = props;
   const [t] = useTranslation();
 
@@ -203,9 +204,13 @@ const ModalBody = (props: {
         <Button type="primary" htmlType="submit" style={{ margin: "0 10px 0 0", width: "200px" }} disabled={!!validateStatus} >
           {t('general.save')}
         </Button>
-        <Button type="link" htmlType="button" onClick={() => { onCancel() }}>
-          {t('general.cancel')}
-        </Button>
+        <Button danger type="link" htmlType='button' onClick={() => {
+          form.setFieldsValue({
+            gasPrice: EVM_MINIMUM_GAS_PRICE,
+            gasLimit: EVM_MINIMUM_GAS_LIMIT
+          })
+          setNetworkFee(EVM_MINIMUM_GAS_PRICE, EVM_MINIMUM_GAS_LIMIT)
+        }}>{t("general.default")}</Button>
       </Form.Item>
     </Form>
   </div>
