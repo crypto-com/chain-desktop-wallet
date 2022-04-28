@@ -41,6 +41,44 @@ export class LedgerEthSigner {
     }
   }
 
+  async getAddressList(gap: number = 10, display: boolean): Promise<string[]> {
+    console.log('Hi getAddressList()');
+    const addressList: string[] = [];
+    try {
+      await this.createTransport();
+      console.log('createTransport()');
+
+      for (let index = 0; index < gap; index++) {
+          console.log(`getAddress #${index}`);
+        const path: string = `44'/60'/0'/0/${index}`;
+        const retAddress = await this.app!.getAddress(path, display, false);
+        addressList[index] = retAddress.address;
+          console.log(`retAddress index:${index}`, retAddress);
+      }
+
+      // const getAddressPromises = [];
+      // for (let index = 0; index < gap; index++) {
+      //   const path: string = `44'/60'/0'/0/${index}`;
+      //   getAddressPromises.push(async () => {
+      //     console.log(`getAddressPromises #${index}`);
+      //     const retAddress = await this.app!.getAddress(path, display, false);
+      //     console.log(`retAddress index:${index}`, retAddress);
+      //     addressList[index] = retAddress.address;
+      //     // return retAddress;
+      //     return Promise.resolve(retAddress);
+      //   });
+      // }
+      // console.log('getAddressPromises', getAddressPromises);
+      // const results = await Promise.allSettled(getAddressPromises)
+      // .then((results) => results.forEach((result) => console.log(result)));
+      // console.log('results', results);
+      console.log('addressList', addressList);
+      return addressList;
+    } finally {
+      await this.closeTransport();
+    }
+  }
+
   public static padZero(original_array: Uint8Array, wanted_length: number) {
     const new_array = new Uint8Array(wanted_length);
     for (let i = wanted_length - 1; i >= 0; i--) {

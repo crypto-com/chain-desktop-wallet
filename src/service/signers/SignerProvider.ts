@@ -18,6 +18,7 @@ export interface ISignerProvider {
     data: string,
   ): Promise<string>;
   getEthAddress(index: number, display: boolean): Promise<string>;
+  getEthAddressList(gap: number, display: boolean): Promise<string[]>;
   signPersonalMessage(index: number, message: string): Promise<string>;
   signTypedDataV4(index: number, typedData: string): Promise<string>;
 }

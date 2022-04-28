@@ -431,6 +431,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           targetWallet.config.network.addressPrefix,
           false,
         );
+
         const croAsset = createdWallet.assets.filter(
           asset => asset.assetType === UserAssetType.TENDERMINT,
         )[0];
@@ -449,11 +450,19 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           }
         }
 
-        const ethAddresss = await device.getEthAddress(targetWallet.addressIndex, false);
-        const evmAsset = createdWallet.assets.filter(
-          asset => asset.assetType === UserAssetType.EVM,
-        )[0];
-        evmAsset.address = ethAddresss;
+        const ethAddress = await device.getEthAddress(targetWallet.addressIndex, false);
+        const ethAddressList = await device.getEthAddressList(10, false);
+        console.log('ethAddressList', ethAddressList);
+        // const evmAsset = createdWallet.assets.filter(
+        //   asset => asset.assetType === UserAssetType.EVM,
+        // )[0];
+        // evmAsset.address = ethAddress;
+        createdWallet.assets
+          .filter(asset => asset.assetType === UserAssetType.EVM)
+          .forEach(asset => {
+            asset.address = ethAddress;
+          });
+
         setIsLedgerEthAppConnected(true);
       }
 
