@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
-import { AutoComplete, FormInstance, Table, Tooltip } from 'antd';
+import { FormInstance, Table } from 'antd';
 
 import './LedgerAddressIndexBalanceTable.less';
 
@@ -70,7 +69,7 @@ const LedgerAddressIndexBalanceTable = (props: {
             }
             if (form) {
               form.setFieldsValue({
-                addressIndex: record.derivationPath,
+                derivationPath: record.derivationPath,
               });
             }
           }}

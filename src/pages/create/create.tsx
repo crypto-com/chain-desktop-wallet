@@ -306,6 +306,15 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
   );
 };
 
+enum LedgerAssetType {
+  TENDERMINT = "tendermint",
+  EVM = "evm"
+}
+enum WalletDerivationStrategy {
+  BIP44 = "bip44",
+  LedgerLive = "ledgerLive"
+}
+
 const FormCreate: React.FC<FormCreateProps> = props => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
@@ -318,6 +327,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
+  const [ledgerAssetType, setLedgerAssetType] = useState<UserAssetType>();
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(walletTempBackupState);
   const [hwcheck, setHwcheck] = useState(!props.isWalletSelectFieldDisable);
@@ -578,7 +589,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       onChange={onChange}
       initialValues={{
         walletType: 'normal',
-        addressIndex: 'm',
+        addressIndex: '0',
         network: 'MAINNET',
       }}
     >
@@ -611,18 +622,62 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           <div className="title">{'Ledger Wallet Accounts'}</div>
           <div className="description">{t('Please select one of the derived address.')}</div>
           <div className="item">
-            <LedgerAddressIndexBalanceTable
+            <Select
+              placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
+              disabled={props.isWalletSelectFieldDisable}
+              defaultActiveFirstOption={true}
+              onSelect={(e) => {
+                switch (e) {
+                  case LedgerAssetType.TENDERMINT:
+                    setLedgerAssetType(UserAssetType.TENDERMINT);
+                    break;
+                  case LedgerAssetType.EVM:
+                    setLedgerAssetType(UserAssetType.EVM);
+                    break;
+                }
+              }}
+            >
+              <Select.Option key="tendermint" value={LedgerAssetType.TENDERMINT}>
+                {'TENDERMINT'}
+              </Select.Option>
+              <Select.Option key="evm" value={LedgerAssetType.EVM}>
+                {'EVM'}
+              </Select.Option>
+            </Select>
+            {(ledgerAssetType) ? <LedgerAddressIndexBalanceTable
               addressIndexBalanceList={
                 /** @TODO: DUMMY DATA */
-                [{
-                publicAddress: 'somePublicAddress',
-                derivationPath: `m/44'/0'`,
-                balance: 1000
-              }]}
+                [
+                  {
+                    publicAddress: 'somePublicAddress',
+                    derivationPath: `m/44'/0'`,
+                    balance: 1000
+                  },
+                  {
+                    publicAddress: 'somePublicAddress',
+                    derivationPath: `m/44'/0'`,
+                    balance: 1000
+                  },
+                  {
+                    publicAddress: 'somePublicAddress',
+                    derivationPath: `m/44'/0'`,
+                    balance: 1000
+                  },
+                  {
+                    publicAddress: 'somePublicAddress',
+                    derivationPath: `m/44'/0'`,
+                    balance: 1000
+                  },
+                  {
+                    publicAddress: 'somePublicAddress',
+                    derivationPath: `m/44'/0'`,
+                    balance: 1000
+                  },
+                ]}
               setisHWModeSelected={setIsHWModeSelected}
-              assetType={/* Replace user asset type*/ UserAssetType.EVM}
+              assetType={ledgerAssetType}
               form={props.form}
-            />
+            /> : <></>}
           </div>
         </ModalPopup>
       </>
@@ -641,29 +696,34 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             </Select.Option>
           </Select>
         </Form.Item>
-        <Form.Item name="assetType" label={'Asset Type'}>
+        <Form.Item name="derivationStrategy" label={'Derivation Strategy'}>
           <Select
             placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
             disabled={props.isWalletSelectFieldDisable}
-            onSelect={(e) => {
-              //TODO: Set Assetype to ${e} for dyanmic addresses (tendermint or evm)
-              setIsHWModeSelected(true);
-            }}
           >
-            <Select.Option key="tendermint" value="tendermint">
-              {'TENDERMINT'}
+            <Select.Option key="bip44" value={WalletDerivationStrategy.BIP44}>
+              {t('BIP-44')}
             </Select.Option>
-            <Select.Option key="evm" value="evm">
-              {'EVM'}
+            <Select.Option key="ledgerLive" value={WalletDerivationStrategy.LedgerLive}>
+              {t('Ledger Live')}
             </Select.Option>
           </Select>
         </Form.Item>
         <Form.Item
-          name="addressIndex"
-          label={t('create.formCreate.addressIndex.label')}
+          name="derivationPath"
+          label={t('Address derivation path')}
         >
-          <Input placeholder="Your derivation path here" />
+          <Input placeholder="Your derivation path here" value={props.form.getFieldValue("derivationPath")}>
+          </Input>
+          <Button type="dashed" size="small" onClick={
+            () => {
+              setIsHWModeSelected(true);
+            }
+          } style={{
+            border: "0"
+          }}> {"Show Ledger Accounts"} </Button>
         </Form.Item>
+
       </div>
 
       <Form.Item
@@ -734,8 +794,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 </a>
               </>
             ) : (
-              <></>
-            )}
+                <></>
+              )}
           </>
         </ErrorModalPopup>
         <LedgerModalPopup
@@ -751,20 +811,20 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             isLedgerCroAppConnected ? (
               <></>
             ) : (
-              <Button
-                type="primary"
-                size="small"
-                className="btn-restart"
-                onClick={() => {
-                  checkIsLedgerCroAppConnected();
-                  // setIsLedgerModalButtonLoading(true);
-                }}
+                <Button
+                  type="primary"
+                  size="small"
+                  className="btn-restart"
+                  onClick={() => {
+                    checkIsLedgerCroAppConnected();
+                    // setIsLedgerModalButtonLoading(true);
+                  }}
                 // loading={isLedgerModalButtonLoading}
                 // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
-              >
-                {t('general.connect')}
-              </Button>
-            ),
+                >
+                  {t('general.connect')}
+                </Button>
+              ),
           ]}
           image={isLedgerCroAppConnected ? <SuccessCheckmark /> : <IconLedger />}
         >
@@ -772,14 +832,14 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             {isLedgerCroAppConnected ? (
               t('create.ledgerModalPopup.tendermintAddress.description1')
             ) : (
-              <>
-                {t('create.ledgerModalPopup.tendermintAddress.description3')}
-                <div className="ledger-app-icon">
-                  <IconCro style={{ color: '#fff' }} />
-                </div>
+                <>
+                  {t('create.ledgerModalPopup.tendermintAddress.description3')}
+                  <div className="ledger-app-icon">
+                    <IconCro style={{ color: '#fff' }} />
+                  </div>
                 Crypto.org App
               </>
-            )}
+              )}
           </div>
         </LedgerModalPopup>
         <LedgerModalPopup
@@ -795,22 +855,22 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             isLedgerEthAppConnected ? (
               <></>
             ) : (
-              <Button
-                type="primary"
-                size="small"
-                className="btn-restart"
-                onClick={() => {
-                  handleEthOk();
-                  // setIsEthModalVisible(false);
-                  // checkIsLedgerEthAppConnected();
-                  // setIsLedgerModalButtonLoading(true);
-                }}
+                <Button
+                  type="primary"
+                  size="small"
+                  className="btn-restart"
+                  onClick={() => {
+                    handleEthOk();
+                    // setIsEthModalVisible(false);
+                    // checkIsLedgerEthAppConnected();
+                    // setIsLedgerModalButtonLoading(true);
+                  }}
                 // loading={isLedgerModalButtonLoading}
                 // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
-              >
-                {t('general.connect')}
-              </Button>
-            ),
+                >
+                  {t('general.connect')}
+                </Button>
+              ),
           ]}
           image={isLedgerEthAppConnected ? <SuccessCheckmark /> : <IconLedger />}
         >
@@ -818,14 +878,14 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             {isLedgerEthAppConnected ? (
               t('create.ledgerModalPopup.evmAddress.description1')
             ) : (
-              <>
-                {t('create.ledgerModalPopup.tendermintAddress.description3')}
-                <div className="ledger-app-icon">
-                  <IconEth style={{ color: '#fff' }} />
-                </div>
+                <>
+                  {t('create.ledgerModalPopup.tendermintAddress.description3')}
+                  <div className="ledger-app-icon">
+                    <IconEth style={{ color: '#fff' }} />
+                  </div>
                 Ethereum App
               </>
-            )}
+              )}
           </div>
         </LedgerModalPopup>
       </Form.Item>
@@ -920,12 +980,12 @@ const CreatePage = () => {
               networkConfig={networkConfig}
             />
           ) : (
-            <FormCustomConfig
-              setIsConnected={setIsConnected}
-              setIsCreateDisable={setIsCreateDisable}
-              setNetworkConfig={setNetworkConfig}
-            />
-          )}
+              <FormCustomConfig
+                setIsConnected={setIsConnected}
+                setIsCreateDisable={setIsCreateDisable}
+                setNetworkConfig={setNetworkConfig}
+              />
+            )}
 
           <PasswordFormModal
             description={t('general.passwordFormModal.createWallet.description')}
