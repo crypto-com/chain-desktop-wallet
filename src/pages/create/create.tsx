@@ -21,6 +21,7 @@ import { secretStoreService } from '../../storage/SecretStoreService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup';
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import NoticeDisclaimer from '../../components/NoticeDisclaimer/NoticeDisclaimer';
 import IconLedger from '../../svg/IconLedger';
 import { UserAssetType } from '../../models/UserAsset';
@@ -562,6 +563,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const addressIndexValidator = TransactionUtils.rangeValidator(
     `0`,
     `${LedgerWalletMaximum}`,
@@ -608,19 +610,22 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           okText="Confirm"
           width={1200}
         >
-          <div className="title">{'Ledger Wallet Accounts'}</div>
+          <div className="title">Ledger Wallet Accounts</div>
           <div className="description">{t('Please select one of the derived address.')}</div>
           <div className="item">
             <LedgerAddressIndexBalanceTable
               addressIndexBalanceList={
                 /** @TODO: DUMMY DATA */
-                [{
-                publicAddress: 'somePublicAddress',
-                derivationPath: `m/44'/0'`,
-                balance: 1000
-              }]}
+                [
+                  {
+                    publicAddress: 'somePublicAddress',
+                    derivationPath: `m/44'/0'`,
+                    balance: 1000,
+                  },
+                ]
+              }
               setisHWModeSelected={setIsHWModeSelected}
-              assetType={/* Replace user asset type*/ UserAssetType.EVM}
+              assetType={/* Replace user asset type */ UserAssetType.EVM}
               form={props.form}
             />
           </div>
@@ -641,27 +646,25 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             </Select.Option>
           </Select>
         </Form.Item>
-        <Form.Item name="assetType" label={'Asset Type'}>
+        <Form.Item name="assetType" label="Asset Type">
           <Select
             placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
             disabled={props.isWalletSelectFieldDisable}
-            onSelect={(e) => {
-              //TODO: Set Assetype to ${e} for dyanmic addresses (tendermint or evm)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            onSelect={e => {
+              // TODO: Set Assetype to ${e} for dyanmic addresses (tendermint or evm)
               setIsHWModeSelected(true);
             }}
           >
             <Select.Option key="tendermint" value="tendermint">
-              {'TENDERMINT'}
+              TENDERMINT
             </Select.Option>
             <Select.Option key="evm" value="evm">
-              {'EVM'}
+              EVM
             </Select.Option>
           </Select>
         </Form.Item>
-        <Form.Item
-          name="addressIndex"
-          label={t('create.formCreate.addressIndex.label')}
-        >
+        <Form.Item name="addressIndex" label={t('create.formCreate.addressIndex.label')}>
           <Input placeholder="Your derivation path here" />
         </Form.Item>
       </div>
