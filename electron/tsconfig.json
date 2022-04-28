@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
     "target": "es5",
+    "lib": [
+      "ES2020.Promise"
+    ],
     "module": "commonjs",
     "sourceMap": true,
     "allowJs": true,

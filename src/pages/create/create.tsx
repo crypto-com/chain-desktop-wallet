@@ -21,6 +21,7 @@ import { secretStoreService } from '../../storage/SecretStoreService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup';
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import NoticeDisclaimer from '../../components/NoticeDisclaimer/NoticeDisclaimer';
 import IconLedger from '../../svg/IconLedger';
 import { UserAssetType } from '../../models/UserAsset';
@@ -441,6 +442,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           targetWallet.config.network.addressPrefix,
           false,
         );
+
         const croAsset = createdWallet.assets.filter(
           asset => asset.assetType === UserAssetType.TENDERMINT,
         )[0];
@@ -459,11 +461,19 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           }
         }
 
-        const ethAddresss = await device.getEthAddress(targetWallet.addressIndex, false);
-        const evmAsset = createdWallet.assets.filter(
-          asset => asset.assetType === UserAssetType.EVM,
-        )[0];
-        evmAsset.address = ethAddresss;
+        const ethAddress = await device.getEthAddress(targetWallet.addressIndex, false);
+        const ethAddressList = await device.getEthAddressList(10, false);
+        console.log('ethAddressList', ethAddressList);
+        // const evmAsset = createdWallet.assets.filter(
+        //   asset => asset.assetType === UserAssetType.EVM,
+        // )[0];
+        // evmAsset.address = ethAddress;
+        createdWallet.assets
+          .filter(asset => asset.assetType === UserAssetType.EVM)
+          .forEach(asset => {
+            asset.address = ethAddress;
+          });
+
         setIsLedgerEthAppConnected(true);
       }
 
@@ -573,6 +583,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const addressIndexValidator = TransactionUtils.rangeValidator(
     `0`,
     `${LedgerWalletMaximum}`,
@@ -619,7 +630,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           okText="Confirm"
           width={1200}
         >
-          <div className="title">{'Ledger Wallet Accounts'}</div>
+          <div className="title">Ledger Wallet Accounts</div>
           <div className="description">{t('Please select one of the derived address.')}</div>
           <div className="item">
             <Select

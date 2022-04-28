@@ -227,6 +227,10 @@ export class LedgerWalletSignerProviderZemu implements ISignerProvider {
     return '';
   }
 
+  public async getEthAddressList(_gap: number): Promise<string[]> {
+    return [];
+  }
+
   async signPersonalMessage(_index: number, _message: string): Promise<string> {
     return '';
   }

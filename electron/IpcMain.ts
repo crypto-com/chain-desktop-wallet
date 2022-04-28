@@ -142,6 +142,24 @@ export class IpcMain {
       }
       event.returnValue = ret;
     });
+    ipcMain.on('ethGetAddressList', async (event: any, arg: any) => {
+      let ret = {};
+      try {
+        const addressList = await this.ethProvider.getAddressList(arg.gap, arg.display);
+        ret = {
+          addressList,
+          success: true,
+          label: 'ethGetAddressList reply',
+        };
+      } catch (e) {
+        ret = {
+          success: false,
+          error: e.toString(),
+        };
+        console.error('ethGetAddressList error ' + e);
+      }
+      event.returnValue = ret;
+    });
     ipcMain.on('ethSignPersonalMessage', async (event: any, arg: any) => {
       let ret = {};
       console.log('ethSignPersonalMessage, ', arg.message, ' . ', arg.index);

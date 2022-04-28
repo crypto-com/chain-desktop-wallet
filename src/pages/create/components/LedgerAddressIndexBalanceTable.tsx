@@ -9,14 +9,11 @@ import { UserAssetType } from '../../../models/UserAsset';
 const LedgerAddressIndexBalanceTable = (props: {
   addressIndexBalanceList;
   form?: FormInstance;
-  assetType: UserAssetType,
+  // eslint-disable-next-line react/no-unused-prop-types
+  assetType: UserAssetType;
   setisHWModeSelected?: (value: boolean) => void;
 }) => {
-  const {
-    addressIndexBalanceList: rawAddressIndexBalanceList,
-    form,
-    setisHWModeSelected,
-  } = props;
+  const { addressIndexBalanceList: rawAddressIndexBalanceList, form, setisHWModeSelected } = props;
   const [addressIndexBalanceList, setAddressIndexBalanceList] = useState<any[]>([]);
 
   const [t] = useTranslation();
@@ -26,9 +23,7 @@ const LedgerAddressIndexBalanceTable = (props: {
       title: 'Address',
       dataIndex: 'publicAddress',
       key: 'publicAddress',
-      render: publicAddress => (
-        publicAddress
-      ),
+      render: publicAddress => publicAddress,
     },
     {
       title: 'Derivation Path',
@@ -37,11 +32,7 @@ const LedgerAddressIndexBalanceTable = (props: {
       // sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
       // defaultSortOrder: 'descend' as any,
       render: derivationPath => {
-        return (
-          <span>
-            {derivationPath}
-          </span>
-        );
+        return <span>{derivationPath}</span>;
       },
     },
     {
@@ -104,9 +95,8 @@ const LedgerAddressIndexBalanceTable = (props: {
         dataSource={addressIndexBalanceList}
         columns={tableColumns}
         pagination={{ showSizeChanger: false }}
-        onChange={(pagination, filters, sorter: any) => {
-        }}
-
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        onChange={(pagination, filters, sorter: any) => {}}
         defaultExpandAllRows
       />
     </div>

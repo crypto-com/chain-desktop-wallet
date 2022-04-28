@@ -129,6 +129,20 @@ export class IpcRender implements ISignerProvider {
     return arg.address;
   }
 
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line  class-methods-use-this
+  public async getEthAddressList(gap: number, display: boolean): Promise<string[]> {
+    const a = {
+      gap,
+      display,
+    };
+    const arg = electron.ipcRenderer.sendSync('ethGetAddressList', a);
+    if (!arg.success) {
+      throw new Error(`test fail: ${arg.error}`);
+    }
+    return arg.addressList;
+  }
+
   // eslint-disable-next-line class-methods-use-this
   public async signPersonalMessage(index: number, hexMessage: string): Promise<string> {
     const message = hexToString(hexMessage);
