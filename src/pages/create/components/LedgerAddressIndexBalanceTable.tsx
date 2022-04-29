@@ -59,8 +59,11 @@ const LedgerAddressIndexBalanceTable = (props: {
               setisHWModeSelected(false);
             }
             if (form) {
+              const lastIndexOfSlash = record.derivationPath.lastIndexOf('/');
+              const [rootPath, index] = [record.derivationPath.substring(0, lastIndexOfSlash), record.derivationPath.substring(lastIndexOfSlash + 1)]
               form.setFieldsValue({
-                derivationPath: record.derivationPath,
+                derivationPath: rootPath,
+                addressIndex: index
               });
             }
           }}
@@ -96,7 +99,7 @@ const LedgerAddressIndexBalanceTable = (props: {
         columns={tableColumns}
         pagination={{ showSizeChanger: false }}
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onChange={(pagination, filters, sorter: any) => {}}
+        onChange={(pagination, filters, sorter: any) => { }}
         defaultExpandAllRows
       />
     </div>

@@ -661,17 +661,17 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 [
                   {
                     publicAddress: 'somePublicAddress',
-                    derivationPath: `m/44'/0'`,
+                    derivationPath: `m/44'/0'/0`,
                     balance: 1000
                   },
                   {
                     publicAddress: 'somePublicAddress',
-                    derivationPath: `m/44'/0'`,
+                    derivationPath: `m/44'/0'/1`,
                     balance: 1000
                   },
                   {
                     publicAddress: 'somePublicAddress',
-                    derivationPath: `m/44'/0'`,
+                    derivationPath: `m/44'/0'/2`,
                     balance: 1000
                   },
                   {
@@ -719,14 +719,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
               {t('Ledger Live')}
             </Select.Option>
           </Select>
-        </Form.Item>
-        <Form.Item
-          name="derivationPath"
-          label={t('Address derivation path')}
-        >
-          <Input placeholder="Your derivation path here" value={props.form.getFieldValue("derivationPath")}>
-          </Input>
-          <Button type="dashed" size="small" onClick={
+          <Button type="ghost" size="small" onClick={
             () => {
               setIsHWModeSelected(true);
             }
@@ -734,7 +727,27 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             border: "0"
           }}> {"Show Ledger Accounts"} </Button>
         </Form.Item>
-
+        <Form.Item
+          name="derivationPath"
+          label={t('Base derivation path')}
+        >
+          <Input
+            readOnly
+            placeholder="Your derivation path here"
+            value={props.form.getFieldValue("derivationPath")}
+            style={{ backgroundColor: "#d4d4d4" }}
+          >
+          </Input>
+        </Form.Item>
+        <Form.Item
+          name="addressIndex"
+          label={t('Address Index')}
+        >
+          <Input
+            placeholder="Enter derivation address index here"
+            value={props.form.getFieldValue("addressIndex")}>
+          </Input>
+        </Form.Item>
       </div>
 
       <Form.Item
