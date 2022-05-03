@@ -30,10 +30,9 @@ const ModalBody = (props: {
   gasFee: string;
   gasLimit: string;
   onSuccess: (gasLimit: number, networkFee: number) => void;
-  onCancel: () => void;
 }) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { asset, gasFee, gasLimit, onSuccess, onCancel } = props;
+  const { asset, gasFee, gasLimit, onSuccess } = props;
 
   const [t] = useTranslation();
 
@@ -279,16 +278,7 @@ const useCustomGasModalTendermint = (asset: UserAsset, gasFee: string, gasLimit:
         padding: '20px 20px 0 20px',
       },
       content: (
-        <ModalBody
-          asset={asset}
-          gasFee={gasFee}
-          gasLimit={gasLimit}
-          onSuccess={props.onSuccess}
-          onCancel={() => {
-            dismiss();
-            props.onCancel?.();
-          }}
-        />
+        <ModalBody asset={asset} gasFee={gasFee} gasLimit={gasLimit} onSuccess={props.onSuccess} />
       ),
     });
     setIsShowing(true);

@@ -29,10 +29,8 @@ const ModalBody = (props: {
   gasPrice: string;
   gasLimit: string;
   onSuccess: (gasLimit: number, gasPrice: number) => void;
-  onCancel: () => void;
 }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { gasPrice, gasLimit, onSuccess, onCancel } = props;
+  const { gasPrice, gasLimit, onSuccess } = props;
   const [t] = useTranslation();
 
   const [form] = Form.useForm();
@@ -284,17 +282,7 @@ const useCustomGasModalEVM = (asset: UserAsset, gasFee: string, gasLimit: string
       style: {
         padding: '20px 20px 0 20px',
       },
-      content: (
-        <ModalBody
-          gasPrice={gasFee}
-          gasLimit={gasLimit}
-          onSuccess={props.onSuccess}
-          onCancel={() => {
-            dismiss();
-            props.onCancel?.();
-          }}
-        />
-      ),
+      content: <ModalBody gasPrice={gasFee} gasLimit={gasLimit} onSuccess={props.onSuccess} />,
     });
     setIsShowing(true);
     modalRef = modal;
