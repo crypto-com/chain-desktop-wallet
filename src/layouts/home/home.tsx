@@ -966,7 +966,7 @@ function HomeLayout(props: HomeLayoutProps) {
       <Layout>
         <Sider className="home-sider">
           <div className="logo" />
-          <div className="version">CHAIN DESKTOP WALLET v{buildVersion}</div>
+          <div className="version">DEFI DESKTOP WALLET v{buildVersion}</div>
           <HomeMenu />
           <Button
             className="bottom-icon"
