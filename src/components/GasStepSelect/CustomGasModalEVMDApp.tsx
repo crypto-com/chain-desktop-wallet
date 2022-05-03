@@ -53,6 +53,8 @@ const ModalBody = (props: {
       newGasLimit.toString() !== EVM_MINIMUM_GAS_LIMIT
     ) {
       setIsUsingCustomGas(true);
+    } else {
+      setIsUsingCustomGas(false);
     }
 
     const amountBigNumber = newGasLimit.times(newGasPrice);

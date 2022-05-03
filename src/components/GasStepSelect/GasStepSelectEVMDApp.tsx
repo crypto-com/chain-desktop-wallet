@@ -57,6 +57,8 @@ const GasStepSelectEVMDApp = (props: {
 
     if (newGasPrice.toString() !== EVM_MINIMUM_GAS_PRICE || newGasLimit.toString() !== EVM_MINIMUM_GAS_LIMIT) {
       setIsUsingCustomGas(true)
+    } else {
+      setIsUsingCustomGas(false);
     }
 
     const amount = getNormalScaleAmount(newGasPrice.times(newGasLimit).toString(), asset!)

@@ -93,7 +93,9 @@ const GasStepSelectEVM = (props: {
   const updateFee = (newGasPrice: string, newGasLimit: string) => {
 
     if (newGasPrice !== EVM_MINIMUM_GAS_PRICE || newGasLimit !== EVM_MINIMUM_GAS_LIMIT) {
-      setIsUsingCustomGas(true)
+      setIsUsingCustomGas(true);
+    } else {
+      setIsUsingCustomGas(false);
     }
 
     const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(ethers.BigNumber.from(newGasPrice))

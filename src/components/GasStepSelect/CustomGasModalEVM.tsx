@@ -57,6 +57,8 @@ const ModalBody = (props: {
 
     if (newGasPrice !== EVM_MINIMUM_GAS_PRICE || newGasLimit !== EVM_MINIMUM_GAS_LIMIT) {
       setIsUsingCustomGas(true);
+    } else {
+      setIsUsingCustomGas(false);
     }
 
     const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(newGasPrice);
