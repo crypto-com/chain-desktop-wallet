@@ -51,10 +51,10 @@ const ModalBody = (props: {
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
   const { analyticsService } = useAnalytics();
 
-  const setNetworkFee = (fee: number) => {
-    const amount = getNormalScaleAmount(fee.toString(), asset);
+  const setNetworkFee = (fee: string) => {
+    const amount = getNormalScaleAmount(fee, asset);
 
-    if (ethers.BigNumber.from(asset.balance.toString()).lte(fee.toString())) {
+    if (ethers.BigNumber.from(asset.balance.toString()).lte(fee)) {
       setValidateStatus('error');
     } else {
       setValidateStatus('');
@@ -78,7 +78,7 @@ const ModalBody = (props: {
       return;
     }
 
-    setNetworkFee(Number(gasFee));
+    setNetworkFee(gasFee);
 
     form.setFieldsValue({
       networkFee: gasFee,
@@ -174,7 +174,8 @@ const ModalBody = (props: {
         >
           <InputNumber
             precision={0}
-            min={1}
+            min="1"
+            stringMode
             onChange={v => {
               setNetworkFee(v);
             }}
@@ -229,7 +230,7 @@ const ModalBody = (props: {
                 networkFee: FIXED_DEFAULT_FEE,
                 gasLimit: FIXED_DEFAULT_GAS_LIMIT,
               });
-              setNetworkFee(Number(FIXED_DEFAULT_FEE));
+              setNetworkFee(FIXED_DEFAULT_FEE);
             }}
           >
             {t('general.default')}

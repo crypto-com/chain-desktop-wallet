@@ -28,7 +28,7 @@ import { useAnalytics } from '../../hooks/useAnalytics';
 const ModalBody = (props: {
   gasPrice: string;
   gasLimit: string;
-  onSuccess: (gasLimit: number, gasPrice: number) => void;
+  onSuccess: (gasLimit: string, gasPrice: string) => void;
 }) => {
   const { gasPrice, gasLimit, onSuccess } = props;
   const [t] = useTranslation();
@@ -115,12 +115,12 @@ const ModalBody = (props: {
         layout="vertical"
         form={form}
         onValuesChange={v => {
-          const newGasPrice = v?.gasPrice ?? gasPrice;
-          const newGasLimit = v?.gasLimit ?? gasLimit;
+          const newGasPrice: string = v?.gasPrice ?? gasPrice;
+          const newGasLimit: string = v?.gasLimit ?? gasLimit;
           if (!gasPrice || !gasLimit) {
             setReadableNetworkFee('-');
           } else {
-            setNetworkFee(newGasPrice.toString(), newGasLimit.toString());
+            setNetworkFee(newGasPrice, newGasLimit);
           }
         }}
         onFinish={async values => {
@@ -131,7 +131,7 @@ const ModalBody = (props: {
           const {
             gasLimit: newGasLimit,
             gasPrice: newGasPrice,
-          }: { gasLimit: number; gasPrice: number } = values;
+          }: { gasLimit: string; gasPrice: string } = values;
 
           if (gasLimit === newGasLimit.toString() && gasPrice === newGasPrice.toString()) {
             onSuccess(newGasLimit, newGasPrice);
@@ -185,7 +185,7 @@ const ModalBody = (props: {
             },
           ]}
         >
-          <InputNumber precision={0} min={1} />
+          <InputNumber stringMode precision={0} min="1" />
         </Form.Item>
         <Form.Item
           name="gasLimit"
@@ -200,7 +200,7 @@ const ModalBody = (props: {
             },
           ]}
         >
-          <InputNumber precision={0} min={1} />
+          <InputNumber stringMode precision={0} min="1" />
         </Form.Item>
         <div>
           <div style={{ color: '#7B849B' }}>{t('estimate-network-fee')}</div>
@@ -259,7 +259,7 @@ const useCustomGasModalEVM = (asset: UserAsset, gasFee: string, gasLimit: string
 
   function show(props: {
     onCancel?: () => void;
-    onSuccess: (gasLimit: number, gasFee: number) => void;
+    onSuccess: (gasLimit: string, gasFee: string) => void;
   }) {
     if (isShowing) {
       return;

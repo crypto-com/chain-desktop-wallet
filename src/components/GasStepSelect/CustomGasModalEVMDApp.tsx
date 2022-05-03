@@ -127,12 +127,9 @@ const ModalBody = (props: {
           const {
             gasLimit: newGasLimit,
             gasPrice: newGasPrice,
-          }: { gasLimit: number; gasPrice: number } = values;
+          }: { gasLimit: string; gasPrice: string } = values;
 
-          if (
-            gasLimit.toString() === newGasLimit.toString() &&
-            gasPrice.toString() === newGasPrice.toString()
-          ) {
+          if (gasLimit.toString() === newGasLimit && gasPrice.toString() === newGasPrice) {
             onSuccess(new BigNumber(newGasLimit), new BigNumber(newGasPrice));
             return;
           }
@@ -154,7 +151,7 @@ const ModalBody = (props: {
             },
           ]}
         >
-          <InputNumber precision={0} min={1} />
+          <InputNumber precision={0} min="1" stringMode />
         </Form.Item>
         <Form.Item
           name="gasLimit"
@@ -169,7 +166,7 @@ const ModalBody = (props: {
             },
           ]}
         >
-          <InputNumber precision={0} min={1} />
+          <InputNumber precision={0} min="1" stringMode />
         </Form.Item>
         <div>
           <div style={{ color: '#7B849B' }}>{t('estimate-network-fee')}</div>
