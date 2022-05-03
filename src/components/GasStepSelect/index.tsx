@@ -5,33 +5,33 @@ import GasStepSelectTendermint from './GasStepSelectTendermint';
 
 interface IGasStepProps {
   asset: UserAsset;
-  onChange?: (gasLimit: number, networkFee: number) => void;
+  onChange?: (gasLimit: string, networkFee: string) => void;
 }
 
 const GasStepSelect = (props: IGasStepProps) => {
   const { asset, onChange } = props;
 
-
   if (asset.assetType === UserAssetType.TENDERMINT || asset.assetType === UserAssetType.IBC) {
-    return <GasStepSelectTendermint onChange={onChange} />
+    return <GasStepSelectTendermint onChange={onChange} />;
   }
 
   if (asset.assetType === UserAssetType.EVM || asset.assetType === UserAssetType.CRC_20_TOKEN) {
-    return <GasStepSelectEVM onChange={onChange} />
+    return <GasStepSelectEVM onChange={onChange} />;
   }
 
   // const { gasStep, updateGasStep } = useCROGasStep(asset)
 
-  return <div>
-
-    {/* <Radio.Group defaultValue={gasStep} buttonStyle="solid" onChange={(e) => {
+  return (
+    <div>
+      {/* <Radio.Group defaultValue={gasStep} buttonStyle="solid" onChange={(e) => {
       updateGasStep(e.target.value)
     }}>
       <Radio.Button value="low">Low {getGasFee('low', asset)}</Radio.Button>
       <Radio.Button value="average">Average {getGasFee('average', asset)} </Radio.Button>
       <Radio.Button value="high">High {getGasFee('high', asset)}</Radio.Button>
     </Radio.Group> */}
-  </div>
-}
+    </div>
+  );
+};
 
 export default GasStepSelect;
