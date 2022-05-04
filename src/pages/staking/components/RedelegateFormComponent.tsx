@@ -13,6 +13,7 @@ import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { UNBLOCKING_PERIOD_IN_DAYS } from '../../../config/StaticConfig';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 import ValidatorListTable from './ValidatorListTable';
+import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSelectTendermint';
 
 const { Search } = Input;
 
@@ -138,6 +139,7 @@ const RedelegateFormComponent = (props: {
           </Form.Item>
         </Form>
       </div>
+      <GasInfoTendermint />
       <div>
         <Alert
           type="info"

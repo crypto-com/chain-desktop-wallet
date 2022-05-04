@@ -99,6 +99,8 @@ import nftThumbnail from '../../assets/nft-thumbnail.png';
 
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { useCronosEvmAsset, useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
+import GasStepSelectTendermint, { GasInfoTendermint } from '../../components/GasStepSelect/GasStepSelectTendermint';
+import GasStepSelectEVM, { GasInfoEVM } from '../../components/GasStepSelect/GasStepSelectEVM';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -177,11 +179,11 @@ const FormMintNft = () => {
 
   const [t] = useTranslation();
 
-  const networkFee =
-    currentSession.wallet.config.fee !== undefined &&
+  const [networkFee, setNetworkFee] =
+    useState(currentSession.wallet.config.fee !== undefined &&
     currentSession.wallet.config.fee.networkFee !== undefined
       ? currentSession.wallet.config.fee.networkFee
-      : FIXED_DEFAULT_FEE;
+      : FIXED_DEFAULT_FEE);
 
   const closeSuccessModal = () => {
     setIsSuccessModalVisible(false);
@@ -403,10 +405,10 @@ const FormMintNft = () => {
       setIsUploadButtonVisible(true);
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+        setLedgerIsExpertMode(detectConditionsError((e as unknown as any).toString()));
       }
 
-      setErrorMessages(e.message.split(': '));
+      setErrorMessages((e as unknown as any).message.split(': '));
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -657,6 +659,9 @@ const FormMintNft = () => {
               ''
             )}
           </div>
+          <GasStepSelectTendermint onChange={(_, fee) => {
+            setNetworkFee(fee.toString())
+          }} />
         </Form.Item>
         <ModalPopup
           isModalVisible={isConfirmationModalVisible}
@@ -781,6 +786,7 @@ const FormMintNft = () => {
                   {walletAsset.symbol}
                 </div>
               </div>
+              <GasInfoTendermint />
               {new Big(multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1)).gt(
                 walletAsset.balance,
               ) ? (
@@ -946,11 +952,11 @@ const NftPage = () => {
   //   { label: <AppstoreOutlined />, value: 'grid' },
   // ];
 
-  const networkFee =
-    currentSession.wallet.config.fee !== undefined &&
+  const [networkFee, setNetworkFee] =
+    useState(currentSession.wallet.config.fee !== undefined &&
     currentSession.wallet.config.fee.networkFee !== undefined
       ? currentSession.wallet.config.fee.networkFee
-      : FIXED_DEFAULT_FEE;
+      : FIXED_DEFAULT_FEE);
 
   const size = useWindowSize();
 
@@ -1079,10 +1085,10 @@ const NftPage = () => {
       form.resetFields();
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
-        setLedgerIsExpertMode(detectConditionsError(e.toString()));
+        setLedgerIsExpertMode(detectConditionsError((e as unknown as any).toString()));
       }
 
-      setErrorMessages(e.message.split(': '));
+      setErrorMessages((e as unknown as any).message.split(': '));
       setIsNftModalVisible(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
@@ -1741,6 +1747,7 @@ const NftPage = () => {
                         <div>{`${formValues.tokenId}`}</div>
                       </div>
                       {formValues.nftType === NftType.CRYPTO_ORG && (
+                        <>
                         <div className="item">
                           <div className="label">{t('nft.modal2.label4')}</div>
                           <div>
@@ -1748,6 +1755,11 @@ const NftPage = () => {
                             {walletAsset.symbol}
                           </div>
                         </div>
+                          <GasInfoTendermint />
+                        </>
+                      )}
+                      {formValues.nftType === NftType.CRC_721_TOKEN && (
+                        <GasInfoEVM />
                       )}
                     </>
                   ) : (
@@ -1792,6 +1804,16 @@ const NftPage = () => {
                         >
                           <Input placeholder={t('nft.modal3.form.recipientAddress.placeholder')} />
                         </Form.Item>
+                          {isCryptoOrgNftModel(nft) && (
+                            <GasStepSelectTendermint onChange={(_, fee) => {
+                              setNetworkFee(fee.toString())
+                            }} />
+                          )}
+                          {isCronosNftModel(nft) && (
+                            <GasStepSelectEVM onChange={(_, fee) => {
+                              setNetworkFee(fee.toString())
+                            }} />
+                          )}
                       </Form>
                       {new Big(networkFee).gt(walletAsset.balance) ? (
                         <div className="item notice">
