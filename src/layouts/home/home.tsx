@@ -88,6 +88,7 @@ import {
   DefaultTestnetBridgeConfigs,
 } from '../../service/bridge/BridgeConfig';
 import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
+import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
 
 // import i18n from '../../language/I18n';
 
@@ -329,7 +330,11 @@ function HomeLayout(props: HomeLayoutProps) {
     try {
       const device: ISignerProvider = createLedgerDevice();
 
-      ledgerEvmAddress = await device.getEthAddress(walletSession.wallet.addressIndex, walletSession.wallet.derivationPathStandard, false);
+      ledgerEvmAddress = await device.getEthAddress(
+        walletSession.wallet.addressIndex,
+        walletSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
+        false,
+      );
       setIsLedgerEthAppConnected(true);
 
       await new Promise(resolve => {
