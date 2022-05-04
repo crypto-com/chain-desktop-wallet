@@ -42,6 +42,7 @@ const ModalBody = (props: {
   const [validateStatus, setValidateStatus] = useState<ValidateStatus>('');
   const currentSession = getRecoil(sessionState);
   const allMarketData = getRecoil(allMarketState);
+  const [isUsingCustomGas, setIsUsingCustomGas] = useState(false);
 
   const [readableNetworkFee, setReadableNetworkFee] = useState('');
 
@@ -53,6 +54,12 @@ const ModalBody = (props: {
 
   const setNetworkFee = (fee: string) => {
     const amount = getNormalScaleAmount(fee, asset);
+
+    if (fee !== FIXED_DEFAULT_FEE) {
+      setIsUsingCustomGas(true);
+    } else {
+      setIsUsingCustomGas(false);
+    }
 
     if (ethers.BigNumber.from(asset.balance.toString()).lte(fee)) {
       setValidateStatus('error');
@@ -84,6 +91,7 @@ const ModalBody = (props: {
       networkFee: gasFee,
       gasLimit,
     });
+
   }, [asset, gasFee, gasLimit]);
 
   if (!croTendermintAsset) {
@@ -104,7 +112,7 @@ const ModalBody = (props: {
         layout="vertical"
         form={form}
         onValuesChange={v => {
-          const networkFee = v?.networkFee ?? gasFee;
+          const networkFee: string = v?.networkFee ?? gasFee;
           if (!networkFee) {
             setReadableNetworkFee('-');
           } else {
@@ -176,9 +184,6 @@ const ModalBody = (props: {
             precision={0}
             min="1"
             stringMode
-            onChange={v => {
-              setNetworkFee(v);
-            }}
           />
         </Form.Item>
         <Form.Item
@@ -206,7 +211,7 @@ const ModalBody = (props: {
           }}
         >
           <div style={{ color: '#7B849B' }}>{t('estimate-time')}</div>
-          <div>6s</div>
+          <div>{isUsingCustomGas ? `~1~24 ${t('general.hours').toLowerCase()}` : '6s'}</div>
         </div>
         <Form.Item
           style={{
