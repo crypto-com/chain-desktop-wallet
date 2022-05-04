@@ -1,7 +1,7 @@
 import * as Zemu from '@zondax/zemu';
 import CosmosApp from 'ledger-cosmos-js';
 import * as path from 'path';
-import { LedgerSigner } from '../../src/service/signers/LedgerSigner';
+import { DerivationPathStandard, LedgerSigner } from '../../src/service/signers/LedgerSigner';
 import { ISignerProvider } from '../../src/service/signers/SignerProvider';
 import { LedgerTransactionSigner } from '../../src/service/signers/LedgerTransactionSigner';
 import { CustomDevNet } from '../../src/config/StaticConfig';
@@ -246,7 +246,7 @@ async function main() {
   await Zemu.default.sleep(SLEEP_MS);
   const walletConfig = CustomDevNet;
   walletConfig.nodeUrl = 'http://127.0.0.1';
-  const signer = new LedgerTransactionSigner(walletConfig, signerProvider, 0);
+  const signer = new LedgerTransactionSigner(walletConfig, signerProvider, 0, DerivationPathStandard.BIP44);
   console.log(signer);
 
   const phrase = '';

@@ -19,12 +19,12 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
 
   const clickCheckLedger = async () => {
     try {
-      const { addressIndex, config, walletType } = wallet;
+      const { addressIndex, derivationPathStandard, config, walletType } = wallet;
       const addressprefix = config.network.addressPrefix;
       if (LEDGER_WALLET_TYPE === walletType) {
         const device = createLedgerDevice();
         if (assetType === UserAssetType.TENDERMINT || assetType === UserAssetType.IBC) {
-          const ledgerAddress = await device.getAddress(addressIndex, addressprefix, true);
+          const ledgerAddress = await device.getAddress(addressIndex, addressprefix, derivationPathStandard ?? DerivationPathStandard.BIP44, true);
 
           if (ledgerAddress === wallet.address) {
             setRecoil(ledgerIsConnectedState, LedgerConnectedApp.CRYPTO_ORG);
@@ -51,7 +51,7 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
           assetType === UserAssetType.CRC_20_TOKEN ||
           assetType === UserAssetType.ERC_20_TOKEN
         ) {
-          const ledgerAddress = await device.getEthAddress(addressIndex, DerivationPathStandard.BIP44, true);
+          const ledgerAddress = await device.getEthAddress(addressIndex, derivationPathStandard ?? DerivationPathStandard.BIP44, true);
 
           if (ledgerAddress === asset.address) {
             setRecoil(ledgerIsConnectedState, LedgerConnectedApp.ETHEREUM);
@@ -162,7 +162,7 @@ export function ledgerNotificationWithoutCheck(assetType: UserAssetType) {
     try {
       const device = createLedgerDevice();
       if (assetType === UserAssetType.TENDERMINT || assetType === UserAssetType.IBC) {
-        await device.getPubKey(0, false);
+        await device.getPubKey(0, DerivationPathStandard.BIP44, false);
 
         setRecoil(ledgerIsConnectedState, LedgerConnectedApp.CRYPTO_ORG);
         notification.close(LedgerNotificationKey);

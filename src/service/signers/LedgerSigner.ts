@@ -58,6 +58,7 @@ export class LedgerSigner {
   public async enable(
     index: number,
     addressPrefix: string,
+    derivationPathStandard: DerivationPathStandard,
     showLedgerDisplay: boolean /* display address in ledger */,
   ): Promise<[string, Bytes]> {
     await this.createTransport();
@@ -70,7 +71,14 @@ export class LedgerSigner {
 
     // purpose(44), coin(394), account(0), change(0), index(0)
     // for string: `m/44'/394'/${this.account}'/0/${index}`;
-    this.path = [44, 394, this.account, 0, index];
+    switch (derivationPathStandard) {
+      case DerivationPathStandard.LEDGER_LIVE:
+        this.path = [44, 394, index, 0, this.account];
+        break;
+      case DerivationPathStandard.BIP44:
+      default:
+        this.path = [44, 394, this.account, 0, index];
+    }
 
     if (showLedgerDisplay) {
       response = await this.app.showAddressAndPubKey(this.path, addressPrefix);
@@ -86,6 +94,51 @@ export class LedgerSigner {
     const ret: [string, Bytes] = [response.bech32_address, pubkey];
     await this.closeTransport();
     return ret;
+  }
+
+  public async getAddressList(
+    startIndex: number,
+    gap: number,
+    addressPrefix: string,
+    derivationPathStandard: DerivationPathStandard,
+  ): Promise<string[]> {
+    const addressList: string[] = [];
+    await this.createTransport();
+
+    let response = await this.app.getVersion();
+    if (response.error_message !== 'No errors') {
+      await this.closeTransport();
+      throw new Error(`${response.error_message}`);
+    }
+
+    for (let index = startIndex; index < gap; index++) {
+      console.log(`getAddress #${index}`);
+      // purpose(44), coin(394), account(0), change(0), index(0)
+      // for string: `m/44'/394'/${this.account}'/0/${index}`;
+      let path = [44, 394, this.account, 0, index];
+      switch (derivationPathStandard) {
+        case DerivationPathStandard.LEDGER_LIVE:
+          path = [44, 394, index, 0, this.account];
+          break;
+        case DerivationPathStandard.BIP44:
+        default:
+          path = [44, 394, this.account, 0, index];
+      }
+      // eslint-disable-next-line no-await-in-loop
+      response = await this.app.getAddressAndPubKey(path, addressPrefix);
+
+      if (response.error_message !== 'No errors') {
+        // eslint-disable-next-line no-await-in-loop
+        await this.closeTransport();
+        throw new Error(`${response.error_message}`);
+      }
+
+      addressList[index] = response.bech32_address;
+      console.log(`response index:${index}`, response.bech32_address);
+    }
+
+    await this.closeTransport();
+    return addressList;
   }
 
   public static padZero(original_array: Uint8Array, wanted_length: number) {

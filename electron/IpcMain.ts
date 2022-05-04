@@ -24,8 +24,9 @@ export class IpcMain {
       try {
         let index = arg.index;
         let addressPrefix = arg.addressPrefix;
+        let derivationPathStandard = arg.derivationPathStandard;
         let showLedgerDisplay = arg.showLedgerDisplay;
-        const info = await this.provider.enable(index, addressPrefix, showLedgerDisplay);
+        const info = await this.provider.enable(index, addressPrefix, derivationPathStandard, showLedgerDisplay);
         let accountInfo = info[0];
         let accountPubKey = info[1].toUint8Array();
         ret = {
@@ -40,6 +41,31 @@ export class IpcMain {
           error: e.toString(),
         };
         console.error('enableWallet error ' + e);
+      } finally {
+      }
+
+      event.returnValue = ret;
+    });
+
+    ipcMain.on('getAddressList', async (event: any, arg: any) => {
+      let ret = {};
+      try {
+        let startIndex = arg.startIndex;
+        let gap = arg.gap;
+        let addressPrefix = arg.addressPrefix;
+        let derivationPathStandard = arg.derivationPathStandard;
+        const addressList = await this.provider.getAddressList(startIndex, gap, addressPrefix, derivationPathStandard);
+        ret = {
+          success: true,
+          addressList: addressList,
+          label: 'getAddressList reply',
+        };
+      } catch (e) {
+        ret = {
+          success: false,
+          error: e.toString(),
+        };
+        console.error('getAddressList error ' + e);
       } finally {
       }
 

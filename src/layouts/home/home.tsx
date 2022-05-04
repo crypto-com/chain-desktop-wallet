@@ -284,6 +284,7 @@ function HomeLayout(props: HomeLayoutProps) {
       const tendermintAddress = await device.getAddress(
         walletSession.wallet.addressIndex,
         walletSession.wallet.config.network.addressPrefix,
+        walletSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
         false,
       );
 

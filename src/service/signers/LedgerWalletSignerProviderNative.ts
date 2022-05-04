@@ -10,18 +10,29 @@ export class LedgerWalletSignerProviderNative implements ISignerProvider {
     this.ipcRender = new IpcRender();
   }
 
-  public async getPubKey(index: number, showLedgerDisplay: boolean): Promise<Bytes> {
-    const pubkey = await this.ipcRender.getPubKey(index, showLedgerDisplay);
+  public async getPubKey(index: number, derivationPathStandard: DerivationPathStandard, showLedgerDisplay: boolean): Promise<Bytes> {
+    const pubkey = await this.ipcRender.getPubKey(index, derivationPathStandard, showLedgerDisplay);
     return pubkey;
   }
 
   public async getAddress(
     index: number,
     addressPrefix: string,
+    derivationPathStandard: DerivationPathStandard,
     showLedgerDisplay: boolean,
   ): Promise<string> {
-    const address = await this.ipcRender.getAddress(index, addressPrefix, showLedgerDisplay);
+    const address = await this.ipcRender.getAddress(index, addressPrefix, derivationPathStandard, showLedgerDisplay);
     return address;
+  }
+
+  public async getAddressList(
+    startIndex: number,
+    gap: number,
+    addressPrefix: string,
+    derivationPathStandard: DerivationPathStandard,
+  ): Promise<string[]> {
+    const addressList = await this.ipcRender.getAddressList(startIndex, gap, addressPrefix, derivationPathStandard);
+    return addressList;
   }
 
   public async sign(message: Bytes): Promise<Bytes> {

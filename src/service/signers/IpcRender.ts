@@ -10,10 +10,11 @@ if (window.require) {
 export class IpcRender implements ISignerProvider {
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   // eslint-disable-next-line  class-methods-use-this
-  async getPubKey(index: number, showLedgerDisplay: boolean): Promise<Bytes> {
+  async getPubKey(index: number, derivationPathStandard: DerivationPathStandard, showLedgerDisplay: boolean): Promise<Bytes> {
     const arg = electron.ipcRenderer.sendSync('enableWallet', {
       index,
       addressPrefix: 'cro', // dummy value
+      derivationPathStandard,
       showLedgerDisplay,
       message: 'enableWallet request for getPubKey',
     });
@@ -29,13 +30,36 @@ export class IpcRender implements ISignerProvider {
   async getAddress(
     index: number,
     addressPrefix: string,
+    derivationPathStandard: DerivationPathStandard,
     showLedgerDisplay: boolean,
   ): Promise<string> {
     const arg = electron.ipcRenderer.sendSync('enableWallet', {
       index,
       addressPrefix,
+      derivationPathStandard,
       showLedgerDisplay,
       message: 'enableWallet request for getAddress',
+    });
+    if (!arg.success) {
+      throw new Error(`get address fail: ${arg.error}`);
+    }
+    return arg.account;
+  }
+
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line  class-methods-use-this
+  async getAddressList(
+    startIndex: number,
+    gap: number,
+    addressPrefix: string,
+    derivationPathStandard: DerivationPathStandard,
+  ): Promise<string[]> {
+    const arg = electron.ipcRenderer.sendSync('getAddressList', {
+      startIndex,
+      gap,
+      addressPrefix,
+      derivationPathStandard,
+      message: 'enableWallet request for getAddressList',
     });
     if (!arg.success) {
       throw new Error(`get address fail: ${arg.error}`);

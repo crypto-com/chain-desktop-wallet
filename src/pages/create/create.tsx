@@ -58,7 +58,7 @@ const tailLayout = {
 };
 
 function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 interface FormCustomConfigProps {
@@ -81,7 +81,7 @@ interface FormCreateProps {
   networkConfig: any;
 }
 
-const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
+const FormCustomConfig: React.FC<FormCustomConfigProps> = (props) => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [checkingNodeConnection, setCheckingNodeConnection] = useState(false);
@@ -117,7 +117,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
 
   const checkNodeConnectivity = async () => {
     // TO-DO Node Connectivity check
-    form.validateFields().then(async values => {
+    form.validateFields().then(async (values) => {
       setCheckingNodeConnection(true);
       const { nodeUrl } = values;
       const isNodeLive = await walletService.checkNodeIsLive(`${nodeUrl}${NodePorts.Tendermint}`);
@@ -326,7 +326,7 @@ enum WalletDerivationStrategy {
   LedgerLive = 'ledgerLive',
 }
 
-const FormCreate: React.FC<FormCreateProps> = props => {
+const FormCreate: React.FC<FormCreateProps> = (props) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [isCroModalVisible, setIsCroModalVisible] = useState(false);
@@ -405,7 +405,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     }
   };
 
-  const onCheckboxChange = e => {
+  const onCheckboxChange = (e) => {
     setHwcheck(!hwcheck);
     props.setIsWalletSelectFieldDisable(!e.target.checked);
     if (e.target.checked) props.form.setFieldsValue({ walletType: LEDGER_WALLET_TYPE });
@@ -452,11 +452,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         const croAddress = await device.getAddress(
           targetWallet.addressIndex,
           targetWallet.config.network.addressPrefix,
+          targetWallet.derivationPathStandard,
           false,
         );
 
         const croAsset = createdWallet.assets.filter(
-          asset => asset.assetType === UserAssetType.TENDERMINT,
+          (asset) => asset.assetType === UserAssetType.TENDERMINT,
         )[0];
         croAsset.address = croAddress;
 
@@ -473,7 +474,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           }
         }
 
-        const ethAddress = await device.getEthAddress(targetWallet.addressIndex, DerivationPathStandard.BIP44, false);
+        const ethAddress = await device.getEthAddress(
+          targetWallet.addressIndex,
+          DerivationPathStandard.BIP44,
+          false,
+        );
         // const ethAddressList = await device.getEthAddressList(10, false);
         // console.log('ethAddressList', ethAddressList);
         // const evmAsset = createdWallet.assets.filter(
@@ -481,8 +486,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         // )[0];
         // evmAsset.address = ethAddress;
         createdWallet.assets
-          .filter(asset => asset.assetType === UserAssetType.EVM)
-          .forEach(asset => {
+          .filter((asset) => asset.assetType === UserAssetType.EVM)
+          .forEach((asset) => {
             asset.address = ethAddress;
           });
 
@@ -528,7 +533,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       const device = createLedgerDevice();
       await device.getEthAddress(0, DerivationPathStandard.BIP44, false);
       setIsLedgerEthAppConnected(true);
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 2000);
       });
       setIsEthModalVisible(false);
@@ -567,7 +572,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       // }
       setIsLedgerEthAppConnected(false);
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 2000);
       });
       setIsEthModalVisible(false);
@@ -588,10 +593,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     try {
       const device = createLedgerDevice();
       // check ledger device ok
-      await device.getPubKey(addressIndex, false);
+      await device.getPubKey(addressIndex, DerivationPathStandard.BIP44, false);
       setIsLedgerCroAppConnected(true);
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 2000);
       });
       setIsCroModalVisible(false);
@@ -633,7 +638,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
 
       setIsLedgerCroAppConnected(false);
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 2000);
       });
       setIsCroModalVisible(false);
@@ -645,7 +650,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         duration: 20,
       });
     }
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 2000);
     });
     if (hwok) {
@@ -667,15 +672,42 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       switch (ledgerAssetType) {
         case UserAssetType.EVM:
           {
-            const ethAddressList = await device.getEthAddressList(0, 10, DerivationPathStandard.BIP44);
-            const returnList = ethAddressList.map((address, idx) => {
-              return {
-                publicAddress: address,
-                derivationPath: `m/44'/60'/0'/0/${idx}`,
-                balance: '0',
-              };
-            });
-            setLedgerAddressList(returnList);
+            const ethAddressList = await device.getEthAddressList(
+              0,
+              10,
+              DerivationPathStandard.BIP44,
+            );
+            if (ethAddressList) {
+              const returnList = ethAddressList.map((address, idx) => {
+                return {
+                  publicAddress: address,
+                  derivationPath: `m/44'/60'/0'/0/${idx}`,
+                  balance: '0',
+                };
+              });
+              setLedgerAddressList(returnList);
+            }
+          }
+          break;
+        case UserAssetType.TENDERMINT:
+          {
+            const tendermintAddressList = await device.getAddressList(
+              0,
+              10,
+              'cro',
+              DerivationPathStandard.BIP44,
+            );
+            console.log('tendermintAddressList', tendermintAddressList);
+            if (tendermintAddressList) {
+              const returnList = tendermintAddressList.map((address, idx) => {
+                return {
+                  publicAddress: address,
+                  derivationPath: `m/44'/60'/0'/0/${idx}`,
+                  balance: '0',
+                };
+              });
+              setLedgerAddressList(returnList);
+            }
           }
           break;
         default:
@@ -734,7 +766,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
               placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
               disabled={props.isWalletSelectFieldDisable}
               defaultActiveFirstOption
-              onSelect={e => {
+              onSelect={(e) => {
                 setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
                 setLedgerAddressList([]);
                 switch (e) {
@@ -836,7 +868,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           onChange={onNetworkChange}
           disabled={props.isNetworkSelectFieldDisable}
         >
-          {walletService.supportedConfigs().map(config => (
+          {walletService.supportedConfigs().map((config) => (
             <Select.Option key={config.name} value={config.name} disabled={!config.enabled}>
               {config.name}
             </Select.Option>
