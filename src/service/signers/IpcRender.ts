@@ -1,5 +1,6 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { hexToString } from 'web3-utils';
+import { DerivationPathStandard } from './LedgerSigner';
 import { ISignerProvider } from './SignerProvider';
 
 let electron: any;
@@ -117,9 +118,10 @@ export class IpcRender implements ISignerProvider {
 
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   // eslint-disable-next-line  class-methods-use-this
-  public async getEthAddress(index: number, display: boolean): Promise<string> {
+  public async getEthAddress(index: number, standard: DerivationPathStandard, display: boolean): Promise<string> {
     const a = {
       index,
+      standard,
       display,
     };
     const arg = electron.ipcRenderer.sendSync('ethGetAddress', a);
@@ -131,10 +133,11 @@ export class IpcRender implements ISignerProvider {
 
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   // eslint-disable-next-line  class-methods-use-this
-  public async getEthAddressList(gap: number, display: boolean): Promise<string[]> {
+  public async getEthAddressList(startIndex: number, gap: number, standard: DerivationPathStandard): Promise<string[]> {
     const a = {
+      startIndex,
       gap,
-      display,
+      standard,
     };
     const arg = electron.ipcRenderer.sendSync('ethGetAddressList', a);
     if (!arg.success) {

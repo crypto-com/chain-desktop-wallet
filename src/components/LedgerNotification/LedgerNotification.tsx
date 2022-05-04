@@ -8,6 +8,7 @@ import IconEth from '../../svg/IconEth';
 import IconCro from '../../svg/IconCro';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { UserAsset, UserAssetType } from '../../models/UserAsset';
+import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
 
 export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
   const { assetType } = asset;
@@ -50,7 +51,7 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
           assetType === UserAssetType.CRC_20_TOKEN ||
           assetType === UserAssetType.ERC_20_TOKEN
         ) {
-          const ledgerAddress = await device.getEthAddress(addressIndex, true);
+          const ledgerAddress = await device.getEthAddress(addressIndex, DerivationPathStandard.BIP44, true);
 
           if (ledgerAddress === asset.address) {
             setRecoil(ledgerIsConnectedState, LedgerConnectedApp.ETHEREUM);
@@ -161,7 +162,7 @@ export function ledgerNotificationWithoutCheck(assetType: UserAssetType) {
     try {
       const device = createLedgerDevice();
       if (assetType === UserAssetType.TENDERMINT || assetType === UserAssetType.IBC) {
-        await device.getPubKey(0, true);
+        await device.getPubKey(0, false);
 
         setRecoil(ledgerIsConnectedState, LedgerConnectedApp.CRYPTO_ORG);
         notification.close(LedgerNotificationKey);
@@ -179,7 +180,7 @@ export function ledgerNotificationWithoutCheck(assetType: UserAssetType) {
         assetType === UserAssetType.CRC_20_TOKEN ||
         assetType === UserAssetType.ERC_20_TOKEN
       ) {
-        await device.getEthAddress(0, true);
+        await device.getEthAddress(0, DerivationPathStandard.BIP44, false);
         setRecoil(ledgerIsConnectedState, LedgerConnectedApp.ETHEREUM);
         notification.close(LedgerNotificationKey);
         notification.close(LedgerErrorNotificationKey);

@@ -4,9 +4,14 @@ import { FormInstance, Table } from 'antd';
 
 import './LedgerAddressIndexBalanceTable.less';
 
-import { UserAssetType } from '../../../models/UserAsset';
+import { UserAssetType, scaledAmountByAsset } from '../../../models/UserAsset';
 import { CronosClient } from '../../../service/cronos/CronosClient';
-import { MainNetEvmConfig } from '../../../config/StaticAssets';
+import {
+  CRONOS_TENDERMINT_ASSET,
+  CRONOS_EVM_ASSET,
+  MainNetEvmConfig,
+} from '../../../config/StaticAssets';
+import { DefaultWalletConfigs } from '../../../config/StaticConfig';
 
 const LedgerAddressIndexBalanceTable = (props: {
   addressIndexBalanceList;
@@ -20,12 +25,19 @@ const LedgerAddressIndexBalanceTable = (props: {
 
   const [t] = useTranslation();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const cronosTendermintAsset = {
+    ...CRONOS_TENDERMINT_ASSET(DefaultWalletConfigs.MainNetConfig),
+    walletId: '',
+  };
+  const cronosEvmAsset = { ...CRONOS_EVM_ASSET(DefaultWalletConfigs.MainNetConfig), walletId: '' };
+
   const tableColumns = [
     {
       title: 'Address',
       dataIndex: 'publicAddress',
       key: 'publicAddress',
-      render: publicAddress => publicAddress,
+      render: (publicAddress) => publicAddress,
     },
     {
       title: 'Derivation Path',
@@ -33,7 +45,7 @@ const LedgerAddressIndexBalanceTable = (props: {
       key: 'derivationPath',
       // sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
       // defaultSortOrder: 'descend' as any,
-      render: derivationPath => {
+      render: (derivationPath) => {
         return <span>{derivationPath}</span>;
       },
     },
@@ -43,7 +55,7 @@ const LedgerAddressIndexBalanceTable = (props: {
       key: 'balance',
       // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
       // defaultSortOrder: 'descend' as any,
-      render: balance => {
+      render: (balance) => {
         return (
           <>
             <span>{balance.toString()}</span>
@@ -54,7 +66,7 @@ const LedgerAddressIndexBalanceTable = (props: {
     {
       title: t('general.action'),
       key: 'action',
-      render: record => (
+      render: (record) => (
         <a
           onClick={() => {
             if (setisHWModeSelected) {
@@ -83,21 +95,23 @@ const LedgerAddressIndexBalanceTable = (props: {
     // if (ledgerAccountList) {
     const cronosClient = new CronosClient(MainNetEvmConfig.nodeUrl, MainNetEvmConfig.indexingUrl);
 
-    await ledgerAccountList.forEach(async account => {
+    await Promise.all(ledgerAccountList.map(async (account) => {
       const { publicAddress } = account;
-      account.balance = await cronosClient.getNativeBalanceByAddress(publicAddress);
-      console.log(`Balance - ${publicAddress}:`, account.balance);
-    });
+      const nativeBalance = await cronosClient.getNativeBalanceByAddress(publicAddress);
+      account.balance = `${scaledAmountByAsset(nativeBalance, cronosEvmAsset)} ${
+        cronosEvmAsset.symbol
+      }`;
+    })).then(() => {
+      setAddressIndexBalanceList(ledgerAccountList);
+    })
 
     // }
-    return ledgerAccountList || [];
+    // return ledgerAccountList || [];
   };
 
   useEffect(() => {
-    const syncAddressIndexBalanceList = async () => {
-      const addressList = await processLedgerAccountsList(rawAddressIndexBalanceList);
-      console.log('addressList', addressList);
-      setAddressIndexBalanceList(addressList);
+    const syncAddressIndexBalanceList = () => {
+      processLedgerAccountsList(rawAddressIndexBalanceList);
     };
 
     syncAddressIndexBalanceList();

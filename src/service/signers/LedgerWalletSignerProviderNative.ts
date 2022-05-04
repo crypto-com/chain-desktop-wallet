@@ -1,5 +1,6 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { IpcRender } from './IpcRender';
+import { DerivationPathStandard } from './LedgerSigner';
 import { ISignerProvider } from './SignerProvider';
 
 export class LedgerWalletSignerProviderNative implements ISignerProvider {
@@ -56,13 +57,13 @@ export class LedgerWalletSignerProviderNative implements ISignerProvider {
 
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   // eslint-disable-next-line  class-methods-use-this
-  public async getEthAddress(index: number, display: boolean): Promise<string> {
-    const address = await this.ipcRender.getEthAddress(index, display);
+  public async getEthAddress(index: number, standard: DerivationPathStandard, display: boolean): Promise<string> {
+    const address = await this.ipcRender.getEthAddress(index, standard, display);
     return address;
   }
 
-  public async getEthAddressList(gap: number, display: boolean): Promise<string[]> {
-    const addressList = await this.ipcRender.getEthAddressList(gap, display);
+  public async getEthAddressList(startIndex: number, gap: number, standard: DerivationPathStandard): Promise<string[]> {
+    const addressList = await this.ipcRender.getEthAddressList(startIndex, gap, standard);
     return addressList;
   }
 

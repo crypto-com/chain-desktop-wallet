@@ -46,6 +46,7 @@ import IconEth from '../../svg/IconEth';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import LedgerAddressIndexBalanceTable from './components/LedgerAddressIndexBalanceTable';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
+import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
 
 let waitFlag = false;
 const layout = {
@@ -472,7 +473,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           }
         }
 
-        const ethAddress = await device.getEthAddress(targetWallet.addressIndex, false);
+        const ethAddress = await device.getEthAddress(targetWallet.addressIndex, DerivationPathStandard.BIP44, false);
         // const ethAddressList = await device.getEthAddressList(10, false);
         // console.log('ethAddressList', ethAddressList);
         // const evmAsset = createdWallet.assets.filter(
@@ -525,7 +526,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     setCreateLoading(true);
     try {
       const device = createLedgerDevice();
-      await device.getEthAddress(0, false);
+      await device.getEthAddress(0, DerivationPathStandard.BIP44, false);
       setIsLedgerEthAppConnected(true);
       await new Promise(resolve => {
         setTimeout(resolve, 2000);
@@ -666,12 +667,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       switch (ledgerAssetType) {
         case UserAssetType.EVM:
           {
-            const ethAddressList = await device.getEthAddressList(10, false);
+            const ethAddressList = await device.getEthAddressList(0, 10, DerivationPathStandard.BIP44);
             const returnList = ethAddressList.map((address, idx) => {
               return {
                 publicAddress: address,
                 derivationPath: `m/44'/60'/0'/0/${idx}`,
-                balance: 0,
+                balance: '0',
               };
             });
             setLedgerAddressList(returnList);
@@ -735,6 +736,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
               defaultActiveFirstOption
               onSelect={e => {
                 setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
+                setLedgerAddressList([]);
                 switch (e) {
                   case LedgerAssetType.TENDERMINT:
                     setLedgerAssetType(UserAssetType.TENDERMINT);

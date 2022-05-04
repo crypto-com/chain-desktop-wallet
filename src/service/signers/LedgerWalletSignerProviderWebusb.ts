@@ -1,6 +1,7 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { ISignerProvider } from './SignerProvider';
 import { LedgerSignerWebusb } from './LedgerSignerWebusb';
+import { DerivationPathStandard } from './LedgerSigner';
 
 export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
   provider: LedgerSignerWebusb;
@@ -50,12 +51,12 @@ export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
   }
 
   // eslint-disable-next-line  class-methods-use-this, @typescript-eslint/no-unused-vars
-  public async getEthAddress(_index: number, _display: boolean): Promise<string> {
+  public async getEthAddress(_index: number, _standard: DerivationPathStandard, _display: boolean): Promise<string> {
     return '';
   }
 
   // eslint-disable-next-line  class-methods-use-this, @typescript-eslint/no-unused-vars
-  public async getEthAddressList(_gap: number, _display: boolean): Promise<string[]> {
+  public async getEthAddressList(_startIndex: number, _gap: number, _standard: DerivationPathStandard): Promise<string[]> {
     return [];
   }
 

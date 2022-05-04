@@ -1,5 +1,11 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { bech32 } from 'bech32';
+import { UserAssetType } from '../../models/UserAsset';
+
+export enum DerivationPathStandard {
+  BIP44 = 'bip-44',
+  LEDGER_LIVE = 'ledger-live',
+}
 
 export class LedgerSigner {
   app: any;
@@ -146,5 +152,39 @@ export class LedgerSigner {
     const bytes = Bytes.fromUint8Array(new Uint8Array(signature));
     await this.closeTransport();
     return bytes;
+  }
+
+  // public getDerivativePath(path:{
+  //   purpose?: number,
+  //   coin?: number,
+  //   account?: number,
+  //   change?: number,
+  //   index?: number,
+  // }): string {
+  //   const { purpose = 44, coin = 0, account = 0, change = 0, index = 0 } = path;
+  //   return `44'/60'/${account}'/0/${index}`;
+  // }
+
+  public static getDerivationPath(
+    index: number,
+    assetType: UserAssetType,
+    standard: DerivationPathStandard,
+  ): string {
+    let coin = '394';
+    switch (assetType) {
+      case UserAssetType.EVM:
+        coin = '60';
+        break;
+      case UserAssetType.TENDERMINT:
+      default:
+        coin = '394';
+    }
+    switch (standard) {
+      case DerivationPathStandard.LEDGER_LIVE:
+        return `44'/${coin}'/${index}'/0/0`;
+      case DerivationPathStandard.BIP44:
+      default:
+        return `44'/${coin}'/0'/0/${index}`;
+    }
   }
 }

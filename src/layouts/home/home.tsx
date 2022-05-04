@@ -329,7 +329,7 @@ function HomeLayout(props: HomeLayoutProps) {
     try {
       const device: ISignerProvider = createLedgerDevice();
 
-      ledgerEvmAddress = await device.getEthAddress(walletSession.wallet.addressIndex, false);
+      ledgerEvmAddress = await device.getEthAddress(walletSession.wallet.addressIndex, walletSession.wallet.derivationPathStandard, false);
       setIsLedgerEthAppConnected(true);
 
       await new Promise(resolve => {

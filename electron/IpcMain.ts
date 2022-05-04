@@ -127,7 +127,7 @@ export class IpcMain {
     ipcMain.on('ethGetAddress', async (event: any, arg: any) => {
       let ret = {};
       try {
-        const address = await this.ethProvider.getAddress(arg.index, arg.display);
+        const address = await this.ethProvider.getAddress(arg.index, arg.standard, arg.display);
         ret = {
           address,
           success: true,
@@ -145,7 +145,7 @@ export class IpcMain {
     ipcMain.on('ethGetAddressList', async (event: any, arg: any) => {
       let ret = {};
       try {
-        const addressList = await this.ethProvider.getAddressList(arg.gap, arg.display);
+        const addressList = await this.ethProvider.getAddressList(arg.startIndex, arg.gap, arg.standard);
         ret = {
           addressList,
           success: true,

@@ -3,6 +3,7 @@ import { WalletConfig } from '../config/StaticConfig';
 import { getRandomId } from '../crypto/RandomGen';
 import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { UserAssetType } from '../models/UserAsset';
+import { DerivationPathStandard } from './signers/LedgerSigner';
 
 export class WalletCreator extends WalletOps {
   private readonly createOptions: WalletCreateOptions;
@@ -29,7 +30,8 @@ export class WalletCreator extends WalletOps {
       encryptedPhrase,
       hasBeenEncrypted: false,
       walletType: options.walletType,
-      addressIndex: options.addressIndex,
+      addressIndex: options.addressIndex, 
+      derivationPathStandard: DerivationPathStandard.BIP44,
       // assets: initialAssets,
     };
 
