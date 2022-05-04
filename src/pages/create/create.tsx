@@ -1,10 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { setRecoil } from 'recoil-nexus';
 import { Button, Checkbox, Form, Input, notification, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { useTranslation } from 'react-i18next';
-import { walletIdentifierState, walletTempBackupState, sessionState } from '../../recoil/atom';
+import {
+  walletIdentifierState,
+  walletTempBackupState,
+  sessionState,
+  ledgerIsConnectedState,
+  LedgerConnectedApp,
+} from '../../recoil/atom';
 import './create.less';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
@@ -23,6 +30,7 @@ import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import NoticeDisclaimer from '../../components/NoticeDisclaimer/NoticeDisclaimer';
+import { ledgerNotificationWithoutCheck } from '../../components/LedgerNotification/LedgerNotification';
 import IconLedger from '../../svg/IconLedger';
 import { UserAssetType } from '../../models/UserAsset';
 import { ISignerProvider } from '../../service/signers/SignerProvider';
@@ -37,6 +45,7 @@ import IconCro from '../../svg/IconCro';
 import IconEth from '../../svg/IconEth';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import LedgerAddressIndexBalanceTable from './components/LedgerAddressIndexBalanceTable';
+import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 
 let waitFlag = false;
 const layout = {
@@ -333,6 +342,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(walletTempBackupState);
   const [hwcheck, setHwcheck] = useState(!props.isWalletSelectFieldDisable);
+  const { isLedgerConnected } = useLedgerStatus({ assetType: ledgerAssetType });
+  const [ledgerAddressList, setLedgerAddressList] = useState<any[]>([]);
 
   const [t] = useTranslation();
 
@@ -462,8 +473,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         }
 
         const ethAddress = await device.getEthAddress(targetWallet.addressIndex, false);
-        const ethAddressList = await device.getEthAddressList(10, false);
-        console.log('ethAddressList', ethAddressList);
+        // const ethAddressList = await device.getEthAddressList(10, false);
+        // console.log('ethAddressList', ethAddressList);
         // const evmAsset = createdWallet.assets.filter(
         //   asset => asset.assetType === UserAssetType.EVM,
         // )[0];
@@ -508,6 +519,65 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     }
     setIsCroModalVisible(true);
     setIsLedgerCroAppConnected(false);
+  };
+
+  const checkIsLedgerEthAppConnected = async () => {
+    setCreateLoading(true);
+    try {
+      const device = createLedgerDevice();
+      await device.getEthAddress(0, false);
+      setIsLedgerEthAppConnected(true);
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+      setIsEthModalVisible(false);
+    } catch (e) {
+      let message = `${t('create.notification.ledger.message1')}`;
+      let description = (
+        <>
+          {t('create.notification.ledger.description1')}
+          <br /> -{' '}
+          <a
+            href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t('general.errorModalPopup.ledgerTroubleshoot')}
+          </a>
+        </>
+      );
+      // if (walletType === LEDGER_WALLET_TYPE) {
+      if (detectConditionsError(((e as unknown) as any).toString())) {
+        message = `${t('create.notification.ledger.message2')}`;
+        description = (
+          <>
+            {t('create.notification.ledger.description2')}
+            <br /> -{' '}
+            <a
+              href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t('general.errorModalPopup.ledgerTroubleshoot')}
+            </a>
+          </>
+        );
+      }
+      // }
+      setIsLedgerEthAppConnected(false);
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+      setIsEthModalVisible(false);
+      setCreateLoading(false);
+      notification.error({
+        message,
+        description,
+        placement: 'topRight',
+        duration: 20,
+      });
+    }
   };
 
   const checkIsLedgerCroAppConnected = async () => {
@@ -590,6 +660,31 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     `${t('create.addressIndexValidator.error')} ${LedgerWalletMaximum}`,
   );
 
+  useEffect(() => {
+    const fetchAddressList = async () => {
+      const device: ISignerProvider = createLedgerDevice();
+      switch (ledgerAssetType) {
+        case UserAssetType.EVM:
+          {
+            const ethAddressList = await device.getEthAddressList(10, false);
+            const returnList = ethAddressList.map((address, idx) => {
+              return {
+                publicAddress: address,
+                derivationPath: `m/44'/60'/0'/0/${idx}`,
+                balance: 0,
+              };
+            });
+            setLedgerAddressList(returnList);
+          }
+          break;
+        default:
+      }
+    };
+    if (isLedgerConnected) {
+      fetchAddressList();
+    }
+  }, [isLedgerConnected]);
+
   return (
     <Form
       {...layout}
@@ -629,6 +724,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           footer={[]}
           okText="Confirm"
           width={1200}
+          style={{ zIndex: 100 }}
         >
           <div className="title">Ledger Wallet Accounts</div>
           <div className="description">{t('Please select one of the derived address.')}</div>
@@ -638,12 +734,15 @@ const FormCreate: React.FC<FormCreateProps> = props => {
               disabled={props.isWalletSelectFieldDisable}
               defaultActiveFirstOption
               onSelect={e => {
+                setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
                 switch (e) {
                   case LedgerAssetType.TENDERMINT:
                     setLedgerAssetType(UserAssetType.TENDERMINT);
+                    ledgerNotificationWithoutCheck(UserAssetType.TENDERMINT);
                     break;
                   case LedgerAssetType.EVM:
                     setLedgerAssetType(UserAssetType.EVM);
+                    ledgerNotificationWithoutCheck(UserAssetType.EVM);
                     break;
                   default:
                 }
@@ -658,36 +757,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             </Select>
             {ledgerAssetType ? (
               <LedgerAddressIndexBalanceTable
-                addressIndexBalanceList={
-                  /** @TODO: DUMMY DATA */
-                  [
-                    {
-                      publicAddress: 'somePublicAddress',
-                      derivationPath: `m/44'/0'/0`,
-                      balance: 1000,
-                    },
-                    {
-                      publicAddress: 'somePublicAddress',
-                      derivationPath: `m/44'/0'/1`,
-                      balance: 1000,
-                    },
-                    {
-                      publicAddress: 'somePublicAddress',
-                      derivationPath: `m/44'/0'/2`,
-                      balance: 1000,
-                    },
-                    {
-                      publicAddress: 'somePublicAddress',
-                      derivationPath: `m/44'/0'`,
-                      balance: 1000,
-                    },
-                    {
-                      publicAddress: 'somePublicAddress',
-                      derivationPath: `m/44'/0'`,
-                      balance: 1000,
-                    },
-                  ]
-                }
+                addressIndexBalanceList={ledgerAddressList}
                 setisHWModeSelected={setIsHWModeSelected}
                 assetType={ledgerAssetType}
                 form={props.form}
@@ -890,7 +960,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 onClick={() => {
                   handleEthOk();
                   // setIsEthModalVisible(false);
-                  // checkIsLedgerEthAppConnected();
+                  checkIsLedgerEthAppConnected();
                   // setIsLedgerModalButtonLoading(true);
                 }}
                 // loading={isLedgerModalButtonLoading}

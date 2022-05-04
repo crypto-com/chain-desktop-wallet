@@ -5,6 +5,8 @@ import { FormInstance, Table } from 'antd';
 import './LedgerAddressIndexBalanceTable.less';
 
 import { UserAssetType } from '../../../models/UserAsset';
+import { CronosClient } from '../../../service/cronos/CronosClient';
+import { MainNetEvmConfig } from '../../../config/StaticAssets';
 
 const LedgerAddressIndexBalanceTable = (props: {
   addressIndexBalanceList;
@@ -60,10 +62,13 @@ const LedgerAddressIndexBalanceTable = (props: {
             }
             if (form) {
               const lastIndexOfSlash = record.derivationPath.lastIndexOf('/');
-              const [rootPath, index] = [record.derivationPath.substring(0, lastIndexOfSlash), record.derivationPath.substring(lastIndexOfSlash + 1)]
+              const [rootPath, index] = [
+                record.derivationPath.substring(0, lastIndexOfSlash),
+                record.derivationPath.substring(lastIndexOfSlash + 1),
+              ];
               form.setFieldsValue({
                 derivationPath: rootPath,
-                addressIndex: index
+                addressIndex: index,
               });
             }
           }}
@@ -74,34 +79,49 @@ const LedgerAddressIndexBalanceTable = (props: {
     },
   ];
 
-  const processLedgerAccountsList = async (ledgerAccountList: any[] | null) => {
+  const processLedgerAccountsList = async (ledgerAccountList: any[]) => {
+    // if (ledgerAccountList) {
+    const cronosClient = new CronosClient(MainNetEvmConfig.nodeUrl, MainNetEvmConfig.indexingUrl);
+
+    await ledgerAccountList.forEach(async account => {
+      const { publicAddress } = account;
+      account.balance = await cronosClient.getNativeBalanceByAddress(publicAddress);
+      console.log(`Balance - ${publicAddress}:`, account.balance);
+    });
+
+    // }
     return ledgerAccountList || [];
   };
 
   useEffect(() => {
     const syncAddressIndexBalanceList = async () => {
-      const validatorList = await processLedgerAccountsList(rawAddressIndexBalanceList);
-      setAddressIndexBalanceList(validatorList);
+      const addressList = await processLedgerAccountsList(rawAddressIndexBalanceList);
+      console.log('addressList', addressList);
+      setAddressIndexBalanceList(addressList);
     };
 
     syncAddressIndexBalanceList();
-  }, rawAddressIndexBalanceList);
+  }, [rawAddressIndexBalanceList]);
 
   return (
     <div className="address-index-balance-list">
-      <Table
-        locale={{
-          triggerDesc: t('general.table.triggerDesc'),
-          triggerAsc: t('general.table.triggerAsc'),
-          cancelSort: t('general.table.cancelSort'),
-        }}
-        dataSource={addressIndexBalanceList}
-        columns={tableColumns}
-        pagination={{ showSizeChanger: false }}
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onChange={(pagination, filters, sorter: any) => { }}
-        defaultExpandAllRows
-      />
+      {rawAddressIndexBalanceList.length > 0 ? (
+        <Table
+          locale={{
+            triggerDesc: t('general.table.triggerDesc'),
+            triggerAsc: t('general.table.triggerAsc'),
+            cancelSort: t('general.table.cancelSort'),
+          }}
+          dataSource={addressIndexBalanceList}
+          columns={tableColumns}
+          pagination={{ showSizeChanger: false }}
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          onChange={(pagination, filters, sorter: any) => {}}
+          defaultExpandAllRows
+        />
+      ) : (
+        <div>Please connect app</div>
+      )}
     </div>
   );
 };
