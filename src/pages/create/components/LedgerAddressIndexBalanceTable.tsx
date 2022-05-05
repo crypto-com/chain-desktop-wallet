@@ -12,6 +12,7 @@ import {
   MainNetEvmConfig,
 } from '../../../config/StaticAssets';
 import { DefaultWalletConfigs } from '../../../config/StaticConfig';
+import { NodeRpcService } from '../../../service/rpc/NodeRpcService';
 
 const LedgerAddressIndexBalanceTable = (props: {
   addressIndexBalanceList;
@@ -20,7 +21,12 @@ const LedgerAddressIndexBalanceTable = (props: {
   assetType: UserAssetType;
   setisHWModeSelected?: (value: boolean) => void;
 }) => {
-  const { addressIndexBalanceList: rawAddressIndexBalanceList, form, setisHWModeSelected } = props;
+  const {
+    addressIndexBalanceList: rawAddressIndexBalanceList,
+    assetType,
+    form,
+    setisHWModeSelected,
+  } = props;
   const [addressIndexBalanceList, setAddressIndexBalanceList] = useState<any[]>([]);
 
   const [t] = useTranslation();
@@ -37,7 +43,7 @@ const LedgerAddressIndexBalanceTable = (props: {
       title: 'Address',
       dataIndex: 'publicAddress',
       key: 'publicAddress',
-      render: (publicAddress) => publicAddress,
+      render: publicAddress => publicAddress,
     },
     {
       title: 'Derivation Path',
@@ -45,7 +51,7 @@ const LedgerAddressIndexBalanceTable = (props: {
       key: 'derivationPath',
       // sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
       // defaultSortOrder: 'descend' as any,
-      render: (derivationPath) => {
+      render: derivationPath => {
         return <span>{derivationPath}</span>;
       },
     },
@@ -55,7 +61,7 @@ const LedgerAddressIndexBalanceTable = (props: {
       key: 'balance',
       // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
       // defaultSortOrder: 'descend' as any,
-      render: (balance) => {
+      render: balance => {
         return (
           <>
             <span>{balance.toString()}</span>
@@ -66,7 +72,7 @@ const LedgerAddressIndexBalanceTable = (props: {
     {
       title: t('general.action'),
       key: 'action',
-      render: (record) => (
+      render: record => (
         <a
           onClick={() => {
             if (setisHWModeSelected) {
@@ -92,21 +98,43 @@ const LedgerAddressIndexBalanceTable = (props: {
   ];
 
   const processLedgerAccountsList = async (ledgerAccountList: any[]) => {
-    // if (ledgerAccountList) {
-    const cronosClient = new CronosClient(MainNetEvmConfig.nodeUrl, MainNetEvmConfig.indexingUrl);
+    switch (assetType) {
+      case UserAssetType.TENDERMINT: {
+        const nodeRpc = await NodeRpcService.init(DefaultWalletConfigs.MainNetConfig.nodeUrl);
 
-    await Promise.all(ledgerAccountList.map(async (account) => {
-      const { publicAddress } = account;
-      const nativeBalance = await cronosClient.getNativeBalanceByAddress(publicAddress);
-      account.balance = `${scaledAmountByAsset(nativeBalance, cronosEvmAsset)} ${
-        cronosEvmAsset.symbol
-      }`;
-    })).then(() => {
-      setAddressIndexBalanceList(ledgerAccountList);
-    })
+        await Promise.all(
+          ledgerAccountList.map(async account => {
+            const { publicAddress } = account;
+            const nativeBalance = await nodeRpc.loadAccountBalance(publicAddress, 'basecro');
+            account.balance = `${scaledAmountByAsset(nativeBalance, cronosTendermintAsset)} ${
+              cronosEvmAsset.symbol
+            }`;
+          }),
+        ).then(() => {
+          setAddressIndexBalanceList(ledgerAccountList);
+        });
+        break;
+      }
+      case UserAssetType.EVM:
+      default: {
+        const cronosClient = new CronosClient(
+          MainNetEvmConfig.nodeUrl,
+          MainNetEvmConfig.indexingUrl,
+        );
 
-    // }
-    // return ledgerAccountList || [];
+        await Promise.all(
+          ledgerAccountList.map(async account => {
+            const { publicAddress } = account;
+            const nativeBalance = await cronosClient.getNativeBalanceByAddress(publicAddress);
+            account.balance = `${scaledAmountByAsset(nativeBalance, cronosEvmAsset)} ${
+              cronosEvmAsset.symbol
+            }`;
+          }),
+        ).then(() => {
+          setAddressIndexBalanceList(ledgerAccountList);
+        });
+      }
+    }
   };
 
   useEffect(() => {

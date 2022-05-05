@@ -10,7 +10,11 @@ if (window.require) {
 export class IpcRender implements ISignerProvider {
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   // eslint-disable-next-line  class-methods-use-this
-  async getPubKey(index: number, derivationPathStandard: DerivationPathStandard, showLedgerDisplay: boolean): Promise<Bytes> {
+  async getPubKey(
+    index: number,
+    derivationPathStandard: DerivationPathStandard,
+    showLedgerDisplay: boolean,
+  ): Promise<Bytes> {
     const arg = electron.ipcRenderer.sendSync('enableWallet', {
       index,
       addressPrefix: 'cro', // dummy value
@@ -46,7 +50,7 @@ export class IpcRender implements ISignerProvider {
     return arg.account;
   }
 
-    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   // eslint-disable-next-line  class-methods-use-this
   async getAddressList(
     startIndex: number,
@@ -64,7 +68,7 @@ export class IpcRender implements ISignerProvider {
     if (!arg.success) {
       throw new Error(`get address fail: ${arg.error}`);
     }
-    return arg.account;
+    return arg.addressList;
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
@@ -142,7 +146,11 @@ export class IpcRender implements ISignerProvider {
 
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   // eslint-disable-next-line  class-methods-use-this
-  public async getEthAddress(index: number, standard: DerivationPathStandard, display: boolean): Promise<string> {
+  public async getEthAddress(
+    index: number,
+    standard: DerivationPathStandard,
+    display: boolean,
+  ): Promise<string> {
     const a = {
       index,
       standard,
@@ -157,7 +165,11 @@ export class IpcRender implements ISignerProvider {
 
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   // eslint-disable-next-line  class-methods-use-this
-  public async getEthAddressList(startIndex: number, gap: number, standard: DerivationPathStandard): Promise<string[]> {
+  public async getEthAddressList(
+    startIndex: number,
+    gap: number,
+    standard: DerivationPathStandard,
+  ): Promise<string[]> {
     const a = {
       startIndex,
       gap,
