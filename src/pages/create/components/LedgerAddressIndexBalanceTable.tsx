@@ -28,7 +28,7 @@ const LedgerAddressIndexBalanceTable = (props: {
     setisHWModeSelected,
   } = props;
   const [addressIndexBalanceList, setAddressIndexBalanceList] = useState<any[]>([]);
-
+  const [loading, setLoading] = useState<boolean>(false);
   const [t] = useTranslation();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -98,6 +98,7 @@ const LedgerAddressIndexBalanceTable = (props: {
   ];
 
   const processLedgerAccountsList = async (ledgerAccountList: any[]) => {
+    setLoading(true);
     switch (assetType) {
       case UserAssetType.TENDERMINT: {
         const nodeRpc = await NodeRpcService.init(DefaultWalletConfigs.MainNetConfig.nodeUrl);
@@ -112,6 +113,7 @@ const LedgerAddressIndexBalanceTable = (props: {
           }),
         ).then(() => {
           setAddressIndexBalanceList(ledgerAccountList);
+          setLoading(false);
         });
         break;
       }
@@ -132,6 +134,7 @@ const LedgerAddressIndexBalanceTable = (props: {
           }),
         ).then(() => {
           setAddressIndexBalanceList(ledgerAccountList);
+          setLoading(false);
         });
       }
     }
@@ -160,9 +163,10 @@ const LedgerAddressIndexBalanceTable = (props: {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           onChange={(pagination, filters, sorter: any) => {}}
           defaultExpandAllRows
+          loading={loading}
         />
       ) : (
-        <div>Please connect app</div>
+        <div>Please connect your Ledger Device</div>
       )}
     </div>
   );

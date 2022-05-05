@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, notification } from 'antd';
 import { setRecoil } from 'recoil-nexus';
 import i18n from '../../language/I18n';
@@ -24,7 +24,12 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
       if (LEDGER_WALLET_TYPE === walletType) {
         const device = createLedgerDevice();
         if (assetType === UserAssetType.TENDERMINT || assetType === UserAssetType.IBC) {
-          const ledgerAddress = await device.getAddress(addressIndex, addressprefix, derivationPathStandard ?? DerivationPathStandard.BIP44, true);
+          const ledgerAddress = await device.getAddress(
+            addressIndex,
+            addressprefix,
+            derivationPathStandard ?? DerivationPathStandard.BIP44,
+            true,
+          );
 
           if (ledgerAddress === wallet.address) {
             setRecoil(ledgerIsConnectedState, LedgerConnectedApp.CRYPTO_ORG);
@@ -51,7 +56,11 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
           assetType === UserAssetType.CRC_20_TOKEN ||
           assetType === UserAssetType.ERC_20_TOKEN
         ) {
-          const ledgerAddress = await device.getEthAddress(addressIndex, derivationPathStandard ?? DerivationPathStandard.BIP44, true);
+          const ledgerAddress = await device.getEthAddress(
+            addressIndex,
+            derivationPathStandard ?? DerivationPathStandard.BIP44,
+            true,
+          );
 
           if (ledgerAddress === asset.address) {
             setRecoil(ledgerIsConnectedState, LedgerConnectedApp.ETHEREUM);
@@ -98,19 +107,28 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
     }
   };
 
-  const checkLedgerBtn = (
-    <Button
-      type="primary"
-      size="small"
-      className="btn-restart"
-      onClick={() => {
-        clickCheckLedger();
-      }}
-      style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
-    >
-      {i18n.t('general.connect')}
-    </Button>
-  );
+  const CheckLedgerBtn = () => {
+    // eslint-disable-next-line
+    const [loading, setLoading] = useState(false);
+    return (
+      <Button
+        type="primary"
+        size="small"
+        className="btn-restart"
+        onClick={async () => {
+          setLoading(true);
+          setTimeout(async () => {
+            await clickCheckLedger();
+            setLoading(false);
+          }, 500);
+        }}
+        style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+        loading={loading}
+      >
+        {i18n.t('general.connect')}
+      </Button>
+    );
+  };
 
   switch (assetType) {
     case UserAssetType.EVM:
@@ -128,7 +146,7 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
             <IconEth style={{ color: '#fff' }} />
           </div>
         ),
-        btn: checkLedgerBtn,
+        btn: <CheckLedgerBtn />,
       });
       break;
     case UserAssetType.TENDERMINT:
@@ -145,7 +163,7 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
             <IconCro style={{ color: '#fff' }} />
           </div>
         ),
-        btn: checkLedgerBtn,
+        btn: <CheckLedgerBtn />,
       });
       break;
     default:
@@ -216,19 +234,28 @@ export function ledgerNotificationWithoutCheck(assetType: UserAssetType) {
     }
   };
 
-  const checkLedgerBtn = (
-    <Button
-      type="primary"
-      size="small"
-      className="btn-restart"
-      onClick={() => {
-        clickCheckLedger();
-      }}
-      style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
-    >
-      {i18n.t('general.connect')}
-    </Button>
-  );
+  const CheckLedgerBtn = () => {
+    // eslint-disable-next-line
+    const [loading, setLoading] = useState(false);
+    return (
+      <Button
+        type="primary"
+        size="small"
+        className="btn-restart"
+        onClick={async () => {
+          setLoading(true);
+          setTimeout(async () => {
+            await clickCheckLedger();
+            setLoading(false);
+          }, 500);
+        }}
+        style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+        loading={loading}
+      >
+        {i18n.t('general.connect')}
+      </Button>
+    );
+  };
 
   switch (assetType) {
     case UserAssetType.EVM:
@@ -246,7 +273,7 @@ export function ledgerNotificationWithoutCheck(assetType: UserAssetType) {
             <IconEth style={{ color: '#fff' }} />
           </div>
         ),
-        btn: checkLedgerBtn,
+        btn: <CheckLedgerBtn />,
       });
       break;
     case UserAssetType.TENDERMINT:
@@ -263,7 +290,7 @@ export function ledgerNotificationWithoutCheck(assetType: UserAssetType) {
             <IconCro style={{ color: '#fff' }} />
           </div>
         ),
-        btn: checkLedgerBtn,
+        btn: <CheckLedgerBtn />,
       });
       break;
     default:
