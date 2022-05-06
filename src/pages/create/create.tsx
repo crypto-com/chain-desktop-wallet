@@ -404,7 +404,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const onCheckboxChange = e => {
     setHwcheck(!hwcheck);
     props.setIsWalletSelectFieldDisable(!e.target.checked);
-    if (e.target.checked) props.form.setFieldsValue({ walletType: LEDGER_WALLET_TYPE });
+    if (e.target.checked)
+      props.form.setFieldsValue({
+        walletType: LEDGER_WALLET_TYPE,
+        derivationPathStandard: DerivationPathStandard.BIP44,
+      });
     else props.form.setFieldsValue({ walletType: NORMAL_WALLET_TYPE });
   };
 
