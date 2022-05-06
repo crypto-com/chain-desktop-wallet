@@ -328,7 +328,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const [isCroModalVisible, setIsCroModalVisible] = useState(false);
   const [isEthModalVisible, setIsEthModalVisible] = useState(false);
   const [isHWModeSelected, setIsHWModeSelected] = useState(false);
-
+  const [isLedgerModalButtonLoading, setIsLedgerModalButtonLoading] = useState(false);
   // eslint-disable-next-line
   const [isLedgerEthAppConnected, setIsLedgerEthAppConnected] = useState(false);
   const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
@@ -420,7 +420,13 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   // eslint-disable-next-line
   const onWalletCreateFinishCore = async () => {
     setCreateLoading(true);
-    const { addressIndex, name, walletType, network } = props.form.getFieldsValue();
+    const {
+      addressIndex,
+      name,
+      walletType,
+      network,
+      derivationPathStandard,
+    } = props.form.getFieldsValue();
     if (!name || !walletType || !network) {
       return;
     }
@@ -434,7 +440,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       walletName: name,
       config: selectedNetworkConfig,
       walletType,
-      addressIndex,
+      addressIndex: parseInt(addressIndex, 10),
+      derivationPathStandard,
     };
 
     try {
@@ -444,7 +451,6 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       if (targetWallet.walletType === LEDGER_WALLET_TYPE) {
         const device: ISignerProvider = createLedgerDevice();
         // collect cro address
-
         const croAddress = await device.getAddress(
           targetWallet.addressIndex,
           targetWallet.config.network.addressPrefix,
@@ -472,7 +478,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
 
         const ethAddress = await device.getEthAddress(
           targetWallet.addressIndex,
-          DerivationPathStandard.BIP44,
+          derivationPathStandard,
           false,
         );
         // const ethAddressList = await device.getEthAddressList(10, false);
@@ -533,6 +539,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         setTimeout(resolve, 2000);
       });
       setIsEthModalVisible(false);
+      setIsLedgerModalButtonLoading(false);
     } catch (e) {
       let message = `${t('create.notification.ledger.message1')}`;
       let description = (
@@ -573,6 +580,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       });
       setIsEthModalVisible(false);
       setCreateLoading(false);
+      setIsLedgerModalButtonLoading(false);
       notification.error({
         message,
         description,
@@ -583,20 +591,20 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   };
 
   const checkIsLedgerCroAppConnected = async () => {
-    const { walletType, addressIndex } = props.form.getFieldsValue();
+    const { walletType, addressIndex, derivationPathStandard } = props.form.getFieldsValue();
     let hwok = false;
     setCreateLoading(true);
     try {
       const device = createLedgerDevice();
       // check ledger device ok
-      await device.getPubKey(addressIndex, DerivationPathStandard.BIP44, false);
+      await device.getPubKey(parseInt(addressIndex, 10), derivationPathStandard, false);
       setIsLedgerCroAppConnected(true);
 
       await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
       setIsCroModalVisible(false);
-
+      setIsLedgerModalButtonLoading(false);
       hwok = true;
     } catch (e) {
       let message = `${t('create.notification.ledger.message1')}`;
@@ -639,6 +647,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       });
       setIsCroModalVisible(false);
       setCreateLoading(false);
+      setIsLedgerModalButtonLoading(false);
       notification.error({
         message,
         description,
@@ -665,20 +674,16 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   useEffect(() => {
     const fetchAddressList = async () => {
       const device: ISignerProvider = createLedgerDevice();
-      const derivationStandard = props.form.getFieldValue('derivationStrategy');
+      const standard = props.form.getFieldValue('derivationPathStandard');
       switch (ledgerAssetType) {
         case UserAssetType.EVM:
           {
-            const ethAddressList = await device.getEthAddressList(0, 10, derivationStandard);
+            const ethAddressList = await device.getEthAddressList(0, 10, standard);
             if (ethAddressList) {
               const returnList = ethAddressList.map((address, idx) => {
                 return {
                   publicAddress: address,
-                  derivationPath: LedgerSigner.getDerivationPath(
-                    idx,
-                    UserAssetType.EVM,
-                    derivationStandard,
-                  ),
+                  derivationPath: LedgerSigner.getDerivationPath(idx, UserAssetType.EVM, standard),
                   balance: '0',
                 };
               });
@@ -688,12 +693,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           break;
         case UserAssetType.TENDERMINT:
           {
-            const tendermintAddressList = await device.getAddressList(
-              0,
-              10,
-              'cro',
-              derivationStandard,
-            );
+            const tendermintAddressList = await device.getAddressList(0, 10, 'cro', standard);
             if (tendermintAddressList) {
               const returnList = tendermintAddressList.map((address, idx) => {
                 return {
@@ -701,7 +701,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                   derivationPath: LedgerSigner.getDerivationPath(
                     idx,
                     UserAssetType.TENDERMINT,
-                    derivationStandard,
+                    standard,
                   ),
                   balance: '0',
                 };
@@ -817,7 +817,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             </Select.Option>
           </Select>
         </Form.Item>
-        <Form.Item name="derivationStrategy" label="Derivation Strategy">
+        <Form.Item name="derivationPathStandard" label="Derivation Path Standard">
           <Select
             placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
             disabled={props.isWalletSelectFieldDisable}
@@ -948,10 +948,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 size="small"
                 className="btn-restart"
                 onClick={() => {
-                  checkIsLedgerCroAppConnected();
-                  // setIsLedgerModalButtonLoading(true);
+                  setIsLedgerModalButtonLoading(true);
+                  setTimeout(() => {
+                    checkIsLedgerCroAppConnected();
+                  }, 500);
                 }}
-                // loading={isLedgerModalButtonLoading}
+                loading={isLedgerModalButtonLoading}
                 // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
@@ -994,10 +996,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 onClick={() => {
                   handleEthOk();
                   // setIsEthModalVisible(false);
-                  checkIsLedgerEthAppConnected();
-                  // setIsLedgerModalButtonLoading(true);
+                  setIsLedgerModalButtonLoading(true);
+                  setTimeout(() => {
+                    checkIsLedgerEthAppConnected();
+                  }, 500);
                 }}
-                // loading={isLedgerModalButtonLoading}
+                loading={isLedgerModalButtonLoading}
                 // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}

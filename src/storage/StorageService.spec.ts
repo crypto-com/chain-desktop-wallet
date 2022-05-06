@@ -7,6 +7,7 @@ import { Session } from '../models/Session';
 import { SettingsDataUpdate, Wallet } from '../models/Wallet';
 import { getRandomId } from '../crypto/RandomGen';
 import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
+import { DerivationPathStandard } from '../service/signers/LedgerSigner';
 
 jest.setTimeout(20_000);
 
@@ -18,6 +19,7 @@ function buildTestWallet(name?: string) {
     config: testNetConfig,
     walletName: name || 'My-TestNet-Wallet',
     addressIndex: 0,
+    derivationPathStandard: DerivationPathStandard.BIP44,
   };
   return new WalletCreator(createOptions).create().wallet;
 }
@@ -30,6 +32,7 @@ function buildMainnetWallet(name?: string) {
     config: mainNetConfig,
     walletName: name || 'My-Mainnet-Wallet',
     addressIndex: 0,
+    derivationPathStandard: DerivationPathStandard.BIP44,
   };
   return new WalletCreator(createOptions).create().wallet;
 }

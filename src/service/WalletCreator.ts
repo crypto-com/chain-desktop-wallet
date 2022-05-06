@@ -30,8 +30,8 @@ export class WalletCreator extends WalletOps {
       encryptedPhrase,
       hasBeenEncrypted: false,
       walletType: options.walletType,
-      addressIndex: options.addressIndex, 
-      derivationPathStandard: DerivationPathStandard.BIP44,
+      addressIndex: options.addressIndex,
+      derivationPathStandard: options.derivationPathStandard,
       // assets: initialAssets,
     };
 
@@ -51,15 +51,19 @@ export class WalletCreateOptions {
 
   public readonly addressIndex: number;
 
+  public readonly derivationPathStandard: DerivationPathStandard;
+
   constructor(
     walletConfig: WalletConfig,
     walletName: string,
     walletType: string,
     addressIndex: number,
+    derivationPathStandard: DerivationPathStandard,
   ) {
     this.config = walletConfig;
     this.walletName = walletName;
     this.walletType = walletType;
     this.addressIndex = addressIndex;
+    this.derivationPathStandard = derivationPathStandard;
   }
 }
