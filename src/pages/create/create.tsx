@@ -46,7 +46,7 @@ import IconEth from '../../svg/IconEth';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import LedgerAddressIndexBalanceTable from './components/LedgerAddressIndexBalanceTable';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
-import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
+import { DerivationPathStandard, LedgerSigner } from '../../service/signers/LedgerSigner';
 
 let waitFlag = false;
 const layout = {
@@ -58,7 +58,7 @@ const tailLayout = {
 };
 
 function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 interface FormCustomConfigProps {
@@ -81,7 +81,7 @@ interface FormCreateProps {
   networkConfig: any;
 }
 
-const FormCustomConfig: React.FC<FormCustomConfigProps> = (props) => {
+const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [checkingNodeConnection, setCheckingNodeConnection] = useState(false);
@@ -117,7 +117,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = (props) => {
 
   const checkNodeConnectivity = async () => {
     // TO-DO Node Connectivity check
-    form.validateFields().then(async (values) => {
+    form.validateFields().then(async values => {
       setCheckingNodeConnection(true);
       const { nodeUrl } = values;
       const isNodeLive = await walletService.checkNodeIsLive(`${nodeUrl}${NodePorts.Tendermint}`);
@@ -321,12 +321,8 @@ enum LedgerAssetType {
   TENDERMINT = 'tendermint',
   EVM = 'evm',
 }
-enum WalletDerivationStrategy {
-  BIP44 = 'bip44',
-  LedgerLive = 'ledgerLive',
-}
 
-const FormCreate: React.FC<FormCreateProps> = (props) => {
+const FormCreate: React.FC<FormCreateProps> = props => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [isCroModalVisible, setIsCroModalVisible] = useState(false);
@@ -405,7 +401,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
     }
   };
 
-  const onCheckboxChange = (e) => {
+  const onCheckboxChange = e => {
     setHwcheck(!hwcheck);
     props.setIsWalletSelectFieldDisable(!e.target.checked);
     if (e.target.checked) props.form.setFieldsValue({ walletType: LEDGER_WALLET_TYPE });
@@ -457,7 +453,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
         );
 
         const croAsset = createdWallet.assets.filter(
-          (asset) => asset.assetType === UserAssetType.TENDERMINT,
+          asset => asset.assetType === UserAssetType.TENDERMINT,
         )[0];
         croAsset.address = croAddress;
 
@@ -486,8 +482,8 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
         // )[0];
         // evmAsset.address = ethAddress;
         createdWallet.assets
-          .filter((asset) => asset.assetType === UserAssetType.EVM)
-          .forEach((asset) => {
+          .filter(asset => asset.assetType === UserAssetType.EVM)
+          .forEach(asset => {
             asset.address = ethAddress;
           });
 
@@ -533,7 +529,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
       const device = createLedgerDevice();
       await device.getEthAddress(0, DerivationPathStandard.BIP44, false);
       setIsLedgerEthAppConnected(true);
-      await new Promise((resolve) => {
+      await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
       setIsEthModalVisible(false);
@@ -572,7 +568,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
       // }
       setIsLedgerEthAppConnected(false);
 
-      await new Promise((resolve) => {
+      await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
       setIsEthModalVisible(false);
@@ -596,7 +592,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
       await device.getPubKey(addressIndex, DerivationPathStandard.BIP44, false);
       setIsLedgerCroAppConnected(true);
 
-      await new Promise((resolve) => {
+      await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
       setIsCroModalVisible(false);
@@ -638,7 +634,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
 
       setIsLedgerCroAppConnected(false);
 
-      await new Promise((resolve) => {
+      await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
       setIsCroModalVisible(false);
@@ -650,7 +646,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
         duration: 20,
       });
     }
-    await new Promise((resolve) => {
+    await new Promise(resolve => {
       setTimeout(resolve, 2000);
     });
     if (hwok) {
@@ -669,19 +665,20 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
   useEffect(() => {
     const fetchAddressList = async () => {
       const device: ISignerProvider = createLedgerDevice();
+      const derivationStandard = props.form.getFieldValue('derivationStrategy');
       switch (ledgerAssetType) {
         case UserAssetType.EVM:
           {
-            const ethAddressList = await device.getEthAddressList(
-              0,
-              10,
-              DerivationPathStandard.BIP44,
-            );
+            const ethAddressList = await device.getEthAddressList(0, 10, derivationStandard);
             if (ethAddressList) {
               const returnList = ethAddressList.map((address, idx) => {
                 return {
                   publicAddress: address,
-                  derivationPath: `m/44'/60'/0'/0/${idx}`,
+                  derivationPath: LedgerSigner.getDerivationPath(
+                    idx,
+                    UserAssetType.EVM,
+                    derivationStandard,
+                  ),
                   balance: '0',
                 };
               });
@@ -695,14 +692,17 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
               0,
               10,
               'cro',
-              DerivationPathStandard.BIP44,
+              derivationStandard,
             );
-            console.log('tendermintAddressList', tendermintAddressList);
             if (tendermintAddressList) {
               const returnList = tendermintAddressList.map((address, idx) => {
                 return {
                   publicAddress: address,
-                  derivationPath: `m/44'/60'/0'/0/${idx}`,
+                  derivationPath: LedgerSigner.getDerivationPath(
+                    idx,
+                    UserAssetType.TENDERMINT,
+                    derivationStandard,
+                  ),
                   balance: '0',
                 };
               });
@@ -766,7 +766,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
               placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
               disabled={props.isWalletSelectFieldDisable}
               defaultActiveFirstOption
-              onSelect={(e) => {
+              onSelect={e => {
                 setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
                 setLedgerAddressList([]);
                 switch (e) {
@@ -822,26 +822,26 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
             placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
             disabled={props.isWalletSelectFieldDisable}
           >
-            <Select.Option key="bip44" value={WalletDerivationStrategy.BIP44}>
+            <Select.Option key="bip-44" value={DerivationPathStandard.BIP44}>
               {t('BIP-44')}
             </Select.Option>
-            <Select.Option key="ledgerLive" value={WalletDerivationStrategy.LedgerLive}>
+            <Select.Option key="ledger-live" value={DerivationPathStandard.LEDGER_LIVE}>
               {t('Ledger Live')}
             </Select.Option>
           </Select>
-          <Button
-            type="ghost"
-            size="small"
-            onClick={() => {
-              setIsHWModeSelected(true);
-            }}
-            style={{
-              border: '0',
-            }}
-          >
-            Show Ledger Accounts
-          </Button>
         </Form.Item>
+        <Button
+          type="ghost"
+          size="small"
+          onClick={() => {
+            setIsHWModeSelected(true);
+          }}
+          style={{
+            border: '0',
+          }}
+        >
+          Show Ledger Accounts
+        </Button>
         <Form.Item name="derivationPath" label={t('Base derivation path')}>
           <Input
             readOnly
@@ -868,7 +868,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
           onChange={onNetworkChange}
           disabled={props.isNetworkSelectFieldDisable}
         >
-          {walletService.supportedConfigs().map((config) => (
+          {walletService.supportedConfigs().map(config => (
             <Select.Option key={config.name} value={config.name} disabled={!config.enabled}>
               {config.name}
             </Select.Option>
