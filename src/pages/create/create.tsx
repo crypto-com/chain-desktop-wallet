@@ -764,11 +764,16 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           width={1200}
           style={{ zIndex: 100 }}
         >
-          <div className="title">Ledger Wallet Accounts</div>
-          <div className="description">{t('Please select one of the derived address.')}</div>
+          <div className="title">{t('create.LedgerAddressIndexBalanceTable.title')}</div>
+          <div className="description">
+            {t('create.LedgerAddressIndexBalanceTable.description')}
+          </div>
           <div className="item">
             <Select
-              placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
+              style={{ width: '140px', textAlign: 'center' }}
+              placeholder={`${t('general.select')} ${t(
+                'create.LedgerAddressIndexBalanceTable.assetType.label',
+              )}`}
               disabled={props.isWalletSelectFieldDisable}
               defaultActiveFirstOption
               onSelect={e => {
@@ -811,7 +816,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       </>
       <div hidden={props.isWalletSelectFieldDisable}>
         {/* wallet type and ledger specific code starts here */}
-        <Form.Item name="walletType" label={t('create.formCreate.walletType.label')}>
+        <Form.Item name="walletType" label={t('create.formCreate.walletType.label')} hidden>
           <Select
             placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
             disabled={props.isWalletSelectFieldDisable}
@@ -824,7 +829,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             </Select.Option>
           </Select>
         </Form.Item>
-        <Form.Item name="derivationPathStandard" label="Derivation Path Standard">
+        <Form.Item
+          name="derivationPathStandard"
+          label={t('create.formCreate.derivationPathStandard.label')}
+        >
           <Select
             placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
             disabled={props.isWalletSelectFieldDisable}
@@ -846,10 +854,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             }}
           >
             <Select.Option key="bip-44" value={DerivationPathStandard.BIP44}>
-              {t('BIP-44')}
+              BIP-44
             </Select.Option>
             <Select.Option key="ledger-live" value={DerivationPathStandard.LEDGER_LIVE}>
-              {t('Ledger Live')}
+              Ledger Live
             </Select.Option>
           </Select>
         </Form.Item>
@@ -863,15 +871,9 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             border: '0',
           }}
         >
-          Show Ledger Accounts
+          {t('create.formCreate.showLedger.label')}
         </Button>
-        <Form.Item name="derivationPath" label={t('Derivation Path')}>
-          {/* <Input
-            readOnly
-            placeholder="Your derivation path here"
-            value={props.form.getFieldValue('derivationPath')}
-            style={{ backgroundColor: '#e4e4e4' }}
-          /> */}
+        <Form.Item name="derivationPath" label={t('create.formCreate.derivationPath.label')}>
           <div
             style={{
               display: 'flex',
@@ -890,20 +892,21 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         </Form.Item>
         <Form.Item
           name="addressIndex"
-          label={t('Address Index')}
+          label={t('create.formCreate.index.label')}
           rules={[
             {
               required: true,
-              message: `${t('create.formCreate.name.label')} ${t('general.required')}`,
+              message: `${t('create.formCreate.index.label')} ${t('general.required')}`,
             },
             {
               pattern: /^\d+$/,
-              message: `${t('create.formCreate.name.label')} ${t('general.required')}`,
+              message: `${t('create.formCreate.index.label')} ${t(
+                'create.formCreate.index.error',
+              )}`,
             },
           ]}
         >
           <InputNumber
-            placeholder="Enter derivation address index here"
             value={props.form.getFieldValue('addressIndex')}
             type="number"
             onChange={() => {

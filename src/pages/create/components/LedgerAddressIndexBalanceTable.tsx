@@ -16,6 +16,7 @@ import { NodeRpcService } from '../../../service/rpc/NodeRpcService';
 import { LedgerSigner } from '../../../service/signers/LedgerSigner';
 import { ISignerProvider } from '../../../service/signers/SignerProvider';
 import { createLedgerDevice } from '../../../service/LedgerService';
+import { ledgerNotificationWithoutCheck } from '../../../components/LedgerNotification/LedgerNotification';
 
 const LedgerAddressIndexBalanceTable = (props: {
   addressIndexBalanceList;
@@ -50,13 +51,13 @@ const LedgerAddressIndexBalanceTable = (props: {
 
   const tableColumns = [
     {
-      title: 'Address',
+      title: t('wallet.table1.address'),
       dataIndex: 'publicAddress',
       key: 'publicAddress',
       render: publicAddress => publicAddress,
     },
     {
-      title: 'Derivation Path',
+      title: t('create.formCustomConfig.derivationPath.label'),
       dataIndex: 'derivationPath',
       key: 'derivationPath',
       // sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
@@ -66,7 +67,7 @@ const LedgerAddressIndexBalanceTable = (props: {
       },
     },
     {
-      title: 'Balance',
+      title: t('home.assetList.table.amount'),
       dataIndex: 'balance',
       key: 'balance',
       // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
@@ -89,13 +90,7 @@ const LedgerAddressIndexBalanceTable = (props: {
               setisHWModeSelected(false);
             }
             if (form && setDerivationPath) {
-              // const lastIndexOfSlash = record.derivationPath.lastIndexOf('/');
-              // const [rootPath, index] = [
-              //   record.derivationPath.substring(0, lastIndexOfSlash),
-              //   record.derivationPath.substring(lastIndexOfSlash + 1),
-              // ];
               form.setFieldsValue({
-                // derivationPath: rootPath,
                 addressIndex: record.index,
               });
               setDerivationPath({
@@ -162,6 +157,70 @@ const LedgerAddressIndexBalanceTable = (props: {
     }
   };
 
+  const onLoadMoreAddressList = async () => {
+    const device: ISignerProvider = createLedgerDevice();
+    const standard = form?.getFieldValue('derivationPathStandard');
+
+    try {
+      switch (assetType) {
+        case UserAssetType.EVM:
+          {
+            const ethAddressList = await device.getEthAddressList(
+              startIndex,
+              DEFAULT_GAP,
+              standard,
+            );
+            if (ethAddressList) {
+              const returnList = ethAddressList.map((address, idx) => {
+                return {
+                  index: startIndex + idx,
+                  publicAddress: address,
+                  derivationPath: LedgerSigner.getDerivationPath(
+                    startIndex + idx,
+                    UserAssetType.EVM,
+                    standard,
+                  ),
+                  balance: '0',
+                };
+              });
+              setStartIndex(startIndex + DEFAULT_GAP);
+              setRawAddressIndexBalanceList(rawAddressIndexBalanceList.concat(returnList));
+            }
+          }
+          break;
+        case UserAssetType.TENDERMINT:
+          {
+            const tendermintAddressList = await device.getAddressList(
+              startIndex,
+              DEFAULT_GAP,
+              'cro',
+              standard,
+            );
+            if (tendermintAddressList) {
+              const returnList = tendermintAddressList.map((address, idx) => {
+                return {
+                  index: startIndex + idx,
+                  publicAddress: address,
+                  derivationPath: LedgerSigner.getDerivationPath(
+                    startIndex + idx,
+                    UserAssetType.TENDERMINT,
+                    standard,
+                  ),
+                  balance: '0',
+                };
+              });
+              setStartIndex(startIndex + DEFAULT_GAP);
+              setRawAddressIndexBalanceList(rawAddressIndexBalanceList.concat(returnList));
+            }
+          }
+          break;
+        default:
+      }
+    } catch {
+      ledgerNotificationWithoutCheck(assetType);
+    }
+  };
+
   useEffect(() => {
     const syncAddressIndexBalanceList = () => {
       processLedgerAccountsList(rawAddressIndexBalanceList);
@@ -169,6 +228,10 @@ const LedgerAddressIndexBalanceTable = (props: {
 
     syncAddressIndexBalanceList();
   }, [rawAddressIndexBalanceList]);
+
+  useEffect(() => {
+    setStartIndex(DEFAULT_START_INDEX);
+  }, [assetType]);
 
   return (
     <div className="address-index-balance-list">
@@ -189,71 +252,21 @@ const LedgerAddressIndexBalanceTable = (props: {
             loading={loading}
           />
           <Button
+            style={{ float: 'right' }}
+            loading={loading}
             onClick={async () => {
-              const device: ISignerProvider = createLedgerDevice();
-              const standard = form?.getFieldValue('derivationPathStandard');
-              setStartIndex(DEFAULT_START_INDEX);
-              switch (assetType) {
-                case UserAssetType.EVM:
-                  {
-                    const ethAddressList = await device.getEthAddressList(
-                      startIndex,
-                      DEFAULT_GAP,
-                      standard,
-                    );
-                    if (ethAddressList) {
-                      const returnList = ethAddressList.map((address, idx) => {
-                        return {
-                          index: startIndex + idx,
-                          publicAddress: address,
-                          derivationPath: LedgerSigner.getDerivationPath(
-                            startIndex + idx,
-                            UserAssetType.EVM,
-                            standard,
-                          ),
-                          balance: '0',
-                        };
-                      });
-                      setStartIndex(startIndex + DEFAULT_GAP);
-                      setRawAddressIndexBalanceList(rawAddressIndexBalanceList.concat(returnList));
-                    }
-                  }
-                  break;
-                case UserAssetType.TENDERMINT:
-                  {
-                    const tendermintAddressList = await device.getAddressList(
-                      startIndex,
-                      DEFAULT_GAP,
-                      'cro',
-                      standard,
-                    );
-                    if (tendermintAddressList) {
-                      const returnList = tendermintAddressList.map((address, idx) => {
-                        return {
-                          index: startIndex + idx,
-                          publicAddress: address,
-                          derivationPath: LedgerSigner.getDerivationPath(
-                            startIndex + idx,
-                            UserAssetType.TENDERMINT,
-                            standard,
-                          ),
-                          balance: '0',
-                        };
-                      });
-                      setStartIndex(startIndex + DEFAULT_GAP);
-                      setRawAddressIndexBalanceList(rawAddressIndexBalanceList.concat(returnList));
-                    }
-                  }
-                  break;
-                default:
-              }
+              setLoading(true);
+              setTimeout(() => {
+                onLoadMoreAddressList();
+                setLoading(false);
+              }, 500);
             }}
           >
-            Load more
+            {t('general.loadMore')}
           </Button>
         </>
       ) : (
-        <div>Please select</div>
+        <></>
       )}
     </div>
   );
