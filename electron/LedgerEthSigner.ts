@@ -56,30 +56,10 @@ export class LedgerEthSigner {
     try {
       await this.createTransport();
       for (let index = startIndex; index < startIndex + gap; index++) {
-        console.log(`getAddress #${index}`);
         const path: string = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, standard);
         const retAddress = await this.app!.getAddress(path, false, false);
         addressList[index] = retAddress.address;
-        console.log(`retAddress index:${index}`, retAddress);
       }
-
-      // const getAddressPromises = [];
-      // for (let index = 0; index < gap; index++) {
-      //   const path: string = `44'/60'/0'/0/${index}`;
-      //   getAddressPromises.push(async () => {
-      //     console.log(`getAddressPromises #${index}`);
-      //     const retAddress = await this.app!.getAddress(path, display, false);
-      //     console.log(`retAddress index:${index}`, retAddress);
-      //     addressList[index] = retAddress.address;
-      //     // return retAddress;
-      //     return Promise.resolve(retAddress);
-      //   });
-      // }
-      // console.log('getAddressPromises', getAddressPromises);
-      // const results = await Promise.allSettled(getAddressPromises)
-      // .then((results) => results.forEach((result) => console.log(result)));
-      // console.log('results', results);
-
       return addressList.filter((address) => address !== undefined);
     } finally {
       await this.closeTransport();
