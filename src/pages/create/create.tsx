@@ -485,18 +485,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             break;
           }
         }
-
         const ethAddress = await device.getEthAddress(
           targetWallet.addressIndex,
           derivationPathStandard,
           false,
         );
-        // const ethAddressList = await device.getEthAddressList(10, false);
-        // console.log('ethAddressList', ethAddressList);
-        // const evmAsset = createdWallet.assets.filter(
-        //   asset => asset.assetType === UserAssetType.EVM,
-        // )[0];
-        // evmAsset.address = ethAddress;
         createdWallet.assets
           .filter(asset => asset.assetType === UserAssetType.EVM)
           .forEach(asset => {
@@ -804,6 +797,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             {ledgerAssetType ? (
               <LedgerAddressIndexBalanceTable
                 addressIndexBalanceList={ledgerAddressList}
+                setAddressIndexBalanceList={setLedgerAddressList}
                 setisHWModeSelected={setIsHWModeSelected}
                 assetType={ledgerAssetType}
                 form={props.form}
@@ -836,6 +830,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             disabled={props.isWalletSelectFieldDisable}
             onChange={() => {
               setLedgerAddressList([]);
+              setLedgerAssetType(undefined);
               setDerivationPath({
                 tendermint: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),

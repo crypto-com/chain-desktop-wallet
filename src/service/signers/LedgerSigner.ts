@@ -111,7 +111,7 @@ export class LedgerSigner {
       throw new Error(`${response.error_message}`);
     }
 
-    for (let index = startIndex; index < gap; index++) {
+    for (let index = startIndex; index < startIndex + gap; index++) {
       console.log(`getAddress #${index}`);
       // purpose(44), coin(394), account(0), change(0), index(0)
       // for string: `m/44'/394'/${this.account}'/0/${index}`;
@@ -138,7 +138,7 @@ export class LedgerSigner {
     }
 
     await this.closeTransport();
-    return addressList;
+    return addressList.filter(address => address !== undefined);
   }
 
   public static padZero(original_array: Uint8Array, wanted_length: number) {
