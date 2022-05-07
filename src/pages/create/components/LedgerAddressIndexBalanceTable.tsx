@@ -18,6 +18,7 @@ import { LedgerSigner } from '../../../service/signers/LedgerSigner';
 import { ISignerProvider } from '../../../service/signers/SignerProvider';
 import { createLedgerDevice } from '../../../service/LedgerService';
 import { ledgerNotificationWithoutCheck } from '../../../components/LedgerNotification/LedgerNotification';
+import { renderExplorerUrl } from '../../../models/Explorer';
 
 const LedgerAddressIndexBalanceTable = (props: {
   addressIndexBalanceList;
@@ -43,26 +44,41 @@ const LedgerAddressIndexBalanceTable = (props: {
   const [t] = useTranslation();
 
   const network = props.form?.getFieldValue('network');
+  const isTestnet = network === DefaultWalletConfigs.TestNetCroeseid4Config.name;
+  const config = isTestnet
+    ? DefaultWalletConfigs.TestNetCroeseid4Config
+    : DefaultWalletConfigs.MainNetConfig;
+  const cronosTendermintAsset = {
+    ...CRONOS_TENDERMINT_ASSET(config),
+    walletId: '',
+  };
 
-  const cronosTendermintAsset =
-    network === DefaultWalletConfigs.TestNetCroeseid4Config.name
-      ? {
-          ...CRONOS_TENDERMINT_ASSET(DefaultWalletConfigs.TestNetCroeseid4Config),
-          walletId: '',
-        }
-      : {
-          ...CRONOS_TENDERMINT_ASSET(DefaultWalletConfigs.MainNetConfig),
-          walletId: '',
-        };
-
-  const cronosEvmAsset = { ...CRONOS_EVM_ASSET(DefaultWalletConfigs.MainNetConfig), walletId: '' };
+  const cronosEvmAsset = {
+    ...CRONOS_EVM_ASSET(config),
+    walletId: '',
+  };
 
   const tableColumns = [
     {
       title: t('wallet.table1.address'),
       dataIndex: 'publicAddress',
       key: 'publicAddress',
-      render: publicAddress => publicAddress,
+      render: publicAddress => {
+        let url;
+        switch (assetType) {
+          case UserAssetType.EVM:
+            url = `${renderExplorerUrl(cronosEvmAsset.config, 'address')}/${publicAddress}`;
+            break;
+          case UserAssetType.TENDERMINT:
+          default:
+            url = `${renderExplorerUrl(cronosTendermintAsset.config, 'address')}/${publicAddress}`;
+        }
+        return (
+          <a data-original={publicAddress} target="_blank" rel="noreferrer" href={url}>
+            {publicAddress}
+          </a>
+        );
+      },
     },
     {
       title: t('create.formCustomConfig.derivationPath.label'),
@@ -122,10 +138,9 @@ const LedgerAddressIndexBalanceTable = (props: {
     setLoading(true);
     switch (assetType) {
       case UserAssetType.TENDERMINT: {
-        const nodeUrl =
-          network === DefaultWalletConfigs.TestNetCroeseid4Config.name
-            ? DefaultWalletConfigs.TestNetCroeseid4Config.nodeUrl
-            : DefaultWalletConfigs.MainNetConfig.nodeUrl;
+        const nodeUrl = isTestnet
+          ? DefaultWalletConfigs.TestNetCroeseid4Config.nodeUrl
+          : DefaultWalletConfigs.MainNetConfig.nodeUrl;
         const nodeRpc = await NodeRpcService.init(nodeUrl);
 
         await Promise.all(
@@ -133,7 +148,7 @@ const LedgerAddressIndexBalanceTable = (props: {
             const { publicAddress } = account;
             const nativeBalance = await nodeRpc.loadAccountBalance(
               publicAddress,
-              network === DefaultWalletConfigs.TestNetCroeseid4Config.name ? 'basetcro' : 'basecro',
+              isTestnet ? 'basetcro' : 'basecro',
             );
             account.balance = `${scaledAmountByAsset(nativeBalance, cronosTendermintAsset)} ${
               cronosTendermintAsset.symbol
@@ -204,7 +219,7 @@ const LedgerAddressIndexBalanceTable = (props: {
             const tendermintAddressList = await device.getAddressList(
               startIndex,
               DEFAULT_GAP,
-              network === DefaultWalletConfigs.TestNetCroeseid4Config.name ? 'tcro' : 'cro',
+              isTestnet ? 'tcro' : 'cro',
               standard,
             );
             if (tendermintAddressList) {
