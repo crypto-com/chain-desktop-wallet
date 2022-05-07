@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, FormInstance, Table } from 'antd';
+import { Button, FormInstance, Spin, Table } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 
 import './LedgerAddressIndexBalanceTable.less';
 
@@ -249,7 +250,10 @@ const LedgerAddressIndexBalanceTable = (props: {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             onChange={(pagination, filters, sorter: any) => {}}
             defaultExpandAllRows
-            loading={loading}
+            loading={{
+              indicator: <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />,
+              spinning: loading,
+            }}
           />
           <Button
             style={{ float: 'right' }}
