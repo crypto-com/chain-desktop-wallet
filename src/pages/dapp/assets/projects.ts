@@ -500,6 +500,14 @@ const unListedProjects: CronosProject[] = [
     logo: 'cougar-exchange.png',
     description: '',
     twitter: ''
+  },
+  {
+    name: 'MMF Money',
+    category: ['DEX'],
+    link: 'https://mmf.money/',
+    logo: 'mmf-money.png',
+    description: '',
+    twitter: ''
   }
 ];
 

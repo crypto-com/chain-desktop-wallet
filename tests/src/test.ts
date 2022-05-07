@@ -268,6 +268,8 @@ async function main() {
       toAddress: 'cro1sza72v70tm9l38h6uxhwgra5eg33xd4jr3ujl7',
     },
     phrase,
+    "10000",
+    300000
   );
   console.log('broadcast transaction');
   console.log(signedTxHex);
