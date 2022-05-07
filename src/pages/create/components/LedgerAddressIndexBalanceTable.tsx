@@ -13,6 +13,7 @@ import {
 } from '../../../config/StaticAssets';
 import { DefaultWalletConfigs } from '../../../config/StaticConfig';
 import { NodeRpcService } from '../../../service/rpc/NodeRpcService';
+import { LedgerSigner } from '../../../service/signers/LedgerSigner';
 
 const LedgerAddressIndexBalanceTable = (props: {
   addressIndexBalanceList;
@@ -20,12 +21,14 @@ const LedgerAddressIndexBalanceTable = (props: {
   // eslint-disable-next-line react/no-unused-prop-types
   assetType: UserAssetType;
   setisHWModeSelected?: (value: boolean) => void;
+  setDerivationPath?: ({ tendermint, evm }) => void;
 }) => {
   const {
     addressIndexBalanceList: rawAddressIndexBalanceList,
     assetType,
     form,
     setisHWModeSelected,
+    setDerivationPath,
   } = props;
   const [addressIndexBalanceList, setAddressIndexBalanceList] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -78,15 +81,27 @@ const LedgerAddressIndexBalanceTable = (props: {
             if (setisHWModeSelected) {
               setisHWModeSelected(false);
             }
-            if (form) {
-              const lastIndexOfSlash = record.derivationPath.lastIndexOf('/');
-              const [rootPath, index] = [
-                record.derivationPath.substring(0, lastIndexOfSlash),
-                record.derivationPath.substring(lastIndexOfSlash + 1),
-              ];
+            if (form && setDerivationPath) {
+              // const lastIndexOfSlash = record.derivationPath.lastIndexOf('/');
+              // const [rootPath, index] = [
+              //   record.derivationPath.substring(0, lastIndexOfSlash),
+              //   record.derivationPath.substring(lastIndexOfSlash + 1),
+              // ];
               form.setFieldsValue({
-                derivationPath: rootPath,
-                addressIndex: index,
+                // derivationPath: rootPath,
+                addressIndex: record.index,
+              });
+              setDerivationPath({
+                tendermint: LedgerSigner.getDerivationPath(
+                  record.index,
+                  UserAssetType.TENDERMINT,
+                  form.getFieldValue('derivationPathStandard'),
+                ),
+                evm: LedgerSigner.getDerivationPath(
+                  record.index,
+                  UserAssetType.EVM,
+                  form.getFieldValue('derivationPathStandard'),
+                ),
               });
             }
           }}

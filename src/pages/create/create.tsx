@@ -692,6 +692,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             if (ethAddressList) {
               const returnList = ethAddressList.map((address, idx) => {
                 return {
+                  index: idx,
                   publicAddress: address,
                   derivationPath: LedgerSigner.getDerivationPath(idx, UserAssetType.EVM, standard),
                   balance: '0',
@@ -707,6 +708,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             if (tendermintAddressList) {
               const returnList = tendermintAddressList.map((address, idx) => {
                 return {
+                  index: idx,
                   publicAddress: address,
                   derivationPath: LedgerSigner.getDerivationPath(
                     idx,
@@ -805,6 +807,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 setisHWModeSelected={setIsHWModeSelected}
                 assetType={ledgerAssetType}
                 form={props.form}
+                setDerivationPath={setDerivationPath}
               />
             ) : (
               <></>
@@ -832,6 +835,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
             disabled={props.isWalletSelectFieldDisable}
             onChange={() => {
+              setLedgerAddressList([]);
               setDerivationPath({
                 tendermint: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
