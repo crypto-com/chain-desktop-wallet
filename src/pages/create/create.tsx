@@ -319,11 +319,6 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
   );
 };
 
-enum LedgerAssetType {
-  TENDERMINT = 'tendermint',
-  EVM = 'evm',
-}
-
 const FormCreate: React.FC<FormCreateProps> = props => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
@@ -419,6 +414,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   };
 
   const onNetworkChange = (network: string) => {
+    setLedgerAddressList([]);
     props.form.setFieldsValue({ network });
     if (network === DefaultWalletConfigs.CustomDevNet.name) {
       props.setIsCustomConfig(true);
@@ -678,6 +674,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     const fetchAddressList = async () => {
       const device: ISignerProvider = createLedgerDevice();
       const standard = props.form.getFieldValue('derivationPathStandard');
+      const network = props.form.getFieldValue('network');
       switch (ledgerAssetType) {
         case UserAssetType.EVM:
           {
@@ -697,7 +694,14 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           break;
         case UserAssetType.TENDERMINT:
           {
-            const tendermintAddressList = await device.getAddressList(0, 10, 'cro', standard);
+            const addressPrefix =
+              network === DefaultWalletConfigs.TestNetCroeseid4Config.name ? 'tcro' : 'cro';
+            const tendermintAddressList = await device.getAddressList(
+              0,
+              10,
+              addressPrefix,
+              standard,
+            );
             if (tendermintAddressList) {
               const returnList = tendermintAddressList.map((address, idx) => {
                 return {
@@ -780,11 +784,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
                 setLedgerAddressList([]);
                 switch (e) {
-                  case LedgerAssetType.TENDERMINT:
+                  case UserAssetType.TENDERMINT:
                     setLedgerAssetType(UserAssetType.TENDERMINT);
                     ledgerNotificationWithoutCheck(UserAssetType.TENDERMINT);
                     break;
-                  case LedgerAssetType.EVM:
+                  case UserAssetType.EVM:
                     setLedgerAssetType(UserAssetType.EVM);
                     ledgerNotificationWithoutCheck(UserAssetType.EVM);
                     break;
@@ -792,10 +796,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 }
               }}
             >
-              <Select.Option key="tendermint" value={LedgerAssetType.TENDERMINT}>
+              <Select.Option key="tendermint" value={UserAssetType.TENDERMINT}>
                 TENDERMINT
               </Select.Option>
-              <Select.Option key="evm" value={LedgerAssetType.EVM}>
+              <Select.Option key="evm" value={UserAssetType.EVM}>
                 EVM
               </Select.Option>
             </Select>

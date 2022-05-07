@@ -112,7 +112,6 @@ export class LedgerSigner {
     }
 
     for (let index = startIndex; index < startIndex + gap; index++) {
-      console.log(`getAddress #${index}`);
       // purpose(44), coin(394), account(0), change(0), index(0)
       // for string: `m/44'/394'/${this.account}'/0/${index}`;
       let path = [44, 394, this.account, 0, index];
@@ -134,7 +133,6 @@ export class LedgerSigner {
       }
 
       addressList[index] = response.bech32_address;
-      console.log(`response index:${index}`, response.bech32_address);
     }
 
     await this.closeTransport();

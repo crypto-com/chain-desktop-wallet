@@ -22,7 +22,6 @@ import { ledgerNotificationWithoutCheck } from '../../../components/LedgerNotifi
 const LedgerAddressIndexBalanceTable = (props: {
   addressIndexBalanceList;
   form?: FormInstance;
-  // eslint-disable-next-line react/no-unused-prop-types
   assetType: UserAssetType;
   setisHWModeSelected?: (value: boolean) => void;
   setDerivationPath?: ({ tendermint, evm }) => void;
@@ -43,11 +42,19 @@ const LedgerAddressIndexBalanceTable = (props: {
   const [loading, setLoading] = useState<boolean>(false);
   const [t] = useTranslation();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const cronosTendermintAsset = {
-    ...CRONOS_TENDERMINT_ASSET(DefaultWalletConfigs.MainNetConfig),
-    walletId: '',
-  };
+  const network = props.form?.getFieldValue('network');
+
+  const cronosTendermintAsset =
+    network === DefaultWalletConfigs.TestNetCroeseid4Config.name
+      ? {
+          ...CRONOS_TENDERMINT_ASSET(DefaultWalletConfigs.TestNetCroeseid4Config),
+          walletId: '',
+        }
+      : {
+          ...CRONOS_TENDERMINT_ASSET(DefaultWalletConfigs.MainNetConfig),
+          walletId: '',
+        };
+
   const cronosEvmAsset = { ...CRONOS_EVM_ASSET(DefaultWalletConfigs.MainNetConfig), walletId: '' };
 
   const tableColumns = [
@@ -61,8 +68,6 @@ const LedgerAddressIndexBalanceTable = (props: {
       title: t('create.formCustomConfig.derivationPath.label'),
       dataIndex: 'derivationPath',
       key: 'derivationPath',
-      // sorter: (a, b) => new Big(a.currentTokens).cmp(new Big(b.currentTokens)),
-      // defaultSortOrder: 'descend' as any,
       render: derivationPath => {
         return <span>{derivationPath}</span>;
       },
@@ -71,8 +76,6 @@ const LedgerAddressIndexBalanceTable = (props: {
       title: t('home.assetList.table.amount'),
       dataIndex: 'balance',
       key: 'balance',
-      // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
-      // defaultSortOrder: 'descend' as any,
       render: balance => {
         return (
           <>
@@ -119,14 +122,21 @@ const LedgerAddressIndexBalanceTable = (props: {
     setLoading(true);
     switch (assetType) {
       case UserAssetType.TENDERMINT: {
-        const nodeRpc = await NodeRpcService.init(DefaultWalletConfigs.MainNetConfig.nodeUrl);
+        const nodeUrl =
+          network === DefaultWalletConfigs.TestNetCroeseid4Config.name
+            ? DefaultWalletConfigs.TestNetCroeseid4Config.nodeUrl
+            : DefaultWalletConfigs.MainNetConfig.nodeUrl;
+        const nodeRpc = await NodeRpcService.init(nodeUrl);
 
         await Promise.all(
           ledgerAccountList.map(async account => {
             const { publicAddress } = account;
-            const nativeBalance = await nodeRpc.loadAccountBalance(publicAddress, 'basecro');
+            const nativeBalance = await nodeRpc.loadAccountBalance(
+              publicAddress,
+              network === DefaultWalletConfigs.TestNetCroeseid4Config.name ? 'basetcro' : 'basecro',
+            );
             account.balance = `${scaledAmountByAsset(nativeBalance, cronosTendermintAsset)} ${
-              cronosEvmAsset.symbol
+              cronosTendermintAsset.symbol
             }`;
           }),
         ).then(() => {
@@ -194,7 +204,7 @@ const LedgerAddressIndexBalanceTable = (props: {
             const tendermintAddressList = await device.getAddressList(
               startIndex,
               DEFAULT_GAP,
-              'cro',
+              network === DefaultWalletConfigs.TestNetCroeseid4Config.name ? 'tcro' : 'cro',
               standard,
             );
             if (tendermintAddressList) {
@@ -247,8 +257,6 @@ const LedgerAddressIndexBalanceTable = (props: {
             dataSource={addressIndexBalanceList}
             columns={tableColumns}
             pagination={{ showSizeChanger: false }}
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            onChange={(pagination, filters, sorter: any) => {}}
             defaultExpandAllRows
             loading={{
               indicator: <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />,
