@@ -257,6 +257,7 @@
   "wallet.table1.name": "名稱",
   "wallet.table1.address": "地址",
   "wallet.table1.walletType": "錢包種類",
+  "wallet.table1.derivationPathStandard": "標準",
   "wallet.table1.network": "網絡",
   "wallet.table1.addressIndex": "索引",
   "announcement.modal.title": "數據分析已添加",

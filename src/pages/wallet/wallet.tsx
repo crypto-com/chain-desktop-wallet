@@ -188,7 +188,7 @@ function WalletPage() {
       render: text => <Text type="success">{text}</Text>,
     },
     {
-      title: t('create.formCreate.derivationPathStandard.label'),
+      title: t('wallet.table1.derivationPathStandard'),
       dataIndex: 'derivationPathStandard',
       key: 'derivationPathStandard',
       children: [
