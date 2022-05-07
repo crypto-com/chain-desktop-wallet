@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { setRecoil } from 'recoil-nexus';
-import { Button, Checkbox, Form, Input, notification, Select } from 'antd';
+import { Button, Checkbox, Form, Input, InputNumber, notification, Select, Typography } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { useTranslation } from 'react-i18next';
 import {
@@ -56,6 +56,8 @@ const layout = {
 const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
+
+const { Text } = Typography;
 
 function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -341,6 +343,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const [hwcheck, setHwcheck] = useState(!props.isWalletSelectFieldDisable);
   const { isLedgerConnected } = useLedgerStatus({ assetType: ledgerAssetType });
   const [ledgerAddressList, setLedgerAddressList] = useState<any[]>([]);
+  const [derivationPath, setDerivationPath] = useState({
+    tendermint: "m/44'/394'/0'/0/0",
+    evm: "m/44'/60'/0'/0/0",
+  });
 
   const [t] = useTranslation();
 
@@ -825,6 +831,20 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           <Select
             placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
             disabled={props.isWalletSelectFieldDisable}
+            onChange={() => {
+              setDerivationPath({
+                tendermint: LedgerSigner.getDerivationPath(
+                  props.form.getFieldValue('addressIndex'),
+                  UserAssetType.TENDERMINT,
+                  props.form.getFieldValue('derivationPathStandard'),
+                ),
+                evm: LedgerSigner.getDerivationPath(
+                  props.form.getFieldValue('addressIndex'),
+                  UserAssetType.EVM,
+                  props.form.getFieldValue('derivationPathStandard'),
+                ),
+              });
+            }}
           >
             <Select.Option key="bip-44" value={DerivationPathStandard.BIP44}>
               {t('BIP-44')}
@@ -846,18 +866,63 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         >
           Show Ledger Accounts
         </Button>
-        <Form.Item name="derivationPath" label={t('Base derivation path')}>
-          <Input
+        <Form.Item name="derivationPath" label={t('Derivation Path')}>
+          {/* <Input
             readOnly
             placeholder="Your derivation path here"
             value={props.form.getFieldValue('derivationPath')}
-            style={{ backgroundColor: '#d4d4d4' }}
-          />
+            style={{ backgroundColor: '#e4e4e4' }}
+          /> */}
+          <div
+            style={{
+              display: 'flex',
+            }}
+            className="derivation-path-container"
+          >
+            <div>
+              TENDERMINT <br />
+              <Text type="secondary">{derivationPath.tendermint}</Text>
+            </div>
+            <div>
+              EVM <br />
+              <Text type="secondary">{derivationPath.evm}</Text>
+            </div>
+          </div>
         </Form.Item>
-        <Form.Item name="addressIndex" label={t('Address Index')}>
-          <Input
+        <Form.Item
+          name="addressIndex"
+          label={t('Address Index')}
+          rules={[
+            {
+              required: true,
+              message: `${t('create.formCreate.name.label')} ${t('general.required')}`,
+            },
+            {
+              pattern: /^\d+$/,
+              message: `${t('create.formCreate.name.label')} ${t('general.required')}`,
+            },
+          ]}
+        >
+          <InputNumber
             placeholder="Enter derivation address index here"
             value={props.form.getFieldValue('addressIndex')}
+            type="number"
+            onChange={() => {
+              setDerivationPath({
+                tendermint: LedgerSigner.getDerivationPath(
+                  props.form.getFieldValue('addressIndex'),
+                  UserAssetType.TENDERMINT,
+                  props.form.getFieldValue('derivationPathStandard'),
+                ),
+                evm: LedgerSigner.getDerivationPath(
+                  props.form.getFieldValue('addressIndex'),
+                  UserAssetType.EVM,
+                  props.form.getFieldValue('derivationPathStandard'),
+                ),
+              });
+            }}
+            min={0}
+            max={2147483647}
           />
         </Form.Item>
       </div>
