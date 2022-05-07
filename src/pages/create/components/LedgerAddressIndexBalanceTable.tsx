@@ -264,7 +264,8 @@ const LedgerAddressIndexBalanceTable = (props: {
             }}
           />
           <Button
-            style={{ float: 'right' }}
+            type="ghost"
+            style={{ float: 'right', marginRight: '0', border: '0', boxShadow: 'none' }}
             loading={loading}
             onClick={async () => {
               setLoading(true);

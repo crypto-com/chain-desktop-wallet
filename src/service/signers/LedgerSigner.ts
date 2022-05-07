@@ -221,7 +221,9 @@ export class LedgerSigner {
     assetType: UserAssetType,
     standard: DerivationPathStandard,
   ): string {
-    let coin = '394';
+    let coin;
+    index = index ?? 0;
+
     switch (assetType) {
       case UserAssetType.EVM:
         coin = '60';

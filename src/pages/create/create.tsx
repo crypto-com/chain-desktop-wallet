@@ -746,9 +746,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       >
         <Input maxLength={36} placeholder={t('create.formCreate.name.label')} />
       </Form.Item>
-      <Checkbox onChange={onCheckboxChange} checked={hwcheck}>
-        {t('create.formCreate.checkbox1')}
-      </Checkbox>
+      <Form.Item>
+        <Checkbox onChange={onCheckboxChange} checked={hwcheck}>
+          {t('create.formCreate.checkbox1')}
+        </Checkbox>
+      </Form.Item>
       <>
         <ModalPopup
           isModalVisible={isHWModeSelected}
@@ -766,7 +768,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           </div>
           <div className="item">
             <Select
-              style={{ width: '140px', textAlign: 'center' }}
+              style={{ width: '180px', textAlign: 'center' }}
               placeholder={`${t('general.select')} ${t(
                 'create.LedgerAddressIndexBalanceTable.assetType.label',
               )}`}
@@ -865,6 +867,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           }}
           style={{
             border: '0',
+            boxShadow: 'none',
           }}
         >
           {t('create.formCreate.showLedger.label')}
