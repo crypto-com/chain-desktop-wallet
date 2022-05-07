@@ -40,7 +40,6 @@ import {
   LEDGER_WALLET_TYPE,
   NORMAL_WALLET_TYPE,
 } from '../../service/LedgerService';
-import { TransactionUtils } from '../../utils/TransactionUtils';
 import IconCro from '../../svg/IconCro';
 import IconEth from '../../svg/IconEth';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
@@ -663,13 +662,6 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const addressIndexValidator = TransactionUtils.rangeValidator(
-    `0`,
-    `${LedgerWalletMaximum}`,
-    `${t('create.addressIndexValidator.error')} ${LedgerWalletMaximum}`,
-  );
-
   useEffect(() => {
     const fetchAddressList = async () => {
       const device: ISignerProvider = createLedgerDevice();
@@ -928,8 +920,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
               });
             }}
             min={0}
-            max={2147483647}
+            max={LedgerWalletMaximum}
           />
+        </Form.Item>
+        <Form.Item>
+          <NoticeDisclaimer>{t('create.formCreate.addressIndex.disclaimer')}</NoticeDisclaimer>
         </Form.Item>
       </div>
 

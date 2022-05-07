@@ -184,7 +184,7 @@
   "create.formCreate.index.label": "索引",
   "create.formCreate.index.error": "只可以為 0 至 2147483647 的數字",
   "create.formCreate.addressIndex.label": "地址索引",
-  "create.formCreate.addressIndex.disclaimer": "可以創建至多 100 個地址。在專家模式下沒有限制。",
+  "create.formCreate.addressIndex.disclaimer": "可使用索引 0 至上限 100 來創建地址。在 Ledger 內啟用專家模式後沒有此限制。",
   "create.formCreate.network.label": "網絡",
   "create.formCreate.checkbox1": "想要創建硬件錢包？",
   "create.LedgerAddressIndexBalanceTable.title": "Ledger 衍生路徑列表",

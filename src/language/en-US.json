@@ -184,7 +184,7 @@
   "create.formCreate.index.label": "Index",
   "create.formCreate.index.error": "can only be numbers between 0 and 2147483647",
   "create.formCreate.addressIndex.label": "Address Index",
-  "create.formCreate.addressIndex.disclaimer": "You can create an index of up to 100 addresses. Expert mode allows you to exceed 100.",
+  "create.formCreate.addressIndex.disclaimer": "You can create an index of up to 100 addresses. Enable Expert mode in Ledger allows you to exceed 100.",
   "create.formCreate.network.label": "Network",
   "create.formCreate.checkbox1": "Want to create with hardware wallet?",
   "create.LedgerAddressIndexBalanceTable.title": "Ledger Derive Address List",

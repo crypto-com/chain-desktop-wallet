@@ -181,7 +181,7 @@
   "create.formCreate.derivationPath.label": "지갑 HD 경로",
   "create.formCreate.index.label": "인덱스",
   "create.formCreate.addressIndex.label": "주소 인덱스",
-  "create.formCreate.addressIndex.disclaimer": "최대 100 개의 주소를 만들 수 있습니다. 전문가 모드에는 제한이 없습니다.",
+  "create.formCreate.addressIndex.disclaimer": "인덱스 0에서 상한 100을 사용하여 주소를 만들 수 있습니다. 원장의 전문가 모드에는 제한이 없습니다.",
   "create.formCreate.network.label": "네트워크",
   "create.formCreate.checkbox1": "하드웨어 지갑을 만들까요?",
   "create.LedgerAddressIndexBalanceTable.title": "Ledger 지갑 HD 경로",

@@ -114,7 +114,7 @@ export class LedgerSigner {
     for (let index = startIndex; index < startIndex + gap; index++) {
       // purpose(44), coin(394), account(0), change(0), index(0)
       // for string: `m/44'/394'/${this.account}'/0/${index}`;
-      let path = [44, 394, this.account, 0, index];
+      let path;
       switch (derivationPathStandard) {
         case DerivationPathStandard.LEDGER_LIVE:
           path = [44, 394, index, 0, this.account];
