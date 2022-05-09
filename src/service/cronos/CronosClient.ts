@@ -1,14 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import axios, { AxiosResponse } from 'axios';
+import { Log } from '@ethersproject/abstract-provider';
 import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 import { EVMClient } from '../rpc/clients/EVMClient';
 import {
-  ICronosChainIndexAPI,
-  txListRequestOptions,
-  queryPaginationOptions,
-  tokenTransfersRequestOptions,
-} from '../rpc/interface/cronos.chainIndex';
-import {
+  EventLog,
   TxListAPIResponse,
   txListByAccountRequestParams,
   PendingTxListAPIResponse,
@@ -18,7 +14,14 @@ import {
   tokenTransfersRequestParams,
   tokensOwnedByAddressRequestParams,
   TokensOwnedByAddressResponse,
+  EventLogResponse,
 } from '../rpc/models/cronos.models';
+import {
+  ICronosChainIndexAPI,
+  txListRequestOptions,
+  queryPaginationOptions,
+  tokenTransfersRequestOptions,
+} from '../rpc/interface/cronos.chainIndex';
 
 /**
  * name: CronosClient
@@ -157,5 +160,31 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
     const tokenInfo = CRC20MainnetTokenInfos.get(symbol.toUpperCase());
 
     return tokenInfo?.iconURL ?? '';
+  }
+
+  async getEventLogByAddress(args: {
+    fromBlock: number;
+    toBlock: number | 'latest';
+    address?: string;
+    topics?: Object;
+  }): Promise<Log[]> {
+    const requestParams = {
+      module: 'logs',
+      action: 'getLogs',
+      fromBlock: args.fromBlock,
+      toBlock: args.toBlock,
+      address: args.address,
+      ...args.topics,
+    };
+
+    const response: AxiosResponse<EventLogResponse> = await axios({
+      baseURL: this.cronosExplorerAPIBaseURL,
+      params: requestParams,
+    });
+
+    if (response.status !== 200) {
+      throw new Error('Could not fetch token owned by user address from Cronos Chain Index API.');
+    }
+    return response.data.result;
   }
 }

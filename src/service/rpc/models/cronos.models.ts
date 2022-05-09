@@ -1,3 +1,5 @@
+import { Log } from '@ethersproject/abstract-provider';
+
 interface ExplorerAPIResponse {
   message: string;
   // "1": ok | "0" : not ok
@@ -14,6 +16,10 @@ export interface PendingTxListAPIResponse extends ExplorerAPIResponse {
 
 export interface TokenTransferEventLogsResponse extends ExplorerAPIResponse {
   result: TokenTransferEventLog[];
+}
+
+export interface EventLogResponse extends ExplorerAPIResponse {
+  result: Log[];
 }
 
 export interface TokensOwnedByAddressResponse extends ExplorerAPIResponse {
@@ -76,6 +82,8 @@ export interface TokenTransferEventLog {
   tokenSymbol: string;
   transactionIndex: string;
 }
+
+export interface EventLog {}
 
 // Tokens owned by an address
 export interface TokenDataOwnedByAddress {
