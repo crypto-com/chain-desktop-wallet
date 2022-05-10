@@ -4,6 +4,8 @@ import Eth from '@ledgerhq/hw-app-eth';
 import { ethers } from 'ethers';
 import Web3 from 'web3';
 import { TypedDataUtils } from 'eth-sig-util';
+import { DerivationPathStandard, LedgerSigner } from '../src/service/signers/LedgerSigner';
+import { UserAssetType } from '../src/models/UserAsset';
 
 export class LedgerEthSigner {
   public app: Eth | undefined;
@@ -30,12 +32,35 @@ export class LedgerEthSigner {
     }
   }
 
-  async getAddress(index: number = 0, display: boolean): Promise<string> {
+  async getAddress(
+    index: number = 0,
+    standard: DerivationPathStandard,
+    display: boolean,
+  ): Promise<string> {
     try {
-      const path: string = `44'/60'/0'/0/${index}`;
+      const path: string = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, standard);
       await this.createTransport();
       const retAddress = await this.app!.getAddress(path, display, false);
       return retAddress.address;
+    } finally {
+      await this.closeTransport();
+    }
+  }
+
+  async getAddressList(
+    startIndex: number = 0,
+    gap: number = 10,
+    standard: DerivationPathStandard,
+  ): Promise<string[]> {
+    const addressList: string[] = [];
+    try {
+      await this.createTransport();
+      for (let index = startIndex; index < startIndex + gap; index++) {
+        const path: string = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, standard);
+        const retAddress = await this.app!.getAddress(path, false, false);
+        addressList[index] = retAddress.address;
+      }
+      return addressList.filter((address) => address !== undefined);
     } finally {
       await this.closeTransport();
     }

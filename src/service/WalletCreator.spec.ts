@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
 import { WalletCreateOptions, WalletCreator } from './WalletCreator';
 import { UserAssetType } from '../models/UserAsset';
+import { DerivationPathStandard } from './signers/LedgerSigner';
 
 describe('Testing Wallet Creation', () => {
   it('Test creating a new wallet with testnet configuration', () => {
@@ -13,6 +14,7 @@ describe('Testing Wallet Creation', () => {
       walletType: 'normal',
       config: testNetConfig,
       walletName: 'My-TestNet-Wallet',
+      derivationPathStandard: DerivationPathStandard.BIP44,
     };
     const testNetWallet = new WalletCreator(createOptions).create().wallet;
 
@@ -48,6 +50,7 @@ describe('Testing Wallet Creation', () => {
       walletType: 'normal',
       config: mainNetConfig,
       walletName: 'My-MainNet-Wallet',
+      derivationPathStandard: DerivationPathStandard.BIP44,
     };
     const mainNetWallet = new WalletCreator(createOptions).create().wallet;
 
@@ -99,6 +102,7 @@ describe('Testing Wallet Creation', () => {
       walletType: 'normal',
       config: customConfig,
       walletName: 'My-Custom-Config-Wallet',
+      derivationPathStandard: DerivationPathStandard.BIP44,
     };
     const customWallet = new WalletCreator(createOptions).create().wallet;
 

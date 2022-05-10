@@ -19,6 +19,7 @@ import { secretStoreService } from '../../storage/SecretStoreService';
 import { Session } from '../../models/Session';
 import { NORMAL_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -338,6 +339,7 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
       config: selectedNetworkConfig,
       walletType: NORMAL_WALLET_TYPE,
       addressIndex: 0, // this is for ledger, dummy value
+      derivationPathStandard: DerivationPathStandard.BIP44,
     };
     try {
       const restoreResult = await walletService.restoreWallet(importOptions);

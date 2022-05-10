@@ -1,5 +1,6 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { IpcRender } from './IpcRender';
+import { DerivationPathStandard } from './LedgerSigner';
 import { ISignerProvider } from './SignerProvider';
 
 export class LedgerWalletSignerProviderNative implements ISignerProvider {
@@ -9,18 +10,29 @@ export class LedgerWalletSignerProviderNative implements ISignerProvider {
     this.ipcRender = new IpcRender();
   }
 
-  public async getPubKey(index: number, showLedgerDisplay: boolean): Promise<Bytes> {
-    const pubkey = await this.ipcRender.getPubKey(index, showLedgerDisplay);
+  public async getPubKey(index: number, derivationPathStandard: DerivationPathStandard, showLedgerDisplay: boolean): Promise<Bytes> {
+    const pubkey = await this.ipcRender.getPubKey(index, derivationPathStandard, showLedgerDisplay);
     return pubkey;
   }
 
   public async getAddress(
     index: number,
     addressPrefix: string,
+    derivationPathStandard: DerivationPathStandard,
     showLedgerDisplay: boolean,
   ): Promise<string> {
-    const address = await this.ipcRender.getAddress(index, addressPrefix, showLedgerDisplay);
+    const address = await this.ipcRender.getAddress(index, addressPrefix, derivationPathStandard, showLedgerDisplay);
     return address;
+  }
+
+  public async getAddressList(
+    startIndex: number,
+    gap: number,
+    addressPrefix: string,
+    derivationPathStandard: DerivationPathStandard,
+  ): Promise<string[]> {
+    const addressList = await this.ipcRender.getAddressList(startIndex, gap, addressPrefix, derivationPathStandard);
+    return addressList;
   }
 
   public async sign(message: Bytes): Promise<Bytes> {
@@ -56,9 +68,14 @@ export class LedgerWalletSignerProviderNative implements ISignerProvider {
 
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   // eslint-disable-next-line  class-methods-use-this
-  public async getEthAddress(index: number, display: boolean): Promise<string> {
-    const address = await this.ipcRender.getEthAddress(index, display);
+  public async getEthAddress(index: number, standard: DerivationPathStandard, display: boolean): Promise<string> {
+    const address = await this.ipcRender.getEthAddress(index, standard, display);
     return address;
+  }
+
+  public async getEthAddressList(startIndex: number, gap: number, standard: DerivationPathStandard): Promise<string[]> {
+    const addressList = await this.ipcRender.getEthAddressList(startIndex, gap, standard);
+    return addressList;
   }
 
   public async signTypedDataV4(index: number, typedData: string): Promise<string> {
