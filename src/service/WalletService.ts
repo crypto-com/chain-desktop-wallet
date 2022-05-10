@@ -196,6 +196,7 @@ class WalletService {
             data.hasBeenEncrypted,
             data.walletType,
             data.addressIndex,
+            data.derivationPathStandard,
           ),
       );
   }

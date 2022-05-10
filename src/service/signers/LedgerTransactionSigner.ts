@@ -23,6 +23,7 @@ import {
 import { ISignerProvider } from './SignerProvider';
 import { BaseTransactionSigner, ITransactionSigner } from './TransactionSigner';
 import { isNumeric } from '../../utils/utils';
+import { DerivationPathStandard } from './LedgerSigner';
 
 export class LedgerTransactionSigner extends BaseTransactionSigner implements ITransactionSigner {
   public readonly config: WalletConfig;
@@ -31,11 +32,14 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
 
   public readonly addressIndex: number;
 
-  constructor(config: WalletConfig, signerProvider: ISignerProvider, addressIndex: number) {
+  public readonly derivationPathStandard: DerivationPathStandard;
+
+  constructor(config: WalletConfig, signerProvider: ISignerProvider, addressIndex: number, derivationPathStandard: DerivationPathStandard) {
     super(config);
     this.config = config;
     this.signerProvider = signerProvider;
     this.addressIndex = addressIndex;
+    this.derivationPathStandard = derivationPathStandard;
   }
 
   public getTransactionInfo(_phrase: string, transaction: TransactionUnsigned, gasFee: string, gasLimit: number) {
@@ -208,7 +212,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
 
   async getSignedMessageTransaction(transaction: TransactionUnsigned, message: CosmosMsg, rawTx) {
     const pubkeyoriginal = (
-      await this.signerProvider.getPubKey(this.addressIndex, false)
+      await this.signerProvider.getPubKey(this.addressIndex, this.derivationPathStandard, false)
     ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
     /* 
