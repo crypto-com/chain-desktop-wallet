@@ -86,6 +86,7 @@ import {
 import { isValidatorAddressSuspicious, ModerationConfig } from '../../models/ModerationConfig';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
+import GasStepSelectTendermint, { GasInfoTendermint } from '../../components/GasStepSelect/GasStepSelectTendermint';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
@@ -408,6 +409,7 @@ const FormDelegationRequest = props => {
         </div>
         <RowAmountOption form={form} walletAsset={walletAsset} style={{ marginBottom: '10px' }} />
       </div>
+      <GasStepSelectTendermint />
       <Checkbox onChange={onShowMemoChange} checked={showMemo}>
         {t('staking.formDelegation.checkbox1')}
       </Checkbox>
@@ -497,7 +499,7 @@ const FormDelegationRequest = props => {
                 type="error"
               />
             )}
-
+            <GasInfoTendermint />
             <div className="item">
               <Checkbox checked={isChecked} onChange={() => setIsChecked(!isChecked)}>
                 {t('general.undelegateFormComponent.checkbox1', {
@@ -1442,6 +1444,7 @@ const FormWithdrawStakingReward = () => {
             <div>{`${withdrawValues.rewardAmount}`}</div>
             <div className="fiat">{`${withdrawValues.rewardMarketPrice}`}</div>
           </div>
+          <GasInfoTendermint />
         </>
       </ModalPopup>
       <ModalPopup
@@ -1481,6 +1484,7 @@ const FormWithdrawStakingReward = () => {
             <div>{`${withdrawValues.rewardAmount}`}</div>
             <div className="fiat">{`${withdrawValues.rewardMarketPrice}`}</div>
           </div>
+          <GasInfoTendermint />
         </>
       </ModalPopup>
       <PasswordFormModal

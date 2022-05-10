@@ -5,7 +5,7 @@ import { FIXED_DEFAULT_FEE } from '../config/StaticConfig';
 // Here we are telling the library to NOT DO any rounding, either up or down
 Big.RM = 0;
 
-export function fromScientificNotation(value) {
+export function fromScientificNotation(value: any) {
   return Big(value).toFixed();
 }
 
@@ -48,7 +48,7 @@ export function getUIDynamicAmount(amount: string = '0', currentAsset: UserAsset
   return finalAmount;
 }
 
-export const formatLargeNumber = (n): string => {
+export const formatLargeNumber = (n: any): string => {
   if (n < 1e3) return `${n}`;
   if (n >= 1e3 && n < 1e6) return `${+(n / 1e3).toFixed(1)}K`;
   if (n >= 1e6 && n < 1e9) return `${+(n / 1e6).toFixed(1)}M`;

@@ -5,6 +5,7 @@ import React from 'react';
 import { Session } from '../../../models/Session';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { UNBLOCKING_PERIOD_IN_DAYS } from '../../../config/StaticConfig';
+import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSelectTendermint';
 
 export const UndelegateFormComponent = (props: {
   currentSession: Session;
@@ -70,6 +71,7 @@ export const UndelegateFormComponent = (props: {
           </Form.Item>
         </Form>
       </div>
+      <GasInfoTendermint />
       <div className="item">
         <Checkbox checked={props.isChecked} onChange={() => props.setIsChecked(!props.isChecked)}>
           {t('general.undelegateFormComponent.checkbox1', { unbondingPeriod: undelegatePeriod })}
