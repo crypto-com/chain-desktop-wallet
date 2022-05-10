@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 ### Additions
 - Gas Fee option customization panel
 - Ledger Wallet creation UX enhancement
+- Support Ledger Live Derivation Path standard
 ### Bug fixes
 - Stablize Market Price fetching
 ## [v0.7.6] - 2022-04-20
