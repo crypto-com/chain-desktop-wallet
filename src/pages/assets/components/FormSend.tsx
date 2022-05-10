@@ -30,7 +30,6 @@ import {
   adjustedTransactionAmount,
   fromScientificNotation,
   getCurrentMinAssetAmount,
-  getNormalScaleAmount,
 } from '../../../utils/NumberUtils';
 import { FIXED_DEFAULT_FEE, SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
@@ -45,6 +44,8 @@ import { ledgerNotification } from '../../../components/LedgerNotification/Ledge
 import { AddressBookService } from '../../../service/AddressBookService';
 import { AddressBookContact } from '../../../models/AddressBook';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
+import GasStepSelect from '../../../components/GasStepSelect';
+import GasInfo from '../../../components/GasStepSelect/GasInfo';
 
 const layout = {};
 const tailLayout = {};
@@ -72,6 +73,7 @@ const FormSend: React.FC<FormSendProps> = props => {
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [availableBalance, setAvailableBalance] = useState('--');
+
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const didMountRef = useRef(false);
@@ -238,8 +240,7 @@ const FormSend: React.FC<FormSendProps> = props => {
   );
   const customMinValidator = TransactionUtils.minValidator(
     fromScientificNotation(currentMinAssetAmount),
-    `${t('send.formSend.amount.error2')} ${fromScientificNotation(currentMinAssetAmount)} ${
-      walletAsset?.symbol
+    `${t('send.formSend.amount.error2')} ${fromScientificNotation(currentMinAssetAmount)} ${walletAsset?.symbol
     }`,
   );
 
@@ -330,13 +331,14 @@ const FormSend: React.FC<FormSendProps> = props => {
             {availableBalance} {walletAsset?.symbol}{' '}
             {walletAsset && localFiatSymbol && assetMarketData
               ? `(${localFiatSymbol}${numeral(
-                  getAssetBalancePrice(walletAsset, assetMarketData),
-                ).format('0,0.00')})`
+                getAssetBalancePrice(walletAsset, assetMarketData),
+              ).format('0,0.00')})`
               : ''}
           </div>
         </div>
       </div>
       <RowAmountOption walletAsset={walletAsset!} form={form} />
+      <GasStepSelect asset={walletAsset!} onChange={() => { }} />
       <Form.Item name="memo" label={t('send.formSend.memo.label')}>
         <Input />
       </Form.Item>
@@ -403,26 +405,17 @@ const FormSend: React.FC<FormSendProps> = props => {
                 {`${formValues?.amount} ${walletAsset?.symbol}`}{' '}
                 {walletAsset && localFiatSymbol && assetMarketData && assetMarketData.price
                   ? `(${localFiatSymbol}${numeral(
-                      getAssetAmountInFiat(formValues?.amount, assetMarketData),
-                    ).format('0,0.00')})`
+                    getAssetAmountInFiat(formValues?.amount, assetMarketData),
+                  ).format('0,0.00')})`
                   : ''}
               </div>
             </div>
-            {walletAsset?.assetType === UserAssetType.TENDERMINT ? (
-              <div className="item">
-                <div className="label">{t('send.modal1.label4')}</div>
-                <div>{`~${getNormalScaleAmount(getTransactionFee(walletAsset!), walletAsset!)} ${
-                  walletAsset?.symbol
-                }`}</div>
-              </div>
-            ) : (
-              <></>
-            )}
+            <GasInfo asset={walletAsset!} />
             <div className="item">
               <div className="label">{t('send.modal1.label5')}</div>
               {formValues?.memo !== undefined &&
-              formValues?.memo !== null &&
-              formValues.memo !== '' ? (
+                formValues?.memo !== null &&
+                formValues.memo !== '' ? (
                 <div>{`${formValues?.memo}`}</div>
               ) : (
                 <div>--</div>
@@ -466,8 +459,8 @@ const FormSend: React.FC<FormSendProps> = props => {
         >
           <>
             {broadcastResult?.code !== undefined &&
-            broadcastResult?.code !== null &&
-            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+              broadcastResult?.code !== null &&
+              broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
               <div className="description">
                 {t('general.successModalPopup.timeout.description')}
               </div>

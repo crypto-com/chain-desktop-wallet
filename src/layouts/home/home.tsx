@@ -88,6 +88,7 @@ import {
   DefaultTestnetBridgeConfigs,
 } from '../../service/bridge/BridgeConfig';
 import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
+import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
 
 // import i18n from '../../language/I18n';
 
@@ -283,6 +284,7 @@ function HomeLayout(props: HomeLayoutProps) {
       const tendermintAddress = await device.getAddress(
         walletSession.wallet.addressIndex,
         walletSession.wallet.config.network.addressPrefix,
+        walletSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
         false,
       );
 
@@ -329,7 +331,11 @@ function HomeLayout(props: HomeLayoutProps) {
     try {
       const device: ISignerProvider = createLedgerDevice();
 
-      ledgerEvmAddress = await device.getEthAddress(walletSession.wallet.addressIndex, false);
+      ledgerEvmAddress = await device.getEthAddress(
+        walletSession.wallet.addressIndex,
+        walletSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
+        false,
+      );
       setIsLedgerEthAppConnected(true);
 
       await new Promise(resolve => {
@@ -692,10 +698,10 @@ function HomeLayout(props: HomeLayoutProps) {
       const currentValidatorList = await walletService.retrieveTopValidators(
         currentSession.wallet.config.network.chainId,
       );
-      const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
+      const currentNftLists = await walletService.retrieveNFTs(currentSession.wallet.identifier);
 
       setValidatorList(currentValidatorList);
-      setNftList(currentNftList);
+      setNftList(currentNftLists);
 
       setFetchingDB(false);
 
@@ -928,11 +934,12 @@ function HomeLayout(props: HomeLayoutProps) {
 
             // Deleting local storage
             if (latestIncorrectAttemptCount >= MAX_INCORRECT_ATTEMPTS_ALLOWED) {
-              indexedDB.deleteDatabase('NeDB');
-              setTimeout(() => {
-                history.replace('/');
-                history.go(0);
-              }, 3000);
+              const deleteDBRequest = indexedDB.deleteDatabase('NeDB');
+              deleteDBRequest.onsuccess = () => {
+                setTimeout(() => {
+                  ipcRenderer.send('restart_app');
+                }, 3000);
+              };
             }
 
             // Show warning after `X` number of wrong attempts

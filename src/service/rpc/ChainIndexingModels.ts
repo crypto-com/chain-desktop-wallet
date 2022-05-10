@@ -1,4 +1,4 @@
-import { MsgTypeName } from "../../models/Transaction";
+import { MsgTypeName } from '../../models/Transaction';
 
 export interface TransferData {
   version: number;
@@ -34,9 +34,9 @@ export interface TransferListResponse {
   result: TransferResult[];
 }
 
-/// Nft models
+/// Crypto.org Nft models
 
-export interface NftResponse {
+export interface CryptoOrgNftResponse {
   denomId: string;
   tokenId: string;
   drop: string;
@@ -53,7 +53,7 @@ export interface NftResponse {
 }
 
 export interface NftListResponse {
-  result: NftResponse[];
+  result: CryptoOrgNftResponse[];
   pagination: NftPagination;
 }
 

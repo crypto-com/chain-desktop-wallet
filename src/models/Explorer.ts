@@ -9,7 +9,13 @@ export class Explorer {
   }
 }
 
-export const renderExplorerUrl = (config: WalletConfig | UserAssetConfig, page: string) => {
+export const renderExplorerUrl = (
+  config: WalletConfig | UserAssetConfig | undefined,
+  page: string,
+) => {
+  if (!config) {
+    return '';
+  }
   const { explorer, explorerUrl } = config;
   let url = '';
 

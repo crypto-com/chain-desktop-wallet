@@ -5,6 +5,7 @@ import {
   Network,
   WalletConfig,
 } from '../config/StaticConfig';
+import { DerivationPathStandard } from '../service/signers/LedgerSigner';
 
 export class Wallet {
   public readonly identifier: string;
@@ -27,6 +28,8 @@ export class Wallet {
   public readonly walletType: string;
 
   public readonly addressIndex: number; // for ledger
+  
+  public readonly derivationPathStandard: DerivationPathStandard; // for ledger
 
   constructor(
     id: string,
@@ -37,6 +40,7 @@ export class Wallet {
     hasBeenEncrypted: boolean = false,
     walletType: string,
     addressIndex: number,
+    derivationPathStandard: DerivationPathStandard,
   ) {
     this.identifier = id;
     this.name = name;
@@ -46,6 +50,7 @@ export class Wallet {
     this.hasBeenEncrypted = hasBeenEncrypted;
     this.walletType = walletType;
     this.addressIndex = addressIndex;
+    this.derivationPathStandard = derivationPathStandard;
     // this.assets = [];
   }
 }
