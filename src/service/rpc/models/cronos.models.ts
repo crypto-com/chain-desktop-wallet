@@ -30,6 +30,20 @@ export interface ContractDataResponse extends ExplorerAPIResponse {
   result: ContractData;
 }
 
+export interface TokenBalanceResponse extends ExplorerAPIResponse {
+  result: string;
+}
+
+export interface ContractSourceCode {
+  ABI: string;
+  ContractName: string;
+  Address: string;
+}
+
+export interface ContractSourceCodeResponse extends ExplorerAPIResponse {
+  result: ContractSourceCode[];
+}
+
 export interface txListByAccountRequestParams extends ApiRequestParamsBase {
   module: 'account';
   action: 'txlist' | 'pendingtxlist';

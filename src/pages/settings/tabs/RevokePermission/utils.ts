@@ -1,7 +1,9 @@
-import { Contract, providers } from 'ethers';
+import { Contract, ethers, providers } from 'ethers';
 import { Filter, Log } from '@ethersproject/abstract-provider';
+import BigNumber from 'bignumber.js';
 import { sleep } from '../../../../utils/utils';
 import { CronosClient } from '../../../../service/cronos/CronosClient';
+import { ContractData } from '../../../../service/rpc/models/cronos.models';
 
 export function toFloat(n: number, decimals: number): string {
   return (n / 10 ** decimals).toFixed(3);
@@ -9,6 +11,12 @@ export function toFloat(n: number, decimals: number): string {
 
 export const unpackResult = async (promise: Promise<any>) => (await promise)[0];
 export const convertString = async (promise: Promise<any>) => String(await promise);
+
+export function parsePadZero32Value(value: string): string {
+  return `0x${value.slice(26)}`;
+}
+
+const ContractDataMapping = new Map<string, ContractData>();
 
 export async function getCRC20TokenData(
   contract: Contract,
@@ -18,17 +26,31 @@ export async function getCRC20TokenData(
 ) {
   const cronosClient = new CronosClient(nodeURL, indexingURL);
 
-  const [balance, tokenDataResponse] = await Promise.all([
-    convertString(unpackResult(contract.functions.balanceOf(ownerAddress))),
-    cronosClient.getContractDataByAddress(contract.address),
-  ]);
+  const fetchContractData = async () => {
+    if (ContractDataMapping.has(contract.address)) {
+      return ContractDataMapping.get(contract.address)!;
+    }
 
-  const { result } = tokenDataResponse;
+    const response = await cronosClient.getContractDataByAddress(contract.address);
+
+    if (response.result) {
+      ContractDataMapping.set(contract.address, response.result);
+    }
+
+    return response.result;
+  };
+
+  const fetchBalance = async () => {
+    const response = await cronosClient.getTokenBalanceByAddress(contract.address, ownerAddress);
+    return response.result;
+  };
+
+  const [balance, tokenData] = await Promise.all([fetchBalance(), fetchContractData()]);
 
   return {
-    symbol: result.symbol,
-    decimals: Number(result.decimals),
-    totalSupply: result.totalSupply,
+    symbol: tokenData.symbol,
+    decimals: Number(tokenData.decimals),
+    totalSupply: tokenData.totalSupply,
     balance,
   };
 }

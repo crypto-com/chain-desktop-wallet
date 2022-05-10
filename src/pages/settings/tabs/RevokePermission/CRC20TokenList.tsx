@@ -2,32 +2,12 @@ import { Contract, ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import { Log } from '@ethersproject/abstract-provider';
 import React, { useEffect, useState } from 'react';
-import { Table } from 'antd';
+import { Button, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import CRC20TokenContract from '../../../../service/signers/abi/TokenContractABI.json';
-import { getCRC20TokenData, toFloat } from './utils';
-
-export interface CRC20TokenData {
-  contract: Contract;
-  // icon: string
-  symbol: string;
-  decimals: number;
-  balance: string;
-  // totalSupply: string
-  // verified: boolean
-  approvals: Array<Log>;
-}
-
-interface TokenDataWithApproval {
-  token: Omit<CRC20TokenData, 'approvals'>;
-  approval: {
-    spender: string;
-    readableSpenderName: string;
-    amount: string;
-    riskExposure: string;
-  };
-  rowSpan: number;
-}
+import { getCRC20TokenData, toFloat, parsePadZero32Value } from './utils';
+import { Amount, RiskExposure, TokenBalance, TokenSpender } from './TableCells';
+import { CRC20TokenData, TokenDataWithApproval } from './types';
 
 interface Props {
   filterUnverifiedTokens: boolean;
@@ -58,31 +38,42 @@ function CRC20TokenList({
     loadData();
   }, [inputAddress]);
 
+  const getContracts = (events: Log[]) => {
+    const provider = new ethers.providers.JsonRpcProvider(nodeURL);
+
+    const tokenContracts = events
+      .filter((event, i) => i === events.findIndex(other => event.address === other.address))
+      .map(event => new Contract(getAddress(event.address), CRC20TokenContract.abi, provider));
+
+    return tokenContracts;
+  };
+
+  const filterDuplicatedApprovalsEvents = (contract: Contract) => {
+    const tokenApprovals = approvalEvents.filter(
+      approval => approval.address.toLowerCase() === contract.address.toLowerCase(),
+    );
+    const map = new Map<string, Log>();
+    tokenApprovals.forEach(approval => {
+      if (!map.has(approval.topics[2])) {
+        map.set(approval.topics[2], approval);
+      }
+    });
+    return Array.from(map.values());
+  };
+
+  const hasBalanceOrApprovals = (token: CRC20TokenData) =>
+    token.approvals.length > 0 || toFloat(Number(token.balance), token.decimals) !== '0.000';
+
   const loadData = async () => {
     if (!inputAddress) return;
 
     setLoading(true);
 
-    const allEvents = [...approvalEvents, ...transferEvents];
-
-    const provider = new ethers.providers.JsonRpcProvider(nodeURL);
-
-    const tokenContracts = allEvents
-      .filter((event, i) => i === allEvents.findIndex(other => event.address === other.address))
-      .map(event => new Contract(getAddress(event.address), CRC20TokenContract.abi, provider));
+    const tokenContracts = getContracts([...approvalEvents, ...transferEvents]);
 
     const unsortedTokens: CRC20TokenData[] = await Promise.all(
       tokenContracts.map(async contract => {
-        const tokenApprovals = approvalEvents.filter(
-          approval => approval.address.toLowerCase() === contract.address.toLowerCase(),
-        );
-        const map = new Map<string, Log>();
-        tokenApprovals.forEach(approval => {
-          if (!map.has(approval.topics[2])) {
-            map.set(approval.topics[2], approval);
-          }
-        });
-        const approvals = Array.from(map.values());
+        const approvals = filterDuplicatedApprovalsEvents(contract);
 
         const tokenData = await getCRC20TokenData(contract, inputAddress, nodeURL, indexingURL);
         return {
@@ -95,15 +86,10 @@ function CRC20TokenList({
       }),
     );
 
-    const hasBalanceOrApprovals = (token: CRC20TokenData) =>
-      token.approvals.length > 0 || toFloat(Number(token.balance), token.decimals) !== '0.000';
-
     const sortedTokens = unsortedTokens
       .filter(token => token !== undefined)
       .filter(hasBalanceOrApprovals)
       .sort((a, b) => a.balance.localeCompare(b.balance));
-
-    console.log(sortedTokens);
 
     const approvals = sortedTokens.reduce<TokenDataWithApproval[]>((acc, token) => {
       const tokensWithApprovalData: TokenDataWithApproval[] = [];
@@ -114,14 +100,14 @@ function CRC20TokenList({
           map.set(spender, t);
 
           const rowSpan = idx === 0 ? token.approvals.length : 0;
-          console.log('rowSpan: ', rowSpan, token.symbol);
+          console.log('rowSpan: ', rowSpan, token.symbol, t);
 
           tokensWithApprovalData.push({
             token,
             approval: {
               spender,
               readableSpenderName: '',
-              amount: t.topics[1],
+              amount: t.data === '0x' ? ethers.BigNumber.from(0) : ethers.BigNumber.from(t.data),
               riskExposure: '',
             },
             rowSpan,
@@ -134,10 +120,7 @@ function CRC20TokenList({
       return acc;
     }, []);
 
-    console.log(approvals);
-
     setFlatternedApprovalledData(approvals);
-
     setLoading(false);
   };
 
@@ -152,9 +135,7 @@ function CRC20TokenList({
   const columns: ColumnsType<TokenDataWithApproval> = [
     {
       title: 'Token/Balance',
-      render: (data: TokenDataWithApproval) => {
-        return <div>{data.token.symbol}</div>;
-      },
+      render: (data: TokenDataWithApproval) => <TokenBalance data={data} />,
       onCell: (data: TokenDataWithApproval, _) =>
         ({
           rowSpan: data.rowSpan,
@@ -163,7 +144,22 @@ function CRC20TokenList({
     {
       title: 'Approved Spender',
       render: (data: TokenDataWithApproval) => {
-        return <div>{data.approval.spender}</div>;
+        const spender = parsePadZero32Value(data.approval.spender);
+        return <TokenSpender indexingURL={indexingURL} nodeURL={nodeURL} spender={spender} />;
+      },
+    },
+    {
+      title: 'Approved Amount',
+      render: (data: TokenDataWithApproval) => <Amount data={data} />,
+    },
+    {
+      title: 'Risk Exposure',
+      render: (data: TokenDataWithApproval) => <RiskExposure data={data} />,
+    },
+    {
+      title: '',
+      render: (data: TokenDataWithApproval) => {
+        return <Button>revoke</Button>;
       },
     },
   ];

@@ -15,6 +15,8 @@ import {
   tokensOwnedByAddressRequestParams,
   TokensOwnedByAddressResponse,
   EventLogResponse,
+  ContractSourceCodeResponse,
+  TokenBalanceResponse,
 } from '../rpc/models/cronos.models';
 import {
   ICronosChainIndexAPI,
@@ -151,9 +153,48 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
     });
 
     if (txListResponse.status !== 200) {
-      throw new Error('Could not fetch token owned by user address from Cronos Chain Index API.');
+      throw new Error('Could not fetch from Cronos Chain Index API.');
     }
     return txListResponse.data;
+  }
+
+  async getTokenBalanceByAddress(token: string, address: string) {
+    const requestParams = {
+      module: 'account',
+      action: 'tokenbalance',
+      contractaddress: token,
+      address,
+    };
+
+    const response: AxiosResponse<TokenBalanceResponse> = await axios({
+      baseURL: this.cronosExplorerAPIBaseURL,
+      url: '/api',
+      params: requestParams,
+    });
+
+    if (response.status !== 200) {
+      throw new Error('Could not fetch from Cronos Chain Index API.');
+    }
+    return response.data;
+  }
+
+  async getContractSourceCodeByAddress(address: string) {
+    const requestParams = {
+      module: 'contract',
+      action: 'getsourcecode',
+      address,
+    };
+
+    const response: AxiosResponse<ContractSourceCodeResponse> = await axios({
+      baseURL: this.cronosExplorerAPIBaseURL,
+      url: '/api',
+      params: requestParams,
+    });
+
+    if (response.status !== 200) {
+      throw new Error('Could not fetch from Cronos Chain Index API.');
+    }
+    return response.data;
   }
 
   static getTokenIconUrlBySymbol(symbol: string): string {
