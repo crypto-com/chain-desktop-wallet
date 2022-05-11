@@ -196,6 +196,7 @@ class WalletService {
             data.hasBeenEncrypted,
             data.walletType,
             data.addressIndex,
+            data.derivationPathStandard,
           ),
       );
   }
@@ -537,8 +538,8 @@ class WalletService {
       await axios.head(nodeUrl);
       return true;
     } catch (error) {
-      if (error && error.response) {
-        const { status } = error.response;
+      if (error && (error as unknown as any).response) {
+        const { status } = (error as unknown as any).response;
         return !(status >= 400 && status < 500);
       }
     }

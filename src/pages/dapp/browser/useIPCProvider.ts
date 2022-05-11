@@ -3,6 +3,7 @@ import { TransactionConfig } from 'web3-eth';
 import { useRecoilValue } from 'recoil';
 import Web3 from 'web3';
 import { ethers } from 'ethers';
+import BigNumber from 'bignumber.js';
 import { TransactionPrepareService } from '../../../service/TransactionPrepareService';
 import { walletService } from '../../../service/WalletService';
 import { ChainConfig } from './config';
@@ -18,32 +19,35 @@ import { TransactionDataParser } from './TransactionDataParser';
 import { ErrorHandler, WebView } from './types';
 import { useRefCallback } from './useRefCallback';
 
+export type ConfirmTransactionSuccessCallback = (info: { decryptedPhrase: string, gasPrice: BigNumber, gasLimit: BigNumber, signature: string }) => void
+
+
 interface IUseIPCProviderProps {
   webview: WebView | null;
   onRequestAddress: (onSuccess: (address: string) => void, onError: ErrorHandler) => void;
   onRequestTokenApproval: (
     event: DappBrowserIPC.TokenApprovalEvent,
-    onSuccess: (passphrase: string) => void,
+    onSuccess: ConfirmTransactionSuccessCallback,
     onError: ErrorHandler,
   ) => void;
   onRequestSendTransaction: (
     event: DappBrowserIPC.SendTransactionEvent,
-    onSuccess: (passphrase: string) => void,
+    onSuccess: ConfirmTransactionSuccessCallback,
     onError: ErrorHandler,
   ) => Promise<void>;
   onRequestSignMessage: (
     event: DappBrowserIPC.SignMessageEvent,
-    onSuccess: (passphrase: string) => void,
+    onSuccess: ConfirmTransactionSuccessCallback,
     onError: ErrorHandler,
   ) => Promise<void>;
   onRequestSignPersonalMessage: (
     event: DappBrowserIPC.SignPersonalMessageEvent,
-    onSuccess: (passphrase: string) => void,
+    onSuccess: ConfirmTransactionSuccessCallback,
     onError: ErrorHandler,
   ) => Promise<void>;
   onRequestSignTypedMessage: (
     event: DappBrowserIPC.SignTypedMessageEvent,
-    onSuccess: (passphrase: string) => void,
+    onSuccess: ConfirmTransactionSuccessCallback,
     onError: ErrorHandler,
   ) => Promise<void>;
   onRequestEcRecover: (
@@ -136,7 +140,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   });
 
   const handleTokenApproval = useRefCallback(
-    async (event: DappBrowserIPC.TokenApprovalEvent, passphrase: string) => {
+    async (event: DappBrowserIPC.TokenApprovalEvent, passphrase: string, _gasPrice: BigNumber, _gasLimit: BigNumber) => {
       const prepareTXConfig: TransactionConfig = {
         from: event.object.from,
         to: event.object.to,
@@ -157,8 +161,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         from: event.object.from,
         contractAddress: event.object.to,
         data,
-        gasLimit: ethers.utils.hexValue(event.object.gas),
-        gasPrice: event.object.gasPrice,
+        gasLimit: `0x${_gasLimit.toString(16)}`,
+        gasPrice: `0x${_gasPrice.toString(16)}`,
         nonce: prepareTxInfo.nonce,
       };
       try {
@@ -198,7 +202,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   };
 
   const handleSendTransaction = useRefCallback(
-    async (event: DappBrowserIPC.SendTransactionEvent, passphrase: string) => {
+    async (event: DappBrowserIPC.SendTransactionEvent, passphrase: string, _gasPrice: BigNumber, _gasLimit: BigNumber) => {
       const prepareTXConfig: TransactionConfig = {
         from: event.object.from,
         to: event.object.to,
@@ -213,8 +217,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         from: event.object.from,
         contractAddress: event.object.to,
         data: event.object.data,
-        gasLimit: ethers.utils.hexValue(event.object.gas),
-        gasPrice: event.object.gasPrice,
+        gasLimit: `0x${_gasLimit.toString(16)}`,
+        gasPrice: `0x${_gasPrice.toString(16)}`,
         value: event.object.value,
         nonce: prepareTxInfo.nonce,
       };
@@ -316,8 +320,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             };
             props.onRequestTokenApproval(
               approvalEvent,
-              passphrase => {
-                handleTokenApproval.current(approvalEvent, passphrase);
+              info => {
+                handleTokenApproval.current(approvalEvent, info.decryptedPhrase, info.gasPrice, info.gasLimit);
               },
               reason => {
                 sendError(event.id, reason);
@@ -326,8 +330,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           } else {
             props.onRequestSendTransaction(
               event,
-              passphrase => {
-                handleSendTransaction.current(event, passphrase);
+              info => {
+                handleSendTransaction.current(event, info.decryptedPhrase, info.gasPrice, info.gasLimit);
               },
               reason => {
                 sendError(event.id, reason);
@@ -351,8 +355,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'signPersonalMessage':
           props.onRequestSignPersonalMessage(
             event,
-            passphrase => {
-              handleSignMessage.current(event.id, event.object.data, passphrase);
+            info => {
+              handleSignMessage.current(event.id, event.object.data, info.decryptedPhrase);
             },
             reason => {
               sendError(event.id, reason);
@@ -362,8 +366,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'signTypedMessage':
           props.onRequestSignTypedMessage(
             event,
-            passphrase => {
-              handleSignTypedMessage.current(event, passphrase);
+            info => {
+              handleSignTypedMessage.current(event, info.decryptedPhrase);
             },
             reason => {
               sendError(event.id, reason);

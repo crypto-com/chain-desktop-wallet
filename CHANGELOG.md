@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.7.7] - 2022-05-10
+### Additions
+- Gas Fee option customization panel
+- Ledger Wallet creation UX enhancement
+- Support Ledger Live Derivation Path standard
+### Bug fixes
+- Stablize Market Price fetching
 ## [v0.7.6] - 2022-04-20
 ### Bug fixes
 - Measures on preventing potential Phishing Attack on DApp Browser

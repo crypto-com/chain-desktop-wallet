@@ -1,10 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { Button, Checkbox, Form, Input, notification, Select } from 'antd';
+import { setRecoil } from 'recoil-nexus';
+import { Button, Checkbox, Form, Input, InputNumber, notification, Select, Typography } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { useTranslation } from 'react-i18next';
-import { walletIdentifierState, walletTempBackupState, sessionState } from '../../recoil/atom';
+import {
+  walletIdentifierState,
+  walletTempBackupState,
+  sessionState,
+  ledgerIsConnectedState,
+  LedgerConnectedApp,
+} from '../../recoil/atom';
 import './create.less';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
@@ -21,7 +28,9 @@ import { secretStoreService } from '../../storage/SecretStoreService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup';
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import NoticeDisclaimer from '../../components/NoticeDisclaimer/NoticeDisclaimer';
+import { ledgerNotificationWithoutCheck } from '../../components/LedgerNotification/LedgerNotification';
 import IconLedger from '../../svg/IconLedger';
 import { UserAssetType } from '../../models/UserAsset';
 import { ISignerProvider } from '../../service/signers/SignerProvider';
@@ -31,9 +40,12 @@ import {
   LEDGER_WALLET_TYPE,
   NORMAL_WALLET_TYPE,
 } from '../../service/LedgerService';
-import { TransactionUtils } from '../../utils/TransactionUtils';
 import IconCro from '../../svg/IconCro';
 import IconEth from '../../svg/IconEth';
+import ModalPopup from '../../components/ModalPopup/ModalPopup';
+import LedgerAddressIndexBalanceTable from './components/LedgerAddressIndexBalanceTable';
+import { useLedgerStatus } from '../../hooks/useLedgerStatus';
+import { DerivationPathStandard, LedgerSigner } from '../../service/signers/LedgerSigner';
 
 let waitFlag = false;
 const layout = {
@@ -43,6 +55,8 @@ const layout = {
 const tailLayout = {
   // wrapperCol: { offset: 8, span: 16 },
 };
+
+const { Text } = Typography;
 
 function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -309,14 +323,24 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [isCroModalVisible, setIsCroModalVisible] = useState(false);
   const [isEthModalVisible, setIsEthModalVisible] = useState(false);
+  const [isHWModeSelected, setIsHWModeSelected] = useState(false);
+  const [isLedgerModalButtonLoading, setIsLedgerModalButtonLoading] = useState(false);
   // eslint-disable-next-line
   const [isLedgerEthAppConnected, setIsLedgerEthAppConnected] = useState(false);
   const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
+  const [ledgerAssetType, setLedgerAssetType] = useState<UserAssetType>();
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(walletTempBackupState);
   const [hwcheck, setHwcheck] = useState(!props.isWalletSelectFieldDisable);
+  const { isLedgerConnected } = useLedgerStatus({ assetType: ledgerAssetType });
+  const [ledgerAddressList, setLedgerAddressList] = useState<any[]>([]);
+  const [derivationPath, setDerivationPath] = useState({
+    tendermint: "m/44'/394'/0'/0/0",
+    evm: "m/44'/60'/0'/0/0",
+  });
 
   const [t] = useTranslation();
 
@@ -380,11 +404,16 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const onCheckboxChange = e => {
     setHwcheck(!hwcheck);
     props.setIsWalletSelectFieldDisable(!e.target.checked);
-    if (e.target.checked) props.form.setFieldsValue({ walletType: LEDGER_WALLET_TYPE });
+    if (e.target.checked)
+      props.form.setFieldsValue({
+        walletType: LEDGER_WALLET_TYPE,
+        derivationPathStandard: DerivationPathStandard.BIP44,
+      });
     else props.form.setFieldsValue({ walletType: NORMAL_WALLET_TYPE });
   };
 
   const onNetworkChange = (network: string) => {
+    setLedgerAddressList([]);
     props.form.setFieldsValue({ network });
     if (network === DefaultWalletConfigs.CustomDevNet.name) {
       props.setIsCustomConfig(true);
@@ -396,7 +425,13 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   // eslint-disable-next-line
   const onWalletCreateFinishCore = async () => {
     setCreateLoading(true);
-    const { addressIndex, name, walletType, network } = props.form.getFieldsValue();
+    const {
+      addressIndex,
+      name,
+      walletType,
+      network,
+      derivationPathStandard,
+    } = props.form.getFieldsValue();
     if (!name || !walletType || !network) {
       return;
     }
@@ -410,7 +445,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       walletName: name,
       config: selectedNetworkConfig,
       walletType,
-      addressIndex,
+      addressIndex: parseInt(addressIndex, 10),
+      derivationPathStandard,
     };
 
     try {
@@ -420,12 +456,13 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       if (targetWallet.walletType === LEDGER_WALLET_TYPE) {
         const device: ISignerProvider = createLedgerDevice();
         // collect cro address
-
         const croAddress = await device.getAddress(
           targetWallet.addressIndex,
           targetWallet.config.network.addressPrefix,
+          targetWallet.derivationPathStandard,
           false,
         );
+
         const croAsset = createdWallet.assets.filter(
           asset => asset.assetType === UserAssetType.TENDERMINT,
         )[0];
@@ -443,6 +480,16 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             break;
           }
         }
+        const ethAddress = await device.getEthAddress(
+          targetWallet.addressIndex,
+          derivationPathStandard,
+          false,
+        );
+        createdWallet.assets
+          .filter(asset => asset.assetType === UserAssetType.EVM)
+          .forEach(asset => {
+            asset.address = ethAddress;
+          });
 
         const ethAddresss = await device.getEthAddress(targetWallet.addressIndex, false);
         // const evmAsset = createdWallet.assets.filter(
@@ -491,21 +538,82 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     setIsLedgerCroAppConnected(false);
   };
 
+  const checkIsLedgerEthAppConnected = async () => {
+    setCreateLoading(true);
+    try {
+      const device = createLedgerDevice();
+      await device.getEthAddress(0, DerivationPathStandard.BIP44, false);
+      setIsLedgerEthAppConnected(true);
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+      setIsEthModalVisible(false);
+      setIsLedgerModalButtonLoading(false);
+    } catch (e) {
+      let message = `${t('create.notification.ledger.message1')}`;
+      let description = (
+        <>
+          {t('create.notification.ledger.description1')}
+          <br /> -{' '}
+          <a
+            href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t('general.errorModalPopup.ledgerTroubleshoot')}
+          </a>
+        </>
+      );
+      // if (walletType === LEDGER_WALLET_TYPE) {
+      if (detectConditionsError(((e as unknown) as any).toString())) {
+        message = `${t('create.notification.ledger.message2')}`;
+        description = (
+          <>
+            {t('create.notification.ledger.description2')}
+            <br /> -{' '}
+            <a
+              href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t('general.errorModalPopup.ledgerTroubleshoot')}
+            </a>
+          </>
+        );
+      }
+      // }
+      setIsLedgerEthAppConnected(false);
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+      setIsEthModalVisible(false);
+      setCreateLoading(false);
+      setIsLedgerModalButtonLoading(false);
+      notification.error({
+        message,
+        description,
+        placement: 'topRight',
+        duration: 20,
+      });
+    }
+  };
+
   const checkIsLedgerCroAppConnected = async () => {
-    const { walletType, addressIndex } = props.form.getFieldsValue();
+    const { walletType, addressIndex, derivationPathStandard } = props.form.getFieldsValue();
     let hwok = false;
     setCreateLoading(true);
     try {
       const device = createLedgerDevice();
       // check ledger device ok
-      await device.getPubKey(addressIndex, false);
+      await device.getPubKey(parseInt(addressIndex, 10), derivationPathStandard, false);
       setIsLedgerCroAppConnected(true);
 
       await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
       setIsCroModalVisible(false);
-
+      setIsLedgerModalButtonLoading(false);
       hwok = true;
     } catch (e) {
       let message = `${t('create.notification.ledger.message1')}`;
@@ -548,6 +656,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       });
       setIsCroModalVisible(false);
       setCreateLoading(false);
+      setIsLedgerModalButtonLoading(false);
       notification.error({
         message,
         description,
@@ -564,11 +673,62 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     }
   };
 
-  const addressIndexValidator = TransactionUtils.rangeValidator(
-    `0`,
-    `${LedgerWalletMaximum}`,
-    `${t('create.addressIndexValidator.error')} ${LedgerWalletMaximum}`,
-  );
+  useEffect(() => {
+    const fetchAddressList = async () => {
+      const device: ISignerProvider = createLedgerDevice();
+      const standard = props.form.getFieldValue('derivationPathStandard');
+      const network = props.form.getFieldValue('network');
+      switch (ledgerAssetType) {
+        case UserAssetType.EVM:
+          {
+            const ethAddressList = await device.getEthAddressList(0, 10, standard);
+            if (ethAddressList) {
+              const returnList = ethAddressList.map((address, idx) => {
+                return {
+                  index: idx,
+                  publicAddress: address,
+                  derivationPath: LedgerSigner.getDerivationPath(idx, UserAssetType.EVM, standard),
+                  balance: '0',
+                };
+              });
+              setLedgerAddressList(returnList);
+            }
+          }
+          break;
+        case UserAssetType.TENDERMINT:
+          {
+            const addressPrefix =
+              network === DefaultWalletConfigs.TestNetCroeseid4Config.name ? 'tcro' : 'cro';
+            const tendermintAddressList = await device.getAddressList(
+              0,
+              10,
+              addressPrefix,
+              standard,
+            );
+            if (tendermintAddressList) {
+              const returnList = tendermintAddressList.map((address, idx) => {
+                return {
+                  index: idx,
+                  publicAddress: address,
+                  derivationPath: LedgerSigner.getDerivationPath(
+                    idx,
+                    UserAssetType.TENDERMINT,
+                    standard,
+                  ),
+                  balance: '0',
+                };
+              });
+              setLedgerAddressList(returnList);
+            }
+          }
+          break;
+        default:
+      }
+    };
+    if (isLedgerConnected) {
+      fetchAddressList();
+    }
+  }, [isLedgerConnected]);
 
   return (
     <Form
@@ -597,11 +757,75 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       >
         <Input maxLength={36} placeholder={t('create.formCreate.name.label')} />
       </Form.Item>
-      <Checkbox onChange={onCheckboxChange} checked={hwcheck}>
-        {t('create.formCreate.checkbox1')}
-      </Checkbox>
+      <Form.Item>
+        <Checkbox onChange={onCheckboxChange} checked={hwcheck}>
+          {t('create.formCreate.checkbox1')}
+        </Checkbox>
+      </Form.Item>
+      <>
+        <ModalPopup
+          isModalVisible={isHWModeSelected}
+          handleCancel={() => setIsHWModeSelected(false)}
+          handleOk={() => setIsHWModeSelected(false)}
+          className=""
+          footer={[]}
+          okText="Confirm"
+          width={1200}
+          style={{ zIndex: 100 }}
+        >
+          <div className="title">{t('create.LedgerAddressIndexBalanceTable.title')}</div>
+          <div className="description">
+            {t('create.LedgerAddressIndexBalanceTable.description')}
+          </div>
+          <div className="item">
+            <Select
+              style={{ width: '180px', textAlign: 'center' }}
+              placeholder={`${t('general.select')} ${t(
+                'create.LedgerAddressIndexBalanceTable.assetType.label',
+              )}`}
+              disabled={props.isWalletSelectFieldDisable}
+              defaultActiveFirstOption
+              onSelect={e => {
+                setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
+                setLedgerAddressList([]);
+                switch (e) {
+                  case UserAssetType.TENDERMINT:
+                    setLedgerAssetType(UserAssetType.TENDERMINT);
+                    ledgerNotificationWithoutCheck(UserAssetType.TENDERMINT);
+                    break;
+                  case UserAssetType.EVM:
+                    setLedgerAssetType(UserAssetType.EVM);
+                    ledgerNotificationWithoutCheck(UserAssetType.EVM);
+                    break;
+                  default:
+                }
+              }}
+            >
+              <Select.Option key="tendermint" value={UserAssetType.TENDERMINT}>
+                TENDERMINT
+              </Select.Option>
+              <Select.Option key="evm" value={UserAssetType.EVM}>
+                EVM
+              </Select.Option>
+            </Select>
+            {ledgerAssetType ? (
+              <LedgerAddressIndexBalanceTable
+                addressIndexBalanceList={ledgerAddressList}
+                setAddressIndexBalanceList={setLedgerAddressList}
+                setisHWModeSelected={setIsHWModeSelected}
+                assetType={ledgerAssetType}
+                form={props.form}
+                setDerivationPath={setDerivationPath}
+              />
+            ) : (
+              <></>
+            )}
+          </div>
+        </ModalPopup>
+      </>
       <div hidden={props.isWalletSelectFieldDisable}>
-        <Form.Item name="walletType" label={t('create.formCreate.walletType.label')}>
+        {/* wallet type and ledger specific code starts here */}
+        <Form.Item name="walletType" label={t('create.formCreate.walletType.label')} hidden>
           <Select
             placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
             disabled={props.isWalletSelectFieldDisable}
@@ -615,17 +839,103 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           </Select>
         </Form.Item>
         <Form.Item
+          name="derivationPathStandard"
+          label={t('create.formCreate.derivationPathStandard.label')}
+        >
+          <Select
+            placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
+            disabled={props.isWalletSelectFieldDisable}
+            onChange={() => {
+              setLedgerAddressList([]);
+              setLedgerAssetType(undefined);
+              setDerivationPath({
+                tendermint: LedgerSigner.getDerivationPath(
+                  props.form.getFieldValue('addressIndex'),
+                  UserAssetType.TENDERMINT,
+                  props.form.getFieldValue('derivationPathStandard'),
+                ),
+                evm: LedgerSigner.getDerivationPath(
+                  props.form.getFieldValue('addressIndex'),
+                  UserAssetType.EVM,
+                  props.form.getFieldValue('derivationPathStandard'),
+                ),
+              });
+            }}
+          >
+            <Select.Option key="bip-44" value={DerivationPathStandard.BIP44}>
+              BIP-44
+            </Select.Option>
+            <Select.Option key="ledger-live" value={DerivationPathStandard.LEDGER_LIVE}>
+              Ledger Live
+            </Select.Option>
+          </Select>
+        </Form.Item>
+        <Button
+          type="ghost"
+          size="small"
+          onClick={() => {
+            setIsHWModeSelected(true);
+          }}
+          style={{
+            border: '0',
+            boxShadow: 'none',
+          }}
+        >
+          {t('create.formCreate.showLedger.label')}
+        </Button>
+        <Form.Item name="derivationPath" label={t('create.formCreate.derivationPath.label')}>
+          <div
+            style={{
+              display: 'flex',
+            }}
+            className="derivation-path-container"
+          >
+            <div>
+              TENDERMINT <br />
+              <Text type="secondary">{derivationPath.tendermint}</Text>
+            </div>
+            <div>
+              EVM <br />
+              <Text type="secondary">{derivationPath.evm}</Text>
+            </div>
+          </div>
+        </Form.Item>
+        <Form.Item
           name="addressIndex"
-          label={t('create.formCreate.addressIndex.label')}
+          label={t('create.formCreate.index.label')}
           rules={[
             {
               required: true,
-              message: `${t('create.formCreate.addressIndex.label')} ${t('general.required')}`,
+              message: `${t('create.formCreate.index.label')} ${t('general.required')}`,
             },
-            addressIndexValidator,
+            {
+              pattern: /^\d+$/,
+              message: `${t('create.formCreate.index.label')} ${t(
+                'create.formCreate.index.error',
+              )}`,
+            },
           ]}
         >
-          <Input placeholder="0" />
+          <InputNumber
+            value={props.form.getFieldValue('addressIndex')}
+            type="number"
+            onChange={() => {
+              setDerivationPath({
+                tendermint: LedgerSigner.getDerivationPath(
+                  props.form.getFieldValue('addressIndex'),
+                  UserAssetType.TENDERMINT,
+                  props.form.getFieldValue('derivationPathStandard'),
+                ),
+                evm: LedgerSigner.getDerivationPath(
+                  props.form.getFieldValue('addressIndex'),
+                  UserAssetType.EVM,
+                  props.form.getFieldValue('derivationPathStandard'),
+                ),
+              });
+            }}
+            min={0}
+            max={LedgerWalletMaximum}
+          />
         </Form.Item>
         <Form.Item>
           <NoticeDisclaimer>{t('create.formCreate.addressIndex.disclaimer')}</NoticeDisclaimer>
@@ -722,10 +1032,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 size="small"
                 className="btn-restart"
                 onClick={() => {
-                  checkIsLedgerCroAppConnected();
-                  // setIsLedgerModalButtonLoading(true);
+                  setIsLedgerModalButtonLoading(true);
+                  setTimeout(() => {
+                    checkIsLedgerCroAppConnected();
+                  }, 500);
                 }}
-                // loading={isLedgerModalButtonLoading}
+                loading={isLedgerModalButtonLoading}
                 // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
@@ -768,10 +1080,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 onClick={() => {
                   handleEthOk();
                   // setIsEthModalVisible(false);
-                  // checkIsLedgerEthAppConnected();
-                  // setIsLedgerModalButtonLoading(true);
+                  setIsLedgerModalButtonLoading(true);
+                  setTimeout(() => {
+                    checkIsLedgerEthAppConnected();
+                  }, 500);
                 }}
-                // loading={isLedgerModalButtonLoading}
+                loading={isLedgerModalButtonLoading}
                 // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}

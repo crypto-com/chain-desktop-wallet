@@ -1,7 +1,7 @@
 import * as Zemu from '@zondax/zemu';
 import CosmosApp from 'ledger-cosmos-js';
 import * as path from 'path';
-import { LedgerSigner } from '../../src/service/signers/LedgerSigner';
+import { DerivationPathStandard, LedgerSigner } from '../../src/service/signers/LedgerSigner';
 import { ISignerProvider } from '../../src/service/signers/SignerProvider';
 import { LedgerTransactionSigner } from '../../src/service/signers/LedgerTransactionSigner';
 import { CustomDevNet } from '../../src/config/StaticConfig';
@@ -190,16 +190,22 @@ export class LedgerWalletSignerProviderZemu implements ISignerProvider {
     this.provider = new LedgerSignerZemu();
   }
 
-  public async getPubKey(index: number): Promise<Bytes> {
-    const result = await this.provider.enable(index, 'cro', false); // dummy value
+  public async getPubKey(index: number, derivationPathStandard: DerivationPathStandard): Promise<Bytes> {
+    const result = await this.provider.enable(index, 'cro', derivationPathStandard, false); // dummy value
     await this.provider.closeTransport();
     return result[1];
   }
 
-  public async getAddress(index: number, addressPrefix: string): Promise<string> {
-    const result = await this.provider.enable(index, addressPrefix, false);
+  public async getAddress(index: number, addressPrefix: string, derivationPathStandard: DerivationPathStandard): Promise<string> {
+    const result = await this.provider.enable(index, addressPrefix, derivationPathStandard, false);
     await this.provider.closeTransport();
     return result[0];
+  }
+
+  public async getAddressList(startIndex: number, gap: number, addressPrefix: string, derivationPathStandard: DerivationPathStandard): Promise<string[]> {
+    const result = await this.provider.getAddressList(startIndex, gap, addressPrefix, derivationPathStandard);
+    await this.provider.closeTransport();
+    return result;
   }
 
   public async sign(message: Bytes): Promise<Bytes> {
@@ -227,6 +233,10 @@ export class LedgerWalletSignerProviderZemu implements ISignerProvider {
     return '';
   }
 
+  public async getEthAddressList(_gap: number): Promise<string[]> {
+    return [];
+  }
+
   async signPersonalMessage(_index: number, _message: string): Promise<string> {
     return '';
   }
@@ -242,7 +252,7 @@ async function main() {
   await Zemu.default.sleep(SLEEP_MS);
   const walletConfig = CustomDevNet;
   walletConfig.nodeUrl = 'http://127.0.0.1';
-  const signer = new LedgerTransactionSigner(walletConfig, signerProvider, 0);
+  const signer = new LedgerTransactionSigner(walletConfig, signerProvider, 0, DerivationPathStandard.BIP44);
   console.log(signer);
 
   const phrase = '';
@@ -264,6 +274,8 @@ async function main() {
       toAddress: 'cro1sza72v70tm9l38h6uxhwgra5eg33xd4jr3ujl7',
     },
     phrase,
+    "10000",
+    300000
   );
   console.log('broadcast transaction');
   console.log(signedTxHex);
