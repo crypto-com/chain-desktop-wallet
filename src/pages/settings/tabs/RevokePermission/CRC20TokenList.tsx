@@ -61,7 +61,7 @@ function CRC20TokenList({
     const sortedTokens = unsortedTokens
       .filter(token => token !== undefined)
       .filter(hasBalanceOrApprovals)
-      .sort((a, b) => a.balance.localeCompare(b.balance));
+      .sort((a, b) => b.balance.localeCompare(a.balance));
 
     const approvals = sortedTokens.reduce<TokenDataWithApproval[]>((acc, token) => {
       const tokensWithApprovalData: TokenDataWithApproval[] = [];
@@ -179,12 +179,16 @@ function CRC20TokenList({
     {
       title: '',
       render: (data: TokenDataWithApproval) => {
-        return <Button>revoke</Button>;
+        return <a
+          onClick={async () => { }}
+        >
+          Revoke
+        </a>
       },
     },
   ];
 
-  return <Table columns={columns} dataSource={flatternedApprovalledData} pagination={false} />;
+  return <Table columns={columns} size="middle" dataSource={flatternedApprovalledData} pagination={false} />;
 }
 
 export default CRC20TokenList;

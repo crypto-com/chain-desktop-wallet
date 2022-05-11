@@ -1,37 +1,22 @@
 import { ethers } from 'ethers';
-import numeral from 'numeral';
 import * as React from 'react';
-import { useState, useEffect, useMemo } from 'react';
-import { getRecoil } from 'recoil-nexus';
-import { SUPPORTED_CURRENCY } from '../../../../config/StaticConfig';
-import { getAssetAmountInFiat } from '../../../../models/UserAsset';
-import { allMarketState, sessionState } from '../../../../recoil/atom';
+import { useState, useEffect, useCallback } from 'react';
+import { useMarketPrice } from '../../../../hooks/useMarketPrice';
 import { CronosClient } from '../../../../service/cronos/CronosClient';
 import { getUINormalScaleAmount } from '../../../../utils/NumberUtils';
 import { TokenDataWithApproval } from './types';
 
 const SpenderMapping = new Map<string, string>();
 
+const isUnlimited = (amount: ethers.BigNumber) => {
+  return amount.gte(ethers.BigNumber.from('0xffffffffffffffffffffffffffffffff'))
+}
+
 export const TokenBalance = (props: { data: TokenDataWithApproval }) => {
   const { data } = props;
 
-  const allMarketData = getRecoil(allMarketState);
-  const currentSession = getRecoil(sessionState);
-
-  const assetMarketData = allMarketData.get(`${data.token.symbol}-${currentSession.currency}`);
-
   const amount = getUINormalScaleAmount(data.token.balance, data.token.decimals);
-  const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
-
-  const readablePrice = useMemo(() => {
-    let price = '--';
-
-    if (assetMarketData) {
-      price = numeral(getAssetAmountInFiat(amount, assetMarketData)).format('0,0.00');
-    }
-
-    return `${localFiatSymbol}${price}`;
-  }, [amount, assetMarketData, localFiatSymbol]);
+  const { readablePrice } = useMarketPrice({ symbol: data.token.symbol, amount })
 
   return (
     <div
@@ -40,10 +25,10 @@ export const TokenBalance = (props: { data: TokenDataWithApproval }) => {
         flexDirection: 'column',
       }}
     >
-      <div>{data.token.symbol}</div>
+      <a target='__blank' href={`https://cronoscan.com/token/${data.token.contract.address}`}>{data.token.symbol}</a>
       <div>
-        <span>{amount}</span>
-        <span>{readablePrice}</span>
+        <span>{`${amount} ${data.token.symbol}  `}</span>
+        <span style={{ color: '#A0A9BE' }}>({readablePrice})</span>
       </div>
     </div>
   );
@@ -53,43 +38,49 @@ export const Amount = (props: { data: TokenDataWithApproval }) => {
   const { data } = props;
   return (
     <div>
-      {data.approval.amount.gte(ethers.BigNumber.from('0xffffffffffffffffffffffffffffffff'))
-        ? `Unlimited ${data.token.symbol}`
-        : getUINormalScaleAmount(data.approval.amount.toString(), data.token.decimals)}
+      {
+        isUnlimited(data.approval.amount) ? `Unlimited ${data.token.symbol}`
+          : `${getUINormalScaleAmount(data.approval.amount.toString(), data.token.decimals)} ${data.token.symbol}`}
     </div>
   );
 };
 
 export const RiskExposure = (props: { data: TokenDataWithApproval }) => {
   const { data } = props;
-  return <div>{data.approval.riskExposure}</div>;
+  const amount = getUINormalScaleAmount(data.approval.amount.toString(), data.token.decimals);
+  const balanceAmount = getUINormalScaleAmount(data.token.balance, data.token.decimals);
+  const { readablePrice: totalBalancePrice } = useMarketPrice({ symbol: data.token.symbol, amount: balanceAmount })
+  const { readablePrice } = useMarketPrice({ symbol: data.token.symbol, amount })
+
+  return <div>{isUnlimited(data.approval.amount) ? totalBalancePrice : readablePrice}</div>;
 };
 
 export const TokenSpender = (props: { nodeURL: string; indexingURL: string; spender: string }) => {
-  const [name, setName] = useState('unknown');
   const { spender } = props;
+  const [name, setName] = useState(spender);
+
+  const fetch = useCallback(async () => {
+    if (SpenderMapping.has(spender)) {
+      setName(SpenderMapping.get(spender) ?? spender);
+      return;
+    }
+
+    const cronosClient = new CronosClient(props.nodeURL, props.indexingURL);
+    const response = await cronosClient.getContractSourceCodeByAddress(props.spender);
+
+    let contractName = spender;
+    if (response.result.length > 0) {
+      contractName = response.result[0].ContractName;
+      SpenderMapping.set(spender, contractName);
+    }
+
+    setName(contractName);
+  }, [props.nodeURL, props.indexingURL, props.spender]);
+
 
   useEffect(() => {
-    const fetch = async () => {
-      if (SpenderMapping.has(spender)) {
-        setName(SpenderMapping.get(spender) ?? '');
-        return;
-      }
-
-      const cronosClient = new CronosClient(props.nodeURL, props.indexingURL);
-      const response = await cronosClient.getContractSourceCodeByAddress(props.spender);
-
-      let contractName = 'unknown';
-      if (response.result.length > 0) {
-        contractName = response.result[0].ContractName;
-        SpenderMapping.set(spender, contractName);
-      }
-
-      setName(contractName);
-    };
-
     fetch();
-  }, [props.spender, props.indexingURL, props.nodeURL]);
+  }, [fetch]);
 
-  return <div>{name}</div>;
+  return <a href={`https://cronoscan.com/address/${spender}`} target="__blank">{name}</a>;
 };
