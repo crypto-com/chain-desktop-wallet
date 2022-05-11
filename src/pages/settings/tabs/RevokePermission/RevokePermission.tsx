@@ -1,21 +1,19 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
-import { ethers } from 'ethers';
+import { useCallback, useEffect, useState } from 'react';
 import { hexZeroPad, Interface } from 'ethers/lib/utils';
-import { Filter, Log } from '@ethersproject/abstract-provider';
+import { Log } from '@ethersproject/abstract-provider';
+import { Button } from 'antd';
 import { useCronosEvmAsset } from '../../../../hooks/useCronosEvmAsset';
 import CRC20TokenContract from '../../../../service/signers/abi/TokenContractABI.json';
-import { getLogsFromProvider } from './utils';
 import { CronosClient } from '../../../../service/cronos/CronosClient';
 import CRC20TokenList from './CRC20TokenList';
+import ErrorXmark from '../../../../components/ErrorXmark/ErrorXmark';
 
 const RevokePermission = () => {
   const cronosAsset = useCronosEvmAsset();
-  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<Error | null>(null);
   const [transferEvents, setTransferEvents] = useState<Log[]>();
   const [approvalEvents, setApprovalEvents] = useState<Log[]>();
-  // const [approvalForAllEvents, setApprovalForAllEvents] = useState<Log[]>()
 
   const fetchTxAndApprovals = async (
     nodeURL: string,
@@ -23,53 +21,41 @@ const RevokePermission = () => {
     chainID: string,
     inputAddress: string,
   ) => {
-    setLoading(true);
+    setError(null);
 
-    const provider = new ethers.providers.JsonRpcProvider(nodeURL);
+    try {
+      const tokenInterface = new Interface(CRC20TokenContract.abi);
 
-    // const latestBlockNumber = await provider.getBlockNumber();
-    const tokenInterface = new Interface(CRC20TokenContract.abi);
+      const cronosClient = new CronosClient(nodeURL, indexingURL);
 
-    const cronosClient = new CronosClient(nodeURL, indexingURL);
-
-    const foundTransferEvents = await cronosClient.getEventLogByAddress({
-      fromBlock: 0,
-      toBlock: 'latest',
-      topics: {
-        topic0: tokenInterface.getEventTopic('Transfer'),
-        topic1: hexZeroPad(inputAddress, 32).toLowerCase(),
-        topic0_1_opr: 'and',
-      },
-    });
-    setTransferEvents(foundTransferEvents);
-
-    const foundApprovalEvents = await cronosClient.getEventLogByAddress({
-      fromBlock: 0,
-      toBlock: 'latest',
-      topics: {
-        topic0: tokenInterface.getEventTopic('Approval'),
-        topic1: hexZeroPad(inputAddress, 32).toLowerCase(),
-        topic0_1_opr: 'and',
-      },
-    });
-    setApprovalEvents(foundApprovalEvents);
-
-    // const foundApprovalForAllEvents = await cronosClient.getEventLogByAddress({
-    //   fromBlock: 0,
-    //   toBlock: 'latest',
-    //   topics: {
-    //     'topic0': tokenInterface.getEventTopic('ApprovalForAll'),
-    //     'topic0_1_opr': 'and',
-    //     'topic1': hexZeroPad(inputAddress, 32).toLowerCase()
-    //   }
-    // })
-    // setApprovalForAllEvents(foundApprovalForAllEvents)
-    // console.log('ApprovalForAll events', foundApprovalForAllEvents)
-
-    setLoading(false);
+      const [foundTransferEvents, foundApprovalEvents] = await Promise.all([
+        cronosClient.getEventLogByAddress({
+          fromBlock: 0,
+          toBlock: 'latest',
+          topics: {
+            topic0: tokenInterface.getEventTopic('Transfer'),
+            topic1: hexZeroPad(inputAddress, 32).toLowerCase(),
+            topic0_1_opr: 'and',
+          },
+        }),
+        cronosClient.getEventLogByAddress({
+          fromBlock: 0,
+          toBlock: 'latest',
+          topics: {
+            topic0: tokenInterface.getEventTopic('Approval'),
+            topic1: hexZeroPad(inputAddress, 32).toLowerCase(),
+            topic0_1_opr: 'and',
+          },
+        }),
+      ]);
+      setTransferEvents(foundTransferEvents);
+      setApprovalEvents(foundApprovalEvents);
+    } catch (e) {
+      setError((e as unknown) as any);
+    }
   };
 
-  useEffect(() => {
+  const fetch = useCallback(() => {
     if (!cronosAsset?.config?.nodeUrl || !cronosAsset.address || !cronosAsset.config.indexingUrl) {
       return;
     }
@@ -81,6 +67,38 @@ const RevokePermission = () => {
       cronosAsset.address,
     );
   }, [cronosAsset]);
+
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
+
+  if (error) {
+    return (
+      <div
+        className="site-layout-background settings-content"
+        style={{
+          padding: '10px',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <ErrorXmark />
+          <div>{error.toString()}</div>
+          <div>
+            <Button type="primary" onClick={() => fetch()}>
+              Retry
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (
     !cronosAsset ||
@@ -100,6 +118,9 @@ const RevokePermission = () => {
       }}
     >
       <CRC20TokenList
+        onError={e => {
+          setError(e);
+        }}
         filterUnverifiedTokens={false}
         filterZeroBalances={false}
         transferEvents={transferEvents}

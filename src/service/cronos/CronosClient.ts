@@ -220,6 +220,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
     const response: AxiosResponse<EventLogResponse> = await axios({
       baseURL: this.cronosExplorerAPIBaseURL,
+      url: '/api',
       params: requestParams,
     });
 

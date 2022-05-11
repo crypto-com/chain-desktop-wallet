@@ -1,8 +1,8 @@
 import { Contract, ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import { Log } from '@ethersproject/abstract-provider';
-import React, { useEffect, useState } from 'react';
-import { Button, Table } from 'antd';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Button, Spin, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import CRC20TokenContract from '../../../../service/signers/abi/TokenContractABI.json';
 import { getCRC20TokenData, toFloat, parsePadZero32Value } from './utils';
@@ -17,6 +17,7 @@ interface Props {
   inputAddress?: string;
   nodeURL: string;
   indexingURL: string;
+  onError: (error: Error) => void;
 }
 
 function CRC20TokenList({
@@ -27,6 +28,7 @@ function CRC20TokenList({
   inputAddress,
   nodeURL,
   indexingURL,
+  onError,
 }: Props) {
   const [tokens, setTokens] = useState<CRC20TokenData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -34,37 +36,7 @@ function CRC20TokenList({
     TokenDataWithApproval[]
   >([]);
 
-  useEffect(() => {
-    loadData();
-  }, [inputAddress]);
-
-  const getContracts = (events: Log[]) => {
-    const provider = new ethers.providers.JsonRpcProvider(nodeURL);
-
-    const tokenContracts = events
-      .filter((event, i) => i === events.findIndex(other => event.address === other.address))
-      .map(event => new Contract(getAddress(event.address), CRC20TokenContract.abi, provider));
-
-    return tokenContracts;
-  };
-
-  const filterDuplicatedApprovalsEvents = (contract: Contract) => {
-    const tokenApprovals = approvalEvents.filter(
-      approval => approval.address.toLowerCase() === contract.address.toLowerCase(),
-    );
-    const map = new Map<string, Log>();
-    tokenApprovals.forEach(approval => {
-      if (!map.has(approval.topics[2])) {
-        map.set(approval.topics[2], approval);
-      }
-    });
-    return Array.from(map.values());
-  };
-
-  const hasBalanceOrApprovals = (token: CRC20TokenData) =>
-    token.approvals.length > 0 || toFloat(Number(token.balance), token.decimals) !== '0.000';
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!inputAddress) return;
 
     setLoading(true);
@@ -122,10 +94,58 @@ function CRC20TokenList({
 
     setFlatternedApprovalledData(approvals);
     setLoading(false);
+  }, [inputAddress, approvalEvents, transferEvents]);
+
+  const fetch = useCallback(async () => {
+    try {
+      await loadData();
+    } catch (error) {
+      onError((error as unknown) as any);
+    }
+  }, [loadData]);
+
+  useEffect(() => {
+    fetch();
+  }, [inputAddress, fetch]);
+
+  const getContracts = (events: Log[]) => {
+    const provider = new ethers.providers.JsonRpcProvider(nodeURL);
+
+    const tokenContracts = events
+      .filter((event, i) => i === events.findIndex(other => event.address === other.address))
+      .map(event => new Contract(getAddress(event.address), CRC20TokenContract.abi, provider));
+
+    return tokenContracts;
   };
 
+  const filterDuplicatedApprovalsEvents = (contract: Contract) => {
+    const tokenApprovals = approvalEvents.filter(
+      approval => approval.address.toLowerCase() === contract.address.toLowerCase(),
+    );
+    const map = new Map<string, Log>();
+    tokenApprovals.forEach(approval => {
+      if (!map.has(approval.topics[2])) {
+        map.set(approval.topics[2], approval);
+      }
+    });
+    return Array.from(map.values());
+  };
+
+  const hasBalanceOrApprovals = (token: CRC20TokenData) =>
+    token.approvals.length > 0 || toFloat(Number(token.balance), token.decimals) !== '0.000';
+
   if (loading) {
-    return <div>Loading</div>;
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Spin />
+      </div>
+    );
   }
 
   if (flatternedApprovalledData.length === 0) {
