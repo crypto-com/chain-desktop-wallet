@@ -87,6 +87,21 @@ export interface WithdrawStakingRewardRequest {
   walletType: string; // normal, ledger
 }
 
+/**
+ * Common Wallet authentication parameters for a Crypto.org mainnet transaction
+ */
+export interface BaseTxAuth {
+  decryptedPhrase: string;
+  walletType: string; // normal, ledger
+}
+
+/**
+ * Withdraw all staking rewards from multiple delegations in a single transaction
+ */
+export interface WithdrawAllStakingRewardRequest extends BaseTxAuth {
+  validatorAddressList: string[];
+}
+
 //
 export interface BridgeTransferRequest {
   bridgeTransferDirection: BridgeTransferDirection;

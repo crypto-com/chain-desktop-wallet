@@ -58,6 +58,7 @@ import { StorageService } from '../storage/StorageService';
 import { TransactionPrepareService } from './TransactionPrepareService';
 import { TransactionHistoryService } from './TransactionHistoryService';
 import { TransactionSenderService } from './TransactionSenderService';
+import { WithdrawAllStakingRewardRequest } from './TransactionRequestModels';
 
 class WalletService {
   public readonly BROADCAST_TIMEOUT_CODE = -32603;
@@ -111,6 +112,12 @@ class WalletService {
     rewardWithdrawRequest: WithdrawStakingRewardRequest,
   ): Promise<BroadCastResult> {
     return await this.txSenderManager.sendStakingRewardWithdrawalTx(rewardWithdrawRequest);
+  }
+
+  public async sendStakingWithdrawAllRewardsTx(
+    rewardWithdrawAllRequest: WithdrawAllStakingRewardRequest,
+  ): Promise<BroadCastResult> {
+    return await this.txSenderManager.sendStakingWithdrawAllRewardsTx(rewardWithdrawAllRequest);
   }
 
   public async sendVote(voteRequest: VoteRequest): Promise<BroadCastResult> {
