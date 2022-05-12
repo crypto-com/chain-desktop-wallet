@@ -18,6 +18,7 @@ import { UserAsset, UserAssetType } from '../../models/UserAsset';
 import { walletService } from '../WalletService';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../LedgerService';
 import { CronosClient } from '../cronos/CronosClient';
+import { DerivationPathStandard } from './LedgerSigner';
 
 const DEFAULT_CHAIN_ID = 338;
 
@@ -69,9 +70,11 @@ class EvmTransactionSigner implements ITransactionSigner {
       const device = createLedgerDevice();
 
       const walletAddressIndex = currentSession.wallet.addressIndex;
+      const walletDerivationPathStandard = currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
 
       const signedTx = await device.signEthTx(
         walletAddressIndex,
+        walletDerivationPathStandard,
         Number(asset?.config?.chainId), // chainid
         transaction.nonce,
         transaction.gasLimit,
@@ -127,8 +130,9 @@ class EvmTransactionSigner implements ITransactionSigner {
       const device = createLedgerDevice();
 
       const walletAddressIndex = currentSession.wallet.addressIndex;
+      const walletDerivationPathStandard = currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
 
-      return await device.signPersonalMessage(walletAddressIndex, message);
+      return await device.signPersonalMessage(walletAddressIndex, walletDerivationPathStandard, message);
     }
 
     const wallet = ethers.Wallet.fromMnemonic(passphrase);
@@ -143,8 +147,9 @@ class EvmTransactionSigner implements ITransactionSigner {
       const device = createLedgerDevice();
 
       const walletAddressIndex = currentSession.wallet.addressIndex;
+      const walletDerivationPathStandard = currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
 
-      return await device.signTypedDataV4(walletAddressIndex, message);
+      return await device.signTypedDataV4(walletAddressIndex, walletDerivationPathStandard, message);
     }
     const wallet = ethers.Wallet.fromMnemonic(passphrase);
     const bufferedKey = Buffer.from(wallet.privateKey.replace(/^(0x)/, ''), 'hex');
