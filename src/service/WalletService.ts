@@ -49,6 +49,7 @@ import {
   UndelegationRequest,
   VoteRequest,
   WithdrawStakingRewardRequest,
+  WithdrawAllStakingRewardRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter } from '../utils/utils';
@@ -58,7 +59,6 @@ import { StorageService } from '../storage/StorageService';
 import { TransactionPrepareService } from './TransactionPrepareService';
 import { TransactionHistoryService } from './TransactionHistoryService';
 import { TransactionSenderService } from './TransactionSenderService';
-import { WithdrawAllStakingRewardRequest } from './TransactionRequestModels';
 
 class WalletService {
   public readonly BROADCAST_TIMEOUT_CODE = -32603;

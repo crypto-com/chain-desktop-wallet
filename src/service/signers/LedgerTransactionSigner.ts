@@ -19,12 +19,12 @@ import {
   NFTMintUnsigned,
   NFTDenomIssueUnsigned,
   BridgeTransactionUnsigned,
+  WithdrawAllStakingRewardsUnsigned,
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
 import { BaseTransactionSigner, ITransactionSigner } from './TransactionSigner';
 import { isNumeric } from '../../utils/utils';
 import { DerivationPathStandard } from './LedgerSigner';
-import { WithdrawAllStakingRewardsUnsigned } from './TransactionSupported';
 
 export class LedgerTransactionSigner extends BaseTransactionSigner implements ITransactionSigner {
   public readonly config: WalletConfig;

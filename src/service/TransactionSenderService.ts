@@ -27,6 +27,7 @@ import {
   VoteRequest,
   NFTTransferRequest,
   WithdrawStakingRewardRequest,
+  WithdrawAllStakingRewardRequest,
   BridgeTransferRequest,
   NFTDenomIssueRequest,
   NFTMintRequest,
@@ -41,7 +42,6 @@ import { getCronosEvmAsset, sleep } from '../utils/utils';
 import { BridgeService } from './bridge/BridgeService';
 import { walletService } from './WalletService';
 import { getCronosTendermintFeeConfig } from './Gas';
-import { WithdrawAllStakingRewardRequest } from './TransactionRequestModels';
 
 export class TransactionSenderService {
   public readonly storageService: StorageService;
