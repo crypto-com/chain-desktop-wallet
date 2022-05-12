@@ -2,12 +2,15 @@ import { Contract, ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import { Log } from '@ethersproject/abstract-provider';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Button, Spin, Table } from 'antd';
+import { Spin, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import CRC20TokenContract from '../../../../service/signers/abi/TokenContractABI.json';
 import { getCRC20TokenData, toFloat, parsePadZero32Value } from './utils';
 import { Amount, RiskExposure, TokenBalance, TokenSpender } from './TableCells';
 import { CRC20TokenData, TokenDataWithApproval } from './types';
+import { useConfirmModal } from '../../../../components/ConfirmModal/useConfirmModal';
+import { usePasswordModal } from '../../../../components/PasswordForm/PasswordFormModal';
 
 interface Props {
   filterUnverifiedTokens: boolean;
@@ -17,6 +20,7 @@ interface Props {
   inputAddress?: string;
   nodeURL: string;
   indexingURL: string;
+  explorerURL: string,
   onError: (error: Error) => void;
 }
 
@@ -28,6 +32,7 @@ function CRC20TokenList({
   inputAddress,
   nodeURL,
   indexingURL,
+  explorerURL,
   onError,
 }: Props) {
   const [tokens, setTokens] = useState<CRC20TokenData[]>([]);
@@ -35,6 +40,9 @@ function CRC20TokenList({
   const [flatternedApprovalledData, setFlatternedApprovalledData] = useState<
     TokenDataWithApproval[]
   >([]);
+
+  const { showWithConfig: showConfirmModal, dismiss: dismissConfirmModal } = useConfirmModal();
+  const { show: showPasswordModal } = usePasswordModal();
 
   const loadData = useCallback(async () => {
     if (!inputAddress) return;
@@ -156,7 +164,7 @@ function CRC20TokenList({
     {
       title: 'Token/Balance',
       key: 'token',
-      render: (data: TokenDataWithApproval) => <TokenBalance data={data} />,
+      render: (data: TokenDataWithApproval) => <TokenBalance data={data} explorerURL={explorerURL} />,
       onCell: (data: TokenDataWithApproval, _) =>
         ({
           rowSpan: data.rowSpan,
@@ -167,7 +175,7 @@ function CRC20TokenList({
       key: 'spender',
       render: (data: TokenDataWithApproval) => {
         const spender = parsePadZero32Value(data.approval.spender);
-        return <TokenSpender indexingURL={indexingURL} nodeURL={nodeURL} spender={spender} />;
+        return <TokenSpender indexingURL={indexingURL} nodeURL={nodeURL} spender={spender} explorerURL={explorerURL} />;
       },
     },
     {
@@ -185,7 +193,28 @@ function CRC20TokenList({
       key: 'action',
       render: (data: TokenDataWithApproval) => {
         return <a
-          onClick={async () => { }}
+          onClick={async () => {
+
+            showPasswordModal({
+              onSuccess: (password) => {
+                showConfirmModal({
+                  title: 'Confirm',
+                  icon: <InfoCircleOutlined style={{ color: '#f27474', fontSize: '70px' }} />,
+                  okText: 'Revoke Permission',
+                  subTitle: `Are you sure you want to revoke permission?`,
+                  onApprove: () => { },
+                  onCancel: () => {
+                    dismissConfirmModal()
+                  },
+                })
+              },
+              onCancel: () => {
+
+              }
+            })
+
+          }}
+          style={{ color: '#D9475A' }}
         >
           Revoke
         </a>

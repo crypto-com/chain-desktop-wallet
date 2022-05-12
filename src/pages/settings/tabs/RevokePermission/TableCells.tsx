@@ -13,7 +13,7 @@ const isUnlimited = (amount: ethers.BigNumber) => {
   return amount.gte(ethers.BigNumber.from('0xffffffffffffffffffffffffffffffff'))
 }
 
-export const TokenBalance = (props: { data: TokenDataWithApproval }) => {
+export const TokenBalance = (props: { data: TokenDataWithApproval, explorerURL: string }) => {
   const { data } = props;
 
   const amount = getUINormalScaleAmount(data.token.balance, data.token.decimals);
@@ -26,7 +26,7 @@ export const TokenBalance = (props: { data: TokenDataWithApproval }) => {
         flexDirection: 'column',
       }}
     >
-      <a target='__blank' href={`https://cronoscan.com/token/${data.token.contract.address}`}>{data.token.symbol}</a>
+      <a target='__blank' href={`${props.explorerURL}/token/${data.token.contract.address}`}>{data.token.symbol}</a>
       <div>
         <span>{`${amount} ${data.token.symbol}  `}</span>
         <span style={{ color: '#A0A9BE' }}>({readablePrice})</span>
@@ -56,7 +56,7 @@ export const RiskExposure = (props: { data: TokenDataWithApproval }) => {
   return <div style={{ color: '#626973' }}>{isUnlimited(data.approval.amount) ? totalBalancePrice : readablePrice}</div>;
 };
 
-export const TokenSpender = (props: { nodeURL: string; indexingURL: string; spender: string }) => {
+export const TokenSpender = (props: { nodeURL: string; indexingURL: string; spender: string, explorerURL: string }) => {
   const { spender, indexingURL, nodeURL } = props;
   const [name, setName] = useState(spender);
 
@@ -83,5 +83,5 @@ export const TokenSpender = (props: { nodeURL: string; indexingURL: string; spen
     fetch();
   }, [fetch]);
 
-  return <a href={`https://cronoscan.com/address/${spender}`} target="__blank">{name}</a>;
+  return <a href={`${props.explorerURL}/address/${spender}`} target="__blank">{name}</a>;
 };

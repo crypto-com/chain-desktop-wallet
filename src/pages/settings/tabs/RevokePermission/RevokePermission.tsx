@@ -121,6 +121,7 @@ const RevokePermission = () => {
         onError={e => {
           setError(e);
         }}
+        explorerURL={cronosAsset.config?.explorerUrl ?? ''}
         filterUnverifiedTokens={false}
         filterZeroBalances={false}
         transferEvents={transferEvents}
