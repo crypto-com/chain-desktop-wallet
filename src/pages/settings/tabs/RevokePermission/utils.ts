@@ -1,9 +1,13 @@
 import { Contract, ethers, providers } from 'ethers';
 import { Filter, Log } from '@ethersproject/abstract-provider';
 import BigNumber from 'bignumber.js';
+import Web3 from 'web3';
 import { sleep } from '../../../../utils/utils';
 import { CronosClient } from '../../../../service/cronos/CronosClient';
 import { ContractData } from '../../../../service/rpc/models/cronos.models';
+import { TransactionPrepareService } from '../../../../service/TransactionPrepareService';
+import { walletService } from '../../../../service/WalletService';
+import { UserAsset } from '../../../../models/UserAsset';
 
 export function toFloat(n: number, decimals: number): string {
   return (n / 10 ** decimals).toFixed(3);
@@ -17,6 +21,20 @@ export function parsePadZero32Value(value: string): string {
 }
 
 const ContractDataMapping = new Map<string, ContractData>();
+
+export const getGasPrice = async (asset: UserAsset, config: { from: string, to: string, data: string, value: string }) => {
+  const transactionPrepareService = new TransactionPrepareService(walletService.storageService);
+  const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
+    asset,
+    config,
+  );
+
+  return {
+    gasLimit: prepareTxInfo.gasLimit,
+    gasPrice: Web3.utils.toHex(prepareTxInfo.loadedGasPrice),
+  };
+};
+
 
 export async function getCRC20TokenData(
   contract: Contract,

@@ -5,12 +5,19 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Spin, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import { InfoCircleOutlined } from '@ant-design/icons';
+import { useRecoilValue } from 'recoil';
 import CRC20TokenContract from '../../../../service/signers/abi/TokenContractABI.json';
-import { getCRC20TokenData, toFloat, parsePadZero32Value } from './utils';
+import { getCRC20TokenData, toFloat, parsePadZero32Value, getGasPrice } from './utils';
 import { Amount, RiskExposure, TokenBalance, TokenSpender } from './TableCells';
 import { CRC20TokenData, TokenDataWithApproval } from './types';
 import { useConfirmModal } from '../../../../components/ConfirmModal/useConfirmModal';
 import { usePasswordModal } from '../../../../components/PasswordForm/PasswordFormModal';
+import RequestConfirmation from '../../../dapp/components/RequestConfirmation/RequestConfirmation';
+import { DappBrowserIPC } from '../../../dapp/types';
+import { UserAsset } from '../../../../models/UserAsset';
+import { allMarketState, sessionState } from '../../../../recoil/atom';
+import { CronosClient } from '../../../../service/cronos/CronosClient';
+import { evmTransactionSigner } from '../../../../service/signers/EvmTransactionSigner';
 
 interface Props {
   filterUnverifiedTokens: boolean;
@@ -21,6 +28,7 @@ interface Props {
   nodeURL: string;
   indexingURL: string;
   explorerURL: string,
+  cronosAsset: UserAsset,
   onError: (error: Error) => void;
 }
 
@@ -28,6 +36,7 @@ function CRC20TokenList({
   filterUnverifiedTokens,
   filterZeroBalances,
   transferEvents,
+  cronosAsset,
   approvalEvents,
   inputAddress,
   nodeURL,
@@ -35,6 +44,12 @@ function CRC20TokenList({
   explorerURL,
   onError,
 }: Props) {
+
+  const [txEvent, setTxEvent] = useState<DappBrowserIPC.TokenApprovalEvent>();
+  const [requestConfirmationVisible, setRequestConfirmationVisible] = useState(false);
+  const allMarketData = useRecoilValue(allMarketState);
+  const currentSession = useRecoilValue(sessionState);
+
   const [tokens, setTokens] = useState<CRC20TokenData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [flatternedApprovalledData, setFlatternedApprovalledData] = useState<
@@ -75,12 +90,11 @@ function CRC20TokenList({
       const tokensWithApprovalData: TokenDataWithApproval[] = [];
       const map = new Map<string, Log>();
       token.approvals.forEach((t, idx) => {
-        const spender = t.topics[2];
+        const spender = parsePadZero32Value(t.topics[2]);
         if (!map.has(spender)) {
           map.set(spender, t);
 
           const rowSpan = idx === 0 ? token.approvals.length : 0;
-          console.log('rowSpan: ', rowSpan, token.symbol, t);
 
           tokensWithApprovalData.push({
             token,
@@ -166,16 +180,15 @@ function CRC20TokenList({
       key: 'token',
       render: (data: TokenDataWithApproval) => <TokenBalance data={data} explorerURL={explorerURL} />,
       onCell: (data: TokenDataWithApproval, _) =>
-        ({
-          rowSpan: data.rowSpan,
-        } as any),
+      ({
+        rowSpan: data.rowSpan,
+      } as any),
     },
     {
       title: 'Approved Spender',
       key: 'spender',
       render: (data: TokenDataWithApproval) => {
-        const spender = parsePadZero32Value(data.approval.spender);
-        return <TokenSpender indexingURL={indexingURL} nodeURL={nodeURL} spender={spender} explorerURL={explorerURL} />;
+        return <TokenSpender indexingURL={indexingURL} nodeURL={nodeURL} spender={data.approval.spender} explorerURL={explorerURL} />;
       },
     },
     {
@@ -196,17 +209,57 @@ function CRC20TokenList({
           onClick={async () => {
 
             showPasswordModal({
-              onSuccess: (password) => {
-                showConfirmModal({
-                  title: 'Confirm',
-                  icon: <InfoCircleOutlined style={{ color: '#f27474', fontSize: '70px' }} />,
-                  okText: 'Revoke Permission',
-                  subTitle: `Are you sure you want to revoke permission?`,
-                  onApprove: () => { },
-                  onCancel: () => {
-                    dismissConfirmModal()
-                  },
+              onSuccess: async (password) => {
+                // showConfirmModal({
+                //   title: 'Confirm',
+                //   icon: <InfoCircleOutlined style={{ color: '#f27474', fontSize: '70px' }} />,
+                //   okText: 'Revoke Permission',
+                //   subTitle: `Are you sure you want to revoke permission?`,
+                //   onApprove: async () => {
+
+                if (!cronosAsset.address) {
+                  return;
+                }
+
+                const tokenAddress = data.token.contract.address;
+                // eslint-disable-next-line prefer-destructuring
+                const spender = data.approval.spender;
+                const from = cronosAsset.address;
+
+                const client = new CronosClient(nodeURL, indexingURL);
+
+                const abi = evmTransactionSigner.encodeTokenApprovalABI(tokenAddress, spender, 0);
+
+                const response = await client.getContractDataByAddress(tokenAddress);
+                const { gasLimit, gasPrice } = await getGasPrice(cronosAsset, {
+                  from,
+                  to: tokenAddress,
+                  data: abi,
+                  value: "0x0",
                 })
+
+                const approvalEvent: DappBrowserIPC.TokenApprovalEvent = {
+                  name: 'tokenApproval',
+                  id: 12345,
+                  object: {
+                    tokenData: response.result,
+                    amount: "0",
+                    gas: gasLimit,
+                    gasPrice,
+                    from,
+                    spender,
+                    to: tokenAddress,
+                  },
+                };
+
+                setTxEvent(approvalEvent)
+                setRequestConfirmationVisible(true)
+
+                  // },
+                  // onCancel: () => {
+                  //   dismissConfirmModal()
+                  // },
+                // })
               },
               onCancel: () => {
 
@@ -222,7 +275,26 @@ function CRC20TokenList({
     },
   ];
 
-  return <Table columns={columns} size="middle" dataSource={flatternedApprovalledData} pagination={false} rowKey={(d) => `${d.token.contract.address}-${d.approval.spender}`} />;
+  return <div>
+    {txEvent && requestConfirmationVisible && (
+      <RequestConfirmation
+        event={txEvent}
+        cronosAsset={cronosAsset}
+        allMarketData={allMarketData}
+        currentSession={currentSession}
+        wallet={currentSession.wallet}
+        visible
+        onConfirm={({ gasLimit, gasPrice }) => {
+          setRequestConfirmationVisible(false);
+        }}
+        onCancel={() => {
+          setRequestConfirmationVisible(false);
+          setTxEvent(undefined);
+        }}
+      />
+    )}
+    <Table columns={columns} size="middle" dataSource={flatternedApprovalledData} pagination={false} rowKey={(d) => `${d.token.contract.address}-${d.approval.spender}`} />
+  </div>
 }
 
 export default CRC20TokenList;

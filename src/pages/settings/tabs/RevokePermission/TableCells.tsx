@@ -1,17 +1,13 @@
-import { ethers } from 'ethers';
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { useMarketPrice } from '../../../../hooks/useMarketPrice';
 import { CronosClient } from '../../../../service/cronos/CronosClient';
 import { getUINormalScaleAmount } from '../../../../utils/NumberUtils';
-import { middleEllipsis } from '../../../../utils/utils';
+import { isUnlimited, middleEllipsis } from '../../../../utils/utils';
 import { TokenDataWithApproval } from './types';
 
 const SpenderMapping = new Map<string, string>();
 
-const isUnlimited = (amount: ethers.BigNumber) => {
-  return amount.gte(ethers.BigNumber.from('0xffffffffffffffffffffffffffffffff'))
-}
 
 export const TokenBalance = (props: { data: TokenDataWithApproval, explorerURL: string }) => {
   const { data } = props;

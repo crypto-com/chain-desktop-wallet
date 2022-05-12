@@ -66,7 +66,7 @@ const RevokePermission = () => {
       cronosAsset.config.chainId,
       cronosAsset.address,
     );
-  }, [cronosAsset]);
+  }, []);
 
   useEffect(() => {
     fetch();
@@ -121,6 +121,7 @@ const RevokePermission = () => {
         onError={e => {
           setError(e);
         }}
+        cronosAsset={cronosAsset}
         explorerURL={cronosAsset.config?.explorerUrl ?? ''}
         filterUnverifiedTokens={false}
         filterZeroBalances={false}
