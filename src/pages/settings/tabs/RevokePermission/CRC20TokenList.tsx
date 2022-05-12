@@ -155,6 +155,7 @@ function CRC20TokenList({
   const columns: ColumnsType<TokenDataWithApproval> = [
     {
       title: 'Token/Balance',
+      key: 'token',
       render: (data: TokenDataWithApproval) => <TokenBalance data={data} />,
       onCell: (data: TokenDataWithApproval, _) =>
         ({
@@ -163,6 +164,7 @@ function CRC20TokenList({
     },
     {
       title: 'Approved Spender',
+      key: 'spender',
       render: (data: TokenDataWithApproval) => {
         const spender = parsePadZero32Value(data.approval.spender);
         return <TokenSpender indexingURL={indexingURL} nodeURL={nodeURL} spender={spender} />;
@@ -170,14 +172,17 @@ function CRC20TokenList({
     },
     {
       title: 'Approved Amount',
+      key: 'amount',
       render: (data: TokenDataWithApproval) => <Amount data={data} />,
     },
     {
       title: 'Risk Exposure',
+      key: 'risk',
       render: (data: TokenDataWithApproval) => <RiskExposure data={data} />,
     },
     {
       title: '',
+      key: 'action',
       render: (data: TokenDataWithApproval) => {
         return <a
           onClick={async () => { }}
@@ -188,7 +193,7 @@ function CRC20TokenList({
     },
   ];
 
-  return <Table columns={columns} size="middle" dataSource={flatternedApprovalledData} pagination={false} />;
+  return <Table columns={columns} size="middle" dataSource={flatternedApprovalledData} pagination={false} rowKey={(d) => `${d.token.contract.address}-${d.approval.spender}`} />;
 }
 
 export default CRC20TokenList;

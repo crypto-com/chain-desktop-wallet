@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useMarketPrice } from '../../../../hooks/useMarketPrice';
 import { CronosClient } from '../../../../service/cronos/CronosClient';
 import { getUINormalScaleAmount } from '../../../../utils/NumberUtils';
+import { middleEllipsis } from '../../../../utils/utils';
 import { TokenDataWithApproval } from './types';
 
 const SpenderMapping = new Map<string, string>();
@@ -37,7 +38,7 @@ export const TokenBalance = (props: { data: TokenDataWithApproval }) => {
 export const Amount = (props: { data: TokenDataWithApproval }) => {
   const { data } = props;
   return (
-    <div>
+    <div style={{ color: '#626973' }}>
       {
         isUnlimited(data.approval.amount) ? `Unlimited ${data.token.symbol}`
           : `${getUINormalScaleAmount(data.approval.amount.toString(), data.token.decimals)} ${data.token.symbol}`}
@@ -52,11 +53,11 @@ export const RiskExposure = (props: { data: TokenDataWithApproval }) => {
   const { readablePrice: totalBalancePrice } = useMarketPrice({ symbol: data.token.symbol, amount: balanceAmount })
   const { readablePrice } = useMarketPrice({ symbol: data.token.symbol, amount })
 
-  return <div>{isUnlimited(data.approval.amount) ? totalBalancePrice : readablePrice}</div>;
+  return <div style={{ color: '#626973' }}>{isUnlimited(data.approval.amount) ? totalBalancePrice : readablePrice}</div>;
 };
 
 export const TokenSpender = (props: { nodeURL: string; indexingURL: string; spender: string }) => {
-  const { spender } = props;
+  const { spender, indexingURL, nodeURL } = props;
   const [name, setName] = useState(spender);
 
   const fetch = useCallback(async () => {
@@ -65,17 +66,17 @@ export const TokenSpender = (props: { nodeURL: string; indexingURL: string; spen
       return;
     }
 
-    const cronosClient = new CronosClient(props.nodeURL, props.indexingURL);
-    const response = await cronosClient.getContractSourceCodeByAddress(props.spender);
+    const cronosClient = new CronosClient(nodeURL, indexingURL);
+    const response = await cronosClient.getContractSourceCodeByAddress(spender);
 
-    let contractName = spender;
-    if (response.result.length > 0) {
+    let contractName = middleEllipsis(spender, 8);
+    if (response.result.length > 0 && response.result[0]?.ContractName?.length > 0) {
       contractName = response.result[0].ContractName;
       SpenderMapping.set(spender, contractName);
     }
 
     setName(contractName);
-  }, [props.nodeURL, props.indexingURL, props.spender]);
+  }, [nodeURL, indexingURL, spender]);
 
 
   useEffect(() => {
