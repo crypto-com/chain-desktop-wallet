@@ -1128,7 +1128,7 @@ const FormWithdrawStakingReward = () => {
     };
 
     syncRewardsData();
-  }, [fetchingDB, confirmLoading, walletAsset]);
+  }, [fetchingDB, confirmLoading]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -1506,34 +1506,47 @@ const FormWithdrawStakingReward = () => {
           <div className="item">
             <div className="label">{t('staking.modal2.label3')}</div>
             <div>
+              {console.log('currentSession ', currentSession)}
               {rewards
                 ?.map(elem => {
-                  const tcro_amount = parseFloat(elem?.rewardAmount.replace('TCRO', '').trim());
-                  return tcro_amount;
+                  return new Big(
+                    elem?.rewardAmount
+                      .replace(currentSession?.activeAsset?.symbol || 'TCRO', '')
+                      .replace(currentSession?.activeAsset?.mainnetSymbol || 'CRO', '')
+                      .trim(),
+                  );
                 })
-                .reduce((b, a) => b + a, 0)}{' '}
-              TCRO
+                .reduce((b, a) => b.plus(a), Big(0))
+                .toNumber()}
+              {currentSession?.activeAsset?.symbol}
             </div>
             <div className="fiat">
-              ${' '}
+              $
               {rewards
                 ?.map(elem => {
-                  const tcro_amount = parseFloat(elem?.rewardAmount.replace('TCRO', '').trim());
-                  return tcro_amount;
+                  return new Big(
+                    elem?.rewardAmount
+                      .replace(currentSession?.activeAsset?.symbol || 'TCRO', '')
+                      .replace(currentSession?.activeAsset?.mainnetSymbol || 'CRO', '')
+                      .trim(),
+                  );
                 })
-                .reduce((b, a) => b + a, 0) *
-                rewards
-                  ?.map(elem => {
-                    const tcro_amount = parseFloat(
-                      elem?.rewardMarketPrice
-                        .replace('$', '')
-                        .replace('USD', '')
-                        .trim(),
-                    );
-                    return tcro_amount;
-                  })
-                  .reduce((b, a) => b + a, 0)}{' '}
-              USD
+                .reduce((b, a) => b.plus(a), Big(0))
+                .times(
+                  rewards
+                    ?.map(elem => {
+                      const currency_amount = new Big(
+                        elem?.rewardMarketPrice
+                          .replace('$', '')
+                          .replace(currentSession.currency, '')
+                          .trim(),
+                      );
+                      return currency_amount;
+                    })
+                    .reduce((b, a) => b.plus(a), Big(0)),
+                )
+                .toNumber()}{' '}
+              {currentSession.currency}
             </div>
           </div>
           <GasInfoTendermint />
