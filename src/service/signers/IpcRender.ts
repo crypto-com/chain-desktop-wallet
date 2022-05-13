@@ -118,6 +118,7 @@ export class IpcRender implements ISignerProvider {
   // eslint-disable-next-line  class-methods-use-this
   public async signEthTx(
     index: number,
+    standard: DerivationPathStandard,
     chainId: number,
     nonce: number,
     gasLimit: string,
@@ -128,6 +129,7 @@ export class IpcRender implements ISignerProvider {
   ): Promise<string> {
     const a = {
       index,
+      standard,
       chainId,
       nonce,
       gasLimit,
@@ -183,11 +185,12 @@ export class IpcRender implements ISignerProvider {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public async signPersonalMessage(index: number, hexMessage: string): Promise<string> {
+  public async signPersonalMessage(index: number, standard: DerivationPathStandard, hexMessage: string): Promise<string> {
     const message = hexToString(hexMessage);
     const ret = electron.ipcRenderer.sendSync('ethSignPersonalMessage', {
       message,
       index,
+      standard
     });
     if (!ret.success) {
       throw new Error(`signPersonalMessage failed: ${ret.error}`);
@@ -197,8 +200,8 @@ export class IpcRender implements ISignerProvider {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public async signTypedDataV4(index: number, typedData: string): Promise<string> {
-    const ret = electron.ipcRenderer.sendSync('ethSignTypedDataV4', { index, typedData });
+  public async signTypedDataV4(index: number, standard: DerivationPathStandard, typedData: string): Promise<string> {
+    const ret = electron.ipcRenderer.sendSync('ethSignTypedDataV4', { index, standard, typedData });
     if (!ret.success) {
       throw new Error(`signTypedDataV4 failed: ${ret.error}`);
     }

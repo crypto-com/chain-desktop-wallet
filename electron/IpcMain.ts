@@ -127,6 +127,7 @@ export class IpcMain {
       try {
         const signedtx = await this.ethProvider.signTx(
           arg.index,
+          arg.standard,
           arg.chainId,
           arg.nonce,
           arg.gasLimit,
@@ -188,10 +189,10 @@ export class IpcMain {
     });
     ipcMain.on('ethSignPersonalMessage', async (event: any, arg: any) => {
       let ret = {};
-      console.log('ethSignPersonalMessage, ', arg.message, ' . ', arg.index);
+      console.log('ethSignPersonalMessage, ', arg.message, ' . ', arg.index, ' . ', arg.standard);
 
       try {
-        const sig = await this.ethProvider.signPersonalMessage(arg.message, arg.index);
+        const sig = await this.ethProvider.signPersonalMessage(arg.message, arg.index, arg.standard);
         ret = {
           sig,
           success: true,
@@ -210,7 +211,7 @@ export class IpcMain {
     ipcMain.on('ethSignTypedDataV4', async (event: any, arg: any) => {
       let ret = {};
       try {
-        const sig = await this.ethProvider.signTypedDataV4(arg.typedData, arg.index);
+        const sig = await this.ethProvider.signTypedDataV4(arg.typedData, arg.index, arg.standard);
         ret = {
           sig,
           success: true,
