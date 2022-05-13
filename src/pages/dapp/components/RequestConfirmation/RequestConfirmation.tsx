@@ -37,7 +37,7 @@ interface RequestConfirmationProps {
   wallet: Wallet;
   visible: boolean;
   dapp?: Dapp;
-  onConfirm: (info: { gasPrice: BigNumber, gasLimit: BigNumber }) => void;
+  onConfirm: (info: { gasPrice: BigNumber, gasLimit: BigNumber, event: DappBrowserIPC.Event }) => void;
   onCancel: () => void;
 }
 
@@ -284,7 +284,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
               onClick={() => {
                 onConfirm({
                   gasLimit,
-                  gasPrice
+                  gasPrice,
+                  event
                 })
               }}
               disabled={

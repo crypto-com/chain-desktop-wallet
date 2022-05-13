@@ -121,6 +121,9 @@ const RevokePermission = () => {
         onError={e => {
           setError(e);
         }}
+        onRevokeSuccess={() => {
+          fetch();
+        }}
         cronosAsset={cronosAsset}
         explorerURL={cronosAsset.config?.explorerUrl ?? ''}
         filterUnverifiedTokens={false}

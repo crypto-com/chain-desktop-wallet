@@ -1,23 +1,39 @@
+import { Log } from '@ethersproject/abstract-provider';
+import { message, Spin, Table } from 'antd';
+import { ColumnsType } from 'antd/lib/table';
+import { props } from 'bluebird';
 import { Contract, ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
-import { Log } from '@ethersproject/abstract-provider';
 import React, { useCallback, useEffect, useState } from 'react';
-import { Spin, Table } from 'antd';
-import { ColumnsType } from 'antd/lib/table';
-import { InfoCircleOutlined } from '@ant-design/icons';
 import { useRecoilValue } from 'recoil';
-import CRC20TokenContract from '../../../../service/signers/abi/TokenContractABI.json';
-import { getCRC20TokenData, toFloat, parsePadZero32Value, getGasPrice } from './utils';
-import { Amount, RiskExposure, TokenBalance, TokenSpender } from './TableCells';
-import { CRC20TokenData, TokenDataWithApproval } from './types';
-import { useConfirmModal } from '../../../../components/ConfirmModal/useConfirmModal';
+import { TransactionConfig } from 'web3-core';
 import { usePasswordModal } from '../../../../components/PasswordForm/PasswordFormModal';
-import RequestConfirmation from '../../../dapp/components/RequestConfirmation/RequestConfirmation';
-import { DappBrowserIPC } from '../../../dapp/types';
 import { UserAsset } from '../../../../models/UserAsset';
 import { allMarketState, sessionState } from '../../../../recoil/atom';
 import { CronosClient } from '../../../../service/cronos/CronosClient';
+import CRC20TokenContract from '../../../../service/signers/abi/TokenContractABI.json';
 import { evmTransactionSigner } from '../../../../service/signers/EvmTransactionSigner';
+import { EVMContractCallUnsigned } from '../../../../service/signers/TransactionSupported';
+import { TransactionPrepareService } from '../../../../service/TransactionPrepareService';
+import { walletService } from '../../../../service/WalletService';
+import { secretStoreService } from '../../../../storage/SecretStoreService';
+import { ChainConfig } from '../../../dapp/browser/config';
+import RequestConfirmation from '../../../dapp/components/RequestConfirmation/RequestConfirmation';
+import { DappBrowserIPC } from '../../../dapp/types';
+import { ConfirmModal } from './ConfirmModal';
+import {
+  Amount,
+  RiskExposure,
+  TokenBalance,
+  TokenSpender
+} from './TableCells';
+import { CRC20TokenData, TokenDataWithApproval } from './types';
+import {
+  getCRC20TokenData,
+  getGasPrice,
+  parsePadZero32Value,
+  toFloat
+} from './utils';
 
 interface Props {
   filterUnverifiedTokens: boolean;
@@ -29,6 +45,7 @@ interface Props {
   indexingURL: string;
   explorerURL: string,
   cronosAsset: UserAsset,
+  onRevokeSuccess: () => void;
   onError: (error: Error) => void;
 }
 
@@ -42,6 +59,7 @@ function CRC20TokenList({
   nodeURL,
   indexingURL,
   explorerURL,
+  onRevokeSuccess,
   onError,
 }: Props) {
 
@@ -50,17 +68,21 @@ function CRC20TokenList({
   const allMarketData = useRecoilValue(allMarketState);
   const currentSession = useRecoilValue(sessionState);
 
-  const [tokens, setTokens] = useState<CRC20TokenData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [flatternedApprovalledData, setFlatternedApprovalledData] = useState<
     TokenDataWithApproval[]
   >([]);
 
-  const { showWithConfig: showConfirmModal, dismiss: dismissConfirmModal } = useConfirmModal();
   const { show: showPasswordModal } = usePasswordModal();
+  const [decryptedPhrase, setDecryptedPhrase] = useState('');
+  const [selectedData, setSelectedData] = useState<TokenDataWithApproval>()
+  const [isConfirmLoading, setIsConfirmLoading] = useState(false);
+  const transactionPrepareService = new TransactionPrepareService(walletService.storageService);
 
   const loadData = useCallback(async () => {
     if (!inputAddress) return;
+
+    console.log(approvalEvents);
 
     setLoading(true);
 
@@ -115,6 +137,7 @@ function CRC20TokenList({
     }, []);
 
     setFlatternedApprovalledData(approvals);
+    console.log(approvals);
     setLoading(false);
   }, [inputAddress, approvalEvents, transferEvents]);
 
@@ -146,8 +169,13 @@ function CRC20TokenList({
     );
     const map = new Map<string, Log>();
     tokenApprovals.forEach(approval => {
-      if (!map.has(approval.topics[2])) {
-        map.set(approval.topics[2], approval);
+      const spender = approval.topics[2];
+      const lastApproval = map.get(spender);
+      console.log(spender, lastApproval?.blockNumber, approval.blockNumber);
+      if (!lastApproval) {
+        map.set(spender, approval);
+      } else if (ethers.BigNumber.from(approval.blockNumber).gt(lastApproval.blockNumber)) {
+        map.set(spender, approval);
       }
     });
     return Array.from(map.values());
@@ -210,62 +238,16 @@ function CRC20TokenList({
 
             showPasswordModal({
               onSuccess: async (password) => {
-                // showConfirmModal({
-                //   title: 'Confirm',
-                //   icon: <InfoCircleOutlined style={{ color: '#f27474', fontSize: '70px' }} />,
-                //   okText: 'Revoke Permission',
-                //   subTitle: `Are you sure you want to revoke permission?`,
-                //   onApprove: async () => {
-
-                if (!cronosAsset.address) {
-                  return;
-                }
-
-                const tokenAddress = data.token.contract.address;
-                // eslint-disable-next-line prefer-destructuring
-                const spender = data.approval.spender;
-                const from = cronosAsset.address;
-
-                const client = new CronosClient(nodeURL, indexingURL);
-
-                const abi = evmTransactionSigner.encodeTokenApprovalABI(tokenAddress, spender, 0);
-
-                const response = await client.getContractDataByAddress(tokenAddress);
-                const { gasLimit, gasPrice } = await getGasPrice(cronosAsset, {
-                  from,
-                  to: tokenAddress,
-                  data: abi,
-                  value: "0x0",
-                })
-
-                const approvalEvent: DappBrowserIPC.TokenApprovalEvent = {
-                  name: 'tokenApproval',
-                  id: 12345,
-                  object: {
-                    tokenData: response.result,
-                    amount: "0",
-                    gas: gasLimit,
-                    gasPrice,
-                    from,
-                    spender,
-                    to: tokenAddress,
-                  },
-                };
-
-                setTxEvent(approvalEvent)
-                setRequestConfirmationVisible(true)
-
-                  // },
-                  // onCancel: () => {
-                  //   dismissConfirmModal()
-                  // },
-                // })
+                const phraseDecrypted = await secretStoreService.decryptPhrase(
+                  password,
+                  currentSession.wallet.identifier,
+                );
+                setDecryptedPhrase(phraseDecrypted);
+                setSelectedData({ ...data });
               },
               onCancel: () => {
-
               }
             })
-
           }}
           style={{ color: '#D9475A' }}
         >
@@ -284,8 +266,58 @@ function CRC20TokenList({
         currentSession={currentSession}
         wallet={currentSession.wallet}
         visible
-        onConfirm={({ gasLimit, gasPrice }) => {
+        onConfirm={async ({ gasLimit: _gasLimit, gasPrice: _gasPrice, event }) => {
           setRequestConfirmationVisible(false);
+
+          if (event.name !== "tokenApproval" || !cronosAsset.config?.nodeUrl) {
+            return
+          }
+
+          const prepareTXConfig: TransactionConfig = {
+            from: event.object.from,
+            to: event.object.to,
+          };
+
+          const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
+            cronosAsset!,
+            prepareTXConfig,
+          );
+
+          const data = evmTransactionSigner.encodeTokenApprovalABI(
+            event.object.tokenData.contractAddress,
+            event.object.spender,
+            ethers.BigNumber.from(event.object.amount),
+          );
+
+          const txConfig: EVMContractCallUnsigned = {
+            from: event.object.from,
+            contractAddress: event.object.to,
+            data,
+            gasLimit: `0x${_gasLimit.toString(16)}`,
+            gasPrice: `0x${_gasPrice.toString(16)}`,
+            nonce: prepareTxInfo.nonce,
+          };
+          try {
+            const result = await evmTransactionSigner.sendContractCallTransaction(
+              cronosAsset!,
+              txConfig,
+              decryptedPhrase,
+              cronosAsset.config.nodeUrl,
+            );
+
+            console.log("Tx success: ", result);
+
+            setIsConfirmLoading(false);
+            setTxEvent(undefined);
+            setSelectedData(undefined);
+            message.success('Revoke success');
+
+            onRevokeSuccess();
+
+          } catch (error) {
+            message.error(error as unknown as any)
+          }
+
         }}
         onCancel={() => {
           setRequestConfirmationVisible(false);
@@ -293,6 +325,56 @@ function CRC20TokenList({
         }}
       />
     )}
+    {
+      selectedData && (
+        <ConfirmModal isLoading={isConfirmLoading} onCancel={() => {
+          setSelectedData(undefined)
+          setIsConfirmLoading(false);
+        }} onConfirm={async () => {
+
+          const data = selectedData;
+          if (!cronosAsset.address) {
+            return;
+          }
+
+          setIsConfirmLoading(true);
+
+          const tokenAddress = data.token.contract.address;
+          // eslint-disable-next-line prefer-destructuring
+          const spender = data.approval.spender;
+          const from = cronosAsset.address;
+
+          const client = new CronosClient(nodeURL, indexingURL);
+
+          const abi = evmTransactionSigner.encodeTokenApprovalABI(tokenAddress, spender, 0);
+
+          const response = await client.getContractDataByAddress(tokenAddress);
+          const { gasLimit, gasPrice } = await getGasPrice(cronosAsset, {
+            from,
+            to: tokenAddress,
+            data: abi,
+            value: "0x0",
+          })
+
+          const approvalEvent: DappBrowserIPC.TokenApprovalEvent = {
+            name: 'tokenApproval',
+            id: 12345,
+            object: {
+              tokenData: response.result,
+              amount: "0",
+              gas: gasLimit,
+              gasPrice,
+              from,
+              spender,
+              to: tokenAddress,
+            },
+          };
+
+          setTxEvent(approvalEvent)
+          setRequestConfirmationVisible(true)
+          }} />
+      )
+    }
     <Table columns={columns} size="middle" dataSource={flatternedApprovalledData} pagination={false} rowKey={(d) => `${d.token.contract.address}-${d.approval.spender}`} />
   </div>
 }
