@@ -126,6 +126,7 @@ export class LedgerEthSigner {
 
   async signTx(
     index: number = 0,
+    standard: DerivationPathStandard = DerivationPathStandard.BIP44,
     chainId: number = 9000,
     nonce: number = 0,
     gasLimit: string = '0x5208',
@@ -136,7 +137,7 @@ export class LedgerEthSigner {
   ): Promise<string> {
     try {
       await this.createTransport();
-      const path: string = `44'/60'/0'/0/${index}`;
+      const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, standard);
       const signedTx = await this.doSignTx(
         path,
         chainId,
@@ -156,6 +157,7 @@ export class LedgerEthSigner {
   async signAndSendTx(
     url: string = 'http://127.0.0.1:8545',
     index: number = 0,
+    standard: DerivationPathStandard = DerivationPathStandard.BIP44,
     chainId: number = 9000,
     gasLimit: string = '0x5000',
     gasPrice: string = '0x0400000000',
@@ -165,7 +167,7 @@ export class LedgerEthSigner {
   ): Promise<string> {
     try {
       await this.createTransport();
-      const path: string = `44'/60'/0'/0/${index}`;
+      const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, standard);
       const web3 = new Web3(url);
       const from_addr = (await this.app!.getAddress(path)).address;
       const nonce = await web3.eth.getTransactionCount(from_addr);
@@ -187,10 +189,10 @@ export class LedgerEthSigner {
     }
   }
 
-  async signPersonalMessage(msg: string, index = 0) {
+  async signPersonalMessage(msg: string, index = 0, standard: DerivationPathStandard = DerivationPathStandard.BIP44) {
     try {
       await this.createTransport();
-      const path: string = `44'/60'/0'/0/${index}`;
+      const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, standard);
       const sig = await this.app!.signPersonalMessage(path, Buffer.from(msg).toString('hex'));
       return LedgerEthSigner.getHexlifySignature(sig);
     } finally {
@@ -208,10 +210,10 @@ export class LedgerEthSigner {
     return '0x' + sig.r + sig.s + vStr;
   }
 
-  async signTypedDataV4(typedData: any, index = 0) {
+  async signTypedDataV4(typedData: any, index = 0, standard: DerivationPathStandard = DerivationPathStandard.BIP44) {
     try {
       await this.createTransport();
-      const path: string = `44'/60'/0'/0/${index}`;
+      const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, standard);
 
       const data = JSON.parse(typedData);
 

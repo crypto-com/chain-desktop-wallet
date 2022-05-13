@@ -767,36 +767,39 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             {t('create.LedgerAddressIndexBalanceTable.description')}
           </div>
           <div className="item">
-            <Select
-              style={{ width: '180px', textAlign: 'center' }}
-              placeholder={`${t('general.select')} ${t(
-                'create.LedgerAddressIndexBalanceTable.assetType.label',
-              )}`}
-              disabled={props.isWalletSelectFieldDisable}
-              defaultActiveFirstOption
-              onSelect={e => {
-                setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
-                setLedgerAddressList([]);
-                switch (e) {
-                  case UserAssetType.TENDERMINT:
-                    setLedgerAssetType(UserAssetType.TENDERMINT);
-                    ledgerNotificationWithoutCheck(UserAssetType.TENDERMINT);
-                    break;
-                  case UserAssetType.EVM:
-                    setLedgerAssetType(UserAssetType.EVM);
-                    ledgerNotificationWithoutCheck(UserAssetType.EVM);
-                    break;
-                  default:
-                }
-              }}
-            >
-              <Select.Option key="tendermint" value={UserAssetType.TENDERMINT}>
-                TENDERMINT
-              </Select.Option>
-              <Select.Option key="evm" value={UserAssetType.EVM}>
-                EVM
-              </Select.Option>
-            </Select>
+            <Form.Item name="assetType">
+              <Select
+                style={{ width: '180px', textAlign: 'center' }}
+                placeholder={`${t('general.select')} ${t(
+                  'create.LedgerAddressIndexBalanceTable.assetType.label',
+                )}`}
+                disabled={props.isWalletSelectFieldDisable}
+                defaultActiveFirstOption
+                onSelect={e => {
+                  setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
+                  setLedgerAddressList([]);
+                  switch (e) {
+                    case UserAssetType.TENDERMINT:
+                      setLedgerAssetType(UserAssetType.TENDERMINT);
+                      ledgerNotificationWithoutCheck(UserAssetType.TENDERMINT);
+                      break;
+                    case UserAssetType.EVM:
+                      setLedgerAssetType(UserAssetType.EVM);
+                      ledgerNotificationWithoutCheck(UserAssetType.EVM);
+                      break;
+                    default:
+                  }
+                }}
+              >
+                <Select.Option key="tendermint" value={UserAssetType.TENDERMINT}>
+                  TENDERMINT
+                </Select.Option>
+                <Select.Option key="evm" value={UserAssetType.EVM}>
+                  EVM
+                </Select.Option>
+              </Select>
+            </Form.Item>
+
             {ledgerAssetType ? (
               <LedgerAddressIndexBalanceTable
                 addressIndexBalanceList={ledgerAddressList}
@@ -837,6 +840,9 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             onChange={() => {
               setLedgerAddressList([]);
               setLedgerAssetType(undefined);
+              props.form.setFieldsValue({
+                assetType: undefined,
+              });
               setDerivationPath({
                 tendermint: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
