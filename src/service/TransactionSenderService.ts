@@ -40,6 +40,7 @@ import { getCronosEvmAsset, sleep } from '../utils/utils';
 import { BridgeService } from './bridge/BridgeService';
 import { walletService } from './WalletService';
 import { getCronosTendermintFeeConfig } from './Gas';
+import { DerivationPathStandard } from './signers/LedgerSigner';
 
 export class TransactionSenderService {
   public readonly storageService: StorageService;
@@ -68,6 +69,7 @@ export class TransactionSenderService {
     const currentSession = await this.storageService.retrieveCurrentSession();
     const fromAddress = currentSession.wallet.address;
     const walletAddressIndex = currentSession.wallet.addressIndex;
+    const walletDerivationPathStandard = currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
     if (!transferRequest.memo && !currentSession.wallet.config.disableDefaultClientMemo) {
       transferRequest.memo = DEFAULT_CLIENT_MEMO;
     }
@@ -125,6 +127,7 @@ export class TransactionSenderService {
 
             signedTx = await device.signEthTx(
               walletAddressIndex,
+              walletDerivationPathStandard,
               Number(transfer.asset?.config?.chainId), // chainid
               transfer.nonce,
               web3.utils.toHex(gasLimitTx) /* gas limit */,
@@ -223,6 +226,7 @@ export class TransactionSenderService {
 
             signedTx = await device.signEthTx(
               walletAddressIndex,
+              walletDerivationPathStandard,
               Number(transfer.asset?.config?.chainId), // chainid
               transfer.nonce,
               web3.utils.toHex(gasLimitTx) /* gas limit */,

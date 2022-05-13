@@ -102,12 +102,22 @@ class EVMClient implements IEvmRpc {
     if (!signedTxHex.startsWith('0x')) {
       signedTxHex = `0x${signedTxHex}`;
     }
-    const broadcastTx = await this.web3.eth.sendSignedTransaction(signedTxHex);
 
-    if (broadcastTx.status) {
-      return broadcastTx.transactionHash;
+    let broadcastTxHash = '';
+
+    try {
+      const broadcastTx = await this.web3.eth.sendSignedTransaction(signedTxHex, (err, hash) => {
+        broadcastTxHash = hash;
+      });
+      if (broadcastTx.status) {
+        return broadcastTx.transactionHash;
+      }
+    } catch (e) {
+      if (broadcastTxHash) {
+        return broadcastTxHash;
+      }
+      throw new Error(e.message);
     }
-
     throw new Error('Transaction broadcast failed.');
   }
 }

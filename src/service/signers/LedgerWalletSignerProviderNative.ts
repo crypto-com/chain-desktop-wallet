@@ -45,6 +45,7 @@ export class LedgerWalletSignerProviderNative implements ISignerProvider {
   // eslint-disable-next-line  class-methods-use-this
   public async signEthTx(
     index: number,
+    standard: DerivationPathStandard,
     chainId: number,
     nonce: number,
     gasLimit: string,
@@ -55,6 +56,7 @@ export class LedgerWalletSignerProviderNative implements ISignerProvider {
   ): Promise<string> {
     const signedtx = await this.ipcRender.signEthTx(
       index,
+      standard,
       chainId,
       nonce,
       gasLimit,
@@ -78,13 +80,13 @@ export class LedgerWalletSignerProviderNative implements ISignerProvider {
     return addressList;
   }
 
-  public async signTypedDataV4(index: number, typedData: string): Promise<string> {
-    const signature = await this.ipcRender.signTypedDataV4(index, typedData);
+  public async signTypedDataV4(index: number, standard: DerivationPathStandard, typedData: string): Promise<string> {
+    const signature = await this.ipcRender.signTypedDataV4(index, standard, typedData);
     return signature;
   }
 
-  public async signPersonalMessage(index: number, message: string): Promise<string> {
-    const signature = await this.ipcRender.signPersonalMessage(index, message);
+  public async signPersonalMessage(index: number, standard: DerivationPathStandard, message: string): Promise<string> {
+    const signature = await this.ipcRender.signPersonalMessage(index, standard, message);
     return signature;
   }
 }
