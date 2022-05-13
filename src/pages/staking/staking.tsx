@@ -86,7 +86,9 @@ import {
 import { isValidatorAddressSuspicious, ModerationConfig } from '../../models/ModerationConfig';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
-import GasStepSelectTendermint, { GasInfoTendermint } from '../../components/GasStepSelect/GasStepSelectTendermint';
+import GasStepSelectTendermint, {
+  GasInfoTendermint,
+} from '../../components/GasStepSelect/GasStepSelectTendermint';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
@@ -138,6 +140,7 @@ const FormDelegationRequest = props => {
     amount: '',
     memo: '',
   });
+
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -1054,7 +1057,8 @@ const FormWithdrawStakingReward = () => {
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [rewardAction, setRewardAction] = useState<RewardActionType>('withdraw');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
-  // const walletAllAssets = useRecoilValue(walletAllAssetsState);
+
+  const [withdrawAllModalVisible, setWithdrawAllModal] = useState(false);
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const allMarketData = useRecoilValue(allMarketState);
@@ -1124,7 +1128,7 @@ const FormWithdrawStakingReward = () => {
     };
 
     syncRewardsData();
-  }, [fetchingDB, confirmLoading]);
+  }, [fetchingDB, confirmLoading, walletAsset]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -1136,14 +1140,24 @@ const FormWithdrawStakingReward = () => {
     setIsConfirmationRestakeModalVisible(true);
   };
 
+  const handleWithdrawAllModal = () => {
+    setWithdrawAllModal(false);
+    setInputPasswordVisible(false);
+  };
+
   const showPasswordInput = (action: string) => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, walletAsset!);
         return;
       }
+
+      console.log('action is ', action);
+
       if (action === 'restake') {
         showConfirmationRestakeModal();
+      } else if (action === 'withdrawAll') {
+        setWithdrawAllModal(true);
       } else {
         showConfirmationModal();
       }
@@ -1162,6 +1176,39 @@ const FormWithdrawStakingReward = () => {
       showConfirmationRestakeModal();
     } else {
       showConfirmationModal();
+    }
+  };
+
+  const onConfirmWithdrawAllStakingRewards = async () => {
+    const { walletType } = currentSession.wallet;
+    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
+      setWithdrawAllModal(false);
+      return;
+    }
+    try {
+      setConfirmLoading(true);
+      const rewardWithdrawAllResult = await walletService.sendStakingWithdrawAllRewardsTx({
+        validatorAddressList: rewards.map(rewardInfo => rewardInfo.validatorAddress),
+        decryptedPhrase,
+        walletType,
+      });
+      setBroadcastResult(rewardWithdrawAllResult);
+
+      handleWithdrawAllModal();
+      setConfirmLoading(false);
+      setIsSuccessTransferModalVisible(true);
+    } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
+      }
+
+      setErrorMessages(((e as unknown) as any).message.split(': '));
+      setWithdrawAllModal(false);
+      setConfirmLoading(false);
+      setInputPasswordVisible(false);
+      setIsErrorTransferModalVisible(true);
+      // eslint-disable-next-line no-console
+      console.log('Error occurred while transfer', e);
     }
   };
 
@@ -1405,6 +1452,94 @@ const FormWithdrawStakingReward = () => {
 
   return (
     <div>
+      <Button
+        id="withdraw-all-btn"
+        onClick={() => {
+          showPasswordInput('withdrawAll');
+          console.log('rewards here is ', rewards);
+        }}
+      >
+        {t('staking.withdrawall')}
+      </Button>
+
+      <ModalPopup
+        isModalVisible={withdrawAllModalVisible}
+        handleCancel={handleWithdrawAllModal}
+        handleOk={onConfirmWithdrawAllStakingRewards}
+        confirmationLoading={confirmLoading}
+        className="reward-modal"
+        footer={[
+          <Button
+            key="submit"
+            type="primary"
+            loading={confirmLoading}
+            disabled={!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE}
+            onClick={onConfirmWithdrawAllStakingRewards}
+          >
+            {t('general.confirm')}
+          </Button>,
+          <Button key="back" type="link" onClick={handleWithdrawAllModal}>
+            {t('general.cancel')}
+          </Button>,
+        ]}
+        okText={t('general.confirm')}
+      >
+        <>
+          <div className="title">{t('staking.withdrawall')}</div>
+          <div className="description">{t('staking.modal2.description')}</div>
+          <div className="item">
+            <div className="label">{t('staking.modal2.label1')}</div>
+            <div className="address">{`${currentSession.wallet.address}`}</div>
+          </div>
+          <div className="item">
+            <div className="label">{t('staking.modal2.label4')}(s)</div>
+
+            {rewards.map((elem, idx) => (
+              <>
+                <div className="address multiple">
+                  {`${elem?.validatorAddress}`}
+                  <span className="address-num">{idx}</span>
+                </div>
+              </>
+            ))}
+          </div>
+          <div className="item">
+            <div className="label">{t('staking.modal2.label3')}</div>
+            <div>
+              {rewards
+                ?.map(elem => {
+                  const tcro_amount = parseFloat(elem?.rewardAmount.replace('TCRO', '').trim());
+                  return tcro_amount;
+                })
+                .reduce((b, a) => b + a, 0)}{' '}
+              TCRO
+            </div>
+            <div className="fiat">
+              ${' '}
+              {rewards
+                ?.map(elem => {
+                  const tcro_amount = parseFloat(elem?.rewardAmount.replace('TCRO', '').trim());
+                  return tcro_amount;
+                })
+                .reduce((b, a) => b + a, 0) *
+                rewards
+                  ?.map(elem => {
+                    const tcro_amount = parseFloat(
+                      elem?.rewardMarketPrice
+                        .replace('$', '')
+                        .replace('USD', '')
+                        .trim(),
+                    );
+                    return tcro_amount;
+                  })
+                  .reduce((b, a) => b + a, 0)}{' '}
+              USD
+            </div>
+          </div>
+          <GasInfoTendermint />
+        </>
+      </ModalPopup>
+
       <StakingTable />
       <ModalPopup
         isModalVisible={isConfirmationModalVisible}
@@ -1600,7 +1735,7 @@ const StakingPage = () => {
   const currentValidatorList = useRecoilValue(validatorListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
   const allMarketData = useRecoilValue(allMarketState);
-  // const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
+
   const [marketData, setMarketData] = useState<AssetMarketPrice>();
 
   const [isUnbondingDelegationModalVisible, setIsUnbondingDelegationModalVisible] = useState(false);
@@ -1788,6 +1923,31 @@ const StakingPage = () => {
                 : ''}
             </div>
           </div>
+
+          <ModalPopup
+            isModalVisible={isUnbondingDelegationModalVisible}
+            handleCancel={() => setIsUnbondingDelegationModalVisible(false)}
+            handleOk={() => setIsUnbondingDelegationModalVisible(false)}
+            className="unbonding-modal"
+            footer={[]}
+            okText="OK"
+          >
+            <>
+              <div className="title">{t('staking.modal3.title')}</div>
+              <div className="description">
+                {t('staking.modal3.description', { unbondingPeriod: undelegatePeriod })}
+              </div>
+              <Table
+                locale={{
+                  triggerDesc: t('general.table.triggerDesc'),
+                  triggerAsc: t('general.table.triggerAsc'),
+                  cancelSort: t('general.table.cancelSort'),
+                }}
+                columns={unbondingDelegationColumns}
+                dataSource={unbondingDelegations}
+              />
+            </>
+          </ModalPopup>
         </div>
         <Tabs defaultActiveKey="1">
           <TabPane tab={t('staking.tab1')} key="1">
