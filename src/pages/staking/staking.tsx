@@ -1326,6 +1326,7 @@ const FormWithdrawStakingReward = () => {
         setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
+      
       setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsConfirmationRestakeModalVisible(false);
       setConfirmLoading(false);
