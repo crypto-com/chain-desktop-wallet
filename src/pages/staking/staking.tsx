@@ -273,7 +273,7 @@ const FormDelegationRequest = props => {
       setInputPasswordVisible(false);
       setIsErrorTransferModalVisible(true);
       // eslint-disable-next-line no-console
-      console.log('Error occurred while transfer', e);
+      console.error('Error occurred while transfer', e);
     }
   };
 
@@ -1151,9 +1151,6 @@ const FormWithdrawStakingReward = () => {
         ledgerNotification(currentSession.wallet, walletAsset!);
         return;
       }
-
-      console.log('action is ', action);
-
       if (action === 'restake') {
         showConfirmationRestakeModal();
       } else if (action === 'withdrawAll') {
@@ -1208,7 +1205,7 @@ const FormWithdrawStakingReward = () => {
       setInputPasswordVisible(false);
       setIsErrorTransferModalVisible(true);
       // eslint-disable-next-line no-console
-      console.log('Error occurred while transfer', e);
+      console.error('Error occurred while transfer', e);
     }
   };
 
@@ -1241,7 +1238,7 @@ const FormWithdrawStakingReward = () => {
       setInputPasswordVisible(false);
       setIsErrorTransferModalVisible(true);
       // eslint-disable-next-line no-console
-      console.log('Error occurred while transfer', e);
+      console.error('Error occurred while transfer', e);
     }
   };
 
@@ -1335,7 +1332,7 @@ const FormWithdrawStakingReward = () => {
       setInputPasswordVisible(false);
       setIsErrorTransferModalVisible(true);
       // eslint-disable-next-line no-console
-      console.log('Error occurred while transfer', e);
+      console.error('Error occurred while transfer', e);
     }
   };
 
@@ -1456,7 +1453,6 @@ const FormWithdrawStakingReward = () => {
         id="withdraw-all-btn"
         onClick={() => {
           showPasswordInput('withdrawAll');
-          console.log('rewards here is ', rewards);
         }}
       >
         {t('staking.withdrawall')}
@@ -1506,7 +1502,6 @@ const FormWithdrawStakingReward = () => {
           <div className="item">
             <div className="label">{t('staking.modal2.label3')}</div>
             <div>
-              {console.log('currentSession ', currentSession)}
               {rewards
                 ?.map(elem => {
                   return new Big(
