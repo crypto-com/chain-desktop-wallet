@@ -11,6 +11,7 @@ export interface ISignerProvider {
   // eth
   signEthTx(
     index: number,
+    standard: DerivationPathStandard,
     chainId: number,
     nonce: number,
     gasLimit: string,
@@ -21,6 +22,6 @@ export interface ISignerProvider {
   ): Promise<string>;
   getEthAddress(index: number, standard: DerivationPathStandard, display: boolean): Promise<string>;
   getEthAddressList(startIndex:number, gap: number, standard: DerivationPathStandard): Promise<string[]>;
-  signPersonalMessage(index: number, message: string): Promise<string>;
-  signTypedDataV4(index: number, typedData: string): Promise<string>;
+  signPersonalMessage(index: number, standard: DerivationPathStandard, message: string): Promise<string>;
+  signTypedDataV4(index: number, standard: DerivationPathStandard, typedData: string): Promise<string>;
 }

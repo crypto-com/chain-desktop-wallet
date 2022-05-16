@@ -217,6 +217,7 @@ export class LedgerWalletSignerProviderZemu implements ISignerProvider {
   // TODO: add zemu test
   public async signEthTx(
     _index: number,
+    _standard: DerivationPathStandard,
     _chainId: number,
     _nonce: number,
     _gasLimit: string,
@@ -237,11 +238,11 @@ export class LedgerWalletSignerProviderZemu implements ISignerProvider {
     return [];
   }
 
-  async signPersonalMessage(_index: number, _message: string): Promise<string> {
+  async signPersonalMessage(_index: number, _standard: DerivationPathStandard, _message: string): Promise<string> {
     return '';
   }
 
-  async signTypedDataV4(_index: number, _typedData: string): Promise<string> {
+  async signTypedDataV4(_index: number, _standard: DerivationPathStandard, _typedData: string): Promise<string> {
     return '';
   }
 }
