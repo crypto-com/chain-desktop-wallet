@@ -1454,6 +1454,7 @@ const FormWithdrawStakingReward = () => {
     <div>
       <Button
         id="withdraw-all-btn"
+        type="primary"
         onClick={() => {
           showPasswordInput('withdrawAll');
         }}
