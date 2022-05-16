@@ -1059,6 +1059,7 @@ const FormWithdrawStakingReward = () => {
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
 
   const [withdrawAllModalVisible, setWithdrawAllModal] = useState(false);
+  const [marketData, setMarketData] = useState<AssetMarketPrice>();
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const allMarketData = useRecoilValue(allMarketState);
@@ -1126,6 +1127,8 @@ const FormWithdrawStakingReward = () => {
       setIsRewardsLoading(false);
       setWalletAsset(primaryAsset);
     };
+
+    setMarketData(allMarketData.get(`${walletAsset?.mainnetSymbol}-${currentSession.currency}`));
 
     syncRewardsData();
   }, [fetchingDB, confirmLoading]);
@@ -1502,47 +1505,19 @@ const FormWithdrawStakingReward = () => {
           <div className="item">
             <div className="label">{t('staking.modal2.label3')}</div>
             <div>
-              {rewards
-                ?.map(elem => {
-                  return new Big(
-                    elem?.rewardAmount
-                      .replace(currentSession?.activeAsset?.symbol || 'TCRO', '')
-                      .replace(currentSession?.activeAsset?.mainnetSymbol || 'CRO', '')
-                      .trim(),
-                  );
-                })
-                .reduce((b, a) => b.plus(a), Big(0))
-                .toNumber()}
-              {currentSession?.activeAsset?.symbol}
+              {numeral(scaledRewardBalance(walletAsset)).format('0,0.0000')}
+              {walletAsset?.symbol}
+
+              {console.log('walletAsset ', walletAsset)}
             </div>
 
             <div className="fiat">
-              $
-              {rewards
-                ?.map(elem => {
-                  return new Big(
-                    elem?.rewardAmount
-                      .replace(currentSession?.activeAsset?.symbol || 'TCRO', '')
-                      .replace(currentSession?.activeAsset?.mainnetSymbol || 'CRO', '')
-                      .trim(),
-                  );
-                })
-                .reduce((b, a) => b.plus(a), Big(0))
-                .times(
-                  rewards
-                    ?.map(elem => {
-                      const currency_amount = new Big(
-                        elem?.rewardMarketPrice
-                          .replace('$', '')
-                          .replace(currentSession.currency, '')
-                          .trim(),
-                      );
-                      return currency_amount;
-                    })
-                    .reduce((b, a) => b.plus(a), Big(0)),
-                )
-                .toNumber()}{' '}
-              {currentSession.currency}
+              {walletAsset && marketData && marketData.price
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetRewardsBalancePrice(walletAsset, marketData),
+                  ).format('0,0.00')} ${marketData?.currency}
+                  `
+                : ''}
             </div>
           </div>
           <GasInfoTendermint />
