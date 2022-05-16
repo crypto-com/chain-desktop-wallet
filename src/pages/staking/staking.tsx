@@ -1430,6 +1430,7 @@ const FormWithdrawStakingReward = () => {
     },
   ];
 
+  
   const StakingTable = () => {
     return (
       <Table
