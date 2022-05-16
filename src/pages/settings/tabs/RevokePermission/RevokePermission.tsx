@@ -1,13 +1,13 @@
-import * as React from 'react';
-import { useCallback, useEffect, useState } from 'react';
-import { hexZeroPad, Interface } from 'ethers/lib/utils';
-import { Log } from '@ethersproject/abstract-provider';
-import { Button } from 'antd';
-import { useCronosEvmAsset } from '../../../../hooks/useCronosEvmAsset';
-import CRC20TokenContract from '../../../../service/signers/abi/TokenContractABI.json';
-import { CronosClient } from '../../../../service/cronos/CronosClient';
-import CRC20TokenList from './CRC20TokenList';
-import ErrorXmark from '../../../../components/ErrorXmark/ErrorXmark';
+import * as React from "react";
+import { useCallback, useEffect, useState } from "react";
+import { hexZeroPad, Interface } from "ethers/lib/utils";
+import { Log } from "@ethersproject/abstract-provider";
+import { Button } from "antd";
+import { useCronosEvmAsset } from "../../../../hooks/useCronosEvmAsset";
+import CRC20TokenContract from "../../../../service/signers/abi/TokenContractABI.json";
+import { CronosClient } from "../../../../service/cronos/CronosClient";
+import CRC20TokenList from "./CRC20TokenList";
+import ErrorXmark from "../../../../components/ErrorXmark/ErrorXmark";
 
 const RevokePermission = () => {
   const cronosAsset = useCronosEvmAsset();
@@ -19,7 +19,7 @@ const RevokePermission = () => {
     nodeURL: string,
     indexingURL: string,
     chainID: string,
-    inputAddress: string,
+    inputAddress: string
   ) => {
     setError(null);
 
@@ -31,22 +31,22 @@ const RevokePermission = () => {
       const [foundTransferEvents, foundApprovalEvents] = await Promise.all([
         cronosClient.getEventLogByAddress({
           fromBlock: 0,
-          toBlock: 'latest',
+          toBlock: "latest",
           topics: {
-            topic0: tokenInterface.getEventTopic('Transfer'),
+            topic0: tokenInterface.getEventTopic("Transfer"),
             topic1: hexZeroPad(inputAddress, 32).toLowerCase(),
-            topic0_1_opr: 'and',
-          },
+            topic0_1_opr: "and"
+          }
         }),
         cronosClient.getEventLogByAddress({
           fromBlock: 0,
-          toBlock: 'latest',
+          toBlock: "latest",
           topics: {
-            topic0: tokenInterface.getEventTopic('Approval'),
+            topic0: tokenInterface.getEventTopic("Approval"),
             topic1: hexZeroPad(inputAddress, 32).toLowerCase(),
-            topic0_1_opr: 'and',
-          },
-        }),
+            topic0_1_opr: "and"
+          }
+        })
       ]);
       setTransferEvents(foundTransferEvents);
       setApprovalEvents(foundApprovalEvents);
@@ -56,7 +56,11 @@ const RevokePermission = () => {
   };
 
   const fetch = useCallback(() => {
-    if (!cronosAsset?.config?.nodeUrl || !cronosAsset.address || !cronosAsset.config.indexingUrl) {
+    if (
+      !cronosAsset?.config?.nodeUrl ||
+      !cronosAsset.address ||
+      !cronosAsset.config.indexingUrl
+    ) {
       return;
     }
 
@@ -64,7 +68,7 @@ const RevokePermission = () => {
       cronosAsset.config.nodeUrl,
       cronosAsset.config.indexingUrl,
       cronosAsset.config.chainId,
-      cronosAsset.address,
+      cronosAsset.address
     );
   }, []);
 
@@ -77,15 +81,15 @@ const RevokePermission = () => {
       <div
         className="site-layout-background settings-content"
         style={{
-          padding: '10px',
+          padding: "10px"
         }}
       >
         <div
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center"
           }}
         >
           <ErrorXmark />
@@ -114,7 +118,7 @@ const RevokePermission = () => {
     <div
       className="site-layout-background settings-content"
       style={{
-        padding: '10px',
+        padding: "10px"
       }}
     >
       <CRC20TokenList
@@ -125,7 +129,7 @@ const RevokePermission = () => {
           fetch();
         }}
         cronosAsset={cronosAsset}
-        explorerURL={cronosAsset.config?.explorerUrl ?? ''}
+        explorerURL={cronosAsset.config?.explorerUrl ?? ""}
         filterUnverifiedTokens={false}
         filterZeroBalances={false}
         transferEvents={transferEvents}

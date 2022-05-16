@@ -8,21 +8,34 @@ import { TokenDataWithApproval } from './types';
 
 const SpenderMapping = new Map<string, string>();
 
-
-export const TokenBalance = (props: { data: TokenDataWithApproval, explorerURL: string }) => {
+export const TokenBalance = (props: {
+  data: TokenDataWithApproval;
+  explorerURL: string;
+}) => {
   const { data } = props;
 
-  const amount = getUINormalScaleAmount(data.token.balance, data.token.decimals);
-  const { readablePrice } = useMarketPrice({ symbol: data.token.symbol, amount })
+  const amount = getUINormalScaleAmount(
+    data.token.balance,
+    data.token.decimals
+  );
+  const { readablePrice } = useMarketPrice({
+    symbol: data.token.symbol,
+    amount
+  });
 
   return (
     <div
       style={{
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'column'
       }}
     >
-      <a target='__blank' href={`${props.explorerURL}/token/${data.token.contract.address}`}>{data.token.symbol}</a>
+      <a
+        target="__blank"
+        href={`${props.explorerURL}/token/${data.token.contract.address}`}
+      >
+        {data.token.symbol}
+      </a>
       <div>
         <span>{`${amount} ${data.token.symbol}  `}</span>
         <span style={{ color: '#A0A9BE' }}>({readablePrice})</span>
@@ -31,28 +44,57 @@ export const TokenBalance = (props: { data: TokenDataWithApproval, explorerURL: 
   );
 };
 
-export const Amount = (props: { data: TokenDataWithApproval }) => {
+export const Amount = (props: {
+  data: TokenDataWithApproval;
+  explorerURL: string;
+}) => {
   const { data } = props;
   return (
     <div style={{ color: '#626973' }}>
-      {
-        isUnlimited(data.approval.amount) ? `Unlimited ${data.token.symbol}`
-          : `${getUINormalScaleAmount(data.approval.amount.toString(), data.token.decimals)} ${data.token.symbol}`}
+      <a href={`${props.explorerURL}/tx/${data.approval.tx}`} target="__blank">
+        {isUnlimited(data.approval.amount)
+          ? `Unlimited ${data.token.symbol}`
+          : `${getUINormalScaleAmount(
+              data.approval.amount.toString(),
+              data.token.decimals
+            )} ${data.token.symbol}`}
+      </a>
     </div>
   );
 };
 
 export const RiskExposure = (props: { data: TokenDataWithApproval }) => {
   const { data } = props;
-  const amount = getUINormalScaleAmount(data.approval.amount.toString(), data.token.decimals);
-  const balanceAmount = getUINormalScaleAmount(data.token.balance, data.token.decimals);
-  const { readablePrice: totalBalancePrice } = useMarketPrice({ symbol: data.token.symbol, amount: balanceAmount })
-  const { readablePrice } = useMarketPrice({ symbol: data.token.symbol, amount })
+  const amount = getUINormalScaleAmount(
+    data.approval.amount.toString(),
+    data.token.decimals
+  );
+  const balanceAmount = getUINormalScaleAmount(
+    data.token.balance,
+    data.token.decimals
+  );
+  const { readablePrice: totalBalancePrice } = useMarketPrice({
+    symbol: data.token.symbol,
+    amount: balanceAmount
+  });
+  const { readablePrice } = useMarketPrice({
+    symbol: data.token.symbol,
+    amount
+  });
 
-  return <div style={{ color: '#626973' }}>{isUnlimited(data.approval.amount) ? totalBalancePrice : readablePrice}</div>;
+  return (
+    <div style={{ color: '#626973' }}>
+      {isUnlimited(data.approval.amount) ? totalBalancePrice : readablePrice}
+    </div>
+  );
 };
 
-export const TokenSpender = (props: { nodeURL: string; indexingURL: string; spender: string, explorerURL: string }) => {
+export const TokenSpender = (props: {
+  nodeURL: string;
+  indexingURL: string;
+  spender: string;
+  explorerURL: string;
+}) => {
   const { spender, indexingURL, nodeURL } = props;
   const [name, setName] = useState(spender);
 
@@ -66,7 +108,10 @@ export const TokenSpender = (props: { nodeURL: string; indexingURL: string; spen
     const response = await cronosClient.getContractSourceCodeByAddress(spender);
 
     let contractName = middleEllipsis(spender, 8);
-    if (response.result.length > 0 && response.result[0]?.ContractName?.length > 0) {
+    if (
+      response.result.length > 0 &&
+      response.result[0]?.ContractName?.length > 0
+    ) {
       contractName = response.result[0].ContractName;
       SpenderMapping.set(spender, contractName);
     }
@@ -74,10 +119,13 @@ export const TokenSpender = (props: { nodeURL: string; indexingURL: string; spen
     setName(contractName);
   }, [nodeURL, indexingURL, spender]);
 
-
   useEffect(() => {
     fetch();
   }, [fetch]);
 
-  return <a href={`${props.explorerURL}/address/${spender}`} target="__blank">{name}</a>;
+  return (
+    <a href={`${props.explorerURL}/address/${spender}`} target="__blank">
+      {name}
+    </a>
+  );
 };
