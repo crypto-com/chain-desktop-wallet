@@ -1326,7 +1326,6 @@ const FormWithdrawStakingReward = () => {
         setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
-      
       setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsConfirmationRestakeModalVisible(false);
       setConfirmLoading(false);
@@ -1430,7 +1429,6 @@ const FormWithdrawStakingReward = () => {
     },
   ];
 
-  
   const StakingTable = () => {
     return (
       <Table
@@ -1517,6 +1515,7 @@ const FormWithdrawStakingReward = () => {
                 .toNumber()}
               {currentSession?.activeAsset?.symbol}
             </div>
+
             <div className="fiat">
               $
               {rewards
