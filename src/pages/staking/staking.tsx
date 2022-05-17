@@ -1508,8 +1508,6 @@ const FormWithdrawStakingReward = () => {
             <div>
               {numeral(scaledRewardBalance(walletAsset)).format('0,0.0000')}
               {walletAsset?.symbol}
-
-              {console.log('walletAsset ', walletAsset)}
             </div>
 
             <div className="fiat">
