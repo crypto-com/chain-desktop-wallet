@@ -1504,7 +1504,11 @@ const FormWithdrawStakingReward = () => {
           <div className="item">
             <div className="label">{t('staking.modal2.label4')}</div>
 
-            <div className="address-container">
+            <div
+              className={
+                rewards && rewards.length > 3 ? 'address-container scrollable' : 'address-container'
+              }
+            >
               {rewards.map(elem => (
                 <>
                   <div className="address multiple">{`${elem?.validatorAddress}`}</div>
