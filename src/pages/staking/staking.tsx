@@ -1058,7 +1058,7 @@ const FormWithdrawStakingReward = () => {
   const [rewardAction, setRewardAction] = useState<RewardActionType>('withdraw');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
 
-  const [withdrawAllModalVisible, setWithdrawAllModal] = useState(false);
+  const [withdrawAllModalVisible, setWithdrawAllModalVisible] = useState(false);
   const [marketData, setMarketData] = useState<AssetMarketPrice>();
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
@@ -1144,7 +1144,7 @@ const FormWithdrawStakingReward = () => {
   };
 
   const handleWithdrawAllModal = () => {
-    setWithdrawAllModal(false);
+    setWithdrawAllModalVisible(false);
     setInputPasswordVisible(false);
   };
 
@@ -1156,8 +1156,8 @@ const FormWithdrawStakingReward = () => {
       }
       if (action === 'restake') {
         showConfirmationRestakeModal();
-      } else if (action === 'withdrawAll') {
-        setWithdrawAllModal(true);
+      } else if (action === 'withdrawall') {
+        setWithdrawAllModalVisible(true);
       } else {
         showConfirmationModal();
       }
@@ -1173,12 +1173,10 @@ const FormWithdrawStakingReward = () => {
     );
     setDecryptedPhrase(phraseDecrypted);
 
-    console.log('rewardAction ', rewardAction);
-
     if (rewardAction === 'restake') {
       showConfirmationRestakeModal();
     } else if (rewardAction === 'withdrawall') {
-      setWithdrawAllModal(true);
+      setWithdrawAllModalVisible(true);
     } else {
       showConfirmationModal();
     }
@@ -1187,7 +1185,7 @@ const FormWithdrawStakingReward = () => {
   const onConfirmWithdrawAllStakingRewards = async () => {
     const { walletType } = currentSession.wallet;
     if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
-      setWithdrawAllModal(false);
+      setWithdrawAllModalVisible(false);
       setIsVisibleConfirmationModal(false);
       return;
     }
@@ -1211,7 +1209,7 @@ const FormWithdrawStakingReward = () => {
 
       setIsVisibleConfirmationModal(false);
       setErrorMessages(((e as unknown) as any).message.split(': '));
-      setWithdrawAllModal(false);
+      setWithdrawAllModalVisible(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
       setIsErrorTransferModalVisible(true);
