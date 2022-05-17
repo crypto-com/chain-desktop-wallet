@@ -309,7 +309,8 @@ function CRC20TokenList({
                 gasPrice: `0x${_gasPrice.toString(16)}`,
                 nonce: prepareTxInfo.nonce,
               };
-              const result = await evmTransactionSigner.sendContractCallTransaction(
+
+              await evmTransactionSigner.sendContractCallTransaction(
                 cronosAsset!,
                 txConfig,
                 decryptedPhrase,
