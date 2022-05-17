@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.7.8] - 2022-05-10
+### Bug fixes
+- Handle Ledger Live standard support on EVM transaction signing functions
+- Incorrect Transaction Failed popup on Testnet due to delayed transaction receipt return
+- UX optimization
 ## [v0.7.7] - 2022-05-10
 ### Additions
 - Gas Fee option customization panel
