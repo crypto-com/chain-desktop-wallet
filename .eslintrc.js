@@ -16,7 +16,7 @@ module.exports = {
     'react/no-array-index-key': 'off',
     'no-plusplus': 'off',
     '@typescript-eslint/no-use-before-define': 'off',
-    '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/no-shadow': 'off',
     'react/prefer-stateless-function': 'off',
     'no-param-reassign': 'off', // used redux-immer for simplification
     'prefer-object-spread': 'off',

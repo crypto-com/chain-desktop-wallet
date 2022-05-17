@@ -22,16 +22,9 @@ import { DappBrowserIPC } from '../../../dapp/types';
 import { ConfirmModal } from './ConfirmModal';
 import { Amount, RiskExposure, TokenBalance, TokenSpender } from './TableCells';
 import { CRC20TokenData, TokenDataWithApproval } from './types';
-import {
-  getCRC20TokenData,
-  getGasPrice,
-  parsePadZero32Value,
-  toFloat
-} from './utils';
+import { getCRC20TokenData, getGasPrice, parsePadZero32Value, toFloat } from './utils';
 
 interface Props {
-  filterUnverifiedTokens: boolean;
-  filterZeroBalances: boolean;
   transferEvents: Log[];
   approvalEvents: Log[];
   inputAddress?: string;
@@ -44,8 +37,6 @@ interface Props {
 }
 
 function CRC20TokenList({
-  filterUnverifiedTokens,
-  filterZeroBalances,
   transferEvents,
   cronosAsset,
   approvalEvents,
@@ -54,12 +45,10 @@ function CRC20TokenList({
   indexingURL,
   explorerURL,
   onRevokeSuccess,
-  onError
+  onError,
 }: Props) {
   const [txEvent, setTxEvent] = useState<DappBrowserIPC.TokenApprovalEvent>();
-  const [requestConfirmationVisible, setRequestConfirmationVisible] = useState(
-    false
-  );
+  const [requestConfirmationVisible, setRequestConfirmationVisible] = useState(false);
   const allMarketData = useRecoilValue(allMarketState);
   const currentSession = useRecoilValue(sessionState);
 
@@ -73,14 +62,10 @@ function CRC20TokenList({
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [selectedData, setSelectedData] = useState<TokenDataWithApproval>();
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
-  const transactionPrepareService = new TransactionPrepareService(
-    walletService.storageService
-  );
+  const transactionPrepareService = new TransactionPrepareService(walletService.storageService);
 
   const loadData = useCallback(async () => {
     if (!inputAddress) return;
-
-    console.log(approvalEvents);
 
     setLoading(true);
 
@@ -90,20 +75,15 @@ function CRC20TokenList({
       tokenContracts.map(async contract => {
         const approvals = filterDuplicatedApprovalsEvents(contract);
 
-        const tokenData = await getCRC20TokenData(
-          contract,
-          inputAddress,
-          nodeURL,
-          indexingURL
-        );
+        const tokenData = await getCRC20TokenData(contract, inputAddress, nodeURL, indexingURL);
         return {
           contract,
           approvals,
           symbol: tokenData.symbol,
           balance: tokenData.balance,
-          decimals: tokenData.decimals
+          decimals: tokenData.decimals,
         };
-      })
+      }),
     );
 
     const sortedTokens = unsortedTokens
@@ -111,40 +91,34 @@ function CRC20TokenList({
       .filter(hasBalanceOrApprovals)
       .sort((a, b) => b.balance.localeCompare(a.balance));
 
-    const approvals = sortedTokens.reduce<TokenDataWithApproval[]>(
-      (acc, token) => {
-        const tokensWithApprovalData: TokenDataWithApproval[] = [];
-        const map = new Map<string, Log>();
-        token.approvals.forEach((t, idx) => {
-          const spender = parsePadZero32Value(t.topics[2]);
-          if (!map.has(spender)) {
-            map.set(spender, t);
+    const approvals = sortedTokens.reduce<TokenDataWithApproval[]>((acc, token) => {
+      const tokensWithApprovalData: TokenDataWithApproval[] = [];
+      const map = new Map<string, Log>();
+      token.approvals.forEach((t, idx) => {
+        const spender = parsePadZero32Value(t.topics[2]);
+        if (!map.has(spender)) {
+          map.set(spender, t);
 
-            const rowSpan = idx === 0 ? token.approvals.length : 0;
+          const rowSpan = idx === 0 ? token.approvals.length : 0;
 
-            tokensWithApprovalData.push({
-              token,
-              approval: {
-                spender,
-                tx: t.transactionHash,
-                readableSpenderName: '',
-                amount:
-                  t.data === '0x'
-                    ? ethers.BigNumber.from(0)
-                    : ethers.BigNumber.from(t.data),
-                riskExposure: ''
-              },
-              rowSpan
-            });
-          }
-        });
+          tokensWithApprovalData.push({
+            token,
+            approval: {
+              spender,
+              tx: t.transactionHash,
+              readableSpenderName: '',
+              amount: t.data === '0x' ? ethers.BigNumber.from(0) : ethers.BigNumber.from(t.data),
+              riskExposure: '',
+            },
+            rowSpan,
+          });
+        }
+      });
 
-        acc.push(...tokensWithApprovalData);
+      acc.push(...tokensWithApprovalData);
 
-        return acc;
-      },
-      []
-    );
+      return acc;
+    }, []);
 
     setFlatternedApprovalledData(approvals);
     setLoading(false);
@@ -166,26 +140,15 @@ function CRC20TokenList({
     const provider = new ethers.providers.JsonRpcProvider(nodeURL);
 
     const tokenContracts = events
-      .filter(
-        (event, i) =>
-          i === events.findIndex(other => event.address === other.address)
-      )
-      .map(
-        event =>
-          new Contract(
-            getAddress(event.address),
-            CRC20TokenContract.abi,
-            provider
-          )
-      );
+      .filter((event, i) => i === events.findIndex(other => event.address === other.address))
+      .map(event => new Contract(getAddress(event.address), CRC20TokenContract.abi, provider));
 
     return tokenContracts;
   };
 
   const filterDuplicatedApprovalsEvents = (contract: Contract) => {
     const tokenApprovals = approvalEvents.filter(
-      approval =>
-        approval.address.toLowerCase() === contract.address.toLowerCase()
+      approval => approval.address.toLowerCase() === contract.address.toLowerCase(),
     );
     const map = new Map<string, Log>();
     tokenApprovals.forEach(approval => {
@@ -194,18 +157,14 @@ function CRC20TokenList({
       console.log(spender, lastApproval?.blockNumber, approval.blockNumber);
       if (!lastApproval) {
         map.set(spender, approval);
-      } else if (
-        ethers.BigNumber.from(approval.blockNumber).gt(lastApproval.blockNumber)
-      ) {
+      } else if (ethers.BigNumber.from(approval.blockNumber).gt(lastApproval.blockNumber)) {
         map.set(spender, approval);
       }
     });
 
     const filterZeroApprovals = (log: Log) => {
       const approval =
-        log.data === '0x'
-          ? ethers.BigNumber.from(0)
-          : ethers.BigNumber.from(log.data);
+        log.data === '0x' ? ethers.BigNumber.from(0) : ethers.BigNumber.from(log.data);
 
       return approval.gt(ethers.BigNumber.from(0));
     };
@@ -214,8 +173,7 @@ function CRC20TokenList({
   };
 
   const hasBalanceOrApprovals = (token: CRC20TokenData) =>
-    token.approvals.length > 0 ||
-    toFloat(Number(token.balance), token.decimals) !== '0.000';
+    token.approvals.length > 0 || toFloat(Number(token.balance), token.decimals) !== '0.000';
 
   if (loading) {
     return (
@@ -233,11 +191,17 @@ function CRC20TokenList({
   }
 
   if (flatternedApprovalledData.length === 0) {
-    return <div style={{
-      display: "flex",
-      justifyContent: 'center',
-      alignItems: 'center'
-    }}>No Approvalled Data</div>;
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        No Approvalled Data
+      </div>
+    );
   }
 
   const columns: ColumnsType<TokenDataWithApproval> = [
@@ -247,10 +211,10 @@ function CRC20TokenList({
       render: (data: TokenDataWithApproval) => (
         <TokenBalance data={data} explorerURL={explorerURL} />
       ),
-      onCell: (data: TokenDataWithApproval, _) =>
-      ({
-        rowSpan: data.rowSpan
-      } as any)
+      onCell: (data: TokenDataWithApproval) =>
+        ({
+          rowSpan: data.rowSpan,
+        } as any),
     },
     {
       title: t('settings.revoke.spender'),
@@ -264,19 +228,17 @@ function CRC20TokenList({
             explorerURL={explorerURL}
           />
         );
-      }
+      },
     },
     {
       title: t('settings.revoke.amount'),
       key: 'amount',
-      render: (data: TokenDataWithApproval) => (
-        <Amount data={data} explorerURL={explorerURL} />
-      )
+      render: (data: TokenDataWithApproval) => <Amount data={data} explorerURL={explorerURL} />,
     },
     {
       title: t('settings.revoke.risk'),
       key: 'risk',
-      render: (data: TokenDataWithApproval) => <RiskExposure data={data} />
+      render: (data: TokenDataWithApproval) => <RiskExposure data={data} />,
     },
     {
       title: '',
@@ -289,12 +251,12 @@ function CRC20TokenList({
                 onSuccess: async password => {
                   const phraseDecrypted = await secretStoreService.decryptPhrase(
                     password,
-                    currentSession.wallet.identifier
+                    currentSession.wallet.identifier,
                   );
                   setDecryptedPhrase(phraseDecrypted);
                   setSelectedData({ ...data });
                 },
-                onCancel: () => { }
+                onCancel: () => {},
               });
             }}
             style={{ color: '#D9475A' }}
@@ -302,8 +264,8 @@ function CRC20TokenList({
             {t('settings.revoke')}
           </a>
         );
-      }
-    }
+      },
+    },
   ];
 
   return (
@@ -316,35 +278,28 @@ function CRC20TokenList({
           currentSession={currentSession}
           wallet={currentSession.wallet}
           visible
-          onConfirm={async ({
-            gasLimit: _gasLimit,
-            gasPrice: _gasPrice,
-            event
-          }) => {
+          onConfirm={async ({ gasLimit: _gasLimit, gasPrice: _gasPrice, event }) => {
             setRequestConfirmationVisible(false);
 
-            if (
-              event.name !== 'tokenApproval' ||
-              !cronosAsset.config?.nodeUrl
-            ) {
+            if (event.name !== 'tokenApproval' || !cronosAsset.config?.nodeUrl) {
               return;
             }
 
             try {
               const prepareTXConfig: TransactionConfig = {
                 from: event.object.from,
-                to: event.object.to
+                to: event.object.to,
               };
 
               const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
                 cronosAsset!,
-                prepareTXConfig
+                prepareTXConfig,
               );
 
               const data = evmTransactionSigner.encodeTokenApprovalABI(
                 event.object.tokenData.contractAddress,
                 event.object.spender,
-                ethers.BigNumber.from(event.object.amount)
+                ethers.BigNumber.from(event.object.amount),
               );
 
               const txConfig: EVMContractCallUnsigned = {
@@ -353,13 +308,13 @@ function CRC20TokenList({
                 data,
                 gasLimit: `0x${_gasLimit.toString(16)}`,
                 gasPrice: `0x${_gasPrice.toString(16)}`,
-                nonce: prepareTxInfo.nonce
+                nonce: prepareTxInfo.nonce,
               };
               const result = await evmTransactionSigner.sendContractCallTransaction(
                 cronosAsset!,
                 txConfig,
                 decryptedPhrase,
-                cronosAsset.config.nodeUrl
+                cronosAsset.config.nodeUrl,
               );
 
               console.log('Tx success: ', result);
@@ -403,20 +358,14 @@ function CRC20TokenList({
 
             const client = new CronosClient(nodeURL, indexingURL);
 
-            const abi = evmTransactionSigner.encodeTokenApprovalABI(
-              tokenAddress,
-              spender,
-              0
-            );
+            const abi = evmTransactionSigner.encodeTokenApprovalABI(tokenAddress, spender, 0);
 
-            const response = await client.getContractDataByAddress(
-              tokenAddress
-            );
+            const response = await client.getContractDataByAddress(tokenAddress);
             const { gasLimit, gasPrice } = await getGasPrice(cronosAsset, {
               from,
               to: tokenAddress,
               data: abi,
-              value: '0x0'
+              value: '0x0',
             });
 
             const approvalEvent: DappBrowserIPC.TokenApprovalEvent = {
@@ -429,8 +378,8 @@ function CRC20TokenList({
                 gasPrice,
                 from,
                 spender,
-                to: tokenAddress
-              }
+                to: tokenAddress,
+              },
             };
 
             setTxEvent(approvalEvent);
