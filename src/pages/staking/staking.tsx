@@ -1492,7 +1492,7 @@ const FormWithdrawStakingReward = () => {
             <div className="address">{`${currentSession.wallet.address}`}</div>
           </div>
           <div className="item">
-            <div className="label">{t('staking.modal2.label4')}(s)</div>
+            <div className="label">{t('staking.modal2.label4')}</div>
 
             {rewards.map((elem, idx) => (
               <>
