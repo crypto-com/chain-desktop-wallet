@@ -4,7 +4,6 @@ import { Log } from '@ethersproject/abstract-provider';
 import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 import { EVMClient } from '../rpc/clients/EVMClient';
 import {
-  EventLog,
   TxListAPIResponse,
   txListByAccountRequestParams,
   PendingTxListAPIResponse,
