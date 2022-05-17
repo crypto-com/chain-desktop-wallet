@@ -1034,7 +1034,7 @@ const FormDelegationOperations = props => {
 };
 
 const FormWithdrawStakingReward = () => {
-  type RewardActionType = 'withdraw' | 'restake';
+  type RewardActionType = 'withdrawall' | 'withdraw' | 'restake';
 
   const [withdrawValues, setWithdrawValues] = useState({
     validatorAddress: '',
@@ -1172,8 +1172,13 @@ const FormWithdrawStakingReward = () => {
       currentSession.wallet.identifier,
     );
     setDecryptedPhrase(phraseDecrypted);
+
+    console.log('rewardAction ', rewardAction);
+
     if (rewardAction === 'restake') {
       showConfirmationRestakeModal();
+    } else if (rewardAction === 'withdrawall') {
+      setWithdrawAllModal(true);
     } else {
       showConfirmationModal();
     }
@@ -1183,9 +1188,11 @@ const FormWithdrawStakingReward = () => {
     const { walletType } = currentSession.wallet;
     if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
       setWithdrawAllModal(false);
+      setIsVisibleConfirmationModal(false);
       return;
     }
     try {
+      setIsVisibleConfirmationModal(false);
       setConfirmLoading(true);
       const rewardWithdrawAllResult = await walletService.sendStakingWithdrawAllRewardsTx({
         validatorAddressList: rewards.map(rewardInfo => rewardInfo.validatorAddress),
@@ -1193,7 +1200,7 @@ const FormWithdrawStakingReward = () => {
         walletType,
       });
       setBroadcastResult(rewardWithdrawAllResult);
-
+      setIsVisibleConfirmationModal(false);
       handleWithdrawAllModal();
       setConfirmLoading(false);
       setIsSuccessTransferModalVisible(true);
@@ -1202,6 +1209,7 @@ const FormWithdrawStakingReward = () => {
         setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
+      setIsVisibleConfirmationModal(false);
       setErrorMessages(((e as unknown) as any).message.split(': '));
       setWithdrawAllModal(false);
       setConfirmLoading(false);
@@ -1220,6 +1228,7 @@ const FormWithdrawStakingReward = () => {
     }
     try {
       setConfirmLoading(true);
+
       const rewardWithdrawResult = await walletService.sendStakingRewardWithdrawalTx({
         validatorAddress: withdrawValues.validatorAddress,
         decryptedPhrase,
@@ -1456,7 +1465,10 @@ const FormWithdrawStakingReward = () => {
         id="withdraw-all-btn"
         type="primary"
         onClick={() => {
-          showPasswordInput('withdrawAll');
+          setRewardAction('withdrawall');
+          setTimeout(() => {
+            showPasswordInput('withdrawall');
+          }, 200);
         }}
       >
         {t('staking.withdrawall')}
@@ -1494,21 +1506,22 @@ const FormWithdrawStakingReward = () => {
           <div className="item">
             <div className="label">{t('staking.modal2.label4')}</div>
 
-            {rewards.map((elem, idx) => (
+            {rewards.map(elem => (
               <>
-                <div className="address multiple">
-                  {`${elem?.validatorAddress}`}
-                  <span className="address-num">{idx}</span>
-                </div>
+                <div className="address multiple">{`${elem?.validatorAddress}`}</div>
               </>
             ))}
           </div>
           <div className="item">
-            <div className="label">{t('staking.modal2.label3')}</div>
-            <div>
-              {numeral(scaledRewardBalance(walletAsset)).format('0,0.0000')}
-              {walletAsset?.symbol}
-            </div>
+            <div className="label">{t('staking.modal2.label5')}</div>
+            {walletAsset ? (
+              <div>
+                {numeral(scaledRewardBalance(walletAsset)).format('0,0.0000')}
+                {walletAsset?.symbol}
+              </div>
+            ) : (
+              ''
+            )}
 
             <div className="fiat">
               {walletAsset && marketData && marketData.price

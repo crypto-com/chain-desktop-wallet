@@ -725,5 +725,13 @@
   "settings.addressBook.removeConfirm": "確定要刪除此地址嗎？",
   "settings.addressBook.addNewAddress": "添加新地址",
   "settings.addressBook.title": "地址簿",
-  "settings.addressBook.address": "地址"
+  "settings.addressBook.address": "地址",
+  "settings.revoke-permission": "撤銷許可",
+  "settings.revoke.sure": "您確定要撤銷許可嗎?",
+  "settings.revoke.token": "代幣/餘額",
+  "settings.revoke.spender": "批准的消費者",
+  "settings.revoke.amount": "批准的數量",
+  "settings.revoke.risk": "風險敞口",
+  "settings.revoke": "撤銷許可",
+  "settings.revoke.unlimited": "無限的"
 }

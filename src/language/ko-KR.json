@@ -722,5 +722,13 @@
   "settings.addressBook.removeConfirm": "제거 하시겠습니까?",
   "settings.addressBook.addNewAddress": "새 주소를 추가하십시오",
   "settings.addressBook.title": "주소록",
-  "settings.addressBook.address": "주소"
+  "settings.addressBook.address": "주소",
+  "settings.revoke-permission": "취소 허가",
+  "settings.revoke.sure": "허가를 철회 하시겠습니까?",
+  "settings.revoke.token": "토큰/균형",
+  "settings.revoke.spender": "승인 된 스펜더",
+  "settings.revoke.amount": "승인 된 금액",
+  "settings.revoke.risk": "위험 노출",
+  "settings.revoke": "취소",
+  "settings.revoke.unlimited": "제한 없는"
 }

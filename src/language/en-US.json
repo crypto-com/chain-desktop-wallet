@@ -529,6 +529,7 @@
   "staking.modal2.label2": "Withdraw Reward From Validator",
   "staking.modal2.label3": "Rewards",
   "staking.modal2.label4": "Withdraw Reward(s) From Validator(s)",
+  "staking.modal2.label5": "Total Rewards",
   "staking.modal3.title": "Unbonding Delegation",
   "staking.modal3.description": "Your unstaked assets will be available to you after a {{ unbondingPeriod }} day unbonding period, as enforced by the Crypto.org Chain network.",
   "staking.modal3.button": "View Unbonding Delegation",
@@ -725,5 +726,13 @@
   "settings.addressBook.removeConfirm": "Are you sure you want to remove?",
   "settings.addressBook.addNewAddress": "Add new address",
   "settings.addressBook.title": "Address Book",
-  "settings.addressBook.address": "Address"
+  "settings.addressBook.address": "Address",
+  "settings.revoke-permission": "Revoke Permission",
+  "settings.revoke.sure": "Are you sure you want to revoke permission?",
+  "settings.revoke.token": "Token/Balance",
+  "settings.revoke.spender": "Approved Spender",
+  "settings.revoke.amount": "Approved Amount",
+  "settings.revoke.risk": "Risk Exposure",
+  "settings.revoke": "Revoke",
+  "settings.revoke.unlimited": "Unlimited"
 }
