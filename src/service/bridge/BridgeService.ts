@@ -29,6 +29,8 @@ import {
   BridgeTransactionListResponse,
   BridgeTransactionStatusResponse,
 } from './contracts/BridgeModels';
+import { getCronosTendermintFeeConfig } from '../Gas';
+import { DerivationPathStandard } from '../signers/LedgerSigner';
 
 export class BridgeService {
   public readonly storageService: StorageService;
@@ -133,12 +135,14 @@ export class BridgeService {
     if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       const device = createLedgerDevice();
       const walletAddressIndex = currentSession.wallet.addressIndex;
+      const walletDerivationPathStandard = currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
 
       // Use fixed hard-coded max GasLimit for bridge transactions ( Known contract and predictable consumption )
       const gasPriceTx = web3.utils.toBN(bridgeTransaction.gasPrice);
 
       signedTransactionHex = await device.signEthTx(
         walletAddressIndex,
+        walletDerivationPathStandard,
         chainId, // chainid
         bridgeTransaction.nonce,
         web3.utils.toHex(gasLimit) /* gas limit */,
@@ -218,16 +222,21 @@ export class BridgeService {
     };
 
     let signedTxHex: string = '';
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig()
 
     if (bridgeTransferRequest.walletType === LEDGER_WALLET_TYPE) {
       signedTxHex = await ledgerTransactionSigner.signIBCTransfer(
         bridgeTransaction,
         bridgeTransferRequest.decryptedPhrase,
+        networkFee,
+        gasLimit
       );
     } else {
       signedTxHex = await transactionSigner.signIBCTransfer(
         bridgeTransaction,
         bridgeTransferRequest.decryptedPhrase,
+        networkFee,
+        gasLimit
       );
     }
 

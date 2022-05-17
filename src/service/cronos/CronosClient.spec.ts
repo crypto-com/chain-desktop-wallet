@@ -64,7 +64,7 @@ describe('CronosClient', () => {
       status: '1',
     };
     axiosMock
-      .onGet('/api', {
+      .onGet('', {
         params: {
           module: 'account',
           action: 'txlist',
@@ -83,7 +83,7 @@ describe('CronosClient', () => {
 
     const cronosClient = new CronosClient(
       'https://evm-t3.cronos.org:8545/',
-      'https://cronos-chainindex.com',
+      'https://cronos.org/explorer/testnet3/api',
     );
 
     const txListRespone = await cronosClient.getTxsByAddress(
@@ -104,42 +104,9 @@ describe('CronosClient', () => {
   });
 
   it('should return the `pendingTxList` from chainIndexAPI ', async () => {
-    const txPendingListStub = {
-      message: 'OK',
-      result: [
-        {
-          contractAddress: '',
-          cumulativeGasUsed: '52380',
-          from: '0x5a58b4d21720a96077ef0df280d73a26249f0784',
-          gas: '72000',
-          gasPrice: '100',
-          gasUsed: '1000',
-          hash: '0xc7d45697d4f2296964500a83ca3fbcc34f6d68ba58ed6b8ea4fe93363d6dd384',
-          input:
-            '0xa9059cbb000000000000000000000000899c7b2a8d62c3b848c052a16a4364a091eb308b0000000000000000000000000000000000000000000000000000102e294e53fd',
-          nonce: '2992',
-          to: '0x95f7c0b0def5ec981709c5c47e32963e5450bf38',
-          value: '0',
-        },
-        {
-          contractAddress: '',
-          cumulativeGasUsed: '52380',
-          from: '0x5a58b4d21720a96077ef0df280d73a26249f0784',
-          gas: '72000',
-          gasPrice: '100',
-          gasUsed: '1000',
-          hash: '0xc7d45697d4f2296964500a83ca3fbcc34f6d68ba58ed6b8ea4fe93363d6dd384',
-          input:
-            '0xa9059cbb000000000000000000000000899c7b2a8d62c3b848c052a16a4364a091eb308b0000000000000000000000000000000000000000000000000000102e294e53fd',
-          nonce: '2992',
-          to: '0x95f7c0b0def5ec981709c5c47e32963e5450bf38',
-          value: '0',
-        },
-      ],
-      status: '1',
-    };
+    const txPendingListStub = { message: 'No transactions found', result: [], status: '0' };
     axiosMock
-      .onGet('/api', {
+      .onGet('', {
         params: {
           module: 'account',
           action: 'pendingtxlist',
@@ -159,14 +126,14 @@ describe('CronosClient', () => {
     const cronosClient = new CronosClient(
       // 'https://cronos-testnet-3.crypto.org:8545/',
       'https://evm-t3.cronos.org:8545/',
-      'https://cronos-chainindex.com',
+      'https://cronos.org/explorer/testnet3/api',
     );
     const txPendingListRespone = await cronosClient.getPendingTxsByAddress(
       '0x95F7C0B0dEF5Ec981709c5C47E32963E5450bF38',
       { page: '1', offset: '2' },
     );
-    expect(txPendingListRespone.message).to.equal('OK');
-    expect(txPendingListRespone.status).to.equal('1');
+    expect(txPendingListRespone.message).to.equal('No transactions found');
+    expect(txPendingListRespone.status).to.equal('0');
     expect(txPendingListRespone.result).to.deep.equal(txPendingListStub.result);
 
     const txPendingListEmptyRespone = await cronosClient.getPendingTxsByAddress(

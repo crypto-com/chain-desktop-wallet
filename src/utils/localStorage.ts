@@ -3,11 +3,15 @@ import { Bookmark } from '../models/DappBrowser';
 export enum SettingsKey {
   DappBookmarks = 'dapp_book_marks',
   DappDisclaimerDisabledList = 'dapp_disclaimer_disabled_list',
+  CROGasStep = 'cro_gas_step',
 }
+
+export type CROGasStep = 'low' | 'average' | 'high'
 
 export const DefaultSettings = {
   [SettingsKey.DappBookmarks]: [] as Bookmark[],
   [SettingsKey.DappDisclaimerDisabledList]: [] as string[],
+  [SettingsKey.CROGasStep]: 'average' as CROGasStep,
 };
 
 export const getLocalSetting = <T>(key: SettingsKey): T => {

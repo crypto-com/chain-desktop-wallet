@@ -478,20 +478,12 @@ const unListedProjects: CronosProject[] = [
     twitter: '',
   },
   {
-    name: 'BankSwap',
-    category: ['DEX'],
-    logo: 'bankswap.png',
-    description: '',
-    link: 'https://bankswap.crobank.net/swap',
-    twitter: '',
-  },
-  {
     name: 'CronosBay',
     category: ['NFT'],
     link: 'https://www.cronosbay.com/',
     logo: 'cronosbay.png',
     description: '',
-    twitter: ''
+    twitter: '',
   },
   {
     name: 'Cougar Exchange',
@@ -499,8 +491,16 @@ const unListedProjects: CronosProject[] = [
     link: 'https://cgx.finance/',
     logo: 'cougar-exchange.png',
     description: '',
-    twitter: ''
-  }
+    twitter: '',
+  },
+  {
+    name: 'MMF Money',
+    category: ['DEX'],
+    link: 'https://mmf.money/',
+    logo: 'mmf-money.png',
+    description: '',
+    twitter: '',
+  },
 ];
 
 const NFTProjects: CronosProject[] = [

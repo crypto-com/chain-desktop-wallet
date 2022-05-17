@@ -59,7 +59,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
     const txListResponse: AxiosResponse<TxListAPIResponse> = await axios({
       baseURL: this.cronosExplorerAPIBaseURL,
-      url: '/api',
+      url: '',
       params: requestParams,
     });
 
@@ -82,7 +82,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
     const txListResponse: AxiosResponse<PendingTxListAPIResponse> = await axios({
       baseURL: this.cronosExplorerAPIBaseURL,
-      url: '/api',
+      url: '',
       params: requestParams,
     });
 
@@ -105,7 +105,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
     const txListResponse: AxiosResponse<TokenTransferEventLogsResponse> = await axios({
       baseURL: this.cronosExplorerAPIBaseURL,
-      url: '/api',
+      url: '',
       params: requestParams,
     });
 
@@ -124,7 +124,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
     const txListResponse: AxiosResponse<TokensOwnedByAddressResponse> = await axios({
       baseURL: this.cronosExplorerAPIBaseURL,
-      url: '/api',
+      url: '',
       params: requestParams,
     });
 
@@ -143,7 +143,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
     const txListResponse: AxiosResponse<ContractDataResponse> = await axios({
       baseURL: this.cronosExplorerAPIBaseURL,
-      url: '/api',
+      url: '',
       params: requestParams,
     });
 
