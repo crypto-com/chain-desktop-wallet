@@ -154,7 +154,6 @@ function CRC20TokenList({
     tokenApprovals.forEach(approval => {
       const spender = approval.topics[2];
       const lastApproval = map.get(spender);
-      console.log(spender, lastApproval?.blockNumber, approval.blockNumber);
       if (!lastApproval) {
         map.set(spender, approval);
       } else if (ethers.BigNumber.from(approval.blockNumber).gt(lastApproval.blockNumber)) {
@@ -316,8 +315,6 @@ function CRC20TokenList({
                 decryptedPhrase,
                 cronosAsset.config.nodeUrl,
               );
-
-              console.log('Tx success: ', result);
 
               setIsConfirmLoading(false);
               setTxEvent(undefined);
