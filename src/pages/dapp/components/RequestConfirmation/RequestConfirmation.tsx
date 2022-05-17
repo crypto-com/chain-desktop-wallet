@@ -181,8 +181,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
           >{`${contractAddress}`}</div>
           {
             event.name === 'tokenApproval' && <div className="row">
-              <div className="title">Approval Amount</div>
-              <div>{isUnlimited(ethers.BigNumber.from(event.object.amount)) ? `Unlimited ${event.object.tokenData.symbol}` : `${scaledAmount(event.object.amount, Number(event.object.tokenData.decimals))} ${event.object.tokenData.symbol}`}</div>
+              <div className="title">{t('settings.revoke.amount')}</div>
+              <div>{isUnlimited(ethers.BigNumber.from(event.object.amount)) ? `${t('settings.revoke.unlimited')} ${event.object.tokenData.symbol}` : `${scaledAmount(event.object.amount, Number(event.object.tokenData.decimals))} ${event.object.tokenData.symbol}`}</div>
             </div>
           }
         </>

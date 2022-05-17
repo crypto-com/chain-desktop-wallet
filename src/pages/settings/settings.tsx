@@ -1075,7 +1075,7 @@ const FormSettings = () => {
                     </>
                   </ModalPopup>
                 </TabPane>
-                <TabPane tab={t('Revoke Permission')} key="revoke-permission">
+                <TabPane tab={t('settings.revoke-permission')} key="revoke-permission">
                   <RevokePermission />
                 </TabPane>
               </Tabs>

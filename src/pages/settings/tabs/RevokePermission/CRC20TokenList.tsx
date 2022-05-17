@@ -4,6 +4,7 @@ import { ColumnsType } from 'antd/lib/table';
 import { Contract, ethers } from 'ethers';
 import { getAddress } from 'ethers/lib/utils';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useRecoilValue } from 'recoil';
 import { TransactionConfig } from 'web3-core';
 import { usePasswordModal } from '../../../../components/PasswordForm/PasswordFormModal';
@@ -66,6 +67,7 @@ function CRC20TokenList({
   const [flatternedApprovalledData, setFlatternedApprovalledData] = useState<
     TokenDataWithApproval[]
   >([]);
+  const [t] = useTranslation();
 
   const { show: showPasswordModal } = usePasswordModal();
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
@@ -240,7 +242,7 @@ function CRC20TokenList({
 
   const columns: ColumnsType<TokenDataWithApproval> = [
     {
-      title: 'Token/Balance',
+      title: t('settings.revoke.token'),
       key: 'token',
       render: (data: TokenDataWithApproval) => (
         <TokenBalance data={data} explorerURL={explorerURL} />
@@ -251,7 +253,7 @@ function CRC20TokenList({
       } as any)
     },
     {
-      title: 'Approved Spender',
+      title: t('settings.revoke.spender'),
       key: 'spender',
       render: (data: TokenDataWithApproval) => {
         return (
@@ -265,14 +267,14 @@ function CRC20TokenList({
       }
     },
     {
-      title: 'Approved Amount',
+      title: t('settings.revoke.amount'),
       key: 'amount',
       render: (data: TokenDataWithApproval) => (
         <Amount data={data} explorerURL={explorerURL} />
       )
     },
     {
-      title: 'Risk Exposure',
+      title: t('settings.revoke.risk'),
       key: 'risk',
       render: (data: TokenDataWithApproval) => <RiskExposure data={data} />
     },
@@ -297,7 +299,7 @@ function CRC20TokenList({
             }}
             style={{ color: '#D9475A' }}
           >
-            Revoke
+            {t('settings.revoke')}
           </a>
         );
       }

@@ -31,7 +31,7 @@ export const ConfirmModal = (props: ModalConfig) => {
             onClick={props.onConfirm}
             loading={props.isLoading}
           >
-            Revoke Permission
+            {t('settings.revoke-permission')} 
           </Button>
           <Button type="link" onClick={props.onCancel}>
             {t('general.cancel')}
@@ -58,10 +58,10 @@ export const ConfirmModal = (props: ModalConfig) => {
             padding: '10px'
           }}
         >
-          Confirm
+          {t('general.confirm')}
         </div>
         <div style={{ color: '#0B142680' }}>
-          Are you sure you want to revoke permission?
+          {t('settings.revoke.sure')}
         </div>
       </div>
     </Modal>

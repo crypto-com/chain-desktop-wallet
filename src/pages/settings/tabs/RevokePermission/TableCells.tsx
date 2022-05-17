@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useMarketPrice } from '../../../../hooks/useMarketPrice';
 import { CronosClient } from '../../../../service/cronos/CronosClient';
 import { getUINormalScaleAmount } from '../../../../utils/NumberUtils';
@@ -48,12 +49,14 @@ export const Amount = (props: {
   data: TokenDataWithApproval;
   explorerURL: string;
 }) => {
+  const [t] = useTranslation();
+
   const { data } = props;
   return (
     <div style={{ color: '#626973' }}>
       <a href={`${props.explorerURL}/tx/${data.approval.tx}`} target="__blank">
         {isUnlimited(data.approval.amount)
-          ? `Unlimited ${data.token.symbol}`
+          ? `${t('settings.revoke.unlimited')} ${data.token.symbol}`
           : `${getUINormalScaleAmount(
               data.approval.amount.toString(),
               data.token.decimals
