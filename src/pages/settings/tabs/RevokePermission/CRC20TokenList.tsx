@@ -36,7 +36,7 @@ interface Props {
   onError: (error: Error) => void;
 }
 
-function CRC20TokenList({
+const CRC20TokenList = ({
   transferEvents,
   cronosAsset,
   approvalEvents,
@@ -46,7 +46,7 @@ function CRC20TokenList({
   explorerURL,
   onRevokeSuccess,
   onError,
-}: Props) {
+}: Props) => {
   const [txEvent, setTxEvent] = useState<DappBrowserIPC.TokenApprovalEvent>();
   const [requestConfirmationVisible, setRequestConfirmationVisible] = useState(false);
   const allMarketData = useRecoilValue(allMarketState);
@@ -397,6 +397,6 @@ function CRC20TokenList({
       />
     </div>
   );
-}
+};
 
 export default CRC20TokenList;
