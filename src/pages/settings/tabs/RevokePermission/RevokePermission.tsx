@@ -8,12 +8,14 @@ import CRC20TokenContract from '../../../../service/signers/abi/TokenContractABI
 import { CronosClient } from '../../../../service/cronos/CronosClient';
 import CRC20TokenList from './CRC20TokenList';
 import ErrorXmark from '../../../../components/ErrorXmark/ErrorXmark';
+import { useTranslation } from 'react-i18next';
 
 const RevokePermission = () => {
   const cronosAsset = useCronosEvmAsset();
   const [error, setError] = useState<Error | null>(null);
   const [transferEvents, setTransferEvents] = useState<Log[]>();
   const [approvalEvents, setApprovalEvents] = useState<Log[]>();
+  const [t] = useTranslation();
 
   const fetchTxAndApprovals = async (
     nodeURL: string,
@@ -105,7 +107,19 @@ const RevokePermission = () => {
     !transferEvents ||
     !approvalEvents
   ) {
-    return <React.Fragment />;
+    return (
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '40px',
+          color: '#777777',
+        }}
+      >
+        {t('settings.noApproval')}
+      </div>
+    );
   }
 
   return (

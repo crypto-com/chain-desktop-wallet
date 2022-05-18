@@ -196,9 +196,11 @@ function CRC20TokenList({
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          padding: '40px',
+          color: '#777777',
         }}
       >
-        No Approvalled Data
+        {t('settings.noApproval')}
       </div>
     );
   }
@@ -336,6 +338,7 @@ function CRC20TokenList({
       )}
       {selectedData && (
         <ConfirmModal
+          closable={!isConfirmLoading}
           isLoading={isConfirmLoading}
           onCancel={() => {
             setSelectedData(undefined);

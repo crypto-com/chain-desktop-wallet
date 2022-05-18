@@ -7,15 +7,19 @@ interface ModalConfig {
   onCancel: () => void;
   onConfirm: () => void;
   isLoading: boolean;
+  closable: boolean;
 }
 
-export const ConfirmModal = (props: ModalConfig) => {
+export const ConfirmModal = ({ onCancel, onConfirm, isLoading, closable }: ModalConfig) => {
   const [t] = useTranslation();
 
   return (
     <Modal
       visible
-      onCancel={props.onCancel}
+      closable={closable}
+      onCancel={onCancel}
+      maskClosable={false}
+      keyboard={false}
       footer={
         <div
           style={{
@@ -25,10 +29,10 @@ export const ConfirmModal = (props: ModalConfig) => {
             marginBottom: '20px',
           }}
         >
-          <Button type="primary" onClick={props.onConfirm} loading={props.isLoading}>
+          <Button type="primary" onClick={onConfirm} loading={isLoading}>
             {t('settings.revoke-permission')}
           </Button>
-          <Button type="link" onClick={props.onCancel}>
+          <Button type="link" onClick={onCancel} disabled={!closable}>
             {t('general.cancel')}
           </Button>
         </div>
