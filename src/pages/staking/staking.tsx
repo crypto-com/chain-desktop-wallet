@@ -1457,7 +1457,7 @@ const FormWithdrawStakingReward = () => {
 
   return (
     <div>
-      {!rewards || rewards.length === 0 ? (
+      {!rewards || rewards.length === 0 || !rewards[0].validatorAddress ? (
         ''
       ) : (
         <Button
