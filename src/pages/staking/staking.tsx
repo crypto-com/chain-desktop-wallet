@@ -1509,7 +1509,7 @@ const FormWithdrawStakingReward = () => {
             >
               {rewards.map(elem => (
                 <>
-                  <div className="address multiple">{`${elem?.validatorAddress}`}</div>
+                  <div className="address">{`${elem?.validatorAddress}`}</div>
                 </>
               ))}
             </div>
