@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { useCallback, useEffect, useState } from 'react';
-import { hexZeroPad, Interface } from 'ethers/lib/utils';
 import { Log } from '@ethersproject/abstract-provider';
 import { Button } from 'antd';
-import { useCronosEvmAsset } from '../../../../hooks/useCronosEvmAsset';
-import CRC20TokenContract from '../../../../service/signers/abi/TokenContractABI.json';
-import { CronosClient } from '../../../../service/cronos/CronosClient';
-import CRC20TokenList from './CRC20TokenList';
-import ErrorXmark from '../../../../components/ErrorXmark/ErrorXmark';
+import { hexZeroPad, Interface } from 'ethers/lib/utils';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ErrorXmark from '../../../../components/ErrorXmark/ErrorXmark';
+import { useCronosEvmAsset } from '../../../../hooks/useCronosEvmAsset';
+import { CronosClient } from '../../../../service/cronos/CronosClient';
+import CRC20TokenContract from '../../../../service/signers/abi/TokenContractABI.json';
+import CRC20TokenList from './CRC20TokenList';
 
 const RevokePermission = () => {
   const cronosAsset = useCronosEvmAsset();
