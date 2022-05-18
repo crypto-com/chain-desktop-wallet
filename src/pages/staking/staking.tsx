@@ -1986,30 +1986,6 @@ const StakingPage = () => {
                           {t('staking.modal3.button')}
                         </a>
                       </div>
-                      <ModalPopup
-                        isModalVisible={isUnbondingDelegationModalVisible}
-                        handleCancel={() => setIsUnbondingDelegationModalVisible(false)}
-                        handleOk={() => setIsUnbondingDelegationModalVisible(false)}
-                        className="unbonding-modal"
-                        footer={[]}
-                        okText="OK"
-                      >
-                        <>
-                          <div className="title">{t('staking.modal3.title')}</div>
-                          <div className="description">
-                            {t('staking.modal3.description', { unbondingPeriod: undelegatePeriod })}
-                          </div>
-                          <Table
-                            locale={{
-                              triggerDesc: t('general.table.triggerDesc'),
-                              triggerAsc: t('general.table.triggerAsc'),
-                              cancelSort: t('general.table.cancelSort'),
-                            }}
-                            columns={unbondingDelegationColumns}
-                            dataSource={unbondingDelegations}
-                          />
-                        </>
-                      </ModalPopup>
                     </Content>
                   ) : (
                     <></>
