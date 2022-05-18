@@ -58,6 +58,14 @@ export interface WithdrawStakingRewardUnsigned extends TransactionUnsigned {
   validatorAddress: string;
 }
 
+/**
+ *  Withdraw all staking rewards from same `delegatorAddress`
+ */
+export interface WithdrawAllStakingRewardsUnsigned extends TransactionUnsigned {
+  delegatorAddress: string;
+  validatorAddressList: string[];
+}
+
 export interface UndelegateTransactionUnsigned extends TransactionUnsigned {
   delegatorAddress: string;
   validatorAddress: string;

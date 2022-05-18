@@ -480,6 +480,7 @@
   "sending-crypto-on-blockchain-requires-confirmation": "在區塊鏈上發送加密貨幣需要獲得網絡的確認。在正常的情況下，網絡費用越高，您的交易越有可能在較短的時間內得到確認。",
   "confirmation-speed": "確認速度",
   "staking.title": "抵押",
+  "staking.withdrawall": "提取所有獎勵",
   "staking.tab1": "抵押獎勵",
   "staking.tab2": "委託資金",
   "staking.tab3": "委託管理",
@@ -527,6 +528,7 @@
   "staking.modal2.label1": "發送人地址",
   "staking.modal2.label2": "從驗證者提取獎勵",
   "staking.modal2.label3": "獎勵",
+  "staking.modal2.label4": "從所有驗證者提取獎勵",
   "staking.modal3.title": "贖回中的委託",
   "staking.modal3.description": "根據 Crypto.org Chain 的規定，你的委託需要經過 {{ unbondingPeriod }} 日才可以完成贖回過程。",
   "staking.modal3.button": "查看贖回中的委託",
@@ -723,5 +725,13 @@
   "settings.addressBook.removeConfirm": "確定要刪除此地址嗎？",
   "settings.addressBook.addNewAddress": "添加新地址",
   "settings.addressBook.title": "地址簿",
-  "settings.addressBook.address": "地址"
+  "settings.addressBook.address": "地址",
+  "settings.revoke-permission": "撤銷許可",
+  "settings.revoke.sure": "您確定要撤銷許可嗎?",
+  "settings.revoke.token": "代幣/餘額",
+  "settings.revoke.spender": "批准的消費者",
+  "settings.revoke.amount": "批准的數量",
+  "settings.revoke.risk": "風險敞口",
+  "settings.revoke": "撤銷許可",
+  "settings.revoke.unlimited": "無限的"
 }
