@@ -12,6 +12,7 @@ import {
   NFTDenomIssueUnsigned,
   NFTMintUnsigned,
   EVMContractCallUnsigned,
+  WithdrawAllStakingRewardsUnsigned,
 } from './signers/TransactionSupported';
 import { BroadCastResult } from '../models/Transaction';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
@@ -26,6 +27,7 @@ import {
   VoteRequest,
   NFTTransferRequest,
   WithdrawStakingRewardRequest,
+  WithdrawAllStakingRewardRequest,
   BridgeTransferRequest,
   NFTDenomIssueRequest,
   NFTMintRequest,
@@ -713,6 +715,54 @@ export class TransactionSenderService {
       signedTxHex = await transactionSigner.signWithdrawStakingRewardTx(
         withdrawStakingReward,
         rewardWithdrawRequest.decryptedPhrase,
+        networkFee,
+        gasLimit
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await Promise.all([
+      await this.txHistoryManager.fetchAndSaveRewards(nodeRpc, currentSession),
+      await this.txHistoryManager.fetchAndUpdateBalances(currentSession),
+    ]);
+    return broadCastResult;
+  }
+
+  public async sendStakingWithdrawAllRewardsTx(
+    rewardWithdrawAllRequest: WithdrawAllStakingRewardRequest,
+  ): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.transactionPrepareService.prepareTransaction();
+
+    const withdrawAllStakingReward: WithdrawAllStakingRewardsUnsigned = {
+      delegatorAddress: currentSession.wallet.address,
+      validatorAddressList: rewardWithdrawAllRequest.validatorAddressList,
+      memo: DEFAULT_CLIENT_MEMO,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string;
+
+    const { gasLimit, networkFee } = await getCronosTendermintFeeConfig()
+
+    if (rewardWithdrawAllRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signWithdrawAllStakingRewardsTx(
+        withdrawAllStakingReward,
+        rewardWithdrawAllRequest.decryptedPhrase,
+        networkFee,
+        gasLimit
+      );
+    } else {
+      signedTxHex = await transactionSigner.signWithdrawAllStakingRewardsTx(
+        withdrawAllStakingReward,
+        rewardWithdrawAllRequest.decryptedPhrase,
         networkFee,
         gasLimit
       );
