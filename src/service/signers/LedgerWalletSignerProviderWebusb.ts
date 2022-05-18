@@ -44,6 +44,8 @@ export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
     // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     index: number,
     // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+    standard: DerivationPathStandard,
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     chainId: number,
     // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     nonce: number,
@@ -72,12 +74,12 @@ export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
   }
 
   // eslint-disable-next-line  class-methods-use-this, @typescript-eslint/no-unused-vars
-  public async signPersonalMessage(index: number, message: string): Promise<string> {
+  public async signPersonalMessage(index: number, standard: DerivationPathStandard, message: string): Promise<string> {
     throw new Error('not implemented');
   }
 
   // eslint-disable-next-line  class-methods-use-this, @typescript-eslint/no-unused-vars
-  public async signTypedDataV4(index: number, typedData: string): Promise<string> {
+  public async signTypedDataV4(index: number, standard: DerivationPathStandard, typedData: string): Promise<string> {
     throw new Error('not implemented');
   }
 }

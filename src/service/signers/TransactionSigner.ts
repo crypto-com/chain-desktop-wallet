@@ -18,6 +18,7 @@ import {
   NFTMintUnsigned,
   NFTDenomIssueUnsigned,
   BridgeTransactionUnsigned,
+  WithdrawAllStakingRewardsUnsigned,
 } from './TransactionSupported';
 
 export interface ITransactionSigner {
@@ -80,7 +81,7 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    return this.getSignedMessageTransaction(msgSend, transaction, keyPair, rawTx);
+    return this.getSignedMessageTransaction([msgSend], transaction, keyPair, rawTx);
   }
 
   public async signVoteTransaction(
@@ -97,7 +98,7 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       proposalId: Big(transaction.proposalID),
     });
 
-    return this.getSignedMessageTransaction(msgVote, transaction, keyPair, rawTx);
+    return this.getSignedMessageTransaction([msgVote], transaction, keyPair, rawTx);
   }
 
   public async signNFTTransfer(transaction: NFTTransferUnsigned, phrase: string, gasFee: string,
@@ -111,7 +112,7 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       recipient: transaction.recipient,
     });
 
-    return this.getSignedMessageTransaction(msgTransferNFT, transaction, keyPair, rawTx);
+    return this.getSignedMessageTransaction([msgTransferNFT], transaction, keyPair, rawTx);
   }
 
   public async signNFTMint(transaction: NFTMintUnsigned, phrase: string, gasFee: string,
@@ -128,7 +129,7 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       recipient: transaction.recipient,
     });
 
-    return this.getSignedMessageTransaction(msgMintNFT, transaction, keyPair, rawTx);
+    return this.getSignedMessageTransaction([msgMintNFT], transaction, keyPair, rawTx);
   }
 
   public async signNFTDenomIssue(
@@ -146,7 +147,7 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       schema: transaction.schema,
     });
 
-    return this.getSignedMessageTransaction(msgIssueDenom, transaction, keyPair, rawTx);
+    return this.getSignedMessageTransaction([msgIssueDenom], transaction, keyPair, rawTx);
   }
 
   public async signDelegateTx(
@@ -164,7 +165,7 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       amount: delegateAmount,
     });
 
-    return this.getSignedMessageTransaction(msgDelegate, transaction, keyPair, rawTx);
+    return this.getSignedMessageTransaction([msgDelegate], transaction, keyPair, rawTx);
   }
 
   public async signWithdrawStakingRewardTx(
@@ -180,8 +181,33 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       validatorAddress: transaction.validatorAddress,
     });
 
+    return this.getSignedMessageTransaction([
+      msgWithdrawDelegatorReward],
+      transaction,
+      keyPair,
+      rawTx,
+    );
+  }
+
+  public async signWithdrawAllStakingRewardsTx(
+    transaction: WithdrawAllStakingRewardsUnsigned,
+    phrase: string,
+    gasFee: string,
+    gasLimit: number,
+  ): Promise<string> {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
+
+    const msgWithdrawAllDelegatorRewards =
+      transaction.validatorAddressList.map(validatorAddress => {
+        return new cro.distribution.MsgWithdrawDelegatorReward({
+          delegatorAddress: transaction.delegatorAddress,
+          validatorAddress,
+        });
+      });
+
+
     return this.getSignedMessageTransaction(
-      msgWithdrawDelegatorReward,
+      msgWithdrawAllDelegatorRewards,
       transaction,
       keyPair,
       rawTx,
@@ -202,7 +228,7 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    return this.getSignedMessageTransaction(msgUndelegate, transaction, keyPair, rawTx);
+    return this.getSignedMessageTransaction([msgUndelegate], transaction, keyPair, rawTx);
   }
 
   public async signRedelegateTx(
@@ -220,18 +246,23 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    return this.getSignedMessageTransaction(msgBeginRedelegate, transaction, keyPair, rawTx);
+    return this.getSignedMessageTransaction([msgBeginRedelegate], transaction, keyPair, rawTx);
   }
 
   // eslint-disable-next-line class-methods-use-this
   async getSignedMessageTransaction(
-    message: CosmosMsg,
+    message: CosmosMsg[],
     transaction: TransactionUnsigned,
     keyPair,
     rawTx,
   ) {
+
+    // Appending cosmos messages to raw transaction
+    message.forEach(msg => {
+      rawTx.appendMessage(msg);
+    });
+
     const signableTx = rawTx
-      .appendMessage(message)
       .addSigner({
         publicKey: keyPair.getPubKey(),
         accountNumber: new Big(transaction.accountNumber),
@@ -265,6 +296,6 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       token: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    return this.getSignedMessageTransaction(msgSend, transaction, keyPair, rawTx);
+    return this.getSignedMessageTransaction([msgSend], transaction, keyPair, rawTx);
   }
 }

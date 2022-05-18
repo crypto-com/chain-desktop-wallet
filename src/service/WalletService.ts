@@ -49,6 +49,7 @@ import {
   UndelegationRequest,
   VoteRequest,
   WithdrawStakingRewardRequest,
+  WithdrawAllStakingRewardRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter } from '../utils/utils';
@@ -111,6 +112,12 @@ class WalletService {
     rewardWithdrawRequest: WithdrawStakingRewardRequest,
   ): Promise<BroadCastResult> {
     return await this.txSenderManager.sendStakingRewardWithdrawalTx(rewardWithdrawRequest);
+  }
+
+  public async sendStakingWithdrawAllRewardsTx(
+    rewardWithdrawAllRequest: WithdrawAllStakingRewardRequest,
+  ): Promise<BroadCastResult> {
+    return await this.txSenderManager.sendStakingWithdrawAllRewardsTx(rewardWithdrawAllRequest);
   }
 
   public async sendVote(voteRequest: VoteRequest): Promise<BroadCastResult> {
