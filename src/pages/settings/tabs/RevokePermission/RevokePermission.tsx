@@ -90,7 +90,7 @@ const RevokePermission = () => {
           <div>{error.toString()}</div>
           <div>
             <Button type="primary" onClick={() => fetch()}>
-              Retry
+              {t('general.retry')}
             </Button>
           </div>
         </div>
