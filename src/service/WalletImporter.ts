@@ -3,6 +3,7 @@ import { WalletConfig } from '../config/StaticConfig';
 import { getRandomId } from '../crypto/RandomGen';
 import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { UserAssetType } from '../models/UserAsset';
+import { DerivationPathStandard } from './signers/LedgerSigner';
 
 export class WalletImporter extends WalletOps {
   private readonly importOptions: WalletImportOptions;
@@ -34,6 +35,7 @@ export class WalletImporter extends WalletOps {
       hasBeenEncrypted: false,
       walletType: options.walletType,
       addressIndex: options.addressIndex,
+      derivationPathStandard: options.derivationPathStandard,
     };
     return {
       wallet: importedWallet,
@@ -53,17 +55,21 @@ export class WalletImportOptions {
 
   public readonly addressIndex: number;
 
+  public readonly derivationPathStandard: DerivationPathStandard;
+
   constructor(
     walletName: string,
     walletConfig: WalletConfig,
     phrase: string,
     walletType: string,
     addressIndex: number,
+    derivationPathStandard: DerivationPathStandard,
   ) {
     this.walletName = walletName;
     this.config = walletConfig;
     this.phrase = phrase;
     this.walletType = walletType;
     this.addressIndex = addressIndex;
+    this.derivationPathStandard = derivationPathStandard;
   }
 }

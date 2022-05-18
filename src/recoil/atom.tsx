@@ -3,8 +3,10 @@ import { DefaultWalletConfigs } from '../config/StaticConfig';
 import { Session } from '../models/Session';
 import { Wallet } from '../models/Wallet';
 import { UserAsset, AssetMarketPrice } from '../models/UserAsset';
-import { ValidatorModel, NftModel } from '../models/Transaction';
+import { ValidatorModel } from '../models/Transaction';
+import { NftList } from '../models/Nft';
 import { NORMAL_WALLET_TYPE } from '../service/LedgerService';
+import { DerivationPathStandard } from '../service/signers/LedgerSigner';
 
 const wallet = new Wallet(
   '',
@@ -15,6 +17,7 @@ const wallet = new Wallet(
   false,
   NORMAL_WALLET_TYPE,
   0, // addressIndex default
+  DerivationPathStandard.BIP44,
 );
 
 export type NavbarMenuKey =
@@ -108,7 +111,7 @@ const validatorListState = atom<ValidatorModel[] | null>({
   default: null,
 });
 
-const nftListState = atom<NftModel[] | undefined>({
+const nftListState = atom<NftList | undefined>({
   key: 'nftList',
   default: undefined,
 });

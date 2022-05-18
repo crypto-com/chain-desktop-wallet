@@ -4,7 +4,7 @@ import { WebviewTag } from 'electron';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import Web3 from 'web3';
-import { useIPCProvider } from './useIPCProvider';
+import { ConfirmTransactionSuccessCallback, useIPCProvider } from './useIPCProvider';
 import { allMarketState, sessionState, walletAllAssetsState } from '../../../recoil/atom';
 import { addHTTPsPrefixIfNeeded, getCronosEvmAsset } from '../../../utils/utils';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
@@ -24,6 +24,7 @@ import {
 } from './useWebviewStatusInfo';
 import { LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
+
 
 // use **only** one of the following
 // priority: dapp > dappURL
@@ -102,7 +103,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const currentSession = useRecoilValue(sessionState);
   const [confirmPasswordCallback, setConfirmPasswordCallback] = useState<{
-    successCallback: Function;
+    successCallback: ConfirmTransactionSuccessCallback;
     errorCallback: Function;
   }>();
 
@@ -141,7 +142,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   const onRequestTokenApproval = useRefCallback(
     (
       event: DappBrowserIPC.TokenApprovalEvent,
-      successCallback: (passphrase: string) => void,
+      successCallback: ConfirmTransactionSuccessCallback,
       errorCallback: (message: string) => void,
     ) => {
       setTxEvent(event);
@@ -158,7 +159,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   const onRequestSendTransaction = useRefCallback(
     (
       event: DappBrowserIPC.SendTransactionEvent,
-      successCallback: (passphrase: string) => void,
+      successCallback: ConfirmTransactionSuccessCallback,
       errorCallback: (message: string) => void,
     ) => {
       setTxEvent(event);
@@ -175,7 +176,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   const onRequestSignMessage = useRefCallback(
     (
       event: DappBrowserIPC.SignMessageEvent,
-      successCallback: (signature: string) => void,
+      successCallback: ConfirmTransactionSuccessCallback,
       errorCallback: (message: string) => void,
     ) => {
       setTxEvent(event);
@@ -192,7 +193,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   const onRequestSignTypedMessage = useRefCallback(
     (
       event: DappBrowserIPC.SignTypedMessageEvent,
-      successCallback: (signature: string) => void,
+      successCallback: ConfirmTransactionSuccessCallback,
       errorCallback: (message: string) => void,
     ) => {
       setTxEvent(event);
@@ -209,7 +210,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   const onRequestSignPersonalMessage = useRefCallback(
     (
       event: DappBrowserIPC.SignPersonalMessageEvent,
-      successCallback: (signature: string) => void,
+      successCallback: ConfirmTransactionSuccessCallback,
       errorCallback: (message: string) => void,
     ) => {
       setTxEvent(event);
@@ -241,9 +242,9 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
 
   useIPCProvider({
     webview: webviewRef.current,
-    onRequestAddress: (onSuccess, onError) => {
+    onRequestAddress: (onSuccess,) => {
       // TODO: !! cronosAsset may not be ready
-      onRequestAddress.current(onSuccess, onError);
+      onRequestAddress.current(onSuccess);
     },
     onRequestTokenApproval: (event, successCallback, errorCallback) => {
       onRequestTokenApproval.current(event, successCallback, errorCallback);
@@ -272,7 +273,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
       // no-op for now
     },
     onFinishTransaction: (error?: string) => {
-      onFinishTransaction.current(error);
+      onFinishTransaction.current(error ?? "");
     },
   });
 
@@ -343,9 +344,14 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
             ...pageDapp,
             url: providedURL,
           }}
-          onConfirm={() => {
+          onConfirm={({ gasLimit, gasPrice }) => {
             setRequestConfirmationVisible(false);
-            confirmPasswordCallback?.successCallback(decryptedPhrase);
+            confirmPasswordCallback?.successCallback({
+              signature: "",
+              gasLimit,
+              gasPrice,
+              decryptedPhrase
+            });
           }}
           onCancel={() => {
             setRequestConfirmationVisible(false);

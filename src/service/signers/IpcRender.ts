@@ -1,5 +1,6 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { hexToString } from 'web3-utils';
+import { DerivationPathStandard } from './LedgerSigner';
 import { ISignerProvider } from './SignerProvider';
 
 let electron: any;
@@ -9,10 +10,15 @@ if (window.require) {
 export class IpcRender implements ISignerProvider {
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   // eslint-disable-next-line  class-methods-use-this
-  async getPubKey(index: number, showLedgerDisplay: boolean): Promise<Bytes> {
+  async getPubKey(
+    index: number,
+    derivationPathStandard: DerivationPathStandard,
+    showLedgerDisplay: boolean,
+  ): Promise<Bytes> {
     const arg = electron.ipcRenderer.sendSync('enableWallet', {
       index,
       addressPrefix: 'cro', // dummy value
+      derivationPathStandard,
       showLedgerDisplay,
       message: 'enableWallet request for getPubKey',
     });
@@ -28,11 +34,13 @@ export class IpcRender implements ISignerProvider {
   async getAddress(
     index: number,
     addressPrefix: string,
+    derivationPathStandard: DerivationPathStandard,
     showLedgerDisplay: boolean,
   ): Promise<string> {
     const arg = electron.ipcRenderer.sendSync('enableWallet', {
       index,
       addressPrefix,
+      derivationPathStandard,
       showLedgerDisplay,
       message: 'enableWallet request for getAddress',
     });
@@ -40,6 +48,27 @@ export class IpcRender implements ISignerProvider {
       throw new Error(`get address fail: ${arg.error}`);
     }
     return arg.account;
+  }
+
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line  class-methods-use-this
+  async getAddressList(
+    startIndex: number,
+    gap: number,
+    addressPrefix: string,
+    derivationPathStandard: DerivationPathStandard,
+  ): Promise<string[]> {
+    const arg = electron.ipcRenderer.sendSync('getAddressList', {
+      startIndex,
+      gap,
+      addressPrefix,
+      derivationPathStandard,
+      message: 'enableWallet request for getAddressList',
+    });
+    if (!arg.success) {
+      throw new Error(`get address fail: ${arg.error}`);
+    }
+    return arg.addressList;
   }
 
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
@@ -89,6 +118,7 @@ export class IpcRender implements ISignerProvider {
   // eslint-disable-next-line  class-methods-use-this
   public async signEthTx(
     index: number,
+    standard: DerivationPathStandard,
     chainId: number,
     nonce: number,
     gasLimit: string,
@@ -99,6 +129,7 @@ export class IpcRender implements ISignerProvider {
   ): Promise<string> {
     const a = {
       index,
+      standard,
       chainId,
       nonce,
       gasLimit,
@@ -117,9 +148,14 @@ export class IpcRender implements ISignerProvider {
 
   // eslint-disable-next-line  @typescript-eslint/no-unused-vars
   // eslint-disable-next-line  class-methods-use-this
-  public async getEthAddress(index: number, display: boolean): Promise<string> {
+  public async getEthAddress(
+    index: number,
+    standard: DerivationPathStandard,
+    display: boolean,
+  ): Promise<string> {
     const a = {
       index,
+      standard,
       display,
     };
     const arg = electron.ipcRenderer.sendSync('ethGetAddress', a);
@@ -129,12 +165,32 @@ export class IpcRender implements ISignerProvider {
     return arg.address;
   }
 
+  // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line  class-methods-use-this
+  public async getEthAddressList(
+    startIndex: number,
+    gap: number,
+    standard: DerivationPathStandard,
+  ): Promise<string[]> {
+    const a = {
+      startIndex,
+      gap,
+      standard,
+    };
+    const arg = electron.ipcRenderer.sendSync('ethGetAddressList', a);
+    if (!arg.success) {
+      throw new Error(`test fail: ${arg.error}`);
+    }
+    return arg.addressList;
+  }
+
   // eslint-disable-next-line class-methods-use-this
-  public async signPersonalMessage(index: number, hexMessage: string): Promise<string> {
+  public async signPersonalMessage(index: number, standard: DerivationPathStandard, hexMessage: string): Promise<string> {
     const message = hexToString(hexMessage);
     const ret = electron.ipcRenderer.sendSync('ethSignPersonalMessage', {
       message,
       index,
+      standard
     });
     if (!ret.success) {
       throw new Error(`signPersonalMessage failed: ${ret.error}`);
@@ -144,8 +200,8 @@ export class IpcRender implements ISignerProvider {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public async signTypedDataV4(index: number, typedData: string): Promise<string> {
-    const ret = electron.ipcRenderer.sendSync('ethSignTypedDataV4', { index, typedData });
+  public async signTypedDataV4(index: number, standard: DerivationPathStandard, typedData: string): Promise<string> {
+    const ret = electron.ipcRenderer.sendSync('ethSignTypedDataV4', { index, standard, typedData });
     if (!ret.success) {
       throw new Error(`signTypedDataV4 failed: ${ret.error}`);
     }

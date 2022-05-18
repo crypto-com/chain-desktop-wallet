@@ -438,7 +438,7 @@ const CronosBridge = props => {
 
     if (isBridgeTransferSuccess) {
       try {
-        const callMaxCount = 3;
+        const callMaxCount = 6;
         const callTimeout = 6_000;
         const callInterval = 8_000;
         let callFailedCounts = 0;
