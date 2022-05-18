@@ -1457,18 +1457,22 @@ const FormWithdrawStakingReward = () => {
 
   return (
     <div>
-      <Button
-        id="withdraw-all-btn"
-        type="primary"
-        onClick={() => {
-          setRewardAction('withdrawall');
-          setTimeout(() => {
-            showPasswordInput('withdrawall');
-          }, 200);
-        }}
-      >
-        {t('staking.withdrawall')}
-      </Button>
+      {!rewards || rewards.length === 0 ? (
+        ''
+      ) : (
+        <Button
+          id="withdraw-all-btn"
+          type="primary"
+          onClick={() => {
+            setRewardAction('withdrawall');
+            setTimeout(() => {
+              showPasswordInput('withdrawall');
+            }, 200);
+          }}
+        >
+          {t('staking.withdrawall')}
+        </Button>
+      )}
 
       <ModalPopup
         isModalVisible={withdrawAllModalVisible}
