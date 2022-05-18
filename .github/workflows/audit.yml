@@ -15,7 +15,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 14
-          cache: 'yarn'
+
+      - name: Upgrade to Yarn 2
+        run: |
+          yarn set version 2
 
       - name: Refresh
         run: |
