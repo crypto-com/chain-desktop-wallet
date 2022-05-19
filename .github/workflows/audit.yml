@@ -22,7 +22,7 @@ jobs:
       
       - name: Remove any cached files
         run: |
-          rm -Rf ./.yarn && rm -Rf ./node_modules
+          rm -Rf ./node_modules
 
       - name: Refresh
         run: |
