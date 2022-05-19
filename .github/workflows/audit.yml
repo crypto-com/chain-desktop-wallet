@@ -16,9 +16,13 @@ jobs:
         with:
           node-version: 14
 
-      - name: Upgrade to Yarn 2
+      - name: Upgrade to Yarn 3
         run: |
           yarn set version 3
+      
+      - name: Remove any cached files
+        run: |
+          rm -Rf ./.yarn && rm -Rf ./node_modules
 
       - name: Refresh
         run: |
