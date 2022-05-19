@@ -13,7 +13,6 @@ import { UserAsset } from '../../../models/UserAsset';
 import { secretStoreService } from '../../../storage/SecretStoreService';
 import { Dapp, DappBrowserIPC } from '../types';
 import { ProviderPreloadScriptPath } from './config';
-import packageJson from '../../../../package.json';
 import { walletService } from '../../../service/WalletService';
 import { useRefCallback } from './useRefCallback';
 import { useWebInfoProvider } from './useWebInfoProvider';
