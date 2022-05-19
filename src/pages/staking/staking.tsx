@@ -86,7 +86,9 @@ import {
 import { isValidatorAddressSuspicious, ModerationConfig } from '../../models/ModerationConfig';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
-import GasStepSelectTendermint, { GasInfoTendermint } from '../../components/GasStepSelect/GasStepSelectTendermint';
+import GasStepSelectTendermint, {
+  GasInfoTendermint,
+} from '../../components/GasStepSelect/GasStepSelectTendermint';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { Search } = Input;
@@ -138,6 +140,7 @@ const FormDelegationRequest = props => {
     amount: '',
     memo: '',
   });
+
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const [isSuccessTransferModalVisible, setIsSuccessTransferModalVisible] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
@@ -270,7 +273,7 @@ const FormDelegationRequest = props => {
       setInputPasswordVisible(false);
       setIsErrorTransferModalVisible(true);
       // eslint-disable-next-line no-console
-      console.log('Error occurred while transfer', e);
+      console.error('Error occurred while transfer', e);
     }
   };
 
@@ -1031,7 +1034,7 @@ const FormDelegationOperations = props => {
 };
 
 const FormWithdrawStakingReward = () => {
-  type RewardActionType = 'withdraw' | 'restake';
+  type RewardActionType = 'withdrawall' | 'withdraw' | 'restake';
 
   const [withdrawValues, setWithdrawValues] = useState({
     validatorAddress: '',
@@ -1054,7 +1057,9 @@ const FormWithdrawStakingReward = () => {
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [rewardAction, setRewardAction] = useState<RewardActionType>('withdraw');
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
-  // const walletAllAssets = useRecoilValue(walletAllAssetsState);
+
+  const [withdrawAllModalVisible, setWithdrawAllModalVisible] = useState(false);
+  const [marketData, setMarketData] = useState<AssetMarketPrice>();
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const allMarketData = useRecoilValue(allMarketState);
@@ -1111,17 +1116,17 @@ const FormWithdrawStakingReward = () => {
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setWalletAsset(currentWalletAsset);
 
-      // Make sure the primary/default asset is the correct one
-      const primaryAsset =
-        walletAsset.identifier && walletAsset.name !== 'default'
-          ? walletAsset
-          : await walletService.retrieveDefaultWalletAsset(currentSession);
-
-      const rewardsTabularData = convertToTabularData(allRewards, primaryAsset, currentMarketData);
+      const rewardsTabularData = convertToTabularData(
+        allRewards,
+        currentWalletAsset,
+        currentMarketData,
+      );
       setRewards(rewardsTabularData);
       setIsRewardsLoading(false);
-      setWalletAsset(primaryAsset);
+      setWalletAsset(currentWalletAsset);
     };
+
+    setMarketData(allMarketData.get(`${walletAsset?.mainnetSymbol}-${currentSession.currency}`));
 
     syncRewardsData();
   }, [fetchingDB, confirmLoading]);
@@ -1136,6 +1141,11 @@ const FormWithdrawStakingReward = () => {
     setIsConfirmationRestakeModalVisible(true);
   };
 
+  const handleWithdrawAllModal = () => {
+    setWithdrawAllModalVisible(false);
+    setInputPasswordVisible(false);
+  };
+
   const showPasswordInput = (action: string) => {
     if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
@@ -1144,6 +1154,8 @@ const FormWithdrawStakingReward = () => {
       }
       if (action === 'restake') {
         showConfirmationRestakeModal();
+      } else if (action === 'withdrawall') {
+        setWithdrawAllModalVisible(true);
       } else {
         showConfirmationModal();
       }
@@ -1158,10 +1170,49 @@ const FormWithdrawStakingReward = () => {
       currentSession.wallet.identifier,
     );
     setDecryptedPhrase(phraseDecrypted);
+
     if (rewardAction === 'restake') {
       showConfirmationRestakeModal();
+    } else if (rewardAction === 'withdrawall') {
+      setWithdrawAllModalVisible(true);
     } else {
       showConfirmationModal();
+    }
+  };
+
+  const onConfirmWithdrawAllStakingRewards = async () => {
+    const { walletType } = currentSession.wallet;
+    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
+      setWithdrawAllModalVisible(false);
+      setIsVisibleConfirmationModal(false);
+      return;
+    }
+    try {
+      setIsVisibleConfirmationModal(false);
+      setConfirmLoading(true);
+      const rewardWithdrawAllResult = await walletService.sendStakingWithdrawAllRewardsTx({
+        validatorAddressList: rewards.map(rewardInfo => rewardInfo.validatorAddress),
+        decryptedPhrase,
+        walletType,
+      });
+      setBroadcastResult(rewardWithdrawAllResult);
+      setIsVisibleConfirmationModal(false);
+      handleWithdrawAllModal();
+      setConfirmLoading(false);
+      setIsSuccessTransferModalVisible(true);
+    } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
+      }
+
+      setIsVisibleConfirmationModal(false);
+      setErrorMessages(((e as unknown) as any).message.split(': '));
+      setWithdrawAllModalVisible(false);
+      setConfirmLoading(false);
+      setInputPasswordVisible(false);
+      setIsErrorTransferModalVisible(true);
+      // eslint-disable-next-line no-console
+      console.error('Error occurred while transfer', e);
     }
   };
 
@@ -1173,6 +1224,7 @@ const FormWithdrawStakingReward = () => {
     }
     try {
       setConfirmLoading(true);
+
       const rewardWithdrawResult = await walletService.sendStakingRewardWithdrawalTx({
         validatorAddress: withdrawValues.validatorAddress,
         decryptedPhrase,
@@ -1194,7 +1246,7 @@ const FormWithdrawStakingReward = () => {
       setInputPasswordVisible(false);
       setIsErrorTransferModalVisible(true);
       // eslint-disable-next-line no-console
-      console.log('Error occurred while transfer', e);
+      console.error('Error occurred while transfer', e);
     }
   };
 
@@ -1288,7 +1340,7 @@ const FormWithdrawStakingReward = () => {
       setInputPasswordVisible(false);
       setIsErrorTransferModalVisible(true);
       // eslint-disable-next-line no-console
-      console.log('Error occurred while transfer', e);
+      console.error('Error occurred while transfer', e);
     }
   };
 
@@ -1405,6 +1457,91 @@ const FormWithdrawStakingReward = () => {
 
   return (
     <div>
+      {!rewards || rewards.length === 0 || !rewards[0].validatorAddress ? (
+        ''
+      ) : (
+        <Button
+          id="withdraw-all-btn"
+          type="primary"
+          onClick={() => {
+            setRewardAction('withdrawall');
+            setTimeout(() => {
+              showPasswordInput('withdrawall');
+            }, 200);
+          }}
+        >
+          {t('staking.withdrawall')}
+        </Button>
+      )}
+
+      <ModalPopup
+        isModalVisible={withdrawAllModalVisible}
+        handleCancel={handleWithdrawAllModal}
+        handleOk={onConfirmWithdrawAllStakingRewards}
+        confirmationLoading={confirmLoading}
+        className="reward-modal"
+        footer={[
+          <Button
+            key="submit"
+            type="primary"
+            loading={confirmLoading}
+            disabled={!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE}
+            onClick={onConfirmWithdrawAllStakingRewards}
+          >
+            {t('general.confirm')}
+          </Button>,
+          <Button key="back" type="link" onClick={handleWithdrawAllModal}>
+            {t('general.cancel')}
+          </Button>,
+        ]}
+        okText={t('general.confirm')}
+      >
+        <>
+          <div className="title">{t('staking.withdrawall')}</div>
+          <div className="description">{t('staking.modal2.description')}</div>
+          <div className="item">
+            <div className="label">{t('staking.modal2.label1')}</div>
+            <div className="address">{`${currentSession.wallet.address}`}</div>
+          </div>
+          <div className="item">
+            <div className="label">{t('staking.modal2.label4')}</div>
+
+            <div
+              className={
+                rewards && rewards.length > 3 ? 'address-container scrollable' : 'address-container'
+              }
+            >
+              {rewards.map(elem => (
+                <>
+                  <div className="address">{`${elem?.validatorAddress}`}</div>
+                </>
+              ))}
+            </div>
+          </div>
+          <div className="item">
+            <div className="label">{t('staking.modal2.label5')}</div>
+            {walletAsset ? (
+              <div>
+                {numeral(scaledRewardBalance(walletAsset)).format('0,0.0000')}
+                {walletAsset?.symbol}
+              </div>
+            ) : (
+              ''
+            )}
+
+            <div className="fiat">
+              {walletAsset && marketData && marketData.price
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetRewardsBalancePrice(walletAsset, marketData),
+                  ).format('0,0.00')} ${marketData?.currency}
+                  `
+                : ''}
+            </div>
+          </div>
+          <GasInfoTendermint />
+        </>
+      </ModalPopup>
+
       <StakingTable />
       <ModalPopup
         isModalVisible={isConfirmationModalVisible}
@@ -1600,7 +1737,7 @@ const StakingPage = () => {
   const currentValidatorList = useRecoilValue(validatorListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
   const allMarketData = useRecoilValue(allMarketState);
-  // const [validatorTopList, setValidatorTopList] = useState<ValidatorModel[]>([]);
+
   const [marketData, setMarketData] = useState<AssetMarketPrice>();
 
   const [isUnbondingDelegationModalVisible, setIsUnbondingDelegationModalVisible] = useState(false);
@@ -1732,7 +1869,7 @@ const StakingPage = () => {
       moderationConfigHandler();
       analyticsService.logPage('Staking');
     }
-  }, [fetchingDB, currentValidatorList]);
+  }, [fetchingDB, currentValidatorList, userAsset]);
 
   return (
     <Layout className="site-layout">
@@ -1792,6 +1929,31 @@ const StakingPage = () => {
                 : ''}
             </div>
           </div>
+
+          <ModalPopup
+            isModalVisible={isUnbondingDelegationModalVisible}
+            handleCancel={() => setIsUnbondingDelegationModalVisible(false)}
+            handleOk={() => setIsUnbondingDelegationModalVisible(false)}
+            className="unbonding-modal"
+            footer={[]}
+            okText="OK"
+          >
+            <>
+              <div className="title">{t('staking.modal3.title')}</div>
+              <div className="description">
+                {t('staking.modal3.description', { unbondingPeriod: undelegatePeriod })}
+              </div>
+              <Table
+                locale={{
+                  triggerDesc: t('general.table.triggerDesc'),
+                  triggerAsc: t('general.table.triggerAsc'),
+                  cancelSort: t('general.table.cancelSort'),
+                }}
+                columns={unbondingDelegationColumns}
+                dataSource={unbondingDelegations}
+              />
+            </>
+          </ModalPopup>
         </div>
         <Tabs defaultActiveKey="1">
           <TabPane tab={t('staking.tab1')} key="1">
@@ -1828,30 +1990,6 @@ const StakingPage = () => {
                           {t('staking.modal3.button')}
                         </a>
                       </div>
-                      <ModalPopup
-                        isModalVisible={isUnbondingDelegationModalVisible}
-                        handleCancel={() => setIsUnbondingDelegationModalVisible(false)}
-                        handleOk={() => setIsUnbondingDelegationModalVisible(false)}
-                        className="unbonding-modal"
-                        footer={[]}
-                        okText="OK"
-                      >
-                        <>
-                          <div className="title">{t('staking.modal3.title')}</div>
-                          <div className="description">
-                            {t('staking.modal3.description', { unbondingPeriod: undelegatePeriod })}
-                          </div>
-                          <Table
-                            locale={{
-                              triggerDesc: t('general.table.triggerDesc'),
-                              triggerAsc: t('general.table.triggerAsc'),
-                              cancelSort: t('general.table.cancelSort'),
-                            }}
-                            columns={unbondingDelegationColumns}
-                            dataSource={unbondingDelegations}
-                          />
-                        </>
-                      </ModalPopup>
                     </Content>
                   ) : (
                     <></>
