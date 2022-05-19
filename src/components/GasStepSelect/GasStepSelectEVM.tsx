@@ -6,8 +6,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
 import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
+import { UserAsset, UserAssetType } from '../../models/UserAsset';
 import { getNormalScaleAmount } from '../../utils/NumberUtils';
 import { useCustomGasModalEVM } from './CustomGasModalEVM';
+import { GasStepSelectEthereum } from './GasStepSelectEthereum';
 
 export const GasInfoEVM = () => {
   const asset = useCronosEvmAsset();
@@ -89,15 +91,20 @@ const GasStep = (props: { isUsingCustomFee: boolean }) => {
   );
 };
 
-const GasStepSelectEVM = (props: { onChange?: (gasLimit: string, gasPrice: string) => void }) => {
-  const asset = useCronosEvmAsset();
+interface IGasStepSelectEVMProps {
+  asset: UserAsset
+  onChange?: (gasLimit: string, gasPrice: string) => void
+}
+
+
+const GasConfigEVM = ({ asset, onChange }: IGasStepSelectEVMProps) => {
 
   const [t] = useTranslation();
   const [gasPrice, setGasPrice] = useState(asset?.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE);
   const [gasLimit, setGasLimit] = useState(asset?.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT);
   const [isUsingCustomGas, setIsUsingCustomGas] = useState(false);
 
-  const { show, dismiss } = useCustomGasModalEVM(asset!, gasPrice, gasLimit);
+  const { show, dismiss } = useCustomGasModalEVM(asset, gasPrice, gasLimit);
 
   const [readableGasFee, setReadableGasFee] = useState('');
 
@@ -114,7 +121,7 @@ const GasStepSelectEVM = (props: { onChange?: (gasLimit: string, gasPrice: strin
 
     const amount = getNormalScaleAmount(amountBigNumber.toString(), asset!);
 
-    setReadableGasFee(`${amount} ${asset!.symbol}`);
+    setReadableGasFee(`${amount} ${asset.symbol}`);
   };
 
   useEffect(() => {
@@ -175,7 +182,7 @@ const GasStepSelectEVM = (props: { onChange?: (gasLimit: string, gasPrice: strin
           show({
             onCancel: () => {},
             onSuccess: (newGasLimit, newGasFee) => {
-              props.onChange?.(newGasLimit, newGasFee);
+              onChange?.(newGasLimit, newGasFee);
               dismiss();
 
               setGasLimit(newGasLimit);
@@ -190,5 +197,15 @@ const GasStepSelectEVM = (props: { onChange?: (gasLimit: string, gasPrice: strin
     </Form.Item>
   );
 };
+
+const GasStepSelectEVM = (props: IGasStepSelectEVMProps) => {
+
+  if (props.asset.assetType === UserAssetType.EVM && props.asset.mainnetSymbol === 'ETH' || props.asset.assetType === UserAssetType.ERC_20_TOKEN) {
+    return <GasStepSelectEthereum {...props} />
+  }
+
+  return <GasConfigEVM {...props} />
+}
+
 
 export default GasStepSelectEVM;
