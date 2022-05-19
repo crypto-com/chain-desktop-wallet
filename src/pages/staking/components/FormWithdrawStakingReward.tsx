@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './staking.less';
+import '../staking.less';
 import 'antd/dist/antd.css';
 import { Button, Table, Typography, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';

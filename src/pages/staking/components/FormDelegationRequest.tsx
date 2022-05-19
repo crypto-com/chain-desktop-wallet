@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import './staking.less';
+import '../staking.less';
 import 'antd/dist/antd.css';
 import { Button, Checkbox, Form, Input, InputNumber, Layout, Alert } from 'antd';
 import { OrderedListOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
@@ -27,35 +27,35 @@ import {
   adjustedTransactionAmount,
   fromScientificNotation,
   getCurrentMinAssetAmount,
-} from "../../../utils/NumberUtils";
-import { LEDGER_WALLET_TYPE, detectConditionsError } from "../../../service/LedgerService";
+} from '../../../utils/NumberUtils';
+import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../../service/LedgerService';
 import {
   AnalyticsActions,
   AnalyticsCategory,
   AnalyticsService,
   AnalyticsTxType,
-} from "../../../service/analytics/AnalyticsService";
-import { secretStoreService } from "../../../storage/SecretStoreService";
-import { walletService } from "../../../service/WalletService";
+} from '../../../service/analytics/AnalyticsService';
+import { secretStoreService } from '../../../storage/SecretStoreService';
+import { walletService } from '../../../service/WalletService';
 
-import ModalPopup from "../../../components/ModalPopup/ModalPopup";
-import SuccessModalPopup from "../../../components/SuccessModalPopup/SuccessModalPopup";
-import ErrorModalPopup from "../../../components/ErrorModalPopup/ErrorModalPopup";
-import PasswordFormModal from "../../../components/PasswordForm/PasswordFormModal";
-import RowAmountOption from "../../../components/RowAmountOption/RowAmountOption";
-import ValidatorListTable from "./ValidatorListTable";
+import ModalPopup from '../../../components/ModalPopup/ModalPopup';
+import SuccessModalPopup from '../../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
+import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
+import RowAmountOption from '../../../components/RowAmountOption/RowAmountOption';
+import ValidatorListTable from './ValidatorListTable';
 
 import {
   UNBLOCKING_PERIOD_IN_DAYS,
   FIXED_DEFAULT_FEE,
   SUPPORTED_CURRENCY,
-} from "../../../config/StaticConfig";
-import { isValidatorAddressSuspicious } from "../../../models/ModerationConfig";
-import { useLedgerStatus } from "../../../hooks/useLedgerStatus";
-import { ledgerNotification } from "../../../components/LedgerNotification/LedgerNotification";
+} from '../../../config/StaticConfig';
+import { isValidatorAddressSuspicious } from '../../../models/ModerationConfig';
+import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
+import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
 import GasStepSelectTendermint, {
   GasInfoTendermint,
-} from "../../../components/GasStepSelect/GasStepSelectTendermint";
+} from '../../../components/GasStepSelect/GasStepSelectTendermint';
 
 const { Content, Sider } = Layout;
 const { Search } = Input;
