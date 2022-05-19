@@ -22,11 +22,11 @@ jobs:
 
       - name: Install deps with big timeout
         run: |
-          yarn install --network-timeout 600000
+          yarn config set httpTimeout 600000 && yarn install
 
       - name: Install deps with big timeout for tests
         run: |
-          cd tests && yarn install --network-timeout 600000
+          cd tests && yarn install
 
       - name: install chain-maind
         run: sudo mv ./tests/app/bin/chain-maind /usr/local/bin
