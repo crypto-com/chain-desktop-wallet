@@ -18,7 +18,7 @@ jobs:
 
       - name: Upgrade to Yarn 2
         run: |
-          yarn set version 2
+          yarn set version 3
 
       - name: Refresh
         run: |
