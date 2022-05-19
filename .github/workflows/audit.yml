@@ -16,13 +16,13 @@ jobs:
         with:
           node-version: 14
 
-      - name: Upgrade to Yarn 3
+      - name: Upgrade to Yarn 3.0
         run: |
-          yarn set version 3
+          yarn set version 3.0
       
       - name: Remove any cached files
         run: |
-          rm -Rf ./node_modules
+          rm -Rf ./node_modules && rm -Rf ./.yarn/cache && rm ./.yarn/build-state.yml && rm ./.yarn/install-state.gz && rm -Rf ./.yarn/unplugged
 
       - name: Refresh
         run: |

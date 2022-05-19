@@ -29,7 +29,7 @@ jobs:
 
       - name: Install deps with big timeout
         run: |
-          yarn install --network-timeout 600000
+          YARN_HTTP_TIMEOUT=600000 yarn config && yarn install
 
       - name: Install Snapcraft
         uses: samuelmeuli/action-snapcraft@v1
