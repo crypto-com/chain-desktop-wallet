@@ -38,9 +38,9 @@ import {
 } from '../../config/StaticConfig';
 import { ModerationConfig } from '../../models/ModerationConfig';
 
-import { FormDelegationOperations } from './FormDelegationOperations';
-import { FormWithdrawStakingReward } from './FormWithdrawStakingReward';
-import { FormDelegationRequest } from './FormDelegationRequest';
+import { FormDelegationOperations } from './components/FormDelegationOperations';
+import { FormWithdrawStakingReward } from './components/FormWithdrawStakingReward';
+import { FormDelegationRequest } from './components/FormDelegationRequest';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;

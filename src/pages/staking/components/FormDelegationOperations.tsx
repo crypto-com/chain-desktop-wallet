@@ -11,26 +11,26 @@ import {
   walletAssetState,
   ledgerIsExpertModeState,
   fetchingDBState,
-} from '../../recoil/atom';
-import { UserAsset } from '../../models/UserAsset';
-import { BroadCastResult, StakingTransactionData } from '../../models/Transaction';
-import { renderExplorerUrl } from '../../models/Explorer';
-import { getUIDynamicAmount } from '../../utils/NumberUtils';
-import { middleEllipsis } from '../../utils/utils';
-import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
+} from "../../../recoil/atom";
+import { UserAsset } from "../../../models/UserAsset";
+import { BroadCastResult, StakingTransactionData } from "../../../models/Transaction";
+import { renderExplorerUrl } from "../../../models/Explorer";
+import { getUIDynamicAmount } from "../../../utils/NumberUtils";
+import { middleEllipsis } from "../../../utils/utils";
+import { LEDGER_WALLET_TYPE, detectConditionsError } from "../../../service/LedgerService";
 
-import { secretStoreService } from '../../storage/SecretStoreService';
-import { walletService } from '../../service/WalletService';
+import { secretStoreService } from "../../../storage/SecretStoreService";
+import { walletService } from "../../../service/WalletService";
 
-import ModalPopup from '../../components/ModalPopup/ModalPopup';
-import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
-import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { UndelegateFormComponent } from './components/UndelegateFormComponent';
-import RedelegateFormComponent from './components/RedelegateFormComponent';
+import ModalPopup from "../../../components/ModalPopup/ModalPopup";
+import SuccessModalPopup from "../../../components/SuccessModalPopup/SuccessModalPopup";
+import ErrorModalPopup from "../../../components/ErrorModalPopup/ErrorModalPopup";
+import PasswordFormModal from "../../../components/PasswordForm/PasswordFormModal";
+import { UndelegateFormComponent } from './UndelegateFormComponent';
+import RedelegateFormComponent from './RedelegateFormComponent';
 
-import { useLedgerStatus } from '../../hooks/useLedgerStatus';
-import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
+import { useLedgerStatus } from "../../../hooks/useLedgerStatus";
+import { ledgerNotification } from "../../../components/LedgerNotification/LedgerNotification";
 
 const { Text } = Typography;
 

@@ -14,32 +14,32 @@ import {
   walletAssetState,
   ledgerIsExpertModeState,
   fetchingDBState,
-} from '../../recoil/atom';
+} from '../../../recoil/atom';
 import {
   AssetMarketPrice,
   getAssetRewardsBalancePrice,
   scaledRewardBalance,
   UserAsset,
-} from '../../models/UserAsset';
-import { BroadCastResult, RewardTransactionData } from '../../models/Transaction';
-import { renderExplorerUrl } from '../../models/Explorer';
-import { getUIDynamicAmount } from '../../utils/NumberUtils';
-import { isNumeric } from '../../utils/utils';
-import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../service/LedgerService';
+} from '../../../models/UserAsset';
+import { BroadCastResult, RewardTransactionData } from '../../../models/Transaction';
+import { renderExplorerUrl } from '../../../models/Explorer';
+import { getUIDynamicAmount } from '../../../utils/NumberUtils';
+import { isNumeric } from '../../../utils/utils';
+import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../../service/LedgerService';
 
-import { secretStoreService } from '../../storage/SecretStoreService';
-import { walletService } from '../../service/WalletService';
+import { secretStoreService } from '../../../storage/SecretStoreService';
+import { walletService } from '../../../service/WalletService';
 
-import ModalPopup from '../../components/ModalPopup/ModalPopup';
-import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
-import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import ModalPopup from '../../../components/ModalPopup/ModalPopup';
+import SuccessModalPopup from '../../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
+import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
 
-import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
+import { SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
 
-import { useLedgerStatus } from '../../hooks/useLedgerStatus';
-import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
-import { GasInfoTendermint } from '../../components/GasStepSelect/GasStepSelectTendermint';
+import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
+import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
+import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSelectTendermint';
 
 const { Text } = Typography;
 
