@@ -16,6 +16,7 @@ export interface TokenDataWithApproval {
     readableSpenderName: string;
     amount: ethers.BigNumber;
     riskExposure: string;
+    timeStamp: string;
     tx: string;
   };
   rowSpan: number;

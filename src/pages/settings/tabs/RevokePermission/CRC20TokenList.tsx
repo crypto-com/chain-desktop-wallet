@@ -106,6 +106,7 @@ const CRC20TokenList = ({
             approval: {
               spender,
               tx: t.transactionHash,
+              timeStamp: (t as any).timeStamp,
               readableSpenderName: '',
               amount: t.data === '0x' ? ethers.BigNumber.from(0) : ethers.BigNumber.from(t.data),
               riskExposure: '',
@@ -240,6 +241,13 @@ const CRC20TokenList = ({
       title: t('settings.revoke.risk'),
       key: 'risk',
       render: (data: TokenDataWithApproval) => <RiskExposure data={data} />,
+    },
+    {
+      title: t('home.transactions.table1.time'),
+      key: 'approval.timeStamp',
+      render: (data: TokenDataWithApproval) => {
+        return new Date(Number(data.approval.timeStamp) * 1000).toLocaleString();
+      }
     },
     {
       title: '',
