@@ -22,7 +22,7 @@ jobs:
 
       - name: Install deps with big timeout
         run: |
-          YARN_HTTP_TIMEOUT=600000 yarn config && yarn install
+          yarn config set httpTimeout 600000 && yarn install
 
       - name: Install deps with big timeout for tests
         run: |
