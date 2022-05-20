@@ -490,7 +490,6 @@ export const FormWithdrawStakingReward = () => {
           {t('staking.withdrawall')}
         </Button>
       )}
-
       <ModalPopup
         isModalVisible={withdrawAllModalVisible}
         handleCancel={handleWithdrawAllModal}
