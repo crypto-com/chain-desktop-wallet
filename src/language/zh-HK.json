@@ -733,5 +733,6 @@
   "settings.revoke.amount": "批准的數量",
   "settings.revoke.risk": "風險敞口",
   "settings.revoke": "撤銷許可",
-  "settings.revoke.unlimited": "無限的"
+  "settings.revoke.unlimited": "無限的",
+  "settings.noApproval": "沒有批准數據"
 }

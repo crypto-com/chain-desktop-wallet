@@ -730,5 +730,6 @@
   "settings.revoke.amount": "승인 된 금액",
   "settings.revoke.risk": "위험 노출",
   "settings.revoke": "취소",
-  "settings.revoke.unlimited": "제한 없는"
+  "settings.revoke.unlimited": "제한 없는",
+  "settings.noApproval": "승인 데이터가 없습니다"
 }
