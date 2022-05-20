@@ -13,7 +13,6 @@ import { UserAsset } from '../../../models/UserAsset';
 import { secretStoreService } from '../../../service/storage/SecretStoreService';
 import { Dapp, DappBrowserIPC } from '../types';
 import { ProviderPreloadScriptPath } from './config';
-import packageJson from '../../../../package.json';
 import { walletService } from '../../../service/WalletService';
 import { useRefCallback } from './useRefCallback';
 import { useWebInfoProvider } from './useWebInfoProvider';
@@ -362,8 +361,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
       <webview
         preload={ProviderPreloadScriptPath}
         ref={webviewRef}
-        // useragent is required for some dapps to auto connect, eg. cronoschimps
-        useragent={`Mozilla/5.0 (Linux; Android 8.0.0; Desktop Wallet Build/${packageJson.version}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.84 Mobile Safari/537.36`}
+        useragent={window.navigator.userAgent.replace('chain-desktop-wallet', 'Desktop Wallet Build')}
         style={{
           width: '100%',
           height: 'calc(100vh - 48px)',

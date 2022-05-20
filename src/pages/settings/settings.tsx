@@ -60,6 +60,7 @@ import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
 import AddressBook from './tabs/AddressBook/AddressBook';
 import { getChainName, getCronosTendermintAsset } from '../../utils/utils';
 import { AssetIcon } from '../../components/AssetIcon';
+import RevokePermission from './tabs/RevokePermission/RevokePermission';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -1073,6 +1074,9 @@ const FormSettings = () => {
                       )}
                     </>
                   </ModalPopup>
+                </TabPane>
+                <TabPane tab={t('settings.revoke-permission')} key="revoke-permission">
+                  <RevokePermission />
                 </TabPane>
               </Tabs>
             </Form>
