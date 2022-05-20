@@ -5,7 +5,11 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
-## [v0.7.8] - 2022-05-10
+## [v0.7.9] - 2022-05-20
+### Additions
+- Revoke Token Permission
+- Batch withdraw rewards
+## [v0.7.8] - 2022-05-13
 ### Bug fixes
 - Handle Ledger Live standard support on EVM transaction signing functions
 - Incorrect Transaction Failed popup on Testnet due to delayed transaction receipt return
