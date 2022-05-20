@@ -4,17 +4,17 @@ import {
   DisableGASettings,
   SettingsDataUpdate,
   Wallet,
-} from '../models/Wallet';
+} from '../../models/Wallet';
 import { DatabaseManager } from './DatabaseManager';
-import { Session } from '../models/Session';
+import { Session } from '../../models/Session';
 import {
   AssetCreationType,
   AssetMarketPrice,
   getAssetPriceId,
   getAssetPriceIdFrom,
   UserAsset,
-} from '../models/UserAsset';
-import { CommonNftModel, CronosCRC721NftModel, CryptoOrgNftModel, NftType } from '../models/Nft';
+} from '../../models/UserAsset';
+import { CommonNftModel, CronosCRC721NftModel, CryptoOrgNftModel, NftType } from '../../models/Nft';
 import {
   NftAccountTransactionList,
   NftQueryParams,
@@ -37,15 +37,15 @@ import {
   NftAttributesRecord,
   StakingAttributesRecord,
   RewardAttributesRecord,
-} from '../models/Transaction';
-import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../config/StaticConfig';
+} from '../../models/Transaction';
+import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
 import {
   BridgeConfig,
   BridgeNetworkConfigType,
   BridgeTransferDirection,
-} from '../service/bridge/BridgeConfig';
-import { BridgeTransactionHistoryList } from '../service/bridge/contracts/BridgeModels';
-import { AddressBookContactModel } from '../models/AddressBook';
+} from '../bridge/BridgeConfig';
+import { BridgeTransactionHistoryList } from '../bridge/contracts/BridgeModels';
+import { AddressBookContactModel } from '../../models/AddressBook';
 // import { generalConfigService } from './GeneralConfigService';
 
 export class StorageService {

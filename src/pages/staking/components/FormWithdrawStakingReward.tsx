@@ -27,7 +27,7 @@ import { getUIDynamicAmount } from '../../../utils/NumberUtils';
 import { isNumeric } from '../../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../../service/LedgerService';
 
-import { secretStoreService } from '../../../storage/SecretStoreService';
+import { secretStoreService } from '../../../service/storage/SecretStoreService';
 import { walletService } from '../../../service/WalletService';
 
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
@@ -528,9 +528,12 @@ export const FormWithdrawStakingReward = () => {
                 rewards && rewards.length > 3 ? 'address-container scrollable' : 'address-container'
               }
             >
-              {rewards.map(elem => (
+              {rewards.map((elem, idx) => (
                 <>
-                  <div className="address">{`${elem?.validatorAddress}`}</div>
+                  <div
+                    id={'address'.concat(idx.toString())}
+                    className="address"
+                  >{`${elem?.validatorAddress}`}</div>
                 </>
               ))}
             </div>

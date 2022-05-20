@@ -33,7 +33,7 @@ import {
 } from '../../recoil/atom';
 import { setMomentLocale } from '../../language/I18n';
 import { walletService } from '../../service/WalletService';
-import { secretStoreService } from '../../storage/SecretStoreService';
+import { secretStoreService } from '../../service/storage/SecretStoreService';
 import {
   DisableDefaultMemoSettings,
   DisableGASettings,
@@ -55,7 +55,7 @@ import {
 } from '../../config/StaticConfig';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
-import { generalConfigService } from '../../storage/GeneralConfigService';
+import { generalConfigService } from '../../service/storage/GeneralConfigService';
 import { UserAsset, UserAssetConfig } from '../../models/UserAsset';
 import AddressBook from './tabs/AddressBook/AddressBook';
 import { getChainName, getCronosTendermintAsset } from '../../utils/utils';
@@ -107,12 +107,13 @@ const GeneralSettingsForm = props => {
   };
 
   useEffect(() => {
-
-    if (session.activeAsset?.identifier && session.activeAsset?.identifier !== currentAssetIdentifier) {
-      onSwitchAsset(session.activeAsset?.identifier)
+    if (
+      session.activeAsset?.identifier &&
+      session.activeAsset?.identifier !== currentAssetIdentifier
+    ) {
+      onSwitchAsset(session.activeAsset?.identifier);
     }
-
-  }, [session])
+  }, [session]);
 
   useEffect(() => {
     let unmounted = false;

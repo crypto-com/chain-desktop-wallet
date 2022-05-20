@@ -10,7 +10,7 @@ import { addHTTPsPrefixIfNeeded, getCronosEvmAsset } from '../../../utils/utils'
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
 import RequestConfirmation from '../components/RequestConfirmation/RequestConfirmation';
 import { UserAsset } from '../../../models/UserAsset';
-import { secretStoreService } from '../../../storage/SecretStoreService';
+import { secretStoreService } from '../../../service/storage/SecretStoreService';
 import { Dapp, DappBrowserIPC } from '../types';
 import { ProviderPreloadScriptPath } from './config';
 import packageJson from '../../../../package.json';
@@ -24,7 +24,6 @@ import {
 } from './useWebviewStatusInfo';
 import { LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
-
 
 // use **only** one of the following
 // priority: dapp > dappURL
@@ -242,7 +241,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
 
   useIPCProvider({
     webview: webviewRef.current,
-    onRequestAddress: (onSuccess,) => {
+    onRequestAddress: onSuccess => {
       // TODO: !! cronosAsset may not be ready
       onRequestAddress.current(onSuccess);
     },
@@ -273,7 +272,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
       // no-op for now
     },
     onFinishTransaction: (error?: string) => {
-      onFinishTransaction.current(error ?? "");
+      onFinishTransaction.current(error ?? '');
     },
   });
 
@@ -347,10 +346,10 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
           onConfirm={({ gasLimit, gasPrice }) => {
             setRequestConfirmationVisible(false);
             confirmPasswordCallback?.successCallback({
-              signature: "",
+              signature: '',
               gasLimit,
               gasPrice,
-              decryptedPhrase
+              decryptedPhrase,
             });
           }}
           onCancel={() => {
