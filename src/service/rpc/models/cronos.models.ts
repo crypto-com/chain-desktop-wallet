@@ -1,3 +1,5 @@
+import { Log } from '@ethersproject/abstract-provider';
+
 interface ExplorerAPIResponse {
   message: string;
   // "1": ok | "0" : not ok
@@ -16,12 +18,30 @@ export interface TokenTransferEventLogsResponse extends ExplorerAPIResponse {
   result: TokenTransferEventLog[];
 }
 
+export interface EventLogResponse extends ExplorerAPIResponse {
+  result: Log[];
+}
+
 export interface TokensOwnedByAddressResponse extends ExplorerAPIResponse {
   result: TokenDataOwnedByAddress[];
 }
 
 export interface ContractDataResponse extends ExplorerAPIResponse {
   result: ContractData;
+}
+
+export interface TokenBalanceResponse extends ExplorerAPIResponse {
+  result: string;
+}
+
+export interface ContractSourceCode {
+  ABI: string;
+  ContractName: string;
+  Address: string;
+}
+
+export interface ContractSourceCodeResponse extends ExplorerAPIResponse {
+  result: ContractSourceCode[];
 }
 
 export interface txListByAccountRequestParams extends ApiRequestParamsBase {
@@ -76,6 +96,8 @@ export interface TokenTransferEventLog {
   tokenSymbol: string;
   transactionIndex: string;
 }
+
+export interface EventLog {}
 
 // Tokens owned by an address
 export interface TokenDataOwnedByAddress {

@@ -1,6 +1,7 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Form, Tooltip } from 'antd';
 import BigNumber from 'bignumber.js';
+import numeral from 'numeral';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -61,7 +62,7 @@ const GasStepSelectEVMDApp = (props: {
       setIsUsingCustomGas(false);
     }
 
-    const amount = getNormalScaleAmount(newGasPrice.times(newGasLimit).toString(), asset!)
+    const amount = numeral(getNormalScaleAmount(newGasPrice.times(newGasLimit).toString(), asset!)).format("0,0.0000");
 
     setReadableGasFee(`${amount} ${asset!.symbol}`);
   }

@@ -478,6 +478,7 @@
   "sending-crypto-on-blockchain-requires-confirmation": "블록 체인에서 cryptocurrencies를 보내는 것은 네트워크에서 확인해야합니다. 정상적인 상황에서는 네트워크 비용이 높을수록 단기간에 거래가 확인 될 가능성이 높습니다.",
   "confirmation-speed": "확인 속도",
   "staking.title": "스테이킹",
+  "staking.withdrawall": "모두보상 인출하기",
   "staking.tab1": "스테이킹 보상",
   "staking.tab2": "금액 위임",
   "staking.tab3": "위임 관리",
@@ -524,6 +525,7 @@
   "staking.modal2.label1": "송신인 주소",
   "staking.modal2.label2": "검증인로부터 보상 인출하기",
   "staking.modal2.label3": "보상",
+  "staking.modal2.label4": "검증인모두로부터 보상 인출하기",
   "staking.modal3.title": "위임 취소",
   "staking.modal3.description": "스테이킹 해제된 자산은 Crypto.org 체인 네트워크에 의해 시행되는 {{ unbondingPeriod }}일 후에 사용할 수 있습니다.",
   "staking.modal3.button": "위임 취소 보기",
@@ -720,5 +722,14 @@
   "settings.addressBook.removeConfirm": "제거 하시겠습니까?",
   "settings.addressBook.addNewAddress": "새 주소를 추가하십시오",
   "settings.addressBook.title": "주소록",
-  "settings.addressBook.address": "주소"
+  "settings.addressBook.address": "주소",
+  "settings.revoke-permission": "취소 허가",
+  "settings.revoke.sure": "허가를 철회 하시겠습니까?",
+  "settings.revoke.token": "토큰/균형",
+  "settings.revoke.spender": "승인 된 스펜더",
+  "settings.revoke.amount": "승인 된 금액",
+  "settings.revoke.risk": "위험 노출",
+  "settings.revoke": "취소",
+  "settings.revoke.unlimited": "제한 없는",
+  "settings.noApproval": "승인 데이터가 없습니다"
 }
