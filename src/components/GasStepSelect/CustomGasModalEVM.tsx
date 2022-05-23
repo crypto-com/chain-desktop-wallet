@@ -21,21 +21,19 @@ import {
 import { getAssetAmountInFiat, UserAsset } from '../../models/UserAsset';
 import { getNormalScaleAmount } from '../../utils/NumberUtils';
 import { walletService } from '../../service/WalletService';
-import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
 import { Session } from '../../models/Session';
 import { useAnalytics } from '../../hooks/useAnalytics';
 
 const ModalBody = (props: {
+  asset: UserAsset;
   gasPrice: string;
   gasLimit: string;
   onSuccess: (gasLimit: string, gasPrice: string) => void;
 }) => {
-  const { gasPrice, gasLimit, onSuccess } = props;
+  const { gasPrice, gasLimit, onSuccess, asset } = props;
   const [t] = useTranslation();
 
   const [form] = Form.useForm();
-
-  const cronosEVMAsset = useCronosEvmAsset();
 
   const currentSession = getRecoil(sessionState);
   const allMarketData = getRecoil(allMarketState);
@@ -45,16 +43,12 @@ const ModalBody = (props: {
   const [readableNetworkFee, setReadableNetworkFee] = useState('');
 
   const assetMarketData = allMarketData.get(
-    `${cronosEVMAsset?.mainnetSymbol}-${currentSession.currency}`,
+    `${asset.mainnetSymbol}-${currentSession.currency}`,
   );
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
   const [isUsingCustomGas, setIsUsingCustomGas] = useState(false);
 
   const setNetworkFee = (newGasPrice: string, newGasLimit: string) => {
-    if (!cronosEVMAsset) {
-      return;
-    }
-
     if (newGasPrice !== EVM_MINIMUM_GAS_PRICE || newGasLimit !== EVM_MINIMUM_GAS_LIMIT) {
       setIsUsingCustomGas(true);
     } else {
@@ -63,31 +57,28 @@ const ModalBody = (props: {
 
     const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(newGasPrice);
 
-    if (ethers.BigNumber.from(cronosEVMAsset.balance.toString()).lte(amountBigNumber)) {
+    if (ethers.BigNumber.from(asset.balance.toString()).lte(amountBigNumber)) {
       setValidateStatus('error');
     } else {
       setValidateStatus('');
     }
 
-    const amount = getNormalScaleAmount(amountBigNumber.toString(), cronosEVMAsset);
+    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset);
 
-    if (!(cronosEVMAsset && localFiatSymbol && assetMarketData && assetMarketData.price)) {
-      setReadableNetworkFee(`${amount} ${cronosEVMAsset.symbol}`);
+    if (!(asset && localFiatSymbol && assetMarketData && assetMarketData.price)) {
+      setReadableNetworkFee(`${amount} ${asset.symbol}`);
       return;
     }
     const price = numeral(getAssetAmountInFiat(amount, assetMarketData)).format('0,0.00');
 
     if (price === '0.00') {
-      setReadableNetworkFee(`${amount} ${cronosEVMAsset.symbol} (<${localFiatSymbol}0.01)`);
+      setReadableNetworkFee(`${amount} ${asset.symbol} (<${localFiatSymbol}0.01)`);
     } else {
-      setReadableNetworkFee(`${amount} ${cronosEVMAsset.symbol} (~${localFiatSymbol}${price})`);
+      setReadableNetworkFee(`${amount} ${asset.symbol} (~${localFiatSymbol}${price})`);
     }
   };
 
   useEffect(() => {
-    if (!cronosEVMAsset) {
-      return;
-    }
 
     setNetworkFee(gasPrice, gasLimit);
 
@@ -95,9 +86,9 @@ const ModalBody = (props: {
       gasPrice,
       gasLimit,
     });
-  }, [cronosEVMAsset, gasPrice, gasLimit]);
+  }, [asset, gasPrice, gasLimit]);
 
-  if (!cronosEVMAsset) {
+  if (!asset) {
     return <React.Fragment />;
   }
 
@@ -124,7 +115,7 @@ const ModalBody = (props: {
           }
         }}
         onFinish={async values => {
-          if (!cronosEVMAsset.config) {
+          if (!asset.config) {
             return;
           }
 
@@ -143,9 +134,9 @@ const ModalBody = (props: {
           );
 
           const newlyUpdatedAsset = {
-            ...cronosEVMAsset,
+            ...asset,
             config: {
-              ...cronosEVMAsset.config,
+              ...asset.config,
               fee: { gasLimit: newGasLimit.toString(), networkFee: newGasPrice.toString() },
             },
           };
@@ -169,7 +160,7 @@ const ModalBody = (props: {
 
           onSuccess(newGasLimit, newGasPrice);
 
-          analyticsService.logCustomizeGas(cronosEVMAsset.assetType ?? '');
+          analyticsService.logCustomizeGas(asset.assetType ?? '');
         }}
       >
         <Form.Item
@@ -284,7 +275,7 @@ const useCustomGasModalEVM = (asset: UserAsset, gasFee: string, gasLimit: string
       style: {
         padding: '20px 20px 0 20px',
       },
-      content: <ModalBody gasPrice={gasFee} gasLimit={gasLimit} onSuccess={props.onSuccess} />,
+      content: <ModalBody asset={asset} gasPrice={gasFee} gasLimit={gasLimit} onSuccess={props.onSuccess} />,
     });
     setIsShowing(true);
     modalRef = modal;

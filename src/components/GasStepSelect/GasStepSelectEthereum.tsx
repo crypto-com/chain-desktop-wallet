@@ -4,10 +4,12 @@ import { ethers } from 'ethers';
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EVM_MINIMUM_GAS_LIMIT } from '../../config/StaticConfig';
+import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
 import { useMarketPrice } from '../../hooks/useMarketPrice';
 import { UserAsset } from "../../models/UserAsset"
 import { EthereumGasStepInfo, getEthereumGasSteps } from '../../service/Gas';
+import { getNormalScaleAmount } from '../../utils/NumberUtils';
+import { useCustomGasModalEVM } from './CustomGasModalEVM';
 import "./style.less";
 
 const { Option } = Select;
@@ -76,13 +78,18 @@ const GasStepOption = ({ title, wait, gasPrice, gasLimit }: IGasStepOption) => {
 interface IGasStepSelectEVMProps {
   asset: UserAsset
   onChange?: (gasLimit: string, gasPrice: string) => void
-  gasLimit?: string
 }
 
-export const GasStepSelectEthereum = ({ asset, onChange, gasLimit }: IGasStepSelectEVMProps) => {
+export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProps) => {
 
   const [gasInfo, setGasInfo] = useState<EthereumGasStepInfo | undefined>()
   const [isLoading, setIsLoading] = useState(false);
+  const [gasPrice, setGasPrice] = useState(asset?.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE);
+  const [gasLimit, setGasLimit] = useState(asset?.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT);
+  const { show, dismiss } = useCustomGasModalEVM(asset, gasPrice, gasLimit);
+  const [readableGasFee, setReadableGasFee] = useState('');
+  const [isUsingCustomGas, setIsUsingCustomGas] = useState(false);
+  const [t] = useTranslation();
 
   const gasLimitInfo = useMemo(() => {
     if (!gasLimit) {
@@ -91,8 +98,6 @@ export const GasStepSelectEthereum = ({ asset, onChange, gasLimit }: IGasStepSel
 
     return ethers.BigNumber.from(gasLimit);
   }, [gasLimit])
-
-  const [t] = useTranslation();
 
   useEffect(() => {
     const fetch = async () => {
@@ -105,13 +110,27 @@ export const GasStepSelectEthereum = ({ asset, onChange, gasLimit }: IGasStepSel
     fetch();
   }, [])
 
-  console.log(asset, onChange, gasInfo);
+  const updateFee = (newGasPrice: string, newGasLimit: string) => {
+    if (newGasPrice !== EVM_MINIMUM_GAS_PRICE || newGasLimit !== EVM_MINIMUM_GAS_LIMIT) {
+      setIsUsingCustomGas(true);
+    } else {
+      setIsUsingCustomGas(false);
+    }
+
+    const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(
+      ethers.BigNumber.from(newGasPrice),
+    );
+
+    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset!);
+
+    setReadableGasFee(`${amount} ${asset.symbol}`);
+  };
 
   if (!gasInfo) {
     return <Spin style={{ left: 'auto' }} />
   }
 
-  return <div style={{ width: "100%", marginBottom: "10px" }}>
+  return <div style={{ width: "100%", marginBottom: "30px" }}>
     <div
       style={{
         display: 'flex',
@@ -127,10 +146,30 @@ export const GasStepSelectEthereum = ({ asset, onChange, gasLimit }: IGasStepSel
         <ExclamationCircleOutlined style={{ color: '#1199fa', cursor: 'pointer' }} />
       </Tooltip>
     </div>
-    <Select loading={isLoading} style={{ width: "100%" }} defaultValue="average" className=''>
-      <Option value="slow"><GasStepOption title='Slow' wait={gasInfo.safeLowWait} gasPrice={gasInfo.safeLow} gasLimit={gasLimitInfo} /></Option>
-      <Option value="average" ><GasStepOption title='Average' wait={gasInfo.averageWait} gasPrice={gasInfo.average} gasLimit={gasLimitInfo} /></Option>
-      <Option value="fast"><GasStepOption title='Fast' wait={gasInfo.fastWait} gasPrice={gasInfo.fast} gasLimit={gasLimitInfo} /></Option>
+    <Select loading={isLoading} style={{ width: "100%" }} defaultValue="average" className='gasStepSelectEthereum' onChange={(value) => {
+      setGasPrice(value)
+    }}>
+      <Option value={gasInfo.safeLow.toString()}><GasStepOption title='Slow' wait={gasInfo.safeLowWait} gasPrice={gasInfo.safeLow} gasLimit={gasLimitInfo} /></Option>
+      <Option value={gasInfo.average.toString()} ><GasStepOption title='Average' wait={gasInfo.averageWait} gasPrice={gasInfo.average} gasLimit={gasLimitInfo} /></Option>
+      <Option value={gasInfo.fast.toString()}><GasStepOption title='Fast' wait={gasInfo.fastWait} gasPrice={gasInfo.fast} gasLimit={gasLimitInfo} /></Option>
     </Select>
+    <a
+      style={{ float: 'right', marginTop: '4px' }}
+      onClick={() => {
+        show({
+          onCancel: () => { },
+          onSuccess: (newGasLimit, newGasFee) => {
+            onChange?.(newGasLimit, newGasFee);
+            dismiss();
+
+            setGasLimit(newGasLimit);
+            setGasPrice(newGasFee);
+            updateFee(newGasFee, newGasLimit);
+          },
+        });
+      }}
+    >
+      {t('custom-options')}
+    </a>
   </div>
 }
