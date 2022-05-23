@@ -6,17 +6,17 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
 import { useMarketPrice } from '../../hooks/useMarketPrice';
-import { UserAsset } from "../../models/UserAsset"
+import { UserAsset } from '../../models/UserAsset';
 import { EthereumGasStepInfo, getEthereumGasSteps } from '../../service/Gas';
 import { getNormalScaleAmount } from '../../utils/NumberUtils';
 import { useCustomGasModalEVM } from './CustomGasModalEVM';
-import "./style.less";
+import './style.less';
 
 const { Option } = Select;
 
 interface IGasStepOption {
   title: string;
-  wait: number;// minutes
+  wait: number; // minutes
   gasPrice: ethers.BigNumber;
   gasLimit: ethers.BigNumber;
 }
@@ -24,9 +24,8 @@ interface IGasStepOption {
 const GasStepOption = ({ title, wait, gasPrice, gasLimit }: IGasStepOption) => {
   const [t] = useTranslation();
 
-
   const readableGasFee = ethers.utils.formatEther(gasPrice.mul(gasLimit));
-  const { readablePrice } = useMarketPrice({ symbol: 'WETH', amount: readableGasFee })
+  const { readablePrice } = useMarketPrice({ symbol: 'WETH', amount: readableGasFee });
 
   return (
     <div
@@ -36,8 +35,8 @@ const GasStepOption = ({ title, wait, gasPrice, gasLimit }: IGasStepOption) => {
         alignItems: 'center',
         padding: '0 14px',
         // height: '80px',
-        lineHeight: "30px",
-        width: "100%"
+        lineHeight: '30px',
+        width: '100%',
       }}
     >
       <div
@@ -64,7 +63,7 @@ const GasStepOption = ({ title, wait, gasPrice, gasLimit }: IGasStepOption) => {
       <div
         style={{
           marginBottom: '0px',
-          textAlign: 'right'
+          textAlign: 'right',
         }}
       >
         <div>{readableGasFee} ETH</div>
@@ -74,15 +73,13 @@ const GasStepOption = ({ title, wait, gasPrice, gasLimit }: IGasStepOption) => {
   );
 };
 
-
 interface IGasStepSelectEVMProps {
-  asset: UserAsset
-  onChange?: (gasLimit: string, gasPrice: string) => void
+  asset: UserAsset;
+  onChange?: (gasLimit: string, gasPrice: string) => void;
 }
 
 export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProps) => {
-
-  const [gasInfo, setGasInfo] = useState<EthereumGasStepInfo | undefined>()
+  const [gasInfo, setGasInfo] = useState<EthereumGasStepInfo | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const [gasPrice, setGasPrice] = useState(asset?.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE);
   const [gasLimit, setGasLimit] = useState(asset?.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT);
@@ -97,18 +94,18 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProp
     }
 
     return ethers.BigNumber.from(gasLimit);
-  }, [gasLimit])
+  }, [gasLimit]);
 
   useEffect(() => {
     const fetch = async () => {
       setIsLoading(true);
-      const info = await getEthereumGasSteps()
+      const info = await getEthereumGasSteps();
       setGasInfo(info);
-      setIsLoading(false)
-    }
+      setIsLoading(false);
+    };
 
     fetch();
-  }, [])
+  }, []);
 
   const updateFee = (newGasPrice: string, newGasLimit: string) => {
     if (newGasPrice !== EVM_MINIMUM_GAS_PRICE || newGasLimit !== EVM_MINIMUM_GAS_LIMIT) {
@@ -127,49 +124,78 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProp
   };
 
   if (!gasInfo) {
-    return <Spin style={{ left: 'auto' }} />
+    return <Spin style={{ left: 'auto' }} />;
   }
 
-  return <div style={{ width: "100%", marginBottom: "30px" }}>
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        marginBottom: '8px'
-      }}
-    >
-      <div style={{ marginRight: 4 }}>{t('confirmation-speed')}</div>
-      <Tooltip
-        style={{ cursor: 'pointer' }}
-        title={t('sending-crypto-on-blockchain-requires-confirmation')}
+  return (
+    <div style={{ width: '100%', marginBottom: '30px' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          marginBottom: '8px',
+        }}
       >
-        <ExclamationCircleOutlined style={{ color: '#1199fa', cursor: 'pointer' }} />
-      </Tooltip>
-    </div>
-    <Select loading={isLoading} style={{ width: "100%" }} defaultValue="average" className='gasStepSelectEthereum' onChange={(value) => {
-      setGasPrice(value)
-    }}>
-      <Option value={gasInfo.safeLow.toString()}><GasStepOption title='Slow' wait={gasInfo.safeLowWait} gasPrice={gasInfo.safeLow} gasLimit={gasLimitInfo} /></Option>
-      <Option value={gasInfo.average.toString()} ><GasStepOption title='Average' wait={gasInfo.averageWait} gasPrice={gasInfo.average} gasLimit={gasLimitInfo} /></Option>
-      <Option value={gasInfo.fast.toString()}><GasStepOption title='Fast' wait={gasInfo.fastWait} gasPrice={gasInfo.fast} gasLimit={gasLimitInfo} /></Option>
-    </Select>
-    <a
-      style={{ float: 'right', marginTop: '4px' }}
-      onClick={() => {
-        show({
-          onCancel: () => { },
-          onSuccess: (newGasLimit, newGasFee) => {
-            onChange?.(newGasLimit, newGasFee);
-            dismiss();
+        <div style={{ marginRight: 4 }}>{t('confirmation-speed')}</div>
+        <Tooltip
+          style={{ cursor: 'pointer' }}
+          title={t('sending-crypto-on-blockchain-requires-confirmation')}
+        >
+          <ExclamationCircleOutlined style={{ color: '#1199fa', cursor: 'pointer' }} />
+        </Tooltip>
+      </div>
+      <Select
+        loading={isLoading}
+        style={{ width: '100%' }}
+        defaultValue={gasInfo.average.toString()}
+        className="gasStepSelectEthereum"
+        onChange={value => {
+          setGasPrice(value);
+        }}
+      >
+        <Option value={gasInfo.safeLow.toString()}>
+          <GasStepOption
+            title="Slow"
+            wait={gasInfo.safeLowWait}
+            gasPrice={gasInfo.safeLow}
+            gasLimit={gasLimitInfo}
+          />
+        </Option>
+        <Option value={gasInfo.average.toString()}>
+          <GasStepOption
+            title="Average"
+            wait={gasInfo.averageWait}
+            gasPrice={gasInfo.average}
+            gasLimit={gasLimitInfo}
+          />
+        </Option>
+        <Option value={gasInfo.fast.toString()}>
+          <GasStepOption
+            title="Fast"
+            wait={gasInfo.fastWait}
+            gasPrice={gasInfo.fast}
+            gasLimit={gasLimitInfo}
+          />
+        </Option>
+      </Select>
+      <a
+        style={{ float: 'right', marginTop: '4px' }}
+        onClick={() => {
+          show({
+            onCancel: () => {},
+            onSuccess: (newGasLimit, newGasFee) => {
+              onChange?.(newGasLimit, newGasFee);
+              dismiss();
 
-            setGasLimit(newGasLimit);
-            setGasPrice(newGasFee);
-            updateFee(newGasFee, newGasLimit);
-          },
-        });
-      }}
-    >
-      {t('custom-options')}
-    </a>
-  </div>
-}
+              setGasLimit(newGasLimit);
+              setGasPrice(newGasFee);
+              updateFee(newGasFee, newGasLimit);
+            },
+          });
+        }}
+      >
+        {t('custom-options')}
+      </a>
+    </div>
+  );
+};
