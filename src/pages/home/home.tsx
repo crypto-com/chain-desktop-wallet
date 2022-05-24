@@ -62,6 +62,7 @@ const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const { Meta } = Card;
 
+const maxAssetPreview = 5;
 const maxNftPreview = 5;
 
 const isWalletNotLive = (config: WalletConfig) => {
@@ -445,7 +446,7 @@ const HomePage = () => {
             <div className="site-layout-background asset-container">
               <Table
                 columns={AssetColumns}
-                dataSource={walletAllAssets}
+                dataSource={walletAllAssets.slice(0, maxAssetPreview)}
                 rowKey={record => record.identifier}
                 className="asset-table"
                 pagination={false}
