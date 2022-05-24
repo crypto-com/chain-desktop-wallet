@@ -2,8 +2,8 @@ import 'mocha';
 import { expect } from 'chai';
 
 import { SecretStoreService } from './SecretStoreService';
-import { getRandomId } from '../crypto/RandomGen';
-import { EncryptedCredential } from '../models/SecretStorage';
+import { getRandomId } from '../../crypto/RandomGen';
+import { EncryptedCredential } from '../../models/SecretStorage';
 
 describe('Testing Secret storage service', () => {
   const hashedCredential: EncryptedCredential = {

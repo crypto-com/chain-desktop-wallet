@@ -35,7 +35,9 @@ import {
   AnalyticsService,
   AnalyticsTxType,
 } from '../../../service/analytics/AnalyticsService';
-import { secretStoreService } from '../../../storage/SecretStoreService';
+
+import { secretStoreService } from '../../../service/storage/SecretStoreService';
+
 import { walletService } from '../../../service/WalletService';
 
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
