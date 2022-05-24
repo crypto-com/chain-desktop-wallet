@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
 import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
-import { UserAsset, UserAssetType } from '../../models/UserAsset';
+import { UserAssetType } from '../../models/UserAsset';
 import { getNormalScaleAmount } from '../../utils/NumberUtils';
 import { useCustomGasModalEVM } from './CustomGasModalEVM';
 import { GasStepSelectEthereum } from './GasStepSelectEthereum';
@@ -92,19 +92,20 @@ const GasStep = (props: { isUsingCustomFee: boolean }) => {
 };
 
 interface IGasStepSelectEVMProps {
-  asset: UserAsset
   onChange?: (gasLimit: string, gasPrice: string) => void
 }
 
 
-const GasConfigEVM = ({ asset, onChange }: IGasStepSelectEVMProps) => {
+const GasConfigEVM = ({ onChange }: IGasStepSelectEVMProps) => {
+
+  const asset = useCronosEvmAsset();
 
   const [t] = useTranslation();
   const [gasPrice, setGasPrice] = useState(asset?.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE);
   const [gasLimit, setGasLimit] = useState(asset?.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT);
   const [isUsingCustomGas, setIsUsingCustomGas] = useState(false);
 
-  const { show, dismiss } = useCustomGasModalEVM(asset, gasPrice, gasLimit);
+  const { show, dismiss } = useCustomGasModalEVM(asset!, gasPrice, gasLimit);
 
   const [readableGasFee, setReadableGasFee] = useState('');
 
@@ -121,7 +122,7 @@ const GasConfigEVM = ({ asset, onChange }: IGasStepSelectEVMProps) => {
 
     const amount = getNormalScaleAmount(amountBigNumber.toString(), asset!);
 
-    setReadableGasFee(`${amount} ${asset.symbol}`);
+    setReadableGasFee(`${amount} ${asset!.symbol}`);
   };
 
   useEffect(() => {

@@ -103,6 +103,9 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProp
       setIsLoading(true);
       const info = await getEthereumGasSteps();
       setGasInfo(info);
+      if (info) {
+        setGasPrice(info.average.toString());
+      }
       setIsLoading(false);
     };
 
