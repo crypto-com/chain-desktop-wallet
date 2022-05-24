@@ -37,6 +37,8 @@ import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { croMarketPriceApi } from './rpc/MarketApi';
 import { CronosNftIndexingAPI } from './rpc/indexing/nft/cronos/CronosNftIndexingAPI';
 import { checkIfTestnet, getCronosEvmAsset, isCRC20AssetWhitelisted } from '../utils/utils';
+import { getErc20IconUrlByContractAddress } from '../utils/ERC20IconUrl';
+
 import { SupportedCRCTokenStandard } from './rpc/interface/cronos.chainIndex';
 import { EVMClient } from './rpc/clients/EVMClient';
 import { EthClient } from './ethereum/EthClient';
@@ -722,7 +724,7 @@ export class TransactionHistoryService {
           decimals: token.decimals,
           contractAddress: token.token_addr,
           description: `${token.token_name} (${token.token_symbol})`,
-          icon_url: CronosClient.getTokenIconUrlBySymbol(token.token_symbol),
+          icon_url: getErc20IconUrlByContractAddress(token.token_addr),
           identifier: `${token.token_name}_(${token.token_symbol})_${ethEvmAsset.walletId}`,
           mainnetSymbol: token.token_symbol,
           name: ethEvmAsset.name,

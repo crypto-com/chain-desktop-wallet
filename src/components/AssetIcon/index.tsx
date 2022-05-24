@@ -1,7 +1,7 @@
 import React from 'react';
 import { Avatar } from 'antd';
 import { UserAsset, UserAssetType } from '../../models/UserAsset';
-import { getErc20IconUrlByContractAddress } from '../../utils/ERC20IconUrl';
+// import { getErc20IconUrlByContractAddress } from '../../utils/ERC20IconUrl';
 
 // because of we will persist the user asset in the database,
 // we don't want the icons urls change based on bundle system,
@@ -21,9 +21,9 @@ export const AssetIcon = (props: { asset: UserAsset }) => {
       return <img src={ICON_CRO_EVM} alt="cronos" className="asset-icon" />;
     }
   }
-  if (asset.assetType === UserAssetType.ERC_20_TOKEN) {
-    return <img src={getErc20IconUrlByContractAddress(asset.contractAddress!)} alt={asset.symbol || "erc20"} className="asset-icon" />;
-  }
+  // if (asset.assetType === UserAssetType.ERC_20_TOKEN) {
+  //   return <img src={getErc20IconUrlByContractAddress(asset.contractAddress!)} alt={asset.symbol || "erc20"} className="asset-icon" />;
+  // }
 
   return icon_url ? (
     <img src={icon_url} alt={name} className="asset-icon" />
