@@ -155,22 +155,22 @@ export const FormDelegationOperations = props => {
       let broadcastedTransaction: BroadCastResult | null = null;
 
       if (delegationActionType === StakingActionType.UNDELEGATE) {
-        const undelegateAmount = form.getFieldValue('undelegateAmount');
+        // const undelegateAmount = form.getFieldValue('undelegateAmount');
         broadcastedTransaction = await walletService.sendUnDelegateTransaction({
           validatorAddress: undelegateFormValues.validatorAddress,
-          amount: undelegateAmount,
+          amount: undelegateFormValues.undelegateAmount,
           asset: userAsset,
           memo: '',
           decryptedPhrase,
           walletType,
         });
       } else if (delegationActionType === StakingActionType.REDELEGATE) {
-        const redelegateAmount = form.getFieldValue('redelegateAmount');
+        // const redelegateAmount = form.getFieldValue('redelegateAmount');
         const validatorDesAddress = form.getFieldValue('validatorDestinationAddress');
         broadcastedTransaction = await walletService.sendReDelegateTransaction({
           validatorSourceAddress: redelegateFormValues.validatorOriginAddress,
           validatorDestinationAddress: validatorDesAddress,
-          amount: redelegateAmount,
+          amount: redelegateFormValues.redelegateAmount,
           asset: userAsset,
           memo: '',
           decryptedPhrase,
@@ -242,7 +242,6 @@ export const FormDelegationOperations = props => {
         validatorDestinationAddress: '',
       });
     }
-
     showPasswordInput();
   };
 
