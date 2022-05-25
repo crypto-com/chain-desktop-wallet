@@ -51,7 +51,7 @@ interface RewardsTabularData {
 }
 
 export const FormWithdrawStakingReward = () => {
-  type RewardActionType = 'withdrawall' | 'withdraw' | 'restake';
+  type RewardActionType = 'withdrawall' | 'withdraw' | 'restake' | 'restakeall';
 
   const [withdrawValues, setWithdrawValues] = useState({
     validatorAddress: '',
@@ -506,6 +506,17 @@ export const FormWithdrawStakingReward = () => {
           >
             {t('general.confirm')}
           </Button>,
+
+          <Button
+            id="restake-all-btn"
+            type="primary"
+            onClick={() => {
+              setRewardAction('restakeall');
+            }}
+          >
+            {t('staking.restakeall')}
+          </Button>,
+
           <Button key="back" type="link" onClick={handleWithdrawAllModal}>
             {t('general.cancel')}
           </Button>,
@@ -557,6 +568,7 @@ export const FormWithdrawStakingReward = () => {
                 : ''}
             </div>
           </div>
+
           <GasInfoTendermint />
         </>
       </ModalPopup>
