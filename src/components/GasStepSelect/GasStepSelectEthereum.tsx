@@ -4,12 +4,16 @@ import { ethers } from 'ethers';
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { getRecoil } from 'recoil-nexus';
 import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
+import { useAnalytics } from '../../hooks/useAnalytics';
 import { useMarketPrice } from '../../hooks/useMarketPrice';
 import { UserAsset } from '../../models/UserAsset';
+import { sessionState } from '../../recoil/atom';
 import { EthereumGasStepInfo, getEthereumGasSteps } from '../../service/Gas';
 import { useCustomGasModalEVM } from './CustomGasModalEVM';
 import './style.less';
+import { updateGasInfo } from './utils';
 
 const { Option } = Select;
 
@@ -89,6 +93,8 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProp
   const { show, dismiss } = useCustomGasModalEVM(asset, gasPrice, gasLimit);
   const [isUsingCustomGas, setIsUsingCustomGas] = useState(false);
   const [t] = useTranslation();
+  const currentSession = getRecoil(sessionState);
+  const { analyticsService } = useAnalytics();
 
   const gasLimitInfo = useMemo(() => {
     if (!gasLimit) {
@@ -105,6 +111,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProp
       setGasInfo(info);
       if (info) {
         setGasPrice(info.average.toString());
+        updateFee(info.average.toString(), gasLimit);
       }
       setIsLoading(false);
     };
@@ -112,7 +119,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProp
     fetch();
   }, []);
 
-  const updateFee = (newGasPrice: string, newGasLimit: string) => {
+  const updateFee = async (newGasPrice: string, newGasLimit: string) => {
     if (!gasInfo) {
       return;
     }
@@ -126,6 +133,8 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProp
     } else {
       setIsUsingCustomGas(false);
     }
+
+    await updateGasInfo(currentSession, asset, newGasLimit, newGasPrice, analyticsService);
   };
 
   if (!gasInfo) {
