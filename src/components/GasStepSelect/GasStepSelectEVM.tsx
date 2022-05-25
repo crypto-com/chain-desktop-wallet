@@ -6,10 +6,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
 import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
-import { UserAssetType } from '../../models/UserAsset';
+import { UserAsset, UserAssetType } from '../../models/UserAsset';
 import { getNormalScaleAmount } from '../../utils/NumberUtils';
 import { useCustomGasModalEVM } from './CustomGasModalEVM';
 import { GasStepSelectEthereum } from './GasStepSelectEthereum';
+import { useNativeAsset } from './useNativeAsset';
 
 export const GasInfoEVM = () => {
   const asset = useCronosEvmAsset();
@@ -91,12 +92,11 @@ const GasStep = (props: { isUsingCustomFee: boolean }) => {
   );
 };
 
-interface IGasStepSelectEVMProps {
+interface IGasConfigEVMProps {
   onChange?: (gasLimit: string, gasPrice: string) => void
 }
 
-
-const GasConfigEVM = ({ onChange }: IGasStepSelectEVMProps) => {
+const GasConfigCronosEVM = ({ onChange }: IGasConfigEVMProps) => {
 
   const asset = useCronosEvmAsset();
 
@@ -199,13 +199,20 @@ const GasConfigEVM = ({ onChange }: IGasStepSelectEVMProps) => {
   );
 };
 
+interface IGasStepSelectEVMProps {
+  asset: UserAsset
+  onChange?: (gasLimit: string, gasPrice: string) => void
+}
+
 const GasStepSelectEVM = (props: IGasStepSelectEVMProps) => {
 
+  const nativeAsset = useNativeAsset(props.asset);
+
   if (props.asset.assetType === UserAssetType.EVM && props.asset.mainnetSymbol === 'ETH' || props.asset.assetType === UserAssetType.ERC_20_TOKEN) {
-    return <GasStepSelectEthereum {...props} />
+    return <GasStepSelectEthereum {...props} asset={nativeAsset} />
   }
 
-  return <GasConfigEVM {...props} />
+  return <GasConfigCronosEVM {...props} />
 }
 
 

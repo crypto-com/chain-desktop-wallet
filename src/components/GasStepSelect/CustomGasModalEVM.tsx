@@ -3,15 +3,13 @@ import { Button, Form, InputNumber, Modal } from 'antd';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import './style.less';
-import { getRecoil, setRecoil } from 'recoil-nexus';
+import { getRecoil } from 'recoil-nexus';
 import numeral from 'numeral';
 import { ethers } from 'ethers';
 import { ValidateStatus } from 'antd/lib/form/FormItem';
 import {
   allMarketState,
   sessionState,
-  walletAllAssetsState,
-  walletListState,
 } from '../../recoil/atom';
 import {
   EVM_MINIMUM_GAS_LIMIT,
@@ -20,9 +18,8 @@ import {
 } from '../../config/StaticConfig';
 import { getAssetAmountInFiat, UserAsset } from '../../models/UserAsset';
 import { getNormalScaleAmount } from '../../utils/NumberUtils';
-import { walletService } from '../../service/WalletService';
-import { Session } from '../../models/Session';
 import { useAnalytics } from '../../hooks/useAnalytics';
+import { updateGasInfo } from './utils';
 
 const ModalBody = (props: {
   asset: UserAsset;
@@ -129,38 +126,9 @@ const ModalBody = (props: {
             return;
           }
 
-          const updatedWallet = await walletService.findWalletByIdentifier(
-            currentSession.wallet.identifier,
-          );
-
-          const newlyUpdatedAsset = {
-            ...asset,
-            config: {
-              ...asset.config,
-              fee: { gasLimit: newGasLimit.toString(), networkFee: newGasPrice.toString() },
-            },
-          };
-
-          await walletService.saveAssets([newlyUpdatedAsset as UserAsset]);
-
-          const newSession = {
-            ...currentSession,
-            wallet: updatedWallet,
-            activeAsset: newlyUpdatedAsset,
-          };
-          setRecoil(sessionState, newSession as Session);
-
-          await walletService.setCurrentSession(newSession as Session);
-
-          const allNewUpdatedWallets = await walletService.retrieveAllWallets();
-          setRecoil(walletListState, [...allNewUpdatedWallets]);
-
-          const allAssets = await walletService.retrieveCurrentWalletAssets(newSession as Session);
-          setRecoil(walletAllAssetsState, [...allAssets]);
+          await updateGasInfo(currentSession, asset, newGasLimit.toString(), newGasPrice.toString(), analyticsService);
 
           onSuccess(newGasLimit, newGasPrice);
-
-          analyticsService.logCustomizeGas(asset.assetType ?? '');
         }}
       >
         <Form.Item
