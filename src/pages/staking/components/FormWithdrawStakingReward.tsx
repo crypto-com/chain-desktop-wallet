@@ -490,6 +490,7 @@ export const FormWithdrawStakingReward = () => {
           {t('staking.withdrawall')}
         </Button>
       )}
+
       <ModalPopup
         isModalVisible={withdrawAllModalVisible}
         handleCancel={handleWithdrawAllModal}
@@ -527,6 +528,7 @@ export const FormWithdrawStakingReward = () => {
                 rewards && rewards.length > 3 ? 'address-container scrollable' : 'address-container'
               }
             >
+
               {rewards.map((elem, idx) => (
                 <>
                   <div

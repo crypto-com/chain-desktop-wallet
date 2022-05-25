@@ -361,7 +361,10 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
       <webview
         preload={ProviderPreloadScriptPath}
         ref={webviewRef}
-        useragent={window.navigator.userAgent.replace('chain-desktop-wallet', 'Desktop Wallet Build')}
+        useragent={window.navigator.userAgent.replace(
+          'chain-desktop-wallet',
+          'Desktop Wallet Build',
+        )}
         style={{
           width: '100%',
           height: 'calc(100vh - 48px)',
