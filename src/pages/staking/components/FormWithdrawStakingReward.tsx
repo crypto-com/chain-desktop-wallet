@@ -27,7 +27,7 @@ import { getUIDynamicAmount } from '../../../utils/NumberUtils';
 import { isNumeric } from '../../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../../service/LedgerService';
 
-import { secretStoreService } from '../../../storage/SecretStoreService';
+import { secretStoreService } from '../../../service/storage/SecretStoreService';
 import { walletService } from '../../../service/WalletService';
 
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';

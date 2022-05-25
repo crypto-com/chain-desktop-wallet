@@ -1,7 +1,7 @@
 import 'mocha';
 import { expect } from 'chai';
 
-import { getRandomId } from '../crypto/RandomGen';
+import { getRandomId } from '../../crypto/RandomGen';
 import { GeneralConfigService } from './GeneralConfigService';
 
 describe('Testing general config storage service', () => {

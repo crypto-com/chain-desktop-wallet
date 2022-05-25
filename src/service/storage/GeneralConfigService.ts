@@ -1,6 +1,6 @@
 import { DatabaseManager } from './DatabaseManager';
-import { GeneralConfig } from '../config/GeneralConfig';
-import { DEFAULT_LANGUAGE_CODE } from '../config/StaticConfig';
+import { GeneralConfig } from '../../config/GeneralConfig';
+import { DEFAULT_LANGUAGE_CODE } from '../../config/StaticConfig';
 
 export class GeneralConfigService {
   private readonly db: DatabaseManager;
