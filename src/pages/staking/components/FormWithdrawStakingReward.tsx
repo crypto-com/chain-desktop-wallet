@@ -528,9 +528,13 @@ export const FormWithdrawStakingReward = () => {
                 rewards && rewards.length > 3 ? 'address-container scrollable' : 'address-container'
               }
             >
-              {rewards.map(elem => (
+
+              {rewards.map((elem, idx) => (
                 <>
-                  <div className="address">{`${elem?.validatorAddress}`}</div>
+                  <div
+                    id={'address'.concat(idx.toString())}
+                    className="address"
+                  >{`${elem?.validatorAddress}`}</div>
                 </>
               ))}
             </div>
