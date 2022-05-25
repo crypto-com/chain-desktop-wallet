@@ -26,8 +26,8 @@ import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
-import { UndelegateFormComponent } from './UndelegateFormComponent';
-import RedelegateFormComponent from './RedelegateFormComponent';
+import { FormUndelegateComponent } from './FormUndelegateComponent';
+import { FormRedelegateComponent } from './FormRedelegateComponent';
 
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
@@ -373,7 +373,7 @@ export const FormDelegationOperations = props => {
           okText={t('general.confirm')}
         >
           {delegationActionType === StakingActionType.UNDELEGATE ? (
-            <UndelegateFormComponent
+            <FormUndelegateComponent
               currentSession={currentSession}
               undelegateFormValues={undelegateFormValues}
               isChecked={isUndelegateDisclaimerChecked}
@@ -381,7 +381,7 @@ export const FormDelegationOperations = props => {
               form={form}
             />
           ) : (
-            <RedelegateFormComponent
+            <FormRedelegateComponent
               currentSession={currentSession}
               redelegateFormValues={redelegateFormValues}
               moderationConfig={moderationConfig}
