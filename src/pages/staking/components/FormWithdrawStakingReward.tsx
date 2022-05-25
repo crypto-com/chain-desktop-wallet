@@ -361,6 +361,105 @@ export const FormWithdrawStakingReward = () => {
     }
   };
 
+  const onConfirmRestakeAllRewards = async () => {
+    const { walletType } = currentSession.wallet;
+    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
+      // setWithdrawAllModalVisible(false);
+      setIsVisibleConfirmationModal(false);
+      return;
+    }
+    try {
+      // setIsVisibleConfirmationModal(false);
+      // setConfirmLoading(true);
+
+      const rewardWithdrawResult = await walletService.sendStakingWithdrawAllRewardsTx({
+        validatorAddressList: rewards.map(rewardInfo => rewardInfo.validatorAddress),
+        decryptedPhrase,
+        walletType,
+      });
+
+      if (rewardWithdrawResult.transactionHash) {
+        // Success - Reward withdraw transaction was successfully broadcasted
+
+        // withdrawValues.rewardAmount = '0.1 CRO'
+        // const restakeRewardAmount = withdrawValues.rewardAmount.split(' ')[0];
+
+        console.log('restake reward amount ', withdrawValues);
+
+        // if (!isNumeric(restakeRewardAmount)) {
+        //   setSuccessRestakeRewardModalMessage(
+        //     t('general.successModalPopup.restakeReward.description3'),
+        //   );
+        // } else {
+        //   const restakeRewardResult = await walletService.sendAllDelegateTransactions({
+        //     validatorAddressList: rewards.map(rewardInfo => rewardInfo.validatorAddress),
+        //     amount: restakeRewardAmount,
+        //     asset: walletAsset,
+        //     memo: '',
+        //     decryptedPhrase,
+        //     walletType,
+        //   });
+
+        //   if (restakeRewardResult.transactionHash) {
+        //     // Success - Both Reward withdraw & restake transactions were successfully broadcasted
+        //     setBroadcastResult(restakeRewardResult);
+        //     setSuccessRestakeRewardModalMessage(
+        //       t('general.successModalPopup.restakeReward.description1'),
+        //     );
+        //   } else if (
+        //     rewardWithdrawResult?.code !== undefined &&
+        //     rewardWithdrawResult?.code !== null &&
+        //     rewardWithdrawResult.code === walletService.BROADCAST_TIMEOUT_CODE
+        //   ) {
+        //     // Timed Out - Restake transaction
+        //     setBroadcastResult(restakeRewardResult);
+        //     setSuccessRestakeRewardModalMessage(
+        //       t('general.successModalPopup.restakeReward.description2'),
+        //     );
+        //   } else {
+        //     // Failed - Restake transaction
+        //     setBroadcastResult(restakeRewardResult);
+        //     setSuccessRestakeRewardModalMessage(
+        //       t('general.successModalPopup.restakeReward.description3'),
+        //     );
+        //   }
+        //   setIsConfirmationRestakeModalVisible(false);
+        //   setConfirmLoading(false);
+        //   setIsSuccessRestakeRewardModalVisible(true);
+        // }
+      }
+      // else if (
+      //   rewardWithdrawResult?.code !== undefined &&
+      //   rewardWithdrawResult?.code !== null &&
+      //   rewardWithdrawResult.code === walletService.BROADCAST_TIMEOUT_CODE
+      // ) {
+      //   // Timed Out - Reward withdraw transaction
+      //   setBroadcastResult(rewardWithdrawResult);
+      //   setSuccessRestakeRewardModalMessage(
+      //     t('general.successModalPopup.restakeReward.description4'),
+      //   );
+      //   setIsConfirmationRestakeModalVisible(false);
+      //   setConfirmLoading(false);
+      //   setIsSuccessRestakeRewardModalVisible(true);
+      // } else {
+      //   // Failed - Reward withdraw transaction
+      //   throw new Error(t('general.errorModalPopup.reward.description'));
+      // }
+    } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
+      }
+
+      setErrorMessages(((e as unknown) as any).message.split(': '));
+      setIsConfirmationRestakeModalVisible(false);
+      setConfirmLoading(false);
+      setInputPasswordVisible(false);
+      setIsErrorTransferModalVisible(true);
+      // eslint-disable-next-line no-console
+      console.error('Error occurred while transfer', e);
+    }
+  };
+
   const handleCancelConfirmationModal = () => {
     setIsVisibleConfirmationModal(false);
     setInputPasswordVisible(false);
@@ -487,7 +586,8 @@ export const FormWithdrawStakingReward = () => {
             }, 200);
           }}
         >
-          {t('staking.withdrawall')}
+          {t('staking.withdraw-restake')}
+          {/* {t('staking.withdrawall')} */}
         </Button>
       )}
       <ModalPopup
@@ -504,19 +604,17 @@ export const FormWithdrawStakingReward = () => {
             disabled={!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE}
             onClick={onConfirmWithdrawAllStakingRewards}
           >
-            {t('general.confirm')}
+            {/* {t('general.confirm')} */}
+            {t('staking.withdrawall')}
           </Button>,
-
           <Button
             id="restake-all-btn"
-            type="primary"
-            onClick={() => {
-              setRewardAction('restakeall');
-            }}
+            loading={confirmLoading}
+            disabled={!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE}
+            onClick={onConfirmRestakeAllRewards}
           >
             {t('staking.restakeall')}
           </Button>,
-
           <Button key="back" type="link" onClick={handleWithdrawAllModal}>
             {t('general.cancel')}
           </Button>,
@@ -524,7 +622,10 @@ export const FormWithdrawStakingReward = () => {
         okText={t('general.confirm')}
       >
         <>
-          <div className="title">{t('staking.withdrawall')}</div>
+          <div className="title">
+            {/* {t('staking.withdrawall')} */}
+            {t('staking.withdraw-restake')}
+          </div>
           <div className="description">{t('staking.modal2.description')}</div>
           <div className="item">
             <div className="label">{t('staking.modal2.label1')}</div>

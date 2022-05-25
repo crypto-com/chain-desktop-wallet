@@ -75,6 +75,23 @@
       color: @azure;
     }
   }
+
+  .ant-modal-footer {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    overflow: hidden;
+
+    button {
+      position: relative;
+      display: inline-block;
+      margin: 10px 8px !important;
+
+      span {
+        font-size: 14px;
+      }
+    }
+  }
 }
 
 .validator-modal {
@@ -127,20 +144,6 @@
   }
   &.notice {
     color: @font-color;
-  }
-}
-
-.site-layout {
-  #withdraw-all-btn {
-    position: absolute;
-    top: 0;
-    right: 12px;
-    z-index: 5;
-    display: block;
-    width: 200px;
-    margin: 12px auto;
-    font-size: 14px;
-    text-align: center;
   }
 }
 

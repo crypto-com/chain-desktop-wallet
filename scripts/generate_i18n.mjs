@@ -11,12 +11,19 @@ const SHEET_CSV_URL =
   'http://docs.google.com/spreadsheets/d/e/2PACX-1vTUsMndccslvcJzIbZ5kvXzx6ltJzNe3O0vpBYDv56d7mhFzW-laRfZRRwJ9DT3hboTafba2lHFyrzQ/pub?gid=0&single=true&output=csv';
 
 async function fetchSheet(csvURL) {
-  const response = await axios.get(csvURL);
+  const response = await axios.get(csvURL)
+  .catch((err) => {
+    console.error('Error here is ', err);
+    return err;
+  });
 
-  const responseString = response.data.toString();
-  const parsedResult = papa.parse(responseString);
+  if(response && response.data){
+    const responseString = response.data.toString();
+    const parsedResult = papa.parse(responseString);
 
-  return parsedResult.data;
+    return parsedResult.data;
+  }
+  
 }
 
 /**
