@@ -12,12 +12,15 @@ import { useCustomGasModalEVM } from './CustomGasModalEVM';
 import { GasStepSelectEthereum } from './GasStepSelectEthereum';
 import { useNativeAsset } from './useNativeAsset';
 
-export const GasInfoEVM = () => {
-  const asset = useCronosEvmAsset();
+interface GasInfoEVMProps {
+  asset: UserAsset;
+}
+
+export const GasInfoEVM = ({ asset }: GasInfoEVMProps) => {
 
   const [t] = useTranslation();
-  const gasPrice = useMemo(() => asset?.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE, [asset]);
-  const gasLimit = useMemo(() => asset?.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT, [asset]);
+  const gasPrice = useMemo(() => asset.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE, [asset]);
+  const gasLimit = useMemo(() => asset.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT, [asset]);
   const [readableGasFee, setReadableGasFee] = useState('');
 
   const updateFee = (newGasPrice: string, newGasLimit: string) => {
@@ -25,27 +28,20 @@ export const GasInfoEVM = () => {
       ethers.BigNumber.from(newGasPrice),
     );
 
-    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset!);
+    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset);
 
-    setReadableGasFee(`${amount} ${asset!.symbol}`);
+    setReadableGasFee(`${amount} ${asset.symbol}`);
   };
 
   useEffect(() => {
-    if (!asset) {
-      return;
-    }
     updateFee(gasPrice, gasLimit);
-  }, [gasPrice, gasLimit]);
+  }, [asset, gasPrice, gasLimit]);
 
   return (
     <>
       <div className="item">
         <div className="label">{t('estimate-network-fee')}</div>
         <div>{readableGasFee}</div>
-      </div>
-      <div className="item">
-        <div className="label">{t('estimate-time')}</div>
-        <div>6s</div>
       </div>
     </>
   );

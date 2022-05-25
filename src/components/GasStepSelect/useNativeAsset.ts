@@ -8,14 +8,12 @@ export const useNativeAsset = (asset: UserAsset) => {
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
 
   const nativeAssets = useMemo(() => {
-    return walletAllAssets.filter(asset => {
-      return _.size(asset.contractAddress) < 1;
-    });
+    return walletAllAssets.filter(asset =>  _.size(asset.contractAddress) < 1);
   }, [walletAllAssets]);
 
   const nativeAsset = useMemo(() => {
     if (_.size(asset.contractAddress) < 1) {
-      return asset;
+      return nativeAssets.find(a => a.symbol === asset.symbol);
     }
 
     if (asset.assetType === UserAssetType.CRC_20_TOKEN) {

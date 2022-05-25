@@ -188,8 +188,9 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProp
           defaultValue={gasInfo.average.toString()}
           value={gasPrice}
           className="gasStepSelectEthereum"
-          onChange={value => {
+            onChange={async (value) => {
             setGasPrice(value);
+            await updateFee(value, gasLimit);
           }}
         >
           <Option value={gasInfo.safeLow.toString()}>
