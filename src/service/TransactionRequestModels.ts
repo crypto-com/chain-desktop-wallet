@@ -67,6 +67,11 @@ export interface NFTDenomIssueRequest {
 
 export interface AllDelegationRequests {
   validatorAddressList: string[];
+  amount: string;
+  memo: string;
+  asset: UserAsset;
+  decryptedPhrase: string;
+  walletType: string; // normal, ledger
 }
 
 export interface DelegationRequest {

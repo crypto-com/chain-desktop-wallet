@@ -19,7 +19,7 @@ import RevokePermission from '../tabs/RevokePermission/RevokePermission';
 
 import { GeneralSettingsForm } from './GeneralSettingsForm';
 import { MetaInfoComponent } from './MetaInfoComponent';
-import { getAssetConfigFromWalletConfig } from './getAssetConfigFromWalletConfig';
+import { getAssetConfigFromWalletConfig } from '../utils';
 
 const { ipcRenderer } = window.require('electron');
 

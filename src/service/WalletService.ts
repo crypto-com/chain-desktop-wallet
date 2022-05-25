@@ -41,6 +41,7 @@ import { LEDGER_WALLET_TYPE } from './LedgerService';
 import {
   BridgeTransferRequest,
   DelegationRequest,
+  AllDelegationRequests,
   NFTDenomIssueRequest,
   NFTMintRequest,
   NFTTransferRequest,
@@ -94,6 +95,12 @@ class WalletService {
     delegationRequest: DelegationRequest,
   ): Promise<BroadCastResult> {
     return await this.txSenderManager.sendDelegateTransaction(delegationRequest);
+  }
+
+  public async sendAllDelegateTransactions(
+    allDelegationRequests: AllDelegationRequests,
+  ): Promise<BroadCastResult> {
+    return await this.txSenderManager.sendAllDelegateTransactions(allDelegationRequests);
   }
 
   public async sendUnDelegateTransaction(

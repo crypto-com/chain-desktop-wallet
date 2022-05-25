@@ -53,6 +53,12 @@ export interface DelegateTransactionUnsigned extends TransactionUnsigned {
   amount: string;
 }
 
+export interface AllDelegateTransactionsUnsigned extends TransactionUnsigned {
+  delegatorAddress: string;
+  validatorAddressList: string[];
+  amount: string;
+}
+
 export interface WithdrawStakingRewardUnsigned extends TransactionUnsigned {
   delegatorAddress: string;
   validatorAddress: string;

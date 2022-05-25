@@ -3,6 +3,7 @@ import { TransactionConfig } from 'web3-eth';
 import { ethers } from 'ethers';
 import {
   DelegateTransactionUnsigned,
+  AllDelegateTransactionsUnsigned,
   TransferTransactionUnsigned,
   UndelegateTransactionUnsigned,
   RedelegateTransactionUnsigned,
@@ -22,6 +23,7 @@ import { DEFAULT_CLIENT_MEMO } from '../config/StaticConfig';
 import {
   TransferRequest,
   DelegationRequest,
+  AllDelegationRequests,
   UndelegationRequest,
   RedelegationRequest,
   VoteRequest,
@@ -361,6 +363,65 @@ export class TransactionSenderService {
       signedTxHex = await transactionSigner.signDelegateTx(
         delegateTransaction,
         delegationRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await Promise.all([
+      await this.txHistoryManager.fetchAndUpdateBalances(currentSession),
+      await this.txHistoryManager.fetchAndSaveDelegations(nodeRpc, currentSession),
+    ]);
+
+    return broadCastResult;
+  }
+
+  public async sendAllDelegateTransactions(
+    allDelegationRequests: AllDelegationRequests,
+  ): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.transactionPrepareService.prepareTransaction();
+
+    const delegationAmountScaled = getBaseScaledAmount(
+      allDelegationRequests.amount,
+      allDelegationRequests.asset,
+    );
+
+    let { memo } = allDelegationRequests;
+    if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
+      memo = DEFAULT_CLIENT_MEMO;
+    }
+
+    const allDelegateTransactions: AllDelegateTransactionsUnsigned = {
+      delegatorAddress: currentSession.wallet.address,
+      validatorAddressList: allDelegationRequests.validatorAddressList,
+      amount: String(delegationAmountScaled),
+      memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string;
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();
+
+    if (allDelegationRequests.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signAllDelegateTx(
+        allDelegateTransactions,
+        allDelegationRequests.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signAllDelegateTx(
+        allDelegateTransactions,
+        allDelegationRequests.decryptedPhrase,
         networkFee,
         gasLimit,
       );

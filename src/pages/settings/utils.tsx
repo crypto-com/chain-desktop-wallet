@@ -1,5 +1,5 @@
-import { WalletConfig } from '../../../config/StaticConfig';
-import { UserAssetConfig } from '../../../models/UserAsset';
+import { WalletConfig } from '../../config/StaticConfig';
+import { UserAssetConfig } from '../../models/UserAsset';
 
 export function getAssetConfigFromWalletConfig(walletConfig: WalletConfig): UserAssetConfig {
   return {
