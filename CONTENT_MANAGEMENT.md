@@ -1,7 +1,7 @@
 # Instructions on Multi-Language Content Management
-All the language contents are managed inside the Google Spreadsheet [Desktop Wallet Language](https://docs.google.com/spreadsheets/d/1QTqPb97jr6zOD7krA4pAXHYx51CiSkJYq7m71OYcLok/edit#gid=0).
+All the language contents are managed inside the Google Spreadsheet [Desktop Wallet Language](https://docs.google.com/spreadsheets/d/1tzmTGMyaex1JUv0HV1HQtisIOPOl3SpCoXIhXDlO_-U/edit#gid=0).
 
-If you need the access, please contact: [matthew.to@crypto.com](mailto:matthew.to@crypto.com) or [eddy.wanny@crypto.com](mailto:eddy.wanny@crypto.com)
+If you need the access, please contact: [matthew.to@crypto.com](mailto:matthew.to@crypto.com) or [xinyu.zhao@crypto.com](mailto:xinyu.zhao@crypto.com)
 
 ## Content Update Guidelines & Procedure
 Always add the `en-US` content first and then the others, as by default the `en-US` translation will be displayed if there are any missing contents yet to be translated.
@@ -29,7 +29,7 @@ export function MyComponent() {
 ```
 
 ### Procedure
-Whenever you've modified any contents inside the [Spreadsheet](https://docs.google.com/spreadsheets/d/1QTqPb97jr6zOD7krA4pAXHYx51CiSkJYq7m71OYcLok/edit#gid=0), you will need to do the following step properly in order to take effective:
+Whenever you've modified any contents inside the [Spreadsheet](https://docs.google.com/spreadsheets/d/1tzmTGMyaex1JUv0HV1HQtisIOPOl3SpCoXIhXDlO_-U/edit#gid=0), you will need to do the following step properly in order to take effective:
 
 ```sh
 yarn generate-i18n
