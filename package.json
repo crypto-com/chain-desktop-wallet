@@ -363,6 +363,7 @@
     "plist": "3.0.5",
     "ansi-html": "https://registry.yarnpkg.com/ansi-html-community/-/ansi-html-community-0.0.8.tgz",
     "ansi-regex": "4.1.1",
-    "ejs": "3.1.7"
+    "ejs": "3.1.7",
+    "eventsource": "2.0.2"
   }
 }
