@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import axios, { AxiosResponse } from 'axios';
-import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 import { EVMClient } from '../rpc/clients/EVMClient';
 import {
   balanceQueryBaseParams,
@@ -12,27 +10,10 @@ import {
   TransactionData,
   TransactionsByAddressResponse,
 } from '../rpc/models/eth.models';
-import {
-  ICronosChainIndexAPI,
-  txListRequestOptions,
-  queryPaginationOptions,
-  tokenTransfersRequestOptions,
-} from '../rpc/interface/cronos.chainIndex';
-import {
-  TxListAPIResponse,
-  txListByAccountRequestParams,
-  PendingTxListAPIResponse,
-  ContractDataResponse,
-  tokenContractDataRequestParams,
-  TokenTransferEventLogsResponse,
-  tokenTransfersRequestParams,
-  tokensOwnedByAddressRequestParams,
-  TokensOwnedByAddressResponse,
-} from '../rpc/models/cronos.models';
 
 /**
  * name: EthClient
- * Uses: Crypto.com Chain Indexing APIs
+ * Uses: Ethereum Chain Indexing APIs
  * purpose: This client is used to consume data from an indexing service.
  */
 export class EthClient extends EVMClient implements IEthChainIndexAPI {
