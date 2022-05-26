@@ -1,7 +1,7 @@
 import Big from 'big.js';
 // import { ethers } from 'ethers';
 // import axios from 'axios';
-import { StorageService } from '../storage/StorageService';
+import { StorageService } from './storage/StorageService';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import {
   NOT_KNOWN_YET_VALUE,

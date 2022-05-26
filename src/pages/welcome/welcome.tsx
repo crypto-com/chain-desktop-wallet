@@ -6,7 +6,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { walletService } from '../../service/WalletService';
 import logo from '../../assets/logo-products-chain.svg';
-import { secretStoreService } from '../../storage/SecretStoreService';
+import { secretStoreService } from '../../service/storage/SecretStoreService';
 
 function WelcomePage() {
   const history = useHistory();

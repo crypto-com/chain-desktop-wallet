@@ -71,9 +71,9 @@ import {
   MAX_INCORRECT_ATTEMPTS_ALLOWED,
   SHOW_WARNING_INCORRECT_ATTEMPTS,
 } from '../../config/StaticConfig';
-import { generalConfigService } from '../../storage/GeneralConfigService';
+import { generalConfigService } from '../../service/storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { secretStoreService } from '../../storage/SecretStoreService';
+import { secretStoreService } from '../../service/storage/SecretStoreService';
 import SessionLockModal from '../../components/PasswordForm/SessionLockModal';
 import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup';
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';

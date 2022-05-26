@@ -11,7 +11,7 @@ import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import logo from '../../assets/logo-products-chain.svg';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
-import { secretStoreService } from '../../storage/SecretStoreService';
+import { secretStoreService } from '../../service/storage/SecretStoreService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 
 const BackupPage = () => {

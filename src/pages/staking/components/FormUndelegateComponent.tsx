@@ -1,13 +1,13 @@
 import { FormInstance } from 'antd/lib/form';
 import { Form, InputNumber, Checkbox } from 'antd';
 import { useTranslation } from 'react-i18next';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Session } from '../../../models/Session';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { UNBLOCKING_PERIOD_IN_DAYS } from '../../../config/StaticConfig';
 import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSelectTendermint';
 
-export const UndelegateFormComponent = (props: {
+export const FormUndelegateComponent = (props: {
   currentSession: Session;
   undelegateFormValues: { validatorAddress: string; undelegateAmount: string };
   isChecked: boolean;
@@ -15,6 +15,8 @@ export const UndelegateFormComponent = (props: {
   form: FormInstance;
 }) => {
   const [t] = useTranslation();
+
+  useEffect(() => props.form.resetFields(), [props]);
 
   const customMaxValidator = TransactionUtils.maxValidator(
     props.undelegateFormValues.undelegateAmount,
@@ -32,11 +34,11 @@ export const UndelegateFormComponent = (props: {
       <div className="description">{t('general.undelegateFormComponent.description')}</div>
       <div className="item">
         <div className="label">{t('general.undelegateFormComponent.label1')}</div>
-        <div className="address">{`${props.currentSession.wallet.address}`}</div>
+        <div className="address">{props.currentSession.wallet.address}</div>
       </div>
       <div className="item">
         <div className="label">{t('general.undelegateFormComponent.label2')}</div>
-        <div className="address">{`${props.undelegateFormValues?.validatorAddress}`}</div>
+        <div className="address">{props.undelegateFormValues?.validatorAddress}</div>
       </div>
       <div className="item">
         <Form

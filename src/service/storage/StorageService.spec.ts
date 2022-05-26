@@ -1,13 +1,13 @@
 import 'mocha';
 import { expect } from 'chai';
-import { DefaultWalletConfigs } from '../config/StaticConfig';
-import { WalletCreateOptions, WalletCreator } from '../service/WalletCreator';
+import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import { WalletCreateOptions, WalletCreator } from '../WalletCreator';
 import { StorageService } from './StorageService';
-import { Session } from '../models/Session';
-import { SettingsDataUpdate, Wallet } from '../models/Wallet';
-import { getRandomId } from '../crypto/RandomGen';
-import { AssetMarketPrice, UserAsset, UserAssetType } from '../models/UserAsset';
-import { DerivationPathStandard } from '../service/signers/LedgerSigner';
+import { Session } from '../../models/Session';
+import { SettingsDataUpdate, Wallet } from '../../models/Wallet';
+import { getRandomId } from '../../crypto/RandomGen';
+import { AssetMarketPrice, UserAsset, UserAssetType } from '../../models/UserAsset';
+import { DerivationPathStandard } from '../signers/LedgerSigner';
 
 jest.setTimeout(20_000);
 

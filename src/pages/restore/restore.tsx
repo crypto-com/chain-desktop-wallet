@@ -15,7 +15,7 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import BackButton from '../../components/BackButton/BackButton';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { secretStoreService } from '../../storage/SecretStoreService';
+import { secretStoreService } from '../../service/storage/SecretStoreService';
 import { Session } from '../../models/Session';
 import { NORMAL_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
