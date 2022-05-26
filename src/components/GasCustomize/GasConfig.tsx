@@ -10,7 +10,7 @@ interface IGasStepProps {
   onChange?: (gasLimit: string, networkFee: string) => void;
 }
 
-const GasStepSelect = (props: IGasStepProps) => {
+const GasConfig = (props: IGasStepProps) => {
   const { asset, onChange } = props;
 
   const nativeAsset = useNativeAsset(asset);
@@ -19,16 +19,17 @@ const GasStepSelect = (props: IGasStepProps) => {
     return <GasConfigTendermint onChange={onChange} />;
   }
 
-  if (asset.assetType === UserAssetType.EVM || asset.assetType === UserAssetType.CRC_20_TOKEN || asset.assetType === UserAssetType.ERC_20_TOKEN) {
-    return <GasConfigEVM asset={nativeAsset} onChange={onChange} />;
-  }
-
   // Ethereum has a special select slow/average/fast
   if (props.asset.assetType === UserAssetType.EVM && props.asset.mainnetSymbol === 'ETH' || props.asset.assetType === UserAssetType.ERC_20_TOKEN) {
     return <GasStepSelectEthereum {...props} asset={nativeAsset} />
   }
 
+  if (asset.assetType === UserAssetType.EVM || asset.assetType === UserAssetType.CRC_20_TOKEN) {
+    return <GasConfigEVM asset={nativeAsset} onChange={onChange} />;
+  }
+
+
   return <React.Fragment />
 };
 
-export default GasStepSelect;
+export default GasConfig;

@@ -11,6 +11,7 @@ import { useMarketPrice } from '../../../hooks/useMarketPrice';
 import { UserAsset } from '../../../models/UserAsset';
 import { sessionState } from '../../../recoil/atom';
 import { EthereumGasStepInfo, getEthereumGasSteps } from '../../../service/Gas';
+import GasConfigEVM from '../EVM/GasConfig';
 import { useCustomGasModalEVM } from '../EVM/GasModal';
 import '../style.less';
 import { updateGasInfo } from '../utils';
@@ -80,12 +81,12 @@ const GasStepOption = ({ title, wait, gasPrice, gasLimit }: IGasStepOption) => {
   );
 };
 
-interface IGasStepSelectEVMProps {
+interface IGasStepSelectEthereumProps {
   asset: UserAsset;
   onChange?: (gasLimit: string, gasPrice: string) => void;
 }
 
-export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProps) => {
+export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEthereumProps) => {
   const [gasInfo, setGasInfo] = useState<EthereumGasStepInfo | undefined>();
   const [isLoading, setIsLoading] = useState(false);
   const [gasPrice, setGasPrice] = useState(asset?.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE);
@@ -95,6 +96,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProp
   const [t] = useTranslation();
   const currentSession = getRecoil(sessionState);
   const { analyticsService } = useAnalytics();
+  const [hasFetchError, setHasFetchedError] = useState(false);
 
   const gasLimitInfo = useMemo(() => {
     if (!gasLimit) {
@@ -106,15 +108,18 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProp
 
   useEffect(() => {
     const fetch = async () => {
+      setHasFetchedError(false);
       setIsLoading(true);
       const info = await getEthereumGasSteps();
       setGasInfo(info);
       if (info) {
         setGasPrice(info.average.toString());
         updateFee(info.average.toString(), gasLimit);
+      } else {
+        setHasFetchedError(true);
       }
       setIsLoading(false);
-    };
+    } 
 
     fetch();
   }, []);
@@ -137,7 +142,12 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProp
     await updateGasInfo(currentSession, asset, newGasLimit, newGasPrice, analyticsService);
   };
 
-  if (!gasInfo) {
+  // fall back to general EVM gas config
+  if (hasFetchError) {
+    return <GasConfigEVM asset={asset} onChange={onChange} />
+  }
+
+  if (!gasInfo || isLoading) {
     return <Spin style={{ left: 'auto' }} />;
   }
 
