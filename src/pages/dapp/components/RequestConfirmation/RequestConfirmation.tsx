@@ -25,7 +25,7 @@ import { walletAllAssetsState } from '../../../../recoil/atom';
 import { useLedgerStatus } from '../../../../hooks/useLedgerStatus';
 import { LEDGER_WALLET_TYPE } from '../../../../service/LedgerService';
 import { ledgerNotification } from '../../../../components/LedgerNotification/LedgerNotification';
-import GasStepSelectEVMDApp from '../../../../components/GasCustomize/EVM/GasSelectDApp';
+import GasStepSelectEVMDApp from '../../../../components/GasCustomize/EVM/GasConfigDApp';
 
 const { Content, Footer } = Layout;
 

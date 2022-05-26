@@ -55,7 +55,7 @@ import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
 import GasStepSelectTendermint, {
   GasInfoTendermint,
-} from '../../../components/GasCustomize/Tendermint/GasSelect';
+} from '../../../components/GasCustomize/Tendermint/GasConfig';
 
 const { Content, Sider } = Layout;
 const { Search } = Input;

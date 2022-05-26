@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { UserAsset, UserAssetType } from '../../models/UserAsset';
-import { GasInfoEVM } from './EVM/GasSelect';
-import { GasInfoTendermint } from './Tendermint/GasSelect';
+import { GasInfoEVM } from './EVM/GasConfig';
+import { GasInfoTendermint } from './Tendermint/GasConfig';
 import { useNativeAsset } from '../../hooks/useNativeAsset';
 
 interface GasInfoProps {

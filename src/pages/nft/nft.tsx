@@ -101,8 +101,8 @@ import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { useCronosEvmAsset, useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
 import GasStepSelectTendermint, {
   GasInfoTendermint,
-} from '../../components/GasCustomize/Tendermint/GasSelect';
-import GasStepSelectEVM, { GasInfoEVM } from '../../components/GasCustomize/EVM/GasSelect';
+} from '../../components/GasCustomize/Tendermint/GasConfig';
+import GasStepSelectEVM, { GasInfoEVM } from '../../components/GasCustomize/EVM/GasConfig';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;

@@ -5,7 +5,7 @@ import React, { useEffect } from 'react';
 import { Session } from '../../../models/Session';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { UNBLOCKING_PERIOD_IN_DAYS } from '../../../config/StaticConfig';
-import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasSelect';
+import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasConfig';
 
 export const FormUndelegateComponent = (props: {
   currentSession: Session;

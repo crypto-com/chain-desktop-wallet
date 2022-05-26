@@ -81,7 +81,7 @@ const GasStep = (props: { isUsingCustomFee: boolean }) => {
   );
 };
 
-const GasStepSelectTendermint = (props: {
+const GasConfig = (props: {
   onChange?: (gasLimit: string, networkFee: string) => void;
 }) => {
   const { onChange } = props;
@@ -179,4 +179,4 @@ const GasStepSelectTendermint = (props: {
   );
 };
 
-export default GasStepSelectTendermint;
+export default GasConfig;
