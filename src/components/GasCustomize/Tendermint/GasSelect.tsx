@@ -3,10 +3,10 @@ import { Form, Tooltip } from 'antd';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
-import { useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
-import { getNormalScaleAmount } from '../../utils/NumberUtils';
-import { useCustomGasModalTendermint } from './CustomGasModalTendermint';
+import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../../config/StaticConfig';
+import { useCronosTendermintAsset } from '../../../hooks/useCronosEvmAsset';
+import { getNormalScaleAmount } from '../../../utils/NumberUtils';
+import { useCustomGasModalTendermint } from './GasModal';
 
 export const GasInfoTendermint = () => {
   const asset = useCronosTendermintAsset();
@@ -161,7 +161,7 @@ const GasStepSelectTendermint = (props: {
         style={{ float: 'right', marginTop: '4px' }}
         onClick={() => {
           show({
-            onCancel: () => {},
+            onCancel: () => { },
             onSuccess: (newGasLimit, newGasFee) => {
               onChange?.(newGasLimit, newGasFee);
               dismiss();

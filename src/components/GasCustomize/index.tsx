@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { UserAsset, UserAssetType } from '../../models/UserAsset';
-import GasStepSelectEVM from './GasStepSelectEVM';
-import GasStepSelectTendermint from './GasStepSelectTendermint';
+import GasStepSelectEVM from './EVM/GasSelect';
+import GasStepSelectTendermint from './Tendermint/GasSelect';
 
 interface IGasStepProps {
   asset: UserAsset;

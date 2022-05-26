@@ -39,7 +39,7 @@ import { SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
 
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
-import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSelectTendermint';
+import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasSelect';
 
 const { Text } = Typography;
 

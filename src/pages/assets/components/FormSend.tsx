@@ -44,8 +44,8 @@ import { ledgerNotification } from '../../../components/LedgerNotification/Ledge
 import { AddressBookService } from '../../../service/AddressBookService';
 import { AddressBookContact } from '../../../models/AddressBook';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
-import GasStepSelect from '../../../components/GasStepSelect';
-import GasInfo from '../../../components/GasStepSelect/GasInfo';
+import GasStepSelect from '../../../components/GasCustomize';
+import GasInfo from '../../../components/GasCustomize/GasInfo';
 
 const layout = {};
 const tailLayout = {};

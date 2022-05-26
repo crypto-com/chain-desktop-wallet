@@ -2,65 +2,70 @@ import * as React from 'react';
 import { Button, Form, InputNumber, Modal } from 'antd';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import './style.less';
+import '../style.less';
 import { getRecoil } from 'recoil-nexus';
 import numeral from 'numeral';
-import { ethers } from 'ethers';
+import BigNumber from 'bignumber.js';
 import { ValidateStatus } from 'antd/lib/form/FormItem';
-import {
-  allMarketState,
-  sessionState,
-} from '../../recoil/atom';
+import { allMarketState, sessionState } from '../../../recoil/atom';
 import {
   EVM_MINIMUM_GAS_LIMIT,
   EVM_MINIMUM_GAS_PRICE,
   SUPPORTED_CURRENCY,
-} from '../../config/StaticConfig';
-import { getAssetAmountInFiat, UserAsset } from '../../models/UserAsset';
-import { getNormalScaleAmount } from '../../utils/NumberUtils';
-import { useAnalytics } from '../../hooks/useAnalytics';
-import { updateGasInfo } from './utils';
+} from '../../../config/StaticConfig';
+import { getAssetAmountInFiat, UserAsset } from '../../../models/UserAsset';
+import { getNormalScaleAmount } from '../../../utils/NumberUtils';
+import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
+import { useAnalytics } from '../../../hooks/useAnalytics';
 
 const ModalBody = (props: {
   asset: UserAsset;
-  gasPrice: string;
-  gasLimit: string;
-  onSuccess: (gasLimit: string, gasPrice: string) => void;
+  gasPrice: BigNumber;
+  gasLimit: BigNumber;
+  onSuccess: (gasLimit: BigNumber, gasPrice: BigNumber) => void;
+  onCancel: () => void;
 }) => {
-  const { gasPrice, gasLimit, onSuccess, asset } = props;
+  const { asset, gasPrice, gasLimit, onSuccess, onCancel } = props;
   const [t] = useTranslation();
 
   const [form] = Form.useForm();
 
+  const cronosEVMAsset = useCronosEvmAsset();
+  const { analyticsService } = useAnalytics();
   const currentSession = getRecoil(sessionState);
   const allMarketData = getRecoil(allMarketState);
-  const { analyticsService } = useAnalytics();
   const [validateStatus, setValidateStatus] = useState<ValidateStatus>('');
-
   const [readableNetworkFee, setReadableNetworkFee] = useState('');
-
-  const assetMarketData = allMarketData.get(
-    `${asset.mainnetSymbol}-${currentSession.currency}`,
-  );
-  const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
   const [isUsingCustomGas, setIsUsingCustomGas] = useState(false);
 
-  const setNetworkFee = (newGasPrice: string, newGasLimit: string) => {
-    if (newGasPrice !== EVM_MINIMUM_GAS_PRICE || newGasLimit !== EVM_MINIMUM_GAS_LIMIT) {
+  const assetMarketData = allMarketData.get(
+    `${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
+  );
+  const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
+
+  const setNetworkFee = (newGasPrice: BigNumber, newGasLimit: BigNumber) => {
+    if (!cronosEVMAsset) {
+      return;
+    }
+
+    if (
+      newGasPrice.toString() !== EVM_MINIMUM_GAS_PRICE ||
+      newGasLimit.toString() !== EVM_MINIMUM_GAS_LIMIT
+    ) {
       setIsUsingCustomGas(true);
     } else {
       setIsUsingCustomGas(false);
     }
 
-    const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(newGasPrice);
+    const amountBigNumber = newGasLimit.times(newGasPrice);
 
-    if (ethers.BigNumber.from(asset.balance.toString()).lte(amountBigNumber)) {
+    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset);
+
+    if (new BigNumber(cronosEVMAsset.balance).lte(amountBigNumber)) {
       setValidateStatus('error');
     } else {
       setValidateStatus('');
     }
-
-    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset);
 
     if (!(asset && localFiatSymbol && assetMarketData && assetMarketData.price)) {
       setReadableNetworkFee(`${amount} ${asset.symbol}`);
@@ -76,6 +81,9 @@ const ModalBody = (props: {
   };
 
   useEffect(() => {
+    if (!asset) {
+      return;
+    }
 
     setNetworkFee(gasPrice, gasLimit);
 
@@ -85,7 +93,7 @@ const ModalBody = (props: {
     });
   }, [asset, gasPrice, gasLimit]);
 
-  if (!asset) {
+  if (!cronosEVMAsset) {
     return <React.Fragment />;
   }
 
@@ -103,8 +111,8 @@ const ModalBody = (props: {
         layout="vertical"
         form={form}
         onValuesChange={v => {
-          const newGasPrice: string = v?.gasPrice ?? gasPrice;
-          const newGasLimit: string = v?.gasLimit ?? gasLimit;
+          const newGasPrice = new BigNumber(v?.gasPrice ?? gasPrice);
+          const newGasLimit = new BigNumber(v?.gasLimit ?? gasLimit);
           if (!gasPrice || !gasLimit) {
             setReadableNetworkFee('-');
           } else {
@@ -121,14 +129,13 @@ const ModalBody = (props: {
             gasPrice: newGasPrice,
           }: { gasLimit: string; gasPrice: string } = values;
 
-          if (gasLimit === newGasLimit.toString() && gasPrice === newGasPrice.toString()) {
-            onSuccess(newGasLimit, newGasPrice);
+          if (gasLimit.toString() === newGasLimit && gasPrice.toString() === newGasPrice) {
+            onSuccess(new BigNumber(newGasLimit), new BigNumber(newGasPrice));
             return;
           }
 
-          await updateGasInfo(currentSession, asset, newGasLimit.toString(), newGasPrice.toString(), analyticsService);
-
-          onSuccess(newGasLimit, newGasPrice);
+          onSuccess(new BigNumber(newGasLimit), new BigNumber(newGasPrice));
+          analyticsService.logCustomizeGas(cronosEVMAsset.assetType ?? '');
         }}
       >
         <Form.Item
@@ -144,7 +151,7 @@ const ModalBody = (props: {
             },
           ]}
         >
-          <InputNumber stringMode precision={0} min="1" />
+          <InputNumber precision={0} min="1" stringMode />
         </Form.Item>
         <Form.Item
           name="gasLimit"
@@ -159,7 +166,7 @@ const ModalBody = (props: {
             },
           ]}
         >
-          <InputNumber stringMode precision={0} min="1" />
+          <InputNumber precision={0} min="1" stringMode />
         </Form.Item>
         <div>
           <div style={{ color: '#7B849B' }}>{t('estimate-network-fee')}</div>
@@ -187,18 +194,13 @@ const ModalBody = (props: {
             {t('general.save')}
           </Button>
           <Button
-            danger
             type="link"
             htmlType="button"
             onClick={() => {
-              form.setFieldsValue({
-                gasPrice: EVM_MINIMUM_GAS_PRICE,
-                gasLimit: EVM_MINIMUM_GAS_LIMIT,
-              });
-              setNetworkFee(EVM_MINIMUM_GAS_PRICE, EVM_MINIMUM_GAS_LIMIT);
+              onCancel();
             }}
           >
-            {t('general.default')}
+            {t('general.cancel')}
           </Button>
         </Form.Item>
       </Form>
@@ -206,7 +208,7 @@ const ModalBody = (props: {
   );
 };
 
-const useCustomGasModalEVM = (asset: UserAsset, gasFee: string, gasLimit: string) => {
+const useCustomGasModalEVMDApp = (asset: UserAsset, gasPrice: BigNumber, gasLimit: BigNumber) => {
   let modalRef;
 
   const [isShowing, setIsShowing] = useState(false);
@@ -218,7 +220,7 @@ const useCustomGasModalEVM = (asset: UserAsset, gasFee: string, gasLimit: string
 
   function show(props: {
     onCancel?: () => void;
-    onSuccess: (gasLimit: string, gasFee: string) => void;
+    onSuccess: (gasLimit: BigNumber, gasFee: BigNumber) => void;
   }) {
     if (isShowing) {
       return;
@@ -243,7 +245,18 @@ const useCustomGasModalEVM = (asset: UserAsset, gasFee: string, gasLimit: string
       style: {
         padding: '20px 20px 0 20px',
       },
-      content: <ModalBody asset={asset} gasPrice={gasFee} gasLimit={gasLimit} onSuccess={props.onSuccess} />,
+      content: (
+        <ModalBody
+          asset={asset}
+          gasPrice={gasPrice}
+          gasLimit={gasLimit}
+          onSuccess={props.onSuccess}
+          onCancel={() => {
+            dismiss();
+            props.onCancel?.();
+          }}
+        />
+      ),
     });
     setIsShowing(true);
     modalRef = modal;
@@ -255,4 +268,4 @@ const useCustomGasModalEVM = (asset: UserAsset, gasFee: string, gasLimit: string
   };
 };
 
-export { useCustomGasModalEVM };
+export { useCustomGasModalEVMDApp };

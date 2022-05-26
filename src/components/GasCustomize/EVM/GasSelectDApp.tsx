@@ -5,10 +5,10 @@ import numeral from 'numeral';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
-import { UserAsset } from '../../models/UserAsset';
-import { getNormalScaleAmount } from '../../utils/NumberUtils';
-import { useCustomGasModalEVMDApp } from './CustomGasModalEVMDApp';
+import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../../config/StaticConfig';
+import { UserAsset } from '../../../models/UserAsset';
+import { getNormalScaleAmount } from '../../../utils/NumberUtils';
+import { useCustomGasModalEVMDApp } from './GasModalDApp';
 
 const GasStep = (props: { isUsingCustomFee: boolean }) => {
 

@@ -1,8 +1,8 @@
 import _ from "lodash";
 import { useMemo } from "react";
 import { useRecoilValue } from "recoil";
-import { UserAsset, UserAssetType } from "../../models/UserAsset";
-import { walletAllAssetsState } from "../../recoil/atom";
+import { UserAsset, UserAssetType } from "../models/UserAsset";
+import { walletAllAssetsState } from "../recoil/atom";
 
 export const useNativeAsset = (asset: UserAsset) => {
   const walletAllAssets = useRecoilValue(walletAllAssetsState);

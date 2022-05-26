@@ -5,15 +5,15 @@ import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getRecoil } from 'recoil-nexus';
-import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
-import { useAnalytics } from '../../hooks/useAnalytics';
-import { useMarketPrice } from '../../hooks/useMarketPrice';
-import { UserAsset } from '../../models/UserAsset';
-import { sessionState } from '../../recoil/atom';
-import { EthereumGasStepInfo, getEthereumGasSteps } from '../../service/Gas';
-import { useCustomGasModalEVM } from './CustomGasModalEVM';
-import './style.less';
-import { updateGasInfo } from './utils';
+import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../../config/StaticConfig';
+import { useAnalytics } from '../../../hooks/useAnalytics';
+import { useMarketPrice } from '../../../hooks/useMarketPrice';
+import { UserAsset } from '../../../models/UserAsset';
+import { sessionState } from '../../../recoil/atom';
+import { EthereumGasStepInfo, getEthereumGasSteps } from '../../../service/Gas';
+import { useCustomGasModalEVM } from '../EVM/GasModal';
+import '../style.less';
+import { updateGasInfo } from '../utils';
 
 const { Option } = Select;
 
@@ -188,7 +188,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProp
           defaultValue={gasInfo.average.toString()}
           value={gasPrice}
           className="gasStepSelectEthereum"
-            onChange={async (value) => {
+          onChange={async (value) => {
             setGasPrice(value);
             await updateFee(value, gasLimit);
           }}
@@ -223,7 +223,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEVMProp
         style={{ float: 'right', marginTop: '4px' }}
         onClick={() => {
           show({
-            onCancel: () => {},
+            onCancel: () => { },
             onSuccess: (newGasLimit, newGasFee) => {
               onChange?.(newGasLimit, newGasFee);
               dismiss();

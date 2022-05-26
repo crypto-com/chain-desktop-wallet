@@ -2,7 +2,7 @@ import * as React from 'react';
 import { Button, Form, InputNumber, Modal } from 'antd';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import './style.less';
+import '../style.less';
 import { getRecoil, setRecoil } from 'recoil-nexus';
 import numeral from 'numeral';
 import { ethers } from 'ethers';
@@ -12,18 +12,18 @@ import {
   sessionState,
   walletAllAssetsState,
   walletListState,
-} from '../../recoil/atom';
+} from '../../../recoil/atom';
 import {
   FIXED_DEFAULT_FEE,
   FIXED_DEFAULT_GAS_LIMIT,
   SUPPORTED_CURRENCY,
-} from '../../config/StaticConfig';
-import { getAssetAmountInFiat, UserAsset } from '../../models/UserAsset';
-import { getNormalScaleAmount } from '../../utils/NumberUtils';
-import { walletService } from '../../service/WalletService';
-import { useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
-import { Session } from '../../models/Session';
-import { useAnalytics } from '../../hooks/useAnalytics';
+} from '../../../config/StaticConfig';
+import { getAssetAmountInFiat, UserAsset } from '../../../models/UserAsset';
+import { getNormalScaleAmount } from '../../../utils/NumberUtils';
+import { walletService } from '../../../service/WalletService';
+import { useCronosTendermintAsset } from '../../../hooks/useCronosEvmAsset';
+import { Session } from '../../../models/Session';
+import { useAnalytics } from '../../../hooks/useAnalytics';
 
 const ModalBody = (props: {
   asset: UserAsset;
