@@ -32,6 +32,7 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error',
     'import/no-unresolved': 'off',
     'no-return-await': 'off',
+    'no-console': 'off',
     'react-hooks/exhaustive-deps': [
       'off',
       {

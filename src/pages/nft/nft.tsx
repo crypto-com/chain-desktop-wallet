@@ -942,7 +942,6 @@ const NftPage = () => {
   const [errorMessages, setErrorMessages] = useState([]);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
-  const cronosAsset = useCronosEvmAsset();
 
   const didMountRef = useRef(false);
 
