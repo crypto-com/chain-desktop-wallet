@@ -105,9 +105,14 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
     // Result
     const finalList: TransactionData[] = [];
 
-    while (true) {
+    let txDataList = await this.getTxsByAddressPaginated(address, {
+      pageSize: limit,
+      page: currentPage,
+    });
+
+    while (txDataList.length >= 1) {
       // eslint-disable-next-line
-      const txDataList = await this._getTxsByAddressPaginated(address, {
+      txDataList = await this.getTxsByAddressPaginated(address, {
         pageSize: limit,
         page: currentPage,
       });
@@ -118,16 +123,16 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
       // Increment pagination params
       currentPage += 1;
 
-      if (txDataList.length < 1) {
-        // If the list is empty
-        break;
-      }
+      // if (txDataList.length < 1) {
+      //   // If the list is empty
+      //   break;
+      // }
     }
 
     return finalList;
   };
 
-  private _getTxsByAddressPaginated = async (address: string, options?: txQueryBaseParams) => {
+  private getTxsByAddressPaginated = async (address: string, options?: txQueryBaseParams) => {
     const txListResponse: AxiosResponse<TransactionsByAddressResponse> = await axios({
       baseURL: this.indexingBaseUrl,
       url: `/address/${address}/transaction-history`,

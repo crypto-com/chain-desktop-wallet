@@ -118,7 +118,7 @@ export class CroMarketApi implements IMarketApi {
         whitelistedCRC20Tokens.includes(token.data.symbol) ||
         (assetType === UserAssetType.CRC_20_TOKEN &&
           token.data.tags.includes('cronos-ecosystem')) ||
-        (assetType === UserAssetType.ERC_20_TOKEN && token.data.tags.includes('ethereum-ecosystem'))
+        (assetType === UserAssetType.ERC_20_TOKEN && token.data.tags.includes('ethereum-ecosystem')) // TODO: ethereum-ecosystem is missing in a lot of ERC20 tokens
       );
     });
 

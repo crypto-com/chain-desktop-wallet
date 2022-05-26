@@ -6,6 +6,7 @@ import Web3 from 'web3';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { Network, WalletConfig, SupportedChainName } from '../config/StaticConfig';
 import { CRC20MainnetTokenInfos } from '../config/CRC20Tokens';
+import { ERC20MainnetTokenInfos } from '../config/ERC20Tokens';
 
 export function isElectron() {
   // Renderer process
@@ -142,8 +143,8 @@ export function getCronosTendermintAsset(walletAllAssets: UserAsset[]) {
 }
 
 export const isUnlimited = (amount: ethers.BigNumber) => {
-  return amount.gte(ethers.BigNumber.from('0xffffffffffffffffffffffffffffffff'))
-}
+  return amount.gte(ethers.BigNumber.from('0xffffffffffffffffffffffffffffffff'));
+};
 
 export function getCronosEvmAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
@@ -227,6 +228,24 @@ export function isCRC20AssetWhitelisted(
   }
 
   const tokenInfo = CRC20MainnetTokenInfos.get(symbol.toUpperCase());
+  if (!tokenInfo) {
+    return false;
+  }
+
+  return tokenInfo.isWhitelisted && isAddressEqual(contractAddress, tokenInfo.address);
+}
+
+export function isERC20AssetWhitelisted(
+  symbol: string,
+  contractAddress: string,
+  config: WalletConfig,
+) {
+  const isTestnet = checkIfTestnet(config.network);
+  if (isTestnet) {
+    return true;
+  }
+
+  const tokenInfo = ERC20MainnetTokenInfos.get(symbol.toUpperCase());
   if (!tokenInfo) {
     return false;
   }
