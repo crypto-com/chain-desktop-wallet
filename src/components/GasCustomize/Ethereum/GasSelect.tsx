@@ -185,7 +185,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEthereu
         >
           <Option value="custom">
             <GasStepOption
-              title="Custom"
+              title={t('general.custom')}
               gasPrice={ethers.BigNumber.from(gasPrice)}
               gasLimit={ethers.BigNumber.from(gasLimit)}
             />
@@ -205,7 +205,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEthereu
         >
           <Option value={gasInfo.safeLow.toString()}>
             <GasStepOption
-              title="Slow"
+                title={t('general.slow')}
               wait={gasInfo.safeLowWait}
               gasPrice={gasInfo.safeLow}
               gasLimit={gasLimitInfo}
@@ -213,7 +213,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEthereu
           </Option>
           <Option value={gasInfo.average.toString()}>
             <GasStepOption
-              title="Average"
+                title={t('general.average')}
               wait={gasInfo.averageWait}
               gasPrice={gasInfo.average}
               gasLimit={gasLimitInfo}
@@ -221,7 +221,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEthereu
           </Option>
           <Option value={gasInfo.fast.toString()}>
             <GasStepOption
-              title="Fast"
+                title={t('general.fast')}
               wait={gasInfo.fastWait}
               gasPrice={gasInfo.fast}
               gasLimit={gasLimitInfo}

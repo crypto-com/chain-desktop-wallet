@@ -50,7 +50,7 @@ const GasStep = (props: { isUsingCustomFee: boolean }) => {
             marginBottom: '0px',
           }}
         >
-          Custom
+          {t('general.custom')}
         </p>
         <p
           style={{
