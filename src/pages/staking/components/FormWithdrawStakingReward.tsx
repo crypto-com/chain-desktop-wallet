@@ -123,7 +123,7 @@ export const FormWithdrawStakingReward = () => {
     const syncRewardsData = async () => {
       setIsRewardsLoading(true);
       const currentMarketData = allMarketData.get(
-        `${walletAsset?.mainnetSymbol}-${currentSession?.currency}`,
+        `${walletAsset?.assetType}-${walletAsset?.mainnetSymbol}-${currentSession?.currency}`,
       );
 
       const allRewards: RewardTransactionData[] = await walletService.retrieveAllRewards(
@@ -555,7 +555,7 @@ export const FormWithdrawStakingReward = () => {
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
                     getAssetRewardsBalancePrice(walletAsset, marketData),
                   ).format('0,0.00')} ${marketData?.currency}
-                    `
+                  `
                 : ''}
             </div>
           </div>

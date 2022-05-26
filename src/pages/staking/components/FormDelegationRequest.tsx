@@ -249,7 +249,7 @@ export const FormDelegationRequest = props => {
   }
 
   const assetMarketData = allMarketData.get(
-    `${walletAsset.mainnetSymbol}-${currentSession.currency}`,
+    `${walletAsset.assetType}-${walletAsset.mainnetSymbol}-${currentSession.currency}`,
   );
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol;
   const undelegatePeriod =
