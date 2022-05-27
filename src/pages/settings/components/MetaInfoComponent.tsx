@@ -440,8 +440,6 @@ export function MetaInfoComponent() {
         title={t('general.passwordFormModal.title')}
         visible={inputPasswordVisible}
         successButtonText={t('general.continue')}
-        confirmPassword={false}
-        repeatValidation
       />
       <ModalPopup
         className="export-recovery-phrase-modal"

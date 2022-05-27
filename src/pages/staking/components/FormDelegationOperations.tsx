@@ -132,7 +132,8 @@ export const FormDelegationOperations = props => {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+    // TODO: check if decryptedPhrase expired
+    if ((decryptedPhrase && false) || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, userAsset!);
       }
@@ -408,7 +409,6 @@ export const FormDelegationOperations = props => {
           title={t('general.passwordFormModal.title')}
           visible={inputPasswordVisible}
           successButtonText={t('general.continue')}
-          confirmPassword={false}
         />
 
         <SuccessModalPopup

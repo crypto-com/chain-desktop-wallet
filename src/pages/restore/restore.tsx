@@ -456,7 +456,6 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
         title={t('general.passwordFormModal.title')}
         visible={inputPasswordVisible}
         successButtonText={t('general.passwordFormModal.restoreWallet.successButton')}
-        confirmPassword={false}
       />
       <ErrorModalPopup
         isModalVisible={isErrorModalVisible}
