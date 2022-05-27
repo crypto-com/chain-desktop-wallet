@@ -16,7 +16,7 @@ import { evmTransactionSigner } from '../../../../service/signers/EvmTransaction
 import { EVMContractCallUnsigned } from '../../../../service/signers/TransactionSupported';
 import { TransactionPrepareService } from '../../../../service/TransactionPrepareService';
 import { walletService } from '../../../../service/WalletService';
-import { secretStoreService } from '../../../../storage/SecretStoreService';
+import { secretStoreService } from '../../../../service/storage/SecretStoreService';
 import RequestConfirmation from '../../../dapp/components/RequestConfirmation/RequestConfirmation';
 import { DappBrowserIPC } from '../../../dapp/types';
 import { ConfirmModal } from './ConfirmModal';
@@ -247,7 +247,7 @@ const CRC20TokenList = ({
       key: 'approval.timeStamp',
       render: (data: TokenDataWithApproval) => {
         return new Date(Number(data.approval.timeStamp) * 1000).toLocaleString();
-      }
+      },
     },
     {
       title: '',

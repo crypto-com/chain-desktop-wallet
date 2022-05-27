@@ -1,6 +1,6 @@
 import i18n from '../language/I18n';
 import { AddressBookContact, AddressBookContactModel } from '../models/AddressBook';
-import { StorageService } from '../storage/StorageService';
+import { StorageService } from './storage/StorageService';
 
 export class AddressBookService {
   private readonly storageService: StorageService;

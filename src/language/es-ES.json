@@ -21,8 +21,6 @@
   "general.retry": "Reintentar",
   "general.connect": "Connectar",
   "general.seeAll": "Ver todo",
-  "general.addressValidator.reason1": "Invalido",
-  "general.validTransactionAmountValidator.reason": "Valor de envio invalido",
   "general.passwordForm.password.label": "Contraseña",
   "general.passwordForm.password.placeholder": "Introduzca la contraseña",
   "general.passwordForm.passwordConfirm.label": "Confirmar contraseña",

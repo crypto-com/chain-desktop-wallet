@@ -31,6 +31,7 @@ module.exports = {
     'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/*.spec.ts'] }],
     'react-hooks/rules-of-hooks': 'error',
     'import/no-unresolved': 'off',
+    'prefer-promise-reject-errors': 'off',
     'no-return-await': 'off',
     'react-hooks/exhaustive-deps': [
       'off',
