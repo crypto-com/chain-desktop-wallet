@@ -111,10 +111,15 @@ const ModalBody = (props: {
         layout="vertical"
         form={form}
         onValuesChange={() => {
-          const newGasPrice: string = form.getFieldValue('gasPrice');
-          const newGasLimit: string = form.getFieldValue('gasLimit')
-          const fieldsError = form.getFieldsError(['gasPrice', 'gasLimit'])
-          if (fieldsError[0].errors.length > 0 || fieldsError[1].errors.length > 0 || !gasPrice || !gasLimit) {
+          const newGasPrice: string = form.getFieldValue('gasPrice') ?? '0';
+          const newGasLimit: string = form.getFieldValue('gasLimit') ?? '0';
+          const fieldsError = form.getFieldsError(['gasPrice', 'gasLimit']);
+          if (
+            fieldsError[0].errors.length > 0 ||
+            fieldsError[1].errors.length > 0 ||
+            !gasPrice ||
+            !gasLimit
+          ) {
             setReadableNetworkFee('-');
           } else {
             setNetworkFee(new BigNumber(newGasPrice), new BigNumber(newGasLimit));
@@ -150,8 +155,8 @@ const ModalBody = (props: {
             },
             {
               pattern: /^[1-9]+[0-9]*$/,
-              message: t('general.invalidAmount')
-            }
+              message: t('general.invalidAmount'),
+            },
           ]}
         >
           <InputNumber precision={0} stringMode />
@@ -167,15 +172,17 @@ const ModalBody = (props: {
             },
             {
               pattern: /^[1-9]+[0-9]*$/,
-              message: t('general.invalidAmount')
-            }
+              message: t('general.invalidAmount'),
+            },
           ]}
         >
           <InputNumber precision={0} stringMode />
         </Form.Item>
-        {
-          validateStatus && <div style={{ color: 'red', marginTop: '-10px', marginBottom: '6px' }}>{t('dapp.requestConfirmation.error.insufficientBalance')}</div>
-        }
+        {validateStatus && (
+          <div style={{ color: 'red', marginTop: '-10px', marginBottom: '6px' }}>
+            {t('dapp.requestConfirmation.error.insufficientBalance')}
+          </div>
+        )}
         <div>
           <div style={{ color: '#7B849B' }}>{t('estimate-network-fee')}</div>
           <div>{readableNetworkFee}</div>

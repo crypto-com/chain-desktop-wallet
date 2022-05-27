@@ -61,7 +61,7 @@ const ModalBody = (props: {
       setIsUsingCustomGas(false);
     }
 
-    const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(newGasPrice);
+    const amountBigNumber = ethers.BigNumber.from(newGasLimit ?? '0').mul(newGasPrice ?? '0');
 
     if (ethers.BigNumber.from(cronosEVMAsset.balance.toString()).lte(amountBigNumber)) {
       setValidateStatus('error');
@@ -116,9 +116,14 @@ const ModalBody = (props: {
         form={form}
         onValuesChange={() => {
           const newGasPrice: string = form.getFieldValue('gasPrice');
-          const newGasLimit: string = form.getFieldValue('gasLimit')
-          const fieldsError = form.getFieldsError(['gasPrice', 'gasLimit'])
-          if (fieldsError[0].errors.length > 0 || fieldsError[1].errors.length > 0 || !gasPrice || !gasLimit) {
+          const newGasLimit: string = form.getFieldValue('gasLimit');
+          const fieldsError = form.getFieldsError(['gasPrice', 'gasLimit']);
+          if (
+            fieldsError[0].errors.length > 0 ||
+            fieldsError[1].errors.length > 0 ||
+            !gasPrice ||
+            !gasLimit
+          ) {
             setReadableNetworkFee('-');
           } else {
             setNetworkFee(newGasPrice, newGasLimit);
@@ -184,8 +189,8 @@ const ModalBody = (props: {
             },
             {
               pattern: /^[1-9]+[0-9]*$/,
-              message: t('general.invalidAmount')
-            }
+              message: t('general.invalidAmount'),
+            },
           ]}
         >
           <InputNumber stringMode precision={0} />
@@ -201,15 +206,17 @@ const ModalBody = (props: {
             },
             {
               pattern: /^[1-9]+[0-9]*$/,
-              message: t('general.invalidAmount')
-            }
+              message: t('general.invalidAmount'),
+            },
           ]}
         >
           <InputNumber stringMode precision={0} />
         </Form.Item>
-        {
-          validateStatus && <div style={{ color: 'red', marginTop: '-10px', marginBottom: '6px' }}>{t('dapp.requestConfirmation.error.insufficientBalance')}</div>
-        }
+        {validateStatus && (
+          <div style={{ color: 'red', marginTop: '-10px', marginBottom: '6px' }}>
+            {t('dapp.requestConfirmation.error.insufficientBalance')}
+          </div>
+        )}
         <div>
           <div style={{ color: '#7B849B' }}>{t('estimate-network-fee')}</div>
           <div>{readableNetworkFee}</div>
