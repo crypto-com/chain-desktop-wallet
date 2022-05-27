@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.8.0] - 2022-05-27
+### Additions
+- Enforce better password protection on transactions
+### Bug fixes
+- Gas Fee validation on invalid values
 ## [v0.7.9] - 2022-05-20
 ### Additions
 - Revoke Token Permission
