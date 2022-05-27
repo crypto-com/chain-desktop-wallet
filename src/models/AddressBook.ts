@@ -34,6 +34,10 @@ const SupportedNetworks: AddressBookNetwork[] = [
     label: SupportedChainName.CRYPTO_ORG,
     networkType: UserAssetType.TENDERMINT,
   },
+  {
+    label: SupportedChainName.ETHEREUM,
+    networkType: UserAssetType.EVM,
+  }
 ];
 
 export { SupportedNetworks };
