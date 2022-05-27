@@ -131,14 +131,29 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
   ): Promise<string> {
     const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
+    const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
+
     const msgDelegateAll = transaction.validatorAddressList.map(validatorAddress => {
-      return new cro.distribution.MsgWithdrawDelegatorReward({
+      return new cro.staking.MsgDelegate({
         delegatorAddress: transaction.delegatorAddress,
         validatorAddress,
+        amount: delegateAmount,
       });
     });
 
-    return this.getSignedMessageTransaction(transaction, msgDelegateAll, rawTx);
+    const msgDelegateAll0 = transaction.validatorAddressList.map(validatorAddress => {
+      return new cro.staking.MsgDelegate({
+        delegatorAddress: transaction.delegatorAddress,
+        validatorAddress,
+        amount: delegateAmount,
+      });
+    });
+
+    return this.getSignedMessageTransaction(
+      transaction,
+      [...msgDelegateAll, ...msgDelegateAll0],
+      rawTx,
+    );
   }
 
   public async signWithdrawStakingRewardTx(

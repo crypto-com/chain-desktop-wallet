@@ -196,18 +196,26 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
     gasLimit: number,
   ): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
+    const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
 
-    const msgWithdrawAllDelegatorRewards = transaction.validatorAddressList.map(
-      validatorAddress => {
-        return new cro.distribution.MsgWithdrawDelegatorReward({
-          delegatorAddress: transaction.delegatorAddress,
-          validatorAddress,
-        });
-      },
-    );
+    const msgRestakeAllRewards = transaction.validatorAddressList.map(validatorAddress => {
+      return new cro.staking.MsgDelegate({
+        delegatorAddress: transaction.delegatorAddress,
+        validatorAddress,
+        amount: delegateAmount,
+      });
+    });
+
+    const msgRestakeAllRewards0 = transaction.validatorAddressList.map(validatorAddress => {
+      return new cro.staking.MsgDelegate({
+        delegatorAddress: transaction.delegatorAddress,
+        validatorAddress,
+        amount: delegateAmount,
+      });
+    });
 
     return this.getSignedMessageTransaction(
-      msgWithdrawAllDelegatorRewards,
+      [...msgRestakeAllRewards, ...msgRestakeAllRewards0],
       transaction,
       keyPair,
       rawTx,
