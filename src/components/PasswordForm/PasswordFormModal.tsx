@@ -28,7 +28,7 @@ export interface PasswordFormModalProps {
   isButtonLoading?: boolean;
 
   // Will ask for password again even after password was validated before
-  repeatValidation?: boolean;
+  skipRepeatValidation?: boolean;
 
   mask?: boolean;
 
@@ -109,7 +109,7 @@ const PasswordFormWithResult = (props: {
   successButtonText?: string;
   confirmPassword?: boolean;
   okButtonText?: string;
-  repeatValidation?: boolean;
+  skipRepeatValidation?: boolean;
   isButtonLoading?: boolean;
   successText: string;
 }) => {
@@ -168,9 +168,11 @@ const PasswordFormWithResult = (props: {
           return;
         }
         await props.onSuccess(appPassword!);
-        if (props.repeatValidation) {
-          setAppPassword('');
-          setDisplayComponent('form');
+        if (!props.skipRepeatValidation) {
+          setTimeout(() => {
+            setAppPassword('');
+            setDisplayComponent('form');
+          }, 200);
         }
       }}
     />

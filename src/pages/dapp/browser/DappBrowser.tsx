@@ -327,7 +327,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
           title={t('general.passwordFormModal.title')}
           visible
           successButtonText={t('general.continue')}
-          confirmPassword={false}
+          skipRepeatValidation
         />
       )}
       {txEvent && requestConfirmationVisible && (
