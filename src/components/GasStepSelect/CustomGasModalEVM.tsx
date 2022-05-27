@@ -193,6 +193,7 @@ const ModalBody = (props: {
         <Form.Item
           name="gasLimit"
           label={t('settings.form1.gasLimit.label')}
+          hasFeedback
           rules={[
             {
               required: true,
