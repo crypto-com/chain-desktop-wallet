@@ -231,7 +231,8 @@ const CronosBridge = props => {
       ...form.getFieldsValue(),
     });
 
-    if (decryptedPhrase || session.wallet.walletType === LEDGER_WALLET_TYPE) {
+    // TODO: check if decryptedPhrase expired
+    if ((decryptedPhrase && false) || session.wallet.walletType === LEDGER_WALLET_TYPE) {
       const { tendermintAddress, evmAddress } = formValues;
       const { toAddress, isCustomToAddress } = form.getFieldsValue();
       let amount = form.getFieldValue('amount');

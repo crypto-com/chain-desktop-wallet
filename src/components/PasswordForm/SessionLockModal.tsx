@@ -10,7 +10,6 @@ const SessionLockModal = props => {
     onValidatePassword,
     onSuccess,
     onCancel,
-    repeatValidation,
   } = props;
   return PasswordFormModal({
     title,
@@ -21,7 +20,6 @@ const SessionLockModal = props => {
     onValidatePassword,
     onSuccess,
     onCancel,
-    repeatValidation,
     mask: true,
     maskStyle: {
       backdropFilter: 'blur(5px)',
