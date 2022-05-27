@@ -97,10 +97,10 @@ class WalletService {
     return await this.txSenderManager.sendDelegateTransaction(delegationRequest);
   }
 
-  public async sendAllDelegateTransactions(
+  public async sendRestakeRewardsTransaction(
     allDelegationRequests: AllDelegationRequests,
   ): Promise<BroadCastResult> {
-    return await this.txSenderManager.sendAllDelegateTransactions(allDelegationRequests);
+    return await this.txSenderManager.sendRestakeRewardsTransaction(allDelegationRequests);
   }
 
   public async sendUnDelegateTransaction(

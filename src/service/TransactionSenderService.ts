@@ -377,7 +377,7 @@ export class TransactionSenderService {
     return broadCastResult;
   }
 
-  public async sendAllDelegateTransactions(
+  public async sendRestakeRewardsTransaction(
     allDelegationRequests: AllDelegationRequests,
   ): Promise<BroadCastResult> {
     const {

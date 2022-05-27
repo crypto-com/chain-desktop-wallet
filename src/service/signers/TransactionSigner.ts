@@ -197,14 +197,21 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
   ): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
-    const msgDelegateAll = transaction.validatorAddressList.map(validatorAddress => {
-      return new cro.distribution.MsgWithdrawDelegatorReward({
-        delegatorAddress: transaction.delegatorAddress,
-        validatorAddress,
-      });
-    });
+    const msgWithdrawAllDelegatorRewards = transaction.validatorAddressList.map(
+      validatorAddress => {
+        return new cro.distribution.MsgWithdrawDelegatorReward({
+          delegatorAddress: transaction.delegatorAddress,
+          validatorAddress,
+        });
+      },
+    );
 
-    return this.getSignedMessageTransaction(msgDelegateAll, transaction, keyPair, rawTx);
+    return this.getSignedMessageTransaction(
+      msgWithdrawAllDelegatorRewards,
+      transaction,
+      keyPair,
+      rawTx,
+    );
   }
 
   public async signWithdrawStakingRewardTx(
