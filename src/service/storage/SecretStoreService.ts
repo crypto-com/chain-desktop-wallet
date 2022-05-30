@@ -1,6 +1,6 @@
 import { DatabaseManager } from './DatabaseManager';
-import { EncryptedCredential, EncryptedSeed, EncryptionResult } from '../models/SecretStorage';
-import { cryptographer } from '../crypto/Cryptographer';
+import { EncryptedCredential, EncryptedSeed, EncryptionResult } from '../../models/SecretStorage';
+import { cryptographer } from '../../crypto/Cryptographer';
 
 export class SecretStoreService {
   private readonly db: DatabaseManager;

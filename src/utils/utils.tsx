@@ -141,6 +141,10 @@ export function getCronosTendermintAsset(walletAllAssets: UserAsset[]) {
   });
 }
 
+export const isUnlimited = (amount: ethers.BigNumber) => {
+  return amount.gte(ethers.BigNumber.from('0xffffffffffffffffffffffffffffffff'))
+}
+
 export function getCronosEvmAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
     return (

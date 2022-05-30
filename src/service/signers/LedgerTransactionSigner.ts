@@ -19,6 +19,7 @@ import {
   NFTMintUnsigned,
   NFTDenomIssueUnsigned,
   BridgeTransactionUnsigned,
+  WithdrawAllStakingRewardsUnsigned,
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
 import { BaseTransactionSigner, ITransactionSigner } from './TransactionSigner';
@@ -76,7 +77,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    return this.getSignedMessageTransaction(transaction, msgSend, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgSend], rawTx);
   }
 
   public async signVoteTransaction(
@@ -93,7 +94,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       proposalId: Big(transaction.proposalID),
     });
 
-    return this.getSignedMessageTransaction(transaction, msgVote, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgVote], rawTx);
   }
 
   public async signDelegateTx(
@@ -111,7 +112,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       amount: delegateAmount,
     });
 
-    return this.getSignedMessageTransaction(transaction, msgDelegate, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgDelegate], rawTx);
   }
 
   public async signWithdrawStakingRewardTx(
@@ -127,7 +128,33 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       validatorAddress: transaction.validatorAddress,
     });
 
-    return this.getSignedMessageTransaction(transaction, msgWithdrawDelegatorReward, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgWithdrawDelegatorReward], rawTx);
+  }
+
+  /**
+   * 
+   * @param transaction 
+   * @param phrase 
+   * @param gasFee 
+   * @param gasLimit 
+   */
+  public async signWithdrawAllStakingRewardsTx(
+    transaction: WithdrawAllStakingRewardsUnsigned,
+    phrase: string,
+    gasFee: string,
+    gasLimit: number,
+  ): Promise<string> {
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
+
+    const msgWithdrawAllDelegatorRewards =
+      transaction.validatorAddressList.map(validatorAddress => {
+        return new cro.distribution.MsgWithdrawDelegatorReward({
+          delegatorAddress: transaction.delegatorAddress,
+          validatorAddress,
+        });
+      });
+
+    return this.getSignedMessageTransaction(transaction, msgWithdrawAllDelegatorRewards, rawTx);
   }
 
   public async signUndelegateTx(
@@ -144,7 +171,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    return this.getSignedMessageTransaction(transaction, msgUndelegate, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgUndelegate], rawTx);
   }
 
   public async signRedelegateTx(
@@ -162,7 +189,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    return this.getSignedMessageTransaction(transaction, msgBeginRedelegate, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgBeginRedelegate], rawTx);
   }
 
   async signNFTTransfer(transaction: NFTTransferUnsigned, decryptedPhrase: string, gasFee: string,
@@ -176,7 +203,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       recipient: transaction.recipient,
     });
 
-    return this.getSignedMessageTransaction(transaction, msgTransferNFT, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgTransferNFT], rawTx);
   }
 
   async signNFTMint(transaction: NFTMintUnsigned, decryptedPhrase: string, gasFee: string,
@@ -193,7 +220,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       recipient: transaction.recipient,
     });
 
-    return this.getSignedMessageTransaction(transaction, msgMintNFT, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgMintNFT], rawTx);
   }
 
   async signNFTDenomIssue(transaction: NFTDenomIssueUnsigned, decryptedPhrase: string, gasFee: string,
@@ -207,10 +234,10 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       schema: transaction.schema,
     });
 
-    return this.getSignedMessageTransaction(transaction, msgIssueDenom, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgIssueDenom], rawTx);
   }
 
-  async getSignedMessageTransaction(transaction: TransactionUnsigned, message: CosmosMsg, rawTx) {
+  async getSignedMessageTransaction(transaction: TransactionUnsigned, message: CosmosMsg[], rawTx) {
     const pubkeyoriginal = (
       await this.signerProvider.getPubKey(this.addressIndex, this.derivationPathStandard, false)
     ).toUint8Array();
@@ -222,8 +249,12 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     SIGN_MODE_LEGACY_AMINO_JSON = 127,
     */
 
+    // Appending cosmos messages to raw transaction
+    message.forEach(msg => {
+      rawTx.appendMessage(msg);
+    });
+
     const signableTx = rawTx
-      .appendMessage(message)
       .addSigner({
         publicKey: pubkey,
         accountNumber: new Big(transaction.accountNumber),
@@ -281,6 +312,6 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       token: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    return this.getSignedMessageTransaction(transaction, msgSend, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgSend], rawTx);
   }
 }

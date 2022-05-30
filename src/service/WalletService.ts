@@ -17,7 +17,7 @@ import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import { Session } from '../models/Session';
 import { cryptographer } from '../crypto/Cryptographer';
-import { secretStoreService } from '../storage/SecretStoreService';
+import { secretStoreService } from './storage/SecretStoreService';
 import { AssetCreationType, AssetMarketPrice, UserAsset, UserAssetType } from '../models/UserAsset';
 import {
   BroadCastResult,
@@ -49,12 +49,13 @@ import {
   UndelegationRequest,
   VoteRequest,
   WithdrawStakingRewardRequest,
+  WithdrawAllStakingRewardRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter } from '../utils/utils';
 import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
-import { StorageService } from '../storage/StorageService';
+import { StorageService } from './storage/StorageService';
 import { TransactionPrepareService } from './TransactionPrepareService';
 import { TransactionHistoryService } from './TransactionHistoryService';
 import { TransactionSenderService } from './TransactionSenderService';
@@ -111,6 +112,12 @@ class WalletService {
     rewardWithdrawRequest: WithdrawStakingRewardRequest,
   ): Promise<BroadCastResult> {
     return await this.txSenderManager.sendStakingRewardWithdrawalTx(rewardWithdrawRequest);
+  }
+
+  public async sendStakingWithdrawAllRewardsTx(
+    rewardWithdrawAllRequest: WithdrawAllStakingRewardRequest,
+  ): Promise<BroadCastResult> {
+    return await this.txSenderManager.sendStakingWithdrawAllRewardsTx(rewardWithdrawAllRequest);
   }
 
   public async sendVote(voteRequest: VoteRequest): Promise<BroadCastResult> {
@@ -537,8 +544,8 @@ class WalletService {
       await axios.head(nodeUrl);
       return true;
     } catch (error) {
-      if (error && (error as unknown as any).response) {
-        const { status } = (error as unknown as any).response;
+      if (error && ((error as unknown) as any).response) {
+        const { status } = ((error as unknown) as any).response;
         return !(status >= 400 && status < 500);
       }
     }
