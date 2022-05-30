@@ -111,9 +111,10 @@ const ModalBody = (props: {
       <Form
         layout="vertical"
         form={form}
-        onValuesChange={v => {
-          const networkFee: string = v?.networkFee ?? gasFee;
-          if (!networkFee) {
+        onValuesChange={() => {
+          const networkFee: string = form.getFieldValue('networkFee');
+          const fieldsError = form.getFieldsError(['networkFee'])
+          if (fieldsError[0].errors.length > 0 || !networkFee) {
             setReadableNetworkFee('-');
           } else {
             setNetworkFee(networkFee);
@@ -171,18 +172,19 @@ const ModalBody = (props: {
           name="networkFee"
           label={`${t('settings.form1.networkFee.label')}(baseCRO)`}
           hasFeedback
-          validateStatus={validateStatus}
-          help={validateStatus ? t('dapp.requestConfirmation.error.insufficientBalance') : ''}
           rules={[
             {
               required: true,
               message: `${t('settings.form1.networkFee.label')} ${t('general.required')}`,
             },
+            {
+              pattern: /^[1-9]+[0-9]*$/,
+              message: t('general.invalidAmount')
+            }
           ]}
         >
           <InputNumber
             precision={0}
-            min="1"
             stringMode
           />
         </Form.Item>
@@ -190,17 +192,22 @@ const ModalBody = (props: {
           name="gasLimit"
           label={t('settings.form1.gasLimit.label')}
           hasFeedback
-          validateStatus={validateStatus}
-          help={validateStatus ? t('dapp.requestConfirmation.error.insufficientBalance') : ''}
           rules={[
             {
               required: true,
               message: `${t('settings.form1.gasLimit.label')} ${t('general.required')}`,
             },
+            {
+              pattern: /^[1-9]+[0-9]*$/,
+              message: t('general.invalidAmount')
+            }
           ]}
         >
-          <InputNumber precision={0} min={1} />
+          <InputNumber stringMode precision={0} />
         </Form.Item>
+        {
+          validateStatus && <div style={{ color: 'red', marginTop: '-10px', marginBottom: '6px' }}>{t('dapp.requestConfirmation.error.insufficientBalance')}</div>
+        }
         <div>
           <div style={{ color: '#7B849B' }}>{t('estimate-network-fee')}</div>
           <div>{readableNetworkFee}</div>

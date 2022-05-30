@@ -52,7 +52,7 @@ const ModalBody = (props: {
       setIsUsingCustomGas(false);
     }
 
-    const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(newGasPrice);
+    const amountBigNumber = ethers.BigNumber.from(newGasLimit ?? '0').mul(newGasPrice ?? '0');
 
     if (ethers.BigNumber.from(asset.balance.toString()).lte(amountBigNumber)) {
       setValidateStatus('error');
@@ -102,10 +102,16 @@ const ModalBody = (props: {
       <Form
         layout="vertical"
         form={form}
-        onValuesChange={v => {
-          const newGasPrice: string = v?.gasPrice ?? gasPrice;
-          const newGasLimit: string = v?.gasLimit ?? gasLimit;
-          if (!gasPrice || !gasLimit) {
+        onValuesChange={() => {
+          const newGasPrice: string = form.getFieldValue('gasPrice');
+          const newGasLimit: string = form.getFieldValue('gasLimit');
+          const fieldsError = form.getFieldsError(['gasPrice', 'gasLimit']);
+          if (
+            fieldsError[0].errors.length > 0 ||
+            fieldsError[1].errors.length > 0 ||
+            !gasPrice ||
+            !gasLimit
+          ) {
             setReadableNetworkFee('-');
           } else {
             setNetworkFee(newGasPrice, newGasLimit);
@@ -135,32 +141,41 @@ const ModalBody = (props: {
           name="gasPrice"
           label={`${t('gas-price')}(WEI)`}
           hasFeedback
-          validateStatus={validateStatus}
-          help={validateStatus ? t('dapp.requestConfirmation.error.insufficientBalance') : ''}
           rules={[
             {
               required: true,
               message: `${t('settings.form1.networkFee.label')} ${t('general.required')}`,
             },
+            {
+              pattern: /^[1-9]+[0-9]*$/,
+              message: t('general.invalidAmount'),
+            },
           ]}
         >
-          <InputNumber stringMode precision={0} min="1" />
+          <InputNumber stringMode precision={0} />
         </Form.Item>
         <Form.Item
           name="gasLimit"
           label={t('settings.form1.gasLimit.label')}
           hasFeedback
-          validateStatus={validateStatus}
-          help={validateStatus ? t('dapp.requestConfirmation.error.insufficientBalance') : ''}
           rules={[
             {
               required: true,
               message: `${t('settings.form1.gasLimit.label')} ${t('general.required')}`,
             },
+            {
+              pattern: /^[1-9]+[0-9]*$/,
+              message: t('general.invalidAmount'),
+            },
           ]}
         >
-          <InputNumber stringMode precision={0} min="1" />
+          <InputNumber stringMode precision={0} />
         </Form.Item>
+        {validateStatus && (
+          <div style={{ color: 'red', marginTop: '-10px', marginBottom: '6px' }}>
+            {t('dapp.requestConfirmation.error.insufficientBalance')}
+          </div>
+        )}
         <div>
           <div style={{ color: '#7B849B' }}>{t('estimate-network-fee')}</div>
           <div>{readableNetworkFee}</div>

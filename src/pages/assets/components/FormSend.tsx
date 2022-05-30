@@ -127,7 +127,8 @@ const FormSend: React.FC<FormSendProps> = props => {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+    // TODO: check if decryptedPhrase expired
+    if ((decryptedPhrase && false) || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, walletAsset!);
       }
@@ -442,7 +443,6 @@ const FormSend: React.FC<FormSendProps> = props => {
           title={t('general.passwordFormModal.title')}
           visible={inputPasswordVisible}
           successButtonText={t('general.continue')}
-          confirmPassword={false}
         />
 
         <SuccessModalPopup

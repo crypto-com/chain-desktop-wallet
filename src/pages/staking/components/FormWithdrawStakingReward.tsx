@@ -164,7 +164,8 @@ export const FormWithdrawStakingReward = () => {
   };
 
   const showPasswordInput = (action: string) => {
-    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+    // TODO: check if decryptedPhrase expired
+    if ((decryptedPhrase && false) || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, walletAsset!);
         return;
@@ -528,7 +529,6 @@ export const FormWithdrawStakingReward = () => {
                 rewards && rewards.length > 3 ? 'address-container scrollable' : 'address-container'
               }
             >
-
               {rewards.map((elem, idx) => (
                 <>
                   <div
@@ -663,7 +663,6 @@ export const FormWithdrawStakingReward = () => {
         title={t('general.passwordFormModal.title')}
         visible={inputPasswordVisible}
         successButtonText={t('general.continue')}
-        confirmPassword={false}
       />
       <SuccessModalPopup
         isModalVisible={isSuccessTransferModalVisible}

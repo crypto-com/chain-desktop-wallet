@@ -247,7 +247,8 @@ const FormMintNft = () => {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+    // TODO: check if decryptedPhrase expired
+    if ((decryptedPhrase && false) || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, walletAsset!);
       }
@@ -842,7 +843,6 @@ const FormMintNft = () => {
         title={t('general.passwordFormModal.title')}
         visible={inputPasswordVisible}
         successButtonText={t('general.continue')}
-        confirmPassword={false}
       />
       <SuccessModalPopup
         isModalVisible={isSuccessModalVisible}
@@ -1020,7 +1020,8 @@ const NftPage = () => {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+    // TODO: check if decryptedPhrase expired
+    if ((decryptedPhrase && false) || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, walletAsset!);
       }
@@ -1887,7 +1888,6 @@ const NftPage = () => {
                 title={t('general.passwordFormModal.title')}
                 visible={inputPasswordVisible}
                 successButtonText={t('general.continue')}
-                confirmPassword={false}
               />
               <SuccessModalPopup
                 isModalVisible={isSuccessModalVisible}

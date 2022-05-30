@@ -896,8 +896,6 @@ function HomeLayout(props: HomeLayoutProps) {
         title={t('general.passwordFormModal.title')}
         visible={inputPasswordVisible}
         successButtonText={t('general.continue')}
-        confirmPassword={false}
-        repeatValidation
       />
 
       <SessionLockModal
@@ -966,8 +964,6 @@ function HomeLayout(props: HomeLayoutProps) {
         title={t('general.sessionLockModal.title')}
         visible={isSessionLockModalVisible}
         successButtonText={t('general.continue')}
-        confirmPassword={false}
-        repeatValidation
       />
 
       <Layout>

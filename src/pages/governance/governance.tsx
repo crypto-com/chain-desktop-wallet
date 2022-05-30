@@ -109,7 +109,8 @@ const GovernancePage = () => {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+    // TODO: check if decryptedPhrase expired
+    if ((decryptedPhrase && false) || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, userAsset!);
       }

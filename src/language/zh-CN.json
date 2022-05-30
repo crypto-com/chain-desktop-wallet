@@ -50,6 +50,7 @@
   "general.average": "平均",
   "general.slow": "慢速",
   "general.custom": "自定义",
+  "general.invalidAmount": "无效的数量",
   "general.passwordForm.password.label": "密码",
   "general.passwordForm.password.placeholder": "输入密码",
   "general.passwordForm.password.error1": "密码需要至少8个字母，并包括英文字母、数字及特殊符号各一。",
