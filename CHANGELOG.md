@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.8.1] - 2022-05-30
+### Bug fixes
+- Token Approval request failure
 ## [v0.8.0] - 2022-05-27
 ### Additions
 - Enforce better password protection on transactions
