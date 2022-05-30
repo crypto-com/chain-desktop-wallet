@@ -5,6 +5,7 @@ import Long from 'long';
 import { Big, Units, Secp256k1KeyPair } from '../../utils/ChainJsLib';
 import { DEFAULT_IBC_TRANSFER_TIMEOUT, WalletConfig } from '../../config/StaticConfig';
 import {
+  RestakeTransactionUnsigned,
   TransactionUnsigned,
   DelegateTransactionUnsigned,
   AllDelegateTransactionsUnsigned,
@@ -103,6 +104,30 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     });
 
     return this.getSignedMessageTransaction(transaction, [msgVote], rawTx);
+  }
+
+  public async signRestakeTx(
+    transaction: RestakeTransactionUnsigned,
+    phrase: string,
+    gasFee: string,
+    gasLimit: number,
+  ): Promise<string> {
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
+
+    const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
+    const msgDelegate = new cro.staking.MsgDelegate({
+      delegatorAddress: transaction.delegatorAddress,
+      validatorAddress: transaction.validatorAddress,
+      amount: delegateAmount,
+    });
+
+    const msgDelegate0 = new cro.staking.MsgDelegate({
+      delegatorAddress: transaction.delegatorAddress,
+      validatorAddress: transaction.validatorAddress,
+      amount: delegateAmount,
+    });
+
+    return this.getSignedMessageTransaction(transaction, [msgDelegate, msgDelegate0], rawTx);
   }
 
   public async signDelegateTx(

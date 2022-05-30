@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import '../staking.less';
 import 'antd/dist/antd.css';
-import { Button, Table, Typography, Spin } from 'antd';
+import {
+  Button,
+  Table,
+  Typography,
+  Spin,
+  // Checkbox
+} from 'antd';
+// import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
@@ -275,18 +282,22 @@ export const FormWithdrawStakingReward = () => {
     }
     try {
       setConfirmLoading(true);
+      const restakeRewardAmount = withdrawValues.rewardAmount.split(' ')[0];
 
-      const rewardWithdrawResult = await walletService.sendStakingRewardWithdrawalTx({
+      console.log('Restake Reward 0 ', restakeRewardAmount);
+
+      const rewardWithdrawResult = await walletService.sendRestakeRewardTransaction({
         validatorAddress: withdrawValues.validatorAddress,
         decryptedPhrase,
         walletType,
+        amount: restakeRewardAmount,
+        asset: walletAsset,
+        memo: '',
       });
 
       if (rewardWithdrawResult.transactionHash) {
         // Success - Reward withdraw transaction was successfully broadcasted
-
         // withdrawValues.rewardAmount = '0.1 CRO'
-        const restakeRewardAmount = withdrawValues.rewardAmount.split(' ')[0];
 
         if (!isNumeric(restakeRewardAmount)) {
           setSuccessRestakeRewardModalMessage(
@@ -681,7 +692,7 @@ export const FormWithdrawStakingReward = () => {
             }, 200);
           }}
         >
-          {t('staking.withdraw-restake')}
+          {t('staking.withdraw.restake')}
           {/* {t('staking.withdrawall')} */}
         </Button>
       )}
@@ -719,7 +730,7 @@ export const FormWithdrawStakingReward = () => {
         <>
           <div className="title">
             {/* {t('staking.withdrawall')} */}
-            {t('staking.withdraw-restake')}
+            {t('staking.withdraw.restake')}
           </div>
           <div className="description">{t('staking.modal2.description')}</div>
           <div className="item">

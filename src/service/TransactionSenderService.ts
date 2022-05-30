@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import { TransactionConfig } from 'web3-eth';
 import { ethers } from 'ethers';
 import {
+  RestakeTransactionUnsigned,
   DelegateTransactionUnsigned,
   AllDelegateTransactionsUnsigned,
   TransferTransactionUnsigned,
@@ -397,7 +398,7 @@ export class TransactionSenderService {
       memo = DEFAULT_CLIENT_MEMO;
     }
 
-    const delegateTransaction: DelegateTransactionUnsigned = {
+    const restakeTransaction: RestakeTransactionUnsigned = {
       delegatorAddress: currentSession.wallet.address,
       validatorAddress: restakeRequest.validatorAddress,
       amount: String(delegationAmountScaled),
@@ -410,15 +411,15 @@ export class TransactionSenderService {
     const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();
 
     if (restakeRequest.walletType === LEDGER_WALLET_TYPE) {
-      signedTxHex = await ledgerTransactionSigner.signDelegateTx(
-        delegateTransaction,
+      signedTxHex = await ledgerTransactionSigner.signRestakeTx(
+        restakeTransaction,
         restakeRequest.decryptedPhrase,
         networkFee,
         gasLimit,
       );
     } else {
-      signedTxHex = await transactionSigner.signDelegateTx(
-        delegateTransaction,
+      signedTxHex = await transactionSigner.signRestakeTx(
+        restakeTransaction,
         restakeRequest.decryptedPhrase,
         networkFee,
         gasLimit,

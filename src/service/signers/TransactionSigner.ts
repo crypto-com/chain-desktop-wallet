@@ -206,7 +206,18 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       amount: delegateAmount,
     });
 
-    return this.getSignedMessageTransaction([msgDelegate], transaction, keyPair, rawTx);
+    const msgDelegate0 = new cro.staking.MsgDelegate({
+      delegatorAddress: transaction.delegatorAddress,
+      validatorAddress: transaction.validatorAddress,
+      amount: delegateAmount,
+    });
+
+    return this.getSignedMessageTransaction(
+      [msgDelegate, msgDelegate0],
+      transaction,
+      keyPair,
+      rawTx,
+    );
   }
 
   public async signAllDelegateTx(
