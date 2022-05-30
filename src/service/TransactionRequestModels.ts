@@ -65,6 +65,15 @@ export interface NFTDenomIssueRequest {
  * Restaking all rewards
  */
 
+export interface RestakeRequest {
+  validatorAddress: string;
+  amount: string;
+  memo: string;
+  asset: UserAsset;
+  decryptedPhrase: string;
+  walletType: string; // normal, ledger
+}
+
 export interface AllDelegationRequests {
   validatorAddressList: string[];
   amount: string;

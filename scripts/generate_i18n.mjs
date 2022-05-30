@@ -7,8 +7,7 @@ import axios from 'axios';
 import papa from 'papaparse';
 import fs from 'fs';
 
-const SHEET_CSV_URL =
-  'http://docs.google.com/spreadsheets/d/e/2PACX-1vTUsMndccslvcJzIbZ5kvXzx6ltJzNe3O0vpBYDv56d7mhFzW-laRfZRRwJ9DT3hboTafba2lHFyrzQ/pub?gid=0&single=true&output=csv';
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQymJDoWdbW5z7LBhgNLttYaqZDmai1CSDIUA_QNe2VBBGo6tRtE5sfhRA5M0w_9yrHDnzgxYhTlf9D/pub?gid=0&single=true&output=csv';
 
 async function fetchSheet(csvURL) {
   const response = await axios.get(csvURL)

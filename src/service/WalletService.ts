@@ -39,6 +39,7 @@ import { CommonNftModel, NftDenomModel } from '../models/Nft';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { LEDGER_WALLET_TYPE } from './LedgerService';
 import {
+  RestakeRequest,
   BridgeTransferRequest,
   DelegationRequest,
   AllDelegationRequests,
@@ -101,6 +102,12 @@ class WalletService {
     allDelegationRequests: AllDelegationRequests,
   ): Promise<BroadCastResult> {
     return await this.txSenderManager.sendRestakeRewardsTransaction(allDelegationRequests);
+  }
+
+  public async sendRestakeRewardTransaction(
+    restakeRequest: RestakeRequest,
+  ): Promise<BroadCastResult> {
+    return await this.txSenderManager.sendRestakeRewardTransaction(restakeRequest);
   }
 
   public async sendUnDelegateTransaction(

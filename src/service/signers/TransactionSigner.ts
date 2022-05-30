@@ -4,6 +4,7 @@ import Long from 'long';
 import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
 import { DEFAULT_IBC_TRANSFER_TIMEOUT, WalletConfig } from '../../config/StaticConfig';
 import {
+  RestakeTransactionUnsigned,
   TransactionUnsigned,
   DelegateTransactionUnsigned,
   AllDelegateTransactionsUnsigned,
@@ -189,6 +190,25 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
     return this.getSignedMessageTransaction([msgDelegate], transaction, keyPair, rawTx);
   }
 
+  public async signRestakeTx(
+    transaction: RestakeTransactionUnsigned,
+    phrase: string,
+    gasFee: string,
+    gasLimit: number,
+  ): Promise<string> {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
+
+    const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
+
+    const msgDelegate = new cro.staking.MsgDelegate({
+      delegatorAddress: transaction.delegatorAddress,
+      validatorAddress: transaction.validatorAddress,
+      amount: delegateAmount,
+    });
+
+    return this.getSignedMessageTransaction([msgDelegate], transaction, keyPair, rawTx);
+  }
+
   public async signAllDelegateTx(
     transaction: AllDelegateTransactionsUnsigned,
     phrase: string,
@@ -206,20 +226,15 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       });
     });
 
-    const msgRestakeAllRewards0 = transaction.validatorAddressList.map(validatorAddress => {
-      return new cro.staking.MsgDelegate({
-        delegatorAddress: transaction.delegatorAddress,
-        validatorAddress,
-        amount: delegateAmount,
-      });
-    });
+    // const msgRestakeAllRewards0 = transaction.validatorAddressList.map(validatorAddress => {
+    //   return new cro.staking.MsgDelegate({
+    //     delegatorAddress: transaction.delegatorAddress,
+    //     validatorAddress,
+    //     amount: delegateAmount,
+    //   });
+    // });
 
-    return this.getSignedMessageTransaction(
-      [...msgRestakeAllRewards, ...msgRestakeAllRewards0],
-      transaction,
-      keyPair,
-      rawTx,
-    );
+    return this.getSignedMessageTransaction(msgRestakeAllRewards, transaction, keyPair, rawTx);
   }
 
   public async signWithdrawStakingRewardTx(

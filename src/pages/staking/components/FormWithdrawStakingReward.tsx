@@ -267,7 +267,7 @@ export const FormWithdrawStakingReward = () => {
     }
   };
 
-  const onConfirmRestakeReward = async () => {
+  const onConfirmRestakeReward0 = async () => {
     const { walletType } = currentSession.wallet;
     if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
       setIsVisibleConfirmationModal(false);
@@ -360,6 +360,100 @@ export const FormWithdrawStakingReward = () => {
       console.error('Error occurred while transfer', e);
     }
   };
+
+  // const onConfirmRestakeReward = async () => {
+  //   const { walletType } = currentSession.wallet;
+  //   if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
+  //     setIsVisibleConfirmationModal(false);
+  //     return;
+  //   }
+  //   try {
+  //     setConfirmLoading(true);
+
+  //     const rewardWithdrawResult = await walletService.sendStakingRewardWithdrawalTx({
+  //       validatorAddress: withdrawValues.validatorAddress,
+  //       decryptedPhrase,
+  //       walletType,
+  //     });
+
+  //     if (rewardWithdrawResult.transactionHash) {
+  //       // Success - Reward withdraw transaction was successfully broadcasted
+
+  //       // withdrawValues.rewardAmount = '0.1 CRO'
+  //       const restakeRewardAmount = withdrawValues.rewardAmount.split(' ')[0];
+
+  //       if (!isNumeric(restakeRewardAmount)) {
+  //         setSuccessRestakeRewardModalMessage(
+  //           t('general.successModalPopup.restakeReward.description3'),
+  //         );
+  //       } else {
+  //         const restakeRewardResult = await walletService.sendDelegateTransaction({
+  //           validatorAddress: withdrawValues.validatorAddress,
+  //           amount: restakeRewardAmount,
+  //           asset: walletAsset,
+  //           memo: '',
+  //           decryptedPhrase,
+  //           walletType,
+  //         });
+
+  //         if (restakeRewardResult.transactionHash) {
+  //           // Success - Both Reward withdraw & restake transactions were successfully broadcasted
+  //           setBroadcastResult(restakeRewardResult);
+  //           setSuccessRestakeRewardModalMessage(
+  //             t('general.successModalPopup.restakeReward.description1'),
+  //           );
+  //         } else if (
+  //           rewardWithdrawResult?.code !== undefined &&
+  //           rewardWithdrawResult?.code !== null &&
+  //           rewardWithdrawResult.code === walletService.BROADCAST_TIMEOUT_CODE
+  //         ) {
+  //           // Timed Out - Restake transaction
+  //           setBroadcastResult(restakeRewardResult);
+  //           setSuccessRestakeRewardModalMessage(
+  //             t('general.successModalPopup.restakeReward.description2'),
+  //           );
+  //         } else {
+  //           // Failed - Restake transaction
+  //           setBroadcastResult(restakeRewardResult);
+  //           setSuccessRestakeRewardModalMessage(
+  //             t('general.successModalPopup.restakeReward.description3'),
+  //           );
+  //         }
+  //         setIsConfirmationRestakeModalVisible(false);
+  //         setConfirmLoading(false);
+  //         setIsSuccessRestakeRewardModalVisible(true);
+  //       }
+  //     } else if (
+  //       rewardWithdrawResult?.code !== undefined &&
+  //       rewardWithdrawResult?.code !== null &&
+  //       rewardWithdrawResult.code === walletService.BROADCAST_TIMEOUT_CODE
+  //     ) {
+  //       // Timed Out - Reward withdraw transaction
+  //       setBroadcastResult(rewardWithdrawResult);
+  //       setSuccessRestakeRewardModalMessage(
+  //         t('general.successModalPopup.restakeReward.description4'),
+  //       );
+  //       setIsConfirmationRestakeModalVisible(false);
+  //       setConfirmLoading(false);
+  //       setIsSuccessRestakeRewardModalVisible(true);
+  //     } else {
+  //       // Failed - Reward withdraw transaction
+  //       throw new Error(t('general.errorModalPopup.reward.description'));
+  //     }
+  //   } catch (e) {
+  //     if (walletType === LEDGER_WALLET_TYPE) {
+  //       setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
+  //     }
+
+  //     setErrorMessages(((e as unknown) as any).message.split(': '));
+  //     setIsConfirmationRestakeModalVisible(false);
+  //     setConfirmLoading(false);
+  //     setInputPasswordVisible(false);
+  //     setIsErrorTransferModalVisible(true);
+  //     // eslint-disable-next-line no-console
+  //     console.error('Error occurred while transfer', e);
+  //   }
+  // };
 
   const onConfirmRestakeAllRewards = async () => {
     const { walletType } = currentSession.wallet;
@@ -541,6 +635,7 @@ export const FormWithdrawStakingReward = () => {
                 rewardMarketPrice: record.rewardMarketPrice,
               });
               setRewardAction('restake');
+
               setTimeout(() => {
                 showPasswordInput('restake');
               }, 200);
@@ -719,7 +814,7 @@ export const FormWithdrawStakingReward = () => {
       <ModalPopup
         isModalVisible={isConfirmationRestakeModalVisible}
         handleCancel={handleCancelConfirmationRestakeModal}
-        handleOk={onConfirmRestakeReward}
+        handleOk={onConfirmRestakeReward0}
         confirmationLoading={confirmLoading}
         className="reward-modal"
         footer={[
@@ -727,7 +822,7 @@ export const FormWithdrawStakingReward = () => {
             key="submit"
             type="primary"
             loading={confirmLoading}
-            onClick={onConfirmRestakeReward}
+            onClick={onConfirmRestakeReward0}
           >
             {t('general.confirm')}
           </Button>,
