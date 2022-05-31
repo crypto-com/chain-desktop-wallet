@@ -19,7 +19,7 @@ export function getBaseScaledAmount(amount: string = '0', asset: UserAsset): str
 }
 
 /// E.G : From 5000 BASETRCRO to 0.00005 TCRO
-export function getNormalScaleAmount(amount: string = '0', asset: UserAsset): string {
+export function getNormalScaleAmount(amount: string = '0', asset: Pick<UserAsset, 'decimals'>): string {
   const exp = Big(10).pow(asset.decimals);
   return Big(amount)
     .div(exp)

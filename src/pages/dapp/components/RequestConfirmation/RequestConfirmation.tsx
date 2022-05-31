@@ -116,7 +116,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
               selectedChain.nativeCurrency.symbol
             }`}</div>
           </div>
-          <GasStepSelectEVMDApp asset={cronosAsset} gasLimit={new BigNumber(gasLimit.toString())} gasPrice={new BigNumber(gasPrice.toString())} onChange={(_gasLimit, _gasPrice) => {
+          <GasStepSelectEVMDApp config={selectedChain} gasLimit={new BigNumber(gasLimit.toString())} gasPrice={new BigNumber(gasPrice.toString())} onChange={(_gasLimit, _gasPrice) => {
             setGasLimit(ethers.BigNumber.from(_gasLimit.toString()))
             setGasPrice(ethers.BigNumber.from(_gasPrice.toString))
           }} />
@@ -187,7 +187,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
               selectedChain.nativeCurrency.symbol
             }`}</div>
           </div>
-          <GasStepSelectEVMDApp asset={cronosAsset} gasLimit={new BigNumber(gasLimit.toString())} gasPrice={new BigNumber(gasPrice.toString())} onChange={(_gasLimit, _gasPrice) => {
+          <GasStepSelectEVMDApp config={selectedChain} gasLimit={new BigNumber(gasLimit.toString())} gasPrice={new BigNumber(gasPrice.toString())} onChange={(_gasLimit, _gasPrice) => {
             setGasLimit(ethers.BigNumber.from(_gasLimit.toString()))
             setGasPrice(ethers.BigNumber.from(_gasPrice.toString))
           }} />
@@ -264,12 +264,6 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       );
 
       setSubMessage(`${dapp?.url ?? ''}`);
-      // const asset = getAssetBySymbolAndChain(
-      //   allAssets,
-      //   event.object.tokenData.symbol,
-      //   SupportedChainName.CRONOS,
-      // );
-      // setCurrentAsset(asset ?? cronosAsset);
     }
   }, [event, allAssets]);
 

@@ -13,24 +13,28 @@ import {
   EVM_MINIMUM_GAS_PRICE,
   SUPPORTED_CURRENCY,
 } from '../../../config/StaticConfig';
-import { getAssetAmountInFiat, UserAsset } from '../../../models/UserAsset';
+import { getAssetAmountInFiat } from '../../../models/UserAsset';
 import { getNormalScaleAmount } from '../../../utils/NumberUtils';
 import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
 import { useAnalytics } from '../../../hooks/useAnalytics';
+import { useBalance } from '../../../pages/dapp/hooks/useBalance';
+import { EVMChainConfig } from '../../../models/Chain';
 
 const ModalBody = (props: {
-  asset: UserAsset;
+  config: EVMChainConfig,
   gasPrice: BigNumber;
   gasLimit: BigNumber;
   onSuccess: (gasLimit: BigNumber, gasPrice: BigNumber) => void;
   onCancel: () => void;
 }) => {
-  const { asset, gasPrice, gasLimit, onSuccess, onCancel } = props;
+  const { config, gasPrice, gasLimit, onSuccess, onCancel } = props;
   const [t] = useTranslation();
+
+  const cronosEVMAsset = useCronosEvmAsset();
+  const { balance, isFetchingBalance } = useBalance(config.rpcUrls[0], cronosEVMAsset?.address ?? '')
 
   const [form] = Form.useForm();
 
-  const cronosEVMAsset = useCronosEvmAsset();
   const { analyticsService } = useAnalytics();
   const currentSession = getRecoil(sessionState);
   const allMarketData = getRecoil(allMarketState);
@@ -44,7 +48,7 @@ const ModalBody = (props: {
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
 
   const setNetworkFee = (newGasPrice: BigNumber, newGasLimit: BigNumber) => {
-    if (!cronosEVMAsset) {
+    if (!cronosEVMAsset || !balance) {
       return;
     }
 
@@ -59,39 +63,37 @@ const ModalBody = (props: {
 
     const amountBigNumber = newGasLimit.times(newGasPrice);
 
-    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset);
+    const amount = getNormalScaleAmount(amountBigNumber.toString(), { "decimals": config.nativeCurrency.decimals });
 
-    if (new BigNumber(cronosEVMAsset.balance).lte(amountBigNumber)) {
+    if ((new BigNumber(balance.toString()).lt(amountBigNumber))) {
       setValidateStatus('error');
     } else {
       setValidateStatus('');
     }
 
-    if (!(asset && localFiatSymbol && assetMarketData && assetMarketData.price)) {
-      setReadableNetworkFee(`${amount} ${asset.symbol}`);
+    const { symbol } = config.nativeCurrency;
+
+    if (!(localFiatSymbol && assetMarketData && assetMarketData.price)) {
+      setReadableNetworkFee(`${amount} ${symbol}`);
       return;
     }
     const price = numeral(getAssetAmountInFiat(amount, assetMarketData)).format('0,0.00');
 
     if (price === '0.00') {
-      setReadableNetworkFee(`${amount} ${asset.symbol} (<${localFiatSymbol}0.01)`);
+      setReadableNetworkFee(`${amount} ${symbol} (<${localFiatSymbol}0.01)`);
     } else {
-      setReadableNetworkFee(`${amount} ${asset.symbol} (~${localFiatSymbol}${price})`);
+      setReadableNetworkFee(`${amount} ${symbol} (~${localFiatSymbol}${price})`);
     }
   };
 
   useEffect(() => {
-    if (!asset) {
-      return;
-    }
-
     setNetworkFee(gasPrice, gasLimit);
 
     form.setFieldsValue({
       gasPrice,
       gasLimit,
     });
-  }, [asset, gasPrice, gasLimit]);
+  }, [config, gasPrice, gasLimit, balance]);
 
   if (!cronosEVMAsset) {
     return <React.Fragment />;
@@ -126,9 +128,6 @@ const ModalBody = (props: {
           }
         }}
         onFinish={async values => {
-          if (!asset.config) {
-            return;
-          }
 
           const {
             gasLimit: newGasLimit,
@@ -203,6 +202,7 @@ const ModalBody = (props: {
           <Button
             type="primary"
             htmlType="submit"
+            loading={isFetchingBalance}
             style={{ margin: '0 10px 0 0', width: '200px' }}
             disabled={!!validateStatus}
           >
@@ -223,7 +223,7 @@ const ModalBody = (props: {
   );
 };
 
-const useCustomGasModalEVMDApp = (asset: UserAsset, gasPrice: BigNumber, gasLimit: BigNumber) => {
+const useCustomGasModalEVMDApp = (config: EVMChainConfig, gasPrice: BigNumber, gasLimit: BigNumber) => {
   let modalRef;
 
   const [isShowing, setIsShowing] = useState(false);
@@ -262,7 +262,7 @@ const useCustomGasModalEVMDApp = (asset: UserAsset, gasPrice: BigNumber, gasLimi
       },
       content: (
         <ModalBody
-          asset={asset}
+          config={config}
           gasPrice={gasPrice}
           gasLimit={gasLimit}
           onSuccess={props.onSuccess}

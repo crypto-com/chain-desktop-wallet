@@ -6,7 +6,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../../config/StaticConfig';
-import { UserAsset } from '../../../models/UserAsset';
+import { EVMChainConfig } from '../../../models/Chain';
 import { getNormalScaleAmount } from '../../../utils/NumberUtils';
 import { useCustomGasModalEVMDApp } from './GasModalDApp';
 
@@ -37,20 +37,20 @@ const GasStep = (props: { isUsingCustomFee: boolean }) => {
 }
 
 const GasStepSelectEVMDApp = (props: {
-  asset?: UserAsset,
+  config: EVMChainConfig,
   gasLimit: BigNumber,
   gasPrice: BigNumber,
   onChange?: (gasLimit: BigNumber, gasPrice: BigNumber) => void,
 }) => {
 
-  const { asset } = props;
+  const { config } = props;
 
   const [t] = useTranslation();
   const [gasPrice, setGasPrice] = useState(props.gasPrice);
   const [gasLimit, setGasLimit] = useState(props.gasLimit);
   const [isUsingCustomGas, setIsUsingCustomGas] = useState(false)
 
-  const { show, dismiss } = useCustomGasModalEVMDApp(asset!, gasPrice, gasLimit);
+  const { show, dismiss } = useCustomGasModalEVMDApp(config, gasPrice, gasLimit);
 
   const [readableGasFee, setReadableGasFee] = useState('')
 
@@ -62,17 +62,14 @@ const GasStepSelectEVMDApp = (props: {
       setIsUsingCustomGas(false);
     }
 
-    const amount = numeral(getNormalScaleAmount(newGasPrice.times(newGasLimit).toString(), asset!)).format("0,0.0000");
+    const amount = numeral(getNormalScaleAmount(newGasPrice.times(newGasLimit).toString(), { decimals: config.nativeCurrency.decimals })).format("0,0.0000");
 
-    setReadableGasFee(`${amount} ${asset!.symbol}`);
+    setReadableGasFee(`${amount} ${config.nativeCurrency.symbol}`);
   }
 
   useEffect(() => {
-    if (!asset) {
-      return;
-    }
     updateFee(gasPrice, gasLimit);
-  }, [gasPrice, gasLimit]);
+  }, [config, gasPrice, gasLimit]);
 
   return <Form.Item label={
     <div style={{
