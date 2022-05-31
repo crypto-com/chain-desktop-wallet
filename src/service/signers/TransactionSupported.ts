@@ -59,6 +59,14 @@ export interface WithdrawStakingRewardUnsigned extends TransactionUnsigned {
   validatorAddress: string;
 }
 
+/**
+ *  Withdraw all staking rewards from same `delegatorAddress`
+ */
+export interface WithdrawAllStakingRewardsUnsigned extends TransactionUnsigned {
+  delegatorAddress: string;
+  validatorAddressList: string[];
+}
+
 export interface UndelegateTransactionUnsigned extends TransactionUnsigned {
   delegatorAddress: string;
   validatorAddress: string;
@@ -108,4 +116,13 @@ export interface EVMContractCallUnsigned {
   gasLimit: string;
   maxFeePerGas?: ethers.BigNumber;
   maxPriorityFeePerGas?: ethers.BigNumber;
+}
+
+export interface EVMNFTTransferUnsigned {
+  tokenId: string;
+  sender: string;
+  recipient: string;
+  nonce?: number;
+  gasPrice?: string;
+  gasLimit?: string;
 }

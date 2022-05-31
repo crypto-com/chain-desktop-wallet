@@ -14,7 +14,7 @@ import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
 import NoticeDisclaimer from '../../../components/NoticeDisclaimer/NoticeDisclaimer';
 import RowAmountOption from '../../../components/RowAmountOption/RowAmountOption';
-import { secretStoreService } from '../../../storage/SecretStoreService';
+import { secretStoreService } from '../../../service/storage/SecretStoreService';
 import {
   getAssetAmountInFiat,
   getAssetBalancePrice,
@@ -30,7 +30,6 @@ import {
   adjustedTransactionAmount,
   fromScientificNotation,
   getCurrentMinAssetAmount,
-  getNormalScaleAmount,
 } from '../../../utils/NumberUtils';
 import { FIXED_DEFAULT_FEE, SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
@@ -45,6 +44,8 @@ import { ledgerNotification } from '../../../components/LedgerNotification/Ledge
 import { AddressBookService } from '../../../service/AddressBookService';
 import { AddressBookContact } from '../../../models/AddressBook';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
+import GasStepSelect from '../../../components/GasCustomize/GasConfig';
+import GasInfo from '../../../components/GasCustomize/GasInfo';
 
 const layout = {};
 const tailLayout = {};
@@ -126,7 +127,8 @@ const FormSend: React.FC<FormSendProps> = props => {
   };
 
   const showPasswordInput = () => {
-    if (decryptedPhrase || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+    // TODO: check if decryptedPhrase expired
+    if ((decryptedPhrase && false) || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, walletAsset!);
       }
@@ -248,7 +250,7 @@ const FormSend: React.FC<FormSendProps> = props => {
   }, [walletAsset]);
 
   const assetMarketData = allMarketData.get(
-    `${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
+    `${currentSession?.activeAsset?.assetType}-${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
   );
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
 
@@ -337,6 +339,7 @@ const FormSend: React.FC<FormSendProps> = props => {
         </div>
       </div>
       <RowAmountOption walletAsset={walletAsset!} form={form} />
+      <GasStepSelect asset={walletAsset!} onChange={() => {}} />
       <Form.Item name="memo" label={t('send.formSend.memo.label')}>
         <Input />
       </Form.Item>
@@ -408,16 +411,7 @@ const FormSend: React.FC<FormSendProps> = props => {
                   : ''}
               </div>
             </div>
-            {walletAsset?.assetType === UserAssetType.TENDERMINT ? (
-              <div className="item">
-                <div className="label">{t('send.modal1.label4')}</div>
-                <div>{`~${getNormalScaleAmount(getTransactionFee(walletAsset!), walletAsset!)} ${
-                  walletAsset?.symbol
-                }`}</div>
-              </div>
-            ) : (
-              <></>
-            )}
+            <GasInfo asset={walletAsset!} />
             <div className="item">
               <div className="label">{t('send.modal1.label5')}</div>
               {formValues?.memo !== undefined &&
@@ -449,7 +443,6 @@ const FormSend: React.FC<FormSendProps> = props => {
           title={t('general.passwordFormModal.title')}
           visible={inputPasswordVisible}
           successButtonText={t('general.continue')}
-          confirmPassword={false}
         />
 
         <SuccessModalPopup

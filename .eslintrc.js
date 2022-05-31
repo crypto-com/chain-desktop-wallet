@@ -15,6 +15,8 @@ module.exports = {
     'no-extra-boolean-cast': 'off',
     'react/no-array-index-key': 'off',
     'no-plusplus': 'off',
+    '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/no-shadow': 'off',
     'react/prefer-stateless-function': 'off',
     'no-param-reassign': 'off', // used redux-immer for simplification
     'prefer-object-spread': 'off',
@@ -29,7 +31,9 @@ module.exports = {
     'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/*.spec.ts'] }],
     'react-hooks/rules-of-hooks': 'error',
     'import/no-unresolved': 'off',
+    'prefer-promise-reject-errors': 'off',
     'no-return-await': 'off',
+    'no-console': 'off',
     'react-hooks/exhaustive-deps': [
       'off',
       {

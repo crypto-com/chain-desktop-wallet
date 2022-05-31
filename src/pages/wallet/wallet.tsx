@@ -24,6 +24,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import IconLedger from '../../svg/IconLedger';
 import IconWallet from '../../svg/IconWallet';
+import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -56,6 +57,9 @@ function WalletPage() {
       const walletModel = {
         ...wallet,
         key: `${idx}`,
+        derivationPathStandard: wallet.derivationPathStandard
+          ? wallet.derivationPathStandard
+          : DerivationPathStandard.BIP44,
       };
       if (wallet.identifier !== session.wallet.identifier) {
         resultList.push(walletModel);
@@ -76,9 +80,6 @@ function WalletPage() {
       case DefaultWalletConfigs.TestNetConfig.name:
         networkColor = 'error';
         break;
-      case DefaultWalletConfigs.TestNetCroeseid3Config.name:
-        networkColor = 'error';
-        break;
       case DefaultWalletConfigs.TestNetCroeseid4Config.name:
         networkColor = 'warning';
         break;
@@ -93,6 +94,16 @@ function WalletPage() {
         {network}
       </Tag>
     );
+  };
+
+  const processDerivationPathStandard = (standard: DerivationPathStandard) => {
+    switch (standard) {
+      case DerivationPathStandard.LEDGER_LIVE:
+        return 'Ledger Live';
+      case DerivationPathStandard.BIP44:
+      default:
+        return 'BIP-44';
+    }
   };
 
   const onWalletSwitch = async e => {
@@ -172,6 +183,18 @@ function WalletPage() {
         },
       ],
       render: text => <Text type="success">{text}</Text>,
+    },
+    {
+      title: t('wallet.table1.derivationPathStandard'),
+      dataIndex: 'derivationPathStandard',
+      key: 'derivationPathStandard',
+      children: [
+        {
+          title: processDerivationPathStandard(session?.wallet.derivationPathStandard),
+          dataIndex: 'derivationPathStandard',
+          render: standard => processDerivationPathStandard(standard),
+        },
+      ],
     },
     {
       title: t('wallet.table1.addressIndex'),

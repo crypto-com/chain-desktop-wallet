@@ -1,5 +1,7 @@
 import Big from 'big.js';
-import { StorageService } from '../storage/StorageService';
+// import { ethers } from 'ethers';
+// import axios from 'axios';
+import { StorageService } from './storage/StorageService';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import {
   NOT_KNOWN_YET_VALUE,
@@ -7,10 +9,16 @@ import {
   VALIDATOR_UPTIME_THRESHOLD,
 } from '../config/StaticConfig';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
+import {
+  NftType,
+  CronosCRC721NftModelData,
+  CronosCRC721NftModel,
+  CryptoOrgNftModel,
+  CryptoOrgNftModelData,
+} from '../models/Nft';
 import { CronosClient } from './cronos/CronosClient';
 import {
   CommonTransactionRecord,
-  NftModel,
   NftQueryParams,
   NftTransferModel,
   ProposalModel,
@@ -27,8 +35,18 @@ import {
 import { Session } from '../models/Session';
 import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { croMarketPriceApi } from './rpc/MarketApi';
-import { isCRC20AssetWhitelisted } from '../utils/utils';
+import { CronosNftIndexingAPI } from './rpc/indexing/nft/cronos/CronosNftIndexingAPI';
+import {
+  checkIfTestnet,
+  getCronosEvmAsset,
+  isCRC20AssetWhitelisted,
+  isERC20AssetWhitelisted,
+} from '../utils/utils';
+import { getErc20IconUrlByContractAddress } from '../utils/ERC20IconUrl';
+
 import { SupportedCRCTokenStandard } from './rpc/interface/cronos.chainIndex';
+import { EVMClient } from './rpc/clients/EVMClient';
+import { EthClient } from './ethereum/EthClient';
 
 export class TransactionHistoryService {
   private storageService: StorageService;
@@ -225,131 +243,92 @@ export class TransactionHistoryService {
       });
   }
 
-  public async fetchAndSaveTransfers(currentSession: Session) {
-    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
+  // eslint-disable-next-line class-methods-use-this
+  public async fetchEVMTransferTxs(currentAsset: UserAsset, walletIdentifier: string) {
+    if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
+      return [];
+    }
 
-    await Promise.all(
-      assets.map(async currentAsset => {
-        const indexingUrl =
-          currentAsset?.config?.indexingUrl || currentSession.wallet.config.indexingUrl;
+    const defaultTxType = 'transfer';
 
-        switch (currentAsset.assetType) {
-          case UserAssetType.TENDERMINT:
-          case UserAssetType.IBC:
-          case undefined:
-            try {
-              const chainIndexAPI = ChainIndexingAPI.init(indexingUrl);
-              const transferTransactions = await chainIndexAPI.fetchAllTransferTransactions(
-                currentSession.wallet.config.network.coin.baseDenom,
-                currentAsset?.address || currentSession.wallet.address,
-                currentAsset,
-              );
+    if (currentAsset.symbol === 'ETH' && currentAsset.name.toLowerCase().includes('ethereum')) {
+      // For ETH Ecosystem
+      const ethClient = new EthClient(
+        currentAsset.config?.nodeUrl,
+        currentAsset.config?.indexingUrl,
+      );
 
-              this.saveTransfers({
-                transactions: transferTransactions,
-                walletId: currentSession.wallet.identifier,
-                assetId: currentAsset.identifier,
-              });
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.error('FAILED_TO_LOAD_TRANSFERS', e);
-            }
+      const txList = await ethClient.getTxsByAddress(currentAsset.address);
+      // const txList = await ethClient.getTxsByAddress('0xdac17f958d2ee523a2206206994597c13d831ec7');
 
-            break;
-          case UserAssetType.EVM:
-            try {
-              if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
-                return;
-              }
+      console.log('ETH', txList);
 
-              const cronosClient = new CronosClient(
-                currentAsset.config?.nodeUrl,
-                currentAsset.config?.indexingUrl,
-              );
+      const loadedTxList = txList.map(tx => {
+        const transferTx: TransferTransactionData = {
+          amount: tx.amount,
+          assetSymbol: currentAsset.symbol,
+          date: new Date(Number(tx.timestamp) * 1000).toISOString(),
+          hash: tx.transaction_hash,
+          memo: '',
+          receiverAddress: tx.to,
+          // Note: Assuming first address in the list to be from address
+          senderAddress: tx.from[0] === currentAsset.address ? tx.from[0] : currentAsset.address!,
+          status: tx.failed ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
+        };
 
-              const transactions = await cronosClient.getTxsByAddress(currentAsset.address);
-              const loadedTransactions = transactions.result.map(evmTx => {
-                const transactionTime = new Date(Number(evmTx.timeStamp) * 1000).toISOString();
+        const transferTxRecord: TransferTransactionRecord = {
+          walletId: walletIdentifier,
+          assetId: currentAsset.identifier,
+          assetType: currentAsset.assetType,
+          txHash: tx.transaction_hash,
+          txType: defaultTxType,
+          txData: transferTx,
+          // TODO: add messageTypeName
+        };
 
-                const transferTx: TransferTransactionData = {
-                  amount: evmTx.value,
-                  assetSymbol: currentAsset.symbol,
-                  date: transactionTime,
-                  hash: evmTx.hash,
-                  memo: '',
-                  receiverAddress: evmTx.to,
-                  senderAddress: evmTx.from,
-                  status:
-                    evmTx.isError === '1' ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
-                };
+        return transferTxRecord;
+      });
 
-                return transferTx;
-              });
+      // Return processed list here
+      return loadedTxList;
+    }
 
-              // eslint-disable-next-line no-console
-              console.log('Loaded transactions', transactions, loadedTransactions);
-
-              this.saveTransfers({
-                transactions: loadedTransactions,
-                walletId: currentSession.wallet.identifier,
-                assetId: currentAsset?.identifier,
-              });
-            } catch (e) {
-              // eslint-disable-next-line no-console
-              console.error(`FAILED_TO_LOAD_TRANSFERS - ${currentAsset.assetType}`, e);
-            }
-
-            break;
-          case UserAssetType.CRC_20_TOKEN:
-            {
-              if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
-                return;
-              }
-
-              const cronosClient = new CronosClient(
-                currentAsset.config?.nodeUrl,
-                currentAsset.config?.indexingUrl,
-              );
-
-              const transactionsResponse = await cronosClient.getTokenTransfersByAddress(
-                currentAsset.address,
-                { contractaddress: currentAsset.contractAddress },
-              );
-              const loadedTransactions = transactionsResponse.result.map(crc20TokenTx => {
-                const transactionTime = new Date(
-                  Number(crc20TokenTx.timeStamp) * 1000,
-                ).toISOString();
-
-                const transferTx: TransferTransactionData = {
-                  amount: crc20TokenTx.value,
-                  assetSymbol: currentAsset.symbol,
-                  date: transactionTime,
-                  hash: crc20TokenTx.hash,
-                  memo: '',
-                  receiverAddress: crc20TokenTx.to,
-                  senderAddress: crc20TokenTx.from,
-                  status: TransactionStatus.SUCCESS,
-                };
-
-                return transferTx;
-              });
-
-              // eslint-disable-next-line no-console
-              console.log(`LOADED_TXS ${currentAsset.symbol}: `, loadedTransactions);
-
-              this.saveTransfers({
-                transactions: loadedTransactions,
-                walletId: currentSession.wallet.identifier,
-                assetId: currentAsset?.identifier,
-              });
-            }
-            break;
-
-          default:
-            break;
-        }
-      }),
+    // NOTE: By default assuming a CRONOS EVM asset
+    // For Cronos EVM Ecosystem
+    const cronosClient = new CronosClient(
+      currentAsset.config?.nodeUrl,
+      currentAsset.config?.indexingUrl,
     );
+
+    const transactions = await cronosClient.getTxsByAddress(currentAsset.address);
+    const loadedTransactions = transactions.result.map(evmTx => {
+      const transactionTime = new Date(Number(evmTx.timeStamp) * 1000).toISOString();
+
+      const transferTx: TransferTransactionData = {
+        amount: evmTx.value,
+        assetSymbol: currentAsset.symbol,
+        date: transactionTime,
+        hash: evmTx.hash,
+        memo: '',
+        receiverAddress: evmTx.to,
+        senderAddress: evmTx.from,
+        status: evmTx.isError === '1' ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
+      };
+
+      const transferTxRecord: TransferTransactionRecord = {
+        walletId: walletIdentifier,
+        assetId: currentAsset.identifier,
+        assetType: currentAsset.assetType,
+        txHash: evmTx.hash,
+        txType: defaultTxType,
+        txData: transferTx,
+        // TODO: add messageTypeName
+      };
+
+      return transferTxRecord;
+    });
+
+    return loadedTransactions;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -387,42 +366,13 @@ export class TransactionHistoryService {
             return [];
           }
 
-          const cronosClient = new CronosClient(
-            currentAsset.config?.nodeUrl,
-            currentAsset.config?.indexingUrl,
+          const loadedTransactions = await this.fetchEVMTransferTxs(
+            currentAsset,
+            currentSession.wallet.identifier,
           );
 
-          const transactions = await cronosClient.getTxsByAddress(currentAsset.address);
-          const loadedTransactions = transactions.result.map(evmTx => {
-            const transactionTime = new Date(Number(evmTx.timeStamp) * 1000).toISOString();
-
-            const transferTx: TransferTransactionData = {
-              amount: evmTx.value,
-              assetSymbol: currentAsset.symbol,
-              date: transactionTime,
-              hash: evmTx.hash,
-              memo: '',
-              receiverAddress: evmTx.to,
-              senderAddress: evmTx.from,
-              status: evmTx.isError === '1' ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
-            };
-
-            const transferTxRecord: TransferTransactionRecord = {
-              walletId: currentSession.wallet.identifier,
-              assetId: currentAsset.identifier,
-              assetType: currentAsset.assetType,
-              txHash: evmTx.hash,
-              txType: defaultTxType,
-              txData: transferTx,
-              // TODO: add messageTypeName
-              // messageTypeName: 'transfer',
-            };
-
-            return transferTxRecord;
-          });
-
           // eslint-disable-next-line no-console
-          console.log('Loaded transactions', transactions, loadedTransactions);
+          console.log('Loaded transactions', loadedTransactions);
 
           return loadedTransactions;
         } catch (e) {
@@ -511,30 +461,52 @@ export class TransactionHistoryService {
 
   public async fetchAndSaveNFTs(currentSession: Session) {
     try {
-      const nfts = await this.loadAllCurrentAccountNFTs();
-      if (nfts === null) {
-        return;
+      const cryptoOrgNFTs = await this.loadAllCurrentAccountCryptoOrgNFTs();
+
+      const cronosCRC721NFTs = await this.fetchCurrentWalletCRC721Tokens();
+
+      if (cryptoOrgNFTs !== null) {
+        await this.storageService.saveCryptoOrgNFTs(
+          currentSession.wallet.identifier,
+          cryptoOrgNFTs,
+        );
       }
 
-      await this.storageService.saveNFTs({
-        walletId: currentSession.wallet.identifier,
-        nfts,
-      });
+      if (cronosCRC721NFTs !== null) {
+        await this.storageService.saveCronosCRC721NFTs(
+          currentSession.wallet.identifier,
+          cronosCRC721NFTs,
+        );
+      }
     } catch (e) {
       // eslint-disable-next-line no-console
       console.error('FAILED_TO_LOAD_SAVE_NFTS', e);
     }
   }
 
-  private async loadAllCurrentAccountNFTs(): Promise<NftModel[] | null> {
+  private async loadAllCurrentAccountCryptoOrgNFTs(): Promise<CryptoOrgNftModel[] | null> {
     try {
       const currentSession = await this.storageService.retrieveCurrentSession();
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
         return Promise.resolve([]);
       }
       const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
-      const nftList = await chainIndexAPI.getAccountNFTList(currentSession.wallet.address);
-      return await chainIndexAPI.getNftListMarketplaceData(nftList);
+      const cryptoOrgNftListResponse = await chainIndexAPI.getAccountNFTList(
+        currentSession.wallet.address,
+      );
+      const cryptoOrgNftListMarketplaceResponse: CryptoOrgNftModelData[] = await chainIndexAPI.getNftListMarketplaceData(
+        cryptoOrgNftListResponse,
+      );
+
+      const cryptoOrgNFTList: CryptoOrgNftModel[] = cryptoOrgNftListMarketplaceResponse.map(nft => {
+        return {
+          walletId: currentSession.wallet.identifier,
+          type: NftType.CRYPTO_ORG,
+          model: nft,
+        };
+      });
+
+      return cryptoOrgNFTList;
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING NFTs', e);
@@ -557,10 +529,7 @@ export class TransactionHistoryService {
 
     await Promise.all(
       assets.map(async (asset: UserAsset) => {
-        const assetPrice = await croMarketPriceApi.getAssetPrice(
-          asset.mainnetSymbol,
-          currentSession.currency,
-        );
+        const assetPrice = await croMarketPriceApi.getAssetPrice(asset, currentSession.currency);
         await this.storageService.saveAssetMarketPrice(assetPrice);
       }),
     );
@@ -693,6 +662,113 @@ export class TransactionHistoryService {
     return newlyLoadedTokens;
   }
 
+  public async fetchCRC721TokenTxs() {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
+    const croEvmAsset: UserAsset | undefined = getCronosEvmAsset(assets);
+
+    if (!croEvmAsset || !croEvmAsset.config?.nodeUrl || !croEvmAsset.address) {
+      return [];
+    }
+
+    const { address } = croEvmAsset;
+
+    const cronosNftIndexingClient = CronosNftIndexingAPI.init();
+
+    return cronosNftIndexingClient.getNftTxsList(address);
+  }
+
+  private async fetchCurrentWalletCRC721Tokens(): Promise<CronosCRC721NftModel[] | null> {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
+    const croEvmAsset: UserAsset | undefined = getCronosEvmAsset(assets);
+    const isTestnet = checkIfTestnet(currentSession.wallet.config.network);
+
+    if (!croEvmAsset || !croEvmAsset.config?.nodeUrl || !croEvmAsset.address || isTestnet) {
+      return [];
+    }
+
+    const { address } = croEvmAsset;
+
+    const cronosNftIndexingClient = CronosNftIndexingAPI.init();
+
+    const nftListResponse: CronosCRC721NftModelData[] = await cronosNftIndexingClient.getNftList(
+      address,
+    );
+
+    const nftList: CronosCRC721NftModel[] = nftListResponse.map(nft => {
+      return {
+        walletId: currentSession.wallet.identifier,
+        type: NftType.CRC_721_TOKEN,
+        model: nft,
+      };
+    });
+
+    return nftList;
+  }
+
+  private async fetchCurrentWalletERC20Tokens(ethEvmAsset: UserAsset, session: Session) {
+    const { address } = ethEvmAsset;
+
+    if (!address || !ethEvmAsset.config?.nodeUrl) {
+      return [];
+    }
+
+    const ethClient = new EthClient(ethEvmAsset.config?.nodeUrl, ethEvmAsset.config?.indexingUrl);
+
+    // const tokensListResponse = await ethClient.getTokensOwnedByAddress(address);
+    const tokensListResponse = await ethClient.getBalanceByAddress(address, {
+      token: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+    });
+    const newlyLoadedTokens = await tokensListResponse
+      // .filter(token => token.type === SupportedCRCTokenStandard.CRC_20_TOKEN)
+      .filter(token => token.balance > 0 && token.token_addr !== 'ETH')
+      .map(async token => {
+        const newERC20Token: UserAsset = {
+          balance: token.balance.toString(),
+          decimals: token.decimals,
+          contractAddress: token.token_addr,
+          description: `${token.token_name} (${token.token_symbol})`,
+          icon_url: getErc20IconUrlByContractAddress(token.token_addr),
+          identifier: `${token.token_name}_(${token.token_symbol})_${ethEvmAsset.walletId}`,
+          mainnetSymbol: token.token_symbol,
+          name: ethEvmAsset.name,
+          rewardsBalance: '',
+          stakedBalance: '',
+          symbol: token.token_symbol,
+          unbondingBalance: '',
+          walletId: ethEvmAsset.walletId,
+          isSecondaryAsset: true,
+          assetType: UserAssetType.ERC_20_TOKEN,
+          address: ethEvmAsset.address,
+          config: ethEvmAsset.config,
+          isWhitelisted: isERC20AssetWhitelisted(
+            token.token_symbol,
+            token.token_addr,
+            session.wallet.config,
+          ),
+        };
+
+        // eslint-disable-next-line no-console
+        console.log(`ERC_20_PERSISTED_TOKEN ${token.token_symbol}:`, {
+          address,
+          balance: token.balance,
+        });
+
+        await this.storageService.saveAsset(newERC20Token);
+        return newERC20Token;
+      });
+
+    // eslint-disable-next-line no-console
+    console.log('ERC_20_PERSISTED_TOKENS', {
+      address,
+      size: newlyLoadedTokens.length,
+      newlyLoadedTokens,
+    });
+
+    return newlyLoadedTokens;
+  }
+
   public async fetchTokensAndPersistBalances(session: Session | null = null) {
     const currentSession =
       session == null ? await this.storageService.retrieveCurrentSession() : session;
@@ -705,9 +781,13 @@ export class TransactionHistoryService {
       return;
     }
 
-    // Remove existing CRC20 tokens & refetch balances for all assets
-    const CRC20TokenList = assets.filter(asset => asset.assetType === UserAssetType.CRC_20_TOKEN);
-    await this.storageService.removeAssets(CRC20TokenList);
+    // Remove existing non-native tokens & refetch balances for all assets
+    const nonNativeTokenList = assets.filter(
+      asset =>
+        asset.assetType === UserAssetType.CRC_20_TOKEN ||
+        asset.assetType === UserAssetType.ERC_20_TOKEN,
+    );
+    await this.storageService.removeAssets(nonNativeTokenList);
 
     await Promise.all(
       assets.map(async asset => {
@@ -715,10 +795,15 @@ export class TransactionHistoryService {
           case UserAssetType.TENDERMINT:
             break;
           case UserAssetType.EVM:
-            await this.fetchCurrentWalletCRC20Tokens(asset, currentSession);
+            if (asset.name.includes('Cronos')) {
+              await this.fetchCurrentWalletCRC20Tokens(asset, currentSession);
+            }
+            if (asset.name.includes('Ethereum')) {
+              await this.fetchCurrentWalletERC20Tokens(asset, currentSession);
+            }
             break;
           default:
-            throw TypeError('Not supported yet');
+            break;
         }
       }),
     );
@@ -761,21 +846,39 @@ export class TransactionHistoryService {
               await this.storageService.saveAsset(asset);
               return;
             }
+            // if (asset.name.includes('Cronos')) {
             try {
-              const cronosClient = new CronosClient(
-                asset.config?.nodeUrl,
-                asset.config?.indexingUrl,
-              );
+              const evmClient = EVMClient.create(asset.config?.nodeUrl);
 
-              asset.balance = await cronosClient.getNativeBalanceByAddress(asset.address);
+              asset.balance = await evmClient.getNativeBalanceByAddress(asset.address);
               // eslint-disable-next-line no-console
-              console.log(`${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`);
+              console.log(
+                `${asset.name} ${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`,
+              );
             } catch (e) {
               // eslint-disable-next-line no-console
               console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
             } finally {
               await this.storageService.saveAsset(asset);
             }
+            // }
+            // if (asset.name.includes('Ethereum')) {
+            //   try {
+            //     const ethClient = new EthClient(asset.config?.nodeUrl, asset.config?.indexingUrl);
+            //     const tokensListResponse = await ethClient.getETHBalanceByAddress(asset.address);
+
+            //     asset.balance = tokensListResponse;
+            //     // eslint-disable-next-line no-console
+            //     console.log(
+            //       `${asset.name} ${asset.assetType} Loaded balance: ${asset.balance} - ${asset.address}`,
+            //     );
+            //   } catch (e) {
+            //     // eslint-disable-next-line no-console
+            //     console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
+            //   } finally {
+            //     await this.storageService.saveAsset(asset);
+            //   }
+            // }
             break;
 
           case UserAssetType.TENDERMINT:

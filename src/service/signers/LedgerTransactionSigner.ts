@@ -5,8 +5,6 @@ import Long from 'long';
 import { Big, Units, Secp256k1KeyPair } from '../../utils/ChainJsLib';
 import {
   DEFAULT_IBC_TRANSFER_TIMEOUT,
-  FIXED_DEFAULT_FEE,
-  FIXED_DEFAULT_GAS_LIMIT,
   WalletConfig,
 } from '../../config/StaticConfig';
 import {
@@ -21,10 +19,12 @@ import {
   NFTMintUnsigned,
   NFTDenomIssueUnsigned,
   BridgeTransactionUnsigned,
+  WithdrawAllStakingRewardsUnsigned,
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
 import { BaseTransactionSigner, ITransactionSigner } from './TransactionSigner';
 import { isNumeric } from '../../utils/utils';
+import { DerivationPathStandard } from './LedgerSigner';
 
 export class LedgerTransactionSigner extends BaseTransactionSigner implements ITransactionSigner {
   public readonly config: WalletConfig;
@@ -33,14 +33,17 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
 
   public readonly addressIndex: number;
 
-  constructor(config: WalletConfig, signerProvider: ISignerProvider, addressIndex: number) {
+  public readonly derivationPathStandard: DerivationPathStandard;
+
+  constructor(config: WalletConfig, signerProvider: ISignerProvider, addressIndex: number, derivationPathStandard: DerivationPathStandard) {
     super(config);
     this.config = config;
     this.signerProvider = signerProvider;
     this.addressIndex = addressIndex;
+    this.derivationPathStandard = derivationPathStandard;
   }
 
-  public getTransactionInfo(_phrase: string, transaction: TransactionUnsigned) {
+  public getTransactionInfo(_phrase: string, transaction: TransactionUnsigned, gasFee: string, gasLimit: number) {
     const cro = sdk.CroSDK({ network: this.config.network });
 
     const rawTx = new cro.RawTransaction();
@@ -53,23 +56,20 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     memo = memo.replace('>', '_');
     rawTx.setMemo(memo);
 
-    const networkFee =
-      this.config.fee !== undefined ? this.config.fee.networkFee : FIXED_DEFAULT_FEE;
-    const gasLimit =
-      this.config.fee !== undefined ? this.config.fee.gasLimit : FIXED_DEFAULT_GAS_LIMIT;
-
-    const fee = new cro.Coin(networkFee, Units.BASE);
+    const fee = new cro.Coin(gasFee, Units.BASE);
 
     rawTx.setFee(fee);
-    rawTx.setGasLimit(gasLimit);
+    rawTx.setGasLimit(gasLimit.toString());
     return { cro, rawTx, keyPair };
   }
 
   public async signTransfer(
     transaction: TransferTransactionUnsigned,
     phrase: string,
+    gasFee: string,
+    gasLimit: number,
   ): Promise<string> {
-    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
     const msgSend = new cro.bank.MsgSend({
       fromAddress: transaction.fromAddress,
@@ -77,14 +77,16 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    return this.getSignedMessageTransaction(transaction, msgSend, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgSend], rawTx);
   }
 
   public async signVoteTransaction(
     transaction: VoteTransactionUnsigned,
     phrase: string,
+    gasFee: string,
+    gasLimit: number,
   ): Promise<string> {
-    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
     const msgVote = new cro.gov.MsgVote({
       voter: transaction.voter,
@@ -92,14 +94,16 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       proposalId: Big(transaction.proposalID),
     });
 
-    return this.getSignedMessageTransaction(transaction, msgVote, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgVote], rawTx);
   }
 
   public async signDelegateTx(
     transaction: DelegateTransactionUnsigned,
     phrase: string,
+    gasFee: string,
+    gasLimit: number,
   ): Promise<string> {
-    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
     const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
     const msgDelegate = new cro.staking.MsgDelegate({
@@ -108,28 +112,58 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       amount: delegateAmount,
     });
 
-    return this.getSignedMessageTransaction(transaction, msgDelegate, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgDelegate], rawTx);
   }
 
   public async signWithdrawStakingRewardTx(
     transaction: WithdrawStakingRewardUnsigned,
     phrase: string,
+    gasFee: string,
+    gasLimit: number,
   ): Promise<string> {
-    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
     const msgWithdrawDelegatorReward = new cro.distribution.MsgWithdrawDelegatorReward({
       delegatorAddress: transaction.delegatorAddress,
       validatorAddress: transaction.validatorAddress,
     });
 
-    return this.getSignedMessageTransaction(transaction, msgWithdrawDelegatorReward, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgWithdrawDelegatorReward], rawTx);
+  }
+
+  /**
+   * 
+   * @param transaction 
+   * @param phrase 
+   * @param gasFee 
+   * @param gasLimit 
+   */
+  public async signWithdrawAllStakingRewardsTx(
+    transaction: WithdrawAllStakingRewardsUnsigned,
+    phrase: string,
+    gasFee: string,
+    gasLimit: number,
+  ): Promise<string> {
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
+
+    const msgWithdrawAllDelegatorRewards =
+      transaction.validatorAddressList.map(validatorAddress => {
+        return new cro.distribution.MsgWithdrawDelegatorReward({
+          delegatorAddress: transaction.delegatorAddress,
+          validatorAddress,
+        });
+      });
+
+    return this.getSignedMessageTransaction(transaction, msgWithdrawAllDelegatorRewards, rawTx);
   }
 
   public async signUndelegateTx(
     transaction: UndelegateTransactionUnsigned,
     phrase: string,
+    gasFee: string,
+    gasLimit: number,
   ): Promise<string> {
-    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
     const msgUndelegate = new cro.staking.MsgUndelegate({
       delegatorAddress: transaction.delegatorAddress,
@@ -137,14 +171,16 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    return this.getSignedMessageTransaction(transaction, msgUndelegate, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgUndelegate], rawTx);
   }
 
   public async signRedelegateTx(
     transaction: RedelegateTransactionUnsigned,
     phrase: string,
+    gasFee: string,
+    gasLimit: number,
   ): Promise<string> {
-    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction);
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
     const msgBeginRedelegate = new cro.staking.MsgBeginRedelegate({
       delegatorAddress: transaction.delegatorAddress,
@@ -153,11 +189,12 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       amount: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    return this.getSignedMessageTransaction(transaction, msgBeginRedelegate, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgBeginRedelegate], rawTx);
   }
 
-  async signNFTTransfer(transaction: NFTTransferUnsigned, decryptedPhrase: string) {
-    const { cro, rawTx } = this.getTransactionInfo(decryptedPhrase, transaction);
+  async signNFTTransfer(transaction: NFTTransferUnsigned, decryptedPhrase: string, gasFee: string,
+    gasLimit: number) {
+    const { cro, rawTx } = this.getTransactionInfo(decryptedPhrase, transaction, gasFee, gasLimit);
 
     const msgTransferNFT = new cro.nft.MsgTransferNFT({
       id: transaction.tokenId,
@@ -166,11 +203,12 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       recipient: transaction.recipient,
     });
 
-    return this.getSignedMessageTransaction(transaction, msgTransferNFT, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgTransferNFT], rawTx);
   }
 
-  async signNFTMint(transaction: NFTMintUnsigned, decryptedPhrase: string) {
-    const { cro, rawTx } = this.getTransactionInfo(decryptedPhrase, transaction);
+  async signNFTMint(transaction: NFTMintUnsigned, decryptedPhrase: string, gasFee: string,
+    gasLimit: number,) {
+    const { cro, rawTx } = this.getTransactionInfo(decryptedPhrase, transaction, gasFee, gasLimit);
 
     const msgMintNFT = new cro.nft.MsgMintNFT({
       id: transaction.tokenId,
@@ -182,11 +220,12 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       recipient: transaction.recipient,
     });
 
-    return this.getSignedMessageTransaction(transaction, msgMintNFT, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgMintNFT], rawTx);
   }
 
-  async signNFTDenomIssue(transaction: NFTDenomIssueUnsigned, decryptedPhrase: string) {
-    const { cro, rawTx } = this.getTransactionInfo(decryptedPhrase, transaction);
+  async signNFTDenomIssue(transaction: NFTDenomIssueUnsigned, decryptedPhrase: string, gasFee: string,
+    gasLimit: number) {
+    const { cro, rawTx } = this.getTransactionInfo(decryptedPhrase, transaction, gasFee, gasLimit);
 
     const msgIssueDenom = new cro.nft.MsgIssueDenom({
       id: transaction.denomId,
@@ -195,12 +234,12 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       schema: transaction.schema,
     });
 
-    return this.getSignedMessageTransaction(transaction, msgIssueDenom, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgIssueDenom], rawTx);
   }
 
-  async getSignedMessageTransaction(transaction: TransactionUnsigned, message: CosmosMsg, rawTx) {
+  async getSignedMessageTransaction(transaction: TransactionUnsigned, message: CosmosMsg[], rawTx) {
     const pubkeyoriginal = (
-      await this.signerProvider.getPubKey(this.addressIndex, false)
+      await this.signerProvider.getPubKey(this.addressIndex, this.derivationPathStandard, false)
     ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
     /* 
@@ -210,8 +249,12 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     SIGN_MODE_LEGACY_AMINO_JSON = 127,
     */
 
+    // Appending cosmos messages to raw transaction
+    message.forEach(msg => {
+      rawTx.appendMessage(msg);
+    });
+
     const signableTx = rawTx
-      .appendMessage(message)
       .addSigner({
         publicKey: pubkey,
         accountNumber: new Big(transaction.accountNumber),
@@ -237,8 +280,10 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
   public async signIBCTransfer(
     transaction: BridgeTransactionUnsigned,
     phrase: string,
+    gasFee: string,
+    gasLimit: number,
   ): Promise<string> {
-    const { cro, rawTx } = this.getTransactionInfoData(phrase, transaction.memo);
+    const { cro, rawTx } = this.getTransactionInfoData(phrase, transaction.memo, gasFee, gasLimit);
 
     const millisToNanoSecond = 1_000_000;
     const timeout = (Date.now() + DEFAULT_IBC_TRANSFER_TIMEOUT) * millisToNanoSecond;
@@ -267,6 +312,6 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       token: new cro.Coin(transaction.amount, Units.BASE),
     });
 
-    return this.getSignedMessageTransaction(transaction, msgSend, rawTx);
+    return this.getSignedMessageTransaction(transaction, [msgSend], rawTx);
   }
 }

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import logo from '../../assets/logo-products-chain.svg';
 import PasswordFormContainer from '../../components/PasswordForm/PasswordFormContainer';
 import { cryptographer } from '../../crypto/Cryptographer';
-import { secretStoreService } from '../../storage/SecretStoreService';
+import { secretStoreService } from '../../service/storage/SecretStoreService';
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
 import BackButton from '../../components/BackButton/BackButton';
 import { walletService } from '../../service/WalletService';

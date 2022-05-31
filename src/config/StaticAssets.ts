@@ -3,15 +3,20 @@ import { getRandomId } from '../crypto/RandomGen';
 import { AssetCreationType, UserAssetConfig, UserAssetType } from '../models/UserAsset';
 import { WalletConfig, SupportedChainName } from './StaticConfig';
 import { checkIfTestnet } from '../utils/utils';
+import iconETHSvg from '../assets/icon-eth.svg';
 import { ICON_CRO_EVM, ICON_CRO_TENDERMINT } from '../components/AssetIcon';
 
 // This will be used later for asset recreation/migration
-export const STATIC_ASSET_COUNT = 2;
+export const STATIC_ASSET_COUNT = 3;
 
 // Update Explorer Url - https://cronoscan.com
 export const MAINNET_EVM_EXPLORER_URL = 'https://cronoscan.com';
 // There's no testnet explorer on cronoscan.com. Use cronos.org/explorer instead.
 export const TESTNET_EVM_EXPLORER_URL = 'https://cronos.org/explorer/testnet3';
+
+export const MAINNET_ETHEREUM_EXPLORER_URL = 'https://etherscan.io';
+export const ROPSTEN_ETHEREUM_EXPLORER_URL = 'https://ropsten.etherscan.io';
+export const RINKEBY_ETHEREUM_EXPLORER_URL = 'https://rinkeby.etherscan.io';
 
 export const TestNetEvmConfig: UserAssetConfig = {
   explorer: {
@@ -97,6 +102,57 @@ export const CRONOS_EVM_ASSET = (walletConfig: WalletConfig) => {
     name: SupportedChainName.CRONOS,
     symbol: isTestnet ? 'TCRO' : 'CRO',
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
+    stakedBalance: '0',
+    unbondingBalance: '0',
+    rewardsBalance: '0',
+    decimals: 18,
+    assetType: UserAssetType.EVM,
+    isSecondaryAsset: true,
+    assetCreationType: AssetCreationType.STATIC,
+    config,
+  };
+};
+
+export const ETH_ASSET = (walletConfig: WalletConfig) => {
+  const { network } = walletConfig;
+
+  const isTestnet = checkIfTestnet(network);
+
+  const config: UserAssetConfig = {
+    explorer: {
+      tx: isTestnet ? `${RINKEBY_ETHEREUM_EXPLORER_URL}/tx` : `${MAINNET_ETHEREUM_EXPLORER_URL}/tx`,
+      address: isTestnet
+        ? `${RINKEBY_ETHEREUM_EXPLORER_URL}/address`
+        : `${MAINNET_ETHEREUM_EXPLORER_URL}/address`,
+    },
+    explorerUrl: isTestnet
+      ? `${RINKEBY_ETHEREUM_EXPLORER_URL}`
+      : `${MAINNET_ETHEREUM_EXPLORER_URL}`,
+
+    chainId: isTestnet ? '4' : '1',
+
+    fee: { gasLimit: `50000`, networkFee: `20000000000` },
+    // TODO: Change this to the production indexing url
+    indexingUrl: isTestnet
+      ? 'https://eth-indexing.3ona.co/ethereum/testnet/api/v1' // rinkeby
+      : 'https://eth-indexing.3ona.co/ethereum/mainnet/api/v1',
+    isLedgerSupportDisabled: false,
+    isStakingDisabled: false,
+    // TODO: Change this to the production node url
+    nodeUrl: isTestnet
+      ? 'https://cql.3ona.co/ethereum/rinkeby/rpc?apikey=anonymous'
+      : 'https://mainnet.infura.io/v3/8baf8ee1539c497ab4773d983c7367bf',
+    memoSupportDisabled: true,
+  };
+
+  return {
+    balance: '0',
+    description: '',
+    icon_url: iconETHSvg,
+    identifier: getRandomId(),
+    name: SupportedChainName.ETHEREUM,
+    symbol: 'ETH',
+    mainnetSymbol: 'ETH', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
     unbondingBalance: '0',
     rewardsBalance: '0',

@@ -4,10 +4,11 @@ import { TransactionSigner } from './signers/TransactionSigner';
 import { ISignerProvider } from './signers/SignerProvider';
 import { createLedgerDevice } from './LedgerService';
 import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
-import { StorageService } from '../storage/StorageService';
+import { StorageService } from './storage/StorageService';
 import { UserAsset } from '../models/UserAsset';
 import { CronosClient } from './cronos/CronosClient';
 import { PrepareEVMTransaction, TenderMintTransactionPrepared } from './Models';
+import { DerivationPathStandard } from './signers/LedgerSigner';
 
 export class TransactionPrepareService {
   public readonly storageService: StorageService;
@@ -47,6 +48,7 @@ export class TransactionPrepareService {
       tmpWalletConfig,
       signerProvider,
       currentWallet.addressIndex,
+      currentWallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
     );
     return {
       nodeRpc,

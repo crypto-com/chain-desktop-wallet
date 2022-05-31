@@ -1,12 +1,13 @@
 import 'mocha';
 import { expect } from 'chai';
-import { DefaultWalletConfigs } from '../config/StaticConfig';
-import { WalletCreateOptions, WalletCreator } from '../service/WalletCreator';
+import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import { WalletCreateOptions, WalletCreator } from '../WalletCreator';
 import { StorageService } from './StorageService';
-import { Session } from '../models/Session';
-import { SettingsDataUpdate, Wallet } from '../models/Wallet';
-import { getRandomId } from '../crypto/RandomGen';
-import { AssetMarketPrice, UserAsset } from '../models/UserAsset';
+import { Session } from '../../models/Session';
+import { SettingsDataUpdate, Wallet } from '../../models/Wallet';
+import { getRandomId } from '../../crypto/RandomGen';
+import { AssetMarketPrice, UserAsset, UserAssetType } from '../../models/UserAsset';
+import { DerivationPathStandard } from '../signers/LedgerSigner';
 
 jest.setTimeout(20_000);
 
@@ -18,6 +19,7 @@ function buildTestWallet(name?: string) {
     config: testNetConfig,
     walletName: name || 'My-TestNet-Wallet',
     addressIndex: 0,
+    derivationPathStandard: DerivationPathStandard.BIP44,
   };
   return new WalletCreator(createOptions).create().wallet;
 }
@@ -30,6 +32,7 @@ function buildMainnetWallet(name?: string) {
     config: mainNetConfig,
     walletName: name || 'My-Mainnet-Wallet',
     addressIndex: 0,
+    derivationPathStandard: DerivationPathStandard.BIP44,
   };
   return new WalletCreator(createOptions).create().wallet;
 }
@@ -236,7 +239,7 @@ describe('Testing Full Storage Service', () => {
 
     await mockWalletStore.saveAssetMarketPrice(assetMarketPrice);
 
-    const fetchedAsset = await mockWalletStore.retrieveAssetPrice('CRO', 'USD');
+    const fetchedAsset = await mockWalletStore.retrieveAssetPrice(UserAssetType.EVM, 'CRO', 'USD');
 
     expect(fetchedAsset.assetSymbol).to.eq('CRO');
     expect(fetchedAsset.currency).to.eq('USD');
@@ -248,7 +251,7 @@ describe('Testing Full Storage Service', () => {
 
     await mockWalletStore.saveAssetMarketPrice(fetchedAsset);
 
-    const updatedAsset = await mockWalletStore.retrieveAssetPrice('CRO', 'USD');
+    const updatedAsset = await mockWalletStore.retrieveAssetPrice(UserAssetType.EVM, 'CRO', 'USD');
 
     expect(updatedAsset.assetSymbol).to.eq('CRO');
     expect(updatedAsset.currency).to.eq('USD');

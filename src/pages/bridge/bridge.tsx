@@ -78,7 +78,7 @@ import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import BridgeTransactionHistory from './components/BridgeTransactionHistory';
 import CronosBridgeForm from './components/CronosBridgeForm';
-import { secretStoreService } from '../../storage/SecretStoreService';
+import { secretStoreService } from '../../service/storage/SecretStoreService';
 import { BridgeTransferRequest } from '../../service/TransactionRequestModels';
 import IconTransferHistory from '../../svg/IconTransferHistory';
 import { BridgeIcon, ICON_CRO_EVM } from '../../components/AssetIcon';
@@ -231,7 +231,8 @@ const CronosBridge = props => {
       ...form.getFieldsValue(),
     });
 
-    if (decryptedPhrase || session.wallet.walletType === LEDGER_WALLET_TYPE) {
+    // TODO: check if decryptedPhrase expired
+    if ((decryptedPhrase && false) || session.wallet.walletType === LEDGER_WALLET_TYPE) {
       const { tendermintAddress, evmAddress } = formValues;
       const { toAddress, isCustomToAddress } = form.getFieldsValue();
       let amount = form.getFieldValue('amount');
@@ -438,7 +439,7 @@ const CronosBridge = props => {
 
     if (isBridgeTransferSuccess) {
       try {
-        const callMaxCount = 3;
+        const callMaxCount = 6;
         const callTimeout = 6_000;
         const callInterval = 8_000;
         let callFailedCounts = 0;

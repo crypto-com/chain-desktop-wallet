@@ -4,21 +4,24 @@ import { AbiItem } from 'web3-utils';
 import { signTypedData_v4 } from 'eth-sig-util';
 import { ITransactionSigner } from './TransactionSigner';
 import TokenContractABI from './abi/TokenContractABI.json';
+import CRC721TokenContractABI from '../../contracts/CRC721.json';
 
 import {
   BridgeTransactionUnsigned,
   DelegateTransactionUnsigned,
   EVMContractCallUnsigned,
+  EVMNFTTransferUnsigned,
   TransferTransactionUnsigned,
   WithdrawStakingRewardUnsigned,
 } from './TransactionSupported';
-import { UserAssetType } from '../../models/UserAsset';
+import { UserAsset, UserAssetType } from '../../models/UserAsset';
 import { walletService } from '../WalletService';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../LedgerService';
 import { CronosClient } from '../cronos/CronosClient';
 import { EVMChainConfig } from '../../models/Chain';
 import { parseChainId } from '../evm/chainId';
 import { IERC20__factory } from '../../contracts';
+import { DerivationPathStandard } from './LedgerSigner';
 
 const DEFAULT_CHAIN_ID = 338;
 
@@ -71,9 +74,11 @@ class EvmTransactionSigner implements ITransactionSigner {
       const device = createLedgerDevice();
 
       const walletAddressIndex = currentSession.wallet.addressIndex;
+      const walletDerivationPathStandard = currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
 
       const signedTx = await device.signEthTx(
         walletAddressIndex,
+        walletDerivationPathStandard,
         chainId,
         transaction.nonce,
         transaction.gasLimit,
@@ -98,6 +103,7 @@ class EvmTransactionSigner implements ITransactionSigner {
       to: transaction.contractAddress,
       value: transaction.value ?? '0x0',
     }
+
     if (transaction.maxFeePerGas && transaction.maxPriorityFeePerGas) {
       txRequest.maxFeePerGas = transaction.maxFeePerGas;
       txRequest.maxPriorityFeePerGas = transaction.maxPriorityFeePerGas;
@@ -113,6 +119,23 @@ class EvmTransactionSigner implements ITransactionSigner {
     return Promise.resolve(signedTx.hash);
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  public async sendCall(
+    asset: UserAsset,
+    payload: ethers.providers.TransactionRequest,
+    jsonRpcUrl: string,
+  ): Promise<string> {
+    if (!asset.address || !asset.config?.nodeUrl) {
+      throw TypeError(`Missing asset config: ${asset.config}`);
+    }
+
+    const provider = new ethers.providers.JsonRpcProvider(jsonRpcUrl);
+
+    const response = await provider.call(payload);
+
+    return Promise.resolve(response);
+  }
+
   static async signPersonalMessage(message: string, passphrase = ''): Promise<string> {
     const currentSession = await walletService.retrieveCurrentSession();
 
@@ -120,8 +143,9 @@ class EvmTransactionSigner implements ITransactionSigner {
       const device = createLedgerDevice();
 
       const walletAddressIndex = currentSession.wallet.addressIndex;
+      const walletDerivationPathStandard = currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
 
-      return await device.signPersonalMessage(walletAddressIndex, message);
+      return await device.signPersonalMessage(walletAddressIndex, walletDerivationPathStandard, message);
     }
 
     const wallet = ethers.Wallet.fromMnemonic(passphrase);
@@ -136,8 +160,9 @@ class EvmTransactionSigner implements ITransactionSigner {
       const device = createLedgerDevice();
 
       const walletAddressIndex = currentSession.wallet.addressIndex;
+      const walletDerivationPathStandard = currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
 
-      return await device.signTypedDataV4(walletAddressIndex, message);
+      return await device.signTypedDataV4(walletAddressIndex, walletDerivationPathStandard, message);
     }
     const wallet = ethers.Wallet.fromMnemonic(passphrase);
     const bufferedKey = Buffer.from(wallet.privateKey.replace(/^(0x)/, ''), 'hex');
@@ -204,6 +229,33 @@ class EvmTransactionSigner implements ITransactionSigner {
 
     const IERC20 = IERC20__factory.createInterface()
     return IERC20.encodeFunctionData('approve', [spender, amount])
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public encodeNFTTransferABI(tokenContractAddress: string, transaction: EVMNFTTransferUnsigned) {
+    const web3 = new Web3('');
+    const contractABI = CRC721TokenContractABI.abi as AbiItem[];
+    const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
+    return contract.methods
+      .safeTransferFrom(transaction.sender, transaction.recipient, transaction.tokenId)
+      .encodeABI() as string;
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  public getNFTSafeTransferFromEstimatedGas(
+    asset: UserAsset,
+    tokenContractAddress: string,
+    transaction: EVMNFTTransferUnsigned,
+  ) {
+    if (!asset.config?.nodeUrl) {
+      throw new TypeError('Missing config Node URL');
+    }
+    const web3 = new Web3(asset.config.nodeUrl);
+    const contractABI = CRC721TokenContractABI.abi as AbiItem[];
+    const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
+    return contract.methods
+      .safeTransferFrom(transaction.sender, transaction.recipient, transaction.tokenId)
+      .estimateGas();
   }
 
   // eslint-disable-next-line class-methods-use-this

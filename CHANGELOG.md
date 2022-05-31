@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v0.8.0] - 2022-05-27
+### Additions
+- Enforce better password protection on transactions
+### Bug fixes
+- Gas Fee validation on invalid values
+## [v0.7.9] - 2022-05-20
+### Additions
+- Revoke Token Permission
+- Batch withdraw rewards
+## [v0.7.8] - 2022-05-13
+### Bug fixes
+- Handle Ledger Live standard support on EVM transaction signing functions
+- Incorrect Transaction Failed popup on Testnet due to delayed transaction receipt return
+- UX optimization
+## [v0.7.7] - 2022-05-10
+### Additions
+- Gas Fee option customization panel
+- Ledger Wallet creation UX enhancement
+- Support Ledger Live Derivation Path standard
+### Bug fixes
+- Stablize Market Price fetching
+## [v0.7.6] - 2022-04-20
+### Bug fixes
+- Measures on preventing potential Phishing Attack on DApp Browser
+## [v0.7.5] - 2022-04-14
+### Additions
+- Cronos NFT support
+- Password protection on Address Book
+### Bug fixes
+- Restart & purge local storage automatically after 10 incorrect password attempts
 ## [v0.7.4] - 2022-03-25
 ### Additions
 - Duration selection for Auto Update disable

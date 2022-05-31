@@ -24,8 +24,9 @@ export class IpcMain {
       try {
         let index = arg.index;
         let addressPrefix = arg.addressPrefix;
+        let derivationPathStandard = arg.derivationPathStandard;
         let showLedgerDisplay = arg.showLedgerDisplay;
-        const info = await this.provider.enable(index, addressPrefix, showLedgerDisplay);
+        const info = await this.provider.enable(index, addressPrefix, derivationPathStandard, showLedgerDisplay);
         let accountInfo = info[0];
         let accountPubKey = info[1].toUint8Array();
         ret = {
@@ -40,6 +41,31 @@ export class IpcMain {
           error: e.toString(),
         };
         console.error('enableWallet error ' + e);
+      } finally {
+      }
+
+      event.returnValue = ret;
+    });
+
+    ipcMain.on('getAddressList', async (event: any, arg: any) => {
+      let ret = {};
+      try {
+        let startIndex = arg.startIndex;
+        let gap = arg.gap;
+        let addressPrefix = arg.addressPrefix;
+        let derivationPathStandard = arg.derivationPathStandard;
+        const addressList = await this.provider.getAddressList(startIndex, gap, addressPrefix, derivationPathStandard);
+        ret = {
+          success: true,
+          addressList: addressList,
+          label: 'getAddressList reply',
+        };
+      } catch (e) {
+        ret = {
+          success: false,
+          error: e.toString(),
+        };
+        console.error('getAddressList error ' + e);
       } finally {
       }
 
@@ -101,6 +127,7 @@ export class IpcMain {
       try {
         const signedtx = await this.ethProvider.signTx(
           arg.index,
+          arg.standard,
           arg.chainId,
           arg.nonce,
           arg.gasLimit,
@@ -127,7 +154,7 @@ export class IpcMain {
     ipcMain.on('ethGetAddress', async (event: any, arg: any) => {
       let ret = {};
       try {
-        const address = await this.ethProvider.getAddress(arg.index, arg.display);
+        const address = await this.ethProvider.getAddress(arg.index, arg.standard, arg.display);
         ret = {
           address,
           success: true,
@@ -142,12 +169,30 @@ export class IpcMain {
       }
       event.returnValue = ret;
     });
+    ipcMain.on('ethGetAddressList', async (event: any, arg: any) => {
+      let ret = {};
+      try {
+        const addressList = await this.ethProvider.getAddressList(arg.startIndex, arg.gap, arg.standard);
+        ret = {
+          addressList,
+          success: true,
+          label: 'ethGetAddressList reply',
+        };
+      } catch (e) {
+        ret = {
+          success: false,
+          error: e.toString(),
+        };
+        console.error('ethGetAddressList error ' + e);
+      }
+      event.returnValue = ret;
+    });
     ipcMain.on('ethSignPersonalMessage', async (event: any, arg: any) => {
       let ret = {};
-      console.log('ethSignPersonalMessage, ', arg.message, ' . ', arg.index);
+      console.log('ethSignPersonalMessage, ', arg.message, ' . ', arg.index, ' . ', arg.standard);
 
       try {
-        const sig = await this.ethProvider.signPersonalMessage(arg.message, arg.index);
+        const sig = await this.ethProvider.signPersonalMessage(arg.message, arg.index, arg.standard);
         ret = {
           sig,
           success: true,
@@ -166,7 +211,7 @@ export class IpcMain {
     ipcMain.on('ethSignTypedDataV4', async (event: any, arg: any) => {
       let ret = {};
       try {
-        const sig = await this.ethProvider.signTypedDataV4(arg.typedData, arg.index);
+        const sig = await this.ethProvider.signTypedDataV4(arg.typedData, arg.index, arg.standard);
         ret = {
           sig,
           success: true,

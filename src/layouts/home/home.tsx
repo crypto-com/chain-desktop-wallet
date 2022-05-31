@@ -71,9 +71,9 @@ import {
   MAX_INCORRECT_ATTEMPTS_ALLOWED,
   SHOW_WARNING_INCORRECT_ATTEMPTS,
 } from '../../config/StaticConfig';
-import { generalConfigService } from '../../storage/GeneralConfigService';
+import { generalConfigService } from '../../service/storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { secretStoreService } from '../../storage/SecretStoreService';
+import { secretStoreService } from '../../service/storage/SecretStoreService';
 import SessionLockModal from '../../components/PasswordForm/SessionLockModal';
 import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup';
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
@@ -88,6 +88,7 @@ import {
   DefaultTestnetBridgeConfigs,
 } from '../../service/bridge/BridgeConfig';
 import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
+import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
 
 // import i18n from '../../language/I18n';
 
@@ -283,6 +284,7 @@ function HomeLayout(props: HomeLayoutProps) {
       const tendermintAddress = await device.getAddress(
         walletSession.wallet.addressIndex,
         walletSession.wallet.config.network.addressPrefix,
+        walletSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
         false,
       );
 
@@ -329,7 +331,11 @@ function HomeLayout(props: HomeLayoutProps) {
     try {
       const device: ISignerProvider = createLedgerDevice();
 
-      ledgerEvmAddress = await device.getEthAddress(walletSession.wallet.addressIndex, false);
+      ledgerEvmAddress = await device.getEthAddress(
+        walletSession.wallet.addressIndex,
+        walletSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
+        false,
+      );
       setIsLedgerEthAppConnected(true);
 
       await new Promise(resolve => {
@@ -650,6 +656,7 @@ function HomeLayout(props: HomeLayoutProps) {
       const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
       const allWalletsData = await walletService.retrieveAllWallets();
       const currentMarketData = await walletService.retrieveAssetPrice(
+        currentAsset?.assetType,
         currentAsset?.mainnetSymbol,
         currentSession.currency,
       );
@@ -692,10 +699,10 @@ function HomeLayout(props: HomeLayoutProps) {
       const currentValidatorList = await walletService.retrieveTopValidators(
         currentSession.wallet.config.network.chainId,
       );
-      const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
+      const currentNftLists = await walletService.retrieveNFTs(currentSession.wallet.identifier);
 
       setValidatorList(currentValidatorList);
-      setNftList(currentNftList);
+      setNftList(currentNftLists);
 
       setFetchingDB(false);
 
@@ -889,8 +896,6 @@ function HomeLayout(props: HomeLayoutProps) {
         title={t('general.passwordFormModal.title')}
         visible={inputPasswordVisible}
         successButtonText={t('general.continue')}
-        confirmPassword={false}
-        repeatValidation
       />
 
       <SessionLockModal
@@ -928,11 +933,12 @@ function HomeLayout(props: HomeLayoutProps) {
 
             // Deleting local storage
             if (latestIncorrectAttemptCount >= MAX_INCORRECT_ATTEMPTS_ALLOWED) {
-              indexedDB.deleteDatabase('NeDB');
-              setTimeout(() => {
-                history.replace('/');
-                history.go(0);
-              }, 3000);
+              const deleteDBRequest = indexedDB.deleteDatabase('NeDB');
+              deleteDBRequest.onsuccess = () => {
+                setTimeout(() => {
+                  ipcRenderer.send('restart_app');
+                }, 3000);
+              };
             }
 
             // Show warning after `X` number of wrong attempts
@@ -958,8 +964,6 @@ function HomeLayout(props: HomeLayoutProps) {
         title={t('general.sessionLockModal.title')}
         visible={isSessionLockModalVisible}
         successButtonText={t('general.continue')}
-        confirmPassword={false}
-        repeatValidation
       />
 
       <Layout>

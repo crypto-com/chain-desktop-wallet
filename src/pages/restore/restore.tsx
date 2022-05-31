@@ -15,10 +15,11 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import BackButton from '../../components/BackButton/BackButton';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-import { secretStoreService } from '../../storage/SecretStoreService';
+import { secretStoreService } from '../../service/storage/SecretStoreService';
 import { Session } from '../../models/Session';
 import { NORMAL_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
 
 const layout = {
   // labelCol: { span: 8 },
@@ -338,6 +339,7 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
       config: selectedNetworkConfig,
       walletType: NORMAL_WALLET_TYPE,
       addressIndex: 0, // this is for ledger, dummy value
+      derivationPathStandard: DerivationPathStandard.BIP44,
     };
     try {
       const restoreResult = await walletService.restoreWallet(importOptions);
@@ -454,7 +456,6 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
         title={t('general.passwordFormModal.title')}
         visible={inputPasswordVisible}
         successButtonText={t('general.passwordFormModal.restoreWallet.successButton')}
-        confirmPassword={false}
       />
       <ErrorModalPopup
         isModalVisible={isErrorModalVisible}

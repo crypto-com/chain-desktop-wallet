@@ -6,14 +6,18 @@ export enum SettingsKey {
   DappBookmarks = 'dapp_book_marks',
   DappDisclaimerDisabledList = 'dapp_disclaimer_disabled_list',
   DappChainConfigs = 'dapp_chain_configs',
-  DappSelectedChain = 'dapp_selected_chain'
+  DappSelectedChain = 'dapp_selected_chain',
+  CROGasStep = 'cro_gas_step',
 }
+
+export type CROGasStep = 'low' | 'average' | 'high'
 
 export const DefaultSettings = {
   [SettingsKey.DappBookmarks]: [] as Bookmark[],
   [SettingsKey.DappDisclaimerDisabledList]: [] as string[],
   [SettingsKey.DappChainConfigs]: DAppDefaultChainConfigs,
   [SettingsKey.DappSelectedChain]: DAppDefaultChainConfigs[0],
+  [SettingsKey.CROGasStep]: 'average' as CROGasStep,
 };
 
 export const getLocalSetting = <T>(key: SettingsKey): T => {

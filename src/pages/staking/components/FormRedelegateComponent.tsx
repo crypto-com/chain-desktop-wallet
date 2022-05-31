@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRecoilValue } from 'recoil';
 import { FormInstance } from 'antd/lib/form';
 import { Form, InputNumber, Alert, Input } from 'antd';
@@ -13,10 +13,11 @@ import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { UNBLOCKING_PERIOD_IN_DAYS } from '../../../config/StaticConfig';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 import ValidatorListTable from './ValidatorListTable';
+import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasConfig';
 
 const { Search } = Input;
 
-const RedelegateFormComponent = (props: {
+export const FormRedelegateComponent = (props: {
   currentSession: Session;
   walletAsset: UserAsset;
   moderationConfig: ModerationConfig;
@@ -27,6 +28,8 @@ const RedelegateFormComponent = (props: {
   };
   form: FormInstance;
 }) => {
+  useEffect(() => props.form.resetFields(), [props]);
+
   const currentValidatorList = useRecoilValue(validatorListState);
   const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
   const [t] = useTranslation();
@@ -138,6 +141,7 @@ const RedelegateFormComponent = (props: {
           </Form.Item>
         </Form>
       </div>
+      <GasInfoTendermint />
       <div>
         <Alert
           type="info"
@@ -150,5 +154,3 @@ const RedelegateFormComponent = (props: {
     </div>
   );
 };
-
-export default RedelegateFormComponent;

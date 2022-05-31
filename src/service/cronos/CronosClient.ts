@@ -1,13 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import axios, { AxiosResponse } from 'axios';
+import { Log } from '@ethersproject/abstract-provider';
 import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 import { EVMClient } from '../rpc/clients/EVMClient';
-import {
-  ICronosChainIndexAPI,
-  txListRequestOptions,
-  queryPaginationOptions,
-  tokenTransfersRequestOptions,
-} from '../rpc/interface/cronos.chainIndex';
 import {
   TxListAPIResponse,
   txListByAccountRequestParams,
@@ -18,7 +13,16 @@ import {
   tokenTransfersRequestParams,
   tokensOwnedByAddressRequestParams,
   TokensOwnedByAddressResponse,
+  EventLogResponse,
+  ContractSourceCodeResponse,
+  TokenBalanceResponse,
 } from '../rpc/models/cronos.models';
+import {
+  ICronosChainIndexAPI,
+  txListRequestOptions,
+  queryPaginationOptions,
+  tokenTransfersRequestOptions,
+} from '../rpc/interface/cronos.chainIndex';
 
 /**
  * name: CronosClient
@@ -59,7 +63,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
     const txListResponse: AxiosResponse<TxListAPIResponse> = await axios({
       baseURL: this.cronosExplorerAPIBaseURL,
-      url: '/api',
+      url: '',
       params: requestParams,
     });
 
@@ -82,7 +86,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
     const txListResponse: AxiosResponse<PendingTxListAPIResponse> = await axios({
       baseURL: this.cronosExplorerAPIBaseURL,
-      url: '/api',
+      url: '',
       params: requestParams,
     });
 
@@ -105,7 +109,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
     const txListResponse: AxiosResponse<TokenTransferEventLogsResponse> = await axios({
       baseURL: this.cronosExplorerAPIBaseURL,
-      url: '/api',
+      url: '',
       params: requestParams,
     });
 
@@ -124,7 +128,7 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
     const txListResponse: AxiosResponse<TokensOwnedByAddressResponse> = await axios({
       baseURL: this.cronosExplorerAPIBaseURL,
-      url: '/api',
+      url: '',
       params: requestParams,
     });
 
@@ -143,19 +147,85 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
 
     const txListResponse: AxiosResponse<ContractDataResponse> = await axios({
       baseURL: this.cronosExplorerAPIBaseURL,
-      url: '/api',
+      url: '',
       params: requestParams,
     });
 
     if (txListResponse.status !== 200) {
-      throw new Error('Could not fetch token owned by user address from Cronos Chain Index API.');
+      throw new Error('Could not fetch from Cronos Chain Index API.');
     }
     return txListResponse.data;
+  }
+
+  async getTokenBalanceByAddress(token: string, address: string) {
+    const requestParams = {
+      module: 'account',
+      action: 'tokenbalance',
+      contractaddress: token,
+      address,
+    };
+
+    const response: AxiosResponse<TokenBalanceResponse> = await axios({
+      baseURL: this.cronosExplorerAPIBaseURL,
+      url: '',
+      params: requestParams,
+    });
+
+    if (response.status !== 200) {
+      throw new Error('Could not fetch from Cronos Chain Index API.');
+    }
+    return response.data;
+  }
+
+  async getContractSourceCodeByAddress(address: string) {
+    const requestParams = {
+      module: 'contract',
+      action: 'getsourcecode',
+      address,
+    };
+
+    const response: AxiosResponse<ContractSourceCodeResponse> = await axios({
+      baseURL: this.cronosExplorerAPIBaseURL,
+      url: '',
+      params: requestParams,
+    });
+
+    if (response.status !== 200) {
+      throw new Error('Could not fetch from Cronos Chain Index API.');
+    }
+    return response.data;
   }
 
   static getTokenIconUrlBySymbol(symbol: string): string {
     const tokenInfo = CRC20MainnetTokenInfos.get(symbol.toUpperCase());
 
     return tokenInfo?.iconURL ?? '';
+  }
+
+  async getEventLogByAddress(args: {
+    fromBlock: number;
+    toBlock: number | 'latest';
+    address?: string;
+    topics?: Object;
+  }): Promise<Log[]> {
+    const requestParams = {
+      module: 'logs',
+      action: 'getLogs',
+      fromBlock: args.fromBlock,
+      toBlock: args.toBlock,
+      address: args.address,
+      ...args.topics,
+    };
+
+    const response: AxiosResponse<EventLogResponse> = await axios({
+      baseURL: this.cronosExplorerAPIBaseURL,
+      url: '',
+      params: requestParams,
+    });
+
+    if (response.status !== 200) {
+      throw new Error('Could not fetch token owned by user address from Cronos Chain Index API.');
+    }
+    return response.data.result;
   }
 }

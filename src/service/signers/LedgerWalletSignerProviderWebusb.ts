@@ -1,6 +1,7 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { ISignerProvider } from './SignerProvider';
 import { LedgerSignerWebusb } from './LedgerSignerWebusb';
+import { DerivationPathStandard } from './LedgerSigner';
 
 export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
   provider: LedgerSignerWebusb;
@@ -9,18 +10,29 @@ export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
     this.provider = new LedgerSignerWebusb();
   }
 
-  public async getPubKey(index: number, showLedgerDisplay: boolean): Promise<Bytes> {
-    const result = await this.provider.enable(index, 'cro', showLedgerDisplay); // dummy value
+  public async getPubKey(index: number, derivationPathStandard: DerivationPathStandard, showLedgerDisplay: boolean): Promise<Bytes> {
+    const result = await this.provider.enable(index, 'cro', derivationPathStandard, showLedgerDisplay); // dummy value
     return result[1];
   }
 
   public async getAddress(
     index: number,
     addressPrefix: string,
+    derivationPathStandard: DerivationPathStandard,
     showLedgerDisplay: boolean,
   ): Promise<string> {
-    const result = await this.provider.enable(index, addressPrefix, showLedgerDisplay);
+    const result = await this.provider.enable(index, addressPrefix, derivationPathStandard, showLedgerDisplay);
     return result[0];
+  }
+
+  public async getAddressList(
+    startIndex: number,
+    gap: number,
+    addressPrefix: string,
+    derivationPathStandard: DerivationPathStandard,
+  ): Promise<string[]> {
+    const result = await this.provider.getAddressList(startIndex, gap, addressPrefix, derivationPathStandard);
+    return result;
   }
 
   public async sign(message: Bytes): Promise<Bytes> {
@@ -31,6 +43,8 @@ export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
   public async signEthTx(
     // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     index: number,
+    // eslint-disable-next-line  @typescript-eslint/no-unused-vars
+    standard: DerivationPathStandard,
     // eslint-disable-next-line  @typescript-eslint/no-unused-vars
     chainId: number,
     // eslint-disable-next-line  @typescript-eslint/no-unused-vars
@@ -50,17 +64,22 @@ export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
   }
 
   // eslint-disable-next-line  class-methods-use-this, @typescript-eslint/no-unused-vars
-  public async getEthAddress(_index: number, _display: boolean): Promise<string> {
+  public async getEthAddress(_index: number, _standard: DerivationPathStandard, _display: boolean): Promise<string> {
     return '';
   }
 
   // eslint-disable-next-line  class-methods-use-this, @typescript-eslint/no-unused-vars
-  public async signPersonalMessage(index: number, message: string): Promise<string> {
+  public async getEthAddressList(_startIndex: number, _gap: number, _standard: DerivationPathStandard): Promise<string[]> {
+    return [];
+  }
+
+  // eslint-disable-next-line  class-methods-use-this, @typescript-eslint/no-unused-vars
+  public async signPersonalMessage(index: number, standard: DerivationPathStandard, message: string): Promise<string> {
     throw new Error('not implemented');
   }
 
   // eslint-disable-next-line  class-methods-use-this, @typescript-eslint/no-unused-vars
-  public async signTypedDataV4(index: number, typedData: string): Promise<string> {
+  public async signTypedDataV4(index: number, standard: DerivationPathStandard, typedData: string): Promise<string> {
     throw new Error('not implemented');
   }
 }
