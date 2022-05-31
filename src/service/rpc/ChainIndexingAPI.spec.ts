@@ -249,6 +249,58 @@ describe('Testing ChainIndexingApi', () => {
       }),
     );
   });
+  it('should return MsgVote transaction messages for an account', async () => {
+    const nodeRpcService = ChainIndexingAPI.init('https://crypto.org/explorer/croeseid4/api/v1');
+    moxios.wait(() => {
+      const accountInfoReq = moxios.requests.first(
+      );
+
+      accountInfoReq.respondWith({
+        status: 200,
+        response: {
+          result: [
+            {
+              "account": "tcro1ydyw9gzstgk9atua4w3zrkplq67t85hnfhw8ku",
+              "blockHeight": 2577466,
+              "blockHash": "DDF898FFCA28A88C7CCC1639C41DB57F00603474E576C1EB5D53CBBEA0178730",
+              "blockTime": "2022-01-21T05:13:03.12597736Z",
+              "transactionHash": "10665C12CAC865CE4AD3E087C4A5206E7B5C22801139952D275BABCD9BE51526",
+              "success": true,
+              "messageIndex": 0,
+              "messageType": "MsgVote",
+              "data": {
+                "uuid": "8a01e039-f0f4-4172-bdd5-fd4716bb1d42",
+                "voter": "tcro1ydyw9gzstgk9atua4w3zrkplq67t85hnfhw8ku",
+                "msgName": "MsgVote",
+                "version": 1,
+                "name": "MsgVoteCreated",
+                "height": 2577466,
+                "option": "VOTE_OPTION_ABSTAIN",
+                "txHash": "10665C12CAC865CE4AD3E087C4A5206E7B5C22801139952D275BABCD9BE51526",
+                "msgIndex": 0,
+                "proposalId": "509"
+              }
+            }
+          ],
+          pagination: {
+            total_record: 1,
+            total_page: 1,
+            current_page: 1,
+            limit: 1,
+          },
+        },
+      });
+    });
+
+    expect(
+      JSON.stringify(
+        await nodeRpcService.fetchAccountVotingHistory(
+          'tcro1ydyw9gzstgk9atua4w3zrkplq67t85hnfhw8ku'
+        )
+      )).to.equal(
+        JSON.stringify([{ "account": "tcro1ydyw9gzstgk9atua4w3zrkplq67t85hnfhw8ku", "blockHeight": 2577466, "blockHash": "DDF898FFCA28A88C7CCC1639C41DB57F00603474E576C1EB5D53CBBEA0178730", "blockTime": "2022-01-21T05:13:03.12597736Z", "transactionHash": "10665C12CAC865CE4AD3E087C4A5206E7B5C22801139952D275BABCD9BE51526", "success": true, "messageIndex": 0, "messageType": "MsgVote", "data": { "uuid": "8a01e039-f0f4-4172-bdd5-fd4716bb1d42", "voter": "tcro1ydyw9gzstgk9atua4w3zrkplq67t85hnfhw8ku", "msgName": "MsgVote", "version": 1, "name": "MsgVoteCreated", "height": 2577466, "option": "VOTE_OPTION_ABSTAIN", "txHash": "10665C12CAC865CE4AD3E087C4A5206E7B5C22801139952D275BABCD9BE51526", "msgIndex": 0, "proposalId": "509" } }]),
+      );
+  });
   it('should return estimated rewards for a user account, apy = 10%, period = 6 Months', async () => {
     const nodeRpcService = ChainIndexingAPI.init('https://crypto.org/explorer/api/v1');
     moxios.wait(() => {
