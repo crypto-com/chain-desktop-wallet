@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import {
   RestakeTransactionUnsigned,
   DelegateTransactionUnsigned,
-  AllDelegateTransactionsUnsigned,
+  AllRestakeTransactionsUnsigned,
   TransferTransactionUnsigned,
   UndelegateTransactionUnsigned,
   RedelegateTransactionUnsigned,
@@ -457,7 +457,7 @@ export class TransactionSenderService {
       memo = DEFAULT_CLIENT_MEMO;
     }
 
-    const allDelegateTransactions: AllDelegateTransactionsUnsigned = {
+    const allRestakeTransactions: AllRestakeTransactionsUnsigned = {
       delegatorAddress: currentSession.wallet.address,
       validatorAddressList: allDelegationRequests.validatorAddressList,
       amount: String(delegationAmountScaled),
@@ -471,14 +471,14 @@ export class TransactionSenderService {
 
     if (allDelegationRequests.walletType === LEDGER_WALLET_TYPE) {
       signedTxHex = await ledgerTransactionSigner.signAllDelegateTx(
-        allDelegateTransactions,
+        allRestakeTransactions,
         allDelegationRequests.decryptedPhrase,
         networkFee,
         gasLimit,
       );
     } else {
-      signedTxHex = await transactionSigner.signAllDelegateTx(
-        allDelegateTransactions,
+      signedTxHex = await transactionSigner.signRestakeAllTx(
+        allRestakeTransactions,
         allDelegationRequests.decryptedPhrase,
         networkFee,
         gasLimit,

@@ -485,12 +485,9 @@ export const FormWithdrawStakingReward = () => {
 
       if (rewardWithdrawResult.transactionHash) {
         // Success - Reward withdraw transaction was successfully broadcasted
-
         // withdrawValues.rewardAmount = '0.1 CRO'
         // const restakeRewardAmount = withdrawValues.rewardAmount.split(' ')[0];
-
-        console.log('restake reward amount ', withdrawValues);
-
+        // console.log('restake reward amount ', withdrawValues);
         // if (!isNumeric(restakeRewardAmount)) {
         //   setSuccessRestakeRewardModalMessage(
         //     t('general.successModalPopup.restakeReward.description3'),
@@ -504,7 +501,6 @@ export const FormWithdrawStakingReward = () => {
         //     decryptedPhrase,
         //     walletType,
         //   });
-
         //   if (restakeRewardResult.transactionHash) {
         //     // Success - Both Reward withdraw & restake transactions were successfully broadcasted
         //     setBroadcastResult(restakeRewardResult);

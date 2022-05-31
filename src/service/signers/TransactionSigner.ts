@@ -200,27 +200,26 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
 
     const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
 
+    const msgWithdraw = new cro.distribution.MsgWithdrawDelegatorReward({
+      delegatorAddress: transaction.delegatorAddress,
+      validatorAddress: transaction.validatorAddress,
+    });
+
     const msgDelegate = new cro.staking.MsgDelegate({
       delegatorAddress: transaction.delegatorAddress,
       validatorAddress: transaction.validatorAddress,
       amount: delegateAmount,
     });
 
-    const msgDelegate0 = new cro.staking.MsgDelegate({
-      delegatorAddress: transaction.delegatorAddress,
-      validatorAddress: transaction.validatorAddress,
-      amount: delegateAmount,
-    });
-
     return this.getSignedMessageTransaction(
-      [msgDelegate, msgDelegate0],
+      [msgWithdraw, msgDelegate],
       transaction,
       keyPair,
       rawTx,
     );
   }
 
-  public async signAllDelegateTx(
+  public async signRestakeAllTx(
     transaction: AllDelegateTransactionsUnsigned,
     phrase: string,
     gasFee: string,
@@ -228,6 +227,13 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
   ): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
     const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
+
+    const msgWithdrawAllRewards = transaction.validatorAddressList.map(validatorAddress => {
+      return new cro.distribution.MsgWithdrawDelegatorReward({
+        delegatorAddress: transaction.delegatorAddress,
+        validatorAddress,
+      });
+    });
 
     const msgRestakeAllRewards = transaction.validatorAddressList.map(validatorAddress => {
       return new cro.staking.MsgDelegate({
@@ -237,15 +243,12 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       });
     });
 
-    // const msgRestakeAllRewards0 = transaction.validatorAddressList.map(validatorAddress => {
-    //   return new cro.staking.MsgDelegate({
-    //     delegatorAddress: transaction.delegatorAddress,
-    //     validatorAddress,
-    //     amount: delegateAmount,
-    //   });
-    // });
-
-    return this.getSignedMessageTransaction(msgRestakeAllRewards, transaction, keyPair, rawTx);
+    return this.getSignedMessageTransaction(
+      [...msgWithdrawAllRewards, ...msgRestakeAllRewards],
+      transaction,
+      keyPair,
+      rawTx,
+    );
   }
 
   public async signWithdrawStakingRewardTx(
