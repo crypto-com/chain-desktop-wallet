@@ -718,7 +718,7 @@ export class TransactionHistoryService {
 
     // const tokensListResponse = await ethClient.getTokensOwnedByAddress(address);
     const tokensListResponse = await ethClient.getBalanceByAddress(address, {
-      apikey: 'anonymous', // TODO: Remove this hardcoded value
+      // apikey: 'anonymous', // TODO: Remove this hardcoded value
       token: '0xdac17f958d2ee523a2206206994597c13d831ec7',
     });
     const newlyLoadedTokens = await tokensListResponse

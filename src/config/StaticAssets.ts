@@ -134,14 +134,14 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
     // TODO: Change this to the production indexing url
     indexingUrl: isTestnet
-      ? 'https://cql.3ona.co/ethereum/testnet/api/v1' // rinkeby
-      : 'https://cql.3ona.co/ethereum/mainnet/api/v1',
+      ? 'https://eth-indexing.3ona.co/ethereum/rinkeby/api/v1'
+      : 'https://eth-indexing.3ona.co/ethereum/mainnet/api/v1',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
     // TODO: Change this to the production node url
     nodeUrl: isTestnet
-      ? 'https://cql.3ona.co/ethereum/rinkeby/rpc?apikey=anonymous'
-      : 'https://mainnet.infura.io/v3/8baf8ee1539c497ab4773d983c7367bf',
+      ? 'https://eth-indexing.3ona.co/ethereum/rinkeby/rpc'
+      : 'https://eth-indexing.3ona.co/ethereum/mainnet/rpc',
     memoSupportDisabled: true,
   };
 
