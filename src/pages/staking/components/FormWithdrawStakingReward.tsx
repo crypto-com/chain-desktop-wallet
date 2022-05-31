@@ -284,7 +284,7 @@ export const FormWithdrawStakingReward = () => {
       setConfirmLoading(true);
       const restakeRewardAmount = withdrawValues.rewardAmount.split(' ')[0];
 
-      console.log('Restake Reward 0 ', restakeRewardAmount);
+      // console.log('Restake Reward 0 ', restakeRewardAmount);
 
       const rewardWithdrawResult = await walletService.sendRestakeRewardTransaction({
         validatorAddress: withdrawValues.validatorAddress,
@@ -678,19 +678,36 @@ export const FormWithdrawStakingReward = () => {
       {!rewards || rewards.length === 0 || !rewards[0].validatorAddress ? (
         ''
       ) : (
-        <Button
-          id="withdraw-all-btn"
-          type="primary"
-          onClick={() => {
-            setRewardAction('withdrawall');
-            setTimeout(() => {
-              showPasswordInput('withdrawall');
-            }, 200);
-          }}
-        >
-          {t('staking.withdraw.restake')}
-          {/* {t('staking.withdrawall')} */}
-        </Button>
+        <div className="top-action-btns">
+          <Button
+            id="withdraw-all-btn"
+            className="top-action-btn"
+            type="primary"
+            onClick={() => {
+              setRewardAction('withdrawall');
+              setTimeout(() => {
+                showPasswordInput('withdrawall');
+              }, 200);
+            }}
+          >
+            {/* {t('staking.withdraw.restake')} */}
+            {t('staking.withdrawall')}
+          </Button>
+
+          <Button
+            id="restake-all-btn"
+            className="top-action-btn"
+            onClick={() => {
+              setRewardAction('restakeall');
+              setTimeout(() => {
+                showPasswordInput('restakeall');
+              }, 200);
+            }}
+          >
+            {/* {t('staking.withdraw.restake')} */}
+            {t('staking.restakeall')}
+          </Button>
+        </div>
       )}
       <ModalPopup
         isModalVisible={withdrawAllModalVisible}

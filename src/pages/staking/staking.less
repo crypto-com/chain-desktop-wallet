@@ -60,6 +60,29 @@
       margin: 0;
       background-color: transparent;
     }
+
+    .top-action-btns {
+      position: absolute;
+      top: 0;
+      right: 12px;
+      z-index: 5;
+      display: block;
+      margin: 12px auto;
+      font-size: 14px;
+      text-align: center;
+
+      .top-action-btn {
+        position: relative;
+        top: 0;
+        left: 0;
+        display: inline-block;
+        width: 180px;
+        margin: 0 8px !important;
+        margin: 12px auto;
+        font-size: 14px;
+        text-align: center;
+      }
+    }
   }
 
   .input-validator-address {
@@ -145,18 +168,6 @@
   &.notice {
     color: @font-color;
   }
-}
-
-#withdraw-all-btn {
-  position: absolute;
-  top: 0;
-  right: 12px;
-  z-index: 5;
-  display: block;
-  width: 200px;
-  margin: 12px auto;
-  font-size: 14px;
-  text-align: center;
 }
 
 .address-container {
