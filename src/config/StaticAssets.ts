@@ -134,8 +134,8 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
     // TODO: Change this to the production indexing url
     indexingUrl: isTestnet
-      ? 'https://eth-indexing.3ona.co/ethereum/testnet/api/v1' // rinkeby
-      : 'https://eth-indexing.3ona.co/ethereum/mainnet/api/v1',
+      ? 'https://cql.3ona.co/ethereum/testnet/api/v1' // rinkeby
+      : 'https://cql.3ona.co/ethereum/mainnet/api/v1',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
     // TODO: Change this to the production node url

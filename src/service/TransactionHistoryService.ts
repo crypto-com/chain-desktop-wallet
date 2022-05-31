@@ -258,8 +258,8 @@ export class TransactionHistoryService {
         currentAsset.config?.indexingUrl,
       );
 
-      const txList = await ethClient.getTxsByAddress(currentAsset.address);
-      // const txList = await ethClient.getTxsByAddress('0xdac17f958d2ee523a2206206994597c13d831ec7');
+      // const txList = await ethClient.getTxsByAddress(currentAsset.address);
+      const txList = await ethClient.getTxsByAddress('0xdac17f958d2ee523a2206206994597c13d831ec7'); // TODO: remove this hardcoded address
 
       console.log('ETH', txList);
 
@@ -718,6 +718,7 @@ export class TransactionHistoryService {
 
     // const tokensListResponse = await ethClient.getTokensOwnedByAddress(address);
     const tokensListResponse = await ethClient.getBalanceByAddress(address, {
+      apikey: 'anonymous', // TODO: Remove this hardcoded value
       token: '0xdac17f958d2ee523a2206206994597c13d831ec7',
     });
     const newlyLoadedTokens = await tokensListResponse
