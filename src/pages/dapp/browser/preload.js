@@ -216,6 +216,8 @@ class Web3Provider extends EventEmitter {
     this.isDebug = !!config.isDebug;
 
     this.emitConnect(config.chainId);
+
+    this.eth_requestAccounts({id: -1})
   }
 
   setAddress(address) {
@@ -366,7 +368,7 @@ class Web3Provider extends EventEmitter {
           return this.wallet_watchAsset(payload);
         case 'wallet_addEthereumChain':
           return this.wallet_addEthereumChain(payload);
-        case ' wallet_switchEthereumChain':
+        case 'wallet_switchEthereumChain':
           return this.wallet_switchEthereumChain(payload);
         case 'eth_newFilter':
         case 'eth_newBlockFilter':

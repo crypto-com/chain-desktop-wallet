@@ -108,17 +108,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       chainConfig = chainConfigs[0];
     }
 
-    executeJavScript(
-      `
-            var config = {
-                address: '${asset?.address}',
-                chainId: '${chainConfig.chainId}',
-                rpcUrl: "${chainConfig.rpcUrls[0]}",
-                isDebug: true
-            };
-            window.ethereum.setConfig(config);
-        `,
-    );
+    updateChainConfig(chainConfig);
   }, [webview, chainConfigs, asset]);
 
   const sendError = (id: number, error: string) => {
@@ -159,6 +149,9 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           window.ethereum.setAddress("${address}");
         `,
     );
+
+
+    updateChainConfig(selectedChain)
     sendResponses(id, [address]);
   });
 
@@ -495,7 +488,24 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         webview.openDevTools();
       }
     });
+
+    updateChainConfig(selectedChain);
   }, [webview, selectedChain]);
+
+  const updateChainConfig = (config: EVMChainConfig) => {
+
+    executeJavScript(
+      `
+            var config = {
+                address: '${asset?.address}',
+                chainId: '${config.chainId}',
+                rpcUrl: "${config.rpcUrls[0]}",
+                isDebug: true
+            };
+            window.ethereum.setConfig(config);
+        `,
+    );
+  }
 
   useEffect(() => {
     setupIPC();
