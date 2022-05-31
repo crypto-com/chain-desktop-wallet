@@ -7,10 +7,13 @@
 export interface txQueryBaseParams {
   pageSize?: number | 10000; // max: 10000 ; default: 100
   page?: number | 0; // max: 1000000 ; default: 0
+  apikey?: string;
+  sort?: string;
 }
 
 export interface balanceQueryBaseParams {
-  token: string;
+  token?: string;
+  apikey?: string;
 }
 
 export interface IEthChainIndexAPI {
