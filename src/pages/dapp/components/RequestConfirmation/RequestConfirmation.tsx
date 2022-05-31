@@ -118,7 +118,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
           </div>
           <GasStepSelectEVMDApp config={selectedChain} gasLimit={new BigNumber(gasLimit.toString())} gasPrice={new BigNumber(gasPrice.toString())} onChange={(_gasLimit, _gasPrice) => {
             setGasLimit(ethers.BigNumber.from(_gasLimit.toString()))
-            setGasPrice(ethers.BigNumber.from(_gasPrice.toString))
+            setGasPrice(ethers.BigNumber.from(_gasPrice.toString()))
           }} />
           <div className="row">
             <div className="title">{t('dapp.requestConfirmation.total.title')}</div>
@@ -189,7 +189,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
           </div>
           <GasStepSelectEVMDApp config={selectedChain} gasLimit={new BigNumber(gasLimit.toString())} gasPrice={new BigNumber(gasPrice.toString())} onChange={(_gasLimit, _gasPrice) => {
             setGasLimit(ethers.BigNumber.from(_gasLimit.toString()))
-            setGasPrice(ethers.BigNumber.from(_gasPrice.toString))
+            setGasPrice(ethers.BigNumber.from(_gasPrice.toString()))
           }} />
           <div className="row">
             <div className="title">{t('dapp.requestConfirmation.total.title')}</div>
