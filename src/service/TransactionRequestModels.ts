@@ -70,7 +70,7 @@ export interface DelegationRequest {
   walletType: string; // normal, ledger
 }
 
-export interface UndelegationRequest extends DelegationRequest { }
+export interface UndelegationRequest extends DelegationRequest {}
 export interface RedelegationRequest {
   validatorSourceAddress: string;
   validatorDestinationAddress: string;
@@ -80,6 +80,8 @@ export interface RedelegationRequest {
   decryptedPhrase: string;
   walletType: string; // normal, ledger
 }
+
+export interface RestakeRequest extends DelegationRequest {}
 
 export interface WithdrawStakingRewardRequest {
   validatorAddress: string;

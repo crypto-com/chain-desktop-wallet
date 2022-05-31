@@ -3,7 +3,6 @@ import { Route, useHistory, Switch as RouterSwitch } from 'react-router-dom';
 import '../settings.less';
 import 'antd/dist/antd.css';
 import { Alert, Button, Checkbox, Form, Input, message, Tabs } from 'antd';
-
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
@@ -13,7 +12,6 @@ import { SettingsDataUpdate } from '../../../models/Wallet';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../../config/StaticConfig';
-
 import { UserAsset, UserAssetConfig } from '../../../models/UserAsset';
 import AddressBook from '../tabs/AddressBook/AddressBook';
 import { getCronosTendermintAsset } from '../../../utils/utils';
