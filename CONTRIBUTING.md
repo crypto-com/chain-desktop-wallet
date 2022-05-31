@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in contributing to Chain Desktop Wallet! Good places to start are this document and [the official documentation](https://crypto.org/docs). If you have any questions, feel free to ask on [Discord](https://discord.gg/pahqHz26q4).
+Thank you for your interest in contributing to DeFi Desktop Wallet! Good places to start are this document and [the official documentation](https://crypto.org/docs). If you have any questions, feel free to ask on [Discord](https://discord.gg/pahqHz26q4).
 
 
 ## Code of Conduct
@@ -53,16 +53,22 @@ Please refer to the [Instructions on Multi-Language Content Management](CONTENT_
 
 ### Detailed Pull Request Steps
 
-* Fork the Chain Desktop Wallet's repository under your Github account.
+* Fork the DeFi Desktop Wallet's repository under your Github account.
+
 * Clone your fork locally on your machine.
 * Post a comment in the issue to say that you are working on it, so that other people do not work on the same issue.
 * Create a local branch on your machine by `git checkout -b branch_name` from `dev` branch.
 * Commit your changes to your own fork -- see [Conventional Commits](https://www.conventionalcommits.org/) for commit message guidelines.
 * Include tests that cover all non-trivial code.
-* Check you are working on the latest version on `dev` in Chain Desktop Wallet's official repository. If not, please pull Chain Desktop Wallet's official repository's `dev` (upstream) into your fork's `dev` branch, and rebase your committed changes or replay your stashed changes in your branch over the latest changes in the upstream version.
-* Run all tests locally and make sure they pass. `yarn test`
+
+* Check you are working on the latest version on master in DeFi Desktop Wallet's official repository. If not, please pull DeFi Desktop Wallet's official repository's master (upstream) into your fork's master branch, and rebase your committed changes or replay your stashed changes in your branch over the latest changes in the upstream version.
+
+* Run all tests locally and make sure they pass.
+
 * If your changes are of interest to other developers, please make corresponding changes in the official documentation and the changelog.
-* Push your changes to your fork's branch and open the pull request to Chain Desktop Wallet's repository `dev` branch.
+
+* Push your changes to your fork's branch and open the pull request to DeFi Desktop Wallet's repository master branch.
+
 * In the pull request, complete its checklist, add a clear description of the problem your changes solve, and add the following statement to confirm that your contribution is your own original work: "I hereby certify that my contribution is in accordance with the Developer Certificate of Origin (https://developercertificate.org/)."
 * The reviewer will either accept and merge your pull request, or leave comments requesting changes via the Github PR interface (you should then make changes by pushing directly to your existing PR branch).
 
