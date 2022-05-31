@@ -110,12 +110,6 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
 
       return (
         <>
-          <div className="row">
-            <div className="title">{t('dapp.requestConfirmation.networkFee.title')}</div>
-            <div>{`${scaledAmount(networkFee.toString(), selectedChain.nativeCurrency.decimals)} ${
-              selectedChain.nativeCurrency.symbol
-            }`}</div>
-          </div>
           <GasStepSelectEVMDApp config={selectedChain} gasLimit={new BigNumber(gasLimit.toString())} gasPrice={new BigNumber(gasPrice.toString())} onChange={(_gasLimit, _gasPrice) => {
             setGasLimit(ethers.BigNumber.from(_gasLimit.toString()))
             setGasPrice(ethers.BigNumber.from(_gasPrice.toString()))
@@ -181,12 +175,6 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
 
       return (
         <>
-          <div className="row">
-            <div className="title">{t('dapp.requestConfirmation.networkFee.title')}</div>
-            <div>{`${scaledAmount(networkFee.toString(), selectedChain.nativeCurrency.decimals)} ${
-              selectedChain.nativeCurrency.symbol
-            }`}</div>
-          </div>
           <GasStepSelectEVMDApp config={selectedChain} gasLimit={new BigNumber(gasLimit.toString())} gasPrice={new BigNumber(gasPrice.toString())} onChange={(_gasLimit, _gasPrice) => {
             setGasLimit(ethers.BigNumber.from(_gasLimit.toString()))
             setGasPrice(ethers.BigNumber.from(_gasPrice.toString()))
