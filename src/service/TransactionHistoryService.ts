@@ -263,31 +263,32 @@ export class TransactionHistoryService {
 
       console.log('ETH', txList);
 
-      const loadedTxList = txList.map(tx => {
-        const transferTx: TransferTransactionData = {
-          amount: tx.amount,
-          assetSymbol: currentAsset.symbol,
-          date: new Date(Number(tx.timestamp) * 1000).toISOString(),
-          hash: tx.transaction_hash,
-          memo: '',
-          receiverAddress: tx.to,
-          // Note: Assuming first address in the list to be from address
-          senderAddress: tx.from[0] === currentAsset.address ? tx.from[0] : currentAsset.address!,
-          status: tx.failed ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
-        };
+      const loadedTxList = txList
+        .filter(tx => tx.token_symbol === 'ETH' && tx.type?.toLowerCase() === defaultTxType)
+        .map(tx => {
+          const transferTx: TransferTransactionData = {
+            amount: tx.amount,
+            assetSymbol: tx.token_symbol,
+            date: new Date(Number(tx.timestamp) * 1000).toISOString(),
+            hash: tx.transaction_hash,
+            memo: '',
+            receiverAddress: tx.to,
+            senderAddress: tx.from,
+            status: tx.failed ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
+          };
 
-        const transferTxRecord: TransferTransactionRecord = {
-          walletId: walletIdentifier,
-          assetId: currentAsset.identifier,
-          assetType: currentAsset.assetType,
-          txHash: tx.transaction_hash,
-          txType: defaultTxType,
-          txData: transferTx,
-          // TODO: add messageTypeName
-        };
+          const transferTxRecord: TransferTransactionRecord = {
+            walletId: walletIdentifier,
+            assetId: currentAsset.identifier,
+            assetType: currentAsset.assetType,
+            txHash: tx.transaction_hash,
+            txType: defaultTxType,
+            txData: transferTx,
+            // TODO: add messageTypeName
+          };
 
-        return transferTxRecord;
-      });
+          return transferTxRecord;
+        });
 
       // Return processed list here
       return loadedTxList;

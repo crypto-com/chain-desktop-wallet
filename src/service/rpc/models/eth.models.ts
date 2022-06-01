@@ -24,7 +24,7 @@ export interface TransactionsByAddressResponse {
 export interface TransactionData {
   transaction_hash: string;
   signer: string[];
-  from: string[];
+  from: string;
   to: string;
   amount: string;
   decimal: number;
