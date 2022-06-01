@@ -1,28 +1,33 @@
+import { EVMChainConfig } from '../models/Chain';
 import { MainNetEvmConfig, TestNetEvmConfig } from './StaticAssets';
 
+export const CronosMainnetChainConfig: EVMChainConfig = {
+  chainId: "0x19",
+  chainName: "Cronos Mainnet",
+  blockExplorerUrls: [MainNetEvmConfig.explorerUrl],
+  rpcUrls: [MainNetEvmConfig.nodeUrl],
+  nativeCurrency: {
+    decimals: 18,
+    name: "Cronos",
+    symbol: "CRO"
+  },
+}
+
+export const CronosTestnetChainConfig: EVMChainConfig = {
+  chainId: "0x152",
+  chainName: "Cronos Testnet",
+  blockExplorerUrls: [TestNetEvmConfig.explorerUrl],
+  rpcUrls: [TestNetEvmConfig.nodeUrl],
+  nativeCurrency: {
+    decimals: 18,
+    name: "Cronos test coin",
+    symbol: "TCRO"
+  }
+}
+
 export const DAppDefaultChainConfigs = [
-  {
-    chainId: "0x19",
-    chainName: "Cronos Mainnet",
-    blockExplorerUrls: [MainNetEvmConfig.explorerUrl],
-    rpcUrls: [MainNetEvmConfig.nodeUrl],
-    nativeCurrency: {
-      decimals: 18,
-      name: "Cronos",
-      symbol: "CRO"
-    },
-  },
-  {
-    chainId: "0x152",
-    chainName: "Cronos Testnet",
-    blockExplorerUrls: [TestNetEvmConfig.explorerUrl],
-    rpcUrls: [TestNetEvmConfig.nodeUrl],
-    nativeCurrency: {
-      decimals: 18,
-      name: "Cronos test coin",
-      symbol: "TCRO"
-    }
-  },
+  CronosMainnetChainConfig,
+  CronosTestnetChainConfig,
   // {
   //   chainId: "0x01",
   //   chainName: "Ethereum Mainnet",

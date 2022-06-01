@@ -23,6 +23,7 @@ import { ConfirmModal } from './ConfirmModal';
 import { Amount, RiskExposure, TokenBalance, TokenSpender } from './TableCells';
 import { CRC20TokenData, TokenDataWithApproval } from './types';
 import { getCRC20TokenData, getGasPrice, parsePadZero32Value, toFloat } from './utils';
+import { CronosMainnetChainConfig } from '../../../../config/DAppChainConfig';
 
 interface Props {
   transferEvents: Log[];
@@ -306,7 +307,6 @@ const CRC20TokenList = ({
               );
 
               const data = evmTransactionSigner.encodeTokenApprovalABI(
-                event.object.tokenData.contractAddress,
                 event.object.spender,
                 ethers.BigNumber.from(event.object.amount),
               );
@@ -321,10 +321,11 @@ const CRC20TokenList = ({
               };
 
               await evmTransactionSigner.sendContractCallTransaction(
-                cronosAsset!,
-                txConfig,
-                decryptedPhrase,
-                cronosAsset.config.nodeUrl,
+                {
+                  chainConfig: CronosMainnetChainConfig,
+                  transaction: txConfig,
+                  phrase: decryptedPhrase
+                }
               );
 
               setIsConfirmLoading(false);
@@ -367,7 +368,7 @@ const CRC20TokenList = ({
 
             const client = new CronosClient(nodeURL, indexingURL);
 
-            const abi = evmTransactionSigner.encodeTokenApprovalABI(tokenAddress, spender, 0);
+            const abi = evmTransactionSigner.encodeTokenApprovalABI(spender, 0);
 
             const response = await client.getContractDataByAddress(tokenAddress);
             const { gasLimit, gasPrice } = await getGasPrice(cronosAsset, {
@@ -381,13 +382,14 @@ const CRC20TokenList = ({
               name: 'tokenApproval',
               id: 12345,
               object: {
-                tokenData: response.result,
                 amount: '0',
+                chainConfig: CronosMainnetChainConfig,
+                from,
                 gas: gasLimit,
                 gasPrice,
-                from,
                 spender,
                 to: tokenAddress,
+                tokenData: response.result,
               },
             };
 

@@ -39,11 +39,12 @@ import { TransactionPrepareService } from './TransactionPrepareService';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
 import { TransactionHistoryService } from './TransactionHistoryService';
-import { getCronosEvmAsset, sleep } from '../utils/utils';
+import { checkIfTestnet, getCronosEvmAsset, sleep } from '../utils/utils';
 import { BridgeService } from './bridge/BridgeService';
 import { walletService } from './WalletService';
 import { getCronosTendermintFeeConfig } from './Gas';
 import { DerivationPathStandard } from './signers/LedgerSigner';
+import { CronosMainnetChainConfig, CronosTestnetChainConfig } from '../config/DAppChainConfig';
 
 export class TransactionSenderService {
   public readonly storageService: StorageService;
@@ -644,11 +645,16 @@ export class TransactionSenderService {
         };
 
         try {
+          const session = await walletService.retrieveCurrentSession();
+          const isTestnet = checkIfTestnet(session.wallet.config.network);
+          const chainConfig = !isTestnet ? CronosMainnetChainConfig : CronosTestnetChainConfig;
+
           const result = await evmTransactionSigner.sendContractCallTransaction(
-            asset!,
-            txConfig,
-            decryptedPhrase,
-            asset.config?.nodeUrl,
+            {
+              chainConfig,
+              transaction: txConfig,
+              phrase: decryptedPhrase,
+            }
           );
 
           await sleep(7_000);

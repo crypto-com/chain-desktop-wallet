@@ -61,7 +61,7 @@ export namespace DappBrowserIPC {
       from: string;
       gas: number;
       gasPrice: string;
-      maxFeePerGas: ethers.BigNumber | null;
+      maxFeePerGas?: ethers.BigNumber | null;
       maxPriorityFeePerGas?: ethers.BigNumber | null;
       spender: string;
       to: string;
