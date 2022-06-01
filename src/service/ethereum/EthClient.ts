@@ -91,16 +91,9 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
     // Result
     const finalList: TransactionData[] = [];
 
-    let txDataList = await this.getTxsByAddressPaginated(address, {
-      pageSize: limit,
-      page: currentPage,
-      sort: 'timestamp:desc',
-      // apikey: 'anonymous', // TODO: Remove this hardcoded value
-    });
-
-    while (txDataList.length >= 1) {
+    while (true) {
       // eslint-disable-next-line
-      txDataList = await this.getTxsByAddressPaginated(address, {
+      const txDataList = await this.getTxsByAddressPaginated(address, {
         pageSize: limit,
         page: currentPage,
         sort: 'timestamp:desc',
@@ -113,10 +106,9 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
       // Increment pagination params
       currentPage += 1;
 
-      // if (txDataList.length < 1) {
-      //   // If the list is empty
-      //   break;
-      // }
+      if (txDataList.length < 1 || txDataList.length < limit) {
+        break;
+      }
     }
 
     return finalList;
