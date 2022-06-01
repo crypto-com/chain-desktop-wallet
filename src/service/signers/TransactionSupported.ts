@@ -79,7 +79,7 @@ export interface RedelegateTransactionUnsigned extends TransactionUnsigned {
   amount: string;
 }
 
-export interface RestakeTransactionUnsigned extends TransactionUnsigned {
+export interface RestakeStakingRewardTransactionUnsigned extends TransactionUnsigned {
   delegatorAddress: string;
   validatorAddress: string;
   amount: string;

@@ -4,7 +4,7 @@ import Long from 'long';
 import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
 import { DEFAULT_IBC_TRANSFER_TIMEOUT, WalletConfig } from '../../config/StaticConfig';
 import {
-  RestakeTransactionUnsigned,
+  RestakeStakingRewardTransactionUnsigned,
   TransactionUnsigned,
   DelegateTransactionUnsigned,
   TransferTransactionUnsigned,
@@ -189,8 +189,8 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
     return this.getSignedMessageTransaction([msgDelegate], transaction, keyPair, rawTx);
   }
 
-  public async signRestakeTx(
-    transaction: RestakeTransactionUnsigned,
+  public async signRestakeStakingRewardTx(
+    transaction: RestakeStakingRewardTransactionUnsigned,
     phrase: string,
     gasFee: string,
     gasLimit: number,

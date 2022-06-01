@@ -89,7 +89,7 @@ export interface RedelegationRequest {
   walletType: string; // normal, ledger
 }
 
-export interface RestakeRequest extends DelegationRequest {}
+export interface RestakeStakingRewardRequest extends DelegationRequest {}
 
 export interface WithdrawStakingRewardRequest {
   validatorAddress: string;
