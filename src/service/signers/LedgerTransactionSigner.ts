@@ -119,7 +119,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     gasFee: string,
     gasLimit: number,
   ): Promise<string> {
-    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
     // Transforming user amount to library compatible type
     const msgDepositAmount = transaction.amount.map(coin => {
