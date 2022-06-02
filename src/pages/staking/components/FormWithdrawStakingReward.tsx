@@ -51,7 +51,7 @@ interface RewardsTabularData {
 }
 
 export const FormWithdrawStakingReward = () => {
-  type RewardActionType = 'withdrawall' | 'withdraw' | 'restake';
+  type RewardActionType = 'withdrawall' | 'withdraw' | 'restake' | 'restakeall';
 
   const [withdrawValues, setWithdrawValues] = useState({
     validatorAddress: '',
@@ -76,6 +76,8 @@ export const FormWithdrawStakingReward = () => {
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
 
   const [withdrawAllModalVisible, setWithdrawAllModalVisible] = useState(false);
+  const [restakeAllModalVisible, setRestakeAllModalVisible] = useState(false);
+
   const [marketData, setMarketData] = useState<AssetMarketPrice>();
 
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
@@ -163,6 +165,11 @@ export const FormWithdrawStakingReward = () => {
     setInputPasswordVisible(false);
   };
 
+  const handleRestakeAllModal = () => {
+    setRestakeAllModalVisible(false);
+    setInputPasswordVisible(false);
+  };
+
   const showPasswordInput = (action: string) => {
     // TODO: check if decryptedPhrase expired
     if ((decryptedPhrase && false) || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
@@ -174,6 +181,8 @@ export const FormWithdrawStakingReward = () => {
         showConfirmationRestakeModal();
       } else if (action === 'withdrawall') {
         setWithdrawAllModalVisible(true);
+      } else if (action === 'restakeall') {
+        setRestakeAllModalVisible(true);
       } else {
         showConfirmationModal();
       }
@@ -193,6 +202,8 @@ export const FormWithdrawStakingReward = () => {
       showConfirmationRestakeModal();
     } else if (rewardAction === 'withdrawall') {
       setWithdrawAllModalVisible(true);
+    } else if (rewardAction === 'restakeall') {
+      setRestakeAllModalVisible(true);
     } else {
       showConfirmationModal();
     }
@@ -331,6 +342,75 @@ export const FormWithdrawStakingReward = () => {
     }
   };
 
+  const onConfirmRestakeAllRewards = async () => {
+    const { walletType } = currentSession.wallet;
+    if (!decryptedPhrase && currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) {
+      setIsVisibleConfirmationModal(false);
+      setRestakeAllModalVisible(false);
+      return;
+    }
+    try {
+      setIsVisibleConfirmationModal(false);
+      setConfirmLoading(true);
+      const restakeRewardAmount = withdrawValues.rewardAmount.split(' ')[0];
+
+      const restakeRewardResult = await walletService.sendRestakeAllRewardsTx({
+        validatorAddressList: rewards.map(rewardInfo => rewardInfo.validatorAddress),
+        decryptedPhrase,
+        walletType,
+        amount: restakeRewardAmount,
+        asset: walletAsset,
+        memo: '',
+      });
+
+      if (restakeRewardResult.transactionHash) {
+        // Success - Reward withdraw transaction was successfully broadcasted
+
+        // withdrawValues.rewardAmount = '0.1 CRO'
+
+        console.log('restakeRewardResult ', restakeRewardResult);
+
+        setBroadcastResult(restakeRewardResult);
+        setSuccessRestakeRewardModalMessage(
+          t('general.successModalPopup.restakeReward.description1'),
+        );
+
+        setIsConfirmationRestakeModalVisible(false);
+        setConfirmLoading(false);
+        setIsSuccessRestakeRewardModalVisible(true);
+      } else if (
+        restakeRewardResult?.code !== undefined &&
+        restakeRewardResult?.code !== null &&
+        restakeRewardResult.code === walletService.BROADCAST_TIMEOUT_CODE
+      ) {
+        // Timed Out - Reward withdraw transaction
+        setBroadcastResult(restakeRewardResult);
+        setSuccessRestakeRewardModalMessage(
+          t('general.successModalPopup.restakeReward.description4'),
+        );
+        setIsConfirmationRestakeModalVisible(false);
+        setConfirmLoading(false);
+        setIsSuccessRestakeRewardModalVisible(true);
+      } else {
+        // Failed - Reward withdraw transaction
+        throw new Error(t('general.errorModalPopup.reward.description'));
+      }
+    } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
+      }
+
+      setErrorMessages(((e as unknown) as any).message.split(': '));
+      setRestakeAllModalVisible(false);
+      setIsConfirmationRestakeModalVisible(false);
+      setConfirmLoading(false);
+      setInputPasswordVisible(false);
+      setIsErrorTransferModalVisible(true);
+      // eslint-disable-next-line no-console
+      console.error('Error occurred while transfer', e);
+    }
+  };
+
   const handleCancelConfirmationModal = () => {
     setIsVisibleConfirmationModal(false);
     setInputPasswordVisible(false);
@@ -447,20 +527,37 @@ export const FormWithdrawStakingReward = () => {
       {!rewards || rewards.length === 0 || !rewards[0].validatorAddress ? (
         ''
       ) : (
-        <Button
-          id="withdraw-all-btn"
-          type="primary"
-          onClick={() => {
-            setRewardAction('withdrawall');
-            setTimeout(() => {
-              showPasswordInput('withdrawall');
-            }, 200);
-          }}
-        >
-          {t('staking.withdrawall')}
-        </Button>
+        <div className="top-action-btns">
+          <Button
+            id="withdraw-all-btn"
+            className="top-action-btn"
+            type="primary"
+            onClick={() => {
+              setRewardAction('withdrawall');
+              setTimeout(() => {
+                showPasswordInput('withdrawall');
+              }, 200);
+            }}
+          >
+            {t('staking.withdrawall')}
+          </Button>
+          <Button
+            id="restake-all-btn"
+            className="top-action-btn"
+            type="primary"
+            onClick={() => {
+              setRewardAction('restakeall');
+              setTimeout(() => {
+                showPasswordInput('restakeall');
+              }, 200);
+            }}
+          >
+            {t('staking.restakeall')}
+          </Button>
+        </div>
       )}
 
+      {/* Withdraw All Rewards Modal */}
       <ModalPopup
         isModalVisible={withdrawAllModalVisible}
         handleCancel={handleWithdrawAllModal}
@@ -478,6 +575,78 @@ export const FormWithdrawStakingReward = () => {
             {t('general.confirm')}
           </Button>,
           <Button key="back" type="link" onClick={handleWithdrawAllModal}>
+            {t('general.cancel')}
+          </Button>,
+        ]}
+        okText={t('general.confirm')}
+      >
+        <>
+          <div className="title">{t('staking.withdrawall')}</div>
+          <div className="description">{t('staking.modal2.description')}</div>
+          <div className="item">
+            <div className="label">{t('staking.modal2.label1')}</div>
+            <div className="address">{`${currentSession.wallet.address}`}</div>
+          </div>
+          <div className="item">
+            <div className="label">{t('staking.modal2.label4')}</div>
+
+            <div
+              className={
+                rewards && rewards.length > 3 ? 'address-container scrollable' : 'address-container'
+              }
+            >
+              {rewards.map((elem, idx) => (
+                <>
+                  <div
+                    id={'address'.concat(idx.toString())}
+                    className="address"
+                  >{`${elem?.validatorAddress}`}</div>
+                </>
+              ))}
+            </div>
+          </div>
+          <div className="item">
+            <div className="label">{t('staking.modal2.label5')}</div>
+            {walletAsset ? (
+              <div>
+                {numeral(scaledRewardBalance(walletAsset)).format('0,0.0000')}
+                {walletAsset?.symbol}
+              </div>
+            ) : (
+              ''
+            )}
+
+            <div className="fiat">
+              {walletAsset && marketData && marketData.price
+                ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
+                    getAssetRewardsBalancePrice(walletAsset, marketData),
+                  ).format('0,0.00')} ${marketData?.currency}
+                    `
+                : ''}
+            </div>
+          </div>
+          <GasInfoTendermint />
+        </>
+      </ModalPopup>
+
+      {/* Restake All Rewards Modal */}
+      <ModalPopup
+        isModalVisible={restakeAllModalVisible}
+        handleCancel={handleRestakeAllModal}
+        handleOk={onConfirmRestakeAllRewards}
+        confirmationLoading={confirmLoading}
+        className="reward-modal"
+        footer={[
+          <Button
+            key="submit"
+            type="primary"
+            loading={confirmLoading}
+            disabled={!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE}
+            onClick={onConfirmRestakeAllRewards}
+          >
+            {t('general.confirm')}
+          </Button>,
+          <Button key="back" type="link" onClick={handleRestakeAllModal}>
             {t('general.cancel')}
           </Button>,
         ]}

@@ -5,6 +5,7 @@ import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
 import { DEFAULT_IBC_TRANSFER_TIMEOUT, WalletConfig } from '../../config/StaticConfig';
 import {
   RestakeStakingRewardTransactionUnsigned,
+  RestakeStakingAllRewardsTransactionUnsigned,
   TransactionUnsigned,
   DelegateTransactionUnsigned,
   TransferTransactionUnsigned,
@@ -212,6 +213,40 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
 
     return this.getSignedMessageTransaction(
       [msgWithdraw, msgDelegate],
+      transaction,
+      keyPair,
+      rawTx,
+    );
+  }
+
+  public async signRestakeAllStakingRewardsTx(
+    transaction: RestakeStakingAllRewardsTransactionUnsigned,
+    phrase: string,
+    gasFee: string,
+    gasLimit: number,
+  ): Promise<string> {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
+
+    const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
+    const msgWithdrawAllDelegatorRewards = transaction.validatorAddressList.map(
+      validatorAddress => {
+        return new cro.distribution.MsgWithdrawDelegatorReward({
+          delegatorAddress: transaction.delegatorAddress,
+          validatorAddress,
+        });
+      },
+    );
+
+    const msgDelegation = transaction.validatorAddressList.map(validatorAddress => {
+      return new cro.staking.MsgDelegate({
+        delegatorAddress: transaction.delegatorAddress,
+        validatorAddress,
+        amount: delegateAmount,
+      });
+    });
+
+    return this.getSignedMessageTransaction(
+      [...msgWithdrawAllDelegatorRewards, ...msgDelegation],
       transaction,
       keyPair,
       rawTx,

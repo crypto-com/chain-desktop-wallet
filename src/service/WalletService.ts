@@ -40,6 +40,7 @@ import { ChainIndexingAPI } from './rpc/ChainIndexingAPI';
 import { LEDGER_WALLET_TYPE } from './LedgerService';
 import {
   RestakeStakingRewardRequest,
+  RestakeStakingAllRewardsRequest,
   BridgeTransferRequest,
   DelegationRequest,
   NFTDenomIssueRequest,
@@ -125,6 +126,12 @@ class WalletService {
     restakeRequest: RestakeStakingRewardRequest,
   ): Promise<BroadCastResult> {
     return await this.txSenderManager.sendRestakeRewardTransaction(restakeRequest);
+  }
+
+  public async sendRestakeAllRewardsTx(
+    restakeAllRequest: RestakeStakingAllRewardsRequest,
+  ): Promise<BroadCastResult> {
+    return await this.txSenderManager.sendRestakeAllRewardsTransaction(restakeAllRequest);
   }
 
   public async sendVote(voteRequest: VoteRequest): Promise<BroadCastResult> {

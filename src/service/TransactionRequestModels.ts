@@ -91,6 +91,15 @@ export interface RedelegationRequest {
 
 export interface RestakeStakingRewardRequest extends DelegationRequest {}
 
+export interface RestakeStakingAllRewardsRequest {
+  validatorAddressList: string[];
+  amount: string;
+  memo: string;
+  asset: UserAsset;
+  decryptedPhrase: string;
+  walletType: string; // normal, ledger
+}
+
 export interface WithdrawStakingRewardRequest {
   validatorAddress: string;
   decryptedPhrase: string;
