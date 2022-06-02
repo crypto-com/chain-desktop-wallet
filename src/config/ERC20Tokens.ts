@@ -4,8 +4,9 @@ export interface ERC20TokenInfo {
   address: string;
   // is tradable on VVS
   isWhitelisted: boolean;
+  symbol: string;
+  slug: string;
   iconURL?: string;
-  slug?: string;
 }
 
 // https://cronos.org/explorer/tokens
@@ -17,12 +18,13 @@ export const ERC20MainnetTokenInfos: Map<string, ERC20TokenInfo> = new Map(
     })
     .map(token => {
       return [
-        token.symbol,
+        `${token.symbol.toUpperCase()}`,
         {
           address: token.contract_address.toLowerCase(),
           isWhitelisted: token.enabled,
-          iconURL: token.colorful_image_url,
+          symbol: token.symbol,
           slug: token.slug,
+          iconURL: token.colorful_image_url,
         },
       ];
     }),

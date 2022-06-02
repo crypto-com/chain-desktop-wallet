@@ -11,6 +11,7 @@ import {
   CryptoTokenPriceAPIResponse,
 } from './models/marketApi.models';
 import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
+import { ERC20MainnetTokenInfos } from '../../config/ERC20Tokens';
 
 export interface IMarketApi {
   getAssetPrice(asset: UserAsset, currency: string): Promise<AssetMarketPrice>;
@@ -88,6 +89,7 @@ export class CroMarketApi implements IMarketApi {
   public async getTokenPriceFromCryptoCom(asset: UserAsset, fiatCurrency: string) {
     const { assetType, mainnetSymbol } = asset;
     const whitelistedCRC20Tokens: string[] = Array.from(CRC20MainnetTokenInfos.keys());
+    const whitelistedERC20Tokens: string[] = Array.from(ERC20MainnetTokenInfos.keys());
     const allTokensSlugMap: CryptoComSlugResponse[] = await this.loadTokenSlugMap();
 
     const nativeTokenSlug = ['crypto-com-coin', 'ethereum'];
@@ -115,10 +117,12 @@ export class CroMarketApi implements IMarketApi {
       token.data.tags = token.data.tags ?? [];
       return (
         nativeTokenSlug.includes(token.data.slug) ||
-        whitelistedCRC20Tokens.includes(token.data.symbol) ||
+        (assetType === UserAssetType.CRC_20_TOKEN &&
+          whitelistedCRC20Tokens.includes(token.data.symbol)) ||
         (assetType === UserAssetType.CRC_20_TOKEN &&
           token.data.tags.includes('cronos-ecosystem')) ||
-        (assetType === UserAssetType.ERC_20_TOKEN && token.data.tags.includes('ethereum-ecosystem')) // TODO: ethereum-ecosystem is missing in a lot of ERC20 tokens
+        (assetType === UserAssetType.ERC_20_TOKEN &&
+          whitelistedERC20Tokens.includes(`${token.data.symbol.toUpperCase()}`))
       );
     });
 

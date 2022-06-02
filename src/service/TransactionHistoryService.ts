@@ -745,7 +745,7 @@ export class TransactionHistoryService {
           address: ethEvmAsset.address,
           config: ethEvmAsset.config,
           isWhitelisted: isERC20AssetWhitelisted(
-            token.token_symbol,
+            `${token.token_symbol.toUpperCase()}`,
             token.token_addr,
             session.wallet.config,
           ),
