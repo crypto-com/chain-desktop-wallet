@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import { TransactionConfig } from 'web3-eth';
 import { ethers } from 'ethers';
 import {
+  RestakeStakingRewardTransactionUnsigned,
   DelegateTransactionUnsigned,
   TransferTransactionUnsigned,
   UndelegateTransactionUnsigned,
@@ -20,6 +21,7 @@ import { NftType } from '../models/Nft';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
 import { DEFAULT_CLIENT_MEMO } from '../config/StaticConfig';
 import {
+  RestakeStakingRewardRequest,
   TransferRequest,
   DelegationRequest,
   UndelegationRequest,
@@ -361,6 +363,62 @@ export class TransactionSenderService {
       signedTxHex = await transactionSigner.signDelegateTx(
         delegateTransaction,
         delegationRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await Promise.all([
+      await this.txHistoryManager.fetchAndUpdateBalances(currentSession),
+      await this.txHistoryManager.fetchAndSaveDelegations(nodeRpc, currentSession),
+    ]);
+
+    return broadCastResult;
+  }
+
+  public async sendRestakeRewardTransaction(
+    restakeRequest: RestakeStakingRewardRequest,
+  ): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.transactionPrepareService.prepareTransaction();
+
+    const delegationAmountScaled = getBaseScaledAmount(restakeRequest.amount, restakeRequest.asset);
+
+    let { memo } = restakeRequest;
+    if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
+      memo = DEFAULT_CLIENT_MEMO;
+    }
+
+    const restakeTransaction: RestakeStakingRewardTransactionUnsigned = {
+      delegatorAddress: currentSession.wallet.address,
+      validatorAddress: restakeRequest.validatorAddress,
+      amount: String(delegationAmountScaled),
+      memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string;
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();
+
+    if (restakeRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signRestakeStakingRewardTx(
+        restakeTransaction,
+        restakeRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signRestakeStakingRewardTx(
+        restakeTransaction,
+        restakeRequest.decryptedPhrase,
         networkFee,
         gasLimit,
       );

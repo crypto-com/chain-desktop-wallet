@@ -79,6 +79,12 @@ export interface RedelegateTransactionUnsigned extends TransactionUnsigned {
   amount: string;
 }
 
+export interface RestakeStakingRewardTransactionUnsigned extends TransactionUnsigned {
+  delegatorAddress: string;
+  validatorAddress: string;
+  amount: string;
+}
+
 export interface CustomFeeRequest {
   fee: string;
   gasLimit: string;
