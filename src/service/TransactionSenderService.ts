@@ -34,6 +34,7 @@ import {
   BridgeTransferRequest,
   NFTDenomIssueRequest,
   NFTMintRequest,
+  DepositToProposalRequest,
 } from './TransactionRequestModels';
 import { StorageService } from './storage/StorageService';
 import { CronosClient } from './cronos/CronosClient';
@@ -46,8 +47,6 @@ import { BridgeService } from './bridge/BridgeService';
 import { walletService } from './WalletService';
 import { getCronosTendermintFeeConfig } from './Gas';
 import { DerivationPathStandard } from './signers/LedgerSigner';
-import { DepositToProposalRequest } from './TransactionRequestModels';
-import { Big } from '../utils/ChainJsLib';
 
 export class TransactionSenderService {
   public readonly storageService: StorageService;
