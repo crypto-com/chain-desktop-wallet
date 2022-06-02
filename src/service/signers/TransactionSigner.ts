@@ -2,6 +2,7 @@ import sdk from '@crypto-org-chain/chain-jslib';
 import { CosmosMsg } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/msg/cosmosMsg';
 import Long from 'long';
 import { Big, HDKey, Secp256k1KeyPair, Units } from '../../utils/ChainJsLib';
+import { MsgDepositTransactionUnsigned } from './TransactionSupported';
 import {
   DEFAULT_IBC_TRANSFER_TIMEOUT,
   WalletConfig,
@@ -99,6 +100,36 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
     });
 
     return this.getSignedMessageTransaction([msgVote], transaction, keyPair, rawTx);
+  }
+
+  /**
+   * Sign a raw `MsgDeposit` tx for onchain submission
+   * @param transaction 
+   * @param phrase 
+   * @param gasFee 
+   * @param gasLimit 
+   */
+  public async signProposalDepositTransaction(
+    transaction: MsgDepositTransactionUnsigned,
+    phrase: string,
+    gasFee: string,
+    gasLimit: number,
+  ): Promise<string> {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
+
+    // Transforming user amount to library compatible type
+    const msgDepositAmount = transaction.amount.map(coin => {
+      return cro.v2.CoinV2.fromCustomAmountDenom(coin.amount, coin.denom);
+    });
+
+    // Using V2 because it has support for multiple `amount` in a single transaction
+    const msgDeposit = new cro.v2.gov.MsgDepositV2({
+      amount: msgDepositAmount,
+      depositor: transaction.depositor,
+      proposalId: Big(transaction.proposalId),
+    });
+
+    return this.getSignedMessageTransaction([msgDeposit], transaction, keyPair, rawTx);
   }
 
   public async signNFTTransfer(transaction: NFTTransferUnsigned, phrase: string, gasFee: string,

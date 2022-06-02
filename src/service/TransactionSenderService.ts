@@ -13,6 +13,7 @@ import {
   NFTMintUnsigned,
   EVMContractCallUnsigned,
   WithdrawAllStakingRewardsUnsigned,
+  MsgDepositTransactionUnsigned,
 } from './signers/TransactionSupported';
 import { BroadCastResult } from '../models/Transaction';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
@@ -43,6 +44,8 @@ import { BridgeService } from './bridge/BridgeService';
 import { walletService } from './WalletService';
 import { getCronosTendermintFeeConfig } from './Gas';
 import { DerivationPathStandard } from './signers/LedgerSigner';
+import { DepositToProposalRequest } from './TransactionRequestModels';
+import { Big } from '../utils/ChainJsLib';
 
 export class TransactionSenderService {
   public readonly storageService: StorageService;
@@ -526,6 +529,49 @@ export class TransactionSenderService {
       signedTxHex = await transactionSigner.signVoteTransaction(
         voteTransactionUnsigned,
         voteRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.txHistoryManager.fetchAndSaveProposals(currentSession);
+    return broadCastResult;
+  }
+
+  public async sendMsgDepositTx(depositRequest: DepositToProposalRequest): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.transactionPrepareService.prepareTransaction();
+
+    const depositToProposalUnsigned: MsgDepositTransactionUnsigned = {
+      proposalId: depositRequest.proposalId,
+      depositor: depositRequest.depositor,
+      amount: depositRequest.amount,
+      memo: '', // Todo: This can be brought up in future transactions
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();
+
+    if (depositRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signProposalDepositTransaction(
+        depositToProposalUnsigned,
+        depositRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signProposalDepositTransaction(
+        depositToProposalUnsigned,
+        depositRequest.decryptedPhrase,
         networkFee,
         gasLimit,
       );

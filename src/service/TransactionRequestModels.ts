@@ -2,6 +2,8 @@ import { UserAsset } from '../models/UserAsset';
 import { VoteOption } from '../models/Transaction';
 import { NftType } from '../models/Nft';
 import { BridgeTransferDirection } from './bridge/BridgeConfig';
+import { Coin } from '@cosmjs/stargate';
+import Big from 'big.js';
 
 export interface TransferRequest {
   toAddress: string;
@@ -100,6 +102,15 @@ export interface BaseTxAuth {
  */
 export interface WithdrawAllStakingRewardRequest extends BaseTxAuth {
   validatorAddressList: string[];
+}
+
+/**
+ * Request params for `MsgDeposit` transaction 
+ */
+export interface DepositToProposalRequest extends BaseTxAuth {
+  proposalId: Big;
+  depositor: string;
+  amount: Coin[];
 }
 
 //
