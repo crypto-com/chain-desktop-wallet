@@ -24,7 +24,7 @@ import {
 import { BroadCastResult, RewardTransactionData } from '../../../models/Transaction';
 import { renderExplorerUrl } from '../../../models/Explorer';
 import { getUIDynamicAmount } from '../../../utils/NumberUtils';
-import { isNumeric } from '../../../utils/utils';
+// import { isNumeric } from '../../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../../service/LedgerService';
 
 import { secretStoreService } from '../../../service/storage/SecretStoreService';
@@ -276,67 +276,36 @@ export const FormWithdrawStakingReward = () => {
     }
     try {
       setConfirmLoading(true);
-
-      const rewardWithdrawResult = await walletService.sendStakingRewardWithdrawalTx({
+      const restakeRewardAmount = withdrawValues.rewardAmount.split(' ')[0];
+      const restakeRewardResult = await walletService.sendRestakeRewardsTx({
         validatorAddress: withdrawValues.validatorAddress,
         decryptedPhrase,
         walletType,
+        amount: restakeRewardAmount,
+        asset: walletAsset,
+        memo: '',
       });
 
-      if (rewardWithdrawResult.transactionHash) {
+      if (restakeRewardResult.transactionHash) {
         // Success - Reward withdraw transaction was successfully broadcasted
 
         // withdrawValues.rewardAmount = '0.1 CRO'
-        const restakeRewardAmount = withdrawValues.rewardAmount.split(' ')[0];
 
-        if (!isNumeric(restakeRewardAmount)) {
-          setSuccessRestakeRewardModalMessage(
-            t('general.successModalPopup.restakeReward.description3'),
-          );
-        } else {
-          const restakeRewardResult = await walletService.sendDelegateTransaction({
-            validatorAddress: withdrawValues.validatorAddress,
-            amount: restakeRewardAmount,
-            asset: walletAsset,
-            memo: '',
-            decryptedPhrase,
-            walletType,
-          });
+        setBroadcastResult(restakeRewardResult);
+        setSuccessRestakeRewardModalMessage(
+          t('general.successModalPopup.restakeReward.description1'),
+        );
 
-          if (restakeRewardResult.transactionHash) {
-            // Success - Both Reward withdraw & restake transactions were successfully broadcasted
-            setBroadcastResult(restakeRewardResult);
-            setSuccessRestakeRewardModalMessage(
-              t('general.successModalPopup.restakeReward.description1'),
-            );
-          } else if (
-            rewardWithdrawResult?.code !== undefined &&
-            rewardWithdrawResult?.code !== null &&
-            rewardWithdrawResult.code === walletService.BROADCAST_TIMEOUT_CODE
-          ) {
-            // Timed Out - Restake transaction
-            setBroadcastResult(restakeRewardResult);
-            setSuccessRestakeRewardModalMessage(
-              t('general.successModalPopup.restakeReward.description2'),
-            );
-          } else {
-            // Failed - Restake transaction
-            setBroadcastResult(restakeRewardResult);
-            setSuccessRestakeRewardModalMessage(
-              t('general.successModalPopup.restakeReward.description3'),
-            );
-          }
-          setIsConfirmationRestakeModalVisible(false);
-          setConfirmLoading(false);
-          setIsSuccessRestakeRewardModalVisible(true);
-        }
+        setIsConfirmationRestakeModalVisible(false);
+        setConfirmLoading(false);
+        setIsSuccessRestakeRewardModalVisible(true);
       } else if (
-        rewardWithdrawResult?.code !== undefined &&
-        rewardWithdrawResult?.code !== null &&
-        rewardWithdrawResult.code === walletService.BROADCAST_TIMEOUT_CODE
+        restakeRewardResult?.code !== undefined &&
+        restakeRewardResult?.code !== null &&
+        restakeRewardResult.code === walletService.BROADCAST_TIMEOUT_CODE
       ) {
         // Timed Out - Reward withdraw transaction
-        setBroadcastResult(rewardWithdrawResult);
+        setBroadcastResult(restakeRewardResult);
         setSuccessRestakeRewardModalMessage(
           t('general.successModalPopup.restakeReward.description4'),
         );
