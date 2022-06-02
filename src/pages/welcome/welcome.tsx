@@ -36,12 +36,12 @@ function WelcomePage() {
 
   return (
     <main className="welcome-page">
-      <div className="header">
+      {/* <div className="header">
         <img src={logo} className="logo" alt="logo" />
-      </div>
+      </div> */}
       <div className="container">
         <div>
-          <img src={logo} className="logo" alt="logo" />
+          <img src={logo} className="logo" alt="logo" style={{ width: '800px' }} />
           <div className="button-container">
             <Link to="/signup">
               <Button type="primary">{t('welcome.button')}</Button>
