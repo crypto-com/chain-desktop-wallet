@@ -61,6 +61,7 @@ import { StorageService } from './storage/StorageService';
 import { TransactionPrepareService } from './TransactionPrepareService';
 import { TransactionHistoryService } from './TransactionHistoryService';
 import { TransactionSenderService } from './TransactionSenderService';
+import { TextProposalRequest } from './TransactionRequestModels';
 
 class WalletService {
   public readonly BROADCAST_TIMEOUT_CODE = -32603;
@@ -138,6 +139,14 @@ class WalletService {
    */
   public async sendProposalDepositTx(depositProposalRequest: DepositToProposalRequest): Promise<BroadCastResult> {
     return await this.txSenderManager.sendMsgDepositTx(depositProposalRequest);
+  }
+
+  /**
+   * Creates, signs and broadcasts a new `MsgSubmitProposal.TextProposal` transaction on-chain
+   * @param textProposalSubmitRequest 
+   */
+  public async sendTextProposalSubmitTx(textProposalSubmitRequest: TextProposalRequest): Promise<BroadCastResult> {
+    return await this.txSenderManager.sendSubmitTextProposalTransaction(textProposalSubmitRequest);
   }
 
   public async sendNFT(nftTransferRequest: NFTTransferRequest): Promise<BroadCastResult> {

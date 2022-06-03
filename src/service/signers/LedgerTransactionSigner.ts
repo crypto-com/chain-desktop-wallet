@@ -19,6 +19,7 @@ import {
   BridgeTransactionUnsigned,
   WithdrawAllStakingRewardsUnsigned,
   MsgDepositTransactionUnsigned,
+  TextProposalTransactionUnsigned,
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
 import { BaseTransactionSigner, ITransactionSigner } from './TransactionSigner';
@@ -134,6 +135,39 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     });
 
     return this.getSignedMessageTransaction(transaction, [msgDeposit], rawTx);
+  }
+
+  /**
+     * Sign a raw `MsgSubmitProposal.TextProposal` tx for onchain submission
+     * @param transaction 
+     * @param phrase 
+     * @param gasFee 
+     * @param gasLimit 
+     */
+  public async signSubmitTextProposalTransaction(
+    transaction: TextProposalTransactionUnsigned,
+    phrase: string,
+    gasFee: string,
+    gasLimit: number,
+  ): Promise<string> {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
+
+    // Converting `initialDeposit` to library compatible types
+    const initialDepositTyped = transaction.initialDeposit.map(coin => {
+      return cro.v2.CoinV2.fromCustomAmountDenom(coin.amount, coin.denom);
+    });
+
+    // Constucting a Msg TextProposal
+    const submitTextProposalContent = new cro.gov.proposal.TextProposal(transaction.params);
+
+    // Using V2 because it has support for multiple `amount` in a single transaction
+    const msgSubmitProposal = new cro.v2.gov.MsgSubmitProposalV2({
+      initialDeposit: initialDepositTyped,
+      proposer: transaction.proposer,
+      content: submitTextProposalContent,
+    });
+
+    return this.getSignedMessageTransaction(transaction, [msgSubmitProposal], rawTx);
   }
 
   public async signDelegateTx(
