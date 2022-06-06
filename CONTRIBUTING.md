@@ -57,7 +57,7 @@ Please refer to the [Instructions on Multi-Language Content Management](CONTENT_
 * Clone your fork locally on your machine.
 * Post a comment in the issue to say that you are working on it, so that other people do not work on the same issue.
 * Create a local branch on your machine by `git checkout -b branch_name` from `dev` branch.
-* Commit your changes to your own fork -- see [C4 Patch Requirements](https://rfc.zeromq.org/spec:42/C4/#23-patch-requirements) and [Conventional Commits](https://www.conventionalcommits.org/) for guidelines.
+* Commit your changes to your own fork -- see [Conventional Commits](https://www.conventionalcommits.org/) for commit message guidelines.
 * Include tests that cover all non-trivial code.
 * Check you are working on the latest version on `dev` in Chain Desktop Wallet's official repository. If not, please pull Chain Desktop Wallet's official repository's `dev` (upstream) into your fork's `dev` branch, and rebase your committed changes or replay your stashed changes in your branch over the latest changes in the upstream version.
 * Run all tests locally and make sure they pass. `yarn test`

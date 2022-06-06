@@ -4,8 +4,8 @@
 # PR Checklist:
 
 - [ ] Have you read the [CONTRIBUTING.md](/CONTRIBUTING.md)?
-- [ ] Does your PR follow the [C4 patch requirements](https://rfc.zeromq.org/spec:42/C4/#23-patch-requirements) and [Conventional Commits](https://www.conventionalcommits.org/)?
 - [ ] Have you rebased your work on top of the latest `dev`? 
+- [ ] Does your PR follow the [Conventional Commits Guide](https://www.conventionalcommits.org/)?
 - [ ] Have you checked your code compiles? (`yarn build`)
 - [ ] Have you included tests for any non-trivial functionality?
 - [ ] Have you followed the [Multi-Language Content Management Guide](/CONTENT_MANAGEMENT.md)?
