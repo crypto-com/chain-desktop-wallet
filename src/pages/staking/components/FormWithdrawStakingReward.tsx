@@ -352,7 +352,7 @@ export const FormWithdrawStakingReward = () => {
     try {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(true);
-      const restakeRewardAmount = withdrawValues.rewardAmount.split(' ')[0];
+      const restakeRewardAmount = numeral(scaledRewardBalance(walletAsset)).format('0,0.0000');
 
       const restakeRewardResult = await walletService.sendRestakeAllRewardsTx({
         validatorAddressList: rewards.map(rewardInfo => rewardInfo.validatorAddress),
@@ -363,12 +363,12 @@ export const FormWithdrawStakingReward = () => {
         memo: '',
       });
 
+      // console.log('restakeRewardResult ', restakeRewardResult);
+
       if (restakeRewardResult.transactionHash) {
         // Success - Reward withdraw transaction was successfully broadcasted
 
         // withdrawValues.rewardAmount = '0.1 CRO'
-
-        console.log('restakeRewardResult ', restakeRewardResult);
 
         setBroadcastResult(restakeRewardResult);
         setSuccessRestakeRewardModalMessage(

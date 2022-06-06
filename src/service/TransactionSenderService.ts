@@ -447,7 +447,11 @@ export class TransactionSenderService {
       ledgerTransactionSigner,
     } = await this.transactionPrepareService.prepareTransaction();
 
+    console.log('sendRestakeAllRewardsTransaction ', restakeRequest);
+
     const delegationAmountScaled = getBaseScaledAmount(restakeRequest.amount, restakeRequest.asset);
+
+    console.log('delegationAmountScaled ', delegationAmountScaled);
 
     let { memo } = restakeRequest;
     if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
