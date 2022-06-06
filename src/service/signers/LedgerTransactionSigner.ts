@@ -18,6 +18,7 @@ import {
   NFTDenomIssueUnsigned,
   BridgeTransactionUnsigned,
   WithdrawAllStakingRewardsUnsigned,
+  MsgDepositTransactionUnsigned,
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
 import { BaseTransactionSigner, ITransactionSigner } from './TransactionSigner';
@@ -103,6 +104,36 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     });
 
     return this.getSignedMessageTransaction(transaction, [msgVote], rawTx);
+  }
+
+  /**
+   * Sign a raw `MsgDeposit` tx for onchain submission
+   * @param transaction 
+   * @param phrase 
+   * @param gasFee 
+   * @param gasLimit 
+   */
+  public async signProposalDepositTransaction(
+    transaction: MsgDepositTransactionUnsigned,
+    phrase: string,
+    gasFee: string,
+    gasLimit: number,
+  ): Promise<string> {
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
+
+    // Transforming user amount to library compatible type
+    const msgDepositAmount = transaction.amount.map(coin => {
+      return cro.v2.CoinV2.fromCustomAmountDenom(coin.amount, coin.denom);
+    });
+
+    // Using V2 because it has support for multiple `amount` in a single transaction
+    const msgDeposit = new cro.v2.gov.MsgDepositV2({
+      amount: msgDepositAmount,
+      depositor: transaction.depositor,
+      proposalId: Big(transaction.proposalId),
+    });
+
+    return this.getSignedMessageTransaction(transaction, [msgDeposit], rawTx);
   }
 
   public async signDelegateTx(

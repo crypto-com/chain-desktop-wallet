@@ -1,3 +1,5 @@
+import { Coin } from '@crypto-org-chain/chain-jslib/lib/dist/cosmos/coins';
+import Big from 'big.js';
 import { VoteOption } from '../../models/Transaction';
 import { UserAsset } from '../../models/UserAsset';
 
@@ -21,6 +23,11 @@ export interface VoteTransactionUnsigned extends TransactionUnsigned {
   voter: string;
   option: VoteOption;
   proposalID: string;
+}
+export interface MsgDepositTransactionUnsigned extends TransactionUnsigned {
+  proposalId: Big;
+  depositor: string;
+  amount: Coin[];
 }
 
 export interface NFTTransferUnsigned extends TransactionUnsigned {

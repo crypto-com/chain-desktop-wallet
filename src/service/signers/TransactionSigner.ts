@@ -17,6 +17,7 @@ import {
   NFTDenomIssueUnsigned,
   BridgeTransactionUnsigned,
   WithdrawAllStakingRewardsUnsigned,
+  MsgDepositTransactionUnsigned
 } from './TransactionSupported';
 
 export interface ITransactionSigner {
@@ -114,12 +115,38 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
     return this.getSignedMessageTransaction([msgVote], transaction, keyPair, rawTx);
   }
 
-  public async signNFTTransfer(
-    transaction: NFTTransferUnsigned,
+  /**
+   * Sign a raw `MsgDeposit` tx for onchain submission
+   * @param transaction 
+   * @param phrase 
+   * @param gasFee 
+   * @param gasLimit 
+   */
+  public async signProposalDepositTransaction(
+    transaction: MsgDepositTransactionUnsigned,
     phrase: string,
     gasFee: string,
     gasLimit: number,
   ): Promise<string> {
+    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
+
+    // Transforming user amount to library compatible type
+    const msgDepositAmount = transaction.amount.map(coin => {
+      return cro.v2.CoinV2.fromCustomAmountDenom(coin.amount, coin.denom);
+    });
+
+    // Using V2 because it has support for multiple `amount` in a single transaction
+    const msgDeposit = new cro.v2.gov.MsgDepositV2({
+      amount: msgDepositAmount,
+      depositor: transaction.depositor,
+      proposalId: Big(transaction.proposalId),
+    });
+
+    return this.getSignedMessageTransaction([msgDeposit], transaction, keyPair, rawTx);
+  }
+
+  public async signNFTTransfer(transaction: NFTTransferUnsigned, phrase: string, gasFee: string,
+    gasLimit: number): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
     const msgTransferNFT = new cro.nft.MsgTransferNFT({
