@@ -51,7 +51,6 @@ import {
   VoteRequest,
   WithdrawStakingRewardRequest,
   WithdrawAllStakingRewardRequest,
-  DepositToProposalRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter } from '../utils/utils';
@@ -130,14 +129,6 @@ class WalletService {
 
   public async sendVote(voteRequest: VoteRequest): Promise<BroadCastResult> {
     return await this.txSenderManager.sendVote(voteRequest);
-  }
-
-  /**
-   * Creates, signs and broadcasts a new `MsgDeposit` transaction on-chain
-   * @param depositProposalRequest 
-   */
-  public async sendProposalDepositTx(depositProposalRequest: DepositToProposalRequest): Promise<BroadCastResult> {
-    return await this.txSenderManager.sendMsgDepositTx(depositProposalRequest);
   }
 
   public async sendNFT(nftTransferRequest: NFTTransferRequest): Promise<BroadCastResult> {
