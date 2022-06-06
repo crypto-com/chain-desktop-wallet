@@ -25,11 +25,6 @@ export interface VoteTransactionUnsigned extends TransactionUnsigned {
   option: VoteOption;
   proposalID: string;
 }
-export interface MsgDepositTransactionUnsigned extends TransactionUnsigned {
-  proposalId: Big;
-  depositor: string;
-  amount: Coin[];
-}
 
 /**
  * MsgSubmitProposal type message parameters

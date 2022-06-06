@@ -51,7 +51,6 @@ import {
   VoteRequest,
   WithdrawStakingRewardRequest,
   WithdrawAllStakingRewardRequest,
-  DepositToProposalRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter } from '../utils/utils';
@@ -135,9 +134,11 @@ class WalletService {
 
   /**
    * Creates, signs and broadcasts a new `MsgDeposit` transaction on-chain
-   * @param depositProposalRequest 
+   * @param depositProposalRequest
    */
-  public async sendProposalDepositTx(depositProposalRequest: DepositToProposalRequest): Promise<BroadCastResult> {
+  public async sendProposalDepositTx(
+    depositProposalRequest: DepositToProposalRequest,
+  ): Promise<BroadCastResult> {
     return await this.txSenderManager.sendMsgDepositTx(depositProposalRequest);
   }
 
@@ -371,7 +372,7 @@ class WalletService {
   public async retrieveDefaultWalletAsset(currentSession: Session): Promise<UserAsset> {
     const allWalletAssets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
     // eslint-disable-next-line no-console
-    console.log('ALL_WALLET_ASSETS : ', allWalletAssets);
+    console.log('ALL_WALLET_ASSETS: ', allWalletAssets);
 
     for (let i = 0; i < allWalletAssets.length; i++) {
       if (!allWalletAssets[i].isSecondaryAsset) {

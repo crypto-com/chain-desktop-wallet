@@ -63,7 +63,7 @@ export class BaseTransactionSigner {
   public getTransactionInfoData(_phrase: string, memo: string, gasFee: string, gasLimit: number) {
     const cro = sdk.CroSDK({ network: this.config.network });
     let keyPair;
-    // For ledger based devices a mnemonic phrase is never passed in so we need to handle this only for normal wallets
+    // For ledger based devices, a mnemonic phrase is never passed in so we need to handle this only for normal wallets
     if (_phrase) {
       const importedHDKey = HDKey.fromMnemonic(_phrase);
       const privateKey = importedHDKey.derivePrivKey(this.config.derivationPath);
@@ -115,13 +115,13 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
 
     return this.getSignedMessageTransaction([msgVote], transaction, keyPair, rawTx);
   }
-
+  
   /**
    * Sign a raw `MsgDeposit` tx for onchain submission
-   * @param transaction 
-   * @param phrase 
-   * @param gasFee 
-   * @param gasLimit 
+   * @param transaction
+   * @param phrase
+   * @param gasFee
+   * @param gasLimit
    */
   public async signProposalDepositTransaction(
     transaction: MsgDepositTransactionUnsigned,
