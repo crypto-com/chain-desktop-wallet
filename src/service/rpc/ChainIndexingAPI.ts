@@ -361,6 +361,27 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     }
   }
 
+  /**
+   * Fetch all `MsgVote` transactions submitted on-chain by an account
+   * @param address {string}
+   */
+  public async fetchAccountVotingHistory(
+    address: string,
+  ): Promise<AccountMessage[]> {
+    try {
+      const msgTypeNames: MsgTypeName[] = [
+        'MsgVote',
+      ];
+
+      const userVoteHistory = await this.getMessagesByAccountAddress(address, msgTypeNames);
+      return userVoteHistory;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING_VOTE_HISTORY', e);
+      return [];
+    }
+  }
+
   public async fetchNftDenomData(denomId: string): Promise<NftDenomResponse> {
     try {
       const denomIdInfo = await this.axiosClient.get<NftDenomResponse>(`nfts/denoms/${denomId}`);

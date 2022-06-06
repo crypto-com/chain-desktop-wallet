@@ -61,6 +61,14 @@ export interface NFTDenomIssueRequest {
   walletType: string; // normal, ledger
 }
 
+/**
+ * Restaking all rewards
+ */
+
+export interface AllDelegationRequests {
+  validatorAddressList: string[];
+}
+
 export interface DelegationRequest {
   validatorAddress: string;
   amount: string;
@@ -70,7 +78,7 @@ export interface DelegationRequest {
   walletType: string; // normal, ledger
 }
 
-export interface UndelegationRequest extends DelegationRequest { }
+export interface UndelegationRequest extends DelegationRequest {}
 export interface RedelegationRequest {
   validatorSourceAddress: string;
   validatorDestinationAddress: string;
@@ -80,6 +88,8 @@ export interface RedelegationRequest {
   decryptedPhrase: string;
   walletType: string; // normal, ledger
 }
+
+export interface RestakeStakingRewardRequest extends DelegationRequest {}
 
 export interface WithdrawStakingRewardRequest {
   validatorAddress: string;
