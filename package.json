@@ -1,7 +1,7 @@
 {
   "name": "chain-desktop-wallet",
   "version": "0.8.1",
-  "description": "Crypto.com Chain Desktop Wallet App",
+  "description": "Crypto.com DeFi Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.org <chain@crypto.org>",
   "license": "Apache-2.0",
@@ -229,7 +229,7 @@
     "src/**/*.{js,jsx,ts,tsx}": "yarn lint:js"
   },
   "build": {
-    "productName": "Crypto.org Chain Desktop Wallet (Beta)",
+    "productName": "Crypto.com DeFi Desktop Wallet",
     "appId": "chain.crypto.org.chain-desktop-wallet",
     "files": [
       "./build/**/*",
