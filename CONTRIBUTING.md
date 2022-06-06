@@ -24,8 +24,8 @@ There are several ways to identify an area where you can contribute:
 * Occasionally, some issues on Github may be labelled with `help wanted` or `good first issue` tags.
 
 ### Discuss First
-Before you start to work on a feature pull request, it's always better to open a feature request issue first to discuss with the maintainers whether the feature is desired and the design of those features. This would help save time for both the maintainers and the contributors and help features to be shipped faster.
 
+Before sending a feature pull request, it's always better to open a issue first to discuss whether it is desired and the design of the feature. 
 
 ### Editor Setup
 We recommend using VS Code along with the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension.
@@ -42,7 +42,11 @@ There are two main branches:
 - `master`: This is the branch that is used to work on the official release.
 
 ### Commit Convention
-We use [Conventional Commits](https://www.conventionalcommits.org/) for commit messages, which allows the changelog to be auto-generated based on the commits. Please read the guide through if you aren't familiar with it already.
+We use [Conventional Commits](https://www.conventionalcommits.org/) for commit messages. Please read the guide through if you aren't familiar with it already.
+
+
+### Changelog
+Changelogs are handled by maintainers, which will be batch updated before each release.
 
 ### Multi-Language Content Management
 Please refer to the [Instructions on Multi-Language Content Management](CONTENT_MANAGEMENT.md) for any content updates. 
@@ -53,7 +57,7 @@ Please refer to the [Instructions on Multi-Language Content Management](CONTENT_
 * Clone your fork locally on your machine.
 * Post a comment in the issue to say that you are working on it, so that other people do not work on the same issue.
 * Create a local branch on your machine by `git checkout -b branch_name` from `dev` branch.
-* Commit your changes to your own fork -- see [C4 Patch Requirements](https://rfc.zeromq.org/spec:42/C4/#23-patch-requirements) for guidelines.
+* Commit your changes to your own fork -- see [C4 Patch Requirements](https://rfc.zeromq.org/spec:42/C4/#23-patch-requirements) and [Conventional Commits](https://www.conventionalcommits.org/) for guidelines.
 * Include tests that cover all non-trivial code.
 * Check you are working on the latest version on `dev` in Chain Desktop Wallet's official repository. If not, please pull Chain Desktop Wallet's official repository's `dev` (upstream) into your fork's `dev` branch, and rebase your committed changes or replay your stashed changes in your branch over the latest changes in the upstream version.
 * Run all tests locally and make sure they pass. `yarn test`
