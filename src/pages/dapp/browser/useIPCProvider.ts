@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Web3 from 'web3';
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
@@ -441,6 +441,9 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             const foundConfig = chainConfigs.find(c => isHexEqual(c.chainId, event.object.chainId));
 
             if (foundConfig && isHexEqual(selectedChain.chainId, event.object.chainId)) {
+              setSelectedChain(foundConfig);
+              injectDomReadyScript(foundConfig);
+              sendResponse(event.id, foundConfig.chainId);
               return;
             }
 
@@ -453,6 +456,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
                 () => {
                   setSelectedChain(foundConfig);
                   injectDomReadyScript(foundConfig);
+                  sendResponse(event.id, foundConfig.chainId);
                 },
                 () => {
                   // no-op
@@ -482,6 +486,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
                   () => {
                     setSelectedChain(config);
                     injectDomReadyScript(config);
+                    sendResponse(event.id, config.chainId);
                   },
                   () => {
                     // no-op
@@ -508,6 +513,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
                 () => {
                   setSelectedChain(foundConfig);
                   injectDomReadyScript(foundConfig);
+                  sendResponse(event.id, foundConfig.chainId);
                 },
                 () => {
                   // no-op
