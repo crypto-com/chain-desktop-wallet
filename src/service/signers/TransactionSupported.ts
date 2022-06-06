@@ -1,5 +1,6 @@
 import { Coin } from '@crypto-org-chain/chain-jslib/lib/dist/cosmos/coins';
 import Big from 'big.js';
+
 import { VoteOption } from '../../models/Transaction';
 import { UserAsset } from '../../models/UserAsset';
 

@@ -108,10 +108,10 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
 
   /**
    * Sign a raw `MsgDeposit` tx for onchain submission
-   * @param transaction 
-   * @param phrase 
-   * @param gasFee 
-   * @param gasLimit 
+   * @param transaction
+   * @param phrase
+   * @param gasFee
+   * @param gasLimit
    */
   public async signProposalDepositTransaction(
     transaction: MsgDepositTransactionUnsigned,
@@ -334,11 +334,11 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
         publicKey: pubkey,
         accountNumber: new Big(transaction.accountNumber),
         accountSequence: new Big(transaction.accountSequence),
-        signMode: 127, //   LEGACY_AMINO_JSON = 127, DIRECT = 1,
+        signMode: 127, // LEGACY_AMINO_JSON = 127, DIRECT = 1,
       })
       .toSignable();
 
-    // 0 : signer index
+    // 0: signer index
     const bytesMessage: Bytes = signableTx.toSignDocument(0);
     const signature = await this.signerProvider.sign(bytesMessage);
 

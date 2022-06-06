@@ -596,7 +596,9 @@ export class TransactionSenderService {
     return broadCastResult;
   }
 
-  public async sendMsgDepositTx(depositRequest: DepositToProposalRequest): Promise<BroadCastResult> {
+  public async sendMsgDepositTx(
+    depositRequest: DepositToProposalRequest,
+  ): Promise<BroadCastResult> {
     const {
       nodeRpc,
       accountNumber,
@@ -896,7 +898,7 @@ export class TransactionSenderService {
     return bridgeTransactionResult;
   }
 
-  /* _______________________
+  /* _________________________
         NFT RELATED FUNCTIONS  
      _________________________ */
 
