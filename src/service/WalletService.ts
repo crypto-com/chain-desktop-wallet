@@ -52,7 +52,7 @@ import {
   WithdrawAllStakingRewardRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
-import { capitalizeFirstLetter } from '../utils/utils';
+import { capitalizeFirstLetter, sleep } from '../utils/utils';
 import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
 import { StorageService } from './storage/StorageService';
@@ -651,6 +651,7 @@ class WalletService {
 
     if (await this.checkIfWalletNeedAssetCreation(currentSession)) {
       await this.storageService.removeWalletAssets(wallet.identifier);
+      await sleep(3_000);
 
       const walletOps = new WalletOps();
       const assetGeneration = walletOps.generate(wallet.config, wallet.identifier, phrase);

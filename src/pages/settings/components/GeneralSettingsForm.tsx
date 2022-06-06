@@ -110,7 +110,7 @@ export const GeneralSettingsForm = props => {
     <>
       <div className="title">{t('settings.form1.assetIdentifier.label')}</div>
       <div className="description">{t('settings.form1.assetIdentifier.description')}</div>
-      <Select style={{ width: 240 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
+      <Select style={{ width: 300 }} onChange={onSwitchAsset} value={currentAssetIdentifier}>
         {configurableAssets.map(asset => {
           return (
             <Option value={asset.identifier} key={asset.identifier}>

@@ -184,8 +184,9 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
     switch (name) {
       case SupportedChainName.CRONOS:
       case SupportedChainName.CRYPTO_ORG:
-      case SupportedChainName.ETHEREUM:
         return name.replace('Chain', 'Testnet');
+      case SupportedChainName.ETHEREUM:
+        return name.replace('Chain', 'Rinkeby Testnet');
       default:
         return name;
     }
