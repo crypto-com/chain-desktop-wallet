@@ -114,7 +114,7 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
 
     return this.getSignedMessageTransaction([msgVote], transaction, keyPair, rawTx);
   }
-
+  
   /**
    * Sign a raw `MsgDeposit` tx for onchain submission
    * @param transaction

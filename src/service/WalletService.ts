@@ -51,7 +51,6 @@ import {
   VoteRequest,
   WithdrawStakingRewardRequest,
   WithdrawAllStakingRewardRequest,
-  DepositToProposalRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter } from '../utils/utils';

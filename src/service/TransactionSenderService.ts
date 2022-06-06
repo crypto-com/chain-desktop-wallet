@@ -14,7 +14,6 @@ import {
   NFTMintUnsigned,
   EVMContractCallUnsigned,
   WithdrawAllStakingRewardsUnsigned,
-  MsgDepositTransactionUnsigned,
 } from './signers/TransactionSupported';
 import { BroadCastResult } from '../models/Transaction';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
@@ -34,7 +33,6 @@ import {
   BridgeTransferRequest,
   NFTDenomIssueRequest,
   NFTMintRequest,
-  DepositToProposalRequest,
 } from './TransactionRequestModels';
 import { StorageService } from './storage/StorageService';
 import { CronosClient } from './cronos/CronosClient';
