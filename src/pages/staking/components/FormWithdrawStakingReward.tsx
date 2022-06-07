@@ -705,8 +705,11 @@ export const FormWithdrawStakingReward = () => {
           {/* <GasInfoTendermint /> */}
           <GasStepSelect asset={walletAsset} />
           <div className="note">
-            You may be required to use a <b>Higher Network Fee</b> & <b>Gas Limit</b> in order to
-            broadcast this transaction successfully
+            {t('staking.modal6.note.part1')}
+            <b>{t('staking.modal6.note.part2')}</b>
+            {t('staking.modal6.note.part3')}
+            <b>{t('staking.modal6.note.part4')}</b>
+            {t('staking.modal6.note.part5')}
           </div>
         </>
       </ModalPopup>
