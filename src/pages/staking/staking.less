@@ -136,15 +136,17 @@
     top: 0;
     right: 0;
     z-index: 7;
-    display: block;
-    margin: 12px 0;
+    display: grid;
+    grid-column-gap: 20px;
+    grid-template-columns: 1fr 1fr;
+    margin-right: 20px;
     text-align: center;
 
     .top-action-btn {
       position: relative;
       display: inline-block;
-      width: 180px;
-      margin: 0 5px !important;
+      height: 36px;
+      padding: 8px;
       font-size: 14px;
     }
   }
@@ -168,16 +170,7 @@
   display: block;
   width: 100%;
   color: #777;
-  font-size: 11px;
-
-  &::before {
-    position: relative;
-    display: inline-block;
-    margin-right: 3px;
-    color: crimson;
-    font-size: 14px;
-    content: '*';
-  }
+  font-size: 12px;
 
   b {
     color: #444;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import '../staking.less';
 import 'antd/dist/antd.css';
 import { Button, Table, Typography, Spin } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
+import { ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import Big from 'big.js';
@@ -705,10 +705,11 @@ export const FormWithdrawStakingReward = () => {
           {/* <GasInfoTendermint /> */}
           <GasStepSelect asset={walletAsset} />
           <div className="note">
-            {t('staking.modal6.note.part1')}
-            <b>{t('staking.modal6.note.part2')}</b>
-            {t('staking.modal6.note.part3')}
-            <b>{t('staking.modal6.note.part4')}</b>
+            <ExclamationCircleOutlined
+              style={{ color: '#1199fa', cursor: 'pointer', marginRight: '4px' }}
+            />
+            {t('staking.modal6.note.part1')} <b>{t('staking.modal6.note.part2')}</b>{' '}
+            {t('staking.modal6.note.part3')} <b>{t('staking.modal6.note.part4')}</b>{' '}
             {t('staking.modal6.note.part5')}
           </div>
         </>
