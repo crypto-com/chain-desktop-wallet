@@ -1,4 +1,5 @@
 import { Coin } from '@crypto-org-chain/chain-jslib/lib/dist/cosmos/coins';
+import { TextProposalOptions } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/msg/gov/proposal/TextProposal';
 import Big from 'big.js';
 import { VoteOption } from '../../models/Transaction';
 import { UserAsset } from '../../models/UserAsset';
@@ -25,11 +26,24 @@ export interface VoteTransactionUnsigned extends TransactionUnsigned {
   proposalID: string;
 }
 
+/**
+ * MsgSubmitProposal type message parameters
+ */
+export interface MsgSubmitProposalTransactionUnsigned extends TransactionUnsigned {
+  proposer: string;
+  initialDeposit: Coin[];
+}
+
+export interface TextProposalTransactionUnsigned extends TransactionUnsigned, MsgSubmitProposalTransactionUnsigned {
+  params: TextProposalOptions;
+}
+
 export interface MsgDepositTransactionUnsigned extends TransactionUnsigned {
   proposalId: Big;
   depositor: string;
   amount: Coin[];
 }
+
 export interface NFTTransferUnsigned extends TransactionUnsigned {
   tokenId: string;
   denomId: string;
