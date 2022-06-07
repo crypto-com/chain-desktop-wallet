@@ -89,6 +89,7 @@ import {
 } from '../../service/bridge/BridgeConfig';
 import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
 import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
+import { WalletConnect } from '../../service/wallet-connect';
 
 // import i18n from '../../language/I18n';
 
@@ -877,6 +878,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   return (
     <main className="home-layout">
+      <WalletConnect />
       <PasswordFormModal
         description={t('general.passwordFormModal.description')}
         okButtonText={t('general.passwordFormModal.okButton')}
