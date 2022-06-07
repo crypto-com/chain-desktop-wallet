@@ -18,6 +18,7 @@ import {
   NFTDenomIssueUnsigned,
   BridgeTransactionUnsigned,
   WithdrawAllStakingRewardsUnsigned,
+  MsgDepositTransactionUnsigned,
 } from './TransactionSupported';
 import { ISignerProvider } from './SignerProvider';
 import { BaseTransactionSigner, ITransactionSigner } from './TransactionSigner';
