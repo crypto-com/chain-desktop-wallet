@@ -462,7 +462,7 @@ export class TransactionSenderService {
       amountList: restakeRequest.amountList.map(rewardAmount =>
         getBaseScaledAmount(rewardAmount, restakeRequest.asset),
       ),
-      memo: DEFAULT_CLIENT_MEMO,
+      memo,
       accountNumber,
       accountSequence,
     };
