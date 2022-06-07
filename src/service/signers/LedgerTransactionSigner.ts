@@ -138,19 +138,19 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
   }
 
   /**
-     * Sign a raw `MsgSubmitProposal.TextProposal` tx for onchain submission
-     * @param transaction 
-     * @param phrase 
-     * @param gasFee 
-     * @param gasLimit 
-     */
+   * Sign a raw `MsgSubmitProposal.TextProposal` tx for onchain submission
+   * @param transaction
+   * @param phrase
+   * @param gasFee
+   * @param gasLimit
+   */
   public async signSubmitTextProposalTransaction(
     transaction: TextProposalTransactionUnsigned,
     phrase: string,
     gasFee: string,
     gasLimit: number,
   ): Promise<string> {
-    const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
+    const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
     // Converting `initialDeposit` to library compatible types
     const initialDepositTyped = transaction.initialDeposit.map(coin => {
