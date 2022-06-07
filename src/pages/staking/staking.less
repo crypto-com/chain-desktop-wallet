@@ -162,3 +162,24 @@
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;
 }
+
+.note {
+  position: relative;
+  display: block;
+  width: 100%;
+  color: #777;
+  font-size: 11px;
+
+  &::before {
+    position: relative;
+    display: inline-block;
+    margin-right: 3px;
+    color: crimson;
+    font-size: 14px;
+    content: '*';
+  }
+
+  b {
+    color: #444;
+  }
+}

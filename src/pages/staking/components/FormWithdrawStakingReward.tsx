@@ -40,6 +40,7 @@ import { SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
 import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSelectTendermint';
+import GasStepSelect from '../../../components/GasStepSelect/index';
 
 const { Text } = Typography;
 
@@ -407,7 +408,7 @@ export const FormWithdrawStakingReward = () => {
       setInputPasswordVisible(false);
       setIsErrorTransferModalVisible(true);
       // eslint-disable-next-line no-console
-      console.error('Error occurred while transfer', e);
+      console.error('Error occurred during transfer', e);
     }
   };
 
@@ -653,7 +654,7 @@ export const FormWithdrawStakingReward = () => {
         okText={t('general.confirm')}
       >
         <>
-          <div className="title">{t('staking.withdrawall')}</div>
+          <div className="title">{t('staking.restakeall')}</div>
           <div className="description">{t('staking.modal2.description')}</div>
           <div className="item">
             <div className="label">{t('staking.modal2.label1')}</div>
@@ -697,7 +698,12 @@ export const FormWithdrawStakingReward = () => {
                 : ''}
             </div>
           </div>
-          <GasInfoTendermint />
+          {/* <GasInfoTendermint /> */}
+          <GasStepSelect asset={walletAsset} />
+          <div className="note">
+            You may be required to use a <b>Higher Network Fee</b> & <b>Gas Limit</b> in order to
+            broadcast this transaction successfully
+          </div>
         </>
       </ModalPopup>
 
