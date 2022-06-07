@@ -4,7 +4,7 @@ name: Release Executables Binaries
 on:
   push:
     branches:
-      - master
+      - feature/rebranding
 jobs:
   release:
     runs-on: ${{ matrix.os }}
