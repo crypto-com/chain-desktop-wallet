@@ -227,7 +227,7 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
   ): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
-    const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
+    // const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
     const msgWithdrawAllDelegatorRewards = transaction.validatorAddressList.map(
       validatorAddress => {
         return new cro.distribution.MsgWithdrawDelegatorReward({
@@ -237,7 +237,8 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       },
     );
 
-    const msgDelegation = transaction.validatorAddressList.map(validatorAddress => {
+    const msgDelegation = transaction.validatorAddressList.map((validatorAddress, idx) => {
+      const delegateAmount = new cro.Coin(transaction.amountList[idx], Units.BASE);
       return new cro.staking.MsgDelegate({
         delegatorAddress: transaction.delegatorAddress,
         validatorAddress,

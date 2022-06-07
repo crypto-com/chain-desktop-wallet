@@ -164,9 +164,9 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       },
     );
 
-    const delegateAmount = new cro.Coin(transaction.amount, Units.BASE);
+    const msgDelegation = transaction.validatorAddressList.map((validatorAddress, idx) => {
+      const delegateAmount = new cro.Coin(transaction.amountList[idx], Units.BASE);
 
-    const msgDelegation = transaction.validatorAddressList.map(validatorAddress => {
       return new cro.staking.MsgDelegate({
         delegatorAddress: transaction.delegatorAddress,
         validatorAddress,

@@ -353,13 +353,13 @@ export const FormWithdrawStakingReward = () => {
     try {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(true);
-      const restakeRewardAmount = numeral(scaledRewardBalance(walletAsset)).format('0,0.0000');
+      // const restakeRewardAmount = numeral(scaledRewardBalance(walletAsset)).format('0,0.0000');
 
       const restakeRewardResult = await walletService.sendRestakeAllRewardsTx({
         validatorAddressList: rewards.map(rewardInfo => rewardInfo.validatorAddress),
         decryptedPhrase,
         walletType,
-        amount: restakeRewardAmount,
+        amountList: rewards.map(rewardInfo => numeral(rewardInfo.rewardAmount).format('0,0.0000')),
         asset: walletAsset,
         memo: '',
       });
@@ -377,8 +377,10 @@ export const FormWithdrawStakingReward = () => {
         );
 
         setIsConfirmationRestakeModalVisible(false);
+        setIsVisibleConfirmationModal(false);
         setConfirmLoading(false);
         setIsSuccessRestakeRewardModalVisible(true);
+        handleRestakeAllModal();
       } else if (
         restakeRewardResult?.code !== undefined &&
         restakeRewardResult?.code !== null &&
@@ -389,9 +391,11 @@ export const FormWithdrawStakingReward = () => {
         setSuccessRestakeRewardModalMessage(
           t('general.successModalPopup.restakeReward.description4'),
         );
+        setIsVisibleConfirmationModal(false);
         setIsConfirmationRestakeModalVisible(false);
         setConfirmLoading(false);
         setIsSuccessRestakeRewardModalVisible(true);
+        setRestakeAllModalVisible(false);
       } else {
         // Failed - Reward withdraw transaction
         throw new Error(t('general.errorModalPopup.reward.description'));

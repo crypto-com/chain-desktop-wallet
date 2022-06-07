@@ -93,7 +93,7 @@ export interface RestakeStakingRewardRequest extends DelegationRequest {}
 
 export interface RestakeStakingAllRewardsRequest {
   validatorAddressList: string[];
-  amount: string;
+  amountList: string[];
   memo: string;
   asset: UserAsset;
   decryptedPhrase: string;

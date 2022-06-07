@@ -88,7 +88,7 @@ export interface RestakeStakingRewardTransactionUnsigned extends TransactionUnsi
 export interface RestakeStakingAllRewardsTransactionUnsigned extends TransactionUnsigned {
   delegatorAddress: string;
   validatorAddressList: string[];
-  amount: string;
+  amountList: string[];
 }
 
 export interface CustomFeeRequest {
