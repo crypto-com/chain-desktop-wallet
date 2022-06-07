@@ -1,0 +1,138 @@
+# Only run on master push
+name: Release Executables Binaries
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  release:
+    runs-on: ${{ matrix.os }}
+    environment: deployment
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: setup dependencies
+        if: startsWith(matrix.os, 'ubuntu')
+        run: sudo apt-get update && sudo apt-get install -y libusb-1.0-0-dev  libudev-dev
+
+      - name: Check out Git repository
+        uses: actions/checkout@v1
+
+      - name: Install Node.js, NPM and Yarn
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14
+
+      - name: Install deps with big timeout
+        run: |
+          yarn install --network-timeout 600000
+
+      - name: Install Snapcraft
+        uses: samuelmeuli/action-snapcraft@v1
+        # Only install Snapcraft on Ubuntu
+        if: startsWith(matrix.os, 'ubuntu')
+        with:
+          # Log in to Snap Store
+          snapcraft_token: ${{ secrets.snapcraft_token }}
+
+      - name: Install AzureSignTool
+        # Only install Azure Sign Tool on Windows
+        if: startsWith(matrix.os, 'windows')
+        run: dotnet tool install --global AzureSignTool
+
+      - name: Extract current branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+        id: extract_branch
+
+      - name: Get name & version from package.json
+        shell: bash
+        run: | 
+          echo "##[set-output name=name;]$(node -p -e '`${require("./package.json").name}`')"
+          echo "##[set-output name=version;]$(node -p -e '`${require("./package.json").version}`')"
+        id: package_json
+
+      - name: Log release reference
+        run: |
+          echo "********* START RELEASE REF **********"
+          echo ${{ github.ref }}
+          echo branch: ${{ steps.extract_branch.outputs.branch }}
+          echo name: ${{ steps.package_json.outputs.name }}
+          echo version: ${{ steps.package_json.outputs.version }}
+          echo "********* END RELEASE REF ************"
+
+      - name: Prepare for app notarization (MacOS)
+        if: startsWith(matrix.os, 'macos')
+        # Import Apple API key for app notarization on macOS
+        run: |
+          mkdir -p ~/private_keys/
+          echo '${{ secrets.mac_api_key }}' > ~/private_keys/AuthKey_${{ secrets.mac_api_key_id }}.p8
+
+      - name: Build/release Electron app (MacOS, Ubuntu)
+        uses: samuelmeuli/action-electron-builder@v1
+        if: startsWith(matrix.os, 'macos') || startsWith(matrix.os, 'ubuntu')
+        with:
+
+          build_script_name: electron:pre-build
+
+          # GitHub token, automatically provided to the action
+          # (No need to define this secret in the repo settings)
+          github_token: ${{ secrets.github_token }}
+
+          # When a push is done to master, the action builds binaries for all OS and they are then released directly
+          release: ${{ steps.extract_branch.outputs.branch == 'master' }}
+
+          mac_certs: ${{ secrets.mac_certs }}
+          mac_certs_password: ${{ secrets.mac_certs_password }}
+
+        env:
+          # macOS notarization API key
+          API_KEY_ID: ${{ secrets.mac_api_key_id }}
+          API_KEY_ISSUER_ID: ${{ secrets.mac_api_key_issuer_id }}
+          
+      - name: Build Electron app (Windows)
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          yarn run electron:build
+
+      - name: Sign built binary (Windows)
+        if: startsWith(matrix.os, 'windows')
+        # Instead of pointing to a specific .exe, uses a PowerShell script which iterates through all the files stored in dist folder. 
+        # If the file has the .exe extension, then it will use the AzureSignTool command to sign it.
+        run: |
+              cd dist; Get-ChildItem -recurse -Include **.exe | ForEach-Object {
+              $exePath = $_.FullName
+              & AzureSignTool sign -kvu "${{ secrets.azure_key_vault_url }}" -kvi "${{ secrets.azure_key_vault_client_id }}" -kvt "${{ secrets.azure_key_vault_tenant_id }}" -kvs "${{ secrets.azure_key_vault_client_secret }}" -kvc "${{ secrets.azure_key_vault_name }}" -tr http://timestamp.digicert.com -v $exePath
+              }; cd ..
+
+      - name: Cleanup artifacts (Windows)
+        if: startsWith(matrix.os, 'windows')
+        run: |
+          mkdir dist/temp; Move-Item -Path dist/*.exe, dist/*.blockmap, dist/latest.yml -Destination dist/temp
+          npx rimraf "dist/!(temp)"
+          npx rimraf "dist/.icon-ico"
+          mv dist/temp/* dist
+          npx rimraf "dist/temp"
+          mv dist/*.exe dist/${{ steps.package_json.outputs.name }}-setup-${{ steps.package_json.outputs.version }}.exe
+          mv dist/*.blockmap dist/${{ steps.package_json.outputs.name }}-setup-${{ steps.package_json.outputs.version }}.exe.blockmap
+
+      - name: Upload artifacts (Windows)
+        uses: actions/upload-artifact@v2
+        if: startsWith(matrix.os, 'windows')
+        with:
+          name: ${{ matrix.os }}
+          path: dist
+
+      - name: Release Electron app (Windows)
+        uses: softprops/action-gh-release@v1
+        if: startsWith(matrix.os, 'windows')
+        with:
+          draft: true
+          tag_name: v${{ steps.package_json.outputs.version }}
+          files: "dist/**"
+        env:
+          GITHUB_TOKEN: ${{ secrets.github_token }}
