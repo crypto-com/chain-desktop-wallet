@@ -359,7 +359,7 @@ export const FormWithdrawStakingReward = () => {
         validatorAddressList: rewards.map(rewardInfo => rewardInfo.validatorAddress),
         decryptedPhrase,
         walletType,
-        amountList: rewards.map(rewardInfo => numeral(rewardInfo.rewardAmount).format('0,0.0000')),
+        amountList: rewards.map(rewardInfo => rewardInfo.rewardAmount),
         asset: walletAsset,
         memo: '',
       });

@@ -239,6 +239,9 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
 
     const msgDelegation = transaction.validatorAddressList.map((validatorAddress, idx) => {
       const delegateAmount = new cro.Coin(transaction.amountList[idx], Units.BASE);
+
+      console.log('delegation amount ', delegateAmount);
+
       return new cro.staking.MsgDelegate({
         delegatorAddress: transaction.delegatorAddress,
         validatorAddress,
