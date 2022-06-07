@@ -52,6 +52,7 @@ import {
   WithdrawStakingRewardRequest,
   WithdrawAllStakingRewardRequest,
   DepositToProposalRequest,
+  TextProposalRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter } from '../utils/utils';
@@ -61,7 +62,6 @@ import { StorageService } from './storage/StorageService';
 import { TransactionPrepareService } from './TransactionPrepareService';
 import { TransactionHistoryService } from './TransactionHistoryService';
 import { TransactionSenderService } from './TransactionSenderService';
-import { TextProposalRequest } from './TransactionRequestModels';
 
 class WalletService {
   public readonly BROADCAST_TIMEOUT_CODE = -32603;
@@ -145,9 +145,11 @@ class WalletService {
 
   /**
    * Creates, signs and broadcasts a new `MsgSubmitProposal.TextProposal` transaction on-chain
-   * @param textProposalSubmitRequest 
+   * @param textProposalSubmitRequest
    */
-  public async sendTextProposalSubmitTx(textProposalSubmitRequest: TextProposalRequest): Promise<BroadCastResult> {
+  public async sendTextProposalSubmitTx(
+    textProposalSubmitRequest: TextProposalRequest,
+  ): Promise<BroadCastResult> {
     return await this.txSenderManager.sendSubmitTextProposalTransaction(textProposalSubmitRequest);
   }
 
