@@ -95,31 +95,37 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     selectedChain,
   } = useChainConfigs();
 
+  useEffect(() => {
+    if (!isDOMReady) {
+      return;
+    }
+
+    if (queuedMessages.length > 0) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const message of queuedMessages) {
+        // eslint-disable-next-line no-await-in-loop
+        execute(message);
+      }
+
+      setQueuedMessages([]);
+    }
+  }, [isDOMReady]);
+
+  const execute = async (script: string) => {
+    await webview?.executeJavaScript(
+      `
+          (function() {
+              ${script}
+          })();
+          `,
+    );
+  };
+
   const executeJavScript = useCallback(
     async (script: string) => {
       if (!isDOMReady) {
         setQueuedMessages([...queuedMessages, script]);
         return;
-      }
-
-      const execute = async (script: string) => {
-        await webview?.executeJavaScript(
-          `
-          (function() {
-              ${script}
-          })();
-          `,
-        );
-      };
-
-      if (queuedMessages.length > 0) {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const message of queuedMessages) {
-          // eslint-disable-next-line no-await-in-loop
-          await execute(message);
-        }
-
-        setQueuedMessages([]);
       }
 
       execute(script);
@@ -561,10 +567,10 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       }
     });
 
-    updateChainConfig(selectedChain);
+    updateChainConfig(selectedChain, true);
   }, [webview, selectedChain]);
 
-  const updateChainConfig = (config: EVMChainConfig) => {
+  const updateChainConfig = (config: EVMChainConfig, emitChanged = false) => {
     executeJavScript(
       `
             var config = {
@@ -573,7 +579,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
                 rpcUrl: "${config.rpcUrls[0]}",
                 isDebug: true
             };
-            window.ethereum.setConfig(config);
+            window.ethereum.setConfig(config, ${emitChanged});
         `,
     );
   };

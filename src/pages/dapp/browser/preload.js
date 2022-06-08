@@ -215,9 +215,7 @@ class Web3Provider extends EventEmitter {
     this.isDesktopWallet = true;
     this.isDebug = !!config.isDebug;
 
-    this.emitConnect(config.chainId);
-
-    this.eth_requestAccounts({id: -1})
+    this.eth_requestAccounts({ id: -1 });
   }
 
   setAddress(address) {
@@ -230,13 +228,22 @@ class Web3Provider extends EventEmitter {
     }
   }
 
-  setConfig(config) {
+  setConfig(config, emitChanged = false) {
+    if (!config) {
+      return;
+    }
+
     this.setAddress(config.address);
 
+    const oldChainId = this.chainId;
+
     this.chainId = config.chainId;
+    if (emitChanged) {
+      this.emit('chainChanged', config.chainId);
+    }
     this.rpc = new RPCServer(config.rpcUrl);
     this.isDebug = !!config.isDebug;
-    this.emit('chainChanged', config.chainId);
+    this.emitConnect(config.chainId);
   }
 
   request(payload) {
@@ -557,7 +564,8 @@ window.desktopWallet = {
 };
 
 const providerConfig = {
-  chainId: "0x19",
+  chainId: '0x19',
+  address: '',
   rpcUrl: 'https://evm.cronos.org',
   isDebug: true,
 };
