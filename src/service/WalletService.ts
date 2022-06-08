@@ -52,6 +52,8 @@ import {
   VoteRequest,
   WithdrawStakingRewardRequest,
   WithdrawAllStakingRewardRequest,
+  DepositToProposalRequest,
+  TextProposalRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter } from '../utils/utils';
@@ -136,6 +138,26 @@ class WalletService {
 
   public async sendVote(voteRequest: VoteRequest): Promise<BroadCastResult> {
     return await this.txSenderManager.sendVote(voteRequest);
+  }
+
+  /**
+   * Creates, signs and broadcasts a new `MsgDeposit` transaction on-chain
+   * @param depositProposalRequest
+   */
+  public async sendProposalDepositTx(
+    depositProposalRequest: DepositToProposalRequest,
+  ): Promise<BroadCastResult> {
+    return await this.txSenderManager.sendMsgDepositTx(depositProposalRequest);
+  }
+
+  /**
+   * Creates, signs and broadcasts a new `MsgSubmitProposal.TextProposal` transaction on-chain
+   * @param textProposalSubmitRequest
+   */
+  public async sendTextProposalSubmitTx(
+    textProposalSubmitRequest: TextProposalRequest,
+  ): Promise<BroadCastResult> {
+    return await this.txSenderManager.sendSubmitTextProposalTransaction(textProposalSubmitRequest);
   }
 
   public async sendNFT(nftTransferRequest: NFTTransferRequest): Promise<BroadCastResult> {
@@ -360,7 +382,7 @@ class WalletService {
   public async retrieveDefaultWalletAsset(currentSession: Session): Promise<UserAsset> {
     const allWalletAssets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
     // eslint-disable-next-line no-console
-    console.log('ALL_WALLET_ASSETS : ', allWalletAssets);
+    console.log('ALL_WALLET_ASSETS: ', allWalletAssets);
 
     for (let i = 0; i < allWalletAssets.length; i++) {
       if (!allWalletAssets[i].isSecondaryAsset) {

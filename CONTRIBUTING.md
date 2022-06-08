@@ -16,42 +16,58 @@ If you think that you have identified an issue with Chain that might compromise
 its users' security, please do not open a public issue on GitHub. Instead,
 we ask you to refer to [security policy](SECURITY.md).
 
-## Working on issues
-There are several ways to identify an area where you can contribute to Chain:
+## Sending Pull requests
+
+There are several ways to identify an area where you can contribute:
 
 * You can reach out by sending a message in the developer community communication channel, either with a specific contribution in mind or in general by saying "I want to help!".
 * Occasionally, some issues on Github may be labelled with `help wanted` or `good first issue` tags.
 
-We use the variation of the "fork and pull" model where contributors push changes to their personal fork and create pull requests to bring those changes into the source repository.
-Changes in pull requests should satisfy "Patch Requirements" described in [The Collective Code Construction Contract (C4)](https://rfc.zeromq.org/spec:42/C4/#23-patch-requirements). The code and comments should follow [Effective Go Guide](https://golang.org/doc/effective_go.html) (and [Uber Style Guide](https://github.com/uber-go/guide/blob/master/style.md)). Many of the code style rules are captured by `yarn lint:js`, `eslint` and other tools, so we recommend [setting up your editor to do formatting and lint-checking for you](https://github.com/golang/go/wiki/IDEsAndTextEditorPlugins).
+### Discuss First
 
-Once you identified an issue to work on, this is the summary of your basic steps:
+Before sending a feature pull request, it's always better to open a issue first to discuss whether it is desired and the design of the feature. 
+
+### Editor Setup
+We recommend using VS Code along with the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) extension.
+
+### Style Guide
+The code and comments should follow [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html). Many of the code style rules are captured by `eslint`. 
+
+### Branch Model
+We use the [Fork and Pull](https://git-scm.com/book/en/v2/Git-Basics-Fork-and-Pull) model and [GitFlow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) to work on this repository.
+
+There are two main branches:
+
+- `dev`: This is the branch that is used to work on features and bug fixes.
+- `master`: This is the branch that is used to work on the official release.
+
+### Commit Convention
+We use [Conventional Commits](https://www.conventionalcommits.org/) for commit messages. Please read the guide through if you aren't familiar with it already.
+
+
+### Changelog
+Changelogs are handled by maintainers, which will be batch updated before each release.
+
+### Multi-Language Content Management
+Please refer to the [Instructions on Multi-Language Content Management](CONTENT_MANAGEMENT.md) for any content updates. 
+
+### Detailed Pull Request Steps
 
 * Fork the Chain Desktop Wallet's repository under your Github account.
-
 * Clone your fork locally on your machine.
-
 * Post a comment in the issue to say that you are working on it, so that other people do not work on the same issue.
-
-* Create a local branch on your machine by `git checkout -b branch_name`.
-
-* Commit your changes to your own fork -- see [C4 Patch Requirements](https://rfc.zeromq.org/spec:42/C4/#23-patch-requirements) for guidelines.
-
+* Create a local branch on your machine by `git checkout -b branch_name` from `dev` branch.
+* Commit your changes to your own fork -- see [Conventional Commits](https://www.conventionalcommits.org/) for commit message guidelines.
 * Include tests that cover all non-trivial code.
-
-* Check you are working on the latest version on master in Chain Desktop Wallet's official repository. If not, please pull Chain Desktop Wallet's official repository's master (upstream) into your fork's master branch, and rebase your committed changes or replay your stashed changes in your branch over the latest changes in the upstream version.
-
-* Run all tests locally and make sure they pass.
-
+* Check you are working on the latest version on `dev` in Chain Desktop Wallet's official repository. If not, please pull Chain Desktop Wallet's official repository's `dev` (upstream) into your fork's `dev` branch, and rebase your committed changes or replay your stashed changes in your branch over the latest changes in the upstream version.
+* Run all tests locally and make sure they pass. `yarn test`
 * If your changes are of interest to other developers, please make corresponding changes in the official documentation and the changelog.
-
-* Push your changes to your fork's branch and open the pull request to Chain Desktop Wallet's repository master branch.
-
+* Push your changes to your fork's branch and open the pull request to Chain Desktop Wallet's repository `dev` branch.
 * In the pull request, complete its checklist, add a clear description of the problem your changes solve, and add the following statement to confirm that your contribution is your own original work: "I hereby certify that my contribution is in accordance with the Developer Certificate of Origin (https://developercertificate.org/)."
-
 * The reviewer will either accept and merge your pull request, or leave comments requesting changes via the Github PR interface (you should then make changes by pushing directly to your existing PR branch).
 
-### Developer Certificate of Origin
+
+## Developer Certificate of Origin
 All contributions to this project are subject to the terms of the Developer Certificate of Origin, available [here](https://developercertificate.org/) and reproduced below:
 
 ```

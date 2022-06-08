@@ -15,6 +15,8 @@ import {
   NFTMintUnsigned,
   EVMContractCallUnsigned,
   WithdrawAllStakingRewardsUnsigned,
+  MsgDepositTransactionUnsigned,
+  TextProposalTransactionUnsigned,
 } from './signers/TransactionSupported';
 import { BroadCastResult } from '../models/Transaction';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
@@ -35,6 +37,8 @@ import {
   BridgeTransferRequest,
   NFTDenomIssueRequest,
   NFTMintRequest,
+  DepositToProposalRequest,
+  TextProposalRequest,
 } from './TransactionRequestModels';
 import { StorageService } from './storage/StorageService';
 import { CronosClient } from './cronos/CronosClient';
@@ -652,6 +656,102 @@ export class TransactionSenderService {
     return broadCastResult;
   }
 
+  public async sendMsgDepositTx(
+    depositRequest: DepositToProposalRequest,
+  ): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.transactionPrepareService.prepareTransaction();
+
+    const depositToProposalUnsigned: MsgDepositTransactionUnsigned = {
+      proposalId: depositRequest.proposalId,
+      depositor: depositRequest.depositor,
+      amount: depositRequest.amount,
+      memo: '', // Todo: This can be brought up in future transactions
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();
+
+    if (depositRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signProposalDepositTransaction(
+        depositToProposalUnsigned,
+        depositRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signProposalDepositTransaction(
+        depositToProposalUnsigned,
+        depositRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.txHistoryManager.fetchAndSaveProposals(currentSession);
+    return broadCastResult;
+
+  }
+
+  /**
+   * 
+   * @param textProposalSubmitRequest 
+   */
+  public async sendSubmitTextProposalTransaction(textProposalSubmitRequest: TextProposalRequest): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.transactionPrepareService.prepareTransaction();
+
+    const submitTextProposalUnsigned: TextProposalTransactionUnsigned = {
+      params: {
+        description: textProposalSubmitRequest.description,
+        title: textProposalSubmitRequest.title,
+      },
+      proposer: textProposalSubmitRequest.proposer,
+      initialDeposit: textProposalSubmitRequest.initialDeposit,
+      memo: '', // Todo: This can be brought up in future transactions
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();
+
+    if (textProposalSubmitRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signSubmitTextProposalTransaction(
+        submitTextProposalUnsigned,
+        textProposalSubmitRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signSubmitTextProposalTransaction(
+        submitTextProposalUnsigned,
+        textProposalSubmitRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.txHistoryManager.fetchAndSaveProposals(currentSession);
+    return broadCastResult;
+  }
+
   public async sendNFT(nftTransferRequest: NFTTransferRequest): Promise<BroadCastResult> {
     const currentSession = await this.storageService.retrieveCurrentSession();
 
@@ -909,7 +1009,7 @@ export class TransactionSenderService {
     return bridgeTransactionResult;
   }
 
-  /* _______________________
+  /* _________________________
         NFT RELATED FUNCTIONS  
      _________________________ */
 
