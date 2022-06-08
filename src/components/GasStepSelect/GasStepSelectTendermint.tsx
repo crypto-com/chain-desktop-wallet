@@ -122,10 +122,6 @@ const GasStepSelectTendermint = (props: {
           }}
         >
           <div className="label">{t('confirmation-speed')}</div>
-          <br />
-          <br />
-          <br />
-          <br />
 
           <Tooltip
             style={{ cursor: 'pointer' }}
