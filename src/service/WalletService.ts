@@ -404,7 +404,7 @@ class WalletService {
       // eslint-disable-next-line no-empty
     } catch (e) {
       // eslint-disable-next-line no-console
-      // console.log('SYNC_ERROR', e);
+      // console.error('SYNC_ERROR', e);
       return Promise.resolve();
     }
   }
@@ -427,7 +427,7 @@ class WalletService {
       return await this.txHistoryManager.fetchAndSaveTransfersByAsset(session, asset);
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.log('SYNC_ERROR', e);
+      console.error('SYNC_ERROR', e);
       return Promise.resolve([]);
     }
   }
@@ -624,7 +624,7 @@ class WalletService {
       return nftDenomData.result;
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.log('FAILED_LOADING NFT denom data', e);
+      console.error('FAILED_LOADING NFT denom data', e);
 
       return null;
     }
