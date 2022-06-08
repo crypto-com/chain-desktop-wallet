@@ -623,7 +623,7 @@ export const FormWithdrawStakingReward = () => {
                 : ''}
             </div>
           </div>
-          <GasInfoTendermint />
+          <GasStepSelect asset={walletAsset} />
         </>
       </ModalPopup>
 
@@ -695,7 +695,6 @@ export const FormWithdrawStakingReward = () => {
                 : ''}
             </div>
           </div>
-          {/* <GasInfoTendermint /> */}
           <GasStepSelect asset={walletAsset} />
           <div className="note">
             <ExclamationCircleOutlined
