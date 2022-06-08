@@ -607,8 +607,7 @@ export const FormWithdrawStakingReward = () => {
             <div className="label">{t('staking.modal2.label5')}</div>
             {walletAsset ? (
               <div>
-                {numeral(scaledRewardBalance(walletAsset)).format('0,0.0000')}
-                {walletAsset?.symbol}
+                {numeral(scaledRewardBalance(walletAsset)).format('0,0.0000')} {walletAsset?.symbol}
               </div>
             ) : (
               ''
@@ -687,8 +686,7 @@ export const FormWithdrawStakingReward = () => {
             <div className="label">{t('staking.modal2.label5')}</div>
             {walletAsset ? (
               <div>
-                {numeral(scaledRewardBalance(walletAsset)).format('0,0.0000')}
-                {walletAsset?.symbol}
+                {numeral(scaledRewardBalance(walletAsset)).format('0,0.0000')} {walletAsset?.symbol}
               </div>
             ) : (
               ''
