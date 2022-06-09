@@ -3,14 +3,9 @@ import moment from 'moment';
 import './governance.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Layout, Tabs, List, Space, Radio, Button, Card, Progress, Tag, Spin } from 'antd';
+import { Layout, Tabs, List, Space, Button, Tag } from 'antd';
 import Big from 'big.js';
-import {
-  DislikeOutlined,
-  LikeOutlined,
-  ArrowLeftOutlined,
-  LoadingOutlined,
-} from '@ant-design/icons';
+import { DislikeOutlined, LikeOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { ledgerIsExpertModeState, sessionState, walletAssetState } from '../../recoil/atom';
@@ -34,7 +29,9 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 
-const { Header, Content, Footer, Sider } = Layout;
+import { ProposalVisible } from './components/ProposalVisible';
+
+const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 
 const IconText = ({ icon, text }) => (
@@ -127,14 +124,6 @@ const GovernancePage = () => {
     );
     setDecryptedPhrase(phraseDecrypted);
     showConfirmationModal();
-  };
-
-  const onRadioChange = e => {
-    setVoteOption(e.target.value);
-  };
-
-  const onVote = async () => {
-    showPasswordInput();
   };
 
   const processProposalFigures = async (_proposal: ProposalModel) => {
@@ -346,145 +335,20 @@ const GovernancePage = () => {
       <div className="header-description">{t('governance.description')}</div>
       <Content>
         {isProposalVisible ? (
-          <div className="site-layout-background governance-content">
-            <div className="container">
-              <Layout className="proposal-detail">
-                <Content>
-                  <a>
-                    <div
-                      className="back-button"
-                      onClick={() => setIsProposalVisible(false)}
-                      style={{ fontSize: '16px' }}
-                    >
-                      <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
-                      {t('governance.backToList')}
-                    </div>
-                  </a>
-                  <div className="title">
-                    {proposal?.content.title} #ID-{proposal?.proposal_id}
-                  </div>
-                  <div className="item">
-                    <div className="status">{processStatusTag(proposal?.status)}</div>
-                  </div>
-                  <div className="item">
-                    <div className="date">
-                      {t('governance.start')}:{' '}
-                      {moment(proposal?.voting_start_time).format('DD/MM/YYYY, h:mm A')} <br />
-                      {t('governance.end')}:{' '}
-                      {moment(proposal?.voting_end_time).format('DD/MM/YYYY, h:mm A')}
-                    </div>
-                  </div>
-
-                  <div className="description">
-                    {proposal?.content.description.split('\\n').map((p, i) => (
-                      <p key={i}>{p}</p>
-                    ))}
-                  </div>
-                  <div className="item">
-                    {proposal?.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD ? (
-                      <Card
-                        title={t('governance.castVote')}
-                        style={{
-                          maxWidth: '500px',
-                        }}
-                      >
-                        <Radio.Group onChange={onRadioChange} value={voteOption}>
-                          <Radio.Button value={VoteOption.VOTE_OPTION_YES}>
-                            Yes - {t('governance.voteOption.yes')}
-                          </Radio.Button>
-                          <Radio.Button value={VoteOption.VOTE_OPTION_NO}>
-                            No - {t('governance.voteOption.no')}
-                          </Radio.Button>
-                          <Radio.Button value={VoteOption.VOTE_OPTION_NO_WITH_VETO}>
-                            No with Veto - {t('governance.voteOption.noWithVeto')}
-                          </Radio.Button>
-                          <Radio.Button value={VoteOption.VOTE_OPTION_ABSTAIN}>
-                            Abstain - {t('governance.voteOption.abstain')}
-                          </Radio.Button>
-                        </Radio.Group>
-                        {/* <div className="item"> */}
-                        <Button type="primary" disabled={!voteOption} onClick={onVote}>
-                          {t('governance.sendVote')}
-                        </Button>
-                        {/* </div> */}
-                      </Card>
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                </Content>
-                <Sider width="300px">
-                  <Spin
-                    spinning={isLoadingTally}
-                    indicator={<LoadingOutlined />}
-                    tip="Loading latest results"
-                  >
-                    <Card title={t('governance.result')} style={{ padding: '4px' }}>
-                      <div className="vote-result-section">
-                        Yes - {t('governance.voteOption.yes')}
-                        <br />
-                        {/* Vote: {proposalFigures.yes.vote} */}
-                        <Progress
-                          percent={parseFloat(proposalFigures.yes.rate)}
-                          size="small"
-                          status="normal"
-                          strokeColor={{
-                            from: '#31ac46',
-                            to: '#1a7905',
-                          }}
-                        />
-                      </div>
-
-                      <div className="vote-result-section">
-                        No - {t('governance.voteOption.no')}
-                        <br />
-                        {/* Vote:  {proposalFigures.no.vote} */}
-                        <Progress
-                          percent={parseFloat(proposalFigures.no.rate)}
-                          strokeColor={{
-                            from: '#ec7777',
-                            to: '#f27474',
-                          }}
-                          size="small"
-                          status="normal"
-                        />
-                      </div>
-
-                      <div className="vote-result-section">
-                        No with Veto - {t('governance.voteOption.noWithVeto')}
-                        <br />
-                        {/* Vote:  {proposalFigures.no.vote} */}
-                        <Progress
-                          percent={parseFloat(proposalFigures.noWithVeto.rate)}
-                          strokeColor={{
-                            from: '#e2c24d',
-                            to: '#f3a408',
-                          }}
-                          size="small"
-                          status="normal"
-                        />
-                      </div>
-
-                      <div className="vote-result-section">
-                        Abstain - {t('governance.voteOption.abstain')}
-                        <br />
-                        {/* Vote:  {proposalFigures.no.vote} */}
-                        <Progress
-                          percent={parseFloat(proposalFigures.abstain.rate)}
-                          strokeColor={{
-                            from: '#dbdddc',
-                            to: '#b1b3b3',
-                          }}
-                          size="small"
-                          status="normal"
-                        />
-                      </div>
-                    </Card>
-                  </Spin>
-                </Sider>
-              </Layout>
-            </div>
-          </div>
+          <ProposalVisible
+            props={{
+              setIsProposalVisible,
+              setInputPasswordVisible,
+              setIsVisibleConfirmationModal,
+              proposal,
+              decryptedPhrase,
+              isLoadingTally,
+              proposalFigures,
+              showPasswordInput,
+              voteOption,
+              setVoteOption,
+            }}
+          />
         ) : (
           <Tabs defaultActiveKey="1">
             <TabPane tab={t('governance.tab1')} key="1">
