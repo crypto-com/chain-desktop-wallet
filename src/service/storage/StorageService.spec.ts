@@ -232,6 +232,7 @@ describe('Testing Full Storage Service', () => {
 
     const assetMarketPrice: AssetMarketPrice = {
       assetSymbol: 'CRO',
+      assetType: UserAssetType.EVM,
       currency: 'USD',
       dailyChange: '-2.48',
       price: '0.071',
