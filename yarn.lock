@@ -1887,10 +1887,10 @@
   resolved "https://registry.npmjs.org/@cosmjs/utils/-/utils-0.25.6.tgz"
   integrity sha512-ofOYiuxVKNo238vCPPlaDzqPXy2AQ/5/nashBo5rvPZJkxt9LciGfUEQWPCOb1BIJDNx2Dzu0z4XCf/dwzl0Dg==
 
-"@crypto-org-chain/chain-jslib@1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@crypto-org-chain/chain-jslib/-/chain-jslib-1.0.3.tgz#65cfab9e371d49e2cca023c398f44a5019bc8f14"
-  integrity sha512-SDWv2dj3A0FeYoQu1P13vFnCF/QZxAVi3Z5Y8lnkXHqLrfG7cgZwPplEMfa3Kb7PdvqqsTBg3wOQuFqXA1yEaA==
+"@crypto-org-chain/chain-jslib@1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@crypto-org-chain/chain-jslib/-/chain-jslib-1.0.5.tgz#f95fb4385fe0635db801ca94e6698d0bb5a36d2c"
+  integrity sha512-dQQ/umQqy6W9Pi8eAHAWW4sbn5qT/+8qtJil/ahKyO/pwtvbm56zgOA413cXTh2lene0IE6R7JqleszqJQO4zg==
   dependencies:
     "@cosmjs/amino" "0.25.0-alpha.2"
     "@cosmjs/encoding" "0.23.1"
@@ -1909,7 +1909,7 @@
     long "4.0.0"
     moment "2.29.1"
     ow "0.17.0"
-    protobufjs "6.10.1"
+    protobufjs "6.11.3"
     randombytes "2.1.0"
     secp256k1 "4.0.2"
     snakecase-keys "3.2.1"
@@ -14452,7 +14452,7 @@ proto-list@~1.2.1:
   resolved "https://registry.yarnpkg.com/proto-list/-/proto-list-1.2.4.tgz"
   integrity sha1-IS1b/hMYMGpCD2QCuOJv85ZHqEk=
 
-protobufjs@6.10.1, protobufjs@6.11.3, protobufjs@^6.8.8, protobufjs@~6.10.2, protobufjs@~6.11.2:
+protobufjs@6.11.3, protobufjs@^6.8.8, protobufjs@~6.10.2, protobufjs@~6.11.2:
   version "6.11.3"
   resolved "https://registry.yarnpkg.com/protobufjs/-/protobufjs-6.11.3.tgz#637a527205a35caa4f3e2a9a4a13ddffe0e7af74"
   integrity sha512-xL96WDdCZYdU7Slin569tFX712BxsxslWwAfAhCYjQKGTq7dAU91Lomy6nLLhh/dyGhk/YH4TwTSRxTzhuHyZg==
