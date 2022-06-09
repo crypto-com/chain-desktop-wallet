@@ -81,9 +81,7 @@ const GasStep = (props: { isUsingCustomFee: boolean }) => {
   );
 };
 
-const GasConfig = (props: {
-  onChange?: (gasLimit: string, networkFee: string) => void;
-}) => {
+const GasConfig = (props: { onChange?: (gasLimit: string, networkFee: string) => void }) => {
   const { onChange } = props;
 
   const [t] = useTranslation();
@@ -121,7 +119,8 @@ const GasConfig = (props: {
             marginTop: '10px',
           }}
         >
-          <div style={{ marginRight: 4 }}>{t('confirmation-speed')}</div>
+          <div className="label">{t('confirmation-speed')}</div>
+
           <Tooltip
             style={{ cursor: 'pointer' }}
             title={t('sending-crypto-on-blockchain-requires-confirmation')}
@@ -161,7 +160,7 @@ const GasConfig = (props: {
         style={{ float: 'right', marginTop: '4px' }}
         onClick={() => {
           show({
-            onCancel: () => { },
+            onCancel: () => {},
             onSuccess: (newGasLimit, newGasFee) => {
               onChange?.(newGasLimit, newGasFee);
               dismiss();

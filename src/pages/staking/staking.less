@@ -131,16 +131,31 @@
 }
 
 .site-layout {
-  #withdraw-all-btn {
+  .top-action-btns {
     position: absolute;
     top: 0;
-    right: 12px;
-    z-index: 5;
-    display: block;
-    width: 200px;
-    margin: 12px auto;
-    font-size: 14px;
+    right: 0;
+    z-index: 7;
+    display: grid;
+    grid-column-gap: 20px;
+    grid-template-columns: 1fr 1fr;
+    margin-right: 20px;
     text-align: center;
+
+    .top-action-btn {
+      position: relative;
+      display: inline-block;
+      height: 36px;
+      margin-top: 13px;
+      padding: 8px;
+      font-size: 13px;
+      transition: background-color 0.4s ease, border-color 0.4s ease;
+
+      &:hover {
+        background-color: #007fda !important;
+        border-color: #007fda !important;
+      }
+    }
   }
 }
 
@@ -155,4 +170,16 @@
 .address-container.scrollable {
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;
+}
+
+.note {
+  position: relative;
+  display: block;
+  width: 100%;
+  color: #777;
+  font-size: 12px;
+
+  b {
+    color: #444;
+  }
 }
