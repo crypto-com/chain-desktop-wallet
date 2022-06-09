@@ -44,7 +44,6 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
       url: `/address/${address.toLowerCase()}/balance`,
       params: {
         ...{
-          // apikey: 'anonymous', // TODO: Remove this hardcoded value
           token: '0xdac17f958d2ee523a2206206994597c13d831ec7',
         },
       },
@@ -91,13 +90,13 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
     // Result
     const finalList: TransactionData[] = [];
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       // eslint-disable-next-line
       const txDataList = await this.getTxsByAddressPaginated(address, {
         pageSize: limit,
         page: currentPage,
         sort: 'timestamp:desc',
-        // apikey: 'anonymous', // TODO: Remove this hardcoded value
       });
 
       // Append TxData list to the final response array

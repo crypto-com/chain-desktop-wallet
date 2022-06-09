@@ -235,8 +235,6 @@ class Web3Provider extends EventEmitter {
 
     this.setAddress(config.address);
 
-    const oldChainId = this.chainId;
-
     this.chainId = config.chainId;
     if (emitChanged) {
       this.emit('chainChanged', config.chainId);

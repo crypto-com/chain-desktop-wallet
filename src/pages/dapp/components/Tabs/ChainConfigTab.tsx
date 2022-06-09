@@ -8,7 +8,10 @@ import { useForm } from 'antd/lib/form/Form';
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal';
 import { useChainConfigs } from '../../browser/useChainConfigs';
 import { isHexEqual } from '../../../../utils/utils';
-import { ChainConfigFormData, ChainConfigFormKeys } from '../../types';
+import {
+  ChainConfigFormData,
+  ChainConfigFormKeys,
+} from '../../types'; /* lgtm[js/unused-local-variable] */
 import { useAddChainConfigModal } from '../../hooks/useAddChainConfigModal';
 import { DAppDefaultChainConfigs, isChainDefaultConfig } from '../../../../config/DAppChainConfig';
 import { EVMChainConfig } from '../../../../models/Chain';
@@ -282,9 +285,11 @@ const ChainConfigTab = () => {
                   {t('general.save')}
                 </Button>
               </div>
-              {
-                !(isChainDefaultConfig(editingChainConfig.chainId) || isHexEqual(selectedChain.chainId, editingChainConfig.chainId))
-                && <Button
+              {!(
+                isChainDefaultConfig(editingChainConfig.chainId) ||
+                isHexEqual(selectedChain.chainId, editingChainConfig.chainId)
+              ) && (
+                <Button
                   type="primary"
                   danger
                   style={{ color: 'red', borderColor: 'red' }}
@@ -294,7 +299,7 @@ const ChainConfigTab = () => {
                 >
                   {t('settings.addressBook.remove')}
                 </Button>
-              }
+              )}
             </div>
           </Form.Item>
         </Form>

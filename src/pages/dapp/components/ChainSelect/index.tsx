@@ -2,7 +2,7 @@ import { Select } from 'antd';
 import * as React from 'react';
 import { isHexEqual } from '../../../../utils/utils';
 import { useChainConfigs } from '../../browser/useChainConfigs';
-import './index.css';
+import './index.less';
 
 const { Option } = Select;
 
