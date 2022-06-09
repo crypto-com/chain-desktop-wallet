@@ -19,6 +19,7 @@ import {
 import { CronosClient } from './cronos/CronosClient';
 import {
   CommonTransactionRecord,
+  EthereumTransactionType,
   NftQueryParams,
   NftTransferModel,
   ProposalModel,
@@ -258,13 +259,16 @@ export class TransactionHistoryService {
         currentAsset.config?.indexingUrl,
       );
 
-      // const txList = await ethClient.getTxsByAddress(currentAsset.address);
-      const txList = await ethClient.getTxsByAddress('0xdac17f958d2ee523a2206206994597c13d831ec7'); // TODO: remove this hardcoded address
-
-      console.log('ETH', txList);
+      const txList = await ethClient.getTxsByAddress(currentAsset.address);
+      // const txList = await ethClient.getTxsByAddress('0xdac17f958d2ee523a2206206994597c13d831ec7'); // TODO: remove this hardcoded address
 
       const loadedTxList = txList
-        .filter(tx => tx.token_symbol === 'ETH' && tx.type?.toLowerCase() === defaultTxType)
+        .filter(
+          tx =>
+            tx.token_symbol === 'ETH' &&
+            (tx.type?.toLowerCase() === EthereumTransactionType.TRANSFER ||
+              tx.type?.toLowerCase() === EthereumTransactionType.UTF8TRANSFER),
+        )
         .map(tx => {
           const transferTx: TransferTransactionData = {
             amount: tx.amount,
@@ -282,7 +286,7 @@ export class TransactionHistoryService {
             assetId: currentAsset.identifier,
             assetType: currentAsset.assetType,
             txHash: tx.transaction_hash,
-            txType: defaultTxType,
+            txType: EthereumTransactionType.TRANSFER,
             txData: transferTx,
             // TODO: add messageTypeName
           };
