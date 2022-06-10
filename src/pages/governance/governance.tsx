@@ -166,31 +166,31 @@ const GovernancePage = () => {
     // in percentage
     const yesRate = totalVotes.gt('0')
       ? yesValue
-          .div(totalVotes)
-          .times(100)
-          .toFixed(2)
-      : `n.a.`;
+        .div(totalVotes)
+        .times(100)
+        .toFixed(2)
+      : 'n.a.';
 
     const noRate = totalVotes.gt('0')
       ? noValue
-          .div(totalVotes)
-          .times(100)
-          .toFixed(2)
-      : `n.a.`;
+        .div(totalVotes)
+        .times(100)
+        .toFixed(2)
+      : 'n.a.';
 
     const noWithVetoRate = totalVotes.gt('0')
       ? noWithVetoValue
-          .div(totalVotes)
-          .times(100)
-          .toFixed(2)
-      : `n.a.`;
+        .div(totalVotes)
+        .times(100)
+        .toFixed(2)
+      : 'n.a.';
 
     const abstainRate = totalVotes.gt('0')
       ? abstainValue
-          .div(totalVotes)
-          .times(100)
-          .toFixed(2)
-      : `n.a.`;
+        .div(totalVotes)
+        .times(100)
+        .toFixed(2)
+      : 'n.a.';
 
     const baseUnitDenominator = 1_0000_0000;
     setProposalFigures({
@@ -499,22 +499,22 @@ const GovernancePage = () => {
                           item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
                             ? []
                             : [
-                                <IconText
-                                  icon={LikeOutlined}
-                                  text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
-                                  key="list-vertical-yes-o"
-                                />,
-                                <IconText
-                                  icon={DislikeOutlined}
-                                  text={getUIVoteAmount(
-                                    Big(item.final_tally_result.no)
-                                      .add(item.final_tally_result.no_with_veto)
-                                      .toFixed(),
-                                    userAsset,
-                                  )}
-                                  key="list-vertical-no-o"
-                                />,
-                              ]
+                              <IconText
+                                icon={LikeOutlined}
+                                text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                                key="list-vertical-yes-o"
+                              />,
+                              <IconText
+                                icon={DislikeOutlined}
+                                text={getUIVoteAmount(
+                                  Big(item.final_tally_result.no)
+                                    .add(item.final_tally_result.no_with_veto)
+                                    .toFixed(),
+                                  userAsset,
+                                )}
+                                key="list-vertical-no-o"
+                              />,
+                            ]
                         }
                         onClick={() => {
                           setProposal(item);
@@ -561,22 +561,22 @@ const GovernancePage = () => {
                           item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
                             ? []
                             : [
-                                <IconText
-                                  icon={LikeOutlined}
-                                  text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
-                                  key="list-vertical-yes-o"
-                                />,
-                                <IconText
-                                  icon={DislikeOutlined}
-                                  text={getUIVoteAmount(
-                                    Big(item.final_tally_result.no)
-                                      .add(item.final_tally_result.no_with_veto)
-                                      .toFixed(),
-                                    userAsset,
-                                  )}
-                                  key="list-vertical-no-o"
-                                />,
-                              ]
+                              <IconText
+                                icon={LikeOutlined}
+                                text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                                key="list-vertical-yes-o"
+                              />,
+                              <IconText
+                                icon={DislikeOutlined}
+                                text={getUIVoteAmount(
+                                  Big(item.final_tally_result.no)
+                                    .add(item.final_tally_result.no_with_veto)
+                                    .toFixed(),
+                                  userAsset,
+                                )}
+                                key="list-vertical-no-o"
+                              />,
+                            ]
                         }
                         onClick={() => {
                           setProposal(item);
@@ -812,10 +812,10 @@ const GovernancePage = () => {
           {broadcastResult?.code !== undefined &&
           broadcastResult?.code !== null &&
           broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">{t('general.successModalPopup.timeout.description')}</div>
-          ) : (
-            <div className="description">{t('general.successModalPopup.vote.description')}</div>
-          )}
+              <div className="description">{t('general.successModalPopup.timeout.description')}</div>
+            ) : (
+              <div className="description">{t('general.successModalPopup.vote.description')}</div>
+            )}
           {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
         </>
       </SuccessModalPopup>

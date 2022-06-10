@@ -426,16 +426,16 @@ export const FormDelegationOperations = props => {
             {broadcastResult?.code !== undefined &&
             broadcastResult?.code !== null &&
             broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div className="description">
-                {t('general.successModalPopup.timeout.description')}
-              </div>
-            ) : (
-              <div className="description">
-                {delegationActionType === StakingActionType.UNDELEGATE
-                  ? t('general.successModalPopup.undelegation.description')
-                  : t('general.successModalPopup.redelegation.description')}
-              </div>
-            )}
+                <div className="description">
+                  {t('general.successModalPopup.timeout.description')}
+                </div>
+              ) : (
+                <div className="description">
+                  {delegationActionType === StakingActionType.UNDELEGATE
+                    ? t('general.successModalPopup.undelegation.description')
+                    : t('general.successModalPopup.redelegation.description')}
+                </div>
+              )}
           </>
         </SuccessModalPopup>
         <ErrorModalPopup

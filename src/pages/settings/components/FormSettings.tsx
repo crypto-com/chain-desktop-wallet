@@ -147,8 +147,8 @@ export const FormSettings = () => {
       `${t('settings.message.success1')} ${
         session.wallet.config.enableGeneralSettings
           ? `(${t('settings.message.success2')} ${session.wallet.config.name} ${t(
-              'settings.message.success3',
-            )})`
+            'settings.message.success3',
+          )})`
           : ''
       }`,
     );

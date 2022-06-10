@@ -154,8 +154,8 @@ const HomePage = () => {
             assetMarketData.price &&
             record.mainnetSymbol === assetMarketData.assetSymbol
               ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
-                  assetMarketData.price,
-                ).format('0,0.00')} ${assetMarketData?.currency}`
+                assetMarketData.price,
+              ).format('0,0.00')} ${assetMarketData?.currency}`
               : `${SUPPORTED_CURRENCY.get(currentSession.currency)?.symbol}--`}
           </>
         );
@@ -187,8 +187,8 @@ const HomePage = () => {
             assetMarketData.price &&
             record.mainnetSymbol === assetMarketData.assetSymbol
               ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
-                  getAssetBalancePrice(record, assetMarketData),
-                ).format('0,0.00')} ${assetMarketData?.currency}`
+                getAssetBalancePrice(record, assetMarketData),
+              ).format('0,0.00')} ${assetMarketData?.currency}`
               : `${SUPPORTED_CURRENCY.get(currentSession.currency)?.symbol}--`}
           </>
         );
@@ -234,7 +234,7 @@ const HomePage = () => {
     ipcRenderer.on('update_available', () => {
       ipcRenderer.removeAllListeners('update_available');
 
-      const newVersionNotificationKey = `open-update_available`;
+      const newVersionNotificationKey = 'open-update_available';
 
       notification.info({
         message: t('home.notification.updateAvailable.message'),
@@ -250,7 +250,7 @@ const HomePage = () => {
     ipcRenderer.on('update_downloaded', () => {
       ipcRenderer.removeAllListeners('update_downloaded');
 
-      const newVersionNotificationKey = `open-update_downloaded`;
+      const newVersionNotificationKey = 'open-update_downloaded';
 
       const restartBtn = (
         <Button
@@ -366,8 +366,8 @@ const HomePage = () => {
             <div className="quantity">
               {defaultWalletAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAllAssetsTotalBalance(),
-                  ).format(`0,0.00`)} ${marketData?.currency}`
+                  getAllAssetsTotalBalance(),
+                ).format('0,0.00')} ${marketData?.currency}`
                 : ''}
             </div>
           </div>
@@ -382,8 +382,8 @@ const HomePage = () => {
             <div className="fiat">
               {defaultWalletAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetStakingBalancePrice(defaultWalletAsset, marketData),
-                  ).format('0,0.00')} ${marketData?.currency}
+                  getAssetStakingBalancePrice(defaultWalletAsset, marketData),
+                ).format('0,0.00')} ${marketData?.currency}
                   `
                 : ''}
             </div>

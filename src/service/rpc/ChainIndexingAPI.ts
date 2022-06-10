@@ -365,13 +365,9 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
    * Fetch all `MsgVote` transactions submitted on-chain by an account
    * @param address {string}
    */
-  public async fetchAccountVotingHistory(
-    address: string,
-  ): Promise<AccountMessage[]> {
+  public async fetchAccountVotingHistory(address: string): Promise<AccountMessage[]> {
     try {
-      const msgTypeNames: MsgTypeName[] = [
-        'MsgVote',
-      ];
+      const msgTypeNames: MsgTypeName[] = ['MsgVote'];
 
       const userVoteHistory = await this.getMessagesByAccountAddress(address, msgTypeNames);
       return userVoteHistory;
@@ -449,7 +445,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   private async getValidatorDetails(validatorAddr: string) {
     const validatorList = await this.axiosClient.get<ValidatorListResponse>(
-      `validators?limit=1000000`,
+      'validators?limit=1000000',
     );
 
     if (validatorList.data.pagination.total_page > 1) {
@@ -471,7 +467,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   public async getValidatorsDetail(validatorAddrList: string[]) {
     const validatorList = await this.axiosClient.get<ValidatorListResponse>(
-      `validators?limit=1000000`,
+      'validators?limit=1000000',
     );
 
     if (validatorList.data.pagination.total_page > 1) {
@@ -489,7 +485,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   public async getValidatorsAverageApy(validatorAddrList: string[]) {
     const validatorList = await this.axiosClient.get<ValidatorListResponse>(
-      `validators?limit=1000000`,
+      'validators?limit=1000000',
     );
 
     if (validatorList.data.pagination.total_page > 1) {

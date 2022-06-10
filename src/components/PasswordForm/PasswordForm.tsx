@@ -63,29 +63,29 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
           rules={
             props.shouldValidate
               ? [
-                  {
-                    required: true,
-                    message: `${t('general.passwordForm.password.label')} ${t('general.required')}`,
+                {
+                  required: true,
+                  message: `${t('general.passwordForm.password.label')} ${t('general.required')}`,
+                },
+                {
+                  pattern: /^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
+                  message: t('general.passwordForm.password.error1'),
+                },
+                () => ({
+                  validator() {
+                    if (strength < 3) {
+                      return Promise.reject(new Error(t('general.passwordForm.password.error2')));
+                    }
+                    return Promise.resolve();
                   },
-                  {
-                    pattern: /^(?=.*?[A-Za-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,}$/,
-                    message: t('general.passwordForm.password.error1'),
-                  },
-                  () => ({
-                    validator() {
-                      if (strength < 3) {
-                        return Promise.reject(new Error(t('general.passwordForm.password.error2')));
-                      }
-                      return Promise.resolve();
-                    },
-                  }),
-                ]
+                }),
+              ]
               : [
-                  {
-                    required: true,
-                    message: `${t('general.passwordForm.password.label')} ${t('general.required')}`,
-                  },
-                ]
+                {
+                  required: true,
+                  message: `${t('general.passwordForm.password.label')} ${t('general.required')}`,
+                },
+              ]
           }
           validateFirst
         >
@@ -152,10 +152,10 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
                     value
                       ? Promise.resolve()
                       : Promise.reject(
-                          new Error(
-                            `${t('signup.passwordFormContainer.tAndC')} ${t('general.required')}`,
-                          ),
+                        new Error(
+                          `${t('signup.passwordFormContainer.tAndC')} ${t('general.required')}`,
                         ),
+                      ),
                 },
               ]}
             >

@@ -119,7 +119,7 @@ export class BridgeService {
       amount: scaledBaseAmount,
       fromAddress: bridgeTransferRequest.evmAddress,
       toAddress: bridgeContractAddress,
-      memo: `bridge:desktop-wallet-client`,
+      memo: 'bridge:desktop-wallet-client',
       data: encodedABI,
       accountNumber: 0,
       accountSequence: 0,
@@ -218,7 +218,7 @@ export class BridgeService {
       accountSequence,
       channel: loadedBridgeConfig?.bridgeChannel || defaultBridgeConfig.bridgeChannel,
       port: loadedBridgeConfig?.bridgePort || defaultBridgeConfig.bridgePort,
-      memo: `bridge:desktop-wallet-client`,
+      memo: 'bridge:desktop-wallet-client',
       latestBlockHeight: latestBlock,
     };
 

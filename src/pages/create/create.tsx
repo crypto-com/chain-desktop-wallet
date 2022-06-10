@@ -141,7 +141,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
       initialValues={{
         indexingUrl: DefaultWalletConfigs.TestNetConfig.indexingUrl,
         nodeUrl: 'http://127.0.0.1',
-        derivationPath: "m/44'/394'/0'/0/0",
+        derivationPath: 'm/44\'/394\'/0\'/0/0',
         validatorPrefix: 'crocncl',
         croDenom: 'cro',
         baseDenom: 'basecro',
@@ -338,8 +338,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const { isLedgerConnected } = useLedgerStatus({ assetType: ledgerAssetType });
   const [ledgerAddressList, setLedgerAddressList] = useState<any[]>([]);
   const [derivationPath, setDerivationPath] = useState({
-    tendermint: "m/44'/394'/0'/0/0",
-    evm: "m/44'/60'/0'/0/0",
+    tendermint: 'm/44\'/394\'/0\'/0/0',
+    evm: 'm/44\'/60\'/0\'/0/0',
   });
 
   const [t] = useTranslation();

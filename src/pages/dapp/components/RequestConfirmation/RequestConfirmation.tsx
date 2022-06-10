@@ -19,7 +19,12 @@ import { Session } from '../../../../models/Session';
 import { SupportedChainName, SUPPORTED_CURRENCY } from '../../../../config/StaticConfig';
 import { Dapp, DappBrowserIPC } from '../../types';
 
-import { middleEllipsis, hexToUtf8, getAssetBySymbolAndChain, isUnlimited } from '../../../../utils/utils';
+import {
+  middleEllipsis,
+  hexToUtf8,
+  getAssetBySymbolAndChain,
+  isUnlimited,
+} from '../../../../utils/utils';
 import { walletService } from '../../../../service/WalletService';
 import { walletAllAssetsState } from '../../../../recoil/atom';
 import { useLedgerStatus } from '../../../../hooks/useLedgerStatus';
@@ -37,7 +42,11 @@ interface RequestConfirmationProps {
   wallet: Wallet;
   visible: boolean;
   dapp?: Dapp;
-  onConfirm: (info: { gasPrice: BigNumber, gasLimit: BigNumber, event: DappBrowserIPC.Event }) => void;
+  onConfirm: (info: {
+    gasPrice: BigNumber;
+    gasLimit: BigNumber;
+    event: DappBrowserIPC.Event;
+  }) => void;
   onCancel: () => void;
 }
 
@@ -95,14 +104,20 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
 
       return (
         <>
-          <GasStepSelectEVMDApp asset={cronosAsset} gasLimit={gasLimit} gasPrice={gasPrice} onChange={(_gasLimit, _gasPrice) => {
-            setGasLimit(_gasLimit)
-            setGasPrice(_gasPrice)
-          }} />
+          <GasStepSelectEVMDApp
+            asset={cronosAsset}
+            gasLimit={gasLimit}
+            gasPrice={gasPrice}
+            onChange={(_gasLimit, _gasPrice) => {
+              setGasLimit(_gasLimit);
+              setGasPrice(_gasPrice);
+            }}
+          />
           <div className="row">
             <div className="title">{t('dapp.requestConfirmation.total.title')}</div>
-            <div>{`${scaledAmount(total.toString(), cronosAsset?.decimals ?? 1)} ${cronosAsset?.symbol
-              }`}</div>
+            <div>{`${scaledAmount(total.toString(), cronosAsset?.decimals ?? 1)} ${
+              cronosAsset?.symbol
+            }`}</div>
           </div>
         </>
       );
@@ -159,14 +174,20 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
 
       return (
         <>
-          <GasStepSelectEVMDApp asset={cronosAsset} gasLimit={gasLimit} gasPrice={gasPrice} onChange={(_gasLimit, _gasPrice) => {
-            setGasLimit(_gasLimit)
-            setGasPrice(_gasPrice)
-          }} />
+          <GasStepSelectEVMDApp
+            asset={cronosAsset}
+            gasLimit={gasLimit}
+            gasPrice={gasPrice}
+            onChange={(_gasLimit, _gasPrice) => {
+              setGasLimit(_gasLimit);
+              setGasPrice(_gasPrice);
+            }}
+          />
           <div className="row">
             <div className="title">{t('dapp.requestConfirmation.total.title')}</div>
-            <div>{`${scaledAmount(total.toString(), cronosAsset?.decimals ?? 1)} ${cronosAsset?.symbol
-              }`}</div>
+            <div>{`${scaledAmount(total.toString(), cronosAsset?.decimals ?? 1)} ${
+              cronosAsset?.symbol
+            }`}</div>
           </div>
 
           <div className="row">
@@ -179,12 +200,19 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
             className="contract-address"
             hidden={!isContractAddressReview}
           >{`${contractAddress}`}</div>
-          {
-            event.name === 'tokenApproval' && <div className="row">
+          {event.name === 'tokenApproval' && (
+            <div className="row">
               <div className="title">{t('settings.revoke.amount')}</div>
-              <div>{isUnlimited(ethers.BigNumber.from(event.object.amount)) ? `${t('settings.revoke.unlimited')} ${event.object.tokenData.symbol}` : `${scaledAmount(event.object.amount, Number(event.object.tokenData.decimals))} ${event.object.tokenData.symbol}`}</div>
+              <div>
+                {isUnlimited(ethers.BigNumber.from(event.object.amount))
+                  ? `${t('settings.revoke.unlimited')} ${event.object.tokenData.symbol}`
+                  : `${scaledAmount(
+                    event.object.amount,
+                    Number(event.object.tokenData.decimals),
+                  )} ${event.object.tokenData.symbol}`}
+              </div>
             </div>
-          }
+          )}
         </>
       );
     }
@@ -209,8 +237,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       );
       const totalValue =
         assetMarketData &&
-          assetMarketData.price &&
-          currentAsset?.mainnetSymbol === assetMarketData.assetSymbol
+        assetMarketData.price &&
+        currentAsset?.mainnetSymbol === assetMarketData.assetSymbol
           ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
             getAssetAmountInFiat(totalScaledAmount, assetMarketData),
           ).format('0,0.00')} ${assetMarketData?.currency}`
@@ -285,8 +313,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
                 onConfirm({
                   gasLimit,
                   gasPrice,
-                  event
-                })
+                  event,
+                });
               }}
               disabled={
                 isConfirmDisabled ||

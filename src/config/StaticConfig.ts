@@ -288,7 +288,7 @@ export const AUTO_UPDATE_DISABLE_DURATIONS = [14, 30];
 const TestNetConfig: WalletConfig = {
   enabled: true,
   name: 'TESTNET',
-  derivationPath: "m/44'/1'/0'/0/0",
+  derivationPath: 'm/44\'/1\'/0\'/0/0',
   explorer: {
     baseUrl: 'https://crypto.org/explorer/croeseid',
     tx: 'https://crypto.org/explorer/croeseid/tx',
@@ -311,7 +311,7 @@ const TestNetConfig: WalletConfig = {
 const TestNetCroeseid3Config: WalletConfig = {
   enabled: true,
   name: 'TESTNET CROESEID 3',
-  derivationPath: "m/44'/1'/0'/0/0",
+  derivationPath: 'm/44\'/1\'/0\'/0/0',
   explorer: {
     baseUrl: 'https://crypto.org/explorer/croeseid3',
     tx: 'https://crypto.org/explorer/croeseid3/tx',
@@ -351,7 +351,7 @@ const TestnetCroeseid4: Network = {
 const TestNetCroeseid4Config: WalletConfig = {
   enabled: true,
   name: 'TESTNET CROESEID 4',
-  derivationPath: "m/44'/1'/0'/0/0",
+  derivationPath: 'm/44\'/1\'/0\'/0/0',
   explorer: {
     baseUrl: 'https://crypto.org/explorer/croeseid4',
     tx: 'https://crypto.org/explorer/croeseid4/tx',
@@ -374,7 +374,7 @@ const TestNetCroeseid4Config: WalletConfig = {
 const MainNetConfig: WalletConfig = {
   enabled: true,
   name: 'MAINNET',
-  derivationPath: "m/44'/394'/0'/0/0",
+  derivationPath: 'm/44\'/394\'/0\'/0/0',
   nodeUrl: CroNetwork.Mainnet.defaultNodeUrl,
   explorer: {
     baseUrl: 'https://crypto.org/explorer',
@@ -396,7 +396,7 @@ const MainNetConfig: WalletConfig = {
 
 // Supposed to be fully customizable by the user when it will be supported
 export const CustomDevNet: WalletConfig = {
-  derivationPath: "m/44'/394'/0'/0/0",
+  derivationPath: 'm/44\'/394\'/0\'/0/0',
   enabled: true,
   name: 'CUSTOM DEVNET',
   disableDefaultClientMemo: false,

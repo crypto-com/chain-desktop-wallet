@@ -38,7 +38,7 @@ export class LedgerSigner {
     const { prefix: b32Prefix, words } = bech32.decode(bech32Addr);
 
     if (prefix != null && b32Prefix !== prefix) {
-      throw new Error("Prefix doesn't match");
+      throw new Error('Prefix doesn\'t match');
     }
     const address = bech32.fromWords(words);
 

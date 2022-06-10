@@ -1,9 +1,9 @@
-import numeral from "numeral";
-import { useMemo } from "react";
-import { getRecoil } from "recoil-nexus";
-import { SUPPORTED_CURRENCY } from "../config/StaticConfig";
-import { getAssetAmountInFiat } from "../models/UserAsset";
-import { allMarketState, sessionState } from "../recoil/atom";
+import numeral from 'numeral';
+import { useMemo } from 'react';
+import { getRecoil } from 'recoil-nexus';
+import { SUPPORTED_CURRENCY } from '../config/StaticConfig';
+import { getAssetAmountInFiat } from '../models/UserAsset';
+import { allMarketState, sessionState } from '../recoil/atom';
 
 interface Props {
   symbol: string;
@@ -28,4 +28,4 @@ export const useMarketPrice = ({ symbol, amount }: Props) => {
   }, [amount, assetMarketData, localFiatSymbol]);
 
   return { readablePrice };
-}
+};

@@ -207,8 +207,8 @@ const StakingPage = () => {
             <div className="fiat">
               {userAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetStakingBalancePrice(userAsset, marketData),
-                  ).format(`0,0.00`)} ${marketData?.currency}`
+                  getAssetStakingBalancePrice(userAsset, marketData),
+                ).format('0,0.00')} ${marketData?.currency}`
                 : ''}
             </div>
           </div>
@@ -224,8 +224,8 @@ const StakingPage = () => {
               <div className="fiat">
                 {userAsset && marketData && marketData.price
                   ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                      getAssetUnbondingBalancePrice(userAsset, marketData),
-                    ).format('0,0.00')} ${marketData?.currency}
+                    getAssetUnbondingBalancePrice(userAsset, marketData),
+                  ).format('0,0.00')} ${marketData?.currency}
                 `
                   : ''}
               </div>
@@ -243,8 +243,8 @@ const StakingPage = () => {
             <div className="fiat">
               {userAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetRewardsBalancePrice(userAsset, marketData),
-                  ).format('0,0.00')} ${marketData?.currency}
+                  getAssetRewardsBalancePrice(userAsset, marketData),
+                ).format('0,0.00')} ${marketData?.currency}
                   `
                 : ''}
             </div>

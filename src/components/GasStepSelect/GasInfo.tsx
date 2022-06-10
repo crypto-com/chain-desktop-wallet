@@ -4,22 +4,21 @@ import { GasInfoEVM } from './GasStepSelectEVM';
 import { GasInfoTendermint } from './GasStepSelectTendermint';
 
 interface GasInfoProps {
-  asset: UserAsset,
+  asset: UserAsset;
 }
 
 const GasInfo = (props: GasInfoProps) => {
   const { asset } = props;
 
   if (asset.assetType === UserAssetType.TENDERMINT || asset.assetType === UserAssetType.IBC) {
-    return <GasInfoTendermint />
+    return <GasInfoTendermint />;
   }
 
   if (asset.assetType === UserAssetType.EVM || asset.assetType === UserAssetType.CRC_20_TOKEN) {
-    return <GasInfoEVM />
+    return <GasInfoEVM />;
   }
 
-  return <React.Fragment />
-}
-
+  return <React.Fragment />;
+};
 
 export default GasInfo;

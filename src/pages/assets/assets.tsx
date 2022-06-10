@@ -240,8 +240,8 @@ const AssetsPage = () => {
             assetMarketData.price &&
             record.mainnetSymbol === assetMarketData.assetSymbol
               ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
-                  assetMarketData.price,
-                ).format('0,0.00')} ${assetMarketData.currency}`
+                assetMarketData.price,
+              ).format('0,0.00')} ${assetMarketData.currency}`
               : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
           </>
         );
@@ -271,8 +271,8 @@ const AssetsPage = () => {
             assetMarketData.price &&
             record.mainnetSymbol === assetMarketData.assetSymbol
               ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
-                  getAssetBalancePrice(record, assetMarketData),
-                ).format('0,0.00')} ${assetMarketData?.currency}`
+                getAssetBalancePrice(record, assetMarketData),
+              ).format('0,0.00')} ${assetMarketData?.currency}`
               : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
           </>
         );
@@ -331,15 +331,15 @@ const AssetsPage = () => {
     ...(currentAsset?.assetType === UserAssetType.TENDERMINT ||
     currentAsset?.assetType === UserAssetType.IBC
       ? [
-          {
-            title: t('home.transactions.table1.msgTypeName'),
-            dataIndex: 'msgTypeName',
-            key: 'msgTypeName',
-            render: text => {
-              return <TagMsgType msgTypeName={text} />;
-            },
+        {
+          title: t('home.transactions.table1.msgTypeName'),
+          dataIndex: 'msgTypeName',
+          key: 'msgTypeName',
+          render: text => {
+            return <TagMsgType msgTypeName={text} />;
           },
-        ]
+        },
+      ]
       : []),
     {
       title: t('home.transactions.table1.amount'),
@@ -450,10 +450,10 @@ const AssetsPage = () => {
                           currentAssetMarketData.price &&
                           currentAsset?.mainnetSymbol === currentAssetMarketData.assetSymbol
                             ? `${
-                                SUPPORTED_CURRENCY.get(currentAssetMarketData.currency)?.symbol
-                              }${numeral(
-                                getAssetBalancePrice(currentAsset, currentAssetMarketData),
-                              ).format('0,0.00')} ${currentAssetMarketData?.currency}`
+                              SUPPORTED_CURRENCY.get(currentAssetMarketData.currency)?.symbol
+                            }${numeral(
+                              getAssetBalancePrice(currentAsset, currentAssetMarketData),
+                            ).format('0,0.00')} ${currentAssetMarketData?.currency}`
                             : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
                         </div>
                       </Content>

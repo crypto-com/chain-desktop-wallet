@@ -378,7 +378,7 @@ const defillamaProjects: CronosProject[] = [
     name: 'Genesis Finance',
     category: ['DEX'],
     description:
-      "Genesis Finance is the a cross chain yield aggregator that enables users to get great returns on their assets from different yield finance products farms pools vaults and the 'Garden of Eden' Genesis. Finance’s team is bringing something new on Cronos and our aim is to keep investors funds safe across different chains",
+      'Genesis Finance is the a cross chain yield aggregator that enables users to get great returns on their assets from different yield finance products farms pools vaults and the \'Garden of Eden\' Genesis. Finance’s team is bringing something new on Cronos and our aim is to keep investors funds safe across different chains',
     logo: 'genesis-finance.png',
     link: 'https://genesisfinance.app',
     twitter: 'https://twitter.com/cronos_genesis',
@@ -413,7 +413,7 @@ const defillamaProjects: CronosProject[] = [
     name: 'Croissant Games',
     category: ['Staking'],
     description:
-      "Unlike traditional games that operate in black boxes, Croissant Games runs on smart contracts that are fair, transparent, non-custodian, and immutable. Furthermore, we have a proprietary gasless model utilizing EIP-712, meaning that playing any of our games will not require any gas fees from the player's end!",
+      'Unlike traditional games that operate in black boxes, Croissant Games runs on smart contracts that are fair, transparent, non-custodian, and immutable. Furthermore, we have a proprietary gasless model utilizing EIP-712, meaning that playing any of our games will not require any gas fees from the player\'s end!',
     logo: 'croissant-games.png',
     link: 'https://croissant.games',
     twitter: 'https://twitter.com/GamesCroissant',
@@ -517,7 +517,7 @@ const NFTProjects: CronosProject[] = [
     name: 'Crosmonauts',
     category: ['NFT'],
     description:
-      "Cronos Crosmonauts is an extremely limited collection of 1000 unique NFT's on the Cronos blockchain.",
+      'Cronos Crosmonauts is an extremely limited collection of 1000 unique NFT\'s on the Cronos blockchain.',
     logo: 'VNkWg0qu_400x400.png',
     link: 'https://www.crosmonauts.club/',
     twitter: 'https://twitter.com/crosmonaut',
@@ -578,7 +578,7 @@ const NFTProjects: CronosProject[] = [
     name: 'Petite Planets',
     category: ['NFT'],
     description:
-      "We're creating 10,000 unique and beautiful NFT planets. Based on our solar system and beyond, which will live on the Cronos chain",
+      'We\'re creating 10,000 unique and beautiful NFT planets. Based on our solar system and beyond, which will live on the Cronos chain',
     logo: 'Xc1TIhyS_400x400.png',
     link: 'https://petiteplanets.com/',
     twitter: 'https://twitter.com/PetitePlanets',

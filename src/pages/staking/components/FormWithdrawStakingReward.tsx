@@ -113,9 +113,9 @@ export const FormWithdrawStakingReward = () => {
           rewardMarketPrice:
             rewardMarketPrice !== '' && currentMarketPrice
               ? `${SUPPORTED_CURRENCY.get(currentMarketPrice?.currency)?.symbol}${numeral(
-                  rewardMarketPrice,
-                ).format('0,0.00')} ${currentMarketPrice?.currency}`
-              : ``,
+                rewardMarketPrice,
+              ).format('0,0.00')} ${currentMarketPrice?.currency}`
+              : '',
           validatorAddress: reward.validatorAddress,
         };
         return rewardData;
@@ -616,8 +616,8 @@ export const FormWithdrawStakingReward = () => {
             <div className="fiat">
               {walletAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetRewardsBalancePrice(walletAsset, marketData),
-                  ).format('0,0.00')} ${marketData?.currency}
+                  getAssetRewardsBalancePrice(walletAsset, marketData),
+                ).format('0,0.00')} ${marketData?.currency}
                     `
                 : ''}
             </div>
@@ -695,8 +695,8 @@ export const FormWithdrawStakingReward = () => {
             <div className="fiat">
               {walletAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetRewardsBalancePrice(walletAsset, marketData),
-                  ).format('0,0.00')} ${marketData?.currency}
+                  getAssetRewardsBalancePrice(walletAsset, marketData),
+                ).format('0,0.00')} ${marketData?.currency}
                     `
                 : ''}
             </div>
@@ -830,10 +830,10 @@ export const FormWithdrawStakingReward = () => {
           {broadcastResult?.code !== undefined &&
           broadcastResult?.code !== null &&
           broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">{t('general.successModalPopup.timeout.description')}</div>
-          ) : (
-            <div className="description">{t('general.successModalPopup.reward.description')}</div>
-          )}
+              <div className="description">{t('general.successModalPopup.timeout.description')}</div>
+            ) : (
+              <div className="description">{t('general.successModalPopup.reward.description')}</div>
+            )}
         </>
       </SuccessModalPopup>
       <SuccessModalPopup

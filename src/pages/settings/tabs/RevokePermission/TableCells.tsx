@@ -9,32 +9,23 @@ import { TokenDataWithApproval } from './types';
 
 const SpenderMapping = new Map<string, string>();
 
-export const TokenBalance = (props: {
-  data: TokenDataWithApproval;
-  explorerURL: string;
-}) => {
+export const TokenBalance = (props: { data: TokenDataWithApproval; explorerURL: string }) => {
   const { data } = props;
 
-  const amount = getUINormalScaleAmount(
-    data.token.balance,
-    data.token.decimals
-  );
+  const amount = getUINormalScaleAmount(data.token.balance, data.token.decimals);
   const { readablePrice } = useMarketPrice({
     symbol: data.token.symbol,
-    amount
+    amount,
   });
 
   return (
     <div
       style={{
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
       }}
     >
-      <a
-        target="__blank"
-        href={`${props.explorerURL}/token/${data.token.contract.address}`}
-      >
+      <a target="__blank" href={`${props.explorerURL}/token/${data.token.contract.address}`}>
         {data.token.symbol}
       </a>
       <div>
@@ -45,10 +36,7 @@ export const TokenBalance = (props: {
   );
 };
 
-export const Amount = (props: {
-  data: TokenDataWithApproval;
-  explorerURL: string;
-}) => {
+export const Amount = (props: { data: TokenDataWithApproval; explorerURL: string }) => {
   const [t] = useTranslation();
 
   const { data } = props;
@@ -57,10 +45,9 @@ export const Amount = (props: {
       <a href={`${props.explorerURL}/tx/${data.approval.tx}`} target="__blank">
         {isUnlimited(data.approval.amount)
           ? `${t('settings.revoke.unlimited')} ${data.token.symbol}`
-          : `${getUINormalScaleAmount(
-              data.approval.amount.toString(),
-              data.token.decimals
-            )} ${data.token.symbol}`}
+          : `${getUINormalScaleAmount(data.approval.amount.toString(), data.token.decimals)} ${
+            data.token.symbol
+          }`}
       </a>
     </div>
   );
@@ -68,21 +55,15 @@ export const Amount = (props: {
 
 export const RiskExposure = (props: { data: TokenDataWithApproval }) => {
   const { data } = props;
-  const amount = getUINormalScaleAmount(
-    data.approval.amount.toString(),
-    data.token.decimals
-  );
-  const balanceAmount = getUINormalScaleAmount(
-    data.token.balance,
-    data.token.decimals
-  );
+  const amount = getUINormalScaleAmount(data.approval.amount.toString(), data.token.decimals);
+  const balanceAmount = getUINormalScaleAmount(data.token.balance, data.token.decimals);
   const { readablePrice: totalBalancePrice } = useMarketPrice({
     symbol: data.token.symbol,
-    amount: balanceAmount
+    amount: balanceAmount,
   });
   const { readablePrice } = useMarketPrice({
     symbol: data.token.symbol,
-    amount
+    amount,
   });
 
   return (
@@ -111,10 +92,7 @@ export const TokenSpender = (props: {
     const response = await cronosClient.getContractSourceCodeByAddress(spender);
 
     let contractName = middleEllipsis(spender, 8);
-    if (
-      response.result.length > 0 &&
-      response.result[0]?.ContractName?.length > 0
-    ) {
+    if (response.result.length > 0 && response.result[0]?.ContractName?.length > 0) {
       contractName = response.result[0].ContractName;
       SpenderMapping.set(spender, contractName);
     }
