@@ -39,6 +39,7 @@ import { croMarketPriceApi } from './rpc/MarketApi';
 import { CronosNftIndexingAPI } from './rpc/indexing/nft/cronos/CronosNftIndexingAPI';
 import {
   checkIfTestnet,
+  getAllERC20WhiteListedAddress,
   getCronosEvmAsset,
   isCRC20AssetWhitelisted,
   isERC20AssetWhitelisted,
@@ -721,9 +722,10 @@ export class TransactionHistoryService {
 
     const ethClient = new EthClient(ethEvmAsset.config?.nodeUrl, ethEvmAsset.config?.indexingUrl);
 
+    const allWhiteListedTokens = getAllERC20WhiteListedAddress();
     // const tokensListResponse = await ethClient.getTokensOwnedByAddress(address);
     const tokensListResponse = await ethClient.getBalanceByAddress(address, {
-      token: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+      token: allWhiteListedTokens.slice(0, 20).join(','),
     });
     const newlyLoadedTokens = await tokensListResponse
       // .filter(token => token.type === SupportedCRCTokenStandard.CRC_20_TOKEN)

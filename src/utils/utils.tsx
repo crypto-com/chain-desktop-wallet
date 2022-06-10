@@ -254,6 +254,16 @@ export function isERC20AssetWhitelisted(
   return tokenInfo.isWhitelisted && isAddressEqual(contractAddress, tokenInfo.address);
 }
 
+export function getAllERC20WhiteListedAddress() {
+  const whiteListedAddresses: String[] = [];
+  ERC20MainnetTokenInfos.forEach(token => {
+    if (token.isWhitelisted) {
+      whiteListedAddresses.push(token.address);
+    }
+  });
+  return whiteListedAddresses;
+}
+
 export function isAddressEqual(lhs: string, rhs: string) {
   return Web3.utils.toChecksumAddress(lhs) === Web3.utils.toChecksumAddress(rhs);
 }
