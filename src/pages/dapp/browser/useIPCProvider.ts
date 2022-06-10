@@ -17,10 +17,14 @@ import { walletAllAssetsState } from '../../../recoil/atom';
 import { getCronosEvmAsset } from '../../../utils/utils';
 import { TransactionDataParser } from './TransactionDataParser';
 import { ErrorHandler, WebView } from './types';
-import { useRefCallback } from './useRefCallback';
+import { useRefCallback } from '../../../hooks/useRefCallback';
 
-export type ConfirmTransactionSuccessCallback = (info: { decryptedPhrase: string, gasPrice: BigNumber, gasLimit: BigNumber, signature: string }) => void
-
+export type ConfirmTransactionSuccessCallback = (info: {
+  decryptedPhrase: string;
+  gasPrice: BigNumber;
+  gasLimit: BigNumber;
+  signature: string;
+}) => void;
 
 interface IUseIPCProviderProps {
   webview: WebView | null;
@@ -140,7 +144,12 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   });
 
   const handleTokenApproval = useRefCallback(
-    async (event: DappBrowserIPC.TokenApprovalEvent, passphrase: string, _gasPrice: BigNumber, _gasLimit: BigNumber) => {
+    async (
+      event: DappBrowserIPC.TokenApprovalEvent,
+      passphrase: string,
+      _gasPrice: BigNumber,
+      _gasLimit: BigNumber,
+    ) => {
       const prepareTXConfig: TransactionConfig = {
         from: event.object.from,
         to: event.object.to,
@@ -202,7 +211,12 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   };
 
   const handleSendTransaction = useRefCallback(
-    async (event: DappBrowserIPC.SendTransactionEvent, passphrase: string, _gasPrice: BigNumber, _gasLimit: BigNumber) => {
+    async (
+      event: DappBrowserIPC.SendTransactionEvent,
+      passphrase: string,
+      _gasPrice: BigNumber,
+      _gasLimit: BigNumber,
+    ) => {
       const prepareTXConfig: TransactionConfig = {
         from: event.object.from,
         to: event.object.to,
@@ -321,7 +335,12 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             props.onRequestTokenApproval(
               approvalEvent,
               info => {
-                handleTokenApproval.current(approvalEvent, info.decryptedPhrase, info.gasPrice, info.gasLimit);
+                handleTokenApproval.current(
+                  approvalEvent,
+                  info.decryptedPhrase,
+                  info.gasPrice,
+                  info.gasLimit,
+                );
               },
               reason => {
                 sendError(event.id, reason);
@@ -331,7 +350,12 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             props.onRequestSendTransaction(
               event,
               info => {
-                handleSendTransaction.current(event, info.decryptedPhrase, info.gasPrice, info.gasLimit);
+                handleSendTransaction.current(
+                  event,
+                  info.decryptedPhrase,
+                  info.gasPrice,
+                  info.gasLimit,
+                );
               },
               reason => {
                 sendError(event.id, reason);
@@ -397,7 +421,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'watchAsset':
           props.onRequestWatchAsset(
             event,
-            () => { },
+            () => {},
             reason => {
               sendError(event.id, reason);
             },
@@ -406,17 +430,18 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'addEthereumChain':
           props.onRequestAddEthereumChain(
             event,
-            () => { },
+            () => {},
             reason => {
               sendError(event.id, reason);
             },
           );
           break;
-        case 'openLinkInDefaultBrowser': {
-          const { url } = event.object;
-          const { shell } = window.require('electron');
-          shell.openExternal(url);
-        }
+        case 'openLinkInDefaultBrowser':
+          {
+            const { url } = event.object;
+            const { shell } = window.require('electron');
+            shell.openExternal(url);
+          }
           break;
         default:
           break;

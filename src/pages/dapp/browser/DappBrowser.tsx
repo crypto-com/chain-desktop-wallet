@@ -14,7 +14,7 @@ import { secretStoreService } from '../../../service/storage/SecretStoreService'
 import { Dapp, DappBrowserIPC } from '../types';
 import { ProviderPreloadScriptPath } from './config';
 import { walletService } from '../../../service/WalletService';
-import { useRefCallback } from './useRefCallback';
+import { useRefCallback } from '../../../hooks/useRefCallback';
 import { useWebInfoProvider } from './useWebInfoProvider';
 import {
   IWebviewNavigationState,
