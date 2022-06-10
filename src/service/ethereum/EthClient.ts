@@ -42,11 +42,6 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
     const balanceResponse: AxiosResponse<BalancesByAddressResponse> = await axios({
       baseURL: this.indexingBaseUrl,
       url: `/address/${address.toLowerCase()}/balance`,
-      params: {
-        ...{
-          token: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-        },
-      },
     });
 
     if (balanceResponse.status !== 200) {

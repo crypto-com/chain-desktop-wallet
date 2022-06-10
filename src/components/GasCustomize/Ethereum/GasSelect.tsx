@@ -8,7 +8,7 @@ import { getRecoil } from 'recoil-nexus';
 import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../../config/StaticConfig';
 import { useAnalytics } from '../../../hooks/useAnalytics';
 import { useMarketPrice } from '../../../hooks/useMarketPrice';
-import { UserAsset } from '../../../models/UserAsset';
+import { UserAsset, UserAssetType } from '../../../models/UserAsset';
 import { sessionState } from '../../../recoil/atom';
 import { EthereumGasStepInfo, getEthereumGasSteps } from '../../../service/Gas';
 import GasConfigEVM from '../EVM/GasConfig';
@@ -29,7 +29,11 @@ const GasStepOption = ({ title, wait, gasPrice, gasLimit }: IGasStepOption) => {
   const [t] = useTranslation();
 
   const readableGasFee = ethers.utils.formatEther(gasPrice.mul(gasLimit));
-  const { readablePrice } = useMarketPrice({ symbol: 'WETH', amount: readableGasFee });
+  const { readablePrice } = useMarketPrice({
+    assetType: UserAssetType.EVM,
+    symbol: 'ETH',
+    amount: readableGasFee,
+  });
 
   return (
     <div
@@ -119,7 +123,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEthereu
         setHasFetchedError(true);
       }
       setIsLoading(false);
-    } 
+    };
 
     fetch();
   }, []);
@@ -144,7 +148,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEthereu
 
   // fall back to general EVM gas config
   if (hasFetchError) {
-    return <GasConfigEVM asset={asset} onChange={onChange} />
+    return <GasConfigEVM asset={asset} onChange={onChange} />;
   }
 
   if (!gasInfo || isLoading) {
@@ -198,14 +202,14 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEthereu
           defaultValue={gasInfo.average.toString()}
           value={gasPrice}
           className="gasStepSelectEthereum"
-          onChange={async (value) => {
+          onChange={async value => {
             setGasPrice(value);
             await updateFee(value, gasLimit);
           }}
         >
           <Option value={gasInfo.safeLow.toString()}>
             <GasStepOption
-                title={t('general.slow')}
+              title={t('general.slow')}
               wait={gasInfo.safeLowWait}
               gasPrice={gasInfo.safeLow}
               gasLimit={gasLimitInfo}
@@ -213,7 +217,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEthereu
           </Option>
           <Option value={gasInfo.average.toString()}>
             <GasStepOption
-                title={t('general.average')}
+              title={t('general.average')}
               wait={gasInfo.averageWait}
               gasPrice={gasInfo.average}
               gasLimit={gasLimitInfo}
@@ -221,7 +225,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEthereu
           </Option>
           <Option value={gasInfo.fast.toString()}>
             <GasStepOption
-                title={t('general.fast')}
+              title={t('general.fast')}
               wait={gasInfo.fastWait}
               gasPrice={gasInfo.fast}
               gasLimit={gasLimitInfo}
@@ -233,7 +237,7 @@ export const GasStepSelectEthereum = ({ asset, onChange }: IGasStepSelectEthereu
         style={{ float: 'right', marginTop: '4px' }}
         onClick={() => {
           show({
-            onCancel: () => { },
+            onCancel: () => {},
             onSuccess: (newGasLimit, newGasFee) => {
               onChange?.(newGasLimit, newGasFee);
               dismiss();
