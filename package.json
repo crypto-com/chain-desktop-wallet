@@ -230,7 +230,7 @@
   },
   "build": {
     "productName": "Crypto.com DeFi Desktop Wallet",
-    "appId": "chain.crypto.com.defi-desktop-wallet",
+    "appId": "chain.crypto.com.chain-desktop-wallet",
     "files": [
       "./build/**/*",
       "./dist/**/*",
