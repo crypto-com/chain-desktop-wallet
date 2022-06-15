@@ -15,7 +15,7 @@ import { AnalyticsService } from '../../../service/analytics/AnalyticsService';
 
 const { Content, Sider } = Layout;
 
-export const ProposalVisible = (props: any) => {
+export const ProposalView = (props: any) => {
   // const [form] = Form.useForm();
 
   const [proposalList, setProposalList] = useState<ProposalModel[]>();

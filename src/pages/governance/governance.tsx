@@ -29,7 +29,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 
-import { ProposalVisible } from './components/ProposalVisible';
+import { ProposalView } from './components/ProposalView';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -335,7 +335,7 @@ const GovernancePage = () => {
       <div className="header-description">{t('governance.description')}</div>
       <Content>
         {isProposalVisible ? (
-          <ProposalVisible
+          <ProposalView
             props={{
               setIsProposalVisible,
               setInputPasswordVisible,
