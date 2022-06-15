@@ -16,6 +16,8 @@
   "general.close": "Đóng",
   "general.retry": "Thử lại",
   "general.connect": "Kết nối",
+  "general.addressValidator.reason1": "Không hợp lệ",
+  "general.addressValidator.reason2": "dã cung cấp địa chỉ",
   "general.passwordForm.password.label": "Mật khẩu ứng dụng",
   "general.passwordForm.password.placeholder": "Nhập mật khẩu ứng dụng"
 }

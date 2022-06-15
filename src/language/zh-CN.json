@@ -51,6 +51,10 @@
   "general.slow": "慢速",
   "general.custom": "自定义",
   "general.invalidAmount": "无效的数量",
+  "general.learnMore": "查看更多",
+  "general.addressValidator.reason1": "无效的",
+  "general.addressValidator.reason2": "地址",
+  "general.validTransactionAmountValidator.reason": "无效的转账款项",
   "general.passwordForm.password.label": "密码",
   "general.passwordForm.password.placeholder": "输入密码",
   "general.passwordForm.password.error1": "密码需要至少8个字母，并包括英文字母、数字及特殊符号各一。",
@@ -745,5 +749,12 @@
   "settings.revoke.risk": "风险敞口",
   "settings.revoke": "撤销许可",
   "settings.revoke.unlimited": "无限的",
-  "settings.noApproval": "没有批准数据"
+  "settings.noApproval": "没有批准数据",
+  "settings.support.title": "支援",
+  "settings.support.helpCenter.title": "支援中心",
+  "settings.support.helpCenter.description": "#VALUE!",
+  "settings.support.feedbackForm.title": "意见回报",
+  "settings.support.feedbackForm.description": "#VALUE!",
+  "settings.about.title": "关于",
+  "settings.about.termsAndConditions.title": "条款及细则"
 }

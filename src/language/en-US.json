@@ -51,6 +51,10 @@
   "general.slow": "Slow",
   "general.custom": "Custom",
   "general.invalidAmount": "Invalid Amount",
+  "general.learnMore": "Learn More",
+  "general.addressValidator.reason1": "Invalid",
+  "general.addressValidator.reason2": "address provided",
+  "general.validTransactionAmountValidator.reason": "Invalid sending amount",
   "general.passwordForm.password.label": "App Password",
   "general.passwordForm.password.placeholder": "Enter App Password",
   "general.passwordForm.password.error1": "The password should be at least 8 character containing a letter, a number and a special character",
@@ -745,5 +749,12 @@
   "settings.revoke.risk": "Risk Exposure",
   "settings.revoke": "Revoke",
   "settings.revoke.unlimited": "Unlimited",
-  "settings.noApproval": "No Approval Data"
+  "settings.noApproval": "No Approval Data",
+  "settings.support.title": "Support",
+  "settings.support.helpCenter.title": "Help Center",
+  "settings.support.helpCenter.description": "Detailed information about Crypto.com DeFi Desktop Wallet - onboarding, wallet management, deposit and withdrawal",
+  "settings.support.feedbackForm.title": "Feedback Form",
+  "settings.support.feedbackForm.description": "If you have any feedback, questions, complaints relating to our Crypto.com DeFi Desktop Wallet, please complete the online survey",
+  "settings.about.title": "About",
+  "settings.about.termsAndConditions.title": "Terms & Conditions"
 }
