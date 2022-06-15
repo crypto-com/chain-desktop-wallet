@@ -1,6 +1,6 @@
 import WalletConnect from '@walletconnect/client';
 import { IClientMeta } from '@walletconnect/types';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRefCallback } from '../../hooks/useRefCallback';
 import { clearCachedSession, getCachedSession } from './utils';
 
@@ -8,13 +8,14 @@ export const useWalletConnect = () => {
   const [connector, setConnector] = useState<WalletConnect | null>(null);
   const [connected, setConnected] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
   const [uri, setUri] = useState('');
   const [peerMeta, setPeerMeta] = useState<IClientMeta | null>(null);
   const [address, setAddress] = useState('');
   const [chainId, setChainId] = useState(0);
 
   useEffect(() => {
-    clearCachedSession();
+    // clearCachedSession();
 
     // const session = getCachedSession();
 
@@ -35,25 +36,53 @@ export const useWalletConnect = () => {
     //     resetApp();
     //   }
     // }
+
+    return () => {
+      // killSession();
+    };
   }, []);
+
+  const rejectSession = async () => {
+    console.log('ACTION', 'rejectSession');
+    try {
+      await connector?.rejectSession();
+    } finally {
+      resetApp();
+    }
+  };
 
   const killSession = async () => {
     console.log('ACTION', 'killSession');
-    if (connector) {
-      await connector.killSession();
+    try {
+      await connector?.killSession();
+    } finally {
+      resetApp();
     }
-    resetApp();
+  };
+
+  const approveSession = async (address: string) => {
+    console.log('ACTION', 'approveSession');
+    if (connector) {
+      try {
+        await connector.approveSession({
+          accounts: [address],
+          chainId: 1,
+        });
+        setIsConnecting(false);
+      } catch {}
+    }
   };
 
   const connect = async (uri: string, chainId: number, account: string) => {
+    if (isConnecting) {
+      return;
+    }
+
+    setIsConnecting(true);
     setLoading(true);
 
     try {
       const connector = new WalletConnect({ uri });
-      setConnector(connector);
-      setUri(connector.uri);
-      setLoading(false);
-      subscribeToEvents.current();
 
       if (!connector.connected) {
         await connector.createSession({ chainId });
@@ -62,6 +91,10 @@ export const useWalletConnect = () => {
           setPeerMeta(connector.peerMeta);
         }
       }
+
+      setConnector(connector);
+      setUri(connector.uri);
+      subscribeToEvents.current();
     } catch (error) {
       setLoading(false);
       throw error;
@@ -69,6 +102,7 @@ export const useWalletConnect = () => {
   };
 
   const resetApp = () => {
+    setIsConnecting(false);
     setConnector(null);
     setConnected(false);
     setPeerMeta(null);
@@ -91,6 +125,7 @@ export const useWalletConnect = () => {
         }
         console.log('SESSION_REQUEST', payload.params);
         const { peerMeta } = payload.params[0];
+        setLoading(false);
         setPeerMeta({ ...peerMeta });
       });
 
@@ -147,5 +182,14 @@ export const useWalletConnect = () => {
     }
   });
 
-  return { connect, killSession, connected, peerMeta, connector };
+  return {
+    connect,
+    approveSession,
+    rejectSession,
+    killSession,
+    connected,
+    peerMeta,
+    loading,
+    isConnecting,
+  };
 };
