@@ -5,7 +5,7 @@ import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Layout, Tabs, List, Space, Button, Tag } from 'antd';
 import Big from 'big.js';
-import { DislikeOutlined, LikeOutlined } from '@ant-design/icons';
+import { DislikeOutlined, LikeOutlined, HistoryOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { ledgerIsExpertModeState, sessionState, walletAssetState } from '../../recoil/atom';
@@ -84,6 +84,14 @@ const GovernancePage = () => {
   const { isLedgerConnected } = useLedgerStatus({ asset: userAsset });
 
   const analyticsService = new AnalyticsService(currentSession);
+
+  // const [historyVisible, setHistoryVisible] = useState(false);
+
+  const historyBtn = (
+    <Button id="votingHistoryBtn" type="link" size="small">
+      <HistoryOutlined style={{ fontSize: '17px' }} /> View Voting History
+    </Button>
+  );
 
   const [t] = useTranslation();
 
@@ -350,7 +358,7 @@ const GovernancePage = () => {
             }}
           />
         ) : (
-          <Tabs defaultActiveKey="1">
+          <Tabs defaultActiveKey="1" tabBarExtraContent={historyBtn}>
             <TabPane tab={t('governance.tab1')} key="1">
               <div className="site-layout-background governance-content">
                 <div className="container">
