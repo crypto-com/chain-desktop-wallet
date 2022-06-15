@@ -878,7 +878,6 @@ function HomeLayout(props: HomeLayoutProps) {
 
   return (
     <main className="home-layout">
-      <WalletConnect />
       <PasswordFormModal
         description={t('general.passwordFormModal.description')}
         okButtonText={t('general.passwordFormModal.okButton')}
@@ -972,6 +971,7 @@ function HomeLayout(props: HomeLayoutProps) {
           <div className="logo" />
           <div className="version">CHAIN DESKTOP WALLET v{buildVersion}</div>
           <HomeMenu />
+          <WalletConnect />
           <Button
             className="bottom-icon"
             type="ghost"

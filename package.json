@@ -233,6 +233,12 @@
   "build": {
     "productName": "Crypto.org Chain Desktop Wallet (Beta)",
     "appId": "chain.crypto.org.chain-desktop-wallet",
+    "protocols": {
+      "name": "desktop wallet",
+      "schemes": [
+        "cryptowallet"
+      ]
+    },
     "files": [
       "./build/**/*",
       "./dist/**/*",
