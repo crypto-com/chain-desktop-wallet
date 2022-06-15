@@ -5,6 +5,9 @@ import { Form, InputNumber, Alert, Input } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { OrderedListOutlined } from '@ant-design/icons';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
+
+import Big from 'big.js';
+
 import { validatorListState } from '../../../recoil/atom';
 import { Session } from '../../../models/Session';
 import { UserAsset } from '../../../models/UserAsset';
@@ -26,6 +29,7 @@ export const FormRedelegateComponent = (props: {
     validatorDestinationAddress: string;
     redelegateAmount: string;
   };
+  setRedelegateFormValues: React.Dispatch<React.SetStateAction<any>>;
   form: FormInstance;
 }) => {
   useEffect(() => props.form.resetFields(), [props]);
@@ -137,7 +141,21 @@ export const FormRedelegateComponent = (props: {
               customMaxValidator,
             ]}
           >
-            <InputNumber stringMode />
+            <InputNumber
+              stringMode
+              onChange={(val: string) => {
+                const curval = val ? Big(val.toString()).toString() : '0';
+                const curOrigin = props.redelegateFormValues.validatorOriginAddress;
+                const curDestination = props.redelegateFormValues.validatorDestinationAddress;
+                const newFormValues = {
+                  validatorOriginAddress: curOrigin,
+                  validatorDestinationAddress: curDestination,
+                  redelegateAmount: curval,
+                };
+
+                props.setRedelegateFormValues(newFormValues);
+              }}
+            />
           </Form.Item>
         </Form>
       </div>

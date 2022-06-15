@@ -2,6 +2,9 @@ import { FormInstance } from 'antd/lib/form';
 import { Form, InputNumber, Checkbox } from 'antd';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect } from 'react';
+
+import Big from 'big.js';
+
 import { Session } from '../../../models/Session';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { UNBLOCKING_PERIOD_IN_DAYS } from '../../../config/StaticConfig';
@@ -10,18 +13,26 @@ import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSele
 export const FormUndelegateComponent = (props: {
   currentSession: Session;
   undelegateFormValues: { validatorAddress: string; undelegateAmount: string };
+  setUndelegateFormValues: React.Dispatch<React.SetStateAction<any>>;
   isChecked: boolean;
   setIsChecked;
   form: FormInstance;
 }) => {
   const [t] = useTranslation();
 
-  useEffect(() => props.form.resetFields(), [props]);
-
-  const customMaxValidator = TransactionUtils.maxValidator(
+  let customMaxValidator = TransactionUtils.maxValidator(
     props.undelegateFormValues.undelegateAmount,
     t('general.undelegateFormComponent.maxValidator.error'),
   );
+
+  useEffect(() => {
+    props.form.resetFields();
+
+    customMaxValidator = TransactionUtils.maxValidator(
+      props.undelegateFormValues.undelegateAmount,
+      t('general.undelegateFormComponent.maxValidator.error'),
+    );
+  }, [props]);
 
   const undelegatePeriod =
     props.currentSession.wallet.config.name === 'MAINNET'
@@ -69,7 +80,19 @@ export const FormUndelegateComponent = (props: {
               customMaxValidator,
             ]}
           >
-            <InputNumber />
+            <InputNumber
+              stringMode
+              onChange={(val: string) => {
+                const curval = val ? Big(val.toString()).toString() : '0';
+                const curAddress = props.undelegateFormValues.validatorAddress;
+                const newFormValues = {
+                  validatorAddress: curAddress,
+                  undelegateAmount: curval,
+                };
+
+                props.setUndelegateFormValues(newFormValues);
+              }}
+            />
           </Form.Item>
         </Form>
       </div>
