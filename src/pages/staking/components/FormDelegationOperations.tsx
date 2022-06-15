@@ -157,8 +157,10 @@ export const FormDelegationOperations = props => {
       if (delegationActionType === StakingActionType.UNDELEGATE) {
         // const undelegateAmount = form.getFieldValue('undelegateAmount');
         broadcastedTransaction = await walletService.sendUnDelegateTransaction({
-          validatorAddress: undelegateFormValues.validatorAddress,
-          amount: undelegateFormValues.undelegateAmount,
+          validatorAddress: form.getFieldValue('validatorAddress'),
+          amount: form.getFieldValue('undelegateAmount'),
+          // validatorAddress: undelegateFormValues.validatorAddress,
+          // amount: undelegateFormValues.undelegateAmount,
           asset: userAsset,
           memo: '',
           decryptedPhrase,
@@ -231,10 +233,14 @@ export const FormDelegationOperations = props => {
     setDelegationActionType(newStakingAction);
 
     if (newStakingAction === StakingActionType.UNDELEGATE) {
-      setUndelegateFormValues({
+      form.setFieldsValue({
         validatorAddress,
         undelegateAmount: stakedAmount,
       });
+      // setUndelegateFormValues({
+      //   validatorAddress,
+      //   undelegateAmount: stakedAmount,
+      // });
     } else if (newStakingAction === StakingActionType.REDELEGATE) {
       setRedelegateFormValues({
         redelegateAmount: stakedAmount,

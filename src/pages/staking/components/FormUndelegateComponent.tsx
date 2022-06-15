@@ -12,7 +12,9 @@ import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSele
 
 export const FormUndelegateComponent = (props: {
   currentSession: Session;
+  // eslint-disable-next-line
   undelegateFormValues: { validatorAddress: string; undelegateAmount: string };
+  // eslint-disable-next-line
   setUndelegateFormValues: React.Dispatch<React.SetStateAction<any>>;
   isChecked: boolean;
   setIsChecked;
@@ -20,16 +22,18 @@ export const FormUndelegateComponent = (props: {
 }) => {
   const [t] = useTranslation();
 
+  const { form: undelegationForm } = props;
+
   let customMaxValidator = TransactionUtils.maxValidator(
-    props.undelegateFormValues.undelegateAmount,
+    undelegationForm.getFieldValue('undelegateAmount'),
     t('general.undelegateFormComponent.maxValidator.error'),
   );
 
   useEffect(() => {
-    props.form.resetFields();
+    // undelegationForm.resetFields();
 
     customMaxValidator = TransactionUtils.maxValidator(
-      props.undelegateFormValues.undelegateAmount,
+      undelegationForm.getFieldValue('undelegateAmount'),
       t('general.undelegateFormComponent.maxValidator.error'),
     );
   }, [props]);
@@ -49,15 +53,15 @@ export const FormUndelegateComponent = (props: {
       </div>
       <div className="item">
         <div className="label">{t('general.undelegateFormComponent.label2')}</div>
-        <div className="address">{props.undelegateFormValues?.validatorAddress}</div>
+        <div className="address">{undelegationForm.getFieldValue('validatorAddress')}</div>
       </div>
       <div className="item">
         <Form
-          form={props.form}
+          form={undelegationForm}
           layout="vertical"
           requiredMark={false}
           initialValues={{
-            undelegateAmount: props.undelegateFormValues.undelegateAmount,
+            undelegateAmount: undelegationForm.getFieldValue('undelegateAmount'),
           }}
         >
           <Form.Item
@@ -84,13 +88,16 @@ export const FormUndelegateComponent = (props: {
               stringMode
               onChange={(val: string) => {
                 const curval = val ? Big(val.toString()).toString() : '0';
-                const curAddress = props.undelegateFormValues.validatorAddress;
-                const newFormValues = {
+                const curAddress = undelegationForm.getFieldValue('validatorAddress');
+                // const newFormValues = {
+                //   validatorAddress: curAddress,
+                //   undelegateAmount: curval,
+                // };
+                undelegationForm.setFieldsValue({
                   validatorAddress: curAddress,
                   undelegateAmount: curval,
-                };
-
-                props.setUndelegateFormValues(newFormValues);
+                });
+                // props.setUndelegateFormValues(newFormValues);
               }}
             />
           </Form.Item>
