@@ -376,6 +376,7 @@ export const FormDelegationOperations = props => {
             <FormUndelegateComponent
               currentSession={currentSession}
               undelegateFormValues={undelegateFormValues}
+              setUndelegateFormValues={setUndelegateFormValues}
               isChecked={isUndelegateDisclaimerChecked}
               setIsChecked={setIsUndelegateDisclaimerChecked}
               form={form}
