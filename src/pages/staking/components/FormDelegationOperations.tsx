@@ -392,6 +392,7 @@ export const FormDelegationOperations = props => {
               currentSession={currentSession}
               redelegateFormValues={redelegateFormValues}
               moderationConfig={moderationConfig}
+              setRedelegateFormValues={setRedelegateFormValues}
               walletAsset={userAsset}
               form={form}
             />
