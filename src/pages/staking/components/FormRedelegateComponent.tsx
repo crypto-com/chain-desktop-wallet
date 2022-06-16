@@ -24,34 +24,49 @@ export const FormRedelegateComponent = (props: {
   currentSession: Session;
   walletAsset: UserAsset;
   moderationConfig: ModerationConfig;
+  // eslint-disable-next-line
   redelegateFormValues: {
     validatorOriginAddress: string;
     validatorDestinationAddress: string;
     redelegateAmount: string;
   };
+  // eslint-disable-next-line
   setRedelegateFormValues: React.Dispatch<React.SetStateAction<any>>;
   form: FormInstance;
 }) => {
-  useEffect(() => props.form.resetFields(), [props]);
-
-  const currentValidatorList = useRecoilValue(validatorListState);
-  const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
   const [t] = useTranslation();
 
-  const redelegatePeriod =
-    props.currentSession.wallet.config.name === 'MAINNET'
-      ? UNBLOCKING_PERIOD_IN_DAYS.REDELEGATION.MAINNET
-      : UNBLOCKING_PERIOD_IN_DAYS.REDELEGATION.OTHERS;
+  const { form: redelegationForm } = props;
 
   const customAddressValidator = TransactionUtils.addressValidator(
     props.currentSession,
     props.walletAsset,
     AddressType.VALIDATOR,
   );
-  const customMaxValidator = TransactionUtils.maxValidator(
-    props.redelegateFormValues.redelegateAmount,
+
+  let customMaxValidator = TransactionUtils.maxValidator(
+    redelegationForm.getFieldValue('redelegateAmount'),
     t('general.redelegateFormComponent.maxValidator.error'),
   );
+
+  useEffect(() => {
+    // props.form.resetFields();
+
+    console.log('redelegateAmount ', redelegationForm.getFieldValue('redelegateAmount'));
+
+    customMaxValidator = TransactionUtils.maxValidator(
+      redelegationForm.getFieldValue('redelegateAmount'),
+      t('general.redelegateFormComponent.maxValidator.error'),
+    );
+  }, [props]);
+
+  const currentValidatorList = useRecoilValue(validatorListState);
+  const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
+
+  const redelegatePeriod =
+    props.currentSession.wallet.config.name === 'MAINNET'
+      ? UNBLOCKING_PERIOD_IN_DAYS.REDELEGATION.MAINNET
+      : UNBLOCKING_PERIOD_IN_DAYS.REDELEGATION.OTHERS;
 
   return (
     <div className="redelegate-form">
@@ -73,7 +88,7 @@ export const FormRedelegateComponent = (props: {
               currentValidatorList={currentValidatorList}
               moderationConfig={props.moderationConfig}
               setIsValidatorListVisible={setIsValidatorListVisible}
-              form={props.form}
+              form={redelegationForm}
             />
           </div>
         </ModalPopup>
@@ -86,15 +101,18 @@ export const FormRedelegateComponent = (props: {
       </div>
       <div className="item">
         <div className="label">{t('general.redelegateFormComponent.label2')}</div>
-        <div className="address">{`${props.redelegateFormValues?.validatorOriginAddress}`}</div>
+        <div className="address">{redelegationForm.getFieldValue('validatorOriginAddress')}</div>
       </div>
       <div className="item">
         <Form
-          form={props.form}
+          form={redelegationForm}
           layout="vertical"
           requiredMark={false}
           initialValues={{
-            redelegateAmount: props.redelegateFormValues.redelegateAmount,
+            undelegateAmount: redelegationForm.getFieldValue('redelegateAmount'),
+            validatorDestinationAddress: redelegationForm.getFieldValue(
+              'validatorDestinationAddress',
+            ),
           }}
         >
           <Form.Item
@@ -145,15 +163,16 @@ export const FormRedelegateComponent = (props: {
               stringMode
               onChange={(val: string) => {
                 const curval = val ? Big(val.toString()).toString() : '0';
-                const curOrigin = props.redelegateFormValues.validatorOriginAddress;
-                const curDestination = props.redelegateFormValues.validatorDestinationAddress;
-                const newFormValues = {
+                const curOrigin = redelegationForm.getFieldValue('validatorOriginAddress');
+                const curDestination = redelegationForm.getFieldValue(
+                  'validatorDestinationAddress',
+                );
+
+                redelegationForm.setFieldsValue({
                   validatorOriginAddress: curOrigin,
                   validatorDestinationAddress: curDestination,
                   redelegateAmount: curval,
-                };
-
-                props.setRedelegateFormValues(newFormValues);
+                });
               }}
             />
           </Form.Item>
