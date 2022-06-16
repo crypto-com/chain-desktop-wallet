@@ -89,15 +89,10 @@ export const FormUndelegateComponent = (props: {
               onChange={(val: string) => {
                 const curval = val ? Big(val.toString()).toString() : '0';
                 const curAddress = undelegationForm.getFieldValue('validatorAddress');
-                // const newFormValues = {
-                //   validatorAddress: curAddress,
-                //   undelegateAmount: curval,
-                // };
                 undelegationForm.setFieldsValue({
                   validatorAddress: curAddress,
                   undelegateAmount: curval,
                 });
-                // props.setUndelegateFormValues(newFormValues);
               }}
             />
           </Form.Item>

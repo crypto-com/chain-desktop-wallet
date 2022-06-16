@@ -247,6 +247,11 @@ export const FormDelegationOperations = props => {
         validatorOriginAddress: validatorAddress,
         validatorDestinationAddress: '',
       });
+      form.setFieldsValue({
+        redelegateAmount: stakedAmount,
+        validatorOriginAddress: validatorAddress,
+        validatorDestinationAddress: '',
+      });
     }
     showPasswordInput();
   };
