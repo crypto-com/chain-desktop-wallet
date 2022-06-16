@@ -24,7 +24,7 @@ import Icon, {
   SettingOutlined,
   LockFilled,
 } from '@ant-design/icons';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -89,7 +89,8 @@ import {
 } from '../../service/bridge/BridgeConfig';
 import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
 import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
-import { WalletConnect } from '../../service/wallet-connect';
+import { walletConnectStateAtom } from '../../service/walletconnect/store';
+import { WalletConnectModal } from '../../pages/walletconnect/components/modal';
 
 // import i18n from '../../language/I18n';
 
@@ -774,6 +775,8 @@ function HomeLayout(props: HomeLayoutProps) {
       menuSelectedKey = '/home';
     }
 
+    const walletConnectState = useRecoilValue(walletConnectStateAtom);
+
     return (
       <Menu
         theme="dark"
@@ -819,6 +822,11 @@ function HomeLayout(props: HomeLayoutProps) {
         <Menu.Item key="/settings" icon={<SettingOutlined />}>
           {conditionalLink('/settings', t('navbar.settings'))}
         </Menu.Item>
+        {walletConnectState.connected && (
+          <Menu.Item key="/walletconnect" icon={<SettingOutlined />}>
+            {conditionalLink('/walletconnect', t('WalletConnect'))}
+          </Menu.Item>
+        )}
       </Menu>
     );
   };
@@ -970,8 +978,8 @@ function HomeLayout(props: HomeLayoutProps) {
         <Sider className="home-sider">
           <div className="logo" />
           <div className="version">CHAIN DESKTOP WALLET v{buildVersion}</div>
+          <WalletConnectModal />
           <HomeMenu />
-          <WalletConnect />
           <Button
             className="bottom-icon"
             type="ghost"

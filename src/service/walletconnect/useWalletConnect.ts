@@ -1,18 +1,18 @@
 import WalletConnect from '@walletconnect/client';
-import { IClientMeta } from '@walletconnect/types';
+import { IClientMeta, IJsonRpcRequest } from '@walletconnect/types';
 import { useEffect, useState } from 'react';
+import { atom, useRecoilState } from 'recoil';
 import { useRefCallback } from '../../hooks/useRefCallback';
+import { DefaultState, walletConnectStateAtom } from './store';
 import { clearCachedSession, getCachedSession } from './utils';
 
 export const useWalletConnect = () => {
-  const [connector, setConnector] = useState<WalletConnect | null>(null);
-  const [connected, setConnected] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [isConnecting, setIsConnecting] = useState(false);
   const [uri, setUri] = useState('');
-  const [peerMeta, setPeerMeta] = useState<IClientMeta | null>(null);
   const [address, setAddress] = useState('');
   const [chainId, setChainId] = useState(0);
+  const [state, setState] = useRecoilState(walletConnectStateAtom);
+
+  const { connector } = state;
 
   useEffect(() => {
     // clearCachedSession();
@@ -68,18 +68,20 @@ export const useWalletConnect = () => {
           accounts: [address],
           chainId: 1,
         });
-        setIsConnecting(false);
+        setState({
+          ...state,
+          connected: true,
+        });
       } catch {}
     }
   };
 
   const connect = async (uri: string, chainId: number, account: string) => {
-    if (isConnecting) {
-      return;
-    }
-
-    setIsConnecting(true);
-    setLoading(true);
+    setState({
+      ...state,
+      fetchingPeerMeta: true,
+      loading: true,
+    });
 
     try {
       const connector = new WalletConnect({ uri });
@@ -88,28 +90,36 @@ export const useWalletConnect = () => {
         await connector.createSession({ chainId });
       } else {
         if (connector.peerMeta) {
-          setPeerMeta(connector.peerMeta);
+          setState({
+            ...state,
+            peerMeta: connector.peerMeta,
+          });
         }
       }
 
-      setConnector(connector);
+      setState({
+        ...state,
+        connector,
+      });
       setUri(connector.uri);
       subscribeToEvents.current();
     } catch (error) {
-      setLoading(false);
+      setState({
+        ...state,
+        loading: false,
+        fetchingPeerMeta: false,
+      });
       throw error;
     }
   };
 
   const resetApp = () => {
-    setIsConnecting(false);
-    setConnector(null);
-    setConnected(false);
-    setPeerMeta(null);
+    setState({
+      ...DefaultState,
+    });
     setAddress('');
     setChainId(0);
     setUri('');
-    setLoading(false);
     clearCachedSession();
   };
 
@@ -125,8 +135,12 @@ export const useWalletConnect = () => {
         }
         console.log('SESSION_REQUEST', payload.params);
         const { peerMeta } = payload.params[0];
-        setLoading(false);
-        setPeerMeta({ ...peerMeta });
+        setState({
+          ...state,
+          peerMeta,
+          fetchingPeerMeta: false,
+          loading: false,
+        });
       });
 
       connector.on('session_update', error => {
@@ -137,8 +151,7 @@ export const useWalletConnect = () => {
         }
       });
 
-      connector.on('call_request', async (error, payload) => {
-        // tslint:disable-next-line
+      connector.on('call_request', async (error, payload: IJsonRpcRequest) => {
         console.log('EVENT', 'call_request', 'method', payload.method);
         console.log('EVENT', 'call_request', 'params', payload.params);
 
@@ -146,7 +159,25 @@ export const useWalletConnect = () => {
           throw error;
         }
 
-        // await getAppConfig().rpcEngine.router(payload, this.state, this.bindedSetState);
+        switch (payload.method) {
+          case 'personal_sign':
+            break;
+          case 'eth_sign':
+            break;
+          case 'eth_signTransaction':
+            break;
+          case 'eth_signTypedData':
+            break;
+          case 'eth_sendTransaction':
+            break;
+          case 'eth_signPersonalMessage':
+            break;
+          case 'eth_signTypedData_v3':
+            break;
+          default:
+            console.log('unknown payload');
+            break;
+        }
       });
 
       connector.on('connect', error => {
@@ -156,7 +187,10 @@ export const useWalletConnect = () => {
           throw error;
         }
 
-        setConnected(true);
+        setState({
+          ...state,
+          connected: true,
+        });
       });
 
       connector.on('disconnect', error => {
@@ -173,12 +207,18 @@ export const useWalletConnect = () => {
         const { chainId, accounts } = connector;
         const index = 0;
         const address = accounts[index];
-        setConnected(true);
+        setState({
+          ...state,
+          connected: true,
+        });
         setAddress(address);
         setChainId(chainId);
       }
 
-      setConnector(connector);
+      setState({
+        ...state,
+        connector,
+      });
     }
   });
 
@@ -187,9 +227,6 @@ export const useWalletConnect = () => {
     approveSession,
     rejectSession,
     killSession,
-    connected,
-    peerMeta,
-    loading,
-    isConnecting,
+    state,
   };
 };
