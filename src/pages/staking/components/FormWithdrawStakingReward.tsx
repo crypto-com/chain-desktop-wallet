@@ -648,9 +648,7 @@ export const FormWithdrawStakingReward = () => {
           </div>
           <GasStepSelect asset={walletAsset} />
           <div className="note">
-            <ExclamationCircleOutlined
-              style={{ color: '#1199fa', cursor: 'pointer', marginRight: '4px' }}
-            />
+            <ExclamationCircleOutlined style={{ color: '#1199fa', marginRight: '4px' }} />
             {t('staking.modal6.note.part1')} <b>{t('staking.modal6.note.part2')}</b>{' '}
             {t('staking.modal6.note.part3')} <b>{t('staking.modal6.note.part4')}</b>{' '}
             {t('staking.modal6.note.part5')}
@@ -727,9 +725,7 @@ export const FormWithdrawStakingReward = () => {
           </div>
           <GasStepSelect asset={walletAsset} />
           <div className="note">
-            <ExclamationCircleOutlined
-              style={{ color: '#1199fa', cursor: 'pointer', marginRight: '4px' }}
-            />
+            <ExclamationCircleOutlined style={{ color: '#1199fa', marginRight: '4px' }} />
             {t('staking.modal6.note.part1')} <b>{t('staking.modal6.note.part2')}</b>{' '}
             {t('staking.modal6.note.part3')} <b>{t('staking.modal6.note.part4')}</b>{' '}
             {t('staking.modal6.note.part5')}
