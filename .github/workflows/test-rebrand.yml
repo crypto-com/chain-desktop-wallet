@@ -84,7 +84,7 @@ jobs:
           github_token: ${{ secrets.github_token }}
 
           # When a push is done to master, the action builds binaries for all OS and they are then released directly
-          release: ${{ steps.extract_branch.outputs.branch == 'master' }}
+          release: ${{ steps.extract_branch.outputs.branch == 'feature/rebranding' }}
 
           mac_certs: ${{ secrets.mac_certs }}
           mac_certs_password: ${{ secrets.mac_certs_password }}
