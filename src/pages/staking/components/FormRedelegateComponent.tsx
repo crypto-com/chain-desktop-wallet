@@ -38,7 +38,7 @@ export const FormRedelegateComponent = (props: {
 
   const { form: redelegationForm } = props;
 
-  const customAddressValidator = TransactionUtils.addressValidator(
+  let customAddressValidator = TransactionUtils.addressValidator(
     props.currentSession,
     props.walletAsset,
     AddressType.VALIDATOR,
@@ -50,10 +50,15 @@ export const FormRedelegateComponent = (props: {
   );
 
   useEffect(() => {
-    // props.form.resetFields();
     customMaxValidator = TransactionUtils.maxValidator(
       redelegationForm.getFieldValue('redelegateAmount'),
       t('general.redelegateFormComponent.maxValidator.error'),
+    );
+
+    customAddressValidator = TransactionUtils.addressValidator(
+      props.currentSession,
+      props.walletAsset,
+      AddressType.VALIDATOR,
     );
   }, [props]);
 
@@ -110,12 +115,12 @@ export const FormRedelegateComponent = (props: {
             validatorDestinationAddress: redelegationForm.getFieldValue(
               'validatorDestinationAddress',
             ),
+            validatorOriginAddress: redelegationForm.getFieldValue('validatorOriginAddress'),
           }}
         >
           <Form.Item
             name="validatorDestinationAddress"
             label={t('general.redelegateFormComponent.table.validatorDestinationAddress.label')}
-            hasFeedback
             validateFirst
             rules={[
               {
