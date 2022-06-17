@@ -1,18 +1,21 @@
 import WalletConnect from '@walletconnect/client';
-import { IClientMeta, IJsonRpcRequest } from '@walletconnect/types';
+import { IJsonRpcRequest } from '@walletconnect/types';
 import { useEffect, useState } from 'react';
-import { atom, useRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
+import { getRecoil, setRecoil } from 'recoil-nexus';
 import { useRefCallback } from '../../hooks/useRefCallback';
-import { DefaultState, walletConnectStateAtom } from './store';
-import { clearCachedSession, getCachedSession } from './utils';
+import { DefaultState, WalletConnectState, walletConnectStateAtom } from './store';
+import { clearCachedSession } from './utils';
 
 export const useWalletConnect = () => {
-  const [uri, setUri] = useState('');
-  const [address, setAddress] = useState('');
   const [chainId, setChainId] = useState(0);
   const [state, setState] = useRecoilState(walletConnectStateAtom);
-
   const { connector } = state;
+  // const state = getRecoil(walletConnectStateAtom);
+
+  // const setState = (newState: Partial<WalletConnectState>) => {
+  //   setRecoil(walletConnectStateAtom, {...state, ...newState});
+  // };
 
   useEffect(() => {
     // clearCachedSession();
@@ -42,8 +45,12 @@ export const useWalletConnect = () => {
     };
   }, []);
 
+  const log = (message?: any, ...optionalParams: any[]) => {
+    console.log('[WalletConnect] ', message, ...optionalParams);
+  };
+
   const rejectSession = async () => {
-    console.log('ACTION', 'rejectSession');
+    log('ACTION', 'rejectSession');
     try {
       await connector?.rejectSession();
     } finally {
@@ -52,7 +59,7 @@ export const useWalletConnect = () => {
   };
 
   const killSession = async () => {
-    console.log('ACTION', 'killSession');
+    log('ACTION', 'killSession');
     try {
       await connector?.killSession();
     } finally {
@@ -61,7 +68,7 @@ export const useWalletConnect = () => {
   };
 
   const approveSession = async (address: string) => {
-    console.log('ACTION', 'approveSession');
+    log('ACTION', 'approveSession');
     if (connector) {
       try {
         await connector.approveSession({
@@ -70,6 +77,7 @@ export const useWalletConnect = () => {
         });
         setState({
           ...state,
+          address,
           connected: true,
         });
       } catch {}
@@ -77,32 +85,36 @@ export const useWalletConnect = () => {
   };
 
   const connect = async (uri: string, chainId: number, account: string) => {
-    setState({
-      ...state,
-      fetchingPeerMeta: true,
-      loading: true,
-    });
+    log('ACTION', 'connect', uri, chainId, account);
 
     try {
       const connector = new WalletConnect({ uri });
+      subscribeToEvents.current(connector);
 
       if (!connector.connected) {
+        setState({
+          ...state,
+          peerMeta: null,
+          fetchingPeerMeta: true,
+          loading: true,
+          connector,
+        });
         await connector.createSession({ chainId });
+      } else if (connector.peerMeta) {
+        log('connector.peerMeta', connector.peerMeta);
+        setState({
+          ...state,
+          peerMeta: connector.peerMeta,
+          connected: false,
+          loading: false,
+          connector,
+        });
       } else {
-        if (connector.peerMeta) {
-          setState({
-            ...state,
-            peerMeta: connector.peerMeta,
-          });
-        }
+        setState({
+          ...state,
+          connector,
+        });
       }
-
-      setState({
-        ...state,
-        connector,
-      });
-      setUri(connector.uri);
-      subscribeToEvents.current();
     } catch (error) {
       setState({
         ...state,
@@ -117,34 +129,33 @@ export const useWalletConnect = () => {
     setState({
       ...DefaultState,
     });
-    setAddress('');
     setChainId(0);
-    setUri('');
     clearCachedSession();
   };
 
-  const subscribeToEvents = useRefCallback(() => {
-    console.log('ACTION', 'subscribeToEvents');
+  const subscribeToEvents = useRefCallback((connector: WalletConnect) => {
+    log('ACTION', 'subscribeToEvents');
 
     if (connector) {
       connector.on('session_request', (error, payload) => {
-        console.log('EVENT', 'session_request');
+        log('EVENT', 'session_request');
 
         if (error) {
           throw error;
         }
-        console.log('SESSION_REQUEST', payload.params);
+        log('SESSION_REQUEST', payload.params);
         const { peerMeta } = payload.params[0];
         setState({
           ...state,
           peerMeta,
+          connector,
           fetchingPeerMeta: false,
           loading: false,
         });
       });
 
       connector.on('session_update', error => {
-        console.log('EVENT', 'session_update');
+        log('EVENT', 'session_update');
 
         if (error) {
           throw error;
@@ -152,8 +163,8 @@ export const useWalletConnect = () => {
       });
 
       connector.on('call_request', async (error, payload: IJsonRpcRequest) => {
-        console.log('EVENT', 'call_request', 'method', payload.method);
-        console.log('EVENT', 'call_request', 'params', payload.params);
+        log('EVENT', 'call_request', 'method', payload.method);
+        log('EVENT', 'call_request', 'params', payload.params);
 
         if (error) {
           throw error;
@@ -175,13 +186,13 @@ export const useWalletConnect = () => {
           case 'eth_signTypedData_v3':
             break;
           default:
-            console.log('unknown payload');
+            log('unknown payload');
             break;
         }
       });
 
       connector.on('connect', error => {
-        console.log('EVENT', 'connect');
+        log('EVENT', 'connect');
 
         if (error) {
           throw error;
@@ -194,7 +205,7 @@ export const useWalletConnect = () => {
       });
 
       connector.on('disconnect', error => {
-        console.log('EVENT', 'disconnect');
+        log('EVENT', 'disconnect');
 
         if (error) {
           throw error;
@@ -210,15 +221,10 @@ export const useWalletConnect = () => {
         setState({
           ...state,
           connected: true,
+          address,
         });
-        setAddress(address);
         setChainId(chainId);
       }
-
-      setState({
-        ...state,
-        connector,
-      });
     }
   });
 

@@ -7,12 +7,12 @@ import { PeerMetaInfo } from './PeerMetaInfo';
 
 export const ConnectModal = (props: { address: string }) => {
   const { rejectSession, approveSession, state } = useWalletConnect();
-  const { loading, peerMeta } = state;
+  const { loading, peerMeta, fetchingPeerMeta, connected } = state;
   const [t] = useTranslation();
 
   return (
     <Modal
-      visible
+      visible={fetchingPeerMeta || (!connected && peerMeta !== null)}
       okText="Approve"
       okButtonProps={{ disabled: loading }}
       cancelText="Reject"
