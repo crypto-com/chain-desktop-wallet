@@ -51,9 +51,6 @@ export const FormRedelegateComponent = (props: {
 
   useEffect(() => {
     // props.form.resetFields();
-
-    console.log('redelegateAmount ', redelegationForm.getFieldValue('redelegateAmount'));
-
     customMaxValidator = TransactionUtils.maxValidator(
       redelegationForm.getFieldValue('redelegateAmount'),
       t('general.redelegateFormComponent.maxValidator.error'),
