@@ -878,6 +878,7 @@ function HomeLayout(props: HomeLayoutProps) {
             setIsConfirmationModalVisible(true);
           }
         }}
+        className="wallet-menu"
       />
     );
   };
