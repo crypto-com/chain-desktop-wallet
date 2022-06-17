@@ -30,6 +30,7 @@ import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 
 import { ProposalView } from './components/ProposalView';
+import { VotingHistory } from './components/VotingHistory';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -85,10 +86,10 @@ const GovernancePage = () => {
 
   const analyticsService = new AnalyticsService(currentSession);
 
-  // const [historyVisible, setHistoryVisible] = useState(false);
+  const [historyVisible, setHistoryVisible] = useState(false);
 
   const historyBtn = (
-    <Button id="votingHistoryBtn" type="link" size="small">
+    <Button id="votingHistoryBtn" type="link" size="small" onClick={() => setHistoryVisible(true)}>
       <HistoryOutlined style={{ fontSize: '17px' }} /> View Voting History
     </Button>
   );
@@ -339,380 +340,394 @@ const GovernancePage = () => {
 
   return (
     <Layout className="site-layout">
-      <Header className="site-layout-background">{t('governance.title')}</Header>
-      <div className="header-description">{t('governance.description')}</div>
-      <Content>
-        {isProposalVisible ? (
-          <ProposalView
-            props={{
-              setIsProposalVisible,
-              setInputPasswordVisible,
-              setIsVisibleConfirmationModal,
-              proposal,
-              decryptedPhrase,
-              isLoadingTally,
-              proposalFigures,
-              showPasswordInput,
-              voteOption,
-              setVoteOption,
+      {historyVisible ? (
+        <VotingHistory setHistoryVisible={setHistoryVisible} />
+      ) : (
+        <>
+          <Header className="site-layout-background">{t('governance.title')}</Header>
+          <div className="header-description">{t('governance.description')}</div>
+          <Content>
+            {isProposalVisible ? (
+              <ProposalView
+                props={{
+                  setIsProposalVisible,
+                  setInputPasswordVisible,
+                  setIsVisibleConfirmationModal,
+                  proposal,
+                  decryptedPhrase,
+                  isLoadingTally,
+                  proposalFigures,
+                  showPasswordInput,
+                  voteOption,
+                  setVoteOption,
+                }}
+              />
+            ) : (
+              <Tabs defaultActiveKey="1" tabBarExtraContent={historyBtn}>
+                <TabPane tab={t('governance.tab1')} key="1">
+                  <div className="site-layout-background governance-content">
+                    <div className="container">
+                      <List
+                        dataSource={proposalList}
+                        renderItem={(item: ProposalModel) => (
+                          <List.Item
+                            key={item.proposal_id}
+                            actions={
+                              item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
+                                ? []
+                                : [
+                                    <IconText
+                                      icon={LikeOutlined}
+                                      text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                                      key="list-vertical-yes-o"
+                                    />,
+                                    <IconText
+                                      icon={DislikeOutlined}
+                                      text={getUIVoteAmount(
+                                        Big(item.final_tally_result.no)
+                                          .add(item.final_tally_result.no_with_veto)
+                                          .toFixed(),
+                                        userAsset,
+                                      )}
+                                      key="list-vertical-no-o"
+                                    />,
+                                  ]
+                            }
+                            onClick={() => {
+                              setProposal(item);
+                              setIsProposalVisible(true);
+                              processProposalFigures(item);
+                            }}
+                          >
+                            <List.Item.Meta
+                              title={
+                                <>
+                                  {processStatusTag(item.status)} #{item.proposal_id}{' '}
+                                  <a>{item.content.title}</a>
+                                </>
+                              }
+                              description={
+                                <span>
+                                  {t('governance.start')}:{' '}
+                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
+                                  {t('governance.end')}:{' '}
+                                  {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                </span>
+                              }
+                            />
+                          </List.Item>
+                        )}
+                        pagination={{
+                          pageSize: 10,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </TabPane>
+                <TabPane tab={t('governance.tab2')} key="2">
+                  <div className="site-layout-background governance-content">
+                    <div className="container">
+                      <List
+                        dataSource={proposalList?.filter(item => {
+                          return item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD;
+                        })}
+                        renderItem={item => (
+                          <List.Item
+                            key={item.proposal_id}
+                            actions={
+                              item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
+                                ? []
+                                : [
+                                    <IconText
+                                      icon={LikeOutlined}
+                                      text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                                      key="list-vertical-yes-o"
+                                    />,
+                                    <IconText
+                                      icon={DislikeOutlined}
+                                      text={getUIVoteAmount(
+                                        Big(item.final_tally_result.no)
+                                          .add(item.final_tally_result.no_with_veto)
+                                          .toFixed(),
+                                        userAsset,
+                                      )}
+                                      key="list-vertical-no-o"
+                                    />,
+                                  ]
+                            }
+                            onClick={() => {
+                              setProposal(item);
+                              setIsProposalVisible(true);
+                              processProposalFigures(item);
+                            }}
+                          >
+                            <List.Item.Meta
+                              title={
+                                <>
+                                  {processStatusTag(item.status)} #{item.proposal_id}{' '}
+                                  <a>{item.content.title}</a>
+                                </>
+                              }
+                              description={
+                                <span>
+                                  {t('governance.start')}:{' '}
+                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
+                                  {t('governance.end')}:{' '}
+                                  {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                </span>
+                              }
+                            />
+                          </List.Item>
+                        )}
+                        pagination={{
+                          pageSize: 10,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </TabPane>
+                <TabPane tab={t('governance.tab3')} key="3">
+                  <div className="site-layout-background governance-content">
+                    <div className="container">
+                      <List
+                        dataSource={proposalList?.filter(item => {
+                          return item.status === ProposalStatuses.PROPOSAL_STATUS_PASSED;
+                        })}
+                        renderItem={item => (
+                          <List.Item
+                            key={item.proposal_id}
+                            actions={[]}
+                            onClick={() => {
+                              setProposal(item);
+                              setIsProposalVisible(true);
+                              processProposalFigures(item);
+                            }}
+                          >
+                            <List.Item.Meta
+                              title={
+                                <>
+                                  {processStatusTag(item.status)} #{item.proposal_id}{' '}
+                                  <a>{item.content.title}</a>
+                                </>
+                              }
+                              description={
+                                <span>
+                                  {t('governance.start')}:{' '}
+                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
+                                  {t('governance.end')}:{' '}
+                                  {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                </span>
+                              }
+                            />
+                          </List.Item>
+                        )}
+                        pagination={{
+                          pageSize: 10,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </TabPane>
+                <TabPane tab={t('governance.tab4')} key="4">
+                  <div className="site-layout-background governance-content">
+                    <div className="container">
+                      <List
+                        dataSource={proposalList?.filter(item => {
+                          return item.status === ProposalStatuses.PROPOSAL_STATUS_FAILED;
+                        })}
+                        renderItem={item => (
+                          <List.Item
+                            key={item.proposal_id}
+                            actions={[]}
+                            onClick={() => {
+                              setProposal(item);
+                              setIsProposalVisible(true);
+                              processProposalFigures(item);
+                            }}
+                          >
+                            <List.Item.Meta
+                              title={
+                                <>
+                                  {processStatusTag(item.status)} #{item.proposal_id}{' '}
+                                  <a>{item.content.title}</a>
+                                </>
+                              }
+                              description={
+                                <span>
+                                  {t('governance.start')}:{' '}
+                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
+                                  {t('governance.end')}:{' '}
+                                  {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                </span>
+                              }
+                            />
+                          </List.Item>
+                        )}
+                        pagination={{
+                          pageSize: 10,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </TabPane>
+                <TabPane tab={t('governance.tab5')} key="5">
+                  <div className="site-layout-background governance-content">
+                    <div className="container">
+                      <List
+                        dataSource={proposalList?.filter(item => {
+                          return item.status === ProposalStatuses.PROPOSAL_STATUS_REJECTED;
+                        })}
+                        renderItem={item => (
+                          <List.Item
+                            key={item.proposal_id}
+                            actions={[]}
+                            onClick={() => {
+                              setProposal(item);
+                              setIsProposalVisible(true);
+                              processProposalFigures(item);
+                            }}
+                          >
+                            <List.Item.Meta
+                              title={
+                                <>
+                                  {processStatusTag(item.status)} #{item.proposal_id}{' '}
+                                  <a>{item.content.title}</a>
+                                </>
+                              }
+                              description={
+                                <span>
+                                  {t('governance.start')}:{' '}
+                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
+                                  {t('governance.end')}:{' '}
+                                  {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                </span>
+                              }
+                            />
+                          </List.Item>
+                        )}
+                        pagination={{
+                          pageSize: 10,
+                        }}
+                      />
+                    </div>
+                  </div>
+                </TabPane>
+              </Tabs>
+            )}
+          </Content>
+          <Footer />
+          <PasswordFormModal
+            description={t('general.passwordFormModal.description')}
+            okButtonText={t('general.passwordFormModal.okButton')}
+            onCancel={() => {
+              setInputPasswordVisible(false);
             }}
+            onSuccess={onWalletDecryptFinish}
+            onValidatePassword={async (password: string) => {
+              const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+              return {
+                valid: isValid,
+                errMsg: !isValid ? t('general.passwordFormModal.error') : '',
+              };
+            }}
+            successText={t('general.passwordFormModal.success')}
+            title={t('general.passwordFormModal.title')}
+            visible={inputPasswordVisible}
+            successButtonText={t('general.continue')}
+            confirmPassword={false}
           />
-        ) : (
-          <Tabs defaultActiveKey="1" tabBarExtraContent={historyBtn}>
-            <TabPane tab={t('governance.tab1')} key="1">
-              <div className="site-layout-background governance-content">
-                <div className="container">
-                  <List
-                    dataSource={proposalList}
-                    renderItem={(item: ProposalModel) => (
-                      <List.Item
-                        key={item.proposal_id}
-                        actions={
-                          item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
-                            ? []
-                            : [
-                                <IconText
-                                  icon={LikeOutlined}
-                                  text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
-                                  key="list-vertical-yes-o"
-                                />,
-                                <IconText
-                                  icon={DislikeOutlined}
-                                  text={getUIVoteAmount(
-                                    Big(item.final_tally_result.no)
-                                      .add(item.final_tally_result.no_with_veto)
-                                      .toFixed(),
-                                    userAsset,
-                                  )}
-                                  key="list-vertical-no-o"
-                                />,
-                              ]
-                        }
-                        onClick={() => {
-                          setProposal(item);
-                          setIsProposalVisible(true);
-                          processProposalFigures(item);
-                        }}
-                      >
-                        <List.Item.Meta
-                          title={
-                            <>
-                              {processStatusTag(item.status)} #{item.proposal_id}{' '}
-                              <a>{item.content.title}</a>
-                            </>
-                          }
-                          description={
-                            <span>
-                              {t('governance.start')}:{' '}
-                              {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
-                              {t('governance.end')}:{' '}
-                              {moment(item.voting_end_time).format('DD/MM/YYYY')}
-                            </span>
-                          }
-                        />
-                      </List.Item>
-                    )}
-                    pagination={{
-                      pageSize: 10,
-                    }}
-                  />
-                </div>
-              </div>
-            </TabPane>
-            <TabPane tab={t('governance.tab2')} key="2">
-              <div className="site-layout-background governance-content">
-                <div className="container">
-                  <List
-                    dataSource={proposalList?.filter(item => {
-                      return item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD;
-                    })}
-                    renderItem={item => (
-                      <List.Item
-                        key={item.proposal_id}
-                        actions={
-                          item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
-                            ? []
-                            : [
-                                <IconText
-                                  icon={LikeOutlined}
-                                  text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
-                                  key="list-vertical-yes-o"
-                                />,
-                                <IconText
-                                  icon={DislikeOutlined}
-                                  text={getUIVoteAmount(
-                                    Big(item.final_tally_result.no)
-                                      .add(item.final_tally_result.no_with_veto)
-                                      .toFixed(),
-                                    userAsset,
-                                  )}
-                                  key="list-vertical-no-o"
-                                />,
-                              ]
-                        }
-                        onClick={() => {
-                          setProposal(item);
-                          setIsProposalVisible(true);
-                          processProposalFigures(item);
-                        }}
-                      >
-                        <List.Item.Meta
-                          title={
-                            <>
-                              {processStatusTag(item.status)} #{item.proposal_id}{' '}
-                              <a>{item.content.title}</a>
-                            </>
-                          }
-                          description={
-                            <span>
-                              {t('governance.start')}:{' '}
-                              {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
-                              {t('governance.end')}:{' '}
-                              {moment(item.voting_end_time).format('DD/MM/YYYY')}
-                            </span>
-                          }
-                        />
-                      </List.Item>
-                    )}
-                    pagination={{
-                      pageSize: 10,
-                    }}
-                  />
-                </div>
-              </div>
-            </TabPane>
-            <TabPane tab={t('governance.tab3')} key="3">
-              <div className="site-layout-background governance-content">
-                <div className="container">
-                  <List
-                    dataSource={proposalList?.filter(item => {
-                      return item.status === ProposalStatuses.PROPOSAL_STATUS_PASSED;
-                    })}
-                    renderItem={item => (
-                      <List.Item
-                        key={item.proposal_id}
-                        actions={[]}
-                        onClick={() => {
-                          setProposal(item);
-                          setIsProposalVisible(true);
-                          processProposalFigures(item);
-                        }}
-                      >
-                        <List.Item.Meta
-                          title={
-                            <>
-                              {processStatusTag(item.status)} #{item.proposal_id}{' '}
-                              <a>{item.content.title}</a>
-                            </>
-                          }
-                          description={
-                            <span>
-                              {t('governance.start')}:{' '}
-                              {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
-                              {t('governance.end')}:{' '}
-                              {moment(item.voting_end_time).format('DD/MM/YYYY')}
-                            </span>
-                          }
-                        />
-                      </List.Item>
-                    )}
-                    pagination={{
-                      pageSize: 10,
-                    }}
-                  />
-                </div>
-              </div>
-            </TabPane>
-            <TabPane tab={t('governance.tab4')} key="4">
-              <div className="site-layout-background governance-content">
-                <div className="container">
-                  <List
-                    dataSource={proposalList?.filter(item => {
-                      return item.status === ProposalStatuses.PROPOSAL_STATUS_FAILED;
-                    })}
-                    renderItem={item => (
-                      <List.Item
-                        key={item.proposal_id}
-                        actions={[]}
-                        onClick={() => {
-                          setProposal(item);
-                          setIsProposalVisible(true);
-                          processProposalFigures(item);
-                        }}
-                      >
-                        <List.Item.Meta
-                          title={
-                            <>
-                              {processStatusTag(item.status)} #{item.proposal_id}{' '}
-                              <a>{item.content.title}</a>
-                            </>
-                          }
-                          description={
-                            <span>
-                              {t('governance.start')}:{' '}
-                              {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
-                              {t('governance.end')}:{' '}
-                              {moment(item.voting_end_time).format('DD/MM/YYYY')}
-                            </span>
-                          }
-                        />
-                      </List.Item>
-                    )}
-                    pagination={{
-                      pageSize: 10,
-                    }}
-                  />
-                </div>
-              </div>
-            </TabPane>
-            <TabPane tab={t('governance.tab5')} key="5">
-              <div className="site-layout-background governance-content">
-                <div className="container">
-                  <List
-                    dataSource={proposalList?.filter(item => {
-                      return item.status === ProposalStatuses.PROPOSAL_STATUS_REJECTED;
-                    })}
-                    renderItem={item => (
-                      <List.Item
-                        key={item.proposal_id}
-                        actions={[]}
-                        onClick={() => {
-                          setProposal(item);
-                          setIsProposalVisible(true);
-                          processProposalFigures(item);
-                        }}
-                      >
-                        <List.Item.Meta
-                          title={
-                            <>
-                              {processStatusTag(item.status)} #{item.proposal_id}{' '}
-                              <a>{item.content.title}</a>
-                            </>
-                          }
-                          description={
-                            <span>
-                              {t('governance.start')}:{' '}
-                              {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
-                              {t('governance.end')}:{' '}
-                              {moment(item.voting_end_time).format('DD/MM/YYYY')}
-                            </span>
-                          }
-                        />
-                      </List.Item>
-                    )}
-                    pagination={{
-                      pageSize: 10,
-                    }}
-                  />
-                </div>
-              </div>
-            </TabPane>
-          </Tabs>
-        )}
-      </Content>
-      <Footer />
-      <PasswordFormModal
-        description={t('general.passwordFormModal.description')}
-        okButtonText={t('general.passwordFormModal.okButton')}
-        onCancel={() => {
-          setInputPasswordVisible(false);
-        }}
-        onSuccess={onWalletDecryptFinish}
-        onValidatePassword={async (password: string) => {
-          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
-          return {
-            valid: isValid,
-            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
-          };
-        }}
-        successText={t('general.passwordFormModal.success')}
-        title={t('general.passwordFormModal.title')}
-        visible={inputPasswordVisible}
-        successButtonText={t('general.continue')}
-        confirmPassword={false}
-      />
-      <ModalPopup
-        isModalVisible={isConfirmationModalVisible}
-        handleCancel={handleCancelConfirmationModal}
-        handleOk={() => {}}
-        footer={[
-          <Button
-            key="submit"
-            type="primary"
-            loading={confirmLoading}
-            disabled={!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE}
-            onClick={onConfirm}
+          <ModalPopup
+            isModalVisible={isConfirmationModalVisible}
+            handleCancel={handleCancelConfirmationModal}
+            handleOk={() => {}}
+            footer={[
+              <Button
+                key="submit"
+                type="primary"
+                loading={confirmLoading}
+                disabled={
+                  !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
+                }
+                onClick={onConfirm}
+              >
+                {t('general.confirm')}
+              </Button>,
+              <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
+                {t('general.cancel')}
+              </Button>,
+            ]}
+            okText={t('general.confirm')}
           >
-            {t('general.confirm')}
-          </Button>,
-          <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
-            {t('general.cancel')}
-          </Button>,
-        ]}
-        okText={t('general.confirm')}
-      >
-        <>
-          <div className="title">{t('governance.modal1.title')}</div>
-          <div className="description">{t('governance.modal1.description')}</div>
-          <div className="item">
-            <div className="label">{t('governance.modal1.label1')}</div>
-            <div className="address">{`${currentSession.wallet.address}`}</div>
-          </div>
-          <div className="item">
-            <div className="label">{t('governance.modal1.label2')}</div>
-            <div className="address">{`#${proposal?.proposal_id} ${proposal?.content.title}`}</div>
-          </div>
-          <div className="item">
-            <div className="label">{t('governance.modal1.label3')}</div>
-            <div>{processVoteTag(voteOption)}</div>
-          </div>
+            <>
+              <div className="title">{t('governance.modal1.title')}</div>
+              <div className="description">{t('governance.modal1.description')}</div>
+              <div className="item">
+                <div className="label">{t('governance.modal1.label1')}</div>
+                <div className="address">{`${currentSession.wallet.address}`}</div>
+              </div>
+              <div className="item">
+                <div className="label">{t('governance.modal1.label2')}</div>
+                <div className="address">{`#${proposal?.proposal_id} ${proposal?.content.title}`}</div>
+              </div>
+              <div className="item">
+                <div className="label">{t('governance.modal1.label3')}</div>
+                <div>{processVoteTag(voteOption)}</div>
+              </div>
+            </>
+          </ModalPopup>
+          <SuccessModalPopup
+            isModalVisible={isSuccessModalVisible}
+            handleCancel={closeSuccessModal}
+            handleOk={closeSuccessModal}
+            title={t('general.successModalPopup.title')}
+            button={null}
+            footer={[
+              <Button key="submit" type="primary" onClick={closeSuccessModal}>
+                {t('general.ok')}
+              </Button>,
+            ]}
+          >
+            <>
+              {broadcastResult?.code !== undefined &&
+              broadcastResult?.code !== null &&
+              broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+                <div className="description">
+                  {t('general.successModalPopup.timeout.description')}
+                </div>
+              ) : (
+                <div className="description">{t('general.successModalPopup.vote.description')}</div>
+              )}
+              {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
+            </>
+          </SuccessModalPopup>
+          <ErrorModalPopup
+            isModalVisible={isErrorModalVisible}
+            handleCancel={closeErrorModal}
+            handleOk={closeErrorModal}
+            title={t('general.errorModalPopup.title')}
+            footer={[]}
+          >
+            <>
+              <div className="description">
+                {t('general.errorModalPopup.vote.description')}
+                <br />
+                {errorMessages
+                  .filter((item, idx) => {
+                    return errorMessages.indexOf(item) === idx;
+                  })
+                  .map((err, idx) => (
+                    <div key={idx}>- {err}</div>
+                  ))}
+                {ledgerIsExpertMode ? (
+                  <div>{t('general.errorModalPopup.ledgerExportMode')}</div>
+                ) : (
+                  ''
+                )}
+              </div>
+            </>
+          </ErrorModalPopup>
         </>
-      </ModalPopup>
-      <SuccessModalPopup
-        isModalVisible={isSuccessModalVisible}
-        handleCancel={closeSuccessModal}
-        handleOk={closeSuccessModal}
-        title={t('general.successModalPopup.title')}
-        button={null}
-        footer={[
-          <Button key="submit" type="primary" onClick={closeSuccessModal}>
-            {t('general.ok')}
-          </Button>,
-        ]}
-      >
-        <>
-          {broadcastResult?.code !== undefined &&
-          broadcastResult?.code !== null &&
-          broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">{t('general.successModalPopup.timeout.description')}</div>
-          ) : (
-            <div className="description">{t('general.successModalPopup.vote.description')}</div>
-          )}
-          {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
-        </>
-      </SuccessModalPopup>
-      <ErrorModalPopup
-        isModalVisible={isErrorModalVisible}
-        handleCancel={closeErrorModal}
-        handleOk={closeErrorModal}
-        title={t('general.errorModalPopup.title')}
-        footer={[]}
-      >
-        <>
-          <div className="description">
-            {t('general.errorModalPopup.vote.description')}
-            <br />
-            {errorMessages
-              .filter((item, idx) => {
-                return errorMessages.indexOf(item) === idx;
-              })
-              .map((err, idx) => (
-                <div key={idx}>- {err}</div>
-              ))}
-            {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
-          </div>
-        </>
-      </ErrorModalPopup>
+      )}
     </Layout>
   );
 };
