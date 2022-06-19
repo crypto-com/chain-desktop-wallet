@@ -11,11 +11,7 @@ const About = () => {
         <div className="container">
           <div className="title">{t('settings.about.termsAndConditions.title')}</div>
           {/* <div className="description">{t('settings.support.helpCenter.description')}</div> */}
-          <a
-            href="https://help.crypto.com/en/collections/2221157-crypto-com-defi-wallet"
-            target="_blank"
-            rel="noreferrer"
-          >
+          <a href="https://crypto.com/document/desktop_wallet" target="_blank" rel="noreferrer">
             {t('general.learnMore')}
           </a>
           {/* <Divider />
