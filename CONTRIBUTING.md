@@ -1,6 +1,6 @@
 # Contributing
 
-Thank you for your interest in contributing to DeFi Desktop Wallet! Good places to start are this document and [the official documentation](https://crypto.org/docs). If you have any questions, feel free to ask on [Discord](https://discord.gg/pahqHz26q4).
+Thank you for your interest in contributing to DeFi Desktop Wallet! Good places to start are this document and [the official documentation](https://help.crypto.com/en/collections/2221157-crypto-com-defi-wallet#crypto-com-defi-desktop-wallet). If you have any questions, feel free to ask on [Discord](https://discord.gg/pahqHz26q4).
 
 
 ## Code of Conduct
