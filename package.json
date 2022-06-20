@@ -3,7 +3,7 @@
   "version": "0.8.2",
   "description": "Crypto.com DeFi Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
-  "author": "DeFi Labs <chain@crypto.org>",
+  "author": "DeFi Labs <contact@crypto.com>",
   "license": "Apache-2.0",
   "homepage": ".",
   "main": "build/electron/main.js",
