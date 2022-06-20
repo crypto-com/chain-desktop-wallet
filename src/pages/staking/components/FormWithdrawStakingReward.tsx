@@ -90,6 +90,8 @@ export const FormWithdrawStakingReward = () => {
   const [rewards, setRewards] = useState<RewardsTabularData[]>([]);
   const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
 
+  const maxLedgerRestake = 3;
+
   const [t] = useTranslation();
 
   const convertToTabularData = (
@@ -526,32 +528,54 @@ export const FormWithdrawStakingReward = () => {
         ''
       ) : (
         <div className="top-action-btns">
-          <Button
-            id="withdraw-all-btn"
-            className="top-action-btn"
-            type="primary"
-            onClick={() => {
-              setRewardAction('withdrawall');
-              setTimeout(() => {
-                showPasswordInput('withdrawall');
-              }, 200);
-            }}
-          >
-            {t('staking.withdrawall')}
-          </Button>
-          <Button
-            id="restake-all-btn"
-            className="top-action-btn"
-            type="primary"
-            onClick={() => {
-              setRewardAction('restakeall');
-              setTimeout(() => {
-                showPasswordInput('restakeall');
-              }, 200);
-            }}
-          >
-            {t('staking.restakeall')}
-          </Button>
+          {rewards.length > maxLedgerRestake &&
+          currentSession.wallet.walletType === LEDGER_WALLET_TYPE ? (
+              <>
+                <div />
+                <Button
+                  id="withdraw-all-btn"
+                  className="top-action-btn"
+                  type="primary"
+                  onClick={() => {
+                    setRewardAction('withdrawall');
+                    setTimeout(() => {
+                      showPasswordInput('withdrawall');
+                    }, 200);
+                  }}
+                >
+                  {t('staking.withdrawall')}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  id="withdraw-all-btn"
+                  className="top-action-btn"
+                  type="primary"
+                  onClick={() => {
+                    setRewardAction('withdrawall');
+                    setTimeout(() => {
+                      showPasswordInput('withdrawall');
+                    }, 200);
+                  }}
+                >
+                  {t('staking.withdrawall')}
+                </Button>
+                <Button
+                  id="restake-all-btn"
+                  className="top-action-btn"
+                  type="primary"
+                  onClick={() => {
+                    setRewardAction('restakeall');
+                    setTimeout(() => {
+                      showPasswordInput('restakeall');
+                    }, 200);
+                  }}
+                >
+                  {t('staking.restakeall')}
+                </Button>
+              </>
+            )}
         </div>
       )}
 
@@ -624,9 +648,7 @@ export const FormWithdrawStakingReward = () => {
           </div>
           <GasStepSelect asset={walletAsset} />
           <div className="note">
-            <ExclamationCircleOutlined
-              style={{ color: '#1199fa', cursor: 'pointer', marginRight: '4px' }}
-            />
+            <ExclamationCircleOutlined style={{ color: '#1199fa', marginRight: '4px' }} />
             {t('staking.modal6.note.part1')} <b>{t('staking.modal6.note.part2')}</b>{' '}
             {t('staking.modal6.note.part3')} <b>{t('staking.modal6.note.part4')}</b>{' '}
             {t('staking.modal6.note.part5')}
@@ -703,9 +725,7 @@ export const FormWithdrawStakingReward = () => {
           </div>
           <GasStepSelect asset={walletAsset} />
           <div className="note">
-            <ExclamationCircleOutlined
-              style={{ color: '#1199fa', cursor: 'pointer', marginRight: '4px' }}
-            />
+            <ExclamationCircleOutlined style={{ color: '#1199fa', marginRight: '4px' }} />
             {t('staking.modal6.note.part1')} <b>{t('staking.modal6.note.part2')}</b>{' '}
             {t('staking.modal6.note.part3')} <b>{t('staking.modal6.note.part4')}</b>{' '}
             {t('staking.modal6.note.part5')}
