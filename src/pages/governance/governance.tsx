@@ -350,7 +350,6 @@ const GovernancePage = () => {
             {isProposalVisible ? (
               <ProposalView
                 props={{
-                  setIsProposalVisible,
                   setInputPasswordVisible,
                   setIsVisibleConfirmationModal,
                   proposal,
@@ -360,6 +359,8 @@ const GovernancePage = () => {
                   showPasswordInput,
                   voteOption,
                   setVoteOption,
+                  isProposalVisible,
+                  setIsProposalVisible,
                 }}
               />
             ) : (

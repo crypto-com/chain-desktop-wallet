@@ -18,6 +18,8 @@ const { Content, Sider } = Layout;
 export const ProposalView = (props: any) => {
   // const [form] = Form.useForm();
 
+  const allProps = props?.props;
+
   const [proposalList, setProposalList] = useState<ProposalModel[]>();
   const currentSession = useRecoilValue(sessionState);
   const didMountRef = useRef(false);
@@ -27,11 +29,11 @@ export const ProposalView = (props: any) => {
   const [t] = useTranslation();
 
   const onRadioChange = e => {
-    props.setVoteOption(e.target.value);
+    allProps.setVoteOption(e.target.value);
   };
 
   const onVote = async () => {
-    props.showPasswordInput();
+    allProps.showPasswordInput();
   };
 
   const processStatusTag = status => {
@@ -96,7 +98,7 @@ export const ProposalView = (props: any) => {
             <a>
               <div
                 className="back-button"
-                onClick={() => props.setIsProposalVisible(false)}
+                onClick={() => allProps.setIsProposalVisible(false)}
                 style={{ fontSize: '16px' }}
               >
                 <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
@@ -104,34 +106,34 @@ export const ProposalView = (props: any) => {
               </div>
             </a>
             <div className="title">
-              {props.proposal?.content.title} #ID-{props.proposal?.proposal_id}
+              {allProps.proposal?.content.title} #ID-{allProps.proposal?.proposal_id}
             </div>
             <div className="item">
-              <div className="status">{processStatusTag(props.proposal?.status)}</div>
+              <div className="status">{processStatusTag(allProps.proposal?.status)}</div>
             </div>
             <div className="item">
               <div className="date">
                 {t('governance.start')}:{' '}
-                {moment(props.proposal?.voting_start_time).format('DD/MM/YYYY, h:mm A')} <br />
+                {moment(allProps.proposal?.voting_start_time).format('DD/MM/YYYY, h:mm A')} <br />
                 {t('governance.end')}:{' '}
-                {moment(props.proposal?.voting_end_time).format('DD/MM/YYYY, h:mm A')}
+                {moment(allProps.proposal?.voting_end_time).format('DD/MM/YYYY, h:mm A')}
               </div>
             </div>
 
             <div className="description">
-              {props.proposal?.content.description.split('\\n').map((p, i) => (
+              {allProps.proposal?.content.description.split('\\n').map((p, i) => (
                 <p key={i}>{p}</p>
               ))}
             </div>
             <div className="item">
-              {props.proposal?.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD ? (
+              {allProps.proposal?.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD ? (
                 <Card
                   title={t('governance.castVote')}
                   style={{
                     maxWidth: '500px',
                   }}
                 >
-                  <Radio.Group onChange={onRadioChange} value={props.voteOption}>
+                  <Radio.Group onChange={onRadioChange} value={allProps.voteOption}>
                     <Radio.Button value={VoteOption.VOTE_OPTION_YES}>
                       Yes - {t('governance.voteOption.yes')}
                     </Radio.Button>
@@ -146,7 +148,7 @@ export const ProposalView = (props: any) => {
                     </Radio.Button>
                   </Radio.Group>
                   {/* <div className="item"> */}
-                  <Button type="primary" disabled={!props.voteOption} onClick={onVote}>
+                  <Button type="primary" disabled={!allProps.voteOption} onClick={onVote}>
                     {t('governance.sendVote')}
                   </Button>
                   {/* </div> */}
@@ -158,7 +160,7 @@ export const ProposalView = (props: any) => {
           </Content>
           <Sider width="300px">
             <Spin
-              spinning={props.isLoadingTally}
+              spinning={allProps.isLoadingTally}
               indicator={<LoadingOutlined />}
               tip="Loading latest results"
             >
@@ -168,7 +170,7 @@ export const ProposalView = (props: any) => {
                   <br />
                   {/* Vote: {proposalFigures.yes.vote} */}
                   <Progress
-                    percent={parseFloat(props.proposalFigures.yes.rate)}
+                    percent={parseFloat(allProps?.proposalFigures?.yes.rate)}
                     size="small"
                     status="normal"
                     strokeColor={{
@@ -183,7 +185,7 @@ export const ProposalView = (props: any) => {
                   <br />
                   {/* Vote:  {proposalFigures.no.vote} */}
                   <Progress
-                    percent={parseFloat(props.proposalFigures.no.rate)}
+                    percent={parseFloat(allProps?.proposalFigures?.no.rate)}
                     strokeColor={{
                       from: '#ec7777',
                       to: '#f27474',
@@ -198,7 +200,7 @@ export const ProposalView = (props: any) => {
                   <br />
                   {/* Vote:  {proposalFigures.no.vote} */}
                   <Progress
-                    percent={parseFloat(props.proposalFigures.noWithVeto.rate)}
+                    percent={parseFloat(allProps?.proposalFigures?.noWithVeto.rate)}
                     strokeColor={{
                       from: '#e2c24d',
                       to: '#f3a408',
@@ -213,7 +215,7 @@ export const ProposalView = (props: any) => {
                   <br />
                   {/* Vote:  {proposalFigures.no.vote} */}
                   <Progress
-                    percent={parseFloat(props.proposalFigures.abstain.rate)}
+                    percent={parseFloat(allProps?.proposalFigures?.abstain.rate)}
                     strokeColor={{
                       from: '#dbdddc',
                       to: '#b1b3b3',

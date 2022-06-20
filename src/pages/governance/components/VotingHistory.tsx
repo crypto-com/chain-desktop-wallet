@@ -1,17 +1,13 @@
-import React, {
-  useEffect,
-  // useState
-} from 'react';
+import React, { useEffect, useState } from 'react';
 
-// eslint-disable-next-line
-// import type { TableProps } from 'antd';
-import { Layout, Button, Table, Space } from 'antd';
+import { Layout, Button, Table } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-// import type {
-//   ColumnsType,
-//   FilterValue,
-//   // SorterResult
-// } from 'antd/lib/table/interface';
+
+import { useRecoilValue } from 'recoil';
+
+import { ProposalModel } from '../../../models/Transaction';
+import { walletService } from '../../../service/WalletService';
+import { sessionState } from '../../../recoil/atom';
 
 // import { useTranslation } from 'react-i18next';
 
@@ -20,7 +16,6 @@ import 'antd/dist/antd.css';
 
 const {
   Header,
-  // ,
   // Content,
   // Footer
 } = Layout;
@@ -36,6 +31,11 @@ export const VotingHistory = (props: {
   setHistoryVisible: React.Dispatch<React.SetStateAction<any>>;
 }) => {
   // const [t] = useTranslation();
+
+  const currentSession = useRecoilValue(sessionState);
+
+  const [proposalList, setProposalList] = useState<ProposalModel[]>();
+  // const [votingHistoryData, SetVotingHistory] = useState([]);
 
   const tableData: DataType[] = [
     {
@@ -58,24 +58,11 @@ export const VotingHistory = (props: {
     },
   ];
 
-  // const [filteredInfo, setFilteredInfo] = useState<Record<string, FilterValue | null>>({});
-  // const [sortedInfo, setSortedInfo] = useState<SorterResult<DataType>>({});
-
-  // const handleTableChange: TableProps<DataType>['onChange'] = (pagination, filters, sorter) => {
-  //   setFilteredInfo(filters);
-  //   setSortedInfo(sorter as SorterResult<DataType>);
-  // };
-
-  // const clearFilters = () => {
-  //   setFilteredInfo({});
-  // };
-
-  const columns = [
+  const columnsData = [
     {
       title: '#',
       dataIndex: 'index',
       key: 'index',
-      // sortOrder: sortedInfo.columnKey === 'index' ? sortedInfo.order : null,
     },
     {
       title: 'Proposal',
@@ -90,8 +77,8 @@ export const VotingHistory = (props: {
         { text: 'Yes', value: 'yes' },
         { text: 'No', value: 'no' },
       ],
-      // filteredValue: filteredInfo.vote || null,
-      // onFilter: (value: string, record) => (record.vote.toLowerCase().indexOf(value) > -1),
+      sorter: (a, b) => a.vote.localeCompare(b.vote),
+      onFilter: (value: string, record) => record.vote.toLowerCase().indexOf(value) > -1,
     },
     {
       title: 'Voted On',
@@ -100,12 +87,36 @@ export const VotingHistory = (props: {
     },
   ];
 
-  // const tableColumns = columns.map(item => ({ ...item }));
+  // const []
 
   useEffect(() => {
-    // tableColumns[0].fixed = true;
-    // tableColumns[tableColumns.length - 1].fixed = 'right';
-  });
+    const fetchProposalList = async () => {
+      const list: ProposalModel[] = await walletService.retrieveProposals(
+        currentSession.wallet.config.network.chainId,
+      );
+
+      // eslint-disable-next-line
+      console.log('fetchProposalList ', list);
+
+      setProposalList(list);
+      return list;
+    };
+
+    const fetchVotingHistory = async () => {
+      const votingHistory = await walletService.fetchAccountVotingHistory(
+        currentSession.wallet.address,
+      );
+      // eslint-disable-next-line
+      console.log('votingHistory ', votingHistory, currentSession.wallet);
+    };
+
+    // proposalList?.map((elem, idx) => {
+
+    // });
+
+    // eslint-disable-next-line
+    console.log('fetchProposalList 00 ', fetchVotingHistory(), fetchProposalList());
+  }, [proposalList, setProposalList]);
 
   return (
     <div id="voting-history-section">
@@ -120,18 +131,13 @@ export const VotingHistory = (props: {
       </Button>
       <Header className="site-layout-background">Voting History</Header>
       <div className="header-description">Below is your voting history</div>
-      <Space style={{ marginBottom: 12 }}>
-        <Button
-          size="small"
-          // onClick={clearFilters}
-        >
-          Clear filters
-        </Button>
-      </Space>
+
       <Table
+        className="voting-history-table"
         dataSource={tableData}
-        columns={columns}
-        // onChange={handleTableChange}
+        columns={columnsData}
+        rowKey={record => record.index}
+        pagination={false}
       />
     </div>
   );
