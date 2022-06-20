@@ -51,6 +51,7 @@
   "general.slow": "慢速",
   "general.custom": "自定義",
   "general.invalidAmount": "無效的數量",
+  "general.learnMore": "查看更多",
   "general.addressValidator.reason1": "無效的",
   "general.addressValidator.reason2": "地址",
   "general.validTransactionAmountValidator.reason": "無效的轉賬款項",
@@ -748,5 +749,12 @@
   "settings.revoke.risk": "風險敞口",
   "settings.revoke": "撤銷許可",
   "settings.revoke.unlimited": "無限的",
-  "settings.noApproval": "沒有批准數據"
+  "settings.noApproval": "沒有批准數據",
+  "settings.support.title": "支援",
+  "settings.support.helpCenter.title": "支援中心",
+  "settings.support.helpCenter.description": "詳細的 Crypto.com DeFi Desktop Wallet 操作教學",
+  "settings.support.feedbackForm.title": "回饋表格",
+  "settings.support.feedbackForm.description": "如你有任何有關 Crypto.com DeFi Desktop Wallet 的查詢、意見或問題反映，請填妥以下回饋表格",
+  "settings.about.title": "關於",
+  "settings.about.termsAndConditions.title": "條款及細則"
 }
