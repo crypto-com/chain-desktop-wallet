@@ -768,6 +768,7 @@ function HomeLayout(props: HomeLayoutProps) {
   };
 
   const HomeMenu = () => {
+    const isTestnet = checkIfTestnet(session.wallet.config.network);
     let menuSelectedKey = currentLocationPath;
     if (!allPaths.includes(menuSelectedKey as NavbarMenuKey)) {
       menuSelectedKey = '/home';
@@ -794,11 +795,13 @@ function HomeLayout(props: HomeLayoutProps) {
         key: '/bridge',
         icon: <Icon component={IconCronos} />,
       },
-      {
-        label: conditionalLink('/dapp', t('navbar.dapp')),
-        key: '/dapp',
-        icon: <Icon component={IconDApp} />,
-      },
+      !isTestnet
+        ? {
+            label: conditionalLink('/dapp', t('navbar.dapp')),
+            key: '/dapp',
+            icon: <Icon component={IconDApp} />,
+          }
+        : null,
       {
         label: conditionalLink('/governance', t('navbar.governance')),
         key: '/governance',
