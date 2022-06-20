@@ -2,10 +2,9 @@ import WalletConnect from '@walletconnect/client';
 import { IJsonRpcRequest } from '@walletconnect/types';
 import { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { getRecoil, setRecoil } from 'recoil-nexus';
 import { useRefCallback } from '../../hooks/useRefCallback';
-import { DefaultState, WalletConnectState, walletConnectStateAtom } from './store';
-import { clearCachedSession } from './utils';
+import { DefaultState, walletConnectStateAtom } from './store';
+import { clearCachedSession, getCachedSession } from './utils';
 
 export const useWalletConnect = () => {
   const [chainId, setChainId] = useState(0);
@@ -20,25 +19,26 @@ export const useWalletConnect = () => {
   useEffect(() => {
     // clearCachedSession();
 
-    // const session = getCachedSession();
+    const session = getCachedSession();
 
-    // if (session) {
-    //   try {
-    //     const connector = new WalletConnect({ session });
+    if (session) {
+      try {
+        const connector = new WalletConnect({ session });
 
-    //     const { connected, accounts, peerMeta } = connector;
+        const { connected, accounts, peerMeta } = connector;
 
-    //     setConnected(connected);
-    //     setConnector(connector);
-    //     setAddress(accounts[0]);
-    //     setChainId(connector.chainId);
-    //     setPeerMeta(peerMeta);
-
-    //     subscribeToEvents.current();
-    //   } catch {
-    //     resetApp();
-    //   }
-    // }
+        setState({
+          ...state,
+          connector,
+          connected,
+          address: accounts[0],
+          peerMeta,
+        });
+        subscribeToEvents.current(connector);
+      } catch {
+        resetApp();
+      }
+    }
 
     return () => {
       // killSession();
