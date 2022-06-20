@@ -56,7 +56,7 @@ import {
   TextProposalRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
-import { capitalizeFirstLetter } from '../utils/utils';
+import { capitalizeFirstLetter, sleep } from '../utils/utils';
 import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
 import { StorageService } from './storage/StorageService';
@@ -404,10 +404,11 @@ class WalletService {
   }
 
   public async retrieveAssetPrice(
+    assetType: UserAssetType | undefined,
     assetSymbol: string,
     currency: string = 'USD',
   ): Promise<AssetMarketPrice> {
-    const price = await this.storageService.retrieveAssetPrice(assetSymbol, currency);
+    const price = await this.storageService.retrieveAssetPrice(assetType, assetSymbol, currency);
     return {
       ...price,
     };
@@ -686,6 +687,7 @@ class WalletService {
 
     if (await this.checkIfWalletNeedAssetCreation(currentSession)) {
       await this.storageService.removeWalletAssets(wallet.identifier);
+      await sleep(3_000);
 
       const walletOps = new WalletOps();
       const assetGeneration = walletOps.generate(wallet.config, wallet.identifier, phrase);

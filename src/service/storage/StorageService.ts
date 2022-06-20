@@ -13,6 +13,7 @@ import {
   getAssetPriceId,
   getAssetPriceIdFrom,
   UserAsset,
+  UserAssetType,
 } from '../../models/UserAsset';
 import { CommonNftModel, CronosCRC721NftModel, CryptoOrgNftModel, NftType } from '../../models/Nft';
 import {
@@ -293,8 +294,12 @@ export class StorageService {
     return this.db.marketPriceStore.find<AssetMarketPrice>({ currency });
   }
 
-  public async retrieveAssetPrice(assetSymbol: string, currency: string) {
-    const assetPriceId = getAssetPriceIdFrom(assetSymbol, currency);
+  public async retrieveAssetPrice(
+    assetType: UserAssetType | undefined,
+    assetSymbol: string,
+    currency: string,
+  ) {
+    const assetPriceId = getAssetPriceIdFrom(assetType, assetSymbol, currency);
     return this.db.marketPriceStore.findOne<AssetMarketPrice>({ _id: assetPriceId });
   }
 

@@ -44,8 +44,8 @@ import { ledgerNotification } from '../../../components/LedgerNotification/Ledge
 import { AddressBookService } from '../../../service/AddressBookService';
 import { AddressBookContact } from '../../../models/AddressBook';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
-import GasStepSelect from '../../../components/GasStepSelect';
-import GasInfo from '../../../components/GasStepSelect/GasInfo';
+import GasStepSelect from '../../../components/GasCustomize/GasConfig';
+import GasInfo from '../../../components/GasCustomize/GasInfo';
 
 const layout = {};
 const tailLayout = {};
@@ -250,7 +250,7 @@ const FormSend: React.FC<FormSendProps> = props => {
   }, [walletAsset]);
 
   const assetMarketData = allMarketData.get(
-    `${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
+    `${currentSession?.activeAsset?.assetType}-${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
   );
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
 

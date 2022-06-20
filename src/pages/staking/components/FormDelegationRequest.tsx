@@ -55,7 +55,7 @@ import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
 import GasStepSelectTendermint, {
   GasInfoTendermint,
-} from '../../../components/GasStepSelect/GasStepSelectTendermint';
+} from '../../../components/GasCustomize/Tendermint/GasConfig';
 
 const { Content, Sider } = Layout;
 const { Search } = Input;
@@ -250,7 +250,7 @@ export const FormDelegationRequest = props => {
   }
 
   const assetMarketData = allMarketData.get(
-    `${walletAsset.mainnetSymbol}-${currentSession.currency}`,
+    `${walletAsset.assetType}-${walletAsset.mainnetSymbol}-${currentSession.currency}`,
   );
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol;
   const undelegatePeriod =

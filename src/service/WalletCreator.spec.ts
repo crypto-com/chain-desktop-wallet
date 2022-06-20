@@ -28,7 +28,7 @@ describe('Testing Wallet Creation', () => {
 
     const { assets } = new WalletCreator(createOptions).create();
 
-    expect(assets.length).to.eq(2);
+    expect(assets.length).to.eq(3);
     expect(
       assets
         .filter(asset => asset.assetType === UserAssetType.TENDERMINT)[0]

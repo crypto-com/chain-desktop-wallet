@@ -159,7 +159,9 @@ const AssetsPage = () => {
         syncTransactions(session.activeAsset);
         setCurrentAsset(session.activeAsset);
         setCurrentAssetMarketData(
-          allMarketData.get(`${session.activeAsset.mainnetSymbol}-${session.currency}`),
+          allMarketData.get(
+            `${session.activeAsset.assetType}-${session.activeAsset.mainnetSymbol}-${session.currency}`,
+          ),
         );
         setIsAssetVisible(true);
         setFetchingDB(false);
@@ -233,7 +235,9 @@ const AssetsPage = () => {
       // dataIndex: 'price',
       key: 'price',
       render: record => {
-        const assetMarketData = allMarketData.get(`${record.mainnetSymbol}-${session.currency}`);
+        const assetMarketData = allMarketData.get(
+          `${record.assetType}-${record.mainnetSymbol}-${session.currency}`,
+        );
         return (
           <>
             {assetMarketData &&
@@ -264,7 +268,9 @@ const AssetsPage = () => {
       // dataIndex: 'value',
       key: 'value',
       render: record => {
-        const assetMarketData = allMarketData.get(`${record.mainnetSymbol}-${session.currency}`);
+        const assetMarketData = allMarketData.get(
+          `${record.assetType}-${record.mainnetSymbol}-${session.currency}`,
+        );
         return (
           <>
             {assetMarketData &&
@@ -564,7 +570,9 @@ const AssetsPage = () => {
                       syncTransactions(selectedAsset);
                       setCurrentAsset(selectedAsset);
                       setCurrentAssetMarketData(
-                        allMarketData.get(`${selectedAsset.mainnetSymbol}-${session.currency}`),
+                        allMarketData.get(
+                          `${selectedAsset.assetType}-${selectedAsset.mainnetSymbol}-${session.currency}`,
+                        ),
                       );
                       setIsAssetVisible(true);
                     }, // click row

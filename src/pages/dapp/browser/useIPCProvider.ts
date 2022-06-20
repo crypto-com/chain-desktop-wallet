@@ -1,22 +1,21 @@
-import { useCallback, useEffect, useMemo } from 'react';
-import { TransactionConfig } from 'web3-eth';
-import { useRecoilValue } from 'recoil';
+import { useCallback, useEffect, useState } from 'react';
 import Web3 from 'web3';
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
-import { TransactionPrepareService } from '../../../service/TransactionPrepareService';
-import { walletService } from '../../../service/WalletService';
-import { ChainConfig } from './config';
 import { DappBrowserIPC } from '../types';
 import {
   evmTransactionSigner,
   EvmTransactionSigner,
 } from '../../../service/signers/EvmTransactionSigner';
 import { EVMContractCallUnsigned } from '../../../service/signers/TransactionSupported';
-import { walletAllAssetsState } from '../../../recoil/atom';
-import { getCronosEvmAsset } from '../../../utils/utils';
+import { isHexEqual } from '../../../utils/utils';
 import { TransactionDataParser } from './TransactionDataParser';
 import { ErrorHandler, WebView } from './types';
+import { useChainConfigs } from './useChainConfigs';
+import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
+import { EVMChainConfig } from '../../../models/Chain';
+import { getGasPrice } from '../../../service/evm/gas';
+import { getNonce } from '../../../service/evm/nonce';
 import { useRefCallback } from '../../../hooks/useRefCallback';
 
 export type ConfirmTransactionSuccessCallback = (info: {
@@ -65,7 +64,17 @@ interface IUseIPCProviderProps {
     onError: ErrorHandler,
   ) => Promise<void>;
   onRequestAddEthereumChain: (
-    event: DappBrowserIPC.AddEthereumChainEvent,
+    event: {
+      chainConfig: EVMChainConfig;
+    },
+    onSuccess: () => void,
+    onError: ErrorHandler,
+  ) => Promise<void>;
+  onRequestSwitchEthereumChain: (
+    event: {
+      prev: EVMChainConfig;
+      next: EVMChainConfig;
+    },
     onSuccess: () => void,
     onError: ErrorHandler,
   ) => Promise<void>;
@@ -74,46 +83,73 @@ interface IUseIPCProviderProps {
 
 export const useIPCProvider = (props: IUseIPCProviderProps) => {
   const { webview, onFinishTransaction } = props;
+  const asset = useCronosEvmAsset();
+  const [isDOMReady, setIsDOMReady] = useState(false);
 
-  const transactionPrepareService = new TransactionPrepareService(walletService.storageService);
-  const allAssets = useRecoilValue(walletAllAssetsState);
-  const cronosAsset = getCronosEvmAsset(allAssets);
-  const transactionDataParser = useMemo(() => {
-    return new TransactionDataParser(ChainConfig.RpcUrl, ChainConfig.ExplorerAPIUrl);
-  }, []);
+  const [queuedMessages, setQueuedMessages] = useState<string[]>([]);
+
+  const {
+    list: chainConfigs,
+    add: addChainConfig,
+    setSelectedChain,
+    selectedChain,
+  } = useChainConfigs();
+
+  useEffect(() => {
+    if (!isDOMReady) {
+      return;
+    }
+
+    if (queuedMessages.length > 0) {
+      // eslint-disable-next-line no-restricted-syntax
+      for (const message of queuedMessages) {
+        // eslint-disable-next-line no-await-in-loop
+        execute(message);
+      }
+
+      setQueuedMessages([]);
+    }
+  }, [isDOMReady]);
+
+  const execute = async (script: string) => {
+    await webview?.executeJavaScript(
+      `
+          (function() {
+              ${script}
+          })();
+          `,
+    );
+  };
 
   const executeJavScript = useCallback(
-    (script: string) => {
-      webview?.executeJavaScript(
-        `
-        (function() {
-            ${script}
-        })();
-        `,
-      );
+    async (script: string) => {
+      if (!isDOMReady) {
+        setQueuedMessages([...queuedMessages, script]);
+        return;
+      }
+
+      execute(script);
     },
-    [webview],
+    [webview, isDOMReady, queuedMessages],
   );
 
-  // Prevent potential Phishing Attack
-  const injectDomReadyScript = useCallback(() => {
-    executeJavScript(`
+  const injectDomReadyScript = useCallback(
+    (chainConfig?: EVMChainConfig) => {
+      executeJavScript(`
     window.onbeforeunload = function() {
       return;
     }
     `);
-    // executeJavScript(
-    //   `
-    //         var config = {
-    //             chainId: ${ChainConfig.chainId},
-    //             rpcUrl: "${ChainConfig.rpcUrl}",
-    //             isDebug: true
-    //         };
-    //         window.ethereum = new window.desktopWallet.Provider(config);
-    //         window.web3 = new window.desktopWallet.Web3(window.ethereum);
-    //     `,
-    // );
-  }, [webview]);
+
+      if (!chainConfig) {
+        // eslint-disable-next-line prefer-destructuring
+        chainConfig = chainConfigs[0];
+      }
+
+      updateChainConfig(chainConfig);
+    },
+    [webview, chainConfigs, asset],
+  );
 
   const sendError = (id: number, error: string) => {
     executeJavScript(`
@@ -121,11 +157,21 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     `);
   };
 
-  const sendResponse = (id: number, response: string) => {
-    executeJavScript(`
-        window.ethereum.sendResponse(${id}, "${response}")
-    `);
+  const sendResponse = (id: number, response?: string) => {
+    if (response) {
+      executeJavScript(`
+          window.ethereum.sendResponse(${id}, "${response}")
+      `);
+    } else {
+      executeJavScript(`
+          window.ethereum.sendResponse(${id})
+      `);
+    }
   };
+
+  useEffect(() => {
+    injectDomReadyScript(selectedChain);
+  }, [selectedChain]);
 
   const sendResponses = (id: number, responses: string[]) => {
     const script = responses.map(r => `'${r}'`).join(',');
@@ -140,6 +186,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           window.ethereum.setAddress("${address}");
         `,
     );
+
+    updateChainConfig(selectedChain);
     sendResponses(id, [address]);
   });
 
@@ -150,37 +198,27 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       _gasPrice: BigNumber,
       _gasLimit: BigNumber,
     ) => {
-      const prepareTXConfig: TransactionConfig = {
-        from: event.object.from,
-        to: event.object.to,
-      };
-
-      const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
-        cronosAsset!,
-        prepareTXConfig,
-      );
-
       const data = evmTransactionSigner.encodeTokenApprovalABI(
-        event.object.tokenData.contractAddress,
         event.object.spender,
         ethers.constants.MaxUint256,
       );
 
-      const txConfig: EVMContractCallUnsigned = {
+      const transaction: EVMContractCallUnsigned = {
         from: event.object.from,
         contractAddress: event.object.to,
         data,
         gasLimit: `0x${_gasLimit.toString(16)}`,
         gasPrice: `0x${_gasPrice.toString(16)}`,
-        nonce: prepareTxInfo.nonce,
+        maxFeePerGas: event.object.maxFeePerGas ?? undefined,
+        maxPriorityFeePerGas: event.object.maxPriorityFeePerGas ?? undefined,
+        nonce: await getNonce(event.object.from, event.object.chainConfig),
       };
       try {
-        const result = await evmTransactionSigner.sendContractCallTransaction(
-          cronosAsset!,
-          txConfig,
-          passphrase,
-          ChainConfig.RpcUrl,
-        );
+        const result = await evmTransactionSigner.sendContractCallTransaction({
+          chainConfig: event.object.chainConfig,
+          transaction,
+          phrase: passphrase,
+        });
 
         sendResponse(event.id, result);
       } catch (error) {
@@ -191,25 +229,6 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     },
   );
 
-  const getGasPrice = async (event: DappBrowserIPC.SendTransactionEvent) => {
-    const prepareTXConfig: TransactionConfig = {
-      from: event.object.from,
-      to: event.object.to,
-      data: event.object.data,
-      value: event.object.value,
-    };
-
-    const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
-      cronosAsset!,
-      prepareTXConfig,
-    );
-
-    return {
-      gasLimit: prepareTxInfo.gasLimit,
-      gasPrice: Web3.utils.toHex(prepareTxInfo.loadedGasPrice),
-    };
-  };
-
   const handleSendTransaction = useRefCallback(
     async (
       event: DappBrowserIPC.SendTransactionEvent,
@@ -217,33 +236,24 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       _gasPrice: BigNumber,
       _gasLimit: BigNumber,
     ) => {
-      const prepareTXConfig: TransactionConfig = {
-        from: event.object.from,
-        to: event.object.to,
-      };
-
-      const prepareTxInfo = await transactionPrepareService.prepareEVMTransaction(
-        cronosAsset!,
-        prepareTXConfig,
-      );
-
-      const txConfig: EVMContractCallUnsigned = {
-        from: event.object.from,
+      const transaction: EVMContractCallUnsigned = {
         contractAddress: event.object.to,
         data: event.object.data,
+        from: event.object.from,
         gasLimit: `0x${_gasLimit.toString(16)}`,
         gasPrice: `0x${_gasPrice.toString(16)}`,
+        maxFeePerGas: event.object.maxFeePerGas ?? undefined,
+        maxPriorityFeePerGas: event.object.maxPriorityFeePerGas ?? undefined,
+        nonce: await getNonce(event.object.from, event.object.chainConfig),
         value: event.object.value,
-        nonce: prepareTxInfo.nonce,
       };
 
       try {
-        const result = await evmTransactionSigner.sendContractCallTransaction(
-          cronosAsset!,
-          txConfig,
-          passphrase,
-          ChainConfig.RpcUrl,
-        );
+        const result = await evmTransactionSigner.sendContractCallTransaction({
+          chainConfig: event.object.chainConfig,
+          transaction,
+          phrase: passphrase,
+        });
         sendResponse(event.id, result);
         onFinishTransaction();
       } catch (error) {
@@ -275,12 +285,12 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     },
   );
 
-  const listenIPCMessages = () => {
+  useEffect(() => {
     if (!webview) {
       return;
     }
 
-    webview.addEventListener('ipc-message', async e => {
+    const ipcMessageHandler = async (e: Electron.IpcMessageEvent) => {
       const { channel, args } = e;
 
       if (channel !== DappBrowserIPC.ChannelName) {
@@ -305,64 +315,69 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           );
           break;
         case 'signTransaction':
-          // parse transaction data
+          {
+            // fill in gasData
+            const gasObject = await getGasPrice(selectedChain, {
+              from: event.object.from,
+              to: event.object.to,
+              data: event.object.data,
+              value: ethers.BigNumber.from(event.object.value ? event.object.value : 0),
+            });
 
-          // gasPrice maybe missing (eg. Tectonic)
-          if (!event.object?.gasPrice || !event.object.gas) {
-            const gasObject = await getGasPrice(event);
             event.object.gasPrice = event.object?.gasPrice ?? gasObject.gasPrice;
             event.object.gas = event.object?.gas ?? gasObject.gasLimit;
-          }
+            event.object.maxFeePerGas = gasObject.maxFeePerGas;
+            event.object.maxPriorityFeePerGas = gasObject.maxPriorityFeePerGas;
 
-          if (event.object.data.startsWith('0x095ea7b3')) {
-            const response = await transactionDataParser.parseTokenApprovalData(
-              event.object.to,
-              event.object.data,
-            );
-            const approvalEvent: DappBrowserIPC.TokenApprovalEvent = {
-              name: 'tokenApproval',
-              id: event.id,
-              object: {
-                tokenData: response.tokenData,
-                amount: response.amount,
-                gas: event.object.gas,
-                gasPrice: event.object.gasPrice,
-                from: event.object.from,
-                spender: response.spender,
-                to: event.object.to,
-              },
-            };
-            props.onRequestTokenApproval(
-              approvalEvent,
-              info => {
-                handleTokenApproval.current(
-                  approvalEvent,
-                  info.decryptedPhrase,
-                  info.gasPrice,
-                  info.gasLimit,
-                );
-              },
-              reason => {
-                sendError(event.id, reason);
-              },
-            );
-          } else {
-            props.onRequestSendTransaction(
-              event,
-              info => {
-                handleSendTransaction.current(
-                  event,
-                  info.decryptedPhrase,
-                  info.gasPrice,
-                  info.gasLimit,
-                );
-              },
-              reason => {
-                sendError(event.id, reason);
-              },
-            );
-          }
+            event.object.chainConfig = selectedChain;
 
+            if (event.object.data.startsWith('0x095ea7b3')) {
+              const parsedData = await TransactionDataParser.parseTokenApprovalData(
+                selectedChain,
+                event.object.to,
+                event.object.data,
+              );
+              const approvalEvent: DappBrowserIPC.TokenApprovalEvent = {
+                name: 'tokenApproval',
+                id: event.id,
+                object: {
+                  tokenData: parsedData.tokenData,
+                  amount: parsedData.amount,
+                  spender: parsedData.spender,
+                  ...event.object,
+                },
+              };
+              props.onRequestTokenApproval(
+                approvalEvent,
+                info => {
+                  handleTokenApproval.current(
+                    approvalEvent,
+                    info.decryptedPhrase,
+                    info.gasPrice,
+                    info.gasLimit,
+                  );
+                },
+                reason => {
+                  sendError(event.id, reason);
+                },
+              );
+            } else {
+              props.onRequestSendTransaction(
+                event,
+                info => {
+                  handleSendTransaction.current(
+                    event,
+                    info.decryptedPhrase,
+                    info.gasPrice,
+                    info.gasLimit,
+                  );
+                },
+                reason => {
+                  sendError(event.id, reason);
+                },
+              );
+            }
+          }
           break;
         case 'signMessage':
           props.onRequestSignMessage(
@@ -428,13 +443,90 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
           );
           break;
         case 'addEthereumChain':
-          props.onRequestAddEthereumChain(
-            event,
-            () => {},
-            reason => {
-              sendError(event.id, reason);
-            },
-          );
+          {
+            const foundConfig = chainConfigs.find(c => isHexEqual(c.chainId, event.object.chainId));
+
+            if (foundConfig && isHexEqual(selectedChain.chainId, event.object.chainId)) {
+              setSelectedChain(foundConfig);
+              injectDomReadyScript(foundConfig);
+              sendResponse(event.id, foundConfig.chainId);
+              return;
+            }
+
+            if (foundConfig && selectedChain.chainId !== event.object.chainId) {
+              props.onRequestSwitchEthereumChain(
+                {
+                  prev: selectedChain,
+                  next: foundConfig,
+                },
+                () => {
+                  setSelectedChain(foundConfig);
+                  injectDomReadyScript(foundConfig);
+                  sendResponse(event.id, foundConfig.chainId);
+                },
+                () => {
+                  // no-op
+                },
+              );
+              return;
+            }
+
+            const config = {
+              chainId: event.object.chainId,
+              rpcUrls: event.object.rpcUrls,
+              blockExplorerUrls: event.object.blockExplorerUrls,
+              chainName: event.object.chainName,
+              nativeCurrency: event.object.nativeCurrency,
+            };
+
+            props.onRequestAddEthereumChain(
+              { chainConfig: config },
+              async () => {
+                addChainConfig(config);
+
+                props.onRequestSwitchEthereumChain(
+                  {
+                    prev: selectedChain,
+                    next: config,
+                  },
+                  () => {
+                    setSelectedChain(config);
+                    injectDomReadyScript(config);
+                    sendResponse(event.id, config.chainId);
+                  },
+                  () => {
+                    // no-op
+                  },
+                );
+
+                sendResponse(event.id);
+              },
+              reason => {
+                sendError(event.id, reason);
+              },
+            );
+          }
+          break;
+        case 'switchEthereumChain':
+          {
+            const foundConfig = chainConfigs.find(c => isHexEqual(c.chainId, event.object.chainId));
+            if (foundConfig && selectedChain.chainId !== event.object.chainId) {
+              props.onRequestSwitchEthereumChain(
+                {
+                  prev: selectedChain,
+                  next: foundConfig,
+                },
+                () => {
+                  setSelectedChain(foundConfig);
+                  injectDomReadyScript(foundConfig);
+                  sendResponse(event.id, foundConfig.chainId);
+                },
+                () => {
+                  // no-op
+                },
+              );
+            }
+          }
           break;
         case 'openLinkInDefaultBrowser':
           {
@@ -446,15 +538,20 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         default:
           break;
       }
-    });
-  };
+    };
+
+    webview.addEventListener('ipc-message', ipcMessageHandler);
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      webview.removeEventListener('ipc-message', ipcMessageHandler);
+    };
+  }, [chainConfigs, webview, selectedChain]);
 
   const setupIPC = useCallback(() => {
     if (!webview) {
       return;
     }
-
-    listenIPCMessages();
 
     webview.addEventListener('new-window', e => {
       e.preventDefault();
@@ -462,12 +559,30 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
     });
 
     webview.addEventListener('did-finish-load', () => {
-      injectDomReadyScript();
+      setIsDOMReady(true);
+
+      injectDomReadyScript(selectedChain);
       if (process.env.NODE_ENV === 'development') {
         webview.openDevTools();
       }
     });
-  }, [webview]);
+
+    updateChainConfig(selectedChain, true);
+  }, [webview, selectedChain]);
+
+  const updateChainConfig = (config: EVMChainConfig, emitChanged = false) => {
+    executeJavScript(
+      `
+            var config = {
+                address: '${asset?.address}',
+                chainId: '${config.chainId}',
+                rpcUrl: "${config.rpcUrls[0]}",
+                isDebug: true
+            };
+            window.ethereum.setConfig(config, ${emitChanged});
+        `,
+    );
+  };
 
   useEffect(() => {
     setupIPC();

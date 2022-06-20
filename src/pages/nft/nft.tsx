@@ -101,8 +101,8 @@ import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { useCronosEvmAsset, useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
 import GasStepSelectTendermint, {
   GasInfoTendermint,
-} from '../../components/GasStepSelect/GasStepSelectTendermint';
-import GasStepSelectEVM, { GasInfoEVM } from '../../components/GasStepSelect/GasStepSelectEVM';
+} from '../../components/GasCustomize/Tendermint/GasConfig';
+import GasStepSelectEVM, { GasInfoEVM } from '../../components/GasCustomize/EVM/GasConfig';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -1765,7 +1765,7 @@ const NftPage = () => {
                           <GasInfoTendermint />
                         </>
                       )}
-                      {formValues.nftType === NftType.CRC_721_TOKEN && <GasInfoEVM />}
+                      {formValues.nftType === NftType.CRC_721_TOKEN && <GasInfoEVM asset={cronosEvmAsset!} />}
                     </>
                   ) : (
                     <>
@@ -1818,6 +1818,7 @@ const NftPage = () => {
                         )}
                         {isCronosNftModel(nft) && (
                           <GasStepSelectEVM
+                            asset={cronosEvmAsset!}
                             onChange={(_, fee) => {
                               setNetworkFee(fee.toString());
                             }}

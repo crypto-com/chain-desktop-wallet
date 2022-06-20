@@ -659,6 +659,7 @@ function HomeLayout(props: HomeLayoutProps) {
       const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
       const allWalletsData = await walletService.retrieveAllWallets();
       const currentMarketData = await walletService.retrieveAssetPrice(
+        currentAsset?.assetType,
         currentAsset?.mainnetSymbol,
         currentSession.currency,
       );

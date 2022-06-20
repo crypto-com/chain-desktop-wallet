@@ -61,6 +61,7 @@ module.exports = {
     'import/no-unresolved': 'off',
     'prefer-promise-reject-errors': 'off',
     'no-return-await': 'off',
+    'no-console': 'off',
     'react-hooks/exhaustive-deps': [
       'off',
       {

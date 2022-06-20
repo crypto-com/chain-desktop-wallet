@@ -2,70 +2,65 @@ import * as React from 'react';
 import { Button, Form, InputNumber, Modal } from 'antd';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import './style.less';
-import { getRecoil, setRecoil } from 'recoil-nexus';
+import '../style.less';
+import { getRecoil } from 'recoil-nexus';
 import numeral from 'numeral';
 import { ethers } from 'ethers';
 import { ValidateStatus } from 'antd/lib/form/FormItem';
 import {
   allMarketState,
   sessionState,
-  walletAllAssetsState,
-  walletListState,
-} from '../../recoil/atom';
+} from '../../../recoil/atom';
 import {
-  FIXED_DEFAULT_FEE,
-  FIXED_DEFAULT_GAS_LIMIT,
+  EVM_MINIMUM_GAS_LIMIT,
+  EVM_MINIMUM_GAS_PRICE,
   SUPPORTED_CURRENCY,
-} from '../../config/StaticConfig';
-import { getAssetAmountInFiat, UserAsset } from '../../models/UserAsset';
-import { getNormalScaleAmount } from '../../utils/NumberUtils';
-import { walletService } from '../../service/WalletService';
-import { useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
-import { Session } from '../../models/Session';
-import { useAnalytics } from '../../hooks/useAnalytics';
+} from '../../../config/StaticConfig';
+import { getAssetAmountInFiat, UserAsset } from '../../../models/UserAsset';
+import { getNormalScaleAmount } from '../../../utils/NumberUtils';
+import { useAnalytics } from '../../../hooks/useAnalytics';
+import { updateGasInfo } from '../utils';
 
 const ModalBody = (props: {
   asset: UserAsset;
-  gasFee: string;
+  gasPrice: string;
   gasLimit: string;
-  onSuccess: (gasLimit: string, networkFee: string) => void;
+  onSuccess: (gasLimit: string, gasPrice: string) => void;
 }) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { asset, gasFee, gasLimit, onSuccess } = props;
-
+  const { gasPrice, gasLimit, onSuccess, asset } = props;
   const [t] = useTranslation();
 
   const [form] = Form.useForm();
 
-  const croTendermintAsset = useCronosTendermintAsset();
-  const [validateStatus, setValidateStatus] = useState<ValidateStatus>('');
   const currentSession = getRecoil(sessionState);
   const allMarketData = getRecoil(allMarketState);
-  const [isUsingCustomGas, setIsUsingCustomGas] = useState(false);
+  const { analyticsService } = useAnalytics();
+  const [validateStatus, setValidateStatus] = useState<ValidateStatus>('');
 
   const [readableNetworkFee, setReadableNetworkFee] = useState('');
 
   const assetMarketData = allMarketData.get(
-    `${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
+    `${asset.mainnetSymbol}-${currentSession.currency}`,
   );
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
-  const { analyticsService } = useAnalytics();
+  const [isUsingCustomGas, setIsUsingCustomGas] = useState(false);
 
-  const setNetworkFee = (fee: string) => {
-    const amount = getNormalScaleAmount(fee, asset);
-
-    if (fee !== FIXED_DEFAULT_FEE) {
+  const setNetworkFee = (newGasPrice: string, newGasLimit: string) => {
+    if (newGasPrice !== EVM_MINIMUM_GAS_PRICE || newGasLimit !== EVM_MINIMUM_GAS_LIMIT) {
       setIsUsingCustomGas(true);
     } else {
       setIsUsingCustomGas(false);
     }
 
-    if (ethers.BigNumber.from(asset.balance.toString()).lte(fee)) {
+    const amountBigNumber = ethers.BigNumber.from(newGasLimit ?? '0').mul(newGasPrice ?? '0');
+
+    if (ethers.BigNumber.from(asset.balance.toString()).lte(amountBigNumber)) {
       setValidateStatus('error');
     } else {
       setValidateStatus('');
     }
+
+    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset);
 
     if (!(asset && localFiatSymbol && assetMarketData && assetMarketData.price)) {
       setReadableNetworkFee(`${amount} ${asset.symbol}`);
@@ -81,19 +76,16 @@ const ModalBody = (props: {
   };
 
   useEffect(() => {
-    if (!asset) {
-      return;
-    }
 
-    setNetworkFee(gasFee);
+    setNetworkFee(gasPrice, gasLimit);
 
     form.setFieldsValue({
-      networkFee: gasFee,
+      gasPrice,
       gasLimit,
     });
-  }, [asset, gasFee, gasLimit]);
+  }, [asset, gasPrice, gasLimit]);
 
-  if (!croTendermintAsset) {
+  if (!asset) {
     return <React.Fragment />;
   }
 
@@ -111,12 +103,18 @@ const ModalBody = (props: {
         layout="vertical"
         form={form}
         onValuesChange={() => {
-          const networkFee: string = form.getFieldValue('networkFee');
-          const fieldsError = form.getFieldsError(['networkFee']);
-          if (fieldsError[0].errors.length > 0 || !networkFee) {
+          const newGasPrice: string = form.getFieldValue('gasPrice');
+          const newGasLimit: string = form.getFieldValue('gasLimit');
+          const fieldsError = form.getFieldsError(['gasPrice', 'gasLimit']);
+          if (
+            fieldsError[0].errors.length > 0 ||
+            fieldsError[1].errors.length > 0 ||
+            !gasPrice ||
+            !gasLimit
+          ) {
             setReadableNetworkFee('-');
           } else {
-            setNetworkFee(networkFee);
+            setNetworkFee(newGasPrice, newGasLimit);
           }
         }}
         onFinish={async values => {
@@ -126,50 +124,22 @@ const ModalBody = (props: {
 
           const {
             gasLimit: newGasLimit,
-            networkFee: newNetworkFee,
-          }: { gasLimit: string; networkFee: string } = values;
+            gasPrice: newGasPrice,
+          }: { gasLimit: string; gasPrice: string } = values;
 
-          if (gasLimit === newGasLimit && gasFee === newNetworkFee) {
-            onSuccess(newGasLimit, newNetworkFee);
+          if (gasLimit === newGasLimit.toString() && gasPrice === newGasPrice.toString()) {
+            onSuccess(newGasLimit, newGasPrice);
             return;
           }
 
-          const updatedWallet = await walletService.findWalletByIdentifier(
-            currentSession.wallet.identifier,
-          );
+          await updateGasInfo(currentSession, asset, newGasLimit.toString(), newGasPrice.toString(), analyticsService);
 
-          const newlyUpdatedAsset = {
-            ...croTendermintAsset,
-            config: {
-              ...croTendermintAsset.config,
-              fee: { gasLimit: newGasLimit.toString(), networkFee: newNetworkFee.toString() },
-            },
-          };
-
-          await walletService.saveAssets([newlyUpdatedAsset as UserAsset]);
-
-          const newSession = {
-            ...currentSession,
-            wallet: updatedWallet,
-            activeAsset: newlyUpdatedAsset,
-          };
-          setRecoil(sessionState, newSession as Session);
-
-          await walletService.setCurrentSession(newSession as Session);
-
-          const allNewUpdatedWallets = await walletService.retrieveAllWallets();
-          setRecoil(walletListState, [...allNewUpdatedWallets]);
-
-          const allAssets = await walletService.retrieveCurrentWalletAssets(newSession as Session);
-          setRecoil(walletAllAssetsState, [...allAssets]);
-
-          onSuccess(newGasLimit, newNetworkFee);
-          analyticsService.logCustomizeGas(asset.assetType ?? '');
+          onSuccess(newGasLimit, newGasPrice);
         }}
       >
         <Form.Item
-          name="networkFee"
-          label={`${t('settings.form1.networkFee.label')}(baseCRO)`}
+          name="gasPrice"
+          label={`${t('gas-price')}(WEI)`}
           hasFeedback
           rules={[
             {
@@ -182,7 +152,7 @@ const ModalBody = (props: {
             },
           ]}
         >
-          <InputNumber precision={0} stringMode />
+          <InputNumber stringMode precision={0} />
         </Form.Item>
         <Form.Item
           name="gasLimit"
@@ -237,10 +207,10 @@ const ModalBody = (props: {
             htmlType="button"
             onClick={() => {
               form.setFieldsValue({
-                networkFee: FIXED_DEFAULT_FEE,
-                gasLimit: FIXED_DEFAULT_GAS_LIMIT,
+                gasPrice: EVM_MINIMUM_GAS_PRICE,
+                gasLimit: EVM_MINIMUM_GAS_LIMIT,
               });
-              setNetworkFee(FIXED_DEFAULT_FEE);
+              setNetworkFee(EVM_MINIMUM_GAS_PRICE, EVM_MINIMUM_GAS_LIMIT);
             }}
           >
             {t('general.default')}
@@ -251,7 +221,7 @@ const ModalBody = (props: {
   );
 };
 
-const useCustomGasModalTendermint = (asset: UserAsset, gasFee: string, gasLimit: string) => {
+const useCustomGasModalEVM = (asset: UserAsset, gasFee: string, gasLimit: string) => {
   let modalRef;
 
   const [isShowing, setIsShowing] = useState(false);
@@ -288,9 +258,7 @@ const useCustomGasModalTendermint = (asset: UserAsset, gasFee: string, gasLimit:
       style: {
         padding: '20px 20px 0 20px',
       },
-      content: (
-        <ModalBody asset={asset} gasFee={gasFee} gasLimit={gasLimit} onSuccess={props.onSuccess} />
-      ),
+      content: <ModalBody asset={asset} gasPrice={gasFee} gasLimit={gasLimit} onSuccess={props.onSuccess} />,
     });
     setIsShowing(true);
     modalRef = modal;
@@ -302,4 +270,4 @@ const useCustomGasModalTendermint = (asset: UserAsset, gasFee: string, gasLimit:
   };
 };
 
-export { useCustomGasModalTendermint };
+export { useCustomGasModalEVM };

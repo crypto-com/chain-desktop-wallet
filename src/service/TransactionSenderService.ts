@@ -42,15 +42,17 @@ import {
 } from './TransactionRequestModels';
 import { StorageService } from './storage/StorageService';
 import { CronosClient } from './cronos/CronosClient';
+import { EVMClient } from './rpc/clients/EVMClient';
 import { TransactionPrepareService } from './TransactionPrepareService';
 import { evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
 import { TransactionHistoryService } from './TransactionHistoryService';
-import { getCronosEvmAsset, sleep } from '../utils/utils';
+import { checkIfTestnet, getCronosEvmAsset, sleep } from '../utils/utils';
 import { BridgeService } from './bridge/BridgeService';
 import { walletService } from './WalletService';
 import { getCronosTendermintFeeConfig } from './Gas';
 import { DerivationPathStandard } from './signers/LedgerSigner';
+import { CronosMainnetChainConfig, CronosTestnetChainConfig } from '../config/DAppChainConfig';
 
 export class TransactionSenderService {
   public readonly storageService: StorageService;
@@ -92,13 +94,10 @@ export class TransactionSenderService {
             throw TypeError(`Missing asset config: ${currentAsset.config}`);
           }
 
-          const cronosClient = new CronosClient(
-            currentAsset.config?.nodeUrl,
-            currentAsset.config?.indexingUrl,
-          );
+          const evmClient = EVMClient.create(currentAsset.config?.nodeUrl);
 
           const transfer: TransferTransactionUnsigned = {
-            fromAddress,
+            fromAddress: currentAsset.address,
             toAddress: transferRequest.toAddress,
             amount: String(scaledBaseAmount),
             memo: transferRequest.memo,
@@ -154,7 +153,7 @@ export class TransactionSenderService {
             );
           }
 
-          const result = await cronosClient.broadcastRawTransactionHex(signedTx);
+          const result = await evmClient.broadcastRawTransactionHex(signedTx);
           return {
             transactionHash: result,
             message: '',
@@ -699,14 +698,15 @@ export class TransactionSenderService {
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
     await this.txHistoryManager.fetchAndSaveProposals(currentSession);
     return broadCastResult;
-
   }
 
   /**
-   * 
-   * @param textProposalSubmitRequest 
+   *
+   * @param textProposalSubmitRequest
    */
-  public async sendSubmitTextProposalTransaction(textProposalSubmitRequest: TextProposalRequest): Promise<BroadCastResult> {
+  public async sendSubmitTextProposalTransaction(
+    textProposalSubmitRequest: TextProposalRequest,
+  ): Promise<BroadCastResult> {
     const {
       nodeRpc,
       accountNumber,
@@ -862,12 +862,15 @@ export class TransactionSenderService {
         };
 
         try {
-          const result = await evmTransactionSigner.sendContractCallTransaction(
-            asset!,
-            txConfig,
-            decryptedPhrase,
-            asset.config?.nodeUrl,
-          );
+          const session = await walletService.retrieveCurrentSession();
+          const isTestnet = checkIfTestnet(session.wallet.config.network);
+          const chainConfig = !isTestnet ? CronosMainnetChainConfig : CronosTestnetChainConfig;
+
+          const result = await evmTransactionSigner.sendContractCallTransaction({
+            chainConfig,
+            transaction: txConfig,
+            phrase: decryptedPhrase,
+          });
 
           await sleep(7_000);
           await Promise.all([

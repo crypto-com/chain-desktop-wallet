@@ -182,7 +182,11 @@ const StakingPage = () => {
 
     syncUnbondingDelegationsData();
 
-    setMarketData(allMarketData.get(`${userAsset?.mainnetSymbol}-${currentSession.currency}`));
+    setMarketData(
+      allMarketData.get(
+        `${userAsset?.assetType}-${userAsset?.mainnetSymbol}-${currentSession.currency}`,
+      ),
+    );
 
     if (!didMountRef.current) {
       didMountRef.current = true;

@@ -1,4 +1,6 @@
-import { CronosClient } from '../../../service/cronos/CronosClient';
+import { ethers } from 'ethers';
+import { ERC20__factory, IERC20__factory } from '../../../contracts';
+import { EVMChainConfig } from '../../../models/Chain';
 import { TokenApprovalRequestData } from '../types';
 
 export function instanceOfTokenApprovalRequestData(data: any): data is TokenApprovalRequestData {
@@ -6,23 +8,36 @@ export function instanceOfTokenApprovalRequestData(data: any): data is TokenAppr
 }
 
 class TransactionDataParser {
-  private client: CronosClient;
 
-  constructor(rpcEndPoint: string, explorerAPIEndPoint: string) {
-    this.client = new CronosClient(rpcEndPoint, explorerAPIEndPoint);
-  }
-
-  parseTokenApprovalData = async (
+  static parseTokenApprovalData = async (
+    chainConfig: EVMChainConfig,
     tokenAddress: string,
     data: string,
   ): Promise<TokenApprovalRequestData> => {
-    const amount = `0x${data.slice(74, data.length)}`;
-    const spender = `0x${data.slice(34, 74)}`;
-    const response = await this.client.getContractDataByAddress(tokenAddress);
+
+    const IERC20 = IERC20__factory.createInterface();
+    const parsedData = IERC20.decodeFunctionData(IERC20.functions['approve(address,uint256)'].name, data)
+
+    const provider = new ethers.providers.JsonRpcProvider(chainConfig.rpcUrls[0]);
+    const contract = ERC20__factory.connect(tokenAddress, provider);
+    const [symbol, decimals, totalSupply] = await Promise.all([
+      contract.symbol(),
+      contract.decimals(),
+      contract.totalSupply(),
+    ])
+
     return {
-      amount,
-      spender,
-      tokenData: response.result,
+      amount: parsedData.amount,
+      spender: parsedData.spender,
+      tokenData: {
+        contractAddress: tokenAddress,
+        symbol,
+        name: symbol,
+        type: '',
+        decimals: decimals.toString(),
+        totalSupply: totalSupply.toString(),
+        cataloged: false,
+      },
     };
   };
 }

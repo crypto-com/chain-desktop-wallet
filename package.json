@@ -25,8 +25,8 @@
     "lint-staged": "lint-staged",
     "lint:js": "eslint --cache --fix --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
     "prettier": "prettier --write '/src/**/*.{js,jsx,tsx,ts,less,md,json}'",
-    "generate-i18n": "node scripts/generate_i18n.mjs",
-    "generate:typings": "npx typechain --target ethers-v5 --out-dir src/contracts './src/contracts/**/*.json'"
+    "generate:i18n": "node scripts/generate_i18n.mjs",
+    "generate:typechain": "npx typechain --target ethers-v5 --out-dir src/contracts './src/contracts/**/*.json'"
   },
   "dependencies": {
     "@ant-design/icons": "4.6.2",
@@ -39,7 +39,7 @@
     "@ledgerhq/hw-transport-node-hid": "6.6.0",
     "@ledgerhq/hw-transport-webhid": "5.48.0",
     "@ledgerhq/hw-transport-webusb": "5.48.0",
-    "@typechain/ethers-v5": "9.0.0",
+    "@typechain/ethers-v5": "^9.0.0",
     "@types/bluebird": "3.5.36",
     "@walletconnect/client": "^1.7.8",
     "ansi-html": "0.0.8",
@@ -92,7 +92,7 @@
     "stylelint-declaration-block-no-ignored-properties": "2.3.0",
     "stylelint-order": "4.1.0",
     "ts-pnp": "1.2.0",
-    "typechain": "7.0.1",
+    "typechain": "^7.0.1",
     "typescript": "4.0.5",
     "universal-analytics": "0.4.23",
     "url-loader": "4.1.1",

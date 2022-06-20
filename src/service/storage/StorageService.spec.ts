@@ -6,7 +6,7 @@ import { StorageService } from './StorageService';
 import { Session } from '../../models/Session';
 import { SettingsDataUpdate, Wallet } from '../../models/Wallet';
 import { getRandomId } from '../../crypto/RandomGen';
-import { AssetMarketPrice, UserAsset } from '../../models/UserAsset';
+import { AssetMarketPrice, UserAsset, UserAssetType } from '../../models/UserAsset';
 import { DerivationPathStandard } from '../signers/LedgerSigner';
 
 jest.setTimeout(20_000);
@@ -232,6 +232,7 @@ describe('Testing Full Storage Service', () => {
 
     const assetMarketPrice: AssetMarketPrice = {
       assetSymbol: 'CRO',
+      assetType: UserAssetType.EVM,
       currency: 'USD',
       dailyChange: '-2.48',
       price: '0.071',
@@ -239,7 +240,7 @@ describe('Testing Full Storage Service', () => {
 
     await mockWalletStore.saveAssetMarketPrice(assetMarketPrice);
 
-    const fetchedAsset = await mockWalletStore.retrieveAssetPrice('CRO', 'USD');
+    const fetchedAsset = await mockWalletStore.retrieveAssetPrice(UserAssetType.EVM, 'CRO', 'USD');
 
     expect(fetchedAsset.assetSymbol).to.eq('CRO');
     expect(fetchedAsset.currency).to.eq('USD');
@@ -251,7 +252,7 @@ describe('Testing Full Storage Service', () => {
 
     await mockWalletStore.saveAssetMarketPrice(fetchedAsset);
 
-    const updatedAsset = await mockWalletStore.retrieveAssetPrice('CRO', 'USD');
+    const updatedAsset = await mockWalletStore.retrieveAssetPrice(UserAssetType.EVM, 'CRO', 'USD');
 
     expect(updatedAsset.assetSymbol).to.eq('CRO');
     expect(updatedAsset.currency).to.eq('USD');

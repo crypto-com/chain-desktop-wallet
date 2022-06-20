@@ -16,7 +16,7 @@ import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { UNBLOCKING_PERIOD_IN_DAYS } from '../../../config/StaticConfig';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 import ValidatorListTable from './ValidatorListTable';
-import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSelectTendermint';
+import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasConfig';
 
 const { Search } = Input;
 

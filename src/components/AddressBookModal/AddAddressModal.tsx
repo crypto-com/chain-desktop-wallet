@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Button, Form, Input, message, Modal, Select } from 'antd';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import _ from 'lodash';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { useRecoilValue } from 'recoil';
@@ -62,7 +62,7 @@ const AddAddressModal = (props: IAddAddressModalProps) => {
     return allAssets.filter(asset => asset.assetType === network.networkType);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isEditing || !contact) {
       return;
     }

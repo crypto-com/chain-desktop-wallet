@@ -1,3 +1,4 @@
+import { ethers } from 'ethers';
 import { Coin } from '@crypto-org-chain/chain-jslib/lib/dist/cosmos/coins';
 import { TextProposalOptions } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/msg/gov/proposal/TextProposal';
 import Big from 'big.js';
@@ -34,7 +35,9 @@ export interface MsgSubmitProposalTransactionUnsigned extends TransactionUnsigne
   initialDeposit: Coin[];
 }
 
-export interface TextProposalTransactionUnsigned extends TransactionUnsigned, MsgSubmitProposalTransactionUnsigned {
+export interface TextProposalTransactionUnsigned
+  extends TransactionUnsigned,
+    MsgSubmitProposalTransactionUnsigned {
   params: TextProposalOptions;
 }
 
@@ -146,6 +149,8 @@ export interface EVMContractCallUnsigned {
   value?: string;
   gasPrice: string;
   gasLimit: string;
+  maxFeePerGas?: ethers.BigNumber;
+  maxPriorityFeePerGas?: ethers.BigNumber;
 }
 
 export interface EVMNFTTransferUnsigned {

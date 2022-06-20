@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMarketPrice } from '../../../../hooks/useMarketPrice';
+import { UserAssetType } from '../../../../models/UserAsset';
 import { CronosClient } from '../../../../service/cronos/CronosClient';
 import { getUINormalScaleAmount } from '../../../../utils/NumberUtils';
 import { isUnlimited, middleEllipsis } from '../../../../utils/utils';
@@ -14,6 +15,7 @@ export const TokenBalance = (props: { data: TokenDataWithApproval; explorerURL: 
 
   const amount = getUINormalScaleAmount(data.token.balance, data.token.decimals);
   const { readablePrice } = useMarketPrice({
+    assetType: UserAssetType.CRC_20_TOKEN,
     symbol: data.token.symbol,
     amount,
   });
@@ -58,10 +60,12 @@ export const RiskExposure = (props: { data: TokenDataWithApproval }) => {
   const amount = getUINormalScaleAmount(data.approval.amount.toString(), data.token.decimals);
   const balanceAmount = getUINormalScaleAmount(data.token.balance, data.token.decimals);
   const { readablePrice: totalBalancePrice } = useMarketPrice({
+    assetType: UserAssetType.CRC_20_TOKEN,
     symbol: data.token.symbol,
     amount: balanceAmount,
   });
   const { readablePrice } = useMarketPrice({
+    assetType: UserAssetType.CRC_20_TOKEN,
     symbol: data.token.symbol,
     amount,
   });

@@ -8,7 +8,7 @@ import Big from 'big.js';
 import { Session } from '../../../models/Session';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { UNBLOCKING_PERIOD_IN_DAYS } from '../../../config/StaticConfig';
-import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSelectTendermint';
+import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasConfig';
 
 export const FormUndelegateComponent = (props: {
   currentSession: Session;

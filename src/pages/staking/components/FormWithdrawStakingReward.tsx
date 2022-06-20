@@ -39,8 +39,8 @@ import { SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
 
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
-import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSelectTendermint';
-import GasStepSelect from '../../../components/GasStepSelect/index';
+import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasConfig';
+import GasStepSelect from '../../../components/GasCustomize/GasConfig';
 
 const { Text } = Typography;
 
@@ -128,7 +128,7 @@ export const FormWithdrawStakingReward = () => {
     const syncRewardsData = async () => {
       setIsRewardsLoading(true);
       const currentMarketData = allMarketData.get(
-        `${walletAsset?.mainnetSymbol}-${currentSession?.currency}`,
+        `${walletAsset?.assetType}-${walletAsset?.mainnetSymbol}-${currentSession?.currency}`,
       );
 
       const allRewards: RewardTransactionData[] = await walletService.retrieveAllRewards(
@@ -642,7 +642,7 @@ export const FormWithdrawStakingReward = () => {
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
                   getAssetRewardsBalancePrice(walletAsset, marketData),
                 ).format('0,0.00')} ${marketData?.currency}
-                    `
+                  `
                 : ''}
             </div>
           </div>

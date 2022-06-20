@@ -2,18 +2,19 @@ import numeral from 'numeral';
 import { useMemo } from 'react';
 import { getRecoil } from 'recoil-nexus';
 import { SUPPORTED_CURRENCY } from '../config/StaticConfig';
-import { getAssetAmountInFiat } from '../models/UserAsset';
+import { getAssetAmountInFiat, UserAssetType } from '../models/UserAsset';
 import { allMarketState, sessionState } from '../recoil/atom';
 
 interface Props {
+  assetType: UserAssetType;
   symbol: string;
   amount: string;
 }
-export const useMarketPrice = ({ symbol, amount }: Props) => {
+export const useMarketPrice = ({ assetType, symbol, amount }: Props) => {
   const allMarketData = getRecoil(allMarketState);
   const currentSession = getRecoil(sessionState);
 
-  const assetMarketData = allMarketData.get(`${symbol}-${currentSession.currency}`);
+  const assetMarketData = allMarketData.get(`${assetType}-${symbol}-${currentSession.currency}`);
 
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
 

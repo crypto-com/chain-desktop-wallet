@@ -1,40 +1,44 @@
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Form, Tooltip } from 'antd';
+import { ethers } from 'ethers';
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../config/StaticConfig';
-import { useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
-import { getNormalScaleAmount } from '../../utils/NumberUtils';
-import { useCustomGasModalTendermint } from './CustomGasModalTendermint';
+import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../../config/StaticConfig';
+import { UserAsset } from '../../../models/UserAsset';
+import { getNormalScaleAmount } from '../../../utils/NumberUtils';
+import { useCustomGasModalEVM } from './GasModal';
 
-export const GasInfoTendermint = () => {
-  const asset = useCronosTendermintAsset();
-  const [readableGasFee, setReadableGasFee] = useState('');
+interface GasInfoEVMProps {
+  asset: UserAsset;
+}
+
+export const GasInfoEVM = ({ asset }: GasInfoEVMProps) => {
+
   const [t] = useTranslation();
+  const gasPrice = useMemo(() => asset.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE, [asset]);
+  const gasLimit = useMemo(() => asset.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT, [asset]);
+  const [readableGasFee, setReadableGasFee] = useState('');
 
-  const updateFee = (newNetworkFee: string) => {
-    const amount = getNormalScaleAmount(newNetworkFee, asset!);
+  const updateFee = (newGasPrice: string, newGasLimit: string) => {
+    const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(
+      ethers.BigNumber.from(newGasPrice),
+    );
 
-    setReadableGasFee(`${amount} ${asset!.symbol}`);
+    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset);
+
+    setReadableGasFee(`${amount} ${asset.symbol}`);
   };
 
   useEffect(() => {
-    if (!asset) {
-      return;
-    }
-    updateFee(asset.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE);
-  }, [asset]);
+    updateFee(gasPrice, gasLimit);
+  }, [asset, gasPrice, gasLimit]);
 
   return (
     <>
       <div className="item">
         <div className="label">{t('estimate-network-fee')}</div>
         <div>{readableGasFee}</div>
-      </div>
-      <div className="item">
-        <div className="label">{t('estimate-time')}</div>
-        <div>6s</div>
       </div>
     </>
   );
@@ -50,7 +54,7 @@ const GasStep = (props: { isUsingCustomFee: boolean }) => {
             marginBottom: '0px',
           }}
         >
-          Custom
+          {t('general.custom')}
         </p>
         <p
           style={{
@@ -81,25 +85,34 @@ const GasStep = (props: { isUsingCustomFee: boolean }) => {
   );
 };
 
-const GasStepSelectTendermint = (props: {
-  onChange?: (gasLimit: string, networkFee: string) => void;
-}) => {
-  const { onChange } = props;
+interface IGasConfigProps {
+  asset: UserAsset;
+  onChange?: (gasLimit: string, gasPrice: string) => void
+}
+
+const GasConfig = ({ onChange, asset }: IGasConfigProps) => {
 
   const [t] = useTranslation();
-  const asset = useCronosTendermintAsset();
+  const [gasPrice, setGasPrice] = useState(asset?.config?.fee?.networkFee ?? EVM_MINIMUM_GAS_PRICE);
+  const [gasLimit, setGasLimit] = useState(asset?.config?.fee?.gasLimit ?? EVM_MINIMUM_GAS_LIMIT);
+  const [isUsingCustomGas, setIsUsingCustomGas] = useState(false);
 
-  const [networkFee, setNetworkFee] = useState(asset!.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE);
-  const [gasLimit, setGasLimit] = useState(asset!.config?.fee?.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT);
-
-  const [isUsingCustomFee, setIsUsingCustomFee] = useState(false);
-  const { show, dismiss } = useCustomGasModalTendermint(asset!, networkFee, gasLimit);
+  const { show, dismiss } = useCustomGasModalEVM(asset!, gasPrice, gasLimit);
 
   const [readableGasFee, setReadableGasFee] = useState('');
 
-  const updateFee = (newNetworkFee: string) => {
-    setIsUsingCustomFee(newNetworkFee !== FIXED_DEFAULT_FEE);
-    const amount = getNormalScaleAmount(newNetworkFee, asset!);
+  const updateFee = (newGasPrice: string, newGasLimit: string) => {
+    if (newGasPrice !== EVM_MINIMUM_GAS_PRICE || newGasLimit !== EVM_MINIMUM_GAS_LIMIT) {
+      setIsUsingCustomGas(true);
+    } else {
+      setIsUsingCustomGas(false);
+    }
+
+    const amountBigNumber = ethers.BigNumber.from(newGasLimit).mul(
+      ethers.BigNumber.from(newGasPrice),
+    );
+
+    const amount = getNormalScaleAmount(amountBigNumber.toString(), asset!);
 
     setReadableGasFee(`${amount} ${asset!.symbol}`);
   };
@@ -108,8 +121,8 @@ const GasStepSelectTendermint = (props: {
     if (!asset) {
       return;
     }
-    updateFee(asset.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE);
-  }, [asset]);
+    updateFee(gasPrice, gasLimit);
+  }, [gasPrice, gasLimit]);
 
   return (
     <Form.Item
@@ -118,11 +131,9 @@ const GasStepSelectTendermint = (props: {
           style={{
             display: 'flex',
             alignItems: 'center',
-            marginTop: '10px',
           }}
         >
-          <div className="label">{t('confirmation-speed')}</div>
-
+          <div style={{ marginRight: 4 }}>{t('confirmation-speed')}</div>
           <Tooltip
             style={{ cursor: 'pointer' }}
             title={t('sending-crypto-on-blockchain-requires-confirmation')}
@@ -148,7 +159,7 @@ const GasStepSelectTendermint = (props: {
             alignItems: 'flex-start',
           }}
         >
-          <GasStep isUsingCustomFee={isUsingCustomFee} />
+          <GasStep isUsingCustomFee={isUsingCustomGas} />
         </div>
         <p
           style={{
@@ -162,14 +173,14 @@ const GasStepSelectTendermint = (props: {
         style={{ float: 'right', marginTop: '4px' }}
         onClick={() => {
           show({
-            onCancel: () => {},
+            onCancel: () => { },
             onSuccess: (newGasLimit, newGasFee) => {
               onChange?.(newGasLimit, newGasFee);
               dismiss();
 
-              setGasLimit(newGasLimit.toString());
-              setNetworkFee(newGasFee.toString());
-              updateFee(newGasFee.toString());
+              setGasLimit(newGasLimit);
+              setGasPrice(newGasFee);
+              updateFee(newGasFee, newGasLimit);
             },
           });
         }}
@@ -180,4 +191,4 @@ const GasStepSelectTendermint = (props: {
   );
 };
 
-export default GasStepSelectTendermint;
+export default GasConfig;
