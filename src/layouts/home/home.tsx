@@ -774,6 +774,49 @@ function HomeLayout(props: HomeLayoutProps) {
       menuSelectedKey = '/home';
     }
 
+    const homeMenuItemList = [
+      {
+        label: conditionalLink('/home', t('navbar.home')),
+        key: '/home',
+        icon: <Icon component={IconHome} />,
+      },
+      {
+        label: conditionalLink('/staking', t('navbar.staking')),
+        key: '/staking',
+        icon: <Icon component={IconStaking} />,
+      },
+      {
+        label: conditionalLink('/assets', t('navbar.assets')),
+        key: '/assets',
+        icon: <Icon component={IconAssets} />,
+      },
+      {
+        label: conditionalLink('/bridge', t('navbar.bridge')),
+        key: '/bridge',
+        icon: <Icon component={IconCronos} />,
+      },
+      {
+        label: conditionalLink('/dapp', t('navbar.dapp')),
+        key: '/dapp',
+        icon: <Icon component={IconDApp} />,
+      },
+      {
+        label: conditionalLink('/governance', t('navbar.governance')),
+        key: '/governance',
+        icon: <BankOutlined />,
+      },
+      {
+        label: conditionalLink('/nft', t('navbar.nft')),
+        key: '/nft',
+        icon: <Icon component={IconNft} />,
+      },
+      {
+        label: conditionalLink('/settings', t('navbar.settings')),
+        key: '/settings',
+        icon: <SettingOutlined />,
+      },
+    ];
+
     return (
       <Menu
         theme="dark"
@@ -786,91 +829,58 @@ function HomeLayout(props: HomeLayoutProps) {
             setNavbarMenuSelectedKey(item.key as NavbarMenuKey);
           }
         }}
-      >
-        <Menu.Item key="/home" icon={<Icon component={IconHome} />}>
-          {conditionalLink('/home', t('navbar.home'))}
-        </Menu.Item>
-        <Menu.Item key="/staking" icon={<Icon component={IconStaking} />}>
-          {conditionalLink('/staking', t('navbar.staking'))}
-        </Menu.Item>
-        <Menu.Item key="/assets" icon={<Icon component={IconAssets} />}>
-          {conditionalLink('/assets', t('navbar.assets'))}
-        </Menu.Item>
-        <Menu.Item key="/bridge" icon={<Icon component={IconCronos} />}>
-          {conditionalLink('/bridge', t('navbar.bridge'))}
-        </Menu.Item>
-        {!checkIfTestnet(session.wallet.config.network) && (
-          <Menu.Item key="/dapp" icon={<Icon component={IconDApp} />}>
-            {conditionalLink('/dapp', t('navbar.dapp'))}
-          </Menu.Item>
-        )}
-        {/* <Menu.Item key="/send" icon={<Icon component={IconSend} />}>
-          <Link to="/send">{t('navbar.send')}</Link>
-        </Menu.Item>
-        <Menu.Item key="/receive" icon={<Icon component={IconReceive} />}>
-          <Link to="/receive">{t('navbar.receive')}</Link>
-        </Menu.Item> */}
-        <Menu.Item key="/governance" icon={<BankOutlined />}>
-          {conditionalLink('/governance', t('navbar.governance'))}
-        </Menu.Item>
-        <Menu.Item key="/nft" icon={<Icon component={IconNft} />}>
-          {conditionalLink('/nft', t('navbar.nft'))}
-        </Menu.Item>
-        <Menu.Item key="/settings" icon={<SettingOutlined />}>
-          {conditionalLink('/settings', t('navbar.settings'))}
-        </Menu.Item>
-      </Menu>
+        items={homeMenuItemList}
+      />
     );
   };
 
   const WalletMenu = () => {
+    const walletMenuItemList = [
+      ...(walletList.length <= LedgerWalletMaximum
+        ? [
+            {
+              label: conditionalLink('/restore', t('navbar.wallet.restore')),
+              key: 'restore-wallet-item',
+              className: 'restore-wallet-item',
+              icon: <ReloadOutlined style={{ color: '#1199fa' }} />,
+            },
+            {
+              label: conditionalLink('/create', t('navbar.wallet.create')),
+              key: 'create-wallet-item',
+              className: 'create-wallet-item',
+              icon: <PlusOutlined style={{ color: '#1199fa' }} />,
+            },
+          ]
+        : []),
+      ...(walletList.length > 1
+        ? [
+            {
+              label: t('navbar.wallet.delete'),
+              key: 'delete-wallet-item',
+              className: 'delete-wallet-item',
+              icon: <DeleteOutlined style={{ color: '#f27474' }} />,
+            },
+          ]
+        : []),
+      {
+        label: conditionalLink('/wallet', t('navbar.wallet.list')),
+        key: 'wallet-list-item',
+        className: 'wallet-list-item',
+        icon: <Icon component={IconWallet} style={{ color: '#1199fa' }} />,
+      }, // which is required
+    ];
+
     return (
-      <Menu>
-        {walletList.length <= LedgerWalletMaximum ? (
-          <>
-            <Menu.Item
-              className="restore-wallet-item"
-              key="restore-wallet-item"
-              icon={<ReloadOutlined style={{ color: '#1199fa' }} />}
-            >
-              {conditionalLink('/restore', t('navbar.wallet.restore'))}
-            </Menu.Item>
-            <Menu.Item
-              className="create-wallet-item"
-              key="create-wallet-item"
-              icon={<PlusOutlined style={{ color: '#1199fa' }} />}
-            >
-              {conditionalLink('/create', t('navbar.wallet.create'))}
-            </Menu.Item>
-          </>
-        ) : (
-          ''
-        )}
-        {walletList.length > 1 ? (
-          <>
-            <Menu.Item
-              className="delete-wallet-item"
-              key="delete-wallet-item"
-              icon={<DeleteOutlined style={{ color: '#f27474' }} />}
-              onClick={() => {
-                setDeleteWalletAddress(session.wallet.address);
-                setIsConfirmationModalVisible(true);
-              }}
-            >
-              {/* <DeleteOutlined /> */}
-              {t('navbar.wallet.delete')}
-            </Menu.Item>
-          </>
-        ) : (
-          ''
-        )}
-        <Menu.Item
-          key="wallet-list-item"
-          icon={<Icon component={IconWallet} style={{ color: '#1199fa' }} />}
-        >
-          {conditionalLink('/wallet', t('navbar.wallet.list'))}
-        </Menu.Item>
-      </Menu>
+      <Menu
+        items={walletMenuItemList}
+        onClick={({ key }) => {
+          if (key === 'delete-wallet-item') {
+            setDeleteWalletAddress(session.wallet.address);
+            setIsConfirmationModalVisible(true);
+          }
+        }}
+        className="wallet-menu"
+      />
     );
   };
 

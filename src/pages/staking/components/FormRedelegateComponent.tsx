@@ -5,6 +5,9 @@ import { Form, InputNumber, Alert, Input } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { OrderedListOutlined } from '@ant-design/icons';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
+
+import Big from 'big.js';
+
 import { validatorListState } from '../../../recoil/atom';
 import { Session } from '../../../models/Session';
 import { UserAsset } from '../../../models/UserAsset';
@@ -21,33 +24,51 @@ export const FormRedelegateComponent = (props: {
   currentSession: Session;
   walletAsset: UserAsset;
   moderationConfig: ModerationConfig;
+  // eslint-disable-next-line
   redelegateFormValues: {
     validatorOriginAddress: string;
     validatorDestinationAddress: string;
     redelegateAmount: string;
   };
+  // eslint-disable-next-line
+  setRedelegateFormValues: React.Dispatch<React.SetStateAction<any>>;
   form: FormInstance;
 }) => {
-  useEffect(() => props.form.resetFields(), [props]);
+  const [t] = useTranslation();
+
+  const { form: redelegationForm } = props;
+
+  let customAddressValidator = TransactionUtils.addressValidator(
+    props.currentSession,
+    props.walletAsset,
+    AddressType.VALIDATOR,
+  );
+
+  let customMaxValidator = TransactionUtils.maxValidator(
+    redelegationForm.getFieldValue('redelegateAmount'),
+    t('general.redelegateFormComponent.maxValidator.error'),
+  );
+
+  useEffect(() => {
+    customMaxValidator = TransactionUtils.maxValidator(
+      redelegationForm.getFieldValue('redelegateAmount'),
+      t('general.redelegateFormComponent.maxValidator.error'),
+    );
+
+    customAddressValidator = TransactionUtils.addressValidator(
+      props.currentSession,
+      props.walletAsset,
+      AddressType.VALIDATOR,
+    );
+  }, [props]);
 
   const currentValidatorList = useRecoilValue(validatorListState);
   const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
-  const [t] = useTranslation();
 
   const redelegatePeriod =
     props.currentSession.wallet.config.name === 'MAINNET'
       ? UNBLOCKING_PERIOD_IN_DAYS.REDELEGATION.MAINNET
       : UNBLOCKING_PERIOD_IN_DAYS.REDELEGATION.OTHERS;
-
-  const customAddressValidator = TransactionUtils.addressValidator(
-    props.currentSession,
-    props.walletAsset,
-    AddressType.VALIDATOR,
-  );
-  const customMaxValidator = TransactionUtils.maxValidator(
-    props.redelegateFormValues.redelegateAmount,
-    t('general.redelegateFormComponent.maxValidator.error'),
-  );
 
   return (
     <div className="redelegate-form">
@@ -69,7 +90,7 @@ export const FormRedelegateComponent = (props: {
               currentValidatorList={currentValidatorList}
               moderationConfig={props.moderationConfig}
               setIsValidatorListVisible={setIsValidatorListVisible}
-              form={props.form}
+              form={redelegationForm}
             />
           </div>
         </ModalPopup>
@@ -82,21 +103,24 @@ export const FormRedelegateComponent = (props: {
       </div>
       <div className="item">
         <div className="label">{t('general.redelegateFormComponent.label2')}</div>
-        <div className="address">{`${props.redelegateFormValues?.validatorOriginAddress}`}</div>
+        <div className="address">{redelegationForm.getFieldValue('validatorOriginAddress')}</div>
       </div>
       <div className="item">
         <Form
-          form={props.form}
+          form={redelegationForm}
           layout="vertical"
           requiredMark={false}
           initialValues={{
-            redelegateAmount: props.redelegateFormValues.redelegateAmount,
+            undelegateAmount: redelegationForm.getFieldValue('redelegateAmount'),
+            validatorDestinationAddress: redelegationForm.getFieldValue(
+              'validatorDestinationAddress',
+            ),
+            validatorOriginAddress: redelegationForm.getFieldValue('validatorOriginAddress'),
           }}
         >
           <Form.Item
             name="validatorDestinationAddress"
             label={t('general.redelegateFormComponent.table.validatorDestinationAddress.label')}
-            hasFeedback
             validateFirst
             rules={[
               {
@@ -137,7 +161,22 @@ export const FormRedelegateComponent = (props: {
               customMaxValidator,
             ]}
           >
-            <InputNumber stringMode />
+            <InputNumber
+              stringMode
+              onChange={(val: string) => {
+                const curval = val ? Big(val.toString()).toString() : '0';
+                const curOrigin = redelegationForm.getFieldValue('validatorOriginAddress');
+                const curDestination = redelegationForm.getFieldValue(
+                  'validatorDestinationAddress',
+                );
+
+                redelegationForm.setFieldsValue({
+                  validatorOriginAddress: curOrigin,
+                  validatorDestinationAddress: curDestination,
+                  redelegateAmount: curval,
+                });
+              }}
+            />
           </Form.Item>
         </Form>
       </div>

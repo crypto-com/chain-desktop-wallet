@@ -42,7 +42,7 @@
     "@typechain/ethers-v5": "^9.0.0",
     "@types/bluebird": "3.5.36",
     "ansi-html": "0.0.8",
-    "antd": "4.18.0",
+    "antd": "4.21.0",
     "axios": "0.21.2",
     "bech32": "2.0.0",
     "bfj": "7.0.2",

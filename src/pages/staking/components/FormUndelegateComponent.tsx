@@ -2,6 +2,9 @@ import { FormInstance } from 'antd/lib/form';
 import { Form, InputNumber, Checkbox } from 'antd';
 import { useTranslation } from 'react-i18next';
 import React, { useEffect } from 'react';
+
+import Big from 'big.js';
+
 import { Session } from '../../../models/Session';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { UNBLOCKING_PERIOD_IN_DAYS } from '../../../config/StaticConfig';
@@ -9,19 +12,31 @@ import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/G
 
 export const FormUndelegateComponent = (props: {
   currentSession: Session;
+  // eslint-disable-next-line
   undelegateFormValues: { validatorAddress: string; undelegateAmount: string };
+  // eslint-disable-next-line
+  setUndelegateFormValues: React.Dispatch<React.SetStateAction<any>>;
   isChecked: boolean;
   setIsChecked;
   form: FormInstance;
 }) => {
   const [t] = useTranslation();
 
-  useEffect(() => props.form.resetFields(), [props]);
+  const { form: undelegationForm } = props;
 
-  const customMaxValidator = TransactionUtils.maxValidator(
-    props.undelegateFormValues.undelegateAmount,
+  let customMaxValidator = TransactionUtils.maxValidator(
+    undelegationForm.getFieldValue('undelegateAmount'),
     t('general.undelegateFormComponent.maxValidator.error'),
   );
+
+  useEffect(() => {
+    // undelegationForm.resetFields();
+
+    customMaxValidator = TransactionUtils.maxValidator(
+      undelegationForm.getFieldValue('undelegateAmount'),
+      t('general.undelegateFormComponent.maxValidator.error'),
+    );
+  }, [props]);
 
   const undelegatePeriod =
     props.currentSession.wallet.config.name === 'MAINNET'
@@ -38,15 +53,15 @@ export const FormUndelegateComponent = (props: {
       </div>
       <div className="item">
         <div className="label">{t('general.undelegateFormComponent.label2')}</div>
-        <div className="address">{props.undelegateFormValues?.validatorAddress}</div>
+        <div className="address">{undelegationForm.getFieldValue('validatorAddress')}</div>
       </div>
       <div className="item">
         <Form
-          form={props.form}
+          form={undelegationForm}
           layout="vertical"
           requiredMark={false}
           initialValues={{
-            undelegateAmount: props.undelegateFormValues.undelegateAmount,
+            undelegateAmount: undelegationForm.getFieldValue('undelegateAmount'),
           }}
         >
           <Form.Item
@@ -69,7 +84,17 @@ export const FormUndelegateComponent = (props: {
               customMaxValidator,
             ]}
           >
-            <InputNumber />
+            <InputNumber
+              stringMode
+              onChange={(val: string) => {
+                const curval = val ? Big(val.toString()).toString() : '0';
+                const curAddress = undelegationForm.getFieldValue('validatorAddress');
+                undelegationForm.setFieldsValue({
+                  validatorAddress: curAddress,
+                  undelegateAmount: curval,
+                });
+              }}
+            />
           </Form.Item>
         </Form>
       </div>
