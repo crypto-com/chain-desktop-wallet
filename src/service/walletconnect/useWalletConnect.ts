@@ -1,6 +1,6 @@
 import WalletConnect from '@walletconnect/client';
 import { IJsonRpcRequest } from '@walletconnect/types';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { useRefCallback } from '../../hooks/useRefCallback';
 import { DefaultState, walletConnectStateAtom } from './store';
@@ -16,9 +16,7 @@ export const useWalletConnect = () => {
   //   setRecoil(walletConnectStateAtom, {...state, ...newState});
   // };
 
-  useEffect(() => {
-    // clearCachedSession();
-
+  const restoreSession = () => {
     const session = getCachedSession();
 
     if (session) {
@@ -39,11 +37,7 @@ export const useWalletConnect = () => {
         resetApp();
       }
     }
-
-    return () => {
-      // killSession();
-    };
-  }, []);
+  };
 
   const log = (message?: any, ...optionalParams: any[]) => {
     console.log('[WalletConnect] ', message, ...optionalParams);
@@ -233,6 +227,7 @@ export const useWalletConnect = () => {
     approveSession,
     rejectSession,
     killSession,
+    restoreSession,
     state,
   };
 };

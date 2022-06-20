@@ -221,7 +221,7 @@
   },
   "lint-staged": {
     "src/**/*.{js,jsx,tsx,ts,less,md,json}": [
-      "prettier --write"
+      "eslint --fix"
     ],
     "src/**/*.less": [
       "stylelint --fix less",

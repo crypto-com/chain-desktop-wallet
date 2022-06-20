@@ -1,15 +1,11 @@
-import { SettingOutlined } from '@ant-design/icons';
-import { Button, Menu, Modal, Spin } from 'antd';
 import * as React from 'react';
-import { useCallback, useEffect, useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useCallback, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
 import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
 import { navbarMenuSelectedKeyState } from '../../../recoil/atom';
-import { walletConnectStateAtom } from '../../../service/walletconnect/store';
 import { useWalletConnect } from '../../../service/walletconnect/useWalletConnect';
 import { ConnectModal } from './ConnectModal';
-import { PeerMetaInfo } from './PeerMetaInfo';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -18,7 +14,7 @@ const APP_PROTOCOL_NAME = 'ledgerlive';
 const WALLET_CONNECT_PAGE_KEY = '/walletconnect';
 
 export const WalletConnectModal = () => {
-  const { connect, state } = useWalletConnect();
+  const { connect, state, restoreSession } = useWalletConnect();
   const history = useHistory();
 
   const cronosAsset = useCronosEvmAsset();
@@ -59,7 +55,13 @@ export const WalletConnectModal = () => {
   );
 
   useEffect(() => {
+
+  }, []);
+
+
+  useEffect(() => {
     ipcRenderer.on('open-url', handleOpenURL);
+    restoreSession();
 
     return () => {
       ipcRenderer.removeListener('open-url', handleOpenURL);
