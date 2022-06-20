@@ -14,6 +14,6 @@ Once we receive a vulnerability report, Crypto.com will take these steps to addr
 4. Crypto.com will publicly release the security patch for the vulnerability, and acknowledge the security fix in the release notes once the issue has been resolved. Public release notes can reference to the person or people who reported the vulnerability, unless they wish to stay anonymous.
 
 ## Contact Us
-If you find a security issue, you can contact our team directly at [chain-security@crypto.org](mailto:chain-security@crypto.org).
+If you find a security issue, you can contact our team directly at [contact@crypto.com](mailto:contact@crypto.com).
 To communicate sensitive information, you can use the latest key in the 
 [cryptocom's Keybase account](https://keybase.io/cryptocom/pgp_keys.asc) or use its [chat functionality](https://keybase.io/cryptocom/chat).
