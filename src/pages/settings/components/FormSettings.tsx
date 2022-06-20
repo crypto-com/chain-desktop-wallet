@@ -21,7 +21,6 @@ import { GeneralSettingsForm } from './GeneralSettingsForm';
 import { MetaInfoComponent } from './MetaInfoComponent';
 import { getAssetConfigFromWalletConfig } from '../utils';
 import Support from '../tabs/Support/Support';
-import About from '../tabs/About/About';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -346,9 +345,6 @@ export const FormSettings = () => {
                 </TabPane>
                 <TabPane tab={t('settings.support.title')} key="support">
                   <Support />
-                </TabPane>
-                <TabPane tab={t('settings.about.title')} key="about">
-                  <About />
                 </TabPane>
               </Tabs>
             </Form>
