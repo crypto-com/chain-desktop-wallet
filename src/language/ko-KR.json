@@ -747,5 +747,11 @@
   "settings.revoke": "취소",
   "settings.revoke.unlimited": "무제한",
   "settings.noApproval": "승인 데이터가 없습니다",
+  "settings.support.title": "지원",
+  "settings.support.helpCenter.title": "지원 센터",
+  "settings.support.helpCenter.description": "크립토닷컴 디파이 데스크톱 지갑에 대한 자세한 정보- 시작하기, 지갑관리, 입출금",
+  "settings.support.feedbackForm.title": "피드백 양식",
+  "settings.support.feedbackForm.description": "크립토닷컴 디파이 데스크탑 지갑과 관련된 피드백, 질문, 불만 사항이 있는 경우 피드백 양식을 작성해 주세요.",
+  "settings.about.title": "자세한 사항",
   "settings.about.termsAndConditions.title": "이용 약관"
 }
