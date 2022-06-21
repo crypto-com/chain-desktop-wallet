@@ -2,17 +2,20 @@ import { CheckOutlined } from '@ant-design/icons';
 import { Modal, Spin } from 'antd';
 import * as React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useRecoilState } from 'recoil';
+import { walletConnectPeerMetaAtom } from '../../../service/walletconnect/store';
 import { useWalletConnect } from '../../../service/walletconnect/useWalletConnect';
 import { PeerMetaInfo } from './PeerMetaInfo';
 
 export const ConnectModal = (props: { address: string }) => {
   const { rejectSession, approveSession, state } = useWalletConnect();
-  const { loading, peerMeta, fetchingPeerMeta, connected } = state;
+  const { loading, fetchingPeerMeta, connected } = state;
+  const [peerMeta, setPeerMeta] = useRecoilState(walletConnectPeerMetaAtom);
   const [t] = useTranslation();
 
   return (
     <Modal
-      visible={fetchingPeerMeta || (!connected && peerMeta !== null)}
+      visible={fetchingPeerMeta || (!connected && peerMeta?.name !== undefined)}
       okText="Approve"
       okButtonProps={{ disabled: loading }}
       cancelText="Reject"
@@ -35,7 +38,7 @@ export const ConnectModal = (props: { address: string }) => {
         }}
       >
         {loading && <Spin style={{ left: 'auto' }} />}
-        {peerMeta && (
+        {peerMeta?.name && (
           <div style={{ textAlign: 'center' }}>
             <div
               style={{
@@ -49,7 +52,7 @@ export const ConnectModal = (props: { address: string }) => {
                   width: '64px',
                   height: '64px',
                 }}
-                src={peerMeta.icons[0]}
+                src={peerMeta?.icons?.[0]}
               />
               <div
                 style={{

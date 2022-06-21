@@ -3,13 +3,14 @@ import { IJsonRpcRequest } from '@walletconnect/types';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { useRefCallback } from '../../hooks/useRefCallback';
-import { DefaultState, walletConnectStateAtom } from './store';
+import { DefaultState, walletConnectConnectorAtom, walletConnectPeerMetaAtom, walletConnectStateAtom } from './store';
 import { clearCachedSession, getCachedSession } from './utils';
 
 export const useWalletConnect = () => {
   const [chainId, setChainId] = useState(0);
   const [state, setState] = useRecoilState(walletConnectStateAtom);
-  const { connector } = state;
+  const [connector, setConnector] = useRecoilState(walletConnectConnectorAtom);
+  const [peerMeta, setPeerMeta] = useRecoilState(walletConnectPeerMetaAtom);
   // const state = getRecoil(walletConnectStateAtom);
 
   // const setState = (newState: Partial<WalletConnectState>) => {
@@ -27,11 +28,10 @@ export const useWalletConnect = () => {
 
         setState({
           ...state,
-          connector,
           connected,
           address: accounts[0],
-          peerMeta,
         });
+        setPeerMeta({...peerMeta});
         subscribeToEvents.current(connector);
       } catch {
         resetApp();
@@ -56,6 +56,8 @@ export const useWalletConnect = () => {
     log('ACTION', 'killSession');
     try {
       await connector?.killSession();
+    } catch (error) {
+      log('ERROR', error);
     } finally {
       resetApp();
     }
@@ -88,26 +90,26 @@ export const useWalletConnect = () => {
       if (!connector.connected) {
         setState({
           ...state,
-          peerMeta: null,
           fetchingPeerMeta: true,
           loading: true,
-          connector,
         });
+        setPeerMeta({...peerMeta});
+        setConnector(connector);
         await connector.createSession({ chainId });
       } else if (connector.peerMeta) {
         log('connector.peerMeta', connector.peerMeta);
         setState({
           ...state,
-          peerMeta: connector.peerMeta,
           connected: false,
           loading: false,
-          connector,
         });
+        setPeerMeta({...peerMeta});
+        setConnector(connector);
       } else {
         setState({
           ...state,
-          connector,
         });
+        setConnector(connector);
       }
     } catch (error) {
       setState({
@@ -123,6 +125,8 @@ export const useWalletConnect = () => {
     setState({
       ...DefaultState,
     });
+    setConnector(null);
+    setPeerMeta(null);
     setChainId(0);
     clearCachedSession();
   };
@@ -141,11 +145,11 @@ export const useWalletConnect = () => {
         const { peerMeta } = payload.params[0];
         setState({
           ...state,
-          peerMeta,
-          connector,
           fetchingPeerMeta: false,
           loading: false,
         });
+        setPeerMeta({...peerMeta});
+        setConnector(connector);
       });
 
       connector.on('session_update', error => {

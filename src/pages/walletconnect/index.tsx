@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useRecoilState } from 'recoil';
-import { walletConnectStateAtom } from '../../service/walletconnect/store';
+import { walletConnectPeerMetaAtom, walletConnectStateAtom } from '../../service/walletconnect/store';
 import { Badge, Button, Layout } from 'antd';
 import { Content, Footer, Header } from 'antd/lib/layout/layout';
 import { useTranslation } from 'react-i18next';
@@ -12,8 +12,7 @@ const WalletConnectTab = () => {
   const [t] = useTranslation();
   const { killSession } = useWalletConnect();
   const [state, setState] = useRecoilState(walletConnectStateAtom);
-
-  const { peerMeta, address } = state;
+  const [peerMeta, setPeerMeta] = useRecoilState(walletConnectPeerMetaAtom);
 
   if (!peerMeta) {
     return <div>Not Connected</div>;
@@ -41,7 +40,7 @@ const WalletConnectTab = () => {
             }}
             count={<Icon style={{ color: 'white' }} component={IconWalletConnect} />}
           >
-            <img style={{ width: '72px' }} src={peerMeta.icons[0]} />
+            <img style={{ width: '72px' }} src={peerMeta?.icons?.[0] ?? ''} />
           </Badge>
           <div style={{ marginTop: '12px', fontSize: '22px', fontWeight: 'bold' }}>
             {peerMeta.name}
@@ -61,7 +60,7 @@ const WalletConnectTab = () => {
                 padding: '16px',
               }}
             >
-              {address}
+              {state.address}
             </div>
           </div>
           <Button
