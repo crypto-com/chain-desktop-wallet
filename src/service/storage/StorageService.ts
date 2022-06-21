@@ -396,11 +396,14 @@ export class StorageService {
       },
     );
 
-    // Insert to common transactoin store
-    await this.insertCommonTransactionRecords(rewardTxRecords);
+    // Delay inserts to avoid remove records failure
+    setTimeout(async () => {
+      // Insert to common transactoin store
+      await this.insertCommonTransactionRecords(rewardTxRecords);
 
-    // Insert to common Attributes store
-    await this.updateCommonAttributes(rewardAttributeRecord);
+      // Insert to common Attributes store
+      await this.updateCommonAttributes(rewardAttributeRecord);
+    }, 2_000);
 
     // @deprecated
     /**

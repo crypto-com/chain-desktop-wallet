@@ -81,7 +81,7 @@ import CronosBridgeForm from './components/CronosBridgeForm';
 import { secretStoreService } from '../../service/storage/SecretStoreService';
 import { BridgeTransferRequest } from '../../service/TransactionRequestModels';
 import IconTransferHistory from '../../svg/IconTransferHistory';
-import { BridgeIcon, ICON_CRO_EVM } from '../../components/AssetIcon';
+import { BridgeIcon, ICON_BRIDGE_CRONOS } from '../../components/AssetIcon';
 
 const { Content, Sider } = Layout;
 const { Step } = Steps;
@@ -1050,7 +1050,7 @@ const CronosBridge = props => {
             </ModalPopup>
           </div>
           <div>
-            <img src={ICON_CRO_EVM} alt="cronos" />
+            <img src={ICON_BRIDGE_CRONOS} alt="cronos" />
           </div>
         </>
       ) : (
@@ -1114,7 +1114,7 @@ const BridgePage = () => {
             <div className="go-to-cronos-bridge">
               <a>
                 <div onClick={() => setView('cronos-bridge')}>
-                  <img src={ICON_CRO_EVM} alt="cronos" style={{ height: '24px' }} />
+                  <img src={ICON_BRIDGE_CRONOS} alt="cronos" style={{ height: '24px' }} />
                   <span>{t('bridge.action.backToCronosBridge')}</span>
                 </div>
               </a>

@@ -4,7 +4,6 @@ import 'antd/dist/antd.css';
 import { Checkbox, Divider, Form, Input, InputNumber, message, Select } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
-
 import _ from 'lodash';
 import { sessionState, walletAllAssetsState } from '../../../recoil/atom';
 import { walletService } from '../../../service/WalletService';

@@ -54,16 +54,17 @@
     }
     .logo {
       position: relative;
-      height: 24px;
-      margin-top: 20px;
+      height: 28px;
       margin-bottom: 20px;
       background: url('../../assets/logo-products-chain.svg');
       background-repeat: no-repeat;
+      background-position: center;
       background-size: contain;
     }
     .version {
       color: @font-color;
       font-size: 12px;
+      text-align: center;
     }
     .wallet-selection {
       position: absolute;
@@ -150,15 +151,19 @@
   }
 }
 
-.ant-dropdown {
-  ul.ant-menu-root {
+.wallet-menu.ant-dropdown-menu {
+  ul.ant-dropdown-menu-root {
     margin-bottom: 16px;
     border-radius: 8px;
     box-shadow: 0 4px 10px 3px rgba(0, 0, 0, 0.05);
   }
-  .ant-menu-item {
+  .ant-dropdown-menu-item {
+    padding: 10px 12px;
     a,
     div {
+      color: @azure;
+    }
+    a:hover {
       color: @azure;
     }
     .anticon {

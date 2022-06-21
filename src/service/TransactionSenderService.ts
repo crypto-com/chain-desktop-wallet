@@ -2,6 +2,8 @@ import Web3 from 'web3';
 import { TransactionConfig } from 'web3-eth';
 import { ethers } from 'ethers';
 import {
+  RestakeStakingRewardTransactionUnsigned,
+  RestakeStakingAllRewardsTransactionUnsigned,
   DelegateTransactionUnsigned,
   TransferTransactionUnsigned,
   UndelegateTransactionUnsigned,
@@ -13,6 +15,8 @@ import {
   NFTMintUnsigned,
   EVMContractCallUnsigned,
   WithdrawAllStakingRewardsUnsigned,
+  MsgDepositTransactionUnsigned,
+  TextProposalTransactionUnsigned,
 } from './signers/TransactionSupported';
 import { BroadCastResult } from '../models/Transaction';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
@@ -20,6 +24,8 @@ import { NftType } from '../models/Nft';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
 import { DEFAULT_CLIENT_MEMO } from '../config/StaticConfig';
 import {
+  RestakeStakingRewardRequest,
+  RestakeStakingAllRewardsRequest,
   TransferRequest,
   DelegationRequest,
   UndelegationRequest,
@@ -31,6 +37,8 @@ import {
   BridgeTransferRequest,
   NFTDenomIssueRequest,
   NFTMintRequest,
+  DepositToProposalRequest,
+  TextProposalRequest,
 } from './TransactionRequestModels';
 import { StorageService } from './storage/StorageService';
 import { CronosClient } from './cronos/CronosClient';
@@ -375,6 +383,118 @@ export class TransactionSenderService {
     return broadCastResult;
   }
 
+  public async sendRestakeRewardTransaction(
+    restakeRequest: RestakeStakingRewardRequest,
+  ): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.transactionPrepareService.prepareTransaction();
+
+    const delegationAmountScaled = getBaseScaledAmount(restakeRequest.amount, restakeRequest.asset);
+
+    let { memo } = restakeRequest;
+    if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
+      memo = DEFAULT_CLIENT_MEMO;
+    }
+
+    const restakeTransaction: RestakeStakingRewardTransactionUnsigned = {
+      delegatorAddress: currentSession.wallet.address,
+      validatorAddress: restakeRequest.validatorAddress,
+      amount: String(delegationAmountScaled),
+      memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string;
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();
+
+    if (restakeRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signRestakeStakingRewardTx(
+        restakeTransaction,
+        restakeRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signRestakeStakingRewardTx(
+        restakeTransaction,
+        restakeRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await Promise.all([
+      await this.txHistoryManager.fetchAndUpdateBalances(currentSession),
+      await this.txHistoryManager.fetchAndSaveDelegations(nodeRpc, currentSession),
+    ]);
+
+    return broadCastResult;
+  }
+
+  public async sendRestakeAllRewardsTransaction(
+    restakeRequest: RestakeStakingAllRewardsRequest,
+  ): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.transactionPrepareService.prepareTransaction();
+
+    let { memo } = restakeRequest;
+    if (!memo && !currentSession.wallet.config.disableDefaultClientMemo) {
+      memo = DEFAULT_CLIENT_MEMO;
+    }
+
+    const restakeAllRewardsTransaction: RestakeStakingAllRewardsTransactionUnsigned = {
+      delegatorAddress: currentSession.wallet.address,
+      validatorAddressList: restakeRequest.validatorAddressList,
+      amountList: restakeRequest.amountList.map(rewardAmount =>
+        getBaseScaledAmount(rewardAmount, restakeRequest.asset),
+      ),
+      memo,
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string;
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();
+
+    if (restakeRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signRestakeAllStakingRewardsTx(
+        restakeAllRewardsTransaction,
+        restakeRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signRestakeAllStakingRewardsTx(
+        restakeAllRewardsTransaction,
+        restakeRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await Promise.all([
+      await this.txHistoryManager.fetchAndUpdateBalances(currentSession),
+      await this.txHistoryManager.fetchAndSaveDelegations(nodeRpc, currentSession),
+    ]);
+
+    return broadCastResult;
+  }
+
   public async sendUnDelegateTransaction(
     undelegationRequest: UndelegationRequest,
   ): Promise<BroadCastResult> {
@@ -526,6 +646,103 @@ export class TransactionSenderService {
       signedTxHex = await transactionSigner.signVoteTransaction(
         voteTransactionUnsigned,
         voteRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.txHistoryManager.fetchAndSaveProposals(currentSession);
+    return broadCastResult;
+  }
+
+  public async sendMsgDepositTx(
+    depositRequest: DepositToProposalRequest,
+  ): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.transactionPrepareService.prepareTransaction();
+
+    const depositToProposalUnsigned: MsgDepositTransactionUnsigned = {
+      proposalId: depositRequest.proposalId,
+      depositor: depositRequest.depositor,
+      amount: depositRequest.amount,
+      memo: '', // Todo: This can be brought up in future transactions
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();
+
+    if (depositRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signProposalDepositTransaction(
+        depositToProposalUnsigned,
+        depositRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signProposalDepositTransaction(
+        depositToProposalUnsigned,
+        depositRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    }
+
+    const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
+    await this.txHistoryManager.fetchAndSaveProposals(currentSession);
+    return broadCastResult;
+  }
+
+  /**
+   *
+   * @param textProposalSubmitRequest
+   */
+  public async sendSubmitTextProposalTransaction(
+    textProposalSubmitRequest: TextProposalRequest,
+  ): Promise<BroadCastResult> {
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      currentSession,
+      transactionSigner,
+      ledgerTransactionSigner,
+    } = await this.transactionPrepareService.prepareTransaction();
+
+    const submitTextProposalUnsigned: TextProposalTransactionUnsigned = {
+      params: {
+        description: textProposalSubmitRequest.description,
+        title: textProposalSubmitRequest.title,
+      },
+      proposer: textProposalSubmitRequest.proposer,
+      initialDeposit: textProposalSubmitRequest.initialDeposit,
+      memo: '', // Todo: This can be brought up in future transactions
+      accountNumber,
+      accountSequence,
+    };
+
+    let signedTxHex: string = '';
+    const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();
+
+    if (textProposalSubmitRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signSubmitTextProposalTransaction(
+        submitTextProposalUnsigned,
+        textProposalSubmitRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    } else {
+      signedTxHex = await transactionSigner.signSubmitTextProposalTransaction(
+        submitTextProposalUnsigned,
+        textProposalSubmitRequest.decryptedPhrase,
         networkFee,
         gasLimit,
       );
@@ -793,7 +1010,7 @@ export class TransactionSenderService {
     return bridgeTransactionResult;
   }
 
-  /* _______________________
+  /* _________________________
         NFT RELATED FUNCTIONS  
      _________________________ */
 
