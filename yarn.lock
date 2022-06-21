@@ -6575,6 +6575,17 @@ cosmiconfig@^7.0.0:
     path-type "^4.0.0"
     yaml "^1.10.0"
 
+cosmiconfig@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/cosmiconfig/-/cosmiconfig-7.0.1.tgz#714d756522cace867867ccb4474c5d01bbae5d6d"
+  integrity sha512-a1YWNUV2HwGimB7dU2s1wUMurNKjpx60HxBB6xUM8Re+2s1g1IIfJvFR0/iCF+XHdE0GMTKTuLR32UQff4TEyQ==
+  dependencies:
+    "@types/parse-json" "^4.0.0"
+    import-fresh "^3.2.1"
+    parse-json "^5.0.0"
+    path-type "^4.0.0"
+    yaml "^1.10.0"
+
 cosmjs-types@^0.4.0:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/cosmjs-types/-/cosmjs-types-0.4.1.tgz#3b2a53ba60d33159dd075596ce8267cfa7027063"
@@ -8796,6 +8807,17 @@ fast-glob@^3.1.1, fast-glob@^3.2.5:
     micromatch "^4.0.2"
     picomatch "^2.2.1"
 
+fast-glob@^3.2.7:
+  version "3.2.11"
+  resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.2.11.tgz#a1172ad95ceb8a16e20caa5c5e56480e5129c1d9"
+  integrity sha512-xrO3+1bxSo3ZVHAnqzyuewYT6aMFHRAd4Kcs92MAonjwQZLsK9d0SF1IyQ3k5PoirxTW0Oe/RqFgMQ6TcNE5Ew==
+  dependencies:
+    "@nodelib/fs.stat" "^2.0.2"
+    "@nodelib/fs.walk" "^1.2.3"
+    glob-parent "^5.1.2"
+    merge2 "^1.3.0"
+    micromatch "^4.0.4"
+
 fast-json-stable-stringify@^2.0.0, fast-json-stable-stringify@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/fast-json-stable-stringify/-/fast-json-stable-stringify-2.1.0.tgz"
@@ -8817,6 +8839,13 @@ fastq@^1.6.0:
   integrity sha512-7Eczs8gIPDrVzT+EksYBcupqMyxSHXXrHOLRRxU2/DicV8789MRBRR8+Hc2uWzUupOs4YS4JzBmBxjjCVBxD/g==
   dependencies:
     reusify "^1.0.4"
+
+fault@^1.0.0:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/fault/-/fault-1.0.4.tgz#eafcfc0a6d214fc94601e170df29954a4f842f13"
+  integrity sha512-CJ0HCB5tL5fYTEA7ToAq5+kTwd++Borf1/bifxd9iT70QcXr4MRrO3Llf8Ifs70q+SJcGHFtnIE/Nw6giCtECA==
+  dependencies:
+    format "^0.2.0"
 
 faye-websocket@^0.11.3:
   version "0.11.4"
@@ -9059,6 +9088,11 @@ form-data@~2.3.2:
     combined-stream "^1.0.6"
     mime-types "^2.1.12"
 
+format@^0.2.0:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/format/-/format-0.2.2.tgz#d6170107e9efdc4ed30c9dc39016df942b5cb58b"
+  integrity sha512-wzsgA6WOq+09wrU1tsJ09udeR/YZRaeArL9e1wPbFg3GG2yDnC2ldKpxs4xunpFF9DgqCqOIra3bc1HWrJ37Ww==
+
 forwarded@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.1.2.tgz"
@@ -9299,7 +9333,7 @@ github-from-package@0.0.0:
   resolved "https://registry.yarnpkg.com/github-from-package/-/github-from-package-0.0.0.tgz"
   integrity sha1-l/tdlr/eiXMxPyDoKI75oWf6ZM4=
 
-glob-parent@6.0.2, glob-parent@^3.1.0, glob-parent@^5.0.0, glob-parent@^5.1.0, glob-parent@~5.1.0:
+glob-parent@6.0.2, glob-parent@^3.1.0, glob-parent@^5.0.0, glob-parent@^5.1.0, glob-parent@^5.1.2, glob-parent@~5.1.0:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/glob-parent/-/glob-parent-6.0.2.tgz#6d237d99083950c79290f24c7642a3de9a28f9e3"
   integrity sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A==
@@ -10537,6 +10571,11 @@ is-plain-object@^2.0.3, is-plain-object@^2.0.4:
   dependencies:
     isobject "^3.0.1"
 
+is-plain-object@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-5.0.0.tgz#4427f50ab3429e9025ea7d52e9043a9ef4159344"
+  integrity sha512-VRSzKkbMm5jMDoKLbltAkFQ5Qr7VDiTFGXxYFXXowVj387GeGNOCsOH6Msy00SGZ3Fp84b1Naa1psqgcCIEP5Q==
+
 is-potential-custom-element-name@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/is-potential-custom-element-name/-/is-potential-custom-element-name-1.0.0.tgz"
@@ -11518,6 +11557,11 @@ known-css-properties@^0.21.0:
   resolved "https://registry.yarnpkg.com/known-css-properties/-/known-css-properties-0.21.0.tgz"
   integrity sha512-sZLUnTqimCkvkgRS+kbPlYW5o8q5w1cu+uIisKpEWkj31I8mx8kNG162DwRav8Zirkva6N5uoFsm9kzK4mUXjw==
 
+known-css-properties@^0.23.0:
+  version "0.23.0"
+  resolved "https://registry.yarnpkg.com/known-css-properties/-/known-css-properties-0.23.0.tgz#e643e1bab2b1f8ba292eea9557121cc02e9846a0"
+  integrity sha512-h9ivI88e1lFNmTT4HovBN33Ysn0OIJG7IPG2mkpx2uniQXFWqo35QdiX7w0TovlUFXfW8aPFblP5/q0jlOr2sA==
+
 language-subtag-registry@~0.3.2:
   version "0.3.21"
   resolved "https://registry.yarnpkg.com/language-subtag-registry/-/language-subtag-registry-0.3.21.tgz"
@@ -11859,7 +11903,7 @@ log-symbols@4.0.0:
   dependencies:
     chalk "^4.0.0"
 
-log-symbols@^4.0.0, log-symbols@^4.1.0:
+log-symbols@^4.0.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/log-symbols/-/log-symbols-4.1.0.tgz"
   integrity sha512-8XPvpAA8uyhfteu8pIvQxpJZ7SYYdpUivZpGy6sFsBuKRY/7rQGavedeB8aK+Zkyq6upMFVL/9AW6vOYzfRyLg==
@@ -12012,7 +12056,7 @@ md5.js@^1.3.4:
     inherits "^2.0.1"
     safe-buffer "^5.1.2"
 
-mdast-util-from-markdown@^0.8.0:
+mdast-util-from-markdown@^0.8.0, mdast-util-from-markdown@^0.8.5:
   version "0.8.5"
   resolved "https://registry.yarnpkg.com/mdast-util-from-markdown/-/mdast-util-from-markdown-0.8.5.tgz"
   integrity sha512-2hkTXtYYnr+NubD/g6KGBS/0mFmBcifAsI0yIWRiRo0PjVs6SSOSOdtzbp6kSGnShDN6G5aWZpKQ2lWRy27mWQ==
@@ -12022,6 +12066,13 @@ mdast-util-from-markdown@^0.8.0:
     micromark "~2.11.0"
     parse-entities "^2.0.0"
     unist-util-stringify-position "^2.0.0"
+
+mdast-util-frontmatter@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/mdast-util-frontmatter/-/mdast-util-frontmatter-0.2.0.tgz#8bd5cd55e236c03e204a036f7372ebe9e6748240"
+  integrity sha512-FHKL4w4S5fdt1KjJCwB0178WJ0evnyyQr5kXTM3wrOVpytD0hrkvd+AOOjU9Td8onOejCkmZ+HQRT3CZ3coHHQ==
+  dependencies:
+    micromark-extension-frontmatter "^0.2.0"
 
 mdast-util-to-markdown@^0.6.0:
   version "0.6.5"
@@ -12123,6 +12174,13 @@ microevent.ts@~0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/microevent.ts/-/microevent.ts-0.1.1.tgz"
   integrity sha512-jo1OfR4TaEwd5HOrt5+tAZ9mqT4jmpNAusXtyfNzqVm9uiSYFZlKM1wYL4oU7azZW/PxQW53wM0S6OR1JHNa2g==
+
+micromark-extension-frontmatter@^0.2.0, micromark-extension-frontmatter@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/micromark-extension-frontmatter/-/micromark-extension-frontmatter-0.2.2.tgz#61b8e92e9213e1d3c13f5a59e7862f5ca98dfa53"
+  integrity sha512-q6nPLFCMTLtfsctAuS0Xh4vaolxSFUWUWR6PZSrXXiRy+SANGllpcqdXFv2z07l0Xz/6Hl40hK0ffNCJPH2n1A==
+  dependencies:
+    fault "^1.0.0"
 
 micromark@~2.11.0:
   version "2.11.4"
@@ -12522,6 +12580,11 @@ nanoid@^3.3.3:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.3.tgz#fd8e8b7aa761fe807dba2d1b98fb7241bb724a25"
   integrity sha512-p1sjXuopFs0xg+fPASzQ28agW1oHD7xDsd9Xkf3T15H3c/cifrFHVwrh74PdoklAPi+i7MdRsE47vm2r6JoB+w==
+
+nanoid@^3.3.4:
+  version "3.3.4"
+  resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.4.tgz#730b67e3cd09e2deacf03c027c81c9d9dbc5e8ab"
+  integrity sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==
 
 nanomatch@^1.2.9:
   version "1.2.13"
@@ -13793,6 +13856,17 @@ postcss-logical@^3.0.0:
   dependencies:
     postcss "^7.0.2"
 
+postcss-markdown@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/postcss-markdown/-/postcss-markdown-1.2.0.tgz#252dd318e5fc62c803aa9c4f046a61e2a3b38462"
+  integrity sha512-sO7eeu6pq5F0lx3XavY/rBVmifXbMTd6fGRuXaT/Q7wEuIAWTi0E2t747nQ57iVz99WynTPls4mw5wlLvZLFzw==
+  dependencies:
+    mdast-util-from-markdown "^0.8.5"
+    mdast-util-frontmatter "^0.2.0"
+    micromark-extension-frontmatter "^0.2.2"
+    postcss "^8.4.0"
+    postcss-safe-parser "^6.0.0"
+
 postcss-media-minmax@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/postcss-media-minmax/-/postcss-media-minmax-4.0.0.tgz"
@@ -14127,6 +14201,11 @@ postcss-safe-parser@^4.0.2:
   dependencies:
     postcss "^7.0.26"
 
+postcss-safe-parser@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/postcss-safe-parser/-/postcss-safe-parser-6.0.0.tgz#bb4c29894171a94bc5c996b9a30317ef402adaa1"
+  integrity sha512-FARHN8pwH+WiS2OPCxJI8FuRJpTVnn6ZNFiqAM2aeW2LwTHWWmWgIyKC6cUo0L8aeKiF/14MNvnpls6R2PBeMQ==
+
 postcss-sass@^0.4.4:
   version "0.4.4"
   resolved "https://registry.yarnpkg.com/postcss-sass/-/postcss-sass-0.4.4.tgz"
@@ -14176,7 +14255,7 @@ postcss-selector-parser@^5.0.0-rc.3, postcss-selector-parser@^5.0.0-rc.4:
     indexes-of "^1.0.1"
     uniq "^1.0.1"
 
-postcss-selector-parser@^6.0.0, postcss-selector-parser@^6.0.5:
+postcss-selector-parser@^6.0.0:
   version "6.0.6"
   resolved "https://registry.yarnpkg.com/postcss-selector-parser/-/postcss-selector-parser-6.0.6.tgz"
   integrity sha512-9LXrvaaX3+mcv5xkg5kFwqSzSH1JIObIx51PrndZwlmznwXRfxMddDvo9gve3gVR8ZTKgoFDdWkbRFmEhT4PMg==
@@ -14192,6 +14271,14 @@ postcss-selector-parser@^6.0.2, postcss-selector-parser@^6.0.4:
     cssesc "^3.0.0"
     indexes-of "^1.0.1"
     uniq "^1.0.1"
+    util-deprecate "^1.0.2"
+
+postcss-selector-parser@^6.0.6:
+  version "6.0.10"
+  resolved "https://registry.yarnpkg.com/postcss-selector-parser/-/postcss-selector-parser-6.0.10.tgz#79b61e2c0d1bfc2602d549e11d0876256f8df88d"
+  integrity sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==
+  dependencies:
+    cssesc "^3.0.0"
     util-deprecate "^1.0.2"
 
 postcss-sorting@^4.1.0:
@@ -14277,6 +14364,15 @@ postcss@^8.1.0:
     colorette "^1.2.2"
     nanoid "^3.1.23"
     source-map-js "^0.6.2"
+
+postcss@^8.3.11, postcss@^8.4.0:
+  version "8.4.14"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.14.tgz#ee9274d5622b4858c1007a74d76e42e56fd21caf"
+  integrity sha512-E398TUmfAYFPBSdzgeieK2Y1+1cpdxJx8yXbK/m57nRhKSmk1GB2tO4lbLBtlkfPQTDKfe4Xqv1ASWPpayPEig==
+  dependencies:
+    nanoid "^3.3.4"
+    picocolors "^1.0.0"
+    source-map-js "^1.0.2"
 
 postcss@^8.4.13:
   version "8.4.13"
@@ -16980,60 +17076,6 @@ stylelint-order@^2.2.1:
     postcss "^7.0.2"
     postcss-sorting "^4.1.0"
 
-stylelint@13.13.1:
-  version "13.13.1"
-  resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-13.13.1.tgz"
-  integrity sha512-Mv+BQr5XTUrKqAXmpqm6Ddli6Ief+AiPZkRsIrAoUKFuq/ElkUh9ZMYxXD0iQNZ5ADghZKLOWz1h7hTClB7zgQ==
-  dependencies:
-    "@stylelint/postcss-css-in-js" "^0.37.2"
-    "@stylelint/postcss-markdown" "^0.36.2"
-    autoprefixer "^9.8.6"
-    balanced-match "^2.0.0"
-    chalk "^4.1.1"
-    cosmiconfig "^7.0.0"
-    debug "^4.3.1"
-    execall "^2.0.0"
-    fast-glob "^3.2.5"
-    fastest-levenshtein "^1.0.12"
-    file-entry-cache "^6.0.1"
-    get-stdin "^8.0.0"
-    global-modules "^2.0.0"
-    globby "^11.0.3"
-    globjoin "^0.1.4"
-    html-tags "^3.1.0"
-    ignore "^5.1.8"
-    import-lazy "^4.0.0"
-    imurmurhash "^0.1.4"
-    known-css-properties "^0.21.0"
-    lodash "^4.17.21"
-    log-symbols "^4.1.0"
-    mathml-tag-names "^2.1.3"
-    meow "^9.0.0"
-    micromatch "^4.0.4"
-    normalize-selector "^0.2.0"
-    postcss "^7.0.35"
-    postcss-html "^0.36.0"
-    postcss-less "^3.1.4"
-    postcss-media-query-parser "^0.2.3"
-    postcss-resolve-nested-selector "^0.1.1"
-    postcss-safe-parser "^4.0.2"
-    postcss-sass "^0.4.4"
-    postcss-scss "^2.1.1"
-    postcss-selector-parser "^6.0.5"
-    postcss-syntax "^0.36.2"
-    postcss-value-parser "^4.1.0"
-    resolve-from "^5.0.0"
-    slash "^3.0.0"
-    specificity "^0.4.1"
-    string-width "^4.2.2"
-    strip-ansi "^6.0.0"
-    style-search "^0.1.0"
-    sugarss "^2.0.0"
-    svg-tags "^1.0.0"
-    table "^6.6.0"
-    v8-compile-cache "^2.3.0"
-    write-file-atomic "^3.0.3"
-
 stylelint@13.9.0, stylelint@^9.10.1:
   version "13.9.0"
   resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-13.9.0.tgz#93921ee6e11d4556b9f31131f485dc813b68e32a"
@@ -17086,6 +17128,50 @@ stylelint@13.9.0, stylelint@^9.10.1:
     svg-tags "^1.0.0"
     table "^6.0.7"
     v8-compile-cache "^2.2.0"
+    write-file-atomic "^3.0.3"
+
+stylelint@14.0.0:
+  version "14.0.0"
+  resolved "https://registry.yarnpkg.com/stylelint/-/stylelint-14.0.0.tgz#0dc9655bc81378ac9937e6ea2f32704e9c2f92f9"
+  integrity sha512-//4Po+WlWImVaro2BiNJZMamBo0Enekb+3fp5cYYN5r08kaPTHlxM8bCi/yvnPl7G+zqyLqjZU+O22vr/SDW0w==
+  dependencies:
+    balanced-match "^2.0.0"
+    cosmiconfig "^7.0.1"
+    debug "^4.3.2"
+    execall "^2.0.0"
+    fast-glob "^3.2.7"
+    fastest-levenshtein "^1.0.12"
+    file-entry-cache "^6.0.1"
+    get-stdin "^8.0.0"
+    global-modules "^2.0.0"
+    globby "^11.0.3"
+    globjoin "^0.1.4"
+    html-tags "^3.1.0"
+    ignore "^5.1.8"
+    import-lazy "^4.0.0"
+    imurmurhash "^0.1.4"
+    is-plain-object "^5.0.0"
+    known-css-properties "^0.23.0"
+    mathml-tag-names "^2.1.3"
+    meow "^9.0.0"
+    micromatch "^4.0.4"
+    normalize-path "^3.0.0"
+    normalize-selector "^0.2.0"
+    picocolors "^1.0.0"
+    postcss "^8.3.11"
+    postcss-media-query-parser "^0.2.3"
+    postcss-resolve-nested-selector "^0.1.1"
+    postcss-safe-parser "^6.0.0"
+    postcss-selector-parser "^6.0.6"
+    postcss-value-parser "^4.1.0"
+    resolve-from "^5.0.0"
+    specificity "^0.4.1"
+    string-width "^4.2.2"
+    strip-ansi "^6.0.0"
+    style-search "^0.1.0"
+    svg-tags "^1.0.0"
+    table "^6.7.2"
+    v8-compile-cache "^2.3.0"
     write-file-atomic "^3.0.3"
 
 stylelint@^13.7.0:
@@ -17278,17 +17364,16 @@ table@^6.0.4, table@^6.0.7:
     slice-ansi "^4.0.0"
     string-width "^4.2.0"
 
-table@^6.6.0:
-  version "6.7.1"
-  resolved "https://registry.yarnpkg.com/table/-/table-6.7.1.tgz"
-  integrity sha512-ZGum47Yi6KOOFDE8m223td53ath2enHcYLgOCjGr5ngu8bdIARQk6mN/wRMv4yMRcHnCSnHbCEha4sobQx5yWg==
+table@^6.7.2:
+  version "6.8.0"
+  resolved "https://registry.yarnpkg.com/table/-/table-6.8.0.tgz#87e28f14fa4321c3377ba286f07b79b281a3b3ca"
+  integrity sha512-s/fitrbVeEyHKFa7mFdkuQMWlH1Wgw/yEXMt5xACT4ZpzWFluehAxRtUUQKPuWhaLAWhFcVx6w3oC8VKaUfPGA==
   dependencies:
     ajv "^8.0.1"
-    lodash.clonedeep "^4.5.0"
     lodash.truncate "^4.4.2"
     slice-ansi "^4.0.0"
-    string-width "^4.2.0"
-    strip-ansi "^6.0.0"
+    string-width "^4.2.3"
+    strip-ansi "^6.0.1"
 
 tapable@^1.0.0, tapable@^1.1.3:
   version "1.1.3"
