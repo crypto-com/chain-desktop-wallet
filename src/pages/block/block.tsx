@@ -2,7 +2,8 @@ import React from 'react';
 import './block.less';
 import 'antd/dist/antd.css';
 import { useTranslation } from 'react-i18next';
-import logo from '../../assets/logo-products-chain.svg';
+// import logo from '../../assets/logo-products-chain.svg';
+import fullLogo from '../../assets/full-logo.svg';
 
 const BlockPage = props => {
   const { isCountryBlocked, isBlockSloganVisible } = props;
@@ -10,14 +11,14 @@ const BlockPage = props => {
 
   return (
     <main className="block-page fade-in">
-      <div className="header">
+      {/* <div className="header">
         <img src={logo} className="logo" alt="logo" />
-      </div>
+      </div> */}
       <div className="container">
         <div>
-          <div className="title">Crypto.org Chain Wallet</div>
+          <img src={fullLogo} className="logo" alt="logo" style={{ width: '800px' }} />
           <div className="slogan">
-            {isCountryBlocked && isBlockSloganVisible ? t('welcome.block') : t('welcome.slogan')}
+            {isCountryBlocked && isBlockSloganVisible ? t('welcome.block') : ''}
           </div>
         </div>
       </div>

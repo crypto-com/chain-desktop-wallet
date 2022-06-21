@@ -46,6 +46,7 @@
   "general.minute": "دقيقة",
   "general.seconds": "ثواني",
   "general.second": "ثواني قليله",
+  "general.learnMore": "تعلم اكثر",
   "general.addressValidator.reason1": "غير صالح",
   "general.addressValidator.reason2": "العنواين المقدمه ",
   "general.validTransactionAmountValidator.reason": "المبلغ المرسل غير صحيح",
@@ -536,5 +537,6 @@
   "settings.revoke.risk": "التعرض للخطر",
   "settings.revoke": "إبطال",
   "settings.revoke.unlimited": "غير محدود",
-  "settings.noApproval": "لا توجد بيانات الموافقة"
+  "settings.noApproval": "لا توجد بيانات الموافقة",
+  "settings.about.termsAndConditions.title": "الاحكام والشروط"
 }
