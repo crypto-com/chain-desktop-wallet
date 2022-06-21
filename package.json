@@ -1,9 +1,9 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "0.8.1",
-  "description": "Crypto.com Chain Desktop Wallet App",
+  "version": "1.0.0",
+  "description": "Crypto.com DeFi Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
-  "author": "Crypto.org <chain@crypto.org>",
+  "author": "DeFi Labs <contact@crypto.com>",
   "license": "Apache-2.0",
   "homepage": ".",
   "main": "build/electron/main.js",
@@ -104,7 +104,7 @@
     "zxcvbn": "4.4.2"
   },
   "devDependencies": {
-    "@babel/core": "7.12.3",
+    "@babel/core": "7.18.5",
     "@babel/plugin-syntax-jsx": "7.12.1",
     "@esbuild-plugins/node-globals-polyfill": "0.1.1",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.2",
@@ -186,6 +186,7 @@
     "pnp-webpack-plugin": "1.6.4",
     "postcss-flexbugs-fixes": "4.2.1",
     "postcss-loader": "3.0.0",
+    "postcss-markdown": "1.2.0",
     "postcss-normalize": "8.0.1",
     "postcss-preset-env": "6.7.0",
     "postcss-safe-parser": "5.0.2",
@@ -199,7 +200,7 @@
     "sass-loader": "8.0.2",
     "semver": "7.3.2",
     "style-loader": "1.3.0",
-    "stylelint": "13.13.1",
+    "stylelint": "14.9.1",
     "stylelint-config-standard": "22.0.0",
     "terser-webpack-plugin": "4.2.3",
     "vite": "2.9.7",
@@ -229,7 +230,7 @@
     "src/**/*.{js,jsx,ts,tsx}": "yarn lint:js"
   },
   "build": {
-    "productName": "Crypto.org Chain Desktop Wallet (Beta)",
+    "productName": "Crypto.com DeFi Desktop Wallet",
     "appId": "chain.crypto.org.chain-desktop-wallet",
     "files": [
       "./build/**/*",

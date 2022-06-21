@@ -5,7 +5,7 @@ import { Button } from 'antd';
 import { Link, useHistory } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { walletService } from '../../service/WalletService';
-import logo from '../../assets/logo-products-chain.svg';
+import logo from '../../assets/full-logo.svg';
 import { secretStoreService } from '../../service/storage/SecretStoreService';
 
 function WelcomePage() {
@@ -36,20 +36,16 @@ function WelcomePage() {
 
   return (
     <main className="welcome-page">
-      <div className="header">
+      {/* <div className="header">
         <img src={logo} className="logo" alt="logo" />
-      </div>
+      </div> */}
       <div className="container">
         <div>
-          <div className="title">Crypto.org Chain Wallet</div>
-          <div className="slogan">{t('welcome.slogan')}</div>
+          <img src={logo} className="logo" alt="logo" style={{ width: '800px' }} />
           <div className="button-container">
             <Link to="/signup">
               <Button type="primary">{t('welcome.button')}</Button>
             </Link>
-            {/* <Link to="/create">
-              <Button>Create Wallet</Button>
-            </Link> */}
           </div>
         </div>
       </div>
