@@ -315,9 +315,23 @@ export class StorageService {
     // );
   }
 
+  public async removeStakingTransactions(walletId: string) {
+    return this.db.commonTransactionStore.remove(
+      {
+        walletId,
+        txType: 'staking',
+      },
+      {
+        multi: true,
+      },
+    );
+  }
+
   // eslint-disable-next-line consistent-return
   public async saveStakingTransactions(stakingTransactions: StakingTransactionList) {
     if (stakingTransactions.transactions.length === 0) {
+      // If there are no staking transactions, delete any stray records
+      await this.removeStakingTransactions(stakingTransactions.walletId);
       return Promise.resolve();
     }
     const stakingTxRecords: StakingTransactionRecord[] = stakingTransactions.transactions.map(
@@ -340,15 +354,7 @@ export class StorageService {
     };
 
     // Manually remove `staking` records first
-    await this.db.commonTransactionStore.remove(
-      {
-        walletId: stakingTransactions.walletId,
-        txType: 'staking',
-      },
-      {
-        multi: true,
-      },
-    );
+    await this.removeStakingTransactions(stakingTransactions.walletId);
 
     await this.insertCommonTransactionRecords(stakingTxRecords);
 
@@ -361,9 +367,22 @@ export class StorageService {
     return this.db.stakingStore.insert(stakingTransactions); */
   }
 
+  public async removeRewardList() {
+    return this.db.commonTransactionStore.remove(
+      {
+        txType: 'reward',
+      },
+      {
+        multi: true,
+      },
+    );
+  }
+
   // eslint-disable-next-line consistent-return
   public async saveRewardList(rewardTransactions: RewardTransactionList) {
     if (rewardTransactions.transactions.length === 0) {
+      // If there is no current reward transactions, delete any stray records
+      await this.removeRewardList();
       return Promise.resolve();
     }
     const rewardTxRecords: RewardTransactionRecord[] = rewardTransactions.transactions.map(tx => {
@@ -386,15 +405,7 @@ export class StorageService {
     };
 
     // Remove previous `reward` records before insertion
-    await this.db.commonTransactionStore.remove(
-      {
-        walletId: rewardTransactions.walletId,
-        txType: 'reward',
-      },
-      {
-        multi: true,
-      },
-    );
+    await this.removeRewardList();
 
     // Delay inserts to avoid remove records failure
     setTimeout(async () => {
