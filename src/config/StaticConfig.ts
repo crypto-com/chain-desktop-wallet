@@ -203,6 +203,7 @@ SUPPORTED_CURRENCY.set('TRY', { value: 'TRY', label: 'TRY - ₺', symbol: '₺' 
 export enum SupportedChainName {
   CRYPTO_ORG = 'Crypto.org Chain',
   CRONOS = 'Cronos Chain',
+  COSMOS_HUB = 'Cosmos Hub Chain',
   ETHEREUM = 'Ethereum Chain',
 }
 
