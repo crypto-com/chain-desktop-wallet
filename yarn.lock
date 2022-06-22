@@ -1706,6 +1706,19 @@
     ripemd160 "^2.0.2"
     sha.js "^2.4.11"
 
+"@cosmjs/crypto@0.28.7":
+  version "0.28.7"
+  resolved "https://registry.yarnpkg.com/@cosmjs/crypto/-/crypto-0.28.7.tgz#546dd66234c9a10a67f7b490291283694fbdd8be"
+  integrity sha512-Fuq90nnqXQb6VvUadGtPy1X6arXY+yhqB95VzN8GM/ZdBLeigu6a3XjOvFki4lKO94QdLn2e9huD8dm4tDQDsA==
+  dependencies:
+    "@cosmjs/encoding" "0.28.7"
+    "@cosmjs/math" "0.28.7"
+    "@cosmjs/utils" "0.28.7"
+    "@noble/hashes" "^1"
+    bn.js "^5.2.0"
+    elliptic "^6.5.3"
+    libsodium-wrappers "^0.7.6"
+
 "@cosmjs/crypto@^0.24.1":
   version "0.24.1"
   resolved "https://registry.npmjs.org/@cosmjs/crypto/-/crypto-0.24.1.tgz"
@@ -1753,6 +1766,15 @@
   version "0.27.0"
   resolved "https://registry.yarnpkg.com/@cosmjs/encoding/-/encoding-0.27.0.tgz#b335fe5a10b842ab348fb226d0c9c97155fdfb81"
   integrity sha512-cCT8X/NUAGXOe14F/k2GE6N9btjrOqALBilUPIn5CL4OEGxvRTPD59nWSACu0iafCGz10Tw3LPcouuYPtZmkbg==
+  dependencies:
+    base64-js "^1.3.0"
+    bech32 "^1.1.4"
+    readonly-date "^1.0.0"
+
+"@cosmjs/encoding@0.28.7":
+  version "0.28.7"
+  resolved "https://registry.yarnpkg.com/@cosmjs/encoding/-/encoding-0.28.7.tgz#7f04a782a558d5116ba61a5441a485be95684b79"
+  integrity sha512-m2OuRhxux0YacvtjTocEOHyjnKO/KKGjqXlAY5HXGJpyntr+PIlJFdoS9tHax+1rNRrblZXwYIT+UqOs+kSk5Q==
   dependencies:
     base64-js "^1.3.0"
     bech32 "^1.1.4"
@@ -1824,6 +1846,13 @@
   version "0.27.0"
   resolved "https://registry.yarnpkg.com/@cosmjs/math/-/math-0.27.0.tgz#1597d86d9fd96fdeef0989ac0b7d75be11f15234"
   integrity sha512-+WsrdXojqpUL6l2LKOWYgiAJIDD0faONNtnjb1kpS1btSzZe1Ns+RdygG6QZLLvZuxMfkEzE54ZXDKPD5MhVPA==
+  dependencies:
+    bn.js "^5.2.0"
+
+"@cosmjs/math@0.28.7":
+  version "0.28.7"
+  resolved "https://registry.yarnpkg.com/@cosmjs/math/-/math-0.28.7.tgz#6db91f7dddb364f9d2584817b5fa1bf6b06380c1"
+  integrity sha512-wSXIOOGVzgtRFsGwScpvQ6C6DUx97K7Ez3KyvRALNzspEnIoKPDgTXf438zhZnb+0+ERAwgdkb/6zWaDoVBfUA==
   dependencies:
     bn.js "^5.2.0"
 
@@ -1980,6 +2009,11 @@
   version "0.27.0"
   resolved "https://registry.yarnpkg.com/@cosmjs/utils/-/utils-0.27.0.tgz#c7112d6dab01ad2e9d57cd2bf4328da156aaae4e"
   integrity sha512-UC1eWY9isDQm6POy6GaTmYtbPVY5dkywdjW8Qzj+JNMhbhMM0KHuI4pHwjv5TPXSO/Ba2z10MTnD9nUlZtDwtA==
+
+"@cosmjs/utils@0.28.7":
+  version "0.28.7"
+  resolved "https://registry.yarnpkg.com/@cosmjs/utils/-/utils-0.28.7.tgz#d0ac60da967975ac741482a4af5664ff3a0566c2"
+  integrity sha512-0ya5mRaDY956n87dKjx6wfqgH/uEfrZyMswIhcEPqQPegwp4FDd6cwJtSdv/d5S7fgvoEs2UABvUFNzCT5C0hg==
 
 "@cosmjs/utils@^0.24.1":
   version "0.24.1"
@@ -3113,6 +3147,11 @@
   integrity sha512-GeeM827DlzFFidn1eKkMBiqXFD2oLsnZbaiGhByPl0vcapsRzUL+t9hDoov1swc9rB2jw64R+ihtzC8qOE9wXw==
   dependencies:
     extend "3.0.2"
+
+"@noble/hashes@^1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.1.1.tgz#c056d9b7166c1e7387a7453c2aff199bf7d88e5f"
+  integrity sha512-Lkp9+NijmV7eSVZqiUvt3UCuuHeJpUVmRrvh430gyJjJiuJMqkeHf6/A9lQ/smmbWV/0spDeJscscPzyB4waZg==
 
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
@@ -5909,22 +5948,7 @@ caniuse-api@^3.0.0:
     lodash.memoize "^4.1.2"
     lodash.uniq "^4.5.0"
 
-caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001125, caniuse-lite@^1.0.30001166:
-  version "1.0.30001344"
-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001344.tgz"
-  integrity sha512-0ZFjnlCaXNOAYcV7i+TtdKBp0L/3XEU2MF/x6Du1lrh+SRX4IfzIVL4HNJg5pB2PmFb8rszIGyOvsZnqqRoc2g==
-
-caniuse-lite@^1.0.30001196, caniuse-lite@^1.0.30001219:
-  version "1.0.30001344"
-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001344.tgz"
-  integrity sha512-0ZFjnlCaXNOAYcV7i+TtdKBp0L/3XEU2MF/x6Du1lrh+SRX4IfzIVL4HNJg5pB2PmFb8rszIGyOvsZnqqRoc2g==
-
-caniuse-lite@^1.0.30001264:
-  version "1.0.30001344"
-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001344.tgz"
-  integrity sha512-0ZFjnlCaXNOAYcV7i+TtdKBp0L/3XEU2MF/x6Du1lrh+SRX4IfzIVL4HNJg5pB2PmFb8rszIGyOvsZnqqRoc2g==
-
-caniuse-lite@^1.0.30001332:
+caniuse-lite@^1.0.0, caniuse-lite@^1.0.30000981, caniuse-lite@^1.0.30001109, caniuse-lite@^1.0.30001125, caniuse-lite@^1.0.30001166, caniuse-lite@^1.0.30001196, caniuse-lite@^1.0.30001219, caniuse-lite@^1.0.30001264, caniuse-lite@^1.0.30001332:
   version "1.0.30001344"
   resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001344.tgz"
   integrity sha512-0ZFjnlCaXNOAYcV7i+TtdKBp0L/3XEU2MF/x6Du1lrh+SRX4IfzIVL4HNJg5pB2PmFb8rszIGyOvsZnqqRoc2g==
@@ -6714,6 +6738,14 @@ cosmjs-types@^0.4.0:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/cosmjs-types/-/cosmjs-types-0.4.1.tgz#3b2a53ba60d33159dd075596ce8267cfa7027063"
   integrity sha512-I7E/cHkIgoJzMNQdFF0YVqPlaTqrqKHrskuSTIqlEyxfB5Lf3WKCajSXVK2yHOfOFfSux/RxEdpMzw/eO4DIog==
+  dependencies:
+    long "^4.0.0"
+    protobufjs "~6.11.2"
+
+cosmjs-types@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/cosmjs-types/-/cosmjs-types-0.5.0.tgz#2497a2c5ddf62a8e8dea03e0725b8cd763d4ab4f"
+  integrity sha512-Qy2yxDp5HasBUnBV5OL9EOuTJw94LAbCWfiRb5QcW1sqh93KSSY5PpNMB3rTsxwuPcf/k3CNRY02DeQMjrsJuA==
   dependencies:
     long "^4.0.0"
     protobufjs "~6.11.2"
