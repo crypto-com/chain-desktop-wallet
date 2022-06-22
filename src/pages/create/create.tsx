@@ -450,7 +450,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     };
 
     try {
-      const createdWallet = new WalletCreator(createOptions).create();
+      const createdWallet = await new WalletCreator(createOptions).create();
 
       const targetWallet = createdWallet.wallet;
       if (targetWallet.walletType === LEDGER_WALLET_TYPE) {

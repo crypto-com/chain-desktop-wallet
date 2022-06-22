@@ -690,15 +690,15 @@ class WalletService {
       await sleep(3_000);
 
       const walletOps = new WalletOps();
-      const assetGeneration = walletOps.generate(wallet.config, wallet.identifier, phrase);
+      const assetGeneration = await walletOps.generate(wallet.config, wallet.identifier, phrase);
 
       if (currentSession?.wallet.walletType === LEDGER_WALLET_TYPE) {
         if (tendermintAddress !== '' && evmAddress !== '') {
-          const tendermintAsset = assetGeneration.initialAssets.filter(
-            asset => asset.assetType === UserAssetType.TENDERMINT,
+          const tendermintAsset = (await assetGeneration.initialAssets).filter(
+            asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO',
           )[0];
           tendermintAsset.address = tendermintAddress;
-          const evmAsset = assetGeneration.initialAssets.filter(
+          const evmAsset = (await assetGeneration.initialAssets).filter(
             asset => asset.assetType === UserAssetType.EVM,
           )[0];
           evmAsset.address = evmAddress;
@@ -709,9 +709,9 @@ class WalletService {
         }
       }
 
-      await this.saveAssets(assetGeneration.initialAssets);
+      await this.saveAssets(await assetGeneration.initialAssets);
 
-      const activeAsset = assetGeneration.initialAssets[0];
+      const activeAsset = (await assetGeneration.initialAssets)[0];
       const newSession = new Session(wallet, activeAsset);
       await this.setCurrentSession(newSession);
 

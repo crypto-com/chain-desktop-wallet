@@ -13,17 +13,17 @@ export class WalletImporter extends WalletOps {
     this.importOptions = importOptions;
   }
 
-  public import(): WalletBuiltResult {
+  public async import(): Promise<WalletBuiltResult> {
     const options = this.importOptions;
     const walletIdentifier = getRandomId();
-    const { initialAssets, encryptedPhrase } = this.generate(
+    const { initialAssets, encryptedPhrase } = await this.generate(
       options.config,
       walletIdentifier,
       options.phrase,
     );
 
-    const defaultAsset = initialAssets.filter(
-      asset => asset.assetType === UserAssetType.TENDERMINT,
+    const defaultAsset = (await initialAssets).filter(
+      asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO',
     )[0];
 
     const importedWallet: Wallet = {
@@ -39,7 +39,7 @@ export class WalletImporter extends WalletOps {
     };
     return {
       wallet: importedWallet,
-      assets: initialAssets,
+      assets: await initialAssets,
     };
   }
 }

@@ -184,6 +184,7 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
     switch (name) {
       case SupportedChainName.CRONOS:
       case SupportedChainName.CRYPTO_ORG:
+      case SupportedChainName.COSMOS_HUB:
         return name.replace('Chain', 'Testnet');
       case SupportedChainName.ETHEREUM:
         return name.replace('Chain', 'Rinkeby Testnet');
@@ -202,7 +203,12 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
 
 export function getAssetTypeName(assetType: UserAssetType | undefined, assetSymbol?: string) {
   switch (assetType) {
-    case UserAssetType.TENDERMINT:
+    case UserAssetType.TENDERMINT: {
+      if (assetSymbol && assetSymbol === 'ATOM') {
+        return 'Atom';
+      }
+      return 'Cronos';
+    }
     case UserAssetType.EVM: {
       if (assetSymbol && assetSymbol === 'ETH') {
         return 'Ethereum';
