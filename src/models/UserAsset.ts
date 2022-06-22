@@ -18,6 +18,14 @@ export interface UserAssetConfig {
 
   // Some assets don't have support for memo
   memoSupportDisabled?: boolean;
+  tendermint?: {
+    chain: string;
+    defaultChainId: string;
+    addressPrefix: string;
+    validatorPubKeyPrefix: string;
+    validatorAddressPrefix: string;
+    coin: { baseDenom: string; denom: string };
+  };
 }
 
 export interface UserAsset {
