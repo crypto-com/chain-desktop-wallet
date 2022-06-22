@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 import { Layout, Button, Table } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
-import { useRecoilValue } from 'recoil';
+import moment from 'moment';
 
-import { ProposalModel } from '../../../models/Transaction';
 import { walletService } from '../../../service/WalletService';
-import { sessionState } from '../../../recoil/atom';
-
+import { ProposalModel } from '../../../models/Transaction';
 // import { useTranslation } from 'react-i18next';
 
 import '../governance.less';
@@ -20,49 +18,31 @@ const {
   // Footer
 } = Layout;
 
-interface DataType {
-  index: string;
-  proposal: string;
-  vote: string;
-  vote_date: string;
-}
+// interface DataType {
+//   index: string;
+//   proposal: string;
+//   vote: string;
+//   vote_date: string;
+// }
 
 export const VotingHistory = (props: {
   setHistoryVisible: React.Dispatch<React.SetStateAction<any>>;
+  proposalList: ProposalModel[];
 }) => {
   // const [t] = useTranslation();
 
-  const currentSession = useRecoilValue(sessionState);
+  // const currentSession = useRecoilValue(sessionState);
+  const didMountRef = useRef(false);
+  const [votingHistoryData, SetVotingHistory] = useState([]);
 
-  const [proposalList, setProposalList] = useState<ProposalModel[]>();
-  // const [votingHistoryData, SetVotingHistory] = useState([]);
-
-  const tableData: DataType[] = [
-    {
-      index: '1',
-      proposal: 'Decrease the minimum deposit amount for governance proposals',
-      vote: 'Yes',
-      vote_date: '12/07/2020 01:12:48',
-    },
-    {
-      index: '2',
-      proposal: 'Draco II - Phase 2 - Crypto.org Chain with native token issuance',
-      vote: 'No',
-      vote_date: '03/05/2021 16:32:08',
-    },
-    {
-      index: '3',
-      proposal: 'Draco II - Phase 2 - Crypto.org Chain with native token issuance',
-      vote: 'No',
-      vote_date: '03/05/2021 16:32:08',
-    },
-  ];
+  const [tableData, SetTableData] = useState([]);
 
   const columnsData = [
     {
       title: '#',
       dataIndex: 'index',
       key: 'index',
+      render: txt => '#'.concat(txt),
     },
     {
       title: 'Proposal',
@@ -79,44 +59,75 @@ export const VotingHistory = (props: {
       ],
       sorter: (a, b) => a.vote.localeCompare(b.vote),
       onFilter: (value: string, record) => record.vote.toLowerCase().indexOf(value) > -1,
+      render: txt => checkVoteStatus(txt),
     },
     {
       title: 'Voted On',
       dataIndex: 'vote_date',
       key: 'vote_date',
+      sorter: (a, b) =>
+        parseInt(moment(a.vote_date).format('YYYYMMDD'), 10) -
+        parseInt(moment(b.vote_date).format('YYYYMMDD'), 10),
     },
   ];
 
-  // const []
+  const checkVoteStatus = vote => {
+    let status = '';
+    switch (vote) {
+      case 'VOTE_OPTION_YES':
+        status = 'Yes';
+        break;
+      case 'VOTE_OPTION_NO':
+        status = 'No';
+        break;
+      case 'VOTE_OPTION_NO_WITH_VETO':
+        status = 'No';
+        break;
+      case 'VOTE_OPTION_ABSTAIN':
+        status = 'No';
+        break;
+      default:
+        status = ' ';
+        break;
+    }
+    return status;
+  };
+
+  const fetchVotingHistory = async () => {
+    const votingHistory = await walletService
+      .fetchAccountVotingHistory('tcro1ydyw9gzstgk9atua4w3zrkplq67t85hnfhw8ku')
+      .then(abc => {
+        console.log('abc0 ', abc);
+        return abc;
+      });
+
+    SetVotingHistory(votingHistory);
+
+    const curData = votingHistory?.map((elem: any, idx) => {
+      const proposal_id = elem?.data?.proposalId;
+      const option = elem?.data?.option;
+      const contentTitle = props?.proposalList?.find(val => val.proposal_id === proposal_id)
+        ?.content.title;
+      console.log('contentTitle ', contentTitle);
+      return {
+        index: idx + 1,
+        proposal: contentTitle,
+        vote: option,
+        vote_date: moment(elem.blockTime).format('DD/MM/YYYY - HH:mm:ss'),
+      };
+    });
+    // eslint-disable-next-line
+    console.log('curData ', curData);
+
+    SetTableData(curData);
+  };
 
   useEffect(() => {
-    const fetchProposalList = async () => {
-      const list: ProposalModel[] = await walletService.retrieveProposals(
-        currentSession.wallet.config.network.chainId,
-      );
-
-      // eslint-disable-next-line
-      console.log('fetchProposalList ', list);
-
-      setProposalList(list);
-      return list;
-    };
-
-    const fetchVotingHistory = async () => {
-      const votingHistory = await walletService.fetchAccountVotingHistory(
-        currentSession.wallet.address,
-      );
-      // eslint-disable-next-line
-      console.log('votingHistory ', votingHistory, currentSession.wallet);
-    };
-
-    // proposalList?.map((elem, idx) => {
-
-    // });
-
-    // eslint-disable-next-line
-    console.log('fetchProposalList 00 ', fetchVotingHistory(), fetchProposalList());
-  }, [proposalList, setProposalList]);
+    if (!didMountRef.current) {
+      fetchVotingHistory();
+      didMountRef.current = true;
+    }
+  }, [votingHistoryData, SetVotingHistory]);
 
   return (
     <div id="voting-history-section">

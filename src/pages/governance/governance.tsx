@@ -29,6 +29,7 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 
+import { processVoteTag } from './utils';
 import { ProposalView } from './components/ProposalView';
 import { VotingHistory } from './components/VotingHistory';
 
@@ -289,35 +290,35 @@ const GovernancePage = () => {
     );
   };
 
-  const processVoteTag = vote => {
-    let voteColor;
-    let voteMessage;
-    switch (vote) {
-      case VoteOption.VOTE_OPTION_YES:
-        voteColor = 'success';
-        voteMessage = `Yes - ${t('governance.voteOption.yes')}`;
-        break;
-      case VoteOption.VOTE_OPTION_NO:
-        voteColor = 'error';
-        voteMessage = `No - ${t('governance.voteOption.no')}`;
-        break;
-      case VoteOption.VOTE_OPTION_NO_WITH_VETO:
-        voteColor = 'error';
-        voteMessage = `No with Veto - ${t('governance.voteOption.noWithVeto')}`;
-        break;
-      case VoteOption.VOTE_OPTION_ABSTAIN:
-        voteColor = 'default';
-        voteMessage = `Abstain - ${t('governance.voteOption.abstain')}`;
-        break;
-      default:
-        voteColor = 'default';
-    }
-    return (
-      <Tag style={{ border: 'none', padding: '5px 14px' }} color={voteColor}>
-        {voteMessage}
-      </Tag>
-    );
-  };
+  // const processVoteTag = vote => {
+  //   let voteColor;
+  //   let voteMessage;
+  //   switch (vote) {
+  //     case VoteOption.VOTE_OPTION_YES:
+  //       voteColor = 'success';
+  //       voteMessage = `Yes - ${t('governance.voteOption.yes')}`;
+  //       break;
+  //     case VoteOption.VOTE_OPTION_NO:
+  //       voteColor = 'error';
+  //       voteMessage = `No - ${t('governance.voteOption.no')}`;
+  //       break;
+  //     case VoteOption.VOTE_OPTION_NO_WITH_VETO:
+  //       voteColor = 'error';
+  //       voteMessage = `No with Veto - ${t('governance.voteOption.noWithVeto')}`;
+  //       break;
+  //     case VoteOption.VOTE_OPTION_ABSTAIN:
+  //       voteColor = 'default';
+  //       voteMessage = `Abstain - ${t('governance.voteOption.abstain')}`;
+  //       break;
+  //     default:
+  //       voteColor = 'default';
+  //   }
+  //   return (
+  //     <Tag style={{ border: 'none', padding: '5px 14px' }} color={voteColor}>
+  //       {voteMessage}
+  //     </Tag>
+  //   );
+  // };
 
   useEffect(() => {
     const fetchProposalList = async () => {
@@ -341,7 +342,7 @@ const GovernancePage = () => {
   return (
     <Layout className="site-layout">
       {historyVisible ? (
-        <VotingHistory setHistoryVisible={setHistoryVisible} />
+        <VotingHistory setHistoryVisible={setHistoryVisible} proposalList={proposalList} />
       ) : (
         <>
           <Header className="site-layout-background">{t('governance.title')}</Header>
