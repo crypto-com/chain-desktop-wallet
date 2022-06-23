@@ -6,6 +6,7 @@ import { usePasswordModal } from '../../../components/PasswordForm/PasswordFormM
 import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
 import { allMarketState, navbarMenuSelectedKeyState, sessionState } from '../../../recoil/atom';
 import { secretStoreService } from '../../../service/storage/SecretStoreService';
+import { walletConnectPeerMetaAtom } from '../../../service/walletconnect/store';
 import { useWalletConnect } from '../../../service/walletconnect/useWalletConnect';
 import RequestConfirmation from '../../dapp/components/RequestConfirmation/RequestConfirmation';
 import { handleEvent } from '../provider';
@@ -19,6 +20,7 @@ const WALLET_CONNECT_PAGE_KEY = '/walletconnect';
 
 export const WalletConnectModal = () => {
   const { connect, state, restoreSession, requests, cancelRequest, approveRequest } = useWalletConnect();
+  const peerMeta = useRecoilValue(walletConnectPeerMetaAtom);
   const history = useHistory();
 
   const { show, passphrase } = usePasswordModal();
@@ -82,10 +84,17 @@ export const WalletConnectModal = () => {
   return (
     <>
       {
-        requests.length > 0 && <RequestConfirmation
+        requests.length > 0 && peerMeta && <RequestConfirmation
           event={requests[0]}
           cronosAsset={cronosAsset}
           allMarketData={allMarketData}
+          dapp={{
+            name: peerMeta.name ?? '',
+            logo: peerMeta.icons?.[0] ?? '',
+            alt: peerMeta.name ?? '',
+            url: peerMeta.url ?? '',
+            description: peerMeta.description ?? '',
+          }}
           currentSession={currentSession}
           wallet={currentSession.wallet}
           visible

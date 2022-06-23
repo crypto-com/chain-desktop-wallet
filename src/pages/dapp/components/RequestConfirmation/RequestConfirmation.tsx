@@ -143,7 +143,12 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
 
       if (parsedRaw.message) {
         Object.keys(parsedRaw.message).forEach(key => {
-          displayMessage = displayMessage.concat(`${key}: \n${parsedRaw.message[key]}\n\n`);
+          let value = parsedRaw.message[key];
+          if (typeof value !== 'string') {
+            value = JSON.stringify(value);
+          }
+
+          displayMessage = displayMessage.concat(`${key}: \n${value}\n\n`);
         });
       }
 
@@ -270,9 +275,12 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       <Layout>
         <Content>
           {dapp && (
-            <div className="logo">
-              <img src={dapp.logo} alt={dapp.alt} />
-            </div>
+            <>
+              <div className="logo">
+                <img style={{ width: '60px', height: '60px' }} src={dapp.logo} alt={dapp.alt} />
+                <div >{dapp.url}</div>
+              </div>
+            </>
           )}
           {message && <div className="message">{message}</div>}
           {subMessage && <div className="sub-message">{subMessage}</div>}
