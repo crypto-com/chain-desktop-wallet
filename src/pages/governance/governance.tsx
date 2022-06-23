@@ -606,6 +606,8 @@ const GovernancePage = () => {
 
     fetchProposalList();
 
+    fetchProposalList();
+
     if (!didMountRef.current) {
       didMountRef.current = true;
       analyticsService.logPage('Governance');
