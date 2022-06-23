@@ -5,6 +5,7 @@ import { signTypedData_v4 } from 'eth-sig-util';
 import { ITransactionSigner } from './TransactionSigner';
 import TokenContractABI from './abi/TokenContractABI.json';
 import CRC721TokenContractABI from '../../contracts/CRC721.json';
+import { arrayify } from '@ethersproject/bytes';
 
 import {
   BridgeTransactionUnsigned,
@@ -102,7 +103,7 @@ class EvmTransactionSigner implements ITransactionSigner {
       nonce: transaction.nonce,
       to: transaction.contractAddress,
       value: transaction.value ?? '0x0',
-    }
+    };
 
     if (transaction.maxFeePerGas && transaction.maxPriorityFeePerGas) {
       txRequest.maxFeePerGas = transaction.maxFeePerGas;
@@ -227,8 +228,8 @@ class EvmTransactionSigner implements ITransactionSigner {
     amount: BigNumberish,
   ) {
 
-    const IERC20 = IERC20__factory.createInterface()
-    return IERC20.encodeFunctionData('approve', [spender, amount])
+    const IERC20 = IERC20__factory.createInterface();
+    return IERC20.encodeFunctionData('approve', [spender, amount]);
   }
 
   // eslint-disable-next-line class-methods-use-this

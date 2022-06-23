@@ -201,7 +201,7 @@ export const useWalletConnect = () => {
             setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: {data: payload.params[0]} }]);
             break;
           case 'eth_sign':
-            setRequests([...requests, { id: payload.id, name: 'signMessage', object: {data: payload.params[0]} }]);
+            setRequests([...requests, { id: payload.id, name: 'signMessage', object: {data: payload.params[1]} }]);
             break;
           case 'eth_signTransaction': {
             const txParam = payload.params[0] as TxParams;

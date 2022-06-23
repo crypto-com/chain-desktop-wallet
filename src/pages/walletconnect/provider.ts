@@ -10,6 +10,13 @@ export const handleEvent = async (event: DappBrowserIPC.Event, mnemonic: string,
         onSuccess(event, sig);
       }
       break;
+
+    case 'signMessage':
+      {
+        const sig = await EvmTransactionSigner.signPersonalMessage(event.object.data, mnemonic);
+        onSuccess(event, sig);
+      }
+      break;
   
     default:
       break;
