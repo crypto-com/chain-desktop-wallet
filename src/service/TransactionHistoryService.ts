@@ -649,12 +649,14 @@ export class TransactionHistoryService {
         return Promise.resolve([]);
       }
       const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-      return nodeRpc.loadProposals([
+      const loadedProposals = await nodeRpc.loadProposals([
         ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD,
         ProposalStatuses.PROPOSAL_STATUS_PASSED,
         ProposalStatuses.PROPOSAL_STATUS_FAILED,
         ProposalStatuses.PROPOSAL_STATUS_REJECTED,
       ]);
+
+      return loadedProposals;
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING PROPOSALS', e);

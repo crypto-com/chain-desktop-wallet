@@ -1,43 +1,38 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { useRecoilValue } from 'recoil';
 
-import { Layout, Button, Table } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { Layout, Button, Table, Tag, Spin } from 'antd';
+import { ArrowLeftOutlined, LoadingOutlined } from '@ant-design/icons';
 
 import moment from 'moment';
+import { useTranslation } from 'react-i18next';
 
 import { walletService } from '../../../service/WalletService';
 import { ProposalModel } from '../../../models/Transaction';
-// import { useTranslation } from 'react-i18next';
+import { sessionState } from '../../../recoil/atom';
 
 import '../governance.less';
 import 'antd/dist/antd.css';
 
-const {
-  Header,
-  // Content,
-  // Footer
-} = Layout;
+const { Header } = Layout;
 
-// interface DataType {
-//   index: string;
-//   proposal: string;
-//   vote: string;
-//   vote_date: string;
-// }
+enum sortOrder {
+  asc = 'ascend',
+  desc = 'descend',
+}
 
 export const VotingHistory = (props: {
   setHistoryVisible: React.Dispatch<React.SetStateAction<any>>;
   proposalList: ProposalModel[];
 }) => {
-  // const [t] = useTranslation();
+  const [t] = useTranslation();
 
-  // const currentSession = useRecoilValue(sessionState);
+  const currentSession = useRecoilValue(sessionState);
   const didMountRef = useRef(false);
-  const [votingHistoryData, SetVotingHistory] = useState([]);
-
   const [tableData, SetTableData] = useState([]);
+  const [loadingTableData, SetLoadingTableData] = useState(true);
 
-  const columnsData = [
+  const columns: any = [
     {
       title: '#',
       dataIndex: 'index',
@@ -45,70 +40,82 @@ export const VotingHistory = (props: {
       render: txt => '#'.concat(txt),
     },
     {
-      title: 'Proposal',
+      title: t('governance.voteHistory.table.column1'), // Proposal
       dataIndex: 'proposal',
       key: 'proposal',
+      render: txt => <a>{txt}</a>,
     },
     {
-      title: 'Your Vote',
+      title: t('governance.voteHistory.table.column2'), // Your Vote
       dataIndex: 'vote',
       key: 'vote',
       filters: [
         { text: 'Yes', value: 'yes' },
         { text: 'No', value: 'no' },
+        { text: 'Abstained', value: 'abstain' },
       ],
       sorter: (a, b) => a.vote.localeCompare(b.vote),
-      onFilter: (value: string, record) => record.vote.toLowerCase().indexOf(value) > -1,
+      onFilter: (value: string, record) =>
+        record.vote
+          .toLowerCase()
+          .split('_')
+          .indexOf(value) > -1,
       render: txt => checkVoteStatus(txt),
     },
     {
-      title: 'Voted On',
+      title: t('governance.voteHistory.table.column3'), // Voted On
       dataIndex: 'vote_date',
       key: 'vote_date',
       sorter: (a, b) =>
         parseInt(moment(a.vote_date).format('YYYYMMDD'), 10) -
         parseInt(moment(b.vote_date).format('YYYYMMDD'), 10),
+      defaultSortOrder: sortOrder.desc,
     },
   ];
 
   const checkVoteStatus = vote => {
-    let status = '';
+    let status;
+    let statusColor;
     switch (vote) {
       case 'VOTE_OPTION_YES':
         status = 'Yes';
+        statusColor = 'success';
         break;
       case 'VOTE_OPTION_NO':
         status = 'No';
+        statusColor = 'error';
         break;
       case 'VOTE_OPTION_NO_WITH_VETO':
         status = 'No';
+        statusColor = 'error';
         break;
       case 'VOTE_OPTION_ABSTAIN':
-        status = 'No';
+        status = '--';
+        statusColor = 'default';
         break;
       default:
-        status = ' ';
+        status = '--';
+        statusColor = 'default';
         break;
     }
-    return status;
+    return (
+      <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+        {status}
+      </Tag>
+    );
   };
 
   const fetchVotingHistory = async () => {
-    const votingHistory = await walletService
-      .fetchAccountVotingHistory('tcro1ydyw9gzstgk9atua4w3zrkplq67t85hnfhw8ku')
-      .then(abc => {
-        console.log('abc0 ', abc);
-        return abc;
-      });
+    const votingHistory: any = await walletService.fetchAccountVotingHistory(
+      // currentSession.wallet.address
+      'tcro1ydyw9gzstgk9atua4w3zrkplq67t85hnfhw8ku',
+    );
 
-    SetVotingHistory(votingHistory);
-
-    const curData = votingHistory?.map((elem: any, idx) => {
+    const curData: any = votingHistory?.map((elem: any, idx) => {
       const proposal_id = elem?.data?.proposalId;
       const option = elem?.data?.option;
       const contentTitle = props?.proposalList?.find(val => val.proposal_id === proposal_id)
         ?.content.title;
-      console.log('contentTitle ', contentTitle);
       return {
         index: idx + 1,
         proposal: contentTitle,
@@ -116,10 +123,9 @@ export const VotingHistory = (props: {
         vote_date: moment(elem.blockTime).format('DD/MM/YYYY - HH:mm:ss'),
       };
     });
-    // eslint-disable-next-line
-    console.log('curData ', curData);
 
     SetTableData(curData);
+    setTimeout(() => SetLoadingTableData(false), 500);
   };
 
   useEffect(() => {
@@ -127,7 +133,7 @@ export const VotingHistory = (props: {
       fetchVotingHistory();
       didMountRef.current = true;
     }
-  }, [votingHistoryData, SetVotingHistory]);
+  }, [currentSession, loadingTableData, SetLoadingTableData, tableData, SetTableData]);
 
   return (
     <div id="voting-history-section">
@@ -144,11 +150,20 @@ export const VotingHistory = (props: {
       <div className="header-description">Below is your voting history</div>
 
       <Table
+        locale={{
+          triggerDesc: t('general.table.triggerDesc'),
+          triggerAsc: t('general.table.triggerAsc'),
+          cancelSort: t('general.table.cancelSort'),
+        }}
         className="voting-history-table"
         dataSource={tableData}
-        columns={columnsData}
-        rowKey={record => record.index}
+        columns={columns}
+        rowKey={(record: any) => record.index}
         pagination={false}
+        loading={{
+          indicator: <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />,
+          spinning: loadingTableData,
+        }}
       />
     </div>
   );

@@ -51,6 +51,10 @@
   "general.slow": "느린",
   "general.custom": "관습",
   "general.invalidAmount": "잘못된 금액",
+  "general.learnMore": "더 알아보기",
+  "general.addressValidator.reason1": "무효",
+  "general.addressValidator.reason2": "주소 필요",
+  "general.validTransactionAmountValidator.reason": "잘못된 송금액",
   "general.passwordForm.password.label": "앱 패스워드",
   "general.passwordForm.password.placeholder": "앱 패스워드 입력",
   "general.passwordForm.password.error1": "패스워드의 최소 길이는 8글자이며, 숫자와 알파벳, 그리고 특수문자만 사용해야 합니다.",
@@ -742,5 +746,12 @@
   "settings.revoke.risk": "위험 노출",
   "settings.revoke": "취소",
   "settings.revoke.unlimited": "무제한",
-  "settings.noApproval": "승인 데이터가 없습니다"
+  "settings.noApproval": "승인 데이터가 없습니다",
+  "settings.support.title": "지원",
+  "settings.support.helpCenter.title": "지원 센터",
+  "settings.support.helpCenter.description": "크립토닷컴 디파이 데스크톱 지갑에 대한 자세한 정보- 시작하기, 지갑관리, 입출금",
+  "settings.support.feedbackForm.title": "피드백 양식",
+  "settings.support.feedbackForm.description": "크립토닷컴 디파이 데스크탑 지갑과 관련된 피드백, 질문, 불만 사항이 있는 경우 피드백 양식을 작성해 주세요.",
+  "settings.about.title": "자세한 사항",
+  "settings.about.termsAndConditions.title": "이용 약관"
 }
