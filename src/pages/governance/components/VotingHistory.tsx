@@ -8,7 +8,7 @@ import moment from 'moment';
 import { useTranslation } from 'react-i18next';
 
 import { walletService } from '../../../service/WalletService';
-import { ProposalModel } from '../../../models/Transaction';
+// import { ProposalModel } from '../../../models/Transaction';
 import { sessionState } from '../../../recoil/atom';
 
 import '../governance.less';
@@ -21,10 +21,7 @@ enum sortOrder {
   desc = 'descend',
 }
 
-export const VotingHistory = (props: {
-  setHistoryVisible: React.Dispatch<React.SetStateAction<any>>;
-  proposalList: ProposalModel[];
-}) => {
+export const VotingHistory = (props: any) => {
   const [t] = useTranslation();
 
   const currentSession = useRecoilValue(sessionState);
@@ -43,7 +40,20 @@ export const VotingHistory = (props: {
       title: t('governance.voteHistory.table.column1'), // Proposal
       dataIndex: 'proposal',
       key: 'proposal',
-      render: txt => <a>{txt}</a>,
+      render: elem => (
+        <>
+          <Button
+            type="link"
+            onClick={() => {
+              props.setProposal(elem);
+              props.setIsProposalVisible(true);
+            }}
+          >
+            <span className="proposalNo">#{elem.proposal_id}</span>{' '}
+            <span className="proposalTitle">{elem.content.title}</span>
+          </Button>
+        </>
+      ),
     },
     {
       title: t('governance.voteHistory.table.column2'), // Your Vote
@@ -107,15 +117,16 @@ export const VotingHistory = (props: {
 
   const fetchVotingHistory = async () => {
     const votingHistory: any = await walletService.fetchAccountVotingHistory(
-      // currentSession.wallet.address
-      'tcro1ydyw9gzstgk9atua4w3zrkplq67t85hnfhw8ku',
+      currentSession.wallet.address,
     );
 
     const curData: any = votingHistory?.map((elem: any, idx) => {
       const proposal_id = elem?.data?.proposalId;
       const option = elem?.data?.option;
-      const contentTitle = props?.proposalList?.find(val => val.proposal_id === proposal_id)
-        ?.content.title;
+      const contentTitle = props?.proposalList?.find(val => val.proposal_id === proposal_id);
+
+      console.log('props?.proposalList ', props?.proposalList);
+
       return {
         index: idx + 1,
         proposal: contentTitle,

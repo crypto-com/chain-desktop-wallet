@@ -342,7 +342,12 @@ const GovernancePage = () => {
   return (
     <Layout className="site-layout">
       {historyVisible ? (
-        <VotingHistory setHistoryVisible={setHistoryVisible} proposalList={proposalList} />
+        <VotingHistory
+          setHistoryVisible={setHistoryVisible}
+          proposalList={proposalList}
+          setProposal={setProposal}
+          setIsProposalVisible={setIsProposalVisible}
+        />
       ) : (
         <>
           <Header className="site-layout-background">{t('governance.title')}</Header>
