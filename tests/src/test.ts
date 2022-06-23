@@ -259,7 +259,7 @@ async function main() {
   const phrase = '';
   signerProvider.provider.setClickTimes(7);
   const ledgerAddress = 'cro1tzhdkuc328cgh2hycyfddtdpqfwwu42yq3qgkr';
-  const nodeRpc = await NodeRpcService.init(walletConfig.nodeUrl);
+  const nodeRpc = await NodeRpcService.init({ baseUrl: walletConfig.nodeUrl });
   await Zemu.default.sleep(SLEEP_MS);
   const accountNumber = await nodeRpc.fetchAccountNumber(ledgerAddress);
   console.log('get account number ', accountNumber);

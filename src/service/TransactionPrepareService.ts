@@ -21,7 +21,7 @@ export class TransactionPrepareService {
     const currentSession = await this.storageService.retrieveCurrentSession();
     const currentWallet = currentSession.wallet;
 
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
 
     const [accountNumber, accountSequence, latestBlock] = await Promise.all([
       nodeRpc.fetchAccountNumber(currentSession.wallet.address),

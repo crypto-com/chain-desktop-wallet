@@ -25,6 +25,10 @@ export interface UserAssetConfig {
     validatorPubKeyPrefix: string;
     validatorAddressPrefix: string;
     coin: { baseDenom: string; denom: string };
+    node?: {
+      clientUrl: string;
+      proxyUrl: string;
+    };
   };
 }
 

@@ -141,7 +141,7 @@ const LedgerAddressIndexBalanceTable = (props: {
         const nodeUrl = isTestnet
           ? DefaultWalletConfigs.TestNetCroeseid4Config.nodeUrl
           : DefaultWalletConfigs.MainNetConfig.nodeUrl;
-        const nodeRpc = await NodeRpcService.init(nodeUrl);
+        const nodeRpc = await NodeRpcService.init({ baseUrl: nodeUrl });
 
         await Promise.all(
           ledgerAccountList.map(async account => {

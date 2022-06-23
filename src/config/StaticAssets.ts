@@ -123,6 +123,14 @@ export const ATOM_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
       validatorPubKeyPrefix: 'cosmosvaloperpub',
       validatorAddressPrefix: 'cosmosvaloper',
       coin: { baseDenom: 'uatom', denom: 'atom' },
+      node: {
+        clientUrl: isTestnet
+          ? 'https://rpc.sentry-01.theta-testnet.polypore.xyz'
+          : 'https://cql.crypto.com/cosmos/mainnet/rpc?apikey=pFuDmQca4vwhroAC8vc7o8k73PkhBUkwgaHYMq4wa2MpxA4fiF',
+        proxyUrl: isTestnet
+          ? 'https://rest.sentry-01.theta-testnet.polypore.xyz'
+          : 'https://cql.crypto.com/cosmos/mainnet/rpc?apikey=pFuDmQca4vwhroAC8vc7o8k73PkhBUkwgaHYMq4wa2MpxA4fiF',
+      },
     },
   };
 

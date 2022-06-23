@@ -296,7 +296,7 @@ class WalletService {
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve(null);
     }
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
     const ibcAssets: UserAsset[] = await nodeRpc.loadIBCAssets(currentSession);
 
     const persistedAssets = await ibcAssets.map(async ibcAsset => {
@@ -724,7 +724,7 @@ class WalletService {
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve(null);
     }
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
     return nodeRpc.loadLatestTally(proposalID);
   }
 }

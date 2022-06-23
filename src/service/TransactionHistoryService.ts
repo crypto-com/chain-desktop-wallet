@@ -64,7 +64,7 @@ export class TransactionHistoryService {
       return;
     }
 
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
 
     await Promise.all([
       this.fetchAndSaveDelegations(nodeRpc, currentSession),
@@ -96,7 +96,7 @@ export class TransactionHistoryService {
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
         return Promise.resolve([]);
       }
-      const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+      const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
       const topValidators = await nodeRpc.loadTopValidators();
       const topValidatorsAddressList = topValidators.map(validator => {
         return validator.validatorAddress;
@@ -592,7 +592,7 @@ export class TransactionHistoryService {
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
         return Promise.resolve([]);
       }
-      const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+      const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
       return nodeRpc.loadProposals([
         ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD,
         ProposalStatuses.PROPOSAL_STATUS_PASSED,
@@ -823,7 +823,7 @@ export class TransactionHistoryService {
       return;
     }
 
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    // const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
 
     const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
 
@@ -893,10 +893,28 @@ export class TransactionHistoryService {
           case undefined:
             // Handle case for legacy assets that got persisted without a assetType - undefined
             try {
+              if (!asset.config || !asset.address) {
+                // eslint-disable-next-line no-console
+                console.log('NO_ASSET_CONFIG_0R_ADDRESS_FOUND', {
+                  config: asset.config,
+                  address: asset.address,
+                });
+                asset.balance = '0';
+                await this.storageService.saveAsset(asset);
+                return;
+              }
+              const { tendermint } = asset.config;
+              const baseDenom =
+                tendermint?.coin.baseDenom ?? currentSession.wallet.config.network.coin.baseDenom;
               const baseDenomination =
-                asset.assetType !== UserAssetType.IBC
-                  ? currentSession.wallet.config.network.coin.baseDenom
-                  : `ibc/${asset.ibcDenomHash}`;
+                asset.assetType !== UserAssetType.IBC ? baseDenom : `ibc/${asset.ibcDenomHash}`;
+              // const nodeRpc = await NodeRpcService.init({ baseUrl: asset.config.nodeUrl });
+              const nodeRpc = await NodeRpcService.init({
+                baseUrl: asset.config.nodeUrl,
+                clientUrl: asset.config.tendermint?.node?.clientUrl,
+                proxyUrl: asset.config.tendermint?.node?.proxyUrl,
+              });
+
               asset.balance = await nodeRpc.loadAccountBalance(
                 // Handling legacy wallets which had wallet.address
                 asset.address || currentSession.wallet.address,
