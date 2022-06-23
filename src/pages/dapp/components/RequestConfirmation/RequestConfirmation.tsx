@@ -97,7 +97,6 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
   }, []);
 
   const EventView = () => {
-    setIsConfirmDisabled(false);
 
     if (event.name === 'signTransaction') {
       const networkFee = gasLimit.mul(gasPrice);

@@ -1,10 +1,14 @@
 import * as React from 'react';
 import { useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { usePasswordModal } from '../../../components/PasswordForm/PasswordFormModal';
 import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
-import { navbarMenuSelectedKeyState } from '../../../recoil/atom';
+import { allMarketState, navbarMenuSelectedKeyState, sessionState } from '../../../recoil/atom';
+import { secretStoreService } from '../../../service/storage/SecretStoreService';
 import { useWalletConnect } from '../../../service/walletconnect/useWalletConnect';
+import RequestConfirmation from '../../dapp/components/RequestConfirmation/RequestConfirmation';
+import { handleEvent } from '../provider';
 import { ConnectModal } from './ConnectModal';
 
 const { ipcRenderer } = window.require('electron');
@@ -14,9 +18,12 @@ const APP_PROTOCOL_NAME = 'ledgerlive';
 const WALLET_CONNECT_PAGE_KEY = '/walletconnect';
 
 export const WalletConnectModal = () => {
-  const { connect, state, restoreSession } = useWalletConnect();
+  const { connect, state, restoreSession, requests, cancelRequest, approveRequest } = useWalletConnect();
   const history = useHistory();
 
+  const { show, passphrase } = usePasswordModal();
+  const allMarketData = useRecoilValue(allMarketState);
+  const currentSession = useRecoilValue(sessionState);
   const cronosAsset = useCronosEvmAsset();
   const address = cronosAsset?.address;
   const [navbarMenuSelectedKey, setNavbarMenuSelectedKey] = useRecoilState(
@@ -74,6 +81,48 @@ export const WalletConnectModal = () => {
 
   return (
     <>
+      {
+        requests.length > 0 && <RequestConfirmation
+          event={requests[0]}
+          cronosAsset={cronosAsset}
+          allMarketData={allMarketData}
+          currentSession={currentSession}
+          wallet={currentSession.wallet}
+          visible
+          onConfirm={() => {
+            const request = requests[0];
+
+
+            const handler = async (passphrase: string) => {
+              const mnemonic = await secretStoreService.decryptPhrase(
+                passphrase,
+                currentSession.wallet.identifier,
+              );
+
+              handleEvent(request, mnemonic, (request, sig) => {
+                approveRequest(request, sig);
+              });
+            };
+
+            if (!passphrase) {
+              show({
+                onCancel: () => { },
+                onSuccess: (passphrase) => {
+                  handler(passphrase);
+                },
+              });
+              return;
+            }
+
+            handler(passphrase);
+
+
+          }}
+          onCancel={() => {
+            cancelRequest(requests[0]);
+          }}
+        />
+      }
       <ConnectModal address={address} />
     </>
   );
