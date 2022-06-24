@@ -149,10 +149,10 @@ export const VotingHistory = (props: any) => {
         onClick={() => props.setHistoryVisible(false)}
       >
         <ArrowLeftOutlined style={{ fontSize: '17px', color: '#1199fa', marginRight: '6px' }} />{' '}
-        Back
+        {t('governance.voteHistory.backBtn')}
       </Button>
-      <Header>Voting History</Header>
-      <div className="header-description">Below is your voting history</div>
+      <Header>{t('governance.voteHistory.title')}</Header>
+      <div className="header-description">{t('governance.voteHistory.description')}</div>
 
       <Table
         locale={{

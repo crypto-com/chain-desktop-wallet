@@ -3,9 +3,22 @@ import moment from 'moment';
 import './governance.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Layout, Tabs, List, Space, Button, Tag } from 'antd';
+import {
+  Layout,
+  Tabs,
+  List,
+  Space,
+  Button,
+  Tag,
+  //  Dropdown, Form
+} from 'antd';
 import Big from 'big.js';
-import { DislikeOutlined, LikeOutlined, HistoryOutlined } from '@ant-design/icons';
+import {
+  DislikeOutlined,
+  LikeOutlined,
+  HistoryOutlined,
+  // CaretDownOutlined
+} from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { ledgerIsExpertModeState, sessionState, walletAssetState } from '../../recoil/atom';
@@ -355,7 +368,7 @@ const GovernancePage = () => {
           <div id="governance-description" className="header-description">
             {t('governance.description')}
           </div>
-          <Button
+          {/* <Button
             id="create-proposal-btn"
             type="primary"
             onClick={() => {
@@ -363,10 +376,11 @@ const GovernancePage = () => {
             }}
           >
             {t('governance.modal2.title')}
-          </Button>
+          </Button> */}
         </>
       )}
       <Content>
+        {/* CREATE PROPOSAL MODAL */}
         <ModalPopup
           isModalVisible={isProposalModalVisible}
           handleCancel={handleCancelProposalModal}
@@ -391,6 +405,46 @@ const GovernancePage = () => {
         >
           <>
             <Header> {t('governance.modal2.title')} </Header>
+
+            <div className="instructions">
+              <div className="header-instructions">{t('governance.modal2.instructions.head')}</div>
+              <ul>
+                <li>{t('governance.modal2.instructions.part1')}</li>
+                <li>
+                  {t('governance.modal2.instructions.part2')}{' '}
+                  <a>{t('governance.modal2.instructions.part2.github')}</a>
+                  {t('governance.modal2.instructions.part2.or')}
+                  <a>{t('governance.modal2.instructions.part2.discord')}</a>
+                </li>
+              </ul>
+            </div>
+
+            {/* <Form
+                  layout="vertical"
+                  form={
+                    // confirmDeleteForm
+                  }
+                  name="control-hooks"
+                  requiredMark="optional"
+                  onFinish={
+                    // onWalletDeleteFinish
+                  }
+                >
+                  <Dropdown
+                    placement="topCenter"
+                    className="proposal-type-selection"
+                    trigger={['click']}
+                  >
+                    <div>
+                      <img src={WalletIcon} alt="walletIcon" />
+                      {ellipsis(session?.wallet.name, 16)}
+                      <CaretDownOutlined />
+                    </div>
+                  </Dropdown>
+
+
+
+                </Form> */}
           </>
         </ModalPopup>
 
