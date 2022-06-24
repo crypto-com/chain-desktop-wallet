@@ -1,10 +1,15 @@
 import { CheckOutlined } from '@ant-design/icons';
 import { Modal, Spin } from 'antd';
 import * as React from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRecoilState } from 'recoil';
+import { hexToNumber } from 'web3-utils';
+import { EVMChainConfig } from '../../../models/Chain';
 import { walletConnectPeerMetaAtom } from '../../../service/walletconnect/store';
 import { useWalletConnect } from '../../../service/walletconnect/useWalletConnect';
+import { useChainConfigs } from '../../dapp/browser/useChainConfigs';
+import ChainSelect from '../../dapp/components/ChainSelect';
 import { PeerMetaInfo } from './PeerMetaInfo';
 
 export const ConnectModal = (props: { address: string }) => {
@@ -12,6 +17,7 @@ export const ConnectModal = (props: { address: string }) => {
   const { loading, fetchingPeerMeta, connected } = state;
   const [peerMeta, setPeerMeta] = useRecoilState(walletConnectPeerMetaAtom);
   const [t] = useTranslation();
+  const { selectedChain } = useChainConfigs();
 
   return (
     <Modal
@@ -24,7 +30,7 @@ export const ConnectModal = (props: { address: string }) => {
         rejectSession();
       }}
       onOk={() => {
-        approveSession(props.address);
+        approveSession(props.address, hexToNumber(selectedChain.chainId));
       }}
       width="555px"
     >
@@ -75,10 +81,12 @@ export const ConnectModal = (props: { address: string }) => {
               By allowing permission, you are allowing the following DApp to access your address:
             </div>
             <div style={{ opacity: '0.5', marginTop: '10px' }}>{peerMeta.url}</div>
-
+            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+              <ChainSelect />
+            </div>
             <div
               style={{
-                marginTop: '40px',
+                marginTop: '20px',
                 fontSize: '14px',
                 color: '#0B1426',
                 display: 'flex',

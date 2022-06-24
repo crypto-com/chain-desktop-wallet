@@ -5,7 +5,6 @@ import { signTypedData_v4 } from 'eth-sig-util';
 import { ITransactionSigner } from './TransactionSigner';
 import TokenContractABI from './abi/TokenContractABI.json';
 import CRC721TokenContractABI from '../../contracts/CRC721.json';
-import { arrayify } from '@ethersproject/bytes';
 
 import {
   BridgeTransactionUnsigned,

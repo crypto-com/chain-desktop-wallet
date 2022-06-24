@@ -13,7 +13,6 @@ import { IWCRequest, TxParams } from './types';
 import { clearCachedSession, getCachedSession } from './utils';
 
 export const useWalletConnect = () => {
-  const [chainId, setChainId] = useState(0);
   const [state, setState] = useRecoilState(walletConnectStateAtom);
   const [connector, setConnector] = useRecoilState(walletConnectConnectorAtom);
   const [peerMeta, setPeerMeta] = useRecoilState(walletConnectPeerMetaAtom);
@@ -65,21 +64,20 @@ export const useWalletConnect = () => {
   const killSession = async () => {
     log('ACTION', 'killSession');
     try {
+      resetApp();
       await connector?.killSession();
     } catch (error) {
       log('ERROR', error);
-    } finally {
-      resetApp();
     }
   };
 
-  const approveSession = async (address: string) => {
+  const approveSession = async (address: string, chainId: number) => {
     log('ACTION', 'approveSession');
     if (connector) {
       try {
         await connector.approveSession({
           accounts: [address],
-          chainId: 1,
+          chainId,
         });
         setState({
           ...state,
@@ -150,12 +148,11 @@ export const useWalletConnect = () => {
   };
 
   const resetApp = () => {
+    setPeerMeta(null);
     setState({
       ...DefaultState,
     });
     setConnector(null);
-    setPeerMeta(null);
-    setChainId(0);
     clearCachedSession();
   };
 
@@ -272,7 +269,6 @@ export const useWalletConnect = () => {
           connected: true,
           address,
         });
-        setChainId(chainId);
       }
     }
   });

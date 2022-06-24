@@ -1,10 +1,13 @@
 import { Select } from 'antd';
 import * as React from 'react';
+import { useEffect } from 'react';
+import { EVMChainConfig } from '../../../../models/Chain';
 import { isHexEqual } from '../../../../utils/utils';
 import { useChainConfigs } from '../../browser/useChainConfigs';
 import './index.less';
 
 const { Option } = Select;
+
 
 const ChainSelect = () => {
   const { list: chainConfigs, selectedChain, setSelectedChain } = useChainConfigs();
