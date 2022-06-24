@@ -31,7 +31,7 @@ export const VotingHistory = (props: any) => {
 
   const columns: any = [
     {
-      title: '#',
+      title: ' ',
       dataIndex: 'index',
       key: 'index',
       render: txt => '#'.concat(txt),
