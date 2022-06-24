@@ -1,14 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useRecoilValue } from 'recoil';
-
 import { Layout, Button, Table, Tag, Spin } from 'antd';
 import { ArrowLeftOutlined, LoadingOutlined } from '@ant-design/icons';
-
 import moment from 'moment';
 import { useTranslation } from 'react-i18next';
 
 import { walletService } from '../../../service/WalletService';
-// import { ProposalModel } from '../../../models/Transaction';
 import { sessionState } from '../../../recoil/atom';
 
 import '../governance.less';
@@ -23,7 +20,6 @@ enum sortOrder {
 
 export const VotingHistory = (props: any) => {
   const [t] = useTranslation();
-
   const currentSession = useRecoilValue(sessionState);
   const didMountRef = useRef(false);
   const [tableData, SetTableData] = useState([]);
