@@ -699,14 +699,15 @@ export class TransactionSenderService {
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
     await this.txHistoryManager.fetchAndSaveProposals(currentSession);
     return broadCastResult;
-
   }
 
   /**
-   * 
-   * @param textProposalSubmitRequest 
+   *
+   * @param textProposalSubmitRequest
    */
-  public async sendSubmitTextProposalTransaction(textProposalSubmitRequest: TextProposalRequest): Promise<BroadCastResult> {
+  public async sendSubmitTextProposalTransaction(
+    textProposalSubmitRequest: TextProposalRequest,
+  ): Promise<BroadCastResult> {
     const {
       nodeRpc,
       accountNumber,

@@ -20,6 +20,7 @@ import RevokePermission from '../tabs/RevokePermission/RevokePermission';
 import { GeneralSettingsForm } from './GeneralSettingsForm';
 import { MetaInfoComponent } from './MetaInfoComponent';
 import { getAssetConfigFromWalletConfig } from '../utils';
+import Support from '../tabs/Support/Support';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -341,6 +342,9 @@ export const FormSettings = () => {
                 </TabPane>
                 <TabPane tab={t('settings.revoke-permission')} key="revoke-permission">
                   <RevokePermission />
+                </TabPane>
+                <TabPane tab={t('settings.support.title')} key="support">
+                  <Support />
                 </TabPane>
               </Tabs>
             </Form>

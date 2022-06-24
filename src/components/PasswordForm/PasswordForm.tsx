@@ -165,7 +165,11 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
                 }}
               >
                 {t('signup.passwordFormContainer.agreeTermsLabel')}{' '}
-                <a href="https://crypto.org/desktopwallet/terms" target="_blank" rel="noreferrer">
+                <a
+                  href="https://crypto.com/document/desktop_wallet"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   {t('signup.passwordFormContainer.tAndC')}
                 </a>
               </Checkbox>
