@@ -82,6 +82,8 @@ const GovernancePage = () => {
   const didMountRef = useRef(false);
   const [isLoadingTally, setIsLoadingTally] = useState(false);
 
+  const [isProposalModalVisible, setIsProposalModalVisible] = useState(false);
+
   const { isLedgerConnected } = useLedgerStatus({ asset: userAsset });
 
   const analyticsService = new AnalyticsService(currentSession);
@@ -95,6 +97,10 @@ const GovernancePage = () => {
   );
 
   const [t] = useTranslation();
+
+  const handleCancelProposalModal = () => {
+    setIsProposalModalVisible(false);
+  };
 
   const handleCancelConfirmationModal = () => {
     setIsVisibleConfirmationModal(false);
@@ -346,10 +352,48 @@ const GovernancePage = () => {
       ) : (
         <>
           <Header className="site-layout-background">{t('governance.title')}</Header>
-          <div className="header-description">{t('governance.description')}</div>
+          <div id="governance-description" className="header-description">
+            {t('governance.description')}
+          </div>
+          <Button
+            id="create-proposal-btn"
+            type="primary"
+            onClick={() => {
+              setIsProposalModalVisible(true);
+            }}
+          >
+            {t('governance.modal2.title')}
+          </Button>
         </>
       )}
       <Content>
+        <ModalPopup
+          isModalVisible={isProposalModalVisible}
+          handleCancel={handleCancelProposalModal}
+          handleOk={() => {}}
+          footer={[
+            <Button
+              key="submit"
+              type="primary"
+              loading={confirmLoading}
+              disabled={
+                !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
+              }
+              onClick={onConfirm}
+            >
+              {t('governance.modal2.button.submit')}
+            </Button>,
+            <Button key="back" type="link" onClick={handleCancelProposalModal}>
+              {t('general.cancel')}
+            </Button>,
+          ]}
+          okText={t('general.confirm')}
+        >
+          <>
+            <Header> {t('governance.modal2.title')} </Header>
+          </>
+        </ModalPopup>
+
         {isProposalVisible ? (
           <ProposalView
             props={{

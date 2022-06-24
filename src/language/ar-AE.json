@@ -195,6 +195,7 @@
   "create.ledgerModalPopup.tendermintAddress.title1": "! نجاح",
   "create.ledgerModalPopup.tendermintAddress.title2": "قم بتوصيل جهاز الLedger الخاصة بك ",
   "create.ledgerModalPopup.evmAddress.title1": "!نجاح",
+  "create.ledgerModalPopup.evmAddress.title2": "قم بتوصيل جهاز الLedger الخاصة بك ",
   "restore.title1": "اعاده المحظه",
   "restore.title2": "التكوين المخصص",
   "restore.formCustomConfig.chainId.label": "معرف السلسلة",

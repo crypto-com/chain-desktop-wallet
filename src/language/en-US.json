@@ -589,6 +589,8 @@
   "governance.modal1.label1": "Sender Address",
   "governance.modal1.label2": "Vote to Proposal",
   "governance.modal1.label3": "Vote",
+  "governance.modal2.title": "Create Proposal",
+  "governance.modal2.button.submit": "Submit",
   "governance.voteHistory.table.column1": "Proposal",
   "governance.voteHistory.table.column2": "Your Vote",
   "governance.voteHistory.table.column3": "Voted On",
