@@ -120,6 +120,10 @@
     position: relative;
   }
 
+  .header-description {
+    margin-bottom: 32px;
+  }
+
   .proposalTitle {
     font-size: 14px;
   }
@@ -127,5 +131,17 @@
   .proposalNo {
     margin-right: 6px;
     font-size: 14px;
+  }
+
+  .ant-table {
+    .ant-table-thead > tr > th,
+    .ant-table-tbody .ant-table-cell {
+      padding: 24px 20px;
+
+      .ant-btn:not(.ant-upload-list-item-card-actions-btn) {
+        margin: 0;
+        padding: 0;
+      }
+    }
   }
 }

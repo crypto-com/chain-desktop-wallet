@@ -342,32 +342,39 @@ const GovernancePage = () => {
   return (
     <Layout className="site-layout">
       {historyVisible ? (
-        <VotingHistory
-          setHistoryVisible={setHistoryVisible}
-          proposalList={proposalList}
-          setProposal={setProposal}
-          setIsProposalVisible={setIsProposalVisible}
-        />
+        <></>
       ) : (
         <>
           <Header className="site-layout-background">{t('governance.title')}</Header>
           <div className="header-description">{t('governance.description')}</div>
-          <Content>
-            {isProposalVisible ? (
-              <ProposalView
-                props={{
-                  setInputPasswordVisible,
-                  setIsVisibleConfirmationModal,
-                  proposal,
-                  decryptedPhrase,
-                  isLoadingTally,
-                  proposalFigures,
-                  showPasswordInput,
-                  voteOption,
-                  setVoteOption,
-                  isProposalVisible,
-                  setIsProposalVisible,
-                }}
+        </>
+      )}
+      <Content>
+        {isProposalVisible ? (
+          <ProposalView
+            props={{
+              setInputPasswordVisible,
+              setIsVisibleConfirmationModal,
+              proposal,
+              decryptedPhrase,
+              isLoadingTally,
+              proposalFigures,
+              showPasswordInput,
+              voteOption,
+              setVoteOption,
+              isProposalVisible,
+              setIsProposalVisible,
+              historyVisible,
+            }}
+          />
+        ) : (
+          <>
+            {historyVisible ? (
+              <VotingHistory
+                setHistoryVisible={setHistoryVisible}
+                proposalList={proposalList}
+                setProposal={setProposal}
+                setIsProposalVisible={setIsProposalVisible}
               />
             ) : (
               <Tabs defaultActiveKey="1" tabBarExtraContent={historyBtn}>
@@ -621,120 +628,112 @@ const GovernancePage = () => {
                 </TabPane>
               </Tabs>
             )}
-          </Content>
-          <Footer />
-          <PasswordFormModal
-            description={t('general.passwordFormModal.description')}
-            okButtonText={t('general.passwordFormModal.okButton')}
-            onCancel={() => {
-              setInputPasswordVisible(false);
-            }}
-            onSuccess={onWalletDecryptFinish}
-            onValidatePassword={async (password: string) => {
-              const isValid = await secretStoreService.checkIfPasswordIsValid(password);
-              return {
-                valid: isValid,
-                errMsg: !isValid ? t('general.passwordFormModal.error') : '',
-              };
-            }}
-            successText={t('general.passwordFormModal.success')}
-            title={t('general.passwordFormModal.title')}
-            visible={inputPasswordVisible}
-            successButtonText={t('general.continue')}
-            confirmPassword={false}
-          />
-          <ModalPopup
-            isModalVisible={isConfirmationModalVisible}
-            handleCancel={handleCancelConfirmationModal}
-            handleOk={() => {}}
-            footer={[
-              <Button
-                key="submit"
-                type="primary"
-                loading={confirmLoading}
-                disabled={
-                  !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
-                }
-                onClick={onConfirm}
-              >
-                {t('general.confirm')}
-              </Button>,
-              <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
-                {t('general.cancel')}
-              </Button>,
-            ]}
-            okText={t('general.confirm')}
+          </>
+        )}
+      </Content>
+      <Footer />
+      <PasswordFormModal
+        description={t('general.passwordFormModal.description')}
+        okButtonText={t('general.passwordFormModal.okButton')}
+        onCancel={() => {
+          setInputPasswordVisible(false);
+        }}
+        onSuccess={onWalletDecryptFinish}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          return {
+            valid: isValid,
+            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
+          };
+        }}
+        successText={t('general.passwordFormModal.success')}
+        title={t('general.passwordFormModal.title')}
+        visible={inputPasswordVisible}
+        successButtonText={t('general.continue')}
+        confirmPassword={false}
+      />
+      <ModalPopup
+        isModalVisible={isConfirmationModalVisible}
+        handleCancel={handleCancelConfirmationModal}
+        handleOk={() => {}}
+        footer={[
+          <Button
+            key="submit"
+            type="primary"
+            loading={confirmLoading}
+            disabled={!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE}
+            onClick={onConfirm}
           >
-            <>
-              <div className="title">{t('governance.modal1.title')}</div>
-              <div className="description">{t('governance.modal1.description')}</div>
-              <div className="item">
-                <div className="label">{t('governance.modal1.label1')}</div>
-                <div className="address">{`${currentSession.wallet.address}`}</div>
-              </div>
-              <div className="item">
-                <div className="label">{t('governance.modal1.label2')}</div>
-                <div className="address">{`#${proposal?.proposal_id} ${proposal?.content.title}`}</div>
-              </div>
-              <div className="item">
-                <div className="label">{t('governance.modal1.label3')}</div>
-                <div>{processVoteTag(voteOption)}</div>
-              </div>
-            </>
-          </ModalPopup>
-          <SuccessModalPopup
-            isModalVisible={isSuccessModalVisible}
-            handleCancel={closeSuccessModal}
-            handleOk={closeSuccessModal}
-            title={t('general.successModalPopup.title')}
-            button={null}
-            footer={[
-              <Button key="submit" type="primary" onClick={closeSuccessModal}>
-                {t('general.ok')}
-              </Button>,
-            ]}
-          >
-            <>
-              {broadcastResult?.code !== undefined &&
-              broadcastResult?.code !== null &&
-              broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-                <div className="description">
-                  {t('general.successModalPopup.timeout.description')}
-                </div>
-              ) : (
-                <div className="description">{t('general.successModalPopup.vote.description')}</div>
-              )}
-              {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
-            </>
-          </SuccessModalPopup>
-          <ErrorModalPopup
-            isModalVisible={isErrorModalVisible}
-            handleCancel={closeErrorModal}
-            handleOk={closeErrorModal}
-            title={t('general.errorModalPopup.title')}
-            footer={[]}
-          >
-            <>
-              <div className="description">
-                {t('general.errorModalPopup.vote.description')}
-                <br />
-                {errorMessages
-                  .filter((item, idx) => {
-                    return errorMessages.indexOf(item) === idx;
-                  })
-                  .map((err, idx) => (
-                    <div key={idx}>- {err}</div>
-                  ))}
-                {ledgerIsExpertMode ? (
-                  <div>{t('general.errorModalPopup.ledgerExportMode')}</div>
-                ) : (
-                  ''
-                )}
-              </div>
-            </>
-          </ErrorModalPopup>
+            {t('general.confirm')}
+          </Button>,
+          <Button key="back" type="link" onClick={handleCancelConfirmationModal}>
+            {t('general.cancel')}
+          </Button>,
+        ]}
+        okText={t('general.confirm')}
+      >
+        <>
+          <div className="title">{t('governance.modal1.title')}</div>
+          <div className="description">{t('governance.modal1.description')}</div>
+          <div className="item">
+            <div className="label">{t('governance.modal1.label1')}</div>
+            <div className="address">{`${currentSession.wallet.address}`}</div>
+          </div>
+          <div className="item">
+            <div className="label">{t('governance.modal1.label2')}</div>
+            <div className="address">{`#${proposal?.proposal_id} ${proposal?.content.title}`}</div>
+          </div>
+          <div className="item">
+            <div className="label">{t('governance.modal1.label3')}</div>
+            <div>{processVoteTag(voteOption)}</div>
+          </div>
         </>
-      )}
+      </ModalPopup>
+      <SuccessModalPopup
+        isModalVisible={isSuccessModalVisible}
+        handleCancel={closeSuccessModal}
+        handleOk={closeSuccessModal}
+        title={t('general.successModalPopup.title')}
+        button={null}
+        footer={[
+          <Button key="submit" type="primary" onClick={closeSuccessModal}>
+            {t('general.ok')}
+          </Button>,
+        ]}
+      >
+        <>
+          {broadcastResult?.code !== undefined &&
+          broadcastResult?.code !== null &&
+          broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+            <div className="description">{t('general.successModalPopup.timeout.description')}</div>
+          ) : (
+            <div className="description">{t('general.successModalPopup.vote.description')}</div>
+          )}
+          {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
+        </>
+      </SuccessModalPopup>
+      <ErrorModalPopup
+        isModalVisible={isErrorModalVisible}
+        handleCancel={closeErrorModal}
+        handleOk={closeErrorModal}
+        title={t('general.errorModalPopup.title')}
+        footer={[]}
+      >
+        <>
+          <div className="description">
+            {t('general.errorModalPopup.vote.description')}
+            <br />
+            {errorMessages
+              .filter((item, idx) => {
+                return errorMessages.indexOf(item) === idx;
+              })
+              .map((err, idx) => (
+                <div key={idx}>- {err}</div>
+              ))}
+            {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
+          </div>
+        </>
+      </ErrorModalPopup>
     </Layout>
   );
 };

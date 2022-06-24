@@ -117,16 +117,14 @@ export const VotingHistory = (props: any) => {
 
   const fetchVotingHistory = async () => {
     const votingHistory: any = await walletService.fetchAccountVotingHistory(
-      currentSession.wallet.address,
+      // currentSession.wallet.address,
+      'tcro1ydyw9gzstgk9atua4w3zrkplq67t85hnfhw8ku',
     );
 
     const curData: any = votingHistory?.map((elem: any, idx) => {
       const proposal_id = elem?.data?.proposalId;
       const option = elem?.data?.option;
       const contentTitle = props?.proposalList?.find(val => val.proposal_id === proposal_id);
-
-      console.log('props?.proposalList ', props?.proposalList);
-
       return {
         index: idx + 1,
         proposal: contentTitle,
@@ -157,7 +155,7 @@ export const VotingHistory = (props: any) => {
         <ArrowLeftOutlined style={{ fontSize: '17px', color: '#1199fa', marginRight: '6px' }} />{' '}
         Back
       </Button>
-      <Header className="site-layout-background">Voting History</Header>
+      <Header>Voting History</Header>
       <div className="header-description">Below is your voting history</div>
 
       <Table

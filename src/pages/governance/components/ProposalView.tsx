@@ -102,7 +102,11 @@ export const ProposalView = (props: any) => {
                 style={{ fontSize: '16px' }}
               >
                 <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
-                {t('governance.backToList')}
+                {allProps.historyVisible ? (
+                  <>{t('governance.backToHistory')}</>
+                ) : (
+                  <>{t('governance.backToList')}</>
+                )}
               </div>
             </a>
             <div className="title">
