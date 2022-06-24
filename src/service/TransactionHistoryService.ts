@@ -903,16 +903,17 @@ export class TransactionHistoryService {
                 await this.storageService.saveAsset(asset);
                 return;
               }
-              const { tendermint } = asset.config;
+              const { tendermintNetwork } = asset.config;
               const baseDenom =
-                tendermint?.coin.baseDenom ?? currentSession.wallet.config.network.coin.baseDenom;
+                tendermintNetwork?.coin.baseDenom ??
+                currentSession.wallet.config.network.coin.baseDenom;
               const baseDenomination =
                 asset.assetType !== UserAssetType.IBC ? baseDenom : `ibc/${asset.ibcDenomHash}`;
               // const nodeRpc = await NodeRpcService.init({ baseUrl: asset.config.nodeUrl });
               const nodeRpc = await NodeRpcService.init({
                 baseUrl: asset.config.nodeUrl,
-                clientUrl: asset.config.tendermint?.node?.clientUrl,
-                proxyUrl: asset.config.tendermint?.node?.proxyUrl,
+                clientUrl: asset.config.tendermintNetwork?.node?.clientUrl,
+                proxyUrl: asset.config.tendermintNetwork?.node?.proxyUrl,
               });
 
               asset.balance = await nodeRpc.loadAccountBalance(

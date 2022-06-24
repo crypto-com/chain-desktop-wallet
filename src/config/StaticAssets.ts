@@ -116,13 +116,17 @@ export const ATOM_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
       ? 'https://rpc.sentry-01.theta-testnet.polypore.xyz'
       : 'https://cql.crypto.com/cosmos/mainnet/rpc?apikey=pFuDmQca4vwhroAC8vc7o8k73PkhBUkwgaHYMq4wa2MpxA4fiF',
     memoSupportDisabled: false,
-    tendermint: {
-      chain: SupportedChainName.COSMOS_HUB,
-      defaultChainId: isTestnet ? 'theta-testnet-001' : 'cosmoshub-4',
+    tendermintNetwork: {
+      defaultNodeUrl: isTestnet
+        ? 'https://rpc.sentry-01.theta-testnet.polypore.xyz'
+        : 'https://cql.crypto.com/cosmos/mainnet/rpc?apikey=pFuDmQca4vwhroAC8vc7o8k73PkhBUkwgaHYMq4wa2MpxA4fiF',
+      chainName: SupportedChainName.COSMOS_HUB,
+      chainId: isTestnet ? 'theta-testnet-001' : 'cosmoshub-4',
       addressPrefix: 'cosmos',
       validatorPubKeyPrefix: 'cosmosvaloperpub',
       validatorAddressPrefix: 'cosmosvaloper',
-      coin: { baseDenom: 'uatom', denom: 'atom' },
+      bip44Path: { coinType: 118, account: 0 },
+      coin: { baseDenom: 'uatom', croDenom: 'atom', denom: 'atom' },
       node: {
         clientUrl: isTestnet
           ? 'https://rpc.sentry-01.theta-testnet.polypore.xyz'

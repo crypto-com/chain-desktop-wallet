@@ -24,16 +24,16 @@ export class AddressGenerator {
     switch (assetType) {
       case UserAssetType.TENDERMINT:
       case UserAssetType.IBC: {
-        if (assetConfig?.tendermint) {
-          const { tendermint } = assetConfig;
-          const { addressPrefix: prefix, chain } = tendermint;
+        if (assetConfig?.tendermintNetwork) {
+          const { tendermintNetwork } = assetConfig;
+          const { addressPrefix: prefix, chainName } = tendermintNetwork;
           let hdPaths;
-          switch (chain) {
+          switch (chainName) {
             case SupportedChainName.COSMOS_HUB:
               hdPaths = [MakeHdPath.init(0, DerivationPathStandard.BIP44).cosmosHubMainnet()];
               break;
             default:
-              throw new TypeError(`Unsupported Chain: ${chain}`);
+              throw new TypeError(`Unsupported Chain: ${chainName}`);
           }
           const wallet = await DirectSecp256k1HdWallet.fromMnemonic(this.seed, {
             hdPaths,

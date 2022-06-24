@@ -451,6 +451,11 @@ export type Network = {
   bip44Path: { coinType: number; account: number };
   validatorPubKeyPrefix: string;
   validatorAddressPrefix: string;
-  coin: { baseDenom: string; croDenom: string };
+  coin: { baseDenom: string; croDenom: string; denom?: string };
   rpcUrl?: string;
+  chainName?: string;
+  node?: {
+    clientUrl: string;
+    proxyUrl: string;
+  };
 };
