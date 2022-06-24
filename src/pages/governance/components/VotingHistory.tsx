@@ -151,7 +151,7 @@ export const VotingHistory = (props: any) => {
         <ArrowLeftOutlined style={{ fontSize: '17px', color: '#1199fa', marginRight: '6px' }} />{' '}
         {t('governance.voteHistory.backBtn')}
       </Button>
-      <Header>{t('governance.voteHistory.title')}</Header>
+      <Header className="voting-history-title">{t('governance.voteHistory.title')}</Header>
       <div className="header-description">{t('governance.voteHistory.description')}</div>
 
       <Table
