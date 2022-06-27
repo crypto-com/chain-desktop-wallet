@@ -38,6 +38,7 @@ module.exports = {
       'warn',
       'always',
     ],
+    '@typescript-eslint/indent': ['warn', 2],
     '@typescript-eslint/object-curly-spacing': 'off',
     'jsx-a11y/accessible-emoji': 'off',
     'no-new-wrappers': 'off',

@@ -56,14 +56,12 @@ class EvmTransactionSigner implements ITransactionSigner {
     return Promise.resolve(signedTx);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  public async sendContractCallTransaction(props: {
-    chainConfig: EVMChainConfig,
-    transaction: EVMContractCallUnsigned,
-    phrase: string,
-  }): Promise<string> {
 
-    const { chainConfig, transaction, phrase } = props;
+  static async signContractCallTransaction(props: {    chainConfig: EVMChainConfig,
+    transaction: EVMContractCallUnsigned,
+    mnemonic: string}) {
+
+    const { chainConfig, transaction, mnemonic } = props;
 
     const chainId = parseChainId(chainConfig);
     const rpcURL = chainConfig.rpcUrls[0];
@@ -87,11 +85,8 @@ class EvmTransactionSigner implements ITransactionSigner {
         transaction.value ?? '0x0',
         transaction.data,
       );
-      const cronosClient = new CronosClient(rpcURL, chainConfig.rpcUrls[0]);
 
-      const result = await cronosClient.broadcastRawTransactionHex(signedTx);
-
-      return Promise.resolve(result);
+      return signedTx;
     }
 
     const txRequest: ethers.providers.TransactionRequest = {
@@ -113,10 +108,27 @@ class EvmTransactionSigner implements ITransactionSigner {
     }
 
     const provider = new ethers.providers.JsonRpcProvider(rpcURL);
-    const wallet = ethers.Wallet.fromMnemonic(phrase).connect(provider);
+    const wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider);
 
-    const signedTx = await wallet.sendTransaction(txRequest);
-    return Promise.resolve(signedTx.hash);
+    return await wallet.signTransaction(txRequest);
+  
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  static async sendContractCallTransaction(props: {
+    chainConfig: EVMChainConfig,
+    transaction: EVMContractCallUnsigned,
+    mnemonic: string,
+  }): Promise<string> {
+    const { chainConfig } = props;
+    const rpcURL = chainConfig.rpcUrls[0];
+
+    const cronosClient = new CronosClient(rpcURL, chainConfig.rpcUrls[0]);
+    const signedTx = await this.signContractCallTransaction(props);
+
+    const result = await cronosClient.broadcastRawTransactionHex(signedTx);
+
+    return result;
   }
 
   // eslint-disable-next-line class-methods-use-this

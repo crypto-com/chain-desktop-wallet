@@ -1,6 +1,7 @@
 import { atom } from 'recoil';
 import { IClientMeta } from '@walletconnect/types';
 import WalletConnect from '@walletconnect/client';
+import { EVMChainConfig } from '../../models/Chain';
 
 export interface WalletConnectState {
   connected: boolean;
@@ -15,6 +16,11 @@ export const DefaultState: WalletConnectState = {
   fetchingPeerMeta: false,
   address: '',
 };
+
+export const walletConnectSelectedChainConfigAtom = atom<EVMChainConfig | null>({
+  key: 'walletConnectSelectedChainConfigAtom',
+  default: null,
+});
 
 export const walletConnectPeerMetaAtom = atom<Partial<IClientMeta> | null>({
   key: 'walletConnectPeerMetaAtom',

@@ -1,23 +1,27 @@
-import { DEFAULT_GAS_LIMIT } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/v2.signable';
 import WalletConnect from '@walletconnect/client';
 import { IJsonRpcRequest } from '@walletconnect/types';
 import { useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { usePasswordModal } from '../../components/PasswordForm/PasswordFormModal';
-import { DAppDefaultChainConfigs } from '../../config/DAppChainConfig';
+import { hexToNumber, numberToHex } from 'web3-utils';
 import { EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
 import { useRefCallback } from '../../hooks/useRefCallback';
+import { EVMChainConfig } from '../../models/Chain';
+import { useChainConfigs } from '../../pages/dapp/browser/useChainConfigs';
 import { DappBrowserIPC } from '../../pages/dapp/types';
-import { DefaultState, walletConnectConnectorAtom, walletConnectPeerMetaAtom, walletConnectStateAtom } from './store';
-import { IWCRequest, TxParams } from './types';
+import { fillInTransactionEventData } from '../../pages/dapp/utils';
+import { isHexEqual } from '../../utils/utils';
+import { DefaultState, walletConnectConnectorAtom, walletConnectPeerMetaAtom, walletConnectSelectedChainConfigAtom, walletConnectStateAtom } from './store';
+import { TxParams } from './types';
 import { clearCachedSession, getCachedSession } from './utils';
 
 export const useWalletConnect = () => {
   const [state, setState] = useRecoilState(walletConnectStateAtom);
   const [connector, setConnector] = useRecoilState(walletConnectConnectorAtom);
   const [peerMeta, setPeerMeta] = useRecoilState(walletConnectPeerMetaAtom);
-
+  const [chainConfig, setChainConfig] = useRecoilState(walletConnectSelectedChainConfigAtom);
   const [requests, setRequests] = useState<DappBrowserIPC.Event[]>([]);
+
+  const { list: chainConfigs } = useChainConfigs();
 
   // const state = getRecoil(walletConnectStateAtom);
 
@@ -32,7 +36,7 @@ export const useWalletConnect = () => {
       try {
         const connector = new WalletConnect({ session });
 
-        const { connected, accounts, peerMeta } = connector;
+        const { connected, accounts, peerMeta, chainId } = connector;
 
         setConnector(connector);
         setState({
@@ -41,6 +45,13 @@ export const useWalletConnect = () => {
           address: accounts[0],
         });
         setPeerMeta({...peerMeta});
+
+        // find chainConfig
+        const foundConfig = chainConfigs.find(c => hexToNumber(c.chainId) === chainId);
+        if (foundConfig) {
+          setChainConfig(foundConfig);
+        }
+
         subscribeToEvents.current(connector);
       } catch {
         resetApp();
@@ -71,14 +82,15 @@ export const useWalletConnect = () => {
     }
   };
 
-  const approveSession = async (address: string, chainId: number) => {
+  const approveSession = async (address: string, chainConfig: EVMChainConfig) => {
     log('ACTION', 'approveSession');
     if (connector) {
       try {
         await connector.approveSession({
           accounts: [address],
-          chainId,
+          chainId: hexToNumber(chainConfig.chainId),
         });
+        setChainConfig(chainConfig);
         setState({
           ...state,
           address,
@@ -156,6 +168,68 @@ export const useWalletConnect = () => {
     clearCachedSession();
   };
 
+  const handleCallRequest = useRefCallback(async (error, payload: IJsonRpcRequest) => {
+    log('EVENT', 'call_request', 'method', payload.method);
+    log('EVENT', 'call_request', 'params', payload.params);
+
+    if (error) {
+      throw error;
+    }
+
+    if (!chainConfig) {
+      throw new Error('Not connected');
+    }
+
+    switch (payload.method) {
+      case 'personal_sign':
+        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: {data: payload.params[0]} }]);
+        break;
+      case 'eth_sign':
+        setRequests([...requests, { id: payload.id, name: 'signMessage', object: {data: payload.params[1]} }]);
+        break;
+
+      case 'eth_signTypedData':
+        setRequests([...requests, {id: payload.id, name: 'signTypedMessage', object: {data: payload.params[0], raw: payload.params[1]} }]);
+        break;
+      case 'eth_signTransaction': {
+        const txParam = payload.params[0] as TxParams;
+
+        const request = await fillInTransactionEventData({ id: payload.id, name: 'signTransaction', object: {
+          chainConfig: chainConfig,
+          ...txParam,
+          gas: txParam.gas ?  Number(txParam.gas) : 0,
+          gasPrice: txParam.gasPrice ?? EVM_MINIMUM_GAS_PRICE,
+        } }, chainConfig);
+
+        setRequests([...requests, request]);
+      }
+        break;
+      case 'eth_sendTransaction': {
+        const txParam = payload.params[0] as TxParams;
+
+        const request = await fillInTransactionEventData({ id: payload.id, name: 'sendTransaction', object: {
+          chainConfig: chainConfig,
+          ...txParam,
+          gas: txParam.gas ?  Number(txParam.gas) : 0,
+          gasPrice: txParam.gasPrice ?? EVM_MINIMUM_GAS_PRICE,
+        } }, chainConfig);
+
+        setRequests([...requests, request]);
+      }
+        break;
+      case 'eth_signPersonalMessage':
+        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: {data: payload.params[0]} }]);
+        break;
+      case 'eth_signTypedData_v3':
+        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: {data: payload.params[0]} }]);
+        break;
+      default:
+        log('unknown payload');
+        break;
+    }
+  }
+  );
+
   const subscribeToEvents = useRefCallback((connector: WalletConnect) => {
     log('ACTION', 'subscribeToEvents');
 
@@ -186,55 +260,7 @@ export const useWalletConnect = () => {
       });
 
       connector.on('call_request', async (error, payload: IJsonRpcRequest) => {
-        log('EVENT', 'call_request', 'method', payload.method);
-        log('EVENT', 'call_request', 'params', payload.params);
-
-        if (error) {
-          throw error;
-        }
-
-        switch (payload.method) {
-          case 'personal_sign':
-            setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: {data: payload.params[0]} }]);
-            break;
-          case 'eth_sign':
-            setRequests([...requests, { id: payload.id, name: 'signMessage', object: {data: payload.params[1]} }]);
-            break;
-          case 'eth_signTransaction': {
-            const txParam = payload.params[0] as TxParams;
-
-            setRequests([...requests, { id: payload.id, name: 'signTransaction', object: {
-              chainConfig: DAppDefaultChainConfigs[0],
-              ...txParam,
-              gas: txParam.gas ?  Number(txParam.gas) : 0,
-              gasPrice: txParam.gasPrice ?? EVM_MINIMUM_GAS_PRICE,
-            } }]);
-          }
-            break;
-          case 'eth_signTypedData':
-            setRequests([...requests, {id: payload.id, name: 'signTypedMessage', object: {data: payload.params[0], raw: payload.params[1]} }]);
-            break;
-          case 'eth_sendTransaction': {
-            const txParam = payload.params[0] as TxParams;
-
-            setRequests([...requests, { id: payload.id, name: 'signTransaction', object: {
-              chainConfig: DAppDefaultChainConfigs[0],
-              ...txParam,
-              gas: txParam.gas ?  Number(txParam.gas) : 0,
-              gasPrice: txParam.gasPrice ?? EVM_MINIMUM_GAS_PRICE,
-            } }]);
-          }
-            break;
-          case 'eth_signPersonalMessage':
-            setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: {data: payload.params[0]} }]);
-            break;
-          case 'eth_signTypedData_v3':
-            setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: {data: payload.params[0]} }]);
-            break;
-          default:
-            log('unknown payload');
-            break;
-        }
+        handleCallRequest.current(error, payload);
       });
 
       connector.on('connect', error => {

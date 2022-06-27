@@ -98,9 +98,8 @@ export const WalletConnectModal = () => {
           currentSession={currentSession}
           wallet={currentSession.wallet}
           visible
-          onConfirm={() => {
-            const request = requests[0];
-
+          onConfirm={({ gasLimit, gasPrice }) => {
+            const event = requests[0];
 
             const handler = async (passphrase: string) => {
               const mnemonic = await secretStoreService.decryptPhrase(
@@ -108,8 +107,10 @@ export const WalletConnectModal = () => {
                 currentSession.wallet.identifier,
               );
 
-              handleEvent(request, mnemonic, (request, sig) => {
-                approveRequest(request, sig);
+              handleEvent({
+                event, mnemonic, gasLimit, gasPrice, onSuccess: (result) => {
+                  approveRequest(event, result);
+                }, onError: (error) => { }
               });
             };
 
