@@ -12,7 +12,7 @@ interface EventInfo {
   onError: (error: string) => void
 }
 
-export const handleEvent = async ({event, mnemonic, gasLimit: _gasLimit, gasPrice: _gasPrice, onSuccess, onError}: EventInfo) => {
+export const handleEvent = async ({ event, mnemonic, gasLimit: _gasLimit, gasPrice: _gasPrice, onSuccess, onError }: EventInfo) => {
 
   switch (event.name) {
     case 'signPersonalMessage':
@@ -37,17 +37,17 @@ export const handleEvent = async ({event, mnemonic, gasLimit: _gasLimit, gasPric
       break;
 
     case 'tokenApproval': {
-      await sendTokenApprovalEvent({event, mnemonic,_gasLimit, _gasPrice, onSuccess, onError });
+      await sendTokenApprovalEvent({ event, mnemonic,_gasLimit, _gasPrice, onSuccess, onError });
     }
       break;
 
     case 'sendTransaction': {
-      await sendTransactionEvent({event, mnemonic, _gasLimit, _gasPrice, onSuccess, onError });
+      await sendTransactionEvent({ event, mnemonic, _gasLimit, _gasPrice, onSuccess, onError });
     }
       break;
 
     case 'signTransaction': {
-      await signTransactionEvent({event, mnemonic, _gasLimit, _gasPrice, onSuccess, onError });
+      await signTransactionEvent({ event, mnemonic, _gasLimit, _gasPrice, onSuccess, onError });
     }
       break;
   

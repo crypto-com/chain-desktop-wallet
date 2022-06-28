@@ -2,14 +2,20 @@ import WalletConnect from '@walletconnect/client';
 import { IJsonRpcRequest } from '@walletconnect/types';
 import { useCallback, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { hexToNumber, numberToHex } from 'web3-utils';
+import { hexToNumber } from 'web3-utils';
 import { EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
 import { useRefCallback } from '../../hooks/useRefCallback';
 import { EVMChainConfig } from '../../models/Chain';
 import { useChainConfigs } from '../../pages/dapp/browser/useChainConfigs';
 import { DappBrowserIPC } from '../../pages/dapp/types';
 import { fillInTransactionEventData } from '../../pages/dapp/utils';
-import { DefaultState, walletConnectConnectorAtom, walletConnectPeerMetaAtom, walletConnectSelectedChainConfigAtom, walletConnectStateAtom } from './store';
+import {
+  DefaultState,
+  walletConnectConnectorAtom,
+  walletConnectPeerMetaAtom,
+  walletConnectSelectedChainConfigAtom,
+  walletConnectStateAtom
+} from './store';
 import { TxParams } from './types';
 import { clearCachedSession, getCachedSession } from './utils';
 
@@ -21,12 +27,6 @@ export const useWalletConnect = () => {
   const [requests, setRequests] = useState<DappBrowserIPC.Event[]>([]);
 
   const { list: chainConfigs } = useChainConfigs();
-
-  // const state = getRecoil(walletConnectStateAtom);
-
-  // const setState = (newState: Partial<WalletConnectState>) => {
-  //   setRecoil(walletConnectStateAtom, {...state, ...newState});
-  // };
 
   const restoreSession = () => {
     const session = getCachedSession();
@@ -43,9 +43,8 @@ export const useWalletConnect = () => {
           connected,
           address: accounts[0],
         });
-        setPeerMeta({...peerMeta});
+        setPeerMeta({ ...peerMeta });
 
-        // find chainConfig
         const foundConfig = chainConfigs.find(c => hexToNumber(c.chainId) === chainId);
         if (foundConfig) {
           setChainConfig(foundConfig);
@@ -114,7 +113,7 @@ export const useWalletConnect = () => {
     log('ACTION', 'cancelRequest');
     const newRequests = requests.filter(r => r.id !== request.id);
     setRequests([...newRequests]);
-    connector?.rejectRequest({id: request.id, error: { message: 'Failed or Rejected Request' },});
+    connector?.rejectRequest({ id: request.id, error: { message: 'Failed or Rejected Request' }, });
   };
 
   const connect = useRefCallback(async (uri: string, chainId: number, account: string) => {
@@ -140,7 +139,7 @@ export const useWalletConnect = () => {
           connected: false,
           loading: false,
         });
-        setPeerMeta({...peerMeta});
+        setPeerMeta({ ...peerMeta });
         setConnector(connector);
       } else {
         setState({
@@ -159,17 +158,16 @@ export const useWalletConnect = () => {
   });
 
   const resetApp = useRefCallback(() => {
-    setPeerMeta(null);
     setState({
       ...DefaultState,
     });
+    setPeerMeta(null);
     setConnector(null);
     clearCachedSession();
   });
 
   const handleCallRequest = useRefCallback(async (error, payload: IJsonRpcRequest) => {
-    log('EVENT', 'call_request', 'method', payload.method);
-    log('EVENT', 'call_request', 'params', payload.params);
+    log('EVENT', 'call_request', 'method: ', payload.method, 'params: ', payload.params);
 
     if (error) {
       throw error;
@@ -181,24 +179,26 @@ export const useWalletConnect = () => {
 
     switch (payload.method) {
       case 'personal_sign':
-        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: {data: payload.params[0]} }]);
+        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: { data: payload.params[0] } }]);
         break;
       case 'eth_sign':
-        setRequests([...requests, { id: payload.id, name: 'signMessage', object: {data: payload.params[1]} }]);
+        setRequests([...requests, { id: payload.id, name: 'signMessage', object: { data: payload.params[1] } }]);
         break;
 
       case 'eth_signTypedData':
-        setRequests([...requests, {id: payload.id, name: 'signTypedMessage', object: {data: payload.params[0], raw: payload.params[1]} }]);
+        setRequests([...requests, { id: payload.id, name: 'signTypedMessage', object: { data: payload.params[0], raw: payload.params[1] } }]);
         break;
       case 'eth_signTransaction': {
         const txParam = payload.params[0] as TxParams;
 
-        const request = await fillInTransactionEventData({ id: payload.id, name: 'signTransaction', object: {
-          chainConfig: chainConfig,
-          ...txParam,
-          gas: txParam.gas ?  Number(txParam.gas) : 0,
-          gasPrice: txParam.gasPrice ?? EVM_MINIMUM_GAS_PRICE,
-        } }, chainConfig);
+        const request = await fillInTransactionEventData({ 
+          id: payload.id, 
+          name: 'signTransaction', 
+          object: {
+            chainConfig: chainConfig,
+            ...txParam,
+            gas: txParam.gas ?  Number(txParam.gas) : 0,
+            gasPrice: txParam.gasPrice ?? EVM_MINIMUM_GAS_PRICE, } }, chainConfig);
 
         setRequests([...requests, request]);
       }
@@ -217,10 +217,10 @@ export const useWalletConnect = () => {
       }
         break;
       case 'eth_signPersonalMessage':
-        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: {data: payload.params[0]} }]);
+        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: { data: payload.params[0] } }]);
         break;
       case 'eth_signTypedData_v3':
-        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: {data: payload.params[0]} }]);
+        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: { data: payload.params[0] } }]);
         break;
       default:
         log('unknown payload');
@@ -246,7 +246,7 @@ export const useWalletConnect = () => {
           fetchingPeerMeta: false,
           loading: false,
         });
-        setPeerMeta({...peerMeta});
+        setPeerMeta({ ...peerMeta });
         setConnector(connector);
       });
 

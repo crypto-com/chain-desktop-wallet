@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { walletConnectPeerMetaAtom, walletConnectStateAtom } from '../../service/walletconnect/store';
 import { Badge, Button, Layout } from 'antd';
-import { Content, Footer, Header } from 'antd/lib/layout/layout';
+import { Content } from 'antd/lib/layout/layout';
 import { useTranslation } from 'react-i18next';
 import { useWalletConnect } from '../../service/walletconnect/useWalletConnect';
 import IconWalletConnect from '../../svg/IconWalletConnect';
@@ -11,11 +11,11 @@ import Icon from '@ant-design/icons';
 const WalletConnectTab = () => {
   const [t] = useTranslation();
   const { killSession } = useWalletConnect();
-  const [state, setState] = useRecoilState(walletConnectStateAtom);
-  const [peerMeta, setPeerMeta] = useRecoilState(walletConnectPeerMetaAtom);
+  const state = useRecoilValue(walletConnectStateAtom);
+  const peerMeta = useRecoilValue(walletConnectPeerMetaAtom);
 
   if (!peerMeta) {
-    return <div>Not Connected</div>;
+    return <div />;
   }
 
   return (
@@ -43,15 +43,15 @@ const WalletConnectTab = () => {
             <img style={{ width: '72px' }} src={peerMeta?.icons?.[0] ?? ''} />
           </Badge>
           <div style={{ marginTop: '12px', fontSize: '22px', fontWeight: 'bold' }}>
-            {peerMeta.name}
+            {peerMeta?.name}
           </div>
           <div style={{ opacity: '0.5', marginTop: '10px' }}>{peerMeta.url}</div>
-          <div style={{ color: '#00A68C' }}>Connected</div>
+          <div style={{ color: '#00A68C' }}>{t('general.walletconnect.connected')}</div>
           <div style={{ marginTop: '30px', fontSize: '14px', opacity: '0.5' }}>
-            You can now access DApp on your web browser
+            {t('general.walletconnect.connect.desc6')}
           </div>
           <div style={{ marginTop: '20px' }}>
-            <div style={{ color: '#626973' }}>Wallet Address</div>
+            <div style={{ color: '#626973' }}>{t('general.walletconnect.connect.desc7')}</div>
             <div
               style={{
                 marginTop: '6px',
@@ -69,10 +69,10 @@ const WalletConnectTab = () => {
             }}
             type="primary"
             onClick={() => {
-              killSession();
+              killSession.current();
             }}
           >
-            Disconnect
+            {t('general.walletconnect.disconnect')}
           </Button>
         </div>
       </Content>

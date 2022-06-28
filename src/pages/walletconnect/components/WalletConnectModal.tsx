@@ -7,16 +7,13 @@ import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
 import { allMarketState, navbarMenuSelectedKeyState, sessionState } from '../../../recoil/atom';
 import { secretStoreService } from '../../../service/storage/SecretStoreService';
 import { walletConnectPeerMetaAtom } from '../../../service/walletconnect/store';
+import { APP_PROTOCOL_NAME, WALLET_CONNECT_PAGE_KEY } from '../../../service/walletconnect/types';
 import { useWalletConnect } from '../../../service/walletconnect/useWalletConnect';
 import RequestConfirmation from '../../dapp/components/RequestConfirmation/RequestConfirmation';
 import { handleEvent } from '../provider';
-import { ConnectModal } from './ConnectModal';
+import { ApproveModal } from './ApproveModal';
 
 const { ipcRenderer } = window.require('electron');
-
-// const APP_PROTOCOL_NAME = 'cryptowallet';
-const APP_PROTOCOL_NAME = 'ledgerlive';
-const WALLET_CONNECT_PAGE_KEY = '/walletconnect';
 
 export const WalletConnectModal = () => {
   const { connect, state, restoreSession, requests, cancelRequest, approveRequest } = useWalletConnect();
@@ -133,7 +130,7 @@ export const WalletConnectModal = () => {
           }}
         />
       }
-      <ConnectModal address={address} />
+      <ApproveModal address={address} />
     </>
   );
 };

@@ -90,7 +90,7 @@ import {
 import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
 import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
 import { walletConnectStateAtom } from '../../service/walletconnect/store';
-import { WalletConnectModal } from '../../pages/walletconnect/components/modal';
+import { WalletConnectModal } from '../../pages/walletconnect/components/WalletConnectModal';
 import IconWalletConnect from '../../svg/IconWalletConnect';
 
 // import i18n from '../../language/I18n';

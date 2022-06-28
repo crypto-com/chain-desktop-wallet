@@ -1,26 +1,26 @@
+import * as React from 'react';
 import { CheckOutlined } from '@ant-design/icons';
 import { Modal, Spin } from 'antd';
-import * as React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { walletConnectPeerMetaAtom } from '../../../service/walletconnect/store';
 import { useWalletConnect } from '../../../service/walletconnect/useWalletConnect';
 import { useChainConfigs } from '../../dapp/browser/useChainConfigs';
 import ChainSelect from '../../dapp/components/ChainSelect';
 
-export const ConnectModal = (props: { address: string }) => {
+export const ApproveModal = (props: { address: string }) => {
   const { rejectSession, approveSession, state } = useWalletConnect();
   const { loading, fetchingPeerMeta, connected } = state;
-  const [peerMeta, setPeerMeta] = useRecoilState(walletConnectPeerMetaAtom);
+  const peerMeta = useRecoilValue(walletConnectPeerMetaAtom);
   const [t] = useTranslation();
   const { selectedChain } = useChainConfigs();
 
   return (
     <Modal
       visible={fetchingPeerMeta || (!connected && peerMeta?.name !== undefined)}
-      okText="Approve"
+      okText={t('Approve')}
       okButtonProps={{ disabled: loading }}
-      cancelText="Reject"
+      cancelText={t('governance.tab5')}
       closable={false}
       onCancel={() => {
         rejectSession();
@@ -71,10 +71,10 @@ export const ConnectModal = (props: { address: string }) => {
               />
             </div>
             <div style={{ fontSize: '21px', fontWeight: 'bold', marginTop: '16px' }}>
-              {peerMeta.name} Would like to connect to:
+              {peerMeta.name} {t('general.walletconnect.connect.desc1')}:
             </div>
             <div style={{ marginTop: '16px', opacity: '0.5' }}>
-              By allowing permission, you are allowing the following DApp to access your address:
+              {t('general.walletconnect.connect.desc2')}
             </div>
             <div style={{ opacity: '0.5', marginTop: '10px' }}>{peerMeta.url}</div>
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
@@ -90,7 +90,7 @@ export const ConnectModal = (props: { address: string }) => {
                 alignItems: 'center',
               }}
             >
-              <div style={{ color: '#97A0B6' }}>Allow the DApp to: </div>
+              <div style={{ color: '#97A0B6' }}>{t('general.walletconnect.connect.desc5')}</div>
               <div
                 style={{
                   textAlign: 'left',
@@ -99,11 +99,11 @@ export const ConnectModal = (props: { address: string }) => {
               >
                 <div>
                   <CheckOutlined style={{ marginRight: '10px', color: '#20BCA4' }} />
-                  View your wallet balance and activity
+                  {t('general.walletconnect.connect.desc3')}
                 </div>
                 <div>
                   <CheckOutlined style={{ marginRight: '10px', color: '#20BCA4' }} />
-                  Request approval for transactions
+                  {t('general.walletconnect.connect.desc4')}
                 </div>
               </div>
             </div>

@@ -91,6 +91,8 @@ module.exports = {
     '@typescript-eslint/no-namespace': 'off',
     '@typescript-eslint/no-inferrable-types': 'off',
     '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
-    'react/jsx-key': 'off'
+    'react/jsx-key': 'off',
+    'object-curly-spacing': ['error', 'always'],
+    'function-call-argument-newline': ['error', 'consistent']
   },
 };

@@ -1,5 +1,11 @@
 
 
+// FIXME: change me
+// const APP_PROTOCOL_NAME = 'cryptowallet';
+export const APP_PROTOCOL_NAME = 'ledgerlive';
+export const WALLET_CONNECT_PAGE_KEY = '/walletconnect';
+
+
 type WCRequestMethod = 'personal_sign' | 'eth_sign' | 'eth_signTransaction' | 'eth_signTypedData' | 'eth_sendTransaction' | 'eth_signPersonalMessage' | 'eth_signTypedData_v3';
 
 
@@ -7,14 +13,14 @@ type WCRequestMethod = 'personal_sign' | 'eth_sign' | 'eth_signTransaction' | 'e
 export type IWCRequest = IWCRequestPersonalSign | IWCRequestEthSign | IWCRequestEthSignTransaction | IWCRequestEthSignTypedData | IWCRequestEthSendTransaction | IWCRequestEthSignPersonalMessage | IWCRequestEthSignTypedDataV3;
 
 export interface TxParams {
-    from: string;
-    to: string;
-    data: string;
-    gas?: string;
-    gasPrice?: string;
-    value?: string;
-    nonce?: string;
-  }
+  from: string;
+  to: string;
+  data: string;
+  gas?: string;
+  gasPrice?: string;
+  value?: string;
+  nonce?: string;
+}
 
 interface IWCRequestBase {
   id: number;
