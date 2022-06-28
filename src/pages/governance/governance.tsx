@@ -3,27 +3,19 @@ import moment from 'moment';
 import './governance.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import {
-  Layout,
-  Tabs,
-  List,
-  Space,
-  Button,
-  Tag,
-  //  Dropdown, Form
-} from 'antd';
+import { Layout, Tabs, List, Space, Button, Tag, Select, Form, Input, InputNumber } from 'antd';
 import Big from 'big.js';
 import {
   DislikeOutlined,
   LikeOutlined,
   HistoryOutlined,
-  // CaretDownOutlined
+  InfoCircleOutlined,
 } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { ledgerIsExpertModeState, sessionState, walletAssetState } from '../../recoil/atom';
 
-import { getUIVoteAmount } from '../../utils/NumberUtils';
+import { getUIVoteAmount, getUIDynamicAmount } from '../../utils/NumberUtils';
 import {
   ProposalModel,
   ProposalStatuses,
@@ -41,6 +33,7 @@ import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
+import { TransactionUtils } from '../../utils/TransactionUtils';
 
 import { ProposalView } from './components/ProposalView';
 import { VotingHistory } from './components/VotingHistory';
@@ -56,7 +49,7 @@ const IconText = ({ icon, text }) => (
 );
 
 const GovernancePage = () => {
-  // const [form] = Form.useForm();
+  const [form] = Form.useForm();
   const [voteOption, setVoteOption] = useState<VoteOption>(VoteOption.VOTE_OPTION_ABSTAIN);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   // const [isModalVisible, setIsModalVisible] = useState(false);
@@ -94,6 +87,8 @@ const GovernancePage = () => {
   const userAsset = useRecoilValue(walletAssetState);
   const didMountRef = useRef(false);
   const [isLoadingTally, setIsLoadingTally] = useState(false);
+  const minDeposit = '1000';
+  const maxDeposit = '10000';
 
   const [isProposalModalVisible, setIsProposalModalVisible] = useState(false);
 
@@ -103,13 +98,20 @@ const GovernancePage = () => {
 
   const [historyVisible, setHistoryVisible] = useState(false);
 
+  const { Option } = Select;
+  const [t] = useTranslation();
+
   const historyBtn = (
     <Button id="votingHistoryBtn" type="link" size="small" onClick={() => setHistoryVisible(true)}>
-      <HistoryOutlined style={{ fontSize: '17px' }} /> View Voting History
+      <HistoryOutlined style={{ fontSize: '17px' }} /> {t('governance.votingHistoryBtn')}
     </Button>
   );
 
-  const [t] = useTranslation();
+  let customRangeValidator = TransactionUtils.rangeValidator(
+    minDeposit,
+    maxDeposit,
+    t('governance.modal2.form.input.proposalDeposit.error'),
+  );
 
   const handleCancelProposalModal = () => {
     setIsProposalModalVisible(false);
@@ -348,6 +350,15 @@ const GovernancePage = () => {
       setProposalList(latestProposalOnTop);
     };
 
+    form.setFieldsValue({ initial_deposit: 1000 });
+    console.log('form is ', form);
+
+    customRangeValidator = TransactionUtils.rangeValidator(
+      minDeposit,
+      maxDeposit,
+      t('governance.modal2.form.input.proposalDeposit.error'),
+    );
+
     fetchProposalList();
 
     if (!didMountRef.current) {
@@ -368,7 +379,7 @@ const GovernancePage = () => {
           <div id="governance-description" className="header-description">
             {t('governance.description')}
           </div>
-          {/* <Button
+          <Button
             id="create-proposal-btn"
             type="primary"
             onClick={() => {
@@ -376,7 +387,7 @@ const GovernancePage = () => {
             }}
           >
             {t('governance.modal2.title')}
-          </Button> */}
+          </Button>
         </>
       )}
       <Content>
@@ -404,7 +415,7 @@ const GovernancePage = () => {
           okText={t('general.confirm')}
         >
           <>
-            <Header> {t('governance.modal2.title')} </Header>
+            <Header className="create-proposal-header"> {t('governance.modal2.title')} </Header>
 
             <div className="instructions">
               <div className="header-instructions">{t('governance.modal2.instructions.head')}</div>
@@ -412,39 +423,120 @@ const GovernancePage = () => {
                 <li>{t('governance.modal2.instructions.part1')}</li>
                 <li>
                   {t('governance.modal2.instructions.part2')}{' '}
-                  <a>{t('governance.modal2.instructions.part2.github')}</a>
-                  {t('governance.modal2.instructions.part2.or')}
-                  <a>{t('governance.modal2.instructions.part2.discord')}</a>
+                  <a
+                    href="https://github.com/crypto-org-chain/chain-main/discussions"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t('governance.modal2.instructions.part2.github')}
+                  </a>{' '}
+                  {t('governance.modal2.instructions.part2.or')}{' '}
+                  <a
+                    href="https://discord.com/invite/5JTk2ppsY3"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t('governance.modal2.instructions.part2.discord')}
+                  </a>
                 </li>
               </ul>
             </div>
 
-            {/* <Form
-                  layout="vertical"
-                  form={
-                    // confirmDeleteForm
-                  }
-                  name="control-hooks"
-                  requiredMark="optional"
-                  onFinish={
-                    // onWalletDeleteFinish
-                  }
-                >
-                  <Dropdown
-                    placement="topCenter"
-                    className="proposal-type-selection"
-                    trigger={['click']}
-                  >
-                    <div>
-                      <img src={WalletIcon} alt="walletIcon" />
-                      {ellipsis(session?.wallet.name, 16)}
-                      <CaretDownOutlined />
-                    </div>
-                  </Dropdown>
+            <Form
+              className="create-proposal-form"
+              form={form}
+              layout="vertical"
+              requiredMark={false}
+            >
+              <Form.Item
+                name="proposalType"
+                label={t('governance.modal2.form.dropdown')}
+                validateFirst
+                rules={[
+                  {
+                    required: true,
+                    message: `${t('governance.modal2.form.dropdown')} ${t('general.required')}`,
+                  },
+                  {
+                    message: `${t('governance.modal2.form.dropdown')} 
+                    ${t('governance.modal2.form.dropdown.cannot')}`,
+                  },
+                ]}
+              >
+                <Select showSearch placeholder="Select Proposal Type">
+                  <Option value="parameter_change">Parameter Change</Option>
+                  <Option value="community_pool_spend">Community Pool Spend</Option>
+                  <Option value="text_proposal">Text Proposal</Option>
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name="proposal_title"
+                label={t('governance.modal2.form.input.proposalTitle')}
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: `${t('governance.modal2.form.input.proposalTitle')} ${t(
+                      'general.required',
+                    )}`,
+                  },
+                ]}
+              >
+                <Input placeholder="Enter the proposal title" />
+              </Form.Item>
+              <Form.Item
+                name="proposal_desc"
+                label={t('governance.modal2.form.input.proposalDesc')}
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: `${t('governance.modal2.form.input.proposalDesc')} ${t(
+                      'general.required',
+                    )}`,
+                  },
+                ]}
+              >
+                <Input placeholder="Enter the proposal description" />
+              </Form.Item>
 
+              <Form.Item
+                name="initial_deposit"
+                label={t('governance.modal2.form.input.proposalDeposit')}
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: `${t('governance.modal2.form.input.proposalDeposit')} ${t(
+                      'general.required',
+                    )}`,
+                  },
+                  {
+                    pattern: /[^0]+/,
+                    message: t('governance.modal2.form.input.proposalDeposit.error'),
+                  },
+                  customRangeValidator,
+                ]}
+              >
+                <InputNumber
+                  placeholder={`Enter the initial ${userAsset.symbol} amount`}
+                  addonAfter={userAsset.symbol}
+                />
+              </Form.Item>
+              <div className="note">{t('governance.modal2.form.proposalDeposit.wanring')}</div>
 
+              <div className="avail-bal-container">
+                <div className="avail-bal-txt">{t('governance.modal2.form.balance')}</div>
+                <div className="avail-bal-val">
+                  {getUIDynamicAmount(userAsset.balance, userAsset)} {userAsset.symbol}
+                </div>
+              </div>
 
-                </Form> */}
+              <div className="note warning">
+                <InfoCircleOutlined className="icon" />{' '}
+                <span className="txt">{t('governance.modal2.form.warning')}</span>
+              </div>
+            </Form>
           </>
         </ModalPopup>
 
