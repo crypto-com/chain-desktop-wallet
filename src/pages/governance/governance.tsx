@@ -350,8 +350,7 @@ const GovernancePage = () => {
       setProposalList(latestProposalOnTop);
     };
 
-    form.setFieldsValue({ initial_deposit: 1000 });
-    console.log('form is ', form);
+    form.setFieldsValue({ initial_deposit: minDeposit });
 
     customRangeValidator = TransactionUtils.rangeValidator(
       minDeposit,
