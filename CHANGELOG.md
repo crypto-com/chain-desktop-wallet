@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.0.0] - 2022-06-21
+### Additions
+- Batch restake rewards
+- Rebranded as Crypto.com DeFi Desktop Wallet
+### Bug fixes
+- App crashes in URL search bar
+- Occasional incorrect reward list
 ## [v0.8.1] - 2022-05-30
 ### Bug fixes
 - Token Approval request failure
