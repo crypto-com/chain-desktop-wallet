@@ -58,7 +58,7 @@ export const WalletConnectModal = () => {
         return;
       }
 
-      connect(wcURL, 1, address ?? '');
+      connect.current(wcURL, 1, address ?? '');
     },
     [connect],
   );

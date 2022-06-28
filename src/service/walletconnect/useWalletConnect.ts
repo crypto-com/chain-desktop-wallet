@@ -1,6 +1,6 @@
 import WalletConnect from '@walletconnect/client';
 import { IJsonRpcRequest } from '@walletconnect/types';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { hexToNumber, numberToHex } from 'web3-utils';
 import { EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
@@ -9,7 +9,6 @@ import { EVMChainConfig } from '../../models/Chain';
 import { useChainConfigs } from '../../pages/dapp/browser/useChainConfigs';
 import { DappBrowserIPC } from '../../pages/dapp/types';
 import { fillInTransactionEventData } from '../../pages/dapp/utils';
-import { isHexEqual } from '../../utils/utils';
 import { DefaultState, walletConnectConnectorAtom, walletConnectPeerMetaAtom, walletConnectSelectedChainConfigAtom, walletConnectStateAtom } from './store';
 import { TxParams } from './types';
 import { clearCachedSession, getCachedSession } from './utils';
@@ -54,7 +53,7 @@ export const useWalletConnect = () => {
 
         subscribeToEvents.current(connector);
       } catch {
-        resetApp();
+        resetApp.current();
       }
     }
   };
@@ -63,24 +62,24 @@ export const useWalletConnect = () => {
     console.log('[WalletConnect] ', message, ...optionalParams);
   };
 
-  const rejectSession = async () => {
+  const rejectSession = useCallback(async () => {
     log('ACTION', 'rejectSession');
     try {
       await connector?.rejectSession();
     } finally {
-      resetApp();
+      resetApp.current();
     }
-  };
+  }, [connector]);
 
-  const killSession = async () => {
+  const killSession = useRefCallback(async () => {
     log('ACTION', 'killSession');
     try {
-      resetApp();
       await connector?.killSession();
+      resetApp.current();
     } catch (error) {
       log('ERROR', error);
     }
-  };
+  });
 
   const approveSession = async (address: string, chainConfig: EVMChainConfig) => {
     log('ACTION', 'approveSession');
@@ -118,7 +117,8 @@ export const useWalletConnect = () => {
     connector?.rejectRequest({id: request.id, error: { message: 'Failed or Rejected Request' },});
   };
 
-  const connect = async (uri: string, chainId: number, account: string) => {
+  const connect = useRefCallback(async (uri: string, chainId: number, account: string) => {
+    await killSession.current();
     log('ACTION', 'connect', uri, chainId, account);
 
     try {
@@ -131,7 +131,6 @@ export const useWalletConnect = () => {
           fetchingPeerMeta: true,
           loading: true,
         });
-        setPeerMeta({...peerMeta});
         setConnector(connector);
         await connector.createSession({ chainId });
       } else if (connector.peerMeta) {
@@ -157,16 +156,16 @@ export const useWalletConnect = () => {
       });
       throw error;
     }
-  };
+  });
 
-  const resetApp = () => {
+  const resetApp = useRefCallback(() => {
     setPeerMeta(null);
     setState({
       ...DefaultState,
     });
     setConnector(null);
     clearCachedSession();
-  };
+  });
 
   const handleCallRequest = useRefCallback(async (error, payload: IJsonRpcRequest) => {
     log('EVENT', 'call_request', 'method', payload.method);
@@ -283,7 +282,7 @@ export const useWalletConnect = () => {
           throw error;
         }
 
-        resetApp();
+        resetApp.current();
       });
 
       if (connector.connected) {
