@@ -15,6 +15,9 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: 'module',
   },
+  ignorePatterns: [
+    'src/language/*.json'
+  ],
   plugins: [
     'react',
     'react-hooks',

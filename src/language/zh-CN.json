@@ -756,5 +756,14 @@
   "settings.support.feedbackForm.title": "回馈表格",
   "settings.support.feedbackForm.description": "如你有任何有关 Crypto.com DeFi Desktop Wallet 的查询、意见或问题回报，请填妥以下回馈表格",
   "settings.about.title": "关于",
-  "settings.about.termsAndConditions.title": "条款及细则"
+  "settings.about.termsAndConditions.title": "条款及细则",
+  "general.walletconnect.connect.desc1": "想要连接到：",
+  "general.walletconnect.connect.desc2": "通过批准权限，将允许以下 DApp 访问钱包地址: ",
+  "general.walletconnect.connect.desc3": "查看钱包余额和交易记录",
+  "general.walletconnect.connect.desc4": "获取对交易的批准",
+  "general.walletconnect.connect.desc5": "允许 DApp：",
+  "general.walletconnect.connected": "已连接",
+  "general.walletconnect.disconnect": "断开连接",
+  "general.walletconnect.connect.desc6": "现在你可以在浏览器上访问 DApp",
+  "general.walletconnect.connect.desc7": "钱包地址"
 }
