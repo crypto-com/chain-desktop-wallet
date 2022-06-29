@@ -114,7 +114,9 @@ export const WalletConnectModal = () => {
                   setIsConfirming(false);
                 }, onError: (error) => {
                   setIsConfirming(false);
-                  message.error(error.toString());
+                  message.error({
+                    content: error.toString(),
+                  });
                 }
               });
             };
