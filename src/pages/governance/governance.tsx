@@ -444,10 +444,7 @@ const GovernancePage = () => {
               key="submit"
               type="primary"
               loading={confirmLoading}
-              onClick={() => {
-                console.log('clicked');
-                onCreateProposalAction();
-              }}
+              onClick={onCreateProposalAction}
               disabled={
                 !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
               }
