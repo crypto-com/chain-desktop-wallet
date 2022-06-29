@@ -354,6 +354,9 @@ const GovernancePage = () => {
 
       const proposalType = form.getFieldValue('proposalType');
       let textProposal: BroadCastResult | null = null;
+
+      console.log('proposalType...', proposalType === 'text_proposal');
+
       if (proposalType === 'text_proposal') {
         textProposal = await walletService.sendTextProposalSubmitTx({
           description: form?.getFieldValue('proposalDescription'),
@@ -374,6 +377,9 @@ const GovernancePage = () => {
       if (walletType === LEDGER_WALLET_TYPE) {
         setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
+
+      console.log('erroro ', e);
+
       setErrorMessages(((e as unknown) as any).message.split(': '));
 
       setIsProposalModalVisible(false);
@@ -392,7 +398,7 @@ const GovernancePage = () => {
       setProposalList(latestProposalOnTop);
     };
 
-    form.setFieldsValue({ initial_deposit: minDeposit });
+    form.setFieldsValue({ initialDeposit: minDeposit });
 
     fetchProposalList();
 
@@ -408,7 +414,7 @@ const GovernancePage = () => {
     );
 
     // eslint-disable-next-line
-  }, [currentSession]);
+  }, [currentSession, form]);
 
   return (
     <Layout className="site-layout">
@@ -439,7 +445,7 @@ const GovernancePage = () => {
           handleOk={() => {
             onCreateProposalAction();
             setTimeout(() => {
-              showPasswordInput('withdraw');
+              showPasswordInput();
             }, 200);
           }}
           confirmationLoading={confirmLoading}
@@ -451,7 +457,7 @@ const GovernancePage = () => {
               onClick={() => {
                 onCreateProposalAction();
                 setTimeout(() => {
-                  showPasswordInput('withdraw');
+                  showPasswordInput();
                 }, 200);
               }}
               disabled={
