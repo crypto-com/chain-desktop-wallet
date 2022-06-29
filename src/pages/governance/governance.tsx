@@ -81,13 +81,13 @@ const GovernancePage = () => {
   };
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [proposalFigures, setProposalFigures] = useState(initialFiguresStates);
+  const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [proposalList, setProposalList] = useState<ProposalModel[]>();
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
   const currentSession = useRecoilValue(sessionState);
-  const userAsset = useRecoilValue(walletAssetState);
   const didMountRef = useRef(false);
   const [isLoadingTally, setIsLoadingTally] = useState(false);
-  const minDeposit = '1000';
+  const minDeposit = '100';
   const maxDeposit = '10000';
 
   const [isProposalModalVisible, setIsProposalModalVisible] = useState(false);
@@ -340,6 +340,49 @@ const GovernancePage = () => {
     );
   };
 
+  const onCreateProposalAction = async () => {
+    const { walletType } = currentSession.wallet;
+
+    if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
+      return;
+    }
+
+    console.log('onCreateProposalAction...', form);
+
+    try {
+      setConfirmLoading(true);
+
+      const proposalType = form.getFieldValue('proposal_type');
+      let textProposal: BroadCastResult | null = null;
+      if (proposalType === 'text_proposal') {
+        textProposal = await walletService.sendTextProposalSubmitTx({
+          description: form?.getFieldValue('proposal_description'),
+          title: form?.getFieldValue('proposal_title'),
+          initialDeposit: form?.getFieldValue('initial_deposit'),
+          proposer: userAsset?.address,
+          decryptedPhrase,
+          walletType,
+        });
+
+        console.log('textProposal ', textProposal);
+      }
+      setIsVisibleConfirmationModal(false);
+      // setBroadcastResult(textProposal);
+      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+      setUserAsset(currentWalletAsset);
+      setInputPasswordVisible(false);
+    } catch (e) {
+      if (walletType === LEDGER_WALLET_TYPE) {
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
+      }
+      setErrorMessages(((e as unknown) as any).message.split(': '));
+      setIsVisibleConfirmationModal(false);
+      setIsProposalModalVisible(false);
+      setConfirmLoading(false);
+      setInputPasswordVisible(false);
+    }
+  };
+
   useEffect(() => {
     const fetchProposalList = async () => {
       const list: ProposalModel[] = await walletService.retrieveProposals(
@@ -352,18 +395,18 @@ const GovernancePage = () => {
 
     form.setFieldsValue({ initial_deposit: minDeposit });
 
-    customRangeValidator = TransactionUtils.rangeValidator(
-      minDeposit,
-      maxDeposit,
-      t('governance.modal2.form.input.proposalDeposit.error'),
-    );
-
     fetchProposalList();
 
     if (!didMountRef.current) {
       didMountRef.current = true;
       analyticsService.logPage('Governance');
     }
+
+    customRangeValidator = TransactionUtils.rangeValidator(
+      minDeposit,
+      maxDeposit,
+      t('governance.modal2.form.input.proposalDeposit.error'),
+    );
 
     // eslint-disable-next-line
   }, [currentSession]);
@@ -394,16 +437,20 @@ const GovernancePage = () => {
         <ModalPopup
           isModalVisible={isProposalModalVisible}
           handleCancel={handleCancelProposalModal}
-          handleOk={() => {}}
+          handleOk={onCreateProposalAction}
+          confirmationLoading={confirmLoading}
           footer={[
             <Button
               key="submit"
               type="primary"
               loading={confirmLoading}
+              onClick={() => {
+                console.log('clicked');
+                onCreateProposalAction();
+              }}
               disabled={
                 !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
               }
-              onClick={onConfirm}
             >
               {t('governance.modal2.button.submit')}
             </Button>,
@@ -446,19 +493,17 @@ const GovernancePage = () => {
               form={form}
               layout="vertical"
               requiredMark={false}
+              initialValues={{
+                initial_deposit: minDeposit,
+              }}
             >
               <Form.Item
-                name="proposalType"
+                name="proposal_type"
                 label={t('governance.modal2.form.dropdown')}
-                validateFirst
                 rules={[
                   {
                     required: true,
                     message: `${t('governance.modal2.form.dropdown')} ${t('general.required')}`,
-                  },
-                  {
-                    message: `${t('governance.modal2.form.dropdown')} 
-                    ${t('governance.modal2.form.dropdown.cannot')}`,
                   },
                 ]}
               >
@@ -484,7 +529,7 @@ const GovernancePage = () => {
                 <Input placeholder="Enter the proposal title" />
               </Form.Item>
               <Form.Item
-                name="proposal_desc"
+                name="proposal_description"
                 label={t('governance.modal2.form.input.proposalDesc')}
                 hasFeedback
                 rules={[
@@ -498,7 +543,6 @@ const GovernancePage = () => {
               >
                 <Input placeholder="Enter the proposal description" />
               </Form.Item>
-
               <Form.Item
                 name="initial_deposit"
                 label={t('governance.modal2.form.input.proposalDeposit')}
