@@ -347,7 +347,7 @@ const GovernancePage = () => {
       return;
     }
 
-    console.log('onCreateProposalAction...', form);
+    console.log('onCreateProposalAction...', form.getFieldValue('proposalType'));
 
     try {
       setConfirmLoading(true);
@@ -366,8 +366,7 @@ const GovernancePage = () => {
 
         console.log('textProposal ', textProposal);
       }
-      setIsVisibleConfirmationModal(false);
-      // setBroadcastResult(textProposal);
+
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setUserAsset(currentWalletAsset);
       setInputPasswordVisible(false);
@@ -376,7 +375,7 @@ const GovernancePage = () => {
         setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
       setErrorMessages(((e as unknown) as any).message.split(': '));
-      setIsVisibleConfirmationModal(false);
+
       setIsProposalModalVisible(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
