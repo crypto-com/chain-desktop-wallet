@@ -87,6 +87,7 @@ export const useWalletConnect = () => {
         await connector.approveSession({
           accounts: [address],
           chainId: hexToNumber(chainConfig.chainId),
+          rpcUrl: chainConfig.rpcUrls[0],
         });
         setChainConfig(chainConfig);
         setState({
