@@ -1,5 +1,6 @@
+import { message } from 'antd';
 import * as React from 'react';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { usePasswordModal } from '../../../components/PasswordForm/PasswordFormModal';
@@ -20,6 +21,7 @@ export const WalletConnectModal = () => {
   const peerMeta = useRecoilValue(walletConnectPeerMetaAtom);
   const history = useHistory();
 
+  const [isConfirming, setIsConfirming] = useState(false);
   const { show, passphrase } = usePasswordModal();
   const allMarketData = useRecoilValue(allMarketState);
   const currentSession = useRecoilValue(sessionState);
@@ -82,6 +84,7 @@ export const WalletConnectModal = () => {
     <>
       {
         requests.length > 0 && peerMeta && <RequestConfirmation
+          isConfirming={isConfirming}
           event={requests[0]}
           cronosAsset={cronosAsset}
           allMarketData={allMarketData}
@@ -99,6 +102,7 @@ export const WalletConnectModal = () => {
             const event = requests[0];
 
             const handler = async (passphrase: string) => {
+              setIsConfirming(true);
               const mnemonic = await secretStoreService.decryptPhrase(
                 passphrase,
                 currentSession.wallet.identifier,
@@ -107,13 +111,18 @@ export const WalletConnectModal = () => {
               handleEvent({
                 event, mnemonic, gasLimit, gasPrice, onSuccess: (result) => {
                   approveRequest(event, result);
-                }, onError: (error) => { }
+                  setIsConfirming(false);
+                }, onError: (error) => {
+                  setIsConfirming(false);
+                  message.error(error.toString());
+                }
               });
             };
 
             if (!passphrase) {
               show({
-                onCancel: () => { },
+                onCancel: () => {
+                },
                 onSuccess: (passphrase) => {
                   handler(passphrase);
                 },
@@ -126,6 +135,7 @@ export const WalletConnectModal = () => {
 
           }}
           onCancel={() => {
+            setIsConfirming(false);
             cancelRequest(requests[0]);
           }}
         />

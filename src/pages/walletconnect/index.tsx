@@ -40,7 +40,7 @@ const WalletConnectTab = () => {
             }}
             count={<Icon style={{ color: 'white' }} component={IconWalletConnect} />}
           >
-            <img style={{ width: '72px' }} src={peerMeta?.icons?.[0] ?? ''} />
+            <img style={{ width: '72px', height: '72px' }} src={peerMeta?.icons?.[0] ?? ''} />
           </Badge>
           <div style={{ marginTop: '12px', fontSize: '22px', fontWeight: 'bold' }}>
             {peerMeta?.name}

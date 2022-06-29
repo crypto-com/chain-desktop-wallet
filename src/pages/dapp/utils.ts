@@ -57,7 +57,7 @@ interface SendTokenApprovalEventArgs {
 }
 
 export const sendTokenApprovalEvent = async (
-  {event, mnemonic, _gasLimit, _gasPrice, onSuccess, onError}: SendTokenApprovalEventArgs
+  { event, mnemonic, _gasLimit, _gasPrice, onSuccess, onError }: SendTokenApprovalEventArgs
 ) => {
   const data = evmTransactionSigner.encodeTokenApprovalABI(
     event.object.spender,
@@ -96,7 +96,7 @@ interface ISignTransactionEventArgs {
   onError: (error: string) => void
 }
 
-export const signTransactionEvent = async ({event, mnemonic, _gasLimit, _gasPrice, onSuccess, onError}: ISignTransactionEventArgs) => {
+export const signTransactionEvent = async ({ event, mnemonic, _gasLimit, _gasPrice, onSuccess, onError }: ISignTransactionEventArgs) => {
   const transaction: EVMContractCallUnsigned = {
     contractAddress: event.object.to,
     data: event.object.data,

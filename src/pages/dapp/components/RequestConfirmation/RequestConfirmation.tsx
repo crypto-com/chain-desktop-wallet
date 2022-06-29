@@ -40,6 +40,7 @@ interface RequestConfirmationProps {
   currentSession: Session;
   wallet: Wallet;
   visible: boolean;
+  isConfirming: boolean;
   dapp?: Dapp;
   onConfirm: (info: {
     gasPrice: BigNumber;
@@ -58,6 +59,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     wallet,
     visible,
     dapp,
+    isConfirming,
     onConfirm,
     onCancel,
   } = props;
@@ -98,7 +100,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
 
   const EventView = () => {
 
-    if (event.name === 'signTransaction') {
+    if (event.name === 'signTransaction' || event.name === 'sendTransaction') {
       const networkFee = gasLimit.mul(gasPrice);
       // if (event.object.gasPrice) {
       //   networkFee = event ? ethers.BigNumber.from(event.object?.gas).mul(event.object?.gasPrice) : 0;
@@ -231,7 +233,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     if (!event) {
       return;
     }
-    if (event.name === 'signTransaction') {
+    if (event.name === 'signTransaction' || event.name === 'sendTransaction') {
       // TODO:
       const assetMarketData = allMarketData.get(
         `${UserAssetType.CRC_20_TOKEN}-${selectedChain.nativeCurrency.symbol}-${currentSession.currency}`,
@@ -328,6 +330,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
                   event
                 });
               }}
+              loading={isConfirming}
               disabled={
                 isConfirmDisabled ||
                 (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE)

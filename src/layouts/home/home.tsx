@@ -826,7 +826,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
     if (walletConnectState.connected) {
       homeMenuItemList.push({
-        label: conditionalLink('/walletconnect', t('navbar.wallet-connect')),
+        label: conditionalLink('/walletconnect', 'WalletConnect'),
         key: '/walletconnect',
         icon: <Icon component={IconWalletConnect} />,
       });
