@@ -352,13 +352,13 @@ const GovernancePage = () => {
     try {
       setConfirmLoading(true);
 
-      const proposalType = form.getFieldValue('proposal_type');
+      const proposalType = form.getFieldValue('proposalType');
       let textProposal: BroadCastResult | null = null;
       if (proposalType === 'text_proposal') {
         textProposal = await walletService.sendTextProposalSubmitTx({
-          description: form?.getFieldValue('proposal_description'),
-          title: form?.getFieldValue('proposal_title'),
-          initialDeposit: form?.getFieldValue('initial_deposit'),
+          description: form?.getFieldValue('proposalDescription'),
+          title: form?.getFieldValue('proposalTitle'),
+          initialDeposit: form?.getFieldValue('initialDeposit'),
           proposer: userAsset?.address,
           decryptedPhrase,
           walletType,
@@ -437,14 +437,24 @@ const GovernancePage = () => {
         <ModalPopup
           isModalVisible={isProposalModalVisible}
           handleCancel={handleCancelProposalModal}
-          handleOk={onCreateProposalAction}
+          handleOk={() => {
+            onCreateProposalAction();
+            setTimeout(() => {
+              showPasswordInput('withdraw');
+            }, 200);
+          }}
           confirmationLoading={confirmLoading}
           footer={[
             <Button
               key="submit"
               type="primary"
               loading={confirmLoading}
-              onClick={onCreateProposalAction}
+              onClick={() => {
+                onCreateProposalAction();
+                setTimeout(() => {
+                  showPasswordInput('withdraw');
+                }, 200);
+              }}
               disabled={
                 !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
               }
@@ -488,6 +498,7 @@ const GovernancePage = () => {
             <Form
               className="create-proposal-form"
               form={form}
+              name="create-proposal-form"
               layout="vertical"
               requiredMark={false}
               initialValues={{
@@ -495,7 +506,7 @@ const GovernancePage = () => {
               }}
             >
               <Form.Item
-                name="proposal_type"
+                name="proposalType"
                 label={t('governance.modal2.form.dropdown')}
                 rules={[
                   {
@@ -503,15 +514,22 @@ const GovernancePage = () => {
                     message: `${t('governance.modal2.form.dropdown')} ${t('general.required')}`,
                   },
                 ]}
+                style={{ textAlign: 'left' }}
               >
-                <Select showSearch placeholder="Select Proposal Type">
-                  <Option value="parameter_change">Parameter Change</Option>
-                  <Option value="community_pool_spend">Community Pool Spend</Option>
-                  <Option value="text_proposal">Text Proposal</Option>
+                <Select placeholder="Select Proposal Type">
+                  <Option key="parameter_change" value="parameter_change">
+                    Parameter Change
+                  </Option>
+                  <Option key="community_pool_spend" value="community_pool_spend">
+                    Community Pool Spend
+                  </Option>
+                  <Option key="text_proposal" value="text_proposal">
+                    Text Proposal
+                  </Option>
                 </Select>
               </Form.Item>
               <Form.Item
-                name="proposal_title"
+                name="proposalTitle"
                 label={t('governance.modal2.form.input.proposalTitle')}
                 hasFeedback
                 rules={[
@@ -526,7 +544,7 @@ const GovernancePage = () => {
                 <Input placeholder="Enter the proposal title" />
               </Form.Item>
               <Form.Item
-                name="proposal_description"
+                name="proposalDescription"
                 label={t('governance.modal2.form.input.proposalDesc')}
                 hasFeedback
                 rules={[
@@ -541,7 +559,7 @@ const GovernancePage = () => {
                 <Input placeholder="Enter the proposal description" />
               </Form.Item>
               <Form.Item
-                name="initial_deposit"
+                name="initialDeposit"
                 label={t('governance.modal2.form.input.proposalDeposit')}
                 hasFeedback
                 rules={[
