@@ -115,6 +115,8 @@ const GovernancePage = () => {
 
   const handleCancelProposalModal = () => {
     setIsProposalModalVisible(false);
+    form.resetFields();
+    form.setFieldsValue({ initialDeposit: minDeposit });
   };
 
   const handleCancelConfirmationModal = () => {
@@ -355,13 +357,11 @@ const GovernancePage = () => {
       const proposalType = form.getFieldValue('proposalType');
       let textProposal: BroadCastResult | null = null;
 
-      console.log('proposalType...', proposalType === 'text_proposal');
-
       if (proposalType === 'text_proposal') {
         textProposal = await walletService.sendTextProposalSubmitTx({
           description: form?.getFieldValue('proposalDescription'),
           title: form?.getFieldValue('proposalTitle'),
-          initialDeposit: form?.getFieldValue('initialDeposit'),
+          initialDeposit: [{ amount: form?.getFieldValue('initialDeposit'), denom: '' }],
           proposer: userAsset?.address,
           decryptedPhrase,
           walletType,
@@ -373,15 +373,16 @@ const GovernancePage = () => {
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setUserAsset(currentWalletAsset);
       setInputPasswordVisible(false);
+      setConfirmLoading(false);
+      console.log('finish ');
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
         setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
-      console.log('erroro ', e);
+      console.error('erroro ', e);
 
       setErrorMessages(((e as unknown) as any).message.split(': '));
-
       setIsProposalModalVisible(false);
       setConfirmLoading(false);
       setInputPasswordVisible(false);
