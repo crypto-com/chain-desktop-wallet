@@ -31,7 +31,7 @@ const ModalBody = (props: {
   const [t] = useTranslation();
 
   const cronosEVMAsset = useCronosEvmAsset();
-  const { balance, isFetchingBalance } = useBalance(config.rpcUrls[0], cronosEVMAsset?.address ?? '')
+  const { balance, isFetchingBalance } = useBalance(config.rpcUrls[0], cronosEVMAsset?.address ?? '');
 
   const [form] = Form.useForm();
 
@@ -63,7 +63,7 @@ const ModalBody = (props: {
 
     const amountBigNumber = newGasLimit.times(newGasPrice);
 
-    const amount = getNormalScaleAmount(amountBigNumber.toString(), { "decimals": config.nativeCurrency.decimals });
+    const amount = getNormalScaleAmount(amountBigNumber.toString(), { 'decimals': config.nativeCurrency.decimals });
 
     if ((new BigNumber(balance.toString()).lt(amountBigNumber))) {
       setValidateStatus('error');

@@ -55,7 +55,7 @@ const CRC20TokenList = ({
 
   const [loading, setLoading] = useState<boolean>(true);
   const [flatternedApprovalledData, setFlatternedApprovalledData] = useState<
-    TokenDataWithApproval[]
+  TokenDataWithApproval[]
   >([]);
   const [t] = useTranslation();
 

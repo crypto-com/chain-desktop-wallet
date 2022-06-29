@@ -1,9 +1,9 @@
-import { setRecoil } from "recoil-nexus";
-import { Session } from "../../models/Session";
-import { UserAsset } from "../../models/UserAsset";
-import { sessionState, walletAllAssetsState, walletListState } from "../../recoil/atom";
-import { AnalyticsService } from "../../service/analytics/AnalyticsService";
-import { walletService } from "../../service/WalletService";
+import { setRecoil } from 'recoil-nexus';
+import { Session } from '../../models/Session';
+import { UserAsset } from '../../models/UserAsset';
+import { sessionState, walletAllAssetsState, walletListState } from '../../recoil/atom';
+import { AnalyticsService } from '../../service/analytics/AnalyticsService';
+import { walletService } from '../../service/WalletService';
 
 export async function updateGasInfo(currentSession: Session, asset: UserAsset, newGasLimit: string, newGasPrice: string, analyticsService: AnalyticsService) {
   const updatedWallet = await walletService.findWalletByIdentifier(

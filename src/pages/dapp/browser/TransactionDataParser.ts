@@ -16,7 +16,7 @@ class TransactionDataParser {
   ): Promise<TokenApprovalRequestData> => {
 
     const IERC20 = IERC20__factory.createInterface();
-    const parsedData = IERC20.decodeFunctionData(IERC20.functions['approve(address,uint256)'].name, data)
+    const parsedData = IERC20.decodeFunctionData(IERC20.functions['approve(address,uint256)'].name, data);
 
     const provider = new ethers.providers.JsonRpcProvider(chainConfig.rpcUrls[0]);
     const contract = ERC20__factory.connect(tokenAddress, provider);
@@ -24,7 +24,7 @@ class TransactionDataParser {
       contract.symbol(),
       contract.decimals(),
       contract.totalSupply(),
-    ])
+    ]);
 
     return {
       amount: parsedData.amount,

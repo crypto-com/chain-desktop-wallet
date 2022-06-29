@@ -131,7 +131,7 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
 
     chainId: isTestnet ? '4' : '1',
 
-    fee: { gasLimit: `50000`, networkFee: `20000000000` },
+    fee: { gasLimit: '50000', networkFee: '20000000000' },
     // TODO: Change this to the production indexing url
     indexingUrl: isTestnet
       ? 'https://eth-indexing.3ona.co/ethereum/rinkeby/api/v1'

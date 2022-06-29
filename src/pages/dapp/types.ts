@@ -39,7 +39,7 @@ export namespace DappBrowserIPC {
     object: {};
   }
 
-    export interface SignTransactionEvent extends BaseEvent {
+  export interface SignTransactionEvent extends BaseEvent {
     name: 'signTransaction';
     object: {
       chainConfig: EVMChainConfig;

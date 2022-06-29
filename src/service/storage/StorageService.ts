@@ -568,7 +568,7 @@ export class StorageService {
     walletId: string,
   ): Promise<NftAccountTransactionList> {
     const nftAccountTxRecords = await this.db.commonTransactionStore.find<
-      NftAccountTransactionRecord
+    NftAccountTransactionRecord
     >({
       walletId,
       txType: 'nftAccount',

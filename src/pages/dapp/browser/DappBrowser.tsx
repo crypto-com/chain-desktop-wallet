@@ -99,11 +99,11 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   }));
 
   const [txEvent, setTxEvent] = useState<
-    | DappBrowserIPC.SendTransactionEvent
-    | DappBrowserIPC.TokenApprovalEvent
-    | DappBrowserIPC.SignPersonalMessageEvent
-    | DappBrowserIPC.SignTypedMessageEvent
-    | DappBrowserIPC.SignMessageEvent
+  | DappBrowserIPC.SendTransactionEvent
+  | DappBrowserIPC.TokenApprovalEvent
+  | DappBrowserIPC.SignPersonalMessageEvent
+  | DappBrowserIPC.SignTypedMessageEvent
+  | DappBrowserIPC.SignMessageEvent
   >();
   const [requestConfirmationVisible, setRequestConfirmationVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');

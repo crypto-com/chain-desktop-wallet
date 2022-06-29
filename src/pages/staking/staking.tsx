@@ -67,7 +67,7 @@ const StakingPage = () => {
   const [isUnbondingDelegationModalVisible, setIsUnbondingDelegationModalVisible] = useState(false);
   const [isUnbondingVisible, setIsUnbondingVisible] = useState(false);
   const [unbondingDelegations, setUnbondingDelegations] = useState<
-    UnbondingDelegationTabularData[]
+  UnbondingDelegationTabularData[]
   >([]);
   const [moderationConfig, setModerationConfig] = useState<ModerationConfig>();
   const analyticsService = new AnalyticsService(currentSession);
