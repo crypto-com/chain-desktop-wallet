@@ -221,9 +221,6 @@
     }
   },
   "lint-staged": {
-    "src/**/*.{js,jsx,tsx,ts,less,md,json}": [
-      "eslint --fix"
-    ],
     "src/**/*.less": [
       "stylelint --fix less",
       "stylelint --fix --syntax less",
