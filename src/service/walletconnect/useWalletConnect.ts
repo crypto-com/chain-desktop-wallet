@@ -287,7 +287,7 @@ export const useWalletConnect = () => {
       });
 
       if (connector.connected) {
-        const { chainId, accounts } = connector;
+        const { accounts } = connector;
         const index = 0;
         const address = accounts[index];
         setState({

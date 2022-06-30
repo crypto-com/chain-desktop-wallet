@@ -92,10 +92,11 @@ module.exports = {
     '@typescript-eslint/no-empty-interface': 'off',
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/no-namespace': 'off',
-    '@typescript-eslint/no-inferrable-types': 'off',
     '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
     'react/jsx-key': 'off',
     'object-curly-spacing': ['error', 'always'],
-    'function-call-argument-newline': ['error', 'consistent']
+    'function-call-argument-newline': ['error', 'consistent'],
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off', 
   },
 };
