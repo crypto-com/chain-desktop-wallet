@@ -785,12 +785,11 @@ export class StorageService {
     chainName: string,
     assetSymbol: string,
   ) {
-    return this.db.addressBookStore
-      .find<AddressBookContactModel>({
-        walletId,
-        chainName,
-        assetSymbol,
-      })
+    return this.db.addressBookStore.find<AddressBookContactModel>({
+      walletId,
+      chainName,
+      assetSymbol,
+    })
       .exec();
   }
 
