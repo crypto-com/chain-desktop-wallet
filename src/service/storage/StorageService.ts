@@ -787,10 +787,10 @@ export class StorageService {
   ) {
     return this.db.addressBookStore
       .find<AddressBookContactModel>({
-      walletId,
-      chainName,
-      assetSymbol,
-    })
+        walletId,
+        chainName,
+        assetSymbol,
+      })
       .exec();
   }
 
