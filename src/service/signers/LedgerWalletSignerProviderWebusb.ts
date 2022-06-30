@@ -2,6 +2,7 @@ import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes'
 import { ISignerProvider } from './SignerProvider';
 import { LedgerSignerWebusb } from './LedgerSignerWebusb';
 import { DerivationPathStandard } from './LedgerSigner';
+import { SupportedChainName } from '../../config/StaticConfig';
 
 export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
   provider: LedgerSignerWebusb;
@@ -10,18 +11,19 @@ export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
     this.provider = new LedgerSignerWebusb();
   }
 
-  public async getPubKey(index: number, derivationPathStandard: DerivationPathStandard, showLedgerDisplay: boolean): Promise<Bytes> {
-    const result = await this.provider.enable(index, 'cro', derivationPathStandard, showLedgerDisplay); // dummy value
+  public async getPubKey(index: number, chainName: SupportedChainName, derivationPathStandard: DerivationPathStandard, showLedgerDisplay: boolean): Promise<Bytes> {
+    const result = await this.provider.enable(index, 'cro', chainName, derivationPathStandard, showLedgerDisplay); // dummy value
     return result[1];
   }
 
   public async getAddress(
     index: number,
     addressPrefix: string,
+    chainName: SupportedChainName,
     derivationPathStandard: DerivationPathStandard,
     showLedgerDisplay: boolean,
   ): Promise<string> {
-    const result = await this.provider.enable(index, addressPrefix, derivationPathStandard, showLedgerDisplay);
+    const result = await this.provider.enable(index, addressPrefix, chainName, derivationPathStandard, showLedgerDisplay);
     return result[0];
   }
 

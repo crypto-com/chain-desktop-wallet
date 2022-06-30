@@ -4,7 +4,7 @@ import * as path from 'path';
 import { DerivationPathStandard, LedgerSigner } from '../../src/service/signers/LedgerSigner';
 import { ISignerProvider } from '../../src/service/signers/SignerProvider';
 import { LedgerTransactionSigner } from '../../src/service/signers/LedgerTransactionSigner';
-import { CustomDevNet } from '../../src/config/StaticConfig';
+import { CustomDevNet, SupportedChainName } from '../../src/config/StaticConfig';
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { NodeRpcService } from '../../src/service/rpc/NodeRpcService';
 const { exec } = require('child_process');
@@ -196,7 +196,7 @@ export class LedgerWalletSignerProviderZemu implements ISignerProvider {
     return result[1];
   }
 
-  public async getAddress(index: number, addressPrefix: string, derivationPathStandard: DerivationPathStandard): Promise<string> {
+  public async getAddress(index: number, addressPrefix: string, chainName: SupportedChainName, derivationPathStandard: DerivationPathStandard): Promise<string> {
     const result = await this.provider.enable(index, addressPrefix, derivationPathStandard, false);
     await this.provider.closeTransport();
     return result[0];

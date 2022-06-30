@@ -111,7 +111,7 @@ export class EthClient extends EVMClient implements IEthChainIndexAPI {
   private getTxsByAddressPaginated = async (address: string, options?: txQueryBaseParams) => {
     const txListResponse: AxiosResponse<TransactionsByAddressResponse> = await axios({
       baseURL: this.indexingBaseUrl,
-      url: `/address/${address.toLowerCase()}/transaction-history`,
+      url: `/address/${address.toLowerCase()}/normal`,
       params: { ...options },
     });
 

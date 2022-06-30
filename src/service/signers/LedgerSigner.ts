@@ -1,5 +1,6 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { bech32 } from 'bech32';
+import { SupportedChainName } from '../../config/StaticConfig';
 import { UserAssetType } from '../../models/UserAsset';
 
 export enum DerivationPathStandard {
@@ -20,10 +21,10 @@ export class LedgerSigner {
 
   // override this function
   // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-empty-function
-  async createTransport() {}
+  async createTransport() { }
 
   // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-empty-function
-  async closeTransport() {}
+  async closeTransport() { }
 
   public static toBech32(address: Uint8Array, bech32Prefix: string): string {
     const words = bech32.toWords(Buffer.from(address) as any);
@@ -58,26 +59,38 @@ export class LedgerSigner {
   public async enable(
     index: number,
     addressPrefix: string,
+    chainName: SupportedChainName,
     derivationPathStandard: DerivationPathStandard,
     showLedgerDisplay: boolean /* display address in ledger */,
   ): Promise<[string, Bytes]> {
     await this.createTransport();
 
     let response = await this.app.getVersion();
+    let coin = 394;
     if (response.error_message !== 'No errors') {
       await this.closeTransport();
       throw new Error(`${response.error_message}`);
+    }
+
+
+    switch (chainName) {
+      case SupportedChainName.COSMOS_HUB:
+        coin = 118;
+        break;
+      case SupportedChainName.CRYPTO_ORG:
+      default:
+        coin = 394;
     }
 
     // purpose(44), coin(394), account(0), change(0), index(0)
     // for string: `m/44'/394'/${this.account}'/0/${index}`;
     switch (derivationPathStandard) {
       case DerivationPathStandard.LEDGER_LIVE:
-        this.path = [44, 394, index, 0, this.account];
+        this.path = [44, coin, index, 0, this.account];
         break;
       case DerivationPathStandard.BIP44:
       default:
-        this.path = [44, 394, this.account, 0, index];
+        this.path = [44, coin, this.account, 0, index];
     }
 
     if (showLedgerDisplay) {
@@ -100,6 +113,7 @@ export class LedgerSigner {
     startIndex: number,
     gap: number,
     addressPrefix: string,
+    chainName: SupportedChainName,
     derivationPathStandard: DerivationPathStandard,
   ): Promise<string[]> {
     const addressList: string[] = [];
@@ -115,13 +129,22 @@ export class LedgerSigner {
       // purpose(44), coin(394), account(0), change(0), index(0)
       // for string: `m/44'/394'/${this.account}'/0/${index}`;
       let path;
+      let coin;
+      switch (chainName) {
+        case SupportedChainName.COSMOS_HUB:
+          coin = 118;
+          break;
+        case SupportedChainName.CRYPTO_ORG:
+        default:
+          coin = 394;
+      }
       switch (derivationPathStandard) {
         case DerivationPathStandard.LEDGER_LIVE:
-          path = [44, 394, index, 0, this.account];
+          path = [44, coin, index, 0, this.account];
           break;
         case DerivationPathStandard.BIP44:
         default:
-          path = [44, 394, this.account, 0, index];
+          path = [44, coin, this.account, 0, index];
       }
       // eslint-disable-next-line no-await-in-loop
       response = await this.app.getAddressAndPubKey(path, addressPrefix);
@@ -229,6 +252,8 @@ export class LedgerSigner {
         coin = '60';
         break;
       case UserAssetType.TENDERMINT:
+        coin = '394';
+        break;
       default:
         coin = '394';
     }

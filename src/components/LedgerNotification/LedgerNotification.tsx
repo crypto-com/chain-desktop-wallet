@@ -9,6 +9,7 @@ import IconCro from '../../svg/IconCro';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
 import { UserAsset, UserAssetType } from '../../models/UserAsset';
 import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
+import { SupportedChainName } from '../../config/StaticConfig';
 
 export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
   const { assetType } = asset;
@@ -27,6 +28,7 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
           const ledgerAddress = await device.getAddress(
             addressIndex,
             addressprefix,
+            asset.config?.tendermintNetwork?.chainName ?? SupportedChainName.CRYPTO_ORG,
             derivationPathStandard ?? DerivationPathStandard.BIP44,
             true,
           );
@@ -171,7 +173,7 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
   }
 }
 
-export function ledgerNotificationWithoutCheck(assetType: UserAssetType) {
+export function ledgerNotificationWithoutCheck(assetType: UserAssetType, chainName?: SupportedChainName) {
   const LedgerNotificationKey = 'LedgerNotification';
   const LedgerSuccessNotificationKey = 'LedgerSuccessNotification';
   const LedgerErrorNotificationKey = 'LedgerErrorNotification';
@@ -180,7 +182,7 @@ export function ledgerNotificationWithoutCheck(assetType: UserAssetType) {
     try {
       const device = createLedgerDevice();
       if (assetType === UserAssetType.TENDERMINT || assetType === UserAssetType.IBC) {
-        await device.getPubKey(0, DerivationPathStandard.BIP44, false);
+        await device.getPubKey(0, chainName, DerivationPathStandard.BIP44, false);
 
         setRecoil(ledgerIsConnectedState, LedgerConnectedApp.CRYPTO_ORG);
         notification.close(LedgerNotificationKey);

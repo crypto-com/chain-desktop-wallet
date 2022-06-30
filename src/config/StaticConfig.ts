@@ -453,7 +453,7 @@ export type Network = {
   validatorAddressPrefix: string;
   coin: { baseDenom: string; croDenom: string; denom?: string };
   rpcUrl?: string;
-  chainName?: string;
+  chainName?: SupportedChainName;
   node?: {
     clientUrl: string;
     proxyUrl: string;

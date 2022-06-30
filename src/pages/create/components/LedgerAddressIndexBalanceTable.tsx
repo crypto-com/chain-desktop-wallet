@@ -12,7 +12,7 @@ import {
   CRONOS_EVM_ASSET,
   MainNetEvmConfig,
 } from '../../../config/StaticAssets';
-import { DefaultWalletConfigs } from '../../../config/StaticConfig';
+import { DefaultWalletConfigs, SupportedChainName } from '../../../config/StaticConfig';
 import { NodeRpcService } from '../../../service/rpc/NodeRpcService';
 import { LedgerSigner } from '../../../service/signers/LedgerSigner';
 import { ISignerProvider } from '../../../service/signers/SignerProvider';
@@ -220,6 +220,7 @@ const LedgerAddressIndexBalanceTable = (props: {
               startIndex,
               DEFAULT_GAP,
               isTestnet ? 'tcro' : 'cro',
+              SupportedChainName.CRYPTO_ORG,
               standard,
             );
             if (tendermintAddressList) {
@@ -243,7 +244,7 @@ const LedgerAddressIndexBalanceTable = (props: {
         default:
       }
     } catch {
-      ledgerNotificationWithoutCheck(assetType);
+      ledgerNotificationWithoutCheck(assetType, SupportedChainName.CRYPTO_ORG);
     }
   };
 

@@ -74,7 +74,7 @@ export class CosmjsTendermintTransactionSigner extends BaseTransactionSigner
         hdPath = MakeHdPath.init(0, DerivationPathStandard.BIP44).cosmosHubMainnet();
         break;
       default:
-        hdPath = MakeHdPath.init(0, DerivationPathStandard.BIP44).cryptoOrgMainnet();
+        throw new Error(`${network.chainName} is not supported`);
     }
 
     const wallet = await DirectSecp256k1HdWallet.fromMnemonic(phrase, {

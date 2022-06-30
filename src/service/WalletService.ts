@@ -676,6 +676,7 @@ class WalletService {
     session?: Session,
     tendermintAddress?: string,
     evmAddress?: string,
+    cosmosHubAddress?: string,
   ) {
     // 1. Check if current wallet has all expected static assets
     // 2. If static assets are missing, remove all existing non dynamic assets
@@ -693,7 +694,7 @@ class WalletService {
       const assetGeneration = await walletOps.generate(wallet.config, wallet.identifier, phrase);
 
       if (currentSession?.wallet.walletType === LEDGER_WALLET_TYPE) {
-        if (tendermintAddress !== '' && evmAddress !== '') {
+        if (tendermintAddress !== '' && evmAddress !== '' && cosmosHubAddress !== '') {
           const tendermintAsset = (await assetGeneration.initialAssets).filter(
             asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO',
           )[0];
@@ -702,6 +703,11 @@ class WalletService {
             asset => asset.assetType === UserAssetType.EVM,
           )[0];
           evmAsset.address = evmAddress;
+          const cosmosHubAsset = (await assetGeneration.initialAssets).filter(
+            asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'ATOM',
+          )[0];
+          cosmosHubAsset.address = cosmosHubAddress;
+
         } else {
           // eslint-disable-next-line no-console
           console.log('FAILED_TO_GET_LEDGER_ADDRESSES');

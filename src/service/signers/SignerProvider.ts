@@ -1,11 +1,12 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
+import { SupportedChainName } from '../../config/StaticConfig';
 import { DerivationPathStandard } from './LedgerSigner';
 
 export interface ISignerProvider {
   // cosmos
-  getPubKey(index: number, derivationPathStandard: DerivationPathStandard, showLedgerDisplay: boolean): Promise<Bytes>;
-  getAddress(index: number, addressPrefix: string, derivationPathStandard: DerivationPathStandard, showLedgerDisplay: boolean): Promise<string>;
-  getAddressList(startIndex:number, gap: number, addressPrefix: string, derivationPathStandard: DerivationPathStandard): Promise<string[]>;
+  getPubKey(index: number, chainName: SupportedChainName, derivationPathStandard: DerivationPathStandard, showLedgerDisplay: boolean): Promise<Bytes>;
+  getAddress(index: number, addressPrefix: string, chainName: SupportedChainName, derivationPathStandard: DerivationPathStandard, showLedgerDisplay: boolean): Promise<string>;
+  getAddressList(startIndex:number, gap: number, addressPrefix: string, chainName: SupportedChainName, derivationPathStandard: DerivationPathStandard): Promise<string[]>;
   sign(message: Bytes): Promise<Bytes>;
 
   // eth
