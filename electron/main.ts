@@ -1,4 +1,5 @@
 import { app, BrowserWindow, nativeImage, Menu, ipcMain } from 'electron';
+import * as remoteMain from '@electron/remote/main';
 
 import * as path from 'path';
 
@@ -10,6 +11,8 @@ import Big from "big.js";
 import Store from "electron-store";
 
 import { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } from './UsageAnalytics';
+
+remoteMain.initialize();
 
 (global as any).actionEvent = actionEvent;
 (global as any).transactionEvent = transactionEvent;
@@ -74,12 +77,13 @@ function createWindow() {
       webviewTag: true,
       nodeIntegration: true,
       devTools: isDev,
-      enableRemoteModule: true,
       contextIsolation: false,
     },
     resizable: true,
     icon: iconImage,
   });
+
+  remoteMain.enable(win.webContents);
 
   // Note that all efforts to hide menus only work on Windows and Linux
   // The option Menu.setApplicationMenu(null) seemed to have worked on all platforms, but it had some breaking behaviors
@@ -141,7 +145,6 @@ app.on('activate', async () => {
 });
 
 app.on('ready', async function () {
-  app.allowRendererProcessReuse = false
   createWindow();
 
   await new Promise(resolve => setTimeout(resolve, 20_000));
