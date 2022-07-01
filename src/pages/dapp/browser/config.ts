@@ -1,6 +1,6 @@
 import path from 'path';
 
-const { remote } = window.require('electron');
+const remote = window.require('@electron/remote');
 
 export class ChainConfig {
   static ChainId = 0x19;
