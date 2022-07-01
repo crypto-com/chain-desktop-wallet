@@ -176,7 +176,7 @@ class IdMapping {
     this.intIds = new Map();
   }
 
-  tryIntifyId(payload) {
+  tryIdentifyId(payload) {
     if (!payload.id) {
       payload.id = Utils.genId();
       return;
@@ -318,7 +318,7 @@ class Web3Provider extends EventEmitter {
    * @private Internal rpc handler
    */
   requestInner(payload, wrapResult = true) {
-    this.idMapping.tryIntifyId(payload);
+    this.idMapping.tryIdentifyId(payload);
     if (this.isDebug) {
       console.log(`==> _request payload ${JSON.stringify(payload)}`);
     }
