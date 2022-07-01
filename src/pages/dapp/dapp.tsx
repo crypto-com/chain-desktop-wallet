@@ -11,7 +11,7 @@ import logoVvs from './assets/vvs.svg';
 import logoTectonic from './assets/tectonic.svg';
 import AddressBar from './components/AddressBar/AddressBar';
 import SavedTab from './components/Tabs/SavedTab';
-import { isValidURL } from '../../utils/utils';
+import { isLocalhostURL, isValidURL } from '../../utils/utils';
 import { IWebviewNavigationState, WebviewState } from './browser/useWebviewStatusInfo';
 import { useBookmark } from './hooks/useBookmark';
 import { useShowDisclaimer } from './hooks/useShowDisclaimer';
@@ -198,7 +198,7 @@ const DappPage = () => {
         onSearch={value => {
           setSelectedDapp(undefined);
           // detect whether it's a domain
-          if (isValidURL(value)) {
+          if (isValidURL(value) || isLocalhostURL(value)) {
             // jump to website
             setSelectedURL(value);
           } else {
