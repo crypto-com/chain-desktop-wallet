@@ -16,7 +16,12 @@ import './create.less';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions, WalletCreator } from '../../service/WalletCreator';
-import { DefaultWalletConfigs, LedgerWalletMaximum, NodePorts, SupportedChainName } from '../../config/StaticConfig';
+import {
+  DefaultWalletConfigs,
+  LedgerWalletMaximum,
+  NodePorts,
+  SupportedChainName,
+} from '../../config/StaticConfig';
 import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
@@ -46,6 +51,7 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import LedgerAddressIndexBalanceTable from './components/LedgerAddressIndexBalanceTable';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { DerivationPathStandard, LedgerSigner } from '../../service/signers/LedgerSigner';
+import IconCosmos from '../../svg/IconCosmos';
 
 let waitFlag = false;
 const layout = {
@@ -371,12 +377,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   };
   const handleCosmosOk = () => {
     waitFlag = false;
-  }
+  };
 
   const handleCosmosCancel = () => {
     waitFlag = false;
     setIsCosmosModalVisible(false);
-  }
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -479,10 +485,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         );
 
         const croAsset = createdWallet.assets.filter(
-          asset => (
-            asset.assetType === UserAssetType.TENDERMINT
-            && asset.mainnetSymbol === 'CRO'
-          ),
+          asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO',
         )[0];
         croAsset.address = croAddress;
 
@@ -535,12 +538,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         );
 
         const atomAsset = createdWallet.assets.filter(
-          asset => (
+          asset =>
             asset.assetType === UserAssetType.TENDERMINT &&
-            asset.config?.tendermintNetwork?.chainName === SupportedChainName.COSMOS_HUB)
+            asset.config?.tendermintNetwork?.chainName === SupportedChainName.COSMOS_HUB,
         )[0];
         atomAsset.address = cosmosHubAddress;
-
       }
 
       await walletService.saveAssets(createdWallet.assets);
@@ -643,7 +645,13 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     setCreateLoading(true);
     try {
       const device = createLedgerDevice();
-      await device.getAddress(0, 'cosmos', SupportedChainName.COSMOS_HUB, DerivationPathStandard.BIP44, false);
+      await device.getAddress(
+        0,
+        'cosmos',
+        SupportedChainName.COSMOS_HUB,
+        DerivationPathStandard.BIP44,
+        false,
+      );
       setIsLedgerCosmosAppConnected(true);
       await new Promise(resolve => {
         setTimeout(resolve, 2000);
@@ -707,7 +715,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     try {
       const device = createLedgerDevice();
       // check ledger device ok
-      await device.getPubKey(parseInt(addressIndex, 10), SupportedChainName.CRYPTO_ORG, derivationPathStandard, false);
+      await device.getPubKey(
+        parseInt(addressIndex, 10),
+        SupportedChainName.CRYPTO_ORG,
+        derivationPathStandard,
+        false,
+      );
       setIsLedgerCroAppConnected(true);
 
       await new Promise(resolve => {
@@ -894,7 +907,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                   switch (e) {
                     case UserAssetType.TENDERMINT:
                       setLedgerAssetType(UserAssetType.TENDERMINT);
-                      ledgerNotificationWithoutCheck(UserAssetType.TENDERMINT, SupportedChainName.CRYPTO_ORG);
+                      ledgerNotificationWithoutCheck(
+                        UserAssetType.TENDERMINT,
+                        SupportedChainName.CRYPTO_ORG,
+                      );
                       break;
                     case UserAssetType.EVM:
                       setLedgerAssetType(UserAssetType.EVM);
@@ -1162,7 +1178,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
               <>
                 {t('create.ledgerModalPopup.tendermintAddress.description3')}
                 <div className="ledger-app-icon">
-                  <IconCro style={{ color: '#fff' }} />
+                  <IconCosmos style={{ color: '#fff' }} />
                 </div>
                 Cosmos App
               </>
