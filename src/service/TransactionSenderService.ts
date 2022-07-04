@@ -677,6 +677,8 @@ export class TransactionSenderService {
       accountSequence,
     };
 
+    console.log('depositRequest.amount ', depositRequest.amount);
+
     let signedTxHex: string = '';
     const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();
 
@@ -717,6 +719,9 @@ export class TransactionSenderService {
       ledgerTransactionSigner,
     } = await this.transactionPrepareService.prepareTransaction();
 
+
+    console.log('textProposalSubmitRequest ', textProposalSubmitRequest);
+
     const submitTextProposalUnsigned: TextProposalTransactionUnsigned = {
       params: {
         description: textProposalSubmitRequest.description,
@@ -749,7 +754,10 @@ export class TransactionSenderService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    await this.txHistoryManager.fetchAndSaveProposals(currentSession);
+    const proposals = await this.txHistoryManager.fetchAndSaveProposals(currentSession);
+
+    console.log('broadCastResult ', proposals, broadCastResult);
+
     return broadCastResult;
   }
 

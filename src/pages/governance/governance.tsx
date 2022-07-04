@@ -53,6 +53,7 @@ const GovernancePage = () => {
   const [voteOption, setVoteOption] = useState<VoteOption>(VoteOption.VOTE_OPTION_ABSTAIN);
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   // const [isModalVisible, setIsModalVisible] = useState(false);
+  const [modalType, setModalType] = useState('confirmation');
   const [confirmLoading, setConfirmLoading] = useState(false);
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
@@ -116,7 +117,18 @@ const GovernancePage = () => {
   const handleCancelProposalModal = () => {
     setIsProposalModalVisible(false);
     form.resetFields();
-    form.setFieldsValue({ initialDeposit: minDeposit });
+    const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
+    const userDeposit = (Big(usersBalance).cmp(Big(minDeposit)) === 1) ? minDeposit : usersBalance;
+    form.setFieldsValue({ initialDeposit: userDeposit });
+    customRangeValidator = TransactionUtils.rangeValidator(
+      minDeposit,
+      maxDeposit,
+      t('governance.modal2.form.input.proposalDeposit.error'),
+    );
+
+    form.validateFields(['initialDeposit']);
+
+    console.log('form ', form);
   };
 
   const handleCancelConfirmationModal = () => {
@@ -134,6 +146,7 @@ const GovernancePage = () => {
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
+    setModalType('confirmation');
     setIsVisibleConfirmationModal(true);
   };
 
@@ -143,7 +156,11 @@ const GovernancePage = () => {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, userAsset!);
       }
-      showConfirmationModal();
+
+      if(modalType === 'confirmation'){
+        showConfirmationModal();
+      }
+      
     } else {
       setInputPasswordVisible(true);
     }
@@ -155,7 +172,15 @@ const GovernancePage = () => {
       currentSession.wallet.identifier,
     );
     setDecryptedPhrase(phraseDecrypted);
-    showConfirmationModal();
+
+    if(modalType === "confirmation"){
+      showConfirmationModal();
+    }
+
+    if(modalType === "create_proposal"){
+      setIsProposalModalVisible(true);
+    }
+    
   };
 
   const processProposalFigures = async (_proposal: ProposalModel) => {
@@ -344,48 +369,65 @@ const GovernancePage = () => {
 
   const onCreateProposalAction = async () => {
     const { walletType } = currentSession.wallet;
+    const currentDenom = currentSession.wallet.config.network.coin.croDenom;
 
     if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
       return;
     }
 
-    console.log('onCreateProposalAction...', form.getFieldValue('proposalType'));
-
     try {
       setConfirmLoading(true);
+      setInputPasswordVisible(false);
 
       const proposalType = form.getFieldValue('proposalType');
       let textProposal: BroadCastResult | null = null;
+
+      console.log('form?.getFieldValue ', (form?.getFieldValue('initialDeposit')), currentDenom);
 
       if (proposalType === 'text_proposal') {
         textProposal = await walletService.sendTextProposalSubmitTx({
           description: form?.getFieldValue('proposalDescription'),
           title: form?.getFieldValue('proposalTitle'),
-          initialDeposit: [{ amount: form?.getFieldValue('initialDeposit'), denom: '' }],
+          initialDeposit: [{amount: Big(form?.getFieldValue('initialDeposit')).toString(), denom: currentDenom}],
           proposer: userAsset?.address,
           decryptedPhrase,
           walletType,
         });
 
+
+      
+        // const confirmProposalDepositTrans = await walletService.sendMsgDepositTx({
+          // depositor: userAsset?.address,
+          // amount: [{ amount: form?.getFieldValue('initialDeposit'), denom: currentDenom }],
+          // proposalId: textProposal.proposalId,
+          // decryptedPhrase,
+          // walletType,
+        // });
+
         console.log('textProposal ', textProposal);
+
+        // const reQuery = await walletService.fetchAndSaveProposals(currentSession);
+
+        // console.log('reQuery ', reQuery);
       }
 
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
       setUserAsset(currentWalletAsset);
+      setIsVisibleConfirmationModal(false);
       setInputPasswordVisible(false);
       setConfirmLoading(false);
-      console.log('finish ');
+      console.log('finish... ');
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
         setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
 
       console.error('erroro ', e);
-
+      setIsVisibleConfirmationModal(false);
       setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsProposalModalVisible(false);
       setConfirmLoading(false);
-      setInputPasswordVisible(false);
+      // setInputPasswordVisible(false);
     }
   };
 
@@ -399,7 +441,10 @@ const GovernancePage = () => {
       setProposalList(latestProposalOnTop);
     };
 
-    form.setFieldsValue({ initialDeposit: minDeposit });
+    const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
+    const userDeposit = (Big(usersBalance).cmp(Big(minDeposit)) === 1) ? minDeposit : usersBalance;
+
+    form.setFieldsValue({ initialDeposit: userDeposit });
 
     fetchProposalList();
 
@@ -414,8 +459,11 @@ const GovernancePage = () => {
       t('governance.modal2.form.input.proposalDeposit.error'),
     );
 
+
+    form.validateFields(['initialDeposit']);
+
     // eslint-disable-next-line
-  }, [currentSession, form]);
+  }, [currentSession, form, userAsset]);
 
   return (
     <Layout className="site-layout">
@@ -431,7 +479,9 @@ const GovernancePage = () => {
             id="create-proposal-btn"
             type="primary"
             onClick={() => {
-              setIsProposalModalVisible(true);
+              form.validateFields(['initialDeposit']);
+              setModalType('create_proposal');
+              showPasswordInput('create_proposal');
             }}
           >
             {t('governance.modal2.title')}
@@ -445,9 +495,6 @@ const GovernancePage = () => {
           handleCancel={handleCancelProposalModal}
           handleOk={() => {
             onCreateProposalAction();
-            setTimeout(() => {
-              showPasswordInput();
-            }, 200);
           }}
           confirmationLoading={confirmLoading}
           footer={[
@@ -457,9 +504,6 @@ const GovernancePage = () => {
               loading={confirmLoading}
               onClick={() => {
                 onCreateProposalAction();
-                setTimeout(() => {
-                  showPasswordInput();
-                }, 200);
               }}
               disabled={
                 !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
@@ -508,7 +552,8 @@ const GovernancePage = () => {
               layout="vertical"
               requiredMark={false}
               initialValues={{
-                initial_deposit: minDeposit,
+                initialDeposit: (Big(getUIDynamicAmount(userAsset.balance, userAsset)).cmp(Big(minDeposit)) === 1) ? minDeposit : getUIDynamicAmount(userAsset.balance, userAsset),
+                proposalType: "text_proposal"
               }}
             >
               <Form.Item
@@ -522,13 +567,13 @@ const GovernancePage = () => {
                 ]}
                 style={{ textAlign: 'left' }}
               >
-                <Select placeholder="Select Proposal Type">
-                  <Option key="parameter_change" value="parameter_change">
+                <Select placeholder="Select Proposal Type" >
+                  {/* <Option key="parameter_change" value="parameter_change">
                     Parameter Change
                   </Option>
                   <Option key="community_pool_spend" value="community_pool_spend">
                     Community Pool Spend
-                  </Option>
+                  </Option> */}
                   <Option key="text_proposal" value="text_proposal">
                     Text Proposal
                   </Option>
@@ -583,6 +628,7 @@ const GovernancePage = () => {
                 ]}
               >
                 <InputNumber
+                  stringMode
                   placeholder={`Enter the initial ${userAsset.symbol} amount`}
                   addonAfter={userAsset.symbol}
                 />
@@ -886,6 +932,8 @@ const GovernancePage = () => {
         )}
       </Content>
       <Footer />
+
+
       <PasswordFormModal
         description={t('general.passwordFormModal.description')}
         okButtonText={t('general.passwordFormModal.okButton')}
@@ -905,7 +953,9 @@ const GovernancePage = () => {
         visible={inputPasswordVisible}
         successButtonText={t('general.continue')}
         confirmPassword={false}
-      />
+      /> 
+
+
       <ModalPopup
         isModalVisible={isConfirmationModalVisible}
         handleCancel={handleCancelConfirmationModal}

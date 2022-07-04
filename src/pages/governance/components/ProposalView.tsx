@@ -33,7 +33,7 @@ export const ProposalView = (props: any) => {
   };
 
   const onVote = async () => {
-    allProps.showPasswordInput();
+    allProps.showPasswordInput(undefined);
   };
 
   const processStatusTag = status => {
