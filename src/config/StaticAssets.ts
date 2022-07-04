@@ -114,12 +114,12 @@ export const ATOM_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
     isStakingDisabled: true,
     nodeUrl: isTestnet
       ? 'https://rpc.sentry-01.theta-testnet.polypore.xyz'
-      : 'https://cql.crypto.com/cosmos/mainnet/rpc?apikey=pFuDmQca4vwhroAC8vc7o8k73PkhBUkwgaHYMq4wa2MpxA4fiF',
+      : 'https://eth-indexing.crypto.org/cosmos/mainnet/rpc',
     memoSupportDisabled: false,
     tendermintNetwork: {
       defaultNodeUrl: isTestnet
         ? 'https://rpc.sentry-01.theta-testnet.polypore.xyz'
-        : 'https://cql.crypto.com/cosmos/mainnet/rpc?apikey=pFuDmQca4vwhroAC8vc7o8k73PkhBUkwgaHYMq4wa2MpxA4fiF',
+        : 'https://eth-indexing.crypto.org/cosmos/mainnet/rpc',
       chainName: SupportedChainName.COSMOS_HUB,
       chainId: isTestnet ? 'theta-testnet-001' : 'cosmoshub-4',
       addressPrefix: 'cosmos',
@@ -130,10 +130,10 @@ export const ATOM_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
       node: {
         clientUrl: isTestnet
           ? 'https://rpc.sentry-01.theta-testnet.polypore.xyz'
-          : 'https://cql.crypto.com/cosmos/mainnet/rpc?apikey=pFuDmQca4vwhroAC8vc7o8k73PkhBUkwgaHYMq4wa2MpxA4fiF',
+          : 'https://eth-indexing.crypto.org/cosmos/mainnet/rpc',
         proxyUrl: isTestnet
           ? 'https://rest.sentry-01.theta-testnet.polypore.xyz'
-          : 'https://cql.crypto.com/cosmos/mainnet/rpc?apikey=pFuDmQca4vwhroAC8vc7o8k73PkhBUkwgaHYMq4wa2MpxA4fiF',
+          : 'https://eth-indexing.crypto.org/cosmos/mainnet/rest',
       },
     },
   };
@@ -205,14 +205,14 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
     fee: { gasLimit: `50000`, networkFee: `20000000000` },
     // TODO: Change this to the production indexing url
     indexingUrl: isTestnet
-      ? 'https://eth-indexing.3ona.co/ethereum/rinkeby/api/v1'
-      : 'https://eth-indexing.3ona.co/ethereum/mainnet/api/v1',
+      ? 'https://eth-indexing.crypto.org/ethereum/rinkeby/api/v1'
+      : 'https://eth-indexing.crypto.org/ethereum/mainnet/api/v1',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
     // TODO: Change this to the production node url
     nodeUrl: isTestnet
-      ? 'https://eth-indexing.3ona.co/ethereum/rinkeby/rpc'
-      : 'https://eth-indexing.3ona.co/ethereum/mainnet/rpc',
+      ? 'https://eth-indexing.crypto.org/ethereum/rinkeby/rpc'
+      : 'https://eth-indexing.crypto.org/ethereum/mainnet/rpc',
     memoSupportDisabled: true,
   };
 
