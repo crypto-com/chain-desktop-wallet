@@ -15,7 +15,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { ledgerIsExpertModeState, sessionState, walletAssetState } from '../../recoil/atom';
 
-import { getUIVoteAmount, getUIDynamicAmount } from '../../utils/NumberUtils';
+import { getUIVoteAmount, getUIDynamicAmount, getBaseScaledAmount } from '../../utils/NumberUtils';
 import {
   ProposalModel,
   ProposalStatuses,
@@ -118,7 +118,7 @@ const GovernancePage = () => {
     setIsProposalModalVisible(false);
     form.resetFields();
     const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
-    const userDeposit = (Big(usersBalance).cmp(Big(minDeposit)) === 1) ? minDeposit : usersBalance;
+    const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
     form.setFieldsValue({ initialDeposit: userDeposit });
     customRangeValidator = TransactionUtils.rangeValidator(
       minDeposit,
@@ -157,10 +157,9 @@ const GovernancePage = () => {
         ledgerNotification(currentSession.wallet, userAsset!);
       }
 
-      if(modalType === 'confirmation'){
+      if (modalType === 'confirmation') {
         showConfirmationModal();
       }
-      
     } else {
       setInputPasswordVisible(true);
     }
@@ -173,14 +172,13 @@ const GovernancePage = () => {
     );
     setDecryptedPhrase(phraseDecrypted);
 
-    if(modalType === "confirmation"){
+    if (modalType === 'confirmation') {
       showConfirmationModal();
     }
 
-    if(modalType === "create_proposal"){
+    if (modalType === 'create_proposal') {
       setIsProposalModalVisible(true);
     }
-    
   };
 
   const processProposalFigures = async (_proposal: ProposalModel) => {
@@ -369,7 +367,7 @@ const GovernancePage = () => {
 
   const onCreateProposalAction = async () => {
     const { walletType } = currentSession.wallet;
-    const currentDenom = currentSession.wallet.config.network.coin.croDenom;
+    const currentDenom = currentSession.wallet.config.network.coin.baseDenom;
 
     if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
       return;
@@ -382,26 +380,29 @@ const GovernancePage = () => {
       const proposalType = form.getFieldValue('proposalType');
       let textProposal: BroadCastResult | null = null;
 
-      console.log('form?.getFieldValue ', (form?.getFieldValue('initialDeposit')), currentDenom);
+      console.log('form?.getFieldValue ', form?.getFieldValue('initialDeposit'), currentDenom);
 
       if (proposalType === 'text_proposal') {
         textProposal = await walletService.sendTextProposalSubmitTx({
           description: form?.getFieldValue('proposalDescription'),
           title: form?.getFieldValue('proposalTitle'),
-          initialDeposit: [{amount: Big(form?.getFieldValue('initialDeposit')).toString(), denom: currentDenom}],
-          proposer: userAsset?.address,
+          initialDeposit: [
+            {
+              amount: getBaseScaledAmount(form?.getFieldValue('initialDeposit'), userAsset),
+              denom: currentDenom,
+            },
+          ],
+          proposer: userAsset?.address!,
           decryptedPhrase,
           walletType,
         });
 
-
-      
         // const confirmProposalDepositTrans = await walletService.sendMsgDepositTx({
-          // depositor: userAsset?.address,
-          // amount: [{ amount: form?.getFieldValue('initialDeposit'), denom: currentDenom }],
-          // proposalId: textProposal.proposalId,
-          // decryptedPhrase,
-          // walletType,
+        // depositor: userAsset?.address,
+        // amount: [{ amount: form?.getFieldValue('initialDeposit'), denom: currentDenom }],
+        // proposalId: textProposal.proposalId,
+        // decryptedPhrase,
+        // walletType,
         // });
 
         console.log('textProposal ', textProposal);
@@ -442,7 +443,7 @@ const GovernancePage = () => {
     };
 
     const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
-    const userDeposit = (Big(usersBalance).cmp(Big(minDeposit)) === 1) ? minDeposit : usersBalance;
+    const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
 
     form.setFieldsValue({ initialDeposit: userDeposit });
 
@@ -458,7 +459,6 @@ const GovernancePage = () => {
       maxDeposit,
       t('governance.modal2.form.input.proposalDeposit.error'),
     );
-
 
     form.validateFields(['initialDeposit']);
 
@@ -552,8 +552,11 @@ const GovernancePage = () => {
               layout="vertical"
               requiredMark={false}
               initialValues={{
-                initialDeposit: (Big(getUIDynamicAmount(userAsset.balance, userAsset)).cmp(Big(minDeposit)) === 1) ? minDeposit : getUIDynamicAmount(userAsset.balance, userAsset),
-                proposalType: "text_proposal"
+                initialDeposit:
+                  Big(getUIDynamicAmount(userAsset.balance, userAsset)).cmp(Big(minDeposit)) === 1
+                    ? minDeposit
+                    : getUIDynamicAmount(userAsset.balance, userAsset),
+                proposalType: 'text_proposal',
               }}
             >
               <Form.Item
@@ -567,7 +570,7 @@ const GovernancePage = () => {
                 ]}
                 style={{ textAlign: 'left' }}
               >
-                <Select placeholder="Select Proposal Type" >
+                <Select placeholder="Select Proposal Type">
                   {/* <Option key="parameter_change" value="parameter_change">
                     Parameter Change
                   </Option>
@@ -933,7 +936,6 @@ const GovernancePage = () => {
       </Content>
       <Footer />
 
-
       <PasswordFormModal
         description={t('general.passwordFormModal.description')}
         okButtonText={t('general.passwordFormModal.okButton')}
@@ -953,8 +955,7 @@ const GovernancePage = () => {
         visible={inputPasswordVisible}
         successButtonText={t('general.continue')}
         confirmPassword={false}
-      /> 
-
+      />
 
       <ModalPopup
         isModalVisible={isConfirmationModalVisible}
