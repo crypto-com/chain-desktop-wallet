@@ -331,15 +331,14 @@ const GovernancePage = () => {
       setProposalList(latestProposalOnTop);
     };
 
-    fetchProposalList();
-
     if (!didMountRef.current) {
+      fetchProposalList();
       didMountRef.current = true;
       analyticsService.logPage('Governance');
     }
 
     // eslint-disable-next-line
-  }, [currentSession]);
+  }, [proposalList, setProposalList]);
 
   return (
     <Layout className="site-layout">
