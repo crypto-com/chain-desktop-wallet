@@ -45,7 +45,6 @@ export const WalletConnectModal = () => {
 
   const handleOpenURL = useCallback(
     (_event, urlString: string) => {
-      console.log('ACTION handleOpenURL');
       if (urlString?.length < 1 || !urlString.startsWith(`${APP_PROTOCOL_NAME}://wc`)) {
         return;
       }
