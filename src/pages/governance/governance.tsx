@@ -108,10 +108,24 @@ const GovernancePage = () => {
     </Button>
   );
 
-  let customRangeValidator = TransactionUtils.rangeValidator(
-    minDeposit,
+  // let customRangeValidator = TransactionUtils.rangeValidator(
+  //   minDeposit,
+  //   maxDeposit,
+  //   t('governance.modal2.form.input.proposalDeposit.error'),
+  // );
+
+  let customMaxValidator = TransactionUtils.maxValidator(
     maxDeposit,
-    t('governance.modal2.form.input.proposalDeposit.error'),
+    t('governance.modal2.form.input.proposalDeposit.max.error'),
+  );
+  let customMaxValidator0 = TransactionUtils.maxValidator(
+    getUIDynamicAmount(userAsset.balance, userAsset),
+    t('governance.modal2.form.input.proposalDeposit.max2.error'),
+  );
+  let customAmountValidator = TransactionUtils.validTransactionAmountValidator();
+  let customMinValidator = TransactionUtils.minValidator(
+    minDeposit,
+    t('governance.modal2.form.input.proposalDeposit.min.error'),
   );
 
   const handleCancelProposalModal = () => {
@@ -120,12 +134,6 @@ const GovernancePage = () => {
     const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
     const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
     form.setFieldsValue({ initialDeposit: userDeposit });
-    customRangeValidator = TransactionUtils.rangeValidator(
-      minDeposit,
-      maxDeposit,
-      t('governance.modal2.form.input.proposalDeposit.error'),
-    );
-
     form.validateFields(['initialDeposit']);
   };
 
@@ -173,6 +181,7 @@ const GovernancePage = () => {
       currentSession.wallet.identifier,
     );
     setDecryptedPhrase(phraseDecrypted);
+    setInputPasswordVisible(false);
 
     if (modalType === 'confirmation') {
       showConfirmationModal();
@@ -368,6 +377,7 @@ const GovernancePage = () => {
   };
 
   const onCreateProposalAction = async () => {
+    setInputPasswordVisible(false);
     const { walletType } = currentSession.wallet;
     const currentDenom = currentSession.wallet.config.network.coin.baseDenom;
 
@@ -377,8 +387,6 @@ const GovernancePage = () => {
 
     try {
       setConfirmLoading(true);
-      setInputPasswordVisible(false);
-
       const proposalType = form.getFieldValue('proposalType');
       let textProposal: BroadCastResult | null = null;
       if (proposalType === 'text_proposal') {
@@ -444,10 +452,24 @@ const GovernancePage = () => {
       analyticsService.logPage('Governance');
     }
 
-    customRangeValidator = TransactionUtils.rangeValidator(
-      minDeposit,
+    // customRangeValidator = TransactionUtils.rangeValidator(
+    //   minDeposit,
+    //   maxDeposit,
+    //   t('governance.modal2.form.input.proposalDeposit.error'),
+    // );
+
+    customMaxValidator = TransactionUtils.maxValidator(
       maxDeposit,
+      t('send.formSend.amount.error1'),
+    );
+    customAmountValidator = TransactionUtils.validTransactionAmountValidator();
+    customMinValidator = TransactionUtils.minValidator(
+      minDeposit,
       t('governance.modal2.form.input.proposalDeposit.error'),
+    );
+    customMaxValidator0 = TransactionUtils.maxValidator(
+      getUIDynamicAmount(userAsset.balance, userAsset),
+      t('governance.modal2.form.input.proposalDeposit.max2.error'),
     );
 
     form.validateFields(['initialDeposit']);
@@ -671,6 +693,7 @@ const GovernancePage = () => {
               </Form.Item>
               <Form.Item
                 name="initialDeposit"
+                validateFirst
                 label={t('governance.modal2.form.input.proposalDeposit')}
                 hasFeedback
                 rules={[
@@ -684,11 +707,13 @@ const GovernancePage = () => {
                     pattern: /[^0]+/,
                     message: t('governance.modal2.form.input.proposalDeposit.error'),
                   },
-                  customRangeValidator,
+                  customAmountValidator,
+                  customMaxValidator,
+                  customMaxValidator0,
+                  customMinValidator,
                 ]}
               >
                 <InputNumber
-                  stringMode
                   placeholder={`Enter the initial ${userAsset.symbol} amount`}
                   addonAfter={userAsset.symbol}
                 />
