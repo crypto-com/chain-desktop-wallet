@@ -32,6 +32,7 @@
     "@ant-design/icons": "4.6.2",
     "@babel/helper-builder-react-jsx": "7.12.13",
     "@babel/helper-builder-react-jsx-experimental": "7.12.11",
+    "@cosmjs/amino": "^0.28.10",
     "@cosmjs/crypto": "0.28.7",
     "@cosmjs/stargate": "0.27.0",
     "@crypto-org-chain/chain-jslib": "1.0.5",

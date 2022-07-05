@@ -6,9 +6,10 @@ import {
   Registry,
   makeAuthInfoBytes,
   encodePubkey,
-  makeSignDoc,
-  makeSignBytes,
+  // makeSignDoc,
+  // makeSignBytes,
 } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing';
+import { AminoMsg, makeSignDoc, serializeSignDoc } from '@cosmjs/amino';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import { toBase64, toHex } from '@crypto-org-chain/chain-jslib/node_modules/@cosmjs/encoding';
 import Long from 'long';
@@ -134,7 +135,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
         ],
         gas: gasLimit,
       };
-      // eslint-disable-next-line
+      // // eslint-disable-next-line
       const txBodyBytes = registry.encode(txBodyFields);
 
       const pubkeyBytes = (
@@ -156,14 +157,44 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
         127,
       );
 
-      console.log('authInfoBytes', authInfoBytes);
+      console.log('transaction', transaction);
 
       const chainId = network.chainId ?? '';
-      const signDoc = makeSignDoc(txBodyBytes, authInfoBytes, chainId, transaction.accountNumber);
-      const signBytes = makeSignBytes(signDoc);
-      const messageByte = new Bytes(signBytes);
+      const msg1: AminoMsg = {
+        type: 'cosmos-sdk/MsgSend',
+        value: {
+          fromAddress: transaction.fromAddress,
+          toAddress: transaction.toAddress,
+          amount: {
+            denom: network.coin.baseDenom,
+            amount: String(transaction.amount),
+          },
+        },
+      };
 
-      console.log('cosmosHub signBytes', signBytes);
+      const fee2 = {
+        amount: [
+          {
+            denom: network.coin.baseDenom,
+            amount: gasFee,
+          },
+        ],
+        gas: gasLimit.toString(),
+      };
+      const signDoc = makeSignDoc(
+        [msg1],
+        fee2,
+        chainId,
+        transaction.memo,
+        transaction.accountNumber,
+        transaction.accountSequence,
+      );
+      // const signDoc = makeSignDoc(txBodyBytes, authInfoBytes, chainId, transaction.accountNumber);
+      // const signBytes = makeSignBytes(signDoc);
+      const uint8SignDoc = serializeSignDoc(signDoc);
+      const messageByte = new Bytes(uint8SignDoc);
+
+      console.log('cosmosHub signBytes', uint8SignDoc);
       console.log('cosmosHub messageByte', messageByte);
 
       const signature = await this.signerProvider.sign(messageByte);

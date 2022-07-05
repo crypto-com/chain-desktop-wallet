@@ -79,7 +79,7 @@ export class TransactionSenderService {
     const scaledBaseAmount = getBaseScaledAmount(transferRequest.amount, currentAsset);
 
     const currentSession = await this.storageService.retrieveCurrentSession();
-    const fromAddress = currentSession.wallet.address;
+    const fromAddress = currentSession.activeAsset?.address ?? currentSession.wallet.address;
     const walletAddressIndex = currentSession.wallet.addressIndex;
     const walletDerivationPathStandard =
       currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
