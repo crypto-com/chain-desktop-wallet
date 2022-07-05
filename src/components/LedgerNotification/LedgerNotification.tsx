@@ -10,6 +10,7 @@ import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../../service/LedgerServ
 import { UserAsset, UserAssetType } from '../../models/UserAsset';
 import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
 import { SupportedChainName } from '../../config/StaticConfig';
+import IconCosmos from '../../svg/IconCosmos';
 
 export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
   const { assetType } = asset;
@@ -21,7 +22,8 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
   const clickCheckLedger = async () => {
     try {
       const { addressIndex, derivationPathStandard, config, walletType } = wallet;
-      const addressprefix = config.network.addressPrefix;
+      const addressprefix =
+        asset.config?.tendermintNetwork?.addressPrefix ?? config.network.addressPrefix;
       if (LEDGER_WALLET_TYPE === walletType) {
         const device = createLedgerDevice();
         if (assetType === UserAssetType.TENDERMINT || assetType === UserAssetType.IBC) {
@@ -33,7 +35,7 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
             true,
           );
 
-          if (ledgerAddress === wallet.address) {
+          if (ledgerAddress === asset.address) {
             setRecoil(ledgerIsConnectedState, LedgerConnectedApp.CRYPTO_ORG);
             notification.close(LedgerNotificationKey);
             notification.close(LedgerErrorNotificationKey);
@@ -162,7 +164,11 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
         className: 'notification-ledger',
         icon: (
           <div className="ledger-app-icon">
-            <IconCro style={{ color: '#fff' }} />
+            {asset.config?.tendermintNetwork?.chainName === SupportedChainName.COSMOS_HUB ? (
+              <IconCosmos style={{ color: '#fff' }} />
+            ) : (
+              <IconCro style={{ color: '#fff' }} />
+            )}
           </div>
         ),
         btn: <CheckLedgerBtn />,
@@ -173,7 +179,10 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
   }
 }
 
-export function ledgerNotificationWithoutCheck(assetType: UserAssetType, chainName?: SupportedChainName) {
+export function ledgerNotificationWithoutCheck(
+  assetType: UserAssetType,
+  chainName?: SupportedChainName,
+) {
   const LedgerNotificationKey = 'LedgerNotification';
   const LedgerSuccessNotificationKey = 'LedgerSuccessNotification';
   const LedgerErrorNotificationKey = 'LedgerErrorNotification';
@@ -182,7 +191,7 @@ export function ledgerNotificationWithoutCheck(assetType: UserAssetType, chainNa
     try {
       const device = createLedgerDevice();
       if (assetType === UserAssetType.TENDERMINT || assetType === UserAssetType.IBC) {
-        await device.getPubKey(0, chainName, DerivationPathStandard.BIP44, false);
+        await device.getPubKey(0, chainName!, DerivationPathStandard.BIP44, false);
 
         setRecoil(ledgerIsConnectedState, LedgerConnectedApp.CRYPTO_ORG);
         notification.close(LedgerNotificationKey);
@@ -289,7 +298,11 @@ export function ledgerNotificationWithoutCheck(assetType: UserAssetType, chainNa
         className: 'notification-ledger',
         icon: (
           <div className="ledger-app-icon">
-            <IconCro style={{ color: '#fff' }} />
+            {chainName === SupportedChainName.COSMOS_HUB ? (
+              <IconCosmos style={{ color: '#fff' }} />
+            ) : (
+              <IconCro style={{ color: '#fff' }} />
+            )}
           </div>
         ),
         btn: <CheckLedgerBtn />,
