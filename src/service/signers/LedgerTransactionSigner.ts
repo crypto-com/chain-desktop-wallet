@@ -1,9 +1,25 @@
 import sdk from '@crypto-org-chain/chain-jslib';
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { CosmosMsg } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/msg/cosmosMsg';
+import {
+  TxBodyEncodeObject,
+  Registry,
+  makeAuthInfoBytes,
+  encodePubkey,
+  makeSignDoc,
+  makeSignBytes,
+} from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing';
+import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
+import { toBase64, toHex } from '@crypto-org-chain/chain-jslib/node_modules/@cosmjs/encoding';
 import Long from 'long';
+import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx';
+import { MsgSendEncodeObject } from '@cosmjs/stargate';
 import { Big, Units, Secp256k1KeyPair } from '../../utils/ChainJsLib';
-import { DEFAULT_IBC_TRANSFER_TIMEOUT, WalletConfig } from '../../config/StaticConfig';
+import {
+  DEFAULT_IBC_TRANSFER_TIMEOUT,
+  SupportedChainName,
+  WalletConfig,
+} from '../../config/StaticConfig';
 import {
   RestakeStakingRewardTransactionUnsigned,
   RestakeStakingAllRewardsTransactionUnsigned,
@@ -80,6 +96,90 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     gasFee: string,
     gasLimit: number,
   ): Promise<string> {
+    if (
+      transaction.asset?.config?.tendermintNetwork &&
+      transaction.asset?.config?.tendermintNetwork?.chainName !== SupportedChainName.CRYPTO_ORG
+    ) {
+      const registry = new Registry();
+      const network = transaction.asset?.config?.tendermintNetwork;
+      const msg = MsgSend.fromPartial({
+        fromAddress: transaction.fromAddress,
+        toAddress: transaction.toAddress,
+        amount: [
+          {
+            denom: network.coin.baseDenom,
+            amount: String(transaction.amount),
+          },
+        ],
+      });
+
+      const msgAny: MsgSendEncodeObject = {
+        typeUrl: '/cosmos.bank.v1beta1.MsgSend',
+        value: msg,
+      };
+
+      const txBodyFields: TxBodyEncodeObject = {
+        typeUrl: '/cosmos.tx.v1beta1.TxBody',
+        value: {
+          messages: [msgAny],
+        },
+      };
+
+      const fee = {
+        amount: [
+          {
+            denom: network.coin.baseDenom,
+            amount: gasFee,
+          },
+        ],
+        gas: gasLimit,
+      };
+      // eslint-disable-next-line
+      const txBodyBytes = registry.encode(txBodyFields);
+
+      const pubkeyBytes = (
+        await this.signerProvider.getPubKey(
+          this.addressIndex,
+          network.chainName!,
+          this.derivationPathStandard,
+          false,
+        )
+      ).toUint8Array();
+      const pubkey = encodePubkey({
+        type: 'tendermint/PubKeySecp256k1',
+        value: toBase64(pubkeyBytes),
+      });
+      const authInfoBytes = makeAuthInfoBytes(
+        [{ pubkey, sequence: transaction.accountSequence }],
+        fee.amount,
+        fee.gas,
+        127,
+      );
+
+      console.log('authInfoBytes', authInfoBytes);
+
+      const chainId = network.chainId ?? '';
+      const signDoc = makeSignDoc(txBodyBytes, authInfoBytes, chainId, transaction.accountNumber);
+      const signBytes = makeSignBytes(signDoc);
+      const messageByte = new Bytes(signBytes);
+
+      console.log('cosmosHub signBytes', signBytes);
+      console.log('cosmosHub messageByte', messageByte);
+
+      const signature = await this.signerProvider.sign(messageByte);
+
+      console.log('cosmosHub signature', signature);
+
+      const txRaw = TxRaw.fromPartial({
+        bodyBytes: txBodyBytes,
+        authInfoBytes,
+        signatures: [signature.toUint8Array()],
+      });
+      const signedBytes = Uint8Array.from(TxRaw.encode(txRaw).finish());
+      const txHash = toHex(signedBytes);
+
+      return txHash;
+    }
     const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
     const msgSend = new cro.bank.MsgSend({
@@ -383,7 +483,12 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
 
   async getSignedMessageTransaction(transaction: TransactionUnsigned, message: CosmosMsg[], rawTx) {
     const pubkeyoriginal = (
-      await this.signerProvider.getPubKey(this.addressIndex, this.derivationPathStandard, false)
+      await this.signerProvider.getPubKey(
+        this.addressIndex,
+        transaction.asset?.config?.tendermintNetwork?.chainName ?? SupportedChainName.CRYPTO_ORG,
+        this.derivationPathStandard,
+        false,
+      )
     ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
     /* 
@@ -409,7 +514,16 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
 
     // 0: signer index
     const bytesMessage: Bytes = signableTx.toSignDocument(0);
+    console.log('cosmosHub bytesMessage', bytesMessage);
     const signature = await this.signerProvider.sign(bytesMessage);
+    console.log('cosmosHub signature', signature);
+    console.log(
+      'signableTxHash',
+      signableTx
+        .setSignature(0, signature)
+        .toSigned()
+        .getHexEncoded(),
+    );
 
     return signableTx
       .setSignature(0, signature)
