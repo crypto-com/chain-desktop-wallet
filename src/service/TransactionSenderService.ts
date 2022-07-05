@@ -1,6 +1,7 @@
 import Web3 from 'web3';
 import { TransactionConfig } from 'web3-eth';
 import { ethers } from 'ethers';
+import Big from 'big.js';
 import {
   RestakeStakingRewardTransactionUnsigned,
   RestakeStakingAllRewardsTransactionUnsigned,
@@ -719,8 +720,11 @@ export class TransactionSenderService {
       ledgerTransactionSigner,
     } = await this.transactionPrepareService.prepareTransaction();
 
+    const minDeposit = '1000';
 
-    console.log('textProposalSubmitRequest ', textProposalSubmitRequest);
+    if(Big(textProposalSubmitRequest.initialDeposit[0].amount).cmp(Big(minDeposit)) !== -1){
+      return await nodeRpc.broadcastTransaction('');
+    }
 
     const submitTextProposalUnsigned: TextProposalTransactionUnsigned = {
       params: {
@@ -754,9 +758,7 @@ export class TransactionSenderService {
     }
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
-    const proposals = await this.txHistoryManager.fetchAndSaveProposals(currentSession);
-
-    console.log('broadCastResult ', proposals, broadCastResult);
+     await this.txHistoryManager.fetchAndSaveProposals(currentSession);
 
     return broadCastResult;
   }

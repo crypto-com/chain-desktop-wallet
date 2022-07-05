@@ -61,10 +61,7 @@ const GovernancePage = () => {
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [isProposalVisible, setIsProposalVisible] = useState(false);
-
-
   const [isProposalSuccessModalVisible, setProposalSuccessModalVisible] = useState(false);
-
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
   const [proposal, setProposal] = useState<ProposalModel>();
@@ -94,19 +91,14 @@ const GovernancePage = () => {
   const currentSession = useRecoilValue(sessionState);
   const didMountRef = useRef(false);
   const [isLoadingTally, setIsLoadingTally] = useState(false);
-  const minDeposit = '100';
+  const minDeposit = '10';
   const maxDeposit = '10000';
   const [createProposalHash, setCreateProposalHash] = useState('')
   const [initialDepositProposal, setInitialDeposit] = useState('0');
-
   const [isProposalModalVisible, setIsProposalModalVisible] = useState(false);
-
   const { isLedgerConnected } = useLedgerStatus({ asset: userAsset });
-
   const analyticsService = new AnalyticsService(currentSession);
-
   const [historyVisible, setHistoryVisible] = useState(false);
-
   const { Option } = Select;
   const [t] = useTranslation();
 
@@ -135,8 +127,6 @@ const GovernancePage = () => {
     );
 
     form.validateFields(['initialDeposit']);
-
-    console.log('form ', form);
   };
 
   const handleCancelConfirmationModal = () => {
@@ -307,7 +297,7 @@ const GovernancePage = () => {
       // setInputPasswordVisible(false);
       setIsErrorModalVisible(true);
       // eslint-disable-next-line no-console
-      console.log('Error occurred while transfer', e);
+      console.error('Error occurred while transfer', e);
     }
     setConfirmLoading(false);
   };
@@ -392,23 +382,22 @@ const GovernancePage = () => {
       const proposalType = form.getFieldValue('proposalType');
       let textProposal: BroadCastResult | null = null;
       if (proposalType === 'text_proposal') {
-
         setInitialDeposit(form?.getFieldValue('initialDeposit')+currentDenom.replace('base',' ').toUpperCase());
         textProposal = await walletService.sendTextProposalSubmitTx({
           description: form?.getFieldValue('proposalDescription'),
           title: form?.getFieldValue('proposalTitle'),
+          asset: userAsset,
           initialDeposit: [
             {
               amount: getBaseScaledAmount(form?.getFieldValue('initialDeposit'), userAsset),
               denom: currentDenom,
+             
             },
           ],
           proposer: userAsset?.address!,
           decryptedPhrase,
           walletType,
         });
-
-
         setCreateProposalHash(textProposal?.transactionHash || '');
       }
 
@@ -423,8 +412,8 @@ const GovernancePage = () => {
       if (walletType === LEDGER_WALLET_TYPE) {
         setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
-
-      console.error('erroro ', e);
+      // eslint-disable-next-line no-console
+      console.error('Error occurred during proposal creation ', e);
       setIsVisibleConfirmationModal(false);
       setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsProposalModalVisible(false);
