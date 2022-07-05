@@ -677,9 +677,7 @@ export class TransactionSenderService {
       accountNumber,
       accountSequence,
     };
-
-    console.log('depositRequest.amount ', depositRequest.amount);
-
+    
     let signedTxHex: string = '';
     const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();
 
@@ -721,7 +719,6 @@ export class TransactionSenderService {
     } = await this.transactionPrepareService.prepareTransaction();
 
     const minDeposit = '1000';
-
     if(Big(textProposalSubmitRequest.initialDeposit[0].amount).cmp(Big(minDeposit)) !== -1){
       return await nodeRpc.broadcastTransaction('');
     }

@@ -91,7 +91,7 @@ const GovernancePage = () => {
   const currentSession = useRecoilValue(sessionState);
   const didMountRef = useRef(false);
   const [isLoadingTally, setIsLoadingTally] = useState(false);
-  const minDeposit = '10';
+  const minDeposit = '1000';
   const maxDeposit = '10000';
   const [createProposalHash, setCreateProposalHash] = useState('')
   const [initialDepositProposal, setInitialDeposit] = useState('0');
@@ -860,6 +860,10 @@ const GovernancePage = () => {
                     </div>
                   </div>
                 </TabPane>
+{/* 
+                <TabPane tab={t('governance.tab1')} key="1"></TabPane>
+ */}
+
                 <TabPane tab={t('governance.tab3')} key="3">
                   <div className="site-layout-background governance-content">
                     <div className="container">
