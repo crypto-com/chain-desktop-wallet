@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeImage, Menu, ipcMain } from 'electron';
+import { app, BrowserWindow, nativeImage, ipcMain } from 'electron';
 
 import * as path from 'path';
 
@@ -8,6 +8,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import Big from 'big.js';
 import Store from 'electron-store';
+import { APP_PROTOCOL_NAME } from '../src/config/StaticConfig';
 
 import { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } from './UsageAnalytics';
 
@@ -22,8 +23,6 @@ let win: BrowserWindow | null = null;
 let ipcmain: IpcMain | null = null;
 const isDev = process.env.NODE_ENV === 'development'; // change true, in developing mode
 const store = new Store();
-// const APP_PROTOCOL_NAME = 'cryptowallet';
-const APP_PROTOCOL_NAME = 'ledgerlive';
 
 // Updater log setup
 log.transports.file.level = 'debug';

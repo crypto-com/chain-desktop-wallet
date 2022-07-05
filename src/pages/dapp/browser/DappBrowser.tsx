@@ -388,6 +388,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
       )}
       {txEvent && requestConfirmationVisible && (
         <RequestConfirmation
+          isConfirming={false}
           event={txEvent}
           cronosAsset={cronosAsset}
           allMarketData={allMarketData}
