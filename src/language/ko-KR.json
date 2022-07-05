@@ -242,7 +242,6 @@
   "navbar.nft": "나의 NFT",
   "navbar.settings": "설정",
   "navbar.lock": "잠김",
-  "navbar.wallet.list": "지갑 리스트",
   "navbar.wallet.restore": "지갑 가져오기",
   "navbar.wallet.create": "지갑 만들기",
   "navbar.wallet.delete": "지갑 지우기",
@@ -753,5 +752,14 @@
   "settings.support.feedbackForm.title": "피드백 양식",
   "settings.support.feedbackForm.description": "크립토닷컴 디파이 데스크탑 지갑과 관련된 피드백, 질문, 불만 사항이 있는 경우 피드백 양식을 작성해 주세요.",
   "settings.about.title": "자세한 사항",
-  "settings.about.termsAndConditions.title": "이용 약관"
+  "settings.about.termsAndConditions.title": "이용 약관",
+  "general.walletconnect.connect.desc1": "다음에 연결하고 싶습니다 :",
+  "general.walletconnect.connect.desc2": "권한을 허용함으로써 다음 DAPP가 주소에 액세스 할 수 있도록합니다.",
+  "general.walletconnect.connect.desc3": "지갑 균형과 활동을보십시오",
+  "general.walletconnect.connect.desc4": "거래에 대한 승인을 요청합니다",
+  "general.walletconnect.connect.desc5": "DAPP를 다음으로 허용합니다.",
+  "general.walletconnect.connected": "연결",
+  "general.walletconnect.disconnect": "연결을 끊습니다",
+  "general.walletconnect.connect.desc6": "이제 웹 브라우저에서 DAPP에 액세스 할 수 있습니다",
+  "general.walletconnect.connect.desc7": "지갑 주소"
 }

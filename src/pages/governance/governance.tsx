@@ -34,6 +34,8 @@ import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 import { TransactionUtils } from '../../utils/TransactionUtils';
+import { renderExplorerUrl } from '../../models/Explorer';
+import { middleEllipsis } from '../../utils/utils';
 
 import { ProposalView } from './components/ProposalView';
 import { VotingHistory } from './components/VotingHistory';
@@ -59,6 +61,10 @@ const GovernancePage = () => {
   const [isSuccessModalVisible, setIsSuccessModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [isProposalVisible, setIsProposalVisible] = useState(false);
+
+
+  const [isProposalSuccessModalVisible, setProposalSuccessModalVisible] = useState(false);
+
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
   const [proposal, setProposal] = useState<ProposalModel>();
@@ -90,6 +96,8 @@ const GovernancePage = () => {
   const [isLoadingTally, setIsLoadingTally] = useState(false);
   const minDeposit = '100';
   const maxDeposit = '10000';
+  const [createProposalHash, setCreateProposalHash] = useState('')
+  const [initialDepositProposal, setInitialDeposit] = useState('0');
 
   const [isProposalModalVisible, setIsProposalModalVisible] = useState(false);
 
@@ -134,6 +142,10 @@ const GovernancePage = () => {
   const handleCancelConfirmationModal = () => {
     setIsVisibleConfirmationModal(false);
   };
+
+  const handleCloseProposalSuccessModal = () => {
+    setProposalSuccessModalVisible(false);
+  }
 
   const closeSuccessModal = () => {
     setIsSuccessModalVisible(false);
@@ -379,10 +391,9 @@ const GovernancePage = () => {
 
       const proposalType = form.getFieldValue('proposalType');
       let textProposal: BroadCastResult | null = null;
-
-      console.log('form?.getFieldValue ', form?.getFieldValue('initialDeposit'), currentDenom);
-
       if (proposalType === 'text_proposal') {
+
+        setInitialDeposit(form?.getFieldValue('initialDeposit')+currentDenom.replace('base',' ').toUpperCase());
         textProposal = await walletService.sendTextProposalSubmitTx({
           description: form?.getFieldValue('proposalDescription'),
           title: form?.getFieldValue('proposalTitle'),
@@ -397,19 +408,8 @@ const GovernancePage = () => {
           walletType,
         });
 
-        // const confirmProposalDepositTrans = await walletService.sendMsgDepositTx({
-        // depositor: userAsset?.address,
-        // amount: [{ amount: form?.getFieldValue('initialDeposit'), denom: currentDenom }],
-        // proposalId: textProposal.proposalId,
-        // decryptedPhrase,
-        // walletType,
-        // });
 
-        console.log('textProposal ', textProposal);
-
-        // const reQuery = await walletService.fetchAndSaveProposals(currentSession);
-
-        // console.log('reQuery ', reQuery);
+        setCreateProposalHash(textProposal?.transactionHash || '');
       }
 
       const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
@@ -417,7 +417,8 @@ const GovernancePage = () => {
       setIsVisibleConfirmationModal(false);
       setInputPasswordVisible(false);
       setConfirmLoading(false);
-      console.log('finish... ');
+      setProposalSuccessModalVisible(true);
+      setIsProposalModalVisible(false);
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
         setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
@@ -481,7 +482,7 @@ const GovernancePage = () => {
             onClick={() => {
               form.validateFields(['initialDeposit']);
               setModalType('create_proposal');
-              showPasswordInput('create_proposal');
+              showPasswordInput();
             }}
           >
             {t('governance.modal2.title')}
@@ -489,6 +490,73 @@ const GovernancePage = () => {
         </>
       )}
       <Content>
+
+      {/* CREATE PROPOSAL's SUCCESS MODAL */}
+      <SuccessModalPopup
+          
+          isModalVisible={isProposalSuccessModalVisible}
+          handleCancel={handleCloseProposalSuccessModal}
+          handleOk={handleCloseProposalSuccessModal}
+          title={t('general.successModalPopup.title')}
+          button={null}
+          footer={[
+            <Button className="create-proposal-success-btn" key="submit" type="primary" onClick={handleCloseProposalSuccessModal}>
+              {t('general.ok')}
+            </Button>,
+          ]}
+        >
+
+          <div className="create-proposal-success-modal">
+          <div className="info">
+            {t('governance.success-modal2.info')}
+          </div>
+          <ul>
+            <li>
+              <div className="left">
+                {t('governance.modal2.form.input.proposalDeposit')}
+              </div>
+              <div className="right">
+                {initialDepositProposal}
+              </div>
+            </li>
+            {/* <li>
+              <div className="left">
+                {t('governance.success-modal2.proposal-id')}
+              </div>
+              <div className="right">
+
+              </div>
+            </li> */}
+            <li>
+              <div className="left">
+                {t('home.transactions.table1.transactionHash')}
+              </div>
+              <div className="right">
+                <a
+                  data-original={createProposalHash}
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`${renderExplorerUrl(
+                    currentSession?.activeAsset?.config ?? currentSession?.wallet?.config,
+                    'tx',
+                  )}/${createProposalHash}`}
+                >
+                  {middleEllipsis(createProposalHash, 7)}
+                </a>
+              </div>
+            </li>
+          </ul>
+
+
+          
+          
+          
+          
+          </div>
+        </SuccessModalPopup>
+
+
+
         {/* CREATE PROPOSAL MODAL */}
         <ModalPopup
           isModalVisible={isProposalModalVisible}
