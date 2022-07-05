@@ -96,6 +96,7 @@ const GovernancePage = () => {
   const [createProposalHash, setCreateProposalHash] = useState('')
   const [initialDepositProposal, setInitialDeposit] = useState('0');
   const [isProposalModalVisible, setIsProposalModalVisible] = useState(false);
+  const [isProposalErrorModalVisible, setProposalErrorModalVisible] = useState(false);
   const { isLedgerConnected } = useLedgerStatus({ asset: userAsset });
   const analyticsService = new AnalyticsService(currentSession);
   const [historyVisible, setHistoryVisible] = useState(false);
@@ -152,6 +153,10 @@ const GovernancePage = () => {
 
   const closeErrorModal = () => {
     setIsErrorModalVisible(false);
+  };
+
+  const closeProposalErrorModal = () => {
+    setProposalErrorModalVisible(false);
   };
 
   const showConfirmationModal = () => {
@@ -426,7 +431,8 @@ const GovernancePage = () => {
       setErrorMessages(((e as unknown) as any).message.split(': '));
       setIsProposalModalVisible(false);
       setConfirmLoading(false);
-      // setInputPasswordVisible(false);
+      setInputPasswordVisible(false);
+      setProposalErrorModalVisible(true);
     }
   };
 
@@ -501,6 +507,33 @@ const GovernancePage = () => {
         </>
       )}
       <Content>
+
+      <ErrorModalPopup
+        isModalVisible={isProposalErrorModalVisible}
+        handleCancel={closeProposalErrorModal}
+        handleOk={closeProposalErrorModal}
+        title={t('general.errorModalPopup.title')}
+        footer={[]}
+      >
+        <>
+          <div className="description">
+            {t('governance.error-modal2.info')}
+            <br />
+            {errorMessages
+              .filter((item, idx) => {
+                return errorMessages.indexOf(item) === idx;
+              })
+              .map((err, idx) => (
+                <div key={idx}>- {err}</div>
+              ))}
+            {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
+          </div>
+            {/* <ul className="proposal-guidelines">
+              <li  className="proposal-guideline"></li>
+            </ul> */}
+
+        </>
+      </ErrorModalPopup>
 
       {/* CREATE PROPOSAL's SUCCESS MODAL */}
       <SuccessModalPopup
