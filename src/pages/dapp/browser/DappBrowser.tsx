@@ -360,7 +360,8 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
       <webview
         preload={ProviderPreloadScriptPath}
         ref={webviewRef}
-        webpreferences="contextIsolation=false, webSecurity=false, nodeIntegration=false, allowRunningInsecureContent, javascript=yes"
+        allowpopups={'true' as any}
+        webpreferences="contextIsolation=false, nodeIntegration=false, javascript=yes, allowpopup=yes"
         useragent={window.navigator.userAgent.replace(
           'chain-desktop-wallet',
           'Desktop Wallet Build',
