@@ -203,7 +203,7 @@ const DappPage = () => {
             setSelectedURL(value);
           } else {
             // google search
-            setSelectedURL(`https://www.bing.com/search?q=${value}`);
+            setSelectedURL(`https://www.google.com/search?q=${value}`);
           }
         }}
       />
