@@ -129,28 +129,35 @@ const GovernancePage = () => {
     t('governance.modal2.form.input.proposalDeposit.min.error'),
   );
 
+  const resetCreateProposalForm = () => {
+    form.resetFields();
+    const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
+    const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
+    form.setFieldsValue({ initialDeposit: userDeposit });
+
+    customAmountValidator = TransactionUtils.validTransactionAmountValidator();
+    customMaxValidator = TransactionUtils.maxValidator(
+      maxDeposit,
+      t('governance.modal2.form.input.proposalDeposit.max.error'),
+    );
+    customMaxValidator0 = TransactionUtils.maxValidator(
+      getUIDynamicAmount(userAsset.balance, userAsset),
+      t('governance.modal2.form.input.proposalDeposit.max2.error'),
+    );
+    
+    customMinValidator = TransactionUtils.minValidator(
+      minDeposit,
+      t('governance.modal2.form.input.proposalDeposit.min.error'),
+    );
+
+    
+    form.validateFields(['initialDeposit']);
+  };
+
   const handleCancelProposalModal = () => {
     if(!confirmLoading){
       setIsProposalModalVisible(false);
-      form.resetFields();
-      const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
-      const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
-      form.setFieldsValue({ initialDeposit: userDeposit });
-
-      customMaxValidator = TransactionUtils.maxValidator(
-        maxDeposit,
-        t('governance.modal2.form.input.proposalDeposit.max.error'),
-      );
-      customMaxValidator0 = TransactionUtils.maxValidator(
-        getUIDynamicAmount(userAsset.balance, userAsset),
-        t('governance.modal2.form.input.proposalDeposit.max2.error'),
-      );
-      customAmountValidator = TransactionUtils.validTransactionAmountValidator();
-      customMinValidator = TransactionUtils.minValidator(
-        minDeposit,
-        t('governance.modal2.form.input.proposalDeposit.min.error'),
-      );
-      form.validateFields(['initialDeposit']);
+      resetCreateProposalForm();
     }
   };
 
@@ -438,6 +445,7 @@ const GovernancePage = () => {
         setConfirmLoading(false);
         setProposalSuccessModalVisible(true);
         setIsProposalModalVisible(false);
+        resetCreateProposalForm();
       }else{
         // eslint-disable-next-line no-console
         console.error('Error occurred during proposal creation - Initial Deposit not within the valid range');
