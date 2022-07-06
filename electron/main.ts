@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeImage, Menu, ipcMain } from 'electron';
+import { app, BrowserWindow, nativeImage, ipcMain } from 'electron';
 import * as remoteMain from '@electron/remote/main';
 
 import * as path from 'path';
@@ -76,6 +76,7 @@ function createWindow() {
     webPreferences: {
       webviewTag: true,
       nodeIntegration: true,
+      nodeIntegrationInSubFrames: true,
       devTools: isDev,
       contextIsolation: false,
     },
