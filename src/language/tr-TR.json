@@ -2,7 +2,7 @@
   "language": "Türkçe",
   "general.enabled": "Etkinleştir",
   "general.disabled": "Etkisizleştir",
-  " ": "Onayla",
+  "general.confirm": "Onayla",
   "general.continue": "Devam et",
   "general.cancel": "İptal et",
   "general.save": "Kaydet",

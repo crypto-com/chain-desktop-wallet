@@ -2,7 +2,7 @@
   "language": "हिंदी",
   "general.enabled": "सक्षम ",
   "general.disabled": "असक्षम   ",
-  " ": "पुष्टि करें ",
+  "general.confirm": "पुष्टि करें ",
   "general.continue": "जारी रखें",
   "general.cancel": "रद्द करें ",
   "general.save": "बचाये ",

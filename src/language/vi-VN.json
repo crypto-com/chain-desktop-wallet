@@ -1,7 +1,7 @@
 {
   "language": "Ngôn ngữ",
   "general.enabled": "Kích hoạt",
-  " ": "Xác nhận",
+  "general.confirm": "Xác nhận",
   "general.continue": "Tiếp tục",
   "general.cancel": "Huỷ",
   "general.save": "Lưu",

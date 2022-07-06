@@ -2,7 +2,7 @@
   "language": "العربية",
   "general.enabled": "ممكن",
   "general.disabled": "غير ممكن",
-  " ": "تؤكد",
+  "general.confirm": "تؤكد",
   "general.continue": "استمر",
   "general.cancel": "إلغاء",
   "general.save": "احفظ",

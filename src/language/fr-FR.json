@@ -2,7 +2,7 @@
   "language": "Langue",
   "general.enabled": "Activé",
   "general.disabled": "Desactivé",
-  " ": "Confirmer",
+  "general.confirm": "Confirmer",
   "general.continue": "Continuer",
   "general.cancel": "Annuler",
   "general.save": "Sauvegarder",

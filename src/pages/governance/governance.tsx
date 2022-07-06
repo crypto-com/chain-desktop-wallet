@@ -130,12 +130,28 @@ const GovernancePage = () => {
   );
 
   const handleCancelProposalModal = () => {
-    setIsProposalModalVisible(false);
-    form.resetFields();
-    const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
-    const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
-    form.setFieldsValue({ initialDeposit: userDeposit });
-    form.validateFields(['initialDeposit']);
+    if(!confirmLoading){
+      setIsProposalModalVisible(false);
+      form.resetFields();
+      const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
+      const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
+      form.setFieldsValue({ initialDeposit: userDeposit });
+
+      customMaxValidator = TransactionUtils.maxValidator(
+        maxDeposit,
+        t('governance.modal2.form.input.proposalDeposit.max.error'),
+      );
+      customMaxValidator0 = TransactionUtils.maxValidator(
+        getUIDynamicAmount(userAsset.balance, userAsset),
+        t('governance.modal2.form.input.proposalDeposit.max2.error'),
+      );
+      customAmountValidator = TransactionUtils.validTransactionAmountValidator();
+      customMinValidator = TransactionUtils.minValidator(
+        minDeposit,
+        t('governance.modal2.form.input.proposalDeposit.min.error'),
+      );
+      form.validateFields(['initialDeposit']);
+    }
   };
 
   const handleCancelConfirmationModal = () => {
@@ -391,36 +407,43 @@ const GovernancePage = () => {
     }
 
     try {
-      setConfirmLoading(true);
-      const proposalType = form.getFieldValue('proposalType');
-      let textProposal: BroadCastResult | null = null;
-      if (proposalType === 'text_proposal') {
-        setInitialDeposit(form?.getFieldValue('initialDeposit')+currentDenom.replace('base',' ').toUpperCase());
-        textProposal = await walletService.sendTextProposalSubmitTx({
-          description: form?.getFieldValue('proposalDescription'),
-          title: form?.getFieldValue('proposalTitle'),
-          asset: userAsset,
-          initialDeposit: [
-            {
-              amount: getBaseScaledAmount(form?.getFieldValue('initialDeposit'), userAsset),
-              denom: currentDenom,
-             
-            },
-          ],
-          proposer: userAsset?.address!,
-          decryptedPhrase,
-          walletType,
-        });
-        setCreateProposalHash(textProposal?.transactionHash || '');
-      }
+      if(Big(form?.getFieldValue('initialDeposit')).cmp(Big(minDeposit)) !== -1 && Big(form?.getFieldValue('initialDeposit')).cmp(Big(maxDeposit)) !== 1 ){
+        setConfirmLoading(true);
+        const proposalType = form.getFieldValue('proposalType');
+        let textProposal: BroadCastResult | null = null;
+        if (proposalType === 'text_proposal') {
+          setInitialDeposit(form?.getFieldValue('initialDeposit')+currentDenom.replace('base',' ').toUpperCase());
+          textProposal = await walletService.sendTextProposalSubmitTx({
+            description: form?.getFieldValue('proposalDescription'),
+            title: form?.getFieldValue('proposalTitle'),
+            asset: userAsset,
+            initialDeposit: [
+              {
+                amount: getBaseScaledAmount(form?.getFieldValue('initialDeposit'), userAsset),
+                denom: currentDenom,
+              
+              },
+            ],
+            proposer: userAsset?.address!,
+            decryptedPhrase,
+            walletType,
+          });
+          setCreateProposalHash(textProposal?.transactionHash || '');
+        }
 
-      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
-      setUserAsset(currentWalletAsset);
-      setIsVisibleConfirmationModal(false);
-      setInputPasswordVisible(false);
-      setConfirmLoading(false);
-      setProposalSuccessModalVisible(true);
-      setIsProposalModalVisible(false);
+        const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+        setUserAsset(currentWalletAsset);
+        setIsVisibleConfirmationModal(false);
+        setInputPasswordVisible(false);
+        setConfirmLoading(false);
+        setProposalSuccessModalVisible(true);
+        setIsProposalModalVisible(false);
+      }else{
+        // eslint-disable-next-line no-console
+        console.error('Error occurred during proposal creation - Initial Deposit not within the valid range');
+        setErrorMessages([t('governance.modal2.form.submit.error')]);
+        setProposalErrorModalVisible(true);
+      }
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
         setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
@@ -590,16 +613,8 @@ const GovernancePage = () => {
               </div>
             </li>
           </ul>
-
-
-          
-          
-          
-          
           </div>
         </SuccessModalPopup>
-
-
 
         {/* CREATE PROPOSAL MODAL */}
         <ModalPopup
@@ -608,6 +623,7 @@ const GovernancePage = () => {
           handleOk={() => {
             onCreateProposalAction();
           }}
+          closable={!confirmLoading}
           confirmationLoading={confirmLoading}
           footer={[
             <Button
