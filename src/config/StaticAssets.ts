@@ -109,7 +109,9 @@ export const ATOM_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
     },
     chainId: isTestnet ? 'theta-testnet-001' : 'cosmoshub-4',
     fee: { gasLimit: '300000', networkFee: '10000' },
-    indexingUrl: isTestnet ? walletConfig.indexingUrl : walletConfig.indexingUrl,
+    indexingUrl: isTestnet
+      ? ''
+      : 'https://cronos.org/ncw-quandra-api-middleware-server/quantra/adapter/api',
     isLedgerSupportDisabled: true,
     isStakingDisabled: true,
     nodeUrl: isTestnet

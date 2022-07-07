@@ -49,6 +49,7 @@ import { getErc20IconUrlByContractAddress } from '../utils/ERC20IconUrl';
 import { SupportedCRCTokenStandard } from './rpc/interface/cronos.chainIndex';
 import { EVMClient } from './rpc/clients/EVMClient';
 import { EthClient } from './ethereum/EthClient';
+import { CosmosHubIndexingAPI } from './rpc/indexing/tendermint/cosmoshub/CosmosHubIndexingAPI';
 
 export class TransactionHistoryService {
   private storageService: StorageService;
@@ -246,6 +247,54 @@ export class TransactionHistoryService {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  public async fetchCosmosHubTransferTxs(
+    currentAsset: UserAsset,
+    walletIdentifier: string,
+  ): Promise<TransferTransactionRecord[]> {
+    if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
+      return [];
+    }
+
+    const { address, mainnetSymbol } = currentAsset;
+
+    if (mainnetSymbol === 'ATOM') {
+      const cosmosHubindexingClient = CosmosHubIndexingAPI.init(currentAsset.config.indexingUrl);
+
+      const txList = await cosmosHubindexingClient.getCosmosHubTxList(address);
+
+      const loadedTxList = txList.map(tx => {
+        const transferTx: TransferTransactionData = {
+          amount: tx.sub[0].amount,
+          assetSymbol: 'ATOM',
+          date: new Date(Number(tx.time) * 1000).toISOString(),
+          hash: tx.hash,
+          memo: tx.memo,
+          receiverAddress: tx.sub[0].to_address,
+          senderAddress: tx.sub[0].from_address,
+          status: tx.status !== 'success' ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
+        };
+
+        const transferTxRecord: TransferTransactionRecord = {
+          walletId: walletIdentifier,
+          assetId: currentAsset.identifier,
+          assetType: currentAsset.assetType,
+          txHash: tx.hash,
+          txType: EthereumTransactionType.TRANSFER,
+          messageTypeName: 'MsgSend',
+          txData: transferTx,
+          // TODO: add messageTypeName
+        };
+
+        return transferTxRecord;
+      });
+
+      return loadedTxList;
+    }
+
+    return [];
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   public async fetchEVMTransferTxs(currentAsset: UserAsset, walletIdentifier: string) {
     if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
       return [];
@@ -352,14 +401,26 @@ export class TransactionHistoryService {
       case UserAssetType.IBC:
       case undefined:
         try {
-          const chainIndexAPI = ChainIndexingAPI.init(indexingUrl);
-          const transferTransactions = await chainIndexAPI.fetchAssetDetailTransactions(
-            currentSession.wallet.identifier,
-            currentSession.wallet.config.network.coin.baseDenom,
-            currentAsset?.address || currentSession.wallet.address,
-            currentAsset,
-          );
-          return transferTransactions;
+          if (currentAsset.mainnetSymbol === 'CRO') {
+            const chainIndexAPI = ChainIndexingAPI.init(indexingUrl);
+            const transferTransactions = await chainIndexAPI.fetchAssetDetailTransactions(
+              currentSession.wallet.identifier,
+              currentSession.wallet.config.network.coin.baseDenom,
+              currentAsset?.address || currentSession.wallet.address,
+              currentAsset,
+            );
+            console.log('CRYPTO_ORG transferTransactions', transferTransactions);
+            return transferTransactions;
+          }
+
+          if (currentAsset.mainnetSymbol === 'ATOM' && currentAsset.address) {
+            const transferTransactions = await this.fetchCosmosHubTransferTxs(
+              currentAsset,
+              currentSession.wallet.identifier,
+            );
+            console.log('COSMOS_HUB transferTransactions', transferTransactions);
+            return transferTransactions;
+          }
         } catch (e) {
           // eslint-disable-next-line no-console
           console.error('FAILED_TO_LOAD_TRANSFERS', e);
