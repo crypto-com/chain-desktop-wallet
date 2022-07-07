@@ -21,22 +21,11 @@ Please refer to the [Instructions on Multi-Language Content Management](./CONTEN
 
 ## Manual Build for Development
 
-### For M1 Chip Macs 💻
-At this moment, the project could only be compiled with `node` in `x64` binary version. 
+### Pre-requirements
 
-Please check the installed binary version of your `node`:
+This project requires [Node.js](https://nodejs.org/) to build, [.node-version](./.node-version) indicates the version currently using. 
 
-```sh
-node -p process.arch
-x64
-```
-If `arm64` is returned, open your favourite Shell in Rosetta
-
-```sh
-arch -x86_64 /bin/bash
-```
-
-Reinstall `node` 14 or 15 under Rosetta. The reinstalled `node` will be in `x64` binary version by default. 
+You can either install Node.js globally or use any of the Node Version Manager which respect [.node-version](./.node-version) in [this list](https://github.com/shadowspawn/node-version-usage).
 
 ### Installation
 
