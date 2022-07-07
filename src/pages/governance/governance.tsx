@@ -996,7 +996,7 @@ const GovernancePage = () => {
                     <div className="container">
                     <List
                         dataSource={proposalList?.filter(item => {
-                          return item.status === ProposalStatuses.PROPOSAL_STATUS_PASSED;
+                          return item.status === ProposalStatuses.PROPOSAL_STATUS_DEPOSIT_PERIOD;
                         })}
                         renderItem={item => (
                           <List.Item
@@ -1017,21 +1017,21 @@ const GovernancePage = () => {
                               }
                               description={
                                 <span className="time-container">
-                                    <FieldTimeOutlined />{' '}
-                                    <span className="time-area">
-                                      <span className="time-label">
-                                      {' '}{t('governance.start')}:{' '}
-                                      </span>
-                                      {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                  <FieldTimeOutlined />{' '}
+                                  <span className="time-area">
+                                    <span className="time-label">
+                                    {' '}{t('governance.start')}:{' '}
                                     </span>
-                                    {' '}{' - '}{' '}
-                                    <span className="time-area">
-                                      <span className="time-label">
-                                      {t('governance.end')}:{' '}
-                                      </span>
-                                      {moment(item.voting_end_time).format('DD/MM/YYYY')}
-                                    </span>
+                                    {moment(item.submit_time).format('DD/MM/YYYY')}
                                   </span>
+                                  {' '}{' - '}{' '}
+                                  <span className="time-area">
+                                    <span className="time-label">
+                                    {t('governance.end')}:{' '}
+                                    </span>
+                                    {moment(item.deposit_end_time).format('DD/MM/YYYY')}
+                                  </span>
+                                </span>
                               }
                             />
                           </List.Item>
