@@ -444,9 +444,10 @@
   "governance.description": "قد ترى جميع المقترحات وتدلي بأصواتك هنا.",
   "governance.tab1": "جميع",
   "governance.tab2": "التصويت",
-  "governance.tab3": "نجح",
-  "governance.tab4": "فشل",
-  "governance.tab5": "مرفوض",
+  "governance.tab3": "إيداع",
+  "governance.tab4": "نجح",
+  "governance.tab5": "فشل",
+  "governance.tab6": "مرفوض",
   "governance.voteOption.yes": "دعم",
   "governance.voteOption.no": "لا تدعم",
   "governance.voteOption.noWithVeto": "لا تؤيد الفيتو",
@@ -596,5 +597,11 @@
   "settings.revoke": "إبطال",
   "settings.revoke.unlimited": "غير محدود",
   "settings.noApproval": "لا توجد بيانات الموافقة",
-  "settings.about.termsAndConditions.title": "الاحكام والشروط"
+  "settings.about.termsAndConditions.title": "الاحكام والشروط",
+  "general.walletconnect.connect.desc4": "طلب الموافقة على المعاملات",
+  "general.walletconnect.connect.desc5": "السماح لـ DApp بـ:",
+  "general.walletconnect.connected": "موصول",
+  "general.walletconnect.disconnect": "قطع الاتصال",
+  "general.walletconnect.connect.desc6": "يمكنك الآن الوصول إلى DApp على متصفح الويب الخاص بك",
+  "general.walletconnect.connect.desc7": "عنوان المحفظة"
 }

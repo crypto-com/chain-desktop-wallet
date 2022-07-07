@@ -4,12 +4,15 @@ import './governance.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Layout, Tabs, List, Space, Button, Tag, Select, Form, Input, InputNumber } from 'antd';
+
+
 import Big from 'big.js';
 import {
   DislikeOutlined,
   LikeOutlined,
   HistoryOutlined,
   InfoCircleOutlined,
+  FieldTimeOutlined
 } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
@@ -863,12 +866,47 @@ const GovernancePage = () => {
                                 </>
                               }
                               description={
-                                <span>
-                                  {t('governance.start')}:{' '}
-                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
-                                  {t('governance.end')}:{' '}
-                                  {moment(item.voting_end_time).format('DD/MM/YYYY')}
-                                </span>
+                                <>
+
+                                  {((item.status === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? 
+                                  (<span className="time-container">
+                                    <FieldTimeOutlined />{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {' '}{t('governance.start')}:{' '}
+                                      </span>
+                                      {moment(item.submit_time).format('DD/MM/YYYY')}
+                                    </span>
+                                    {' '}{' - '}{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {t('governance.end')}:{' '}
+                                      </span>
+                                      {moment(item.deposit_end_time).format('DD/MM/YYYY')}
+                                    </span>
+                                  </span>)
+                                    
+                                  :
+                                  (<span className="time-container">
+                                    <FieldTimeOutlined />{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {' '}{t('governance.start')}:{' '}
+                                      </span>
+                                      {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                    </span>
+                                    {' '}{' - '}{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {t('governance.end')}:{' '}
+                                      </span>
+                                      {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                    </span>
+                                  </span>)
+                                  )}
+
+                                  
+                                </>
                               }
                             />
                           </List.Item>
@@ -925,12 +963,22 @@ const GovernancePage = () => {
                                 </>
                               }
                               description={
-                                <span>
-                                  {t('governance.start')}:{' '}
-                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
-                                  {t('governance.end')}:{' '}
-                                  {moment(item.voting_end_time).format('DD/MM/YYYY')}
-                                </span>
+                                <span className="time-container">
+                                    <FieldTimeOutlined />{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {' '}{t('governance.start')}:{' '}
+                                      </span>
+                                      {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                    </span>
+                                    {' '}{' - '}{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {t('governance.end')}:{' '}
+                                      </span>
+                                      {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                    </span>
+                                  </span>
                               }
                             />
                           </List.Item>
@@ -942,11 +990,64 @@ const GovernancePage = () => {
                     </div>
                   </div>
                 </TabPane>
-{/* 
-                <TabPane tab={t('governance.tab1')} key="1"></TabPane>
- */}
 
                 <TabPane tab={t('governance.tab3')} key="3">
+                  <div className="site-layout-background governance-content">
+                    <div className="container">
+                    <List
+                        dataSource={proposalList?.filter(item => {
+                          return item.status === ProposalStatuses.PROPOSAL_STATUS_PASSED;
+                        })}
+                        renderItem={item => (
+                          <List.Item
+                            key={item.proposal_id}
+                            actions={[]}
+                            onClick={() => {
+                              setProposal(item);
+                              setIsProposalVisible(true);
+                              processProposalFigures(item);
+                            }}
+                          >
+                            <List.Item.Meta
+                              title={
+                                <>
+                                  {processStatusTag(item.status)} #{item.proposal_id}{' '}
+                                  <a>{item.content.title}</a>
+                                </>
+                              }
+                              description={
+                                <span className="time-container">
+                                    <FieldTimeOutlined />{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {' '}{t('governance.start')}:{' '}
+                                      </span>
+                                      {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                    </span>
+                                    {' '}{' - '}{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {t('governance.end')}:{' '}
+                                      </span>
+                                      {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                    </span>
+                                  </span>
+                              }
+                            />
+                          </List.Item>
+                        )}
+                        pagination={{
+                          pageSize: 10,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+
+                </TabPane>
+
+
+                <TabPane tab={t('governance.tab4')} key="4">
                   <div className="site-layout-background governance-content">
                     <div className="container">
                       <List
@@ -971,12 +1072,22 @@ const GovernancePage = () => {
                                 </>
                               }
                               description={
-                                <span>
-                                  {t('governance.start')}:{' '}
-                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
-                                  {t('governance.end')}:{' '}
-                                  {moment(item.voting_end_time).format('DD/MM/YYYY')}
-                                </span>
+                                <span className="time-container">
+                                    <FieldTimeOutlined />{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {' '}{t('governance.start')}:{' '}
+                                      </span>
+                                      {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                    </span>
+                                    {' '}{' - '}{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {t('governance.end')}:{' '}
+                                      </span>
+                                      {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                    </span>
+                                  </span>
                               }
                             />
                           </List.Item>
@@ -988,7 +1099,7 @@ const GovernancePage = () => {
                     </div>
                   </div>
                 </TabPane>
-                <TabPane tab={t('governance.tab4')} key="4">
+                <TabPane tab={t('governance.tab5')} key="5">
                   <div className="site-layout-background governance-content">
                     <div className="container">
                       <List
@@ -1013,12 +1124,22 @@ const GovernancePage = () => {
                                 </>
                               }
                               description={
-                                <span>
-                                  {t('governance.start')}:{' '}
-                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
+                                <span className="time-container">
+                                <FieldTimeOutlined />{' '}
+                                <span className="time-area">
+                                  <span className="time-label">
+                                  {' '}{t('governance.start')}:{' '}
+                                  </span>
+                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                </span>
+                                {' '}{' - '}{' '}
+                                <span className="time-area">
+                                  <span className="time-label">
                                   {t('governance.end')}:{' '}
+                                  </span>
                                   {moment(item.voting_end_time).format('DD/MM/YYYY')}
                                 </span>
+                              </span>
                               }
                             />
                           </List.Item>
@@ -1030,7 +1151,7 @@ const GovernancePage = () => {
                     </div>
                   </div>
                 </TabPane>
-                <TabPane tab={t('governance.tab5')} key="5">
+                <TabPane tab={t('governance.tab6')} key="6">
                   <div className="site-layout-background governance-content">
                     <div className="container">
                       <List
@@ -1055,12 +1176,22 @@ const GovernancePage = () => {
                                 </>
                               }
                               description={
-                                <span>
-                                  {t('governance.start')}:{' '}
-                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}{' '}
+                                <span className="time-container">
+                                <FieldTimeOutlined />{' '}
+                                <span className="time-area">
+                                  <span className="time-label">
+                                  {' '}{t('governance.start')}:{' '}
+                                  </span>
+                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                </span>
+                                {' '}{' - '}{' '}
+                                <span className="time-area">
+                                  <span className="time-label">
                                   {t('governance.end')}:{' '}
+                                  </span>
                                   {moment(item.voting_end_time).format('DD/MM/YYYY')}
                                 </span>
+                              </span>
                               }
                             />
                           </List.Item>
