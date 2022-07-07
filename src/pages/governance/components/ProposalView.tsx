@@ -1,17 +1,24 @@
 import React, { useState, useEffect, useRef } from 'react';
 import moment from 'moment';
+import Big from 'big.js';
 import '../governance.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Layout, Radio, Button, Card, Progress, Tag, Spin } from 'antd';
 import { ArrowLeftOutlined, LoadingOutlined } from '@ant-design/icons';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
-import { sessionState } from '../../../recoil/atom';
+
+import { 
+  sessionState, 
+  walletAssetState 
+} from '../../../recoil/atom';
 
 import { ProposalModel, ProposalStatuses, VoteOption } from '../../../models/Transaction';
 import { walletService } from '../../../service/WalletService';
 import { AnalyticsService } from '../../../service/analytics/AnalyticsService';
+import { getUIDynamicAmount } from '../../../utils/NumberUtils';
+
 
 const { Content, Sider } = Layout;
 
@@ -19,9 +26,15 @@ export const ProposalView = (props: any) => {
   // const [form] = Form.useForm();
 
   const allProps = props?.props;
-
+  const finalAmount = '10,000';
   const [proposalList, setProposalList] = useState<ProposalModel[]>();
+  const [proposalStatus, setProposposalStatus] = useState(allProps?.proposal?.status);
   const currentSession = useRecoilValue(sessionState);
+  const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
+
+  const [totalDepositValue, setTotalDeposit] = useState('0');
+  const [totalDepositPercentageValue, setTotalDepositPercentageValue] = useState('0');
+
   const didMountRef = useRef(false);
 
   const analyticsService = new AnalyticsService(currentSession);
@@ -33,7 +46,8 @@ export const ProposalView = (props: any) => {
   };
 
   const onVote = async () => {
-    allProps.showPasswordInput(undefined);
+    allProps.setModalType('confirmation');
+    allProps.showPasswordInput();
   };
 
   const processStatusTag = status => {
@@ -71,6 +85,44 @@ export const ProposalView = (props: any) => {
     );
   };
 
+  function numWithCommas(x:StringConstructor) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  const totalDeposit = () => {
+    const depositCalc = (allProps?.proposal?.total_deposit.reduce((partialSum, a) => partialSum.plus(Big(a.amount)), Big(0))).toString();
+    const totalDeposit = Big(getUIDynamicAmount(depositCalc, userAsset)).toString();
+    setTotalDeposit(totalDeposit);
+  };
+
+
+  const totalDepositPercentage = () => {
+    const finalPercentage = (Big(totalDepositValue).div(Big((finalAmount.replace(',',''))))).times(100).toString()
+    setTotalDepositPercentageValue(finalPercentage);
+  };
+
+  const remainingDays = () => {
+    const submitTime = moment(allProps?.proposal?.submit_time);
+    const endDepositTime = moment(allProps?.proposal?.deposit_end_time);
+    const duration = moment.duration(endDepositTime.diff(submitTime));
+    const days = duration.asDays();
+    return days.toString();
+  };
+
+
+  const submitProposalDeposit = () => {
+    
+
+    // try{
+    //   const proposalDeposit = await walletService.sendProposalDepositTx({
+
+    //   });
+    // }catch(e){
+
+    // }
+
+  };
+
   useEffect(() => {
     const fetchProposalList = async () => {
       const list: ProposalModel[] = await walletService.retrieveProposals(
@@ -86,6 +138,14 @@ export const ProposalView = (props: any) => {
       didMountRef.current = true;
       analyticsService.logPage('Governance');
     }
+
+    setUserAsset(userAsset);
+
+    setProposposalStatus(allProps?.proposal?.status);
+    totalDeposit();
+    totalDepositPercentage();
+
+    console.log('remainingDays ',remainingDays(), userAsset);
 
     // eslint-disable-next-line
   }, [proposalList, setProposalList]);
@@ -116,12 +176,38 @@ export const ProposalView = (props: any) => {
               <div className="status">{processStatusTag(allProps.proposal?.status)}</div>
             </div>
             <div className="item">
+            {(proposalStatus  === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? (
               <div className="date">
-                {t('governance.start')}:{' '}
-                {moment(allProps.proposal?.voting_start_time).format('DD/MM/YYYY, h:mm A')} <br />
-                {t('governance.end')}:{' '}
-                {moment(allProps.proposal?.voting_end_time).format('DD/MM/YYYY, h:mm A')}
+                <div className="date-container">
+                <div className="date-area date-start">
+                  <div className="txt">
+                  {t('governance.start')}:{' '}
+                  </div>
+                  <div className="date">
+                  {moment(allProps.proposal?.submit_time).format('DD/MM/YYYY, h:mm A')}
+                  </div>
+                
+                 <br />
+                </div>
+                <div className="date-area date-end">
+                <div className="txt">
+                  {t('governance.end')}:{' '}
+                  </div>
+                  <div className="date">
+                  {moment(allProps.proposal?.deposit_end_time).format('DD/MM/YYYY, h:mm A')}
+                  </div>
+                
+                </div>
+                </div>
               </div>
+            ) : (
+                <div className="date">
+                  {t('governance.start')}:{' '}
+                  {moment(allProps.proposal?.voting_start_time).format('DD/MM/YYYY, h:mm A')} <br />
+                  {t('governance.end')}:{' '}
+                  {moment(allProps.proposal?.voting_end_time).format('DD/MM/YYYY, h:mm A')}
+                </div>
+            )}
             </div>
 
             <div className="description">
@@ -162,12 +248,49 @@ export const ProposalView = (props: any) => {
               )}
             </div>
           </Content>
-          <Sider width="300px">
+
+
+
+
+          <Sider width={(proposalStatus  === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? "400px" : "300px"  }>
             <Spin
               spinning={allProps.isLoadingTally}
               indicator={<LoadingOutlined />}
               tip="Loading latest results"
             >
+
+              {(proposalStatus  === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? (<>
+                <Card title={numWithCommas(totalDepositValue).concat(' ').concat(userAsset?.symbol).concat(' ').concat(t('governance.proposalView.deposited.header')).concat(' ').concat(userAsset?.symbol)}>
+                  <Progress
+                  className="deposit-progress"
+                      percent={parseFloat(totalDepositPercentageValue)}
+                      showInfo={false}
+                      status="normal"
+                      strokeColor={{
+                        from: '#00A68C',
+                        to: '#00A68C',
+                      }}
+                    />
+                    <div className="progress-info">
+                      <span className="left">
+                        {totalDepositPercentageValue}%{' '}{t('governance.proposalView.deposited.cro')}{' '}{finalAmount}{' '}{userAsset?.symbol} 
+                      </span>
+                      <span className="right">
+                        {(remainingDays())}{' '}{t('governance.proposalView.deposited.days')}
+                      </span>
+                    </div>
+
+
+
+                    <Button type="primary" disabled={!allProps.voteOption} onClick={submitProposalDeposit}>
+                      {t('governance.tab3')}
+                    </Button>
+
+                </Card>
+              
+              </>) : (
+
+            
               <Card title={t('governance.result')} style={{ padding: '4px' }}>
                 <div className="vote-result-section">
                   Yes - {t('governance.voteOption.yes')}
@@ -229,8 +352,13 @@ export const ProposalView = (props: any) => {
                   />
                 </div>
               </Card>
+                )}
             </Spin>
           </Sider>
+
+
+
+
         </Layout>
       </div>
     </div>

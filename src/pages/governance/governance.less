@@ -44,6 +44,9 @@
     }
     .ant-list-item {
       cursor: pointer;
+      padding-bottom: 42px;
+      position: relative;
+      display: flex;
     }
   }
   .back-button {
@@ -52,9 +55,11 @@
 
 
   .time-container{
-    position: relative;
+    position: absolute;
     float: right;
-    
+    right: 0;
+    bottom: 7px;
+
     .time-area{
       position: relative;
       display: inline-block;
@@ -310,4 +315,37 @@
 
 .create-proposal-success-btn{
   margin-bottom: 32px;
+}
+
+
+.progress-info{
+  position: relative;
+  display: block;
+  font-size: 10px;
+  margin-top: 6px;
+  margin-bottom: 12px;
+
+  .right{
+    position: relative;
+    float: right;
+    color: #323C52;
+  }
+}
+
+.deposit-progress{
+  .ant-progress-inner{
+    border-radius: 0px !important;
+  }
+  .ant-progress-bg{
+    height: 16px !important;
+    border-radius: 0px !important;
+  }
+}
+
+
+.date-container{
+  .date-area{
+    .txt{}
+    .date{}
+  }
 }

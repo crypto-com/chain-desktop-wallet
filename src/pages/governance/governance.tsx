@@ -19,6 +19,8 @@ import { useTranslation } from 'react-i18next';
 import { ledgerIsExpertModeState, sessionState, walletAssetState } from '../../recoil/atom';
 
 import { getUIVoteAmount, getUIDynamicAmount, getBaseScaledAmount } from '../../utils/NumberUtils';
+
+
 import {
   ProposalModel,
   ProposalStatuses,
@@ -38,7 +40,7 @@ import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import { renderExplorerUrl } from '../../models/Explorer';
-import { middleEllipsis } from '../../utils/utils';
+import { middleEllipsis, checkIfTestnet } from '../../utils/utils';
 
 import { ProposalView } from './components/ProposalView';
 import { VotingHistory } from './components/VotingHistory';
@@ -68,6 +70,7 @@ const GovernancePage = () => {
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
   const [proposal, setProposal] = useState<ProposalModel>();
+
   const initialFiguresStates = {
     yes: {
       vote: '',
@@ -94,7 +97,7 @@ const GovernancePage = () => {
   const currentSession = useRecoilValue(sessionState);
   const didMountRef = useRef(false);
   const [isLoadingTally, setIsLoadingTally] = useState(false);
-  const minDeposit = '1000';
+  const minDeposit = (checkIfTestnet(currentSession.wallet.config.network) ? '20000' : '1000');
   const maxDeposit = '10000';
   const [createProposalHash, setCreateProposalHash] = useState('')
   const [initialDepositProposal, setInitialDeposit] = useState('0');
@@ -410,7 +413,7 @@ const GovernancePage = () => {
   const onCreateProposalAction = async () => {
     setInputPasswordVisible(false);
     const { walletType } = currentSession.wallet;
-    const currentDenom = currentSession.wallet.config.network.coin.baseDenom;
+    const { baseDenom, croDenom } = currentSession.wallet.config.network.coin;
 
     if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
       return;
@@ -422,7 +425,7 @@ const GovernancePage = () => {
         const proposalType = form.getFieldValue('proposalType');
         let textProposal: BroadCastResult | null = null;
         if (proposalType === 'text_proposal') {
-          setInitialDeposit(form?.getFieldValue('initialDeposit')+currentDenom.replace('base',' ').toUpperCase());
+          setInitialDeposit(form?.getFieldValue('initialDeposit')+croDenom.replace('base',' ').toUpperCase());
           textProposal = await walletService.sendTextProposalSubmitTx({
             description: form?.getFieldValue('proposalDescription'),
             title: form?.getFieldValue('proposalTitle'),
@@ -430,7 +433,7 @@ const GovernancePage = () => {
             initialDeposit: [
               {
                 amount: getBaseScaledAmount(form?.getFieldValue('initialDeposit'), userAsset),
-                denom: currentDenom,
+                denom: baseDenom,
               
               },
             ],
@@ -709,7 +712,7 @@ const GovernancePage = () => {
                 ]}
                 style={{ textAlign: 'left' }}
               >
-                <Select placeholder="Select Proposal Type">
+                <Select placeholder={t('governance.modal2.form.input.proposalType.placeholder')}>
                   {/* <Option key="parameter_change" value="parameter_change">
                     Parameter Change
                   </Option>
@@ -734,7 +737,7 @@ const GovernancePage = () => {
                   },
                 ]}
               >
-                <Input placeholder="Enter the proposal title" />
+                <Input placeholder={t('governance.modal2.form.input.proposalTitle.placeholder')} />
               </Form.Item>
               <Form.Item
                 name="proposalDescription"
@@ -749,7 +752,7 @@ const GovernancePage = () => {
                   },
                 ]}
               >
-                <Input placeholder="Enter the proposal description" />
+                <Input placeholder={t('governance.modal2.form.input.proposalDesc.placeholder')} />
               </Form.Item>
               <Form.Item
                 name="initialDeposit"
@@ -774,11 +777,11 @@ const GovernancePage = () => {
                 ]}
               >
                 <InputNumber
-                  placeholder={`Enter the initial ${userAsset.symbol} amount`}
+                  placeholder={`${t('governance.modal2.form.input.proposalDeposit.placeholder')} ${userAsset.symbol} ${t('governance.modal2.form.input.proposalDeposit.placeholder2')}`}
                   addonAfter={userAsset.symbol}
                 />
               </Form.Item>
-              <div className="note">{t('governance.modal2.form.proposalDeposit.wanring')}</div>
+              <div className="note">{t('governance.modal2.form.proposalDeposit.warning')}</div>
 
               <div className="avail-bal-container">
                 <div className="avail-bal-txt">{t('governance.modal2.form.balance')}</div>
@@ -810,6 +813,7 @@ const GovernancePage = () => {
               isProposalVisible,
               setIsProposalVisible,
               historyVisible,
+              setModalType
             }}
           />
         ) : (
