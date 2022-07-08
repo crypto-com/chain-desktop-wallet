@@ -801,7 +801,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 return {
                   index: idx,
                   publicAddress: address,
-                  derivationPath: LedgerSigner.getDerivationPath(idx, UserAssetType.EVM, standard),
+                  derivationPath: LedgerSigner.getDerivationPath(
+                    idx,
+                    UserAssetType.EVM,
+                    SupportedChainName.CRONOS,
+                    standard,
+                  ),
                   balance: '0',
                 };
               });
@@ -828,6 +833,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                   derivationPath: LedgerSigner.getDerivationPath(
                     idx,
                     UserAssetType.TENDERMINT,
+                    SupportedChainName.CRYPTO_ORG,
                     standard,
                   ),
                   balance: '0',
@@ -976,11 +982,13 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 tendermint: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
                   UserAssetType.TENDERMINT,
+                  SupportedChainName.CRYPTO_ORG,
                   props.form.getFieldValue('derivationPathStandard'),
                 ),
                 evm: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
                   UserAssetType.EVM,
+                  SupportedChainName.CRONOS,
                   props.form.getFieldValue('derivationPathStandard'),
                 ),
               });
@@ -1048,11 +1056,13 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 tendermint: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
                   UserAssetType.TENDERMINT,
+                  SupportedChainName.CRYPTO_ORG,
                   props.form.getFieldValue('derivationPathStandard'),
                 ),
                 evm: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
                   UserAssetType.EVM,
+                  SupportedChainName.CRONOS,
                   props.form.getFieldValue('derivationPathStandard'),
                 ),
               });

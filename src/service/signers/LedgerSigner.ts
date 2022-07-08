@@ -21,10 +21,10 @@ export class LedgerSigner {
 
   // override this function
   // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-empty-function
-  async createTransport() { }
+  async createTransport() {}
 
   // eslint-disable-next-line class-methods-use-this, @typescript-eslint/no-empty-function
-  async closeTransport() { }
+  async closeTransport() {}
 
   public static toBech32(address: Uint8Array, bech32Prefix: string): string {
     const words = bech32.toWords(Buffer.from(address) as any);
@@ -71,7 +71,6 @@ export class LedgerSigner {
       await this.closeTransport();
       throw new Error(`${response.error_message}`);
     }
-
 
     switch (chainName) {
       case SupportedChainName.COSMOS_HUB:
@@ -242,6 +241,7 @@ export class LedgerSigner {
   public static getDerivationPath(
     index: number,
     assetType: UserAssetType,
+    chainName: SupportedChainName,
     standard: DerivationPathStandard,
   ): string {
     let coin;
@@ -252,7 +252,12 @@ export class LedgerSigner {
         coin = '60';
         break;
       case UserAssetType.TENDERMINT:
-        coin = '394';
+        if (chainName === SupportedChainName.CRYPTO_ORG) {
+          coin = '394';
+        }
+        if (chainName === SupportedChainName.COSMOS_HUB) {
+          coin = '118';
+        }
         break;
       default:
         coin = '394';

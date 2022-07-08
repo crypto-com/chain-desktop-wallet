@@ -117,11 +117,13 @@ const LedgerAddressIndexBalanceTable = (props: {
                 tendermint: LedgerSigner.getDerivationPath(
                   record.index,
                   UserAssetType.TENDERMINT,
+                  SupportedChainName.CRYPTO_ORG,
                   form.getFieldValue('derivationPathStandard'),
                 ),
                 evm: LedgerSigner.getDerivationPath(
                   record.index,
                   UserAssetType.EVM,
+                  SupportedChainName.CRONOS,
                   form.getFieldValue('derivationPathStandard'),
                 ),
               });
@@ -204,6 +206,7 @@ const LedgerAddressIndexBalanceTable = (props: {
                   derivationPath: LedgerSigner.getDerivationPath(
                     startIndex + idx,
                     UserAssetType.EVM,
+                    SupportedChainName.CRONOS,
                     standard,
                   ),
                   balance: '0',
@@ -231,6 +234,7 @@ const LedgerAddressIndexBalanceTable = (props: {
                   derivationPath: LedgerSigner.getDerivationPath(
                     startIndex + idx,
                     UserAssetType.TENDERMINT,
+                    SupportedChainName.CRYPTO_ORG,
                     standard,
                   ),
                   balance: '0',
