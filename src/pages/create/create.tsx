@@ -346,7 +346,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const { isLedgerConnected } = useLedgerStatus({ assetType: ledgerAssetType });
   const [ledgerAddressList, setLedgerAddressList] = useState<any[]>([]);
   const [derivationPath, setDerivationPath] = useState({
-    tendermint: "m/44'/394'/0'/0/0",
+    cronosTendermint: "m/44'/394'/0'/0/0",
+    cosmosTendermint: "m/44'/118'/0'/0/0",
     evm: "m/44'/60'/0'/0/0",
   });
 
@@ -979,10 +980,16 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 assetType: undefined,
               });
               setDerivationPath({
-                tendermint: LedgerSigner.getDerivationPath(
+                cronosTendermint: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
                   UserAssetType.TENDERMINT,
                   SupportedChainName.CRYPTO_ORG,
+                  props.form.getFieldValue('derivationPathStandard'),
+                ),
+                cosmosTendermint: LedgerSigner.getDerivationPath(
+                  props.form.getFieldValue('addressIndex'),
+                  UserAssetType.TENDERMINT,
+                  SupportedChainName.COSMOS_HUB,
                   props.form.getFieldValue('derivationPathStandard'),
                 ),
                 evm: LedgerSigner.getDerivationPath(
@@ -1023,11 +1030,18 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             className="derivation-path-container"
           >
             <div>
-              TENDERMINT <br />
-              <Text type="secondary">{derivationPath.tendermint}</Text>
+              Crypto.org Chain
+              <br />
+              <Text type="secondary">{derivationPath.cronosTendermint}</Text>
             </div>
             <div>
-              EVM <br />
+              Cosmos Hub Chain
+              <br />
+              <Text type="secondary">{derivationPath.cosmosTendermint}</Text>
+            </div>
+            <div>
+              EVM Chain
+              <br />
               <Text type="secondary">{derivationPath.evm}</Text>
             </div>
           </div>
@@ -1053,10 +1067,16 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             type="number"
             onChange={() => {
               setDerivationPath({
-                tendermint: LedgerSigner.getDerivationPath(
+                cronosTendermint: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
                   UserAssetType.TENDERMINT,
                   SupportedChainName.CRYPTO_ORG,
+                  props.form.getFieldValue('derivationPathStandard'),
+                ),
+                cosmosTendermint: LedgerSigner.getDerivationPath(
+                  props.form.getFieldValue('addressIndex'),
+                  UserAssetType.TENDERMINT,
+                  SupportedChainName.COSMOS_HUB,
                   props.form.getFieldValue('derivationPathStandard'),
                 ),
                 evm: LedgerSigner.getDerivationPath(

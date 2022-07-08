@@ -25,7 +25,7 @@ const LedgerAddressIndexBalanceTable = (props: {
   form?: FormInstance;
   assetType: UserAssetType;
   setisHWModeSelected?: (value: boolean) => void;
-  setDerivationPath?: ({ tendermint, evm }) => void;
+  setDerivationPath?: ({ cronosTendermint, cosmosTendermint, evm }) => void;
   setAddressIndexBalanceList: (list: any[]) => void;
 }) => {
   const DEFAULT_START_INDEX = 10;
@@ -114,10 +114,16 @@ const LedgerAddressIndexBalanceTable = (props: {
                 addressIndex: record.index,
               });
               setDerivationPath({
-                tendermint: LedgerSigner.getDerivationPath(
+                cronosTendermint: LedgerSigner.getDerivationPath(
                   record.index,
                   UserAssetType.TENDERMINT,
                   SupportedChainName.CRYPTO_ORG,
+                  form.getFieldValue('derivationPathStandard'),
+                ),
+                cosmosTendermint: LedgerSigner.getDerivationPath(
+                  record.index,
+                  UserAssetType.TENDERMINT,
+                  SupportedChainName.COSMOS_HUB,
                   form.getFieldValue('derivationPathStandard'),
                 ),
                 evm: LedgerSigner.getDerivationPath(
