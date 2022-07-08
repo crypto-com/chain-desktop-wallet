@@ -31,9 +31,10 @@ export class LedgerWalletSignerProviderWebusb implements ISignerProvider {
     startIndex: number,
     gap: number,
     addressPrefix: string,
+    chainName: SupportedChainName,
     derivationPathStandard: DerivationPathStandard,
   ): Promise<string[]> {
-    const result = await this.provider.getAddressList(startIndex, gap, addressPrefix, derivationPathStandard);
+    const result = await this.provider.getAddressList(startIndex, gap, addressPrefix, chainName, derivationPathStandard);
     return result;
   }
 

@@ -190,20 +190,20 @@ export class LedgerWalletSignerProviderZemu implements ISignerProvider {
     this.provider = new LedgerSignerZemu();
   }
 
-  public async getPubKey(index: number, derivationPathStandard: DerivationPathStandard): Promise<Bytes> {
-    const result = await this.provider.enable(index, 'cro', derivationPathStandard, false); // dummy value
+  public async getPubKey(index: number, chainName: SupportedChainName, derivationPathStandard: DerivationPathStandard): Promise<Bytes> {
+    const result = await this.provider.enable(index, 'cro', chainName, derivationPathStandard, false); // dummy value
     await this.provider.closeTransport();
     return result[1];
   }
 
   public async getAddress(index: number, addressPrefix: string, chainName: SupportedChainName, derivationPathStandard: DerivationPathStandard): Promise<string> {
-    const result = await this.provider.enable(index, addressPrefix, derivationPathStandard, false);
+    const result = await this.provider.enable(index, addressPrefix, chainName, derivationPathStandard, false);
     await this.provider.closeTransport();
     return result[0];
   }
 
-  public async getAddressList(startIndex: number, gap: number, addressPrefix: string, derivationPathStandard: DerivationPathStandard): Promise<string[]> {
-    const result = await this.provider.getAddressList(startIndex, gap, addressPrefix, derivationPathStandard);
+  public async getAddressList(startIndex: number, gap: number, addressPrefix: string, chainName: SupportedChainName, derivationPathStandard: DerivationPathStandard): Promise<string[]> {
+    const result = await this.provider.getAddressList(startIndex, gap, addressPrefix, chainName, derivationPathStandard);
     await this.provider.closeTransport();
     return result;
   }

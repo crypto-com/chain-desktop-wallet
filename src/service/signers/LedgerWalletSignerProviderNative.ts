@@ -31,9 +31,10 @@ export class LedgerWalletSignerProviderNative implements ISignerProvider {
     startIndex: number,
     gap: number,
     addressPrefix: string,
+    chainName: SupportedChainName,
     derivationPathStandard: DerivationPathStandard,
   ): Promise<string[]> {
-    const addressList = await this.ipcRender.getAddressList(startIndex, gap, addressPrefix, derivationPathStandard);
+    const addressList = await this.ipcRender.getAddressList(startIndex, gap, addressPrefix, chainName, derivationPathStandard);
     return addressList;
   }
 
