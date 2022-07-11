@@ -131,7 +131,7 @@ export const ProposalView = (props: any) => {
 
     try{
       const proposalDeposit = await walletService.sendProposalDepositTx({
-        proposalId: Big(allProps?.proposal?.proposal_id),
+        proposalId: allProps?.proposal?.proposal_id,
         depositor: userAsset.address!,
         amount: 
         [
