@@ -3,7 +3,7 @@ import moment from 'moment';
 import './governance.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Layout, Tabs, List, Space, Button, Tag, Select, Form, Input, InputNumber } from 'antd';
+import { Layout, Tabs, List, Space, Button, Tag, Select, Form, Input, InputNumber, Progress } from 'antd';
 
 
 import Big from 'big.js';
@@ -99,6 +99,7 @@ const GovernancePage = () => {
   const [isLoadingTally, setIsLoadingTally] = useState(false);
   const minDeposit = (checkIfTestnet(currentSession.wallet.config.network) ? '200' : '100');
   const maxDeposit = (checkIfTestnet(currentSession.wallet.config.network) ? '20000' : '10000');
+
   const [createProposalHash, setCreateProposalHash] = useState('')
   const [initialDepositProposal, setInitialDeposit] = useState('0');
   const [isProposalModalVisible, setIsProposalModalVisible] = useState(false);
@@ -486,6 +487,62 @@ const GovernancePage = () => {
       setProposalErrorModalVisible(true);
     }
   };
+
+
+  const rightSideItem = (item) => {
+    let code = [<></>];
+    switch (item?.status){
+      case ProposalStatuses.PROPOSAL_STATUS_DEPOSIT_PERIOD:
+        code = 
+        [<Progress
+            className="deposit-progress-list"
+            type="circle"
+            width={70}
+            percent={percentageCalc(item)}
+            status="normal"
+            strokeColor={{
+              from: '#00A68C',
+              to: '#00A68C',
+            }}
+          />];
+            break;
+      case ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD:
+        code = [<></>];
+        break;
+
+      default:
+        code = 
+        [
+          <IconText
+            icon={LikeOutlined}
+            text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+            key="list-vertical-yes-o"
+          />,
+          <IconText
+            icon={DislikeOutlined}
+            text={getUIVoteAmount(
+              Big(item.final_tally_result.no)
+                .add(item.final_tally_result.no_with_veto)
+                .toFixed(),
+              userAsset,
+            )}
+            key="list-vertical-no-o"
+          />,
+        ]
+        ;
+        break;
+    }
+    return code;
+  };
+
+
+  const percentageCalc = (proposal: any) => {
+    const depositCalc = (proposal?.total_deposit.reduce((partialSum, a) => partialSum.plus(Big(a.amount)), Big(0))).toString();
+    const totalDeposit = Big(getUIDynamicAmount(depositCalc, userAsset)).toString();
+    const finalPercentage = (Big(totalDeposit).div(Big((maxDeposit.replace(',',''))))).times(100).toFixed(2);
+    return Big(finalPercentage).toNumber();
+  };
+
 
   useEffect(() => {
     const fetchProposalList = async () => {
@@ -902,27 +959,7 @@ const GovernancePage = () => {
                         renderItem={(item: ProposalModel) => (
                           <List.Item
                             key={item.proposal_id}
-                            actions={
-                              item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
-                                ? []
-                                : [
-                                    <IconText
-                                      icon={LikeOutlined}
-                                      text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
-                                      key="list-vertical-yes-o"
-                                    />,
-                                    <IconText
-                                      icon={DislikeOutlined}
-                                      text={getUIVoteAmount(
-                                        Big(item.final_tally_result.no)
-                                          .add(item.final_tally_result.no_with_veto)
-                                          .toFixed(),
-                                        userAsset,
-                                      )}
-                                      key="list-vertical-no-o"
-                                    />,
-                                  ]
-                            }
+                            actions={rightSideItem(item)}
                             onClick={() => {
                               setProposal(item);
                               setIsProposalVisible(true);
@@ -942,7 +979,10 @@ const GovernancePage = () => {
                                     {checkProposalType(item)}
                                   </div>
 
-                                  {((item.status === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? 
+
+                                  
+
+                                  {((item.status === ProposalStatuses.PROPOSAL_STATUS_DEPOSIT_PERIOD) ? 
                                   (<span className="time-container">
                                     <FieldTimeOutlined />{' '}
                                     <span className="time-area">
@@ -1098,7 +1138,7 @@ const GovernancePage = () => {
                         renderItem={item => (
                           <List.Item
                             key={item.proposal_id}
-                            actions={[]}
+                            actions={rightSideItem(item)}
                             onClick={() => {
                               setProposal(item);
                               setIsProposalVisible(true);

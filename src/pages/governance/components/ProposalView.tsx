@@ -16,8 +16,8 @@ import { useTranslation } from 'react-i18next';
 
 import { secretStoreService } from '../../../service/storage/SecretStoreService';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
-
-
+import { checkIfTestnet } from '../../../utils/utils';
+import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { 
   sessionState, 
   walletAssetState 
@@ -43,10 +43,11 @@ export const ProposalView = (props: any) => {
   
 
   const allProps = props?.props;
-  const finalAmount = '10,000';
+  const currentSession = useRecoilValue(sessionState);
+  const finalAmount = (checkIfTestnet(currentSession.wallet.config.network) ? '20,000' : '10,000');
   const [proposalList, setProposalList] = useState<ProposalModel[]>();
   const [proposalStatus, setProposposalStatus] = useState(allProps?.proposal?.status);
-  const currentSession = useRecoilValue(sessionState);
+
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
 
   const [totalDepositValue, setTotalDeposit] = useState('0');
@@ -67,6 +68,17 @@ export const ProposalView = (props: any) => {
   const analyticsService = new AnalyticsService(currentSession);
 
   const [t] = useTranslation();
+
+
+  let customMaxValidator = TransactionUtils.maxValidator(
+    finalAmount.replace(',',''),
+    t('governance.modal2.form.input.proposalDeposit.max.error'),
+  );
+  let customMaxValidator0 = TransactionUtils.maxValidator(
+    getUIDynamicAmount(userAsset.balance, userAsset),
+    t('governance.modal2.form.input.proposalDeposit.max2.error'),
+  );
+  let customAmountValidator = TransactionUtils.validTransactionAmountValidator();
 
 
   const handleCloseDepositSuccessModal = () => {
@@ -123,11 +135,11 @@ export const ProposalView = (props: any) => {
     const { baseDenom } = currentSession.wallet.config.network.coin;
     allProps.setConfirmLoading(true);
 
-    if (decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
+    if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
       return;
     }
 
-    console.log('submitProposalDeposit ');  
+    console.log('submitProposalDeposit ', decryptedPhrase);  
 
     try{
       const proposalDeposit = await walletService.sendProposalDepositTx({
@@ -140,6 +152,7 @@ export const ProposalView = (props: any) => {
             denom: baseDenom,
           },
         ],
+
         decryptedPhrase,
         walletType,
       });
@@ -185,6 +198,7 @@ export const ProposalView = (props: any) => {
       password,
       currentSession.wallet.identifier,
     );
+    
     setDecryptedPhrase(phraseDecrypted);
     setInputPasswordVisible(false);
 
@@ -218,6 +232,16 @@ export const ProposalView = (props: any) => {
       didMountRef.current = true;
       analyticsService.logPage('Governance');
     }
+
+    customMaxValidator = TransactionUtils.maxValidator(
+      finalAmount.replace(',',''),
+      t('governance.modal2.form.input.proposalDeposit.max.error'),
+    );
+    customMaxValidator0 = TransactionUtils.maxValidator(
+      getUIDynamicAmount(userAsset.balance, userAsset),
+      t('governance.modal2.form.input.proposalDeposit.max2.error'),
+    );
+    customAmountValidator = TransactionUtils.validTransactionAmountValidator();
 
     setUserAsset(userAsset);
 
@@ -370,7 +394,7 @@ export const ProposalView = (props: any) => {
 
               {(proposalStatus  === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? (<>
                 <Card 
-                  title={numWithCommas(totalDepositValue).concat(' ').concat(userAsset?.symbol).concat(' ').concat(t('governance.proposalView.deposited.header')).concat(' ').concat(userAsset?.symbol)}
+                  title={numWithCommas(totalDepositValue).concat(' ').concat(userAsset?.symbol).concat(' ').concat(t('governance.proposalView.deposited.header')).concat(' ').concat(finalAmount).concat(' ').concat(userAsset?.symbol)}
                   >
                   <Progress
                   className="deposit-progress"
@@ -526,10 +550,9 @@ export const ProposalView = (props: any) => {
                     pattern: /[^0]+/,
                     message: t('governance.modal2.form.input.proposalDeposit.error'),
                   },
-                  // customAmountValidator,
-                  // customMaxValidator,
-                  // customMaxValidator0,
-                  // customMinValidator,
+                  customAmountValidator,
+                  customMaxValidator,
+                  customMaxValidator0,
                 ]}
               >
                 <InputNumber

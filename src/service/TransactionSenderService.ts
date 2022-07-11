@@ -677,6 +677,8 @@ export class TransactionSenderService {
       accountNumber,
       accountSequence,
     };
+
+    console.log('sendMsgDepositTx ', depositRequest);
     
     let signedTxHex: string = '';
     const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();

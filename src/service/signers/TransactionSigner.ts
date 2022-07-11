@@ -136,13 +136,15 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
     const msgDepositAmount = transaction.amount.map(coin => {
       return cro.v2.CoinV2.fromCustomAmountDenom(coin.amount, coin.denom);
     });
-    
+
     // Using V2 because it has support for multiple `amount` in a single transaction
     const msgDeposit = new cro.v2.gov.MsgDepositV2({
       amount: msgDepositAmount,
       depositor: transaction.depositor,
       proposalId: Big(transaction.proposalId),
     });
+
+    console.log('signProposalDepositTransaction ', keyPair, phrase);
 
     return this.getSignedMessageTransaction([msgDeposit], transaction, keyPair, rawTx);
   }
