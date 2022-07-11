@@ -718,7 +718,7 @@ export class TransactionSenderService {
       ledgerTransactionSigner,
     } = await this.transactionPrepareService.prepareTransaction();
 
-    const minDeposit = '1000';
+    const minDeposit = '100';
     if(Big(textProposalSubmitRequest.initialDeposit[0].amount).cmp(Big(minDeposit)) === -1){
       return await nodeRpc.broadcastTransaction('');
     }

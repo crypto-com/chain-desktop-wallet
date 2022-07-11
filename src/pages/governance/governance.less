@@ -44,7 +44,10 @@
     }
     .ant-list-item {
       cursor: pointer;
-      padding-bottom: 42px;
+      padding-bottom: 60px;
+      padding-top: 4px;
+      margin-bottom: 7px;
+      margin-top: 4px;
       position: relative;
       display: flex;
     }
@@ -64,14 +67,17 @@
       position: relative;
       display: inline-block;
       margin-top: 12px;
+      letter-spacing: -0.1px;
+        font-size: 11px;
 
       .time-label{
         position: relative;
-        font-weight: 500;
-        letter-spacing: -0.1px;
-        // font-style: italic;
-        font-size: 11px;
+        font-weight: 400;
+      }
 
+      .time{
+        position: relative;
+        font-weight: 700;
       }
     }
   }
@@ -89,9 +95,9 @@
 
 .ant-layout-content .proposal-detail {
   background: #fff;
-  > .ant-layout-content {
-    margin-top: 32px;
-  }
+  // > .ant-layout-content {
+  //   margin-top: 32px;
+  // }
   .title {
     margin-top: 16px;
     font-size: 24px;
@@ -101,7 +107,7 @@
     color: @font-color;
   }
   .item {
-    margin: 30px 0;
+    margin: 0;
     .label {
       color: @font-color;
     }
@@ -313,6 +319,54 @@
   }
 }
 
+.proposal-details-header{
+  position: relative;
+  display: block;
+  margin-top: 72px !important;
+
+  .top{
+    position: absolute;
+    top: -20px;
+    font-size: 12px;
+    color: #bbb;
+    letter-spacing: -0.2px;
+    font-weight: 700;
+  }
+}
+
+.top-proposal-container{
+  position: relative;
+  // display: block;
+  // width: 100%;
+  padding: 0 38px;
+
+  .title{
+    font-size: 15px;
+    color: #0B1426;
+    letter-spacing: 0.1px;
+    display: inline-block;
+    max-width: calc(100% - 200px);
+  }
+
+  .item{
+    position: relative;
+    display: inline-block;
+    float: right;
+  }
+}
+
+.proposal-back-btn{
+  position: absolute;
+  margin: 7px 24px;
+  font-size: 16px;
+  top: 7px;
+  width: 100%;
+}
+
+.deposit-side{
+
+}
+
 .create-proposal-success-btn{
   margin-bottom: 32px;
 }
@@ -321,7 +375,7 @@
 .progress-info{
   position: relative;
   display: block;
-  font-size: 10px;
+  font-size: 12px;
   margin-top: 6px;
   margin-bottom: 12px;
 
@@ -339,13 +393,72 @@
   .ant-progress-bg{
     height: 16px !important;
     border-radius: 0px !important;
+    transition: all 0.6s cubic-bezier(0.08, 0.82, 0.17, 1) 0.4s;
   }
 }
 
 
 .date-container{
-  .date-area{
-    .txt{}
-    .date{}
+  position: relative;
+  display: flex;
+}
+
+.info-area{
+  position: relative;
+  display: inline-block;
+  width: 48%;
+  margin: 20px 1%;
+  font-size: 15px;
+  .txt{
+    color: #888;
+    letter-spacing: -0.1px;
+    font-size: 15px;
+    margin-bottom: -5px;
   }
+}
+
+.proposal-id{
+  margin-bottom: 42px;
+}
+
+.submit-proposal-btn{
+  margin-top: 42px;
+  margin-bottom: 12px;
+}
+
+.deposit-proposal-modal{
+  .title{
+    position: relative;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .description{
+    position: relative;
+    display: block;
+    margin-bottom: 20px;
+  }
+
+  .row{
+    margin-bottom: 20px;
+  }
+
+  .field{
+    color: #737c8f;
+  }
+
+  .ant-modal-footer{
+    text-align: center !important;
+    padding-bottom: 20px;
+  }
+}
+
+
+.proposal-type{
+  position: absolute;
+  bottom: 7px;
+  left: 10px;
+  letter-spacing: -0.1px;
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 700;
 }

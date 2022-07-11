@@ -11,7 +11,7 @@ import {
   DislikeOutlined,
   LikeOutlined,
   HistoryOutlined,
-  InfoCircleOutlined,
+  InfoCircleOutlined,ArrowLeftOutlined,
   FieldTimeOutlined
 } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -97,8 +97,8 @@ const GovernancePage = () => {
   const currentSession = useRecoilValue(sessionState);
   const didMountRef = useRef(false);
   const [isLoadingTally, setIsLoadingTally] = useState(false);
-  const minDeposit = (checkIfTestnet(currentSession.wallet.config.network) ? '20000' : '1000');
-  const maxDeposit = '10000';
+  const minDeposit = (checkIfTestnet(currentSession.wallet.config.network) ? '200' : '100');
+  const maxDeposit = (checkIfTestnet(currentSession.wallet.config.network) ? '20000' : '10000');
   const [createProposalHash, setCreateProposalHash] = useState('')
   const [initialDepositProposal, setInitialDeposit] = useState('0');
   const [isProposalModalVisible, setIsProposalModalVisible] = useState(false);
@@ -192,6 +192,21 @@ const GovernancePage = () => {
     setInputPasswordVisible(false);
     setModalType('confirmation');
     setIsVisibleConfirmationModal(true);
+  };
+
+
+  const checkProposalType = (proposal: any) => {
+    const proposal_initial_deposit = proposal.content['@type'];
+    let status = "";
+
+    // t('governance.modal2.form.input.proposalType.choice2') // Community Pool Spend
+    // t('governance.modal2.form.input.proposalType.choice3') // Parameter Change
+
+    if(proposal_initial_deposit.toLowerCase().indexOf('textproposal')){
+      status = t('governance.modal2.form.input.proposalType.choice1'); // Text Proposal
+    }
+    
+    return status;
   };
 
   const showPasswordInput = () => {
@@ -434,7 +449,6 @@ const GovernancePage = () => {
               {
                 amount: getBaseScaledAmount(form?.getFieldValue('initialDeposit'), userAsset),
                 denom: baseDenom,
-              
               },
             ],
             proposer: userAsset?.address!,
@@ -526,21 +540,63 @@ const GovernancePage = () => {
         <></>
       ) : (
         <>
-          <Header className="site-layout-background">{t('governance.title')}</Header>
-          <div id="governance-description" className="header-description">
-            {t('governance.description')}
-          </div>
-          <Button
-            id="create-proposal-btn"
-            type="primary"
-            onClick={() => {
-              form.validateFields(['initialDeposit']);
-              setModalType('create_proposal');
-              showPasswordInput();
-            }}
-          >
-            {t('governance.modal2.title')}
-          </Button>
+          
+
+          {isProposalVisible ? (<>
+
+
+            <Header className="site-layout-background proposal-details-header">
+              <div className="top">
+                {t('governance.proposalDetails')}
+              </div>
+              {proposal?.content.title}
+              </Header>
+
+            <a className="proposal-back-btn">
+              <div
+                className="back-button"
+                onClick={() => setIsProposalVisible(false)}
+                style={{ fontSize: '16px' }}
+              >
+                <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
+                <span>
+                  {historyVisible ? (
+                    <>{t('governance.backToHistory')}</>
+                  ) : (
+                    <>{t('governance.backToList')}</>
+                  )}
+                </span>
+              </div>
+            </a>
+
+
+            <div className="top-proposal-container">
+      
+              <div className="item">
+                <div className="status">{processStatusTag(proposal?.status)}</div>
+              </div>
+            </div>
+          
+          
+          </>) : (
+            <>
+             <Header className="site-layout-background">{t('governance.title')}</Header>
+              <div id="governance-description" className="header-description">
+                {t('governance.description')}
+              </div>
+              <Button
+                id="create-proposal-btn"
+                type="primary"
+                onClick={() => {
+                form.validateFields(['initialDeposit']);
+                setModalType('create_proposal');
+                showPasswordInput();
+                }}
+              >
+                {t('governance.modal2.title')}
+              </Button>
+            </>
+          )}
         </>
       )}
       <Content>
@@ -713,15 +769,18 @@ const GovernancePage = () => {
                 style={{ textAlign: 'left' }}
               >
                 <Select placeholder={t('governance.modal2.form.input.proposalType.placeholder')}>
-                  {/* <Option key="parameter_change" value="parameter_change">
-                    Parameter Change
-                  </Option>
-                  <Option key="community_pool_spend" value="community_pool_spend">
-                    Community Pool Spend
-                  </Option> */}
+                  
                   <Option key="text_proposal" value="text_proposal">
-                    Text Proposal
+                    {t('governance.modal2.form.input.proposalType.choice1')}
                   </Option>
+                  {/* 
+                  <Option key="community_pool_spend" value="community_pool_spend">
+                    {t('governance.modal2.form.input.proposalType.choice2')}
+                  </Option>
+                  <Option key="parameter_change" value="parameter_change">
+                    {t('governance.modal2.form.input.proposalType.choice3')}
+                  </Option>
+                   */}
                 </Select>
               </Form.Item>
               <Form.Item
@@ -813,7 +872,14 @@ const GovernancePage = () => {
               isProposalVisible,
               setIsProposalVisible,
               historyVisible,
-              setModalType
+              modalType,
+              setModalType,
+              confirmLoading,
+              setConfirmLoading,
+              setLedgerIsExpertMode,
+              setErrorMessages,
+              setIsErrorModalVisible,
+              
             }}
           />
         ) : (
@@ -830,6 +896,7 @@ const GovernancePage = () => {
                 <TabPane tab={t('governance.tab1')} key="1">
                   <div className="site-layout-background governance-content">
                     <div className="container">
+                
                       <List
                         dataSource={proposalList}
                         renderItem={(item: ProposalModel) => (
@@ -871,6 +938,9 @@ const GovernancePage = () => {
                               }
                               description={
                                 <>
+                                  <div className="proposal-type">
+                                    {checkProposalType(item)}
+                                  </div>
 
                                   {((item.status === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? 
                                   (<span className="time-container">
@@ -879,14 +949,20 @@ const GovernancePage = () => {
                                       <span className="time-label">
                                       {' '}{t('governance.start')}:{' '}
                                       </span>
+                                      <span className="time">
                                       {moment(item.submit_time).format('DD/MM/YYYY')}
+                                      </span>
+                                      
                                     </span>
                                     {' '}{' - '}{' '}
                                     <span className="time-area">
                                       <span className="time-label">
                                       {t('governance.end')}:{' '}
                                       </span>
+                                      <span className="time">
                                       {moment(item.deposit_end_time).format('DD/MM/YYYY')}
+                                      </span>
+                                      
                                     </span>
                                   </span>)
                                     
@@ -897,14 +973,20 @@ const GovernancePage = () => {
                                       <span className="time-label">
                                       {' '}{t('governance.start')}:{' '}
                                       </span>
+                                      <span className="time">
                                       {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                      </span>
+                                      
                                     </span>
                                     {' '}{' - '}{' '}
                                     <span className="time-area">
                                       <span className="time-label">
                                       {t('governance.end')}:{' '}
                                       </span>
+                                      <span className="time">
                                       {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                      </span>
+                                      
                                     </span>
                                   </span>)
                                   )}
@@ -967,22 +1049,33 @@ const GovernancePage = () => {
                                 </>
                               }
                               description={
-                                <span className="time-container">
-                                    <FieldTimeOutlined />{' '}
-                                    <span className="time-area">
-                                      <span className="time-label">
-                                      {' '}{t('governance.start')}:{' '}
+                                <>
+                                  <div className="proposal-type">
+                                    {checkProposalType(item)}
+                                  </div>
+                                  <span className="time-container">
+                                      <FieldTimeOutlined />{' '}
+                                      <span className="time-area">
+                                        <span className="time-label">
+                                        {' '}{t('governance.start')}:{' '}
+                                        </span>
+                                        <span className="time">
+                                        {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                        </span>
+                                        
                                       </span>
-                                      {moment(item.voting_start_time).format('DD/MM/YYYY')}
-                                    </span>
-                                    {' '}{' - '}{' '}
-                                    <span className="time-area">
-                                      <span className="time-label">
-                                      {t('governance.end')}:{' '}
+                                      {' '}{' - '}{' '}
+                                      <span className="time-area">
+                                        <span className="time-label">
+                                        {t('governance.end')}:{' '}
+                                        </span>
+                                        <span className="time">
+                                        {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                        </span>
+                                        
                                       </span>
-                                      {moment(item.voting_end_time).format('DD/MM/YYYY')}
-                                    </span>
                                   </span>
+                                </>
                               }
                             />
                           </List.Item>
@@ -1020,22 +1113,33 @@ const GovernancePage = () => {
                                 </>
                               }
                               description={
-                                <span className="time-container">
-                                  <FieldTimeOutlined />{' '}
-                                  <span className="time-area">
-                                    <span className="time-label">
-                                    {' '}{t('governance.start')}:{' '}
+                                <>
+                                  <div className="proposal-type">
+                                    {checkProposalType(item)}
+                                  </div>
+                                  <span className="time-container">
+                                    <FieldTimeOutlined />{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {' '}{t('governance.start')}:{' '}
+                                      </span>
+                                      <span className="time">
+                                      {moment(item.submit_time).format('DD/MM/YYYY')}
+                                      </span>
+                                      
                                     </span>
-                                    {moment(item.submit_time).format('DD/MM/YYYY')}
-                                  </span>
-                                  {' '}{' - '}{' '}
-                                  <span className="time-area">
-                                    <span className="time-label">
-                                    {t('governance.end')}:{' '}
+                                    {' '}{' - '}{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {t('governance.end')}:{' '}
+                                      </span>
+                                      <span className="time">
+                                      {moment(item.deposit_end_time).format('DD/MM/YYYY')}
+                                      </span>
+                                      
                                     </span>
-                                    {moment(item.deposit_end_time).format('DD/MM/YYYY')}
                                   </span>
-                                </span>
+                                </>
                               }
                             />
                           </List.Item>
@@ -1076,22 +1180,36 @@ const GovernancePage = () => {
                                 </>
                               }
                               description={
+                                <>
+                                
+                                  <div className="proposal-type">
+                                    {checkProposalType(item)}
+                                  </div>
+                                
                                 <span className="time-container">
                                     <FieldTimeOutlined />{' '}
                                     <span className="time-area">
                                       <span className="time-label">
                                       {' '}{t('governance.start')}:{' '}
                                       </span>
+                                      <span className="time">
                                       {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                      </span>
+                                      
                                     </span>
                                     {' '}{' - '}{' '}
                                     <span className="time-area">
                                       <span className="time-label">
                                       {t('governance.end')}:{' '}
                                       </span>
+                                      <span className="time">
                                       {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                      </span>
+                                      
                                     </span>
                                   </span>
+                                  
+                                </>
                               }
                             />
                           </List.Item>
@@ -1128,22 +1246,36 @@ const GovernancePage = () => {
                                 </>
                               }
                               description={
+                                <>
+
+                                <div className="proposal-type">
+                                  {checkProposalType(item)}
+                                </div>
+
                                 <span className="time-container">
                                 <FieldTimeOutlined />{' '}
                                 <span className="time-area">
                                   <span className="time-label">
                                   {' '}{t('governance.start')}:{' '}
                                   </span>
-                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                  <span className="time">
+                                    {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                  </span>
+                                  
                                 </span>
                                 {' '}{' - '}{' '}
                                 <span className="time-area">
                                   <span className="time-label">
                                   {t('governance.end')}:{' '}
                                   </span>
+                                  <span className="time">
                                   {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                  </span>
+                                  
                                 </span>
                               </span>
+
+                              </>
                               }
                             />
                           </List.Item>
@@ -1180,22 +1312,38 @@ const GovernancePage = () => {
                                 </>
                               }
                               description={
-                                <span className="time-container">
-                                <FieldTimeOutlined />{' '}
-                                <span className="time-area">
-                                  <span className="time-label">
-                                  {' '}{t('governance.start')}:{' '}
+
+                                <>
+
+                                  <div className="proposal-type">
+                                      {checkProposalType(item)}
+                                  </div>
+
+
+                                  <span className="time-container">
+                                    <FieldTimeOutlined />{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {' '}{t('governance.start')}:{' '}
+                                      </span>
+                                      <span className="time">
+                                      {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                      </span>
+                                      
+                                    </span>
+                                    {' '}{' - '}{' '}
+                                    <span className="time-area">
+                                      <span className="time-label">
+                                      {t('governance.end')}:{' '}
+                                      </span>
+                                      <span className="time">
+                                      {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                      </span>
+                                      
+                                    </span>
                                   </span>
-                                  {moment(item.voting_start_time).format('DD/MM/YYYY')}
-                                </span>
-                                {' '}{' - '}{' '}
-                                <span className="time-area">
-                                  <span className="time-label">
-                                  {t('governance.end')}:{' '}
-                                  </span>
-                                  {moment(item.voting_end_time).format('DD/MM/YYYY')}
-                                </span>
-                              </span>
+
+                              </>
                               }
                             />
                           </List.Item>
@@ -1214,27 +1362,7 @@ const GovernancePage = () => {
       </Content>
       <Footer />
 
-      <PasswordFormModal
-        description={t('general.passwordFormModal.description')}
-        okButtonText={t('general.passwordFormModal.okButton')}
-        onCancel={() => {
-          setInputPasswordVisible(false);
-        }}
-        onSuccess={onWalletDecryptFinish}
-        onValidatePassword={async (password: string) => {
-          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
-          return {
-            valid: isValid,
-            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
-          };
-        }}
-        successText={t('general.passwordFormModal.success')}
-        title={t('general.passwordFormModal.title')}
-        visible={inputPasswordVisible}
-        successButtonText={t('general.continue')}
-        confirmPassword={false}
-      />
-
+      
       <ModalPopup
         isModalVisible={isConfirmationModalVisible}
         handleCancel={handleCancelConfirmationModal}
@@ -1317,6 +1445,29 @@ const GovernancePage = () => {
           </div>
         </>
       </ErrorModalPopup>
+
+
+      <PasswordFormModal
+        description={t('general.passwordFormModal.description')}
+        okButtonText={t('general.passwordFormModal.okButton')}
+        onCancel={() => {
+          setInputPasswordVisible(false);
+        }}
+        onSuccess={onWalletDecryptFinish}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+          return {
+            valid: isValid,
+            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
+          };
+        }}
+        successText={t('general.passwordFormModal.success')}
+        title={t('general.passwordFormModal.title')}
+        visible={inputPasswordVisible}
+        successButtonText={t('general.continue')}
+        confirmPassword={false}
+      />
+
     </Layout>
   );
 };
