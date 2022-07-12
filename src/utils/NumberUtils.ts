@@ -54,7 +54,7 @@ export const formatLargeNumber = (n: any): string => {
   if (n >= 1e6 && n < 1e9) return `${+(n / 1e6).toFixed(1)}M`;
   if (n >= 1e9 && n < 1e12) return `${+(n / 1e9).toFixed(1)}B`;
   if (n >= 1e12) return `${+(n / 1e12).toFixed(1)}T`;
-  return ``;
+  return '';
 };
 
 export function getUIVoteAmount(amount: string = '0', asset: UserAsset) {

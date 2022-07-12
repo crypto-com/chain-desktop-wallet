@@ -568,7 +568,7 @@ export class StorageService {
     walletId: string,
   ): Promise<NftAccountTransactionList> {
     const nftAccountTxRecords = await this.db.commonTransactionStore.find<
-      NftAccountTransactionRecord
+    NftAccountTransactionRecord
     >({
       walletId,
       txType: 'nftAccount',
@@ -611,7 +611,7 @@ export class StorageService {
   }
 
   public async retrieveAllProposals(chainId: string) {
-    return this.db.proposalStore.findOne<ProposalList>({ chainId });
+    return await this.db.proposalStore.findOne<ProposalList>({ chainId });
   }
 
   // eslint-disable-next-line
@@ -785,12 +785,11 @@ export class StorageService {
     chainName: string,
     assetSymbol: string,
   ) {
-    return this.db.addressBookStore
-      .find<AddressBookContactModel>({
-        walletId,
-        chainName,
-        assetSymbol,
-      })
+    return this.db.addressBookStore.find<AddressBookContactModel>({
+      walletId,
+      chainName,
+      assetSymbol,
+    })
       .exec();
   }
 

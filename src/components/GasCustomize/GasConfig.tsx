@@ -21,7 +21,7 @@ const GasConfig = (props: IGasStepProps) => {
 
   // Ethereum has a special select slow/average/fast
   if (props.asset.assetType === UserAssetType.EVM && props.asset.mainnetSymbol === 'ETH' || props.asset.assetType === UserAssetType.ERC_20_TOKEN) {
-    return <GasStepSelectEthereum {...props} asset={nativeAsset} />
+    return <GasStepSelectEthereum {...props} asset={nativeAsset} />;
   }
 
   if (asset.assetType === UserAssetType.EVM || asset.assetType === UserAssetType.CRC_20_TOKEN) {
@@ -29,7 +29,7 @@ const GasConfig = (props: IGasStepProps) => {
   }
 
 
-  return <React.Fragment />
+  return <React.Fragment />;
 };
 
 export default GasConfig;

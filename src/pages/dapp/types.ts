@@ -26,6 +26,7 @@ export namespace DappBrowserIPC {
     | 'requestAccounts'
     | 'signMessage'
     | 'signPersonalMessage'
+    | 'sendTransaction'
     | 'signTransaction'
     | 'signTypedMessage'
     | 'switchEthereumChain'
@@ -38,7 +39,7 @@ export namespace DappBrowserIPC {
     object: {};
   }
 
-  export interface SendTransactionEvent extends BaseEvent {
+  export interface SignTransactionEvent extends BaseEvent {
     name: 'signTransaction';
     object: {
       chainConfig: EVMChainConfig;
@@ -46,7 +47,22 @@ export namespace DappBrowserIPC {
       from: string;
       gas: number;
       gasPrice: string;
-      maxFeePerGas: ethers.BigNumber | null;
+      maxFeePerGas?: ethers.BigNumber | null;
+      maxPriorityFeePerGas?: ethers.BigNumber | null;
+      to: string;
+      value?: string;
+    };
+  }
+
+  export interface SendTransactionEvent extends BaseEvent {
+    name: 'sendTransaction';
+    object: {
+      chainConfig: EVMChainConfig;
+      data: string;
+      from: string;
+      gas: number;
+      gasPrice: string;
+      maxFeePerGas?: ethers.BigNumber | null;
       maxPriorityFeePerGas?: ethers.BigNumber | null;
       to: string;
       value?: string;
@@ -133,6 +149,7 @@ export namespace DappBrowserIPC {
   }
 
   export type Event =
+    | SignTransactionEvent
     | SendTransactionEvent
     | RequestAccountsEvent
     | SignPersonalMessageEvent

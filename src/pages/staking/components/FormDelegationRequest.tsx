@@ -341,8 +341,8 @@ export const FormDelegationRequest = props => {
             {scaledBalance(walletAsset)} {walletAsset?.symbol}{' '}
             {walletAsset && assetMarketData
               ? `(${localFiatSymbol}${numeral(
-                  getAssetBalancePrice(walletAsset, assetMarketData),
-                ).format('0,0.00')})`
+                getAssetBalancePrice(walletAsset, assetMarketData),
+              ).format('0,0.00')})`
               : ''}{' '}
           </div>
         </div>
@@ -408,21 +408,21 @@ export const FormDelegationRequest = props => {
                 {`${formValues?.amount} ${walletAsset?.symbol}`}{' '}
                 {walletAsset && assetMarketData && assetMarketData.price
                   ? `(${localFiatSymbol}${numeral(
-                      getAssetAmountInFiat(formValues?.amount, assetMarketData),
-                    ).format('0,0.00')})`
+                    getAssetAmountInFiat(formValues?.amount, assetMarketData),
+                  ).format('0,0.00')})`
                   : ''}
               </div>
             </div>
             {formValues?.memo !== undefined &&
             formValues?.memo !== null &&
             formValues.memo !== '' ? (
-              <div className="item">
-                <div className="label">{t('staking.modal1.label4')}</div>
-                <div>{`${formValues?.memo}`}</div>
-              </div>
-            ) : (
-              <div />
-            )}
+                <div className="item">
+                  <div className="label">{t('staking.modal1.label4')}</div>
+                  <div>{`${formValues?.memo}`}</div>
+                </div>
+              ) : (
+                <div />
+              )}
             {isValidatorAddressSuspicious(formValues.validatorAddress, moderationConfig) && (
               <Alert
                 message={
@@ -483,14 +483,14 @@ export const FormDelegationRequest = props => {
             {broadcastResult?.code !== undefined &&
             broadcastResult?.code !== null &&
             broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div className="description">
-                {t('general.successModalPopup.timeout.description')}
-              </div>
-            ) : (
-              <div className="description">
-                {t('general.successModalPopup.staking.description')}
-              </div>
-            )}
+                <div className="description">
+                  {t('general.successModalPopup.timeout.description')}
+                </div>
+              ) : (
+                <div className="description">
+                  {t('general.successModalPopup.staking.description')}
+                </div>
+              )}
             {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
           </>
         </SuccessModalPopup>

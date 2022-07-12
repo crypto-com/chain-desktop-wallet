@@ -5,7 +5,7 @@ import { GasInfoTendermint } from './Tendermint/GasConfig';
 import { useNativeAsset } from '../../hooks/useNativeAsset';
 
 interface GasInfoProps {
-  asset: UserAsset,
+  asset: UserAsset;
 }
 
 const GasInfo = (props: GasInfoProps) => {
@@ -14,15 +14,14 @@ const GasInfo = (props: GasInfoProps) => {
   const nativeAsset = useNativeAsset(asset);
 
   if (asset.assetType === UserAssetType.TENDERMINT || asset.assetType === UserAssetType.IBC) {
-    return <GasInfoTendermint />
+    return <GasInfoTendermint />;
   }
 
   if (asset.assetType === UserAssetType.EVM || asset.assetType === UserAssetType.CRC_20_TOKEN) {
-    return <GasInfoEVM asset={nativeAsset} />
+    return <GasInfoEVM asset={nativeAsset} />;
   }
 
-  return <React.Fragment />
-}
-
+  return <React.Fragment />;
+};
 
 export default GasInfo;

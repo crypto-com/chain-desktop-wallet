@@ -45,7 +45,7 @@ export interface EthereumGasStepInfo {
 // https://docs.ethgasstation.info/gas-price
 export async function fetchEthereumGasSteps() {
   const response = await axios.get<EthereumGasStepsInfoResponse>(
-    `https://ethgasstation.info/api/ethgasAPI.json`,
+    'https://ethgasstation.info/api/ethgasAPI.json',
   );
   return response.data;
 }

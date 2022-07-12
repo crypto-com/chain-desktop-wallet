@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Web3 from 'web3';
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
+import { HandlerDetails } from 'electron';
 import { DappBrowserIPC } from '../types';
 import {
   evmTransactionSigner,
@@ -11,12 +12,14 @@ import { EVMContractCallUnsigned } from '../../../service/signers/TransactionSup
 import { isHexEqual } from '../../../utils/utils';
 import { TransactionDataParser } from './TransactionDataParser';
 import { ErrorHandler, WebView } from './types';
-import { useRefCallback } from './useRefCallback';
 import { useChainConfigs } from './useChainConfigs';
 import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
 import { EVMChainConfig } from '../../../models/Chain';
 import { getGasPrice } from '../../../service/evm/gas';
 import { getNonce } from '../../../service/evm/nonce';
+import { useRefCallback } from '../../../hooks/useRefCallback';
+
+const remote = window.require('@electron/remote');
 
 export type ConfirmTransactionSuccessCallback = (info: {
   decryptedPhrase: string;
@@ -194,7 +197,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   const handleTokenApproval = useRefCallback(
     async (
       event: DappBrowserIPC.TokenApprovalEvent,
-      passphrase: string,
+      mnemonic: string,
       _gasPrice: BigNumber,
       _gasLimit: BigNumber,
     ) => {
@@ -214,10 +217,10 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         nonce: await getNonce(event.object.from, event.object.chainConfig),
       };
       try {
-        const result = await evmTransactionSigner.sendContractCallTransaction({
+        const result = await EvmTransactionSigner.sendContractCallTransaction({
           chainConfig: event.object.chainConfig,
           transaction,
-          phrase: passphrase,
+          mnemonic,
         });
 
         sendResponse(event.id, result);
@@ -232,7 +235,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   const handleSendTransaction = useRefCallback(
     async (
       event: DappBrowserIPC.SendTransactionEvent,
-      passphrase: string,
+      mnemonic: string,
       _gasPrice: BigNumber,
       _gasLimit: BigNumber,
     ) => {
@@ -249,10 +252,10 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       };
 
       try {
-        const result = await evmTransactionSigner.sendContractCallTransaction({
+        const result = await EvmTransactionSigner.sendContractCallTransaction({
           chainConfig: event.object.chainConfig,
           transaction,
-          phrase: passphrase,
+          mnemonic,
         });
         sendResponse(event.id, result);
         onFinishTransaction();
@@ -314,7 +317,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             },
           );
           break;
-        case 'signTransaction':
+        case 'sendTransaction':
           {
             // fill in gasData
             const gasObject = await getGasPrice(selectedChain, {
@@ -565,6 +568,15 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       if (process.env.NODE_ENV === 'development') {
         webview.openDevTools();
       }
+
+      const webContents = remote.webContents.fromId(webview.getWebContentsId());
+      webContents.setWindowOpenHandler((details: HandlerDetails) => {
+        if (details.url.startsWith('http:') || details.url.startsWith('https:')) {
+          webview.loadURL(details.url);
+          return { action: 'allow', overrideBrowserWindowOptions: { show: false } };
+        }
+        return { action: 'deny' };
+      });
     });
 
     updateChainConfig(selectedChain, true);

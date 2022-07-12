@@ -24,7 +24,7 @@ import Icon, {
   SettingOutlined,
   LockFilled,
 } from '@ant-design/icons';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -90,6 +90,9 @@ import {
 } from '../../service/bridge/BridgeConfig';
 import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
 import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
+import { walletConnectStateAtom } from '../../service/walletconnect/store';
+import { WalletConnectModal } from '../../pages/walletconnect/components/WalletConnectModal';
+import IconWalletConnect from '../../svg/IconWalletConnect';
 import IconCosmos from '../../svg/IconCosmos';
 
 // import i18n from '../../language/I18n';
@@ -864,6 +867,7 @@ function HomeLayout(props: HomeLayoutProps) {
       menuSelectedKey = '/home';
     }
 
+    const walletConnectState = useRecoilValue(walletConnectStateAtom);
     const homeMenuItemList = [
       {
         label: conditionalLink('/home', t('navbar.home')),
@@ -887,10 +891,10 @@ function HomeLayout(props: HomeLayoutProps) {
       },
       !isTestnet
         ? {
-            label: conditionalLink('/dapp', t('navbar.dapp')),
-            key: '/dapp',
-            icon: <Icon component={IconDApp} />,
-          }
+          label: conditionalLink('/dapp', t('navbar.dapp')),
+          key: '/dapp',
+          icon: <Icon component={IconDApp} />,
+        }
         : null,
       {
         label: conditionalLink('/governance', t('navbar.governance')),
@@ -908,6 +912,14 @@ function HomeLayout(props: HomeLayoutProps) {
         icon: <SettingOutlined />,
       },
     ];
+
+    if (walletConnectState.connected) {
+      homeMenuItemList.push({
+        label: conditionalLink('/walletconnect', 'WalletConnect'),
+        key: '/walletconnect',
+        icon: <Icon component={IconWalletConnect} />,
+      });
+    }
 
     return (
       <Menu
@@ -930,29 +942,29 @@ function HomeLayout(props: HomeLayoutProps) {
     const walletMenuItemList = [
       ...(walletList.length <= LedgerWalletMaximum
         ? [
-            {
-              label: conditionalLink('/restore', t('navbar.wallet.restore')),
-              key: 'restore-wallet-item',
-              className: 'restore-wallet-item',
-              icon: <ReloadOutlined style={{ color: '#1199fa' }} />,
-            },
-            {
-              label: conditionalLink('/create', t('navbar.wallet.create')),
-              key: 'create-wallet-item',
-              className: 'create-wallet-item',
-              icon: <PlusOutlined style={{ color: '#1199fa' }} />,
-            },
-          ]
+          {
+            label: conditionalLink('/restore', t('navbar.wallet.restore')),
+            key: 'restore-wallet-item',
+            className: 'restore-wallet-item',
+            icon: <ReloadOutlined style={{ color: '#1199fa' }} />,
+          },
+          {
+            label: conditionalLink('/create', t('navbar.wallet.create')),
+            key: 'create-wallet-item',
+            className: 'create-wallet-item',
+            icon: <PlusOutlined style={{ color: '#1199fa' }} />,
+          },
+        ]
         : []),
       ...(walletList.length > 1
         ? [
-            {
-              label: t('navbar.wallet.delete'),
-              key: 'delete-wallet-item',
-              className: 'delete-wallet-item',
-              icon: <DeleteOutlined style={{ color: '#f27474' }} />,
-            },
-          ]
+          {
+            label: t('navbar.wallet.delete'),
+            key: 'delete-wallet-item',
+            className: 'delete-wallet-item',
+            icon: <DeleteOutlined style={{ color: '#f27474' }} />,
+          },
+        ]
         : []),
       {
         label: conditionalLink('/wallet', t('navbar.wallet.list')),
@@ -1071,6 +1083,7 @@ function HomeLayout(props: HomeLayoutProps) {
       <Layout>
         <Sider className="home-sider">
           <div className="logo" />
+          <WalletConnectModal />
           <div className="version">DEFI DESKTOP WALLET v{buildVersion}</div>
           <HomeMenu />
           <Button

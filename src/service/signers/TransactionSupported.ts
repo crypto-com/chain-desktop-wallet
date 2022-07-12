@@ -37,7 +37,7 @@ export interface MsgSubmitProposalTransactionUnsigned extends TransactionUnsigne
 
 export interface TextProposalTransactionUnsigned
   extends TransactionUnsigned,
-    MsgSubmitProposalTransactionUnsigned {
+  MsgSubmitProposalTransactionUnsigned {
   params: TextProposalOptions;
 }
 

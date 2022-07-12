@@ -1,8 +1,8 @@
-import _ from "lodash";
-import { useMemo } from "react";
-import { useRecoilValue } from "recoil";
-import { UserAsset, UserAssetType } from "../models/UserAsset";
-import { walletAllAssetsState } from "../recoil/atom";
+import _ from 'lodash';
+import { useMemo } from 'react';
+import { useRecoilValue } from 'recoil';
+import { UserAsset, UserAssetType } from '../models/UserAsset';
+import { walletAllAssetsState } from '../recoil/atom';
 
 export const useNativeAsset = (asset: UserAsset) => {
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
@@ -25,9 +25,9 @@ export const useNativeAsset = (asset: UserAsset) => {
     }
 
 
-    return nativeAssets.find(a => a.assetType === UserAssetType.TENDERMINT && a.mainnetSymbol === 'CRO' )
+    return nativeAssets.find(a => a.assetType === UserAssetType.TENDERMINT && a.mainnetSymbol === 'CRO' );
   
   }, [nativeAssets, asset]);
 
   return nativeAsset!;
-}
+};

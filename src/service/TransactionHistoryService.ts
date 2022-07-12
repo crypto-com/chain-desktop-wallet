@@ -653,13 +653,16 @@ export class TransactionHistoryService {
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
         return Promise.resolve([]);
       }
+
       const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
-      return nodeRpc.loadProposals([
+      const loadedProposals = await nodeRpc.loadProposals([
         ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD,
         ProposalStatuses.PROPOSAL_STATUS_PASSED,
         ProposalStatuses.PROPOSAL_STATUS_FAILED,
         ProposalStatuses.PROPOSAL_STATUS_REJECTED,
       ]);
+
+      return loadedProposals;
     } catch (e) {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING PROPOSALS', e);

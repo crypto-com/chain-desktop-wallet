@@ -439,7 +439,7 @@ export class NodeRpcService implements INodeRpcService {
   public async loadProposalsPaginated(
     nextPage: string | null,
   ): Promise<[Proposal[], PaginationNextKey]> {
-    const baseUrl = `/cosmos/gov/v1beta1/proposals`;
+    const baseUrl = '/cosmos/gov/v1beta1/proposals';
     const url =
       nextPage === null ? baseUrl : `${baseUrl}?pagination.key=${encodeURIComponent(nextPage)}`;
     const response = await this.cosmosClient.get<AllProposalResponse>(url);

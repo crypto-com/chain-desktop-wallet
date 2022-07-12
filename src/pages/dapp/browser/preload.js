@@ -176,7 +176,7 @@ class IdMapping {
     this.intIds = new Map();
   }
 
-  tryIntifyId(payload) {
+  tryIdentifyId(payload) {
     if (!payload.id) {
       payload.id = Utils.genId();
       return;
@@ -326,7 +326,7 @@ class Web3Provider extends EventEmitter {
    * @private Internal rpc handler
    */
   requestInner(payload, wrapResult = true) {
-    this.idMapping.tryIntifyId(payload);
+    this.idMapping.tryIdentifyId(payload);
     if (this.isDebug) {
       console.log(`==> _request payload ${JSON.stringify(payload)}`);
     }
@@ -458,7 +458,7 @@ class Web3Provider extends EventEmitter {
   }
 
   eth_sendTransaction(payload) {
-    this.postMessage('signTransaction', payload.id, payload.params[0]);
+    this.postMessage('sendTransaction', payload.id, payload.params[0]);
   }
 
   eth_requestAccounts(payload) {

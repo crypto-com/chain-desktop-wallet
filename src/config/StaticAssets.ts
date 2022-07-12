@@ -29,7 +29,7 @@ export const TestNetEvmConfig: UserAssetConfig = {
   },
   explorerUrl: TESTNET_EVM_EXPLORER_URL,
   chainId: '338',
-  fee: { gasLimit: `50000`, networkFee: `20000000000` },
+  fee: { gasLimit: '50000', networkFee: '20000000000' },
   indexingUrl: 'https://cronos.org/explorer/testnet3/api',
   isLedgerSupportDisabled: false,
   isStakingDisabled: false,
@@ -44,7 +44,7 @@ export const MainNetEvmConfig: UserAssetConfig = {
   },
   explorerUrl: MAINNET_EVM_EXPLORER_URL,
   chainId: '25',
-  fee: { gasLimit: `50000`, networkFee: `20000000000` },
+  fee: { gasLimit: '50000', networkFee: '20000000000' },
   // indexingUrl sticks with https://cronos.org/explorer for now
   indexingUrl: 'https://cronos.org/explorer/api',
   isLedgerSupportDisabled: false,
@@ -204,7 +204,7 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
 
     chainId: isTestnet ? '4' : '1',
 
-    fee: { gasLimit: `50000`, networkFee: `20000000000` },
+    fee: { gasLimit: '50000', networkFee: '20000000000' },
     // TODO: Change this to the production indexing url
     indexingUrl: isTestnet
       ? 'https://eth-indexing.crypto.org/ethereum/rinkeby/api/v1'

@@ -373,7 +373,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       return userVoteHistory;
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.log('FAILED_LOADING_VOTE_HISTORY', e);
+      console.error('FAILED_LOADING_VOTE_HISTORY', e);
       return [];
     }
   }
@@ -445,7 +445,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   private async getValidatorDetails(validatorAddr: string) {
     const validatorList = await this.axiosClient.get<ValidatorListResponse>(
-      `validators?limit=1000000`,
+      'validators?limit=1000000',
     );
 
     if (validatorList.data.pagination.total_page > 1) {
@@ -467,7 +467,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   public async getValidatorsDetail(validatorAddrList: string[]) {
     const validatorList = await this.axiosClient.get<ValidatorListResponse>(
-      `validators?limit=1000000`,
+      'validators?limit=1000000',
     );
 
     if (validatorList.data.pagination.total_page > 1) {
@@ -485,7 +485,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   public async getValidatorsAverageApy(validatorAddrList: string[]) {
     const validatorList = await this.axiosClient.get<ValidatorListResponse>(
-      `validators?limit=1000000`,
+      'validators?limit=1000000',
     );
 
     if (validatorList.data.pagination.total_page > 1) {

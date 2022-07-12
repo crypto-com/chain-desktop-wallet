@@ -274,6 +274,16 @@ export function isAddressEqual(lhs: string, rhs: string) {
   return Web3.utils.toChecksumAddress(lhs) === Web3.utils.toChecksumAddress(rhs);
 }
 
+export function isLocalhostURL(str: string) {
+  try {
+    const url = new URL(str);
+    const validHostnames = ['localhost', '127.0.0.1'];
+    return validHostnames.includes(url.hostname);
+  } catch {
+    return false;
+  }
+}
+
 export function isValidURL(str: string) {
   const regex = new RegExp(
     '^(http[s]?:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?', // lgtm [js/redos]

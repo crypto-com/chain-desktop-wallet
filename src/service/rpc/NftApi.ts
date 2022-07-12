@@ -88,7 +88,7 @@ export class NftApi implements INftApi {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error(
-        `[getExternalNftMetadataByIdentifier] Querying external nft metadata failed.`,
+        '[getExternalNftMetadataByIdentifier] Querying external nft metadata failed.',
         error,
       );
       return [];

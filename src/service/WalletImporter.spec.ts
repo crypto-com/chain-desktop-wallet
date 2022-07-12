@@ -70,7 +70,7 @@ describe('Testing WalletImporter', () => {
       explorer: {},
       explorerUrl: '',
       enabled: true,
-      derivationPath: "44'/245'/0'/0/0",
+      derivationPath: '44\'/245\'/0\'/0/0',
       name: 'Pystaport-Custom-Network',
       analyticsDisabled: false,
       network: {
