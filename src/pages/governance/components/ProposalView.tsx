@@ -44,7 +44,7 @@ export const ProposalView = (props: any) => {
 
   const allProps = props?.props;
   const currentSession = useRecoilValue(sessionState);
-  const finalAmount = (checkIfTestnet(currentSession.wallet.config.network) ? '20,000' : '10,000');
+  const [finalAmount, setFinalAmount] = useState('10,000');
   const [proposalList, setProposalList] = useState<ProposalModel[]>();
   const [proposalStatus, setProposposalStatus] = useState(allProps?.proposal?.status);
 
@@ -135,35 +135,25 @@ export const ProposalView = (props: any) => {
     const { baseDenom } = currentSession.wallet.config.network.coin;
     allProps.setConfirmLoading(true);
 
-    if (!decryptedPhrase && walletType !== LEDGER_WALLET_TYPE) {
-      return;
-    }
-
-    console.log('submitProposalDeposit ', decryptedPhrase);  
-
     try{
       const proposalDeposit = await walletService.sendProposalDepositTx({
         proposalId: allProps?.proposal?.proposal_id,
         depositor: userAsset.address!,
-        amount: 
-        [
-          {
-            amount: getBaseScaledAmount(form?.getFieldValue('depositAmount'), userAsset),
-            denom: baseDenom,
-          },
-        ],
-
+        amount: [{
+          amount: getBaseScaledAmount(form?.getFieldValue('depositAmount'), userAsset),
+          denom: baseDenom,
+        }],
         decryptedPhrase,
         walletType,
       });
 
-
-      console.log('proposalDeposit ', proposalDeposit);  
-
-
-      allProps.setConfirmLoading(false);
-      // setDepositSuccessModalVisible(true);
-
+      if(proposalDeposit?.transactionHash){
+        await refreshProposal();
+        allProps.setConfirmLoading(false);
+        allProps.setIsVisibleConfirmationModal(false);
+        handleCancelDepositModal();
+        setDepositSuccessModalVisible(true);
+      }
     }catch(e){
       if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         allProps.setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
@@ -179,6 +169,24 @@ export const ProposalView = (props: any) => {
     allProps.setConfirmLoading(false);
   };
 
+  let fetchProposalList = async () => {
+    const list: ProposalModel[] = await walletService.retrieveProposals(
+      currentSession.wallet.config.network.chainId,
+    );
+
+    const latestProposalOnTop = list.reverse();
+    setProposalList(latestProposalOnTop);
+  };
+
+
+  const refreshProposal = async () => {
+    await allProps.refreshProposal();
+    setUserAsset(userAsset);
+
+    setProposposalStatus(allProps?.proposal?.status);
+    totalDeposit();
+    totalDepositPercentage()
+  };
 
   const showPasswordInput = () => {
     // TODO: check if decryptedPhrase expired
@@ -186,8 +194,6 @@ export const ProposalView = (props: any) => {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, userAsset!);
       }
-
-      submitProposalDeposit();
     } else {
       setInputPasswordVisible(true);
     }
@@ -202,23 +208,10 @@ export const ProposalView = (props: any) => {
     setDecryptedPhrase(phraseDecrypted);
     setInputPasswordVisible(false);
 
-    if (allProps.modalType === 'confirmation') {
-      allProps.showConfirmationModal();
-    }
-
-    if (allProps.modalType === 'create_proposal') {
-      allProps.setIsProposalModalVisible(true);
-    }
-
-    console.log('allProps.modalType ', allProps.modalType);
-
-    if (allProps.modalType === 'deposit') {
-      submitProposalDeposit();
-    }
   };
 
   useEffect(() => {
-    const fetchProposalList = async () => {
+    fetchProposalList = async () => {
       const list: ProposalModel[] = await walletService.retrieveProposals(
         currentSession.wallet.config.network.chainId,
       );
@@ -232,6 +225,8 @@ export const ProposalView = (props: any) => {
       didMountRef.current = true;
       analyticsService.logPage('Governance');
     }
+
+    setFinalAmount(checkIfTestnet(currentSession.wallet.config.network) ? '20,000' : '10,000');
 
     customMaxValidator = TransactionUtils.maxValidator(
       finalAmount.replace(',',''),
@@ -251,7 +246,7 @@ export const ProposalView = (props: any) => {
 
 
     // eslint-disable-next-line
-  }, [proposalList, setProposalList]);
+  }, [proposalList, setProposalList, finalAmount, setFinalAmount]);
 
   return (
     <div className="site-layout-background governance-content">
@@ -382,9 +377,6 @@ export const ProposalView = (props: any) => {
             </div>
           </Content>
 
-
-
-
           <Sider width={(proposalStatus  === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? "400px" : "300px"  } className={(proposalStatus  === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? "deposit-side" : "side"  } >
             <Spin
               spinning={allProps.isLoadingTally}
@@ -392,35 +384,42 @@ export const ProposalView = (props: any) => {
               tip="Loading latest results"
             >
 
+              {
+                console.log(allProps.proposal)
+              }
+
               {(proposalStatus  === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? (<>
-                <Card 
-                  title={numWithCommas(totalDepositValue).concat(' ').concat(userAsset?.symbol).concat(' ').concat(t('governance.proposalView.deposited.header')).concat(' ').concat(finalAmount).concat(' ').concat(userAsset?.symbol)}
-                  >
+                <Card>
+                    <div className="deposit-card-header">
+                      {numWithCommas(totalDepositValue).concat(' ')}{' '}{(userAsset?.symbol)}
+                      <span>
+                        {(' ').concat(t('governance.proposalView.deposited.header'))}
+                        {' '}{finalAmount}{' '}{userAsset?.symbol}
+                      </span>
+                    </div>
                   <Progress
-                  className="deposit-progress"
-                      percent={parseFloat(totalDepositPercentageValue)}
-                      showInfo={false}
-                      status="normal"
-                      strokeColor={{
-                        from: '#00A68C',
-                        to: '#00A68C',
-                      }}
-                    />
+                    className="deposit-progress"
+                    percent={parseFloat(totalDepositPercentageValue)}
+                    showInfo={false}
+                    status="normal"
+                    strokeColor={{
+                      from: '#00A68C',
+                      to: '#00A68C',
+                    }}
+                  />
                     <div className="progress-info">
                       <span className="left">
-                        {totalDepositPercentageValue}%{' '}{t('governance.proposalView.deposited.cro')}{' '}{finalAmount}{' '}{userAsset?.symbol} 
+                        {totalDepositPercentageValue}%{' '}{t('governance.proposalView.deposited.cro')}
+                        {' '}{finalAmount}{' '}{userAsset?.symbol} 
                       </span>
                       <span className="right">
                         {(remainingDays())}{' '}{t('governance.proposalView.deposited.days')}
                       </span>
                     </div>
 
-
-
                     <Button className="submit-proposal-btn" type="primary" disabled={!allProps.voteOption} onClick={() => setDepositModalVisible(true)}>
                       {t('governance.proposalView.modal3.depositBtn')}
                     </Button>
-
                 </Card>
               
               </>) : (
@@ -498,8 +497,12 @@ export const ProposalView = (props: any) => {
           isModalVisible={isDepositModalVisible}
           handleCancel={handleCancelDepositModal}
           handleOk={() => {
+            allProps.setModalType('deposit');
             setDepositModalVisible(false);
             setConfirmDepositModalVisible(true);
+            setTimeout(() => {
+              showPasswordInput();
+            }, 200);
           }}
           closable={!allProps.confirmLoading}
           confirmationLoading={allProps.confirmLoading}
@@ -509,8 +512,12 @@ export const ProposalView = (props: any) => {
               type="primary"
               loading={allProps.confirmLoading}
               onClick={() => {
+                allProps.setModalType('deposit');
                 setDepositModalVisible(false);
                 setConfirmDepositModalVisible(true);
+                setTimeout(() => {
+                  showPasswordInput();
+                }, 200);
               }}
               disabled={
                 !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
@@ -560,8 +567,7 @@ export const ProposalView = (props: any) => {
                   addonAfter={userAsset.symbol}
                 />
               </Form.Item>
-              <div className="note">{t('governance.modal2.form.proposalDeposit.warning')}</div>
-
+     
               <div className="avail-bal-container">
                 <div className="avail-bal-txt">{t('governance.modal2.form.balance')}</div>
                 <div className="avail-bal-val">
@@ -576,15 +582,11 @@ export const ProposalView = (props: any) => {
 
         {/* DEPOSIT IN PROPOSAL MODAL */}
         <ModalPopup
-        className="deposit-proposal-modal"
+          className="deposit-proposal-modal"
           isModalVisible={confirmDepositModalVisible}
           handleCancel={handleCancelDepositModal}
           handleOk={() => { 
-            allProps.setModalType('deposit');
-         
-            setTimeout(() => {
-              showPasswordInput();
-            }, 200);
+           submitProposalDeposit();
           }}
           closable={!allProps.confirmLoading}
           confirmationLoading={allProps.confirmLoading}
@@ -594,11 +596,7 @@ export const ProposalView = (props: any) => {
               type="primary"
               loading={allProps.confirmLoading}
               onClick={() => {
-                allProps.setModalType('deposit');
-                
-                setTimeout(() => {
-                  showPasswordInput();
-                }, 200);
+                submitProposalDeposit();
               }}
               disabled={
                 !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
@@ -613,40 +611,35 @@ export const ProposalView = (props: any) => {
           okText={t('general.confirm')}
         >
           <>
-
-          <div className="title">{t('governance.proposalView.modal4.header')}</div>
-          <div className="description">
-            {t('governance.proposalView.modal4.description')}
+            <div className="title">{t('governance.proposalView.modal4.header')}</div>
+            <div className="description">
+              {t('governance.proposalView.modal4.description')}
             </div>
-
-
-          <div className="row">
-              <div className="field">{t('home.transactions.table1.fromAddress')} </div>
-              <div className="value">
-                <a
-                  data-original={userAsset.address}
-                  target="_blank"
-                  rel="noreferrer"
-                  href={`${renderExplorerUrl(
-                    currentSession.activeAsset?.config ?? currentSession.wallet.config,
-                    'address',
-                  )}/${userAsset.address}`}
-                >
-                  {userAsset.address}
-                </a>
-              </div>
-            </div>
-
             <div className="row">
-              <div className="field">{t('governance.proposalView.modal4.amountLabel')} </div>
-              <div className="value">
-                {numWithCommas(form?.getFieldValue('depositAmount'))}{' '}{currentSession.wallet.config.network.coin.croDenom.toUpperCase()}
+                <div className="field">{t('home.transactions.table1.fromAddress')} </div>
+                <div className="value">
+                  <a
+                    data-original={userAsset.address}
+                    target="_blank"
+                    rel="noreferrer"
+                    href={`${renderExplorerUrl(
+                      currentSession.activeAsset?.config ?? currentSession.wallet.config,
+                      'address',
+                    )}/${userAsset.address}`}
+                  >
+                    {userAsset.address}
+                  </a>
+                </div>
               </div>
-            </div>
-          
-            <GasInfoTendermint />
-          
-          </>
+
+              <div className="row">
+                <div className="field">{t('governance.proposalView.modal4.amountLabel')} </div>
+                <div className="value">
+                  {numWithCommas(form?.getFieldValue('depositAmount'))}{' '}{currentSession.wallet.config.network.coin.croDenom.toUpperCase()}
+                </div>
+              </div>
+              <GasInfoTendermint />
+            </>
         </ModalPopup>
 
 
@@ -669,8 +662,6 @@ export const ProposalView = (props: any) => {
             </div>
           </div>
         </SuccessModalPopup>
-
-
 
         <PasswordFormModal
           description={t('general.passwordFormModal.description')}

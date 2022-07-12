@@ -348,10 +348,11 @@
 }
 
 .top-proposal-container{
-  position: relative;
-  // display: block;
-  // width: 100%;
+  position: absolute;
   padding: 0 38px;
+  float: right;
+  right: 0;
+  top: 88px;
 
   .title{
     font-size: 15px;
@@ -422,6 +423,8 @@
   width: 48%;
   margin: 20px 1%;
   font-size: 15px;
+
+  min-width: 172px;
   .txt{
     color: #888;
     letter-spacing: -0.1px;
@@ -474,4 +477,30 @@
   text-transform: uppercase;
   font-size: 10px;
   font-weight: 700;
+}
+
+
+.deposit-card-header{
+  position: relative;
+  display: block;
+  width: 100%;
+  font-size: 18px;
+  padding: 0 ;
+  margin-bottom: 12px;
+
+  span{
+    font-size: 13px !important;
+    color: #777;
+  }
+}
+
+
+@media screen and (max-width: 1200px) {
+  .date-container{
+    display: block;
+
+    .info-area{
+      display: block;
+    }
+  }
 }

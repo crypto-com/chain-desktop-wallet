@@ -544,16 +544,39 @@ const GovernancePage = () => {
   };
 
 
+  let fetchProposalList = async () => {
+    const list: ProposalModel[] = await walletService.retrieveProposals(
+      currentSession.wallet.config.network.chainId,
+    );
+
+    const latestProposalOnTop = list.reverse();
+    setProposalList(latestProposalOnTop);
+  };
+
+
+  const refreshProposal = async () => {
+    await fetchProposalList();
+    const currentProposalId = proposal?.proposal_id;
+    const currentProposal = proposalList?.filter((item) => {
+      return item.proposal_id === currentProposalId
+    })[0];
+
+    setIsProposalVisible(false);
+    setProposal(currentProposal);
+    processProposalFigures(currentProposal!);
+  };
+
   useEffect(() => {
-    const fetchProposalList = async () => {
+
+    fetchProposalList = async () => {
       const list: ProposalModel[] = await walletService.retrieveProposals(
         currentSession.wallet.config.network.chainId,
       );
-
+  
       const latestProposalOnTop = list.reverse();
       setProposalList(latestProposalOnTop);
     };
-
+    
     const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
     const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
 
@@ -936,7 +959,7 @@ const GovernancePage = () => {
               setLedgerIsExpertMode,
               setErrorMessages,
               setIsErrorModalVisible,
-              
+              refreshProposal
             }}
           />
         ) : (
@@ -978,10 +1001,6 @@ const GovernancePage = () => {
                                   <div className="proposal-type">
                                     {checkProposalType(item)}
                                   </div>
-
-
-                                  
-
                                   {((item.status === ProposalStatuses.PROPOSAL_STATUS_DEPOSIT_PERIOD) ? 
                                   (<span className="time-container">
                                     <FieldTimeOutlined />{' '}

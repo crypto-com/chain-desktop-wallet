@@ -144,8 +144,6 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
       proposalId: Big(transaction.proposalId),
     });
 
-    console.log('signProposalDepositTransaction ', keyPair, phrase);
-
     return this.getSignedMessageTransaction([msgDeposit], transaction, keyPair, rawTx);
   }
 

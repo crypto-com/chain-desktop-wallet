@@ -639,7 +639,7 @@
   "governance.proposalView.modal4.header": "Confirm Deposit",
   "governance.proposalView.modal4.description": "Please review the below information",
   "governance.proposalView.successModal.message": "Your transaction is broadcasted successfully",
-  "governance.proposalView.deposited.header": " deposited of 10,000",
+  "governance.proposalView.deposited.header": " deposited of ",
   "governance.proposalView.deposited.days": "days left",
   "governance.proposalView.deposited.cro": "of",
   "nft.title": "My NFT",
