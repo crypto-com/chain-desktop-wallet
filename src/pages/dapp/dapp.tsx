@@ -9,6 +9,8 @@ import { Dapp } from './types';
 import BorderlessCard from './components/BorderlessCard/BorderlessCard';
 import logoVvs from './assets/vvs.svg';
 import logoTectonic from './assets/tectonic.svg';
+import logoFerroProtocol from './assets/Ferro_Protocol.png';
+
 import AddressBar from './components/AddressBar/AddressBar';
 import SavedTab from './components/Tabs/SavedTab';
 import { isLocalhostURL, isValidURL } from '../../utils/utils';
@@ -23,6 +25,14 @@ const { Header, Content } = Layout;
 const { TabPane } = Tabs;
 
 const DappList: Dapp[] = [
+  {
+    name: 'Ferro Protocol',
+    logo: logoFerroProtocol,
+    alt: '',
+    description:
+      'Optimized to bring you the best rates to trade your stablecoins and pegged assets.',
+    url: 'https://ferroprotocol.com/#/',
+  },
   {
     name: 'VVS Finance',
     logo: logoVvs,
