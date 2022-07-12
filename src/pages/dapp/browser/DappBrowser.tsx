@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { WebviewTag } from 'electron';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import Web3 from 'web3';
@@ -51,7 +50,7 @@ export interface DappBrowserRef {
 
 const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBrowserProps, ref) => {
   const { dapp, dappURL, onStateChange, onURLChanged } = props;
-  const webviewRef = useRef<WebviewTag & HTMLWebViewElement>(null);
+  const webviewRef = useRef<Electron.WebviewTag & HTMLWebViewElement>(null);
   const [t] = useTranslation();
   const [allAssets, setAllAssets] = useRecoilState(walletAllAssetsState);
   const allMarketData = useRecoilValue(allMarketState);
@@ -418,6 +417,8 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
       <webview
         preload={ProviderPreloadScriptPath}
         ref={webviewRef}
+        allowpopups={'true' as any}
+        webpreferences="contextIsolation=false, nodeIntegration=false, javascript=yes, allowpopup=yes"
         useragent={window.navigator.userAgent.replace(
           'chain-desktop-wallet',
           'Desktop Wallet Build',

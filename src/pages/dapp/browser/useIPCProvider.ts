@@ -2,6 +2,10 @@ import { useCallback, useEffect, useState } from 'react';
 import Web3 from 'web3';
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
+import { HandlerDetails } from 'electron';
+import { TransactionPrepareService } from '../../../service/TransactionPrepareService';
+import { walletService } from '../../../service/WalletService';
+import { ChainConfig } from './config';
 import { DappBrowserIPC } from '../types';
 import {
   evmTransactionSigner,
@@ -17,6 +21,8 @@ import { EVMChainConfig } from '../../../models/Chain';
 import { getGasPrice } from '../../../service/evm/gas';
 import { getNonce } from '../../../service/evm/nonce';
 import { useRefCallback } from '../../../hooks/useRefCallback';
+
+const remote = window.require('@electron/remote');
 
 export type ConfirmTransactionSuccessCallback = (info: {
   decryptedPhrase: string;
@@ -565,6 +571,15 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       if (process.env.NODE_ENV === 'development') {
         webview.openDevTools();
       }
+
+      const webContents = remote.webContents.fromId(webview.getWebContentsId());
+      webContents.setWindowOpenHandler((details: HandlerDetails) => {
+        if (details.url.startsWith('http:') || details.url.startsWith('https:')) {
+          webview.loadURL(details.url);
+          return { action: 'allow', overrideBrowserWindowOptions: { show: false } };
+        }
+        return { action: 'deny' };
+      });
     });
 
     updateChainConfig(selectedChain, true);

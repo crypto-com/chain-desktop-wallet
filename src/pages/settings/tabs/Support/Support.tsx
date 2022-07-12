@@ -12,7 +12,7 @@ const Support = () => {
           <div className="title">{t('settings.support.helpCenter.title')}</div>
           <div className="description">{t('settings.support.helpCenter.description')}</div>
           <a
-            href="https://help.crypto.com/en/collections/2221157-crypto-com-defi-wallet"
+            href="https://help.crypto.com/en/collections/2221157-crypto-com-defi-wallet#crypto-com-defi-desktop-wallet"
             target="_blank"
             rel="noreferrer"
           >

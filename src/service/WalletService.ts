@@ -635,6 +635,24 @@ class WalletService {
     return this.txHistoryManager.fetchCRC721TokenTxs();
   }
 
+  public async fetchAccountVotingHistory(user_address: string) {
+    const currentSession = await this.storageService.retrieveCurrentSession();
+    if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+      return Promise.resolve(null);
+    }
+
+    try {
+      const chainIndexAPI = ChainIndexingAPI.init(currentSession.wallet.config.indexingUrl);
+      const votingHistory = await chainIndexAPI.fetchAccountVotingHistory(user_address);
+
+      return votingHistory;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_LOADING Account Voting History data', e);
+      return null;
+    }
+  }
+
   public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {
     const currentSession = await this.storageService.retrieveCurrentSession();
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {

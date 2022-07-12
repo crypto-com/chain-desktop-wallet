@@ -9,9 +9,11 @@ import { Dapp } from './types';
 import BorderlessCard from './components/BorderlessCard/BorderlessCard';
 import logoVvs from './assets/vvs.svg';
 import logoTectonic from './assets/tectonic.svg';
+import logoFerroProtocol from './assets/Ferro_Protocol.png';
+
 import AddressBar from './components/AddressBar/AddressBar';
 import SavedTab from './components/Tabs/SavedTab';
-import { isValidURL } from '../../utils/utils';
+import { isLocalhostURL, isValidURL } from '../../utils/utils';
 import { IWebviewNavigationState, WebviewState } from './browser/useWebviewStatusInfo';
 import { useBookmark } from './hooks/useBookmark';
 import { useShowDisclaimer } from './hooks/useShowDisclaimer';
@@ -24,6 +26,14 @@ const { Header, Content } = Layout;
 const { TabPane } = Tabs;
 
 const DappList: Dapp[] = [
+  {
+    name: 'Ferro Protocol',
+    logo: logoFerroProtocol,
+    alt: '',
+    description:
+      'Optimized to bring you the best rates to trade your stablecoins and pegged assets.',
+    url: 'https://ferroprotocol.com/#/',
+  },
   {
     name: 'VVS Finance',
     logo: logoVvs,
@@ -183,12 +193,12 @@ const DappPage = () => {
         onSearch={value => {
           setSelectedDapp(undefined);
           // detect whether it's a domain
-          if (isValidURL(value)) {
+          if (isValidURL(value) || isLocalhostURL(value)) {
             // jump to website
             setSelectedURL(value);
           } else {
             // google search
-            setSelectedURL(`https://www.bing.com/search?q=${value}`);
+            setSelectedURL(`https://www.google.com/search?q=${value}`);
           }
         }}
       />

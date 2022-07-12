@@ -1,11 +1,11 @@
 import { Session } from '../../models/Session';
 
-const electron = window.require('electron');
+const remote = window.require('@electron/remote');
 
 // Load all analytics functions from the main electron process
-const transactionEvent = electron.remote.getGlobal('transactionEvent');
-const actionEvent = electron.remote.getGlobal('actionEvent');
-const pageView = electron.remote.getGlobal('pageView');
+const transactionEvent = remote.getGlobal('transactionEvent');
+const actionEvent = remote.getGlobal('actionEvent');
+const pageView = remote.getGlobal('pageView');
 
 export enum AnalyticsTxType {
   TransferTransaction = 'TransferTransaction',

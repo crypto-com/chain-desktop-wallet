@@ -373,7 +373,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
       return userVoteHistory;
     } catch (e) {
       // eslint-disable-next-line no-console
-      console.log('FAILED_LOADING_VOTE_HISTORY', e);
+      console.error('FAILED_LOADING_VOTE_HISTORY', e);
       return [];
     }
   }

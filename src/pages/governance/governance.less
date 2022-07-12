@@ -1,8 +1,8 @@
 .governance-content {
   position: relative;
   padding: 24px;
+
   .container {
-    // max-width: 500px;
     .description {
       margin-bottom: 20px;
       color: @font-color;
@@ -26,7 +26,6 @@
     }
     .ant-btn {
       width: 100%;
-      // max-width: 190px;
       margin: 24px 0 -24px 0;
     }
     .row {
@@ -48,6 +47,16 @@
   .back-button {
     margin: 24px 0;
   }
+}
+
+#create-proposal-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 5;
+  display: inline-block;
+  width: 180px;
+  margin-top: 85px;
 }
 
 .ant-layout-content .proposal-detail {
@@ -111,6 +120,50 @@
     }
     .ant-radio-button-wrapper-checked {
       border: 1px solid @azure;
+    }
+  }
+}
+
+#voting-history-section {
+  #votingHistoryBtn {
+    position: relative;
+  }
+
+  .voting-history-title {
+    margin: 0;
+  }
+
+  .header-description {
+    margin-bottom: 32px;
+  }
+
+  .proposalTitle {
+    font-size: 14px;
+  }
+
+  .proposalNo {
+    margin-right: 6px;
+    font-size: 14px;
+  }
+
+  .ant-table {
+    .ant-table-thead > tr > th {
+      padding: 24px 20px;
+      color: #626973;
+    }
+
+    td.ant-table-column-sort,
+    .ant-table-thead th.ant-table-column-sort {
+      background-color: #fff;
+    }
+
+    .ant-table-tbody .ant-table-cell {
+      padding: 24px 20px;
+
+      .ant-btn:not(.ant-upload-list-item-card-actions-btn) {
+        margin: 0;
+        padding: 0;
+      }
     }
   }
 }

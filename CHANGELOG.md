@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.1.0] - 2022-07-11
+### Additions
+- View Governance Voting History
+- Allow DApp Browser localhost access for development use
+- Security enhancement with Electron package bump
+- Update Cronos DApps list
+### Bug fixes
+- Google search engine in URL search bar
 ## [v1.0.0] - 2022-06-21
 ### Additions
 - Batch restake rewards
