@@ -6,6 +6,7 @@ import './index.less';
 
 const { Option } = Select;
 
+
 const ChainSelect = () => {
   const { list: chainConfigs, selectedChain, setSelectedChain } = useChainConfigs();
 

@@ -43,7 +43,7 @@ export function MetaInfoComponent() {
   const [defaultGAStateDisabled, setDefaultGAStateDisabled] = useState<boolean>(false);
   const [defaultAutoUpdateDisabled, setDefaultAutoUpdateDisabled] = useState<boolean>(false);
   const [defaultAutoUpdateExpireTime, setDefaultAutoUpdateExpireTime] = useState<
-    number | undefined
+  number | undefined
   >();
   const [autoUpdateDisableDuration, setAutoUpdateDisableDuration] = useState<number>(14);
   const [supportedCurrencies, setSupportedCurrencies] = useState<SupportedCurrency[]>([]);
@@ -52,7 +52,7 @@ export function MetaInfoComponent() {
   const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState<string>();
   const [isExportRecoveryPhraseModalVisible, setIsExportRecoveryPhraseModalVisible] = useState<
-    boolean
+  boolean
   >(false);
   const [currentSlide, setCurrentSlide] = useState(0);
 

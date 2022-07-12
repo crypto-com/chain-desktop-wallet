@@ -678,15 +678,15 @@ const CronosBridge = props => {
                       ),
                     ),
                   ).gt(0) ? (
-                    <></>
-                  ) : (
-                    <Layout>
-                      <Sider width="20px">
-                        <ExclamationCircleOutlined style={{ color: '#f27474' }} />
-                      </Sider>
-                      <Content>{t('bridge.step1.notice1')}</Content>
-                    </Layout>
-                  )}
+                      <></>
+                    ) : (
+                      <Layout>
+                        <Sider width="20px">
+                          <ExclamationCircleOutlined style={{ color: '#f27474' }} />
+                        </Sider>
+                        <Content>{t('bridge.step1.notice1')}</Content>
+                      </Layout>
+                    )}
                 </div>
               </div>
             </div>
@@ -915,49 +915,49 @@ const CronosBridge = props => {
               >
                 {bridgeConfigFields.includes('prefix') &&
                 bridgeTransferDirection !== BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG ? (
-                  <Form.Item
-                    name="prefix"
-                    label={t('bridge.config.prefix.title')}
-                    rules={[
-                      {
-                        required: true,
-                        message: `${t('bridge.config.prefix.title')} ${t('general.required')}`,
-                      },
-                      {
-                        pattern: isTestnet ? /^[a-z]{4}$/ : /^[a-z]{3}$/,
-                        message: t('bridge.config.prefix.validation', {
-                          number: isTestnet ? '4' : '3',
-                        }),
-                      },
-                    ]}
-                    style={{ textAlign: 'left' }}
-                  >
-                    <Input />
-                  </Form.Item>
-                ) : (
-                  <></>
-                )}
+                    <Form.Item
+                      name="prefix"
+                      label={t('bridge.config.prefix.title')}
+                      rules={[
+                        {
+                          required: true,
+                          message: `${t('bridge.config.prefix.title')} ${t('general.required')}`,
+                        },
+                        {
+                          pattern: isTestnet ? /^[a-z]{4}$/ : /^[a-z]{3}$/,
+                          message: t('bridge.config.prefix.validation', {
+                            number: isTestnet ? '4' : '3',
+                          }),
+                        },
+                      ]}
+                      style={{ textAlign: 'left' }}
+                    >
+                      <Input />
+                    </Form.Item>
+                  ) : (
+                    <></>
+                  )}
                 {bridgeConfigFields.includes('cronosBridgeContractAddress') &&
                 bridgeConfigs?.cronosBridgeContractAddress !== '' ? (
-                  <Form.Item
-                    name="cronosBridgeContractAddress"
-                    label={t('bridge.config.address.title')}
-                    rules={[
-                      {
-                        required: true,
-                        message: `${t('bridge.config.address.validation')} ${t(
-                          'general.required',
-                        )}`,
-                      },
-                      customEvmAddressValidator,
-                    ]}
-                    style={{ textAlign: 'left' }}
-                  >
-                    <Input />
-                  </Form.Item>
-                ) : (
-                  <></>
-                )}
+                    <Form.Item
+                      name="cronosBridgeContractAddress"
+                      label={t('bridge.config.address.title')}
+                      rules={[
+                        {
+                          required: true,
+                          message: `${t('bridge.config.address.validation')} ${t(
+                            'general.required',
+                          )}`,
+                        },
+                        customEvmAddressValidator,
+                      ]}
+                      style={{ textAlign: 'left' }}
+                    >
+                      <Input />
+                    </Form.Item>
+                  ) : (
+                    <></>
+                  )}
                 {bridgeConfigFields.includes('bridgeChannel') ? (
                   <Form.Item
                     name="bridgeChannel"
@@ -1017,22 +1017,22 @@ const CronosBridge = props => {
                 )} */}
                 {bridgeConfigFields.includes('gasLimit') &&
                 form.getFieldValue('bridgeFrom') === 'CRONOS' ? (
-                  <Form.Item
-                    name="gasLimit"
-                    label={t('bridge.config.gasLimit.title')}
-                    rules={[
-                      {
-                        required: true,
-                        message: `${t('bridge.config.gasLimit.title')} ${t('general.required')}`,
-                      },
-                    ]}
-                    style={{ textAlign: 'left' }}
-                  >
-                    <InputNumber />
-                  </Form.Item>
-                ) : (
-                  <></>
-                )}
+                    <Form.Item
+                      name="gasLimit"
+                      label={t('bridge.config.gasLimit.title')}
+                      rules={[
+                        {
+                          required: true,
+                          message: `${t('bridge.config.gasLimit.title')} ${t('general.required')}`,
+                        },
+                      ]}
+                      style={{ textAlign: 'left' }}
+                    >
+                      <InputNumber />
+                    </Form.Item>
+                  ) : (
+                    <></>
+                  )}
                 <Form.Item>
                   <Button key="submit" type="primary" htmlType="submit" loading={confirmLoading}>
                     {t('general.save')}

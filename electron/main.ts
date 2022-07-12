@@ -1,13 +1,14 @@
-import { app, BrowserWindow, nativeImage, Menu, ipcMain } from 'electron';
+import { app, BrowserWindow, nativeImage, ipcMain } from 'electron';
 
 import * as path from 'path';
 
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import { IpcMain } from './IpcMain';
-import { autoUpdater } from "electron-updater";
-import log from "electron-log";
-import Big from "big.js";
-import Store from "electron-store";
+import { autoUpdater } from 'electron-updater';
+import log from 'electron-log';
+import Big from 'big.js';
+import Store from 'electron-store';
+import { APP_PROTOCOL_NAME } from '../src/config/StaticConfig';
 
 import { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } from './UsageAnalytics';
 
@@ -24,9 +25,36 @@ const isDev = process.env.NODE_ENV === 'development'; // change true, in develop
 const store = new Store();
 
 // Updater log setup
-log.transports.file.level = "debug"
-autoUpdater.logger = log
+log.transports.file.level = 'debug';
+autoUpdater.logger = log;
 log.info('App starting...');
+
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient(APP_PROTOCOL_NAME, process.execPath, [path.resolve(process.argv[1])]);
+  }
+} else {
+  app.setAsDefaultProtocolClient(APP_PROTOCOL_NAME);
+}
+
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+  app.quit();
+}
+
+app.on('second-instance', (event, commandLine, workingDirectory) => {
+  // Someone tried to run a second instance, we should focus our window.
+  if (win) {
+    if (win.isMinimized()) win.restore();
+    win.focus();
+  }
+});
+
+app.on('open-url', (event, url) => {
+  win?.webContents.send('open-url', url);
+});
+
 
 function sendStatusToWindow(text: string) {
   log.info(text);
@@ -35,11 +63,11 @@ function sendStatusToWindow(text: string) {
 
 autoUpdater.on('checking-for-update', () => {
   sendStatusToWindow('Checking for update...');
-})
+});
 
 autoUpdater.on('error', (err) => {
   sendStatusToWindow(`Error in auto-updater. ${err}`);
-})
+});
 
 autoUpdater.on('update-available', (info) => {
   sendStatusToWindow('update_available');
@@ -50,12 +78,12 @@ autoUpdater.on('update-downloaded', (info) => {
 });
 
 autoUpdater.on('download-progress', (progressObj) => {
-  let log_message = "Download speed: " + progressObj.bytesPerSecond;
+  let log_message = 'Download speed: ' + progressObj.bytesPerSecond;
   log_message = `${log_message} - Downloaded ${Big(progressObj.percent).toFixed(2)}%`;
   log_message = `${log_message} (${progressObj.transferred}/${progressObj.total})`;
 
   sendStatusToWindow(log_message);
-})
+});
 
 function createWindow() {
   const iconPath = path.join(__dirname, '/public/icon.png').replace(/\\/g, '\\\\');
@@ -122,11 +150,11 @@ function createWindow() {
     win.webContents.openDevTools();
   }
 
-  actionEvent('App', 'Open', 'AppOpened', 0)
+  actionEvent('App', 'Open', 'AppOpened', 0);
 }
 
 app.on('window-all-closed', () => {
-  actionEvent('App', 'Close', 'AppClosed', 0)
+  actionEvent('App', 'Close', 'AppClosed', 0);
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -141,7 +169,7 @@ app.on('activate', async () => {
 });
 
 app.on('ready', async function () {
-  app.allowRendererProcessReuse = false
+  app.allowRendererProcessReuse = false;
   createWindow();
 
   await new Promise(resolve => setTimeout(resolve, 20_000));
@@ -171,6 +199,6 @@ ipcMain.on('auto_updater_restart_app', () => {
 ipcMain.on('restart_app', () => {
   app.relaunch();
   app.exit(0);
-})
+});
 
 

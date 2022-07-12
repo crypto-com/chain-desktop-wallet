@@ -796,22 +796,22 @@ const FormMintNft = () => {
               {new Big(multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1)).gt(
                 walletAsset.balance,
               ) ? (
-                <div className="item notice">
-                  <Layout>
-                    <Sider width="20px">
-                      <ExclamationCircleOutlined style={{ color: '#f27474' }} />
-                    </Sider>
-                    <Content>
-                      {`${t('nft.modal1.notice2')} ${getUINormalScaleAmount(
-                        multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1),
-                        walletAsset.decimals,
-                      )} ${walletAsset.symbol} ${t('nft.modal1.notice3')}`}
-                    </Content>
-                  </Layout>
-                </div>
-              ) : (
-                ''
-              )}
+                  <div className="item notice">
+                    <Layout>
+                      <Sider width="20px">
+                        <ExclamationCircleOutlined style={{ color: '#f27474' }} />
+                      </Sider>
+                      <Content>
+                        {`${t('nft.modal1.notice2')} ${getUINormalScaleAmount(
+                          multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1),
+                          walletAsset.decimals,
+                        )} ${walletAsset.symbol} ${t('nft.modal1.notice3')}`}
+                      </Content>
+                    </Layout>
+                  </div>
+                ) : (
+                  ''
+                )}
               <div className="item notice">
                 <Layout>
                   <Sider width="20px">
@@ -860,10 +860,10 @@ const FormMintNft = () => {
           {broadcastResult?.code !== undefined &&
           broadcastResult?.code !== null &&
           broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">{t('general.successModalPopup.timeout.description')}</div>
-          ) : (
-            <div className="description">{t('general.successModalPopup.nftMint.description')}</div>
-          )}
+              <div className="description">{t('general.successModalPopup.timeout.description')}</div>
+            ) : (
+              <div className="description">{t('general.successModalPopup.nftMint.description')}</div>
+            )}
         </>
       </SuccessModalPopup>
       <ErrorModalPopup
@@ -1242,10 +1242,10 @@ const NftPage = () => {
                               />
                               {supportedVideo(tokenData?.mimeType) ||
                               supportedVideo(tokenData?.animationMimeType) ? (
-                                <Icon component={IconPlayer} />
-                              ) : (
-                                ''
-                              )}
+                                  <Icon component={IconPlayer} />
+                                ) : (
+                                  ''
+                                )}
                             </>
                           }
                           hoverable
@@ -1905,14 +1905,14 @@ const NftPage = () => {
                   {broadcastResult?.code !== undefined &&
                   broadcastResult?.code !== null &&
                   broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-                    <div className="description">
-                      {t('general.successModalPopup.timeout.description')}
-                    </div>
-                  ) : (
-                    <div className="description">
-                      {t('general.successModalPopup.nftTransfer.description')}
-                    </div>
-                  )}
+                      <div className="description">
+                        {t('general.successModalPopup.timeout.description')}
+                      </div>
+                    ) : (
+                      <div className="description">
+                        {t('general.successModalPopup.nftTransfer.description')}
+                      </div>
+                    )}
                 </>
               </SuccessModalPopup>
               <ErrorModalPopup

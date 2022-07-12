@@ -1,14 +1,47 @@
 module.exports = {
-  extends: [require.resolve('@umijs/fabric/dist/eslint')],
-  globals: {
-    page: true,
-    REACT_APP_ENV: true,
+  env: {
+    browser: true,
+    es2021: true,
   },
-  plugins: ['react-hooks'],
-  settings: {
-    'import/core-modules': ["electron"],
+  extends: [
+    'plugin:react/recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
+    ecmaVersion: 12,
+    sourceType: 'module',
   },
+  ignorePatterns: [
+    'src/language/*.json'
+  ],
+  plugins: [
+    'react',
+    'react-hooks',
+    '@typescript-eslint',
+  ],
   rules: {
+    indent: [
+      'warn',
+      2,
+      { SwitchCase: 1 },
+    ],
+    'linebreak-style': [
+      'warn',
+      'unix',
+    ],
+    quotes: [
+      'warn',
+      'single',
+    ],
+    semi: [
+      'warn',
+      'always',
+    ],
+    '@typescript-eslint/indent': ['warn', 2],
     '@typescript-eslint/object-curly-spacing': 'off',
     'jsx-a11y/accessible-emoji': 'off',
     'no-new-wrappers': 'off',
@@ -28,7 +61,6 @@ module.exports = {
     '@typescript-eslint/array-type': 'off',
     '@typescript-eslint/return-await': 'off',
     '@typescript-eslint/parser': 'off',
-    'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/*.spec.ts'] }],
     'react-hooks/rules-of-hooks': 'error',
     'import/no-unresolved': 'off',
     'prefer-promise-reject-errors': 'off',
@@ -40,5 +72,31 @@ module.exports = {
         additionalHooks: 'useRecoilCallback',
       },
     ],
+    'import/prefer-default-export': 'off',
+    'no-shadow': 'off',
+    'no-use-before-define': 'off',
+    'import/extensions': 'off',
+    'arrow-body-style': 'off',
+    'react/jsx-filename-extension': 'off',
+    'arrow-parens': 'off',
+    'max-len': 'off',
+    'react/jsx-one-expression-per-line': 'off',
+    'react/destructuring-assignment': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
+    'operator-linebreak': 'off',
+    'react/require-default-props': 'off',
+    'react/display-name': 'off',
+    'object-curly-newline': 'off',
+    'react/prop-types': 'off',
+    '@typescript-eslint/no-inferrable-types': 'off',
+    '@typescript-eslint/no-empty-interface': 'off',
+    '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/no-namespace': 'off',
+    '@typescript-eslint/no-non-null-asserted-optional-chain': 'off',
+    'react/jsx-key': 'off',
+    'object-curly-spacing': ['error', 'always'],
+    'function-call-argument-newline': ['error', 'consistent'],
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off', 
   },
 };

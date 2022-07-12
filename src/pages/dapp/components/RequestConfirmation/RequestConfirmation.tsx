@@ -40,8 +40,13 @@ interface RequestConfirmationProps {
   currentSession: Session;
   wallet: Wallet;
   visible: boolean;
+  isConfirming: boolean;
   dapp?: Dapp;
-  onConfirm: (info: { gasPrice: BigNumber, gasLimit: BigNumber, event: DappBrowserIPC.Event }) => void;
+  onConfirm: (info: {
+    gasPrice: BigNumber;
+    gasLimit: BigNumber;
+    event: DappBrowserIPC.Event;
+  }) => void;
   onCancel: () => void;
 }
 
@@ -54,6 +59,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     wallet,
     visible,
     dapp,
+    isConfirming,
     onConfirm,
     onCancel,
   } = props;
@@ -93,9 +99,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
   }, []);
 
   const EventView = () => {
-    setIsConfirmDisabled(false);
 
-    if (event.name === 'signTransaction') {
+    if (event.name === 'signTransaction' || event.name === 'sendTransaction') {
       const networkFee = gasLimit.mul(gasPrice);
       // if (event.object.gasPrice) {
       //   networkFee = event ? ethers.BigNumber.from(event.object?.gas).mul(event.object?.gasPrice) : 0;
@@ -111,8 +116,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       return (
         <>
           <GasStepSelectEVMDApp config={selectedChain} gasLimit={new BigNumber(gasLimit.toString())} gasPrice={new BigNumber(gasPrice.toString())} onChange={(_gasLimit, _gasPrice) => {
-            setGasLimit(ethers.BigNumber.from(_gasLimit.toString()))
-            setGasPrice(ethers.BigNumber.from(_gasPrice.toString()))
+            setGasLimit(ethers.BigNumber.from(_gasLimit.toString()));
+            setGasPrice(ethers.BigNumber.from(_gasPrice.toString()));
           }} />
           <div className="row">
             <div className="title">{t('dapp.requestConfirmation.total.title')}</div>
@@ -140,7 +145,12 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
 
       if (parsedRaw.message) {
         Object.keys(parsedRaw.message).forEach(key => {
-          displayMessage = displayMessage.concat(`${key}: \n${parsedRaw.message[key]}\n\n`);
+          let value = parsedRaw.message[key];
+          if (typeof value !== 'string') {
+            value = JSON.stringify(value);
+          }
+
+          displayMessage = displayMessage.concat(`${key}: \n${value}\n\n`);
         });
       }
 
@@ -176,8 +186,8 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       return (
         <>
           <GasStepSelectEVMDApp config={selectedChain} gasLimit={new BigNumber(gasLimit.toString())} gasPrice={new BigNumber(gasPrice.toString())} onChange={(_gasLimit, _gasPrice) => {
-            setGasLimit(ethers.BigNumber.from(_gasLimit.toString()))
-            setGasPrice(ethers.BigNumber.from(_gasPrice.toString()))
+            setGasLimit(ethers.BigNumber.from(_gasLimit.toString()));
+            setGasPrice(ethers.BigNumber.from(_gasPrice.toString()));
           }} />
           <div className="row">
             <div className="title">{t('dapp.requestConfirmation.total.title')}</div>
@@ -196,12 +206,19 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
             className="contract-address"
             hidden={!isContractAddressReview}
           >{`${contractAddress}`}</div>
-          {
-            event.name === 'tokenApproval' && <div className="row">
+          {event.name === 'tokenApproval' && (
+            <div className="row">
               <div className="title">{t('settings.revoke.amount')}</div>
-              <div>{isUnlimited(ethers.BigNumber.from(event.object.amount)) ? `${t('settings.revoke.unlimited')} ${event.object.tokenData.symbol}` : `${scaledAmount(event.object.amount, Number(event.object.tokenData.decimals))} ${event.object.tokenData.symbol}`}</div>
+              <div>
+                {isUnlimited(ethers.BigNumber.from(event.object.amount))
+                  ? `${t('settings.revoke.unlimited')} ${event.object.tokenData.symbol}`
+                  : `${scaledAmount(
+                    event.object.amount,
+                    Number(event.object.tokenData.decimals),
+                  )} ${event.object.tokenData.symbol}`}
+              </div>
             </div>
-          }
+          )}
         </>
       );
     }
@@ -216,7 +233,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     if (!event) {
       return;
     }
-    if (event.name === 'signTransaction') {
+    if (event.name === 'signTransaction' || event.name === 'sendTransaction') {
       // TODO:
       const assetMarketData = allMarketData.get(
         `${UserAssetType.CRC_20_TOKEN}-${selectedChain.nativeCurrency.symbol}-${currentSession.currency}`,
@@ -260,9 +277,12 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
       <Layout>
         <Content>
           {dapp && (
-            <div className="logo">
-              <img src={dapp.logo} alt={dapp.alt} />
-            </div>
+            <>
+              <div className="logo">
+                <img style={{ width: '60px', height: '60px' }} src={dapp.logo} alt={dapp.alt} />
+                <div >{dapp.url}</div>
+              </div>
+            </>
           )}
           {message && <div className="message">{message}</div>}
           {subMessage && <div className="sub-message">{subMessage}</div>}
@@ -308,8 +328,9 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
                   gasLimit: new BigNumber(gasLimit.toString()),
                   gasPrice: new BigNumber(gasPrice.toString()),
                   event
-                })
+                });
               }}
+              loading={isConfirming}
               disabled={
                 isConfirmDisabled ||
                 (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE)

@@ -11,12 +11,12 @@ import { EVMContractCallUnsigned } from '../../../service/signers/TransactionSup
 import { isHexEqual } from '../../../utils/utils';
 import { TransactionDataParser } from './TransactionDataParser';
 import { ErrorHandler, WebView } from './types';
-import { useRefCallback } from './useRefCallback';
 import { useChainConfigs } from './useChainConfigs';
 import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
 import { EVMChainConfig } from '../../../models/Chain';
 import { getGasPrice } from '../../../service/evm/gas';
 import { getNonce } from '../../../service/evm/nonce';
+import { useRefCallback } from '../../../hooks/useRefCallback';
 
 export type ConfirmTransactionSuccessCallback = (info: {
   decryptedPhrase: string;
@@ -194,7 +194,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   const handleTokenApproval = useRefCallback(
     async (
       event: DappBrowserIPC.TokenApprovalEvent,
-      passphrase: string,
+      mnemonic: string,
       _gasPrice: BigNumber,
       _gasLimit: BigNumber,
     ) => {
@@ -214,10 +214,10 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         nonce: await getNonce(event.object.from, event.object.chainConfig),
       };
       try {
-        const result = await evmTransactionSigner.sendContractCallTransaction({
+        const result = await EvmTransactionSigner.sendContractCallTransaction({
           chainConfig: event.object.chainConfig,
           transaction,
-          phrase: passphrase,
+          mnemonic,
         });
 
         sendResponse(event.id, result);
@@ -232,7 +232,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   const handleSendTransaction = useRefCallback(
     async (
       event: DappBrowserIPC.SendTransactionEvent,
-      passphrase: string,
+      mnemonic: string,
       _gasPrice: BigNumber,
       _gasLimit: BigNumber,
     ) => {
@@ -249,10 +249,10 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       };
 
       try {
-        const result = await evmTransactionSigner.sendContractCallTransaction({
+        const result = await EvmTransactionSigner.sendContractCallTransaction({
           chainConfig: event.object.chainConfig,
           transaction,
-          phrase: passphrase,
+          mnemonic,
         });
         sendResponse(event.id, result);
         onFinishTransaction();
@@ -314,7 +314,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             },
           );
           break;
-        case 'signTransaction':
+        case 'sendTransaction':
           {
             // fill in gasData
             const gasObject = await getGasPrice(selectedChain, {

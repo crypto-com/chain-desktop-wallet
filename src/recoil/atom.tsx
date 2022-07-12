@@ -31,7 +31,8 @@ export type NavbarMenuKey =
   | '/dapp'
   | '/wallet'
   | '/restore'
-  | '/create';
+  | '/create'
+  | '/walletconnect';
 
 export type lockPageType = '' | 'bridge' | 'dapp';
 

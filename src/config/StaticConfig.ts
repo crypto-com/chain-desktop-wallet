@@ -15,6 +15,9 @@ export const NCW_NFT_MIDDLEWARE_SERVER_ENDPOINT =
 export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';
 export const CLOUDFLARE_TRACE_URI = 'https://www.cloudflare.com/cdn-cgi/trace';
 
+// const APP_PROTOCOL_NAME = 'cryptowallet';
+export const APP_PROTOCOL_NAME = 'ledgerlive';
+
 // This constant value is used when actual values are not known yet
 // For instance :
 export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
@@ -322,7 +325,7 @@ export const AUTO_UPDATE_DISABLE_DURATIONS = [14, 30];
 const TestNetConfig: WalletConfig = {
   enabled: true,
   name: 'TESTNET',
-  derivationPath: "m/44'/1'/0'/0/0",
+  derivationPath: 'm/44\'/1\'/0\'/0/0',
   explorer: {
     baseUrl: 'https://crypto.org/explorer/croeseid',
     tx: 'https://crypto.org/explorer/croeseid/tx',
@@ -362,7 +365,7 @@ const TestnetCroeseid4: Network = {
 const TestNetCroeseid4Config: WalletConfig = {
   enabled: true,
   name: 'TESTNET',
-  derivationPath: "m/44'/1'/0'/0/0",
+  derivationPath: 'm/44\'/1\'/0\'/0/0',
   explorer: {
     baseUrl: 'https://crypto.org/explorer/croeseid4',
     tx: 'https://crypto.org/explorer/croeseid4/tx',
@@ -385,7 +388,7 @@ const TestNetCroeseid4Config: WalletConfig = {
 const MainNetConfig: WalletConfig = {
   enabled: true,
   name: 'MAINNET',
-  derivationPath: "m/44'/394'/0'/0/0",
+  derivationPath: 'm/44\'/394\'/0\'/0/0',
   nodeUrl: CroNetwork.Mainnet.defaultNodeUrl,
   explorer: {
     baseUrl: 'https://crypto.org/explorer',
@@ -407,7 +410,7 @@ const MainNetConfig: WalletConfig = {
 
 // Supposed to be fully customizable by the user when it will be supported
 export const CustomDevNet: WalletConfig = {
-  derivationPath: "m/44'/394'/0'/0/0",
+  derivationPath: 'm/44\'/394\'/0\'/0/0',
   enabled: true,
   name: 'CUSTOM DEVNET',
   disableDefaultClientMemo: false,

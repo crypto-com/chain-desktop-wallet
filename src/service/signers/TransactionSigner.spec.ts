@@ -44,8 +44,8 @@ describe('Testing TransactionSigner', () => {
         toAddress: 'tcro184lta2lsyu47vwyp2e8zmtca3k5yq85p6c4vp3',
       },
       phrase,
-      "5000",
-      200000
+      '5000',
+      200000,
     );
 
     expect(signedTransferHex).to.eq(
@@ -69,8 +69,8 @@ describe('Testing TransactionSigner', () => {
         validatorAddress: 'tcrocncl1reyshfdygf7673xm9p8v0xvtd96m6cd6canhu3',
       },
       phrase,
-      "5000",
-      200000
+      '5000',
+      200000,
     );
 
     expect(signedDelegateTxHex).to.eq(
@@ -93,8 +93,8 @@ describe('Testing TransactionSigner', () => {
         validatorAddress: 'tcrocncl1reyshfdygf7673xm9p8v0xvtd96m6cd6canhu3',
       },
       phrase,
-      "5000",
-      200000
+      '5000',
+      200000,
     );
 
     expect(withdrawStakingRewardTxHex).to.eq(
@@ -111,7 +111,7 @@ describe('Testing TransactionSigner', () => {
         amount: '345',
         fromAddress: '0xc2aFcEC3DAfAF1a4f47030eE35Fd1A1231C08256',
         gasLimit: 20_000,
-        gasPrice: "5000000",
+        gasPrice: '5000000',
         nonce: 12,
         toAddress: '0x8875bF87684f46111dbc27725332CEA9C0f12D39',
         accountNumber: 0,

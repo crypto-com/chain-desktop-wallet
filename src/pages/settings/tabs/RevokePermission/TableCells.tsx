@@ -48,8 +48,8 @@ export const Amount = (props: { data: TokenDataWithApproval; explorerURL: string
         {isUnlimited(data.approval.amount)
           ? `${t('settings.revoke.unlimited')} ${data.token.symbol}`
           : `${getUINormalScaleAmount(data.approval.amount.toString(), data.token.decimals)} ${
-              data.token.symbol
-            }`}
+            data.token.symbol
+          }`}
       </a>
     </div>
   );

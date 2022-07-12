@@ -14,7 +14,7 @@ import { secretStoreService } from '../../../service/storage/SecretStoreService'
 import { Dapp, DappBrowserIPC } from '../types';
 import { ProviderPreloadScriptPath } from './config';
 import { walletService } from '../../../service/WalletService';
-import { useRefCallback } from './useRefCallback';
+import { useRefCallback } from '../../../hooks/useRefCallback';
 import { useWebInfoProvider } from './useWebInfoProvider';
 import {
   IWebviewNavigationState,
@@ -99,11 +99,11 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   }));
 
   const [txEvent, setTxEvent] = useState<
-    | DappBrowserIPC.SendTransactionEvent
-    | DappBrowserIPC.TokenApprovalEvent
-    | DappBrowserIPC.SignPersonalMessageEvent
-    | DappBrowserIPC.SignTypedMessageEvent
-    | DappBrowserIPC.SignMessageEvent
+  | DappBrowserIPC.SendTransactionEvent
+  | DappBrowserIPC.TokenApprovalEvent
+  | DappBrowserIPC.SignPersonalMessageEvent
+  | DappBrowserIPC.SignTypedMessageEvent
+  | DappBrowserIPC.SignMessageEvent
   >();
   const [requestConfirmationVisible, setRequestConfirmationVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
@@ -388,6 +388,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
       )}
       {txEvent && requestConfirmationVisible && (
         <RequestConfirmation
+          isConfirming={false}
           event={txEvent}
           cronosAsset={cronosAsset}
           allMarketData={allMarketData}

@@ -60,7 +60,7 @@ describe('Testing Wallet Creation', () => {
     expect(mainNetWallet.address.startsWith('cro')).to.eq(true);
     expect(mainNetWallet.encryptedPhrase.length > 0).to.eq(true);
     expect(mainNetWallet.identifier.length).to.eq(16);
-    expect(mainNetConfig.derivationPath).to.eq("m/44'/394'/0'/0/0");
+    expect(mainNetConfig.derivationPath).to.eq('m/44\'/394\'/0\'/0/0');
   });
 
   it('Test creating wallet from custom configurations ', () => {
@@ -69,7 +69,7 @@ describe('Testing Wallet Creation', () => {
       explorerUrl: '',
       indexingUrl: '',
       enabled: false,
-      derivationPath: "44'/245'/0'/0/0",
+      derivationPath: '44\'/245\'/0\'/0/0',
       name: 'Pystaport-Custom-Network',
       enableGeneralSettings: false,
       disableDefaultClientMemo: false,

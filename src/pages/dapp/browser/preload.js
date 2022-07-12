@@ -458,7 +458,7 @@ class Web3Provider extends EventEmitter {
   }
 
   eth_sendTransaction(payload) {
-    this.postMessage('signTransaction', payload.id, payload.params[0]);
+    this.postMessage('sendTransaction', payload.id, payload.params[0]);
   }
 
   eth_requestAccounts(payload) {
