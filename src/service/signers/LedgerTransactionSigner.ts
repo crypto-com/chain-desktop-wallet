@@ -9,12 +9,11 @@ import {
   // makeSignDoc,
   // makeSignBytes,
 } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing';
-import { AminoMsg, makeSignDoc, serializeSignDoc } from '@cosmjs/amino';
+import { encodeSecp256k1Pubkey, makeSignDoc, serializeSignDoc } from '@cosmjs/amino';
+import { createBankAminoConverters, AminoTypes, MsgSendEncodeObject } from '@cosmjs/stargate';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
-import { toBase64, toHex } from '@crypto-org-chain/chain-jslib/node_modules/@cosmjs/encoding';
+import { toHex } from '@crypto-org-chain/chain-jslib/node_modules/@cosmjs/encoding';
 import Long from 'long';
-import { MsgSend } from 'cosmjs-types/cosmos/bank/v1beta1/tx';
-import { MsgSendEncodeObject } from '@cosmjs/stargate';
 import { Big, Units, Secp256k1KeyPair } from '../../utils/ChainJsLib';
 import {
   DEFAULT_IBC_TRANSFER_TIMEOUT,
@@ -53,6 +52,8 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
 
   public readonly derivationPathStandard: DerivationPathStandard;
 
+  public registry: Registry;
+
   constructor(
     config: WalletConfig,
     signerProvider: ISignerProvider,
@@ -64,6 +65,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     this.signerProvider = signerProvider;
     this.addressIndex = addressIndex;
     this.derivationPathStandard = derivationPathStandard;
+    this.registry = new Registry();
   }
 
   public getTransactionInfo(
@@ -101,30 +103,8 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       transaction.asset?.config?.tendermintNetwork &&
       transaction.asset?.config?.tendermintNetwork?.chainName !== SupportedChainName.CRYPTO_ORG
     ) {
-      const registry = new Registry();
+      // const registry = new Registry();
       const network = transaction.asset?.config?.tendermintNetwork;
-      const msg = MsgSend.fromPartial({
-        fromAddress: transaction.fromAddress,
-        toAddress: transaction.toAddress,
-        amount: [
-          {
-            denom: network.coin.baseDenom,
-            amount: String(transaction.amount),
-          },
-        ],
-      });
-
-      const msgAny: MsgSendEncodeObject = {
-        typeUrl: '/cosmos.bank.v1beta1.MsgSend',
-        value: msg,
-      };
-
-      const txBodyFields: TxBodyEncodeObject = {
-        typeUrl: '/cosmos.tx.v1beta1.TxBody',
-        value: {
-          messages: [msgAny],
-        },
-      };
 
       const fee = {
         amount: [
@@ -135,8 +115,16 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
         ],
         gas: gasLimit,
       };
-      // // eslint-disable-next-line
-      const txBodyBytes = registry.encode(txBodyFields);
+
+      const feeInAmino = {
+        amount: [
+          {
+            denom: network.coin.baseDenom,
+            amount: gasFee,
+          },
+        ],
+        gas: gasLimit.toString(),
+      };
 
       const pubkeyBytes = (
         await this.signerProvider.getPubKey(
@@ -146,10 +134,14 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
           false,
         )
       ).toUint8Array();
-      const pubkey = encodePubkey({
-        type: 'tendermint/PubKeySecp256k1',
-        value: toBase64(pubkeyBytes),
-      });
+
+      // this is 34 bytes, 33 length itself, 0x02 pr 0x03
+      // cut first byte of pubkeyBytes
+      // pubkeyBytes is 34 bytes, first byte is length itself, 33
+      const pubkeyBytesInLength33 = pubkeyBytes.slice(1);
+      const pubkey = encodePubkey(encodeSecp256k1Pubkey(pubkeyBytesInLength33));
+
+      // amino json auto info bytes
       const authInfoBytes = makeAuthInfoBytes(
         [{ pubkey, sequence: transaction.accountSequence }],
         fee.amount,
@@ -157,58 +149,58 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
         127,
       );
 
-      console.log('transaction', transaction);
-
       const chainId = network.chainId ?? '';
-      const msg1: AminoMsg = {
-        type: 'cosmos-sdk/MsgSend',
+
+      const msgSend: MsgSendEncodeObject = {
+        typeUrl: '/cosmos.bank.v1beta1.MsgSend',
         value: {
           fromAddress: transaction.fromAddress,
           toAddress: transaction.toAddress,
-          amount: {
-            denom: network.coin.baseDenom,
-            amount: String(transaction.amount),
-          },
+          amount: [
+            {
+              denom: network.coin.baseDenom,
+              amount: String(transaction.amount),
+            },
+          ],
         },
       };
 
-      const fee2 = {
-        amount: [
-          {
-            denom: network.coin.baseDenom,
-            amount: gasFee,
-          },
-        ],
-        gas: gasLimit.toString(),
+      const converter = new AminoTypes(createBankAminoConverters());
+      const msgSendInAmino = converter.toAmino(msgSend);
+
+      const signedTxBody = {
+        messages: [msgSend],
+        memo: transaction.memo,
       };
+      const signedTxBodyEncodeObject: TxBodyEncodeObject = {
+        typeUrl: '/cosmos.tx.v1beta1.TxBody',
+        value: signedTxBody,
+      };
+
+      const signedTxBodyBytes = this.registry.encode(signedTxBodyEncodeObject);
+
       const signDoc = makeSignDoc(
-        [msg1],
-        fee2,
+        [msgSendInAmino],
+        feeInAmino,
         chainId,
         transaction.memo,
         transaction.accountNumber,
         transaction.accountSequence,
       );
-      // const signDoc = makeSignDoc(txBodyBytes, authInfoBytes, chainId, transaction.accountNumber);
-      // const signBytes = makeSignBytes(signDoc);
       const uint8SignDoc = serializeSignDoc(signDoc);
       const messageByte = new Bytes(uint8SignDoc);
 
-      console.log('cosmosHub signBytes', uint8SignDoc);
-      console.log('cosmosHub messageByte', messageByte);
-
       const signature = await this.signerProvider.sign(messageByte);
 
-      console.log('cosmosHub signature', signature);
-
       const txRaw = TxRaw.fromPartial({
-        bodyBytes: txBodyBytes,
+        bodyBytes: signedTxBodyBytes,
         authInfoBytes,
         signatures: [signature.toUint8Array()],
       });
+
+      // get signed tx from TxRaw
       const signedBytes = Uint8Array.from(TxRaw.encode(txRaw).finish());
       const txHash = toHex(signedBytes);
-
       return txHash;
     }
     const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);

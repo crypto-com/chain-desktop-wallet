@@ -45,10 +45,10 @@ export class TransactionPrepareService {
     // eslint-disable-next-line no-console
     console.log('PREPARE_TX: ', {
       latestBlock,
-      address: currentSession.wallet.address,
+      address: currentSession.activeAsset?.address!,
       accountNumber,
       accountSequence,
-      chainId: currentSession.wallet.config.network.chainId,
+      chainId: currentSession.activeAsset?.config?.chainId,
     });
 
     const ledgerTransactionSigner = new LedgerTransactionSigner(
