@@ -3,9 +3,6 @@ import Web3 from 'web3';
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
 import { HandlerDetails } from 'electron';
-import { TransactionPrepareService } from '../../../service/TransactionPrepareService';
-import { walletService } from '../../../service/WalletService';
-import { ChainConfig } from './config';
 import { DappBrowserIPC } from '../types';
 import {
   evmTransactionSigner,
