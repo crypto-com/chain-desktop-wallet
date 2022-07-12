@@ -66,7 +66,7 @@ export class LedgerSigner {
     await this.createTransport();
 
     let response = await this.app.getVersion();
-    let coin = 394;
+    let coin;
     if (response.error_message !== 'No errors') {
       await this.closeTransport();
       throw new Error(`${response.error_message}`);
