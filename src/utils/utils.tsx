@@ -142,8 +142,8 @@ export function getCronosTendermintAsset(walletAllAssets: UserAsset[]) {
 }
 
 export const isUnlimited = (amount: ethers.BigNumber) => {
-  return amount.gte(ethers.BigNumber.from('0xffffffffffffffffffffffffffffffff'))
-}
+  return amount.gte(ethers.BigNumber.from('0xffffffffffffffffffffffffffffffff'));
+};
 
 export function getCronosEvmAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
@@ -231,6 +231,16 @@ export function isCRC20AssetWhitelisted(
 
 export function isAddressEqual(lhs: string, rhs: string) {
   return Web3.utils.toChecksumAddress(lhs) === Web3.utils.toChecksumAddress(rhs);
+}
+
+export function isLocalhostURL(str: string) {
+  try {
+    const url = new URL(str);
+    const validHostnames = ['localhost', '127.0.0.1'];
+    return validHostnames.includes(url.hostname);
+  } catch {
+    return false;
+  }
 }
 
 export function isValidURL(str: string) {

@@ -4,6 +4,7 @@ import { useRecoilValue } from 'recoil';
 import Web3 from 'web3';
 import { ethers } from 'ethers';
 import BigNumber from 'bignumber.js';
+import { HandlerDetails } from 'electron';
 import { TransactionPrepareService } from '../../../service/TransactionPrepareService';
 import { walletService } from '../../../service/WalletService';
 import { ChainConfig } from './config';
@@ -19,8 +20,14 @@ import { TransactionDataParser } from './TransactionDataParser';
 import { ErrorHandler, WebView } from './types';
 import { useRefCallback } from './useRefCallback';
 
-export type ConfirmTransactionSuccessCallback = (info: { decryptedPhrase: string, gasPrice: BigNumber, gasLimit: BigNumber, signature: string }) => void
+const remote = window.require('@electron/remote');
 
+export type ConfirmTransactionSuccessCallback = (info: {
+  decryptedPhrase: string;
+  gasPrice: BigNumber;
+  gasLimit: BigNumber;
+  signature: string;
+}) => void;
 
 interface IUseIPCProviderProps {
   webview: WebView | null;
@@ -140,7 +147,12 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   });
 
   const handleTokenApproval = useRefCallback(
-    async (event: DappBrowserIPC.TokenApprovalEvent, passphrase: string, _gasPrice: BigNumber, _gasLimit: BigNumber) => {
+    async (
+      event: DappBrowserIPC.TokenApprovalEvent,
+      passphrase: string,
+      _gasPrice: BigNumber,
+      _gasLimit: BigNumber,
+    ) => {
       const prepareTXConfig: TransactionConfig = {
         from: event.object.from,
         to: event.object.to,
@@ -202,7 +214,12 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
   };
 
   const handleSendTransaction = useRefCallback(
-    async (event: DappBrowserIPC.SendTransactionEvent, passphrase: string, _gasPrice: BigNumber, _gasLimit: BigNumber) => {
+    async (
+      event: DappBrowserIPC.SendTransactionEvent,
+      passphrase: string,
+      _gasPrice: BigNumber,
+      _gasLimit: BigNumber,
+    ) => {
       const prepareTXConfig: TransactionConfig = {
         from: event.object.from,
         to: event.object.to,
@@ -321,7 +338,12 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             props.onRequestTokenApproval(
               approvalEvent,
               info => {
-                handleTokenApproval.current(approvalEvent, info.decryptedPhrase, info.gasPrice, info.gasLimit);
+                handleTokenApproval.current(
+                  approvalEvent,
+                  info.decryptedPhrase,
+                  info.gasPrice,
+                  info.gasLimit,
+                );
               },
               reason => {
                 sendError(event.id, reason);
@@ -331,7 +353,12 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
             props.onRequestSendTransaction(
               event,
               info => {
-                handleSendTransaction.current(event, info.decryptedPhrase, info.gasPrice, info.gasLimit);
+                handleSendTransaction.current(
+                  event,
+                  info.decryptedPhrase,
+                  info.gasPrice,
+                  info.gasLimit,
+                );
               },
               reason => {
                 sendError(event.id, reason);
@@ -397,7 +424,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'watchAsset':
           props.onRequestWatchAsset(
             event,
-            () => { },
+            () => {},
             reason => {
               sendError(event.id, reason);
             },
@@ -406,17 +433,18 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'addEthereumChain':
           props.onRequestAddEthereumChain(
             event,
-            () => { },
+            () => {},
             reason => {
               sendError(event.id, reason);
             },
           );
           break;
-        case 'openLinkInDefaultBrowser': {
-          const { url } = event.object;
-          const { shell } = window.require('electron');
-          shell.openExternal(url);
-        }
+        case 'openLinkInDefaultBrowser':
+          {
+            const { url } = event.object;
+            const { shell } = window.require('electron');
+            shell.openExternal(url);
+          }
           break;
         default:
           break;
@@ -441,6 +469,15 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
       if (process.env.NODE_ENV === 'development') {
         webview.openDevTools();
       }
+
+      const webContents = remote.webContents.fromId(webview.getWebContentsId());
+      webContents.setWindowOpenHandler((details: HandlerDetails) => {
+        if (details.url.startsWith('http:') || details.url.startsWith('https:')) {
+          webview.loadURL(details.url);
+          return { action: 'allow', overrideBrowserWindowOptions: { show: false } };
+        }
+        return { action: 'deny' };
+      });
     });
   }, [webview]);
 

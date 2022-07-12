@@ -606,7 +606,7 @@ export class StorageService {
   }
 
   public async retrieveAllProposals(chainId: string) {
-    return this.db.proposalStore.findOne<ProposalList>({ chainId });
+    return await this.db.proposalStore.findOne<ProposalList>({ chainId });
   }
 
   // eslint-disable-next-line
