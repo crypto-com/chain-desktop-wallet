@@ -669,8 +669,6 @@ export class TransactionSenderService {
       ledgerTransactionSigner,
     } = await this.transactionPrepareService.prepareTransaction();
 
-    console.log('sendMsgDepositTx ', depositRequest);
-
     const depositToProposalUnsigned: MsgDepositTransactionUnsigned = {
       proposalId: depositRequest.proposalId,
       depositor: depositRequest.depositor,
