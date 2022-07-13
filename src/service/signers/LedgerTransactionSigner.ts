@@ -8,7 +8,7 @@ import {
   encodePubkey,
   // makeSignDoc,
   // makeSignBytes,
-} from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing';
+} from '@cosmjs/proto-signing';
 import { encodeSecp256k1Pubkey, makeSignDoc, serializeSignDoc } from '@cosmjs/amino';
 import { createBankAminoConverters, AminoTypes, MsgSendEncodeObject } from '@cosmjs/stargate';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';

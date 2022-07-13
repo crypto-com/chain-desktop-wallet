@@ -1,5 +1,5 @@
 import sdk from '@crypto-org-chain/chain-jslib';
-import { DirectSecp256k1HdWallet } from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing';
+import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { ethers } from 'ethers';
 import { UserAssetConfig, UserAssetType } from '../models/UserAsset';
 import { HDKey, Secp256k1KeyPair } from '../utils/ChainJsLib';

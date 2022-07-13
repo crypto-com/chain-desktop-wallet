@@ -8,6 +8,7 @@ import { UserAsset, UserAssetType } from '../../models/UserAsset';
 // so treat the icons as static assets
 export const ICON_CRO_TENDERMINT = './assets/icon-cronos-tendermint.svg';
 export const ICON_CRO_EVM = './assets/icon-cronos-evm.svg';
+export const ICON_ETH_EVM = './assets/icon-eth-evm.svg';
 export const ICON_ATOM_TENDERMINT = './assets/icon-atom-tendermint.svg';
 export const ICON_BRIDGE_CRYPTO_ORG = './assets/icon-bridge-crypto-org.svg';
 export const ICON_BRIDGE_CRONOS = './assets/icon-bridge-cronos.svg';

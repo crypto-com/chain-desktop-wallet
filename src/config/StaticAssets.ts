@@ -3,8 +3,7 @@ import { getRandomId } from '../crypto/RandomGen';
 import { AssetCreationType, UserAssetConfig, UserAssetType } from '../models/UserAsset';
 import { WalletConfig, SupportedChainName } from './StaticConfig';
 import { checkIfTestnet } from '../utils/utils';
-import iconETHSvg from '../assets/icon-eth.svg';
-import { ICON_CRO_EVM, ICON_CRO_TENDERMINT } from '../components/AssetIcon';
+import { ICON_ATOM_TENDERMINT, ICON_CRO_EVM, ICON_CRO_TENDERMINT, ICON_ETH_EVM } from '../components/AssetIcon';
 
 // This will be used later for asset recreation/migration
 export const STATIC_ASSET_COUNT = 4;
@@ -143,7 +142,7 @@ export const ATOM_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
   return {
     balance: '0',
     description: 'ATOM',
-    icon_url: ICON_CRO_TENDERMINT,
+    icon_url: ICON_ATOM_TENDERMINT,
     identifier: getRandomId(),
     name: SupportedChainName.COSMOS_HUB,
     symbol: assetSymbol,
@@ -221,7 +220,7 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
   return {
     balance: '0',
     description: '',
-    icon_url: iconETHSvg,
+    icon_url: ICON_ETH_EVM,
     identifier: getRandomId(),
     name: SupportedChainName.ETHEREUM,
     symbol: 'ETH',

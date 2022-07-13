@@ -6,7 +6,7 @@ import {
   makeSignDoc,
   Registry,
   TxBodyEncodeObject,
-} from '@cosmjs/stargate/node_modules/@cosmjs/proto-signing';
+} from '@cosmjs/proto-signing';
 import { MsgSendEncodeObject } from '@cosmjs/stargate';
 import { HdPath } from '@cosmjs/stargate/node_modules/@cosmjs/crypto';
 import {

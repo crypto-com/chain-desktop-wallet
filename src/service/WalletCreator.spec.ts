@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import 'mocha';
 import { expect } from 'chai';
 import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
@@ -28,7 +31,7 @@ describe('Testing Wallet Creation', () => {
 
     const { assets } = await new WalletCreator(createOptions).create();
 
-    expect(assets.length).to.eq(3);
+    expect(assets.length).to.eq(4);
     expect(
       assets
         .filter(asset => asset.assetType === UserAssetType.TENDERMINT)[0]

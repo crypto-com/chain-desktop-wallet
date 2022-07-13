@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import 'mocha';
 import { expect } from 'chai';
 import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
@@ -26,7 +29,7 @@ describe('Testing WalletImporter', () => {
 
     const { assets } = await new WalletImporter(importOptions).import();
 
-    expect(assets.length).to.eq(3);
+    expect(assets.length).to.eq(4);
     expect(
       assets
         .filter(asset => asset.assetType === UserAssetType.TENDERMINT)[0]
