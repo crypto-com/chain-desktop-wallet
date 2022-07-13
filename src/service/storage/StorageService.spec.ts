@@ -12,8 +12,6 @@ import { getRandomId } from '../../crypto/RandomGen';
 import { AssetMarketPrice, UserAsset, UserAssetType } from '../../models/UserAsset';
 import { DerivationPathStandard } from '../signers/LedgerSigner';
 
-jest.setTimeout(20_000);
-
 async function buildTestWallet(name?: string) {
   const testNetConfig = DefaultWalletConfigs.TestNetConfig;
 
