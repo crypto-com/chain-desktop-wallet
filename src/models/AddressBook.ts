@@ -35,9 +35,13 @@ const SupportedNetworks: AddressBookNetwork[] = [
     networkType: UserAssetType.TENDERMINT,
   },
   {
+    label: SupportedChainName.COSMOS_HUB,
+    networkType: UserAssetType.TENDERMINT,
+  },
+  {
     label: SupportedChainName.ETHEREUM,
     networkType: UserAssetType.EVM,
-  }
+  },
 ];
 
 export { SupportedNetworks };

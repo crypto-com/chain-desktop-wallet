@@ -1,6 +1,7 @@
 import { NodeRpcService } from './rpc/NodeRpcService';
 import { Session } from '../models/Session';
 import { TransactionSigner } from './signers/TransactionSigner';
+import { CosmjsTendermintTransactionSigner } from './signers/CosmjsTendermintTransactionSigner';
 import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
 
 export interface TenderMintTransactionPrepared {
@@ -9,6 +10,7 @@ export interface TenderMintTransactionPrepared {
   accountSequence: number;
   currentSession: Session;
   transactionSigner: TransactionSigner;
+  cosmjsTendermintTransactionSigner: CosmjsTendermintTransactionSigner;
   ledgerTransactionSigner: LedgerTransactionSigner;
   latestBlock?: number;
 }

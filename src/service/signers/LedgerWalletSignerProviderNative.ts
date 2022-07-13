@@ -1,4 +1,5 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
+import { SupportedChainName } from '../../config/StaticConfig';
 import { IpcRender } from './IpcRender';
 import { DerivationPathStandard } from './LedgerSigner';
 import { ISignerProvider } from './SignerProvider';
@@ -10,18 +11,19 @@ export class LedgerWalletSignerProviderNative implements ISignerProvider {
     this.ipcRender = new IpcRender();
   }
 
-  public async getPubKey(index: number, derivationPathStandard: DerivationPathStandard, showLedgerDisplay: boolean): Promise<Bytes> {
-    const pubkey = await this.ipcRender.getPubKey(index, derivationPathStandard, showLedgerDisplay);
+  public async getPubKey(index: number, chainName: SupportedChainName, derivationPathStandard: DerivationPathStandard, showLedgerDisplay: boolean): Promise<Bytes> {
+    const pubkey = await this.ipcRender.getPubKey(index, chainName, derivationPathStandard, showLedgerDisplay);
     return pubkey;
   }
 
   public async getAddress(
     index: number,
     addressPrefix: string,
+    chainName: SupportedChainName,
     derivationPathStandard: DerivationPathStandard,
     showLedgerDisplay: boolean,
   ): Promise<string> {
-    const address = await this.ipcRender.getAddress(index, addressPrefix, derivationPathStandard, showLedgerDisplay);
+    const address = await this.ipcRender.getAddress(index, addressPrefix, chainName, derivationPathStandard, showLedgerDisplay);
     return address;
   }
 
@@ -29,9 +31,10 @@ export class LedgerWalletSignerProviderNative implements ISignerProvider {
     startIndex: number,
     gap: number,
     addressPrefix: string,
+    chainName: SupportedChainName,
     derivationPathStandard: DerivationPathStandard,
   ): Promise<string[]> {
-    const addressList = await this.ipcRender.getAddressList(startIndex, gap, addressPrefix, derivationPathStandard);
+    const addressList = await this.ipcRender.getAddressList(startIndex, gap, addressPrefix, chainName, derivationPathStandard);
     return addressList;
   }
 

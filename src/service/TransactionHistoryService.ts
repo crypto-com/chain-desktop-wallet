@@ -49,6 +49,7 @@ import { getErc20IconUrlByContractAddress } from '../utils/ERC20IconUrl';
 import { SupportedCRCTokenStandard } from './rpc/interface/cronos.chainIndex';
 import { EVMClient } from './rpc/clients/EVMClient';
 import { EthClient } from './ethereum/EthClient';
+import { CosmosHubIndexingAPI } from './rpc/indexing/tendermint/cosmoshub/CosmosHubIndexingAPI';
 
 export class TransactionHistoryService {
   private storageService: StorageService;
@@ -64,7 +65,7 @@ export class TransactionHistoryService {
       return;
     }
 
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
 
     await Promise.all([
       this.fetchAndSaveDelegations(nodeRpc, currentSession),
@@ -96,7 +97,7 @@ export class TransactionHistoryService {
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
         return Promise.resolve([]);
       }
-      const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+      const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
       const topValidators = await nodeRpc.loadTopValidators();
       const topValidatorsAddressList = topValidators.map(validator => {
         return validator.validatorAddress;
@@ -246,6 +247,54 @@ export class TransactionHistoryService {
   }
 
   // eslint-disable-next-line class-methods-use-this
+  public async fetchCosmosHubTransferTxs(
+    currentAsset: UserAsset,
+    walletIdentifier: string,
+  ): Promise<TransferTransactionRecord[]> {
+    if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
+      return [];
+    }
+
+    const { address, mainnetSymbol } = currentAsset;
+
+    if (mainnetSymbol === 'ATOM') {
+      const cosmosHubindexingClient = CosmosHubIndexingAPI.init(currentAsset.config.indexingUrl);
+
+      const txList = await cosmosHubindexingClient.getCosmosHubTxList(address);
+
+      const loadedTxList = txList.map(tx => {
+        const transferTx: TransferTransactionData = {
+          amount: tx.sub[0].amount,
+          assetSymbol: 'ATOM',
+          date: new Date(Number(tx.time) * 1000).toISOString(),
+          hash: tx.hash,
+          memo: tx.memo,
+          receiverAddress: tx.sub[0].to_address,
+          senderAddress: tx.sub[0].from_address,
+          status: tx.status !== 'success' ? TransactionStatus.FAILED : TransactionStatus.SUCCESS,
+        };
+
+        const transferTxRecord: TransferTransactionRecord = {
+          walletId: walletIdentifier,
+          assetId: currentAsset.identifier,
+          assetType: currentAsset.assetType,
+          txHash: tx.hash,
+          txType: EthereumTransactionType.TRANSFER,
+          messageTypeName: 'MsgSend',
+          txData: transferTx,
+          // TODO: add messageTypeName
+        };
+
+        return transferTxRecord;
+      });
+
+      return loadedTxList;
+    }
+
+    return [];
+  }
+
+  // eslint-disable-next-line class-methods-use-this
   public async fetchEVMTransferTxs(currentAsset: UserAsset, walletIdentifier: string) {
     if (!currentAsset.address || !currentAsset.config?.nodeUrl) {
       return [];
@@ -352,14 +401,26 @@ export class TransactionHistoryService {
       case UserAssetType.IBC:
       case undefined:
         try {
-          const chainIndexAPI = ChainIndexingAPI.init(indexingUrl);
-          const transferTransactions = await chainIndexAPI.fetchAssetDetailTransactions(
-            currentSession.wallet.identifier,
-            currentSession.wallet.config.network.coin.baseDenom,
-            currentAsset?.address || currentSession.wallet.address,
-            currentAsset,
-          );
-          return transferTransactions;
+          if (currentAsset.mainnetSymbol === 'CRO') {
+            const chainIndexAPI = ChainIndexingAPI.init(indexingUrl);
+            const transferTransactions = await chainIndexAPI.fetchAssetDetailTransactions(
+              currentSession.wallet.identifier,
+              currentSession.wallet.config.network.coin.baseDenom,
+              currentAsset?.address || currentSession.wallet.address,
+              currentAsset,
+            );
+            console.log('CRYPTO_ORG transferTransactions', transferTransactions);
+            return transferTransactions;
+          }
+
+          if (currentAsset.mainnetSymbol === 'ATOM' && currentAsset.address) {
+            const transferTransactions = await this.fetchCosmosHubTransferTxs(
+              currentAsset,
+              currentSession.wallet.identifier,
+            );
+            console.log('COSMOS_HUB transferTransactions', transferTransactions);
+            return transferTransactions;
+          }
         } catch (e) {
           // eslint-disable-next-line no-console
           console.error('FAILED_TO_LOAD_TRANSFERS', e);
@@ -592,7 +653,8 @@ export class TransactionHistoryService {
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
         return Promise.resolve([]);
       }
-      const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+
+      const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
       const loadedProposals = await nodeRpc.loadProposals([
         ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD,
         ProposalStatuses.PROPOSAL_STATUS_PASSED,
@@ -825,7 +887,7 @@ export class TransactionHistoryService {
       return;
     }
 
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    // const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
 
     const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
 
@@ -852,7 +914,7 @@ export class TransactionHistoryService {
                 address: asset.address,
               });
               asset.balance = '0';
-              await this.storageService.saveAsset(asset);
+              await this.storageService.updateAsset(asset);
               return;
             }
             // if (asset.name.includes('Cronos')) {
@@ -868,7 +930,7 @@ export class TransactionHistoryService {
               // eslint-disable-next-line no-console
               console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
             } finally {
-              await this.storageService.saveAsset(asset);
+              await this.storageService.updateAsset(asset);
             }
             // }
             // if (asset.name.includes('Ethereum')) {
@@ -895,10 +957,29 @@ export class TransactionHistoryService {
           case undefined:
             // Handle case for legacy assets that got persisted without a assetType - undefined
             try {
+              if (!asset.config || !asset.address) {
+                // eslint-disable-next-line no-console
+                console.log('NO_ASSET_CONFIG_0R_ADDRESS_FOUND', {
+                  config: asset.config,
+                  address: asset.address,
+                });
+                asset.balance = '0';
+                await this.storageService.updateAsset(asset);
+                return;
+              }
+              const { tendermintNetwork } = asset.config;
+              const baseDenom =
+                tendermintNetwork?.coin.baseDenom ??
+                currentSession.wallet.config.network.coin.baseDenom;
               const baseDenomination =
-                asset.assetType !== UserAssetType.IBC
-                  ? currentSession.wallet.config.network.coin.baseDenom
-                  : `ibc/${asset.ibcDenomHash}`;
+                asset.assetType !== UserAssetType.IBC ? baseDenom : `ibc/${asset.ibcDenomHash}`;
+              // const nodeRpc = await NodeRpcService.init({ baseUrl: asset.config.nodeUrl });
+              const nodeRpc = await NodeRpcService.init({
+                baseUrl: asset.config.nodeUrl,
+                clientUrl: asset.config.tendermintNetwork?.node?.clientUrl,
+                proxyUrl: asset.config.tendermintNetwork?.node?.proxyUrl,
+              });
+
               asset.balance = await nodeRpc.loadAccountBalance(
                 // Handling legacy wallets which had wallet.address
                 asset.address || currentSession.wallet.address,
@@ -926,7 +1007,7 @@ export class TransactionHistoryService {
               // eslint-disable-next-line no-console
               console.log('BALANCE_FETCH_ERROR', { asset, e });
             } finally {
-              await this.storageService.saveAsset(asset);
+              await this.storageService.updateAsset(asset);
             }
 
             break;

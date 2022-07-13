@@ -212,6 +212,14 @@ export class StorageService {
     );
   }
 
+  public async updateAsset(asset: UserAsset) {
+    return this.db.assetStore.update<UserAsset>(
+      { _id: asset.identifier },
+      { $set: asset },
+      { upsert: false },
+    );
+  }
+
   public async removeAssets(assets: UserAsset[]) {
     return this.db.assetStore.remove(
       { _id: { $in: assets.map(asset => asset.identifier) } },

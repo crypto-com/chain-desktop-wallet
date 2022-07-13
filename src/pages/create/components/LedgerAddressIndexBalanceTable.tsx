@@ -12,7 +12,7 @@ import {
   CRONOS_EVM_ASSET,
   MainNetEvmConfig,
 } from '../../../config/StaticAssets';
-import { DefaultWalletConfigs } from '../../../config/StaticConfig';
+import { DefaultWalletConfigs, SupportedChainName } from '../../../config/StaticConfig';
 import { NodeRpcService } from '../../../service/rpc/NodeRpcService';
 import { LedgerSigner } from '../../../service/signers/LedgerSigner';
 import { ISignerProvider } from '../../../service/signers/SignerProvider';
@@ -25,7 +25,7 @@ const LedgerAddressIndexBalanceTable = (props: {
   form?: FormInstance;
   assetType: UserAssetType;
   setisHWModeSelected?: (value: boolean) => void;
-  setDerivationPath?: ({ tendermint, evm }) => void;
+  setDerivationPath?: ({ cronosTendermint, cosmosTendermint, evm }) => void;
   setAddressIndexBalanceList: (list: any[]) => void;
 }) => {
   const DEFAULT_START_INDEX = 10;
@@ -114,14 +114,22 @@ const LedgerAddressIndexBalanceTable = (props: {
                 addressIndex: record.index,
               });
               setDerivationPath({
-                tendermint: LedgerSigner.getDerivationPath(
+                cronosTendermint: LedgerSigner.getDerivationPath(
                   record.index,
                   UserAssetType.TENDERMINT,
+                  SupportedChainName.CRYPTO_ORG,
+                  form.getFieldValue('derivationPathStandard'),
+                ),
+                cosmosTendermint: LedgerSigner.getDerivationPath(
+                  record.index,
+                  UserAssetType.TENDERMINT,
+                  SupportedChainName.COSMOS_HUB,
                   form.getFieldValue('derivationPathStandard'),
                 ),
                 evm: LedgerSigner.getDerivationPath(
                   record.index,
                   UserAssetType.EVM,
+                  SupportedChainName.CRONOS,
                   form.getFieldValue('derivationPathStandard'),
                 ),
               });
@@ -141,7 +149,7 @@ const LedgerAddressIndexBalanceTable = (props: {
         const nodeUrl = isTestnet
           ? DefaultWalletConfigs.TestNetCroeseid4Config.nodeUrl
           : DefaultWalletConfigs.MainNetConfig.nodeUrl;
-        const nodeRpc = await NodeRpcService.init(nodeUrl);
+        const nodeRpc = await NodeRpcService.init({ baseUrl: nodeUrl });
 
         await Promise.all(
           ledgerAccountList.map(async account => {
@@ -204,6 +212,7 @@ const LedgerAddressIndexBalanceTable = (props: {
                   derivationPath: LedgerSigner.getDerivationPath(
                     startIndex + idx,
                     UserAssetType.EVM,
+                    SupportedChainName.CRONOS,
                     standard,
                   ),
                   balance: '0',
@@ -220,6 +229,7 @@ const LedgerAddressIndexBalanceTable = (props: {
               startIndex,
               DEFAULT_GAP,
               isTestnet ? 'tcro' : 'cro',
+              SupportedChainName.CRYPTO_ORG,
               standard,
             );
             if (tendermintAddressList) {
@@ -230,6 +240,7 @@ const LedgerAddressIndexBalanceTable = (props: {
                   derivationPath: LedgerSigner.getDerivationPath(
                     startIndex + idx,
                     UserAssetType.TENDERMINT,
+                    SupportedChainName.CRYPTO_ORG,
                     standard,
                   ),
                   balance: '0',
@@ -243,7 +254,7 @@ const LedgerAddressIndexBalanceTable = (props: {
         default:
       }
     } catch {
-      ledgerNotificationWithoutCheck(assetType);
+      ledgerNotificationWithoutCheck(assetType, SupportedChainName.CRYPTO_ORG);
     }
   };
 

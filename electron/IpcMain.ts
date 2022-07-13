@@ -24,9 +24,10 @@ export class IpcMain {
       try {
         let index = arg.index;
         let addressPrefix = arg.addressPrefix;
+        let chainName = arg.chainName;
         let derivationPathStandard = arg.derivationPathStandard;
         let showLedgerDisplay = arg.showLedgerDisplay;
-        const info = await this.provider.enable(index, addressPrefix, derivationPathStandard, showLedgerDisplay);
+        const info = await this.provider.enable(index, addressPrefix, chainName, derivationPathStandard, showLedgerDisplay);
         let accountInfo = info[0];
         let accountPubKey = info[1].toUint8Array();
         ret = {
@@ -53,8 +54,9 @@ export class IpcMain {
         let startIndex = arg.startIndex;
         let gap = arg.gap;
         let addressPrefix = arg.addressPrefix;
+        let chainName = arg.chainName;
         let derivationPathStandard = arg.derivationPathStandard;
-        const addressList = await this.provider.getAddressList(startIndex, gap, addressPrefix, derivationPathStandard);
+        const addressList = await this.provider.getAddressList(startIndex, gap, addressPrefix, chainName, derivationPathStandard);
         ret = {
           success: true,
           addressList: addressList,
