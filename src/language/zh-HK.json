@@ -807,5 +807,6 @@
   "general.walletconnect.connected": "已連接",
   "general.walletconnect.disconnect": "斷開連接",
   "general.walletconnect.connect.desc6": "現在你可以在瀏覽器上訪問 DApp",
-  "general.walletconnect.connect.desc7": "錢包地址"
+  "general.walletconnect.connect.desc7": "錢包地址",
+  "asset.tx.checkOnEtherscan": "在 Etherscan 上查看交易歷史"
 }

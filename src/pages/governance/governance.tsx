@@ -157,7 +157,6 @@ const GovernancePage = () => {
       t('governance.modal2.form.input.proposalDeposit.min.error'),
     );
 
-    
     form.validateFields(['initialDeposit']);
   };
 
@@ -195,18 +194,35 @@ const GovernancePage = () => {
     setIsVisibleConfirmationModal(true);
   };
 
-
   const checkProposalType = (proposal: any) => {
-    const proposal_initial_deposit = proposal.content['@type'];
+    const proposal_initial_deposit = proposal?.content['@type']?.toLowerCase();
     let status = "";
-
-    // t('governance.modal2.form.input.proposalType.choice2') // Community Pool Spend
-    // t('governance.modal2.form.input.proposalType.choice3') // Parameter Change
-
-    if(proposal_initial_deposit.toLowerCase().indexOf('textproposal')){
-      status = t('governance.modal2.form.input.proposalType.choice1'); // Text Proposal
+    switch(true){
+      case (proposal_initial_deposit.indexOf('textproposal') > -1):
+        status = t('governance.modal2.form.input.proposalType.choice1');
+        break;
+      case (proposal_initial_deposit.indexOf('parameterchange') > -1):
+        status = t('governance.modal2.form.input.proposalType.choice3');
+        break;
+      case (proposal_initial_deposit.indexOf('communitypoolspend') > -1):
+        status = t('governance.modal2.form.input.proposalType.choice2');
+        break;
+      case (proposal_initial_deposit.indexOf('cancelsoftwareupgrade') > -1):
+        status = t('governance.modal2.form.input.proposalType.choice5');
+        break;
+      case (proposal_initial_deposit.indexOf('softwareupgrade') > -1 && proposal_initial_deposit.indexOf('cancelsoftwareupgrade') < 0):
+        status = t('governance.modal2.form.input.proposalType.choice4');
+        break;
+      case (proposal_initial_deposit.indexOf('upgrade') > -1 && proposal_initial_deposit.indexOf('softwareupgrade') < 0 && proposal_initial_deposit.indexOf('cancelsoftwareupgrade') < 0):
+        status = t('governance.modal2.form.input.proposalType.choice6');
+        break;
+      case (proposal_initial_deposit.indexOf('clientupdate') > -1):
+        status = t('governance.modal2.form.input.proposalType.choice7');
+        break;
+      default:
+        status = "";
+        break;
     }
-    
     return status;
   };
 
@@ -551,19 +567,27 @@ const GovernancePage = () => {
     setProposalList(latestProposalOnTop);
   };
 
-  // const refreshProposal = async () => {
-  //   const reFetchProposalList = await fetchProposalList();
-  //   const currentProposalId = proposal?.proposal_id;
-  //   const currentProposal = proposalList?.filter((item) => {
-  //     return item.proposal_id === currentProposalId
-  //   })[0];
+  const refreshProposal = async () => {
+    const list: ProposalModel[] = await walletService.retrieveProposals(
+      currentSession.wallet.config.network.chainId,
+    );
 
-  //   console.log('reFetchProposalList ', reFetchProposalList);
+    const latestProposalOnTop = list.reverse();
+    setProposalList(latestProposalOnTop);
+    setTimeout(() => {
+      const currentProposalId = proposal?.proposal_id;
+      const currentProposal = latestProposalOnTop?.filter((item) => {
+        return item.proposal_id === currentProposalId;
+      })[0];
 
-  //   setIsProposalVisible(false);
-  //   setProposal(currentProposal);
-  //   processProposalFigures(currentProposal!);
-  // };
+      setProposal(currentProposal);
+      processProposalFigures(currentProposal!);
+
+      return currentProposal;
+    }, 300);
+  };
+
+
 
   useEffect(() => {
     fetchProposalList = async () => {
@@ -604,7 +628,7 @@ const GovernancePage = () => {
     form.validateFields(['initialDeposit']);
 
     // eslint-disable-next-line
-  }, [currentSession, form, userAsset]);
+  }, [currentSession, form, userAsset, proposal, proposalList]);
 
   return (
     <Layout className="site-layout">
@@ -945,7 +969,8 @@ const GovernancePage = () => {
               setLedgerIsExpertMode,
               setErrorMessages,
               setIsErrorModalVisible,
-              // refreshProposal
+              refreshProposal,
+              setProposal
             }}
           />
         ) : (

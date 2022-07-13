@@ -611,6 +611,10 @@
   "governance.modal2.form.input.proposalType.choice1": "Text Proposal",
   "governance.modal2.form.input.proposalType.choice2": "Community Pool Spend",
   "governance.modal2.form.input.proposalType.choice3": "Parameter Change",
+  "governance.modal2.form.input.proposalType.choice4": "Software Upgrade",
+  "governance.modal2.form.input.proposalType.choice5": "Cancel Software Upgrade",
+  "governance.modal2.form.input.proposalType.choice6": "Upgrade",
+  "governance.modal2.form.input.proposalType.choice7": "Client Update",
   "governance.modal2.form.input.proposalTitle": "Title",
   "governance.modal2.form.input.proposalTitle.error": "Must declare a clear title",
   "governance.modal2.form.input.proposalDesc": "Description",
@@ -821,5 +825,6 @@
   "general.walletconnect.connected": "Connected",
   "general.walletconnect.disconnect": "Disconnect",
   "general.walletconnect.connect.desc6": "You can now access DApp on your web browser",
-  "general.walletconnect.connect.desc7": "Wallet Address"
+  "general.walletconnect.connect.desc7": "Wallet Address",
+  "asset.tx.checkOnEtherscan": "Check Transaction history on Etherscan"
 }

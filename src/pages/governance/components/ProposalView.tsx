@@ -164,13 +164,11 @@ export const ProposalView = (props: any) => {
         setConfirmDepositModalVisible(false);
         form.resetFields();
 
-        console.log('proposalDeposit000...');
-
         setTimeout(() => {
           setDepositSuccessModalVisible(true);
-        },500);
+        }, 400);
         
-        // await refreshProposal();
+        await refreshProposal();
       }
     }catch(e){
       if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
@@ -197,17 +195,20 @@ export const ProposalView = (props: any) => {
   };
 
 
-  // const refreshProposal = async () => {
-  //   const refreshProposal0 = await allProps.refreshProposal();
+  const refreshProposal = async () => {
+    const currrentProposal = await allProps.refreshProposal();
+    await walletService.syncAll();
 
-  //   console.log('refreshProposal....', refreshProposal0);
+    const sessionData = await walletService.retrieveCurrentSession();
+    allProps?.setProposal(currrentProposal);
 
-  //   setProposposalStatus(allProps?.proposal?.status);
-  //   totalDeposit();
-  //   totalDepositPercentage()
-  //   const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
-  //   setUserAsset(currentWalletAsset);
-  // };
+    console.log('allProps?.proposal ', allProps?.proposal);
+
+    totalDeposit();
+    totalDepositPercentage()
+    const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+    setUserAsset(currentWalletAsset);
+  };
 
   const showPasswordInput = () => {
     // TODO: check if decryptedPhrase expired
