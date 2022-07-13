@@ -551,17 +551,19 @@ const GovernancePage = () => {
     setProposalList(latestProposalOnTop);
   };
 
-  const refreshProposal = async () => {
-    await fetchProposalList();
-    const currentProposalId = proposal?.proposal_id;
-    const currentProposal = proposalList?.filter((item) => {
-      return item.proposal_id === currentProposalId
-    })[0];
+  // const refreshProposal = async () => {
+  //   const reFetchProposalList = await fetchProposalList();
+  //   const currentProposalId = proposal?.proposal_id;
+  //   const currentProposal = proposalList?.filter((item) => {
+  //     return item.proposal_id === currentProposalId
+  //   })[0];
 
-    setIsProposalVisible(false);
-    setProposal(currentProposal);
-    processProposalFigures(currentProposal!);
-  };
+  //   console.log('reFetchProposalList ', reFetchProposalList);
+
+  //   setIsProposalVisible(false);
+  //   setProposal(currentProposal);
+  //   processProposalFigures(currentProposal!);
+  // };
 
   useEffect(() => {
     fetchProposalList = async () => {
@@ -753,9 +755,7 @@ const GovernancePage = () => {
         <ModalPopup
           isModalVisible={isProposalModalVisible}
           handleCancel={handleCancelProposalModal}
-          handleOk={() => {
-            onCreateProposalAction();
-          }}
+          handleOk={() => {}}
           closable={!confirmLoading}
           confirmationLoading={confirmLoading}
           footer={[
@@ -764,7 +764,7 @@ const GovernancePage = () => {
               type="primary"
               loading={confirmLoading}
               onClick={() => {
-                onCreateProposalAction();
+                form.submit();
               }}
               disabled={
                 !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
@@ -818,6 +818,9 @@ const GovernancePage = () => {
                     ? minDeposit
                     : getUIDynamicAmount(userAsset.balance, userAsset),
                 proposalType: 'text_proposal',
+              }}
+              onFinish={() => {
+                onCreateProposalAction();
               }}
             >
               <Form.Item
@@ -942,7 +945,7 @@ const GovernancePage = () => {
               setLedgerIsExpertMode,
               setErrorMessages,
               setIsErrorModalVisible,
-              refreshProposal
+              // refreshProposal
             }}
           />
         ) : (

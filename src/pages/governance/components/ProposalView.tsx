@@ -158,12 +158,19 @@ export const ProposalView = (props: any) => {
       });
 
       if(proposalDeposit?.transactionHash){
-        await refreshProposal();
+        
         allProps.setConfirmLoading(false);
         allProps.setIsVisibleConfirmationModal(false);
         setConfirmDepositModalVisible(false);
         form.resetFields();
-        setDepositSuccessModalVisible(true);
+
+        console.log('proposalDeposit000...');
+
+        setTimeout(() => {
+          setDepositSuccessModalVisible(true);
+        },500);
+        
+        // await refreshProposal();
       }
     }catch(e){
       if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
@@ -190,14 +197,17 @@ export const ProposalView = (props: any) => {
   };
 
 
-  const refreshProposal = async () => {
-    await allProps.refreshProposal();
-    setUserAsset(userAsset);
+  // const refreshProposal = async () => {
+  //   const refreshProposal0 = await allProps.refreshProposal();
 
-    setProposposalStatus(allProps?.proposal?.status);
-    totalDeposit();
-    totalDepositPercentage()
-  };
+  //   console.log('refreshProposal....', refreshProposal0);
+
+  //   setProposposalStatus(allProps?.proposal?.status);
+  //   totalDeposit();
+  //   totalDepositPercentage()
+  //   const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+  //   setUserAsset(currentWalletAsset);
+  // };
 
   const showPasswordInput = () => {
     // TODO: check if decryptedPhrase expired
@@ -503,14 +513,7 @@ export const ProposalView = (props: any) => {
           <ModalPopup
           isModalVisible={isDepositModalVisible}
           handleCancel={handleCancelDepositModal}
-          handleOk={() => {
-            allProps.setModalType('deposit');
-            setDepositModalVisible(false);
-            
-            setTimeout(() => {
-              showPasswordInput();
-            }, 200);
-          }}
+          handleOk={() => {}}
           closable={!allProps.confirmLoading}
           confirmationLoading={allProps.confirmLoading}
           footer={[
@@ -519,12 +522,7 @@ export const ProposalView = (props: any) => {
               type="primary"
               loading={allProps.confirmLoading}
               onClick={() => {
-                allProps.setModalType('deposit');
-                setDepositModalVisible(false);
-                
-                setTimeout(() => {
-                  showPasswordInput();
-                }, 200);
+                form.submit();
               }}
               disabled={
                 !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
@@ -547,6 +545,14 @@ export const ProposalView = (props: any) => {
               name="create-proposal-form"
               layout="vertical"
               requiredMark={false}
+              onFinish={() => {
+                allProps.setModalType('deposit');
+                setDepositModalVisible(false);
+                
+                setTimeout(() => {
+                  showPasswordInput();
+                }, 200);
+              }}
             >
               <Form.Item
                 name="depositAmount"
