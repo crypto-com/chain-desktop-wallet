@@ -50,9 +50,12 @@
       margin-top: 4px;
       position: relative;
       display: flex;
+      min-height: 120px;
 
 
       .deposit-progress-list{
+        position: relative;
+        top: 12px;
 
         .ant-progress-circle-trail{
           stroke: #e7e7e7;
@@ -61,14 +64,13 @@
         .ant-progress-text{
           font-size: 11px;
         }
-
       }
     }
   }
+
   .back-button {
     margin: 24px 0;
   }
-
 
   .time-container{
     position: absolute;
@@ -121,9 +123,11 @@
   }
   .item {
     margin: 0;
+
     .label {
       color: @font-color;
     }
+
     .address {
       padding: 10px 8px;
       background: #f0f0f0;
@@ -136,8 +140,10 @@
   }
   .ant-layout {
     margin: 10px;
+
     .ant-layout-content {
       margin: 0 10px;
+
       .description {
         white-space: pre-line;
       }
@@ -147,12 +153,15 @@
   .ant-card-head-title {
     color: @azure;
   }
+
   .vote-result-section {
     padding-bottom: 10px;
   }
+
   .ant-radio-group {
     width: 100%;
     text-align: center;
+
     .ant-radio-button-wrapper {
       display: block;
       height: 46px;
@@ -292,9 +301,6 @@
   }
 }
 
-
-
-
 .create-proposal-success-modal{
   .info{
     position: relative;
@@ -310,7 +316,6 @@
     margin: 0;
     padding: 0;
     margin-bottom: 32px;
-
 
     li{
       position: relative;
@@ -385,7 +390,6 @@
   margin-bottom: 32px;
 }
 
-
 .progress-info{
   position: relative;
   display: block;
@@ -404,6 +408,7 @@
   .ant-progress-inner{
     border-radius: 0px !important;
   }
+
   .ant-progress-bg{
     height: 16px !important;
     border-radius: 0px !important;
@@ -423,8 +428,8 @@
   width: 48%;
   margin: 20px 1%;
   font-size: 15px;
-
   min-width: 172px;
+
   .txt{
     color: #888;
     letter-spacing: -0.1px;
@@ -468,7 +473,6 @@
   }
 }
 
-
 .proposal-type{
   position: absolute;
   bottom: 7px;
@@ -478,7 +482,6 @@
   font-size: 10px;
   font-weight: 700;
 }
-
 
 .deposit-card-header{
   position: relative;
@@ -493,7 +496,6 @@
     color: #777;
   }
 }
-
 
 @media screen and (max-width: 1200px) {
   .date-container{

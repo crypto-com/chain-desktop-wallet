@@ -632,6 +632,8 @@
   "governance.voteHistory.table.column1": "Proposal",
   "governance.voteHistory.table.column2": "Your Vote",
   "governance.voteHistory.table.column3": "Voted On",
+  "governance.proposalView.modal3.header": "Deposit",
+  "governance.proposalView.modal3.field": "Amount",
   "governance.proposalView.modal3.depositBtn": "Deposit",
   "governance.proposalView.modal3.placeholder": "Enter deposit amount",
   "governance.proposalView.modal4.depositBtn": "Confirm Deposit",

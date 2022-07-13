@@ -535,14 +535,12 @@ const GovernancePage = () => {
     return code;
   };
 
-
   const percentageCalc = (proposal: any) => {
     const depositCalc = (proposal?.total_deposit.reduce((partialSum, a) => partialSum.plus(Big(a.amount)), Big(0))).toString();
     const totalDeposit = Big(getUIDynamicAmount(depositCalc, userAsset)).toString();
     const finalPercentage = (Big(totalDeposit).div(Big((maxDeposit.replace(',',''))))).times(100).toFixed(2);
     return Big(finalPercentage).toNumber();
   };
-
 
   let fetchProposalList = async () => {
     const list: ProposalModel[] = await walletService.retrieveProposals(
@@ -552,7 +550,6 @@ const GovernancePage = () => {
     const latestProposalOnTop = list.reverse();
     setProposalList(latestProposalOnTop);
   };
-
 
   const refreshProposal = async () => {
     await fetchProposalList();
@@ -567,7 +564,6 @@ const GovernancePage = () => {
   };
 
   useEffect(() => {
-
     fetchProposalList = async () => {
       const list: ProposalModel[] = await walletService.retrieveProposals(
         currentSession.wallet.config.network.chainId,
@@ -588,12 +584,6 @@ const GovernancePage = () => {
       didMountRef.current = true;
       analyticsService.logPage('Governance');
     }
-
-    // customRangeValidator = TransactionUtils.rangeValidator(
-    //   minDeposit,
-    //   maxDeposit,
-    //   t('governance.modal2.form.input.proposalDeposit.error'),
-    // );
 
     customMaxValidator = TransactionUtils.maxValidator(
       maxDeposit,
@@ -620,11 +610,7 @@ const GovernancePage = () => {
         <></>
       ) : (
         <>
-          
-
           {isProposalVisible ? (<>
-
-
             <Header className="site-layout-background proposal-details-header">
               <div className="top">
                 {t('governance.proposalDetails')}
@@ -649,14 +635,11 @@ const GovernancePage = () => {
               </div>
             </a>
 
-
             <div className="top-proposal-container">
-      
               <div className="item">
                 <div className="status">{processStatusTag(proposal?.status)}</div>
               </div>
             </div>
-          
           
           </>) : (
             <>

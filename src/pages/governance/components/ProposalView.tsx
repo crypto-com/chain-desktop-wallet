@@ -13,19 +13,22 @@ import {
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
-
 import { secretStoreService } from '../../../service/storage/SecretStoreService';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
 import { checkIfTestnet } from '../../../utils/utils';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
+
 import { 
+  ledgerIsExpertModeState,
   sessionState, 
   walletAssetState 
 } from '../../../recoil/atom';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
+
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../../components/SuccessModalPopup/SuccessModalPopup';
+import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
 
 import { ProposalModel, ProposalStatuses, VoteOption } from '../../../models/Transaction';
@@ -56,11 +59,14 @@ export const ProposalView = (props: any) => {
   const [isDepositModalVisible, setDepositModalVisible] = useState(false);
   const [confirmDepositModalVisible, setConfirmDepositModalVisible] = useState(false);
   const [isDepositSuccessModalVisible, setDepositSuccessModalVisible] = useState(false);
+  const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
+  const [errorMessages, setErrorMessages] = useState([]);
 
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
 
   const { isLedgerConnected } = useLedgerStatus({ asset: userAsset });
+  const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
 
 
   const didMountRef = useRef(false);
@@ -84,6 +90,10 @@ export const ProposalView = (props: any) => {
   const handleCloseDepositSuccessModal = () => {
     setDepositSuccessModalVisible(false);
   }
+
+  const closeErrorModal = () => {
+    setIsErrorModalVisible(false);
+  };
 
   const handleCancelDepositModal = () => {
     if(!allProps.confirmLoading){
@@ -151,18 +161,19 @@ export const ProposalView = (props: any) => {
         await refreshProposal();
         allProps.setConfirmLoading(false);
         allProps.setIsVisibleConfirmationModal(false);
-        handleCancelDepositModal();
+        setConfirmDepositModalVisible(false);
+        form.resetFields();
         setDepositSuccessModalVisible(true);
       }
     }catch(e){
       if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-        allProps.setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
+        setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
-      allProps.setErrorMessages(((e as unknown) as any).message.split(': '));
+      setErrorMessages(((e as unknown) as any).message.split(': '));
       allProps.setIsVisibleConfirmationModal(false);
       allProps.setConfirmLoading(false);
       // setInputPasswordVisible(false);
-      allProps.setIsErrorModalVisible(true);
+      setIsErrorModalVisible(true);
       // eslint-disable-next-line no-console
       console.error('Error occurred while transfer', e);
     }
@@ -207,7 +218,7 @@ export const ProposalView = (props: any) => {
     
     setDecryptedPhrase(phraseDecrypted);
     setInputPasswordVisible(false);
-
+    setConfirmDepositModalVisible(true);
   };
 
   useEffect(() => {
@@ -384,10 +395,6 @@ export const ProposalView = (props: any) => {
               tip="Loading latest results"
             >
 
-              {
-                console.log(allProps.proposal)
-              }
-
               {(proposalStatus  === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? (<>
                 <Card>
                     <div className="deposit-card-header">
@@ -499,7 +506,7 @@ export const ProposalView = (props: any) => {
           handleOk={() => {
             allProps.setModalType('deposit');
             setDepositModalVisible(false);
-            setConfirmDepositModalVisible(true);
+            
             setTimeout(() => {
               showPasswordInput();
             }, 200);
@@ -514,7 +521,6 @@ export const ProposalView = (props: any) => {
               onClick={() => {
                 allProps.setModalType('deposit');
                 setDepositModalVisible(false);
-                setConfirmDepositModalVisible(true);
                 setTimeout(() => {
                   showPasswordInput();
                 }, 200);
@@ -532,7 +538,7 @@ export const ProposalView = (props: any) => {
           okText={t('general.confirm')}
         >
           <>
-            <Header className="create-proposal-header"> {t('governance.modal2.title')} </Header>
+            <Header className="create-proposal-header"> {t('governance.proposalView.modal3.header')} </Header>
 
             <Form
               className="create-proposal-form"
@@ -544,7 +550,7 @@ export const ProposalView = (props: any) => {
               <Form.Item
                 name="depositAmount"
                 validateFirst
-                label={t('governance.modal2.form.input.proposalDeposit')}
+                label={t('governance.proposalView.modal3.field')}
                 hasFeedback
                 rules={[
                   {
@@ -662,6 +668,29 @@ export const ProposalView = (props: any) => {
             </div>
           </div>
         </SuccessModalPopup>
+
+        <ErrorModalPopup
+          isModalVisible={isErrorModalVisible}
+          handleCancel={closeErrorModal}
+          handleOk={closeErrorModal}
+          title={t('general.errorModalPopup.title')}
+          footer={[]}
+        >
+          <>
+            <div className="description">
+              {t('general.errorModalPopup.vote.description')}
+              <br />
+              {errorMessages
+                .filter((item, idx) => {
+                  return errorMessages.indexOf(item) === idx;
+                })
+                .map((err, idx) => (
+                  <div key={idx}>- {err}</div>
+                ))}
+              {ledgerIsExpertMode ? <div>{t('general.errorModalPopup.ledgerExportMode')}</div> : ''}
+            </div>
+          </>
+        </ErrorModalPopup>
 
         <PasswordFormModal
           description={t('general.passwordFormModal.description')}
