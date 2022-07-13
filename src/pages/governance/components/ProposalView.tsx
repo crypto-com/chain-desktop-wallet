@@ -521,6 +521,7 @@ export const ProposalView = (props: any) => {
               onClick={() => {
                 allProps.setModalType('deposit');
                 setDepositModalVisible(false);
+                
                 setTimeout(() => {
                   showPasswordInput();
                 }, 200);
