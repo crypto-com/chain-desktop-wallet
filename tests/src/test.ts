@@ -4,7 +4,7 @@ import * as path from 'path';
 import { DerivationPathStandard, LedgerSigner } from '../../src/service/signers/LedgerSigner';
 import { ISignerProvider } from '../../src/service/signers/SignerProvider';
 import { LedgerTransactionSigner } from '../../src/service/signers/LedgerTransactionSigner';
-import { CustomDevNet } from '../../src/config/StaticConfig';
+import { CustomDevNet, SupportedChainName } from '../../src/config/StaticConfig';
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { NodeRpcService } from '../../src/service/rpc/NodeRpcService';
 const { exec } = require('child_process');
@@ -190,20 +190,20 @@ export class LedgerWalletSignerProviderZemu implements ISignerProvider {
     this.provider = new LedgerSignerZemu();
   }
 
-  public async getPubKey(index: number, derivationPathStandard: DerivationPathStandard): Promise<Bytes> {
-    const result = await this.provider.enable(index, 'cro', derivationPathStandard, false); // dummy value
+  public async getPubKey(index: number, chainName: SupportedChainName, derivationPathStandard: DerivationPathStandard): Promise<Bytes> {
+    const result = await this.provider.enable(index, 'cro', chainName, derivationPathStandard, false); // dummy value
     await this.provider.closeTransport();
     return result[1];
   }
 
-  public async getAddress(index: number, addressPrefix: string, derivationPathStandard: DerivationPathStandard): Promise<string> {
-    const result = await this.provider.enable(index, addressPrefix, derivationPathStandard, false);
+  public async getAddress(index: number, addressPrefix: string, chainName: SupportedChainName, derivationPathStandard: DerivationPathStandard): Promise<string> {
+    const result = await this.provider.enable(index, addressPrefix, chainName, derivationPathStandard, false);
     await this.provider.closeTransport();
     return result[0];
   }
 
-  public async getAddressList(startIndex: number, gap: number, addressPrefix: string, derivationPathStandard: DerivationPathStandard): Promise<string[]> {
-    const result = await this.provider.getAddressList(startIndex, gap, addressPrefix, derivationPathStandard);
+  public async getAddressList(startIndex: number, gap: number, addressPrefix: string, chainName: SupportedChainName, derivationPathStandard: DerivationPathStandard): Promise<string[]> {
+    const result = await this.provider.getAddressList(startIndex, gap, addressPrefix, chainName, derivationPathStandard);
     await this.provider.closeTransport();
     return result;
   }
@@ -259,7 +259,7 @@ async function main() {
   const phrase = '';
   signerProvider.provider.setClickTimes(7);
   const ledgerAddress = 'cro1tzhdkuc328cgh2hycyfddtdpqfwwu42yq3qgkr';
-  const nodeRpc = await NodeRpcService.init(walletConfig.nodeUrl);
+  const nodeRpc = await NodeRpcService.init({ baseUrl: walletConfig.nodeUrl });
   await Zemu.default.sleep(SLEEP_MS);
   const accountNumber = await nodeRpc.fetchAccountNumber(ledgerAddress);
   console.log('get account number ', accountNumber);

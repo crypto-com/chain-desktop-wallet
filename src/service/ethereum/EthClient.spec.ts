@@ -18,11 +18,11 @@ describe('EthClient', () => {
   });
   it('should return transaction list from blockchain chainIndexAPI ', async () => {
     axiosMock
-      .onGet('/address/0xa976a66bfcbd5d71e6d0b7a0a3a9aa8eaa1b377a/transaction-history', {
+      .onGet('/address/0xa976a66bfcbd5d71e6d0b7a0a3a9aa8eaa1b377a/normal', {
         params: { pageSize: 5, page: 0, sort: 'timestamp:desc' },
       })
       .replyOnce(200, txListStubSuccessful)
-      .onGet('/address/0xa976a66bfcbd5d71e6d0b7a0a3a9aa8eaa1b377a/transaction-history', {
+      .onGet('/address/0xa976a66bfcbd5d71e6d0b7a0a3a9aa8eaa1b377a/normal', {
         params: { pageSize: 5, page: 1, sort: 'timestamp:desc' },
       })
       .replyOnce(200, txListStubEmpty);

@@ -54,7 +54,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
       case UserAssetType.CRC_20_TOKEN:
         return address;
       case UserAssetType.IBC:
-        return wallet.address;
+        return address;
       default:
         return wallet.address;
     }

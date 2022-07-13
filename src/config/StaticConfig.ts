@@ -206,6 +206,7 @@ SUPPORTED_CURRENCY.set('TRY', { value: 'TRY', label: 'TRY - ₺', symbol: '₺' 
 export enum SupportedChainName {
   CRYPTO_ORG = 'Crypto.org Chain',
   CRONOS = 'Cronos Chain',
+  COSMOS_HUB = 'Cosmos Hub Chain',
   ETHEREUM = 'Ethereum Chain',
 }
 
@@ -453,6 +454,11 @@ export type Network = {
   bip44Path: { coinType: number; account: number };
   validatorPubKeyPrefix: string;
   validatorAddressPrefix: string;
-  coin: { baseDenom: string; croDenom: string };
+  coin: { baseDenom: string; croDenom: string; denom?: string };
   rpcUrl?: string;
+  chainName?: SupportedChainName;
+  node?: {
+    clientUrl: string;
+    proxyUrl: string;
+  };
 };

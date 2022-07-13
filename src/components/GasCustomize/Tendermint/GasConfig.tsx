@@ -4,12 +4,13 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../../config/StaticConfig';
-import { useCronosTendermintAsset } from '../../../hooks/useCronosEvmAsset';
+import { useActiveAsset } from '../../../hooks/useCronosEvmAsset';
+
 import { getNormalScaleAmount } from '../../../utils/NumberUtils';
 import { useCustomGasModalTendermint } from './GasModal';
 
 export const GasInfoTendermint = () => {
-  const asset = useCronosTendermintAsset();
+  const asset = useActiveAsset();
   const [readableGasFee, setReadableGasFee] = useState('');
   const [t] = useTranslation();
 
@@ -85,7 +86,7 @@ const GasConfig = (props: { onChange?: (gasLimit: string, networkFee: string) =>
   const { onChange } = props;
 
   const [t] = useTranslation();
-  const asset = useCronosTendermintAsset();
+  const asset = useActiveAsset();
 
   const [networkFee, setNetworkFee] = useState(asset!.config?.fee?.networkFee ?? FIXED_DEFAULT_FEE);
   const [gasLimit, setGasLimit] = useState(asset!.config?.fee?.gasLimit ?? FIXED_DEFAULT_GAS_LIMIT);

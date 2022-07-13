@@ -1,5 +1,6 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { hexToString } from 'web3-utils';
+import { SupportedChainName } from '../../config/StaticConfig';
 import { DerivationPathStandard } from './LedgerSigner';
 import { ISignerProvider } from './SignerProvider';
 
@@ -12,12 +13,14 @@ export class IpcRender implements ISignerProvider {
   // eslint-disable-next-line  class-methods-use-this
   async getPubKey(
     index: number,
+    chainName: SupportedChainName,
     derivationPathStandard: DerivationPathStandard,
     showLedgerDisplay: boolean,
   ): Promise<Bytes> {
     const arg = electron.ipcRenderer.sendSync('enableWallet', {
       index,
       addressPrefix: 'cro', // dummy value
+      chainName,
       derivationPathStandard,
       showLedgerDisplay,
       message: 'enableWallet request for getPubKey',
@@ -34,12 +37,14 @@ export class IpcRender implements ISignerProvider {
   async getAddress(
     index: number,
     addressPrefix: string,
+    chainName: SupportedChainName,
     derivationPathStandard: DerivationPathStandard,
     showLedgerDisplay: boolean,
   ): Promise<string> {
     const arg = electron.ipcRenderer.sendSync('enableWallet', {
       index,
       addressPrefix,
+      chainName,
       derivationPathStandard,
       showLedgerDisplay,
       message: 'enableWallet request for getAddress',
@@ -56,12 +61,14 @@ export class IpcRender implements ISignerProvider {
     startIndex: number,
     gap: number,
     addressPrefix: string,
+    chainName: SupportedChainName,
     derivationPathStandard: DerivationPathStandard,
   ): Promise<string[]> {
     const arg = electron.ipcRenderer.sendSync('getAddressList', {
       startIndex,
       gap,
       addressPrefix,
+      chainName,
       derivationPathStandard,
       message: 'enableWallet request for getAddressList',
     });

@@ -21,7 +21,7 @@ import {
 import { getAssetAmountInFiat, UserAsset } from '../../../models/UserAsset';
 import { getNormalScaleAmount } from '../../../utils/NumberUtils';
 import { walletService } from '../../../service/WalletService';
-import { useCronosTendermintAsset } from '../../../hooks/useCronosEvmAsset';
+import { useActiveAsset } from '../../../hooks/useCronosEvmAsset';
 import { Session } from '../../../models/Session';
 import { useAnalytics } from '../../../hooks/useAnalytics';
 
@@ -38,7 +38,7 @@ const ModalBody = (props: {
 
   const [form] = Form.useForm();
 
-  const croTendermintAsset = useCronosTendermintAsset();
+  const tendermintAsset = useActiveAsset();
   const [validateStatus, setValidateStatus] = useState<ValidateStatus>('');
   const currentSession = getRecoil(sessionState);
   const allMarketData = getRecoil(allMarketState);
@@ -93,7 +93,7 @@ const ModalBody = (props: {
     });
   }, [asset, gasFee, gasLimit]);
 
-  if (!croTendermintAsset) {
+  if (!tendermintAsset) {
     return <React.Fragment />;
   }
 
@@ -139,9 +139,9 @@ const ModalBody = (props: {
           );
 
           const newlyUpdatedAsset = {
-            ...croTendermintAsset,
+            ...tendermintAsset,
             config: {
-              ...croTendermintAsset.config,
+              ...tendermintAsset.config,
               fee: { gasLimit: newGasLimit.toString(), networkFee: newNetworkFee.toString() },
             },
           };

@@ -4,6 +4,7 @@ import { Session } from '../models/Session';
 import { UserAsset } from '../models/UserAsset';
 import i18n from '../language/I18n';
 import { AssetAddressValidator } from '../service/AssetAddressValidator';
+import { Network } from '../config/StaticConfig';
 
 export class TransactionUtils {
   public static addressValidator(
@@ -20,11 +21,9 @@ export class TransactionUtils {
           walletAsset.symbol
         } ${addressType} ${i18n.t('general.addressValidator.reason2')}`;
 
-        const addressValidator = new AssetAddressValidator(
-          value,
-          currentSession.wallet.config,
-          walletAsset.assetType,
-        );
+        const network: Network =
+          walletAsset.config?.tendermintNetwork ?? currentSession.wallet.config.network;
+        const addressValidator = new AssetAddressValidator(value, network, walletAsset.assetType);
 
         try {
           if (addressValidator.validate(type)) {

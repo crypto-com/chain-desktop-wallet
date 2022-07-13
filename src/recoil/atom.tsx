@@ -54,6 +54,7 @@ const defaultAsset: UserAsset = {
 export enum LedgerConnectedApp {
   CRYPTO_ORG = 'Crypto.org',
   ETHEREUM = 'Ethereum',
+  COSMOS = 'Cosmos',
   NOT_CONNECTED = '',
 }
 

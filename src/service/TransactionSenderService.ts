@@ -79,7 +79,7 @@ export class TransactionSenderService {
     const scaledBaseAmount = getBaseScaledAmount(transferRequest.amount, currentAsset);
 
     const currentSession = await this.storageService.retrieveCurrentSession();
-    const fromAddress = currentSession.wallet.address;
+    const fromAddress = currentSession.activeAsset?.address ?? currentSession.wallet.address;
     const walletAddressIndex = currentSession.wallet.addressIndex;
     const walletDerivationPathStandard =
       currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
@@ -277,6 +277,7 @@ export class TransactionSenderService {
           accountNumber,
           accountSequence,
           transactionSigner,
+          cosmjsTendermintTransactionSigner,
           ledgerTransactionSigner,
         } = await this.transactionPrepareService.prepareTransaction();
 
@@ -294,6 +295,13 @@ export class TransactionSenderService {
 
         if (transferRequest.walletType === LEDGER_WALLET_TYPE) {
           signedTxHex = await ledgerTransactionSigner.signTransfer(
+            transfer,
+            transferRequest.decryptedPhrase,
+            networkFee,
+            gasLimit,
+          );
+        } else if (transfer.asset?.config?.tendermintNetwork) {
+          signedTxHex = await cosmjsTendermintTransactionSigner.signTransfer(
             transfer,
             transferRequest.decryptedPhrase,
             networkFee,
