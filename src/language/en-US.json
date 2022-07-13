@@ -632,6 +632,8 @@
   "governance.voteHistory.table.column1": "Proposal",
   "governance.voteHistory.table.column2": "Your Vote",
   "governance.voteHistory.table.column3": "Voted On",
+  "governance.proposalView.modal3.header": "Deposit",
+  "governance.proposalView.modal3.field": "Amount",
   "governance.proposalView.modal3.depositBtn": "Deposit",
   "governance.proposalView.modal3.placeholder": "Enter deposit amount",
   "governance.proposalView.modal4.depositBtn": "Confirm Deposit",
@@ -819,5 +821,6 @@
   "general.walletconnect.connected": "Connected",
   "general.walletconnect.disconnect": "Disconnect",
   "general.walletconnect.connect.desc6": "You can now access DApp on your web browser",
-  "general.walletconnect.connect.desc7": "Wallet Address"
+  "general.walletconnect.connect.desc7": "Wallet Address",
+  "asset.tx.checkOnEtherscan": "Check Transaction history on Etherscan"
 }

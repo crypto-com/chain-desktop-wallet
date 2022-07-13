@@ -118,7 +118,7 @@ const AssetsPage = () => {
   const allMarketData = useRecoilValue(allMarketState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setFetchingDB = useSetRecoilState(fetchingDBState);
-  const [fetchingComoponent, setFetchingComponent] = useRecoilState(fetchingComponentState);
+  const [fetchingComponent, setFetchingComponent] = useRecoilState(fetchingComponentState);
 
   // const [isLedger, setIsLedger] = useState(false);
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(session.activeAsset);
@@ -523,28 +523,32 @@ const AssetsPage = () => {
                       <ReceiveDetail currentAsset={currentAsset} session={session} />
                     </TabPane>
                     <TabPane tab={t('assets.tab1')} key="transaction">
-                      <Table
-                        columns={TransactionColumns}
-                        dataSource={allTransactions}
-                        className="transaction-table"
-                        rowKey={record => record.key}
-                        locale={{
-                          triggerDesc: t('general.table.triggerDesc'),
-                          triggerAsc: t('general.table.triggerAsc'),
-                          cancelSort: t('general.table.cancelSort'),
-                        }}
-                        loading={{
-                          indicator: (
-                            <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />
-                          ),
-                          spinning: fetchingComoponent,
-                        }}
-                        expandable={{
-                          expandedRowRender: record => (
-                            <TransactionDetail transaction={record} session={session} />
-                          ),
-                        }}
-                      />
+                      {
+                        currentAsset?.mainnetSymbol === 'ETH' || currentAsset?.assetType === UserAssetType.ERC_20_TOKEN ? <div style={{ margin: '20px' }}> <a target="__blank" href={`https://etherscan.io/address/${currentAsset.address}`}>{t('asset.tx.checkOnEtherscan')}</a></div>
+                          :
+                          <Table
+                            columns={TransactionColumns}
+                            dataSource={allTransactions}
+                            className="transaction-table"
+                            rowKey={record => record.key}
+                            locale={{
+                              triggerDesc: t('general.table.triggerDesc'),
+                              triggerAsc: t('general.table.triggerAsc'),
+                              cancelSort: t('general.table.cancelSort'),
+                            }}
+                            loading={{
+                              indicator: (
+                                <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />
+                              ),
+                              spinning: fetchingComponent,
+                            }}
+                            expandable={{
+                              expandedRowRender: record => (
+                                <TransactionDetail transaction={record} session={session} />
+                              ),
+                            }}
+                          />
+                      }
                     </TabPane>
                   </Tabs>
                 </Content>
