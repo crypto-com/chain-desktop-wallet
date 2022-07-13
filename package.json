@@ -310,6 +310,7 @@
     ],
     "testEnvironment": "jsdom",
     "testRunner": "<rootDir>/node_modules/jest-circus/runner.js",
+    "testTimeout": 20000,
     "transform": {
       "^.+\\.(js|jsx|mjs|cjs|ts|tsx)$": "<rootDir>/node_modules/babel-jest",
       "^.+\\.css$": "<rootDir>/config/jest/cssTransform.js",
