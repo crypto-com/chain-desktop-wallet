@@ -914,7 +914,7 @@ export class TransactionHistoryService {
                 address: asset.address,
               });
               asset.balance = '0';
-              await this.storageService.saveAsset(asset);
+              await this.storageService.updateAsset(asset);
               return;
             }
             // if (asset.name.includes('Cronos')) {
@@ -930,7 +930,7 @@ export class TransactionHistoryService {
               // eslint-disable-next-line no-console
               console.log(`BALANCE_FETCH_ERROR - ${asset.assetType}`, { asset, e });
             } finally {
-              await this.storageService.saveAsset(asset);
+              await this.storageService.updateAsset(asset);
             }
             // }
             // if (asset.name.includes('Ethereum')) {
@@ -964,7 +964,7 @@ export class TransactionHistoryService {
                   address: asset.address,
                 });
                 asset.balance = '0';
-                await this.storageService.saveAsset(asset);
+                await this.storageService.updateAsset(asset);
                 return;
               }
               const { tendermintNetwork } = asset.config;
@@ -1007,7 +1007,7 @@ export class TransactionHistoryService {
               // eslint-disable-next-line no-console
               console.log('BALANCE_FETCH_ERROR', { asset, e });
             } finally {
-              await this.storageService.saveAsset(asset);
+              await this.storageService.updateAsset(asset);
             }
 
             break;
