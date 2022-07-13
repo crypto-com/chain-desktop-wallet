@@ -5,23 +5,19 @@ import '../governance.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Layout, Radio, Button, Card, Progress, Form, InputNumber, Spin } from 'antd';
-import { 
-  // ArrowLeftOutlined, 
+import {
+  // ArrowLeftOutlined,
   LoadingOutlined,
   // InfoCircleOutlined
 } from '@ant-design/icons';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
-
 import { secretStoreService } from '../../../service/storage/SecretStoreService';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
 import { checkIfTestnet } from '../../../utils/utils';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
-import { 
-  sessionState, 
-  walletAssetState 
-} from '../../../recoil/atom';
+import { sessionState, walletAssetState } from '../../../recoil/atom';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
@@ -40,7 +36,6 @@ const { Header, Content, Sider } = Layout;
 
 export const ProposalView = (props: any) => {
   const [form] = Form.useForm();
-  
 
   const allProps = props?.props;
   const currentSession = useRecoilValue(sessionState);
@@ -62,16 +57,14 @@ export const ProposalView = (props: any) => {
 
   const { isLedgerConnected } = useLedgerStatus({ asset: userAsset });
 
-
   const didMountRef = useRef(false);
 
   const analyticsService = new AnalyticsService(currentSession);
 
   const [t] = useTranslation();
 
-
   let customMaxValidator = TransactionUtils.maxValidator(
-    finalAmount.replace(',',''),
+    finalAmount.replace(',', ''),
     t('governance.modal2.form.input.proposalDeposit.max.error'),
   );
   let customMaxValidator0 = TransactionUtils.maxValidator(
@@ -80,13 +73,12 @@ export const ProposalView = (props: any) => {
   );
   let customAmountValidator = TransactionUtils.validTransactionAmountValidator();
 
-
   const handleCloseDepositSuccessModal = () => {
     setDepositSuccessModalVisible(false);
-  }
+  };
 
   const handleCancelDepositModal = () => {
-    if(!allProps.confirmLoading){
+    if (!allProps.confirmLoading) {
       setDepositModalVisible(false);
       setConfirmDepositModalVisible(false);
       form.resetFields();
@@ -103,21 +95,25 @@ export const ProposalView = (props: any) => {
   };
 
   function numWithCommas(x: string) {
-    if(x){
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    if (x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
     return x;
   }
 
   const totalDeposit = () => {
-    const depositCalc = (allProps?.proposal?.total_deposit.reduce((partialSum, a) => partialSum.plus(Big(a.amount)), Big(0))).toString();
+    const depositCalc = allProps?.proposal?.total_deposit
+      .reduce((partialSum, a) => partialSum.plus(Big(a.amount)), Big(0))
+      .toString();
     const totalDeposit = Big(getUIDynamicAmount(depositCalc, userAsset)).toString();
     setTotalDeposit(totalDeposit);
   };
 
-
   const totalDepositPercentage = () => {
-    const finalPercentage = (Big(totalDepositValue).div(Big((finalAmount.replace(',',''))))).times(100).toString()
+    const finalPercentage = Big(totalDepositValue)
+      .div(Big(finalAmount.replace(',', '')))
+      .times(100)
+      .toString();
     setTotalDepositPercentageValue(finalPercentage);
   };
 
@@ -129,32 +125,33 @@ export const ProposalView = (props: any) => {
     return days.toString();
   };
 
-
   const submitProposalDeposit = async () => {
     const { walletType } = currentSession.wallet;
     const { baseDenom } = currentSession.wallet.config.network.coin;
     allProps.setConfirmLoading(true);
 
-    try{
+    try {
       const proposalDeposit = await walletService.sendProposalDepositTx({
         proposalId: allProps?.proposal?.proposal_id,
         depositor: userAsset.address!,
-        amount: [{
-          amount: getBaseScaledAmount(form?.getFieldValue('depositAmount'), userAsset),
-          denom: baseDenom,
-        }],
+        amount: [
+          {
+            amount: getBaseScaledAmount(form?.getFieldValue('depositAmount'), userAsset),
+            denom: baseDenom,
+          },
+        ],
         decryptedPhrase,
         walletType,
       });
 
-      if(proposalDeposit?.transactionHash){
+      if (proposalDeposit?.transactionHash) {
         await refreshProposal();
         allProps.setConfirmLoading(false);
         allProps.setIsVisibleConfirmationModal(false);
         handleCancelDepositModal();
         setDepositSuccessModalVisible(true);
       }
-    }catch(e){
+    } catch (e) {
       if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         allProps.setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
       }
@@ -178,14 +175,13 @@ export const ProposalView = (props: any) => {
     setProposalList(latestProposalOnTop);
   };
 
-
   const refreshProposal = async () => {
     await allProps.refreshProposal();
     setUserAsset(userAsset);
 
     setProposposalStatus(allProps?.proposal?.status);
     totalDeposit();
-    totalDepositPercentage()
+    totalDepositPercentage();
   };
 
   const showPasswordInput = () => {
@@ -204,10 +200,9 @@ export const ProposalView = (props: any) => {
       password,
       currentSession.wallet.identifier,
     );
-    
+
     setDecryptedPhrase(phraseDecrypted);
     setInputPasswordVisible(false);
-
   };
 
   useEffect(() => {
@@ -229,7 +224,7 @@ export const ProposalView = (props: any) => {
     setFinalAmount(checkIfTestnet(currentSession.wallet.config.network) ? '20,000' : '10,000');
 
     customMaxValidator = TransactionUtils.maxValidator(
-      finalAmount.replace(',',''),
+      finalAmount.replace(',', ''),
       t('governance.modal2.form.input.proposalDeposit.max.error'),
     );
     customMaxValidator0 = TransactionUtils.maxValidator(
@@ -243,7 +238,6 @@ export const ProposalView = (props: any) => {
     setProposposalStatus(allProps?.proposal?.status);
     totalDeposit();
     totalDepositPercentage();
-
 
     // eslint-disable-next-line
   }, [proposalList, setProposalList, finalAmount, setFinalAmount]);
@@ -274,67 +268,48 @@ export const ProposalView = (props: any) => {
               <div className="status">{processStatusTag(allProps.proposal?.status)}</div>
             </div> */}
             <div className="item">
-            {(proposalStatus  === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? (
-              <div className="date">
-                <div className="date-container">
-                <div className="info-area date-start">
-                  <div className="txt">
-                  {t('governance.start')}{' '}
+              {proposalStatus === 'PROPOSAL_STATUS_DEPOSIT_PERIOD' ? (
+                <div className="date">
+                  <div className="date-container">
+                    <div className="info-area date-start">
+                      <div className="txt">{t('governance.start')} </div>
+                      <div className="info">
+                        {moment(allProps.proposal?.submit_time).format('DD/MM/YYYY, h:mm A')}
+                      </div>
+                    </div>
+                    <div className="info-area date-end">
+                      <div className="txt">{t('governance.end')} </div>
+                      <div className="info">
+                        {moment(allProps.proposal?.deposit_end_time).format('DD/MM/YYYY, h:mm A')}
+                      </div>
+                    </div>
                   </div>
-                  <div className="info">
-                  {moment(allProps.proposal?.submit_time).format('DD/MM/YYYY, h:mm A')}
-                  </div>
-                
-        
                 </div>
-                <div className="info-area date-end">
-                <div className="txt">
-                  {t('governance.end')}{' '}
+              ) : (
+                <div className="date">
+                  <div className="date-container">
+                    <div className="info-area date-start">
+                      <div className="txt">{t('governance.start')} </div>
+                      <div className="info">
+                        {moment(allProps.proposal?.voting_start_time).format('DD/MM/YYYY, h:mm A')}
+                      </div>
+                    </div>
+                    <div className="info-area date-end">
+                      <div className="txt">{t('governance.end')} </div>
+                      <div className="info">
+                        {moment(allProps.proposal?.voting_end_time).format('DD/MM/YYYY, h:mm A')}
+                      </div>
+                    </div>
                   </div>
-                  <div className="info">
-                  {moment(allProps.proposal?.deposit_end_time).format('DD/MM/YYYY, h:mm A')}
-                  </div>
-                
                 </div>
-                </div>
-              </div>
-            ) : (
-              <div className="date">
-                <div className="date-container">
-                <div className="info-area date-start">
-                  <div className="txt">
-                  {t('governance.start')}{' '}
-                  </div>
-                  <div className="info">
-                  {moment(allProps.proposal?.voting_start_time).format('DD/MM/YYYY, h:mm A')}
-                  </div>
-                
-        
-                </div>
-                <div className="info-area date-end">
-                <div className="txt">
-                  {t('governance.end')}{' '}
-                  </div>
-                  <div className="info">
-                  {moment(allProps.proposal?.voting_end_time).format('DD/MM/YYYY, h:mm A')}
-                  </div>
-                
-                </div>
-                </div>
-              </div>
-            )}
+              )}
             </div>
 
-
             <div className="info-area proposal-id">
-              <div className="txt">
-                {t('governance.success-modal2.proposal-id')}
-              </div>
+              <div className="txt">{t('governance.success-modal2.proposal-id')}</div>
               <div className="info">
-              #ID-
-                {
-                  allProps?.proposal?.proposal_id
-                }
+                #ID-
+                {allProps?.proposal?.proposal_id}
               </div>
             </div>
 
@@ -377,245 +352,240 @@ export const ProposalView = (props: any) => {
             </div>
           </Content>
 
-          <Sider width={(proposalStatus  === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? "400px" : "300px"  } className={(proposalStatus  === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? "deposit-side" : "side"  } >
+          <Sider
+            width={proposalStatus === 'PROPOSAL_STATUS_DEPOSIT_PERIOD' ? '400px' : '300px'}
+            className={
+              proposalStatus === 'PROPOSAL_STATUS_DEPOSIT_PERIOD' ? 'deposit-side' : 'side'
+            }
+          >
             <Spin
               spinning={allProps.isLoadingTally}
               indicator={<LoadingOutlined />}
               tip="Loading latest results"
             >
+              {console.log(allProps.proposal)}
 
-              {
-                console.log(allProps.proposal)
-              }
-
-              {(proposalStatus  === "PROPOSAL_STATUS_DEPOSIT_PERIOD") ? (<>
-                <Card>
+              {proposalStatus === 'PROPOSAL_STATUS_DEPOSIT_PERIOD' ? (
+                <>
+                  <Card>
                     <div className="deposit-card-header">
-                      {numWithCommas(totalDepositValue).concat(' ')}{' '}{(userAsset?.symbol)}
+                      {numWithCommas(totalDepositValue).concat(' ')} {userAsset?.symbol}
                       <span>
-                        {(' ').concat(t('governance.proposalView.deposited.header'))}
-                        {' '}{finalAmount}{' '}{userAsset?.symbol}
+                        {' '.concat(t('governance.proposalView.deposited.header'))} {finalAmount}{' '}
+                        {userAsset?.symbol}
                       </span>
                     </div>
-                  <Progress
-                    className="deposit-progress"
-                    percent={parseFloat(totalDepositPercentageValue)}
-                    showInfo={false}
-                    status="normal"
-                    strokeColor={{
-                      from: '#00A68C',
-                      to: '#00A68C',
-                    }}
-                  />
+                    <Progress
+                      className="deposit-progress"
+                      percent={parseFloat(totalDepositPercentageValue)}
+                      showInfo={false}
+                      status="normal"
+                      strokeColor={{
+                        from: '#00A68C',
+                        to: '#00A68C',
+                      }}
+                    />
                     <div className="progress-info">
                       <span className="left">
-                        {totalDepositPercentageValue}%{' '}{t('governance.proposalView.deposited.cro')}
-                        {' '}{finalAmount}{' '}{userAsset?.symbol} 
+                        {totalDepositPercentageValue}% {t('governance.proposalView.deposited.cro')}{' '}
+                        {finalAmount} {userAsset?.symbol}
                       </span>
                       <span className="right">
-                        {(remainingDays())}{' '}{t('governance.proposalView.deposited.days')}
+                        {remainingDays()} {t('governance.proposalView.deposited.days')}
                       </span>
                     </div>
 
-                    <Button className="submit-proposal-btn" type="primary" disabled={!allProps.voteOption} onClick={() => setDepositModalVisible(true)}>
+                    <Button
+                      className="submit-proposal-btn"
+                      type="primary"
+                      disabled={!allProps.voteOption}
+                      onClick={() => setDepositModalVisible(true)}
+                    >
                       {t('governance.proposalView.modal3.depositBtn')}
                     </Button>
+                  </Card>
+                </>
+              ) : (
+                <Card title={t('governance.result')} style={{ padding: '4px' }}>
+                  <div className="vote-result-section">
+                    Yes - {t('governance.voteOption.yes')}
+                    <br />
+                    {/* Vote: {proposalFigures.yes.vote} */}
+                    <Progress
+                      percent={parseFloat(allProps?.proposalFigures?.yes.rate)}
+                      size="small"
+                      status="normal"
+                      strokeColor={{
+                        from: '#31ac46',
+                        to: '#1a7905',
+                      }}
+                    />
+                  </div>
+
+                  <div className="vote-result-section">
+                    No - {t('governance.voteOption.no')}
+                    <br />
+                    {/* Vote:  {proposalFigures.no.vote} */}
+                    <Progress
+                      percent={parseFloat(allProps?.proposalFigures?.no.rate)}
+                      strokeColor={{
+                        from: '#ec7777',
+                        to: '#f27474',
+                      }}
+                      size="small"
+                      status="normal"
+                    />
+                  </div>
+
+                  <div className="vote-result-section">
+                    No with Veto - {t('governance.voteOption.noWithVeto')}
+                    <br />
+                    {/* Vote:  {proposalFigures.no.vote} */}
+                    <Progress
+                      percent={parseFloat(allProps?.proposalFigures?.noWithVeto.rate)}
+                      strokeColor={{
+                        from: '#e2c24d',
+                        to: '#f3a408',
+                      }}
+                      size="small"
+                      status="normal"
+                    />
+                  </div>
+
+                  <div className="vote-result-section">
+                    Abstain - {t('governance.voteOption.abstain')}
+                    <br />
+                    {/* Vote:  {proposalFigures.no.vote} */}
+                    <Progress
+                      percent={parseFloat(allProps?.proposalFigures?.abstain.rate)}
+                      strokeColor={{
+                        from: '#dbdddc',
+                        to: '#b1b3b3',
+                      }}
+                      size="small"
+                      status="normal"
+                    />
+                  </div>
                 </Card>
-              
-              </>) : (
-
-            
-              <Card title={t('governance.result')} style={{ padding: '4px' }}>
-                <div className="vote-result-section">
-                  Yes - {t('governance.voteOption.yes')}
-                  <br />
-                  {/* Vote: {proposalFigures.yes.vote} */}
-                  <Progress
-                    percent={parseFloat(allProps?.proposalFigures?.yes.rate)}
-                    size="small"
-                    status="normal"
-                    strokeColor={{
-                      from: '#31ac46',
-                      to: '#1a7905',
-                    }}
-                  />
-                </div>
-
-                <div className="vote-result-section">
-                  No - {t('governance.voteOption.no')}
-                  <br />
-                  {/* Vote:  {proposalFigures.no.vote} */}
-                  <Progress
-                    percent={parseFloat(allProps?.proposalFigures?.no.rate)}
-                    strokeColor={{
-                      from: '#ec7777',
-                      to: '#f27474',
-                    }}
-                    size="small"
-                    status="normal"
-                  />
-                </div>
-
-                <div className="vote-result-section">
-                  No with Veto - {t('governance.voteOption.noWithVeto')}
-                  <br />
-                  {/* Vote:  {proposalFigures.no.vote} */}
-                  <Progress
-                    percent={parseFloat(allProps?.proposalFigures?.noWithVeto.rate)}
-                    strokeColor={{
-                      from: '#e2c24d',
-                      to: '#f3a408',
-                    }}
-                    size="small"
-                    status="normal"
-                  />
-                </div>
-
-                <div className="vote-result-section">
-                  Abstain - {t('governance.voteOption.abstain')}
-                  <br />
-                  {/* Vote:  {proposalFigures.no.vote} */}
-                  <Progress
-                    percent={parseFloat(allProps?.proposalFigures?.abstain.rate)}
-                    strokeColor={{
-                      from: '#dbdddc',
-                      to: '#b1b3b3',
-                    }}
-                    size="small"
-                    status="normal"
-                  />
-                </div>
-              </Card>
-                )}
+              )}
             </Spin>
           </Sider>
 
+          {/* DEPOSIT IN PROPOSAL MODAL */}
+          <ModalPopup
+            isModalVisible={isDepositModalVisible}
+            handleCancel={handleCancelDepositModal}
+            handleOk={() => {}}
+            closable={!allProps.confirmLoading}
+            confirmationLoading={allProps.confirmLoading}
+            footer={[
+              <Button
+                key="submit"
+                type="primary"
+                loading={allProps.confirmLoading}
+                disabled={
+                  !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
+                }
+                onClick={() => {
+                  form.submit();
+                }}
+              >
+                {t('governance.proposalView.modal3.depositBtn')}
+              </Button>,
+              <Button key="back" type="link" onClick={handleCancelDepositModal}>
+                {t('general.cancel')}
+              </Button>,
+            ]}
+            okText={t('general.confirm')}
+          >
+            <>
+              <Header className="create-proposal-header"> {t('governance.modal2.title')} </Header>
 
+              <Form
+                className="create-proposal-form"
+                form={form}
+                name="create-proposal-form"
+                layout="vertical"
+                requiredMark={false}
+                onFinish={() => {
+                  allProps.setModalType('deposit');
+                  setDepositModalVisible(false);
+                  setConfirmDepositModalVisible(true);
+                  setTimeout(() => {
+                    showPasswordInput();
+                  }, 200);
+                }}
+              >
+                <Form.Item
+                  name="depositAmount"
+                  validateFirst
+                  label={t('governance.modal2.form.input.proposalDeposit')}
+                  hasFeedback
+                  rules={[
+                    {
+                      required: true,
+                      message: `${t('governance.modal2.form.input.proposalDeposit')} ${t(
+                        'general.required',
+                      )}`,
+                    },
+                    {
+                      pattern: /[^0]+/,
+                      message: t('governance.modal2.form.input.proposalDeposit.error'),
+                    },
+                    customAmountValidator,
+                    customMaxValidator,
+                    customMaxValidator0,
+                  ]}
+                >
+                  <InputNumber
+                    placeholder={`${t('governance.proposalView.modal3.placeholder')}`}
+                    addonAfter={userAsset.symbol}
+                  />
+                </Form.Item>
+                <div className="avail-bal-container">
+                  <div className="avail-bal-txt">{t('governance.modal2.form.balance')}</div>
+                  <div className="avail-bal-val">
+                    {getUIDynamicAmount(userAsset.balance, userAsset)} {userAsset.symbol}
+                  </div>
+                </div>
+              </Form>
+            </>
+          </ModalPopup>
 
           {/* DEPOSIT IN PROPOSAL MODAL */}
           <ModalPopup
-          isModalVisible={isDepositModalVisible}
-          handleCancel={handleCancelDepositModal}
-          handleOk={() => {
-            allProps.setModalType('deposit');
-            setDepositModalVisible(false);
-            setConfirmDepositModalVisible(true);
-            setTimeout(() => {
-              showPasswordInput();
-            }, 200);
-          }}
-          closable={!allProps.confirmLoading}
-          confirmationLoading={allProps.confirmLoading}
-          footer={[
-            <Button
-              key="submit"
-              type="primary"
-              loading={allProps.confirmLoading}
-              onClick={() => {
-                allProps.setModalType('deposit');
-                setDepositModalVisible(false);
-                setConfirmDepositModalVisible(true);
-                setTimeout(() => {
-                  showPasswordInput();
-                }, 200);
-              }}
-              disabled={
-                !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
-              }
-            >
-               {t('governance.proposalView.modal3.depositBtn')}
-            </Button>,
-            <Button key="back" type="link" onClick={handleCancelDepositModal}>
-              {t('general.cancel')}
-            </Button>,
-          ]}
-          okText={t('general.confirm')}
-        >
-          <>
-            <Header className="create-proposal-header"> {t('governance.modal2.title')} </Header>
-
-            <Form
-              className="create-proposal-form"
-              form={form}
-              name="create-proposal-form"
-              layout="vertical"
-              requiredMark={false}
-            >
-              <Form.Item
-                name="depositAmount"
-                validateFirst
-                label={t('governance.modal2.form.input.proposalDeposit')}
-                hasFeedback
-                rules={[
-                  {
-                    required: true,
-                    message: `${t('governance.modal2.form.input.proposalDeposit')} ${t(
-                      'general.required',
-                    )}`,
-                  },
-                  {
-                    pattern: /[^0]+/,
-                    message: t('governance.modal2.form.input.proposalDeposit.error'),
-                  },
-                  customAmountValidator,
-                  customMaxValidator,
-                  customMaxValidator0,
-                ]}
+            className="deposit-proposal-modal"
+            isModalVisible={confirmDepositModalVisible}
+            handleCancel={handleCancelDepositModal}
+            handleOk={() => {
+              submitProposalDeposit();
+            }}
+            closable={!allProps.confirmLoading}
+            confirmationLoading={allProps.confirmLoading}
+            footer={[
+              <Button
+                key="submit"
+                type="primary"
+                loading={allProps.confirmLoading}
+                onClick={() => {
+                  submitProposalDeposit();
+                }}
+                disabled={
+                  !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
+                }
               >
-                <InputNumber
-                  placeholder={`${t('governance.proposalView.modal3.placeholder')}`}
-                  addonAfter={userAsset.symbol}
-                />
-              </Form.Item>
-     
-              <div className="avail-bal-container">
-                <div className="avail-bal-txt">{t('governance.modal2.form.balance')}</div>
-                <div className="avail-bal-val">
-                  {getUIDynamicAmount(userAsset.balance, userAsset)} {userAsset.symbol}
-                </div>
-              </div>
-            </Form>
-          </>
-        </ModalPopup>
-
-
-
-        {/* DEPOSIT IN PROPOSAL MODAL */}
-        <ModalPopup
-          className="deposit-proposal-modal"
-          isModalVisible={confirmDepositModalVisible}
-          handleCancel={handleCancelDepositModal}
-          handleOk={() => { 
-           submitProposalDeposit();
-          }}
-          closable={!allProps.confirmLoading}
-          confirmationLoading={allProps.confirmLoading}
-          footer={[
-            <Button
-              key="submit"
-              type="primary"
-              loading={allProps.confirmLoading}
-              onClick={() => {
-                submitProposalDeposit();
-              }}
-              disabled={
-                !isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE
-              }
-            >
-               {t('governance.proposalView.modal4.depositBtn')}
-            </Button>,
-            <Button key="back" type="link" onClick={handleCancelDepositModal}>
-              {t('general.cancel')}
-            </Button>,
-          ]}
-          okText={t('general.confirm')}
-        >
-          <>
-            <div className="title">{t('governance.proposalView.modal4.header')}</div>
-            <div className="description">
-              {t('governance.proposalView.modal4.description')}
-            </div>
-            <div className="row">
+                {t('governance.proposalView.modal4.depositBtn')}
+              </Button>,
+              <Button key="back" type="link" onClick={handleCancelDepositModal}>
+                {t('general.cancel')}
+              </Button>,
+            ]}
+            okText={t('general.confirm')}
+          >
+            <>
+              <div className="title">{t('governance.proposalView.modal4.header')}</div>
+              <div className="description">{t('governance.proposalView.modal4.description')}</div>
+              <div className="row">
                 <div className="field">{t('home.transactions.table1.fromAddress')} </div>
                 <div className="value">
                   <a
@@ -635,55 +605,57 @@ export const ProposalView = (props: any) => {
               <div className="row">
                 <div className="field">{t('governance.proposalView.modal4.amountLabel')} </div>
                 <div className="value">
-                  {numWithCommas(form?.getFieldValue('depositAmount'))}{' '}{currentSession.wallet.config.network.coin.croDenom.toUpperCase()}
+                  {numWithCommas(form?.getFieldValue('depositAmount'))}{' '}
+                  {currentSession.wallet.config.network.coin.croDenom.toUpperCase()}
                 </div>
               </div>
               <GasInfoTendermint />
             </>
-        </ModalPopup>
+          </ModalPopup>
 
-
-        {/* CREATE PROPOSAL's SUCCESS MODAL */}
-        <SuccessModalPopup
-          isModalVisible={isDepositSuccessModalVisible}
-          handleCancel={handleCloseDepositSuccessModal}
-          handleOk={handleCloseDepositSuccessModal}
-          title={t('general.successModalPopup.title')}
-          button={null}
-          footer={[
-            <Button className="create-proposal-success-btn" key="submit" type="primary" onClick={handleCloseDepositSuccessModal}>
-              {t('general.ok')}
-            </Button>,
-          ]}
-        >
-          <div className="create-proposal-success-modal">
-            <div className="info">
-              {t('governance.proposalView.successModal.message')}
+          {/* CREATE PROPOSAL's SUCCESS MODAL */}
+          <SuccessModalPopup
+            isModalVisible={isDepositSuccessModalVisible}
+            handleCancel={handleCloseDepositSuccessModal}
+            handleOk={handleCloseDepositSuccessModal}
+            title={t('general.successModalPopup.title')}
+            button={null}
+            footer={[
+              <Button
+                className="create-proposal-success-btn"
+                key="submit"
+                type="primary"
+                onClick={handleCloseDepositSuccessModal}
+              >
+                {t('general.ok')}
+              </Button>,
+            ]}
+          >
+            <div className="create-proposal-success-modal">
+              <div className="info">{t('governance.proposalView.successModal.message')}</div>
             </div>
-          </div>
-        </SuccessModalPopup>
+          </SuccessModalPopup>
 
-        <PasswordFormModal
-          description={t('general.passwordFormModal.description')}
-          okButtonText={t('general.passwordFormModal.okButton')}
-          onCancel={() => {
-            setInputPasswordVisible(false);
-          }}
-          onSuccess={onWalletDecryptFinish}
-          onValidatePassword={async (password: string) => {
-            const isValid = await secretStoreService.checkIfPasswordIsValid(password);
-            return {
-              valid: isValid,
-              errMsg: !isValid ? t('general.passwordFormModal.error') : '',
-            };
-          }}
-          successText={t('general.passwordFormModal.success')}
-          title={t('general.passwordFormModal.title')}
-          visible={inputPasswordVisible}
-          successButtonText={t('general.continue')}
-          confirmPassword={false}
-        />
-
+          <PasswordFormModal
+            description={t('general.passwordFormModal.description')}
+            okButtonText={t('general.passwordFormModal.okButton')}
+            onCancel={() => {
+              setInputPasswordVisible(false);
+            }}
+            onSuccess={onWalletDecryptFinish}
+            onValidatePassword={async (password: string) => {
+              const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+              return {
+                valid: isValid,
+                errMsg: !isValid ? t('general.passwordFormModal.error') : '',
+              };
+            }}
+            successText={t('general.passwordFormModal.success')}
+            title={t('general.passwordFormModal.title')}
+            visible={inputPasswordVisible}
+            successButtonText={t('general.continue')}
+            confirmPassword={false}
+          />
         </Layout>
       </div>
     </div>
