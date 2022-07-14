@@ -196,14 +196,10 @@ export const ProposalView = (props: any) => {
 
 
   const refreshProposal = async () => {
-    const currrentProposal = await allProps.refreshProposal();
+    // const currrentProposal = await allProps.refreshProposal();
     await walletService.syncAll();
-
     const sessionData = await walletService.retrieveCurrentSession();
-    allProps?.setProposal(currrentProposal);
-
-    console.log('allProps?.proposal ', allProps?.proposal);
-
+  
     totalDeposit();
     totalDepositPercentage()
     const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(sessionData);

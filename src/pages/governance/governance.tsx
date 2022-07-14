@@ -567,25 +567,25 @@ const GovernancePage = () => {
     setProposalList(latestProposalOnTop);
   };
 
-  const refreshProposal = async () => {
-    const list: ProposalModel[] = await walletService.retrieveProposals(
-      currentSession.wallet.config.network.chainId,
-    );
+  // const refreshProposal = async () => {
+  //   const list: ProposalModel[] = await walletService.retrieveProposals(
+  //     currentSession.wallet.config.network.chainId,
+  //   );
 
-    const latestProposalOnTop = list.reverse();
-    setProposalList(latestProposalOnTop);
-    setTimeout(() => {
-      const currentProposalId = proposal?.proposal_id;
-      const currentProposal = latestProposalOnTop?.filter((item) => {
-        return item.proposal_id === currentProposalId;
-      })[0];
+  //   const latestProposalOnTop = list.reverse();
+  //   setProposalList(latestProposalOnTop);
+  //   setTimeout(() => {
+  //     const currentProposalId = proposal?.proposal_id;
+  //     const currentProposal = latestProposalOnTop?.filter((item) => {
+  //       return item.proposal_id === currentProposalId;
+  //     })[0];
 
-      setProposal(currentProposal);
-      processProposalFigures(currentProposal!);
+  //     setProposal(currentProposal);
+  //     processProposalFigures(currentProposal!);
 
-      return currentProposal;
-    }, 300);
-  };
+  //     return currentProposal;
+  //   }, 300);
+  // };
 
 
 
@@ -971,8 +971,8 @@ const GovernancePage = () => {
               setLedgerIsExpertMode,
               setErrorMessages,
               setIsErrorModalVisible,
-              refreshProposal,
-              setProposal
+              // refreshProposal,
+              // setProposal
             }}
           />
         ) : (
