@@ -367,9 +367,10 @@ export class StorageService {
     return this.db.stakingStore.insert(stakingTransactions); */
   }
 
-  public async removeRewardList() {
+  public async removeRewardList(walletId: string) {
     return this.db.commonTransactionStore.remove(
       {
+        walletId,
         txType: 'reward',
       },
       {
@@ -382,7 +383,7 @@ export class StorageService {
   public async saveRewardList(rewardTransactions: RewardTransactionList) {
     if (rewardTransactions.transactions.length === 0) {
       // If there is no current reward transactions, delete any stray records
-      await this.removeRewardList();
+      await this.removeRewardList(rewardTransactions.walletId);
       return Promise.resolve();
     }
     const rewardTxRecords: RewardTransactionRecord[] = rewardTransactions.transactions.map(tx => {
