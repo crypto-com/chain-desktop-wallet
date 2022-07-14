@@ -527,7 +527,7 @@ const AssetsPage = () => {
                         || currentAsset?.assetType === UserAssetType.ERC_20_TOKEN
                           ? <div style={{ margin: '20px' }}>
                             <a target="__blank" href={`${renderExplorerUrl(currentAsset.config, 'address')}/${currentAsset.address}`}>
-                              {t('asset.tx.checkOnExplorer')}
+                              {t('assets.tx.checkOnExplorer')}
                             </a>
                           </div>
                           : <Table
