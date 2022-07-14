@@ -116,24 +116,17 @@ const GovernancePage = () => {
     </Button>
   );
 
-  // let customRangeValidator = TransactionUtils.rangeValidator(
-  //   minDeposit,
-  //   maxDeposit,
-  //   t('governance.modal2.form.input.proposalDeposit.error'),
-  // );
-
-  let customMaxValidator = TransactionUtils.maxValidator(
+  const customMaxValidator = TransactionUtils.maxValidator(
     maxDeposit,
     t('governance.modal2.form.input.proposalDeposit.max.error'),
   );
-  let customMaxValidator0 = TransactionUtils.maxValidator(
+  const customMaxValidator0 = TransactionUtils.maxValidator(
     getUIDynamicAmount(userAsset.balance, userAsset),
     t('governance.modal2.form.input.proposalDeposit.max2.error'),
   );
-  let customAmountValidator = TransactionUtils.validTransactionAmountValidator();
-  let customMinValidator = TransactionUtils.minValidator(
+  const customMinValidator = TransactionUtils.minValidator(
     minDeposit,
-    t('governance.modal2.form.input.proposalDeposit.min.error'),
+    t('governance.modal2.form.input.proposalDeposit.min.error').concat(' ').concat(minDeposit).concat(' ').concat(userAsset.symbol).concat(' ').concat(t('governance.modal2.form.input.proposalDeposit.min.error2')),
   );
 
   const resetCreateProposalForm = () => {
@@ -141,22 +134,6 @@ const GovernancePage = () => {
     const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
     const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
     form.setFieldsValue({ initialDeposit: userDeposit });
-
-    customAmountValidator = TransactionUtils.validTransactionAmountValidator();
-    customMaxValidator = TransactionUtils.maxValidator(
-      maxDeposit,
-      t('governance.modal2.form.input.proposalDeposit.max.error'),
-    );
-    customMaxValidator0 = TransactionUtils.maxValidator(
-      getUIDynamicAmount(userAsset.balance, userAsset),
-      t('governance.modal2.form.input.proposalDeposit.max2.error'),
-    );
-    
-    customMinValidator = TransactionUtils.minValidator(
-      minDeposit,
-      t('governance.modal2.form.input.proposalDeposit.min.error'),
-    );
-
     form.validateFields(['initialDeposit']);
   };
 
@@ -599,35 +576,18 @@ const GovernancePage = () => {
       setProposalList(latestProposalOnTop);
     };
     
-    const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
-    const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
-
-    form.setFieldsValue({ initialDeposit: userDeposit });
-
-    fetchProposalList();
+    
 
     fetchProposalList();
 
     if (!didMountRef.current) {
+      const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
+      const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
       didMountRef.current = true;
       analyticsService.logPage('Governance');
+      form.setFieldsValue({ initialDeposit: userDeposit });
+      form.validateFields(['initialDeposit']);
     }
-
-    customMaxValidator = TransactionUtils.maxValidator(
-      maxDeposit,
-      t('send.formSend.amount.error1'),
-    );
-    customAmountValidator = TransactionUtils.validTransactionAmountValidator();
-    customMinValidator = TransactionUtils.minValidator(
-      minDeposit,
-      t('governance.modal2.form.input.proposalDeposit.error'),
-    );
-    customMaxValidator0 = TransactionUtils.maxValidator(
-      getUIDynamicAmount(userAsset.balance, userAsset),
-      t('governance.modal2.form.input.proposalDeposit.max2.error'),
-    );
-
-    form.validateFields(['initialDeposit']);
 
     // eslint-disable-next-line
   }, [currentSession, form, userAsset, proposal, proposalList]);
@@ -921,7 +881,6 @@ const GovernancePage = () => {
                     pattern: /[^0]+/,
                     message: t('governance.modal2.form.input.proposalDeposit.error'),
                   },
-                  customAmountValidator,
                   customMaxValidator,
                   customMaxValidator0,
                   customMinValidator,
