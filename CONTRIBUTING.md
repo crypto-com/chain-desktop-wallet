@@ -24,7 +24,6 @@ There are several ways to identify an area where you can contribute:
 * Occasionally, some issues on Github may be labelled with `help wanted` or `good first issue` tags.
 
 ### Discuss First
-
 Before sending a feature pull request, it's always better to open a issue first to discuss whether it is desired and the design of the feature. 
 
 ### Editor Setup
@@ -44,7 +43,6 @@ There are two main branches:
 ### Commit Convention
 We use [Conventional Commits](https://www.conventionalcommits.org/) for commit messages. Please read the guide through if you aren't familiar with it already.
 
-
 ### Changelog
 Changelogs are handled by maintainers, which will be batch updated before each release.
 
@@ -52,14 +50,19 @@ Changelogs are handled by maintainers, which will be batch updated before each r
 Please refer to the [Instructions on Multi-Language Content Management](CONTENT_MANAGEMENT.md) for any content updates. 
 
 ### Detailed Pull Request Steps
+<<<<<<< HEAD
 
 * Fork the DeFi Desktop Wallet's repository under your Github account.
 
+=======
+* Fork the DeFi Desktop Wallet's repository under your Github account.
+>>>>>>> 3bc297a0d1f7cc3d951dd30381b5c685a124f62b
 * Clone your fork locally on your machine.
 * Post a comment in the issue to say that you are working on it, so that other people do not work on the same issue.
 * Create a local branch on your machine by `git checkout -b branch_name` from `dev` branch.
 * Commit your changes to your own fork -- see [Conventional Commits](https://www.conventionalcommits.org/) for commit message guidelines.
 * Include tests that cover all non-trivial code.
+<<<<<<< HEAD
 
 * Check you are working on the latest version on master in DeFi Desktop Wallet's official repository. If not, please pull DeFi Desktop Wallet's official repository's master (upstream) into your fork's master branch, and rebase your committed changes or replay your stashed changes in your branch over the latest changes in the upstream version.
 
@@ -69,6 +72,12 @@ Please refer to the [Instructions on Multi-Language Content Management](CONTENT_
 
 * Push your changes to your fork's branch and open the pull request to DeFi Desktop Wallet's repository master branch.
 
+=======
+* Check you are working on the latest version on `dev` in DeFi Desktop Wallet's official repository. If not, please pull DeFi Desktop Wallet's official repository's `dev` (upstream) into your fork's `dev` branch, and rebase your committed changes or replay your stashed changes in your branch over the latest changes in the upstream version.
+* Run all tests locally and make sure they pass. `yarn test`
+* If your changes are of interest to other developers, please make corresponding changes in the official documentation and the changelog.
+* Push your changes to your fork's branch and open the pull request to DeFi Desktop Wallet's repository `dev` branch.
+>>>>>>> 3bc297a0d1f7cc3d951dd30381b5c685a124f62b
 * In the pull request, complete its checklist, add a clear description of the problem your changes solve, and add the following statement to confirm that your contribution is your own original work: "I hereby certify that my contribution is in accordance with the Developer Certificate of Origin (https://developercertificate.org/)."
 * The reviewer will either accept and merge your pull request, or leave comments requesting changes via the Github PR interface (you should then make changes by pushing directly to your existing PR branch).
 

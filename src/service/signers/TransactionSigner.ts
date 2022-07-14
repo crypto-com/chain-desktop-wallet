@@ -19,7 +19,7 @@ import {
   BridgeTransactionUnsigned,
   WithdrawAllStakingRewardsUnsigned,
   MsgDepositTransactionUnsigned,
-  TextProposalTransactionUnsigned
+  TextProposalTransactionUnsigned,
 } from './TransactionSupported';
 
 export interface ITransactionSigner {
@@ -116,7 +116,7 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
 
     return this.getSignedMessageTransaction([msgVote], transaction, keyPair, rawTx);
   }
-  
+
   /**
    * Sign a raw `MsgDeposit` tx for onchain submission
    * @param transaction
@@ -149,10 +149,10 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
 
   /**
    * Sign a raw `MsgSubmitProposal.TextProposal` tx for onchain submission
-   * @param transaction 
-   * @param phrase 
-   * @param gasFee 
-   * @param gasLimit 
+   * @param transaction
+   * @param phrase
+   * @param gasFee
+   * @param gasLimit
    */
   public async signSubmitTextProposalTransaction(
     transaction: TextProposalTransactionUnsigned,
@@ -180,8 +180,12 @@ export class TransactionSigner extends BaseTransactionSigner implements ITransac
     return this.getSignedMessageTransaction([msgSubmitProposal], transaction, keyPair, rawTx);
   }
 
-  public async signNFTTransfer(transaction: NFTTransferUnsigned, phrase: string, gasFee: string,
-    gasLimit: number): Promise<string> {
+  public async signNFTTransfer(
+    transaction: NFTTransferUnsigned,
+    phrase: string,
+    gasFee: string,
+    gasLimit: number,
+  ): Promise<string> {
     const { cro, keyPair, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
     const msgTransferNFT = new cro.nft.MsgTransferNFT({

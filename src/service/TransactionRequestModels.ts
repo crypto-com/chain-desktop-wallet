@@ -80,7 +80,7 @@ export interface DelegationRequest {
   walletType: string; // normal, ledger
 }
 
-export interface UndelegationRequest extends DelegationRequest { }
+export interface UndelegationRequest extends DelegationRequest {}
 export interface RedelegationRequest {
   validatorSourceAddress: string;
   validatorDestinationAddress: string;
@@ -91,7 +91,7 @@ export interface RedelegationRequest {
   walletType: string; // normal, ledger
 }
 
-export interface RestakeStakingRewardRequest extends DelegationRequest { }
+export interface RestakeStakingRewardRequest extends DelegationRequest {}
 
 export interface RestakeStakingAllRewardsRequest {
   validatorAddressList: string[];
@@ -133,7 +133,7 @@ export interface DepositToProposalRequest extends BaseTxAuth {
 }
 
 /**
- * Request params for `TextProposal` transaction 
+ * Request params for `TextProposal` transaction
  */
 export interface TextProposalRequest extends SubmitTextProposalRequest {
   description: string;
@@ -142,7 +142,7 @@ export interface TextProposalRequest extends SubmitTextProposalRequest {
 }
 
 /**
- * Request params for `MsgSubmitProposal` transaction 
+ * Request params for `MsgSubmitProposal` transaction
  */
 export interface SubmitTextProposalRequest extends BaseTxAuth {
   proposer: string;

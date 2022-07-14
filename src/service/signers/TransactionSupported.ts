@@ -34,7 +34,9 @@ export interface MsgSubmitProposalTransactionUnsigned extends TransactionUnsigne
   initialDeposit: Coin[];
 }
 
-export interface TextProposalTransactionUnsigned extends TransactionUnsigned, MsgSubmitProposalTransactionUnsigned {
+export interface TextProposalTransactionUnsigned
+  extends TransactionUnsigned,
+    MsgSubmitProposalTransactionUnsigned {
   params: TextProposalOptions;
 }
 
