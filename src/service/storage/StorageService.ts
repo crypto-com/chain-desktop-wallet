@@ -406,7 +406,7 @@ export class StorageService {
     };
 
     // Remove previous `reward` records before insertion
-    await this.removeRewardList();
+    await this.removeRewardList(rewardTransactions.walletId);
 
     // Delay inserts to avoid remove records failure
     setTimeout(async () => {
