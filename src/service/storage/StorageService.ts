@@ -408,14 +408,11 @@ export class StorageService {
     // Remove previous `reward` records before insertion
     await this.removeRewardList(rewardTransactions.walletId);
 
-    // Delay inserts to avoid remove records failure
-    setTimeout(async () => {
-      // Insert to common transactoin store
-      await this.insertCommonTransactionRecords(rewardTxRecords);
+    // Insert to common transactoin store
+    await this.insertCommonTransactionRecords(rewardTxRecords);
 
-      // Insert to common Attributes store
-      await this.updateCommonAttributes(rewardAttributeRecord);
-    }, 2_000);
+    // Insert to common Attributes store
+    await this.updateCommonAttributes(rewardAttributeRecord);
 
     // @deprecated
     /**
