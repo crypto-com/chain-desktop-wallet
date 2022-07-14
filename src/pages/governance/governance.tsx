@@ -509,7 +509,7 @@ const GovernancePage = () => {
   };
 
   const rightSideItem = item => {
-    let code = [<></>];
+    let code;
     switch (item?.status) {
       case ProposalStatuses.PROPOSAL_STATUS_DEPOSIT_PERIOD:
         code = [
@@ -626,11 +626,7 @@ const GovernancePage = () => {
                 >
                   <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
                   <span>
-                    {historyVisible ? (
-                      <>{t('governance.backToHistory')}</>
-                    ) : (
-                      <>{t('governance.backToList')}</>
-                    )}
+                    <>{t('governance.backToList')}</>
                   </span>
                 </div>
               </a>

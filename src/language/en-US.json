@@ -643,7 +643,7 @@
   "governance.error-modal2.info": "An error occurred when creating your proposal",
   "governance.voteHistory.title": "Voting History",
   "governance.voteHistory.description": "Below is your voting history",
-  "governance.voteHistory.backBtn": "governance.voteHistory.backBtn",
+  "governance.voteHistory.backBtn": "Back to Proposal List",
   "governance.voteHistory.table.column1": "Proposal",
   "governance.voteHistory.table.column2": "Your Vote",
   "governance.voteHistory.table.column3": "Voted On",
