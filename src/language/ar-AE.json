@@ -147,6 +147,12 @@
   "general.table.triggerDesc": "انقر للترتيب حسب النزول",
   "general.table.triggerAsc": "انقر للترتيب حسب الصعود",
   "general.table.cancelSort": "انقر لإلغاء الفرز",
+  "general.walletconnect.connect.desc4": "طلب الموافقة على المعاملات",
+  "general.walletconnect.connect.desc5": "السماح لـ DApp بـ:",
+  "general.walletconnect.connected": "موصول",
+  "general.walletconnect.disconnect": "قطع الاتصال",
+  "general.walletconnect.connect.desc6": "يمكنك الآن الوصول إلى DApp على متصفح الويب الخاص بك",
+  "general.walletconnect.connect.desc7": "عنوان المحفظة",
   "welcome.slogan": "محفظة سطح مكتب عامة وopen-source على سلسلة Crypto.org.",
   "welcome.button": "للبدء",
   "welcome.block": "هذا المنتج غير متوفر حاليا في بلدك أو منطقتك.",
@@ -597,11 +603,5 @@
   "settings.revoke": "إبطال",
   "settings.revoke.unlimited": "غير محدود",
   "settings.noApproval": "لا توجد بيانات الموافقة",
-  "settings.about.termsAndConditions.title": "الاحكام والشروط",
-  "general.walletconnect.connect.desc4": "طلب الموافقة على المعاملات",
-  "general.walletconnect.connect.desc5": "السماح لـ DApp بـ:",
-  "general.walletconnect.connected": "موصول",
-  "general.walletconnect.disconnect": "قطع الاتصال",
-  "general.walletconnect.connect.desc6": "يمكنك الآن الوصول إلى DApp على متصفح الويب الخاص بك",
-  "general.walletconnect.connect.desc7": "عنوان المحفظة"
+  "settings.about.termsAndConditions.title": "الاحكام والشروط"
 }

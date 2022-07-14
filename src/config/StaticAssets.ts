@@ -95,7 +95,7 @@ export const ATOM_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
   const assetSymbol = 'ATOM';
   const isTestnet = checkIfTestnet(network);
   const explorerUrl = isTestnet
-    ? MAINNET_TENDERMINT_COSMOS_HUB_EXPLORER_URL
+    ? TESTNET_TENDERMINT_COSMOS_HUB_EXPLORER_URL
     : MAINNET_TENDERMINT_COSMOS_HUB_EXPLORER_URL;
 
   const config: UserAssetConfig = {
@@ -103,7 +103,7 @@ export const ATOM_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
     explorer: {
       baseUrl: `${explorerUrl}`,
       tx: isTestnet ? `${explorerUrl}/transactions` : `${explorerUrl}/txs`,
-      address: `${explorerUrl}/'account`,
+      address: `${explorerUrl}/account`,
       validator: isTestnet ? `${explorerUrl}/validator` : `${explorerUrl}/validators`,
     },
     chainId: isTestnet ? 'theta-testnet-001' : 'cosmoshub-4',
