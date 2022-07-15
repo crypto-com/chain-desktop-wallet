@@ -82,6 +82,13 @@ const GovernancePage = () => {
   const [errorMessages, setErrorMessages] = useState([]);
   const [proposal, setProposal] = useState<ProposalModel>();
 
+  const numWithCommas = (x: string) => {
+    if (x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+    return x;
+  }
+
   const initialFiguresStates = {
     yes: {
       vote: '',
@@ -129,7 +136,9 @@ const GovernancePage = () => {
 
   const customMaxValidator = TransactionUtils.maxValidator(
     maxDeposit,
-    t('governance.modal2.form.input.proposalDeposit.max.error'),
+    t('governance.modal2.form.input.proposalDeposit.max.error', {
+      maxDeposit: (numWithCommas(maxDeposit).concat(' ').concat(userAsset?.symbol))
+    }),
   );
   const customMaxValidator0 = TransactionUtils.maxValidator(
     getUIDynamicAmount(userAsset.balance, userAsset),
@@ -585,8 +594,6 @@ const GovernancePage = () => {
 
       setProposal(currentProposal);
       processProposalFigures(currentProposal!);
-
-      return currentProposal;
     }, 300);
   };
 
@@ -893,7 +900,7 @@ const GovernancePage = () => {
                   addonAfter={userAsset.symbol}
                 />
               </Form.Item>
-              <div className="note">{t('governance.modal2.form.proposalDeposit.warning')}</div>
+              <div className="note">{t('governance.modal2.form.proposalDeposit.warning')}{' '}{minDeposit}{' '}{userAsset.symbol}</div>
 
               <div className="avail-bal-container">
                 <div className="avail-bal-txt">{t('governance.modal2.form.balance')}</div>

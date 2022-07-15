@@ -43,6 +43,7 @@ export const ProposalView = (props: any) => {
   const { proposalList, setProposalList } = allProps;
   const currentSession = useRecoilValue(sessionState);
   const [finalAmount, setFinalAmount] = useState('10,000');
+  const [remainingAmount, setRemainingAmount] = useState('10000');
   const [proposalStatus, setProposposalStatus] = useState(allProps?.proposal?.status);
 
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
@@ -66,11 +67,22 @@ export const ProposalView = (props: any) => {
 
   const analyticsService = new AnalyticsService(currentSession);
 
+  const numWithCommas = (x: string) => {
+    if (x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+    return x;
+  }
+
   const [t] = useTranslation();
 
   let customMaxValidator = TransactionUtils.maxValidator(
-    finalAmount.replace(',', ''),
-    t('governance.modal2.form.input.proposalDeposit.max.error'),
+    remainingAmount.replace(',', ''),
+    t('governance.modal2.form.input.proposalDeposit.max.error', 
+    {
+      maxDeposit: (numWithCommas(remainingAmount).concat(' ').concat(userAsset?.symbol))
+    }
+    ),
   );
   let customMaxValidator0 = TransactionUtils.maxValidator(
     getUIDynamicAmount(userAsset.balance, userAsset),
@@ -103,13 +115,7 @@ export const ProposalView = (props: any) => {
     allProps.showPasswordInput();
   };
 
-  function numWithCommas(x: string) {
-    if (x) {
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    }
-    return x;
-  }
-
+  
   const totalDeposit = () => {
     const depositCalc = allProps?.proposal?.total_deposit
       .reduce((partialSum, a) => partialSum.plus(Big(a.amount)), Big(0))
@@ -132,6 +138,11 @@ export const ProposalView = (props: any) => {
     const duration = moment.duration(endDepositTime.diff(submitTime));
     const days = duration.asDays();
     return days.toString();
+  };
+
+  const remainingTotal = () => {
+    const remaining = Big(finalAmount.replace(',','')).minus(Big(totalDepositValue)).toString();
+    setRemainingAmount(remaining);
   };
 
   const submitProposalDeposit = async () => {
@@ -238,6 +249,7 @@ export const ProposalView = (props: any) => {
     }
 
     setFinalAmount('10,000');
+    remainingTotal();
 
     customMaxValidator = TransactionUtils.maxValidator(
       finalAmount.replace(',', ''),
