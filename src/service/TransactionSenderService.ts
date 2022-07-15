@@ -385,6 +385,7 @@ export class TransactionSenderService {
     await Promise.all([
       await this.txHistoryManager.fetchAndUpdateBalances(currentSession),
       await this.txHistoryManager.fetchAndSaveDelegations(nodeRpc, currentSession),
+      await this.txHistoryManager.fetchAndSaveRewards(nodeRpc, currentSession),
     ]);
 
     return broadCastResult;
@@ -556,6 +557,7 @@ export class TransactionSenderService {
     await Promise.all([
       await this.txHistoryManager.fetchAndUpdateBalances(currentSession),
       await this.txHistoryManager.fetchAndSaveDelegations(nodeRpc, currentSession),
+      await this.txHistoryManager.fetchAndSaveRewards(nodeRpc, currentSession),
       await this.txHistoryManager.fetchAndSaveUnbondingDelegations(nodeRpc, currentSession),
     ]);
 
@@ -616,6 +618,7 @@ export class TransactionSenderService {
     await Promise.all([
       await this.txHistoryManager.fetchAndUpdateBalances(currentSession),
       await this.txHistoryManager.fetchAndSaveDelegations(nodeRpc, currentSession),
+      await this.txHistoryManager.fetchAndSaveRewards(nodeRpc, currentSession),
     ]);
     return broadCastResult;
   }
