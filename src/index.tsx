@@ -7,12 +7,16 @@ import RouteHub from './pages/route';
 import './index.less';
 import { task } from './service/tasks/BackgroundJob';
 import './language/I18n';
+import { IntercomProvider } from 'react-use-intercom';
+import { INTERCOM_APP_ID } from './config/StaticConfig';
 
 ReactDOM.render(
-  <RecoilRoot>
-    <RecoilNexus />
-    <RouteHub />
-  </RecoilRoot>,
+  <IntercomProvider appId={INTERCOM_APP_ID}>
+    <RecoilRoot>
+      <RecoilNexus />
+      <RouteHub />
+    </RecoilRoot>
+  </IntercomProvider>,
   document.getElementById('root'),
 );
 

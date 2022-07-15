@@ -89,6 +89,7 @@ import {
 } from '../../service/bridge/BridgeConfig';
 import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
 import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
+import IntercomCustomerService from '../../pages/customer-service';
 
 // import i18n from '../../language/I18n';
 
@@ -890,6 +891,7 @@ function HomeLayout(props: HomeLayoutProps) {
 
   return (
     <main className="home-layout">
+      <IntercomCustomerService />
       <PasswordFormModal
         description={t('general.passwordFormModal.description')}
         okButtonText={t('general.passwordFormModal.okButton')}
