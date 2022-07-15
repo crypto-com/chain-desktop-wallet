@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.1.1] - 2022-07-15
+### Bug fixes
+- Clean up duplicated rewards & delegations
 ## [v1.1.0] - 2022-07-11
 ### Additions
 - View Governance Voting History
