@@ -1,7 +1,10 @@
 import { Select } from 'antd';
 import React, { useState } from 'react';
+import { useRecoilValue } from 'recoil';
 import { useCronosEvmAsset, useCronosTendermintAsset } from '../../../hooks/useCronosEvmAsset';
 import { UserAsset } from '../../../models/UserAsset';
+import { sessionState } from '../../../recoil/atom';
+import { checkIfTestnet } from '../../../utils/utils';
 
 interface IChainSelectProps {
   onChangeAsset: (asset: UserAsset | undefined) => void;
@@ -11,7 +14,11 @@ const ChainSelect = (props: IChainSelectProps) => {
   const cronosTendermintAsset = useCronosTendermintAsset();
   const cronosEvmAsset = useCronosEvmAsset();
   const [currentAsset, setCurrentAsset] = useState(cronosTendermintAsset);
-  const selectableAssets = [cronosTendermintAsset, cronosEvmAsset];
+  const currentSession = useRecoilValue(sessionState);
+  const selectableAssets = [
+    cronosTendermintAsset,
+    ...(!checkIfTestnet(currentSession.wallet.config.network) ? [cronosEvmAsset] : []),
+  ];
 
   return (
     <Select
