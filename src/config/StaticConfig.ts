@@ -1,7 +1,7 @@
 import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 
-export const INTERCOM_APP_ID = 'fyq3wodw';
-// export const INTERCOM_APP_ID = 'yrt83fbd';
+// export const INTERCOM_APP_ID = 'fyq3wodw';
+export const INTERCOM_APP_ID = 'yrt83fbd';
 
 export const APP_DB_NAMESPACE = 'data-store';
 export const MARKET_API_BASE_URL = 'https://crypto.org/api';
