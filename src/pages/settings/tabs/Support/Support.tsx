@@ -5,7 +5,7 @@ import { useIntercom } from 'react-use-intercom';
 
 const Support = () => {
   const [t] = useTranslation();
-  const { show, update } = useIntercom();
+  const { show } = useIntercom();
 
   return (
     <>
@@ -26,9 +26,6 @@ const Support = () => {
               marginTop: '10px',
             }}
             onClick={() => {
-              update({
-                hideDefaultLauncher: false,
-              });
               show();
             }}
           >
