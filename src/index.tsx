@@ -9,9 +9,10 @@ import { task } from './service/tasks/BackgroundJob';
 import './language/I18n';
 import { IntercomProvider } from 'react-use-intercom';
 import { INTERCOM_APP_ID } from './config/StaticConfig';
+import { handleUnreadCountChange } from './pages/customer-service';
 
 ReactDOM.render(
-  <IntercomProvider appId={INTERCOM_APP_ID}>
+  <IntercomProvider appId={INTERCOM_APP_ID} onUnreadCountChange={handleUnreadCountChange}>
     <RecoilRoot>
       <RecoilNexus />
       <RouteHub />
