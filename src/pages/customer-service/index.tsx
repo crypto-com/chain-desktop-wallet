@@ -2,14 +2,24 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useIntercom } from 'react-use-intercom';
 import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
+import i18n from '../../language/I18n';
+
+let lastUnreadCount = 0;
 
 export const handleUnreadCountChange = (unreadCount: number) => {
   if (unreadCount < 1) {
+    lastUnreadCount = 0;
     return;
   }
 
-  // eslint-disable-next-line no-new
-  new Notification('new message', { body: 'body' });
+  if (unreadCount > lastUnreadCount) {
+    // eslint-disable-next-line no-new
+    new Notification(i18n.t('general.customerService.notification.title'), {
+      body: i18n.t('general.customerService.notification.body'),
+    });
+  }
+
+  lastUnreadCount = unreadCount;
 };
 
 const IntercomCustomerService = () => {
@@ -26,6 +36,7 @@ const IntercomCustomerService = () => {
 
     if (lastAddress !== address) {
       setLastAddress(address);
+      lastUnreadCount = 0;
       shutdown();
       boot({
         hideDefaultLauncher: true,
