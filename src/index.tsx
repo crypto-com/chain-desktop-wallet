@@ -2,12 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { RecoilRoot } from 'recoil';
 import RecoilNexus from 'recoil-nexus';
+import { IntercomProvider } from 'react-use-intercom';
 import * as serviceWorker from './serviceWorker';
 import RouteHub from './pages/route';
 import './index.less';
 import { task } from './service/tasks/BackgroundJob';
 import './language/I18n';
-import { IntercomProvider } from 'react-use-intercom';
 import { INTERCOM_APP_ID } from './config/StaticConfig';
 import { handleUnreadCountChange } from './pages/customer-service';
 

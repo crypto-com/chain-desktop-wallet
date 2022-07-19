@@ -29,7 +29,7 @@ const Support = () => {
               show();
             }}
           >
-            Live Chat
+            {t('general.customerService.liveChat')}
           </a>
           <Divider />
           <div className="title">{t('settings.support.feedbackForm.title')}</div>

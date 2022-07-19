@@ -821,5 +821,6 @@
   "settings.about.title": "關於",
   "settings.about.termsAndConditions.title": "條款及細則",
   "general.customerService.notification.title": "收到了一條新的回复",
-  "general.customerService.notification.body": "你有來自客服的新消息"
+  "general.customerService.notification.body": "你有來自客服的新消息",
+  "general.customerService.liveChat": "實時聊天"
 }

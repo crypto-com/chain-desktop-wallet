@@ -829,5 +829,6 @@
   "settings.about.title": "About",
   "settings.about.termsAndConditions.title": "Terms & Conditions",
   "general.customerService.notification.title": "You have received a response",
-  "general.customerService.notification.body": "You have a new message from Customer Service."
+  "general.customerService.notification.body": "You have a new message from Customer Service.",
+  "general.customerService.liveChat": "Live Chat"
 }
