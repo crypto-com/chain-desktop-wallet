@@ -743,8 +743,9 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
                     case 'COSMOS_HUB': {
                       setToAddress(atomAsset?.address);
                       form.setFieldsValue({
-                        toAddress: cronosAsset?.address,
+                        toAddress: atomAsset?.address,
                       });
+                      break;
                     }
                     default:
                   }
@@ -801,7 +802,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
           <div className="flex-row">
             <div>{t('bridge.form.willReceive')}</div>
             <div>
-              {new Big(sendingAmount).toFixed(4)} {toAsset?.symbol}
+              {new Big(sendingAmount).toFixed(4)} {currentAsset?.symbol}
             </div>
           </div>
           <div className="flex-row">
