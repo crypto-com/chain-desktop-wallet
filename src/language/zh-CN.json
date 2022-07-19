@@ -819,5 +819,8 @@
   "settings.support.feedbackForm.title": "回馈表格",
   "settings.support.feedbackForm.description": "如你有任何有关 Crypto.com DeFi Desktop Wallet 的查询、意见或问题回报，请填妥以下回馈表格",
   "settings.about.title": "关于",
-  "settings.about.termsAndConditions.title": "条款及细则"
+  "settings.about.termsAndConditions.title": "条款及细则",
+  "general.customerService.notification.title": "收到了一条新的回复",
+  "general.customerService.notification.body": "你有来自客服的新消息",
+  "general.customerService.liveChat": "实时聊天"
 }

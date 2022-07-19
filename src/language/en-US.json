@@ -827,5 +827,8 @@
   "settings.support.feedbackForm.title": "Feedback Form",
   "settings.support.feedbackForm.description": "If you have any feedback, questions, complaints relating to our Crypto.com DeFi Desktop Wallet, please complete the feedback form",
   "settings.about.title": "About",
-  "settings.about.termsAndConditions.title": "Terms & Conditions"
+  "settings.about.termsAndConditions.title": "Terms & Conditions",
+  "general.customerService.notification.title": "You have received a response",
+  "general.customerService.notification.body": "You have a new message from Customer Service.",
+  "general.customerService.liveChat": "Live Chat"
 }

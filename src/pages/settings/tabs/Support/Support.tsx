@@ -1,9 +1,11 @@
+import * as React from 'react';
 import { Divider } from 'antd';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useIntercom } from 'react-use-intercom';
 
 const Support = () => {
   const [t] = useTranslation();
+  const { show } = useIntercom();
 
   return (
     <>
@@ -16,7 +18,18 @@ const Support = () => {
             target="_blank"
             rel="noreferrer"
           >
-            {t('general.learnMore')}
+            FAQ
+          </a>
+          <a
+            style={{
+              display: 'block',
+              marginTop: '10px',
+            }}
+            onClick={() => {
+              show();
+            }}
+          >
+            {t('general.customerService.liveChat')}
           </a>
           <Divider />
           <div className="title">{t('settings.support.feedbackForm.title')}</div>
