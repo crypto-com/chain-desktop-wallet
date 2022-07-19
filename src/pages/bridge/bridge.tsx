@@ -56,7 +56,6 @@ import {
   fromScientificNotation,
   getBaseScaledAmount,
 } from '../../utils/NumberUtils';
-import { SUPPORTED_BRIDGE } from '../../config/StaticConfig';
 import IconHexagon from '../../svg/IconHexagon';
 // import IconTransferHistory from '../../svg/IconTransferHistory';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
@@ -66,6 +65,7 @@ import {
   DefaultTestnetBridgeConfigs,
   DefaultMainnetBridgeConfigs,
   BridgeConfig,
+  SUPPORTED_BRIDGE
 } from '../../service/bridge/BridgeConfig';
 import { BridgeService } from '../../service/bridge/BridgeService';
 import {
@@ -288,6 +288,9 @@ const CronosBridge = props => {
         break;
       case 'CRONOS':
         app = 'Ethereum App';
+        break;
+      case 'COSMOS_HUB':
+        app = 'Cosmos App';
         break;
       default:
     }

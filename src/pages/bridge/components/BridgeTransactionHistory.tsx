@@ -275,7 +275,10 @@ const BridgeTransactionHistory = () => {
   useEffect(() => {
     const fetchBridgeHistory = async () => {
       if (cronosAsset) {
-        await bridgeService.fetchAndSaveBridgeTxs(cronosAsset?.address!, cryptoOrgAsset?.address!);
+        await bridgeService.fetchAndSaveBridgeTxs({
+          cronosEvmAddress: cronosAsset?.address!,
+          cronosTendermintAddress: cryptoOrgAsset?.address!
+        }, );
       }
       const transactionHistory = await bridgeService.retrieveCurrentWalletBridgeTransactions();
       const processedHistory = convertBridgeTransfers(transactionHistory);

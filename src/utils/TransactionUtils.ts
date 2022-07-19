@@ -9,7 +9,7 @@ import { Network } from '../config/StaticConfig';
 export class TransactionUtils {
   public static addressValidator(
     currentSession: Session,
-    walletAsset: UserAsset,
+    walletAsset: UserAsset | undefined,
     type: AddressType,
   ) {
     const addressType =
@@ -17,6 +17,10 @@ export class TransactionUtils {
 
     return () => ({
       validator(rule, value) {
+        if(!walletAsset) {
+          return Promise.reject();
+        }
+
         const reason = `${i18n.t('general.addressValidator.reason1')} ${
           walletAsset.symbol
         } ${addressType} ${i18n.t('general.addressValidator.reason2')}`;

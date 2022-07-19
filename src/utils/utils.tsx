@@ -156,6 +156,16 @@ export function getCronosEvmAsset(walletAllAssets: UserAsset[]) {
   });
 }
 
+export function getCosmosHubTendermintAsset(walletAllAssets: UserAsset[]) {
+  return walletAllAssets.find(asset => {
+    return (
+      asset.mainnetSymbol.toUpperCase() === 'ATOM' &&
+      asset.name.includes('Cosmos') &&
+      asset.assetType === UserAssetType.TENDERMINT
+    );
+  });
+}
+
 export function getAssetBySymbolAndChain(
   walletAllAssets: UserAsset[],
   symbol: string,

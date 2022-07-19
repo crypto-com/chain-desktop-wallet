@@ -17,6 +17,7 @@ import {
   BridgeConfig,
   BridgeNetworkConfigType,
   BridgeTransferDirection,
+  BridgeTxHistoryAddressQuery,
   DefaultMainnetBridgeConfigs,
   DefaultTestnetBridgeConfigs,
 } from './BridgeConfig';
@@ -53,6 +54,16 @@ export class BridgeService {
       }
 
       case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG: {
+        return await this.handleCronosToCryptoOrgTransfer(bridgeTransferRequest);
+      }
+
+      case BridgeTransferDirection.COSMOS_HUB_TO_CRONOS: {
+        // TODO: implement
+        return await this.handleCryptoOrgToCronosTransfer(bridgeTransferRequest);
+      }
+
+      case BridgeTransferDirection.CRONOS_TO_COSMOS_HUB: {
+        // TODO: implement
         return await this.handleCronosToCryptoOrgTransfer(bridgeTransferRequest);
       }
 
@@ -287,7 +298,8 @@ export class BridgeService {
       await this.storageService.saveBridgeConfigsList([
         DefaultMainnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG,
         DefaultMainnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS,
-
+        DefaultMainnetBridgeConfigs.COSMOS_HUB_TO_CRONOS,
+        DefaultMainnetBridgeConfigs.CRONOS_TO_COSMOS_HUB,
         DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG,
         DefaultTestnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS,
       ]);
@@ -338,8 +350,11 @@ export class BridgeService {
     );
   };
 
-  public async fetchAndSaveBridgeTxs(evmAddress: string, tendermintAddress: string) {
+  public async fetchAndSaveBridgeTxs(query: BridgeTxHistoryAddressQuery) {
     try {
+      const { cronosEvmAddress, cronosTendermintAddress, 
+        // cosmosHubTendermintAddress 
+      } = query;
       const currentSession = await this.storageService.retrieveCurrentSession();
       const defaultBridgeDirection = BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS;
 
@@ -351,8 +366,13 @@ export class BridgeService {
         loadedBridgeConfig?.bridgeIndexingUrl || defaultBridgeConfig?.bridgeIndexingUrl!;
 
       const response = await axios.get<BridgeTransactionListResponse>(
-        `${bridgeIndexingUrl}/activities?cronosevmAddress=${evmAddress}&cryptoorgchainAddress=${tendermintAddress}&order=sourceBlockTime.desc`,
+        `${bridgeIndexingUrl}/activities?cronosevmAddress=${cronosEvmAddress}&cryptoorgchainAddress=${cronosTendermintAddress}&order=sourceBlockTime.desc`,
       );
+
+      // Load COSMOS_HUB_TO_CRONOS activities as well
+      // const responseCosmos = await axios.get<BridgeTransactionListResponse>(
+      //   `${bridgeIndexingUrl}/activities?cosmoshubAddress=${cosmosHubTendermintAddress}&cryptoorgchainAddress=${cronosTendermintAddress}&order=sourceBlockTime.desc`,
+      // );
       const loadedBridgeTransactions = response.data.result;
 
       // eslint-disable-next-line no-console

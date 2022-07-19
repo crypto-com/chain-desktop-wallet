@@ -6,7 +6,7 @@ import { scaledBalance, UserAsset } from '../../models/UserAsset';
 
 interface RowAmountOptionProps {
   form: FormInstance;
-  walletAsset: UserAsset;
+  walletAsset: UserAsset | undefined;
   setSendingAmount?: (value: string) => void;
   style?;
 }
@@ -14,6 +14,8 @@ const RowAmountOption: React.FC<RowAmountOptionProps> = props => {
   const { form, walletAsset, setSendingAmount, style } = props;
 
   const onAmountOption = value => {
+    if(!walletAsset) return;
+    
     const optionAmount = Big(scaledBalance(walletAsset)).times(value);
     form.setFieldsValue({
       amount: Number(optionAmount.toNumber()),
