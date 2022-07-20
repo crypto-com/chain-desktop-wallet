@@ -126,7 +126,7 @@ export const DefaultMainnetBridgeConfigs = {
     bridgeIndexingUrl: DefaultBridgeIndexingUrl,
   },
   CRONOS_TO_COSMOS_HUB: {
-    bridgeDirectionType: BridgeTransferDirection.COSMOS_HUB_TO_CRONOS,
+    bridgeDirectionType: BridgeTransferDirection.CRONOS_TO_COSMOS_HUB,
     bridgeNetworkConfigType: BridgeNetworkConfigType.MAINNET_BRIDGE,
     cronosBridgeContractAddress: '0xB888d8Dd1733d72681b30c00ee76BDE93ae7aa93',
     gasLimit: 30_000,
@@ -135,7 +135,7 @@ export const DefaultMainnetBridgeConfigs = {
     bridgeIndexingUrl: DefaultBridgeIndexingUrl,
   },
   COSMOS_HUB_TO_CRONOS: {
-    bridgeDirectionType: BridgeTransferDirection.CRONOS_TO_COSMOS_HUB,
+    bridgeDirectionType: BridgeTransferDirection.COSMOS_HUB_TO_CRONOS,
     bridgeNetworkConfigType: BridgeNetworkConfigType.MAINNET_BRIDGE,
     cronosBridgeContractAddress: '',
     prefix: 'crc',
