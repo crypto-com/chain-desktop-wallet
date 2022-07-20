@@ -32,7 +32,7 @@ import { AnalyticsService } from '../../../service/analytics/AnalyticsService';
 import { getUIDynamicAmount, getBaseScaledAmount } from '../../../utils/NumberUtils';
 
 import { renderExplorerUrl } from '../../../models/Explorer';
-import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSelectTendermint';
+import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasConfig';
 
 const { Header, Content, Sider } = Layout;
 
