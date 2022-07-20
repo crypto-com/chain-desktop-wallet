@@ -670,7 +670,7 @@ const CronosBridge = props => {
                         getBaseScaledAmount(networkFee, currentAsset!),
                       ),
                     )}{' '}
-                    {toAsset?.symbol}
+                    {currentAsset?.symbol}
                   </div>
                   {Big(
                     fromScientificNotation(

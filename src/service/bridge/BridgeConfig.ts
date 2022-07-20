@@ -141,8 +141,8 @@ export const DefaultMainnetBridgeConfigs = {
     prefix: 'crc',
     bridgeChannel: 'channel-241',
     bridgePort: 'transfer',
-    gasLimit: 300_000,
-    defaultGasPrice: 10,
+    gasLimit: 30_000,
+    defaultGasPrice: 1,
     bridgeIndexingUrl: DefaultBridgeIndexingUrl,
   },
 };
