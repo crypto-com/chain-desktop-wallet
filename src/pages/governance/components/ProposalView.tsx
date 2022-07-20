@@ -76,7 +76,7 @@ export const ProposalView = (props: any) => {
 
   const [t] = useTranslation();
 
-  let customMaxValidator = TransactionUtils.maxValidator(
+  const customMaxValidator = TransactionUtils.maxValidator(
     remainingAmount.replace(',', ''),
     t('governance.modal2.form.input.proposalDeposit.max.error', {
       maxDeposit: numWithCommas(remainingAmount)
@@ -84,11 +84,11 @@ export const ProposalView = (props: any) => {
         .concat(userAsset?.symbol),
     }),
   );
-  let customMaxValidator0 = TransactionUtils.maxValidator(
+  const customMaxValidator0 = TransactionUtils.maxValidator(
     getUIDynamicAmount(userAsset.balance, userAsset),
     t('governance.modal2.form.input.proposalDeposit.max2.error'),
   );
-  let customAmountValidator = TransactionUtils.validTransactionAmountValidator();
+  const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
 
   const handleCloseDepositSuccessModal = () => {
     setDepositSuccessModalVisible(false);
@@ -252,16 +252,6 @@ export const ProposalView = (props: any) => {
 
     setFinalAmount('10,000');
     remainingTotal();
-
-    customMaxValidator = TransactionUtils.maxValidator(
-      finalAmount.replace(',', ''),
-      t('governance.modal2.form.input.proposalDeposit.max.error'),
-    );
-    customMaxValidator0 = TransactionUtils.maxValidator(
-      getUIDynamicAmount(userAsset.balance, userAsset),
-      t('governance.modal2.form.input.proposalDeposit.max2.error'),
-    );
-    customAmountValidator = TransactionUtils.validTransactionAmountValidator();
 
     setUserAsset(userAsset);
 
