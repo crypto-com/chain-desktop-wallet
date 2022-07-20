@@ -55,6 +55,8 @@ import IconTick from '../../svg/IconTick';
 import RewardModalPopup from '../../components/RewardModalPopup/RewardModalPopup';
 import { AssetIcon } from '../../components/AssetIcon';
 import NftPreview from '../nft/components/NftPreview';
+// import { ChartArea } from './components/ChartArea';
+
 
 const { ipcRenderer } = window.require('electron');
 
@@ -291,6 +293,7 @@ const HomePage = () => {
   }
 
   useEffect(() => {
+
     const syncAssetData = async () => {
       setAssetsLoading(true);
 
@@ -481,6 +484,8 @@ const HomePage = () => {
             </div>
           </TabPane>
         </Tabs>
+        
+        {/* <ChartArea /> */}
         <Tabs>
           <TabPane tab={t('home.nft.tab1')} key="1">
             <div className="site-layout-background nft-container">

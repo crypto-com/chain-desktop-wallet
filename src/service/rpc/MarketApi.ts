@@ -14,12 +14,15 @@ import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 
 export interface IMarketApi {
   getAssetPrice(assetSymbol: string, currency: string): Promise<AssetMarketPrice>;
+  getTokenPrices(cryptoSymbol: string, fiatCurrency: string, interval: string): Promise<AssetMarketPrice>;
 }
 
 export class CroMarketApi implements IMarketApi {
   private readonly axiosClient: AxiosInstance;
 
   private readonly coinbaseRateBaseUrl: string;
+
+  private readonly cryptocomApiBaseUrlV2: string;
 
   private tokenSlugMap: undefined | null | CryptoComSlugResponse[] = null;
 
@@ -28,6 +31,8 @@ export class CroMarketApi implements IMarketApi {
       baseURL: MARKET_API_BASE_URL,
     });
     this.coinbaseRateBaseUrl = COINBASE_TICKER_API_BASE_URL;
+
+    this.cryptocomApiBaseUrlV2 = CRYPTO_COM_PRICE_API_BASE_URL.V2;
 
     this.loadTokenSlugMap().then(slugMap => {
       this.tokenSlugMap = slugMap;
@@ -55,6 +60,42 @@ export class CroMarketApi implements IMarketApi {
       price: fiatPrice,
     };
   }
+
+  public async getTokenPrices(cryptoSymbol: string, fiatCurrency: string, interval: string){
+    // const whitelistedCRC20Tokens: string[] = Array.from(CRC20MainnetTokenInfos.keys());
+    const allTokensSlugMap: CryptoComSlugResponse[] = await this.loadTokenSlugMap();
+
+    const tokenSlugInfo = allTokensSlugMap?.filter(tokenSlug => tokenSlug.symbol === cryptoSymbol)[0];
+
+    if (!tokenSlugInfo) {
+      throw Error(`Couldn't find a valid slug name for ${cryptoSymbol}`);
+    }
+
+    const cryptoSlug = tokenSlugInfo?.slug;
+
+    if(cryptoSlug){
+      const tokenPriceResponse: AxiosResponse<CryptoTokenPriceAPIResponse> = await axios({
+        baseURL: this.cryptocomApiBaseUrlV2,
+        url: `/${interval}/${cryptoSlug}/`,
+        params: {
+          convert: fiatCurrency
+        },
+      });
+
+      if (tokenPriceResponse.status !== 200) {
+        throw Error('Could not find requested token price info from Crypto.com');
+      }
+      console.log('tokenPriceResponse ', tokenPriceResponse);
+      if(tokenPriceResponse?.data && tokenPriceResponse?.data?.prices){
+        return tokenPriceResponse;
+      }
+
+      return tokenPriceResponse;
+    }
+
+    return {};
+  }
+
 
   public async getCryptoToFiatRateFromCoinbase(cryptoSymbol: string, fiatCurrency: string) {
     const fiatRateResp: AxiosResponse<CoinbaseResponse> = await axios({
@@ -130,6 +171,9 @@ export class CroMarketApi implements IMarketApi {
 
     return String(tokenPriceInFiat);
   }
+
+
+
 
   private async loadTokenSlugMap() {
     if (!this.tokenSlugMap || this.tokenSlugMap.length === 0) {
