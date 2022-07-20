@@ -72,17 +72,17 @@ export const ProposalView = (props: any) => {
       return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
     return x;
-  }
+  };
 
   const [t] = useTranslation();
 
   let customMaxValidator = TransactionUtils.maxValidator(
     remainingAmount.replace(',', ''),
-    t('governance.modal2.form.input.proposalDeposit.max.error', 
-    {
-      maxDeposit: (numWithCommas(remainingAmount).concat(' ').concat(userAsset?.symbol))
-    }
-    ),
+    t('governance.modal2.form.input.proposalDeposit.max.error', {
+      maxDeposit: numWithCommas(remainingAmount)
+        .concat(' ')
+        .concat(userAsset?.symbol),
+    }),
   );
   let customMaxValidator0 = TransactionUtils.maxValidator(
     getUIDynamicAmount(userAsset.balance, userAsset),
@@ -115,7 +115,6 @@ export const ProposalView = (props: any) => {
     allProps.showPasswordInput();
   };
 
-  
   const totalDeposit = () => {
     const depositCalc = allProps?.proposal?.total_deposit
       .reduce((partialSum, a) => partialSum.plus(Big(a.amount)), Big(0))
@@ -141,7 +140,9 @@ export const ProposalView = (props: any) => {
   };
 
   const remainingTotal = () => {
-    const remaining = Big(finalAmount.replace(',','')).minus(Big(totalDepositValue)).toString();
+    const remaining = Big(finalAmount.replace(',', ''))
+      .minus(Big(totalDepositValue))
+      .toString();
     setRemainingAmount(remaining);
   };
 
@@ -216,6 +217,7 @@ export const ProposalView = (props: any) => {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, userAsset!);
       }
+      setConfirmDepositModalVisible(true);
     } else {
       setInputPasswordVisible(true);
     }
@@ -424,7 +426,15 @@ export const ProposalView = (props: any) => {
                       className="submit-proposal-btn"
                       type="primary"
                       disabled={!allProps.voteOption}
-                      onClick={() => setDepositModalVisible(true)}
+                      onClick={() => {
+                        if (
+                          !isLedgerConnected &&
+                          currentSession.wallet.walletType === LEDGER_WALLET_TYPE
+                        ) {
+                          ledgerNotification(currentSession.wallet, userAsset!);
+                        }
+                        setDepositModalVisible(true);
+                      }}
                     >
                       {t('governance.proposalView.modal3.depositBtn')}
                     </Button>
