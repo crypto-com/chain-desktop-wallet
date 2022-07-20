@@ -43,7 +43,7 @@ export class TransactionUtils {
   public static validTransactionAmountValidator() {
     return () => ({
       validator(rule, value) {
-        if (!Number.isNaN(parseFloat(value)) && Number.isFinite(value) && Number(value) > 0) {
+        if (!Number.isNaN(parseFloat(value)) && Number.isFinite(parseFloat(value)) && Number(parseFloat(value)) > 0) {
           return Promise.resolve();
         }
         // eslint-disable-next-line prefer-promise-reject-errors

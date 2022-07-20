@@ -764,5 +764,8 @@
   "settings.support.feedbackForm.title": "피드백 양식",
   "settings.support.feedbackForm.description": "크립토닷컴 디파이 데스크탑 지갑과 관련된 피드백, 질문, 불만 사항이 있는 경우 피드백 양식을 작성해 주세요.",
   "settings.about.title": "자세한 사항",
-  "settings.about.termsAndConditions.title": "이용 약관"
+  "settings.about.termsAndConditions.title": "이용 약관",
+  "general.customerService.notification.title": "응답을 받았습니다",
+  "general.customerService.notification.body": "고객 서비스의 새로운 메시지가 있습니다.",
+  "general.customerService.liveChat": "라이브 채팅"
 }

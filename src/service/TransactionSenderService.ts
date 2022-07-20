@@ -1,6 +1,7 @@
 import Web3 from 'web3';
 import { TransactionConfig } from 'web3-eth';
 import { ethers } from 'ethers';
+import Big from 'big.js';
 import {
   RestakeStakingRewardTransactionUnsigned,
   RestakeStakingAllRewardsTransactionUnsigned,
@@ -686,7 +687,7 @@ export class TransactionSenderService {
       accountNumber,
       accountSequence,
     };
-
+    
     let signedTxHex: string = '';
     const { networkFee, gasLimit } = await getCronosTendermintFeeConfig();
 
@@ -727,6 +728,11 @@ export class TransactionSenderService {
       ledgerTransactionSigner,
     } = await this.transactionPrepareService.prepareTransaction();
 
+    const minDeposit = '100';
+    if(Big(textProposalSubmitRequest.initialDeposit[0].amount).cmp(Big(minDeposit)) === -1){
+      return await nodeRpc.broadcastTransaction('');
+    }
+
     const submitTextProposalUnsigned: TextProposalTransactionUnsigned = {
       params: {
         description: textProposalSubmitRequest.description,
@@ -760,6 +766,7 @@ export class TransactionSenderService {
 
     const broadCastResult = await nodeRpc.broadcastTransaction(signedTxHex);
     await this.txHistoryManager.fetchAndSaveProposals(currentSession);
+
     return broadCastResult;
   }
 

@@ -7,7 +7,8 @@ All notable changes to this project will be documented in this file.
 *Released*
 ## [v1.1.1] - 2022-07-15
 ### Bug fixes
-- Clean up duplicated rewards & delegations
+- Clean up duplicated rewards, delegations 
+- Incorrect display of Mainnet Cronos NFT transfer history for Testnet wallet
 ## [v1.1.0] - 2022-07-11
 ### Additions
 - View Governance Voting History

@@ -660,6 +660,7 @@ export class TransactionHistoryService {
         ProposalStatuses.PROPOSAL_STATUS_PASSED,
         ProposalStatuses.PROPOSAL_STATUS_FAILED,
         ProposalStatuses.PROPOSAL_STATUS_REJECTED,
+        ProposalStatuses.PROPOSAL_STATUS_DEPOSIT_PERIOD,
       ]);
 
       return loadedProposals;
