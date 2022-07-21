@@ -1,18 +1,95 @@
-import { useState } from 'react';
+import { atom, useRecoilState } from 'recoil';
 import { getLocalSetting, setLocalSetting, SettingsKey } from '../../utils/localStorage';
+import { fetchRemoteNotifications, isRemoteNotificationExpired } from './remote';
+import { LocalNotification, NotificationItem, RemoteNotification } from './types';
 
-export const getNotifications = () => {
-  return getLocalSetting<Notification[]>(SettingsKey.Notification);
+export const getNotificationsInSettings = () => {
+  return getLocalSetting<NotificationItem[]>(SettingsKey.Notification);
 };
 
-export const setNotifications = (notifications: Notification[]) => {
+export const setNotificationsInSettings = (notifications: NotificationItem[]) => {
   setLocalSetting(SettingsKey.Notification, notifications);
 };
 
+const notificationsState = atom({
+  key: 'notifications',
+  default: getLocalSetting<NotificationItem[]>(SettingsKey.Notification),
+});
+
 export const useNotification = () => {
-  const notifications = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useRecoilState(notificationsState);
+
+  const getNotificationById = (id: number) => {
+    return notifications.find(n => n.id === id);
+  };
+
+  const markAsRead = (notification: NotificationItem) => {
+    const newNotifications = notifications.map(n => {
+      if (n.id === notification.id) {
+        return { ...n, isRead: true };
+      }
+      return n;
+    });
+    updateNotifications(newNotifications);
+  };
+
+  const postLocalNotification = (notification: LocalNotification) => {
+    postNotifications([
+      {
+        id: Date.now(),
+        content: notification.content,
+        isRead: false,
+        icon: notification.icon,
+        createdAt: Date.now(),
+      },
+    ]);
+  };
+
+  const postRemoteNotifications = (remoteNotifications: RemoteNotification[]) => {
+    const newNotifications = remoteNotifications.map(n => ({
+      id: n.id,
+      content: n.content,
+      icon: '',
+      isRead: false,
+      createdAt: Date.now(),
+    }));
+    updateNotifications([...notifications, ...newNotifications]);
+  };
+
+  const postNotifications = (aNotifications: NotificationItem[]) => {
+    const newNotifications = [...notifications, ...aNotifications];
+    updateNotifications(newNotifications);
+  };
+
+  const updateNotifications = (lst: NotificationItem[]) => {
+    setNotifications(lst);
+    setNotificationsInSettings(lst);
+  };
+
+  const loadRemoteNotifications = async (providerURL: string) => {
+    const remoteNotifications = await fetchRemoteNotifications(providerURL);
+
+    return remoteNotifications.filter(noti => {
+      if (isRemoteNotificationExpired(noti)) {
+        return false;
+      }
+
+      const notification = getNotificationById(noti.id);
+      if (notification) {
+        return false;
+      }
+
+      return true;
+    });
+  };
 
   return {
     notifications,
+    loadRemoteNotifications,
+    postNotifications,
+    postRemoteNotifications,
+    getNotificationById,
+    markAsRead,
+    postLocalNotification,
   };
 };

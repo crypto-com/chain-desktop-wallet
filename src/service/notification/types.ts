@@ -1,5 +1,5 @@
-export interface Notification {
-  id: string;
+export interface NotificationItem {
+  id: number;
   content: string;
   isRead: boolean;
   icon: string;
@@ -8,9 +8,7 @@ export interface Notification {
 
 export interface LocalNotification {
   content: string;
-  hasRead: boolean;
   icon: string; // https://ant.design/components/icon/
-  createdAt: number;
 }
 
 export interface RemoteNotification {
