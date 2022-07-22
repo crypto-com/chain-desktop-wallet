@@ -236,7 +236,6 @@ const GovernancePage = () => {
 
   const showPasswordInput = () => {
     // TODO: check if decryptedPhrase expired
-    console.log('modalType', modalType);
     if ((decryptedPhrase && false) || currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, userAsset!);
@@ -248,7 +247,6 @@ const GovernancePage = () => {
         showConfirmationModal();
       }
     } else {
-      console.log('hihi');
       setInputPasswordVisible(true);
     }
   };
