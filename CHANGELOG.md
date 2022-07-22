@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.2.0] - 2022-07-25
+### Additions
+- Governance Proposal Submission
+- Deposit to Governance Proposal
+- Customer Service Live Support
+### Bug fixes
+- Inaccurate Voting History
 ## [v1.1.1] - 2022-07-15
 ### Bug fixes
 - Clean up duplicated rewards, delegations 
