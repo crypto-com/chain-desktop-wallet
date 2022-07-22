@@ -1,14 +1,16 @@
+export type NotificationType = 'remote' | 'customerService'
+
 export interface NotificationItem {
   id: number;
   content: string;
+  type: NotificationType;
   isRead: boolean;
-  icon: string;
   createdAt: number;
 }
 
 export interface LocalNotification {
   content: string;
-  icon: string; // https://ant.design/components/icon/
+  type: NotificationType;
 }
 
 export interface RemoteNotification {

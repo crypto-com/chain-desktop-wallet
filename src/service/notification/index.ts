@@ -39,18 +39,18 @@ export const useNotification = () => {
         id: Date.now(),
         content: notification.content,
         isRead: false,
-        icon: notification.icon,
+        type: notification.type,
         createdAt: Date.now(),
       },
     ]);
   };
 
   const postRemoteNotifications = (remoteNotifications: RemoteNotification[]) => {
-    const newNotifications = remoteNotifications.map(n => ({
+    const newNotifications: NotificationItem[] = remoteNotifications.map(n => ({
       id: n.id,
       content: n.content,
-      icon: '',
       isRead: false,
+      type: 'remote',
       createdAt: Date.now(),
     }));
     updateNotifications([...notifications, ...newNotifications]);
@@ -81,7 +81,13 @@ export const useNotification = () => {
 
       return true;
     });
+
   };
+
+    const fetchNotifications = async (providerURL: string) => {
+      const notifications = await loadRemoteNotifications(providerURL);
+      postRemoteNotifications(notifications);
+    }
 
   return {
     notifications,
@@ -91,5 +97,6 @@ export const useNotification = () => {
     getNotificationById,
     markAsRead,
     postLocalNotification,
+    fetchNotifications
   };
 };
