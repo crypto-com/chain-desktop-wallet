@@ -42,8 +42,8 @@ export const ProposalView = (props: any) => {
   const allProps = props?.props;
   const { proposalList, setProposalList } = allProps;
   const currentSession = useRecoilValue(sessionState);
-  const [finalAmount, setFinalAmount] = useState('10,000');
-  const [remainingAmount, setRemainingAmount] = useState('10000');
+  const [finalAmount, setFinalAmount] = useState('10,001');
+  const [remainingAmount, setRemainingAmount] = useState('10001');
   const [proposalStatus, setProposposalStatus] = useState(allProps?.proposal?.status);
 
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
@@ -250,7 +250,7 @@ export const ProposalView = (props: any) => {
       analyticsService.logPage('Governance');
     }
 
-    setFinalAmount('10,000');
+    setFinalAmount('10,001');
     remainingTotal();
 
     setUserAsset(userAsset);
