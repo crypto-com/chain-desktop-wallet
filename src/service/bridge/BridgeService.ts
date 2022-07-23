@@ -30,7 +30,7 @@ import {
   BridgeTransactionListResponse,
   BridgeTransactionStatusResponse,
 } from './contracts/BridgeModels';
-import { getCronosTendermintFeeConfig } from '../Gas';
+import { getCosmosHubTendermintFeeConfig, getCronosTendermintFeeConfig } from '../Gas';
 import { DerivationPathStandard } from '../signers/LedgerSigner';
 
 export class BridgeService {
@@ -59,20 +59,21 @@ export class BridgeService {
 
       case BridgeTransferDirection.COSMOS_HUB_TO_CRONOS: {
         // TODO: implement
-        return await this.handleCryptoOrgToCronosTransfer(bridgeTransferRequest);
+        return await this.handleCosmosHubToCronosTransfer(bridgeTransferRequest);
       }
 
       case BridgeTransferDirection.CRONOS_TO_COSMOS_HUB: {
         // TODO: implement
-        return await this.handleCronosToCryptoOrgTransfer(bridgeTransferRequest);
+        // return await this.handleCronosToCryptoOrgTransfer(bridgeTransferRequest);
+        throw new TypeError('Bridge transfer direction not supported yet');
       }
 
       case BridgeTransferDirection.ETH_TO_CRONOS:
-        throw new TypeError('Bridge  transfer direction not supported yet');
+        throw new TypeError('Bridge transfer direction not supported yet');
 
         break;
       case BridgeTransferDirection.CRONOS_TO_ETH:
-        throw new TypeError('Bridge  transfer direction not supported yet');
+        throw new TypeError('Bridge transfer direction not supported yet');
 
         break;
       default:
@@ -245,6 +246,74 @@ export class BridgeService {
       );
     } else {
       signedTxHex = await transactionSigner.signIBCTransfer(
+        bridgeTransaction,
+        bridgeTransferRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    }
+
+    return await nodeRpc.broadcastTransaction(signedTxHex);
+  }
+
+  private async handleCosmosHubToCronosTransfer(bridgeTransferRequest: BridgeTransferRequest) {
+    if (!bridgeTransferRequest.cosmosHubAddress || !bridgeTransferRequest.evmAddress) {
+      throw new TypeError(
+        `The Bech32 address and EVM address are required for doing ${bridgeTransferRequest.bridgeTransferDirection} transfer`,
+      );
+    }
+
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      ledgerTransactionSigner,
+      cosmjsTendermintTransactionSigner,
+      currentSession,
+      latestBlock,
+    } = await this.transactionPrepareService.prepareTransaction();
+
+    const scaledBaseAmount = getBaseScaledAmount(
+      bridgeTransferRequest.amount,
+      bridgeTransferRequest.originAsset,
+    );
+    const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
+      currentSession,
+      bridgeTransferRequest.bridgeTransferDirection,
+    );
+
+    const evmToBech32ConvertedRecipient = getBech32AddressFromEVMAddress(
+      bridgeTransferRequest.isCustomToAddress
+        ? bridgeTransferRequest.toAddress
+        : bridgeTransferRequest.evmAddress,
+      loadedBridgeConfig?.prefix || defaultBridgeConfig.prefix,
+    );
+
+    const bridgeTransaction: BridgeTransactionUnsigned = {
+      amount: scaledBaseAmount,
+      fromAddress: bridgeTransferRequest.cosmosHubAddress,
+      toAddress: evmToBech32ConvertedRecipient,
+      originAsset: bridgeTransferRequest.originAsset,
+      accountNumber,
+      accountSequence,
+      channel: loadedBridgeConfig?.bridgeChannel || defaultBridgeConfig.bridgeChannel,
+      port: loadedBridgeConfig?.bridgePort || defaultBridgeConfig.bridgePort,
+      memo: 'bridge:desktop-wallet-client',
+      latestBlockHeight: latestBlock,
+    };
+
+    let signedTxHex: string = '';
+    const { networkFee, gasLimit } = await getCosmosHubTendermintFeeConfig();
+
+    if (bridgeTransferRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signIBCTransfer(
+        bridgeTransaction,
+        bridgeTransferRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    } else {
+      signedTxHex = await cosmjsTendermintTransactionSigner.signIBCTransfer(
         bridgeTransaction,
         bridgeTransferRequest.decryptedPhrase,
         networkFee,

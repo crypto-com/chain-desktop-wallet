@@ -115,6 +115,7 @@ const CronosBridge = props => {
     bridgeTo: '',
     tendermintAddress: '',
     evmAddress: '',
+    cosmosHubAddress: '',
     toAddress: '',
     isCustomToAddress: false,
   });
@@ -181,7 +182,7 @@ const CronosBridge = props => {
   ];
 
   const onWalletDecryptFinish = async (password: string) => {
-    const { tendermintAddress, evmAddress, toAddress, isCustomToAddress } = formValues;
+    const { tendermintAddress, evmAddress, cosmosHubAddress, toAddress, isCustomToAddress } = formValues;
     let { amount } = formValues;
     amount = fromScientificNotation(amount).toString();
 
@@ -199,6 +200,7 @@ const CronosBridge = props => {
       bridgeTransferDirection,
       tendermintAddress,
       evmAddress,
+      cosmosHubAddress,
       toAddress,
       isCustomToAddress,
       amount,
@@ -233,7 +235,7 @@ const CronosBridge = props => {
 
     // TODO: check if decryptedPhrase expired
     if ((decryptedPhrase && false) || session.wallet.walletType === LEDGER_WALLET_TYPE) {
-      const { tendermintAddress, evmAddress } = formValues;
+      const { tendermintAddress, evmAddress, cosmosHubAddress } = formValues;
       const { toAddress, isCustomToAddress } = form.getFieldsValue();
       let amount = form.getFieldValue('amount');
       amount = fromScientificNotation(amount).toString();
@@ -242,6 +244,7 @@ const CronosBridge = props => {
         bridgeTransferDirection,
         tendermintAddress,
         evmAddress,
+        cosmosHubAddress,
         toAddress,
         isCustomToAddress,
         amount,

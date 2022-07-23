@@ -451,7 +451,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
       initFieldValues();
       analyticsService.logPage('Bridge');
     }
-  }, [bridgeTransferDirection]);
+  }, [bridgeTransferDirection, toAsset]);
 
   return (
     <Form
