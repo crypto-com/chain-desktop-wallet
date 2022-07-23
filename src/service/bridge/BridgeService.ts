@@ -373,7 +373,7 @@ export class BridgeService {
       nodeRpc,
       accountNumber,
       accountSequence,
-      // ledgerTransactionSigner,
+      ledgerTransactionSigner,
       cosmjsTendermintTransactionSigner,
       currentSession,
       latestBlock,
@@ -412,13 +412,12 @@ export class BridgeService {
     const { networkFee, gasLimit } = await getCosmosHubTendermintFeeConfig();
 
     if (bridgeTransferRequest.walletType === LEDGER_WALLET_TYPE) {
-      // TO-DO: add support for CosmosHub to Ledger
-      // signedTxHex = await ledgerTransactionSigner.signIBCTransfer(
-      //   bridgeTransaction,
-      //   bridgeTransferRequest.decryptedPhrase,
-      //   networkFee,
-      //   gasLimit,
-      // );
+      signedTxHex = await ledgerTransactionSigner.signIBCTransfer(
+        bridgeTransaction,
+        bridgeTransferRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
     } else {
       signedTxHex = await cosmjsTendermintTransactionSigner.signIBCTransfer(
         bridgeTransaction,
