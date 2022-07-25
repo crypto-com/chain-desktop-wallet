@@ -741,8 +741,19 @@ export class StorageService {
     // });
   }
 
+  public async removeBridgeTransactions() {
+    return this.db.commonTransactionStore.remove(
+      {
+        txType: 'ibc',
+      },
+      { multi: true },
+    );
+  }
+
   // eslint-disable-next-line
   public async saveBridgeTransactions(bridgeTransactions: BridgeTransactionHistoryList) {
+    // await this.removeBridgeTransactions();
+
     if (!bridgeTransactions) {
       return Promise.resolve();
     }
@@ -754,8 +765,10 @@ export class StorageService {
         txType: 'ibc',
         txData: tx,
         txHash: tx.sourceTransactionId,
+        sourceChain: tx.sourceChain,
       };
     });
+
     await this.insertCommonTransactionRecords(ibcTxRecords);
 
     // @deprecated
@@ -768,10 +781,11 @@ export class StorageService {
     return this.db.bridgeTransactionStore.insert<BridgeTransactionHistoryList>(bridgeTransactions); */
   }
 
-  public async retrieveAllBridgeTransactions(walletId: string) {
+  public async retrieveBridgeTransactions(walletId: string, sourceChain?: string) {
     const bridgeTxs = await this.db.commonTransactionStore.find<IBCTransactionRecord>({
       walletId,
       txType: 'ibc',
+      sourceChain,
     } as IBCTransactionRecord);
 
     // Sort the txdata list by `blockTime` in descending

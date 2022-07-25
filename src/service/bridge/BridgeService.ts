@@ -527,8 +527,10 @@ export class BridgeService {
 
   public async fetchAndSaveBridgeTxs(query: BridgeTxHistoryAddressQuery) {
     try {
-      const { cronosEvmAddress, cronosTendermintAddress, 
-        // cosmosHubTendermintAddress 
+      const { 
+        cronosEvmAddress, 
+        cronosTendermintAddress, 
+        cosmosHubTendermintAddress 
       } = query;
       const currentSession = await this.storageService.retrieveCurrentSession();
       const defaultBridgeDirection = BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS;
@@ -540,9 +542,33 @@ export class BridgeService {
       const bridgeIndexingUrl =
         loadedBridgeConfig?.bridgeIndexingUrl || defaultBridgeConfig?.bridgeIndexingUrl!;
 
+      let address = '';
+      let chain = '';
+
+      if(cronosTendermintAddress) {
+        address = cronosTendermintAddress;
+        chain = 'cryptoorgchain';
+      } else if(cronosEvmAddress) {
+        address = cronosEvmAddress;
+        chain = 'cronosevm';
+      } else if(cosmosHubTendermintAddress) {
+        address = cosmosHubTendermintAddress;
+        chain = 'cosmoshub';
+      } else {
+        console.log('Empty Address for fetchAndSaveBridgeTxs');
+        return;
+      }
+
+      // const response = await axios.get<BridgeTransactionListResponse>(
+      //   `${bridgeIndexingUrl}/activities?cronosevmAddress=${cronosEvmAddress}&cryptoorgchainAddress=${cronosTendermintAddress}&order=sourceBlockTime.desc`,
+      // );
+
       const response = await axios.get<BridgeTransactionListResponse>(
-        `${bridgeIndexingUrl}/activities?cronosevmAddress=${cronosEvmAddress}&cryptoorgchainAddress=${cronosTendermintAddress}&order=sourceBlockTime.desc`,
+        `${bridgeIndexingUrl}/${chain}/account/${address}/activities?order=sourceBlockTime.desc`
       );
+
+      // https://cronos.org/indexing/api/v1/bridges/activities?cronosevmAddress=0x85e0280712AaBDD0884732141B048b3B6fdE405B&cryptoorgchainAddress=cro1y0rtatsmnl69nwgcxwud84yscc5vku48nw52uu&order=sourceBlockTime.desc
+      // https://cronos.org/indexing/api/v1/bridges/cryptoorgchain/account/cro1y0rtatsmnl69nwgcxwud84yscc5vku48nw52uu/activities
 
       // Load COSMOS_HUB_TO_CRONOS activities as well
       // const responseCosmos = await axios.get<BridgeTransactionListResponse>(
@@ -563,11 +589,14 @@ export class BridgeService {
     }
   }
 
-  public async retrieveCurrentWalletBridgeTransactions(): Promise<BridgeTransaction[]> {
+  public async retrieveCurrentWalletBridgeTransactions(sourceChain?: string): Promise<BridgeTransaction[]> {
     const currentSession = await this.storageService.retrieveCurrentSession();
-    const savedTxs = await this.storageService.retrieveAllBridgeTransactions(
+    const savedTxs = await this.storageService.retrieveBridgeTransactions(
       currentSession.wallet.identifier,
+      sourceChain
     );
+
+    console.log('retrieveCurrentWalletBridgeTransactions', savedTxs);
     if (!savedTxs) {
       return [];
     }

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './BridgeTransactionHistory.less';
 import { useRecoilValue } from 'recoil';
-import { Table, Tag, Tooltip } from 'antd';
+import { Select, Table, Tag, Tooltip } from 'antd';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
@@ -13,27 +13,33 @@ import {
   getCronosTendermintAsset,
   getAssetBySymbolAndChain,
   getChainName,
+  getCosmosHubTendermintAsset,
 } from '../../../utils/utils';
 
 import { walletService } from '../../../service/WalletService';
 import { BridgeService } from '../../../service/bridge/BridgeService';
 import {
+  BridgeSourceChain,
   BridgeTransaction,
   BridgeTransactionStatus,
 } from '../../../service/bridge/contracts/BridgeModels';
 import { renderExplorerUrl } from '../../../models/Explorer';
 
+const { Option } = Select;
+
 const BridgeTransactionHistory = () => {
   const session = useRecoilValue(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
 
+  const [selectedChain, setSelectedChain] = useState<BridgeSourceChain>(BridgeSourceChain.CRYPTO_ORG);
   const [allBridgeHistory, setAllBridgeHistory] = useState<BridgeTransferTabularData[]>([]);
 
   const [t] = useTranslation();
 
   // eslint-disable-next-line
-  const cronosAsset = getCronosEvmAsset(walletAllAssets);
-  const cryptoOrgAsset = getCronosTendermintAsset(walletAllAssets);
+  const cronosEvmAsset = getCronosEvmAsset(walletAllAssets);
+  const cronosTendermintAsset = getCronosTendermintAsset(walletAllAssets);
+  const cosmosHubTendermintAsset = getCosmosHubTendermintAsset(walletAllAssets);
 
   const bridgeService = new BridgeService(walletService.storageService);
 
@@ -274,22 +280,34 @@ const BridgeTransactionHistory = () => {
 
   useEffect(() => {
     const fetchBridgeHistory = async () => {
-      if (cronosAsset) {
-        await bridgeService.fetchAndSaveBridgeTxs({
-          cronosEvmAddress: cronosAsset?.address!,
-          cronosTendermintAddress: cryptoOrgAsset?.address!
-        }, );
-      }
-      const transactionHistory = await bridgeService.retrieveCurrentWalletBridgeTransactions();
+      // if (cronosEvmAsset) {
+      await bridgeService.fetchAndSaveBridgeTxs({
+        cronosEvmAddress: selectedChain === BridgeSourceChain.CRONOS ? cronosEvmAsset?.address! : undefined,
+        cronosTendermintAddress: selectedChain === BridgeSourceChain.CRYPTO_ORG ? cronosTendermintAsset?.address! : undefined,
+        cosmosHubTendermintAddress: selectedChain === BridgeSourceChain.COSMOS_HUB ? cosmosHubTendermintAsset?.address! : undefined,
+      });
+      // }
+      const transactionHistory = await bridgeService.retrieveCurrentWalletBridgeTransactions(selectedChain);
+
       const processedHistory = convertBridgeTransfers(transactionHistory);
 
       setAllBridgeHistory(processedHistory);
     };
     fetchBridgeHistory();
-  }, []);
+  }, [selectedChain]);
 
   return (
     <>
+      <Select
+        value={selectedChain}
+        onChange={(value: BridgeSourceChain) => {
+          setSelectedChain(value);
+        }}
+      >
+        <Option key={BridgeSourceChain.CRONOS} value={BridgeSourceChain.CRONOS}>Cronos Beta: {`${cronosEvmAsset?.address}`}</Option>
+        <Option key={BridgeSourceChain.CRYPTO_ORG} value={BridgeSourceChain.CRYPTO_ORG}>Crypto.org Chain: {`${cronosTendermintAsset?.address}`}</Option>
+        <Option key={BridgeSourceChain.COSMOS_HUB} value={BridgeSourceChain.COSMOS_HUB}>Cosmos Hub Chain: {`${cosmosHubTendermintAsset?.address}`}</Option>
+      </Select>
       <Table
         columns={HistoryColumns}
         dataSource={allBridgeHistory}

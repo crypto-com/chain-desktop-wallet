@@ -170,6 +170,7 @@ export interface NftTransferRecord extends BaseCommonTransaction {
 export interface IBCTransactionRecord extends BaseCommonTransaction {
   txType: 'ibc';
   messageTypeName?: string;
+  sourceChain?: string;
   txData: BridgeTransaction;
 }
 
