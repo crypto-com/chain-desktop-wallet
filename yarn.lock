@@ -1991,10 +1991,10 @@
   resolved "https://registry.npmjs.org/@cosmjs/utils/-/utils-0.25.6.tgz"
   integrity sha512-ofOYiuxVKNo238vCPPlaDzqPXy2AQ/5/nashBo5rvPZJkxt9LciGfUEQWPCOb1BIJDNx2Dzu0z4XCf/dwzl0Dg==
 
-"@crypto-org-chain/chain-jslib@1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@crypto-org-chain/chain-jslib/-/chain-jslib-1.0.5.tgz#f95fb4385fe0635db801ca94e6698d0bb5a36d2c"
-  integrity sha512-dQQ/umQqy6W9Pi8eAHAWW4sbn5qT/+8qtJil/ahKyO/pwtvbm56zgOA413cXTh2lene0IE6R7JqleszqJQO4zg==
+"@crypto-org-chain/chain-jslib@1.0.7":
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/@crypto-org-chain/chain-jslib/-/chain-jslib-1.0.7.tgz#b8c647ff1c0f12f1c45a252f5d52a193d713c271"
+  integrity sha512-2EkXJHyQQWF0kqm7IrRO9Vn/Elxqh9GFJC8YIMeNLh3uArlKJchMXZtwNMmJXv5GTxVOrfwTF56gr67NkN7wow==
   dependencies:
     "@cosmjs/amino" "0.25.0-alpha.2"
     "@cosmjs/encoding" "0.23.1"
