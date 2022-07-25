@@ -42,8 +42,8 @@ export const ProposalView = (props: any) => {
   const allProps = props?.props;
   const { proposalList, setProposalList } = allProps;
   const currentSession = useRecoilValue(sessionState);
-  const [finalAmount, setFinalAmount] = useState('10,000');
-  const [remainingAmount, setRemainingAmount] = useState('10000');
+  const [finalAmount, setFinalAmount] = useState('10,001');
+  const [remainingAmount, setRemainingAmount] = useState('10001');
   const [proposalStatus, setProposposalStatus] = useState(allProps?.proposal?.status);
 
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
@@ -72,23 +72,23 @@ export const ProposalView = (props: any) => {
       return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
     return x;
-  }
+  };
 
   const [t] = useTranslation();
 
-  let customMaxValidator = TransactionUtils.maxValidator(
+  const customMaxValidator = TransactionUtils.maxValidator(
     remainingAmount.replace(',', ''),
-    t('governance.modal2.form.input.proposalDeposit.max.error', 
-    {
-      maxDeposit: (numWithCommas(remainingAmount).concat(' ').concat(userAsset?.symbol))
-    }
-    ),
+    t('governance.modal2.form.input.proposalDeposit.max.error', {
+      maxDeposit: numWithCommas(remainingAmount)
+        .concat(' ')
+        .concat(userAsset?.symbol),
+    }),
   );
-  let customMaxValidator0 = TransactionUtils.maxValidator(
+  const customMaxValidator0 = TransactionUtils.maxValidator(
     getUIDynamicAmount(userAsset.balance, userAsset),
     t('governance.modal2.form.input.proposalDeposit.max2.error'),
   );
-  let customAmountValidator = TransactionUtils.validTransactionAmountValidator();
+  const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
 
   const handleCloseDepositSuccessModal = () => {
     setDepositSuccessModalVisible(false);
@@ -115,7 +115,6 @@ export const ProposalView = (props: any) => {
     allProps.showPasswordInput();
   };
 
-  
   const totalDeposit = () => {
     const depositCalc = allProps?.proposal?.total_deposit
       .reduce((partialSum, a) => partialSum.plus(Big(a.amount)), Big(0))
@@ -141,7 +140,9 @@ export const ProposalView = (props: any) => {
   };
 
   const remainingTotal = () => {
-    const remaining = Big(finalAmount.replace(',','')).minus(Big(totalDepositValue)).toString();
+    const remaining = Big(finalAmount.replace(',', ''))
+      .minus(Big(totalDepositValue))
+      .toString();
     setRemainingAmount(remaining);
   };
 
@@ -216,6 +217,7 @@ export const ProposalView = (props: any) => {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, userAsset!);
       }
+      setConfirmDepositModalVisible(true);
     } else {
       setInputPasswordVisible(true);
     }
@@ -248,18 +250,8 @@ export const ProposalView = (props: any) => {
       analyticsService.logPage('Governance');
     }
 
-    setFinalAmount('10,000');
+    setFinalAmount('10,001');
     remainingTotal();
-
-    customMaxValidator = TransactionUtils.maxValidator(
-      finalAmount.replace(',', ''),
-      t('governance.modal2.form.input.proposalDeposit.max.error'),
-    );
-    customMaxValidator0 = TransactionUtils.maxValidator(
-      getUIDynamicAmount(userAsset.balance, userAsset),
-      t('governance.modal2.form.input.proposalDeposit.max2.error'),
-    );
-    customAmountValidator = TransactionUtils.validTransactionAmountValidator();
 
     setUserAsset(userAsset);
 
@@ -424,7 +416,15 @@ export const ProposalView = (props: any) => {
                       className="submit-proposal-btn"
                       type="primary"
                       disabled={!allProps.voteOption}
-                      onClick={() => setDepositModalVisible(true)}
+                      onClick={() => {
+                        if (
+                          !isLedgerConnected &&
+                          currentSession.wallet.walletType === LEDGER_WALLET_TYPE
+                        ) {
+                          ledgerNotification(currentSession.wallet, userAsset!);
+                        }
+                        setDepositModalVisible(true);
+                      }}
                     >
                       {t('governance.proposalView.modal3.depositBtn')}
                     </Button>
