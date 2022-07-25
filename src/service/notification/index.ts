@@ -16,12 +16,32 @@ const notificationsState = atom({
   default: getLocalSetting<NotificationItem[]>(SettingsKey.Notification),
 });
 
+const notificationHasUnRead = atom({
+  key: 'notificationHasUnRead',
+  default: false,
+})
+
 export const useNotification = () => {
   const [notifications, setNotifications] = useRecoilState(notificationsState);
+  const [hasUnread, setHasUnread] = useRecoilState(notificationHasUnRead);
+
+  const markAllAsRead = () => {
+    setHasUnread(false);
+    const newNotifications = notifications.map((n) => {
+      return { ...n, isRead: true };
+    })
+
+    updateNotifications(newNotifications);
+  }
 
   const getNotificationById = (id: number) => {
     return notifications.find(n => n.id === id);
   };
+
+  const updateHasUnRead = (notifications: NotificationItem[]) => {
+    const hasUnRead = notifications.some(n => n.isRead === false);
+    setHasUnread(hasUnRead);
+  }
 
   const markAsRead = (notification: NotificationItem) => {
     const newNotifications = notifications.map(n => {
@@ -64,6 +84,7 @@ export const useNotification = () => {
   const updateNotifications = (lst: NotificationItem[]) => {
     setNotifications(lst);
     setNotificationsInSettings(lst);
+    updateHasUnRead(lst);
   };
 
   const loadRemoteNotifications = async (providerURL: string) => {
@@ -96,7 +117,9 @@ export const useNotification = () => {
     postRemoteNotifications,
     getNotificationById,
     markAsRead,
+    markAllAsRead,
     postLocalNotification,
-    fetchNotifications
+    fetchNotifications,
+    hasUnread
   };
 };

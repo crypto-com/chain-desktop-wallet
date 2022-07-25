@@ -74,8 +74,8 @@ describe('notification management', () => {
       id: 10,
       createdAt: 1658220227,
       content: 'test',
+      type: 'remote',
       isRead: false,
-      icon: 'smile',
     };
 
     setNotificationsInSettings([n1]);
@@ -103,7 +103,6 @@ describe('notification management', () => {
       expect(newNotifications[0].id).to.be.eq(0);
       expect(newNotifications[1].id).to.be.eq(2);
       result.current.postRemoteNotifications(newNotifications);
-      await waitForNextUpdate();
     });
 
     expect(result.current.notifications).to.be.length(2);
@@ -120,7 +119,7 @@ describe('notification management', () => {
     await act(async () => {
       result.current.postLocalNotification({
         content: 'abc',
-        icon: 'smile',
+        type: 'customerService'
       });
       await waitForNextUpdate();
     });
@@ -142,9 +141,100 @@ describe('notification management', () => {
       );
       expect(newNotifications).to.be.length(0);
       result.current.postRemoteNotifications(newNotifications);
-      await waitForNextUpdate();
     });
 
     expect(result.current.notifications).to.be.length(3);
+
+
+
+    await act(async () => {
+      result.current.postLocalNotification({
+        content: 'abc',
+        type: 'customerService'
+      });
+      await waitForNextUpdate();
+    });
+
+    expect(result.current.notifications[0].isRead).to.be.eq(true);
+    expect(result.current.notifications[1].isRead).to.be.eq(false);
+    expect(result.current.notifications[2].isRead).to.be.eq(true);
   });
+
+
+  it('read logic', async () => {
+    const wrapper = ({ children }) => (
+      <RecoilRoot>
+        <RecoilNexus />
+        {children}
+      </RecoilRoot>
+    );
+    const { result, waitForNextUpdate } = renderHook(() => useNotification(), { wrapper });
+
+    expect(result.current.notifications).to.be.length(0);
+    await act(async () => {
+      const newNotifications = await result.current.loadRemoteNotifications(
+        DevRemoteNotificationProviderURL,
+      );
+      expect(newNotifications).to.be.length(2);
+      expect(newNotifications[0].id).to.be.eq(0);
+      expect(newNotifications[1].id).to.be.eq(2);
+      result.current.postRemoteNotifications(newNotifications);
+    });
+
+    expect(result.current.notifications).to.be.length(2);
+    expect(result.current.notifications[0].isRead).to.be.eq(false);
+    expect(result.current.notifications[1].isRead).to.be.eq(false);
+
+    await act(async () => {
+      result.current.markAllAsRead();
+    })
+
+    expect(result.current.hasUnread).to.be.eq(false)
+    expect(result.current.notifications[0].isRead).to.be.eq(true);
+    expect(result.current.notifications[1].isRead).to.be.eq(true);
+
+    await act(async () => {
+      result.current.postLocalNotification({
+        content: 'abc',
+        type: 'customerService'
+      });
+      await waitForNextUpdate();
+      result.current.postLocalNotification({
+        content: 'abc',
+        type: 'customerService'
+      });
+    });
+
+    expect(result.current.hasUnread).to.be.eq(true)
+    expect(result.current.notifications[2].isRead).to.be.eq(false);
+    expect(result.current.notifications[3].isRead).to.be.eq(false);
+
+    await act(async () => {
+      result.current.markAsRead(result.current.notifications[2]);
+      await waitForNextUpdate();
+      result.current.markAsRead(result.current.notifications[3]);
+    });
+
+    expect(result.current.hasUnread).to.be.eq(false)
+
+    await act(async () => {
+      result.current.postLocalNotification({
+        content: 'abc',
+        type: 'customerService'
+      });
+      await waitForNextUpdate();
+      result.current.postLocalNotification({
+        content: 'abc',
+        type: 'customerService'
+      });
+    });
+
+    expect(result.current.hasUnread).to.be.eq(true)
+
+    await act(async () => {
+      result.current.markAllAsRead();
+    });
+
+    expect(result.current.hasUnread).to.be.eq(false)
+  })
 });
