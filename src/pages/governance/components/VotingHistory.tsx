@@ -113,8 +113,7 @@ export const VotingHistory = (props: any) => {
 
   const fetchVotingHistory = async () => {
     const votingHistory: any = await walletService.fetchAccountVotingHistory(
-      // currentSession.wallet.address,
-      'tcro1ydyw9gzstgk9atua4w3zrkplq67t85hnfhw8ku',
+      currentSession.wallet.address,
     );
 
     const curData: any = votingHistory?.map((elem: any, idx) => {

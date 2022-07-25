@@ -87,7 +87,7 @@ const GovernancePage = () => {
       return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
     return x;
-  }
+  };
 
   const initialFiguresStates = {
     yes: {
@@ -115,8 +115,8 @@ const GovernancePage = () => {
   const currentSession = useRecoilValue(sessionState);
   const didMountRef = useRef(false);
   const [isLoadingTally, setIsLoadingTally] = useState(false);
-  const minDeposit = '100';
-  const maxDeposit = '10000';
+  const minDeposit = '1000';
+  const maxDeposit = '10001';
 
   const [createProposalHash, setCreateProposalHash] = useState('');
   const [initialDepositProposal, setInitialDeposit] = useState('0');
@@ -137,7 +137,9 @@ const GovernancePage = () => {
   const customMaxValidator = TransactionUtils.maxValidator(
     maxDeposit,
     t('governance.modal2.form.input.proposalDeposit.max.error', {
-      maxDeposit: (numWithCommas(maxDeposit).concat(' ').concat(userAsset?.symbol))
+      maxDeposit: numWithCommas(maxDeposit)
+        .concat(' ')
+        .concat(userAsset?.symbol),
     }),
   );
   const customMaxValidator0 = TransactionUtils.maxValidator(
@@ -238,7 +240,9 @@ const GovernancePage = () => {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, userAsset!);
       }
-
+      if (modalType === 'create_proposal') {
+        setIsProposalModalVisible(true);
+      }
       if (modalType === 'confirmation') {
         showConfirmationModal();
       }
@@ -610,7 +614,7 @@ const GovernancePage = () => {
     }
 
     // eslint-disable-next-line
-  }, [currentSession, form, userAsset, proposal, proposalList]);
+  }, [currentSession, form, userAsset, proposal, proposalList, setModalType, modalType]);
 
   return (
     <Layout className="site-layout">
@@ -650,17 +654,21 @@ const GovernancePage = () => {
               <div id="governance-description" className="header-description">
                 {t('governance.description')}
               </div>
-              <Button
-                id="create-proposal-btn"
-                type="primary"
-                onClick={() => {
-                  form.validateFields(['initialDeposit']);
-                  setModalType('create_proposal');
-                  showPasswordInput();
-                }}
-              >
-                {t('governance.modal2.title')}
-              </Button>
+              {currentSession.wallet.walletType !== LEDGER_WALLET_TYPE ? (
+                <Button
+                  id="create-proposal-btn"
+                  type="primary"
+                  onClick={() => {
+                    form.validateFields(['initialDeposit']);
+                    setModalType('create_proposal');
+                    showPasswordInput();
+                  }}
+                >
+                  {t('governance.modal2.title')}
+                </Button>
+              ) : (
+                <></>
+              )}
             </>
           )}
         </>
@@ -900,7 +908,10 @@ const GovernancePage = () => {
                   addonAfter={userAsset.symbol}
                 />
               </Form.Item>
-              <div className="note">{t('governance.modal2.form.proposalDeposit.warning')}{' '}{minDeposit}{' '}{userAsset.symbol}</div>
+              <div className="note">
+                {t('governance.modal2.form.proposalDeposit.warning')} {minDeposit}{' '}
+                {userAsset.symbol}
+              </div>
 
               <div className="avail-bal-container">
                 <div className="avail-bal-txt">{t('governance.modal2.form.balance')}</div>
