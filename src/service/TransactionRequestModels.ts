@@ -138,7 +138,6 @@ export interface DepositToProposalRequest extends BaseTxAuth {
 export interface TextProposalRequest extends SubmitTextProposalRequest {
   description: string;
   title: string;
-  asset: UserAsset;
 }
 
 /**
