@@ -296,14 +296,13 @@ export class BridgeService {
     const gasLimit = loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit;
 
     const contract = new web3.eth.Contract(bridgeContractABI, bridgeContractAddress);
-    const encodedABI = contract.methods.send_to_ibc(recipientAddress).encodeABI();
-
     const scaledBaseAmount = getBaseScaledAmount(bridgeTransferRequest.amount, originAsset);
+    const encodedABI = contract.methods.send_to_ibc(recipientAddress, scaledBaseAmount).encodeABI();
 
     const bridgeTransaction: BridgeTransactionUnsigned = {
       originAsset,
       asset: originAsset,
-      amount: scaledBaseAmount,
+      amount: '0', // This is CRO amount. The ATOM transfer amount is specified in the above send_to_ibc method instead
       fromAddress: bridgeTransferRequest.evmAddress,
       toAddress: bridgeContractAddress,
       memo: 'bridge:desktop-wallet-client',

@@ -129,7 +129,7 @@ export const DefaultMainnetBridgeConfigs = {
     bridgeDirectionType: BridgeTransferDirection.CRONOS_TO_COSMOS_HUB,
     bridgeNetworkConfigType: BridgeNetworkConfigType.MAINNET_BRIDGE,
     cronosBridgeContractAddress: '0xB888d8Dd1733d72681b30c00ee76BDE93ae7aa93',
-    gasLimit: 30_000,
+    gasLimit: 60_000,
     defaultGasPrice: 5_000_000_000_000,
     prefix: 'crc',
     bridgeIndexingUrl: DefaultBridgeIndexingUrl,
