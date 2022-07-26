@@ -33,6 +33,8 @@ import {
 } from './contracts/BridgeModels';
 import { getCosmosHubTendermintFeeConfig, getCronosTendermintFeeConfig } from '../Gas';
 import { DerivationPathStandard } from '../signers/LedgerSigner';
+import { UserAssetType } from '../../models/UserAsset';
+import { walletService } from '../WalletService';
 
 export class BridgeService {
   public readonly storageService: StorageService;
@@ -486,6 +488,21 @@ export class BridgeService {
     );
   }
 
+  public async getBridgeNativeAsset(currentSession: Session, bridgeTransferDirection: BridgeTransferDirection) {
+    const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
+    switch(bridgeTransferDirection) {
+      case BridgeTransferDirection.CRONOS_TO_COSMOS_HUB:
+      case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG:
+        return allAssets.find(asset => asset.assetType === UserAssetType.EVM && asset.mainnetSymbol === 'CRO');
+      case BridgeTransferDirection.COSMOS_HUB_TO_CRONOS:
+        return allAssets.find(asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'ATOM');
+      case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS:
+        return allAssets.find(asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO');
+      default: 
+        return allAssets.find(asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO');
+    }
+  }
+
   public async getBridgeTransactionFee(
     currentSession: Session,
     bridgeTransferRequest: BridgeTransferRequest,
@@ -494,8 +511,15 @@ export class BridgeService {
       currentSession,
       bridgeTransferRequest.bridgeTransferDirection,
     );
+
+    const nativeAsset = await this.getBridgeNativeAsset(currentSession, bridgeTransferRequest.bridgeTransferDirection);
+
+    if(!nativeAsset) {
+      throw new TypeError('Native Asset not found.');
+    }
     const { loadedBridgeConfig, defaultBridgeConfig } = bridgeConfig;
-    const exp = Big(10).pow(bridgeTransferRequest?.originAsset.decimals);
+
+    const exp = Big(10).pow(nativeAsset.decimals);
 
     const gasLimit = loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit;
     const gasPrice = loadedBridgeConfig.defaultGasPrice || defaultBridgeConfig.defaultGasPrice;
@@ -503,6 +527,7 @@ export class BridgeService {
     // eslint-disable-next-line no-console
     console.log('getBridgeTransactionFee ASSET_FEE', {
       asset: bridgeTransferRequest?.originAsset,
+      nativeAsset: nativeAsset,
       gasLimit,
       gasPrice,
     });

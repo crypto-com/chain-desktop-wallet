@@ -132,6 +132,10 @@ export function bech32ToEVMAddress(bech32Address: string) {
   return ethers.utils.getAddress(originalEVMAddress);
 }
 
+export const isUnlimited = (amount: ethers.BigNumber) => {
+  return amount.gte(ethers.BigNumber.from('0xffffffffffffffffffffffffffffffff'));
+};
+
 export function getCronosTendermintAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
     return (
@@ -141,10 +145,6 @@ export function getCronosTendermintAsset(walletAllAssets: UserAsset[]) {
     );
   });
 }
-
-export const isUnlimited = (amount: ethers.BigNumber) => {
-  return amount.gte(ethers.BigNumber.from('0xffffffffffffffffffffffffffffffff'));
-};
 
 export function getCronosEvmAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
