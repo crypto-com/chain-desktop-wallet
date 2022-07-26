@@ -345,14 +345,6 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
   const onSwitchAsset = async value => {
     setCurrentAssetIdentifier(value);
     const selectedAsset = walletAllAssets.find(asset => asset.identifier === value);
-    setSession({
-      ...session,
-      activeAsset: selectedAsset,
-    });
-    walletService.setCurrentSession({
-      ...session,
-      activeAsset: selectedAsset,
-    });
     setCurrentAsset(selectedAsset);
     setAvailableBalance(scaledBalance(selectedAsset!));
   };
@@ -466,6 +458,14 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
           return;
         }
         showPasswordInput();
+        setSession({
+          ...session,
+          activeAsset: currentAsset,
+        });
+        walletService.setCurrentSession({
+          ...session,
+          activeAsset: currentAsset,
+        });
       }}
     >
       <div className="row-bridge ant-double-height">
