@@ -396,7 +396,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
             break;
           }
           case 'CRONOS': {
-            setBridgeSupportedAssets(getBridgeSupportedAssetList([UserAssetType.EVM], direction));
+            setBridgeSupportedAssets(getBridgeSupportedAssetList([UserAssetType.EVM, UserAssetType.CRC_20_TOKEN], direction));
             break;
           }
           default:
