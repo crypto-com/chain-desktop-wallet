@@ -129,15 +129,28 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
 
   const isTestnet = checkIfTestnet(session.wallet.config.network);
 
-  const getBridgeSupportedAssetList = (assetType: UserAssetType[], direction: BridgeTransferDirection | undefined) => {
+  const getBridgeSupportedAssetList = (direction: BridgeTransferDirection | undefined) => {
     if(!direction) return [];
+
+    let assetType: UserAssetType[];
+    
+    switch(direction){
+      case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS:
+      case BridgeTransferDirection.COSMOS_HUB_TO_CRONOS:
+        assetType = [UserAssetType.TENDERMINT];
+        break;
+      case BridgeTransferDirection.CRONOS_TO_COSMOS_HUB:
+        assetType = [UserAssetType.CRC_20_TOKEN];
+        break;
+      case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG:
+        assetType = [UserAssetType.EVM];
+        break;
+      default:
+        assetType = [];
+    }
 
     const supportedAssets = SUPPORTED_ASSETS_BY_BRIDGE_DIRECTION
       .get(direction)!;
-
-    console.log('bridgeTransferDirection', direction);
-    console.log('getBridgeSupportedAssetList', supportedAssets);
-    console.log('assetType', assetType);
 
     return walletAllAssets.filter(asset => {
       return (
@@ -159,7 +172,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
 
     switch (bridgeFrom) {
       case 'CRYPTO_ORG': {
-        setBridgeSupportedAssets(getBridgeSupportedAssetList([UserAssetType.TENDERMINT], direction));
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(direction));
         setCurrentAsset(croAsset);
         setCurrentAssetIdentifier(croAsset?.identifier);
         setAvailableBalance(scaledBalance(croAsset!));
@@ -169,7 +182,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
         break;
       }
       case 'CRONOS': {
-        setBridgeSupportedAssets(getBridgeSupportedAssetList([UserAssetType.EVM, UserAssetType.CRC_20_TOKEN], direction));
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(direction));
         setCurrentAsset(cronosAsset);
         setCurrentAssetIdentifier(cronosAsset?.identifier);
         setAvailableBalance(scaledBalance(cronosAsset!));
@@ -179,7 +192,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
         break;
       }
       case 'COSMOS_HUB': {
-        setBridgeSupportedAssets(getBridgeSupportedAssetList([UserAssetType.TENDERMINT], direction));
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(direction));
         setCurrentAsset(atomAsset);
         setCurrentAssetIdentifier(atomAsset?.identifier);
         setAvailableBalance(scaledBalance(atomAsset!));
@@ -193,7 +206,6 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
 
     switch (bridgeTo) {
       case 'CRYPTO_ORG': {
-        // setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.TENDERMINT, direction));
         form.setFieldsValue({
           toAddress: tendermintAddress,
         });
@@ -202,7 +214,6 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
         break;
       }
       case 'CRONOS': {
-        // setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.EVM, direction));
         form.setFieldsValue({
           toAddress: evmAddress,
         });
@@ -211,7 +222,6 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
         break;
       }
       case 'COSMOS_HUB': {
-        // setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.TENDERMINT, direction));
         form.setFieldsValue({
           toAddress: cosmosHubAddress,
         });
@@ -220,7 +230,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
         break;
       }
       default: {
-        setBridgeSupportedAssets(getBridgeSupportedAssetList([UserAssetType.TENDERMINT], direction));
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(direction));
         form.setFieldsValue({
           toAddress: tendermintAddress,
         });
@@ -249,10 +259,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
 
     switch (newBridgeFrom) {
       case 'CRYPTO_ORG': {
-        setBridgeSupportedAssets(getBridgeSupportedAssetList([UserAssetType.TENDERMINT], direction));
-        // setCurrentAsset(croAsset);
-        // setCurrentAssetIdentifier(croAsset?.identifier);
-        // setAvailableBalance(scaledBalance(croAsset!));
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(direction));
         setCurrentAsset(undefined);
         setCurrentAssetIdentifier(undefined);
         setAvailableBalance('--');
@@ -262,10 +269,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
         break;
       }
       case 'CRONOS': {
-        setBridgeSupportedAssets(getBridgeSupportedAssetList([UserAssetType.EVM, UserAssetType.CRC_20_TOKEN], direction));
-        // setCurrentAsset(cronosAsset);
-        // setCurrentAssetIdentifier(cronosAsset?.identifier);
-        // setAvailableBalance(scaledBalance(cronosAsset!));
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(direction));
         setCurrentAsset(undefined);
         setCurrentAssetIdentifier(undefined);
         setAvailableBalance('--');
@@ -275,10 +279,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
         break;
       }
       case 'COSMOS_HUB': {
-        setBridgeSupportedAssets(getBridgeSupportedAssetList([UserAssetType.TENDERMINT], direction));
-        // setCurrentAsset(atomAsset);
-        // setCurrentAssetIdentifier(atomAsset?.identifier);
-        // setAvailableBalance(scaledBalance(atomAsset!));
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(direction));
         setCurrentAsset(undefined);
         setCurrentAssetIdentifier(undefined);
         setAvailableBalance('--');
@@ -288,14 +289,13 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
         break;
       }
       default:
-        setBridgeSupportedAssets(getBridgeSupportedAssetList([UserAssetType.TENDERMINT], direction));
+        setBridgeSupportedAssets(getBridgeSupportedAssetList(direction));
 
     }
 
 
     switch (newBridgeTo) {
       case 'CRYPTO_ORG': {
-        // setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.TENDERMINT, direction));
         form.setFieldsValue({
           toAddress: tendermintAddress,
         });
@@ -304,7 +304,6 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
         break;
       }
       case 'CRONOS': {
-        // setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.EVM, direction));
         form.setFieldsValue({
           toAddress: evmAddress,
         });
@@ -313,7 +312,6 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
         break;
       }
       case 'COSMOS_HUB': {
-        // setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.TENDERMINT, direction));
         form.setFieldsValue({
           toAddress: cosmosHubAddress,
         });
@@ -322,7 +320,6 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
         break;
       }
       default: {
-        // setBridgeSupportedAssets(getBridgeSupportedAssetList(UserAssetType.TENDERMINT, direction));
         form.setFieldsValue({
           toAddress: tendermintAddress,
         });
@@ -392,11 +389,11 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
         switch (bridgeFrom) {
           case 'CRYPTO_ORG':
           case 'COSMOS_HUB': {
-            setBridgeSupportedAssets(getBridgeSupportedAssetList([UserAssetType.TENDERMINT], direction));
+            setBridgeSupportedAssets(getBridgeSupportedAssetList(direction));
             break;
           }
           case 'CRONOS': {
-            setBridgeSupportedAssets(getBridgeSupportedAssetList([UserAssetType.EVM, UserAssetType.CRC_20_TOKEN], direction));
+            setBridgeSupportedAssets(getBridgeSupportedAssetList(direction));
             break;
           }
           default:
