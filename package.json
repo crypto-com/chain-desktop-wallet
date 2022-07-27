@@ -25,7 +25,7 @@
     "lint-staged": "lint-staged",
     "lint:js": "eslint --cache --fix --ext .js,.jsx,.ts,.tsx --format=pretty ./src",
     "prettier": "prettier --write '/src/**/*.{js,jsx,tsx,ts,less,md,json}'",
-    "generate-i18n": "node scripts/generate_i18n.mjs",
+    "generate:i18n": "node scripts/generate_i18n.mjs",
     "generate:typings": "npx typechain --target ethers-v5 --out-dir src/contracts './src/contracts/**/*.json'"
   },
   "dependencies": {
