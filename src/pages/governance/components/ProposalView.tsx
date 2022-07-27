@@ -5,11 +5,7 @@ import '../governance.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Layout, Radio, Button, Card, Progress, Form, InputNumber, Spin } from 'antd';
-import {
-  // ArrowLeftOutlined,
-  LoadingOutlined,
-  // InfoCircleOutlined
-} from '@ant-design/icons';
+import { LoadingOutlined } from '@ant-design/icons';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
@@ -266,26 +262,6 @@ export const ProposalView = (props: any) => {
       <div className="container">
         <Layout className="proposal-detail">
           <Content>
-            {/* <a>
-              <div
-                className="back-button"
-                onClick={() => allProps.setIsProposalVisible(false)}
-                style={{ fontSize: '16px' }}
-              >
-                <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
-                {allProps.historyVisible ? (
-                  <>{t('governance.backToHistory')}</>
-                ) : (
-                  <>{t('governance.backToList')}</>
-                )}
-              </div>
-            </a> */}
-            {/* <div className="title">
-              {allProps.proposal?.content.title}
-            </div>
-            <div className="item">
-              <div className="status">{processStatusTag(allProps.proposal?.status)}</div>
-            </div> */}
             <div className="item">
               {proposalStatus === 'PROPOSAL_STATUS_DEPOSIT_PERIOD' ? (
                 <div className="date">
