@@ -618,60 +618,88 @@ const GovernancePage = () => {
 
   return (
     <Layout className="site-layout">
-      {historyVisible ? (
-        <></>
-      ) : (
+      {historyVisible && isProposalVisible ? (
         <>
-          {isProposalVisible ? (
-            <>
-              <Header className="site-layout-background proposal-details-header">
-                <div className="top">{t('governance.proposalDetails')}</div>
-                {proposal?.content.title}
-              </Header>
+          <Header className="site-layout-background proposal-details-header">
+            <div className="top">{t('governance.proposalDetails')}</div>
+            {proposal?.content.title}
+          </Header>
 
-              <a className="proposal-back-btn">
-                <div
-                  className="back-button"
-                  onClick={() => setIsProposalVisible(false)}
-                  style={{ fontSize: '16px' }}
-                >
-                  <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
-                  <span>
-                    <>{t('governance.backToList')}</>
-                  </span>
-                </div>
-              </a>
+          <a className="proposal-back-btn">
+            <div
+              className="back-button"
+              onClick={() => setIsProposalVisible(false)}
+              style={{ fontSize: '16px' }}
+            >
+              <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
+              <span>
+                <>{t('governance.backToHistory')}</>
+              </span>
+            </div>
+          </a>
 
-              <div className="top-proposal-container">
-                <div className="item">
-                  <div className="status">{processStatusTag(proposal?.status)}</div>
-                </div>
-              </div>
-            </>
+          <div className="top-proposal-container">
+            <div className="item">
+              <div className="status">{processStatusTag(proposal?.status)}</div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
+      {!historyVisible && isProposalVisible ? (
+        <>
+          <Header className="site-layout-background proposal-details-header">
+            <div className="top">{t('governance.proposalDetails')}</div>
+            {proposal?.content.title}
+          </Header>
+
+          <a className="proposal-back-btn">
+            <div
+              className="back-button"
+              onClick={() => setIsProposalVisible(false)}
+              style={{ fontSize: '16px' }}
+            >
+              <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
+              <span>
+                <>{t('governance.backToList')}</>
+              </span>
+            </div>
+          </a>
+
+          <div className="top-proposal-container">
+            <div className="item">
+              <div className="status">{processStatusTag(proposal?.status)}</div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
+      {!historyVisible && !isProposalVisible ? (
+        <>
+          <Header className="site-layout-background">{t('governance.title')}</Header>
+          <div id="governance-description" className="header-description">
+            {t('governance.description')}
+          </div>
+          {currentSession.wallet.walletType !== LEDGER_WALLET_TYPE ? (
+            <Button
+              id="create-proposal-btn"
+              type="primary"
+              onClick={() => {
+                form.validateFields(['initialDeposit']);
+                setModalType('create_proposal');
+                showPasswordInput();
+              }}
+            >
+              {t('governance.modal2.title')}
+            </Button>
           ) : (
-            <>
-              <Header className="site-layout-background">{t('governance.title')}</Header>
-              <div id="governance-description" className="header-description">
-                {t('governance.description')}
-              </div>
-              {currentSession.wallet.walletType !== LEDGER_WALLET_TYPE ? (
-                <Button
-                  id="create-proposal-btn"
-                  type="primary"
-                  onClick={() => {
-                    form.validateFields(['initialDeposit']);
-                    setModalType('create_proposal');
-                    showPasswordInput();
-                  }}
-                >
-                  {t('governance.modal2.title')}
-                </Button>
-              ) : (
-                <></>
-              )}
-            </>
+            <></>
           )}
         </>
+      ) : (
+        <></>
       )}
       <Content>
         <ErrorModalPopup
