@@ -10,6 +10,7 @@ import { sessionState } from '../../../recoil/atom';
 
 import '../governance.less';
 import 'antd/dist/antd.css';
+import { AccountMessage } from '../../../service/rpc/ChainIndexingModels';
 
 const { Header } = Layout;
 
@@ -36,20 +37,22 @@ export const VotingHistory = (props: any) => {
       title: t('governance.voteHistory.table.column1'), // Proposal
       dataIndex: 'proposal',
       key: 'proposal',
-      render: elem => (
-        <>
-          <Button
-            type="link"
-            onClick={() => {
-              props.setProposal(elem);
-              props.setIsProposalVisible(true);
-            }}
-          >
-            <span className="proposalNo">#{elem.proposal_id}</span>{' '}
-            <span className="proposalTitle">{elem.content.title}</span>
-          </Button>
-        </>
-      ),
+      render: elem => {
+        return (
+          <>
+            <Button
+              type="link"
+              onClick={() => {
+                props.setProposal(elem);
+                props.setIsProposalVisible(true);
+              }}
+            >
+              <span className="proposalNo">#{elem.proposal_id}</span>{' '}
+              <span className="proposalTitle">{elem.content.title}</span>
+            </Button>
+          </>
+        );
+      },
     },
     {
       title: t('governance.voteHistory.table.column2'), // Your Vote
@@ -113,21 +116,23 @@ export const VotingHistory = (props: any) => {
   };
 
   const fetchVotingHistory = async () => {
-    const votingHistory: any = await walletService.fetchAccountVotingHistory(
+    const votingHistory: AccountMessage[] | null = await walletService.fetchAccountVotingHistory(
       currentSession.wallet.address,
     );
 
-    const curData: any = votingHistory?.map((elem: any, idx) => {
-      const proposal_id = elem?.data?.proposalId;
-      const option = elem?.data?.option;
-      const contentTitle = props?.proposalList?.find(val => val.proposal_id === proposal_id);
-      return {
-        index: idx + 1,
-        proposal: contentTitle,
-        vote: option,
-        vote_date: moment(elem.blockTime).format('DD/MM/YYYY - HH:mm:ss'),
-      };
-    });
+    const curData: any = votingHistory
+      ?.map((elem: AccountMessage, idx) => {
+        const proposal_id = elem?.data?.proposalId;
+        const option = elem?.data?.option;
+        const content = props?.proposalList?.find(val => val.proposal_id === proposal_id);
+        return {
+          index: idx + 1,
+          proposal: content,
+          vote: option,
+          vote_date: moment(elem.blockTime).format('DD/MM/YYYY - HH:mm:ss'),
+        };
+      })
+      .filter(elem => elem.proposal !== undefined);
 
     SetTableData(curData);
     setTimeout(() => SetLoadingTableData(false), 500);
