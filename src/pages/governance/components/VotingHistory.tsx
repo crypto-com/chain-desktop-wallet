@@ -73,8 +73,9 @@ export const VotingHistory = (props: any) => {
       dataIndex: 'vote_date',
       key: 'vote_date',
       sorter: (a, b) =>
-        parseInt(moment(a.vote_date).format('YYYYMMDD'), 10) -
-        parseInt(moment(b.vote_date).format('YYYYMMDD'), 10),
+        moment(a.vote_date, 'DD/MM/YYYY - HH:mm:ss').diff(
+          moment(b.vote_date, 'DD/MM/YYYY - HH:mm:ss'),
+        ),
       defaultSortOrder: sortOrder.desc,
     },
   ];
