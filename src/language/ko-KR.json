@@ -827,5 +827,7 @@
   "settings.about.termsAndConditions.title": "이용 약관",
   "general.customerService.notification.title": "응답을 받았습니다",
   "general.customerService.notification.body": "고객 서비스의 새로운 메시지가 있습니다.",
-  "general.customerService.liveChat": "라이브 채팅"
+  "general.customerService.liveChat": "라이브 채팅",
+  "general.notification.viewMessage": "메시지를 봅니다",
+  "general.notification.title": "알림"
 }
