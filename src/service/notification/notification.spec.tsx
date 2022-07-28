@@ -67,6 +67,8 @@ describe('notification management', () => {
     })();
 
     Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+
+    globalThis.Notification = (jest.fn() as any) as jest.Mocked<typeof Notification>;
   });
 
   it('localstorage', async () => {
@@ -119,7 +121,7 @@ describe('notification management', () => {
     await act(async () => {
       result.current.postLocalNotification({
         content: 'abc',
-        type: 'customerService'
+        type: 'customerService',
       });
       await waitForNextUpdate();
     });
@@ -145,12 +147,10 @@ describe('notification management', () => {
 
     expect(result.current.notifications).to.be.length(3);
 
-
-
     await act(async () => {
       result.current.postLocalNotification({
         content: 'abc',
-        type: 'customerService'
+        type: 'customerService',
       });
       await waitForNextUpdate();
     });
@@ -159,7 +159,6 @@ describe('notification management', () => {
     expect(result.current.notifications[1].isRead).to.be.eq(false);
     expect(result.current.notifications[2].isRead).to.be.eq(true);
   });
-
 
   it('read logic', async () => {
     const wrapper = ({ children }) => (
@@ -187,25 +186,25 @@ describe('notification management', () => {
 
     await act(async () => {
       result.current.markAllAsRead();
-    })
+    });
 
-    expect(result.current.hasUnread).to.be.eq(false)
+    expect(result.current.hasUnread).to.be.eq(false);
     expect(result.current.notifications[0].isRead).to.be.eq(true);
     expect(result.current.notifications[1].isRead).to.be.eq(true);
 
     await act(async () => {
       result.current.postLocalNotification({
         content: 'abc',
-        type: 'customerService'
+        type: 'customerService',
       });
       await waitForNextUpdate();
       result.current.postLocalNotification({
         content: 'abc',
-        type: 'customerService'
+        type: 'customerService',
       });
     });
 
-    expect(result.current.hasUnread).to.be.eq(true)
+    expect(result.current.hasUnread).to.be.eq(true);
     expect(result.current.notifications[2].isRead).to.be.eq(false);
     expect(result.current.notifications[3].isRead).to.be.eq(false);
 
@@ -215,26 +214,26 @@ describe('notification management', () => {
       result.current.markAsRead(result.current.notifications[3]);
     });
 
-    expect(result.current.hasUnread).to.be.eq(false)
+    expect(result.current.hasUnread).to.be.eq(false);
 
     await act(async () => {
       result.current.postLocalNotification({
         content: 'abc',
-        type: 'customerService'
+        type: 'customerService',
       });
       await waitForNextUpdate();
       result.current.postLocalNotification({
         content: 'abc',
-        type: 'customerService'
+        type: 'customerService',
       });
     });
 
-    expect(result.current.hasUnread).to.be.eq(true)
+    expect(result.current.hasUnread).to.be.eq(true);
 
     await act(async () => {
       result.current.markAllAsRead();
     });
 
-    expect(result.current.hasUnread).to.be.eq(false)
-  })
+    expect(result.current.hasUnread).to.be.eq(false);
+  });
 });
