@@ -112,7 +112,9 @@ const CronosNFTTransactionList = () => {
       }}
       columns={NftTransactionColumns}
       dataSource={nftTransfers}
-      rowKey={record => record.tx_hash}
+      rowKey={record =>
+        `${record.tx_hash}_${record.event_type}_${record.token_address}_${record.token_name}`
+      }
     />
   );
 };

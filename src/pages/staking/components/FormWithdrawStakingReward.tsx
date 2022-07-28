@@ -91,6 +91,7 @@ export const FormWithdrawStakingReward = () => {
   const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
 
   const maxLedgerRestake = 3;
+  const maxNormalRestake = 10;
 
   const [t] = useTranslation();
 
@@ -124,34 +125,31 @@ export const FormWithdrawStakingReward = () => {
       });
   };
 
+  const syncRewardsData = async () => {
+    const currentMarketData = allMarketData.get(
+      `${walletAsset?.mainnetSymbol}-${currentSession?.currency}`,
+    );
+
+    const allRewards: RewardTransactionData[] = await walletService.retrieveAllRewards(
+      currentSession.wallet.identifier,
+    );
+
+    const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
+    setWalletAsset(currentWalletAsset);
+
+    const rewardsTabularData = convertToTabularData(
+      allRewards,
+      currentWalletAsset,
+      currentMarketData,
+    );
+    setRewards(rewardsTabularData);
+    setWalletAsset(currentWalletAsset);
+  };
+
   useEffect(() => {
-    const syncRewardsData = async () => {
-      setIsRewardsLoading(true);
-      const currentMarketData = allMarketData.get(
-        `${walletAsset?.mainnetSymbol}-${currentSession?.currency}`,
-      );
-
-      const allRewards: RewardTransactionData[] = await walletService.retrieveAllRewards(
-        currentSession.wallet.identifier,
-      );
-
-      const currentWalletAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
-      setWalletAsset(currentWalletAsset);
-
-      const rewardsTabularData = convertToTabularData(
-        allRewards,
-        currentWalletAsset,
-        currentMarketData,
-      );
-      setRewards(rewardsTabularData);
-      setIsRewardsLoading(false);
-      setWalletAsset(currentWalletAsset);
-    };
-
     setMarketData(allMarketData.get(`${walletAsset?.mainnetSymbol}-${currentSession.currency}`));
-
     syncRewardsData();
-  }, [fetchingDB, confirmLoading]);
+  }, [fetchingDB, confirmLoading, isRewardsLoading]);
 
   const showConfirmationModal = () => {
     setInputPasswordVisible(false);
@@ -267,6 +265,9 @@ export const FormWithdrawStakingReward = () => {
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setIsSuccessTransferModalVisible(true);
+      setIsRewardsLoading(true);
+      await syncRewardsData();
+      setIsRewardsLoading(false);
     } catch (e) {
       if (walletType === LEDGER_WALLET_TYPE) {
         setLedgerIsExpertMode(detectConditionsError(((e as unknown) as any).toString()));
@@ -528,8 +529,10 @@ export const FormWithdrawStakingReward = () => {
         ''
       ) : (
         <div className="top-action-btns">
-          {rewards.length > maxLedgerRestake &&
-          currentSession.wallet.walletType === LEDGER_WALLET_TYPE ? (
+          {(rewards.length > maxLedgerRestake &&
+            currentSession.wallet.walletType === LEDGER_WALLET_TYPE) ||
+          (rewards.length > maxNormalRestake &&
+            currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) ? (
             <>
               <div />
               <Button
