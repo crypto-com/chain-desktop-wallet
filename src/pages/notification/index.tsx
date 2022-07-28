@@ -1,8 +1,11 @@
 
 import { BellOutlined, SyncOutlined, TeamOutlined } from '@ant-design/icons';
-import { Avatar, List, Popover, Typography } from 'antd';
+import { Avatar, List, Popover, Typography, Badge } from 'antd';
 import * as React from 'react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useIntercom } from 'react-use-intercom';
+import useInterval from '../../hooks/useInterval';
 import { useNotification } from '../../service/notification';
 import { NotificationItem } from '../../service/notification/types';
 import "./style.less"
@@ -27,11 +30,23 @@ const IconFromNotification = (notification: NotificationItem) => {
 
 const NotificationCenter = ({ onClick }: INotificationCenterProps) => {
 
-  const { notifications, fetchNotifications } = useNotification();
+  const { notifications, fetchNotifications, hasUnread, markAllAsRead } = useNotification();
+
+  const [t] = useTranslation();
+
+  const { show } = useIntercom();
+
+  const fetch = () => {
+    fetchNotifications(DEV_NOTIFICATION_LIST_PROVIDER)
+  }
 
   useEffect(() => {
-    fetchNotifications(DEV_NOTIFICATION_LIST_PROVIDER)
+    fetch();
   }, [])
+
+  useInterval(() => {
+    fetch();
+  }, 5 * 60_000)
 
   const NotificationList = () => {
 
@@ -48,7 +63,7 @@ const NotificationCenter = ({ onClick }: INotificationCenterProps) => {
           <List.Item key={item.id} style={{ padding: "16px 10px" }}>
             <div style={{ display: 'flex', flexDirection: "row", alignItems: "center" }}>
               <div style={{ display: 'flex', alignSelf: "start", alignItems: 'center', justifyContent: "center" }}>
-                <div>
+                <div style={{ position: 'absolute', left: '-10px' }}>
                   {
                     !item.isRead && <div style={{ width: "8px", height: "8px", borderRadius: "4px", backgroundColor: "#1199FA", marginRight: "10px" }} />
                   }
@@ -62,6 +77,9 @@ const NotificationCenter = ({ onClick }: INotificationCenterProps) => {
                   {item.content}
                 </Typography.Paragraph>
                 <div style={{ fontSize: "10px", color: "#626973" }}>{new Date(item.createdAt).toLocaleString()}</div>
+                {
+                  item.type === 'customerService' && <a onClick={() => { show() }} style={{ fontSize: "13px", color: "#1199FA" }}>{t('general.notification.viewMessage')}</a>
+                }
               </div>
             </div>
           </List.Item>
@@ -71,10 +89,24 @@ const NotificationCenter = ({ onClick }: INotificationCenterProps) => {
   }
 
   return <>
-    <Popover destroyTooltipOnHide overlayClassName='notification-popover' placement="topLeft" content={<NotificationList />} trigger="click">
-      <BellOutlined onClick={() => {
-        onClick?.()
-      }} />
+    <Popover onVisibleChange={(visible) => {
+      if (!visible) {
+        markAllAsRead()
+      }
+    }
+    }
+      destroyTooltipOnHide
+      overlayClassName='notification-popover'
+      placement="topLeft"
+      content={<NotificationList />}
+      trigger="click">
+      <Badge dot style={{
+        display: hasUnread ? 'block' : 'none',
+      }}>
+        <BellOutlined style={{ fontSize: 24 }} onClick={() => {
+          onClick?.()
+        }} />
+      </Badge>
     </Popover>
   </>
 }
