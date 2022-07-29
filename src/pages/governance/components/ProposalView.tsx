@@ -5,11 +5,7 @@ import '../governance.less';
 import 'antd/dist/antd.css';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Layout, Radio, Button, Card, Progress, Form, InputNumber, Spin } from 'antd';
-import {
-  // ArrowLeftOutlined,
-  LoadingOutlined,
-  // InfoCircleOutlined
-} from '@ant-design/icons';
+import { LoadingOutlined } from '@ant-design/icons';
 import { useRecoilValue, useRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
@@ -42,8 +38,8 @@ export const ProposalView = (props: any) => {
   const allProps = props?.props;
   const { proposalList, setProposalList } = allProps;
   const currentSession = useRecoilValue(sessionState);
-  const [finalAmount, setFinalAmount] = useState('10,000');
-  const [remainingAmount, setRemainingAmount] = useState('10000');
+  const [finalAmount, setFinalAmount] = useState('10,001');
+  const [remainingAmount, setRemainingAmount] = useState('10001');
   const [proposalStatus, setProposposalStatus] = useState(allProps?.proposal?.status);
 
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
@@ -76,19 +72,19 @@ export const ProposalView = (props: any) => {
 
   const [t] = useTranslation();
 
-  let customMaxValidator = TransactionUtils.maxValidator(
+  const customMaxValidator = TransactionUtils.maxValidator(
     remainingAmount.replace(',', ''),
-    t('governance.modal2.form.input.proposalDeposit.max.error', 
-      {
-        maxDeposit: (numWithCommas(remainingAmount).concat(' ').concat(userAsset?.symbol))
-      }
-    ),
+    t('governance.modal2.form.input.proposalDeposit.max.error', {
+      maxDeposit: numWithCommas(remainingAmount)
+        .concat(' ')
+        .concat(userAsset?.symbol),
+    }),
   );
-  let customMaxValidator0 = TransactionUtils.maxValidator(
+  const customMaxValidator0 = TransactionUtils.maxValidator(
     getUIDynamicAmount(userAsset.balance, userAsset),
     t('governance.modal2.form.input.proposalDeposit.max2.error'),
   );
-  let customAmountValidator = TransactionUtils.validTransactionAmountValidator();
+  const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
 
   const handleCloseDepositSuccessModal = () => {
     setDepositSuccessModalVisible(false);
@@ -115,7 +111,6 @@ export const ProposalView = (props: any) => {
     allProps.showPasswordInput();
   };
 
-  
   const totalDeposit = () => {
     const depositCalc = allProps?.proposal?.total_deposit
       .reduce((partialSum, a) => partialSum.plus(Big(a.amount)), Big(0))
@@ -141,7 +136,9 @@ export const ProposalView = (props: any) => {
   };
 
   const remainingTotal = () => {
-    const remaining = Big(finalAmount.replace(',','')).minus(Big(totalDepositValue)).toString();
+    const remaining = Big(finalAmount.replace(',', ''))
+      .minus(Big(totalDepositValue))
+      .toString();
     setRemainingAmount(remaining);
   };
 
@@ -216,6 +213,7 @@ export const ProposalView = (props: any) => {
       if (!isLedgerConnected && currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
         ledgerNotification(currentSession.wallet, userAsset!);
       }
+      setConfirmDepositModalVisible(true);
     } else {
       setInputPasswordVisible(true);
     }
@@ -248,18 +246,8 @@ export const ProposalView = (props: any) => {
       analyticsService.logPage('Governance');
     }
 
-    setFinalAmount('10,000');
+    setFinalAmount('10,001');
     remainingTotal();
-
-    customMaxValidator = TransactionUtils.maxValidator(
-      finalAmount.replace(',', ''),
-      t('governance.modal2.form.input.proposalDeposit.max.error'),
-    );
-    customMaxValidator0 = TransactionUtils.maxValidator(
-      getUIDynamicAmount(userAsset.balance, userAsset),
-      t('governance.modal2.form.input.proposalDeposit.max2.error'),
-    );
-    customAmountValidator = TransactionUtils.validTransactionAmountValidator();
 
     setUserAsset(userAsset);
 
@@ -274,26 +262,6 @@ export const ProposalView = (props: any) => {
       <div className="container">
         <Layout className="proposal-detail">
           <Content>
-            {/* <a>
-              <div
-                className="back-button"
-                onClick={() => allProps.setIsProposalVisible(false)}
-                style={{ fontSize: '16px' }}
-              >
-                <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
-                {allProps.historyVisible ? (
-                  <>{t('governance.backToHistory')}</>
-                ) : (
-                  <>{t('governance.backToList')}</>
-                )}
-              </div>
-            </a> */}
-            {/* <div className="title">
-              {allProps.proposal?.content.title}
-            </div>
-            <div className="item">
-              <div className="status">{processStatusTag(allProps.proposal?.status)}</div>
-            </div> */}
             <div className="item">
               {proposalStatus === 'PROPOSAL_STATUS_DEPOSIT_PERIOD' ? (
                 <div className="date">
@@ -424,7 +392,15 @@ export const ProposalView = (props: any) => {
                       className="submit-proposal-btn"
                       type="primary"
                       disabled={!allProps.voteOption}
-                      onClick={() => setDepositModalVisible(true)}
+                      onClick={() => {
+                        if (
+                          !isLedgerConnected &&
+                          currentSession.wallet.walletType === LEDGER_WALLET_TYPE
+                        ) {
+                          ledgerNotification(currentSession.wallet, userAsset!);
+                        }
+                        setDepositModalVisible(true);
+                      }}
                     >
                       {t('governance.proposalView.modal3.depositBtn')}
                     </Button>
