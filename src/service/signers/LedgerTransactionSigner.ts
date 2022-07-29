@@ -11,7 +11,7 @@ import {
   // makeSignBytes,
 } from '@cosmjs/proto-signing';
 import { encodeSecp256k1Pubkey, makeSignDoc, serializeSignDoc } from '@cosmjs/amino';
-import { createBankAminoConverters, AminoTypes, MsgSendEncodeObject, MsgTransferEncodeObject } from '@cosmjs/stargate';
+import { createBankAminoConverters, AminoTypes, MsgSendEncodeObject, MsgTransferEncodeObject, createIbcAminoConverters } from '@cosmjs/stargate';
 import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
 import { toHex } from '@crypto-org-chain/chain-jslib/node_modules/@cosmjs/encoding';
 import Long from 'long';
@@ -105,7 +105,6 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       transaction.asset?.config?.tendermintNetwork &&
       transaction.asset?.config?.tendermintNetwork?.chainName !== SupportedChainName.CRYPTO_ORG
     ) {
-      // const registry = new Registry();
       const network = transaction.asset?.config?.tendermintNetwork;
 
       const fee = {
@@ -178,7 +177,6 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
         typeUrl: '/cosmos.tx.v1beta1.TxBody',
         value: signedTxBody,
       };
-
       const signedTxBodyBytes = this.registry.encode(signedTxBodyEncodeObject);
 
       const signDoc = makeSignDoc(
@@ -567,10 +565,11 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     gasLimit: number,
   ): Promise<string> {
     if (
-      transaction.asset?.config?.tendermintNetwork &&
-      transaction.asset?.config?.tendermintNetwork?.chainName !== SupportedChainName.CRYPTO_ORG
+      transaction.originAsset?.config?.tendermintNetwork &&
+      transaction.originAsset?.config?.tendermintNetwork?.chainName !== SupportedChainName.CRYPTO_ORG
     ) {
-      const network = transaction.asset?.config?.tendermintNetwork;
+      const typeUrlIBCTransfer = '/ibc.applications.transfer.v1.MsgTransfer';
+      const network = transaction.originAsset?.config?.tendermintNetwork;
 
       const fee = {
         amount: [
@@ -630,11 +629,11 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
       });
 
       const msgTransfer: MsgTransferEncodeObject = {
-        typeUrl: '/ibc.applications.transfer.v1.MsgTransfer',
+        typeUrl: typeUrlIBCTransfer,
         value: msg,
       };
 
-      const converter = new AminoTypes(createBankAminoConverters());
+      const converter = new AminoTypes(createIbcAminoConverters());
       const msgTransferInAmino = converter.toAmino(msgTransfer);
 
       const signedTxBody = {
@@ -645,6 +644,8 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
         typeUrl: '/cosmos.tx.v1beta1.TxBody',
         value: signedTxBody,
       };
+      
+      this.registry.register(typeUrlIBCTransfer, MsgTransfer);
 
       const signedTxBodyBytes = this.registry.encode(signedTxBodyEncodeObject);
 
@@ -679,7 +680,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     const timeout = (Date.now() + DEFAULT_IBC_TRANSFER_TIMEOUT) * millisToNanoSecond;
 
     // For a chainID string like testnet-croeseid-4, revision number is 4
-    const revisionNumberFromChainID = transaction?.asset?.config?.chainId?.split('-').pop();
+    const revisionNumberFromChainID = transaction?.originAsset?.config?.chainId?.split('-').pop();
     const revisionNumber = isNumeric(revisionNumberFromChainID)
       ? revisionNumberFromChainID
       : this.StaticRevisionNumber;
