@@ -471,7 +471,7 @@ const AssetsPage = () => {
                       />
                     )}
                   </div>
-                  <ChartArea />
+                  <ChartArea asset={currentAsset!} />
                   <Tabs
                     activeKey={activeAssetTab}
                     onTabClick={key => {
