@@ -191,6 +191,10 @@ const StakingPage = () => {
     if (!didMountRef.current) {
       didMountRef.current = true;
       moderationConfigHandler();
+      walletService.setCurrentSession({
+        ...currentSession,
+        activeAsset: userAsset,
+      });
       analyticsService.logPage('Staking');
     }
   }, [fetchingDB, currentValidatorList, userAsset]);
