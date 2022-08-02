@@ -23,7 +23,7 @@ export const ChartArea = ({ asset }:Props) => {
   const [loadingData, setLoadingData] = useState(false);
   const [tokenPriceData, setTokenPriceData] = useState<TokenData[]>([]);
   const [duration, setDuration] = useState('d');
-  const [dimensions, setDimensions] = useState<Dimensions>({ width: 0, height: 400, margin: {left:40, right: 40, top: 40, bottom: 40} });
+  const [dimensions, setDimensions] = useState<Dimensions>({ width: 0, height: 360, margin: {left:40, right: 40, top: 10, bottom: 40} });
 
   const getContainerSize = () => {
     if (!container?.current) {
