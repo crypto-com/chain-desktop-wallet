@@ -27,7 +27,7 @@ interface LineChartProps {
   headers: string[];
 }
 
-const BOTTOM_OFFSET = 10;
+const BOTTOM_OFFSET = 12;
 
 const LineChart = ({ data, dimensions }: LineChartProps) => {
 
@@ -99,27 +99,31 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
     const focus = svg.append("g")
       .attr("class", "price-chart-focus")
       .style("z-index", 10)
-      .style("display", "none");
+      .style("opacity", "0");
 
     focus.append("circle")
       .attr("r", 3);
 
-    focus.append("rect")
+    const tooltipRect = focus.append("rect")
       .attr("class", "price-chart-tooltip")
-      .attr("width", 100)
-      .attr("height", 50)
+      .attr("width", 'auto')
+      .attr("height", 'auto')
+      .attr("fill", "red")
       .attr("x", 10)
       .attr("y", -22)
       .attr("rx", 4)
       .attr("ry", 4);
 
-    focus.append("text")
+    const dateText = focus.append("text")
       .attr("class", "price-chart-tooltip-date")
-      .attr("x", 18)
+      .attr("dominant-baseline", "center")
+      .attr("text-anchor", "center")
+      .attr("x", 20)
       .attr("y", -2);
 
-    focus.append("text")
+    const priceText = focus.append("text")
       .attr("class", "price-chart-tooltip-price")
+      .attr("dominant-baseline", "center")
       .attr("x", 18)
       .attr("y", 18);
 
@@ -131,9 +135,24 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
       const d0 = data[i - 1]
       const d1 = data[i]
       const d = x0.getDate() - d0.datetime.getDate() > d1.datetime.getDate() - x0.getDate() ? d1 : d0;
-      focus.attr("transform", `translate(${xScale(d.datetime)}, ${yScale(d.price) + BOTTOM_OFFSET})`);
+
       focus.select(".price-chart-tooltip-date").text(d.datetime.toLocaleString());
       focus.select(".price-chart-tooltip-price").text(d.price);
+
+      const x = xScale(d.datetime);
+      const y = yScale(d.price) + BOTTOM_OFFSET;
+
+      const dateTextBox = dateText.node()?.getBBox();
+      const priceTextWidth = priceText.node()?.getBBox().width ?? 0;
+
+      const tooltipWidth = (dateTextBox?.width ?? 0) + 20
+
+      console.log(x, y, focus.node()?.getBBox().width);
+
+      focus.attr("transform", `translate(${x}, ${y})`);
+      tooltipRect.attr("width", tooltipWidth).attr("height", 46);
+
+      priceText.attr("x", (tooltipWidth - priceTextWidth + 20) / 2)
     }
 
     svg.append("rect")
@@ -141,8 +160,16 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
       .attr("width", width)
       .attr("height", height)
       .attr("transform", `translate(0, ${margin.top})`)
-      .on("mouseover", function () { focus.style("display", null); })
-      .on("mouseout", function () { focus.style("display", "none"); })
+      .on("mouseover", () => {
+        focus.transition()
+          .duration(250)
+          .style('opacity', 1);
+      })
+      .on("mouseout", () => {
+        focus.transition()
+          .duration(250)
+          .style('opacity', 0);
+      })
       .on("mousemove", mousemove);
 
   }, [data, dimensions]);
