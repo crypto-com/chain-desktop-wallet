@@ -111,6 +111,7 @@
     "@esbuild-plugins/node-globals-polyfill": "0.1.1",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.2",
     "@svgr/webpack": "5.4.0",
+    "@testing-library/react-hooks": "^8.0.1",
     "@types/big.js": "6.0.2",
     "@types/chai": "4.2.14",
     "@types/chai-as-promised": "7.1.3",

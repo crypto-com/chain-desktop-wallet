@@ -33,6 +33,7 @@ module.exports = {
     'import/no-unresolved': 'off',
     'prefer-promise-reject-errors': 'off',
     'no-return-await': 'off',
+    'no-continue': 'off',
     'react-hooks/exhaustive-deps': [
       'off',
       {

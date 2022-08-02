@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useIntercom } from 'react-use-intercom';
 import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
 import i18n from '../../language/I18n';
+import { postLocalNotification } from '../../service/notification';
 
 let lastUnreadCount = 0;
 
@@ -13,10 +14,11 @@ export const handleUnreadCountChange = (unreadCount: number) => {
   }
 
   if (unreadCount > lastUnreadCount) {
-    // eslint-disable-next-line no-new
-    new Notification(i18n.t('general.customerService.notification.title'), {
-      body: i18n.t('general.customerService.notification.body'),
-    });
+
+    postLocalNotification({
+      content: i18n.t('general.customerService.notification.body'),
+      type: 'customerService'
+    })
   }
 
   lastUnreadCount = unreadCount;
