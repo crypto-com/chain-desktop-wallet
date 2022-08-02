@@ -42,7 +42,7 @@ export const UNBLOCKING_PERIOD_IN_DAYS = {
   },
 };
 
-// Reference: Google Sheet : Foris Markets Table - 4 October 2021
+// Reference: Google Sheet : Markets Table - 4 October 2021
 export const COUNTRY_CODES_TO_BLOCK = [
   // Afghanistan
   'AF',
