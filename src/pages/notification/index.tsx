@@ -100,7 +100,7 @@ const NotificationCenter = ({ onClick }: INotificationCenterProps) => {
                 <div style={{ marginLeft: '10px', overflow: 'hidden' }}>
                   <Typography.Paragraph
                     style={{ fontSize: '14px' }}
-                    ellipsis={{ rows: 1, expandable: true }}
+                    ellipsis={{ rows: 1, expandable: true, symbol: t('general.notification.expand') }}
                   >
                     {item.content}
                   </Typography.Paragraph>
