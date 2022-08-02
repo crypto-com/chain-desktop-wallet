@@ -832,5 +832,6 @@
   "general.customerService.notification.body": "You have a new message from Customer Service.",
   "general.customerService.liveChat": "Live Chat",
   "general.notification.viewMessage": "View Message",
-  "general.notification.title": "Notifications"
+  "general.notification.title": "Notifications",
+  "general.notification.expand": "Expand"
 }

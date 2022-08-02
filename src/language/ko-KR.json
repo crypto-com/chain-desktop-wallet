@@ -829,5 +829,6 @@
   "general.customerService.notification.body": "고객 서비스의 새로운 메시지가 있습니다.",
   "general.customerService.liveChat": "라이브 채팅",
   "general.notification.viewMessage": "메시지를 봅니다",
-  "general.notification.title": "알림"
+  "general.notification.title": "알림",
+  "general.notification.expand": "확장"
 }
