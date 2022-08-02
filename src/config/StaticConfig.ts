@@ -212,20 +212,6 @@ export enum SupportedChainName {
   ETHEREUM = 'Ethereum Chain',
 }
 
-export interface SupportedBridge {
-  value: string;
-  label: string;
-}
-
-export const SUPPORTED_BRIDGE = new Map<string, SupportedBridge>();
-SUPPORTED_BRIDGE.set('CRONOS', { value: 'CRONOS', label: SupportedChainName.CRONOS });
-SUPPORTED_BRIDGE.set('CRYPTO_ORG', {
-  value: 'CRYPTO_ORG',
-  label: SupportedChainName.CRYPTO_ORG,
-});
-
-export const SUPPORTED_BRIDGES_ASSETS = ['CRO'];
-
 export type WalletConfig = {
   enabled: boolean;
   name: string;

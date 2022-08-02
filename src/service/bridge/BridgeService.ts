@@ -11,12 +11,14 @@ import { BridgeTransactionUnsigned } from '../signers/TransactionSupported';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../LedgerService';
 import { getBaseScaledAmount } from '../../utils/NumberUtils';
 import BridgeABI from './contracts/BridgeABI.json';
+import AtomBridgeABI from './contracts/ATOM_BridgeABI.json';
 import { CronosClient } from '../cronos/CronosClient';
 import { evmTransactionSigner } from '../signers/EvmTransactionSigner';
 import {
   BridgeConfig,
   BridgeNetworkConfigType,
   BridgeTransferDirection,
+  BridgeTxHistoryAddressQuery,
   DefaultMainnetBridgeConfigs,
   DefaultTestnetBridgeConfigs,
 } from './BridgeConfig';
@@ -29,8 +31,10 @@ import {
   BridgeTransactionListResponse,
   BridgeTransactionStatusResponse,
 } from './contracts/BridgeModels';
-import { getCronosTendermintFeeConfig } from '../Gas';
+import { getCosmosHubTendermintFeeConfig, getCronosTendermintFeeConfig } from '../Gas';
 import { DerivationPathStandard } from '../signers/LedgerSigner';
+import { UserAssetType } from '../../models/UserAsset';
+import { walletService } from '../WalletService';
 
 export class BridgeService {
   public readonly storageService: StorageService;
@@ -56,12 +60,20 @@ export class BridgeService {
         return await this.handleCronosToCryptoOrgTransfer(bridgeTransferRequest);
       }
 
+      case BridgeTransferDirection.COSMOS_HUB_TO_CRONOS: {
+        return await this.handleCosmosHubToCronosTransfer(bridgeTransferRequest);
+      }
+
+      case BridgeTransferDirection.CRONOS_TO_COSMOS_HUB: {
+        return await this.handleCronosToCosmosHubTransfer(bridgeTransferRequest);
+      }
+
       case BridgeTransferDirection.ETH_TO_CRONOS:
-        throw new TypeError('Bridge  transfer direction not supported yet');
+        throw new TypeError('Bridge transfer direction not supported yet');
 
         break;
       case BridgeTransferDirection.CRONOS_TO_ETH:
-        throw new TypeError('Bridge  transfer direction not supported yet');
+        throw new TypeError('Bridge transfer direction not supported yet');
 
         break;
       default:
@@ -244,6 +256,181 @@ export class BridgeService {
     return await nodeRpc.broadcastTransaction(signedTxHex);
   }
 
+  private async handleCronosToCosmosHubTransfer(bridgeTransferRequest: BridgeTransferRequest) {
+    const { originAsset, isCustomToAddress, toAddress, cosmosHubAddress } = bridgeTransferRequest;
+
+    const recipientAddress = isCustomToAddress ? toAddress : cosmosHubAddress;
+
+    if (!originAsset.config?.nodeUrl || !originAsset.address) {
+      throw TypeError(`Missing asset config: ${originAsset.config}`);
+    }
+
+    const cronosClient = new CronosClient(
+      originAsset.config?.nodeUrl,
+      originAsset.config?.indexingUrl,
+    );
+
+    const web3 = new Web3(originAsset.config?.nodeUrl);
+
+    const txConfig: TransactionConfig = {
+      from: bridgeTransferRequest.evmAddress,
+      to: recipientAddress,
+      value: web3.utils.toWei(bridgeTransferRequest.amount, 'ether'),
+    };
+
+    const prepareTxInfo = await this.transactionPrepareService.prepareEVMTransaction(
+      originAsset,
+      txConfig,
+    );
+
+    const { currentSession } = prepareTxInfo;
+    const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
+      currentSession,
+      bridgeTransferRequest.bridgeTransferDirection,
+    );
+
+    const bridgeContractABI = AtomBridgeABI as AbiItem[];
+    const bridgeContractAddress =
+      loadedBridgeConfig?.cronosBridgeContractAddress ||
+      defaultBridgeConfig.cronosBridgeContractAddress;
+    const gasLimit = loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit;
+
+    const contract = new web3.eth.Contract(bridgeContractABI, bridgeContractAddress);
+    const scaledBaseAmount = getBaseScaledAmount(bridgeTransferRequest.amount, originAsset);
+    const encodedABI = contract.methods.send_to_ibc(recipientAddress, scaledBaseAmount).encodeABI();
+
+    const bridgeTransaction: BridgeTransactionUnsigned = {
+      originAsset,
+      asset: originAsset,
+      amount: '0', // This is CRO amount. The ATOM transfer amount is specified in the above send_to_ibc method instead
+      fromAddress: bridgeTransferRequest.evmAddress,
+      toAddress: bridgeContractAddress,
+      memo: 'bridge:desktop-wallet-client',
+      data: encodedABI,
+      accountNumber: 0,
+      accountSequence: 0,
+    };
+
+    bridgeTransaction.nonce = prepareTxInfo.nonce;
+    bridgeTransaction.gasPrice = prepareTxInfo.loadedGasPrice;
+    bridgeTransaction.gasLimit = gasLimit;
+
+    const chainId = Number(originAsset?.config?.chainId);
+
+    let signedTransactionHex = '';
+    if (currentSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+      const device = createLedgerDevice();
+      const walletAddressIndex = currentSession.wallet.addressIndex;
+      const walletDerivationPathStandard =
+        currentSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44;
+
+      // Use fixed hard-coded max GasLimit for bridge transactions ( Known contract and predictable consumption )
+      const gasPriceTx = web3.utils.toBN(bridgeTransaction.gasPrice);
+
+      signedTransactionHex = await device.signEthTx(
+        walletAddressIndex,
+        walletDerivationPathStandard,
+        chainId, // chainid
+        bridgeTransaction.nonce,
+        web3.utils.toHex(gasLimit) /* gas limit */,
+        web3.utils.toHex(gasPriceTx) /* gas price */,
+        bridgeContractAddress,
+        web3.utils.toHex(bridgeTransaction.amount),
+        encodedABI,
+      );
+    } else {
+      signedTransactionHex = await evmTransactionSigner.signBridgeTransfer(
+        bridgeTransaction,
+        bridgeTransferRequest.decryptedPhrase,
+      );
+    }
+
+    // eslint-disable-next-line no-console
+    console.log(`${bridgeTransferRequest.originAsset.assetType} REQUEST & SIGNED-TX`, {
+      chainId,
+      signedTransactionHex,
+      bridgeTransaction,
+    });
+
+    const broadcastedTransactionHash = await cronosClient.broadcastRawTransactionHex(
+      signedTransactionHex,
+    );
+
+    return {
+      transactionHash: broadcastedTransactionHash,
+      message: '',
+      code: 200,
+    };
+  }
+
+  private async handleCosmosHubToCronosTransfer(bridgeTransferRequest: BridgeTransferRequest) {
+    if (!bridgeTransferRequest.cosmosHubAddress || !bridgeTransferRequest.evmAddress) {
+      throw new TypeError(
+        `The Bech32 address and EVM address are required for doing ${bridgeTransferRequest.bridgeTransferDirection} transfer`,
+      );
+    }
+
+    const {
+      nodeRpc,
+      accountNumber,
+      accountSequence,
+      ledgerTransactionSigner,
+      cosmjsTendermintTransactionSigner,
+      currentSession,
+      latestBlock,
+    } = await this.transactionPrepareService.prepareTransaction();
+
+    const scaledBaseAmount = getBaseScaledAmount(
+      bridgeTransferRequest.amount,
+      bridgeTransferRequest.originAsset,
+    );
+    const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
+      currentSession,
+      bridgeTransferRequest.bridgeTransferDirection,
+    );
+
+    const evmToBech32ConvertedRecipient = getBech32AddressFromEVMAddress(
+      bridgeTransferRequest.isCustomToAddress
+        ? bridgeTransferRequest.toAddress
+        : bridgeTransferRequest.evmAddress,
+      loadedBridgeConfig?.prefix || defaultBridgeConfig.prefix,
+    );
+
+    const bridgeTransaction: BridgeTransactionUnsigned = {
+      amount: scaledBaseAmount,
+      fromAddress: bridgeTransferRequest.cosmosHubAddress,
+      toAddress: evmToBech32ConvertedRecipient,
+      originAsset: bridgeTransferRequest.originAsset,
+      accountNumber,
+      accountSequence,
+      channel: loadedBridgeConfig?.bridgeChannel || defaultBridgeConfig.bridgeChannel,
+      port: loadedBridgeConfig?.bridgePort || defaultBridgeConfig.bridgePort,
+      memo: 'bridge:desktop-wallet-client',
+      latestBlockHeight: latestBlock,
+    };
+
+    let signedTxHex: string = '';
+    const { networkFee, gasLimit } = await getCosmosHubTendermintFeeConfig();
+
+    if (bridgeTransferRequest.walletType === LEDGER_WALLET_TYPE) {
+      signedTxHex = await ledgerTransactionSigner.signIBCTransfer(
+        bridgeTransaction,
+        bridgeTransferRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    } else {
+      signedTxHex = await cosmjsTendermintTransactionSigner.signIBCTransfer(
+        bridgeTransaction,
+        bridgeTransferRequest.decryptedPhrase,
+        networkFee,
+        gasLimit,
+      );
+    }
+
+    return await nodeRpc.broadcastTransaction(signedTxHex);
+  }
+
   public async getCurrentBridgeConfig(
     currentSession: Session,
     bridgeDirection: BridgeTransferDirection,
@@ -287,7 +474,8 @@ export class BridgeService {
       await this.storageService.saveBridgeConfigsList([
         DefaultMainnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG,
         DefaultMainnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS,
-
+        DefaultMainnetBridgeConfigs.COSMOS_HUB_TO_CRONOS,
+        DefaultMainnetBridgeConfigs.CRONOS_TO_COSMOS_HUB,
         DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG,
         DefaultTestnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS,
       ]);
@@ -299,6 +487,21 @@ export class BridgeService {
     );
   }
 
+  public async getBridgeNativeAsset(currentSession: Session, bridgeTransferDirection: BridgeTransferDirection) {
+    const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
+    switch(bridgeTransferDirection) {
+      case BridgeTransferDirection.CRONOS_TO_COSMOS_HUB:
+      case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG:
+        return allAssets.find(asset => asset.assetType === UserAssetType.EVM && asset.mainnetSymbol === 'CRO');
+      case BridgeTransferDirection.COSMOS_HUB_TO_CRONOS:
+        return allAssets.find(asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'ATOM');
+      case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS:
+        return allAssets.find(asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO');
+      default: 
+        return allAssets.find(asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO');
+    }
+  }
+
   public async getBridgeTransactionFee(
     currentSession: Session,
     bridgeTransferRequest: BridgeTransferRequest,
@@ -307,8 +510,15 @@ export class BridgeService {
       currentSession,
       bridgeTransferRequest.bridgeTransferDirection,
     );
+
+    const nativeAsset = await this.getBridgeNativeAsset(currentSession, bridgeTransferRequest.bridgeTransferDirection);
+
+    if(!nativeAsset) {
+      throw new TypeError('Native Asset not found.');
+    }
     const { loadedBridgeConfig, defaultBridgeConfig } = bridgeConfig;
-    const exp = Big(10).pow(bridgeTransferRequest?.originAsset.decimals);
+
+    const exp = Big(10).pow(nativeAsset.decimals);
 
     const gasLimit = loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit;
     const gasPrice = loadedBridgeConfig.defaultGasPrice || defaultBridgeConfig.defaultGasPrice;
@@ -316,6 +526,7 @@ export class BridgeService {
     // eslint-disable-next-line no-console
     console.log('getBridgeTransactionFee ASSET_FEE', {
       asset: bridgeTransferRequest?.originAsset,
+      nativeAsset: nativeAsset,
       gasLimit,
       gasPrice,
     });
@@ -338,8 +549,13 @@ export class BridgeService {
     );
   };
 
-  public async fetchAndSaveBridgeTxs(evmAddress: string, tendermintAddress: string) {
+  public async fetchAndSaveBridgeTxs(query: BridgeTxHistoryAddressQuery) {
     try {
+      const { 
+        cronosEvmAddress, 
+        cronosTendermintAddress, 
+        cosmosHubTendermintAddress 
+      } = query;
       const currentSession = await this.storageService.retrieveCurrentSession();
       const defaultBridgeDirection = BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS;
 
@@ -350,9 +566,38 @@ export class BridgeService {
       const bridgeIndexingUrl =
         loadedBridgeConfig?.bridgeIndexingUrl || defaultBridgeConfig?.bridgeIndexingUrl!;
 
+      let address = '';
+      let chain = '';
+
+      if(cronosTendermintAddress) {
+        address = cronosTendermintAddress;
+        chain = 'cryptoorgchain';
+      } else if(cronosEvmAddress) {
+        address = cronosEvmAddress;
+        chain = 'cronosevm';
+      } else if(cosmosHubTendermintAddress) {
+        address = cosmosHubTendermintAddress;
+        chain = 'cosmoshub';
+      } else {
+        console.log('Empty Address for fetchAndSaveBridgeTxs');
+        return;
+      }
+
+      // const response = await axios.get<BridgeTransactionListResponse>(
+      //   `${bridgeIndexingUrl}/activities?cronosevmAddress=${cronosEvmAddress}&cryptoorgchainAddress=${cronosTendermintAddress}&order=sourceBlockTime.desc`,
+      // );
+
       const response = await axios.get<BridgeTransactionListResponse>(
-        `${bridgeIndexingUrl}/activities?cronosevmAddress=${evmAddress}&cryptoorgchainAddress=${tendermintAddress}&order=sourceBlockTime.desc`,
+        `${bridgeIndexingUrl}/${chain}/account/${address}/activities?order=sourceBlockTime.desc`
       );
+
+      // https://cronos.org/indexing/api/v1/bridges/activities?cronosevmAddress=0x85e0280712AaBDD0884732141B048b3B6fdE405B&cryptoorgchainAddress=cro1y0rtatsmnl69nwgcxwud84yscc5vku48nw52uu&order=sourceBlockTime.desc
+      // https://cronos.org/indexing/api/v1/bridges/cryptoorgchain/account/cro1y0rtatsmnl69nwgcxwud84yscc5vku48nw52uu/activities
+
+      // Load COSMOS_HUB_TO_CRONOS activities as well
+      // const responseCosmos = await axios.get<BridgeTransactionListResponse>(
+      //   `${bridgeIndexingUrl}/activities?cosmoshubAddress=${cosmosHubTendermintAddress}&cryptoorgchainAddress=${cronosTendermintAddress}&order=sourceBlockTime.desc`,
+      // );
       const loadedBridgeTransactions = response.data.result;
 
       // eslint-disable-next-line no-console
@@ -368,11 +613,14 @@ export class BridgeService {
     }
   }
 
-  public async retrieveCurrentWalletBridgeTransactions(): Promise<BridgeTransaction[]> {
+  public async retrieveCurrentWalletBridgeTransactions(sourceChain?: string): Promise<BridgeTransaction[]> {
     const currentSession = await this.storageService.retrieveCurrentSession();
-    const savedTxs = await this.storageService.retrieveAllBridgeTransactions(
+    const savedTxs = await this.storageService.retrieveBridgeTransactions(
       currentSession.wallet.identifier,
+      sourceChain
     );
+
+    console.log('retrieveCurrentWalletBridgeTransactions', savedTxs);
     if (!savedTxs) {
       return [];
     }

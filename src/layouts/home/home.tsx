@@ -537,6 +537,35 @@ function HomeLayout(props: HomeLayoutProps) {
     }, 1000);
   };
 
+  const checkBridgeConfigs = async (walletSession?: Session) => {
+    if (!walletSession || !walletSession.wallet) {
+      return;
+    }
+
+    setTimeout(async () => {
+      const allConfigs = await walletService.storageService.fetchAllBridgeConfigs();
+
+      if (allConfigs.length < 6) {
+        const updateBridgeConfigsNotificationKey = 'updateBridgeConfigsNotificationKey';
+        const bridgeService = new BridgeService(walletService.storageService);
+        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.COSMOS_HUB_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_COSMOS_HUB);
+
+        notification.info({
+          message: 'New config setting found',
+          description: 'Your bridge config setting is updated!',
+          duration: 15,
+          key: updateBridgeConfigsNotificationKey,
+          placement: 'topRight',
+        });
+      }
+    }, 5_000);
+  };
+
   const checkCorrectExplorerUrl = async (walletSession?: Session) => {
     if (!walletSession || !walletSession.wallet) {
       return;
@@ -562,6 +591,8 @@ function HomeLayout(props: HomeLayoutProps) {
         bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
         bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
         bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.COSMOS_HUB_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_COSMOS_HUB);
 
         // Update All Assets in All Wallets
         const allWallets = await walletService.retrieveAllWallets();
@@ -609,11 +640,10 @@ function HomeLayout(props: HomeLayoutProps) {
                 explorer: {
                   baseUrl: `${explorerUrl}`,
                   tx: `${explorerUrl}/tx`,
-                  address: `${explorerUrl}/${
-                    asset.assetType === UserAssetType.TENDERMINT ||
-                    asset.assetType === UserAssetType.IBC
-                      ? 'account'
-                      : 'address'
+                  address: `${explorerUrl}/${asset.assetType === UserAssetType.TENDERMINT ||
+                      asset.assetType === UserAssetType.IBC
+                    ? 'account'
+                    : 'address'
                   }`,
                   validator: `${explorerUrl}/validator`,
                 },
@@ -809,6 +839,7 @@ function HomeLayout(props: HomeLayoutProps) {
         ...currentSession,
         activeAsset: currentAsset,
       });
+      checkBridgeConfigs(currentSession);
     };
 
     if (!didMountRef.current) {
@@ -1176,10 +1207,9 @@ function HomeLayout(props: HomeLayoutProps) {
                 <div className="item">
                   <Alert
                     type="warning"
-                    message={`${t('navbar.wallet.modal.warning1')} ${
-                      session.wallet.walletType !== LEDGER_WALLET_TYPE
-                        ? t('navbar.wallet.modal.warning2')
-                        : ''
+                    message={`${t('navbar.wallet.modal.warning1')} ${session.wallet.walletType !== LEDGER_WALLET_TYPE
+                      ? t('navbar.wallet.modal.warning2')
+                      : ''
                     }`}
                     showIcon
                   />
@@ -1264,7 +1294,7 @@ function HomeLayout(props: HomeLayoutProps) {
             setIsAnnouncementVisible(false);
             generalConfigService.setHasShownAnalyticsPopup(true);
           }}
-          handleOk={() => {}}
+          handleOk={() => { }}
           footer={[]}
         >
           <>
@@ -1345,7 +1375,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   setIsLedgerModalButtonLoading(true);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>
@@ -1393,7 +1423,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   setIsLedgerModalButtonLoading(true);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>
@@ -1441,7 +1471,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   setIsLedgerModalButtonLoading(true);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>

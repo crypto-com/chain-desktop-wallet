@@ -107,6 +107,7 @@ function createWindow() {
       nodeIntegrationInSubFrames: true,
       devTools: isDev,
       contextIsolation: false,
+      webSecurity: !isDev,
     },
     resizable: true,
     icon: iconImage,

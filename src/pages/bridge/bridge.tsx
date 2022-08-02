@@ -56,7 +56,6 @@ import {
   fromScientificNotation,
   getBaseScaledAmount,
 } from '../../utils/NumberUtils';
-import { SUPPORTED_BRIDGE } from '../../config/StaticConfig';
 import IconHexagon from '../../svg/IconHexagon';
 // import IconTransferHistory from '../../svg/IconTransferHistory';
 import { LEDGER_WALLET_TYPE } from '../../service/LedgerService';
@@ -66,6 +65,7 @@ import {
   DefaultTestnetBridgeConfigs,
   DefaultMainnetBridgeConfigs,
   BridgeConfig,
+  SUPPORTED_BRIDGE,
 } from '../../service/bridge/BridgeConfig';
 import { BridgeService } from '../../service/bridge/BridgeService';
 import {
@@ -115,6 +115,7 @@ const CronosBridge = props => {
     bridgeTo: '',
     tendermintAddress: '',
     evmAddress: '',
+    cosmosHubAddress: '',
     toAddress: '',
     isCustomToAddress: false,
   });
@@ -125,6 +126,8 @@ const CronosBridge = props => {
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(croAsset);
   const [toAsset, setToAsset] = useState<UserAsset | undefined>();
+  const [bridgeNativeAsset, setBridgeNativeAsset] = useState<UserAsset>();
+
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
   const [toDestinationAddress, setToDestinationAddress] = useState('');
@@ -135,6 +138,7 @@ const CronosBridge = props => {
     bridgeTransferDirection: BridgeTransferDirection.NOT_SUPPORT,
     tendermintAddress: '',
     evmAddress: '',
+    cosmosHubAddress: '',
     toAddress: '',
     isCustomToAddress: false,
     originAsset: currentAsset!,
@@ -181,7 +185,7 @@ const CronosBridge = props => {
   ];
 
   const onWalletDecryptFinish = async (password: string) => {
-    const { tendermintAddress, evmAddress, toAddress, isCustomToAddress } = formValues;
+    const { tendermintAddress, evmAddress, cosmosHubAddress, toAddress, isCustomToAddress } = formValues;
     let { amount } = formValues;
     amount = fromScientificNotation(amount).toString();
 
@@ -199,6 +203,7 @@ const CronosBridge = props => {
       bridgeTransferDirection,
       tendermintAddress,
       evmAddress,
+      cosmosHubAddress,
       toAddress,
       isCustomToAddress,
       amount,
@@ -212,8 +217,8 @@ const CronosBridge = props => {
       ...transferRequest,
       amount: adjustedTransactionAmount(
         amount,
-        currentAsset!,
-        getBaseScaledAmount(txFee, currentAsset!),
+        bridgeNativeAsset!,
+        getBaseScaledAmount(txFee, bridgeNativeAsset!),
       ),
     };
 
@@ -233,7 +238,7 @@ const CronosBridge = props => {
 
     // TODO: check if decryptedPhrase expired
     if ((decryptedPhrase && false) || session.wallet.walletType === LEDGER_WALLET_TYPE) {
-      const { tendermintAddress, evmAddress } = formValues;
+      const { tendermintAddress, evmAddress, cosmosHubAddress } = formValues;
       const { toAddress, isCustomToAddress } = form.getFieldsValue();
       let amount = form.getFieldValue('amount');
       amount = fromScientificNotation(amount).toString();
@@ -242,6 +247,7 @@ const CronosBridge = props => {
         bridgeTransferDirection,
         tendermintAddress,
         evmAddress,
+        cosmosHubAddress,
         toAddress,
         isCustomToAddress,
         amount,
@@ -255,8 +261,8 @@ const CronosBridge = props => {
         ...transferRequest,
         amount: adjustedTransactionAmount(
           amount,
-          currentAsset!,
-          getBaseScaledAmount(txFee, currentAsset!),
+          bridgeNativeAsset!,
+          getBaseScaledAmount(txFee, bridgeNativeAsset!),
         ),
       };
 
@@ -289,6 +295,9 @@ const CronosBridge = props => {
       case 'CRONOS':
         app = 'Ethereum App';
         break;
+      case 'COSMOS_HUB':
+        app = 'Cosmos App';
+        break;
       default:
     }
 
@@ -297,10 +306,10 @@ const CronosBridge = props => {
         title: t('bridge.pendingTransfer.title', {
           amount: adjustedTransactionAmount(
             amount,
-            currentAsset!,
-            getBaseScaledAmount(networkFee, currentAsset!),
+            bridgeNativeAsset!,
+            getBaseScaledAmount(networkFee, bridgeNativeAsset!),
           ),
-          symbol: currentAsset?.symbol,
+          symbol: bridgeNativeAsset?.symbol,
         }),
         description: (
           <>
@@ -345,10 +354,10 @@ const CronosBridge = props => {
         title: t('bridge.deposit.complete.title', {
           amount: adjustedTransactionAmount(
             amount,
-            currentAsset!,
-            getBaseScaledAmount(networkFee, currentAsset!),
+            bridgeNativeAsset!,
+            getBaseScaledAmount(networkFee, bridgeNativeAsset!),
           ),
-          symbol: currentAsset?.symbol,
+          symbol: bridgeNativeAsset?.symbol,
         }),
         description: (
           <>
@@ -383,8 +392,8 @@ const CronosBridge = props => {
         fromScientificNotation(
           adjustedTransactionAmount(
             formValues.amount,
-            currentAsset!,
-            getBaseScaledAmount(networkFee, currentAsset!),
+            bridgeNativeAsset!,
+            getBaseScaledAmount(networkFee, bridgeNativeAsset!),
           ),
         ),
         AnalyticsTxType.BridgeTransaction,
@@ -400,10 +409,10 @@ const CronosBridge = props => {
               {t('bridge.ledgerSign.failed.title', {
                 amount: adjustedTransactionAmount(
                   amount,
-                  currentAsset!,
-                  getBaseScaledAmount(networkFee, currentAsset!),
+                  bridgeNativeAsset!,
+                  getBaseScaledAmount(networkFee, bridgeNativeAsset!),
                 ),
-                symbol: currentAsset?.symbol,
+                symbol: bridgeNativeAsset?.symbol,
               })}
               <br />-{' '}
               <a
@@ -422,10 +431,10 @@ const CronosBridge = props => {
         title: t('bridge.deposit.failed.title', {
           amount: adjustedTransactionAmount(
             amount,
-            currentAsset!,
-            getBaseScaledAmount(networkFee, currentAsset!),
+            bridgeNativeAsset!,
+            getBaseScaledAmount(networkFee, bridgeNativeAsset!),
           ),
-          symbol: currentAsset?.symbol,
+          symbol: bridgeNativeAsset?.symbol,
         }),
         description: <>{t('bridge.deposit.failed.description')}</>,
         loading: false,
@@ -634,7 +643,7 @@ const CronosBridge = props => {
                   <div className="flex-row">
                     <div>{t('bridge.form.networkFee')}</div>
                     <div>
-                      ~{networkFee} {currentAsset?.symbol}
+                      ~{networkFee} {bridgeNativeAsset?.mainnetSymbol}
                     </div>
                   </div>
                   <div className="flex-row">
@@ -663,18 +672,18 @@ const CronosBridge = props => {
                     {fromScientificNotation(
                       adjustedTransactionAmount(
                         amount,
-                        currentAsset!,
-                        getBaseScaledAmount(networkFee, currentAsset!),
+                        bridgeNativeAsset!,
+                        getBaseScaledAmount(networkFee, bridgeNativeAsset!),
                       ),
                     )}{' '}
-                    {toAsset?.symbol}
+                    {currentAsset?.symbol}
                   </div>
                   {Big(
                     fromScientificNotation(
                       adjustedTransactionAmount(
                         amount,
-                        currentAsset!,
-                        getBaseScaledAmount(networkFee, currentAsset!),
+                        bridgeNativeAsset!,
+                        getBaseScaledAmount(networkFee, bridgeNativeAsset!),
                       ),
                     ),
                   ).gt(0) ? (
@@ -712,8 +721,8 @@ const CronosBridge = props => {
                     fromScientificNotation(
                       adjustedTransactionAmount(
                         amount,
-                        currentAsset!,
-                        getBaseScaledAmount(networkFee, currentAsset!),
+                        bridgeNativeAsset!,
+                        getBaseScaledAmount(networkFee, bridgeNativeAsset!),
                       ),
                     ),
                   ).gt(0)
@@ -848,6 +857,15 @@ const CronosBridge = props => {
       </div>
     );
   };
+
+  useEffect(() => {
+    const getBridgeDirectionNativeAsset = async (direction: BridgeTransferDirection) => {
+      const asset = await bridgeService.getBridgeNativeAsset(session, direction);
+      setBridgeNativeAsset(asset);
+    };
+
+    getBridgeDirectionNativeAsset(bridgeTransferDirection);
+  }, [bridgeTransferDirection]);
 
   useEffect(() => {
     if (isBridgeTransfering) {
