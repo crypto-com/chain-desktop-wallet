@@ -18,7 +18,7 @@ export const handleUnreadCountChange = (unreadCount: number) => {
     postLocalNotification({
       content: i18n.t('general.customerService.notification.body'),
       type: 'customerService'
-    })
+    });
   }
 
   lastUnreadCount = unreadCount;

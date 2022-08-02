@@ -347,15 +347,15 @@ const HomePage = () => {
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">
-        <div style={{ display: 'flex', justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             {t('home.title')}
           </div>
-          <div style={{ display: "flex", gap: "20px" }}>
+          <div style={{ display: 'flex', gap: '20px' }}>
             <SyncOutlined onClick={() => {
               onSyncAndRefreshBtnCall();
             }}
-              spin={fetchingDB}
+            spin={fetchingDB}
             />
             <NotificationCenter />
           </div>

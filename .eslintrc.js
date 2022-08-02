@@ -66,6 +66,7 @@ module.exports = {
     'prefer-promise-reject-errors': 'off',
     'no-return-await': 'off',
     'no-console': 'off',
+    'no-continue': 'off',
     'react-hooks/exhaustive-deps': [
       'off',
       {
