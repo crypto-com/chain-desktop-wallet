@@ -24,7 +24,6 @@ import {
 import { BroadCastResult, RewardTransactionData } from '../../../models/Transaction';
 import { renderExplorerUrl } from '../../../models/Explorer';
 import { getUIDynamicAmount } from '../../../utils/NumberUtils';
-// import { isNumeric } from '../../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../../service/LedgerService';
 
 import { secretStoreService } from '../../../service/storage/SecretStoreService';
@@ -91,6 +90,7 @@ export const FormWithdrawStakingReward = () => {
   const { isLedgerConnected } = useLedgerStatus({ asset: walletAsset });
 
   const maxLedgerRestake = 3;
+  const maxNormalRestake = 10;
 
   const [t] = useTranslation();
 
@@ -260,7 +260,7 @@ export const FormWithdrawStakingReward = () => {
         walletType,
       });
       setBroadcastResult(rewardWithdrawResult);
-      
+
       setIsVisibleConfirmationModal(false);
       setConfirmLoading(false);
       setIsSuccessTransferModalVisible(true);
@@ -528,8 +528,10 @@ export const FormWithdrawStakingReward = () => {
         ''
       ) : (
         <div className="top-action-btns">
-          {rewards.length > maxLedgerRestake &&
-          currentSession.wallet.walletType === LEDGER_WALLET_TYPE ? (
+          {(rewards.length > maxLedgerRestake &&
+            currentSession.wallet.walletType === LEDGER_WALLET_TYPE) ||
+            (rewards.length > maxNormalRestake &&
+              currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) ? (
               <>
                 <div />
                 <Button
@@ -848,8 +850,8 @@ export const FormWithdrawStakingReward = () => {
       >
         <>
           {broadcastResult?.code !== undefined &&
-          broadcastResult?.code !== null &&
-          broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+            broadcastResult?.code !== null &&
+            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
               <div className="description">{t('general.successModalPopup.timeout.description')}</div>
             ) : (
               <div className="description">{t('general.successModalPopup.reward.description')}</div>

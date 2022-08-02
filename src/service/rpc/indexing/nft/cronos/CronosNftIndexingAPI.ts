@@ -71,7 +71,7 @@ export class CronosNftIndexingAPI {
       return [];
     }
 
-    nftTxsList.push(...response.data.nft_txs);
+    nftTxsList.push(...response.data.nft_txs.filter(tx => tx.event_type === 'Transfer'));
 
     let txsResponse: NftTxsResponse = response;
 
@@ -85,7 +85,7 @@ export class CronosNftIndexingAPI {
       txsResponse = pageNftsListRequest.data;
       paginationPage++;
       if (txsResponse.code === 0) {
-        nftTxsList.push(...txsResponse.data.nft_txs);
+        nftTxsList.push(...txsResponse.data.nft_txs.filter(tx => tx.event_type === 'Transfer'));
       }
     }
 
