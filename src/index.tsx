@@ -12,12 +12,12 @@ import { INTERCOM_APP_ID } from './config/StaticConfig';
 import { handleUnreadCountChange } from './pages/customer-service';
 
 ReactDOM.render(
-  <IntercomProvider appId={INTERCOM_APP_ID} onUnreadCountChange={handleUnreadCountChange}>
-    <RecoilRoot>
-      <RecoilNexus />
+  <RecoilRoot>
+    <RecoilNexus />
+    <IntercomProvider appId={INTERCOM_APP_ID} onUnreadCountChange={handleUnreadCountChange}>
       <RouteHub />
-    </RecoilRoot>
-  </IntercomProvider>,
+    </IntercomProvider>
+  </RecoilRoot>,
   document.getElementById('root'),
 );
 

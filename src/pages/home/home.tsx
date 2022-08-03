@@ -55,6 +55,7 @@ import IconTick from '../../svg/IconTick';
 import RewardModalPopup from '../../components/RewardModalPopup/RewardModalPopup';
 import { AssetIcon } from '../../components/AssetIcon';
 import NftPreview from '../nft/components/NftPreview';
+import NotificationCenter from '../notification';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -339,14 +340,19 @@ const HomePage = () => {
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">
-        {t('home.title')}
-        <SyncOutlined
-          onClick={() => {
-            onSyncAndRefreshBtnCall();
-          }}
-          style={{ position: 'absolute', right: '36px', marginTop: '6px' }}
-          spin={fetchingDB}
-        />
+        <div style={{ display: 'flex', justifyContent: "space-between", alignItems: "center" }}>
+          <div>
+            {t('home.title')}
+          </div>
+          <div style={{ display: "flex", gap: "20px" }}>
+            <SyncOutlined onClick={() => {
+              onSyncAndRefreshBtnCall();
+            }}
+              spin={fetchingDB}
+            />
+            <NotificationCenter />
+          </div>
+        </div>
       </Header>
       <Content>
         <div className="site-layout-background balance-container">
