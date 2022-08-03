@@ -339,14 +339,14 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const [createLoading, setCreateLoading] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
   const [ledgerAssetType, setLedgerAssetType] = useState<UserAssetType>();
+  const [ledgerChainName, setLedgerChainName] = useState<SupportedChainName>();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(walletTempBackupState);
   const [hwcheck, setHwcheck] = useState(!props.isWalletSelectFieldDisable);
-  const { isLedgerConnected } = useLedgerStatus({ assetType: ledgerAssetType });
+  const { isLedgerConnected } = useLedgerStatus({ assetType: ledgerAssetType, chainName: ledgerChainName });
   const [ledgerAddressList, setLedgerAddressList] = useState<any[]>([]);
   const [derivationPath, setDerivationPath] = useState({
-    tendermint: 'm/44\'/394\'/0\'/0/0',
     cronosTendermint: 'm/44\'/394\'/0\'/0/0',
     cosmosTendermint: 'm/44\'/118\'/0\'/0/0',
     evm: 'm/44\'/60\'/0\'/0/0',
@@ -794,8 +794,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       const device: ISignerProvider = createLedgerDevice();
       const standard = props.form.getFieldValue('derivationPathStandard');
       const network = props.form.getFieldValue('network');
-      switch (ledgerAssetType) {
-        case UserAssetType.EVM:
+      switch (`${ledgerAssetType}-${ledgerChainName}`) {
+        case `${UserAssetType.EVM}-${SupportedChainName.CRONOS}`:
           {
             const ethAddressList = await device.getEthAddressList(0, 10, standard);
             if (ethAddressList) {
@@ -816,7 +816,28 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             }
           }
           break;
-        case UserAssetType.TENDERMINT:
+        case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`:
+          {
+            const ethAddressList = await device.getEthAddressList(0, 10, standard);
+            if (ethAddressList) {
+              const returnList = ethAddressList.map((address, idx) => {
+                return {
+                  index: idx,
+                  publicAddress: address,
+                  derivationPath: LedgerSigner.getDerivationPath(
+                    idx,
+                    UserAssetType.EVM,
+                    SupportedChainName.ETHEREUM,
+                    standard,
+                  ),
+                  balance: '0',
+                };
+              });
+              setLedgerAddressList(returnList);
+            }
+          }
+          break;
+        case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
           {
             const addressPrefix =
               network === DefaultWalletConfigs.TestNetCroeseid4Config.name ? 'tcro' : 'cro';
@@ -836,6 +857,34 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                     idx,
                     UserAssetType.TENDERMINT,
                     SupportedChainName.CRYPTO_ORG,
+                    standard,
+                  ),
+                  balance: '0',
+                };
+              });
+              setLedgerAddressList(returnList);
+            }
+          }
+          break;
+        case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`:
+          {
+            const addressPrefix = 'cosmos';
+            const cosmosHubAddressList = await device.getAddressList(
+              0,
+              10,
+              addressPrefix,
+              SupportedChainName.COSMOS_HUB,
+              standard,
+            );
+            if (cosmosHubAddressList) {
+              const returnList = cosmosHubAddressList.map((address, idx) => {
+                return {
+                  index: idx,
+                  publicAddress: address,
+                  derivationPath: LedgerSigner.getDerivationPath(
+                    idx,
+                    UserAssetType.TENDERMINT,
+                    SupportedChainName.COSMOS_HUB,
                     standard,
                   ),
                   balance: '0',
@@ -913,36 +962,58 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                   setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
                   setLedgerAddressList([]);
                   switch (e) {
-                    case UserAssetType.TENDERMINT:
+                    case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
                       setLedgerAssetType(UserAssetType.TENDERMINT);
+                      setLedgerChainName(SupportedChainName.CRYPTO_ORG);
                       ledgerNotificationWithoutCheck(
                         UserAssetType.TENDERMINT,
                         SupportedChainName.CRYPTO_ORG,
                       );
                       break;
-                    case UserAssetType.EVM:
+                    case `${UserAssetType.EVM}-${SupportedChainName.CRONOS}`:
                       setLedgerAssetType(UserAssetType.EVM);
+                      setLedgerChainName(SupportedChainName.CRONOS);
                       ledgerNotificationWithoutCheck(UserAssetType.EVM);
+                      break;
+                    case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`:
+                      setLedgerAssetType(UserAssetType.EVM);
+                      setLedgerChainName(SupportedChainName.ETHEREUM);
+                      ledgerNotificationWithoutCheck(UserAssetType.EVM);
+                      break;
+                    case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`:
+                      setLedgerAssetType(UserAssetType.TENDERMINT);
+                      setLedgerChainName(SupportedChainName.COSMOS_HUB);
+                      ledgerNotificationWithoutCheck(
+                        UserAssetType.TENDERMINT,
+                        SupportedChainName.COSMOS_HUB,
+                      );
                       break;
                     default:
                   }
                 }}
               >
-                <Select.Option key="tendermint" value={UserAssetType.TENDERMINT}>
-                  TENDERMINT
+                <Select.Option key="crypto-org-chain" value={`${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`}>
+                  {SupportedChainName.CRYPTO_ORG}
                 </Select.Option>
-                <Select.Option key="evm" value={UserAssetType.EVM}>
-                  EVM
+                <Select.Option key="cronos-chain" value={`${UserAssetType.EVM}-${SupportedChainName.CRONOS}`}>
+                  {SupportedChainName.CRONOS}
+                </Select.Option>
+                <Select.Option key="ethereum-chain" value={`${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`}>
+                  {SupportedChainName.ETHEREUM}
+                </Select.Option>
+                <Select.Option key="cosmos-hub-chain" value={`${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`}>
+                  {SupportedChainName.COSMOS_HUB}
                 </Select.Option>
               </Select>
             </Form.Item>
 
-            {ledgerAssetType ? (
+            {ledgerAssetType && ledgerChainName ? (
               <LedgerAddressIndexBalanceTable
                 addressIndexBalanceList={ledgerAddressList}
                 setAddressIndexBalanceList={setLedgerAddressList}
                 setisHWModeSelected={setIsHWModeSelected}
                 assetType={ledgerAssetType}
+                chainName={ledgerChainName}
                 form={props.form}
                 setDerivationPath={setDerivationPath}
               />
@@ -977,6 +1048,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             onChange={() => {
               setLedgerAddressList([]);
               setLedgerAssetType(undefined);
+              setLedgerChainName(undefined);
               props.form.setFieldsValue({
                 assetType: undefined,
               });
@@ -1194,7 +1266,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                   }, 500);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>
@@ -1240,7 +1312,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                   }, 500);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>
@@ -1287,7 +1359,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                   }, 500);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>

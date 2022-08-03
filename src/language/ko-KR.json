@@ -215,6 +215,7 @@
   "create.ledgerModalPopup.evmAddress.description1": "레져가 잘 연결되었습니다",
   "create.ledgerModalPopup.evmAddress.description2": "레져 연결을 확인해주세요",
   "create.ledgerModalPopup.evmAddress.description3": "레져에서 아래 앱을 실행해주세요.",
+  "create.ledgerModalPopup.confirmAppConnection.description1": "레져 연결을 확인해주세요",
   "restore.title1": "지갑 복원",
   "restore.title2": "커스텀 설정",
   "restore.slogan1": "지갑 이름과 네트워크를 설정해주세요",
