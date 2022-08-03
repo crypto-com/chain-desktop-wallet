@@ -1,6 +1,6 @@
 /**
  * CDC Ethereum Indexing service API
- * @link https://cql.3ona.co/ethereum/testnet/api/docs/?apikey=anonymous
+ * @link https://eth-indexing.crypto.org/ethereum/mainnet/api/docs
  * @dev
  */
 

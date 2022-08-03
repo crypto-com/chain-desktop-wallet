@@ -28,8 +28,8 @@ describe('EthClient', () => {
       .replyOnce(200, txListStubEmpty);
 
     const ethClientApi = new EthClient(
-      'https://eth-indexing.3ona.co/ethereum/rinkeby/api/v1',
-      'https://eth-indexing.3ona.co/ethereum/mainnet/api/v1',
+      'https://eth-indexing.crypto.org/ethereum/mainnet/rpc',
+      'https://eth-indexing.crypto.org/ethereum/mainnet/api/v1',
     );
 
     const txDataList = await ethClientApi.getTxsByAddress(
