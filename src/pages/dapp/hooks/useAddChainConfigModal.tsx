@@ -3,10 +3,7 @@ import { useState } from 'react';
 import { Form, Input, InputNumber, message, Modal } from 'antd';
 import { ethers } from 'ethers';
 import { useTranslation } from 'react-i18next';
-import { /* lgtm [js/unused-local-variable] */
-  ChainConfigFormData,
-  ChainConfigFormKeys,
-} from '../types'; 
+import { ChainConfigFormData, ChainConfigFormKeys } from '../types'; /* lgtm [js/unused-local-variable] */
 import { useChainConfigs } from '../browser/useChainConfigs';
 import { EVMChainConfig } from '../../../models/Chain';
 

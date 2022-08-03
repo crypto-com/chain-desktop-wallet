@@ -8,10 +8,7 @@ import { useForm } from 'antd/lib/form/Form';
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal';
 import { useChainConfigs } from '../../browser/useChainConfigs';
 import { isHexEqual } from '../../../../utils/utils';
-import { /* lgtm [js/unused-local-variable] */
-  ChainConfigFormData,
-  ChainConfigFormKeys,
-} from '../../types';
+import { ChainConfigFormData, ChainConfigFormKeys } from '../../types'; /* lgtm [js/unused-local-variable] */
 import { useAddChainConfigModal } from '../../hooks/useAddChainConfigModal';
 import { DAppDefaultChainConfigs, isChainDefaultConfig } from '../../../../config/DAppChainConfig';
 import { EVMChainConfig } from '../../../../models/Chain';
