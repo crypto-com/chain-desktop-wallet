@@ -50,6 +50,7 @@ import { SupportedCRCTokenStandard } from './rpc/interface/cronos.chainIndex';
 import { EVMClient } from './rpc/clients/EVMClient';
 import { EthClient } from './ethereum/EthClient';
 import { CosmosHubIndexingAPI } from './rpc/indexing/tendermint/cosmoshub/CosmosHubIndexingAPI';
+import { CRC20MainnetTokenInfos } from '../config/CRC20Tokens';
 
 export class TransactionHistoryService {
   private storageService: StorageService;
@@ -684,6 +685,26 @@ export class TransactionHistoryService {
     );
 
     const tokensListResponse = await cronosClient.getTokensOwnedByAddress(address);
+
+    // Special case for ATOM-CRC20 token balance not updated properly from Indexing API after first IBC transfer
+    if(!tokensListResponse.result.find(token => token.contractAddress === CRC20MainnetTokenInfos.get('ATOM')?.address)) {
+      const contractAddress = CRC20MainnetTokenInfos.get('ATOM')?.address;
+      if(!contractAddress) return;
+      
+      const balance = await cronosClient.getBalanceOfContractByAddress(contractAddress, address);
+      const { name, symbol, decimals } = await cronosClient.getTokenContractDetails(contractAddress);
+
+      if(balance) {
+        tokensListResponse.result.push({
+          balance,
+          contractAddress,
+          decimals,
+          name,
+          symbol,
+          type: 'ERC-20'
+        });
+      }
+    }
 
     const newlyLoadedTokens = await tokensListResponse.result
       .filter(token => token.type === SupportedCRCTokenStandard.CRC_20_TOKEN)

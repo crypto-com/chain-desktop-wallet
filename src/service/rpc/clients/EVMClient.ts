@@ -1,6 +1,8 @@
 import Web3 from 'web3';
 import { BlockTransactionObject, TransactionReceipt, TransactionConfig } from 'web3-eth';
+import { AbiItem } from 'web3-utils';
 import { IEvmRpc } from '../interface/evm.rpcClient';
+import TokenContractABI from '../../../service/signers/abi/TokenContractABI.json';
 
 class EVMClient implements IEvmRpc {
   private web3: Web3;
@@ -45,6 +47,40 @@ class EVMClient implements IEvmRpc {
 
     const nativeBalance = await this.web3.eth.getBalance(address, 'latest');
     return nativeBalance;
+  }
+
+  async getBalanceOfContractByAddress(tokenContractAddress: string, address: string): Promise<string> {
+    if (!this.web3.utils.isAddress(address) || !this.web3.utils.isAddress(tokenContractAddress)) {
+      throw new Error('Please provide a valid EVM compatible address.');
+    }
+
+    const contractABI = TokenContractABI.abi as AbiItem[];
+    const contract = new this.web3.eth.Contract(contractABI, tokenContractAddress);
+    const tokenBalance = contract.methods.balanceOf(address).call();
+
+    return tokenBalance;
+  }
+
+  async getTokenContractDetails(tokenContractAddress: string): Promise<{
+    name: string;
+    decimals: string;
+    symbol: string;
+  }> {
+    if (!this.web3.utils.isAddress(tokenContractAddress)) {
+      throw new Error('Please provide a valid EVM compatible address.');
+    }
+
+    const contractABI = TokenContractABI.abi as AbiItem[];
+    const contract = new this.web3.eth.Contract(contractABI, tokenContractAddress);
+    const name = await contract.methods.name().call();
+    const decimals = await contract.methods.decimals().call();
+    const symbol = await contract.methods.symbol().call();
+
+    return {
+      name,
+      decimals,
+      symbol,
+    };
   }
 
   async getNextNonceByAddress(address: string): Promise<number> {
