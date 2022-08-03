@@ -1,6 +1,9 @@
 import React, { useRef, useEffect } from "react";
 import * as d3 from "d3";
 import "./style.less"
+import { useRecoilValue } from "recoil";
+import { roundPrice } from "../../utils/NumberUtils";
+import { sessionState } from "../../recoil/atom";
 
 export interface TokenData {
   datetime: Date;
@@ -34,6 +37,7 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
   const { width, height, margin } = dimensions;
+  const session = useRecoilValue(sessionState);
 
   const svgWidth = width + margin.left + margin.right;
   const svgHeight = height + margin.top + margin.bottom;
@@ -58,8 +62,8 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
     const svg = svgEl
       .append("g")
       .attr("transform", `translate(${margin.left},${margin.top})`)
-      .attr("width", dimensions.width)
-      .attr("height", dimensions.height);
+      .attr("width", width)
+      .attr("height", height);
 
     // x axis
     svg.append('g')
@@ -98,7 +102,7 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
 
     const focus = svg.append("g")
       .attr("class", "price-chart-focus")
-      .style("z-index", 10)
+      .style("z-index", 2)
       .style("opacity", "0");
 
     focus.append("circle")
@@ -108,7 +112,6 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
       .attr("class", "price-chart-tooltip")
       .attr("width", 'auto')
       .attr("height", 'auto')
-      .attr("fill", "red")
       .attr("x", 10)
       .attr("y", -22)
       .attr("rx", 4)
@@ -124,7 +127,7 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
     const priceText = focus.append("text")
       .attr("class", "price-chart-tooltip-price")
       .attr("dominant-baseline", "center")
-      .attr("x", 18)
+      .attr("x", 20)
       .attr("y", 18);
 
     const bisectDate = d3.bisector<TokenData, Date>((d) => { return d.datetime; }).left
@@ -132,34 +135,40 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
     const mousemove = (event: MouseEvent) => {
       const x0 = xScale.invert(d3.pointer(event)[0]);
       const i = bisectDate(data, x0, 1)
+
+
       const d0 = data[i - 1]
       const d1 = data[i]
-      const d = x0.getDate() - d0.datetime.getDate() > d1.datetime.getDate() - x0.getDate() ? d1 : d0;
-
+      let d: TokenData;
+      if (i === data.length) {
+        d = d0;
+      } else {
+        d = x0.getDate() - d0.datetime.getDate() > d1.datetime.getDate() - x0.getDate() ? d1 : d0;
+      }
       focus.select(".price-chart-tooltip-date").text(d.datetime.toLocaleString());
-      focus.select(".price-chart-tooltip-price").text(d.price);
+      focus.select(".price-chart-tooltip-price").text(`Price (${session.currency}) ${roundPrice(d.price)}`);
 
       const x = xScale(d.datetime);
       const y = yScale(d.price) + BOTTOM_OFFSET;
 
-      const dateTextBox = dateText.node()?.getBBox();
+      const dateTextWidth = dateText.node()?.getBBox().width ?? 0;
       const priceTextWidth = priceText.node()?.getBBox().width ?? 0;
 
-      const tooltipWidth = (dateTextBox?.width ?? 0) + 20
-
-      console.log(x, y, focus.node()?.getBBox().width);
+      const tooltipWidth = Math.max(dateTextWidth, priceTextWidth) + 20
 
       focus.attr("transform", `translate(${x}, ${y})`);
       tooltipRect.attr("width", tooltipWidth).attr("height", 46);
 
-      priceText.attr("x", (tooltipWidth - priceTextWidth + 20) / 2)
+      if (x > width / 2) {
+        console.log(x);
+      }
     }
 
     svg.append("rect")
       .attr("class", "price-chart-overlay")
-      .attr("width", width)
-      .attr("height", height)
-      .attr("transform", `translate(0, ${margin.top})`)
+      .attr("width", svgWidth)
+      .attr("height", svgHeight)
+      .attr("transform", `translate(0, 0)`)
       .on("mouseover", () => {
         focus.transition()
           .duration(250)
