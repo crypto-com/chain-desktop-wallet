@@ -692,7 +692,7 @@ export class TransactionHistoryService {
       const balance = await cronosClient.getBalanceOfContractByAddress(contractAddress, address);
       const { name, symbol, decimals } = await cronosClient.getTokenContractDetails(contractAddress);
 
-      if(balance) {
+      if(balance !== '0') {
         tokensListResponse.result.push({
           balance,
           contractAddress,
