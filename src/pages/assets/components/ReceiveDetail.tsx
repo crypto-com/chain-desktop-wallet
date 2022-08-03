@@ -52,6 +52,7 @@ const ReceiveDetail: React.FC<ReceiveDetailProps> = props => {
         return address;
       case UserAssetType.EVM:
       case UserAssetType.CRC_20_TOKEN:
+      case UserAssetType.ERC_20_TOKEN:
         return address;
       case UserAssetType.IBC:
         return address;
