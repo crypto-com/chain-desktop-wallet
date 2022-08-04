@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import { useRecoilValue } from 'recoil';
+import { useTranslation } from 'react-i18next';
 import { roundPrice } from '../../utils/NumberUtils';
 import { sessionState } from '../../recoil/atom';
 
@@ -33,6 +34,8 @@ const TOOLTIP_RECT_Y = -56;
 
 const LineChart = ({ data, dimensions }: LineChartProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
+
+  const [t] = useTranslation();
 
   const { width, height, margin } = dimensions;
   const session = useRecoilValue(sessionState);
@@ -102,7 +105,7 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
       .style('font-size', '0.8rem')
       .style('opacity', '0');
 
-    const circle = focus
+    focus
       .append('circle')
       .style('fill', 'steelblue')
       .attr('r', 3);
@@ -142,7 +145,7 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
       }
 
       dateText.text(d.datetime.toLocaleString());
-      priceText.text(`Price (${session.currency}) ${roundPrice(d.price)}`);
+      priceText.text(`${t('general.price')} (${session.currency}) ${roundPrice(d.price)}`);
 
       const x = xScale(d.datetime);
       const y = yScale(d.price) + BOTTOM_OFFSET;
@@ -192,11 +195,6 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
       })
       .on('mouseout', () => {
         focus
-          .transition()
-          .duration(250)
-          .style('opacity', 0);
-
-        circle
           .transition()
           .duration(250)
           .style('opacity', 0);

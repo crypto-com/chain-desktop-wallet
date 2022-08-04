@@ -215,6 +215,7 @@
   "create.ledgerModalPopup.evmAddress.description1": "你的Ledger钱包已经成功连接。",
   "create.ledgerModalPopup.evmAddress.description2": "请在Ledger钱包上打开 Ethereum App 再确认连接",
   "create.ledgerModalPopup.evmAddress.description3": "请在Ledger钱包上打开以下 App 再确认连接",
+  "create.ledgerModalPopup.confirmAppConnection.description1": "请在Ledger钱包上打开 {{ app }} 再确认连接",
   "restore.title1": "复原钱包",
   "restore.title2": "自定义配置",
   "restore.slogan1": "为你的钱包创建名字和选择网络。",
@@ -833,5 +834,6 @@
   "general.customerService.liveChat": "实时聊天",
   "general.notification.viewMessage": "查看消息",
   "general.notification.title": "通知",
-  "general.notification.expand": "展开"
+  "general.notification.expand": "展开",
+  "general.price": "价格"
 }
