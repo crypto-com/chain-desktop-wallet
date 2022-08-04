@@ -13,9 +13,12 @@ import {
 import { CRC20MainnetTokenInfos } from '../../config/CRC20Tokens';
 import { ERC20MainnetTokenInfos } from '../../config/ERC20Tokens';
 
+
+const TokenSlugMap = new Map<string, string>();
+
 export interface IMarketApi {
   getTokenPrices(
-    cryptoSymbol: string,
+    asset: UserAsset,
     fiatCurrency: string,
     interval: string,
   ): Promise<CryptoTokenPriceAPIResponse>;
@@ -69,14 +72,11 @@ export class CroMarketApi implements IMarketApi {
     };
   }
 
-  public async getTokenPrices(cryptoSymbol: string, fiatCurrency: string, interval: string) {
-    const allTokensSlugMap = await this.loadTokenSlugMap();
+  public async getTokenPrices(asset: UserAsset, fiatCurrency: string, interval: string) {
+    const slug = await this.getTokenSlug(asset);
 
-    const tokenSlugInfo = allTokensSlugMap?.find(tokenSlug => tokenSlug.symbol === cryptoSymbol);
-    const slug = tokenSlugInfo?.slug;
-
-    if (!tokenSlugInfo || !slug) {
-      throw Error(`Couldn't find a valid slug name for ${cryptoSymbol}`);
+    if (!slug) {
+      throw Error(`Couldn't find a valid slug name for ${asset.symbol}`);
     }
 
     const response = await axios.get<CryptoTokenPriceAPIResponse>(`/${interval}/${slug}/`, {
@@ -91,6 +91,61 @@ export class CroMarketApi implements IMarketApi {
     }
 
     return response.data;
+  }
+
+  private async getTokenSlug(asset: UserAsset)  {
+    const cachedSlug = TokenSlugMap.get(asset.identifier);
+
+    if (cachedSlug && cachedSlug.length > 0) {
+      return cachedSlug;
+    }
+
+    const { assetType, mainnetSymbol } = asset;
+    const whitelistedCRC20Tokens: string[] = Array.from(CRC20MainnetTokenInfos.keys());
+    const whitelistedERC20Tokens: string[] = Array.from(ERC20MainnetTokenInfos.keys());
+    const allTokensSlugMap: CryptoComSlugResponse[] = await this.loadTokenSlugMap();
+
+    const nativeTokenSlug = ['crypto-com-coin', 'ethereum', 'cosmos'];
+    const tokenSlugInfo = allTokensSlugMap.filter(tokenSlug => tokenSlug.symbol === mainnetSymbol);
+
+    if (!tokenSlugInfo) {
+      throw Error(`Couldn't find a valid slug name for ${mainnetSymbol}`);
+    }
+
+    const tokenPriceResponses: CryptoTokenPriceAPIResponse[] = [];
+
+    await Promise.all(
+      tokenSlugInfo.map(async slugInfo => {
+        const response: AxiosResponse<CryptoTokenPriceAPIResponse> = await axios({
+          baseURL: CRYPTO_COM_PRICE_API_BASE_URL.V1,
+          url: `/tokens/${slugInfo?.slug}`,
+        });
+        tokenPriceResponses.push(response.data);
+      }),
+    );
+
+    // Filter supported native / whitelisted / Cronos / Ethereum token price only
+    const tokenPriceInUSD = tokenPriceResponses.find(token => {
+      // tags could be null
+      token.tags = token.tags ?? [];
+      return (
+        nativeTokenSlug.includes(token.slug) ||
+        (assetType === UserAssetType.CRC_20_TOKEN &&
+          whitelistedCRC20Tokens.includes(token.symbol)) ||
+        (assetType === UserAssetType.CRC_20_TOKEN &&
+          token.tags.includes('cronos-ecosystem')) ||
+        (assetType === UserAssetType.ERC_20_TOKEN &&
+          whitelistedERC20Tokens.includes(`${token.symbol.toUpperCase()}`))
+      );
+    });
+
+    if (!tokenPriceInUSD || !tokenPriceInUSD.slug) {
+      return null;
+    }
+
+    TokenSlugMap.set(asset.identifier, tokenPriceInUSD.slug);
+
+    return tokenPriceInUSD.slug;
   }
 
   public async getCryptoToFiatRateFromCoinbase(cryptoSymbol: string, fiatCurrency: string) {
