@@ -109,5 +109,5 @@ describe('Testing Number utils', () => {
 
     expect(roundPrice(12323.01234567)).to.eq('12323.0123');
     expect(roundPrice(-12323.01234567)).to.eq('-12323.01234567');
-  })
+  });
 });

@@ -182,7 +182,7 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
       .attr('height', svgHeight)
       .style('fill', 'none')
       .style('pointer-events', 'all')
-      .attr('transform', `translate(0, 0)`)
+      .attr('transform', 'translate(0, 0)')
       .on('mouseover', () => {
         if (data.length < 1) {
           return;
