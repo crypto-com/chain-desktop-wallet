@@ -55,7 +55,7 @@ export const ChartArea = ({ asset }: Props) => {
     setLoadingData(true);
     try {
       const data = await croMarketPriceApi.getTokenPrices(
-        `${asset.symbol}`,
+        `${asset.mainnetSymbol}`,
         session.currency,
         duration,
       );
