@@ -102,7 +102,7 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
       .style('font-size', '0.8rem')
       .style('opacity', '0');
 
-    focus
+    const circle = focus
       .append('circle')
       .style('fill', 'steelblue')
       .attr('r', 3);
@@ -125,6 +125,10 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
     }).left;
 
     const mousemove = (event: MouseEvent) => {
+      if (data.length < 1) {
+        return;
+      }
+
       const x0 = xScale.invert(d3.pointer(event)[0]);
       const i = bisectDate(data, x0, 1);
 
@@ -147,11 +151,10 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
       const priceTextWidth = priceText.node()?.getBBox().width ?? 0;
 
       const tooltipWidth = Math.max(dateTextWidth, priceTextWidth) + 20;
-
       focus.attr('transform', `translate(${x}, ${y})`);
       tooltipRect.attr('width', tooltipWidth);
 
-      // prevent x-axis overflow
+      // prevent tooltip x-axis overflow
       const offsetRatio = (tooltipWidth - 60) / width;
       const offset = (x - width / 2) * offsetRatio;
       tooltipRect.attr('x', -tooltipWidth / 2 - offset);
@@ -178,6 +181,10 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
       .style('pointer-events', 'all')
       .attr('transform', `translate(0, 0)`)
       .on('mouseover', () => {
+        if (data.length < 1) {
+          return;
+        }
+
         focus
           .transition()
           .duration(250)
@@ -185,6 +192,11 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
       })
       .on('mouseout', () => {
         focus
+          .transition()
+          .duration(250)
+          .style('opacity', 0);
+
+        circle
           .transition()
           .duration(250)
           .style('opacity', 0);

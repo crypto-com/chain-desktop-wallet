@@ -15,8 +15,15 @@ interface Props {
   asset: UserAsset;
 }
 
+const CHART_HEIGHT = 360;
+const CHART_MARGIN = {
+  left: 40,
+  right: 40,
+  top: 10,
+  bottom: 40,
+};
+
 export const ChartArea = ({ asset }: Props) => {
-  const headers = ['datetime', 'price'];
   const session = useRecoilValue(sessionState);
   const container = useRef<HTMLDivElement>(null);
 
@@ -25,8 +32,8 @@ export const ChartArea = ({ asset }: Props) => {
   const [duration, setDuration] = useState('d');
   const [dimensions, setDimensions] = useState<Dimensions>({
     width: 0,
-    height: 360,
-    margin: { left: 40, right: 40, top: 10, bottom: 40 },
+    height: CHART_HEIGHT,
+    margin: CHART_MARGIN,
   });
 
   const getContainerSize = () => {
@@ -35,7 +42,7 @@ export const ChartArea = ({ asset }: Props) => {
     }
 
     const newWidth = container.current.clientWidth;
-    setDimensions({ ...dimensions, width: newWidth - 40 * 2 });
+    setDimensions({ ...dimensions, width: newWidth - CHART_MARGIN.left - CHART_MARGIN.right });
   };
 
   useEffect(() => {
@@ -47,7 +54,11 @@ export const ChartArea = ({ asset }: Props) => {
   const fetchTokenPrices = useCallback(async () => {
     setLoadingData(true);
     try {
-      const data = await croMarketPriceApi.getTokenPrices(asset.symbol, session.currency, duration);
+      const data = await croMarketPriceApi.getTokenPrices(
+        `${asset.symbol}`,
+        session.currency,
+        duration,
+      );
 
       const mappedTokenData: TokenData[] = data.prices?.map(elem => {
         return {
@@ -57,6 +68,8 @@ export const ChartArea = ({ asset }: Props) => {
         };
       });
       setTokenPriceData(mappedTokenData);
+    } catch {
+      setTokenPriceData([]);
     } finally {
       setLoadingData(false);
     }
@@ -68,7 +81,7 @@ export const ChartArea = ({ asset }: Props) => {
 
   return (
     <Card ref={container}>
-      <Spin spinning={loadingData} indicator={<LoadingOutlined />} tip="Calculating...">
+      <Spin spinning={loadingData} indicator={<LoadingOutlined />}>
         <Radio.Group
           className="duration-changer"
           onChange={e => {
@@ -83,7 +96,7 @@ export const ChartArea = ({ asset }: Props) => {
           <Radio.Button value="3m">3M</Radio.Button>
           <Radio.Button value="6m">6M</Radio.Button>
         </Radio.Group>
-        <LineChart data={tokenPriceData} dimensions={dimensions} headers={headers} />
+        <LineChart data={tokenPriceData} dimensions={dimensions} />
       </Spin>
     </Card>
   );
