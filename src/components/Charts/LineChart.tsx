@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import { useRecoilValue } from 'recoil';
-import { useTranslation } from 'react-i18next';
 import { roundPrice } from '../../utils/NumberUtils';
 import { sessionState } from '../../recoil/atom';
 import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
@@ -37,8 +36,6 @@ const TOOLTIP_RECT_Y = -56;
 
 const LineChart = ({ data, dimensions, currentTokenPriceText, setTokenPriceText }: LineChartProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
-
-  const [t] = useTranslation();
 
   const { width, height, margin } = dimensions;
   const session = useRecoilValue(sessionState);
