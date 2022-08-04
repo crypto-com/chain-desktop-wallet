@@ -21,6 +21,24 @@ const AssetTypeTooltip: React.FC<AssetTypeTooltipProps> = props => {
   let tooltipMessage = <></>;
   switch (currentAsset?.assetType) {
     case UserAssetType.TENDERMINT:
+      tooltipMessage = (
+        <>
+          {t('assets.assetTypeTooltip.nativeToken', {
+            chainName: getChainName(currentAsset?.name, currentSession.wallet.config),
+            nativeToken: currentAsset.symbol === 'ATOM' ? 'ATOM' : 'CRO',
+            assetType: currentAsset.symbol === 'ATOM' ? 'ATOM' : 'Cronos ',
+          })}
+          <br />
+          <a
+            href="https://help.crypto.com/en/articles/5495745-all-about-network-settings-mainnet-and-evm-chains"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t('assets.assetTypeTooltip.learnMore')}
+          </a>
+        </>
+      );
+      break;
     case UserAssetType.EVM:
       tooltipMessage = (
         <>
