@@ -63,6 +63,7 @@ const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const { Meta } = Card;
 
+const maxAssetPreview = 5;
 const maxNftPreview = 5;
 
 const isWalletNotLive = (config: WalletConfig) => {
@@ -147,7 +148,7 @@ const HomePage = () => {
       key: 'price',
       render: record => {
         const assetMarketData = allMarketData.get(
-          `${record.mainnetSymbol}-${currentSession.currency}`,
+          `${record.assetType}-${record.mainnetSymbol}-${currentSession.currency}`,
         );
         return (
           <>
@@ -155,8 +156,8 @@ const HomePage = () => {
             assetMarketData.price &&
             record.mainnetSymbol === assetMarketData.assetSymbol
               ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
-                  assetMarketData.price,
-                ).format('0,0.00')} ${assetMarketData?.currency}`
+                assetMarketData.price,
+              ).format('0,0.00')} ${assetMarketData?.currency}`
               : `${SUPPORTED_CURRENCY.get(currentSession.currency)?.symbol}--`}
           </>
         );
@@ -180,7 +181,7 @@ const HomePage = () => {
       key: 'value',
       render: record => {
         const assetMarketData = allMarketData.get(
-          `${record.mainnetSymbol}-${currentSession.currency}`,
+          `${record.assetType}-${record.mainnetSymbol}-${currentSession.currency}`,
         );
         return (
           <>
@@ -188,8 +189,8 @@ const HomePage = () => {
             assetMarketData.price &&
             record.mainnetSymbol === assetMarketData.assetSymbol
               ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
-                  getAssetBalancePrice(record, assetMarketData),
-                ).format('0,0.00')} ${assetMarketData?.currency}`
+                getAssetBalancePrice(record, assetMarketData),
+              ).format('0,0.00')} ${assetMarketData?.currency}`
               : `${SUPPORTED_CURRENCY.get(currentSession.currency)?.symbol}--`}
           </>
         );
@@ -235,7 +236,7 @@ const HomePage = () => {
     ipcRenderer.on('update_available', () => {
       ipcRenderer.removeAllListeners('update_available');
 
-      const newVersionNotificationKey = `open-update_available`;
+      const newVersionNotificationKey = 'open-update_available';
 
       notification.info({
         message: t('home.notification.updateAvailable.message'),
@@ -251,7 +252,7 @@ const HomePage = () => {
     ipcRenderer.on('update_downloaded', () => {
       ipcRenderer.removeAllListeners('update_downloaded');
 
-      const newVersionNotificationKey = `open-update_downloaded`;
+      const newVersionNotificationKey = 'open-update_downloaded';
 
       const restartBtn = (
         <Button
@@ -282,7 +283,9 @@ const HomePage = () => {
   function getAllAssetsTotalBalance() {
     let totalBalance = Big('0');
     walletAllAssets.forEach(asset => {
-      const priceData = allMarketData.get(`${asset.mainnetSymbol}-${currentSession.currency}`);
+      const priceData = allMarketData.get(
+        `${asset.assetType}-${asset.mainnetSymbol}-${currentSession.currency}`,
+      );
       if (priceData) {
         const addingBalance = getAssetTotalBalancePrice(asset, priceData);
         totalBalance = totalBalance.add(addingBalance);
@@ -296,7 +299,8 @@ const HomePage = () => {
       setAssetsLoading(true);
 
       const sessionData = await walletService.retrieveCurrentSession();
-      const currentAsset = await walletService.retrieveDefaultWalletAsset(sessionData);
+      const currentAsset =
+        (await walletService.retrieveDefaultWalletAsset(sessionData)) ?? sessionData.activeAsset;
       const allAssets = await walletService.retrieveCurrentWalletAssets(sessionData);
       const allNFTs: NftList = await walletService.retrieveNFTs(sessionData.wallet.identifier);
       const allRewards = await walletService.retrieveRewardsBalances(
@@ -309,7 +313,11 @@ const HomePage = () => {
       setNFTList(allNFTs);
       setDefaultWalletAsset(currentAsset);
       setWalletAsset(currentAsset);
-      setMarketData(allMarketData.get(`${currentAsset?.mainnetSymbol}-${sessionData.currency}`));
+      setMarketData(
+        allMarketData.get(
+          `${currentAsset.assetType}-${currentAsset?.mainnetSymbol}-${sessionData.currency}`,
+        ),
+      );
 
       setRewards(allRewards);
 
@@ -339,15 +347,15 @@ const HomePage = () => {
   return (
     <Layout className="site-layout">
       <Header className="site-layout-background">
-        <div style={{ display: 'flex', justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             {t('home.title')}
           </div>
-          <div style={{ display: "flex", gap: "20px" }}>
+          <div style={{ display: 'flex', gap: '20px' }}>
             <SyncOutlined onClick={() => {
               onSyncAndRefreshBtnCall();
             }}
-              spin={fetchingDB}
+            spin={fetchingDB}
             />
             <NotificationCenter />
           </div>
@@ -372,8 +380,8 @@ const HomePage = () => {
             <div className="quantity">
               {defaultWalletAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAllAssetsTotalBalance(),
-                  ).format(`0,0.00`)} ${marketData?.currency}`
+                  getAllAssetsTotalBalance(),
+                ).format('0,0.00')} ${marketData?.currency}`
                 : ''}
             </div>
           </div>
@@ -388,8 +396,8 @@ const HomePage = () => {
             <div className="fiat">
               {defaultWalletAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetStakingBalancePrice(defaultWalletAsset, marketData),
-                  ).format('0,0.00')} ${marketData?.currency}
+                  getAssetStakingBalancePrice(defaultWalletAsset, marketData),
+                ).format('0,0.00')} ${marketData?.currency}
                   `
                 : ''}
             </div>
@@ -445,7 +453,7 @@ const HomePage = () => {
             <div className="site-layout-background asset-container">
               <Table
                 columns={AssetColumns}
-                dataSource={walletAllAssets}
+                dataSource={walletAllAssets.slice(0, maxAssetPreview)}
                 rowKey={record => record.identifier}
                 className="asset-table"
                 pagination={false}

@@ -2,6 +2,7 @@ import { StargateClient, isDeliverTxFailure } from '@cosmjs/stargate';
 import axios, { AxiosInstance } from 'axios';
 import { Big } from 'big.js';
 import { Bytes } from '../../utils/ChainJsLib';
+// eslint-disable-next-line
 import { NodePorts } from '../../config/StaticConfig';
 import {
   AllProposalResponse,
@@ -57,6 +58,8 @@ export interface INodeRpcService {
 
   getIBCAssetTrace(ibcHash: string): Promise<DenomTrace>;
 
+  getChainId(): Promise<string>;
+
   loadLatestBlock(address: string): Promise<number>;
 }
 
@@ -73,15 +76,31 @@ export class NodeRpcService implements INodeRpcService {
     this.cosmosClient = proxyClient;
   }
 
-  public static async init(baseUrl: string) {
+  public static async init(urls: {
+    baseUrl?: string;
+    clientUrl?: string;
+    proxyUrl?: string;
+  }): Promise<NodeRpcService> {
+    const { baseUrl, clientUrl, proxyUrl } = urls;
+    if (clientUrl && proxyUrl) {
+      const client = await StargateClient.connect(clientUrl);
+      const proxyClient = axios.create({
+        baseURL: proxyUrl,
+      });
+      return new NodeRpcService(client, proxyClient);
+    }
     // take first 2 words
-    const words = baseUrl.split(':', 2);
-    const newClientUrl = `${words[0]}:${words[1]}${NodePorts.Tendermint}`;
-    const client = await StargateClient.connect(newClientUrl);
-    const proxyClient = axios.create({
-      baseURL: baseUrl + NodePorts.Cosmos,
-    });
-    return new NodeRpcService(client, proxyClient);
+    if (baseUrl) {
+      const words = baseUrl.split(':', 2);
+      const newClientUrl = `${words[0]}:${words[1]}${NodePorts.Tendermint}`;
+      const client = await StargateClient.connect(newClientUrl);
+      const proxyClient = axios.create({
+        baseURL: baseUrl + NodePorts.Cosmos,
+      });
+      return new NodeRpcService(client, proxyClient);
+    }
+
+    throw new Error('Unable to init NodeRpcService');
   }
 
   public async loadAccountBalance(address: string, assetDenom: string): Promise<string> {
@@ -420,7 +439,7 @@ export class NodeRpcService implements INodeRpcService {
   public async loadProposalsPaginated(
     nextPage: string | null,
   ): Promise<[Proposal[], PaginationNextKey]> {
-    const baseUrl = `/cosmos/gov/v1beta1/proposals`;
+    const baseUrl = '/cosmos/gov/v1beta1/proposals';
     const url =
       nextPage === null ? baseUrl : `${baseUrl}?pagination.key=${encodeURIComponent(nextPage)}`;
     const response = await this.cosmosClient.get<AllProposalResponse>(url);
@@ -603,6 +622,10 @@ export class NodeRpcService implements INodeRpcService {
       );
       throw new Error(`[${NodeRpcService.name}-getIBCAssetTrace] [Error] Unable to fetch data.`);
     }
+  }
+
+  async getChainId(): Promise<string> {
+    return (await this.tendermintClient.getChainId()) ?? '0';
   }
 }
 

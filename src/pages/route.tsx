@@ -26,6 +26,7 @@ import HomeLayout from '../layouts/home/home';
 import AssetsPage from './assets/assets';
 import BlockPage from './block/block';
 import DappPage from './dapp/dapp';
+import WalletConnectPage from './walletconnect';
 
 import {
   CLOUDFLARE_TRACE_URI,
@@ -182,6 +183,12 @@ function RouteHub() {
       key: 'refresh',
       path: '/refresh',
       component: <RefreshPage />,
+    },
+    {
+      name: 'WalletConnect',
+      key: 'walletconnect',
+      path: '/walletconnect',
+      component: <WalletConnectPage />,
     },
   ];
 

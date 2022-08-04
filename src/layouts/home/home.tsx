@@ -24,7 +24,7 @@ import Icon, {
   SettingOutlined,
   LockFilled,
 } from '@ant-design/icons';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -70,6 +70,7 @@ import {
   LedgerWalletMaximum,
   MAX_INCORRECT_ATTEMPTS_ALLOWED,
   SHOW_WARNING_INCORRECT_ATTEMPTS,
+  SupportedChainName,
 } from '../../config/StaticConfig';
 import { generalConfigService } from '../../service/storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
@@ -89,6 +90,10 @@ import {
 } from '../../service/bridge/BridgeConfig';
 import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
 import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
+import { walletConnectStateAtom } from '../../service/walletconnect/store';
+import { WalletConnectModal } from '../../pages/walletconnect/components/WalletConnectModal';
+import IconWalletConnect from '../../svg/IconWalletConnect';
+import IconCosmos from '../../svg/IconCosmos';
 import IntercomCustomerService from '../../pages/customer-service';
 
 // import i18n from '../../language/I18n';
@@ -144,10 +149,15 @@ function HomeLayout(props: HomeLayoutProps) {
   const [menuToBeSelectedKey, setMenuToBeSelectedKey] = useState('');
 
   const [ledgerTendermintAddress, setLedgerTendermintAddress] = useState('');
+  const [ledgerEvmAddress, setLedgerEvmAddress] = useState('');
   const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
   const [isLedgerEthAppConnected, setIsLedgerEthAppConnected] = useState(false);
+  const [isLedgerCosmosAppConnected, setIsLedgerCosmosAppConnected] = useState(false);
   const [isLedgerCroAppConnectModalVisible, setIsLedgerCroAppConnectModalVisible] = useState(false);
   const [isLedgerEthAppConnectModalVisible, setIsLedgerEthAppConnectModalVisible] = useState(false);
+  const [isLedgerCosmosAppConnectModalVisible, setIsLedgerCosmosAppConnectModalVisible] = useState(
+    false,
+  );
   const [
     isLedgerCreateAssetSuccessModalVisible,
     setIsLedgerCreateAssetSuccessModalVisible,
@@ -262,6 +272,7 @@ function HomeLayout(props: HomeLayoutProps) {
     walletSession: Session,
     tendermintAddress: string,
     evmAddress: string,
+    cosmosHubAddress: string,
   ) => {
     setFetchingDB(true);
     try {
@@ -270,6 +281,7 @@ function HomeLayout(props: HomeLayoutProps) {
         walletSession,
         tendermintAddress,
         evmAddress,
+        cosmosHubAddress,
       );
       setIsLedgerCreateAssetSuccessModalVisible(true);
     } catch (e) {
@@ -285,6 +297,7 @@ function HomeLayout(props: HomeLayoutProps) {
       const tendermintAddress = await device.getAddress(
         walletSession.wallet.addressIndex,
         walletSession.wallet.config.network.addressPrefix,
+        SupportedChainName.CRYPTO_ORG,
         walletSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
         false,
       );
@@ -327,18 +340,16 @@ function HomeLayout(props: HomeLayoutProps) {
   };
 
   const checkIsLedgerEthAppConnected = async (walletSession: Session) => {
-    let hwok = false;
-    let ledgerEvmAddress = '';
     try {
       const device: ISignerProvider = createLedgerDevice();
 
-      ledgerEvmAddress = await device.getEthAddress(
+      const evmAddress = await device.getEthAddress(
         walletSession.wallet.addressIndex,
         walletSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
         false,
       );
       setIsLedgerEthAppConnected(true);
-
+      setLedgerEvmAddress(evmAddress);
       await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
@@ -346,8 +357,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setIsLedgerEthAppConnected(false);
       setIsLedgerEthAppConnectModalVisible(false);
       setIsLedgerModalButtonLoading(false);
-
-      hwok = true;
+      setIsLedgerCosmosAppConnectModalVisible(true);
     } catch (e) {
       let message = `${t('create.notification.ledger.message1')}`;
       let description = (
@@ -399,9 +409,91 @@ function HomeLayout(props: HomeLayoutProps) {
     await new Promise(resolve => {
       setTimeout(resolve, 2000);
     });
+  };
+
+  const checkIsLedgerCosmosAppConnected = async (walletSession: Session) => {
+    let hwok = false;
+    let ledgerCosmosAddress = '';
+    try {
+      const device: ISignerProvider = createLedgerDevice();
+
+      ledgerCosmosAddress = await device.getAddress(
+        walletSession.wallet.addressIndex,
+        'cosmos',
+        SupportedChainName.COSMOS_HUB,
+        walletSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
+        false,
+      );
+      setIsLedgerCosmosAppConnected(true);
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+
+      setIsLedgerCosmosAppConnected(false);
+      setIsLedgerCosmosAppConnectModalVisible(false);
+      setIsLedgerModalButtonLoading(false);
+
+      hwok = true;
+    } catch (e) {
+      let message = `${t('create.notification.ledger.message1')}`;
+      let description = (
+        <>
+          {t('create.notification.ledger.description1')}
+          <br /> -{' '}
+          <a
+            href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t('general.errorModalPopup.ledgerTroubleshoot')}
+          </a>
+        </>
+      );
+      if (walletSession.wallet.walletType === LEDGER_WALLET_TYPE) {
+        if (detectConditionsError(((e as unknown) as any).toString())) {
+          message = `${t('create.notification.ledger.message2')}`;
+          description = (
+            <>
+              {t('create.notification.ledger.description2')}
+              <br /> -{' '}
+              <a
+                href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t('general.errorModalPopup.ledgerTroubleshoot')}
+              </a>
+            </>
+          );
+        }
+      }
+
+      setIsLedgerCosmosAppConnected(false);
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+      setIsLedgerCosmosAppConnectModalVisible(false);
+      setIsLedgerModalButtonLoading(false);
+
+      notification.error({
+        message,
+        description,
+        placement: 'topRight',
+        duration: 20,
+      });
+    }
+    await new Promise(resolve => {
+      setTimeout(resolve, 2000);
+    });
     if (hwok) {
       // proceed
-      migrateLedgerAsset(walletSession, ledgerTendermintAddress, ledgerEvmAddress);
+      migrateLedgerAsset(
+        walletSession,
+        ledgerTendermintAddress,
+        ledgerEvmAddress,
+        ledgerCosmosAddress,
+      );
     }
   };
 
@@ -445,6 +537,35 @@ function HomeLayout(props: HomeLayoutProps) {
     }, 1000);
   };
 
+  const checkBridgeConfigs = async (walletSession?: Session) => {
+    if (!walletSession || !walletSession.wallet) {
+      return;
+    }
+
+    setTimeout(async () => {
+      const allConfigs = await walletService.storageService.fetchAllBridgeConfigs();
+
+      if (allConfigs.length < 6) {
+        const updateBridgeConfigsNotificationKey = 'updateBridgeConfigsNotificationKey';
+        const bridgeService = new BridgeService(walletService.storageService);
+        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.COSMOS_HUB_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_COSMOS_HUB);
+
+        notification.info({
+          message: 'New config setting found',
+          description: 'Your bridge config setting is updated!',
+          duration: 15,
+          key: updateBridgeConfigsNotificationKey,
+          placement: 'topRight',
+        });
+      }
+    }, 5_000);
+  };
+
   const checkCorrectExplorerUrl = async (walletSession?: Session) => {
     if (!walletSession || !walletSession.wallet) {
       return;
@@ -470,6 +591,8 @@ function HomeLayout(props: HomeLayoutProps) {
         bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
         bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
         bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.COSMOS_HUB_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_COSMOS_HUB);
 
         // Update All Assets in All Wallets
         const allWallets = await walletService.retrieveAllWallets();
@@ -517,11 +640,10 @@ function HomeLayout(props: HomeLayoutProps) {
                 explorer: {
                   baseUrl: `${explorerUrl}`,
                   tx: `${explorerUrl}/tx`,
-                  address: `${explorerUrl}/${
-                    asset.assetType === UserAssetType.TENDERMINT ||
-                    asset.assetType === UserAssetType.IBC
-                      ? 'account'
-                      : 'address'
+                  address: `${explorerUrl}/${asset.assetType === UserAssetType.TENDERMINT ||
+                      asset.assetType === UserAssetType.IBC
+                    ? 'account'
+                    : 'address'
                   }`,
                   validator: `${explorerUrl}/validator`,
                 },
@@ -657,6 +779,7 @@ function HomeLayout(props: HomeLayoutProps) {
       const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
       const allWalletsData = await walletService.retrieveAllWallets();
       const currentMarketData = await walletService.retrieveAssetPrice(
+        currentAsset?.assetType,
         currentAsset?.mainnetSymbol,
         currentSession.currency,
       );
@@ -716,6 +839,7 @@ function HomeLayout(props: HomeLayoutProps) {
         ...currentSession,
         activeAsset: currentAsset,
       });
+      checkBridgeConfigs(currentSession);
     };
 
     if (!didMountRef.current) {
@@ -775,6 +899,7 @@ function HomeLayout(props: HomeLayoutProps) {
       menuSelectedKey = '/home';
     }
 
+    const walletConnectState = useRecoilValue(walletConnectStateAtom);
     const homeMenuItemList = [
       {
         label: conditionalLink('/home', t('navbar.home')),
@@ -798,10 +923,10 @@ function HomeLayout(props: HomeLayoutProps) {
       },
       !isTestnet
         ? {
-            label: conditionalLink('/dapp', t('navbar.dapp')),
-            key: '/dapp',
-            icon: <Icon component={IconDApp} />,
-          }
+          label: conditionalLink('/dapp', t('navbar.dapp')),
+          key: '/dapp',
+          icon: <Icon component={IconDApp} />,
+        }
         : null,
       {
         label: conditionalLink('/governance', t('navbar.governance')),
@@ -819,6 +944,14 @@ function HomeLayout(props: HomeLayoutProps) {
         icon: <SettingOutlined />,
       },
     ];
+
+    if (walletConnectState.connected) {
+      homeMenuItemList.push({
+        label: conditionalLink('/walletconnect', 'WalletConnect'),
+        key: '/walletconnect',
+        icon: <Icon component={IconWalletConnect} />,
+      });
+    }
 
     return (
       <Menu
@@ -841,29 +974,29 @@ function HomeLayout(props: HomeLayoutProps) {
     const walletMenuItemList = [
       ...(walletList.length <= LedgerWalletMaximum
         ? [
-            {
-              label: conditionalLink('/restore', t('navbar.wallet.restore')),
-              key: 'restore-wallet-item',
-              className: 'restore-wallet-item',
-              icon: <ReloadOutlined style={{ color: '#1199fa' }} />,
-            },
-            {
-              label: conditionalLink('/create', t('navbar.wallet.create')),
-              key: 'create-wallet-item',
-              className: 'create-wallet-item',
-              icon: <PlusOutlined style={{ color: '#1199fa' }} />,
-            },
-          ]
+          {
+            label: conditionalLink('/restore', t('navbar.wallet.restore')),
+            key: 'restore-wallet-item',
+            className: 'restore-wallet-item',
+            icon: <ReloadOutlined style={{ color: '#1199fa' }} />,
+          },
+          {
+            label: conditionalLink('/create', t('navbar.wallet.create')),
+            key: 'create-wallet-item',
+            className: 'create-wallet-item',
+            icon: <PlusOutlined style={{ color: '#1199fa' }} />,
+          },
+        ]
         : []),
       ...(walletList.length > 1
         ? [
-            {
-              label: t('navbar.wallet.delete'),
-              key: 'delete-wallet-item',
-              className: 'delete-wallet-item',
-              icon: <DeleteOutlined style={{ color: '#f27474' }} />,
-            },
-          ]
+          {
+            label: t('navbar.wallet.delete'),
+            key: 'delete-wallet-item',
+            className: 'delete-wallet-item',
+            icon: <DeleteOutlined style={{ color: '#f27474' }} />,
+          },
+        ]
         : []),
       {
         label: conditionalLink('/wallet', t('navbar.wallet.list')),
@@ -983,6 +1116,7 @@ function HomeLayout(props: HomeLayoutProps) {
       <Layout>
         <Sider className="home-sider">
           <div className="logo" />
+          <WalletConnectModal />
           <div className="version">DEFI DESKTOP WALLET v{buildVersion}</div>
           <HomeMenu />
           <Button
@@ -1073,10 +1207,9 @@ function HomeLayout(props: HomeLayoutProps) {
                 <div className="item">
                   <Alert
                     type="warning"
-                    message={`${t('navbar.wallet.modal.warning1')} ${
-                      session.wallet.walletType !== LEDGER_WALLET_TYPE
-                        ? t('navbar.wallet.modal.warning2')
-                        : ''
+                    message={`${t('navbar.wallet.modal.warning1')} ${session.wallet.walletType !== LEDGER_WALLET_TYPE
+                      ? t('navbar.wallet.modal.warning2')
+                      : ''
                     }`}
                     showIcon
                   />
@@ -1161,7 +1294,7 @@ function HomeLayout(props: HomeLayoutProps) {
             setIsAnnouncementVisible(false);
             generalConfigService.setHasShownAnalyticsPopup(true);
           }}
-          handleOk={() => {}}
+          handleOk={() => { }}
           footer={[]}
         >
           <>
@@ -1242,7 +1375,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   setIsLedgerModalButtonLoading(true);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>
@@ -1290,7 +1423,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   setIsLedgerModalButtonLoading(true);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>
@@ -1308,6 +1441,54 @@ function HomeLayout(props: HomeLayoutProps) {
                   <IconEth style={{ color: '#fff' }} />
                 </div>
                 Ethereum App
+              </>
+            )}
+          </div>
+        </LedgerModalPopup>
+        <LedgerModalPopup
+          isModalVisible={isLedgerCosmosAppConnectModalVisible}
+          handleCancel={() => {
+            setIsLedgerCosmosAppConnectModalVisible(false);
+          }}
+          handleOk={() => {
+            setIsLedgerCosmosAppConnectModalVisible(false);
+          }}
+          title={
+            isLedgerCosmosAppConnected
+              ? t('home.ledgerModalPopup.tendermintAsset.title1')
+              : t('home.ledgerModalPopup.tendermintAsset.title2')
+          }
+          footer={[
+            isLedgerCosmosAppConnected ? (
+              <></>
+            ) : (
+              <Button
+                type="primary"
+                size="small"
+                className="btn-restart"
+                onClick={() => {
+                  checkIsLedgerCosmosAppConnected(session);
+                  setIsLedgerModalButtonLoading(true);
+                }}
+                loading={isLedgerModalButtonLoading}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              >
+                {t('general.connect')}
+              </Button>
+            ),
+          ]}
+          image={isLedgerCosmosAppConnected ? <SuccessCheckmark /> : <IconLedger />}
+        >
+          <div className="description">
+            {isLedgerCosmosAppConnected ? (
+              t('create.ledgerModalPopup.tendermintAddress.description1')
+            ) : (
+              <>
+                {t('create.ledgerModalPopup.tendermintAddress.description3')}
+                <div className="ledger-app-icon">
+                  <IconCosmos style={{ color: '#fff' }} />
+                </div>
+                Cosmos App
               </>
             )}
           </div>

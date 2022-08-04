@@ -215,6 +215,7 @@
   "create.ledgerModalPopup.evmAddress.description1": "你的Ledger錢包已經成功連接。",
   "create.ledgerModalPopup.evmAddress.description2": "請在Ledger錢包上打開 Ethereum App 再確認連接",
   "create.ledgerModalPopup.evmAddress.description3": "請在Ledger錢包上打開以下 App",
+  "create.ledgerModalPopup.confirmAppConnection.description1": "請在Ledger錢包上打開 {{ app }} App 再確認連接",
   "restore.title1": "復原錢包",
   "restore.title2": "自定義配置",
   "restore.slogan1": "為你的錢包創建名字和選擇網絡。",

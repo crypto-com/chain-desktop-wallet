@@ -297,31 +297,31 @@ const GovernancePage = () => {
     // in percentage
     const yesRate = totalVotes.gt('0')
       ? yesValue
-          .div(totalVotes)
-          .times(100)
-          .toFixed(2)
-      : `n.a.`;
+        .div(totalVotes)
+        .times(100)
+        .toFixed(2)
+      : 'n.a.';
 
     const noRate = totalVotes.gt('0')
       ? noValue
-          .div(totalVotes)
-          .times(100)
-          .toFixed(2)
-      : `n.a.`;
+        .div(totalVotes)
+        .times(100)
+        .toFixed(2)
+      : 'n.a.';
 
     const noWithVetoRate = totalVotes.gt('0')
       ? noWithVetoValue
-          .div(totalVotes)
-          .times(100)
-          .toFixed(2)
-      : `n.a.`;
+        .div(totalVotes)
+        .times(100)
+        .toFixed(2)
+      : 'n.a.';
 
     const abstainRate = totalVotes.gt('0')
       ? abstainValue
-          .div(totalVotes)
-          .times(100)
-          .toFixed(2)
-      : `n.a.`;
+        .div(totalVotes)
+        .times(100)
+        .toFixed(2)
+      : 'n.a.';
 
     const baseUnitDenominator = 1_0000_0000;
     setProposalFigures({
@@ -1003,7 +1003,27 @@ const GovernancePage = () => {
                         renderItem={(item: ProposalModel) => (
                           <List.Item
                             key={item.proposal_id}
-                            actions={rightSideItem(item)}
+                            actions={
+                              item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
+                                ? []
+                                : [
+                                  <IconText
+                                    icon={LikeOutlined}
+                                    text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                                    key="list-vertical-yes-o"
+                                  />,
+                                  <IconText
+                                    icon={DislikeOutlined}
+                                    text={getUIVoteAmount(
+                                      Big(item.final_tally_result.no)
+                                        .add(item.final_tally_result.no_with_veto)
+                                        .toFixed(),
+                                      userAsset,
+                                    )}
+                                    key="list-vertical-no-o"
+                                  />,
+                                ]
+                            }
                             onClick={() => {
                               setProposal(item);
                               setIsProposalVisible(true);
@@ -1022,46 +1042,46 @@ const GovernancePage = () => {
                                   <div className="proposal-type">{checkProposalType(item)}</div>
                                   {item.status ===
                                   ProposalStatuses.PROPOSAL_STATUS_DEPOSIT_PERIOD ? (
-                                    <span className="time-container">
-                                      <FieldTimeOutlined />{' '}
-                                      <span className="time-area">
-                                        <span className="time-label">
-                                          {' '}
-                                          {t('governance.start')}:{' '}
-                                        </span>
-                                        <span className="time">
-                                          {moment(item.submit_time).format('DD/MM/YYYY')}
-                                        </span>
-                                      </span>{' '}
-                                      {' - '}{' '}
-                                      <span className="time-area">
-                                        <span className="time-label">{t('governance.end')}: </span>
-                                        <span className="time">
-                                          {moment(item.deposit_end_time).format('DD/MM/YYYY')}
-                                        </span>
-                                      </span>
-                                    </span>
-                                  ) : (
-                                    <span className="time-container">
-                                      <FieldTimeOutlined />{' '}
-                                      <span className="time-area">
-                                        <span className="time-label">
-                                          {' '}
-                                          {t('governance.start')}:{' '}
-                                        </span>
-                                        <span className="time">
-                                          {moment(item.voting_start_time).format('DD/MM/YYYY')}
-                                        </span>
-                                      </span>{' '}
-                                      {' - '}{' '}
-                                      <span className="time-area">
-                                        <span className="time-label">{t('governance.end')}: </span>
-                                        <span className="time">
-                                          {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                      <span className="time-container">
+                                        <FieldTimeOutlined />{' '}
+                                        <span className="time-area">
+                                          <span className="time-label">
+                                            {' '}
+                                            {t('governance.start')}:{' '}
+                                          </span>
+                                          <span className="time">
+                                            {moment(item.submit_time).format('DD/MM/YYYY')}
+                                          </span>
+                                        </span>{' '}
+                                        {' - '}{' '}
+                                        <span className="time-area">
+                                          <span className="time-label">{t('governance.end')}: </span>
+                                          <span className="time">
+                                            {moment(item.deposit_end_time).format('DD/MM/YYYY')}
+                                          </span>
                                         </span>
                                       </span>
-                                    </span>
-                                  )}
+                                    ) : (
+                                      <span className="time-container">
+                                        <FieldTimeOutlined />{' '}
+                                        <span className="time-area">
+                                          <span className="time-label">
+                                            {' '}
+                                            {t('governance.start')}:{' '}
+                                          </span>
+                                          <span className="time">
+                                            {moment(item.voting_start_time).format('DD/MM/YYYY')}
+                                          </span>
+                                        </span>{' '}
+                                        {' - '}{' '}
+                                        <span className="time-area">
+                                          <span className="time-label">{t('governance.end')}: </span>
+                                          <span className="time">
+                                            {moment(item.voting_end_time).format('DD/MM/YYYY')}
+                                          </span>
+                                        </span>
+                                      </span>
+                                    )}
                                 </>
                               }
                             />
@@ -1088,22 +1108,22 @@ const GovernancePage = () => {
                               item.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD
                                 ? []
                                 : [
-                                    <IconText
-                                      icon={LikeOutlined}
-                                      text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
-                                      key="list-vertical-yes-o"
-                                    />,
-                                    <IconText
-                                      icon={DislikeOutlined}
-                                      text={getUIVoteAmount(
-                                        Big(item.final_tally_result.no)
-                                          .add(item.final_tally_result.no_with_veto)
-                                          .toFixed(),
-                                        userAsset,
-                                      )}
-                                      key="list-vertical-no-o"
-                                    />,
-                                  ]
+                                  <IconText
+                                    icon={LikeOutlined}
+                                    text={getUIVoteAmount(item.final_tally_result.yes, userAsset)}
+                                    key="list-vertical-yes-o"
+                                  />,
+                                  <IconText
+                                    icon={DislikeOutlined}
+                                    text={getUIVoteAmount(
+                                      Big(item.final_tally_result.no)
+                                        .add(item.final_tally_result.no_with_veto)
+                                        .toFixed(),
+                                      userAsset,
+                                    )}
+                                    key="list-vertical-no-o"
+                                  />,
+                                ]
                             }
                             onClick={() => {
                               setProposal(item);
@@ -1434,10 +1454,10 @@ const GovernancePage = () => {
           {broadcastResult?.code !== undefined &&
           broadcastResult?.code !== null &&
           broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">{t('general.successModalPopup.timeout.description')}</div>
-          ) : (
-            <div className="description">{t('general.successModalPopup.vote.description')}</div>
-          )}
+              <div className="description">{t('general.successModalPopup.timeout.description')}</div>
+            ) : (
+              <div className="description">{t('general.successModalPopup.vote.description')}</div>
+            )}
           {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
         </>
       </SuccessModalPopup>

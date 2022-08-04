@@ -1,17 +1,18 @@
+/**
+ * @jest-environment node
+ */
 import 'mocha';
 import { expect } from 'chai';
-import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import { DefaultWalletConfigs, NetworkName } from '../../config/StaticConfig';
 import { WalletCreateOptions, WalletCreator } from '../WalletCreator';
 import { StorageService } from './StorageService';
 import { Session } from '../../models/Session';
 import { SettingsDataUpdate, Wallet } from '../../models/Wallet';
 import { getRandomId } from '../../crypto/RandomGen';
-import { AssetMarketPrice, UserAsset } from '../../models/UserAsset';
+import { AssetMarketPrice, UserAsset, UserAssetType } from '../../models/UserAsset';
 import { DerivationPathStandard } from '../signers/LedgerSigner';
 
-jest.setTimeout(20_000);
-
-function buildTestWallet(name?: string) {
+async function buildTestWallet(name?: string) {
   const testNetConfig = DefaultWalletConfigs.TestNetConfig;
 
   const createOptions: WalletCreateOptions = {
@@ -21,10 +22,10 @@ function buildTestWallet(name?: string) {
     addressIndex: 0,
     derivationPathStandard: DerivationPathStandard.BIP44,
   };
-  return new WalletCreator(createOptions).create().wallet;
+  return (await new WalletCreator(createOptions).create()).wallet;
 }
 
-function buildMainnetWallet(name?: string) {
+async function buildMainnetWallet(name?: string) {
   const mainNetConfig = DefaultWalletConfigs.MainNetConfig;
 
   const createOptions: WalletCreateOptions = {
@@ -34,12 +35,12 @@ function buildMainnetWallet(name?: string) {
     addressIndex: 0,
     derivationPathStandard: DerivationPathStandard.BIP44,
   };
-  return new WalletCreator(createOptions).create().wallet;
+  return (await new WalletCreator(createOptions).create()).wallet;
 }
 
 describe('Testing Full Storage Service', () => {
   it('Test creating and storing a new wallet', async () => {
-    const wallet = buildTestWallet();
+    const wallet = await buildTestWallet();
     const newWalletAddress = wallet.address;
     const walletIdentifier = wallet.identifier;
 
@@ -55,7 +56,7 @@ describe('Testing Full Storage Service', () => {
   });
 
   it('Test session storage ', async () => {
-    const wallet = buildTestWallet();
+    const wallet = await buildTestWallet();
     const walletIdentifier = wallet.identifier;
     const session = new Session(wallet);
 
@@ -74,7 +75,7 @@ describe('Testing Full Storage Service', () => {
   it('Test loading all persisted wallets', async () => {
     const mockWalletStore = new StorageService(`test-load-all-${getRandomId()}`);
     for (let i = 0; i < 10; i++) {
-      const wallet: Wallet = buildTestWallet();
+      const wallet: Wallet = await buildTestWallet();
       mockWalletStore.saveWallet(wallet);
     }
 
@@ -84,7 +85,7 @@ describe('Testing Full Storage Service', () => {
 
   it('Test updating wallet fees settings', async () => {
     const mockWalletStore = new StorageService(`test-update-wallet-fees-settings-${getRandomId()}`);
-    const wallet: Wallet = buildTestWallet();
+    const wallet: Wallet = await buildTestWallet();
     const walletId = wallet.identifier;
     await mockWalletStore.saveWallet(wallet);
 
@@ -124,7 +125,7 @@ describe('Testing Full Storage Service', () => {
 
   it('Test updating wallet settings data', async () => {
     const mockWalletStore = new StorageService(`test-update-wallet-settings-${getRandomId()}`);
-    const wallet: Wallet = buildTestWallet();
+    const wallet: Wallet = await buildTestWallet();
     const walletId = wallet.identifier;
 
     await mockWalletStore.saveWallet(wallet);
@@ -168,7 +169,7 @@ describe('Testing Full Storage Service', () => {
 
   it('Test wallet config : Enable and Disable default memo', async () => {
     const mockWalletStore = new StorageService(`test-update-wallet-memo-settings-${getRandomId()}`);
-    const wallet: Wallet = buildTestWallet();
+    const wallet: Wallet = await buildTestWallet();
     const walletId = wallet.identifier;
 
     await mockWalletStore.saveWallet(wallet);
@@ -232,6 +233,7 @@ describe('Testing Full Storage Service', () => {
 
     const assetMarketPrice: AssetMarketPrice = {
       assetSymbol: 'CRO',
+      assetType: UserAssetType.EVM,
       currency: 'USD',
       dailyChange: '-2.48',
       price: '0.071',
@@ -239,7 +241,7 @@ describe('Testing Full Storage Service', () => {
 
     await mockWalletStore.saveAssetMarketPrice(assetMarketPrice);
 
-    const fetchedAsset = await mockWalletStore.retrieveAssetPrice('CRO', 'USD');
+    const fetchedAsset = await mockWalletStore.retrieveAssetPrice(UserAssetType.EVM, 'CRO', 'USD');
 
     expect(fetchedAsset.assetSymbol).to.eq('CRO');
     expect(fetchedAsset.currency).to.eq('USD');
@@ -251,7 +253,7 @@ describe('Testing Full Storage Service', () => {
 
     await mockWalletStore.saveAssetMarketPrice(fetchedAsset);
 
-    const updatedAsset = await mockWalletStore.retrieveAssetPrice('CRO', 'USD');
+    const updatedAsset = await mockWalletStore.retrieveAssetPrice(UserAssetType.EVM, 'CRO', 'USD');
 
     expect(updatedAsset.assetSymbol).to.eq('CRO');
     expect(updatedAsset.currency).to.eq('USD');
@@ -290,7 +292,7 @@ describe('Testing Full Storage Service', () => {
   });
 
   it('Test wallet deletion', async () => {
-    const wallet = buildTestWallet();
+    const wallet = await buildTestWallet();
     const newWalletAddress = wallet.address;
     const walletIdentifier = wallet.identifier;
 
@@ -322,15 +324,15 @@ describe('Testing Full Storage Service', () => {
   });
 
   it('Test general settings enable/disable ', async () => {
-    const walletTestnet1 = buildTestWallet('My-TEST-WalletZZ');
+    const walletTestnet1 = await buildTestWallet('My-TEST-WalletZZ');
     const walletTestnet1ID = walletTestnet1.identifier;
 
-    const walletTestnet2 = buildTestWallet('TheBestTestnetWalletZ');
-    const walletTestnet3 = buildTestWallet('TheTestnetWalletZ');
+    const walletTestnet2 = await buildTestWallet('TheBestTestnetWalletZ');
+    const walletTestnet3 = await buildTestWallet('TheTestnetWalletZ');
 
-    const walletMainnet1 = buildMainnetWallet('MainNetWalletX');
+    const walletMainnet1 = await buildMainnetWallet('MainNetWalletX');
     const walletMainnet1ID = walletMainnet1.identifier;
-    const walletMainnet2 = buildMainnetWallet('MainNetWalletX22');
+    const walletMainnet2 = await buildMainnetWallet('MainNetWalletX22');
 
     const mockWalletStore = new StorageService(
       `test-general-settings-propagation-${getRandomId()}`,
@@ -352,7 +354,7 @@ describe('Testing Full Storage Service', () => {
     }
 
     // GeneralSettingsPropagation updated for TESTNET wallets
-    await mockWalletStore.updateGeneralSettingsPropagation('TESTNET', true);
+    await mockWalletStore.updateGeneralSettingsPropagation(NetworkName.TESTNET, true);
 
     const dataSettings: SettingsDataUpdate = {
       chainId: 'testnet-xxx-2',
@@ -368,7 +370,7 @@ describe('Testing Full Storage Service', () => {
 
     // eslint-disable-next-line no-restricted-syntax
     for (const wallet of allWallets) {
-      if (wallet.config.name === 'TESTNET') {
+      if (wallet.config.name === NetworkName.TESTNET) {
         expect(wallet.config.enableGeneralSettings).to.eq(true);
         expect(wallet.config.network.chainId).to.eq('testnet-xxx-2');
         expect(wallet.config.fee.gasLimit).to.eq('330000');
@@ -384,7 +386,7 @@ describe('Testing Full Storage Service', () => {
     }
 
     // GeneralSettingsPropagation now updated for MAINNET wallets
-    await mockWalletStore.updateGeneralSettingsPropagation('MAINNET', true);
+    await mockWalletStore.updateGeneralSettingsPropagation(NetworkName.MAINNET, true);
     const dataSettingsMainnet: SettingsDataUpdate = {
       chainId: 'MainnetZZ-ChainID',
       gasLimit: '3300022',
@@ -400,7 +402,7 @@ describe('Testing Full Storage Service', () => {
     // eslint-disable-next-line no-restricted-syntax
     for (const wallet of allWalletsAfterMainnetEnabledPropagation) {
       expect(wallet.config.enableGeneralSettings).to.eq(true);
-      if (wallet.config.name === 'MAINNET') {
+      if (wallet.config.name === NetworkName.MAINNET) {
         expect(wallet.config.network.chainId).to.eq('MainnetZZ-ChainID');
         expect(wallet.config.fee.gasLimit).to.eq('3300022');
         expect(wallet.config.fee.networkFee).to.eq('12022');
@@ -410,7 +412,7 @@ describe('Testing Full Storage Service', () => {
         );
       }
 
-      if (wallet.config.name === 'TESTNET') {
+      if (wallet.config.name === NetworkName.TESTNET) {
         expect(wallet.config.enableGeneralSettings).to.eq(true);
         expect(wallet.config.network.chainId).to.eq('testnet-xxx-2');
         expect(wallet.config.fee.gasLimit).to.eq('330000');

@@ -19,7 +19,7 @@ export function getBaseScaledAmount(amount: string = '0', asset: UserAsset): str
 }
 
 /// E.G : From 5000 BASETRCRO to 0.00005 TCRO
-export function getNormalScaleAmount(amount: string = '0', asset: UserAsset): string {
+export function getNormalScaleAmount(amount: string = '0', asset: Pick<UserAsset, 'decimals'>): string {
   const exp = Big(10).pow(asset.decimals);
   return Big(amount)
     .div(exp)
@@ -54,7 +54,7 @@ export const formatLargeNumber = (n: any): string => {
   if (n >= 1e6 && n < 1e9) return `${+(n / 1e6).toFixed(1)}M`;
   if (n >= 1e9 && n < 1e12) return `${+(n / 1e9).toFixed(1)}B`;
   if (n >= 1e12) return `${+(n / 1e12).toFixed(1)}T`;
-  return ``;
+  return '';
 };
 
 export function getUIVoteAmount(amount: string = '0', asset: UserAsset) {

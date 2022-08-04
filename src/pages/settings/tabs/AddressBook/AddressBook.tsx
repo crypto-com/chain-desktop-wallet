@@ -98,8 +98,8 @@ const AddressBook = () => {
                   onSuccess: () => {
                     setCurrentEditContact(contact);
                     setIsAddModalShowing(true);
-                  }
-                })
+                  },
+                });
               }}
             >
               {t('settings.addressBook.edit')}
@@ -109,8 +109,8 @@ const AddressBook = () => {
                 showPasswordModal({
                   onSuccess: () => {
                     setCurrentDeleteContact(contact);
-                  }
-                })
+                  },
+                });
               }}
             >
               {t('settings.addressBook.remove')}
@@ -201,8 +201,8 @@ const AddressBook = () => {
           showPasswordModal({
             onSuccess: () => {
               setIsAddModalShowing(true);
-            }
-          })
+            },
+          });
         }}
       >
         {t('settings.addressBook.addNewAddress')}

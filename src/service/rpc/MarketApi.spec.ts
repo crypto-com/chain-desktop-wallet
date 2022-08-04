@@ -10,6 +10,9 @@ import {
   usdToFiatConversionRate,
   vvsFinancePrice,
 } from './test/mock.marketapi';
+import { CRONOS_EVM_ASSET } from '../../config/StaticAssets';
+import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import { UserAsset, UserAssetType } from '../../models/UserAsset';
 
 describe('MarketApi', () => {
   let axiosMock: MockAdapter;
@@ -74,10 +77,18 @@ describe('MarketApi', () => {
       })
       .replyOnce(200, usdToFiatConversionRate);
 
-    const vvsTokenPriceSGD = await croMarketPriceApi.getTokenPriceFromCryptoCom('VVS', 'SGD');
+    const vvsAsset: UserAsset = {
+      ...CRONOS_EVM_ASSET(DefaultWalletConfigs.MainNetConfig),
+      mainnetSymbol: 'VVS',
+      symbol: 'VVS',
+      assetType: UserAssetType.CRC_20_TOKEN,
+      walletId: '',
+    };
+
+    const vvsTokenPriceSGD = await croMarketPriceApi.getTokenPriceFromCryptoCom(vvsAsset, 'SGD');
     expect(vvsTokenPriceSGD).to.equals('0.00060383095694892');
 
-    const vvsTokenPriceUSD = await croMarketPriceApi.getTokenPriceFromCryptoCom('VVS', 'USD');
+    const vvsTokenPriceUSD = await croMarketPriceApi.getTokenPriceFromCryptoCom(vvsAsset, 'USD');
     expect(vvsTokenPriceUSD).to.equals('0.000442751368');
   });
 });

@@ -56,7 +56,7 @@ import {
   TextProposalRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
-import { capitalizeFirstLetter } from '../utils/utils';
+import { capitalizeFirstLetter, checkIfTestnet, sleep } from '../utils/utils';
 import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
 import { StorageService } from './storage/StorageService';
@@ -296,7 +296,7 @@ class WalletService {
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve(null);
     }
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
     const ibcAssets: UserAsset[] = await nodeRpc.loadIBCAssets(currentSession);
 
     const persistedAssets = await ibcAssets.map(async ibcAsset => {
@@ -404,10 +404,11 @@ class WalletService {
   }
 
   public async retrieveAssetPrice(
+    assetType: UserAssetType | undefined,
     assetSymbol: string,
     currency: string = 'USD',
   ): Promise<AssetMarketPrice> {
-    const price = await this.storageService.retrieveAssetPrice(assetSymbol, currency);
+    const price = await this.storageService.retrieveAssetPrice(assetType, assetSymbol, currency);
     return {
       ...price,
     };
@@ -693,6 +694,7 @@ class WalletService {
     session?: Session,
     tendermintAddress?: string,
     evmAddress?: string,
+    cosmosHubAddress?: string,
   ) {
     // 1. Check if current wallet has all expected static assets
     // 2. If static assets are missing, remove all existing non dynamic assets
@@ -703,21 +705,34 @@ class WalletService {
     const { wallet } = currentSession;
 
     if (await this.checkIfWalletNeedAssetCreation(currentSession)) {
+      const isTestnet = checkIfTestnet(wallet.config.network);
+      // Update wallet config to default settings here if necessary
+      const config = {
+        ...wallet.config,
+        name: isTestnet ? DefaultWalletConfigs.TestNetCroeseid4Config.name : wallet.config.name
+      };
+      
       await this.storageService.removeWalletAssets(wallet.identifier);
+      await sleep(3_000);
 
       const walletOps = new WalletOps();
-      const assetGeneration = walletOps.generate(wallet.config, wallet.identifier, phrase);
+      const assetGeneration = await walletOps.generate(config, wallet.identifier, phrase);
 
       if (currentSession?.wallet.walletType === LEDGER_WALLET_TYPE) {
-        if (tendermintAddress !== '' && evmAddress !== '') {
-          const tendermintAsset = assetGeneration.initialAssets.filter(
-            asset => asset.assetType === UserAssetType.TENDERMINT,
+        if (tendermintAddress !== '' && evmAddress !== '' && cosmosHubAddress !== '') {
+          const tendermintAsset = (await assetGeneration.initialAssets).filter(
+            asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO',
           )[0];
           tendermintAsset.address = tendermintAddress;
-          const evmAsset = assetGeneration.initialAssets.filter(
+          const evmAsset = (await assetGeneration.initialAssets).filter(
             asset => asset.assetType === UserAssetType.EVM,
           )[0];
           evmAsset.address = evmAddress;
+          const cosmosHubAsset = (await assetGeneration.initialAssets).filter(
+            asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'ATOM',
+          )[0];
+          cosmosHubAsset.address = cosmosHubAddress;
+
         } else {
           // eslint-disable-next-line no-console
           console.log('FAILED_TO_GET_LEDGER_ADDRESSES');
@@ -725,10 +740,10 @@ class WalletService {
         }
       }
 
-      await this.saveAssets(assetGeneration.initialAssets);
+      await this.saveAssets(await assetGeneration.initialAssets);
 
-      const activeAsset = assetGeneration.initialAssets[0];
-      const newSession = new Session(wallet, activeAsset);
+      const activeAsset = (await assetGeneration.initialAssets)[0];
+      const newSession = new Session({ ...wallet, config: config }, activeAsset);
       await this.setCurrentSession(newSession);
 
       await this.syncAll(newSession);
@@ -740,7 +755,7 @@ class WalletService {
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve(null);
     }
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
     return nodeRpc.loadLatestTally(proposalID);
   }
 }

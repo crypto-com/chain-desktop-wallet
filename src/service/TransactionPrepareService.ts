@@ -1,6 +1,7 @@
 import { TransactionConfig } from 'web3-eth';
 import { NodeRpcService } from './rpc/NodeRpcService';
 import { TransactionSigner } from './signers/TransactionSigner';
+import { CosmjsTendermintTransactionSigner } from './signers/CosmjsTendermintTransactionSigner';
 import { ISignerProvider } from './signers/SignerProvider';
 import { createLedgerDevice } from './LedgerService';
 import { LedgerTransactionSigner } from './signers/LedgerTransactionSigner';
@@ -21,15 +22,22 @@ export class TransactionPrepareService {
     const currentSession = await this.storageService.retrieveCurrentSession();
     const currentWallet = currentSession.wallet;
 
-    const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
+    const nodeRpc = await NodeRpcService.init({
+      baseUrl: currentSession.wallet.config.nodeUrl,
+      proxyUrl: currentSession.activeAsset?.config?.tendermintNetwork?.node?.proxyUrl,
+      clientUrl: currentSession.activeAsset?.config?.tendermintNetwork?.node?.clientUrl,
+    });
 
     const [accountNumber, accountSequence, latestBlock] = await Promise.all([
-      nodeRpc.fetchAccountNumber(currentSession.wallet.address),
-      nodeRpc.loadSequenceNumber(currentSession.wallet.address),
+      nodeRpc.fetchAccountNumber(currentSession.activeAsset?.address!),
+      nodeRpc.loadSequenceNumber(currentSession.activeAsset?.address!),
       nodeRpc.loadLatestBlock(),
     ]);
 
     const transactionSigner = new TransactionSigner(currentWallet.config);
+    const cosmjsTendermintTransactionSigner = new CosmjsTendermintTransactionSigner(
+      currentWallet.config,
+    );
     const signerProvider: ISignerProvider = createLedgerDevice();
 
     const tmpWalletConfig = currentWallet.config;
@@ -37,10 +45,10 @@ export class TransactionPrepareService {
     // eslint-disable-next-line no-console
     console.log('PREPARE_TX: ', {
       latestBlock,
-      address: currentSession.wallet.address,
+      address: currentSession.activeAsset?.address!,
       accountNumber,
       accountSequence,
-      chainId: currentSession.wallet.config.network.chainId,
+      chainId: currentSession.activeAsset?.config?.chainId,
     });
 
     const ledgerTransactionSigner = new LedgerTransactionSigner(
@@ -56,6 +64,7 @@ export class TransactionPrepareService {
       accountSequence,
       currentSession,
       transactionSigner,
+      cosmjsTendermintTransactionSigner,
       ledgerTransactionSigner,
       latestBlock,
     };

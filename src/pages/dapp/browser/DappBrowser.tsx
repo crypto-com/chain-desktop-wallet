@@ -13,7 +13,7 @@ import { secretStoreService } from '../../../service/storage/SecretStoreService'
 import { Dapp, DappBrowserIPC } from '../types';
 import { ProviderPreloadScriptPath } from './config';
 import { walletService } from '../../../service/WalletService';
-import { useRefCallback } from './useRefCallback';
+import { useRefCallback } from '../../../hooks/useRefCallback';
 import { useWebInfoProvider } from './useWebInfoProvider';
 import {
   IWebviewNavigationState,
@@ -22,6 +22,9 @@ import {
 } from './useWebviewStatusInfo';
 import { LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
+import { useAddChainModal } from '../hooks/useAddChainModal';
+import { useSwitchChainModal } from '../hooks/useSwitchChainModal';
+import { EVMChainConfig } from '../../../models/Chain';
 
 // use **only** one of the following
 // priority: dapp > dappURL
@@ -56,6 +59,12 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   );
   const [txFailedMessage, setTxFailedMessage] = useState('');
 
+  const { showWithConfig: showAddChainModal, dismiss: dismissAddChainModal } = useAddChainModal();
+  const {
+    showWithConfig: showSwitchChainModal,
+    dismiss: dismissSwitchChainModal,
+  } = useSwitchChainModal();
+
   const {
     title: providedTitle,
     faviconURL: providedFaviconURL,
@@ -89,11 +98,11 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
   }));
 
   const [txEvent, setTxEvent] = useState<
-    | DappBrowserIPC.SendTransactionEvent
-    | DappBrowserIPC.TokenApprovalEvent
-    | DappBrowserIPC.SignPersonalMessageEvent
-    | DappBrowserIPC.SignTypedMessageEvent
-    | DappBrowserIPC.SignMessageEvent
+  | DappBrowserIPC.SendTransactionEvent
+  | DappBrowserIPC.TokenApprovalEvent
+  | DappBrowserIPC.SignPersonalMessageEvent
+  | DappBrowserIPC.SignTypedMessageEvent
+  | DappBrowserIPC.SignMessageEvent
   >();
   const [requestConfirmationVisible, setRequestConfirmationVisible] = useState(false);
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
@@ -221,6 +230,50 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     },
   );
 
+  const onRequestAddEthereumChain = useRefCallback(
+    (
+      event: { chainConfig: EVMChainConfig },
+      successCallback: () => void,
+      errorCallback: (message: string) => void,
+    ) => {
+      showAddChainModal({
+        dappURL: providedURL,
+        faviconURL: providedFaviconURL,
+        config: event.chainConfig,
+        onApprove: () => {
+          successCallback();
+          dismissAddChainModal();
+        },
+        onCancel: () => {
+          errorCallback('User cancelled');
+          dismissAddChainModal();
+        },
+      });
+    },
+  );
+
+  const onRequestSwitchEthereumChain = useRefCallback(
+    (
+      event: { prev: EVMChainConfig; next: EVMChainConfig },
+      successCallback: () => void,
+      errorCallback: (message: string) => void,
+    ) => {
+      showSwitchChainModal({
+        dappURL: providedURL,
+        faviconURL: providedFaviconURL,
+        config: event.next,
+        onApprove: () => {
+          successCallback();
+          dismissSwitchChainModal();
+        },
+        onCancel: () => {
+          errorCallback('User cancelled');
+          dismissSwitchChainModal();
+        },
+      });
+    },
+  );
+
   const onFinishTransaction = useRefCallback(async (error: string) => {
     if (error?.length > 0) {
       // show error
@@ -263,8 +316,11 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
     onRequestSendTransaction: async (event, successCallback, errorCallback) => {
       onRequestSendTransaction.current(event, successCallback, errorCallback);
     },
-    onRequestAddEthereumChain: async () => {
-      // no-op, cause we only support cronos for now
+    onRequestAddEthereumChain: async (event, successCallback, errorCallback) => {
+      onRequestAddEthereumChain.current(event, successCallback, errorCallback);
+    },
+    onRequestSwitchEthereumChain: async (event, successCallback, errorCallback) => {
+      onRequestSwitchEthereumChain.current(event, successCallback, errorCallback);
     },
     onRequestWatchAsset: async () => {
       // no-op for now
@@ -331,6 +387,7 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
       )}
       {txEvent && requestConfirmationVisible && (
         <RequestConfirmation
+          isConfirming={false}
           event={txEvent}
           cronosAsset={cronosAsset}
           allMarketData={allMarketData}

@@ -18,6 +18,12 @@ export enum TransactionDirection {
   SELF,
 }
 
+export enum EthereumTransactionType {
+  TRANSFER = 'transfer',
+  UTF8TRANSFER = '0x636c6965',
+  APPROVE = 'approve',
+}
+
 export interface TransactionData {
   hash: string;
   memo: string | null;
@@ -164,6 +170,7 @@ export interface NftTransferRecord extends BaseCommonTransaction {
 export interface IBCTransactionRecord extends BaseCommonTransaction {
   txType: 'ibc';
   messageTypeName?: string;
+  sourceChain?: string;
   txData: BridgeTransaction;
 }
 

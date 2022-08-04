@@ -13,12 +13,15 @@ export class WalletCreator extends WalletOps {
     this.createOptions = options;
   }
 
-  public create(): WalletBuiltResult {
+  public async create(): Promise<WalletBuiltResult> {
     const options = this.createOptions;
     const walletIdentifier = getRandomId();
-    const { initialAssets, encryptedPhrase } = this.generate(options.config, walletIdentifier);
+    const { initialAssets, encryptedPhrase } = await this.generate(
+      options.config,
+      walletIdentifier,
+    );
 
-    const defaultAsset = initialAssets.filter(
+    const defaultAsset = (await initialAssets).filter(
       asset => asset.assetType === UserAssetType.TENDERMINT,
     )[0];
 
@@ -37,7 +40,7 @@ export class WalletCreator extends WalletOps {
 
     return {
       wallet: newWallet,
-      assets: initialAssets,
+      assets: await initialAssets,
     };
   }
 }

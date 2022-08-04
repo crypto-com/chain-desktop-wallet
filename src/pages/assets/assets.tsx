@@ -40,7 +40,7 @@ import TransactionDetail from './components/TransactionDetail';
 import TagMsgType from './components/TagMsgType';
 import FormSend from './components/FormSend';
 import { walletService } from '../../service/WalletService';
-import { getChainName, middleEllipsis } from '../../utils/utils';
+import { checkIfTestnet, getChainName, middleEllipsis } from '../../utils/utils';
 import { TransactionDirection, TransactionStatus } from '../../models/Transaction';
 import { AssetIcon } from '../../components/AssetIcon';
 import AssetTypeTooltip from './components/AssetTypeTooltip';
@@ -101,8 +101,7 @@ const convertTransactions = (
       time: `${moment(new Date(txData.date)).format('YYYY-MM-DD, HH:mm:ss Z')}`,
       amount: `${getUIDynamicAmount(txData.amount, asset)} ${txData.assetSymbol}`,
       stakedAmount: `${getUIDynamicAmount(txData.stakedAmount, asset)} ${txData.assetSymbol}`,
-      autoClaimedRewards: `${getUIDynamicAmount(txData.autoClaimedRewards, asset)} ${
-        txData.assetSymbol
+      autoClaimedRewards: `${getUIDynamicAmount(txData.autoClaimedRewards, asset)} ${txData.assetSymbol
       }`,
       msgTypeName: transaction.messageTypeName,
       direction: getDirection(txData.senderAddress, txData.receiverAddress),
@@ -118,7 +117,7 @@ const AssetsPage = () => {
   const allMarketData = useRecoilValue(allMarketState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setFetchingDB = useSetRecoilState(fetchingDBState);
-  const [fetchingComoponent, setFetchingComponent] = useRecoilState(fetchingComponentState);
+  const [fetchingComponent, setFetchingComponent] = useRecoilState(fetchingComponentState);
 
   // const [isLedger, setIsLedger] = useState(false);
   const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(session.activeAsset);
@@ -159,7 +158,9 @@ const AssetsPage = () => {
         syncTransactions(session.activeAsset);
         setCurrentAsset(session.activeAsset);
         setCurrentAssetMarketData(
-          allMarketData.get(`${session.activeAsset.mainnetSymbol}-${session.currency}`),
+          allMarketData.get(
+            `${session.activeAsset.assetType}-${session.activeAsset.mainnetSymbol}-${session.currency}`,
+          ),
         );
         setIsAssetVisible(true);
         setFetchingDB(false);
@@ -233,15 +234,17 @@ const AssetsPage = () => {
       // dataIndex: 'price',
       key: 'price',
       render: record => {
-        const assetMarketData = allMarketData.get(`${record.mainnetSymbol}-${session.currency}`);
+        const assetMarketData = allMarketData.get(
+          `${record.assetType}-${record.mainnetSymbol}-${session.currency}`,
+        );
         return (
           <>
             {assetMarketData &&
-            assetMarketData.price &&
-            record.mainnetSymbol === assetMarketData.assetSymbol
+              assetMarketData.price &&
+              record.mainnetSymbol === assetMarketData.assetSymbol
               ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
-                  assetMarketData.price,
-                ).format('0,0.00')} ${assetMarketData.currency}`
+                assetMarketData.price,
+              ).format('0,0.00')} ${assetMarketData.currency}`
               : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
           </>
         );
@@ -264,15 +267,17 @@ const AssetsPage = () => {
       // dataIndex: 'value',
       key: 'value',
       render: record => {
-        const assetMarketData = allMarketData.get(`${record.mainnetSymbol}-${session.currency}`);
+        const assetMarketData = allMarketData.get(
+          `${record.assetType}-${record.mainnetSymbol}-${session.currency}`,
+        );
         return (
           <>
             {assetMarketData &&
-            assetMarketData.price &&
-            record.mainnetSymbol === assetMarketData.assetSymbol
+              assetMarketData.price &&
+              record.mainnetSymbol === assetMarketData.assetSymbol
               ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
-                  getAssetBalancePrice(record, assetMarketData),
-                ).format('0,0.00')} ${assetMarketData?.currency}`
+                getAssetBalancePrice(record, assetMarketData),
+              ).format('0,0.00')} ${assetMarketData?.currency}`
               : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
           </>
         );
@@ -329,17 +334,17 @@ const AssetsPage = () => {
       ),
     },
     ...(currentAsset?.assetType === UserAssetType.TENDERMINT ||
-    currentAsset?.assetType === UserAssetType.IBC
+      currentAsset?.assetType === UserAssetType.IBC
       ? [
-          {
-            title: t('home.transactions.table1.msgTypeName'),
-            dataIndex: 'msgTypeName',
-            key: 'msgTypeName',
-            render: text => {
-              return <TagMsgType msgTypeName={text} />;
-            },
+        {
+          title: t('home.transactions.table1.msgTypeName'),
+          dataIndex: 'msgTypeName',
+          key: 'msgTypeName',
+          render: text => {
+            return <TagMsgType msgTypeName={text} />;
           },
-        ]
+        },
+      ]
       : []),
     {
       title: t('home.transactions.table1.amount'),
@@ -447,13 +452,12 @@ const AssetsPage = () => {
                         </div>
                         <div className="value">
                           {currentAssetMarketData &&
-                          currentAssetMarketData.price &&
-                          currentAsset?.mainnetSymbol === currentAssetMarketData.assetSymbol
-                            ? `${
-                                SUPPORTED_CURRENCY.get(currentAssetMarketData.currency)?.symbol
-                              }${numeral(
-                                getAssetBalancePrice(currentAsset, currentAssetMarketData),
-                              ).format('0,0.00')} ${currentAssetMarketData?.currency}`
+                            currentAssetMarketData.price &&
+                            currentAsset?.mainnetSymbol === currentAssetMarketData.assetSymbol
+                            ? `${SUPPORTED_CURRENCY.get(currentAssetMarketData.currency)?.symbol
+                            }${numeral(
+                              getAssetBalancePrice(currentAsset, currentAssetMarketData),
+                            ).format('0,0.00')} ${currentAssetMarketData?.currency}`
                             : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
                         </div>
                       </Content>
@@ -480,31 +484,31 @@ const AssetsPage = () => {
                       }
                     }}
                     centered
-                    // renderTabBar={() => {
-                    //   // renderTabBar={(props) => {
-                    //   return (
-                    //     <div className="tab-container">
-                    //       <div onClick={() => setActiveAssetTab('2')}>
-                    //         <>
-                    //           <Icon
-                    //             className={`tab ${activeAssetTab === '2' ? 'active' : ''}`}
-                    //             component={IconSend}
-                    //           />
-                    //           {t('navbar.send')}
-                    //         </>
-                    //       </div>
-                    //       <div onClick={() => setActiveAssetTab('3')}>
-                    //         <>
-                    //           <Icon
-                    //             className={`tab ${activeAssetTab === '3' ? 'active' : ''}`}
-                    //             component={IconReceive}
-                    //           />
-                    //           {t('navbar.receive')}
-                    //         </>
-                    //       </div>
-                    //     </div>
-                    //   );
-                    // }}
+                  // renderTabBar={() => {
+                  //   // renderTabBar={(props) => {
+                  //   return (
+                  //     <div className="tab-container">
+                  //       <div onClick={() => setActiveAssetTab('2')}>
+                  //         <>
+                  //           <Icon
+                  //             className={`tab ${activeAssetTab === '2' ? 'active' : ''}`}
+                  //             component={IconSend}
+                  //           />
+                  //           {t('navbar.send')}
+                  //         </>
+                  //       </div>
+                  //       <div onClick={() => setActiveAssetTab('3')}>
+                  //         <>
+                  //           <Icon
+                  //             className={`tab ${activeAssetTab === '3' ? 'active' : ''}`}
+                  //             component={IconReceive}
+                  //           />
+                  //           {t('navbar.receive')}
+                  //         </>
+                  //       </div>
+                  //     </div>
+                  //   );
+                  // }}
                   >
                     <TabPane tab={t('assets.tab2')} key="send">
                       <FormSend
@@ -517,28 +521,38 @@ const AssetsPage = () => {
                       <ReceiveDetail currentAsset={currentAsset} session={session} />
                     </TabPane>
                     <TabPane tab={t('assets.tab1')} key="transaction">
-                      <Table
-                        columns={TransactionColumns}
-                        dataSource={allTransactions}
-                        className="transaction-table"
-                        rowKey={record => record.key}
-                        locale={{
-                          triggerDesc: t('general.table.triggerDesc'),
-                          triggerAsc: t('general.table.triggerAsc'),
-                          cancelSort: t('general.table.cancelSort'),
-                        }}
-                        loading={{
-                          indicator: (
-                            <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />
-                          ),
-                          spinning: fetchingComoponent,
-                        }}
-                        expandable={{
-                          expandedRowRender: record => (
-                            <TransactionDetail transaction={record} session={session} />
-                          ),
-                        }}
-                      />
+                      {
+                        (currentAsset?.assetType === UserAssetType.EVM && currentAsset?.mainnetSymbol === 'ETH')
+                        || (currentAsset?.assetType === UserAssetType.TENDERMINT && checkIfTestnet(session.wallet.config.network) && currentAsset?.mainnetSymbol === 'ATOM')
+                        || currentAsset?.assetType === UserAssetType.ERC_20_TOKEN
+                          ? <div style={{ margin: '20px' }}>
+                            <a target="__blank" href={`${renderExplorerUrl(currentAsset.config, 'address')}/${currentAsset.address}`}>
+                              {t('assets.tx.checkOnExplorer')}
+                            </a>
+                          </div>
+                          : <Table
+                            columns={TransactionColumns}
+                            dataSource={allTransactions}
+                            className="transaction-table"
+                            rowKey={record => record.key}
+                            locale={{
+                              triggerDesc: t('general.table.triggerDesc'),
+                              triggerAsc: t('general.table.triggerAsc'),
+                              cancelSort: t('general.table.cancelSort'),
+                            }}
+                            loading={{
+                              indicator: (
+                                <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />
+                              ),
+                              spinning: fetchingComponent,
+                            }}
+                            expandable={{
+                              expandedRowRender: record => (
+                                <TransactionDetail transaction={record} session={session} />
+                              ),
+                            }}
+                          />
+                      }
                     </TabPane>
                   </Tabs>
                 </Content>
@@ -564,7 +578,9 @@ const AssetsPage = () => {
                       syncTransactions(selectedAsset);
                       setCurrentAsset(selectedAsset);
                       setCurrentAssetMarketData(
-                        allMarketData.get(`${selectedAsset.mainnetSymbol}-${session.currency}`),
+                        allMarketData.get(
+                          `${selectedAsset.assetType}-${selectedAsset.mainnetSymbol}-${session.currency}`,
+                        ),
                       );
                       setIsAssetVisible(true);
                     }, // click row

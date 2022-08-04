@@ -1,14 +1,18 @@
 import React from 'react';
 import { Avatar } from 'antd';
 import { UserAsset, UserAssetType } from '../../models/UserAsset';
+// import { getErc20IconUrlByContractAddress } from '../../utils/ERC20IconUrl';
 
 // because of we will persist the user asset in the database,
 // we don't want the icons urls change based on bundle system,
 // so treat the icons as static assets
 export const ICON_CRO_TENDERMINT = './assets/icon-cronos-tendermint.svg';
 export const ICON_CRO_EVM = './assets/icon-cronos-evm.svg';
+export const ICON_ETH_EVM = './assets/icon-eth-evm.svg';
+export const ICON_ATOM_TENDERMINT = './assets/icon-atom-tendermint.svg';
 export const ICON_BRIDGE_CRYPTO_ORG = './assets/icon-bridge-crypto-org.svg';
 export const ICON_BRIDGE_CRONOS = './assets/icon-bridge-cronos.svg';
+export const ICON_BRIDGE_COSMOSHUB = './assets/icon-atom-tendermint.svg';
 
 export const AssetIcon = (props: { asset: UserAsset }) => {
   const { asset } = props;
@@ -22,6 +26,12 @@ export const AssetIcon = (props: { asset: UserAsset }) => {
       return <img src={ICON_CRO_EVM} alt="cronos" className="asset-icon" />;
     }
   }
+  if (asset.mainnetSymbol === 'ATOM') {
+    return <img src={ICON_ATOM_TENDERMINT} alt="atom" className="asset-icon" />;
+  }
+  // if (asset.assetType === UserAssetType.ERC_20_TOKEN) {
+  //   return <img src={getErc20IconUrlByContractAddress(asset.contractAddress!)} alt={asset.symbol || "erc20"} className="asset-icon" />;
+  // }
 
   return icon_url ? (
     <img src={icon_url} alt={name} className="asset-icon" />
@@ -40,6 +50,9 @@ export const BridgeIcon = (props: { bridgeValue: string | undefined }) => {
       break;
     case 'CRONOS':
       icon = ICON_BRIDGE_CRONOS;
+      break;
+    case 'COSMOS_HUB':
+      icon = ICON_BRIDGE_COSMOSHUB;
       break;
     default:
       break;

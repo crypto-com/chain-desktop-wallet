@@ -3,15 +3,23 @@ import { getRandomId } from '../crypto/RandomGen';
 import { AssetCreationType, UserAssetConfig, UserAssetType } from '../models/UserAsset';
 import { WalletConfig, SupportedChainName } from './StaticConfig';
 import { checkIfTestnet } from '../utils/utils';
-import { ICON_CRO_EVM, ICON_CRO_TENDERMINT } from '../components/AssetIcon';
+import { ICON_ATOM_TENDERMINT, ICON_CRO_EVM, ICON_CRO_TENDERMINT, ICON_ETH_EVM } from '../components/AssetIcon';
 
 // This will be used later for asset recreation/migration
-export const STATIC_ASSET_COUNT = 2;
+export const STATIC_ASSET_COUNT = 4;
 
 // Update Explorer Url - https://cronoscan.com
 export const MAINNET_EVM_EXPLORER_URL = 'https://cronoscan.com';
 // There's no testnet explorer on cronoscan.com. Use cronos.org/explorer instead.
 export const TESTNET_EVM_EXPLORER_URL = 'https://cronos.org/explorer/testnet3';
+
+export const MAINNET_ETHEREUM_EXPLORER_URL = 'https://etherscan.io';
+export const ROPSTEN_ETHEREUM_EXPLORER_URL = 'https://ropsten.etherscan.io';
+export const RINKEBY_ETHEREUM_EXPLORER_URL = 'https://rinkeby.etherscan.io';
+
+export const MAINNET_TENDERMINT_COSMOS_HUB_EXPLORER_URL = 'https://www.mintscan.io/cosmos';
+export const TESTNET_TENDERMINT_COSMOS_HUB_EXPLORER_URL =
+  'https://explorer.theta-testnet.polypore.xyz';
 
 export const TestNetEvmConfig: UserAssetConfig = {
   explorer: {
@@ -20,7 +28,7 @@ export const TestNetEvmConfig: UserAssetConfig = {
   },
   explorerUrl: TESTNET_EVM_EXPLORER_URL,
   chainId: '338',
-  fee: { gasLimit: `50000`, networkFee: `20000000000` },
+  fee: { gasLimit: '50000', networkFee: '20000000000' },
   indexingUrl: 'https://cronos.org/explorer/testnet3/api',
   isLedgerSupportDisabled: false,
   isStakingDisabled: false,
@@ -35,7 +43,7 @@ export const MainNetEvmConfig: UserAssetConfig = {
   },
   explorerUrl: MAINNET_EVM_EXPLORER_URL,
   chainId: '25',
-  fee: { gasLimit: `50000`, networkFee: `20000000000` },
+  fee: { gasLimit: '50000', networkFee: '20000000000' },
   // indexingUrl sticks with https://cronos.org/explorer for now
   indexingUrl: 'https://cronos.org/explorer/api',
   isLedgerSupportDisabled: false,
@@ -81,6 +89,75 @@ export const CRONOS_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
   };
 };
 
+// Every created wallet get initialized with a new CRO asset
+export const ATOM_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
+  const { network } = walletConfig;
+  const assetSymbol = 'ATOM';
+  const isTestnet = checkIfTestnet(network);
+  const explorerUrl = isTestnet
+    ? TESTNET_TENDERMINT_COSMOS_HUB_EXPLORER_URL
+    : MAINNET_TENDERMINT_COSMOS_HUB_EXPLORER_URL;
+
+  const config: UserAssetConfig = {
+    explorerUrl,
+    explorer: {
+      baseUrl: `${explorerUrl}`,
+      tx: isTestnet ? `${explorerUrl}/transactions` : `${explorerUrl}/txs`,
+      address: `${explorerUrl}/account`,
+      validator: isTestnet ? `${explorerUrl}/validator` : `${explorerUrl}/validators`,
+    },
+    chainId: isTestnet ? 'theta-testnet-001' : 'cosmoshub-4',
+    fee: { gasLimit: '200000', networkFee: '1000' },
+    indexingUrl: isTestnet
+      ? ''
+      : 'https://cronos.org/ncw-quandra-api-middleware-server/quantra/adapter/api',
+    isLedgerSupportDisabled: true,
+    isStakingDisabled: true,
+    nodeUrl: isTestnet
+      ? 'https://rpc.sentry-01.theta-testnet.polypore.xyz'
+      : 'https://eth-indexing.crypto.org/cosmos/mainnet/rpc',
+    memoSupportDisabled: false,
+    tendermintNetwork: {
+      defaultNodeUrl: isTestnet
+        ? 'https://rpc.sentry-01.theta-testnet.polypore.xyz'
+        : 'https://eth-indexing.crypto.org/cosmos/mainnet/rpc',
+      chainName: SupportedChainName.COSMOS_HUB,
+      chainId: isTestnet ? 'theta-testnet-001' : 'cosmoshub-4',
+      addressPrefix: 'cosmos',
+      validatorPubKeyPrefix: 'cosmosvaloperpub',
+      validatorAddressPrefix: 'cosmosvaloper',
+      bip44Path: { coinType: 118, account: 0 },
+      coin: { baseDenom: 'uatom', croDenom: 'atom', denom: 'atom' },
+      node: {
+        clientUrl: isTestnet
+          ? 'https://rpc.sentry-01.theta-testnet.polypore.xyz'
+          : 'https://eth-indexing.crypto.org/cosmos/mainnet/rpc',
+        proxyUrl: isTestnet
+          ? 'https://rest.sentry-01.theta-testnet.polypore.xyz'
+          : 'https://eth-indexing.crypto.org/cosmos/mainnet/rest',
+      },
+    },
+  };
+
+  return {
+    balance: '0',
+    description: 'ATOM',
+    icon_url: ICON_ATOM_TENDERMINT,
+    identifier: getRandomId(),
+    name: SupportedChainName.COSMOS_HUB,
+    symbol: assetSymbol,
+    mainnetSymbol: 'ATOM', // This is to be used solely for markets data since testnet market prices is always non existent
+    stakedBalance: '0',
+    unbondingBalance: '0',
+    rewardsBalance: '0',
+    decimals: 6,
+    assetType: UserAssetType.TENDERMINT,
+    isSecondaryAsset: true,
+    assetCreationType: AssetCreationType.STATIC,
+    config,
+  };
+};
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CRONOS_EVM_ASSET = (walletConfig: WalletConfig) => {
   const { network } = walletConfig;
@@ -97,6 +174,57 @@ export const CRONOS_EVM_ASSET = (walletConfig: WalletConfig) => {
     name: SupportedChainName.CRONOS,
     symbol: isTestnet ? 'TCRO' : 'CRO',
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
+    stakedBalance: '0',
+    unbondingBalance: '0',
+    rewardsBalance: '0',
+    decimals: 18,
+    assetType: UserAssetType.EVM,
+    isSecondaryAsset: true,
+    assetCreationType: AssetCreationType.STATIC,
+    config,
+  };
+};
+
+export const ETH_ASSET = (walletConfig: WalletConfig) => {
+  const { network } = walletConfig;
+
+  const isTestnet = checkIfTestnet(network);
+
+  const config: UserAssetConfig = {
+    explorer: {
+      tx: isTestnet ? `${RINKEBY_ETHEREUM_EXPLORER_URL}/tx` : `${MAINNET_ETHEREUM_EXPLORER_URL}/tx`,
+      address: isTestnet
+        ? `${RINKEBY_ETHEREUM_EXPLORER_URL}/address`
+        : `${MAINNET_ETHEREUM_EXPLORER_URL}/address`,
+    },
+    explorerUrl: isTestnet
+      ? `${RINKEBY_ETHEREUM_EXPLORER_URL}`
+      : `${MAINNET_ETHEREUM_EXPLORER_URL}`,
+
+    chainId: isTestnet ? '4' : '1',
+
+    fee: { gasLimit: '50000', networkFee: '20000000000' },
+    // TODO: Change this to the production indexing url
+    indexingUrl: isTestnet
+      ? 'https://eth-indexing.crypto.org/ethereum/rinkeby/api/v1'
+      : 'https://eth-indexing.crypto.org/ethereum/mainnet/api/v1',
+    isLedgerSupportDisabled: false,
+    isStakingDisabled: false,
+    // TODO: Change this to the production node url
+    nodeUrl: isTestnet
+      ? 'https://eth-indexing.crypto.org/ethereum/rinkeby/rpc'
+      : 'https://eth-indexing.crypto.org/ethereum/mainnet/rpc',
+    memoSupportDisabled: true,
+  };
+
+  return {
+    balance: '0',
+    description: '',
+    icon_url: ICON_ETH_EVM,
+    identifier: getRandomId(),
+    name: SupportedChainName.ETHEREUM,
+    symbol: 'ETH',
+    mainnetSymbol: 'ETH', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
     unbondingBalance: '0',
     rewardsBalance: '0',

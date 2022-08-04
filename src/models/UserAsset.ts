@@ -1,4 +1,5 @@
 import Big from 'big.js';
+import { Network } from '../config/StaticConfig';
 import { getUINormalScaleAmount } from '../utils/NumberUtils';
 
 // Need for asset level configuration since every asset now needs to know
@@ -18,6 +19,19 @@ export interface UserAssetConfig {
 
   // Some assets don't have support for memo
   memoSupportDisabled?: boolean;
+  // tendermint?: {
+  //   chain: string;
+  //   defaultChainId: string;
+  //   addressPrefix: string;
+  //   validatorPubKeyPrefix: string;
+  //   validatorAddressPrefix: string;
+  //   coin: { baseDenom: string; denom: string };
+  //   node?: {
+  //     clientUrl: string;
+  //     proxyUrl: string;
+  //   };
+  // };
+  tendermintNetwork?: Network;
 }
 
 export interface UserAsset {
@@ -104,6 +118,8 @@ export interface AssetMarketPrice {
   assetSymbol: string;
 
   dailyChange: string;
+
+  assetType?: UserAssetType;
 }
 
 export const scaledAmount = (baseAmount: string = '0', decimals: number) => {
@@ -139,12 +155,16 @@ export const scaledTotalBalance = (asset: UserAsset) => {
   return getUINormalScaleAmount(totalBalance, asset.decimals);
 };
 
-export const getAssetPriceIdFrom = (assetSymbol: string, currency: string) => {
-  return `${assetSymbol}-${currency}`.toUpperCase();
+export const getAssetPriceIdFrom = (
+  assetType: UserAssetType | undefined,
+  assetSymbol: string,
+  currency: string,
+) => {
+  return `${assetType}-${assetSymbol}-${currency}`.toUpperCase();
 };
 
 export const getAssetPriceId = (assetPrice: AssetMarketPrice) => {
-  return getAssetPriceIdFrom(assetPrice.assetSymbol, assetPrice.currency);
+  return getAssetPriceIdFrom(assetPrice.assetType, assetPrice.assetSymbol, assetPrice.currency);
 };
 
 export const getAssetBalancePrice = (asset: UserAsset, marketPrice: AssetMarketPrice) => {
