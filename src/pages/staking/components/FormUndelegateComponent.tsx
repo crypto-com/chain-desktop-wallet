@@ -9,6 +9,7 @@ import { Session } from '../../../models/Session';
 import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { UNBLOCKING_PERIOD_IN_DAYS } from '../../../config/StaticConfig';
 import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasConfig';
+import { checkIfTestnet } from '../../../utils/utils';
 
 export const FormUndelegateComponent = (props: {
   currentSession: Session;
@@ -22,7 +23,14 @@ export const FormUndelegateComponent = (props: {
 }) => {
   const [t] = useTranslation();
 
-  const { form: undelegationForm } = props;
+  const { form: undelegationForm, currentSession } = props;
+
+  const isTestnet = checkIfTestnet(currentSession.wallet.config.network);
+
+  const undelegatePeriod =
+    isTestnet
+      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS
+      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET;
 
   let customMaxValidator = TransactionUtils.maxValidator(
     undelegationForm.getFieldValue('undelegateAmount'),
@@ -38,10 +46,6 @@ export const FormUndelegateComponent = (props: {
     );
   }, [props]);
 
-  const undelegatePeriod =
-    props.currentSession.wallet.config.name === 'MAINNET'
-      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET
-      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
 
   return (
     <>
@@ -49,7 +53,7 @@ export const FormUndelegateComponent = (props: {
       <div className="description">{t('general.undelegateFormComponent.description')}</div>
       <div className="item">
         <div className="label">{t('general.undelegateFormComponent.label1')}</div>
-        <div className="address">{props.currentSession.wallet.address}</div>
+        <div className="address">{currentSession.wallet.address}</div>
       </div>
       <div className="item">
         <div className="label">{t('general.undelegateFormComponent.label2')}</div>

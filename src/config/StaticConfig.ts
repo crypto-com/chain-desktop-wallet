@@ -219,6 +219,12 @@ export enum SupportedChainName {
   ETHEREUM = 'Ethereum Chain',
 }
 
+export enum NetworkName {
+  MAINNET = 'MAINNET',
+  TESTNET = 'TESTNET',
+  CUSTOM_DEVNET = 'CUSTOM DEVNET',
+}
+
 export type WalletConfig = {
   enabled: boolean;
   name: string;
@@ -320,7 +326,7 @@ export const AUTO_UPDATE_DISABLE_DURATIONS = [14, 30];
 
 const TestNetConfig: WalletConfig = {
   enabled: true,
-  name: 'TESTNET',
+  name: NetworkName.TESTNET,
   derivationPath: 'm/44\'/1\'/0\'/0/0',
   explorer: {
     baseUrl: 'https://crypto.org/explorer/croeseid',
@@ -360,7 +366,7 @@ const TestnetCroeseid4: Network = {
 
 const TestNetCroeseid4Config: WalletConfig = {
   enabled: true,
-  name: 'TESTNET',
+  name: NetworkName.TESTNET,
   derivationPath: 'm/44\'/1\'/0\'/0/0',
   explorer: {
     baseUrl: 'https://crypto.org/explorer/croeseid4',
@@ -383,7 +389,7 @@ const TestNetCroeseid4Config: WalletConfig = {
 
 const MainNetConfig: WalletConfig = {
   enabled: true,
-  name: 'MAINNET',
+  name: NetworkName.MAINNET,
   derivationPath: 'm/44\'/394\'/0\'/0/0',
   nodeUrl: CroNetwork.Mainnet.defaultNodeUrl,
   explorer: {
@@ -408,7 +414,7 @@ const MainNetConfig: WalletConfig = {
 export const CustomDevNet: WalletConfig = {
   derivationPath: 'm/44\'/394\'/0\'/0/0',
   enabled: true,
-  name: 'CUSTOM DEVNET',
+  name: NetworkName.CUSTOM_DEVNET,
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,

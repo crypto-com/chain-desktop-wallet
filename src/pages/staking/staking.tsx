@@ -41,6 +41,7 @@ import { ModerationConfig } from '../../models/ModerationConfig';
 import { FormDelegationOperations } from './components/FormDelegationOperations';
 import { FormWithdrawStakingReward } from './components/FormWithdrawStakingReward';
 import { FormDelegationRequest } from './components/FormDelegationRequest';
+import { checkIfTestnet } from '../../utils/utils';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -74,11 +75,12 @@ const StakingPage = () => {
   const didMountRef = useRef(false);
 
   const [t, i18n] = useTranslation();
+  const isTestnet = checkIfTestnet(currentSession.wallet.config.network);
 
   const undelegatePeriod =
-    currentSession.wallet.config.name === 'MAINNET'
-      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET
-      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
+    isTestnet
+      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS
+      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET;
 
   const unbondingDelegationColumns = [
     {

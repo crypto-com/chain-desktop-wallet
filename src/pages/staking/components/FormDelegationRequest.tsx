@@ -56,6 +56,7 @@ import { ledgerNotification } from '../../../components/LedgerNotification/Ledge
 import GasStepSelectTendermint, {
   GasInfoTendermint,
 } from '../../../components/GasCustomize/Tendermint/GasConfig';
+import { checkIfTestnet } from '../../../utils/utils';
 
 const { Content, Sider } = Layout;
 const { Search } = Input;
@@ -253,10 +254,13 @@ export const FormDelegationRequest = props => {
     `${walletAsset.assetType}-${walletAsset.mainnetSymbol}-${currentSession.currency}`,
   );
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol;
+  
+  const isTestnet = checkIfTestnet(currentSession.wallet.config.network);
+
   const undelegatePeriod =
-    currentSession.wallet.config.name === 'MAINNET'
-      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET
-      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
+    isTestnet
+      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS
+      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET;
 
   return (
     <Form

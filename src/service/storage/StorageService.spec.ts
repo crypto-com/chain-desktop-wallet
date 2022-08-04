@@ -3,7 +3,7 @@
  */
 import 'mocha';
 import { expect } from 'chai';
-import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import { DefaultWalletConfigs, NetworkName } from '../../config/StaticConfig';
 import { WalletCreateOptions, WalletCreator } from '../WalletCreator';
 import { StorageService } from './StorageService';
 import { Session } from '../../models/Session';
@@ -354,7 +354,7 @@ describe('Testing Full Storage Service', () => {
     }
 
     // GeneralSettingsPropagation updated for TESTNET wallets
-    await mockWalletStore.updateGeneralSettingsPropagation('TESTNET', true);
+    await mockWalletStore.updateGeneralSettingsPropagation(NetworkName.TESTNET, true);
 
     const dataSettings: SettingsDataUpdate = {
       chainId: 'testnet-xxx-2',
@@ -370,7 +370,7 @@ describe('Testing Full Storage Service', () => {
 
     // eslint-disable-next-line no-restricted-syntax
     for (const wallet of allWallets) {
-      if (wallet.config.name === 'TESTNET') {
+      if (wallet.config.name === NetworkName.TESTNET) {
         expect(wallet.config.enableGeneralSettings).to.eq(true);
         expect(wallet.config.network.chainId).to.eq('testnet-xxx-2');
         expect(wallet.config.fee.gasLimit).to.eq('330000');
@@ -386,7 +386,7 @@ describe('Testing Full Storage Service', () => {
     }
 
     // GeneralSettingsPropagation now updated for MAINNET wallets
-    await mockWalletStore.updateGeneralSettingsPropagation('MAINNET', true);
+    await mockWalletStore.updateGeneralSettingsPropagation(NetworkName.MAINNET, true);
     const dataSettingsMainnet: SettingsDataUpdate = {
       chainId: 'MainnetZZ-ChainID',
       gasLimit: '3300022',
@@ -402,7 +402,7 @@ describe('Testing Full Storage Service', () => {
     // eslint-disable-next-line no-restricted-syntax
     for (const wallet of allWalletsAfterMainnetEnabledPropagation) {
       expect(wallet.config.enableGeneralSettings).to.eq(true);
-      if (wallet.config.name === 'MAINNET') {
+      if (wallet.config.name === NetworkName.MAINNET) {
         expect(wallet.config.network.chainId).to.eq('MainnetZZ-ChainID');
         expect(wallet.config.fee.gasLimit).to.eq('3300022');
         expect(wallet.config.fee.networkFee).to.eq('12022');
@@ -412,7 +412,7 @@ describe('Testing Full Storage Service', () => {
         );
       }
 
-      if (wallet.config.name === 'TESTNET') {
+      if (wallet.config.name === NetworkName.TESTNET) {
         expect(wallet.config.enableGeneralSettings).to.eq(true);
         expect(wallet.config.network.chainId).to.eq('testnet-xxx-2');
         expect(wallet.config.fee.gasLimit).to.eq('330000');

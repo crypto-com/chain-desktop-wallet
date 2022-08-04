@@ -19,6 +19,7 @@ import { WalletCreateOptions, WalletCreator } from '../../service/WalletCreator'
 import {
   DefaultWalletConfigs,
   LedgerWalletMaximum,
+  NetworkName,
   NodePorts,
   SupportedChainName,
 } from '../../config/StaticConfig';
@@ -913,7 +914,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       initialValues={{
         walletType: 'normal',
         addressIndex: '0',
-        network: 'MAINNET',
+        network: NetworkName.MAINNET,
       }}
     >
       <Form.Item

@@ -10,7 +10,7 @@ import { sessionState } from '../../recoil/atom';
 import logo from '../../assets/logo-products-chain.svg';
 import { walletService } from '../../service/WalletService';
 import { WalletImportOptions } from '../../service/WalletImporter';
-import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import { DefaultWalletConfigs, NetworkName } from '../../config/StaticConfig';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import BackButton from '../../components/BackButton/BackButton';
@@ -369,7 +369,7 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
       }}
       onChange={onChange}
       initialValues={{
-        network: 'MAINNET',
+        network: NetworkName.MAINNET,
       }}
     >
       <Form.Item

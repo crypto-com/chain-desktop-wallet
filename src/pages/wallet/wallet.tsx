@@ -72,14 +72,11 @@ function WalletPage() {
 
   const processNetworkTag = (network, selectedWallet) => {
     let networkColor;
-
     switch (network) {
       case DefaultWalletConfigs.MainNetConfig.name:
         networkColor = 'success';
         break;
       case DefaultWalletConfigs.TestNetConfig.name:
-        networkColor = 'error';
-        break;
       case DefaultWalletConfigs.TestNetCroeseid4Config.name:
         networkColor = 'warning';
         break;

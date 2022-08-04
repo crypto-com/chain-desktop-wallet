@@ -56,7 +56,7 @@ import {
   TextProposalRequest,
 } from './TransactionRequestModels';
 import { FinalTallyResult } from './rpc/NodeRpcModels';
-import { capitalizeFirstLetter, sleep } from '../utils/utils';
+import { capitalizeFirstLetter, checkIfTestnet, sleep } from '../utils/utils';
 import { WalletBuiltResult, WalletOps } from './WalletOps';
 import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
 import { StorageService } from './storage/StorageService';
@@ -705,11 +705,18 @@ class WalletService {
     const { wallet } = currentSession;
 
     if (await this.checkIfWalletNeedAssetCreation(currentSession)) {
+      const isTestnet = checkIfTestnet(wallet.config.network);
+      // Update wallet config to default settings here if necessary
+      const config = {
+        ...wallet.config,
+        name: isTestnet ? DefaultWalletConfigs.TestNetCroeseid4Config.name : wallet.config.name
+      };
+      
       await this.storageService.removeWalletAssets(wallet.identifier);
       await sleep(3_000);
 
       const walletOps = new WalletOps();
-      const assetGeneration = await walletOps.generate(wallet.config, wallet.identifier, phrase);
+      const assetGeneration = await walletOps.generate(config, wallet.identifier, phrase);
 
       if (currentSession?.wallet.walletType === LEDGER_WALLET_TYPE) {
         if (tendermintAddress !== '' && evmAddress !== '' && cosmosHubAddress !== '') {
@@ -736,7 +743,7 @@ class WalletService {
       await this.saveAssets(await assetGeneration.initialAssets);
 
       const activeAsset = (await assetGeneration.initialAssets)[0];
-      const newSession = new Session(wallet, activeAsset);
+      const newSession = new Session({ ...wallet, config: config }, activeAsset);
       await this.setCurrentSession(newSession);
 
       await this.syncAll(newSession);
