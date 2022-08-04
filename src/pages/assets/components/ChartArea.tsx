@@ -3,16 +3,21 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import '../assets.less';
 import '../chartarea.less';
 
-import { Radio, Card, Spin } from 'antd';
+import { Radio, Card, Spin, Typography } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useRecoilValue } from 'recoil';
 import LineChart, { Dimensions, TokenData } from '../../../components/Charts/LineChart';
 import { sessionState } from '../../../recoil/atom';
 import { croMarketPriceApi } from '../../../service/rpc/MarketApi';
-import { UserAsset } from '../../../models/UserAsset';
+import { AssetMarketPrice, UserAsset } from '../../../models/UserAsset';
+import { roundPrice } from '../../../utils/NumberUtils';
+import { SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
+
+const Text = Typography.Text;
 
 interface Props {
   asset: UserAsset;
+  assetMarketData?: AssetMarketPrice;
 }
 
 const CHART_HEIGHT = 360;
@@ -23,18 +28,23 @@ const CHART_MARGIN = {
   bottom: 40,
 };
 
-export const ChartArea = ({ asset }: Props) => {
+export const ChartArea = ({ asset, assetMarketData }: Props) => {
   const session = useRecoilValue(sessionState);
   const container = useRef<HTMLDivElement>(null);
 
   const [loadingData, setLoadingData] = useState(false);
   const [tokenPriceData, setTokenPriceData] = useState<TokenData[]>([]);
+  const [tokenPriceText, setTokenPriceText] = useState('');
   const [duration, setDuration] = useState('d');
   const [dimensions, setDimensions] = useState<Dimensions>({
     width: 0,
     height: CHART_HEIGHT,
     margin: CHART_MARGIN,
   });
+
+  const currentTokenPriceText = assetMarketData?.price
+    ? `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}${roundPrice(parseFloat(assetMarketData?.price!))} ${session.currency}`
+    : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`;
 
   const getContainerSize = () => {
     if (!container?.current) {
@@ -68,6 +78,9 @@ export const ChartArea = ({ asset }: Props) => {
         };
       });
       setTokenPriceData(mappedTokenData);
+      if (assetMarketData) {
+        setTokenPriceText(currentTokenPriceText);
+      }
     } catch {
       setTokenPriceData([]);
     } finally {
@@ -79,9 +92,14 @@ export const ChartArea = ({ asset }: Props) => {
     fetchTokenPrices();
   }, [duration]);
 
+  useEffect(() => {
+
+  }, [tokenPriceText]);
+
   return (
     <Card ref={container}>
       <Spin spinning={loadingData} indicator={<LoadingOutlined />}>
+        <Text style={{ float: 'left', fontSize: '24px' }}>{tokenPriceText}</Text>
         <Radio.Group
           className="duration-changer"
           onChange={e => {
@@ -96,7 +114,7 @@ export const ChartArea = ({ asset }: Props) => {
           <Radio.Button value="3m">3M</Radio.Button>
           <Radio.Button value="6m">6M</Radio.Button>
         </Radio.Group>
-        <LineChart data={tokenPriceData} dimensions={dimensions} />
+        <LineChart data={tokenPriceData} dimensions={dimensions} currentTokenPriceText={currentTokenPriceText} setTokenPriceText={setTokenPriceText} />
       </Spin>
     </Card>
   );

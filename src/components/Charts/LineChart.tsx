@@ -4,6 +4,7 @@ import { useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { roundPrice } from '../../utils/NumberUtils';
 import { sessionState } from '../../recoil/atom';
+import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
 
 export interface TokenData {
   datetime: Date;
@@ -27,12 +28,14 @@ export interface Dimensions {
 interface LineChartProps {
   data: TokenData[];
   dimensions: Dimensions;
+  currentTokenPriceText?: string;
+  setTokenPriceText?: (text: string) => void;
 }
 
 const BOTTOM_OFFSET = 12;
 const TOOLTIP_RECT_Y = -56;
 
-const LineChart = ({ data, dimensions }: LineChartProps) => {
+const LineChart = ({ data, dimensions, currentTokenPriceText, setTokenPriceText }: LineChartProps) => {
   const svgRef = useRef<SVGSVGElement>(null);
 
   const [t] = useTranslation();
@@ -147,6 +150,10 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
       dateText.text(d.datetime.toLocaleString());
       priceText.text(`${t('general.price')} (${session.currency}) ${roundPrice(d.price)}`);
 
+      if(setTokenPriceText){
+        setTokenPriceText(`${SUPPORTED_CURRENCY.get(session.currency)?.symbol}${roundPrice(d.price)} ${session.currency}`);
+      }
+
       const x = xScale(d.datetime);
       const y = yScale(d.price) + BOTTOM_OFFSET;
 
@@ -198,6 +205,9 @@ const LineChart = ({ data, dimensions }: LineChartProps) => {
           .transition()
           .duration(250)
           .style('opacity', 0);
+        if(setTokenPriceText && currentTokenPriceText) {
+          setTokenPriceText(`${currentTokenPriceText}`);
+        }
       })
       .on('mousemove', mousemove);
   }, [data, dimensions]);

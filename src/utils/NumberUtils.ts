@@ -92,7 +92,7 @@ export function adjustedTransactionAmount(
   return formAmount.toString();
 }
 
-export function roundPrice(value: number, decimal: number = 4) {
+export function roundPrice(value: number, decimal: number = 2) {
 
   if (value <= 0) {
     return value.toString();
