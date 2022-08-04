@@ -103,11 +103,8 @@ describe('Testing Number utils', () => {
     expect(roundPrice(0.123, 4)).to.eq('0.1230');
     expect(roundPrice(0.0123, 4)).to.eq('0.01230');
     expect(roundPrice(0.0000001234567, 4)).to.eq('0.0000001235');
-    expect(roundPrice(12.123412323)).to.eq('12.1234');
-    expect(roundPrice(12323.01234567)).to.eq('12323.0123');
-
-
-    expect(roundPrice(12323.01234567)).to.eq('12323.0123');
+    expect(roundPrice(12.123412323)).to.eq('12.12');
+    expect(roundPrice(12323.01234567)).to.eq('12323.01');
     expect(roundPrice(-12323.01234567)).to.eq('-12323.01234567');
   });
 });
