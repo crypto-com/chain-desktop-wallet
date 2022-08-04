@@ -148,10 +148,11 @@ const LineChart = ({ data, dimensions, currentTokenPriceText, setTokenPriceText 
       }
 
       dateText.text(d.datetime.toLocaleString());
-      priceText.text(`${t('general.price')} (${session.currency}) ${roundPrice(d.price)}`);
 
+      const tokenPriceText = `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}${roundPrice(d.price)} ${session.currency}`;
+      priceText.text(tokenPriceText);
       if(setTokenPriceText){
-        setTokenPriceText(`${SUPPORTED_CURRENCY.get(session.currency)?.symbol}${roundPrice(d.price)} ${session.currency}`);
+        setTokenPriceText(tokenPriceText);
       }
 
       const x = xScale(d.datetime);
