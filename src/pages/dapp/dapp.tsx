@@ -20,6 +20,7 @@ import { useShowDisclaimer } from './hooks/useShowDisclaimer';
 import { DisclaimerModal } from './components/DisclaimerModal/DisclaimerModal';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import CronosDAppsTab from './components/Tabs/CronosDAppsTab';
+import ChainConfigTab from './components/Tabs/ChainConfigTab';
 
 const { Header, Content } = Layout;
 const { TabPane } = Tabs;
@@ -49,30 +50,14 @@ const DappList: Dapp[] = [
       'Tectonic is a cross-chain money market for earning passive yield and accessing instant backed loans.',
     url: 'https://tectonic.finance/',
   },
-  // {
-  //   name: 'Cronos Chimp Club',
-  //   logo: logoVvs,
-  //   alt: '',
-  //   description: '',
-  //   url: 'https://cronoschimp.club/',
-  // },
-  // {
-  //   name: 'Beefy Finance',
-  //   logo: logoVvs,
-  //   alt: '',
-  //   description: '',
-  //   url: 'https://app.beefy.finance/#/cronos',
-  // },
-  // {
-  //   name: 'Debank',
-  //   logo: logoVvs,
-  //   alt: '',
-  //   description: '',
-  //   url: 'https://debank.com',
-  // },
 ];
 
-const TabKey = { popular: 'popular', cronosDapps: 'Cronos DApps', saved: 'saved' };
+const TabKey = {
+  popular: 'popular',
+  cronosDapps: 'Cronos DApps',
+  saved: 'saved',
+  chainConfig: 'Chain Config',
+};
 
 const DappPage = () => {
   const setPageLock = useSetRecoilState(pageLockState);
@@ -304,6 +289,9 @@ const DappPage = () => {
                   setSelectedURL(bookmark.url);
                 }}
               />
+            </TabPane>
+            <TabPane tab={t('dapp.chainConfig')} key={TabKey.chainConfig}>
+              <ChainConfigTab />
             </TabPane>
           </Tabs>
         </Content>

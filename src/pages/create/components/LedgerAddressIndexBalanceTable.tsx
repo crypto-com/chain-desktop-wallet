@@ -11,21 +11,25 @@ import {
   CRONOS_TENDERMINT_ASSET,
   CRONOS_EVM_ASSET,
   MainNetEvmConfig,
+  ETH_ASSET,
+  ATOM_TENDERMINT_ASSET,
 } from '../../../config/StaticAssets';
-import { DefaultWalletConfigs } from '../../../config/StaticConfig';
+import { DefaultWalletConfigs, SupportedChainName } from '../../../config/StaticConfig';
 import { NodeRpcService } from '../../../service/rpc/NodeRpcService';
 import { LedgerSigner } from '../../../service/signers/LedgerSigner';
 import { ISignerProvider } from '../../../service/signers/SignerProvider';
 import { createLedgerDevice } from '../../../service/LedgerService';
 import { ledgerNotificationWithoutCheck } from '../../../components/LedgerNotification/LedgerNotification';
 import { renderExplorerUrl } from '../../../models/Explorer';
+import { EthClient } from '../../../service/ethereum/EthClient';
 
 const LedgerAddressIndexBalanceTable = (props: {
   addressIndexBalanceList;
   form?: FormInstance;
   assetType: UserAssetType;
+  chainName: SupportedChainName;
   setisHWModeSelected?: (value: boolean) => void;
-  setDerivationPath?: ({ tendermint, evm }) => void;
+  setDerivationPath?: ({ cronosTendermint, cosmosTendermint, evm }) => void;
   setAddressIndexBalanceList: (list: any[]) => void;
 }) => {
   const DEFAULT_START_INDEX = 10;
@@ -34,6 +38,7 @@ const LedgerAddressIndexBalanceTable = (props: {
     addressIndexBalanceList: rawAddressIndexBalanceList,
     setAddressIndexBalanceList: setRawAddressIndexBalanceList,
     assetType,
+    chainName,
     form,
     setisHWModeSelected,
     setDerivationPath,
@@ -58,6 +63,16 @@ const LedgerAddressIndexBalanceTable = (props: {
     walletId: '',
   };
 
+  const ethEvmAsset = {
+    ...ETH_ASSET(config),
+    walletId: '',
+  };
+
+  const atomTendermintAsset = {
+    ...ATOM_TENDERMINT_ASSET(config),
+    walletId: '',
+  };
+
   const tableColumns = [
     {
       title: t('wallet.table1.address'),
@@ -65,11 +80,19 @@ const LedgerAddressIndexBalanceTable = (props: {
       key: 'publicAddress',
       render: publicAddress => {
         let url;
-        switch (assetType) {
-          case UserAssetType.EVM:
+        switch (`${assetType}-${chainName}`) {
+          case `${UserAssetType.EVM}-${SupportedChainName.CRONOS}`:
             url = `${renderExplorerUrl(cronosEvmAsset.config, 'address')}/${publicAddress}`;
             break;
-          case UserAssetType.TENDERMINT:
+          case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`:
+            url = `${renderExplorerUrl(ethEvmAsset.config, 'address')}/${publicAddress}`;
+            break;
+          case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
+            url = `${renderExplorerUrl(cronosTendermintAsset.config, 'address')}/${publicAddress}`;
+            break;
+          case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`:
+            url = `${renderExplorerUrl(atomTendermintAsset.config, 'address')}/${publicAddress}`;
+            break;
           default:
             url = `${renderExplorerUrl(cronosTendermintAsset.config, 'address')}/${publicAddress}`;
         }
@@ -114,14 +137,22 @@ const LedgerAddressIndexBalanceTable = (props: {
                 addressIndex: record.index,
               });
               setDerivationPath({
-                tendermint: LedgerSigner.getDerivationPath(
+                cronosTendermint: LedgerSigner.getDerivationPath(
                   record.index,
                   UserAssetType.TENDERMINT,
+                  SupportedChainName.CRYPTO_ORG,
+                  form.getFieldValue('derivationPathStandard'),
+                ),
+                cosmosTendermint: LedgerSigner.getDerivationPath(
+                  record.index,
+                  UserAssetType.TENDERMINT,
+                  SupportedChainName.COSMOS_HUB,
                   form.getFieldValue('derivationPathStandard'),
                 ),
                 evm: LedgerSigner.getDerivationPath(
                   record.index,
                   UserAssetType.EVM,
+                  SupportedChainName.CRONOS,
                   form.getFieldValue('derivationPathStandard'),
                 ),
               });
@@ -136,13 +167,14 @@ const LedgerAddressIndexBalanceTable = (props: {
 
   const processLedgerAccountsList = async (ledgerAccountList: any[]) => {
     setLoading(true);
-    switch (assetType) {
-      case UserAssetType.TENDERMINT: {
+    switch (`${assetType}-${chainName}`) {
+      case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`: {
         const nodeUrl = isTestnet
           ? DefaultWalletConfigs.TestNetCroeseid4Config.nodeUrl
           : DefaultWalletConfigs.MainNetConfig.nodeUrl;
-        const nodeRpc = await NodeRpcService.init(nodeUrl);
-
+        const nodeRpc = await NodeRpcService.init({
+          baseUrl: nodeUrl,
+        });
         await Promise.all(
           ledgerAccountList.map(async account => {
             const { publicAddress } = account;
@@ -150,9 +182,29 @@ const LedgerAddressIndexBalanceTable = (props: {
               publicAddress,
               isTestnet ? 'basetcro' : 'basecro',
             );
-            account.balance = `${scaledAmountByAsset(nativeBalance, cronosTendermintAsset)} ${
-              cronosTendermintAsset.symbol
-            }`;
+            account.balance = `${scaledAmountByAsset(nativeBalance, cronosTendermintAsset)} ${cronosTendermintAsset.symbol}`;
+          }),
+        ).then(() => {
+          setAddressIndexBalanceList(ledgerAccountList);
+          setLoading(false);
+        });
+
+        break;
+      }
+      case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`: {
+        const nodeRpc = await NodeRpcService.init({
+          baseUrl: atomTendermintAsset.config.nodeUrl,
+          clientUrl: atomTendermintAsset.config.tendermintNetwork?.node?.clientUrl,
+          proxyUrl: atomTendermintAsset.config.tendermintNetwork?.node?.proxyUrl,
+        });
+        await Promise.all(
+          ledgerAccountList.map(async account => {
+            const { publicAddress } = account;
+            const nativeBalance = await nodeRpc.loadAccountBalance(
+              publicAddress,
+              isTestnet ? 'uatom' : 'uatom',
+            );
+            account.balance = `${scaledAmountByAsset(nativeBalance, atomTendermintAsset)} ${atomTendermintAsset.symbol}`;
           }),
         ).then(() => {
           setAddressIndexBalanceList(ledgerAccountList);
@@ -160,8 +212,7 @@ const LedgerAddressIndexBalanceTable = (props: {
         });
         break;
       }
-      case UserAssetType.EVM:
-      default: {
+      case `${UserAssetType.EVM}-${SupportedChainName.CRONOS}`: {
         const cronosClient = new CronosClient(
           MainNetEvmConfig.nodeUrl,
           MainNetEvmConfig.indexingUrl,
@@ -171,15 +222,33 @@ const LedgerAddressIndexBalanceTable = (props: {
           ledgerAccountList.map(async account => {
             const { publicAddress } = account;
             const nativeBalance = await cronosClient.getNativeBalanceByAddress(publicAddress);
-            account.balance = `${scaledAmountByAsset(nativeBalance, cronosEvmAsset)} ${
-              cronosEvmAsset.symbol
-            }`;
+            account.balance = `${scaledAmountByAsset(nativeBalance, cronosEvmAsset)} ${cronosEvmAsset.symbol}`;
           }),
         ).then(() => {
           setAddressIndexBalanceList(ledgerAccountList);
           setLoading(false);
         });
+        break;
       }
+      case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`: {
+        const ethClient = new EthClient(
+          ethEvmAsset.config.nodeUrl,
+          ethEvmAsset.config.indexingUrl,
+        );
+
+        await Promise.all(
+          ledgerAccountList.map(async account => {
+            const { publicAddress } = account;
+            const nativeBalance = await ethClient.getNativeBalanceByAddress(publicAddress);
+            account.balance = `${scaledAmountByAsset(nativeBalance, ethEvmAsset)} ${ethEvmAsset.symbol}`;
+          }),
+        ).then(() => {
+          setAddressIndexBalanceList(ledgerAccountList);
+          setLoading(false);
+        });
+        break;
+      }
+      default:
     }
   };
 
@@ -188,8 +257,8 @@ const LedgerAddressIndexBalanceTable = (props: {
     const standard = form?.getFieldValue('derivationPathStandard');
 
     try {
-      switch (assetType) {
-        case UserAssetType.EVM:
+      switch (`${assetType}-${chainName}`) {
+        case `${UserAssetType.EVM}-${SupportedChainName.CRONOS}`:
           {
             const ethAddressList = await device.getEthAddressList(
               startIndex,
@@ -204,6 +273,7 @@ const LedgerAddressIndexBalanceTable = (props: {
                   derivationPath: LedgerSigner.getDerivationPath(
                     startIndex + idx,
                     UserAssetType.EVM,
+                    SupportedChainName.CRONOS,
                     standard,
                   ),
                   balance: '0',
@@ -214,12 +284,39 @@ const LedgerAddressIndexBalanceTable = (props: {
             }
           }
           break;
-        case UserAssetType.TENDERMINT:
+        case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`:
+          {
+            const ethAddressList = await device.getEthAddressList(
+              startIndex,
+              DEFAULT_GAP,
+              standard,
+            );
+            if (ethAddressList) {
+              const returnList = ethAddressList.map((address, idx) => {
+                return {
+                  index: startIndex + idx,
+                  publicAddress: address,
+                  derivationPath: LedgerSigner.getDerivationPath(
+                    startIndex + idx,
+                    UserAssetType.EVM,
+                    SupportedChainName.ETHEREUM,
+                    standard,
+                  ),
+                  balance: '0',
+                };
+              });
+              setStartIndex(startIndex + DEFAULT_GAP);
+              setRawAddressIndexBalanceList(rawAddressIndexBalanceList.concat(returnList));
+            }
+          }
+          break;
+        case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
           {
             const tendermintAddressList = await device.getAddressList(
               startIndex,
               DEFAULT_GAP,
               isTestnet ? 'tcro' : 'cro',
+              SupportedChainName.CRYPTO_ORG,
               standard,
             );
             if (tendermintAddressList) {
@@ -230,6 +327,35 @@ const LedgerAddressIndexBalanceTable = (props: {
                   derivationPath: LedgerSigner.getDerivationPath(
                     startIndex + idx,
                     UserAssetType.TENDERMINT,
+                    SupportedChainName.CRYPTO_ORG,
+                    standard,
+                  ),
+                  balance: '0',
+                };
+              });
+              setStartIndex(startIndex + DEFAULT_GAP);
+              setRawAddressIndexBalanceList(rawAddressIndexBalanceList.concat(returnList));
+            }
+          }
+          break;
+        case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`:
+          {
+            const cosmosHubAddressList = await device.getAddressList(
+              startIndex,
+              DEFAULT_GAP,
+              'cosmos',
+              SupportedChainName.COSMOS_HUB,
+              standard,
+            );
+            if (cosmosHubAddressList) {
+              const returnList = cosmosHubAddressList.map((address, idx) => {
+                return {
+                  index: startIndex + idx,
+                  publicAddress: address,
+                  derivationPath: LedgerSigner.getDerivationPath(
+                    startIndex + idx,
+                    UserAssetType.TENDERMINT,
+                    SupportedChainName.COSMOS_HUB,
                     standard,
                   ),
                   balance: '0',
@@ -243,7 +369,7 @@ const LedgerAddressIndexBalanceTable = (props: {
         default:
       }
     } catch {
-      ledgerNotificationWithoutCheck(assetType);
+      ledgerNotificationWithoutCheck(assetType, chainName);
     }
   };
 
@@ -257,7 +383,7 @@ const LedgerAddressIndexBalanceTable = (props: {
 
   useEffect(() => {
     setStartIndex(DEFAULT_START_INDEX);
-  }, [assetType]);
+  }, [assetType, chainName]);
 
   return (
     <div className="address-index-balance-list">

@@ -18,6 +18,9 @@ import { UserAsset, UserAssetType } from '../../models/UserAsset';
 import { walletService } from '../WalletService';
 import { createLedgerDevice, LEDGER_WALLET_TYPE } from '../LedgerService';
 import { CronosClient } from '../cronos/CronosClient';
+import { EVMChainConfig } from '../../models/Chain';
+import { parseChainId } from '../evm/chainId';
+import { IERC20__factory } from '../../contracts';
 import { DerivationPathStandard } from './LedgerSigner';
 
 const DEFAULT_CHAIN_ID = 338;
@@ -53,16 +56,15 @@ class EvmTransactionSigner implements ITransactionSigner {
     return Promise.resolve(signedTx);
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  public async sendContractCallTransaction(
-    asset: UserAsset,
+
+  static async signContractCallTransaction(props: {    chainConfig: EVMChainConfig,
     transaction: EVMContractCallUnsigned,
-    phrase: string,
-    jsonRpcUrl: string,
-  ): Promise<string> {
-    if (!asset.address || !asset.config?.nodeUrl) {
-      throw TypeError(`Missing asset config: ${asset.config}`);
-    }
+    mnemonic: string}) {
+
+    const { chainConfig, transaction, mnemonic } = props;
+
+    const chainId = parseChainId(chainConfig);
+    const rpcURL = chainConfig.rpcUrls[0];
 
     const currentSession = await walletService.retrieveCurrentSession();
 
@@ -75,7 +77,7 @@ class EvmTransactionSigner implements ITransactionSigner {
       const signedTx = await device.signEthTx(
         walletAddressIndex,
         walletDerivationPathStandard,
-        Number(asset?.config?.chainId), // chainid
+        chainId,
         transaction.nonce,
         transaction.gasLimit,
         transaction.gasPrice,
@@ -83,27 +85,50 @@ class EvmTransactionSigner implements ITransactionSigner {
         transaction.value ?? '0x0',
         transaction.data,
       );
-      const cronosClient = new CronosClient(asset.config?.nodeUrl, asset.config?.indexingUrl);
 
-      const result = await cronosClient.broadcastRawTransactionHex(signedTx);
-
-      return Promise.resolve(result);
+      return signedTx;
     }
 
-    const txParams: ethers.providers.TransactionRequest = {
-      nonce: transaction.nonce,
-      gasPrice: transaction.gasPrice,
-      gasLimit: transaction.gasLimit,
-      to: transaction.contractAddress,
+    const txRequest: ethers.providers.TransactionRequest = {
+      chainId,
       data: transaction.data,
+      from: transaction.from,
+      gasLimit: transaction.gasLimit,
+      nonce: transaction.nonce,
+      to: transaction.contractAddress,
       value: transaction.value ?? '0x0',
     };
 
-    const provider = new ethers.providers.JsonRpcProvider(jsonRpcUrl);
-    const wallet = ethers.Wallet.fromMnemonic(phrase).connect(provider);
+    if (transaction.maxFeePerGas && transaction.maxPriorityFeePerGas) {
+      txRequest.maxFeePerGas = transaction.maxFeePerGas;
+      txRequest.maxPriorityFeePerGas = transaction.maxPriorityFeePerGas;
+      txRequest.type = 2;
+    } else {
+      txRequest.gasPrice = transaction.gasPrice;
+    }
 
-    const signedTx = await wallet.sendTransaction(txParams);
-    return Promise.resolve(signedTx.hash);
+    const provider = new ethers.providers.JsonRpcProvider(rpcURL);
+    const wallet = ethers.Wallet.fromMnemonic(mnemonic).connect(provider);
+
+    return await wallet.signTransaction(txRequest);
+  
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  static async sendContractCallTransaction(props: {
+    chainConfig: EVMChainConfig,
+    transaction: EVMContractCallUnsigned,
+    mnemonic: string,
+  }): Promise<string> {
+    const { chainConfig } = props;
+    const rpcURL = chainConfig.rpcUrls[0];
+
+    const cronosClient = new CronosClient(rpcURL, chainConfig.rpcUrls[0]);
+    const signedTx = await this.signContractCallTransaction(props);
+
+    const result = await cronosClient.broadcastRawTransactionHex(signedTx);
+
+    return result;
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -210,14 +235,12 @@ class EvmTransactionSigner implements ITransactionSigner {
 
   // eslint-disable-next-line class-methods-use-this
   public encodeTokenApprovalABI(
-    tokenContractAddress: string,
     spender: string,
     amount: BigNumberish,
   ) {
-    const web3 = new Web3('');
-    const contractABI = TokenContractABI.abi as AbiItem[];
-    const contract = new web3.eth.Contract(contractABI, tokenContractAddress);
-    return contract.methods.approve(spender, amount).encodeABI() as string;
+
+    const IERC20 = IERC20__factory.createInterface();
+    return IERC20.encodeFunctionData('approve', [spender, amount]);
   }
 
   // eslint-disable-next-line class-methods-use-this

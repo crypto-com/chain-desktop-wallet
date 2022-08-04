@@ -153,6 +153,7 @@ export interface BridgeTransferRequest {
   bridgeTransferDirection: BridgeTransferDirection;
   tendermintAddress: string;
   evmAddress: string;
+  cosmosHubAddress: string;
   toAddress: string;
   isCustomToAddress: boolean;
   originAsset: UserAsset;

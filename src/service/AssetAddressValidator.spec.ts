@@ -10,7 +10,7 @@ describe('Testing Asset Address Validation', () => {
 
     const addressValidator = new AssetAddressValidator(
       'tcro1nrztwwgrgjg4gtctgul80menh7p04n4vhmh5wj',
-      testNetConfig,
+      testNetConfig.network,
       UserAssetType.TENDERMINT,
     );
 
@@ -18,7 +18,7 @@ describe('Testing Asset Address Validation', () => {
 
     const addressValidator2 = new AssetAddressValidator(
       'azz2tcro1nrztwwgrgjg4gtctgul80menh7p04n4vhmh5wj',
-      testNetConfig,
+      testNetConfig.network,
       UserAssetType.TENDERMINT,
     );
 
@@ -30,7 +30,7 @@ describe('Testing Asset Address Validation', () => {
 
     const addressValidator = new AssetAddressValidator(
       '0xD47286f025F947482a2C374Fb70e9D4c94d809CF',
-      testNetConfig,
+      testNetConfig.network,
       UserAssetType.EVM,
     );
 

@@ -27,6 +27,12 @@ export interface BridgeTransaction {
   displayDenom: string;
 }
 
+export enum BridgeSourceChain {
+  CRYPTO_ORG = 'Crypto.org-Chain',
+  CRONOS = 'Cronos',
+  COSMOS_HUB = 'Cosmos-Hub',
+}
+
 export interface BridgeTransactionListResponse {
   result: BridgeTransaction[];
 }

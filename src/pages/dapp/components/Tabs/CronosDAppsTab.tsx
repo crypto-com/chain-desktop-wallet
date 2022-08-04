@@ -264,8 +264,8 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
           selectedCategories.length === 0
             ? sortedProjects
             : sortedProjects.filter(project => {
-                return project.category.some(c => selectedCategories.includes(c));
-              })
+              return project.category.some(c => selectedCategories.includes(c));
+            })
         }
         rowKey="name"
         rowClassName="dapps-table-row"

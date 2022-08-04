@@ -1,9 +1,26 @@
 import sdk from '@crypto-org-chain/chain-jslib';
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
 import { CosmosMsg } from '@crypto-org-chain/chain-jslib/lib/dist/transaction/msg/cosmosMsg';
+import {
+  TxBodyEncodeObject,
+  Registry,
+  makeAuthInfoBytes,
+  encodePubkey,
+  coin,
+  // makeSignDoc,
+  // makeSignBytes,
+} from '@cosmjs/proto-signing';
+import { encodeSecp256k1Pubkey, makeSignDoc, serializeSignDoc } from '@cosmjs/amino';
+import { createBankAminoConverters, AminoTypes, MsgSendEncodeObject, MsgTransferEncodeObject, createIbcAminoConverters } from '@cosmjs/stargate';
+import { TxRaw } from 'cosmjs-types/cosmos/tx/v1beta1/tx';
+import { toHex } from '@crypto-org-chain/chain-jslib/node_modules/@cosmjs/encoding';
 import Long from 'long';
 import { Big, Units, Secp256k1KeyPair } from '../../utils/ChainJsLib';
-import { DEFAULT_IBC_TRANSFER_TIMEOUT, WalletConfig } from '../../config/StaticConfig';
+import {
+  DEFAULT_IBC_TRANSFER_TIMEOUT,
+  SupportedChainName,
+  WalletConfig,
+} from '../../config/StaticConfig';
 import {
   RestakeStakingRewardTransactionUnsigned,
   RestakeStakingAllRewardsTransactionUnsigned,
@@ -26,6 +43,7 @@ import { ISignerProvider } from './SignerProvider';
 import { BaseTransactionSigner, ITransactionSigner } from './TransactionSigner';
 import { isNumeric } from '../../utils/utils';
 import { DerivationPathStandard } from './LedgerSigner';
+import { MsgTransfer } from 'cosmjs-types/ibc/applications/transfer/v1/tx';
 
 export class LedgerTransactionSigner extends BaseTransactionSigner implements ITransactionSigner {
   public readonly config: WalletConfig;
@@ -35,6 +53,8 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
   public readonly addressIndex: number;
 
   public readonly derivationPathStandard: DerivationPathStandard;
+
+  public registry: Registry;
 
   constructor(
     config: WalletConfig,
@@ -47,6 +67,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     this.signerProvider = signerProvider;
     this.addressIndex = addressIndex;
     this.derivationPathStandard = derivationPathStandard;
+    this.registry = new Registry();
   }
 
   public getTransactionInfo(
@@ -80,6 +101,108 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     gasFee: string,
     gasLimit: number,
   ): Promise<string> {
+    if (
+      transaction.asset?.config?.tendermintNetwork &&
+      transaction.asset?.config?.tendermintNetwork?.chainName !== SupportedChainName.CRYPTO_ORG
+    ) {
+      const network = transaction.asset?.config?.tendermintNetwork;
+
+      const fee = {
+        amount: [
+          {
+            denom: network.coin.baseDenom,
+            amount: gasFee,
+          },
+        ],
+        gas: gasLimit,
+      };
+
+      const feeInAmino = {
+        amount: [
+          {
+            denom: network.coin.baseDenom,
+            amount: gasFee,
+          },
+        ],
+        gas: gasLimit.toString(),
+      };
+
+      const pubkeyBytes = (
+        await this.signerProvider.getPubKey(
+          this.addressIndex,
+          network.chainName!,
+          this.derivationPathStandard,
+          false,
+        )
+      ).toUint8Array();
+
+      // this is 34 bytes, 33 length itself, 0x02 pr 0x03
+      // cut first byte of pubkeyBytes
+      // pubkeyBytes is 34 bytes, first byte is length itself, 33
+      const pubkeyBytesInLength33 = pubkeyBytes.slice(1);
+      const pubkey = encodePubkey(encodeSecp256k1Pubkey(pubkeyBytesInLength33));
+
+      // amino json auto info bytes
+      const authInfoBytes = makeAuthInfoBytes(
+        [{ pubkey, sequence: transaction.accountSequence }],
+        fee.amount,
+        fee.gas,
+        127,
+      );
+
+      const chainId = network.chainId ?? '';
+
+      const msgSend: MsgSendEncodeObject = {
+        typeUrl: '/cosmos.bank.v1beta1.MsgSend',
+        value: {
+          fromAddress: transaction.fromAddress,
+          toAddress: transaction.toAddress,
+          amount: [
+            {
+              denom: network.coin.baseDenom,
+              amount: String(transaction.amount),
+            },
+          ],
+        },
+      };
+
+      const converter = new AminoTypes(createBankAminoConverters());
+      const msgSendInAmino = converter.toAmino(msgSend);
+
+      const signedTxBody = {
+        messages: [msgSend],
+        memo: transaction.memo,
+      };
+      const signedTxBodyEncodeObject: TxBodyEncodeObject = {
+        typeUrl: '/cosmos.tx.v1beta1.TxBody',
+        value: signedTxBody,
+      };
+      const signedTxBodyBytes = this.registry.encode(signedTxBodyEncodeObject);
+
+      const signDoc = makeSignDoc(
+        [msgSendInAmino],
+        feeInAmino,
+        chainId,
+        transaction.memo,
+        transaction.accountNumber,
+        transaction.accountSequence,
+      );
+      const uint8SignDoc = serializeSignDoc(signDoc);
+      const messageByte = new Bytes(uint8SignDoc);
+
+      const signature = await this.signerProvider.sign(messageByte);
+
+      const txRaw = TxRaw.fromPartial({
+        bodyBytes: signedTxBodyBytes,
+        authInfoBytes,
+        signatures: [signature.toUint8Array()],
+      });
+
+      // get signed tx from TxRaw
+      const signedBytes = Uint8Array.from(TxRaw.encode(txRaw).finish());
+      const txHash = toHex(signedBytes);
+      return txHash;
+    }
     const { cro, rawTx } = this.getTransactionInfo(phrase, transaction, gasFee, gasLimit);
 
     const msgSend = new cro.bank.MsgSend({
@@ -383,7 +506,12 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
 
   async getSignedMessageTransaction(transaction: TransactionUnsigned, message: CosmosMsg[], rawTx) {
     const pubkeyoriginal = (
-      await this.signerProvider.getPubKey(this.addressIndex, this.derivationPathStandard, false)
+      await this.signerProvider.getPubKey(
+        this.addressIndex,
+        transaction.asset?.config?.tendermintNetwork?.chainName ?? SupportedChainName.CRYPTO_ORG,
+        this.derivationPathStandard,
+        false,
+      )
     ).toUint8Array();
     const pubkey = Bytes.fromUint8Array(pubkeyoriginal.slice(1));
     /* 
@@ -409,7 +537,16 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
 
     // 0: signer index
     const bytesMessage: Bytes = signableTx.toSignDocument(0);
+    console.log('cosmosHub bytesMessage', bytesMessage);
     const signature = await this.signerProvider.sign(bytesMessage);
+    console.log('cosmosHub signature', signature);
+    console.log(
+      'signableTxHash',
+      signableTx
+        .setSignature(0, signature)
+        .toSigned()
+        .getHexEncoded(),
+    );
 
     return signableTx
       .setSignature(0, signature)
@@ -427,13 +564,123 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     gasFee: string,
     gasLimit: number,
   ): Promise<string> {
+    if (
+      transaction.originAsset?.config?.tendermintNetwork &&
+      transaction.originAsset?.config?.tendermintNetwork?.chainName !== SupportedChainName.CRYPTO_ORG
+    ) {
+      const typeUrlIBCTransfer = '/ibc.applications.transfer.v1.MsgTransfer';
+      const network = transaction.originAsset?.config?.tendermintNetwork;
+
+      const fee = {
+        amount: [
+          {
+            denom: network.coin.baseDenom,
+            amount: gasFee,
+          },
+        ],
+        gas: gasLimit,
+      };
+
+      const feeInAmino = {
+        amount: [
+          {
+            denom: network.coin.baseDenom,
+            amount: gasFee,
+          },
+        ],
+        gas: gasLimit.toString(),
+      };
+
+      const pubkeyBytes = (
+        await this.signerProvider.getPubKey(
+          this.addressIndex,
+          network.chainName!,
+          this.derivationPathStandard,
+          false,
+        )
+      ).toUint8Array();
+
+      // this is 34 bytes, 33 length itself, 0x02 pr 0x03
+      // cut first byte of pubkeyBytes
+      // pubkeyBytes is 34 bytes, first byte is length itself, 33
+      const pubkeyBytesInLength33 = pubkeyBytes.slice(1);
+      const pubkey = encodePubkey(encodeSecp256k1Pubkey(pubkeyBytesInLength33));
+
+      // amino json auto info bytes
+      const authInfoBytes = makeAuthInfoBytes(
+        [{ pubkey, sequence: transaction.accountSequence }],
+        fee.amount,
+        fee.gas,
+        127,
+      );
+
+      const chainId = network.chainId ?? '';
+
+      const millisToNanoSecond = 1_000_000;
+      const timeout = (Date.now() + DEFAULT_IBC_TRANSFER_TIMEOUT) * millisToNanoSecond;
+
+      const msg = MsgTransfer.fromPartial({
+        sourcePort: transaction.port || '',
+        sourceChannel: transaction.channel || '',
+        token: coin(transaction.amount, network.coin.baseDenom),
+        sender: transaction.fromAddress,
+        receiver: transaction.toAddress,
+        timeoutTimestamp: Long.fromString(String(timeout), true),
+      });
+
+      const msgTransfer: MsgTransferEncodeObject = {
+        typeUrl: typeUrlIBCTransfer,
+        value: msg,
+      };
+
+      const converter = new AminoTypes(createIbcAminoConverters());
+      const msgTransferInAmino = converter.toAmino(msgTransfer);
+
+      const signedTxBody = {
+        messages: [msgTransfer],
+        memo: transaction.memo,
+      };
+      const signedTxBodyEncodeObject: TxBodyEncodeObject = {
+        typeUrl: '/cosmos.tx.v1beta1.TxBody',
+        value: signedTxBody,
+      };
+      
+      this.registry.register(typeUrlIBCTransfer, MsgTransfer);
+
+      const signedTxBodyBytes = this.registry.encode(signedTxBodyEncodeObject);
+
+      const signDoc = makeSignDoc(
+        [msgTransferInAmino],
+        feeInAmino,
+        chainId,
+        transaction.memo,
+        transaction.accountNumber,
+        transaction.accountSequence,
+      );
+      const uint8SignDoc = serializeSignDoc(signDoc);
+      const messageByte = new Bytes(uint8SignDoc);
+
+      const signature = await this.signerProvider.sign(messageByte);
+
+      const txRaw = TxRaw.fromPartial({
+        bodyBytes: signedTxBodyBytes,
+        authInfoBytes,
+        signatures: [signature.toUint8Array()],
+      });
+
+      // get signed tx from TxRaw
+      const signedBytes = Uint8Array.from(TxRaw.encode(txRaw).finish());
+      const txHash = toHex(signedBytes);
+      return txHash;
+
+    }
     const { cro, rawTx } = this.getTransactionInfoData(phrase, transaction.memo, gasFee, gasLimit);
 
     const millisToNanoSecond = 1_000_000;
     const timeout = (Date.now() + DEFAULT_IBC_TRANSFER_TIMEOUT) * millisToNanoSecond;
 
     // For a chainID string like testnet-croeseid-4, revision number is 4
-    const revisionNumberFromChainID = transaction?.asset?.config?.chainId?.split('-').pop();
+    const revisionNumberFromChainID = transaction?.originAsset?.config?.chainId?.split('-').pop();
     const revisionNumber = isNumeric(revisionNumberFromChainID)
       ? revisionNumberFromChainID
       : this.StaticRevisionNumber;

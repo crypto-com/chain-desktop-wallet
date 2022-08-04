@@ -1,5 +1,5 @@
 import { atom, useRecoilState } from 'recoil';
-import { getRecoil, setRecoil } from 'recoil-nexus'
+import { getRecoil, setRecoil } from 'recoil-nexus';
 import { getLocalSetting, setLocalSetting, SettingsKey } from '../../utils/localStorage';
 import { fetchRemoteNotifications, isRemoteNotificationExpired } from './remote';
 import { LocalNotification, NotificationItem, RemoteNotification } from './types';
@@ -20,19 +20,19 @@ const notificationsState = atom({
 const notificationHasUnRead = atom({
   key: 'notificationHasUnRead',
   default: false,
-})
+});
 
 // use outside hooks
 export const postLocalNotification = (notification: LocalNotification) => {
 
   const notifications = getRecoil(notificationsState);
   const newNotification = {
-      id: Date.now(),
-      content: notification.content,
-      isRead: false,
-      type: notification.type,
-      createdAt: Date.now(),
-  }
+    id: Date.now(),
+    content: notification.content,
+    isRead: false,
+    type: notification.type,
+    createdAt: Date.now(),
+  };
 
   const newNotifications = [...notifications, newNotification];
 
@@ -45,7 +45,7 @@ export const postLocalNotification = (notification: LocalNotification) => {
 
   // eslint-disable-next-line no-new
   new Notification(notification.content);
-}
+};
 
 export const useNotification = () => {
   const [notifications, setNotifications] = useRecoilState(notificationsState);
@@ -55,10 +55,10 @@ export const useNotification = () => {
     setHasUnread(false);
     const newNotifications = notifications.map((n) => {
       return { ...n, isRead: true };
-    })
+    });
 
     updateNotifications(newNotifications);
-  }
+  };
 
   const getNotificationById = (id: number) => {
     return notifications.find(n => n.id === id);
@@ -67,7 +67,7 @@ export const useNotification = () => {
   const updateHasUnRead = (notifications: NotificationItem[]) => {
     const hasUnRead = notifications.some(n => n.isRead === false);
     setHasUnread(hasUnRead);
-  }
+  };
 
   const markAsRead = (notification: NotificationItem) => {
     const newNotifications = notifications.map(n => {
@@ -105,7 +105,7 @@ export const useNotification = () => {
     newNotifications.forEach((n) => {
       // eslint-disable-next-line no-new
       new Notification(n.content);
-    })
+    });
     updateNotifications([...notifications, ...newNotifications]);
   };
 
@@ -138,10 +138,10 @@ export const useNotification = () => {
 
   };
 
-    const fetchNotifications = async (providerURL: string) => {
-      const notifications = await loadRemoteNotifications(providerURL);
-      postRemoteNotifications(notifications);
-    }
+  const fetchNotifications = async (providerURL: string) => {
+    const notifications = await loadRemoteNotifications(providerURL);
+    postRemoteNotifications(notifications);
+  };
 
   return {
     notifications,

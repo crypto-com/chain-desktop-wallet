@@ -22,7 +22,7 @@ export class NftUtils {
       // On errors
       if (Array.isArray(externalMetadata) && !externalMetadata.length) {
         // eslint-disable-next-line no-console
-        console.log(`[extractTokenMetadata], Unable to extract External token metadata.`);
+        console.log('[extractTokenMetadata], Unable to extract External token metadata.');
         return parsedTokenData;
       }
 
@@ -32,7 +32,7 @@ export class NftUtils {
       // On external metadata being `non-translatable`
       if (!externalMetadata.data.translatedNft.translatable) {
         // eslint-disable-next-line no-console
-        console.log(`[extractTokenMetadata], External metadata is untranslatable.`);
+        console.log('[extractTokenMetadata], External metadata is untranslatable.');
         return parsedTokenData;
       }
 
@@ -134,24 +134,24 @@ export class NftUtils {
     }
 
     await Promise.all(
-          lists.map(async nft => {
-            if (isCryptoOrgNftModel(nft)) {
-              const { model } = nft;
+      lists.map(async nft => {
+        if (isCryptoOrgNftModel(nft)) {
+          const { model } = nft;
 
-              const denomSchema = isJson(model.denomSchema) ? JSON.parse(model.denomSchema) : null;
-              const tokenData = isJson(model.tokenData)
-                ? await NftUtils.extractTokenMetadata(model.tokenData, model.denomId)
-                : null;
+          const denomSchema = isJson(model.denomSchema) ? JSON.parse(model.denomSchema) : null;
+          const tokenData = isJson(model.tokenData)
+            ? await NftUtils.extractTokenMetadata(model.tokenData, model.denomId)
+            : null;
 
-              fullNftList.push({
-                ...nft,
-                denomSchema,
-                tokenData,
-              });
-            }
-            if (isCronosNftModel(nft)) {
-              fullNftList.push(nft);
-            }
+          fullNftList.push({
+            ...nft,
+            denomSchema,
+            tokenData,
+          });
+        }
+        if (isCronosNftModel(nft)) {
+          fullNftList.push(nft);
+        }
       }),
     );
 

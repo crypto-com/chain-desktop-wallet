@@ -71,8 +71,8 @@ const PasswordResult = (props: {
           <div className="result-message">
             {validationErrMsg.includes('*break*')
               ? validationErrMsg.split('*break*').map((err, idx) => {
-                  return <div key={idx}> {err}</div>;
-                })
+                return <div key={idx}> {err}</div>;
+              })
               : validationErrMsg}
           </div>
         </div>

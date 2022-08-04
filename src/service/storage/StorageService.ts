@@ -13,6 +13,7 @@ import {
   getAssetPriceId,
   getAssetPriceIdFrom,
   UserAsset,
+  UserAssetType,
 } from '../../models/UserAsset';
 import { CommonNftModel, CronosCRC721NftModel, CryptoOrgNftModel, NftType } from '../../models/Nft';
 import {
@@ -211,6 +212,14 @@ export class StorageService {
     );
   }
 
+  public async updateAsset(asset: UserAsset) {
+    return this.db.assetStore.update<UserAsset>(
+      { _id: asset.identifier },
+      { $set: asset },
+      { upsert: false },
+    );
+  }
+
   public async removeAssets(assets: UserAsset[]) {
     return this.db.assetStore.remove(
       { _id: { $in: assets.map(asset => asset.identifier) } },
@@ -293,8 +302,12 @@ export class StorageService {
     return this.db.marketPriceStore.find<AssetMarketPrice>({ currency });
   }
 
-  public async retrieveAssetPrice(assetSymbol: string, currency: string) {
-    const assetPriceId = getAssetPriceIdFrom(assetSymbol, currency);
+  public async retrieveAssetPrice(
+    assetType: UserAssetType | undefined,
+    assetSymbol: string,
+    currency: string,
+  ) {
+    const assetPriceId = getAssetPriceIdFrom(assetType, assetSymbol, currency);
     return this.db.marketPriceStore.findOne<AssetMarketPrice>({ _id: assetPriceId });
   }
 
@@ -572,7 +585,7 @@ export class StorageService {
     walletId: string,
   ): Promise<NftAccountTransactionList> {
     const nftAccountTxRecords = await this.db.commonTransactionStore.find<
-      NftAccountTransactionRecord
+    NftAccountTransactionRecord
     >({
       walletId,
       txType: 'nftAccount',
@@ -728,8 +741,19 @@ export class StorageService {
     // });
   }
 
+  public async removeBridgeTransactions() {
+    return this.db.commonTransactionStore.remove(
+      {
+        txType: 'ibc',
+      },
+      { multi: true },
+    );
+  }
+
   // eslint-disable-next-line
   public async saveBridgeTransactions(bridgeTransactions: BridgeTransactionHistoryList) {
+    // await this.removeBridgeTransactions();
+
     if (!bridgeTransactions) {
       return Promise.resolve();
     }
@@ -741,8 +765,10 @@ export class StorageService {
         txType: 'ibc',
         txData: tx,
         txHash: tx.sourceTransactionId,
+        sourceChain: tx.sourceChain,
       };
     });
+
     await this.insertCommonTransactionRecords(ibcTxRecords);
 
     // @deprecated
@@ -755,10 +781,11 @@ export class StorageService {
     return this.db.bridgeTransactionStore.insert<BridgeTransactionHistoryList>(bridgeTransactions); */
   }
 
-  public async retrieveAllBridgeTransactions(walletId: string) {
+  public async retrieveBridgeTransactions(walletId: string, sourceChain?: string) {
     const bridgeTxs = await this.db.commonTransactionStore.find<IBCTransactionRecord>({
       walletId,
       txType: 'ibc',
+      sourceChain,
     } as IBCTransactionRecord);
 
     // Sort the txdata list by `blockTime` in descending
@@ -789,12 +816,11 @@ export class StorageService {
     chainName: string,
     assetSymbol: string,
   ) {
-    return this.db.addressBookStore
-      .find<AddressBookContactModel>({
-        walletId,
-        chainName,
-        assetSymbol,
-      })
+    return this.db.addressBookStore.find<AddressBookContactModel>({
+      walletId,
+      chainName,
+      assetSymbol,
+    })
       .exec();
   }
 

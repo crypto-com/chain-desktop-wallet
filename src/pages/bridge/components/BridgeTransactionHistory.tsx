@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './BridgeTransactionHistory.less';
 import { useRecoilValue } from 'recoil';
-import { Table, Tag, Tooltip } from 'antd';
+import { Select, Spin, Table, Tag, Tooltip } from 'antd';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 
@@ -13,29 +13,38 @@ import {
   getCronosTendermintAsset,
   getAssetBySymbolAndChain,
   getChainName,
+  getCosmosHubTendermintAsset,
 } from '../../../utils/utils';
 
 import { walletService } from '../../../service/WalletService';
 import { BridgeService } from '../../../service/bridge/BridgeService';
 import {
+  BridgeSourceChain,
   BridgeTransaction,
   BridgeTransactionStatus,
 } from '../../../service/bridge/contracts/BridgeModels';
 import { renderExplorerUrl } from '../../../models/Explorer';
+import { LoadingOutlined } from '@ant-design/icons';
+
+const { Option } = Select;
 
 const BridgeTransactionHistory = () => {
   const session = useRecoilValue(sessionState);
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
 
+  const [loading, setLoading] = useState(false);
+  const [selectedChain, setSelectedChain] = useState<BridgeSourceChain>(BridgeSourceChain.CRYPTO_ORG);
   const [allBridgeHistory, setAllBridgeHistory] = useState<BridgeTransferTabularData[]>([]);
 
   const [t] = useTranslation();
 
   // eslint-disable-next-line
-  const cronosAsset = getCronosEvmAsset(walletAllAssets);
-  const cryptoOrgAsset = getCronosTendermintAsset(walletAllAssets);
+  const cronosEvmAsset = getCronosEvmAsset(walletAllAssets);
+  const cronosTendermintAsset = getCronosTendermintAsset(walletAllAssets);
+  const cosmosHubTendermintAsset = getCosmosHubTendermintAsset(walletAllAssets);
 
   const bridgeService = new BridgeService(walletService.storageService);
+  const isTestnet = bridgeService.checkIfTestnet(session.wallet.config.network);
 
   interface BridgeTransferTabularData {
     key: string;
@@ -274,24 +283,50 @@ const BridgeTransactionHistory = () => {
 
   useEffect(() => {
     const fetchBridgeHistory = async () => {
-      if (cronosAsset) {
-        await bridgeService.fetchAndSaveBridgeTxs(cronosAsset?.address!, cryptoOrgAsset?.address!);
-      }
-      const transactionHistory = await bridgeService.retrieveCurrentWalletBridgeTransactions();
+      setLoading(true);
+      // if (cronosEvmAsset) {
+      await bridgeService.fetchAndSaveBridgeTxs({
+        cronosEvmAddress: selectedChain === BridgeSourceChain.CRONOS ? cronosEvmAsset?.address! : undefined,
+        cronosTendermintAddress: selectedChain === BridgeSourceChain.CRYPTO_ORG ? cronosTendermintAsset?.address! : undefined,
+        cosmosHubTendermintAddress: selectedChain === BridgeSourceChain.COSMOS_HUB ? cosmosHubTendermintAsset?.address! : undefined,
+      });
+      // }
+      const transactionHistory = await bridgeService.retrieveCurrentWalletBridgeTransactions(selectedChain);
+      setLoading(false);
       const processedHistory = convertBridgeTransfers(transactionHistory);
-
       setAllBridgeHistory(processedHistory);
+
     };
     fetchBridgeHistory();
-  }, []);
+  }, [selectedChain]);
+
 
   return (
     <>
+      <Select
+        value={selectedChain}
+        onChange={(value: BridgeSourceChain) => {
+          setSelectedChain(value);
+        }}
+      >
+        <Option key={BridgeSourceChain.CRONOS} value={BridgeSourceChain.CRONOS}>{getChainName('Cronos', session.wallet.config)}: {`${middleEllipsis(cronosEvmAsset?.address!, 6)}`}</Option>
+        <Option key={BridgeSourceChain.CRYPTO_ORG} value={BridgeSourceChain.CRYPTO_ORG}>{getChainName('Crypto.org', session.wallet.config)}: {`${middleEllipsis(cronosTendermintAsset?.address!, 6)}`}</Option>
+        {!isTestnet
+          ? <Option key={BridgeSourceChain.COSMOS_HUB} value={BridgeSourceChain.COSMOS_HUB}>{getChainName('Cosmos Hub', session.wallet.config)}: {`${middleEllipsis(cosmosHubTendermintAsset?.address!, 6)}`}</Option>
+          : <></>
+        }
+      </Select>
       <Table
         columns={HistoryColumns}
         dataSource={allBridgeHistory}
         className="transfer-table"
         rowKey={record => record.key}
+        loading={{
+          indicator: (
+            <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />
+          ),
+          spinning: loading,
+        }}
       />
     </>
   );

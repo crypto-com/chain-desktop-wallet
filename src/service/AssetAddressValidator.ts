@@ -3,19 +3,19 @@ import {
   AddressValidator,
 } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
 import { ethers } from 'ethers';
-import { WalletConfig } from '../config/StaticConfig';
+import { Network } from '../config/StaticConfig';
 import { UserAssetType } from '../models/UserAsset';
 
 export class AssetAddressValidator {
   private readonly address: string;
 
-  private readonly config: WalletConfig;
+  private readonly network: Network;
 
   private readonly assetType?: UserAssetType;
 
-  constructor(address: string, config: WalletConfig, assetType?: UserAssetType) {
+  constructor(address: string, network: Network, assetType?: UserAssetType) {
     this.address = address;
-    this.config = config;
+    this.network = network;
     this.assetType = assetType;
   }
 
@@ -26,7 +26,7 @@ export class AssetAddressValidator {
       case UserAssetType.IBC: {
         const addressValidator = new AddressValidator({
           address: this.address,
-          network: this.config.network,
+          network: this.network,
           type: addressType,
         });
         return addressValidator.isValid();

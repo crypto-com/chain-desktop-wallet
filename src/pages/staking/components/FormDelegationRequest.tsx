@@ -55,7 +55,8 @@ import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
 import GasStepSelectTendermint, {
   GasInfoTendermint,
-} from '../../../components/GasStepSelect/GasStepSelectTendermint';
+} from '../../../components/GasCustomize/Tendermint/GasConfig';
+import { checkIfTestnet } from '../../../utils/utils';
 
 const { Content, Sider } = Layout;
 const { Search } = Input;
@@ -250,13 +251,16 @@ export const FormDelegationRequest = props => {
   }
 
   const assetMarketData = allMarketData.get(
-    `${walletAsset.mainnetSymbol}-${currentSession.currency}`,
+    `${walletAsset.assetType}-${walletAsset.mainnetSymbol}-${currentSession.currency}`,
   );
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol;
+  
+  const isTestnet = checkIfTestnet(currentSession.wallet.config.network);
+
   const undelegatePeriod =
-    currentSession.wallet.config.name === 'MAINNET'
-      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET
-      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
+    isTestnet
+      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS
+      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET;
 
   return (
     <Form
@@ -341,8 +345,8 @@ export const FormDelegationRequest = props => {
             {scaledBalance(walletAsset)} {walletAsset?.symbol}{' '}
             {walletAsset && assetMarketData
               ? `(${localFiatSymbol}${numeral(
-                  getAssetBalancePrice(walletAsset, assetMarketData),
-                ).format('0,0.00')})`
+                getAssetBalancePrice(walletAsset, assetMarketData),
+              ).format('0,0.00')})`
               : ''}{' '}
           </div>
         </div>
@@ -408,21 +412,21 @@ export const FormDelegationRequest = props => {
                 {`${formValues?.amount} ${walletAsset?.symbol}`}{' '}
                 {walletAsset && assetMarketData && assetMarketData.price
                   ? `(${localFiatSymbol}${numeral(
-                      getAssetAmountInFiat(formValues?.amount, assetMarketData),
-                    ).format('0,0.00')})`
+                    getAssetAmountInFiat(formValues?.amount, assetMarketData),
+                  ).format('0,0.00')})`
                   : ''}
               </div>
             </div>
             {formValues?.memo !== undefined &&
             formValues?.memo !== null &&
             formValues.memo !== '' ? (
-              <div className="item">
-                <div className="label">{t('staking.modal1.label4')}</div>
-                <div>{`${formValues?.memo}`}</div>
-              </div>
-            ) : (
-              <div />
-            )}
+                <div className="item">
+                  <div className="label">{t('staking.modal1.label4')}</div>
+                  <div>{`${formValues?.memo}`}</div>
+                </div>
+              ) : (
+                <div />
+              )}
             {isValidatorAddressSuspicious(formValues.validatorAddress, moderationConfig) && (
               <Alert
                 message={
@@ -483,14 +487,14 @@ export const FormDelegationRequest = props => {
             {broadcastResult?.code !== undefined &&
             broadcastResult?.code !== null &&
             broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div className="description">
-                {t('general.successModalPopup.timeout.description')}
-              </div>
-            ) : (
-              <div className="description">
-                {t('general.successModalPopup.staking.description')}
-              </div>
-            )}
+                <div className="description">
+                  {t('general.successModalPopup.timeout.description')}
+                </div>
+              ) : (
+                <div className="description">
+                  {t('general.successModalPopup.staking.description')}
+                </div>
+              )}
             {/* <div>{broadcastResult.transactionHash ?? ''}</div> */}
           </>
         </SuccessModalPopup>

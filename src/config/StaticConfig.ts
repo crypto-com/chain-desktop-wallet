@@ -17,6 +17,9 @@ export const NCW_NFT_MIDDLEWARE_SERVER_ENDPOINT =
 export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';
 export const CLOUDFLARE_TRACE_URI = 'https://www.cloudflare.com/cdn-cgi/trace';
 
+// const APP_PROTOCOL_NAME = 'cryptowallet';
+export const APP_PROTOCOL_NAME = 'ledgerlive';
+
 // This constant value is used when actual values are not known yet
 // For instance :
 export const NOT_KNOWN_YET_VALUE = 'TO_BE_DECIDED';
@@ -148,6 +151,39 @@ export interface SupportedCurrency {
   label: string;
 }
 
+export const CRC20_TOKEN_ICON_URL = {
+  VVS:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/61711b671ef47000c5ac9f78/VVS_Finance_Logo_Token_Symbol-White.png',
+  BIFI:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5f979dd0acbd0e009941cbf0/BIFI_8.png',
+  DOGE:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c1248835568a4017c20a9a6/dogecoin.png',
+  ATOM:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5cc8dba7d436cf008a5ad9cd/cosmos.png',
+  SWAPP:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/610b8b87d07aba00c6590f3b/SWAPP_cronos_4.png',
+  CRONA:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/619de338a4396a00c5b30250/CRONA_4.png',
+  USDT:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c12487f5568a4017c20a999/tether.png',
+  USDC:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c1251c25afb9500ec2d2ff3/coin_log_usd-coin.png',
+  ELK:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/619de4423363e600c5f22dbc/ELK_4.png',
+  SMOL:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/61a4da089a45a100c53b189f/SMOL_4.png',
+  SHIB:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5f979d61acbd0e009941ca04/SHIBxxxhdpi.png',
+  WCRO:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c1248c15568a4017c20aa87/cro.png',
+  DAI:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5e01c4cd49cde700adb27b0d/DAIxxxhdpi.png',
+  WETH:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5fc4d2ba3deadb00995dbfc5/WETH-xxxhdpi.png',
+  WBTC:
+    'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5eb427298eadfb009885d309/WBTC_4x.png',
+};
+
 export const SUPPORTED_CURRENCY = new Map<string, SupportedCurrency>();
 SUPPORTED_CURRENCY.set('USD', { value: 'USD', label: 'USD - $', symbol: '$' });
 SUPPORTED_CURRENCY.set('GBP', { value: 'GBP', label: 'GBP - £', symbol: '£' });
@@ -179,21 +215,15 @@ SUPPORTED_CURRENCY.set('TRY', { value: 'TRY', label: 'TRY - ₺', symbol: '₺' 
 export enum SupportedChainName {
   CRYPTO_ORG = 'Crypto.org Chain',
   CRONOS = 'Cronos Chain',
+  COSMOS_HUB = 'Cosmos Hub Chain',
+  ETHEREUM = 'Ethereum Chain',
 }
 
-export interface SupportedBridge {
-  value: string;
-  label: string;
+export enum NetworkName {
+  MAINNET = 'MAINNET',
+  TESTNET = 'TESTNET',
+  CUSTOM_DEVNET = 'CUSTOM DEVNET',
 }
-
-export const SUPPORTED_BRIDGE = new Map<string, SupportedBridge>();
-SUPPORTED_BRIDGE.set('CRONOS', { value: 'CRONOS', label: SupportedChainName.CRONOS });
-SUPPORTED_BRIDGE.set('CRYPTO_ORG', {
-  value: 'CRYPTO_ORG',
-  label: SupportedChainName.CRYPTO_ORG,
-});
-
-export const SUPPORTED_BRIDGES_ASSETS = ['CRO'];
 
 export type WalletConfig = {
   enabled: boolean;
@@ -296,8 +326,8 @@ export const AUTO_UPDATE_DISABLE_DURATIONS = [14, 30];
 
 const TestNetConfig: WalletConfig = {
   enabled: true,
-  name: 'TESTNET',
-  derivationPath: "m/44'/1'/0'/0/0",
+  name: NetworkName.TESTNET,
+  derivationPath: 'm/44\'/1\'/0\'/0/0',
   explorer: {
     baseUrl: 'https://crypto.org/explorer/croeseid',
     tx: 'https://crypto.org/explorer/croeseid/tx',
@@ -308,29 +338,6 @@ const TestNetConfig: WalletConfig = {
   indexingUrl: 'https://crypto.org/explorer/croeseid/api/v1/',
   nodeUrl: CroNetwork.Testnet.defaultNodeUrl,
   network: CroNetwork.Testnet,
-  disableDefaultClientMemo: false,
-  enableGeneralSettings: false,
-  analyticsDisabled: false,
-  fee: {
-    gasLimit: FIXED_DEFAULT_GAS_LIMIT,
-    networkFee: FIXED_DEFAULT_FEE,
-  },
-};
-
-const TestNetCroeseid3Config: WalletConfig = {
-  enabled: true,
-  name: 'TESTNET CROESEID 3',
-  derivationPath: "m/44'/1'/0'/0/0",
-  explorer: {
-    baseUrl: 'https://crypto.org/explorer/croeseid3',
-    tx: 'https://crypto.org/explorer/croeseid3/tx',
-    address: 'https://crypto.org/explorer/croeseid3/account',
-    validator: 'https://crypto.org/explorer/croeseid3/validator',
-  },
-  explorerUrl: 'https://crypto.org/explorer/croeseid3',
-  indexingUrl: 'https://crypto.org/explorer/croeseid3/api/v1/',
-  nodeUrl: CroNetwork.TestnetCroeseid3.defaultNodeUrl,
-  network: CroNetwork.TestnetCroeseid3,
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,
@@ -359,8 +366,8 @@ const TestnetCroeseid4: Network = {
 
 const TestNetCroeseid4Config: WalletConfig = {
   enabled: true,
-  name: 'TESTNET CROESEID 4',
-  derivationPath: "m/44'/1'/0'/0/0",
+  name: NetworkName.TESTNET,
+  derivationPath: 'm/44\'/1\'/0\'/0/0',
   explorer: {
     baseUrl: 'https://crypto.org/explorer/croeseid4',
     tx: 'https://crypto.org/explorer/croeseid4/tx',
@@ -382,8 +389,8 @@ const TestNetCroeseid4Config: WalletConfig = {
 
 const MainNetConfig: WalletConfig = {
   enabled: true,
-  name: 'MAINNET',
-  derivationPath: "m/44'/394'/0'/0/0",
+  name: NetworkName.MAINNET,
+  derivationPath: 'm/44\'/394\'/0\'/0/0',
   nodeUrl: CroNetwork.Mainnet.defaultNodeUrl,
   explorer: {
     baseUrl: 'https://crypto.org/explorer',
@@ -405,9 +412,9 @@ const MainNetConfig: WalletConfig = {
 
 // Supposed to be fully customizable by the user when it will be supported
 export const CustomDevNet: WalletConfig = {
-  derivationPath: "m/44'/394'/0'/0/0",
+  derivationPath: 'm/44\'/394\'/0\'/0/0',
   enabled: true,
-  name: 'CUSTOM DEVNET',
+  name: NetworkName.CUSTOM_DEVNET,
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,
@@ -437,7 +444,6 @@ export const DefaultWalletConfigs = {
   MainNetConfig,
   CustomDevNet,
   TestNetCroeseid4Config,
-  TestNetCroeseid3Config,
 };
 
 // This type is a copy of the Network type defined inside chain-js
@@ -449,6 +455,11 @@ export type Network = {
   bip44Path: { coinType: number; account: number };
   validatorPubKeyPrefix: string;
   validatorAddressPrefix: string;
-  coin: { baseDenom: string; croDenom: string };
+  coin: { baseDenom: string; croDenom: string; denom?: string };
   rpcUrl?: string;
+  chainName?: SupportedChainName;
+  node?: {
+    clientUrl: string;
+    proxyUrl: string;
+  };
 };

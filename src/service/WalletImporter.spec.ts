@@ -1,11 +1,15 @@
+/**
+ * @jest-environment node
+ */
 import 'mocha';
 import { expect } from 'chai';
 import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
 import { WalletImporter, WalletImportOptions } from './WalletImporter';
 import { UserAssetType } from '../models/UserAsset';
+import { DerivationPathStandard } from './signers/LedgerSigner';
 
 describe('Testing WalletImporter', () => {
-  it('Test importing wallet with testnet configuration', () => {
+  it('Test importing wallet with testnet configuration', async () => {
     const testNetConfig = DefaultWalletConfigs.TestNetConfig;
 
     const importOptions: WalletImportOptions = {
@@ -15,16 +19,17 @@ describe('Testing WalletImporter', () => {
       phrase:
         'ramp sock spice enrich exhibit skate empower process kit pudding olive mesh friend camp labor coconut devote shell argue system pig then provide nose',
       walletName: 'My-TestNet-Wallet',
+      derivationPathStandard: DerivationPathStandard.BIP44,
     };
-    const testNetWallet = new WalletImporter(importOptions).import().wallet;
+    const testNetWallet = (await new WalletImporter(importOptions).import()).wallet;
 
     expect(testNetWallet.name).to.eq('My-TestNet-Wallet');
     expect(testNetWallet.address).to.eq('tcro15rsn69ze9r7g52tk0u6cyhu4edep88dxgtzm65');
     expect(testNetWallet.config).to.eq(testNetConfig);
 
-    const { assets } = new WalletImporter(importOptions).import();
+    const { assets } = await new WalletImporter(importOptions).import();
 
-    expect(assets.length).to.eq(2);
+    expect(assets.length).to.eq(4);
     expect(
       assets
         .filter(asset => asset.assetType === UserAssetType.TENDERMINT)[0]
@@ -38,7 +43,7 @@ describe('Testing WalletImporter', () => {
     expect(evmCronosAsset?.address).to.eq('0x23806BC778F56AaA1e20CD0d1A44078aFa8D65b0');
   });
 
-  it('Test importing wallet with main-net configuration', () => {
+  it('Test importing wallet with main-net configuration', async () => {
     const mainNetConfig = DefaultWalletConfigs.MainNetConfig;
 
     const importOptions: WalletImportOptions = {
@@ -48,20 +53,21 @@ describe('Testing WalletImporter', () => {
       phrase:
         'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone',
       walletName: 'My-MainNet-Wallet',
+      derivationPathStandard: DerivationPathStandard.BIP44,
     };
-    const testNetWallet = new WalletImporter(importOptions).import().wallet;
+    const testNetWallet = (await new WalletImporter(importOptions).import()).wallet;
 
     expect(testNetWallet.name).to.eq('My-MainNet-Wallet');
     expect(testNetWallet.address).to.eq('cro1n0ejfh2ur2nslekrynvcwuwc9cccnhxfqn6sfs');
     expect(testNetWallet.config).to.eq(mainNetConfig);
 
-    const { assets } = new WalletImporter(importOptions).import();
+    const { assets } = await new WalletImporter(importOptions).import();
 
     const evmCronosAsset = assets.filter(asset => asset.assetType === UserAssetType.EVM)[0];
     expect(evmCronosAsset?.address).to.eq('0xc2aFcEC3DAfAF1a4f47030eE35Fd1A1231C08256');
   });
 
-  it('Test importing wallet with custom configurations', () => {
+  it('Test importing wallet with custom configurations', async () => {
     const customConfig: WalletConfig = {
       disableDefaultClientMemo: false,
       enableGeneralSettings: false,
@@ -70,7 +76,7 @@ describe('Testing WalletImporter', () => {
       explorer: {},
       explorerUrl: '',
       enabled: true,
-      derivationPath: "44'/245'/0'/0/0",
+      derivationPath: '44\'/245\'/0\'/0/0',
       name: 'Pystaport-Custom-Network',
       analyticsDisabled: false,
       network: {
@@ -99,8 +105,9 @@ describe('Testing WalletImporter', () => {
         'team school reopen cave banner pass autumn march immune album hockey region baby critic insect armor pigeon owner number velvet romance flight blame tone',
       config: customConfig,
       walletName: 'My-Custom-Config-Wallet',
+      derivationPathStandard: DerivationPathStandard.BIP44,
     };
-    const customWallet = new WalletImporter(importOptions).import().wallet;
+    const customWallet = (await new WalletImporter(importOptions).import()).wallet;
 
     expect(customWallet.address).to.eq('pcro1fdu6qgn3r4ptsx8z6v5hr5dsjvkjw6jkyrphvx');
     expect(customWallet.config).to.eq(customConfig);

@@ -1,24 +1,42 @@
 import { WalletConfig } from '../config/StaticConfig';
 import { AddressGenerator } from './AddressGenerator';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
-import { CRONOS_TENDERMINT_ASSET, CRONOS_EVM_ASSET } from '../config/StaticAssets';
+import {
+  CRONOS_TENDERMINT_ASSET,
+  CRONOS_EVM_ASSET,
+  ATOM_TENDERMINT_ASSET,
+  ETH_ASSET,
+} from '../config/StaticAssets';
 import { HDKey } from '../utils/ChainJsLib';
 import { Wallet } from '../models/Wallet';
 
 export class WalletOps {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars,class-methods-use-this
-  public generateAssets(config: WalletConfig, walletIdentifier: string, phrase: string) {
+  public async generateAssets(config: WalletConfig, walletIdentifier: string, phrase: string) {
     const addressGenerator = new AddressGenerator(phrase, config);
     const assets: UserAsset[] = [
       {
         ...CRONOS_TENDERMINT_ASSET(config),
         walletId: walletIdentifier,
-        address: addressGenerator.getAddress(UserAssetType.TENDERMINT),
+        address: await addressGenerator.getAddress(UserAssetType.TENDERMINT),
       },
       {
         ...CRONOS_EVM_ASSET(config),
         walletId: walletIdentifier,
-        address: addressGenerator.getAddress(UserAssetType.EVM),
+        address: await addressGenerator.getAddress(UserAssetType.EVM),
+      },
+      {
+        ...ATOM_TENDERMINT_ASSET(config),
+        walletId: walletIdentifier,
+        address: await addressGenerator.getAddress(
+          UserAssetType.TENDERMINT,
+          ATOM_TENDERMINT_ASSET(config).config,
+        ),
+      },
+      {
+        ...ETH_ASSET(config),
+        walletId: walletIdentifier,
+        address: await addressGenerator.getAddress(UserAssetType.EVM),
       },
     ];
 
