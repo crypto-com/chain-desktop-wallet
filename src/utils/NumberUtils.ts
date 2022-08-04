@@ -92,14 +92,14 @@ export function adjustedTransactionAmount(
   return formAmount.toString();
 }
 
-export function roundPrice(value: number, decimal: number = 2) {
+export function roundPrice(value: number, decimal: number = 4) {
 
   if (value <= 0) {
     return value.toString();
   }
 
   if (value > 10) {
-    return value.toFixed(decimal);
+    return value.toFixed(2);
   }
 
   const zeroCount = -Math.floor( Math.log10(value) + 1);
