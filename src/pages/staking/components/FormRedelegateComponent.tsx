@@ -16,7 +16,8 @@ import { TransactionUtils } from '../../../utils/TransactionUtils';
 import { UNBLOCKING_PERIOD_IN_DAYS } from '../../../config/StaticConfig';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 import ValidatorListTable from './ValidatorListTable';
-import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSelectTendermint';
+import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasConfig';
+import { checkIfTestnet } from '../../../utils/utils';
 
 const { Search } = Input;
 
@@ -65,10 +66,12 @@ export const FormRedelegateComponent = (props: {
   const currentValidatorList = useRecoilValue(validatorListState);
   const [isValidatorListVisible, setIsValidatorListVisible] = useState(false);
 
+  const isTestnet = checkIfTestnet(props.currentSession.wallet.config.network);
+
   const redelegatePeriod =
-    props.currentSession.wallet.config.name === 'MAINNET'
-      ? UNBLOCKING_PERIOD_IN_DAYS.REDELEGATION.MAINNET
-      : UNBLOCKING_PERIOD_IN_DAYS.REDELEGATION.OTHERS;
+    isTestnet
+      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS
+      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET;
 
   return (
     <div className="redelegate-form">

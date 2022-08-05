@@ -6,6 +6,7 @@ import Web3 from 'web3';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { Network, WalletConfig, SupportedChainName } from '../config/StaticConfig';
 import { CRC20MainnetTokenInfos } from '../config/CRC20Tokens';
+import { ERC20MainnetTokenInfos } from '../config/ERC20Tokens';
 
 export function isElectron() {
   // Renderer process
@@ -131,6 +132,10 @@ export function bech32ToEVMAddress(bech32Address: string) {
   return ethers.utils.getAddress(originalEVMAddress);
 }
 
+export const isUnlimited = (amount: ethers.BigNumber) => {
+  return amount.gte(ethers.BigNumber.from('0xffffffffffffffffffffffffffffffff'));
+};
+
 export function getCronosTendermintAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
     return (
@@ -141,16 +146,22 @@ export function getCronosTendermintAsset(walletAllAssets: UserAsset[]) {
   });
 }
 
-export const isUnlimited = (amount: ethers.BigNumber) => {
-  return amount.gte(ethers.BigNumber.from('0xffffffffffffffffffffffffffffffff'));
-};
-
 export function getCronosEvmAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
     return (
       asset.mainnetSymbol.toUpperCase() === 'CRO' &&
       asset.name.includes('Cronos') &&
       asset.assetType === UserAssetType.EVM
+    );
+  });
+}
+
+export function getCosmosHubTendermintAsset(walletAllAssets: UserAsset[]) {
+  return walletAllAssets.find(asset => {
+    return (
+      asset.mainnetSymbol.toUpperCase() === 'ATOM' &&
+      asset.name.includes('Cosmos') &&
+      asset.assetType === UserAssetType.TENDERMINT
     );
   });
 }
@@ -183,7 +194,10 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
     switch (name) {
       case SupportedChainName.CRONOS:
       case SupportedChainName.CRYPTO_ORG:
+      case SupportedChainName.COSMOS_HUB:
         return name.replace('Chain', 'Testnet');
+      case SupportedChainName.ETHEREUM:
+        return name.replace('Chain', 'Rinkeby Testnet');
       default:
         return name;
     }
@@ -197,11 +211,20 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
   }
 }
 
-export function getAssetTypeName(assetType: UserAssetType | undefined) {
+export function getAssetTypeName(assetType: UserAssetType | undefined, assetSymbol?: string) {
   switch (assetType) {
-    case UserAssetType.TENDERMINT:
-    case UserAssetType.EVM:
+    case UserAssetType.TENDERMINT: {
+      if (assetSymbol && assetSymbol === 'ATOM') {
+        return 'Atom';
+      }
       return 'Cronos';
+    }
+    case UserAssetType.EVM: {
+      if (assetSymbol && assetSymbol === 'ETH') {
+        return 'Ethereum';
+      }
+      return 'Cronos';
+    }
     case UserAssetType.CRC_20_TOKEN:
       return 'CRC20';
     case UserAssetType.ERC_20_TOKEN:
@@ -227,6 +250,34 @@ export function isCRC20AssetWhitelisted(
   }
 
   return tokenInfo.isWhitelisted && isAddressEqual(contractAddress, tokenInfo.address);
+}
+
+export function isERC20AssetWhitelisted(
+  symbol: string,
+  contractAddress: string,
+  config: WalletConfig,
+) {
+  const isTestnet = checkIfTestnet(config.network);
+  if (isTestnet) {
+    return true;
+  }
+
+  const tokenInfo = ERC20MainnetTokenInfos.get(symbol.toUpperCase());
+  if (!tokenInfo) {
+    return false;
+  }
+
+  return tokenInfo.isWhitelisted && isAddressEqual(contractAddress, tokenInfo.address);
+}
+
+export function getAllERC20WhiteListedAddress() {
+  const whiteListedAddresses: String[] = [];
+  ERC20MainnetTokenInfos.forEach(token => {
+    if (token.isWhitelisted) {
+      whiteListedAddresses.push(token.address);
+    }
+  });
+  return whiteListedAddresses;
 }
 
 export function isAddressEqual(lhs: string, rhs: string) {
@@ -260,4 +311,8 @@ export function addHTTPsPrefixIfNeeded(str: string) {
   }
 
   return `https://${str}`;
+}
+
+export function isHexEqual(lhs: string, rhs: string) {
+  return Web3.utils.toHex(lhs) === Web3.utils.toHex(rhs);
 }

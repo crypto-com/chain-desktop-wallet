@@ -44,8 +44,8 @@ import { ledgerNotification } from '../../../components/LedgerNotification/Ledge
 import { AddressBookService } from '../../../service/AddressBookService';
 import { AddressBookContact } from '../../../models/AddressBook';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
-import GasStepSelect from '../../../components/GasStepSelect';
-import GasInfo from '../../../components/GasStepSelect/GasInfo';
+import GasStepSelect from '../../../components/GasCustomize/GasConfig';
+import GasInfo from '../../../components/GasCustomize/GasInfo';
 
 const layout = {};
 const tailLayout = {};
@@ -250,7 +250,7 @@ const FormSend: React.FC<FormSendProps> = props => {
   }, [walletAsset]);
 
   const assetMarketData = allMarketData.get(
-    `${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
+    `${currentSession?.activeAsset?.assetType}-${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
   );
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
 
@@ -332,8 +332,8 @@ const FormSend: React.FC<FormSendProps> = props => {
             {availableBalance} {walletAsset?.symbol}{' '}
             {walletAsset && localFiatSymbol && assetMarketData
               ? `(${localFiatSymbol}${numeral(
-                  getAssetBalancePrice(walletAsset, assetMarketData),
-                ).format('0,0.00')})`
+                getAssetBalancePrice(walletAsset, assetMarketData),
+              ).format('0,0.00')})`
               : ''}
           </div>
         </div>
@@ -406,8 +406,8 @@ const FormSend: React.FC<FormSendProps> = props => {
                 {`${formValues?.amount} ${walletAsset?.symbol}`}{' '}
                 {walletAsset && localFiatSymbol && assetMarketData && assetMarketData.price
                   ? `(${localFiatSymbol}${numeral(
-                      getAssetAmountInFiat(formValues?.amount, assetMarketData),
-                    ).format('0,0.00')})`
+                    getAssetAmountInFiat(formValues?.amount, assetMarketData),
+                  ).format('0,0.00')})`
                   : ''}
               </div>
             </div>
@@ -417,10 +417,10 @@ const FormSend: React.FC<FormSendProps> = props => {
               {formValues?.memo !== undefined &&
               formValues?.memo !== null &&
               formValues.memo !== '' ? (
-                <div>{`${formValues?.memo}`}</div>
-              ) : (
-                <div>--</div>
-              )}
+                  <div>{`${formValues?.memo}`}</div>
+                ) : (
+                  <div>--</div>
+                )}
             </div>
           </>
         </ModalPopup>
@@ -461,14 +461,14 @@ const FormSend: React.FC<FormSendProps> = props => {
             {broadcastResult?.code !== undefined &&
             broadcastResult?.code !== null &&
             broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-              <div className="description">
-                {t('general.successModalPopup.timeout.description')}
-              </div>
-            ) : (
-              <div className="description">
-                {t('general.successModalPopup.transfer.description')}
-              </div>
-            )}
+                <div className="description">
+                  {t('general.successModalPopup.timeout.description')}
+                </div>
+              ) : (
+                <div className="description">
+                  {t('general.successModalPopup.transfer.description')}
+                </div>
+              )}
             {/* <div className="description">{broadcastResult.transactionHash ?? ''}</div> */}
           </>
         </SuccessModalPopup>

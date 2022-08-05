@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { getRecoil } from 'recoil-nexus';
-import { walletAllAssetsState } from '../recoil/atom';
+import { walletAllAssetsState, sessionState } from '../recoil/atom';
 import { getCronosEvmAsset, getCronosTendermintAsset } from '../utils/utils';
 
 export const useCronosEvmAsset = () => {
@@ -21,4 +21,10 @@ export const useCronosTendermintAsset = () => {
   }, [allAssets]);
 
   return cronosTendermintAsset;
+};
+
+export const useActiveAsset = () => {
+  const currentSession = getRecoil(sessionState);
+
+  return currentSession.activeAsset;
 };

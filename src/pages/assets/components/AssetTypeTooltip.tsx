@@ -21,13 +21,31 @@ const AssetTypeTooltip: React.FC<AssetTypeTooltipProps> = props => {
   let tooltipMessage = <></>;
   switch (currentAsset?.assetType) {
     case UserAssetType.TENDERMINT:
+      tooltipMessage = (
+        <>
+          {t('assets.assetTypeTooltip.nativeToken', {
+            chainName: getChainName(currentAsset?.name, currentSession.wallet.config),
+            nativeToken: currentAsset.symbol === 'ATOM' ? 'ATOM' : 'CRO',
+            assetType: currentAsset.symbol === 'ATOM' ? 'ATOM' : 'Cronos ',
+          })}
+          <br />
+          <a
+            href="https://help.crypto.com/en/articles/5495745-all-about-network-settings-mainnet-and-evm-chains"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t('assets.assetTypeTooltip.learnMore')}
+          </a>
+        </>
+      );
+      break;
     case UserAssetType.EVM:
       tooltipMessage = (
         <>
           {t('assets.assetTypeTooltip.nativeToken', {
             chainName: getChainName(currentAsset?.name, currentSession.wallet.config),
-            nativeToken: 'CRO',
-            assetType: 'Cronos',
+            nativeToken: currentAsset.symbol === 'ETH' ? 'ETH' : 'CRO',
+            assetType: currentAsset.symbol === 'ETH' ? 'Ether' : 'Cronos ',
           })}
           <br />
           <a
@@ -85,7 +103,7 @@ const AssetTypeTooltip: React.FC<AssetTypeTooltipProps> = props => {
     <></>
   ) : (
     <div>
-      {t('assets.assetTypeTooltip.whatIs')} {getAssetTypeName(currentAsset?.assetType)}?
+      {t('assets.assetTypeTooltip.whatIs')} {getAssetTypeName(currentAsset?.assetType, currentAsset?.symbol)}?
       <Tooltip placement="top" title={tooltipMessage}>
         <ExclamationCircleOutlined
           style={{ color: '#1199fa', marginLeft: '5px', cursor: 'pointer' }}

@@ -24,7 +24,6 @@ import {
 import { BroadCastResult, RewardTransactionData } from '../../../models/Transaction';
 import { renderExplorerUrl } from '../../../models/Explorer';
 import { getUIDynamicAmount } from '../../../utils/NumberUtils';
-// import { isNumeric } from '../../../utils/utils';
 import { LEDGER_WALLET_TYPE, detectConditionsError } from '../../../service/LedgerService';
 
 import { secretStoreService } from '../../../service/storage/SecretStoreService';
@@ -39,8 +38,8 @@ import { SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
 
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
-import { GasInfoTendermint } from '../../../components/GasStepSelect/GasStepSelectTendermint';
-import GasStepSelect from '../../../components/GasStepSelect/index';
+import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasConfig';
+import GasStepSelect from '../../../components/GasCustomize/GasConfig';
 
 const { Text } = Typography;
 
@@ -116,9 +115,9 @@ export const FormWithdrawStakingReward = () => {
           rewardMarketPrice:
             rewardMarketPrice !== '' && currentMarketPrice
               ? `${SUPPORTED_CURRENCY.get(currentMarketPrice?.currency)?.symbol}${numeral(
-                  rewardMarketPrice,
-                ).format('0,0.00')} ${currentMarketPrice?.currency}`
-              : ``,
+                rewardMarketPrice,
+              ).format('0,0.00')} ${currentMarketPrice?.currency}`
+              : '',
           validatorAddress: reward.validatorAddress,
         };
         return rewardData;
@@ -531,54 +530,54 @@ export const FormWithdrawStakingReward = () => {
         <div className="top-action-btns">
           {(rewards.length > maxLedgerRestake &&
             currentSession.wallet.walletType === LEDGER_WALLET_TYPE) ||
-          (rewards.length > maxNormalRestake &&
-            currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) ? (
-            <>
-              <div />
-              <Button
-                id="withdraw-all-btn"
-                className="top-action-btn"
-                type="primary"
-                onClick={() => {
-                  setRewardAction('withdrawall');
-                  setTimeout(() => {
-                    showPasswordInput('withdrawall');
-                  }, 200);
-                }}
-              >
-                {t('staking.withdrawall')}
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                id="withdraw-all-btn"
-                className="top-action-btn"
-                type="primary"
-                onClick={() => {
-                  setRewardAction('withdrawall');
-                  setTimeout(() => {
-                    showPasswordInput('withdrawall');
-                  }, 200);
-                }}
-              >
-                {t('staking.withdrawall')}
-              </Button>
-              <Button
-                id="restake-all-btn"
-                className="top-action-btn"
-                type="primary"
-                onClick={() => {
-                  setRewardAction('restakeall');
-                  setTimeout(() => {
-                    showPasswordInput('restakeall');
-                  }, 200);
-                }}
-              >
-                {t('staking.restakeall')}
-              </Button>
-            </>
-          )}
+            (rewards.length > maxNormalRestake &&
+              currentSession.wallet.walletType !== LEDGER_WALLET_TYPE) ? (
+              <>
+                <div />
+                <Button
+                  id="withdraw-all-btn"
+                  className="top-action-btn"
+                  type="primary"
+                  onClick={() => {
+                    setRewardAction('withdrawall');
+                    setTimeout(() => {
+                      showPasswordInput('withdrawall');
+                    }, 200);
+                  }}
+                >
+                  {t('staking.withdrawall')}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  id="withdraw-all-btn"
+                  className="top-action-btn"
+                  type="primary"
+                  onClick={() => {
+                    setRewardAction('withdrawall');
+                    setTimeout(() => {
+                      showPasswordInput('withdrawall');
+                    }, 200);
+                  }}
+                >
+                  {t('staking.withdrawall')}
+                </Button>
+                <Button
+                  id="restake-all-btn"
+                  className="top-action-btn"
+                  type="primary"
+                  onClick={() => {
+                    setRewardAction('restakeall');
+                    setTimeout(() => {
+                      showPasswordInput('restakeall');
+                    }, 200);
+                  }}
+                >
+                  {t('staking.restakeall')}
+                </Button>
+              </>
+            )}
         </div>
       )}
 
@@ -643,9 +642,9 @@ export const FormWithdrawStakingReward = () => {
             <div className="fiat">
               {walletAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetRewardsBalancePrice(walletAsset, marketData),
-                  ).format('0,0.00')} ${marketData?.currency}
-                    `
+                  getAssetRewardsBalancePrice(walletAsset, marketData),
+                ).format('0,0.00')} ${marketData?.currency}
+                  `
                 : ''}
             </div>
           </div>
@@ -720,8 +719,8 @@ export const FormWithdrawStakingReward = () => {
             <div className="fiat">
               {walletAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetRewardsBalancePrice(walletAsset, marketData),
-                  ).format('0,0.00')} ${marketData?.currency}
+                  getAssetRewardsBalancePrice(walletAsset, marketData),
+                ).format('0,0.00')} ${marketData?.currency}
                     `
                 : ''}
             </div>
@@ -851,12 +850,12 @@ export const FormWithdrawStakingReward = () => {
       >
         <>
           {broadcastResult?.code !== undefined &&
-          broadcastResult?.code !== null &&
-          broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
-            <div className="description">{t('general.successModalPopup.timeout.description')}</div>
-          ) : (
-            <div className="description">{t('general.successModalPopup.reward.description')}</div>
-          )}
+            broadcastResult?.code !== null &&
+            broadcastResult.code === walletService.BROADCAST_TIMEOUT_CODE ? (
+              <div className="description">{t('general.successModalPopup.timeout.description')}</div>
+            ) : (
+              <div className="description">{t('general.successModalPopup.reward.description')}</div>
+            )}
         </>
       </SuccessModalPopup>
       <SuccessModalPopup

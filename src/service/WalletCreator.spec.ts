@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import 'mocha';
 import { expect } from 'chai';
 import { DefaultWalletConfigs, WalletConfig } from '../config/StaticConfig';
@@ -6,7 +9,7 @@ import { UserAssetType } from '../models/UserAsset';
 import { DerivationPathStandard } from './signers/LedgerSigner';
 
 describe('Testing Wallet Creation', () => {
-  it('Test creating a new wallet with testnet configuration', () => {
+  it('Test creating a new wallet with testnet configuration', async () => {
     const testNetConfig = DefaultWalletConfigs.TestNetConfig;
 
     const createOptions: WalletCreateOptions = {
@@ -16,7 +19,7 @@ describe('Testing Wallet Creation', () => {
       walletName: 'My-TestNet-Wallet',
       derivationPathStandard: DerivationPathStandard.BIP44,
     };
-    const testNetWallet = new WalletCreator(createOptions).create().wallet;
+    const testNetWallet = (await new WalletCreator(createOptions).create()).wallet;
 
     expect(testNetWallet.name).to.eq('My-TestNet-Wallet');
     expect(testNetWallet.config).to.eq(testNetConfig);
@@ -26,9 +29,9 @@ describe('Testing Wallet Creation', () => {
     expect(testNetWallet.encryptedPhrase.length > 0).to.eq(true);
     expect(testNetWallet.identifier.length).to.eq(16);
 
-    const { assets } = new WalletCreator(createOptions).create();
+    const { assets } = await new WalletCreator(createOptions).create();
 
-    expect(assets.length).to.eq(2);
+    expect(assets.length).to.eq(4);
     expect(
       assets
         .filter(asset => asset.assetType === UserAssetType.TENDERMINT)[0]
@@ -42,7 +45,7 @@ describe('Testing Wallet Creation', () => {
     expect(assets.filter(asset => asset.assetType === UserAssetType.EVM)[0].decimals).to.eq(18);
   });
 
-  it('Test creating a new wallet with main-net configuration', () => {
+  it('Test creating a new wallet with main-net configuration', async () => {
     const mainNetConfig = DefaultWalletConfigs.MainNetConfig;
 
     const createOptions: WalletCreateOptions = {
@@ -52,7 +55,7 @@ describe('Testing Wallet Creation', () => {
       walletName: 'My-MainNet-Wallet',
       derivationPathStandard: DerivationPathStandard.BIP44,
     };
-    const mainNetWallet = new WalletCreator(createOptions).create().wallet;
+    const mainNetWallet = (await new WalletCreator(createOptions).create()).wallet;
 
     expect(mainNetWallet.name).to.eq('My-MainNet-Wallet');
     expect(mainNetWallet.config).to.eq(mainNetConfig);
@@ -60,16 +63,16 @@ describe('Testing Wallet Creation', () => {
     expect(mainNetWallet.address.startsWith('cro')).to.eq(true);
     expect(mainNetWallet.encryptedPhrase.length > 0).to.eq(true);
     expect(mainNetWallet.identifier.length).to.eq(16);
-    expect(mainNetConfig.derivationPath).to.eq("m/44'/394'/0'/0/0");
+    expect(mainNetConfig.derivationPath).to.eq('m/44\'/394\'/0\'/0/0');
   });
 
-  it('Test creating wallet from custom configurations ', () => {
+  it('Test creating wallet from custom configurations ', async () => {
     const customConfig: WalletConfig = {
       explorer: {},
       explorerUrl: '',
       indexingUrl: '',
       enabled: false,
-      derivationPath: "44'/245'/0'/0/0",
+      derivationPath: '44\'/245\'/0\'/0/0',
       name: 'Pystaport-Custom-Network',
       enableGeneralSettings: false,
       disableDefaultClientMemo: false,
@@ -104,7 +107,7 @@ describe('Testing Wallet Creation', () => {
       walletName: 'My-Custom-Config-Wallet',
       derivationPathStandard: DerivationPathStandard.BIP44,
     };
-    const customWallet = new WalletCreator(createOptions).create().wallet;
+    const customWallet = (await new WalletCreator(createOptions).create()).wallet;
 
     expect(customWallet.address.startsWith('pcro')).to.eq(true);
     expect(customWallet.config).to.eq(customConfig);

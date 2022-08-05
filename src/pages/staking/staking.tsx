@@ -41,6 +41,7 @@ import { ModerationConfig } from '../../models/ModerationConfig';
 import { FormDelegationOperations } from './components/FormDelegationOperations';
 import { FormWithdrawStakingReward } from './components/FormWithdrawStakingReward';
 import { FormDelegationRequest } from './components/FormDelegationRequest';
+import { checkIfTestnet } from '../../utils/utils';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -67,18 +68,19 @@ const StakingPage = () => {
   const [isUnbondingDelegationModalVisible, setIsUnbondingDelegationModalVisible] = useState(false);
   const [isUnbondingVisible, setIsUnbondingVisible] = useState(false);
   const [unbondingDelegations, setUnbondingDelegations] = useState<
-    UnbondingDelegationTabularData[]
+  UnbondingDelegationTabularData[]
   >([]);
   const [moderationConfig, setModerationConfig] = useState<ModerationConfig>();
   const analyticsService = new AnalyticsService(currentSession);
   const didMountRef = useRef(false);
 
   const [t, i18n] = useTranslation();
+  const isTestnet = checkIfTestnet(currentSession.wallet.config.network);
 
   const undelegatePeriod =
-    currentSession.wallet.config.name === 'MAINNET'
-      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET
-      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS;
+    isTestnet
+      ? UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.OTHERS
+      : UNBLOCKING_PERIOD_IN_DAYS.UNDELEGATION.MAINNET;
 
   const unbondingDelegationColumns = [
     {
@@ -182,11 +184,19 @@ const StakingPage = () => {
 
     syncUnbondingDelegationsData();
 
-    setMarketData(allMarketData.get(`${userAsset?.mainnetSymbol}-${currentSession.currency}`));
+    setMarketData(
+      allMarketData.get(
+        `${userAsset?.assetType}-${userAsset?.mainnetSymbol}-${currentSession.currency}`,
+      ),
+    );
 
     if (!didMountRef.current) {
       didMountRef.current = true;
       moderationConfigHandler();
+      walletService.setCurrentSession({
+        ...currentSession,
+        activeAsset: userAsset,
+      });
       analyticsService.logPage('Staking');
     }
   }, [fetchingDB, currentValidatorList, userAsset]);
@@ -207,8 +217,8 @@ const StakingPage = () => {
             <div className="fiat">
               {userAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetStakingBalancePrice(userAsset, marketData),
-                  ).format(`0,0.00`)} ${marketData?.currency}`
+                  getAssetStakingBalancePrice(userAsset, marketData),
+                ).format('0,0.00')} ${marketData?.currency}`
                 : ''}
             </div>
           </div>
@@ -224,8 +234,8 @@ const StakingPage = () => {
               <div className="fiat">
                 {userAsset && marketData && marketData.price
                   ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                      getAssetUnbondingBalancePrice(userAsset, marketData),
-                    ).format('0,0.00')} ${marketData?.currency}
+                    getAssetUnbondingBalancePrice(userAsset, marketData),
+                  ).format('0,0.00')} ${marketData?.currency}
                 `
                   : ''}
               </div>
@@ -243,8 +253,8 @@ const StakingPage = () => {
             <div className="fiat">
               {userAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetRewardsBalancePrice(userAsset, marketData),
-                  ).format('0,0.00')} ${marketData?.currency}
+                  getAssetRewardsBalancePrice(userAsset, marketData),
+                ).format('0,0.00')} ${marketData?.currency}
                   `
                 : ''}
             </div>

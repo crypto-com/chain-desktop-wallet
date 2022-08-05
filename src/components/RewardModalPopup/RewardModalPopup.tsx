@@ -80,16 +80,16 @@ const RewardModalPopup: React.FC<RewardModalPopupProps> = props => {
             <div className="fiat">
               {walletAsset && marketData && marketData.price
                 ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                    getAssetAmountInFiat(
-                      scaledAmount(
-                        new Big(walletAsset.rewardsBalance || '0')
-                          .add(claimedRewards || '0')
-                          .toFixed(2),
-                        walletAsset.decimals,
-                      ),
-                      marketData,
+                  getAssetAmountInFiat(
+                    scaledAmount(
+                      new Big(walletAsset.rewardsBalance || '0')
+                        .add(claimedRewards || '0')
+                        .toFixed(2),
+                      walletAsset.decimals,
                     ),
-                  ).format('0,0.00')} ${marketData?.currency}
+                    marketData,
+                  ),
+                ).format('0,0.00')} ${marketData?.currency}
               `
                 : ''}
             </div>
@@ -114,8 +114,8 @@ const RewardModalPopup: React.FC<RewardModalPopupProps> = props => {
                 <div className="fiat">
                   {walletAsset && marketData && marketData.price
                     ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                        getAssetRewardsBalancePrice(walletAsset, marketData),
-                      ).format('0,0.00')} ${marketData?.currency}
+                      getAssetRewardsBalancePrice(walletAsset, marketData),
+                    ).format('0,0.00')} ${marketData?.currency}
               `
                     : ''}
                 </div>
@@ -136,11 +136,11 @@ const RewardModalPopup: React.FC<RewardModalPopupProps> = props => {
                 <div className="fiat">
                   {walletAsset && marketData && marketData.price
                     ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                        getAssetAmountInFiat(
-                          scaledAmountByAsset(claimedRewards, walletAsset),
-                          marketData,
-                        ),
-                      ).format('0,0.00')} ${marketData?.currency}
+                      getAssetAmountInFiat(
+                        scaledAmountByAsset(claimedRewards, walletAsset),
+                        marketData,
+                      ),
+                    ).format('0,0.00')} ${marketData?.currency}
               `
                     : ''}
                 </div>
@@ -161,11 +161,11 @@ const RewardModalPopup: React.FC<RewardModalPopupProps> = props => {
                 <div className="fiat">
                   {walletAsset && marketData && marketData.price
                     ? `${SUPPORTED_CURRENCY.get(marketData.currency)?.symbol}${numeral(
-                        getAssetAmountInFiat(
-                          scaledAmountByAsset(estimatedRewards, walletAsset),
-                          marketData,
-                        ),
-                      ).format('0,0.00')} ${marketData?.currency}
+                      getAssetAmountInFiat(
+                        scaledAmountByAsset(estimatedRewards, walletAsset),
+                        marketData,
+                      ),
+                    ).format('0,0.00')} ${marketData?.currency}
               `
                     : ''}
                 </div>

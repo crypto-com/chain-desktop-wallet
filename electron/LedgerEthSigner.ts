@@ -6,6 +6,7 @@ import Web3 from 'web3';
 import { TypedDataUtils } from 'eth-sig-util';
 import { DerivationPathStandard, LedgerSigner } from '../src/service/signers/LedgerSigner';
 import { UserAssetType } from '../src/models/UserAsset';
+import { SupportedChainName } from '../src/config/StaticConfig';
 
 export class LedgerEthSigner {
   public app: Eth | undefined;
@@ -38,7 +39,7 @@ export class LedgerEthSigner {
     display: boolean,
   ): Promise<string> {
     try {
-      const path: string = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, standard);
+      const path: string = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, SupportedChainName.CRONOS, standard);
       await this.createTransport();
       const retAddress = await this.app!.getAddress(path, display, false);
       return retAddress.address;
@@ -56,7 +57,7 @@ export class LedgerEthSigner {
     try {
       await this.createTransport();
       for (let index = startIndex; index < startIndex + gap; index++) {
-        const path: string = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, standard);
+        const path: string = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, SupportedChainName.CRONOS, standard);
         const retAddress = await this.app!.getAddress(path, false, false);
         addressList[index] = retAddress.address;
       }
@@ -137,7 +138,7 @@ export class LedgerEthSigner {
   ): Promise<string> {
     try {
       await this.createTransport();
-      const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, standard);
+      const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, SupportedChainName.CRONOS, standard);
       const signedTx = await this.doSignTx(
         path,
         chainId,
@@ -167,7 +168,7 @@ export class LedgerEthSigner {
   ): Promise<string> {
     try {
       await this.createTransport();
-      const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, standard);
+      const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, SupportedChainName.CRONOS, standard);
       const web3 = new Web3(url);
       const from_addr = (await this.app!.getAddress(path)).address;
       const nonce = await web3.eth.getTransactionCount(from_addr);
@@ -192,7 +193,7 @@ export class LedgerEthSigner {
   async signPersonalMessage(msg: string, index = 0, standard: DerivationPathStandard = DerivationPathStandard.BIP44) {
     try {
       await this.createTransport();
-      const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, standard);
+      const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, SupportedChainName.CRONOS, standard);
       const sig = await this.app!.signPersonalMessage(path, Buffer.from(msg).toString('hex'));
       return LedgerEthSigner.getHexlifySignature(sig);
     } finally {
@@ -213,7 +214,7 @@ export class LedgerEthSigner {
   async signTypedDataV4(typedData: any, index = 0, standard: DerivationPathStandard = DerivationPathStandard.BIP44) {
     try {
       await this.createTransport();
-      const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, standard);
+      const path = LedgerSigner.getDerivationPath(index, UserAssetType.EVM, SupportedChainName.CRONOS, standard);
 
       const data = JSON.parse(typedData);
 

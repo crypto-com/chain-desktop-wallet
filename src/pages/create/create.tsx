@@ -16,7 +16,13 @@ import './create.less';
 import { Wallet } from '../../models/Wallet';
 import { walletService } from '../../service/WalletService';
 import { WalletCreateOptions, WalletCreator } from '../../service/WalletCreator';
-import { DefaultWalletConfigs, LedgerWalletMaximum, NodePorts } from '../../config/StaticConfig';
+import {
+  DefaultWalletConfigs,
+  LedgerWalletMaximum,
+  NetworkName,
+  NodePorts,
+  SupportedChainName,
+} from '../../config/StaticConfig';
 import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
@@ -46,6 +52,7 @@ import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import LedgerAddressIndexBalanceTable from './components/LedgerAddressIndexBalanceTable';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { DerivationPathStandard, LedgerSigner } from '../../service/signers/LedgerSigner';
+import IconCosmos from '../../svg/IconCosmos';
 
 let waitFlag = false;
 const layout = {
@@ -141,7 +148,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
       initialValues={{
         indexingUrl: DefaultWalletConfigs.TestNetConfig.indexingUrl,
         nodeUrl: 'http://127.0.0.1',
-        derivationPath: "m/44'/394'/0'/0/0",
+        derivationPath: 'm/44\'/394\'/0\'/0/0',
         validatorPrefix: 'crocncl',
         croDenom: 'cro',
         baseDenom: 'basecro',
@@ -323,23 +330,27 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [isCroModalVisible, setIsCroModalVisible] = useState(false);
   const [isEthModalVisible, setIsEthModalVisible] = useState(false);
+  const [isCosmosModalVisible, setIsCosmosModalVisible] = useState(false);
   const [isHWModeSelected, setIsHWModeSelected] = useState(false);
   const [isLedgerModalButtonLoading, setIsLedgerModalButtonLoading] = useState(false);
   // eslint-disable-next-line
   const [isLedgerEthAppConnected, setIsLedgerEthAppConnected] = useState(false);
   const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
+  const [isLedgerCosmosAppConnected, setIsLedgerCosmosAppConnected] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
   const [ledgerAssetType, setLedgerAssetType] = useState<UserAssetType>();
+  const [ledgerChainName, setLedgerChainName] = useState<SupportedChainName>();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(walletTempBackupState);
   const [hwcheck, setHwcheck] = useState(!props.isWalletSelectFieldDisable);
-  const { isLedgerConnected } = useLedgerStatus({ assetType: ledgerAssetType });
+  const { isLedgerConnected } = useLedgerStatus({ assetType: ledgerAssetType, chainName: ledgerChainName });
   const [ledgerAddressList, setLedgerAddressList] = useState<any[]>([]);
   const [derivationPath, setDerivationPath] = useState({
-    tendermint: "m/44'/394'/0'/0/0",
-    evm: "m/44'/60'/0'/0/0",
+    cronosTendermint: 'm/44\'/394\'/0\'/0/0',
+    cosmosTendermint: 'm/44\'/118\'/0\'/0/0',
+    evm: 'm/44\'/60\'/0\'/0/0',
   });
 
   const [t] = useTranslation();
@@ -350,7 +361,6 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   };
   const handleEthOk = () => {
     waitFlag = false;
-    setIsEthModalVisible(false);
   };
   const handleEthCancel = () => {
     waitFlag = false;
@@ -363,6 +373,18 @@ const FormCreate: React.FC<FormCreateProps> = props => {
 
   const handleCroCancel = () => {
     setIsCroModalVisible(false);
+  };
+
+  const showCosmosModal = () => {
+    setIsCosmosModalVisible(true);
+  };
+  const handleCosmosOk = () => {
+    waitFlag = false;
+  };
+
+  const handleCosmosCancel = () => {
+    waitFlag = false;
+    setIsCosmosModalVisible(false);
   };
 
   const showModal = () => {
@@ -450,21 +472,23 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     };
 
     try {
-      const createdWallet = new WalletCreator(createOptions).create();
+      const createdWallet = await new WalletCreator(createOptions).create();
 
       const targetWallet = createdWallet.wallet;
       if (targetWallet.walletType === LEDGER_WALLET_TYPE) {
         const device: ISignerProvider = createLedgerDevice();
+
         // collect cro address
         const croAddress = await device.getAddress(
           targetWallet.addressIndex,
           targetWallet.config.network.addressPrefix,
+          SupportedChainName.CRYPTO_ORG,
           targetWallet.derivationPathStandard,
           false,
         );
 
         const croAsset = createdWallet.assets.filter(
-          asset => asset.assetType === UserAssetType.TENDERMINT,
+          asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO',
         )[0];
         croAsset.address = croAddress;
 
@@ -492,6 +516,36 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           });
 
         setIsLedgerEthAppConnected(true);
+
+        await delay(3_000);
+        setIsEthModalVisible(false);
+
+        waitFlag = true;
+        showCosmosModal();
+        for (let i = 0; i < 600; i++) {
+          // eslint-disable-next-line no-await-in-loop
+          await delay(100); // milli seconds
+          if (!waitFlag) {
+            break;
+          }
+        }
+
+        setIsLedgerCosmosAppConnected(true);
+
+        const cosmosHubAddress = await device.getAddress(
+          targetWallet.addressIndex,
+          'cosmos',
+          SupportedChainName.COSMOS_HUB,
+          targetWallet.derivationPathStandard,
+          false,
+        );
+
+        const atomAsset = createdWallet.assets.filter(
+          asset =>
+            asset.assetType === UserAssetType.TENDERMINT &&
+            asset.config?.tendermintNetwork?.chainName === SupportedChainName.COSMOS_HUB,
+        )[0];
+        atomAsset.address = cosmosHubAddress;
       }
 
       await walletService.saveAssets(createdWallet.assets);
@@ -501,6 +555,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       setCreateLoading(false);
       setIsLedgerCroAppConnected(false);
       setIsLedgerEthAppConnected(false);
+      setIsLedgerCosmosAppConnected(false);
       showModal();
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -509,6 +564,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       setCreateLoading(false);
       setIsLedgerCroAppConnected(false);
       setIsLedgerEthAppConnected(false);
+      setIsLedgerCosmosAppConnected(false);
       showErrorModal();
       return;
     }
@@ -536,7 +592,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       await new Promise(resolve => {
         setTimeout(resolve, 2000);
       });
-      setIsEthModalVisible(false);
+      // setIsEthModalVisible(false);
       setIsLedgerModalButtonLoading(false);
     } catch (e) {
       let message = `${t('create.notification.ledger.message1')}`;
@@ -574,9 +630,76 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       setIsLedgerEthAppConnected(false);
 
       await new Promise(resolve => {
-        setTimeout(resolve, 2000);
+        setTimeout(resolve, 5000);
       });
       setIsEthModalVisible(false);
+      setCreateLoading(false);
+      setIsLedgerModalButtonLoading(false);
+      notification.error({
+        message,
+        description,
+        placement: 'topRight',
+        duration: 20,
+      });
+    }
+  };
+
+  const checkIsLedgerCosmosAppConnected = async () => {
+    setCreateLoading(true);
+    try {
+      const device = createLedgerDevice();
+      await device.getAddress(
+        0,
+        'cosmos',
+        SupportedChainName.COSMOS_HUB,
+        DerivationPathStandard.BIP44,
+        false,
+      );
+      setIsLedgerCosmosAppConnected(true);
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+      setIsCosmosModalVisible(false);
+      setIsLedgerModalButtonLoading(false);
+    } catch (e) {
+      let message = `${t('create.notification.ledger.message1')}`;
+      let description = (
+        <>
+          {t('create.notification.ledger.description1')}
+          <br /> -{' '}
+          <a
+            href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t('general.errorModalPopup.ledgerTroubleshoot')}
+          </a>
+        </>
+      );
+      // if (walletType === LEDGER_WALLET_TYPE) {
+      if (detectConditionsError(((e as unknown) as any).toString())) {
+        message = `${t('create.notification.ledger.message2')}`;
+        description = (
+          <>
+            {t('create.notification.ledger.description2')}
+            <br /> -{' '}
+            <a
+              href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {t('general.errorModalPopup.ledgerTroubleshoot')}
+            </a>
+          </>
+        );
+      }
+      // }
+      setIsLedgerCosmosAppConnected(false);
+
+      await new Promise(resolve => {
+        setTimeout(resolve, 2000);
+      });
+      setIsCosmosModalVisible(false);
       setCreateLoading(false);
       setIsLedgerModalButtonLoading(false);
       notification.error({
@@ -595,7 +718,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     try {
       const device = createLedgerDevice();
       // check ledger device ok
-      await device.getPubKey(parseInt(addressIndex, 10), derivationPathStandard, false);
+      await device.getPubKey(
+        parseInt(addressIndex, 10),
+        SupportedChainName.CRYPTO_ORG,
+        derivationPathStandard,
+        false,
+      );
       setIsLedgerCroAppConnected(true);
 
       await new Promise(resolve => {
@@ -667,8 +795,8 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       const device: ISignerProvider = createLedgerDevice();
       const standard = props.form.getFieldValue('derivationPathStandard');
       const network = props.form.getFieldValue('network');
-      switch (ledgerAssetType) {
-        case UserAssetType.EVM:
+      switch (`${ledgerAssetType}-${ledgerChainName}`) {
+        case `${UserAssetType.EVM}-${SupportedChainName.CRONOS}`:
           {
             const ethAddressList = await device.getEthAddressList(0, 10, standard);
             if (ethAddressList) {
@@ -676,7 +804,12 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 return {
                   index: idx,
                   publicAddress: address,
-                  derivationPath: LedgerSigner.getDerivationPath(idx, UserAssetType.EVM, standard),
+                  derivationPath: LedgerSigner.getDerivationPath(
+                    idx,
+                    UserAssetType.EVM,
+                    SupportedChainName.CRONOS,
+                    standard,
+                  ),
                   balance: '0',
                 };
               });
@@ -684,7 +817,28 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             }
           }
           break;
-        case UserAssetType.TENDERMINT:
+        case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`:
+          {
+            const ethAddressList = await device.getEthAddressList(0, 10, standard);
+            if (ethAddressList) {
+              const returnList = ethAddressList.map((address, idx) => {
+                return {
+                  index: idx,
+                  publicAddress: address,
+                  derivationPath: LedgerSigner.getDerivationPath(
+                    idx,
+                    UserAssetType.EVM,
+                    SupportedChainName.ETHEREUM,
+                    standard,
+                  ),
+                  balance: '0',
+                };
+              });
+              setLedgerAddressList(returnList);
+            }
+          }
+          break;
+        case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
           {
             const addressPrefix =
               network === DefaultWalletConfigs.TestNetCroeseid4Config.name ? 'tcro' : 'cro';
@@ -692,6 +846,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
               0,
               10,
               addressPrefix,
+              SupportedChainName.CRYPTO_ORG,
               standard,
             );
             if (tendermintAddressList) {
@@ -702,6 +857,35 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                   derivationPath: LedgerSigner.getDerivationPath(
                     idx,
                     UserAssetType.TENDERMINT,
+                    SupportedChainName.CRYPTO_ORG,
+                    standard,
+                  ),
+                  balance: '0',
+                };
+              });
+              setLedgerAddressList(returnList);
+            }
+          }
+          break;
+        case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`:
+          {
+            const addressPrefix = 'cosmos';
+            const cosmosHubAddressList = await device.getAddressList(
+              0,
+              10,
+              addressPrefix,
+              SupportedChainName.COSMOS_HUB,
+              standard,
+            );
+            if (cosmosHubAddressList) {
+              const returnList = cosmosHubAddressList.map((address, idx) => {
+                return {
+                  index: idx,
+                  publicAddress: address,
+                  derivationPath: LedgerSigner.getDerivationPath(
+                    idx,
+                    UserAssetType.TENDERMINT,
+                    SupportedChainName.COSMOS_HUB,
                     standard,
                   ),
                   balance: '0',
@@ -730,7 +914,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       initialValues={{
         walletType: 'normal',
         addressIndex: '0',
-        network: 'MAINNET',
+        network: NetworkName.MAINNET,
       }}
     >
       <Form.Item
@@ -779,33 +963,58 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                   setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
                   setLedgerAddressList([]);
                   switch (e) {
-                    case UserAssetType.TENDERMINT:
+                    case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
                       setLedgerAssetType(UserAssetType.TENDERMINT);
-                      ledgerNotificationWithoutCheck(UserAssetType.TENDERMINT);
+                      setLedgerChainName(SupportedChainName.CRYPTO_ORG);
+                      ledgerNotificationWithoutCheck(
+                        UserAssetType.TENDERMINT,
+                        SupportedChainName.CRYPTO_ORG,
+                      );
                       break;
-                    case UserAssetType.EVM:
+                    case `${UserAssetType.EVM}-${SupportedChainName.CRONOS}`:
                       setLedgerAssetType(UserAssetType.EVM);
+                      setLedgerChainName(SupportedChainName.CRONOS);
                       ledgerNotificationWithoutCheck(UserAssetType.EVM);
+                      break;
+                    case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`:
+                      setLedgerAssetType(UserAssetType.EVM);
+                      setLedgerChainName(SupportedChainName.ETHEREUM);
+                      ledgerNotificationWithoutCheck(UserAssetType.EVM);
+                      break;
+                    case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`:
+                      setLedgerAssetType(UserAssetType.TENDERMINT);
+                      setLedgerChainName(SupportedChainName.COSMOS_HUB);
+                      ledgerNotificationWithoutCheck(
+                        UserAssetType.TENDERMINT,
+                        SupportedChainName.COSMOS_HUB,
+                      );
                       break;
                     default:
                   }
                 }}
               >
-                <Select.Option key="tendermint" value={UserAssetType.TENDERMINT}>
-                  TENDERMINT
+                <Select.Option key="crypto-org-chain" value={`${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`}>
+                  {SupportedChainName.CRYPTO_ORG}
                 </Select.Option>
-                <Select.Option key="evm" value={UserAssetType.EVM}>
-                  EVM
+                <Select.Option key="cronos-chain" value={`${UserAssetType.EVM}-${SupportedChainName.CRONOS}`}>
+                  {SupportedChainName.CRONOS}
+                </Select.Option>
+                <Select.Option key="ethereum-chain" value={`${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`}>
+                  {SupportedChainName.ETHEREUM}
+                </Select.Option>
+                <Select.Option key="cosmos-hub-chain" value={`${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`}>
+                  {SupportedChainName.COSMOS_HUB}
                 </Select.Option>
               </Select>
             </Form.Item>
 
-            {ledgerAssetType ? (
+            {ledgerAssetType && ledgerChainName ? (
               <LedgerAddressIndexBalanceTable
                 addressIndexBalanceList={ledgerAddressList}
                 setAddressIndexBalanceList={setLedgerAddressList}
                 setisHWModeSelected={setIsHWModeSelected}
                 assetType={ledgerAssetType}
+                chainName={ledgerChainName}
                 form={props.form}
                 setDerivationPath={setDerivationPath}
               />
@@ -840,18 +1049,27 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             onChange={() => {
               setLedgerAddressList([]);
               setLedgerAssetType(undefined);
+              setLedgerChainName(undefined);
               props.form.setFieldsValue({
                 assetType: undefined,
               });
               setDerivationPath({
-                tendermint: LedgerSigner.getDerivationPath(
+                cronosTendermint: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
                   UserAssetType.TENDERMINT,
+                  SupportedChainName.CRYPTO_ORG,
+                  props.form.getFieldValue('derivationPathStandard'),
+                ),
+                cosmosTendermint: LedgerSigner.getDerivationPath(
+                  props.form.getFieldValue('addressIndex'),
+                  UserAssetType.TENDERMINT,
+                  SupportedChainName.COSMOS_HUB,
                   props.form.getFieldValue('derivationPathStandard'),
                 ),
                 evm: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
                   UserAssetType.EVM,
+                  SupportedChainName.CRONOS,
                   props.form.getFieldValue('derivationPathStandard'),
                 ),
               });
@@ -886,11 +1104,18 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             className="derivation-path-container"
           >
             <div>
-              TENDERMINT <br />
-              <Text type="secondary">{derivationPath.tendermint}</Text>
+              Crypto.org Chain
+              <br />
+              <Text type="secondary">{derivationPath.cronosTendermint}</Text>
             </div>
             <div>
-              EVM <br />
+              Cosmos Hub Chain
+              <br />
+              <Text type="secondary">{derivationPath.cosmosTendermint}</Text>
+            </div>
+            <div>
+              EVM Chain
+              <br />
               <Text type="secondary">{derivationPath.evm}</Text>
             </div>
           </div>
@@ -916,14 +1141,22 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             type="number"
             onChange={() => {
               setDerivationPath({
-                tendermint: LedgerSigner.getDerivationPath(
+                cronosTendermint: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
                   UserAssetType.TENDERMINT,
+                  SupportedChainName.CRYPTO_ORG,
+                  props.form.getFieldValue('derivationPathStandard'),
+                ),
+                cosmosTendermint: LedgerSigner.getDerivationPath(
+                  props.form.getFieldValue('addressIndex'),
+                  UserAssetType.TENDERMINT,
+                  SupportedChainName.COSMOS_HUB,
                   props.form.getFieldValue('derivationPathStandard'),
                 ),
                 evm: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
                   UserAssetType.EVM,
+                  SupportedChainName.CRONOS,
                   props.form.getFieldValue('derivationPathStandard'),
                 ),
               });
@@ -1010,6 +1243,53 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           </>
         </ErrorModalPopup>
         <LedgerModalPopup
+          isModalVisible={isCosmosModalVisible}
+          handleCancel={handleCosmosCancel}
+          handleOk={handleCosmosOk}
+          title={
+            isLedgerCosmosAppConnected
+              ? t('create.ledgerModalPopup.tendermintAddress.title1')
+              : t('create.ledgerModalPopup.tendermintAddress.title2')
+          }
+          footer={[
+            isLedgerCosmosAppConnected ? (
+              <></>
+            ) : (
+              <Button
+                type="primary"
+                size="small"
+                className="btn-restart"
+                onClick={() => {
+                  handleCosmosOk();
+                  setIsLedgerModalButtonLoading(true);
+                  setTimeout(() => {
+                    checkIsLedgerCosmosAppConnected();
+                  }, 500);
+                }}
+                loading={isLedgerModalButtonLoading}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              >
+                {t('general.connect')}
+              </Button>
+            ),
+          ]}
+          image={isLedgerCosmosAppConnected ? <SuccessCheckmark /> : <IconLedger />}
+        >
+          <div className="description">
+            {isLedgerCosmosAppConnected ? (
+              t('create.ledgerModalPopup.tendermintAddress.description1')
+            ) : (
+              <>
+                {t('create.ledgerModalPopup.tendermintAddress.description3')}
+                <div className="ledger-app-icon">
+                  <IconCosmos style={{ color: '#fff' }} />
+                </div>
+                Cosmos App
+              </>
+            )}
+          </div>
+        </LedgerModalPopup>
+        <LedgerModalPopup
           isModalVisible={isCroModalVisible}
           handleCancel={handleCroCancel}
           handleOk={handleCroOk}
@@ -1033,7 +1313,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                   }, 500);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>
@@ -1074,14 +1354,13 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 className="btn-restart"
                 onClick={() => {
                   handleEthOk();
-                  // setIsEthModalVisible(false);
                   setIsLedgerModalButtonLoading(true);
                   setTimeout(() => {
                     checkIsLedgerEthAppConnected();
                   }, 500);
                 }}
                 loading={isLedgerModalButtonLoading}
-                // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
               >
                 {t('general.connect')}
               </Button>

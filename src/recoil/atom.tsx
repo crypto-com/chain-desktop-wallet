@@ -31,7 +31,8 @@ export type NavbarMenuKey =
   | '/dapp'
   | '/wallet'
   | '/restore'
-  | '/create';
+  | '/create'
+  | '/walletconnect';
 
 export type lockPageType = '' | 'bridge' | 'dapp';
 
@@ -53,6 +54,7 @@ const defaultAsset: UserAsset = {
 export enum LedgerConnectedApp {
   CRYPTO_ORG = 'Crypto.org',
   ETHEREUM = 'Ethereum',
+  COSMOS = 'Cosmos',
   NOT_CONNECTED = '',
 }
 

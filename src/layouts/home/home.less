@@ -138,8 +138,10 @@
   }
 }
 .home-page {
-  width: 100%;
   height: 100vh;
+  width: calc(100vw - 200px);
+  overflow-x: hidden;
+
   margin-left: @sider-width;
   > .ant-spin-nested-loading :not(.ant-spin-container) .ant-spin {
     max-height: none !important;
