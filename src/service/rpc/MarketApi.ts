@@ -49,10 +49,13 @@ export class CroMarketApi implements IMarketApi {
 
   public async getAssetPrice(asset: UserAsset, currency: string): Promise<AssetMarketPrice> {
     let fiatPrice = '';
+    let dailyChange = '';
     const { mainnetSymbol, assetType } = asset;
 
     try {
-      fiatPrice = await this.getTokenPriceFromCryptoCom(asset, currency);
+      const tokenPrice = await this.getTokenPriceFromCryptoCom(asset, currency);
+      fiatPrice = tokenPrice.fiatPrice;
+      dailyChange = tokenPrice.dailyChange;
     } catch (e) {
       return {
         assetSymbol: mainnetSymbol,
@@ -66,7 +69,7 @@ export class CroMarketApi implements IMarketApi {
     return {
       assetSymbol: mainnetSymbol,
       currency,
-      dailyChange: '',
+      dailyChange: dailyChange,
       price: fiatPrice,
       assetType,
     };
@@ -229,7 +232,10 @@ export class CroMarketApi implements IMarketApi {
 
     const tokenPriceInFiat = Number(tokenPriceInUSD.data.usd_price) * Number(usdToFiatRate);
 
-    return String(tokenPriceInFiat);
+    return {
+      dailyChange: String(tokenPriceInUSD.data.usd_price_change_24h),
+      fiatPrice: String(tokenPriceInFiat)
+    };
   }
 
   private async loadTokenSlugMap() {

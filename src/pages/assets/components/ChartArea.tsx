@@ -46,6 +46,8 @@ export const ChartArea = ({ asset, assetMarketData }: Props) => {
     ? `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}${roundPrice(parseFloat(assetMarketData?.price!))} ${session.currency}`
     : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`;
 
+  const currentTokenDailyChange = parseFloat(assetMarketData?.dailyChange ?? '0') * 100;
+
   const getContainerSize = () => {
     if (!container?.current) {
       return;
@@ -99,7 +101,17 @@ export const ChartArea = ({ asset, assetMarketData }: Props) => {
   return (
     <Card ref={container}>
       <Spin spinning={loadingData} indicator={<LoadingOutlined />}>
-        <Text style={{ float: 'left', fontSize: '24px' }}>{tokenPriceText}</Text>
+        <div style={{ float: 'left', display: 'flex', alignItems: 'center' }}>
+          <Text style={{ fontSize: '24px' }}>
+            {tokenPriceText}
+          </Text>
+          <Text style={{ marginLeft: '5px', fontSize: '20px', color: currentTokenDailyChange > 0 ? '#00A68C' : '#D9475A' }}>
+            {`${currentTokenDailyChange > 0 ? '+' : ''}${currentTokenDailyChange.toPrecision(2)}%`}
+          </Text>
+          <Text style={{ marginLeft: '5px', fontSize: '16px' }}>
+            {'(24H)'}
+          </Text>
+        </div>
         <Radio.Group
           className="duration-changer"
           onChange={e => {
@@ -114,7 +126,7 @@ export const ChartArea = ({ asset, assetMarketData }: Props) => {
           <Radio.Button value="3m">3M</Radio.Button>
           <Radio.Button value="6m">6M</Radio.Button>
         </Radio.Group>
-        <LineChart data={tokenPriceData} dimensions={dimensions} currentTokenPriceText={currentTokenPriceText} setTokenPriceText={setTokenPriceText} />
+        <LineChart data={tokenPriceData} dimensions={dimensions} />
       </Spin>
     </Card>
   );
