@@ -106,7 +106,7 @@ export const ChartArea = ({ asset, assetMarketData }: Props) => {
             {tokenPriceText}
           </Text>
           <Text style={{ marginLeft: '5px', fontSize: '20px', color: currentTokenDailyChange > 0 ? '#00A68C' : '#D9475A' }}>
-            {`${currentTokenDailyChange > 0 ? '+' : ''}${currentTokenDailyChange.toPrecision(2)}%`}
+            {!isNaN(currentTokenDailyChange) ? `${currentTokenDailyChange > 0 ? '+' : ''}${currentTokenDailyChange.toPrecision(2)}%` : '--%'}
           </Text>
           <Text style={{ marginLeft: '5px', fontSize: '16px' }}>
             {'(24H)'}
