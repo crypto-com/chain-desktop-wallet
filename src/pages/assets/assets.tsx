@@ -45,6 +45,8 @@ import { TransactionDirection, TransactionStatus } from '../../models/Transactio
 import { AssetIcon } from '../../components/AssetIcon';
 import AssetTypeTooltip from './components/AssetTypeTooltip';
 
+import { ChartArea } from './components/ChartArea';
+
 const { Sider, Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
 const { Text } = Typography;
@@ -473,6 +475,7 @@ const AssetsPage = () => {
                       />
                     )}
                   </div>
+                  <ChartArea asset={currentAsset!} assetMarketData={currentAssetMarketData} />
                   <Tabs
                     activeKey={activeAssetTab}
                     onTabClick={key => {

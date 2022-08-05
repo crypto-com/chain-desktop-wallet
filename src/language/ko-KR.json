@@ -831,5 +831,6 @@
   "general.customerService.liveChat": "라이브 채팅",
   "general.notification.viewMessage": "메시지를 봅니다",
   "general.notification.title": "알림",
-  "general.notification.expand": "확장"
+  "general.notification.expand": "확장",
+  "general.price": "가격"
 }

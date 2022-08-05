@@ -834,5 +834,6 @@
   "general.customerService.liveChat": "Live Chat",
   "general.notification.viewMessage": "View Message",
   "general.notification.title": "Notifications",
-  "general.notification.expand": "Expand"
+  "general.notification.expand": "Expand",
+  "general.price": "Price"
 }

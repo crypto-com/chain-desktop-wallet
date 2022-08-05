@@ -7,6 +7,7 @@ import {
   getNormalScaleAmount,
   getUIDynamicAmount,
   getUINormalScaleAmount,
+  roundPrice,
 } from './NumberUtils';
 import { UserAsset } from '../models/UserAsset';
 import { DefaultWalletConfigs } from '../config/StaticConfig';
@@ -95,5 +96,15 @@ describe('Testing Number utils', () => {
 
     expect(adjustedTransactionAmount('0.245', asset, networkFee)).to.eq('0.2449');
     expect(adjustedTransactionAmount('0.1223', asset, networkFee)).to.eq('0.1223');
+  });
+
+  it('test roundNumber', () => {
+    expect(roundPrice(0.123456789, 4)).to.eq('0.1235');
+    expect(roundPrice(0.123, 4)).to.eq('0.1230');
+    expect(roundPrice(0.0123, 4)).to.eq('0.01230');
+    expect(roundPrice(0.0000001234567, 4)).to.eq('0.0000001235');
+    expect(roundPrice(12.123412323)).to.eq('12.12');
+    expect(roundPrice(12323.01234567)).to.eq('12323.01');
+    expect(roundPrice(-12323.01234567)).to.eq('-12323.01234567');
   });
 });

@@ -85,10 +85,11 @@ describe('MarketApi', () => {
       walletId: '',
     };
 
-    const vvsTokenPriceSGD = await croMarketPriceApi.getTokenPriceFromCryptoCom(vvsAsset, 'SGD');
+    const { fiatPrice: vvsTokenPriceSGD, dailyChange: vvsTokenPriceDailyChange } = await croMarketPriceApi.getTokenPriceFromCryptoCom(vvsAsset, 'SGD');
     expect(vvsTokenPriceSGD).to.equals('0.00060383095694892');
+    expect(vvsTokenPriceDailyChange).to.equals('-0.012577');
 
-    const vvsTokenPriceUSD = await croMarketPriceApi.getTokenPriceFromCryptoCom(vvsAsset, 'USD');
+    const { fiatPrice: vvsTokenPriceUSD } = await croMarketPriceApi.getTokenPriceFromCryptoCom(vvsAsset, 'USD');
     expect(vvsTokenPriceUSD).to.equals('0.000442751368');
   });
 });

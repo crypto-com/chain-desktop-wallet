@@ -295,6 +295,7 @@ const HomePage = () => {
   }
 
   useEffect(() => {
+
     const syncAssetData = async () => {
       setAssetsLoading(true);
 
