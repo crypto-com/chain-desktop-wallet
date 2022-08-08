@@ -329,6 +329,7 @@
   "home.notification.downloadComplete.message": "다운로드 완료",
   "home.notification.downloadComplete.description": "업데이트가 성공적으로 다운로드되었습니다. 다시 시작하면 설치됩니다.",
   "home.notification.downloadComplete.button": "지금 재시작합니다",
+  "home.notification.downloadComplete.updateButton": "업데이트를 위해 재부팅",
   "home.notification.cronosBridgeExit.message": "브릿지 전송이 완료되지 않았습니다",
   "home.notification.cronosBridgeExit.description": "프로그램을 종료할까요?",
   "home.notification.cronosBridgeExit.button": "종료",

@@ -163,6 +163,11 @@ const fetchingComponentState = atom<boolean>({
   default: false,
 });
 
+export const updateDownloadedState = atom({
+  key: 'updatedDownloaded',
+  default: false,
+});
+
 export {
   walletIdentifierState,
   sessionState,

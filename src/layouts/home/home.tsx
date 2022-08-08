@@ -41,6 +41,7 @@ import {
   navbarMenuSelectedKeyState,
   pageLockState,
   NavbarMenuKey,
+  updateDownloadedState,
 } from '../../recoil/atom';
 import { ellipsis, checkIfTestnet, getCronosEvmAsset } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
@@ -139,6 +140,8 @@ function HomeLayout(props: HomeLayoutProps) {
   const [pageLock, setPageLock] = useRecoilState(pageLockState);
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const setIsIbcVisible = useSetRecoilState(isIbcVisibleState);
+  const updatedDownloaded = useRecoilValue(updateDownloadedState);
+
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const [isConfirmDeleteVisible, setIsConfirmDeleteVisible] = useState(false);
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false);
@@ -1119,6 +1122,9 @@ function HomeLayout(props: HomeLayoutProps) {
           <WalletConnectModal />
           <div className="version">DEFI DESKTOP WALLET v{buildVersion}</div>
           <HomeMenu />
+          {updatedDownloaded && <Button onClick={() => {
+            ipcRenderer.send('auto_updater_restart_app');
+          }} className="restart-button" type="primary" size="large">{t('home.notification.downloadComplete.updateButton')}</Button>}
           <Button
             className="bottom-icon"
             type="ghost"
