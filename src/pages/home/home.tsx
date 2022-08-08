@@ -16,7 +16,7 @@ import {
   Spin,
 } from 'antd';
 import { ExclamationCircleOutlined, LoadingOutlined, SyncOutlined } from '@ant-design/icons';
-import { useRecoilState, useResetRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import numeral from 'numeral';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
