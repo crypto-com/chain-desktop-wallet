@@ -373,6 +373,11 @@ class WalletService {
 
     return assets
       .filter(asset => asset.assetType !== UserAssetType.IBC)
+      .sort((a,b) => {
+        if (a.assetCreationType === AssetCreationType.STATIC) return 1;
+        if (b.assetCreationType === AssetCreationType.STATIC) return -1;
+        return 0;
+      })
       .map(data => {
         const asset: UserAsset = { ...data };
         return asset;
