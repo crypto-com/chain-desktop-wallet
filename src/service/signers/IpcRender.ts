@@ -1,5 +1,4 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
-import { hexToString } from 'web3-utils';
 import { SupportedChainName } from '../../config/StaticConfig';
 import { DerivationPathStandard } from './LedgerSigner';
 import { ISignerProvider } from './SignerProvider';
