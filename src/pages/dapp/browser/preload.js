@@ -438,9 +438,9 @@ class Web3Provider extends EventEmitter {
     if (buffer.length === 0) {
       // hex it
       const hex = Utils.bufferToHex(message);
-      this.postMessage('signPersonalMessage', payload.id, { data: hex });
+      this.postMessage('signPersonalMessage', payload.id, { data: hex, params: payload.params });
     } else {
-      this.postMessage('signPersonalMessage', payload.id, { data: message });
+      this.postMessage('signPersonalMessage', payload.id, { data: message, params: payload.params });
     }
   }
 
