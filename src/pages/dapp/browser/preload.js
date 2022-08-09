@@ -435,10 +435,6 @@ class Web3Provider extends EventEmitter {
   personal_sign(payload) {
     let message = payload.params[0];
     let buffer = Utils.messageToBuffer(message);
-    if (!Utils.isUtf8(buffer)) {
-      message = payload.params[1];
-      buffer = Utils.messageToBuffer(message);
-    }
     if (buffer.length === 0) {
       // hex it
       const hex = Utils.bufferToHex(message);

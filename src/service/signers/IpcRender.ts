@@ -192,8 +192,7 @@ export class IpcRender implements ISignerProvider {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public async signPersonalMessage(index: number, standard: DerivationPathStandard, hexMessage: string): Promise<string> {
-    const message = hexToString(hexMessage);
+  public async signPersonalMessage(index: number, standard: DerivationPathStandard, message: string): Promise<string> {
     const ret = electron.ipcRenderer.sendSync('ethSignPersonalMessage', {
       message,
       index,
