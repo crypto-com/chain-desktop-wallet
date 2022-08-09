@@ -120,8 +120,7 @@ const GasConfig = (props: { onChange?: (gasLimit: string, networkFee: string) =>
             marginTop: '10px',
           }}
         >
-          <div className="label">{t('confirmation-speed')}</div>
-
+          <div className="label" style={{ marginRight: 4 }}>{t('confirmation-speed')}</div>
           <Tooltip
             style={{ cursor: 'pointer' }}
             title={t('sending-crypto-on-blockchain-requires-confirmation')}
