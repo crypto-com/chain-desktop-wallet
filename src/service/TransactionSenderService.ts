@@ -790,7 +790,6 @@ export class TransactionSenderService {
           denomId: nftTransferRequest.denomId,
           sender: nftTransferRequest.sender,
           recipient: nftTransferRequest.recipient,
-
           memo,
           accountNumber,
           accountSequence,
