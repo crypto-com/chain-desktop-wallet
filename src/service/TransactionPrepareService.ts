@@ -21,16 +21,15 @@ export class TransactionPrepareService {
   public async prepareTransaction(): Promise<TenderMintTransactionPrepared> {
     const currentSession = await this.storageService.retrieveCurrentSession();
     const currentWallet = currentSession.wallet;
-
     const nodeRpc = await NodeRpcService.init({
       baseUrl: currentSession.wallet.config.nodeUrl,
-      proxyUrl: currentSession.activeAsset?.config?.tendermintNetwork?.node?.proxyUrl,
-      clientUrl: currentSession.activeAsset?.config?.tendermintNetwork?.node?.clientUrl,
+      proxyUrl: currentSession.activeAsset?.config?.tendermintNetwork?.node?.proxyUrl ?? '',
+      clientUrl: currentSession.activeAsset?.config?.tendermintNetwork?.node?.clientUrl ?? '',
     });
 
     const [accountNumber, accountSequence, latestBlock] = await Promise.all([
-      nodeRpc.fetchAccountNumber(currentSession.activeAsset?.address!),
-      nodeRpc.loadSequenceNumber(currentSession.activeAsset?.address!),
+      nodeRpc.fetchAccountNumber(currentSession.activeAsset?.address ?? currentSession.wallet.address),
+      nodeRpc.loadSequenceNumber(currentSession.activeAsset?.address ?? currentSession.wallet.address),
       nodeRpc.loadLatestBlock(),
     ]);
 

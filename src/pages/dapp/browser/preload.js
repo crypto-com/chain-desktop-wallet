@@ -425,7 +425,7 @@ class Web3Provider extends EventEmitter {
   eth_sign(payload) {
     const buffer = Utils.messageToBuffer(payload.params[1]);
     const hex = Utils.bufferToHex(buffer);
-    if (isUtf8(buffer)) {
+    if (Utils.isUtf8(buffer)) {
       this.postMessage('signPersonalMessage', payload.id, { data: hex });
     } else {
       this.postMessage('signMessage', payload.id, { data: hex });
@@ -438,9 +438,9 @@ class Web3Provider extends EventEmitter {
     if (buffer.length === 0) {
       // hex it
       const hex = Utils.bufferToHex(message);
-      this.postMessage('signPersonalMessage', payload.id, { data: hex });
+      this.postMessage('signPersonalMessage', payload.id, { data: hex, params: payload.params });
     } else {
-      this.postMessage('signPersonalMessage', payload.id, { data: message });
+      this.postMessage('signPersonalMessage', payload.id, { data: message, params: payload.params });
     }
   }
 

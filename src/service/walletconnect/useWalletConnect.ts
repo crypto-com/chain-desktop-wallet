@@ -180,7 +180,7 @@ export const useWalletConnect = () => {
 
     switch (payload.method) {
       case 'personal_sign':
-        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: { data: payload.params[0] } }]);
+        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: { data: payload.params[0], params: payload.params } }]);
         break;
       case 'eth_sign':
         setRequests([...requests, { id: payload.id, name: 'signMessage', object: { data: payload.params[1] } }]);
@@ -218,10 +218,10 @@ export const useWalletConnect = () => {
       }
         break;
       case 'eth_signPersonalMessage':
-        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: { data: payload.params[0] } }]);
+        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: { data: payload.params[0], params: payload.params } }]);
         break;
       case 'eth_signTypedData_v3':
-        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: { data: payload.params[0] } }]);
+        setRequests([...requests, { id: payload.id, name: 'signPersonalMessage', object: { data: payload.params[0], params: payload.params } }]);
         break;
       default:
         log('unknown payload');

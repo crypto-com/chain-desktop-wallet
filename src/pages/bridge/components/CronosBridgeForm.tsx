@@ -537,8 +537,6 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
               validator: async () => {
                 const { bridgeFrom, bridgeTo } = form.getFieldValue();
 
-                console.log('bridgeFrom', bridgeFrom);
-                console.log('bridgeTo', bridgeTo);
                 switch (`${bridgeFrom}_TO_${bridgeTo}`) {
                   case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS: {
                     setBridgeTransferDirection(BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS);

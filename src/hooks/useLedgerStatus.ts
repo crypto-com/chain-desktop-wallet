@@ -13,7 +13,7 @@ interface Props {
 export const useLedgerStatus = (props: Props) => {
   // const { asset } = props;
   const assetType = props.assetType || props.asset?.assetType;
-  const chainName = props.chainName;
+  const chainName = props.chainName || props.asset?.name;
 
   const ledgerConnectedApp = useRecoilValue(ledgerIsConnectedState);
   const [isLedgerConnected, setIsLedgerConnected] = useState<boolean>();

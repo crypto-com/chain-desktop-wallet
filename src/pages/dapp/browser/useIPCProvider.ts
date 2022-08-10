@@ -528,6 +528,8 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
                   // no-op
                 },
               );
+            } else {
+              sendError(event.id, 'Chain not found');
             }
           }
           break;

@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
 - Cosmos Hub ATOM Support
 - Bridge Transfer supports between Cronos Chain and Cosmos Hub
 - DApps Browser EVM chain switching capability
+- WalletConnect connection capability
 - Token Price Chart
 - Notification Center
 ## [v1.2.0] - 2022-07-25
