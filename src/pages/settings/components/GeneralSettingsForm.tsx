@@ -12,6 +12,7 @@ import { EnableGeneralSettingsPropagation } from '../../../models/Wallet';
 import { AnalyticsService } from '../../../service/analytics/AnalyticsService';
 import { getChainName } from '../../../utils/utils';
 import { AssetIcon } from '../../../components/AssetIcon';
+import { UserAssetType } from '../../../models/UserAsset';
 
 const { Option } = Select;
 
@@ -31,7 +32,17 @@ export const GeneralSettingsForm = props => {
   const configurableAssets = useMemo(() => {
     return walletAllAssets.filter(asset => {
       return _.size(asset.contractAddress) < 1;
-    });
+    })
+      // Prioritize CRO assets over other assets
+      .sort((a, b) => {
+        if(a.mainnetSymbol === 'CRO') {
+          if(b.mainnetSymbol === 'CRO' && b.assetType === UserAssetType.TENDERMINT) {
+            return 1;
+          }
+          return -1;
+        }
+        return 1;
+      });
   }, [walletAllAssets]);
 
   const onSwitchAsset = value => {
