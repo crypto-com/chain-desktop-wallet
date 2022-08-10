@@ -29,6 +29,7 @@ import {
   nftListState,
   navbarMenuSelectedKeyState,
   fetchingDBState,
+  updateDownloadedState,
 } from '../../recoil/atom';
 import { NOT_KNOWN_YET_VALUE, SUPPORTED_CURRENCY, WalletConfig } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
@@ -81,6 +82,7 @@ const HomePage = () => {
   const setNFTList = useSetRecoilState(nftListState);
   const [allMarketData, setAllMarketData] = useRecoilState(allMarketState);
   const [marketData, setMarketData] = useState<AssetMarketPrice>();
+  const setUpdateDownloadedState = useSetRecoilState(updateDownloadedState);
 
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const didMountRef = useRef(false);
@@ -249,6 +251,7 @@ const HomePage = () => {
   function listenToUpdatesDownloaded() {
     ipcRenderer.on('update_downloaded', () => {
       ipcRenderer.removeAllListeners('update_downloaded');
+      setUpdateDownloadedState(true);
 
       const newVersionNotificationKey = 'open-update_downloaded';
 
