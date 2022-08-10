@@ -29,6 +29,7 @@ import {
   nftListState,
   navbarMenuSelectedKeyState,
   fetchingDBState,
+  updateDownloadedState,
 } from '../../recoil/atom';
 import { NOT_KNOWN_YET_VALUE, SUPPORTED_CURRENCY, WalletConfig } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
@@ -81,6 +82,7 @@ const HomePage = () => {
   const setNFTList = useSetRecoilState(nftListState);
   const [allMarketData, setAllMarketData] = useRecoilState(allMarketState);
   const [marketData, setMarketData] = useState<AssetMarketPrice>();
+  const setUpdateDownloadedState = useSetRecoilState(updateDownloadedState);
 
   const [fetchingDB, setFetchingDB] = useRecoilState(fetchingDBState);
   const didMountRef = useRef(false);
@@ -108,7 +110,6 @@ const HomePage = () => {
       title: t('home.assetList.table.name'),
       // dataIndex: 'name',
       key: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
       render: (record: UserAsset) => {
         const { symbol } = record;
         return (
@@ -128,7 +129,6 @@ const HomePage = () => {
       title: t('home.assetList.table.chainName'),
       // dataIndex: 'name',
       key: 'chainName',
-      sorter: (a, b) => a.name.localeCompare(b.name),
       render: record => {
         const { name } = record;
 
@@ -251,6 +251,7 @@ const HomePage = () => {
   function listenToUpdatesDownloaded() {
     ipcRenderer.on('update_downloaded', () => {
       ipcRenderer.removeAllListeners('update_downloaded');
+      setUpdateDownloadedState(true);
 
       const newVersionNotificationKey = 'open-update_downloaded';
 
@@ -323,7 +324,29 @@ const HomePage = () => {
       setRewards(allRewards);
 
       showWalletStateNotification(sessionData.wallet.config);
-      setWalletAllAssets(allAssets);
+
+      const processedAllAssets = allAssets.map((asset) => {
+        const assetMarketData = allMarketData.get(
+          `${asset.assetType}-${asset.mainnetSymbol}-${currentSession.currency}`,
+        );
+        return {
+          ...asset,
+          marketValue: assetMarketData &&
+          assetMarketData.price && 
+          asset.mainnetSymbol === assetMarketData.assetSymbol 
+            ? numeral(
+              getAssetBalancePrice(asset, assetMarketData),
+            ).value() ?? 0
+            : 0
+        };
+      })
+        .sort((a, b) => {
+          if(a.marketValue < b.marketValue) return 1;
+          if(a.marketValue > b.marketValue) return -1;
+          return 0;
+        });
+
+      setWalletAllAssets(processedAllAssets);
       setHasShownNotLiveWallet(true);
 
       // Fetch again balances data

@@ -329,6 +329,7 @@
   "home.notification.downloadComplete.message": "Download Complete",
   "home.notification.downloadComplete.description": "Update downloaded successfully. It will be installed on restart.",
   "home.notification.downloadComplete.button": "Restart Now",
+  "home.notification.downloadComplete.updateButton": "Restart to update",
   "home.notification.cronosBridgeExit.message": "Bridge Transfer is not completed",
   "home.notification.cronosBridgeExit.description": "Are you sure you want to leave?",
   "home.notification.cronosBridgeExit.button": "Leave",

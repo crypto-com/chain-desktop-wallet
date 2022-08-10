@@ -94,6 +94,7 @@ export namespace DappBrowserIPC {
     name: 'signPersonalMessage';
     object: {
       data: string;
+      params: string[]
     };
   }
 

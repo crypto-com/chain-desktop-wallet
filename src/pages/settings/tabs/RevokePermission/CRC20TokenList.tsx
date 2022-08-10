@@ -12,7 +12,7 @@ import { UserAsset } from '../../../../models/UserAsset';
 import { allMarketState, sessionState } from '../../../../recoil/atom';
 import { CronosClient } from '../../../../service/cronos/CronosClient';
 import CRC20TokenContract from '../../../../service/signers/abi/TokenContractABI.json';
-import { evmTransactionSigner } from '../../../../service/signers/EvmTransactionSigner';
+import { EvmTransactionSigner, evmTransactionSigner } from '../../../../service/signers/EvmTransactionSigner';
 import { EVMContractCallUnsigned } from '../../../../service/signers/TransactionSupported';
 import { TransactionPrepareService } from '../../../../service/TransactionPrepareService';
 import { walletService } from '../../../../service/WalletService';
@@ -288,6 +288,7 @@ const CRC20TokenList = ({
           currentSession={currentSession}
           wallet={currentSession.wallet}
           visible
+          isConfirming={isConfirmLoading}
           onConfirm={async ({ gasLimit: _gasLimit, gasPrice: _gasPrice, event }) => {
             setRequestConfirmationVisible(false);
 
@@ -320,11 +321,11 @@ const CRC20TokenList = ({
                 nonce: prepareTxInfo.nonce,
               };
 
-              await evmTransactionSigner.sendContractCallTransaction(
+              await EvmTransactionSigner.sendContractCallTransaction(
                 {
                   chainConfig: CronosMainnetChainConfig,
                   transaction: txConfig,
-                  phrase: decryptedPhrase
+                  mnemonic: decryptedPhrase
                 }
               );
 

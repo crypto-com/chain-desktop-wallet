@@ -329,6 +329,7 @@
   "home.notification.downloadComplete.message": "下载完成",
   "home.notification.downloadComplete.description": "成功下载更新，重启程序以完成安装。",
   "home.notification.downloadComplete.button": "现在重启程序",
+  "home.notification.downloadComplete.updateButton": "重启以更新",
   "home.notification.cronosBridgeExit.message": "跨链交易尚未完成",
   "home.notification.cronosBridgeExit.description": "你确定想要离开吗？",
   "home.notification.cronosBridgeExit.button": "离开",
