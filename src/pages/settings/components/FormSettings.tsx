@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Route, useHistory, Switch as RouterSwitch } from 'react-router-dom';
 import '../settings.less';
 import 'antd/dist/antd.css';
@@ -21,6 +21,7 @@ import { GeneralSettingsForm } from './GeneralSettingsForm';
 import { MetaInfoComponent } from './MetaInfoComponent';
 import { getAssetConfigFromWalletConfig } from '../utils';
 import Support from '../tabs/Support/Support';
+import { getDefaultUserAssetConfig } from '../../../config/StaticAssets';
 
 const { ipcRenderer } = window.require('electron');
 
@@ -43,8 +44,10 @@ export const FormSettings = () => {
   const [session, setSession] = useRecoilState(sessionState);
   const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
   const [currentAssetIdentifier, setCurrentAssetIdentifier] = useState<string>();
+  
+  const didMountRef = useRef(false);
 
-  const defaultSettings: UserAssetConfig =
+  const prevSettings: UserAssetConfig =
     session.activeAsset?.config || getAssetConfigFromWalletConfig(session.wallet.config);
 
   const history = useHistory();
@@ -59,35 +62,44 @@ export const FormSettings = () => {
   useEffect(() => {
     const croAsset = getCronosTendermintAsset(walletAllAssets);
 
-    if (defaultSettings.fee !== undefined) {
-      networkFee = defaultSettings.fee.networkFee;
+    if (prevSettings.fee !== undefined) {
+      networkFee = prevSettings.fee.networkFee;
     }
-    if (defaultSettings.fee !== undefined) {
-      gasLimit = defaultSettings.fee.gasLimit;
+    if (prevSettings.fee !== undefined) {
+      gasLimit = prevSettings.fee.gasLimit;
     }
 
     form.setFieldsValue({
-      nodeUrl: defaultSettings.nodeUrl,
-      chainId: defaultSettings.chainId,
-      indexingUrl: defaultSettings.indexingUrl,
+      nodeUrl: prevSettings.nodeUrl,
+      chainId: prevSettings.chainId,
+      indexingUrl: prevSettings.indexingUrl,
       networkFee,
       gasLimit,
     });
     if (!currentAssetIdentifier && croAsset) {
       setCurrentAssetIdentifier(croAsset?.identifier);
+
     }
-  }, [form, defaultSettings, walletAllAssets, setSession]);
+    if (!didMountRef.current && croAsset) {
+      didMountRef.current = true;
+      setSession({
+        ...session,
+        activeAsset: croAsset,
+      });
+      return;
+    }
+  }, [form, prevSettings, walletAllAssets, session, setSession]);
 
   const onFinish = async values => {
     const defaultGasLimit =
-      defaultSettings.fee !== undefined ? defaultSettings.fee.gasLimit : FIXED_DEFAULT_GAS_LIMIT;
+      prevSettings.fee !== undefined ? prevSettings.fee.gasLimit : FIXED_DEFAULT_GAS_LIMIT;
     const defaultNetworkFee =
-      defaultSettings.fee !== undefined ? defaultSettings.fee.networkFee : FIXED_DEFAULT_FEE;
+      prevSettings.fee !== undefined ? prevSettings.fee.networkFee : FIXED_DEFAULT_FEE;
 
     if (
-      defaultSettings.nodeUrl === values.nodeUrl &&
-      defaultSettings.indexingUrl === values.indexingUrl &&
-      defaultSettings.chainId === values.chainId &&
+      prevSettings.nodeUrl === values.nodeUrl &&
+      prevSettings.indexingUrl === values.indexingUrl &&
+      prevSettings.chainId === values.chainId &&
       defaultGasLimit === values.gasLimit &&
       defaultNetworkFee === values.networkFee
     ) {
@@ -155,15 +167,26 @@ export const FormSettings = () => {
     );
   };
 
-  const onRestoreDefaults = () => {
+  const onRestorePrevSettings = () => {
     form.setFieldsValue({
-      nodeUrl: defaultSettings.nodeUrl,
-      chainId: defaultSettings.chainId,
-      indexingUrl: defaultSettings.indexingUrl,
+      nodeUrl: prevSettings.nodeUrl,
+      chainId: prevSettings.chainId,
+      indexingUrl: prevSettings.indexingUrl,
       networkFee:
-        defaultSettings.fee && defaultSettings.fee.networkFee ? defaultSettings.fee.networkFee : '',
+        prevSettings.fee && prevSettings.fee.networkFee ? prevSettings.fee.networkFee : '',
       gasLimit:
-        defaultSettings.fee && defaultSettings.fee.gasLimit ? defaultSettings.fee.gasLimit : '',
+        prevSettings.fee && prevSettings.fee.gasLimit ? prevSettings.fee.gasLimit : '',
+    });
+  };
+
+  const onDefaultSettings = () => {
+    const defaultAssetConfig = getDefaultUserAssetConfig(session.activeAsset!, session);
+    form.setFieldsValue({
+      nodeUrl: defaultAssetConfig?.config.nodeUrl,
+      chainId: defaultAssetConfig?.config.chainId,
+      indexingUrl: defaultAssetConfig?.config.indexingUrl,
+      networkFee: defaultAssetConfig?.config.fee.networkFee,
+      gasLimit: defaultAssetConfig?.config.fee.gasLimit,
     });
   };
 
@@ -216,8 +239,11 @@ export const FormSettings = () => {
                         <Button type="primary" htmlType="submit" loading={isButtonLoading}>
                           {t('general.save')}
                         </Button>
-                        <Button type="link" htmlType="button" onClick={onRestoreDefaults}>
+                        <Button type="link" htmlType="button" onClick={onRestorePrevSettings}>
                           {t('general.discard')}
+                        </Button>
+                        <Button type="link" htmlType="button" onClick={onDefaultSettings} style={{ color: '#20bca4' }}>
+                          {t('general.default')}
                         </Button>
                       </Form.Item>
                     </div>

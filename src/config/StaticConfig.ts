@@ -364,7 +364,7 @@ const TestnetCroeseid4: Network = {
   rpcUrl: 'https://testnet-croeseid-4.crypto.org:26657',
 };
 
-const TestNetCroeseid4Config: WalletConfig = {
+export const TestNetCroeseid4Config: WalletConfig = {
   enabled: true,
   name: NetworkName.TESTNET,
   derivationPath: 'm/44\'/1\'/0\'/0/0',
@@ -387,7 +387,7 @@ const TestNetCroeseid4Config: WalletConfig = {
   },
 };
 
-const MainNetConfig: WalletConfig = {
+export const MainNetConfig: WalletConfig = {
   enabled: true,
   name: NetworkName.MAINNET,
   derivationPath: 'm/44\'/394\'/0\'/0/0',
