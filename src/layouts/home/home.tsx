@@ -81,7 +81,7 @@ import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup
 import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
 import IconLedger from '../../svg/IconLedger';
 import { ISignerProvider } from '../../service/signers/SignerProvider';
-import { UserAsset, UserAssetType } from '../../models/UserAsset';
+import { getAssetBalancePrice, UserAsset, UserAssetType } from '../../models/UserAsset';
 import IconCro from '../../svg/IconCro';
 import IconEth from '../../svg/IconEth';
 import { BridgeService } from '../../service/bridge/BridgeService';
@@ -96,6 +96,7 @@ import { WalletConnectModal } from '../../pages/walletconnect/components/WalletC
 import IconWalletConnect from '../../svg/IconWalletConnect';
 import IconCosmos from '../../svg/IconCosmos';
 import IntercomCustomerService from '../../pages/customer-service';
+import numeral from 'numeral';
 
 // import i18n from '../../language/I18n';
 
@@ -790,6 +791,27 @@ function HomeLayout(props: HomeLayoutProps) {
         currentSession.currency,
       );
 
+      const processedAllAssets = allAssets.map((asset) => {
+        const assetMarketData = currentAllAssetsMarketData.get(
+          `${asset.assetType}-${asset.mainnetSymbol}-${currentSession.currency}`,
+        );
+        return {
+          ...asset,
+          marketValue: assetMarketData &&
+          assetMarketData.price && 
+          asset.mainnetSymbol === assetMarketData.assetSymbol 
+            ? numeral(
+              getAssetBalancePrice(asset, assetMarketData),
+            ).value() ?? 0
+            : 0
+        };
+      })
+        .sort((a, b) => {
+          if(a.marketValue < b.marketValue) return 1;
+          if(a.marketValue > b.marketValue) return -1;
+          return 0;
+        });
+
       const isIbcVisible = allAssets.length > 1;
 
       const announcementShown = await generalConfigService.checkIfHasShownAnalyticsPopup();
@@ -808,7 +830,7 @@ function HomeLayout(props: HomeLayoutProps) {
         activeAsset: currentAsset,
       });
       setUserAsset(currentAsset);
-      setWalletAllAssets(allAssets);
+      setWalletAllAssets(processedAllAssets);
       setIsIbcVisible(isIbcVisible);
       setWalletList(allWalletsData);
       setMarketData(currentMarketData);

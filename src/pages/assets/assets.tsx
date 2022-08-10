@@ -196,7 +196,7 @@ const AssetsPage = () => {
       title: t('assets.assetList.table.name'),
       // dataIndex: 'name',
       key: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
+      sorter: (a, b) => a.symbol.localeCompare(b.symbol),
       render: (record: UserAsset) => {
         const { symbol } = record;
 

@@ -1,5 +1,4 @@
 import { Bytes } from '@crypto-org-chain/chain-jslib/lib/dist/utils/bytes/bytes';
-import { hexToString } from 'web3-utils';
 import { SupportedChainName } from '../../config/StaticConfig';
 import { DerivationPathStandard } from './LedgerSigner';
 import { ISignerProvider } from './SignerProvider';
@@ -192,8 +191,7 @@ export class IpcRender implements ISignerProvider {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public async signPersonalMessage(index: number, standard: DerivationPathStandard, hexMessage: string): Promise<string> {
-    const message = hexToString(hexMessage);
+  public async signPersonalMessage(index: number, standard: DerivationPathStandard, message: string): Promise<string> {
     const ret = electron.ipcRenderer.sendSync('ethSignPersonalMessage', {
       message,
       index,

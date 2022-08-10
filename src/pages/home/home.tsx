@@ -110,7 +110,6 @@ const HomePage = () => {
       title: t('home.assetList.table.name'),
       // dataIndex: 'name',
       key: 'name',
-      sorter: (a, b) => a.name.localeCompare(b.name),
       render: (record: UserAsset) => {
         const { symbol } = record;
         return (
@@ -130,7 +129,6 @@ const HomePage = () => {
       title: t('home.assetList.table.chainName'),
       // dataIndex: 'name',
       key: 'chainName',
-      sorter: (a, b) => a.name.localeCompare(b.name),
       render: record => {
         const { name } = record;
 
@@ -326,7 +324,29 @@ const HomePage = () => {
       setRewards(allRewards);
 
       showWalletStateNotification(sessionData.wallet.config);
-      setWalletAllAssets(allAssets);
+
+      const processedAllAssets = allAssets.map((asset) => {
+        const assetMarketData = allMarketData.get(
+          `${asset.assetType}-${asset.mainnetSymbol}-${currentSession.currency}`,
+        );
+        return {
+          ...asset,
+          marketValue: assetMarketData &&
+          assetMarketData.price && 
+          asset.mainnetSymbol === assetMarketData.assetSymbol 
+            ? numeral(
+              getAssetBalancePrice(asset, assetMarketData),
+            ).value() ?? 0
+            : 0
+        };
+      })
+        .sort((a, b) => {
+          if(a.marketValue < b.marketValue) return 1;
+          if(a.marketValue > b.marketValue) return -1;
+          return 0;
+        });
+
+      setWalletAllAssets(processedAllAssets);
       setHasShownNotLiveWallet(true);
 
       // Fetch again balances data

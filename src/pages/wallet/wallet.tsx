@@ -25,6 +25,7 @@ import { DefaultWalletConfigs } from '../../config/StaticConfig';
 import IconLedger from '../../svg/IconLedger';
 import IconWallet from '../../svg/IconWallet';
 import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
+import { getCronosTendermintAsset } from '../../utils/utils';
 
 const { Header, Content, Footer } = Layout;
 const { Text } = Typography;
@@ -110,11 +111,14 @@ function WalletPage() {
       new Session(walletList[e.key], undefined, session.currency),
     );
     const currentSession = await walletService.retrieveCurrentSession();
-    const currentAsset = await walletService.retrieveDefaultWalletAsset(currentSession);
     const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
+    const cronosTendermintAsset = getCronosTendermintAsset(allAssets);
     const currentNftList = await walletService.retrieveNFTs(currentSession.wallet.identifier);
-    setSession(currentSession);
-    setUserAsset(currentAsset);
+    setSession({
+      ...currentSession,
+      activeAsset: cronosTendermintAsset
+    });
+    setUserAsset(cronosTendermintAsset!);
     setWalletAllAssets(allAssets);
     setNftList(currentNftList);
     await walletService.syncAll(currentSession);

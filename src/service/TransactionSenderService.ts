@@ -45,7 +45,7 @@ import { StorageService } from './storage/StorageService';
 import { CronosClient } from './cronos/CronosClient';
 import { EVMClient } from './rpc/clients/EVMClient';
 import { TransactionPrepareService } from './TransactionPrepareService';
-import { evmTransactionSigner } from './signers/EvmTransactionSigner';
+import { EvmTransactionSigner, evmTransactionSigner } from './signers/EvmTransactionSigner';
 import { LEDGER_WALLET_TYPE, createLedgerDevice } from './LedgerService';
 import { TransactionHistoryService } from './TransactionHistoryService';
 import { checkIfTestnet, getCronosEvmAsset, sleep } from '../utils/utils';
@@ -790,7 +790,6 @@ export class TransactionSenderService {
           denomId: nftTransferRequest.denomId,
           sender: nftTransferRequest.sender,
           recipient: nftTransferRequest.recipient,
-
           memo,
           accountNumber,
           accountSequence,
@@ -884,10 +883,10 @@ export class TransactionSenderService {
           const isTestnet = checkIfTestnet(session.wallet.config.network);
           const chainConfig = !isTestnet ? CronosMainnetChainConfig : CronosTestnetChainConfig;
 
-          const result = await evmTransactionSigner.sendContractCallTransaction({
+          const result = await EvmTransactionSigner.sendContractCallTransaction({
             chainConfig,
             transaction: txConfig,
-            phrase: decryptedPhrase,
+            mnemonic: decryptedPhrase,
           });
 
           await sleep(7_000);

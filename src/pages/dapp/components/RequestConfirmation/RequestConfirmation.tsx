@@ -98,6 +98,20 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
     fetch();
   }, []);
 
+  const getReadableSignedMessage = (event: DappBrowserIPC.SignPersonalMessageEvent
+  ) => {
+
+    let message = '';
+    try {
+
+      message = hexToUtf8(event.object.params[0]);
+    } catch (error) {
+      message = event.object.params[1];
+    }
+
+    return message;
+  };
+
   const EventView = () => {
 
     if (event.name === 'signTransaction' || event.name === 'sendTransaction') {
@@ -170,7 +184,7 @@ const RequestConfirmation = (props: RequestConfirmationProps) => {
           <div className="row">
             <div className="title">{t('dapp.requestConfirmation.message.title')}: </div>
           </div>
-          <pre className="signing-message">{hexToUtf8(event.object.data)}</pre>
+          <pre className="signing-message">{getReadableSignedMessage(event)}</pre>
         </>
       );
     }
