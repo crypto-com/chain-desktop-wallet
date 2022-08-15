@@ -725,6 +725,14 @@ const NFTProjects: CronosProject[] = [
     link: 'https://cronossociety.com/',
     twitter: 'https://twitter.com/CronosSociety',
   },
+  {
+    name: 'Minted',
+    category: ['NFT'],
+    description: 'Get rewarded for trading NFTs',
+    logo: 'minted.png',
+    link: 'https://minted.network/',
+    twitter: '', 
+  }
 ];
 
 export const projects = [...defillamaProjects, ...unListedProjects, ...NFTProjects];
