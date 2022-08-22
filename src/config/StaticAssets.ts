@@ -1,9 +1,11 @@
 // Every created wallet get initialized with a new CRO asset
 import { getRandomId } from '../crypto/RandomGen';
-import { AssetCreationType, UserAssetConfig, UserAssetType } from '../models/UserAsset';
+import { AssetCreationType, UserAsset, UserAssetConfig, UserAssetType } from '../models/UserAsset';
 import { WalletConfig, SupportedChainName } from './StaticConfig';
 import { checkIfTestnet } from '../utils/utils';
 import { ICON_ATOM_TENDERMINT, ICON_CRO_EVM, ICON_CRO_TENDERMINT, ICON_ETH_EVM } from '../components/AssetIcon';
+import { Session } from '../models/Session';
+import { TestNetCroeseid4Config, MainNetConfig } from './StaticConfig';
 
 // This will be used later for asset recreation/migration
 export const STATIC_ASSET_COUNT = 4;
@@ -55,17 +57,20 @@ export const MainNetEvmConfig: UserAssetConfig = {
 // Every created wallet get initialized with a new CRO asset
 export const CRONOS_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
   const { network } = walletConfig;
-  const assetSymbol = network.coin.croDenom.toString().toUpperCase();
+  const isTestnet = checkIfTestnet(network);
 
   const config: UserAssetConfig = {
-    explorerUrl: walletConfig.explorerUrl,
-    explorer: walletConfig.explorer,
-    chainId: network.chainId,
-    fee: { gasLimit: '300000', networkFee: '10000' },
-    indexingUrl: walletConfig.indexingUrl,
+    explorerUrl: isTestnet ? TestNetCroeseid4Config.explorerUrl : MainNetConfig.explorerUrl,
+    explorer: isTestnet ? TestNetCroeseid4Config.explorer : MainNetConfig.explorer,
+    chainId: isTestnet ? TestNetCroeseid4Config.network.chainId : MainNetConfig.network.chainId,
+    fee: { 
+      gasLimit: isTestnet ? TestNetCroeseid4Config.fee.gasLimit : MainNetConfig.fee.gasLimit,
+      networkFee: isTestnet ? TestNetCroeseid4Config.fee.networkFee : MainNetConfig.fee.networkFee,
+    },
+    indexingUrl: isTestnet ? TestNetCroeseid4Config.indexingUrl : MainNetConfig.indexingUrl,
     isLedgerSupportDisabled: true,
     isStakingDisabled: true,
-    nodeUrl: network.defaultNodeUrl,
+    nodeUrl: isTestnet ? TestNetCroeseid4Config.nodeUrl : MainNetConfig.nodeUrl,
     memoSupportDisabled: false,
   };
 
@@ -76,7 +81,7 @@ export const CRONOS_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
     icon_url: ICON_CRO_TENDERMINT,
     identifier: getRandomId(),
     name: SupportedChainName.CRYPTO_ORG,
-    symbol: assetSymbol,
+    symbol: isTestnet ? TestNetCroeseid4Config.network.coin.croDenom.toString().toUpperCase() : MainNetConfig.network.coin.croDenom.toString().toUpperCase(),
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
     unbondingBalance: '0',
@@ -234,4 +239,23 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
     assetCreationType: AssetCreationType.STATIC,
     config,
   };
+};
+
+export const getDefaultUserAssetConfig = (asset: UserAsset | undefined, session: Session) => {
+  if(!asset) return;
+  const { assetType, name } = asset;
+  const { config } = session.wallet; 
+
+  switch (`${assetType}-${name}`) {
+    case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`:
+      return ATOM_TENDERMINT_ASSET(config);
+    case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
+      return CRONOS_TENDERMINT_ASSET(config);
+    case `${UserAssetType.EVM}-${SupportedChainName.CRONOS}`:
+      return CRONOS_EVM_ASSET(config);
+    case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`:
+      return ETH_ASSET(config);
+    default:
+      return null;
+  }
 };

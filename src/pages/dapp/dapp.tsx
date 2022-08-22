@@ -9,7 +9,7 @@ import { Dapp } from './types';
 import BorderlessCard from './components/BorderlessCard/BorderlessCard';
 import logoVvs from './assets/vvs.svg';
 import logoTectonic from './assets/tectonic.svg';
-import logoFerroProtocol from './assets/Ferro_Protocol.png';
+import logoFerroProtocol from './assets/ferro.png';
 
 import AddressBar from './components/AddressBar/AddressBar';
 import SavedTab from './components/Tabs/SavedTab';
@@ -26,6 +26,14 @@ const { Header, Content } = Layout;
 const { TabPane } = Tabs;
 
 const DappList: Dapp[] = [
+  {
+    name: 'Minted',
+    logo: '/dapp_logos/minted.png',
+    alt: '',
+    description:
+      'Get rewarded for trading NFTs.',
+    url: 'https://minted.network/',
+  },
   {
     name: 'Ferro Protocol',
     logo: logoFerroProtocol,
