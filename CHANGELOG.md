@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
-## [v1.3.0] - 2022-08-05
+## [v1.3.0] - 2022-08-24
 ### Additions
 - Ethereum Chain Support
 - Cosmos Hub ATOM Support
