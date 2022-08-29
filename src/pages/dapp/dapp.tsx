@@ -28,7 +28,7 @@ const { TabPane } = Tabs;
 const DappList: Dapp[] = [
   {
     name: 'Minted',
-    logo: '/dapp_logos/minted.png',
+    logo: './dapp_logos/minted.png',
     alt: '',
     description:
       'Get rewarded for trading NFTs.',
