@@ -17,8 +17,7 @@ export const NCW_NFT_MIDDLEWARE_SERVER_ENDPOINT =
 export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';
 export const CLOUDFLARE_TRACE_URI = 'https://www.cloudflare.com/cdn-cgi/trace';
 
-// const APP_PROTOCOL_NAME = 'cryptowallet';
-export const APP_PROTOCOL_NAME = 'ledgerlive';
+export const APP_PROTOCOL_NAME = 'cryptowallet';
 
 // This constant value is used when actual values are not known yet
 // For instance :
