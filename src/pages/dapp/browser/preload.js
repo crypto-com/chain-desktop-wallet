@@ -488,6 +488,16 @@ class Web3Provider extends EventEmitter {
    */
   postMessage(handler, id, data) {
     if (this.ready || handler === 'requestAccounts') {
+      if (handler === 'switchEthereumChain') {
+        this.sendError(
+          id,
+          new ProviderRpcError(
+            4902,
+            `Chain config for chainId ${data.chainId} was not found.`,
+          ),
+        );
+      }
+
       const object = {
         id,
         name: handler,
