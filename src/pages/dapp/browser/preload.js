@@ -415,7 +415,7 @@ class Web3Provider extends EventEmitter {
   }
 
   net_version() {
-    return this.chainId.toString(10) || null;
+    return parseInt(this.chainId, 16) || null;
   }
 
   eth_chainId() {

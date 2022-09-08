@@ -522,7 +522,13 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
         case 'switchEthereumChain':
           {
             const foundConfig = chainConfigs.find(c => isHexEqual(c.chainId, event.object.chainId));
-            if (foundConfig && selectedChain.chainId !== event.object.chainId) {
+
+            if (!foundConfig) {
+              sendError(event.id, { code: 4902, message: 'Chain not found' });
+              return;
+            }
+
+            if (selectedChain.chainId !== event.object.chainId) {
               props.onRequestSwitchEthereumChain(
                 {
                   prev: selectedChain,
@@ -538,7 +544,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
                 },
               );
             } else {
-              sendError(event.id, { code: 4902, message: 'Chain not found' });
+              sendResponse(event.id, foundConfig.chainId);
             }
           }
           break;
