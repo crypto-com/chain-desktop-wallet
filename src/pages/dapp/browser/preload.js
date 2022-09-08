@@ -415,7 +415,7 @@ class Web3Provider extends EventEmitter {
   }
 
   net_version() {
-    return this.chainId.toString(10) || null;
+    return parseInt(this.chainId, 16) || null;
   }
 
   eth_chainId() {
@@ -543,12 +543,13 @@ class Web3Provider extends EventEmitter {
 
   /**
    * @private Internal native error -> js
+   * error format: { code: number, message: string }
    */
   sendError(id, error) {
-    console.log(`<== ${id} sendError ${error}`);
+    console.log(`<== ${id} sendError {code: ${error.code} message: ${error.message}}`);
     const callback = this.callbacks.get(id);
     if (callback) {
-      callback(error instanceof Error ? error : new ProviderRpcError(4001, error), null);
+      callback(error);
       this.callbacks.delete(id);
     }
   }

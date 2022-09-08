@@ -67,7 +67,7 @@ export const useAddChainModal = () => {
               },
               {
                 title: t('dapp.chainConfig.blockExplorer'),
-                value: props.config.blockExplorerUrls[0],
+                value: props.config.blockExplorerUrls ? props.config.blockExplorerUrls[0] : '',
               },
             ].map(({ title, value }) => {
               return (
