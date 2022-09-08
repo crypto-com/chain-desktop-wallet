@@ -9,7 +9,8 @@ export type CategoryType =
   | 'Stablecoin'
   | 'Staking'
   | 'Yield Aggregator'
-  | 'Yield';
+  | 'Yield'
+  | 'Domain';
 
 export const categories: CategoryType[] = [
   'DEX',
@@ -23,6 +24,7 @@ export const categories: CategoryType[] = [
   'Staking',
   'Yield Aggregator',
   'Yield',
+  'Domain'
 ];
 
 export interface CronosProject {
@@ -462,27 +464,11 @@ const unListedProjects: CronosProject[] = [
     twitter: '',
   },
   {
-    name: 'LootPad',
-    category: ['NFT'],
-    logo: 'lootpad.png',
-    description: '',
-    link: 'https://lootpad.io/',
-    twitter: '',
-  },
-  {
     name: 'METF Finance',
     category: ['NFT'],
     logo: 'metf-finance.png',
     description: '',
     link: 'https://metf.finance/#/dashboard',
-    twitter: '',
-  },
-  {
-    name: 'CronosBay',
-    category: ['NFT'],
-    link: 'https://www.cronosbay.com/',
-    logo: 'cronosbay.png',
-    description: '',
     twitter: '',
   },
   {
@@ -602,14 +588,6 @@ const NFTProjects: CronosProject[] = [
     logo: '5E1nW_0q_400x400.png',
     link: 'https://crocosnft.com/',
     twitter: 'https://twitter.com/CrocosNFT',
-  },
-  {
-    name: 'Agora',
-    category: ['NFT'],
-    description: 'Global NFT MarketPlace Powered On Arbitrum and Cronos.',
-    logo: 'XcdQvwmw_400x400.png',
-    link: 'https://agoracro.com/',
-    twitter: 'https://twitter.com/AgoramarketNFT',
   },
   {
     name: 'CRO Crow',
@@ -732,6 +710,22 @@ const NFTProjects: CronosProject[] = [
     logo: 'minted.png',
     link: 'https://minted.network/',
     twitter: '', 
+  },
+  {
+    name: 'Cronos ID',
+    category: ['Domain'],
+    logo: 'cronos_id.png',
+    description: 'Secure your domain name now!',
+    link: 'https://cronosid.xyz/',
+    twitter: '',
+  },
+  {
+    name: 'NFTLaunch.me',
+    category: ['NFT'],
+    logo: 'nftlaunch_me.png',
+    description: 'NFTLaunch.me aims to democratize the launching and collecting of NFTs, for participants of all walks of life - all over the world.',
+    link: 'https://nftlaunch.me/',
+    twitter: '',
   }
 ];
 
