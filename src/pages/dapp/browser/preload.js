@@ -543,18 +543,13 @@ class Web3Provider extends EventEmitter {
 
   /**
    * @private Internal native error -> js
+   * error format: { code: number, message: string }
    */
   sendError(id, error) {
-    console.log(`<== ${id} sendError ${error}`);
-    const errorCodeHandler = ['4902']
+    console.log(`<== ${id} sendError {code: ${error.code} message: ${error.message}}`);
     const callback = this.callbacks.get(id);
     if (callback) {
-      if(error instanceof Error) {
-        callback(error);
-      } else {
-        const code = errorCodeHandler.find(c => { return error.indexOf(c)})
-        callback(new ProviderRpcError(code ? parseInt(code) : 4001, error), null);
-      }
+      callback(error);
       this.callbacks.delete(id);
     }
   }
