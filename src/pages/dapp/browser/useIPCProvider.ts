@@ -529,7 +529,7 @@ export const useIPCProvider = (props: IUseIPCProviderProps) => {
                 },
               );
             } else {
-              sendError(event.id, 'Chain not found');
+              sendError(event.id, '(4902) Chain not found');
             }
           }
           break;

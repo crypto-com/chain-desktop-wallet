@@ -488,16 +488,6 @@ class Web3Provider extends EventEmitter {
    */
   postMessage(handler, id, data) {
     if (this.ready || handler === 'requestAccounts') {
-      if (handler === 'switchEthereumChain') {
-        this.sendError(
-          id,
-          new ProviderRpcError(
-            4902,
-            `Chain config for chainId ${data.chainId} was not found.`,
-          ),
-        );
-      }
-
       const object = {
         id,
         name: handler,
@@ -556,9 +546,15 @@ class Web3Provider extends EventEmitter {
    */
   sendError(id, error) {
     console.log(`<== ${id} sendError ${error}`);
+    const errorCodeHandler = ['4902']
     const callback = this.callbacks.get(id);
     if (callback) {
-      callback(error instanceof Error ? error : new ProviderRpcError(4001, error), null);
+      if(error instanceof Error) {
+        callback(error);
+      } else {
+        const code = errorCodeHandler.find(c => { return error.indexOf(c)})
+        callback(new ProviderRpcError(code ? parseInt(code) : 4001, error), null);
+      }
       this.callbacks.delete(id);
     }
   }
