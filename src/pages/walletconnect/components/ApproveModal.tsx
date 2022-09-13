@@ -20,7 +20,7 @@ export const ApproveModal = (props: { address: string }) => {
       visible={fetchingPeerMeta || (!connected && peerMeta?.name !== undefined)}
       okText={t('Approve')}
       okButtonProps={{ disabled: loading }}
-      cancelText={t('governance.tab5')}
+      cancelText={t('general.cancel')}
       closable={false}
       onCancel={() => {
         rejectSession();
@@ -67,7 +67,7 @@ export const ApproveModal = (props: { address: string }) => {
                   width: '64px',
                   height: '64px',
                 }}
-                src={'/icon.png'}
+                src={'./icon.png'}
               />
             </div>
             <div style={{ fontSize: '21px', fontWeight: 'bold', marginTop: '16px' }}>

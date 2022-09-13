@@ -1,8 +1,6 @@
 
 
-// FIXME: change me
-// const APP_PROTOCOL_NAME = 'cryptowallet';
-export const APP_PROTOCOL_NAME = 'ledgerlive';
+export const APP_PROTOCOL_NAME = 'cryptowallet';
 export const WALLET_CONNECT_PAGE_KEY = '/walletconnect';
 
 

@@ -27,8 +27,15 @@ const { TabPane } = Tabs;
 
 const DappList: Dapp[] = [
   {
+    name: 'Cronos ID',
+    logo: './dapp_logos/cronos_id.png',
+    alt: 'Cronos ID',
+    description: 'Secure your domain name now!',
+    url: 'https://cronosid.xyz/',
+  },
+  {
     name: 'Minted',
-    logo: '/dapp_logos/minted.png',
+    logo: './dapp_logos/minted.png',
     alt: '',
     description:
       'Get rewarded for trading NFTs.',
