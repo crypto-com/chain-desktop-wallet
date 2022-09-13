@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.3.1] - 2022-09-08
+### Bug Fixes
+- Incorrect WalletConnect URL scheme
+- Optimize certain EVM chain switching behaviors within DApps
 ## [v1.3.0] - 2022-08-24
 ### Additions
 - Ethereum Chain Support
