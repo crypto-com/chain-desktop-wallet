@@ -2,7 +2,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { setRecoil } from 'recoil-nexus';
-import { Button, Checkbox, Form, Input, InputNumber, notification, Select, Typography } from 'antd';
+import {
+  Button,
+  Checkbox,
+  Form,
+  Input,
+  InputNumber,
+  notification,
+  Select,
+  Typography,
+} from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { useTranslation } from 'react-i18next';
 import {
@@ -51,8 +60,11 @@ import IconEth from '../../svg/IconEth';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import LedgerAddressIndexBalanceTable from './components/LedgerAddressIndexBalanceTable';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
-import { DerivationPathStandard, LedgerSigner } from '../../service/signers/LedgerSigner';
-import IconCosmos from '../../svg/IconCosmos';
+import {
+  DerivationPathStandard,
+  LedgerSigner,
+} from '../../service/signers/LedgerSigner';
+// import IconCosmos from '../../svg/IconCosmos';
 
 let waitFlag = false;
 const layout = {
@@ -66,7 +78,7 @@ const tailLayout = {
 const { Text } = Typography;
 
 function delay(ms: number) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 interface FormCustomConfigProps {
@@ -89,7 +101,7 @@ interface FormCreateProps {
   networkConfig: any;
 }
 
-const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
+const FormCustomConfig: React.FC<FormCustomConfigProps> = (props) => {
   const [form] = Form.useForm();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [checkingNodeConnection, setCheckingNodeConnection] = useState(false);
@@ -125,10 +137,12 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
 
   const checkNodeConnectivity = async () => {
     // TO-DO Node Connectivity check
-    form.validateFields().then(async values => {
+    form.validateFields().then(async (values) => {
       setCheckingNodeConnection(true);
       const { nodeUrl } = values;
-      const isNodeLive = await walletService.checkNodeIsLive(`${nodeUrl}${NodePorts.Tendermint}`);
+      const isNodeLive = await walletService.checkNodeIsLive(
+        `${nodeUrl}${NodePorts.Tendermint}`,
+      );
       setCheckingNodeConnection(false);
 
       if (isNodeLive) {
@@ -163,7 +177,9 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         rules={[
           {
             required: true,
-            message: `${t('create.formCustomConfig.nodeUrl.label')} ${t('general.required')}`,
+            message: `${t('create.formCustomConfig.nodeUrl.label')} ${t(
+              'general.required',
+            )}`,
           },
           {
             type: 'url',
@@ -181,7 +197,9 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         rules={[
           {
             required: true,
-            message: `${t('create.formCustomConfig.indexingUrl.label')} ${t('general.required')}`,
+            message: `${t('create.formCustomConfig.indexingUrl.label')} ${t(
+              'general.required',
+            )}`,
           },
           {
             type: 'url',
@@ -200,9 +218,9 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
           rules={[
             {
               required: true,
-              message: `${t('create.formCustomConfig.derivationPath.label')} ${t(
-                'general.required',
-              )}`,
+              message: `${t(
+                'create.formCustomConfig.derivationPath.label',
+              )} ${t('general.required')}`,
             },
             {
               pattern: /^m\/\d+'?\/\d+'?\/\d+'?\/\d+'?\/\d+'?$/,
@@ -210,7 +228,10 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
             },
           ]}
         >
-          <Input maxLength={64} placeholder={t('create.formCustomConfig.derivationPath.label')} />
+          <Input
+            maxLength={64}
+            placeholder={t('create.formCustomConfig.derivationPath.label')}
+          />
         </Form.Item>
         <Form.Item
           name="validatorPrefix"
@@ -219,13 +240,15 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
           rules={[
             {
               required: true,
-              message: `${t('create.formCustomConfig.validatorPrefix.label')} ${t(
-                'general.required',
-              )}`,
+              message: `${t(
+                'create.formCustomConfig.validatorPrefix.label',
+              )} ${t('general.required')}`,
             },
           ]}
         >
-          <Input placeholder={t('create.formCustomConfig.validatorPrefix.label')} />
+          <Input
+            placeholder={t('create.formCustomConfig.validatorPrefix.label')}
+          />
         </Form.Item>
       </div>
 
@@ -243,7 +266,9 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
             },
           ]}
         >
-          <Input placeholder={t('create.formCustomConfig.addressPrefix.label')} />
+          <Input
+            placeholder={t('create.formCustomConfig.addressPrefix.label')}
+          />
         </Form.Item>
         <Form.Item
           name="chainId"
@@ -252,7 +277,9 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
           rules={[
             {
               required: true,
-              message: `${t('create.formCustomConfig.chainId.label')} ${t('general.required')}`,
+              message: `${t('create.formCustomConfig.chainId.label')} ${t(
+                'general.required',
+              )}`,
             },
           ]}
         >
@@ -267,7 +294,9 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
           rules={[
             {
               required: true,
-              message: `${t('create.formCustomConfig.baseDenom.label')} ${t('general.required')}`,
+              message: `${t('create.formCustomConfig.baseDenom.label')} ${t(
+                'general.required',
+              )}`,
             },
           ]}
         >
@@ -280,7 +309,9 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
           rules={[
             {
               required: true,
-              message: `${t('create.formCustomConfig.croDenom.label')} ${t('general.required')}`,
+              message: `${t('create.formCustomConfig.croDenom.label')} ${t(
+                'general.required',
+              )}`,
             },
           ]}
         >
@@ -294,7 +325,11 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         handleOk={handleOk}
         title={t('general.successModalPopup.title')}
         button={
-          <Button type="primary" onClick={checkNodeConnectivity} loading={checkingNodeConnection}>
+          <Button
+            type="primary"
+            onClick={checkNodeConnectivity}
+            loading={checkingNodeConnection}
+          >
             {t('general.connect')}
           </Button>
         }
@@ -318,34 +353,45 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = props => {
         footer={[]}
       >
         <>
-          <div className="description">{t('general.errorModalPopup.nodeConnect.description')}</div>
+          <div className="description">
+            {t('general.errorModalPopup.nodeConnect.description')}
+          </div>
         </>
       </ErrorModalPopup>
     </Form>
   );
 };
 
-const FormCreate: React.FC<FormCreateProps> = props => {
+const FormCreate: React.FC<FormCreateProps> = (props) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [isCroModalVisible, setIsCroModalVisible] = useState(false);
   const [isEthModalVisible, setIsEthModalVisible] = useState(false);
   const [isCosmosModalVisible, setIsCosmosModalVisible] = useState(false);
   const [isHWModeSelected, setIsHWModeSelected] = useState(false);
-  const [isLedgerModalButtonLoading, setIsLedgerModalButtonLoading] = useState(false);
+  const [isLedgerModalButtonLoading, setIsLedgerModalButtonLoading] = useState(
+    false,
+  );
   // eslint-disable-next-line
   const [isLedgerEthAppConnected, setIsLedgerEthAppConnected] = useState(false);
   const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
-  const [isLedgerCosmosAppConnected, setIsLedgerCosmosAppConnected] = useState(false);
+  const [isLedgerCosmosAppConnected, setIsLedgerCosmosAppConnected] = useState(
+    false,
+  );
   const [createLoading, setCreateLoading] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
   const [ledgerAssetType, setLedgerAssetType] = useState<UserAssetType>();
   const [ledgerChainName, setLedgerChainName] = useState<SupportedChainName>();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(walletTempBackupState);
+  const [walletTempBackupSeed, setWalletTempBackupSeed] = useRecoilState(
+    walletTempBackupState,
+  );
   const [hwcheck, setHwcheck] = useState(!props.isWalletSelectFieldDisable);
-  const { isLedgerConnected } = useLedgerStatus({ assetType: ledgerAssetType, chainName: ledgerChainName });
+  const { isLedgerConnected } = useLedgerStatus({
+    assetType: ledgerAssetType,
+    chainName: ledgerChainName,
+  });
   const [ledgerAddressList, setLedgerAddressList] = useState<any[]>([]);
   const [derivationPath, setDerivationPath] = useState({
     cronosTendermint: 'm/44\'/394\'/0\'/0/0',
@@ -423,7 +469,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
     }
   };
 
-  const onCheckboxChange = e => {
+  const onCheckboxChange = (e) => {
     setHwcheck(!hwcheck);
     props.setIsWalletSelectFieldDisable(!e.target.checked);
     if (e.target.checked)
@@ -458,7 +504,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       return;
     }
 
-    const selectedNetworkConfig = walletService.getSelectedNetwork(network, props);
+    const selectedNetworkConfig = walletService.getSelectedNetwork(
+      network,
+      props,
+    );
     if (!selectedNetworkConfig) {
       return;
     }
@@ -473,8 +522,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
 
     try {
       const createdWallet = await new WalletCreator(createOptions).create();
+      let walletAssets = createdWallet.assets;
 
       const targetWallet = createdWallet.wallet;
+
       if (targetWallet.walletType === LEDGER_WALLET_TYPE) {
         const device: ISignerProvider = createLedgerDevice();
 
@@ -487,8 +538,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           false,
         );
 
-        const croAsset = createdWallet.assets.filter(
-          asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO',
+        const croAsset = walletAssets.filter(
+          (asset) =>
+            asset.assetType === UserAssetType.TENDERMINT &&
+            asset.mainnetSymbol === 'CRO',
         )[0];
         croAsset.address = croAddress;
 
@@ -509,46 +562,54 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           derivationPathStandard,
           false,
         );
-        createdWallet.assets
-          .filter(asset => asset.assetType === UserAssetType.EVM)
-          .forEach(asset => {
+        walletAssets
+          .filter((asset) => asset.assetType === UserAssetType.EVM)
+          .forEach((asset) => {
             asset.address = ethAddress;
           });
 
         setIsLedgerEthAppConnected(true);
 
-        await delay(3_000);
-        setIsEthModalVisible(false);
-
-        waitFlag = true;
-        showCosmosModal();
-        for (let i = 0; i < 600; i++) {
-          // eslint-disable-next-line no-await-in-loop
-          await delay(100); // milli seconds
-          if (!waitFlag) {
-            break;
-          }
-        }
-
-        setIsLedgerCosmosAppConnected(true);
-
-        const cosmosHubAddress = await device.getAddress(
-          targetWallet.addressIndex,
-          'cosmos',
-          SupportedChainName.COSMOS_HUB,
-          targetWallet.derivationPathStandard,
-          false,
+        // Only CRO & ETH as Initial Assets for Ledger
+        walletAssets = walletAssets.filter(
+          (asset) =>
+            (asset.assetType === UserAssetType.TENDERMINT &&
+              asset.mainnetSymbol === 'CRO') ||
+            asset.assetType === UserAssetType.EVM,
         );
 
-        const atomAsset = createdWallet.assets.filter(
-          asset =>
-            asset.assetType === UserAssetType.TENDERMINT &&
-            asset.config?.tendermintNetwork?.chainName === SupportedChainName.COSMOS_HUB,
-        )[0];
-        atomAsset.address = cosmosHubAddress;
+        // await delay(3_000);
+        // setIsEthModalVisible(false);
+
+        // waitFlag = true;
+        // showCosmosModal();
+        // for (let i = 0; i < 600; i++) {
+        //   // eslint-disable-next-line no-await-in-loop
+        //   await delay(100); // milli seconds
+        //   if (!waitFlag) {
+        //     break;
+        //   }
+        // }
+
+        // setIsLedgerCosmosAppConnected(true);
+
+        // const cosmosHubAddress = await device.getAddress(
+        //   targetWallet.addressIndex,
+        //   'cosmos',
+        //   SupportedChainName.COSMOS_HUB,
+        //   targetWallet.derivationPathStandard,
+        //   false,
+        // );
+
+        // const atomAsset = createdWallet.assets.filter(
+        //   asset =>
+        //     asset.assetType === UserAssetType.TENDERMINT &&
+        //     asset.config?.tendermintNetwork?.chainName === SupportedChainName.COSMOS_HUB,
+        // )[0];
+        // atomAsset.address = cosmosHubAddress;
       }
 
-      await walletService.saveAssets(createdWallet.assets);
+      await walletService.saveAssets(walletAssets);
 
       setWalletTempBackupSeed(createdWallet.wallet);
       setWallet(createdWallet.wallet);
@@ -589,7 +650,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       const device = createLedgerDevice();
       await device.getEthAddress(0, DerivationPathStandard.BIP44, false);
       setIsLedgerEthAppConnected(true);
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 2000);
       });
       // setIsEthModalVisible(false);
@@ -629,7 +690,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       // }
       setIsLedgerEthAppConnected(false);
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 5000);
       });
       setIsEthModalVisible(false);
@@ -656,7 +717,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         false,
       );
       setIsLedgerCosmosAppConnected(true);
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 2000);
       });
       setIsCosmosModalVisible(false);
@@ -696,7 +757,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       // }
       setIsLedgerCosmosAppConnected(false);
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 2000);
       });
       setIsCosmosModalVisible(false);
@@ -712,7 +773,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
   };
 
   const checkIsLedgerCroAppConnected = async () => {
-    const { walletType, addressIndex, derivationPathStandard } = props.form.getFieldsValue();
+    const {
+      walletType,
+      addressIndex,
+      derivationPathStandard,
+    } = props.form.getFieldsValue();
     let hwok = false;
     setCreateLoading(true);
     try {
@@ -726,7 +791,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       );
       setIsLedgerCroAppConnected(true);
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 2000);
       });
       setIsCroModalVisible(false);
@@ -768,7 +833,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
 
       setIsLedgerCroAppConnected(false);
 
-      await new Promise(resolve => {
+      await new Promise((resolve) => {
         setTimeout(resolve, 2000);
       });
       setIsCroModalVisible(false);
@@ -781,7 +846,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         duration: 20,
       });
     }
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 2000);
     });
     if (hwok) {
@@ -798,7 +863,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       switch (`${ledgerAssetType}-${ledgerChainName}`) {
         case `${UserAssetType.EVM}-${SupportedChainName.CRONOS}`:
           {
-            const ethAddressList = await device.getEthAddressList(0, 10, standard);
+            const ethAddressList = await device.getEthAddressList(
+              0,
+              10,
+              standard,
+            );
             if (ethAddressList) {
               const returnList = ethAddressList.map((address, idx) => {
                 return {
@@ -819,7 +888,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           break;
         case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`:
           {
-            const ethAddressList = await device.getEthAddressList(0, 10, standard);
+            const ethAddressList = await device.getEthAddressList(
+              0,
+              10,
+              standard,
+            );
             if (ethAddressList) {
               const returnList = ethAddressList.map((address, idx) => {
                 return {
@@ -841,7 +914,9 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
           {
             const addressPrefix =
-              network === DefaultWalletConfigs.TestNetCroeseid4Config.name ? 'tcro' : 'cro';
+              network === DefaultWalletConfigs.TestNetCroeseid4Config.name
+                ? 'tcro'
+                : 'cro';
             const tendermintAddressList = await device.getAddressList(
               0,
               10,
@@ -924,7 +999,9 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         rules={[
           {
             required: true,
-            message: `${t('create.formCreate.name.label')} ${t('general.required')}`,
+            message: `${t('create.formCreate.name.label')} ${t(
+              'general.required',
+            )}`,
           },
         ]}
       >
@@ -946,7 +1023,9 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           width={1200}
           style={{ zIndex: 100 }}
         >
-          <div className="title">{t('create.LedgerAddressIndexBalanceTable.title')}</div>
+          <div className="title">
+            {t('create.LedgerAddressIndexBalanceTable.title')}
+          </div>
           <div className="description">
             {t('create.LedgerAddressIndexBalanceTable.description')}
           </div>
@@ -959,8 +1038,11 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                 )}`}
                 disabled={props.isWalletSelectFieldDisable}
                 defaultActiveFirstOption
-                onSelect={e => {
-                  setRecoil(ledgerIsConnectedState, LedgerConnectedApp.NOT_CONNECTED);
+                onSelect={(e) => {
+                  setRecoil(
+                    ledgerIsConnectedState,
+                    LedgerConnectedApp.NOT_CONNECTED,
+                  );
                   setLedgerAddressList([]);
                   switch (e) {
                     case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
@@ -993,16 +1075,28 @@ const FormCreate: React.FC<FormCreateProps> = props => {
                   }
                 }}
               >
-                <Select.Option key="crypto-org-chain" value={`${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`}>
+                <Select.Option
+                  key="crypto-org-chain"
+                  value={`${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`}
+                >
                   {SupportedChainName.CRYPTO_ORG}
                 </Select.Option>
-                <Select.Option key="cronos-chain" value={`${UserAssetType.EVM}-${SupportedChainName.CRONOS}`}>
+                <Select.Option
+                  key="cronos-chain"
+                  value={`${UserAssetType.EVM}-${SupportedChainName.CRONOS}`}
+                >
                   {SupportedChainName.CRONOS}
                 </Select.Option>
-                <Select.Option key="ethereum-chain" value={`${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`}>
+                <Select.Option
+                  key="ethereum-chain"
+                  value={`${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`}
+                >
                   {SupportedChainName.ETHEREUM}
                 </Select.Option>
-                <Select.Option key="cosmos-hub-chain" value={`${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`}>
+                <Select.Option
+                  key="cosmos-hub-chain"
+                  value={`${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`}
+                >
                   {SupportedChainName.COSMOS_HUB}
                 </Select.Option>
               </Select>
@@ -1026,9 +1120,15 @@ const FormCreate: React.FC<FormCreateProps> = props => {
       </>
       <div hidden={props.isWalletSelectFieldDisable}>
         {/* wallet type and ledger specific code starts here */}
-        <Form.Item name="walletType" label={t('create.formCreate.walletType.label')} hidden>
+        <Form.Item
+          name="walletType"
+          label={t('create.formCreate.walletType.label')}
+          hidden
+        >
           <Select
-            placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
+            placeholder={`${t('general.select')} ${t(
+              'create.formCreate.walletType.label',
+            )}`}
             disabled={props.isWalletSelectFieldDisable}
           >
             <Select.Option key="normal" value="normal">
@@ -1044,7 +1144,9 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           label={t('create.formCreate.derivationPathStandard.label')}
         >
           <Select
-            placeholder={`${t('general.select')} ${t('create.formCreate.walletType.label')}`}
+            placeholder={`${t('general.select')} ${t(
+              'create.formCreate.walletType.label',
+            )}`}
             disabled={props.isWalletSelectFieldDisable}
             onChange={() => {
               setLedgerAddressList([]);
@@ -1078,7 +1180,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             <Select.Option key="bip-44" value={DerivationPathStandard.BIP44}>
               BIP-44
             </Select.Option>
-            <Select.Option key="ledger-live" value={DerivationPathStandard.LEDGER_LIVE}>
+            <Select.Option
+              key="ledger-live"
+              value={DerivationPathStandard.LEDGER_LIVE}
+            >
               Ledger Live
             </Select.Option>
           </Select>
@@ -1096,7 +1201,10 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         >
           {t('create.formCreate.showLedger.label')}
         </Button>
-        <Form.Item name="derivationPath" label={t('create.formCreate.derivationPath.label')}>
+        <Form.Item
+          name="derivationPath"
+          label={t('create.formCreate.derivationPath.label')}
+        >
           <div
             style={{
               display: 'flex',
@@ -1126,7 +1234,9 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           rules={[
             {
               required: true,
-              message: `${t('create.formCreate.index.label')} ${t('general.required')}`,
+              message: `${t('create.formCreate.index.label')} ${t(
+                'general.required',
+              )}`,
             },
             {
               pattern: /^\d+$/,
@@ -1166,7 +1276,9 @@ const FormCreate: React.FC<FormCreateProps> = props => {
           />
         </Form.Item>
         <Form.Item>
-          <NoticeDisclaimer>{t('create.formCreate.addressIndex.disclaimer')}</NoticeDisclaimer>
+          <NoticeDisclaimer>
+            {t('create.formCreate.addressIndex.disclaimer')}
+          </NoticeDisclaimer>
         </Form.Item>
       </div>
 
@@ -1176,12 +1288,18 @@ const FormCreate: React.FC<FormCreateProps> = props => {
         rules={[{ required: true }]}
       >
         <Select
-          placeholder={`${t('general.select')} ${t('create.formCreate.network.label')}`}
+          placeholder={`${t('general.select')} ${t(
+            'create.formCreate.network.label',
+          )}`}
           onChange={onNetworkChange}
           disabled={props.isNetworkSelectFieldDisable}
         >
-          {walletService.supportedConfigs().map(config => (
-            <Select.Option key={config.name} value={config.name} disabled={!config.enabled}>
+          {walletService.supportedConfigs().map((config) => (
+            <Select.Option
+              key={config.name}
+              value={config.name}
+              disabled={!config.enabled}
+            >
               {config.name}
             </Select.Option>
           ))}
@@ -1242,7 +1360,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
             )}
           </>
         </ErrorModalPopup>
-        <LedgerModalPopup
+        {/* <LedgerModalPopup
           isModalVisible={isCosmosModalVisible}
           handleCancel={handleCosmosCancel}
           handleOk={handleCosmosOk}
@@ -1288,7 +1406,7 @@ const FormCreate: React.FC<FormCreateProps> = props => {
               </>
             )}
           </div>
-        </LedgerModalPopup>
+        </LedgerModalPopup> */}
         <LedgerModalPopup
           isModalVisible={isCroModalVisible}
           handleCancel={handleCroCancel}
@@ -1319,7 +1437,9 @@ const FormCreate: React.FC<FormCreateProps> = props => {
               </Button>
             ),
           ]}
-          image={isLedgerCroAppConnected ? <SuccessCheckmark /> : <IconLedger />}
+          image={
+            isLedgerCroAppConnected ? <SuccessCheckmark /> : <IconLedger />
+          }
         >
           <div className="description">
             {isLedgerCroAppConnected ? (
@@ -1366,7 +1486,9 @@ const FormCreate: React.FC<FormCreateProps> = props => {
               </Button>
             ),
           ]}
-          image={isLedgerEthAppConnected ? <SuccessCheckmark /> : <IconLedger />}
+          image={
+            isLedgerEthAppConnected ? <SuccessCheckmark /> : <IconLedger />
+          }
         >
           <div className="description">
             {isLedgerEthAppConnected ? (
@@ -1392,10 +1514,17 @@ const CreatePage = () => {
   const [isCreateDisable, setIsCreateDisable] = useState(false);
   const [isCustomConfig, setIsCustomConfig] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
-  const [isNetworkSelectFieldDisable, setIsNetworkSelectFieldDisable] = useState(true);
-  const [isWalletSelectFieldDisable, setIsWalletSelectFieldDisable] = useState(true);
+  const [
+    isNetworkSelectFieldDisable,
+    setIsNetworkSelectFieldDisable,
+  ] = useState(true);
+  const [isWalletSelectFieldDisable, setIsWalletSelectFieldDisable] = useState(
+    true,
+  );
   const [networkConfig, setNetworkConfig] = useState();
-  const [walletIdentifier, setWalletIdentifier] = useRecoilState(walletIdentifierState);
+  const [walletIdentifier, setWalletIdentifier] = useRecoilState(
+    walletIdentifierState,
+  );
   const didMountRef = useRef(false);
   const history = useHistory();
   const [inputPasswordVisible, setInputPasswordVisible] = useState(false);
@@ -1453,10 +1582,14 @@ const CreatePage = () => {
         <BackButton />
         <div>
           <div className="title">
-            {!isCustomConfig || isConnected ? t('create.title1') : t('create.title2')}
+            {!isCustomConfig || isConnected
+              ? t('create.title1')
+              : t('create.title2')}
           </div>
           <div className="slogan">
-            {!isCustomConfig || isConnected ? t('create.slogan1') : t('create.slogan2')}
+            {!isCustomConfig || isConnected
+              ? t('create.slogan1')
+              : t('create.slogan2')}
           </div>
 
           {!isCustomConfig || isConnected ? (
@@ -1482,7 +1615,9 @@ const CreatePage = () => {
           )}
 
           <PasswordFormModal
-            description={t('general.passwordFormModal.createWallet.description')}
+            description={t(
+              'general.passwordFormModal.createWallet.description',
+            )}
             okButtonText={t('general.passwordFormModal.createWallet.okButton')}
             isButtonLoading={goHomeButtonLoading}
             onCancel={() => {
@@ -1490,7 +1625,9 @@ const CreatePage = () => {
             }}
             onSuccess={onWalletBackupFinish}
             onValidatePassword={async (password: string) => {
-              const isValid = await secretStoreService.checkIfPasswordIsValid(password);
+              const isValid = await secretStoreService.checkIfPasswordIsValid(
+                password,
+              );
               return {
                 valid: isValid,
                 errMsg: !isValid ? t('general.passwordFormModal.error') : '',
@@ -1499,7 +1636,9 @@ const CreatePage = () => {
             successText={t('general.passwordFormModal.createWallet.success')}
             title={t('general.passwordFormModal.title')}
             visible={inputPasswordVisible}
-            successButtonText={t('general.passwordFormModal.createWallet.successButton')}
+            successButtonText={t(
+              'general.passwordFormModal.createWallet.successButton',
+            )}
             confirmPassword={false}
           />
         </div>

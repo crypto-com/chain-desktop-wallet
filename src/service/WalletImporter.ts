@@ -22,7 +22,7 @@ export class WalletImporter extends WalletOps {
       options.phrase,
     );
 
-    const defaultAsset = (await initialAssets).filter(
+    const defaultAsset = initialAssets.filter(
       asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO',
     )[0];
 
@@ -39,7 +39,7 @@ export class WalletImporter extends WalletOps {
     };
     return {
       wallet: importedWallet,
-      assets: await initialAssets,
+      assets: initialAssets,
     };
   }
 }

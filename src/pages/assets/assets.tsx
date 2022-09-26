@@ -7,7 +7,18 @@ import { useTranslation } from 'react-i18next';
 import './assets.less';
 import 'antd/dist/antd.css';
 import { BaseType } from 'antd/lib/typography/Base';
-import { Layout, Table, Tabs, Tag, Typography, Dropdown, Menu, Tooltip, Alert, Spin } from 'antd';
+import {
+  Layout,
+  Table,
+  Tabs,
+  Tag,
+  Typography,
+  Dropdown,
+  Menu,
+  Tooltip,
+  Alert,
+  Spin,
+} from 'antd';
 import {
   ArrowLeftOutlined,
   ExclamationCircleOutlined,
@@ -21,6 +32,8 @@ import {
   navbarMenuSelectedKeyState,
   fetchingDBState,
   fetchingComponentState,
+  LedgerConnectedApp,
+  ledgerIsConnectedState,
 } from '../../recoil/atom';
 import { Session } from '../../models/Session';
 import {
@@ -30,7 +43,10 @@ import {
   UserAssetType,
 } from '../../models/UserAsset';
 import { renderExplorerUrl } from '../../models/Explorer';
-import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
+import {
+  SupportedChainName,
+  SUPPORTED_CURRENCY,
+} from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 // import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
@@ -41,11 +57,31 @@ import TagMsgType from './components/TagMsgType';
 import FormSend from './components/FormSend';
 import { walletService } from '../../service/WalletService';
 import { checkIfTestnet, getChainName, middleEllipsis } from '../../utils/utils';
-import { TransactionDirection, TransactionStatus } from '../../models/Transaction';
+import {
+  TransactionDirection,
+  TransactionStatus,
+} from '../../models/Transaction';
 import { AssetIcon } from '../../components/AssetIcon';
 import AssetTypeTooltip from './components/AssetTypeTooltip';
+import { useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
 
 import { ChartArea } from './components/ChartArea';
+import {
+  ATOM_TENDERMINT_ASSET,
+  ETH_ASSET,
+} from '../../config/StaticAssets';
+import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
+import { secretStoreService } from '../../service/storage/SecretStoreService';
+import {
+  createLedgerDevice,
+  LEDGER_WALLET_TYPE,
+  NORMAL_WALLET_TYPE,
+} from '../../service/LedgerService';
+import {
+  ledgerNotification,
+  ledgerNotificationWithoutCheck,
+} from '../../components/LedgerNotification/LedgerNotification';
+import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
 
 const { Sider, Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -74,8 +110,12 @@ const convertTransactions = (
   sessionData: Session,
   asset: UserAsset,
 ) => {
-  const address = asset.address?.toLowerCase() || sessionData.wallet.address.toLowerCase();
-  function getDirection(from: string = '', to: string = ''): TransactionDirection {
+  const address =
+    asset.address?.toLowerCase() || sessionData.wallet.address.toLowerCase();
+  function getDirection(
+    from: string = '',
+    to: string = '',
+  ): TransactionDirection {
     if (address === from.toLowerCase() && address === to.toLowerCase()) {
       return TransactionDirection.SELF;
     }
@@ -89,7 +129,7 @@ const convertTransactions = (
     return TransactionDirection.SELF;
   }
 
-  return allTransactions.map(transaction => {
+  return allTransactions.map((transaction) => {
     const { txData } = transaction;
 
     const data: TransactionTabularData = {
@@ -103,8 +143,10 @@ const convertTransactions = (
       time: `${moment(new Date(txData.date)).format('YYYY-MM-DD, HH:mm:ss Z')}`,
       amount: `${getUIDynamicAmount(txData.amount, asset)} ${txData.assetSymbol}`,
       stakedAmount: `${getUIDynamicAmount(txData.stakedAmount, asset)} ${txData.assetSymbol}`,
-      autoClaimedRewards: `${getUIDynamicAmount(txData.autoClaimedRewards, asset)} ${txData.assetSymbol
-      }`,
+      autoClaimedRewards: `${getUIDynamicAmount(
+        txData.autoClaimedRewards,
+        asset,
+      )} ${txData.assetSymbol}`,
       msgTypeName: transaction.messageTypeName,
       direction: getDirection(txData.senderAddress, txData.receiverAddress),
       status: txData.status,
@@ -115,18 +157,39 @@ const convertTransactions = (
 
 const AssetsPage = () => {
   const [session, setSession] = useRecoilState<Session>(sessionState);
-  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
+  const [walletAllAssets, setWalletAllAssets] = useRecoilState(
+    walletAllAssetsState,
+  );
+  const [displayAllAssets, setDisplayAllAssets] = useState<UserAsset[]>(
+    walletAllAssets,
+  );
+  const [ledgerConnectedApp, setLedgerConnectedApp] = useRecoilState(
+    ledgerIsConnectedState,
+  );
+  const [isAddingMissingAsset, setIsAddingMissingAsset] = useState<boolean>(
+    false,
+  );
+
+  const cronosTendermintAsset = useCronosTendermintAsset();
+
   const allMarketData = useRecoilValue(allMarketState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setFetchingDB = useSetRecoilState(fetchingDBState);
-  const [fetchingComponent, setFetchingComponent] = useRecoilState(fetchingComponentState);
+  const [fetchingComponent, setFetchingComponent] = useRecoilState(
+    fetchingComponentState,
+  );
 
   // const [isLedger, setIsLedger] = useState(false);
-  const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(session.activeAsset);
+  const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(
+    session.activeAsset,
+  );
   const [currentAssetMarketData, setCurrentAssetMarketData] = useState<AssetMarketPrice>();
   const [isAssetVisible, setIsAssetVisible] = useState(false);
   const [activeAssetTab, setActiveAssetTab] = useState('transaction');
   const [allTransactions, setAllTransactions] = useState<any>();
+  const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(
+    false,
+  );
 
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
@@ -137,21 +200,138 @@ const AssetsPage = () => {
     identifier: '',
   };
 
-  const syncTransactions = async asset => {
+  const syncTransactions = async (asset) => {
     setFetchingComponent(true);
-    const transactions = await walletService.syncTransactionRecordsByAsset(session, asset);
-    setAllTransactions(convertTransactions(transactions, walletAllAssets, session, asset));
+    const transactions = await walletService.syncTransactionRecordsByAsset(
+      session,
+      asset,
+    );
+    setAllTransactions(
+      convertTransactions(transactions, walletAllAssets, session, asset),
+    );
     setFetchingComponent(false);
   };
 
-  const syncAssetBalance = async asset => {
+  const syncAssetBalance = async (asset) => {
     const allAssets = await walletService.retrieveCurrentWalletAssets(session);
     setWalletAllAssets(allAssets);
-    allAssets.forEach(item => {
+    allAssets.forEach((item) => {
       if (asset.identifier === item.identifier) {
         setCurrentAsset(item);
       }
     });
+  };
+
+  const onWalletDecryptFinishCreateFreshAssets = async (password: string) => {
+    setFetchingDB(true);
+    setInputPasswordVisible(false);
+    const phraseDecrypted = await secretStoreService.decryptPhrase(
+      password,
+      session.wallet.identifier,
+    );
+
+    await walletService.handleCurrentWalletAssetsMigration(
+      phraseDecrypted,
+      session,
+    );
+
+    setFetchingDB(false);
+  };
+
+  const onAddMissingAsset = async (asset) => {
+    if (session.wallet.walletType === NORMAL_WALLET_TYPE) {
+      setInputPasswordVisible(true);
+    }
+    if (session.wallet.walletType === LEDGER_WALLET_TYPE) {
+      if (ledgerConnectedApp === LedgerConnectedApp.CRYPTO_ORG) {
+        switch (`${asset?.assetType}-${asset?.name}`) {
+          case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`: {
+            ledgerNotificationWithoutCheck(
+              UserAssetType.TENDERMINT,
+              SupportedChainName.COSMOS_HUB,
+            );
+            break;
+          }
+          case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`: {
+            ledgerNotificationWithoutCheck(
+              UserAssetType.EVM,
+              SupportedChainName.ETHEREUM,
+            );
+            break;
+          }
+          default:
+        }
+      } else {
+        ledgerNotification(session.wallet, cronosTendermintAsset!);
+        setIsAddingMissingAsset(true);
+      }
+    }
+  };
+
+  const getLedgerAddress = async (
+    assetType: UserAssetType,
+    chainName: SupportedChainName,
+  ) => {
+    const device = createLedgerDevice();
+    let ledgerAddress = '';
+    let addressPrefix = 'cro';
+    switch (chainName) {
+      case SupportedChainName.COSMOS_HUB:
+        addressPrefix = 'cosmos';
+        break;
+      case SupportedChainName.CRYPTO_ORG:
+      default:
+        addressPrefix = 'cro';
+    }
+    if (
+      assetType === UserAssetType.TENDERMINT ||
+      assetType === UserAssetType.IBC
+    ) {
+      ledgerAddress = await device.getAddress(
+        session.wallet.addressIndex,
+        addressPrefix,
+        chainName,
+        session.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
+        false,
+      );
+      if (chainName === SupportedChainName.COSMOS_HUB) {
+        setLedgerConnectedApp(LedgerConnectedApp.COSMOS);
+      } else {
+        setLedgerConnectedApp(LedgerConnectedApp.CRYPTO_ORG);
+      }
+      // notification.close(LedgerNotificationKey);
+      // notification.close(LedgerErrorNotificationKey);
+      // notification.success({
+      //   message: i18n.t('home.ledgerModalPopup.tendermintAsset.title1'),
+      //   description: i18n.t('home.ledgerModalPopup.tendermintAsset.description1'),
+      //   placement: 'topRight',
+      //   duration: 2,
+      //   key: LedgerSuccessNotificationKey,
+      // });
+    }
+
+    if (
+      assetType === UserAssetType.EVM ||
+      assetType === UserAssetType.CRC_20_TOKEN ||
+      assetType === UserAssetType.ERC_20_TOKEN
+    ) {
+      ledgerAddress = await device.getEthAddress(
+        session.wallet.addressIndex,
+        session.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
+        false,
+      );
+      setLedgerConnectedApp(LedgerConnectedApp.ETHEREUM);
+      // notification.close(LedgerNotificationKey);
+      // notification.close(LedgerErrorNotificationKey);
+      // notification.success({
+      //   message: i18n.t('home.ledgerModalPopup.tendermintAsset.title1'),
+      //   description: i18n.t('home.ledgerModalPopup.tendermintAsset.description1'),
+      //   placement: 'topRight',
+      //   duration: 2,
+      //   key: LedgerSuccessNotificationKey,
+      // });
+    }
+    return ledgerAddress;
   };
 
   useEffect(() => {
@@ -175,6 +355,98 @@ const AssetsPage = () => {
       analyticsService.logPage('Assets');
     }
   });
+
+  useEffect(() => {
+    const checkAssets = async () => {
+      const missingStaticAssets: UserAsset[] = [];
+      if (
+        !walletAllAssets.find(
+          (asset) =>
+            asset.assetType === UserAssetType.TENDERMINT &&
+            asset.mainnetSymbol === 'ATOM',
+        )
+      ) {
+        missingStaticAssets.push({
+          ...ATOM_TENDERMINT_ASSET(session.wallet.config),
+          walletId: '',
+        });
+      }
+      if (
+        !walletAllAssets.find(
+          (asset) =>
+            asset.assetType === UserAssetType.EVM &&
+            asset.mainnetSymbol === 'ETH',
+        )
+      ) {
+        missingStaticAssets.push({
+          ...ETH_ASSET(session.wallet.config),
+          walletId: '',
+        });
+      }
+      // if (missingStaticAssets) {
+      setDisplayAllAssets([...missingStaticAssets, ...walletAllAssets]);
+      // }
+    };
+
+    checkAssets();
+  }, walletAllAssets);
+
+  useEffect(() => {
+    const addMissingLedgerAsset = async () => {
+      if (!isAddingMissingAsset) return;
+      if (ledgerConnectedApp === LedgerConnectedApp.CRYPTO_ORG) {
+        switch (`${currentAsset?.assetType}-${currentAsset?.name}`) {
+          case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`: {
+            ledgerNotificationWithoutCheck(
+              UserAssetType.TENDERMINT,
+              SupportedChainName.COSMOS_HUB,
+            );
+            break;
+          }
+          case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`: {
+            ledgerNotificationWithoutCheck(
+              UserAssetType.EVM,
+              SupportedChainName.ETHEREUM,
+            );
+            break;
+          }
+          default:
+        }
+      }
+
+      if (ledgerConnectedApp === LedgerConnectedApp.COSMOS) {
+        const ledgerAddress = await getLedgerAddress(
+          UserAssetType.TENDERMINT,
+          SupportedChainName.COSMOS_HUB,
+        );
+        const atomAsset: UserAsset = {
+          ...ATOM_TENDERMINT_ASSET(session.wallet.config),
+          walletId: session.wallet.identifier,
+          address: ledgerAddress,
+        };
+        await walletService.saveAssets([atomAsset]);
+        await syncAssetBalance(atomAsset);
+        setIsAddingMissingAsset(false);
+      }
+
+      if (ledgerConnectedApp === LedgerConnectedApp.ETHEREUM) {
+        const ledgerAddress = await getLedgerAddress(
+          UserAssetType.EVM,
+          SupportedChainName.ETHEREUM,
+        );
+        const ethAsset: UserAsset = {
+          ...ETH_ASSET(session.wallet.config),
+          walletId: session.wallet.identifier,
+          address: ledgerAddress,
+        };
+        await walletService.saveAssets([ethAsset]);
+        await syncAssetBalance(ethAsset);
+        setIsAddingMissingAsset(false);
+      }
+    };
+
+    addMissingLedgerAsset();
+  }, [ledgerConnectedApp]);
 
   const moreMenu = (
     <Menu className="moreDropdown">
@@ -206,7 +478,9 @@ const AssetsPage = () => {
             {symbol}
             {record.isWhitelisted === false && (
               <Tooltip title={t('assets.whitelist.warning')}>
-                <ExclamationCircleOutlined style={{ color: '#ff4d4f', marginLeft: '6px' }} />
+                <ExclamationCircleOutlined
+                  style={{ color: '#ff4d4f', marginLeft: '6px' }}
+                />
               </Tooltip>
             )}
           </div>
@@ -218,7 +492,7 @@ const AssetsPage = () => {
       // dataIndex: 'name',
       key: 'chainName',
       sorter: (a, b) => a.name.localeCompare(b.name),
-      render: record => {
+      render: (record) => {
         const { name } = record;
 
         return (
@@ -235,7 +509,7 @@ const AssetsPage = () => {
       title: t('assets.assetList.table.price'),
       // dataIndex: 'price',
       key: 'price',
-      render: record => {
+      render: (record) => {
         const assetMarketData = allMarketData.get(
           `${record.assetType}-${record.mainnetSymbol}-${session.currency}`,
         );
@@ -244,9 +518,9 @@ const AssetsPage = () => {
             {assetMarketData &&
               assetMarketData.price &&
               record.mainnetSymbol === assetMarketData.assetSymbol
-              ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
-                assetMarketData.price,
-              ).format('0,0.00')} ${assetMarketData.currency}`
+              ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol
+              }${numeral(assetMarketData.price).format('0,0.00')} ${assetMarketData.currency
+              }`
               : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
           </>
         );
@@ -268,7 +542,7 @@ const AssetsPage = () => {
       title: t('assets.assetList.table.value'),
       // dataIndex: 'value',
       key: 'value',
-      render: record => {
+      render: (record) => {
         const assetMarketData = allMarketData.get(
           `${record.assetType}-${record.mainnetSymbol}-${session.currency}`,
         );
@@ -277,7 +551,8 @@ const AssetsPage = () => {
             {assetMarketData &&
               assetMarketData.price &&
               record.mainnetSymbol === assetMarketData.assetSymbol
-              ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol}${numeral(
+              ? `${SUPPORTED_CURRENCY.get(assetMarketData.currency)?.symbol
+              }${numeral(
                 getAssetBalancePrice(record, assetMarketData),
               ).format('0,0.00')} ${assetMarketData?.currency}`
               : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
@@ -287,32 +562,51 @@ const AssetsPage = () => {
     },
     {
       title: t('general.action'),
-      dataIndex: 'action',
+      // dataIndex: 'action',
       key: 'action',
-      render: () => (
-        <>
-          <a
-            onClick={() => {
-              setTimeout(() => {
-                setActiveAssetTab('send');
-              }, 50);
-            }}
-          >
-            {t('assets.assetList.table.actionSend')}
-          </a>
-
-          <a
-            style={{ marginLeft: '20px' }}
-            onClick={() => {
-              setTimeout(() => {
-                setActiveAssetTab('receive');
-              }, 50);
-            }}
-          >
-            {t('assets.assetList.table.actionReceive')}
-          </a>
-        </>
-      ),
+      render: (record) => {
+        if (record?.walletId) {
+          return (
+            <>
+              <a
+                onClick={() => {
+                  setTimeout(() => {
+                    setActiveAssetTab('send');
+                  }, 50);
+                }}
+              >
+                {t('assets.assetList.table.actionSend')}
+              </a>
+              <a
+                style={{ marginLeft: '20px' }}
+                onClick={() => {
+                  setTimeout(() => {
+                    setActiveAssetTab('receive');
+                  }, 50);
+                }}
+              >
+                {t('assets.assetList.table.actionReceive')}
+              </a>
+            </>
+          );
+        } else {
+          return (
+            <>
+              <a
+                style={{ marginLeft: '20px' }}
+                onClick={() => {
+                  setTimeout(() => {
+                    // setActiveAssetTab('receive');
+                    onAddMissingAsset(record);
+                  }, 50);
+                }}
+              >
+                Add
+              </a>
+            </>
+          );
+        }
+      },
     },
   ];
 
@@ -321,7 +615,7 @@ const AssetsPage = () => {
       title: t('home.transactions.table1.transactionHash'),
       dataIndex: 'transactionHash',
       key: 'transactionHash',
-      render: text => (
+      render: (text) => (
         <a
           data-original={text}
           target="_blank"
@@ -342,7 +636,7 @@ const AssetsPage = () => {
           title: t('home.transactions.table1.msgTypeName'),
           dataIndex: 'msgTypeName',
           key: 'msgTypeName',
-          render: text => {
+          render: (text) => {
             return <TagMsgType msgTypeName={text} />;
           },
         },
@@ -371,7 +665,8 @@ const AssetsPage = () => {
             break;
         }
         const text =
-          record.msgTypeName === 'MsgDelegate' || record.msgTypeName === 'MsgUndelegate'
+          record.msgTypeName === 'MsgDelegate' ||
+            record.msgTypeName === 'MsgUndelegate'
             ? record.stakedAmount
             : record.amount;
         return (
@@ -402,7 +697,10 @@ const AssetsPage = () => {
         }
 
         return (
-          <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
+          <Tag
+            style={{ border: 'none', padding: '5px 14px' }}
+            color={statusColor}
+          >
             {record.status.toString()}
           </Tag>
         );
@@ -427,12 +725,18 @@ const AssetsPage = () => {
                         onClick={() => setIsAssetVisible(false)}
                         style={{ fontSize: '16px' }}
                       >
-                        <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
+                        <ArrowLeftOutlined
+                          style={{ fontSize: '16px', color: '#1199fa' }}
+                        />{' '}
                         {t('assets.backToList')}
                       </div>
                     </a>
 
-                    <Dropdown overlay={moreMenu} placement="bottomRight" trigger={['click']}>
+                    <Dropdown
+                      overlay={moreMenu}
+                      placement="bottomRight"
+                      trigger={['click']}
+                    >
                       <MoreOutlined />
                     </Dropdown>
                   </div>
@@ -443,42 +747,70 @@ const AssetsPage = () => {
                       </Sider>
                       <Content>
                         <div className="balance">
-                          {getUIDynamicAmount(currentAsset!.balance, currentAsset!)}{' '}
+                          {getUIDynamicAmount(
+                            currentAsset!.balance,
+                            currentAsset!,
+                          )}{' '}
                           {currentAsset?.symbol}
                           <Tag
-                            style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
+                            style={{
+                              border: 'none',
+                              padding: '5px 14px',
+                              marginLeft: '10px',
+                            }}
                             color="processing"
                           >
-                            {getChainName(currentAsset?.name, session.wallet.config)}
+                            {getChainName(
+                              currentAsset?.name,
+                              session.wallet.config,
+                            )}
                           </Tag>
                         </div>
                         <div className="value">
                           {currentAssetMarketData &&
                             currentAssetMarketData.price &&
-                            currentAsset?.mainnetSymbol === currentAssetMarketData.assetSymbol
-                            ? `${SUPPORTED_CURRENCY.get(currentAssetMarketData.currency)?.symbol
+                            currentAsset?.mainnetSymbol ===
+                            currentAssetMarketData.assetSymbol
+                            ? `${SUPPORTED_CURRENCY.get(
+                              currentAssetMarketData.currency,
+                            )?.symbol
                             }${numeral(
-                              getAssetBalancePrice(currentAsset, currentAssetMarketData),
-                            ).format('0,0.00')} ${currentAssetMarketData?.currency}`
-                            : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol}--`}
+                              getAssetBalancePrice(
+                                currentAsset,
+                                currentAssetMarketData,
+                              ),
+                            ).format('0,0.00')} ${currentAssetMarketData?.currency
+                            }`
+                            : `${SUPPORTED_CURRENCY.get(session.currency)?.symbol
+                            }--`}
                         </div>
                       </Content>
                     </Layout>
-                    <AssetTypeTooltip currentAsset={currentAsset} currentSession={session} />
+                    <AssetTypeTooltip
+                      currentAsset={currentAsset}
+                      currentSession={session}
+                    />
 
                     {currentAsset?.isWhitelisted === false && (
                       <Alert
                         message={t('assets.whitelist.warning')}
                         type="error"
                         showIcon
-                        icon={<ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />}
+                        icon={
+                          <ExclamationCircleOutlined
+                            style={{ color: '#ff4d4f' }}
+                          />
+                        }
                       />
                     )}
                   </div>
-                  <ChartArea asset={currentAsset!} assetMarketData={currentAssetMarketData} />
+                  <ChartArea
+                    asset={currentAsset!}
+                    assetMarketData={currentAssetMarketData}
+                  />
                   <Tabs
                     activeKey={activeAssetTab}
-                    onTabClick={key => {
+                    onTabClick={(key) => {
                       setActiveAssetTab(key);
                       if (key === 'transaction') {
                         syncTransactions(currentAsset);
@@ -521,23 +853,35 @@ const AssetsPage = () => {
                       />
                     </TabPane>
                     <TabPane tab={t('assets.tab3')} key="receive">
-                      <ReceiveDetail currentAsset={currentAsset} session={session} />
+                      <ReceiveDetail
+                        currentAsset={currentAsset}
+                        session={session}
+                      />
                     </TabPane>
                     <TabPane tab={t('assets.tab1')} key="transaction">
-                      {
-                        (currentAsset?.assetType === UserAssetType.EVM && currentAsset?.mainnetSymbol === 'ETH')
-                        || (currentAsset?.assetType === UserAssetType.TENDERMINT && checkIfTestnet(session.wallet.config.network) && currentAsset?.mainnetSymbol === 'ATOM')
-                        || currentAsset?.assetType === UserAssetType.ERC_20_TOKEN
-                          ? <div style={{ margin: '20px' }}>
-                            <a target="__blank" href={`${renderExplorerUrl(currentAsset.config, 'address')}/${currentAsset.address}`}>
+                      {(currentAsset?.assetType === UserAssetType.EVM &&
+                        currentAsset?.mainnetSymbol === 'ETH') ||
+                        (currentAsset?.assetType === UserAssetType.TENDERMINT &&
+                          checkIfTestnet(session.wallet.config.network) &&
+                          currentAsset?.mainnetSymbol === 'ATOM') ||
+                          currentAsset?.assetType === UserAssetType.ERC_20_TOKEN ? (
+                          <div style={{ margin: '20px' }}>
+                            <a
+                              target="__blank"
+                              href={`${renderExplorerUrl(
+                                currentAsset.config,
+                                'address',
+                              )}/${currentAsset.address}`}
+                            >
                               {t('assets.tx.checkOnExplorer')}
                             </a>
                           </div>
-                          : <Table
+                        ) : (
+                          <Table
                             columns={TransactionColumns}
                             dataSource={allTransactions}
                             className="transaction-table"
-                            rowKey={record => record.key}
+                            rowKey={(record) => record.key}
                             locale={{
                               triggerDesc: t('general.table.triggerDesc'),
                               triggerAsc: t('general.table.triggerAsc'),
@@ -545,17 +889,27 @@ const AssetsPage = () => {
                             }}
                             loading={{
                               indicator: (
-                                <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />
+                                <Spin
+                                  indicator={
+                                    <LoadingOutlined
+                                      style={{ fontSize: 36 }}
+                                      spin
+                                    />
+                                  }
+                                />
                               ),
                               spinning: fetchingComponent,
                             }}
                             expandable={{
-                              expandedRowRender: record => (
-                                <TransactionDetail transaction={record} session={session} />
+                              expandedRowRender: (record) => (
+                                <TransactionDetail
+                                  transaction={record}
+                                  session={session}
+                                />
                               ),
                             }}
                           />
-                      }
+                        )}
                     </TabPane>
                   </Tabs>
                 </Content>
@@ -563,31 +917,42 @@ const AssetsPage = () => {
             ) : (
               <Table
                 columns={AssetColumns}
-                dataSource={walletAllAssets}
+                dataSource={displayAllAssets}
                 className="asset-table"
-                rowKey={record => record.identifier}
-                onRow={selectedAsset => {
+                rowKey={(record) => record.identifier}
+                onRow={(selectedAsset) => {
+                  if (selectedAsset.walletId) {
+                    return {
+                      onClick: async () => {
+                        setActiveAssetTab('transaction');
+                        setSession({
+                          ...session,
+                          activeAsset: selectedAsset,
+                        });
+                        await walletService.setCurrentSession({
+                          ...session,
+                          activeAsset: selectedAsset,
+                        });
+                        syncTransactions(selectedAsset);
+                        setCurrentAsset(selectedAsset);
+                        setCurrentAssetMarketData(
+                          allMarketData.get(
+                            `${selectedAsset.assetType}-${selectedAsset.mainnetSymbol}-${session.currency}`,
+                          ),
+                        );
+                        setIsAssetVisible(true);
+                      }, // click row
+                    };
+                  }
+
                   return {
-                    onClick: async () => {
-                      setActiveAssetTab('transaction');
-                      setSession({
-                        ...session,
-                        activeAsset: selectedAsset,
-                      });
-                      await walletService.setCurrentSession({
-                        ...session,
-                        activeAsset: selectedAsset,
-                      });
-                      syncTransactions(selectedAsset);
+                    onClick: () => {
                       setCurrentAsset(selectedAsset);
-                      setCurrentAssetMarketData(
-                        allMarketData.get(
-                          `${selectedAsset.assetType}-${selectedAsset.mainnetSymbol}-${session.currency}`,
-                        ),
-                      );
-                      setIsAssetVisible(true);
-                    }, // click row
+                    },
                   };
+                }}
+                rowClassName={(record) => {
+                  return record.walletId ? '' : 'missing-asset';
                 }}
                 locale={{
                   triggerDesc: t('general.table.triggerDesc'),
@@ -600,6 +965,27 @@ const AssetsPage = () => {
         </div>
       </Content>
       <Footer />
+      <PasswordFormModal
+        description={t('general.passwordFormModal.description')}
+        okButtonText={t('general.passwordFormModal.okButton')}
+        onCancel={() => {
+          setInputPasswordVisible(false);
+        }}
+        onSuccess={onWalletDecryptFinishCreateFreshAssets}
+        onValidatePassword={async (password: string) => {
+          const isValid = await secretStoreService.checkIfPasswordIsValid(
+            password,
+          );
+          return {
+            valid: isValid,
+            errMsg: !isValid ? t('general.passwordFormModal.error') : '',
+          };
+        }}
+        successText={t('general.passwordFormModal.success')}
+        title={t('general.passwordFormModal.title')}
+        visible={inputPasswordVisible}
+        successButtonText={t('general.continue')}
+      />
     </Layout>
   );
 };

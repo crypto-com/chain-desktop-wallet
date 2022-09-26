@@ -8,7 +8,8 @@ import { Session } from '../models/Session';
 import { TestNetCroeseid4Config, MainNetConfig } from './StaticConfig';
 
 // This will be used later for asset recreation/migration
-export const STATIC_ASSET_COUNT = 4;
+export const STATIC_NORMAL_ASSET_COUNT = 4;
+export const STATIC_LEDGER_ASSET_COUNT = 3;
 
 // Update Explorer Url - https://cronoscan.com
 export const MAINNET_EVM_EXPLORER_URL = 'https://cronoscan.com';

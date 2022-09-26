@@ -43,9 +43,9 @@ export class WalletOps {
     return assets;
   }
 
-  public generate(config: WalletConfig, walletIdentifier: string, availablePhrase?: string) {
+  public async generate(config: WalletConfig, walletIdentifier: string, availablePhrase?: string) {
     const phrase = availablePhrase || HDKey.generateMnemonic(24);
-    const assets = this.generateAssets(config, walletIdentifier, phrase);
+    const assets = await this.generateAssets(config, walletIdentifier, phrase);
     return { encryptedPhrase: phrase, initialAssets: assets };
   }
 }

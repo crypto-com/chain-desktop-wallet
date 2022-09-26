@@ -21,7 +21,7 @@ export class WalletCreator extends WalletOps {
       walletIdentifier,
     );
 
-    const defaultAsset = (await initialAssets).filter(
+    const defaultAsset = initialAssets.filter(
       asset => asset.assetType === UserAssetType.TENDERMINT,
     )[0];
 
@@ -40,7 +40,7 @@ export class WalletCreator extends WalletOps {
 
     return {
       wallet: newWallet,
-      assets: await initialAssets,
+      assets: initialAssets,
     };
   }
 }

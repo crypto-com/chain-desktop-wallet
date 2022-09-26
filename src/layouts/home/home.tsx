@@ -276,7 +276,7 @@ function HomeLayout(props: HomeLayoutProps) {
     walletSession: Session,
     tendermintAddress: string,
     evmAddress: string,
-    cosmosHubAddress: string,
+    // cosmosHubAddress: string,
   ) => {
     setFetchingDB(true);
     try {
@@ -285,7 +285,7 @@ function HomeLayout(props: HomeLayoutProps) {
         walletSession,
         tendermintAddress,
         evmAddress,
-        cosmosHubAddress,
+        // cosmosHubAddress,
       );
       setIsLedgerCreateAssetSuccessModalVisible(true);
     } catch (e) {
@@ -361,7 +361,7 @@ function HomeLayout(props: HomeLayoutProps) {
       setIsLedgerEthAppConnected(false);
       setIsLedgerEthAppConnectModalVisible(false);
       setIsLedgerModalButtonLoading(false);
-      setIsLedgerCosmosAppConnectModalVisible(true);
+      // setIsLedgerCosmosAppConnectModalVisible(true);
     } catch (e) {
       let message = `${t('create.notification.ledger.message1')}`;
       let description = (
@@ -496,7 +496,7 @@ function HomeLayout(props: HomeLayoutProps) {
         walletSession,
         ledgerTendermintAddress,
         ledgerEvmAddress,
-        ledgerCosmosAddress,
+        // ledgerCosmosAddress,
       );
     }
   };
@@ -1473,7 +1473,7 @@ function HomeLayout(props: HomeLayoutProps) {
             )}
           </div>
         </LedgerModalPopup>
-        <LedgerModalPopup
+        {/* <LedgerModalPopup
           isModalVisible={isLedgerCosmosAppConnectModalVisible}
           handleCancel={() => {
             setIsLedgerCosmosAppConnectModalVisible(false);
@@ -1520,7 +1520,7 @@ function HomeLayout(props: HomeLayoutProps) {
               </>
             )}
           </div>
-        </LedgerModalPopup>
+        </LedgerModalPopup> */}
       </Layout>
     </main>
   );
