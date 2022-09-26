@@ -58,7 +58,7 @@ import {
 import { FinalTallyResult } from './rpc/NodeRpcModels';
 import { capitalizeFirstLetter, checkIfTestnet, sleep } from '../utils/utils';
 import { WalletBuiltResult, WalletOps } from './WalletOps';
-import { STATIC_LEDGER_ASSET_COUNT, STATIC_NORMAL_ASSET_COUNT } from '../config/StaticAssets';
+import { STATIC_ASSET_COUNT } from '../config/StaticAssets';
 import { StorageService } from './storage/StorageService';
 import { TransactionPrepareService } from './TransactionPrepareService';
 import { TransactionHistoryService } from './TransactionHistoryService';
@@ -682,13 +682,12 @@ class WalletService {
       AssetCreationType.STATIC,
       wallet.identifier,
     );
-    const staticAssetCount = wallet.walletType === LEDGER_WALLET_TYPE ? STATIC_LEDGER_ASSET_COUNT : STATIC_NORMAL_ASSET_COUNT;
-    const needAssetsCreation = existingStaticAssets.length < staticAssetCount;
+    const needAssetsCreation = existingStaticAssets.length < STATIC_ASSET_COUNT;
     if (needAssetsCreation) {
       // eslint-disable-next-line no-console
       console.log('NEEDS_ASSETS_CREATIONS', {
         assets: existingStaticAssets,
-        STATIC_NORMAL_ASSET_COUNT,
+        STATIC_ASSET_COUNT,
         walletID: wallet.identifier,
       });
     }

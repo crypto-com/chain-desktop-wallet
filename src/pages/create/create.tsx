@@ -367,7 +367,6 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
   const [isErrorModalVisible, setIsErrorModalVisible] = useState(false);
   const [isCroModalVisible, setIsCroModalVisible] = useState(false);
   const [isEthModalVisible, setIsEthModalVisible] = useState(false);
-  const [isCosmosModalVisible, setIsCosmosModalVisible] = useState(false);
   const [isHWModeSelected, setIsHWModeSelected] = useState(false);
   const [isLedgerModalButtonLoading, setIsLedgerModalButtonLoading] = useState(
     false,
@@ -375,9 +374,6 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
   // eslint-disable-next-line
   const [isLedgerEthAppConnected, setIsLedgerEthAppConnected] = useState(false);
   const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
-  const [isLedgerCosmosAppConnected, setIsLedgerCosmosAppConnected] = useState(
-    false,
-  );
   const [createLoading, setCreateLoading] = useState(false);
   const [wallet, setWallet] = useState<Wallet>();
   const [ledgerAssetType, setLedgerAssetType] = useState<UserAssetType>();
@@ -419,18 +415,6 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
 
   const handleCroCancel = () => {
     setIsCroModalVisible(false);
-  };
-
-  const showCosmosModal = () => {
-    setIsCosmosModalVisible(true);
-  };
-  const handleCosmosOk = () => {
-    waitFlag = false;
-  };
-
-  const handleCosmosCancel = () => {
-    waitFlag = false;
-    setIsCosmosModalVisible(false);
   };
 
   const showModal = () => {
@@ -525,7 +509,12 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
       let walletAssets = createdWallet.assets;
 
       const targetWallet = createdWallet.wallet;
-
+      walletAssets = walletAssets.filter(
+        (asset) =>
+          (asset.assetType === UserAssetType.TENDERMINT &&
+            asset.mainnetSymbol === 'CRO') ||
+          asset.assetType === UserAssetType.EVM,
+      );
       if (targetWallet.walletType === LEDGER_WALLET_TYPE) {
         const device: ISignerProvider = createLedgerDevice();
 
@@ -578,35 +567,9 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
             asset.assetType === UserAssetType.EVM,
         );
 
-        // await delay(3_000);
-        // setIsEthModalVisible(false);
+        await delay(3_000);
+        setIsEthModalVisible(false);
 
-        // waitFlag = true;
-        // showCosmosModal();
-        // for (let i = 0; i < 600; i++) {
-        //   // eslint-disable-next-line no-await-in-loop
-        //   await delay(100); // milli seconds
-        //   if (!waitFlag) {
-        //     break;
-        //   }
-        // }
-
-        // setIsLedgerCosmosAppConnected(true);
-
-        // const cosmosHubAddress = await device.getAddress(
-        //   targetWallet.addressIndex,
-        //   'cosmos',
-        //   SupportedChainName.COSMOS_HUB,
-        //   targetWallet.derivationPathStandard,
-        //   false,
-        // );
-
-        // const atomAsset = createdWallet.assets.filter(
-        //   asset =>
-        //     asset.assetType === UserAssetType.TENDERMINT &&
-        //     asset.config?.tendermintNetwork?.chainName === SupportedChainName.COSMOS_HUB,
-        // )[0];
-        // atomAsset.address = cosmosHubAddress;
       }
 
       await walletService.saveAssets(walletAssets);
@@ -616,7 +579,6 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
       setCreateLoading(false);
       setIsLedgerCroAppConnected(false);
       setIsLedgerEthAppConnected(false);
-      setIsLedgerCosmosAppConnected(false);
       showModal();
     } catch (e) {
       // eslint-disable-next-line no-console
@@ -625,7 +587,6 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
       setCreateLoading(false);
       setIsLedgerCroAppConnected(false);
       setIsLedgerEthAppConnected(false);
-      setIsLedgerCosmosAppConnected(false);
       showErrorModal();
       return;
     }
@@ -694,73 +655,6 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
         setTimeout(resolve, 5000);
       });
       setIsEthModalVisible(false);
-      setCreateLoading(false);
-      setIsLedgerModalButtonLoading(false);
-      notification.error({
-        message,
-        description,
-        placement: 'topRight',
-        duration: 20,
-      });
-    }
-  };
-
-  const checkIsLedgerCosmosAppConnected = async () => {
-    setCreateLoading(true);
-    try {
-      const device = createLedgerDevice();
-      await device.getAddress(
-        0,
-        'cosmos',
-        SupportedChainName.COSMOS_HUB,
-        DerivationPathStandard.BIP44,
-        false,
-      );
-      setIsLedgerCosmosAppConnected(true);
-      await new Promise((resolve) => {
-        setTimeout(resolve, 2000);
-      });
-      setIsCosmosModalVisible(false);
-      setIsLedgerModalButtonLoading(false);
-    } catch (e) {
-      let message = `${t('create.notification.ledger.message1')}`;
-      let description = (
-        <>
-          {t('create.notification.ledger.description1')}
-          <br /> -{' '}
-          <a
-            href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {t('general.errorModalPopup.ledgerTroubleshoot')}
-          </a>
-        </>
-      );
-      // if (walletType === LEDGER_WALLET_TYPE) {
-      if (detectConditionsError(((e as unknown) as any).toString())) {
-        message = `${t('create.notification.ledger.message2')}`;
-        description = (
-          <>
-            {t('create.notification.ledger.description2')}
-            <br /> -{' '}
-            <a
-              href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {t('general.errorModalPopup.ledgerTroubleshoot')}
-            </a>
-          </>
-        );
-      }
-      // }
-      setIsLedgerCosmosAppConnected(false);
-
-      await new Promise((resolve) => {
-        setTimeout(resolve, 2000);
-      });
-      setIsCosmosModalVisible(false);
       setCreateLoading(false);
       setIsLedgerModalButtonLoading(false);
       notification.error({

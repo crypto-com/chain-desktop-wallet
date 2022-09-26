@@ -56,45 +56,33 @@ import IconDApp from '../../svg/IconDApp';
 import IconWallet from '../../svg/IconWallet';
 import ModalPopup from '../../components/ModalPopup/ModalPopup';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
-import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import { walletService } from '../../service/WalletService';
 import { Session } from '../../models/Session';
 // eslint-disable-next-line
 import { SettingsDataUpdate } from '../../models/Wallet';
 import packageJson from '../../../package.json';
 import {
-  createLedgerDevice,
-  detectConditionsError,
   LEDGER_WALLET_TYPE,
 } from '../../service/LedgerService';
 import {
   LedgerWalletMaximum,
   MAX_INCORRECT_ATTEMPTS_ALLOWED,
   SHOW_WARNING_INCORRECT_ATTEMPTS,
-  SupportedChainName,
 } from '../../config/StaticConfig';
 import { generalConfigService } from '../../service/storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../service/storage/SecretStoreService';
 import SessionLockModal from '../../components/PasswordForm/SessionLockModal';
-import LedgerModalPopup from '../../components/LedgerModalPopup/LedgerModalPopup';
-import SuccessCheckmark from '../../components/SuccessCheckmark/SuccessCheckmark';
-import IconLedger from '../../svg/IconLedger';
-import { ISignerProvider } from '../../service/signers/SignerProvider';
 import { getAssetBalancePrice, UserAsset, UserAssetType } from '../../models/UserAsset';
-import IconCro from '../../svg/IconCro';
-import IconEth from '../../svg/IconEth';
 import { BridgeService } from '../../service/bridge/BridgeService';
 import {
   DefaultMainnetBridgeConfigs,
   DefaultTestnetBridgeConfigs,
 } from '../../service/bridge/BridgeConfig';
 import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
-import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
 import { walletConnectStateAtom } from '../../service/walletconnect/store';
 import { WalletConnectModal } from '../../pages/walletconnect/components/WalletConnectModal';
 import IconWalletConnect from '../../svg/IconWalletConnect';
-import IconCosmos from '../../svg/IconCosmos';
 import IntercomCustomerService from '../../pages/customer-service';
 import numeral from 'numeral';
 
@@ -152,24 +140,10 @@ function HomeLayout(props: HomeLayoutProps) {
   const [isButtonLoading, setIsButtonLoading] = useState(false);
   const [menuToBeSelectedKey, setMenuToBeSelectedKey] = useState('');
 
-  const [ledgerTendermintAddress, setLedgerTendermintAddress] = useState('');
-  const [ledgerEvmAddress, setLedgerEvmAddress] = useState('');
-  const [isLedgerCroAppConnected, setIsLedgerCroAppConnected] = useState(false);
-  const [isLedgerEthAppConnected, setIsLedgerEthAppConnected] = useState(false);
-  const [isLedgerCosmosAppConnected, setIsLedgerCosmosAppConnected] = useState(false);
-  const [isLedgerCroAppConnectModalVisible, setIsLedgerCroAppConnectModalVisible] = useState(false);
-  const [isLedgerEthAppConnectModalVisible, setIsLedgerEthAppConnectModalVisible] = useState(false);
-  const [isLedgerCosmosAppConnectModalVisible, setIsLedgerCosmosAppConnectModalVisible] = useState(
-    false,
-  );
   const [
     isLedgerCreateAssetSuccessModalVisible,
     setIsLedgerCreateAssetSuccessModalVisible,
   ] = useState(false);
-  const [isLedgerCreateAssetErrorModalVisible, setIsLedgerCreateAssetErrorModalVisible] = useState(
-    false,
-  );
-  const [isLedgerModalButtonLoading, setIsLedgerModalButtonLoading] = useState(false);
 
   const didMountRef = useRef(false);
   const currentLocationPath = useLocation().pathname;
@@ -268,239 +242,6 @@ function HomeLayout(props: HomeLayoutProps) {
   const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
   const [isSessionLockModalVisible, setIsSessionLockModalVisible] = useState<boolean>(false);
 
-  const showPasswordInput = () => {
-    setInputPasswordVisible(true);
-  };
-
-  const migrateLedgerAsset = async (
-    walletSession: Session,
-    tendermintAddress: string,
-    evmAddress: string,
-    // cosmosHubAddress: string,
-  ) => {
-    setFetchingDB(true);
-    try {
-      await walletService.handleCurrentWalletAssetsMigration(
-        '',
-        walletSession,
-        tendermintAddress,
-        evmAddress,
-        // cosmosHubAddress,
-      );
-      setIsLedgerCreateAssetSuccessModalVisible(true);
-    } catch (e) {
-      setIsLedgerCreateAssetErrorModalVisible(true);
-    }
-    setFetchingDB(false);
-  };
-
-  const checkIsLedgerCroAppConnected = async (walletSession: Session) => {
-    try {
-      const device: ISignerProvider = createLedgerDevice();
-
-      const tendermintAddress = await device.getAddress(
-        walletSession.wallet.addressIndex,
-        walletSession.wallet.config.network.addressPrefix,
-        SupportedChainName.CRYPTO_ORG,
-        walletSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
-        false,
-      );
-
-      setLedgerTendermintAddress(tendermintAddress);
-      setIsLedgerCroAppConnected(true);
-
-      await new Promise(resolve => {
-        setTimeout(resolve, 2000);
-      });
-
-      setIsLedgerCroAppConnectModalVisible(false);
-      setIsLedgerCroAppConnected(false);
-      setIsLedgerModalButtonLoading(false);
-      setIsLedgerEthAppConnectModalVisible(true);
-    } catch (e) {
-      let message = `${t('create.notification.ledger.message1')}`;
-      let description = `${t('create.notification.ledger.description1')}`;
-      if (walletSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-        if (detectConditionsError(((e as unknown) as any).toString())) {
-          message = `${t('create.notification.ledger.message2')}`;
-          description = `${t('create.notification.ledger.message2')}`;
-        }
-      }
-
-      await new Promise(resolve => {
-        setTimeout(resolve, 2000);
-      });
-      setIsLedgerCroAppConnected(false);
-      setIsLedgerCroAppConnectModalVisible(false);
-      setIsLedgerModalButtonLoading(false);
-
-      notification.error({
-        message,
-        description,
-        placement: 'topRight',
-        duration: 20,
-      });
-    }
-  };
-
-  const checkIsLedgerEthAppConnected = async (walletSession: Session) => {
-    try {
-      const device: ISignerProvider = createLedgerDevice();
-
-      const evmAddress = await device.getEthAddress(
-        walletSession.wallet.addressIndex,
-        walletSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
-        false,
-      );
-      setIsLedgerEthAppConnected(true);
-      setLedgerEvmAddress(evmAddress);
-      await new Promise(resolve => {
-        setTimeout(resolve, 2000);
-      });
-
-      setIsLedgerEthAppConnected(false);
-      setIsLedgerEthAppConnectModalVisible(false);
-      setIsLedgerModalButtonLoading(false);
-      // setIsLedgerCosmosAppConnectModalVisible(true);
-    } catch (e) {
-      let message = `${t('create.notification.ledger.message1')}`;
-      let description = (
-        <>
-          {t('create.notification.ledger.description1')}
-          <br /> -{' '}
-          <a
-            href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {t('general.errorModalPopup.ledgerTroubleshoot')}
-          </a>
-        </>
-      );
-      if (walletSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-        if (detectConditionsError(((e as unknown) as any).toString())) {
-          message = `${t('create.notification.ledger.message2')}`;
-          description = (
-            <>
-              {t('create.notification.ledger.description2')}
-              <br /> -{' '}
-              <a
-                href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
-                target="_blank"
-                rel="noreferrer"
-              >
-                {t('general.errorModalPopup.ledgerTroubleshoot')}
-              </a>
-            </>
-          );
-        }
-      }
-
-      setIsLedgerEthAppConnected(false);
-      await new Promise(resolve => {
-        setTimeout(resolve, 2000);
-      });
-      setIsLedgerEthAppConnectModalVisible(false);
-      setIsLedgerModalButtonLoading(false);
-
-      notification.error({
-        message,
-        description,
-        placement: 'topRight',
-        duration: 20,
-      });
-    }
-    await new Promise(resolve => {
-      setTimeout(resolve, 2000);
-    });
-  };
-
-  const checkIsLedgerCosmosAppConnected = async (walletSession: Session) => {
-    let hwok = false;
-    let ledgerCosmosAddress = '';
-    try {
-      const device: ISignerProvider = createLedgerDevice();
-
-      ledgerCosmosAddress = await device.getAddress(
-        walletSession.wallet.addressIndex,
-        'cosmos',
-        SupportedChainName.COSMOS_HUB,
-        walletSession.wallet.derivationPathStandard ?? DerivationPathStandard.BIP44,
-        false,
-      );
-      setIsLedgerCosmosAppConnected(true);
-
-      await new Promise(resolve => {
-        setTimeout(resolve, 2000);
-      });
-
-      setIsLedgerCosmosAppConnected(false);
-      setIsLedgerCosmosAppConnectModalVisible(false);
-      setIsLedgerModalButtonLoading(false);
-
-      hwok = true;
-    } catch (e) {
-      let message = `${t('create.notification.ledger.message1')}`;
-      let description = (
-        <>
-          {t('create.notification.ledger.description1')}
-          <br /> -{' '}
-          <a
-            href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
-            target="_blank"
-            rel="noreferrer"
-          >
-            {t('general.errorModalPopup.ledgerTroubleshoot')}
-          </a>
-        </>
-      );
-      if (walletSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-        if (detectConditionsError(((e as unknown) as any).toString())) {
-          message = `${t('create.notification.ledger.message2')}`;
-          description = (
-            <>
-              {t('create.notification.ledger.description2')}
-              <br /> -{' '}
-              <a
-                href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
-                target="_blank"
-                rel="noreferrer"
-              >
-                {t('general.errorModalPopup.ledgerTroubleshoot')}
-              </a>
-            </>
-          );
-        }
-      }
-
-      setIsLedgerCosmosAppConnected(false);
-      await new Promise(resolve => {
-        setTimeout(resolve, 2000);
-      });
-      setIsLedgerCosmosAppConnectModalVisible(false);
-      setIsLedgerModalButtonLoading(false);
-
-      notification.error({
-        message,
-        description,
-        placement: 'topRight',
-        duration: 20,
-      });
-    }
-    await new Promise(resolve => {
-      setTimeout(resolve, 2000);
-    });
-    if (hwok) {
-      // proceed
-      migrateLedgerAsset(
-        walletSession,
-        ledgerTendermintAddress,
-        ledgerEvmAddress,
-        // ledgerCosmosAddress,
-      );
-    }
-  };
-
   const checkNewlyAddedStaticAssets = (walletSession?: Session) => {
     if (!walletSession || !walletSession.wallet) {
       return;
@@ -516,11 +257,10 @@ function HomeLayout(props: HomeLayoutProps) {
             size="small"
             className="btn-restart"
             onClick={() => {
-              if (walletSession.wallet.walletType === LEDGER_WALLET_TYPE) {
-                setIsLedgerCroAppConnectModalVisible(true);
-              } else {
-                showPasswordInput();
-              }
+              setNavbarMenuSelectedKey('/assets');
+              setTimeout(() => {
+                history.push('/assets');
+              }, 100);
               notification.close(newAssetAddedNotificationKey);
             }}
             style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
@@ -1358,169 +1098,6 @@ function HomeLayout(props: HomeLayoutProps) {
             </div>
           </>
         </SuccessModalPopup>
-        <ErrorModalPopup
-          isModalVisible={isLedgerCreateAssetErrorModalVisible}
-          handleCancel={() => {
-            setIsLedgerCreateAssetErrorModalVisible(false);
-            setIsLedgerCroAppConnectModalVisible(true);
-          }}
-          handleOk={() => {
-            setIsLedgerCreateAssetErrorModalVisible(false);
-            setIsLedgerCroAppConnectModalVisible(true);
-          }}
-          title={t('general.errorModalPopup.title')}
-          footer={[]}
-        >
-          <>
-            <div className="description">
-              {t('general.errorModalPopup.createWallet.description')}
-            </div>
-          </>
-        </ErrorModalPopup>
-        <LedgerModalPopup
-          isModalVisible={isLedgerCroAppConnectModalVisible}
-          handleCancel={() => {
-            setIsLedgerCroAppConnectModalVisible(false);
-          }}
-          handleOk={() => {
-            setIsLedgerCroAppConnectModalVisible(false);
-          }}
-          title={
-            isLedgerCroAppConnected
-              ? t('home.ledgerModalPopup.tendermintAsset.title1')
-              : t('home.ledgerModalPopup.tendermintAsset.title2')
-          }
-          footer={[
-            isLedgerCroAppConnected ? (
-              <></>
-            ) : (
-              <Button
-                type="primary"
-                size="small"
-                className="btn-restart"
-                onClick={() => {
-                  checkIsLedgerCroAppConnected(session);
-                  setIsLedgerModalButtonLoading(true);
-                }}
-                loading={isLedgerModalButtonLoading}
-              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
-              >
-                {t('general.connect')}
-              </Button>
-            ),
-          ]}
-          image={isLedgerCroAppConnected ? <SuccessCheckmark /> : <IconLedger />}
-        >
-          <div className="description">
-            {isLedgerCroAppConnected ? (
-              t('create.ledgerModalPopup.tendermintAddress.description1')
-            ) : (
-              <>
-                {t('create.ledgerModalPopup.tendermintAddress.description3')}
-                <div className="ledger-app-icon">
-                  <IconCro style={{ color: '#fff' }} />
-                </div>
-                Crypto.org App
-              </>
-            )}
-          </div>
-        </LedgerModalPopup>
-        <LedgerModalPopup
-          isModalVisible={isLedgerEthAppConnectModalVisible}
-          handleCancel={() => {
-            setIsLedgerEthAppConnectModalVisible(false);
-          }}
-          handleOk={() => {
-            setIsLedgerEthAppConnectModalVisible(false);
-          }}
-          title={
-            isLedgerEthAppConnected
-              ? t('home.ledgerModalPopup.evmAsset.title1')
-              : t('home.ledgerModalPopup.evmAsset.title2')
-          }
-          footer={[
-            isLedgerEthAppConnected ? (
-              <></>
-            ) : (
-              <Button
-                type="primary"
-                size="small"
-                className="btn-restart"
-                onClick={() => {
-                  checkIsLedgerEthAppConnected(session);
-                  setIsLedgerModalButtonLoading(true);
-                }}
-                loading={isLedgerModalButtonLoading}
-              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
-              >
-                {t('general.connect')}
-              </Button>
-            ),
-          ]}
-          image={isLedgerEthAppConnected ? <SuccessCheckmark /> : <IconLedger />}
-        >
-          <div className="description">
-            {isLedgerEthAppConnected ? (
-              t('create.ledgerModalPopup.evmAddress.description1')
-            ) : (
-              <>
-                {t('create.ledgerModalPopup.tendermintAddress.description3')}
-                <div className="ledger-app-icon">
-                  <IconEth style={{ color: '#fff' }} />
-                </div>
-                Ethereum App
-              </>
-            )}
-          </div>
-        </LedgerModalPopup>
-        {/* <LedgerModalPopup
-          isModalVisible={isLedgerCosmosAppConnectModalVisible}
-          handleCancel={() => {
-            setIsLedgerCosmosAppConnectModalVisible(false);
-          }}
-          handleOk={() => {
-            setIsLedgerCosmosAppConnectModalVisible(false);
-          }}
-          title={
-            isLedgerCosmosAppConnected
-              ? t('home.ledgerModalPopup.tendermintAsset.title1')
-              : t('home.ledgerModalPopup.tendermintAsset.title2')
-          }
-          footer={[
-            isLedgerCosmosAppConnected ? (
-              <></>
-            ) : (
-              <Button
-                type="primary"
-                size="small"
-                className="btn-restart"
-                onClick={() => {
-                  checkIsLedgerCosmosAppConnected(session);
-                  setIsLedgerModalButtonLoading(true);
-                }}
-                loading={isLedgerModalButtonLoading}
-              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
-              >
-                {t('general.connect')}
-              </Button>
-            ),
-          ]}
-          image={isLedgerCosmosAppConnected ? <SuccessCheckmark /> : <IconLedger />}
-        >
-          <div className="description">
-            {isLedgerCosmosAppConnected ? (
-              t('create.ledgerModalPopup.tendermintAddress.description1')
-            ) : (
-              <>
-                {t('create.ledgerModalPopup.tendermintAddress.description3')}
-                <div className="ledger-app-icon">
-                  <IconCosmos style={{ color: '#fff' }} />
-                </div>
-                Cosmos App
-              </>
-            )}
-          </div>
-        </LedgerModalPopup> */}
       </Layout>
     </main>
   );
