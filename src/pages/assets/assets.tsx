@@ -235,6 +235,9 @@ const AssetsPage = () => {
       session,
     );
 
+    const allAssets = await walletService.retrieveCurrentWalletAssets(session);
+    setWalletAllAssets(allAssets);
+    
     setFetchingDB(false);
   };
 
@@ -425,7 +428,10 @@ const AssetsPage = () => {
           address: ledgerAddress,
         };
         await walletService.saveAssets([atomAsset]);
-        await syncAssetBalance(atomAsset);
+
+        const allAssets = await walletService.retrieveCurrentWalletAssets(session);
+        setWalletAllAssets(allAssets);
+
         setIsAddingMissingAsset(false);
       }
 
@@ -440,7 +446,10 @@ const AssetsPage = () => {
           address: ledgerAddress,
         };
         await walletService.saveAssets([ethAsset]);
-        await syncAssetBalance(ethAsset);
+
+        const allAssets = await walletService.retrieveCurrentWalletAssets(session);
+        setWalletAllAssets(allAssets);
+
         setIsAddingMissingAsset(false);
       }
     };
@@ -596,12 +605,11 @@ const AssetsPage = () => {
                 style={{ marginLeft: '20px' }}
                 onClick={() => {
                   setTimeout(() => {
-                    // setActiveAssetTab('receive');
                     onAddMissingAsset(record);
                   }, 50);
                 }}
               >
-                Add
+                {t('home.createNewAsset.enable')}
               </a>
             </>
           );
