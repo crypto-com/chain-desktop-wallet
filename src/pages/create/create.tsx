@@ -509,12 +509,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
       let walletAssets = createdWallet.assets;
 
       const targetWallet = createdWallet.wallet;
-      walletAssets = walletAssets.filter(
-        (asset) =>
-          (asset.assetType === UserAssetType.TENDERMINT &&
-            asset.mainnetSymbol === 'CRO') ||
-          asset.assetType === UserAssetType.EVM,
-      );
+
       if (targetWallet.walletType === LEDGER_WALLET_TYPE) {
         const device: ISignerProvider = createLedgerDevice();
 
