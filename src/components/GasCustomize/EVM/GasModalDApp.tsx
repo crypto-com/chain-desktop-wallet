@@ -15,7 +15,7 @@ import {
 } from '../../../config/StaticConfig';
 import { getAssetAmountInFiat } from '../../../models/UserAsset';
 import { getNormalScaleAmount } from '../../../utils/NumberUtils';
-import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
+import { useCronosEvmAsset } from '../../../hooks/useAsset';
 import { useAnalytics } from '../../../hooks/useAnalytics';
 import { useBalance } from '../../../pages/dapp/hooks/useBalance';
 import { EVMChainConfig } from '../../../models/Chain';

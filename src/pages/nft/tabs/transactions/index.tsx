@@ -1,7 +1,7 @@
 import { Card } from 'antd';
 import * as React from 'react';
 import { useState } from 'react';
-import { useCronosTendermintAsset } from '../../../../hooks/useCronosEvmAsset';
+import { useCronosTendermintAsset } from '../../../../hooks/useAsset';
 import { UserAssetType } from '../../../../models/UserAsset';
 import ChainSelect from '../../components/ChainSelect';
 import { CronosNFTTransactionList } from './Cronos';
