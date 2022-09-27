@@ -645,7 +645,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
           rules={[
             {
               required: true,
-              message: `Asset ${t('general.required')}`,
+              message: `${t('assets.title')} ${t('general.required')}`,
             },
           ]}
           style={{ textAlign: 'left' }}
