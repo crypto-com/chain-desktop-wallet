@@ -138,6 +138,8 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
     );
   };
 
+  notification.close(LedgerErrorNotificationKey);
+  
   switch (assetType) {
     case UserAssetType.EVM:
     case UserAssetType.CRC_20_TOKEN:
@@ -281,6 +283,8 @@ export function ledgerNotificationWithoutCheck(
       </Button>
     );
   };
+
+  notification.close(LedgerErrorNotificationKey);
 
   switch (assetType) {
     case UserAssetType.EVM:

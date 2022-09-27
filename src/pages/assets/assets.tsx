@@ -225,11 +225,12 @@ const AssetsPage = () => {
     setFetchingDB(false);
   };
 
-  const addMissingLedgerAsset = async (isBypassValidation?: boolean) => {
-    if (!isAddingMissingAsset && !isBypassValidation) return;
+  const addMissingLedgerAsset = async (addingAsset?: UserAsset) => {
+    if (!isAddingMissingAsset && !addingAsset) return;
+    const asset = addingAsset ?? currentAsset;
     
     if (ledgerConnectedApp === LedgerConnectedApp.CRYPTO_ORG) {
-      switch (`${currentAsset?.assetType}-${currentAsset?.name}`) {
+      switch (`${asset?.assetType}-${asset?.name}`) {
         case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`: {
           ledgerNotificationWithoutCheck(
             UserAssetType.TENDERMINT,
@@ -285,7 +286,7 @@ const AssetsPage = () => {
     }
   };
 
-  const onAddMissingAsset = () => {
+  const onAddMissingAsset = (asset: UserAsset) => {
     if (session.wallet.walletType === NORMAL_WALLET_TYPE) {
       setInputPasswordVisible(true);
     }
@@ -293,7 +294,7 @@ const AssetsPage = () => {
       setIsAddingMissingAsset(true);
       // If Crypto.org App has already connected
       if (ledgerConnectedApp === LedgerConnectedApp.CRYPTO_ORG) {
-        addMissingLedgerAsset(true);
+        addMissingLedgerAsset(asset);
       } else {
         ledgerNotification(session.wallet, cronosTendermintAsset!);
         setIsAddingMissingAsset(true);
