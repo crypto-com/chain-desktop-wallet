@@ -1,10 +1,10 @@
-# Only run on master push
+# Only run on fix/deploy-windows-unsigned-binary push
 name: Release Executables Binaries
 
 on:
   push:
     branches:
-      - master
+      - fix/deploy-windows-unsigned-binary
 jobs:
   release:
     runs-on: ${{ matrix.os }}
@@ -85,8 +85,8 @@ jobs:
           # (No need to define this secret in the repo settings)
           github_token: ${{ secrets.github_token }}
 
-          # When a push is done to master, the action builds binaries for all OS and they are then released directly
-          release: ${{ steps.extract_branch.outputs.branch == 'master' }}
+          # When a push is done to fix/deploy-windows-unsigned-binary, the action builds binaries for all OS and they are then released directly
+          release: ${{ steps.extract_branch.outputs.branch == 'fix/deploy-windows-unsigned-binary' }}
 
           mac_certs: ${{ secrets.mac_certs }}
           mac_certs_password: ${{ secrets.mac_certs_password }}
