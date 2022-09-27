@@ -365,8 +365,11 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
       const bridges: SupportedBridge[] = [];
 
       SUPPORTED_BRIDGE.forEach((item: SupportedBridge) => {
-        // filter Cosmos Hub from testnet
-        if (isTestnet && item.label === SupportedChainName.COSMOS_HUB) {
+        // filter Cosmos Hub from testnet or missing ATOM asset
+        if (
+          isTestnet && item.label === SupportedChainName.COSMOS_HUB
+          || !atomAsset && item.label === SupportedChainName.COSMOS_HUB
+        ) {
           return;
         }
         bridges.push(item);
@@ -618,8 +621,11 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
               SUPPORTED_BRIDGE_BY_CHAIN
                 .get(form.getFieldValue('bridgeFrom'))
                 ?.filter(bridge => {
-                // filter Cosmos Hub bridge from testnet
-                  return !(isTestnet && bridge.label === SupportedChainName.COSMOS_HUB);
+                // filter Cosmos Hub from testnet or missing ATOM asset
+                  return !(
+                    (isTestnet && bridge.label === SupportedChainName.COSMOS_HUB) 
+                    || (!atomAsset && bridge.label === SupportedChainName.COSMOS_HUB)
+                  );
                 })
                 ?.map(bridge => {
                   return (
