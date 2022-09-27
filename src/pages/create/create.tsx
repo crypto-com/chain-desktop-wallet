@@ -36,8 +36,6 @@ import logo from '../../assets/logo-products-chain.svg';
 import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPopup';
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-// import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
-// import PasswordFormContainer from '../../components/PasswordForm/PasswordFormContainer';
 import BackButton from '../../components/BackButton/BackButton';
 import { secretStoreService } from '../../service/storage/SecretStoreService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
@@ -64,7 +62,6 @@ import {
   DerivationPathStandard,
   LedgerSigner,
 } from '../../service/signers/LedgerSigner';
-// import IconCosmos from '../../svg/IconCosmos';
 
 let waitFlag = false;
 const layout = {
@@ -1249,53 +1246,6 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
             )}
           </>
         </ErrorModalPopup>
-        {/* <LedgerModalPopup
-          isModalVisible={isCosmosModalVisible}
-          handleCancel={handleCosmosCancel}
-          handleOk={handleCosmosOk}
-          title={
-            isLedgerCosmosAppConnected
-              ? t('create.ledgerModalPopup.tendermintAddress.title1')
-              : t('create.ledgerModalPopup.tendermintAddress.title2')
-          }
-          footer={[
-            isLedgerCosmosAppConnected ? (
-              <></>
-            ) : (
-              <Button
-                type="primary"
-                size="small"
-                className="btn-restart"
-                onClick={() => {
-                  handleCosmosOk();
-                  setIsLedgerModalButtonLoading(true);
-                  setTimeout(() => {
-                    checkIsLedgerCosmosAppConnected();
-                  }, 500);
-                }}
-                loading={isLedgerModalButtonLoading}
-              // style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
-              >
-                {t('general.connect')}
-              </Button>
-            ),
-          ]}
-          image={isLedgerCosmosAppConnected ? <SuccessCheckmark /> : <IconLedger />}
-        >
-          <div className="description">
-            {isLedgerCosmosAppConnected ? (
-              t('create.ledgerModalPopup.tendermintAddress.description1')
-            ) : (
-              <>
-                {t('create.ledgerModalPopup.tendermintAddress.description3')}
-                <div className="ledger-app-icon">
-                  <IconCosmos style={{ color: '#fff' }} />
-                </div>
-                Cosmos App
-              </>
-            )}
-          </div>
-        </LedgerModalPopup> */}
         <LedgerModalPopup
           isModalVisible={isCroModalVisible}
           handleCancel={handleCroCancel}
