@@ -557,7 +557,6 @@ const AssetsPage = () => {
           return (
             <>
               <a
-                style={{ marginLeft: '20px' }}
                 onClick={() => {
                   setTimeout(() => {
                     onAddMissingAsset(record);
