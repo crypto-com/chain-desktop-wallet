@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.3.2] - 2022-09-28
+### Additions
+- Optionalize import of Cosmos Hub ATOM in Ledger wallet
+- Revise migration flow for new assets
+- Rebrand Cronos Chain
+### Bug Fixes
+- App crash when Cosmos Hub ATOM not migrated in Bridge Transfer
+- Invalid Gas Token on various Tendermint related operations
 ## [v1.3.1] - 2022-09-08
 ### Bug Fixes
 - Incorrect WalletConnect URL scheme
