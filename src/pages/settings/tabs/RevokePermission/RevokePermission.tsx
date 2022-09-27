@@ -5,7 +5,7 @@ import { hexZeroPad, Interface } from 'ethers/lib/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ErrorXmark from '../../../../components/ErrorXmark/ErrorXmark';
-import { useCronosEvmAsset } from '../../../../hooks/useCronosEvmAsset';
+import { useCronosEvmAsset } from '../../../../hooks/useAsset';
 import { CronosClient } from '../../../../service/cronos/CronosClient';
 import CRC20TokenContract from '../../../../service/signers/abi/TokenContractABI.json';
 import CRC20TokenList from './CRC20TokenList';

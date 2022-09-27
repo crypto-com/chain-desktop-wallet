@@ -63,7 +63,7 @@ import {
 } from '../../models/Transaction';
 import { AssetIcon } from '../../components/AssetIcon';
 import AssetTypeTooltip from './components/AssetTypeTooltip';
-import { useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
+import { useCronosTendermintAsset } from '../../hooks/useAsset';
 
 import { ChartArea } from './components/ChartArea';
 import {

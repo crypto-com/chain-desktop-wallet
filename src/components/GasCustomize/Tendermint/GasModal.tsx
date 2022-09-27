@@ -21,7 +21,7 @@ import {
 import { getAssetAmountInFiat, UserAsset } from '../../../models/UserAsset';
 import { getNormalScaleAmount } from '../../../utils/NumberUtils';
 import { walletService } from '../../../service/WalletService';
-import { useActiveAsset } from '../../../hooks/useCronosEvmAsset';
+import { useActiveAsset } from '../../../hooks/useAsset';
 import { Session } from '../../../models/Session';
 import { useAnalytics } from '../../../hooks/useAnalytics';
 
@@ -81,6 +81,7 @@ const ModalBody = (props: {
   };
 
   useEffect(() => {
+    console.log('GasModal Tendermint', asset);
     if (!asset) {
       return;
     }
