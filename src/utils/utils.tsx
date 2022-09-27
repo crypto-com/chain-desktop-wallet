@@ -202,12 +202,7 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
         return name;
     }
   } else {
-    switch (name) {
-      case SupportedChainName.CRONOS:
-        return name.replace('Chain', 'Beta');
-      default:
-        return name;
-    }
+    return name;
   }
 }
 

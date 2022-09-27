@@ -13,7 +13,7 @@ import { isHexEqual } from '../../../utils/utils';
 import { TransactionDataParser } from './TransactionDataParser';
 import { ErrorHandler, WebView } from './types';
 import { useChainConfigs } from './useChainConfigs';
-import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
+import { useCronosEvmAsset } from '../../../hooks/useAsset';
 import { EVMChainConfig } from '../../../models/Chain';
 import { getGasPrice } from '../../../service/evm/gas';
 import { getNonce } from '../../../service/evm/nonce';

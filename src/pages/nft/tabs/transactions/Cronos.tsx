@@ -3,7 +3,7 @@ import { ColumnsType } from 'antd/lib/table';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useCronosEvmAsset } from '../../../../hooks/useCronosEvmAsset';
+import { useCronosEvmAsset } from '../../../../hooks/useAsset';
 import { renderExplorerUrl } from '../../../../models/Explorer';
 import { NftTxsResponseTxModel } from '../../../../service/rpc/indexing/nft/cronos/CronosNftIndexingModels';
 import { walletService } from '../../../../service/WalletService';
