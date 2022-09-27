@@ -157,39 +157,22 @@ const convertTransactions = (
 
 const AssetsPage = () => {
   const [session, setSession] = useRecoilState<Session>(sessionState);
-  const [walletAllAssets, setWalletAllAssets] = useRecoilState(
-    walletAllAssetsState,
-  );
-  const [displayAllAssets, setDisplayAllAssets] = useState<UserAsset[]>(
-    walletAllAssets,
-  );
-  const [ledgerConnectedApp, setLedgerConnectedApp] = useRecoilState(
-    ledgerIsConnectedState,
-  );
-  const [isAddingMissingAsset, setIsAddingMissingAsset] = useState<boolean>(
-    false,
-  );
-
-  const cronosTendermintAsset = useCronosTendermintAsset();
-
+  const [walletAllAssets, setWalletAllAssets] = useRecoilState(walletAllAssetsState);
+  const [ledgerConnectedApp, setLedgerConnectedApp] = useRecoilState(ledgerIsConnectedState);
   const allMarketData = useRecoilValue(allMarketState);
   const setNavbarMenuSelectedKey = useSetRecoilState(navbarMenuSelectedKeyState);
   const setFetchingDB = useSetRecoilState(fetchingDBState);
-  const [fetchingComponent, setFetchingComponent] = useRecoilState(
-    fetchingComponentState,
-  );
+  const [fetchingComponent, setFetchingComponent] = useRecoilState(fetchingComponentState);
 
-  // const [isLedger, setIsLedger] = useState(false);
-  const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(
-    session.activeAsset,
-  );
+  const [currentAsset, setCurrentAsset] = useState<UserAsset | undefined>(session.activeAsset);
   const [currentAssetMarketData, setCurrentAssetMarketData] = useState<AssetMarketPrice>();
   const [isAssetVisible, setIsAssetVisible] = useState(false);
   const [activeAssetTab, setActiveAssetTab] = useState('transaction');
   const [allTransactions, setAllTransactions] = useState<any>();
-  const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(
-    false,
-  );
+  const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
+
+  const [assetList, setAssetList] = useState<UserAsset[]>(walletAllAssets);
+  const [isAddingMissingAsset, setIsAddingMissingAsset] = useState<boolean>(false);
 
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
@@ -199,6 +182,7 @@ const AssetsPage = () => {
     from: '',
     identifier: '',
   };
+  const cronosTendermintAsset = useCronosTendermintAsset();
 
   const syncTransactions = async (asset) => {
     setFetchingComponent(true);
@@ -241,29 +225,75 @@ const AssetsPage = () => {
     setFetchingDB(false);
   };
 
-  const onAddMissingAsset = async (asset) => {
+  const addMissingLedgerAsset = async (isBypassValidation?: boolean) => {
+    if (!isAddingMissingAsset && !isBypassValidation) return;
+    
+    if (ledgerConnectedApp === LedgerConnectedApp.CRYPTO_ORG) {
+      switch (`${currentAsset?.assetType}-${currentAsset?.name}`) {
+        case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`: {
+          ledgerNotificationWithoutCheck(
+            UserAssetType.TENDERMINT,
+            SupportedChainName.COSMOS_HUB,
+          );
+          break;
+        }
+        case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`: {
+          ledgerNotificationWithoutCheck(
+            UserAssetType.EVM,
+            SupportedChainName.ETHEREUM,
+          );
+          break;
+        }
+        default:
+      }
+    }
+
+    if (ledgerConnectedApp === LedgerConnectedApp.COSMOS) {
+      const ledgerAddress = await getLedgerAddress(
+        UserAssetType.TENDERMINT,
+        SupportedChainName.COSMOS_HUB,
+      );
+      const atomAsset: UserAsset = {
+        ...ATOM_TENDERMINT_ASSET(session.wallet.config),
+        walletId: session.wallet.identifier,
+        address: ledgerAddress,
+      };
+      await walletService.saveAssets([atomAsset]);
+
+      const allAssets = await walletService.retrieveCurrentWalletAssets(session);
+      setWalletAllAssets(allAssets);
+
+      setIsAddingMissingAsset(false);
+    }
+
+    if (ledgerConnectedApp === LedgerConnectedApp.ETHEREUM) {
+      const ledgerAddress = await getLedgerAddress(
+        UserAssetType.EVM,
+        SupportedChainName.ETHEREUM,
+      );
+      const ethAsset: UserAsset = {
+        ...ETH_ASSET(session.wallet.config),
+        walletId: session.wallet.identifier,
+        address: ledgerAddress,
+      };
+      await walletService.saveAssets([ethAsset]);
+
+      const allAssets = await walletService.retrieveCurrentWalletAssets(session);
+      setWalletAllAssets(allAssets);
+
+      setIsAddingMissingAsset(false);
+    }
+  };
+
+  const onAddMissingAsset = () => {
     if (session.wallet.walletType === NORMAL_WALLET_TYPE) {
       setInputPasswordVisible(true);
     }
     if (session.wallet.walletType === LEDGER_WALLET_TYPE) {
+      setIsAddingMissingAsset(true);
+      // If Crypto.org App has already connected
       if (ledgerConnectedApp === LedgerConnectedApp.CRYPTO_ORG) {
-        switch (`${asset?.assetType}-${asset?.name}`) {
-          case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`: {
-            ledgerNotificationWithoutCheck(
-              UserAssetType.TENDERMINT,
-              SupportedChainName.COSMOS_HUB,
-            );
-            break;
-          }
-          case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`: {
-            ledgerNotificationWithoutCheck(
-              UserAssetType.EVM,
-              SupportedChainName.ETHEREUM,
-            );
-            break;
-          }
-          default:
-        }
+        addMissingLedgerAsset(true);
       } else {
         ledgerNotification(session.wallet, cronosTendermintAsset!);
         setIsAddingMissingAsset(true);
@@ -277,7 +307,7 @@ const AssetsPage = () => {
   ) => {
     const device = createLedgerDevice();
     let ledgerAddress = '';
-    let addressPrefix = 'cro';
+    let addressPrefix = '';
     switch (chainName) {
       case SupportedChainName.COSMOS_HUB:
         addressPrefix = 'cosmos';
@@ -286,6 +316,7 @@ const AssetsPage = () => {
       default:
         addressPrefix = 'cro';
     }
+
     if (
       assetType === UserAssetType.TENDERMINT ||
       assetType === UserAssetType.IBC
@@ -302,15 +333,6 @@ const AssetsPage = () => {
       } else {
         setLedgerConnectedApp(LedgerConnectedApp.CRYPTO_ORG);
       }
-      // notification.close(LedgerNotificationKey);
-      // notification.close(LedgerErrorNotificationKey);
-      // notification.success({
-      //   message: i18n.t('home.ledgerModalPopup.tendermintAsset.title1'),
-      //   description: i18n.t('home.ledgerModalPopup.tendermintAsset.description1'),
-      //   placement: 'topRight',
-      //   duration: 2,
-      //   key: LedgerSuccessNotificationKey,
-      // });
     }
 
     if (
@@ -324,16 +346,8 @@ const AssetsPage = () => {
         false,
       );
       setLedgerConnectedApp(LedgerConnectedApp.ETHEREUM);
-      // notification.close(LedgerNotificationKey);
-      // notification.close(LedgerErrorNotificationKey);
-      // notification.success({
-      //   message: i18n.t('home.ledgerModalPopup.tendermintAsset.title1'),
-      //   description: i18n.t('home.ledgerModalPopup.tendermintAsset.description1'),
-      //   placement: 'topRight',
-      //   duration: 2,
-      //   key: LedgerSuccessNotificationKey,
-      // });
     }
+
     return ledgerAddress;
   };
 
@@ -360,7 +374,7 @@ const AssetsPage = () => {
   });
 
   useEffect(() => {
-    const checkAssets = async () => {
+    const checkMissingStaticAssets = async () => {
       const missingStaticAssets: UserAsset[] = [];
       if (
         !walletAllAssets.find(
@@ -371,7 +385,7 @@ const AssetsPage = () => {
       ) {
         missingStaticAssets.push({
           ...ATOM_TENDERMINT_ASSET(session.wallet.config),
-          walletId: '',
+          walletId: '', // dummy static assets
         });
       }
       if (
@@ -383,77 +397,16 @@ const AssetsPage = () => {
       ) {
         missingStaticAssets.push({
           ...ETH_ASSET(session.wallet.config),
-          walletId: '',
+          walletId: '', // dummy static assets
         });
       }
-      // if (missingStaticAssets) {
-      setDisplayAllAssets([...missingStaticAssets, ...walletAllAssets]);
-      // }
+      setAssetList([...missingStaticAssets, ...walletAllAssets]);
     };
 
-    checkAssets();
+    checkMissingStaticAssets();
   }, walletAllAssets);
 
   useEffect(() => {
-    const addMissingLedgerAsset = async () => {
-      if (!isAddingMissingAsset) return;
-      if (ledgerConnectedApp === LedgerConnectedApp.CRYPTO_ORG) {
-        switch (`${currentAsset?.assetType}-${currentAsset?.name}`) {
-          case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`: {
-            ledgerNotificationWithoutCheck(
-              UserAssetType.TENDERMINT,
-              SupportedChainName.COSMOS_HUB,
-            );
-            break;
-          }
-          case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`: {
-            ledgerNotificationWithoutCheck(
-              UserAssetType.EVM,
-              SupportedChainName.ETHEREUM,
-            );
-            break;
-          }
-          default:
-        }
-      }
-
-      if (ledgerConnectedApp === LedgerConnectedApp.COSMOS) {
-        const ledgerAddress = await getLedgerAddress(
-          UserAssetType.TENDERMINT,
-          SupportedChainName.COSMOS_HUB,
-        );
-        const atomAsset: UserAsset = {
-          ...ATOM_TENDERMINT_ASSET(session.wallet.config),
-          walletId: session.wallet.identifier,
-          address: ledgerAddress,
-        };
-        await walletService.saveAssets([atomAsset]);
-
-        const allAssets = await walletService.retrieveCurrentWalletAssets(session);
-        setWalletAllAssets(allAssets);
-
-        setIsAddingMissingAsset(false);
-      }
-
-      if (ledgerConnectedApp === LedgerConnectedApp.ETHEREUM) {
-        const ledgerAddress = await getLedgerAddress(
-          UserAssetType.EVM,
-          SupportedChainName.ETHEREUM,
-        );
-        const ethAsset: UserAsset = {
-          ...ETH_ASSET(session.wallet.config),
-          walletId: session.wallet.identifier,
-          address: ledgerAddress,
-        };
-        await walletService.saveAssets([ethAsset]);
-
-        const allAssets = await walletService.retrieveCurrentWalletAssets(session);
-        setWalletAllAssets(allAssets);
-
-        setIsAddingMissingAsset(false);
-      }
-    };
-
     addMissingLedgerAsset();
   }, [ledgerConnectedApp]);
 
@@ -599,6 +552,7 @@ const AssetsPage = () => {
             </>
           );
         } else {
+          // Add 'Enable' button for dummy static assets
           return (
             <>
               <a
@@ -925,7 +879,7 @@ const AssetsPage = () => {
             ) : (
               <Table
                 columns={AssetColumns}
-                dataSource={displayAllAssets}
+                dataSource={assetList}
                 className="asset-table"
                 rowKey={(record) => record.identifier}
                 onRow={(selectedAsset) => {
@@ -960,7 +914,8 @@ const AssetsPage = () => {
                   };
                 }}
                 rowClassName={(record) => {
-                  return record.walletId ? '' : 'missing-asset';
+                  // Add class for dummy static assets
+                  return record.walletId ? '' : 'missing-static-asset';
                 }}
                 locale={{
                   triggerDesc: t('general.table.triggerDesc'),
