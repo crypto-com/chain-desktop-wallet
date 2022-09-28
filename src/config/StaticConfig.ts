@@ -31,7 +31,7 @@ export const NOTIFICATION_DEV_CONFIG_FILE_URL =
 // TODO: change this when PR merged to dev
 // export const NOTIFICATION_DEV_CONFIG_FILE_URL = 'https://raw.githubusercontent.com/crypto-com/chain-desktop-wallet/dev/config/notifications/dev.json';
 export const NOTIFICATION_RELEASE_CONFIG_FILE_URL =
-  'https://raw.githubusercontent.com/crypto-com/chain-desktop-wallet/dev/config/notifications/release.json';
+  'https://raw.githubusercontent.com/crypto-com/chain-desktop-wallet/master/config/notifications/release.json';
 
 export const UNBLOCKING_PERIOD_IN_DAYS = {
   UNDELEGATION: {
