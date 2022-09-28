@@ -3,7 +3,7 @@ import './staking.less';
 import 'antd/dist/antd.css';
 import moment from 'moment';
 import { Layout, Table, Tabs } from 'antd';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import numeral from 'numeral';
 
@@ -42,6 +42,7 @@ import { FormDelegationOperations } from './components/FormDelegationOperations'
 import { FormWithdrawStakingReward } from './components/FormWithdrawStakingReward';
 import { FormDelegationRequest } from './components/FormDelegationRequest';
 import { checkIfTestnet } from '../../utils/utils';
+import { useCronosTendermintAsset } from '../../hooks/useAsset';
 
 const { Header, Content, Footer, Sider } = Layout;
 const { TabPane } = Tabs;
@@ -57,7 +58,7 @@ interface UnbondingDelegationTabularData {
 }
 
 const StakingPage = () => {
-  const currentSession = useRecoilValue(sessionState);
+  const [currentSession, setCurrentSession] = useRecoilState(sessionState);
   const userAsset = useRecoilValue(walletAssetState);
   const currentValidatorList = useRecoilValue(validatorListState);
   const fetchingDB = useRecoilValue(fetchingDBState);
@@ -75,6 +76,7 @@ const StakingPage = () => {
   const didMountRef = useRef(false);
 
   const [t, i18n] = useTranslation();
+  const cronosTendermintAsset = useCronosTendermintAsset(); 
   const isTestnet = checkIfTestnet(currentSession.wallet.config.network);
 
   const undelegatePeriod =
@@ -186,16 +188,16 @@ const StakingPage = () => {
 
     setMarketData(
       allMarketData.get(
-        `${userAsset?.assetType}-${userAsset?.mainnetSymbol}-${currentSession.currency}`,
+        `${cronosTendermintAsset?.assetType}-${cronosTendermintAsset?.mainnetSymbol}-${currentSession.currency}`,
       ),
     );
 
     if (!didMountRef.current) {
       didMountRef.current = true;
       moderationConfigHandler();
-      walletService.setCurrentSession({
+      setCurrentSession({
         ...currentSession,
-        activeAsset: userAsset,
+        activeAsset: cronosTendermintAsset,
       });
       analyticsService.logPage('Staking');
     }

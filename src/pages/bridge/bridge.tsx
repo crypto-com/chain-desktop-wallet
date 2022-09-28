@@ -130,7 +130,7 @@ const CronosBridge = props => {
 
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [broadcastResult, setBroadcastResult] = useState<BroadCastResult>({});
-  const [toDestinationAddress, setToDestinationAddress] = useState('');
+  const [toDestinationAddress, setToDestinationAddress] = useState<string | undefined>('');
   const [bridgeTransferDirection, setBridgeTransferDirection] = useState<BridgeTransferDirection>(
     BridgeTransferDirection.NOT_SUPPORT,
   );
@@ -660,7 +660,7 @@ const CronosBridge = props => {
                     <div>{t('bridge.form.destination')}</div>
                     <div className="asset-icon">
                       <BridgeIcon bridgeValue={form.getFieldValue('bridgeTo')} />
-                      {middleEllipsis(toDestinationAddress, 6)}
+                      {middleEllipsis(toDestinationAddress ?? '', 6)}
                     </div>
                   </div>
                 </div>
