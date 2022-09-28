@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { usePasswordModal } from '../../../components/PasswordForm/PasswordFormModal';
-import { useCronosEvmAsset } from '../../../hooks/useCronosEvmAsset';
+import { useCronosEvmAsset } from '../../../hooks/useAsset';
 import { allMarketState, navbarMenuSelectedKeyState, sessionState } from '../../../recoil/atom';
 import { secretStoreService } from '../../../service/storage/SecretStoreService';
 import { walletConnectPeerMetaAtom } from '../../../service/walletconnect/store';

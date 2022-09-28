@@ -751,7 +751,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -793,7 +793,7 @@
       "is_new": true,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -1560,7 +1560,7 @@
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "earn_provider": ["xvvs"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -1938,7 +1938,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -2400,7 +2400,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "ETH",
@@ -2442,7 +2442,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -2905,7 +2905,7 @@
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "earn_provider": ["vvs-vault"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "VVS",
@@ -2949,7 +2949,7 @@
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "earn_provider": ["tectonic"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "TONIC",
@@ -3882,7 +3882,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "AVAX",
@@ -4512,7 +4512,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -4554,7 +4554,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -4974,7 +4974,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -5016,7 +5016,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -5058,7 +5058,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -5100,7 +5100,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -5142,7 +5142,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -5184,7 +5184,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "DOT",
@@ -5604,7 +5604,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "PRQ",
@@ -5646,7 +5646,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "AURORA",
@@ -5688,7 +5688,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "SOL",
@@ -5730,7 +5730,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "FTM",
@@ -5772,7 +5772,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "AKT",
@@ -5856,7 +5856,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "USDC",
@@ -5942,7 +5942,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "MATIC",
@@ -6614,7 +6614,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "ALI",
@@ -6656,7 +6656,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "APE",
@@ -7286,7 +7286,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -8508,7 +8508,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "EOS",
@@ -8550,7 +8550,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "QRDO",
@@ -9523,7 +9523,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "USDT",
@@ -9565,7 +9565,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "DAI",
@@ -9742,7 +9742,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "SHIB",
@@ -10288,7 +10288,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "DERC",
@@ -10330,7 +10330,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "RADAR",
@@ -10372,7 +10372,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "XLM",
@@ -10456,7 +10456,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "PENDLE",
@@ -11390,7 +11390,7 @@
       "is_new": false,
       "withdrawal_eta": ["6 secs"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "CRO",
@@ -11726,7 +11726,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "ADA",
@@ -11819,7 +11819,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "LINK",
@@ -12366,7 +12366,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "MMF",
@@ -12408,7 +12408,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -12660,7 +12660,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -13882,7 +13882,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -15100,7 +15100,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "TUSD",
@@ -15730,7 +15730,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "ENJ",
@@ -15856,7 +15856,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "ELON",
@@ -16360,7 +16360,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "ATOM",
@@ -16824,7 +16824,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "DOGE",
@@ -18000,7 +18000,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -18042,7 +18042,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -18084,7 +18084,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -18798,7 +18798,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "",
@@ -20016,7 +20016,7 @@
       "is_new": false,
       "withdrawal_eta": ["30 secs", "2 mins", "30 mins"],
       "network": "mainnet",
-      "chain_name": "Cronos Beta",
+      "chain_name": "Cronos",
       "chain_position": 0,
       "cdc_mapping": {
         "symbol": "WBTC",

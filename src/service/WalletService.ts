@@ -699,7 +699,6 @@ class WalletService {
     session?: Session,
     tendermintAddress?: string,
     evmAddress?: string,
-    cosmosHubAddress?: string,
   ) {
     // 1. Check if current wallet has all expected static assets
     // 2. If static assets are missing, remove all existing non dynamic assets
@@ -722,22 +721,21 @@ class WalletService {
 
       const walletOps = new WalletOps();
       const assetGeneration = await walletOps.generate(config, wallet.identifier, phrase);
-
+      let initialAssets = assetGeneration.initialAssets;
       if (currentSession?.wallet.walletType === LEDGER_WALLET_TYPE) {
-        if (tendermintAddress !== '' && evmAddress !== '' && cosmosHubAddress !== '') {
-          const tendermintAsset = (await assetGeneration.initialAssets).filter(
+        if (tendermintAddress !== '' && evmAddress !== '') {
+          const tendermintAsset = initialAssets.filter(
             asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO',
           )[0];
           tendermintAsset.address = tendermintAddress;
-          const evmAsset = (await assetGeneration.initialAssets).filter(
+          const evmAsset = initialAssets.filter(
             asset => asset.assetType === UserAssetType.EVM,
           )[0];
           evmAsset.address = evmAddress;
-          const cosmosHubAsset = (await assetGeneration.initialAssets).filter(
-            asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'ATOM',
-          )[0];
-          cosmosHubAsset.address = cosmosHubAddress;
-
+          initialAssets = initialAssets.filter(
+            asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO'
+            || asset.assetType === UserAssetType.EVM
+          );
         } else {
           // eslint-disable-next-line no-console
           console.log('FAILED_TO_GET_LEDGER_ADDRESSES');
@@ -745,9 +743,9 @@ class WalletService {
         }
       }
 
-      await this.saveAssets(await assetGeneration.initialAssets);
+      await this.saveAssets(initialAssets);
 
-      const activeAsset = (await assetGeneration.initialAssets)[0];
+      const activeAsset = initialAssets[0];
       const newSession = new Session({ ...wallet, config: config }, activeAsset);
       await this.setCurrentSession(newSession);
 

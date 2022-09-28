@@ -1,7 +1,7 @@
 import { Select } from 'antd';
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { useCronosEvmAsset, useCronosTendermintAsset } from '../../../hooks/useCronosEvmAsset';
+import { useCronosEvmAsset, useCronosTendermintAsset } from '../../../hooks/useAsset';
 import { UserAsset } from '../../../models/UserAsset';
 import { sessionState } from '../../../recoil/atom';
 import { checkIfTestnet } from '../../../utils/utils';

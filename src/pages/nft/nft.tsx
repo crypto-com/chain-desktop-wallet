@@ -98,7 +98,7 @@ import IconPlayer from '../../svg/IconPlayer';
 import nftThumbnail from '../../assets/nft-thumbnail.png';
 
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
-import { useCronosEvmAsset, useCronosTendermintAsset } from '../../hooks/useCronosEvmAsset';
+import { useCronosEvmAsset, useCronosTendermintAsset } from '../../hooks/useAsset';
 import GasStepSelectTendermint, {
   GasInfoTendermint,
 } from '../../components/GasCustomize/Tendermint/GasConfig';
@@ -917,7 +917,7 @@ const NftPage = () => {
     amount: '',
     memo: '',
   });
-  const currentSession = useRecoilValue(sessionState);
+  const [currentSession, setCurrentSession] = useRecoilState(sessionState);
   const [walletAsset, setWalletAsset] = useRecoilState(walletAssetState);
   const [ledgerIsExpertMode, setLedgerIsExpertMode] = useRecoilState(ledgerIsExpertModeState);
   const [nftList, setNftList] = useRecoilState(nftListState);
@@ -1116,6 +1116,10 @@ const NftPage = () => {
     if (!didMountRef.current) {
       didMountRef.current = true;
       analyticsService.logPage('NFT');
+      setCurrentSession({
+        ...currentSession,
+        activeAsset: cronosTendermintAsset,
+      });
     }
   }, [fetchingDB, nftList]);
 

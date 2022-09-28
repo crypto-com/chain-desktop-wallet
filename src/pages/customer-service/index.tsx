@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useIntercom } from 'react-use-intercom';
-import { useCronosEvmAsset } from '../../hooks/useCronosEvmAsset';
+import { useCronosEvmAsset } from '../../hooks/useAsset';
 import i18n from '../../language/I18n';
 import { postLocalNotification } from '../../service/notification';
 
