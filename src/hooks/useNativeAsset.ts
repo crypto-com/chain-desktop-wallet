@@ -13,7 +13,7 @@ export const useNativeAsset = (asset: UserAsset) => {
 
   const nativeAsset = useMemo(() => {
     if (_.size(asset.contractAddress) < 1) {
-      return nativeAssets.find(a => a.symbol === asset.symbol);
+      return nativeAssets.find(a => a.symbol === asset.symbol && a.assetType === asset.assetType);
     }
 
     if (asset.assetType === UserAssetType.CRC_20_TOKEN) {
@@ -23,7 +23,6 @@ export const useNativeAsset = (asset: UserAsset) => {
     if (asset.assetType === UserAssetType.ERC_20_TOKEN) {
       return nativeAssets.find(a => a.assetType === UserAssetType.EVM && a.mainnetSymbol === 'ETH' );
     }
-
 
     return nativeAssets.find(a => a.assetType === UserAssetType.TENDERMINT && a.mainnetSymbol === 'CRO' );
   
