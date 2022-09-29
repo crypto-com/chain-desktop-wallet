@@ -62,6 +62,7 @@ const CRC20TokenList = ({
   const { show: showPasswordModal } = usePasswordModal();
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [selectedData, setSelectedData] = useState<TokenDataWithApproval>();
+  const [isTokenApprovalLoading, setIsTokenApprovalLoading] = useState(false);
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
   const transactionPrepareService = new TransactionPrepareService(walletService.storageService);
 
@@ -330,6 +331,7 @@ const CRC20TokenList = ({
               );
 
               setIsConfirmLoading(false);
+              setIsTokenApprovalLoading(false);
               setTxEvent(undefined);
               setSelectedData(undefined);
               message.success('Revoke success');
@@ -338,21 +340,23 @@ const CRC20TokenList = ({
             } catch (error) {
               message.error(((error as unknown) as any).toString());
               setIsConfirmLoading(false);
+              setIsTokenApprovalLoading(false);
             }
           }}
           onCancel={() => {
             setIsConfirmLoading(false);
+            setIsTokenApprovalLoading(false);
             setRequestConfirmationVisible(false);
           }}
         />
       )}
       {selectedData && (
         <ConfirmModal
-          closable={!isConfirmLoading}
-          isLoading={isConfirmLoading}
+          closable={!isTokenApprovalLoading}
+          isLoading={isTokenApprovalLoading}
           onCancel={() => {
             setSelectedData(undefined);
-            setIsConfirmLoading(false);
+            setIsTokenApprovalLoading(false);
           }}
           onConfirm={async () => {
             const data = selectedData;
@@ -360,7 +364,7 @@ const CRC20TokenList = ({
               return;
             }
 
-            setIsConfirmLoading(true);
+            setIsTokenApprovalLoading(true);
 
             const tokenAddress = data.token.contract.address;
             // eslint-disable-next-line prefer-destructuring
