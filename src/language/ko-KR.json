@@ -401,6 +401,7 @@
   "bridge.form.toAddress": "수신인 주소：",
   "bridge.form.toAddressLabel": "수신인 주소",
   "bridge.form.customAddress.message": "지정된 주소로 송금하고 싶습니다",
+  "bridge.form.customAddress.disclaimer": "중앙 교환 지갑 주소를 사용하지 마십시",
   "bridge.form.transfer": "전송 자산",
   "bridge.form.receiving": "수신 중",
   "bridge.form.disclaimer": "계속 진행함으로써 이용 약관에 동의함을 인정합니다.",

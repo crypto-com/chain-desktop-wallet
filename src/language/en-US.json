@@ -403,6 +403,7 @@
   "bridge.form.toAddress": "To Address: ",
   "bridge.form.toAddressLabel": "Destination Address",
   "bridge.form.customAddress.message": "I want to send funds to a custom destination address.",
+  "bridge.form.customAddress.disclaimer": "Please do not use centralized exchange wallet addresses.",
   "bridge.form.transfer": "Transfer Asset",
   "bridge.form.receiving": "Receiving",
   "bridge.form.disclaimer": "By proceeding, I hereby acknowledge that I agree to the terms and conditions.",
