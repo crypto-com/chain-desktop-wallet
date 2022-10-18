@@ -199,6 +199,10 @@ const StakingPage = () => {
         ...currentSession,
         activeAsset: cronosTendermintAsset,
       });
+      walletService.setCurrentSession({
+        ...currentSession,
+        activeAsset: cronosTendermintAsset,
+      });
       analyticsService.logPage('Staking');
     }
   }, [fetchingDB, currentValidatorList, userAsset]);

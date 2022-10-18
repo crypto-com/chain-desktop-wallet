@@ -32,7 +32,7 @@ export function getUINormalScaleAmount(
   decimals: number,
   decimalPoint?: number,
 ): string {
-  const exp = Big(10).pow(decimals);
+  const exp = Big(10).pow(decimals || 1);
   const dp = decimalPoint || 4;
   return Big(amount || '0')
     .div(exp)
@@ -41,9 +41,9 @@ export function getUINormalScaleAmount(
 
 // For very small transactions amounts => do show up to max decimal numbers
 export function getUIDynamicAmount(amount: string = '0', currentAsset: UserAsset) {
-  let finalAmount = getUINormalScaleAmount(amount, currentAsset.decimals, 4);
+  let finalAmount = getUINormalScaleAmount(amount, currentAsset?.decimals ?? 1, 4);
   if (Big(finalAmount).lte(Big(1))) {
-    finalAmount = getUINormalScaleAmount(amount, currentAsset.decimals, 8);
+    finalAmount = getUINormalScaleAmount(amount, currentAsset?.decimals ?? 1, 8);
   }
   return finalAmount;
 }
