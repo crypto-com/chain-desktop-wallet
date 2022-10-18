@@ -143,7 +143,7 @@ const GovernancePage = () => {
     }),
   );
   const customMaxValidator0 = TransactionUtils.maxValidator(
-    getUIDynamicAmount(userAsset.balance, userAsset),
+    getUIDynamicAmount(userAsset?.balance, userAsset),
     t('governance.modal2.form.input.proposalDeposit.max2.error'),
   );
   const customMinValidator = TransactionUtils.minValidator(
@@ -152,14 +152,14 @@ const GovernancePage = () => {
       .concat(' ')
       .concat(minDeposit)
       .concat(' ')
-      .concat(userAsset.symbol)
+      .concat(userAsset?.symbol)
       .concat(' ')
       .concat(t('governance.modal2.form.input.proposalDeposit.min.error2')),
   );
 
   const resetCreateProposalForm = () => {
     form.resetFields();
-    const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
+    const usersBalance = getUIDynamicAmount(userAsset?.balance, userAsset);
     const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
     form.setFieldsValue({ initialDeposit: userDeposit });
     form.validateFields(['initialDeposit']);
@@ -605,7 +605,7 @@ const GovernancePage = () => {
     fetchProposalList();
 
     if (!didMountRef.current) {
-      const usersBalance = getUIDynamicAmount(userAsset.balance, userAsset);
+      const usersBalance = getUIDynamicAmount(userAsset?.balance, userAsset);
       const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
       didMountRef.current = true;
       analyticsService.logPage('Governance');
@@ -844,9 +844,9 @@ const GovernancePage = () => {
               requiredMark={false}
               initialValues={{
                 initialDeposit:
-                  Big(getUIDynamicAmount(userAsset.balance, userAsset)).cmp(Big(minDeposit)) === 1
+                  Big(getUIDynamicAmount(userAsset?.balance, userAsset)).cmp(Big(minDeposit)) === 1
                     ? minDeposit
-                    : getUIDynamicAmount(userAsset.balance, userAsset),
+                    : getUIDynamicAmount(userAsset?.balance, userAsset),
                 proposalType: 'text_proposal',
               }}
               onFinish={() => {
@@ -931,20 +931,20 @@ const GovernancePage = () => {
               >
                 <InputNumber
                   placeholder={`${t('governance.modal2.form.input.proposalDeposit.placeholder')} ${
-                    userAsset.symbol
+                    userAsset?.symbol
                   } ${t('governance.modal2.form.input.proposalDeposit.placeholder2')}`}
-                  addonAfter={userAsset.symbol}
+                  addonAfter={userAsset?.symbol}
                 />
               </Form.Item>
               <div className="note">
                 {t('governance.modal2.form.proposalDeposit.warning')} {minDeposit}{' '}
-                {userAsset.symbol}
+                {userAsset?.symbol}
               </div>
 
               <div className="avail-bal-container">
                 <div className="avail-bal-txt">{t('governance.modal2.form.balance')}</div>
                 <div className="avail-bal-val">
-                  {getUIDynamicAmount(userAsset.balance, userAsset)} {userAsset.symbol}
+                  {getUIDynamicAmount(userAsset?.balance, userAsset)} {userAsset?.symbol}
                 </div>
               </div>
 

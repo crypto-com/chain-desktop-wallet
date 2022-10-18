@@ -81,7 +81,7 @@ export const ProposalView = (props: any) => {
     }),
   );
   const customMaxValidator0 = TransactionUtils.maxValidator(
-    getUIDynamicAmount(userAsset.balance, userAsset),
+    getUIDynamicAmount(userAsset?.balance, userAsset),
     t('governance.modal2.form.input.proposalDeposit.max2.error'),
   );
   const customAmountValidator = TransactionUtils.validTransactionAmountValidator();
@@ -543,14 +543,14 @@ export const ProposalView = (props: any) => {
                 >
                   <InputNumber
                     placeholder={`${t('governance.proposalView.modal3.placeholder')}`}
-                    addonAfter={userAsset.symbol}
+                    addonAfter={userAsset?.symbol}
                   />
                 </Form.Item>
 
                 <div className="avail-bal-container">
                   <div className="avail-bal-txt">{t('governance.modal2.form.balance')}</div>
                   <div className="avail-bal-val">
-                    {getUIDynamicAmount(userAsset.balance, userAsset)} {userAsset.symbol}
+                    {getUIDynamicAmount(userAsset?.balance, userAsset)} {userAsset?.symbol}
                   </div>
                 </div>
               </Form>
@@ -594,15 +594,15 @@ export const ProposalView = (props: any) => {
                 <div className="field">{t('home.transactions.table1.fromAddress')} </div>
                 <div className="value">
                   <a
-                    data-original={userAsset.address}
+                    data-original={userAsset?.address}
                     target="_blank"
                     rel="noreferrer"
                     href={`${renderExplorerUrl(
                       currentSession.activeAsset?.config ?? currentSession.wallet.config,
                       'address',
-                    )}/${userAsset.address}`}
+                    )}/${userAsset?.address}`}
                   >
-                    {userAsset.address}
+                    {userAsset?.address}
                   </a>
                 </div>
               </div>

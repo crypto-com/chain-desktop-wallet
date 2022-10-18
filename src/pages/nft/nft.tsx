@@ -789,7 +789,7 @@ const FormMintNft = () => {
                     multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1),
                     walletAsset.decimals,
                   )}{' '}
-                  {walletAsset.symbol}
+                  {walletAsset?.symbol}
                 </div>
               </div>
               <GasInfoTendermint />
@@ -804,7 +804,7 @@ const FormMintNft = () => {
                       <Content>
                         {`${t('nft.modal1.notice2')} ${getUINormalScaleAmount(
                           multiplyFee(networkFee, !isDenomIdIssued ? 2 : 1),
-                          walletAsset.decimals,
+                          walletAsset?.decimals,
                         )} ${walletAsset.symbol} ${t('nft.modal1.notice3')}`}
                       </Content>
                     </Layout>
@@ -1673,7 +1673,7 @@ const NftPage = () => {
                       key="submit"
                       type="primary"
                       htmlType="submit"
-                      disabled={new Big(networkFee).gt(walletAsset.balance)}
+                      disabled={new Big(networkFee).gt(walletAsset?.balance ?? 0)}
                       onClick={() => {
                         form.submit();
                       }}
@@ -1829,7 +1829,7 @@ const NftPage = () => {
                           />
                         )}
                       </Form>
-                      {new Big(networkFee).gt(walletAsset.balance) ? (
+                      {new Big(networkFee).gt(walletAsset?.balance ?? 0) ? (
                         <div className="item notice">
                           <Layout>
                             <Sider width="20px">
@@ -1838,8 +1838,8 @@ const NftPage = () => {
                             <Content>
                               {`${t('nft.modal1.notice2')} ${getUINormalScaleAmount(
                                 networkFee,
-                                walletAsset.decimals,
-                              )} ${walletAsset.symbol} ${t('nft.modal1.notice3')}`}
+                                walletAsset?.decimals,
+                              )} ${walletAsset?.symbol} ${t('nft.modal1.notice3')}`}
                             </Content>
                           </Layout>
                         </div>
