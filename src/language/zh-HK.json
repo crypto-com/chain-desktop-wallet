@@ -403,6 +403,7 @@
   "bridge.form.toAddress": "收款人地址：",
   "bridge.form.toAddressLabel": "收款人地址",
   "bridge.form.customAddress.message": "我想轉移至另一自定收款人地址",
+  "bridge.form.customAddress.disclaimer": "請不要轉移至任何中心化交易所地址",
   "bridge.form.transfer": "轉移資產",
   "bridge.form.receiving": "將會收到",
   "bridge.form.disclaimer": "我同意條款及細則。",

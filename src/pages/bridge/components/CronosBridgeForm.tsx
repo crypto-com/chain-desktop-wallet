@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import './CronosBridgeForm.less';
-import { Button, Checkbox, Form, InputNumber, Select } from 'antd';
-import { SwapOutlined } from '@ant-design/icons';
+import { Alert, Button, Checkbox, Form, InputNumber, Select } from 'antd';
+import { ExclamationCircleOutlined, SwapOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,7 @@ import { fromScientificNotation, getCurrentMinAssetAmount } from '../../../utils
 import { AnalyticsService } from '../../../service/analytics/AnalyticsService';
 import { BridgeService } from '../../../service/bridge/BridgeService';
 import { walletService } from '../../../service/WalletService';
-import { 
+import {
   BridgeTransferDirection,
   SUPPORTED_BRIDGE_BY_CHAIN,
   SupportedBridge,
@@ -60,7 +60,7 @@ interface CronosBridgeFormProps {
   setCurrentAsset: (asset: UserAsset | undefined) => void;
   toAsset: UserAsset | undefined;
   setToAsset: (asset: UserAsset | undefined) => void;
-  showPasswordInput: () => void; 
+  showPasswordInput: () => void;
   toAddress: string | undefined;
   setToAddress: (address: string | undefined) => void;
   bridgeTransferDirection: BridgeTransferDirection;
@@ -130,11 +130,11 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
   const isTestnet = checkIfTestnet(session.wallet.config.network);
 
   const getBridgeSupportedAssetList = (direction: BridgeTransferDirection | undefined) => {
-    if(!direction) return [];
+    if (!direction) return [];
 
     let assetType: UserAssetType[];
-    
-    switch(direction){
+
+    switch (direction) {
       case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS:
       case BridgeTransferDirection.COSMOS_HUB_TO_CRONOS:
         assetType = [UserAssetType.TENDERMINT];
@@ -156,14 +156,14 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
       return (
         supportedAssets
           .includes(asset.mainnetSymbol.toUpperCase()) &&
-          assetType.includes(asset.assetType!)
+        assetType.includes(asset.assetType!)
       );
     });
   };
 
   const onSwitchBridge = async () => {
     const { bridgeFrom, bridgeTo } = form.getFieldsValue();
-    const direction : BridgeTransferDirection = BridgeTransferDirection[`${bridgeFrom}_TO_${bridgeTo}`];
+    const direction: BridgeTransferDirection = BridgeTransferDirection[`${bridgeFrom}_TO_${bridgeTo}`];
 
     setCurrentAsset(undefined);
     setCurrentAssetIdentifier(undefined);
@@ -250,7 +250,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
   const onBridgeExchange = () => {
     const { bridgeFrom, bridgeTo } = form.getFieldsValue();
 
-    if(!bridgeFrom || !bridgeTo) return;
+    if (!bridgeFrom || !bridgeTo) return;
 
     const newBridgeFrom = bridgeTo;
     const newBridgeTo = bridgeFrom;
@@ -355,8 +355,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
   );
   const customMinValidator = TransactionUtils.minValidator(
     fromScientificNotation(currentMinAssetAmount),
-    `${t('send.formSend.amount.error2')} ${fromScientificNotation(currentMinAssetAmount)} ${
-      currentAsset?.symbol
+    `${t('send.formSend.amount.error2')} ${fromScientificNotation(currentMinAssetAmount)} ${currentAsset?.symbol
     }`,
   );
 
@@ -621,9 +620,9 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
               SUPPORTED_BRIDGE_BY_CHAIN
                 .get(form.getFieldValue('bridgeFrom'))
                 ?.filter(bridge => {
-                // filter Cosmos Hub from testnet or missing ATOM asset
+                  // filter Cosmos Hub from testnet or missing ATOM asset
                   return !(
-                    (isTestnet && bridge.label === SupportedChainName.COSMOS_HUB) 
+                    (isTestnet && bridge.label === SupportedChainName.COSMOS_HUB)
                     || (!atomAsset && bridge.label === SupportedChainName.COSMOS_HUB)
                   );
                 })
@@ -797,7 +796,22 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
           </Form.Item>
         </div>
       </div>
-
+      {
+        !isToAddressDisabled &&
+        <div className="ant-row ant-form-item">
+          <Alert
+            message={t('bridge.form.customAddress.disclaimer')}
+            style={{ left: '0' }}
+            type="error"
+            showIcon
+            icon={
+              <ExclamationCircleOutlined
+                style={{ color: '#ff4d4f' }}
+              />
+            }
+          />
+        </div>
+      }
       {currentAsset && new Big(sendingAmount).gt(0) ? (
         <div className="review-container">
           <div className="flex-row">

@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.3.3] - 2022-10-18
+### Bug Fixes
+- Potential staking transaction failure on Ledger
+- Increase app stability
 ## [v1.3.2] - 2022-09-28
 ### Additions
 - Optionalize import of Cosmos Hub ATOM in Ledger wallet

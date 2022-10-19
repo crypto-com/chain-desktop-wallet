@@ -317,7 +317,7 @@ const HomePage = () => {
       setWalletAsset(currentAsset);
       setMarketData(
         allMarketData.get(
-          `${currentAsset.assetType}-${currentAsset?.mainnetSymbol}-${sessionData.currency}`,
+          `${currentAsset?.assetType}-${currentAsset?.mainnetSymbol}-${sessionData.currency}`,
         ),
       );
 
