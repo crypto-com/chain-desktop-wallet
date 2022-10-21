@@ -820,6 +820,7 @@
   "settings.revoke.risk": "위험 노출",
   "settings.revoke": "취소",
   "settings.revoke.unlimited": "무제한",
+  "settings.revoke.success": "완화 성공!",
   "settings.noApproval": "승인 데이터가 없습니다",
   "settings.support.title": "지원",
   "settings.support.helpCenter.title": "지원 센터",
