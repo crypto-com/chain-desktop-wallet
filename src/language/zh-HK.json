@@ -823,6 +823,7 @@
   "settings.revoke.risk": "風險敞口",
   "settings.revoke": "撤銷許可",
   "settings.revoke.unlimited": "無限的",
+  "settings.revoke.success": "撤銷許可成功",
   "settings.noApproval": "沒有批准數據",
   "settings.support.title": "支援",
   "settings.support.helpCenter.title": "支援中心",
