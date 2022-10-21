@@ -201,6 +201,7 @@ export const FormSettings = () => {
     setIsButtonLoading(true);
     const deleteDBRequest = indexedDB.deleteDatabase('NeDB');
     deleteDBRequest.onsuccess = () => {
+      localStorage.clear();
       setTimeout(() => {
         ipcRenderer.send('restart_app');
       }, 2000);
