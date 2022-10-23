@@ -823,6 +823,7 @@
   "settings.revoke.risk": "Risk Exposure",
   "settings.revoke": "Revoke",
   "settings.revoke.unlimited": "Unlimited",
+  "settings.revoke.success": "Revoke success!",
   "settings.noApproval": "No Approval Data",
   "settings.support.title": "Support",
   "settings.support.helpCenter.title": "Help Center",
