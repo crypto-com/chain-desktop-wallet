@@ -2,7 +2,7 @@ import WalletConnect from '@walletconnect/client';
 import { IJsonRpcRequest } from '@walletconnect/types';
 import { useCallback, useState } from 'react';
 import { useRecoilState } from 'recoil';
-import { hexToNumber } from 'web3-utils';
+import { hexToNumber, isHex, utf8ToHex } from 'web3-utils';
 import { EVM_MINIMUM_GAS_PRICE } from '../../config/StaticConfig';
 import { useRefCallback } from '../../hooks/useRefCallback';
 import { EVMChainConfig } from '../../models/Chain';
@@ -240,6 +240,9 @@ export const useWalletConnect = () => {
         if (error) {
           throw error;
         }
+        if(!isHex(payload.params[0])) {
+          payload.params[0] = utf8ToHex(payload.params[0]);
+        }
         log('SESSION_REQUEST', payload.params);
         const { peerMeta } = payload.params[0];
         setState({
@@ -260,6 +263,9 @@ export const useWalletConnect = () => {
       });
 
       connector.on('call_request', async (error, payload: IJsonRpcRequest) => {
+        if(!isHex(payload.params[0])) {
+          payload.params[0] = utf8ToHex(payload.params[0]);
+        }
         handleCallRequest.current(error, payload);
       });
 
