@@ -18,6 +18,7 @@ import {
   Tooltip,
   Alert,
   Spin,
+  Switch,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -173,6 +174,7 @@ const AssetsPage = () => {
 
   const [assetList, setAssetList] = useState<UserAsset[]>(walletAllAssets);
   const [isAddingMissingAsset, setIsAddingMissingAsset] = useState<boolean>(false);
+  const [isHideAllAssets, setIsHideAllAssets] = useState<boolean>(true);
 
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
@@ -221,14 +223,14 @@ const AssetsPage = () => {
 
     const allAssets = await walletService.retrieveCurrentWalletAssets(session);
     setWalletAllAssets(allAssets);
-    
+
     setFetchingDB(false);
   };
 
   const addMissingLedgerAsset = async (addingAsset?: UserAsset) => {
     if (!isAddingMissingAsset && !addingAsset) return;
     const asset = addingAsset ?? currentAsset;
-    
+
     if (ledgerConnectedApp === LedgerConnectedApp.CRYPTO_ORG) {
       switch (`${asset?.assetType}-${asset?.name}`) {
         case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`: {
@@ -352,6 +354,10 @@ const AssetsPage = () => {
     return ledgerAddress;
   };
 
+  const onHideAllAssets = () => {
+    setIsHideAllAssets(!isHideAllAssets);
+  };
+
   useEffect(() => {
     const checkDirectedFrom = async () => {
       if (locationState.from === '/home' && session.activeAsset) {
@@ -405,7 +411,17 @@ const AssetsPage = () => {
     };
 
     checkMissingStaticAssets();
-  }, walletAllAssets);
+  }, [walletAllAssets, isHideAllAssets]);
+
+  useEffect(() => {
+    if (isHideAllAssets) {
+      const hiddenAssetList = walletAllAssets.filter( asset => {
+        return asset.isWhitelisted || asset.assetType === UserAssetType.EVM || asset.assetType === UserAssetType.TENDERMINT;
+      });
+
+      setAssetList(hiddenAssetList);
+    }
+  }, [isHideAllAssets]);
 
   useEffect(() => {
     addMissingLedgerAsset();
@@ -875,52 +891,55 @@ const AssetsPage = () => {
                 </Content>
               </Layout>
             ) : (
-              <Table
-                columns={AssetColumns}
-                dataSource={assetList}
-                className="asset-table"
-                rowKey={(record) => record.identifier}
-                onRow={(selectedAsset) => {
-                  if (selectedAsset.walletId) {
-                    return {
-                      onClick: async () => {
-                        setActiveAssetTab('transaction');
-                        setSession({
-                          ...session,
-                          activeAsset: selectedAsset,
-                        });
-                        await walletService.setCurrentSession({
-                          ...session,
-                          activeAsset: selectedAsset,
-                        });
-                        syncTransactions(selectedAsset);
-                        setCurrentAsset(selectedAsset);
-                        setCurrentAssetMarketData(
-                          allMarketData.get(
-                            `${selectedAsset.assetType}-${selectedAsset.mainnetSymbol}-${session.currency}`,
-                          ),
-                        );
-                        setIsAssetVisible(true);
-                      }, // click row
-                    };
-                  }
+              <>
+                <div style={{ float: 'right' }}>{t('assets.button.hide')} <Switch defaultChecked onChange={onHideAllAssets} /></div>
+                <Table
+                  columns={AssetColumns}
+                  dataSource={assetList}
+                  className="asset-table"
+                  rowKey={(record) => record.identifier}
+                  onRow={(selectedAsset) => {
+                    if (selectedAsset.walletId) {
+                      return {
+                        onClick: async () => {
+                          setActiveAssetTab('transaction');
+                          setSession({
+                            ...session,
+                            activeAsset: selectedAsset,
+                          });
+                          await walletService.setCurrentSession({
+                            ...session,
+                            activeAsset: selectedAsset,
+                          });
+                          syncTransactions(selectedAsset);
+                          setCurrentAsset(selectedAsset);
+                          setCurrentAssetMarketData(
+                            allMarketData.get(
+                              `${selectedAsset.assetType}-${selectedAsset.mainnetSymbol}-${session.currency}`,
+                            ),
+                          );
+                          setIsAssetVisible(true);
+                        }, // click row
+                      };
+                    }
 
-                  return {
-                    onClick: () => {
-                      setCurrentAsset(selectedAsset);
-                    },
-                  };
-                }}
-                rowClassName={(record) => {
-                  // Add class for dummy static assets
-                  return record.walletId ? '' : 'missing-static-asset';
-                }}
-                locale={{
-                  triggerDesc: t('general.table.triggerDesc'),
-                  triggerAsc: t('general.table.triggerAsc'),
-                  cancelSort: t('general.table.cancelSort'),
-                }}
-              />
+                    return {
+                      onClick: () => {
+                        setCurrentAsset(selectedAsset);
+                      },
+                    };
+                  }}
+                  rowClassName={(record) => {
+                    // Add class for dummy static assets
+                    return record.walletId ? '' : 'missing-static-asset';
+                  }}
+                  locale={{
+                    triggerDesc: t('general.table.triggerDesc'),
+                    triggerAsc: t('general.table.triggerAsc'),
+                    cancelSort: t('general.table.cancelSort'),
+                  }}
+                />
+              </>
             )}
           </div>
         </div>

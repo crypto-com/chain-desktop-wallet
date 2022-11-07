@@ -390,6 +390,7 @@
   "assets.assetList.table.actionReceive": "接收",
   "assets.moreMenu.nodeConfiguration": "節點設定",
   "assets.whitelist.warning": "此代幣對應的合約地址不在白名單內。請自行承擔使用風險。",
+  "assets.button.hide": "隱藏非白名單的代幣",
   "assets.tx.checkOnExplorer": "在 Explorer 上查看交易歷史",
   "bridge.form.from": "從",
   "bridge.form.to": "至",

@@ -390,6 +390,7 @@
   "assets.assetList.table.actionReceive": "Receive",
   "assets.moreMenu.nodeConfiguration": "Node Configuration",
   "assets.whitelist.warning": "The contract address of this token is not whitelisted. Please use at your own risk.",
+  "assets.button.hide": "Hide non-whitelisted assets",
   "assets.tx.checkOnExplorer": "Check Transaction History on Explorer",
   "bridge.form.from": "From",
   "bridge.form.to": "To",
