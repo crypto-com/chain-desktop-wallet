@@ -242,44 +242,44 @@ function HomeLayout(props: HomeLayoutProps) {
   const [inputPasswordVisible, setInputPasswordVisible] = useState<boolean>(false);
   const [isSessionLockModalVisible, setIsSessionLockModalVisible] = useState<boolean>(false);
 
-  const checkNewlyAddedStaticAssets = (walletSession?: Session) => {
-    if (!walletSession || !walletSession.wallet) {
-      return;
-    }
+  // const checkNewlyAddedStaticAssets = (walletSession?: Session) => {
+  //   if (!walletSession || !walletSession.wallet) {
+  //     return;
+  //   }
 
-    setTimeout(async () => {
-      if (await walletService.checkIfWalletNeedAssetCreation(walletSession)) {
-        const newAssetAddedNotificationKey = 'newAssetAddedNotificationKey';
+  //   setTimeout(async () => {
+  //     if (await walletService.checkIfWalletNeedAssetCreation(walletSession)) {
+  //       const newAssetAddedNotificationKey = 'newAssetAddedNotificationKey';
 
-        const createNewlyAddedAssets = (
-          <Button
-            type="primary"
-            size="small"
-            className="btn-restart"
-            onClick={() => {
-              setNavbarMenuSelectedKey('/assets');
-              setTimeout(() => {
-                history.push('/assets');
-              }, 100);
-              notification.close(newAssetAddedNotificationKey);
-            }}
-            style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
-          >
-            {t('home.createNewAsset.enable')}
-          </Button>
-        );
+  //       const createNewlyAddedAssets = (
+  //         <Button
+  //           type="primary"
+  //           size="small"
+  //           className="btn-restart"
+  //           onClick={() => {
+  //             setNavbarMenuSelectedKey('/assets');
+  //             setTimeout(() => {
+  //               history.push('/assets');
+  //             }, 100);
+  //             notification.close(newAssetAddedNotificationKey);
+  //           }}
+  //           style={{ height: '30px', margin: '0px', lineHeight: 1.0 }}
+  //         >
+  //           {t('home.createNewAsset.enable')}
+  //         </Button>
+  //       );
 
-        notification.info({
-          message: t('home.createNewAsset.notification.message'),
-          description: t('home.createNewAsset.notification.description'),
-          duration: 120,
-          key: newAssetAddedNotificationKey,
-          placement: 'topRight',
-          btn: createNewlyAddedAssets,
-        });
-      }
-    }, 1000);
-  };
+  //       notification.info({
+  //         message: t('home.createNewAsset.notification.message'),
+  //         description: t('home.createNewAsset.notification.description'),
+  //         duration: 120,
+  //         key: newAssetAddedNotificationKey,
+  //         placement: 'topRight',
+  //         btn: createNewlyAddedAssets,
+  //       });
+  //     }
+  //   }, 1000);
+  // };
 
   const checkBridgeConfigs = async (walletSession?: Session) => {
     if (!walletSession || !walletSession.wallet) {
@@ -599,7 +599,7 @@ function HomeLayout(props: HomeLayoutProps) {
         setIsAnnouncementVisible(!announcementShown);
       }, 2000);
 
-      checkNewlyAddedStaticAssets(currentSession);
+      // checkNewlyAddedStaticAssets(currentSession);
       checkCorrectExplorerUrl({
         ...currentSession,
         activeAsset: currentAsset,
