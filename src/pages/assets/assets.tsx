@@ -821,57 +821,55 @@ const AssetsPage = () => {
                       />
                     </TabPane>
                     <TabPane tab={t('assets.tab1')} key="transaction">
-                      {(currentAsset?.assetType === UserAssetType.EVM &&
-                        currentAsset?.mainnetSymbol === 'ETH') ||
+                      {
                         (currentAsset?.assetType === UserAssetType.TENDERMINT &&
                           checkIfTestnet(session.wallet.config.network) &&
-                          currentAsset?.mainnetSymbol === 'ATOM') ||
-                          currentAsset?.assetType === UserAssetType.ERC_20_TOKEN ? (
-                          <div style={{ margin: '20px' }}>
-                            <a
-                              target="__blank"
-                              href={`${renderExplorerUrl(
-                                currentAsset.config,
-                                'address',
-                              )}/${currentAsset.address}`}
-                            >
-                              {t('assets.tx.checkOnExplorer')}
-                            </a>
-                          </div>
-                        ) : (
-                          <Table
-                            columns={TransactionColumns}
-                            dataSource={allTransactions}
-                            className="transaction-table"
-                            rowKey={(record) => record.key}
-                            locale={{
-                              triggerDesc: t('general.table.triggerDesc'),
-                              triggerAsc: t('general.table.triggerAsc'),
-                              cancelSort: t('general.table.cancelSort'),
-                            }}
-                            loading={{
-                              indicator: (
-                                <Spin
-                                  indicator={
-                                    <LoadingOutlined
-                                      style={{ fontSize: 36 }}
-                                      spin
-                                    />
-                                  }
-                                />
-                              ),
-                              spinning: fetchingComponent,
-                            }}
-                            expandable={{
-                              expandedRowRender: (record) => (
-                                <TransactionDetail
-                                  transaction={record}
-                                  session={session}
-                                />
-                              ),
-                            }}
-                          />
-                        )}
+                          currentAsset?.mainnetSymbol === 'ATOM') ? (
+                            <div style={{ margin: '20px' }}>
+                              <a
+                                target="__blank"
+                                href={`${renderExplorerUrl(
+                                  currentAsset.config,
+                                  'address',
+                                )}/${currentAsset.address}`}
+                              >
+                                {t('assets.tx.checkOnExplorer')}
+                              </a>
+                            </div>
+                          ) : (
+                            <Table
+                              columns={TransactionColumns}
+                              dataSource={allTransactions}
+                              className="transaction-table"
+                              rowKey={(record) => record.key}
+                              locale={{
+                                triggerDesc: t('general.table.triggerDesc'),
+                                triggerAsc: t('general.table.triggerAsc'),
+                                cancelSort: t('general.table.cancelSort'),
+                              }}
+                              loading={{
+                                indicator: (
+                                  <Spin
+                                    indicator={
+                                      <LoadingOutlined
+                                        style={{ fontSize: 36 }}
+                                        spin
+                                      />
+                                    }
+                                  />
+                                ),
+                                spinning: fetchingComponent,
+                              }}
+                              expandable={{
+                                expandedRowRender: (record) => (
+                                  <TransactionDetail
+                                    transaction={record}
+                                    session={session}
+                                  />
+                                ),
+                              }}
+                            />
+                          )}
                     </TabPane>
                   </Tabs>
                 </Content>
