@@ -381,8 +381,10 @@ const AssetsPage = () => {
   });
 
   useEffect(() => {
+    let showAssetList: UserAsset[] = walletAllAssets;
+    const missingStaticAssets: UserAsset[] = [];
+
     const checkMissingStaticAssets = async () => {
-      const missingStaticAssets: UserAsset[] = [];
       if (
         !walletAllAssets.find(
           (asset) =>
@@ -407,21 +409,21 @@ const AssetsPage = () => {
           walletId: '', // dummy static assets
         });
       }
-      setAssetList([...missingStaticAssets, ...walletAllAssets]);
+    };
+
+    const hideAssets = () => {
+      if (isHideAllAssets) {
+        showAssetList = walletAllAssets.filter( asset => {
+          return asset.isWhitelisted || asset.assetType === UserAssetType.EVM || asset.assetType === UserAssetType.TENDERMINT;
+        });
+        
+      }
     };
 
     checkMissingStaticAssets();
+    hideAssets();
+    setAssetList([...missingStaticAssets, ...showAssetList]);
   }, [walletAllAssets, isHideAllAssets]);
-
-  useEffect(() => {
-    if (isHideAllAssets) {
-      const hiddenAssetList = walletAllAssets.filter( asset => {
-        return asset.isWhitelisted || asset.assetType === UserAssetType.EVM || asset.assetType === UserAssetType.TENDERMINT;
-      });
-
-      setAssetList(hiddenAssetList);
-    }
-  }, [isHideAllAssets]);
 
   useEffect(() => {
     addMissingLedgerAsset();
