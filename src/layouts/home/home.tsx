@@ -817,7 +817,7 @@ function HomeLayout(props: HomeLayoutProps) {
           await generalConfigService.setIsAppLockedByUser(false);
           setIsSessionLockModalVisible(false);
         }}
-        onSuccess={async password => {
+        onSuccess={async () => {
           await generalConfigService.setIsAppLockedByUser(false);
           notification.info({
             message: t('general.sessionLockModal.notification.message2'),
@@ -826,7 +826,6 @@ function HomeLayout(props: HomeLayoutProps) {
             placement: 'topRight',
           });
           setIsSessionLockModalVisible(false);
-          onWalletDecryptFinishCreateFreshAssets(password);
         }}
         onValidatePassword={async (password: string) => {
           const isValid = await secretStoreService.checkIfPasswordIsValid(password);
