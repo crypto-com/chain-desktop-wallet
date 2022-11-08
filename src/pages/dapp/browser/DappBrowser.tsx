@@ -46,6 +46,7 @@ export interface DappBrowserRef {
   goForward: () => void;
   reload: () => void;
   getCurrentWebStatus: () => WebInfo | undefined;
+  getWebviewRef: () => (Electron.WebviewTag & HTMLWebViewElement) | null;
 }
 
 const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBrowserProps, ref) => {
@@ -95,6 +96,12 @@ const DappBrowser = forwardRef<DappBrowserRef, DappBrowserProps>((props: DappBro
         webviewURL: webviewRef.current?.getURL(),
       };
     },
+    getWebviewRef: () => {
+      if (!isDOMReady) {
+        return null;
+      }
+      return webviewRef.current;
+    }
   }));
 
   const [txEvent, setTxEvent] = useState<

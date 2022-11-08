@@ -488,6 +488,7 @@
   "dapp.chainConfig.reset": "repossess",
   "dapp.chainConfig.resetSuccessfully": "초기화",
   "dapp.chainConfig": "체인 구성",
+  "dapp.clearCache": "Clear WebView 캐시",
   "Wants to Add A Network": "블록 체인 네트워크를 추가하고 싶습니다",
   "Approve": "허용하다",
   "Wants to Switch Network": "블록 체인 네트워크를 전환하고 싶습니다",

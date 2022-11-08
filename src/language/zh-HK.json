@@ -490,6 +490,7 @@
   "dapp.chainConfig.reset": "重置",
   "dapp.chainConfig.resetSuccessfully": "重置成功",
   "dapp.chainConfig": "鏈配置",
+  "dapp.clearCache": "清除 Webview 緩存",
   "Wants to Add A Network": "想要添加一條區塊鍊網絡",
   "Approve": "允許",
   "Wants to Switch Network": "想要切換區塊鍊網絡",

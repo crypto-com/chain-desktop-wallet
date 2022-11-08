@@ -1,16 +1,19 @@
 import * as React from 'react';
-import {
+import Icon, {
   ArrowLeftOutlined,
   ArrowRightOutlined,
   CloseOutlined,
   LoadingOutlined,
+  MoreOutlined,
   ReloadOutlined,
 } from '@ant-design/icons';
-import { Button, Input, Spin } from 'antd';
+import { Button, Dropdown, Input, Menu, Spin } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { IconBookmarkFilled, IconBookmarkNormal } from '../../../../svg/IconBookmark';
 import ChainSelect from '../ChainSelect';
 import './style.less';
+
+type MoreButtonEventName = 'cleanCache'
 
 interface IButtonStates {
   isLoading: boolean;
@@ -25,6 +28,8 @@ interface IButtonStates {
   isBookmarkButtonHighlighted: boolean;
 
   isExitButtonDisabled: boolean;
+
+  isMoreButtonDisabled: boolean;
 }
 
 interface IAddressBarProps {
@@ -35,6 +40,7 @@ interface IAddressBarProps {
     onRefreshButtonClick: () => void;
     onBookmarkButtonClick: () => void;
     onExitButtonClick: () => void;
+    onMoreButtonClick: (name: MoreButtonEventName, value: any) => void;
   };
   value: string;
   onInputChange: (value: string) => void;
@@ -107,6 +113,22 @@ const AddressBar = (props: IAddressBarProps) => {
         disabled={buttonStates.isExitButtonDisabled}
         onClick={buttonCallbacks.onExitButtonClick}
       />
+      <Dropdown
+        disabled={buttonStates.isMoreButtonDisabled}
+        overlay={(
+          <Menu onClick={() => {
+            buttonCallbacks.onMoreButtonClick('cleanCache', null);
+          }}>
+            <Menu.Item key="1">
+              {t('dapp.clearCache')}
+            </Menu.Item>
+          </Menu>)}>
+        <Button
+          type="link"
+          icon={<MoreOutlined />}
+          disabled={buttonStates.isMoreButtonDisabled}
+        />
+      </Dropdown>
     </div>
   );
 };

@@ -490,6 +490,7 @@
   "dapp.chainConfig.reset": "重置",
   "dapp.chainConfig.resetSuccessfully": "重置成功",
   "dapp.chainConfig": "链配置",
+  "dapp.clearCache": "清除 Webview 缓存",
   "Wants to Add A Network": "想要添加一条区块链网络",
   "Approve": "允许",
   "Wants to Switch Network": "想要切换区块链网络",
