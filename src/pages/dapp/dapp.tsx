@@ -178,7 +178,7 @@ const DappPage = () => {
           onRefreshButtonClick: () => {
             browserRef.current?.reload();
           },
-          onMoreButtonClick: async (name, value) => {
+          onMoreButtonClick: async (name) => {
             if (name === 'cleanCache') {
               const webRef = browserRef.current?.getWebviewRef();
               const webId = webRef?.getWebContentsId();
