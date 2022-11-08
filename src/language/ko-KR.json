@@ -388,6 +388,7 @@
   "assets.assetList.table.actionReceive": "수신",
   "assets.moreMenu.nodeConfiguration": "노드 설정",
   "assets.whitelist.warning": "이 토큰에 해당하는 계약 주소는 화이트리스트에 없습니다. 사용 위험을 감수하십시오.",
+  "assets.button.hide": "비 교육 자산을 숨기십시오",
   "assets.tx.checkOnExplorer": "탐색기의 거래 기록을 확인하십시오",
   "bridge.form.from": "송신인",
   "bridge.form.to": "수신인",
