@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.3.4] - 2022-11-08
+### Additions
+- Toggle hide and show for non-whitelisted assets
+### Bug Fixes
+- Incorrect balance & address mismatch issues on Ledger type wallet after lock screen
+- WalletConnect failure on Windows
 ## [v1.3.3] - 2022-10-18
 ### Bug Fixes
 - Potential staking transaction failure on Ledger
