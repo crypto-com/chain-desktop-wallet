@@ -1,5 +1,5 @@
 import * as React from 'react';
-import Icon, {
+import {
   ArrowLeftOutlined,
   ArrowRightOutlined,
   CloseOutlined,
