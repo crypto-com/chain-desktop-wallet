@@ -490,6 +490,7 @@
   "dapp.chainConfig.reset": "Reset",
   "dapp.chainConfig.resetSuccessfully": "Reset successfully",
   "dapp.chainConfig": "Chain Config",
+  "dapp.clearCache": "Clear Webview Cache",
   "Wants to Add A Network": "Wants to Add A Network",
   "Approve": "Approve",
   "Wants to Switch Network": "Wants to Switch Network",
