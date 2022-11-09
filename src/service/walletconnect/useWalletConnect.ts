@@ -1,5 +1,6 @@
 import WalletConnect from '@walletconnect/client';
 import { IJsonRpcRequest } from '@walletconnect/types';
+import { isString } from 'lodash';
 import { useCallback, useState } from 'react';
 import { useRecoilState } from 'recoil';
 import { hexToNumber, isHex, utf8ToHex } from 'web3-utils';
@@ -240,9 +241,6 @@ export const useWalletConnect = () => {
         if (error) {
           throw error;
         }
-        if(!isHex(payload.params[0])) {
-          payload.params[0] = utf8ToHex(payload.params[0]);
-        }
         log('SESSION_REQUEST', payload.params);
         const { peerMeta } = payload.params[0];
         setState({
@@ -263,7 +261,7 @@ export const useWalletConnect = () => {
       });
 
       connector.on('call_request', async (error, payload: IJsonRpcRequest) => {
-        if(!isHex(payload.params[0])) {
+        if(isString(payload.params[0]) && !isHex(payload.params[0])) {
           payload.params[0] = utf8ToHex(payload.params[0]);
         }
         handleCallRequest.current(error, payload);
