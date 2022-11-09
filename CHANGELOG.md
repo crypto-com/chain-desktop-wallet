@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ## [v1.3.4] - 2022-11-08
 ### Additions
 - Toggle hide and show for non-whitelisted assets
+- Clear cache capability in DApp Browser
 ### Bug Fixes
 - Incorrect balance & address mismatch issues on Ledger type wallet after lock screen
 - WalletConnect failure on Windows
