@@ -184,12 +184,11 @@ const DappPage = () => {
               const webId = webRef?.getWebContentsId();
               const webContents: Electron.WebContents = remote.webContents.fromId(webId);
               // clean the initial dapp's cache incase of jump
-              await webContents.session.clearStorageData({
-                origin: initialDapp,
-              });
-              await webContents.session.clearStorageData({
-                origin: webRef?.getURL(),
-              });
+              if (initialDapp.length > 0) {
+                await webContents.session.clearStorageData({
+                  origin: initialDapp,
+                });
+              }
 
               setSelectedDapp(undefined);
               setSelectedURL('');
