@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.3.5] - 2022-11-15
+### Bug Fixes
+- Total balance missing in the home page
 ## [v1.3.4] - 2022-11-08
 ### Additions
 - Toggle hide and show for non-whitelisted assets
