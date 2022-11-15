@@ -108,7 +108,7 @@ export class CroMarketApi implements IMarketApi {
     const whitelistedERC20Tokens: string[] = Array.from(ERC20MainnetTokenInfos.keys());
     const allTokensSlugMap: CryptoComSlugResponse[] = await this.loadTokenSlugMap();
 
-    const nativeTokenSlug = ['crypto-com-coin', 'ethereum', 'cosmos'];
+    const nativeTokenSlug = ['cronos', 'ethereum', 'cosmos'];
     const tokenSlugInfo = allTokensSlugMap.filter(tokenSlug => tokenSlug.symbol === mainnetSymbol);
 
     if (!tokenSlugInfo) {
@@ -183,7 +183,7 @@ export class CroMarketApi implements IMarketApi {
     const whitelistedERC20Tokens: string[] = Array.from(ERC20MainnetTokenInfos.keys());
     const allTokensSlugMap: CryptoComSlugResponse[] = await this.loadTokenSlugMap();
 
-    const nativeTokenSlug = ['crypto-com-coin', 'ethereum', 'cosmos'];
+    const nativeTokenSlug = ['cronos', 'ethereum', 'cosmos'];
     const tokenSlugInfo = allTokensSlugMap.filter(tokenSlug => tokenSlug.symbol === mainnetSymbol);
 
     if (!tokenSlugInfo) {
