@@ -48,8 +48,7 @@ export const CRC20MainnetTokenInfos: Map<string, CRC20TokenInfo> = new Map([
     'WCRO',
     {
       address: '0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23',
-      iconURL:
-        'https://s3-ap-southeast-1.amazonaws.com/monaco-cointrack-production/uploads/coin/colorful_logo/5c1248c15568a4017c20aa87/cro.png',
+      iconURL: '',
       isWhitelisted: true,
     },
   ],
