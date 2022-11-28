@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.3.6] - 2022-11-28
+### Additions
+- Update CRO & WCRO icon
 ## [v1.3.5] - 2022-11-15
 ### Bug Fixes
 - Total balance missing in the home page
