@@ -35,7 +35,7 @@
     "@cosmjs/amino": "0.28.10",
     "@cosmjs/crypto": "0.28.7",
     "@cosmjs/launchpad": "0.27.1",
-    "@cosmjs/proto-signing": "0.28.10",
+    "@cosmjs/proto-signing": "0.29.4",
     "@cosmjs/stargate": "0.28.10",
     "@crypto-org-chain/chain-jslib": "1.0.7",
     "@electron/remote": "^2.0.8",
