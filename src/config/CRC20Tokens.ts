@@ -48,6 +48,7 @@ export const CRC20MainnetTokenInfos: Map<string, CRC20TokenInfo> = new Map([
     'WCRO',
     {
       address: '0x5c7f8a570d578ed84e63fdfa7b1ee72deae1ae23',
+      iconURL: '',
       isWhitelisted: true,
     },
   ],
