@@ -130,6 +130,8 @@ export class CosmjsTendermintTransactionSigner extends BaseTransactionSigner
       [{ pubkey, sequence: accountSequence }],
       fee.amount,
       fee.gas,
+      undefined,
+      undefined,
     );
 
     const chainId = asset.config.chainId ?? '';
@@ -222,6 +224,8 @@ export class CosmjsTendermintTransactionSigner extends BaseTransactionSigner
       [{ pubkey, sequence: accountSequence }],
       fee.amount,
       fee.gas,
+      undefined,
+      undefined,
     );
 
     const chainId = asset.config.chainId ?? '';

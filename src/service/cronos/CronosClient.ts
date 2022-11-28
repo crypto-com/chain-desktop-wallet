@@ -23,6 +23,7 @@ import {
   queryPaginationOptions,
   tokenTransfersRequestOptions,
 } from '../rpc/interface/cronos.chainIndex';
+import { ICON_CRO_EVM } from '../../components/AssetIcon';
 
 /**
  * name: CronosClient
@@ -197,6 +198,8 @@ export class CronosClient extends EVMClient implements ICronosChainIndexAPI {
   }
 
   static getTokenIconUrlBySymbol(symbol: string): string {
+    if (symbol === 'WCRO') return ICON_CRO_EVM;
+
     const tokenInfo = CRC20MainnetTokenInfos.get(symbol.toUpperCase());
 
     return tokenInfo?.iconURL ?? '';
