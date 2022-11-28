@@ -147,6 +147,8 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
         [{ pubkey, sequence: transaction.accountSequence }],
         fee.amount,
         fee.gas,
+        undefined,
+        undefined,
         127,
       );
 
@@ -611,6 +613,8 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
         [{ pubkey, sequence: transaction.accountSequence }],
         fee.amount,
         fee.gas,
+        undefined,
+        undefined,
         127,
       );
 
