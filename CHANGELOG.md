@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.3.7] - 2022-12-07
+### Additions
+- Adapt to Christmas Theme
+### Bug Fixes
+- Deprecated NFT asset endpoint
 ## [v1.3.6] - 2022-11-28
 ### Additions
 - Update CRO & WCRO icon
