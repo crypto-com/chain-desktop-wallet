@@ -150,7 +150,16 @@ export class NftUtils {
           });
         }
         if (isCronosNftModel(nft)) {
-          fullNftList.push(nft);
+          const { model } = nft;
+          fullNftList.push({
+            ...nft,
+            model: {
+              ...model,
+              token_address: model.contract_address ?? model.token_address,
+              owner: model.token_owner ?? model.owner,
+              rank: model.rarity_ranking ?? model.rank,
+            }
+          });
         }
       }),
     );

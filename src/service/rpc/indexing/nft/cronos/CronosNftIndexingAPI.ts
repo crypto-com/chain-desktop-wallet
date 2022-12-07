@@ -29,30 +29,39 @@ export class CronosNftIndexingAPI {
   public async getNftList(address: string) {
     const nftList: NftAssetsResponseAssetModel[] = [];
     let paginationPage = 1;
+
+    // Deprecated NCW Blockchain API
+    // const nftAssetsRequest = await this.axiosClient.get<NftAssetsResponse>(
+    //   `/quantra/v1/nft/assets/${address}?chain=cronos&limit=${CronosNftIndexingAPI.pageLimit}&offset=0`,
+    // );
+    // nftList.push(...response.data.nft_assets);
+
+    // NCW NFT API
     const nftAssetsRequest = await this.axiosClient.get<NftAssetsResponse>(
-      `/assets/${address}?chain=cronos&limit=${CronosNftIndexingAPI.pageLimit}&offset=0`,
+      `/nft/api/v1/inner/assets?protocol=cronos&page_size=${CronosNftIndexingAPI.pageLimit}&offset=0&wallet_address=${address.toLowerCase()}`,
     );
+
     const response: NftAssetsResponse = nftAssetsRequest.data;
 
     if (response.code !== 0) {
       return [];
     }
 
-    nftList.push(...response.data.nft_assets);
+    nftList.push(...response.data);
 
     let assetsResponse: NftAssetsResponse = response;
 
-    while (assetsResponse.data.nft_assets.length >= CronosNftIndexingAPI.pageLimit) {
+    while (assetsResponse.data.length >= CronosNftIndexingAPI.pageLimit) {
       // eslint-disable-next-line no-await-in-loop
       const pageNftsListRequest = await this.axiosClient.get<NftAssetsResponse>(
-        `/assets/${address}?chain=cronos&limit=${
+        `/nft/api/v1/inner/assets?protocol=cronos&wallet_address=${address.toLowerCase()}&page_size=${
           CronosNftIndexingAPI.pageLimit
         }&offset=${paginationPage * CronosNftIndexingAPI.pageLimit}`,
       );
       assetsResponse = pageNftsListRequest.data;
       paginationPage++;
       if (assetsResponse.code === 0) {
-        nftList.push(...assetsResponse.data.nft_assets);
+        nftList.push(...assetsResponse.data);
       }
     }
 
@@ -63,7 +72,7 @@ export class CronosNftIndexingAPI {
     const nftTxsList: NftTxsResponseTxModel[] = [];
     let paginationPage = 1;
     const nftTxsRequest = await this.axiosClient.get<NftTxsResponse>(
-      `/txs/${address}?chain=cronos&limit=${CronosNftIndexingAPI.pageLimit}&offset=0`,
+      `/quantra/v1/nft/txs/${address}?chain=cronos&limit=${CronosNftIndexingAPI.pageLimit}&offset=0`,
     );
     const response: NftTxsResponse = nftTxsRequest.data;
 
@@ -78,7 +87,7 @@ export class CronosNftIndexingAPI {
     while (txsResponse.data.nft_txs.length >= CronosNftIndexingAPI.pageLimit) {
       // eslint-disable-next-line no-await-in-loop
       const pageNftsListRequest = await this.axiosClient.get<NftTxsResponse>(
-        `/txs/${address}?chain=cronos&limit=${
+        `/quantra/v1/nft/txs/${address}?chain=cronos&limit=${
           CronosNftIndexingAPI.pageLimit
         }&offset=${paginationPage * CronosNftIndexingAPI.pageLimit}`,
       );

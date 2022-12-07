@@ -157,7 +157,7 @@
     "css-loader": "4.3.0",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
-    "electron": "19.0.0",
+    "electron": "19.1.8",
     "electron-builder": "23.2.0",
     "electron-builder-notarize": "1.5.0",
     "eslint": "7.23.0",
@@ -383,6 +383,8 @@
     "protobufjs": "6.11.3",
     "shell-quote": "1.7.3",
     "minimatch": "3.0.5",
-    "loader-utils": "2.0.4"
+    "loader-utils": "2.0.4",
+    "qs": "6.7.3",
+    "express": "4.17.3"
   }
 }
