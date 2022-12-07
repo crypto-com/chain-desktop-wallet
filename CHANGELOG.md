@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 ### Additions
 - Adapt to Christmas Theme
 ### Bug Fixes
-- Deprecated NFT asset endpoint
+- Deprecated Cronos NFT asset endpoint
 ## [v1.3.6] - 2022-11-28
 ### Additions
 - Update CRO & WCRO icon
