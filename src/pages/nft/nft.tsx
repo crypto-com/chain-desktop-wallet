@@ -1312,12 +1312,12 @@ const NftPage = () => {
                                 <Avatar
                                   style={{
                                     background: NftUtils.generateLinearGradientByAddress(
-                                      model.token_address,
+                                      model.token_address ?? (model.contract_address ?? ''),
                                     ),
                                     verticalAlign: 'middle',
                                   }}
                                 />
-                                {middleEllipsis(model.token_address, 6)}{' '}
+                                {middleEllipsis(model.token_address ?? '', 6)}{' '}
                               </>
                             }
                           />
@@ -1537,7 +1537,7 @@ const NftPage = () => {
                                 <Avatar
                                   style={{
                                     background: NftUtils.generateLinearGradientByAddress(
-                                      nft.model.token_address,
+                                      nft.model.token_address ?? '',
                                     ),
                                     verticalAlign: 'middle',
                                   }}
@@ -1558,6 +1558,12 @@ const NftPage = () => {
                               </>
                             }
                           />
+                        </div>
+                        <div className="item">
+                          <div className="subtitle">{t('nft.detailModal.subtitle')}</div>
+                          <div className="description">
+                            {nft?.model?.description ? nft?.model.description : 'n.a.'}
+                          </div>
                         </div>
                         <div className="item">
                           <div className="subtitle">{t('nft.detailModal.attributes')}</div>
