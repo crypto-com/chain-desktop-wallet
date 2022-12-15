@@ -29,6 +29,13 @@ const { TabPane } = Tabs;
 
 const DappList: Dapp[] = [
   {
+    name: 'Veno Finance',
+    logo: './dapp_logos/veno.png',
+    alt: 'Veno Finance',
+    description: 'Simple and secure liquid staking.',
+    url: 'https://veno.finance/',
+  },
+  {
     name: 'Cronos ID',
     logo: './dapp_logos/cronos_id.png',
     alt: 'Cronos ID',
