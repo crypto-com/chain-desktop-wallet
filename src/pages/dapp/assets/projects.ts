@@ -10,8 +10,7 @@ export type CategoryType =
   | 'Staking'
   | 'Yield Aggregator'
   | 'Yield'
-  | 'Domain'
-  | 'Crowdfunding';
+  | 'Domain';
 
 export const categories: CategoryType[] = [
   'DEX',
@@ -25,8 +24,7 @@ export const categories: CategoryType[] = [
   'Staking',
   'Yield Aggregator',
   'Yield',
-  'Domain',
-  'Crowdfunding'
+  'Domain'
 ];
 
 export interface CronosProject {
@@ -727,62 +725,6 @@ const NFTProjects: CronosProject[] = [
     logo: 'nftlaunch_me.png',
     description: 'NFTLaunch.me aims to democratize the launching and collecting of NFTs, for participants of all walks of life - all over the world.',
     link: 'https://nftlaunch.me/',
-    twitter: '',
-  },
-  {
-    name: 'CroFundsMe',
-    category: ['Crowdfunding'],
-    description: '',
-    logo: 'cronofundsme.png',
-    link: 'https://crofundsme.org/',
-    twitter: '',
-  },
-  {
-    name: 'SnipeHub',
-    category: ['NFT'],
-    description: '',
-    logo: 'snipehub.png',
-    link: 'https://www.snipehub.io/',
-    twitter: '',
-  },
-  {
-    name: 'Cronos Cruisers',
-    category: ['NFT'],
-    description: '',
-    logo: 'cronos_cruiser.png',
-    link: 'https://cronoscruisers.com/',
-    twitter: '',
-  },
-  {
-    name: 'OpenOcean',
-    category: ['DEX'],
-    description: '',
-    logo: 'open_ocean.png',
-    link: 'https://openocean.finance/',
-    twitter: '',
-  },
-  {
-    name: 'Bored Candy City',
-    category: ['DEX'],
-    description: '',
-    logo: 'candy_city.png',
-    link: 'https://candycity.finance/',
-    twitter: '',
-  },
-  {
-    name: 'NFC Market',
-    category: ['NFT'],
-    description: '',
-    logo: 'nfc_marker.png',
-    link: 'https://nfc.market/',
-    twitter: '',
-  },
-  {
-    name: 'Veno Finance',
-    category: ['Staking'],
-    description: '',
-    logo: 'veno.png',
-    link: 'https://veno.finance/',
     twitter: '',
   }
 ];
