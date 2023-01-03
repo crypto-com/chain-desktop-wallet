@@ -24,7 +24,7 @@ import Icon, {
   SettingOutlined,
   LockFilled,
 } from '@ant-design/icons';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilCallback, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -66,6 +66,7 @@ import {
 } from '../../service/LedgerService';
 import {
   LedgerWalletMaximum,
+  LOADING_TIMEOUT,
   MAX_INCORRECT_ATTEMPTS_ALLOWED,
   SHOW_WARNING_INCORRECT_ATTEMPTS,
 } from '../../config/StaticConfig';
@@ -149,6 +150,16 @@ function HomeLayout(props: HomeLayoutProps) {
   const currentLocationPath = useLocation().pathname;
 
   const [t] = useTranslation();
+
+  const callBackFetchingDB = useRecoilCallback(({ snapshot }) => async () => {
+    const fetchingDB = await snapshot.getPromise(fetchingDBState);
+    // Avoid infinite loading spin
+    if(fetchingDB) {
+      setTimeout(() => {
+        setFetchingDB(false);
+      }, LOADING_TIMEOUT);
+    }
+  }, [fetchingDB]);
 
   async function fetchAndSetNewValidators(currentSession) {
     try {
@@ -609,7 +620,6 @@ function HomeLayout(props: HomeLayoutProps) {
 
     if (!didMountRef.current) {
       fetchDB();
-
       if (allPaths.includes(currentLocationPath as NavbarMenuKey)) {
         setNavbarMenuSelectedKey(currentLocationPath as NavbarMenuKey);
       }
@@ -643,6 +653,10 @@ function HomeLayout(props: HomeLayoutProps) {
     menuToBeSelectedKey,
     setMenuToBeSelectedKey,
   ]);
+  
+  useEffect(() => {
+    callBackFetchingDB();
+  }, [fetchingDB]);
 
   const onWalletDecryptFinishCreateFreshAssets = async (password: string) => {
     setFetchingDB(true);
