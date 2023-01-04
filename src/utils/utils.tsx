@@ -7,7 +7,6 @@ import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { Network, WalletConfig, SupportedChainName } from '../config/StaticConfig';
 import { CRC20MainnetTokenInfos } from '../config/CRC20Tokens';
 import { ERC20MainnetTokenInfos } from '../config/ERC20Tokens';
-import { CRONOS_EVM_ASSET, CRONOS_TENDERMINT_ASSET, ETH_ASSET, ATOM_TENDERMINT_ASSET } from '../config/StaticAssets';
 
 export function isElectron() {
   // Renderer process
