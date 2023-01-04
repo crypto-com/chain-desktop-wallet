@@ -34,7 +34,7 @@ import SuccessModalPopup from '../../../components/SuccessModalPopup/SuccessModa
 import ErrorModalPopup from '../../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../../components/PasswordForm/PasswordFormModal';
 
-import { SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
+import { SUPPORTED_CURRENCY, ThemeColor } from '../../../config/StaticConfig';
 
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
@@ -451,7 +451,7 @@ export const FormWithdrawStakingReward = () => {
         return (
           <>
             {record.rewardAmount} <br />
-            <span style={{ color: '#1199fa' }}>{record.rewardMarketPrice}</span>
+            <span style={{ color: ThemeColor.BLUE }}>{record.rewardMarketPrice}</span>
           </>
         );
       },
@@ -650,7 +650,7 @@ export const FormWithdrawStakingReward = () => {
           </div>
           <GasStepSelect asset={walletAsset} />
           <div className="note">
-            <ExclamationCircleOutlined style={{ color: '#1199fa', marginRight: '4px' }} />
+            <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE, marginRight: '4px' }} />
             {t('staking.modal6.note.part1')} <b>{t('staking.modal6.note.part2')}</b>{' '}
             {t('staking.modal6.note.part3')} <b>{t('staking.modal6.note.part4')}</b>{' '}
             {t('staking.modal6.note.part5')}
@@ -727,7 +727,7 @@ export const FormWithdrawStakingReward = () => {
           </div>
           <GasStepSelect asset={walletAsset} />
           <div className="note">
-            <ExclamationCircleOutlined style={{ color: '#1199fa', marginRight: '4px' }} />
+            <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE, marginRight: '4px' }} />
             {t('staking.modal6.note.part1')} <b>{t('staking.modal6.note.part2')}</b>{' '}
             {t('staking.modal6.note.part3')} <b>{t('staking.modal6.note.part4')}</b>{' '}
             {t('staking.modal6.note.part5')}

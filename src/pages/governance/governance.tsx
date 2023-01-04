@@ -45,7 +45,7 @@ import SuccessModalPopup from '../../components/SuccessModalPopup/SuccessModalPo
 import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../service/LedgerService';
-import { DEFAULT_CLIENT_MEMO } from '../../config/StaticConfig';
+import { DEFAULT_CLIENT_MEMO, ThemeColor } from '../../config/StaticConfig';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
@@ -631,7 +631,7 @@ const GovernancePage = () => {
               onClick={() => setIsProposalVisible(false)}
               style={{ fontSize: '16px' }}
             >
-              <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
+              <ArrowLeftOutlined style={{ fontSize: '16px', color: ThemeColor.BLUE }} />{' '}
               <span>
                 <>{t('governance.backToHistory')}</>
               </span>
@@ -660,7 +660,7 @@ const GovernancePage = () => {
               onClick={() => setIsProposalVisible(false)}
               style={{ fontSize: '16px' }}
             >
-              <ArrowLeftOutlined style={{ fontSize: '16px', color: '#1199fa' }} />{' '}
+              <ArrowLeftOutlined style={{ fontSize: '16px', color: ThemeColor.BLUE }} />{' '}
               <span>
                 <>{t('governance.backToList')}</>
               </span>

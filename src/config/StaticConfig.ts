@@ -146,6 +146,11 @@ export const SUPPORTED_LANGUAGE = [
   { value: 'koKR', label: '한국어' },
 ];
 
+export enum ThemeColor {
+  BLUE = '#1199fa',
+  RED = '#f27474'
+}
+
 export interface SupportedCurrency {
   value: string;
   symbol: string;

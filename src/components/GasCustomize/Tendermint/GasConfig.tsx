@@ -3,7 +3,7 @@ import { Form, Tooltip } from 'antd';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../../config/StaticConfig';
+import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT, ThemeColor } from '../../../config/StaticConfig';
 import { useActiveAsset } from '../../../hooks/useAsset';
 
 import { getNormalScaleAmount } from '../../../utils/NumberUtils';
@@ -125,7 +125,7 @@ const GasConfig = (props: { onChange?: (gasLimit: string, networkFee: string) =>
             style={{ cursor: 'pointer' }}
             title={t('sending-crypto-on-blockchain-requires-confirmation')}
           >
-            <ExclamationCircleOutlined style={{ color: '#1199fa', cursor: 'pointer' }} />
+            <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE, cursor: 'pointer' }} />
           </Tooltip>
         </div>
       }

@@ -4,7 +4,7 @@ import { ethers } from 'ethers';
 import * as React from 'react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE } from '../../../config/StaticConfig';
+import { EVM_MINIMUM_GAS_LIMIT, EVM_MINIMUM_GAS_PRICE, ThemeColor } from '../../../config/StaticConfig';
 import { UserAsset } from '../../../models/UserAsset';
 import { getNormalScaleAmount } from '../../../utils/NumberUtils';
 import { useCustomGasModalEVM } from './GasModal';
@@ -138,7 +138,7 @@ const GasConfig = ({ onChange, asset }: IGasConfigProps) => {
             style={{ cursor: 'pointer' }}
             title={t('sending-crypto-on-blockchain-requires-confirmation')}
           >
-            <ExclamationCircleOutlined style={{ color: '#1199fa', cursor: 'pointer' }} />
+            <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE, cursor: 'pointer' }} />
           </Tooltip>
         </div>
       }

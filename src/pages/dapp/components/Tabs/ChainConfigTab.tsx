@@ -12,6 +12,7 @@ import { ChainConfigFormData, ChainConfigFormKeys } from '../../types'; /* lgtm 
 import { useAddChainConfigModal } from '../../hooks/useAddChainConfigModal';
 import { DAppDefaultChainConfigs, isChainDefaultConfig } from '../../../../config/DAppChainConfig';
 import { EVMChainConfig } from '../../../../models/Chain';
+import { ThemeColor } from '../../../../config/StaticConfig';
 
 const ChainConfigTab = () => {
   const {
@@ -68,7 +69,7 @@ const ChainConfigTab = () => {
               paddingTop: '20px',
             }}
           >
-            <InfoCircleOutlined style={{ color: '#f27474', fontSize: '70px' }} />
+            <InfoCircleOutlined style={{ color: ThemeColor.RED, fontSize: '70px' }} />
             <div style={{ fontSize: '24px', fontWeight: 500, marginTop: '15px' }}>
               {t('dapp.chainConfig.message.remove')}
             </div>

@@ -7,6 +7,7 @@ import { useIntercom } from 'react-use-intercom';
 import {
   NOTIFICATION_DEV_CONFIG_FILE_URL,
   NOTIFICATION_RELEASE_CONFIG_FILE_URL,
+  ThemeColor,
 } from '../../config/StaticConfig';
 import useInterval from '../../hooks/useInterval';
 import { useNotification } from '../../service/notification';
@@ -83,7 +84,7 @@ const NotificationCenter = ({ onClick }: INotificationCenterProps) => {
                           width: '8px',
                           height: '8px',
                           borderRadius: '4px',
-                          backgroundColor: '#1199FA',
+                          backgroundColor: ThemeColor.BLUE,
                           marginRight: '10px',
                         }}
                       />
@@ -112,7 +113,7 @@ const NotificationCenter = ({ onClick }: INotificationCenterProps) => {
                       onClick={() => {
                         show();
                       }}
-                      style={{ fontSize: '13px', color: '#1199FA' }}
+                      style={{ fontSize: '13px', color: ThemeColor.BLUE }}
                     >
                       {t('general.notification.viewMessage')}
                     </a>

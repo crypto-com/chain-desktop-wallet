@@ -377,6 +377,7 @@
   "assets.assetTypeTooltip.learnMore": "Learn More",
   "assets.assetTypeTooltip.nativeToken": "{{assetType}} is the native currency of the {{chainName}} chain, where {{nativeToken}} network fees are required to carry out crypto transactions.",
   "assets.assetTypeTooltip.crc20": "{{assetType}} tokens are created and hosted on the {{chainName}} chain, where {{nativeToken}} network fees are required to carry out crypto transactions.",
+  "assets.defaultConfig.tooltip": "You are using a non-default asset settings. Please use with cautious. ",
   "assets.tab1": "Transaction",
   "assets.tab2": "Send",
   "assets.tab3": "Receive",

@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Modal, Tag } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { EVMChainConfig } from '../../../models/Chain';
+import { ThemeColor } from '../../../config/StaticConfig';
 
 export const useSwitchChainModal = () => {
   const [m, setM] = useState({
@@ -49,7 +50,7 @@ export const useSwitchChainModal = () => {
           <div style={{ margin: 'auto', textAlign: 'left', marginTop: '30px' }}>
             <Tag
               color="blue"
-              style={{ padding: '10px', fontSize: '15px', borderRadius: '4px', color: '#1199FA' }}
+              style={{ padding: '10px', fontSize: '15px', borderRadius: '4px', color: ThemeColor.BLUE }}
             >
               {props.config.chainName}
             </Tag>

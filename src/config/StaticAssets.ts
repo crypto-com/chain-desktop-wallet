@@ -18,6 +18,7 @@ export const TESTNET_EVM_EXPLORER_URL = 'https://cronos.org/explorer/testnet3';
 export const MAINNET_ETHEREUM_EXPLORER_URL = 'https://etherscan.io';
 export const ROPSTEN_ETHEREUM_EXPLORER_URL = 'https://ropsten.etherscan.io';
 export const RINKEBY_ETHEREUM_EXPLORER_URL = 'https://rinkeby.etherscan.io';
+export const GOERLI_ETHEREUM_EXPLORER_URL = 'https://goerli.etherscan.io/';
 
 export const MAINNET_TENDERMINT_COSMOS_HUB_EXPLORER_URL = 'https://www.mintscan.io/cosmos';
 export const TESTNET_TENDERMINT_COSMOS_HUB_EXPLORER_URL =
@@ -197,27 +198,25 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
 
   const config: UserAssetConfig = {
     explorer: {
-      tx: isTestnet ? `${RINKEBY_ETHEREUM_EXPLORER_URL}/tx` : `${MAINNET_ETHEREUM_EXPLORER_URL}/tx`,
+      tx: isTestnet ? `${GOERLI_ETHEREUM_EXPLORER_URL}/tx` : `${MAINNET_ETHEREUM_EXPLORER_URL}/tx`,
       address: isTestnet
-        ? `${RINKEBY_ETHEREUM_EXPLORER_URL}/address`
+        ? `${GOERLI_ETHEREUM_EXPLORER_URL}/address`
         : `${MAINNET_ETHEREUM_EXPLORER_URL}/address`,
     },
     explorerUrl: isTestnet
-      ? `${RINKEBY_ETHEREUM_EXPLORER_URL}`
+      ? `${GOERLI_ETHEREUM_EXPLORER_URL}`
       : `${MAINNET_ETHEREUM_EXPLORER_URL}`,
 
-    chainId: isTestnet ? '4' : '1',
+    chainId: isTestnet ? '5' : '1',
 
     fee: { gasLimit: '50000', networkFee: '20000000000' },
-    // TODO: Change this to the production indexing url
     indexingUrl: isTestnet
-      ? 'https://eth-indexing.crypto.org/ethereum/rinkeby/api/v1'
+      ? 'https://eth-indexing.crypto.org/ethereum/goerli/api/v1'
       : 'https://eth-indexing.crypto.org/ethereum/mainnet/api/v1',
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
-    // TODO: Change this to the production node url
     nodeUrl: isTestnet
-      ? 'https://eth-indexing.crypto.org/ethereum/rinkeby/rpc'
+      ? 'https://eth-indexing.crypto.org/ethereum/goerli/rpc'
       : 'https://eth-indexing.crypto.org/ethereum/mainnet/rpc',
     memoSupportDisabled: true,
   };
@@ -242,7 +241,8 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
 };
 
 export const getDefaultUserAssetConfig = (asset: UserAsset | undefined, session: Session) => {
-  if(!asset) return;
+  if(!asset) return null;
+
   const { assetType, name } = asset;
   const { config } = session.wallet; 
 
@@ -258,4 +258,22 @@ export const getDefaultUserAssetConfig = (asset: UserAsset | undefined, session:
     default:
       return null;
   }
+};
+
+export const checkIsDefaultUserAssetConfig = (asset: UserAsset | undefined, session: Session) => {
+  if (!asset) return false;
+
+  const defaultConfig = getDefaultUserAssetConfig(asset, session);
+
+  if (!defaultConfig) return false;
+
+  const { nodeUrl, indexingUrl, chainId } = defaultConfig.config;
+
+  if (
+    nodeUrl === asset.config?.nodeUrl &&
+    indexingUrl === asset.config?.indexingUrl &&
+    chainId === asset.config?.chainId
+  ) return true;
+
+  return false;
 };

@@ -156,6 +156,16 @@ export function getCronosEvmAsset(walletAllAssets: UserAsset[]) {
   });
 }
 
+export function getEthereumEvmAsset(walletAllAssets: UserAsset[]) {
+  return walletAllAssets.find(asset => {
+    return (
+      asset.mainnetSymbol.toUpperCase() === 'ETH' &&
+      asset.name.includes('Ethereum') &&
+      asset.assetType === UserAssetType.EVM
+    );
+  });
+}
+
 export function getCosmosHubTendermintAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
     return (
@@ -197,7 +207,7 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
       case SupportedChainName.COSMOS_HUB:
         return name.replace('Chain', 'Testnet');
       case SupportedChainName.ETHEREUM:
-        return name.replace('Chain', 'Rinkeby Testnet');
+        return name.replace('Chain', 'Goerli Testnet');
       default:
         return name;
     }

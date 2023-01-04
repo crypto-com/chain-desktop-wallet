@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Button, Modal } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { InfoCircleOutlined } from '@ant-design/icons';
+import { ThemeColor } from '../../../../config/StaticConfig';
 
 interface ModalConfig {
   onCancel: () => void;
@@ -47,7 +48,7 @@ export const ConfirmModal = ({ onCancel, onConfirm, isLoading, closable }: Modal
           paddingTop: '20px',
         }}
       >
-        <InfoCircleOutlined style={{ color: '#f27474', fontSize: '70px' }} />
+        <InfoCircleOutlined style={{ color: ThemeColor.RED, fontSize: '70px' }} />
         <div
           style={{
             fontSize: '24px',
