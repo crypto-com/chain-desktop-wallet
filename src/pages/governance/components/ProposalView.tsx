@@ -29,6 +29,7 @@ import { getUIDynamicAmount, getBaseScaledAmount } from '../../../utils/NumberUt
 
 import { renderExplorerUrl } from '../../../models/Explorer';
 import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasConfig';
+import { ThemeColor } from '../../../config/StaticConfig';
 
 const { Header, Content, Sider } = Layout;
 
@@ -431,7 +432,7 @@ export const ProposalView = (props: any) => {
                       percent={parseFloat(allProps?.proposalFigures?.no.rate)}
                       strokeColor={{
                         from: '#ec7777',
-                        to: '#f27474',
+                        to: ThemeColor.RED,
                       }}
                       size="small"
                       status="normal"

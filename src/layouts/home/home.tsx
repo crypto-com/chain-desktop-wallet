@@ -69,6 +69,7 @@ import {
   LOADING_TIMEOUT,
   MAX_INCORRECT_ATTEMPTS_ALLOWED,
   SHOW_WARNING_INCORRECT_ATTEMPTS,
+  ThemeColor,
 } from '../../config/StaticConfig';
 import { generalConfigService } from '../../service/storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
@@ -776,13 +777,13 @@ function HomeLayout(props: HomeLayoutProps) {
             label: conditionalLink('/restore', t('navbar.wallet.restore')),
             key: 'restore-wallet-item',
             className: 'restore-wallet-item',
-            icon: <ReloadOutlined style={{ color: '#1199fa' }} />,
+            icon: <ReloadOutlined style={{ color: ThemeColor.BLUE }} />,
           },
           {
             label: conditionalLink('/create', t('navbar.wallet.create')),
             key: 'create-wallet-item',
             className: 'create-wallet-item',
-            icon: <PlusOutlined style={{ color: '#1199fa' }} />,
+            icon: <PlusOutlined style={{ color: ThemeColor.BLUE }} />,
           },
         ]
         : []),
@@ -792,7 +793,7 @@ function HomeLayout(props: HomeLayoutProps) {
             label: t('navbar.wallet.delete'),
             key: 'delete-wallet-item',
             className: 'delete-wallet-item',
-            icon: <DeleteOutlined style={{ color: '#f27474' }} />,
+            icon: <DeleteOutlined style={{ color: ThemeColor.RED }} />,
           },
         ]
         : []),
@@ -800,7 +801,7 @@ function HomeLayout(props: HomeLayoutProps) {
         label: conditionalLink('/wallet', t('navbar.wallet.list')),
         key: 'wallet-list-item',
         className: 'wallet-list-item',
-        icon: <Icon component={IconWallet} style={{ color: '#1199fa' }} />,
+        icon: <Icon component={IconWallet} style={{ color: ThemeColor.BLUE }} />,
       }, // which is required
     ];
 
@@ -923,7 +924,7 @@ function HomeLayout(props: HomeLayoutProps) {
             className="bottom-icon"
             type="ghost"
             size="large"
-            icon={<LockFilled style={{ color: '#1199fa' }} />}
+            icon={<LockFilled style={{ color: ThemeColor.BLUE }} />}
             onClick={async () => {
               notification.info({
                 message: t('general.sessionLockModal.notification.message1'),

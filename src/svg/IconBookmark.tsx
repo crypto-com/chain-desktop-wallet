@@ -1,7 +1,8 @@
 import * as React from 'react';
+import { ThemeColor } from '../config/StaticConfig';
 
 function IconBookmarkFilled(props: any) {
-  return <Icon attributes={{ ...props, fill: '#1199FA' }} stroke="none" />;
+  return <Icon attributes={{ ...props, fill: ThemeColor.BLUE }} stroke="none" />;
 }
 
 function IconBookmarkNormal(props) {

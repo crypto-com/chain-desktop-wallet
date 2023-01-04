@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Checkbox, Form, Input, Progress } from 'antd';
 import { useTranslation } from 'react-i18next';
 import './PasswordForm.less';
+import { ThemeColor } from '../../config/StaticConfig';
 
 const zxcvbn = require('zxcvbn');
 
@@ -98,7 +99,7 @@ const PasswordForm: React.FC<PasswordFormProps> = props => {
               {t('general.passwordForm.passwordStrength.title')}
               <Progress
                 strokeColor={{
-                  '0%': '#1199fa',
+                  '0%': ThemeColor.BLUE,
                   '100%': '#20bca4',
                 }}
                 format={percent => {

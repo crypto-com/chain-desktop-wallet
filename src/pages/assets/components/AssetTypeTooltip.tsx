@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { UserAsset, UserAssetType } from '../../../models/UserAsset';
 import { getAssetTypeName, getChainName } from '../../../utils/utils';
 import { Session } from '../../../models/Session';
+import { ThemeColor } from '../../../config/StaticConfig';
 
 interface AssetTypeTooltipProps {
   currentAsset: UserAsset | undefined;
@@ -106,7 +107,7 @@ const AssetTypeTooltip: React.FC<AssetTypeTooltipProps> = props => {
       {t('assets.assetTypeTooltip.whatIs')} {getAssetTypeName(currentAsset?.assetType, currentAsset?.symbol)}?
       <Tooltip placement="top" title={tooltipMessage}>
         <ExclamationCircleOutlined
-          style={{ color: '#1199fa', marginLeft: '5px', cursor: 'pointer' }}
+          style={{ color: ThemeColor.BLUE, marginLeft: '5px', cursor: 'pointer' }}
         />
       </Tooltip>
     </div>

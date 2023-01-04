@@ -47,6 +47,7 @@ import { renderExplorerUrl } from '../../models/Explorer';
 import {
   SupportedChainName,
   SUPPORTED_CURRENCY,
+  ThemeColor,
 } from '../../config/StaticConfig';
 import { getUIDynamicAmount } from '../../utils/NumberUtils';
 // import { LEDGER_WALLET_TYPE, createLedgerDevice } from '../../service/LedgerService';
@@ -57,7 +58,7 @@ import TransactionDetail from './components/TransactionDetail';
 import TagMsgType from './components/TagMsgType';
 import FormSend from './components/FormSend';
 import { walletService } from '../../service/WalletService';
-import { checkIfTestnet, getChainName, middleEllipsis } from '../../utils/utils';
+import { checkIfTestnet, checkIsDefaultAssetConfig, getChainName, middleEllipsis } from '../../utils/utils';
 import {
   TransactionDirection,
   TransactionStatus,
@@ -476,13 +477,16 @@ const AssetsPage = () => {
       render: (record) => {
         const { name } = record;
 
+
         return (
-          <Tag
-            style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
-            color="processing"
-          >
-            {getChainName(name, session.wallet.config)}
-          </Tag>
+          <>
+            <Tag
+              style={{ border: 'none', padding: '5px 14px', marginLeft: '10px' }}
+              color="processing"
+            >
+              {getChainName(name, session.wallet.config)}
+            </Tag>
+          </>
         );
       },
     },
@@ -706,7 +710,7 @@ const AssetsPage = () => {
                         style={{ fontSize: '16px' }}
                       >
                         <ArrowLeftOutlined
-                          style={{ fontSize: '16px', color: '#1199fa' }}
+                          style={{ fontSize: '16px', color: ThemeColor.BLUE }}
                         />{' '}
                         {t('assets.backToList')}
                       </div>
@@ -745,6 +749,13 @@ const AssetsPage = () => {
                               session.wallet.config,
                             )}
                           </Tag>
+                          {!checkIsDefaultAssetConfig(currentAsset, session.wallet.config) ? 
+                            <Tooltip placement="top" title={t('assets.defaultConfig.tooltip')}>
+                              <ExclamationCircleOutlined
+                                style={{ color: ThemeColor.RED, marginLeft: '5px', cursor: 'pointer', fontSize: '16px' }}
+                              />
+                            </Tooltip> : ''
+                          }
                         </div>
                         <div className="value">
                           {currentAssetMarketData &&

@@ -4,6 +4,7 @@ import Checkbox from 'antd/lib/checkbox/Checkbox';
 import * as React from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ThemeColor } from '../../../../config/StaticConfig';
 
 interface IDisclaimerModalProps {
   url: string;
@@ -48,11 +49,11 @@ export const DisclaimerModal = (props: IDisclaimerModalProps) => {
           paddingTop: '20px',
         }}
       >
-        <InfoCircleOutlined style={{ color: '#f27474', fontSize: '70px' }} />
+        <InfoCircleOutlined style={{ color: ThemeColor.RED, fontSize: '70px' }} />
         <div style={{ fontSize: '24px', fontWeight: 500, marginTop: '15px' }}>
           {t('dapp.disclaimer.title')}
         </div>
-        <div style={{ fontSize: '14px', color: '#0B142688', padding: '10px', textAlign: 'center' }}>
+        <div style={{ fontSize: '14px', color: '#0B1426', padding: '10px', textAlign: 'center' }}>
           {t('dapp.disclaimer.content1')}
           <br />
           {t('dapp.disclaimer.content2')}

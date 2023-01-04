@@ -7,6 +7,7 @@ import { walletConnectPeerMetaAtom } from '../../../service/walletconnect/store'
 import { useWalletConnect } from '../../../service/walletconnect/useWalletConnect';
 import { useChainConfigs } from '../../dapp/browser/useChainConfigs';
 import ChainSelect from '../../dapp/components/ChainSelect';
+import { ThemeColor } from '../../../config/StaticConfig';
 
 export const ApproveModal = (props: { address: string }) => {
   const { rejectSession, approveSession, state } = useWalletConnect();
@@ -58,7 +59,7 @@ export const ApproveModal = (props: { address: string }) => {
               />
               <div
                 style={{
-                  border: '1px dashed #1199FA',
+                  border: `1px dashed ${ThemeColor.BLUE}`,
                   width: '32px',
                 }}
               />

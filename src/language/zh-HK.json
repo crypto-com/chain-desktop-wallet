@@ -377,6 +377,7 @@
   "assets.assetTypeTooltip.learnMore": "查看更多",
   "assets.assetTypeTooltip.nativeToken": "{{assetType}} 是 {{chainName}} 鏈上的原生代幣，並需要用 {{nativeToken}} 支付網絡費用以進行交易。",
   "assets.assetTypeTooltip.crc20": "{{assetType}} 代幣是在 {{chainName}} 鏈上所創造和運行的代幣，並需要用 {{nativeToken}} 支付網絡費用以進行交易。",
+  "assets.defaultConfig.tooltip": "你正在使用非預設設定，請小心使用。",
   "assets.tab1": "交易",
   "assets.tab2": "發送",
   "assets.tab3": "接收",

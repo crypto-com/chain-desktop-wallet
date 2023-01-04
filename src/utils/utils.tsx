@@ -7,6 +7,7 @@ import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { Network, WalletConfig, SupportedChainName } from '../config/StaticConfig';
 import { CRC20MainnetTokenInfos } from '../config/CRC20Tokens';
 import { ERC20MainnetTokenInfos } from '../config/ERC20Tokens';
+import { CRONOS_EVM_ASSET, CRONOS_TENDERMINT_ASSET, ETH_ASSET, ATOM_TENDERMINT_ASSET } from '../config/StaticAssets';
 
 export function isElectron() {
   // Renderer process
@@ -192,6 +193,40 @@ export function checkIfTestnet(network: Network) {
       network,
     ) || network.defaultNodeUrl.includes('testnet')
   );
+}
+
+export function checkIsDefaultAssetConfig(asset: UserAsset | undefined, config: WalletConfig) {
+  if (!asset) return false;
+  
+  const name = asset.name.indexOf('Chain') === -1 ? `${asset.name} Chain` : asset.name;
+
+  let defaultConfig = CRONOS_TENDERMINT_ASSET(config).config;
+  switch (name) {
+    case SupportedChainName.CRONOS: {
+      defaultConfig = CRONOS_EVM_ASSET(config).config;
+      break;
+    }
+    case SupportedChainName.COSMOS_HUB: {
+      defaultConfig = ATOM_TENDERMINT_ASSET(config).config;
+      break;
+    }
+    case SupportedChainName.ETHEREUM: {
+      defaultConfig = ETH_ASSET(config).config;
+      break;
+    }
+    case SupportedChainName.CRYPTO_ORG: 
+    default:
+  }
+
+  const { nodeUrl, indexingUrl, chainId } = defaultConfig;
+
+  if (
+    nodeUrl === asset.config?.nodeUrl &&
+    indexingUrl === asset.config?.indexingUrl &&
+    chainId === asset.config?.chainId
+  ) return true;
+
+  return false;
 }
 
 // Temporary measure

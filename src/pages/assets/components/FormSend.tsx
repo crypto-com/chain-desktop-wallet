@@ -31,7 +31,7 @@ import {
   fromScientificNotation,
   getCurrentMinAssetAmount,
 } from '../../../utils/NumberUtils';
-import { FIXED_DEFAULT_FEE, SUPPORTED_CURRENCY } from '../../../config/StaticConfig';
+import { FIXED_DEFAULT_FEE, SUPPORTED_CURRENCY, ThemeColor } from '../../../config/StaticConfig';
 import { detectConditionsError, LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 import {
   AnalyticsActions,
@@ -46,6 +46,8 @@ import { AddressBookContact } from '../../../models/AddressBook';
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import GasStepSelect from '../../../components/GasCustomize/GasConfig';
 import GasInfo from '../../../components/GasCustomize/GasInfo';
+import { checkIsDefaultAssetConfig } from '../../../utils/utils';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
 
 const layout = {};
 const tailLayout = {};
@@ -351,6 +353,17 @@ const FormSend: React.FC<FormSendProps> = props => {
           })}
         </NoticeDisclaimer>
       </Form.Item>
+      {/* <Form.Item>
+        {!checkIsDefaultAssetConfig(walletAsset, currentSession.wallet.config) ? 
+          <>
+            <ExclamationCircleOutlined
+              style={{ color: '#f27474', marginRight: '5px', cursor: 'pointer', fontSize: '16px' }}
+            /> 
+            {t('assets.defaultConfig.tooltip')}
+          </>
+          : ''
+        }
+      </Form.Item> */}
       <Form.Item {...tailLayout}>
         <ModalPopup
           isModalVisible={isConfirmationModalVisible}
@@ -422,6 +435,15 @@ const FormSend: React.FC<FormSendProps> = props => {
                   <div>--</div>
                 )}
             </div>
+            {!checkIsDefaultAssetConfig(walletAsset, currentSession.wallet.config) ? 
+              <div className="item">
+                <ExclamationCircleOutlined
+                  style={{ color: ThemeColor.RED, marginRight: '5px', fontSize: '16px' }}
+                /> 
+                {t('assets.defaultConfig.tooltip')}
+              </div>
+              : ''
+            }
           </>
         </ModalPopup>
 

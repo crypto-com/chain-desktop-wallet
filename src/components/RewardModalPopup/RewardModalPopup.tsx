@@ -16,7 +16,7 @@ import {
   getAssetRewardsBalancePrice,
 } from '../../models/UserAsset';
 import { RewardsBalances } from '../../models/Transaction';
-import { SUPPORTED_CURRENCY } from '../../config/StaticConfig';
+import { SUPPORTED_CURRENCY, ThemeColor } from '../../config/StaticConfig';
 import ModalPopup from '../ModalPopup/ModalPopup';
 
 interface RewardModalPopupProps {
@@ -102,7 +102,7 @@ const RewardModalPopup: React.FC<RewardModalPopupProps> = props => {
                 <div className="title">
                   <span>{t('staking.modal4.label5')}</span>
                   <Tooltip placement="top" title={t('staking.modal4.tooltip1')}>
-                    <ExclamationCircleOutlined style={{ color: '#1199fa', marginLeft: '5px' }} />
+                    <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE, marginLeft: '5px' }} />
                   </Tooltip>
                 </div>
                 {walletAsset && (
@@ -124,7 +124,7 @@ const RewardModalPopup: React.FC<RewardModalPopupProps> = props => {
                 <div className="title">
                   <span>{t('staking.modal4.label2')}</span>
                   <Tooltip placement="top" title={t('staking.modal4.tooltip2')}>
-                    <ExclamationCircleOutlined style={{ color: '#1199fa', marginLeft: '5px' }} />
+                    <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE, marginLeft: '5px' }} />
                   </Tooltip>
                 </div>
                 {walletAsset && (
@@ -149,7 +149,7 @@ const RewardModalPopup: React.FC<RewardModalPopupProps> = props => {
                 <div className="title">
                   <span>{t('staking.modal4.label3')}</span>
                   <Tooltip placement="top" title={t('staking.modal4.tooltip3')}>
-                    <ExclamationCircleOutlined style={{ color: '#1199fa', marginLeft: '5px' }} />
+                    <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE, marginLeft: '5px' }} />
                   </Tooltip>
                 </div>
                 {walletAsset && (
@@ -174,7 +174,7 @@ const RewardModalPopup: React.FC<RewardModalPopupProps> = props => {
                 <div className="title">
                   <span>{t('staking.modal4.label4')}</span>
                   <Tooltip placement="top" title={t('staking.modal4.tooltip4')}>
-                    <ExclamationCircleOutlined style={{ color: '#1199fa', marginLeft: '5px' }} />
+                    <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE, marginLeft: '5px' }} />
                   </Tooltip>
                 </div>
                 <div className="quantity">{`${estimatedApy}%`}</div>
