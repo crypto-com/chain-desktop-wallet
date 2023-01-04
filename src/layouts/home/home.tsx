@@ -43,7 +43,7 @@ import {
   NavbarMenuKey,
   updateDownloadedState,
 } from '../../recoil/atom';
-import { ellipsis, checkIfTestnet, getCronosEvmAsset } from '../../utils/utils';
+import { ellipsis, checkIfTestnet, getCronosEvmAsset, getEthereumEvmAsset } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 // import IconSend from '../../svg/IconSend';
@@ -80,7 +80,7 @@ import {
   DefaultMainnetBridgeConfigs,
   DefaultTestnetBridgeConfigs,
 } from '../../service/bridge/BridgeConfig';
-import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
+import { ETH_ASSET, GOERLI_ETHEREUM_EXPLORER_URL, MainNetEvmConfig, MAINNET_ETHEREUM_EXPLORER_URL, TestNetEvmConfig } from '../../config/StaticAssets';
 import { walletConnectStateAtom } from '../../service/walletconnect/store';
 import { WalletConnectModal } from '../../pages/walletconnect/components/WalletConnectModal';
 import IconWalletConnect from '../../svg/IconWalletConnect';
@@ -328,15 +328,23 @@ function HomeLayout(props: HomeLayoutProps) {
 
     const assets = await walletService.retrieveWalletAssets(walletSession.wallet.identifier);
     const cronosAsset = getCronosEvmAsset(assets);
+
+    const ethAsset = getEthereumEvmAsset(assets);
+
     const checkDefaultExplorerUrl = checkIfTestnet(walletSession.wallet.config.network)
       ? TestNetEvmConfig.explorerUrl
       : MainNetEvmConfig.explorerUrl;
+
+    const checkDefaultEthExplorerUrl = checkIfTestnet(walletSession.wallet.config.network)
+      ? GOERLI_ETHEREUM_EXPLORER_URL
+      : MAINNET_ETHEREUM_EXPLORER_URL;
 
     setTimeout(async () => {
       if (
         !walletSession.activeAsset?.config?.explorer ||
         // Check if explorerUrl has been updated with latest default
-        cronosAsset?.config?.explorerUrl !== checkDefaultExplorerUrl
+        cronosAsset?.config?.explorerUrl !== checkDefaultExplorerUrl ||
+        ethAsset?.config?.explorerUrl !== checkDefaultEthExplorerUrl
       ) {
         const updateExplorerUrlNotificationKey = 'updateExplorerUrlNotificationKey';
 
@@ -353,6 +361,7 @@ function HomeLayout(props: HomeLayoutProps) {
         const allWallets = await walletService.retrieveAllWallets();
         allWallets.forEach(async wallet => {
           const isTestnet = checkIfTestnet(wallet.config.network);
+          const defaultEthAssetConfig = ETH_ASSET(wallet.config).config;
 
           const settingsDataUpdate: SettingsDataUpdate = {
             walletId: wallet.identifier,
@@ -377,13 +386,22 @@ function HomeLayout(props: HomeLayoutProps) {
             let nodeUrl = `${asset.config?.nodeUrl ?? wallet.config.nodeUrl}`;
             let indexingUrl = `${asset.config?.indexingUrl ?? wallet.config.indexingUrl}`;
             let explorerUrl = `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}`;
+            let chainId = `${asset.config?.chainId ?? wallet.config.network.chainId}`;
             if (
-              asset.assetType === UserAssetType.EVM ||
+              asset.assetType === UserAssetType.EVM && asset.name.includes('Cronos') ||
               asset.assetType === UserAssetType.CRC_20_TOKEN
             ) {
               nodeUrl = isTestnet ? TestNetEvmConfig.nodeUrl : MainNetEvmConfig.nodeUrl;
               indexingUrl = isTestnet ? TestNetEvmConfig.indexingUrl : MainNetEvmConfig.indexingUrl;
               explorerUrl = isTestnet ? TestNetEvmConfig.explorerUrl : MainNetEvmConfig.explorerUrl;
+            } else if (
+              asset.assetType === UserAssetType.EVM && asset.name.includes('Ethereum') ||
+              asset.assetType === UserAssetType.ERC_20_TOKEN
+            ) {
+              nodeUrl = defaultEthAssetConfig.nodeUrl;
+              indexingUrl = defaultEthAssetConfig.indexingUrl;
+              explorerUrl = defaultEthAssetConfig.explorerUrl;
+              chainId = defaultEthAssetConfig.chainId;
             }
             const newlyUpdatedAsset: UserAsset = {
               ...asset,
@@ -403,6 +421,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   validator: `${explorerUrl}/validator`,
                 },
                 explorerUrl,
+                chainId,
                 fee: {
                   gasLimit: String(asset.config?.fee.gasLimit ?? wallet.config.fee.gasLimit),
                   networkFee: String(asset.config?.fee.networkFee ?? wallet.config.fee.networkFee),
