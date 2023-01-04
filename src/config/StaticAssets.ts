@@ -241,7 +241,8 @@ export const ETH_ASSET = (walletConfig: WalletConfig) => {
 };
 
 export const getDefaultUserAssetConfig = (asset: UserAsset | undefined, session: Session) => {
-  if(!asset) return;
+  if(!asset) return null;
+
   const { assetType, name } = asset;
   const { config } = session.wallet; 
 
@@ -257,4 +258,22 @@ export const getDefaultUserAssetConfig = (asset: UserAsset | undefined, session:
     default:
       return null;
   }
+};
+
+export const checkIsDefaultUserAssetConfig = (asset: UserAsset | undefined, session: Session) => {
+  if (!asset) return false;
+
+  const defaultConfig = getDefaultUserAssetConfig(asset, session);
+
+  if (!defaultConfig) return false;
+
+  const { nodeUrl, indexingUrl, chainId } = defaultConfig.config;
+
+  if (
+    nodeUrl === asset.config?.nodeUrl &&
+    indexingUrl === asset.config?.indexingUrl &&
+    chainId === asset.config?.chainId
+  ) return true;
+
+  return false;
 };
