@@ -82,6 +82,7 @@ import { secretStoreService } from '../../service/storage/SecretStoreService';
 import { BridgeTransferRequest } from '../../service/TransactionRequestModels';
 import IconTransferHistory from '../../svg/IconTransferHistory';
 import { BridgeIcon, ICON_BRIDGE_CRONOS } from '../../components/AssetIcon';
+import { ThemeColor } from '../../config/StaticConfig';
 
 const { Content, Sider } = Layout;
 const { Step } = Steps;
@@ -691,7 +692,7 @@ const CronosBridge = props => {
                     ) : (
                       <Layout>
                         <Sider width="20px">
-                          <ExclamationCircleOutlined style={{ color: '#f27474' }} />
+                          <ExclamationCircleOutlined style={{ color: ThemeColor.RED }} />
                         </Sider>
                         <Content>{t('bridge.step1.notice1')}</Content>
                       </Layout>
@@ -751,7 +752,7 @@ const CronosBridge = props => {
                                 <>
                                   <IconHexagon
                                     style={{
-                                      color: '#1199fa',
+                                      color: ThemeColor.BLUE,
                                       display: 'flex',
                                       justifyContent: 'center',
                                       alignItems: 'center',

@@ -132,6 +132,8 @@ export const VALIDATOR_UPTIME_THRESHOLD = 0.999;
 // 1 year = 60sec * 60 * 24 * 365 = 31536000 sec
 export const SECONDS_OF_YEAR = 31536000;
 
+export const LOADING_TIMEOUT = 20_000;
+
 // Max Incorrect Attempts allowed
 export const MAX_INCORRECT_ATTEMPTS_ALLOWED = 10;
 export const SHOW_WARNING_INCORRECT_ATTEMPTS = 5;
@@ -143,6 +145,11 @@ export const SUPPORTED_LANGUAGE = [
   { value: 'zhCN', label: '简体中文' },
   { value: 'koKR', label: '한국어' },
 ];
+
+export enum ThemeColor {
+  BLUE = '#1199fa',
+  RED = '#f27474'
+}
 
 export interface SupportedCurrency {
   value: string;

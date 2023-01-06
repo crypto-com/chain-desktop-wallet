@@ -8,6 +8,7 @@ import { convertToInternationalCurrencySystem } from '../../../../utils/currency
 import { categories, projects, CronosProject, CategoryType } from '../../assets/projects';
 import { PercentageLabel } from '../PercentageLabel';
 import './style.less';
+import { ThemeColor } from '../../../../config/StaticConfig';
 
 interface ICronosDappsTabProps {
   onClickDapp: (dapp: CronosProject) => void;
@@ -96,7 +97,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
             />
             <span
               style={{
-                color: '#1199FA',
+                color: ThemeColor.BLUE,
               }}
             >
               {project.name}
@@ -181,7 +182,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
       render: (project: CronosProject) => (
         <div>
           {project.category.map(c => (
-            <Tag color="blue" key={c} style={{ borderRadius: '4px', color: '#1199FA' }}>
+            <Tag color="blue" key={c} style={{ borderRadius: '4px', color: ThemeColor.BLUE }}>
               {c}
             </Tag>
           ))}
@@ -245,7 +246,7 @@ const CronosDAppsTab = (props: ICronosDappsTabProps) => {
               onMouseDown={onPreventMouseDown}
               closable={closable}
               onClose={onClose}
-              style={{ marginRight: 3, borderRadius: '4px', color: '#1199FA' }}
+              style={{ marginRight: 3, borderRadius: '4px', color: ThemeColor.BLUE }}
             >
               {label}
             </Tag>

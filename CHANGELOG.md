@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.3.8] - 2023-01-04
+### Additions
+- Migrate to Ethereum Goerli Testnet
+- Warning for non-default Asset Settings
+### Bug Fixes
+- Avoid infinite loading spin
 ## [v1.3.7] - 2022-12-07
 ### Additions
 - Adapt to Christmas Theme

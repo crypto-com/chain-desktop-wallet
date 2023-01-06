@@ -2,6 +2,7 @@ import { StarOutlined } from '@ant-design/icons';
 import { Card } from 'antd';
 import { Content } from 'antd/lib/layout/layout';
 import * as React from 'react';
+import { ThemeColor } from '../../../../config/StaticConfig';
 import { Bookmark } from '../../../../models/DappBrowser';
 import { IconBookmarkFilled } from '../../../../svg/IconBookmark';
 import { useBookmark } from '../../hooks/useBookmark';
@@ -98,7 +99,7 @@ const SavedTab = (props: ISavedTabProps) => {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     fontSize: '12px',
-                    color: '#1199FA',
+                    color: ThemeColor.BLUE,
                     justifySelf: 'flex-end',
                     marginTop: 'auto',
                   }}

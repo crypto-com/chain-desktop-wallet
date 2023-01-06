@@ -21,7 +21,7 @@ import { Session } from '../../models/Session';
 import { walletService } from '../../service/WalletService';
 import { LEDGER_WALLET_TYPE, NORMAL_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
-import { DefaultWalletConfigs } from '../../config/StaticConfig';
+import { DefaultWalletConfigs, ThemeColor } from '../../config/StaticConfig';
 import IconLedger from '../../svg/IconLedger';
 import IconWallet from '../../svg/IconWallet';
 import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
@@ -283,7 +283,7 @@ function WalletPage() {
             <CheckOutlined
               style={{
                 fontSize: '22px',
-                color: '#1199fa',
+                color: ThemeColor.BLUE,
                 position: 'absolute',
                 top: '20px',
               }}

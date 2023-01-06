@@ -36,7 +36,7 @@ import { ledgerNotification } from '../../../components/LedgerNotification/Ledge
 import { LEDGER_WALLET_TYPE } from '../../../service/LedgerService';
 import { AssetIcon, BridgeIcon } from '../../../components/AssetIcon';
 import { FormInstance } from 'rc-field-form';
-import { SupportedChainName } from '../../../config/StaticConfig';
+import { SupportedChainName, ThemeColor } from '../../../config/StaticConfig';
 
 const { Option } = Select;
 const tailLayout = {
@@ -513,7 +513,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
           </Select>
         </Form.Item>
         <SwapOutlined
-          style={{ color: '#1199fa', fontSize: '40px', cursor: 'pointer' }}
+          style={{ color: ThemeColor.BLUE, fontSize: '40px', cursor: 'pointer' }}
           onClick={onBridgeExchange}
         />
         <Form.Item

@@ -24,7 +24,7 @@ import Icon, {
   SettingOutlined,
   LockFilled,
 } from '@ant-design/icons';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilCallback, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
 import {
@@ -43,7 +43,7 @@ import {
   NavbarMenuKey,
   updateDownloadedState,
 } from '../../recoil/atom';
-import { ellipsis, checkIfTestnet, getCronosEvmAsset } from '../../utils/utils';
+import { ellipsis, checkIfTestnet, getCronosEvmAsset, getEthereumEvmAsset } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 // import IconSend from '../../svg/IconSend';
@@ -66,8 +66,10 @@ import {
 } from '../../service/LedgerService';
 import {
   LedgerWalletMaximum,
+  LOADING_TIMEOUT,
   MAX_INCORRECT_ATTEMPTS_ALLOWED,
   SHOW_WARNING_INCORRECT_ATTEMPTS,
+  ThemeColor,
 } from '../../config/StaticConfig';
 import { generalConfigService } from '../../service/storage/GeneralConfigService';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
@@ -79,7 +81,7 @@ import {
   DefaultMainnetBridgeConfigs,
   DefaultTestnetBridgeConfigs,
 } from '../../service/bridge/BridgeConfig';
-import { MainNetEvmConfig, TestNetEvmConfig } from '../../config/StaticAssets';
+import { ETH_ASSET, GOERLI_ETHEREUM_EXPLORER_URL, MainNetEvmConfig, MAINNET_ETHEREUM_EXPLORER_URL, TestNetEvmConfig } from '../../config/StaticAssets';
 import { walletConnectStateAtom } from '../../service/walletconnect/store';
 import { WalletConnectModal } from '../../pages/walletconnect/components/WalletConnectModal';
 import IconWalletConnect from '../../svg/IconWalletConnect';
@@ -149,6 +151,16 @@ function HomeLayout(props: HomeLayoutProps) {
   const currentLocationPath = useLocation().pathname;
 
   const [t] = useTranslation();
+
+  const callBackFetchingDB = useRecoilCallback(({ snapshot }) => async () => {
+    const fetchingDB = await snapshot.getPromise(fetchingDBState);
+    // Avoid infinite loading spin
+    if(fetchingDB) {
+      setTimeout(() => {
+        setFetchingDB(false);
+      }, LOADING_TIMEOUT);
+    }
+  }, [fetchingDB]);
 
   async function fetchAndSetNewValidators(currentSession) {
     try {
@@ -317,15 +329,23 @@ function HomeLayout(props: HomeLayoutProps) {
 
     const assets = await walletService.retrieveWalletAssets(walletSession.wallet.identifier);
     const cronosAsset = getCronosEvmAsset(assets);
+
+    const ethAsset = getEthereumEvmAsset(assets);
+
     const checkDefaultExplorerUrl = checkIfTestnet(walletSession.wallet.config.network)
       ? TestNetEvmConfig.explorerUrl
       : MainNetEvmConfig.explorerUrl;
+
+    const checkDefaultEthExplorerUrl = checkIfTestnet(walletSession.wallet.config.network)
+      ? GOERLI_ETHEREUM_EXPLORER_URL
+      : MAINNET_ETHEREUM_EXPLORER_URL;
 
     setTimeout(async () => {
       if (
         !walletSession.activeAsset?.config?.explorer ||
         // Check if explorerUrl has been updated with latest default
-        cronosAsset?.config?.explorerUrl !== checkDefaultExplorerUrl
+        cronosAsset?.config?.explorerUrl !== checkDefaultExplorerUrl ||
+        ethAsset?.config?.explorerUrl !== checkDefaultEthExplorerUrl
       ) {
         const updateExplorerUrlNotificationKey = 'updateExplorerUrlNotificationKey';
 
@@ -342,6 +362,7 @@ function HomeLayout(props: HomeLayoutProps) {
         const allWallets = await walletService.retrieveAllWallets();
         allWallets.forEach(async wallet => {
           const isTestnet = checkIfTestnet(wallet.config.network);
+          const defaultEthAssetConfig = ETH_ASSET(wallet.config).config;
 
           const settingsDataUpdate: SettingsDataUpdate = {
             walletId: wallet.identifier,
@@ -366,13 +387,22 @@ function HomeLayout(props: HomeLayoutProps) {
             let nodeUrl = `${asset.config?.nodeUrl ?? wallet.config.nodeUrl}`;
             let indexingUrl = `${asset.config?.indexingUrl ?? wallet.config.indexingUrl}`;
             let explorerUrl = `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}`;
+            let chainId = `${asset.config?.chainId ?? wallet.config.network.chainId}`;
             if (
-              asset.assetType === UserAssetType.EVM ||
+              asset.assetType === UserAssetType.EVM && asset.name.includes('Cronos') ||
               asset.assetType === UserAssetType.CRC_20_TOKEN
             ) {
               nodeUrl = isTestnet ? TestNetEvmConfig.nodeUrl : MainNetEvmConfig.nodeUrl;
               indexingUrl = isTestnet ? TestNetEvmConfig.indexingUrl : MainNetEvmConfig.indexingUrl;
               explorerUrl = isTestnet ? TestNetEvmConfig.explorerUrl : MainNetEvmConfig.explorerUrl;
+            } else if (
+              asset.assetType === UserAssetType.EVM && asset.name.includes('Ethereum') ||
+              asset.assetType === UserAssetType.ERC_20_TOKEN
+            ) {
+              nodeUrl = defaultEthAssetConfig.nodeUrl;
+              indexingUrl = defaultEthAssetConfig.indexingUrl;
+              explorerUrl = defaultEthAssetConfig.explorerUrl;
+              chainId = defaultEthAssetConfig.chainId;
             }
             const newlyUpdatedAsset: UserAsset = {
               ...asset,
@@ -392,6 +422,7 @@ function HomeLayout(props: HomeLayoutProps) {
                   validator: `${explorerUrl}/validator`,
                 },
                 explorerUrl,
+                chainId,
                 fee: {
                   gasLimit: String(asset.config?.fee.gasLimit ?? wallet.config.fee.gasLimit),
                   networkFee: String(asset.config?.fee.networkFee ?? wallet.config.fee.networkFee),
@@ -609,7 +640,6 @@ function HomeLayout(props: HomeLayoutProps) {
 
     if (!didMountRef.current) {
       fetchDB();
-
       if (allPaths.includes(currentLocationPath as NavbarMenuKey)) {
         setNavbarMenuSelectedKey(currentLocationPath as NavbarMenuKey);
       }
@@ -643,6 +673,10 @@ function HomeLayout(props: HomeLayoutProps) {
     menuToBeSelectedKey,
     setMenuToBeSelectedKey,
   ]);
+  
+  useEffect(() => {
+    callBackFetchingDB();
+  }, [fetchingDB]);
 
   const onWalletDecryptFinishCreateFreshAssets = async (password: string) => {
     setFetchingDB(true);
@@ -743,13 +777,13 @@ function HomeLayout(props: HomeLayoutProps) {
             label: conditionalLink('/restore', t('navbar.wallet.restore')),
             key: 'restore-wallet-item',
             className: 'restore-wallet-item',
-            icon: <ReloadOutlined style={{ color: '#1199fa' }} />,
+            icon: <ReloadOutlined style={{ color: ThemeColor.BLUE }} />,
           },
           {
             label: conditionalLink('/create', t('navbar.wallet.create')),
             key: 'create-wallet-item',
             className: 'create-wallet-item',
-            icon: <PlusOutlined style={{ color: '#1199fa' }} />,
+            icon: <PlusOutlined style={{ color: ThemeColor.BLUE }} />,
           },
         ]
         : []),
@@ -759,7 +793,7 @@ function HomeLayout(props: HomeLayoutProps) {
             label: t('navbar.wallet.delete'),
             key: 'delete-wallet-item',
             className: 'delete-wallet-item',
-            icon: <DeleteOutlined style={{ color: '#f27474' }} />,
+            icon: <DeleteOutlined style={{ color: ThemeColor.RED }} />,
           },
         ]
         : []),
@@ -767,7 +801,7 @@ function HomeLayout(props: HomeLayoutProps) {
         label: conditionalLink('/wallet', t('navbar.wallet.list')),
         key: 'wallet-list-item',
         className: 'wallet-list-item',
-        icon: <Icon component={IconWallet} style={{ color: '#1199fa' }} />,
+        icon: <Icon component={IconWallet} style={{ color: ThemeColor.BLUE }} />,
       }, // which is required
     ];
 
@@ -890,7 +924,7 @@ function HomeLayout(props: HomeLayoutProps) {
             className="bottom-icon"
             type="ghost"
             size="large"
-            icon={<LockFilled style={{ color: '#1199fa' }} />}
+            icon={<LockFilled style={{ color: ThemeColor.BLUE }} />}
             onClick={async () => {
               notification.info({
                 message: t('general.sessionLockModal.notification.message1'),

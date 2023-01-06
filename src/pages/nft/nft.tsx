@@ -49,6 +49,7 @@ import {
   NFT_VIDEO_DENOM_SCHEMA,
   MAX_IMAGE_SIZE,
   MAX_VIDEO_SIZE,
+  ThemeColor,
 } from '../../config/StaticConfig';
 
 import {
@@ -656,7 +657,7 @@ const FormMintNft = () => {
             )}
             {isVideo(fileType) && files.length === 1 ? (
               <>
-                <ExclamationCircleOutlined style={{ color: '#1199fa', marginRight: '5px' }} />{' '}
+                <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE, marginRight: '5px' }} />{' '}
                 {t('nft.formMintNft.files.description2')}
               </>
             ) : (
@@ -758,7 +759,7 @@ const FormMintNft = () => {
                 <div className="item notice">
                   <Layout>
                     <Sider width="20px">
-                      <ExclamationCircleOutlined style={{ color: '#f27474' }} />
+                      <ExclamationCircleOutlined style={{ color: ThemeColor.RED }} />
                     </Sider>
                     <Content>{t('nft.modal1.notice1')}</Content>
                   </Layout>
@@ -799,7 +800,7 @@ const FormMintNft = () => {
                   <div className="item notice">
                     <Layout>
                       <Sider width="20px">
-                        <ExclamationCircleOutlined style={{ color: '#f27474' }} />
+                        <ExclamationCircleOutlined style={{ color: ThemeColor.RED }} />
                       </Sider>
                       <Content>
                         {`${t('nft.modal1.notice2')} ${getUINormalScaleAmount(
@@ -815,7 +816,7 @@ const FormMintNft = () => {
               <div className="item notice">
                 <Layout>
                   <Sider width="20px">
-                    <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                    <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE }} />
                   </Sider>
                   <Content>{t('nft.modal1.notice4')}</Content>
                 </Layout>
@@ -1727,7 +1728,7 @@ const NftPage = () => {
                       <div className="item notice">
                         <Layout>
                           <Sider width="20px">
-                            <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                            <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE }} />
                           </Sider>
                           <Content>
                             {t('nft.modal2.notice1', {
@@ -1742,7 +1743,7 @@ const NftPage = () => {
                       <div className="item notice">
                         <Layout>
                           <Sider width="20px">
-                            <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                            <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE }} />
                           </Sider>
                           <Content>{t('nft.modal2.notice2')}</Content>
                         </Layout>
@@ -1839,7 +1840,7 @@ const NftPage = () => {
                         <div className="item notice">
                           <Layout>
                             <Sider width="20px">
-                              <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                              <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE }} />
                             </Sider>
                             <Content>
                               {`${t('nft.modal1.notice2')} ${getUINormalScaleAmount(
@@ -1855,7 +1856,7 @@ const NftPage = () => {
                       <div className="item notice">
                         <Layout>
                           <Sider width="20px">
-                            <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                            <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE }} />
                           </Sider>
                           <Content>
                             {t('nft.modal2.notice1', {
@@ -1870,7 +1871,7 @@ const NftPage = () => {
                       <div className="item notice">
                         <Layout>
                           <Sider width="20px">
-                            <ExclamationCircleOutlined style={{ color: '#1199fa' }} />
+                            <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE }} />
                           </Sider>
                           <Content>{t('nft.modal2.notice2')}</Content>
                         </Layout>

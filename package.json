@@ -1,6 +1,6 @@
 {
   "name": "chain-desktop-wallet",
-  "version": "1.3.7",
+  "version": "1.3.8",
   "description": "Crypto.com DeFi Desktop Wallet App",
   "repository": "github:crypto-com/chain-desktop-wallet",
   "author": "Crypto.com <contact@crypto.com>",
@@ -385,6 +385,7 @@
     "minimatch": "3.0.5",
     "loader-utils": "2.0.4",
     "qs": "6.7.3",
-    "express": "4.17.3"
+    "express": "4.17.3",
+    "json5": "2.2.2"
   }
 }

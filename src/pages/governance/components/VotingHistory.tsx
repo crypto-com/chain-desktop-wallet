@@ -11,6 +11,7 @@ import { sessionState } from '../../../recoil/atom';
 import '../governance.less';
 import 'antd/dist/antd.css';
 import { AccountMessage } from '../../../service/rpc/ChainIndexingModels';
+import { ThemeColor } from '../../../config/StaticConfig';
 
 const { Header } = Layout;
 
@@ -153,7 +154,7 @@ export const VotingHistory = (props: any) => {
         size="large"
         onClick={() => props.setHistoryVisible(false)}
       >
-        <ArrowLeftOutlined style={{ fontSize: '17px', color: '#1199fa', marginRight: '6px' }} />{' '}
+        <ArrowLeftOutlined style={{ fontSize: '17px', color: ThemeColor.BLUE, marginRight: '6px' }} />{' '}
         {t('governance.voteHistory.backBtn')}
       </Button>
       <Header className="voting-history-title">{t('governance.voteHistory.title')}</Header>

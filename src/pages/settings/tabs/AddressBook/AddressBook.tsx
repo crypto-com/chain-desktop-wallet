@@ -15,6 +15,7 @@ import AddAddressModal from '../../../../components/AddressBookModal/AddAddressM
 import ConfirmModal from '../../../../components/ConfirmModal/ConfirmModal';
 import { getChainName } from '../../../../utils/utils';
 import { usePasswordModal } from '../../../../components/PasswordForm/PasswordFormModal';
+import { ThemeColor } from '../../../../config/StaticConfig';
 
 const AddressBook = () => {
   const [contacts, setContacts] = useState<AddressBookContact[]>([]);
@@ -156,11 +157,11 @@ const AddressBook = () => {
               paddingTop: '20px',
             }}
           >
-            <InfoCircleOutlined style={{ color: '#f27474', fontSize: '70px' }} />
+            <InfoCircleOutlined style={{ color: ThemeColor.RED, fontSize: '70px' }} />
             <div style={{ fontSize: '24px', fontWeight: 500, marginTop: '15px' }}>
               {t('settings.addressBook.removeAddress')}
             </div>
-            <div style={{ fontSize: '14px', color: '#0B142688' }}>
+            <div style={{ fontSize: '14px', color: '#0B1426' }}>
               {t('settings.addressBook.removeConfirm')}
             </div>
           </div>
