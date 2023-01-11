@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.3.9] - 2023-01-11
+### Bug Fixes
+- Non-adjustable Gas Price & Limit on EVM Transactions
 ## [v1.3.8] - 2023-01-04
 ### Additions
 - Migrate to Ethereum Goerli Testnet
