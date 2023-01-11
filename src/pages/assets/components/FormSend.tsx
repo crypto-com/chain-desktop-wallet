@@ -342,12 +342,19 @@ const FormSend: React.FC<FormSendProps> = props => {
       </div>
       <RowAmountOption walletAsset={walletAsset!} form={form} />
       <GasStepSelect asset={walletAsset!} onChange={() => {}} />
+      {walletAsset?.assetType === UserAssetType.EVM || walletAsset?.assetType === UserAssetType.ERC_20_TOKEN || walletAsset?.assetType === UserAssetType.CRC_20_TOKEN 
+        ? <Form.Item>
+          <NoticeDisclaimer>
+            {t('send.formSend.disclaimer2')}
+          </NoticeDisclaimer>
+        </Form.Item> 
+        : ''}
       <Form.Item name="memo" label={t('send.formSend.memo.label')}>
         <Input />
       </Form.Item>
       <Form.Item>
         <NoticeDisclaimer>
-          {t('send.formSend.disclaimer', {
+          {t('send.formSend.disclaimer1', {
             assetSymbol: walletAsset?.symbol,
             assetName: walletAsset?.name,
           })}

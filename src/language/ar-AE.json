@@ -299,7 +299,7 @@
   "send.formSend.amount.error1": "المبلغ المرسل يتعدي  رصيدك المتاح بالمحفظه",
   "send.formSend.amount.error2": "المبلغ المرسل اقل من الحد الادني المسموح به",
   "send.formSend.memo.label": "مذكره ( اختياري )",
-  "send.formSend.disclaimer": "قد يؤدي نقل {{assetSymbol}} إلى أي عنوان مستلم غير موجود على {{assetName}} إلى خسارة دائمة لأموالك.",
+  "send.formSend.disclaimer1": "قد يؤدي نقل {{assetSymbol}} إلى أي عنوان مستلم غير موجود على {{assetName}} إلى خسارة دائمة لأموالك.",
   "send.modal1.title": "اكد التحويل",
   "send.modal1.description": "رجاء مراجعه البيانات   ادناه",
   "send.modal1.label1": "عنوان المرسل",
