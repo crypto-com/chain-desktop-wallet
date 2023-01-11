@@ -35,14 +35,14 @@ class EvmTransactionSigner implements ITransactionSigner {
     const transferAsset = transaction.asset;
 
     const gasPriceBN = web3.utils.toBN(
-      transaction.gasPrice || transferAsset?.config?.fee?.networkFee!,
+      transferAsset?.config?.fee?.networkFee! || (transaction.gasPrice ?? '0'),
     );
 
     const chainId = transaction?.asset?.config?.chainId || DEFAULT_CHAIN_ID;
     const txParams = {
       nonce: web3.utils.toHex(transaction.nonce || 0),
       gasPrice: web3.utils.toHex(gasPriceBN),
-      gasLimit: transaction.gasLimit || transferAsset?.config?.fee?.gasLimit,
+      gasLimit: parseInt(transferAsset?.config?.fee?.gasLimit ?? '0') || transaction.gasLimit,
       to: transaction.toAddress,
       value: web3.utils.toHex(transaction.amount),
       data:
