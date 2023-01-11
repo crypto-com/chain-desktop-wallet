@@ -126,7 +126,7 @@ export const FormWithdrawStakingReward = () => {
 
   const syncRewardsData = async () => {
     const currentMarketData = allMarketData.get(
-      `${walletAsset?.mainnetSymbol}-${currentSession?.currency}`,
+      `${walletAsset?.assetType}-${walletAsset?.mainnetSymbol}-${currentSession?.currency}`,
     );
 
     const allRewards: RewardTransactionData[] = await walletService.retrieveAllRewards(
@@ -146,7 +146,7 @@ export const FormWithdrawStakingReward = () => {
   };
 
   useEffect(() => {
-    setMarketData(allMarketData.get(`${walletAsset?.mainnetSymbol}-${currentSession.currency}`));
+    setMarketData(allMarketData.get(`${walletAsset?.assetType}-${walletAsset?.mainnetSymbol}-${currentSession.currency}`));
     syncRewardsData();
   }, [fetchingDB, confirmLoading, isRewardsLoading]);
 

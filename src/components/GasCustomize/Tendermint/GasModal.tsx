@@ -47,7 +47,7 @@ const ModalBody = (props: {
   const [readableNetworkFee, setReadableNetworkFee] = useState('');
 
   const assetMarketData = allMarketData.get(
-    `${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
+    `${currentSession?.activeAsset?.assetType}-${currentSession?.activeAsset?.mainnetSymbol}-${currentSession.currency}`,
   );
   const localFiatSymbol = SUPPORTED_CURRENCY.get(assetMarketData?.currency ?? 'USD')?.symbol ?? '';
   const { analyticsService } = useAnalytics();
