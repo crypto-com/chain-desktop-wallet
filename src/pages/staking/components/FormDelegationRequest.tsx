@@ -6,6 +6,7 @@ import { OrderedListOutlined, ExclamationCircleOutlined } from '@ant-design/icon
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { AddressType } from '@crypto-org-chain/chain-jslib/lib/dist/utils/address';
+import { ThemeColor } from '../../../config/StaticConfig';
 import numeral from 'numeral';
 
 import {
@@ -433,13 +434,13 @@ export const FormDelegationRequest = props => {
                   <div className="alert-item">
                     <Layout>
                       <Sider width="20px">
-                        <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />
+                        <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE }} />
                       </Sider>
                       <Content>{t('staking.model1.warning')}</Content>
                     </Layout>
                   </div>
                 }
-                type="error"
+                type="info"
               />
             )}
             <GasInfoTendermint />
