@@ -8,6 +8,7 @@ import numeral from 'numeral';
 import './ValidatorListTable.less';
 
 import {
+  ThemeColor,
   VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
   VALIDATOR_UPTIME_THRESHOLD,
 } from '../../../config/StaticConfig';
@@ -56,7 +57,7 @@ const ValidatorListTable = (props: {
           {isValidatorAddressSuspicious(record.validatorAddress, moderationConfig) && (
             <Tooltip title={t('staking.model1.warning')}>
               <span>
-                <ExclamationCircleOutlined style={{ color: 'red' }} />
+                <ExclamationCircleOutlined style={{ color: ThemeColor.BLUE }} />
               </span>
             </Tooltip>
           )}
