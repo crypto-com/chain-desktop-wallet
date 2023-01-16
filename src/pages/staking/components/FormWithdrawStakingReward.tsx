@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../staking.less';
 import 'antd/dist/antd.css';
-import { Button, Table, Typography, Spin } from 'antd';
+import { Button, Table, Typography, Spin, Tooltip } from 'antd';
 import { ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
@@ -40,6 +40,7 @@ import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
 import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasConfig';
 import GasStepSelect from '../../../components/GasCustomize/GasConfig';
+import { isValidatorAddressSuspicious } from '../../../models/ModerationConfig';
 
 const { Text } = Typography;
 
@@ -50,7 +51,8 @@ interface RewardsTabularData {
   validatorAddress: string;
 }
 
-export const FormWithdrawStakingReward = () => {
+export const FormWithdrawStakingReward = props => {
+  const { moderationConfig } = props;
   type RewardActionType = 'withdrawall' | 'withdraw' | 'restake' | 'restakeall';
 
   const [withdrawValues, setWithdrawValues] = useState({
@@ -435,13 +437,22 @@ export const FormWithdrawStakingReward = () => {
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
       render: text => (
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href={`${renderExplorerUrl(currentSession.wallet.config, 'validator')}/${text}`}
-        >
-          {text}
-        </a>
+        <>
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href={`${renderExplorerUrl(currentSession.wallet.config, 'validator')}/${text}`}
+          >
+            {text}
+          </a>
+          {isValidatorAddressSuspicious(text, moderationConfig) 
+          && <Tooltip title={t('staking.model1.warning')}>
+            <span>
+              <ExclamationCircleOutlined style={{ paddingLeft: '5px', cursor: 'pointer', color: ThemeColor.BLUE }} />
+            </span>
+          </Tooltip>
+          }
+        </>
       ),
     },
     {

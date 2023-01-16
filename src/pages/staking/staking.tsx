@@ -90,13 +90,15 @@ const StakingPage = () => {
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
       render: text => (
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
-        >
-          {text}
-        </a>
+        <>
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href={`${currentSession.wallet.config.explorerUrl}/validator/${text}`}
+          >
+            {text}
+          </a>
+        </>
       ),
     },
     {
@@ -296,7 +298,7 @@ const StakingPage = () => {
             <div className="site-layout-background stake-content">
               <div className="container">
                 <div className="description">{t('staking.description1')}</div>
-                <FormWithdrawStakingReward />
+                <FormWithdrawStakingReward moderationConfig={moderationConfig} />
               </div>
             </div>
           </TabPane>
