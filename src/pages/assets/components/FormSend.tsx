@@ -101,6 +101,9 @@ const FormSend: React.FC<FormSendProps> = props => {
     }
   }, []);
 
+  useEffect(() => {
+  }, [walletAsset]);
+
   const getTransactionFee = (asset: UserAsset) => {
     const { assetType, config } = asset;
 
@@ -341,7 +344,20 @@ const FormSend: React.FC<FormSendProps> = props => {
         </div>
       </div>
       <RowAmountOption walletAsset={walletAsset!} form={form} />
-      <GasStepSelect asset={walletAsset!} onChange={() => {}} />
+      <GasStepSelect asset={walletAsset!} onChange={(gasLimit, networkFee) => {
+        if(walletAsset?.config) {
+          setWalletAsset({
+            ...walletAsset,
+            config: {
+              ...walletAsset?.config,
+              fee: {
+                gasLimit,
+                networkFee
+              }
+            }
+          });
+        }
+      }} />
       {walletAsset?.assetType === UserAssetType.EVM || walletAsset?.assetType === UserAssetType.ERC_20_TOKEN || walletAsset?.assetType === UserAssetType.CRC_20_TOKEN 
         ? <Form.Item>
           <NoticeDisclaimer>

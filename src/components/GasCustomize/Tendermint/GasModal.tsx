@@ -170,7 +170,7 @@ const ModalBody = (props: {
       >
         <Form.Item
           name="networkFee"
-          label={`${t('settings.form1.networkFee.label')}(baseCRO)`}
+          label={`${t('settings.form1.networkFee.label')}(base${asset.symbol})`}
           hasFeedback
           rules={[
             {

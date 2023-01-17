@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 ### Bug Fixes
 - Non-adjustable Gas Price & Limit on EVM Transactions
 - Incorrect Market Price data in several places
+- Misbehaved Custom Gas
 ## [v1.3.8] - 2023-01-04
 ### Additions
 - Migrate to Ethereum Goerli Testnet

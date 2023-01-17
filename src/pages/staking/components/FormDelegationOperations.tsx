@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import '../staking.less';
 import 'antd/dist/antd.css';
-import { Button, Form, Table, Typography, Spin } from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
+import { Button, Form, Table, Typography, Spin, Tooltip } from 'antd';
+import { ExclamationCircleOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 
@@ -31,6 +31,8 @@ import { FormRedelegateComponent } from './FormRedelegateComponent';
 
 import { useLedgerStatus } from '../../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../../components/LedgerNotification/LedgerNotification';
+import { isValidatorAddressSuspicious } from '../../../models/ModerationConfig';
+import { ThemeColor } from '../../../config/StaticConfig';
 
 const { Text } = Typography;
 
@@ -273,13 +275,23 @@ export const FormDelegationOperations = props => {
       dataIndex: 'validatorAddress',
       key: 'validatorAddress',
       render: text => (
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href={`${renderExplorerUrl(currentSession.wallet.config, 'validator')}/${text}`}
-        >
-          {middleEllipsis(text, 8)}
-        </a>
+        <>
+          <a
+            target="_blank"
+            rel="noreferrer"
+            href={`${renderExplorerUrl(currentSession.wallet.config, 'validator')}/${text}`}
+          >
+            {middleEllipsis(text, 8)}
+          </a>
+          {isValidatorAddressSuspicious(text, moderationConfig) 
+          && <Tooltip title={t('staking.model1.warning')}>
+            <span>
+              <ExclamationCircleOutlined style={{ paddingLeft: '5px', cursor: 'pointer', color: ThemeColor.BLUE }} />
+            </span>
+          </Tooltip>
+          }
+        </>
+        
       ),
     },
     {
