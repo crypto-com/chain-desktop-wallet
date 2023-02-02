@@ -310,9 +310,9 @@ export const ProposalView = (props: any) => {
             </div>
 
             <div className="description">
-              {allProps.proposal?.content.description.split('\\n').map((p, i) => (
+              {allProps.proposal?.content?.description ? allProps.proposal?.content.description.split('\\n').map((p, i) => (
                 <p key={i}>{p}</p>
-              ))}
+              )) : <p key={0}>(No description)</p>}
             </div>
             <div className="item">
               {allProps.proposal?.status === ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD ? (

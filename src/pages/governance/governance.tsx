@@ -200,6 +200,10 @@ const GovernancePage = () => {
   };
 
   const checkProposalType = (proposal: any) => {
+    if (!proposal || !proposal?.content) {
+      return '';
+    }
+    
     const proposal_initial_deposit = proposal?.content['@type']?.toLowerCase();
     let status = '';
     switch (true) {
@@ -622,7 +626,7 @@ const GovernancePage = () => {
         <>
           <Header className="site-layout-background proposal-details-header">
             <div className="top">{t('governance.proposalDetails')}</div>
-            {proposal?.content.title}
+            {proposal?.content?.title}
           </Header>
 
           <a className="proposal-back-btn">
@@ -651,7 +655,7 @@ const GovernancePage = () => {
         <>
           <Header className="site-layout-background proposal-details-header">
             <div className="top">{t('governance.proposalDetails')}</div>
-            {proposal?.content.title}
+            {proposal?.content?.title}
           </Header>
 
           <a className="proposal-back-btn">
@@ -1034,7 +1038,7 @@ const GovernancePage = () => {
                               title={
                                 <>
                                   {processStatusTag(item.status)} #{item.proposal_id}{' '}
-                                  <a>{item.content.title}</a>
+                                  <a>{item.content?.title}</a>
                                 </>
                               }
                               description={
@@ -1135,7 +1139,7 @@ const GovernancePage = () => {
                               title={
                                 <>
                                   {processStatusTag(item.status)} #{item.proposal_id}{' '}
-                                  <a>{item.content.title}</a>
+                                  <a>{item.content?.title}</a>
                                 </>
                               }
                               description={
@@ -1191,7 +1195,7 @@ const GovernancePage = () => {
                               title={
                                 <>
                                   {processStatusTag(item.status)} #{item.proposal_id}{' '}
-                                  <a>{item.content.title}</a>
+                                  <a>{item.content?.title}</a>
                                 </>
                               }
                               description={
@@ -1247,7 +1251,7 @@ const GovernancePage = () => {
                               title={
                                 <>
                                   {processStatusTag(item.status)} #{item.proposal_id}{' '}
-                                  <a>{item.content.title}</a>
+                                  <a>{item.content?.title}</a>
                                 </>
                               }
                               description={
@@ -1303,7 +1307,7 @@ const GovernancePage = () => {
                               title={
                                 <>
                                   {processStatusTag(item.status)} #{item.proposal_id}{' '}
-                                  <a>{item.content.title}</a>
+                                  <a>{item.content?.title}</a>
                                 </>
                               }
                               description={
@@ -1359,7 +1363,7 @@ const GovernancePage = () => {
                               title={
                                 <>
                                   {processStatusTag(item.status)} #{item.proposal_id}{' '}
-                                  <a>{item.content.title}</a>
+                                  <a>{item.content?.title}</a>
                                 </>
                               }
                               description={
@@ -1430,7 +1434,7 @@ const GovernancePage = () => {
           </div>
           <div className="item">
             <div className="label">{t('governance.modal1.label2')}</div>
-            <div className="address">{`#${proposal?.proposal_id} ${proposal?.content.title}`}</div>
+            <div className="address">{`#${proposal?.proposal_id} ${proposal?.content?.title}`}</div>
           </div>
           <div className="item">
             <div className="label">{t('governance.modal1.label3')}</div>
