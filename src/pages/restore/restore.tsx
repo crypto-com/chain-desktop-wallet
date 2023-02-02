@@ -347,7 +347,7 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
       await walletService.saveAssets(restoreResult.assets);
       await walletService.encryptWalletAndSetSession(password, restoreResult.wallet);
 
-      await walletService.syncAll(new Session(restoreResult.wallet));
+      // await walletService.syncAll(new Session(restoreResult.wallet));
       goToHome();
       props.form.resetFields();
       return;

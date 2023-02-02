@@ -5,7 +5,7 @@ import { WalletConfig, SupportedChainName } from './StaticConfig';
 import { checkIfTestnet } from '../utils/utils';
 import { ICON_ATOM_TENDERMINT, ICON_CRO_EVM, ICON_CRO_TENDERMINT, ICON_ETH_EVM } from '../components/AssetIcon';
 import { Session } from '../models/Session';
-import { TestNetCroeseid4Config, MainNetConfig } from './StaticConfig';
+import { TestNetCroeseid5Config, MainNetConfig } from './StaticConfig';
 
 // This will be used later for asset recreation/migration
 export const STATIC_ASSET_COUNT = 4;
@@ -61,18 +61,42 @@ export const CRONOS_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
   const isTestnet = checkIfTestnet(network);
 
   const config: UserAssetConfig = {
-    explorerUrl: isTestnet ? TestNetCroeseid4Config.explorerUrl : MainNetConfig.explorerUrl,
-    explorer: isTestnet ? TestNetCroeseid4Config.explorer : MainNetConfig.explorer,
-    chainId: isTestnet ? TestNetCroeseid4Config.network.chainId : MainNetConfig.network.chainId,
+    explorerUrl: isTestnet ? TestNetCroeseid5Config.explorerUrl : MainNetConfig.explorerUrl,
+    explorer: isTestnet ? TestNetCroeseid5Config.explorer : MainNetConfig.explorer,
+    chainId: isTestnet ? TestNetCroeseid5Config.network.chainId : MainNetConfig.network.chainId,
     fee: { 
-      gasLimit: isTestnet ? TestNetCroeseid4Config.fee.gasLimit : MainNetConfig.fee.gasLimit,
-      networkFee: isTestnet ? TestNetCroeseid4Config.fee.networkFee : MainNetConfig.fee.networkFee,
+      gasLimit: isTestnet ? TestNetCroeseid5Config.fee.gasLimit : MainNetConfig.fee.gasLimit,
+      networkFee: isTestnet ? TestNetCroeseid5Config.fee.networkFee : MainNetConfig.fee.networkFee,
     },
-    indexingUrl: isTestnet ? TestNetCroeseid4Config.indexingUrl : MainNetConfig.indexingUrl,
+    indexingUrl: isTestnet ? TestNetCroeseid5Config.indexingUrl : MainNetConfig.indexingUrl,
     isLedgerSupportDisabled: true,
     isStakingDisabled: true,
-    nodeUrl: isTestnet ? TestNetCroeseid4Config.nodeUrl : MainNetConfig.nodeUrl,
+    nodeUrl: isTestnet ? TestNetCroeseid5Config.nodeUrl : MainNetConfig.nodeUrl,
     memoSupportDisabled: false,
+    tendermintNetwork: {
+      defaultNodeUrl: isTestnet
+        ? 'https://rpc-c5.crypto.org'
+        : 'https://mainnet.crypto.org',
+      chainName: SupportedChainName.CRYPTO_ORG,
+      chainId: isTestnet ? 'testnet-croeseid-5' : MainNetConfig.network.chainId,
+      addressPrefix: isTestnet ? 'tcro' : 'cro',
+      validatorPubKeyPrefix: isTestnet ? 'tcrocnclconspub' : 'crocnclconspub',
+      validatorAddressPrefix: isTestnet ? 'tcrocncl' : 'crocncl',
+      bip44Path: { coinType: 394, account: 0 },
+      coin: { 
+        baseDenom: isTestnet ? 'basetcro' : 'basecro', 
+        croDenom: isTestnet ? 'tcro' : 'cro', 
+        denom: isTestnet ? 'tcro' : 'cro'
+      },
+      node: {
+        clientUrl: isTestnet
+          ? 'https://rpc-c5.crypto.org'
+          : 'https://mainnet.crypto.org',
+        proxyUrl: isTestnet
+          ? 'https://rest-c5.crypto.org'
+          : 'https://mainnet.crypto.org',
+      },
+    },
   };
 
   return {
@@ -82,7 +106,7 @@ export const CRONOS_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
     icon_url: ICON_CRO_TENDERMINT,
     identifier: getRandomId(),
     name: SupportedChainName.CRYPTO_ORG,
-    symbol: isTestnet ? TestNetCroeseid4Config.network.coin.croDenom.toString().toUpperCase() : MainNetConfig.network.coin.croDenom.toString().toUpperCase(),
+    symbol: isTestnet ? TestNetCroeseid5Config.network.coin.croDenom.toString().toUpperCase() : MainNetConfig.network.coin.croDenom.toString().toUpperCase(),
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
     unbondingBalance: '0',

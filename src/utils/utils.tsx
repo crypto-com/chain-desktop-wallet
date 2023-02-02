@@ -190,7 +190,7 @@ export function checkIfTestnet(network: Network) {
   return (
     [CroNetwork.TestnetCroeseid3, CroNetwork.TestnetCroeseid4, CroNetwork.Testnet].includes(
       network,
-    ) || network.defaultNodeUrl.includes('testnet')
+    ) || network.defaultNodeUrl.includes('testnet') || network.defaultNodeUrl.includes('rpc-c5')
   );
 }
 

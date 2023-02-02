@@ -92,7 +92,11 @@ export class NodeRpcService implements INodeRpcService {
     // take first 2 words
     if (baseUrl) {
       const words = baseUrl.split(':', 2);
-      const newClientUrl = `${words[0]}:${words[1]}${NodePorts.Tendermint}`;
+      let newClientUrl = `${words[0]}:${words[1]}${NodePorts.Tendermint}`;
+      if (baseUrl.indexOf('rpc-c5.crypto.org') !== 0) {
+        newClientUrl = `${words[0]}:${words[1]}`;
+      }
+      // const newClientUrl = `${words[0]}:${words[1]}${NodePorts.Tendermint}`;
       const client = await StargateClient.connect(newClientUrl);
       const proxyClient = axios.create({
         baseURL: baseUrl + NodePorts.Cosmos,
@@ -473,18 +477,18 @@ export class NodeRpcService implements INodeRpcService {
       }
     }
 
-    const activeValidators = (await this.fetchLatestActiveValidators()).reduce(
-      (pubKeyMap, validator) => {
-        pubKeyMap[validator.value] = true;
-        return pubKeyMap;
-      },
-      {},
-    );
+    // const activeValidators = (await this.fetchLatestActiveValidators()).reduce(
+    //   (pubKeyMap, validator) => {
+    //     pubKeyMap[validator.value] = true;
+    //     return pubKeyMap;
+    //   },
+    //   {},
+    // );
 
     let topValidators = validators
       .filter(v => v.status === 'BOND_STATUS_BONDED')
       .filter(v => !v.jailed)
-      .filter(v => !!activeValidators[v.pubKey.value])
+      // .filter(v => !!activeValidators[v.pubKey.value])
       // Sort by Lowest voting power, and then Lowest commission
       .sort((v1, v2) => Big(v1.currentCommissionRate).cmp(Big(v2.currentCommissionRate)))
       .sort((v1, v2) => Big(v1.currentShares).cmp(Big(v2.currentShares)))

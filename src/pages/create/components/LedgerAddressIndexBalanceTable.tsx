@@ -49,9 +49,9 @@ const LedgerAddressIndexBalanceTable = (props: {
   const [t] = useTranslation();
 
   const network = props.form?.getFieldValue('network');
-  const isTestnet = network === DefaultWalletConfigs.TestNetCroeseid4Config.name;
+  const isTestnet = network === DefaultWalletConfigs.TestNetCroeseid5Config.name;
   const config = isTestnet
-    ? DefaultWalletConfigs.TestNetCroeseid4Config
+    ? DefaultWalletConfigs.TestNetCroeseid5Config
     : DefaultWalletConfigs.MainNetConfig;
   const cronosTendermintAsset = {
     ...CRONOS_TENDERMINT_ASSET(config),
@@ -170,7 +170,7 @@ const LedgerAddressIndexBalanceTable = (props: {
     switch (`${assetType}-${chainName}`) {
       case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`: {
         const nodeUrl = isTestnet
-          ? DefaultWalletConfigs.TestNetCroeseid4Config.nodeUrl
+          ? DefaultWalletConfigs.TestNetCroeseid5Config.nodeUrl
           : DefaultWalletConfigs.MainNetConfig.nodeUrl;
         const nodeRpc = await NodeRpcService.init({
           baseUrl: nodeUrl,

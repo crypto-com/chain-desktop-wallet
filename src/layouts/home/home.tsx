@@ -631,10 +631,10 @@ function HomeLayout(props: HomeLayoutProps) {
       }, 2000);
 
       // checkNewlyAddedStaticAssets(currentSession);
-      checkCorrectExplorerUrl({
-        ...currentSession,
-        activeAsset: currentAsset,
-      });
+      // checkCorrectExplorerUrl({
+      //   ...currentSession,
+      //   activeAsset: currentAsset,
+      // });
       checkBridgeConfigs(currentSession);
     };
 
