@@ -6,6 +6,7 @@ import { Session } from '../../../models/Session';
 import { UserAssetType } from '../../../models/UserAsset';
 import { TransactionTabularData } from '../assets';
 import { renderExplorerUrl } from '../../../models/Explorer';
+import { MsgTypeName } from '../../../models/Transaction';
 
 interface ReceiveDetailProps {
   transaction: TransactionTabularData;
@@ -61,7 +62,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
       );
     }
     switch (record.msgTypeName) {
-      case 'MsgSend':
+      case MsgTypeName.MsgSend:
         return (
           <>
             <div className="row">
@@ -102,7 +103,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
             </div>
           </>
         );
-      case 'MsgWithdrawDelegatorReward':
+      case MsgTypeName.MsgWithdrawDelegatorReward:
         return (
           <>
             <div className="row">
@@ -159,7 +160,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
             </div>
           </>
         );
-      case 'MsgDelegate':
+      case MsgTypeName.MsgDelegate:
         return (
           <>
             <div className="row">
@@ -204,7 +205,7 @@ const TransactionDetail: React.FC<ReceiveDetailProps> = props => {
             </div>
           </>
         );
-      case 'MsgUndelegate':
+      case MsgTypeName.MsgUndelegate:
         return (
           <>
             <div className="row">
