@@ -281,47 +281,48 @@ export enum VoteOption {
 }
 
 // https://raw.githubusercontent.com/crypto-com/chain-indexing/4c79a3dba2911e738af1d2b2d639f4744c15f58b/usecase/parser/register.go
-export type MsgTypeName =
-  | 'MsgSend'
-  | 'MsgMultiSend'
-  | 'MsgSetWithdrawAddress'
-  | 'MsgWithdrawDelegatorReward'
-  | 'MsgWithdrawValidatorCommission'
-  | 'MsgFundCommunityPool'
-  | 'MsgSubmitProposal'
-  | 'MsgVote'
-  | 'MsgDeposit'
-  | 'MsgDelegate'
-  | 'MsgUndelegate'
-  | 'MsgBeginRedelegate'
-  | 'MsgCreateValidator'
-  | 'MsgEditValidator'
-  | 'MsgUnjail'
-  | 'MsgIssueDenom'
-  | 'MsgMintNFT'
-  | 'MsgTransferNFT'
-  | 'MsgEditNFT'
-  | 'MsgBurnNFT'
-  | 'MsgCreateClient'
-  | 'MsgUpdateClient'
-  | 'MsgConnectionOpenInit'
-  | 'MsgConnectionOpenTry'
-  | 'MsgConnectionOpenAck'
-  | 'MsgConnectionOpenConfirm'
-  | 'MsgChannelOpenInit'
-  | 'MsgChannelOpenTry'
-  | 'MsgChannelOpenAck'
-  | 'MsgChannelOpenConfirm'
-  | 'MsgRecvPacket'
-  | 'MsgAcknowledgement'
-  | 'MsgTimeout'
-  | 'MsgTimeoutOnClose'
-  | 'MsgChannelCloseInit'
-  | 'MsgChannelCloseConfirm'
-  | 'MsgTransfer'
-  | 'MsgGrant'
-  | 'MsgRevoke'
-  | 'MsgExec'
-  | 'MsgGrantAllowance'
-  | 'MsgRevokeAllowance'
-  | 'MsgCreateVestingAccount';
+export enum MsgTypeName {
+  MsgSend = '/cosmos.bank.v1beta1.MsgSend',
+  MsgMultiSend = '/cosmos.bank.v1beta1.MsgMultiSend',
+  MsgSetWithdrawAddress = '/cosmos.distribution.v1beta1.MsgSetWithdrawAddress',
+  MsgWithdrawDelegatorReward = '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward',
+  MsgWithdrawValidatorCommission = '/cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission',
+  MsgFundCommunityPool = '/cosmos.distribution.v1beta1.MsgFundCommunityPool',
+  MsgSubmitProposal = '/cosmos.gov.v1beta1.MsgSubmitProposal',
+  MsgVote = '/cosmos.gov.v1beta1.MsgVote',
+  MsgDeposit = '/cosmos.gov.v1beta1.MsgDeposit',
+  MsgDelegate = '/cosmos.staking.v1beta1.MsgDelegate',
+  MsgUndelegate = '/cosmos.staking.v1beta1.MsgUndelegate',
+  MsgBeginRedelegate = '/cosmos.staking.v1beta1.MsgBeginRedelegate',
+  MsgCreateValidator = '/cosmos.staking.v1beta1.MsgCreateValidator',
+  MsgEditValidator = '/cosmos.staking.v1beta1.MsgEditValidator',
+  MsgUnjail = '/cosmos.slashing.v1beta1.MsgUnjail',
+  MsgIssueDenom = '/chainmain.nft.v1.MsgIssueDenom',
+  MsgMintNFT = '/chainmain.nft.v1.MsgMintNFT',
+  MsgTransferNFT = '/chainmain.nft.v1.MsgTransferNFT',
+  MsgEditNFT = '/chainmain.nft.v1.MsgEditNFT',
+  MsgBurnNFT = '/chainmain.nft.v1.MsgBurnNFT',
+  MsgCreateClient = '/ibc.core.client.v1.MsgCreateClient',
+  MsgUpdateClient = '/ibc.core.client.v1.MsgUpdateClient',
+  MsgConnectionOpenInit = '/ibc.core.connection.v1.MsgConnectionOpenInit',
+  MsgConnectionOpenTry = '/ibc.core.connection.v1.MsgConnectionOpenTry',
+  MsgConnectionOpenAck = '/ibc.core.connection.v1.MsgConnectionOpenAck',
+  MsgConnectionOpenConfirm = '/ibc.core.connection.v1.MsgConnectionOpenConfirm',
+  MsgChannelOpenInit = '/ibc.core.channel.v1.MsgChannelOpenInit',
+  MsgChannelOpenTry = '/ibc.core.channel.v1.MsgChannelOpenTry',
+  MsgChannelOpenAck = '/ibc.core.channel.v1.MsgChannelOpenAck',
+  MsgChannelOpenConfirm = '/ibc.core.channel.v1.MsgChannelOpenConfirm',
+  MsgRecvPacket = '/ibc.core.channel.v1.MsgRecvPacket',
+  MsgAcknowledgement = '/ibc.core.channel.v1.MsgAcknowledgement',
+  MsgTimeout = '/ibc.core.channel.v1.MsgTimeout',
+  MsgTimeoutOnClose = '/ibc.core.channel.v1.MsgTimeoutOnClose',
+  MsgChannelCloseInit = '/ibc.core.channel.v1.MsgChannelCloseInit',
+  MsgChannelCloseConfirm = '/ibc.core.channel.v1.MsgChannelCloseConfirm',
+  MsgTransfer = '/ibc.applications.transfer.v1.MsgTransfer',
+  MsgGrant = '/cosmos.authz.v1beta1.MsgGrant',
+  MsgRevoke = '/cosmos.authz.v1beta1.MsgRevoke',
+  MsgExec = '/cosmos.authz.v1beta1.MsgExec',
+  MsgGrantAllowance = '/cosmos.feegrant.v1beta1.MsgGrantAllowance',
+  MsgRevokeAllowance = '/cosmos.feegrant.v1beta1.MsgRevokeAllowance',
+  MsgCreateVestingAccoun = '/cosmos.vesting.v1beta1.MsgCreateVestingAccount'
+}

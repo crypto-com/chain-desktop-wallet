@@ -20,6 +20,7 @@ import { CronosClient } from './cronos/CronosClient';
 import {
   CommonTransactionRecord,
   EthereumTransactionType,
+  MsgTypeName,
   NftQueryParams,
   NftTransferModel,
   ProposalModel,
@@ -287,7 +288,7 @@ export class TransactionHistoryService {
           assetType: currentAsset.assetType,
           txHash: tx.hash,
           txType: EthereumTransactionType.TRANSFER,
-          messageTypeName: 'MsgSend',
+          messageTypeName: MsgTypeName.MsgSend,
           txData: transferTx,
           // TODO: add messageTypeName
         };
