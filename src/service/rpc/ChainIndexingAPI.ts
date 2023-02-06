@@ -157,10 +157,15 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     address: string,
     asset?: UserAsset,
   ): Promise<Array<TransferTransactionData>> {
-    const msgType = ['MsgSend', 'MsgWithdrawDelegatorReward', 'MsgDelegate', 'MsgUndelegate'];
+    const msgType: MsgTypeName[] = [
+      MsgTypeName.MsgSend,
+      MsgTypeName.MsgWithdrawDelegatorReward,
+      MsgTypeName.MsgDelegate,
+      MsgTypeName.MsgUndelegate,
+    ];
 
     const transferListResponse = await this.axiosClient.get<TransferListResponse>(
-      `/accounts/${address}/messages?order=height.desc&filter.msgType=${msgType.join(
+      `/accounts/${address}/messages?order=height.desc&filter.messageType=${msgType.join(
         ',',
       )}&limit=1000`,
     );
@@ -220,10 +225,10 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     asset: UserAsset,
   ): Promise<CommonTransactionRecord[]> {
     const msgType: MsgTypeName[] = [
-      'MsgSend',
-      'MsgWithdrawDelegatorReward',
-      'MsgDelegate',
-      'MsgUndelegate',
+      MsgTypeName.MsgSend,
+      MsgTypeName.MsgWithdrawDelegatorReward,
+      MsgTypeName.MsgDelegate,
+      MsgTypeName.MsgUndelegate,
     ];
 
     const transactionListResponse = await this.getMessagesByAccountAddress(address, msgType);
@@ -288,7 +293,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
             status: getStatus(tx),
           };
 
-          if (tx.data.msgName === 'MsgWithdrawDelegatorReward') {
+          if (tx.data.msgName === '/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward') {
             const rewardTransactionRecord: RewardTransactionRecord = {
               ...commonTransaction,
               txType: 'reward',
@@ -304,7 +309,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
             return rewardTransactionRecord;
           }
 
-          if (tx.data.msgName === 'MsgDelegate' || tx.data.msgName === 'MsgUndelegate') {
+          if (tx.data.msgName === '/cosmos.staking.v1beta1.MsgDelegate' || tx.data.msgName === '/cosmos.staking.v1beta1.MsgUndelegate') {
             const stakingTransactionRecord: StakingTransactionRecord = {
               ...commonTransaction,
               txType: 'staking',
@@ -349,7 +354,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   ): Promise<NftAccountTransactionListResponse> {
     try {
       const nftTxsListResponse = await this.axiosClient.get<NftAccountTransactionListResponse>(
-        `accounts/${address}/messages?order=height.desc&filter.msgType=MsgTransferNFT,MsgMintNFT,MsgIssueDenom,MsgEditNFT`,
+        `accounts/${address}/messages?order=height.desc&filter.messageType=MsgTransferNFT,MsgMintNFT,MsgIssueDenom,MsgEditNFT`,
       );
       return nftTxsListResponse.data;
     } catch (e) {
@@ -367,7 +372,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
    */
   public async fetchAccountVotingHistory(address: string): Promise<AccountMessage[]> {
     try {
-      const msgTypeNames: MsgTypeName[] = ['MsgVote'];
+      const msgTypeNames: MsgTypeName[] = [MsgTypeName.MsgVote];
 
       const userVoteHistory = await this.getMessagesByAccountAddress(address, msgTypeNames);
       return userVoteHistory;
@@ -534,12 +539,11 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   public async getTotalRewardsClaimedByAddress(address: string) {
     try {
       const rewardMsgList = await this.getDelegatorRewardMessageList(address);
-
       let totalClaims = new Big(0);
 
       rewardMsgList.forEach(msg => {
         // Only process this MSG type
-        if (msg.messageType === 'MsgWithdrawDelegatorReward') {
+        if (msg.messageType === MsgTypeName.MsgWithdrawDelegatorReward) {
           // Check recipient and delegator
           if (msg.data.delegatorAddress === msg.data.recipientAddress) {
             // Process non-empty msg `amount` list
@@ -567,7 +571,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     while (currentPage <= totalPages) {
       // eslint-disable-next-line no-await-in-loop
       const delegatorRewardMessageList = await this.axiosClient.get<AccountMessageListResponse>(
-        `accounts/${address}/messages?order=height.desc&filter.msgType=MsgWithdrawDelegatorReward&page=${currentPage}`,
+        `accounts/${address}/messages?order=height.desc&filter.messageType=${MsgTypeName.MsgWithdrawDelegatorReward}&page=${currentPage}`,
       );
 
       totalPages = delegatorRewardMessageList.data.pagination.total_page;
@@ -609,7 +613,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     const requestParams = {
       page: currentPage,
       order: 'height.desc',
-      'filter.msgType': mayBeMsgTypeList,
+      'filter.messageType': mayBeMsgTypeList,
     };
 
     while (currentPage <= totalPages) {
