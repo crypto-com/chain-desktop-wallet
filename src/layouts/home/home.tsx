@@ -226,7 +226,7 @@ function HomeLayout(props: HomeLayoutProps) {
     setUserAsset(currentAsset);
     setWalletAllAssets(allAssets);
     setIsIbcVisible(isIbcVisible);
-    await walletService.syncAll(currentSession);
+    walletService.syncAll(currentSession);
 
     setIsButtonLoading(false);
     setIsConfirmationModalVisible(false);
