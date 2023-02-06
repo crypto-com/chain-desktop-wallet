@@ -30,6 +30,7 @@ import { getUIDynamicAmount, getBaseScaledAmount } from '../../../utils/NumberUt
 import { renderExplorerUrl } from '../../../models/Explorer';
 import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasConfig';
 import { ThemeColor } from '../../../config/StaticConfig';
+import { checkIfTestnet } from '../../../utils/utils';
 
 const { Header, Content, Sider } = Layout;
 
@@ -39,8 +40,9 @@ export const ProposalView = (props: any) => {
   const allProps = props?.props;
   const { proposalList, setProposalList } = allProps;
   const currentSession = useRecoilValue(sessionState);
-  const [finalAmount, setFinalAmount] = useState('10,001');
-  const [remainingAmount, setRemainingAmount] = useState('10001');
+  const isTestnet = checkIfTestnet(currentSession.wallet.config.network);
+  const [finalAmount, setFinalAmount] = useState(isTestnet ? '20,001' : '5,001');
+  const [remainingAmount, setRemainingAmount] = useState(isTestnet ? '20001' : '5001');
   const [proposalStatus, setProposposalStatus] = useState(allProps?.proposal?.status);
 
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
@@ -247,7 +249,7 @@ export const ProposalView = (props: any) => {
       analyticsService.logPage('Governance');
     }
 
-    setFinalAmount('10,001');
+    setFinalAmount(isTestnet ? '20,001' : '5,001');
     remainingTotal();
 
     setUserAsset(userAsset);

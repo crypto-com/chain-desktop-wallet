@@ -51,7 +51,7 @@ import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import { renderExplorerUrl } from '../../models/Explorer';
-import { middleEllipsis } from '../../utils/utils';
+import { checkIfTestnet, middleEllipsis } from '../../utils/utils';
 
 import { ProposalView } from './components/ProposalView';
 import { VotingHistory } from './components/VotingHistory';
@@ -115,8 +115,9 @@ const GovernancePage = () => {
   const currentSession = useRecoilValue(sessionState);
   const didMountRef = useRef(false);
   const [isLoadingTally, setIsLoadingTally] = useState(false);
+  const isTestnet = checkIfTestnet(currentSession.wallet.config.network);
   const minDeposit = '1000';
-  const maxDeposit = '10001';
+  const maxDeposit = isTestnet ? '20001' : '5001';
 
   const [createProposalHash, setCreateProposalHash] = useState('');
   const [initialDepositProposal, setInitialDeposit] = useState('0');
