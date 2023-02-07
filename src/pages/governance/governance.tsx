@@ -15,6 +15,7 @@ import {
   Input,
   InputNumber,
   Progress,
+  Spin,
 } from 'antd';
 
 import Big from 'big.js';
@@ -25,12 +26,13 @@ import {
   InfoCircleOutlined,
   ArrowLeftOutlined,
   FieldTimeOutlined,
+  LoadingOutlined,
 } from '@ant-design/icons';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import { ledgerIsExpertModeState, sessionState, walletAssetState } from '../../recoil/atom';
 
-import { getUIVoteAmount, getUIDynamicAmount, getBaseScaledAmount } from '../../utils/NumberUtils';
+import { getUIVoteAmount, getUIDynamicAmount, getBaseScaledAmount, getUINormalScaleAmount } from '../../utils/NumberUtils';
 
 import {
   ProposalModel,
@@ -55,6 +57,8 @@ import { checkIfTestnet, middleEllipsis } from '../../utils/utils';
 
 import { ProposalView } from './components/ProposalView';
 import { VotingHistory } from './components/VotingHistory';
+import { useCronosTendermintAsset } from '../../hooks/useAsset';
+import BigNumber from 'bignumber.js';
 
 const { Header, Content, Footer } = Layout;
 const { TabPane } = Tabs;
@@ -81,6 +85,8 @@ const GovernancePage = () => {
   const [decryptedPhrase, setDecryptedPhrase] = useState('');
   const [errorMessages, setErrorMessages] = useState([]);
   const [proposal, setProposal] = useState<ProposalModel>();
+
+  const cronosTendermintAsset = useCronosTendermintAsset(); 
 
   const numWithCommas = (x: string) => {
     if (x) {
@@ -112,12 +118,12 @@ const GovernancePage = () => {
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
   const [proposalList, setProposalList] = useState<ProposalModel[]>();
   const [isConfirmationModalVisible, setIsVisibleConfirmationModal] = useState(false);
-  const currentSession = useRecoilValue(sessionState);
+  const [currentSession, setCurrentSession] = useRecoilState(sessionState);
   const didMountRef = useRef(false);
   const [isLoadingTally, setIsLoadingTally] = useState(false);
-  const isTestnet = checkIfTestnet(currentSession.wallet.config.network);
   const minDeposit = '1000';
-  const maxDeposit = isTestnet ? '20001' : '5001';
+  const [passingDeposit, setPassingDeposit] = useState('10001');
+  const [isLoadingDeposit, setIsLoadingDeposit] = useState(true);
 
   const [createProposalHash, setCreateProposalHash] = useState('');
   const [initialDepositProposal, setInitialDeposit] = useState('0');
@@ -136,9 +142,9 @@ const GovernancePage = () => {
   );
 
   const customMaxValidator = TransactionUtils.maxValidator(
-    maxDeposit,
+    passingDeposit,
     t('governance.modal2.form.input.proposalDeposit.max.error', {
-      maxDeposit: numWithCommas(maxDeposit)
+      maxDeposit: numWithCommas(passingDeposit)
         .concat(' ')
         .concat(userAsset?.symbol),
     }),
@@ -469,7 +475,7 @@ const GovernancePage = () => {
     try {
       if (
         Big(form?.getFieldValue('initialDeposit')).cmp(Big(minDeposit)) !== -1 &&
-        Big(form?.getFieldValue('initialDeposit')).cmp(Big(maxDeposit)) !== 1
+        Big(form?.getFieldValue('initialDeposit')).cmp(Big(passingDeposit)) !== 1
       ) {
         setConfirmLoading(true);
         const proposalType = form.getFieldValue('proposalType');
@@ -577,7 +583,7 @@ const GovernancePage = () => {
       .toString();
     const totalDeposit = Big(getUIDynamicAmount(depositCalc, userAsset)).toString();
     const finalPercentage = Big(totalDeposit)
-      .div(Big(maxDeposit.replace(',', '')))
+      .div(Big(passingDeposit.replace(',', '')))
       .times(100)
       .toFixed(2);
     return Big(finalPercentage).toNumber();
@@ -606,12 +612,29 @@ const GovernancePage = () => {
     }, 300);
   };
 
+  const fetchProposalDeposit = async () => {
+    setIsLoadingDeposit(true);
+    const deposit = await walletService.fetchProposalMinDeposit() ?? '2000000000000';
+    const adjustedDeposit = new BigNumber(deposit).plus('100000000').toString(); // Plus 1 CRO
+    setPassingDeposit(getUINormalScaleAmount(adjustedDeposit, userAsset.decimals, 2));
+    setIsLoadingDeposit(false);
+  };
+
   useEffect(() => {
     fetchProposalList();
 
     if (!didMountRef.current) {
       const usersBalance = getUIDynamicAmount(userAsset?.balance, userAsset);
       const userDeposit = Big(usersBalance).cmp(Big(minDeposit)) === 1 ? minDeposit : usersBalance;
+      setCurrentSession({
+        ...currentSession,
+        activeAsset: cronosTendermintAsset,
+      });
+      walletService.setCurrentSession({
+        ...currentSession,
+        activeAsset: cronosTendermintAsset,
+      });
+      fetchProposalDeposit();
       didMountRef.current = true;
       analyticsService.logPage('Governance');
       form.setFieldsValue({ initialDeposit: userDeposit });
@@ -619,7 +642,7 @@ const GovernancePage = () => {
     }
 
     // eslint-disable-next-line
-  }, [currentSession, form, userAsset, proposal, proposalList, setModalType, modalType]);
+  }, [currentSession, form, userAsset, proposal, proposalList, setModalType, modalType, isLoadingTally, isLoadingDeposit]);
 
   return (
     <Layout className="site-layout">
@@ -987,6 +1010,8 @@ const GovernancePage = () => {
               // setProposal
               proposalList,
               setProposalList,
+              passingDeposit,
+              isLoadingDeposit
             }}
           />
         ) : (
@@ -1004,6 +1029,12 @@ const GovernancePage = () => {
                   <div className="site-layout-background governance-content">
                     <div className="container">
                       <List
+                        loading={{
+                          indicator: (
+                            <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />
+                          ),
+                          spinning: isLoadingDeposit || isLoadingTally,
+                        }}
                         dataSource={proposalList}
                         renderItem={(item: ProposalModel) => (
                           <List.Item

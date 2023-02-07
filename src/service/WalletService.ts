@@ -659,6 +659,17 @@ class WalletService {
     }
   }
 
+  public async fetchProposalMinDeposit() {
+    try {
+      const minDeposit = await this.txHistoryManager.getProposalMinDeposit();
+      return minDeposit;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_LOADING Proposal Min Deposit data', e);
+      return null;
+    }
+  }
+
   public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {
     const currentSession = await this.storageService.retrieveCurrentSession();
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {

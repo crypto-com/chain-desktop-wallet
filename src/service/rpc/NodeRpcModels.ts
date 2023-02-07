@@ -212,6 +212,20 @@ export interface AllProposalResponse {
   pagination: Pagination;
 }
 
+export interface ProposalDepositParamsResponse {
+  voting_params: {
+    voting_period: string;
+  };
+  deposit_params: {
+    min_deposit: Balance[];
+  };
+  tally_params: {
+    quorum: string;
+    threshold: string;
+    veto_threshold: string;
+  }
+}
+
 export interface LoadedTallyResponse {
   tally: FinalTallyResult;
 }
