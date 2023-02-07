@@ -22,6 +22,7 @@ import {
   ErrorRpcResponse,
   UnbondingDelegationResponse,
   DelegationResponse,
+  ProposalDepositParamsResponse,
 } from './NodeRpcModels';
 import {
   BroadCastResult,
@@ -447,6 +448,19 @@ export class NodeRpcService implements INodeRpcService {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { proposals, pagination } = response.data;
     return [proposals, pagination.next_key];
+  }
+
+  public async loadProposalDepositParams(): Promise<ProposalDepositParamsResponse | null> {
+    try {
+      const url = '/cosmos/gov/v1beta1/params/deposit';
+      const response = await this.cosmosClient.get<ProposalDepositParamsResponse>(url);
+      return response.data;
+      
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOAD_DEPOSIT_PARAMS', e);
+      return null;
+    }
   }
 
   public async loadDelegations(

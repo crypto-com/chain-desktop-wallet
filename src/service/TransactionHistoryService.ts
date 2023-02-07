@@ -671,6 +671,26 @@ export class TransactionHistoryService {
     }
   }
 
+  public async getProposalMinDeposit(): Promise<string> {
+    try {
+      const currentSession = await this.storageService.retrieveCurrentSession();
+      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+        return Promise.resolve('1000000000000');
+      }
+
+      const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+
+      const params = await nodeRpc.loadProposalDepositParams();
+      const minDeposit = params?.deposit_params.min_deposit || [];
+
+      return minDeposit[0]?.amount;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING PROPOSAL_MIN_DEPOSIT', e);
+      return '1000000000000';
+    }
+  }
+
   private async fetchCurrentWalletCRC20Tokens(croEvmAsset: UserAsset, session: Session) {
     const { address } = croEvmAsset;
 
