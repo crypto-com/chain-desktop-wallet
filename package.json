@@ -112,7 +112,7 @@
   "devDependencies": {
     "@babel/core": "7.18.5",
     "@babel/plugin-syntax-jsx": "7.12.1",
-    "@esbuild-plugins/node-globals-polyfill": "0.1.1",
+    "@esbuild-plugins/node-globals-polyfill": "0.2.3",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.2",
     "@svgr/webpack": "5.4.0",
     "@testing-library/react-hooks": "^8.0.1",
