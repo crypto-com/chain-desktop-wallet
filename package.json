@@ -387,6 +387,7 @@
     "express": "4.17.3",
     "json5": "2.2.2",
     "flat": "5.0.1",
-    "jszip": "3.8.0"
+    "jszip": "3.8.0",
+    "http-cache-semantics": "4.1.1"
   }
 }
