@@ -1,4 +1,5 @@
-import { Table } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import { Spin, Table } from 'antd';
 import { ColumnsType } from 'antd/lib/table';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -11,13 +12,16 @@ import { ellipsis, middleEllipsis } from '../../../../utils/utils';
 
 const CronosNFTTransactionList = () => {
   const [nftTransfers, setNftTransfers] = useState<NftTxsResponseTxModel[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [t] = useTranslation();
   const cronosAsset = useCronosEvmAsset();
 
   useEffect(() => {
     const fetchNftTransfers = async () => {
+      setIsLoading(true);
       const txs = await walletService.retrieveCronosNFTTxs();
       setNftTransfers(txs);
+      setIsLoading(false);
     };
 
     fetchNftTransfers();
@@ -105,6 +109,10 @@ const CronosNFTTransactionList = () => {
 
   return (
     <Table<NftTxsResponseTxModel>
+      loading={{
+        indicator: <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />,
+        spinning: isLoading,
+      }}
       locale={{
         triggerDesc: t('general.table.triggerDesc'),
         triggerAsc: t('general.table.triggerAsc'),

@@ -556,9 +556,12 @@ export class StorageService {
 
   // eslint-disable-next-line
   public async saveNFTAccountTransactions(nftAccountTransactionList: NftAccountTransactionList) {
+    await this.removeAllNFTAccountTransactions(nftAccountTransactionList.walletId);
+
     if (nftAccountTransactionList.transactions.length === 0) {
       return Promise.resolve();
     }
+
     // Save into new transaction store
     const nftAccountTxRecords: NftAccountTransactionRecord[] = nftAccountTransactionList.transactions.map(
       tx => {
@@ -570,6 +573,7 @@ export class StorageService {
         };
       },
     );
+
     await this.insertCommonTransactionRecords(nftAccountTxRecords);
 
     // @deprecated
@@ -579,6 +583,18 @@ export class StorageService {
       { multi: true },
     );
     return this.db.nftAccountTxStore.insert<NftAccountTransactionList>(nftAccountTransactionList); */
+  }
+
+  public async removeAllNFTAccountTransactions(
+    walletId: string,
+  ) {
+    return this.db.commonTransactionStore.remove(
+      {
+        walletId,
+        txType: 'nftAccount',
+      },
+      { multi: true },
+    );
   }
 
   public async retrieveAllNFTAccountTransactions(
@@ -654,24 +670,24 @@ export class StorageService {
 
   // eslint-disable-next-line
   public async saveCryptoOrgNFTs(walletId: string, nfts: CryptoOrgNftModel[]) {
-    if (nfts.length === 0) {
-      return await await this.db.nftStore.remove(
-        { walletId, type: NftType.CRYPTO_ORG },
-        { multi: true },
-      );
+    await this.db.nftStore.remove(
+      { walletId, type: NftType.CRYPTO_ORG },
+      { multi: true },
+    );
+    if (nfts.length !== 0) {
+      await this.insertCommonNfts(walletId, nfts);
     }
-    await this.insertCommonNfts(walletId, nfts);
   }
 
   // eslint-disable-next-line
   public async saveCronosCRC721NFTs(walletId: string, nfts: CronosCRC721NftModel[]) {
-    if (nfts.length === 0) {
-      return await await this.db.nftStore.remove(
-        { walletId, type: NftType.CRC_721_TOKEN },
-        { multi: true },
-      );
+    await this.db.nftStore.remove(
+      { walletId, type: NftType.CRC_721_TOKEN },
+      { multi: true },
+    );
+    if (nfts.length !== 0) {
+      await this.insertCommonNfts(walletId, nfts);
     }
-    await this.insertCommonNfts(walletId, nfts);
   }
 
   public async retrieveAllNfts(walletId: string) {
