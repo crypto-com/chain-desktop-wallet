@@ -165,7 +165,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     ];
 
     const transferListResponse = await this.axiosClient.get<TransferListResponse>(
-      `/accounts/${address}/messages?order=height.desc&filter.messageType=${msgType.join(
+      `/accounts/${address}/messages?order=height.desc&filter.msgType=${msgType.join(
         ',',
       )}&limit=1000`,
     );
@@ -353,8 +353,17 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     address: string,
   ): Promise<NftAccountTransactionListResponse> {
     try {
+      const msgType: MsgTypeName[] = [
+        MsgTypeName.MsgTransferNFT,
+        MsgTypeName.MsgBurnNFT,
+        MsgTypeName.MsgIssueDenom,
+        MsgTypeName.MsgEditNFT,
+        MsgTypeName.MsgMintNFT
+      ];
       const nftTxsListResponse = await this.axiosClient.get<NftAccountTransactionListResponse>(
-        `accounts/${address}/messages?order=height.desc&filter.messageType=MsgTransferNFT,MsgMintNFT,MsgIssueDenom,MsgEditNFT`,
+        `accounts/${address}/messages?order=height.desc&filter.msgType=${msgType.join(
+          ',',
+        )}`,
       );
       return nftTxsListResponse.data;
     } catch (e) {
@@ -571,7 +580,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     while (currentPage <= totalPages) {
       // eslint-disable-next-line no-await-in-loop
       const delegatorRewardMessageList = await this.axiosClient.get<AccountMessageListResponse>(
-        `accounts/${address}/messages?order=height.desc&filter.messageType=${MsgTypeName.MsgWithdrawDelegatorReward}&page=${currentPage}`,
+        `accounts/${address}/messages?order=height.desc&filter.msgType=${MsgTypeName.MsgWithdrawDelegatorReward}&page=${currentPage}`,
       );
 
       totalPages = delegatorRewardMessageList.data.pagination.total_page;
@@ -613,7 +622,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     const requestParams = {
       page: currentPage,
       order: 'height.desc',
-      'filter.messageType': mayBeMsgTypeList,
+      'filter.msgType': mayBeMsgTypeList,
     };
 
     while (currentPage <= totalPages) {
