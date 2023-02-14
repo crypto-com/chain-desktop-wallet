@@ -601,23 +601,61 @@ describe('Testing NodeRpcService', () => {
 
       return expect(nodeRpcService.loadTopValidators()).to.eventually.deep.equal([
         {
-          cumulativeShares: '0',
-          cumulativeSharesExcludePercentage: '0',
-          cumulativeSharesIncludePercentage: '100',
-          currentCommissionRate: '0.100000000000000000',
-          currentShares: '2',
-          currentTokens: '2',
-          jailed: false,
-          maxCommissionRate: '0.100000000000000000',
-          securityContact: '',
-          status: 'BOND_STATUS_BONDED',
-          validatorAddress: 'active_operator_address_2',
-          validatorName: '2',
-          validatorWebSite: '',
+          cumulativeShares: '0', 
+          cumulativeSharesExcludePercentage: '0', 
+          cumulativeSharesIncludePercentage: '16.666666666666666666', 
+          currentCommissionRate: '0.100000000000000000', 
+          currentShares: '1', 
+          currentTokens: '1', 
+          jailed: false, 
+          maxCommissionRate: '0.100000000000000000', 
           pubKey: {
-            type: '/cosmos.crypto.ed25519.PubKey',
-            value: 'consensus_pubkey_2',
-          },
+            type: '/cosmos.crypto.ed25519.PubKey', 
+            value: 'consensus_pubkey_1'
+          }, 
+          securityContact: '', 
+          status: 'BOND_STATUS_BONDED', 
+          validatorAddress: 'operator_address_1', 
+          validatorName: '1', 
+          validatorWebSite: ''
+        }, 
+        {
+          cumulativeShares: '1',
+          cumulativeSharesExcludePercentage: '16.666666666666666666', 
+          cumulativeSharesIncludePercentage: '50', 
+          currentCommissionRate: '0.100000000000000000', 
+          currentShares: '2', 
+          currentTokens: '2', 
+          jailed: false, 
+          maxCommissionRate: '0.100000000000000000', 
+          pubKey: {
+            type: '/cosmos.crypto.ed25519.PubKey', 
+            value: 'consensus_pubkey_2'
+          }, 
+          securityContact: '', 
+          status: 'BOND_STATUS_BONDED', 
+          validatorAddress: 'active_operator_address_2', 
+          validatorName: '2', 
+          validatorWebSite: ''
+        }, 
+        {
+          cumulativeShares: '3', 
+          cumulativeSharesExcludePercentage: '50', 
+          cumulativeSharesIncludePercentage: '100', 
+          currentCommissionRate: '0.100000000000000000', 
+          currentShares: '3', 
+          currentTokens: '3', 
+          jailed: false,
+          maxCommissionRate: '0.100000000000000000', 
+          pubKey: {
+            type: '/cosmos.crypto.ed25519.PubKey', 
+            value: 'consensus_pubkey_3'
+          }, 
+          securityContact: '', 
+          status: 'BOND_STATUS_BONDED', 
+          validatorAddress: 'operator_address_3', 
+          validatorName: '3', 
+          validatorWebSite: ''
         },
       ]);
     });

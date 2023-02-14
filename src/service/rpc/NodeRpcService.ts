@@ -491,14 +491,6 @@ export class NodeRpcService implements INodeRpcService {
       }
     }
 
-    // const activeValidators = (await this.fetchLatestActiveValidators()).reduce(
-    //   (pubKeyMap, validator) => {
-    //     pubKeyMap[validator.value] = true;
-    //     return pubKeyMap;
-    //   },
-    //   {},
-    // );
-
     let topValidators = validators
       .filter(v => v.status === 'BOND_STATUS_BONDED')
       .filter(v => !v.jailed)
@@ -534,12 +526,6 @@ export class NodeRpcService implements INodeRpcService {
     });
 
     return topValidators;
-  }
-
-  private async fetchLatestActiveValidators(): Promise<ValidatorPubKey[]> {
-    const response = await this.cosmosClient.get<ValidatorSetResponse>('/validatorsets/latest');
-
-    return response.data.result.validators.map(v => v.pub_key);
   }
 
   private async fetchValidators(
