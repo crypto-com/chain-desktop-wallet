@@ -39,8 +39,8 @@ export const ProposalView = (props: any) => {
   const allProps = props?.props;
   const { proposalList, setProposalList } = allProps;
   const currentSession = useRecoilValue(sessionState);
-  const [finalAmount, setFinalAmount] = useState('10,001');
-  const [remainingAmount, setRemainingAmount] = useState('10001');
+  const [finalAmount, setFinalAmount] = useState(allProps.passingDeposit);
+  const [remainingAmount, setRemainingAmount] = useState(allProps.passingDeposit);
   const [proposalStatus, setProposposalStatus] = useState(allProps?.proposal?.status);
 
   const [userAsset, setUserAsset] = useRecoilState(walletAssetState);
@@ -124,7 +124,7 @@ export const ProposalView = (props: any) => {
     const finalPercentage = Big(totalDepositValue)
       .div(Big(finalAmount.replace(',', '')))
       .times(100)
-      .toString();
+      .toFixed(2);
     setTotalDepositPercentageValue(finalPercentage);
   };
 
@@ -247,7 +247,6 @@ export const ProposalView = (props: any) => {
       analyticsService.logPage('Governance');
     }
 
-    setFinalAmount('10,001');
     remainingTotal();
 
     setUserAsset(userAsset);
@@ -355,7 +354,7 @@ export const ProposalView = (props: any) => {
             }
           >
             <Spin
-              spinning={allProps.isLoadingTally}
+              spinning={allProps.isLoadingTally || allProps.isLoadingDeposit}
               indicator={<LoadingOutlined />}
               tip="Loading latest results"
             >

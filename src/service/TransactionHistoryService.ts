@@ -20,6 +20,7 @@ import { CronosClient } from './cronos/CronosClient';
 import {
   CommonTransactionRecord,
   EthereumTransactionType,
+  MsgTypeName,
   NftQueryParams,
   NftTransferModel,
   ProposalModel,
@@ -280,7 +281,7 @@ export class TransactionHistoryService {
           assetType: currentAsset.assetType,
           txHash: tx.hash,
           txType: EthereumTransactionType.TRANSFER,
-          messageTypeName: 'MsgSend',
+          messageTypeName: MsgTypeName.MsgSend,
           txData: transferTx,
           // TODO: add messageTypeName
         };
@@ -667,6 +668,26 @@ export class TransactionHistoryService {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING PROPOSALS', e);
       return [];
+    }
+  }
+
+  public async getProposalMinDeposit(): Promise<string> {
+    try {
+      const currentSession = await this.storageService.retrieveCurrentSession();
+      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+        return Promise.resolve('1000000000000');
+      }
+
+      const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+
+      const params = await nodeRpc.loadProposalDepositParams();
+      const minDeposit = params?.deposit_params.min_deposit || [];
+
+      return minDeposit[0]?.amount;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING PROPOSAL_MIN_DEPOSIT', e);
+      return '1000000000000';
     }
   }
 

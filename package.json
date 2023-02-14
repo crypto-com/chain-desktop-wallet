@@ -112,7 +112,6 @@
   "devDependencies": {
     "@babel/core": "7.18.5",
     "@babel/plugin-syntax-jsx": "7.12.1",
-    "@esbuild-plugins/node-globals-polyfill": "0.1.1",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.2",
     "@svgr/webpack": "5.4.0",
     "@testing-library/react-hooks": "^8.0.1",
@@ -387,6 +386,8 @@
     "qs": "6.7.3",
     "express": "4.17.3",
     "json5": "2.2.2",
-    "flat": "5.0.1"
+    "flat": "5.0.1",
+    "jszip": "3.8.0",
+    "http-cache-semantics": "4.1.1"
   }
 }

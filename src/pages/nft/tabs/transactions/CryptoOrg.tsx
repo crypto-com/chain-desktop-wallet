@@ -1,12 +1,13 @@
-import { Table, Tag } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
+import { Spin, Table, Tag } from 'antd';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRecoilValue } from 'recoil';
 import { renderExplorerUrl } from '../../../../models/Explorer';
 import {
+  MsgTypeName,
   NftAccountTransactionData,
-  NftTransactionType,
   TransactionStatus,
 } from '../../../../models/Transaction';
 import { sessionState } from '../../../../recoil/atom';
@@ -16,7 +17,7 @@ import { ellipsis, middleEllipsis } from '../../../../utils/utils';
 interface NftTransferTabularData {
   key: string;
   transactionHash: string;
-  messageType: NftTransactionType;
+  messageType: MsgTypeName;
   denomId: string;
   tokenId: string;
   recipientAddress: string;
@@ -32,17 +33,17 @@ const convertNftTransfers = (allTransfers: NftAccountTransactionData[]) => {
     return TransactionStatus.FAILED;
   };
   const getType = (transfer: NftAccountTransactionData) => {
-    if (transfer.messageType === NftTransactionType.ISSUE_DENOM) {
-      return NftTransactionType.ISSUE_DENOM;
+    if (transfer.messageType === MsgTypeName.MsgIssueDenom) {
+      return MsgTypeName.MsgIssueDenom;
       // eslint-disable-next-line no-else-return
-    } else if (transfer.messageType === NftTransactionType.MINT_NFT) {
-      return NftTransactionType.MINT_NFT;
-    } else if (transfer.messageType === NftTransactionType.EDIT_NFT) {
-      return NftTransactionType.EDIT_NFT;
-    } else if (transfer.messageType === NftTransactionType.BURN_NFT) {
-      return NftTransactionType.BURN_NFT;
+    } else if (transfer.messageType === MsgTypeName.MsgMintNFT) {
+      return MsgTypeName.MsgMintNFT;
+    } else if (transfer.messageType === MsgTypeName.MsgEditNFT) {
+      return MsgTypeName.MsgEditNFT;
+    } else if (transfer.messageType === MsgTypeName.MsgBurnNFT) {
+      return MsgTypeName.MsgBurnNFT;
     }
-    return NftTransactionType.TRANSFER_NFT;
+    return MsgTypeName.MsgTransferNFT;
   };
 
   return allTransfers.map((transfer, idx) => {
@@ -62,16 +63,20 @@ const convertNftTransfers = (allTransfers: NftAccountTransactionData[]) => {
 
 const CryptoOrgNFTTransactionList = () => {
   const [nftTransfers, setNftTransfers] = useState<NftTransferTabularData[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const currentSession = useRecoilValue(sessionState);
   const [t] = useTranslation();
 
   useEffect(() => {
     const fetchNftTransfers = async () => {
+      setIsLoading(true);
+      await walletService.fetchAndSaveNFTAccountTxs(currentSession);
       const allNftTransfer: NftAccountTransactionData[] = await walletService.getAllNFTAccountTxs(
         currentSession,
       );
       const nftTransferTabularData = convertNftTransfers(allNftTransfer);
       setNftTransfers(nftTransferTabularData);
+      setIsLoading(false);
     };
 
     fetchNftTransfers();
@@ -101,9 +106,9 @@ const CryptoOrgNFTTransactionList = () => {
         let statusColor;
         if (!record.status) {
           statusColor = 'error';
-        } else if (record.messageType === NftTransactionType.MINT_NFT) {
+        } else if (record.messageType === MsgTypeName.MsgMintNFT) {
           statusColor = 'success';
-        } else if (record.messageType === NftTransactionType.TRANSFER_NFT) {
+        } else if (record.messageType === MsgTypeName.MsgTransferNFT) {
           statusColor =
             record.recipientAddress === currentSession.wallet.address ? 'processing' : 'error';
         } else {
@@ -111,14 +116,14 @@ const CryptoOrgNFTTransactionList = () => {
         }
 
         if (record.status) {
-          if (record.messageType === NftTransactionType.MINT_NFT) {
+          if (record.messageType === MsgTypeName.MsgMintNFT) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
                 Minted NFT
               </Tag>
             );
             // eslint-disable-next-line no-else-return
-          } else if (record.messageType === NftTransactionType.TRANSFER_NFT) {
+          } else if (record.messageType === MsgTypeName.MsgTransferNFT) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
                 {record.recipientAddress === currentSession.wallet.address
@@ -126,7 +131,7 @@ const CryptoOrgNFTTransactionList = () => {
                   : 'Sent NFT'}
               </Tag>
             );
-          } else if (record.messageType === NftTransactionType.ISSUE_DENOM) {
+          } else if (record.messageType === MsgTypeName.MsgIssueDenom) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
                 Issued Denom
@@ -140,20 +145,20 @@ const CryptoOrgNFTTransactionList = () => {
           );
           // eslint-disable-next-line no-else-return
         } else {
-          if (record.messageType === NftTransactionType.MINT_NFT) {
+          if (record.messageType === MsgTypeName.MsgMintNFT) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
                 Failed Mint
               </Tag>
             );
             // eslint-disable-next-line no-else-return
-          } else if (record.messageType === NftTransactionType.TRANSFER_NFT) {
+          } else if (record.messageType === MsgTypeName.MsgTransferNFT) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
                 Failed Transfer
               </Tag>
             );
-          } else if (record.messageType === NftTransactionType.ISSUE_DENOM) {
+          } else if (record.messageType === MsgTypeName.MsgIssueDenom) {
             return (
               <Tag style={{ border: 'none', padding: '5px 14px' }} color={statusColor}>
                 Failed Issue
@@ -225,6 +230,10 @@ const CryptoOrgNFTTransactionList = () => {
 
   return (
     <Table
+      loading={{
+        indicator: <Spin indicator={<LoadingOutlined style={{ fontSize: 36 }} spin />} />,
+        spinning: isLoading,
+      }}
       locale={{
         triggerDesc: t('general.table.triggerDesc'),
         triggerAsc: t('general.table.triggerAsc'),
