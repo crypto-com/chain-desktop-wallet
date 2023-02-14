@@ -30,7 +30,6 @@ import { getUIDynamicAmount, getBaseScaledAmount } from '../../../utils/NumberUt
 import { renderExplorerUrl } from '../../../models/Explorer';
 import { GasInfoTendermint } from '../../../components/GasCustomize/Tendermint/GasConfig';
 import { ThemeColor } from '../../../config/StaticConfig';
-import { checkIfTestnet } from '../../../utils/utils';
 
 const { Header, Content, Sider } = Layout;
 

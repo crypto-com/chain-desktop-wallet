@@ -76,7 +76,7 @@ export const CRONOS_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
     tendermintNetwork: {
       defaultNodeUrl: isTestnet
         ? 'https://rpc-c5.crypto.org'
-        : 'https://mainnet.crypto.org',
+        : 'https://rpc.mainnet.crypto.org',
       chainName: SupportedChainName.CRYPTO_ORG,
       chainId: isTestnet ? 'testnet-croeseid-5' : MainNetConfig.network.chainId,
       addressPrefix: isTestnet ? 'tcro' : 'cro',
@@ -91,10 +91,10 @@ export const CRONOS_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
       node: {
         clientUrl: isTestnet
           ? 'https://rpc-c5.crypto.org'
-          : 'https://mainnet.crypto.org',
+          : 'https://rpc.mainnet.crypto.org',
         proxyUrl: isTestnet
           ? 'https://rest-c5.crypto.org'
-          : 'https://mainnet.crypto.org',
+          : 'https://rest.mainnet.crypto.org',
       },
     },
   };

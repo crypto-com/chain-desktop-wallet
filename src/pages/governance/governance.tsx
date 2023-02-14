@@ -53,7 +53,7 @@ import { useLedgerStatus } from '../../hooks/useLedgerStatus';
 import { ledgerNotification } from '../../components/LedgerNotification/LedgerNotification';
 import { TransactionUtils } from '../../utils/TransactionUtils';
 import { renderExplorerUrl } from '../../models/Explorer';
-import { checkIfTestnet, middleEllipsis } from '../../utils/utils';
+import { middleEllipsis } from '../../utils/utils';
 
 import { ProposalView } from './components/ProposalView';
 import { VotingHistory } from './components/VotingHistory';

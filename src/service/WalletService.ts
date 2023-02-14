@@ -770,9 +770,8 @@ class WalletService {
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve(null);
     }
-    // const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
     let nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
-    if(currentSession.activeAsset?.config?.nodeUrl.indexOf('rpc-c5') !== 0 && currentSession.activeAsset?.config?.tendermintNetwork ) {
+    if(currentSession.activeAsset?.config?.tendermintNetwork ) {
       nodeRpc = await  NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
     }
     return nodeRpc.loadLatestTally(proposalID);

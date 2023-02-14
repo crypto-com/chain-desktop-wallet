@@ -43,7 +43,7 @@ import {
   NavbarMenuKey,
   updateDownloadedState,
 } from '../../recoil/atom';
-import { ellipsis, checkIfTestnet, getCronosEvmAsset, getEthereumEvmAsset } from '../../utils/utils';
+import { ellipsis, checkIfTestnet, getCronosEvmAsset, getEthereumEvmAsset, getCronosTendermintAsset } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 // import IconSend from '../../svg/IconSend';
@@ -69,6 +69,7 @@ import {
   LOADING_TIMEOUT,
   MAX_INCORRECT_ATTEMPTS_ALLOWED,
   SHOW_WARNING_INCORRECT_ATTEMPTS,
+  SupportedChainName,
   ThemeColor,
 } from '../../config/StaticConfig';
 import { generalConfigService } from '../../service/storage/GeneralConfigService';
@@ -81,7 +82,7 @@ import {
   DefaultMainnetBridgeConfigs,
   DefaultTestnetBridgeConfigs,
 } from '../../service/bridge/BridgeConfig';
-import { ETH_ASSET, GOERLI_ETHEREUM_EXPLORER_URL, MainNetEvmConfig, MAINNET_ETHEREUM_EXPLORER_URL, TestNetEvmConfig } from '../../config/StaticAssets';
+import { CRONOS_TENDERMINT_ASSET, ETH_ASSET, GOERLI_ETHEREUM_EXPLORER_URL, MainNetEvmConfig, MAINNET_ETHEREUM_EXPLORER_URL, TestNetEvmConfig } from '../../config/StaticAssets';
 import { walletConnectStateAtom } from '../../service/walletconnect/store';
 import { WalletConnectModal } from '../../pages/walletconnect/components/WalletConnectModal';
 import IconWalletConnect from '../../svg/IconWalletConnect';
@@ -328,8 +329,9 @@ function HomeLayout(props: HomeLayoutProps) {
     }
 
     const assets = await walletService.retrieveWalletAssets(walletSession.wallet.identifier);
+    const defaultCronosTendermintAsset = CRONOS_TENDERMINT_ASSET(walletSession.wallet.config);
+    const cronosTendermintAsset = getCronosTendermintAsset(assets);
     const cronosAsset = getCronosEvmAsset(assets);
-
     const ethAsset = getEthereumEvmAsset(assets);
 
     const checkDefaultExplorerUrl = checkIfTestnet(walletSession.wallet.config.network)
@@ -345,7 +347,9 @@ function HomeLayout(props: HomeLayoutProps) {
         !walletSession.activeAsset?.config?.explorer ||
         // Check if explorerUrl has been updated with latest default
         cronosAsset?.config?.explorerUrl !== checkDefaultExplorerUrl ||
-        ethAsset?.config?.explorerUrl !== checkDefaultEthExplorerUrl
+        ethAsset?.config?.explorerUrl !== checkDefaultEthExplorerUrl || 
+        // Check if there are latest tendermintNetwork on Cronos Tendermint
+        !cronosTendermintAsset?.config?.tendermintNetwork
       ) {
         const updateExplorerUrlNotificationKey = 'updateExplorerUrlNotificationKey';
 
@@ -429,6 +433,15 @@ function HomeLayout(props: HomeLayoutProps) {
                 },
                 isLedgerSupportDisabled: asset.config?.isLedgerSupportDisabled!,
                 isStakingDisabled: asset.config?.isStakingDisabled!,
+                ...(asset.assetType === UserAssetType.TENDERMINT && asset.name === SupportedChainName.CRYPTO_ORG) && {
+                  tendermintNetwork: {
+                    ...defaultCronosTendermintAsset.config.tendermintNetwork!,
+                    node: {
+                      clientUrl: defaultCronosTendermintAsset.config.tendermintNetwork?.node?.clientUrl ?? '',
+                      proxyUrl: defaultCronosTendermintAsset.config.tendermintNetwork?.node?.proxyUrl ?? '',
+                    }
+                  }
+                }
               },
             };
             await walletService.saveAssets([newlyUpdatedAsset]);
@@ -631,10 +644,10 @@ function HomeLayout(props: HomeLayoutProps) {
       }, 2000);
 
       // checkNewlyAddedStaticAssets(currentSession);
-      // checkCorrectExplorerUrl({
-      //   ...currentSession,
-      //   activeAsset: currentAsset,
-      // });
+      checkCorrectExplorerUrl({
+        ...currentSession,
+        activeAsset: currentAsset,
+      });
       checkBridgeConfigs(currentSession);
     };
 

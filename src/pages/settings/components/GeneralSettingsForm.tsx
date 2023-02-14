@@ -155,6 +155,10 @@ export const GeneralSettingsForm = props => {
             hasFeedback
             rules={[
               {
+                required: true,
+                message: `RPC URL ${t('general.required')}`,
+              },
+              {
                 type: 'url',
                 message: t('settings.form1.clientUrl.error1'),
               },
@@ -167,6 +171,10 @@ export const GeneralSettingsForm = props => {
             label={'Rest URL'}
             hasFeedback
             rules={[
+              {
+                required: true,
+                message: `Rest URL ${t('general.required')}`,
+              },
               {
                 type: 'url',
                 message: t('settings.form1.proxyUrl.error1'),

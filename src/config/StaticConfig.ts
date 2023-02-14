@@ -355,7 +355,7 @@ const TestNetConfig: WalletConfig = {
 };
 
 const TestnetCroeseid4: Network = {
-  defaultNodeUrl: 'https://testnet-croeseid-4.crypto.org',
+  defaultNodeUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
   chainId: 'testnet-croeseid-4',
   addressPrefix: 'tcro',
   validatorAddressPrefix: 'tcrocncl',
@@ -368,11 +368,10 @@ const TestnetCroeseid4: Network = {
     coinType: 1,
     account: 0,
   },
-  rpcUrl: 'https://testnet-croeseid-4.crypto.org:26657',
+  rpcUrl: 'https://rpc-testnet-croeseid-4.crypto.org:26657',
 };
 
 const TestnetCroeseid5: Network = {
-  // defaultNodeUrl: 'https://testnet-croeseid-5.crypto.org',
   defaultNodeUrl: 'https://rpc-c5.crypto.org',
   chainId: 'testnet-croeseid-5',
   addressPrefix: 'tcro',
@@ -386,8 +385,7 @@ const TestnetCroeseid5: Network = {
     coinType: 1,
     account: 0,
   },
-  // rpcUrl: 'https://testnet-croeseid-5.crypto.org:26657',
-  rpcUrl: 'https://rpc-c5.crypto.org:443',
+  rpcUrl: 'https://rpc-c5.crypto.org',
 };
 
 export const TestNetCroeseid4Config: WalletConfig = {
