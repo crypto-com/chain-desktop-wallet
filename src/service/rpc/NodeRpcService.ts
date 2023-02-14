@@ -17,8 +17,6 @@ import {
   Proposal,
   RewardResponse,
   ValidatorListResponse,
-  ValidatorPubKey,
-  ValidatorSetResponse,
   ErrorRpcResponse,
   UnbondingDelegationResponse,
   DelegationResponse,
