@@ -202,7 +202,7 @@ class WalletService {
   public supportedConfigs(): WalletConfig[] {
     return [
       DefaultWalletConfigs.MainNetConfig,
-      // DefaultWalletConfigs.TestNetCroeseid4Config,
+      DefaultWalletConfigs.TestNetCroeseid4Config,
       DefaultWalletConfigs.TestNetCroeseid5Config,
       DefaultWalletConfigs.CustomDevNet,
     ];

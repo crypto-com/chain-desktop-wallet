@@ -249,6 +249,7 @@ export type WalletConfig = {
     gasLimit: string;
     networkFee: string;
   };
+  tendermintNetwork?: Network;
 };
 
 export const FIXED_DEFAULT_FEE = String(10_000);
@@ -492,7 +493,7 @@ export const DefaultWalletConfigs = {
   TestNetConfig,
   MainNetConfig,
   CustomDevNet,
-  // TestNetCroeseid4Config,
+  TestNetCroeseid4Config,
   TestNetCroeseid5Config,
 };
 

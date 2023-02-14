@@ -35,8 +35,8 @@ export const GeneralSettingsForm = props => {
     })
       // Prioritize CRO assets over other assets
       .sort((a, b) => {
-        if(a.mainnetSymbol === 'CRO') {
-          if(b.mainnetSymbol === 'CRO' && b.assetType === UserAssetType.TENDERMINT) {
+        if (a.mainnetSymbol === 'CRO') {
+          if (b.mainnetSymbol === 'CRO' && b.assetType === UserAssetType.TENDERMINT) {
             return 1;
           }
           return -1;
@@ -109,8 +109,7 @@ export const GeneralSettingsForm = props => {
     setSession(newSession);
 
     message.success(
-      `${t('settings.message.generalSettings1')} ${
-        newState ? t('general.enabled') : t('general.disabled')
+      `${t('settings.message.generalSettings1')} ${newState ? t('general.enabled') : t('general.disabled')
       }`,
     );
     setUpdateLoading(false);
@@ -148,6 +147,35 @@ export const GeneralSettingsForm = props => {
       >
         <Input />
       </Form.Item>
+      {(session.activeAsset?.assetType === UserAssetType.TENDERMINT) && 
+        <>
+          <Form.Item
+            name="clientUrl"
+            label={'RPC URL'}
+            hasFeedback
+            rules={[
+              {
+                type: 'url',
+                message: t('settings.form1.clientUrl.error1'),
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="proxyUrl"
+            label={'Rest URL'}
+            hasFeedback
+            rules={[
+              {
+                type: 'url',
+                message: t('settings.form1.proxyUrl.error1'),
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+        </>}
       <Form.Item
         name="indexingUrl"
         label={t('settings.form1.indexingUrl.label')}

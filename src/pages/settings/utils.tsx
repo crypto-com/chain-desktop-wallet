@@ -11,5 +11,14 @@ export function getAssetConfigFromWalletConfig(walletConfig: WalletConfig): User
     isLedgerSupportDisabled: false,
     isStakingDisabled: false,
     nodeUrl: walletConfig.nodeUrl,
+    ...(walletConfig.tendermintNetwork) && {
+      tendermintNetwork: {
+        ...walletConfig.tendermintNetwork!,
+        node: {
+          clientUrl: walletConfig.tendermintNetwork.node?.clientUrl ?? '',
+          proxyUrl: walletConfig.tendermintNetwork.node?.proxyUrl ?? ''
+        }
+      }
+    }
   };
 }
