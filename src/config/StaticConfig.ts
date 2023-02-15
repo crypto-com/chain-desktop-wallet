@@ -249,6 +249,7 @@ export type WalletConfig = {
     gasLimit: string;
     networkFee: string;
   };
+  tendermintNetwork?: Network;
 };
 
 export const FIXED_DEFAULT_FEE = String(10_000);
@@ -354,7 +355,7 @@ const TestNetConfig: WalletConfig = {
 };
 
 const TestnetCroeseid4: Network = {
-  defaultNodeUrl: 'https://testnet-croeseid-4.crypto.org',
+  defaultNodeUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
   chainId: 'testnet-croeseid-4',
   addressPrefix: 'tcro',
   validatorAddressPrefix: 'tcrocncl',
@@ -367,7 +368,24 @@ const TestnetCroeseid4: Network = {
     coinType: 1,
     account: 0,
   },
-  rpcUrl: 'https://testnet-croeseid-4.crypto.org:26657',
+  rpcUrl: 'https://rpc-testnet-croeseid-4.crypto.org:26657',
+};
+
+const TestnetCroeseid5: Network = {
+  defaultNodeUrl: 'https://rpc-c5.crypto.org',
+  chainId: 'testnet-croeseid-5',
+  addressPrefix: 'tcro',
+  validatorAddressPrefix: 'tcrocncl',
+  validatorPubKeyPrefix: 'tcrocnclconspub',
+  coin: {
+    baseDenom: 'basetcro',
+    croDenom: 'tcro',
+  },
+  bip44Path: {
+    coinType: 1,
+    account: 0,
+  },
+  rpcUrl: 'https://rpc-c5.crypto.org',
 };
 
 export const TestNetCroeseid4Config: WalletConfig = {
@@ -384,6 +402,30 @@ export const TestNetCroeseid4Config: WalletConfig = {
   indexingUrl: 'https://crypto.org/explorer/croeseid4/api/v1/',
   nodeUrl: TestnetCroeseid4.defaultNodeUrl,
   network: TestnetCroeseid4,
+  disableDefaultClientMemo: false,
+  enableGeneralSettings: false,
+  analyticsDisabled: false,
+  fee: {
+    gasLimit: FIXED_DEFAULT_GAS_LIMIT,
+    networkFee: FIXED_DEFAULT_FEE,
+  },
+};
+
+
+export const TestNetCroeseid5Config: WalletConfig = {
+  enabled: true,
+  name: NetworkName.TESTNET,
+  derivationPath: 'm/44\'/1\'/0\'/0/0',
+  explorer: {
+    baseUrl: 'https://crypto.org/explorer/croeseid5',
+    tx: 'https://crypto.org/explorer/croeseid5/tx',
+    address: 'https://crypto.org/explorer/croeseid5/account',
+    validator: 'https://crypto.org/explorer/croeseid5/validator',
+  },
+  explorerUrl: 'https://crypto.org/explorer/croeseid5',
+  indexingUrl: 'https://crypto.org/explorer/croeseid5/api/v1/',
+  nodeUrl: TestnetCroeseid5.defaultNodeUrl,
+  network: TestnetCroeseid5,
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,
@@ -450,6 +492,7 @@ export const DefaultWalletConfigs = {
   MainNetConfig,
   CustomDevNet,
   TestNetCroeseid4Config,
+  TestNetCroeseid5Config,
 };
 
 // This type is a copy of the Network type defined inside chain-js

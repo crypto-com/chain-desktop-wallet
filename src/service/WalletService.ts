@@ -203,6 +203,7 @@ class WalletService {
     return [
       DefaultWalletConfigs.MainNetConfig,
       DefaultWalletConfigs.TestNetCroeseid4Config,
+      DefaultWalletConfigs.TestNetCroeseid5Config,
       DefaultWalletConfigs.CustomDevNet,
     ];
   }
@@ -724,7 +725,7 @@ class WalletService {
       // Update wallet config to default settings here if necessary
       const config = {
         ...wallet.config,
-        name: isTestnet ? DefaultWalletConfigs.TestNetCroeseid4Config.name : wallet.config.name
+        name: isTestnet ? DefaultWalletConfigs.TestNetCroeseid5Config.name : wallet.config.name
       };
       
       await this.storageService.removeWalletAssets(wallet.identifier);
@@ -769,7 +770,10 @@ class WalletService {
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve(null);
     }
-    const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+    let nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+    if(currentSession.activeAsset?.config?.tendermintNetwork ) {
+      nodeRpc = await  NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
+    }
     return nodeRpc.loadLatestTally(proposalID);
   }
 }

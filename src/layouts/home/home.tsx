@@ -43,7 +43,7 @@ import {
   NavbarMenuKey,
   updateDownloadedState,
 } from '../../recoil/atom';
-import { ellipsis, checkIfTestnet, getCronosEvmAsset, getEthereumEvmAsset } from '../../utils/utils';
+import { ellipsis, checkIfTestnet, getCronosEvmAsset, getEthereumEvmAsset, getCronosTendermintAsset } from '../../utils/utils';
 import WalletIcon from '../../assets/icon-wallet-grey.svg';
 import IconHome from '../../svg/IconHome';
 // import IconSend from '../../svg/IconSend';
@@ -69,6 +69,7 @@ import {
   LOADING_TIMEOUT,
   MAX_INCORRECT_ATTEMPTS_ALLOWED,
   SHOW_WARNING_INCORRECT_ATTEMPTS,
+  SupportedChainName,
   ThemeColor,
 } from '../../config/StaticConfig';
 import { generalConfigService } from '../../service/storage/GeneralConfigService';
@@ -81,7 +82,7 @@ import {
   DefaultMainnetBridgeConfigs,
   DefaultTestnetBridgeConfigs,
 } from '../../service/bridge/BridgeConfig';
-import { ETH_ASSET, GOERLI_ETHEREUM_EXPLORER_URL, MainNetEvmConfig, MAINNET_ETHEREUM_EXPLORER_URL, TestNetEvmConfig } from '../../config/StaticAssets';
+import { CRONOS_TENDERMINT_ASSET, ETH_ASSET, GOERLI_ETHEREUM_EXPLORER_URL, MainNetEvmConfig, MAINNET_ETHEREUM_EXPLORER_URL, TestNetEvmConfig } from '../../config/StaticAssets';
 import { walletConnectStateAtom } from '../../service/walletconnect/store';
 import { WalletConnectModal } from '../../pages/walletconnect/components/WalletConnectModal';
 import IconWalletConnect from '../../svg/IconWalletConnect';
@@ -328,8 +329,8 @@ function HomeLayout(props: HomeLayoutProps) {
     }
 
     const assets = await walletService.retrieveWalletAssets(walletSession.wallet.identifier);
+    const cronosTendermintAsset = getCronosTendermintAsset(assets);
     const cronosAsset = getCronosEvmAsset(assets);
-
     const ethAsset = getEthereumEvmAsset(assets);
 
     const checkDefaultExplorerUrl = checkIfTestnet(walletSession.wallet.config.network)
@@ -345,7 +346,9 @@ function HomeLayout(props: HomeLayoutProps) {
         !walletSession.activeAsset?.config?.explorer ||
         // Check if explorerUrl has been updated with latest default
         cronosAsset?.config?.explorerUrl !== checkDefaultExplorerUrl ||
-        ethAsset?.config?.explorerUrl !== checkDefaultEthExplorerUrl
+        ethAsset?.config?.explorerUrl !== checkDefaultEthExplorerUrl || 
+        // Check if there are latest tendermintNetwork on Cronos Tendermint
+        !cronosTendermintAsset?.config?.tendermintNetwork
       ) {
         const updateExplorerUrlNotificationKey = 'updateExplorerUrlNotificationKey';
 
@@ -363,6 +366,7 @@ function HomeLayout(props: HomeLayoutProps) {
         allWallets.forEach(async wallet => {
           const isTestnet = checkIfTestnet(wallet.config.network);
           const defaultEthAssetConfig = ETH_ASSET(wallet.config).config;
+          const defaultCronosTendermintAsset = CRONOS_TENDERMINT_ASSET(wallet.config);
 
           const settingsDataUpdate: SettingsDataUpdate = {
             walletId: wallet.identifier,
@@ -388,6 +392,13 @@ function HomeLayout(props: HomeLayoutProps) {
             let indexingUrl = `${asset.config?.indexingUrl ?? wallet.config.indexingUrl}`;
             let explorerUrl = `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}`;
             let chainId = `${asset.config?.chainId ?? wallet.config.network.chainId}`;
+            if (
+              asset.assetType === UserAssetType.TENDERMINT && asset.name === SupportedChainName.CRYPTO_ORG
+            ) {
+              nodeUrl = defaultCronosTendermintAsset.config.nodeUrl;
+              explorerUrl = defaultCronosTendermintAsset.config.explorerUrl;
+              chainId = defaultCronosTendermintAsset.config.chainId;
+            }
             if (
               asset.assetType === UserAssetType.EVM && asset.name.includes('Cronos') ||
               asset.assetType === UserAssetType.CRC_20_TOKEN
@@ -429,6 +440,15 @@ function HomeLayout(props: HomeLayoutProps) {
                 },
                 isLedgerSupportDisabled: asset.config?.isLedgerSupportDisabled!,
                 isStakingDisabled: asset.config?.isStakingDisabled!,
+                ...(asset.assetType === UserAssetType.TENDERMINT && asset.name === SupportedChainName.CRYPTO_ORG) && {
+                  tendermintNetwork: {
+                    ...defaultCronosTendermintAsset.config.tendermintNetwork!,
+                    node: {
+                      clientUrl: defaultCronosTendermintAsset.config.tendermintNetwork?.node?.clientUrl ?? '',
+                      proxyUrl: defaultCronosTendermintAsset.config.tendermintNetwork?.node?.proxyUrl ?? '',
+                    }
+                  }
+                }
               },
             };
             await walletService.saveAssets([newlyUpdatedAsset]);
@@ -715,11 +735,13 @@ function HomeLayout(props: HomeLayoutProps) {
         key: '/assets',
         icon: <Icon component={IconAssets} />,
       },
-      {
-        label: conditionalLink('/bridge', t('navbar.bridge')),
-        key: '/bridge',
-        icon: <Icon component={IconCronos} />,
-      },
+      (!isTestnet || session.activeAsset?.config?.tendermintNetwork?.chainId === 'testnet-croeseid-4')
+        ? {
+          label: conditionalLink('/bridge', t('navbar.bridge')),
+          key: '/bridge',
+          icon: <Icon component={IconCronos} />,
+        } 
+        : null,
       !isTestnet
         ? {
           label: conditionalLink('/dapp', t('navbar.dapp')),

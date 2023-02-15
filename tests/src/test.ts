@@ -252,7 +252,7 @@ async function main() {
   await signerProvider.provider.initChain();
   await Zemu.default.sleep(SLEEP_MS);
   const walletConfig = CustomDevNet;
-  walletConfig.nodeUrl = 'http://127.0.0.1';
+  walletConfig.nodeUrl = 'http://127.0.0.1:26657';
   const signer = new LedgerTransactionSigner(walletConfig, signerProvider, 0, DerivationPathStandard.BIP44);
   console.log(signer);
 

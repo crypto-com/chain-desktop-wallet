@@ -47,6 +47,8 @@
   "create.title1": "Créer Portefeuille",
   "create.title2": "Configuration personnalisé",
   "create.formCustomConfig.nodeUrl.label": "Node Url ",
+  "create.formCustomConfig.clientUrl.label": "RPC URL",
+  "create.formCustomConfig.proxyUrl.label": "Rest URL",
   "create.formCustomConfig.indexingUrl.label": "Indéxeur URL",
   "create.formCustomConfig.chainId.label": "Chain Id",
   "create.notification.ledger.message2": "Pas de Expert Mode ",

@@ -66,7 +66,10 @@ export class TransactionHistoryService {
       return;
     }
 
-    const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+    let nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+    if(currentSession.activeAsset?.config?.tendermintNetwork ) {
+      nodeRpc = await  NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
+    }
 
     await Promise.all([
       this.fetchAndSaveDelegations(nodeRpc, currentSession),
@@ -98,7 +101,12 @@ export class TransactionHistoryService {
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
         return Promise.resolve([]);
       }
-      const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+
+      let nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+      if(currentSession.activeAsset?.config?.tendermintNetwork ) {
+        nodeRpc = await  NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
+      }
+
       const topValidators = await nodeRpc.loadTopValidators();
       const topValidatorsAddressList = topValidators.map(validator => {
         return validator.validatorAddress;
@@ -654,7 +662,11 @@ export class TransactionHistoryService {
         return Promise.resolve([]);
       }
 
-      const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+      let nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+      if(currentSession.activeAsset?.config?.tendermintNetwork ) {
+        nodeRpc = await  NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
+      }
+      
       const loadedProposals = await nodeRpc.loadProposals([
         ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD,
         ProposalStatuses.PROPOSAL_STATUS_PASSED,
