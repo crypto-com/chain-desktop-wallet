@@ -800,7 +800,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
         case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
           {
             const addressPrefix =
-              network === DefaultWalletConfigs.TestNetCroeseid4Config.name
+              network === DefaultWalletConfigs.TestNetCroeseid5Config.name
                 ? 'tcro'
                 : 'cro';
             const tendermintAddressList = await device.getAddressList(

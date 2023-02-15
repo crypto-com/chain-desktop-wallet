@@ -12,7 +12,7 @@ import { SettingsDataUpdate } from '../../../models/Wallet';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../../config/StaticConfig';
-import { UserAsset, UserAssetConfig } from '../../../models/UserAsset';
+import { UserAsset, UserAssetConfig, UserAssetType } from '../../../models/UserAsset';
 import AddressBook from '../tabs/AddressBook/AddressBook';
 import { getCronosTendermintAsset } from '../../../utils/utils';
 import RevokePermission from '../tabs/RevokePermission/RevokePermission';
@@ -73,9 +73,12 @@ export const FormSettings = () => {
       nodeUrl: prevSettings.nodeUrl,
       chainId: prevSettings.chainId,
       indexingUrl: prevSettings.indexingUrl,
+      clientUrl: prevSettings.tendermintNetwork?.node?.clientUrl,
+      proxyUrl: prevSettings.tendermintNetwork?.node?.proxyUrl,
       networkFee,
       gasLimit,
     });
+
     if (!currentAssetIdentifier && croAsset) {
       setCurrentAssetIdentifier(croAsset?.identifier);
 
@@ -99,6 +102,8 @@ export const FormSettings = () => {
     if (
       prevSettings.nodeUrl === values.nodeUrl &&
       prevSettings.indexingUrl === values.indexingUrl &&
+      prevSettings.tendermintNetwork?.node?.clientUrl === values.clientUrl &&
+      prevSettings.tendermintNetwork?.node?.proxyUrl === values.proxyUrl &&
       prevSettings.chainId === values.chainId &&
       defaultGasLimit === values.gasLimit &&
       defaultNetworkFee === values.networkFee
@@ -113,6 +118,8 @@ export const FormSettings = () => {
       chainId: values.chainId,
       nodeUrl: values.nodeUrl,
       indexingUrl: values.indexingUrl,
+      clientUrl: values.clientUrl,
+      proxyUrl: values.proxyUrl,
       networkFee: String(values.networkFee),
       gasLimit: String(values.gasLimit),
     };
@@ -134,6 +141,15 @@ export const FormSettings = () => {
         fee: { gasLimit: settingsDataUpdate.gasLimit!, networkFee: settingsDataUpdate.networkFee! },
         indexingUrl: settingsDataUpdate.indexingUrl!,
         nodeUrl: settingsDataUpdate.nodeUrl!,
+        ...(settingsDataUpdate.clientUrl || settingsDataUpdate.proxyUrl) && {
+          tendermintNetwork: {
+            ...previousAssetConfig?.tendermintNetwork!,
+            node: {
+              clientUrl: settingsDataUpdate.clientUrl ?? '',
+              proxyUrl: settingsDataUpdate.proxyUrl ?? '',
+            }
+          }
+        }
       },
     };
 
@@ -187,6 +203,8 @@ export const FormSettings = () => {
       indexingUrl: defaultAssetConfig?.config.indexingUrl,
       networkFee: defaultAssetConfig?.config.fee.networkFee,
       gasLimit: defaultAssetConfig?.config.fee.gasLimit,
+      clientUrl: (session.activeAsset?.assetType === UserAssetType.TENDERMINT) ? defaultAssetConfig?.config.tendermintNetwork?.node?.clientUrl : '',
+      proxyUrl: (session.activeAsset?.assetType === UserAssetType.TENDERMINT) ? defaultAssetConfig?.config.tendermintNetwork?.node?.proxyUrl : '',
     });
   };
 
@@ -237,6 +255,7 @@ export const FormSettings = () => {
                       <GeneralSettingsForm
                         currentAssetIdentifier={currentAssetIdentifier}
                         setCurrentAssetIdentifier={setCurrentAssetIdentifier}
+                        form={form}
                       />
                       <Form.Item {...tailLayout} className="button">
                         <Button type="primary" htmlType="submit" loading={isButtonLoading}>

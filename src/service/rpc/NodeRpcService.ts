@@ -17,8 +17,6 @@ import {
   Proposal,
   RewardResponse,
   ValidatorListResponse,
-  ValidatorPubKey,
-  ValidatorSetResponse,
   ErrorRpcResponse,
   UnbondingDelegationResponse,
   DelegationResponse,
@@ -487,18 +485,10 @@ export class NodeRpcService implements INodeRpcService {
       }
     }
 
-    const activeValidators = (await this.fetchLatestActiveValidators()).reduce(
-      (pubKeyMap, validator) => {
-        pubKeyMap[validator.value] = true;
-        return pubKeyMap;
-      },
-      {},
-    );
-
     let topValidators = validators
       .filter(v => v.status === 'BOND_STATUS_BONDED')
       .filter(v => !v.jailed)
-      .filter(v => !!activeValidators[v.pubKey.value])
+      // .filter(v => !!activeValidators[v.pubKey.value])
       // Sort by Lowest voting power, and then Lowest commission
       .sort((v1, v2) => Big(v1.currentCommissionRate).cmp(Big(v2.currentCommissionRate)))
       .sort((v1, v2) => Big(v1.currentShares).cmp(Big(v2.currentShares)))
@@ -530,12 +520,6 @@ export class NodeRpcService implements INodeRpcService {
     });
 
     return topValidators;
-  }
-
-  private async fetchLatestActiveValidators(): Promise<ValidatorPubKey[]> {
-    const response = await this.cosmosClient.get<ValidatorSetResponse>('/validatorsets/latest');
-
-    return response.data.result.validators.map(v => v.pub_key);
   }
 
   private async fetchValidators(

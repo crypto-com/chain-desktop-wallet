@@ -125,6 +125,14 @@ export class StorageService {
       updateConfigSettings['config.indexingUrl'] = dataUpdate.indexingUrl;
     }
 
+    if (dataUpdate.clientUrl) {
+      updateConfigSettings['config.tendermintNetwork.node.clientUrl'] = dataUpdate.clientUrl;
+    }
+
+    if (dataUpdate.proxyUrl) {
+      updateConfigSettings['config.tendermintNetwork.node.proxyUrl'] = dataUpdate.proxyUrl;
+    }
+
     if (!previousWallet.config.fee) {
       updateConfigSettings['config.fee.gasLimit'] = FIXED_DEFAULT_GAS_LIMIT;
       updateConfigSettings['config.fee.networkFee'] = FIXED_DEFAULT_FEE;
@@ -154,6 +162,8 @@ export class StorageService {
       !dataUpdate.chainId &&
       !dataUpdate.nodeUrl &&
       !dataUpdate.indexingUrl &&
+      !dataUpdate.clientUrl &&
+      !dataUpdate.proxyUrl &&
       !dataUpdate.networkFee &&
       !dataUpdate.gasLimit
     ) {

@@ -60,6 +60,8 @@ export interface SettingsDataUpdate {
   chainId?: string | undefined;
   nodeUrl?: string | undefined;
   indexingUrl?: string | undefined;
+  clientUrl?: string | undefined;
+  proxyUrl?: string | undefined;
   gasLimit?: string | undefined;
   networkFee?: string | undefined;
   explorer?: any | undefined;

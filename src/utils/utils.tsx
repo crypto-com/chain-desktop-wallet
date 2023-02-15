@@ -190,7 +190,7 @@ export function checkIfTestnet(network: Network) {
   return (
     [CroNetwork.TestnetCroeseid3, CroNetwork.TestnetCroeseid4, CroNetwork.Testnet].includes(
       network,
-    ) || network.defaultNodeUrl.includes('testnet')
+    ) || network.defaultNodeUrl.includes('testnet') || network.defaultNodeUrl.includes('rpc-c5')
   );
 }
 
@@ -203,11 +203,18 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
   if (isTestnet) {
     switch (name) {
       case SupportedChainName.CRONOS:
-      case SupportedChainName.CRYPTO_ORG:
       case SupportedChainName.COSMOS_HUB:
         return name.replace('Chain', 'Testnet');
+
       case SupportedChainName.ETHEREUM:
         return name.replace('Chain', 'Goerli Testnet');
+
+      case SupportedChainName.CRYPTO_ORG: {
+        if(config.network.chainId.indexOf('croeseid-4') !== -1)
+          return name.replace('Chain', 'Testnet Croeseid 4');
+          
+        return name.replace('Chain', 'Testnet Croeseid 5');
+      }
       default:
         return name;
     }
