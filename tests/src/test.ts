@@ -252,14 +252,18 @@ async function main() {
   await signerProvider.provider.initChain();
   await Zemu.default.sleep(SLEEP_MS);
   const walletConfig = CustomDevNet;
-  walletConfig.nodeUrl = 'http://127.0.0.1:26657';
+  // walletConfig.nodeUrl = 'http://127.0.0.1:26657';
   const signer = new LedgerTransactionSigner(walletConfig, signerProvider, 0, DerivationPathStandard.BIP44);
   console.log(signer);
 
   const phrase = '';
   signerProvider.provider.setClickTimes(7);
   const ledgerAddress = 'cro1tzhdkuc328cgh2hycyfddtdpqfwwu42yq3qgkr';
-  const nodeRpc = await NodeRpcService.init({ baseUrl: walletConfig.nodeUrl });
+  const nodeRpc = await NodeRpcService.init({ 
+    baseUrl: 'http://127.0.0.1:26657',
+    clientUrl: 'http://127.0.0.1:26657',
+    proxyUrl: 'http://127.0.0.1:1337',
+  });
   await Zemu.default.sleep(SLEEP_MS);
   const accountNumber = await nodeRpc.fetchAccountNumber(ledgerAddress);
   console.log('get account number ', accountNumber);

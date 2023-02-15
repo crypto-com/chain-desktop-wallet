@@ -439,7 +439,7 @@ export const MainNetConfig: WalletConfig = {
   enabled: true,
   name: NetworkName.MAINNET,
   derivationPath: 'm/44\'/394\'/0\'/0/0',
-  nodeUrl: CroNetwork.Mainnet.defaultNodeUrl,
+  nodeUrl: 'https://rpc.mainnet.crypto.org',
   explorer: {
     baseUrl: 'https://crypto.org/explorer',
     tx: 'https://crypto.org/explorer/tx',

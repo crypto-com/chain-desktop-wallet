@@ -735,7 +735,7 @@ function HomeLayout(props: HomeLayoutProps) {
         key: '/assets',
         icon: <Icon component={IconAssets} />,
       },
-      (!isTestnet || session.activeAsset?.config?.tendermintNetwork?.chainId === 'testnet-croeseid-4')
+      (!isTestnet || session.wallet.config.network.chainId === 'testnet-croeseid-4')
         ? {
           label: conditionalLink('/bridge', t('navbar.bridge')),
           key: '/bridge',
