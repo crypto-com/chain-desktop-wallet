@@ -194,6 +194,7 @@ class WalletService {
       this.syncBalancesData(currentSession),
       this.syncTransactionsData(currentSession),
       this.fetchAndSaveNFTs(currentSession),
+      this.fetchAndSaveValidators(currentSession)
       // this.fetchIBCAssets(currentSession),
     ]);
   }

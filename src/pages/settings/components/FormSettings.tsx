@@ -173,6 +173,7 @@ export const FormSettings = () => {
 
     const allAssets = await walletService.retrieveCurrentWalletAssets(newSession);
     setWalletAllAssets(allAssets);
+    walletService.syncAll();
 
     setIsButtonLoading(false);
     message.success(
