@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.4.0] - 2023-02-14
+### Additions
+- Testnet Croeseid 5 as default Crypto.org Chain Testnet
+- Compatibility for Crypto.org Chain Mainnet v4 upgrade
+- Customizable RPC & Rest URL for Tendermint Assets
+- Adjust for better network security
+### Bug Fixes
+- Missing transaction records on Crypto.org Chain
+- Potential infinite loading on delete wallet
 ## [v1.3.9] - 2023-01-11
 ### Bug Fixes
 - Non-adjustable Gas Price & Limit on EVM Transactions

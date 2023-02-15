@@ -60,6 +60,7 @@ import FormSend from './components/FormSend';
 import { walletService } from '../../service/WalletService';
 import { checkIfTestnet, getChainName, middleEllipsis } from '../../utils/utils';
 import {
+  MsgTypeName,
   TransactionDirection,
   TransactionStatus,
 } from '../../models/Transaction';
@@ -650,8 +651,8 @@ const AssetsPage = () => {
             break;
         }
         const text =
-          record.msgTypeName === 'MsgDelegate' ||
-            record.msgTypeName === 'MsgUndelegate'
+          record.msgTypeName === MsgTypeName.MsgDelegate ||
+            record.msgTypeName === MsgTypeName.MsgUndelegate
             ? record.stakedAmount
             : record.amount;
         return (

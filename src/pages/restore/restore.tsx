@@ -16,7 +16,6 @@ import ErrorModalPopup from '../../components/ErrorModalPopup/ErrorModalPopup';
 import BackButton from '../../components/BackButton/BackButton';
 import PasswordFormModal from '../../components/PasswordForm/PasswordFormModal';
 import { secretStoreService } from '../../service/storage/SecretStoreService';
-import { Session } from '../../models/Session';
 import { NORMAL_WALLET_TYPE } from '../../service/LedgerService';
 import { AnalyticsService } from '../../service/analytics/AnalyticsService';
 import { DerivationPathStandard } from '../../service/signers/LedgerSigner';
@@ -347,7 +346,7 @@ const FormRestore: React.FC<FormRestoreProps> = props => {
       await walletService.saveAssets(restoreResult.assets);
       await walletService.encryptWalletAndSetSession(password, restoreResult.wallet);
 
-      await walletService.syncAll(new Session(restoreResult.wallet));
+      // await walletService.syncAll(new Session(restoreResult.wallet));
       goToHome();
       props.form.resetFields();
       return;

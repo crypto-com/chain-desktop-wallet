@@ -17,11 +17,10 @@ import {
   Proposal,
   RewardResponse,
   ValidatorListResponse,
-  ValidatorPubKey,
-  ValidatorSetResponse,
   ErrorRpcResponse,
   UnbondingDelegationResponse,
   DelegationResponse,
+  ProposalDepositParamsResponse,
 } from './NodeRpcModels';
 import {
   BroadCastResult,
@@ -92,7 +91,7 @@ export class NodeRpcService implements INodeRpcService {
     // take first 2 words
     if (baseUrl) {
       const words = baseUrl.split(':', 2);
-      const newClientUrl = `${words[0]}:${words[1]}${NodePorts.Tendermint}`;
+      const newClientUrl = `${words[0]}:${words[1]}`;
       const client = await StargateClient.connect(newClientUrl);
       const proxyClient = axios.create({
         baseURL: baseUrl + NodePorts.Cosmos,
@@ -449,6 +448,19 @@ export class NodeRpcService implements INodeRpcService {
     return [proposals, pagination.next_key];
   }
 
+  public async loadProposalDepositParams(): Promise<ProposalDepositParamsResponse | null> {
+    try {
+      const url = '/cosmos/gov/v1beta1/params/deposit';
+      const response = await this.cosmosClient.get<ProposalDepositParamsResponse>(url);
+      return response.data;
+      
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOAD_DEPOSIT_PARAMS', e);
+      return null;
+    }
+  }
+
   public async loadDelegations(
     address: string,
     assetSymbol: string,
@@ -473,18 +485,10 @@ export class NodeRpcService implements INodeRpcService {
       }
     }
 
-    const activeValidators = (await this.fetchLatestActiveValidators()).reduce(
-      (pubKeyMap, validator) => {
-        pubKeyMap[validator.value] = true;
-        return pubKeyMap;
-      },
-      {},
-    );
-
     let topValidators = validators
       .filter(v => v.status === 'BOND_STATUS_BONDED')
       .filter(v => !v.jailed)
-      .filter(v => !!activeValidators[v.pubKey.value])
+      // .filter(v => !!activeValidators[v.pubKey.value])
       // Sort by Lowest voting power, and then Lowest commission
       .sort((v1, v2) => Big(v1.currentCommissionRate).cmp(Big(v2.currentCommissionRate)))
       .sort((v1, v2) => Big(v1.currentShares).cmp(Big(v2.currentShares)))
@@ -516,12 +520,6 @@ export class NodeRpcService implements INodeRpcService {
     });
 
     return topValidators;
-  }
-
-  private async fetchLatestActiveValidators(): Promise<ValidatorPubKey[]> {
-    const response = await this.cosmosClient.get<ValidatorSetResponse>('/validatorsets/latest');
-
-    return response.data.result.validators.map(v => v.pub_key);
   }
 
   private async fetchValidators(

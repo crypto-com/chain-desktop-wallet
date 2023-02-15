@@ -47,6 +47,7 @@ import {
 } from '../bridge/BridgeConfig';
 import { BridgeTransactionHistoryList } from '../bridge/contracts/BridgeModels';
 import { AddressBookContactModel } from '../../models/AddressBook';
+import { CRONOS_TENDERMINT_ASSET } from '../../config/StaticAssets';
 // import { generalConfigService } from './GeneralConfigService';
 
 export class StorageService {
@@ -125,6 +126,14 @@ export class StorageService {
       updateConfigSettings['config.indexingUrl'] = dataUpdate.indexingUrl;
     }
 
+    if (dataUpdate.clientUrl) {
+      updateConfigSettings['config.tendermintNetwork.node.clientUrl'] = dataUpdate.clientUrl;
+    }
+
+    if (dataUpdate.proxyUrl) {
+      updateConfigSettings['config.tendermintNetwork.node.proxyUrl'] = dataUpdate.proxyUrl;
+    }
+
     if (!previousWallet.config.fee) {
       updateConfigSettings['config.fee.gasLimit'] = FIXED_DEFAULT_GAS_LIMIT;
       updateConfigSettings['config.fee.networkFee'] = FIXED_DEFAULT_FEE;
@@ -154,12 +163,15 @@ export class StorageService {
       !dataUpdate.chainId &&
       !dataUpdate.nodeUrl &&
       !dataUpdate.indexingUrl &&
+      !dataUpdate.clientUrl &&
+      !dataUpdate.proxyUrl &&
       !dataUpdate.networkFee &&
       !dataUpdate.gasLimit
     ) {
       return Promise.resolve();
     }
     const previousWallet = await this.findWalletByIdentifier(dataUpdate.walletId);
+    const currentSession = await this.retrieveCurrentSession();
 
     // Handle when general settings has been enabled
     if (previousWallet.config.enableGeneralSettings) {
@@ -173,6 +185,23 @@ export class StorageService {
     if (dataUpdate.nodeUrl) {
       previousWallet.config.nodeUrl = dataUpdate.nodeUrl;
       previousWallet.config.network.defaultNodeUrl = dataUpdate.nodeUrl;
+    }
+
+    if (
+      dataUpdate.clientUrl &&
+      dataUpdate.proxyUrl
+    ) {
+      if(previousWallet.config.tendermintNetwork?.node) {
+        previousWallet.config.tendermintNetwork.node.clientUrl = dataUpdate.clientUrl;
+        previousWallet.config.tendermintNetwork.node.proxyUrl = dataUpdate.proxyUrl;
+      } else {
+        const defaultCronosTendermintAsset = CRONOS_TENDERMINT_ASSET(previousWallet.config);
+        previousWallet.config.tendermintNetwork = defaultCronosTendermintAsset.config.tendermintNetwork!;
+        previousWallet.config.tendermintNetwork.node = {
+          clientUrl: dataUpdate.clientUrl,
+          proxyUrl: dataUpdate.proxyUrl
+        };
+      }
     }
 
     if (dataUpdate.explorer) {
@@ -196,6 +225,11 @@ export class StorageService {
     if (dataUpdate.gasLimit) {
       previousWallet.config.fee.gasLimit = dataUpdate.gasLimit;
     }
+
+    await this.setSession({
+      ...currentSession,
+      wallet: previousWallet
+    });
 
     return this.db.walletStore.update<Wallet>(
       { identifier: previousWallet.identifier },
@@ -556,9 +590,12 @@ export class StorageService {
 
   // eslint-disable-next-line
   public async saveNFTAccountTransactions(nftAccountTransactionList: NftAccountTransactionList) {
+    await this.removeAllNFTAccountTransactions(nftAccountTransactionList.walletId);
+
     if (nftAccountTransactionList.transactions.length === 0) {
       return Promise.resolve();
     }
+
     // Save into new transaction store
     const nftAccountTxRecords: NftAccountTransactionRecord[] = nftAccountTransactionList.transactions.map(
       tx => {
@@ -570,6 +607,7 @@ export class StorageService {
         };
       },
     );
+
     await this.insertCommonTransactionRecords(nftAccountTxRecords);
 
     // @deprecated
@@ -579,6 +617,18 @@ export class StorageService {
       { multi: true },
     );
     return this.db.nftAccountTxStore.insert<NftAccountTransactionList>(nftAccountTransactionList); */
+  }
+
+  public async removeAllNFTAccountTransactions(
+    walletId: string,
+  ) {
+    return this.db.commonTransactionStore.remove(
+      {
+        walletId,
+        txType: 'nftAccount',
+      },
+      { multi: true },
+    );
   }
 
   public async retrieveAllNFTAccountTransactions(
@@ -654,24 +704,24 @@ export class StorageService {
 
   // eslint-disable-next-line
   public async saveCryptoOrgNFTs(walletId: string, nfts: CryptoOrgNftModel[]) {
-    if (nfts.length === 0) {
-      return await await this.db.nftStore.remove(
-        { walletId, type: NftType.CRYPTO_ORG },
-        { multi: true },
-      );
+    await this.db.nftStore.remove(
+      { walletId, type: NftType.CRYPTO_ORG },
+      { multi: true },
+    );
+    if (nfts.length !== 0) {
+      await this.insertCommonNfts(walletId, nfts);
     }
-    await this.insertCommonNfts(walletId, nfts);
   }
 
   // eslint-disable-next-line
   public async saveCronosCRC721NFTs(walletId: string, nfts: CronosCRC721NftModel[]) {
-    if (nfts.length === 0) {
-      return await await this.db.nftStore.remove(
-        { walletId, type: NftType.CRC_721_TOKEN },
-        { multi: true },
-      );
+    await this.db.nftStore.remove(
+      { walletId, type: NftType.CRC_721_TOKEN },
+      { multi: true },
+    );
+    if (nfts.length !== 0) {
+      await this.insertCommonNfts(walletId, nfts);
     }
-    await this.insertCommonNfts(walletId, nfts);
   }
 
   public async retrieveAllNfts(walletId: string) {

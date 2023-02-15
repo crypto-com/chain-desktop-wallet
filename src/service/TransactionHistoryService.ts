@@ -20,6 +20,7 @@ import { CronosClient } from './cronos/CronosClient';
 import {
   CommonTransactionRecord,
   EthereumTransactionType,
+  MsgTypeName,
   NftQueryParams,
   NftTransferModel,
   ProposalModel,
@@ -65,7 +66,15 @@ export class TransactionHistoryService {
       return;
     }
 
-    const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+
+    const nodeRpc = await NodeRpcService.init({ 
+      baseUrl: currentSession.wallet.config.nodeUrl,
+      clientUrl: currentSession.wallet.config.tendermintNetwork?.node?.clientUrl,
+      proxyUrl: currentSession.wallet.config.tendermintNetwork?.node?.proxyUrl,
+    });
+    // if(currentSession.activeAsset?.config?.tendermintNetwork?.node?.clientUrl && currentSession.activeAsset?.config?.tendermintNetwork?.node?.proxyUrl) {
+      // nodeRpc = await NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
+    // }
 
     await Promise.all([
       this.fetchAndSaveDelegations(nodeRpc, currentSession),
@@ -97,7 +106,17 @@ export class TransactionHistoryService {
       if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
         return Promise.resolve([]);
       }
-      const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+
+
+      const nodeRpc = await NodeRpcService.init({ 
+        baseUrl: currentSession.wallet.config.nodeUrl,
+        clientUrl: currentSession.wallet.config.tendermintNetwork?.node?.clientUrl,
+        proxyUrl: currentSession.wallet.config.tendermintNetwork?.node?.proxyUrl,
+      });
+      // if(currentSession.activeAsset?.config?.tendermintNetwork?.node?.clientUrl && currentSession.activeAsset?.config?.tendermintNetwork?.node?.proxyUrl) {
+        // nodeRpc = await NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
+      // }
+
       const topValidators = await nodeRpc.loadTopValidators();
       const topValidatorsAddressList = topValidators.map(validator => {
         return validator.validatorAddress;
@@ -280,7 +299,7 @@ export class TransactionHistoryService {
           assetType: currentAsset.assetType,
           txHash: tx.hash,
           txType: EthereumTransactionType.TRANSFER,
-          messageTypeName: 'MsgSend',
+          messageTypeName: MsgTypeName.MsgSend,
           txData: transferTx,
           // TODO: add messageTypeName
         };
@@ -653,7 +672,15 @@ export class TransactionHistoryService {
         return Promise.resolve([]);
       }
 
-      const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+      const nodeRpc = await NodeRpcService.init({ 
+        baseUrl: currentSession.wallet.config.nodeUrl,
+        clientUrl: currentSession.wallet.config.tendermintNetwork?.node?.clientUrl,
+        proxyUrl: currentSession.wallet.config.tendermintNetwork?.node?.proxyUrl,
+      });
+      // if(currentSession.activeAsset?.config?.tendermintNetwork?.node?.clientUrl && currentSession.activeAsset?.config?.tendermintNetwork?.node?.proxyUrl) {
+        // nodeRpc = await NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
+      // }
+      
       const loadedProposals = await nodeRpc.loadProposals([
         ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD,
         ProposalStatuses.PROPOSAL_STATUS_PASSED,
@@ -667,6 +694,30 @@ export class TransactionHistoryService {
       // eslint-disable-next-line no-console
       console.log('FAILED_LOADING PROPOSALS', e);
       return [];
+    }
+  }
+
+  public async getProposalMinDeposit(): Promise<string> {
+    try {
+      const currentSession = await this.storageService.retrieveCurrentSession();
+      if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
+        return Promise.resolve('1000000000000');
+      }
+
+      const nodeRpc = await NodeRpcService.init({ 
+        baseUrl: currentSession.wallet.config.nodeUrl,
+        clientUrl: currentSession.activeAsset?.config?.tendermintNetwork?.node?.clientUrl,
+        proxyUrl: currentSession.activeAsset?.config?.tendermintNetwork?.node?.proxyUrl,
+      });
+
+      const params = await nodeRpc.loadProposalDepositParams();
+      const minDeposit = params?.deposit_params.min_deposit || [];
+
+      return minDeposit[0]?.amount;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('FAILED_LOADING PROPOSAL_MIN_DEPOSIT', e);
+      return '1000000000000';
     }
   }
 
@@ -905,8 +956,6 @@ export class TransactionHistoryService {
       return;
     }
 
-    // const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-
     const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
 
     if (!assets || assets.length === 0) {
@@ -991,7 +1040,6 @@ export class TransactionHistoryService {
                 currentSession.wallet.config.network.coin.baseDenom;
               const baseDenomination =
                 asset.assetType !== UserAssetType.IBC ? baseDenom : `ibc/${asset.ibcDenomHash}`;
-              // const nodeRpc = await NodeRpcService.init({ baseUrl: asset.config.nodeUrl });
               const nodeRpc = await NodeRpcService.init({
                 baseUrl: asset.config.nodeUrl,
                 clientUrl: asset.config.tendermintNetwork?.node?.clientUrl,

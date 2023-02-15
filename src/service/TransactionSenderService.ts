@@ -23,7 +23,7 @@ import { BroadCastResult } from '../models/Transaction';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import { NftType } from '../models/Nft';
 import { getBaseScaledAmount } from '../utils/NumberUtils';
-import { DEFAULT_CLIENT_MEMO } from '../config/StaticConfig';
+import { DEFAULT_CLIENT_MEMO, SupportedChainName } from '../config/StaticConfig';
 import {
   RestakeStakingRewardRequest,
   RestakeStakingAllRewardsRequest,
@@ -301,15 +301,15 @@ export class TransactionSenderService {
             networkFee,
             gasLimit,
           );
-        } else if (transfer.asset?.config?.tendermintNetwork) {
-          signedTxHex = await cosmjsTendermintTransactionSigner.signTransfer(
+        } else if (transfer.asset?.name === SupportedChainName.CRYPTO_ORG) {
+          signedTxHex = await transactionSigner.signTransfer(
             transfer,
             transferRequest.decryptedPhrase,
             networkFee,
             gasLimit,
           );
         } else {
-          signedTxHex = await transactionSigner.signTransfer(
+          signedTxHex = await cosmjsTendermintTransactionSigner.signTransfer(
             transfer,
             transferRequest.decryptedPhrase,
             networkFee,

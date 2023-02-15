@@ -76,6 +76,9 @@ export class CosmjsTendermintTransactionSigner extends BaseTransactionSigner
       case SupportedChainName.COSMOS_HUB:
         hdPath = MakeHdPath.init(0, DerivationPathStandard.BIP44).cosmosHubMainnet();
         break;
+      case SupportedChainName.CRYPTO_ORG:
+        hdPath = MakeHdPath.init(0, DerivationPathStandard.BIP44).cryptoOrgTestnet();
+        break;
       default:
         throw new Error(`${network.chainName} is not supported`);
     }

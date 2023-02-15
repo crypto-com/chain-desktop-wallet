@@ -78,7 +78,7 @@ function WalletPage() {
         networkColor = 'success';
         break;
       case DefaultWalletConfigs.TestNetConfig.name:
-      case DefaultWalletConfigs.TestNetCroeseid4Config.name:
+      case DefaultWalletConfigs.TestNetCroeseid5Config.name:
         networkColor = 'warning';
         break;
       default:

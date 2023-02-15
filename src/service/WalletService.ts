@@ -194,6 +194,7 @@ class WalletService {
       this.syncBalancesData(currentSession),
       this.syncTransactionsData(currentSession),
       this.fetchAndSaveNFTs(currentSession),
+      this.fetchAndSaveValidators(currentSession)
       // this.fetchIBCAssets(currentSession),
     ]);
   }
@@ -202,7 +203,8 @@ class WalletService {
   public supportedConfigs(): WalletConfig[] {
     return [
       DefaultWalletConfigs.MainNetConfig,
-      DefaultWalletConfigs.TestNetCroeseid4Config,
+      // DefaultWalletConfigs.TestNetCroeseid4Config,
+      DefaultWalletConfigs.TestNetCroeseid5Config,
       DefaultWalletConfigs.CustomDevNet,
     ];
   }
@@ -296,7 +298,11 @@ class WalletService {
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve(null);
     }
-    const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+    const nodeRpc = await NodeRpcService.init({ 
+      baseUrl: currentSession.wallet.config.nodeUrl,
+      clientUrl: currentSession.wallet.config.tendermintNetwork?.node?.clientUrl,
+      proxyUrl: currentSession.wallet.config.tendermintNetwork?.node?.proxyUrl,
+    });
     const ibcAssets: UserAsset[] = await nodeRpc.loadIBCAssets(currentSession);
 
     const persistedAssets = await ibcAssets.map(async ibcAsset => {
@@ -658,6 +664,17 @@ class WalletService {
     }
   }
 
+  public async fetchProposalMinDeposit() {
+    try {
+      const minDeposit = await this.txHistoryManager.getProposalMinDeposit();
+      return minDeposit;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('FAILED_LOADING Proposal Min Deposit data', e);
+      return null;
+    }
+  }
+
   public async getDenomIdData(denomId: string): Promise<NftDenomModel | null> {
     const currentSession = await this.storageService.retrieveCurrentSession();
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
@@ -713,7 +730,7 @@ class WalletService {
       // Update wallet config to default settings here if necessary
       const config = {
         ...wallet.config,
-        name: isTestnet ? DefaultWalletConfigs.TestNetCroeseid4Config.name : wallet.config.name
+        name: isTestnet ? DefaultWalletConfigs.TestNetCroeseid5Config.name : wallet.config.name
       };
       
       await this.storageService.removeWalletAssets(wallet.identifier);
@@ -758,7 +775,14 @@ class WalletService {
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve(null);
     }
-    const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+    const nodeRpc = await NodeRpcService.init({ 
+      baseUrl: currentSession.wallet.config.nodeUrl,
+      clientUrl: currentSession.wallet.config.tendermintNetwork?.node?.clientUrl,
+      proxyUrl: currentSession.wallet.config.tendermintNetwork?.node?.proxyUrl,
+    });
+    // if(currentSession.activeAsset?.config?.tendermintNetwork?.node?.clientUrl && currentSession.activeAsset?.config?.tendermintNetwork?.node?.proxyUrl) {
+    //   nodeRpc = await  NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
+    // }
     return nodeRpc.loadLatestTally(proposalID);
   }
 }
