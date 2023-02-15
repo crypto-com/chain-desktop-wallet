@@ -368,7 +368,7 @@ const TestnetCroeseid4: Network = {
     coinType: 1,
     account: 0,
   },
-  rpcUrl: 'https://rpc-testnet-croeseid-4.crypto.org:26657',
+  rpcUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
 };
 
 const TestnetCroeseid5: Network = {
