@@ -11,7 +11,7 @@ import { walletService } from '../../../service/WalletService';
 import { SettingsDataUpdate } from '../../../models/Wallet';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 
-import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../../config/StaticConfig';
+import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT, SupportedChainName } from '../../../config/StaticConfig';
 import { UserAsset, UserAssetConfig, UserAssetType } from '../../../models/UserAsset';
 import AddressBook from '../tabs/AddressBook/AddressBook';
 import { getCronosTendermintAsset } from '../../../utils/utils';
@@ -125,7 +125,10 @@ export const FormSettings = () => {
     };
 
     // This wallet level settings update should only imply the primary asset.
-    if (!session.activeAsset?.isSecondaryAsset) {
+    if (
+      session.activeAsset?.assetType === UserAssetType.TENDERMINT &&
+      session.activeAsset?.name === SupportedChainName.CRYPTO_ORG
+    ) {
       await walletService.updateWalletNodeConfig(settingsDataUpdate);
     }
 

@@ -47,6 +47,7 @@ import {
 } from '../bridge/BridgeConfig';
 import { BridgeTransactionHistoryList } from '../bridge/contracts/BridgeModels';
 import { AddressBookContactModel } from '../../models/AddressBook';
+import { CRONOS_TENDERMINT_ASSET } from '../../config/StaticAssets';
 // import { generalConfigService } from './GeneralConfigService';
 
 export class StorageService {
@@ -170,6 +171,7 @@ export class StorageService {
       return Promise.resolve();
     }
     const previousWallet = await this.findWalletByIdentifier(dataUpdate.walletId);
+    const currentSession = await this.retrieveCurrentSession();
 
     // Handle when general settings has been enabled
     if (previousWallet.config.enableGeneralSettings) {
@@ -183,6 +185,23 @@ export class StorageService {
     if (dataUpdate.nodeUrl) {
       previousWallet.config.nodeUrl = dataUpdate.nodeUrl;
       previousWallet.config.network.defaultNodeUrl = dataUpdate.nodeUrl;
+    }
+
+    if (
+      dataUpdate.clientUrl &&
+      dataUpdate.proxyUrl
+    ) {
+      if(previousWallet.config.tendermintNetwork?.node) {
+        previousWallet.config.tendermintNetwork.node.clientUrl = dataUpdate.clientUrl;
+        previousWallet.config.tendermintNetwork.node.proxyUrl = dataUpdate.proxyUrl;
+      } else {
+        const defaultCronosTendermintAsset = CRONOS_TENDERMINT_ASSET(previousWallet.config);
+        previousWallet.config.tendermintNetwork = defaultCronosTendermintAsset.config.tendermintNetwork!;
+        previousWallet.config.tendermintNetwork.node = {
+          clientUrl: dataUpdate.clientUrl,
+          proxyUrl: dataUpdate.proxyUrl
+        };
+      }
     }
 
     if (dataUpdate.explorer) {
@@ -206,6 +225,11 @@ export class StorageService {
     if (dataUpdate.gasLimit) {
       previousWallet.config.fee.gasLimit = dataUpdate.gasLimit;
     }
+
+    await this.setSession({
+      ...currentSession,
+      wallet: previousWallet
+    });
 
     return this.db.walletStore.update<Wallet>(
       { identifier: previousWallet.identifier },

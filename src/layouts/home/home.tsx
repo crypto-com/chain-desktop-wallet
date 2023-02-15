@@ -381,6 +381,8 @@ function HomeLayout(props: HomeLayoutProps) {
               address: `${wallet.config.explorerUrl}/account`,
               validator: `${wallet.config.explorerUrl}/validator`,
             },
+            clientUrl: defaultCronosTendermintAsset.config.tendermintNetwork?.node?.clientUrl,
+            proxyUrl: defaultCronosTendermintAsset.config.tendermintNetwork?.node?.proxyUrl,
           };
 
           await walletService.updateWalletNodeConfig(settingsDataUpdate);
