@@ -9,7 +9,8 @@ All notable changes to this project will be documented in this file.
 ### Additions
 - Testnet Croeseid 5 as default Crypto.org Chain Testnet
 - Compatibility for Crypto.org Chain Mainnet v4 upgrade
-- Add RPC & Rest URL for Tendermint Assets in Settings
+- Customizable RPC & Rest URL for Tendermint Assets
+- Adjust for better network security
 ### Bug Fixes
 - Missing transaction records on Crypto.org Chain
 - Potential infinite loading on delete wallet
