@@ -91,7 +91,7 @@ export class NodeRpcService implements INodeRpcService {
     // take first 2 words
     if (baseUrl) {
       const words = baseUrl.split(':', 2);
-      const newClientUrl = `${words[0]}:${words[1]}${NodePorts.Tendermint}`;
+      const newClientUrl = `${words[0]}:${words[1]}`;
       const client = await StargateClient.connect(newClientUrl);
       const proxyClient = axios.create({
         baseURL: baseUrl + NodePorts.Cosmos,

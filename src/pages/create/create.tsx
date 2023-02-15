@@ -29,7 +29,6 @@ import {
   DefaultWalletConfigs,
   LedgerWalletMaximum,
   NetworkName,
-  NodePorts,
   SupportedChainName,
 } from '../../config/StaticConfig';
 import logo from '../../assets/logo-products-chain.svg';
@@ -138,7 +137,7 @@ const FormCustomConfig: React.FC<FormCustomConfigProps> = (props) => {
       setCheckingNodeConnection(true);
       const { nodeUrl } = values;
       const isNodeLive = await walletService.checkNodeIsLive(
-        `${nodeUrl}${NodePorts.Tendermint}`,
+        `${nodeUrl}`,
       );
       setCheckingNodeConnection(false);
 

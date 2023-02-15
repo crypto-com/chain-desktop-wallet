@@ -370,17 +370,19 @@ function HomeLayout(props: HomeLayoutProps) {
 
           const settingsDataUpdate: SettingsDataUpdate = {
             walletId: wallet.identifier,
-            chainId: wallet.config.network.chainId,
-            nodeUrl: wallet.config.nodeUrl,
-            indexingUrl: wallet.config.indexingUrl,
+            chainId: defaultCronosTendermintAsset.config.chainId,
+            nodeUrl: defaultCronosTendermintAsset.config.nodeUrl,
+            indexingUrl: defaultCronosTendermintAsset.config.indexingUrl,
             networkFee: String(wallet.config.fee.networkFee),
             gasLimit: String(wallet.config.fee.gasLimit),
             explorer: {
-              baseUrl: `${wallet.config.explorerUrl}`,
-              tx: `${wallet.config.explorerUrl}/tx`,
-              address: `${wallet.config.explorerUrl}/account`,
-              validator: `${wallet.config.explorerUrl}/validator`,
+              baseUrl: `${defaultCronosTendermintAsset.config.explorerUrl}`,
+              tx: `${defaultCronosTendermintAsset.config.explorerUrl}/tx`,
+              address: `${defaultCronosTendermintAsset.config.explorerUrl}/account`,
+              validator: `${defaultCronosTendermintAsset.config.explorerUrl}/validator`,
             },
+            clientUrl: defaultCronosTendermintAsset.config.tendermintNetwork?.node?.clientUrl,
+            proxyUrl: defaultCronosTendermintAsset.config.tendermintNetwork?.node?.proxyUrl,
           };
 
           await walletService.updateWalletNodeConfig(settingsDataUpdate);
@@ -735,7 +737,7 @@ function HomeLayout(props: HomeLayoutProps) {
         key: '/assets',
         icon: <Icon component={IconAssets} />,
       },
-      (!isTestnet || session.activeAsset?.config?.tendermintNetwork?.chainId === 'testnet-croeseid-4')
+      (!isTestnet || session.wallet.config.network.chainId === 'testnet-croeseid-4')
         ? {
           label: conditionalLink('/bridge', t('navbar.bridge')),
           key: '/bridge',

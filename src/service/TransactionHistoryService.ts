@@ -66,10 +66,15 @@ export class TransactionHistoryService {
       return;
     }
 
-    let nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
-    if(currentSession.activeAsset?.config?.tendermintNetwork ) {
-      nodeRpc = await  NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
-    }
+
+    const nodeRpc = await NodeRpcService.init({ 
+      baseUrl: currentSession.wallet.config.nodeUrl,
+      clientUrl: currentSession.wallet.config.tendermintNetwork?.node?.clientUrl,
+      proxyUrl: currentSession.wallet.config.tendermintNetwork?.node?.proxyUrl,
+    });
+    // if(currentSession.activeAsset?.config?.tendermintNetwork?.node?.clientUrl && currentSession.activeAsset?.config?.tendermintNetwork?.node?.proxyUrl) {
+      // nodeRpc = await NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
+    // }
 
     await Promise.all([
       this.fetchAndSaveDelegations(nodeRpc, currentSession),
@@ -102,10 +107,15 @@ export class TransactionHistoryService {
         return Promise.resolve([]);
       }
 
-      let nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
-      if(currentSession.activeAsset?.config?.tendermintNetwork ) {
-        nodeRpc = await  NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
-      }
+
+      const nodeRpc = await NodeRpcService.init({ 
+        baseUrl: currentSession.wallet.config.nodeUrl,
+        clientUrl: currentSession.wallet.config.tendermintNetwork?.node?.clientUrl,
+        proxyUrl: currentSession.wallet.config.tendermintNetwork?.node?.proxyUrl,
+      });
+      // if(currentSession.activeAsset?.config?.tendermintNetwork?.node?.clientUrl && currentSession.activeAsset?.config?.tendermintNetwork?.node?.proxyUrl) {
+        // nodeRpc = await NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
+      // }
 
       const topValidators = await nodeRpc.loadTopValidators();
       const topValidatorsAddressList = topValidators.map(validator => {
@@ -662,10 +672,14 @@ export class TransactionHistoryService {
         return Promise.resolve([]);
       }
 
-      let nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
-      if(currentSession.activeAsset?.config?.tendermintNetwork ) {
-        nodeRpc = await  NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
-      }
+      const nodeRpc = await NodeRpcService.init({ 
+        baseUrl: currentSession.wallet.config.nodeUrl,
+        clientUrl: currentSession.wallet.config.tendermintNetwork?.node?.clientUrl,
+        proxyUrl: currentSession.wallet.config.tendermintNetwork?.node?.proxyUrl,
+      });
+      // if(currentSession.activeAsset?.config?.tendermintNetwork?.node?.clientUrl && currentSession.activeAsset?.config?.tendermintNetwork?.node?.proxyUrl) {
+        // nodeRpc = await NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
+      // }
       
       const loadedProposals = await nodeRpc.loadProposals([
         ProposalStatuses.PROPOSAL_STATUS_VOTING_PERIOD,
@@ -690,7 +704,11 @@ export class TransactionHistoryService {
         return Promise.resolve('1000000000000');
       }
 
-      const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+      const nodeRpc = await NodeRpcService.init({ 
+        baseUrl: currentSession.wallet.config.nodeUrl,
+        clientUrl: currentSession.activeAsset?.config?.tendermintNetwork?.node?.clientUrl,
+        proxyUrl: currentSession.activeAsset?.config?.tendermintNetwork?.node?.proxyUrl,
+      });
 
       const params = await nodeRpc.loadProposalDepositParams();
       const minDeposit = params?.deposit_params.min_deposit || [];
@@ -938,8 +956,6 @@ export class TransactionHistoryService {
       return;
     }
 
-    // const nodeRpc = await NodeRpcService.init(currentSession.wallet.config.nodeUrl);
-
     const assets: UserAsset[] = await this.retrieveCurrentWalletAssets(currentSession);
 
     if (!assets || assets.length === 0) {
@@ -1024,7 +1040,6 @@ export class TransactionHistoryService {
                 currentSession.wallet.config.network.coin.baseDenom;
               const baseDenomination =
                 asset.assetType !== UserAssetType.IBC ? baseDenom : `ibc/${asset.ibcDenomHash}`;
-              // const nodeRpc = await NodeRpcService.init({ baseUrl: asset.config.nodeUrl });
               const nodeRpc = await NodeRpcService.init({
                 baseUrl: asset.config.nodeUrl,
                 clientUrl: asset.config.tendermintNetwork?.node?.clientUrl,

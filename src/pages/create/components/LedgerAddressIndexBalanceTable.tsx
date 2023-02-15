@@ -169,11 +169,13 @@ const LedgerAddressIndexBalanceTable = (props: {
     setLoading(true);
     switch (`${assetType}-${chainName}`) {
       case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`: {
-        const nodeUrl = isTestnet
-          ? DefaultWalletConfigs.TestNetCroeseid5Config.nodeUrl
-          : DefaultWalletConfigs.MainNetConfig.nodeUrl;
+        const config = isTestnet
+          ? DefaultWalletConfigs.TestNetCroeseid5Config
+          : DefaultWalletConfigs.MainNetConfig;
         const nodeRpc = await NodeRpcService.init({
-          baseUrl: nodeUrl,
+          baseUrl: config.nodeUrl,
+          clientUrl: config.tendermintNetwork?.node?.clientUrl,
+          proxyUrl: config.tendermintNetwork?.node?.proxyUrl,
         });
         await Promise.all(
           ledgerAccountList.map(async account => {

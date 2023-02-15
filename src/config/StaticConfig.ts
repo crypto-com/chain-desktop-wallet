@@ -368,7 +368,7 @@ const TestnetCroeseid4: Network = {
     coinType: 1,
     account: 0,
   },
-  rpcUrl: 'https://rpc-testnet-croeseid-4.crypto.org:26657',
+  rpcUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
 };
 
 const TestnetCroeseid5: Network = {
@@ -439,7 +439,7 @@ export const MainNetConfig: WalletConfig = {
   enabled: true,
   name: NetworkName.MAINNET,
   derivationPath: 'm/44\'/394\'/0\'/0/0',
-  nodeUrl: CroNetwork.Mainnet.defaultNodeUrl,
+  nodeUrl: 'https://rpc.mainnet.crypto.org',
   explorer: {
     baseUrl: 'https://crypto.org/explorer',
     tx: 'https://crypto.org/explorer/tx',

@@ -194,6 +194,7 @@ class WalletService {
       this.syncBalancesData(currentSession),
       this.syncTransactionsData(currentSession),
       this.fetchAndSaveNFTs(currentSession),
+      this.fetchAndSaveValidators(currentSession)
       // this.fetchIBCAssets(currentSession),
     ]);
   }
@@ -202,7 +203,7 @@ class WalletService {
   public supportedConfigs(): WalletConfig[] {
     return [
       DefaultWalletConfigs.MainNetConfig,
-      DefaultWalletConfigs.TestNetCroeseid4Config,
+      // DefaultWalletConfigs.TestNetCroeseid4Config,
       DefaultWalletConfigs.TestNetCroeseid5Config,
       DefaultWalletConfigs.CustomDevNet,
     ];
@@ -297,7 +298,11 @@ class WalletService {
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve(null);
     }
-    const nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
+    const nodeRpc = await NodeRpcService.init({ 
+      baseUrl: currentSession.wallet.config.nodeUrl,
+      clientUrl: currentSession.wallet.config.tendermintNetwork?.node?.clientUrl,
+      proxyUrl: currentSession.wallet.config.tendermintNetwork?.node?.proxyUrl,
+    });
     const ibcAssets: UserAsset[] = await nodeRpc.loadIBCAssets(currentSession);
 
     const persistedAssets = await ibcAssets.map(async ibcAsset => {
@@ -770,10 +775,14 @@ class WalletService {
     if (currentSession?.wallet.config.nodeUrl === NOT_KNOWN_YET_VALUE) {
       return Promise.resolve(null);
     }
-    let nodeRpc = await NodeRpcService.init({ baseUrl: currentSession.wallet.config.nodeUrl });
-    if(currentSession.activeAsset?.config?.tendermintNetwork ) {
-      nodeRpc = await  NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
-    }
+    const nodeRpc = await NodeRpcService.init({ 
+      baseUrl: currentSession.wallet.config.nodeUrl,
+      clientUrl: currentSession.wallet.config.tendermintNetwork?.node?.clientUrl,
+      proxyUrl: currentSession.wallet.config.tendermintNetwork?.node?.proxyUrl,
+    });
+    // if(currentSession.activeAsset?.config?.tendermintNetwork?.node?.clientUrl && currentSession.activeAsset?.config?.tendermintNetwork?.node?.proxyUrl) {
+    //   nodeRpc = await  NodeRpcService.init({ clientUrl: currentSession.activeAsset?.config?.tendermintNetwork.node?.clientUrl, proxyUrl: currentSession.activeAsset.config.tendermintNetwork.node?.proxyUrl });
+    // }
     return nodeRpc.loadLatestTally(proposalID);
   }
 }
