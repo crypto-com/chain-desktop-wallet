@@ -667,7 +667,7 @@
   "governance.proposalView.modal4.header": "確認存款",
   "governance.proposalView.modal4.description": "請確認以下內容",
   "governance.proposalView.successModal.message": "此交易已經成功廣播！",
-  "governance.proposalView.deposited.header": "存款 10,000",
+  "governance.proposalView.deposited.header": "存款目標",
   "governance.proposalView.deposited.days": "日",
   "governance.proposalView.deposited.cro": "的",
   "nft.title": "我的NFT",

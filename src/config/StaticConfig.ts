@@ -409,6 +409,14 @@ export const TestNetCroeseid4Config: WalletConfig = {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
   },
+  tendermintNetwork: {
+    ...TestnetCroeseid4,
+    chainName: SupportedChainName.CRYPTO_ORG,
+    node: {
+      clientUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
+      proxyUrl: 'https://rest-testnet-croeseid-4.crypto.org',
+    }
+  }
 };
 
 
@@ -433,6 +441,14 @@ export const TestNetCroeseid5Config: WalletConfig = {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
   },
+  tendermintNetwork: {
+    ...TestnetCroeseid5,
+    chainName: SupportedChainName.CRYPTO_ORG,
+    node: {
+      clientUrl: 'https://rpc-c5.crypto.org',
+      proxyUrl: 'https://rest-c5.crypto.org'
+    }
+  }
 };
 
 export const MainNetConfig: WalletConfig = {
@@ -448,13 +464,27 @@ export const MainNetConfig: WalletConfig = {
   },
   explorerUrl: 'https://crypto.org/explorer',
   indexingUrl: 'https://crypto.org/explorer/api/v1/',
-  network: CroNetwork.Mainnet,
+  network: {
+    ...CroNetwork.Mainnet,
+    defaultNodeUrl: 'https://rpc.mainnet.crypto.org',
+    rpcUrl: 'https://rpc.mainnet.crypto.org',
+  },
   disableDefaultClientMemo: false,
   enableGeneralSettings: false,
   analyticsDisabled: false,
   fee: {
     gasLimit: FIXED_DEFAULT_GAS_LIMIT,
     networkFee: FIXED_DEFAULT_FEE,
+  },
+  tendermintNetwork: {
+    ...CroNetwork.Mainnet,
+    defaultNodeUrl: 'https://rpc.mainnet.crypto.org',
+    chainName: SupportedChainName.CRYPTO_ORG,
+    rpcUrl: 'https://rpc.mainnet.crypto.org',
+    node: {
+      clientUrl: 'https://rpc.mainnet.crypto.org',
+      proxyUrl: 'https://rest.mainnet.crypto.org',
+    },
   },
 };
 

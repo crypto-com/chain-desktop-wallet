@@ -50,7 +50,7 @@ const AddressBook = () => {
     },
     {
       key: 'network',
-      width: '180px',
+      width: '280px',
       render: (contact: AddressBookContact) => {
         return (
           <Tag
