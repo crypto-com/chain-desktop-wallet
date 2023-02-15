@@ -68,7 +68,7 @@ const MAX_VALIDATOR_LOAD = 100;
 export class NodeRpcService implements INodeRpcService {
   private readonly tendermintClient: StargateClient;
 
-  private readonly cosmosClient: AxiosInstance;
+  private readonly cosmosClient: AxiosInstance; // :1317 port
 
   constructor(client: StargateClient, proxyClient: AxiosInstance) {
     this.tendermintClient = client;
@@ -91,7 +91,7 @@ export class NodeRpcService implements INodeRpcService {
     // take first 2 words
     if (baseUrl) {
       const words = baseUrl.split(':', 2);
-      const newClientUrl = `${words[0]}:${words[1]}`;
+      const newClientUrl = `${words[0]}:${words[1]}${NodePorts.Tendermint}`;
       const client = await StargateClient.connect(newClientUrl);
       const proxyClient = axios.create({
         baseURL: baseUrl + NodePorts.Cosmos,
