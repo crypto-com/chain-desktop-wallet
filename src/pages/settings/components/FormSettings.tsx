@@ -12,7 +12,7 @@ import { SettingsDataUpdate } from '../../../models/Wallet';
 import ModalPopup from '../../../components/ModalPopup/ModalPopup';
 
 import { FIXED_DEFAULT_FEE, FIXED_DEFAULT_GAS_LIMIT } from '../../../config/StaticConfig';
-import { UserAsset, UserAssetConfig } from '../../../models/UserAsset';
+import { UserAsset, UserAssetConfig, UserAssetType } from '../../../models/UserAsset';
 import AddressBook from '../tabs/AddressBook/AddressBook';
 import { getCronosTendermintAsset } from '../../../utils/utils';
 import RevokePermission from '../tabs/RevokePermission/RevokePermission';
@@ -203,6 +203,8 @@ export const FormSettings = () => {
       indexingUrl: defaultAssetConfig?.config.indexingUrl,
       networkFee: defaultAssetConfig?.config.fee.networkFee,
       gasLimit: defaultAssetConfig?.config.fee.gasLimit,
+      clientUrl: (session.activeAsset?.assetType === UserAssetType.TENDERMINT) ? defaultAssetConfig?.config.tendermintNetwork?.node?.clientUrl : '',
+      proxyUrl: (session.activeAsset?.assetType === UserAssetType.TENDERMINT) ? defaultAssetConfig?.config.tendermintNetwork?.node?.proxyUrl : '',
     });
   };
 

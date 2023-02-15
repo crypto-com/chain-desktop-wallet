@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import '../settings.less';
 import 'antd/dist/antd.css';
-import { Checkbox, Divider, Form, Input, InputNumber, message, Select } from 'antd';
+import { Button, Checkbox, Divider, Form, Input, InputNumber, message, Select } from 'antd';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useTranslation } from 'react-i18next';
 import _ from 'lodash';
@@ -10,9 +10,10 @@ import { walletService } from '../../../service/WalletService';
 import { EnableGeneralSettingsPropagation } from '../../../models/Wallet';
 
 import { AnalyticsService } from '../../../service/analytics/AnalyticsService';
-import { getChainName } from '../../../utils/utils';
+import { checkIfTestnet, getChainName } from '../../../utils/utils';
 import { AssetIcon } from '../../../components/AssetIcon';
 import { UserAssetType } from '../../../models/UserAsset';
+import { SupportedChainName } from '../../../config/StaticConfig';
 
 const { Option } = Select;
 
@@ -23,6 +24,8 @@ export const GeneralSettingsForm = props => {
   const [enabledGeneralSettings, setEnabledGeneralSettings] = useState<boolean>(false);
   const didMountRef = useRef(false);
   const analyticsService = new AnalyticsService(session);
+
+  const isTestnet = checkIfTestnet(session.wallet.config.network);
 
   const [t] = useTranslation();
 
@@ -115,6 +118,26 @@ export const GeneralSettingsForm = props => {
     setUpdateLoading(false);
   }
 
+  function onApplyTestnetCroeseid4() {
+    props.form.setFieldsValue({
+      nodeUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
+      clientUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
+      proxyUrl: 'https://rest-testnet-croeseid-4.crypto.org',
+      indexingUrl: 'https://crypto.org/explorer/croeseid4/api/v1/',
+      chainId: 'testnet-croeseid-4'
+    });
+  }
+
+  function onApplyTestnetCroeseid5() {
+    props.form.setFieldsValue({
+      nodeUrl: 'https://rpc-c5.crypto.org',
+      clientUrl: 'https://rpc-c5.crypto.org',
+      proxyUrl: 'https://rest-c5.crypto.org',
+      indexingUrl: 'https://crypto.org/explorer/croeseid5/api/v1/',
+      chainId: 'testnet-croeseid-5'
+    });
+  }
+
   return (
     <>
       <div className="title">{t('settings.form1.assetIdentifier.label')}</div>
@@ -129,6 +152,10 @@ export const GeneralSettingsForm = props => {
           );
         })}
       </Select>
+      {(session.activeAsset?.assetType === UserAssetType.TENDERMINT && session.activeAsset?.name === SupportedChainName.CRYPTO_ORG && isTestnet) && <>
+        <Button type="link" style={{ width: '140px', marginRight: '10px' }} onClick={onApplyTestnetCroeseid4}>Croeseid 4</Button>
+        <Button type="link" style={{ width: '140px' }} onClick={onApplyTestnetCroeseid5}>Croeseid 5</Button>
+      </>}
       <Divider />
       <Form.Item
         name="nodeUrl"
@@ -151,16 +178,16 @@ export const GeneralSettingsForm = props => {
         <>
           <Form.Item
             name="clientUrl"
-            label={'RPC URL'}
+            label={t('create.formCustomConfig.clientUrl.label')}
             hasFeedback
             rules={[
               {
                 required: true,
-                message: `RPC URL ${t('general.required')}`,
+                message: `${t('create.formCustomConfig.clientUrl.label')} ${t('general.required')}`,
               },
               {
                 type: 'url',
-                message: t('settings.form1.clientUrl.error1'),
+                message: t('create.formCustomConfig.clientUrl.error1'),
               },
             ]}
           >
@@ -168,16 +195,16 @@ export const GeneralSettingsForm = props => {
           </Form.Item>
           <Form.Item
             name="proxyUrl"
-            label={'Rest URL'}
+            label={t('create.formCustomConfig.proxyUrl.label')}
             hasFeedback
             rules={[
               {
                 required: true,
-                message: `Rest URL ${t('general.required')}`,
+                message: `${t('create.formCustomConfig.proxyUrl.label')} ${t('general.required')}`,
               },
               {
                 type: 'url',
-                message: t('settings.form1.proxyUrl.error1'),
+                message: t('create.formCustomConfig.proxyUrl.error1'),
               },
             ]}
           >

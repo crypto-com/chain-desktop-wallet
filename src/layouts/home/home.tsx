@@ -329,7 +329,6 @@ function HomeLayout(props: HomeLayoutProps) {
     }
 
     const assets = await walletService.retrieveWalletAssets(walletSession.wallet.identifier);
-    const defaultCronosTendermintAsset = CRONOS_TENDERMINT_ASSET(walletSession.wallet.config);
     const cronosTendermintAsset = getCronosTendermintAsset(assets);
     const cronosAsset = getCronosEvmAsset(assets);
     const ethAsset = getEthereumEvmAsset(assets);
@@ -367,6 +366,7 @@ function HomeLayout(props: HomeLayoutProps) {
         allWallets.forEach(async wallet => {
           const isTestnet = checkIfTestnet(wallet.config.network);
           const defaultEthAssetConfig = ETH_ASSET(wallet.config).config;
+          const defaultCronosTendermintAsset = CRONOS_TENDERMINT_ASSET(wallet.config);
 
           const settingsDataUpdate: SettingsDataUpdate = {
             walletId: wallet.identifier,
@@ -392,6 +392,13 @@ function HomeLayout(props: HomeLayoutProps) {
             let indexingUrl = `${asset.config?.indexingUrl ?? wallet.config.indexingUrl}`;
             let explorerUrl = `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}`;
             let chainId = `${asset.config?.chainId ?? wallet.config.network.chainId}`;
+            if (
+              asset.assetType === UserAssetType.TENDERMINT && asset.name === SupportedChainName.CRYPTO_ORG
+            ) {
+              nodeUrl = defaultCronosTendermintAsset.config.nodeUrl;
+              explorerUrl = defaultCronosTendermintAsset.config.explorerUrl;
+              chainId = defaultCronosTendermintAsset.config.chainId;
+            }
             if (
               asset.assetType === UserAssetType.EVM && asset.name.includes('Cronos') ||
               asset.assetType === UserAssetType.CRC_20_TOKEN
@@ -728,11 +735,13 @@ function HomeLayout(props: HomeLayoutProps) {
         key: '/assets',
         icon: <Icon component={IconAssets} />,
       },
-      {
-        label: conditionalLink('/bridge', t('navbar.bridge')),
-        key: '/bridge',
-        icon: <Icon component={IconCronos} />,
-      },
+      (!isTestnet || session.activeAsset?.config?.tendermintNetwork?.chainId === 'testnet-croeseid-4')
+        ? {
+          label: conditionalLink('/bridge', t('navbar.bridge')),
+          key: '/bridge',
+          icon: <Icon component={IconCronos} />,
+        } 
+        : null,
       !isTestnet
         ? {
           label: conditionalLink('/dapp', t('navbar.dapp')),
