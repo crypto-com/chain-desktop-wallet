@@ -480,8 +480,10 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   }
 
   public async getValidatorsDetail(validatorAddrList: string[]) {
+    const recentBlocks = '100';
+    const limit = '10000';
     const validatorList = await this.axiosClient.get<ValidatorListResponse>(
-      'validators?limit=1000000',
+      `validators?recentBlocks=${recentBlocks}&limit=${limit}`,
     );
 
     if (validatorList.data.pagination.total_page > 1) {
@@ -525,7 +527,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
   }
 
   // NOTE: getting validator by address doesn't have `apy` property
-  public async getValidatorUptimeByAddress(validatorAddr: string) {
+  public async getValidatorLifeUptimeByAddress(validatorAddr: string) {
     const validatorInfo = await this.axiosClient.get<ValidatorResponse>(
       `validators/${validatorAddr}`,
     );
@@ -539,6 +541,29 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     }
 
     return validatorInfo.data.result.impreciseUpTime;
+  }
+
+  public async getValidatorRecentUptimeByAddress(validatorAddr: string, recentBlocks: number) {
+    if (recentBlocks <= 0) {
+      return '0';
+    }
+
+    const validatorInfo = await this.axiosClient.get<ValidatorResponse>(
+      `validators/${validatorAddr}?recentBlocks=${recentBlocks.toString()}`,
+    );
+
+    if (!validatorInfo.data.result) {
+      throw new Error('Validator details not found.');
+    }
+
+    if (validatorInfo.data.result && !validatorInfo.data.result.totalRecentSignedBlocks && !validatorInfo.data.result.totalRecentActiveBlocks) {
+      return '0';
+    }
+
+    const totalRecentSignedBlocks = validatorInfo.data.result.totalRecentSignedBlocks;
+    const totalRecentActiveBlocks = validatorInfo.data.result.totalRecentActiveBlocks > 0 ? validatorInfo.data.result.totalRecentActiveBlocks : recentBlocks; // avoid div by zero
+
+    return totalRecentSignedBlocks / totalRecentActiveBlocks;
   }
 
   /**

@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.4.1] - 2023-03-03
+### Additions
+- Revise on validator uptime calculation & list layout
 ## [v1.4.0] - 2023-02-14
 ### Additions
 - Testnet Croeseid 5 as default Crypto.org Chain Testnet

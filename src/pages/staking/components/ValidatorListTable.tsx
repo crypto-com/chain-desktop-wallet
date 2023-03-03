@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { AutoComplete, FormInstance, Table, Tooltip } from 'antd';
+import { AutoComplete, FormInstance, Table, Tooltip, Typography } from 'antd';
 import numeral from 'numeral';
 
 import './ValidatorListTable.less';
@@ -10,7 +10,8 @@ import './ValidatorListTable.less';
 import {
   ThemeColor,
   VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
-  VALIDATOR_UPTIME_THRESHOLD,
+  VALIDATOR_RECENT_UPTIME_THRESHOLD,
+  VALIDATOR_VOTING_POWER_THRESHOLD,
 } from '../../../config/StaticConfig';
 import { ellipsis, middleEllipsis } from '../../../utils/utils';
 import { renderExplorerUrl } from '../../../models/Explorer';
@@ -19,6 +20,8 @@ import { Session } from '../../../models/Session';
 import { scaledAmount } from '../../../models/UserAsset';
 import { isValidatorAddressSuspicious, ModerationConfig } from '../../../models/ModerationConfig';
 import ValidatorPowerPercentBar from '../../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
+
+const { Text } = Typography;
 
 const ValidatorListTable = (props: {
   currentSession: Session;
@@ -99,7 +102,17 @@ const ValidatorListTable = (props: {
       },
     },
     {
-      title: t('staking.validatorList.table.cumulativeShares'),
+      title: <>
+        {t('staking.validatorList.table.cumulativeShares')}
+        <Tooltip title={t(
+          'staking.validatorList.table.tooltip2',
+          { voting: Math.round(VALIDATOR_VOTING_POWER_THRESHOLD * 100) }
+        )}>
+          <span>
+            <ExclamationCircleOutlined style={{ paddingLeft: '5px', cursor: 'pointer', color: ThemeColor.BLUE }} />
+          </span>
+        </Tooltip>
+      </>,
       // dataIndex: 'cumulativeShares',
       key: 'cumulativeShares',
       // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
@@ -134,11 +147,25 @@ const ValidatorListTable = (props: {
       },
     },
     {
-      title: t('staking.validatorList.table.validatorUptime'),
+      title: <>
+        {t('staking.validatorList.table.validatorUptime')}
+        <Tooltip title={t(
+          'staking.validatorList.table.tooltip1',
+          { uptime: Math.round(VALIDATOR_RECENT_UPTIME_THRESHOLD * 100) }
+        )}>
+          <span>
+            <ExclamationCircleOutlined style={{ paddingLeft: '5px', cursor: 'pointer', color: ThemeColor.BLUE }} />
+          </span>
+        </Tooltip>
+      </>,
       key: 'uptime',
       // sorter: (a, b) => new Big(a.uptime).cmp(new Big(b.uptime)),
       render: record => {
-        return <span>{new Big(record.uptime).times(100).toFixed(2)}%</span>;
+        const color = record.uptime >= VALIDATOR_RECENT_UPTIME_THRESHOLD ? 'success' : 'danger';
+        
+        return <Text type={color}>
+          {new Big(record.uptime).times(100).toFixed(2)}%
+        </Text>;
       },
     },
     {
@@ -253,7 +280,7 @@ const ValidatorListTable = (props: {
         }}
         rowClassName={record => {
           const greyBackground =
-            Big(record.uptime ?? '0').lt(VALIDATOR_UPTIME_THRESHOLD) ||
+            Big(record.uptime ?? '0').lt(VALIDATOR_RECENT_UPTIME_THRESHOLD) ||
             isValidatorAddressSuspicious(record.validatorAddress, moderationConfig);
           // new Big(record.cumulativeSharesIncludePercentage!).lte(
           //   VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,

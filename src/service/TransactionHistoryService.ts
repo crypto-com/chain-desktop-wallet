@@ -6,7 +6,7 @@ import { NodeRpcService } from './rpc/NodeRpcService';
 import {
   NOT_KNOWN_YET_VALUE,
   SECONDS_OF_YEAR,
-  VALIDATOR_UPTIME_THRESHOLD,
+  VALIDATOR_RECENT_UPTIME_THRESHOLD,
 } from '../config/StaticConfig';
 import { UserAsset, UserAssetType } from '../models/UserAsset';
 import {
@@ -130,32 +130,35 @@ export class TransactionHistoryService {
             return val.operatorAddress === validator.validatorAddress;
           });
 
+          const totalRecentSignedBlocks = matchValidator?.totalRecentSignedBlocks ?? 0;
+          const totalRecentActiveBlocks = matchValidator?.totalRecentActiveBlocks ?? 100;
+
           return {
             ...validator,
             apy: matchValidator?.apy,
-            uptime: matchValidator?.impreciseUpTime,
+            uptime: totalRecentSignedBlocks / (totalRecentActiveBlocks > 0 ? totalRecentActiveBlocks : 100), // avoid div by zero
           };
         })
-        // Group validators by uptime >= 99.9% & uptime < 99.9%
-        // For Group uptime < 99.9%, sort by Highest uptime %
+        // Group validators by recent uptime >= 98% & uptime < 98%
+        // For Group uptime < 98%, sort by Highest uptime %
         .sort((v1, v2) => {
           const v1Uptime = Big(v1.uptime ?? '0');
           const v2Uptime = Big(v2.uptime ?? '0');
           if (
-            v1Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) >= 0 &&
-            v2Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) < 0
+            v1Uptime.cmp(VALIDATOR_RECENT_UPTIME_THRESHOLD) >= 0 &&
+            v2Uptime.cmp(VALIDATOR_RECENT_UPTIME_THRESHOLD) < 0
           ) {
             return -1;
           }
           if (
-            v1Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) < 0 &&
-            v2Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) >= 0
+            v1Uptime.cmp(VALIDATOR_RECENT_UPTIME_THRESHOLD) < 0 &&
+            v2Uptime.cmp(VALIDATOR_RECENT_UPTIME_THRESHOLD) >= 0
           ) {
             return 1;
           }
           if (
-            v1Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) < 0 &&
-            v2Uptime.cmp(VALIDATOR_UPTIME_THRESHOLD) < 0
+            v1Uptime.cmp(VALIDATOR_RECENT_UPTIME_THRESHOLD) < 0 &&
+            v2Uptime.cmp(VALIDATOR_RECENT_UPTIME_THRESHOLD) < 0
           ) {
             return v2Uptime.cmp(v1Uptime);
           }
