@@ -535,6 +535,8 @@
   "staking.validatorList.table.validatorUptime": "正常上線時間",
   "staking.validatorList.table.validatorApy": "年收益率",
   "staking.validatorList.table.action": "操作",
+  "staking.validatorList.table.tooltip1": "建議選擇 正常上常時間 >{{ uptime }}% 的驗者證 以確保獎勵收益表現",
+  "staking.validatorList.table.tooltip2": "建議選擇 投票權 <{{ voting }}% 的驗證者 以維持網絡的去中心化。",
   "staking.formWithdralStakingReward.table.validatorName": "名稱",
   "staking.formWithdralStakingReward.table.rewardAmount": "獎勵數目",
   "staking.formWithdralStakingReward.table.withdraw": "提取",
