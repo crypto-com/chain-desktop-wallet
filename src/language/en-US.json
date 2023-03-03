@@ -535,6 +535,8 @@
   "staking.validatorList.table.validatorUptime": "Uptime",
   "staking.validatorList.table.validatorApy": "APY",
   "staking.validatorList.table.action": "Action",
+  "staking.validatorList.table.tooltip1": "It's recommended to select a validator that has >{{ uptime }}% uptime for staking rewards performance.",
+  "staking.validatorList.table.tooltip2": "It's recommended to select a validator that has  <{{ voting }}% voting power to keep the staking pool decentralized.",
   "staking.formWithdralStakingReward.table.validatorName": "Name",
   "staking.formWithdralStakingReward.table.rewardAmount": "Reward Amount",
   "staking.formWithdralStakingReward.table.withdraw": "Withdraw",

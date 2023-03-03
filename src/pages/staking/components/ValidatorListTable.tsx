@@ -11,6 +11,7 @@ import {
   ThemeColor,
   VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
   VALIDATOR_RECENT_UPTIME_THRESHOLD,
+  VALIDATOR_VOTING_POWER_THRESHOLD,
 } from '../../../config/StaticConfig';
 import { ellipsis, middleEllipsis } from '../../../utils/utils';
 import { renderExplorerUrl } from '../../../models/Explorer';
@@ -101,7 +102,17 @@ const ValidatorListTable = (props: {
       },
     },
     {
-      title: t('staking.validatorList.table.cumulativeShares'),
+      title: <>
+        {t('staking.validatorList.table.cumulativeShares')}
+        <Tooltip title={t(
+          'staking.validatorList.table.tooltip2',
+          { voting: Math.round(VALIDATOR_VOTING_POWER_THRESHOLD * 100) }
+        )}>
+          <span>
+            <ExclamationCircleOutlined style={{ paddingLeft: '5px', cursor: 'pointer', color: ThemeColor.BLUE }} />
+          </span>
+        </Tooltip>
+      </>,
       // dataIndex: 'cumulativeShares',
       key: 'cumulativeShares',
       // sorter: (a, b) => new Big(a.cumulativeShares).cmp(new Big(b.cumulativeShares)),
@@ -136,7 +147,17 @@ const ValidatorListTable = (props: {
       },
     },
     {
-      title: t('staking.validatorList.table.validatorUptime'),
+      title: <>
+        {t('staking.validatorList.table.validatorUptime')}
+        <Tooltip title={t(
+          'staking.validatorList.table.tooltip1',
+          { uptime: Math.round(VALIDATOR_RECENT_UPTIME_THRESHOLD * 100) }
+        )}>
+          <span>
+            <ExclamationCircleOutlined style={{ paddingLeft: '5px', cursor: 'pointer', color: ThemeColor.BLUE }} />
+          </span>
+        </Tooltip>
+      </>,
       key: 'uptime',
       // sorter: (a, b) => new Big(a.uptime).cmp(new Big(b.uptime)),
       render: record => {
