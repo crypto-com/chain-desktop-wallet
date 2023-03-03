@@ -127,7 +127,8 @@ export const NodePorts = {
 export const LedgerWalletMaximum = 2147483647;
 
 export const VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD = 33.3;
-export const VALIDATOR_UPTIME_THRESHOLD = 0.999;
+export const VALIDATOR_LIFE_UPTIME_THRESHOLD = 0.999;
+export const VALIDATOR_RECENT_UPTIME_THRESHOLD = 0.98;
 
 // 1 year = 60sec * 60 * 24 * 365 = 31536000 sec
 export const SECONDS_OF_YEAR = 31536000;

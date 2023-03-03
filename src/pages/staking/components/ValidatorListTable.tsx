@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Big from 'big.js';
 import { useTranslation } from 'react-i18next';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { AutoComplete, FormInstance, Table, Tooltip } from 'antd';
+import { AutoComplete, FormInstance, Table, Tooltip, Typography } from 'antd';
 import numeral from 'numeral';
 
 import './ValidatorListTable.less';
@@ -10,7 +10,7 @@ import './ValidatorListTable.less';
 import {
   ThemeColor,
   VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
-  VALIDATOR_UPTIME_THRESHOLD,
+  VALIDATOR_RECENT_UPTIME_THRESHOLD,
 } from '../../../config/StaticConfig';
 import { ellipsis, middleEllipsis } from '../../../utils/utils';
 import { renderExplorerUrl } from '../../../models/Explorer';
@@ -19,6 +19,8 @@ import { Session } from '../../../models/Session';
 import { scaledAmount } from '../../../models/UserAsset';
 import { isValidatorAddressSuspicious, ModerationConfig } from '../../../models/ModerationConfig';
 import ValidatorPowerPercentBar from '../../../components/ValidatorPowerPercentBar/ValidatorPowerPercentBar';
+
+const { Text } = Typography;
 
 const ValidatorListTable = (props: {
   currentSession: Session;
@@ -138,7 +140,11 @@ const ValidatorListTable = (props: {
       key: 'uptime',
       // sorter: (a, b) => new Big(a.uptime).cmp(new Big(b.uptime)),
       render: record => {
-        return <span>{new Big(record.uptime).times(100).toFixed(2)}%</span>;
+        const color = record.uptime >= VALIDATOR_RECENT_UPTIME_THRESHOLD ? 'success' : 'danger';
+        
+        return <Text type={color}>
+          {new Big(record.uptime).times(100).toFixed(2)}%
+        </Text>;
       },
     },
     {
@@ -253,7 +259,7 @@ const ValidatorListTable = (props: {
         }}
         rowClassName={record => {
           const greyBackground =
-            Big(record.uptime ?? '0').lt(VALIDATOR_UPTIME_THRESHOLD) ||
+            Big(record.uptime ?? '0').lt(VALIDATOR_RECENT_UPTIME_THRESHOLD) ||
             isValidatorAddressSuspicious(record.validatorAddress, moderationConfig);
           // new Big(record.cumulativeSharesIncludePercentage!).lte(
           //   VALIDATOR_CUMULATIVE_SHARE_PERCENTAGE_THRESHOLD,
