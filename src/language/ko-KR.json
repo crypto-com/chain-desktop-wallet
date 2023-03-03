@@ -532,6 +532,8 @@
   "staking.validatorList.table.validatorUptime": "정상 가동 시간",
   "staking.validatorList.table.validatorApy": "APY",
   "staking.validatorList.table.action": "활동",
+  "staking.validatorList.table.tooltip1": "보다 좋은 스테이킹 보상을 위해 >{{ uptime }}% 가동 시간을 가진 검증인을 선택하는 것이 좋습니다",
+  "staking.validatorList.table.tooltip2": "스테이킹 풀을 보다 분산된 상태로 유지하기위해 투표 권한이 <{{ voting }}%인 검증인을 선택하는 것이 좋습니다.",
   "staking.formWithdralStakingReward.table.validatorName": "이름",
   "staking.formWithdralStakingReward.table.rewardAmount": "보상 금액",
   "staking.formWithdralStakingReward.table.withdraw": "인출하기",
