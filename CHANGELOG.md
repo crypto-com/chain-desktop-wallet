@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.4.2] - 2023-07-19
+### Additions
+- Security enhancement & package dependencies bump
+### Bug Fixes
+- Potential app crash on Assets Page
 ## [v1.4.1] - 2023-03-03
 ### Additions
 - Revise on validator uptime calculation & list layout
