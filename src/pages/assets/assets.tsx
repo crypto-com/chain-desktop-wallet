@@ -623,7 +623,7 @@ const AssetsPage = () => {
           dataIndex: 'msgTypeName',
           key: 'msgTypeName',
           render: (text) => {
-            return <TagMsgType msgTypeName={text} />;
+            return text ? <TagMsgType msgTypeName={text} /> : <></>;
           },
         },
       ]
