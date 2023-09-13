@@ -35,6 +35,8 @@ import { croNftApi, MintByCDCRequest } from './NftApi';
 import { splitToChunks } from '../../utils/utils';
 import { UserAsset } from '../../models/UserAsset';
 
+const VALIDATOR_FETCH_LIMIT = 1000;
+
 export interface IChainIndexingAPI {
   fetchAllTransferTransactions(
     baseAssetSymbol: string,
@@ -167,7 +169,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
     const transferListResponse = await this.axiosClient.get<TransferListResponse>(
       `/accounts/${address}/messages?order=height.desc&filter.msgType=${msgType.join(
         ',',
-      )}&limit=1000`,
+      )}&limit=${VALIDATOR_FETCH_LIMIT}`,
     );
 
     function getStatus(transfer: TransferResult) {
@@ -459,7 +461,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   private async getValidatorDetails(validatorAddr: string) {
     const validatorList = await this.axiosClient.get<ValidatorListResponse>(
-      'validators?limit=1000000',
+      `validators?limit=${VALIDATOR_FETCH_LIMIT}`,
     );
 
     if (validatorList.data.pagination.total_page > 1) {
@@ -481,9 +483,8 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   public async getValidatorsDetail(validatorAddrList: string[]) {
     const recentBlocks = '100';
-    const limit = '10000';
     const validatorList = await this.axiosClient.get<ValidatorListResponse>(
-      `validators?recentBlocks=${recentBlocks}&limit=${limit}`,
+      `validators?recentBlocks=${recentBlocks}&limit=${VALIDATOR_FETCH_LIMIT}`,
     );
 
     if (validatorList.data.pagination.total_page > 1) {
@@ -501,7 +502,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   public async getValidatorsAverageApy(validatorAddrList: string[]) {
     const validatorList = await this.axiosClient.get<ValidatorListResponse>(
-      'validators?limit=1000000',
+      `validators?limit=${VALIDATOR_FETCH_LIMIT}`,
     );
 
     if (validatorList.data.pagination.total_page > 1) {

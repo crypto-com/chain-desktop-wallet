@@ -142,7 +142,7 @@ describe('Testing ChainIndexingApi', () => {
   it('should return estimated rewards for a user account, , apy = 10%, period = 12 Months', async () => {
     const nodeRpcService = ChainIndexingAPI.init('https://crypto.org/explorer/api/v1');
     moxios.wait(() => {
-      const validatorListReq = moxios.requests.get('get', 'validators?limit=1000000');
+      const validatorListReq = moxios.requests.get('get', 'validators?limit=1000');
       const accountInfoReq = moxios.requests.get(
         'get',
         'accounts/cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a',
@@ -327,7 +327,7 @@ describe('Testing ChainIndexingApi', () => {
   it('should return estimated rewards for a user account, apy = 10%, period = 6 Months', async () => {
     const nodeRpcService = ChainIndexingAPI.init('https://crypto.org/explorer/api/v1');
     moxios.wait(() => {
-      const validatorListReq = moxios.requests.get('get', 'validators?limit=1000000');
+      const validatorListReq = moxios.requests.get('get', 'validators?limit=1000');
       const accountInfoReq = moxios.requests.get(
         'get',
         'accounts/cro1gaf3jqqzvrxvgc4u4vr6x0tlf6kcm703zqa34a',
