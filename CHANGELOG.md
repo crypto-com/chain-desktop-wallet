@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.4.3] - 2023-09-13
+### Bug Fixes
+- Fix malfunctioned Staking services 
 ## [v1.4.2] - 2023-07-19
 ### Additions
 - Security enhancement & package dependencies bump
