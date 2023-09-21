@@ -12,6 +12,7 @@ import Store from 'electron-store';
 import { APP_PROTOCOL_NAME } from '../src/config/StaticConfig';
 
 import { getGAnalyticsCode, getUACode, actionEvent, transactionEvent, pageView } from './UsageAnalytics';
+import { isValidURL } from './utils';
 
 remoteMain.initialize();
 
@@ -191,6 +192,16 @@ app.on('ready', async function () {
     autoUpdater.checkForUpdatesAndNotify();
   }
 });
+
+app.on('web-contents-created', (event, contents) => {
+  if (contents.getType() == 'webview') {
+    contents.on('will-navigate', (event, url) => {
+      if (!isValidURL(url)) {
+        event.preventDefault();
+      }
+    })
+  }
+})
 
 ipcMain.handle('get_auto_update_expire_time', (event) => {
   return store.get('autoUpdateExpireTime');
