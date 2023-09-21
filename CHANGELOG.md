@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.4.4] - 2023-09-21
+### Additions
+- Security enhancement on DApp Browser
 ## [v1.4.3] - 2023-09-13
 ### Bug Fixes
 - Fix malfunctioned Staking services 
