@@ -933,7 +933,7 @@ const CronosBridge = props => {
                 onFinish={onBridgeConfigUpdate}
               >
                 {bridgeConfigFields.includes('prefix') &&
-                bridgeTransferDirection !== BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG ? (
+                bridgeTransferDirection !== BridgeTransferDirection.CRONOS_TO_CRONOS_TENDERMINT ? (
                     <Form.Item
                       name="prefix"
                       label={t('bridge.config.prefix.title')}

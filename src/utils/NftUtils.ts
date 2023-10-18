@@ -56,7 +56,7 @@ export class NftUtils {
       }
     }
 
-    // Crypto.org chain NFT Issued NFT
+    // Cronos POS Chain NFT Issued NFT
     return parsedTokenData;
   }
 

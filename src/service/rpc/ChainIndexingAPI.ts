@@ -626,7 +626,7 @@ export class ChainIndexingAPI implements IChainIndexingAPI {
 
   /**
    * TODO: Under construction
-   * @param userAddress Supports only Crypto.org USER addresses
+   * @param userAddress Supports only Cronos POS Chain USER addresses
    * @param optionalMsgTypeNameList {Optional} Cosmos MsgType Name
    */
   public async getMessagesByAccountAddress(

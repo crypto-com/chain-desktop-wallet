@@ -21,7 +21,7 @@ export const useLedgerStatus = (props: Props) => {
   useEffect(() => {
     const checkIsLedgerConnected = () => {
       if (assetType === UserAssetType.TENDERMINT || assetType === UserAssetType.IBC) {
-        if(chainName === SupportedChainName.CRYPTO_ORG) {
+        if(chainName === SupportedChainName.CRONOS_TENDERMINT) {
           setIsLedgerConnected(ledgerConnectedApp === LedgerConnectedApp.CRYPTO_ORG);
         } else if(chainName === SupportedChainName.COSMOS_HUB) {
           setIsLedgerConnected(ledgerConnectedApp === LedgerConnectedApp.COSMOS);

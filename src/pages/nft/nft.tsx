@@ -594,7 +594,7 @@ const FormMintNft = () => {
         >
           <Input
             maxLength={64}
-            placeholder={`${t('nft.formMintNft.drop.placeholder')} "Crypto.org Genesis"`}
+            placeholder={`${t('nft.formMintNft.drop.placeholder')} "Cronos POS Chain Genesis"`}
           />
         </Form.Item>
         <Form.Item
@@ -607,7 +607,7 @@ const FormMintNft = () => {
             maxLength={1000}
             placeholder={`${t(
               'nft.formMintNft.drop.placeholder',
-            )} "Commemorating the launch of the Crypto.org Chain and the Crypto.com NFT Platform..."`}
+            )} "Commemorating the launch of the Cronos POS Chain and the Crypto.com NFT Platform..."`}
           />
         </Form.Item>
         <Form.Item
@@ -914,7 +914,7 @@ const NftPage = () => {
     denomId: '',
     senderAddress: '',
     recipientAddress: '',
-    nftType: NftType.CRYPTO_ORG,
+    nftType: NftType.CRONOS_TENDERMINT,
     amount: '',
     memo: '',
   });
@@ -1005,7 +1005,7 @@ const NftPage = () => {
         tokenId: model.tokenId,
         senderAddress: currentSession.wallet.address,
         tokenContractAddress: '',
-        nftType: NftType.CRYPTO_ORG,
+        nftType: NftType.CRONOS_TENDERMINT,
       });
     }
     if (isCronosNftModel(nft)) {
@@ -1748,7 +1748,7 @@ const NftPage = () => {
                           <Content>{t('nft.modal2.notice2')}</Content>
                         </Layout>
                       </div>
-                      {formValues.nftType === NftType.CRYPTO_ORG && (
+                      {formValues.nftType === NftType.CRONOS_TENDERMINT && (
                         <div className="item">
                           <div className="label">{t('nft.modal2.label2')}</div>
                           <div>{`${formValues.denomId}`}</div>
@@ -1764,7 +1764,7 @@ const NftPage = () => {
                         <div className="label">{t('nft.modal2.label3')}</div>
                         <div>{`${formValues.tokenId}`}</div>
                       </div>
-                      {formValues.nftType === NftType.CRYPTO_ORG && (
+                      {formValues.nftType === NftType.CRONOS_TENDERMINT && (
                         <>
                           <div className="item">
                             <div className="label">{t('nft.modal2.label4')}</div>

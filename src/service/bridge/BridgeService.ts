@@ -52,11 +52,11 @@ export class BridgeService {
     const { bridgeTransferDirection } = bridgeTransferRequest;
 
     switch (bridgeTransferDirection) {
-      case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS: {
+      case BridgeTransferDirection.CRONOS_TENDERMINT_TO_CRONOS: {
         return await this.handleCryptoOrgToCronosTransfer(bridgeTransferRequest);
       }
 
-      case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG: {
+      case BridgeTransferDirection.CRONOS_TO_CRONOS_TENDERMINT: {
         return await this.handleCronosToCryptoOrgTransfer(bridgeTransferRequest);
       }
 
@@ -121,7 +121,7 @@ export class BridgeService {
     const gasLimit = loadedBridgeConfig.gasLimit || defaultBridgeConfig.gasLimit;
 
     const contract = new web3.eth.Contract(bridgeContractABI, bridgeContractAddress);
-    const encodedABI = contract.methods.send_cro_to_crypto_org(recipientAddress).encodeABI();
+    const encodedABI = contract.methods.send_cro_to_CRONOS_TENDERMINT(recipientAddress).encodeABI();
 
     const scaledBaseAmount = getBaseScaledAmount(bridgeTransferRequest.amount, originAsset);
 
@@ -472,12 +472,12 @@ export class BridgeService {
 
     if (!allConfigs || allConfigs.length < 1) {
       await this.storageService.saveBridgeConfigsList([
-        DefaultMainnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG,
-        DefaultMainnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS,
+        DefaultMainnetBridgeConfigs.CRONOS_TO_CRONOS_TENDERMINT,
+        DefaultMainnetBridgeConfigs.CRONOS_TENDERMINT_TO_CRONOS,
         DefaultMainnetBridgeConfigs.COSMOS_HUB_TO_CRONOS,
         DefaultMainnetBridgeConfigs.CRONOS_TO_COSMOS_HUB,
-        DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG,
-        DefaultTestnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS,
+        DefaultTestnetBridgeConfigs.CRONOS_TO_CRONOS_TENDERMINT,
+        DefaultTestnetBridgeConfigs.CRONOS_TENDERMINT_TO_CRONOS,
       ]);
     }
 
@@ -491,11 +491,11 @@ export class BridgeService {
     const allAssets = await walletService.retrieveCurrentWalletAssets(currentSession);
     switch(bridgeTransferDirection) {
       case BridgeTransferDirection.CRONOS_TO_COSMOS_HUB:
-      case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG:
+      case BridgeTransferDirection.CRONOS_TO_CRONOS_TENDERMINT:
         return allAssets.find(asset => asset.assetType === UserAssetType.EVM && asset.mainnetSymbol === 'CRO');
       case BridgeTransferDirection.COSMOS_HUB_TO_CRONOS:
         return allAssets.find(asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'ATOM');
-      case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS:
+      case BridgeTransferDirection.CRONOS_TENDERMINT_TO_CRONOS:
         return allAssets.find(asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO');
       default: 
         return allAssets.find(asset => asset.assetType === UserAssetType.TENDERMINT && asset.mainnetSymbol === 'CRO');
@@ -557,7 +557,7 @@ export class BridgeService {
         cosmosHubTendermintAddress 
       } = query;
       const currentSession = await this.storageService.retrieveCurrentSession();
-      const defaultBridgeDirection = BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS;
+      const defaultBridgeDirection = BridgeTransferDirection.CRONOS_TENDERMINT_TO_CRONOS;
 
       const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
         currentSession,
@@ -632,7 +632,7 @@ export class BridgeService {
   ): Promise<BridgeTransaction | null> {
     try {
       const session = await this.storageService.retrieveCurrentSession();
-      const bridgeIndexingUrlDirection = BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG;
+      const bridgeIndexingUrlDirection = BridgeTransferDirection.CRONOS_TO_CRONOS_TENDERMINT;
 
       const { defaultBridgeConfig, loadedBridgeConfig } = await this.getCurrentBridgeConfig(
         session,

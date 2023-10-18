@@ -30,7 +30,7 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
           const ledgerAddress = await device.getAddress(
             addressIndex,
             addressprefix,
-            asset.config?.tendermintNetwork?.chainName ?? SupportedChainName.CRYPTO_ORG,
+            asset.config?.tendermintNetwork?.chainName ?? SupportedChainName.CRONOS_TENDERMINT,
             derivationPathStandard ?? DerivationPathStandard.BIP44,
             true,
           );

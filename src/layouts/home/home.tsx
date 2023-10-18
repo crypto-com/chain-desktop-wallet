@@ -305,10 +305,10 @@ function HomeLayout(props: HomeLayoutProps) {
       if (allConfigs.length < 6) {
         const updateBridgeConfigsNotificationKey = 'updateBridgeConfigsNotificationKey';
         const bridgeService = new BridgeService(walletService.storageService);
-        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
-        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
-        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
-        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
+        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TENDERMINT_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TO_CRONOS_TENDERMINT);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TENDERMINT_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_CRONOS_TENDERMINT);
         bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.COSMOS_HUB_TO_CRONOS);
         bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_COSMOS_HUB);
 
@@ -332,20 +332,26 @@ function HomeLayout(props: HomeLayoutProps) {
     const cronosTendermintAsset = getCronosTendermintAsset(assets);
     const cronosAsset = getCronosEvmAsset(assets);
     const ethAsset = getEthereumEvmAsset(assets);
+    const isTestnet = checkIfTestnet(walletSession.wallet.config.network);
 
-    const checkDefaultExplorerUrl = checkIfTestnet(walletSession.wallet.config.network)
+    const checkDefaultCronosPosExplorerUrl = CRONOS_TENDERMINT_ASSET(walletSession.wallet.config).config.explorerUrl;
+
+    const checkDefaultCronosExplorerUrl = isTestnet
       ? TestNetEvmConfig.explorerUrl
       : MainNetEvmConfig.explorerUrl;
 
-    const checkDefaultEthExplorerUrl = checkIfTestnet(walletSession.wallet.config.network)
+    const checkDefaultEthExplorerUrl = isTestnet
       ? GOERLI_ETHEREUM_EXPLORER_URL
       : MAINNET_ETHEREUM_EXPLORER_URL;
 
     setTimeout(async () => {
+
+      console.log('checkCorrectExplorerUrl', cronosTendermintAsset?.config?.explorerUrl, checkDefaultCronosPosExplorerUrl);
       if (
         !walletSession.activeAsset?.config?.explorer ||
         // Check if explorerUrl has been updated with latest default
-        cronosAsset?.config?.explorerUrl !== checkDefaultExplorerUrl ||
+        cronosTendermintAsset?.config?.explorerUrl !== checkDefaultCronosPosExplorerUrl || 
+        cronosAsset?.config?.explorerUrl !== checkDefaultCronosExplorerUrl ||
         ethAsset?.config?.explorerUrl !== checkDefaultEthExplorerUrl || 
         // Check if there are latest tendermintNetwork on Cronos Tendermint
         !cronosTendermintAsset?.config?.tendermintNetwork
@@ -354,10 +360,10 @@ function HomeLayout(props: HomeLayoutProps) {
 
         // Update to Default Bridge Configs
         const bridgeService = new BridgeService(walletService.storageService);
-        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
-        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
-        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRYPTO_ORG_TO_CRONOS);
-        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_CRYPTO_ORG);
+        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TENDERMINT_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultTestnetBridgeConfigs.CRONOS_TO_CRONOS_TENDERMINT);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TENDERMINT_TO_CRONOS);
+        bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_CRONOS_TENDERMINT);
         bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.COSMOS_HUB_TO_CRONOS);
         bridgeService.updateBridgeConfiguration(DefaultMainnetBridgeConfigs.CRONOS_TO_COSMOS_HUB);
 
@@ -390,14 +396,17 @@ function HomeLayout(props: HomeLayoutProps) {
           // Save updated active asset settings.
           const allAssets = await walletService.retrieveWalletAssets(wallet.identifier);
           allAssets.forEach(async asset => {
+            let name = asset.name;
             let nodeUrl = `${asset.config?.nodeUrl ?? wallet.config.nodeUrl}`;
             let indexingUrl = `${asset.config?.indexingUrl ?? wallet.config.indexingUrl}`;
             let explorerUrl = `${asset.config?.explorerUrl ?? wallet.config.explorerUrl}`;
             let chainId = `${asset.config?.chainId ?? wallet.config.network.chainId}`;
             if (
-              asset.assetType === UserAssetType.TENDERMINT && asset.name === SupportedChainName.CRYPTO_ORG
+              asset.assetType === UserAssetType.TENDERMINT && (asset.name === SupportedChainName.CRONOS_TENDERMINT || asset.name.includes('Crypto.org'))
             ) {
+              name = SupportedChainName.CRONOS_TENDERMINT;
               nodeUrl = defaultCronosTendermintAsset.config.nodeUrl;
+              indexingUrl = defaultCronosTendermintAsset.config.indexingUrl;
               explorerUrl = defaultCronosTendermintAsset.config.explorerUrl;
               chainId = defaultCronosTendermintAsset.config.chainId;
             }
@@ -417,9 +426,11 @@ function HomeLayout(props: HomeLayoutProps) {
               explorerUrl = defaultEthAssetConfig.explorerUrl;
               chainId = defaultEthAssetConfig.chainId;
             }
+            
             const newlyUpdatedAsset: UserAsset = {
               ...asset,
-              description: asset.description.replace('Crypto.org Coin', 'Cronos'),
+              name,
+              description: asset.description.replace('Crypto.org Chain', 'Cronos POS Chain'),
               config: {
                 ...asset.config!,
                 nodeUrl,
@@ -442,7 +453,7 @@ function HomeLayout(props: HomeLayoutProps) {
                 },
                 isLedgerSupportDisabled: asset.config?.isLedgerSupportDisabled!,
                 isStakingDisabled: asset.config?.isStakingDisabled!,
-                ...(asset.assetType === UserAssetType.TENDERMINT && asset.name === SupportedChainName.CRYPTO_ORG) && {
+                ...(asset.assetType === UserAssetType.TENDERMINT && (asset.name === SupportedChainName.CRONOS_TENDERMINT || asset.name.includes('Crypto.org') )) && {
                   tendermintNetwork: {
                     ...defaultCronosTendermintAsset.config.tendermintNetwork!,
                     node: {

@@ -34,7 +34,7 @@ export interface TransferListResponse {
   result: TransferResult[];
 }
 
-/// Crypto.org Nft models
+/// Cronos POS Chain Nft models
 
 export interface CryptoOrgNftResponse {
   denomId: string;

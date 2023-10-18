@@ -513,7 +513,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
         const croAddress = await device.getAddress(
           targetWallet.addressIndex,
           targetWallet.config.network.addressPrefix,
-          SupportedChainName.CRYPTO_ORG,
+          SupportedChainName.CRONOS_TENDERMINT,
           targetWallet.derivationPathStandard,
           false,
         );
@@ -670,7 +670,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
       // check ledger device ok
       await device.getPubKey(
         parseInt(addressIndex, 10),
-        SupportedChainName.CRYPTO_ORG,
+        SupportedChainName.CRONOS_TENDERMINT,
         derivationPathStandard,
         false,
       );
@@ -796,7 +796,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
             }
           }
           break;
-        case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
+        case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRONOS_TENDERMINT}`:
           {
             const addressPrefix =
               network === DefaultWalletConfigs.TestNetCroeseid5Config.name
@@ -806,7 +806,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
               0,
               10,
               addressPrefix,
-              SupportedChainName.CRYPTO_ORG,
+              SupportedChainName.CRONOS_TENDERMINT,
               standard,
             );
             if (tendermintAddressList) {
@@ -817,7 +817,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
                   derivationPath: LedgerSigner.getDerivationPath(
                     idx,
                     UserAssetType.TENDERMINT,
-                    SupportedChainName.CRYPTO_ORG,
+                    SupportedChainName.CRONOS_TENDERMINT,
                     standard,
                   ),
                   balance: '0',
@@ -930,12 +930,12 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
                   );
                   setLedgerAddressList([]);
                   switch (e) {
-                    case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
+                    case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRONOS_TENDERMINT}`:
                       setLedgerAssetType(UserAssetType.TENDERMINT);
-                      setLedgerChainName(SupportedChainName.CRYPTO_ORG);
+                      setLedgerChainName(SupportedChainName.CRONOS_TENDERMINT);
                       ledgerNotificationWithoutCheck(
                         UserAssetType.TENDERMINT,
-                        SupportedChainName.CRYPTO_ORG,
+                        SupportedChainName.CRONOS_TENDERMINT,
                       );
                       break;
                     case `${UserAssetType.EVM}-${SupportedChainName.CRONOS}`:
@@ -962,9 +962,9 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
               >
                 <Select.Option
                   key="crypto-org-chain"
-                  value={`${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`}
+                  value={`${UserAssetType.TENDERMINT}-${SupportedChainName.CRONOS_TENDERMINT}`}
                 >
-                  {SupportedChainName.CRYPTO_ORG}
+                  {SupportedChainName.CRONOS_TENDERMINT}
                 </Select.Option>
                 <Select.Option
                   key="cronos-chain"
@@ -1044,7 +1044,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
                 cronosTendermint: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
                   UserAssetType.TENDERMINT,
-                  SupportedChainName.CRYPTO_ORG,
+                  SupportedChainName.CRONOS_TENDERMINT,
                   props.form.getFieldValue('derivationPathStandard'),
                 ),
                 cosmosTendermint: LedgerSigner.getDerivationPath(
@@ -1097,7 +1097,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
             className="derivation-path-container"
           >
             <div>
-              Crypto.org Chain
+              Cronos POS Chain
               <br />
               <Text type="secondary">{derivationPath.cronosTendermint}</Text>
             </div>
@@ -1139,7 +1139,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
                 cronosTendermint: LedgerSigner.getDerivationPath(
                   props.form.getFieldValue('addressIndex'),
                   UserAssetType.TENDERMINT,
-                  SupportedChainName.CRYPTO_ORG,
+                  SupportedChainName.CRONOS_TENDERMINT,
                   props.form.getFieldValue('derivationPathStandard'),
                 ),
                 cosmosTendermint: LedgerSigner.getDerivationPath(

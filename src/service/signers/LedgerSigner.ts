@@ -76,7 +76,7 @@ export class LedgerSigner {
       case SupportedChainName.COSMOS_HUB:
         coin = 118;
         break;
-      case SupportedChainName.CRYPTO_ORG:
+      case SupportedChainName.CRONOS_TENDERMINT:
       default:
         coin = 394;
     }
@@ -133,7 +133,7 @@ export class LedgerSigner {
         case SupportedChainName.COSMOS_HUB:
           coin = 118;
           break;
-        case SupportedChainName.CRYPTO_ORG:
+        case SupportedChainName.CRONOS_TENDERMINT:
         default:
           coin = 394;
       }
@@ -252,7 +252,7 @@ export class LedgerSigner {
         coin = '60';
         break;
       case UserAssetType.TENDERMINT:
-        if (chainName === SupportedChainName.CRYPTO_ORG) {
+        if (chainName === SupportedChainName.CRONOS_TENDERMINT) {
           coin = '394';
         }
         if (chainName === SupportedChainName.COSMOS_HUB) {

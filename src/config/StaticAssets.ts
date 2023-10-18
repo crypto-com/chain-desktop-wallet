@@ -77,7 +77,7 @@ export const CRONOS_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
       defaultNodeUrl: isTestnet
         ? 'https://rpc-c5.crypto.org'
         : 'https://rpc.mainnet.crypto.org',
-      chainName: SupportedChainName.CRYPTO_ORG,
+      chainName: SupportedChainName.CRONOS_TENDERMINT,
       chainId: isTestnet ? 'testnet-croeseid-5' : MainNetConfig.network.chainId,
       addressPrefix: isTestnet ? 'tcro' : 'cro',
       validatorPubKeyPrefix: isTestnet ? 'tcrocnclconspub' : 'crocnclconspub',
@@ -105,7 +105,7 @@ export const CRONOS_TENDERMINT_ASSET = (walletConfig: WalletConfig) => {
       'Cronos (CRO) is the native token of the Crypto.org Chain. The Crypto.org Chain was created to build a network of cryptocurrency projects, and develop merchants’ ability to accept crypto as a form of payment. The Crypto.org Chain is a high performing native blockchain solution, which will make the transaction flows between crypto users and merchants accepting crypto seamless, cost-efficient and secure.\\r\\n\\r\\nBusinesses can use Crypto.org pay Checkout and/or Invoice to enable customers to complete checkout and pay for goods and services with cryptocurrencies using the Crypto.org Wallet App. Businesses receive all their payments instantly in CRO or stable coins, or in fiat.',
     icon_url: ICON_CRO_TENDERMINT,
     identifier: getRandomId(),
-    name: SupportedChainName.CRYPTO_ORG,
+    name: SupportedChainName.CRONOS,
     symbol: isTestnet ? TestNetCroeseid5Config.network.coin.croDenom.toString().toUpperCase() : MainNetConfig.network.coin.croDenom.toString().toUpperCase(),
     mainnetSymbol: 'CRO', // This is to be used solely for markets data since testnet market prices is always non existent
     stakedBalance: '0',
@@ -273,7 +273,7 @@ export const getDefaultUserAssetConfig = (asset: UserAsset | undefined, session:
   switch (`${assetType}-${name}`) {
     case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`:
       return ATOM_TENDERMINT_ASSET(config);
-    case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
+    case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRONOS_TENDERMINT}`:
       return CRONOS_TENDERMINT_ASSET(config);
     case `${UserAssetType.EVM}-${SupportedChainName.CRONOS}`:
       return CRONOS_EVM_ASSET(config);
