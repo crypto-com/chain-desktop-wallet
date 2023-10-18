@@ -470,16 +470,14 @@ export class BridgeService {
     // eslint-disable-next-line no-console
     console.log('ALL_BRIDGE_CONFIGS', allConfigs);
 
-    if (!allConfigs || allConfigs.length < 1) {
-      await this.storageService.saveBridgeConfigsList([
-        DefaultMainnetBridgeConfigs.CRONOS_TO_CRONOS_TENDERMINT,
-        DefaultMainnetBridgeConfigs.CRONOS_TENDERMINT_TO_CRONOS,
-        DefaultMainnetBridgeConfigs.COSMOS_HUB_TO_CRONOS,
-        DefaultMainnetBridgeConfigs.CRONOS_TO_COSMOS_HUB,
-        DefaultTestnetBridgeConfigs.CRONOS_TO_CRONOS_TENDERMINT,
-        DefaultTestnetBridgeConfigs.CRONOS_TENDERMINT_TO_CRONOS,
-      ]);
-    }
+    await this.storageService.saveBridgeConfigsList([
+      DefaultMainnetBridgeConfigs.CRONOS_TO_CRONOS_TENDERMINT,
+      DefaultMainnetBridgeConfigs.CRONOS_TENDERMINT_TO_CRONOS,
+      DefaultMainnetBridgeConfigs.COSMOS_HUB_TO_CRONOS,
+      DefaultMainnetBridgeConfigs.CRONOS_TO_COSMOS_HUB,
+      DefaultTestnetBridgeConfigs.CRONOS_TO_CRONOS_TENDERMINT,
+      DefaultTestnetBridgeConfigs.CRONOS_TENDERMINT_TO_CRONOS,
+    ]);
 
     return this.storageService.findBridgeConfigByNetworkAndBridgeTransactionType(
       bridgeDirectionType,
