@@ -147,13 +147,6 @@ function createWindow() {
     require('electron').shell.openExternal(url);
   });
 
-  win.webContents.on('did-start-navigation', function (e, url) {
-    if (!isValidURL(url)) {
-      e.preventDefault();
-      return;
-    }
-  })
-
   // Hot Reloading
   if (isDev) {
     // 'node_modules/.bin/electronPath'
