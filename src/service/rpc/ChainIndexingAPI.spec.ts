@@ -16,7 +16,7 @@ describe('Testing ChainIndexingApi', () => {
   });
 
   it('should return the total claimed rewards', async () => {
-    const nodeRpcService = ChainIndexingAPI.init('https://crypto.org/explorer/api/v1');
+    const nodeRpcService = ChainIndexingAPI.init('https://cronos-pos.org/explorer/api/v1');
 
     moxios.wait(() => {
       const request1 = moxios.requests.at(0);
@@ -117,7 +117,7 @@ describe('Testing ChainIndexingApi', () => {
   });
 
   it('should return the total claimed rewards as ZERO in case no list is received', async () => {
-    const nodeRpcService = ChainIndexingAPI.init('https://crypto.org/explorer/api/v1');
+    const nodeRpcService = ChainIndexingAPI.init('https://cronos-pos.org/explorer/api/v1');
     moxios.wait(() => {
       const request = moxios.requests.mostRecent();
       request.respondWith({
@@ -140,7 +140,7 @@ describe('Testing ChainIndexingApi', () => {
     ).to.equal('0');
   });
   it('should return estimated rewards for a user account, , apy = 10%, period = 12 Months', async () => {
-    const nodeRpcService = ChainIndexingAPI.init('https://crypto.org/explorer/api/v1');
+    const nodeRpcService = ChainIndexingAPI.init('https://cronos-pos.org/explorer/api/v1');
     moxios.wait(() => {
       const validatorListReq = moxios.requests.get('get', 'validators?limit=1000');
       const accountInfoReq = moxios.requests.get(
@@ -250,7 +250,7 @@ describe('Testing ChainIndexingApi', () => {
     );
   });
   it('should return MsgVote transaction messages for an account', async () => {
-    const nodeRpcService = ChainIndexingAPI.init('https://crypto.org/explorer/croeseid4/api/v1');
+    const nodeRpcService = ChainIndexingAPI.init('https://cronos-pos.org/explorer/croeseid4/api/v1');
     moxios.wait(() => {
       const accountInfoReq = moxios.requests.first();
 
@@ -325,7 +325,7 @@ describe('Testing ChainIndexingApi', () => {
     );
   });
   it('should return estimated rewards for a user account, apy = 10%, period = 6 Months', async () => {
-    const nodeRpcService = ChainIndexingAPI.init('https://crypto.org/explorer/api/v1');
+    const nodeRpcService = ChainIndexingAPI.init('https://cronos-pos.org/explorer/api/v1');
     moxios.wait(() => {
       const validatorListReq = moxios.requests.get('get', 'validators?limit=1000');
       const accountInfoReq = moxios.requests.get(

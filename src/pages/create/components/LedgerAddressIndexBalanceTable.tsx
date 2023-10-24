@@ -87,7 +87,7 @@ const LedgerAddressIndexBalanceTable = (props: {
           case `${UserAssetType.EVM}-${SupportedChainName.ETHEREUM}`:
             url = `${renderExplorerUrl(ethEvmAsset.config, 'address')}/${publicAddress}`;
             break;
-          case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
+          case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRONOS_TENDERMINT}`:
             url = `${renderExplorerUrl(cronosTendermintAsset.config, 'address')}/${publicAddress}`;
             break;
           case `${UserAssetType.TENDERMINT}-${SupportedChainName.COSMOS_HUB}`:
@@ -140,7 +140,7 @@ const LedgerAddressIndexBalanceTable = (props: {
                 cronosTendermint: LedgerSigner.getDerivationPath(
                   record.index,
                   UserAssetType.TENDERMINT,
-                  SupportedChainName.CRYPTO_ORG,
+                  SupportedChainName.CRONOS_TENDERMINT,
                   form.getFieldValue('derivationPathStandard'),
                 ),
                 cosmosTendermint: LedgerSigner.getDerivationPath(
@@ -168,7 +168,7 @@ const LedgerAddressIndexBalanceTable = (props: {
   const processLedgerAccountsList = async (ledgerAccountList: any[]) => {
     setLoading(true);
     switch (`${assetType}-${chainName}`) {
-      case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`: {
+      case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRONOS_TENDERMINT}`: {
         const config = isTestnet
           ? DefaultWalletConfigs.TestNetCroeseid5Config
           : DefaultWalletConfigs.MainNetConfig;
@@ -312,13 +312,13 @@ const LedgerAddressIndexBalanceTable = (props: {
             }
           }
           break;
-        case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRYPTO_ORG}`:
+        case `${UserAssetType.TENDERMINT}-${SupportedChainName.CRONOS_TENDERMINT}`:
           {
             const tendermintAddressList = await device.getAddressList(
               startIndex,
               DEFAULT_GAP,
               isTestnet ? 'tcro' : 'cro',
-              SupportedChainName.CRYPTO_ORG,
+              SupportedChainName.CRONOS_TENDERMINT,
               standard,
             );
             if (tendermintAddressList) {
@@ -329,7 +329,7 @@ const LedgerAddressIndexBalanceTable = (props: {
                   derivationPath: LedgerSigner.getDerivationPath(
                     startIndex + idx,
                     UserAssetType.TENDERMINT,
-                    SupportedChainName.CRYPTO_ORG,
+                    SupportedChainName.CRONOS_TENDERMINT,
                     standard,
                   ),
                   balance: '0',

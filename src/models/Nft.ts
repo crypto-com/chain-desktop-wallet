@@ -3,7 +3,7 @@ import { NftAssetsResponseAssetModel } from '../service/rpc/indexing/nft/cronos/
 import { Attribute } from '../service/rpc/models/nftApi.models';
 
 export enum NftType {
-  CRYPTO_ORG = 'CRYPTO_ORG',
+  CRONOS_TENDERMINT = 'CRONOS_TENDERMINT',
 
   CRC_721_TOKEN = 'CRC_721_TOKEN',
 }
@@ -37,7 +37,7 @@ export interface CryptoOrgNftModelData extends CryptoOrgNftResponse {
 export type CommonNftModel = CryptoOrgNftModel | CronosCRC721NftModel;
 
 export interface CryptoOrgNftModel extends BaseNftModel {
-  type: NftType.CRYPTO_ORG;
+  type: NftType.CRONOS_TENDERMINT;
   model: CryptoOrgNftModelData;
   tokenData?: CryptoOrgNftTokenData;
   denomSchema?: any;
@@ -53,7 +53,7 @@ export function isCryptoOrgNftModel(
 ): checkObj is CryptoOrgNftModel {
   const optionalUser = checkObj as CryptoOrgNftModel;
   // need to be sufficient to identify your case
-  return isObject(optionalUser) && optionalUser.type === NftType.CRYPTO_ORG;
+  return isObject(optionalUser) && optionalUser.type === NftType.CRONOS_TENDERMINT;
 }
 
 export function isCronosNftModel(

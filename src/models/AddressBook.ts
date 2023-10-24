@@ -31,7 +31,7 @@ const SupportedNetworks: AddressBookNetwork[] = [
     networkType: UserAssetType.EVM,
   },
   {
-    label: SupportedChainName.CRYPTO_ORG,
+    label: SupportedChainName.CRONOS_TENDERMINT,
     networkType: UserAssetType.TENDERMINT,
   },
   {

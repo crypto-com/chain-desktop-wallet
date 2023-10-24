@@ -10,7 +10,7 @@ export const ICON_CRO_TENDERMINT = './assets/icon-cronos-tendermint.svg';
 export const ICON_CRO_EVM = './assets/icon-cronos-evm.svg';
 export const ICON_ETH_EVM = './assets/icon-eth-evm.svg';
 export const ICON_ATOM_TENDERMINT = './assets/icon-atom-tendermint.svg';
-export const ICON_BRIDGE_CRYPTO_ORG = './assets/icon-bridge-crypto-org.svg';
+export const ICON_BRIDGE_CRONOS_TENDERMINT = './assets/icon-bridge-crypto-org.svg';
 export const ICON_BRIDGE_CRONOS = './assets/icon-bridge-cronos.svg';
 export const ICON_BRIDGE_COSMOSHUB = './assets/icon-atom-tendermint.svg';
 
@@ -42,11 +42,11 @@ export const AssetIcon = (props: { asset: UserAsset }) => {
 
 export const BridgeIcon = (props: { bridgeValue: string | undefined }) => {
   const { bridgeValue } = props;
-  let icon = ICON_BRIDGE_CRYPTO_ORG;
+  let icon = ICON_BRIDGE_CRONOS_TENDERMINT;
 
   switch (bridgeValue) {
-    case 'CRYPTO_ORG':
-      icon = ICON_BRIDGE_CRYPTO_ORG;
+    case 'CRONOS_TENDERMINT':
+      icon = ICON_BRIDGE_CRONOS_TENDERMINT;
       break;
     case 'CRONOS':
       icon = ICON_BRIDGE_CRONOS;

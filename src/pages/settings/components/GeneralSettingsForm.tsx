@@ -123,7 +123,7 @@ export const GeneralSettingsForm = props => {
       nodeUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
       clientUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
       proxyUrl: 'https://rest-testnet-croeseid-4.crypto.org',
-      indexingUrl: 'https://crypto.org/explorer/croeseid4/api/v1/',
+      indexingUrl: 'https://cronos-pos.org/explorer/croeseid4/api/v1/',
       chainId: 'testnet-croeseid-4'
     });
   }
@@ -133,7 +133,7 @@ export const GeneralSettingsForm = props => {
       nodeUrl: 'https://rpc-c5.crypto.org',
       clientUrl: 'https://rpc-c5.crypto.org',
       proxyUrl: 'https://rest-c5.crypto.org',
-      indexingUrl: 'https://crypto.org/explorer/croeseid5/api/v1/',
+      indexingUrl: 'https://cronos-pos.org/explorer/croeseid5/api/v1/',
       chainId: 'testnet-croeseid-5'
     });
   }
@@ -152,7 +152,7 @@ export const GeneralSettingsForm = props => {
           );
         })}
       </Select>
-      {(session.activeAsset?.assetType === UserAssetType.TENDERMINT && session.activeAsset?.name === SupportedChainName.CRYPTO_ORG && isTestnet) && <>
+      {(session.activeAsset?.assetType === UserAssetType.TENDERMINT && session.activeAsset?.name === SupportedChainName.CRONOS_TENDERMINT && isTestnet) && <>
         <Button type="link" style={{ width: '140px', marginRight: '10px' }} onClick={onApplyTestnetCroeseid4}>Croeseid 4</Button>
         <Button type="link" style={{ width: '140px' }} onClick={onApplyTestnetCroeseid5}>Croeseid 5</Button>
       </>}

@@ -430,7 +430,7 @@ export class TransactionHistoryService {
               currentAsset?.address || currentSession.wallet.address,
               currentAsset,
             );
-            console.log('CRYPTO_ORG transferTransactions', transferTransactions);
+            console.log('CRONOS_TENDERMINT transferTransactions', transferTransactions);
             return transferTransactions;
           }
 
@@ -589,7 +589,7 @@ export class TransactionHistoryService {
       const cryptoOrgNFTList: CryptoOrgNftModel[] = cryptoOrgNftListMarketplaceResponse.map(nft => {
         return {
           walletId: currentSession.wallet.identifier,
-          type: NftType.CRYPTO_ORG,
+          type: NftType.CRONOS_TENDERMINT,
           model: nft,
         };
       });

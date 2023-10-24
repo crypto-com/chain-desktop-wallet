@@ -3,7 +3,7 @@ import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 export const INTERCOM_APP_ID = 'yrt83fbd';
 
 export const APP_DB_NAMESPACE = 'data-store';
-export const MARKET_API_BASE_URL = 'https://crypto.org/api';
+export const MARKET_API_BASE_URL = 'https://cronos-pos.org/api';
 export const COINBASE_TICKER_API_BASE_URL = 'https://api.coinbase.com/v2/';
 export const CRYPTO_COM_PRICE_API_BASE_URL = {
   V1: 'https://price-api.crypto.com/price/v1/',
@@ -11,7 +11,7 @@ export const CRYPTO_COM_PRICE_API_BASE_URL = {
 };
 export const NV_GRAPHQL_API_ENDPOINT = 'https://crypto.com/nft-api/graphql';
 export const IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT =
-  'https://crypto.org/ipfs-middleware-server/uploads';
+  'https://cronos-pos.org/ipfs-middleware-server/uploads';
 export const NCW_NFT_MIDDLEWARE_SERVER_ENDPOINT =
   'https://cronos.org/ncw-quandra-api-middleware-server';
 export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';
@@ -221,7 +221,7 @@ SUPPORTED_CURRENCY.set('BRL', { value: 'BRL', label: 'BRL - R$', symbol: 'R$' })
 SUPPORTED_CURRENCY.set('TRY', { value: 'TRY', label: 'TRY - ₺', symbol: '₺' });
 
 export enum SupportedChainName {
-  CRYPTO_ORG = 'Crypto.org Chain',
+  CRONOS_TENDERMINT = 'Cronos POS Chain',
   CRONOS = 'Cronos Chain',
   COSMOS_HUB = 'Cosmos Hub Chain',
   ETHEREUM = 'Ethereum Chain',
@@ -315,7 +315,7 @@ export const NFT_WRAPPED_ETH_DENOM_SCHEMA = {
   properties: {
     isExternal: {
       type: 'boolean',
-      description: 'Describes whether the NFT is external or internal to the Crypto.org chain',
+      description: 'Describes whether the NFT is external or internal to the Cronos POS Chain',
     },
     network: {
       type: 'string',
@@ -338,13 +338,13 @@ const TestNetConfig: WalletConfig = {
   name: NetworkName.TESTNET,
   derivationPath: 'm/44\'/1\'/0\'/0/0',
   explorer: {
-    baseUrl: 'https://crypto.org/explorer/croeseid',
-    tx: 'https://crypto.org/explorer/croeseid/tx',
-    address: 'https://crypto.org/explorer/croeseid/account',
-    validator: 'https://crypto.org/explorer/croeseid/validator',
+    baseUrl: 'https://cronos-pos.org/explorer/croeseid',
+    tx: 'https://cronos-pos.org/explorer/croeseid/tx',
+    address: 'https://cronos-pos.org/explorer/croeseid/account',
+    validator: 'https://cronos-pos.org/explorer/croeseid/validator',
   },
-  explorerUrl: 'https://crypto.org/explorer/croeseid',
-  indexingUrl: 'https://crypto.org/explorer/croeseid/api/v1/',
+  explorerUrl: 'https://cronos-pos.org/explorer/croeseid',
+  indexingUrl: 'https://cronos-pos.org/explorer/croeseid/api/v1/',
   nodeUrl: CroNetwork.Testnet.defaultNodeUrl,
   network: CroNetwork.Testnet,
   disableDefaultClientMemo: false,
@@ -395,13 +395,13 @@ export const TestNetCroeseid4Config: WalletConfig = {
   name: NetworkName.TESTNET,
   derivationPath: 'm/44\'/1\'/0\'/0/0',
   explorer: {
-    baseUrl: 'https://crypto.org/explorer/croeseid4',
-    tx: 'https://crypto.org/explorer/croeseid4/tx',
-    address: 'https://crypto.org/explorer/croeseid4/account',
-    validator: 'https://crypto.org/explorer/croeseid4/validator',
+    baseUrl: 'https://cronos-pos.org/explorer/croeseid4',
+    tx: 'https://cronos-pos.org/explorer/croeseid4/tx',
+    address: 'https://cronos-pos.org/explorer/croeseid4/account',
+    validator: 'https://cronos-pos.org/explorer/croeseid4/validator',
   },
-  explorerUrl: 'https://crypto.org/explorer/croeseid4',
-  indexingUrl: 'https://crypto.org/explorer/croeseid4/api/v1/',
+  explorerUrl: 'https://cronos-pos.org/explorer/croeseid4',
+  indexingUrl: 'https://cronos-pos.org/explorer/croeseid4/api/v1/',
   nodeUrl: TestnetCroeseid4.defaultNodeUrl,
   network: TestnetCroeseid4,
   disableDefaultClientMemo: false,
@@ -413,7 +413,7 @@ export const TestNetCroeseid4Config: WalletConfig = {
   },
   tendermintNetwork: {
     ...TestnetCroeseid4,
-    chainName: SupportedChainName.CRYPTO_ORG,
+    chainName: SupportedChainName.CRONOS_TENDERMINT,
     node: {
       clientUrl: 'https://rpc-testnet-croeseid-4.crypto.org',
       proxyUrl: 'https://rest-testnet-croeseid-4.crypto.org',
@@ -427,13 +427,13 @@ export const TestNetCroeseid5Config: WalletConfig = {
   name: NetworkName.TESTNET,
   derivationPath: 'm/44\'/1\'/0\'/0/0',
   explorer: {
-    baseUrl: 'https://crypto.org/explorer/croeseid5',
-    tx: 'https://crypto.org/explorer/croeseid5/tx',
-    address: 'https://crypto.org/explorer/croeseid5/account',
-    validator: 'https://crypto.org/explorer/croeseid5/validator',
+    baseUrl: 'https://cronos-pos.org/explorer/croeseid5',
+    tx: 'https://cronos-pos.org/explorer/croeseid5/tx',
+    address: 'https://cronos-pos.org/explorer/croeseid5/account',
+    validator: 'https://cronos-pos.org/explorer/croeseid5/validator',
   },
-  explorerUrl: 'https://crypto.org/explorer/croeseid5',
-  indexingUrl: 'https://crypto.org/explorer/croeseid5/api/v1/',
+  explorerUrl: 'https://cronos-pos.org/explorer/croeseid5',
+  indexingUrl: 'https://cronos-pos.org/explorer/croeseid5/api/v1/',
   nodeUrl: TestnetCroeseid5.defaultNodeUrl,
   network: TestnetCroeseid5,
   disableDefaultClientMemo: false,
@@ -445,7 +445,7 @@ export const TestNetCroeseid5Config: WalletConfig = {
   },
   tendermintNetwork: {
     ...TestnetCroeseid5,
-    chainName: SupportedChainName.CRYPTO_ORG,
+    chainName: SupportedChainName.CRONOS_TENDERMINT,
     node: {
       clientUrl: 'https://rpc-c5.crypto.org',
       proxyUrl: 'https://rest-c5.crypto.org'
@@ -459,13 +459,13 @@ export const MainNetConfig: WalletConfig = {
   derivationPath: 'm/44\'/394\'/0\'/0/0',
   nodeUrl: 'https://rpc.mainnet.crypto.org',
   explorer: {
-    baseUrl: 'https://crypto.org/explorer',
-    tx: 'https://crypto.org/explorer/tx',
-    address: 'https://crypto.org/explorer/account',
-    validator: 'https://crypto.org/explorer/validator',
+    baseUrl: 'https://cronos-pos.org/explorer/',
+    tx: 'https://cronos-pos.org/explorer/tx',
+    address: 'https://cronos-pos.org/explorer/account',
+    validator: 'https://cronos-pos.org/explorer/validator',
   },
-  explorerUrl: 'https://crypto.org/explorer',
-  indexingUrl: 'https://crypto.org/explorer/api/v1/',
+  explorerUrl: 'https://cronos-pos.org/explorer',
+  indexingUrl: 'https://cronos-pos.org/explorer/api/v1/',
   network: {
     ...CroNetwork.Mainnet,
     defaultNodeUrl: 'https://rpc.mainnet.crypto.org',
@@ -481,7 +481,7 @@ export const MainNetConfig: WalletConfig = {
   tendermintNetwork: {
     ...CroNetwork.Mainnet,
     defaultNodeUrl: 'https://rpc.mainnet.crypto.org',
-    chainName: SupportedChainName.CRYPTO_ORG,
+    chainName: SupportedChainName.CRONOS_TENDERMINT,
     rpcUrl: 'https://rpc.mainnet.crypto.org',
     node: {
       clientUrl: 'https://rpc.mainnet.crypto.org',

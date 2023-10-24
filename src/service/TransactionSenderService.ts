@@ -301,7 +301,7 @@ export class TransactionSenderService {
             networkFee,
             gasLimit,
           );
-        } else if (transfer.asset?.name === SupportedChainName.CRYPTO_ORG) {
+        } else if (transfer.asset?.name === SupportedChainName.CRONOS_TENDERMINT) {
           signedTxHex = await transactionSigner.signTransfer(
             transfer,
             transferRequest.decryptedPhrase,
@@ -774,7 +774,7 @@ export class TransactionSenderService {
     const currentSession = await this.storageService.retrieveCurrentSession();
 
     switch (nftTransferRequest.nftType) {
-      case NftType.CRYPTO_ORG: {
+      case NftType.CRONOS_TENDERMINT: {
         const {
           nodeRpc,
           accountNumber,

@@ -33,7 +33,7 @@ const BridgeTransactionHistory = () => {
   const walletAllAssets = useRecoilValue(walletAllAssetsState);
 
   const [loading, setLoading] = useState(false);
-  const [selectedChain, setSelectedChain] = useState<BridgeSourceChain>(BridgeSourceChain.CRYPTO_ORG);
+  const [selectedChain, setSelectedChain] = useState<BridgeSourceChain>(BridgeSourceChain.CRONOS_TENDERMINT);
   const [allBridgeHistory, setAllBridgeHistory] = useState<BridgeTransferTabularData[]>([]);
 
   const [t] = useTranslation();
@@ -287,7 +287,7 @@ const BridgeTransactionHistory = () => {
       // if (cronosEvmAsset) {
       await bridgeService.fetchAndSaveBridgeTxs({
         cronosEvmAddress: selectedChain === BridgeSourceChain.CRONOS ? cronosEvmAsset?.address! : undefined,
-        cronosTendermintAddress: selectedChain === BridgeSourceChain.CRYPTO_ORG ? cronosTendermintAsset?.address! : undefined,
+        cronosTendermintAddress: selectedChain === BridgeSourceChain.CRONOS_TENDERMINT ? cronosTendermintAsset?.address! : undefined,
         cosmosHubTendermintAddress: selectedChain === BridgeSourceChain.COSMOS_HUB ? cosmosHubTendermintAsset?.address! : undefined,
       });
       // }
@@ -310,7 +310,7 @@ const BridgeTransactionHistory = () => {
         }}
       >
         <Option key={BridgeSourceChain.CRONOS} value={BridgeSourceChain.CRONOS}>{getChainName('Cronos', session.wallet.config)}: {`${middleEllipsis(cronosEvmAsset?.address!, 6)}`}</Option>
-        <Option key={BridgeSourceChain.CRYPTO_ORG} value={BridgeSourceChain.CRYPTO_ORG}>{getChainName('Crypto.org', session.wallet.config)}: {`${middleEllipsis(cronosTendermintAsset?.address!, 6)}`}</Option>
+        <Option key={BridgeSourceChain.CRONOS_TENDERMINT} value={BridgeSourceChain.CRONOS_TENDERMINT}>{getChainName('Crypto.org', session.wallet.config)}: {`${middleEllipsis(cronosTendermintAsset?.address!, 6)}`}</Option>
         {!isTestnet
           ? <Option key={BridgeSourceChain.COSMOS_HUB} value={BridgeSourceChain.COSMOS_HUB}>{getChainName('Cosmos Hub', session.wallet.config)}: {`${middleEllipsis(cosmosHubTendermintAsset?.address!, 6)}`}</Option>
           : <></>
