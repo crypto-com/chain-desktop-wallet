@@ -961,7 +961,7 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
                 }}
               >
                 <Select.Option
-                  key="crypto-org-chain"
+                  key="cronos-pos-chain"
                   value={`${UserAssetType.TENDERMINT}-${SupportedChainName.CRONOS_TENDERMINT}`}
                 >
                   {SupportedChainName.CRONOS_TENDERMINT}
