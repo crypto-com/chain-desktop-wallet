@@ -9,7 +9,7 @@
   "main": "build/electron/main.js",
   "private": true,
   "scripts": {
-    "run-audit": "yarn audit-ci --high -a 1005059 1094361",
+    "run-audit": "yarn audit-ci --high -a 1005059 1094228 1094439",
     "start": "node scripts/start.js",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 && yarn clean-builds && node scripts/build.js",
     "test": "node scripts/test.js --watchAll=false",
@@ -149,7 +149,7 @@
     "babel-plugin-named-asset-import": "0.3.7",
     "babel-preset-react-app": "10.0.0",
     "case-sensitive-paths-webpack-plugin": "2.3.0",
-    "chai": "4.3.7",
+    "chai": "4.2.0",
     "chai-as-promised": "7.1.1",
     "concurrently": "5.3.0",
     "css-loader": "4.3.0",
@@ -393,6 +393,6 @@
     "decode-uri-component": "0.2.2",
     "word-wrap": "1.2.4",
     "@babel/traverse": "7.23.2",
-    "get-func-name": "2.0.1"
+    "get-func-name": "2.0.0"
   }
 }
