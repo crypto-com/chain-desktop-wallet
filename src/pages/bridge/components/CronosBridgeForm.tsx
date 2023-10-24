@@ -135,14 +135,14 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
     let assetType: UserAssetType[];
 
     switch (direction) {
-      case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS:
+      case BridgeTransferDirection.CRONOS_TENDERMINT_TO_CRONOS:
       case BridgeTransferDirection.COSMOS_HUB_TO_CRONOS:
         assetType = [UserAssetType.TENDERMINT];
         break;
       case BridgeTransferDirection.CRONOS_TO_COSMOS_HUB:
         assetType = [UserAssetType.CRC_20_TOKEN];
         break;
-      case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG:
+      case BridgeTransferDirection.CRONOS_TO_CRONOS_TENDERMINT:
         assetType = [UserAssetType.EVM];
         break;
       default:
@@ -171,7 +171,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
     setIsToAddressDisabled(true);
 
     switch (bridgeFrom) {
-      case 'CRYPTO_ORG': {
+      case 'CRONOS_TENDERMINT': {
         setBridgeSupportedAssets(getBridgeSupportedAssetList(direction));
         setCurrentAsset(croAsset);
         setCurrentAssetIdentifier(croAsset?.identifier);
@@ -205,7 +205,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
     }
 
     switch (bridgeTo) {
-      case 'CRYPTO_ORG': {
+      case 'CRONOS_TENDERMINT': {
         form.setFieldsValue({
           toAddress: tendermintAddress,
         });
@@ -258,7 +258,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
     const direction: BridgeTransferDirection = BridgeTransferDirection[`${newBridgeFrom}_TO_${newBridgeTo}`];
 
     switch (newBridgeFrom) {
-      case 'CRYPTO_ORG': {
+      case 'CRONOS_TENDERMINT': {
         setBridgeSupportedAssets(getBridgeSupportedAssetList(direction));
         setCurrentAsset(undefined);
         setCurrentAssetIdentifier(undefined);
@@ -295,7 +295,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
 
 
     switch (newBridgeTo) {
-      case 'CRYPTO_ORG': {
+      case 'CRONOS_TENDERMINT': {
         form.setFieldsValue({
           toAddress: tendermintAddress,
         });
@@ -389,7 +389,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
         const direction: BridgeTransferDirection = BridgeTransferDirection[`${bridgeFrom}_TO_${bridgeTo}`];
 
         switch (bridgeFrom) {
-          case 'CRYPTO_ORG':
+          case 'CRONOS_TENDERMINT':
           case 'COSMOS_HUB': {
             setBridgeSupportedAssets(getBridgeSupportedAssetList(direction));
             break;
@@ -401,8 +401,8 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
           default:
         }
       } else {
-        // Default bridgeFrom set to CRYPTO_ORG
-        const defaultBridgeTransferDirection = BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS;
+        // Default bridgeFrom set to CRONOS_TENDERMINT
+        const defaultBridgeTransferDirection = BridgeTransferDirection.CRONOS_TENDERMINT_TO_CRONOS;
 
         const currentSession = await walletService.retrieveCurrentSession();
         const assets = await walletService.retrieveCurrentWalletAssets(currentSession);
@@ -478,7 +478,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
             },
           ]}
           style={{ textAlign: 'left' }}
-          initialValue="CRYPTO_ORG"
+          initialValue="CRONOS_TENDERMINT"
         >
           <Select
             style={{ width: '300px', textAlign: 'left' }}
@@ -540,24 +540,24 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
                 const { bridgeFrom, bridgeTo } = form.getFieldValue();
 
                 switch (`${bridgeFrom}_TO_${bridgeTo}`) {
-                  case BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS: {
-                    setBridgeTransferDirection(BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS);
+                  case BridgeTransferDirection.CRONOS_TENDERMINT_TO_CRONOS: {
+                    setBridgeTransferDirection(BridgeTransferDirection.CRONOS_TENDERMINT_TO_CRONOS);
                     setIsBridgeValid(true);
 
                     const config = await bridgeService.retrieveBridgeConfig(
-                      BridgeTransferDirection.CRYPTO_ORG_TO_CRONOS,
+                      BridgeTransferDirection.CRONOS_TENDERMINT_TO_CRONOS,
                     );
                     setBridgeConfigs(config);
                     bridgeConfigForm.setFieldsValue(config);
                     setBridgeConfigFields(Object.keys(config));
                     return Promise.resolve();
                   }
-                  case BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG: {
-                    setBridgeTransferDirection(BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG);
+                  case BridgeTransferDirection.CRONOS_TO_CRONOS_TENDERMINT: {
+                    setBridgeTransferDirection(BridgeTransferDirection.CRONOS_TO_CRONOS_TENDERMINT);
                     setIsBridgeValid(true);
 
                     const config = await bridgeService.retrieveBridgeConfig(
-                      BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG,
+                      BridgeTransferDirection.CRONOS_TO_CRONOS_TENDERMINT,
                     );
                     setBridgeConfigs(config);
                     bridgeConfigForm.setFieldsValue(config);
@@ -726,7 +726,7 @@ const CronosBridgeForm: React.FC<CronosBridgeFormProps> = props => {
                   const { bridgeTo } = values;
 
                   switch (bridgeTo) {
-                    case 'CRYPTO_ORG': {
+                    case 'CRONOS_TENDERMINT': {
                       setToAddress(croAsset?.address);
                       form.setFieldsValue({
                         toAddress: croAsset?.address,

@@ -28,7 +28,7 @@ export interface BridgeTransaction {
 }
 
 export enum BridgeSourceChain {
-  CRYPTO_ORG = 'Crypto.org-Chain',
+  CRONOS_TENDERMINT = 'Crypto.org-Chain',
   CRONOS = 'Cronos',
   COSMOS_HUB = 'Cosmos-Hub',
 }

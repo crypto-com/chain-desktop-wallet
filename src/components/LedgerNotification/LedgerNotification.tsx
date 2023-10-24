@@ -30,7 +30,7 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
           const ledgerAddress = await device.getAddress(
             addressIndex,
             addressprefix,
-            asset.config?.tendermintNetwork?.chainName ?? SupportedChainName.CRYPTO_ORG,
+            asset.config?.tendermintNetwork?.chainName ?? SupportedChainName.CRONOS_TENDERMINT,
             derivationPathStandard ?? DerivationPathStandard.BIP44,
             true,
           );
@@ -99,7 +99,7 @@ export function ledgerNotification(wallet: Wallet, asset: UserAsset) {
             {i18n.t('receive.notification.ledgerConnect.description')}
             <br /> -{' '}
             <a
-              href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+              href="https://cronos-pos.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
               target="_blank"
               rel="noreferrer"
             >
@@ -245,7 +245,7 @@ export function ledgerNotificationWithoutCheck(
             {i18n.t('receive.notification.ledgerConnect.description')}
             <br /> -{' '}
             <a
-              href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+              href="https://cronos-pos.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
               target="_blank"
               rel="noreferrer"
             >

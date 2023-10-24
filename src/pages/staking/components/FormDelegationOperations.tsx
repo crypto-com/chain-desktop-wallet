@@ -482,7 +482,7 @@ export const FormDelegationOperations = props => {
               {currentSession.wallet.walletType === LEDGER_WALLET_TYPE ? (
                 <>
                   <a
-                    href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                    href="https://cronos-pos.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
                     target="_blank"
                     rel="noreferrer"
                   >

@@ -127,7 +127,7 @@ export const FormSettings = () => {
     // This wallet level settings update should only imply the primary asset.
     if (
       session.activeAsset?.assetType === UserAssetType.TENDERMINT &&
-      session.activeAsset?.name === SupportedChainName.CRYPTO_ORG
+      session.activeAsset?.name === SupportedChainName.CRONOS_TENDERMINT
     ) {
       await walletService.updateWalletNodeConfig(settingsDataUpdate);
     }

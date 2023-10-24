@@ -109,7 +109,7 @@ export interface WithdrawStakingRewardRequest {
 }
 
 /**
- * Common Wallet authentication parameters for a Crypto.org mainnet transaction
+ * Common Wallet authentication parameters for a Cronos POS Chain mainnet transaction
  */
 export interface BaseTxAuth {
   decryptedPhrase: string;
