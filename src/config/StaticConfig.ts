@@ -3,7 +3,7 @@ import { CroNetwork } from '@crypto-org-chain/chain-jslib/lib/dist/core/cro';
 export const INTERCOM_APP_ID = 'yrt83fbd';
 
 export const APP_DB_NAMESPACE = 'data-store';
-export const MARKET_API_BASE_URL = 'https://crypto.org/api';
+export const MARKET_API_BASE_URL = 'https://cronos-pos.org/api';
 export const COINBASE_TICKER_API_BASE_URL = 'https://api.coinbase.com/v2/';
 export const CRYPTO_COM_PRICE_API_BASE_URL = {
   V1: 'https://price-api.crypto.com/price/v1/',
@@ -11,7 +11,7 @@ export const CRYPTO_COM_PRICE_API_BASE_URL = {
 };
 export const NV_GRAPHQL_API_ENDPOINT = 'https://crypto.com/nft-api/graphql';
 export const IPFS_MIDDLEWARE_SERVER_UPLOAD_ENDPOINT =
-  'https://crypto.org/ipfs-middleware-server/uploads';
+  'https://cronos-pos.org/ipfs-middleware-server/uploads';
 export const NCW_NFT_MIDDLEWARE_SERVER_ENDPOINT =
   'https://cronos.org/ncw-quandra-api-middleware-server';
 export const DEFAULT_CLIENT_MEMO = 'client:chain-desktop-app';

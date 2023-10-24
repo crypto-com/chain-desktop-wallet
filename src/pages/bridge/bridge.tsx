@@ -417,7 +417,7 @@ const CronosBridge = props => {
               })}
               <br />-{' '}
               <a
-                href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                href="https://cronos-pos.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
                 target="_blank"
                 rel="noreferrer"
               >
