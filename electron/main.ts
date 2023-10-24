@@ -141,8 +141,18 @@ function createWindow() {
   // Open default browser when direct to external
   win.webContents.on('new-window', function (e, url) {
     e.preventDefault();
+    if (!isValidURL(url)) {
+      return;
+    }
     require('electron').shell.openExternal(url);
   });
+
+  win.webContents.on('did-start-navigation', function (e, url) {
+    if (!isValidURL(url)) {
+      e.preventDefault();
+      return;
+    }
+  })
 
   // Hot Reloading
   if (isDev) {
@@ -196,6 +206,13 @@ app.on('ready', async function () {
 app.on('web-contents-created', (event, contents) => {
   if (contents.getType() == 'webview') {
     contents.on('will-navigate', (event, url) => {
+      if (!isValidURL(url)) {
+        event.preventDefault();
+      }
+    })
+
+    // bolcks 301/302 redirect if the url is not valid
+    contents.on('will-redirect', (event, url) => {
       if (!isValidURL(url)) {
         event.preventDefault();
       }
