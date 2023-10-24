@@ -430,7 +430,7 @@ function HomeLayout(props: HomeLayoutProps) {
             const newlyUpdatedAsset: UserAsset = {
               ...asset,
               name,
-              description: asset.description.replace('Crypto.org Chain', 'Cronos POS Chain'),
+              description: asset.description.replace('Crypto.org Chain', SupportedChainName.CRONOS_TENDERMINT),
               config: {
                 ...asset.config!,
                 nodeUrl,

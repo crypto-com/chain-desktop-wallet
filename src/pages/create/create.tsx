@@ -1097,12 +1097,12 @@ const FormCreate: React.FC<FormCreateProps> = (props) => {
             className="derivation-path-container"
           >
             <div>
-              Cronos POS Chain
+              {SupportedChainName.CRONOS_TENDERMINT}
               <br />
               <Text type="secondary">{derivationPath.cronosTendermint}</Text>
             </div>
             <div>
-              Cosmos Hub Chain
+              {SupportedChainName.COSMOS_HUB}
               <br />
               <Text type="secondary">{derivationPath.cosmosTendermint}</Text>
             </div>

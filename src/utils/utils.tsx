@@ -140,7 +140,7 @@ export function getCronosTendermintAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
     return (
       asset.mainnetSymbol.toUpperCase() === 'CRO' &&
-      (asset.name.includes('Cronos POS') || asset.name.includes('Crypto.org')) && // lgtm [js/incomplete-url-substring-sanitization]
+      (asset.name.includes(SupportedChainName.CRONOS_TENDERMINT) || asset.name.includes('Crypto.org')) && // lgtm [js/incomplete-url-substring-sanitization]
       asset.assetType === UserAssetType.TENDERMINT
     );
   });

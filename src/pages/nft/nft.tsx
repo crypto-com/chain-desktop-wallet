@@ -594,7 +594,7 @@ const FormMintNft = () => {
         >
           <Input
             maxLength={64}
-            placeholder={`${t('nft.formMintNft.drop.placeholder')} "Cronos POS Chain Genesis"`}
+            placeholder={`${t('nft.formMintNft.drop.placeholder')} "${SupportedChainName.CRONOS_TENDERMINT} Genesis"`}
           />
         </Form.Item>
         <Form.Item
