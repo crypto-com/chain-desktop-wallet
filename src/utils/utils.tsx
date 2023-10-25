@@ -140,7 +140,7 @@ export function getCronosTendermintAsset(walletAllAssets: UserAsset[]) {
   return walletAllAssets.find(asset => {
     return (
       asset.mainnetSymbol.toUpperCase() === 'CRO' &&
-      asset.name.includes('Crypto.org') && // lgtm [js/incomplete-url-substring-sanitization]
+      (asset.name.includes(SupportedChainName.CRONOS_TENDERMINT) || asset.name.includes('Crypto.org')) && // lgtm [js/incomplete-url-substring-sanitization]
       asset.assetType === UserAssetType.TENDERMINT
     );
   });
@@ -209,7 +209,7 @@ export function getChainName(name: string | undefined = '', config: WalletConfig
       case SupportedChainName.ETHEREUM:
         return name.replace('Chain', 'Goerli Testnet');
 
-      case SupportedChainName.CRYPTO_ORG: {
+      case SupportedChainName.CRONOS_TENDERMINT: {
         if(config.network.chainId.indexOf('croeseid-4') !== -1)
           return name.replace('Chain', 'Testnet Croeseid 4');
           

@@ -417,7 +417,7 @@ const CronosBridge = props => {
               })}
               <br />-{' '}
               <a
-                href="https://crypto.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
+                href="https://cronos-pos.org/docs/wallets/ledger_desktop_wallet.html#ledger-connection-troubleshoot"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -933,7 +933,7 @@ const CronosBridge = props => {
                 onFinish={onBridgeConfigUpdate}
               >
                 {bridgeConfigFields.includes('prefix') &&
-                bridgeTransferDirection !== BridgeTransferDirection.CRONOS_TO_CRYPTO_ORG ? (
+                bridgeTransferDirection !== BridgeTransferDirection.CRONOS_TO_CRONOS_TENDERMINT ? (
                     <Form.Item
                       name="prefix"
                       label={t('bridge.config.prefix.title')}

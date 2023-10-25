@@ -103,7 +103,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
   ): Promise<string> {
     if (
       transaction.asset?.config?.tendermintNetwork &&
-      transaction.asset?.config?.tendermintNetwork?.chainName !== SupportedChainName.CRYPTO_ORG
+      transaction.asset?.config?.tendermintNetwork?.chainName !== SupportedChainName.CRONOS_TENDERMINT
     ) {
       const network = transaction.asset?.config?.tendermintNetwork;
 
@@ -510,7 +510,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
     const pubkeyoriginal = (
       await this.signerProvider.getPubKey(
         this.addressIndex,
-        transaction.asset?.config?.tendermintNetwork?.chainName ?? SupportedChainName.CRYPTO_ORG,
+        transaction.asset?.config?.tendermintNetwork?.chainName ?? SupportedChainName.CRONOS_TENDERMINT,
         this.derivationPathStandard,
         false,
       )
@@ -568,7 +568,7 @@ export class LedgerTransactionSigner extends BaseTransactionSigner implements IT
   ): Promise<string> {
     if (
       transaction.originAsset?.config?.tendermintNetwork &&
-      transaction.originAsset?.config?.tendermintNetwork?.chainName !== SupportedChainName.CRYPTO_ORG
+      transaction.originAsset?.config?.tendermintNetwork?.chainName !== SupportedChainName.CRONOS_TENDERMINT
     ) {
       const typeUrlIBCTransfer = '/ibc.applications.transfer.v1.MsgTransfer';
       const network = transaction.originAsset?.config?.tendermintNetwork;

@@ -705,7 +705,7 @@ export class StorageService {
   // eslint-disable-next-line
   public async saveCryptoOrgNFTs(walletId: string, nfts: CryptoOrgNftModel[]) {
     await this.db.nftStore.remove(
-      { walletId, type: NftType.CRYPTO_ORG },
+      { walletId, type: NftType.CRONOS_TENDERMINT },
       { multi: true },
     );
     if (nfts.length !== 0) {
@@ -729,7 +729,7 @@ export class StorageService {
   }
 
   public async retrieveCryptoOrgNfts(walletId: string) {
-    return this.db.nftStore.find<CommonNftModel>({ walletId, type: NftType.CRYPTO_ORG });
+    return this.db.nftStore.find<CommonNftModel>({ walletId, type: NftType.CRONOS_TENDERMINT });
   }
 
   public async retrieveCronosNfts(walletId: string) {

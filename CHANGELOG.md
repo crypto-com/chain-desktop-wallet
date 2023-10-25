@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.4.5] - 2023-10-24
+### Additions
+- Rebranding of Cronos POS Chain
+- Security enhancement & package dependencies bump
 ## [v1.4.4] - 2023-09-21
 ### Additions
 - Security enhancement on DApp Browser

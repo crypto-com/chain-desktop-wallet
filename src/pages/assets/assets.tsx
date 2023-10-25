@@ -318,7 +318,7 @@ const AssetsPage = () => {
       case SupportedChainName.COSMOS_HUB:
         addressPrefix = 'cosmos';
         break;
-      case SupportedChainName.CRYPTO_ORG:
+      case SupportedChainName.CRONOS_TENDERMINT:
       default:
         addressPrefix = 'cro';
     }
