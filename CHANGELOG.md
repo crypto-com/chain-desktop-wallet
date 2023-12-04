@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.4.6] - 2023-12-04
+### Additions
+- Adapt to Christmas Theme
+- Security enhancement & package dependencies bump
+### Bug Fixes
+- Potential app crash on My NFT Page
 ## [v1.4.5] - 2023-10-24
 ### Additions
 - Rebranding of Cronos POS Chain
