@@ -9,7 +9,7 @@
   "main": "build/electron/main.js",
   "private": true,
   "scripts": {
-    "run-audit": "yarn audit-ci --high -a 1005059 1094228 1094439",
+    "run-audit": "yarn audit-ci --high -a 1094894",
     "start": "node scripts/start.js",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 && yarn clean-builds && node scripts/build.js",
     "test": "node scripts/test.js --watchAll=false",
@@ -59,7 +59,7 @@
     "copyfiles": "2.4.1",
     "cosmjs-types": "^0.5.0",
     "cross-env": "7.0.3",
-    "crypto-js": "4.0.0",
+    "crypto-js": "4.2.0",
     "d3": "7.6.1",
     "electron-devtools-installer": "3.1.1",
     "electron-is-dev": "1.2.0",
@@ -393,6 +393,7 @@
     "decode-uri-component": "0.2.2",
     "word-wrap": "1.2.4",
     "@babel/traverse": "7.23.2",
-    "get-func-name": "2.0.0"
+    "get-func-name": "2.0.1",
+    "browserify-sign": "4.2.2"
   }
 }
