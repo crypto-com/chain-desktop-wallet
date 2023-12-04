@@ -50,6 +50,7 @@ import {
   MAX_IMAGE_SIZE,
   MAX_VIDEO_SIZE,
   ThemeColor,
+  SupportedChainName,
 } from '../../config/StaticConfig';
 
 import {
