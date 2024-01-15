@@ -197,6 +197,15 @@ app.on('ready', async function () {
 });
 
 app.on('web-contents-created', (event, contents) => {
+  if (contents.getType() == 'window') {
+    contents.on('will-navigate', (event, url) => {
+      console.log('will-navigate', url)
+      if (!isValidURL(url)) {
+        event.preventDefault();
+      }
+    })
+  }
+
   if (contents.getType() == 'webview') {
     // blocks any new windows from being opened
     contents.on('new-window', (event) => {
