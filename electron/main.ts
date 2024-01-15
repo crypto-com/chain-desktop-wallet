@@ -198,14 +198,21 @@ app.on('ready', async function () {
 
 app.on('web-contents-created', (event, contents) => {
   if (contents.getType() == 'webview') {
+    // blocks any new windows from being opened
+    contents.on('new-window', (event) => {
+      event.preventDefault();
+    })
+
     contents.on('will-navigate', (event, url) => {
+      console.log('will-navigate', url)
       if (!isValidURL(url)) {
         event.preventDefault();
       }
     })
 
-    // bolcks 301/302 redirect if the url is not valid
+    // blocks 301/302 redirect if the url is not valid
     contents.on('will-redirect', (event, url) => {
+      console.log('will-redirect', url)
       if (!isValidURL(url)) {
         event.preventDefault();
       }
