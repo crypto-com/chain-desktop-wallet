@@ -219,6 +219,7 @@ app.on('web-contents-created', (event, contents) => {
       return {action: 'deny'};
     })
     
+    // new-window api deprecated, but still working for now
     contents.on('new-window', (event, url, frameName, disposition, options) => {
       options.webPreferences = {
         ...options.webPreferences,
