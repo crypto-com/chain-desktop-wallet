@@ -160,7 +160,7 @@ function createWindow() {
 
   // DevTools
   installExtension(REACT_DEVELOPER_TOOLS)
-    .then(name => console.log(`Added Extension:  ${name}`))
+    .then()
     .catch(err => console.log('An error occurred: ', err));
 
   if (isDev) {
@@ -197,14 +197,50 @@ app.on('ready', async function () {
 });
 
 app.on('web-contents-created', (event, contents) => {
+  
+  if (contents.getType() == 'window') {
+    contents.on('will-navigate', (event, url) => {
+      if (!isValidURL(url)) {
+        event.preventDefault();
+        return;
+      }
+    })
+  }
+
   if (contents.getType() == 'webview') {
+    // blocks any new windows from being opened
+    contents.setWindowOpenHandler((detail) => {
+
+      if (isValidURL(detail.url)) {
+        return {action: 'allow'};
+      }
+
+      console.log('open url reject, not valid', detail.url);
+      return {action: 'deny'};
+    })
+    
+    // new-window api deprecated, but still working for now
+    contents.on('new-window', (event, url, frameName, disposition, options) => {
+      options.webPreferences = {
+        ...options.webPreferences,
+        javascript: false,
+      };
+      
+      if (!isValidURL(url)) {
+        event.preventDefault();
+        return;
+      }
+
+      require('electron').shell.openExternal(url);
+    })
+
     contents.on('will-navigate', (event, url) => {
       if (!isValidURL(url)) {
         event.preventDefault();
       }
     })
 
-    // bolcks 301/302 redirect if the url is not valid
+    // blocks 301/302 redirect if the url is not valid
     contents.on('will-redirect', (event, url) => {
       if (!isValidURL(url)) {
         event.preventDefault();
