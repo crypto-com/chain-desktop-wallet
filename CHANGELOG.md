@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file.
 *Unreleased*
 
 *Released*
+## [v1.4.7] - 2024-01-16
+### Additions
+- Security enhancement on DApp Browser
 ## [v1.4.6] - 2023-12-04
 ### Additions
 - Adapt to Christmas Theme
