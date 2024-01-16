@@ -202,14 +202,22 @@ app.on('web-contents-created', (event, contents) => {
       console.log('will-navigate', url)
       if (!isValidURL(url)) {
         event.preventDefault();
+        return;
       }
     })
   }
 
   if (contents.getType() == 'webview') {
     // blocks any new windows from being opened
-    contents.on('new-window', (event) => {
+    contents.on('new-window', (event, url, frameName, disposition, options) => {
+      console.log('new-window', frameName, disposition, options)
+      options.webPreferences = {
+        ...options.webPreferences,
+        javascript: false,
+      };
       event.preventDefault();
+      require('electron').shell.openExternal(url);
+      return;
     })
 
     contents.on('will-navigate', (event, url) => {
