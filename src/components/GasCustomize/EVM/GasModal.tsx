@@ -186,7 +186,7 @@ const ModalBody = (props: {
           }}
         >
           <div style={{ color: '#7B849B' }}>{t('estimate-time')}</div>
-          <div>{isUsingCustomGas ? `~1~24 ${t('general.hours').toLowerCase()}` : '6s'}</div>
+          <div>{isUsingCustomGas ? `~1~24 ${t('general.hours').toLowerCase()}` : '30s'}</div>
         </div>
         <Form.Item
           style={{
